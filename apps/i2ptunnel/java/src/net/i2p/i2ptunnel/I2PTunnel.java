@@ -46,6 +46,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -57,6 +58,8 @@ import net.i2p.I2PException;
 import net.i2p.client.I2PClient;
 import net.i2p.client.I2PClientFactory;
 import net.i2p.client.I2PSession;
+import net.i2p.client.I2PSessionException;
+import net.i2p.client.I2PSimpleClient;
 import net.i2p.client.naming.NamingService;
 import net.i2p.data.Base64;
 import net.i2p.data.DataFormatException;
@@ -68,6 +71,7 @@ import net.i2p.i2ptunnel.streamr.StreamrConsumer;
 import net.i2p.i2ptunnel.streamr.StreamrProducer;
 import net.i2p.util.EventDispatcherImpl;
 import net.i2p.util.Log;
+import net.i2p.util.OrderedProperties;
 
 /**
  *  An I2PTunnel tracks one or more I2PTunnelTasks and one or more I2PSessions.
@@ -87,9 +91,9 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
 
     public boolean ownDest = false;
 
-    /** the I2CP port */
+    /** the I2CP port, non-null */
     public String port = System.getProperty(I2PClient.PROP_TCP_PORT, "7654");
-    /** the I2CP host */
+    /** the I2CP host, non-null */
     public String host = System.getProperty(I2PClient.PROP_TCP_HOST, "127.0.0.1");
     /** the listen-on host. Sadly the listen-on port does not have a field. */
     public String listenHost = host;
@@ -168,7 +172,7 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
                 System.out.println("Enter 'help' for help.");
                 BufferedReader r = new BufferedReader(new InputStreamReader(System.in));
                 while (true) {
-                    System.out.print("I2PTunnel>");
+                    System.out.print("I2PTunnel> ");
                     String cmd = r.readLine();
                     if (cmd == null) break;
                     if (cmd.length() <= 0) continue;
@@ -293,6 +297,8 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
             runPing(allargs, l);
         } else if (cmdname.equals("owndest")) {
             runOwnDest(args, l);
+        } else if (cmdname.equals("auth")) {
+            runAuth(args, l);
         } else {
             l.log("Unknown command [" + cmdname + "]");
         }
@@ -308,27 +314,28 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
     private static void runHelp(Logging l) {
         l.log("Command list:");
         // alphabetical please...
-        l.log("client <port> <pubkey>[,<pubkey,...]|file:<pubkeyfile> [<sharedClient>]");
-        l.log("clientoptions[ key=value]*");
-        l.log("close [forced] <jobnumber>|all");
-        l.log("config <i2phost> <i2pport>");
-        l.log("connectclient <port> [<sharedClient>] [<proxy>]");
-        l.log("genkeys <privkeyfile> [<pubkeyfile>]");
-        l.log("gentextkeys");
-        l.log("httpbidirserver <host> <port> <proxyport> <spoofedhost> <privkeyfile>");
-        l.log("httpclient <port> [<sharedClient>] [<proxy>]");
-        l.log("httpserver <host> <port> <spoofedhost> <privkeyfile>");
-        l.log("ircclient <port> <pubkey>[,<pubkey,...]|file:<pubkeyfile> [<sharedClient>]");
-        l.log("list");
-        l.log("listen_on <ip>");
-        l.log("lookup <name>");
-        l.log("owndest yes|no");
-        l.log("ping <args>");
-        l.log("quit");
-        l.log("read_timeout <msecs>");
-        l.log("run <commandfile>");
-        l.log("server <host> <port> <privkeyfile>");
-        l.log("textserver <host> <port> <privkey>");
+        l.log("  auth <username> <password>");
+        l.log("  client <port> <pubkey>[,<pubkey,...]|file:<pubkeyfile> [<sharedClient>]");
+        l.log("  clientoptions [-acx] [key=value ]*");
+        l.log("  close [forced] <jobnumber>|all");
+        l.log("  config [-s] <i2phost> <i2pport>");
+        l.log("  connectclient <port> [<sharedClient>] [<proxy>]");
+        l.log("  genkeys <privkeyfile> [<pubkeyfile>]");
+        l.log("  gentextkeys");
+        l.log("  httpbidirserver <host> <port> <proxyport> <spoofedhost> <privkeyfile>");
+        l.log("  httpclient <port> [<sharedClient>] [<proxy>]");
+        l.log("  httpserver <host> <port> <spoofedhost> <privkeyfile>");
+        l.log("  ircclient <port> <pubkey>[,<pubkey,...]|file:<pubkeyfile> [<sharedClient>]");
+        l.log("  list");
+        l.log("  listen_on <ip>");
+        l.log("  lookup <name>");
+        l.log("  owndest yes|no");
+        l.log("  ping <args>");
+        l.log("  quit");
+        l.log("  read_timeout <msecs>");
+        l.log("  run <commandfile>");
+        l.log("  server <host> <port> <privkeyfile>");
+        l.log("  textserver <host> <port> <privkey>");
     }
     
     /**
@@ -345,14 +352,42 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
      * @param l logger to receive events and output
      */
     public void runClientOptions(String args[], Logging l) {
-        _clientOptions.clear();
-        if (args != null) {
-            for (int i = 0; i < args.length; i++) {
+        if (args != null && args.length > 0) {
+            int i = 0;
+            if (args[0].equals("-a")) {
+                i++;
+            } else if (args[0].equals("-c")) {
+                _clientOptions.clear();
+                l.log("Client options cleared");
+                return;
+            } else if (args[0].equals("-x")) {
+                i++;
+                for ( ; i < args.length; i++) {
+                     if (_clientOptions.remove(args[i]) != null)
+                        l.log("Removed " + args[i]);
+                }
+                return;
+            } else {
+                _clientOptions.clear();
+            }
+            for ( ; i < args.length; i++) {
                 int index = args[i].indexOf('=');
                 if (index <= 0) continue;
                 String key = args[i].substring(0, index);
                 String val = args[i].substring(index+1);
                 _clientOptions.setProperty(key, val);
+            }
+        } else {
+            l.log("Usage:");
+            l.log("  clientoptions [key=value ]*     // sets current options");
+            l.log("  clientoptions -a [key=value ]*  // adds to current options");
+            l.log("  clientoptions -c                // clears current options");
+            l.log("  clientoptions -x [key ]*        // removes listed options");
+            l.log("Current options:");
+            Properties p = new OrderedProperties();
+            p.putAll(_clientOptions);
+            for (Map.Entry<Object, Object> e : p.entrySet()) {
+                l.log("  [" + e.getKey() + "] = [" + e.getValue() + ']');
             }
         }
         notifyEvent("clientoptions_onResult", "ok");
@@ -1147,15 +1182,44 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
      * @param l logger to receive events and output
      */
     private void runConfig(String args[], Logging l) {
-        if (args.length == 2) {
-            host = args[0];
+        if (args.length >= 2) {
+            int i = 0;
+            if (args[0].equals("-s")) {
+                _clientOptions.setProperty("i2cp.SSL", "true");
+                i++;
+            } else {
+                _clientOptions.remove("i2cp.SSL");
+            }
+            host = args[i++];
             listenHost = host;
-            port = args[1];
+            port = args[i];
             notifyEvent("configResult", "ok");
         } else {
-            l.log("config <i2phost> <i2pport>");
+            l.log("Usage:");
+            l.log("  config [-s] <i2phost> <i2pport>");
             l.log("  sets the connection to the i2p router.");
+            l.log("Current setting:");
+            boolean ssl = Boolean.parseBoolean(_clientOptions.getProperty("i2cp.SSL"));
+            l.log("  " + host + ' ' + port + (ssl ? " SSL" : ""));
             notifyEvent("configResult", "error");
+        }
+    }
+
+    /**
+     * Specify the i2cp username and password
+     *
+     * @param args {username, password}
+     * @param l logger to receive events and output
+     * @since 0.9.10
+     */
+    private void runAuth(String args[], Logging l) {
+        if (args.length == 2) {
+            _clientOptions.setProperty("i2cp.username", args[0]);
+            _clientOptions.setProperty("i2cp.password", args[1]);
+        } else {
+            l.log("Usage:");
+            l.log("  auth <username> <password>");
+            l.log("  Sets the i2cp credentials");
         }
     }
 
@@ -1415,16 +1479,19 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
             notifyEvent("lookupResult", "invalidUsage");
         } else {
             try {
-                Destination dest = destFromName(args[0]);
+                boolean ssl = Boolean.parseBoolean(_clientOptions.getProperty("i2cp.SSL"));
+                String user = _clientOptions.getProperty("i2cp.username");
+                String pw = _clientOptions.getProperty("i2cp.password");
+                Destination dest = destFromName(args[0], host, port, ssl, user, pw);
                 if (dest == null) {
-                    l.log("Unknown host");
+                    l.log("Unknown host: " + args[0]);
                     notifyEvent("lookupResult", "unkown host");
                 } else {
                     l.log(dest.toBase64());
                     notifyEvent("lookupResult", dest.toBase64());
                 }
             } catch (DataFormatException dfe) {
-                l.log("Unknown or invalid host");
+                l.log("Unknown or invalid host: " + args[0]);
                 notifyEvent("lookupResult", "invalid host");
             }
         }
@@ -1441,20 +1508,19 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
      */
     private void runPing(String allargs, Logging l) {
         if (allargs.length() != 0) {
-            I2PTunnelTask task;
-            // pings always use the main destination
-            task = new I2Ping(allargs, l, false, this, this);
+            _clientOptions.setProperty(I2Ping.PROP_COMMAND, allargs);
+            I2PTunnelTask task = new I2Ping(l, ownDest, this, this);
             addtask(task);
             notifyEvent("pingTaskId", Integer.valueOf(task.getId()));
         } else {
-            l.log("ping <opts> <dest>");
+            l.log("ping <opts> <b64dest|host>");
             l.log("ping <opts> -h (pings all hosts in hosts.txt)");
             l.log("ping <opts> -l <destlistfile> (pings a list of hosts in a file)");
             l.log("   Options:\n" +
                   "     -c (require 5 consecutive pings to report success)\n" +
                   "     -m maxSimultaneousPings (default 10)\n" +
                   "     -n numberOfPings (default 3)\n" +
-                  "     -t timeout (ms, default 5000)\n");
+                  "     -t timeout (ms, default 30000)\n");
             l.log("   Tests communication with peers.\n");
             notifyEvent("pingTaskId", Integer.valueOf(-1));
         }
@@ -1599,6 +1665,19 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
      * @deprecated Don't use i2ptunnel for lookup! Use I2PAppContext.getGlobalContext().namingService().lookup(name) from i2p.jar
      */
     public static Destination destFromName(String name) throws DataFormatException {
+        return destFromName(name, null, null, false, null, null);
+    }
+
+    /**
+     *  @param i2cpHost may be null
+     *  @param i2cpPort may be null
+     *  @param user may be null
+     *  @param pw may be null
+     *  @since 0.9.10
+     */
+    private static Destination destFromName(String name, String i2cpHost,
+                                            String i2cpPort, boolean isSSL,
+                                            String user, String pw) throws DataFormatException {
 
         if ((name == null) || (name.trim().length() <= 0)) throw new DataFormatException("Empty destination provided");
 
@@ -1642,8 +1721,46 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
             }
         } else {
             // ask naming service
+            name = name.trim();
             NamingService inst = ctx.namingService();
-            return inst.lookup(name);
+            boolean b32 = name.length() == 60 && name.toLowerCase(Locale.US).endsWith(".b32.i2p");
+            Destination d = null;
+            if (ctx.isRouterContext() || !b32) {
+                // Local lookup.
+                // Even though we could do b32 outside router ctx here,
+                // we do it below instead so we can set the host and port,
+                // which we can't do with lookup()
+                d = inst.lookup(name);
+                if (d != null || ctx.isRouterContext() || name.length() >= 516)
+                    return d;
+            }
+            // Outside router context only,
+            // try simple session to ask the router.
+            I2PClient client = new I2PSimpleClient();
+            Properties opts = new Properties();
+            if (i2cpHost != null)
+                opts.put(I2PClient.PROP_TCP_HOST, i2cpHost);
+            if (i2cpPort != null)
+                opts.put(I2PClient.PROP_TCP_PORT, i2cpPort);
+            opts.put("i2cp.SSL", Boolean.toString(isSSL));
+            if (user != null)
+                opts.put("i2cp.username", user);
+            if (pw != null)
+                opts.put("i2cp.password", pw);
+            I2PSession session = null;
+            try {
+                session = client.createSession(null, opts);
+                session.connect();
+                d = session.lookupDest(name);
+            } catch (I2PSessionException ise) {
+                if (log.shouldLog(Log.WARN)) 
+                    log.warn("Lookup via router failed", ise);
+            } finally {
+                if (session != null) {
+                    try { session.destroySession(); } catch (I2PSessionException ise) {}
+                }
+            }
+            return d;
         }
     }
 

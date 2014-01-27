@@ -14,13 +14,20 @@ import java.net.UnknownHostException;
 import java.security.GeneralSecurityException;
 import java.util.Properties;
 
+import net.i2p.CoreVersion;
 import net.i2p.I2PAppContext;
 import net.i2p.data.i2cp.BandwidthLimitsMessage;
 import net.i2p.data.i2cp.DestReplyMessage;
+import net.i2p.data.i2cp.DisconnectMessage;
+import net.i2p.data.i2cp.GetDateMessage;
+import net.i2p.data.i2cp.HostReplyMessage;
 import net.i2p.data.i2cp.I2CPMessageReader;
+import net.i2p.data.i2cp.SetDateMessage;
 import net.i2p.internal.InternalClientManager;
 import net.i2p.internal.QueuedI2CPMessageReader;
 import net.i2p.util.I2PSSLSocketFactory;
+import net.i2p.util.Log;
+import net.i2p.util.OrderedProperties;
 
 /**
  * Create a new session for doing naming and bandwidth queries only. Do not create a Destination.
@@ -68,6 +75,7 @@ class I2PSimpleSession extends I2PSessionImpl2 {
                     // the following may throw an I2PSessionException
                     _queue = mgr.connect();
                     _reader = new QueuedI2CPMessageReader(_queue, this);
+                    _reader.startReading();
                 } else {
                     if (Boolean.parseBoolean(getOptions().getProperty(PROP_ENABLE_SSL))) {
                         try {
@@ -85,14 +93,47 @@ class I2PSimpleSession extends I2PSessionImpl2 {
                     out.write(I2PClient.PROTOCOL_BYTE);
                     out.flush();
                     _writer = new ClientWriterRunner(out, this);
+                    _writer.startWriting();
                     InputStream in = new BufferedInputStream(_socket.getInputStream(), BUF_SIZE);
                     _reader = new I2CPMessageReader(in, this);
+                    _reader.startReading();
                 }
+            }
+            // must be out of synch block for writer to get unblocked
+            if (!_context.isRouterContext()) {
+                Properties opts = getOptions();
+                // Send auth message if required
+                // Auth was not enforced on a simple session until 0.9.11
+                // We will get disconnected for router version < 0.9.11 since it doesn't
+                // support the AuthMessage
+                if ((!opts.containsKey(PROP_USER)) && (!opts.containsKey(PROP_PW))) {
+                    // auto-add auth if not set in the options
+                    String configUser = _context.getProperty(PROP_USER);
+                    String configPW = _context.getProperty(PROP_PW);
+                    if (configUser != null && configPW != null) {
+                        opts.setProperty(PROP_USER, configUser);
+                        opts.setProperty(PROP_PW, configPW);
+                    }
+                }
+                if (opts.containsKey(PROP_USER) && opts.containsKey(PROP_PW)) {
+                    Properties auth = new OrderedProperties();
+                    auth.setProperty(PROP_USER, opts.getProperty(PROP_USER));
+                    auth.setProperty(PROP_PW, opts.getProperty(PROP_PW));
+                    sendMessage(new GetDateMessage(CoreVersion.VERSION, auth));
+                } else {
+                    // we must now send a GetDate even in SimpleSession, or we won't know
+                    // what version we are talking with and cannot use HostLookup
+                    sendMessage(new GetDateMessage(CoreVersion.VERSION));
+                }
+                waitForDate();
             }
             // we do not receive payload messages, so we do not need an AvailabilityNotifier
             // ... or an Idle timer, or a VerifyUsage
-            _reader.startReading();
             success = true;
+            if (_log.shouldLog(Log.INFO))
+                _log.info(getPrefix() + " simple session connected");
+        } catch (InterruptedException ie) {
+            throw new I2PSessionException("Interrupted", ie);
         } catch (UnknownHostException uhe) {
             throw new I2PSessionException(getPrefix() + "Cannot connect to the router on " + _hostname + ':' + _portNum, uhe);
         } catch (IOException ioe) {
@@ -115,9 +156,15 @@ class I2PSimpleSession extends I2PSessionImpl2 {
     private static class SimpleMessageHandlerMap extends I2PClientMessageHandlerMap {
         public SimpleMessageHandlerMap(I2PAppContext context) {
             int highest = Math.max(DestReplyMessage.MESSAGE_TYPE, BandwidthLimitsMessage.MESSAGE_TYPE);
+            highest = Math.max(highest, DisconnectMessage.MESSAGE_TYPE);
+            highest = Math.max(highest, HostReplyMessage.MESSAGE_TYPE);
+            highest = Math.max(highest, SetDateMessage.MESSAGE_TYPE);
             _handlers = new I2CPMessageHandler[highest+1];
             _handlers[DestReplyMessage.MESSAGE_TYPE] = new DestReplyMessageHandler(context);
             _handlers[BandwidthLimitsMessage.MESSAGE_TYPE] = new BWLimitsMessageHandler(context);
+            _handlers[DisconnectMessage.MESSAGE_TYPE] = new DisconnectMessageHandler(context);
+            _handlers[HostReplyMessage.MESSAGE_TYPE] = new HostReplyMessageHandler(context);
+            _handlers[SetDateMessage.MESSAGE_TYPE] = new SetDateMessageHandler(context);
         }
     }
 }

@@ -109,7 +109,13 @@ class PacketQueue {
                 options.setTagsToSend(INITIAL_TAGS_TO_SEND);
                 options.setTagThreshold(MIN_TAG_THRESHOLD);
             } else if (packet.isFlagSet(FLAGS_FINAL_TAGS)) {
-                options.setSendLeaseSet(false);
+                if (packet.isFlagSet(Packet.FLAG_ECHO)) {
+                    // Send LS for PING, not for PONG
+                    if (packet.getSendStreamId() <= 0)  // pong
+                        options.setSendLeaseSet(false);
+                } else {
+                    options.setSendLeaseSet(false);
+                }
                 options.setTagsToSend(FINAL_TAGS_TO_SEND);
                 options.setTagThreshold(FINAL_TAG_THRESHOLD);
             } else {

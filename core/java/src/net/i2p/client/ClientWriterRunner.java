@@ -8,10 +8,12 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
+import net.i2p.I2PAppContext;
 import net.i2p.data.i2cp.I2CPMessage;
 import net.i2p.data.i2cp.I2CPMessageException;
 import net.i2p.internal.PoisonI2CPMessage;
 import net.i2p.util.I2PAppThread;
+import net.i2p.util.Log;
 
 /**
  * Copied from net.i2p.router.client
@@ -25,15 +27,24 @@ class ClientWriterRunner implements Runnable {
     private final I2PSessionImpl _session;
     private final BlockingQueue<I2CPMessage> _messagesToWrite;
     private static final AtomicLong __Id = new AtomicLong();
+    //private final Log _log = I2PAppContext.getGlobalContext().logManager().getLog(ClientWriterRunner.class);
 
     private static final int MAX_QUEUE_SIZE = 32;
     private static final long MAX_SEND_WAIT = 10*1000;
     
-    /** starts the thread too */
+    /**
+     *  As of 0.9.11 does not start the thread, caller must call startWriting()
+     */
     public ClientWriterRunner(OutputStream out, I2PSessionImpl session) {
         _out = new BufferedOutputStream(out);
         _session = session;
         _messagesToWrite = new LinkedBlockingQueue<I2CPMessage>(MAX_QUEUE_SIZE);
+    }
+
+    /**
+     *  @since 0.9.11
+     */
+    public void startWriting() {
         Thread t = new I2PAppThread(this, "I2CP Client Writer " + __Id.incrementAndGet(), true);
         t.start();
     }
@@ -76,7 +87,8 @@ class ClientWriterRunner implements Runnable {
             // only thread, we don't need synchronized
             try {
                 msg.writeMessage(_out);
-                _out.flush();
+                if (_messagesToWrite.isEmpty())
+                    _out.flush();
             } catch (I2CPMessageException ime) {
                 _session.propogateError("Error writing out the message", ime);
                 _session.disconnect();

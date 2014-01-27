@@ -110,7 +110,7 @@ public class I2CPMessageReader {
          * reader
          *
 	 * @param reader I2CPMessageReader to notify
-	 * @param error Exception that was thrown
+	 * @param error Exception that was thrown, non-null
 	 */
         public void readError(I2CPMessageReader reader, Exception error);
 

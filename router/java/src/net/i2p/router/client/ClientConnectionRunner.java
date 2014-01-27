@@ -335,12 +335,14 @@ class ClientConnectionRunner {
      *  This is always bad.
      *  See ClientMessageEventListener.handleCreateSession()
      *  for why we don't send a SessionStatusMessage when we do this.
+     *  @param reason will be truncated to 255 bytes
      */
     void disconnectClient(String reason) {
         disconnectClient(reason, Log.ERROR);
     }
 
     /**
+     * @param reason will be truncated to 255 bytes
      * @param logLevel e.g. Log.WARN
      * @since 0.8.2
      */
@@ -351,6 +353,8 @@ class ClientConnectionRunner {
                      + " config: "
                      + _config);
         DisconnectMessage msg = new DisconnectMessage();
+        if (reason.length() > 255)
+            reason = reason.substring(0, 255);
         msg.setReason(reason);
         try {
             doSend(msg);

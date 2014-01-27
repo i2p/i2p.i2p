@@ -19,13 +19,16 @@ import java.net.UnknownHostException;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import net.i2p.CoreVersion;
 import net.i2p.I2PAppContext;
+import net.i2p.data.Base32;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
@@ -35,6 +38,7 @@ import net.i2p.data.SigningPrivateKey;
 import net.i2p.data.i2cp.DestLookupMessage;
 import net.i2p.data.i2cp.GetBandwidthLimitsMessage;
 import net.i2p.data.i2cp.GetDateMessage;
+import net.i2p.data.i2cp.HostLookupMessage;
 import net.i2p.data.i2cp.I2CPMessage;
 import net.i2p.data.i2cp.I2CPMessageReader;
 import net.i2p.data.i2cp.MessagePayloadMessage;
@@ -46,6 +50,7 @@ import net.i2p.util.I2PAppThread;
 import net.i2p.util.I2PSSLSocketFactory;
 import net.i2p.util.LHMCache;
 import net.i2p.util.Log;
+import net.i2p.util.OrderedProperties;
 import net.i2p.util.SimpleTimer;
 import net.i2p.util.VersionComparator;
 
@@ -98,12 +103,13 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
 
     /** hashes of lookups we are waiting for */
     protected final LinkedBlockingQueue<LookupWaiter> _pendingLookups = new LinkedBlockingQueue<LookupWaiter>();
+    private final AtomicInteger _lookupID = new AtomicInteger();
     protected final Object _bwReceivedLock = new Object();
     protected volatile int[] _bwLimits;
     
     protected final I2PClientMessageHandlerMap _handlerMap;
     
-    /** used to seperate things out so we can get rid of singletons */
+    /** used to separate things out so we can get rid of singletons */
     protected final I2PAppContext _context;
 
     /** monitor for waiting until a lease set has been granted */
@@ -114,6 +120,8 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
      */
     protected enum State {
         OPENING,
+        /** @since 0.9.11 */
+        GOTDATE,
         OPEN,
         CLOSING,
         CLOSED
@@ -121,11 +129,6 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
 
     private State _state = State.CLOSED;
     protected final Object _stateLock = new Object();
-
-    /** have we received the current date from the router yet? */
-    private volatile boolean _dateReceived;
-    /** lock that we wait upon, that the SetDateMessageHandler notifies */
-    private final Object _dateReceivedLock = new Object();
 
     /** 
      * thread that we tell when new messages are available who then tells us 
@@ -139,14 +142,20 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     private boolean _isReduced;
     private final boolean _fastReceive;
     private volatile boolean _routerSupportsFastReceive;
+    private volatile boolean _routerSupportsHostLookup;
 
     /**
+     *  Since 0.9.11, key is either a Hash or a String
      *  @since 0.8.9
      */
-    private static final Map<Hash, Destination> _lookupCache = new LHMCache<Hash, Destination>(16);
+    private static final Map<Object, Destination> _lookupCache = new LHMCache<Object, Destination>(16);
+    private static final String MIN_HOST_LOOKUP_VERSION = "0.9.11";
+    private static final boolean TEST_LOOKUP = false;
 
     /** SSL interface (only) @since 0.8.3 */
     protected static final String PROP_ENABLE_SSL = "i2cp.SSL";
+    protected static final String PROP_USER = "i2cp.username";
+    protected static final String PROP_PW = "i2cp.password";
 
     private static final long VERIFY_USAGE_TIME = 60*1000;
 
@@ -159,9 +168,15 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
         _routerSupportsFastReceive = _context.isRouterContext() ||
                                      (routerVersion != null && routerVersion.length() > 0 &&
                                       VersionComparator.comp(routerVersion, MIN_FAST_VERSION) >= 0);
-        _dateReceived = true;
-        synchronized (_dateReceivedLock) {
-            _dateReceivedLock.notifyAll();
+        _routerSupportsHostLookup = _context.isRouterContext() ||
+                                    TEST_LOOKUP ||
+                                     (routerVersion != null && routerVersion.length() > 0 &&
+                                      VersionComparator.comp(routerVersion, MIN_HOST_LOOKUP_VERSION) >= 0);
+        synchronized (_stateLock) {
+            if (_state == State.OPENING) {
+                _state = State.GOTDATE;
+                _stateLock.notifyAll();
+            }
         }
     }
 
@@ -205,6 +220,8 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
             _privateKey = null;
             _signingPrivateKey = null;
         }
+        _routerSupportsFastReceive = _context.isRouterContext();
+        _routerSupportsHostLookup = _context.isRouterContext();
     }
 
     /**
@@ -239,12 +256,12 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
         // auto-add auth if required, not set in the options, and we are not in the same JVM
         if ((!_context.isRouterContext()) &&
             _context.getBooleanProperty("i2cp.auth") &&
-            ((!opts.containsKey("i2cp.username")) || (!opts.containsKey("i2cp.password")))) {
-            String configUser = _context.getProperty("i2cp.username");
-            String configPW = _context.getProperty("i2cp.password");
+            ((!opts.containsKey(PROP_USER)) || (!opts.containsKey(PROP_PW)))) {
+            String configUser = _context.getProperty(PROP_USER);
+            String configPW = _context.getProperty(PROP_PW);
             if (configUser != null && configPW != null) {
-                options.setProperty("i2cp.username", configUser);
-                options.setProperty("i2cp.password", configPW);
+                options.setProperty(PROP_USER, configUser);
+                options.setProperty(PROP_PW, configPW);
             }
         }
         if (options.getProperty(I2PClient.PROP_FAST_RECEIVE) == null)
@@ -399,6 +416,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
                         loop = false;
                         break;
                     case OPENING:
+                    case GOTDATE:
                         wasOpening = true;
                         try {
                             _stateLock.wait(10*1000);
@@ -455,6 +473,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
                     out.write(I2PClient.PROTOCOL_BYTE);
                     out.flush();
                     _writer = new ClientWriterRunner(out, this);
+                    _writer.startWriting();
                     InputStream in = new BufferedInputStream(_socket.getInputStream(), BUF_SIZE);
                     _reader = new I2CPMessageReader(in, this);
                 }
@@ -462,26 +481,23 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
             if (_log.shouldLog(Log.DEBUG)) _log.debug(getPrefix() + "before startReading");
             _reader.startReading();
             if (_log.shouldLog(Log.DEBUG)) _log.debug(getPrefix() + "Before getDate");
-            sendMessage(new GetDateMessage(CoreVersion.VERSION));
-            if (_log.shouldLog(Log.DEBUG)) _log.debug(getPrefix() + "After getDate / begin waiting for a response");
-            int waitcount = 0;
-            while (!_dateReceived) {
-                if (waitcount++ > 30) {
-                    throw new IOException("No handshake received from the router");
-                }
-                synchronized (_dateReceivedLock) {
-                    // InterruptedException caught below
-                    _dateReceivedLock.wait(1000);
-                }
+            Properties auth = null;
+            if ((!_context.isRouterContext()) && _options.containsKey(PROP_USER) && _options.containsKey(PROP_PW)) {
+                // Only supported by routers 0.9.11 or higher, but we don't know the version yet.	
+                // Auth will also be sent in the SessionConfig.
+                auth = new OrderedProperties();
+                auth.setProperty(PROP_USER, _options.getProperty(PROP_USER));
+                auth.setProperty(PROP_PW, _options.getProperty(PROP_PW));
             }
-            if (_log.shouldLog(Log.DEBUG)) _log.debug(getPrefix() + "After received a SetDate response");
+            sendMessage(new GetDateMessage(CoreVersion.VERSION, auth));
+            waitForDate();
 
             if (_log.shouldLog(Log.DEBUG)) _log.debug(getPrefix() + "Before producer.connect()");
             _producer.connect(this);
             if (_log.shouldLog(Log.DEBUG)) _log.debug(getPrefix() + "After producer.connect()");
 
             // wait until we have created a lease set
-            waitcount = 0;
+            int waitcount = 0;
             while (_leaseSet == null) {
                 if (waitcount++ > 5*60) {
                     throw new IOException("No tunnels built after waiting 5 minutes. Your network connection may be down, or there is severe network congestion.");
@@ -522,6 +538,28 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
                 }
             }
         }
+    }
+
+    /**
+     *  @since 0.9.11 moved from connect()
+     */
+    protected void waitForDate() throws InterruptedException, IOException {
+            if (_log.shouldLog(Log.DEBUG)) _log.debug(getPrefix() + "After getDate / begin waiting for a response");
+            int waitcount = 0;
+            while (true) {
+                if (waitcount++ > 30) {
+                    throw new IOException("No handshake received from the router");
+                }
+                synchronized(_stateLock) {
+                    if (_state == State.GOTDATE)
+                        break;
+                    if (_state != State.OPENING)
+                        throw new IOException("Socket closed");
+                    // InterruptedException caught by caller
+                    _stateLock.wait(1000);
+                }
+            }
+            if (_log.shouldLog(Log.DEBUG)) _log.debug(getPrefix() + "After received a SetDate response");
     }
 
     /**
@@ -890,13 +928,16 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
      * Will interrupt a connect in progress.
      */
     protected void disconnect() {
+        State oldState;
         synchronized(_stateLock) {
             if (_state == State.CLOSING || _state == State.CLOSED)
                 return;
+            oldState = _state;
             changeState(State.CLOSING);
         }
         if (_log.shouldLog(Log.DEBUG)) _log.debug(getPrefix() + "Disconnect() called", new Exception("Disconnect"));
-        if (shouldReconnect()) {
+        // don't try to reconnect if it failed before GETTDATE
+        if (oldState != State.OPENING && shouldReconnect()) {
             if (reconnect()) {
                 if (_log.shouldLog(Log.INFO)) _log.info(getPrefix() + "I2CP reconnection successful");
                 return;
@@ -963,14 +1004,17 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
         return buf.toString();
     }
 
-    /** called by the message handler */
+    /**
+     *  Called by the message handler
+     *  on reception of DestReplyMessage
+     */
     void destReceived(Destination d) {
         Hash h = d.calculateHash();
         synchronized (_lookupCache) {
             _lookupCache.put(h, d);
         }
         for (LookupWaiter w : _pendingLookups) {
-            if (w.hash.equals(h)) {
+            if (h.equals(w.hash)) {
                 w.destination = d;
                 synchronized (w) {
                     w.notifyAll();
@@ -979,10 +1023,52 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
         }
     }
 
-    /** called by the message handler */
+    /**
+     *  Called by the message handler
+     *  on reception of DestReplyMessage
+     */
     void destLookupFailed(Hash h) {
         for (LookupWaiter w : _pendingLookups) {
-            if (w.hash.equals(h)) {
+            if (h.equals(w.hash)) {
+                synchronized (w) {
+                    w.notifyAll();
+                }
+            }
+        }
+    }
+
+    /**
+     *  Called by the message handler
+     *  on reception of HostReplyMessage
+     *  @since 0.9.11
+     */
+    void destReceived(long nonce, Destination d) {
+        // notify by hash
+        destReceived(d);
+        // notify by nonce
+        for (LookupWaiter w : _pendingLookups) {
+            if (nonce == w.nonce) {
+                w.destination = d;
+                if (w.name != null) {
+                    synchronized (_lookupCache) {
+                        _lookupCache.put(w.name, d);
+                    }
+                }
+                synchronized (w) {
+                    w.notifyAll();
+                }
+            }
+        }
+    }
+
+    /**
+     *  Called by the message handler
+     *  on reception of HostReplyMessage
+     *  @since 0.9.11
+     */
+    void destLookupFailed(long nonce) {
+        for (LookupWaiter w : _pendingLookups) {
+            if (nonce == w.nonce) {
                 synchronized (w) {
                     w.notifyAll();
                 }
@@ -1003,13 +1089,31 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
      *  @since 0.8.3
      */
     private static class LookupWaiter {
-        /** the request */
+        /** the request (Hash mode) */
         public final Hash hash;
+        /** the request (String mode) */
+        public final String name;
+        /** the request (nonce mode) */
+        public final long nonce;
         /** the reply */
         public volatile Destination destination;
 
         public LookupWaiter(Hash h) {
+            this(h, -1);
+        }
+
+        /** @since 0.9.11 */
+        public LookupWaiter(Hash h, long nonce) {
             this.hash = h;
+            this.name = null;
+            this.nonce = nonce;
+        }
+
+        /** @since 0.9.11 */
+        public LookupWaiter(String name, long nonce) {
+            this.hash = null;
+            this.name = name;
+            this.nonce = nonce;
         }
     }
 
@@ -1037,12 +1141,119 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
             if (rv != null)
                 return rv;
         }
-        if (isClosed())
+        if (isClosed()) {
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Session closed, cannot lookup " + h);
             return null;
-        LookupWaiter waiter = new LookupWaiter(h);
+        }
+        LookupWaiter waiter;
+        long nonce;
+        if (_routerSupportsHostLookup) {
+            nonce = _lookupID.incrementAndGet() & 0x7fffffff;
+            waiter = new LookupWaiter(h, nonce);
+        } else {
+            nonce = 0; // won't be used
+            waiter = new LookupWaiter(h);
+        }
         _pendingLookups.offer(waiter);
         try {
-            sendMessage(new DestLookupMessage(h));
+            if (_routerSupportsHostLookup) {
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Sending HostLookup for " + h);
+                SessionId id = _sessionId;
+                if (id == null)
+                    id = new SessionId(65535);
+                sendMessage(new HostLookupMessage(id, h, nonce, maxWait));
+            } else {
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Sending DestLookup for " + h);
+                sendMessage(new DestLookupMessage(h));
+            }
+            try {
+                synchronized (waiter) {
+                    waiter.wait(maxWait);
+                }
+            } catch (InterruptedException ie) {
+                throw new I2PSessionException("Interrupted", ie);
+            }
+        } finally {
+            _pendingLookups.remove(waiter);
+        }
+        return waiter.destination;
+    }
+
+    /**
+     *  Ask the router to lookup a Destination by host name.
+     *  Blocking. Waits a max of 10 seconds by default.
+     *
+     *  This only makes sense for a b32 hostname, OR outside router context.
+     *  Inside router context, just query the naming service.
+     *  Outside router context, this does NOT query the context naming service.
+     *  Do that first if you expect a local addressbook.
+     *
+     *  This will log a warning for non-b32 in router context.
+     *
+     *  See interface for suggested implementation.
+     *
+     *  Requires router side to be 0.9.11 or higher. If the router is older,
+     *  this will return null immediately.
+     *
+     *  @since 0.9.11
+     */
+    public Destination lookupDest(String name) throws I2PSessionException {
+        return lookupDest(name, 10*1000);
+    }
+
+    /**
+     *  Ask the router to lookup a Destination by host name.
+     *  Blocking. See above for details.
+     *  @param maxWait ms
+     *  @since 0.9.11
+     *  @return null on failure
+     */
+    public Destination lookupDest(String name, long maxWait) throws I2PSessionException {
+        if (name.length() == 0)
+            return null;
+        // Shortcut for b64
+        if (name.length() >= 516) {
+            try {
+                return new Destination(name);
+            } catch (DataFormatException dfe) {
+                return null;
+            }
+        }
+        // won't fit in Mapping
+        if (name.length() >= 256 && !_context.isRouterContext())
+            return null;
+        synchronized (_lookupCache) {
+            Destination rv = _lookupCache.get(name);
+            if (rv != null)
+                return rv;
+        }
+        if (isClosed()) {
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Session closed, cannot lookup " + name);
+            return null;
+        }
+        if (!_routerSupportsHostLookup) {
+            // do them a favor and convert to Hash lookup
+            if (name.length() == 60 && name.toLowerCase(Locale.US).endsWith(".b32.i2p"))
+                return lookupDest(Hash.create(Base32.decode(name.toLowerCase(Locale.US).substring(0, 52))), maxWait);
+            // else unsupported
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Router does not support HostLookup for " + name);
+            return null;
+        }
+        int nonce = _lookupID.incrementAndGet() & 0x7fffffff;
+        LookupWaiter waiter = new LookupWaiter(name, nonce);
+        _pendingLookups.offer(waiter);
+        try {
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Sending HostLookup for " + name);
+            SessionId id = _sessionId;
+            if (id == null)
+                id = new SessionId(65535);
+            sendMessage(new HostLookupMessage(id, name, nonce, maxWait));
             try {
                 synchronized (waiter) {
                     waiter.wait(maxWait);

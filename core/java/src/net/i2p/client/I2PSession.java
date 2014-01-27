@@ -214,12 +214,75 @@ public interface I2PSession {
     public Destination lookupDest(Hash h) throws I2PSessionException;
 
     /**
+     *  Lookup a Destination by Hash.
      *  Blocking.
      *  @param maxWait ms
      *  @since 0.8.3
      *  @return null on failure
      */
     public Destination lookupDest(Hash h, long maxWait) throws I2PSessionException;
+
+    /**
+     *  Ask the router to lookup a Destination by host name.
+     *  Blocking. Waits a max of 10 seconds by default.
+     *
+     *  This only makes sense for a b32 hostname, OR outside router context.
+     *  Inside router context, just query the naming service.
+     *  Outside router context, this does NOT query the context naming service.
+     *  Do that first if you expect a local addressbook.
+     *
+     *  This will log a warning for non-b32 in router context.
+     *
+     *  Suggested implementation:
+     *
+     *<pre>
+     *  if (name.length() == 60 && name.toLowerCase(Locale.US).endsWith(".b32.i2p")) {
+     *      if (session != null)
+     *          return session.lookup(Hash.create(Base32.decode(name.toLowerCase(Locale.US).substring(0, 52))));
+     *      else
+     *          return ctx.namingService().lookup(name); // simple session for xxx.b32.i2p handled by naming service (optional if you need lookup w/o an existing session)
+     *  } else if (ctx.isRouterContext()) {
+     *      return ctx.namingService().lookup(name); // hostname from router's naming service
+     *  } else {
+     *      Destination d = ctx.namingService().lookup(name); // local naming svc, optional
+     *      if (d != null)
+     *          return d;
+     *      if (session != null)
+     *          return session.lookup(name);
+     *      // simple session (optional if you need lookup w/o an existing session)
+     *      Destination rv = null;
+     *      I2PClient client = new I2PSimpleClient();
+     *      Properties opts = new Properties();
+     *      opts.put(I2PClient.PROP_TCP_HOST, host);
+     *      opts.put(I2PClient.PROP_TCP_PORT, port);
+     *      I2PSession session = null;
+     *      try {
+     *          session = client.createSession(null, opts);
+     *          session.connect();
+     *          rv = session.lookupDest(name);
+     *      } finally {
+     *          if (session != null)
+     *              session.destroySession();
+     *      }
+     *      return rv;
+     *  }
+     *</pre>
+     *
+     *  Requires router side to be 0.9.11 or higher. If the router is older,
+     *  this will return null immediately.
+     *
+     *  @since 0.9.11
+     */
+    public Destination lookupDest(String name) throws I2PSessionException;
+
+    /**
+     *  Ask the router to lookup a Destination by host name.
+     *  Blocking. See above for details.
+     *  @param maxWait ms
+     *  @since 0.9.11
+     *  @return null on failure
+     */
+    public Destination lookupDest(String name, long maxWait) throws I2PSessionException;
 
     /**
      *  Pass updated options to the router.

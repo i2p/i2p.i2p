@@ -6,69 +6,70 @@ package net.i2p.i2ptunnel;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
+import net.i2p.client.I2PSession;
+import net.i2p.client.I2PSessionException;
 import net.i2p.client.streaming.I2PSocketManager;
 import net.i2p.data.Destination;
 import net.i2p.util.EventDispatcher;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 
-public class I2Ping extends I2PTunnelTask implements Runnable {
-    private final static Log _log = new Log(I2Ping.class);
+/**
+ *  Warning - not necessarily a stable API.
+ *  Used by I2PTunnel CLI only. Consider this sample code.
+ *  Not for use outside this package.
+ */
+public class I2Ping extends I2PTunnelClientBase {
 
-    private int PING_COUNT = 3;
+    public static final String PROP_COMMAND = "command";
+
+    private static final int PING_COUNT = 3;
     private static final int CPING_COUNT = 5;
-    private static final int PING_TIMEOUT = 5000;
+    private static final int PING_TIMEOUT = 30*1000;
 
     private static final long PING_DISTANCE = 1000;
 
     private int MAX_SIMUL_PINGS = 10; // not really final...
 
-    private boolean countPing = false;
-    private boolean reportTimes = true;
 
-    private I2PSocketManager sockMgr;
-    private Logging l;
-    private boolean finished = false;
-    private String command;
-    private long timeout = PING_TIMEOUT;
+    private volatile boolean finished;
 
     private final Object simulLock = new Object();
-    private int simulPings = 0;
-    private long lastPingTime = 0;
+    private int simulPings;
+    private long lastPingTime;
 
-    private final Object lock = new Object(), slock = new Object();
-
-    //public I2Ping(String cmd, Logging l,
-    //		  boolean ownDest) {
-    //	I2Ping(cmd, l, (EventDispatcher)null);
-    //}
-
-    public I2Ping(String cmd, Logging l, boolean ownDest, EventDispatcher notifyThis, I2PTunnel tunnel) {
-        super("I2Ping [" + cmd + "]", notifyThis, tunnel);
-        this.l = l;
-        command = cmd;
-        synchronized (slock) {
-            if (ownDest) {
-                sockMgr = I2PTunnelClient.buildSocketManager(tunnel);
-            } else {
-                sockMgr = I2PTunnelClient.getSocketManager(tunnel);
-            }
+    /**
+     *  tunnel.getOptions must contain "command".
+     *  @throws IllegalArgumentException if it doesn't
+     */
+    public I2Ping(Logging l, boolean ownDest, EventDispatcher notifyThis, I2PTunnel tunnel) {
+        super(-1, ownDest, l, notifyThis, "I2Ping", tunnel);
+        if (!tunnel.getClientOptions().containsKey(PROP_COMMAND)) {
+            // todo clean up
+            throw new IllegalArgumentException("Options does not contain " + PROP_COMMAND);
         }
-        Thread t = new I2PAppThread(this);
-        t.setName("Client");
-        t.start();
-        open = true;
     }
 
+    /**
+     *  Overrides super. No client ServerSocket is created.
+     */
+    @Override
     public void run() {
+        // Notify constructor that port is ready
+        synchronized (this) {
+            listenerReady = true;
+            notify();
+        }
         l.log("*** I2Ping results:");
         try {
-            runCommand(command);
+            runCommand(getTunnel().getClientOptions().getProperty(PROP_COMMAND));
         } catch (InterruptedException ex) {
             l.log("*** Interrupted");
             _log.error("Pinger interrupted", ex);
@@ -76,13 +77,15 @@ public class I2Ping extends I2PTunnelTask implements Runnable {
             _log.error("Pinger exception", ex);
         }
         l.log("*** Finished.");
-        synchronized (lock) {
-            finished = true;
-        }
+        finished = true;
         close(false);
     }
 
     public void runCommand(String cmd) throws InterruptedException, IOException {
+      long timeout = PING_TIMEOUT;
+      int count = PING_COUNT;
+      boolean countPing = false;
+      boolean reportTimes = true;
       while (true) {
         if (cmd.startsWith("-t ")) { // timeout
             cmd = cmd.substring(3);
@@ -92,6 +95,9 @@ public class I2Ping extends I2PTunnelTask implements Runnable {
                 return;
             } else {
                 timeout = Long.parseLong(cmd.substring(0, pos));
+                // convenience, convert msec to sec
+                if (timeout < 100)
+                    timeout *= 1000;
                 cmd = cmd.substring(pos + 1);
             }
         } else if (cmd.startsWith("-m ")) { // max simultaneous pings
@@ -111,11 +117,12 @@ public class I2Ping extends I2PTunnelTask implements Runnable {
                 l.log("Syntax error");
                 return;
             } else {
-                PING_COUNT = Integer.parseInt(cmd.substring(0, pos));
+                count = Integer.parseInt(cmd.substring(0, pos));
                 cmd = cmd.substring(pos + 1);
             }
         } else if (cmd.startsWith("-c ")) { // "count" ping
             countPing = true;
+            count = CPING_COUNT;
             cmd = cmd.substring(3);
         } else if (cmd.equals("-h")) { // ping all hosts
             cmd = "-l hosts.txt";
@@ -131,7 +138,9 @@ public class I2Ping extends I2PTunnelTask implements Runnable {
                 if (line.indexOf("=") != -1) { // maybe file is hosts.txt?
                     line = line.substring(0, line.indexOf("="));
                 }
-                pingHandlers.add(new PingHandler(line));
+                PingHandler ph = new PingHandler(line, count, timeout, countPing, reportTimes);
+                ph.start();
+                pingHandlers.add(ph);
                 if (++i > 1)
                     reportTimes = false;
             }
@@ -140,28 +149,28 @@ public class I2Ping extends I2PTunnelTask implements Runnable {
                 t.join();
             return;
         } else {
-            Thread t = new PingHandler(cmd);
+            Thread t = new PingHandler(cmd, count, timeout, countPing, reportTimes);
+            t.start();
             t.join();
             return;
         }
       }
     }
 
+    @Override
     public boolean close(boolean forced) {
         if (!open) return true;
-        synchronized (lock) {
-            if (!forced && !finished) {
-                l.log("There are still pings running!");
-                return false;
-            }
-            l.log("Closing pinger " + toString());
-            l.log("Pinger closed.");
-            open = false;
-            return true;
+        super.close(forced);
+        if (!forced && !finished) {
+            l.log("There are still pings running!");
+            return false;
         }
+        l.log("Closing pinger " + toString());
+        l.log("Pinger closed.");
+        return true;
     }
 
-    public boolean ping(Destination dest) throws I2PException {
+    private boolean ping(Destination dest, long timeout) throws I2PException {
         try {
             synchronized (simulLock) {
                 while (simulPings >= MAX_SIMUL_PINGS) {
@@ -186,33 +195,48 @@ public class I2Ping extends I2PTunnelTask implements Runnable {
         }
     }
 
-    public class PingHandler extends I2PAppThread {
-        private String destination;
+    /**
+     *  Does nothing.
+     *  @since 0.9.10
+     */
+    protected void clientConnectionRun(Socket s) {}
 
-        public PingHandler(String dest) {
+    private class PingHandler extends I2PAppThread {
+        private final String destination;
+        private final int cnt;
+        private final long timeout;
+        private final boolean countPing;
+        private final boolean reportTimes;
+
+        /**
+         *  As of 0.9.10, does NOT start itself.
+         *  Caller must call start()
+         *  @param dest b64 or b32 or host name
+         */
+        public PingHandler(String dest, int count, long timeout, boolean countPings, boolean report) {
             this.destination = dest;
+            cnt = count;
+            this.timeout = timeout;
+            countPing = countPings;
+            reportTimes = report;
             setName("PingHandler for " + dest);
-            start();
         }
 
         @Override
         public void run() {
             try {
-                Destination dest = I2PAppContext.getGlobalContext().namingService().lookup(destination);
+                Destination dest = lookup(destination);
                 if (dest == null) {
-                    synchronized (lock) { // Logger is not thread safe
-                        l.log("Unresolvable: " + destination + "");
-                    }
+                    l.log("Unresolvable: " + destination);
                     return;
                 }
                 int pass = 0;
                 int fail = 0;
                 long totalTime = 0;
-                int cnt = countPing ? CPING_COUNT : PING_COUNT;
                 StringBuilder pingResults = new StringBuilder(2 * cnt + destination.length() + 3);
                 for (int i = 0; i < cnt; i++) {
                     boolean sent;
-                    sent = ping(dest);
+                    sent = ping(dest, timeout);
                     if (countPing) {
                         if (!sent) {
                             pingResults.append(i).append(" ");
@@ -244,11 +268,34 @@ public class I2Ping extends I2PTunnelTask implements Runnable {
                     pingResults.append("and ").append(fail).append(" lost for destination: ");
                 }
                 pingResults.append("  ").append(destination);
-                synchronized (lock) { // Logger is not thread safe
-                    l.log(pingResults.toString());
-                }
+                l.log(pingResults.toString());
             } catch (I2PException ex) {
                 _log.error("Error pinging " + destination, ex);
+            }
+        }
+
+        /**
+         *  @param name b64 or b32 or host name
+         *  @since 0.9.10
+         */
+        private Destination lookup(String name) {
+            I2PAppContext ctx = I2PAppContext.getGlobalContext();
+            boolean b32 = name.length() == 60 && name.toLowerCase(Locale.US).endsWith(".b32.i2p");
+            if (ctx.isRouterContext() && !b32) {
+                // Local lookup.
+                // Even though we could do b32 outside router ctx here,
+                // we do it below instead so we can use the session,
+                // which we can't do with lookup()
+                Destination dest = ctx.namingService().lookup(name);
+                if (dest != null || ctx.isRouterContext() || name.length() >= 516)
+                    return dest;
+            }
+            try {
+                I2PSession sess = sockMgr.getSession();
+                return sess.lookupDest(name);
+            } catch (I2PSessionException ise) {
+                _log.error("Error looking up " + name, ise);
+                return null;
             }
         }
     }
