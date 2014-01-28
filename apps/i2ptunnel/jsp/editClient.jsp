@@ -434,6 +434,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
             </div>
          <% } %>
            
+         <% if (editBean.isAdvanced()) { %>
             <div id="tunnelOptionsField" class="rowItem">
                 <label>
                     <%=intl._("Signature type")%>
@@ -462,6 +463,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
             <div class="subdivider">
                 <hr />
             </div>
+         <% } // isAdvanced %>>
 
          <% if ("httpclient".equals(tunnelType) || "connectclient".equals(tunnelType) || "sockstunnel".equals(tunnelType) || "socksirctunnel".equals(tunnelType)) { %>
             <div id="accessField" class="rowItem">

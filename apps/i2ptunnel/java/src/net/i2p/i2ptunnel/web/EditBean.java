@@ -351,6 +351,11 @@ public class EditBean extends IndexBean {
         return Addresses.getAllAddresses();
     }
 
+    /** @since 0.9.11 */
+    public boolean isAdvanced() {
+        return _context.getBooleanProperty("routerconsole.advanced");
+    }
+
     public String getI2CPHost(int tunnel) {
         if (_context.isRouterContext())
             return _("internal");

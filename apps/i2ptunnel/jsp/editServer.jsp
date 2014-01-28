@@ -536,6 +536,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
             </div>
 <% **********************/ %>
 
+         <% if (editBean.isAdvanced()) { %>
             <div id="tunnelOptionsField" class="rowItem">
                 <label>
                     <%=intl._("Signature type")%>
@@ -564,6 +565,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
             <div class="subdivider">
                 <hr />
             </div>
+         <% } // isAdvanced %>>
                  
             <div id="customOptionsField" class="rowItem">
                 <label for="customOptions" accesskey="u">
