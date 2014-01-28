@@ -104,10 +104,10 @@ public final class ByteCache {
     }
 
     /** list of available and available entries */
-    private Queue<ByteArray> _available;
+    private volatile Queue<ByteArray> _available;
     private int _maxCached;
     private final int _entrySize;
-    private long _lastOverflow;
+    private volatile long _lastOverflow;
     
     /** do we actually want to cache? Warning - setting to false may NPE, this should be fixed or removed */
     private static final boolean _cache = true;
