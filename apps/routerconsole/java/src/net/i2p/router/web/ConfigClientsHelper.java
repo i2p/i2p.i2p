@@ -122,7 +122,7 @@ public class ConfigClientsHelper extends HelperBase {
                        // show stop button
                        showStop,
                        // show delete button, show start button
-                       true, showStart);
+                       !isConsole, showStart);
         }
         
         if ("new".equals(_edit))
