@@ -1,5 +1,6 @@
-2014-01-28 zzz
+2014-01-28 zzz, dg
  * I2CP: Use client tunnels for b32 lookups (ticket #1166)
+ * I2PSnark: Make 'kitty.png' transparent
 
 2014-01-27 zzz
 Prop from i2p.i2p.zzz.i2cp:
