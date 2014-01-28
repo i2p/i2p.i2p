@@ -70,7 +70,7 @@ public class TunnelPoolSettings {
     /** expl only */
     private static final int    DEFAULT_IB_EXPL_LENGTH = 2;
     private static final int    DEFAULT_OB_EXPL_LENGTH = 2;
-    private static final int    DEFAULT_IB_EXPL_LENGTH_VARIANCE = 0;
+    private static final int    DEFAULT_IB_EXPL_LENGTH_VARIANCE = isSlow ? 0 : 1;
     private static final int    DEFAULT_OB_EXPL_LENGTH_VARIANCE = isSlow ? 0 : 1;
 
     public static final boolean DEFAULT_ALLOW_ZERO_HOP = true;
