@@ -182,7 +182,10 @@ class ClientConnectionRunner {
         //_manager = null;
     }
     
-    /** current client's config */
+    /**
+     *  Current client's config,
+     *  will be null before session is established
+     */
     public SessionConfig getConfig() { return _config; }
 
     /**
@@ -209,6 +212,10 @@ class ClientConnectionRunner {
     public LeaseSet getLeaseSet() { return _currentLeaseSet; }
     void setLeaseSet(LeaseSet ls) { _currentLeaseSet = ls; }
 
+    /**
+     *  Equivalent to getConfig().getDestination().calculateHash();
+     *  will be null before session is established
+     */
     public Hash getDestHash() { return _destHashCache; }
     
     /** current client's sessionId */

@@ -29,21 +29,24 @@ class LookupDestJob extends JobImpl {
     private final Hash _hash;
     private final String _name;
     private final SessionId _sessID;
+    private final Hash _fromLocalDest;
 
     private static final long DEFAULT_TIMEOUT = 15*1000;
 
-    public LookupDestJob(RouterContext context, ClientConnectionRunner runner, Hash h) {
-        this(context, runner, -1, DEFAULT_TIMEOUT, null, h, null);
+    public LookupDestJob(RouterContext context, ClientConnectionRunner runner, Hash h, Hash fromLocalDest) {
+        this(context, runner, -1, DEFAULT_TIMEOUT, null, h, null, fromLocalDest);
     }
 
     /**
      *  One of h or name non-null
      *  @param reqID must be >= 0 if name != null
      *  @param sessID must non-null if reqID >= 0
+     *  @param fromLocalDest use these tunnels for the lookup, or null for exploratory
      *  @since 0.9.11
      */
     public LookupDestJob(RouterContext context, ClientConnectionRunner runner,
-                         long reqID, long timeout, SessionId sessID, Hash h, String name) {
+                         long reqID, long timeout, SessionId sessID, Hash h, String name,
+                         Hash fromLocalDest) {
         super(context);
         if ((h == null && name == null) ||
             (h != null && name != null) ||
@@ -54,6 +57,7 @@ class LookupDestJob extends JobImpl {
         _reqID = reqID;
         _timeout = timeout;
         _sessID = sessID;
+        _fromLocalDest = fromLocalDest;
         if (name != null && name.length() == 60) {
             // convert a b32 lookup to a hash lookup
             String nlc = name.toLowerCase(Locale.US);
@@ -84,7 +88,7 @@ class LookupDestJob extends JobImpl {
                 returnFail();
         } else {
             DoneJob done = new DoneJob(getContext());
-            getContext().netDb().lookupLeaseSet(_hash, done, done, _timeout);
+            getContext().netDb().lookupLeaseSet(_hash, done, done, _timeout, _fromLocalDest);
         }
     }
 

@@ -222,7 +222,7 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
         _runner.sessionEstablished(cfg);
 
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("after sessionEstablished for " + message.getSessionConfig().getDestination().calculateHash().toBase64());
+            _log.debug("after sessionEstablished for " + _runner.getDestHash());
         startCreateSessionJob();
     }
     
@@ -355,7 +355,7 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
         }
         if (_log.shouldLog(Log.INFO))
             _log.info("New lease set granted for destination " 
-                      + message.getLeaseSet().getDestination().calculateHash().toBase64());
+                      + _runner.getDestHash());
 
         // leaseSetCreated takes care of all the LeaseRequestState stuff (including firing any jobs)
         _runner.leaseSetCreated(message.getLeaseSet());
@@ -363,7 +363,8 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
 
     /** override for testing */
     protected void handleDestLookup(DestLookupMessage message) {
-        _context.jobQueue().addJob(new LookupDestJob(_context, _runner, message.getHash()));
+        _context.jobQueue().addJob(new LookupDestJob(_context, _runner, message.getHash(),
+                                                     _runner.getDestHash()));
     }
 
     /**
@@ -373,7 +374,8 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
     protected void handleHostLookup(HostLookupMessage message) {
         _context.jobQueue().addJob(new LookupDestJob(_context, _runner, message.getReqID(),
                                                      message.getTimeout(), message.getSessionId(),
-                                                     message.getHash(), message.getHostname()));
+                                                     message.getHash(), message.getHostname(),
+                                                     _runner.getDestHash()));
     }
 
     /**
@@ -394,7 +396,7 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
             return;
         }
         _runner.getConfig().getOptions().putAll(message.getSessionConfig().getOptions());
-        Hash dest = _runner.getConfig().getDestination().calculateHash();
+        Hash dest = _runner.getDestHash();
         ClientTunnelSettings settings = new ClientTunnelSettings(dest);
         Properties props = new Properties();
         props.putAll(_runner.getConfig().getOptions());
