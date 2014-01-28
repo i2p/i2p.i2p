@@ -69,7 +69,7 @@ public final class I2PDatagramDissector {
             // read destination
             rxDest = Destination.create(dgStream);
             SigType type = rxDest.getSigningPublicKey().getType();
-            if (type != null)
+            if (type == null)
                 throw new DataFormatException("unsupported sig type");
             rxSign = new Signature(type);
             // read signature
