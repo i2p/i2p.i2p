@@ -171,6 +171,12 @@ class StoreJob extends JobImpl {
                     if (_log.shouldLog(Log.INFO))
                         _log.info(getJobId() + ": Skipping router that doesn't support key certs " + peer + " : " + ds);
                     _state.addSkipped(peer);
+                } else if (_state.getData().getType() == DatabaseEntry.KEY_TYPE_LEASESET &&
+                           ((LeaseSet)_state.getData()).getLeaseCount() > 6 &&
+                           !supportsBigLeaseSets((RouterInfo)ds)) {
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info(getJobId() + ": Skipping router that doesn't support big leasesets " + peer + " : " + ds);
+                    _state.addSkipped(peer);
                 } else {
                     int peerTimeout = _facade.getPeerTimeout(peer);
 
@@ -506,6 +512,19 @@ class StoreJob extends JobImpl {
         if (v == null)
             return false;
         return VersionComparator.comp(v, MIN_KEYCERT_VERSION) >= 0;
+    }
+
+    private static final String MIN_BIGLEASESET_VERSION = "0.9";
+
+    /**
+     * Does he support more than 6 leasesets?
+     * @since 0.9.11
+     */
+    private static boolean supportsBigLeaseSets(RouterInfo ri) {
+        String v = ri.getOption("router.version");
+        if (v == null)
+            return false;
+        return VersionComparator.comp(v, MIN_BIGLEASESET_VERSION) >= 0;
     }
 
     /**
