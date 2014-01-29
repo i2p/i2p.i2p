@@ -88,6 +88,7 @@ public class Reseeder {
               "https://reseed.info/"  + "," +
               "https://reseed.pkol.de/" + "," +
               "https://uk.reseed.i2p2.no/" + "," +
+              "https://i2p-netdb.innovatio.no/" + "," +
               "https://ieb9oopo.mooo.com";
               // Temp disabled since h2ik have been AWOL since 06-03-2013
               //"https://i2p.feared.eu/";
