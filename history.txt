@@ -1,3 +1,6 @@
+2014-01-30 zzz
+ * InboundMessageDistributor: Set reply flag on LeaseSets
+
 2014-01-28 zzz
  * /configclients: Add link to plugins.i2p; don't show delete button for console
  * Tunnels: Change expl. IB default to 2 + 0-1

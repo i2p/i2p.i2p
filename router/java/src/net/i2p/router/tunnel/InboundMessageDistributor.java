@@ -2,6 +2,7 @@ package net.i2p.router.tunnel;
 
 import net.i2p.data.DatabaseEntry;
 import net.i2p.data.Hash;
+import net.i2p.data.LeaseSet;
 import net.i2p.data.Payload;
 import net.i2p.data.TunnelId;
 import net.i2p.data.i2np.DataMessage;
@@ -77,23 +78,29 @@ class InboundMessageDistributor implements GarlicMessageReceiver.CloveReceiver {
                 msg = newMsg;
             }
         } else if ( (_client != null) && 
-             (type == DatabaseStoreMessage.MESSAGE_TYPE) &&
-             (((DatabaseStoreMessage)msg).getEntry().getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO)) {
-            // FVSJ may result in an unsolicited RI store if the peer went non-ff.
-            // Maybe we can figure out a way to handle this safely, so we don't ask him again.
-            // For now, just hope we eventually find out through other means.
-            // Todo: if peer was ff and RI is not ff, queue for exploration in netdb (but that isn't part of the facade now)
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Dropping DSM down a tunnel for " + _client + ": " + msg);
-            return;
+                    (type == DatabaseStoreMessage.MESSAGE_TYPE)) {
+            DatabaseStoreMessage dsm = (DatabaseStoreMessage) msg;
+            if (dsm.getEntry().getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO) {
+                // FVSJ may result in an unsolicited RI store if the peer went non-ff.
+                // Maybe we can figure out a way to handle this safely, so we don't ask him again.
+                // For now, just hope we eventually find out through other means.
+                // Todo: if peer was ff and RI is not ff, queue for exploration in netdb (but that isn't part of the facade now)
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Dropping DSM down a tunnel for " + _client + ": " + msg);
+                return;
+            } else if (dsm.getReplyToken() != 0) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Dropping LS DSM w/ reply token down a tunnel for " + _client + ": " + msg);
+                return;
+            } else {
+                // allow DSM of our own key (used by FloodfillVerifyStoreJob)
+                // or other keys (used by IterativeSearchJob)
+                // as long as there's no reply token (we will never set a reply token but an attacker might)
+                ((LeaseSet)dsm.getEntry()).setReceivedAsReply();
+            }
         } else if ( (_client != null) && 
              (type != DeliveryStatusMessage.MESSAGE_TYPE) &&
              (type != GarlicMessage.MESSAGE_TYPE) &&
-             // allow DSM of our own key (used by FloodfillVerifyStoreJob)
-             // or other keys (used by IterativeSearchJob)
-             // as long as there's no reply token (we will never set a reply token but an attacker might)
-             ((type != DatabaseStoreMessage.MESSAGE_TYPE) ||
-              (((DatabaseStoreMessage)msg).getReplyToken() != 0)) &&
              (type != TunnelBuildReplyMessage.MESSAGE_TYPE) &&
              (type != VariableTunnelBuildReplyMessage.MESSAGE_TYPE)) {
             // drop it, since we should only get tunnel test messages and garlic messages down
@@ -192,6 +199,7 @@ class InboundMessageDistributor implements GarlicMessageReceiver.CloveReceiver {
                                     // Or, it's a normal LS bundled with data and a MessageStatusMessage.
 
                                     // ... and inject it.
+                                    ((LeaseSet)dsm.getEntry()).setReceivedAsReply();
                                     if (_log.shouldLog(Log.INFO))
                                         _log.info("Storing garlic LS down tunnel for: " + dsm.getKey() + " sent to: " + _client);
                                     _context.inNetMessagePool().add(dsm, null, null);
