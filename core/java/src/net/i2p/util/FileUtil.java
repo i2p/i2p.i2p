@@ -370,8 +370,9 @@ public class FileUtil {
                 }
             }
             StringBuilder buf = new StringBuilder(lines.size() * 80);
-            for (int i = 0; i < lines.size(); i++)
-                buf.append((String)lines.get(i)).append('\n');
+            for (int i = 0; i < lines.size(); i++) {
+                buf.append(lines.get(i)).append('\n');
+            }
             return buf.toString();
         } catch (IOException ioe) {
             return null;

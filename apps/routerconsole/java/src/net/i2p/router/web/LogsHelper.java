@@ -1,6 +1,11 @@
 package net.i2p.router.web;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import net.i2p.I2PAppContext;
@@ -71,10 +76,17 @@ public class LogsHelper extends HelperBase {
 
     public String getServiceLogs() {
         File f = wrapperLogFile(_context);
-        String str = FileUtil.readTextFile(f.getAbsolutePath(), 250, false);
-        if (str == null) 
+        String str;
+        if (_context.hasWrapper()) {
+            // platform encoding
+            str = readTextFile(f, 250);
+        } else {
+            // UTF-8
+            str = FileUtil.readTextFile(f.getAbsolutePath(), 250, false);
+        }
+        if (str == null) {
             return "<p>" + _("File not found") + ": <b><code>" + f.getAbsolutePath() + "</code></b></p>";
-        else {
+        } else {
             str = str.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
             return "<p>" + _("File location") + ": <b><code>" + f.getAbsolutePath() + "</code></b></p><pre>" + str + "</pre>";
         }
@@ -135,5 +147,46 @@ public class LogsHelper extends HelperBase {
         buf.append("</ul>\n");
         
         return buf.toString();
+    }
+
+    /**
+     * Read in the last few lines of a (newline delimited) textfile, or null if
+     * the file doesn't exist.  
+     *
+     * Same as FileUtil.readTextFile but uses platform encoding,
+     * not UTF-8, since the wrapper log cannot be configured:
+     * http://stackoverflow.com/questions/14887690/how-do-i-get-the-tanuki-wrapper-log-files-to-be-utf-8-encoded
+     *
+     * Warning - this inefficiently allocates a StringBuilder of size maxNumLines*80,
+     *           so don't make it too big.
+     * Warning - converts \r\n to \n
+     *
+     * @param maxNumLines max number of lines (greater than zero)
+     * @return string or null; does not throw IOException.
+     * @since 0.9.11 modded from FileUtil.readTextFile()
+     */
+    private static String readTextFile(File f, int maxNumLines) {
+        if (!f.exists()) return null;
+        FileInputStream fis = null;
+        try {
+            fis = new FileInputStream(f);
+            BufferedReader in = new BufferedReader(new InputStreamReader(fis));
+            List<String> lines = new ArrayList<String>(maxNumLines);
+            String line = null;
+            while ( (line = in.readLine()) != null) {
+                lines.add(line);
+                if (lines.size() >= maxNumLines)
+                    lines.remove(0);
+            }
+            StringBuilder buf = new StringBuilder(lines.size() * 80);
+            for (int i = 0; i < lines.size(); i++) {
+                buf.append(lines.get(i)).append('\n');
+            }
+            return buf.toString();
+        } catch (IOException ioe) {
+            return null;
+        } finally {
+            if (fis != null) try { fis.close(); } catch (IOException ioe) {}
+        }
     }
 }
