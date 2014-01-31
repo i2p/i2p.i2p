@@ -13,13 +13,11 @@ import java.net.Socket;
 import java.util.Properties;
 
 import net.i2p.i2ptunnel.I2PTunnelHTTPClientBase;
-import net.i2p.util.Log;
 
 /**
  * Factory class for creating SOCKS forwarders through I2P
  */
 public class SOCKSServerFactory {
-    private final static Log _log = new Log(SOCKSServerFactory.class);
 
     private final static String ERR_REQUEST_DENIED =
         "HTTP/1.1 403 Access Denied - This is a SOCKS proxy, not a HTTP proxy\r\n" +
@@ -71,7 +69,7 @@ public class SOCKSServerFactory {
                 throw new SOCKSException("SOCKS protocol version not supported (" + Integer.toHexString(socksVer) + ")");
             }
         } catch (IOException e) {
-            _log.debug("error reading SOCKS protocol version");
+            //_log.debug("error reading SOCKS protocol version");
             throw new SOCKSException("Connection error (" + e.getMessage() + ")");
         }
 

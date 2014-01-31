@@ -2,6 +2,7 @@ package net.i2p.i2ptunnel.socks;
 
 import java.util.Map;
 
+import net.i2p.I2PAppContext;
 import net.i2p.data.Destination;
 import net.i2p.i2ptunnel.udp.*;
 import net.i2p.util.Log;
@@ -11,7 +12,6 @@ import net.i2p.util.Log;
  * @author zzz modded from streamr/MultiSource
  */
 public class MultiSink<S extends Sink> implements Source, Sink {
-    private static final Log _log = new Log(MultiSink.class);
 
     public MultiSink(Map<Destination, S> cache) {
         this.cache = cache;
@@ -25,7 +25,8 @@ public class MultiSink<S extends Sink> implements Source, Sink {
     public void send(Destination from, byte[] data) {
         Sink s = this.cache.get(from);
         if (s == null) {
-            _log.error("No where to go for " + from.calculateHash().toBase64().substring(0, 6));
+            Log log = I2PAppContext.getGlobalContext().logManager().getLog(MultiSink.class);
+            log.error("No where to go for " + from.calculateHash().toBase64().substring(0, 6));
             return;
         }
         s.send(from, data);

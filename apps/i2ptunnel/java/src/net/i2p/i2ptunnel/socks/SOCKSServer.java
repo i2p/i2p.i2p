@@ -10,7 +10,6 @@ import java.net.Socket;
 import java.util.Properties;
 
 import net.i2p.client.streaming.I2PSocket;
-import net.i2p.util.Log;
 
 /**
  * Abstract base class used by all SOCKS servers.
@@ -18,7 +17,6 @@ import net.i2p.util.Log;
  * @author human
  */
 public abstract class SOCKSServer {
-    private static final Log _log = new Log(SOCKSServer.class);
 
     private static final String PROP_MAPPING_PREFIX = "ipmapping.";
 

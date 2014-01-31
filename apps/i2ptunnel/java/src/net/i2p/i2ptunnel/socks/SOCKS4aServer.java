@@ -32,10 +32,10 @@ import net.i2p.util.Log;
  * @author zzz modded from SOCKS5Server
  */
 public class SOCKS4aServer extends SOCKSServer {
-    private static final Log _log = new Log(SOCKS4aServer.class);
+    private final Log _log;
 
-    private Socket clientSock = null;
-    private boolean setupCompleted = false;
+    private final Socket clientSock;
+    private boolean setupCompleted;
 
     /**
      * Create a SOCKS4a server that communicates with the client using
@@ -51,6 +51,7 @@ public class SOCKS4aServer extends SOCKSServer {
     public SOCKS4aServer(Socket clientSock, Properties props) {
         this.clientSock = clientSock;
         this.props = props;
+        _log = I2PAppContext.getGlobalContext().logManager().getLog(SOCKS4aServer.class);
     }
 
     public Socket getClientSocket() throws SOCKSException {

@@ -11,7 +11,6 @@ import net.i2p.util.Log;
  * @author zzz
  */
 public class ReplyTracker<S extends Sink> implements Source, Sink {
-    private static final Log _log = new Log(MultiSink.class);
 
     public ReplyTracker(S reply, Map<Destination, S> cache) {
         this.reply = reply;

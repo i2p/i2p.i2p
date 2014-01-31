@@ -2,6 +2,7 @@ package net.i2p.i2ptunnel.socks;
 
 import java.util.Map;
 
+import net.i2p.I2PAppContext;
 import net.i2p.data.Destination;
 import net.i2p.i2ptunnel.udp.*;
 import net.i2p.util.Log;
@@ -13,7 +14,6 @@ import net.i2p.util.Log;
  * @author zzz
  */
 public class SOCKSUDPUnwrapper implements Source, Sink {
-    private static final Log _log = new Log(SOCKSUDPUnwrapper.class);
 
     /**
      * @param cache put headers here to pass to SOCKSUDPWrapper
@@ -36,13 +36,15 @@ public class SOCKSUDPUnwrapper implements Source, Sink {
         try {
             h = new SOCKSHeader(data);
         } catch (IllegalArgumentException iae) {
-            _log.error(iae.toString());
+            Log log = I2PAppContext.getGlobalContext().logManager().getLog(SOCKSUDPUnwrapper.class);
+            log.error(iae.toString());
             return;
         }
         Destination dest = h.getDestination();
         if (dest == null) {
             // no, we aren't going to send non-i2p traffic to a UDP outproxy :)
-            _log.error("Destination not found: " + h.getHost());
+            Log log = I2PAppContext.getGlobalContext().logManager().getLog(SOCKSUDPUnwrapper.class);
+            log.error("Destination not found: " + h.getHost());
             return;
         }
 

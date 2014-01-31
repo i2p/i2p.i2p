@@ -37,7 +37,7 @@ import net.i2p.util.Log;
  * @author human
  */
 public class SOCKS5Server extends SOCKSServer {
-    private static final Log _log = new Log(SOCKS5Server.class);
+    private final Log _log;
 
     private static final int SOCKS_VERSION_5 = 0x05;
 
@@ -63,6 +63,7 @@ public class SOCKS5Server extends SOCKSServer {
                     Boolean.parseBoolean(props.getProperty(I2PTunnelHTTPClientBase.PROP_AUTH)) &&
                     props.containsKey(I2PTunnelHTTPClientBase.PROP_USER) &&
                     props.containsKey(I2PTunnelHTTPClientBase.PROP_PW);
+        _log = I2PAppContext.getGlobalContext().logManager().getLog(SOCKS5Server.class);
     }
 
     public Socket getClientSocket() throws SOCKSException {
