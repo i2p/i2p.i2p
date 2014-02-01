@@ -1,9 +1,9 @@
 <html><body>
-<p>Implements a TCP-like (reliable, authenticated, in order) set of sockets for 
+<p>API, interfaces, and factory for a TCP-like (reliable, authenticated, in order) set of sockets for 
 communicating over the IP-like (unreliable, unauthenticated, unordered) I2P
 messages.
 Note that this class is split across two jars, streaming.jar and ministreaming.jar.
-The interfaces and some very old code are in ministreaming.jar, but the
+The interfaces are in ministreaming.jar, but the
 real work gets done in streaming.jar. Clients must have both jars
 in their classpath.
 Most clients will require (only) streaming.jar, ministreaming.jar, and i2p.jar
@@ -23,7 +23,10 @@ net.i2p.client.streaming.I2PServerSocket#accept} method, which will provide an
 application wants to create a new stream to a peer, it should do so with the
 appropriate {@link net.i2p.client.streaming.I2PSocketManager#connect} call.</p>
 
-<p>There is a simple pair of demo applications available as well -
+<p>This package also contains the I2PSocketEepGet utility, which is an HTTP client
+that uses an existing I2PSocketManager.</p>
+
+<p>There is a simple pair of demo applications available in the test directory -
 net.i2p.client.streaming.StreamSinkServer listens to a destination and dumps 
 the data from all sockets it accepts to individual files, while
 net.i2p.client.streaming.StreamSinkClient connects to a particular destination
