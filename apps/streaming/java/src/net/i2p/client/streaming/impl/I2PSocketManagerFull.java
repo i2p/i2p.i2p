@@ -148,13 +148,41 @@ public class I2PSocketManagerFull implements I2PSocketManager {
      * Ping the specified peer, returning true if they replied to the ping within 
      * the timeout specified, false otherwise.  This call blocks.
      *
+     * Uses the ports from the default options.
      * 
      * @param peer
-     * @param timeoutMs
+     * @param timeoutMs timeout in ms, greater than zero
      * @return true on success, false on failure
+     * @throws IllegalArgumentException
      */
     public boolean ping(Destination peer, long timeoutMs) {
-        return _connectionManager.ping(peer, timeoutMs);
+        if (timeoutMs <= 0)
+            throw new IllegalArgumentException("bad timeout");
+        return _connectionManager.ping(peer, _defaultOptions.getLocalPort(),
+                                       _defaultOptions.getPort(), timeoutMs);
+    }
+
+    /**
+     * Ping the specified peer, returning true if they replied to the ping within 
+     * the timeout specified, false otherwise.  This call blocks.
+     *
+     * Uses the ports specified.
+     *
+     * @param peer Destination to ping
+     * @param localPort 0 - 65535
+     * @param remotePort 0 - 65535
+     * @param timeoutMs timeout in ms, greater than zero
+     * @return success or failure
+     * @throws IllegalArgumentException
+     * @since 0.9.12
+     */
+    public boolean ping(Destination peer, int localPort, int remotePort, long timeoutMs) {
+        if (localPort < 0 || localPort > 65535 ||
+            remotePort < 0 || remotePort > 65535)
+            throw new IllegalArgumentException("bad port");
+        if (timeoutMs <= 0)
+            throw new IllegalArgumentException("bad timeout");
+        return _connectionManager.ping(peer, localPort, remotePort, timeoutMs);
     }
 
     /**

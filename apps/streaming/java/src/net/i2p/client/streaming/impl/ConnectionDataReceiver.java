@@ -206,9 +206,9 @@ class ConnectionDataReceiver implements MessageOutputStream.DataReceiver {
             packet.setFlag(Packet.FLAG_SYNCHRONIZE);
             packet.setOptionalFrom(con.getSession().getMyDestination());
             packet.setOptionalMaxSize(con.getOptions().getMaxMessageSize());
-            packet.setLocalPort(con.getLocalPort());
-            packet.setRemotePort(con.getPort());
         }
+        packet.setLocalPort(con.getLocalPort());
+        packet.setRemotePort(con.getPort());
         if (con.getSendStreamId() == Packet.STREAM_ID_UNKNOWN) {
             packet.setFlag(Packet.FLAG_NO_ACK);
         }

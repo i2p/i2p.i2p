@@ -307,6 +307,8 @@ class Connection {
         reply.setSendStreamId(_sendStreamId);
         reply.setReceiveStreamId(_receiveStreamId);
         reply.setOptionalFrom(_connectionManager.getSession().getMyDestination());
+        reply.setLocalPort(_localPort);
+        reply.setRemotePort(_remotePort);
         // this just sends the packet - no retries or whatnot
         if (_outboundQueue.enqueue(reply)) {
             _unackedPacketsReceived = 0;

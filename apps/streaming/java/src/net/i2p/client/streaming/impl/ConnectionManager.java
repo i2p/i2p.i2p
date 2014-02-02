@@ -262,6 +262,8 @@ class ConnectionManager {
             reply.setSendStreamId(synPacket.getReceiveStreamId());
             reply.setReceiveStreamId(0);
             reply.setOptionalFrom(_session.getMyDestination());
+            reply.setLocalPort(synPacket.getLocalPort());
+            reply.setRemotePort(synPacket.getRemotePort());
             // this just sends the packet - no retries or whatnot
             _outboundQueue.enqueue(reply);
             return null;
@@ -282,6 +284,44 @@ class ConnectionManager {
         
         _context.statManager().addRateData("stream.connectionReceived", 1, 0);
         return con;
+    }
+    
+    /**
+     *  Process a ping by checking for throttling, etc., then sending a pong.
+     *
+     *  @param con null if unknown
+     *  @param ping Ping packet to process, must have From and Sig fields,
+     *              with signature already verified, only if answerPings() returned true
+     *  @return true if we sent a pong
+     *  @since 0.9.12 from PacketHandler.receivePing()
+     */
+    public boolean receivePing(Connection con, Packet ping) {
+        Destination dest = ping.getOptionalFrom();
+        if (dest == null)
+            return false;
+        if (con == null) {
+            // Use the same throttling as for connections
+            String why = shouldRejectConnection(ping);
+            if (why != null) {
+                if ((!_defaultOptions.getDisableRejectLogging()) || _log.shouldLog(Log.WARN))
+                    _log.logAlways(Log.WARN, "Dropping ping since peer is " + why + ": " + dest.calculateHash());
+                return false;
+            }
+        } else {
+            // in-connection ping to a 3rd party ???
+            if (!dest.equals(con.getRemotePeer())) {
+                _log.logAlways(Log.WARN, "Dropping ping from " + con.getRemotePeer().calculateHash() +
+                                         " to " + dest.calculateHash());
+                return false;
+            }
+        }
+        PacketLocal pong = new PacketLocal(_context, dest);
+        pong.setFlag(Packet.FLAG_ECHO | Packet.FLAG_NO_ACK);
+        pong.setReceiveStreamId(ping.getSendStreamId());
+        pong.setLocalPort(ping.getLocalPort());
+        pong.setRemotePort(ping.getRemotePort());
+        _outboundQueue.enqueue(pong);
+        return true;
     }
     
     private static final long DEFAULT_STREAM_DELAY_MAX = 10*1000;
@@ -572,24 +612,34 @@ class ConnectionManager {
             return new HashSet<Connection>(_connectionByInboundId.values());
     }
 
-    /** blocking */
-    public boolean ping(Destination peer, long timeoutMs) {
-        return ping(peer, timeoutMs, true, null);
-    }
-    public boolean ping(Destination peer, long timeoutMs, boolean blocking) {
-        return ping(peer, timeoutMs, blocking, null);
+    /**
+     *  blocking
+     *
+     *  @param timeoutMs greater than zero
+     *  @return true if pong received
+     *  @since 0.9.12 added port args
+     */
+    public boolean ping(Destination peer, int fromPort, int toPort, long timeoutMs) {
+        return ping(peer, fromPort, toPort, timeoutMs, true, null);
     }
 
     /**
-     * @deprecated I2PSession ignores tags, use non-tag variant
-     * @param keyToUse ignored
-     * @param tagsToSend ignored
+     *  @param timeoutMs greater than zero
+     *  @return true if blocking and pong received
+     *  @since 0.9.12 added port args
      */
-    public boolean ping(Destination peer, long timeoutMs, boolean blocking, SessionKey keyToUse, Set<?> tagsToSend, PingNotifier notifier) {
-        return ping(peer, timeoutMs, blocking, notifier);
+    public boolean ping(Destination peer, int fromPort, int toPort, long timeoutMs, boolean blocking) {
+        return ping(peer, fromPort, toPort, timeoutMs, blocking, null);
     }
 
-    public boolean ping(Destination peer, long timeoutMs, boolean blocking, PingNotifier notifier) {
+    /**
+     *  @param timeoutMs greater than zero
+     *  @param notifier may be null
+     *  @return true if blocking and pong received
+     *  @since 0.9.12 added port args
+     */
+    public boolean ping(Destination peer, int fromPort, int toPort, long timeoutMs,
+                        boolean blocking, PingNotifier notifier) {
         Long id = Long.valueOf(_context.random().nextLong(Packet.MAX_STREAM_ID-1)+1);
         PacketLocal packet = new PacketLocal(_context, peer);
         packet.setSendStreamId(id.longValue());
@@ -597,13 +647,15 @@ class ConnectionManager {
                        Packet.FLAG_NO_ACK |
                        Packet.FLAG_SIGNATURE_INCLUDED);
         packet.setOptionalFrom(_session.getMyDestination());
+        packet.setLocalPort(fromPort);
+        packet.setRemotePort(toPort);
         //if ( (keyToUse != null) && (tagsToSend != null) ) {
         //    packet.setKeyUsed(keyToUse);
         //    packet.setTagsSent(tagsToSend);
         //}
         if (_log.shouldLog(Log.INFO)) {
-            _log.info(String.format("about to ping %s timeout=%d blocking=%b",
-                    peer,timeoutMs,blocking));
+            _log.info(String.format("about to ping %s port %d from port %d timeout=%d blocking=%b",
+                      peer.calculateHash().toString(), toPort, fromPort, timeoutMs, blocking));
         }
             
         
@@ -658,6 +710,7 @@ class ConnectionManager {
         private boolean _ponged;
         private final PingNotifier _notifier;
 
+        /** @param notifier may be null */
         public PingRequest(PingNotifier notifier) { 
             _notifier = notifier;
         }
