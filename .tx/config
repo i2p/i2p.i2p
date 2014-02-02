@@ -241,7 +241,7 @@ trans.zh_CN = installer/resources/locale/po/messages_zh.po
 [I2P.getopt]
 source_file = core/java/src/gnu/getopt/MessagesBundle.properties
 source_lang = en
-type = UNICODEPROPERTIES
+type = PROPERTIES
 trans.cs = core/java/src/gnu/getopt/MessagesBundle_cs.properties
 trans.de = core/java/src/gnu/getopt/MessagesBundle_de.properties
 trans.es = core/java/src/gnu/getopt/MessagesBundle_es.properties
