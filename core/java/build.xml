@@ -46,7 +46,10 @@
     <target name="jar" depends="compile, jarUpToDate, listChangedFiles" unless="jar.uptodate" >
         <!-- set if unset -->
         <property name="workspace.changes.tr" value="" />
-        <jar destfile="./build/i2p.jar" basedir="./build/obj" includes="**/*.class" >
+        <jar destfile="./build/i2p.jar" >
+            <fileset dir="./build/obj" includes="**/*.class" />
+            <!-- the getopt translation files -->
+            <fileset dir="src" includes="gnu/getopt/*.properties" />
             <manifest>
                 <attribute name="Implementation-Version" value="${full.version}" />
                 <attribute name="Built-By" value="${build.built-by}" />
