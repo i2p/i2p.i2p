@@ -26,6 +26,8 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Properties;
 
+import gnu.getopt.Getopt;
+
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
@@ -437,27 +439,37 @@ public class SU3File {
      */
     public static void main(String[] args) {
         boolean ok = false;
-        List<String> a = new ArrayList<String>(Arrays.asList(args));
         try {
             // defaults
             String stype = null;
             String ctype = null;
-            Iterator<String> iter = a.iterator();
-            String cmd = iter.next();
-            iter.remove();
-            for ( ; iter.hasNext(); ) {
-                String arg = iter.next();
-                if (arg.equals("-t")) {
-                    iter.remove();
-                    stype = iter.next();
-                    iter.remove();
-                } else if (arg.equals("-c")) {
-                    iter.remove();
-                    ctype = iter.next();
-                    iter.remove();
-                }
+            boolean error = false;
+            Getopt g = new Getopt("SU3File", args, "t:c:");
+            int c;
+            while ((c = g.getopt()) != -1) {
+              switch (c) {
+                case 't':
+                    stype = g.getOptarg();
+                    break;
+
+                case 'c':
+                    ctype = g.getOptarg();
+                    break;
+
+                case '?':
+                case ':':
+                default:
+                  error = true;
+              }
             }
-            if ("showversion".equals(cmd)) {
+
+            int idx = g.getOptind();
+            String cmd = args[idx];
+            List<String> a = new ArrayList<String>(Arrays.asList(args).subList(idx + 1, args.length));
+
+            if (error) {
+                showUsageCLI();
+            } else if ("showversion".equals(cmd)) {
                 ok = showVersionCLI(a.get(0));
             } else if ("sign".equals(cmd)) {
                 // speed things up by specifying a small PRNG buffer size
