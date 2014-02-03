@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project basedir="." default="all" name="jetty">
 
-    <property name="jetty.ver" value="7.6.14.v20131031" />
+    <property name="jetty.ver" value="8.1.14.v20131031" />
     <property name="jetty.base" value="jetty-distribution-${jetty.ver}" />
-    <property name="jetty.sha1" value="f83894b5641f920ed8ac31501b473528e52a23fd" />
+    <property name="jetty.sha1" value="a6690261a822157c82fcc6327d05ac8c7dfed0a3" />
     <property name="jetty.filename" value="${jetty.base}.zip" />
     <property name="jetty.url" value="http://download.eclipse.org/jetty/${jetty.ver}/dist/${jetty.filename}" />
     <property name="verified.filename" value="verified.txt" />
@@ -104,9 +104,10 @@
               jetty-servlets-xxx.jar: Needed for CGI for eepsite
               jetty-sslengine-xxx.jar: Old Jetty 6, now a dummy
               jetty-java5-threadpool-xxx.jar: Old Jetty 6, now a dummy
-              glassfish 2.1: Not used, too old, see Tomcat below.
               jetty-rewrite-handler: Not used by I2P, but only 20KB and could be useful for eepsites
               jetty-management: Not used by I2P, but only 34KB and could be useful for eepsites, and we bundled it with Jetty 5
+              javax.servlet.jsp-2.2.0.v201112011158.jar: Required API
+              servlet-api-3.0.jar: Required API
               All of these are available in the Ubuntu packages libjetty-java and libjetty-extra-java
         -->
         <copy preservelastmodified="true" file="${jetty.base}/start.jar" tofile="jettylib/jetty-start.jar" />
@@ -133,6 +134,10 @@
                 <attribute name="Note" value="Intentionally empty" />
             </manifest>
         </jar>
+        <jar destfile="jettylib/javax.servlet.jar" duplicate="preserve" filesetmanifest="mergewithoutmain" >
+            <zipfileset excludes="about.html about_files about_files/* META-INF/ECLIPSEF.* META-INF/eclipse.inf plugin.properties" src="${jetty.base}/lib/servlet-api-3.0.jar" />
+            <zipfileset excludes="about.html about_files about_files/* META-INF/ECLIPSEF.* META-INF/eclipse.inf plugin.properties" src="${jetty.base}/lib/jsp/javax.servlet.jsp-2.2.0.v201112011158.jar" />
+        </jar>
       <!--
         <delete file="jetty.tar" />
         <delete dir="${jetty.base}" />
@@ -152,10 +157,14 @@
          was set individually in wrapper.config, we rename and combine the jars as follows:
          jasper.jar : jasper-runtime.jar
          jasper-el.jar + el-api.jar : commons-el.jar
-         servlet-api.jar + jsp-api.jar : javax.servlet.jar
          tomcat-juli.jar : Add to commons-logging.jar
          empty jar : jasper-compiler.jar
          Also, take NOTICE and LICENSE out of each one, we bundle those separately.
+
+         Not as of Jetty 8 (using from Jetty):
+         servlet-api.jar + jsp-api.jar : javax.servlet.jar
+         If we go to Tomcat 7:
+         tomcat-api.jar + tomcat-util.jar: Add to javax.servlet.jar (as of Tomcat 7 / Jetty 8)
      -->
     <target name="copyTomcatLib" >
         <jar destfile="jettylib/jasper-runtime.jar" filesetmanifest="merge" >
@@ -165,10 +174,14 @@
             <zipfileset excludes="META-INF/LICENSE META-INF/NOTICE" src="${tomcat.lib}/jasper-el.jar" />
             <zipfileset excludes="META-INF/**/*" src="${tomcat.lib}/el-api.jar" />
         </jar>
+<!--
         <jar destfile="jettylib/javax.servlet.jar" duplicate="preserve" filesetmanifest="mergewithoutmain" >
             <zipfileset excludes="META-INF/LICENSE META-INF/NOTICE" src="${tomcat.lib}/servlet-api.jar" />
             <zipfileset excludes="META-INF/**/*" src="${tomcat.lib}/jsp-api.jar" />
+            <zipfileset excludes="META-INF/LICENSE META-INF/NOTICE" src="${tomcat.lib}/tomcat-api.jar" />
+            <zipfileset excludes="META-INF/LICENSE META-INF/NOTICE" src="${tomcat.lib}/tomcat-util.jar" />
         </jar>
+-->
         <!-- Ant bug, don't set update and filesetmanifest or the update doesn't happen,
              Their bug tracker claims fixed in 1.8.0 but broken for me in 1.8.1
           -->
