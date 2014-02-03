@@ -448,7 +448,11 @@
         <ant dir="installer/resources/locale" target="poupdate" />
     </target>
 
-    <target name="prep-script-translation" >
+    <condition property="no.bundle">
+        <isfalse value="${require.gettext}" />
+    </condition>
+
+    <target name="prep-script-translation" unless="no.bundle" >
         <!-- script translation added in 0.8.13, enabled in 0.9.5. -->
         <ant dir="installer/resources/locale" target="bundle" />
         <copy todir="pkg-temp/locale/">
