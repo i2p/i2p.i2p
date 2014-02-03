@@ -36,7 +36,7 @@
         <mkdir dir="./build/obj" />
         <javac 
             srcdir="./src" 
-            debug="true" deprecation="on" source="1.5" target="1.5" 
+            debug="true" deprecation="on" source="1.6" target="1.6" 
             destdir="./build/obj" 
             includeAntRuntime="false"
             classpath="../../../core/java/build/i2p.jar:../../jetty/jettylib/org.mortbay.jetty.jar:../../jetty/jettylib/javax.servlet.jar:../../jetty/jettylib/jetty-servlet.jar:../../jetty/jettylib/jetty-util.jar:../../ministreaming/java/build/mstreaming.jar" >

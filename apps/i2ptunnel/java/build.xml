@@ -238,7 +238,7 @@
             <arg value="-webapp" />
             <arg value="../jsp/" />
         </java>
-        <javac debug="true" deprecation="on" source="1.5" target="1.5" 
+        <javac debug="true" deprecation="on" source="1.6" target="1.6" 
                includeAntRuntime="false"
                destdir="../jsp/WEB-INF/classes/" srcdir="../jsp/WEB-INF/classes" includes="**/*.java">
             <compilerarg line="${javac.compilerargs}" />

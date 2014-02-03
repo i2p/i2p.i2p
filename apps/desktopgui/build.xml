@@ -27,7 +27,7 @@
 	</target>
 
 	<target name="compile" depends="init">
-		<javac debug="true" deprecation="on" source="1.5" target="1.5" 
+		<javac debug="true" deprecation="on" source="1.6" target="1.6" 
                        includeAntRuntime="false"
                        srcdir="${src}" destdir="${build}">
             <compilerarg line="${javac.compilerargs}" />

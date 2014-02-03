@@ -29,7 +29,7 @@
 
  	<target name="compile">
 		<mkdir dir="${bin}" />
-		<javac debug="true" deprecation="on" source="1.5" target="1.5"
+		<javac debug="true" deprecation="on" source="1.6" target="1.6"
 			includeAntRuntime="false"
  			classpathref="cp" destdir="${bin}" srcdir="${src}" includes="**/*.java" >
 			<compilerarg line="${javac.compilerargs}" />
@@ -52,7 +52,7 @@
             <arg value="-webapp" />
             <arg value="./jsp" />
         </java>
-        <javac debug="true" deprecation="on" source="1.5" target="1.5" 
+        <javac debug="true" deprecation="on" source="1.6" target="1.6" 
                includeAntRuntime="false"
                destdir="${bin}" srcdir="${tmp}" includes="**/*.java" classpathref="cp">
 		<compilerarg line="${javac.compilerargs}" />

@@ -30,7 +30,7 @@
         <mkdir dir="./build/obj" />
         <javac 
             srcdir="./src" 
-            debug="true" deprecation="on" source="1.5" target="1.5" 
+            debug="true" deprecation="on" source="1.6" target="1.6" 
             includeAntRuntime="false"
             destdir="./build/obj" 
             classpath="../../../core/java/build/i2p.jar:../../ministreaming/java/build/mstreaming.jar:../../streaming/java/build/streaming.jar" >
@@ -41,7 +41,7 @@
     <target name="compileTest" depends="compile">
         <javac 
             srcdir="./test" 
-            debug="true" deprecation="on" source="1.5" target="1.5" 
+            debug="true" deprecation="on" source="1.6" target="1.6" 
             includeAntRuntime="false"
             destdir="./build/obj" 
             classpath="../../../core/java/build/i2p.jar:../../ministreaming/java/build/mstreaming.jar:../../streaming/java/build/streaming.jar" >

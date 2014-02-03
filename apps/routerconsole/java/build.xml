@@ -52,7 +52,7 @@
         <mkdir dir="./build/obj" />
         <javac 
             srcdir="./src" 
-            debug="true" deprecation="on" source="1.5" target="1.5" 
+            debug="true" deprecation="on" source="1.6" target="1.6" 
             includeAntRuntime="false"
             destdir="./build/obj">
             <compilerarg line="${javac.compilerargs}" />
@@ -342,7 +342,7 @@
             <arg value="../jsp/" />
         </java>
         
-        <javac debug="true" deprecation="on" source="1.5" target="1.5" 
+        <javac debug="true" deprecation="on" source="1.6" target="1.6" 
                encoding="UTF-8"
                includeAntRuntime="false"
                destdir="../jsp/WEB-INF/classes/" 

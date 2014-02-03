@@ -17,7 +17,7 @@
         <mkdir dir="./src/WEB-INF/classes" />
         <javac 
             srcdir="./src/src"
-            debug="true" deprecation="off" source="1.5" target="1.5" 
+            debug="true" deprecation="off" source="1.6" target="1.6" 
             includeAntRuntime="false"
             destdir="./src/WEB-INF/classes">
             <compilerarg line="${javac.compilerargs}" />

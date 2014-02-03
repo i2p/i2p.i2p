@@ -227,7 +227,7 @@
         <mkdir dir="./build/obj" />
         <javac 
             srcdir="./java/src" 
-            debug="true" deprecation="on" source="1.5" target="1.5" 
+            debug="true" deprecation="on" source="1.6" target="1.6" 
             destdir="./build/obj" 
             includeAntRuntime="false"
             classpath="../../core/java/build/i2p.jar:./jettylib/commons-logging.jar:./jettylib/javax.servlet.jar:./jettylib/org.mortbay.jetty.jar:./jettylib/jetty-http.jar:./jettylib/jetty-io.jar:./jettylib/jetty-security.jar:./jettylib/jetty-util.jar:./jettylib/jetty-xml.jar" >
