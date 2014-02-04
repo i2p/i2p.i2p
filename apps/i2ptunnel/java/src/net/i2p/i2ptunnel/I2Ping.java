@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import gnu.getopt.Getopt;
+
 import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
 import net.i2p.client.I2PSession;
@@ -86,48 +88,76 @@ public class I2Ping extends I2PTunnelClientBase {
       int count = PING_COUNT;
       boolean countPing = false;
       boolean reportTimes = true;
-      while (true) {
-        if (cmd.startsWith("-t ")) { // timeout
-            cmd = cmd.substring(3);
-            int pos = cmd.indexOf(" ");
-            if (pos == -1) {
-                l.log("Syntax error");
-                return;
-            } else {
-                timeout = Long.parseLong(cmd.substring(0, pos));
+      String hostListFile = null;
+      int localPort = 0;
+      int remotePort = 0;
+      boolean error = false;
+      String[] argv = cmd.split(" ");
+      Getopt g = new Getopt("ping", argv, "t:m:n:chl:f:p:");
+      int c;
+      while ((c = g.getopt()) != -1) {
+        switch (c) {
+          case 't':  // timeout
+            timeout = Long.parseLong(g.getOptarg());
                 // convenience, convert msec to sec
                 if (timeout < 100)
                     timeout *= 1000;
-                cmd = cmd.substring(pos + 1);
-            }
-        } else if (cmd.startsWith("-m ")) { // max simultaneous pings
-            cmd = cmd.substring(3);
-            int pos = cmd.indexOf(" ");
-            if (pos == -1) {
-                l.log("Syntax error");
-                return;
-            } else {
-                MAX_SIMUL_PINGS = Integer.parseInt(cmd.substring(0, pos));
-                cmd = cmd.substring(pos + 1);
-            }
-        } else if (cmd.startsWith("-n ")) { // number of pings
-            cmd = cmd.substring(3);
-            int pos = cmd.indexOf(" ");
-            if (pos == -1) {
-                l.log("Syntax error");
-                return;
-            } else {
-                count = Integer.parseInt(cmd.substring(0, pos));
-                cmd = cmd.substring(pos + 1);
-            }
-        } else if (cmd.startsWith("-c ")) { // "count" ping
+            break;
+
+          case 'm': // max simultaneous pings
+            MAX_SIMUL_PINGS = Integer.parseInt(g.getOptarg());
+            break;
+
+          case 'n': // number of pings
+            count = Integer.parseInt(g.getOptarg());
+            break;
+
+          case 'c': // "count" ping
             countPing = true;
             count = CPING_COUNT;
-            cmd = cmd.substring(3);
-        } else if (cmd.equals("-h")) { // ping all hosts
-            cmd = "-l hosts.txt";
-        } else if (cmd.startsWith("-l ")) { // ping a list of hosts
-            BufferedReader br = new BufferedReader(new FileReader(cmd.substring(3)));
+            break;
+
+          case 'h': // ping all hosts
+            if (hostListFile != null)
+                error = true;
+            else
+                hostListFile = "hosts.txt";
+            break;
+
+          case 'l':  // ping a list of hosts
+            if (hostListFile != null)
+                error = true;
+            else
+                hostListFile = g.getOptarg();
+            break;
+
+          case 'f': // local port
+            localPort = Integer.parseInt(g.getOptarg());
+            break;
+
+          case 'p': // remote port
+            remotePort = Integer.parseInt(g.getOptarg());
+            break;
+
+          case '?':
+          case ':':
+          default:
+            error = true;
+        }
+      }
+
+      int remaining = argv.length - g.getOptind();
+
+      if (error ||
+          remaining > 1 ||
+          (remaining <= 0 && hostListFile == null) ||
+          (remaining > 0 && hostListFile != null)) {
+          System.out.println(usage());
+          return;
+      }
+
+      if (hostListFile != null) {
+            BufferedReader br = new BufferedReader(new FileReader(hostListFile));
             String line;
             List<PingHandler> pingHandlers = new ArrayList<PingHandler>();
             int i = 0;
@@ -138,7 +168,8 @@ public class I2Ping extends I2PTunnelClientBase {
                 if (line.indexOf("=") != -1) { // maybe file is hosts.txt?
                     line = line.substring(0, line.indexOf("="));
                 }
-                PingHandler ph = new PingHandler(line, count, timeout, countPing, reportTimes);
+                PingHandler ph = new PingHandler(line, count, localPort, remotePort,
+                                                 timeout, countPing, reportTimes);
                 ph.start();
                 pingHandlers.add(ph);
                 if (++i > 1)
@@ -148,13 +179,31 @@ public class I2Ping extends I2PTunnelClientBase {
             for (Thread t : pingHandlers)
                 t.join();
             return;
-        } else {
-            Thread t = new PingHandler(cmd, count, timeout, countPing, reportTimes);
-            t.start();
-            t.join();
-            return;
-        }
       }
+
+      String host = argv[g.getOptind()];
+      Thread t = new PingHandler(host, count, localPort, remotePort,
+                                 timeout, countPing, reportTimes);
+      t.start();
+      t.join();
+    }
+
+    /**
+     *  With newlines except for last line
+     *  @since 0.9.12
+     */
+    public static String usage() {
+        return
+            "ping <opts> <b64dest|host>\n" +
+            "ping <opts> -h (pings all hosts in hosts.txt)\n" +
+            "ping <opts> -l <destlistfile> (pings a list of hosts in a file)\n" +
+            "Options:\n" +
+            "     -c (require 5 consecutive pings to report success)\n" +
+            "     -m maxSimultaneousPings (default 10)\n" +
+            "     -n numberOfPings (default 3)\n" +
+            "     -t timeout (ms, default 30000)\n" +
+            "     -f fromPort\n" +
+            "     -p toPort";
     }
 
     @Override
@@ -170,7 +219,7 @@ public class I2Ping extends I2PTunnelClientBase {
         return true;
     }
 
-    private boolean ping(Destination dest, long timeout) throws I2PException {
+    private boolean ping(Destination dest, int fromPort, int toPort, long timeout) throws I2PException {
         try {
             synchronized (simulLock) {
                 while (simulPings >= MAX_SIMUL_PINGS) {
@@ -183,7 +232,7 @@ public class I2Ping extends I2PTunnelClientBase {
                 }
                 lastPingTime = System.currentTimeMillis();
             }
-            boolean sent = sockMgr.ping(dest, timeout);
+            boolean sent = sockMgr.ping(dest, fromPort, toPort, timeout);
             synchronized (simulLock) {
                 simulPings--;
                 simulLock.notifyAll();
@@ -207,15 +256,20 @@ public class I2Ping extends I2PTunnelClientBase {
         private final long timeout;
         private final boolean countPing;
         private final boolean reportTimes;
+        private final int localPort;
+        private final int remotePort;
 
         /**
          *  As of 0.9.10, does NOT start itself.
          *  Caller must call start()
          *  @param dest b64 or b32 or host name
          */
-        public PingHandler(String dest, int count, long timeout, boolean countPings, boolean report) {
+        public PingHandler(String dest, int count, int fromPort, int toPort,
+                           long timeout, boolean countPings, boolean report) {
             this.destination = dest;
             cnt = count;
+            localPort = fromPort;
+            remotePort = toPort;
             this.timeout = timeout;
             countPing = countPings;
             reportTimes = report;
@@ -235,8 +289,7 @@ public class I2Ping extends I2PTunnelClientBase {
                 long totalTime = 0;
                 StringBuilder pingResults = new StringBuilder(2 * cnt + destination.length() + 3);
                 for (int i = 0; i < cnt; i++) {
-                    boolean sent;
-                    sent = ping(dest, timeout);
+                    boolean sent = ping(dest, localPort, remotePort, timeout);
                     if (countPing) {
                         if (!sent) {
                             pingResults.append(i).append(" ");

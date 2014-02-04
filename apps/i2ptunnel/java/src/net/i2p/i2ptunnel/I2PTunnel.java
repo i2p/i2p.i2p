@@ -1513,15 +1513,7 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
             addtask(task);
             notifyEvent("pingTaskId", Integer.valueOf(task.getId()));
         } else {
-            l.log("ping <opts> <b64dest|host>");
-            l.log("ping <opts> -h (pings all hosts in hosts.txt)");
-            l.log("ping <opts> -l <destlistfile> (pings a list of hosts in a file)");
-            l.log("   Options:\n" +
-                  "     -c (require 5 consecutive pings to report success)\n" +
-                  "     -m maxSimultaneousPings (default 10)\n" +
-                  "     -n numberOfPings (default 3)\n" +
-                  "     -t timeout (ms, default 30000)\n");
-            l.log("   Tests communication with peers.\n");
+            l.log(I2Ping.usage());
             notifyEvent("pingTaskId", Integer.valueOf(-1));
         }
     }
