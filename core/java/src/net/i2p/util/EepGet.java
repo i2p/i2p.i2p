@@ -1,16 +1,19 @@
 package net.i2p.util;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.io.OutputStream;
 import java.net.ConnectException;
 import java.net.MalformedURLException;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.net.URL;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -18,6 +21,8 @@ import java.util.Date;
 import java.util.Formatter;
 import java.util.List;
 import java.util.Locale;
+
+import gnu.getopt.Getopt;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.Base64;
@@ -167,52 +172,96 @@ public class EepGet {
         List<String> extra = null;
         String username = null;
         String password = null;
+        boolean error = false;
+        //
+        // note: if you add options, please update installer/resources/man/eepget.1
+        //
+        Getopt g = new Getopt("eepget", args, "p:cn:t:e:o:m:l:h:u:x:");
         try {
-            for (int i = 0; i < args.length; i++) {
-                if (args[i].equals("-p")) {
-                    proxyHost = args[++i].substring(0, args[i].indexOf(':'));
-                    String port = args[i].substring(args[i].indexOf(':')+1);
-                    proxyPort = Integer.parseInt(port);
-                } else if (args[i].equals("-n")) {
-                    numRetries = Integer.parseInt(args[i+1]);
-                    i++;
-                } else if (args[i].equals("-t")) {
-                    inactivityTimeout = 1000 * Integer.parseInt(args[i+1]);
-                    i++;
-                } else if (args[i].equals("-e")) {
-                    etag = "\"" + args[i+1] + "\"";
-                    i++;
-                } else if (args[i].equals("-o")) {
-                    saveAs = args[i+1];
-                    i++;
-                } else if (args[i].equals("-m")) {
-                    markSize = Integer.parseInt(args[++i]);
-                    lineLen = Integer.parseInt(args[++i]);
-                } else if (args[i].equals("-h")) {
+            int c;
+            while ((c = g.getopt()) != -1) {
+              switch (c) {
+                case 'p':
+                    String s = g.getOptarg();
+                    int colon = s.indexOf(':');
+                    if (colon >= 0) {
+                        // Todo IPv6 [a:b:c]:4444
+                        proxyHost = s.substring(0, colon);
+                        String port = s.substring(colon + 1);
+                        proxyPort = Integer.parseInt(port);
+                    } else {
+                        proxyHost = s;
+                        // proxyPort remains default
+                    }
+                    break;
+
+                case 'c':
+                    // no proxy, same as -p :0
+                    proxyHost = "";
+                    proxyPort = 0;
+                    break;
+
+                case 'n':
+                    numRetries = Integer.parseInt(g.getOptarg());
+                    break;
+
+                case 't':
+                    inactivityTimeout = 1000 * Integer.parseInt(g.getOptarg());
+                    break;
+
+                case 'e':
+                    etag = "\"" + g.getOptarg() + "\"";
+                    break;
+
+                case 'o':
+                    saveAs = g.getOptarg();
+                    break;
+
+                case 'm':
+                    markSize = Integer.parseInt(g.getOptarg());
+                    break;
+
+                case 'l':
+                    lineLen = Integer.parseInt(g.getOptarg());
+                    break;
+
+                case 'h':
                     if (extra == null)
                         extra = new ArrayList<String>(2);
-                    extra.add(args[++i]);
-                    extra.add(args[++i]);
-                } else if (args[i].equals("-u")) {
-                    username = args[++i];
-                    password = args[++i];
-                } else if (args[i].startsWith("-")) {
-                    usage();
-                    return;
-                } else {
-                    url = args[i];
-                }
-            }
+                    String a = g.getOptarg();
+                    String key = a.substring(0, a.indexOf('='));
+                    String val = a.substring(a.indexOf('=')+1);
+                    extra.add(key);
+                    extra.add(val);
+                    break;
+
+                case 'u':
+                    username = g.getOptarg();
+                    break;
+
+                case 'x':
+                    password = g.getOptarg();
+                    break;
+
+                case '?':
+                case ':':
+                default:
+                    error = true;
+                    break;
+              }  // switch
+            } // while
         } catch (Exception e) {
             e.printStackTrace();
-            usage();
-            return;
+            error = true;
         }
 
-        if (url == null) {
+        int remaining = args.length - g.getOptind();
+        if (error || remaining != 1) {
             usage();
-            return;
+            System.exit(1);
         }
+        url = args[g.getOptind()];
+
         if (saveAs == null)
             saveAs = suggestName(url);
 
@@ -222,8 +271,23 @@ public class EepGet {
                 get.addHeader(extra.get(i), extra.get(i + 1));
             }
         }
-        if (username != null && password != null)
+        if (username != null) {
+            if (password == null) {
+                try {
+                    BufferedReader r = new BufferedReader(new InputStreamReader(System.in));
+                    do {
+                        System.err.print("Proxy password: ");
+                        password = r.readLine();
+                        if (password == null)
+                            throw new IOException();
+                        password = password.trim();
+                    } while (password.length() <= 0);
+                } catch (IOException ioe) {
+                    System.exit(1);
+                }
+            }
             get.addAuthorization(username, password);
+        }
         get.addStatusListener(get.new CLIStatusListener(markSize, lineLen));
         if (!get.fetch(CONNECT_TIMEOUT, -1, inactivityTimeout))
             System.exit(1);
@@ -278,10 +342,15 @@ public class EepGet {
     }
 
     private static void usage() {
-        System.err.println("EepGet [-p 127.0.0.1:4444] [-n #retries] [-o outputFile]\n" +
-                           "       [-m markSize lineLen] [-t timeout] [-h headerKey headerValue]\n" +
-                           "       [-u username password] url]\n" +
-                           "       (use -p :0 for no proxy)");
+        System.err.println("eepget [-p 127.0.0.1:4444] [-c] [-o outputFile]\n" +
+                           "       [-n #retries] (default 5)\n" +
+                           "       [-m markSize] (default 1024)\n" +
+                           "       [-l lineLen]  (default 40)\n" +
+                           "       [-t timeout]  (default 60 sec)\n" +
+                           "       [-e etag]\n" +
+                           "       [-h headerName=headerValue]\n" +
+                           "       [-u username] [-x password] url\n" +
+                           "       (use -c or -p :0 for no proxy)");
     }
     
     public static interface StatusListener {
@@ -532,6 +601,7 @@ public class EepGet {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("ERR: doFetch failed ", ioe);
                 if (ioe instanceof MalformedURLException ||
+                    ioe instanceof UnknownHostException ||
                     ioe instanceof ConnectException) // proxy or nonproxied host Connection Refused
                     _keepFetching = false;
             } finally {
@@ -1061,8 +1131,11 @@ public class EepGet {
                 URL url = new URL(_actualURL);
                 if ("http".equals(url.getProtocol())) {
                     String host = url.getHost();
-                    if (host.toLowerCase(Locale.US).endsWith(".i2p"))
-                        throw new MalformedURLException("I2P addresses must be proxied");
+                    String hostlc = host.toLowerCase(Locale.US);
+                    if (hostlc.endsWith(".i2p"))
+                        throw new UnknownHostException("I2P addresses must be proxied");
+                    if (hostlc.endsWith(".onion"))
+                        throw new UnknownHostException("Tor addresses must be proxied");
                     int port = url.getPort();
                     if (port == -1)
                         port = 80;
