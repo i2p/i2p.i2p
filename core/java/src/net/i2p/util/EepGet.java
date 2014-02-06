@@ -92,7 +92,7 @@ public class EepGet {
 
     // following for proxy digest auth
     // only created via addAuthorization()
-    private AuthState _authState;
+    protected AuthState _authState;
 
     /** this will be replaced by the HTTP Proxy if we are using it */
     protected static final String USER_AGENT = "Wget/1.11.4";
@@ -175,7 +175,6 @@ public class EepGet {
         long inactivityTimeout = INACTIVITY_TIMEOUT;
         String etag = null;
         String saveAs = null;
-        String url = null;
         List<String> extra = null;
         String username = null;
         String password = null;
@@ -233,13 +232,18 @@ public class EepGet {
                     break;
 
                 case 'h':
-                    if (extra == null)
-                        extra = new ArrayList<String>(2);
                     String a = g.getOptarg();
-                    String key = a.substring(0, a.indexOf('='));
-                    String val = a.substring(a.indexOf('=')+1);
-                    extra.add(key);
-                    extra.add(val);
+                    int eq = a.indexOf('=');
+                    if (eq > 0) {
+                        if (extra == null)
+                            extra = new ArrayList<String>(2);
+                        String key = a.substring(0, eq);
+                        String val = a.substring(eq + 1);
+                        extra.add(key);
+                        extra.add(val);
+                    } else {
+                        error = true;
+                    }
                     break;
 
                 case 'u':
@@ -262,12 +266,11 @@ public class EepGet {
             error = true;
         }
 
-        int remaining = args.length - g.getOptind();
-        if (error || remaining != 1) {
+        if (error || args.length - g.getOptind() != 1) {
             usage();
             System.exit(1);
         }
-        url = args[g.getOptind()];
+        String url = args[g.getOptind()];
 
         if (saveAs == null)
             saveAs = suggestName(url);
@@ -349,7 +352,7 @@ public class EepGet {
     }
 
     private static void usage() {
-        System.err.println("eepget [-p 127.0.0.1:4444] [-c] [-o outputFile]\n" +
+        System.err.println("eepget [-p 127.0.0.1[:4444]] [-c] [-o outputFile]\n" +
                            "       [-n #retries] (default 5)\n" +
                            "       [-m markSize] (default 1024)\n" +
                            "       [-l lineLen]  (default 40)\n" +
@@ -697,8 +700,6 @@ public class EepGet {
                     throw new IOException("Proxy requires authentication");
                 if (as.authSent)
                     throw new IOException("Proxy authentication failed");  // ignore stale
-                if (as.authChallenge == null)
-                    throw new IOException("Bad proxy auth response");
                 if (_log.shouldLog(Log.INFO)) _log.info("Adding auth");
                 // actually happens in getRequest()
             } else {
@@ -1379,7 +1380,6 @@ public class EepGet {
      *  Add basic authorization header for the proxy.
      *  Only added if the request is going through a proxy.
      *  Must be called before fetch().
-     *  Not supported by EepHead.
      *
      *  @since 0.8.9
      */
@@ -1469,7 +1469,7 @@ public class EepGet {
     /**
      *  @since 0.9.12
      */
-    private enum AUTH_MODE {NONE, BASIC, DIGEST, UNKNOWN}
+    protected enum AUTH_MODE {NONE, BASIC, DIGEST, UNKNOWN}
 
     /**
      *  Manage the authentication parameters
@@ -1479,7 +1479,7 @@ public class EepGet {
      *
      *  @since 0.9.12
      */
-    private class AuthState {
+    protected class AuthState {
         private final String username;
         private final String password;
         // as recvd in 407
@@ -1517,7 +1517,7 @@ public class EepGet {
                 // better than NONE only
                 if (authMode == AUTH_MODE.NONE) {
                     authMode = AUTH_MODE.UNKNOWN;
-                    authChallenge = "";
+                    authChallenge = null;
                 }
             }
             nonceCount = 0;
@@ -1533,6 +1533,8 @@ public class EepGet {
                            Base64.encode(DataHelper.getUTF8(username + ':' + password), true);
 
                 case DIGEST:
+                    if (authChallenge == null)
+                        throw new IOException("Bad proxy auth response");
                     if (args == null)
                         args = parseAuthArgs(authChallenge);
                     Map<String, String> outArgs = generateAuthArgs(method, uri);

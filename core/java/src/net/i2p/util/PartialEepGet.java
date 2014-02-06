@@ -1,11 +1,15 @@
 package net.i2p.util;
 
+import java.io.BufferedReader;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Locale;
+
+import gnu.getopt.Getopt;
 
 import net.i2p.I2PAppContext;
 
@@ -50,46 +54,99 @@ public class PartialEepGet extends EepGet {
         int proxyPort = 4444;
         // 40 sig + 16 version for .suds
         long size = 56;
-        String url = null;
+        String saveAs = null;
+        String username = null;
+        String password = null;
+        boolean error = false;
+        Getopt g = new Getopt("partialeepget", args, "p:cl:o:u:x:");
         try {
-            for (int i = 0; i < args.length; i++) {
-                if (args[i].equals("-p")) {
-                    proxyHost = args[i+1].substring(0, args[i+1].indexOf(':'));
-                    String port = args[i+1].substring(args[i+1].indexOf(':')+1);
-                    proxyPort = Integer.parseInt(port);
-                    i++;
-                } else if (args[i].equals("-l")) {
-                    size = Long.parseLong(args[i+1]);
-                    i++;
-                } else if (args[i].startsWith("-")) {
-                    usage();
-                    return;
-                } else {
-                    url = args[i];
-                }
-            }
+            int c;
+            while ((c = g.getopt()) != -1) {
+              switch (c) {
+                case 'p':
+                    String s = g.getOptarg();
+                    int colon = s.indexOf(':');
+                    if (colon >= 0) {
+                        // Todo IPv6 [a:b:c]:4444
+                        proxyHost = s.substring(0, colon);
+                        String port = s.substring(colon + 1);
+                        proxyPort = Integer.parseInt(port);
+                    } else {
+                        proxyHost = s;
+                        // proxyPort remains default
+                    }
+                    break;
+
+                case 'c':
+                    // no proxy, same as -p :0
+                    proxyHost = "";
+                    proxyPort = 0;
+                    break;
+
+                case 'l':
+                    size = Long.parseLong(g.getOptarg());
+                    break;
+
+                case 'o':
+                    saveAs = g.getOptarg();
+                    break;
+
+                case 'u':
+                    username = g.getOptarg();
+                    break;
+
+                case 'x':
+                    password = g.getOptarg();
+                    break;
+
+                case '?':
+                case ':':
+                default:
+                    error = true;
+                    break;
+              }  // switch
+            } // while
         } catch (Exception e) {
             e.printStackTrace();
-            usage();
-            return;
-        }
-        
-        if (url == null) {
-            usage();
-            return;
+            error = true;
         }
 
-        String saveAs = suggestName(url);
+        if (error || args.length - g.getOptind() != 1) {
+            usage();
+            System.exit(1);
+        }
+        String url = args[g.getOptind()];
+
+        if (saveAs == null)
+            saveAs = suggestName(url);
         OutputStream out;
         try {
             // resume from a previous eepget won't work right doing it this way
             out = new FileOutputStream(saveAs);
         } catch (IOException ioe) {
             System.err.println("Failed to create output file " + saveAs);
-            return;
+            out = null; // dummy for compiler
+            System.exit(1);
         }
 
         EepGet get = new PartialEepGet(I2PAppContext.getGlobalContext(), proxyHost, proxyPort, out, url, size);
+        if (username != null) {
+            if (password == null) {
+                try {
+                    BufferedReader r = new BufferedReader(new InputStreamReader(System.in));
+                    do {
+                        System.err.print("Proxy password: ");
+                        password = r.readLine();
+                        if (password == null)
+                            throw new IOException();
+                        password = password.trim();
+                    } while (password.length() <= 0);
+                } catch (IOException ioe) {
+                    System.exit(1);
+                }
+            }
+            get.addAuthorization(username, password);
+        }
         get.addStatusListener(get.new CLIStatusListener(1024, 40));
         if (get.fetch(45*1000, -1, 60*1000)) {
             System.err.println("Last-Modified: " + get.getLastModified());
@@ -101,8 +158,10 @@ public class PartialEepGet extends EepGet {
     }
     
     private static void usage() {
-        System.err.println("PartialEepGet [-p 127.0.0.1:4444] [-l #bytes] url\n" +
-                           "              (use -p :0 for no proxy)");
+        System.err.println("PartialEepGet [-p 127.0.0.1[:4444]] [-c] [-o outputFile]\n" +
+                           "              [-l #bytes] (default 56)\n" +
+                           "              [-u username] [-x password] url\n" +
+                           "              (use -c or -p :0 for no proxy)");
     }
     
     @Override
@@ -158,6 +217,11 @@ public class PartialEepGet extends EepGet {
         // This will be replaced if we are going through I2PTunnelHTTPClient
         if(!uaOverridden)
             buf.append("User-Agent: " + USER_AGENT + "\r\n");
+        if (_authState != null && _shouldProxy && _authState.authMode != AUTH_MODE.NONE) {
+            buf.append("Proxy-Authorization: ");
+            buf.append(_authState.getAuthHeader("GET", urlToSend));
+            buf.append("\r\n");
+        }
         buf.append("\r\n");
 
         if (_log.shouldLog(Log.DEBUG))

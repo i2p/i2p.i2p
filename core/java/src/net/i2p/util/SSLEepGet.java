@@ -58,6 +58,8 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
 
+import gnu.getopt.Getopt;
+
 import net.i2p.I2PAppContext;
 import net.i2p.crypto.CertUtil;
 import net.i2p.crypto.KeyStoreUtil;
@@ -147,29 +149,34 @@ public class SSLEepGet extends EepGet {
      * SSLEepGet -s https://foo/bar
      */ 
     public static void main(String args[]) {
-        String url = null;
         boolean saveCerts = false;
+        boolean error = false;
+        Getopt g = new Getopt("ssleepget", args, "s");
         try {
-            for (int i = 0; i < args.length; i++) {
-                if (args[i].equals("-s")) {
+            int c;
+            while ((c = g.getopt()) != -1) {
+              switch (c) {
+                case 's':
                     saveCerts = true;
-                } else if (args[i].startsWith("-")) {
-                    usage();
-                    return;
-                } else {
-                    url = args[i];
-                }
-            }
+                    break;
+
+                case '?':
+                case ':':
+                default:
+                    error = true;
+                    break;
+              }  // switch
+            } // while
         } catch (Exception e) {
             e.printStackTrace();
-            usage();
-            return;
+            error = true;
         }
-        
-        if (url == null) {
+
+        if (error || args.length - g.getOptind() != 1) {
             usage();
-            return;
+            System.exit(1);
         }
+        String url = args[g.getOptind()];
 
         String saveAs = suggestName(url);
         OutputStream out;
@@ -191,8 +198,8 @@ public class SSLEepGet extends EepGet {
     }
     
     private static void usage() {
-        System.err.println("Usage: SSLEepGet https://url");
-        System.err.println("To save unknown certs, use: SSLEepGet -s https://url");
+        System.err.println("Usage: SSLEepGet https://url\n" +
+                           "To save unknown certs, use: SSLEepGet -s https://url");
     }
 
     /**
