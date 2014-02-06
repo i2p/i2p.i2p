@@ -1,3 +1,9 @@
+2014-02-06 kytv
+ * Brazilian Portuguese, Danish, French, Japanese, Polish, Russian, Ukrainian
+   translation updates
+ * Updates to geoip.txt and geoipv6.dat.gz based on Maxmind GeoLite Country
+   database from 2014-02-05.
+
 2014-01-31 zzz
  * /logs: Fix encoding of wrapper log section (ticket #1193)
  * NetDB: Fix cases where corrupt RouterInfo files were not deleted (ticket #1190)
