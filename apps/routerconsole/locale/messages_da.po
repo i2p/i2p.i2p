@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-01-09 19:27+0000\n"
-"PO-Revision-Date: 2014-01-12 11:28+0000\n"
+"PO-Revision-Date: 2014-01-26 21:36+0000\n"
 "Last-Translator: cacapo <handelsehorisont@gmail.com>\n"
 "Language-Team: Danish (http://www.transifex.com/projects/p/I2P/language/da/)\n"
 "MIME-Version: 1.0\n"
@@ -1384,7 +1384,7 @@ msgstr "Opdaterings link"
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:279
 msgid "Stop"
-msgstr "Sto"
+msgstr "Stop"
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:283
 #: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:141

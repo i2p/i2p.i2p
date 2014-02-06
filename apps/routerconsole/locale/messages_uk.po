@@ -7,13 +7,14 @@
 # naeto <a89393@rmqkr.net>, 2012
 # Денис Лысенко <gribua@gmail.com>, 2011
 # Денис Лысенко <gribua@gmail.com>, 2011
+# jonny_nut, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-01-09 19:27+0000\n"
-"PO-Revision-Date: 2014-01-10 11:42+0000\n"
-"Last-Translator: kytv <killyourtv@i2pmail.org>\n"
+"PO-Revision-Date: 2014-01-23 16:47+0000\n"
+"Last-Translator: jonny_nut\n"
 "Language-Team: Ukrainian (Ukraine) (http://www.transifex.com/projects/p/I2P/language/uk_UA/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -369,7 +370,7 @@ msgstr "Підключений"
 #: ../../../router/java/src/net/i2p/router/transport/ntcp/NTCPTransport.java:1127
 #: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2542
 msgid "Skew"
-msgstr ""
+msgstr "Нахил"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:599
 msgid "The difference between the peer's clock and your own"
@@ -586,12 +587,12 @@ msgstr ""
 #: ../../../router/java/src/net/i2p/router/transport/ntcp/NTCPTransport.java:1117
 #: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2520
 msgid "Limit"
-msgstr ""
+msgstr "Обмеження"
 
 #: ../../../router/java/src/net/i2p/router/transport/ntcp/NTCPTransport.java:1118
 #: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2521
 msgid "Timeout"
-msgstr ""
+msgstr "Упущення часу бездіяльности"
 
 #: ../../../router/java/src/net/i2p/router/transport/ntcp/NTCPTransport.java:1123
 #: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2529
@@ -600,23 +601,23 @@ msgstr ""
 
 #: ../../../router/java/src/net/i2p/router/transport/ntcp/NTCPTransport.java:1130
 msgid "Out Queue"
-msgstr ""
+msgstr "Вихідна Черга"
 
 #: ../../../router/java/src/net/i2p/router/transport/ntcp/NTCPTransport.java:1131
 msgid "Backlogged?"
-msgstr ""
+msgstr "Перевантажено?"
 
 #: ../../../router/java/src/net/i2p/router/transport/ntcp/NTCPTransport.java:1144
 #: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2583
 #: ../java/src/net/i2p/router/web/ConfigTunnelsHelper.java:91
 msgid "Inbound"
-msgstr ""
+msgstr "вхідно"
 
 #: ../../../router/java/src/net/i2p/router/transport/ntcp/NTCPTransport.java:1146
 #: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2585
 #: ../java/src/net/i2p/router/web/ConfigTunnelsHelper.java:91
 msgid "Outbound"
-msgstr ""
+msgstr "вихідно"
 
 #: ../../../router/java/src/net/i2p/router/transport/ntcp/NTCPTransport.java:1201
 #: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2750
@@ -629,7 +630,7 @@ msgstr[2] ""
 
 #: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2519
 msgid "UDP connections"
-msgstr ""
+msgstr "зв'язки UDP"
 
 #: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2526
 msgid "Sort by peer hash"
@@ -641,27 +642,27 @@ msgstr ""
 
 #: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2531
 msgid "Sort by idle inbound"
-msgstr ""
+msgstr "Порядком за вхідню бездіяльність"
 
 #: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2533
 msgid "Sort by idle outbound"
-msgstr ""
+msgstr "Порядком за вихідню бездіяльність"
 
 #: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2536
 msgid "Sort by inbound rate"
-msgstr ""
+msgstr "Порядком за вхідну ставку"
 
 #: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2538
 msgid "Sort by outbound rate"
-msgstr ""
+msgstr "Порядком за вихідну ставку"
 
 #: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2541
 msgid "Sort by connection uptime"
-msgstr ""
+msgstr "Порядком за тривалість зв'язку"
 
 #: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2543
 msgid "Sort by clock skew"
-msgstr ""
+msgstr "Порядком за нахилом такту"
 
 #: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2546
 msgid "Sort by congestion window"
@@ -725,7 +726,7 @@ msgstr ""
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:165
 #: ../java/src/net/i2p/router/web/ProfilesHelper.java:13
 msgid "Banned"
-msgstr ""
+msgstr "Забороненo"
 
 #: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2668
 msgid "backlogged"
@@ -1249,7 +1250,7 @@ msgstr ""
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:326
 msgid "started"
-msgstr ""
+msgstr "почато"
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:328
 msgid "Failed to start"
@@ -1257,7 +1258,7 @@ msgstr ""
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:333
 msgid "Failed to find server."
-msgstr ""
+msgstr "Провал пошуку за сервер"
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:339
 msgid "No plugin URL specified."
@@ -1318,7 +1319,7 @@ msgstr ""
 #: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:76
 #: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:281
 msgid "Edit"
-msgstr ""
+msgstr "Редагування"
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:85
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:474
@@ -1333,7 +1334,7 @@ msgstr ""
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:510
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:427
 msgid "Client"
-msgstr ""
+msgstr "Клієнт"
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:94
 #: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:138

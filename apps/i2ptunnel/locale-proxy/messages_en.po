@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P i2ptunnel\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-12-01 20:06+0000\n"
+"POT-Creation-Date: 2014-02-06 18:27+0000\n"
 "PO-Revision-Date: 2010-06-15 14:09+0100\n"
 "Last-Translator: duck <duck@mail.i2p>\n"
 "Language-Team: duck <duck@mail.i2p>\n"
@@ -339,25 +339,22 @@ msgid "The request uses a bad protocol."
 msgstr ""
 
 #: ../java/build/Proxy.java:133
-#, java-format
-msgid "The I2P HTTP Proxy supports {0}http://{1} requests ONLY."
+msgid "The I2P HTTP Proxy supports HTTP and HTTPS requests only."
 msgstr ""
 
 #: ../java/build/Proxy.java:134
-#, java-format
-msgid ""
-"Other protocols such as {0}https://{1} and {0}ftp://{1} are not allowed."
+msgid "Other protocols such as FTP are not allowed."
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:571
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:595
 msgid "This seems to be a bad destination:"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:571
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:595
 msgid "i2paddresshelper cannot help you with a destination like that!"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:638
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:662
 #, java-format
 msgid ""
 "To visit the destination in your host database, click <a href=\"{0}\">here</"
@@ -365,50 +362,50 @@ msgid ""
 "\"{1}\">here</a>."
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1042
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1151
 msgid "Host"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1046
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1155
 msgid "Base 32"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1050
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1159
 msgid "Destination"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1056
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1165
 #, java-format
 msgid "Continue to {0} without saving"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1061
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1170
 #, java-format
 msgid "Save {0} to router address book and continue to eepsite"
 msgstr ""
 
 #. only blockfile supports multiple books
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1064
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1173
 #, java-format
 msgid "Save {0} to master address book and continue to eepsite"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1065
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1174
 #, java-format
 msgid "Save {0} to private address book and continue to eepsite"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1180
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1290
 msgid "HTTP Outproxy"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1216
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1326
 msgid ""
 "Click a link below to look for an address helper by using a \"jump\" service:"
 msgstr ""
 
 #. Translators: parameter is a host name
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1224
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1334
 #, java-format
 msgid "{0} jump service"
 msgstr ""

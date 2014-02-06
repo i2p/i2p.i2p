@@ -5,13 +5,13 @@
 # 
 # Translators:
 # blueboy, 2013
-# blueboy, 2013
+# blueboy, 2013-2014
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-10-14 13:33+0000\n"
-"PO-Revision-Date: 2013-12-18 03:19+0000\n"
+"PO-Revision-Date: 2014-02-04 19:47+0000\n"
 "Last-Translator: blueboy\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/projects/p/I2P/language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
@@ -210,226 +210,226 @@ msgid "Dominican Republic"
 msgstr "República Dominicana"
 
 msgid "Algeria"
-msgstr ""
+msgstr "Argélia"
 
 msgid "Ecuador"
-msgstr ""
+msgstr "Equador"
 
 msgid "Estonia"
-msgstr ""
+msgstr "Estônia"
 
 msgid "Egypt"
-msgstr ""
+msgstr "Egito"
 
 msgid "Western Sahara"
-msgstr ""
+msgstr "Saara Ocidental"
 
 msgid "Eritrea"
-msgstr ""
+msgstr "Eritreia"
 
 msgid "Spain"
-msgstr ""
+msgstr "Espanha"
 
 msgid "Ethiopia"
-msgstr ""
+msgstr "Etiópia"
 
 msgid "European Union"
-msgstr ""
+msgstr "União Europeia"
 
 msgid "Finland"
-msgstr ""
+msgstr "Finlândia"
 
 msgid "Fiji"
-msgstr ""
+msgstr "Fiji"
 
 msgid "Falkland Islands (Malvinas)"
-msgstr ""
+msgstr "Malvinas (Ilhas Falkland)"
 
 msgid "Federated States of Micronesia"
-msgstr ""
+msgstr "Estados Federados da Micronésia"
 
 msgid "Faroe Islands"
-msgstr ""
+msgstr "Ilhas Faroé"
 
 msgid "France"
-msgstr ""
+msgstr "França"
 
 msgid "Gabon"
-msgstr ""
+msgstr "Gabão"
 
 msgid "United Kingdom"
-msgstr ""
+msgstr "Reino Unido"
 
 msgid "Grenada"
-msgstr ""
+msgstr "Granada"
 
 msgid "Georgia"
-msgstr ""
+msgstr "Geórgia"
 
 msgid "French Guiana"
-msgstr ""
+msgstr "Guiana Francesa"
 
 msgid "Guernsey"
-msgstr ""
+msgstr "Guernsey"
 
 msgid "Ghana"
-msgstr ""
+msgstr "Gana"
 
 msgid "Gibraltar"
-msgstr ""
+msgstr "Gibraltar"
 
 msgid "Greenland"
-msgstr ""
+msgstr "Groenlândia"
 
 msgid "Gambia"
-msgstr ""
+msgstr "Gâmbia"
 
 msgid "Guinea"
-msgstr ""
+msgstr "Guiné"
 
 msgid "Guadeloupe"
-msgstr ""
+msgstr "Guadalupe"
 
 msgid "Equatorial Guinea"
-msgstr ""
+msgstr "Guiné Equatorial"
 
 msgid "Greece"
-msgstr ""
+msgstr "Grécia"
 
 msgid "South Georgia and the South Sandwich Islands"
-msgstr ""
+msgstr "Ilhas Geórgia do Sul e Sandwich do Sul"
 
 msgid "Guatemala"
-msgstr ""
+msgstr "Guatemala"
 
 msgid "Guam"
-msgstr ""
+msgstr "Guam"
 
 msgid "Guinea-Bissau"
-msgstr ""
+msgstr "Guiné-Bissau"
 
 msgid "Guyana"
-msgstr ""
+msgstr "Guiana"
 
 msgid "Hong Kong"
-msgstr ""
+msgstr "Hong Kong"
 
 msgid "Honduras"
-msgstr ""
+msgstr "Honduras"
 
 msgid "Croatia"
-msgstr ""
+msgstr "Croácia"
 
 msgid "Haiti"
-msgstr ""
+msgstr "Haiti"
 
 msgid "Hungary"
-msgstr ""
+msgstr "Hungria"
 
 msgid "Indonesia"
-msgstr ""
+msgstr "Indonésia"
 
 msgid "Ireland"
-msgstr ""
+msgstr "Irlanda"
 
 msgid "Israel"
-msgstr ""
+msgstr "Israel"
 
 msgid "Isle of Man"
-msgstr ""
+msgstr "Ilha de Man"
 
 msgid "India"
-msgstr ""
+msgstr "Índia"
 
 msgid "British Indian Ocean Territory"
-msgstr ""
+msgstr "Território Britânico do Oceano Índico"
 
 msgid "Iraq"
-msgstr ""
+msgstr "Iraque"
 
 msgid "Islamic Republic of Iran"
-msgstr ""
+msgstr "Irã"
 
 msgid "Iceland"
-msgstr ""
+msgstr "Islândia"
 
 msgid "Italy"
-msgstr ""
+msgstr "Itália"
 
 msgid "Jersey"
-msgstr ""
+msgstr "Jersey"
 
 msgid "Jamaica"
-msgstr ""
+msgstr "Jamaica"
 
 msgid "Jordan"
-msgstr ""
+msgstr "Jordânia"
 
 msgid "Japan"
-msgstr ""
+msgstr "Japão"
 
 msgid "Kenya"
-msgstr ""
+msgstr "Quênia"
 
 msgid "Kyrgyzstan"
-msgstr ""
+msgstr "Quirguistão"
 
 msgid "Cambodia"
-msgstr ""
+msgstr "Camboja"
 
 msgid "Kiribati"
-msgstr ""
+msgstr "Quiribati"
 
 msgid "Comoros"
-msgstr ""
+msgstr "Comores"
 
 msgid "Saint Kitts and Nevis"
-msgstr ""
+msgstr "São Cristóvão e Nevis"
 
 msgid "The Democratic People's Republic of Korea"
-msgstr ""
+msgstr "Coreia do Norte"
 
 msgid "Republic of Korea"
-msgstr ""
+msgstr "Coreia do Sul"
 
 msgid "Kuwait"
-msgstr ""
+msgstr "Kuaite"
 
 msgid "Cayman Islands"
-msgstr ""
+msgstr "Ilhas Cayman"
 
 msgid "Kazakhstan"
-msgstr ""
+msgstr "Cazaquistão"
 
 msgid "Lao People's Democratic Republic"
-msgstr ""
+msgstr "Laos"
 
 msgid "Lebanon"
-msgstr ""
+msgstr "Líbano"
 
 msgid "Saint Lucia"
-msgstr ""
+msgstr "Santa Lúcia"
 
 msgid "Liechtenstein"
-msgstr ""
+msgstr "Liechtenstein"
 
 msgid "Sri Lanka"
-msgstr ""
+msgstr "Sri Lanka"
 
 msgid "Liberia"
-msgstr ""
+msgstr "Libéria"
 
 msgid "Lesotho"
-msgstr ""
+msgstr "Lesoto"
 
 msgid "Lithuania"
-msgstr ""
+msgstr "Lituânia"
 
 msgid "Luxembourg"
-msgstr ""
+msgstr "Luxemburgo"
 
 msgid "Latvia"
-msgstr ""
+msgstr "Letônia"
 
 msgid "Libyan Arab Jamahiriya"
 msgstr ""
