@@ -11,12 +11,15 @@ import java.util.Properties;
 
 import com.nettgryppa.security.HashCash;
 
+import gnu.getopt.Getopt;
+
 import net.i2p.I2PException;
 import net.i2p.client.I2PClient;
 import net.i2p.client.I2PClientFactory;
 import net.i2p.client.I2PSession;
 import net.i2p.client.I2PSessionException;
 import net.i2p.crypto.DSAEngine;
+import net.i2p.crypto.SigType;
 
 /**
  * This helper class reads and writes files in the
@@ -50,64 +53,120 @@ public class PrivateKeyFile {
      *  Copied and expanded from that in Destination.java
      */
     public static void main(String args[]) {
-        if (args.length == 0) {
-            System.err.println("Usage: PrivateKeyFile filename (generates if nonexistent, then prints)");
-            System.err.println("       PrivateKeyFile -h filename (generates if nonexistent, adds hashcash cert)");
-            System.err.println("       PrivateKeyFile -h effort filename (specify HashCash effort instead of default " + HASH_EFFORT + ")");
-            System.err.println("       PrivateKeyFile -n filename (changes to null cert)");
-            System.err.println("       PrivateKeyFile -s filename signwithdestfile (generates if nonexistent, adds cert signed by 2nd dest)");
-            System.err.println("       PrivateKeyFile -u filename (changes to unknown cert)");
-            System.err.println("       PrivateKeyFile -x filename (changes to hidden cert)");
-            return;
+        int hashEffort = HASH_EFFORT;
+        String stype = null;
+        int mode = 0;
+        boolean error = false;
+        Getopt g = new Getopt("pkf", args, "t:nuxhse:");
+        int c;
+        while ((c = g.getopt()) != -1) {
+          switch (c) {
+            case 't':
+                stype = g.getOptarg();
+                // fall thru...
+
+            case 'n':
+            case 'u':
+            case 'x':
+            case 'h':
+            case 's':
+                if (mode == 0)
+                    mode = c;
+                else
+                    error = true;
+                break;
+
+            case 'e':
+                hashEffort = Integer.parseInt(g.getOptarg());
+                break;
+
+            case '?':
+            case ':':
+            default:
+                error = true;
+                break;
+          }  // switch
+        } // while
+
+        int remaining = args.length - g.getOptind();
+        int reqd = mode == 's' ? 2 : 1;
+        if (error || remaining != reqd) {
+            usage();
+            System.exit(1);
         }
+        String filearg = args[g.getOptind()];
+
         I2PClient client = I2PClientFactory.createClient();
 
-        int filearg = 0;
-        if (args.length > 1) {
-            if (args.length >= 2 && args[0].equals("-h"))
-                filearg = args.length - 1;
-            else
-                filearg = 1;
-        }
         try {
-            File f = new File(args[filearg]);
+            File f = new File(filearg);
             PrivateKeyFile pkf = new PrivateKeyFile(f, client);
             Destination d = pkf.createIfAbsent();
             System.out.println("Original Destination:");
             System.out.println(pkf);
             verifySignature(d);
-            if (args.length == 1)
-                return;
-            if (args[0].equals("-n")) {
+            switch (mode) {
+              case 0:
+                // we are done
+                break;
+
+              case 'n':
                 // Cert constructor generates a null cert
                 pkf.setCertType(Certificate.CERTIFICATE_TYPE_NULL);
                 System.out.println("New destination with null cert is:");
-            } else if (args[0].equals("-u")) {
+                break;
+
+              case 'u':
                 pkf.setCertType(99);
                 System.out.println("New destination with unknown cert is:");
-            } else if (args[0].equals("-x")) {
+                break;
+
+              case 'x':
                 pkf.setCertType(Certificate.CERTIFICATE_TYPE_HIDDEN);
                 System.out.println("New destination with hidden cert is:");
-            } else if (args[0].equals("-h")) {
-                int hashEffort = HASH_EFFORT;
-                if (args.length == 3)
-                    hashEffort = Integer.parseInt(args[1]);
+                break;
+
+              case 'h':
                 System.out.println("Estimating hashcash generation time, stand by...");
                 System.out.println(estimateHashCashTime(hashEffort));
                 pkf.setHashCashCert(hashEffort);
                 System.out.println("New destination with hashcash cert is:");
-            } else if (args.length == 3 && args[0].equals("-s")) {
+                break;
+
+              case 's':
                 // Sign dest1 with dest2's Signing Private Key
-                PrivateKeyFile pkf2 = new PrivateKeyFile(args[2]);
+                PrivateKeyFile pkf2 = new PrivateKeyFile(args[g.getOptind() + 1]);
                 pkf.setSignedCert(pkf2);
                 System.out.println("New destination with signed cert is:");
+                break;
+
+              case 't':
+                // TODO merge with ecdsa branch
+                throw new UnsupportedOperationException();
+
+              default:
+                // shouldn't happen
+                usage();
+                return;
             }
             System.out.println(pkf);
             pkf.write();
             verifySignature(d);
         } catch (Exception e) {
             e.printStackTrace();
+            System.exit(1);
         }
+    }
+
+    private static void usage() {
+        System.err.println("Usage: PrivateKeyFile filename (generates if nonexistent, then prints)\n" +
+                           "       PrivateKeyFile -h filename (generates if nonexistent, adds hashcash cert)\n" +
+                           "       PrivateKeyFile -h -e effort filename (specify HashCash effort instead of default " + HASH_EFFORT + ")\n" +
+                           "       PrivateKeyFile -n filename (changes to null cert)\n" +
+                           "       PrivateKeyFile -s filename signwithdestfile (generates if nonexistent, adds cert signed by 2nd dest)\n" +
+                           "       PrivateKeyFile -t sigtype filename (changes to KeyCertificate of the given sig type\n" +
+                           "       PrivateKeyFile -u filename (changes to unknown cert)\n" +
+                           "       PrivateKeyFile -x filename (changes to hidden cert)\n");
     }
     
     public PrivateKeyFile(String file) {
