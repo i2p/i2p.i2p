@@ -31,7 +31,6 @@
 
 %>
 <%@page pageEncoding="UTF-8"%>
-<%@page trimDirectiveWhitespaces="true"%>
 <%@ page contentType="text/html"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <jsp:useBean id="version" class="i2p.susi.dns.VersionBean" scope="application" />
@@ -70,7 +69,7 @@
 <%=intl._("It regularly updates your hosts.txt file from distributed sources or \"subscriptions\".")%>
 </p>
 <p>
-<%=intl._("In the default configuration, the address book is only subscribed to www.i2p2.i2p.")%>
+<%=intl._("In the default configuration, the address book is only subscribed to {0}.", "i2p-projekt.i2p")%>
 <%=intl._("Subscribing to additional sites is easy, just add them to your <a href=\"subscriptions\">subscriptions</a> file.")%>
 </p>
 <p>

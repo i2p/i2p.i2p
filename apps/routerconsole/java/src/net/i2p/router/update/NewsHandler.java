@@ -21,8 +21,14 @@ import static net.i2p.update.UpdateMethod.*;
  */
 class NewsHandler extends UpdateHandler implements Checker {
     
-    /** @since 0.7.14 not configurable */
-    private static final String BACKUP_NEWS_URL = "http://www.i2p2.i2p/_static/news/news.xml";
+    /**
+     *  Changed in 0.9.11 to the b32 for psi.i2p, run by psi.
+     *  We may be able to change it to psi.i2p in a future release after
+     *  the hostname propagates.
+     *
+     *  @since 0.7.14 not configurable
+     */
+    private static final String BACKUP_NEWS_URL = "http://avviiexdngd32ccoy4kuckvc3mkf53ycvzbz6vz75vzhv4tbpk5a.b32.i2p/news.xml";
 
     public NewsHandler(RouterContext ctx, ConsoleUpdateManager mgr) {
         super(ctx, mgr);

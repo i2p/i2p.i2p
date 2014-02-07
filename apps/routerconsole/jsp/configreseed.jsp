@@ -26,7 +26,7 @@
 <%=intl._("If reseeding has failed, you should first check your network connection.")%>
 <p><b><%=intl._("The default settings will work for most people.")%></b>
 <%=intl._("Change these only if HTTP is blocked by a restrictive firewall, reseed has failed, and you have access to an HTTP proxy.")%>
-<%=intl._("See {0} for instructions on reseeding manually.", "<a href=\"http://www.i2p2.de/faq.html#manual_reseed\">" + intl._("the FAQ") + "</a>")%>
+<%=intl._("See {0} for instructions on reseeding manually.", "<a href=\"https://geti2p.net/faq#manual_reseed\">" + intl._("the FAQ") + "</a>")%>
 </p>
 <div class="wideload">
 <table border="0" cellspacing="5">
