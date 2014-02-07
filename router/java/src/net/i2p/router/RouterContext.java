@@ -67,7 +67,7 @@ public class RouterContext extends I2PAppContext {
     private final Set<Runnable> _finalShutdownTasks;
     // split up big lock on this to avoid deadlocks
     private volatile boolean _initialized;
-    private final Object _lock1 = new Object(), _lock2 = new Object(), _lock3 = new Object();
+    private final Object _lock1 = new Object(), _lock2 = new Object();
 
     private static final List<RouterContext> _contexts = new CopyOnWriteArrayList<RouterContext>();
     
@@ -544,42 +544,6 @@ public class RouterContext extends I2PAppContext {
     @Override
     public InternalClientManager internalClientManager() {
         return _internalClientManager;
-    }
-
-    /**
-     *  The controller of router, plugin, and other updates.
-     *  @return The manager if it is registered, else null
-     *  @since 0.9.4
-     */
-    @Override
-    public UpdateManager updateManager() {
-        return _updateManager;
-    }
-
-    /**
-     *  Register as the update manager.
-     *  @throws IllegalStateException if one was already registered
-     *  @since 0.9.4
-     */
-    public void registerUpdateManager(UpdateManager mgr) {
-        synchronized(_lock3) {
-            if (_updateManager != null)
-                throw new IllegalStateException();
-            _updateManager = mgr;
-        }
-    }
-
-    /**
-     *  Unregister the update manager.
-     *  @throws IllegalStateException if it was not registered
-     *  @since 0.9.4
-     */
-    public void unregisterUpdateManager(UpdateManager mgr) {
-        synchronized(_lock3) {
-            if (_updateManager != mgr)
-                throw new IllegalStateException();
-            _updateManager = null;
-        }
     }
 
     /**

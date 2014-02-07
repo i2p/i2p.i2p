@@ -24,6 +24,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import net.i2p.I2PAppContext;
+import net.i2p.app.ClientAppManager;
 import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
 import net.i2p.update.*;
@@ -198,7 +199,9 @@ public class SnarkManager implements CompleteListener {
         public void timeReached() {
             if (!_running)
                 return;
-            _umgr = _context.updateManager();
+            ClientAppManager cmgr = _context.clientAppManager();
+            if (cmgr != null)
+                _umgr = (UpdateManager) cmgr.getRegisteredApp(UpdateManager.APP_NAME);
             if (_umgr != null) {
                 _uhandler = new UpdateHandler(_context, _umgr, SnarkManager.this);
                 _umgr.register(_uhandler, UpdateType.ROUTER_SIGNED, UpdateMethod.TORRENT, 10);

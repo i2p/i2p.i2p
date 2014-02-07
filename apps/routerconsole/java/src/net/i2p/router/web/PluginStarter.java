@@ -121,7 +121,7 @@ public class PluginStarter implements Runnable {
         if (toUpdate.isEmpty())
             return;
 
-        ConsoleUpdateManager mgr = (ConsoleUpdateManager) ctx.updateManager();
+        ConsoleUpdateManager mgr = UpdateHandler.updateManager(ctx);
         if (mgr == null)
             return;
         if (mgr.isUpdateInProgress())

@@ -19,6 +19,12 @@ import java.util.Map;
 public interface UpdateManager {
     
     /**
+     *  The name we register with the ClientAppManager
+     *  @since 0.9.12
+     */
+    public static final String APP_NAME = "update";
+
+    /**
      *  Call once for each type/method pair.
      */
     public void register(Updater updater, UpdateType type, UpdateMethod method, int priority);

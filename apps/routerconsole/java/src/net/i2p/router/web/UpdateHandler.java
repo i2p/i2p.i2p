@@ -1,7 +1,9 @@
 package net.i2p.router.web;
 
+import net.i2p.app.ClientAppManager;
 import net.i2p.router.RouterContext;
 import net.i2p.router.update.ConsoleUpdateManager;
+import net.i2p.update.UpdateManager;
 import net.i2p.update.UpdateType;
 import static net.i2p.update.UpdateType.*;
 import net.i2p.util.Log;
@@ -32,6 +34,17 @@ public class UpdateHandler {
     public UpdateHandler(RouterContext ctx) {
         _context = ctx;
         _log = ctx.logManager().getLog(UpdateHandler.class);
+    }
+
+    /**
+     *  @return null if not found
+     *  @since 0.9.12
+     */
+    public static ConsoleUpdateManager updateManager(RouterContext ctx) {
+        ClientAppManager cmgr = ctx.clientAppManager();
+        if (cmgr == null)
+            return null;
+        return (ConsoleUpdateManager) cmgr.getRegisteredApp(UpdateManager.APP_NAME);
     }
     
     /**
@@ -75,7 +88,7 @@ public class UpdateHandler {
     }
 
     private void update(UpdateType type) {
-        ConsoleUpdateManager mgr = (ConsoleUpdateManager) _context.updateManager();
+        ConsoleUpdateManager mgr = updateManager(_context);
         if (mgr == null)
             return;
         if (mgr.isUpdateInProgress(ROUTER_SIGNED) || mgr.isUpdateInProgress(ROUTER_UNSIGNED) ||
