@@ -31,7 +31,6 @@
 
 %>
 <%@page pageEncoding="UTF-8"%>
-<%@page trimDirectiveWhitespaces="true"%>
 <%@ page contentType="text/html"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <jsp:useBean id="version" class="i2p.susi.dns.VersionBean" scope="application" />
@@ -81,9 +80,9 @@
 <%=intl._("The subscription file contains a list of i2p URLs.")%>
 <%=intl._("The addressbook application regularly checks this list for new eepsites.")%>
 <%=intl._("Those URLs refer to published hosts.txt files.")%>
-<%=intl._("The default subscription is the hosts.txt from www.i2p2.i2p, which is updated infrequently.")%>
+<%=intl._("The default subscription is the hosts.txt from {0}, which is updated infrequently.", "i2p-projekt.i2p")%>
 <%=intl._("So it is a good idea to add additional subscriptions to sites that have the latest addresses.")%>
-<a href="http://www.i2p2.i2p/faq.html#subscriptions" target="_top"><%=intl._("See the FAQ for a list of subscription URLs.")%></a>
+<a href="http://i2p-projekt.i2p/faq.html#subscriptions" target="_top"><%=intl._("See the FAQ for a list of subscription URLs.")%></a>
 </p>
 </div>
 <div id="footer">

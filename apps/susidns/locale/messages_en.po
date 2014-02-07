@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P susidns\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-01-09 19:27+0000\n"
+"POT-Creation-Date: 2014-02-06 18:27+0000\n"
 "PO-Revision-Date: 2010-06-15 14:09+0100\n"
 "Last-Translator: duck <duck@mail.i2p>\n"
 "Language-Team: duck <duck@mail.i2p>\n"
@@ -628,8 +628,8 @@ msgstr ""
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:140
 msgid ""
-"For more information on naming in I2P, see <a href=\"http://www.i2p2.i2p/"
-"naming.html\" target=\"_top\">the overview on www.i2p2.i2p</a>."
+"For more information on naming in I2P, see <a href=\"http://i2p-projekt.i2p/"
+"naming.html\" target=\"_top\">the overview</a>."
 msgstr ""
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:142

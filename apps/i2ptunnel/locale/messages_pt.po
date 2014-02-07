@@ -4,6 +4,7 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
 # Translators:
+# kgtm <fabio.h.f.antunes@gmail.com>, 2014
 # rafaelbf, 2013
 # tuliouel, 2013
 # wicked, 2012
@@ -12,8 +13,8 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-01-09 19:27+0000\n"
-"PO-Revision-Date: 2014-01-09 19:27+0000\n"
-"Last-Translator: kytv <killyourtv@i2pmail.org>\n"
+"PO-Revision-Date: 2014-01-28 13:01+0000\n"
+"Last-Translator: kgtm <fabio.h.f.antunes@gmail.com>\n"
 "Language-Team: Portuguese (http://www.transifex.com/projects/p/I2P/language/pt/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -235,7 +236,7 @@ msgstr "Destino do Túnel"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:215
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:382
 msgid "name, name:port, or destination"
-msgstr ""
+msgstr "nome, nome:porta, ou destino"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:218
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:386
@@ -293,22 +294,22 @@ msgstr "Comprimento"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:261
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:277
 msgid "0 hop tunnel (no anonymity)"
-msgstr ""
+msgstr "0 saltos túnel (sem anonimato)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:265
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:281
 msgid "1 hop tunnel (low anonymity)"
-msgstr ""
+msgstr "1 saltos túnel (baixo anonimato)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:269
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:285
 msgid "2 hop tunnel (medium anonymity)"
-msgstr ""
+msgstr "2 saltos túnel (médio anonimato)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:273
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:289
 msgid "3 hop tunnel (high anonymity)"
-msgstr ""
+msgstr "3 saltos túnel (grande anonimato)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:281
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:297
@@ -492,7 +493,7 @@ msgstr "Destino local"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:467
 msgid "Local Base 32"
-msgstr ""
+msgstr "Base 32 do endereço local"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:476
 msgid "Local Authorization"
@@ -551,7 +552,7 @@ msgstr "Nova configuração de servidor"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:179
 msgid "Use SSL?"
-msgstr ""
+msgstr "Usar SSL?"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:222
 msgid "Website name"
@@ -642,19 +643,19 @@ msgstr "Max. de conexões simultâneas (0 = ilimitado)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:477
 msgid "POST limits (0=unlimited)"
-msgstr ""
+msgstr "Limite de submissões HTTP POST (0 = ilimitado)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:481
 msgid "Per period"
-msgstr ""
+msgstr "Por período"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:485
 msgid "Ban minutes"
-msgstr ""
+msgstr "Minutos de proibição"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:495
 msgid "POST limit period (minutes)"
-msgstr ""
+msgstr "Período de limite submissões HTTP POST (minutos)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:516
 msgid "New Certificate type"

@@ -1,3 +1,19 @@
+2014-02-07 zzz
+ * Services:
+   - Move backup news to psi.i2p
+   - Move default addressbook subscription to i2p-projekt.i2p
+   - Remove www.i2p2.i2p from default update lists
+   - Add psi.i2p to hosts.txt
+   - Update links on help pages to avoid redirects on new website
+     and select the correct language
+ * SusiDNS: Fix whitespace issues
+
+2014-02-06 kytv
+ * Brazilian Portuguese, Danish, French, Japanese, Polish, Russian, Ukrainian
+   translation updates
+ * Updates to geoip.txt and geoipv6.dat.gz based on Maxmind GeoLite Country
+   database from 2014-02-05.
+
 2014-01-31 zzz
  * /logs: Fix encoding of wrapper log section (ticket #1193)
  * NetDB: Fix cases where corrupt RouterInfo files were not deleted (ticket #1190)

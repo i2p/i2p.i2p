@@ -24,7 +24,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-01-09 19:27+0000\n"
-"PO-Revision-Date: 2014-01-18 22:20+0000\n"
+"PO-Revision-Date: 2014-01-22 15:14+0000\n"
 "Last-Translator: kgtm <fabio.h.f.antunes@gmail.com>\n"
 "Language-Team: Portuguese (http://www.transifex.com/projects/p/I2P/language/pt/)\n"
 "MIME-Version: 1.0\n"
@@ -3111,31 +3111,31 @@ msgstr "NTCP e SSU com intermediadores"
 
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:448
 msgid "IPv6 Only SSU, introducers"
-msgstr ""
+msgstr "Apenas IPv6 com introdutores SSU"
 
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:448
 msgid "IPv6 SSU"
-msgstr ""
+msgstr "SSU IPv6"
 
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:448
 msgid "IPv6 SSU, introducers"
-msgstr ""
+msgstr "SSU introdutores com IPv6"
 
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:449
 msgid "IPv6 NTCP"
-msgstr ""
+msgstr "NTCP IPv6"
 
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:449
 msgid "IPv6 NTCP, SSU"
-msgstr ""
+msgstr "NTCP e SSU com IPv6"
 
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:449
 msgid "IPv6 NTCP, SSU, introducers"
-msgstr ""
+msgstr "NTCP e SSU introdutores com IPv6"
 
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:449
 msgid "IPv6 Only NTCP, SSU, introducers"
-msgstr ""
+msgstr "Apenas NTCP e SSU introdutores com IPv6"
 
 #: ../java/src/net/i2p/router/web/NewsHelper.java:252
 #, java-format

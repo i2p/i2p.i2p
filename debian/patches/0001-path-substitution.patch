@@ -575,20 +575,41 @@ Debian wrapper.config to try to prevent confusion.
  "true."
 --- a/installer/resources/locale/po/messages_pt_BR.po
 +++ b/installer/resources/locale/po/messages_pt_BR.po
-@@ -186,13 +186,13 @@
+@@ -187,13 +187,13 @@
  msgstr ""
  
  #: ../i2prouter:1807
 -msgid "Please edit i2prouter and set the variable RUN_AS_USER"
 -msgstr "Por favor, edite i2prouter e especifique a variável RUN_AS_USER"
 +msgid "Please edit /etc/default/i2p and set the variable RUN_AS_USER"
-+msgstr "Por favor, edite /etc/default/i2p especifique a variável RUN_AS_USER"
++msgstr "Por favor, edite /etc/default/i2p e especifique a variável RUN_AS_USER"
  
  #: ../i2prouter:1812
  msgid "Running I2P as the root user is *not* recommended."
- msgstr ""
+ msgstr "Executar o roteador I2P como usuário root *não* é recomendado."
  
  #: ../i2prouter:1815
 -msgid "To run as root anyway, edit i2prouter and set ALLOW_ROOT=true."
+-msgstr "De qualquer forma, se quiser mesmo executar o roteador como root, edite i2prouter e ponha ALLOW_ROOT=true."
 +msgid "To run as root anyway, edit /etc/default/i2p and set ALLOW_ROOT=true."
- msgstr ""
++msgstr "De qualquer forma, se quiser mesmo executar o roteador como root, edite /etc/default/i2p e ponha ALLOW_ROOT=true."
+--- a/installer/resources/locale/po/messages_pl.po
++++ b/installer/resources/locale/po/messages_pl.po
+@@ -186,13 +186,13 @@
+ msgstr "Zażądaj zrzutu wątków Java jeśli jest uruchomiona."
+ 
+ #: ../i2prouter:1807
+-msgid "Please edit i2prouter and set the variable RUN_AS_USER"
+-msgstr "Proszę edytuj i2prouter i ustaw zmienną RUN_AS_USER"
++msgid "Please edit /etc/default/i2p and set the variable RUN_AS_USER"
++msgstr "Proszę edytuj /etc/default/i2p i ustaw zmienną RUN_AS_USER"
+ 
+ #: ../i2prouter:1812
+ msgid "Running I2P as the root user is *not* recommended."
+ msgstr "Nie jest polecane uruchamianie I2P jako root."
+ 
+ #: ../i2prouter:1815
+-msgid "To run as root anyway, edit i2prouter and set ALLOW_ROOT=true."
+-msgstr "Aby uruchomić jako root, edytuj i2prouter i ustaw ALLOW_ROOT=true."
++msgid "To run as root anyway, edit /etc/default/i2p and set ALLOW_ROOT=true."
++msgstr "Aby uruchomić jako root, edytuj /etc/default/i2p i ustaw ALLOW_ROOT=true."

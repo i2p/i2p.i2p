@@ -2,26 +2,25 @@
 # Copyright (C) 2009 The I2P Project
 # This file is distributed under the same license as the routerconsole package.
 # To contribute translations, see http://www.i2p2.de/newdevelopers
-#
+# 
 # Translators:
-# plazmism <gomidori@live.jp>, 2013
+# plazmism <gomidori@live.jp>, 2013-2014
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-12-01 20:04+0000\n"
-"PO-Revision-Date: 2013-11-26 10:49+0000\n"
+"POT-Creation-Date: 2013-07-13 21:46+0000\n"
+"PO-Revision-Date: 2014-02-05 11:58+0000\n"
 "Last-Translator: plazmism <gomidori@live.jp>\n"
-"Language-Team: Japanese (http://www.transifex.com/projects/p/I2P/language/"
-"ja/)\n"
-"Language: ja\n"
+"Language-Team: Japanese (http://www.transifex.com/projects/p/I2P/language/ja/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: ja\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 msgid "Congratulations on getting I2P installed!"
-msgstr "I2P がインストールされたことに関する設定"
+msgstr "I2P のインストールに際する設定"
 
 msgid "Welcome to I2P!"
 msgstr "I2P にようこそ！"
@@ -32,21 +31,18 @@ msgstr "I2P が起動し、ピアを検索するまで{0}お待ちください{1
 
 #, java-format
 msgid ""
-"While you are waiting, please {0}adjust your bandwidth settings{1} on the {2}"
-"configuration page{3}."
+"While you are waiting, please {0}adjust your bandwidth settings{1} on the "
+"{2}configuration page{3}."
 msgstr "お待ちの間、{2}設定ページ{3}で{0}帯域幅設定を調整{1}してください。"
 
-msgid "Also you can setup your browser to use the I2P proxy to reach eepsites."
-msgstr ""
-"また、 eepsite に到達するために I2P プロキシを使用するためにブラウザをセット"
-"アップしてください。"
+msgid ""
+"Also you can setup your browser to use the I2P proxy to reach eepsites."
+msgstr "また、 eepsite に到達するために I2P プロキシを使用するためにブラウザをセットアップしてください。"
 
 msgid ""
 "Just enter 127.0.0.1 (or localhost) port 4444 as a http proxy into your "
 "browser settings."
-msgstr ""
-"127.0.0.1 (または localhost) ポート 4444番をHTTPプロキシとして、ブラウザ設定"
-"に入力してください。"
+msgstr "127.0.0.1 (または localhost) ポート 4444番をHTTPプロキシとして、ブラウザ設定に入力してください。"
 
 msgid "Do not use SOCKS for this."
 msgstr "これには SOCKS を使用しないでください。"
@@ -54,20 +50,16 @@ msgstr "これには SOCKS を使用しないでください。"
 #, java-format
 msgid ""
 "More information can be found on the {0}I2P browser proxy setup page{1}."
-msgstr "さらなる情報は {0}I2P ブラウザプロキシ設定ページ{1}で見つけられます。"
+msgstr "詳細は {0}I2P ブラウザプロキシ設定ページ{1} にあります。"
 
 #, java-format
 msgid ""
-"Once you have a \"shared clients\" destination listed on the left, please {0}"
-"check out{1} our {2}FAQ{3}."
-msgstr ""
-"左にリストされている「共有クライアント」の宛先があれば、{2}FAQ{3}を{0}確認{1}"
-"してください。"
+"Once you have a \"shared clients\" destination listed on the left, please "
+"{0}check out{1} our {2}FAQ{3}."
+msgstr "左にリストされている「共有クライアント」の宛先があれば、{2}FAQ{3}を{0}確認{1}してください。"
 
 #, java-format
 msgid ""
 "Point your IRC client to {0}localhost:6668{1} and say hi to us on {2}#i2p-"
 "help{3} or {4}#i2p{5}."
-msgstr ""
-"IRCクライアントを{0}localhost:6668{1}にポイントし、 {2}#i2p-help{3}かr {4}"
-"#i2p{5}で私たちに挨拶してください。"
+msgstr "IRCクライアントを{0}localhost:6668{1}に合わせ、 {2}#i2p-help{3}かr {4}#i2p{5}で私たちによろしくどうぞ。"

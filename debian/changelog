@@ -1,3 +1,27 @@
+i2p (0.9.11-1) unstable; urgency=medium
+
+  * New release
+  * Debconf: New Korean and Polish translations
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Sat, 09 Feb 2014 00:00:00 +0000
+
+i2p (0.9.10-1) unstable; urgency=medium
+
+  * New release
+  * Remove /var/lib/i2p when i2p package is purged.
+  * Bump standards version to 3.9.5 (no changes needed)
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Wed, 22 Jan 2014 16:00:24 +0000
+
+i2p (0.9.9-1) unstable; urgency=medium
+
+  * New Upstream release
+  * debconf:
+    - Updated French translation
+    - New Romanian translation
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Sat, 07 Dec 2013 18:17:24 +0000
+
 i2p (0.9.8-1) unstable; urgency=low
 
   * New Upstream Version

@@ -6,13 +6,14 @@
 # Translators:
 # Денис Лысенко <gribua@gmail.com>, 2011
 # Денис Лысенко <gribua@gmail.com>, 2012
+# jonny_nut, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-12-01 20:06+0000\n"
-"PO-Revision-Date: 2013-11-19 23:52+0000\n"
-"Last-Translator: kytv <killyourtv@i2pmail.org>\n"
+"PO-Revision-Date: 2014-01-23 16:58+0000\n"
+"Last-Translator: jonny_nut\n"
 "Language-Team: Ukrainian (Ukraine) (http://www.transifex.com/projects/p/I2P/language/uk_UA/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -249,14 +250,14 @@ msgstr "Авторизація outproxy"
 #: ../java/build/Proxy.java:89
 msgid ""
 "This proxy is configured to require a username and password for access."
-msgstr ""
+msgstr "Цей проксі налаштований конечно вимагати ім'я користувача і пароль для доступу."
 
 #: ../java/build/Proxy.java:90
 #, java-format
 msgid ""
 "Please enter your username and password, or check your {0}router "
 "configuration{1} or {2}I2PTunnel configuration{3}."
-msgstr ""
+msgstr "Будь ласка, ввести ваш логін і пароль, або перевірити {0}router configuration{1} або {2}I2PTunnel configuration{3}."
 
 #: ../java/build/Proxy.java:91
 #, java-format
