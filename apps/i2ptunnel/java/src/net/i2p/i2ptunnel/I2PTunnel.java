@@ -53,6 +53,9 @@ import java.util.StringTokenizer;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.atomic.AtomicLong;
 
+import gnu.getopt.Getopt;
+import gnu.getopt.LongOpt;
+
 import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
 import net.i2p.client.I2PClient;
@@ -107,18 +110,46 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
 
     private final Set<ConnectionEventListener> listeners = new CopyOnWriteArraySet<ConnectionEventListener>();
 
-    public static void main(String[] args) throws IOException {
-        new I2PTunnel(args);
+    private static final int NOGUI = 99999;
+    private static final LongOpt[] longopts = new LongOpt[] {
+        new LongOpt("cli", LongOpt.NO_ARGUMENT, null, 'c'),
+        new LongOpt("die", LongOpt.NO_ARGUMENT, null, 'd'),
+        new LongOpt("gui", LongOpt.NO_ARGUMENT, null, 'g'),
+        new LongOpt("help", LongOpt.NO_ARGUMENT, null, 'h'),
+        new LongOpt("nocli", LongOpt.NO_ARGUMENT, null, 'w'),
+        new LongOpt("nogui", LongOpt.NO_ARGUMENT, null, NOGUI),
+        new LongOpt("wait", LongOpt.NO_ARGUMENT, null, 'w')
+    };
+
+    public static void main(String[] args) {
+        try {
+            new I2PTunnel(args);
+        } catch (IllegalArgumentException iae) {
+            System.err.println(iae.toString());
+            System.exit(1);
+        }
     }
 
+    /**
+     *  Standard constructor for embedded, uses args "-nocli -die" to return immediately
+     */
     public I2PTunnel() {
         this(nocli_args);
     }
 
+    /**
+     *  See usage() for options
+     *  @throws IllegalArgumentException
+     */
     public I2PTunnel(String[] args) {
         this(args, null);
     }
 
+    /**
+     *  See usage() for options
+     *  @param lsnr may be null
+     *  @throws IllegalArgumentException
+     */
     public I2PTunnel(String[] args, ConnectionEventListener lsnr) {
         super();
         _context = I2PAppContext.getGlobalContext(); // new I2PAppContext();
@@ -134,37 +165,95 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
         boolean checkRunByE = true;
         boolean cli = true;
         boolean dontDie = true;
-        for (int i = 0; i < args.length; i++) {
-            if (args[i].equals("-die")) {
+        boolean error = false;
+        List<String> eargs = null;
+        Getopt g = new Getopt("i2ptunnel", args, "d::n:c::w::e:h::", longopts);
+        int c;
+        while ((c = g.getopt()) != -1) {
+          switch (c) {
+            case 'd':  // -d, -die, --die
                 dontDie = false;
                 gui = false;
                 cli = false;
                 checkRunByE = false;
-            } else if (args[i].equals("-nogui")) {
+                break;
+
+            case 'n':  // -noc, -nog, -nocli, -nogui
+                String a = g.getOptarg();
+                if (a.startsWith("oc")) {
+                    gui = false;
+                    cli = false;
+                    checkRunByE = false;
+                    break;
+                } else if (a.startsWith("og")) {
+                    // fall thru
+                } else {
+                    error = true;
+                    break;
+                }
+                // fall thru for -nogui only
+
+            case NOGUI:  // --nogui
                 gui = false;
-                _log.warn(getPrefix() + "The `-nogui' option of I2PTunnel is deprecated.\n"
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn(getPrefix() + "The `-nogui' option of I2PTunnel is deprecated.\n"
                           + "Use `-cli', `-nocli' (aka `-wait') or `-die' instead.");
-            } else if (args[i].equals("-cli")) {
+
+            case 'c':  // -c, -cli, --cli
                 gui = false;
                 cli = true;
                 checkRunByE = false;
-            } else if (args[i].equals("-nocli") || args[i].equals("-wait")) {
+                break;
+
+            case 'w':  // -w, -wait, --nocli
                 gui = false;
                 cli = false;
                 checkRunByE = false;
-            } else if (args[i].equals("-e")) {
-                runCommand(args[i + 1], this);
-                i++;
+                break;
+
+            case 'e':
+                if (eargs == null)
+                    eargs = new ArrayList<String>(4);
+                eargs.add(g.getOptarg());
                 if (checkRunByE) {
                     checkRunByE = false;
                     cli = false;
                 }
-            } else if (new File(args[i]).exists()) {
-                runCommand("run " + args[i], this);
-            } else {
-                System.out.println("Unknown parameter " + args[i]);
+                break;
+
+            case 'h':
+            case '?':
+            case ':':
+            default:
+              error = true;
+          }
+        }
+
+        int remaining = args.length - g.getOptind();
+
+        if (error || remaining > 1) {
+            System.err.println(usage());
+            throw new IllegalArgumentException();
+        }
+
+        if (eargs != null) {
+            for (String arg : eargs) {
+                runCommand(arg, this);
             }
         }
+
+        if (remaining == 1) {
+            String f = args[g.getOptind()];
+            File file = new File(f);
+            // This is probably just a problem with the options, so
+            // throw from here
+            if (!file.exists()) {
+                System.err.println(usage());
+                throw new IllegalArgumentException("Command file does not exist: " + f);
+            }
+            runCommand("run " + f, this);
+        }
+
         if (gui) {
             new I2PTunnelGUI(this);
         } else if (cli) {
@@ -185,6 +274,9 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
+        } else if (eargs == null && remaining == 0 && dontDie) {
+            System.err.println(usage());
+            throw new IllegalArgumentException("Waiting for nothing! Specify gui, cli, command, command file, or die");
         }
 
         while (dontDie) {
@@ -195,6 +287,23 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
                 }
             }
         }
+    }
+
+    /** with newlines except for last line */
+    private static String usage() {
+        // not sure this all makes sense, just documenting what's above
+        return
+            "Usage: i2ptunnel [options] [commandFile]\n" +
+            "  Default is to run the GUI.\n" +
+            "  commandFile: run all commands in this file\n" +
+            "  Options:\n" +
+            "    -c, -cli, --cli     :  run the command line interface\n" +
+            "    -d, -die, --die     :  exit immediately, do not wait for commands to finish\n" +
+            "    -e 'command [args]' :  run the command\n" +
+            "    -h, --help          :  display this help\n" +
+            "    -nocli, --nocli     :  do not run the command line interface or GUI\n" +
+            "    -nogui, --nogui     :  do not run the GUI\n" +
+            "    -w, -wait, --wait   :  do not run the command line interface or GUI";
     }
 
     /** @return A copy, non-null */
