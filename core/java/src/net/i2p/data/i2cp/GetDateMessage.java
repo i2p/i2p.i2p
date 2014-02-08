@@ -24,7 +24,7 @@ import net.i2p.util.OrderedProperties;
  * Only supported from client to router.
  *
  * Since 0.8.7, optionally include a version string.
- * Since 0.9.10, optionally include options.
+ * Since 0.9.11, optionally include options.
  */
 public class GetDateMessage extends I2CPMessageImpl {
     public final static int MESSAGE_TYPE = 32;
@@ -49,7 +49,7 @@ public class GetDateMessage extends I2CPMessageImpl {
      *                 must be non-null if options is non-null and non-empty.
      *  @param options Client options to be sent to the router; primarily for authentication; may be null;
      *                 keys and values 255 bytes (not chars) max each
-     *  @since 0.9.10
+     *  @since 0.9.11
      */
     public GetDateMessage(String version, Properties options) {
         super();
@@ -72,7 +72,7 @@ public class GetDateMessage extends I2CPMessageImpl {
      *  Primarily for authentication.
      *
      *  @return may be null
-     *  @since 0.9.10
+     *  @since 0.9.11
      */
     public Properties getOptions() {
         return _options;

@@ -128,8 +128,7 @@ public class I2PAppContext {
                          _lock5 = new Object(), _lock6 = new Object(), _lock7 = new Object(), _lock8 = new Object(),
                          _lock9 = new Object(), _lock10 = new Object(), _lock11 = new Object(), _lock12 = new Object(),
                          _lock13 = new Object(), _lock14 = new Object(), _lock15 = new Object(), _lock16 = new Object(),
-                         _lock17 = new Object(), _lock18 = new Object(), _lock19 = new Object(), _lock20 = new Object(),
-                         _lock21 = new Object();
+                         _lock17 = new Object(), _lock18 = new Object(), _lock19 = new Object(), _lock20 = new Object();
 
     /**
      * Pull the default context, creating a new one if necessary, else using 

@@ -197,7 +197,7 @@ public class I2Ping extends I2PTunnelClientBase {
 
     /**
      *  Does nothing.
-     *  @since 0.9.10
+     *  @since 0.9.11
      */
     protected void clientConnectionRun(Socket s) {}
 
@@ -209,7 +209,7 @@ public class I2Ping extends I2PTunnelClientBase {
         private final boolean reportTimes;
 
         /**
-         *  As of 0.9.10, does NOT start itself.
+         *  As of 0.9.11, does NOT start itself.
          *  Caller must call start()
          *  @param dest b64 or b32 or host name
          */
@@ -276,7 +276,7 @@ public class I2Ping extends I2PTunnelClientBase {
 
         /**
          *  @param name b64 or b32 or host name
-         *  @since 0.9.10
+         *  @since 0.9.11
          */
         private Destination lookup(String name) {
             I2PAppContext ctx = I2PAppContext.getGlobalContext();

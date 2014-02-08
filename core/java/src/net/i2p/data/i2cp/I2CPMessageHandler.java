@@ -23,7 +23,7 @@ public class I2CPMessageHandler {
 
     /**
      *  This is huge. Mainly to catch a completly bogus response, possibly not an I2CP socket.
-     *  @since 0.9.10
+     *  @since 0.9.11
      */
     public static final int MAX_LENGTH = 128*1024;
 

@@ -1,3 +1,5 @@
+* 2014-02-08 0.9.11 released
+
 2014-02-07 zzz
  * Services:
    - Move backup news to psi.i2p
