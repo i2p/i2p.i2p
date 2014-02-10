@@ -1,3 +1,12 @@
+2014-02-10 zzz
+ * Console:
+   - Don't reset graph settings when clicking restart or shutdown on graphs page
+   - Don't recommend guest login on trac, it's disabled
+   - Catch and remove corrupt jrb file (ticket #1186)
+   - Always set default language on /configui
+ * Transports: Reduce target connection count again to reduce
+               tunnel reject rate further
+
 * 2014-02-08 0.9.11 released
 
 2014-02-07 zzz
