@@ -351,7 +351,7 @@ public class GraphHelper extends FormHandler {
         try {
             _out.write("<br><h3>" + _("Configure Graph Display") + " [<a href=\"configstats\">" + _("Select Stats") + "</a>]</h3>");
             _out.write("<form action=\"graphs\" method=\"POST\">\n" +
-                       "<input type=\"hidden\" name=\"action\" value=\"foo\">\n" +
+                       "<input type=\"hidden\" name=\"action\" value=\"save\">\n" +
                        "<input type=\"hidden\" name=\"nonce\" value=\"" + nonce + "\" >\n");
             _out.write(_("Periods") + ": <input size=\"5\" style=\"text-align: right;\" type=\"text\" name=\"periodCount\" value=\"" + _periodCount + "\"><br>\n");
             _out.write(_("Plot averages") + ": <input type=\"radio\" class=\"optbox\" name=\"showEvents\" value=\"false\" " + (_showEvents ? "" : "checked=\"checked\" ") + "> ");
@@ -380,7 +380,7 @@ public class GraphHelper extends FormHandler {
             if (persistent)
                 _out.write(" checked=\"checked\"");
             _out.write(">" +
-                       "<hr><div class=\"formaction\"><input type=\"submit\" class=\"acceot\" value=\"" + _("Save settings and redraw graphs") + "\"></div></form>");
+                       "<hr><div class=\"formaction\"><input type=\"submit\" class=\"accept\" value=\"" + _("Save settings and redraw graphs") + "\"></div></form>");
         } catch (IOException ioe) {
             ioe.printStackTrace();
         }
@@ -413,7 +413,8 @@ public class GraphHelper extends FormHandler {
      */
     @Override
     protected void processForm() {
-        saveSettings();
+        if ("save".equals(_action))
+            saveSettings();
     }
 
     /**

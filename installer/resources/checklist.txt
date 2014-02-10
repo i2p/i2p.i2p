@@ -73,17 +73,17 @@ Seed update torrents
 Notify the following people:
 	All in-network update hosts
 	PPA maintainer
-	Google code maintainer
 	news.xml maintainer
+	backup news.xml maintainer
 
 Website files to change:
-	Sync with mtn.i2p2.i2p
+	Sync with mtn.i2p-projekt.i2p
 	hosts.txt if it changed (copy from i2p.i2p mtn branch)
 	i2p2www/__init__.py (release number)
 	i2p2www/pages/downloads/list.html (checksums)
 	i2p2www/static/news/news.xml
 	New release announcement - see i2p2www/blog/README for instructions
-	Sync with mtn.i2p2.i2p
+	Sync with mtn.i2p-projekt.i2p
 
 Announce on:
          #i2p, #i2p-dev (also on freenode side)

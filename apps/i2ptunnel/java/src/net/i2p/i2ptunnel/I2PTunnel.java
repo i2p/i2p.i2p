@@ -1319,7 +1319,7 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
      *
      * @param args {username, password}
      * @param l logger to receive events and output
-     * @since 0.9.10
+     * @since 0.9.11
      */
     private void runAuth(String args[], Logging l) {
         if (args.length == 2) {
@@ -1774,7 +1774,7 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
      *  @param i2cpPort may be null
      *  @param user may be null
      *  @param pw may be null
-     *  @since 0.9.10
+     *  @since 0.9.11
      */
     private static Destination destFromName(String name, String i2cpHost,
                                             String i2cpPort, boolean isSSL,

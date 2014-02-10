@@ -103,11 +103,33 @@ public class ConfigUIHelper extends HelperBase {
 
     /** todo sort by translated string */
     public String getLangSettings() {
-        StringBuilder buf = new StringBuilder(512);
-        String current = Messages.getLanguage(_context);
+        String clang = Messages.getLanguage(_context);
+        String current = clang;
         String country = Messages.getCountry(_context);
         if (country != null && country.length() > 0)
             current += '_' + country;
+        // find best match
+        boolean found = false;
+        for (int i = 0; i < langs.length; i++) {
+            if (langs[i][0].equals(current)) {
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            if (country != null && country.length() > 0) {
+                current = clang;
+                for (int i = 0; i < langs.length; i++) {
+                    if (langs[i][0].equals(current)) {
+                        found = true;
+                        break;
+                    }
+                }
+            }
+            if (!found)
+                current = "en";
+        }
+        StringBuilder buf = new StringBuilder(512);
         for (int i = 0; i < langs.length; i++) {
             // we use "lang" so it is set automagically in CSSHelper
             buf.append("<input type=\"radio\" class=\"optbox\" name=\"lang\" ");

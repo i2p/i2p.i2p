@@ -78,8 +78,17 @@ class SummaryListener implements RateSummaryListener {
                 //String names[] = _sample.getDsNames();
                 //System.out.println("Add " + val + " over " + eventCount + " for " + _name
                 //                   + " [" + names[0] + ", " + names[1] + "]");
+            } catch (IllegalArgumentException iae) {
+                // ticket #1186
+                // apparently a corrupt file, thrown from update()
+                _log.error("Error adding", iae);
+                String path = _isPersistent ? _db.getPath() : null;
+                stopListening();
+                if (path != null)
+                    (new File(path)).delete();
             } catch (IOException ioe) {
                 _log.error("Error adding", ioe);
+                stopListening();
             } catch (RrdException re) {
                 // this can happen after the time slews backwards, so don't make it an error
                 // org.jrobin.core.RrdException: Bad sample timestamp 1264343107. Last update time was 1264343172, at least one second step is required
