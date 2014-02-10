@@ -90,8 +90,11 @@ public class ConfigClientsHelper extends HelperBase {
     /** clients */
     public String getForm1() {
         StringBuilder buf = new StringBuilder(1024);
-        buf.append("<table>\n");
-        buf.append("<tr><th align=\"right\">" + _("Client") + "</th><th>" + _("Run at Startup?") + "</th><th>" + _("Control") + "</th><th align=\"left\">" + _("Class and arguments") + "</th></tr>\n");
+        buf.append("<table>\n" +
+                   "<tr><th align=\"right\">").append(_("Client")).append("</th><th>")
+           .append(_("Run at Startup?")).append("</th><th>")
+           .append(_("Control")).append("</th><th align=\"left\">")
+           .append(_("Class and arguments")).append("</th></tr>\n");
         
         List<ClientAppConfig> clients = ClientAppConfig.getClientApps(_context);
         for (int cur = 0; cur < clients.size(); cur++) {
@@ -134,8 +137,11 @@ public class ConfigClientsHelper extends HelperBase {
     /** webapps */
     public String getForm2() {
         StringBuilder buf = new StringBuilder(1024);
-        buf.append("<table>\n");
-        buf.append("<tr><th align=\"right\">" + _("WebApp") + "</th><th>" + _("Run at Startup?") + "</th><th>" + _("Control") + "</th><th align=\"left\">" + _("Description") + "</th></tr>\n");
+        buf.append("<table>\n" +
+                   "<tr><th align=\"right\">").append(_("WebApp")).append("</th><th>")
+           .append(_("Run at Startup?")).append("</th><th>")
+           .append(_("Control")).append("</th><th align=\"left\">")
+           .append(_("Description")).append("</th></tr>\n");
         Properties props = RouterConsoleRunner.webAppProperties(_context);
         Set<String> keys = new TreeSet(props.keySet());
         for (String name : keys) {
@@ -159,8 +165,11 @@ public class ConfigClientsHelper extends HelperBase {
     /** plugins */
     public String getForm3() {
         StringBuilder buf = new StringBuilder(1024);
-        buf.append("<table>\n");
-        buf.append("<tr><th align=\"right\">" + _("Plugin") + "</th><th>" + _("Run at Startup?") + "</th><th>" + _("Control") + "</th><th align=\"left\">" + _("Description") + "</th></tr>\n");
+        buf.append("<table>\n" +
+                   "<tr><th align=\"right\">").append(_("Plugin")).append("</th><th>")
+           .append(_("Run at Startup?")).append("</th><th>")
+           .append(_("Control")).append("</th><th align=\"left\">")
+           .append(_("Description")).append("</th></tr>\n");
         Properties props = PluginStarter.pluginProperties();
         Set<String> keys = new TreeSet(props.keySet());
         for (String name : keys) {
@@ -273,15 +282,20 @@ public class ConfigClientsHelper extends HelperBase {
         // The icons were way too much, so there's an X in each button class,
         // remove if you wnat to put them back
         if (showStartButton && (!ro) && !edit) {
-            buf.append("<button type=\"submit\" class=\"Xaccept\" name=\"action\" value=\"Start ").append(index).append("\" >" + _("Start") + "<span class=hide> ").append(index).append("</span></button>");
+            buf.append("<button type=\"submit\" class=\"Xaccept\" name=\"action\" value=\"Start ").append(index).append("\" >")
+               .append(_("Start")).append("<span class=hide> ").append(index).append("</span></button>");
         }
         if (showStopButton && (!edit))
-            buf.append("<button type=\"submit\" class=\"Xstop\" name=\"action\" value=\"Stop ").append(index).append("\" >" + _("Stop") + "<span class=hide> ").append(index).append("</span></button>");
+            buf.append("<button type=\"submit\" class=\"Xstop\" name=\"action\" value=\"Stop ").append(index).append("\" >")
+               .append(_("Stop")).append("<span class=hide> ").append(index).append("</span></button>");
         if (showEditButton && (!edit) && !ro)
-            buf.append("<button type=\"submit\" class=\"Xadd\" name=\"edit\" value=\"Edit ").append(index).append("\" >" + _("Edit") + "<span class=hide> ").append(index).append("</span></button>");
+            buf.append("<button type=\"submit\" class=\"Xadd\" name=\"edit\" value=\"Edit ").append(index).append("\" >")
+               .append(_("Edit")).append("<span class=hide> ").append(index).append("</span></button>");
         if (showUpdateButton && (!edit) && !ro) {
-            buf.append("<button type=\"submit\" class=\"Xcheck\" name=\"action\" value=\"Check ").append(index).append("\" >" + _("Check for updates") + "<span class=hide> ").append(index).append("</span></button>");
-            buf.append("<button type=\"submit\" class=\"Xdownload\" name=\"action\" value=\"Update ").append(index).append("\" >" + _("Update") + "<span class=hide> ").append(index).append("</span></button>");
+            buf.append("<button type=\"submit\" class=\"Xcheck\" name=\"action\" value=\"Check ").append(index).append("\" >")
+               .append(_("Check for updates")).append("<span class=hide> ").append(index).append("</span></button>");
+            buf.append("<button type=\"submit\" class=\"Xdownload\" name=\"action\" value=\"Update ").append(index).append("\" >")
+                .append(_("Update")).append("<span class=hide> ").append(index).append("</span></button>");
         }
         if (showDeleteButton && (!edit) && !ro) {
             buf.append("<button type=\"submit\" class=\"Xdelete\" name=\"action\" value=\"Delete ").append(index)

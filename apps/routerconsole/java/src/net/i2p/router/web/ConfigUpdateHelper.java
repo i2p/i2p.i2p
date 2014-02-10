@@ -115,9 +115,9 @@ public class ConfigUpdateHelper extends HelperBase {
                 buf.append("\" selected=\"selected");
             
             if (PERIODS[i] == -1)
-                buf.append("\">" + _("Never") + "</option>\n");
+                buf.append("\">").append(_("Never")).append("</option>\n");
             else
-                buf.append("\">" + _("Every") + " ").append(DataHelper.formatDuration2(PERIODS[i])).append("</option>\n");
+                buf.append("\">").append(_("Every")).append(' ').append(DataHelper.formatDuration2(PERIODS[i])).append("</option>\n");
         }
         buf.append("</select>\n");
         return buf.toString();
