@@ -1,4 +1,46 @@
 2014-02-10 zzz
+Prop from i2p.i2p.zzz.test2:
+ * Addressbook: Rewrite subscriptions.txt for new default URL
+ * Build: Honor require.gettext=false for i2prouter translations
+ * Core: Add lightweight getopt command line parsing lib (ticket #1173)
+ * EepGet:
+   - Convert to getopt (ticket #1173)
+   - New option -c for clearnet (no proxy), same as -p:0
+   - Proxy option -p with host name arg only (no ':') now allowed
+   - Proxy password option is now -x, not the second arg to -u
+   - Prompt for proxy password if not supplied in options
+   - Line length option is now -l, not the second arg to -m
+   - Error on nonproxied .onion hosts
+   - Update man page, sort options (ticket #1173)
+   - Support Digest proxy authentication (ticket #1173)
+   - Move authentication parsing method from I2PTunnelHTTPClientBase
+ * EepHead, PartialEepGet, SSLEepGet: Convert to getopt (ticket #1173)
+ * EepHead, PartialEepGet:
+   - New option -c for clearnet (no proxy), same as -p:0
+   - New option -o, same as EepGet
+   - Proxy option -p with host name arg only (no ':') now allowed
+   - Add proxy auth support with -u and -x options (ticket #1173)
+ * I2Ping:
+   - Convert to getopt (ticket #1173)
+   - Add support for from/to ports
+ * i2psnark: Cache PeerID.toString()
+ * I2PTunnel:
+   - Convert to getopt (ticket #1173)
+   - Add more argument sanity checking and a usage output
+ * PrivateKeyFile:
+   - Convert to getopt (ticket #1173)
+   - New option -e for hashcash effort, replaces -h with arg
+   - Stub out -t option, to be propped from ecdsa branch
+ * Streaming:
+   - Set ports on many packets that were missing them
+   - Use connection throttling methods on pings too (ticket #1142)
+   - Add methods to set ports on pings
+   - Argument checking on ping methods
+ * SU3File: Convert to getopt (ticket #1173)
+ * UpdateManager: Convert to RouterApp and remove update hooks from context
+     (ticket #1185)
+
+2014-02-10 zzz
  * Console:
    - Don't reset graph settings when clicking restart or shutdown on graphs page
    - Don't recommend guest login on trac, it's disabled
