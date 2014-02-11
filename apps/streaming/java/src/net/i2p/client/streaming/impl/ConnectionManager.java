@@ -617,6 +617,16 @@ class ConnectionManager {
      *
      *  @param timeoutMs greater than zero
      *  @return true if pong received
+     */
+    public boolean ping(Destination peer, long timeoutMs) {
+        return ping(peer, 0, 0, timeoutMs, true, null);
+    }
+
+    /**
+     *  blocking
+     *
+     *  @param timeoutMs greater than zero
+     *  @return true if pong received
      *  @since 0.9.12 added port args
      */
     public boolean ping(Destination peer, int fromPort, int toPort, long timeoutMs) {
