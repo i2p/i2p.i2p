@@ -71,20 +71,13 @@ Debian wrapper.config to try to prevent confusion.
  
  # Priority at which to run the wrapper.  See "man nice" for valid priorities.
  #  nice is only used if a priority is specified.
-@@ -167,69 +158,13 @@
- 
- # Do not modify anything beyond this point
- #-----------------------------------------------------------------------------
-+JAVABINARY=$(awk -F'=' '/^ *wrapper\.java\.command/{print $2}' "$WRAPPER_CONF")
-+
- if [ ! -e "$WRAPPER_CONF" ]; then
-        echo "Starting I2P Failed: Unable to find $WRAPPER_CONF"
+@@ -172,84 +163,8 @@
         exit 1
  fi
  
 -# Workaround for Gentoo
--JAVABINARY=$(awk -F'=' '/^ *wrapper\.java\.command/{print $2}' "$WRAPPER_CONF")
--
+ JAVABINARY=$(awk -F'=' '/^ *wrapper\.java\.command/{print $2}' "$WRAPPER_CONF")
+ 
 -if [ -e /etc/gentoo-release ]; then
 -    if [ $JAVABINARY = java ]; then
 -        if [ -x /etc/java-config-2/current-system-vm/bin/java ]; then
@@ -109,25 +102,46 @@ Debian wrapper.config to try to prevent confusion.
 -    echo
 -}
 -
+-freebsd10() {
+-    echo
+-    echo "The current version of the Tanuki wrapper does not"
+-    echo "support FreeBSD 10."
+-    echo
+-    echo "See https://trac.i2p2.de/ticket/1118 for more information"
+-    echo "and a workaround for this issue."
+-    echo
+-    echo "In the meantime, you may start I2P by running the script"
+-    echo "${I2P}/runplain.sh"
+-    echo
+-}
+-
 -failed() {
--        echo "**`gettext 'Failed to load the wrapper'`**"
--        case `uname -s` in
--             FreeBSD)
--                # We should never get here on recent versions of FreeBSD
--                if ! $(pkg_info -E 'libiconv*' > /dev/null 2>&1); then
--                    echo
--                    echo "The wrapper requires libiconv."
--                    echo
--                    echo "It can be installed with pkg_add -r libiconv"
--                    echo
--                fi
--                ;;
--             *)
--                echo
--                unsupported
--                ;;
--        esac
--        exit 1
+-    echo "**`gettext 'Failed to load the wrapper'`**"
+-    case `uname -s` in
+-        FreeBSD)
+-            case `uname -r` in
+-                10*|11*)
+-                    freebsd10
+-                    ;;
+-                *)
+-                    # We should never get here on recent versions of FreeBSD
+-                    if ! $(pkg_info -E 'libiconv*' > /dev/null 2>&1); then
+-                        echo
+-                        echo "The wrapper requires libiconv."
+-                        echo
+-                        echo "It can be installed with pkg_add -r libiconv"
+-                        echo
+-                    fi
+-                    ;;
+-            esac
+-            ;;
+-
+-        *)
+-            echo
+-            unsupported
+-            ;;
+-    esac
+-    exit 1
 -}
 -
 -if $(which ldd > /dev/null 2>&1); then
@@ -139,20 +153,10 @@ Debian wrapper.config to try to prevent confusion.
 -        failed
 -    fi
 -fi
--
+ 
  if [ -n "$FIXED_COMMAND" ]
  then
-     COMMAND="$FIXED_COMMAND"
-@@ -944,7 +879,7 @@
- 
-         # The string passed to eval must handles spaces in paths correctly.
-         COMMAND_LINE="$CMDNICE \"$WRAPPER_CMD\" \"$WRAPPER_CONF\" wrapper.syslog.ident=\"$APP_NAME\" wrapper.java.command=\"$JAVABINARY\" wrapper.pidfile=\"$PIDFILE\" wrapper.name=\"$APP_NAME\" wrapper.displayname=\"$APP_LONG_NAME\" $ANCHORPROP $STATUSPROP $COMMANDPROP $LOCKPROP $LOGPROP wrapper.script.version=3.5.22 $ADDITIONAL_PARA"
--        eval $COMMAND_LINE || failed
-+        eval $COMMAND_LINE
-     else
-         eval echo `gettext '$APP_LONG_NAME is already running.'`
-         exit 1
-@@ -1001,7 +936,6 @@
+@@ -1022,7 +937,6 @@
          if [ "X$pid" = "X" ]
          then
              eval echo " `gettext 'WARNING: $APP_LONG_NAME may have failed to start.'`"
@@ -160,7 +164,7 @@ Debian wrapper.config to try to prevent confusion.
          else
              eval echo ' running: PID:$pid'
          fi
-@@ -1804,7 +1738,7 @@
+@@ -1825,7 +1739,7 @@
  }
  
  showsetusermesg()  {
@@ -169,7 +173,7 @@ Debian wrapper.config to try to prevent confusion.
  }
  
  checkifstartingasroot() {
-@@ -1812,7 +1746,7 @@
+@@ -1833,7 +1747,7 @@
          echo "`gettext 'Running I2P as the root user is *not* recommended.'`"
          showsetusermesg
          echo
@@ -178,7 +182,7 @@ Debian wrapper.config to try to prevent confusion.
          exit 1
      fi
  }
-@@ -1877,24 +1811,10 @@
+@@ -1898,24 +1812,10 @@
              status
              ;;
  
