@@ -1,3 +1,8 @@
+2014-02-11 zzz
+ * HTTP client proxy: Don't flush after headers for a POST,
+   so the POST data is included in the SYN packet,
+   to improve speed and reliability of small POSTs
+
 2014-02-10 zzz
 Prop from i2p.i2p.zzz.test2:
  * Addressbook: Rewrite subscriptions.txt for new default URL
