@@ -43,14 +43,25 @@ public class SessionId extends DataStructureImpl {
         return _sessionId;
     }
 
-    /** @param id 0-65535 */
+    /**
+     *  @param id 0-65535
+     *  @throws IllegalArgumentException
+     *  @throws IllegalStateException if already set
+     */
     public void setSessionId(int id) {
         if (id < 0 || id > 65535)
             throw new IllegalArgumentException();
+        if (_sessionId >= 0)
+            throw new IllegalStateException();
         _sessionId = id;
     }
 
+    /**
+     *  @throws IllegalStateException if already set
+     */
     public void readBytes(InputStream in) throws DataFormatException, IOException {
+        if (_sessionId >= 0)
+            throw new IllegalStateException();
         _sessionId = (int) DataHelper.readLong(in, 2);
     }
 
@@ -62,12 +73,12 @@ public class SessionId extends DataStructureImpl {
     @Override
     public boolean equals(Object obj) {
         if ((obj == null) || !(obj instanceof SessionId)) return false;
-        return _sessionId == ((SessionId) obj).getSessionId();
+        return _sessionId == ((SessionId) obj)._sessionId;
     }
 
     @Override
     public int hashCode() {
-        return _sessionId;
+        return 777 * _sessionId;
     }
 
     @Override

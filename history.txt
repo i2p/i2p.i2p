@@ -1,3 +1,13 @@
+2014-02-14 zzz
+ * I2CP:
+   - Add session limit, add new status code for refused
+   - Ramdomize session ID, prevent dups
+   - Make SessionId immutable
+
+2014-02-13 zzz
+ * Router: Convert to getopt (ticket #1173)
+ * Tunnels: Change expl. OB default to 3+0
+
 2014-02-11 zzz
  * HTTP client proxy: Don't flush after headers for a POST,
    so the POST data is included in the SYN packet,

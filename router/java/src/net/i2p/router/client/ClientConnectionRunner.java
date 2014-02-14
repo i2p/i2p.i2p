@@ -218,9 +218,21 @@ class ClientConnectionRunner {
      */
     public Hash getDestHash() { return _destHashCache; }
     
-    /** current client's sessionId */
+    /**
+     * @return current client's sessionId or null if not yet set
+     */
     SessionId getSessionId() { return _sessionId; }
-    void setSessionId(SessionId id) { if (id != null) _sessionId = id; }
+
+    /**
+     *  To be called only by ClientManager.
+     *
+     *  @throws IllegalStateException if already set
+     */
+    void setSessionId(SessionId id) {
+        if (_sessionId != null)
+            throw new IllegalStateException();
+        _sessionId = id;
+    }
 
     /** data for the current leaseRequest, or null if there is no active leaseSet request */
     LeaseRequestState getLeaseRequest() { return _leaseRequest; }
@@ -263,7 +275,14 @@ class ClientConnectionRunner {
         _messages.remove(id); 
     }
     
-    void sessionEstablished(SessionConfig config) {
+    /**
+     *  Caller must send a SessionStatusMessage to the client with the returned code.
+     *  Caller must call disconnectClient() on failure.
+     *  Side effect: Sets the session ID.
+     *
+     *  @return SessionStatusMessage return code, 1 for success, != 1 for failure
+     */
+    public int sessionEstablished(SessionConfig config) {
         _destHashCache = config.getDestination().calculateHash();
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("SessionEstablished called for destination " + _destHashCache.toBase64());
@@ -293,7 +312,7 @@ class ClientConnectionRunner {
         } else {
             _log.error("SessionEstablished called for twice for destination " + _destHashCache.toBase64().substring(0,4));
         }
-        _manager.destinationEstablished(this);
+        return _manager.destinationEstablished(this);
     }
     
     /** 
