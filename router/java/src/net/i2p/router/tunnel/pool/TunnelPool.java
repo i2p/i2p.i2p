@@ -1137,7 +1137,8 @@ public class TunnelPool {
             peers = Collections.singletonList(_context.routerHash());
         }
 
-        PooledTunnelCreatorConfig cfg = new PooledTunnelCreatorConfig(_context, peers.size(), settings.isInbound(), settings.getDestination());
+        PooledTunnelCreatorConfig cfg = new PooledTunnelCreatorConfig(_context, peers.size(),
+                                                settings.isInbound(), settings.getDestination());
         cfg.setTunnelPool(this);
         // peers list is ordered endpoint first, but cfg.getPeer() is ordered gateway first
         for (int i = 0; i < peers.size(); i++) {
