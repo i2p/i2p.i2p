@@ -1794,7 +1794,7 @@ showUsage() {
             if [ -n "$PASS_THROUGH" ] ; then
                 echo "${MSG} $0 [ console {JavaAppArgs} | start {JavaAppArgs} | stop | restart {JavaAppArgs} | condrestart {JavaAppArgs} | status | install | remove | dump ]"
             else
-                echo "${MSG} $0 [ console | start | stop | restart | condrestart | status | install | remove | dump ]"
+                echo "${MSG} $0 [ console | start | stop | graceful | restart | condrestart | status | install | remove | dump ]"
         fi
     fi
 
