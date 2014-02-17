@@ -20,6 +20,12 @@
    - Hide setting in i2ptunnel edit pages unless advanced user
    - Only store LS with key certs to routers that support it
    - Only store LS with more than 6 leases to routers that support it
+ * Jetty:
+   - Update to Jetty 8.1.14.v20131031, Servlet 3.0, JSP 2.2
+   - Use Servlet and JSP jars from Jetty instead of Tomcat
+   - Tomcat remains at 6.0.37 supporting Servlet 2.5 / JSP 2.1
+   - Remove Jetty dependency in console error pages
+   - Require Java 6
 
 2014-02-14 zzz
  * I2CP:
