@@ -116,7 +116,7 @@ public class SigningPublicKey extends SimpleDataStructure {
      *  Up-convert this from an untyped (type 0) SPK to a typed SPK based on the Key Cert given
      *
      *  @throws IllegalArgumentException if this is already typed to a different type
-     *  @since 0.9.11
+     *  @since 0.9.12
      */
     public SigningPublicKey toTypedKey(KeyCertificate kcert) {
         if (_data == null)
@@ -147,7 +147,7 @@ public class SigningPublicKey extends SimpleDataStructure {
      *
      *  @return leading padding length > 0 or null
      *  @throws IllegalArgumentException if this is already typed to a different type
-     *  @since 0.9.11
+     *  @since 0.9.12
      */
     public byte[] getPadding(KeyCertificate kcert) {
         if (_data == null)
@@ -169,7 +169,7 @@ public class SigningPublicKey extends SimpleDataStructure {
     /**
      *  Write the data up to a max of 128 bytes.
      *  If longer, the rest will be written in the KeyCertificate.
-     *  @since 0.9.11
+     *  @since 0.9.12
      */
     public void writeTruncatedBytes(OutputStream out) throws DataFormatException, IOException {
         if (_type.getPubkeyLen() <= KEYSIZE_BYTES)

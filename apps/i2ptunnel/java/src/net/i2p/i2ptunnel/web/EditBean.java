@@ -178,7 +178,7 @@ public class EditBean extends IndexBean {
         return getBooleanProperty(tunnel, "i2cp.encryptLeaseSet");
     }
     
-    /** @since 0.9.11 */
+    /** @since 0.9.12 */
     public int getSigType(int tunnel) {
         return getProperty(tunnel, I2PClient.PROP_SIGTYPE, 0);
     }
@@ -351,7 +351,7 @@ public class EditBean extends IndexBean {
         return Addresses.getAllAddresses();
     }
 
-    /** @since 0.9.11 */
+    /** @since 0.9.12 */
     public boolean isAdvanced() {
         return _context.getBooleanProperty("routerconsole.advanced");
     }

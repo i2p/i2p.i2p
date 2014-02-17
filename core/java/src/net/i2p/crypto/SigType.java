@@ -177,7 +177,7 @@ public enum SigType {
      *
      *  @param stype number or name
      *  @return null if not found
-     *  @since 0.9.9 moved from SU3File in 0.9.11
+     *  @since 0.9.9 moved from SU3File in 0.9.12
      */
     public static SigType parseSigType(String stype) {
         try {

@@ -227,7 +227,7 @@ public class PrivateKeyFile {
     /**
      * Change cert type - caller must also call write().
      * Side effect - creates new Destination object.
-     * @since 0.9.11
+     * @since 0.9.12
      */
     public Certificate setKeyCert(SigType type) {
         if (type == SigType.DSA_SHA1)

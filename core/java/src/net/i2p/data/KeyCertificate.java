@@ -11,7 +11,7 @@ import net.i2p.crypto.SigType;
  *
  * The crypto type is assumed to be always 0x0000 (ElG) for now.
  *
- * @since 0.9.11
+ * @since 0.9.12
  */
 public class KeyCertificate extends Certificate {
 

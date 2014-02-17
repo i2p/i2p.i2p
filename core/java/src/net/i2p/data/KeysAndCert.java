@@ -81,7 +81,7 @@ public class KeysAndCert extends DataStructureImpl {
     
     /**
      * @throws IllegalStateException if was already set
-     * @since 0.9.11
+     * @since 0.9.12
      */
     public void setPadding(byte[] padding) {
         if (_padding != null)

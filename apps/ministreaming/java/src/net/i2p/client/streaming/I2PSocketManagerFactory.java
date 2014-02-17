@@ -260,7 +260,7 @@ public class I2PSocketManagerFactory {
 
     /**
      *  @param opts may be null
-     *  @since 0.9.11
+     *  @since 0.9.12
      */
     private static SigType getSigType(Properties opts) {
         if (opts != null) {

@@ -501,11 +501,11 @@ class StoreJob extends JobImpl {
         return VersionComparator.comp(v, MIN_ENCRYPTION_VERSION) >= 0;
     }
 
-    private static final String MIN_KEYCERT_VERSION = "0.9.11";
+    private static final String MIN_KEYCERT_VERSION = "0.9.12";
 
     /**
      * Does he support key certs (assumed with a non-DSA key)?
-     * @since 0.9.11
+     * @since 0.9.12
      */
     private static boolean supportsKeyCerts(RouterInfo ri) {
         String v = ri.getOption("router.version");
@@ -518,7 +518,7 @@ class StoreJob extends JobImpl {
 
     /**
      * Does he support more than 6 leasesets?
-     * @since 0.9.11
+     * @since 0.9.12
      */
     private static boolean supportsBigLeaseSets(RouterInfo ri) {
         String v = ri.getOption("router.version");

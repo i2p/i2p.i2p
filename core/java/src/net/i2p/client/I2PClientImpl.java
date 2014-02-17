@@ -58,7 +58,7 @@ class I2PClientImpl implements I2PClient {
      *
      * @param destKeyStream location to write out the destination, PrivateKey, and SigningPrivateKey,
      *                      format is specified in {@link net.i2p.data.PrivateKeyFile PrivateKeyFile}
-     * @since 0.9.11
+     * @since 0.9.12
      */
     public Destination createDestination(OutputStream destKeyStream, SigType type) throws I2PException, IOException {
         Certificate cert;

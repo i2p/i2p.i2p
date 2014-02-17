@@ -42,7 +42,7 @@ public class Certificate extends DataStructureImpl {
     public final static int CERTIFICATE_LENGTH_SIGNED_WITH_HASH = Signature.SIGNATURE_BYTES + Hash.HASH_LENGTH;
     /** Contains multiple certs */
     public final static int CERTIFICATE_TYPE_MULTIPLE = 4;
-    /** @since 0.9.11 */
+    /** @since 0.9.12 */
     public final static int CERTIFICATE_TYPE_KEY = 5;
 
     /**
@@ -218,7 +218,7 @@ public class Certificate extends DataStructureImpl {
      *  Up-convert this to a KeyCertificate
      *
      *  @throws DataFormatException if cert type != CERTIFICATE_TYPE_KEY
-     *  @since 0.9.11
+     *  @since 0.9.12
      */
     public KeyCertificate toKeyCertificate() throws DataFormatException {
         if (_type != CERTIFICATE_TYPE_KEY)

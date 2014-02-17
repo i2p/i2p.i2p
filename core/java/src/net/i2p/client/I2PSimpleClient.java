@@ -33,7 +33,7 @@ public class I2PSimpleClient implements I2PClient {
     /**
      *  @deprecated Don't do this
      *  @throws UnsupportedOperationException always
-     *  @since 0.9.11
+     *  @since 0.9.12
      */
     public Destination createDestination(OutputStream destKeyStream, SigType type) throws I2PException, IOException {
         throw new UnsupportedOperationException();

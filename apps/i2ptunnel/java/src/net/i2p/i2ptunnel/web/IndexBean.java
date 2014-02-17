@@ -964,7 +964,7 @@ public class IndexBean {
         _certSigner = val;
     }
 
-    /** @since 0.9.11 */
+    /** @since 0.9.12 */
     public void setSigType(String val) {
         if (val != null) {
             _otherOptions.put(I2PClient.PROP_SIGTYPE, val);

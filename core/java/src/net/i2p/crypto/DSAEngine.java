@@ -93,7 +93,7 @@ public class DSAEngine {
     }
 
     /**
-     *  Verify using any sig type as of 0.9.11 (DSA only prior to that)
+     *  Verify using any sig type as of 0.9.12 (DSA only prior to that)
      */
     public boolean verifySignature(Signature signature, byte signedData[], int offset, int size, SigningPublicKey verifyingKey) {
         boolean rv;
@@ -266,7 +266,7 @@ public class DSAEngine {
     }
 
     /**
-     *  Sign using any key type as of 0.9.11 (DSA-SHA1 only prior to that)
+     *  Sign using any key type as of 0.9.12 (DSA-SHA1 only prior to that)
      *
      *  @return null on error
      */
@@ -495,7 +495,7 @@ public class DSAEngine {
     /**
      *  Generic verify DSA_SHA1, ECDSA, or RSA
      *  @throws GeneralSecurityException if algorithm unvailable or on other errors
-     *  @since 0.9.9 added off/len 0.9.11
+     *  @since 0.9.9 added off/len 0.9.12
      */
     private boolean altVerifySig(Signature signature, byte[] data, int offset, int len, SigningPublicKey verifyingKey)
                         throws GeneralSecurityException {
@@ -555,7 +555,7 @@ public class DSAEngine {
     /**
      *  Alternate to verifySignature() using java.security libraries.
      *  @throws GeneralSecurityException if algorithm unvailable or on other errors
-     *  @since 0.8.7 added off/len 0.9.11
+     *  @since 0.8.7 added off/len 0.9.12
      */
     private boolean altVerifySigSHA1(Signature signature, byte[] data, int offset,
                                      int len, SigningPublicKey verifyingKey) throws GeneralSecurityException {
@@ -574,7 +574,7 @@ public class DSAEngine {
     /**
      *  Generic sign DSA_SHA1, ECDSA, or RSA
      *  @throws GeneralSecurityException if algorithm unvailable or on other errors
-     *  @since 0.9.9 added off/len 0.9.11
+     *  @since 0.9.9 added off/len 0.9.12
      */
     private Signature altSign(byte[] data, int offset, int len,
                               SigningPrivateKey privateKey) throws GeneralSecurityException {
@@ -624,7 +624,7 @@ public class DSAEngine {
     /**
      *  Alternate to sign() using java.security libraries.
      *  @throws GeneralSecurityException if algorithm unvailable or on other errors
-     *  @since 0.8.7 added off/len args 0.9.11
+     *  @since 0.8.7 added off/len args 0.9.12
      */
     private Signature altSignSHA1(byte[] data, int offset, int len,
                                   SigningPrivateKey privateKey) throws GeneralSecurityException {

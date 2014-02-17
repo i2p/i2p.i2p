@@ -238,7 +238,7 @@ public class AddressBean
 
 	/**
 	 * Do this the easy way
-	 * @since 0.9.11
+	 * @since 0.9.12
 	 */
 	public String getSigType() {
 		// (4 / 3) * (pubkey length + signing key length)
