@@ -5,6 +5,7 @@
    - Use JVM HmacSHA256 instead of I2PHMAC for Syndie since it is standard
  * SSU:
    - Use session key for relay request/response if available (ticket #1206)
+   - Restrict authentication with Bob's intro key to session created packet
    - Remove packetAuthTime stats
 
 2014-02-14 zzz
