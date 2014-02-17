@@ -17,12 +17,16 @@ import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
 
 import net.i2p.I2PAppContext;
+import net.i2p.app.ClientAppManager;
+import net.i2p.app.ClientAppState;
+import static net.i2p.app.ClientAppState.*;
 import net.i2p.crypto.SU3File;
 import net.i2p.crypto.TrustedUpdate;
 import net.i2p.data.DataHelper;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.router.RouterVersion;
+import net.i2p.router.app.RouterApp;
 import net.i2p.router.web.ConfigServiceHandler;
 import net.i2p.router.web.ConfigUpdateHandler;
 import net.i2p.router.web.Messages;
@@ -50,7 +54,7 @@ import net.i2p.util.VersionComparator;
  *
  *  @since 0.9.4
  */
-public class ConsoleUpdateManager implements UpdateManager {
+public class ConsoleUpdateManager implements UpdateManager, RouterApp {
     
     private final RouterContext _context;
     private final Log _log;
@@ -68,6 +72,8 @@ public class ConsoleUpdateManager implements UpdateManager {
     private final Map<UpdateItem, Version> _installed;
     private final boolean _allowTorrent;
     private static final DecimalFormat _pct = new DecimalFormat("0.0%");
+    private final ClientAppManager _cmgr;
+    private volatile ClientAppState _state = UNINITIALIZED;
 
     private volatile String _status;
 
@@ -77,8 +83,12 @@ public class ConsoleUpdateManager implements UpdateManager {
     private static final long TASK_CLEANER_TIME = 15*60*1000;
     private static final String PROP_UNSIGNED_AVAILABLE = "router.updateUnsignedAvailable";
 
-    public ConsoleUpdateManager(RouterContext ctx) {
+    /**
+     *  @param args ignored
+     */
+    public ConsoleUpdateManager(RouterContext ctx, ClientAppManager listener, String[] args) {
         _context = ctx;
+        _cmgr = listener;
         _log = ctx.logManager().getLog(ConsoleUpdateManager.class);
         _registeredUpdaters = new ConcurrentHashSet<RegisteredUpdater>();
         _registeredCheckers = new ConcurrentHashSet<RegisteredChecker>();
@@ -98,13 +108,34 @@ public class ConsoleUpdateManager implements UpdateManager {
         //_allowTorrent = RouterVersion.BUILD != 0 || _context.random().nextInt(100) < 60;
         // Finally, for 0.9.12, 18 months later...
         _allowTorrent = true;
+        _state = INITIALIZED;
     }
 
+    /**
+     *  @return null if not found
+     */
     public static ConsoleUpdateManager getInstance() {
-        return (ConsoleUpdateManager) I2PAppContext.getGlobalContext().updateManager();
+        ClientAppManager cmgr = I2PAppContext.getGlobalContext().clientAppManager();
+        if (cmgr == null)
+            return null;
+        return (ConsoleUpdateManager) cmgr.getRegisteredApp(APP_NAME);
     }
 
+    /////// ClientApp methods
+
+    /**
+     *  UpdateManager interface
+     */
     public void start() {
+        startup();
+    }
+
+    /**
+     *  ClientApp interface
+     *  @since 0.9.12
+     */
+    public synchronized void startup() {
+        changeState(STARTING);
         notifyInstalled(NEWS, "", Long.toString(NewsHelper.lastUpdated(_context)));
         notifyInstalled(ROUTER_SIGNED, "", RouterVersion.VERSION);
         notifyInstalled(ROUTER_SIGNED_SU3, "", RouterVersion.VERSION);
@@ -118,7 +149,6 @@ public class ConsoleUpdateManager implements UpdateManager {
                 notifyInstalled(PLUGIN, plugin, ver);
         }
 
-        _context.registerUpdateManager(this);
         DummyHandler dh = new DummyHandler(_context, this);
         register((Checker)dh, TYPE_DUMMY, METHOD_DUMMY, 0);
         register((Updater)dh, TYPE_DUMMY, METHOD_DUMMY, 0);
@@ -162,10 +192,27 @@ public class ConsoleUpdateManager implements UpdateManager {
         //register((Updater)puh, PLUGIN, FILE, 0);
         new NewsTimerTask(_context, this);
         _context.simpleScheduler().addPeriodicEvent(new TaskCleaner(), TASK_CLEANER_TIME);
+        changeState(RUNNING);
+        if (_cmgr != null)
+            _cmgr.register(this);
     }
 
+    /**
+     *  UpdateManager interface
+     */
     public void shutdown() {
-        _context.unregisterUpdateManager(this);
+        shutdown(null);
+    }
+
+    /**
+     *  ClientApp interface
+     *  @param args ignored
+     *  @since 0.9.12
+     */
+    public synchronized void shutdown(String[] args) {
+        if (_state == STOPPED)
+            return;
+        changeState(STOPPING);
         stopChecks();
         stopUpdates();
         _registeredUpdaters.clear();
@@ -173,6 +220,30 @@ public class ConsoleUpdateManager implements UpdateManager {
         _available.clear();
         _downloaded.clear();
         _installed.clear();
+        changeState(STOPPED);
+    }
+
+    /** @since 0.9.12 */
+    public ClientAppState getState() {
+        return _state;
+    }
+
+    /** @since 0.9.12 */
+    public String getName() {
+        return APP_NAME;
+    }
+
+    /** @since 0.9.12 */
+    public String getDisplayName() {
+        return "Console Update Manager";
+    }
+
+    /////// end ClientApp methods
+
+    private synchronized void changeState(ClientAppState state) {
+        _state = state;
+        if (_cmgr != null)
+            _cmgr.notify(this, state, null, null);
     }
 
     /**

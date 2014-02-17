@@ -261,8 +261,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         _context.statManager().createRateStat("udp.dropPeerDroplist", "How many peers currently have their packets dropped outright when a new peer is added to the list?", "udp", RATES);
         _context.statManager().createRateStat("udp.dropPeerConsecutiveFailures", "How many consecutive failed sends to a peer did we attempt before giving up and reestablishing a new session (lifetime is inactivity perood)", "udp", RATES);
         // following are for PacketBuider
-        _context.statManager().createRateStat("udp.packetAuthTime", "How long it takes to encrypt and MAC a packet for sending", "udp", RATES);
-        _context.statManager().createRateStat("udp.packetAuthTimeSlow", "How long it takes to encrypt and MAC a packet for sending (when its slow)", "udp", RATES);
+        //_context.statManager().createRateStat("udp.packetAuthTime", "How long it takes to encrypt and MAC a packet for sending", "udp", RATES);
+        //_context.statManager().createRateStat("udp.packetAuthTimeSlow", "How long it takes to encrypt and MAC a packet for sending (when its slow)", "udp", RATES);
 
         _context.simpleScheduler().addPeriodicEvent(new PingIntroducers(), MIN_EXPIRE_TIMEOUT * 3 / 4);
     }
@@ -2846,7 +2846,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
 
         public void timeReached() {
             // Increase allowed idle time if we are well under allowed connections, otherwise decrease
-            if (haveCapacity(45)) {
+            if (haveCapacity(33)) {
                 long inc;
                 // don't adjust too quickly if we are looping fast
                 if (_lastLoopShort)

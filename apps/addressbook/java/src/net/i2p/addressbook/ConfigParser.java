@@ -91,7 +91,7 @@ class ConfigParser {
         String inputLine;
         inputLine = input.readLine();
         while (inputLine != null) {
-            inputLine = ConfigParser.stripComments(inputLine);
+            inputLine = stripComments(inputLine);
             String[] splitLine = inputLine.split("=");
             if (splitLine.length == 2) {
                 result.put(splitLine[0].trim().toLowerCase(Locale.US), splitLine[1].trim());
@@ -116,7 +116,7 @@ class ConfigParser {
         FileInputStream fileStream = new FileInputStream(file);
         BufferedReader input = new BufferedReader(new InputStreamReader(
                 fileStream));
-        Map<String, String>  rv = ConfigParser.parse(input);
+        Map<String, String>  rv = parse(input);
         try {
             fileStream.close();
         } catch (IOException ioe) {}
@@ -136,7 +136,7 @@ class ConfigParser {
     public static Map<String, String>  parse(String string) throws IOException {
         StringReader stringReader = new StringReader(string);
         BufferedReader input = new BufferedReader(stringReader);
-        return ConfigParser.parse(input);
+        return parse(input);
     }
     
     /**
@@ -153,7 +153,7 @@ class ConfigParser {
     public static Map<String, String>  parse(File file, Map<String, String>  map) {
         Map<String, String>  result;
         try {
-            result = ConfigParser.parse(file);
+            result = parse(file);
             for (Map.Entry<String, String> entry : map.entrySet()) {
                 if (!result.containsKey(entry.getKey()))
                     result.put(entry.getKey(), entry.getValue());
@@ -161,7 +161,7 @@ class ConfigParser {
         } catch (IOException exp) {
             result = map;
             try {
-                ConfigParser.write(result, file);
+                write(result, file);
             } catch (IOException exp2) {
             }
         }
@@ -182,7 +182,7 @@ class ConfigParser {
         List<String> result = new LinkedList<String>();
         String inputLine = input.readLine();
         while (inputLine != null) {
-            inputLine = ConfigParser.stripComments(inputLine).trim();
+            inputLine = stripComments(inputLine).trim();
             if (inputLine.length() > 0) {
                 result.add(inputLine);
             }
@@ -205,7 +205,7 @@ class ConfigParser {
         FileInputStream fileStream = new FileInputStream(file);
         BufferedReader input = new BufferedReader(new InputStreamReader(
                 fileStream));
-        List<String> rv = ConfigParser.parseSubscriptions(input);
+        List<String> rv = parseSubscriptions(input);
         try {
             fileStream.close();
         } catch (IOException ioe) {}
@@ -224,7 +224,7 @@ class ConfigParser {
     public static List<String> parseSubscriptions(String string) throws IOException {
         StringReader stringReader = new StringReader(string);
         BufferedReader input = new BufferedReader(stringReader);
-        return ConfigParser.parseSubscriptions(input);
+        return parseSubscriptions(input);
     }
     
     /**
@@ -234,18 +234,30 @@ class ConfigParser {
      * 
      * @param file
      *            A File to attempt to parse.
-     * @param list list of files to parse
+     * @param list The default subscriptions to be saved and returned if the file cannot be read
      * @return A List consisting of one element for each line in file, or if
      *         file cannot be read, list.
      */
     public static List<String> parseSubscriptions(File file, List<String> list) {
         List<String> result;
         try {
-            result = ConfigParser.parseSubscriptions(file);
+            result = parseSubscriptions(file);
+            // Fix up files that contain the old default
+            // which was changed in 0.9.11
+            if (result.remove(Daemon.OLD_DEFAULT_SUB)) {
+                for (String sub : list) {
+                    if (!result.contains(sub))
+                        result.add(sub);
+                }
+                try {
+                    writeSubscriptions(result, file);
+                    // TODO log
+                } catch (IOException ioe) {}
+            }
         } catch (IOException exp) {
             result = list;
             try {
-                ConfigParser.writeSubscriptions(result, file);
+                writeSubscriptions(result, file);
             } catch (IOException exp2) {
             }
         }
@@ -289,8 +301,7 @@ class ConfigParser {
         boolean success = false;
         if (!isWindows) {
             File tmp = SecureFile.createTempFile("temp-", ".tmp", file.getAbsoluteFile().getParentFile());
-            ConfigParser
-                .write(map, new BufferedWriter(new OutputStreamWriter(new SecureFileOutputStream(tmp), "UTF-8")));
+            write(map, new BufferedWriter(new OutputStreamWriter(new SecureFileOutputStream(tmp), "UTF-8")));
             success = tmp.renameTo(file);
             if (!success) {
                 tmp.delete();
@@ -299,8 +310,7 @@ class ConfigParser {
         }
         if (!success) {
             // hmm, that didn't work, try it the old way
-            ConfigParser
-                .write(map, new BufferedWriter(new OutputStreamWriter(new SecureFileOutputStream(file), "UTF-8")));
+            write(map, new BufferedWriter(new OutputStreamWriter(new SecureFileOutputStream(file), "UTF-8")));
         }
     }
 
@@ -337,7 +347,7 @@ class ConfigParser {
      */
     public static void writeSubscriptions(List<String> list, File file)
             throws IOException {
-        ConfigParser.writeSubscriptions(list, new BufferedWriter(
+        writeSubscriptions(list, new BufferedWriter(
                 new OutputStreamWriter(new SecureFileOutputStream(file), "UTF-8")));
     }
 

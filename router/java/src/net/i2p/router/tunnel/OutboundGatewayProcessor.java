@@ -16,7 +16,7 @@ class OutboundGatewayProcessor {
     private final Log _log;
     private final TunnelCreatorConfig _config;
         
-    static final boolean USE_ENCRYPTION = HopProcessor.USE_ENCRYPTION;
+    //static final boolean USE_ENCRYPTION = HopProcessor.USE_ENCRYPTION;
 
     public OutboundGatewayProcessor(I2PAppContext ctx, TunnelCreatorConfig cfg) {
         _context = ctx;
@@ -42,7 +42,7 @@ class OutboundGatewayProcessor {
             _log.debug("Orig random IV: " + Base64.encode(iv));
             //_log.debug("data:  " + Base64.encode(orig, iv.length, length - iv.length));
         }
-        if (USE_ENCRYPTION)
+        //if (USE_ENCRYPTION)
             decrypt(_context, _config, iv, orig, offset, length);
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("finished processing the preprocessed data");
@@ -97,7 +97,7 @@ class OutboundGatewayProcessor {
             cur = xf;
         }
         
-        if (HopProcessor.USE_DOUBLE_IV_ENCRYPTION)
+        //if (HopProcessor.USE_DOUBLE_IV_ENCRYPTION)
             ctx.aes().decryptBlock(orig, offset, config.getIVKey(), orig, offset);
     }
 }

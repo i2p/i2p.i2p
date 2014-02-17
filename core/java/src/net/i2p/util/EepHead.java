@@ -1,9 +1,14 @@
 package net.i2p.util;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.URL;
+
+import gnu.getopt.Getopt;
 
 import net.i2p.I2PAppContext;
 
@@ -51,39 +56,86 @@ public class EepHead extends EepGet {
         int proxyPort = 4444;
         int numRetries = 0;
         int inactivityTimeout = 60*1000;
-        String url = null;
+        String username = null;
+        String password = null;
+        boolean error = false;
+        Getopt g = new Getopt("eephead", args, "p:cn:t:u:x:");
         try {
-            for (int i = 0; i < args.length; i++) {
-                if (args[i].equals("-p")) {
-                    proxyHost = args[i+1].substring(0, args[i+1].indexOf(':'));
-                    String port = args[i+1].substring(args[i+1].indexOf(':')+1);
-                    proxyPort = Integer.parseInt(port);
-                    i++;
-                } else if (args[i].equals("-n")) {
-                    numRetries = Integer.parseInt(args[i+1]);
-                    i++;
-                } else if (args[i].equals("-t")) {
-                    inactivityTimeout = 1000 * Integer.parseInt(args[i+1]);
-                    i++;
-                } else if (args[i].startsWith("-")) {
-                    usage();
-                    return;
-                } else {
-                    url = args[i];
-                }
-            }
+            int c;
+            while ((c = g.getopt()) != -1) {
+              switch (c) {
+                case 'p':
+                    String s = g.getOptarg();
+                    int colon = s.indexOf(':');
+                    if (colon >= 0) {
+                        // Todo IPv6 [a:b:c]:4444
+                        proxyHost = s.substring(0, colon);
+                        String port = s.substring(colon + 1);
+                        proxyPort = Integer.parseInt(port);
+                    } else {
+                        proxyHost = s;
+                        // proxyPort remains default
+                    }
+                    break;
+
+                case 'c':
+                    // no proxy, same as -p :0
+                    proxyHost = "";
+                    proxyPort = 0;
+                    break;
+
+                case 'n':
+                    numRetries = Integer.parseInt(g.getOptarg());
+                    break;
+
+                case 't':
+                    inactivityTimeout = 1000 * Integer.parseInt(g.getOptarg());
+                    break;
+
+                case 'u':
+                    username = g.getOptarg();
+                    break;
+
+                case 'x':
+                    password = g.getOptarg();
+                    break;
+
+                case '?':
+                case ':':
+                default:
+                    error = true;
+                    break;
+              }  // switch
+            } // while
         } catch (Exception e) {
             e.printStackTrace();
-            usage();
-            return;
-        }
-        
-        if (url == null) {
-            usage();
-            return;
+            error = true;
         }
 
+        if (error || args.length - g.getOptind() != 1) {
+            usage();
+            System.exit(1);
+        }
+        String url = args[g.getOptind()];
+        
         EepHead get = new EepHead(I2PAppContext.getGlobalContext(), proxyHost, proxyPort, numRetries, url);
+        if (username != null) {
+            if (password == null) {
+                try {
+                    BufferedReader r = new BufferedReader(new InputStreamReader(System.in));
+                    do {
+                        System.err.print("Proxy password: ");
+                        password = r.readLine();
+                        if (password == null)
+                            throw new IOException();
+                        password = password.trim();
+                    } while (password.length() <= 0);
+                } catch (IOException ioe) {
+                    System.exit(1);
+                }
+            }
+            get.addAuthorization(username, password);
+        }
         if (get.fetch(45*1000, -1, inactivityTimeout)) {
             System.err.println("Content-Type: " + get.getContentType());
             System.err.println("Content-Length: " + get.getContentLength());
@@ -96,7 +148,11 @@ public class EepHead extends EepGet {
     }
     
     private static void usage() {
-        System.err.println("EepHead [-p 127.0.0.1:4444] [-n #retries] [-t timeout] url");
+        System.err.println("EepHead [-p 127.0.0.1[:4444]] [-c]\n" +
+                           "        [-n #retries] (default 0)\n" +
+                           "        [-t timeout]  (default 60 sec)\n" +
+                           "        [-u username] [-x password] url\n" +
+                           "        (use -c or -p :0 for no proxy)");
     }
     
     /** return true if the URL was completely retrieved */
@@ -138,10 +194,24 @@ public class EepHead extends EepGet {
             //} catch (MalformedURLException mue) {
             //    throw new IOException("Redirected from an invalid URL");
             //}
-            _redirects++;
-            if (_redirects > 5)
-                throw new IOException("Too many redirects: to " + _redirectLocation);
-            if (_log.shouldLog(Log.INFO)) _log.info("Redirecting to " + _redirectLocation);
+            AuthState as = _authState;
+            if (_responseCode == 407) {
+                if (!_shouldProxy)
+                    throw new IOException("Proxy auth response from non-proxy");
+                if (as == null)
+                    throw new IOException("Proxy requires authentication");
+                if (as.authSent)
+                    throw new IOException("Proxy authentication failed");  // ignore stale
+                if (_log.shouldLog(Log.INFO)) _log.info("Adding auth");
+                // actually happens in getRequest()
+            } else {
+                _redirects++;
+                if (_redirects > 5)
+                    throw new IOException("Too many redirects: to " + _redirectLocation);
+                if (_log.shouldLog(Log.INFO)) _log.info("Redirecting to " + _redirectLocation);
+                if (as != null)
+                    as.authSent = false;
+            }
 
             // reset some important variables, we don't want to save the values from the redirect
             _bytesRemaining = -1;
@@ -212,6 +282,11 @@ public class EepHead extends EepGet {
         buf.append("Accept-Encoding: \r\n");
         // This will be replaced if we are going through I2PTunnelHTTPClient
         buf.append("User-Agent: " + USER_AGENT + "\r\n");
+        if (_authState != null && _shouldProxy && _authState.authMode != AUTH_MODE.NONE) {
+            buf.append("Proxy-Authorization: ");
+            buf.append(_authState.getAuthHeader("HEAD", urlToSend));
+            buf.append("\r\n");
+        }
         buf.append("Connection: close\r\n\r\n");
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Request: [" + buf.toString() + "]");

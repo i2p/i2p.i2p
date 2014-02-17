@@ -17,10 +17,10 @@
 <div class="main" id="main" dir="rtl" lang="ar"><p>
 اذا رغبت في المساعدة أو ترجمة الوثائق، أو المساعدة في أشياء أخرى، انظر اسفله
 
-<a href="http://i2p-projekt.i2p/getinvolved.html">تطوع</a>
+<a href="http://i2p-projekt.i2p/ar/get-involved">تطوع</a>
 </p>المزيد من المساعدة هنا:
 <ul class="links">
-<li class="tidylist"><a href="http://i2p-projekt.i2p/faq.html">ابئلة شائعة i2p-projekt.i2p</a>
+<li class="tidylist"><a href="http://i2p-projekt.i2p/ar/faq">ابئلة شائعة i2p-projekt.i2p</a>
 <br>يمكن ايضا<a href="http://forum.i2p/">I2P منتدى</a>
 او بالدردشة على  IRC.</li></ul>
 
@@ -151,7 +151,7 @@ Apache's javax.servlet (javax.servlet.jar) implementation.
 This product includes software developed by the Apache Software Foundation
 (http://www.apache.org/).</p>
 
-<p>Another application you can see on this webpage is <a href="http://i2p-projekt.i2p/i2ptunnel">I2PTunnel</a>
+<p>Another application you can see on this webpage is <a href="http://i2p-projekt.i2p/ar/docs/api/i2ptunnel">I2PTunnel</a>
 (your <a href="i2ptunnel/" target="_blank">web interface</a>) - a GPL'ed application written by mihi that
 lets you tunnel normal TCP/IP traffic over I2P (such as the eepproxy and the irc proxy).  There is also a
 <a href="http://susi.i2p/">susimail</a> web based mail client <a href="susimail/susimail">available</a> on
@@ -159,15 +159,15 @@ the console, which is a GPL'ed application written by susi23.  The addressbook a
 <a href="http://ragnarok.i2p/">Ragnarok</a> helps maintain your hosts.txt files (see ./addressbook/ for
 more information).</p>
 
-<p>The router by default also includes human's public domain <a href="http://i2p-projekt.i2p/sam">SAM</a> bridge,
+<p>The router by default also includes human's public domain <a href="http://i2p-projekt.i2p/ar/docs/api/sam">SAM</a> bridge,
 which other client applications (such the <a href="http://duck.i2p/i2p-bt/">bittorrent port</a>) can use.
 There is also an optimized library for doing large number calculations - jbigi - which in turn uses the
 LGPL licensed <a href="http://swox.com/gmp/">GMP</a> library, tuned for various PC architectures.  
 Launchers for windows users are built with <a href="http://launch4j.sourceforge.net/">Launch4J</a>, and 
 the installer is built with <a href="http://www.izforge.com/izpack/">IzPack</a>.  For
 details on other applications available, as well as their licenses, please see the
-<a href="http://i2p-projekt.i2p/licenses">license policy</a>.  Source for the I2P code and most bundled
-client applications can be found on our <a href="http://i2p-projekt.i2p/download">download page</a>.
+<a href="http://i2p-projekt.i2p/ar/get-involved/develop/licenses">license policy</a>.  Source for the I2P code and most bundled
+client applications can be found on our <a href="http://i2p-projekt.i2p/ar/download">download page</a>.
 .</p>
 
 <h2>Change Log</h2>

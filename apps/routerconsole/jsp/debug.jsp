@@ -30,7 +30,14 @@
     /*
      *  Print out the status for the UpdateManager
      */
-    ctx.updateManager().renderStatusHTML(out);
+    net.i2p.app.ClientAppManager cmgr = ctx.clientAppManager();
+    if (cmgr != null) {
+        net.i2p.router.update.ConsoleUpdateManager umgr =
+            (net.i2p.router.update.ConsoleUpdateManager) cmgr.getRegisteredApp(net.i2p.update.UpdateManager.APP_NAME);
+        if (umgr != null) {
+            umgr.renderStatusHTML(out);
+        }
+    }
 
     /*
      *  Print out the status for the AppManager

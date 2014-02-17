@@ -23,6 +23,8 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.ConcurrentHashMap;
 
+import gnu.getopt.Getopt;
+
 import net.i2p.data.Certificate;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
@@ -1103,11 +1105,39 @@ public class Router implements RouterClock.ClockShiftListener {
         _isAlive = true;
     }
 
+    /**
+     *  Usage: Router [rebuild]
+     *  No other options allowed, for now
+     *
+     *  @param args non-null
+     *  @throws IllegalArgumentException
+     */
     public static void main(String args[]) {
+        boolean error = false;
+        Getopt g = new Getopt("router", args, "");
+        int c;
+        while ((c = g.getopt()) != -1) {
+            switch (c) {
+                default:
+                    error = true;
+            }
+        }
+        boolean rebuild = false;
+        int remaining = args.length - g.getOptind();
+        if (remaining > 1) {
+            error = true;
+        } else if (remaining == 1) {
+            rebuild = args[g.getOptind()].equals("rebuild");;
+            if (!rebuild)
+                error = true;
+        }
+        if (error)
+            throw new IllegalArgumentException();
+
         System.out.println("Starting I2P " + RouterVersion.FULL_VERSION);
         //verifyWrapperConfig();
         Router r = new Router();
-        if ( (args != null) && (args.length == 1) && ("rebuild".equals(args[0])) ) {
+        if (rebuild) {
             r.rebuildNewIdentity();
         } else {
             // This is here so that we can get the directory location from the context
@@ -1288,7 +1318,7 @@ public class Router implements RouterClock.ClockShiftListener {
             String line;
             while ( (line = in.readLine()) != null) {
                 String fl = line.trim();
-                if (fl.startsWith("..") || fl.startsWith("#") || fl.length() == 0)
+                if (fl.contains("..") || fl.startsWith("#") || fl.length() == 0)
                     continue;
                 File df = new File(fl);
                 if (df.isAbsolute())
@@ -1299,13 +1329,11 @@ public class Router implements RouterClock.ClockShiftListener {
                         System.out.println("INFO: File [" + fl + "] deleted");
                 }
             }
-            fis.close();
-            fis = null;
-            if (deleteFile.delete())
-                System.out.println("INFO: File [" + DELETE_FILE + "] deleted");
         } catch (IOException ioe) {
         } finally {
             if (fis != null) try { fis.close(); } catch (IOException ioe) {}
+            if (deleteFile.delete())
+                System.out.println("INFO: File [" + DELETE_FILE + "] deleted");
         }
     }
 

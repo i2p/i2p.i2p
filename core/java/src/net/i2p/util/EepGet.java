@@ -1,25 +1,33 @@
 package net.i2p.util;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.io.OutputStream;
 import java.net.ConnectException;
 import java.net.MalformedURLException;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.net.URL;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Formatter;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+
+import gnu.getopt.Getopt;
 
 import net.i2p.I2PAppContext;
+import net.i2p.data.Base32;
 import net.i2p.data.Base64;
 import net.i2p.data.ByteArray;
 import net.i2p.data.DataHelper;
@@ -81,6 +89,10 @@ public class EepGet {
     protected String _redirectLocation;
     protected boolean _isGzippedResponse;
     protected IOException _decompressException;
+
+    // following for proxy digest auth
+    // only created via addAuthorization()
+    protected AuthState _authState;
 
     /** this will be replaced by the HTTP Proxy if we are using it */
     protected static final String USER_AGENT = "Wget/1.11.4";
@@ -163,56 +175,103 @@ public class EepGet {
         long inactivityTimeout = INACTIVITY_TIMEOUT;
         String etag = null;
         String saveAs = null;
-        String url = null;
         List<String> extra = null;
         String username = null;
         String password = null;
+        boolean error = false;
+        //
+        // note: if you add options, please update installer/resources/man/eepget.1
+        //
+        Getopt g = new Getopt("eepget", args, "p:cn:t:e:o:m:l:h:u:x:");
         try {
-            for (int i = 0; i < args.length; i++) {
-                if (args[i].equals("-p")) {
-                    proxyHost = args[++i].substring(0, args[i].indexOf(':'));
-                    String port = args[i].substring(args[i].indexOf(':')+1);
-                    proxyPort = Integer.parseInt(port);
-                } else if (args[i].equals("-n")) {
-                    numRetries = Integer.parseInt(args[i+1]);
-                    i++;
-                } else if (args[i].equals("-t")) {
-                    inactivityTimeout = 1000 * Integer.parseInt(args[i+1]);
-                    i++;
-                } else if (args[i].equals("-e")) {
-                    etag = "\"" + args[i+1] + "\"";
-                    i++;
-                } else if (args[i].equals("-o")) {
-                    saveAs = args[i+1];
-                    i++;
-                } else if (args[i].equals("-m")) {
-                    markSize = Integer.parseInt(args[++i]);
-                    lineLen = Integer.parseInt(args[++i]);
-                } else if (args[i].equals("-h")) {
-                    if (extra == null)
-                        extra = new ArrayList<String>(2);
-                    extra.add(args[++i]);
-                    extra.add(args[++i]);
-                } else if (args[i].equals("-u")) {
-                    username = args[++i];
-                    password = args[++i];
-                } else if (args[i].startsWith("-")) {
-                    usage();
-                    return;
-                } else {
-                    url = args[i];
-                }
-            }
+            int c;
+            while ((c = g.getopt()) != -1) {
+              switch (c) {
+                case 'p':
+                    String s = g.getOptarg();
+                    int colon = s.indexOf(':');
+                    if (colon >= 0) {
+                        // Todo IPv6 [a:b:c]:4444
+                        proxyHost = s.substring(0, colon);
+                        String port = s.substring(colon + 1);
+                        proxyPort = Integer.parseInt(port);
+                    } else {
+                        proxyHost = s;
+                        // proxyPort remains default
+                    }
+                    break;
+
+                case 'c':
+                    // no proxy, same as -p :0
+                    proxyHost = "";
+                    proxyPort = 0;
+                    break;
+
+                case 'n':
+                    numRetries = Integer.parseInt(g.getOptarg());
+                    break;
+
+                case 't':
+                    inactivityTimeout = 1000 * Integer.parseInt(g.getOptarg());
+                    break;
+
+                case 'e':
+                    etag = "\"" + g.getOptarg() + "\"";
+                    break;
+
+                case 'o':
+                    saveAs = g.getOptarg();
+                    break;
+
+                case 'm':
+                    markSize = Integer.parseInt(g.getOptarg());
+                    break;
+
+                case 'l':
+                    lineLen = Integer.parseInt(g.getOptarg());
+                    break;
+
+                case 'h':
+                    String a = g.getOptarg();
+                    int eq = a.indexOf('=');
+                    if (eq > 0) {
+                        if (extra == null)
+                            extra = new ArrayList<String>(2);
+                        String key = a.substring(0, eq);
+                        String val = a.substring(eq + 1);
+                        extra.add(key);
+                        extra.add(val);
+                    } else {
+                        error = true;
+                    }
+                    break;
+
+                case 'u':
+                    username = g.getOptarg();
+                    break;
+
+                case 'x':
+                    password = g.getOptarg();
+                    break;
+
+                case '?':
+                case ':':
+                default:
+                    error = true;
+                    break;
+              }  // switch
+            } // while
         } catch (Exception e) {
             e.printStackTrace();
-            usage();
-            return;
+            error = true;
         }
 
-        if (url == null) {
+        if (error || args.length - g.getOptind() != 1) {
             usage();
-            return;
+            System.exit(1);
         }
+        String url = args[g.getOptind()];
+
         if (saveAs == null)
             saveAs = suggestName(url);
 
@@ -222,8 +281,23 @@ public class EepGet {
                 get.addHeader(extra.get(i), extra.get(i + 1));
             }
         }
-        if (username != null && password != null)
+        if (username != null) {
+            if (password == null) {
+                try {
+                    BufferedReader r = new BufferedReader(new InputStreamReader(System.in));
+                    do {
+                        System.err.print("Proxy password: ");
+                        password = r.readLine();
+                        if (password == null)
+                            throw new IOException();
+                        password = password.trim();
+                    } while (password.length() <= 0);
+                } catch (IOException ioe) {
+                    System.exit(1);
+                }
+            }
             get.addAuthorization(username, password);
+        }
         get.addStatusListener(get.new CLIStatusListener(markSize, lineLen));
         if (!get.fetch(CONNECT_TIMEOUT, -1, inactivityTimeout))
             System.exit(1);
@@ -278,10 +352,15 @@ public class EepGet {
     }
 
     private static void usage() {
-        System.err.println("EepGet [-p 127.0.0.1:4444] [-n #retries] [-o outputFile]\n" +
-                           "       [-m markSize lineLen] [-t timeout] [-h headerKey headerValue]\n" +
-                           "       [-u username password] url]\n" +
-                           "       (use -p :0 for no proxy)");
+        System.err.println("eepget [-p 127.0.0.1[:4444]] [-c] [-o outputFile]\n" +
+                           "       [-n #retries] (default 5)\n" +
+                           "       [-m markSize] (default 1024)\n" +
+                           "       [-l lineLen]  (default 40)\n" +
+                           "       [-t timeout]  (default 60 sec)\n" +
+                           "       [-e etag]\n" +
+                           "       [-h headerName=headerValue]\n" +
+                           "       [-u username] [-x password] url\n" +
+                           "       (use -c or -p :0 for no proxy)");
     }
     
     public static interface StatusListener {
@@ -532,6 +611,7 @@ public class EepGet {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("ERR: doFetch failed ", ioe);
                 if (ioe instanceof MalformedURLException ||
+                    ioe instanceof UnknownHostException ||
                     ioe instanceof ConnectException) // proxy or nonproxied host Connection Refused
                     _keepFetching = false;
             } finally {
@@ -592,6 +672,7 @@ public class EepGet {
         }
         
         if (_redirectLocation != null) {
+            // we also are here after a 407
             //try {
                 if (_redirectLocation.startsWith("http://")) {
                     _actualURL = _redirectLocation;
@@ -610,10 +691,25 @@ public class EepGet {
             //} catch (MalformedURLException mue) {
             //    throw new IOException("Redirected from an invalid URL");
             //}
-            _redirects++;
-            if (_redirects > 5)
-                throw new IOException("Too many redirects: to " + _redirectLocation);
-            if (_log.shouldLog(Log.INFO)) _log.info("Redirecting to " + _redirectLocation);
+
+            AuthState as = _authState;
+            if (_responseCode == 407) {
+                if (!_shouldProxy)
+                    throw new IOException("Proxy auth response from non-proxy");
+                if (as == null)
+                    throw new IOException("Proxy requires authentication");
+                if (as.authSent)
+                    throw new IOException("Proxy authentication failed");  // ignore stale
+                if (_log.shouldLog(Log.INFO)) _log.info("Adding auth");
+                // actually happens in getRequest()
+            } else {
+                _redirects++;
+                if (_redirects > 5)
+                    throw new IOException("Too many redirects: to " + _redirectLocation);
+                if (_log.shouldLog(Log.INFO)) _log.info("Redirecting to " + _redirectLocation);
+                if (as != null)
+                    as.authSent = false;
+            }
 
             // reset some important variables, we don't want to save the values from the redirect
             _bytesRemaining = -1;
@@ -801,6 +897,7 @@ public class EepGet {
                 _keepFetching = false;
                 _notModified = true;
                 return; 
+            case 401: // server auth
             case 403: // bad req
             case 404: // not found
             case 409: // bad addr helper
@@ -818,6 +915,17 @@ public class EepGet {
                     else
                         _out = new FileOutputStream(_outputFile, true);
                 }
+                break;
+            case 407: // proxy auth
+                // we will treat this is a redirect if we haven't sent auth yet
+                //_redirectLocation will be set to _actualURL below
+                _alreadyTransferred = 0;
+                if (_authState != null)
+                    rcOk = !_authState.authSent;
+                else
+                    rcOk = false;
+                redirect = rcOk;
+                _keepFetching = rcOk;
                 break;
             case 416: // completed (or range out of reach)
                 _bytesRemaining = 0;
@@ -900,11 +1008,14 @@ public class EepGet {
                     increment(lookahead, cur);
                     if (isEndOfHeaders(lookahead)) {
                         if (!rcOk)
-                            throw new IOException("Invalid HTTP response code: " + _responseCode);
+                            throw new IOException("Invalid HTTP response code: " + _responseCode + ' ' + _responseText);
                         if (_encodingChunked) {
                             _bytesRemaining = readChunkLength();
                         }
-                        if (!redirect) _redirectLocation = null;
+                        if (!redirect)
+                            _redirectLocation = null;
+                        else if (_responseCode == 407)
+                            _redirectLocation = _actualURL;
                         return;
                     }
                     break;
@@ -1011,6 +1122,8 @@ public class EepGet {
             _contentType=val;
         } else if (key.equals("location")) {
             _redirectLocation=val;
+        } else if (key.equals("proxy-authenticate") && _responseCode == 407 && _authState != null && _shouldProxy) {
+            _authState.setAuthChallenge(val);
         } else {
             // ignore the rest
         }
@@ -1061,8 +1174,11 @@ public class EepGet {
                 URL url = new URL(_actualURL);
                 if ("http".equals(url.getProtocol())) {
                     String host = url.getHost();
-                    if (host.toLowerCase(Locale.US).endsWith(".i2p"))
-                        throw new MalformedURLException("I2P addresses must be proxied");
+                    String hostlc = host.toLowerCase(Locale.US);
+                    if (hostlc.endsWith(".i2p"))
+                        throw new UnknownHostException("I2P addresses must be proxied");
+                    if (hostlc.endsWith(".onion"))
+                        throw new UnknownHostException("Tor addresses must be proxied");
                     int port = url.getPort();
                     if (port == -1)
                         port = 80;
@@ -1119,10 +1235,11 @@ public class EepGet {
                 urlToSend += '?' + query;
         }
         if (post) {
-            buf.append("POST ").append(urlToSend).append(" HTTP/1.1\r\n");
+            buf.append("POST ");
         } else {
-            buf.append("GET ").append(urlToSend).append(" HTTP/1.1\r\n");
+            buf.append("GET ");
         }
+        buf.append(urlToSend).append(" HTTP/1.1\r\n");
         // RFC 2616 sec 5.1.2 - host + port (NOT authority, which includes userinfo)
         buf.append("Host: ").append(host);
         if (port >= 0)
@@ -1167,6 +1284,12 @@ public class EepGet {
         }
         if(!uaOverridden)
             buf.append("User-Agent: " + USER_AGENT + "\r\n");
+        if (_authState != null && _shouldProxy && _authState.authMode != AUTH_MODE.NONE) {
+            buf.append("Proxy-Authorization: ");
+            String method = post ? "POST" : "GET";
+            buf.append(_authState.getAuthHeader(method, urlToSend));
+            buf.append("\r\n");
+        }
         buf.append("Connection: close\r\n\r\n");
         if (post)
             buf.append(_postData);
@@ -1257,14 +1380,246 @@ public class EepGet {
      *  Add basic authorization header for the proxy.
      *  Only added if the request is going through a proxy.
      *  Must be called before fetch().
-     *  Not supported by EepHead.
      *
      *  @since 0.8.9
      */
     public void addAuthorization(String userName, String password) {
-        if (_shouldProxy)
-            addHeader("Proxy-Authorization", 
-                      "Basic " + Base64.encode(DataHelper.getUTF8(userName + ':' + password), true));  // true = use standard alphabet
+        if (_shouldProxy) {
+            // Could only do this for Basic
+            // Now we always wait for the 407, in the hope we can use Digest
+            //addHeader("Proxy-Authorization", 
+            //          "Basic " + Base64.encode(DataHelper.getUTF8(userName + ':' + password), true));  // true = use standard alphabet
+            if (_authState != null)
+                throw new IllegalStateException();
+            _authState = new AuthState(userName, password);
+        }
+    }
+
+    /**
+     *  Parse the args in an authentication header.
+     *
+     *  Modified from LoadClientAppsJob.
+     *  All keys are mapped to lower case.
+     *  Double quotes around values are stripped.
+     *  Ref: RFC 2617
+     *
+     *  Public for I2PTunnelHTTPClientBase; use outside of tree at own risk, subject to change or removal
+     *
+     *  @param args non-null, starting after "Digest " or "Basic "
+     *  @since 0.9.4, moved from I2PTunnelHTTPClientBase in 0.9.12
+     */
+    public static Map<String, String> parseAuthArgs(String args) {
+        Map<String, String> rv = new HashMap<String, String>(8);
+        char data[] = args.toCharArray();
+        StringBuilder buf = new StringBuilder(32);
+        boolean isQuoted = false;
+        String key = null;
+        for (int i = 0; i < data.length; i++) {
+            switch (data[i]) {
+                case '\"':
+                    if (isQuoted) {
+                        // keys never quoted
+                        if (key != null) {
+                            rv.put(key, buf.toString().trim());
+                            key = null;
+                        }
+                        buf.setLength(0);
+                    }
+                    isQuoted = !isQuoted;
+                    break;
+
+                case ' ':
+                case '\r':
+                case '\n':
+                case '\t':
+                case ',':
+                    // whitespace - if we're in a quoted section, keep this as part of the quote,
+                    // otherwise use it as a delim
+                    if (isQuoted) {
+                        buf.append(data[i]);
+                    } else {
+                        if (key != null) {
+                            rv.put(key, buf.toString().trim());
+                            key = null;
+                        }
+                        buf.setLength(0);
+                    }
+                    break;
+
+                case '=':
+                    if (isQuoted) {
+                        buf.append(data[i]);
+                    } else {
+                        key = buf.toString().trim().toLowerCase(Locale.US);
+                        buf.setLength(0);
+                    }
+                    break;
+
+                default:
+                    buf.append(data[i]);
+                    break;
+            }
+        }
+        if (key != null)
+            rv.put(key, buf.toString().trim());
+        return rv;
+    }
+
+
+    /**
+     *  @since 0.9.12
+     */
+    protected enum AUTH_MODE {NONE, BASIC, DIGEST, UNKNOWN}
+
+    /**
+     *  Manage the authentication parameters
+     *  Ref: RFC 2617
+     *  Supports both Basic and Digest, however i2ptunnel HTTP proxy
+     *  has migrated all previous Basic support to Digest.
+     *
+     *  @since 0.9.12
+     */
+    protected class AuthState {
+        private final String username;
+        private final String password;
+        // as recvd in 407
+        public AUTH_MODE authMode = AUTH_MODE.NONE;
+        // as recvd in 407, after the mode string
+        private String authChallenge;
+        public boolean authSent;
+        private int nonceCount;
+        private String cnonce;
+        // as parsed from authChallenge
+        private Map<String, String> args;
+
+        public AuthState(String user, String pw) {
+            username = user;
+            password = pw;
+        }
+
+        /**
+         *  May be called multiple times, save the best one
+         */
+        public void setAuthChallenge(String auth) {
+            String authLC = auth.toLowerCase(Locale.US);
+            if (authLC.startsWith("basic ")) {
+                // better than anything but DIGEST
+                if (authMode != AUTH_MODE.DIGEST) {
+                    // use standard alphabet
+                    authMode = AUTH_MODE.BASIC;
+                    authChallenge = auth.substring(6);
+                }
+            } else if (authLC.startsWith("digest ")) {
+                // better than anything
+                authMode = AUTH_MODE.DIGEST;
+                authChallenge = auth.substring(7);
+            } else {
+                // better than NONE only
+                if (authMode == AUTH_MODE.NONE) {
+                    authMode = AUTH_MODE.UNKNOWN;
+                    authChallenge = null;
+                }
+            }
+            nonceCount = 0;
+            args = null;
+        }
+
+        public String getAuthHeader(String method, String uri) throws IOException {
+            switch (authMode) {
+                case BASIC:
+                    authSent = true;
+                    // use standard alphabet
+                    return "Basic " +
+                           Base64.encode(DataHelper.getUTF8(username + ':' + password), true);
+
+                case DIGEST:
+                    if (authChallenge == null)
+                        throw new IOException("Bad proxy auth response");
+                    if (args == null)
+                        args = parseAuthArgs(authChallenge);
+                    Map<String, String> outArgs = generateAuthArgs(method, uri);
+                    if (outArgs == null)
+                        throw new IOException("Bad proxy auth response");
+                    StringBuilder buf = new StringBuilder(256);
+                    buf.append("Digest");
+                    for (Map.Entry<String, String> e : outArgs.entrySet()) {
+                        buf.append(' ').append(e.getKey()).append('=').append(e.getValue());
+                    }
+                    authSent = true;
+                    return buf.toString();
+
+                default:
+                    throw new IOException("Unknown proxy auth type " + authChallenge);
+            }
+        }
+
+        /**
+         *  Generate the digest authentication parameters
+         *  Ref: RFC 2617
+         *
+         *  @since 0.9.12 modified from I2PTunnelHTTPClientBase.validateDigest()
+         */
+        public Map<String, String> generateAuthArgs(String method, String uri) throws IOException {
+            Map<String, String> rv = new HashMap<String, String>(12);
+            String realm = args.get("realm");
+            String nonce = args.get("nonce");
+            String qop = args.get("qop");
+            String opaque = args.get("opaque");
+            //String algorithm = args.get("algorithm");
+            //String stale = args.get("stale");
+            if (realm == null || nonce == null) {
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Bad digest request: " + DataHelper.toString(args));
+                throw new IOException("Bad auth response");
+            }
+            rv.put("username", '"' + username + '"');
+            rv.put("realm", '"' + realm + '"');
+            rv.put("nonce", '"' + nonce + '"');
+            rv.put("uri", '"' + uri + '"');
+            if (opaque != null)
+                rv.put("opaque", '"' + opaque + '"');
+            String kdMiddle;
+            if ("auth".equals(qop)) {
+                rv.put("qop", "\"auth\"");
+                if (cnonce == null) {
+                    byte[] rand = new byte[5];
+                    _context.random().nextBytes(rand);
+                    cnonce = Base32.encode(rand);
+                }  // else reuse on redirect
+                rv.put("cnonce", '"' + cnonce + '"');
+                String nc = lc8hex(++nonceCount);
+                rv.put("nc", nc);
+                kdMiddle = ':' + nc + ':' + cnonce + ':' + qop;
+            } else {
+                kdMiddle = "";
+            }
+
+            // get H(A1)
+            String ha1 = PasswordManager.md5Hex(username + ':' + realm + ':' + password);
+            // get H(A2)
+            String a2 = method + ':' + uri;
+            String ha2 = PasswordManager.md5Hex(a2);
+            // response
+            String kd = ha1 + ':' + nonce + kdMiddle + ':' + ha2;
+            rv.put("response", '"' + PasswordManager.md5Hex(kd) + '"');
+            return rv;
+        }
+    }
+
+    /**
+     *  @return 8 hex chars, lower case, e.g. 00000001
+     *  @since 0.8.10
+     */
+    private static String lc8hex(int nc) {
+        StringBuilder buf = new StringBuilder(8);
+        for (int i = 28; i >= 0; i -= 4) {
+            int v = (nc >> i) & 0xf;
+            if (v < 10)
+                buf.append((char) (v + '0'));
+            else
+                buf.append((char) (v + 'a' - 10));
+        }
+        return buf.toString();
     }
 
     /**

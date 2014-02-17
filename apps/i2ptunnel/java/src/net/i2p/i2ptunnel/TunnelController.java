@@ -7,11 +7,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+
 import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
 import net.i2p.client.I2PClient;
 import net.i2p.client.I2PClientFactory;
 import net.i2p.client.I2PSession;
+import net.i2p.crypto.SigType;
 import net.i2p.data.Base32;
 import net.i2p.data.Destination;
 import net.i2p.i2ptunnel.socks.I2PSOCKSTunnel;
@@ -49,8 +51,8 @@ public class TunnelController implements Logging {
      * the prefix should be used (and, in turn, that prefix should be stripped off
      * before being interpreted by this controller)
      * 
-     * @param config original key=value mapping
-     * @param prefix beginning of key values that are relevent to this tunnel
+     * @param config original key=value mapping non-null
+     * @param prefix beginning of key values that are relevant to this tunnel
      */
     public TunnelController(Properties config, String prefix) {
         this(config, prefix, true);
@@ -58,6 +60,8 @@ public class TunnelController implements Logging {
 
     /**
      * 
+     * @param config original key=value mapping non-null
+     * @param prefix beginning of key values that are relevant to this tunnel
      * @param createKey for servers, whether we want to create a brand new destination
      *                  with private keys at the location specified or not (does not
      *                  overwrite existing ones)
@@ -99,7 +103,16 @@ public class TunnelController implements Logging {
         FileOutputStream fos = null;
         try {
             fos = new SecureFileOutputStream(keyFile);
-            Destination dest = client.createDestination(fos);
+            SigType stype = I2PClient.DEFAULT_SIGTYPE;
+            String st = _config.getProperty("option." + I2PClient.PROP_SIGTYPE);
+            if (st != null) {
+                SigType type = SigType.parseSigType(st);
+                if (type != null)
+                    stype = type;
+                else
+                    log("Unsupported sig type " + st);
+            }
+            Destination dest = client.createDestination(fos, stype);
             String destStr = dest.toBase64();
             log("Private key created and saved in " + keyFile.getAbsolutePath());
             log("You should backup this file in a secure place.");

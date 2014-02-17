@@ -411,13 +411,34 @@ class IntroductionManager {
         // TODO throttle based on alice identity and/or intro tag?
 
         _context.statManager().addRateData("udp.receiveRelayRequest", 1, 0);
-        byte key[] = new byte[SessionKey.KEYSIZE_BYTES];
-        reader.getRelayRequestReader().readAliceIntroKey(key, 0);
-        SessionKey aliceIntroKey = new SessionKey(key);
+
         // send that peer an introduction for alice
         _transport.send(_builder.buildRelayIntro(alice, charlie, reader.getRelayRequestReader()));
+
         // send alice back charlie's info
-        _transport.send(_builder.buildRelayResponse(alice, charlie, reader.getRelayRequestReader().readNonce(), aliceIntroKey));
+        // lookup session so we can use session key if available
+        SessionKey cipherKey = null;
+        SessionKey macKey = null;
+        PeerState aliceState = _transport.getPeerState(alice);
+        if (aliceState != null) {
+            // established session (since 0.9.12)
+            cipherKey = aliceState.getCurrentCipherKey();
+            macKey = aliceState.getCurrentMACKey();
+        }
+        if (cipherKey == null || macKey == null) {
+            // no session, use intro key (was only way before 0.9.12)
+            byte key[] = new byte[SessionKey.KEYSIZE_BYTES];
+            reader.getRelayRequestReader().readAliceIntroKey(key, 0);
+            cipherKey = new SessionKey(key);
+            macKey = cipherKey;
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Sending relay response (w/ intro key) to " + alice);
+        } else {
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Sending relay response (in-session) to " + alice);
+        }
+        _transport.send(_builder.buildRelayResponse(alice, charlie, reader.getRelayRequestReader().readNonce(),
+                                                    cipherKey, macKey));
     }
 
     /**

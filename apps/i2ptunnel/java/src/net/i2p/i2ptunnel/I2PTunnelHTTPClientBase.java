@@ -24,6 +24,7 @@ import net.i2p.I2PAppContext;
 import net.i2p.client.streaming.I2PSocketManager;
 import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
+import net.i2p.util.EepGet;
 import net.i2p.util.EventDispatcher;
 import net.i2p.util.InternalSocket;
 import net.i2p.util.Log;
@@ -409,60 +410,8 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
      *  @since 0.9.4
      */
     private static Map<String, String> parseArgs(String args) {
-        Map<String, String> rv = new HashMap<String, String>(8);
-        char data[] = args.toCharArray();
-        StringBuilder buf = new StringBuilder(32);
-        boolean isQuoted = false;
-        String key = null;
-        for (int i = 0; i < data.length; i++) {
-            switch (data[i]) {
-                case '\"':
-                    if (isQuoted) {
-                        // keys never quoted
-                        if (key != null) {
-                            rv.put(key, buf.toString().trim());
-                            key = null;
-                        }
-                        buf.setLength(0);
-                    }
-                    isQuoted = !isQuoted;
-                    break;
-
-                case ' ':
-                case '\r':
-                case '\n':
-                case '\t':
-                case ',':
-                    // whitespace - if we're in a quoted section, keep this as part of the quote,
-                    // otherwise use it as a delim
-                    if (isQuoted) {
-                        buf.append(data[i]);
-                    } else {
-                        if (key != null) {
-                            rv.put(key, buf.toString().trim());
-                            key = null;
-                        }
-                        buf.setLength(0);
-                    }
-                    break;
-
-                case '=':
-                    if (isQuoted) {
-                        buf.append(data[i]);
-                    } else {
-                        key = buf.toString().trim().toLowerCase(Locale.US);
-                        buf.setLength(0);
-                    }
-                    break;
-
-                default:
-                    buf.append(data[i]);
-                    break;
-            }
-        }
-        if (key != null)
-            rv.put(key, buf.toString().trim());
-        return rv;
+        // moved to EepGet, since it needs this too
+        return EepGet.parseAuthArgs(args);
     }
 
     //////// Error page stuff

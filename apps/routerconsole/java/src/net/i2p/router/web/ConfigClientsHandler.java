@@ -370,7 +370,7 @@ public class ConfigClientsHandler extends FormHandler {
      *  @param app null for a new install
      */
     private void installPlugin(String app, String url) {
-        ConsoleUpdateManager mgr = (ConsoleUpdateManager) _context.updateManager();
+        ConsoleUpdateManager mgr = UpdateHandler.updateManager(_context);
         if (mgr == null) {
             addFormError("Update manager not registered, cannot install");
             return;
@@ -397,7 +397,7 @@ public class ConfigClientsHandler extends FormHandler {
     }
 
     private void checkPlugin(String app) {
-        ConsoleUpdateManager mgr = (ConsoleUpdateManager) _context.updateManager();
+        ConsoleUpdateManager mgr = UpdateHandler.updateManager(_context);
         if (mgr == null) {
             addFormError("Update manager not registered, cannot check");
             return;

@@ -12,6 +12,7 @@ import net.i2p.client.I2PClient;
 import net.i2p.client.I2PClientFactory;
 import net.i2p.client.I2PSession;
 import net.i2p.client.I2PSessionException;
+import net.i2p.crypto.SigType;
 import net.i2p.data.Destination;
 import net.i2p.i2ptunnel.I2PTunnel;
 import net.i2p.i2ptunnel.I2PTunnelTask;
@@ -78,8 +79,17 @@ import net.i2p.util.EventDispatcher;
         I2PClient client = I2PClientFactory.createClient();
         byte[] key;
         try {
-            ByteArrayOutputStream out = new ByteArrayOutputStream(512);
-            client.createDestination(out);
+            ByteArrayOutputStream out = new ByteArrayOutputStream(1024);
+            SigType stype = I2PClient.DEFAULT_SIGTYPE;
+            String st = tunnel.getClientOptions().getProperty(I2PClient.PROP_SIGTYPE);
+            if (st != null) {
+                SigType type = SigType.parseSigType(st);
+                if (type != null)
+                    stype = type;
+                else
+                    l.log("Unsupported sig type " + st);
+            }
+            client.createDestination(out, stype);
             key = out.toByteArray();
         } catch(Exception exc) {
             throw new RuntimeException("failed to create i2p-destination", exc);

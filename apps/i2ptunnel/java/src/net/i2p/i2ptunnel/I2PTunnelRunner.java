@@ -18,6 +18,7 @@ import javax.net.ssl.SSLException;
 import net.i2p.I2PAppContext;
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.data.ByteArray;
+import net.i2p.data.DataHelper;
 import net.i2p.util.ByteCache;
 import net.i2p.util.Clock;
 import net.i2p.util.I2PAppThread;
@@ -137,6 +138,8 @@ public class I2PTunnelRunner extends I2PAppThread implements I2PSocket.SocketErr
     protected InputStream getSocketIn() throws IOException { return s.getInputStream(); }
     protected OutputStream getSocketOut() throws IOException { return s.getOutputStream(); }
     
+    private static final byte[] POST = { 'P', 'O', 'S', 'T', ' ' };
+
     @Override
     public void run() {
         try {
@@ -159,8 +162,12 @@ public class I2PTunnelRunner extends I2PAppThread implements I2PSocket.SocketErr
                     // So we now get a fast return from flush(), and can do it here to save 250 ms.
                     // To make sure we are under the initial window size and don't hang waiting for accept,
                     // only flush if it fits in one message.
-                    if (initialI2PData.length <= 1730)   // ConnectionOptions.DEFAULT_MAX_MESSAGE_SIZE
-                        i2pout.flush();
+                    if (initialI2PData.length <= 1730) {  // ConnectionOptions.DEFAULT_MAX_MESSAGE_SIZE
+                        // Don't flush if POST, so we can get POST data into the initial packet
+                        if (initialI2PData.length < 5 ||
+                            !DataHelper.eq(POST, 0, initialI2PData, 0, 5))
+                            i2pout.flush();
+                    }
                 //}
             }
             if (initialSocketData != null) {

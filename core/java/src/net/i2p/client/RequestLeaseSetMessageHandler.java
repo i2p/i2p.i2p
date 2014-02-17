@@ -14,6 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import net.i2p.I2PAppContext;
 import net.i2p.crypto.KeyGenerator;
+import net.i2p.crypto.SigType;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
@@ -105,6 +106,15 @@ class RequestLeaseSetMessageHandler extends HandlerImpl {
         }
         try {
             leaseSet.sign(session.getPrivateKey());
+            // Workaround for unparsable serialized signing private key for revocation
+            // Send him a dummy DSA_SHA1 private key since it's unused anyway
+            // See CreateLeaseSetMessage.doReadMessage()
+            SigningPrivateKey spk = li.getSigningPrivateKey();
+            if (!_context.isRouterContext() && spk.getType() != SigType.DSA_SHA1) {
+                byte[] dummy = new byte[SigningPrivateKey.KEYSIZE_BYTES];
+                _context.random().nextBytes(dummy);
+                spk = new SigningPrivateKey(dummy);
+            }
             session.getProducer().createLeaseSet(session, leaseSet, li.getSigningPrivateKey(), li.getPrivateKey());
             session.setLeaseSet(leaseSet);
         } catch (DataFormatException dfe) {

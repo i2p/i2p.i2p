@@ -51,7 +51,7 @@ class UDPPacketReader {
         initialize(packet.getPacket().getData(), off, len);
     }
     
-    public void initialize(byte message[], int payloadOffset, int payloadLength) {
+    private void initialize(byte message[], int payloadOffset, int payloadLength) {
         _message = message;
         _payloadBeginOffset = payloadOffset;
         _payloadLength = payloadLength;
@@ -106,7 +106,8 @@ class UDPPacketReader {
     
     @Override
     public String toString() {
-        switch (readPayloadType()) {
+        int type = readPayloadType();
+        switch (type) {
             case UDPPacket.PAYLOAD_TYPE_DATA:
                 return _dataReader.toString();
             case UDPPacket.PAYLOAD_TYPE_SESSION_CONFIRMED:
@@ -126,7 +127,7 @@ class UDPPacketReader {
             case UDPPacket.PAYLOAD_TYPE_SESSION_DESTROY:
                 return "Session destroyed packet";
             default:
-                return "Other packet type...";
+                return "Unknown packet type " + type;
         }
     }
     

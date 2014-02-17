@@ -15,20 +15,20 @@ To build:
 		ant installer-osx
 
 	Run 'ant' with no arguments to see other build options.
-	See INSTALL.txt or http://www.i2p2.de/download.html for installation instructions.
+	See INSTALL.txt or https://geti2p.net/download for installation instructions.
 
 Documentation:
-	http://www.i2p2.de/how
+	https://geti2p.net/how
 	API: run 'ant javadoc' then start at build/javadoc/index.html
 
 Latest release:
-	http://www.i2p2.de/download
+	https://geti2p.net/download
 
 To get development branch from source control:
-	http://www.i2p2.de/newdevelopers
+	https://geti2p.net/newdevelopers
 
 FAQ:
-	http://www.i2p2.de/faq
+	https://geti2p.net/faq
 
 Need help?
 	IRC irc.freenode.net #i2p

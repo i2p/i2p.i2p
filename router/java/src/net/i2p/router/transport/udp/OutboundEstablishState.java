@@ -96,6 +96,7 @@ class OutboundEstablishState {
     /**
      *  @param claimedAddress an IP/port based RemoteHostId, or null if unknown
      *  @param remoteHostId non-null, == claimedAddress if direct, or a hash-based one if indirect
+     *  @param introKey Bob's introduction key, as published in the netdb
      *  @param addr non-null
      */
     public OutboundEstablishState(RouterContext ctx, RemoteHostId claimedAddress,
@@ -163,6 +164,10 @@ class OutboundEstablishState {
     }
     
     public RouterIdentity getRemoteIdentity() { return _remotePeer; }
+
+    /**
+     *  Bob's introduction key, as published in the netdb
+     */
     public SessionKey getIntroKey() { return _introKey; }
     
     /** caller must synch - only call once */
@@ -327,8 +332,8 @@ class OutboundEstablishState {
      */
     private void decryptSignature() {
         if (_receivedEncryptedSignature == null) throw new NullPointerException("encrypted signature is null! this=" + this.toString());
-        else if (_sessionKey == null) throw new NullPointerException("SessionKey is null!");
-        else if (_receivedIV == null) throw new NullPointerException("IV is null!");
+        if (_sessionKey == null) throw new NullPointerException("SessionKey is null!");
+        if (_receivedIV == null) throw new NullPointerException("IV is null!");
         _context.aes().decrypt(_receivedEncryptedSignature, 0, _receivedEncryptedSignature, 0, 
                                _sessionKey, _receivedIV, _receivedEncryptedSignature.length);
         byte signatureBytes[] = new byte[Signature.SIGNATURE_BYTES];

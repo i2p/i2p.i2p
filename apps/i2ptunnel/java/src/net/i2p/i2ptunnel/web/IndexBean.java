@@ -24,6 +24,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import net.i2p.I2PAppContext;
 import net.i2p.app.ClientAppManager;
 import net.i2p.app.Outproxy;
+import net.i2p.client.I2PClient;
 import net.i2p.data.Base32;
 import net.i2p.data.Certificate;
 import net.i2p.data.Destination;
@@ -983,6 +984,7 @@ public class IndexBean {
             } catch (NumberFormatException nfe) {}
         }
     }
+
     public void setCert(String val) {
         if (val != null) {
             try {
@@ -990,8 +992,22 @@ public class IndexBean {
             } catch (NumberFormatException nfe) {}
         }
     }
+
     public void setSigner(String val) {
         _certSigner = val;
+    }
+
+    /** @since 0.9.12 */
+    public void setSigType(String val) {
+        if (val != null) {
+            _otherOptions.put(I2PClient.PROP_SIGTYPE, val);
+            if (val.equals("0"))
+                _certType = 0;
+            else
+                _certType = 5;
+        }
+        // TODO: Call modifyDestination??
+        // Otherwise this only works on a new tunnel...
     }
 
     /** Modify or create a destination */
@@ -1234,13 +1250,14 @@ public class IndexBean {
         "outproxyUsername", "outproxyPassword",
         I2PTunnelHTTPClient.PROP_JUMP_SERVERS,
         I2PTunnelHTTPClientBase.PROP_AUTH,
+        I2PClient.PROP_SIGTYPE,
         I2PTunnelHTTPClient.PROP_SSL_OUTPROXIES
         };
     private static final String _otherServerOpts[] = {
         "i2cp.reduceIdleTime", "i2cp.reduceQuantity", "i2cp.leaseSetKey", "i2cp.accessList",
          PROP_MAX_CONNS_MIN, PROP_MAX_CONNS_HOUR, PROP_MAX_CONNS_DAY,
          PROP_MAX_TOTAL_CONNS_MIN, PROP_MAX_TOTAL_CONNS_HOUR, PROP_MAX_TOTAL_CONNS_DAY,
-         PROP_MAX_STREAMS
+         PROP_MAX_STREAMS, I2PClient.PROP_SIGTYPE
         };
     private static final String _httpServerOpts[] = {
         I2PTunnelHTTPServer.OPT_POST_WINDOW,

@@ -422,11 +422,11 @@ public class SummaryHelper extends HelperBase {
                 
                 buf.append("<tr><td align=\"right\"><img src=\"/themes/console/images/");
                 if (_context.clientManager().shouldPublishLeaseSet(h))
-                    buf.append("server.png\" alt=\"Server\" title=\"" + _("Server") + "\">");
+                    buf.append("server.png\" alt=\"Server\" title=\"").append(_("Server")).append("\">");
                 else
-                    buf.append("client.png\" alt=\"Client\" title=\"" + _("Client") + "\">");
+                    buf.append("client.png\" alt=\"Client\" title=\"").append(_("Client")).append("\">");
                 buf.append("</td><td align=\"left\"><b><a href=\"tunnels#").append(h.toBase64().substring(0,4));
-                buf.append("\" target=\"_top\" title=\"" + _("Show tunnels") + "\">");
+                buf.append("\" target=\"_top\" title=\"").append(_("Show tunnels")).append("\">");
                 if (name.length() < 18)
                     buf.append(name);
                 else
@@ -861,7 +861,7 @@ public class SummaryHelper extends HelperBase {
                .append("\"></td><td align=\"left\">")
                .append(_(sectionNames.get(section)))
                .append("</td><td align=\"right\"><input type=\"hidden\" name=\"order_")
-               .append(i + "_" + section)
+               .append(i).append('_').append(section)
                .append("\" value=\"")
                .append(i)
                .append("\">");

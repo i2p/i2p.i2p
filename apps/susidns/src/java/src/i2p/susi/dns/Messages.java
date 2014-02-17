@@ -20,6 +20,11 @@ public class Messages {
         return Translate.getString(key, _context, BUNDLE_NAME);
     }
 
+    /** @since 0.9.11 */
+    public String _(String key, Object o) {
+        return Translate.getString(key, o, _context, BUNDLE_NAME);
+    }
+
     public static String getString(String s) {
         return Translate.getString(s, I2PAppContext.getGlobalContext(), BUNDLE_NAME);
     }

@@ -12,8 +12,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import net.i2p.data.Certificate;
 import net.i2p.data.DatabaseEntry;
 import net.i2p.data.Hash;
+import net.i2p.data.LeaseSet;
 import net.i2p.data.RouterInfo;
 import net.i2p.data.TunnelId;
 import net.i2p.data.i2np.DatabaseStoreMessage;
@@ -162,6 +164,18 @@ class StoreJob extends JobImpl {
                 if ( (ds == null) || !(ds.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO) ) {
                     if (_log.shouldLog(Log.INFO))
                         _log.info(getJobId() + ": Error selecting closest hash that wasnt a router! " + peer + " : " + ds);
+                    _state.addSkipped(peer);
+                } else if (_state.getData().getType() == DatabaseEntry.KEY_TYPE_LEASESET &&
+                           ((LeaseSet)_state.getData()).getDestination().getCertificate().getCertificateType() == Certificate.CERTIFICATE_TYPE_KEY &&
+                           !supportsKeyCerts((RouterInfo)ds)) {
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info(getJobId() + ": Skipping router that doesn't support key certs " + peer + " : " + ds);
+                    _state.addSkipped(peer);
+                } else if (_state.getData().getType() == DatabaseEntry.KEY_TYPE_LEASESET &&
+                           ((LeaseSet)_state.getData()).getLeaseCount() > 6 &&
+                           !supportsBigLeaseSets((RouterInfo)ds)) {
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info(getJobId() + ": Skipping router that doesn't support big leasesets " + peer + " : " + ds);
                     _state.addSkipped(peer);
                 } else {
                     int peerTimeout = _facade.getPeerTimeout(peer);
@@ -485,6 +499,32 @@ class StoreJob extends JobImpl {
         if (v == null)
             return false;
         return VersionComparator.comp(v, MIN_ENCRYPTION_VERSION) >= 0;
+    }
+
+    private static final String MIN_KEYCERT_VERSION = "0.9.12";
+
+    /**
+     * Does he support key certs (assumed with a non-DSA key)?
+     * @since 0.9.12
+     */
+    private static boolean supportsKeyCerts(RouterInfo ri) {
+        String v = ri.getOption("router.version");
+        if (v == null)
+            return false;
+        return VersionComparator.comp(v, MIN_KEYCERT_VERSION) >= 0;
+    }
+
+    private static final String MIN_BIGLEASESET_VERSION = "0.9";
+
+    /**
+     * Does he support more than 6 leasesets?
+     * @since 0.9.12
+     */
+    private static boolean supportsBigLeaseSets(RouterInfo ri) {
+        String v = ri.getOption("router.version");
+        if (v == null)
+            return false;
+        return VersionComparator.comp(v, MIN_BIGLEASESET_VERSION) >= 0;
     }
 
     /**

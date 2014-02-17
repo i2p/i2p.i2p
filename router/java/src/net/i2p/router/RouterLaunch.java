@@ -10,6 +10,13 @@ package net.i2p.router;
  */
 public class RouterLaunch {
 
+    /**
+     *  Usage: RouterLaunch [rebuild]
+     *  No other options allowed, for now
+     *
+     *  @param args non-null
+     *  @throws IllegalArgumentException
+     */
     public static void main(String args[]) {
 	Router.main(args);
     }

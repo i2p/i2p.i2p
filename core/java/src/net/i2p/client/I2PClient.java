@@ -15,6 +15,7 @@ import java.io.OutputStream;
 import java.util.Properties;
 
 import net.i2p.I2PException;
+import net.i2p.crypto.SigType;
 import net.i2p.data.Certificate;
 import net.i2p.data.Destination;
 
@@ -39,6 +40,11 @@ public interface I2PClient {
     public final static String PROP_RELIABILITY_GUARANTEED = "Guaranteed";
     /** @since 0.8.1 */
     public final static String PROP_RELIABILITY_NONE = "none";
+
+    /** @since 0.9.12 */
+    public static final String PROP_SIGTYPE = "i2cp.destination.sigType";
+    /** @since 0.9.12 */
+    public static final SigType DEFAULT_SIGTYPE = SigType.DSA_SHA1;
 
     /**
      * For router->client payloads.
@@ -82,6 +88,18 @@ public interface I2PClient {
      * @return new destination
      */
     public Destination createDestination(OutputStream destKeyStream) throws I2PException, IOException;
+
+    /**
+     * Create a destination with the given signature type.
+     * It will have a null certificate for DSA 1024/160 and KeyCertificate otherwise.
+     * This is not bound to the I2PClient, you must supply the data back again
+     * in createSession().
+     *
+     * @param destKeyStream location to write out the destination, PrivateKey, and SigningPrivateKey,
+     *                      format is specified in {@link net.i2p.data.PrivateKeyFile PrivateKeyFile}
+     * @since 0.9.12
+     */
+    public Destination createDestination(OutputStream destKeyStream, SigType type) throws I2PException, IOException;
 
     /** Create a new destination with the given certificate and store it, along with the private 
      * encryption and signing keys at the specified location

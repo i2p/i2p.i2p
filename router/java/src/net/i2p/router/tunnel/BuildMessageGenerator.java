@@ -55,7 +55,9 @@ public abstract class BuildMessageGenerator {
      *
      * @param msg out parameter
      */
-    public static void createRecord(int recordNum, int hop, TunnelBuildMessage msg, TunnelCreatorConfig cfg, Hash replyRouter, long replyTunnel, I2PAppContext ctx, PublicKey peerKey) {
+    public static void createRecord(int recordNum, int hop, TunnelBuildMessage msg,
+                                    TunnelCreatorConfig cfg, Hash replyRouter,
+                                    long replyTunnel, I2PAppContext ctx, PublicKey peerKey) {
         byte encrypted[] = new byte[TunnelBuildMessage.RECORD_SIZE];
         //Log log = ctx.logManager().getLog(BuildMessageGenerator.class);
         if (peerKey != null) {
@@ -79,7 +81,8 @@ public abstract class BuildMessageGenerator {
         msg.setRecord(recordNum, new ByteArray(encrypted));
     }
     
-    private static BuildRequestRecord createUnencryptedRecord(I2PAppContext ctx, TunnelCreatorConfig cfg, int hop, Hash replyRouter, long replyTunnel) {
+    private static BuildRequestRecord createUnencryptedRecord(I2PAppContext ctx, TunnelCreatorConfig cfg, int hop,
+                                                              Hash replyRouter, long replyTunnel) {
         //Log log = ctx.logManager().getLog(BuildMessageGenerator.class);
         if (hop < cfg.getLength()) {
             // ok, now lets fill in some data
@@ -143,7 +146,8 @@ public abstract class BuildMessageGenerator {
      * Encrypt the records so their hop ident is visible at the appropriate times
      * @param order list of hop #s as Integers.  For instance, if (order.get(1) is 4), it is peer cfg.getPeer(4)
      */
-    public static void layeredEncrypt(I2PAppContext ctx, TunnelBuildMessage msg, TunnelCreatorConfig cfg, List<Integer> order) {
+    public static void layeredEncrypt(I2PAppContext ctx, TunnelBuildMessage msg,
+                                      TunnelCreatorConfig cfg, List<Integer> order) {
         //Log log = ctx.logManager().getLog(BuildMessageGenerator.class);
         // encrypt the records so that the right elements will be visible at the right time
         for (int i = 0; i < msg.getRecordCount(); i++) {

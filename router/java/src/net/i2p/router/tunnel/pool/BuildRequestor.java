@@ -248,7 +248,9 @@ abstract class BuildRequestor {
      *  then use that, otherwise the old 8-entry version.
      *  @return null on error
      */
-    private static TunnelBuildMessage createTunnelBuildMessage(RouterContext ctx, TunnelPool pool, PooledTunnelCreatorConfig cfg, TunnelInfo pairedTunnel, BuildExecutor exec) {
+    private static TunnelBuildMessage createTunnelBuildMessage(RouterContext ctx, TunnelPool pool,
+                                                               PooledTunnelCreatorConfig cfg,
+                                                               TunnelInfo pairedTunnel, BuildExecutor exec) {
         Log log = ctx.logManager().getLog(BuildRequestor.class);
         long replyTunnel = 0;
         Hash replyRouter = null;

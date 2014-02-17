@@ -449,6 +449,37 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
             </div>
          <% } %>
            
+         <% if (editBean.isAdvanced()) { %>
+            <div id="tunnelOptionsField" class="rowItem">
+                <label>
+                    <%=intl._("Signature type")%>
+                    (<%=intl._("Experts only!")%>)
+                </label>
+            </div>
+            <div id="hostField" class="rowItem">
+              <div id="portField" class="rowItem">
+                <label>DSA-SHA1</label>
+                <input value="0" type="radio" id="startOnLoad" name="sigType" title="Default"<%=(editBean.getSigType(curTunnel)==0 ? " checked=\"checked\"" : "")%> class="tickbox" />                
+              </div>
+              <div id="portField" class="rowItem">
+                <label>ECDSA-P256</label>
+                <input value="1" type="radio" id="startOnLoad" name="sigType" title="Advanced users only"<%=(editBean.getSigType(curTunnel)==1 ? " checked=\"checked\"" : "")%> class="tickbox" />                
+              </div>
+              <div id="portField" class="rowItem">
+                <label>ECDSA-P384</label>
+                <input value="2" type="radio" id="startOnLoad" name="sigType" title="Advanced users only"<%=(editBean.getSigType(curTunnel)==2 ? " checked=\"checked\"" : "")%> class="tickbox" />                
+              </div>
+              <div id="portField" class="rowItem">
+                <label>ECDSA-P521</label>
+                <input value="3" type="radio" id="startOnLoad" name="sigType" title="Advanced users only"<%=(editBean.getSigType(curTunnel)==3 ? " checked=\"checked\"" : "")%> class="tickbox" />                
+              </div>
+            </div>
+                 
+            <div class="subdivider">
+                <hr />
+            </div>
+         <% } // isAdvanced %>>
+
          <% if ("httpclient".equals(tunnelType) || "connectclient".equals(tunnelType) || "sockstunnel".equals(tunnelType) || "socksirctunnel".equals(tunnelType)) { %>
             <div id="accessField" class="rowItem">
                 <label><%=intl._("Local Authorization")%>:</label>

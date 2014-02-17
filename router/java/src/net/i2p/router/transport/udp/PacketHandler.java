@@ -47,6 +47,8 @@ class PacketHandler {
     /** let packets be up to 30s slow */
     private static final long GRACE_PERIOD = Router.CLOCK_FUDGE_FACTOR + 30*1000;
     
+    private enum AuthType { NONE, INTRO, BOBINTRO, SESSION }
+
     PacketHandler(RouterContext ctx, UDPTransport transport, EstablishmentManager establisher,
                   InboundMessageFragments inbound, PeerTestManager testManager, IntroductionManager introManager) {
         _context = ctx;
@@ -319,7 +321,7 @@ class PacketHandler {
          */
         private void receivePacket(UDPPacketReader reader, UDPPacket packet, PeerState state) {
             _state = 17;
-            boolean isStray = false;
+            AuthType auth = AuthType.NONE;
             boolean isValid = packet.validate(state.getCurrentMACKey());
             if (!isValid) {
                 _state = 18;
@@ -341,7 +343,7 @@ class PacketHandler {
                         if (_log.shouldLog(Log.DEBUG))
                             _log.debug("Validation with existing con failed, but validation as reestablish/stray passed");
                         packet.decrypt(_transport.getIntroKey());
-                        isStray = true;
+                        auth = AuthType.INTRO;
                     } else {
                         _state = 21;
                         InboundEstablishState est = _establisher.getInboundState(packet.getRemoteHost());
@@ -360,14 +362,16 @@ class PacketHandler {
                 } else {
                     _state = 23;
                     packet.decrypt(state.getNextCipherKey());
+                    auth = AuthType.SESSION;
                 }
             } else {
                 _state = 24;
                 packet.decrypt(state.getCurrentCipherKey());
+                auth = AuthType.SESSION;
             }
 
             _state = 25;
-            handlePacket(reader, packet, state, null, null, !isStray);
+            handlePacket(reader, packet, state, null, null, auth);
             _state = 26;
         }
 
@@ -436,7 +440,7 @@ class PacketHandler {
                                 buf.append(" CHANGED PORT TO ").append(newPort).append(" AND HANDLED");
                                 _log.warn(buf.toString());
                             }
-                            handlePacket(reader, packet, state, null, null, true);
+                            handlePacket(reader, packet, state, null, null, AuthType.SESSION);
                             return;
                         }
                         if (_log.shouldLog(Log.WARN))
@@ -475,7 +479,7 @@ class PacketHandler {
             //  80 byte Peer Test
             _state = 29;
             packet.decrypt(_transport.getIntroKey());
-            handlePacket(reader, packet, null, null, null, false);
+            handlePacket(reader, packet, null, null, null, AuthType.INTRO);
             _state = 30;
         }
 
@@ -512,7 +516,7 @@ class PacketHandler {
 
                     _state = 32;
                     packet.decrypt(state.getCipherKey());
-                    handlePacket(reader, packet, null, null, null, true);
+                    handlePacket(reader, packet, null, null, null, AuthType.SESSION);
                     return;
                 } else {
                     if (_log.shouldLog(Log.WARN))
@@ -552,11 +556,12 @@ class PacketHandler {
                 _state = 36;
                 isValid = packet.validate(state.getMACKey());
                 if (isValid) {
+                    // this should be the Session Confirmed packet
                     if (_log.shouldLog(Log.INFO))
                         _log.info("Valid introduction packet received for outbound established con: " + packet);
                     _state = 37;
                     packet.decrypt(state.getCipherKey());
-                    handlePacket(reader, packet, null, state, null, true);
+                    handlePacket(reader, packet, null, state, null, AuthType.SESSION);
                     _state = 38;
                     return;
                 }
@@ -566,10 +571,11 @@ class PacketHandler {
             isValid = packet.validate(state.getIntroKey());
             if (isValid) {
                 if (_log.shouldLog(Log.INFO))
-                    _log.info("Valid introduction packet received for outbound established con with old intro key: " + packet);
+                    _log.info("Valid packet received for " + state + " with Bob's intro key: " + packet);
                 _state = 39;
                 packet.decrypt(state.getIntroKey());
-                handlePacket(reader, packet, null, state, null, true);
+                // the only packet we should be getting with Bob's intro key is Session Created
+                handlePacket(reader, packet, null, state, null, AuthType.BOBINTRO);
                 _state = 40;
                 return;
             } else {
@@ -592,11 +598,11 @@ class PacketHandler {
          * @param state non-null if fully established
          * @param outState non-null if outbound establishing in process
          * @param inState unused always null, TODO use for 48-byte destroys during inbound establishment
-         * @param isAuthenticated true if a state key was used, false if our own intro key was used
+         * @param auth what type of authentication succeeded
          */
         private void handlePacket(UDPPacketReader reader, UDPPacket packet, PeerState state,
                                   OutboundEstablishState outState, InboundEstablishState inState,
-                                  boolean isAuthenticated) {
+                                  AuthType auth) {
             _state = 43;
             reader.initialize(packet);
             _state = 44;
@@ -608,7 +614,7 @@ class PacketHandler {
             if (state != null) {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Received packet from " + state.getRemoteHostId().toString() + " with skew " + skew);
-                if (isAuthenticated)
+                if (auth == AuthType.SESSION)
                     state.adjustClockSkew(skew);
             }
             _context.statManager().addRateData("udp.receivePacketSkew", skew, packet.getLifetime());
@@ -645,14 +651,19 @@ class PacketHandler {
             switch (type) {
                 case UDPPacket.PAYLOAD_TYPE_SESSION_REQUEST:
                     _state = 47;
+                    if (auth == AuthType.BOBINTRO) {
+                        if (_log.shouldLog(Log.WARN))
+                            _log.warn("Dropping type " + type + " auth " + auth + ": " + packet);
+                        break;
+                    }
                     _establisher.receiveSessionRequest(from, reader);
                     //_context.statManager().addRateData("udp.receivePacketSize.sessionRequest", packet.getPacket().getLength(), packet.getLifetime());
                     break;
                 case UDPPacket.PAYLOAD_TYPE_SESSION_CONFIRMED:
                     _state = 48;
-                    if (!isAuthenticated) {
+                    if (auth != AuthType.SESSION) {
                         if (_log.shouldLog(Log.WARN))
-                            _log.warn("Dropping unauthenticated type " + type + ": " + packet);
+                            _log.warn("Dropping type " + type + " auth " + auth + ": " + packet);
                         break;
                     }
                     _establisher.receiveSessionConfirmed(from, reader);
@@ -660,9 +671,10 @@ class PacketHandler {
                     break;
                 case UDPPacket.PAYLOAD_TYPE_SESSION_CREATED:
                     _state = 49;
-                    if (!isAuthenticated) {
+                    // this is the only type that allows BOBINTRO
+                    if (auth != AuthType.BOBINTRO && auth != AuthType.SESSION) {
                         if (_log.shouldLog(Log.WARN))
-                            _log.warn("Dropping unauthenticated type " + type + ": " + packet);
+                            _log.warn("Dropping type " + type + " auth " + auth + ": " + packet);
                         break;
                     }
                     _establisher.receiveSessionCreated(from, reader);
@@ -670,9 +682,9 @@ class PacketHandler {
                     break;
                 case UDPPacket.PAYLOAD_TYPE_DATA:
                     _state = 50;
-                    if (!isAuthenticated) {
+                    if (auth != AuthType.SESSION) {
                         if (_log.shouldLog(Log.WARN))
-                            _log.warn("Dropping unauthenticated type " + type + ": " + packet);
+                            _log.warn("Dropping type " + type + " auth " + auth + ": " + packet);
                         break;
                     }
                     if (outState != null)
@@ -681,8 +693,8 @@ class PacketHandler {
                         _log.debug("Received new DATA packet from " + state + ": " + packet);
                     if (state != null) {
                         UDPPacketReader.DataReader dr = reader.getDataReader();
-                        if (_log.shouldLog(Log.INFO)) {
-                            StringBuilder msg = new StringBuilder();
+                        if (_log.shouldLog(Log.DEBUG)) {
+                            StringBuilder msg = new StringBuilder(512);
                             msg.append("Receive ").append(System.identityHashCode(packet));
                             msg.append(" from ").append(state.getRemotePeer().toBase64()).append(" ").append(state.getRemoteHostId());
                             for (int i = 0; i < dr.readFragmentCount(); i++) {
@@ -692,7 +704,7 @@ class PacketHandler {
                                     msg.append("*");
                             }
                             msg.append(": ").append(dr.toString());
-                            _log.info(msg.toString());
+                            _log.debug(msg.toString());
                         }
                         //packet.beforeReceiveFragments();
                         _inbound.receiveData(state, dr);
@@ -709,21 +721,31 @@ class PacketHandler {
                     break;
                 case UDPPacket.PAYLOAD_TYPE_TEST:
                     _state = 51;
+                    if (auth == AuthType.BOBINTRO) {
+                        if (_log.shouldLog(Log.WARN))
+                            _log.warn("Dropping type " + type + " auth " + auth + ": " + packet);
+                        break;
+                    }
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Received test packet: " + reader + " from " + from);
                     _testManager.receiveTest(from, reader);
                     //_context.statManager().addRateData("udp.receivePacketSize.test", packet.getPacket().getLength(), packet.getLifetime());
                     break;
                 case UDPPacket.PAYLOAD_TYPE_RELAY_REQUEST:
+                    if (auth == AuthType.BOBINTRO) {
+                        if (_log.shouldLog(Log.WARN))
+                            _log.warn("Dropping type " + type + " auth " + auth + ": " + packet);
+                        break;
+                    }
                     if (_log.shouldLog(Log.INFO))
                         _log.info("Received relay request packet: " + reader + " from " + from);
                     _introManager.receiveRelayRequest(from, reader);
                     //_context.statManager().addRateData("udp.receivePacketSize.relayRequest", packet.getPacket().getLength(), packet.getLifetime());
                     break;
                 case UDPPacket.PAYLOAD_TYPE_RELAY_INTRO:
-                    if (!isAuthenticated) {
+                    if (auth != AuthType.SESSION) {
                         if (_log.shouldLog(Log.WARN))
-                            _log.warn("Dropping unauthenticated type " + type + ": " + packet);
+                            _log.warn("Dropping type " + type + " auth " + auth + ": " + packet);
                         break;
                     }
                     if (_log.shouldLog(Log.INFO))
@@ -732,6 +754,11 @@ class PacketHandler {
                     //_context.statManager().addRateData("udp.receivePacketSize.relayIntro", packet.getPacket().getLength(), packet.getLifetime());
                     break;
                 case UDPPacket.PAYLOAD_TYPE_RELAY_RESPONSE:
+                    if (auth == AuthType.BOBINTRO) {
+                        if (_log.shouldLog(Log.WARN))
+                            _log.warn("Dropping type " + type + " auth " + auth + ": " + packet);
+                        break;
+                    }
                     if (_log.shouldLog(Log.INFO))
                         _log.info("Received relay response packet: " + reader + " from " + from);
                     _establisher.receiveRelayResponse(from, reader);
@@ -739,7 +766,10 @@ class PacketHandler {
                     break;
                 case UDPPacket.PAYLOAD_TYPE_SESSION_DESTROY:
                     _state = 53;
-                    if (!isAuthenticated)
+                    if (auth == AuthType.BOBINTRO) {
+                        if (_log.shouldLog(Log.WARN))
+                            _log.warn("Dropping type " + type + " auth " + auth + ": " + packet);
+                    } else if (auth != AuthType.SESSION)
                         _establisher.receiveSessionDestroy(from);  // drops
                     else if (outState != null)
                         _establisher.receiveSessionDestroy(from, outState);
@@ -751,7 +781,7 @@ class PacketHandler {
                 default:
                     _state = 52;
                     if (_log.shouldLog(Log.WARN))
-                        _log.warn("Unknown payload type: " + type);
+                        _log.warn("Dropping type " + type + " auth " + auth + ": " + packet);
                     _context.statManager().addRateData("udp.droppedInvalidUnknown", packet.getLifetime(), packet.getExpiration());
                     return;
             }

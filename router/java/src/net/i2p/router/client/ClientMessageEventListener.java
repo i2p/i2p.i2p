@@ -197,6 +197,7 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
         } else {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Signature verification *FAILED* on a create session message.  Hijack attempt?");
+            // For now, we do NOT send a SessionStatusMessage - see javadoc above
             _runner.disconnectClient("Invalid signature on CreateSessionMessage");
             return;
         }
@@ -206,10 +207,11 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
         if (!checkAuth(inProps))
             return;
 
-        SessionId sessionId = new SessionId();
-        sessionId.setSessionId(getNextSessionId()); 
-        _runner.setSessionId(sessionId);
-        sendStatusMessage(SessionStatusMessage.STATUS_CREATED);
+        SessionId id = _runner.getSessionId();
+        if (id != null) {
+            _runner.disconnectClient("Already have session " + id);
+            return;
+        }
 
         // Copy over the whole config structure so we don't later corrupt it on
         // the client side if we change settings or later get a
@@ -219,10 +221,25 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
         Properties props = new Properties();
         props.putAll(in.getOptions());
         cfg.setOptions(props);
-        _runner.sessionEstablished(cfg);
+        int status = _runner.sessionEstablished(cfg);
+        if (status != SessionStatusMessage.STATUS_CREATED) {
+            // For now, we do NOT send a SessionStatusMessage - see javadoc above
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("Session establish failed: code = " + status);
+            String msg;
+            if (status == SessionStatusMessage.STATUS_INVALID)
+                msg = "duplicate destination";
+            else if (status == SessionStatusMessage.STATUS_REFUSED)
+                msg = "session limit exceeded";
+            else
+                msg = "unknown error";
+            _runner.disconnectClient(msg);
+            return;
+        }
+        sendStatusMessage(status);
 
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("after sessionEstablished for " + _runner.getDestHash());
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Session " + _runner.getSessionId() + " established for " + _runner.getDestHash());
         startCreateSessionJob();
     }
     
@@ -410,7 +427,10 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
     
     private void sendStatusMessage(int status) {
         SessionStatusMessage msg = new SessionStatusMessage();
-        msg.setSessionId(_runner.getSessionId());
+        SessionId id = _runner.getSessionId();
+        if (id == null)
+            id = ClientManager.UNKNOWN_SESSION_ID;
+        msg.setSessionId(id);
         msg.setStatus(status);
         try {
             _runner.doSend(msg);
@@ -435,23 +455,8 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
             _runner.doSend(msg);
         } catch (I2CPMessageException ime) {
             if (_log.shouldLog(Log.WARN))
-                _log.warn("Error writing out the session status message", ime);
+                _log.warn("Error writing bw limits msg", ime);
         }
     }
 
-    // this *should* be mod 65536, but UnsignedInteger is still b0rked.  FIXME
-    private final static int MAX_SESSION_ID = 32767;
-
-    private static volatile int _id = RandomSource.getInstance().nextInt(MAX_SESSION_ID); // sessionId counter
-    private final static Object _sessionIdLock = new Object();
-    
-    /** generate a new sessionId */
-    private final static int getNextSessionId() { 
-        synchronized (_sessionIdLock) {
-            int id = (++_id)%MAX_SESSION_ID;
-            if (_id >= MAX_SESSION_ID)
-                _id = 0; 
-            return id; 
-        }
-    }
 }

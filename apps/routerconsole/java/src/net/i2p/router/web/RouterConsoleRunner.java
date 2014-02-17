@@ -645,7 +645,7 @@ public class RouterConsoleRunner implements RouterApp {
         t.setPriority(Thread.NORM_PRIORITY - 1);
         t.start();
         
-            ConsoleUpdateManager um = new ConsoleUpdateManager(_context);
+            ConsoleUpdateManager um = new ConsoleUpdateManager(_context, _mgr, null);
             um.start();
         
             if (PluginStarter.pluginsEnabled(_context)) {

@@ -2,23 +2,22 @@
 # Copyright (C) 2009 The I2P Project
 # This file is distributed under the same license as the i2ptunnel package.
 # To contribute translations, see http://www.i2p2.de/newdevelopers
-#
+# 
 # Translators:
 # blueboy, 2013
-# blueboy, 2013
+# blueboy, 2013-2014
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-01-09 18:16+0000\n"
-"PO-Revision-Date: 2013-11-25 22:03+0000\n"
+"POT-Creation-Date: 2014-01-09 19:27+0000\n"
+"PO-Revision-Date: 2014-01-29 00:58+0000\n"
 "Last-Translator: blueboy\n"
-"Language-Team: Portuguese (Brazil) (http://www.transifex.com/projects/p/I2P/"
-"language/pt_BR/)\n"
-"Language: pt_BR\n"
+"Language-Team: Portuguese (Brazil) (http://www.transifex.com/projects/p/I2P/language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: pt_BR\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 #: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:350
@@ -47,7 +46,7 @@ msgstr ""
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:121
 msgid "Tunnels are not initialized yet, please reload in two minutes."
-msgstr ""
+msgstr "Os túneis não foram inicializados ainda, por favor, recarregue em dois minutos."
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:194
 msgid ""
@@ -59,7 +58,7 @@ msgstr ""
 msgid ""
 "If the problem persists, verify that you have cookies enabled in your "
 "browser."
-msgstr ""
+msgstr "Se o problema persistir, verifique se o seu navegador está configurado para permitir cookies."
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:242
 msgid "Configuration reloaded for all tunnels"
@@ -68,12 +67,12 @@ msgstr ""
 #. and give them something to look at in any case
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:255
 msgid "Starting tunnel"
-msgstr ""
+msgstr "Inicializando túnel"
 
 #. and give them something to look at in any case
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:268
 msgid "Stopping tunnel"
-msgstr ""
+msgstr "Parando túnel"
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:334
 msgid "Configuration changes saved"
@@ -100,7 +99,7 @@ msgstr "Porta inválida"
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:488
 msgid "Warning - ports less than 1024 are not recommended"
-msgstr ""
+msgstr "Aviso - portas abaixo de 1024 não são recomendadas"
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:504
 msgid "Standard client"
@@ -250,7 +249,7 @@ msgstr "Cliente compartilhado"
 msgid ""
 "(Share tunnels with other clients and irc/httpclients? Change requires "
 "restart of client proxy)"
-msgstr ""
+msgstr "(Compartilhar túneis com outros clientes e clientes irc/http? Alterar requer a reinicialização do proxy de cliente)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:232
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:141
@@ -263,7 +262,7 @@ msgstr "Inicialização automática"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:145
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:526
 msgid "(Check the Box for 'YES')"
-msgstr ""
+msgstr "(Selecione a caixa para 'SIM')"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:240
 msgid "Enable DCC"
@@ -272,7 +271,7 @@ msgstr "Permitir DCC"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:248
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:266
 msgid "Advanced networking options"
-msgstr ""
+msgstr "Opções de rede avançadas"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:250
 msgid ""
@@ -421,7 +420,7 @@ msgstr "Endereço I2CP do roteador"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:396
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:413
 msgid "Host"
-msgstr ""
+msgstr "Host"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:394
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:165
@@ -471,7 +470,7 @@ msgstr ""
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:432
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:430
 msgid "Disable"
-msgstr ""
+msgstr "Desabilitar"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:438
 msgid "Delay tunnel open until required"
@@ -571,7 +570,7 @@ msgstr "Adicionar ao livro de endereços local"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:260
 msgid "Hostname Signature"
-msgstr ""
+msgstr "Assinatura do nome do host"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:412
 msgid "Encrypt Leaseset"
@@ -698,7 +697,7 @@ msgstr "Gerenciador de túneis I2P - Lista"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:97
 msgid "Status Messages"
-msgstr ""
+msgstr "Mensagens de Estado"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:101
 msgid "Refresh"
@@ -722,7 +721,7 @@ msgstr "Reinicializar todos"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:124
 msgid "I2P Server Tunnels"
-msgstr ""
+msgstr "Túneis de servidor I2P"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:128
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:149
@@ -740,7 +739,7 @@ msgstr "Mostrar previsão"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:279
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:320
 msgid "Status"
-msgstr ""
+msgstr "Estado"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:192
 msgid "Base32 Address"
@@ -799,7 +798,7 @@ msgstr "Criar"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:269
 msgid "I2P Client Tunnels"
-msgstr ""
+msgstr "Túneis de cliente I2P"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:277
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:306
@@ -866,20 +865,20 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:189
 msgid ""
-"This wizard will take you through the various options available for creating "
-"tunnels in I2P."
+"This wizard will take you through the various options available for creating"
+" tunnels in I2P."
 msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:191
 msgid ""
-"The first thing to decide is whether you want to create a server or a client "
-"tunnel."
+"The first thing to decide is whether you want to create a server or a client"
+" tunnel."
 msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:193
 msgid ""
-"If you need to connect to a remote service, such as an IRC server inside I2P "
-"or a code repository, then you will require a CLIENT tunnel."
+"If you need to connect to a remote service, such as an IRC server inside I2P"
+" or a code repository, then you will require a CLIENT tunnel."
 msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:195
@@ -918,8 +917,8 @@ msgstr ""
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:231
 msgid ""
 "Set your browser to use this tunnel as an http proxy, or set your "
-"\"http_proxy\" environment variable for command-line applications in GNU/"
-"Linux."
+"\"http_proxy\" environment variable for command-line applications in "
+"GNU/Linux."
 msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:233
@@ -946,7 +945,7 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:241
 msgid "A tunnel that implements the SOCKS protocol."
-msgstr ""
+msgstr "Um túnel que implementa o protocolo SOCKS."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:243
 msgid ""
@@ -982,7 +981,7 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:253
 msgid "A client tunnel that implements the HTTP CONNECT command."
-msgstr ""
+msgstr "Um túnel de cliente que implementa o comando HTTP CONNECT."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:255
 msgid ""
@@ -1137,7 +1136,7 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:565
 msgid "Below is a summary of the options you chose:"
-msgstr ""
+msgstr "Abaixo um resumo das opções que você escolheu:"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:663
 msgid ""
@@ -1167,6 +1166,3 @@ msgstr "Terminar"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:727
 msgid "Next"
 msgstr "Próximo"
-
-#~ msgid "(if known)"
-#~ msgstr "(se conhecido)"

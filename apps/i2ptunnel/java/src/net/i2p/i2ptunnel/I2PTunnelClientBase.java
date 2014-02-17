@@ -55,7 +55,7 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
     private int localPort;
 
     /**
-     *  Protected for I2Ping since 0.9.10. Not for use outside package.
+     *  Protected for I2Ping since 0.9.11. Not for use outside package.
      */
     protected boolean listenerReady;
 
@@ -586,7 +586,7 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
     }
 
     /**
-     *  Non-final since 0.9.10.
+     *  Non-final since 0.9.11.
      *  Any overrides must set listenerReady = true.
      */
     public void run() {

@@ -1,3 +1,110 @@
+2014-02-17 zzz
+ * HMAC:
+   - Replace BC MD5 with JVM version, refactor I2PHMAC to use
+     MessageDigest instead of BC Digest (ticket #1189)
+   - Use JVM HmacSHA256 instead of I2PHMAC for Syndie since it is standard
+ * SSU:
+   - Use session key for relay request/response if available (ticket #1206)
+   - Restrict authentication with Bob's intro key to session created packet
+   - Remove packetAuthTime stats
+ * Initial support for key certificates and arbitrary types and lengths
+   of signing keys and signatures in RouterIdentities and Destinations.
+   - Fixup of Destination.create() and Destination.size()
+   - Add generic off/len methods in DSAEngine, needed for streaming
+   - Support i2cp.destination.sigType option in TunnelController and
+     I2PSocketManagerFactory
+   - Fixup of sign/verify in streaming Packet
+   - Add setting in i2ptunnel server edit page (hidden for now)
+   - Comment out cert setting on i2ptunnel server edit page
+   - Show key type on susidns details page and LS debug page
+   - Hide setting in i2ptunnel edit pages unless advanced user
+   - Only store LS with key certs to routers that support it
+   - Only store LS with more than 6 leases to routers that support it
+
+2014-02-14 zzz
+ * I2CP:
+   - Add session limit, add new status code for refused
+   - Ramdomize session ID, prevent dups
+   - Make SessionId immutable
+
+2014-02-13 zzz
+ * Router: Convert to getopt (ticket #1173)
+ * Tunnels: Change expl. OB default to 3+0
+
+2014-02-11 zzz
+ * HTTP client proxy: Don't flush after headers for a POST,
+   so the POST data is included in the SYN packet,
+   to improve speed and reliability of small POSTs
+
+2014-02-10 zzz
+Prop from i2p.i2p.zzz.test2:
+ * Addressbook: Rewrite subscriptions.txt for new default URL
+ * Build: Honor require.gettext=false for i2prouter translations
+ * Core: Add lightweight getopt command line parsing lib (ticket #1173)
+ * EepGet:
+   - Convert to getopt (ticket #1173)
+   - New option -c for clearnet (no proxy), same as -p:0
+   - Proxy option -p with host name arg only (no ':') now allowed
+   - Proxy password option is now -x, not the second arg to -u
+   - Prompt for proxy password if not supplied in options
+   - Line length option is now -l, not the second arg to -m
+   - Error on nonproxied .onion hosts
+   - Update man page, sort options (ticket #1173)
+   - Support Digest proxy authentication (ticket #1173)
+   - Move authentication parsing method from I2PTunnelHTTPClientBase
+ * EepHead, PartialEepGet, SSLEepGet: Convert to getopt (ticket #1173)
+ * EepHead, PartialEepGet:
+   - New option -c for clearnet (no proxy), same as -p:0
+   - New option -o, same as EepGet
+   - Proxy option -p with host name arg only (no ':') now allowed
+   - Add proxy auth support with -u and -x options (ticket #1173)
+ * I2Ping:
+   - Convert to getopt (ticket #1173)
+   - Add support for from/to ports
+ * i2psnark: Cache PeerID.toString()
+ * I2PTunnel:
+   - Convert to getopt (ticket #1173)
+   - Add more argument sanity checking and a usage output
+ * PrivateKeyFile:
+   - Convert to getopt (ticket #1173)
+   - New option -e for hashcash effort, replaces -h with arg
+   - Stub out -t option, to be propped from ecdsa branch
+ * Streaming:
+   - Set ports on many packets that were missing them
+   - Use connection throttling methods on pings too (ticket #1142)
+   - Add methods to set ports on pings
+   - Argument checking on ping methods
+ * SU3File: Convert to getopt (ticket #1173)
+ * UpdateManager: Convert to RouterApp and remove update hooks from context
+     (ticket #1185)
+
+2014-02-10 zzz
+ * Console:
+   - Don't reset graph settings when clicking restart or shutdown on graphs page
+   - Don't recommend guest login on trac, it's disabled
+   - Catch and remove corrupt jrb file (ticket #1186)
+   - Always set default language on /configui
+ * Transports: Reduce target connection count again to reduce
+               tunnel reject rate further
+
+* 2014-02-08 0.9.11 released
+
+2014-02-07 zzz
+ * Services:
+   - Move backup news to psi.i2p
+   - Move default addressbook subscription to i2p-projekt.i2p
+   - Remove www.i2p2.i2p from default update lists
+   - Add psi.i2p to hosts.txt
+   - Update links on help pages to avoid redirects on new website
+     and select the correct language
+ * SusiDNS: Fix whitespace issues
+
+2014-02-06 kytv
+ * Brazilian Portuguese, Danish, French, Japanese, Polish, Russian, Ukrainian
+   translation updates
+ * Updates to geoip.txt and geoipv6.dat.gz based on Maxmind GeoLite Country
+   database from 2014-02-05.
+
 2014-01-31 zzz
  * /logs: Fix encoding of wrapper log section (ticket #1193)
  * NetDB: Fix cases where corrupt RouterInfo files were not deleted (ticket #1190)

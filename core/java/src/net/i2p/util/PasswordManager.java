@@ -9,6 +9,8 @@ import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
 import net.i2p.data.SessionKey;
 
+//import org.bouncycastle.oldcrypto.digests.MD5Digest;
+
 /**
  *  Manage both plaintext and salted/hashed password storage in
  *  router.config.
@@ -197,4 +199,43 @@ public class PasswordManager {
         } catch (NoSuchAlgorithmException nsae) {}
         return null;
     }
+
+    /**
+     *  speed/comparison test before removing BC version;
+     *  JVM was slightly faster
+     */
+/*****
+    public static void main(String[] args) {
+        RandomSource rand = RandomSource.getInstance();
+        byte[] d = new byte[1500];
+        MD5Digest md = new MD5Digest();
+        byte[] bc = new byte[16];
+        // warmup and comparison
+        int runs = 25000;
+        for (int i = 0; i < runs; i++) {
+            rand.nextBytes(d);
+            byte[] jvm = md5Sum(d);
+            md.update(d, 0, d.length);
+            md.doFinal(bc, 0);
+            if (!DataHelper.eq(jvm, bc))
+                throw new IllegalStateException();
+            md.reset();
+        }
+
+        // real thing
+        runs = 500000;
+        long start = System.currentTimeMillis();
+        for (int i = 0; i < runs; i++) {
+            md5Sum(d);
+        }
+        System.out.println("JVM " + (System.currentTimeMillis() - start));
+        start = System.currentTimeMillis();
+        for (int i = 0; i < runs; i++) {
+            md.update(d, 0, d.length);
+            md.doFinal(bc, 0);
+            md.reset();
+        }
+        System.out.println("BC " + (System.currentTimeMillis() - start));
+    }
+*****/
 }

@@ -20,13 +20,15 @@ class HopProcessor {
     private final IVValidator _validator;
         
     /** helpful flag for debugging */
-    static final boolean USE_ENCRYPTION = true;
+    //static final boolean USE_ENCRYPTION = true;
     /**
-     * as of i2p 0.6, the tunnel crypto will change by encrypting the IV both before 
+     * as of i2p 0.6, the tunnel crypto changed  to encrypt the IV both before 
      * and after using it at each hop so as to prevent a certain type of replay/confirmation 
      * attack.
+     *
+     * See: http://osdir.com/ml/network.i2p/2005-07/msg00031.html
      */
-    static final boolean USE_DOUBLE_IV_ENCRYPTION = true;
+    //static final boolean USE_DOUBLE_IV_ENCRYPTION = true;
     static final int IV_LENGTH = 16;
     
     /** @deprecated unused */
@@ -83,12 +85,12 @@ class HopProcessor {
             //_log.debug("IV received: " + Base64.encode(iv));
             //_log.debug("Before:" + Base64.encode(orig, IV_LENGTH, orig.length - IV_LENGTH));
         }
-        if (USE_ENCRYPTION) {
-            if (USE_DOUBLE_IV_ENCRYPTION) 
+        //if (USE_ENCRYPTION) {
+            //if (USE_DOUBLE_IV_ENCRYPTION) 
                 updateIV(orig, offset);
             encrypt(orig, offset, length);
             updateIV(orig, offset);
-        }
+        //}
         //if (_log.shouldLog(Log.DEBUG)) {
             //_log.debug("Data after processing: " + Base64.encode(orig, IV_LENGTH, orig.length - IV_LENGTH));
             //_log.debug("IV sent: " + Base64.encode(orig, 0, IV_LENGTH));

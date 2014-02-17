@@ -5,12 +5,13 @@
 # 
 # Translators:
 # blueboy, 2013
+# blueboy, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-11-19 23:51+0000\n"
-"PO-Revision-Date: 2013-11-23 17:30+0000\n"
+"PO-Revision-Date: 2014-01-31 16:45+0000\n"
 "Last-Translator: blueboy\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/projects/p/I2P/language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
@@ -120,7 +121,7 @@ msgstr ""
 #: ../i2prouter:1532
 #, sh-format
 msgid "Install not currently supported for $DIST_OS"
-msgstr ""
+msgstr "A instalação não possui atualmente suporte para $DIST_OS"
 
 #: ../i2prouter:1548 ../i2prouter:1561 ../i2prouter:1575 ../i2prouter:1584
 #: ../i2prouter:1594 ../i2prouter:1618 ../i2prouter:1631 ../i2prouter:1643
@@ -151,11 +152,11 @@ msgstr ""
 
 #: ../i2prouter:1786
 msgid "Start in the background as a daemon process."
-msgstr ""
+msgstr "Inicializar executando ao fundo, como um processo daemon."
 
 #: ../i2prouter:1787
 msgid "Stop if running as a daemon or in another console."
-msgstr ""
+msgstr "Pare se estiver sendo executado como um daemon ou em um outro console."
 
 #: ../i2prouter:1788
 msgid "Stop gracefully, may take up to 11 minutes."
@@ -163,11 +164,11 @@ msgstr ""
 
 #: ../i2prouter:1789
 msgid "Stop if running and then start."
-msgstr ""
+msgstr "Pare, se estiver sendo executado, e então inicialize."
 
 #: ../i2prouter:1790
 msgid "Restart only if already running."
-msgstr ""
+msgstr "Reinicialize apenas se já estiver sendo executado."
 
 #: ../i2prouter:1791
 msgid "Query the current status."
@@ -191,8 +192,8 @@ msgstr "Por favor, edite i2prouter e especifique a variável RUN_AS_USER"
 
 #: ../i2prouter:1812
 msgid "Running I2P as the root user is *not* recommended."
-msgstr ""
+msgstr "Executar o roteador I2P como usuário root *não* é recomendado."
 
 #: ../i2prouter:1815
 msgid "To run as root anyway, edit i2prouter and set ALLOW_ROOT=true."
-msgstr ""
+msgstr "De qualquer forma, se quiser mesmo executar o roteador como root, edite i2prouter e ponha ALLOW_ROOT=true."

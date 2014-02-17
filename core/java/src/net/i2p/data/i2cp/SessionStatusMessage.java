@@ -31,6 +31,8 @@ public class SessionStatusMessage extends I2CPMessageImpl {
     public final static int STATUS_CREATED = 1;
     public final static int STATUS_UPDATED = 2;
     public final static int STATUS_INVALID = 3;
+    /** @since 0.9.12 */
+    public final static int STATUS_REFUSED = 4;
 
     public SessionStatusMessage() {
         setStatus(STATUS_INVALID);
