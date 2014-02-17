@@ -42,6 +42,8 @@ public class Certificate extends DataStructureImpl {
     public final static int CERTIFICATE_LENGTH_SIGNED_WITH_HASH = Signature.SIGNATURE_BYTES + Hash.HASH_LENGTH;
     /** Contains multiple certs */
     public final static int CERTIFICATE_TYPE_MULTIPLE = 4;
+    /** @since 0.9.12 */
+    public final static int CERTIFICATE_TYPE_KEY = 5;
 
     /**
      * If null cert, return immutable static instance, else create new
@@ -58,6 +60,13 @@ public class Certificate extends DataStructureImpl {
             return new Certificate(type, null);
         byte[] payload = new byte[length];
         System.arraycopy(data, off + 3, payload, 0, length);
+        if (type == CERTIFICATE_TYPE_KEY) {
+            try {
+                return new KeyCertificate(payload);
+            } catch (DataFormatException dfe) {
+                throw new IllegalArgumentException(dfe);
+            }
+        }
         return new Certificate(type, payload);
     }
 
@@ -77,13 +86,20 @@ public class Certificate extends DataStructureImpl {
         int read = DataHelper.read(in, payload);
         if (read != length)
             throw new DataFormatException("Not enough bytes for the payload (read: " + read + " length: " + length + ')');
+        if (type == CERTIFICATE_TYPE_KEY)
+            return new KeyCertificate(payload);
         return new Certificate(type, payload);
     }
 
     public Certificate() {
     }
 
+    /**
+     *  @throws IllegalArgumentException if type < 0
+     */
     public Certificate(int type, byte[] payload) {
+        if (type < 0)
+            throw new IllegalArgumentException();
         _type = type;
         _payload = payload;
     }
@@ -93,7 +109,15 @@ public class Certificate extends DataStructureImpl {
         return _type;
     }
 
+    /**
+     *  @throws IllegalArgumentException if type < 0
+     *  @throws IllegalStateException if already set
+     */
     public void setCertificateType(int type) {
+        if (type < 0)
+            throw new IllegalArgumentException();
+        if (_type != 0 && _type != type)
+            throw new IllegalStateException("already set");
         _type = type;
     }
 
@@ -101,11 +125,21 @@ public class Certificate extends DataStructureImpl {
         return _payload;
     }
 
+    /**
+     *  @throws IllegalStateException if already set
+     */
     public void setPayload(byte[] payload) {
+        if (_payload != null)
+            throw new IllegalStateException("already set");
         _payload = payload;
     }
     
+    /**
+     *  @throws IllegalStateException if already set
+     */
     public void readBytes(InputStream in) throws DataFormatException, IOException {
+        if (_type != 0 || _payload != null)
+            throw new IllegalStateException("already set");
         _type = (int) DataHelper.readLong(in, 1);
         int length = (int) DataHelper.readLong(in, 2);
         if (length > 0) {
@@ -149,7 +183,12 @@ public class Certificate extends DataStructureImpl {
         return cur - offset;
     }
     
+    /**
+     *  @throws IllegalStateException if already set
+     */
     public int readBytes(byte source[], int offset) throws DataFormatException {
+        if (_type != 0 || _payload != null)
+            throw new IllegalStateException("already set");
         if (source == null) throw new DataFormatException("Cert is null");
         if (source.length < offset + 3)
             throw new DataFormatException("Cert is too small [" + source.length + " off=" + offset + "]");
@@ -175,6 +214,18 @@ public class Certificate extends DataStructureImpl {
         return 1 + 2 + (_payload != null ? _payload.length : 0);
     }
     
+    /**
+     *  Up-convert this to a KeyCertificate
+     *
+     *  @throws DataFormatException if cert type != CERTIFICATE_TYPE_KEY
+     *  @since 0.9.12
+     */
+    public KeyCertificate toKeyCertificate() throws DataFormatException {
+        if (_type != CERTIFICATE_TYPE_KEY)
+            throw new DataFormatException("type");
+        return new KeyCertificate(this);
+    }
+
     @Override
     public boolean equals(Object object) {
         if (object == this) return true;
@@ -194,6 +245,8 @@ public class Certificate extends DataStructureImpl {
         buf.append("[Certificate: type: ");
         if (getCertificateType() == CERTIFICATE_TYPE_NULL)
             buf.append("Null certificate");
+        else if (getCertificateType() == CERTIFICATE_TYPE_KEY)
+            buf.append("Key certificate");
         else if (getCertificateType() == CERTIFICATE_TYPE_HASHCASH)
             buf.append("Hashcash certificate");
         else if (getCertificateType() == CERTIFICATE_TYPE_HIDDEN)

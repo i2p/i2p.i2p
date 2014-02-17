@@ -12,6 +12,7 @@ import java.util.Properties;
 
 import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
+import net.i2p.crypto.SigType;
 import net.i2p.data.Certificate;
 import net.i2p.data.Destination;
 
@@ -20,14 +21,30 @@ import net.i2p.data.Destination;
  * just used to talk to the router.
  */
 public class I2PSimpleClient implements I2PClient {
-    /** @deprecated Don't do this */
+
+    /**
+     *  @deprecated Don't do this
+     *  @throws UnsupportedOperationException always
+     */
     public Destination createDestination(OutputStream destKeyStream) throws I2PException, IOException {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
-    /** @deprecated or this */
+    /**
+     *  @deprecated Don't do this
+     *  @throws UnsupportedOperationException always
+     *  @since 0.9.12
+     */
+    public Destination createDestination(OutputStream destKeyStream, SigType type) throws I2PException, IOException {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     *  @deprecated Don't do this
+     *  @throws UnsupportedOperationException always
+     */
     public Destination createDestination(OutputStream destKeyStream, Certificate cert) throws I2PException, IOException {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     /**
@@ -37,6 +54,7 @@ public class I2PSimpleClient implements I2PClient {
     public I2PSession createSession(InputStream destKeyStream, Properties options) throws I2PSessionException {
         return createSession(I2PAppContext.getGlobalContext(), options);
     }
+
     /**
      * Create a new session (though do not connect it yet)
      *

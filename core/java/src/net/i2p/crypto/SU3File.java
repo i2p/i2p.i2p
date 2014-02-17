@@ -535,23 +535,6 @@ public class SU3File {
      *  @return null if not found
      *  @since 0.9.9
      */
-    private static SigType parseSigType(String stype) {
-        try {
-            return SigType.valueOf(stype.toUpperCase(Locale.US));
-        } catch (IllegalArgumentException iae) {
-            try {
-                int code = Integer.parseInt(stype);
-                return SigType.getByCode(code);
-            } catch (NumberFormatException nfe) {
-                return null;
-             }
-        }
-    }
-    /**
-     *  @param stype number or name
-     *  @return null if not found
-     *  @since 0.9.9
-     */
     private static ContentType parseContentType(String ctype) {
         try {
             return ContentType.valueOf(ctype.toUpperCase(Locale.US));
@@ -639,7 +622,7 @@ public class SU3File {
      */
     private static final boolean signCLI(String stype, String ctype, String inputFile, String signedFile,
                                          String privateKeyFile, String version, String signerName, String keypw) {
-        SigType type = stype == null ? SigType.getByCode(Integer.valueOf(DEFAULT_SIG_CODE)) : parseSigType(stype);
+        SigType type = stype == null ? SigType.getByCode(Integer.valueOf(DEFAULT_SIG_CODE)) : SigType.parseSigType(stype);
         if (type == null) {
             System.out.println("Signature type " + stype + " is not supported");
             return false;
@@ -731,7 +714,7 @@ public class SU3File {
      *  @since 0.9.9
      */
     private static final boolean genKeysCLI(String stype, String publicKeyFile, String privateKeyFile, String alias) {
-        SigType type = stype == null ? SigType.getByCode(Integer.valueOf(DEFAULT_SIG_CODE)) : parseSigType(stype);
+        SigType type = stype == null ? SigType.getByCode(Integer.valueOf(DEFAULT_SIG_CODE)) : SigType.parseSigType(stype);
         if (type == null) {
             System.out.println("Signature type " + stype + " is not supported");
             return false;

@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.Arrays;
 
 import net.i2p.I2PAppContext;
+import net.i2p.crypto.SigType;
 import net.i2p.data.Base64;
 import net.i2p.data.ByteArray;
 import net.i2p.data.DataFormatException;
@@ -403,13 +404,14 @@ class Packet {
      * @throws IllegalStateException if there is data missing or otherwise b0rked
      */
     public int writePacket(byte buffer[], int offset) throws IllegalStateException {
-        return writePacket(buffer, offset, true);
+        return writePacket(buffer, offset, 0);
     }
+
     /**
-     * @param includeSig if true, include the real signature, otherwise put zeroes
-     *                   in its place.
+     * @param fakeSigLen if 0, include the real signature in _optionSignature;
+     *                   if nonzero, leave space for that many bytes
      */
-    private int writePacket(byte buffer[], int offset, boolean includeSig) throws IllegalStateException {
+    private int writePacket(byte buffer[], int offset, int fakeSigLen) throws IllegalStateException {
         int cur = offset;
         DataHelper.toLong(buffer, cur, 4, (_sendStreamId >= 0 ? _sendStreamId : STREAM_ID_UNKNOWN));
         cur += 4;
@@ -443,8 +445,14 @@ class Packet {
             optionSize += _optionFrom.size();
         if (isFlagSet(FLAG_MAX_PACKET_SIZE_INCLUDED))
             optionSize += 2;
-        if (isFlagSet(FLAG_SIGNATURE_INCLUDED))
-            optionSize += Signature.SIGNATURE_BYTES;
+        if (isFlagSet(FLAG_SIGNATURE_INCLUDED)) {
+            if (fakeSigLen > 0)
+                optionSize += fakeSigLen;
+            else if (_optionSignature != null)
+                optionSize += _optionSignature.length();
+            else
+                throw new IllegalStateException();
+        }
         
         DataHelper.toLong(buffer, cur, 2, optionSize);
         cur += 2;
@@ -461,11 +469,14 @@ class Packet {
             cur += 2;
         }
         if (isFlagSet(FLAG_SIGNATURE_INCLUDED)) {
-            if (includeSig)
-                System.arraycopy(_optionSignature.getData(), 0, buffer, cur, Signature.SIGNATURE_BYTES);
-            else // we're signing (or validating)
-                Arrays.fill(buffer, cur, cur+Signature.SIGNATURE_BYTES, (byte)0x0);
-            cur += Signature.SIGNATURE_BYTES;
+            if (fakeSigLen == 0) {
+                // we're signing (or validating)
+                System.arraycopy(_optionSignature.getData(), 0, buffer, cur, _optionSignature.length());
+                cur += _optionSignature.length();
+            } else {
+                Arrays.fill(buffer, cur, cur + fakeSigLen, (byte)0x0);
+                cur += fakeSigLen;
+            }
         }
         
         if (_payload != null) {
@@ -518,7 +529,7 @@ class Packet {
         if (isFlagSet(FLAG_MAX_PACKET_SIZE_INCLUDED))
             size += 2;
         if (isFlagSet(FLAG_SIGNATURE_INCLUDED))
-            size += Signature.SIGNATURE_BYTES;
+            size += _optionSignature.length();
         
         size += 2; // option size
         
@@ -613,12 +624,37 @@ class Packet {
             cur += 2;
         }
         if (isFlagSet(FLAG_SIGNATURE_INCLUDED)) {
-            Signature optionSignature = new Signature();
-            byte buf[] = new byte[Signature.SIGNATURE_BYTES];
-            System.arraycopy(buffer, cur, buf, 0, Signature.SIGNATURE_BYTES);
+            Signature optionSignature;
+            Destination from = getOptionalFrom();
+            if (from != null) {
+                optionSignature = new Signature(from.getSigningPublicKey().getType());
+            } else {
+                // super cheat for now, look for correct type,
+                // assume no more options. If we add to the options
+                // we will have to ask the manager.
+                int siglen = payloadBegin - cur;
+                SigType type = null;
+                for (SigType t : SigType.values()) {
+                    if (t.getSigLen() == siglen) {
+                        type = t;
+                        break;
+                    }
+                }
+                if (type == null) {
+                    if (siglen < Signature.SIGNATURE_BYTES)
+                        throw new IllegalArgumentException("unknown sig type len=" + siglen);
+                    // Hope it's the default type with some unknown options following;
+                    // if not the sig will fail later
+                    type = SigType.DSA_SHA1;
+                    siglen = Signature.SIGNATURE_BYTES;
+                }
+                optionSignature = new Signature(type);
+            }
+            byte buf[] = new byte[optionSignature.length()];
+            System.arraycopy(buffer, cur, buf, 0, buf.length);
             optionSignature.setData(buf);
             setOptionalSignature(optionSignature);
-            cur += Signature.SIGNATURE_BYTES;
+            cur += buf.length;
         }
     }
     
@@ -641,7 +677,7 @@ class Packet {
         
         if (buffer == null)
             buffer = new byte[size];
-        int written = writePacket(buffer, 0, false);
+        int written = writePacket(buffer, 0, from.getSigningPublicKey().getType().getSigLen());
         if (written != size) {
             ctx.logManager().getLog(Packet.class).error("Written " + written + " size " + size + " for " + toString(), new Exception("moo"));
             return false;
@@ -672,14 +708,14 @@ class Packet {
      */
     public int writeSignedPacket(byte buffer[], int offset, I2PAppContext ctx, SigningPrivateKey key) throws IllegalStateException {
         setFlag(FLAG_SIGNATURE_INCLUDED);
-        int size = writePacket(buffer, offset, false);
+        int size = writePacket(buffer, offset, key.getType().getSigLen());
         _optionSignature = ctx.dsa().sign(buffer, offset, size, key);
-        if (false) {
-            Log l = ctx.logManager().getLog(Packet.class);
-            l.error("Signing: " + toString());
-            l.error(Base64.encode(buffer, 0, size));
-            l.error("Signature: " + Base64.encode(_optionSignature.getData()));
-        }
+        //if (false) {
+        //    Log l = ctx.logManager().getLog(Packet.class);
+        //    l.error("Signing: " + toString());
+        //    l.error(Base64.encode(buffer, 0, size));
+        //    l.error("Signature: " + Base64.encode(_optionSignature.getData()));
+        //}
         // jump into the signed data and inject the signature where we 
         // previously placed a bunch of zeroes
         int signatureOffset = offset 
@@ -694,7 +730,7 @@ class Packet {
                               + (isFlagSet(FLAG_DELAY_REQUESTED) ? 2 : 0)
                               + (isFlagSet(FLAG_FROM_INCLUDED) ? _optionFrom.size() : 0)
                               + (isFlagSet(FLAG_MAX_PACKET_SIZE_INCLUDED) ? 2 : 0);
-        System.arraycopy(_optionSignature.getData(), 0, buffer, signatureOffset, Signature.SIGNATURE_BYTES);
+        System.arraycopy(_optionSignature.getData(), 0, buffer, signatureOffset, _optionSignature.length());
         return size;
     }
     
@@ -740,7 +776,7 @@ class Packet {
         if (isFlagSet(FLAG_CLOSE)) buf.append(" CLOSE");
         if (isFlagSet(FLAG_DELAY_REQUESTED)) buf.append(" DELAY ").append(_optionDelay);
         if (isFlagSet(FLAG_ECHO)) buf.append(" ECHO");
-        if (isFlagSet(FLAG_FROM_INCLUDED)) buf.append(" FROM");
+        if (isFlagSet(FLAG_FROM_INCLUDED)) buf.append(" FROM ").append(_optionFrom.size());
         if (isFlagSet(FLAG_MAX_PACKET_SIZE_INCLUDED)) buf.append(" MS ").append(_optionMaxSize);
         if (isFlagSet(FLAG_PROFILE_INTERACTIVE)) buf.append(" INTERACTIVE");
         if (isFlagSet(FLAG_RESET)) buf.append(" RESET");

@@ -57,6 +57,16 @@ public class Destination extends KeysAndCert {
         PublicKey pk = PublicKey.create(in);
         SigningPublicKey sk = SigningPublicKey.create(in);
         Certificate c = Certificate.create(in);
+        byte[] padding;
+        if (c.getCertificateType() == Certificate.CERTIFICATE_TYPE_KEY) {
+            // convert SPK to new SPK and padding
+            KeyCertificate kcert = c.toKeyCertificate();
+            padding = sk.getPadding(kcert);
+            sk = sk.toTypedKey(kcert);
+            c = kcert;
+        } else {
+            padding = null;
+        }
         Destination rv;
         synchronized(_cache) {
             rv = _cache.get(sk);
@@ -67,7 +77,7 @@ public class Destination extends KeysAndCert {
             }
             //if (STATS)
             //    I2PAppContext.getGlobalContext().statManager().addRateData("DestCache", 0);
-            rv = new Destination(pk, sk, c);
+            rv = new Destination(pk, sk, c, padding);
             _cache.put(sk, rv);
         }
         return rv;
@@ -86,10 +96,11 @@ public class Destination extends KeysAndCert {
     /**
      * @since 0.9.9
      */
-    private Destination(PublicKey pk, SigningPublicKey sk, Certificate c) {
+    private Destination(PublicKey pk, SigningPublicKey sk, Certificate c, byte[] padding) {
         _publicKey = pk;
         _signingKey = sk;
         _certificate = c;
+        _padding = padding;
     }
 
     /**
@@ -100,14 +111,19 @@ public class Destination extends KeysAndCert {
         int cur = offset;
         System.arraycopy(_publicKey.getData(), 0, target, cur, PublicKey.KEYSIZE_BYTES);
         cur += PublicKey.KEYSIZE_BYTES;
-        System.arraycopy(_signingKey.getData(), 0, target, cur, SigningPublicKey.KEYSIZE_BYTES);
-        cur += SigningPublicKey.KEYSIZE_BYTES;
+        if (_padding != null) {
+            System.arraycopy(_padding, 0, target, cur, _padding.length);
+            cur += _padding.length;
+        }
+        System.arraycopy(_signingKey.getData(), 0, target, cur, _signingKey.length());
+        cur += _signingKey.length();
         cur += _certificate.writeBytes(target, cur);
         return cur - offset;
     }
     
     /**
-     * @deprecated was used only by Packet.java in streaming, now unused
+     * deprecated was used only by Packet.java in streaming, now unused
+     * Warning - used by i2p-bote. Does NOT support alternate key types. DSA-SHA1 only.
      *
      * @throws IllegalStateException if data already set
      */
@@ -132,7 +148,16 @@ public class Destination extends KeysAndCert {
     }
 
     public int size() {
-        return PublicKey.KEYSIZE_BYTES + SigningPublicKey.KEYSIZE_BYTES + _certificate.size();
+        int rv = PublicKey.KEYSIZE_BYTES + _signingKey.length();
+        if (_certificate.getCertificateType() == Certificate.CERTIFICATE_TYPE_KEY) {
+            // cert data included in keys
+            rv += 7;
+            if (_padding != null)
+                rv += _padding.length;
+        } else {
+            rv += _certificate.size();
+        }
+        return rv;
     }
 
     /**

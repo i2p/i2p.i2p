@@ -107,7 +107,7 @@
 <td><%=intl._("ElGamal 2048 bit")%></td>
 </tr><tr class="list${book.trClass}">
 <td><%=intl._("Signing Key")%></td>
-<td><%=intl._("DSA 1024 bit")%></td>
+<td><%=addr.getSigType()%></td>
 </tr><tr class="list${book.trClass}">
 <td><%=intl._("Certificate")%></td>
 <td><%=addr.getCert()%></td>

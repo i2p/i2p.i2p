@@ -12,17 +12,22 @@ package net.i2p.client;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.security.GeneralSecurityException;
 import java.util.Properties;
 
 import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
 import net.i2p.crypto.KeyGenerator;
+import net.i2p.crypto.SigType;
 import net.i2p.data.Certificate;
 import net.i2p.data.Destination;
+import net.i2p.data.KeyCertificate;
 import net.i2p.data.PrivateKey;
 import net.i2p.data.PublicKey;
 import net.i2p.data.SigningPrivateKey;
 import net.i2p.data.SigningPublicKey;
+import net.i2p.data.SimpleDataStructure;
+import net.i2p.util.RandomSource;
 
 /**
  * Base client implementation.
@@ -34,7 +39,7 @@ import net.i2p.data.SigningPublicKey;
 class I2PClientImpl implements I2PClient {
 
     /**
-     * Create the destination with a null payload.
+     * Create a destination with a DSA 1024/160 signature type and a null certificate.
      * This is not bound to the I2PClient, you must supply the data back again
      * in createSession().
      *
@@ -42,9 +47,26 @@ class I2PClientImpl implements I2PClient {
      *                      format is specified in {@link net.i2p.data.PrivateKeyFile PrivateKeyFile}
      */
     public Destination createDestination(OutputStream destKeyStream) throws I2PException, IOException {
-        Certificate cert = new Certificate();
-        cert.setCertificateType(Certificate.CERTIFICATE_TYPE_NULL);
-        cert.setPayload(null);
+        return createDestination(destKeyStream, DEFAULT_SIGTYPE);
+    }
+
+    /**
+     * Create a destination with the given signature type.
+     * It will have a null certificate for DSA 1024/160 and KeyCertificate otherwise.
+     * This is not bound to the I2PClient, you must supply the data back again
+     * in createSession().
+     *
+     * @param destKeyStream location to write out the destination, PrivateKey, and SigningPrivateKey,
+     *                      format is specified in {@link net.i2p.data.PrivateKeyFile PrivateKeyFile}
+     * @since 0.9.12
+     */
+    public Destination createDestination(OutputStream destKeyStream, SigType type) throws I2PException, IOException {
+        Certificate cert;
+        if (type == SigType.DSA_SHA1) {
+            cert = Certificate.NULL_CERT;
+        } else {
+            cert = new KeyCertificate(type);
+        }
         return createDestination(destKeyStream, cert);
     }
 
@@ -52,20 +74,49 @@ class I2PClientImpl implements I2PClient {
      * Create the destination with the given payload and write it out along with
      * the PrivateKey and SigningPrivateKey to the destKeyStream
      *
+     * If cert is a KeyCertificate, the signing keypair will be of the specified type.
+     * The KeyCertificate data must be .............................
+     * The padding if any will be randomized. The extra key data if any will be set in the
+     * key cert.
+     *
      * @param destKeyStream location to write out the destination, PrivateKey, and SigningPrivateKey,
      *                      format is specified in {@link net.i2p.data.PrivateKeyFile PrivateKeyFile}
      */
     public Destination createDestination(OutputStream destKeyStream, Certificate cert) throws I2PException, IOException {
         Destination d = new Destination();
-        d.setCertificate(cert);
         Object keypair[] = KeyGenerator.getInstance().generatePKIKeypair();
         PublicKey publicKey = (PublicKey) keypair[0];
         PrivateKey privateKey = (PrivateKey) keypair[1];
-        Object signingKeys[] = KeyGenerator.getInstance().generateSigningKeypair();
+        SimpleDataStructure signingKeys[];
+        if (cert.getCertificateType() == Certificate.CERTIFICATE_TYPE_KEY) {
+            KeyCertificate kcert = cert.toKeyCertificate();
+            SigType type = kcert.getSigType();
+            try {
+                signingKeys = KeyGenerator.getInstance().generateSigningKeys(type);
+            } catch (GeneralSecurityException gse) {
+                throw new I2PException("keygen fail", gse);
+            }
+        } else {
+            signingKeys = KeyGenerator.getInstance().generateSigningKeys();
+        }
         SigningPublicKey signingPubKey = (SigningPublicKey) signingKeys[0];
         SigningPrivateKey signingPrivKey = (SigningPrivateKey) signingKeys[1];
         d.setPublicKey(publicKey);
         d.setSigningPublicKey(signingPubKey);
+        if (cert.getCertificateType() == Certificate.CERTIFICATE_TYPE_KEY) {
+            // fix up key certificate or padding
+            KeyCertificate kcert = cert.toKeyCertificate();
+            SigType type = kcert.getSigType();
+            int len = type.getPubkeyLen();
+            if (len < 128) {
+                byte[] pad = new byte[128 - len];
+                RandomSource.getInstance().nextBytes(pad);
+                d.setPadding(pad);
+            } else if (len > 128) {
+                System.arraycopy(signingPubKey.getData(), 128, kcert.getPayload(), KeyCertificate.HEADER_LENGTH, len - 128);
+            }
+        }
+        d.setCertificate(cert);
 
         d.writeBytes(destKeyStream);
         privateKey.writeBytes(destKeyStream);

@@ -14,6 +14,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.TreeMap;
 
+import net.i2p.client.I2PClient;
 import net.i2p.data.Base64;
 import net.i2p.data.Destination;
 import net.i2p.data.PrivateKeyFile;
@@ -175,6 +176,11 @@ public class EditBean extends IndexBean {
     
     public boolean getEncrypt(int tunnel) {
         return getBooleanProperty(tunnel, "i2cp.encryptLeaseSet");
+    }
+    
+    /** @since 0.9.12 */
+    public int getSigType(int tunnel) {
+        return getProperty(tunnel, I2PClient.PROP_SIGTYPE, 0);
     }
     
     /** @since 0.8.9 */
@@ -356,6 +362,11 @@ public class EditBean extends IndexBean {
     /** @since 0.8.3 */
     public Set<String> interfaceSet() {
         return Addresses.getAllAddresses();
+    }
+
+    /** @since 0.9.12 */
+    public boolean isAdvanced() {
+        return _context.getBooleanProperty("routerconsole.advanced");
     }
 
     public String getI2CPHost(int tunnel) {

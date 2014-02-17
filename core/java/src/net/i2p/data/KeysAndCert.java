@@ -35,6 +35,7 @@ public class KeysAndCert extends DataStructureImpl {
     protected SigningPublicKey _signingKey;
     protected Certificate _certificate;
     protected Hash __calculatedHash;
+    protected byte[] _padding;
 
     public Certificate getCertificate() {
         return _certificate;
@@ -79,14 +80,35 @@ public class KeysAndCert extends DataStructureImpl {
     }
     
     /**
+     * @throws IllegalStateException if was already set
+     * @since 0.9.12
+     */
+    public void setPadding(byte[] padding) {
+        if (_padding != null)
+            throw new IllegalStateException();
+        _padding = padding;
+        __calculatedHash = null;
+    }
+    
+    /**
      * @throws IllegalStateException if data already set
      */
     public void readBytes(InputStream in) throws DataFormatException, IOException {
         if (_publicKey != null || _signingKey != null || _certificate != null)
             throw new IllegalStateException();
         _publicKey = PublicKey.create(in);
-        _signingKey = SigningPublicKey.create(in);
-        _certificate = Certificate.create(in);
+        SigningPublicKey spk = SigningPublicKey.create(in);
+        Certificate  cert = Certificate.create(in);
+        if (cert.getCertificateType() == Certificate.CERTIFICATE_TYPE_KEY) {
+            // convert SPK to new SPK and padding
+            KeyCertificate kcert = cert.toKeyCertificate();
+            _signingKey = spk.toTypedKey(kcert);
+            _padding = spk.getPadding(kcert);
+            _certificate = kcert;
+        } else {
+            _signingKey = spk;
+            _certificate = cert;
+        }
         __calculatedHash = null;
     }
     
@@ -94,7 +116,9 @@ public class KeysAndCert extends DataStructureImpl {
         if ((_certificate == null) || (_publicKey == null) || (_signingKey == null))
             throw new DataFormatException("Not enough data to format the router identity");
         _publicKey.writeBytes(out);
-        _signingKey.writeBytes(out);
+        if (_padding != null)
+            out.write(_padding);
+        _signingKey.writeTruncatedBytes(out);
         _certificate.writeBytes(out);
     }
     
@@ -106,6 +130,7 @@ public class KeysAndCert extends DataStructureImpl {
         return
                DataHelper.eq(_signingKey, ident._signingKey)
                && DataHelper.eq(_publicKey, ident._publicKey)
+               && DataHelper.eq(_padding, ident._padding)
                && DataHelper.eq(_certificate, ident._certificate);
     }
     
@@ -125,6 +150,8 @@ public class KeysAndCert extends DataStructureImpl {
         buf.append("\n\tCertificate: ").append(_certificate);
         buf.append("\n\tPublicKey: ").append(_publicKey);
         buf.append("\n\tSigningPublicKey: ").append(_signingKey);
+        if (_padding != null)
+            buf.append("\n\tPadding: ").append(_padding.length).append(" bytes");
         buf.append(']');
         return buf.toString();
     }

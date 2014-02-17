@@ -5,6 +5,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.InvalidParameterSpecException;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import net.i2p.data.Hash;
@@ -169,5 +170,25 @@ public enum SigType {
     /** @return null if not supported */
     public static SigType getByCode(int code) {
         return BY_CODE.get(Integer.valueOf(code));
+    }
+
+    /**
+     *  Convenience for user apps
+     *
+     *  @param stype number or name
+     *  @return null if not found
+     *  @since 0.9.9 moved from SU3File in 0.9.12
+     */
+    public static SigType parseSigType(String stype) {
+        try {
+            return valueOf(stype.toUpperCase(Locale.US));
+        } catch (IllegalArgumentException iae) {
+            try {
+                int code = Integer.parseInt(stype);
+                return getByCode(code);
+            } catch (NumberFormatException nfe) {
+                return null;
+             }
+        }
     }
 }

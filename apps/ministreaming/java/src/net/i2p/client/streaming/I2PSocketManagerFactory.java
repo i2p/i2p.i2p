@@ -14,6 +14,7 @@ import net.i2p.client.I2PClient;
 import net.i2p.client.I2PClientFactory;
 import net.i2p.client.I2PSession;
 import net.i2p.client.I2PSessionException;
+import net.i2p.crypto.SigType;
 import net.i2p.util.Log;
 
 /**
@@ -26,7 +27,7 @@ public class I2PSocketManagerFactory {
 
     public static final String PROP_MANAGER = "i2p.streaming.manager";
     public static final String DEFAULT_MANAGER = "net.i2p.client.streaming.impl.I2PSocketManagerFull";
-    
+
     /**
      * Create a socket manager using a brand new destination connected to the
      * I2CP router on the local machine on the default port (7654).
@@ -79,9 +80,9 @@ public class I2PSocketManagerFactory {
      */
     public static I2PSocketManager createManager(String i2cpHost, int i2cpPort, Properties opts) {
         I2PClient client = I2PClientFactory.createClient();
-        ByteArrayOutputStream keyStream = new ByteArrayOutputStream(512);
+        ByteArrayOutputStream keyStream = new ByteArrayOutputStream(1024);
         try {
-            client.createDestination(keyStream);
+            client.createDestination(keyStream, getSigType(opts));
             ByteArrayInputStream in = new ByteArrayInputStream(keyStream.toByteArray());
             return createManager(in, i2cpHost, i2cpPort, opts);
         } catch (IOException ioe) {
@@ -168,9 +169,9 @@ public class I2PSocketManagerFactory {
                                                              int i2cpPort, Properties opts) throws I2PSessionException {
         if (myPrivateKeyStream == null) {
             I2PClient client = I2PClientFactory.createClient();
-            ByteArrayOutputStream keyStream = new ByteArrayOutputStream(512);
+            ByteArrayOutputStream keyStream = new ByteArrayOutputStream(1024);
             try {
-                client.createDestination(keyStream);
+                client.createDestination(keyStream, getSigType(opts));
             } catch (Exception e) {
                 throw new I2PSessionException("Error creating keys", e);
             }
@@ -255,6 +256,23 @@ public class I2PSocketManagerFactory {
             }
         }
         return i2cpPort;
+    }
+
+    /**
+     *  @param opts may be null
+     *  @since 0.9.12
+     */
+    private static SigType getSigType(Properties opts) {
+        if (opts != null) {
+            String st = opts.getProperty(I2PClient.PROP_SIGTYPE);
+            if (st != null) {
+                SigType rv = SigType.parseSigType(st);
+                if (rv != null)
+                    return rv;
+                getLog().error("Unsupported sig type " + st);
+            }
+        }
+        return I2PClient.DEFAULT_SIGTYPE;
     }
 
     /** @since 0.9.7 */

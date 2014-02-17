@@ -6,6 +6,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.security.GeneralSecurityException;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 
@@ -19,7 +21,9 @@ import net.i2p.client.I2PClientFactory;
 import net.i2p.client.I2PSession;
 import net.i2p.client.I2PSessionException;
 import net.i2p.crypto.DSAEngine;
+import net.i2p.crypto.KeyGenerator;
 import net.i2p.crypto.SigType;
+import net.i2p.util.RandomSource;
 
 /**
  * This helper class reads and writes files in the
@@ -138,11 +142,15 @@ public class PrivateKeyFile {
                 PrivateKeyFile pkf2 = new PrivateKeyFile(args[g.getOptind() + 1]);
                 pkf.setSignedCert(pkf2);
                 System.out.println("New destination with signed cert is:");
-                break;
 
               case 't':
-                // TODO merge with ecdsa branch
-                throw new UnsupportedOperationException();
+                // KeyCert
+                SigType type = SigType.parseSigType(args[g.getOptind()]);
+                if (type == null)
+                    throw new IllegalArgumentException("Signature type " + args[g.getOptind()] + " is not supported");
+                pkf.setKeyCert(type);
+                System.out.println("New destination with key cert is:");
+                break;
 
               default:
                 // shouldn't happen
@@ -151,7 +159,7 @@ public class PrivateKeyFile {
             }
             System.out.println(pkf);
             pkf.write();
-            verifySignature(d);
+            verifySignature(pkf.getDestination());
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(1);
@@ -263,6 +271,43 @@ public class PrivateKeyFile {
         Destination newdest = new Destination();
         newdest.setPublicKey(dest.getPublicKey());
         newdest.setSigningPublicKey(dest.getSigningPublicKey());
+        newdest.setCertificate(c);
+        dest = newdest;
+        return c;
+    }
+    
+    /**
+     * Change cert type - caller must also call write().
+     * Side effect - creates new Destination object.
+     * @since 0.9.12
+     */
+    public Certificate setKeyCert(SigType type) {
+        if (type == SigType.DSA_SHA1)
+            return setCertType(Certificate.CERTIFICATE_TYPE_NULL);
+        if (dest == null)
+            throw new IllegalArgumentException("Dest is null");
+        KeyCertificate c = new KeyCertificate(type);
+        SimpleDataStructure signingKeys[];
+        try {
+            signingKeys = KeyGenerator.getInstance().generateSigningKeys(type);
+        } catch (GeneralSecurityException gse) {
+            throw new RuntimeException("keygen fail", gse);
+        }
+        SigningPublicKey signingPubKey = (SigningPublicKey) signingKeys[0];
+        signingPrivKey = (SigningPrivateKey) signingKeys[1];
+        // dests now immutable, must create new
+        Destination newdest = new Destination();
+        newdest.setPublicKey(dest.getPublicKey());
+        newdest.setSigningPublicKey(signingPubKey);
+        // fix up key certificate or padding
+        int len = type.getPubkeyLen();
+        if (len < 128) {
+            byte[] pad = new byte[128 - len];
+            RandomSource.getInstance().nextBytes(pad);
+            newdest.setPadding(pad);
+        } else if (len > 128) {
+            System.arraycopy(signingPubKey.getData(), 128, c.getPayload(), KeyCertificate.HEADER_LENGTH, len - 128);
+        }
         newdest.setCertificate(c);
         dest = newdest;
         return c;
@@ -502,8 +547,6 @@ public class PrivateKeyFile {
     
     
     private static final int HASH_EFFORT = VerifiedDestination.MIN_HASHCASH_EFFORT;
-    
-    
     
     private final File file;
     private final I2PClient client;
