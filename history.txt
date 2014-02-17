@@ -1,3 +1,9 @@
+2014-02-17 zzz
+ * HMAC:
+   - Replace BC MD5 with JVM version, refactor I2PHMAC to use
+     MessageDigest instead of BC Digest (ticket #1189)
+   - Use JVM HmacSHA256 instead of I2PHMAC for Syndie since it is standard
+
 2014-02-14 zzz
  * I2CP:
    - Add session limit, add new status code for refused

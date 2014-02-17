@@ -27,11 +27,12 @@ package org.bouncycastle.oldcrypto.macs;
  */
 
 //import org.bouncycastle.crypto.CipherParameters;
+import java.security.DigestException;
+import java.security.MessageDigest;
 import java.util.Arrays;
 
 import net.i2p.util.SimpleByteCache;
 
-import org.bouncycastle.oldcrypto.Digest;
 import org.bouncycastle.oldcrypto.Mac;
 
 /**
@@ -47,6 +48,10 @@ import org.bouncycastle.oldcrypto.Mac;
  * in the standard bouncycastle library, thus it conflicts in JVMs that contain the
  * standard library (Android).
  *
+ * As of 0.9.12, refactored to use standard MessageDigest.
+ *
+ * Deprecated - Do not use outside of router or Syndie.
+ * To be moved to router.
  */
 public class I2PHMac
 implements Mac
@@ -56,34 +61,34 @@ implements Mac
     private final static byte IPAD = (byte)0x36;
     private final static byte OPAD = (byte)0x5C;
 
-    private final Digest digest;
+    private final MessageDigest digest;
     private final int digestSize;
     private final byte[] inputPad = new byte[BLOCK_LENGTH];
     private final byte[] outputPad = new byte[BLOCK_LENGTH];
 
-    public I2PHMac(
-        Digest digest)
-    {
-        this(digest, digest.getDigestSize()); 
+    /**
+     *  Standard HMAC, size == digest size.
+     *  @deprecated Use javax.crypto.Mac
+     */
+    public I2PHMac(MessageDigest digest) {
+        this(digest, digest.getDigestLength()); 
     }
 
     /**
-     *  @param sz override the digest's size
+     *  @param sz override the digest's size, nonstandard if different.
      *  SEE NOTES in HMACGenerator about why this isn't compatible with standard HmacMD5
      */
-    public I2PHMac(
-        Digest digest, int sz)
-    {
+    public I2PHMac(MessageDigest digest, int sz) {
         this.digest = digest;
         this.digestSize = sz; 
     }
 
     public String getAlgorithmName()
     {
-        return digest.getAlgorithmName() + "/HMAC";
+        return digest.getAlgorithm() + "/HMAC";
     }
 
-    public Digest getUnderlyingDigest()
+    public MessageDigest getUnderlyingDigest()
     {
         return digest;
     }
@@ -100,7 +105,12 @@ implements Mac
         if (key.length > BLOCK_LENGTH)
         {
             digest.update(key, 0, key.length);
-            digest.doFinal(inputPad, 0);
+            try {
+                digest.digest(inputPad, 0, digestSize);
+            } catch (DigestException de) {
+                digest.reset();
+                throw new IllegalArgumentException(de);
+            }
             for (int i = digestSize; i < inputPad.length; i++)
             {
                 inputPad[i] = 0;
@@ -133,42 +143,32 @@ implements Mac
         digest.update(inputPad, 0, inputPad.length);
     }
 
-    public int getMacSize()
-    {
+    public int getMacSize() {
         return digestSize;
     }
 
-    public void update(
-        byte in)
-    {
+    public void update(byte in) {
         digest.update(in);
     }
 
-    public void update(
-        byte[] in,
-        int inOff,
-        int len)
-    {
+    public void update(byte[] in, int inOff, int len) {
         digest.update(in, inOff, len);
     }
 
-    public int doFinal(
-        byte[] out,
-        int outOff)
-    {
+    public int doFinal(byte[] out, int outOff) {
         byte[] tmp = acquireTmp(digestSize);
         //byte[] tmp = new byte[digestSize];
-        digest.doFinal(tmp, 0);
-
-        digest.update(outputPad, 0, outputPad.length);
-        digest.update(tmp, 0, tmp.length);
-        releaseTmp(tmp);
-
-        int     len = digest.doFinal(out, outOff);
-
-        reset();
-
-        return len;
+        try {
+            digest.digest(tmp, 0, digestSize);
+            digest.update(outputPad, 0, outputPad.length);
+            digest.update(tmp, 0, tmp.length);
+            return digest.digest(out, outOff, digestSize);
+        } catch (DigestException de) {
+            throw new IllegalArgumentException(de);
+        } finally {
+            releaseTmp(tmp);
+            reset();
+        }
     }
     
     private static byte[] acquireTmp(int sz) {

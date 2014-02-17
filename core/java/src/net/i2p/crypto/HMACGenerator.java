@@ -1,5 +1,7 @@
 package net.i2p.crypto;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -16,7 +18,6 @@ import net.i2p.data.Hash;
 import net.i2p.data.SessionKey;
 import net.i2p.util.SimpleByteCache;
 
-import org.bouncycastle.oldcrypto.digests.MD5Digest;
 import org.bouncycastle.oldcrypto.macs.I2PHMac;
 
 /**
@@ -56,7 +57,7 @@ public class HMACGenerator {
      * Calculate the HMAC of the data with the given key
      *
      * @return the first 16 bytes contain the HMAC, the last 16 bytes are zero
-     * @deprecated unused
+     * @deprecated unused (not even by Syndie)
      */
     public Hash calculate(SessionKey key, byte data[]) {
         if ((key == null) || (key.getData() == null) || (data == null))
@@ -69,6 +70,9 @@ public class HMACGenerator {
     
     /**
      * Calculate the HMAC of the data with the given key
+     *
+     * @return the first 16 bytes contain the HMAC, the last 16 bytes are zero
+     * @throws IllegalArgumentException for bad key or target too small
      */
     public void calculate(SessionKey key, byte data[], int offset, int length, byte target[], int targetOffset) {
         if ((key == null) || (key.getData() == null) || (data == null))
@@ -91,8 +95,10 @@ public class HMACGenerator {
      * @param origMAC what do we expect the MAC of curData to equal
      * @param origMACOffset index into origMAC
      * @param origMACLength how much of the MAC do we want to verify
+     * @throws IllegalArgumentException for bad key
      */
-    public boolean verify(SessionKey key, byte curData[], int curOffset, int curLength, byte origMAC[], int origMACOffset, int origMACLength) {
+    public boolean verify(SessionKey key, byte curData[], int curOffset, int curLength,
+                          byte origMAC[], int origMACOffset, int origMACLength) {
         if ((key == null) || (key.getData() == null) || (curData == null))
             throw new NullPointerException("Null arguments for HMAC");
         
@@ -116,7 +122,12 @@ public class HMACGenerator {
         // for backwards compatability.  next time we have a backwards
         // incompatible change, we should update this by removing ", 32"
         // SEE NOTES ABOVE
-        return new I2PHMac(new MD5Digest(), 32);
+        try {
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            return new I2PHMac(md, 32);
+        } catch (NoSuchAlgorithmException nsae) {
+            throw new UnsupportedOperationException("MD5");
+        }
     }
 
     private void release(I2PHMac mac) {
@@ -124,15 +135,15 @@ public class HMACGenerator {
     }
 
     /**
-     * Not really tmp, just from the byte array cache.
+     * 32 bytes from the byte array cache.
      * Does NOT zero.
      */
-    private byte[] acquireTmp() {
+    protected byte[] acquireTmp() {
         byte rv[] = SimpleByteCache.acquire(Hash.HASH_LENGTH);
         return rv;
     }
 
-    private void releaseTmp(byte tmp[]) {
+    protected void releaseTmp(byte tmp[]) {
         SimpleByteCache.release(tmp);
     }
 
