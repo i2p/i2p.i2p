@@ -145,9 +145,9 @@ public class PrivateKeyFile {
 
               case 't':
                 // KeyCert
-                SigType type = SigType.parseSigType(args[g.getOptind()]);
+                SigType type = SigType.parseSigType(stype);
                 if (type == null)
-                    throw new IllegalArgumentException("Signature type " + args[g.getOptind()] + " is not supported");
+                    throw new IllegalArgumentException("Signature type " + stype + " is not supported");
                 pkf.setKeyCert(type);
                 System.out.println("New destination with key cert is:");
                 break;

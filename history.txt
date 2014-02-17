@@ -7,6 +7,19 @@
    - Use session key for relay request/response if available (ticket #1206)
    - Restrict authentication with Bob's intro key to session created packet
    - Remove packetAuthTime stats
+ * Initial support for key certificates and arbitrary types and lengths
+   of signing keys and signatures in RouterIdentities and Destinations.
+   - Fixup of Destination.create() and Destination.size()
+   - Add generic off/len methods in DSAEngine, needed for streaming
+   - Support i2cp.destination.sigType option in TunnelController and
+     I2PSocketManagerFactory
+   - Fixup of sign/verify in streaming Packet
+   - Add setting in i2ptunnel server edit page (hidden for now)
+   - Comment out cert setting on i2ptunnel server edit page
+   - Show key type on susidns details page and LS debug page
+   - Hide setting in i2ptunnel edit pages unless advanced user
+   - Only store LS with key certs to routers that support it
+   - Only store LS with more than 6 leases to routers that support it
 
 2014-02-14 zzz
  * I2CP:
