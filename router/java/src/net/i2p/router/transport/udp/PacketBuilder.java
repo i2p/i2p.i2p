@@ -957,7 +957,8 @@ class PacketBuilder {
      * 
      * @return ready to send packet, or null if there was a problem
      */
-    public UDPPacket buildPeerTestToAlice(InetAddress aliceIP, int alicePort, SessionKey aliceIntroKey, SessionKey charlieIntroKey, long nonce) {
+    public UDPPacket buildPeerTestToAlice(InetAddress aliceIP, int alicePort,
+                                          SessionKey aliceIntroKey, SessionKey charlieIntroKey, long nonce) {
         UDPPacket packet = buildPacketHeader(PEER_TEST_FLAG_BYTE);
         DatagramPacket pkt = packet.getPacket();
         byte data[] = pkt.getData();
@@ -1031,7 +1032,9 @@ class PacketBuilder {
      * 
      * @return ready to send packet, or null if there was a problem
      */
-    public UDPPacket buildPeerTestToBob(InetAddress bobIP, int bobPort, InetAddress aliceIP, int alicePort, SessionKey aliceIntroKey, long nonce, SessionKey bobCipherKey, SessionKey bobMACKey) {
+    public UDPPacket buildPeerTestToBob(InetAddress bobIP, int bobPort, InetAddress aliceIP, int alicePort,
+                                        SessionKey aliceIntroKey, long nonce,
+                                        SessionKey bobCipherKey, SessionKey bobMACKey) {
         UDPPacket packet = buildPacketHeader(PEER_TEST_FLAG_BYTE);
         DatagramPacket pkt = packet.getPacket();
         byte data[] = pkt.getData();
@@ -1100,7 +1103,34 @@ class PacketBuilder {
                 // TODO implement some sort of introducer banlist
                 continue;
             }
-            rv.add(buildRelayRequest(iaddr, iport, ikey, tag, ourIntroKey, state.getIntroNonce(), true));
+
+            // lookup session so we can use session key if available
+            SessionKey cipherKey = null;
+            SessionKey macKey = null;
+            // first look up by ikey, it is equal to router hash for now
+            PeerState bobState = transport.getPeerState(Hash.create(ikey));
+            if (bobState == null) {
+                RemoteHostId rhid = new RemoteHostId(iaddr.getAddress(), iport);
+                bobState = transport.getPeerState(rhid);
+            }
+            if (bobState != null) {
+                // established session (since 0.9.12)
+                cipherKey = bobState.getCurrentCipherKey();
+                macKey = bobState.getCurrentMACKey();
+            }
+            if (cipherKey == null || macKey == null) {
+                // no session, use intro key (was only way before 0.9.12)
+                cipherKey = new SessionKey(ikey);
+                macKey = cipherKey;
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Sending relay request (w/ intro key) to " + iaddr + ":" + iport);
+            } else {
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Sending relay request (in-session) to " + iaddr + ":" + iport);
+            }
+
+            rv.add(buildRelayRequest(iaddr, iport, cipherKey, macKey, tag,
+                                     ourIntroKey, state.getIntroNonce()));
         }
         return rv;
     }
@@ -1110,8 +1140,9 @@ class PacketBuilder {
      *  send a RelayRequest over IPv6
      *
      */
-    private UDPPacket buildRelayRequest(InetAddress introHost, int introPort, byte introKey[],
-                                        long introTag, SessionKey ourIntroKey, long introNonce, boolean encrypt) {
+    private UDPPacket buildRelayRequest(InetAddress introHost, int introPort,
+                                        SessionKey cipherKey, SessionKey macKey,
+                                        long introTag, SessionKey ourIntroKey, long introNonce) {
         UDPPacket packet = buildPacketHeader(PEER_RELAY_REQUEST_FLAG_BYTE);
         DatagramPacket pkt = packet.getPacket();
         byte data[] = pkt.getData();
@@ -1120,9 +1151,6 @@ class PacketBuilder {
         // FIXME must specify these if request is going over IPv6
         byte ourIP[] = getOurExplicitIP();
         int ourPort = getOurExplicitPort();
-        
-        if (_log.shouldLog(Log.INFO))
-            _log.info("Sending intro relay request to " + introHost + ":" + introPort); // + " regarding " + state.getRemoteIdentity().calculateHash().toBase64());
         
         // now for the body
         DataHelper.toLong(data, off, 4, introTag);
@@ -1160,8 +1188,7 @@ class PacketBuilder {
         off = pad1(data, off);
         off = pad2(data, off);
         pkt.setLength(off);
-        if (encrypt)
-            authenticate(packet, new SessionKey(introKey), new SessionKey(introKey));
+        authenticate(packet, cipherKey, macKey);
         setTo(packet, introHost, introPort);
         packet.setMessageType(TYPE_RREQ);
         return packet;
@@ -1214,7 +1241,8 @@ class PacketBuilder {
      */
     private static final byte PEER_RELAY_RESPONSE_FLAG_BYTE = (UDPPacket.PAYLOAD_TYPE_RELAY_RESPONSE << 4);
     
-    UDPPacket buildRelayResponse(RemoteHostId alice, PeerState charlie, long nonce, SessionKey aliceIntroKey) {
+    UDPPacket buildRelayResponse(RemoteHostId alice, PeerState charlie, long nonce,
+                                 SessionKey cipherKey, SessionKey macKey) {
         InetAddress aliceAddr = null;
         try {
             aliceAddr = InetAddress.getByAddress(alice.getIP());
@@ -1228,7 +1256,7 @@ class PacketBuilder {
         int off = HEADER_SIZE;
         
         if (_log.shouldLog(Log.INFO))
-            _log.info("Sending relay response to " + alice + " for " + charlie + " with alice's intro key " + aliceIntroKey);
+            _log.info("Sending relay response to " + alice + " for " + charlie + " with key " + cipherKey);
 
         // now for the body
         byte charlieIP[] = charlie.getRemoteIP();
@@ -1255,7 +1283,7 @@ class PacketBuilder {
         off = pad1(data, off);
         off = pad2(data, off);
         pkt.setLength(off);
-        authenticate(packet, aliceIntroKey, aliceIntroKey);
+        authenticate(packet, cipherKey, macKey);
         setTo(packet, aliceAddr, alice.getPort());
         packet.setMessageType(TYPE_RESP);
         return packet;
@@ -1416,7 +1444,7 @@ class PacketBuilder {
      * @param iv IV to deliver
      */
     private void authenticate(UDPPacket packet, SessionKey cipherKey, SessionKey macKey, byte[] iv) {
-        long before = System.currentTimeMillis();
+        //long before = System.currentTimeMillis();
         DatagramPacket pkt = packet.getPacket();
         int off = pkt.getOffset();
         int hmacOff = off;
@@ -1454,9 +1482,10 @@ class PacketBuilder {
         System.arraycopy(ba, 0, data, hmacOff, UDPPacket.MAC_SIZE);
         SimpleByteCache.release(ba);
         System.arraycopy(iv, 0, data, hmacOff + UDPPacket.MAC_SIZE, UDPPacket.IV_SIZE);
-        long timeToAuth = System.currentTimeMillis() - before;
-        _context.statManager().addRateData("udp.packetAuthTime", timeToAuth, timeToAuth);
-        if (timeToAuth > 100)
-            _context.statManager().addRateData("udp.packetAuthTimeSlow", timeToAuth, timeToAuth);
+        // avg. 0.06 ms on a 2005-era PC
+        //long timeToAuth = System.currentTimeMillis() - before;
+        //_context.statManager().addRateData("udp.packetAuthTime", timeToAuth, timeToAuth);
+        //if (timeToAuth > 100)
+        //    _context.statManager().addRateData("udp.packetAuthTimeSlow", timeToAuth, timeToAuth);
     }
 }
