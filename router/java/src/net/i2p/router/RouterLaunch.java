@@ -14,7 +14,7 @@ public class RouterLaunch {
      *  Usage: RouterLaunch [rebuild]
      *  No other options allowed, for now
      *
-     *  @param args non-null
+     *  @param args null ok
      *  @throws IllegalArgumentException
      */
     public static void main(String args[]) {

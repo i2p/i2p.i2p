@@ -1109,30 +1109,32 @@ public class Router implements RouterClock.ClockShiftListener {
      *  Usage: Router [rebuild]
      *  No other options allowed, for now
      *
-     *  @param args non-null
+     *  @param args null ok
      *  @throws IllegalArgumentException
      */
     public static void main(String args[]) {
-        boolean error = false;
-        Getopt g = new Getopt("router", args, "");
-        int c;
-        while ((c = g.getopt()) != -1) {
-            switch (c) {
-                default:
+        boolean rebuild = false;
+        if (args != null) {
+            boolean error = false;
+            Getopt g = new Getopt("router", args, "");
+            int c;
+            while ((c = g.getopt()) != -1) {
+                switch (c) {
+                    default:
+                        error = true;
+                }
+            }
+            int remaining = args.length - g.getOptind();
+            if (remaining > 1) {
+                error = true;
+            } else if (remaining == 1) {
+                rebuild = args[g.getOptind()].equals("rebuild");;
+                if (!rebuild)
                     error = true;
             }
+            if (error)
+                throw new IllegalArgumentException();
         }
-        boolean rebuild = false;
-        int remaining = args.length - g.getOptind();
-        if (remaining > 1) {
-            error = true;
-        } else if (remaining == 1) {
-            rebuild = args[g.getOptind()].equals("rebuild");;
-            if (!rebuild)
-                error = true;
-        }
-        if (error)
-            throw new IllegalArgumentException();
 
         System.out.println("Starting I2P " + RouterVersion.FULL_VERSION);
         //verifyWrapperConfig();

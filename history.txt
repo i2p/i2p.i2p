@@ -1,3 +1,7 @@
+2014-02-20 zzz
+ * i2ptunnel: Add inproxy block option to HTTP server
+ * Router: Allow null args to main() (broke Android)
+
 2014-02-17 zzz
  * HMAC:
    - Replace BC MD5 with JVM version, refactor I2PHMAC to use
