@@ -48,6 +48,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
     public static final String OPT_POST_TOTAL_BAN_TIME = "postTotalBanTime";
     public static final String OPT_POST_MAX = "maxPosts";
     public static final String OPT_POST_TOTAL_MAX = "maxTotalPosts";
+    public static final String OPT_REJECT_INPROXY = "rejectInproxy";
     public static final int DEFAULT_POST_WINDOW = 5*60;
     public static final int DEFAULT_POST_BAN_TIME = 30*60;
     public static final int DEFAULT_POST_TOTAL_BAN_TIME = 10*60;
@@ -92,6 +93,19 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
          "<html><head><title>403 Denied</title></head>\n"+
          "<body><h2>403 Denied</h2>\n" +
          "<p>Denied due to excessive requests. Please try again later.</p>\n" +
+         "</body></html>")
+         .getBytes();
+
+    private final static byte[] ERR_INPROXY =
+        ("HTTP/1.1 403 Denied\r\n"+
+         "Content-Type: text/html; charset=iso-8859-1\r\n"+
+         "Cache-control: no-cache\r\n"+
+         "Connection: close\r\n"+
+         "Proxy-Connection: close\r\n"+
+         "\r\n"+
+         "<html><head><title>403 Denied</title></head>\n"+
+         "<body><h2>403 Denied</h2>\n" +
+         "<p>Inproxy access denied. You must run <a href=\"https://geti2p.net/\">I2P</a> to access this site.</p>\n" +
          "</body></html>")
          .getBytes();
 
@@ -198,6 +212,24 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                 CLIENT_SKIPHEADERS, getTunnel().getContext());
             long afterHeaders = getTunnel().getContext().clock().now();
 
+            Properties opts = getTunnel().getClientOptions();
+            if (Boolean.parseBoolean(opts.getProperty(OPT_REJECT_INPROXY)) &&
+                (headers.containsKey("X-Forwarded-For") ||
+                 headers.containsKey("X-Forwarded-Server") ||
+                 headers.containsKey("X-Forwarded-Host"))) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Refusing inproxy access: " + peerHash.toBase64());
+                try {
+                    // Send a 403, so the user doesn't get an HTTP Proxy error message
+                    // and blame his router or the network.
+                    socket.getOutputStream().write(ERR_INPROXY);
+                } catch (IOException ioe) {}
+                try {
+                    socket.close();
+                } catch (IOException ioe) {}
+                return;
+            }
+
             if (_postThrottler != null &&
                 command.length() >= 5 &&
                 command.substring(0, 5).toUpperCase(Locale.US).equals("POST ")) {
@@ -221,7 +253,6 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
             addEntry(headers, DEST64_HEADER, socket.getPeerDestination().toBase64());
 
             // Port-specific spoofhost
-            Properties opts = getTunnel().getClientOptions();
             String spoofHost;
             int ourPort = socket.getLocalPort();
             if (ourPort != 80 && ourPort > 0 && ourPort <= 65535 && opts != null) {
@@ -668,15 +699,21 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                 else
                     value = "";
 
-                if ("accept-encoding".equals(name.toLowerCase(Locale.US)))
+                String lcName = name.toLowerCase(Locale.US);
+                if ("accept-encoding".equals(lcName))
                     name = "Accept-encoding";
-                else if ("x-accept-encoding".equals(name.toLowerCase(Locale.US)))
+                else if ("x-accept-encoding".equals(lcName))
                     name = "X-Accept-encoding";
+                else if ("x-forwarded-for".equals(lcName))
+                    name = "X-Forwarded-For";
+                else if ("x-forwarded-server".equals(lcName))
+                    name = "X-Forwarded-Server";
+                else if ("x-forwarded-host".equals(lcName))
+                    name = "X-Forwarded-Host";
 
                 // For incoming, we remove certain headers to prevent spoofing.
                 // For outgoing, we remove certain headers to improve anonymity.
                 boolean skip = false;
-                String lcName = name.toLowerCase(Locale.US);
                 for (String skipHeader: skipHeaders) {
                     if (skipHeader.toLowerCase(Locale.US).equals(lcName)) {
                         skip = true;

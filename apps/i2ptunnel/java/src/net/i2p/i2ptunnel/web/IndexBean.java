@@ -808,6 +808,21 @@ public class IndexBean {
         return false;
     }
 
+    /** @since 0.9.12 */
+    public void setRejectInproxy(String moo) {
+        _booleanOptions.add(I2PTunnelHTTPServer.OPT_REJECT_INPROXY);
+    }
+
+    /** @since 0.9.12 */
+    public boolean isRejectInproxy(int tunnel) {
+        TunnelController tun = getController(tunnel);
+        if (tun != null) {
+            Properties opts = tun.getClientOptionProps();
+            return Boolean.parseBoolean(opts.getProperty(I2PTunnelHTTPServer.OPT_REJECT_INPROXY));
+        }
+        return false;
+    }
+
     protected static final String PROP_ENABLE_ACCESS_LIST = "i2cp.enableAccessList";
     protected static final String PROP_ENABLE_BLACKLIST = "i2cp.enableBlackList";
 
@@ -1243,7 +1258,8 @@ public class IndexBean {
         };
     private static final String _booleanServerOpts[] = {
         "i2cp.reduceOnIdle", "i2cp.encryptLeaseSet", PROP_ENABLE_ACCESS_LIST, PROP_ENABLE_BLACKLIST,
-        I2PTunnelServer.PROP_USE_SSL
+        I2PTunnelServer.PROP_USE_SSL,
+        I2PTunnelHTTPServer.OPT_REJECT_INPROXY
         };
     private static final String _otherClientOpts[] = {
         "i2cp.reduceIdleTime", "i2cp.reduceQuantity", "i2cp.closeIdleTime",

@@ -381,7 +381,22 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                 <textarea rows="2" style="height: 8em;" cols="60" id="hostField" name="accessList" title="Access List" wrap="off" spellcheck="false"><%=editBean.getAccessList(curTunnel)%></textarea>               
             </div>
                  
-            <div class="subdivider">
+            <% if (("httpserver".equals(tunnelType)) || ("httpbidirserver".equals(tunnelType))) {
+            %><div class="rowItem">
+                <div id="optionsField" class="rowItem">
+                    <label>
+                        <%=intl._("Block Access via Inproxies")%>:
+                    </label>
+                </div>
+                <div id="portField" class="rowItem">
+                    <label for="access" accesskey="d">
+                        <%=intl._("Enable")%>:
+                    </label>
+                    <input value="1" type="checkbox" id="startOnLoad" name="rejectInproxy" title="Deny inproxy access when enabled"<%=(editBean.isRejectInproxy(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />                
+                </div>
+              </div>
+            <% } // httpserver
+            %><div class="subdivider">
                 <hr />
             </div>
 
