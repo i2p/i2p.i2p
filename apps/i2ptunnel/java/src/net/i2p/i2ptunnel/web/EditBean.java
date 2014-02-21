@@ -15,6 +15,7 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import net.i2p.client.I2PClient;
+import net.i2p.crypto.SigType;
 import net.i2p.data.Base64;
 import net.i2p.data.Destination;
 import net.i2p.data.PrivateKeyFile;
@@ -181,6 +182,12 @@ public class EditBean extends IndexBean {
     /** @since 0.9.12 */
     public int getSigType(int tunnel) {
         return getProperty(tunnel, I2PClient.PROP_SIGTYPE, 0);
+    }
+    
+    /** @since 0.9.12 */
+    public boolean isSigTypeAvailable(int code) {
+        SigType type = SigType.getByCode(code);
+        return type != null && type.isAvailable();
     }
     
     /** @since 0.8.9 */

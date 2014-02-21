@@ -461,18 +461,24 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                 <label>DSA-SHA1</label>
                 <input value="0" type="radio" id="startOnLoad" name="sigType" title="Default"<%=(editBean.getSigType(curTunnel)==0 ? " checked=\"checked\"" : "")%> class="tickbox" />                
               </div>
+           <% if (editBean.isSigTypeAvailable(1)) { %>
               <div id="portField" class="rowItem">
                 <label>ECDSA-P256</label>
                 <input value="1" type="radio" id="startOnLoad" name="sigType" title="Advanced users only"<%=(editBean.getSigType(curTunnel)==1 ? " checked=\"checked\"" : "")%> class="tickbox" />                
               </div>
+           <% }
+              if (editBean.isSigTypeAvailable(2)) { %>
               <div id="portField" class="rowItem">
                 <label>ECDSA-P384</label>
                 <input value="2" type="radio" id="startOnLoad" name="sigType" title="Advanced users only"<%=(editBean.getSigType(curTunnel)==2 ? " checked=\"checked\"" : "")%> class="tickbox" />                
               </div>
+           <% }
+              if (editBean.isSigTypeAvailable(3)) { %>
               <div id="portField" class="rowItem">
                 <label>ECDSA-P521</label>
                 <input value="3" type="radio" id="startOnLoad" name="sigType" title="Advanced users only"<%=(editBean.getSigType(curTunnel)==3 ? " checked=\"checked\"" : "")%> class="tickbox" />                
               </div>
+           <% }   // isAvailable %>
             </div>
                  
             <div class="subdivider">

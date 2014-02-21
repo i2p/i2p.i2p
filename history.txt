@@ -1,3 +1,12 @@
+2014-02-21 zzz
+ * Build: Add property for target version
+ * I2CP Client: Generate revocation key of same type as signing key
+ * i2ptunnel: Only offer SigType options that are available in the JVM
+ * LeaseSet: Add check for SigType mismatch
+ * RouterAddress: Restore storage of expiration and use in signature
+   calculation, broken in 0.9.3, in anticipation of using it someday
+ * SigType: Add isAvailable()
+
 2014-02-20 zzz
  * i2ptunnel: Add inproxy block option to HTTP server
  * Router: Allow null args to main() (broke Android)

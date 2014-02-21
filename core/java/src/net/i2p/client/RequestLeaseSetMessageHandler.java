@@ -9,6 +9,7 @@ package net.i2p.client;
  *
  */
 
+import java.security.GeneralSecurityException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -25,6 +26,7 @@ import net.i2p.data.PublicKey;
 import net.i2p.data.SessionKey;
 import net.i2p.data.SigningPrivateKey;
 import net.i2p.data.SigningPublicKey;
+import net.i2p.data.SimpleDataStructure;
 import net.i2p.data.i2cp.I2CPMessage;
 import net.i2p.data.i2cp.RequestLeaseSetMessage;
 import net.i2p.util.Log;
@@ -129,9 +131,16 @@ class RequestLeaseSetMessageHandler extends HandlerImpl {
         private final PrivateKey _privKey;
         private final SigningPublicKey _signingPubKey;
         private final SigningPrivateKey _signingPrivKey;
+
         public LeaseInfo(Destination dest) {
             Object encKeys[] = KeyGenerator.getInstance().generatePKIKeypair();
-            Object signKeys[] = KeyGenerator.getInstance().generateSigningKeypair();
+            // must be same type as the Destination's signing key
+            SimpleDataStructure signKeys[];
+            try {
+                signKeys = KeyGenerator.getInstance().generateSigningKeys(dest.getSigningPublicKey().getType());
+            } catch (GeneralSecurityException gse) {
+                throw new IllegalStateException(gse);
+            }
             _pubKey = (PublicKey) encKeys[0];
             _privKey = (PrivateKey) encKeys[1];
             _signingPubKey = (SigningPublicKey) signKeys[0];

@@ -137,12 +137,23 @@ public class LeaseSet extends DatabaseEntry {
         _encryptionKey = encryptionKey;
     }
 
-    /** @deprecated unused */
+    /**
+     *  The revocation key.
+     *  @deprecated unused
+     */
     public SigningPublicKey getSigningKey() {
         return _signingKey;
     }
 
+    /**
+     *  The revocation key. Unused.
+     *  Must be the same type as the Destination's SigningPublicKey.
+     *  @throws IllegalArgumentException if different type
+     */
     public void setSigningKey(SigningPublicKey key) {
+        if (key != null && _destination != null &&
+            key.getType() != _destination.getSigningPublicKey().getType())
+            throw new IllegalArgumentException("Signing key type mismatch");
         _signingKey = key;
     }
     

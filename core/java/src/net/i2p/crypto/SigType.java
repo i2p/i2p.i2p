@@ -2,6 +2,7 @@ package net.i2p.crypto;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.Signature;
 import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.InvalidParameterSpecException;
 import java.util.HashMap;
@@ -157,6 +158,24 @@ public enum SigType {
             default:
                 throw new UnsupportedOperationException("Unsupported hash length: " + getHashLen());
         }
+    }
+
+    /**
+     *  @since 0.9.12
+     *  @return true if supported in this JVM
+     */
+    public boolean isAvailable() {
+        if (DSA_SHA1 == this)
+            return true;
+        try {
+            getParams();
+            Signature.getInstance(getAlgorithmName());
+            getDigestInstance();
+            getHashInstance();
+        } catch (Exception e) {
+            return false;
+        }
+        return true;
     }
 
     private static final Map<Integer, SigType> BY_CODE = new HashMap<Integer, SigType>();
