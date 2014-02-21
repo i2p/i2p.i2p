@@ -34,12 +34,13 @@ import net.i2p.util.OrderedProperties;
  * readin and the signature will fail.
  * If we implement expiration, or other use for the field, we must allow
  * several releases for the change to propagate as it is backwards-incompatible.
+ * Restored as of 0.9.12.
  *
  * @author jrandom
  */
 public class RouterAddress extends DataStructureImpl {
     private short _cost;
-    //private Date _expiration;
+    private long _expiration;
     private String _transportStyle;
     private final Properties _options;
     // cached values
@@ -100,25 +101,42 @@ public class RouterAddress extends DataStructureImpl {
      * is null, then the address never expires.
      * As of 0.9.3, expiration MUST be all zeros as it is ignored on
      * readin and the signature will fail.
+     * Restored as of 0.9.12.
      *
      * @deprecated unused for now
-     * @return null always
+     * @return null for never, or a Date
      */
     public Date getExpiration() {
         //return _expiration;
+        if (_expiration > 0)
+            return new Date(_expiration);
         return null;
+    }
+
+    /**
+     * Retrieve the date after which the address should not be used.  If this
+     * is zero, then the address never expires.
+     *
+     * @deprecated unused for now
+     * @return 0 for never
+     * @since 0.9.12
+     */
+    public long getExpirationTime() {
+        return _expiration;
     }
 
     /**
      * Configure the expiration date of the address (null for no expiration)
      * As of 0.9.3, expiration MUST be all zeros as it is ignored on
      * readin and the signature will fail.
+     * Restored as of 0.9.12, wait several more releases before using.
+     * TODO: Use for introducers
      *
      * Unused for now, always null
      * @deprecated unused for now
      */
     public void setExpiration(Date expiration) {
-        //_expiration = expiration;
+        _expiration = expiration.getDate();
     }
 
     /**
@@ -240,14 +258,14 @@ public class RouterAddress extends DataStructureImpl {
     /**
      *  As of 0.9.3, expiration MUST be all zeros as it is ignored on
      *  readin and the signature will fail.
+     *  Restored as of 0.9.12, wait several more releases before using.
      *  @throws IllegalStateException if was already read in
      */
     public void readBytes(InputStream in) throws DataFormatException, IOException {
         if (_transportStyle != null)
             throw new IllegalStateException();
         _cost = (short) DataHelper.readLong(in, 1);
-        //_expiration = DataHelper.readDate(in);
-        DataHelper.readDate(in);
+        _expiration = DataHelper.readLong(in, 8);
         _transportStyle = DataHelper.readString(in);
         // reduce Object proliferation
         if (_transportStyle.equals("SSU"))
@@ -265,8 +283,7 @@ public class RouterAddress extends DataStructureImpl {
         if (_transportStyle == null)
             throw new DataFormatException("uninitialized");
         DataHelper.writeLong(out, 1, _cost);
-        //DataHelper.writeDate(out, _expiration);
-        DataHelper.writeDate(out, null);
+        DataHelper.writeLong(out, 8, _expiration);
         DataHelper.writeString(out, _transportStyle);
         DataHelper.writeProperties(out, _options);
     }
@@ -322,13 +339,14 @@ public class RouterAddress extends DataStructureImpl {
         buf.append("[RouterAddress: ");
         buf.append("\n\tType: ").append(_transportStyle);
         buf.append("\n\tCost: ").append(_cost);
-        //buf.append("\n\tExpiration: ").append(_expiration);
-            buf.append("\n\tOptions (").append(_options.size()).append("):");
-            for (Map.Entry<Object, Object> e : _options.entrySet()) {
-                String key = (String) e.getKey();
-                String val = (String) e.getValue();
-                buf.append("\n\t\t[").append(key).append("] = [").append(val).append("]");
-            }
+        if (_expiration > 0)
+            buf.append("\n\tExpiration: ").append(new Date(_expiration));
+        buf.append("\n\tOptions (").append(_options.size()).append("):");
+        for (Map.Entry<Object, Object> e : _options.entrySet()) {
+            String key = (String) e.getKey();
+            String val = (String) e.getValue();
+            buf.append("\n\t\t[").append(key).append("] = [").append(val).append("]");
+        }
         buf.append("]");
         return buf.toString();
     }
