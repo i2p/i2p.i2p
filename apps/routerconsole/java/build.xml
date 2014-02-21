@@ -46,13 +46,16 @@
              <targetfilelist dir="." files="build/obj/net/i2p/router/web/UpdateHandler.class" />
         </dependset>
     </target>
+
     <property name="javac.compilerargs" value="" />
+    <property name="javac.version" value="1.6" />
+
     <target name="compile" depends="prepare, depend, dependVersion">
         <mkdir dir="./build" />
         <mkdir dir="./build/obj" />
         <javac 
             srcdir="./src" 
-            debug="true" deprecation="on" source="1.6" target="1.6" 
+            debug="true" deprecation="on" source="${javac.version}" target="${javac.version}" 
             includeAntRuntime="false"
             destdir="./build/obj">
             <compilerarg line="${javac.compilerargs}" />
@@ -342,7 +345,7 @@
             <arg value="../jsp/" />
         </java>
         
-        <javac debug="true" deprecation="on" source="1.6" target="1.6" 
+        <javac debug="true" deprecation="on" source="${javac.version}" target="${javac.version}" 
                encoding="UTF-8"
                includeAntRuntime="false"
                destdir="../jsp/WEB-INF/classes/" 

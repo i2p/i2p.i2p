@@ -7,17 +7,18 @@
     </target>
 
     <property name="javac.compilerargs" value="" />
+    <property name="javac.version" value="1.6" />
+    <property name="require.gettext" value="true" />
+
     <condition property="no.bundle">
         <isfalse value="${require.gettext}" />
     </condition>
-
-    <property name="require.gettext" value="true" />
 
     <target name="compile">
         <mkdir dir="./src/WEB-INF/classes" />
         <javac 
             srcdir="./src/src"
-            debug="true" deprecation="off" source="1.6" target="1.6" 
+            debug="true" deprecation="on" source="${javac.version}" target="${javac.version}" 
             includeAntRuntime="false"
             destdir="./src/WEB-INF/classes">
             <compilerarg line="${javac.compilerargs}" />

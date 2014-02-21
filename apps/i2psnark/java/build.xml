@@ -25,18 +25,20 @@
         </depend>
     </target>
 
+    <property name="javac.compilerargs" value="" />
+    <property name="javac.version" value="1.6" />
+    <property name="require.gettext" value="true" />
+
     <condition property="no.bundle">
         <isfalse value="${require.gettext}" />
     </condition>
-    <property name="javac.compilerargs" value="" />
-    <property name="require.gettext" value="true" />
 
     <target name="compile" depends="depend">
         <mkdir dir="./build" />
         <mkdir dir="./build/obj" />
         <javac 
             srcdir="./src" 
-            debug="true" deprecation="on" source="1.6" target="1.6" 
+            debug="true" deprecation="on" source="${javac.version}" target="${javac.version}" 
             destdir="./build/obj" 
             includeAntRuntime="false"
             classpath="../../../core/java/build/i2p.jar:../../jetty/jettylib/org.mortbay.jetty.jar:../../jetty/jettylib/javax.servlet.jar:../../jetty/jettylib/jetty-servlet.jar:../../jetty/jettylib/jetty-util.jar:../../ministreaming/java/build/mstreaming.jar" >

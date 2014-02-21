@@ -7,12 +7,13 @@
 	<property name="jar" value="desktopgui.jar"/>
 	<property name="resources" value="resources"/>
     <property name="javadoc" value="javadoc"/>
+	<property name="javac.compilerargs" value=""/>
+	<property name="javac.version" value="1.6" />
+	<property name="require.gettext" value="true" />
 
     <condition property="no.bundle">
         <isfalse value="${require.gettext}" />
     </condition>
-	<property name="javac.compilerargs" value=""/>
-	<property name="require.gettext" value="true" />
 
 	<target name="init">
 	<mkdir dir="${build}"/>
@@ -27,7 +28,7 @@
 	</target>
 
 	<target name="compile" depends="init">
-		<javac debug="true" deprecation="on" source="1.6" target="1.6" 
+            <javac debug="true" deprecation="on" source="${javac.version}" target="${javac.version}" 
                        includeAntRuntime="false"
                        srcdir="${src}" destdir="${build}">
             <compilerarg line="${javac.compilerargs}" />

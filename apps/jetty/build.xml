@@ -8,6 +8,7 @@
     <property name="jetty.url" value="http://download.eclipse.org/jetty/${jetty.ver}/dist/${jetty.filename}" />
     <property name="verified.filename" value="verified.txt" />
     <property name="javac.compilerargs" value="" />
+    <property name="javac.version" value="1.6" />
     <property name="tomcat.lib" value="apache-tomcat-deployer/lib" />
 
     <target name="all" depends="build" />
@@ -227,7 +228,7 @@
         <mkdir dir="./build/obj" />
         <javac 
             srcdir="./java/src" 
-            debug="true" deprecation="on" source="1.6" target="1.6" 
+            debug="true" deprecation="on" source="${javac.version}" target="${javac.version}" 
             destdir="./build/obj" 
             includeAntRuntime="false"
             classpath="../../core/java/build/i2p.jar:./jettylib/commons-logging.jar:./jettylib/javax.servlet.jar:./jettylib/org.mortbay.jetty.jar:./jettylib/jetty-http.jar:./jettylib/jetty-io.jar:./jettylib/jetty-security.jar:./jettylib/jetty-util.jar:./jettylib/jetty-xml.jar" >

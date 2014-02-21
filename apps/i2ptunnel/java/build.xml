@@ -24,7 +24,9 @@
     <condition property="no.bundle">
         <isfalse value="${require.gettext}" />
     </condition>
+
     <property name="javac.compilerargs" value="" />
+    <property name="javac.version" value="1.6" />
     <property name="require.gettext" value="true" />
 
     <target name="compile" depends="depend">
@@ -238,7 +240,7 @@
             <arg value="-webapp" />
             <arg value="../jsp/" />
         </java>
-        <javac debug="true" deprecation="on" source="1.6" target="1.6" 
+        <javac debug="true" deprecation="on" source="${javac.version}" target="${javac.version}" 
                includeAntRuntime="false"
                destdir="../jsp/WEB-INF/classes/" srcdir="../jsp/WEB-INF/classes" includes="**/*.java">
             <compilerarg line="${javac.compilerargs}" />

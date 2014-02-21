@@ -23,6 +23,7 @@
     </target>
 
     <property name="javac.compilerargs" value="" />
+    <property name="javac.version" value="1.6" />
 
     <!-- compile everything including client classes -->
     <target name="compile" depends="depend">
@@ -30,7 +31,7 @@
         <mkdir dir="./build/obj" />
         <javac 
             srcdir="./src" 
-            debug="true" deprecation="on" source="1.6" target="1.6" 
+            debug="true" deprecation="on" source="${javac.version}" target="${javac.version}" 
             includeAntRuntime="false"
             destdir="./build/obj" 
             classpath="../../../core/java/build/i2p.jar:../../ministreaming/java/build/mstreaming.jar:../../streaming/java/build/streaming.jar" >
@@ -41,7 +42,7 @@
     <target name="compileTest" depends="compile">
         <javac 
             srcdir="./test" 
-            debug="true" deprecation="on" source="1.6" target="1.6" 
+            debug="true" deprecation="on" source="${javac.version}" target="${javac.version}" 
             includeAntRuntime="false"
             destdir="./build/obj" 
             classpath="../../../core/java/build/i2p.jar:../../ministreaming/java/build/mstreaming.jar:../../streaming/java/build/streaming.jar" >

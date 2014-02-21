@@ -5,7 +5,10 @@
     <target name="builddep">
         <!-- run from top level build.xml to get dependencies built -->
     </target>
+
     <property name="javac.compilerargs" value="" />
+    <property name="javac.version" value="1.6" />
+
     <target name="compile">
         <mkdir dir="./build" />
         <mkdir dir="./build/obj" />
@@ -13,8 +16,8 @@
             srcdir="./src"
             debug="true"
             deprecation="on"
-            source="1.6"
-            target="1.6"
+            source="${javac.version}"
+            target="${javac.version}"
             destdir="./build/obj"
             includeAntRuntime="false"
             includes="**/*.java"
