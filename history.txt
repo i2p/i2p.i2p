@@ -1,3 +1,6 @@
+2014-02-23 dg
+ * I2PTunnel: add 'irc.dg.i2p' to the default IRC2P tunnel (for more information, see http://echelon.i2p/docs/IRC2p/irc2p_userguide.txt)
+
 2014-02-21 zzz
  * Build: Add property for target version
  * I2CP Client: Generate revocation key of same type as signing key
