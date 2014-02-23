@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-10-14 13:33+0000\n"
-"PO-Revision-Date: 2014-02-12 22:17+0000\n"
+"PO-Revision-Date: 2014-02-13 13:04+0000\n"
 "Last-Translator: blueboy\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/projects/p/I2P/language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
@@ -684,82 +684,82 @@ msgid "Timor-Leste"
 msgstr "Timor-Leste"
 
 msgid "Turkmenistan"
-msgstr ""
+msgstr "Turcomenistão"
 
 msgid "Tunisia"
-msgstr ""
+msgstr "Tunísia"
 
 msgid "Tonga"
-msgstr ""
+msgstr "Tonga"
 
 msgid "Turkey"
-msgstr ""
+msgstr "Turquia"
 
 msgid "Trinidad and Tobago"
-msgstr ""
+msgstr "Trinidad e Tobago"
 
 msgid "Tuvalu"
-msgstr ""
+msgstr "Tuvalu"
 
 msgid "Taiwan"
-msgstr ""
+msgstr "Taiwan"
 
 msgid "United Republic of Tanzania"
-msgstr ""
+msgstr "Tanzânia"
 
 msgid "Ukraine"
-msgstr ""
+msgstr "Ucrânia"
 
 msgid "Uganda"
-msgstr ""
+msgstr "Uganda"
 
 msgid "United States Minor Outlying Islands"
-msgstr ""
+msgstr "Ilhas Menores Distantes dos Estados Unidos"
 
 msgid "United States"
-msgstr ""
+msgstr "Estados Unidos"
 
 msgid "Uruguay"
-msgstr ""
+msgstr "Uruguai"
 
 msgid "Uzbekistan"
-msgstr ""
+msgstr "Uzbequistão"
 
 msgid "Holy See (Vatican City State)"
-msgstr ""
+msgstr "Santa Sé (Cidade do Vaticano)"
 
 msgid "Saint Vincent and the Grenadines"
-msgstr ""
+msgstr "São Vicente e Granadinas"
 
 msgid "Venezuela"
-msgstr ""
+msgstr "Venezuela"
 
 msgid "Virgin Islands"
-msgstr ""
+msgstr "Ilhas Virgens"
 
 msgid "Viet Nam"
-msgstr ""
+msgstr "Vietnã"
 
 msgid "Vanuatu"
-msgstr ""
+msgstr "Vanuatu"
 
 msgid "Wallis and Futuna"
-msgstr ""
+msgstr "Wallis e Futuna"
 
 msgid "Samoa"
-msgstr ""
+msgstr "Samoa"
 
 msgid "Yemen"
-msgstr ""
+msgstr "Iêmen"
 
 msgid "Mayotte"
-msgstr ""
+msgstr "Mayotte"
 
 msgid "South Africa"
-msgstr ""
+msgstr "África do Sul"
 
 msgid "Zambia"
-msgstr ""
+msgstr "Zâmbia"
 
 msgid "Zimbabwe"
-msgstr ""
+msgstr "Zimbábue"

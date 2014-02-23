@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-01-09 19:27+0000\n"
-"PO-Revision-Date: 2014-02-04 20:01+0000\n"
+"PO-Revision-Date: 2014-02-13 02:52+0000\n"
 "Last-Translator: blueboy\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/projects/p/I2P/language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
@@ -173,7 +173,7 @@ msgstr[1] "{0} mensagens deletadas."
 #: src/src/i2p/susi/webmail/WebMail.java:1314
 #: src/src/i2p/susi/webmail/WebMail.java:1653
 msgid "Login"
-msgstr "Login"
+msgstr "Entrar"
 
 #: src/src/i2p/susi/webmail/WebMail.java:1316
 #, java-format
@@ -246,7 +246,7 @@ msgstr "Recarregar configurações"
 #: src/src/i2p/susi/webmail/WebMail.java:1676
 #: src/src/i2p/susi/webmail/WebMail.java:1757
 msgid "Logout"
-msgstr "Deslogar"
+msgstr "Sair"
 
 #: src/src/i2p/susi/webmail/WebMail.java:1606
 #: src/src/i2p/susi/webmail/WebMail.java:1761
