@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-10-14 13:33+0000\n"
-"PO-Revision-Date: 2014-02-04 19:47+0000\n"
+"PO-Revision-Date: 2014-02-12 22:17+0000\n"
 "Last-Translator: blueboy\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/projects/p/I2P/language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
@@ -432,256 +432,256 @@ msgid "Latvia"
 msgstr "Letônia"
 
 msgid "Libyan Arab Jamahiriya"
-msgstr ""
+msgstr "Líbia"
 
 msgid "Morocco"
-msgstr ""
+msgstr "Marrocos"
 
 msgid "Monaco"
-msgstr ""
+msgstr "Mônaco"
 
 msgid "Republic of Moldova"
-msgstr ""
+msgstr "Moldávia"
 
 msgid "Montenegro"
-msgstr ""
+msgstr "Montenegro"
 
 msgid "Saint Martin"
-msgstr ""
+msgstr "São Martinho"
 
 msgid "Madagascar"
-msgstr ""
+msgstr "Madagascar"
 
 msgid "Marshall Islands"
-msgstr ""
+msgstr "Ilhas Marshall"
 
 msgid "The Former Yugoslav Republic of Macedonia"
-msgstr ""
+msgstr "Macedônia"
 
 msgid "Mali"
-msgstr ""
+msgstr "Mali"
 
 msgid "Myanmar"
-msgstr ""
+msgstr "Myanmar"
 
 msgid "Mongolia"
-msgstr ""
+msgstr "Mongólia"
 
 msgid "Macao"
-msgstr ""
+msgstr "Macau"
 
 msgid "Northern Mariana Islands"
-msgstr ""
+msgstr "Ilhas Marianas do Norte"
 
 msgid "Martinique"
-msgstr ""
+msgstr "Martinica"
 
 msgid "Mauritania"
-msgstr ""
+msgstr "Mauritânia"
 
 msgid "Montserrat"
-msgstr ""
+msgstr "Montserrat"
 
 msgid "Malta"
-msgstr ""
+msgstr "Malta"
 
 msgid "Mauritius"
-msgstr ""
+msgstr "Maurício"
 
 msgid "Maldives"
-msgstr ""
+msgstr "Maldivas"
 
 msgid "Malawi"
-msgstr ""
+msgstr "Malawi"
 
 msgid "Mexico"
-msgstr ""
+msgstr "México"
 
 msgid "Malaysia"
-msgstr ""
+msgstr "Malásia"
 
 msgid "Mozambique"
-msgstr ""
+msgstr "Moçambique"
 
 msgid "Namibia"
-msgstr ""
+msgstr "Namíbia"
 
 msgid "New Caledonia"
-msgstr ""
+msgstr "Nova Caledônia"
 
 msgid "Niger"
-msgstr ""
+msgstr "Níger"
 
 msgid "Norfolk Island"
-msgstr ""
+msgstr "Ilha Norfolk"
 
 msgid "Nigeria"
-msgstr ""
+msgstr "Nigéria"
 
 msgid "Nicaragua"
-msgstr ""
+msgstr "Nicarágua"
 
 msgid "Netherlands"
-msgstr ""
+msgstr "Holanda"
 
 msgid "Norway"
-msgstr ""
+msgstr "Noruega"
 
 msgid "Nepal"
-msgstr ""
+msgstr "Nepal"
 
 msgid "Nauru"
-msgstr ""
+msgstr "Nauru"
 
 msgid "Niue"
-msgstr ""
+msgstr "Niue"
 
 msgid "New Zealand"
-msgstr ""
+msgstr "Nova Zelândia"
 
 msgid "Oman"
-msgstr ""
+msgstr "Omã"
 
 msgid "Panama"
-msgstr ""
+msgstr "Panamá"
 
 msgid "Peru"
-msgstr ""
+msgstr "Peru"
 
 msgid "French Polynesia"
-msgstr ""
+msgstr "Polinésia Francesa"
 
 msgid "Papua New Guinea"
-msgstr ""
+msgstr "Papua-Nova Guiné"
 
 msgid "Philippines"
-msgstr ""
+msgstr "Filipinas"
 
 msgid "Pakistan"
-msgstr ""
+msgstr "Paquistão"
 
 msgid "Poland"
-msgstr ""
+msgstr "Polônia"
 
 msgid "Saint Pierre and Miquelon"
-msgstr ""
+msgstr "Saint-Pierre e Miquelon"
 
 msgid "Pitcairn Islands"
-msgstr ""
+msgstr "Ilhas Pitcairn"
 
 msgid "Puerto Rico"
-msgstr ""
+msgstr "Porto Rico"
 
 msgid "Palestinian Territory"
-msgstr ""
+msgstr "Território palestino"
 
 msgid "Portugal"
-msgstr ""
+msgstr "Portugal"
 
 msgid "Palau"
-msgstr ""
+msgstr "Palau"
 
 msgid "Paraguay"
-msgstr ""
+msgstr "Paraguai"
 
 msgid "Qatar"
-msgstr ""
+msgstr "Catar"
 
 msgid "Réunion"
-msgstr ""
+msgstr "Reunião"
 
 msgid "Romania"
-msgstr ""
+msgstr "Romênia"
 
 msgid "Serbia"
-msgstr ""
+msgstr "Sérvia"
 
 msgid "Russian Federation"
-msgstr ""
+msgstr "Rússia"
 
 msgid "Rwanda"
-msgstr ""
+msgstr "Ruanda"
 
 msgid "Saudi Arabia"
-msgstr ""
+msgstr "Arábia Saudita"
 
 msgid "Solomon Islands"
-msgstr ""
+msgstr "Ilhas Salomão"
 
 msgid "Seychelles"
-msgstr ""
+msgstr "Seychelles"
 
 msgid "Sudan"
-msgstr ""
+msgstr "Sudão"
 
 msgid "Sweden"
-msgstr ""
+msgstr "Suécia"
 
 msgid "Singapore"
-msgstr ""
+msgstr "Singapura"
 
 msgid "Saint Helena"
-msgstr ""
+msgstr "Santa Helena"
 
 msgid "Slovenia"
-msgstr ""
+msgstr "Eslovênia"
 
 msgid "Svalbard and Jan Mayen"
-msgstr ""
+msgstr "Svalbard e Jan Mayen"
 
 msgid "Slovakia"
-msgstr ""
+msgstr "Eslováquia"
 
 msgid "Sierra Leone"
-msgstr ""
+msgstr "Serra Leoa"
 
 msgid "San Marino"
-msgstr ""
+msgstr "São Marinho"
 
 msgid "Senegal"
-msgstr ""
+msgstr "Senegal"
 
 msgid "Somalia"
-msgstr ""
+msgstr "Somália"
 
 msgid "Suriname"
-msgstr ""
+msgstr "Suriname"
 
 msgid "Sao Tome and Principe"
-msgstr ""
+msgstr "São Tomé e Príncipe"
 
 msgid "El Salvador"
-msgstr ""
+msgstr "El Salvador"
 
 msgid "Syrian Arab Republic"
-msgstr ""
+msgstr "Síria"
 
 msgid "Swaziland"
-msgstr ""
+msgstr "Suazilândia"
 
 msgid "Turks and Caicos Islands"
-msgstr ""
+msgstr "Turks e Caicos"
 
 msgid "Chad"
-msgstr ""
+msgstr "Chade"
 
 msgid "French Southern Territories"
-msgstr ""
+msgstr "Terras Austrais e Antárticas Francesas"
 
 msgid "Togo"
-msgstr ""
+msgstr "Togo"
 
 msgid "Thailand"
-msgstr ""
+msgstr "Tailândia"
 
 msgid "Tajikistan"
-msgstr ""
+msgstr "Tajiquistão"
 
 msgid "Tokelau"
-msgstr ""
+msgstr "Tokelau"
 
 msgid "Timor-Leste"
-msgstr ""
+msgstr "Timor-Leste"
 
 msgid "Turkmenistan"
 msgstr ""

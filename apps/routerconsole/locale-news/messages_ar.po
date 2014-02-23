@@ -59,6 +59,5 @@ msgstr "عندما عندما تظهر عبارة \"shared clients\" على ال
 
 #, java-format
 msgid ""
-"Point your IRC client to {0}localhost:6668{1} and say hi to us on {2}#i2p-"
-"help{3} or {4}#i2p{5}."
-msgstr "IRC اتصل بخادم الدردشة الفورية  على {0}localhost:6668{1} {2}#i2p-help{3} or {4}#i2p{5}."
+"Point your IRC client to {0}localhost:6668{1} and say hi to us on {2}#i2p{3}."
+msgstr "IRC اتصل بخادم الدردشة الفورية  على {0}localhost:6668{1} {2}#i2p{3}."

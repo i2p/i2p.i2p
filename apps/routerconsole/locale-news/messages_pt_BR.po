@@ -61,6 +61,5 @@ msgstr "Uma vez que você tenha um destino de \"clientes compartilhados\" listad
 
 #, java-format
 msgid ""
-"Point your IRC client to {0}localhost:6668{1} and say hi to us on {2}#i2p-"
-"help{3} or {4}#i2p{5}."
-msgstr "Direcione o seu cliente IRC para {0}localhost:6668{1} e nos dê um oi em {2}#i2p-help{3} ou {4}#i2p{5}."
+"Point your IRC client to {0}localhost:6668{1} and say hi to us on {2}#i2p{3}."
+msgstr "Direcione o seu cliente IRC para {0}localhost:6668{1} e nos dê um oi em {2}#i2p{3}."

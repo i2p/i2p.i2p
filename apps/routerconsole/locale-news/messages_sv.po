@@ -62,6 +62,5 @@ msgstr "När du har fått en \"delade klienter\" destination listad till vänste
 
 #, java-format
 msgid ""
-"Point your IRC client to {0}localhost:6668{1} and say hi to us on {2}#i2p-"
-"help{3} or {4}#i2p{5}."
-msgstr "Rikta din IRC-klient till {0}localhost:6668{1} och säg hej till oss på {2}#i2p-help{3} eller {4}#i2p{5}."
+"Point your IRC client to {0}localhost:6668{1} and say hi to us on {2}#i2p{3}."
+msgstr "Rikta din IRC-klient till {0}localhost:6668{1} och säg hej till oss på {2}#i2p{3}."

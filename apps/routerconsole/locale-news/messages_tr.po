@@ -60,6 +60,5 @@ msgstr "Sol tarafta \"paylaşılmış istemci\" hedefi listelendiğinde, lütfen
 
 #, java-format
 msgid ""
-"Point your IRC client to {0}localhost:6668{1} and say hi to us on {2}#i2p-"
-"help{3} or {4}#i2p{5}."
-msgstr "IRC istemcinizi {0}localhost:6668{1} adresine yönlendirin ve bize merhaba demek için {2}#i2p-help{3} ya da {4}#i2p{5} kanallarını açın."
+"Point your IRC client to {0}localhost:6668{1} and say hi to us on {2}#i2p{3}."
+msgstr "IRC istemcinizi {0}localhost:6668{1} adresine yönlendirin ve bize merhaba demek için {2}#i2p{3} kanallarını açın."

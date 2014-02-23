@@ -71,8 +71,6 @@ msgstr ""
 
 #, java-format
 msgid ""
-"Point your IRC client to {0}localhost:6668{1} and say hi to us on {2}#i2p-"
-"help{3} or {4}#i2p{5}."
+"Point your IRC client to {0}localhost:6668{1} and say hi to us on {2}#i2p{3}."
 msgstr ""
-"Połącz swój klient IRC z {0}localhost:6668{1} i przywitaj się z nami na {2}"
-"#i2p-help{3} lub {4}#i2p{5}."
+"Połącz swój klient IRC z {0}localhost:6668{1} i przywitaj się z nami na lub {2}#i2p{3}."
