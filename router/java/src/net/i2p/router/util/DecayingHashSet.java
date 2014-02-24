@@ -183,8 +183,8 @@ public class DecayingHashSet extends DecayingBloomFilter {
     
     @Override
     protected void decay() {
-        int currentCount = 0;
-        long dups = 0;
+        int currentCount;
+        long dups;
         if (!getWriteLock())
             return;
         try {
