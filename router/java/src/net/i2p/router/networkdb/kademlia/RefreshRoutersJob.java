@@ -28,8 +28,10 @@ class RefreshRoutersJob extends JobImpl {
     private final FloodfillNetworkDatabaseFacade _facade;
     private List<Hash> _routers;
     
-    /** rerun fairly often. 1500 routers in 50 minutes */
-    private final static long RERUN_DELAY_MS = 2*1000;
+    /** rerun fairly often. 1000 routers in 50 minutes
+     *  Don't go faster as this overloads the expl. OBEP / IBGW
+     */
+    private final static long RERUN_DELAY_MS = 3*1000;
     private final static long EXPIRE = 60*60*1000;
     
     public RefreshRoutersJob(RouterContext ctx, FloodfillNetworkDatabaseFacade facade) {
