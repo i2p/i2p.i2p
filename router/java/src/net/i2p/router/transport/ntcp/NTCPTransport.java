@@ -37,6 +37,8 @@ import net.i2p.router.transport.TransportImpl;
 import net.i2p.router.transport.TransportUtil;
 import static net.i2p.router.transport.TransportUtil.IPv6Config.*;
 import net.i2p.router.transport.crypto.DHSessionKeyBuilder;
+import net.i2p.router.util.DecayingHashSet;
+import net.i2p.router.util.DecayingBloomFilter;
 import net.i2p.util.Addresses;
 import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.Log;
@@ -69,6 +71,8 @@ public class NTCPTransport extends TransportImpl {
      * want to remove on establishment or close on timeout
      */
     private final Set<NTCPConnection> _establishing;
+    /** "bloom filter" */
+    private final DecayingBloomFilter _replayFilter;
 
     /**
      *  Do we have a public IPv6 address?
@@ -135,7 +139,7 @@ public class NTCPTransport extends TransportImpl {
         _context.statManager().createRateStat("ntcp.corruptSkew", "", "ntcp", RATES);
         _context.statManager().createRateStat("ntcp.corruptTooLargeI2NP", "", "ntcp", RATES);
         _context.statManager().createRateStat("ntcp.dontSendOnBacklog", "", "ntcp", RATES);
-        _context.statManager().createRateStat("ntcp.inboundCheckConnection", "", "ntcp", RATES);
+        //_context.statManager().createRateStat("ntcp.inboundCheckConnection", "", "ntcp", RATES);
         _context.statManager().createRateStat("ntcp.inboundEstablished", "", "ntcp", RATES);
         _context.statManager().createRateStat("ntcp.inboundEstablishedDuplicate", "", "ntcp", RATES);
         _context.statManager().createRateStat("ntcp.infoMessageEnqueued", "", "ntcp", RATES);
@@ -162,6 +166,7 @@ public class NTCPTransport extends TransportImpl {
         _context.statManager().createRateStat("ntcp.receiveCorruptEstablishment", "", "ntcp", RATES);
         _context.statManager().createRateStat("ntcp.receiveMeta", "", "ntcp", RATES);
         _context.statManager().createRateStat("ntcp.registerConnect", "", "ntcp", RATES);
+        _context.statManager().createRateStat("ntcp.replayHXxorBIH", "", "ntcp", RATES);
         _context.statManager().createRateStat("ntcp.throttledReadComplete", "", "ntcp", RATES);
         _context.statManager().createRateStat("ntcp.throttledWriteComplete", "", "ntcp", RATES);
         _context.statManager().createRateStat("ntcp.wantsQueuedWrite", "", "ntcp", RATES);
@@ -171,6 +176,7 @@ public class NTCPTransport extends TransportImpl {
         _establishing = new ConcurrentHashSet<NTCPConnection>(16);
         _conLock = new Object();
         _conByIdent = new ConcurrentHashMap<Hash, NTCPConnection>(64);
+        _replayFilter = new DecayingHashSet(ctx, 10*60*1000, 32, "NTCP-Hx^HI");
 
         _finisher = new NTCPSendFinisher(ctx, this);
 
@@ -484,6 +490,19 @@ public class NTCPTransport extends TransportImpl {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("NTCP transport returning " + skews.size() + " peer clock skews.");
         return skews;
+    }
+
+    /**
+     *  Incoming connection replay detection.
+     *  As there is no timestamp in the first message, we can't detect
+     *  something long-delayed. To be fixed in next version of NTCP.
+     *
+     *  @param hxhi 32 bytes
+     *  @return valid
+     *  @since 0.9.12
+     */
+    boolean isHXHIValid(byte[] hxhi) {
+        return !_replayFilter.add(hxhi);
     }
 
     private static final int MIN_CONCURRENT_READERS = 2;  // unless < 32MB
