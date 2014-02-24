@@ -12,12 +12,14 @@ package net.i2p.router.transport.crypto;
 //import java.io.InputStream;
 //import java.io.OutputStream;
 import java.math.BigInteger;
+import java.security.InvalidKeyException;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
 import net.i2p.crypto.CryptoConstants;
 import net.i2p.crypto.SHA256Generator;
+import net.i2p.crypto.SigUtil;
 import net.i2p.data.ByteArray;
 //import net.i2p.data.DataHelper;
 import net.i2p.data.SessionKey;
@@ -183,16 +185,16 @@ public class DHSessionKeyBuilder {
         return toByteArray(getMyPublicValue());
     }
     
+    /**
+     *  @return exactly 256 bytes
+     *  @throws IllegalArgumentException if requires more than 256 bytes
+     */
     private static final byte[] toByteArray(BigInteger bi) {
-        byte data[] = bi.toByteArray();
-        byte rv[] = new byte[256];
-        if (data.length == 257) // high byte has the sign bit
-            System.arraycopy(data, 1, rv, 0, rv.length);
-        else if (data.length == 256)
-            System.arraycopy(data, 0, rv, 0, rv.length);
-        else
-            System.arraycopy(data, 0, rv, rv.length-data.length, data.length);
-        return rv;
+        try {
+            return SigUtil.rectify(bi, 256);
+        } catch (InvalidKeyException ike) {
+            throw new IllegalArgumentException(ike);
+        }
     }
 
     /**

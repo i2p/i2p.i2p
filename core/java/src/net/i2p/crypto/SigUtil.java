@@ -43,9 +43,9 @@ import net.i2p.util.NativeBigInteger;
 /**
  * Utilities for Signing keys and Signatures
  *
- * @since 0.9.9
+ * @since 0.9.9, public since 0.9.12
  */
-class SigUtil {
+public class SigUtil {
 
     private static final Map<SigningPublicKey, ECPublicKey> _pubkeyCache = new LHMCache<SigningPublicKey, ECPublicKey>(64);
     private static final Map<SigningPrivateKey, ECPrivateKey> _privkeyCache = new LHMCache<SigningPrivateKey, ECPrivateKey>(16);
