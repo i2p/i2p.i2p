@@ -254,9 +254,9 @@ public abstract class TransportImpl implements Transport {
 
         long lifetime = msg.getLifetime();
         if (lifetime > 3000) {
-            int level = Log.WARN;
+            int level = Log.INFO;
             if (!sendSuccessful)
-                level = Log.INFO;
+                level = Log.DEBUG;
             if (_log.shouldLog(level))
                 _log.log(level, getStyle() + " afterSend slow (" + (sendSuccessful ? "success " : "FAIL ")
                           + lifetime + "/" + msToSend + "): " + msg.getMessageSize() + " byte "
