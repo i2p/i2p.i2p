@@ -190,6 +190,7 @@ public class TunnelDispatcher implements Service {
         ctx.statManager().createRateStat("tunnel.batchFragmentation", "Avg. number of fragments per msg", "Tunnels", new long[] { 10*60*1000, 60*60*1000 });
         // following is for OutboundMessageDistributor
         ctx.statManager().createRateStat("tunnel.distributeLookupSuccess", "Was a deferred lookup successful?", "Tunnels", new long[] { 60*60*1000 });
+        ctx.statManager().createRateStat("tunnel.dropAtOBEP", "New conn throttle", "Tunnels", new long[] { 60*60*1000 });
         // following is for OutboundReceiver
         ctx.statManager().createRateStat("tunnel.outboundLookupSuccess", "Was a deferred lookup successful?", "Tunnels", new long[] { 60*60*1000 });
         // following is for InboundGatewayReceiver
