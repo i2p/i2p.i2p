@@ -1,3 +1,14 @@
+2014-02-24 zzz
+ * NetDB: Slow down router refresh after startup to reduce load
+   on exploratory tunnels
+ * NTCP:
+   - Add check for replayed session requests (ticket #1212)
+   - Disable inbound check connection
+   - Reduce object churn in EstablishmentManager
+   - Don't pollute Hash cache in EstablishmentManager
+ * Transports: Use SigUtil.rectify() in DH
+ * Tunnels: Rate-limit connections at the OBEP (ticket #1134)
+
 2014-02-23 dg
  * I2PTunnel: add 'irc.dg.i2p' to the default IRC2P tunnel (for more information, see http://echelon.i2p/docs/IRC2p/irc2p_userguide.txt)
 

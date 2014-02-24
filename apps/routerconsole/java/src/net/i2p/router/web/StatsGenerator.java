@@ -244,7 +244,7 @@ public class StatsGenerator {
         buf.append(":</b> ");
     }
     
-    private final static DecimalFormat _fmt = new DecimalFormat("###,##0.00");
+    private final static DecimalFormat _fmt = new DecimalFormat("###,##0.0##");
     private final static String num(double num) { synchronized (_fmt) { return _fmt.format(num); } }
     
     private final static DecimalFormat _pct = new DecimalFormat("#0.00%");
