@@ -10,6 +10,7 @@ package net.i2p.router;
 
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import net.i2p.data.Hash;
@@ -127,18 +128,19 @@ public class InNetMessagePool implements Service {
         long exp = messageBody.getMessageExpiration();
         
         if (_log.shouldLog(Log.INFO))
-                _log.info("Received inbound " 
-                          + " with id " + messageBody.getUniqueId()
-                          + " expiring on " + exp
-                          + " of type " + messageBody.getClass().getSimpleName());
+                _log.info("Rcvd" 
+                          + " ID " + messageBody.getUniqueId()
+                          + " exp. " + new Date(exp)
+                          + " type " + messageBody.getClass().getSimpleName());
         
         //if (messageBody instanceof DataMessage) {
         //    _context.statManager().getStatLog().addData(fromRouterHash.toBase64().substring(0,6), "udp.floodDataReceived", 1, 0);
         //    return 0;
         //}
         
+        int type = messageBody.getType();
         String invalidReason = null;
-        if (messageBody instanceof TunnelDataMessage) {
+        if (type == TunnelDataMessage.MESSAGE_TYPE) {
             // the IV validator is sufficient for dup detection on tunnel messages, so
             // just validate the expiration
             invalidReason = _context.messageValidator().validateMessage(exp);
@@ -169,7 +171,6 @@ public class InNetMessagePool implements Service {
         }
 
         boolean jobFound = false;
-        int type = messageBody.getType();
         boolean allowMatches = true;
         
         if (type == TunnelGatewayMessage.MESSAGE_TYPE) {
@@ -184,8 +185,8 @@ public class InNetMessagePool implements Service {
                 HandlerJobBuilder builder = _handlerJobBuilders[type];
 
                 if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Add message to the inNetMessage pool - builder: " + builder 
-                               + " message class: " + messageBody.getClass().getSimpleName());
+                    _log.debug("Add msg to the pool - builder: " + builder 
+                               + " type: " + messageBody.getClass().getSimpleName());
 
                 if (builder != null) {
                     Job job = builder.createJob(messageBody, fromRouter, 
@@ -258,15 +259,16 @@ public class InNetMessagePool implements Service {
     
     public int handleReplies(I2NPMessage messageBody) {
         List<OutNetMessage> origMessages = _context.messageRegistry().getOriginalMessages(messageBody);
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Original messages for inbound message: " + origMessages.size());
-        if (origMessages.size() > 1) {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Orig: " + origMessages + " \nthe above are replies for: " + messageBody, 
-                           new Exception("Multiple matches"));
+        int sz = origMessages.size();
+        if (sz <= 0)
+            return 0;
+        if (_log.shouldLog(Log.DEBUG)) {
+            _log.debug("Original messages for inbound message: " + sz);
+            if (sz > 1)
+                _log.debug("Orig: " + origMessages + " \nthe above are replies for: " + messageBody);
         }
 
-        for (int i = 0; i < origMessages.size(); i++) {
+        for (int i = 0; i < sz; i++) {
             OutNetMessage omsg = origMessages.get(i);
             ReplyJob job = omsg.getOnReplyJob();
             if (_log.shouldLog(Log.DEBUG))
@@ -278,7 +280,7 @@ public class InNetMessagePool implements Service {
                 _context.jobQueue().addJob(job);
             }
         }
-        return origMessages.size();
+        return sz;
     }
     
     // the following short circuits the tunnel dispatching - i'm not sure whether
@@ -297,6 +299,7 @@ public class InNetMessagePool implements Service {
                 _context.jobQueue().addJob(_shortCircuitGatewayJob);
         }
     }
+
     private void doShortCircuitTunnelGateway(I2NPMessage messageBody) {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Shortcut dispatch tunnelGateway message " + messageBody);

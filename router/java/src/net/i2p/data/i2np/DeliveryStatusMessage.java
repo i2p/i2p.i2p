@@ -22,6 +22,9 @@ public class DeliveryStatusMessage extends FastI2NPMessageImpl {
     private long _id;
     private long _arrival;
     
+    /** 4 bytes unsigned */
+    private static final long MAX_MSG_ID = (1L << 32) - 1;
+
     public DeliveryStatusMessage(I2PAppContext context) {
         super(context);
         _id = -1;
@@ -31,11 +34,15 @@ public class DeliveryStatusMessage extends FastI2NPMessageImpl {
     public long getMessageId() { return _id; }
 
     /**
+     *  @param id 0 to (2**32) - 1
      *  @throws IllegalStateException if id previously set, to protect saved checksum
+     *  @throws IllegalArgumentException
      */
     public void setMessageId(long id) {
         if (_id >= 0)
             throw new IllegalStateException();
+        if (id < 0 || id > MAX_MSG_ID)
+            throw new IllegalArgumentException();
         _id = id;
     }
     
@@ -70,6 +77,7 @@ public class DeliveryStatusMessage extends FastI2NPMessageImpl {
     protected int calculateWrittenLength() { 
         return 4 + DataHelper.DATE_LENGTH; // id + arrival
     }
+
     /** write the message body to the output array, starting at the given index */
     protected int writeMessageBody(byte out[], int curIndex) throws I2NPMessageException {
         if ( (_id < 0) || (_arrival <= 0) ) throw new I2NPMessageException("Not enough data to write out");
@@ -85,7 +93,7 @@ public class DeliveryStatusMessage extends FastI2NPMessageImpl {
     
     @Override
     public int hashCode() {
-        return (int)getMessageId() + (int)getArrival();
+        return (int)getMessageId() ^ (int)getArrival();
     }
     
     @Override

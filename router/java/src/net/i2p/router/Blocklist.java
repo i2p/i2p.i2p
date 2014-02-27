@@ -272,13 +272,13 @@ public class Blocklist {
             return;
         }
         _blocklistSize = count - removed;
-        if (_log.shouldLog(Log.WARN)) {
-            _log.warn("Removed " + badcount + " bad entries and comment lines");
-            _log.warn("Read " + count + " valid entries from the blocklist " + BLFile);
-            _log.warn("Merged " + removed + " overlapping entries");
-            _log.warn("Result is " + _blocklistSize + " entries");
-            _log.warn("Blocking " + ipcount + " IPs and " + peercount + " hashes");
-            _log.warn("Blocklist processing finished, time: " + (_context.clock().now() - start));
+        if (_log.shouldLog(Log.INFO)) {
+            _log.info("Removed " + badcount + " bad entries and comment lines");
+            _log.info("Read " + count + " valid entries from the blocklist " + BLFile);
+            _log.info("Merged " + removed + " overlapping entries");
+            _log.info("Result is " + _blocklistSize + " entries");
+            _log.info("Blocking " + ipcount + " IPs and " + peercount + " hashes");
+            _log.info("Blocklist processing finished, time: " + (_context.clock().now() - start));
         }
     }
 

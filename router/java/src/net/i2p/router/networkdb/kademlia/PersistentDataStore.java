@@ -496,7 +496,8 @@ class PersistentDataStore extends TransientDataStore {
                         // prevent injection from reseeding
                         // this is checked in KNDF.validate() but catch it sooner and log as error.
                         corrupt = true;
-                        _log.error(ri.getIdentity().calculateHash() + " does not match " + _key + " from " + _routerFile);
+                        if (_log.shouldLog(Log.WARN))
+                            _log.warn(ri.getIdentity().calculateHash() + " does not match " + _key + " from " + _routerFile);
                     } else if (ri.getPublished() <= _knownDate) {
                         // Don't store but don't delete
                         if (_log.shouldLog(Log.WARN))

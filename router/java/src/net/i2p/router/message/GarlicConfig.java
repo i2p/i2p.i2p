@@ -18,8 +18,11 @@ import net.i2p.data.RouterInfo;
 import net.i2p.data.i2np.DeliveryInstructions;
 
 /**
- * Define the contents of a garlic chunk that contains 1 or more sub garlics
+ * Define the contents of a garlic chunk that contains 1 or more sub garlics.
  *
+ * This is the top-level config for a Garlic Message that contains cloves.
+ * For cloves themselves, see PayloadGarlicConfig.
+ * Note that this is somewhat misnamed as it contains the actual cloves, not just the config.
  */
 class GarlicConfig {
     private RouterInfo _recipient;
@@ -39,9 +42,13 @@ class GarlicConfig {
     //private long _replyBlockExpiration;
     
     public GarlicConfig() {
+	this(new ArrayList<GarlicConfig>(4));
+    }
+
+    protected GarlicConfig(List<GarlicConfig> cloveConfigs) {
 	_id = -1;
 	_expiration = -1;
-	_cloveConfigs = new ArrayList<GarlicConfig>(4);
+        _cloveConfigs = cloveConfigs;
 	//_replyBlockMessageId = -1;
 	//_replyBlockExpiration = -1;
     }
@@ -51,6 +58,8 @@ class GarlicConfig {
      * delivery instructions and decide what to do process it locally as an I2NPMessage,
      * forward it as an I2NPMessage to a router, forward it as an I2NPMessage to a Destination,
      * or forward it as an I2NPMessage to a tunnel.
+     *
+     * Used only if recipient public key is not set.
      *
      */
     public void setRecipient(RouterInfo info) { _recipient = info; }
@@ -151,13 +160,17 @@ class GarlicConfig {
 	    _cloveConfigs.add(config);
 	}
     }
+
     public int getCloveCount() { return _cloveConfigs.size(); }
+
     public GarlicConfig getClove(int index) { return _cloveConfigs.get(index); }
+
     public void clearCloves() { _cloveConfigs.clear(); }
     
-    
     protected String getSubData() { return ""; }
+
     private final static String NL = System.getProperty("line.separator");
+
     @Override
     public String toString() {
 	StringBuilder buf = new StringBuilder();

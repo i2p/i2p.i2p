@@ -297,7 +297,7 @@ public class DatabaseLookupMessage extends FastI2NPMessageImpl {
         
         if ( (numPeers < 0) || (numPeers > MAX_NUM_PEERS) )
             throw new I2NPMessageException("Invalid number of peers - " + numPeers);
-        List<Hash> peers = new ArrayList<Hash>(numPeers);
+        List<Hash> peers = numPeers > 0 ? new ArrayList<Hash>(numPeers) : null;
         for (int i = 0; i < numPeers; i++) {
             //byte peer[] = new byte[Hash.HASH_LENGTH];
             //System.arraycopy(data, curIndex, peer, 0, Hash.HASH_LENGTH);
@@ -417,7 +417,7 @@ public class DatabaseLookupMessage extends FastI2NPMessageImpl {
             buf.append("\n\tReply Key: ").append(_replyKey);
         if (_replyTag != null)
             buf.append("\n\tReply Tag: ").append(_replyTag);
-        buf.append("\n\tDont Include Peers: ");
+        buf.append("\n\tDon't Include Peers: ");
         if (_dontIncludePeers != null)
             buf.append(_dontIncludePeers.size());
         buf.append("]");

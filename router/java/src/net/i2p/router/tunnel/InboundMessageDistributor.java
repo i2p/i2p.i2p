@@ -170,7 +170,7 @@ class InboundMessageDistributor implements GarlicMessageReceiver.CloveReceiver {
         switch (instructions.getDeliveryMode()) {
             case DeliveryInstructions.DELIVERY_MODE_LOCAL:
                 if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("local delivery instructions for clove: " + data.getClass().getName());
+                    _log.debug("local delivery instructions for clove: " + data.getClass().getSimpleName());
                 int type = data.getType();
                 if (type == GarlicMessage.MESSAGE_TYPE) {
                     _receiver.receive((GarlicMessage)data);
@@ -261,7 +261,7 @@ class InboundMessageDistributor implements GarlicMessageReceiver.CloveReceiver {
                 // Can we route UnknownI2NPMessages to a destination too?
                 if (!(data instanceof DataMessage)) {
                     if (_log.shouldLog(Log.ERROR))
-                        _log.error("cant send a " + data.getClass().getName() + " to a destination");
+                        _log.error("cant send a " + data.getClass().getSimpleName() + " to a destination");
                 } else if ( (_client != null) && (_client.equals(instructions.getDestination())) ) {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("data message came down a tunnel for " 

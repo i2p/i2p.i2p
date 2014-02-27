@@ -15,5 +15,11 @@ import net.i2p.data.i2np.I2NPMessage;
  *
  */
 public interface ReplyJob extends Job {
+
+    /**
+     *  Called by InNetMessagePool when an I2NPMessage
+     *  matching a MessageSelector registered with the OutboundMessageRegistry
+     *  is received
+     */
     public void setMessage(I2NPMessage message);
 }

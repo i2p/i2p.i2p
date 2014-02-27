@@ -11,14 +11,16 @@ package net.i2p.router.message;
 import net.i2p.data.i2np.I2NPMessage;
 
 /**
- * Garlic config containing an I2NP message
+ *  Garlic config for a single clove, containing an I2NP message and no sub-cloves.
  *
+ *  It is used for individual cloves in a Garlic Message, and as the configuration
+ *  for a single garlic-wrapped message by netdb MessageWrapper and tunnel TestJob.
  */
 public class PayloadGarlicConfig extends GarlicConfig {
     private I2NPMessage _payload;
 
     public PayloadGarlicConfig() {
-	super();
+	super(null);
     }
     
     /**
@@ -27,9 +29,8 @@ public class PayloadGarlicConfig extends GarlicConfig {
      */
     public void setPayload(I2NPMessage message) { 
 	_payload = message; 
-	if (message != null)
-	    clearCloves();
     }
+
     public I2NPMessage getPayload() { return _payload; }
  
     @Override
@@ -38,4 +39,35 @@ public class PayloadGarlicConfig extends GarlicConfig {
 	buf.append("<payloadMessage>").append(_payload).append("</payloadMessage>");
 	return buf.toString(); 
     }
+
+    /**
+     *  @since 0.9.12
+     *  @throws UnsupportedOperationException always
+     */
+    @Override
+    public void addClove(GarlicConfig config) {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     *  @return zero
+     *  @since 0.9.12
+     */
+    @Override
+    public int getCloveCount() { return 0; }
+
+    /**
+     *  @since 0.9.12
+     *  @throws UnsupportedOperationException always
+     */
+    @Override
+    public GarlicConfig getClove(int index) {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     *  @since 0.9.12
+     */
+    @Override
+    public void clearCloves() { }
 }

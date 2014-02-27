@@ -71,4 +71,9 @@ class FloodOnlyLookupSelector implements MessageSelector {
         }
         return false;
     }   
+
+    /** @since 0.9.12 */
+    public String toString() {
+        return "FOL Selector for " + _search.getKey();
+    }
 }

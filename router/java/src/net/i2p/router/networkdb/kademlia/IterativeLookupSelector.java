@@ -62,4 +62,9 @@ class IterativeLookupSelector implements MessageSelector {
         }
         return false;
     }   
+
+    /** @since 0.9.12 */
+    public String toString() {
+        return "IL Selector for " + _search.getKey();
+    }
 }
