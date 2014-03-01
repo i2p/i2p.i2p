@@ -417,9 +417,10 @@ public class DatabaseLookupMessage extends FastI2NPMessageImpl {
             buf.append("\n\tReply Key: ").append(_replyKey);
         if (_replyTag != null)
             buf.append("\n\tReply Tag: ").append(_replyTag);
-        buf.append("\n\tDon't Include Peers: ");
-        if (_dontIncludePeers != null)
+        if (_dontIncludePeers != null) {
+            buf.append("\n\tDon't Include Peers: ");
             buf.append(_dontIncludePeers.size());
+        }
         buf.append("]");
         return buf.toString();
     }
