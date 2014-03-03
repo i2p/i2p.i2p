@@ -32,6 +32,18 @@
                 <!-- Depend on classes instead of jars where available -->
                 <classpath>
                     <pathelement location="../../core/java/build/obj" />
+                </classpath>
+            </depend>
+        </target>
+
+        <target name="dependServlet" if="depend.available">
+            <depend
+                cache="../../build"
+                srcdir="${src}"
+                destdir="${build}" >
+                <!-- Depend on classes instead of jars where available -->
+                <classpath>
+                    <pathelement location="../../core/java/build/obj" />
                     <pathelement location="../jetty/jettylib/javax.servlet.jar" />
                 </classpath>
             </depend>
@@ -40,7 +52,21 @@
 	<target name="compile" depends="init, depend">
             <javac debug="true" deprecation="on" source="${javac.version}" target="${javac.version}" 
                        includeAntRuntime="false"
-                       srcdir="${src}" destdir="${build}">
+                       srcdir="${src}" destdir="${build}"
+                       excludes="net/i2p/addressbook/Servlet.java">
+            <compilerarg line="${javac.compilerargs}" />
+            <classpath>
+                <pathelement location="../../core/java/build/i2p.jar" />
+                <pathelement location="../jetty/jettylib/javax.servlet.jar" />
+            </classpath>
+		</javac>
+	</target>
+
+	<target name="compileServlet" depends="init, dependServlet, compile">
+            <javac debug="true" deprecation="on" source="${javac.version}" target="${javac.version}" 
+                       includeAntRuntime="false"
+                       srcdir="${src}" destdir="${build}"
+                       includes="net/i2p/addressbook/Servlet.java">
             <compilerarg line="${javac.compilerargs}" />
             <classpath>
                 <pathelement location="../../core/java/build/i2p.jar" />
@@ -51,9 +77,9 @@
 
         <!-- unused for now, as we oddly ship addressbook as a .war -->
 	<target name="jar" depends="compile, changes">
-		<jar basedir="${build}" destfile="${dist}/${jar}">
 		<!-- set if unset -->
 		<property name="workspace.changes" value="" />
+		<jar basedir="${build}" destfile="${dist}/${jar}">
 			<manifest>
 				<attribute name="Main-Class" value="addressbook.Daemon"/>
 				<attribute name="Implementation-Version" value="${full.version}" />
@@ -65,7 +91,7 @@
 		</jar>
 	</target>
 	
-	<target name="war" depends="compile, changes, warUpToDate" unless="war.uptodate">
+	<target name="war" depends="compileServlet, changes, warUpToDate" unless="war.uptodate">
 		<mkdir dir="${dist}/tmp"/>
 		<mkdir dir="${dist}/tmp/WEB-INF"/>
 		<mkdir dir="${dist}/tmp/WEB-INF/classes"/>
