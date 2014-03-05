@@ -31,7 +31,7 @@ web-out.xml
 /build
 /classes
 /dist
-/mo
+^installer/resources/locale/mo
 /tmp
 ^apps/jetty/jettylib
 
