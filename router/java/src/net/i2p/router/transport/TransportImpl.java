@@ -233,6 +233,11 @@ public abstract class TransportImpl implements Transport {
      * @param allowRequeue true if we should try other transports if available
      */
     protected void afterSend(OutNetMessage msg, boolean sendSuccessful, boolean allowRequeue, long msToSend) {
+        if (msg.getTarget() == null) {
+            // Probably injected by the transport.
+            // Bail out now as it will NPE in a dozen places below.
+            return;
+        }
         boolean log = false;
         if (sendSuccessful)
             msg.timestamp("afterSend(successful)");
@@ -244,7 +249,7 @@ public abstract class TransportImpl implements Transport {
 
         if (msToSend > 1500) {
             if (_log.shouldLog(Log.INFO))
-                _log.warn(getStyle() + " afterSend slow: " + (sendSuccessful ? "success " : "FAIL ")
+                _log.info(getStyle() + " afterSend slow: " + (sendSuccessful ? "success " : "FAIL ")
                           + msg.getMessageSize() + " byte "
                           + msg.getMessageType() + ' ' + msg.getMessageId() + " to "
                           + msg.getTarget().getIdentity().calculateHash().toBase64().substring(0,6) + " took " + msToSend + " ms");

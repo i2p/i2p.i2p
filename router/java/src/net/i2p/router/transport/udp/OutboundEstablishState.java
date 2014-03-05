@@ -9,6 +9,8 @@ import net.i2p.data.DataHelper;
 import net.i2p.data.RouterIdentity;
 import net.i2p.data.SessionKey;
 import net.i2p.data.Signature;
+import net.i2p.data.i2np.DatabaseStoreMessage;
+import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
 import net.i2p.router.transport.crypto.DHSessionKeyBuilder;
@@ -56,6 +58,7 @@ class OutboundEstablishState {
     private final Queue<OutNetMessage> _queuedMessages;
     private OutboundState _currentState;
     private long _introductionNonce;
+    private boolean _isFirstMessageOurDSM;
     // intro
     private final UDPAddress _remoteAddress;
     private boolean _complete;
@@ -151,11 +154,28 @@ class OutboundEstablishState {
      *  Queue a message to be sent after the session is established.
      */
     public void addMessage(OutNetMessage msg) {
+        if (_queuedMessages.isEmpty()) {
+            I2NPMessage m = msg.getMessage();
+            if (m.getType() == DatabaseStoreMessage.MESSAGE_TYPE) {
+               DatabaseStoreMessage dsm = (DatabaseStoreMessage) m;
+               if (dsm.getKey().equals(_context.routerHash())) {
+                   _isFirstMessageOurDSM = true;
+               }
+           }
+        }
         // chance of a duplicate here in a race, that's ok
         if (!_queuedMessages.contains(msg))
             _queuedMessages.offer(msg);
         else if (_log.shouldLog(Log.WARN))
              _log.warn("attempt to add duplicate msg to queue: " + msg);
+    }
+    
+    /**
+     *  Is the first message queued our own DatabaseStoreMessage?
+     *  @since 0.9.12
+     */
+    public boolean isFirstMessageOurDSM() {
+        return _isFirstMessageOurDSM;
     }
 
     /** @return null if none */
@@ -260,8 +280,8 @@ class OutboundEstablishState {
             return false;
         }
         if (_receivedSignature != null) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Session created already validated");
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Session created already validated");
             return true;
         }
         

@@ -1,3 +1,11 @@
+2014-03-05 zzz
+ * Transports: Don't send a duplicate store of our RI at
+     start of a connection (ticket #1187)
+ * NTCP:
+   - Lower send priority of the RI at exchange
+   - Bob will now send his RI even if he doesn't have Alice's
+   - Send RI again sooner on long-lived connections
+
 2014-03-05 str4d
  * Console: Updated website URLs in readme.html files
  * susimail: Removed remaining Jetty dependencies in susimail

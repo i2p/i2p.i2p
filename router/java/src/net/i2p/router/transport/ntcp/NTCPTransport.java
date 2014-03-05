@@ -27,6 +27,8 @@ import net.i2p.data.Hash;
 import net.i2p.data.RouterAddress;
 import net.i2p.data.RouterIdentity;
 import net.i2p.data.RouterInfo;
+import net.i2p.data.i2np.DatabaseStoreMessage;
+import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.router.CommSystemFacade;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
@@ -142,8 +144,8 @@ public class NTCPTransport extends TransportImpl {
         //_context.statManager().createRateStat("ntcp.inboundCheckConnection", "", "ntcp", RATES);
         _context.statManager().createRateStat("ntcp.inboundEstablished", "", "ntcp", RATES);
         _context.statManager().createRateStat("ntcp.inboundEstablishedDuplicate", "", "ntcp", RATES);
-        _context.statManager().createRateStat("ntcp.infoMessageEnqueued", "", "ntcp", RATES);
-        _context.statManager().createRateStat("ntcp.floodInfoMessageEnqueued", "", "ntcp", RATES);
+        //_context.statManager().createRateStat("ntcp.infoMessageEnqueued", "", "ntcp", RATES);
+        //_context.statManager().createRateStat("ntcp.floodInfoMessageEnqueued", "", "ntcp", RATES);
         _context.statManager().createRateStat("ntcp.invalidDH", "", "ntcp", RATES);
         _context.statManager().createRateStat("ntcp.invalidHXY", "", "ntcp", RATES);
         _context.statManager().createRateStat("ntcp.invalidHXxorBIH", "", "ntcp", RATES);
@@ -241,8 +243,26 @@ public class NTCPTransport extends TransportImpl {
                 return;
             }
             if (isNew) {
-                con.enqueueInfoMessage(); // enqueues a netDb store of our own info
                 con.send(msg); // doesn't do anything yet, just enqueues it
+                // As of 0.9.12, don't send our info if the first message is
+                // doing the same (common when connecting to a floodfill).
+                // Also, put the info message after whatever we are trying to send
+                // (it's a priority queue anyway and the info is low priority)
+                // Prior to 0.9.12, Bob would not send his RI unless he had ours,
+                // but that's fixed in 0.9.12.
+                boolean shouldSkipInfo = false;
+                I2NPMessage m = msg.getMessage();
+                if (m.getType() == DatabaseStoreMessage.MESSAGE_TYPE) {
+                    DatabaseStoreMessage dsm = (DatabaseStoreMessage) m;
+                    if (dsm.getKey().equals(_context.routerHash())) {
+                        shouldSkipInfo = true;
+                    }
+                }
+                if (!shouldSkipInfo) {
+                    con.enqueueInfoMessage();
+                } else if (_log.shouldLog(Log.INFO)) {
+                    _log.info("SKIPPING INFO message: " + con);
+                }
 
                 try {
                     SocketChannel channel = SocketChannel.open();

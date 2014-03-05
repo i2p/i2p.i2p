@@ -69,13 +69,13 @@ public class OutNetMessage implements CDPQEntry {
     public static final int PRIORITY_EXPLORATORY = 455;
     /** may be adjusted +/- 25 for outbound traffic */
     public static final int PRIORITY_MY_DATA = 425;
-    public static final int PRIORITY_MY_NETDB_STORE_LOW = 300;
     public static final int PRIORITY_HIS_BUILD_REQUEST = 300;
     public static final int PRIORITY_BUILD_REPLY = 300;
     public static final int PRIORITY_NETDB_REPLY = 300;
     public static final int PRIORITY_HIS_NETDB_STORE = 200;
     public static final int PRIORITY_NETDB_FLOOD = 200;
     public static final int PRIORITY_PARTICIPATING = 200;
+    public static final int PRIORITY_MY_NETDB_STORE_LOW = 150;
     public static final int PRIORITY_NETDB_EXPLORE = 100;
     public static final int PRIORITY_NETDB_HARVEST = 100;
     public static final int PRIORITY_LOWEST = 100;

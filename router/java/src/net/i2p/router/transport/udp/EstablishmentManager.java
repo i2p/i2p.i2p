@@ -792,7 +792,11 @@ class EstablishmentManager {
         _transport.setIP(remote.calculateHash(), state.getSentIP());
         
         _context.statManager().addRateData("udp.outboundEstablishTime", state.getLifetime(), 0);
-        sendOurInfo(peer, false);
+        if (!state.isFirstMessageOurDSM()) {
+            sendOurInfo(peer, false);
+        } else if (_log.shouldLog(Log.INFO)) {
+            _log.info("Skipping publish: " + state);
+        }
         
         OutNetMessage msg;
         while ((msg = state.getNextQueuedMessage()) != null) {
