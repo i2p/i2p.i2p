@@ -22,8 +22,7 @@ import org.bouncycastle.oldcrypto.macs.I2PHMac;
 
 /**
  * Calculate the HMAC-MD5-128 of a key+message.  All the good stuff occurs
- * in {@link org.bouncycastle.oldcrypto.macs.I2PHMac} and 
- * {@link org.bouncycastle.oldcrypto.digests.MD5Digest}.
+ * in {@link org.bouncycastle.oldcrypto.macs.I2PHMac}
  *
  * Keys are always 32 bytes.
  * This is used only by UDP.
@@ -71,7 +70,8 @@ public class HMACGenerator {
     /**
      * Calculate the HMAC of the data with the given key
      *
-     * @return the first 16 bytes contain the HMAC, the last 16 bytes are zero
+     * @param target out parameter the first 16 bytes contain the HMAC, the last 16 bytes are zero
+     * @param targetOffset offset into target to put the hmac
      * @throws IllegalArgumentException for bad key or target too small
      */
     public void calculate(SessionKey key, byte data[], int offset, int length, byte target[], int targetOffset) {

@@ -42,7 +42,7 @@ public class KeyCertificate extends Certificate {
      *  A KeyCertificate with crypto type 0 (ElGamal)
      *  and the signature type and extra data from the given public key.
      *
-     *  @param sig non-null data non-null
+     *  @param spk non-null data non-null
      *  @throws IllegalArgumentException
      */
     public KeyCertificate(SigningPublicKey spk) {
@@ -68,7 +68,7 @@ public class KeyCertificate extends Certificate {
      *  If type.getPubkeyLen() is greater than 128, caller MUST
      *  fill in the extra key data in the payload.
      *
-     *  @param sig non-null data non-null
+     *  @param type non-null
      *  @throws IllegalArgumentException
      */
     public KeyCertificate(SigType type) {
