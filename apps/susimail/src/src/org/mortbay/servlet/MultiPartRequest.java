@@ -29,7 +29,8 @@ import javax.servlet.http.HttpServletRequest;
 
 //import org.apache.commons.logging.Log;
 //import org.mortbay.log.LogFactory;
-import org.eclipse.jetty.util.MultiMap;
+//import org.eclipse.jetty.util.MultiMap;
+import org.mortbay.util.MultiMap;
 import org.mortbay.util.LineInput;
 
 /* ------------------------------------------------------------ */

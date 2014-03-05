@@ -1,3 +1,7 @@
+2014-03-05 str4d
+ * susimail: Removed remaining Jetty dependencies in susimail
+   (patch from wockenfuss) (ticket #1165)
+
 2014-02-24 zzz
  * NetDB: Slow down router refresh after startup to reduce load
    on exploratory tunnels
@@ -10,7 +14,8 @@
  * Tunnels: Rate-limit connections at the OBEP (ticket #1134)
 
 2014-02-23 dg
- * I2PTunnel: add 'irc.dg.i2p' to the default IRC2P tunnel (for more information, see http://echelon.i2p/docs/IRC2p/irc2p_userguide.txt)
+ * I2PTunnel: add 'irc.dg.i2p' to the default IRC2P tunnel (for more
+   information, see http://echelon.i2p/docs/IRC2p/irc2p_userguide.txt)
 
 2014-02-21 zzz
  * Build: Add property for target version
