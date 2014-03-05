@@ -1,4 +1,5 @@
 2014-03-05 str4d
+ * Console: Updated website URLs in readme.html files
  * susimail: Removed remaining Jetty dependencies in susimail
    (patch from wockenfuss) (ticket #1165)
 
