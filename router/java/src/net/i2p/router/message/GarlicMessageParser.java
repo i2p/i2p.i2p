@@ -28,6 +28,12 @@ class GarlicMessageParser {
     private final Log _log;
     private final RouterContext _context;
     
+    /**
+     *  Huge limit just to reduce chance of trouble. Typ. usage is 3.
+     *  As of 0.9.12. Was 255.
+     */
+    private static final int MAX_CLOVES = 32;
+
     public GarlicMessageParser(RouterContext context) { 
         _context = context;
         _log = _context.logManager().getLog(GarlicMessageParser.class);
@@ -64,18 +70,19 @@ class GarlicMessageParser {
     private CloveSet readCloveSet(byte data[]) throws DataFormatException {
         int offset = 0;
         
-        CloveSet set = new CloveSet();
-
         int numCloves = (int)DataHelper.fromLong(data, offset, 1);
         offset++;
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("# cloves to read: " + numCloves);
+        if (numCloves <= 0 || numCloves > MAX_CLOVES)
+            throw new DataFormatException("bad clove count " + numCloves);
+        GarlicClove[] cloves = new GarlicClove[numCloves];
         for (int i = 0; i < numCloves; i++) {
             //if (_log.shouldLog(Log.DEBUG))
             //    _log.debug("Reading clove " + i);
                 GarlicClove clove = new GarlicClove(_context);
                 offset += clove.readBytes(data, offset);
-                set.addClove(clove);
+                cloves[i] = clove;
             //if (_log.shouldLog(Log.DEBUG))
             //    _log.debug("After reading clove " + i);
         }
@@ -85,11 +92,10 @@ class GarlicMessageParser {
         offset += cert.size();
         long msgId = DataHelper.fromLong(data, offset, 4);
         offset += 4;
-        Date expiration = DataHelper.fromDate(data, offset);
+        //Date expiration = DataHelper.fromDate(data, offset);
+        long expiration = DataHelper.fromLong(data, offset, 8);
 
-        set.setCertificate(cert);
-        set.setMessageId(msgId);
-        set.setExpiration(expiration.getTime());
+        CloveSet set = new CloveSet(cloves, cert, msgId, expiration);
         return set;
     }
 }

@@ -13,11 +13,11 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Date;
 
+import net.i2p.I2PAppContext;
 import net.i2p.data.Certificate;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.DataStructureImpl;
-import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
 
 /**
@@ -29,19 +29,17 @@ import net.i2p.util.Log;
  * @author jrandom
  */
 public class GarlicClove extends DataStructureImpl {
-    private final Log _log;
-    //private final RouterContext _context;
+    //private final Log _log;
+    private final I2PAppContext _context;
     private DeliveryInstructions _instructions;
     private I2NPMessage _msg;
     private long _cloveId;
     private Date _expiration;
     private Certificate _certificate;
-    private final I2NPMessageHandler _handler;
     
-    public GarlicClove(RouterContext context) {
-        //_context = context;
-        _log = context.logManager().getLog(GarlicClove.class);
-        _handler = new I2NPMessageHandler(context);
+    public GarlicClove(I2PAppContext context) {
+        _context = context;
+        //_log = context.logManager().getLog(GarlicClove.class);
         _cloveId = -1;
     }
     
@@ -58,8 +56,11 @@ public class GarlicClove extends DataStructureImpl {
     
     /**
      *  @deprecated unused, use byte array method to avoid copying
+     *  @throws UnsupportedOperationException always
      */
     public void readBytes(InputStream in) throws DataFormatException, IOException {
+        throw new UnsupportedOperationException();
+/****
         _instructions = new DeliveryInstructions();
         _instructions.readBytes(in);
         if (_log.shouldLog(Log.DEBUG))
@@ -78,17 +79,22 @@ public class GarlicClove extends DataStructureImpl {
         _certificate = Certificate.create(in);
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Read cert: " + _certificate);
+****/
     }
 
+    /**
+     *
+     */
     public int readBytes(byte source[], int offset) throws DataFormatException {
         int cur = offset;
         _instructions = new DeliveryInstructions();
         cur += _instructions.readBytes(source, cur);
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Read instructions: " + _instructions);
+        //if (_log.shouldLog(Log.DEBUG))
+        //    _log.debug("Read instructions: " + _instructions);
         try {
-            cur += _handler.readMessage(source, cur);
-            _msg = _handler.lastRead();
+            I2NPMessageHandler handler = new I2NPMessageHandler(_context);
+            cur += handler.readMessage(source, cur);
+            _msg = handler.lastRead();
         } catch (I2NPMessageException ime) {
             throw new DataFormatException("Unable to read the message from a garlic clove", ime);
         }
@@ -96,21 +102,24 @@ public class GarlicClove extends DataStructureImpl {
         cur += 4;
         _expiration = DataHelper.fromDate(source, cur);
         cur += DataHelper.DATE_LENGTH;
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("CloveID read: " + _cloveId + " expiration read: " + _expiration);
+        //if (_log.shouldLog(Log.DEBUG))
+        //    _log.debug("CloveID read: " + _cloveId + " expiration read: " + _expiration);
         //_certificate = new Certificate();
         //cur += _certificate.readBytes(source, cur);
         _certificate = Certificate.create(source, cur);
         cur += _certificate.size();
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Read cert: " + _certificate);
+        //if (_log.shouldLog(Log.DEBUG))
+        //    _log.debug("Read cert: " + _certificate);
         return cur - offset;
     }
 
     /**
      *  @deprecated unused, use byte array method to avoid copying
+     *  @throws UnsupportedOperationException always
      */
     public void writeBytes(OutputStream out) throws DataFormatException, IOException {
+        throw new UnsupportedOperationException();
+/****
         StringBuilder error = null; 
         if (_instructions == null) {
             if (error == null) error = new StringBuilder();
@@ -158,15 +167,19 @@ public class GarlicClove extends DataStructureImpl {
         _certificate.writeBytes(out);
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Written cert: " + _certificate);
+****/
     }
 
+    /**
+     *
+     */
     @Override
     public byte[] toByteArray() {
         byte rv[] = new byte[estimateSize()];
         int offset = 0;
         offset += _instructions.writeBytes(rv, offset);
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Wrote instructions: " + _instructions);
+        //if (_log.shouldLog(Log.DEBUG))
+        //    _log.debug("Wrote instructions: " + _instructions);
         //offset += _msg.toByteArray(rv);
         try {
             byte m[] = _msg.toByteArray();
@@ -178,8 +191,10 @@ public class GarlicClove extends DataStructureImpl {
         DataHelper.toDate(rv, offset, _expiration.getTime());
         offset += DataHelper.DATE_LENGTH;
         offset += _certificate.writeBytes(rv, offset);
-        if (offset != rv.length)
-            _log.log(Log.CRIT, "Clove offset: " + offset + " but estimated length: " + rv.length);
+        if (offset != rv.length) {
+            Log log = I2PAppContext.getGlobalContext().logManager().getLog(GarlicClove.class);
+            log.error("Clove offset: " + offset + " but estimated length: " + rv.length);
+        }
         return rv;
     }
     
@@ -196,31 +211,31 @@ public class GarlicClove extends DataStructureImpl {
         if ( (obj == null) || !(obj instanceof GarlicClove))
             return false;
         GarlicClove clove = (GarlicClove)obj;
-        return DataHelper.eq(getCertificate(), clove.getCertificate()) &&
-               _cloveId == clove.getCloveId() &&
-               DataHelper.eq(getData(), clove.getData()) &&
-               DataHelper.eq(getExpiration(), clove.getExpiration()) &&
-               DataHelper.eq(getInstructions(),  clove.getInstructions());
+        return DataHelper.eq(_certificate, clove._certificate) &&
+               _cloveId == clove._cloveId &&
+               DataHelper.eq(_msg, clove._msg) &&
+               DataHelper.eq(_expiration, clove._expiration) &&
+               DataHelper.eq(_instructions,  clove._instructions);
     }
     
     @Override
     public int hashCode() {
-        return DataHelper.hashCode(getCertificate()) +
-               (int)getCloveId() +
-               DataHelper.hashCode(getData()) +
-               DataHelper.hashCode(getExpiration()) +
-               DataHelper.hashCode(getInstructions());
+        return DataHelper.hashCode(_certificate) ^
+               (int) _cloveId ^
+               DataHelper.hashCode(_msg) ^
+               DataHelper.hashCode(_expiration) ^
+               DataHelper.hashCode(_instructions);
     }
     
     @Override
     public String toString() {
         StringBuilder buf = new StringBuilder(128);
         buf.append("[GarlicClove: ");
-        buf.append("\n\tInstructions: ").append(getInstructions());
-        buf.append("\n\tCertificate: ").append(getCertificate());
-        buf.append("\n\tClove ID: ").append(getCloveId());
-        buf.append("\n\tExpiration: ").append(getExpiration());
-        buf.append("\n\tData: ").append(getData());
+        buf.append("\n\tInstructions: ").append(_instructions);
+        buf.append("\n\tCertificate: ").append(_certificate);
+        buf.append("\n\tClove ID: ").append(_cloveId);
+        buf.append("\n\tExpiration: ").append(_expiration);
+        buf.append("\n\tData: ").append(_msg);
         buf.append("]");
         return buf.toString();
     }

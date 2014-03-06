@@ -8,45 +8,47 @@ package net.i2p.router.message;
  *
  */
 
-import java.util.ArrayList;
-import java.util.List;
-
 import net.i2p.data.Certificate;
 import net.i2p.data.i2np.GarlicClove;
 
 /**
- * Wrap up the data contained in a CloveMessage after being decrypted
+ * Wrap up the data contained in a GarlicMessage after being decrypted
  *
  */
 class CloveSet {
-    private final List<GarlicClove> _cloves;
-    private Certificate _cert;
-    private long _msgId;
-    private long _expiration;
+    private final GarlicClove[] _cloves;
+    private final Certificate _cert;
+    private final long _msgId;
+    private final long _expiration;
     
-    public CloveSet() {
-	_cloves = new ArrayList<GarlicClove>(4);
-	_msgId = -1;
-	_expiration = -1;
+    /**
+     *  @param cloves non-null, all entries non-null
+     *  @param cert non-null
+     */
+    public CloveSet(GarlicClove[] cloves, Certificate cert, long msgId, long expiration) {
+	_cloves = cloves;
+        _cert = cert;
+	_msgId = msgId;
+	_expiration = expiration;
     }
     
-    public int getCloveCount() { return _cloves.size(); }
-    public void addClove(GarlicClove clove) { _cloves.add(clove); }
-    public GarlicClove getClove(int index) { return _cloves.get(index); }
+    public int getCloveCount() { return _cloves.length; }
+
+    /** @throws AIOOBE */
+    public GarlicClove getClove(int index) { return _cloves[index]; }
     
     public Certificate getCertificate() { return _cert; }
-    public void setCertificate(Certificate cert) { _cert = cert; }
+
     public long getMessageId() { return _msgId; }
-    public void setMessageId(long id) { _msgId = id; }
+
     public long getExpiration() { return _expiration; }
-    public void setExpiration(long expiration) { _expiration = expiration; }
     
     @Override
     public String toString() { 
 	StringBuilder buf = new StringBuilder(128);
 	buf.append("{");
-	for (int i = 0; i < _cloves.size(); i++) {
-	    GarlicClove clove = _cloves.get(i);
+	for (int i = 0; i < _cloves.length; i++) {
+	    GarlicClove clove = _cloves[i];
 	    if (clove.getData() != null)
 		buf.append(clove.getData().getClass().getName()).append(", ");
 	    else
