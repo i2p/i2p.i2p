@@ -189,12 +189,26 @@ public class MessageWrapper {
      *
      *  @since 0.9.9
      */
-    private static OneTimeSession generateSession(RouterContext ctx, SessionKeyManager skm) {
+    public static OneTimeSession generateSession(RouterContext ctx, SessionKeyManager skm) {
         SessionKey key = ctx.keyGenerator().generateSessionKey();
         SessionTag tag = new SessionTag(true);
         Set<SessionTag> tags = new RemovableSingletonSet<SessionTag>(tag);
         skm.tagsReceived(key, tags, 2*60*1000);
         return new OneTimeSession(key, tag);
+    }
+
+    /**
+     *  Garlic wrap a message from nobody, destined for an unknown router,
+     *  to hide the contents from the IBGW.
+     *  Uses a supplied one-time session key tag for AES encryption,
+     *  avoiding ElGamal.
+     *
+     *  @param session non-null
+     *  @return null on encrypt failure
+     *  @since 0.9.12
+     */
+    public static GarlicMessage wrap(RouterContext ctx, I2NPMessage m, OneTimeSession session) {
+        return wrap(ctx, m, session.key, session.tag);
     }
 
     /**
