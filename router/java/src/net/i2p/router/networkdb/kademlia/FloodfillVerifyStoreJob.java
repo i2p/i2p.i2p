@@ -157,7 +157,9 @@ class FloodfillVerifyStoreJob extends JobImpl {
             _log.info("Starting verify (stored " + _key + " to " + _sentTo + "), asking " + _target);
         _sendTime = getContext().clock().now();
         _expiration = _sendTime + VERIFY_TIMEOUT;
-        getContext().messageRegistry().registerPending(new VerifyReplySelector(), new VerifyReplyJob(getContext()), new VerifyTimeoutJob(getContext()), VERIFY_TIMEOUT);
+        getContext().messageRegistry().registerPending(new VerifyReplySelector(),
+                                                       new VerifyReplyJob(getContext()),
+                                                       new VerifyTimeoutJob(getContext()));
         getContext().tunnelDispatcher().dispatchOutbound(sent, outTunnel.getSendTunnelId(0), _target);
     }
     

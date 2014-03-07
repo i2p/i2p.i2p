@@ -185,7 +185,7 @@ class IterativeSearchJob extends FloodSearchJob {
         MessageSelector replySelector = new IterativeLookupSelector(getContext(), this);
         ReplyJob onReply = new FloodOnlyLookupMatchJob(getContext(), this);
         Job onTimeout = new FloodOnlyLookupTimeoutJob(getContext(), this);
-        _out = getContext().messageRegistry().registerPending(replySelector, onReply, onTimeout, _timeoutMs);
+        _out = getContext().messageRegistry().registerPending(replySelector, onReply, onTimeout);
         if (_log.shouldLog(Log.INFO))
             _log.info(getJobId() + ": New ISJ for " +
                       (_isLease ? "LS " : "RI ") +

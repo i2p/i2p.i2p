@@ -318,8 +318,7 @@ public class TransientSessionKeyManager extends SessionKeyManager {
     private OutboundSession createAndReturnSession(PublicKey target, SessionKey key) {
         if (_log.shouldLog(Log.INFO))
             _log.info("New OB session, sesskey: " + key + " target: " + toString(target));
-        OutboundSession sess = new OutboundSession(_context, _log, target);
-        sess.setCurrentKey(key);
+        OutboundSession sess = new OutboundSession(_context, _log, target, key);
         addSession(sess);
         return sess;
     }
@@ -476,6 +475,7 @@ public class TransientSessionKeyManager extends SessionKeyManager {
 
     /**
      * Mark these tags as acked, start to use them (if we haven't already)
+     * If the set was previously failed, it will be added back in.
      */
     @Override
     public void tagsAcked(PublicKey target, SessionKey key, TagSetHandle ts) {
@@ -822,11 +822,13 @@ public class TransientSessionKeyManager extends SessionKeyManager {
          *  on the callers to call failTags() or ackTags() to remove them from this list.
          *  Actually we now do a failsafe expire.
          *  Synch on _tagSets to access this.
+         *  No particular order.
          */
-        private final List<TagSet> _unackedTagSets;
+        private final Set<TagSet> _unackedTagSets;
         /**
          *  As tagsets are acked, they go here.
          *  After the first ack, new tagsets go here (i.e. presumed acked)
+         *  In order, earliest first.
          */
         private final List<TagSet> _tagSets;
         /**
@@ -844,20 +846,15 @@ public class TransientSessionKeyManager extends SessionKeyManager {
 
         private static final int MAX_FAILS = 2;
 
-        public OutboundSession(I2PAppContext ctx, Log log, PublicKey target) {
-            this(ctx, log, target, null, ctx.clock().now(), ctx.clock().now(), new ArrayList<TagSet>());
-        }
-
-        OutboundSession(I2PAppContext ctx, Log log, PublicKey target, SessionKey curKey,
-                        long established, long lastUsed, List<TagSet> tagSets) {
+        public OutboundSession(I2PAppContext ctx, Log log, PublicKey target, SessionKey key) {
             _context = ctx;
             _log = log;
             _target = target;
-            _currentKey = curKey;
-            _established = established;
-            _lastUsed = lastUsed;
-            _unackedTagSets = tagSets;
-            _tagSets = new ArrayList<TagSet>();
+            _currentKey = key;
+            _established = ctx.clock().now();
+            _lastUsed = _established;
+            _unackedTagSets = new HashSet<TagSet>(4);
+            _tagSets = new ArrayList<TagSet>(6);
         }
 
         /**
@@ -878,6 +875,7 @@ public class TransientSessionKeyManager extends SessionKeyManager {
          *  got an ack for these tags
          *  For tagsets delivered after the session was acked, this is a nop
          *  because the tagset was originally placed directly on the acked list.
+         *  If the set was previously failed, it will be added back in.
          */
         void ackTags(TagSet set) {
             synchronized (_tagSets) {
@@ -885,11 +883,14 @@ public class TransientSessionKeyManager extends SessionKeyManager {
                     // we could perhaps use it even if not previuosly in unacked,
                     // i.e. it was expired already, but _tagSets is a list not a set...
                     _tagSets.add(set);
-                } else if (_log.shouldLog(Log.WARN)) {
-                    if(!_tagSets.contains(set))
-                       _log.warn("Ack of unknown tagset: " + set);
-                    else if (set.getAcked())
-                       _log.warn("Dup ack of tagset: " + set);
+                } else if (!_tagSets.contains(set)) {
+                    // add back (sucess after fail)
+                    _tagSets.add(set);
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Ack of unknown (previously failed?) tagset: " + set);
+                } else if (set.getAcked()) {
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Dup ack of tagset: " + set);
                 }
                 _acked = true;
                 _consecutiveFailures = 0;
@@ -1196,6 +1197,7 @@ public class TransientSessionKeyManager extends SessionKeyManager {
             buf.append("TagSet #").append(_id).append(" created: ").append(new Date(_date));
             buf.append(" Session key: ").append(_key);
             buf.append(" Size: ").append(_sessionTags.size());
+            buf.append('/').append(_origSize);
             buf.append(" Acked? ").append(_acked);
             return buf.toString();
         }

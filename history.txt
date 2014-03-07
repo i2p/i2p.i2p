@@ -1,3 +1,11 @@
+2014-03-07 zzz
+ * Router:
+   - Look for DeliveryStatusMessages beyond the message expiration,
+     so we don't throw out a tagset that gets acked late
+   - Allow re-adding of a "failed" tagset to the SKM
+   - Extend max message age in MessageValidator
+   - Remove unused and confusing timeout param when registering a selector
+
 2014-03-06 zzz
  * Router: Encrypt DeliveryStatusMessages sent in garlics (ticket #1217)
 

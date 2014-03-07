@@ -103,7 +103,7 @@ class FloodOnlySearchJob extends FloodSearchJob {
 
         // This OutNetMessage is never used or sent (setMessage() is never called), it's only
         // so we can register a reply selector.
-        _out = getContext().messageRegistry().registerPending(_replySelector, _onReply, _onTimeout, _timeoutMs);
+        _out = getContext().messageRegistry().registerPending(_replySelector, _onReply, _onTimeout);
 
 /********
         // We need to randomize our ff selection, else we stay with the same ones since

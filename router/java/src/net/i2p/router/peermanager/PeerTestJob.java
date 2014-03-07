@@ -149,7 +149,7 @@ public class PeerTestJob extends JobImpl {
         PeerReplyFoundJob reply = new PeerReplyFoundJob(getContext(), peer, inTunnel, outTunnel);
         PeerReplyTimeoutJob timeoutJob = new PeerReplyTimeoutJob(getContext(), peer, inTunnel, outTunnel, sel);
         
-        getContext().messageRegistry().registerPending(sel, reply, timeoutJob, timeoutMs);
+        getContext().messageRegistry().registerPending(sel, reply, timeoutJob);
         getContext().tunnelDispatcher().dispatchOutbound(msg, outTunnelId, null, peer.getIdentity().getHash());
     }
     

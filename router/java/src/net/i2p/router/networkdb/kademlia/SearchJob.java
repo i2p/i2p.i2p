@@ -447,7 +447,7 @@ class SearchJob extends JobImpl {
         
         if (FloodfillNetworkDatabaseFacade.isFloodfill(router))
             _floodfillSearchesOutstanding++;
-        getContext().messageRegistry().registerPending(sel, reply, new FailedJob(getContext(), router), timeout);
+        getContext().messageRegistry().registerPending(sel, reply, new FailedJob(getContext(), router));
         // TODO pass a priority to the dispatcher
         getContext().tunnelDispatcher().dispatchOutbound(msg, outTunnelId, to);
     }

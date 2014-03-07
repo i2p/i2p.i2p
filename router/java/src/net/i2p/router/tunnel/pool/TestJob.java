@@ -104,7 +104,7 @@ class TestJob extends JobImpl {
             ReplySelector sel = new ReplySelector(getContext(), m.getMessageId(), testExpiration);
             OnTestReply onReply = new OnTestReply(getContext());
             OnTestTimeout onTimeout = new OnTestTimeout(getContext());
-            OutNetMessage msg = getContext().messageRegistry().registerPending(sel, onReply, onTimeout, testPeriod);
+            OutNetMessage msg = getContext().messageRegistry().registerPending(sel, onReply, onTimeout);
             onReply.setSentMessage(msg);
             sendTest(m);
         }

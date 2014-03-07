@@ -50,12 +50,13 @@ public class MessageValidator {
             return null;
         }
     }
+
     /**
      * Only check the expiration for the message
      */
     public String validateMessage(long expiration) {
         long now = _context.clock().now();
-        if (now - Router.CLOCK_FUDGE_FACTOR >= expiration) {
+        if (now - (Router.CLOCK_FUDGE_FACTOR * 3 / 2) >= expiration) {
             if (_log.shouldLog(Log.INFO))
                 _log.info("Rejecting message because it expired " + (now-expiration) + "ms ago");
             _context.statManager().addRateData("router.invalidMessageTime", (now-expiration), 0);
