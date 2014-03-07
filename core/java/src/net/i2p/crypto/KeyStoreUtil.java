@@ -94,9 +94,14 @@ public class KeyStoreUtil {
             success = loadCerts(new File(override), ks);
         if (!success) {
             if (SystemVersion.isAndroid()) {
-                // thru API 13. As of API 14 (ICS), the file is gone, but
-                // ks.load(null, pw) will bring in the default certs?
-                success = loadCerts(new File(System.getProperty("java.home"), "etc/security/cacerts.bks"), ks);
+                if (SystemVersion.getAndroidVersion() >= 14) {
+                    try {
+                        ks.load(null, DEFAULT_KEYSTORE_PASSWORD.toCharArray());
+                        success = addCerts(new File(System.getProperty("java.home"), "etc/security/cacerts"), ks) > 0;
+                    } catch (Exception e) {}
+                } else {
+                    success = loadCerts(new File(System.getProperty("java.home"), "etc/security/cacerts.bks"), ks);
+                }
             } else {
                 success = loadCerts(new File(System.getProperty("java.home"), "lib/security/jssecacerts"), ks);
                 if (!success)
