@@ -1,3 +1,7 @@
+2014-03-08 zzz
+ * PeerManager: Restore profileOrganizer.sameCountryBonus advanced config,
+                inadvertently removed in 0.9.10
+
 2014-03-07 zzz
  * Router:
    - Look for DeliveryStatusMessages beyond the message expiration,
