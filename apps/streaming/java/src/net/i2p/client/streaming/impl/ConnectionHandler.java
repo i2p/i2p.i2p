@@ -76,6 +76,11 @@ class ConnectionHandler {
             }
             return;
         }
+        if (_manager.wasRecentlyClosed(packet.getSendStreamId())) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Dropping packet for recently closed stream: " + packet);
+            return;
+        }
         if (_log.shouldLog(Log.INFO))
             _log.info("Receive new SYN: " + packet + ": timeout in " + _acceptTimeout);
         // also check if expiration of the head is long past for overload detection with peek() ?

@@ -1,3 +1,8 @@
+2014-03-12 zzz
+ * Console: Handle ISO-639-2 language codes (ticket #1229)
+ * Streaming: Track recently closed connections (ticket #1161)
+ * Wrapper: Fix failed restarts on ARM (ticket #1230)
+
 2014-03-08 zzz
  * PeerManager: Restore profileOrganizer.sameCountryBonus advanced config,
                 inadvertently removed in 0.9.10
