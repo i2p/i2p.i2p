@@ -141,7 +141,7 @@ public class SAMv3Handler extends SAMv1Handler
 			server.send(msg, addr);
 		}
 		
-		class Listener implements Runnable {
+		static class Listener implements Runnable {
 			
 			final DatagramChannel server;
 			
@@ -209,7 +209,7 @@ public class SAMv3Handler extends SAMv1Handler
 		}
 	}
 	
-	public class SessionRecord
+	public static class SessionRecord
 	{
 		protected final String m_dest ;
 		protected final Properties m_props ;
@@ -262,10 +262,10 @@ public class SAMv3Handler extends SAMv1Handler
 	{
 		static final long serialVersionUID = 0x1 ;
 
-		class ExistingId   extends Exception {
+		static class ExistingId   extends Exception {
 			static final long serialVersionUID = 0x1 ;
 		}
-		class ExistingDest extends Exception {
+		static class ExistingDest extends Exception {
 			static final long serialVersionUID = 0x1 ;
 		}
 		

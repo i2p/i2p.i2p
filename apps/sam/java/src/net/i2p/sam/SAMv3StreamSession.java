@@ -39,7 +39,7 @@ public class SAMv3StreamSession  extends SAMStreamSession implements SAMv3Handle
 
 		private final static Log _log = new Log ( SAMv3StreamSession.class );
 		
-		protected final int BUFFER_SIZE = 1024 ;
+		protected static final int BUFFER_SIZE = 1024 ;
 		
 		protected final Object socketServerLock = new Object();
 		protected I2PServerSocket socketServer = null;
@@ -279,7 +279,8 @@ public class SAMv3StreamSession  extends SAMStreamSession implements SAMv3Handle
 	    		}
 	    	}
 	    }
-	    public class Pipe extends Thread
+
+	    public static class Pipe extends Thread
 	    {
 	    	final ReadableByteChannel in  ;
 	    	final WritableByteChannel out ;

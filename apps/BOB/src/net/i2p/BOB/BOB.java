@@ -221,15 +221,17 @@ public class BOB implements Runnable, ClientApp {
 			if (!cfg.isAbsolute()) {
 				cfg = new File(I2PAppContext.getGlobalContext().getConfigDir(), configLocation);
 			}
+			FileInputStream fi = null;
 			try {
-				FileInputStream fi = new FileInputStream(cfg);
+				fi = new FileInputStream(cfg);
 				props.load(fi);
-				fi.close();
 			} catch (FileNotFoundException fnfe) {
 				_log.warn("Unable to load up the BOB config file " + cfg.getAbsolutePath() + ", Using defaults.", fnfe);
 				save = true;
 			} catch (IOException ioe) {
 				_log.warn("IOException on BOB config file " + cfg.getAbsolutePath() + ", using defaults.", ioe);
+			} finally {
+				if (fi != null) try { fi.close(); } catch (IOException ioe) {}
 			}
 		}
 		// Global router and client API configurations that are missing are set to defaults here.
@@ -276,13 +278,15 @@ public class BOB implements Runnable, ClientApp {
 			if (!cfg.isAbsolute()) {
 				cfg = new File(I2PAppContext.getGlobalContext().getConfigDir(), configLocation);
 			}
+			FileOutputStream fo = null;
 			try {
 				_log.warn("Writing new defaults file " + cfg.getAbsolutePath());
-				FileOutputStream fo = new FileOutputStream(cfg);
+				fo = new FileOutputStream(cfg);
 				props.store(fo, cfg.getAbsolutePath());
-				fo.close();
 			} catch (IOException ioe) {
 				_log.error("IOException on BOB config file " + cfg.getAbsolutePath(), ioe);
+			} finally {
+				if (fo != null) try { fo.close(); } catch (IOException ioe) {}
 			}
 		}
 	}
