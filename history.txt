@@ -1,6 +1,8 @@
 2014-03-12 zzz
  * Console: Handle ISO-639-2 language codes (ticket #1229)
- * Streaming: Track recently closed connections (ticket #1161)
+ * Streaming:
+   - Track recently closed connections (ticket #1161)
+   - Workaround for jwebcache and i2phex (ticket #1231)
  * Wrapper: Fix failed restarts on ARM (ticket #1230)
 
 2014-03-08 zzz

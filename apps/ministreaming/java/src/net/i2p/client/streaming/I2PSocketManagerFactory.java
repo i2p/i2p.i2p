@@ -225,7 +225,10 @@ public class I2PSocketManagerFactory {
 
     private static I2PSocketManager createManager(I2PSession session, Properties opts, String name) {
         I2PAppContext context = I2PAppContext.getGlobalContext();
-        String classname = opts.getProperty(PROP_MANAGER, DEFAULT_MANAGER);
+        // As of 0.9.12, ignore this setting, as jwebcache and i2phex set it to the old value.
+        // There is no other valid manager.
+        //String classname = opts.getProperty(PROP_MANAGER, DEFAULT_MANAGER);
+        String classname = DEFAULT_MANAGER;
         try {
             Class<?> cls = Class.forName(classname);
             if (!I2PSocketManager.class.isAssignableFrom(cls))
