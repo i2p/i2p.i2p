@@ -698,14 +698,14 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
      */
     private String validate(Hash key, LeaseSet leaseSet) {
         if (!key.equals(leaseSet.getDestination().calculateHash())) {
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("Invalid store attempt! key does not match leaseSet.destination!  key = "
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Invalid store attempt! key does not match leaseSet.destination!  key = "
                           + key + ", leaseSet = " + leaseSet);
             return "Key does not match leaseSet.destination - " + key.toBase64();
         }
         if (!leaseSet.verifySignature()) {
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("Invalid leaseSet signature!  leaseSet = " + leaseSet);
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Invalid leaseSet signature!  leaseSet = " + leaseSet);
             return "Invalid leaseSet signature on " + leaseSet.getDestination().calculateHash().toBase64();
         }
         long earliest = leaseSet.getEarliestLeaseDate();
