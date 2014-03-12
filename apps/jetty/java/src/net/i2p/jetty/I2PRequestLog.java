@@ -405,7 +405,7 @@ public class I2PRequestLog extends AbstractLifeCycle implements RequestLog
         } 
         catch (IOException e) 
         {
-            Log.warn(e);
+            Log.getLogger((String)null).warn(e);
         }
         
     }
@@ -449,7 +449,7 @@ public class I2PRequestLog extends AbstractLifeCycle implements RequestLog
         {
             _fileOut = new RolloverFileOutputStream(_filename,_append,_retainDays,TimeZone.getTimeZone(_logTimeZone),_filenameDateFormat,null);
             _closeOut = true;
-            Log.info("Opened "+getDatedFilename());
+            Log.getLogger((String)null).info("Opened "+getDatedFilename());
         }
         else 
             _fileOut = System.err;
@@ -475,9 +475,9 @@ public class I2PRequestLog extends AbstractLifeCycle implements RequestLog
     protected void doStop() throws Exception
     {
         super.doStop();
-        try {if (_writer != null) _writer.flush();} catch (IOException e) {Log.ignore(e);}
+        try {if (_writer != null) _writer.flush();} catch (IOException e) {Log.getLogger((String)null).ignore(e);}
         if (_out != null && _closeOut) 
-            try {_out.close();} catch (IOException e) {Log.ignore(e);}
+            try {_out.close();} catch (IOException e) {Log.getLogger((String)null).ignore(e);}
             
         _out = null;
         _fileOut = null;
