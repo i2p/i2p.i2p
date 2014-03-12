@@ -53,19 +53,20 @@ public class CSSHelper extends HelperBase {
 
     /**
      * change default language for the router AND save it
-     * @param lang xx OR xx_XX
+     * @param lang xx OR xx_XX OR xxx OR xxx_XX
      */
     public void setLang(String lang) {
         // Protected with nonce in css.jsi
-        if (lang != null) {
+        if (lang != null && lang.length() > 0) {
             Map m = new HashMap(2);
-            if (lang.length() == 2) {
+            int under = lang.indexOf('_');
+            if (under < 0) {
                 m.put(Messages.PROP_LANG, lang.toLowerCase(Locale.US));
                 m.put(Messages.PROP_COUNTRY, "");
                 _context.router().saveConfig(m, null);
-            } else if (lang.length() == 5) {
-                m.put(Messages.PROP_LANG, lang.substring(0, 2).toLowerCase(Locale.US));
-                m.put(Messages.PROP_COUNTRY, lang.substring(3, 5).toUpperCase(Locale.US));
+            } else if (under > 0 && lang.length() > under + 1) {
+                m.put(Messages.PROP_LANG, lang.substring(0, under).toLowerCase(Locale.US));
+                m.put(Messages.PROP_COUNTRY, lang.substring(under + 1).toUpperCase(Locale.US));
                 _context.router().saveConfig(m, null);
             }
         }

@@ -135,7 +135,7 @@ public abstract class Translate {
     }
 
     /**
-     *  Two-letter lower case
+     *  Two- or three-letter lower case
      *  @return lang in routerconsole.lang property, else current locale
      */
     public static String getLanguage(I2PAppContext ctx) {
@@ -192,7 +192,7 @@ public abstract class Translate {
      *  by langCode, using the current language.
      *  Uses translation if available, then JVM Locale.getDisplayLanguage() if available, else default param.
      *
-     *  @param langCode two-letter lower-case
+     *  @param langCode two- or three-letter lower-case
      *  @param dflt e.g. "English"
      *  @since 0.9.5
      */

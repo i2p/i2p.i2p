@@ -70,6 +70,7 @@ public class ConfigUIHelper extends HelperBase {
      *  See http://en.wikipedia.org/wiki/ISO_639-1 .
      *  Any language-specific flag added to the icon set must be
      *  added to the top-level build.xml for the updater.
+     *  As of 0.9.12, ISO 639-2 three-letter codes are supported also.
      */
     private static final String langs[][] = {
         { "ar", "lang_ar", _x("Arabic"), null },
@@ -138,7 +139,8 @@ public class ConfigUIHelper extends HelperBase {
                 buf.append("checked=\"checked\" ");
             buf.append("value=\"").append(lang).append("\">")
                .append("<img height=\"11\" width=\"16\" alt=\"\" src=\"/flags.jsp?c=").append(langs[i][1]).append("\"> ");
-            String slang = lang.length() > 2 ? lang.substring(0, 2) : lang;
+            int under = lang.indexOf('_');
+            String slang = (under > 0) ? lang.substring(0, under) : lang;
             buf.append(Messages.getDisplayLanguage(slang, langs[i][2], _context));
             String name = langs[i][3];
             if (name != null) {
