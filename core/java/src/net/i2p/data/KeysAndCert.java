@@ -166,7 +166,7 @@ public class KeysAndCert extends DataStructureImpl {
             return __calculatedHash;
         byte identBytes[];
         try {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ByteArrayOutputStream baos = new ByteArrayOutputStream(400);
             writeBytes(baos);
             identBytes = baos.toByteArray();
         } catch (Throwable t) {
