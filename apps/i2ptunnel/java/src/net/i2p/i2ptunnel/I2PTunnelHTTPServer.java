@@ -340,6 +340,13 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Error while receiving the new HTTP request", ex);
         } catch (OutOfMemoryError oom) {
+            // Often actually a file handle limit problem so we can safely send a response
+            // java.lang.OutOfMemoryError: unable to create new native thread
+            try {
+                // Send a 503, so the user doesn't get an HTTP Proxy error message
+                // and blame his router or the network.
+                socket.getOutputStream().write(ERR_UNAVAILABLE);
+            } catch (IOException ioe) {}
             try {
                 socket.close();
             } catch (IOException ioe) {}
