@@ -3,6 +3,7 @@ package net.i2p.router.web;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Properties;
 
 import net.i2p.apps.systray.UrlLauncher;
 import net.i2p.router.Router;
@@ -57,7 +58,8 @@ public class ConfigServiceHandler extends FormHandler {
         private final boolean _rekey;
         private final boolean _tellWrapper;
         private static final int HASHCODE = -123999871;
-        private static final int WAIT = 30*1000;
+        // RPi takes a long time to write out the peer profiles
+        private static final int WAIT = SystemVersion.isARM() ? 4*60*1000 : 2*60*1000;
 
         public UpdateWrapperOrRekeyTask(boolean rekey, boolean tellWrapper) {
             _rekey = rekey;
@@ -68,8 +70,19 @@ public class ConfigServiceHandler extends FormHandler {
             try {
                 if (_rekey)
                     ContextHelper.getContext(null).router().killKeys();
-                if (_tellWrapper)
-                    WrapperManager.signalStopping(WAIT);
+                if (_tellWrapper) {
+                    int wait = WAIT;
+                    Properties props = WrapperManager.getProperties();
+                    String tmout = props.getProperty("wrapper.jvm_exit.timeout");
+                    if (tmout != null) {
+                        try {
+                            int cwait = Integer.parseInt(tmout) * 1000;
+                            if (cwait > wait)
+                                wait = cwait;
+                        } catch (NumberFormatException nfe) {}
+                    }
+                    WrapperManager.signalStopping(wait);
+                }
             } catch (Throwable t) {
                 t.printStackTrace();
             }
