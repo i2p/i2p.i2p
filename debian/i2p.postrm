@@ -1,7 +1,12 @@
-#!/bin/sh -e
+#!/bin/sh
+
+set -e
 
 if [ "$1" = "purge" ]; then
 	rm -f /etc/default/i2p
+	rm -rf /var/lib/i2p
+	rm -rf /var/log/i2p
+	rm -rf /etc/i2p
 fi
 
 #DEBHELPER#
