@@ -1,0 +1,46 @@
+# Just to try and prevent some noob disasters.
+# Use git add -f foo.jar to ignore this ignore list
+
+# generated release files
+*.exe
+*.[gx]z
+*.bz2
+*.[rwjt]ar
+*.sig
+*.su[d23]
+*.deb
+*.zip
+
+*~
+web-fragment.xml
+web-out.xml
+*.out
+
+# Temporary/build dirs
+build/
+pkg-temp/
+classes/
+dist/
+/installer/resources/locale/mo
+/tmp
+/apps/jetty/jettylib
+*_jsp.java
+*.class
+
+# Debian-related
+/debian/copyright
+/debian/changelog
+
+# Build property overrides
+/override.properties
+
+# Reporting
+*.fba
+sloccount.sc
+/reports/
+
+# Don't allow patches
+*.(diff|patch)
+
+# but allow debian/patches
+!/debian/patches/*.(patch|diff)
