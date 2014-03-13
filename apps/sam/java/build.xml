@@ -17,7 +17,6 @@
             <classpath>
                 <pathelement location="../../../core/java/build/obj" />
                 <pathelement location="../../ministreaming/java/build/obj" />
-                <pathelement location="../../streaming/java/build/obj" />
             </classpath>
         </depend>
     </target>
@@ -34,7 +33,7 @@
             debug="true" deprecation="on" source="${javac.version}" target="${javac.version}" 
             includeAntRuntime="false"
             destdir="./build/obj" 
-            classpath="../../../core/java/build/i2p.jar:../../ministreaming/java/build/mstreaming.jar:../../streaming/java/build/streaming.jar" >
+            classpath="../../../core/java/build/i2p.jar:../../ministreaming/java/build/mstreaming.jar" >
             <compilerarg line="${javac.compilerargs}" />
         </javac>
     </target>
@@ -45,7 +44,7 @@
             debug="true" deprecation="on" source="${javac.version}" target="${javac.version}" 
             includeAntRuntime="false"
             destdir="./build/obj" 
-            classpath="../../../core/java/build/i2p.jar:../../ministreaming/java/build/mstreaming.jar:../../streaming/java/build/streaming.jar" >
+            classpath="../../../core/java/build/i2p.jar:../../ministreaming/java/build/mstreaming.jar" >
             <compilerarg line="${javac.compilerargs}" />
         </javac>
     </target>

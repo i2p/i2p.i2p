@@ -5,13 +5,18 @@ import java.io.File;
 import net.i2p.I2PAppContext;
 import net.i2p.util.FileUtil;
 
-import org.eclipse.jetty.server.Server;
+//import org.eclipse.jetty.server.Server;
 
+/**
+ *  @deprecated does not work
+ */
 public class RunStandalone {
+/****
     static {
         System.setProperty("org.mortbay.http.Version.paranoid", "true");
         System.setProperty("org.mortbay.xml.XmlParser.NotValidating", "true");
     }
+****/
     
     private RunStandalone(String args[]) {}
     
@@ -21,6 +26,8 @@ public class RunStandalone {
     }
     
     public void start() {
+        throw new RuntimeException("unsupported");
+/****
         File workDir = new File(I2PAppContext.getGlobalContext().getTempDir(), "jetty-work");
         boolean workDirRemoved = FileUtil.rmdir(workDir, false);
         if (!workDirRemoved)
@@ -29,8 +36,6 @@ public class RunStandalone {
         if (!workDirCreated)
             System.err.println("ERROR: Unable to create Jetty temporary work directory");
         
-        throw new RuntimeException("unsupported");
-/****
         try {
             _server = new Server("jetty-i2psnark.xml");
             // just blow up NPE if we don't have a context

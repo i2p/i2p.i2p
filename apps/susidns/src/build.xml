@@ -11,7 +11,6 @@
 		<pathelement path="${classpath}" />
 		<pathelement location="${bin}" />
 		<pathelement location="${lib}/javax.servlet.jar"/>
-		<pathelement location="${lib}/org.mortbay.jetty.jar"/>
         <pathelement location="WEB-INF/lib/jstl.jar" />
         <pathelement location="WEB-INF/lib/standard.jar" />
         <pathelement location="${lib}/jasper-runtime.jar" />
