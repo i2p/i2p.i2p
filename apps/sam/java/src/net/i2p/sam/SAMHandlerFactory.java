@@ -23,7 +23,6 @@ import net.i2p.util.Log;
  */
 public class SAMHandlerFactory {
 
-    private final static Log _log = new Log(SAMHandlerFactory.class);
 
     /**
      * Return the right SAM handler depending on the protocol version
@@ -37,11 +36,12 @@ public class SAMHandlerFactory {
     public static SAMHandler createSAMHandler(SocketChannel s, Properties i2cpProps) throws SAMException {
         String line;
         StringTokenizer tok;
+        Log log = new Log(SAMHandlerFactory.class);
 
         try {
             line = DataHelper.readLine(s.socket().getInputStream());
             if (line == null) {
-                _log.debug("Connection closed by client");
+                log.debug("Connection closed by client");
                 return null;
             }
             tok = new StringTokenizer(line.trim(), " ");
@@ -94,7 +94,7 @@ public class SAMHandlerFactory {
             s.write(ByteBuffer.wrap(("HELLO REPLY RESULT=OK VERSION="
                        + ver + "\n").getBytes("ISO-8859-1")));
         } catch (UnsupportedEncodingException e) {
-            _log.error("Caught UnsupportedEncodingException ("
+            log.error("Caught UnsupportedEncodingException ("
                        + e.getMessage() + ")");
             throw new SAMException("Character encoding error: "
                                    + e.getMessage());
@@ -120,11 +120,11 @@ public class SAMHandlerFactory {
             	handler = new SAMv3Handler(s, verMajor, verMinor, i2cpProps);
             	break;
             default:
-                _log.error("BUG! Trying to initialize the wrong SAM version!");
+                log.error("BUG! Trying to initialize the wrong SAM version!");
                 throw new SAMException("BUG! (in handler instantiation)");
             }
         } catch (IOException e) {
-            _log.error("Error creating the handler for version "+verMajor, e);
+            log.error("Error creating the handler for version "+verMajor, e);
             throw new SAMException("IOException caught during SAM handler instantiation");
         }
         return handler;

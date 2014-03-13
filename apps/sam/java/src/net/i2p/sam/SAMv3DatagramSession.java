@@ -19,12 +19,10 @@ import java.nio.ByteBuffer;
 
 public class SAMv3DatagramSession extends SAMDatagramSession implements SAMv3Handler.Session, SAMDatagramReceiver {
 	
-	private final static Log _log = new Log ( SAMv3DatagramSession.class );
-
-	final SAMv3Handler handler;
-	final SAMv3Handler.DatagramServer server;
-	final String nick;
-	final SocketAddress clientAddress;
+	private final SAMv3Handler handler;
+	private final SAMv3Handler.DatagramServer server;
+	private final String nick;
+	private final SocketAddress clientAddress;
 	
 	public String getNick() { return nick; }
 

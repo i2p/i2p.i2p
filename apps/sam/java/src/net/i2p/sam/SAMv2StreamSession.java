@@ -40,8 +40,6 @@ import net.i2p.util.Log;
 public class SAMv2StreamSession extends SAMStreamSession
 {
 
-		private final static Log _log = new Log ( SAMv2StreamSession.class );
-
 		/**
 		 * Create a new SAM STREAM session.
 		 *
@@ -139,12 +137,12 @@ public class SAMv2StreamSession extends SAMStreamSession
 				* @author mkvore
 		*/
 
-		public class StreamConnector implements Runnable
+		private class StreamConnector implements Runnable
 		{
 
-				private int id;
-				private Destination      dest ;
-				private I2PSocketOptions opts ;
+				private final int id;
+				private final Destination      dest ;
+				private final I2PSocketOptions opts ;
 
 				/**
 						* Create a new SAM STREAM session socket reader
@@ -231,7 +229,7 @@ public class SAMv2StreamSession extends SAMStreamSession
 		@Override
 		protected StreamSender newStreamSender ( I2PSocket s, int id ) throws IOException
 		{
-			return new v2StreamSender ( s, id ) ;
+			return new V2StreamSender ( s, id ) ;
 		}
 
 		@Override
@@ -241,29 +239,23 @@ public class SAMv2StreamSession extends SAMStreamSession
 			return new SAMv2StreamSessionSocketReader(s,id);
 		}
 
-		protected class v2StreamSender extends StreamSender
+		private class V2StreamSender extends StreamSender
 
 		{
 				private final List<ByteArray> _data;
 				private int _dataSize;
-				private final int _id;
 				private final ByteCache _cache;
 				private final OutputStream _out;
 				private volatile boolean _stillRunning, _shuttingDownGracefully;
 				private final Object runningLock = new Object();
-				private final I2PSocket i2pSocket;
 
-				public v2StreamSender ( I2PSocket s, int id ) throws IOException
+				public V2StreamSender ( I2PSocket s, int id ) throws IOException
 				{
 					super ( s, id );
 					_data = new ArrayList<ByteArray> ( 1 );
-					_dataSize = 0;
-					_id = id;
 					_cache = ByteCache.getInstance ( 10, 32 * 1024 );
 					_out = s.getOutputStream();
 					_stillRunning = true;
-					_shuttingDownGracefully = false;
-					i2pSocket = s;
 				}
 
 				/**
@@ -489,9 +481,6 @@ public class SAMv2StreamSession extends SAMStreamSession
 				public SAMv2StreamSessionSocketReader ( I2PSocket s, int id ) throws IOException
 				{
 					super ( s, id );
-					nolimit       = false ;
-					limit         = 0     ;
-					totalReceived = 0     ;
 				}
 
 				public void setLimit ( long limit, boolean nolimit )
@@ -505,6 +494,7 @@ public class SAMv2StreamSession extends SAMStreamSession
 					_log.debug ( "new limit set for socket reader " + id + " : " + (nolimit ? "NOLIMIT" : limit + " bytes" ) );
 				}
 
+			        @Override
 				public void run()
 				{
 					_log.debug ( "run() called for socket reader " + id );

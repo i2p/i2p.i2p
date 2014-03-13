@@ -24,8 +24,6 @@ import net.i2p.util.Log;
 public class SAMv2Handler extends SAMv1Handler implements SAMRawReceiver, SAMDatagramReceiver, SAMStreamReceiver
 {
 
-		private final static Log _log = new Log ( SAMv2Handler.class );
-
 
 		/**
 		 * Create a new SAM version 2 handler.  This constructor expects

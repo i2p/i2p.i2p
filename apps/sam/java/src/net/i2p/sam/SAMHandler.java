@@ -25,7 +25,7 @@ import net.i2p.util.Log;
  */
 public abstract class SAMHandler implements Runnable {
 
-    private final static Log _log = new Log(SAMHandler.class);
+    protected final Log _log;
 
     protected I2PAppThread thread = null;
     protected SAMBridge bridge = null;
@@ -53,6 +53,7 @@ public abstract class SAMHandler implements Runnable {
      */
     protected SAMHandler(SocketChannel s,
                          int verMajor, int verMinor, Properties i2cpProps) throws IOException {
+        _log = new Log(getClass());
         socket = s;
 
         this.verMajor = verMajor;
@@ -136,7 +137,7 @@ public abstract class SAMHandler implements Runnable {
     	try {
             writeBytes(ByteBuffer.wrap(str.getBytes("ISO-8859-1")), out);
         } catch (IOException e) {
-            _log.debug("Caught IOException", e);
+            //_log.debug("Caught IOException", e);
             return false;
         }
         return true ;

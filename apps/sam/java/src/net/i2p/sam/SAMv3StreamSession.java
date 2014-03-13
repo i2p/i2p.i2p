@@ -37,14 +37,12 @@ import java.nio.channels.SocketChannel;
 public class SAMv3StreamSession  extends SAMStreamSession implements SAMv3Handler.Session
 {
 
-		private final static Log _log = new Log ( SAMv3StreamSession.class );
+		private static final int BUFFER_SIZE = 1024 ;
 		
-		protected static final int BUFFER_SIZE = 1024 ;
-		
-		protected final Object socketServerLock = new Object();
-		protected I2PServerSocket socketServer = null;
+		private final Object socketServerLock = new Object();
+		private I2PServerSocket socketServer;
 	
-		protected final String nick ;
+		private final String nick ;
 		
 		public String getNick() {
 			return nick ;
@@ -210,12 +208,12 @@ public class SAMv3StreamSession  extends SAMStreamSession implements SAMv3Handle
 	    	(new Thread(rec.getThreadGroup(), new I2PAppThread(forwarder, "SAMStreamForwarder"), "SAMStreamForwarder")).start();
 	    }
 	    
-	    public class SocketForwarder extends Thread
+	    private static class SocketForwarder extends Thread
 	    {
-	    	final String host;
-	    	final int port;
-	    	final SAMv3StreamSession session;
-	    	final boolean verbose;
+	    	private final String host;
+	    	private final int port;
+	    	private final SAMv3StreamSession session;
+	    	private final boolean verbose;
 	    	
 	    	SocketForwarder(String host, int port, SAMv3StreamSession session, boolean verbose) {
 	    		this.host = host ;
@@ -248,12 +246,6 @@ public class SAMv3StreamSession  extends SAMStreamSession implements SAMv3Handle
 	    			catch ( IOException e ) {
 	    				continue ;
 	    			}
-	    			if (clientServerSock==null) {
-	    				try {
-	    					i2ps.close();
-	    				} catch (IOException ee) {}
-	    				continue ;
-	    			}
 
 	    			// build pipes between both sockets
 	    			try {
@@ -280,11 +272,11 @@ public class SAMv3StreamSession  extends SAMStreamSession implements SAMv3Handle
 	    	}
 	    }
 
-	    public static class Pipe extends Thread
+	    private static class Pipe extends Thread
 	    {
-	    	final ReadableByteChannel in  ;
-	    	final WritableByteChannel out ;
-	    	final ByteBuffer buf ;
+	    	private final ReadableByteChannel in  ;
+	    	private final WritableByteChannel out ;
+	    	private final ByteBuffer buf ;
 	    	
 	    	public Pipe(ReadableByteChannel in, WritableByteChannel out, String name)
 	    	{

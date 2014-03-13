@@ -34,7 +34,7 @@ import net.i2p.util.Log;
  */
 public class SAMUtils {
 
-    private final static Log _log = new Log(SAMUtils.class);
+    //private final static Log _log = new Log(SAMUtils.class);
 
     /**
      * Generate a random destination key
@@ -43,7 +43,7 @@ public class SAMUtils {
      * @param pub Stream used to write the public key (may be null)
      */
     public static void genRandomKey(OutputStream priv, OutputStream pub) {
-        _log.debug("Generating random keys...");
+        //_log.debug("Generating random keys...");
         try {
             I2PClient c = I2PClientFactory.createClient();
             Destination d = c.createDestination(priv);
@@ -161,7 +161,7 @@ public class SAMUtils {
 
             pos = token.indexOf("=");
             if (pos == -1) {
-                _log.debug("Error in params format");
+                //_log.debug("Error in params format");
                 throw new SAMException("Bad formatting for param [" + token + "]");
             }
             param = token.substring(0, pos);
@@ -179,9 +179,9 @@ public class SAMUtils {
             value.setLength(0);
         }
 
-        if (_log.shouldLog(Log.DEBUG)) {
-            _log.debug("Parsed properties: " + dumpProperties(props));
-        }
+        //if (_log.shouldLog(Log.DEBUG)) {
+        //    _log.debug("Parsed properties: " + dumpProperties(props));
+        //}
 
         return props;
     }

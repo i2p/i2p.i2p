@@ -43,23 +43,8 @@ import net.i2p.util.I2PAppThread;
 
 public class SAMv3Handler extends SAMv1Handler
 {
-	private final static Log _log = new Log ( SAMv3Handler.class );
-
-	protected SAMv3RawSession rawSession = null ;
-	protected SAMv3DatagramSession datagramSession = null ;
-	protected SAMv3StreamSession streamSession = null ;
 	
-	protected SAMRawSession getRawSession() {
-		return rawSession ;
-	}
-	protected SAMDatagramSession getDatagramSession() {
-		return datagramSession ;
-	}
-	protected SAMStreamSession getStreamSession() {
-		return streamSession ;
-	}
-	
-	protected Session session = null ;
+	private Session session;
 	
 	interface Session {
 		String getNick();
@@ -103,25 +88,27 @@ public class SAMv3Handler extends SAMv1Handler
 		return (verMajor == 3 && verMinor == 0) ;
 	}
 
-	static public class DatagramServer  {
+	public static class DatagramServer  {
 		
-		private static DatagramServer _instance = null ;
-		private static DatagramChannel server = null ;
+		private static DatagramServer _instance;
+		private static DatagramChannel server;
 		
 		public static DatagramServer getInstance() throws IOException {
 			return getInstance(new Properties());
 		}
 		
 		public static DatagramServer getInstance(Properties props) throws IOException {
-			if (_instance==null) {
-				_instance = new DatagramServer(props);
+			synchronized(DatagramServer.class) {
+				if (_instance==null)
+					_instance = new DatagramServer(props);
+				return _instance ;
 			}
-			return _instance ;
 		}
 		
 		public DatagramServer(Properties props) throws IOException {
-			if (server==null) {
-				server = DatagramChannel.open();
+			synchronized(DatagramServer.class) {
+				if (server==null)
+					server = DatagramChannel.open();
 			}
 			
 			String host = props.getProperty(SAMBridge.PROP_DATAGRAM_HOST, SAMBridge.DEFAULT_DATAGRAM_HOST);
@@ -143,7 +130,7 @@ public class SAMv3Handler extends SAMv1Handler
 		
 		static class Listener implements Runnable {
 			
-			final DatagramChannel server;
+			private final DatagramChannel server;
 			
 			public Listener(DatagramChannel server)
 			{
@@ -171,9 +158,9 @@ public class SAMv3Handler extends SAMv1Handler
 		}
 	}
 
-	public static class MessageDispatcher implements Runnable
+	private static class MessageDispatcher implements Runnable
 	{
-		final ByteArrayInputStream is;
+		private final ByteArrayInputStream is;
 		
 		public MessageDispatcher(byte[] buf)
 		{
@@ -181,23 +168,19 @@ public class SAMv3Handler extends SAMv1Handler
 		}
 		
 		public void run() {
-			String header = null ;
-			String nick ;
-			String dest ;
-			String version ;
-
 			try {
-				header = DataHelper.readLine(is).trim();
+				String header = DataHelper.readLine(is).trim();
 				StringTokenizer tok = new StringTokenizer(header, " ");
 				if (tok.countTokens() != 3) {
 					// This is not a correct message, for sure
-					_log.debug("Error in message format");
+					//_log.debug("Error in message format");
+					// FIXME log? throw?
 					return;
 				}
-				version = tok.nextToken();
+				String version = tok.nextToken();
 				if (!"3.0".equals(version)) return ;
-				nick = tok.nextToken();
-				dest = tok.nextToken();
+				String nick = tok.nextToken();
+				String dest = tok.nextToken();
 
 				byte[] data = new byte[is.available()];
 				is.read(data);
@@ -205,23 +188,24 @@ public class SAMv3Handler extends SAMv1Handler
 				if (rec!=null) {
 					rec.getHandler().session.sendBytes(dest,data);
 				}
-			} catch (Exception e) {}
+			} catch (Exception e) {
+				// FIXME log? throw?
+			}
 		}
 	}
 	
 	public static class SessionRecord
 	{
-		protected final String m_dest ;
-		protected final Properties m_props ;
-		protected ThreadGroup m_threadgroup ;
-		protected final SAMv3Handler m_handler ;
+		private final String m_dest ;
+		private final Properties m_props ;
+		private ThreadGroup m_threadgroup ;
+		private final SAMv3Handler m_handler ;
 
 		public SessionRecord( String dest, Properties props, SAMv3Handler handler )
 		{
 			m_dest = dest; 
 			m_props = new Properties() ;
 			m_props.putAll(props);
-			m_threadgroup = null ;
 			m_handler = handler ;
 		}
 
@@ -269,7 +253,7 @@ public class SAMv3Handler extends SAMv1Handler
 			static final long serialVersionUID = 0x1 ;
 		}
 		
-		final HashMap<String, SessionRecord> map;
+		private final HashMap<String, SessionRecord> map;
 
 		public SessionsDB() {
 			map = new HashMap<String, SessionRecord>() ;
@@ -315,16 +299,15 @@ public class SAMv3Handler extends SAMv1Handler
 		}
 	}
 
-	public static SessionsDB sSessionsHash = new SessionsDB() ;
+	public static final SessionsDB sSessionsHash = new SessionsDB() ;
 
 	public String getClientIP()
 	{
 		return this.socket.socket().getInetAddress().getHostAddress();
 	}
 	
-	boolean stolenSocket = false ;
-	
-	boolean streamForwardingSocket = false ;
+	private boolean stolenSocket;
+	private boolean streamForwardingSocket;
 	
 	public void stealSocket()
 	{
@@ -423,7 +406,7 @@ public class SAMv3Handler extends SAMv1Handler
 			{
 				if (this.getStreamSession()!=null) {
 					try {
-						this.streamSession.stopForwardingIncoming();
+						((SAMv3StreamSession)streamSession).stopForwardingIncoming();
 					} catch (SAMException e) {
 						_log.error("Error while stopping forwarding connections: " + e.getMessage());
 					} catch (InterruptedIOException e) {
@@ -540,15 +523,18 @@ public class SAMv3Handler extends SAMv1Handler
 
 				if (style.equals("RAW")) {
 					DatagramServer.getInstance(i2cpProps);
-					rawSession = newSAMRawSession(nick);
-					this.session = rawSession ;
+					SAMv3RawSession v3 = newSAMRawSession(nick);
+                                        rawSession = v3;
+					this.session = v3;
 				} else if (style.equals("DATAGRAM")) {
 					DatagramServer.getInstance(i2cpProps);
-					datagramSession = newSAMDatagramSession(nick);
-					this.session = datagramSession ;
+					SAMv3DatagramSession v3 = newSAMDatagramSession(nick);
+					datagramSession = v3;
+					this.session = v3;
 				} else if (style.equals("STREAM")) {
-					streamSession = newSAMStreamSession(nick);
-					this.session = streamSession ;
+					SAMv3StreamSession v3 = newSAMStreamSession(nick);
+					streamSession = v3;
+					this.session = v3;
 				} else {
 					_log.debug("Unrecognized SESSION STYLE: \"" + style +"\"");
 					return writeString("SESSION STATUS RESULT=I2P_ERROR MESSAGE=\"Unrecognized SESSION STYLE\"\n");
@@ -585,19 +571,19 @@ public class SAMv3Handler extends SAMv1Handler
 	/**
 	 * @throws NPE if login nickname is not registered
 	 */
-	SAMv3StreamSession newSAMStreamSession(String login )
+	private SAMv3StreamSession newSAMStreamSession(String login )
 	throws IOException, DataFormatException, SAMException
 	{
 		return new SAMv3StreamSession( login ) ;
 	}
 
-	SAMv3RawSession newSAMRawSession(String login )
+	private SAMv3RawSession newSAMRawSession(String login )
 	throws IOException, DataFormatException, SAMException, I2PSessionException
 	{
 		return new SAMv3RawSession( login ) ;
 	}
 
-	SAMv3DatagramSession newSAMDatagramSession(String login )
+	private SAMv3DatagramSession newSAMDatagramSession(String login )
 	throws IOException, DataFormatException, SAMException, I2PSessionException
 	{
 		return new SAMv3DatagramSession( login ) ;
@@ -691,7 +677,7 @@ public class SAMv3Handler extends SAMv1Handler
 			props.remove("DESTINATION");
 
 			try {
-				streamSession.connect( this, dest, props );
+				((SAMv3StreamSession)streamSession).connect( this, dest, props );
 				return true ;
 			} catch (DataFormatException e) {
 				_log.debug("Invalid destination in STREAM CONNECT message");
@@ -718,7 +704,7 @@ public class SAMv3Handler extends SAMv1Handler
 		try {
 			try {
 				streamForwardingSocket = true ;
-				streamSession.startForwardingIncoming(props);
+				((SAMv3StreamSession)streamSession).startForwardingIncoming(props);
 				notifyStreamResult( true, "OK", null );
 				return true ;
 			} catch (SAMException e) {
@@ -736,7 +722,7 @@ public class SAMv3Handler extends SAMv1Handler
 		try {
 			try {
 				notifyStreamResult(verbose, "OK", null);
-				streamSession.accept(this, verbose);
+				((SAMv3StreamSession)streamSession).accept(this, verbose);
 				return true ;
 			} catch (InterruptedIOException e) {
 				_log.debug("STREAM ACCEPT failed: " + e.getMessage());

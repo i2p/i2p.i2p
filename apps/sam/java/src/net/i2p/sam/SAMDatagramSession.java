@@ -27,8 +27,7 @@ import net.i2p.util.Log;
  */
 public class SAMDatagramSession extends SAMMessageSession {
 
-    private final static Log _log = new Log(SAMDatagramSession.class);
-    public static int DGRAM_SIZE_MAX = 31*1024;
+    public static final int DGRAM_SIZE_MAX = 31*1024;
 
     // FIXME make final after fixing SAMv3DatagramSession override
     protected SAMDatagramReceiver recv;

@@ -20,11 +20,10 @@ import net.i2p.util.Log;
  */
 public class SAMv3RawSession extends SAMRawSession  implements SAMv3Handler.Session, SAMRawReceiver {
 	
-	final String nick;
-	final SAMv3Handler handler;
-	final SAMv3Handler.DatagramServer server;
-	private final static Log _log = new Log ( SAMv3DatagramSession.class );
-	final SocketAddress clientAddress;
+	private final String nick;
+	private final SAMv3Handler handler;
+	private final SAMv3Handler.DatagramServer server;
+	private final SocketAddress clientAddress;
 
 	public String getNick() { return nick; }
 

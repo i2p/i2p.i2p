@@ -32,7 +32,7 @@ import net.i2p.util.Log;
  */
 public abstract class SAMMessageSession {
 
-    private final static Log _log = new Log(SAMMessageSession.class);
+    protected final Log _log;
 
     private I2PSession session = null;
 
@@ -48,10 +48,8 @@ public abstract class SAMMessageSession {
      * @throws I2PSessionException 
      */
     protected SAMMessageSession(String dest, Properties props) throws IOException, DataFormatException, I2PSessionException {
-        ByteArrayInputStream bais;
-
-        bais = new ByteArrayInputStream(Base64.decode(dest));
-
+        _log = new Log(getClass());
+        ByteArrayInputStream bais = new ByteArrayInputStream(Base64.decode(dest));
         initSAMMessageSession(bais, props);
     }
 
@@ -65,11 +63,11 @@ public abstract class SAMMessageSession {
      * @throws I2PSessionException 
      */
     protected SAMMessageSession(InputStream destStream, Properties props) throws IOException, DataFormatException, I2PSessionException {
+        _log = new Log(getClass());
         initSAMMessageSession(destStream, props);
     }
 
     private void initSAMMessageSession (InputStream destStream, Properties props) throws IOException, DataFormatException, I2PSessionException {
-
         _log.debug("Initializing SAM message-based session");
 
         handler = new SAMMessageSessionHandler(destStream, props);

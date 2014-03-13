@@ -19,6 +19,7 @@ import java.nio.channels.SocketChannel;
 import java.nio.ByteBuffer;
 import java.util.Properties;
 import java.util.StringTokenizer;
+import java.util.concurrent.atomic.AtomicLong;
 
 import net.i2p.I2PException;
 import net.i2p.client.I2PClient;
@@ -35,20 +36,17 @@ import net.i2p.util.Log;
  * @author human
  */
 public class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramReceiver, SAMStreamReceiver {
-  protected int verMajorId = 1;
-  protected int verMinorId = 0;
     
-    private final static Log _log = new Log(SAMv1Handler.class);
+    protected SAMRawSession rawSession;
+    protected SAMDatagramSession datagramSession;
+    protected SAMStreamSession streamSession;
 
-    protected SAMRawSession rawSession = null;
-    protected SAMDatagramSession datagramSession = null;
-    protected SAMStreamSession streamSession = null;
     protected SAMRawSession getRawSession() {return rawSession ;}
     protected SAMDatagramSession getDatagramSession() {return datagramSession ;}	
     protected SAMStreamSession getStreamSession() {return streamSession ;}
 
     protected final long _id;
-    protected static volatile long __id = 0;
+    private static final AtomicLong __id = new AtomicLong();
     
     /**
      * Create a new SAM version 1 handler.  This constructor expects
@@ -78,7 +76,7 @@ public class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatag
      */
     public SAMv1Handler(SocketChannel s, int verMajor, int verMinor, Properties i2cpProps) throws SAMException, IOException {
         super(s, verMajor, verMinor, i2cpProps);
-        _id = ++__id;
+        _id = __id.incrementAndGet();
         _log.debug("SAM version 1 handler instantiated");
 
     if ( ! verifVersion() ) {

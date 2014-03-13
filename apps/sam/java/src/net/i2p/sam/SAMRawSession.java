@@ -23,7 +23,6 @@ import net.i2p.util.Log;
  */
 public class SAMRawSession extends SAMMessageSession {
 
-    private final static Log _log = new Log(SAMRawSession.class);
     public static final int RAW_SIZE_MAX = 32*1024;
 
     // FIXME make final after fixing SAMv3DatagramSession override
