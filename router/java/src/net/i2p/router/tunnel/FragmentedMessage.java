@@ -57,8 +57,8 @@ class FragmentedMessage {
      */
     public boolean receive(int fragmentNum, byte payload[], int offset, int length, boolean isLast) {
         if (fragmentNum <= 0 || fragmentNum >= MAX_FRAGMENTS) {
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("Fragment # == " + fragmentNum + " for messageId " + _messageId);
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Bad followon fragment # == " + fragmentNum + " for messageId " + _messageId);
             return false;
         }
         if (length <= 0 || length > MAX_FRAGMENT_SIZE) {

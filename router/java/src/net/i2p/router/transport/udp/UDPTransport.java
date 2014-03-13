@@ -2908,8 +2908,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 }
 
             if (!_expireBuffer.isEmpty()) {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Expiring " + _expireBuffer.size() + " peers");
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Expiring " + _expireBuffer.size() + " peers");
                 for (PeerState peer : _expireBuffer) {
                     sendDestroy(peer);
                     dropPeer(peer, false, "idle too long");
