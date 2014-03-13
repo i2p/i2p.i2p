@@ -1,9 +1,12 @@
-#!/bin/sh  -e
+#!/bin/sh
+
+set -e
 
 I2PHOME=/var/lib/i2p
 I2PSYSUSER=i2psvc
 
 conffile="/etc/default/i2p"
+systemdservice="/lib/systemd/system/i2p.service"
 
 # Source debconf library -- we have a Depends line
 # to make sure it is there...
@@ -57,6 +60,20 @@ case "$1" in
             < $conffile > $conffile.tmp
         mv -f $conffile.tmp $conffile
 
+        if [ -e "$systemdservice" ]; then
+            sed -e "s/User=.*/User=$I2PUSER/" < "$systemdservice" > "$systemdservice.tmp"
+            mv -f "$systemdservice.tmp" "$systemdservice"
+            chmod 0644 -f "$systemdservice"
+            if [ -x /bin/systemctl ]; then
+                    systemctl --system daemon-reload
+                    if [ $RUN_DAEMON = 'true' ]; then
+                            systemctl enable i2p.service
+                    else
+                            systemctl disable i2p.service
+                    fi
+            fi
+        fi
+
         sed -e "s/^ *wrapper\.java\.maxmemory=.*/wrapper\.java\.maxmemory=$MEMORYLIMIT/" \
             < /etc/i2p/wrapper.config > /etc/i2p/wrapper.config.tmp
         mv -f /etc/i2p/wrapper.config.tmp /etc/i2p/wrapper.config
@@ -72,7 +89,7 @@ case "$1" in
         usermod -c "I2P Router Daemon" -d $I2PHOME -g $I2PSYSUSER -s "/bin/false" \
             $I2PSYSUSER -e 1 > /dev/null 2>&1 || true
     else
-        adduser --system --quiet --group --home $I2PHOME $I2PSYSUSER
+        adduser --system --quiet --group --home $I2PHOME $I2PSYSUSER > /dev/null 2>&1
     fi
 
     [ -d /var/log/i2p ] || mkdir -m0750 /var/log/i2p

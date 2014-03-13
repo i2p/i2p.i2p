@@ -36,6 +36,10 @@ export DEBIANVERSION := $(shell dpkg-parsechangelog |awk -F' ' '/^Version:/{prin
 
 %:
 	dh $@ --with quilt
+	# with systemd needs dh-systemd which isn't available in Wheezy (except from backports),
+	# and is only Ubuntu as of "Saucy". The official packages will enable this for Debian unstable and
+	# Ubuntu Saucy (and newer)
+	#dh $@ --with systemd,quilt
 
 clean: createcopyright
 
@@ -49,6 +53,13 @@ override_dh_auto_clean:
 	debconf-updatepo
 
 override_dh_auto_build:
+
+# Uncomment the next override line for systems that support dh-systemd
+# (currently Debian unstable and Ubuntu Saucy (and newer))
+#override_dh_systemd_enable:
+	# We purposely do not set I2P to start at boot.
+	# This matches the behavior of the initscript
+	# and the setting RUN_DAEMON=false in /etc/default/i2p
 
 binary-indep: build-indep
 build-indep:

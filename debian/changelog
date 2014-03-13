@@ -1,3 +1,12 @@
+i2p (0.9.11-2) UNRELEASED; urgency=medium
+
+  * systemd support in Ubuntu Saucy (and newer) and Debian unstable (ticket
+    #1208)
+  * Set homepage address to geti2p.net
+  * Bump standards version (no source changes needed)
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Thu, 13 Mar 2014 01:10:46 +0000
+
 i2p (0.9.11-1) unstable; urgency=medium
 
   * New release

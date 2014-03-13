@@ -1,0 +1,26 @@
+[Unit]
+Description=load-balanced unspoofable packet switching network
+After=network.target
+
+[Service]
+Type=forking
+EnvironmentFile=/etc/default/i2p
+Environment="I2P_ARGS=/etc/i2p/wrapper.config \
+ wrapper.java.additional.1=-DloggerFilenameOverride=/var/log/i2p/log-router-@.txt \
+ wrapper.java.additional.10=-Dwrapper.logfile=/var/log/i2p/wrapper.log \
+ wrapper.java.additional.11=-Di2p.dir.pid=/run/i2p \
+ wrapper.java.additional.12=-Di2p.dir.temp=/tmp/i2p-daemon \
+ wrapper.logfile=/var/log/i2p/wrapper.log \
+ wrapper.pidfile=/run/i2p/i2p.pid\
+ wrapper.java.pidfile=/run/i2p/routerjvm.pid \
+ wrapper.daemonize=TRUE" TZ=UTC
+User=i2psvc
+PermissionsStartOnly=true
+ExecStartPre=/bin/mkdir -p /run/i2p /tmp/i2p-daemon
+ExecStartPre=/bin/chown -R ${I2PUSER}:${I2PUSER} /var/log/i2p /run/i2p /tmp/i2p-daemon
+ExecStartPre=/bin/chmod 750 /var/log/i2p
+ExecStart=/usr/sbin/wrapper "$I2P_ARGS"
+ExecStopPost=/bin/rm -rf /run/i2p /tmp/i2p-daemon
+
+[Install]
+WantedBy=multi-user.target

@@ -1,20 +1,24 @@
 Source: i2p
 Maintainer: Kill Your TV <killyourtv@i2pmail.org>
 Section: net
-Standards-Version: 3.9.4
+Standards-Version: 3.9.5
 Priority: optional
 Bugs: mailto:killyourtv@i2pmail.org
-Homepage: http://www.i2p2.de/
-Build-Depends: debhelper (>= 7.0.50~),
- ant,
- debconf,
- default-jdk,
- gettext,
- libgmp3-dev,
-# uncomment the next line for PPA builds
-# libservice-wrapper-java,
- libcommons-logging-java,
- po-debconf
+Homepage: https://geti2p.net
+Build-Depends: debhelper (>= 7.0.50~)
+ ,ant (>= 1.8)
+ ,ant-optional
+ ,debconf
+ ,default-jdk | openjdk-7-jdk | openjdk-6-jdk
+ ,gettext
+ ,libgmp3-dev
+# uncomment the next line for official builds
+# ,libservice-wrapper-java
+ ,libcommons-logging-java
+ ,hardening-wrapper
+ ,po-debconf
+# Uncomment the next line for Debian unstable or Ubuntu Saucy (and newer)
+# ,dh-systemd
 
 Package: i2p
 Architecture: all
@@ -49,46 +53,44 @@ Description: Java Big Integer library
  the ones used by I2P. You can expect to see a 5-7x speed improvement on certain
  tasks, such as elGamal encryption/decryption.
 
-Package: i2p-doc
-Architecture: all
-Section: doc
-Depends: ${misc:Depends}
-Suggests: i2p, default-jdk-doc
-Description: Documentation for I2P
- I2P is an anonymizing network, offering a simple layer that identity-sensitive
- applications can use to securely communicate. All data is wrapped with several
- layers of encryption, and the network is both distributed and dynamic, with no
- trusted parties.
- .
- This package contains the Javadoc files.
+#Package: i2p-doc
+#Architecture: all
+#Section: doc
+#Depends: ${misc:Depends}
+#Suggests: i2p, default-jdk-doc
+#Description: Documentation for I2P
+# I2P is an anonymizing network, offering a simple layer that identity-sensitive
+# applications can use to securely communicate. All data is wrapped with several
+# layers of encryption, and the network is both distributed and dynamic, with no
+# trusted parties.
+# .
+# This package contains the Javadoc files.
 
 Package: i2p-router
 Architecture: all
 Section: net
 Priority: optional
 Depends: ${misc:Depends}, ${java:Depends}, ${shlibs:Depends},
- openjdk-6-jre-headless | openjdk-7-jre-headless | default-jre-headless | java5-runtime-headless | java6-runtime-headless, libecj-java
+ openjdk-7-jre-headless | openjdk-6-jre-headless | default-jre-headless | java7-runtime-headless | java6-runtime-headless, libecj-java
 Replaces: i2p ( << 0.8.6-5)
 Breaks: i2p (<< 0.8.6-5)
-Recommends: libjbigi-jni (>= ${source:Version}), libjbigi-jni (<< ${source:Version}.1~), ttf-dejavu
-Suggests: tor,
- i2p-messenger,
- i2phex,
- i2p-tahoe-lafs,
- imule,
- i2pfox,
- irc-client,
- itoopie,
- jircii,
- mail-client,
- mail-reader,
- news-reader,
- polipo,
- privoxy,
- robert,
- syndie,
- www-browser,
- xul-ext-torbutton
+Recommends: libjbigi-jni, ttf-dejavu
+Suggests: tor
+ ,i2p-messenger
+ ,i2phex
+ ,i2p-tahoe-lafs
+ ,imule
+ ,irc-client
+ ,itoopie
+ ,mail-client
+ ,mail-reader
+ ,news-reader
+ ,polipo
+ ,privox
+ ,robert
+ ,syndie
+ ,www-browser
+ ,xul-ext-torbutton
 Description: Load-balanced unspoofable packet switching network
  I2P is an anonymizing network, offering a simple layer that identity-sensitive
  applications can use to securely communicate. All data is wrapped with several
