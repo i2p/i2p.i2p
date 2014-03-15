@@ -151,11 +151,23 @@ public class KeysAndCert extends DataStructureImpl {
         return buf.toString();
     }
     
+    /**
+     *  Throws IllegalStateException if keys and cert are not initialized,
+     *  as of 0.9.12. Prior to that, returned null.
+     *
+     *  @throws IllegalStateException
+     */
     @Override
     public Hash calculateHash() {
         return getHash();
     }
 
+    /**
+     *  Throws IllegalStateException if keys and cert are not initialized,
+     *  as of 0.9.12. Prior to that, returned null.
+     *
+     *  @throws IllegalStateException
+     */
     public Hash getHash() {
         if (__calculatedHash != null)
             return __calculatedHash;

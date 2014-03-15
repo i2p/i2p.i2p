@@ -101,9 +101,15 @@ public class RouterIdentityTest extends StructureTest {
         ident.calculateHash();
     }
     
-    public void testBadHash() throws Exception{
+    public void testBadHash() throws Exception {
         RouterIdentity ident = new RouterIdentity();
-        ident.getHash();
+        boolean error = false;
+        try {
+            ident.getHash();
+        } catch (IllegalStateException ise) {
+            error = true;
+        }
+        assertTrue(error);
     }
     
     
