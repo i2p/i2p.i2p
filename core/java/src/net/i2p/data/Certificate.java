@@ -244,20 +244,20 @@ public class Certificate extends DataStructureImpl {
         StringBuilder buf = new StringBuilder(64);
         buf.append("[Certificate: type: ");
         if (getCertificateType() == CERTIFICATE_TYPE_NULL)
-            buf.append("Null certificate");
+            buf.append("Null");
         else if (getCertificateType() == CERTIFICATE_TYPE_KEY)
-            buf.append("Key certificate");
+            buf.append("Key");
         else if (getCertificateType() == CERTIFICATE_TYPE_HASHCASH)
-            buf.append("Hashcash certificate");
+            buf.append("HashCash");
         else if (getCertificateType() == CERTIFICATE_TYPE_HIDDEN)
-            buf.append("Hidden certificate");
+            buf.append("Hidden");
         else if (getCertificateType() == CERTIFICATE_TYPE_SIGNED)
-            buf.append("Signed certificate");
+            buf.append("Signed");
         else
-            buf.append("Unknown certificate type (").append(getCertificateType()).append(")");
+            buf.append("Unknown type (").append(getCertificateType()).append(')');
 
         if (_payload == null) {
-            buf.append(" null payload");
+            buf.append(" payload: null");
         } else {
             buf.append(" payload size: ").append(_payload.length);
             if (getCertificateType() == CERTIFICATE_TYPE_HASHCASH) {
@@ -334,7 +334,8 @@ public class Certificate extends DataStructureImpl {
         /** Overridden for efficiency */
         @Override
         public int hashCode() {
-            return 99999;
+            // must be the same as type + payload above
+            return 0;
         }
     }
 }

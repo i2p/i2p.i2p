@@ -1,5 +1,14 @@
+2014-03-15 zzz
+ * Certificate: Fix null cert hash code
+ * Hash: Cleanup of cached hash
+ * NetDB: Randomize returned DSM timestamp
+
+2014-03-13 zzz
+ * SAM: Class, field, findbugs cleanups
+
 2014-03-12 zzz
  * Console: Handle ISO-639-2 language codes (ticket #1229)
+ * I2PTunnel: Send message to client on HTTP Server OOM or out of threads
  * Streaming:
    - Track recently closed connections (ticket #1161)
    - Workaround for jwebcache and i2phex (ticket #1231)

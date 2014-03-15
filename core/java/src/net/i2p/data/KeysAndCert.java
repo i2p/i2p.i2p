@@ -34,7 +34,7 @@ public class KeysAndCert extends DataStructureImpl {
     protected PublicKey _publicKey;
     protected SigningPublicKey _signingKey;
     protected Certificate _certificate;
-    protected Hash __calculatedHash;
+    private Hash __calculatedHash;
     protected byte[] _padding;
 
     public Certificate getCertificate() {
@@ -48,7 +48,6 @@ public class KeysAndCert extends DataStructureImpl {
         if (_certificate != null)
             throw new IllegalStateException();
         _certificate = cert;
-        __calculatedHash = null;
     }
 
     public PublicKey getPublicKey() {
@@ -62,7 +61,6 @@ public class KeysAndCert extends DataStructureImpl {
         if (_publicKey != null)
             throw new IllegalStateException();
         _publicKey = key;
-        __calculatedHash = null;
     }
 
     public SigningPublicKey getSigningPublicKey() {
@@ -76,7 +74,6 @@ public class KeysAndCert extends DataStructureImpl {
         if (_signingKey != null)
             throw new IllegalStateException();
         _signingKey = key;
-        __calculatedHash = null;
     }
     
     /**
@@ -87,7 +84,6 @@ public class KeysAndCert extends DataStructureImpl {
         if (_padding != null)
             throw new IllegalStateException();
         _padding = padding;
-        __calculatedHash = null;
     }
     
     /**
@@ -109,7 +105,6 @@ public class KeysAndCert extends DataStructureImpl {
             _signingKey = spk;
             _certificate = cert;
         }
-        __calculatedHash = null;
     }
     
     public void writeBytes(OutputStream out) throws DataFormatException, IOException {
@@ -169,8 +164,10 @@ public class KeysAndCert extends DataStructureImpl {
             ByteArrayOutputStream baos = new ByteArrayOutputStream(400);
             writeBytes(baos);
             identBytes = baos.toByteArray();
-        } catch (Throwable t) {
-            return null;
+        } catch (IOException ioe) {
+            throw new IllegalStateException("KAC hash error", ioe);
+        } catch (DataFormatException dfe) {
+            throw new IllegalStateException("KAC hash error", dfe);
         }
         __calculatedHash = SHA256Generator.getInstance().calculateHash(identBytes);
         return __calculatedHash;

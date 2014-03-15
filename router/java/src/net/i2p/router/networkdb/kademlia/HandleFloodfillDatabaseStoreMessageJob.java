@@ -56,7 +56,7 @@ public class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
         Hash key = _message.getKey();
         DatabaseEntry entry = _message.getEntry();
         if (entry.getType() == DatabaseEntry.KEY_TYPE_LEASESET) {
-            getContext().statManager().addRateData("netDb.storeLeaseSetHandled", 1, 0);
+            getContext().statManager().addRateData("netDb.storeLeaseSetHandled", 1);
             if (_log.shouldLog(Log.INFO))
                 _log.info("Handling dbStore of leaseset " + _message);
                 //_log.info("Handling dbStore of leasset " + key + " with expiration of " 
@@ -119,7 +119,7 @@ public class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
             }
         } else if (entry.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO) {
             RouterInfo ri = (RouterInfo) entry;
-            getContext().statManager().addRateData("netDb.storeRouterInfoHandled", 1, 0);
+            getContext().statManager().addRateData("netDb.storeRouterInfoHandled", 1);
             if (_log.shouldLog(Log.INFO))
                 _log.info("Handling dbStore of router " + key + " with publishDate of " 
                           + new Date(ri.getPublished()));
@@ -163,7 +163,7 @@ public class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
         }
         
         long recvEnd = System.currentTimeMillis();
-        getContext().statManager().addRateData("netDb.storeRecvTime", recvEnd-recvBegin, 0);
+        getContext().statManager().addRateData("netDb.storeRecvTime", recvEnd-recvBegin);
         
         if (_message.getReplyToken() > 0) 
             sendAck();
@@ -174,7 +174,7 @@ public class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
         if (_fromHash != null) {
             if (invalidMessage == null) {
                 getContext().profileManager().dbStoreReceived(_fromHash, wasNew);
-                getContext().statManager().addRateData("netDb.storeHandled", ackEnd-recvEnd, 0);
+                getContext().statManager().addRateData("netDb.storeHandled", ackEnd-recvEnd);
             } else {
                 // Should we record in the profile?
                 if (_log.shouldLog(Log.WARN))
@@ -195,7 +195,7 @@ public class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                 if (_facade.shouldThrottleFlood(key)) {
                     if (_log.shouldLog(Log.WARN))
                         _log.warn("Too many recent stores, not flooding key: " + key);
-                    getContext().statManager().addRateData("netDb.floodThrottled", 1, 0);
+                    getContext().statManager().addRateData("netDb.floodThrottled", 1);
                     return;
                 }
                 long floodBegin = System.currentTimeMillis();
@@ -203,10 +203,10 @@ public class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                 // ERR: see comment in HandleDatabaseLookupMessageJob regarding hidden mode
                 //else if (!_message.getRouterInfo().isHidden())
                 long floodEnd = System.currentTimeMillis();
-                getContext().statManager().addRateData("netDb.storeFloodNew", floodEnd-floodBegin, 0);
+                getContext().statManager().addRateData("netDb.storeFloodNew", floodEnd-floodBegin);
             } else {
                 // don't flood it *again*
-                getContext().statManager().addRateData("netDb.storeFloodOld", 1, 0);
+                getContext().statManager().addRateData("netDb.storeFloodOld", 1);
             }
         }
     }
@@ -214,7 +214,11 @@ public class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
     private void sendAck() {
         DeliveryStatusMessage msg = new DeliveryStatusMessage(getContext());
         msg.setMessageId(_message.getReplyToken());
-        msg.setArrival(getContext().clock().now());
+        // Randomize for a little protection against clock-skew fingerprinting.
+        // But the "arrival" isn't used for anything, right?
+        // TODO just set to 0?
+        // TODO we have no session to garlic wrap this with, needs new message
+        msg.setArrival(getContext().clock().now() - getContext().random().nextInt(3*1000));
         /*
         if (FloodfillNetworkDatabaseFacade.floodfillEnabled(getContext())) {
             // no need to do anything but send it where they ask
@@ -232,7 +236,8 @@ public class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                     _log.warn("No outbound tunnel could be found");
                 return;
             } else {
-                getContext().tunnelDispatcher().dispatchOutbound(msg, outTunnel.getSendTunnelId(0), _message.getReplyTunnel(), _message.getReplyGateway());
+                getContext().tunnelDispatcher().dispatchOutbound(msg, outTunnel.getSendTunnelId(0),
+                                                                 _message.getReplyTunnel(), _message.getReplyGateway());
             }
         //}
     }
