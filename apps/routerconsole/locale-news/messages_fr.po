@@ -2,24 +2,24 @@
 # Copyright (C) 2009 The I2P Project
 # This file is distributed under the same license as the routerconsole package.
 # To contribute translations, see http://www.i2p2.de/newdevelopers
-#
+# 
 # Translators:
 # Boxoa590, 2013
 # foo <foo@bar>, 2009
 # Boxoa590, 2013
+# Towatowa441, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-09-20 10:24+0000\n"
-"PO-Revision-Date: 2013-08-11 15:50+0000\n"
-"Last-Translator: kytv <killyourtv@i2pmail.org>\n"
-"Language-Team: French (http://www.transifex.com/projects/p/I2P/language/"
-"fr/)\n"
-"Language: fr\n"
+"POT-Creation-Date: 2013-07-13 21:46+0000\n"
+"PO-Revision-Date: 2014-02-24 19:24+0000\n"
+"Last-Translator: Towatowa441\n"
+"Language-Team: French (http://www.transifex.com/projects/p/I2P/language/fr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: fr\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 msgid "Congratulations on getting I2P installed!"
@@ -34,23 +34,18 @@ msgstr "Merci de {0}patienter{1} le temps qu''I2P démarre et trouve des pairs."
 
 #, java-format
 msgid ""
-"While you are waiting, please {0}adjust your bandwidth settings{1} on the {2}"
-"configuration page{3}."
-msgstr ""
-"Pendant ce temps, merci d''{0}adjuster vos réglages de bande passante{1} sur "
-"la page de {2}configuration{3}."
+"While you are waiting, please {0}adjust your bandwidth settings{1} on the "
+"{2}configuration page{3}."
+msgstr "Pendant ce temps, merci d''{0}adjuster vos réglages de bande passante{1} sur la page de {2}configuration{3}."
 
-msgid "Also you can setup your browser to use the I2P proxy to reach eepsites."
-msgstr ""
-"Aussi, vous pouvez configurer votre navigateur pour utiliser le proxy I2P "
-"pour atteindre les eepsites."
+msgid ""
+"Also you can setup your browser to use the I2P proxy to reach eepsites."
+msgstr "Aussi, vous pouvez configurer votre navigateur pour utiliser le proxy I2P pour atteindre les eepsites."
 
 msgid ""
 "Just enter 127.0.0.1 (or localhost) port 4444 as a http proxy into your "
 "browser settings."
-msgstr ""
-"Il suffit d'entrer en tant que proxy http dans les paramètres de votre "
-"navigateur 127.0.0.1 (ou localhost) port 4444."
+msgstr "Il suffit d'entrer en tant que proxy http dans les paramètres de votre navigateur 127.0.0.1 (ou localhost) port 4444."
 
 msgid "Do not use SOCKS for this."
 msgstr "Ne pas utiliser SOCKS pour cela."
@@ -58,22 +53,16 @@ msgstr "Ne pas utiliser SOCKS pour cela."
 #, java-format
 msgid ""
 "More information can be found on the {0}I2P browser proxy setup page{1}."
-msgstr ""
-"Davantage d''informations peuvent être trouvées sur la {0}page de "
-"configuration du proxy du navigateur I2P{1}."
+msgstr "Davantage d''informations peuvent être trouvées sur la {0}page de configuration du proxy du navigateur I2P{1}."
 
 #, java-format
 msgid ""
-"Once you have a \"shared clients\" destination listed on the left, please {0}"
-"check out{1} our {2}FAQ{3}."
-msgstr ""
-"Une fois que vous avez une indication \"clients partagés&hellip;\" listée "
-"sur la gauche, merci de {0}jeter un œil{1} à la {2}FAQ{3}."
+"Once you have a \"shared clients\" destination listed on the left, please "
+"{0}check out{1} our {2}FAQ{3}."
+msgstr "Une fois que vous avez une indication \"clients partagés&hellip;\" listée sur la gauche, merci de {0}jeter un œil{1} à la {2}FAQ{3}."
 
 #, java-format
 msgid ""
-"Point your IRC client to {0}localhost:6668{1} and say hi to us on {2}#i2p{3}."
-msgstr ""
-"Pointez votre client IRC sur {0}localhost:6668{1} et venez nous faire coucou "
-"sur <a href=\"irc://127.0.0.1:6668/i2p-fr\">#i2p-fr</a> ou "
+"Point your IRC client to {0}localhost:6668{1} and say hi to us on "
 "{2}#i2p{3}."
+msgstr "Pointez votre client IRC vers {0}localhost:6668{1} et dites nous bonjour dans {2}#i2p{3}."

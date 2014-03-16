@@ -15,7 +15,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-02-06 18:27+0000\n"
-"PO-Revision-Date: 2014-02-13 21:03+0000\n"
+"PO-Revision-Date: 2014-03-11 20:34+0000\n"
 "Last-Translator: sebx\n"
 "Language-Team: Polish (http://www.transifex.com/projects/p/I2P/language/pl/)\n"
 "MIME-Version: 1.0\n"
@@ -5456,15 +5456,15 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:465
 msgid "Try SSL first then non-SSL"
-msgstr ""
+msgstr "Spróbuj wpierw SSL, później nie-SSL"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:469
 msgid "Use SSL only"
-msgstr ""
+msgstr "Używaj tylko SSL"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:473
 msgid "Use non-SSL only"
-msgstr ""
+msgstr "Używaj tylko nie-SSL"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:475
 msgid "Reseed URLs"
@@ -5476,11 +5476,11 @@ msgstr "Włączyć HTTP Proxy?"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:483
 msgid "HTTP Proxy Host"
-msgstr ""
+msgstr "HTTP Proxy Host"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:487
 msgid "HTTP Proxy Port"
-msgstr ""
+msgstr "HTTP Proxy Port"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:491
 msgid "Use HTTP Proxy Authorization?"
@@ -5857,15 +5857,15 @@ msgstr "Aktualizować przez eepProxy?"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:466
 msgid "eepProxy host"
-msgstr ""
+msgstr "eepProxy host"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:470
 msgid "eepProxy port"
-msgstr ""
+msgstr "eepProxy port"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:478
 msgid "Update URLs"
-msgstr ""
+msgstr "Aktualizuj adresy URL"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:482
 msgid "Trusted keys"

@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-07-13 21:46+0000\n"
-"PO-Revision-Date: 2014-02-05 11:58+0000\n"
+"PO-Revision-Date: 2014-02-25 04:57+0000\n"
 "Last-Translator: plazmism <gomidori@live.jp>\n"
 "Language-Team: Japanese (http://www.transifex.com/projects/p/I2P/language/ja/)\n"
 "MIME-Version: 1.0\n"
@@ -60,5 +60,6 @@ msgstr "左にリストされている「共有クライアント」の宛先が
 
 #, java-format
 msgid ""
-"Point your IRC client to {0}localhost:6668{1} and say hi to us on {2}#i2p{3}."
-msgstr "IRCクライアントを{0}localhost:6668{1}に合わせ、 {2}#i2p{3}で私たちによろしくどうぞ。"
+"Point your IRC client to {0}localhost:6668{1} and say hi to us on "
+"{2}#i2p{3}."
+msgstr "IRC クライアントを {0}localhost:6668{1} にあわせて、  {2}#i2p{3} で私たちに挨拶してみてください。"

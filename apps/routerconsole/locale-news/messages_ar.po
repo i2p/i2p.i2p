@@ -2,22 +2,21 @@
 # Copyright (C) 2009 The I2P Project
 # This file is distributed under the same license as the routerconsole package.
 # To contribute translations, see http://www.i2p2.de/newdevelopers
-#
+# 
+# Translators:
 msgid ""
 msgstr ""
-"Project-Id-Version: I2P routerconsole\n"
+"Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-07-13 21:46+0000\n"
-"PO-Revision-Date: 2011-03-04 14:02-0000\n"
-"Last-Translator: hamada <hamada@mail.i2p>\n"
-"Language-Team: hamada@mail.i2p\n"
-"Language: ar\n"
+"PO-Revision-Date: 2014-02-23 16:51+0000\n"
+"Last-Translator: kytv <killyourtv@i2pmail.org>\n"
+"Language-Team: Arabic (http://www.transifex.com/projects/p/I2P/language/ar/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
-"&& n%100<=10 ? 3 : n%100>=11 ? 4 : 5;\n"
-"X-Generator: Virtaal 0.6.1\n"
+"Language: ar\n"
+"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
 
 msgid "Congratulations on getting I2P installed!"
 msgstr ""
@@ -31,11 +30,12 @@ msgstr "انتظر قليلا بينما يتم ربط الإتصال بباقي
 
 #, java-format
 msgid ""
-"While you are waiting, please {0}adjust your bandwidth settings{1} on the {2}"
-"configuration page{3}."
+"While you are waiting, please {0}adjust your bandwidth settings{1} on the "
+"{2}configuration page{3}."
 msgstr "بسنما يتم الإتصال {0}بتغير بيانات سرعة الشبكة في{1} قم {2}صفحة الخيارات{3}."
 
-msgid "Also you can setup your browser to use the I2P proxy to reach eepsites."
+msgid ""
+"Also you can setup your browser to use the I2P proxy to reach eepsites."
 msgstr ""
 
 msgid ""
@@ -53,11 +53,12 @@ msgstr ""
 
 #, java-format
 msgid ""
-"Once you have a \"shared clients\" destination listed on the left, please {0}"
-"check out{1} our {2}FAQ{3}."
+"Once you have a \"shared clients\" destination listed on the left, please "
+"{0}check out{1} our {2}FAQ{3}."
 msgstr "عندما عندما تظهر عبارة \"shared clients\" على اليسار يمكنك حينها {0}زيارة{1} {2}الأسئلة الشائعة{3}."
 
 #, java-format
 msgid ""
-"Point your IRC client to {0}localhost:6668{1} and say hi to us on {2}#i2p{3}."
-msgstr "IRC اتصل بخادم الدردشة الفورية  على {0}localhost:6668{1} {2}#i2p{3}."
+"Point your IRC client to {0}localhost:6668{1} and say hi to us on "
+"{2}#i2p{3}."
+msgstr ""
