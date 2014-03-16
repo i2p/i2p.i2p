@@ -1,3 +1,6 @@
+2014-03-16 zzz
+ * SSU: Fix corruption of introducer keys
+
 2014-03-15 zzz
  * Certificate: Fix null cert hash code
  * Hash: Cleanup of cached hash

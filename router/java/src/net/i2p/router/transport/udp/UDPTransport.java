@@ -1360,7 +1360,10 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             int valid = 0;
             for (int i = 0; i < ua.getIntroducerCount(); i++) {
                 // warning: this is only valid as long as we use the ident hash as their key.
-                PeerState peer = getPeerState(Hash.create(ua.getIntroducerKey(i)));
+                byte[] key = ua.getIntroducerKey(i);
+                if (key.length != Hash.HASH_LENGTH)
+                    continue;
+                PeerState peer = getPeerState(new Hash(key));
                 if (peer != null)
                     valid++;
             }

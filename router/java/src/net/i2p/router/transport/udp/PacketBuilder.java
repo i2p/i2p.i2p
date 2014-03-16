@@ -1108,7 +1108,10 @@ class PacketBuilder {
             SessionKey cipherKey = null;
             SessionKey macKey = null;
             // first look up by ikey, it is equal to router hash for now
-            PeerState bobState = transport.getPeerState(Hash.create(ikey));
+            PeerState bobState = null;
+            if (ikey.length == Hash.HASH_LENGTH) {
+                bobState = transport.getPeerState(new Hash(ikey));
+            }
             if (bobState == null) {
                 RemoteHostId rhid = new RemoteHostId(iaddr.getAddress(), iport);
                 bobState = transport.getPeerState(rhid);
