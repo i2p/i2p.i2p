@@ -21,6 +21,7 @@ _jsp\.java$
 \.war$
 .\deb$
 \.zip$
+\.torrent$
 ^\.
 ~$
 web-fragment.xml
