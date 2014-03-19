@@ -652,24 +652,18 @@
         <delete dir="./reports" />
         <delete file="installer/lib/izpack/patches.jar" failonerror="false" quiet="true" />
         <delete file="syndie-standalone.zip" failonerror="false" quiet="true" />
-        <delete failonerror="false" quiet="true">
-            <fileset dir="." includes="i2pinstall*jar i2p*deb libjbigi*deb i2p.fba ${sloccount.report.file} javadoc.zip i2pinstall*.exe i2pinstall*bz2" />
-        </delete>
         <delete file="i2psnark-standalone.zip" failonerror="false" quiet="true" />
         <delete file="BOB-one.jar" failonerror="false" quiet="true" />
-        <delete dir="debian/tmp" />
-        <delete dir="debian/db" />
-        <delete file="debian/files" />
-        <delete file="debian/build" />
-        <delete file="debian/substvars"/>
         <delete file="core/java/cobertura.ser"/>
+        <delete file="javadoc.zip" />
+        <delete file="i2p.fba" />
+        <delete file="${sloccount.report.file}" />
     </target>
 
     <target name="distclean" depends="clean">
-        <delete includeemptydirs="true" failonerror="false" >
-            <fileset dir="debian/packages" followSymlinks="false" />
+        <delete failonerror="false" quiet="true">
+            <fileset dir="." includes="i2pinstall* *.deb i2pupdate* i2psource*" />
         </delete>
-        <delete dir="debian/repo" />
         <ant dir="core/java/" target="distclean" />
         <ant dir="router/java/" target="distclean" />
         <ant dir="installer/java" target="distclean" />
