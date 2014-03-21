@@ -647,6 +647,25 @@
         </fail>
     </target>
 
+    <target name="-pre-release">
+            <echo message="================================================================" />
+            <echo message="Did you update these files?" />
+            <exec executable="ls" failonerror="true">
+                    <arg value="-l" />
+                    <arg value="history.txt" />
+                    <arg value="installer/install.xml" />
+                    <arg value="core/java/src/net/i2p/CoreVersion.java" />
+                    <arg value="router/java/src/net/i2p/router/RouterVersion.java" />
+            </exec>
+            <echo message="Everything is checked in, right? Let's be sure:" />
+            <exec executable="mtn" failonerror="true">
+                    <arg value="st" />
+            </exec>
+            <echo message="If there are any modified files above, stop now!" />
+            <echo message="================================================================" />
+            <sleep seconds="3"/>
+    </target>
+
     <target name="clean" depends="pkgclean" >
         <delete dir="./build" />
         <delete dir="./reports" />
@@ -662,7 +681,7 @@
 
     <target name="distclean" depends="clean">
         <delete failonerror="false" quiet="true">
-            <fileset dir="." includes="i2pinstall* *.deb i2pupdate* i2psource*" />
+            <fileset dir="." includes="i2pinstall* *.deb i2p_*.bz2 i2pupdate* i2psource*" />
         </delete>
         <ant dir="core/java/" target="distclean" />
         <ant dir="router/java/" target="distclean" />
@@ -1471,22 +1490,7 @@
 <!--
     <target name="release" depends="distclean, updaterWithJettyFixesAndJbigi , updater200WithJettyFixes, preppkg, installer, getReleaseNumber" >
 -->
-    <target name="release" depends="verifyReleaseBuildNumbers, distclean, testscripts, updaterWithJettyRepack, updater200WithJetty, delete-j6-update, installer-nowindows, delete-nonwindows, installer-windows" >
-        <echo message="================================================================" />
-        <echo message="Did you update these files?" />
-        <exec executable="ls" failonerror="true">
-            <arg value="-l" />
-            <arg value="history.txt" />
-            <arg value="installer/install.xml" />
-	    <arg value="core/java/src/net/i2p/CoreVersion.java" />
-	    <arg value="router/java/src/net/i2p/router/RouterVersion.java" />
-        </exec>
-        <echo message="Everything is checked in, right? Let's be sure:" />
-        <exec executable="mtn" failonerror="true">
-            <arg value="st" />
-        </exec>
-        <echo message="If there are any modified files above, stop now!" />
-
+    <target name="release" depends="verifyReleaseBuildNumbers, -pre-release, distclean, testscripts, updaterWithJettyRepack, updater200WithJetty, delete-j6-update, installer-nowindows, delete-nonwindows, installer-windows" >
         <echo message="New version number is ${release.number}" />
         <copy file="i2pupdate.zip" tofile="i2pupdate_${release.number}.zip" />
         <copy file="i2pinstall_${full.version}_windows-only.exe" tofile="i2pinstall_${release.number}_windows.exe" />
