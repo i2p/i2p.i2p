@@ -19,6 +19,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import net.i2p.CoreVersion;
 import net.i2p.I2PAppContext;
+import net.i2p.app.ClientApp;
+import net.i2p.app.ClientAppState;
 import net.i2p.data.DataHelper;
 import net.i2p.router.RouterContext;
 import net.i2p.router.RouterVersion;
@@ -602,6 +604,20 @@ public class PluginStarter implements Runnable {
             _pendingPluginClients.put(pluginName, new ConcurrentHashSet<SimpleTimer2.TimedEvent>());
         
         for(ClientAppConfig app : apps) {
+            // If the client is a running ClientApp that we want to stop,
+            // bypass all the logic below.
+            ClientApp ca = ctx.routerAppManager().getClientApp(app.className, LoadClientAppsJob.parseArgs(app.args));
+            if (ca != null && ca.getState() == ClientAppState.RUNNING) {
+                if (action.equals("stop")) {
+                    try {
+                        ca.shutdown(LoadClientAppsJob.parseArgs(app.stopargs));
+                    } catch (Throwable t) {
+                        throw new Exception(t);
+                    }
+                    continue;
+                }
+            }
+
             if (action.equals("start") && app.disabled)
                 continue;
             String argVal[];

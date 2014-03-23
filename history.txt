@@ -1,3 +1,6 @@
+2014-03-23 str4d
+ * Console: Handle stopping plugin ClientApps
+
 2014-03-16 zzz
  * SSU: Fix corruption of introducer keys
 
