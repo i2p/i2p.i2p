@@ -21,7 +21,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-02-06 18:27+0000\n"
-"PO-Revision-Date: 2014-03-06 19:24+0000\n"
+"PO-Revision-Date: 2014-03-23 12:02+0000\n"
 "Last-Translator: Towatowa441\n"
 "Language-Team: French (http://www.transifex.com/projects/p/I2P/language/fr/)\n"
 "MIME-Version: 1.0\n"
@@ -4920,11 +4920,11 @@ msgstr "Activer IPv6"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:516
 msgid "Prefer IPv4 over IPv6"
-msgstr "Préférer IPv4 sur IPv6"
+msgstr "Préférer IPv4 à IPv6"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:520
 msgid "Prefer IPv6 over IPv4"
-msgstr "Préférer IPv6 sur IPv4"
+msgstr "Préférer IPv6 à IPv4"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:524
 msgid "Use IPv6 only (disable IPv4)"
@@ -5038,7 +5038,7 @@ msgstr "Certains types de pare-feu (tels que les NAT symétriques) empêchent un
 msgid ""
 "UPnP is used to communicate with Internet Gateway Devices (IGDs) to detect "
 "the external IP address and forward ports."
-msgstr "UPnP est utilisé pour communiquer avec des passerelles Internet pour détecter l'adresse IP extérieure et contrôler la redirection des ports."
+msgstr "UPnP est utilisé pour communiquer avec des passerelles Internet afin de détecter l'adresse IP extérieure et de contrôler la redirection des ports."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:630
 msgid "UPnP support is beta, and may not work for any number of reasons"
@@ -5076,21 +5076,21 @@ msgstr "Vérifier l'état d'UPnP ici."
 msgid ""
 "UPnP may be enabled or disabled above, but a change requires a router "
 "restart to take effect."
-msgstr "UPnP peut être activé ou desactivé ci-dessus, mais afin de prendre en compte la changement il faut rédemarrer le routeur I2P."
+msgstr "Vous pouvez activer ou désactiver UPnP ci-dessus, mais afin de prendre en compte le changement il faut redémarrer le routeur I2P."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:648
 msgid "Hostnames entered above will be published in the network database."
-msgstr "Les noms d'hôtes saisis ci-dessus seront publié dans la base de données du réseau I2P."
+msgstr "Les noms d'hôtes saisis ci-dessus seront publiés dans la base de données du réseau I2P."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:650
 msgid "They are <b>not private</b>."
-msgstr "Ils ne sont pas <b>privés</b>."
+msgstr "Ils ne sont <b>pas privés</b>."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:652
 msgid ""
 "Also, <b>do not enter a private IP address</b> like 127.0.0.1 or "
 "192.168.1.1."
-msgstr "De plus, <b>ne saisissez pas une adresse IP privée</b> tel que 127.0.0.1 ou 192.168.1.1."
+msgstr "De plus, <b>ne saisissez pas une adresse IP privée</b> telle que 127.0.0.1 ou 192.168.1.1."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:654
 msgid ""
@@ -5112,13 +5112,13 @@ msgid ""
 "If you think you have opened up your firewall and I2P still thinks you are "
 "firewalled, remember that you may have multiple firewalls, for example both "
 "software packages and external hardware routers."
-msgstr "Si vous pensez que vous avez ouvert votre pare-feu et qu'I2P indique toujours que vous êtes derrière le pare-feu, n'oubliez pas que vous avez peut-être plusieurs pare-feux: par exemple celui de votre box DSL et un pare-feu logiciel dans votre ordinateur."
+msgstr "Si vous pensez que vous avez ouvert votre pare-feu et qu'I2P indique toujours que vous êtes derrière un pare-feu, n'oubliez pas que vous avez peut-être plusieurs pare-feux : par exemple celui de votre box DSL, ou un pare-feu logiciel dans votre ordinateur."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:666
 msgid ""
 "If there is an error, the <a href=\"logs.jsp\">logs</a> may also help "
 "diagnose the problem."
-msgstr "S'il y a une erreur, les <a href=\"logs.jsp\">historiques</a> peuvent aider au diagnostic."
+msgstr "Si il y a une erreur, les <a href=\"logs.jsp\">historiques</a> peuvent aider au diagnostic."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:670
 msgid "Your UDP port does not appear to be firewalled."
@@ -5138,7 +5138,7 @@ msgstr "Comme les méthodes de détection de pare-feu ne sont pas fiables à 100
 msgid ""
 "However, if it appears consistently, you should check whether both your "
 "external and internal firewalls are open for your port."
-msgstr "Cependant, si ça se reproduit systématiquement, vous devez vérifier que votre box et vos pare-feux internes sont ouverts pour votre port."
+msgstr "Cependant, si cela se reproduit systématiquement, vous devez vérifier que votre box et vos pare-feux internes sont ouverts pour votre port."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:680
 msgid ""
@@ -5249,7 +5249,7 @@ msgstr "Vous apparaissez comme étant bloqué par un pare-feu pour TCP, et en co
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:724
 msgid "Please open your firewall or enable UDP."
-msgstr "Merci d'ouvrir votre pare-feu ou activer UDP."
+msgstr "Merci d'ouvrir votre pare-feu ou d'activer UDP."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:726
 msgid "ERR - Clock Skew"
@@ -5344,13 +5344,13 @@ msgstr "ERR - Erreur du gestionnaire de clients I2CP - vérifier l'historique"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:764
 msgid "This is usually due to a port 7654 conflict. Check the logs to verify."
-msgstr "Ceci est habituellement dû à un conflit de port 7654. Vérifiez dans l'historique (et pensez éventuellement à netstat   ;-)  ) "
+msgstr "Ceci est habituellement dû à un conflit de port 7654. Vérifiez dans l'historique (et pensez éventuellement à netstat   ;-)  )."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:766
 msgid ""
 "Do you have another I2P instance running? Stop the conflicting program and "
 "restart I2P."
-msgstr "Avez-vous une autre instance d'I2P en cours d'exécution ? Arrêtez le logiciel en conflit et redémarrez I2P."
+msgstr "Avez-vous une autre instance d'I2P en cours d'exécution ? Arrêtez le logiciel en conflit puis redémarrez I2P."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configpeer_jsp.java:147
 msgid "config peers"
@@ -5446,7 +5446,7 @@ msgstr "Sélection de l'URL de réamorçage"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:465
 msgid "Try SSL first then non-SSL"
-msgstr "Préférer SSL, sinon,  repli sur non-SSL"
+msgstr "Tenter SSL, sinon repli sur non-SSL"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:469
 msgid "Use SSL only"

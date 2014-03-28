@@ -14,7 +14,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-02-06 18:27+0000\n"
-"PO-Revision-Date: 2014-02-19 22:58+0000\n"
+"PO-Revision-Date: 2014-03-22 14:59+0000\n"
 "Last-Translator: Towatowa441\n"
 "Language-Team: French (http://www.transifex.com/projects/p/I2P/language/fr/)\n"
 "MIME-Version: 1.0\n"
@@ -421,11 +421,11 @@ msgstr "{0} jump service"
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:162
 #, java-format
 msgid "Added via address helper from {0}"
-msgstr "Ajouté via assistant d''adresse depuis {0}"
+msgstr "Ajouté via l''assistant d''adresse depuis {0}"
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:164
 msgid "Added via address helper"
-msgstr "Ajouté via assitant d'adresse"
+msgstr "Ajouté via l''assistant d''adresse"
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:187
 msgid "router"
