@@ -141,7 +141,7 @@ public class StatisticsManager implements Service {
             
             //includeRate("tunnel.buildRequestTime", stats, new long[] { 10*60*1000 });
             long rate = 60*60*1000;
-            includeTunnelRates("Client", stats, rate);
+            //includeTunnelRates("Client", stats, rate);
             includeTunnelRates("Exploratory", stats, rate);
             //includeRate("tunnel.rejectTimeout", stats, new long[] { 10*60*1000 });
             //includeRate("tunnel.rejectOverloaded", stats, new long[] { 10*60*1000 });

@@ -303,8 +303,8 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
         long timeToDistribute = _context.clock().now() - beforeDistribute;
         _runner.ackSendMessage(id, message.getNonce());
         _context.statManager().addRateData("client.distributeTime", timeToDistribute);
-        if ( (timeToDistribute > 50) && (_log.shouldLog(Log.WARN)) )
-            _log.warn("Took too long to distribute the message (which holds up the ack): " + timeToDistribute);
+        if ( (timeToDistribute > 50) && (_log.shouldLog(Log.INFO)) )
+            _log.info("Took too long to distribute the message (which holds up the ack): " + timeToDistribute);
     }
 
     

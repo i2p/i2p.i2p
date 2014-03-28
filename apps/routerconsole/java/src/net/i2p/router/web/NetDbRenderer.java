@@ -209,8 +209,8 @@ public class NetDbRenderer {
             if (median != null) {
                 double log2 = biLog2(median);
                 buf.append("</b></p><p><b>Median distance (bits): ").append(fmt.format(log2));
-                // 3 for 8 floodfills... -1 for median
-                int total = (int) Math.round(Math.pow(2, 3 + 256 - 1 - log2));
+                // 2 for 4 floodfills... -1 for median
+                int total = (int) Math.round(Math.pow(2, 2 + 256 - 1 - log2));
                 buf.append("</b></p><p><b>Estimated total floodfills: ").append(total);
                 buf.append("</b></p><p><b>Estimated total leasesets: ").append(total * rapCount / 8);
             } else {

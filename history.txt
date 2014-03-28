@@ -1,3 +1,8 @@
+2014-03-28 zzz
+ * i2ptunnel.config: Remove irc.freshcoffee.i2p
+ * StatManager: Don't start thread for an empty config
+ * StatisticsManager: Don't publish client tunnel stats
+
 2014-03-28 kytv
  * Updates to geoip.txt and geoipv6.dat.gz based on Maxmind GeoLite Country
    database from 2014-03-05.

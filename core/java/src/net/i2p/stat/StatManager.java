@@ -48,7 +48,8 @@ public class StatManager {
         _context = context;
         _frequencyStats = new ConcurrentHashMap<String,FrequencyStat>(8);
         _rateStats = new ConcurrentHashMap<String,RateStat>(128);
-        if (getStatFilter() != null)
+        String filter = getStatFilter();
+        if (filter != null && filter.length() > 0)
             _statLog = new BufferedStatLog(context);
     }
     

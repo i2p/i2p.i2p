@@ -408,10 +408,14 @@ public class DatabaseLookupMessage extends FastI2NPMessageImpl {
     
     @Override
     public String toString() {
-        StringBuilder buf = new StringBuilder();
+        StringBuilder buf = new StringBuilder(256);
         buf.append("[DatabaseLookupMessage: ");
         buf.append("\n\tSearch Key: ").append(_key);
-        buf.append("\n\tFrom: ").append(_fromHash);
+        if (_replyKey != null)
+            buf.append("\n\tReply GW: ");
+        else
+            buf.append("\n\tFrom: ");
+        buf.append(_fromHash);
         buf.append("\n\tReply Tunnel: ").append(_replyTunnel);
         if (_replyKey != null)
             buf.append("\n\tReply Key: ").append(_replyKey);
