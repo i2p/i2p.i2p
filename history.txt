@@ -6,7 +6,7 @@
 2014-03-28 kytv
  * Updates to geoip.txt and geoipv6.dat.gz based on Maxmind GeoLite Country
    database from 2014-03-05.
- * French, Norwegian, and Russian translation updates imported from Transifex
+ * Brazillian Portuguese, French, Norwegian, and Russian translation updates imported from Transifex
 
 2014-03-23 str4d
  * Console: Handle stopping plugin ClientApps
