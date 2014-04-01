@@ -57,7 +57,6 @@
             <compilerarg line="${javac.compilerargs}" />
             <classpath>
                 <pathelement location="../../core/java/build/i2p.jar" />
-                <pathelement location="../jetty/jettylib/javax.servlet.jar" />
             </classpath>
 		</javac>
 	</target>
@@ -75,7 +74,7 @@
 		</javac>
 	</target>
 
-        <!-- unused for now, as we oddly ship addressbook as a .war -->
+        <!-- unused for now (except for Android), as we oddly ship addressbook as a .war -->
 	<target name="jar" depends="compile, changes">
 		<!-- set if unset -->
 		<property name="workspace.changes" value="" />
