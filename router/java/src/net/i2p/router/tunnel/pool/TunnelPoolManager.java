@@ -62,9 +62,9 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         _clientPeerSelector = new ClientPeerSelector(ctx);
 
         ExploratoryPeerSelector selector = new ExploratoryPeerSelector(_context);
-        TunnelPoolSettings inboundSettings = new TunnelPoolSettings(null, true, true);
+        TunnelPoolSettings inboundSettings = new TunnelPoolSettings(true);
         _inboundExploratory = new TunnelPool(_context, this, inboundSettings, selector);
-        TunnelPoolSettings outboundSettings = new TunnelPoolSettings(null, true, false);
+        TunnelPoolSettings outboundSettings = new TunnelPoolSettings(false);
         _outboundExploratory = new TunnelPool(_context, this, outboundSettings, selector);
         
         // threads will be started in startup()

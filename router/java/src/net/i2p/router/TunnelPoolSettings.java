@@ -79,23 +79,33 @@ public class TunnelPoolSettings {
     private static final int MAX_PRIORITY = 25;
     private static final int EXPLORATORY_PRIORITY = 30;
     
-    public TunnelPoolSettings(Hash dest, boolean isExploratory, boolean isInbound) {
+    /**
+     *  Exploratory tunnel
+     */
+    public TunnelPoolSettings(boolean isInbound) {
+        this(null, isInbound);
+    }
+
+    /**
+     *  Client tunnel unless dest == null
+     */
+    public TunnelPoolSettings(Hash dest, boolean isInbound) {
         _destination = dest;
-        _isExploratory = isExploratory;
+        _isExploratory = dest == null;
         _isInbound = isInbound;
         _quantity = DEFAULT_QUANTITY;
         _backupQuantity = DEFAULT_BACKUP_QUANTITY;
         // _rebuildPeriod = DEFAULT_REBUILD_PERIOD;
         //_duration = DEFAULT_DURATION;
         if (isInbound) {
-            _length = isExploratory ? DEFAULT_IB_EXPL_LENGTH : DEFAULT_IB_LENGTH;
-            _lengthVariance = isExploratory ? DEFAULT_IB_EXPL_LENGTH_VARIANCE : DEFAULT_LENGTH_VARIANCE;
+            _length = _isExploratory ? DEFAULT_IB_EXPL_LENGTH : DEFAULT_IB_LENGTH;
+            _lengthVariance = _isExploratory ? DEFAULT_IB_EXPL_LENGTH_VARIANCE : DEFAULT_LENGTH_VARIANCE;
         } else {
-            _length = isExploratory ? DEFAULT_OB_EXPL_LENGTH : DEFAULT_OB_LENGTH;
-            _lengthVariance = isExploratory ? DEFAULT_OB_EXPL_LENGTH_VARIANCE : DEFAULT_LENGTH_VARIANCE;
+            _length = _isExploratory ? DEFAULT_OB_EXPL_LENGTH : DEFAULT_OB_LENGTH;
+            _lengthVariance = _isExploratory ? DEFAULT_OB_EXPL_LENGTH_VARIANCE : DEFAULT_LENGTH_VARIANCE;
         }
         _lengthOverride = -1;
-        if (isExploratory)
+        if (_isExploratory)
             _allowZeroHop = true;
         else
             _allowZeroHop = DEFAULT_ALLOW_ZERO_HOP;
@@ -189,7 +199,7 @@ public class TunnelPoolSettings {
     //public int getDuration() { return _duration; }
     //public void setDuration(int ms) { _duration = ms; }
     
-    /** what destination is this a tunnel for (or null if none) */
+    /** what destination is this a client tunnel for (or null if exploratory) */
     public Hash getDestination() { return _destination; }
 
     /** random key used for peer ordering */

@@ -114,7 +114,10 @@ public class TunnelCreatorConfig implements TunnelInfo {
     /** is this an inbound tunnel? */
     public boolean isInbound() { return _isInbound; }
 
-    /** if this is a client tunnel, what destination is it for? */
+    /**
+     *  If this is a client tunnel, what destination is it for?
+     *  @return null for exploratory
+     */
     public Hash getDestination() { return _destination; }
     
     public long getExpiration() { return _expiration; }

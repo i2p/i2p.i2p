@@ -22,8 +22,8 @@ public class ClientTunnelSettings {
     private final TunnelPoolSettings _outboundSettings;
     
     public ClientTunnelSettings(Hash dest) {
-        _inboundSettings = new TunnelPoolSettings(dest, false, true);
-        _outboundSettings = new TunnelPoolSettings(dest, false, false);
+        _inboundSettings = new TunnelPoolSettings(dest, true);
+        _outboundSettings = new TunnelPoolSettings(dest, false);
     }
     
     public TunnelPoolSettings getInboundSettings() { return _inboundSettings; }
