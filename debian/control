@@ -43,7 +43,7 @@ Package: libjbigi-jni
 Architecture: any
 Section: java
 Priority: optional
-Depends: ${misc:Depends}, ${shlibs:Depends}
+Depends: ${shlibs:Depends}, i2p-router
 Homepage: http://www.i2p2.de/jbigi
 Description: Java Big Integer library
  This Package contains the libjbigi JNI library (and on x86 platforms, jcpuid).
@@ -53,18 +53,18 @@ Description: Java Big Integer library
  the ones used by I2P. You can expect to see a 5-7x speed improvement on certain
  tasks, such as elGamal encryption/decryption.
 
-#Package: i2p-doc
-#Architecture: all
-#Section: doc
-#Depends: ${misc:Depends}
-#Suggests: i2p, default-jdk-doc
-#Description: Documentation for I2P
-# I2P is an anonymizing network, offering a simple layer that identity-sensitive
-# applications can use to securely communicate. All data is wrapped with several
-# layers of encryption, and the network is both distributed and dynamic, with no
-# trusted parties.
-# .
-# This package contains the Javadoc files.
+Package: i2p-doc
+Architecture: all
+Section: doc
+Depends: ${misc:Depends}
+Suggests: i2p, default-jdk-doc
+Description: Documentation for I2P
+ I2P is an anonymizing network, offering a simple layer that identity-sensitive
+ applications can use to securely communicate. All data is wrapped with several
+ layers of encryption, and the network is both distributed and dynamic, with no
+ trusted parties.
+ .
+ This package contains the Javadoc files.
 
 Package: i2p-router
 Architecture: all
