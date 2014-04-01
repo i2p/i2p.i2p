@@ -688,7 +688,7 @@ public class SummaryHelper extends HelperBase {
                 needSpace = true;
             buf.append("<h4><b>").append(_("Update available")).append(":<br>");
             buf.append(_("Version {0}", getUpdateVersion())).append("<br>");
-            buf.append(constraint).append("</h4>");
+            buf.append(constraint).append("</b></h4>");
             avail = false;
         }
         if ((avail || unsignedAvail) &&
