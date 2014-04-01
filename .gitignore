@@ -31,6 +31,7 @@ dist/
 # Debian-related
 /debian/copyright
 /debian/changelog
+.pc/
 
 # Build property overrides
 /override.properties
