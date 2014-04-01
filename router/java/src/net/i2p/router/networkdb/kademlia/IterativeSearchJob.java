@@ -100,7 +100,9 @@ class IterativeSearchJob extends FloodSearchJob {
     }
 
     /**
-     *  Lookup using the client's tunnels
+     *  Lookup using the client's tunnels.
+     *  Do not use for RI lookups down client tunnels,
+     *  as the response will be dropped in InboundMessageDistributor.
      *  @param fromLocalDest use these tunnels for the lookup, or null for exploratory
      *  @since 0.9.10
      */
@@ -116,6 +118,8 @@ class IterativeSearchJob extends FloodSearchJob {
         _failedPeers = new HashSet<Hash>(TOTAL_SEARCH_LIMIT);
         _sentTime = new ConcurrentHashMap<Hash, Long>(TOTAL_SEARCH_LIMIT);
         _fromLocalDest = fromLocalDest;
+        if (fromLocalDest != null && !isLease && _log.shouldLog(Log.WARN))
+            _log.warn("Search for RI " + key + " down client tunnel " + fromLocalDest, new Exception());
     }
 
     @Override

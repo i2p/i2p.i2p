@@ -4,6 +4,7 @@ import net.i2p.data.DatabaseEntry;
 import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
 import net.i2p.data.Payload;
+import net.i2p.data.RouterInfo;
 import net.i2p.data.TunnelId;
 import net.i2p.data.i2np.DataMessage;
 import net.i2p.data.i2np.DatabaseSearchReplyMessage;
@@ -18,7 +19,7 @@ import net.i2p.router.ClientMessage;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelInfo;
 import net.i2p.router.message.GarlicMessageReceiver;
-//import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
+import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import net.i2p.util.Log;
 
 /**
@@ -82,11 +83,28 @@ class InboundMessageDistributor implements GarlicMessageReceiver.CloveReceiver {
             DatabaseStoreMessage dsm = (DatabaseStoreMessage) msg;
             if (dsm.getEntry().getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO) {
                 // FVSJ may result in an unsolicited RI store if the peer went non-ff.
-                // Maybe we can figure out a way to handle this safely, so we don't ask him again.
-                // For now, just hope we eventually find out through other means.
+                // We handle this safely, so we don't ask him again.
                 // Todo: if peer was ff and RI is not ff, queue for exploration in netdb (but that isn't part of the facade now)
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Dropping DSM down a tunnel for " + _client + ": " + msg);
+                // Handle safely by just updating the caps table, after doing basic validation
+                Hash key = dsm.getKey();
+                if (_context.routerHash().equals(key))
+                    return;
+                RouterInfo ri = (RouterInfo) dsm.getEntry();
+                if (!key.equals(ri.getIdentity().getHash()))
+                    return;
+                if (!ri.isValid())
+                    return;
+                RouterInfo oldri = _context.netDb().lookupRouterInfoLocally(key);
+                // only update if RI is newer and non-ff
+                if (oldri != null && oldri.getPublished() < ri.getPublished() &&
+                    !FloodfillNetworkDatabaseFacade.isFloodfill(ri)) {
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Updating caps for RI " + key + " from \"" +
+                                  oldri.getCapabilities() + "\" to \"" + ri.getCapabilities() + '"');
+                    _context.peerManager().setCapabilities(key, ri.getCapabilities());
+                }
                 return;
             } else if (dsm.getReplyToken() != 0) {
                 if (_log.shouldLog(Log.WARN))
