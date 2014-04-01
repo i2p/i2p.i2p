@@ -54,6 +54,18 @@ do
 	fi
 done
 
+echo "Checking getopt properties files ..."
+for i in `find core/java/src/gnu/getopt -name \*.properties -type f`
+do
+	#echo "Checking $i ..."
+	iconv -f UTF8 -t UTF8 $i -o /dev/null
+        if [ $? -ne 0 ]
+	then
+		echo "********* FAILED CHECK FOR $i *************"
+		FAIL=1
+	fi
+done
+
 if [ "$FAIL" != "" ]
 then
 	echo "******** At least one file failed check *********"
