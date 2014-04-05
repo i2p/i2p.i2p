@@ -16,6 +16,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Properties;
+import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
@@ -169,6 +171,33 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
             }
             return AuthResult.AUTH_GOOD;
         }
+    }
+
+    /**
+     *  Update the outproxy list then call super.
+     *
+     *  @since 0.9.12
+     */
+    @Override
+    public void optionsUpdated(I2PTunnel tunnel) {
+        if (getTunnel() != tunnel)
+            return;
+        Properties props = tunnel.getClientOptions();
+        // see TunnelController.setSessionOptions()
+        String proxies = props.getProperty("proxyList");
+        if (proxies != null) {
+            StringTokenizer tok = new StringTokenizer(proxies, ", ");
+            synchronized(_proxyList) {
+                _proxyList.clear();
+                while (tok.hasMoreTokens())
+                    _proxyList.add(tok.nextToken().trim());
+            }
+        } else {
+            synchronized(_proxyList) {
+                _proxyList.clear();
+            }
+        }
+        super.optionsUpdated(tunnel);
     }
 
     /**

@@ -445,6 +445,10 @@ public class TunnelController implements Logging {
         String target = getTargetDestination();
         if (target != null)
             opts.setProperty("targetDestination", target);
+        // Ditto outproxy list. Since 0.9.12.
+        String proxies = getProxyList();
+        if (proxies != null)
+            opts.setProperty("proxyList", proxies);
         _tunnel.setClientOptions(opts);
     }
     
