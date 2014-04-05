@@ -434,7 +434,7 @@ public abstract class TransportImpl implements Transport {
             level = Log.WARN;
         if (_log.shouldLog(level)) {
             StringBuilder buf = new StringBuilder(128);
-            buf.append("Message received: ").append(inMsg.getClass().getName());
+            buf.append("Message received: ").append(inMsg.getClass().getSimpleName());
             buf.append(" / ").append(inMsg.getUniqueId());
             buf.append(" in ").append(msToReceive).append("ms containing ");
             buf.append(bytesReceived).append(" bytes ");
