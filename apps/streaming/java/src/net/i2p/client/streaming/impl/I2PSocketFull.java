@@ -139,6 +139,9 @@ class I2PSocketFull implements I2PSocket {
         c.getOptions().setReadTimeout(ms);
     }
     
+    /**
+     *  Deprecated, unimplemented, does nothing
+     */
     public void setSocketErrorListener(I2PSocket.SocketErrorListener lsnr) {
     }
     

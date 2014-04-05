@@ -145,7 +145,8 @@ public class I2PTunnelRunner extends I2PAppThread implements I2PSocket.SocketErr
         try {
             InputStream in = getSocketIn();
             OutputStream out = getSocketOut(); // = new BufferedOutputStream(s.getOutputStream(), NETWORK_BUFFER_SIZE);
-            i2ps.setSocketErrorListener(this);
+            // unimplemented in streaming
+            //i2ps.setSocketErrorListener(this);
             InputStream i2pin = i2ps.getInputStream();
             OutputStream i2pout = i2ps.getOutputStream(); //new BufferedOutputStream(i2ps.getOutputStream(), MAX_PACKET_SIZE);
             if (initialI2PData != null) {
@@ -246,7 +247,8 @@ public class I2PTunnelRunner extends I2PAppThread implements I2PSocket.SocketErr
                     if (_log.shouldLog(Log.WARN))
                         _log.warn("Could not close I2PSocket", ex);
                 }
-                i2ps.setSocketErrorListener(null);
+                // unimplemented in streaming
+                //i2ps.setSocketErrorListener(null);
             }
         }
     }
