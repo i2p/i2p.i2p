@@ -206,9 +206,15 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                     <%=intl._("Local destination")%>(<span class="accessKey">L</span>):
                 </label>
                 <textarea rows="1" style="height: 3em;" cols="60" readonly="readonly" id="localDestination" title="Read Only: Local Destination (if known)" wrap="off" spellcheck="false"><%=editBean.getDestinationBase64(curTunnel)%></textarea>               
-         <% if (!"".equals(editBean.getDestinationBase64(curTunnel))) { %>    
-            <a href="/susidns/addressbook.jsp?book=private&amp;hostname=<%=editBean.getTunnelName(curTunnel)%>&amp;destination=<%=editBean.getDestinationBase64(curTunnel)%>#add"><%=intl._("Add to local addressbook")%></a>    
-         <% } %>
+         <% String b64 = editBean.getDestinationBase64(curTunnel);
+            if (!"".equals(b64)) {
+                String name = editBean.getSpoofedHost(curTunnel);
+                if (name == null || name.equals(""))
+                    name = editBean.getTunnelName(curTunnel);
+                if (!"".equals(name)) { %>
+                    <a href="/susidns/addressbook.jsp?book=private&amp;hostname=<%=name%>&amp;destination=<%=b64%>#add"><%=intl._("Add to local addressbook")%></a>    
+         <%     }
+            } %>
             </div>
 
             <% if (("httpserver".equals(tunnelType)) || ("httpbidirserver".equals(tunnelType))) {
@@ -396,7 +402,20 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                 </div>
               </div>
             <% } // httpserver
-            %><div class="subdivider">
+            %><div class="rowItem">
+                <div id="optionsField" class="rowItem">
+                    <label>
+                        <%=intl._("Unique Local Address per Client")%>:
+                    </label>
+                </div>
+                <div id="portField" class="rowItem">
+                    <label for="access" accesskey="d">
+                        <%=intl._("Enable")%>:
+                    </label>
+                    <input value="1" type="checkbox" id="startOnLoad" name="uniqueLocal" title="Use unique IP addresses for each connecting client (local non-SSL servers only)"<%=(editBean.getUniqueLocal(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />                
+                </div>
+            </div>
+            <div class="subdivider">
                 <hr />
             </div>
 

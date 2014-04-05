@@ -277,7 +277,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
             setEntry(headers, "Accept-encoding", ""); 
 
             socket.setReadTimeout(readTimeout);
-            Socket s = getSocket(socket.getLocalPort());
+            Socket s = getSocket(socket.getPeerDestination().calculateHash(), socket.getLocalPort());
             long afterSocket = getTunnel().getContext().clock().now();
             // instead of i2ptunnelrunner, use something that reads the HTTP 
             // request from the socket, modifies the headers, sends the request to the 

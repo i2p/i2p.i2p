@@ -25,6 +25,7 @@ import net.i2p.i2ptunnel.I2PTunnelHTTPClient;
 import net.i2p.i2ptunnel.I2PTunnelHTTPClientBase;
 import net.i2p.i2ptunnel.I2PTunnelHTTPServer;
 import net.i2p.i2ptunnel.I2PTunnelIRCClient;
+import net.i2p.i2ptunnel.I2PTunnelServer;
 import net.i2p.i2ptunnel.TunnelController;
 import net.i2p.i2ptunnel.TunnelControllerGroup;
 import net.i2p.util.Addresses;
@@ -323,6 +324,11 @@ public class EditBean extends IndexBean {
 
     public int getPostTotalBanTime(int tunnel) {
         return getProperty(tunnel, I2PTunnelHTTPServer.OPT_POST_TOTAL_BAN_TIME, I2PTunnelHTTPServer.DEFAULT_POST_TOTAL_BAN_TIME) / 60;
+    }
+    
+    /** @since 0.9.13 */
+    public boolean getUniqueLocal(int tunnel) {
+        return getBooleanProperty(tunnel, I2PTunnelServer.PROP_UNIQUE_LOCAL);
     }
 
     private int getProperty(int tunnel, String prop, int def) {

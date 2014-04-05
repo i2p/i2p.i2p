@@ -823,6 +823,11 @@ public class IndexBean {
         return false;
     }
 
+    /** @since 0.9.13 */
+    public void setUniqueLocal(String moo) {
+        _booleanOptions.add(I2PTunnelServer.PROP_UNIQUE_LOCAL);
+    }
+
     protected static final String PROP_ENABLE_ACCESS_LIST = "i2cp.enableAccessList";
     protected static final String PROP_ENABLE_BLACKLIST = "i2cp.enableBlackList";
 
@@ -1259,7 +1264,8 @@ public class IndexBean {
     private static final String _booleanServerOpts[] = {
         "i2cp.reduceOnIdle", "i2cp.encryptLeaseSet", PROP_ENABLE_ACCESS_LIST, PROP_ENABLE_BLACKLIST,
         I2PTunnelServer.PROP_USE_SSL,
-        I2PTunnelHTTPServer.OPT_REJECT_INPROXY
+        I2PTunnelHTTPServer.OPT_REJECT_INPROXY,
+        I2PTunnelServer.PROP_UNIQUE_LOCAL
         };
     private static final String _otherClientOpts[] = {
         "i2cp.reduceIdleTime", "i2cp.reduceQuantity", "i2cp.closeIdleTime",

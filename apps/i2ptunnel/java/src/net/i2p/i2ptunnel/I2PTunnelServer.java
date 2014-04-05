@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.ConnectException;
 import java.net.InetAddress;
+import java.net.Inet4Address;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketException;
@@ -33,6 +34,7 @@ import net.i2p.client.streaming.I2PSocket;
 import net.i2p.client.streaming.I2PSocketManager;
 import net.i2p.client.streaming.I2PSocketManagerFactory;
 import net.i2p.data.Base64;
+import net.i2p.data.Hash;
 import net.i2p.util.EventDispatcher;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.I2PSSLSocketFactory;
@@ -62,6 +64,7 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
     private static final String PROP_USE_POOL = "i2ptunnel.usePool";
     private static final boolean DEFAULT_USE_POOL = true;
     public static final String PROP_USE_SSL = "useSSL";
+    public static final String PROP_UNIQUE_LOCAL = "enableUniqueLocal";
     /** apparently unused */
     protected static volatile long __serverId = 0;
     /** max number of threads  - this many slowlorisses will DOS this server, but too high could OOM the JVM */
@@ -518,7 +521,7 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
         //threads.
         try {
             socket.setReadTimeout(readTimeout);
-            Socket s = getSocket(socket.getLocalPort());
+            Socket s = getSocket(socket.getPeerDestination().calculateHash(), socket.getLocalPort());
             afterSocket = getTunnel().getContext().clock().now();
             new I2PTunnelRunner(s, socket, slock, null, null);
 
@@ -543,9 +546,10 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
      *  To configure a specific host:port as the server for incoming port xx,
      *  set option targetForPort.xx=host:port
      *
+     *  @param from may be used to construct local address since 0.9.13
      *  @since 0.9.9
      */
-    protected Socket getSocket(int incomingPort) throws IOException {
+    protected Socket getSocket(Hash from, int incomingPort) throws IOException {
         InetAddress host = remoteHost;
         int port = remotePort;
         if (incomingPort != 0 && !_socketMap.isEmpty()) {
@@ -557,16 +561,17 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
                 port = isa.getPort();
             }
         }
-        return getSocket(host, port);
+        return getSocket(from, host, port);
     }
 
     /**
      *  Get a regular or SSL socket depending on config.
      *  The SSL config applies to all hosts/ports.
      *
+     *  @param from may be used to construct local address since 0.9.13
      *  @since 0.9.9
      */
-    protected Socket getSocket(InetAddress remoteHost, int remotePort) throws IOException {
+    protected Socket getSocket(Hash from, InetAddress remoteHost, int remotePort) throws IOException {
         String opt = getTunnel().getClientOptions().getProperty(PROP_USE_SSL);
         if (Boolean.parseBoolean(opt)) {
             synchronized(sslLock) {
@@ -583,7 +588,26 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
             }
             return _sslFactory.createSocket(remoteHost, remotePort);
         } else {
-            return new Socket(remoteHost, remotePort);
+            // as suggested in https://lists.torproject.org/pipermail/tor-dev/2014-March/006576.html
+            boolean unique = Boolean.parseBoolean(getTunnel().getClientOptions().getProperty(PROP_UNIQUE_LOCAL));
+            if (unique && remoteHost.isLoopbackAddress()) {
+                byte[] addr;
+                if (remoteHost instanceof Inet4Address) {
+                    addr = new byte[4];
+                    addr[0] = 127;
+                    System.arraycopy(from.getData(), 0, addr, 1, 3);
+                } else {
+                    addr = new byte[16];
+                    addr[0] = (byte) 0xfd;
+                    System.arraycopy(from.getData(), 0, addr, 1, 15);
+                }
+                InetAddress local = InetAddress.getByAddress(addr);
+                // Javadocs say local port of 0 allowed in Java 7.
+                // Not clear if supported in Java 6 or not.
+                return new Socket(remoteHost, remotePort, local, 0);
+            } else {
+                return new Socket(remoteHost, remotePort);
+            }
         }
     }
 }
