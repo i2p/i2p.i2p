@@ -1,3 +1,8 @@
+2014-04-05 zzz
+ * I2PTunnel:
+   - Add server option for unique local address per-client
+   - Fix changing outproxy without stopping tunnel (ticket #1164)
+
 2014-04-01 zzz
  * Console: Fix summary bar html when displaying an update constraint
  * NetDB: Handle RI response from non-floodfill router down a client tunnel
