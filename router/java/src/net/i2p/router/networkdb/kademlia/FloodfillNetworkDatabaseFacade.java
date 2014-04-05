@@ -200,6 +200,7 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
         Hash rkey = _context.routingKeyGenerator().getRoutingKey(key);
         FloodfillPeerSelector sel = (FloodfillPeerSelector)getPeerSelector();
         List<Hash> peers = sel.selectFloodfillParticipants(rkey, MAX_TO_FLOOD, getKBuckets());
+        // todo key cert skip?
         long until = _context.routingKeyGenerator().getTimeTillMidnight();
         if (until < NEXT_RKEY_LS_ADVANCE_TIME ||
             (ds.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO && until < NEXT_RKEY_RI_ADVANCE_TIME)) {
@@ -209,6 +210,7 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
             List<Hash> nextPeers = sel.selectFloodfillParticipants(nkey, NEXT_FLOOD_QTY, getKBuckets());
             int i = 0;
             for (Hash h : nextPeers) {
+                // todo key cert skip?
                 if (!peers.contains(h)) {
                     peers.add(h);
                     i++;

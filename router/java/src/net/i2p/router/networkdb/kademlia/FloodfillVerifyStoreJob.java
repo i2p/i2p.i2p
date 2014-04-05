@@ -4,8 +4,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import net.i2p.data.Certificate;
 import net.i2p.data.DatabaseEntry;
 import net.i2p.data.Hash;
+import net.i2p.data.LeaseSet;
 import net.i2p.data.RouterInfo;
 import net.i2p.data.i2np.DatabaseLookupMessage;
 import net.i2p.data.i2np.DatabaseSearchReplyMessage;
@@ -169,9 +171,31 @@ class FloodfillVerifyStoreJob extends JobImpl {
     private Hash pickTarget() {
         Hash rkey = getContext().routingKeyGenerator().getRoutingKey(_key);
         FloodfillPeerSelector sel = (FloodfillPeerSelector)_facade.getPeerSelector();
-        List<Hash> peers = sel.selectFloodfillParticipants(rkey, 1, _ignore, _facade.getKBuckets());
-        if (!peers.isEmpty())
-            return peers.get(0);
+        boolean isKeyCert = false;
+        if (!_isRouterInfo) {
+            LeaseSet ls = _facade.lookupLeaseSetLocally(_key);
+            if (ls != null &&
+                ls.getDestination().getCertificate().getCertificateType() == Certificate.CERTIFICATE_TYPE_KEY)
+                isKeyCert = true;
+        }
+        if (isKeyCert) {
+            while (true) {
+                List<Hash> peers = sel.selectFloodfillParticipants(rkey, 1, _ignore, _facade.getKBuckets());
+                if (peers.isEmpty())
+                    break;
+                Hash peer = peers.get(0);
+                RouterInfo ri = _facade.lookupRouterInfoLocally(peer);
+                if (ri != null && StoreJob.supportsKeyCerts(ri))
+                    return peer;
+                if (_log.shouldLog(Log.INFO))
+                    _log.info(getJobId() + ": Skipping verify w/ router that doesn't support key certs " + peer);
+                _ignore.add(peer);
+            }
+        } else {
+            List<Hash> peers = sel.selectFloodfillParticipants(rkey, 1, _ignore, _facade.getKBuckets());
+            if (!peers.isEmpty())
+                return peers.get(0);
+        }
         
         if (_log.shouldLog(Log.WARN))
             _log.warn("No other peers to verify floodfill with, using the one we sent to");

@@ -112,7 +112,10 @@ class StoreJob extends JobImpl {
         }
     }
     
+    /** overridden in FSJ */
     protected int getParallelization() { return PARALLELIZATION; }
+
+    /** overridden in FSJ */
     protected int getRedundancy() { return REDUNDANCY; }
 
     /**
@@ -157,26 +160,29 @@ class StoreJob extends JobImpl {
             }
         } else {
             //_state.addPending(closestHashes);
-            if (_log.shouldLog(Log.INFO))
-                _log.info(getJobId() + ": Continue sending key " + _state.getTarget() + " after " + _state.getAttempted().size() + " tries to " + closestHashes);
+            int queued = 0;
+            int skipped = 0;
             for (Hash peer : closestHashes) {
                 DatabaseEntry ds = _facade.getDataStore().get(peer);
                 if ( (ds == null) || !(ds.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO) ) {
                     if (_log.shouldLog(Log.INFO))
                         _log.info(getJobId() + ": Error selecting closest hash that wasnt a router! " + peer + " : " + ds);
                     _state.addSkipped(peer);
+                    skipped++;
                 } else if (_state.getData().getType() == DatabaseEntry.KEY_TYPE_LEASESET &&
                            ((LeaseSet)_state.getData()).getDestination().getCertificate().getCertificateType() == Certificate.CERTIFICATE_TYPE_KEY &&
                            !supportsKeyCerts((RouterInfo)ds)) {
                     if (_log.shouldLog(Log.INFO))
-                        _log.info(getJobId() + ": Skipping router that doesn't support key certs " + peer + " : " + ds);
+                        _log.info(getJobId() + ": Skipping router that doesn't support key certs " + peer);
                     _state.addSkipped(peer);
+                    skipped++;
                 } else if (_state.getData().getType() == DatabaseEntry.KEY_TYPE_LEASESET &&
                            ((LeaseSet)_state.getData()).getLeaseCount() > 6 &&
                            !supportsBigLeaseSets((RouterInfo)ds)) {
                     if (_log.shouldLog(Log.INFO))
-                        _log.info(getJobId() + ": Skipping router that doesn't support big leasesets " + peer + " : " + ds);
+                        _log.info(getJobId() + ": Skipping router that doesn't support big leasesets " + peer);
                     _state.addSkipped(peer);
+                    skipped++;
                 } else {
                     int peerTimeout = _facade.getPeerTimeout(peer);
 
@@ -206,10 +212,20 @@ class StoreJob extends JobImpl {
                     // ERR: see hidden mode comments in HandleDatabaseLookupMessageJob
                     // // Do not store to hidden nodes
                     // if (!((RouterInfo)ds).isHidden()) {
+                       if (_log.shouldLog(Log.INFO))
+                           _log.info(getJobId() + ": Continue sending key " + _state.getTarget() +
+                                     " after " + _state.getAttempted().size() + " tries to " + closestHashes);
                         _state.addPending(peer);
                         sendStore((RouterInfo)ds, peerTimeout);
+                        queued++;
                     //}
                 }
+            }
+            if (queued == 0 && _state.getPending().isEmpty()) {
+                if (_log.shouldLog(Log.INFO))
+                    _log.info(getJobId() + ": No more peers left after skipping " + skipped + " and none pending");
+                // queue a job to go around again rather than recursing
+                getContext().jobQueue().addJob(new WaitJob(getContext()));
             }
         }
     }
@@ -507,7 +523,7 @@ class StoreJob extends JobImpl {
      * Does he support key certs (assumed with a non-DSA key)?
      * @since 0.9.12
      */
-    private static boolean supportsKeyCerts(RouterInfo ri) {
+    public static boolean supportsKeyCerts(RouterInfo ri) {
         String v = ri.getOption("router.version");
         if (v == null)
             return false;
@@ -520,7 +536,7 @@ class StoreJob extends JobImpl {
      * Does he support more than 6 leasesets?
      * @since 0.9.12
      */
-    private static boolean supportsBigLeaseSets(RouterInfo ri) {
+    public static boolean supportsBigLeaseSets(RouterInfo ri) {
         String v = ri.getOption("router.version");
         if (v == null)
             return false;
