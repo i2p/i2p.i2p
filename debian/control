@@ -24,7 +24,7 @@ Package: i2p
 Architecture: all
 Section: net
 Priority: optional
-Depends: ${misc:Depends}, ${java:Depends}, ${shlibs:Depends},
+Depends: ${java:Depends}, ${shlibs:Depends},
  adduser,
  i2p-router (>= 0.8.6-5),
  libjbigi-jni,
