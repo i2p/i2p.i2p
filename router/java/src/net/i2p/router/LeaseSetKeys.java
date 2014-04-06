@@ -23,27 +23,19 @@ import net.i2p.data.SigningPrivateKey;
  * Wrap up the keys given to the router when a destination connects to it.
  * Used only by KeyManager.
  */
-public class LeaseSetKeys extends DataStructureImpl {
-    private Destination _dest;
-    private SigningPrivateKey _revocationKey;
-    private PrivateKey _decryptionKey;
+public class LeaseSetKeys {
+    private final SigningPrivateKey _revocationKey;
+    private final PrivateKey _decryptionKey;
 
-    /** @deprecated unused */
-    public LeaseSetKeys() {}
-
-    /** @param revocationKey unused */
+    /**
+     *  @param dest unused
+     *  @param revocationKey unused
+     *  @param decryptionKey non-null
+     */
     public LeaseSetKeys(Destination dest, SigningPrivateKey revocationKey, PrivateKey decryptionKey) {
-	_dest = dest;
 	_revocationKey = revocationKey;
 	_decryptionKey = decryptionKey;
     }
-
-    /**
-     * Destination in question
-     *
-     * @deprecated unused
-     */
-    public Destination getDestination() { return _dest; }
 
     /**
      * Key with which a LeaseSet can be revoked (by republishing it with no Leases)
@@ -60,46 +52,5 @@ public class LeaseSetKeys extends DataStructureImpl {
      *
      */
     public PrivateKey getDecryptionKey() { return _decryptionKey; }
-    
-    /** @deprecated unused */
-    public void readBytes(InputStream in) throws DataFormatException, IOException {
-	_dest = new Destination();
-	_dest.readBytes(in);
-	_decryptionKey = new PrivateKey();
-	_decryptionKey.readBytes(in);
-	_revocationKey = new SigningPrivateKey();
-	_revocationKey.readBytes(in);
-    }
-    
-    /** @deprecated unused */
-    public void writeBytes(OutputStream out) throws DataFormatException, IOException {
-        if (_dest == null) throw new DataFormatException("Null destination");
-        if (_decryptionKey == null) throw new DataFormatException("Null decryption key");
-        if (_revocationKey == null) throw new DataFormatException("Null revocation key");
-	_dest.writeBytes(out);
-	_decryptionKey.writeBytes(out);
-	_revocationKey.writeBytes(out);
-    }
-    
-    /** @deprecated unused */
-    @Override
-    public int hashCode() {
-	int rv = DataHelper.hashCode(_dest);
-	rv += DataHelper.hashCode(_revocationKey);
-	rv += DataHelper.hashCode(_decryptionKey);
-	return rv;
-    }
-    
-    /** @deprecated unused */
-    @Override
-    public boolean equals(Object obj) {
-	if ( (obj != null) && (obj instanceof LeaseSetKeys) ) {
-	    LeaseSetKeys keys = (LeaseSetKeys)obj;
-	    return DataHelper.eq(getDestination(), keys.getDestination()) &&
-		   DataHelper.eq(getDecryptionKey(), keys.getDecryptionKey()) &&
-		   DataHelper.eq(getRevocationKey(), keys.getRevocationKey());
-	} else {
-	    return false;
-	}
-    }
+
 }

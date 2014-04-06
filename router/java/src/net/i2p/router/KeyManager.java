@@ -77,16 +77,22 @@ public class KeyManager {
         queueWrite();
     }
 
+    /** router */
     public PrivateKey getPrivateKey() { return _privateKey; }
 
+    /** router */
     public PublicKey getPublicKey() { return _publicKey; }
 
+    /** router */
     public SigningPrivateKey getSigningPrivateKey() { return _signingPrivateKey; }
 
+    /** router */
     public SigningPublicKey getSigningPublicKey() { return _signingPublicKey; }
     
+    /** client */
     public void registerKeys(Destination dest, SigningPrivateKey leaseRevocationPrivateKey, PrivateKey endpointDecryptionKey) {
-        _log.info("Registering keys for destination " + dest.calculateHash().toBase64());
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Registering keys for destination " + dest.calculateHash().toBase64());
         LeaseSetKeys keys = new LeaseSetKeys(dest, leaseRevocationPrivateKey, endpointDecryptionKey);
         _leaseSetKeys.put(dest.calculateHash(), keys);
     }
@@ -98,16 +104,19 @@ public class KeyManager {
         _context.jobQueue().addJob(new SynchronizeKeysJob());
     }
 
+    /** client */
     public LeaseSetKeys unregisterKeys(Destination dest) {
         if (_log.shouldLog(Log.INFO))
             _log.info("Unregistering keys for destination " + dest.calculateHash().toBase64());
         return _leaseSetKeys.remove(dest.calculateHash());
     }
     
+    /** client */
     public LeaseSetKeys getKeys(Destination dest) {
         return getKeys(dest.calculateHash());
     }
 
+    /** client */
     public LeaseSetKeys getKeys(Hash dest) {
             return _leaseSetKeys.get(dest);
     }
