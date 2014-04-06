@@ -1,8 +1,11 @@
+2014-04-06 zzz
+ * NetDB: Iterative search improvements
 
 2014-04-05 zzz
  * I2PTunnel:
    - Add server option for unique local address per-client
    - Fix changing outproxy without stopping tunnel (ticket #1164)
+   - Fix add-to-addressbook hostname link in i2ptunnel (ticket #688)
  * NetDB: Skip key cert LS stores and verifies for floodfills that don't support them
 
 2014-04-01 zzz

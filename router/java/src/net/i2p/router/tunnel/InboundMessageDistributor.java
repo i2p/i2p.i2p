@@ -69,6 +69,7 @@ class InboundMessageDistributor implements GarlicMessageReceiver.CloveReceiver {
             // LS or RI and client or expl., so that we can safely follow references
             // in a reply to a LS lookup over client tunnels.
             // ILJ would also have to follow references via client tunnels
+          /****
             DatabaseSearchReplyMessage orig = (DatabaseSearchReplyMessage) msg;
             if (orig.getNumReplies() > 0) {
                 if (_log.shouldLog(Log.INFO))
@@ -78,6 +79,7 @@ class InboundMessageDistributor implements GarlicMessageReceiver.CloveReceiver {
                 newMsg.setSearchKey(orig.getSearchKey());
                 msg = newMsg;
             }
+          ****/
         } else if ( (_client != null) && 
                     (type == DatabaseStoreMessage.MESSAGE_TYPE)) {
             DatabaseStoreMessage dsm = (DatabaseStoreMessage) msg;
@@ -164,8 +166,8 @@ class InboundMessageDistributor implements GarlicMessageReceiver.CloveReceiver {
                     _log.warn("no outbound tunnel to send the client message for " + _client + ": " + msg);
                 return;
             }
-            if (_log.shouldLog(Log.INFO))
-                _log.info("distributing inbound tunnel message back out " + out
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("distributing IB tunnel msg type " + type + " back out " + out
                           + " targetting " + target);
             TunnelId outId = out.getSendTunnelId(0);
             if (outId == null) {
@@ -174,8 +176,9 @@ class InboundMessageDistributor implements GarlicMessageReceiver.CloveReceiver {
                                + " failing to distribute " + msg);
                 return;
             }
-            if (msg.getMessageExpiration() < _context.clock().now() + 10*1000)
-                msg.setMessageExpiration(_context.clock().now() + 10*1000);
+            long exp = _context.clock().now() + 20*1000;
+            if (msg.getMessageExpiration() < exp)
+                msg.setMessageExpiration(exp);
             _context.tunnelDispatcher().dispatchOutbound(msg, outId, tunnel, target);
         }
     }
@@ -250,6 +253,7 @@ class InboundMessageDistributor implements GarlicMessageReceiver.CloveReceiver {
                     // in a reply to a LS lookup over client tunnels.
                     // ILJ would also have to follow references via client tunnels
                     DatabaseSearchReplyMessage orig = (DatabaseSearchReplyMessage) data;
+                  /****
                     if (orig.getNumReplies() > 0) {
                         if (_log.shouldLog(Log.INFO))
                             _log.info("Removing replies from a garlic DSRM down a tunnel for " + _client + ": " + data);
@@ -258,6 +262,7 @@ class InboundMessageDistributor implements GarlicMessageReceiver.CloveReceiver {
                         newMsg.setSearchKey(orig.getSearchKey());
                         orig = newMsg;
                      }
+                   ****/
                     _context.inNetMessagePool().add(orig, null, null);
                 } else if (type == DataMessage.MESSAGE_TYPE) {
                         // a data message targetting the local router is how we send load tests (real
