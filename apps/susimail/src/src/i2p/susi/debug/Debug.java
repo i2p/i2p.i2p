@@ -23,6 +23,8 @@
  */
 package i2p.susi.debug;
 
+import net.i2p.I2PAppContext;
+
 /**
  * @author susi23
  */
@@ -31,13 +33,17 @@ public class Debug {
 	public static final int ERROR = 1;
 	public static final int DEBUG = 2;
 	private static int level = ERROR;
+
 	public static void setLevel( int newLevel )
 	{
 		level = newLevel;
 	}	
+
 	public static void debug( int msgLevel, String msg )
 	{
 		if( msgLevel <= level )
 			System.err.println( msg );
+		if (msgLevel <= ERROR)
+			I2PAppContext.getGlobalContext().logManager().getLog(Debug.class).error(msg);
 	}
 }

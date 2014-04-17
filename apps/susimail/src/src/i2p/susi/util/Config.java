@@ -37,8 +37,8 @@ import net.i2p.I2PAppContext;
  */
 public class Config {
 	
-	private static Properties properties = null, config = null;
-	private static String configPrefix = null;
+	private static Properties properties, config;
+	private static String configPrefix;
 	/**
 	 * 
 	 * @param name

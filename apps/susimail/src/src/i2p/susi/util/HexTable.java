@@ -28,10 +28,9 @@ package i2p.susi.util;
  */
 public class HexTable {
 	
-	public static String[] table = null;
+	public static final String[] table = new String[256];
 	
 	static {
-		table = new String[256];
 		for( int i = 0; i < 256; i++ ) {
 			String str = intToHex( i );
 			if( str.length() == 1 )
@@ -39,6 +38,7 @@ public class HexTable {
 			table[i] = "=" + str;
 		}
 	}
+
 	private static String intToHex( int b )
 	{
 		if( b == 0 )

@@ -24,6 +24,7 @@
 package i2p.susi.webmail.pop3;
 
 import i2p.susi.debug.Debug;
+import i2p.susi.webmail.Messages;
 import i2p.susi.util.ReadBuffer;
 
 import java.io.IOException;
@@ -40,24 +41,26 @@ public class POP3MailBox {
 
 	private static final int DEFAULT_BUFSIZE = 4096;
 
-	private String host = null, user = null, pass = null;
+	private final String host, user, pass;
 
-	private String lastLine = "-ERR No response from server", lastError = null;
+	private static final String ERR = "-ERR ";
+	private String lastLine, lastError;
 
-	private int port = 0, mails = 0, read = 0;
+	private final int port;
+	private int mails, read;
 
-	private boolean connected = false;
+	private boolean connected;
 
-	private Hashtable<Integer, ReadBuffer> headerList = null, bodyList = null;
-	private Hashtable<Integer, Integer> sizes = null;
-	private Hashtable<String, Integer> uidlToID = null;
-	private ArrayList<String> uidlList = null;
+	private final Hashtable<Integer, ReadBuffer> headerList, bodyList;
+	private Hashtable<Integer, Integer> sizes;
+	private final Hashtable<String, Integer> uidlToID;
+	private final ArrayList<String> uidlList;
 
-	private Socket socket = null;
+	private Socket socket;
 
-	private byte[] buffer = new byte[DEFAULT_BUFSIZE];
+	private final byte[] buffer = new byte[DEFAULT_BUFSIZE];
 
-	private Object synchronizer = null;
+	private final Object synchronizer;
 
 	/**
 	 * @param host
@@ -79,6 +82,8 @@ public class POP3MailBox {
 		uidlToID = new Hashtable<String, Integer>();
 		sizes = new Hashtable<Integer, Integer>();
 		synchronizer = new Object();
+		// this appears in the UI so translate
+		lastLine = ERR + _("No response from server");
 		connect();
 	}
 
@@ -686,5 +691,10 @@ public class POP3MailBox {
 	{
 		close();
 		connect();
+	}
+
+	/** translate */
+	private static String _(String s) {
+		return Messages.getString(s);
 	}
 }

@@ -35,9 +35,9 @@ public class MailCache {
 	public static final boolean FETCH_HEADER = true;
 	public static final boolean FETCH_ALL = false;
 	
-	private POP3MailBox mailbox;
-	private Hashtable<String, Mail> mails;
-	private Object synchronizer;
+	private final POP3MailBox mailbox;
+	private final Hashtable<String, Mail> mails;
+	private final Object synchronizer;
 	
 	MailCache( POP3MailBox mailbox ) {
 		this.mailbox = mailbox;

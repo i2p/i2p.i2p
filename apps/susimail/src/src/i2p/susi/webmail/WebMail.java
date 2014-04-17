@@ -403,9 +403,10 @@ public class WebMail extends HttpServlet
 		if( html ) {
 			out.println( "<!-- " );
 		
-			for( int i = 0; i < mailPart.headerLines.length; i++ )
-				out.println( mailPart.headerLines[i] );
-		
+			for( int i = 0; i < mailPart.headerLines.length; i++ ) {
+				// fix Content-Type: multipart/alternative; boundary="----------8CDE39ECAF2633"
+				out.println( mailPart.headerLines[i].replace("--", "&mdash;") );
+			}	
 			out.println( "-->" );
 		}
 		
@@ -1742,6 +1743,7 @@ public class WebMail extends HttpServlet
 		}
 		if( !RELEASE ) {
 			out.println( "<!--" );
+			// FIXME encoding, escaping --, etc... but disabled.
 			out.println( quoteHTML( new String( mail.body.content, mail.body.offset, mail.body.length ) ) );
 			out.println( "-->" );
 		}

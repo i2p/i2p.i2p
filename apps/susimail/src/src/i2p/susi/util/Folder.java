@@ -51,19 +51,16 @@ public class Folder<O extends Object> {
 
 	private int pages, pageSize, currentPage;
 	private O[] unsortedElements, elements;
-	private Hashtable<String, Comparator<O>> sorter;
+	private final Hashtable<String, Comparator<O>> sorter;
 	private boolean sortingDirection;
 	Comparator<O> currentSorter;
 	
 	public Folder()
 	{
 		pages = 1;
-		pageSize = 0;
 		currentPage = 1;
-		unsortedElements = null;
 		sorter = new Hashtable<String, Comparator<O>>();
 		sortingDirection = UP;
-		currentSorter = null;
 	}
 	
 	/**

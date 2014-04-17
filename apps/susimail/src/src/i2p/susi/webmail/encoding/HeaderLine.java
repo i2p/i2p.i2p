@@ -31,6 +31,10 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
+ *  Ref:
+ *  http://en.wikipedia.org/wiki/MIME#Encoded-Word
+ *  http://tools.ietf.org/html/rfc2047
+ *
  * @author susi
  */
 public class HeaderLine implements Encoding {
@@ -167,6 +171,7 @@ public class HeaderLine implements Encoding {
 					if( in[offset] == '?' ) {
 						// System.err.println( "=? found at " + ( offset -1 ) );
 						int f2 = offset + 1;
+						// FIXME save charset here ticket #508
 						for( ; f2 < end && in[f2] != '?'; f2++ );
 						if( f2 < end ) {
 							/*
@@ -196,6 +201,7 @@ public class HeaderLine implements Encoding {
 											try {
 												// System.err.println( "decode(" + (f3 + 1) + "," + ( f4 - f3 - 1 ) + ")" );
 												tmp = e.decode( in, f3 + 1, f4 - f3 - 1 );
+												// FIXME use saved charset here ticket #508
 												for( int j = 0; j < tmp.length; j++ ) {
 													byte d = tmp.content[ tmp.offset + j ];
 													out[written++] = ( d == '_' ? 32 : d );
@@ -287,6 +293,8 @@ public class HeaderLine implements Encoding {
 	public ReadBuffer decode(ReadBuffer in) throws DecodingException {
 		return decode( in.content, in.offset, in.length );
 	}
+
+/*****
 	public static void main( String[] args ) throws EncodingException {
 		String text = "Subject: test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test \r\n" +
 		"From: Smörebröd <smoerebroed@mail.i2p>\r\n" +
@@ -296,4 +304,5 @@ public class HeaderLine implements Encoding {
 		System.out.println( hl.encode( "test ÄÖÜ" ) );
 		System.out.println( hl.encode( "Здравствуйте" ) );
 	}
+****/
 }

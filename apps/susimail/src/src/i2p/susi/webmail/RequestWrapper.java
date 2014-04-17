@@ -53,16 +53,11 @@ import org.mortbay.servlet.MultiPartRequest;
  */
 public class RequestWrapper {
 
-	private HttpServletRequest httpRequest = null;
-	private MultiPartRequest multiPartRequest = null;
-	private Hashtable<String, String> cache;
+	private final HttpServletRequest httpRequest;
+	private MultiPartRequest multiPartRequest;
+	private final Hashtable<String, String> cache;
 	private Hashtable<String, Integer> cachedParameterNames;
-	/**
-	 * do not call
-	 */
-	private RequestWrapper()
-	{
-	}
+
 	/**
 	 * @param httpRequest
 	 */

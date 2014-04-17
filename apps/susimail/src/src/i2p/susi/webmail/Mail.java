@@ -65,8 +65,6 @@ public class Mail {
 	public boolean deleted;
 	
 	public Mail() {
-		id = 0;
-		size = 0;
 		formattedSender = unknown;
 		formattedSubject = unknown;
 		formattedDate = unknown;

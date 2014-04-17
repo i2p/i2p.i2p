@@ -37,9 +37,9 @@ public class MailPart {
 	public String headerLines[], type, boundary, encoding, name,
 		filename, description, disposition, charset, version;
 	public int beginBody, begin, end;
-	public ArrayList<MailPart> parts = null;
-	public boolean multipart = false, message = false;
-	public ReadBuffer buffer = null;
+	public ArrayList<MailPart> parts;
+	public boolean multipart, message;
+	public ReadBuffer buffer;
 	
 	public void parse( ReadBuffer readBuffer )
 	{
