@@ -178,7 +178,7 @@ public class NTCPTransport extends TransportImpl {
         _establishing = new ConcurrentHashSet<NTCPConnection>(16);
         _conLock = new Object();
         _conByIdent = new ConcurrentHashMap<Hash, NTCPConnection>(64);
-        _replayFilter = new DecayingHashSet(ctx, 10*60*1000, 32, "NTCP-Hx^HI");
+        _replayFilter = new DecayingHashSet(ctx, 10*60*1000, 8, "NTCP-Hx^HI");
 
         _finisher = new NTCPSendFinisher(ctx, this);
 
@@ -522,7 +522,7 @@ public class NTCPTransport extends TransportImpl {
      *  @since 0.9.12
      */
     boolean isHXHIValid(byte[] hxhi) {
-        return !_replayFilter.add(hxhi);
+        return !_replayFilter.add(hxhi, 0, 8);
     }
 
     private static final int MIN_CONCURRENT_READERS = 2;  // unless < 32MB

@@ -23,6 +23,8 @@ import net.i2p.router.RouterContext;
 import net.i2p.router.transport.crypto.DHSessionKeyBuilder;
 import static net.i2p.router.transport.udp.InboundEstablishState.InboundState.*;
 import static net.i2p.router.transport.udp.OutboundEstablishState.OutboundState.*;
+import net.i2p.router.util.DecayingHashSet;
+import net.i2p.router.util.DecayingBloomFilter;
 import net.i2p.util.Addresses;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
@@ -82,6 +84,9 @@ class EstablishmentManager {
     private volatile boolean _alive;
     private final Object _activityLock;
     private int _activity;
+
+    /** "bloom filter" */
+    private final DecayingBloomFilter _replayFilter;
     
     /** max outbound in progress - max inbound is half of this */
     private final int DEFAULT_MAX_CONCURRENT_ESTABLISH;
@@ -132,6 +137,7 @@ class EstablishmentManager {
         _outboundByClaimedAddress = new ConcurrentHashMap<RemoteHostId, OutboundEstablishState>();
         _outboundByHash = new ConcurrentHashMap<Hash, OutboundEstablishState>();
         _activityLock = new Object();
+        _replayFilter = new DecayingHashSet(ctx, 10*60*1000, 8, "SSU-DH-X");
         DEFAULT_MAX_CONCURRENT_ESTABLISH = Math.max(DEFAULT_LOW_MAX_CONCURRENT_ESTABLISH,
                                                     Math.min(DEFAULT_HIGH_MAX_CONCURRENT_ESTABLISH,
                                                              ctx.bandwidthLimiter().getOutboundKBytesPerSecond() / 2));
@@ -159,6 +165,7 @@ class EstablishmentManager {
         _context.statManager().createRateStat("udp.rejectConcurrentSequence", "How many consecutive concurrency rejections have we had when we stop rejecting (period is how many concurrent packets we are on)", "udp", UDPTransport.RATES);
         //_context.statManager().createRateStat("udp.queueDropSize", "How many messages were queued up when it was considered full, causing a tail drop?", "udp", UDPTransport.RATES);
         //_context.statManager().createRateStat("udp.queueAllowTotalLifetime", "When a peer is retransmitting and we probabalistically allow a new message, what is the sum of the pending message lifetimes? (period is the new message's lifetime)?", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.dupDHX", "Session request replay", "udp", new long[] { 24*60*60*1000L } );
     }
     
     public synchronized void startup() {
@@ -450,6 +457,14 @@ class EstablishmentManager {
                                                   _transport.getExternalPort(fromIP.length == 16),
                                                   _transport.getDHBuilder());
                 state.receiveSessionRequest(reader.getSessionRequestReader());
+
+                if (_replayFilter.add(state.getReceivedX(), 0, 8)) {
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Duplicate X in session request from: " + from);
+                    _context.statManager().addRateData("udp.dupDHX", 1);
+                    return; // drop the packet
+                }
+
                 InboundEstablishState oldState = _inboundStates.putIfAbsent(from, state);
                 isNew = oldState == null;
                 if (!isNew)
