@@ -143,7 +143,7 @@ public class NamingServiceBean extends AddressbookBean
 		if (isDirect())
 			return super.getLoadBookMessages();
 		NamingService service = getNamingService();
-		Debug.debug("Searching within " + service + " with filename=" + getFileName() + " and with filter=" + filter + " and with search=" + search);
+		debug("Searching within " + service + " with filename=" + getFileName() + " and with filter=" + filter + " and with search=" + search);
 		String message = "";
 		try {
 			LinkedList<AddressBean> list = new LinkedList<AddressBean>();
@@ -168,7 +168,7 @@ public class NamingServiceBean extends AddressbookBean
 				searchProps.setProperty("search", search.toLowerCase(Locale.US));
 			results = service.getEntries(searchProps);
 
-			Debug.debug("Result count: " + results.size());
+			debug("Result count: " + results.size());
 			for (Map.Entry<String, Destination> entry : results.entrySet()) {
 				String name = entry.getKey();
 				if( filter != null && filter.length() > 0 ) {
@@ -201,7 +201,7 @@ public class NamingServiceBean extends AddressbookBean
 			message = generateLoadMessage();
 		}
 		catch (Exception e) {
-			Debug.debug( e.getClass().getName() + ": " + e.getMessage() );
+			warn(e);
 		}
 		if( message.length() > 0 )
 			message = "<p>" + message + "</p>";

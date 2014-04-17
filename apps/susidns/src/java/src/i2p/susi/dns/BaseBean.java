@@ -2,11 +2,13 @@ package i2p.susi.dns;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
 
 import net.i2p.I2PAppContext;
+import net.i2p.data.DataHelper;
+import net.i2p.util.Log;
+import net.i2p.util.OrderedProperties;
 
 /**
  * Holds methods common to several Beans.
@@ -16,8 +18,9 @@ public class BaseBean
 {
     protected final I2PAppContext _context;
     protected final Properties properties;
+    protected String action, lastSerial, serial;
 
-    private long configLastLoaded = 0;
+    private long configLastLoaded;
     private static final String PRIVATE_BOOK = "private_addressbook";
     private static final String DEFAULT_PRIVATE_BOOK = "../privatehosts.txt";
 
@@ -27,35 +30,56 @@ public class BaseBean
     public static final String DEFAULT_THEME = "light";
     public static final String BASE_THEME_PATH = "/themes/susidns/";
     public static final String PROP_PW_ENABLE = "routerconsole.auth.enable";
+    private static final String ADDRESSBOOK_DIR = "addressbook";
+    private static final String CONFIG_FILE = "config.txt";
 
     public BaseBean()
     {
         _context = I2PAppContext.getGlobalContext();
-        properties = new Properties();
+        properties = new OrderedProperties();
+    }
+
+    /**
+     * @since 0.9.13 moved from ConfigBean.addressbookPrefix
+     */
+    protected File addressbookDir() {
+        return new File(_context.getRouterDir(), ADDRESSBOOK_DIR);
+    }
+
+    /**
+     * @since 0.9.13 moved from ConfigBean.configFileName
+     */
+    protected File configFile() {
+        return new File(addressbookDir(), CONFIG_FILE);
     }
 
     protected void loadConfig()
     {
-        long currentTime = System.currentTimeMillis();
-
-        if( !properties.isEmpty() &&  currentTime - configLastLoaded < 10000 )
-            return;
-
-        FileInputStream fis = null;
-        try {
-            properties.clear();
-            fis = new FileInputStream( ConfigBean.configFileName );
-            properties.load( fis );
-            // added in 0.5, for compatibility with 0.4 config.txt
-            if( properties.getProperty(PRIVATE_BOOK) == null)
-                properties.setProperty(PRIVATE_BOOK, DEFAULT_PRIVATE_BOOK);
-            configLastLoaded = currentTime;
+        synchronized (BaseBean.class) {
+            long currentTime = System.currentTimeMillis();
+            if( !properties.isEmpty() &&  currentTime - configLastLoaded < 10000 )
+                return;
+            reload();
         }
-        catch (Exception e) {
-            Debug.debug( e.getClass().getName() + ": " + e.getMessage() );
-        } finally {
-            if (fis != null)
-                try { fis.close(); } catch (IOException ioe) {}
+    }
+
+    /**
+     * @since 0.9.13 moved from ConfigBean
+     */
+    protected void reload() {
+        try {
+            synchronized (BaseBean.class) {
+                properties.clear();
+                // use loadProps to trim
+                DataHelper.loadProps(properties, configFile());
+                // added in 0.5, for compatibility with 0.4 config.txt
+                if( properties.getProperty(PRIVATE_BOOK) == null)
+                    properties.setProperty(PRIVATE_BOOK, DEFAULT_PRIVATE_BOOK);
+                configLastLoaded = System.currentTimeMillis();
+            }
+        }
+        catch (IOException e) {
+            warn(e);
         }
     }
 
@@ -105,5 +129,85 @@ public class BaseBean
             }
             // return the map.
             return themes;
+    }
+
+    /**
+     * @since 0.9.13 moved from subclasses
+     */
+    public String getAction() {
+        return action;
+    }
+
+    /**
+     * @since 0.9.13 moved from subclasses
+     */
+    public void setAction(String action) {
+        this.action = action;
+    }
+
+    /**
+     * @since 0.9.13 moved from subclasses
+     */
+    public String getSerial() {
+        lastSerial = Long.toString(_context.random().nextLong());
+        action = null;
+        return lastSerial;
+    }
+
+    /**
+     * @since 0.9.13 moved from subclasses
+     */
+    public void setSerial(String serial) {
+        this.serial = serial;
+    }
+
+    /**
+     * Translate
+     * @since 0.9.13 moved from subclasses
+     */
+    protected static String _(String s) {
+        return Messages.getString(s);
+    }
+
+    /**
+     * Translate
+     * @since 0.9.13 moved from subclasses
+     */
+    protected static String _(String s, Object o) {
+        return Messages.getString(s, o);
+    }
+
+    /**
+     * Translate
+     * @since 0.9.13 moved from subclasses
+     */
+    protected static String _(String s, Object o, Object o2) {
+        return Messages.getString(s, o, o2);
+    }
+
+    /**
+     * Translate (ngettext)
+     * @since 0.9.13 moved from subclasses
+     */
+    protected static String ngettext(String s, String p, int n) {
+        return Messages.getString(n, s, p);
+    }
+
+    /**
+     * @since 0.9.13 moved from Debug
+     */
+    protected void debug(String msg) {
+        Log log = _context.logManager().getLog(getClass());
+        if (log.shouldLog(Log.DEBUG))
+            log.debug(msg);
+    }
+
+    /**
+     * @since 0.9.13 moved from Debug
+     */
+    protected void warn(Throwable t) {
+        Log log = _context.logManager().getLog(getClass());
+        if (log.shouldLog(Log.WARN))
+            log.warn("SusiDNS", t);
     }
 }

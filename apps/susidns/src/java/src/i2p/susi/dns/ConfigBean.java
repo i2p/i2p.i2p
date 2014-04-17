@@ -35,80 +35,49 @@ import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
 import net.i2p.util.OrderedProperties;
 
-public class ConfigBean implements Serializable {
+public class ConfigBean extends BaseBean implements Serializable {
 	
-	/*
-	 * as this is not provided as constant in addressbook, we define it here
-	 */
- 	public static final String addressbookPrefix =
- 		(new File(I2PAppContext.getGlobalContext().getRouterDir(), "addressbook")).getAbsolutePath()
-			+ File.separatorChar;
-	public static final String configFileName = addressbookPrefix + "config.txt";
-	
-	private String action, config;
-	private String serial, lastSerial;
+	private String config;
 	private boolean saved;
 	
-	public static String getConfigFileName() {
-		return configFileName;
-	}
-
 	public String getfileName() {
-		return getConfigFileName();
+		return configFile().toString();
 	}
 
 	public boolean isSaved() {
 		return saved;
 	}
 
-	public String getAction() {
-		return action;
-	}
-	
-	public void setAction(String action) {
-		this.action = action;
-	}
-	
 	public String getConfig()
 	{
 		if( config != null )
 			return config;
-		
 		reload();
-		
 		return config;
 	}
 	
-	private void reload()
+	@Override
+	protected void reload()
 	{
-		File file = new File( configFileName );
-		if( file != null && file.isFile() ) {
-			StringBuilder buf = new StringBuilder();
-			try {
-				// use loadProps to trim
-				Properties props = new OrderedProperties();
-				DataHelper.loadProps(props, file);
-				for (Map.Entry<Object, Object> e : props.entrySet()) {
-					buf.append((String) e.getKey()).append('=')
-					   .append((String) e.getValue()).append('\n');
-				}
-				config = buf.toString();
-				saved = true;
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+		super.reload();
+		StringBuilder buf = new StringBuilder(256);
+		for (Map.Entry<Object, Object> e : properties.entrySet()) {
+			buf.append((String) e.getKey()).append('=')
+			   .append((String) e.getValue()).append('\n');
 		}
+		config = buf.toString();
+		saved = true;
 	}
 	
 	private void save()
 	{
-		File file = new File( configFileName );
 		try {
 			// use loadProps to trim, use storeProps to sort and get line endings right
 			Properties props = new OrderedProperties();
 			DataHelper.loadProps(props, new ByteArrayInputStream(config.getBytes("UTF-8")));
-			DataHelper.storeProps(props, file);
+			synchronized (BaseBean.class) {
+				DataHelper.storeProps(props, configFile());
+			}
 			saved = true;
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -144,21 +113,5 @@ public class ConfigBean implements Serializable {
 		if( message.length() > 0 )
 			message = "<p class=\"messages\">" + message + "</p>";
 		return message;
-	}
-
-	public String getSerial()
-	{
-		lastSerial = "" + Math.random();
-		action = null;
-		return lastSerial;
-	}
-
-	public void setSerial(String serial ) {
-		this.serial = serial;
-	}
-
-	/** translate */
-	private static String _(String s) {
-		return Messages.getString(s);
 	}
 }

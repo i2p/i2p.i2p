@@ -40,29 +40,33 @@ import net.i2p.util.SecureFileOutputStream;
 
 public class SubscriptionsBean extends BaseBean
 {
-	private String action, fileName, content, serial, lastSerial;
+	private String fileName, content;
+	private static final String SUBS_FILE = "config.txt";
 	
-	public String getAction() {
-		return action;
-	}
-
-	public void setAction(String action) {
-		this.action = action;
-	}
-
 	public String getFileName()
 	{
 		loadConfig();
-		
-		fileName = ConfigBean.addressbookPrefix + properties.getProperty( "subscriptions", "subscriptions.txt" );
-		
+		fileName = subsFile().toString();
 		return fileName;
 	}
 
-	private void reload()
+	/**
+	 * @since 0.9.13
+	  */
+	private File subsFile() {
+		return new File(addressbookDir(), SUBS_FILE);
+	}
+
+	private void reloadSubs() {
+		synchronized(SubscriptionsBean.class) {
+			locked_reloadSubs();
+		}
+	}
+
+	private void locked_reloadSubs()
 	{
-		File file = new File( getFileName() );
-		if( file != null && file.isFile() ) {
+		File file = subsFile();
+		if(file.isFile()) {
 			StringBuilder buf = new StringBuilder();
 			BufferedReader br = null;
 			try {
@@ -83,9 +87,15 @@ public class SubscriptionsBean extends BaseBean
 		}
 	}
 	
-	private void save()
+	private void save() {
+		synchronized(SubscriptionsBean.class) {
+			locked_save();
+		}
+	}
+
+	private void locked_save()
 	{
-		File file = new File( getFileName() );
+		File file = subsFile();
 		try {
 			// trim and sort
 			List<String> urls = new ArrayList<String>();
@@ -133,7 +143,7 @@ public class SubscriptionsBean extends BaseBean
 						message = _("Subscriptions saved.");
 					}
 				} else if (action.equals(_("Reload"))) {
-					reload();
+					reloadSubs();
 					message = _("Subscriptions reloaded.");
 				}
 			}			
@@ -148,17 +158,6 @@ public class SubscriptionsBean extends BaseBean
 		return message;
 	}
 
-	public String getSerial()
-	{
-		lastSerial = "" + Math.random();
-		action = null;
-		return lastSerial;
-	}
-
-	public void setSerial(String serial ) {
-		this.serial = serial;
-	}
-
 	public void setContent(String content) {
 		// will come from form with \r\n line endings
 		this.content = content;
@@ -169,13 +168,8 @@ public class SubscriptionsBean extends BaseBean
 		if( content != null )
 			return content;
 		
-		reload();
+		reloadSubs();
 		
 		return content;
-	}
-
-	/** translate */
-	private static String _(String s) {
-		return Messages.getString(s);
 	}
 }

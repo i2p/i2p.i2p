@@ -42,7 +42,7 @@ import net.i2p.util.SecureFileOutputStream;
 
 public class AddressbookBean extends BaseBean
 {
-	protected String book, action, serial, lastSerial, filter, search, hostname, destination;
+	protected String book, filter, search, hostname, destination;
 	protected int beginIndex, endIndex;
 	private Properties addressbook;
 	private int trClass;
@@ -92,7 +92,7 @@ public class AddressbookBean extends BaseBean
 		loadConfig();
 		String filename = properties.getProperty( getBook() + "_addressbook" );
 		// clean up the ../ with getCanonicalPath()
-		File path = new File(ConfigBean.addressbookPrefix, filename);
+		File path = new File(addressbookDir(), filename);
 		try {
 			return path.getCanonicalPath();
 		} catch (IOException ioe) {}
@@ -111,12 +111,6 @@ public class AddressbookBean extends BaseBean
 		return entries;
 	}
 
-	public String getAction() {
-		return action;
-	}
-	public void setAction(String action) {
-		this.action = action;
-	}
 	public String getBook()
 	{
 		if( book == null || ( !book.equalsIgnoreCase( "master" ) &&
@@ -130,14 +124,7 @@ public class AddressbookBean extends BaseBean
 	public void setBook(String book) {
 		this.book = DataHelper.stripHTML(book);  // XSS
 	}
-	public String getSerial() {
-		lastSerial = "" + Math.random();
-		action = null;
-		return lastSerial;
-	}
-	public void setSerial(String serial) {
-		this.serial = serial;
-	}
+
 	/** Load addressbook and apply filter, returning messages about this. */
 	public String getLoadBookMessages()
 	{
@@ -178,7 +165,7 @@ public class AddressbookBean extends BaseBean
 			message = generateLoadMessage();
 		}
 		catch (Exception e) {
-			Debug.debug( e.getClass().getName() + ": " + e.getMessage() );
+			warn(e);
 		} finally {
 			if (fis != null)
 				try { fis.close(); } catch (IOException ioe) {}
@@ -330,7 +317,7 @@ public class AddressbookBean extends BaseBean
 						save();
 						message += "<br>" + _("Address book saved.");
 					} catch (Exception e) {
-						Debug.debug( e.getClass().getName() + ": " + e.getMessage() );
+						warn(e);
 						message += "<br>" + _("ERROR: Could not write addressbook file.");
 					}
 				}
@@ -355,7 +342,7 @@ public class AddressbookBean extends BaseBean
 		
 		FileOutputStream fos = null;
 		try {
-			fos = new SecureFileOutputStream( ConfigBean.addressbookPrefix + filename  );
+			fos = new SecureFileOutputStream(new File(addressbookDir(), filename));
 			addressbook.store( fos, null );
 		} finally {
 			if (fos != null) {
@@ -479,25 +466,5 @@ public class AddressbookBean extends BaseBean
 	 */
 	protected int totalSize() {
 		return entries.length;
-	}
-
-	/** translate */
-	protected static String _(String s) {
-		return Messages.getString(s);
-	}
-
-	/** translate */
-	protected static String _(String s, Object o) {
-		return Messages.getString(s, o);
-	}
-
-	/** translate */
-	protected static String _(String s, Object o, Object o2) {
-		return Messages.getString(s, o, o2);
-	}
-
-	/** translate (ngettext) @since 0.8.7 */
-	protected static String ngettext(String s, String p, int n) {
-		return Messages.getString(n, s, p);
 	}
 }
