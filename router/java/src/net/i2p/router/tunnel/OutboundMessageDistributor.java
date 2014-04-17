@@ -27,9 +27,8 @@ class OutboundMessageDistributor {
     private long _newRouterTime;
     
     private static final long MAX_DISTRIBUTE_TIME = 15*1000;
-    // 40 routers per minute per OBEP
     // This is probably too high, to be reduced later
-    private static final int MAX_ROUTERS_PER_PERIOD = 20;
+    private static final int MAX_ROUTERS_PER_PERIOD = 60;
     private static final long NEW_ROUTER_PERIOD = 30*1000;
     
     /**
