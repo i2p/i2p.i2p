@@ -128,7 +128,7 @@ class Writer {
                         _prepBuffer.init();
                         con.prepareNextWrite(_prepBuffer);
                     } catch (RuntimeException re) {
-                        _log.log(Log.CRIT, "Error in the ntcp writer", re);
+                        _log.log(Log.CRIT, "Error in the ntcp writer on " + con, re);
                     }
                 }
             }

@@ -81,8 +81,14 @@ public class CryptixAESEngine extends AESEngine {
      */
     @Override
     public void encrypt(byte payload[], int payloadIndex, byte out[], int outIndex, SessionKey sessionKey, byte iv[], int ivOffset, int length) {
-        if ( (payload == null) || (out == null) || (sessionKey == null) || (iv == null) ) 
-            throw new NullPointerException("invalid args to aes");
+        if (payload == null) 
+            throw new NullPointerException("invalid args to aes - payload");
+        if (out == null)
+            throw new NullPointerException("invalid args to aes - out");
+        if (sessionKey == null)
+            throw new NullPointerException("invalid args to aes - sessionKey");
+        if (iv == null) 
+            throw new NullPointerException("invalid args to aes - iv");
         if (payload.length < payloadIndex + length)
             throw new IllegalArgumentException("Payload is too short");
         if (out.length < outIndex + length)
