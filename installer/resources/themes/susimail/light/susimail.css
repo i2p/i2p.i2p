@@ -180,13 +180,13 @@ input.download, input.lastpage {
      min-height: 22px;
 }
 
-input.firstpage {
+input.firstpage, input.list {
      background: #ddf url('/themes/console/images/arrow_up.png') no-repeat 4px center;
      padding: 2px 3px 2px 21px;
      min-height: 22px;
 }
 
-input.forward, input.login, input.nextpage, input.send {
+input.forward, input.login, input.nextpage, input.send, input.next {
      background: #ddf url('/themes/console/images/arrow_right.png') no-repeat 4px center;
      padding: 2px 3px 2px 21px;
      min-height: 22px;
@@ -210,7 +210,7 @@ input.new, input.reply, input.replyall {
      min-height: 22px;
 }
 
-input.prevpage {
+input.prevpage, input.prev {
      background: #ddf url('/themes/console/images/arrow_left.png') no-repeat 4px center;
      padding: 2px 3px 2px 21px;
      min-height: 22px;

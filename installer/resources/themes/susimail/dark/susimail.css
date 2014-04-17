@@ -193,12 +193,12 @@ input.download, input.lastpage {
      min-height: 22px;
 }
 
-input.firstpage {
+input.firstpage, input.list {
      background: #000 url('/themes/console/images/arrow_up.png') no-repeat 2px center;
      min-height: 22px;
 }
 
-input.forward, input.login, input.nextpage, input.send {
+input.forward, input.login, input.nextpage, input.send, input.next {
      background: #000 url('/themes/console/images/arrow_right.png') no-repeat 2px center;
      min-height: 22px;
 }
@@ -218,7 +218,7 @@ input.new, input.reply, input.replyall {
      min-height: 22px;
 }
 
-input.prevpage {
+input.prevpage, input.prev {
      background: #000 url('/themes/console/images/arrow_left.png') no-repeat 2px center;
      min-height: 22px;
 }
