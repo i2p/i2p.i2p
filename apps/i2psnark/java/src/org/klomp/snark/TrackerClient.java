@@ -84,6 +84,7 @@ public class TrackerClient implements Runnable {
   private final static long MIN_TRACKER_ANNOUNCE_INTERVAL = 15*60*1000;
   private final static long MIN_DHT_ANNOUNCE_INTERVAL = 10*60*1000;
   public static final int PORT = 6881;
+  private static final int MAX_TRACKERS = 12;
 
   private final I2PSnarkUtil _util;
   private final MetaInfo meta;
@@ -288,6 +289,7 @@ public class TrackerClient implements Runnable {
     }
 
     // announce list
+    // We completely ignore the BEP 12 processing rules
     if (meta != null && !meta.isPrivate()) {
         List<List<String>> list = meta.getAnnounceList();
         if (list != null) {
@@ -299,6 +301,12 @@ public class TrackerClient implements Runnable {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Additional announce (list): [" + url + "] for infoHash: " + infoHash);
                 }
+            }
+            if (trackers.size() > 2) {
+                // shuffle everything but the primary
+                TCTracker pri = trackers.remove(0);
+                Collections.shuffle(trackers, _util.getContext().random());
+                trackers.add(0, pri);
             }
         }
     }
@@ -345,7 +353,13 @@ public class TrackerClient implements Runnable {
   private boolean isNewValidTracker(Set<Hash> existing, String ann) {
       Hash h = getHostHash(ann);
       if (h == null) {
-         _log.error("Bad announce URL: [" + ann + ']');
+          if (_log.shouldLog(Log.WARN))
+              _log.warn("Bad announce URL: [" + ann + ']');
+         return false;
+      }
+      if (existing.size() >= MAX_TRACKERS) {
+          if (_log.shouldLog(Log.INFO))
+              _log.info("Not using announce URL, we have enough: [" + ann + ']');
          return false;
       }
       boolean rv = existing.add(h);
