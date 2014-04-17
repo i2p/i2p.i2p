@@ -42,7 +42,7 @@ public class MessageValidator {
         if (isDuplicate) {
             if (_log.shouldLog(Log.INFO))
                 _log.info("Rejecting message " + messageId + " because it is a duplicate", new Exception("Duplicate origin"));
-            _context.statManager().addRateData("router.duplicateMessageId", 1, 0);
+            _context.statManager().addRateData("router.duplicateMessageId", 1);
             return "duplicate";
         } else {
             if (_log.shouldLog(Log.DEBUG))
@@ -59,12 +59,12 @@ public class MessageValidator {
         if (now - (Router.CLOCK_FUDGE_FACTOR * 3 / 2) >= expiration) {
             if (_log.shouldLog(Log.INFO))
                 _log.info("Rejecting message because it expired " + (now-expiration) + "ms ago");
-            _context.statManager().addRateData("router.invalidMessageTime", (now-expiration), 0);
+            _context.statManager().addRateData("router.invalidMessageTime", (now-expiration));
             return "expired " + (now-expiration) + "ms ago";
         } else if (now + 4*Router.CLOCK_FUDGE_FACTOR < expiration) {
             if (_log.shouldLog(Log.INFO))
                 _log.info("Rejecting message because it will expire too far in the future (" + (expiration-now) + "ms)");
-            _context.statManager().addRateData("router.invalidMessageTime", (now-expiration), 0);
+            _context.statManager().addRateData("router.invalidMessageTime", (now-expiration));
             return "expire too far in the future (" + (expiration-now) + "ms)";
         }
         return null;

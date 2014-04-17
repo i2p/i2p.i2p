@@ -38,7 +38,7 @@ class InboundGatewayReceiver implements TunnelGateway.Receiver {
                 // It should be rare to forget the router info for the next peer
                 ReceiveJob j = null;
                 if (alreadySearched)
-                    _context.statManager().addRateData("tunnel.inboundLookupSuccess", 0, 0);
+                    _context.statManager().addRateData("tunnel.inboundLookupSuccess", 0);
                 else
                     j = new ReceiveJob(_context, encrypted);
                 _context.netDb().lookupRouterInfo(_config.getSendTo(), j, j, MAX_LOOKUP_TIME);
@@ -46,7 +46,7 @@ class InboundGatewayReceiver implements TunnelGateway.Receiver {
             }
         }
         if (alreadySearched)
-            _context.statManager().addRateData("tunnel.inboundLookupSuccess", 1, 0);
+            _context.statManager().addRateData("tunnel.inboundLookupSuccess", 1);
         
         // We do this before the preprocessor now (i.e. before fragmentation)
         //if (_context.tunnelDispatcher().shouldDropParticipatingMessage("IBGW", encrypted.length))

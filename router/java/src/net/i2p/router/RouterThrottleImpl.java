@@ -190,7 +190,7 @@ class RouterThrottleImpl implements RouterThrottle {
                         if (_log.shouldLog(Log.WARN))
                             _log.warn("Probabalistically refusing tunnel request (avg=" + avg
                                       + " current=" + numTunnels + ")");
-                        _context.statManager().addRateData("router.throttleTunnelProbTooFast", (long)(numTunnels-avg), 0);
+                        _context.statManager().addRateData("router.throttleTunnelProbTooFast", (long)(numTunnels-avg));
                         // hard to do {0} from here
                         //setTunnelStatus("Rejecting " + (100 - (int) probAccept*100) + "% of tunnels: High number of requests");
                         setTunnelStatus(_x("Rejecting most tunnels: High number of requests"));
@@ -243,7 +243,7 @@ class RouterThrottleImpl implements RouterThrottle {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Refusing tunnel request since we are already participating in " 
                           + numTunnels + " (our max is " + maxTunnels + ")");
-            _context.statManager().addRateData("router.throttleTunnelMaxExceeded", numTunnels, 0);
+            _context.statManager().addRateData("router.throttleTunnelMaxExceeded", numTunnels);
             setTunnelStatus(_x("Rejecting tunnels: Limit reached"));
             return TunnelHistory.TUNNEL_REJECT_BANDWIDTH;
         }
@@ -264,7 +264,7 @@ class RouterThrottleImpl implements RouterThrottle {
         double bytesAllocated = messagesPerTunnel * numTunnels * PREPROCESSED_SIZE;
         
         if (!allowTunnel(bytesAllocated, numTunnels)) {
-            _context.statManager().addRateData("router.throttleTunnelBandwidthExceeded", (long)bytesAllocated, 0);
+            _context.statManager().addRateData("router.throttleTunnelBandwidthExceeded", (long)bytesAllocated);
             return TunnelHistory.TUNNEL_REJECT_BANDWIDTH;
         }
         

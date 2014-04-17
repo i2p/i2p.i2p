@@ -78,7 +78,7 @@ class TunnelParticipant {
             if (_nextHopCache == null) {
                 _nextHopCache = _context.netDb().lookupRouterInfoLocally(_config.getSendTo());
                 // nothing for failure since fail job is null
-                _context.statManager().addRateData("tunnel.participantLookupSuccess", 1, 0);
+                _context.statManager().addRateData("tunnel.participantLookupSuccess", 1);
             }
         }
     }
@@ -225,7 +225,7 @@ class TunnelParticipant {
                                   + " failed!  where do we go for " + _config + "?  msg dropped: " + _msg);
                     stat = 0;
                 }
-                _context.statManager().addRateData("tunnel.participantLookupSuccess", stat, 0);
+                _context.statManager().addRateData("tunnel.participantLookupSuccess", stat);
             }
         }
     }
@@ -255,7 +255,7 @@ class TunnelParticipant {
                     _log.warn("Lookup the nextHop (" + _config.getSendTo()
                               + " failed!  where do we go for " + _config + "?  msg dropped: " + _msg);
             }
-            _context.statManager().addRateData("tunnel.participantLookupSuccess", 0, 0);
+            _context.statManager().addRateData("tunnel.participantLookupSuccess", 0);
         }
     }
     

@@ -1,3 +1,14 @@
+2014-04-17 zzz
+ * i2psnark: Randomize announce list order and limit size
+ * SSU: SessionRequest replay prevention (ticket #1212)
+ * SusiDNS:
+   - Locking on config file accesses
+   - Remove static log and context
+ * SusiMail:
+   - Button styling for prev,next,list
+   - Log errors to router log too
+ * Tunnels: Increase OBEP throttle limit
+
 2014-04-06 zzz
  * NetDB: Iterative search improvements
 

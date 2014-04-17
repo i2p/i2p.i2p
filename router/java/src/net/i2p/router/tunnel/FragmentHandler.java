@@ -251,9 +251,9 @@ class FragmentHandler {
         if (eq) {
             int excessPadding = paddingEnd - (HopProcessor.IV_LENGTH + 4 + 1);
             if (excessPadding > 0) // suboptimal fragmentation
-                _context.statManager().addRateData("tunnel.smallFragments", excessPadding, 0);
+                _context.statManager().addRateData("tunnel.smallFragments", excessPadding);
             else
-                _context.statManager().addRateData("tunnel.fullFragments", 1, 0);
+                _context.statManager().addRateData("tunnel.fullFragments", 1);
         }
         
         // ByteCache/ByteArray corruption detection

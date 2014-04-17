@@ -209,9 +209,9 @@ public class JobQueue {
             }
         }
         
-        _context.statManager().addRateData("jobQueue.readyJobs", numReady, 0);
+        _context.statManager().addRateData("jobQueue.readyJobs", numReady);
         if (dropped) {
-            _context.statManager().addRateData("jobQueue.droppedJobs", 1, 0);
+            _context.statManager().addRateData("jobQueue.droppedJobs", 1);
             _log.logAlways(Log.WARN, "Dropping job due to overload!  # ready jobs: " 
                           + numReady + ": job = " + job);
         }

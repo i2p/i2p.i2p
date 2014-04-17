@@ -210,9 +210,9 @@ public class PeerTestJob extends JobImpl {
                         if (_log.shouldLog(Log.WARN))
                             _log.warn("Took too long to get a reply from peer " + _peer.toBase64() 
                                       + ": " + (0-timeLeft) + "ms too slow");
-                        getContext().statManager().addRateData("peer.testTooSlow", 0-timeLeft, 0);
+                        getContext().statManager().addRateData("peer.testTooSlow", 0-timeLeft);
                     } else {
-                        getContext().statManager().addRateData("peer.testOK", getTestTimeout() - timeLeft, 0);
+                        getContext().statManager().addRateData("peer.testOK", getTestTimeout() - timeLeft);
                     }
                     _matchFound = true;
                     return true;
@@ -297,7 +297,7 @@ public class PeerTestJob extends JobImpl {
             
             // don't fail the tunnels, as the peer might just plain be down, or
             // otherwise overloaded
-            getContext().statManager().addRateData("peer.testTimeout", 1, 0);
+            getContext().statManager().addRateData("peer.testTimeout", 1);
         }
     }
 }

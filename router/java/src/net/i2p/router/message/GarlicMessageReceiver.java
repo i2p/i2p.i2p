@@ -84,7 +84,7 @@ public class GarlicMessageReceiver {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("CloveMessageParser failed to decrypt the message [" + message.getUniqueId() 
                            + "]", new Exception("Decrypt garlic failed"));
-            _context.statManager().addRateData("crypto.garlic.decryptFail", 1, 0);
+            _context.statManager().addRateData("crypto.garlic.decryptFail", 1);
             _context.messageHistory().messageProcessingError(message.getUniqueId(), 
                                                              message.getClass().getName(), 
                                                              "Garlic could not be decrypted");

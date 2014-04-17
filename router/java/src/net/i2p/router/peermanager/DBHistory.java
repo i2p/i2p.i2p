@@ -105,7 +105,7 @@ public class DBHistory {
     public void lookupSuccessful() {
         _successfulLookups++;
         _failedLookupRate.addData(0, 0);
-        _context.statManager().addRateData("peer.failedLookupRate", 0, 0);
+        _context.statManager().addRateData("peer.failedLookupRate", 0);
         _lastLookupSuccessful = _context.clock().now();
     }
 
@@ -115,7 +115,7 @@ public class DBHistory {
     public void lookupFailed() {
         _failedLookups++;
         _failedLookupRate.addData(1, 0);
-        _context.statManager().addRateData("peer.failedLookupRate", 1, 0);
+        _context.statManager().addRateData("peer.failedLookupRate", 1);
         _lastLookupFailed = _context.clock().now();
     }
 
@@ -128,7 +128,7 @@ public class DBHistory {
         // Fixme, redefined this to include both lookup and store fails,
         // need to fix the javadocs
         _failedLookupRate.addData(0, 0);
-        _context.statManager().addRateData("peer.failedLookupRate", 0, 0);
+        _context.statManager().addRateData("peer.failedLookupRate", 0);
         _lastStoreSuccessful = _context.clock().now();
     }
 

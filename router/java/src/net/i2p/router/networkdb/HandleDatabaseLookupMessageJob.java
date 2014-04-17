@@ -111,7 +111,7 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
                 // Local leasesets are not handled here
                 if (_log.shouldLog(Log.INFO))
                     _log.info("We have the published LS " + _message.getSearchKey() + ", answering query");
-                getContext().statManager().addRateData("netDb.lookupsMatchedReceivedPublished", 1, 0);
+                getContext().statManager().addRateData("netDb.lookupsMatchedReceivedPublished", 1);
                 sendData(_message.getSearchKey(), ls, fromKey, _message.getReplyTunnel());
             } else if (shouldPublishLocal && answerAllQueries()) {
                 // We are floodfill, and this is our local leaseset, and we publish it.
@@ -124,13 +124,13 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
                     // It's in our keyspace, so give it to them
                     if (_log.shouldLog(Log.INFO))
                         _log.info("We have local LS " + _message.getSearchKey() + ", answering query, in our keyspace");
-                    getContext().statManager().addRateData("netDb.lookupsMatchedLocalClosest", 1, 0);
+                    getContext().statManager().addRateData("netDb.lookupsMatchedLocalClosest", 1);
                     sendData(_message.getSearchKey(), ls, fromKey, _message.getReplyTunnel());
                 } else {
                     // Lie, pretend we don't have it
                     if (_log.shouldLog(Log.INFO))
                         _log.info("We have local LS " + _message.getSearchKey() + ", NOT answering query, out of our keyspace");
-                    getContext().statManager().addRateData("netDb.lookupsMatchedLocalNotClosest", 1, 0);
+                    getContext().statManager().addRateData("netDb.lookupsMatchedLocalNotClosest", 1);
                     Set<Hash> routerHashSet = getNearestRouters();
                     sendClosest(_message.getSearchKey(), routerHashSet, fromKey, _message.getReplyTunnel());
                 }
@@ -143,7 +143,7 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
                     _log.info("We have LS " + _message.getSearchKey() +
                                ", NOT answering query - local? " + isLocal + " shouldPublish? " + shouldPublishLocal +
                                " RAP? " + ls.getReceivedAsPublished() + " RAR? " + ls.getReceivedAsReply());
-                getContext().statManager().addRateData("netDb.lookupsMatchedRemoteNotClosest", 1, 0);
+                getContext().statManager().addRateData("netDb.lookupsMatchedRemoteNotClosest", 1);
                 Set<Hash> routerHashSet = getNearestRouters();
                 sendClosest(_message.getSearchKey(), routerHashSet, fromKey, _message.getReplyTunnel());
             }
@@ -246,11 +246,11 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
                        + " tunnel " + replyTunnel);
         DatabaseStoreMessage msg = new DatabaseStoreMessage(getContext());
         if (data.getType() == DatabaseEntry.KEY_TYPE_LEASESET) {
-            getContext().statManager().addRateData("netDb.lookupsMatchedLeaseSet", 1, 0);
+            getContext().statManager().addRateData("netDb.lookupsMatchedLeaseSet", 1);
         }
         msg.setEntry(data);
-        getContext().statManager().addRateData("netDb.lookupsMatched", 1, 0);
-        getContext().statManager().addRateData("netDb.lookupsHandled", 1, 0);
+        getContext().statManager().addRateData("netDb.lookupsMatched", 1);
+        getContext().statManager().addRateData("netDb.lookupsHandled", 1);
         sendMessage(msg, toPeer, replyTunnel);
     }
     
@@ -267,7 +267,7 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
             if (++i >= MAX_ROUTERS_RETURNED)
                 break;
         }
-        getContext().statManager().addRateData("netDb.lookupsHandled", 1, 0);
+        getContext().statManager().addRateData("netDb.lookupsHandled", 1);
         sendMessage(msg, toPeer, replyTunnel); // should this go via garlic messages instead?
     }
     

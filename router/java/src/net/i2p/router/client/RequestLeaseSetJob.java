@@ -104,7 +104,7 @@ class RequestLeaseSetJob extends JobImpl {
             _runner.doSend(msg);
             getContext().jobQueue().addJob(new CheckLeaseRequestStatus());
         } catch (I2CPMessageException ime) {
-            getContext().statManager().addRateData("client.requestLeaseSetDropped", 1, 0);
+            getContext().statManager().addRateData("client.requestLeaseSetDropped", 1);
             _log.error("Error sending I2CP message requesting the lease set", ime);
             _requestState.setIsSuccessful(false);
             if (_requestState.getOnFailed() != null)

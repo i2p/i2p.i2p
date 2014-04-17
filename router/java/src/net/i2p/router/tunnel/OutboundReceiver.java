@@ -99,7 +99,7 @@ class OutboundReceiver implements TunnelGateway.Receiver {
             } else {
                 stat = 0;
             }
-            _context.statManager().addRateData("tunnel.outboundLookupSuccess", stat, 0);
+            _context.statManager().addRateData("tunnel.outboundLookupSuccess", stat);
         }
     }
     
@@ -114,7 +114,7 @@ class OutboundReceiver implements TunnelGateway.Receiver {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("lookup of " + _config.getPeer(1)
                            + " failed for " + _config);
-            _context.statManager().addRateData("tunnel.outboundLookupSuccess", 0, 0);
+            _context.statManager().addRateData("tunnel.outboundLookupSuccess", 0);
         }
     }
 }

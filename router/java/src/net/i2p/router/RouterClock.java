@@ -164,7 +164,7 @@ public class RouterClock extends Clock {
                 _context.statManager().createRequiredRateStat("clock.skew", "Clock step adjustment (ms)", "Clock", new long[] { 10*60*1000, 3*60*60*1000, 24*60*60*60 });
                 _statCreated = true;
             }
-            _context.statManager().addRateData("clock.skew", delta, 0);
+            _context.statManager().addRateData("clock.skew", delta);
             _desiredOffset = offsetMs;
         } else {
             getLog().log(Log.INFO, "Initializing clock offset to " + offsetMs + "ms, Stratum " + stratum);

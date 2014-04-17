@@ -98,7 +98,7 @@ class BatchedPreprocessor extends TrivialPreprocessor {
         if (rv > defaultAmount)
             rv = defaultAmount;
         if (shouldStat)
-            _context.statManager().addRateData("tunnel.batchDelayAmount", rv, 0);
+            _context.statManager().addRateData("tunnel.batchDelayAmount", rv);
         return rv;
     }
     
@@ -159,7 +159,7 @@ class BatchedPreprocessor extends TrivialPreprocessor {
                     long beforeSend = System.currentTimeMillis();
                     _pendingSince = 0;
                     send(pending, 0, i, sender, rec);
-                    _context.statManager().addRateData("tunnel.batchFullFragments", 1, 0);
+                    _context.statManager().addRateData("tunnel.batchFullFragments", 1);
                     long afterSend = System.currentTimeMillis();
                     if (_log.shouldLog(Log.INFO))
                         display(allocated, pending, "Sent the message with " + (i+1));
@@ -176,7 +176,7 @@ class BatchedPreprocessor extends TrivialPreprocessor {
                         if (timingBuf != null)
                             timingBuf.append(" sent " + cur);
                         notePreprocessing(cur.getMessageId(), cur.getFragmentNumber(), cur.getData().length, cur.getMessageIds(), "flushed allocated");
-                        _context.statManager().addRateData("tunnel.batchFragmentation", cur.getFragmentNumber() + 1, 0);
+                        _context.statManager().addRateData("tunnel.batchFragmentation", cur.getFragmentNumber() + 1);
                         _context.statManager().addRateData("tunnel.writeDelay", cur.getLifetime(), cur.getData().length);
                     }
                     if (msg.getOffset() >= msg.getData().length) {
@@ -185,11 +185,11 @@ class BatchedPreprocessor extends TrivialPreprocessor {
                         if (timingBuf != null)
                             timingBuf.append(" sent perfect fit " + cur).append(".");
                         notePreprocessing(cur.getMessageId(), cur.getFragmentNumber(), msg.getData().length, msg.getMessageIds(), "flushed tail, remaining: " + pending);
-                        _context.statManager().addRateData("tunnel.batchFragmentation", cur.getFragmentNumber() + 1, 0);
+                        _context.statManager().addRateData("tunnel.batchFragmentation", cur.getFragmentNumber() + 1);
                         _context.statManager().addRateData("tunnel.writeDelay", cur.getLifetime(), cur.getData().length);
                     }
                     if (i > 0)
-                        _context.statManager().addRateData("tunnel.batchMultipleCount", i+1, 0);
+                        _context.statManager().addRateData("tunnel.batchMultipleCount", i+1);
                     allocated = 0;
                     batchCount++;
                     long pendingEnd = System.currentTimeMillis();
@@ -221,11 +221,11 @@ class BatchedPreprocessor extends TrivialPreprocessor {
                     // not even a full message, but we want to flush it anyway
                     
                     if (pending.size() > 1)
-                        _context.statManager().addRateData("tunnel.batchMultipleCount", pending.size(), 0);
+                        _context.statManager().addRateData("tunnel.batchMultipleCount", pending.size());
                     _context.statManager().addRateData("tunnel.batchDelaySent", pending.size(), 0);
 
                     send(pending, 0, pending.size()-1, sender, rec);
-                    _context.statManager().addRateData("tunnel.batchSmallFragments", FULL_SIZE - allocated, 0);
+                    _context.statManager().addRateData("tunnel.batchSmallFragments", FULL_SIZE - allocated);
                     
                     // Remove everything in the outgoing message from the pending queue
                     int beforeSize = pending.size();
@@ -235,7 +235,7 @@ class BatchedPreprocessor extends TrivialPreprocessor {
                             break;
                         pending.remove(0);
                         notePreprocessing(cur.getMessageId(), cur.getFragmentNumber(), cur.getData().length, cur.getMessageIds(), "flushed remaining");
-                        _context.statManager().addRateData("tunnel.batchFragmentation", cur.getFragmentNumber() + 1, 0);
+                        _context.statManager().addRateData("tunnel.batchFragmentation", cur.getFragmentNumber() + 1);
                         _context.statManager().addRateData("tunnel.writeDelay", cur.getLifetime(), cur.getData().length);
                     }
 
@@ -259,7 +259,7 @@ class BatchedPreprocessor extends TrivialPreprocessor {
                             _pendingSince = 0;
                         }
                         if (batchCount > 1)
-                            _context.statManager().addRateData("tunnel.batchCount", batchCount, 0);
+                            _context.statManager().addRateData("tunnel.batchCount", batchCount);
                         if (_log.shouldLog(Log.INFO))
                             display(allocated, pending, "flushed " + (beforeSize) + ", no remaining after " + delayAmount + "ms");
                         
@@ -273,11 +273,11 @@ class BatchedPreprocessor extends TrivialPreprocessor {
                     // won't get here, we returned
                 } else {
                      // We didn't flush. Note that the messages remain on the pending list.
-                    _context.statManager().addRateData("tunnel.batchDelay", pending.size(), 0);
+                    _context.statManager().addRateData("tunnel.batchDelay", pending.size());
                     if (_pendingSince <= 0)
                         _pendingSince = _context.clock().now();
                     if (batchCount > 1)
-                        _context.statManager().addRateData("tunnel.batchCount", batchCount, 0);
+                        _context.statManager().addRateData("tunnel.batchCount", batchCount);
                     // not yet time to send the delayed flush
                     if (_log.shouldLog(Log.INFO))
                         display(allocated, pending, "dont flush");
