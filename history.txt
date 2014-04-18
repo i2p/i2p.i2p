@@ -1,5 +1,6 @@
 2014-04-18 zzz
  * configclients: Don't allow console disable
+ * I2PTunnel IRC Client: Prevent AIOOBE (ticket #1254)
  * SusiMail:
    - Extend session expiration (ticket #1253)
    - Handle non-UTF8 encoding on header lines (ticket #508)
@@ -8,6 +9,9 @@
    - Remove sort-by-ID buttons
    - Hide "reload config" button unless config file is present
    - Increase default page size
+   - Don't force reconnection on folder view (ticket #1253)
+   - Button theme tweaks
+   - Only show logout button on folder view
    - Add dependency tracking to build
 
 2014-04-17 zzz

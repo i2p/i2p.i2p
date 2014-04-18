@@ -301,6 +301,8 @@ abstract class IRCFilter {
         // in addition to the CTCP version
         if("NOTICE".equals(command))
         {
+            if (field.length < 3)
+                return s;  // invalid, allow server response
             String msg = field[2];
             if(msg.startsWith(":DCC "))
                 return filterDCCOut(field[0] + ' ' + field[1] + " :DCC ", msg.substring(5), helper);
@@ -310,8 +312,9 @@ abstract class IRCFilter {
         // Allow PRIVMSG, but block CTCP (except ACTION).
         if("PRIVMSG".equals(command) || "NOTICE".equals(command))
         {
-            String msg;
-            msg = field[2];
+            if (field.length < 3)
+                return s;  // invalid, allow server response
+            String msg = field[2];
         
             if(msg.indexOf(0x01) >= 0) // CTCP marker ^A can be anywhere, not just immediately after the ':'
             {
@@ -345,6 +348,8 @@ abstract class IRCFilter {
         }
         
         if("USER".equals(command)) {
+            if (field.length < 3)
+                return s;  // invalid, allow server response
             int idx = field[2].lastIndexOf(":");
             if(idx<0)
                 return "USER user hostname localhost :realname";
