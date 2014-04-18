@@ -53,7 +53,8 @@ abstract class IRCFilter {
                 "TOPIC",
                 "AUTHENTICATE", // SASL, also requires CAP below
                 // http://tools.ietf.org/html/draft-mitchell-irc-capabilities-01
-                "CAP"
+                "CAP",
+                "PROTOCTL"
         };
         
 
@@ -76,7 +77,7 @@ abstract class IRCFilter {
         } catch(NumberFormatException nfe){}
 
         
-	if ("PONG".equals(command)) {
+        if ("PONG".equals(command)) {
             // Turn the received ":irc.freshcoffee.i2p PONG irc.freshcoffee.i2p :127.0.0.1"
             // into ":127.0.0.1 PONG 127.0.0.1 " so that the caller can append the client's extra parameter
             // though, does 127.0.0.1 work for irc clients connecting remotely?  and for all of them?  sure would
@@ -161,6 +162,7 @@ abstract class IRCFilter {
                 "JOIN",
                 "KICK",
                 "KNOCK",
+                "LINKS",
                 "LIST",
                 "LUSERS",
                 "MAP", // seems safe enough, the ircd should protect themselves though
@@ -174,6 +176,7 @@ abstract class IRCFilter {
                 "PASS",
                 // "PING",
                 "PONG",
+                "PROTOCTL",
                 // "QUIT", // replace with a filtered QUIT to hide client quit messages
                 "RULES",
                 "SETNAME",
@@ -245,15 +248,15 @@ abstract class IRCFilter {
         String field[]=s.split(" ",3);
 
         if(field[0].length()==0)
-	    return null; // W T F?
-	
+            return null; // W T F?
+        
         
         if(field[0].charAt(0)==':')
             return null; // wtf
         
         String command = field[0].toUpperCase(Locale.US);
 
-	if ("PING".equals(command)) {
+        if ("PING".equals(command)) {
             // Most clients just send a PING and are happy with any old PONG.  Others,
             // like BitchX, actually expect certain behavior.  It sends two different pings:
             // "PING :irc.freshcoffee.i2p" and "PING 1234567890 127.0.0.1" (where the IP is the proxy)
