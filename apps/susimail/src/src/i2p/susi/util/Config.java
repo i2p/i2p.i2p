@@ -68,6 +68,16 @@ public class Config {
 
 		return result;
 	}
+
+	/**
+	 *  Don't bother showing a reload config button if this returns false.
+	 *  @since 0.9.13
+	 */
+	public static boolean hasConfigFile() {
+		File cfg = new File(I2PAppContext.getGlobalContext().getConfigDir(), "susimail.config");
+		return cfg.exists();
+	}
+
 	/**
 	 * 
 	 *

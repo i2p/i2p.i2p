@@ -37,6 +37,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
+import java.util.TimeZone;
+
+import net.i2p.I2PAppContext;
 
 /**
  * data structure to hold a single message, mostly used with folder view and sorting
@@ -51,8 +54,12 @@ public class Mail {
 
 	public int id, size;
 	public String sender, reply, subject, dateString,
-	formattedSender, formattedSubject, formattedDate,
-	shortSender, shortSubject, quotedDate, uidl;
+		formattedSender, formattedSubject,
+		formattedDate,  // US Locale, UTC
+		localFormattedDate,  // Current Locale, local time zone
+		shortSender, shortSubject,
+		quotedDate,  // Current Locale, local time zone, longer format
+		uidl;
 	public Date date;
 	public ReadBuffer header, body;
 	public MailPart part;
@@ -68,6 +75,7 @@ public class Mail {
 		formattedSender = unknown;
 		formattedSubject = unknown;
 		formattedDate = unknown;
+		localFormattedDate = unknown;
 		shortSender = unknown;
 		shortSubject = unknown;
 		quotedDate = unknown;
@@ -110,7 +118,7 @@ public class Mail {
 		for( int i = 0; i < tokens.length; i++ ) {
 			if( tokens[i].matches( "^[^@< \t]+@[^> \t]+$" ) )
 				return "<" + tokens[i] + ">";
-			if(	tokens[i].matches( "^<[^@< \t]+@[^> \t]+>$" ) )
+			if( tokens[i].matches( "^<[^@< \t]+@[^> \t]+>$" ) )
 				return tokens[i];
 		}
 		
@@ -149,7 +157,16 @@ public class Mail {
 	}
 	public void parseHeaders()
 	{
-		DateFormat dateFormatter = new SimpleDateFormat( Config.getProperty( DATEFORMAT, "mm/dd/yyyy HH:mm:ss" ) );
+		DateFormat dateFormatter = new SimpleDateFormat("yyyy-mm-dd HH:mm");
+		DateFormat localDateFormatter = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
+		DateFormat longLocalDateFormatter = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM);
+		// the router sets the JVM time zone to UTC but saves the original here so we can get it
+		String systemTimeZone = I2PAppContext.getGlobalContext().getProperty("i2p.systemTimeZone");
+		if (systemTimeZone != null) {
+			TimeZone tz = TimeZone.getTimeZone(systemTimeZone);
+			localDateFormatter.setTimeZone(tz);
+			longLocalDateFormatter.setTimeZone(tz);
+		}
 		DateFormat mailDateFormatter = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z", Locale.ENGLISH );
 		
 		error = "";
@@ -195,7 +212,9 @@ public class Mail {
 							try {
 								date = mailDateFormatter.parse( dateString );
 								formattedDate = dateFormatter.format( date );
-								quotedDate = html.encode( dateString );
+								localFormattedDate = localDateFormatter.format( date );
+								//quotedDate = html.encode( dateString );
+								quotedDate = longLocalDateFormatter.format(date);
 							}
 							catch (ParseException e) {
 								date = null;
@@ -211,16 +230,16 @@ public class Mail {
 							shortSubject = html.encode( shortSubject );
 						}
 						else if( line.toLowerCase(Locale.US).startsWith( "reply-to:" ) ) {
-							reply = Mail.getAddress( line.substring( 9 ).trim() );
+							reply = getAddress( line.substring( 9 ).trim() );
 						}
 						else if( line.startsWith( "To:" ) ) {
 							ArrayList<String> list = new ArrayList<String>();
-							Mail.getRecipientsFromList( list, line.substring( 3 ).trim(), true );
+							getRecipientsFromList( list, line.substring( 3 ).trim(), true );
 							to = list.toArray();
 						}
 						else if( line.startsWith( "Cc:" ) ) {
 							ArrayList<String> list = new ArrayList<String>();
-							Mail.getRecipientsFromList( list, line.substring( 3 ).trim(), true );
+							getRecipientsFromList( list, line.substring( 3 ).trim(), true );
 							cc = list.toArray();
 						}
 					}
