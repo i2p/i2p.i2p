@@ -113,10 +113,10 @@ public class ConfigClientsHelper extends HelperBase {
             renderForm(buf, ""+cur, ca.clientName,
                        // urlify, enabled
                        false, !ca.disabled,
-                       // read only
+                       // read only, preventDisable
                        // dangerous, but allow editing the console args too
                        //"webConsole".equals(ca.clientName) || "Web console".equals(ca.clientName),
-                       false,
+                       false, RouterConsoleRunner.class.getName().equals(ca.className),
                        // description, edit
                        ca.className + ((ca.args != null) ? " " + ca.args : ""), (""+cur).equals(_edit),
                        // show edit button, show update button
@@ -129,7 +129,7 @@ public class ConfigClientsHelper extends HelperBase {
         }
         
         if ("new".equals(_edit))
-            renderForm(buf, "" + clients.size(), "", false, false, false, "", true, false, false, false, false, false);
+            renderForm(buf, "" + clients.size(), "", false, false, false, false, "", true, false, false, false, false, false);
         buf.append("</table>\n");
         return buf.toString();
     }
@@ -150,7 +150,8 @@ public class ConfigClientsHelper extends HelperBase {
                 String val = props.getProperty(name);
                 boolean isRunning = WebAppStarter.isWebAppRunning(app);
                 renderForm(buf, app, app, !"addressbook".equals(app),
-                           "true".equals(val), RouterConsoleRunner.ROUTERCONSOLE.equals(app), app + ".war",
+                           "true".equals(val), RouterConsoleRunner.ROUTERCONSOLE.equals(app),
+                           RouterConsoleRunner.ROUTERCONSOLE.equals(app), app + ".war",
                            false, false, false, isRunning, false, !isRunning);
             }
         }
@@ -239,7 +240,7 @@ public class ConfigClientsHelper extends HelperBase {
                 enableStop &= PluginStarter.isPluginRunning(app, _context);
                 boolean enableStart = !PluginStarter.isPluginRunning(app, _context);
                 renderForm(buf, app, app, false,
-                           "true".equals(val), false, desc.toString(), false, false,
+                           "true".equals(val), false, false, desc.toString(), false, false,
                            updateURL != null, enableStop, true, enableStart);
             }
         }
@@ -253,7 +254,7 @@ public class ConfigClientsHelper extends HelperBase {
      *  ro trumps edit and showEditButton
      */
     private void renderForm(StringBuilder buf, String index, String name, boolean urlify,
-                            boolean enabled, boolean ro, String desc, boolean edit,
+                            boolean enabled, boolean ro, boolean preventDisable, String desc, boolean edit,
                             boolean showEditButton, boolean showUpdateButton, boolean showStopButton,
                             boolean showDeleteButton, boolean showStartButton) {
         String escapeddesc = DataHelper.escapeHTML(desc);
@@ -275,7 +276,7 @@ public class ConfigClientsHelper extends HelperBase {
         buf.append("</td><td align=\"center\" width=\"10%\"><input type=\"checkbox\" class=\"optbox\" name=\"").append(index).append(".enabled\" value=\"true\" ");
         if (enabled) {
             buf.append("checked=\"checked\" ");
-            if (ro)
+            if (ro || preventDisable)
                 buf.append("disabled=\"disabled\" ");
         }
         buf.append("></td><td align=\"center\" width=\"15%\">");
