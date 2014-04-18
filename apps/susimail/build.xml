@@ -13,8 +13,22 @@
     <condition property="no.bundle">
         <isfalse value="${require.gettext}" />
     </condition>
+    <condition property="depend.available">
+        <typefound name="depend" />
+    </condition>
+    <target name="depend" if="depend.available">
+        <depend
+            cache="../../build"
+            srcdir="./src/src" 
+            destdir="./src/WEB-INF/classes" >
+            <!-- Depend on classes instead of jars where available -->
+            <classpath>
+                <pathelement location="../../core/java/build/obj" />
+            </classpath>
+        </depend>
+    </target>
 
-    <target name="compile">
+    <target name="compile" depends="depend" >
         <mkdir dir="./src/WEB-INF/classes" />
         <javac 
             srcdir="./src/src"

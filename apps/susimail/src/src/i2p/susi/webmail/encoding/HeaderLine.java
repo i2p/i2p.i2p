@@ -23,12 +23,14 @@
  */
 package i2p.susi.webmail.encoding;
 
+import i2p.susi.debug.Debug;
 import i2p.susi.util.HexTable;
 import i2p.susi.util.ReadBuffer;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Locale;
 
 /**
  *  Ref:
@@ -170,7 +172,8 @@ public class HeaderLine implements Encoding {
 				if( length > 0 ) {
 					if( in[offset] == '?' ) {
 						// System.err.println( "=? found at " + ( offset -1 ) );
-						int f2 = offset + 1;
+						int f1 = offset;
+						int f2 = f1 + 1;
 						// FIXME save charset here ticket #508
 						for( ; f2 < end && in[f2] != '?'; f2++ );
 						if( f2 < end ) {
@@ -201,18 +204,31 @@ public class HeaderLine implements Encoding {
 											try {
 												// System.err.println( "decode(" + (f3 + 1) + "," + ( f4 - f3 - 1 ) + ")" );
 												tmp = e.decode( in, f3 + 1, f4 - f3 - 1 );
-												// FIXME use saved charset here ticket #508
-												for( int j = 0; j < tmp.length; j++ ) {
-													byte d = tmp.content[ tmp.offset + j ];
-													out[written++] = ( d == '_' ? 32 : d );
+												// get charset
+												String charset = new String(in, f1 + 1, f2 - f1 - 1, "ISO-8859-1");
+												String clc = charset.toLowerCase(Locale.US);
+												if (clc.equals("utf-8") || clc.equals("utf8")) {
+													for( int j = 0; j < tmp.length; j++ ) {
+														byte d = tmp.content[ tmp.offset + j ];
+														out[written++] = ( d == '_' ? 32 : d );
+													}
+												} else {
+													// decode string
+													String decoded = new String(tmp.content, tmp.offset, tmp.length, charset);
+													// encode string
+													byte[] utf8 = decoded.getBytes("UTF-8");
+													for( int j = 0; j < utf8.length; j++ ) {
+														byte d = utf8[j];
+														out[written++] = ( d == '_' ? 32 : d );
+													}
 												}
 												int distance = f4 + 2 - offset;
 												offset += distance;
 												length -= distance;
 												lastCharWasQuoted = true;
 												continue;
-											}
-											catch (Exception e1) {
+											} catch (Exception e1) {
+												Debug.debug(Debug.ERROR, e1.toString());
 											}
 										}
 									}

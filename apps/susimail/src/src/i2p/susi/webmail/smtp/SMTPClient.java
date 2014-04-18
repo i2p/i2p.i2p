@@ -38,19 +38,19 @@ import java.net.Socket;
  */
 public class SMTPClient {
 	
-	Socket socket;
-	byte buffer[];
+	private Socket socket;
+	private final byte buffer[];
 	public String error;
-	String lastResponse;
+	private String lastResponse;
 	
-	private static Encoding base64 = null;
+	private static final Encoding base64;
 	
 	static {
 		base64 = EncodingFactory.getEncoding( "base64" );
 	}
+
 	public SMTPClient()
 	{
-		socket = null;
 		buffer = new byte[10240];
 		error = "";
 		lastResponse = "";

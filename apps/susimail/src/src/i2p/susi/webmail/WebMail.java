@@ -370,7 +370,9 @@ public class WebMail extends HttpServlet
 	 */
 	private static String sortHeader( String name, String label, String imgPath )
 	{
-		return "" + label + "&nbsp;<a href=\"" + myself + "?" + name + "=up\"><img src=\"" + imgPath + "3up.png\" border=\"0\" alt=\"^\"></a><a href=\"" + myself + "?" + name + "=down\"><img src=\"" + imgPath + "3down.png\" border=\"0\" alt=\"v\"></a>";
+		return label + "&nbsp;<a href=\"" + myself + "?" + name + "=up\"><img src=\"" +
+			imgPath + "3up.png\" border=\"0\" alt=\"^\"></a><a href=\"" + myself +
+			"?" + name + "=down\"><img src=\"" + imgPath + "3down.png\" border=\"0\" alt=\"v\"></a>";
 	}
 	/**
 	 * check, if a given button "was pressed" in the received http request
@@ -758,7 +760,7 @@ public class WebMail extends HttpServlet
 							sessionObject.subject = "Re: " + mail.formattedSubject;
 							StringWriter text = new StringWriter();
 							PrintWriter pw = new PrintWriter( text );
-							pw.println( _("On {0} {1} wrote:", mail.formattedDate, sessionObject.replyTo) );
+							pw.println( _("On {0} {1} wrote:", mail.formattedDate + " UTC", sessionObject.replyTo) );
 							StringWriter text2 = new StringWriter();
 							PrintWriter pw2 = new PrintWriter( text2 );
 							showPart( pw2, mail.part, 0, TEXT_ONLY );
@@ -1273,7 +1275,7 @@ public class WebMail extends HttpServlet
 			if( sessionObject.state == STATE_LIST ) {
 				processFolderButtons( sessionObject, request );
 				for( Iterator<String> it = sessionObject.folder.currentPageIterator(); it != null && it.hasNext(); ) {
-					String uidl = (String)it.next();
+					String uidl = it.next();
 					Mail mail = sessionObject.mailCache.getMail( uidl, MailCache.FETCH_HEADER );
 					if( mail != null && mail.error.length() > 0 ) {
 						sessionObject.error += mail.error;
@@ -1579,9 +1581,10 @@ public class WebMail extends HttpServlet
 	{
 		out.println( button( SEND, _("Send") ) +
 				button( CANCEL, _("Cancel") ) + spacer +
-				(sessionObject.attachments != null && (!sessionObject.attachments.isEmpty()) ? button( DELETE_ATTACHMENT, _("Delete Attachment") ) : button2( DELETE_ATTACHMENT, _("Delete Attachment") ) ) + spacer +
-				button( RELOAD, _("Reload Config") ) + spacer +
-				button( LOGOUT, _("Logout") ) );
+				(sessionObject.attachments != null && (!sessionObject.attachments.isEmpty()) ? button( DELETE_ATTACHMENT, _("Delete Attachment") ) : button2( DELETE_ATTACHMENT, _("Delete Attachment") ) ) + spacer);
+		if (Config.hasConfigFile())
+			out.println(button( RELOAD, _("Reload Config") ) + spacer);
+		out.println(button( LOGOUT, _("Logout") ) );
 
 		String from = request.getParameter( NEW_FROM );
 		String fixed = Config.getProperty( CONFIG_SENDER_FIXED, "true" );
@@ -1672,18 +1675,21 @@ public class WebMail extends HttpServlet
 			button( REPLYALL, _("Reply All") ) +
 			button( FORWARD, _("Forward") ) + spacer +
 			button( DELETE, _("Delete") ) + spacer +
-			button( REFRESH, _("Check Mail") ) + spacer +
-			button( RELOAD, _("Reload Config") ) + spacer +
-			button( LOGOUT, _("Logout") ) + "<table id=\"mailbox\" cellspacing=\"0\" cellpadding=\"5\">\n" +
+			button( REFRESH, _("Check Mail") ) + spacer);
+		if (Config.hasConfigFile())
+			out.println(button( RELOAD, _("Reload Config") ) + spacer);
+		out.println(button( LOGOUT, _("Logout") ) + "<table id=\"mailbox\" cellspacing=\"0\" cellpadding=\"5\">\n" +
 			"<tr><td colspan=\"8\"><hr></td></tr>\n<tr>" +
 			thSpacer + "<th>" + sortHeader( SORT_SENDER, _("Sender"), sessionObject.imgPath ) + "</th>" +
 			thSpacer + "<th>" + sortHeader( SORT_SUBJECT, _("Subject"), sessionObject.imgPath ) + "</th>" +
-			thSpacer + "<th>" + sortHeader( SORT_DATE, _("Date"), sessionObject.imgPath ) + sortHeader( SORT_ID, "", sessionObject.imgPath ) + "</th>" +
+			thSpacer + "<th>" + sortHeader( SORT_DATE, _("Date"), sessionObject.imgPath ) +
+			//sortHeader( SORT_ID, "", sessionObject.imgPath ) +
+			"</th>" +
 			thSpacer + "<th>" + sortHeader( SORT_SIZE, _("Size"), sessionObject.imgPath ) + "</th></tr>" );
 		int bg = 0;
 		int i = 0;
 		for( Iterator<String> it = sessionObject.folder.currentPageIterator(); it != null && it.hasNext(); ) {
-			String uidl = (String)it.next();
+			String uidl = it.next();
 			Mail mail = sessionObject.mailCache.getMail( uidl, MailCache.FETCH_HEADER );
 			String link = "<a href=\"" + myself + "?" + SHOW + "=" + i + "\">";
 			
@@ -1705,7 +1711,9 @@ public class WebMail extends HttpServlet
 					", invert=" + sessionObject.invert +
 					", clear=" + sessionObject.clear );
 			out.println( "<tr class=\"list" + bg + "\"><td><input type=\"checkbox\" class=\"optbox\" name=\"check" + i + "\" value=\"1\"" + 
-					( idChecked ? "checked" : "" ) + ">" + ( RELEASE ? "" : "" + i ) + "</td><td>" + link + mail.shortSender + "</a></td><td>&nbsp;</td><td>" + link + mail.shortSubject + "</a></td><td>&nbsp;</td><td>" + mail.formattedDate + "</td><td>&nbsp;</td><td>" + ngettext("1 Byte", "{0} Bytes", mail.size) + "</td></tr>" );
+					( idChecked ? "checked" : "" ) + ">" + ( RELEASE ? "" : "" + i ) + "</td><td>" +
+					link + mail.shortSender + "</a></td><td>&nbsp;</td><td>" + link + mail.shortSubject + "</a></td><td>&nbsp;</td><td>" +
+					 mail.localFormattedDate + "</td><td>&nbsp;</td><td>" + ngettext("1 Byte", "{0} Bytes", mail.size) + "</td></tr>" );
 			bg = 1 - bg;
 			i++;
 		}
@@ -1754,15 +1762,19 @@ public class WebMail extends HttpServlet
 			button( DELETE, _("Delete") ) + spacer +
 			( sessionObject.folder.isFirstElement( sessionObject.showUIDL ) ? button2( PREV, _("Previous") ) : button( PREV, _("Previous") ) ) +
 			( sessionObject.folder.isLastElement( sessionObject.showUIDL ) ? button2( NEXT, _("Next") ) : button( NEXT, _("Next") ) ) + spacer +
-			button( LIST, _("Back to Folder") ) + spacer +
-			button( RELOAD, _("Reload Config") ) + spacer +
-			button( LOGOUT, _("Logout") ) );
+			button( LIST, _("Back to Folder") ) + spacer);
+		if (Config.hasConfigFile())
+			out.println(button( RELOAD, _("Reload Config") ) + spacer);
+		out.println(button( LOGOUT, _("Logout") ) );
 		if( mail != null ) {
 			out.println( "<table cellspacing=\"0\" cellpadding=\"5\">\n" +
 					"<tr><td colspan=\"2\" align=\"center\"><hr></td></tr>\n" +
-					"<tr class=\"mailhead\"><td align=\"right\">" + _("From:") + "</td><td align=\"left\">" + quoteHTML( mail.formattedSender ) + "</td></tr>\n" +
-					"<tr class=\"mailhead\"><td align=\"right\">" + _("Date:") + "</td><td align=\"left\">" + mail.quotedDate + "</td></tr>\n" +
-					"<tr class=\"mailhead\"><td align=\"right\">" + _("Subject:") + "</td><td align=\"left\">" + quoteHTML( mail.formattedSubject ) + "</td></tr>\n" +
+					"<tr class=\"mailhead\"><td align=\"right\" valign=\"top\">" + _("From:") +
+					"</td><td align=\"left\">" + quoteHTML( mail.sender ) + "</td></tr>\n" +
+					"<tr class=\"mailhead\"><td align=\"right\" valign=\"top\">" + _("Date:") +
+					"</td><td align=\"left\">" + mail.quotedDate + "</td></tr>\n" +
+					"<tr class=\"mailhead\"><td align=\"right\" valign=\"top\">" + _("Subject:") +
+					"</td><td align=\"left\">" + quoteHTML( mail.formattedSubject ) + "</td></tr>\n" +
 					"<tr><td colspan=\"2\" align=\"center\"><hr></td></tr>" );
 			if( mail.body != null ) {
 				showPart( out, mail.part, 0, SHOW_HTML );
