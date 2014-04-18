@@ -15,6 +15,20 @@
   <session-config>
     <session-timeout>1440</session-timeout>
   </session-config>
+  <!-- tomcat (untested) -->
+  <context-param>
+    <param-name>crossContext</param-name>
+    <param-value>false</param-value>
+  </context-param>
+  <!-- jetty
+    -  This is required so the same session ID isn't shared with
+    -  the base context. When shared, it's expired after 30 minutes
+    -  in the base context which invalidates it in our context too.
+    -->
+  <context-param>
+    <param-name>org.eclipse.jetty.servlet.SessionCookie</param-name>
+    <param-value>SUSIMAILJSESSIONID</param-value>
+  </context-param>
 
 <!--
      Jetty 6 mulipart form handling

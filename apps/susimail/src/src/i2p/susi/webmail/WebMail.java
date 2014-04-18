@@ -1280,13 +1280,13 @@ public class WebMail extends HttpServlet
 			int newState = sessionObject.state;
 			if (oldState != newState)
 				Debug.debug(Debug.DEBUG, "STATE CHANGE from " + oldState + " to " + newState);
-			if (oldState == STATE_AUTH && newState != STATE_AUTH) {
-				// this isn't working in web.xml, so try setting it here
-				int oldIdle = httpSession.getMaxInactiveInterval();
-				httpSession.setMaxInactiveInterval(60*60*24);  // seconds
-				int newIdle = httpSession.getMaxInactiveInterval();
-				Debug.debug(Debug.DEBUG, "Changed idle from " + oldIdle + " to " + newIdle);
-			}
+			// Set in web.xml
+			//if (oldState == STATE_AUTH && newState != STATE_AUTH) {
+			//	int oldIdle = httpSession.getMaxInactiveInterval();
+			//	httpSession.setMaxInactiveInterval(60*60*24);  // seconds
+			//	int newIdle = httpSession.getMaxInactiveInterval();
+			//	Debug.debug(Debug.DEBUG, "Changed idle from " + oldIdle + " to " + newIdle);
+			//}
 			
 			if( sessionObject.state != STATE_AUTH )
 				processGenericButtons( sessionObject, request );
