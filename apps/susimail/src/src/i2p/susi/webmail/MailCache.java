@@ -37,19 +37,18 @@ public class MailCache {
 	
 	private final POP3MailBox mailbox;
 	private final Hashtable<String, Mail> mails;
-	private final Object synchronizer;
 	
 	MailCache( POP3MailBox mailbox ) {
 		this.mailbox = mailbox;
 		mails = new Hashtable<String, Mail>();
-		synchronizer = new Object();
 	}
+
 	/**
 	 * Fetch any needed data from pop3 server.
 	 * 
 	 * @param uidl message id to get
 	 * @param headerOnly fetch only header lines?
-	 * @return An e-mail
+	 * @return An e-mail or null
 	 */
 	public Mail getMail( String uidl, boolean headerOnly ) {
 		
@@ -59,10 +58,8 @@ public class MailCache {
 			/*
 			 * synchronize update to hashtable
 			 */
-			synchronized( synchronizer ) {
-
+			synchronized(mails) {
 				mail = mails.get( uidl );
-			
 				if( mail == null ) {
 					newMail = new Mail();
 					mails.put( uidl, newMail );

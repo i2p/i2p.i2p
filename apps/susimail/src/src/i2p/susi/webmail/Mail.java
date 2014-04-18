@@ -203,7 +203,7 @@ public class Mail {
 							formattedSender = getAddress( sender );
 							shortSender = formattedSender.trim();
 							if( shortSender.length() > 40 ) {
-								shortSender = shortSender.substring( 0, 37 ).trim() + "...";
+								shortSender = shortSender.substring( 0, 37 ).trim() + "&hellip;";
 							}
 							shortSender = html.encode( shortSender );
 						}
@@ -226,7 +226,7 @@ public class Mail {
 							formattedSubject = subject;
 							shortSubject = formattedSubject;
 							if( formattedSubject.length() > 60 )
-								shortSubject = formattedSubject.substring( 0, 57 ).trim() + "...";
+								shortSubject = formattedSubject.substring( 0, 57 ).trim() + "&hellip;";
 							shortSubject = html.encode( shortSubject );
 						}
 						else if( line.toLowerCase(Locale.US).startsWith( "reply-to:" ) ) {

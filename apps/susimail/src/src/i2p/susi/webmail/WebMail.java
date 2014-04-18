@@ -47,6 +47,7 @@ import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Locale;
@@ -635,11 +636,13 @@ public class WebMail extends HttpServlet
 						sessionObject.folder.addSorter( SORT_SIZE, new SizeSorter( sessionObject.mailCache ) );
 						sessionObject.folder.setSortingDirection( Folder.DOWN );
 						sessionObject.reallyDelete = false;
+						Debug.debug(Debug.DEBUG, "CONNECTED, YAY");
 					}
 					else {
 						sessionObject.error += sessionObject.mailbox.lastError();
 						sessionObject.mailbox.close();
 						sessionObject.mailbox = null;
+						Debug.debug(Debug.DEBUG, "NOT CONNECTED, BOO");
 					}
 				}
 			}
@@ -653,6 +656,7 @@ public class WebMail extends HttpServlet
 	private static void processLogout( SessionObject sessionObject, RequestWrapper request )
 	{
 		if( buttonPressed( request, LOGOUT ) ) {
+			Debug.debug(Debug.DEBUG, "REMOVING SESSION");
 			HttpSession session = request.getSession();
 			session.removeAttribute( "sessionObject" );
 			session.invalidate();
@@ -1181,6 +1185,10 @@ public class WebMail extends HttpServlet
 		if( sessionObject == null ) {
 			sessionObject = new SessionObject();
 			httpSession.setAttribute( "sessionObject", sessionObject );
+			Debug.debug(Debug.DEBUG, "NEW session " + httpSession.getId() + " state = " + sessionObject.state);
+		} else {
+			Debug.debug(Debug.DEBUG, "Existing session " + httpSession.getId() + " state = " + sessionObject.state +
+				" created " + new Date(httpSession.getCreationTime()));
 		}
 		return sessionObject;
 	}
@@ -1267,7 +1275,18 @@ public class WebMail extends HttpServlet
 			sessionObject.imgPath = sessionObject.themePath + "images/";
 			sessionObject.isMobile = isMobile;
 			
+			int oldState = sessionObject.state;
 			processStateChangeButtons( sessionObject, request );
+			int newState = sessionObject.state;
+			if (oldState != newState)
+				Debug.debug(Debug.DEBUG, "STATE CHANGE from " + oldState + " to " + newState);
+			if (oldState == STATE_AUTH && newState != STATE_AUTH) {
+				// this isn't working in web.xml, so try setting it here
+				int oldIdle = httpSession.getMaxInactiveInterval();
+				httpSession.setMaxInactiveInterval(60*60*24);  // seconds
+				int newIdle = httpSession.getMaxInactiveInterval();
+				Debug.debug(Debug.DEBUG, "Changed idle from " + oldIdle + " to " + newIdle);
+			}
 			
 			if( sessionObject.state != STATE_AUTH )
 				processGenericButtons( sessionObject, request );
@@ -1315,9 +1334,12 @@ public class WebMail extends HttpServlet
 				 */
 				if( sessionObject.state == STATE_AUTH )
 					subtitle = _("Login");
-				else if( sessionObject.state == STATE_LIST )
-					subtitle = ngettext("1 Message", "{0} Messages", sessionObject.mailbox.getNumMails());
-				else if( sessionObject.state == STATE_SHOW )
+				else if( sessionObject.state == STATE_LIST ) {
+					// mailbox.getNumMails() forces a connection, don't use it
+					// Not only does it slow things down, but a failure causes all our messages to "vanish"
+					//subtitle = ngettext("1 Message", "{0} Messages", sessionObject.mailbox.getNumMails());
+					subtitle = ngettext("1 Message", "{0} Messages", sessionObject.folder.getSize());
+				} else if( sessionObject.state == STATE_SHOW )
 					subtitle = _("Show Message");
 
 				response.setContentType( "text/html" );
@@ -1359,7 +1381,8 @@ public class WebMail extends HttpServlet
 				else if( sessionObject.state == STATE_NEW )
 					showCompose( out, sessionObject, request );
 				
-				out.println( "</form><div id=\"footer\"><hr><p class=\"footer\">susimail v0." + version +" " + ( RELEASE ? "release" : "development" ) + " &copy; 2004-2005 <a href=\"mailto:susi23@mail.i2p\">susi</a></div></div></body>\n</html>");				
+				//out.println( "</form><div id=\"footer\"><hr><p class=\"footer\">susimail v0." + version +" " + ( RELEASE ? "release" : "development" ) + " &copy; 2004-2005 <a href=\"mailto:susi23@mail.i2p\">susi</a></div></div></body>\n</html>");				
+				out.println( "</form><div id=\"footer\"><hr><p class=\"footer\">susimail &copy; 2004-2005 susi</div></div></body>\n</html>");				
 				out.flush();
 			}
 		}
@@ -1582,9 +1605,9 @@ public class WebMail extends HttpServlet
 		out.println( button( SEND, _("Send") ) +
 				button( CANCEL, _("Cancel") ) + spacer +
 				(sessionObject.attachments != null && (!sessionObject.attachments.isEmpty()) ? button( DELETE_ATTACHMENT, _("Delete Attachment") ) : button2( DELETE_ATTACHMENT, _("Delete Attachment") ) ) + spacer);
-		if (Config.hasConfigFile())
-			out.println(button( RELOAD, _("Reload Config") ) + spacer);
-		out.println(button( LOGOUT, _("Logout") ) );
+		//if (Config.hasConfigFile())
+		//	out.println(button( RELOAD, _("Reload Config") ) + spacer);
+		//out.println(button( LOGOUT, _("Logout") ) );
 
 		String from = request.getParameter( NEW_FROM );
 		String fixed = Config.getProperty( CONFIG_SENDER_FIXED, "true" );
@@ -1749,7 +1772,7 @@ public class WebMail extends HttpServlet
 			mail.part = new MailPart();
 			mail.part.parse( mail.body );
 		}
-		if( !RELEASE ) {
+		if(!RELEASE && mail != null && mail.body != null) {
 			out.println( "<!--" );
 			// FIXME encoding, escaping --, etc... but disabled.
 			out.println( quoteHTML( new String( mail.body.content, mail.body.offset, mail.body.length ) ) );
@@ -1763,18 +1786,18 @@ public class WebMail extends HttpServlet
 			( sessionObject.folder.isFirstElement( sessionObject.showUIDL ) ? button2( PREV, _("Previous") ) : button( PREV, _("Previous") ) ) +
 			( sessionObject.folder.isLastElement( sessionObject.showUIDL ) ? button2( NEXT, _("Next") ) : button( NEXT, _("Next") ) ) + spacer +
 			button( LIST, _("Back to Folder") ) + spacer);
-		if (Config.hasConfigFile())
-			out.println(button( RELOAD, _("Reload Config") ) + spacer);
-		out.println(button( LOGOUT, _("Logout") ) );
+		//if (Config.hasConfigFile())
+		//	out.println(button( RELOAD, _("Reload Config") ) + spacer);
+		//out.println(button( LOGOUT, _("Logout") ) );
 		if( mail != null ) {
 			out.println( "<table cellspacing=\"0\" cellpadding=\"5\">\n" +
 					"<tr><td colspan=\"2\" align=\"center\"><hr></td></tr>\n" +
 					"<tr class=\"mailhead\"><td align=\"right\" valign=\"top\">" + _("From:") +
 					"</td><td align=\"left\">" + quoteHTML( mail.sender ) + "</td></tr>\n" +
-					"<tr class=\"mailhead\"><td align=\"right\" valign=\"top\">" + _("Date:") +
-					"</td><td align=\"left\">" + mail.quotedDate + "</td></tr>\n" +
 					"<tr class=\"mailhead\"><td align=\"right\" valign=\"top\">" + _("Subject:") +
 					"</td><td align=\"left\">" + quoteHTML( mail.formattedSubject ) + "</td></tr>\n" +
+					"<tr class=\"mailhead\"><td align=\"right\" valign=\"top\">" + _("Date:") +
+					"</td><td align=\"left\">" + mail.quotedDate + "</td></tr>\n" +
 					"<tr><td colspan=\"2\" align=\"center\"><hr></td></tr>" );
 			if( mail.body != null ) {
 				showPart( out, mail.part, 0, SHOW_HTML );
