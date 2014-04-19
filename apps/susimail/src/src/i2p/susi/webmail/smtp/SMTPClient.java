@@ -57,10 +57,21 @@ public class SMTPClient {
 	}
 	
 	/**
+	 *  Wait for response
 	 *  @param cmd may be null
 	 *  @return result code or 0 for failure
 	 */
-	private int sendCmd( String cmd )
+	private int sendCmd( String cmd ) {
+		return sendCmd(cmd, true);
+	}
+	
+	/**
+	 *  @param cmd may be null
+	 *  @param shouldWait if false, don't wait for response, and return 100
+	 *  @return result code or 0 for failure
+	 *  @since 0.9.13
+	 */
+	private int sendCmd(String cmd, boolean shouldWait)
 	{
 		Debug.debug( Debug.DEBUG, "SMTP sendCmd(" + cmd +")" );
 		
@@ -78,6 +89,9 @@ public class SMTPClient {
 				cmd += "\r\n";
 				out.write( cmd.getBytes() );
 			}
+			if (!shouldWait)
+				return 100;
+			out.flush();
 			String str = "";
 			boolean doContinue = true;
 			while( doContinue ) {
@@ -170,7 +184,7 @@ public class SMTPClient {
 			for( int i = 0; i < lines.length; i++ )
 				error += lines[i] + "<br>";			
 		}
-		sendCmd( "QUIT" );
+		sendCmd("QUIT", false );
 		if( socket != null ) {
 			try {
 				socket.close();

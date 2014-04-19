@@ -75,9 +75,11 @@ p.mailbody {
      display: none;
 }
 
+/*
 .mailbody {
      display: block !important;
 }
+*/
 
 a {
      color:#327BBF;
@@ -220,4 +222,8 @@ input.send, input.setpagesize {
      background: #ddf url('/themes/console/images/accept.png') no-repeat 4px center;
      padding: 2px 3px 2px 24px;
      min-height: 22px;
+}
+
+input[type=text], input[type=password] {
+     padding: 1px 4px;
 }

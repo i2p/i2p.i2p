@@ -42,7 +42,7 @@ public class Debug {
 	public static void debug( int msgLevel, String msg )
 	{
 		if( msgLevel <= level )
-			System.err.println( msg );
+			System.err.println("SusiMail: " + msg);
 		if (msgLevel <= ERROR)
 			I2PAppContext.getGlobalContext().logManager().getLog(Debug.class).error(msg);
 	}

@@ -39,6 +39,8 @@ import java.util.Iterator;
  * and then fetch the content of the current page with
  * currentPageIterator().
  * 
+ * Warning - unsynchronized - not thread safe
+ * 
  * @author susi
  */
 public class Folder<O extends Object> {

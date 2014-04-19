@@ -27,38 +27,37 @@ import i2p.susi.debug.Debug;
 import i2p.susi.webmail.Messages;
 import i2p.susi.util.ReadBuffer;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.HashMap;
+import java.util.List;
+
+import net.i2p.data.DataHelper;
 
 /**
  * @author susi23
  */
 public class POP3MailBox {
 
-	private static final int DEFAULT_BUFSIZE = 4096;
-
 	private final String host, user, pass;
 
-	private static final String ERR = "-ERR ";
 	private String lastLine, lastError;
 
 	private final int port;
-	private int mails, read;
+	private int mails;
 
 	private boolean connected;
 
-	private final Hashtable<Integer, ReadBuffer> headerList, bodyList;
-	private Hashtable<Integer, Integer> sizes;
-	private final Hashtable<String, Integer> uidlToID;
-	private final ArrayList<String> uidlList;
+	/** ID to size */
+	private final HashMap<Integer, Integer> sizes;
+	/** UIDL to ID */
+	private final HashMap<String, Integer> uidlToID;
 
 	private Socket socket;
-
-	private final byte[] buffer = new byte[DEFAULT_BUFSIZE];
 
 	private final Object synchronizer;
 
@@ -76,109 +75,94 @@ public class POP3MailBox {
 		this.port = port;
 		this.user = user;
 		this.pass = pass;
-		headerList = new Hashtable<Integer, ReadBuffer>();
-		bodyList = new Hashtable<Integer, ReadBuffer>();
-		uidlList = new ArrayList<String>();
-		uidlToID = new Hashtable<String, Integer>();
-		sizes = new Hashtable<Integer, Integer>();
+		uidlToID = new HashMap<String, Integer>();
+		sizes = new HashMap<Integer, Integer>();
 		synchronizer = new Object();
 		// this appears in the UI so translate
-		lastLine = ERR + _("No response from server");
+		lastLine = _("No response from server");
 		connect();
 	}
 
 	/**
+	 * Fetch the header. Does not cache.
 	 * 
 	 * @param uidl
-	 * @return Byte buffer containing header data.
+	 * @return Byte buffer containing header data or null
 	 */
 	public ReadBuffer getHeader( String uidl ) {
 		synchronized( synchronizer ) {
-			return getHeader( getIDfromUIDL( uidl ) );
+			int id = getIDfromUIDL(uidl);
+			if (id < 0)
+				return null;
+			return getHeader(id);
 		}
 	}
 
 	/**
 	 * retrieves header from pop3 server (with TOP command and RETR as fallback)
+	 * Caller must sync.
 	 * 
 	 * @param id message id
-	 * @return Byte buffer containing header data.
+	 * @return Byte buffer containing header data or null
 	 */
 	private ReadBuffer getHeader( int id ) {
-		synchronized( synchronizer ) {
 			Debug.debug(Debug.DEBUG, "getHeader(" + id + ")");
 			Integer idObj = Integer.valueOf(id);
 			ReadBuffer header = null;
 			if (id >= 1 && id <= mails) {
 				/*
-				 * is data already cached?
+				 * try 'TOP n 0' command
 				 */
-				header = (ReadBuffer)headerList.get(idObj);
-				if (header == null) {
-					/*
-					 * try 'TOP n 0' command
-					 */
-					header = sendCmdN("TOP " + id + " 0" );
-				}
+				header = sendCmdN("TOP " + id + " 0" );
 				if( header == null) {
 					/*
 					 * try 'RETR n' command
 					 */
 					header = sendCmdN("RETR " + id );
+					if (header == null)
+						Debug.debug( Debug.DEBUG, "RETR returned null" );
 				}
-				if( header != null ) {
-					/*
-					 * store result in hashtable
-					 */
-					headerList.put(idObj, header);
-				}
-			}
-			else {
+			} else {
 				lastError = "Message id out of range.";
 			}
 			return header;
-		}
 	}
 
 	/**
+	 * Fetch the body. Does not cache.
 	 * 
 	 * @param uidl
-	 * @return Byte buffer containing body data.
+	 * @return Byte buffer containing body data or null
 	 */
 	public ReadBuffer getBody( String uidl ) {
 		synchronized( synchronizer ) {
-			return getBody( getIDfromUIDL( uidl ) );
+			int id = getIDfromUIDL(uidl);
+			if (id < 0)
+				return null;
+			return getBody(id);
 		}
 	}
 	
 	/**
 	 * retrieve message body from pop3 server (via RETR command)
+	 * Caller must sync.
 	 * 
 	 * @param id message id
-	 * @return Byte buffer containing body data.
+	 * @return Byte buffer containing body data or null
 	 */
 	private ReadBuffer getBody(int id) {
-		synchronized( synchronizer ) {
 			Debug.debug(Debug.DEBUG, "getBody(" + id + ")");
 			Integer idObj = Integer.valueOf(id);
 			ReadBuffer body = null;
 			if (id >= 1 && id <= mails) {
-				body = (ReadBuffer)bodyList.get(idObj);
-				if( body == null ) {
-					body = sendCmdN( "RETR " + id );
-					if (body != null) {
-						bodyList.put(idObj, body);
-					}
-					else {
-						Debug.debug( Debug.DEBUG, "sendCmdN returned null" );
-					}
-				}
+				body = sendCmdN( "RETR " + id );
+				if (body == null)
+					Debug.debug( Debug.DEBUG, "RETR returned null" );
 			}
 			else {
 				lastError = "Message id out of range.";
 			}
 			return body;
-		}
 	}
 
 	/**
@@ -190,7 +174,10 @@ public class POP3MailBox {
 	{
 		Debug.debug(Debug.DEBUG, "delete(" + uidl + ")");
 		synchronized( synchronizer ) {
-			return delete( getIDfromUIDL( uidl ) );
+			int id = getIDfromUIDL(uidl);
+			if (id < 0)
+				return false;
+			return delete(id);
 		}
 	}
 	
@@ -218,34 +205,37 @@ public class POP3MailBox {
 	}
 
 	/**
+	 * Get cached size of a message (via previous LIST command).
 	 * 
 	 * @param uidl
-	 * @return Message size in bytes.
+	 * @return Message size in bytes or 0 if not found
 	 */
 	public int getSize( String uidl ) {
 		synchronized( synchronizer ) {
-			return getSize( getIDfromUIDL( uidl ) );
+			int id = getIDfromUIDL(uidl);
+			if (id < 0)
+				return 0;
+			return getSize(id);
 		}
 	}
 	
 	/**
-	 * get size of a message (via LIST command)
+	 * Get cached size of a message (via previous LIST command).
+	 * Caller must sync.
 	 * 
 	 * @param id message id
-	 * @return Message size in bytes.
+	 * @return Message size in bytes or 0 if not found
 	 */
 	private int getSize(int id) {
-		synchronized( synchronizer ) {
-			Debug.debug(Debug.DEBUG, "getSize(" + id + ")");
 			int result = 0;
 			/*
 			 * find value in hashtable
 			 */
-			Integer resultObj = (Integer) sizes.get(Integer.valueOf(id));
+			Integer resultObj = sizes.get(Integer.valueOf(id));
 			if (resultObj != null)
 				result = resultObj.intValue();
+			Debug.debug(Debug.DEBUG, "getSize(" + id + ") = " + result);
 			return result;
-		}
 	}
 
 	/**
@@ -267,43 +257,37 @@ public class POP3MailBox {
 	}
 
 	/**
+	 * Caller must sync.
 	 * 
 	 * @throws IOException
 	 */
 	private void updateUIDLs() throws IOException
 	{
-		synchronized (synchronizer) {
-
-			ReadBuffer readBuffer = null;
-			
 			uidlToID.clear();
-			uidlList.clear();
 			
-			readBuffer = sendCmdNa( "UIDL", DEFAULT_BUFSIZE );
-			if( readBuffer != null ) {
-				String[] lines = readBuffer.toString().split( "\r\n" );
-				
-				for( int i = 0; i < lines.length; i++ ) {
-					int j = lines[i].indexOf( " " );
+			List<String> lines = sendCmdNl( "UIDL");
+			if (lines != null) {
+				for (String line : lines) {
+					int j = line.indexOf( " " );
 					if( j != -1 ) {
 						try {
-							int n = Integer.parseInt( lines[i].substring( 0, j ) );
-							String uidl = lines[i].substring( j+1 );
+							int n = Integer.parseInt( line.substring( 0, j ) );
+							String uidl = line.substring(j + 1).trim();
 							uidlToID.put( uidl, Integer.valueOf( n ) );
-							uidlList.add( n-1, uidl );
-						}
-						catch( NumberFormatException nfe ) {
-							
+						} catch (NumberFormatException nfe) {
+							Debug.debug(Debug.DEBUG, "UIDL error " + nfe);
+						} catch (IndexOutOfBoundsException ioobe) {
+							Debug.debug(Debug.DEBUG, "UIDL error " + ioobe);
 						}
 					}
 				}
+			} else {
+				Debug.debug(Debug.DEBUG, "Error getting UIDL list from server.");
 			}
-			else {
-				System.err.println( "Error getting UIDL list from pop3 server.");
-			}
-		}
 	}
+
 	/**
+	 * Caller must sync.
 	 * 
 	 * @throws IOException
 	 */
@@ -312,23 +296,22 @@ public class POP3MailBox {
 		 * try LIST
 		 */
 		sizes.clear();
-		ReadBuffer readBuffer = sendCmdNa("LIST", DEFAULT_BUFSIZE );
-		if(readBuffer != null) {
-			String[] lines = new String( readBuffer.content, 0, readBuffer.length ).split( "\r\n" );
-			if (lines != null) {
-				sizes = new Hashtable<Integer, Integer>();
-				for (int i = 0; i < lines.length; i++) {
-					int j = lines[i].indexOf(" ");
-					if (j != -1) {
-						int key = Integer.parseInt(lines[i].substring(0, j));
-						int value =	Integer.parseInt(lines[i].substring(j + 1));
+		List<String> lines = sendCmdNl("LIST");
+		if (lines != null) {
+			for (String line : lines) {
+				int j = line.indexOf(" ");
+				if (j != -1) {
+					try {
+						int key = Integer.parseInt(line.substring(0, j));
+						int value = Integer.parseInt(line.substring(j + 1).trim());
 						sizes.put(Integer.valueOf(key), Integer.valueOf(value));
+					} catch (NumberFormatException nfe) {
+						Debug.debug(Debug.DEBUG, "LIST error " + nfe);
 					}
 				}
 			}
-		}
-		else {
-			System.err.println( "Error getting size LIST from pop3 server.");
+		} else {
+			Debug.debug(Debug.DEBUG, "Error getting LIST from server.");
 		}
 	}
 
@@ -342,19 +325,21 @@ public class POP3MailBox {
 			connect();
 		}
 	}
+
 	/**
-	 * 
-	 *
+	 * Caller must sync.
 	 */
 	private void clear()
 	{
-		uidlList.clear();
 		uidlToID.clear();
 		sizes.clear();
 		mails = 0;
 	}
+
 	/**
 	 * connect to pop3 server, login with USER and PASS and try STAT then
+	 *
+	 * Caller must sync.
 	 */
 	private void connect() {
 		Debug.debug(Debug.DEBUG, "connect()");
@@ -367,18 +352,25 @@ public class POP3MailBox {
 		try {
 			socket = new Socket(host, port);
 		} catch (UnknownHostException e) {
-			lastError = e.getMessage();
+			lastError = e.toString();
 			return;
 		} catch (IOException e) {
-			lastError = e.getMessage();
+			lastError = e.toString();
 			return;
 		}
 		if (socket != null) {
 			try {
-				if (sendCmd1a("USER " + user)
-					&& sendCmd1a("PASS " + pass)
-					&& sendCmd1a("STAT") ) {
-
+				// pipeline 2 commands
+				lastError = "";
+				List<String> cmds = new ArrayList(2);
+				// TODO APOP (unsupported by postman)
+				cmds.add("USER " + user);
+				cmds.add("PASS " + pass);
+				// We can't pipleline the STAT because we must
+				// enter the transaction state first.
+				//cmds.add("STAT");
+				// wait for 3 +OK lines since the connect generates one
+				if (sendCmds(cmds, 3) && sendCmd1a("STAT")) {
 					int i = lastLine.indexOf(" ", 5);
 					mails =
 						Integer.parseInt(
@@ -389,216 +381,236 @@ public class POP3MailBox {
 					connected = true;
 					updateUIDLs();
 					updateSizes();
-				}
-				else {
-					lastError = lastLine;
+				} else {
+					if (lastError.equals(""))
+						lastError = _("Error connecting to server");
 					close();
 				}
 			}
 			catch (NumberFormatException e1) {
-				lastError = "Error getting number of messages: " + e1.getCause();
+				lastError = _("Error opening mailbox") + ": " + e1;
 			}
 			catch (IOException e1) {
-				lastError = "Error while opening mailbox: " + e1.getCause();
+				lastError = _("Error opening mailbox") + ": " + e1;
 			}
 		}
 	}
 	
 	/**
 	 * send command to pop3 server (and expect single line answer)
+	 * Response will be in lastLine. Does not read past the first line of the response.
+	 * Caller must sync.
 	 * 
 	 * @param cmd command to send
 	 * @return true if command was successful (+OK)
 	 * @throws IOException
 	 */
 	private boolean sendCmd1a(String cmd) throws IOException {
+		boolean result = false;
+		sendCmd1aNoWait(cmd);
+		socket.getOutputStream().flush();
+		String foo = DataHelper.readLine(socket.getInputStream());
+		// Debug.debug(Debug.DEBUG, "sendCmd1a: read " + read + " bytes");
+		if (foo != null) {
+			lastLine = foo;
+			if (lastLine.startsWith("+OK")) {
+				if (cmd.startsWith("PASS"))
+					cmd = "PASS provided";
+				Debug.debug(Debug.DEBUG, "sendCmd1a: (" + cmd + ") success: \"" + lastLine.trim() + '"');
+				result = true;
+			} else {
+				if (cmd.startsWith("PASS"))
+					cmd = "PASS provided";
+				Debug.debug(Debug.DEBUG, "sendCmd1a: (" + cmd + ") FAIL: \"" + lastLine.trim() + '"');
+				lastError = lastLine;
+			}
+		} else {
+			Debug.debug(Debug.DEBUG, "sendCmd1a: (" + cmd + ") NO RESPONSE");
+			lastError = _("No response from server");
+			throw new IOException(lastError);
+		}
+		return result;
+	}
+	
+	/**
+	 * Send commands to pop3 server all at once (and expect answers).
+	 * Sets lastError to the FIRST error.
+	 * Caller must sync.
+	 * 
+	 * @param cmd command to send
+	 * @param rcvLines lines to receive
+	 * @return true if ALL received lines were successful (+OK)
+	 * @throws IOException
+         * @since 0.9.13
+	 */
+	private boolean sendCmds(List<String> cmds, int rcvLines) throws IOException {
+		boolean result = true;
+		for (String cmd : cmds) {
+			sendCmd1aNoWait(cmd);
+		}
+		socket.getOutputStream().flush();
+		InputStream in = socket.getInputStream();
+		for (int i = 0; i < rcvLines; i++) {
+			String foo = DataHelper.readLine(in);
+			if (foo == null) {
+				lastError = _("No response from server");
+				throw new IOException(lastError);
+			}
+			//foo = foo.trim(); // readLine() doesn't strip \r
+			if (!foo.startsWith("+OK")) {
+				Debug.debug(Debug.DEBUG, "Fail after " + (i+1) + " of " + rcvLines + " responses: \"" + foo.trim() + '"');
+				if (result)
+				    lastError = foo;   // actually the first error, for better info to the user
+				result = false;
+			} else {
+				Debug.debug(Debug.DEBUG, "OK after " + (i+1) + " of " + rcvLines + " responses: \"" + foo.trim() + '"');
+			}
+			lastLine = foo;
+		}
+		return result;
+	}
+	
+	/**
+	 * send command to pop3 server. Does NOT flush or read or wait.
+	 * Caller must sync.
+	 * 
+	 * @param cmd command to send
+	 * @throws IOException
+         * @since 0.9.13
+	 */
+	private void sendCmd1aNoWait(String cmd) throws IOException {
 		/*
 		 * dont log password
 		 */
-		boolean result = false;
 		String msg = cmd;
 		if (msg.startsWith("PASS"))
 			msg = "PASS provided";
 		Debug.debug(Debug.DEBUG, "sendCmd1a(" + msg + ")");
-
 		cmd += "\r\n";
 		socket.getOutputStream().write(cmd.getBytes());
-		read = socket.getInputStream().read(buffer);
-		// Debug.debug(Debug.DEBUG, "sendCmd1a: read " + read + " bytes");
-		if (read > 0) {
-			lastLine = new String(buffer, 0, read);
-			// Debug.debug( Debug.DEBUG, "sendCmd1a: READBUFFER: '" + lastLine + "'" );
-			if (lastLine.startsWith("+OK")) {
-				result = true;
-			}
-			else {
-				lastError = lastLine;
-			}
-		}
-
-		return result;
 	}
 
 	/**
+	 * Tries twice
+	 * Caller must sync.
 	 * 
-	 * @param cmd
-	 * @return buffer
+	 * @return buffer or null
 	 */
 	private ReadBuffer sendCmdN(String cmd )
 	{
-		return sendCmdN( cmd, DEFAULT_BUFSIZE );
-	}
-	/**
-	 * @param cmd
-	 * @return buffer
-	 */
-	private ReadBuffer sendCmdN(String cmd, int bufSize )
-	{
-		ReadBuffer result = null;
-
 		synchronized (synchronizer) {
-
 			if (!isConnected())
 				connect();
-
 			try {
-				result = sendCmdNa(cmd, bufSize);
+				return sendCmdNa(cmd);
+			} catch (IOException e) {
+				lastError = e.toString();
+				Debug.debug( Debug.DEBUG, "sendCmdNa throws: " + e);
 			}
-			catch (IOException e) {
-				lastError = e.getMessage();
-				Debug.debug( Debug.DEBUG, "sendCmdNa throws IOException: " + lastError );
-				result = null;
-			}
-			
-			if( result == null ) {
-				connect();
-				if (connected) {
-					try {
-						result = sendCmdNa(cmd, bufSize);
-					}
-					catch (IOException e2) {
-						lastError = e2.getMessage();
-						Debug.debug( Debug.DEBUG, "2nd sendCmdNa throws IOException: " + lastError );
-						result = null;
-					}
+			connect();
+			if (connected) {
+				try {
+					return sendCmdNa(cmd);
+				} catch (IOException e2) {
+					lastError = e2.toString();
+					Debug.debug( Debug.DEBUG, "2nd sendCmdNa throws: " + e2);
 				}
-				else {
-					Debug.debug( Debug.DEBUG, "not connected after reconnect" );					
-				}
+			} else {
+				Debug.debug( Debug.DEBUG, "not connected after reconnect" );					
 			}
 		}
-		return result;
+		return null;
 	}
+
 	/**
-	 * 
-	 * @param src
-	 * @param newSize
-	 * @return new array
-	 */
-	private byte[] resizeArray( byte src[], int newSize )
-	{
-		byte dest[] = new byte[newSize];
-		for( int i = 0; i < src.length; i++ )
-			dest[i] = src[i];
-		return dest;
-	}
-	/**
-	 * 
-	 * @param src
-	 * @param srcOffset
-	 * @param len
-	 * @param dest
-	 * @param destOffset
-	 */
-	private void copy( byte[] src, int srcOffset, int len, byte[] dest, int destOffset )
-	{
-		while( len-- > 0 ) {
-			dest[destOffset++] = src[srcOffset++];
-		}
-	}
-	/**
-	 * @param id
-	 * @return buffer
+	 * No total timeout (result could be large)
+	 * Caller must sync.
+	 *
+	 * @return buffer or null
 	 * @throws IOException
 	 */
-	private ReadBuffer sendCmdNa(String cmd, int bufSize ) throws IOException
+	private ReadBuffer sendCmdNa(String cmd) throws IOException
 	{
-		Debug.debug(Debug.DEBUG, "sendCmdNa(" + cmd + ")");
-		
-		ReadBuffer readBuffer = null;
-		long timeOut = 60000;
-		byte result[] = new byte[bufSize];
-		int written = 0;
-		
 		if (sendCmd1a(cmd)) {
-			int offset = 0;
-			while( offset < read - 1 && buffer[offset] != '\r' && buffer[offset+1] != '\n' )
-				offset++;
-			offset += 2;
-			if( read - offset > result.length )
-				result = resizeArray( result, result.length + result.length );
-			if( read - offset > 0 )
-				copy( buffer, offset, read - offset, result, 0 );
-			written = read - offset;
-			boolean doRead = true;
-			// Debug.debug( Debug.DEBUG, "READBUFFER: '" + new String( result, 0, written ) + "'" );
-			if( written >= 5 && result[ written - 5 ] == '\r' &&
-					result[ written - 4 ] == '\n' &&
-					result[ written - 3 ] == '.' &&
-					result[ written - 2 ] == '\r' &&
-					result[ written - 1 ] == '\n' ) {
-				written -= 3;
-				doRead = false;
-			}
 			InputStream input = socket.getInputStream();
-			long startTime = System.currentTimeMillis();
-			while (doRead) {
-				int len = input.available();
-				if( len == 0 ) {
-					if( System.currentTimeMillis() - startTime > timeOut )
-						throw new IOException( "Timeout while waiting on server response." );
-					try {
-						Thread.sleep( 500 );
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-				else {
-					while (len > 0) {
-						read = socket.getInputStream().read(buffer, 0, len > buffer.length ? buffer.length : len );
-						// Debug.debug(Debug.DEBUG, "read " + read + " bytes");
-						if( written + read > result.length )
-							result = resizeArray( result, result.length + result.length );
-						copy( buffer, 0, read, result, written );
-						written += read;
-						// Debug.debug( Debug.DEBUG, "READBUFFER: '" + new String( result, 0, written ) + "'" );
-						if( result[ written - 5 ] == '\r' &&
-								result[ written - 4 ] == '\n' &&
-								result[ written - 3 ] == '.' &&
-								result[ written - 2 ] == '\r' &&
-								result[ written - 1 ] == '\n' ) {
-							written -= 3;
-							doRead = false;
-						}
-						len -= read;
-					}					
-				}
+			StringBuilder buf = new StringBuilder(512);
+			ByteArrayOutputStream baos = new ByteArrayOutputStream(4096);
+			while (DataHelper.readLine(input, buf)) {
+				int len = buf.length();
+				if (len == 0)
+					break; // huh? no \r?
+				if (len == 2 && buf.charAt(0) == '.' && buf.charAt(1) == '\r')
+					break;
+				String line;
+				// RFC 1939 sec. 3 de-byte-stuffing
+				if (buf.charAt(0) == '.')
+					line = buf.substring(1);
+				else
+					line = buf.toString();
+				baos.write(DataHelper.getASCII(line));
+				if (buf.charAt(len - 1) != '\r')
+					baos.write((byte) '\n');
+				baos.write((byte) '\n');
+				buf.setLength(0);
 			}
-			readBuffer = new ReadBuffer();
-			readBuffer.content = result;
+			ReadBuffer readBuffer = new ReadBuffer();
+			readBuffer.content = baos.toByteArray();
 			readBuffer.offset = 0;
-			readBuffer.length = written;
-		}
-		else {
+			readBuffer.length = baos.size();
+			return readBuffer;
+		} else {
 			Debug.debug( Debug.DEBUG, "sendCmd1a returned false" );
+			return null;
 		}
-
-		return readBuffer;
 	}
 
 	/**
+	 * Like sendCmdNa but returns a list of strings, one per line.
+	 * Strings will have trailing \r but not \n.
+	 * Total timeout 2 minutes.
+	 * Caller must sync.
+	 *
+	 * @return the lines or null on error
+	 * @throws IOException on timeout
+         * @since 0.9.13
+	 */
+	private List<String> sendCmdNl(String cmd) throws IOException
+	{
+		if (sendCmd1a(cmd)) {
+			List<String> rv = new ArrayList<String>(16);
+			long timeOut = 120*1000;
+			InputStream input = socket.getInputStream();
+			long startTime = System.currentTimeMillis();
+			StringBuilder buf = new StringBuilder(512);
+			while (DataHelper.readLine(input, buf)) {
+				int len = buf.length();
+				if (len == 0)
+					break; // huh? no \r?
+				if (len == 2 && buf.charAt(0) == '.' && buf.charAt(1) == '\r')
+					break;
+				if( System.currentTimeMillis() - startTime > timeOut )
+					throw new IOException( "Timeout while waiting on server response." );
+				String line;
+				// RFC 1939 sec. 3 de-byte-stuffing
+				if (buf.charAt(0) == '.')
+					line = buf.substring(1);
+				else
+					line = buf.toString();
+				rv.add(line);
+				buf.setLength(0);
+			}
+			return rv;
+		} else {
+			Debug.debug( Debug.DEBUG, "sendCmd1a returned false" );
+			return null;
+		}
+	}
+
+	/**
+	 * Warning - forces a connection.
+	 *
 	 * @return The amount of e-mails available.
+	 * @deprecated unused
 	 */
 	public int getNumMails() {
 		synchronized( synchronizer ) {
@@ -615,24 +627,40 @@ public class POP3MailBox {
 	 * @return The most recent error message.
 	 */
 	public String lastError() {
-		Debug.debug(Debug.DEBUG, "lastError()");
-		return this.lastError;
+		//Debug.debug(Debug.DEBUG, "lastError()");
+		// Hide the "-ERR" from the user
+		String e = lastError;
+		if (e.startsWith("-ERR ") && e.length() > 5)
+			e = e.substring(5);
+		// translate this common error
+		if (e.trim().equals("Login failed."))
+			e = _("Login failed");
+		return e;
 	}
 
 	/**
-	 * 
-	 *  
+	 *  Close without waiting for response
 	 */
 	public void close() {
+		close(false);
+	}
+
+	/**
+	 *  Close and optionally waiting for response
+	 *  @since 0.9.13
+	 */
+	private void close(boolean shouldWait) {
 		synchronized( synchronizer ) {
 			Debug.debug(Debug.DEBUG, "close()");
 			if (socket != null && socket.isConnected()) {
 				try {
-					sendCmd1a("QUIT");
+					if (shouldWait)
+						sendCmd1a("QUIT");
+					else
+						sendCmd1aNoWait("QUIT");
 					socket.close();
 				} catch (IOException e) {
-					System.err.println(
-							"Error while closing connection: " + e.getCause());
+					Debug.debug( Debug.DEBUG, "Error while closing connection: " + e);
 				}
 			}
 			socket = null;
@@ -642,9 +670,10 @@ public class POP3MailBox {
 
 	/**
 	 * returns number of message with given UIDL
+	 * Caller must sync.
 	 * 
 	 * @param uidl
-	 * @return Message number.
+	 * @return Message number or -1
 	 */
 	private int getIDfromUIDL( String uidl )
 	{
@@ -655,27 +684,41 @@ public class POP3MailBox {
 		}
 		return result;
 	}
+
 	/**
-	 * 
+	 * Unused
 	 * @param id
-	 * @return UIDL.
+	 * @return UIDL or null
 	 */
+/****
 	public String getUIDLfromID( int id )
 	{
-		return uidlList.get( id );
+		synchronized( synchronizer ) {
+			try {
+				return uidlList.get( id );
+			} catch (IndexOutOfBoundsException ioobe) {
+				return null;
+			}
+		}
 	}
+****/
+
 	/**
 	 * 
-	 * @return A list of the available UIDLs.
+	 * @return A new array of the available UIDLs. No particular order.
 	 */
 	public String[] getUIDLs()
 	{
-		return uidlList.toArray(new String[uidlList.size()]);
+		synchronized( synchronizer ) {
+		       return uidlToID.keySet().toArray(new String[uidlToID.size()]);
+		}
 	}
+
 	/**
 	 * 
 	 * @param args
 	 */
+/****
 	public static void main( String[] args )
 	{
 		Debug.setLevel( Debug.DEBUG );
@@ -683,14 +726,17 @@ public class POP3MailBox {
 		ReadBuffer readBuffer = mailbox.sendCmdN( "LIST" );
 		System.out.println( "list='" + readBuffer + "'" );
 	}
+****/
 
 	/**
-	 * 
+	 *  Close and reconnect. Takes a while.
 	 */
 	public void performDelete()
 	{
-		close();
-		connect();
+		synchronized( synchronizer ) {
+			close(true);
+			connect();
+		}
 	}
 
 	/** translate */

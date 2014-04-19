@@ -61,6 +61,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import net.i2p.I2PAppContext;
+import net.i2p.data.DataHelper;
 
 /**
  * @author susi23
@@ -182,7 +183,7 @@ public class WebMail extends HttpServlet
 	 * @author susi
 	 */
 	private static class IDSorter implements Comparator<String> {
-		private MailCache mailCache;
+		private final MailCache mailCache;
 		
 		/**
 		 * Set MailCache object, where to get Mails from
@@ -209,7 +210,7 @@ public class WebMail extends HttpServlet
 	 * @author susi
 	 */
 	private static class SenderSorter implements Comparator<String> {
-		private MailCache mailCache;
+		private final MailCache mailCache;
 		
 		/**
 		 * Set MailCache object, where to get Mails from
@@ -236,7 +237,7 @@ public class WebMail extends HttpServlet
 	 */
 	private static class SubjectSorter implements Comparator<String> {
 
-		private MailCache mailCache;
+		private final MailCache mailCache;
 		/**
 		 * Set MailCache object, where to get Mails from
 		 * @param mailCache
@@ -262,7 +263,7 @@ public class WebMail extends HttpServlet
 	 */
 	private static class DateSorter implements Comparator<String> {
 
-		private MailCache mailCache;
+		private final MailCache mailCache;
 		/**
 		 * Set MailCache object, where to get Mails from
 		 * @param mailCache
@@ -287,7 +288,7 @@ public class WebMail extends HttpServlet
 	 */
 	private static class SizeSorter implements Comparator<String> {
 
-		private MailCache mailCache;
+		private final MailCache mailCache;
 		/**
 		 * Set MailCache object, where to get Mails from
 		 * @param mailCache
@@ -444,7 +445,7 @@ public class WebMail extends HttpServlet
 					( mailPart.description != null ? mailPart.description + ", " : "" ) +
 					( mailPart.filename != null ? mailPart.filename + ", " : "" ) +
 					( mailPart.name != null ? mailPart.name + ", " : "" ) +
-					( mailPart.type != null ? mailPart.type : _("unknown") ) );
+					( mailPart.type != null ? '(' + mailPart.type + ')' : _("unknown") ) );
 			
 			if( level == 0 && mailPart.version == null ) {
 				/*
@@ -514,8 +515,10 @@ public class WebMail extends HttpServlet
 			}
 			if( prepareAttachment ) {
 				if( html ) {
-					out.println( "<p class=\"mailbody\">" );
-					out.println( "<a target=\"_blank\" href=\"" + myself + "?" + DOWNLOAD + "=" + mailPart.hashCode() + "\">" + _("Download") + "</a> " + _("attachment ({0}).", ident) + " " + _("File is packed into a zipfile for security reasons.") );
+					out.println( "<hr><p class=\"mailbody\">" );
+					out.println( "<a target=\"_blank\" href=\"" + myself + "?" + DOWNLOAD + "=" +
+						 mailPart.hashCode() + "\">" + _("Download attachment {0}", ident) + "</a>" +
+						 " (" + _("File is packed into a zipfile for security reasons.") + ')');
 					out.println( "</p>" );					
 				}
 				else {
@@ -635,6 +638,7 @@ public class WebMail extends HttpServlet
 						sessionObject.folder.addSorter( SORT_DATE, new DateSorter( sessionObject.mailCache ) );
 						sessionObject.folder.addSorter( SORT_SIZE, new SizeSorter( sessionObject.mailCache ) );
 						sessionObject.folder.setSortingDirection( Folder.DOWN );
+						sessionObject.folder.sortBy(SORT_DATE);
 						sessionObject.reallyDelete = false;
 						Debug.debug(Debug.DEBUG, "CONNECTED, YAY");
 					}
@@ -1077,7 +1081,8 @@ public class WebMail extends HttpServlet
 		String str = request.getParameter( PAGESIZE );
 		if( str != null && str.length() > 0 ) {
 			try {
-				int pageSize = Integer.parseInt( str );
+				// limit max to 100 as it makes the startup really slow
+				int pageSize = Math.min(100, Math.max(5, Integer.parseInt( str )));
 				int oldPageSize = sessionObject.folder.getPageSize();
 				if( pageSize != oldPageSize )
 					sessionObject.folder.setPageSize( pageSize );
@@ -1357,6 +1362,7 @@ public class WebMail extends HttpServlet
 					out.println( "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes\" />\n" +
 						"<link rel=\"stylesheet\" type=\"text/css\" href=\"" + sessionObject.themePath + "mobile.css\" />\n" );
 				}
+				// TODO javascript here
 				out.println( "</head>\n<body>\n" +
 					"<div class=\"page\"><p><img src=\"" + sessionObject.imgPath + "susimail.png\" alt=\"Susimail\"><br>&nbsp;</p>\n" +
 					"<form method=\"POST\" enctype=\"multipart/form-data\" action=\"" + myself + "\" accept-charset=\"UTF-8\">" );
@@ -1603,7 +1609,7 @@ public class WebMail extends HttpServlet
 	 */
 	private static void showCompose( PrintWriter out, SessionObject sessionObject, RequestWrapper request )
 	{
-		out.println( button( SEND, _("Send") ) +
+		out.println( button( SEND, _("Send") ) + spacer +
 				button( CANCEL, _("Cancel") ) + spacer +
 				(sessionObject.attachments != null && (!sessionObject.attachments.isEmpty()) ? button( DELETE_ATTACHMENT, _("Delete Attachment") ) : button2( DELETE_ATTACHMENT, _("Delete Attachment") ) ) + spacer);
 		//if (Config.hasConfigFile())
@@ -1645,10 +1651,12 @@ public class WebMail extends HttpServlet
 			boolean wroteHeader = false;
 			for( Attachment attachment : sessionObject.attachments ) {
 				if( !wroteHeader ) {
-					out.println( "<tr><td colspan=\"2\" align=\"center\">" + _("Attachments:") + "</td></tr>" );
+					out.println("<tr><td align=\"right\">" + _("Attachments:") + "</td>");
 					wroteHeader = true;
+				} else {
+					out.println("<tr><td align=\"right\">&nbsp;</td>");
 				}
-				out.println( "<tr><td colspan=\"2\" align=\"center\"><input type=\"checkbox\" class=\"optbox\" name=\"check" + attachment.hashCode() + "\" value=\"1\">&nbsp;" + attachment.getFileName() + "</td></tr>");
+				out.println("<td align=\"left\"><input type=\"checkbox\" class=\"optbox\" name=\"check" + attachment.hashCode() + "\" value=\"1\">&nbsp;" + attachment.getFileName() + "</td></tr>");
 			}
 		}
 		out.println( "</table>" );
@@ -1756,18 +1764,25 @@ public class WebMail extends HttpServlet
 			out.println( "<tr class=\"list" + bg + "\"><td><input type=\"checkbox\" class=\"optbox\" name=\"check" + i + "\" value=\"1\"" + 
 					( idChecked ? "checked" : "" ) + ">" + "</td><td>" +
 					link + mail.shortSender + "</a></td><td>&nbsp;</td><td>" + link + mail.shortSubject + "</a></td><td>&nbsp;</td><td>" +
-					 mail.localFormattedDate + "</td><td>&nbsp;</td><td>" + ngettext("1 Byte", "{0} Bytes", mail.size) + "</td></tr>" );
+					// don't let date get split across lines
+					mail.localFormattedDate.replace(" ", "&nbsp;") + "</td><td>&nbsp;</td><td>" +
+					DataHelper.formatSize2(mail.size) + "B</td></tr>" );
 			bg = 1 - bg;
 			i++;
 		}
-		out.println( "<tr><td colspan=\"8\"><hr></td></tr>\n</table>" +
+		if (i == 0)
+			out.println("<tr><td colspan=\"8\" align=\"center\"><i>" + _("No messages") + "</i></td></tr>\n</table>");
+		out.println( "<tr><td colspan=\"8\"><hr></td></tr>\n</table>");
+		if (i > 0) {
+			out.println(
 				button( MARKALL, _("Mark All") ) +
 				button( INVERT, _("Invert Selection") ) +
 				button( CLEAR, _("Clear") ) +
 				"<br>");
-		out.println(
+			out.println(
 				_("Page Size:") + "&nbsp;<input type=\"text\" style=\"text-align: right;\" name=\"" + PAGESIZE + "\" size=\"4\" value=\"" +  sessionObject.folder.getPageSize() + "\">" +
 				button( SETPAGESIZE, _("Set") ) );
+		}
 	}
 	/**
 	 * 
