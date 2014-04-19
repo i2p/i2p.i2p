@@ -63,7 +63,7 @@ public class Mail {
 	public Date date;
 	public ReadBuffer header, body;
 	public MailPart part;
-	Object[] to, cc;
+	String[] to, cc;
 
 	public String error;
 
@@ -235,12 +235,12 @@ public class Mail {
 						else if( line.startsWith( "To:" ) ) {
 							ArrayList<String> list = new ArrayList<String>();
 							getRecipientsFromList( list, line.substring( 3 ).trim(), true );
-							to = list.toArray();
+							to = list.toArray(new String[list.size()]);
 						}
 						else if( line.startsWith( "Cc:" ) ) {
 							ArrayList<String> list = new ArrayList<String>();
 							getRecipientsFromList( list, line.substring( 3 ).trim(), true );
-							cc = list.toArray();
+							cc = list.toArray(new String[list.size()]);
 						}
 					}
 				}

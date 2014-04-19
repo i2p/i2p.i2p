@@ -56,9 +56,13 @@ public class SMTPClient {
 		lastResponse = "";
 	}
 	
-	public int sendCmd( String cmd )
+	/**
+	 *  @param cmd may be null
+	 *  @return result code or 0 for failure
+	 */
+	private int sendCmd( String cmd )
 	{
-		Debug.debug( Debug.DEBUG, "sendCmd(" + cmd +")" );
+		Debug.debug( Debug.DEBUG, "SMTP sendCmd(" + cmd +")" );
 		
 		if( socket == null )
 			return 0;
@@ -110,6 +114,10 @@ public class SMTPClient {
 		}
 		return result;
 	}
+
+	/**
+	 *  @return success
+	 */
 	public boolean sendMail( String host, int port, String user, String pass, String sender, Object[] recipients, String body )
 	{
 		boolean mailSent = false;

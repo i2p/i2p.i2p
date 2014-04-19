@@ -38,6 +38,11 @@ public class MailCache {
 	private final POP3MailBox mailbox;
 	private final Hashtable<String, Mail> mails;
 	
+	/** Includes header, headers are generally 1KB to 1.5 KB,
+	 *  and bodies will compress well.
+         */
+	private static final int FETCH_ALL_SIZE = 3072;
+
 	MailCache( POP3MailBox mailbox ) {
 		this.mailbox = mailbox;
 		mails = new Hashtable<String, Mail>();
@@ -70,7 +75,7 @@ public class MailCache {
 				mail.uidl = uidl;
 				mail.size = mailbox.getSize( uidl );
 			}
-			if( mail.size < 1024 )
+			if( mail.size <= FETCH_ALL_SIZE)
 				headerOnly = false;
 			
 			boolean parseHeaders = mail.header == null;

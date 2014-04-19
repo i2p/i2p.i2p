@@ -693,12 +693,13 @@ public class WebMail extends HttpServlet
 		 *  compose dialog
 		 */
 		if( sessionObject.state == STATE_NEW ) {
-			if( buttonPressed( request, CANCEL ) )
+			if (buttonPressed( request, CANCEL ) ||
+			    buttonPressed( request, LIST )) {      // LIST button not shown but we could be lost
 				sessionObject.state = STATE_LIST;
-		
-			else if( buttonPressed( request, SEND ) )
+			} else if( buttonPressed( request, SEND ) ) {
 				if( sendMail( sessionObject, request ) )
 					sessionObject.state = STATE_LIST;
+			}
 		}
 		/*
 		 * message dialog
@@ -740,7 +741,7 @@ public class WebMail extends HttpServlet
 				String uidl = null;
 				if( sessionObject.state == STATE_LIST ) {
 					int pos = getCheckedMessage( request );
-					uidl = (String)sessionObject.folder.getElementAtPosXonCurrentPage( pos );
+					uidl = sessionObject.folder.getElementAtPosXonCurrentPage( pos );
 				}
 				else {
 					uidl = sessionObject.showUIDL;
@@ -784,14 +785,14 @@ public class WebMail extends HttpServlet
 							if( mail.to != null ) {
 								for( int i = 0; i < mail.to.length; i++ ) {
 									buf.append( pad );
-									buf.append( (String)mail.to[i] );
+									buf.append(mail.to[i]);
 									pad = ", ";
 								}
 							}
 							if( mail.cc != null ) {
 								for( int i = 0; i < mail.cc.length; i++ ) {
 									buf.append( pad );
-									buf.append( (String)mail.cc[i] );
+									buf.append(mail.cc[i]);
 									pad = ", ";
 								}
 							}
@@ -817,7 +818,7 @@ public class WebMail extends HttpServlet
 								String pad = "To: ";
 								for( int i = 0; i < mail.to.length; i++ ) {
 									pw.println( pad );
-									pw.println( (String)mail.to[i] );
+									pw.println(mail.to[i]);
 									pad = "    ";
 								}
 							}
@@ -825,7 +826,7 @@ public class WebMail extends HttpServlet
 								String pad = "Cc: ";
 								for( int i = 0; i < mail.cc.length; i++ ) {
 									pw.println( pad );
-									pw.println( (String)mail.cc[i] );
+									pw.println(mail.cc[i]);
 									pad = "    ";
 								}
 							}
@@ -859,7 +860,7 @@ public class WebMail extends HttpServlet
 					int id = Integer.parseInt( show );
 					
 					if( id >= 0 && id < sessionObject.folder.getPageSize() ) {
-						String uidl = (String)sessionObject.folder.getElementAtPosXonCurrentPage( id );
+						String uidl = sessionObject.folder.getElementAtPosXonCurrentPage( id );
 						if( uidl != null ) {
 							sessionObject.state = STATE_SHOW;
 							sessionObject.showUIDL = uidl;
@@ -994,12 +995,12 @@ public class WebMail extends HttpServlet
 	private static void processMessageButtons(SessionObject sessionObject, RequestWrapper request)
 	{
 		if( buttonPressed( request, PREV ) ) {
-			String uidl = (String)sessionObject.folder.getPreviousElement( sessionObject.showUIDL );
+			String uidl = sessionObject.folder.getPreviousElement( sessionObject.showUIDL );
 			if( uidl != null )
 				sessionObject.showUIDL = uidl;
 		}
 		if( buttonPressed( request, NEXT ) ) {
-			String uidl = (String)sessionObject.folder.getNextElement( sessionObject.showUIDL );
+			String uidl = sessionObject.folder.getNextElement( sessionObject.showUIDL );
 			if( uidl != null )
 				sessionObject.showUIDL = uidl;
 		}
@@ -1010,12 +1011,12 @@ public class WebMail extends HttpServlet
 			/*
 			 * first find the next message
 			 */
-			String nextUIDL = (String)sessionObject.folder.getNextElement( sessionObject.showUIDL );
+			String nextUIDL = sessionObject.folder.getNextElement( sessionObject.showUIDL );
 			if( nextUIDL == null ) {
 				/*
 				 * nothing found? then look for the previous one
 				 */
-				nextUIDL = (String)sessionObject.folder.getPreviousElement( sessionObject.showUIDL );
+				nextUIDL = sessionObject.folder.getPreviousElement( sessionObject.showUIDL );
 				if( nextUIDL == null )
 					/*
 					 * still nothing found? then this was the last message, so go back to the folder
@@ -1117,7 +1118,7 @@ public class WebMail extends HttpServlet
 						String number = parameter.substring( 5 );
 						try {
 							int n = Integer.parseInt( number );
-							String uidl = (String)sessionObject.folder.getElementAtPosXonCurrentPage( n );
+							String uidl = sessionObject.folder.getElementAtPosXonCurrentPage( n );
 							if( uidl != null ) {
 								Mail mail = sessionObject.mailCache.getMail( uidl, MailCache.FETCH_HEADER );
 								if( mail != null ) {
@@ -1499,7 +1500,7 @@ public class WebMail extends HttpServlet
 		if( bccToSelf != null && bccToSelf.compareTo( "1" ) == 0 )
 			recipients.add( sender );
 		
-		if( recipients.isEmpty() ) {
+		if( toList.isEmpty() ) {
 			ok = false;
 			sessionObject.error += _("No recipients found.") + "<br>";
 		}
@@ -1508,12 +1509,12 @@ public class WebMail extends HttpServlet
 		
 		if( qp == null ) {
 			ok = false;
-			sessionObject.error += _("Quoted printable encoder not available.");
+			sessionObject.error += _("Internal error") + ": Quoted printable encoder not available.";
 		}
 		
 		if( hl == null ) {
 			ok = false;
-			sessionObject.error += _("Header line encoder not available.");
+			sessionObject.error += _("Internal error") + ": Header line encoder not available.";
 		}
 
 		if( ok ) {
@@ -1666,15 +1667,15 @@ public class WebMail extends HttpServlet
 		
 		out.println( "<table cellspacing=\"0\" cellpadding=\"5\">\n" +
 			// current postman hq length limits 16/12, new postman version 32/32
-			"<tr><td align=\"right\" width=\"30%\">" + _("User") + "</td><td width=\"40%\" align=\"left\"><input type=\"text\" size=\"32\" name=\"" + USER + "\" value=\"" + ( RELEASE ? "" : "test") + "\"> @mail.i2p</td></tr>\n" +
-			"<tr><td align=\"right\" width=\"30%\">" + _("Password") + "</td><td width=\"40%\" align=\"left\"><input type=\"password\" size=\"32\" name=\"pass\" value=\"" + ( RELEASE ? "" : "test") + "\"></td></tr>\n");
+			"<tr><td align=\"right\" width=\"30%\">" + _("User") + "</td><td width=\"40%\" align=\"left\"><input type=\"text\" size=\"32\" name=\"" + USER + "\" value=\"" + "\"> @mail.i2p</td></tr>\n" +
+			"<tr><td align=\"right\" width=\"30%\">" + _("Password") + "</td><td width=\"40%\" align=\"left\"><input type=\"password\" size=\"32\" name=\"pass\" value=\"" + "\"></td></tr>\n");
 		// which is better?
 		//if (!fixed) {
 		if (true) {
 		    out.println(
 			"<tr><td align=\"right\" width=\"30%\">" + _("Host") + "</td><td width=\"40%\" align=\"left\"><input type=\"text\" size=\"32\" name=\"" + HOST +"\" value=\"" + host + "\"" + ( fixed ? " disabled" : "" ) + "></td></tr>\n" +
-			"<tr><td align=\"right\" width=\"30%\">" + _("POP3-Port") + "</td><td width=\"40%\" align=\"left\"><input type=\"text\" size=\"5\" name=\"" + POP3 +"\" value=\"" + pop3 + "\"" + ( fixed ? " disabled" : "" ) + "></td></tr>\n" +
-			"<tr><td align=\"right\" width=\"30%\">" + _("SMTP-Port") + "</td><td width=\"40%\" align=\"left\"><input type=\"text\" size=\"5\" name=\"" + SMTP +"\" value=\"" + smtp + "\"" + ( fixed ? " disabled" : "" ) + "></td></tr>\n");
+			"<tr><td align=\"right\" width=\"30%\">" + _("POP3 Port") + "</td><td width=\"40%\" align=\"left\"><input type=\"text\" style=\"text-align: right;\" size=\"5\" name=\"" + POP3 +"\" value=\"" + pop3 + "\"" + ( fixed ? " disabled" : "" ) + "></td></tr>\n" +
+			"<tr><td align=\"right\" width=\"30%\">" + _("SMTP Port") + "</td><td width=\"40%\" align=\"left\"><input type=\"text\" style=\"text-align: right;\" size=\"5\" name=\"" + SMTP +"\" value=\"" + smtp + "\"" + ( fixed ? " disabled" : "" ) + "></td></tr>\n");
 		}
 		out.println(
 			"<tr><td></td><td align=\"left\">" + button( LOGIN, _("Login") ) + " <input class=\"cancel\" type=\"reset\" value=\"" + _("Reset") + "\"></td></tr>\n" +
@@ -1694,14 +1695,33 @@ public class WebMail extends HttpServlet
 			out.println( "<p class=\"error\">" + _("Really delete the marked messages?") + " " + button( REALLYDELETE, _("Yes, really delete them!") ) + "</p>" );
 		}
 		out.println( button( NEW, _("New") ) + spacer +
-			button( REPLY, _("Reply") ) +
-			button( REPLYALL, _("Reply All") ) +
-			button( FORWARD, _("Forward") ) + spacer +
+			// In theory, these are valid and will apply to the first checked message,
+			// but that's not obvious and did it work?
+			//button( REPLY, _("Reply") ) +
+			//button( REPLYALL, _("Reply All") ) +
+			//button( FORWARD, _("Forward") ) + spacer +
 			button( DELETE, _("Delete") ) + spacer +
 			button( REFRESH, _("Check Mail") ) + spacer);
 		if (Config.hasConfigFile())
 			out.println(button( RELOAD, _("Reload Config") ) + spacer);
-		out.println(button( LOGOUT, _("Logout") ) + "<table id=\"mailbox\" cellspacing=\"0\" cellpadding=\"5\">\n" +
+		out.println(button( LOGOUT, _("Logout") ));
+
+		if (sessionObject.folder.getPages() > 1) {
+			out.println(
+				"<br>" +
+				( sessionObject.folder.isFirstPage() ?
+									button2( FIRSTPAGE, _("First") ) + button2( PREVPAGE, _("Previous") ) :
+									button( FIRSTPAGE, _("First") ) + button( PREVPAGE, _("Previous") ) ) +
+				" &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
+				_("Page {0} of {1}", sessionObject.folder.getCurrentPage(), sessionObject.folder.getPages()) +
+				"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; " +
+				( sessionObject.folder.isLastPage() ? 
+									button2( NEXTPAGE, _("Next") ) + button2( LASTPAGE, _("Last") ) :
+									button( NEXTPAGE, _("Next") ) + button( LASTPAGE, _("Last") ) )
+				);
+		}
+
+		out.println("<table id=\"mailbox\" cellspacing=\"0\" cellpadding=\"5\">\n" +
 			"<tr><td colspan=\"8\"><hr></td></tr>\n<tr>" +
 			thSpacer + "<th>" + sortHeader( SORT_SENDER, _("Sender"), sessionObject.imgPath ) + "</th>" +
 			thSpacer + "<th>" + sortHeader( SORT_SUBJECT, _("Subject"), sessionObject.imgPath ) + "</th>" +
@@ -1717,7 +1737,7 @@ public class WebMail extends HttpServlet
 			String link = "<a href=\"" + myself + "?" + SHOW + "=" + i + "\">";
 			
 			boolean idChecked = false;
-			String checkId = sessionObject.pageChanged ? null : (String)request.getParameter( "check" + i );
+			String checkId = sessionObject.pageChanged ? null : request.getParameter( "check" + i );
 			
 			if( checkId != null && checkId.compareTo( "1" ) == 0 )
 				idChecked = true;
@@ -1729,12 +1749,12 @@ public class WebMail extends HttpServlet
 			if( sessionObject.clear )
 				idChecked = false;
 
-			Debug.debug( Debug.DEBUG, "check" + i + ": checkId=" + checkId + ", idChecked=" + idChecked + ", pageChanged=" + sessionObject.pageChanged +
-					", markAll=" + sessionObject.markAll +
-					", invert=" + sessionObject.invert +
-					", clear=" + sessionObject.clear );
+			//Debug.debug( Debug.DEBUG, "check" + i + ": checkId=" + checkId + ", idChecked=" + idChecked + ", pageChanged=" + sessionObject.pageChanged +
+			//		", markAll=" + sessionObject.markAll +
+			//		", invert=" + sessionObject.invert +
+			//		", clear=" + sessionObject.clear );
 			out.println( "<tr class=\"list" + bg + "\"><td><input type=\"checkbox\" class=\"optbox\" name=\"check" + i + "\" value=\"1\"" + 
-					( idChecked ? "checked" : "" ) + ">" + ( RELEASE ? "" : "" + i ) + "</td><td>" +
+					( idChecked ? "checked" : "" ) + ">" + "</td><td>" +
 					link + mail.shortSender + "</a></td><td>&nbsp;</td><td>" + link + mail.shortSubject + "</a></td><td>&nbsp;</td><td>" +
 					 mail.localFormattedDate + "</td><td>&nbsp;</td><td>" + ngettext("1 Byte", "{0} Bytes", mail.size) + "</td></tr>" );
 			bg = 1 - bg;
@@ -1744,17 +1764,9 @@ public class WebMail extends HttpServlet
 				button( MARKALL, _("Mark All") ) +
 				button( INVERT, _("Invert Selection") ) +
 				button( CLEAR, _("Clear") ) +
-				"<br>" +
-				( sessionObject.folder.isFirstPage() ?
-										 button2( FIRSTPAGE, _("First") ) + button2( PREVPAGE, _("Previous") ) :
- 										 button( FIRSTPAGE, _("First") ) + button( PREVPAGE, _("Previous") ) ) +
-				" &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + _("Page {0} of {1}", sessionObject.folder.getCurrentPage(), sessionObject.folder.getPages()) + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; " +
-				( sessionObject.folder.isLastPage() ? 
-														   button2( NEXTPAGE, _("Next") ) + button2( LASTPAGE, _("Last") ) :
-														   button( NEXTPAGE, _("Next") ) + button( LASTPAGE, _("Last") ) ) +
-														   
-				"<br>" +
-				_("Pagesize:") + "&nbsp;<input type=\"text\" name=\"" + PAGESIZE + "\" size=\"4\" value=\"" +  sessionObject.folder.getPageSize() + "\">" +
+				"<br>");
+		out.println(
+				_("Page Size:") + "&nbsp;<input type=\"text\" style=\"text-align: right;\" name=\"" + PAGESIZE + "\" size=\"4\" value=\"" +  sessionObject.folder.getPageSize() + "\">" +
 				button( SETPAGESIZE, _("Set") ) );
 	}
 	/**
@@ -1783,9 +1795,10 @@ public class WebMail extends HttpServlet
 			button( REPLYALL, _("Reply All") ) +
 			button( FORWARD, _("Forward") ) + spacer +
 			button( DELETE, _("Delete") ) + spacer +
-			( sessionObject.folder.isFirstElement( sessionObject.showUIDL ) ? button2( PREV, _("Previous") ) : button( PREV, _("Previous") ) ) +
-			( sessionObject.folder.isLastElement( sessionObject.showUIDL ) ? button2( NEXT, _("Next") ) : button( NEXT, _("Next") ) ) + spacer +
-			button( LIST, _("Back to Folder") ) + spacer);
+			"<br>" +
+			( sessionObject.folder.isFirstElement( sessionObject.showUIDL ) ? button2( PREV, _("Previous") ) : button( PREV, _("Previous") ) ) + spacer +
+			button( LIST, _("Back to Folder") ) + spacer +
+			( sessionObject.folder.isLastElement( sessionObject.showUIDL ) ? button2( NEXT, _("Next") ) : button( NEXT, _("Next") ) ));
 		//if (Config.hasConfigFile())
 		//	out.println(button( RELOAD, _("Reload Config") ) + spacer);
 		//out.println(button( LOGOUT, _("Logout") ) );
