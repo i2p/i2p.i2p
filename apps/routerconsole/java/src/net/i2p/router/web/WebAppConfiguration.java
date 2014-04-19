@@ -55,6 +55,7 @@ public class WebAppConfiguration implements Configuration {
             return;
         String appName = ctxPath.substring(1);
 
+/****
         if (ctxPath.equals("/susimail")) {
             // allow certain Jetty classes, restricted as of Jetty 7
             // See http://wiki.eclipse.org/Jetty/Reference/Jetty_Classloading
@@ -79,6 +80,7 @@ public class WebAppConfiguration implements Configuration {
             //System.err.println("System classes after:  " + Arrays.toString(wac.getSystemClasses()));
             //System.err.println("Server classes after:  " + Arrays.toString(wac.getServerClasses()));
         }
+****/
 
         I2PAppContext i2pContext = I2PAppContext.getGlobalContext();
         File libDir = new File(i2pContext.getBaseDir(), "lib");
@@ -88,11 +90,12 @@ public class WebAppConfiguration implements Configuration {
 
         File dir = libDir;
         String cp;
+/****
         if (ctxPath.equals("/susimail")) {
             // Ticket #957... don't know why...
             // Only really required if started manually, but we don't know that from here
             cp = "jetty-util.jar";
-        } else if (pluginDir.exists()) {
+        } else ****/ if (pluginDir.exists()) {
             File consoleDir = new File(pluginDir, "console");
             Properties props = RouterConsoleRunner.webAppProperties(consoleDir.getAbsolutePath());
             cp = props.getProperty(RouterConsoleRunner.PREFIX + appName + CLASSPATH);
