@@ -177,6 +177,7 @@ public class WebMail extends HttpServlet
 
 	private static final String spacer = "&nbsp;&nbsp;&nbsp;";
 	private static final String thSpacer = "<th>&nbsp;</th>\n";
+
 	/**
 	 * sorts Mail objects by id field
 	 * 
@@ -313,7 +314,7 @@ public class WebMail extends HttpServlet
 	 * @author susi
 	 */
 	private static class SessionObject {
-		boolean pageChanged, markAll, clear, invert;;
+		boolean pageChanged, markAll, clear, invert;
 		int state, smtpPort;
 		POP3MailBox mailbox;
 		MailCache mailCache;
@@ -327,11 +328,12 @@ public class WebMail extends HttpServlet
 		public boolean reallyDelete;
 		String themePath, imgPath;
 		boolean isMobile;
-		
+		boolean bccToSelf;
 		
 		SessionObject()
 		{
 			state = STATE_AUTH;
+			bccToSelf = Boolean.parseBoolean(Config.getProperty( CONFIG_BCC_TO_SELF, "true" ));
 		}
 	}
 	
@@ -1502,8 +1504,10 @@ public class WebMail extends HttpServlet
 		recipients.addAll( bccList );
 		
 		String bccToSelf = request.getParameter( NEW_BCC_TO_SELF );
-		
-		if( bccToSelf != null && bccToSelf.equals("1"))
+		boolean toSelf = "1".equals(bccToSelf);
+		// save preference in session
+		sessionObject.bccToSelf = toSelf;
+		if (toSelf)
 			recipients.add( sender );
 		
 		if( toList.isEmpty() ) {
@@ -1629,7 +1633,6 @@ public class WebMail extends HttpServlet
 		String bcc = request.getParameter( NEW_BCC, "" );
 		String subject = request.getParameter( NEW_SUBJECT, sessionObject.subject != null ? sessionObject.subject : "" );
 		String text = request.getParameter( NEW_TEXT, sessionObject.body != null ? sessionObject.body : "" );
-		String bccToSelf = Config.getProperty( CONFIG_BCC_TO_SELF, "true" );
 		sessionObject.replyTo = null;
 		sessionObject.replyCC = null;
 		sessionObject.subject = null;
@@ -1641,8 +1644,8 @@ public class WebMail extends HttpServlet
 				"<tr><td align=\"right\">" + _("To:") + "</td><td align=\"left\"><input type=\"text\" size=\"80\" name=\"" + NEW_TO + "\" value=\"" + to + "\"></td></tr>\n" +
 				"<tr><td align=\"right\">" + _("Cc:") + "</td><td align=\"left\"><input type=\"text\" size=\"80\" name=\"" + NEW_CC + "\" value=\"" + cc + "\"></td></tr>\n" +
 				"<tr><td align=\"right\">" + _("Bcc:") + "</td><td align=\"left\"><input type=\"text\" size=\"80\" name=\"" + NEW_BCC + "\" value=\"" + bcc + "\"></td></tr>\n" +
+				"<tr><td align=\"right\">" + _("Bcc to self") + ": </td><td align=\"left\"><input type=\"checkbox\" class=\"optbox\" name=\"" + NEW_BCC_TO_SELF + "\" value=\"1\"" + (sessionObject.bccToSelf ? "checked" : "" ) + "></td></tr>\n" +
 				"<tr><td align=\"right\">" + _("Subject:") + "</td><td align=\"left\"><input type=\"text\" size=\"80\" name=\"" + NEW_SUBJECT + "\" value=\"" + subject + "\"></td></tr>\n" +
-				"<tr><td>&nbsp;</td><td align=\"left\"><input type=\"checkbox\" class=\"optbox\" name=\"" + NEW_BCC_TO_SELF + "\" value=\"1\"" + ( !bccToSelf.equalsIgnoreCase("false") ? "checked" : "" )+ ">" + _("Bcc to self") + "</td></tr>\n" +
 				"<tr><td colspan=\"2\" align=\"center\"><textarea cols=\"" + Config.getProperty( CONFIG_COMPOSER_COLS, 80 )+ "\" rows=\"" + Config.getProperty( CONFIG_COMPOSER_ROWS, 10 )+ "\" name=\"" + NEW_TEXT + "\">" + text + "</textarea>" +
 				"<tr><td colspan=\"2\" align=\"center\"><hr></td></tr>\n" +
 				"<tr><td align=\"right\">" + _("New Attachment:") + "</td><td align=\"left\"><input type=\"file\" size=\"50%\" name=\"" + NEW_FILENAME + "\" value=\"\"><input type=\"submit\" name=\"" + NEW_UPLOAD + "\" value=\"" + _("Upload File") + "\"></td></tr>" );

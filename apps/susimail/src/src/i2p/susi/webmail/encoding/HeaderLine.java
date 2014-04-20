@@ -172,9 +172,9 @@ public class HeaderLine implements Encoding {
 				if( length > 0 ) {
 					if( in[offset] == '?' ) {
 						// System.err.println( "=? found at " + ( offset -1 ) );
+						// save charset position here f1+1 to f2-1
 						int f1 = offset;
 						int f2 = f1 + 1;
-						// FIXME save charset here ticket #508
 						for( ; f2 < end && in[f2] != '?'; f2++ );
 						if( f2 < end ) {
 							/*

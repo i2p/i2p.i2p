@@ -206,9 +206,15 @@ input.markall, input.show {
      min-height: 22px;
 }
 
-input.new, input.reply, input.replyall {
+input.new {
      background: #ddf url('/themes/console/images/email.png') no-repeat 0px center;
      padding: 2px 3px 2px 36px;
+     min-height: 22px;
+}
+
+input.reply, input.replyall {
+     background: #ddf url('/themes/console/images/arrow_turn_left.png') no-repeat 4px center;
+     padding: 2px 3px 2px 24px;
      min-height: 22px;
 }
 

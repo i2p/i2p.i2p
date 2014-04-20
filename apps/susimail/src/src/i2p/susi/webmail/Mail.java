@@ -157,7 +157,7 @@ public class Mail {
 	}
 	public void parseHeaders()
 	{
-		DateFormat dateFormatter = new SimpleDateFormat("yyyy-mm-dd HH:mm");
+		DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 		DateFormat localDateFormatter = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
 		DateFormat longLocalDateFormatter = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM);
 		// the router sets the JVM time zone to UTC but saves the original here so we can get it

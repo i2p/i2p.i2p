@@ -213,8 +213,13 @@ input.markall, input.show {
      min-height: 22px;
 }
 
-input.new, input.reply, input.replyall {
+input.new {
      background: #000 url('/themes/console/images/email.png') no-repeat 2px center;
+     min-height: 22px;
+}
+
+input.reply, input.replyall {
+     background: #000 url('/themes/console/images/arrow_turn_left.png') no-repeat 2px center;
      min-height: 22px;
 }
 
