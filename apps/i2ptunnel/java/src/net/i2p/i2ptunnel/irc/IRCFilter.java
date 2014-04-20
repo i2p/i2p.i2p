@@ -150,12 +150,16 @@ abstract class IRCFilter {
         final String[] allowedCommands =
         {
                 // Commands that regular users might use
+                "ACCEPT", // Inspircd's m_callerid.so module
                 "ADMIN",
-                "AWAY",    // should be harmless
                 "AUTHENTICATE", // SASL, also requires CAP below
+                "AWAY",    // should be harmless
                 "CAP",     // http://tools.ietf.org/html/draft-mitchell-irc-capabilities-01
+                "COMMANDS",
                 "CYCLE",
                 "DCCALLOW",
+                "DEVOICE",
+                "FPART",
                 "HELPME", "HELPOP",  // helpop is what unrealircd uses by default
                 "INVITE",
                 "ISON",    // jIRCii uses this for a ping (response is 303)
@@ -181,9 +185,15 @@ abstract class IRCFilter {
                 "RULES",
                 "SETNAME",
                 "SILENCE",
+                "SSLINFO",
                 "STATS",
+                "TBAN",
+                "TITLE",
                 "TOPIC",
+                "UNINVITE",
                 "USERHOST",
+                "USERS", // Ticket 1249
+                "VHOST",
                 "VHOST",
                 "WATCH",
                 "WHO",
@@ -202,26 +212,43 @@ abstract class IRCFilter {
                 "ADCHAT",
                 "ADDMOTD",
                 "ADDOMOTD",
+                "CBAN",
                 "CHATOPS",
+                "CHECK",
                 "CHGHOST",
                 "CHGIDENT",
                 "CHGNAME",
                 "CLOSE",
                 "DCCDENY",
                 "DIE",
+                "ELINE",
+                "FILTER",
+                "GLINE",
                 "GLOBOPS",
                 "GZLINE",
                 "HTM", // "High Traffic Mode"
+                "JUMPSERVER",
                 "KILL",
                 "KLINE",
+                "LOADMODULE",
+                "LOCKSERV",
                 "LOCOPS",
+                "MKPASSWD",
                 "NACHAT",
+                "NICKLOCK",
+                "NICKUNLOCK",
+                "OLINE",
                 "OPERMOTD",
                 "REHASH",
+                "RELOADMODULE",
                 "RESTART",
+                "RLINE",
                 "SAJOIN",
+                "SAKICK",
                 "SAMODE",
+                "SANICK",
                 "SAPART",
+                "SATOPIC",
                 "SDESC",
                 "SETHOST",
                 "SETIDENT",
@@ -229,7 +256,9 @@ abstract class IRCFilter {
                 "SPAMFILTER",
                 "SQUIT",
                 "TEMPSHUN",
+                "TLINE",
                 "UNDCCDENY",
+                "UNLOCKSERV",
                 "WALLOPS",
                 "ZLINE"
         };
