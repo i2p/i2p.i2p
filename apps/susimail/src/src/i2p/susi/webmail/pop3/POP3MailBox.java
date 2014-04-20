@@ -52,6 +52,8 @@ public class POP3MailBox {
 
 	private boolean connected;
 	private boolean supportsPipelining;
+	private boolean supportsTOP;
+	private boolean supportsUIDL;
 
 	/** ID to size */
 	private final HashMap<Integer, Integer> sizes;
@@ -258,15 +260,34 @@ public class POP3MailBox {
 	}
 
 	/**
+	 * 
+	 * @param response line starting with +OK
+	 */
+	private void updateMailCount(String response) {
+		if (response == null || response.length() < 4) {
+			mails = 0;
+			return;
+		}
+		response = response.trim();
+		try {
+			int i = response.indexOf(" ", 5);
+			mails =
+				Integer.parseInt(
+					i != -1
+						? response.substring(4, i)
+						: response.substring(4));
+		} catch (NumberFormatException nfe) {
+			mails = 0;
+		}
+	}
+
+	/**
 	 * Caller must sync.
 	 * 
 	 * @throws IOException
 	 */
-	private void updateUIDLs() throws IOException
-	{
+	private void updateUIDLs(List<String> lines) {
 			uidlToID.clear();
-			
-			List<String> lines = sendCmdNl( "UIDL");
 			if (lines != null) {
 				for (String line : lines) {
 					int j = line.indexOf( " " );
@@ -292,12 +313,11 @@ public class POP3MailBox {
 	 * 
 	 * @throws IOException
 	 */
-	private void updateSizes() throws IOException {
+	private void updateSizes(List<String> lines) {
 		/*
 		 * try LIST
 		 */
 		sizes.clear();
-		List<String> lines = sendCmdNl("LIST");
 		if (lines != null) {
 			for (String line : lines) {
 				int j = line.indexOf(" ");
@@ -363,27 +383,37 @@ public class POP3MailBox {
 			try {
 				// pipeline 2 commands
 				lastError = "";
-				List<SendRecv> cmds = new ArrayList<SendRecv>(3);
-				// TODO APOP (unsupported by postman)
-				cmds.add(new SendRecv(null, Mode.A1));
-				// TODO CAPA
-				cmds.add(new SendRecv("USER " + user, Mode.A1));
-				cmds.add(new SendRecv("PASS " + pass, Mode.A1));
-				// We can't pipleline the STAT because we must
-				// enter the transaction state first.
-				//cmds.add("STAT");
-				// wait for 3 +OK lines since the connect generates one
-				if (sendCmds(cmds) && sendCmd1a("STAT")) {
-					int i = lastLine.indexOf(" ", 5);
-					mails =
-						Integer.parseInt(
-							i != -1
-								? lastLine.substring(4, i)
-								: lastLine.substring(4));
-
+				boolean ok = doHandshake();
+				if (ok) {
+					// TODO APOP (unsupported by postman)
+					List<SendRecv> cmds = new ArrayList<SendRecv>(4);
+					cmds.add(new SendRecv("USER " + user, Mode.A1));
+					cmds.add(new SendRecv("PASS " + pass, Mode.A1));
+					ok =  sendCmds(cmds);
+				}
+				if (ok) {
 					connected = true;
-					updateUIDLs();
-					updateSizes();
+					List<SendRecv> cmds = new ArrayList<SendRecv>(4);
+					SendRecv stat = new SendRecv("STAT", Mode.A1);
+					cmds.add(stat);
+					SendRecv uidl = new SendRecv("UIDL", Mode.LS);
+					cmds.add(uidl);
+					SendRecv list = new SendRecv("LIST", Mode.LS);
+					cmds.add(list);
+					// check individual responses
+					sendCmds(cmds);
+					if (stat.result)
+						updateMailCount(stat.response);
+					else
+						Debug.debug(Debug.DEBUG, "STAT failed");
+					if (uidl.result)
+						updateUIDLs(uidl.ls);
+					else
+						Debug.debug(Debug.DEBUG, "UIDL failed");
+					if (list.result)
+						updateSizes(list.ls);
+					else
+						Debug.debug(Debug.DEBUG, "LIST failed");
 				} else {
 					if (lastError.equals(""))
 						lastError = _("Error connecting to server");
@@ -397,6 +427,43 @@ public class POP3MailBox {
 				lastError = _("Error opening mailbox") + ": " + e1.getLocalizedMessage();
 			}
 		}
+	}
+
+	/**
+	 * Check the initial response, send CAPA, check the CAPA result
+	 * Caller must sync.
+	 * 
+	 * @return true if successful
+	 * @throws IOException
+	 * @since 0.9.13
+	 */
+	private boolean doHandshake() throws IOException {
+		// can we always pipeline this ?
+		supportsPipelining = false;
+		supportsUIDL = false;
+		supportsTOP = false;
+		List<SendRecv> cmds = new ArrayList<SendRecv>(2);
+		cmds.add(new SendRecv(null, Mode.A1));
+		SendRecv capa = new SendRecv("CAPA", Mode.LS);
+		cmds.add(capa);
+		boolean rv = sendCmds(cmds);
+		if (rv) {
+			if (capa.ls != null) {
+				for (String cap : capa.ls) {
+					String t = cap.trim();
+					if (t.equals("PIPELINING"))
+						supportsPipelining = true;
+					else if (t.equals("UIDL"))
+						supportsUIDL = true;
+					else if (t.equals("TOP"))
+						supportsTOP = true;
+				}
+			}
+		}
+		Debug.debug(Debug.DEBUG, "POP3 server caps: pipelining? " + supportsPipelining +
+		                                           " UIDL? " + supportsUIDL +
+		                                           " TOP? " + supportsTOP);
+		return rv;
 	}
 	
 	/**
