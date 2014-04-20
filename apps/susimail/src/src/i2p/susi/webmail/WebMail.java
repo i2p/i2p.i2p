@@ -374,7 +374,7 @@ public class WebMail extends HttpServlet
 		StringBuilder buf = new StringBuilder(128);
 		buf.append("<input type=\"submit\" class=\"").append(name).append("\" name=\"")
 		   .append(name).append("\" value=\"").append(label).append('"');
-		if (name.equals(SEND) || name.equals(CANCEL) || name.equals(DELETE_ATTACHMENT))
+		if (name.equals(SEND) || name.equals(CANCEL) || name.equals(DELETE_ATTACHMENT) || name.equals(NEW_UPLOAD))
 			buf.append(" onclick=\"cancelPopup()\"");
 		buf.append('>');
 		return buf.toString();
@@ -971,15 +971,21 @@ public class WebMail extends HttpServlet
 			sessionObject.pageChanged = true;
 		}
 	}
+
 	/**
 	 * process buttons of compose message dialog
+	 * This must be called BEFORE processStateChangeButtons so we can add the attachment before SEND
+	 *
 	 * @param sessionObject
 	 * @param request
 	 */
 	private static void processComposeButtons(SessionObject sessionObject, RequestWrapper request)
 	{
-		if( buttonPressed( request, NEW_UPLOAD ) ) {
-			String filename = request.getFilename( NEW_FILENAME );
+		String filename = request.getFilename( NEW_FILENAME );
+		// We handle an attachment whether sending or uploading
+		if (filename != null &&
+		    (buttonPressed(request, NEW_UPLOAD) || buttonPressed(request, SEND))) {
+			Debug.debug(Debug.DEBUG, "Got filename in compose form: " + filename);
 			int i = filename.lastIndexOf( "/" );
 			if( i != - 1 )
 				filename = filename.substring( i + 1 );
@@ -1339,6 +1345,11 @@ public class WebMail extends HttpServlet
 			sessionObject.imgPath = sessionObject.themePath + "images/";
 			sessionObject.isMobile = isMobile;
 			
+			// This must be called to add the attachment before
+			// processStateChangeButtons() sends the message
+			if( sessionObject.state == STATE_NEW )
+				processComposeButtons( sessionObject, request );
+		
 			int oldState = sessionObject.state;
 			processStateChangeButtons( sessionObject, request );
 			int newState = sessionObject.state;
@@ -1381,9 +1392,6 @@ public class WebMail extends HttpServlet
 				}
 			}
 			
-			if( sessionObject.state == STATE_NEW )
-				processComposeButtons( sessionObject, request );
-		
 			/*
 			 * update folder content
 			 */
@@ -1685,8 +1693,7 @@ public class WebMail extends HttpServlet
 	private static void showCompose( PrintWriter out, SessionObject sessionObject, RequestWrapper request )
 	{
 		out.println( button( SEND, _("Send") ) + spacer +
-				button( CANCEL, _("Cancel") ) + spacer +
-				(sessionObject.attachments != null && (!sessionObject.attachments.isEmpty()) ? button( DELETE_ATTACHMENT, _("Delete Attachment") ) : button2( DELETE_ATTACHMENT, _("Delete Attachment") ) ) + spacer);
+				button( CANCEL, _("Cancel") ));
 		//if (Config.hasConfigFile())
 		//	out.println(button( RELOAD, _("Reload Config") ) + spacer);
 		//out.println(button( LOGOUT, _("Logout") ) );
@@ -1715,12 +1722,13 @@ public class WebMail extends HttpServlet
 				"<tr><td align=\"right\">" + _("To:") + "</td><td align=\"left\"><input type=\"text\" size=\"80\" name=\"" + NEW_TO + "\" value=\"" + to + "\"></td></tr>\n" +
 				"<tr><td align=\"right\">" + _("Cc:") + "</td><td align=\"left\"><input type=\"text\" size=\"80\" name=\"" + NEW_CC + "\" value=\"" + cc + "\"></td></tr>\n" +
 				"<tr><td align=\"right\">" + _("Bcc:") + "</td><td align=\"left\"><input type=\"text\" size=\"80\" name=\"" + NEW_BCC + "\" value=\"" + bcc + "\"></td></tr>\n" +
-				"<tr><td align=\"right\">" + _("Bcc to self") + ": </td><td align=\"left\"><input type=\"checkbox\" class=\"optbox\" name=\"" + NEW_BCC_TO_SELF + "\" value=\"1\"" + (sessionObject.bccToSelf ? "checked" : "" ) + "></td></tr>\n" +
+				"<tr><td align=\"right\">" + _("Bcc to self") + ": </td><td align=\"left\"><input type=\"checkbox\" class=\"optbox\" name=\"" + NEW_BCC_TO_SELF + "\" value=\"1\" " + (sessionObject.bccToSelf ? "checked" : "" ) + "></td></tr>\n" +
 				"<tr><td align=\"right\">" + _("Subject:") + "</td><td align=\"left\"><input type=\"text\" size=\"80\" name=\"" + NEW_SUBJECT + "\" value=\"" + subject + "\"></td></tr>\n" +
 				"<tr><td colspan=\"2\" align=\"center\"><textarea cols=\"" + Config.getProperty( CONFIG_COMPOSER_COLS, 80 )+ "\" rows=\"" + Config.getProperty( CONFIG_COMPOSER_ROWS, 10 )+ "\" name=\"" + NEW_TEXT + "\">" + text + "</textarea>" +
 				"<tr><td colspan=\"2\" align=\"center\"><hr></td></tr>\n" +
-				"<tr><td align=\"right\">" + _("New Attachment:") + "</td><td align=\"left\"><input type=\"file\" size=\"50%\" name=\"" + NEW_FILENAME + "\" value=\"\">" +
-				"<input type=\"submit\" name=\"" + NEW_UPLOAD + "\" value=\"" + _("Upload File") + "\" onclick=\"cancelPopup()\"></td></tr>" );
+				"<tr><td align=\"right\">" + _("Add Attachment:") + "</td><td align=\"left\"><input type=\"file\" size=\"50%\" name=\"" + NEW_FILENAME + "\" value=\"\"></td></tr>" +
+				// TODO disable/hide in JS if no file selected
+				"<tr><td>&nbsp;</td><td align=\"left\">" + button(NEW_UPLOAD, _("Add another attachment")) + "</td></tr>");
 		
 		if( sessionObject.attachments != null && !sessionObject.attachments.isEmpty() ) {
 			boolean wroteHeader = false;
@@ -1733,6 +1741,10 @@ public class WebMail extends HttpServlet
 				}
 				out.println("<td align=\"left\"><input type=\"checkbox\" class=\"optbox\" name=\"check" + attachment.hashCode() + "\" value=\"1\">&nbsp;" + attachment.getFileName() + "</td></tr>");
 			}
+			// TODO disable in JS if none selected
+			out.println("<tr><td>&nbsp;</td><td align=\"left\">" +
+			            button( DELETE_ATTACHMENT, _("Delete selected attachments") ) +
+				    "</td></tr>");
 		}
 		out.println( "</table>" );
 	}

@@ -230,6 +230,12 @@ input.send, input.setpagesize {
      min-height: 22px;
 }
 
+input[type=file], input.new_upload {
+     background: #ddf url('/themes/console/images/add.png') no-repeat 4px center;
+     padding: 2px 3px 2px 24px;
+     min-height: 22px;
+}
+
 input[type=text], input[type=password] {
      padding: 1px 4px;
 }
