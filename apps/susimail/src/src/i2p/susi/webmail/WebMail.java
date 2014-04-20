@@ -59,6 +59,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpSessionBindingEvent;
+import javax.servlet.http.HttpSessionBindingListener;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
@@ -71,7 +73,7 @@ public class WebMail extends HttpServlet
 	/*
 	 * set to true, if its a release build
 	 */
-	private static final boolean RELEASE = true;
+	private static final boolean RELEASE;
 	/*
 	 * increase version number for every release
 	 */
@@ -168,6 +170,7 @@ public class WebMail extends HttpServlet
 	private static final String CONFIG_COMPOSER_ROWS = "composer.rows";
 
 	private static final String CONFIG_BCC_TO_SELF = "composer.bcc.to.self";
+	private static final String CONFIG_DEBUG = "debug";
 
 	private static final String RC_PROP_THEME = "routerconsole.theme";
 	private static final String RC_PROP_UNIVERSAL_THEMING = "routerconsole.universal.theme";
@@ -177,6 +180,12 @@ public class WebMail extends HttpServlet
 
 	private static final String spacer = "&nbsp;&nbsp;&nbsp;";
 	private static final String thSpacer = "<th>&nbsp;</th>\n";
+	
+	static {
+		Config.setPrefix( "susimail" );
+		RELEASE = !Boolean.parseBoolean(Config.getProperty(CONFIG_DEBUG));
+		Debug.setLevel( RELEASE ? Debug.ERROR : Debug.DEBUG );
+	}
 
 	/**
 	 * sorts Mail objects by id field
@@ -313,7 +322,7 @@ public class WebMail extends HttpServlet
 	 * data structure to hold any persistent data (to store them in session dictionary)
 	 * @author susi
 	 */
-	private static class SessionObject {
+	private static class SessionObject implements HttpSessionBindingListener {
 		boolean pageChanged, markAll, clear, invert;
 		int state, smtpPort;
 		POP3MailBox mailbox;
@@ -335,11 +344,22 @@ public class WebMail extends HttpServlet
 			state = STATE_AUTH;
 			bccToSelf = Boolean.parseBoolean(Config.getProperty( CONFIG_BCC_TO_SELF, "true" ));
 		}
-	}
-	
-	static {
-			Debug.setLevel( RELEASE ? Debug.ERROR : Debug.DEBUG );
-			Config.setPrefix( "susimail" );
+
+		/** @since 0.9.13 */
+		public void valueBound(HttpSessionBindingEvent event) {}
+
+		/**
+		 * Close the POP3 socket if still open
+		 * @since 0.9.13
+		 */
+		public void valueUnbound(HttpSessionBindingEvent event) {
+			Debug.debug(Debug.DEBUG, "Session unbound: " + event.getSession().getId());
+			POP3MailBox mbox = mailbox;
+			if (mbox != null) {
+				mbox.close();
+				mailbox = null;
+			}
+		}
 	}
 
 	/**
@@ -351,8 +371,15 @@ public class WebMail extends HttpServlet
 	 */
 	private static String button( String name, String label )
 	{
-		return "<input type=\"submit\" class=\"" + name + "\" name=\"" + name + "\" value=\"" + label + "\">";
+		StringBuilder buf = new StringBuilder(128);
+		buf.append("<input type=\"submit\" class=\"").append(name).append("\" name=\"")
+		   .append(name).append("\" value=\"").append(label).append('"');
+		if (name.equals(SEND) || name.equals(CANCEL) || name.equals(DELETE_ATTACHMENT))
+			buf.append(" onclick=\"cancelPopup()\"");
+		buf.append('>');
+		return buf.toString();
 	}
+
 	/**
 	 * returns html string of a disabled form button with name and label
 	 * 
@@ -624,16 +651,17 @@ public class WebMail extends HttpServlet
 					}
 				}
 				if( doContinue ) {
-					sessionObject.mailbox = new POP3MailBox( host, pop3PortNo, user, pass );
-					if( sessionObject.mailbox.isConnected() ) {
+					POP3MailBox mailbox = new POP3MailBox( host, pop3PortNo, user, pass );
+					if (mailbox.isConnected() ) {
+						sessionObject.mailbox = mailbox;
 						sessionObject.user = user;
 						sessionObject.pass = pass;
 						sessionObject.host = host;
 						sessionObject.smtpPort = smtpPortNo;
 						sessionObject.state = STATE_LIST;
-						sessionObject.mailCache = new MailCache( sessionObject.mailbox );
+						sessionObject.mailCache = new MailCache(mailbox);
 						sessionObject.folder = new Folder<String>();
-						sessionObject.folder.setElements( sessionObject.mailbox.getUIDLs() );
+						sessionObject.folder.setElements(mailbox.getUIDLs() );
 						sessionObject.folder.addSorter( SORT_ID, new IDSorter( sessionObject.mailCache ) );
 						sessionObject.folder.addSorter( SORT_SENDER, new SenderSorter( sessionObject.mailCache ) );
 						sessionObject.folder.addSorter( SORT_SUBJECT, new SubjectSorter( sessionObject.mailCache ) );
@@ -645,8 +673,8 @@ public class WebMail extends HttpServlet
 						Debug.debug(Debug.DEBUG, "CONNECTED, YAY");
 					}
 					else {
-						sessionObject.error += sessionObject.mailbox.lastError();
-						sessionObject.mailbox.close();
+						sessionObject.error += mailbox.lastError();
+						mailbox.close();
 						sessionObject.mailbox = null;
 						Debug.debug(Debug.DEBUG, "NOT CONNECTED, BOO");
 					}
@@ -666,8 +694,9 @@ public class WebMail extends HttpServlet
 			HttpSession session = request.getSession();
 			session.removeAttribute( "sessionObject" );
 			session.invalidate();
-			if( sessionObject.mailbox != null ) {
-				sessionObject.mailbox.close();
+			POP3MailBox mailbox = sessionObject.mailbox;
+			if (mailbox != null) {
+				mailbox.close();
 				sessionObject.mailbox = null;
 			}
 			sessionObject.info += _("User logged out.") + "<br>";
@@ -699,12 +728,39 @@ public class WebMail extends HttpServlet
 		 *  compose dialog
 		 */
 		if( sessionObject.state == STATE_NEW ) {
-			if (buttonPressed( request, CANCEL ) ||
-			    buttonPressed( request, LIST )) {      // LIST button not shown but we could be lost
-				sessionObject.state = STATE_LIST;
-			} else if( buttonPressed( request, SEND ) ) {
+			// We have to make sure to get the state right even if
+			// the user hit the back button previously
+			if( buttonPressed( request, SEND ) ) {
 				if( sendMail( sessionObject, request ) )
 					sessionObject.state = STATE_LIST;
+			} else if (buttonPressed( request, CANCEL ) ||
+			    buttonPressed( request, SHOW )  ||       // A param, not a button, but we could be lost
+			    buttonPressed( request, PREVPAGE ) ||    // All these buttons are not shown but we could be lost
+			    buttonPressed( request, NEXTPAGE ) ||
+			    buttonPressed( request, FIRSTPAGE ) ||
+			    buttonPressed( request, LASTPAGE ) ||
+			    buttonPressed( request, SETPAGESIZE ) ||
+			    buttonPressed( request, MARKALL ) ||
+			    buttonPressed( request, CLEAR ) ||
+			    buttonPressed( request, INVERT ) ||
+			    buttonPressed( request, SORT_ID ) ||
+			    buttonPressed( request, SORT_SENDER ) ||
+			    buttonPressed( request, SORT_SUBJECT ) ||
+			    buttonPressed( request, SORT_DATE ) ||
+			    buttonPressed( request, SORT_SIZE ) ||
+			    buttonPressed( request, REFRESH ) ||
+			    buttonPressed( request, LIST )) {
+				sessionObject.state = STATE_LIST;
+				sessionObject.sentMail = null;	
+				if( sessionObject.attachments != null )
+					sessionObject.attachments.clear();
+			} else if (buttonPressed( request, PREV ) ||     // All these buttons are not shown but we could be lost
+			    buttonPressed( request, NEXT )  ||
+			    buttonPressed( request, DELETE )) {
+				sessionObject.state = STATE_SHOW;
+				sessionObject.sentMail = null;	
+				if( sessionObject.attachments != null )
+					sessionObject.attachments.clear();
 			}
 		}
 		/*
@@ -1358,13 +1414,25 @@ public class WebMail extends HttpServlet
 				out.println( "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n<html>\n" +
 					"<head>\n" +
 					"<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\n" +
-					"<title>susimail - " + subtitle + "</title>\n" +
+					"<title>" + _("SusiMail") + " - " + subtitle + "</title>\n" +
 					"<link rel=\"stylesheet\" type=\"text/css\" href=\"" + sessionObject.themePath + "susimail.css\">\n" );
 				if (sessionObject.isMobile ) {
 					out.println( "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes\" />\n" +
 						"<link rel=\"stylesheet\" type=\"text/css\" href=\"" + sessionObject.themePath + "mobile.css\" />\n" );
 				}
-				// TODO javascript here
+				if (sessionObject.state == STATE_NEW) {
+					// TODO cancel if to and body are empty
+					out.println(
+						"<script type = \"text/javascript\">" +
+							"window.onbeforeunload = function () {" +
+								"return \"" + _("Message has not been sent. Do you want to discard it?") + "\";" +
+							"};" +
+							"function cancelPopup() {" +
+								"window.onbeforeunload = null;" +
+							"};" +
+						"</script>"
+					);
+				}
 				out.println( "</head>\n<body>\n" +
 					"<div class=\"page\"><p><img src=\"" + sessionObject.imgPath + "susimail.png\" alt=\"Susimail\"><br>&nbsp;</p>\n" +
 					"<form method=\"POST\" enctype=\"multipart/form-data\" action=\"" + myself + "\" accept-charset=\"UTF-8\">" );
@@ -1519,12 +1587,14 @@ public class WebMail extends HttpServlet
 		
 		if( qp == null ) {
 			ok = false;
-			sessionObject.error += _("Internal error") + ": Quoted printable encoder not available.";
+			// can't happen, don't translate
+			sessionObject.error += "Internal error: Quoted printable encoder not available.";
 		}
 		
 		if( hl == null ) {
 			ok = false;
-			sessionObject.error += _("Internal error") + ": Header line encoder not available.";
+			// can't happen, don't translate
+			sessionObject.error += "Internal error: Header line encoder not available.";
 		}
 
 		if( ok ) {
@@ -1565,17 +1635,18 @@ public class WebMail extends HttpServlet
 				body.append( "\r\n--" + boundary + "--\r\n" );
 			}
 			
+			// TODO set to the StringBuilder instead so SMTP can replace() in place
 			sessionObject.sentMail = body.toString();	
 			
-			SMTPClient relay = new SMTPClient();
-			
 			if( ok ) {
+				SMTPClient relay = new SMTPClient();
 				if( relay.sendMail( sessionObject.host, sessionObject.smtpPort,
 						sessionObject.user, sessionObject.pass,
-						sender, recipients.toArray(), body.toString() ) ) {
+						sender, recipients.toArray(), sessionObject.sentMail ) ) {
 					
 					sessionObject.info += _("Mail sent.");
 					
+					sessionObject.sentMail = null;	
 					if( sessionObject.attachments != null )
 						sessionObject.attachments.clear();
 				}
@@ -1648,7 +1719,8 @@ public class WebMail extends HttpServlet
 				"<tr><td align=\"right\">" + _("Subject:") + "</td><td align=\"left\"><input type=\"text\" size=\"80\" name=\"" + NEW_SUBJECT + "\" value=\"" + subject + "\"></td></tr>\n" +
 				"<tr><td colspan=\"2\" align=\"center\"><textarea cols=\"" + Config.getProperty( CONFIG_COMPOSER_COLS, 80 )+ "\" rows=\"" + Config.getProperty( CONFIG_COMPOSER_ROWS, 10 )+ "\" name=\"" + NEW_TEXT + "\">" + text + "</textarea>" +
 				"<tr><td colspan=\"2\" align=\"center\"><hr></td></tr>\n" +
-				"<tr><td align=\"right\">" + _("New Attachment:") + "</td><td align=\"left\"><input type=\"file\" size=\"50%\" name=\"" + NEW_FILENAME + "\" value=\"\"><input type=\"submit\" name=\"" + NEW_UPLOAD + "\" value=\"" + _("Upload File") + "\"></td></tr>" );
+				"<tr><td align=\"right\">" + _("New Attachment:") + "</td><td align=\"left\"><input type=\"file\" size=\"50%\" name=\"" + NEW_FILENAME + "\" value=\"\">" +
+				"<input type=\"submit\" name=\"" + NEW_UPLOAD + "\" value=\"" + _("Upload File") + "\" onclick=\"cancelPopup()\"></td></tr>" );
 		
 		if( sessionObject.attachments != null && !sessionObject.attachments.isEmpty() ) {
 			boolean wroteHeader = false;
@@ -1676,7 +1748,7 @@ public class WebMail extends HttpServlet
 		String pop3 = Config.getProperty( CONFIG_PORTS_POP3, "" + DEFAULT_POP3PORT );
 		String smtp = Config.getProperty( CONFIG_PORTS_SMTP, "" + DEFAULT_SMTPPORT );
 		
-		out.println( "<table cellspacing=\"0\" cellpadding=\"5\">\n" +
+		out.println( "<table cellspacing=\"3\" cellpadding=\"5\">\n" +
 			// current postman hq length limits 16/12, new postman version 32/32
 			"<tr><td align=\"right\" width=\"30%\">" + _("User") + "</td><td width=\"40%\" align=\"left\"><input type=\"text\" size=\"32\" name=\"" + USER + "\" value=\"" + "\"> @mail.i2p</td></tr>\n" +
 			"<tr><td align=\"right\" width=\"30%\">" + _("Password") + "</td><td width=\"40%\" align=\"left\"><input type=\"password\" size=\"32\" name=\"pass\" value=\"" + "\"></td></tr>\n");
@@ -1689,7 +1761,9 @@ public class WebMail extends HttpServlet
 			"<tr><td align=\"right\" width=\"30%\">" + _("SMTP Port") + "</td><td width=\"40%\" align=\"left\"><input type=\"text\" style=\"text-align: right;\" size=\"5\" name=\"" + SMTP +"\" value=\"" + smtp + "\"" + ( fixed ? " disabled" : "" ) + "></td></tr>\n");
 		}
 		out.println(
-			"<tr><td></td><td align=\"left\">" + button( LOGIN, _("Login") ) + " <input class=\"cancel\" type=\"reset\" value=\"" + _("Reset") + "\"></td></tr>\n" +
+			"<tr><td colspan=\"2\">&nbsp;</td></tr>\n" +
+			"<tr><td></td><td align=\"left\">" + button( LOGIN, _("Login") ) + spacer + " <input class=\"cancel\" type=\"reset\" value=\"" + _("Reset") + "\"></td></tr>\n" +
+			"<tr><td colspan=\"2\">&nbsp;</td></tr>\n" +
 			"<tr><td></td><td align=\"left\"><a href=\"http://hq.postman.i2p/?page_id=14\">" + _("Learn about I2P mail") + "</a></td></tr>\n" +
 			"<tr><td></td><td align=\"left\"><a href=\"http://hq.postman.i2p/?page_id=16\">" + _("Create Account") + "</a></td></tr>\n" +
 			"</table>");

@@ -31,14 +31,18 @@ import java.io.IOException;
 import java.util.Properties;
 
 import net.i2p.I2PAppContext;
+import net.i2p.data.DataHelper;
 
 /**
+ * Warning - static - not for use by multiple applications or prefixes
+ *
  * @author susi
  */
 public class Config {
 	
 	private static Properties properties, config;
 	private static String configPrefix;
+
 	/**
 	 * 
 	 * @param name
@@ -59,10 +63,11 @@ public class Config {
 		if( result != null )
 			return result;
 		
-		result = config.getProperty( name );
-
-		if( result != null )
-			return result;
+		if( config != null ) {
+			result = config.getProperty( name );
+			if( result != null )
+				return result;
+		}
 		
 		result = properties.getProperty( name );
 
@@ -84,25 +89,24 @@ public class Config {
 	 */
 	public static void reloadConfiguration()
 	{
+		// DEBUG level logging won't work here since we haven't loaded the config yet...
 		properties = new Properties();
-		config = new Properties();
 		try {
 			properties.load( Config.class.getResourceAsStream( "/susimail.properties" ) );
 		} catch (Exception e) {
-			Debug.debug( Debug.DEBUG, "Could not open WEB-INF/classes/susimail.properties (possibly in jar), reason: " + e.getMessage() );
+			Debug.debug(Debug.ERROR, "Could not open WEB-INF/classes/susimail.properties (possibly in jar), reason: " + e);
 		}
-                FileInputStream fis = null;
 		try {
 			File cfg = new File(I2PAppContext.getGlobalContext().getConfigDir(), "susimail.config");
-			fis = new FileInputStream(cfg);
-			config.load( fis );
+			if (cfg.exists()) {
+				config = new Properties();
+				DataHelper.loadProps(config, cfg);
+			}
 		} catch (Exception e) {
-			Debug.debug( Debug.DEBUG, "Could not open susimail.config, reason: " + e.getMessage() );
-		} finally {
-			if (fis != null)
-				try { fis.close(); } catch (IOException ioe) {}
+			Debug.debug(Debug.ERROR, "Could not open susimail.config, reason: " + e);
 		}
 	}
+
 	/**
 	 * 
 	 * @param name
@@ -134,8 +138,9 @@ public class Config {
 		}
 		return result;
 	}
+
 	/**
-	 * 
+	 * Static! Not for use by multiple applications!
 	 * @param prefix
 	 */
 	public static void setPrefix( String prefix )

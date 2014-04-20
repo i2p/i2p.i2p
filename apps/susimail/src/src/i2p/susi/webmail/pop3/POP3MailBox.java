@@ -391,7 +391,7 @@ public class POP3MailBox {
 				lastError = _("Error opening mailbox") + ": " + e1;
 			}
 			catch (IOException e1) {
-				lastError = _("Error opening mailbox") + ": " + e1;
+				lastError = _("Error opening mailbox") + ": " + e1.getLocalizedMessage();
 			}
 		}
 	}
