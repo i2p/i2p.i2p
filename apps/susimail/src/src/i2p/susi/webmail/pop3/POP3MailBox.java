@@ -51,6 +51,7 @@ public class POP3MailBox {
 	private int mails;
 
 	private boolean connected;
+	private boolean supportsPipelining;
 
 	/** ID to size */
 	private final HashMap<Integer, Integer> sizes;
@@ -362,15 +363,17 @@ public class POP3MailBox {
 			try {
 				// pipeline 2 commands
 				lastError = "";
-				List<String> cmds = new ArrayList(2);
+				List<SendRecv> cmds = new ArrayList<SendRecv>(3);
 				// TODO APOP (unsupported by postman)
-				cmds.add("USER " + user);
-				cmds.add("PASS " + pass);
+				cmds.add(new SendRecv(null, Mode.A1));
+				// TODO CAPA
+				cmds.add(new SendRecv("USER " + user, Mode.A1));
+				cmds.add(new SendRecv("PASS " + pass, Mode.A1));
 				// We can't pipleline the STAT because we must
 				// enter the transaction state first.
 				//cmds.add("STAT");
 				// wait for 3 +OK lines since the connect generates one
-				if (sendCmds(cmds, 3) && sendCmd1a("STAT")) {
+				if (sendCmds(cmds) && sendCmd1a("STAT")) {
 					int i = lastLine.indexOf(" ", 5);
 					mails =
 						Integer.parseInt(
@@ -431,7 +434,7 @@ public class POP3MailBox {
 		}
 		return result;
 	}
-	
+
 	/**
 	 * Send commands to pop3 server all at once (and expect answers).
 	 * Sets lastError to the FIRST error.
@@ -441,29 +444,70 @@ public class POP3MailBox {
 	 * @param rcvLines lines to receive
 	 * @return true if ALL received lines were successful (+OK)
 	 * @throws IOException
-         * @since 0.9.13
+	 * @since 0.9.13
 	 */
-	private boolean sendCmds(List<String> cmds, int rcvLines) throws IOException {
+	private boolean sendCmds(List<SendRecv> cmds) throws IOException {
 		boolean result = true;
-		for (String cmd : cmds) {
-			sendCmd1aNoWait(cmd);
-		}
+		boolean pipe = supportsPipelining;
+		if (pipe) {
+			Debug.debug(Debug.DEBUG, "POP3 pipelining " + cmds.size() + " commands");
+			for (SendRecv sr : cmds) {
+				String cmd = sr.send;
+				if (cmd != null)
+					sendCmd1aNoWait(cmd);
+			}
+		} // else we will do it below
 		socket.getOutputStream().flush();
 		InputStream in = socket.getInputStream();
-		for (int i = 0; i < rcvLines; i++) {
+		int i = 0;
+		for (SendRecv sr : cmds) {
+			if (!pipe) {
+				String cmd = sr.send;
+				if (cmd != null) {
+					sendCmd1aNoWait(cmd);
+					socket.getOutputStream().flush();
+				}
+			}
 			String foo = DataHelper.readLine(in);
 			if (foo == null) {
 				lastError = _("No response from server");
 				throw new IOException(lastError);
 			}
-			//foo = foo.trim(); // readLine() doesn't strip \r
+			sr.response = foo.trim();
+			i++;
 			if (!foo.startsWith("+OK")) {
-				Debug.debug(Debug.DEBUG, "Fail after " + (i+1) + " of " + rcvLines + " responses: \"" + foo.trim() + '"');
+				Debug.debug(Debug.DEBUG, "Fail after " + i + " of " + cmds.size() + " responses: \"" + foo.trim() + '"');
 				if (result)
 				    lastError = foo;   // actually the first error, for better info to the user
 				result = false;
+				sr.result = false;
 			} else {
-				Debug.debug(Debug.DEBUG, "OK after " + (i+1) + " of " + rcvLines + " responses: \"" + foo.trim() + '"');
+				Debug.debug(Debug.DEBUG, "OK after " + i + " of " + cmds.size() + " responses: \"" + foo.trim() + '"');
+				switch (sr.mode) {
+				    case A1:
+					sr.result = true;
+					break;
+
+				    case RB:
+					try {
+						sr.rb = getResultNa();
+						sr.result = true;
+					} catch (IOException ioe) {
+						result = false;
+						sr.result = false;
+					}
+					break;
+
+				    case LS:
+					try {
+						sr.ls = getResultNl();
+						sr.result = true;
+					} catch (IOException ioe) {
+						result = false;
+						sr.result = false;
+					}
+					break;
+				}
 			}
 			lastLine = foo;
 		}
@@ -474,7 +518,7 @@ public class POP3MailBox {
 	 * send command to pop3 server. Does NOT flush or read or wait.
 	 * Caller must sync.
 	 * 
-	 * @param cmd command to send
+	 * @param cmd command to send non-null
 	 * @throws IOException
          * @since 0.9.13
 	 */
@@ -532,32 +576,7 @@ public class POP3MailBox {
 	private ReadBuffer sendCmdNa(String cmd) throws IOException
 	{
 		if (sendCmd1a(cmd)) {
-			InputStream input = socket.getInputStream();
-			StringBuilder buf = new StringBuilder(512);
-			ByteArrayOutputStream baos = new ByteArrayOutputStream(4096);
-			while (DataHelper.readLine(input, buf)) {
-				int len = buf.length();
-				if (len == 0)
-					break; // huh? no \r?
-				if (len == 2 && buf.charAt(0) == '.' && buf.charAt(1) == '\r')
-					break;
-				String line;
-				// RFC 1939 sec. 3 de-byte-stuffing
-				if (buf.charAt(0) == '.')
-					line = buf.substring(1);
-				else
-					line = buf.toString();
-				baos.write(DataHelper.getASCII(line));
-				if (buf.charAt(len - 1) != '\r')
-					baos.write((byte) '\n');
-				baos.write((byte) '\n');
-				buf.setLength(0);
-			}
-			ReadBuffer readBuffer = new ReadBuffer();
-			readBuffer.content = baos.toByteArray();
-			readBuffer.offset = 0;
-			readBuffer.length = baos.size();
-			return readBuffer;
+			return getResultNa();
 		} else {
 			Debug.debug( Debug.DEBUG, "sendCmd1a returned false" );
 			return null;
@@ -577,33 +596,85 @@ public class POP3MailBox {
 	private List<String> sendCmdNl(String cmd) throws IOException
 	{
 		if (sendCmd1a(cmd)) {
-			List<String> rv = new ArrayList<String>(16);
-			long timeOut = 120*1000;
-			InputStream input = socket.getInputStream();
-			long startTime = System.currentTimeMillis();
-			StringBuilder buf = new StringBuilder(512);
-			while (DataHelper.readLine(input, buf)) {
-				int len = buf.length();
-				if (len == 0)
-					break; // huh? no \r?
-				if (len == 2 && buf.charAt(0) == '.' && buf.charAt(1) == '\r')
-					break;
-				if( System.currentTimeMillis() - startTime > timeOut )
-					throw new IOException( "Timeout while waiting on server response." );
-				String line;
-				// RFC 1939 sec. 3 de-byte-stuffing
-				if (buf.charAt(0) == '.')
-					line = buf.substring(1);
-				else
-					line = buf.toString();
-				rv.add(line);
-				buf.setLength(0);
-			}
-			return rv;
+			return getResultNl();
 		} else {
 			Debug.debug( Debug.DEBUG, "sendCmd1a returned false" );
 			return null;
 		}
+	}
+
+	/**
+	 * No total timeout (result could be large)
+	 * Caller must sync.
+	 *
+	 * @return buffer non-null
+	 * @throws IOException
+	 */
+	private ReadBuffer getResultNa() throws IOException
+	{
+		InputStream input = socket.getInputStream();
+		StringBuilder buf = new StringBuilder(512);
+		ByteArrayOutputStream baos = new ByteArrayOutputStream(4096);
+		while (DataHelper.readLine(input, buf)) {
+			int len = buf.length();
+			if (len == 0)
+				break; // huh? no \r?
+			if (len == 2 && buf.charAt(0) == '.' && buf.charAt(1) == '\r')
+				break;
+			String line;
+			// RFC 1939 sec. 3 de-byte-stuffing
+			if (buf.charAt(0) == '.')
+				line = buf.substring(1);
+			else
+				line = buf.toString();
+			baos.write(DataHelper.getASCII(line));
+			if (buf.charAt(len - 1) != '\r')
+				baos.write((byte) '\n');
+			baos.write((byte) '\n');
+			buf.setLength(0);
+		}
+		ReadBuffer readBuffer = new ReadBuffer();
+		readBuffer.content = baos.toByteArray();
+		readBuffer.offset = 0;
+		readBuffer.length = baos.size();
+		return readBuffer;
+	}
+
+	/**
+	 * Like getResultNa but returns a list of strings, one per line.
+	 * Strings will have trailing \r but not \n.
+	 * Total timeout 2 minutes.
+	 * Caller must sync.
+	 *
+	 * @return the lines non-null
+	 * @throws IOException on timeout
+         * @since 0.9.13
+	 */
+	private List<String> getResultNl() throws IOException
+	{
+		List<String> rv = new ArrayList<String>(16);
+		long timeOut = 120*1000;
+		InputStream input = socket.getInputStream();
+		long startTime = System.currentTimeMillis();
+		StringBuilder buf = new StringBuilder(512);
+		while (DataHelper.readLine(input, buf)) {
+			int len = buf.length();
+			if (len == 0)
+				break; // huh? no \r?
+			if (len == 2 && buf.charAt(0) == '.' && buf.charAt(1) == '\r')
+				break;
+			if( System.currentTimeMillis() - startTime > timeOut )
+				throw new IOException( "Timeout while waiting on server response." );
+			String line;
+			// RFC 1939 sec. 3 de-byte-stuffing
+			if (buf.charAt(0) == '.')
+				line = buf.substring(1);
+			else
+				line = buf.toString();
+			rv.add(line);
+			buf.setLength(0);
+		}
+		return rv;
 	}
 
 	/**
@@ -736,6 +807,34 @@ public class POP3MailBox {
 		synchronized( synchronizer ) {
 			close(true);
 			connect();
+		}
+	}
+
+	private enum Mode {
+		/** no extra lines (sendCmd1a) */
+		A1,
+		/** return extra lines in ReadBuffer (sendCmdNa) */
+		RB,
+		/** return extra lines in List of Strings (sendCmdNl) */
+		LS
+	}
+
+	/**
+	 *  A command to send and a mode to receive and return the results
+	 *  @since 0.9.13
+	 */
+	private static class SendRecv {
+		public final String send;
+		public final Mode mode;
+		public String response;
+		public boolean result;
+		public ReadBuffer rb;
+		public List<String> ls;
+
+		/** @param s may be null */
+		public SendRecv(String s, Mode m) {
+			send = s;
+			mode = m;
 		}
 	}
 
