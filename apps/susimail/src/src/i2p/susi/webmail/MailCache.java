@@ -23,9 +23,14 @@
  */
 package i2p.susi.webmail;
 
+import i2p.susi.util.ReadBuffer;
 import i2p.susi.webmail.pop3.POP3MailBox;
+import i2p.susi.webmail.pop3.POP3MailBox.FetchRequest;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Hashtable;
+import java.util.List;
 
 /**
  * @author user
@@ -43,6 +48,9 @@ public class MailCache {
          */
 	private static final int FETCH_ALL_SIZE = 3072;
 
+	/**
+	 * @param mailbox non-null
+	 */
 	MailCache( POP3MailBox mailbox ) {
 		this.mailbox = mailbox;
 		mails = new Hashtable<String, Mail>();
@@ -59,7 +67,6 @@ public class MailCache {
 		
 		Mail mail = null, newMail = null;
 
-		if( mailbox != null ) {
 			/*
 			 * synchronize update to hashtable
 			 */
@@ -95,9 +102,120 @@ public class MailCache {
 			}
 			if( parseHeaders && mail.header != null )
 				mail.parseHeaders();
-		}
 		if( mail != null && mail.deleted )
 			mail = null;
 		return mail;
+	}
+
+	/**
+	 * Fetch any needed data from pop3 server.
+	 * Mail objects are inserted into the requests.
+	 * 
+	 * @since 0.9.13
+	 */
+	public void getMail(Collection<MailRequest> requests) {
+		
+		List<POP3Request> fetches = new ArrayList<POP3Request>();
+		//  Fill in the answers from the cache and make a list of
+		//  requests.to send off
+		for (MailRequest mr : requests) {
+			Mail mail = null, newMail = null;
+			String uidl = mr.getUIDL();
+			boolean headerOnly = mr.getHeaderOnly();
+
+			/*
+			 * synchronize update to hashtable
+			 */
+			synchronized(mails) {
+				mail = mails.get( uidl );
+				if( mail == null ) {
+					newMail = new Mail();
+					mails.put( uidl, newMail );
+				}
+			}
+			if( mail == null ) {
+				mail = newMail;
+				mail.uidl = uidl;
+				mail.size = mailbox.getSize( uidl );
+			}
+			if(!mail.deleted) {
+				mr.setMail(mail);
+				if( mail.size <= FETCH_ALL_SIZE)
+					headerOnly = false;
+				if( headerOnly ) {
+					if( mail.header == null ) {
+						POP3Request pr = new POP3Request(mr, mail, true);
+						fetches.add(pr);
+					}
+				} else {
+					if( mail.body == null ) {
+						POP3Request pr = new POP3Request(mr, mail, false);
+						fetches.add(pr);
+					}
+				}
+			}
+		}
+
+		if (!fetches.isEmpty()) {
+			//  Send off the fetches
+			// gaah compiler
+			List foo = fetches;
+			List<FetchRequest> bar = foo;
+			mailbox.getBodies(bar);
+			//  Process results
+			for (POP3Request pr : fetches) {
+				ReadBuffer rb = pr.buf;
+				if (rb != null) {
+					Mail mail = pr.mail;
+					boolean parseHeaders = mail.header == null;
+					if (pr.getHeaderOnly()) {
+						mail.header = rb;
+					} else {
+						mail.header = rb;
+						mail.body = rb;
+						MailPart.parse(mail);
+					}
+					if (parseHeaders)
+						mail.parseHeaders();
+				}
+			}
+		}
+	}
+
+	/**
+	 *  Incoming to us
+	 */
+	public interface MailRequest {
+		public String getUIDL();
+		public boolean getHeaderOnly();
+		public void setMail(Mail mail);
+	}
+
+	/**
+	 *  Outgoing to POP3
+	 */
+	private static class POP3Request implements FetchRequest {
+		public final MailRequest request;
+		public final Mail mail;
+		private final boolean headerOnly;
+		public ReadBuffer buf;
+
+		public POP3Request(MailRequest req, Mail m, boolean hOnly) {
+			request = req;
+			mail = m;
+			headerOnly = hOnly;
+		}
+
+		public String getUIDL() {
+			return request.getUIDL();
+		}
+
+		public boolean getHeaderOnly() {
+			return headerOnly;
+		}
+
+		public void setBuffer(ReadBuffer buffer) {
+			buf = buffer;
+		}
 	}
 }

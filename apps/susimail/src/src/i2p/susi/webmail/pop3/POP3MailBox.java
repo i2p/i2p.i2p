@@ -33,6 +33,7 @@ import java.io.InputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
@@ -143,6 +144,44 @@ public class POP3MailBox {
 			if (id < 0)
 				return null;
 			return getBody(id);
+		}
+	}
+
+	/**
+	 * Fetch headers and/or bodies. Does not cache.
+	 * ReadBuffer objects are inserted into the requests.
+	 * No total time limit.
+	 * 
+	 * @since 0.9.13
+	 */
+	public void getBodies(Collection<FetchRequest> requests) {
+		List<SendRecv> srs = new ArrayList<SendRecv>(requests.size());
+		synchronized( synchronizer ) {
+			for (FetchRequest fr : requests) {
+				int id = getIDfromUIDL(fr.getUIDL());
+				if (id < 0)
+					continue;
+				SendRecv sr;
+				if (fr.getHeaderOnly() && supportsTOP)
+					sr = new SendRecv("TOP " + id + " 0", Mode.RB);
+				else
+					sr = new SendRecv("RETR " + id, Mode.RB);
+				sr.savedObject = fr;
+				srs.add(sr);
+			}
+			if (srs.isEmpty())
+				return;
+			try {
+				sendCmds(srs);
+			} catch (IOException ioe) {
+				// todo maybe
+			}
+		}
+		for (SendRecv sr : srs) {
+			if (sr.result) {
+				FetchRequest fr = (FetchRequest) sr.savedObject;
+				fr.setBuffer(sr.rb);
+			}
 		}
 	}
 	
@@ -897,12 +936,20 @@ public class POP3MailBox {
 		public boolean result;
 		public ReadBuffer rb;
 		public List<String> ls;
+		// to remember things
+		public Object savedObject;
 
 		/** @param s may be null */
 		public SendRecv(String s, Mode m) {
 			send = s;
 			mode = m;
 		}
+	}
+
+	public interface FetchRequest {
+		public String getUIDL();
+		public boolean getHeaderOnly();
+		public void setBuffer(ReadBuffer buffer);
 	}
 
 	/** translate */

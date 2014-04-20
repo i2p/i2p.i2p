@@ -50,6 +50,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -659,9 +660,21 @@ public class WebMail extends HttpServlet
 						sessionObject.host = host;
 						sessionObject.smtpPort = smtpPortNo;
 						sessionObject.state = STATE_LIST;
-						sessionObject.mailCache = new MailCache(mailbox);
+						MailCache mc = new MailCache(mailbox);
+						sessionObject.mailCache = mc;
 						sessionObject.folder = new Folder<String>();
-						sessionObject.folder.setElements(mailbox.getUIDLs() );
+						String[] uidls = mailbox.getUIDLs();
+						sessionObject.folder.setElements(uidls);
+						if (uidls.length > 0) {
+							// prime the cache, request all headers at once
+							// otherwise they are pulled one at a time by sortBy() below
+							List<MailCache.MailRequest> reqs = new ArrayList<MailCache.MailRequest>(uidls.length);
+							for (int i = 0; i < uidls.length; i++) {
+								reqs.add(new CacheRequest(uidls[i]));
+							}
+							mc.getMail(reqs);
+						}
+						
 						sessionObject.folder.addSorter( SORT_ID, new IDSorter( sessionObject.mailCache ) );
 						sessionObject.folder.addSorter( SORT_SENDER, new SenderSorter( sessionObject.mailCache ) );
 						sessionObject.folder.addSorter( SORT_SUBJECT, new SubjectSorter( sessionObject.mailCache ) );
@@ -682,6 +695,31 @@ public class WebMail extends HttpServlet
 			}
 		}
 	}
+
+	/**
+	 *  Outgoing to MailCache
+	 *  @since 0.9.13
+	 */
+	private static class CacheRequest implements MailCache.MailRequest {
+		private final String uidl;
+
+		public CacheRequest(String uidl) {
+			this.uidl = uidl;
+		}
+
+		public String getUIDL() {
+			return uidl;
+		}
+
+		public boolean getHeaderOnly() {
+			return true;
+		}
+
+		public void setMail(Mail mail) {
+			// do nothing, this just pumps up the cache
+		}
+	}
+
 	/**
 	 * 
 	 * @param sessionObject

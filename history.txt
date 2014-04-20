@@ -1,3 +1,41 @@
+2014-04-20 zzz
+ * SusiMail:
+   - Implement extensive pipelining in POP3 for a big speedup
+     of the initial connection
+   - Don't require an attachment to be "uploaded" to send it
+   - Move delete attachment button, hide if no attachments
+   - Save BCC-to-self preference in the session
+   - Fix date format in reply
+   - Close any open POP3 socket when session is unbound
+   - Don't keep returning user to compose page (ticket #1252)
+   - Add javascript capture of back button on compose page
+
+2014-04-19 zzz
+ * Console: Remove the classpath workarounds for SusiMail,
+   since it isn't using the jetty classes any more
+ * SusiMail:
+   - Increase max size of mails that are fetched in full,
+     previous limit was so small it never happened.
+   - Move page nav to top of folder view, hide if only one page
+   - Refuse to send mail with no "to"
+   - Reduce default page size as it slows startup
+   - CSS and layout fixes
+   - Flush writes in POP3 and SMTP
+   - Don't wait for SMTP response after QUIT
+   - Tell the user if there are no messages
+   - Fix the message view layout
+   - Message view attachment cleanups
+   - Pipeline USER and PASS to save a round-trip at startup
+   - Better synchronization in POP3
+   - Properly de-byte-stuff in POP3
+   - Remove unnecessary caching in POP3
+   - More efficient handling of POP3 responses
+   - Remove 60s timeout for fetching a message,
+     so retrieval of large messages doesn't fail
+   - Use pipelining in SMTP
+   - Rewrite SMTP response processing
+   - Translate SMTP error messages
+
 2014-04-18 zzz
  * configclients: Don't allow console disable
  * I2PTunnel IRC Client: Prevent AIOOBE (ticket #1254)
