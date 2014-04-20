@@ -415,10 +415,10 @@ public class WebMail extends HttpServlet
 		}
 		
 		if( mailPart.multipart ) {
-			if( mailPart.type.compareTo( "multipart/alternative" ) == 0 ) {
+			if( mailPart.type.equals("multipart/alternative")) {
 				MailPart chosen = null;
 				for( MailPart subPart : mailPart.parts ) {
-					if( subPart.type != null && subPart.type.compareTo( "text/plain" ) == 0 )
+					if( subPart.type != null && subPart.type.equals("text/plain"))
 						chosen = subPart;
 				}
 				if( chosen != null ) {
@@ -454,7 +454,7 @@ public class WebMail extends HttpServlet
 				showBody = true;
 			}
 			if( showBody == false && mailPart.type != null ) {
-				if( mailPart.type.compareTo( "text/plain" ) == 0 ) {
+				if( mailPart.type.equals("text/plain")) {
 					showBody = true;
 				}
 				else
@@ -559,7 +559,7 @@ public class WebMail extends HttpServlet
 			String pop3Port = request.getParameter( POP3 );
 			String smtpPort = request.getParameter( SMTP );
 			String fixedPorts = Config.getProperty( CONFIG_PORTS_FIXED, "true" );
-			if( fixedPorts.compareToIgnoreCase( "false" ) != 0 ) {
+			if( !fixedPorts.equalsIgnoreCase("false")) {
 				host = Config.getProperty( CONFIG_HOST, DEFAULT_HOST );
 				pop3Port = Config.getProperty( CONFIG_PORTS_POP3, "" + DEFAULT_POP3PORT );
 				smtpPort = Config.getProperty( CONFIG_PORTS_SMTP, "" + DEFAULT_SMTPPORT );
@@ -885,7 +885,7 @@ public class WebMail extends HttpServlet
 	private static int getCheckedMessage(RequestWrapper request) {
 		for( Enumeration<String> e = request.getParameterNames(); e.hasMoreElements(); ) {
 			String parameter = e.nextElement();
-			if( parameter.startsWith( "check" ) && request.getParameter( parameter ).compareTo( "1" ) == 0 ) {
+			if( parameter.startsWith( "check" ) && request.getParameter( parameter ).equals("1")) {
 				String number = parameter.substring( 5 );
 				try {
 					int n = Integer.parseInt( number );
@@ -972,7 +972,7 @@ public class WebMail extends HttpServlet
 		else if( sessionObject.attachments != null && buttonPressed( request, DELETE_ATTACHMENT ) ) {
 			for( Enumeration<String> e = request.getParameterNames(); e.hasMoreElements(); ) {
 				String parameter = e.nextElement();
-				if( parameter.startsWith( "check" ) && request.getParameter( parameter ).compareTo( "1" ) == 0 ) {
+				if( parameter.startsWith( "check" ) && request.getParameter( parameter ).equals("1")) {
 					String number = parameter.substring( 5 );
 					try {
 						int n = Integer.parseInt( number );
@@ -1119,7 +1119,7 @@ public class WebMail extends HttpServlet
 			if( buttonPressed( request, REALLYDELETE ) ) {
 				for( Enumeration<String> e = request.getParameterNames(); e.hasMoreElements(); ) {
 					String parameter = e.nextElement();
-					if( parameter.startsWith( "check" ) && request.getParameter( parameter ).compareTo( "1" ) == 0 ) {
+					if( parameter.startsWith( "check" ) && request.getParameter( parameter ).equals("1")) {
 						String number = parameter.substring( 5 );
 						try {
 							int n = Integer.parseInt( number );
@@ -1170,11 +1170,11 @@ public class WebMail extends HttpServlet
 	{
 		String str = request.getParameter( sort_id );
 		if( str != null ) {
-			if( str.compareToIgnoreCase( "up" ) == 0 ) {
+			if( str.equalsIgnoreCase("up")) {
 				sessionObject.folder.setSortingDirection( Folder.UP );
 				sessionObject.folder.sortBy( sort_id );
 			}
-			if( str.compareToIgnoreCase( "down" ) == 0 ) {
+			if( str.equalsIgnoreCase("down")) {
 				sessionObject.folder.setSortingDirection( Folder.DOWN );
 				sessionObject.folder.sortBy( sort_id );
 			}
@@ -1471,7 +1471,7 @@ public class WebMail extends HttpServlet
 
 		String prop = Config.getProperty( CONFIG_SENDER_FIXED, "true" );
 		String domain = Config.getProperty( CONFIG_SENDER_DOMAIN, "mail.i2p" );
-		if( prop.compareToIgnoreCase( "false" ) != 0 ) {
+		if( !prop.equalsIgnoreCase("false")) {
 			from = "<" + sessionObject.user + "@" + domain + ">";
 		}
 		ArrayList<String> toList = new ArrayList<String>();
@@ -1503,7 +1503,7 @@ public class WebMail extends HttpServlet
 		
 		String bccToSelf = request.getParameter( NEW_BCC_TO_SELF );
 		
-		if( bccToSelf != null && bccToSelf.compareTo( "1" ) == 0 )
+		if( bccToSelf != null && bccToSelf.equals("1"))
 			recipients.add( sender );
 		
 		if( toList.isEmpty() ) {
@@ -1619,7 +1619,7 @@ public class WebMail extends HttpServlet
 		String from = request.getParameter( NEW_FROM );
 		String fixed = Config.getProperty( CONFIG_SENDER_FIXED, "true" );
 		
-		if( from == null || fixed.compareToIgnoreCase( "false" ) != 0 ) {
+		if( from == null || !fixed.equalsIgnoreCase("false")) {
 				String domain = Config.getProperty( CONFIG_SENDER_DOMAIN, "mail.i2p" );
 				from = "<" + sessionObject.user + "@" + domain + ">";
 		}
@@ -1637,12 +1637,12 @@ public class WebMail extends HttpServlet
 		
 		out.println( "<table cellspacing=\"0\" cellpadding=\"5\">\n" +
 				"<tr><td colspan=\"2\" align=\"center\"><hr></td></tr>\n" +
-				"<tr><td align=\"right\">" + _("From:") + "</td><td align=\"left\"><input type=\"text\" size=\"80\" name=\"" + NEW_FROM + "\" value=\"" + from + "\" " + ( fixed.compareToIgnoreCase( "false" ) != 0 ? "disabled" : "" ) +"></td></tr>\n" +
+				"<tr><td align=\"right\">" + _("From:") + "</td><td align=\"left\"><input type=\"text\" size=\"80\" name=\"" + NEW_FROM + "\" value=\"" + from + "\" " + ( !fixed.equalsIgnoreCase("false") ? "disabled" : "" ) +"></td></tr>\n" +
 				"<tr><td align=\"right\">" + _("To:") + "</td><td align=\"left\"><input type=\"text\" size=\"80\" name=\"" + NEW_TO + "\" value=\"" + to + "\"></td></tr>\n" +
 				"<tr><td align=\"right\">" + _("Cc:") + "</td><td align=\"left\"><input type=\"text\" size=\"80\" name=\"" + NEW_CC + "\" value=\"" + cc + "\"></td></tr>\n" +
 				"<tr><td align=\"right\">" + _("Bcc:") + "</td><td align=\"left\"><input type=\"text\" size=\"80\" name=\"" + NEW_BCC + "\" value=\"" + bcc + "\"></td></tr>\n" +
 				"<tr><td align=\"right\">" + _("Subject:") + "</td><td align=\"left\"><input type=\"text\" size=\"80\" name=\"" + NEW_SUBJECT + "\" value=\"" + subject + "\"></td></tr>\n" +
-				"<tr><td>&nbsp;</td><td align=\"left\"><input type=\"checkbox\" class=\"optbox\" name=\"" + NEW_BCC_TO_SELF + "\" value=\"1\"" + ( bccToSelf.compareToIgnoreCase( "false" ) != 0 ? "checked" : "" )+ ">" + _("Bcc to self") + "</td></tr>\n" +
+				"<tr><td>&nbsp;</td><td align=\"left\"><input type=\"checkbox\" class=\"optbox\" name=\"" + NEW_BCC_TO_SELF + "\" value=\"1\"" + ( !bccToSelf.equalsIgnoreCase("false") ? "checked" : "" )+ ">" + _("Bcc to self") + "</td></tr>\n" +
 				"<tr><td colspan=\"2\" align=\"center\"><textarea cols=\"" + Config.getProperty( CONFIG_COMPOSER_COLS, 80 )+ "\" rows=\"" + Config.getProperty( CONFIG_COMPOSER_ROWS, 10 )+ "\" name=\"" + NEW_TEXT + "\">" + text + "</textarea>" +
 				"<tr><td colspan=\"2\" align=\"center\"><hr></td></tr>\n" +
 				"<tr><td align=\"right\">" + _("New Attachment:") + "</td><td align=\"left\"><input type=\"file\" size=\"50%\" name=\"" + NEW_FILENAME + "\" value=\"\"><input type=\"submit\" name=\"" + NEW_UPLOAD + "\" value=\"" + _("Upload File") + "\"></td></tr>" );
@@ -1668,7 +1668,7 @@ public class WebMail extends HttpServlet
 	private static void showLogin( PrintWriter out )
 	{
 		String fixedPorts = Config.getProperty( CONFIG_PORTS_FIXED, "true" );
-		boolean fixed = fixedPorts.compareToIgnoreCase( "false" ) != 0;
+		boolean fixed = !fixedPorts.equalsIgnoreCase("false");
 		String host = Config.getProperty( CONFIG_HOST, DEFAULT_HOST );
 		String pop3 = Config.getProperty( CONFIG_PORTS_POP3, "" + DEFAULT_POP3PORT );
 		String smtp = Config.getProperty( CONFIG_PORTS_SMTP, "" + DEFAULT_SMTPPORT );
@@ -1747,7 +1747,7 @@ public class WebMail extends HttpServlet
 			boolean idChecked = false;
 			String checkId = sessionObject.pageChanged ? null : request.getParameter( "check" + i );
 			
-			if( checkId != null && checkId.compareTo( "1" ) == 0 )
+			if( checkId != null && checkId.equals("1"))
 				idChecked = true;
 			
 			if( sessionObject.markAll )
@@ -1765,7 +1765,7 @@ public class WebMail extends HttpServlet
 					( idChecked ? "checked" : "" ) + ">" + "</td><td>" +
 					link + mail.shortSender + "</a></td><td>&nbsp;</td><td>" + link + mail.shortSubject + "</a></td><td>&nbsp;</td><td>" +
 					// don't let date get split across lines
-					mail.localFormattedDate.replace(" ", "&nbsp;") + "</td><td>&nbsp;</td><td>" +
+					mail.localFormattedDate.replace(" ", "&nbsp;") + "</td><td>&nbsp;</td><td align=\"right\">" +
 					DataHelper.formatSize2(mail.size) + "B</td></tr>" );
 			bg = 1 - bg;
 			i++;

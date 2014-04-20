@@ -24,6 +24,7 @@
 package i2p.susi.webmail.smtp;
 
 import i2p.susi.debug.Debug;
+import i2p.susi.webmail.Messages;
 import i2p.susi.webmail.encoding.Encoding;
 import i2p.susi.webmail.encoding.EncodingException;
 import i2p.susi.webmail.encoding.EncodingFactory;
@@ -32,6 +33,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
+
+import net.i2p.data.DataHelper;
 
 /**
  * @author susi
@@ -42,6 +47,7 @@ public class SMTPClient {
 	private final byte buffer[];
 	public String error;
 	private String lastResponse;
+	private boolean supportsPipelining;
 	
 	private static final Encoding base64;
 	
@@ -73,60 +79,125 @@ public class SMTPClient {
 	 */
 	private int sendCmd(String cmd, boolean shouldWait)
 	{
+		if( socket == null )
+			return 0;
+		try {
+			if (cmd != null)
+				sendCmdNoWait(cmd);
+			if (!shouldWait)
+				return 100;
+			socket.getOutputStream().flush();
+			return getResult();
+		} catch (IOException e) {
+			error += "IOException occured.<br>";
+			return 0;
+		}
+	}
+	
+	/**
+	 *  Does not flush, wait, or read
+	 *
+	 *  @param cmd non-null
+	 *  @since 0.9.13
+	 */
+	private void sendCmdNoWait(String cmd) throws IOException
+	{
 		Debug.debug( Debug.DEBUG, "SMTP sendCmd(" + cmd +")" );
 		
 		if( socket == null )
-			return 0;
-
-		int result = 0;
-		lastResponse = "";
-		
-		try {
-			InputStream in = socket.getInputStream();
-			OutputStream out = socket.getOutputStream();
-		
-			if( cmd != null ) {
-				cmd += "\r\n";
-				out.write( cmd.getBytes() );
-			}
-			if (!shouldWait)
-				return 100;
-			out.flush();
-			String str = "";
-			boolean doContinue = true;
-			while( doContinue ) {
-				if( in.available() > 0 ) {
-					int read = in.read( buffer );
-					str += new String( buffer, 0, read );
-					lastResponse += str;
-					while( true ) {
-						int i = str.indexOf( "\r\n" );
-						if( i == -1 )
-							break;
-						if( result == 0 ) {
-							try {
-								result = Integer.parseInt( str.substring( 0, 3 ) );
-							}
-							catch( NumberFormatException nfe ) {
-								result = 0;
-								doContinue = false;
-								break;
-							}
-						}
-						if( str.substring( 3, 4 ).compareTo( " " ) == 0 ) {
-							doContinue = false;
-							break;
-						}
-						str = str.substring( i + 2 );
-					}
+			throw new IOException("no socket");
+		OutputStream out = socket.getOutputStream();
+		cmd += "\r\n";
+		out.write( cmd.getBytes() );
+	}
+	
+	/**
+	 *  Pipeline if supported
+	 *
+	 *  @param cmds non-null
+	 *  @return number of successful commands
+	 *  @since 0.9.13
+	 */
+	private int sendCmds(List<SendExpect> cmds)
+	{
+		int rv = 0;
+		if (supportsPipelining) {
+			Debug.debug(Debug.DEBUG, "SMTP pipelining " + cmds.size() + " commands");
+			try {
+				for (SendExpect cmd : cmds) {
+					sendCmdNoWait(cmd.send);
 				}
+				socket.getOutputStream().flush();
+			} catch (IOException ioe) {
+				return 0;
+			}
+			for (SendExpect cmd : cmds) {
+				int r = getResult();
+				// stop only on EOF
+				if (r == 0)
+					break;
+				if (r == cmd.expect)
+					rv++;
+			}
+		} else {
+			for (SendExpect cmd : cmds) {
+				int r = sendCmd(cmd.send);
+				// stop at first error
+				if (r != cmd.expect)
+					break;
+				rv++;
 			}
 		}
-		catch (IOException e) {
+		Debug.debug(Debug.DEBUG, "SMTP success in " + rv + " of " + cmds.size() + " commands");
+		return rv;
+	}
+
+	/**
+	 *  @return result code or 0 for failure
+	 *  @since 0.9.13
+	 */
+	private int getResult() {
+		return getFullResult().result;
+	}
+
+	/**
+	 *  @return result code and string, all lines combined with \r separators,
+         *          first 3 bytes are the ASCII return code or "000" for failure
+	 *          Result and Result.recv non null
+	 *  @since 0.9.13
+	 */
+	private Result getFullResult() {
+		int result = 0;
+		StringBuilder fullResponse = new StringBuilder(512);
+		try {
+			InputStream in = socket.getInputStream();
+			StringBuilder buf = new StringBuilder(128);
+			while (DataHelper.readLine(in, buf)) {
+				Debug.debug(Debug.DEBUG, "SMTP rcv \"" + buf.toString().trim() + '"');
+				int len = buf.length();
+				if (len < 4) {
+					result = 0;
+					break; // huh? no nnn\r?
+				}
+				if( result == 0 ) {
+					try {
+						String r = buf.substring(0, 3);
+						result = Integer.parseInt(r);
+					} catch ( NumberFormatException nfe ) {
+						break;
+					}
+				}
+				fullResponse.append(buf.substring(4));
+				if (buf.charAt(3) == ' ')
+					break;
+				buf.setLength(0);
+			}
+		} catch (IOException e) {
 			error += "IOException occured.<br>";
 			result = 0;
 		}
-		return result;
+		lastResponse = fullResponse.toString();
+		return new Result(result, lastResponse);
 	}
 
 	/**
@@ -139,60 +210,118 @@ public class SMTPClient {
 		
 		try {
 			socket = new Socket( host, port );
-		}
-		catch (Exception e) {
-			error += "Cannot connect: " + e.getMessage() + "<br>";
+		} catch (Exception e) {
+			error += _("Cannot connect") + ": " + e.getMessage() + "<br>";
 			ok = false;
 		}
 		try {
-			if( ok && sendCmd( null ) == 220 &&
-					sendCmd( "EHLO localhost" ) == 250 &&
-					sendCmd( "AUTH LOGIN" ) == 334 &&
-					sendCmd( base64.encode( user ) ) == 334 &&
-					sendCmd( base64.encode( pass ) ) == 235 &&
-					sendCmd( "MAIL FROM: " + sender ) == 250 ) {
-				
-				for( int i = 0; i < recipients.length; i++ ) {
-					if( sendCmd( "RCPT TO: " + recipients[i] ) != 250 ) {
-						ok = false;
-					}
-				}
-				if( ok ) {
-					if( sendCmd( "DATA" ) == 354 ) {
-						if( body.indexOf( "\r\n.\r\n" ) != -1 )
-							body = body.replaceAll( "\r\n.\r\n", "\r\n..\r\n" );
-						body += "\r\n.\r\n";
-						try {
-							socket.getOutputStream().write( body.getBytes() );
-							if( sendCmd( null ) == 250 ) {
-								mailSent = true;
-							}
-						}
-						catch (Exception e) {
-							ok = false;
-							error += "Error while sending mail: " + e.getMessage() + "<br>";
-						}
-					}
+			// SMTP ref: RFC 821
+			// Pipelining ref: RFC 2920
+			// AUTH ref: RFC 4954
+			if (ok) {
+				int result = sendCmd(null);
+				if (result != 220) {
+					error += _("Server refused connection") + " (" + result +  ")<br>";
+					ok = false;
 				}
 			}
+			if (ok) {
+				sendCmdNoWait( "EHLO localhost" );
+				socket.getOutputStream().flush();
+				Result r = getFullResult();
+				if (r.result == 250) {
+					supportsPipelining = r.recv.contains("PIPELINING");
+				} else {
+					error += _("Server refused connection") + " (" + r.result +  ")<br>";
+					ok = false;
+				}
+			}
+			if (ok) {
+				// RFC 4954 says AUTH must be the last but let's assume
+				// that includes the user/pass on following lines
+				List<SendExpect> cmds = new ArrayList<SendExpect>();
+				cmds.add(new SendExpect("AUTH LOGIN", 334));
+				cmds.add(new SendExpect(base64.encode(user), 334));
+				cmds.add(new SendExpect(base64.encode(pass), 235));
+				if (sendCmds(cmds) != 3) {
+					error += _("Login failed") + "<br>";
+					ok = false;
+				}
+			}
+			if (ok) {
+				List<SendExpect> cmds = new ArrayList<SendExpect>();
+				cmds.add(new SendExpect("MAIL FROM: " + sender, 250));
+				for( int i = 0; i < recipients.length; i++ ) {
+					cmds.add(new SendExpect("RCPT TO: " + recipients[i], 250));
+				}
+				cmds.add(new SendExpect("DATA", 354));
+				if (sendCmds(cmds) != cmds.size()) {
+					// TODO which recipient?
+					error += _("Mail rejected") + "<br>";
+					ok = false;
+				}
+			}
+			if (ok) {
+				if( body.indexOf( "\r\n.\r\n" ) != -1 )
+					body = body.replaceAll( "\r\n.\r\n", "\r\n..\r\n" );
+				socket.getOutputStream().write( body.getBytes() );
+				socket.getOutputStream().write("\r\n.\r\n".getBytes() );
+				int result = sendCmd(null);
+				if (result == 250)
+					mailSent = true;
+				else
+					error += _("Error sending mail") + " (" + result +  ")<br>";
+			}
+		} catch (IOException e) {
+			error += _("Error sending mail") + ": " + e.getMessage() + "<br>";
+
 		} catch (EncodingException e) {
-			ok = false;
 			error += e.getMessage();
 		}
 		if( !mailSent && lastResponse.length() > 0 ) {
-			String[] lines = lastResponse.split( "\r\n" );
+			String[] lines = lastResponse.split( "\r" );
 			for( int i = 0; i < lines.length; i++ )
 				error += lines[i] + "<br>";			
 		}
-		sendCmd("QUIT", false );
+		sendCmd("QUIT", false);
 		if( socket != null ) {
 			try {
 				socket.close();
-			}
-			catch (IOException e1) {
-				// ignore
-			}
+			} catch (IOException e1) {}
 		}
 		return mailSent;
+	}
+
+	/**
+	 *  A command to send and a result code to expect
+	 *  @since 0.9.13
+	 */
+	private static class SendExpect {
+		public final String send;
+		public final int expect;
+
+		public SendExpect(String s, int e) {
+			send = s;
+			expect = e;
+		}
+	}
+
+	/**
+	 *  A result string and code
+	 *  @since 0.9.13
+	 */
+	private static class Result {
+		public final int result;
+		public final String recv;
+
+		public Result(int r, String t) {
+			result = r;
+			recv = t;
+		}
+	}
+
+	/** translate */
+	private static String _(String s) {
+		return Messages.getString(s);
 	}
 }
