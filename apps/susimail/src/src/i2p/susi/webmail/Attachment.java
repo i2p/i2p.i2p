@@ -28,7 +28,7 @@ import i2p.susi.util.ReadBuffer;
 /**
  * @author user
  */
-public class Attachment {
+class Attachment {
 	private String fileName, contentType, transferEncoding;
 	private ReadBuffer buffer;
 	private String data;

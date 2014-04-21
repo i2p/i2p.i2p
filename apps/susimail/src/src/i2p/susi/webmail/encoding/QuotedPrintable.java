@@ -167,13 +167,9 @@ public class QuotedPrintable implements Encoding {
 			out[written++] = c;
 		}
 		
-		ReadBuffer readBuffer = new ReadBuffer();
-		readBuffer.content = out;
-		readBuffer.offset = 0;
-		readBuffer.length = written;
-
-		return readBuffer;
+		return new ReadBuffer(out, 0, written);
 	}
+
 	/* (non-Javadoc)
 	 * @see i2p.susi.webmail.encoding.Encoding#decode(i2p.susi.webmail.util.ReadBuffer)
 	 */

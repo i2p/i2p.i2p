@@ -23,78 +23,87 @@
  */
 package i2p.susi.webmail;
 
+import i2p.susi.debug.Debug;
 import i2p.susi.util.ReadBuffer;
+import i2p.susi.webmail.encoding.DecodingException;
+import i2p.susi.webmail.encoding.Encoding;
 import i2p.susi.webmail.encoding.EncodingFactory;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 /**
  * @author susi23
  */
-public class MailPart {
+class MailPart {
 
-	public String headerLines[], type, boundary, encoding, name,
-		filename, description, disposition, charset, version;
-	public int beginBody, begin, end;
-	public ArrayList<MailPart> parts;
-	public boolean multipart, message;
-	public ReadBuffer buffer;
+	public final String[] headerLines;
+	public final String type, encoding, name,
+		description, disposition, charset, version;
+	private final int beginBody, begin, end;
+	/** fixme never set */
+	public final String filename = null;
+	public final List<MailPart> parts;
+	public final boolean multipart, message;
+	public final ReadBuffer buffer;
 	
-	public void parse( ReadBuffer readBuffer )
+	public MailPart( ReadBuffer readBuffer ) throws DecodingException
 	{
-		parse( readBuffer, readBuffer.offset, readBuffer.length );
+		this(readBuffer, readBuffer.offset, readBuffer.length);
 	}
 
-	public void parse( ReadBuffer readBuffer, int offset, int length )
+	public MailPart( ReadBuffer readBuffer, int offset, int length ) throws DecodingException
 	{
 		begin = offset;
 		end = offset + length;
 		buffer = readBuffer;
 		
-		if( parts == null )
-			parts = new ArrayList<MailPart>();
-		else
-			parts.clear();
+		parts = new ArrayList<MailPart>();
 
 		/*
 		 * parse header lines
 		 */
-		beginBody = end;
-		for( int i = begin; i < end - 4; i++ )
+		int bb = end;
+		for( int i = begin; i < end - 4; i++ ) {
 			if( buffer.content[i] == '\r' &&
 					buffer.content[i+1] == '\n' &&
 					buffer.content[i+2] == '\r' &&
 					buffer.content[i+3] == '\n' ) {
-				beginBody = i + 2;
+				bb = i + 2;
 				break;
 			}
+		}
+		beginBody = bb;
 			
-		ReadBuffer decodedHeaders = null;
-		try {
-			decodedHeaders = EncodingFactory.getEncoding( "HEADERLINE" ).decode( buffer.content, begin, beginBody - begin );
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
-		if (decodedHeaders == null)
-			return;
+		ReadBuffer decodedHeaders = EncodingFactory.getEncoding( "HEADERLINE" ).decode( buffer.content, begin, beginBody - begin );
 		headerLines = new String( decodedHeaders.content, decodedHeaders.offset, decodedHeaders.length ).split( "\r\n" );
+
+		String boundary = null;
+		String x_encoding = null;
+		String x_disposition = null;
+		String x_type = null;
+		boolean x_multipart = false;
+		boolean x_message = false;
+		String x_name = null;
+		String x_charset = null;
+		String x_description = null;
+		String x_version = null;
 
 		for( int i = 0; i < headerLines.length; i++ )
 		{
 			if( headerLines[i].toLowerCase(Locale.US).startsWith( "content-transfer-encoding: " ) ) {
-				encoding = getFirstAttribute( headerLines[i] ).toLowerCase(Locale.US);
+				x_encoding = getFirstAttribute( headerLines[i] ).toLowerCase(Locale.US);
 			}
 			else if( headerLines[i].toLowerCase(Locale.US).startsWith( "content-disposition: " ) ) {
-				disposition = getFirstAttribute( headerLines[i] ).toLowerCase(Locale.US);
+				x_disposition = getFirstAttribute( headerLines[i] ).toLowerCase(Locale.US);
 				String str;
 				str = getHeaderLineAttribute( headerLines[i], "filename" );
 				if( str != null )
-					name = str;
+					x_name = str;
 			}
 			else if( headerLines[i].toLowerCase(Locale.US).startsWith( "content-type: " ) ) {
-				type = getFirstAttribute( headerLines[i] ).toLowerCase(Locale.US);
+				x_type = getFirstAttribute( headerLines[i] ).toLowerCase(Locale.US);
 				/*
 				 * extract boundary, name and charset from content type
 				 */
@@ -102,24 +111,35 @@ public class MailPart {
 				str = getHeaderLineAttribute( headerLines[i], "boundary" );
 				if( str != null )
 					boundary = str;
-				if( type != null && type.startsWith( "multipart" ) && boundary != null )
-					multipart = true;
-				if( type != null && type.startsWith( "message" ) )
-					message = true;
+				if( x_type != null && x_type.startsWith( "multipart" ) && boundary != null )
+					x_multipart = true;
+				if( x_type != null && x_type.startsWith( "message" ) )
+					x_message = true;
 				str = getHeaderLineAttribute( headerLines[i], "name" );
 				if( str != null )
-					name = str;
+					x_name = str;
 				str = getHeaderLineAttribute( headerLines[i], "charset" );
 				if( str != null )
-					charset = str.toUpperCase(Locale.US);
+					x_charset = str.toUpperCase(Locale.US);
 			}
 			else if( headerLines[i].toLowerCase(Locale.US).startsWith( "content-description: " ) ) {
-				description = getFirstAttribute( headerLines[i] );
+				x_description = getFirstAttribute( headerLines[i] );
 			}
 			else if( headerLines[i].toLowerCase(Locale.US).startsWith( "mime-version: " ) ) {
-				version = getFirstAttribute( headerLines[i] );
+				x_version = getFirstAttribute( headerLines[i] );
 			}
 		}
+
+		encoding = x_encoding;
+		disposition = x_disposition;
+		type = x_type;
+		multipart = x_multipart;
+		message = x_message;
+		name = x_name;
+		charset = x_charset;
+		description = x_description;
+		version = x_version;
+
 		/*
 		 * parse body
 		 */
@@ -153,8 +173,7 @@ public class MailPart {
 							
 							int endLastPart = i + 2;
 							if( beginLastPart != -1 ) {
-								MailPart newPart = new MailPart();
-								newPart.parse( buffer, beginLastPart, endLastPart - beginLastPart );
+								MailPart newPart = new MailPart( buffer, beginLastPart, endLastPart - beginLastPart );
 								parts.add( newPart );
 							}
 							beginLastPart = k;
@@ -165,12 +184,29 @@ public class MailPart {
 			}
 		}
 		else if( message ) {
-			MailPart newPart = new MailPart();
-			newPart.parse( buffer, beginBody, end );
+			MailPart newPart = new MailPart(buffer, beginBody, end);
 			parts.add( newPart );			
 		}
 	}
-	public static String getFirstAttribute( String line )
+
+	/**
+         *  @param offset 2 for sendAttachment, 0 otherwise, don't know why
+	 *  @since 0.9.13
+	 */
+	public ReadBuffer decode(int offset) throws DecodingException {
+		String encg = encoding;
+		if (encg == null) {
+			//throw new DecodingException("No encoding specified");
+			Debug.debug(Debug.DEBUG, "Warning: no transfer encoding found, fallback to 7bit.");
+			encg = "7bit";       
+		}
+		Encoding enc = EncodingFactory.getEncoding(encg);
+		if(enc == null)
+			throw new DecodingException(_("No encoder found for encoding \\''{0}\\''.", WebMail.quoteHTML(encg)));
+		return enc.decode(buffer.content, beginBody + offset, end - beginBody - offset);
+	}
+
+	private static String getFirstAttribute( String line )
 	{
 		String result = null;
 		int i = line.indexOf( ": " );
@@ -184,7 +220,8 @@ public class MailPart {
 		}
 		return result;
 	}
-	public static String getHeaderLineAttribute( String line, String attributeName )
+
+	private static String getHeaderLineAttribute( String line, String attributeName )
 	{
 		String result = null;
 		int h = 0;
@@ -253,11 +290,9 @@ public class MailPart {
 		}
 		return result;
 	}
-	/**
-	 * @param mail
-	 */
-	public static void parse(Mail mail) {
-		// TODO Auto-generated method stub
-		
+
+	/** translate */
+	private static String _(String s, Object o) {
+		return Messages.getString(s, o);
 	}
 }

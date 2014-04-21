@@ -491,24 +491,13 @@ public class WebMail extends HttpServlet
 					prepareAttachment = true;
 			}
 			if( showBody ) {			
-				String encoding = mailPart.encoding;
-				if( encoding == null ) {
-					encoding = "7bit";
-					reason += _("Warning: no transfer encoding found, fallback to 7bit.") + br;
-				}
-				Encoding e = EncodingFactory.getEncoding( encoding );
-				if( e == null ) {
-					showBody = false;
-					reason += _("No encoder found for encoding \\''{0}\\''.", quoteHTML( encoding ));
-				}
-				else {
 					String charset = mailPart.charset;
 					if( charset == null ) {
 						charset = "US-ASCII";
 						reason += _("Warning: no charset found, fallback to US-ASCII.") + br;
 					}
 					try {
-						ReadBuffer decoded = e.decode( mailPart.buffer.content, mailPart.beginBody, mailPart.end - mailPart.beginBody );
+						ReadBuffer decoded = mailPart.decode(0);
 						BufferedReader reader = new BufferedReader( new InputStreamReader( new ByteArrayInputStream( decoded.content, decoded.offset, decoded.length ), charset ) );
 						body = new StringBuilder();
 						String line;
@@ -525,7 +514,6 @@ public class WebMail extends HttpServlet
 						showBody = false;
 						reason += _("Part ({0}) not shown, because of {1}", ident, e1.getClass().getName()) + br;
 					}
-				}
 			}
 			if( html )
 				out.println( "<tr class=\"mailbody\"><td colspan=\"2\" align=\"center\">" );
@@ -567,7 +555,7 @@ public class WebMail extends HttpServlet
 	 * @param line
 	 * @return escaped string
 	 */
-	private static String quoteHTML( String line )
+	static String quoteHTML( String line )
 	{
 		if( line != null )
 			line = line.replaceAll( "<", "&lt;" ).replaceAll( ">", "&gt;" );
@@ -849,14 +837,11 @@ public class WebMail extends HttpServlet
 				
 				if( uidl != null ) {
 					Mail mail = sessionObject.mailCache.getMail( uidl, MailCache.FETCH_ALL );
-					if( mail.part == null ) {
-						mail.part = new MailPart();
-						mail.part.parse( mail.body );
-					}
 					/*
 					 * extract original sender from Reply-To: or From:
 					 */
-					if( mail.part != null ) {
+					MailPart part = mail.getPart();
+					if (part != null) {
 						if( reply || replyAll ) {
 							if( mail.reply != null && Mail.validateAddress( mail.reply ) )
 								sessionObject.replyTo = Mail.getAddress( mail.reply );
@@ -868,7 +853,7 @@ public class WebMail extends HttpServlet
 							pw.println( _("On {0} {1} wrote:", mail.formattedDate + " UTC", sessionObject.replyTo) );
 							StringWriter text2 = new StringWriter();
 							PrintWriter pw2 = new PrintWriter( text2 );
-							showPart( pw2, mail.part, 0, TEXT_ONLY );
+							showPart( pw2, part, 0, TEXT_ONLY );
 							pw2.flush();
 							String[] lines = text2.toString().split( "\r\n" );
 							for( int i = 0; i < lines.length; i++ )
@@ -933,7 +918,7 @@ public class WebMail extends HttpServlet
 							if( mail.dateString != null )
 								pw.print( "Date: " + mail.dateString );
 							pw.println();
-							showPart( pw, mail.part, 0, TEXT_ONLY );
+							showPart( pw, part, 0, TEXT_ONLY );
 							pw.println( "----  " + _("end forwarded mail") + "  ----" );
 							pw.flush();
 							sessionObject.body = text.toString();
@@ -1140,7 +1125,7 @@ public class WebMail extends HttpServlet
 			try {
 				int hashCode = Integer.parseInt( str );
 				Mail mail = sessionObject.mailCache.getMail( sessionObject.showUIDL, MailCache.FETCH_ALL );
-				MailPart part = getMailPartFromHashCode( mail.part, hashCode );
+				MailPart part = getMailPartFromHashCode( mail.getPart(), hashCode );
 				if( part != null )
 					sessionObject.showAttachment = part;
 			}
@@ -1510,6 +1495,7 @@ public class WebMail extends HttpServlet
 			}
 		}
 	}
+
 	/**
 	 * @param sessionObject
 	 * @param response
@@ -1524,20 +1510,14 @@ public class WebMail extends HttpServlet
 			ReadBuffer content = part.buffer;
 			
 			if( part.encoding != null ) {
-				Encoding encoding = EncodingFactory.getEncoding( part.encoding );
-				if( encoding != null ) {
 					try {
-						content = encoding.decode( part.buffer.content, part.beginBody + 2, part.end - part.beginBody - 2 );
+						// why +2 ??
+						content = part.decode(2);
 					}
 					catch (DecodingException e) {
 						sessionObject.error += _("Error decoding content: {0}", e.getMessage()) + "<br>";
 						content = null;
 					}
-				}
-				else {
-					sessionObject.error += _("Error decoding content: No encoder found.");
-					content = null;
-				}
 			}
 			if( content != null ) {
 				ZipOutputStream zip = null;
@@ -1922,14 +1902,11 @@ public class WebMail extends HttpServlet
 			out.println( "<p class=\"error\">" + _("Really delete this message?") + " " + button( REALLYDELETE, _("Yes, really delete it!") ) + "</p>" );
 		}
 		Mail mail = sessionObject.mailCache.getMail( sessionObject.showUIDL, MailCache.FETCH_ALL );
-		if( mail != null && mail.body != null && mail.part == null ) {
-			mail.part = new MailPart();
-			mail.part.parse( mail.body );
-		}
-		if(!RELEASE && mail != null && mail.body != null) {
+		if(!RELEASE && mail != null && mail.hasBody()) {
 			out.println( "<!--" );
 			// FIXME encoding, escaping --, etc... but disabled.
-			out.println( quoteHTML( new String( mail.body.content, mail.body.offset, mail.body.length ) ) );
+			ReadBuffer body = mail.getBody();
+			out.println( quoteHTML( new String(body.content, body.offset, body.length ) ) );
 			out.println( "-->" );
 		}
 		out.println( button( NEW, _("New") ) + spacer +
@@ -1954,8 +1931,8 @@ public class WebMail extends HttpServlet
 					"<tr class=\"mailhead\"><td align=\"right\" valign=\"top\">" + _("Date:") +
 					"</td><td align=\"left\">" + mail.quotedDate + "</td></tr>\n" +
 					"<tr><td colspan=\"2\" align=\"center\"><hr></td></tr>" );
-			if( mail.body != null ) {
-				showPart( out, mail.part, 0, SHOW_HTML );
+			if( mail.hasPart()) {
+				showPart( out, mail.getPart(), 0, SHOW_HTML );
 			}
 			else {
 				out.println( "<tr class=\"mailbody\"><td colspan=\"2\" align=\"center\"><p class=\"error\">" + _("Could not fetch mail body.") + "</p></td></tr>" );

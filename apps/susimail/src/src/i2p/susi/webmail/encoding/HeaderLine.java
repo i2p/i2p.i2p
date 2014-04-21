@@ -293,16 +293,13 @@ public class HeaderLine implements Encoding {
 			lastSkip = 0;
 		}
 			
-		ReadBuffer readBuffer = new ReadBuffer();
-		readBuffer.content = out;
-		readBuffer.offset = 0;
-		readBuffer.length = written;
-
-		return readBuffer;
+		return new ReadBuffer(out, 0, written);
 	}
+
 	public ReadBuffer decode(String text) throws DecodingException {
 		return text != null ? decode( text.getBytes() ) : null;
 	}
+
 	/* (non-Javadoc)
 	 * @see i2p.susi.webmail.encoding.Encoding#decode(i2p.susi.webmail.util.ReadBuffer)
 	 */

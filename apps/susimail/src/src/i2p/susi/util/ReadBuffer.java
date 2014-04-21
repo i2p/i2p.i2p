@@ -28,9 +28,15 @@ package i2p.susi.util;
  */
 public class ReadBuffer {
 
-	public byte content[];
-	public int length, offset;
+	public final byte content[];
+	public final int length, offset;
 	
+	public ReadBuffer(byte[] content, int offset, int length) {
+		this.content = content;
+		this.offset = offset;
+		this.length = length;
+	}
+
 	public String toString()
 	{
 		return content != null ? new String( content, offset, length ) : "";

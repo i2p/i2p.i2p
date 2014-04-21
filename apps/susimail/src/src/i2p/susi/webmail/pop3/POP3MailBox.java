@@ -739,11 +739,7 @@ public class POP3MailBox {
 			baos.write((byte) '\n');
 			buf.setLength(0);
 		}
-		ReadBuffer readBuffer = new ReadBuffer();
-		readBuffer.content = baos.toByteArray();
-		readBuffer.offset = 0;
-		readBuffer.length = baos.size();
-		return readBuffer;
+		return new ReadBuffer(baos.toByteArray(), 0, baos.size());
 	}
 
 	/**

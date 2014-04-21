@@ -219,11 +219,7 @@ public class Base64 implements Encoding {
 				throw new DecodingException( "Decoding base64 failed (trailing garbage)." );
 			}
 		}
-		ReadBuffer readBuffer = new ReadBuffer();
-		readBuffer.content = out;
-		readBuffer.offset = 0;
-		readBuffer.length = written;
-		return readBuffer;
+		return new ReadBuffer(out, 0, written);
 	}
 
 	/*

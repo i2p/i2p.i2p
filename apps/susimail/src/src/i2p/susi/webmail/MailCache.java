@@ -35,7 +35,7 @@ import java.util.List;
 /**
  * @author user
  */
-public class MailCache {
+class MailCache {
 	
 	public static final boolean FETCH_HEADER = true;
 	public static final boolean FETCH_ALL = false;
@@ -73,35 +73,26 @@ public class MailCache {
 			synchronized(mails) {
 				mail = mails.get( uidl );
 				if( mail == null ) {
-					newMail = new Mail();
+					newMail = new Mail(uidl);
 					mails.put( uidl, newMail );
 				}
 			}
 			if( mail == null ) {
 				mail = newMail;
-				mail.uidl = uidl;
 				mail.size = mailbox.getSize( uidl );
 			}
 			if( mail.size <= FETCH_ALL_SIZE)
 				headerOnly = false;
 			
-			boolean parseHeaders = mail.header == null;
-			
 			if( headerOnly ) {
-				if( mail.header == null )
-					mail.header = mailbox.getHeader( uidl );
+				if(!mail.hasHeader())
+					mail.setHeader(mailbox.getHeader(uidl));
 			}
 			else {
-				if( mail.body == null ) {
-					mail.body = mailbox.getBody( uidl );
-					if( mail.body != null ) {
-						mail.header = mail.body;
-						MailPart.parse( mail );
-					}
+				if(!mail.hasBody()) {
+					mail.setBody(mailbox.getBody(uidl));
 				}
 			}
-			if( parseHeaders && mail.header != null )
-				mail.parseHeaders();
 		if( mail != null && mail.deleted )
 			mail = null;
 		return mail;
@@ -129,13 +120,12 @@ public class MailCache {
 			synchronized(mails) {
 				mail = mails.get( uidl );
 				if( mail == null ) {
-					newMail = new Mail();
+					newMail = new Mail(uidl);
 					mails.put( uidl, newMail );
 				}
 			}
 			if( mail == null ) {
 				mail = newMail;
-				mail.uidl = uidl;
 				mail.size = mailbox.getSize( uidl );
 			}
 			if(!mail.deleted) {
@@ -143,12 +133,12 @@ public class MailCache {
 				if( mail.size <= FETCH_ALL_SIZE)
 					headerOnly = false;
 				if( headerOnly ) {
-					if( mail.header == null ) {
+					if(!mail.hasHeader()) {
 						POP3Request pr = new POP3Request(mr, mail, true);
 						fetches.add(pr);
 					}
 				} else {
-					if( mail.body == null ) {
+					if(!mail.hasBody()) {
 						POP3Request pr = new POP3Request(mr, mail, false);
 						fetches.add(pr);
 					}
@@ -167,16 +157,11 @@ public class MailCache {
 				ReadBuffer rb = pr.buf;
 				if (rb != null) {
 					Mail mail = pr.mail;
-					boolean parseHeaders = mail.header == null;
 					if (pr.getHeaderOnly()) {
-						mail.header = rb;
+						mail.setHeader(rb);
 					} else {
-						mail.header = rb;
-						mail.body = rb;
-						MailPart.parse(mail);
+						mail.setBody(rb);
 					}
-					if (parseHeaders)
-						mail.parseHeaders();
 				}
 			}
 		}

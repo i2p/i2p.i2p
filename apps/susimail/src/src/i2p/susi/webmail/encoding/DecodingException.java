@@ -29,7 +29,7 @@ package i2p.susi.webmail.encoding;
 public class DecodingException extends Exception {
 	private static final long serialVersionUID = 1L;
 
-	DecodingException( String msg ) {
+	public DecodingException( String msg ) {
 		super( msg );
 	}
 

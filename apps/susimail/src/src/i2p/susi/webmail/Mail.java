@@ -24,7 +24,9 @@
 package i2p.susi.webmail;
 
 import i2p.susi.util.Config;
+import i2p.susi.debug.Debug;
 import i2p.susi.util.ReadBuffer;
+import i2p.susi.webmail.encoding.DecodingException;
 import i2p.susi.webmail.encoding.Encoding;
 import i2p.susi.webmail.encoding.EncodingFactory;
 
@@ -46,11 +48,11 @@ import net.i2p.I2PAppContext;
  * 
  * @author susi
  */
-public class Mail {
+class Mail {
 	
-	public static final String DATEFORMAT = "date.format";
+	private static final String DATEFORMAT = "date.format";
 	
-	public static final String unknown = "unknown";
+	private static final String unknown = "unknown";
 
 	public int id, size;
 	public String sender, reply, subject, dateString,
@@ -58,11 +60,11 @@ public class Mail {
 		formattedDate,  // US Locale, UTC
 		localFormattedDate,  // Current Locale, local time zone
 		shortSender, shortSubject,
-		quotedDate,  // Current Locale, local time zone, longer format
-		uidl;
+		quotedDate;  // Current Locale, local time zone, longer format
+	public final String uidl;
 	public Date date;
-	public ReadBuffer header, body;
-	public MailPart part;
+	private ReadBuffer header, body;
+	private MailPart part;
 	String[] to, cc;
 
 	public String error;
@@ -71,7 +73,8 @@ public class Mail {
 
 	public boolean deleted;
 	
-	public Mail() {
+	public Mail(String uidl) {
+		this.uidl = uidl;
 		formattedSender = unknown;
 		formattedSubject = unknown;
 		formattedDate = unknown;
@@ -81,6 +84,51 @@ public class Mail {
 		quotedDate = unknown;
 		error = "";
 	}
+
+	public ReadBuffer getHeader() {
+		return header;
+	}
+
+	public void setHeader(ReadBuffer rb) {
+		if (rb == null)
+			return;
+		header = rb;
+		parseHeaders();
+	}
+
+	public boolean hasHeader() {
+		return header != null;
+	}
+
+	public ReadBuffer getBody() {
+		return body;
+	}
+
+	public void setBody(ReadBuffer rb) {
+		if (rb == null)
+			return;
+		if (header == null)
+			setHeader(rb);
+		body = rb;
+		try {
+			part = new MailPart(rb);
+		} catch (DecodingException de) {
+			Debug.debug(Debug.ERROR, "Decode error: " + de);
+		}
+	}
+
+	public boolean hasBody() {
+		return body != null;
+	}
+
+	public MailPart getPart() {
+		return part;
+	}
+
+	public boolean hasPart() {
+		return part != null;
+	}
+
 	/**
 	 * 
 	 * @param address E-mail address to be validated

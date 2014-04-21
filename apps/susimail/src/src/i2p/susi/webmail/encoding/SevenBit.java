@@ -77,11 +77,7 @@ public class SevenBit implements Encoding {
 				continue;
 			throw new DecodingException( "No 8bit Data allowed (" + b + ")" );
 		}
-		ReadBuffer readBuffer = new ReadBuffer();
-		readBuffer.content = in;
-		readBuffer.offset = backupOffset;
-		readBuffer.length = backupLength;
-		return readBuffer;
+		return new ReadBuffer(in, backupOffset, backupLength);
 	}
 
 	/* (non-Javadoc)

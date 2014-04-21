@@ -51,7 +51,7 @@ import org.mortbay.servlet.MultiPartRequest;
  *
  * @author user
  */
-public class RequestWrapper {
+class RequestWrapper {
 
 	private final HttpServletRequest httpRequest;
 	private MultiPartRequest multiPartRequest;

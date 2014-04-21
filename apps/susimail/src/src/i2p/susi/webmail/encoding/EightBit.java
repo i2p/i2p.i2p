@@ -65,11 +65,7 @@ public class EightBit implements Encoding {
 	 */
 	public ReadBuffer decode(byte[] in, int offset, int length)
 		throws DecodingException {
-		ReadBuffer readBuffer = new ReadBuffer();
-		readBuffer.content = in;
-		readBuffer.offset = offset;
-		readBuffer.length = length;
-		return readBuffer;
+		return new ReadBuffer(in, offset, length);
 	}
 
 	/* (non-Javadoc)
