@@ -1,3 +1,6 @@
+2014-04-21 dg
+ * findbugs: mostly stream closure fixes in router, apps, core
+
 2014-04-20 zzz
  * SusiMail:
    - Implement extensive pipelining in POP3 for a big speedup

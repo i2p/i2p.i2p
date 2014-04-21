@@ -81,7 +81,7 @@ public class SAMStreamSend {
         public void streamClosedReceived(String result, int id, String message) {
             Sender sender = null;
             synchronized (_remotePeers) {
-                sender = _remotePeers.remove(new Integer(id));
+                sender = _remotePeers.remove(Integer.valueOf(id));
             }
             if (sender != null) {
                 sender.closed();
@@ -171,7 +171,7 @@ public class SAMStreamSend {
                 _remoteDestination = new String(dest, 0, read);
                 synchronized (_remotePeers) {
                     _connectionId = _remotePeers.size() + 1;
-                    _remotePeers.put(new Integer(_connectionId), Sender.this);
+                    _remotePeers.put(Integer.valueOf(_connectionId), Sender.this);
                 }
 
                 _context.statManager().createRateStat("send." + _connectionId + ".totalSent", "Data size sent", "swarm", new long[] { 30*1000, 60*1000, 5*60*1000 });

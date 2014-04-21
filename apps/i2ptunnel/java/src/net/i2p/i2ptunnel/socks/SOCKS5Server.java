@@ -468,8 +468,10 @@ public class SOCKS5Server extends SOCKSServer {
         if (dest == null)
             throw new SOCKSException("Outproxy not found");
         I2PSocket destSock = tun.createI2PSocket(I2PAppContext.getGlobalContext().namingService().lookup(proxy), proxyOpts);
+        DataOutputStream out = null;
+        DataInputStream in = null;
         try {
-            DataOutputStream out = new DataOutputStream(destSock.getOutputStream());
+            out = new DataOutputStream(destSock.getOutputStream());
             boolean authAvail = Boolean.parseBoolean(props.getProperty(I2PTunnelHTTPClientBase.PROP_OUTPROXY_AUTH));
             String configUser =  null;
             String configPW = null;
@@ -497,7 +499,7 @@ public class SOCKS5Server extends SOCKSServer {
             out.flush();
 
             // read init reply
-            DataInputStream in = new DataInputStream(destSock.getInputStream());
+            in = new DataInputStream(destSock.getInputStream());
             // is this right or should we not try to do 5-to-4 conversion?
             int hisVersion = in.readByte();
             if (hisVersion != SOCKS_VERSION_5 /* && addrtype == AddressType.DOMAINNAME */ )
@@ -573,6 +575,8 @@ public class SOCKS5Server extends SOCKSServer {
                 throw new SOCKSException("Outproxy rejected request, response = " + reply);
             // throw away the address in the response
             // todo pass the response through?
+            out.close();
+            in.close();
         } catch (IOException e) {
             try { destSock.close(); } catch (IOException ioe) {}
             throw e;

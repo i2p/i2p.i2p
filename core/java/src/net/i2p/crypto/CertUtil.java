@@ -39,11 +39,12 @@ public class CertUtil {
      */
     public static boolean saveCert(Certificate cert, File file) {
         OutputStream os = null;
+        PrintWriter wr = null;
         try {
            // Get the encoded form which is suitable for exporting
            byte[] buf = cert.getEncoded();
            os = new SecureFileOutputStream(file);
-           PrintWriter wr = new PrintWriter(os);
+           wr = new PrintWriter(os);
            wr.println("-----BEGIN CERTIFICATE-----");
            String b64 = Base64.encode(buf, true);     // true = use standard alphabet
            for (int i = 0; i < b64.length(); i += LINE_LENGTH) {

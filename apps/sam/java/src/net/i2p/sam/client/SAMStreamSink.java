@@ -83,7 +83,7 @@ public class SAMStreamSink {
         public void streamClosedReceived(String result, int id, String message) {
             Sink sink = null;
             synchronized (_remotePeers) {
-                sink = _remotePeers.remove(new Integer(id));
+                sink = _remotePeers.remove(Integer.valueOf(id));
             }
             if (sink != null) {
                 sink.closed();
@@ -96,7 +96,7 @@ public class SAMStreamSink {
         public void streamDataReceived(int id, byte data[], int offset, int length) {
             Sink sink = null;
             synchronized (_remotePeers) {
-                sink = _remotePeers.get(new Integer(id));
+                sink = _remotePeers.get(Integer.valueOf(id));
             }
             if (sink != null) {
                 sink.received(data, offset, length);
@@ -111,7 +111,7 @@ public class SAMStreamSink {
             try {
                 Sink sink = new Sink(id, dest);
                 synchronized (_remotePeers) {
-                    _remotePeers.put(new Integer(id), sink);
+                    _remotePeers.put(Integer.valueOf(id), sink);
                 }
             } catch (IOException ioe) {
                 _log.error("Error creating a new sink", ioe);
@@ -169,15 +169,17 @@ public class SAMStreamSink {
     }
     
     private boolean writeDest(String dest) {
+        FileOutputStream fos = null;
         try {
-            FileOutputStream fos = new FileOutputStream(_destFile);
+            fos = new FileOutputStream(_destFile);
             fos.write(dest.getBytes());
-            fos.close();
-            return true;
         } catch (Exception e) {
             _log.error("Error writing to " + _destFile, e);
             return false;
+        } finally {
+            if(fos != null) try { fos.close(); } catch(IOException ioe) {}
         }
+        return true;
     }
     
     private class Sink {

@@ -135,7 +135,7 @@ class PeerConnectionOut implements Runnable
                             nm = null;
                           }
                           
-                        if (m == null && nm != null)
+                        if (nm != null)
                           {
                             m = nm;
                             //SimpleTimer.getInstance().removeEvent(nm.expireEvent);

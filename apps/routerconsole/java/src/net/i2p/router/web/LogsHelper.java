@@ -168,9 +168,10 @@ public class LogsHelper extends HelperBase {
     private static String readTextFile(File f, int maxNumLines) {
         if (!f.exists()) return null;
         FileInputStream fis = null;
+        BufferedReader in = null;
         try {
             fis = new FileInputStream(f);
-            BufferedReader in = new BufferedReader(new InputStreamReader(fis));
+            in = new BufferedReader(new InputStreamReader(fis));
             List<String> lines = new ArrayList<String>(maxNumLines);
             String line = null;
             while ( (line = in.readLine()) != null) {
@@ -186,7 +187,7 @@ public class LogsHelper extends HelperBase {
         } catch (IOException ioe) {
             return null;
         } finally {
-            if (fis != null) try { fis.close(); } catch (IOException ioe) {}
+            if (in != null) try { in.close(); } catch (IOException ioe) {}
         }
     }
 }

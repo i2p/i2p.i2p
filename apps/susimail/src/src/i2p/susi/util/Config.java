@@ -27,6 +27,7 @@ import i2p.susi.debug.Debug;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.io.IOException;
 import java.util.Properties;
 
@@ -91,10 +92,14 @@ public class Config {
 	{
 		// DEBUG level logging won't work here since we haven't loaded the config yet...
 		properties = new Properties();
+		InputStream iv = null;
 		try {
-			properties.load( Config.class.getResourceAsStream( "/susimail.properties" ) );
+			iv = Config.class.getResourceAsStream("/susimail.properties");
+			properties.load(iv);
 		} catch (Exception e) {
 			Debug.debug(Debug.ERROR, "Could not open WEB-INF/classes/susimail.properties (possibly in jar), reason: " + e);
+		} finally {
+			if(iv != null) try { iv.close(); } catch(IOException ioe) {}
 		}
 		try {
 			File cfg = new File(I2PAppContext.getGlobalContext().getConfigDir(), "susimail.config");

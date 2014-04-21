@@ -1314,9 +1314,10 @@ public class Router implements RouterClock.ClockShiftListener {
             return;
         // this is similar to FileUtil.readTextFile() but we can't use any I2P classes here
         FileInputStream fis = null;
+        BufferedReader in = null;
         try {
             fis = new FileInputStream(deleteFile);
-            BufferedReader in = new BufferedReader(new InputStreamReader(fis, "UTF-8"));
+            in = new BufferedReader(new InputStreamReader(fis, "UTF-8"));
             String line;
             while ( (line = in.readLine()) != null) {
                 String fl = line.trim();
@@ -1331,9 +1332,9 @@ public class Router implements RouterClock.ClockShiftListener {
                         System.out.println("INFO: File [" + fl + "] deleted");
                 }
             }
-        } catch (IOException ioe) {
-        } finally {
-            if (fis != null) try { fis.close(); } catch (IOException ioe) {}
+        } catch (IOException ioe) {}
+        finally {
+            if (in != null) try { in.close(); } catch(IOException ioe) {}
             if (deleteFile.delete())
                 System.out.println("INFO: File [" + DELETE_FILE + "] deleted");
         }

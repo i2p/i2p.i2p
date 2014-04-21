@@ -355,9 +355,10 @@ public class FileUtil {
         File f = new File(filename);
         if (!f.exists()) return null;
         FileInputStream fis = null;
+        BufferedReader in = null;
         try {
             fis = new FileInputStream(f);
-            BufferedReader in = new BufferedReader(new InputStreamReader(fis, "UTF-8"));
+            in = new BufferedReader(new InputStreamReader(fis, "UTF-8"));
             List<String> lines = new ArrayList<String>(maxNumLines > 0 ? maxNumLines : 64);
             String line = null;
             while ( (line = in.readLine()) != null) {
@@ -377,7 +378,7 @@ public class FileUtil {
         } catch (IOException ioe) {
             return null;
         } finally {
-            if (fis != null) try { fis.close(); } catch (IOException ioe) {}
+            if (in != null) try { in.close(); } catch (IOException ioe) {}
         }
     }
     
