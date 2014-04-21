@@ -26,9 +26,12 @@ package i2p.susi.util;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Folder object manages a array Object[] to support
@@ -183,6 +186,39 @@ public class Folder<O extends Object> {
 				this.elements = elements;
 		} else
 			this.elements = null;
+		update();
+	}
+
+	/**
+	 * Remove an element
+	 * 
+	 * @param element to remove
+	 */
+	public void removeElement(O element) {
+		removeElements(Collections.singleton(element));
+	}
+	
+	/**
+	 * Remove elements
+	 * 
+	 * @param elements to remove
+	 */
+	@SuppressWarnings("unchecked")
+	public void removeElements(Collection<O> elems) {
+		if (elements != null) {
+			List<O> list = new ArrayList<O>(Arrays.asList(elements));
+			for (O e : elems) {
+				list.remove(e);
+			}
+			elements = (O[]) list.toArray(new Object[list.size()]);
+		}
+		if (unsortedElements != null) {
+			List<O> list = new ArrayList<O>(Arrays.asList(unsortedElements));
+			for (O e : elems) {
+				list.remove(e);
+			}
+			unsortedElements = (O[]) list.toArray(new Object[list.size()]);
+		}
 		update();
 	}
 	

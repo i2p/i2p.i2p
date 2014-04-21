@@ -70,8 +70,6 @@ class Mail {
 	public String error;
 
 	public boolean markForDeletion;
-
-	public boolean deleted;
 	
 	public Mail(String uidl) {
 		this.uidl = uidl;

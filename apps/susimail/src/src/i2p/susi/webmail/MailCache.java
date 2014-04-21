@@ -29,6 +29,7 @@ import i2p.susi.webmail.pop3.POP3MailBox.FetchRequest;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Hashtable;
 import java.util.List;
 
@@ -46,7 +47,7 @@ class MailCache {
 	/** Includes header, headers are generally 1KB to 1.5 KB,
 	 *  and bodies will compress well.
          */
-	private static final int FETCH_ALL_SIZE = 3072;
+	private static final int FETCH_ALL_SIZE = 4096;
 
 	/**
 	 * @param mailbox non-null
@@ -67,34 +68,33 @@ class MailCache {
 		
 		Mail mail = null, newMail = null;
 
-			/*
-			 * synchronize update to hashtable
-			 */
-			synchronized(mails) {
-				mail = mails.get( uidl );
-				if( mail == null ) {
-					newMail = new Mail(uidl);
-					mails.put( uidl, newMail );
-				}
-			}
+		/*
+		 * synchronize update to hashtable
+		 */
+		synchronized(mails) {
+			mail = mails.get( uidl );
 			if( mail == null ) {
-				mail = newMail;
-				mail.size = mailbox.getSize( uidl );
+				newMail = new Mail(uidl);
+				mails.put( uidl, newMail );
 			}
-			if( mail.size <= FETCH_ALL_SIZE)
-				headerOnly = false;
+		}
+		if( mail == null ) {
+			mail = newMail;
+			mail.size = mailbox.getSize( uidl );
+		}
+		if (mail.markForDeletion)
+			return null;
+		if( mail.size <= FETCH_ALL_SIZE)
+			headerOnly = false;
 			
-			if( headerOnly ) {
-				if(!mail.hasHeader())
-					mail.setHeader(mailbox.getHeader(uidl));
+		if( headerOnly ) {
+			if(!mail.hasHeader())
+				mail.setHeader(mailbox.getHeader(uidl));
+		} else {
+			if(!mail.hasBody()) {
+				mail.setBody(mailbox.getBody(uidl));
 			}
-			else {
-				if(!mail.hasBody()) {
-					mail.setBody(mailbox.getBody(uidl));
-				}
-			}
-		if( mail != null && mail.deleted )
-			mail = null;
+		}
 		return mail;
 	}
 
@@ -128,20 +128,20 @@ class MailCache {
 				mail = newMail;
 				mail.size = mailbox.getSize( uidl );
 			}
-			if(!mail.deleted) {
-				mr.setMail(mail);
-				if( mail.size <= FETCH_ALL_SIZE)
-					headerOnly = false;
-				if( headerOnly ) {
-					if(!mail.hasHeader()) {
-						POP3Request pr = new POP3Request(mr, mail, true);
-						fetches.add(pr);
-					}
-				} else {
-					if(!mail.hasBody()) {
-						POP3Request pr = new POP3Request(mr, mail, false);
-						fetches.add(pr);
-					}
+			if (mail.markForDeletion)
+				continue;
+			mr.setMail(mail);
+			if( mail.size <= FETCH_ALL_SIZE)
+				headerOnly = false;
+			if( headerOnly ) {
+				if(!mail.hasHeader()) {
+					POP3Request pr = new POP3Request(mr, mail, true);
+					fetches.add(pr);
+				}
+			} else {
+				if(!mail.hasBody()) {
+					POP3Request pr = new POP3Request(mr, mail, false);
+					fetches.add(pr);
 				}
 			}
 		}
@@ -165,6 +165,38 @@ class MailCache {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Mark mail for deletion locally.
+	 * Send delete requests to POP3 then quit and reconnect.
+	 * No success/failure indication is returned.
+	 * 
+	 * @since 0.9.13
+	 */
+	public void delete(String uidl) {
+		delete(Collections.singleton(uidl));
+	}
+
+	/**
+	 * Mark mail for deletion locally.
+	 * Send delete requests to POP3 then quit and reconnect.
+	 * No success/failure indication is returned.
+	 * 
+	 * @since 0.9.13
+	 */
+	public void delete(Collection<String> uidls) {
+		List<String> toDelete = new ArrayList<String>(uidls.size());
+		for (String uidl : uidls) {
+			Mail mail = mails.get(uidl);
+			if (mail == null)
+				continue;
+			mail.markForDeletion = true;
+			toDelete.add(uidl);
+		}
+		if (toDelete.isEmpty())
+			return;
+		mailbox.delete(toDelete);
 	}
 
 	/**

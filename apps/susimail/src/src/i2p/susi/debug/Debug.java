@@ -37,7 +37,12 @@ public class Debug {
 	public static void setLevel( int newLevel )
 	{
 		level = newLevel;
-	}	
+	}
+
+	/** @since 0.9.13 */
+	public static int getLevel() {
+		return level;
+	}
 
 	public static void debug( int msgLevel, String msg )
 	{

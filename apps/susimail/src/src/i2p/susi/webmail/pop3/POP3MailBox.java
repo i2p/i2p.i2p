@@ -95,6 +95,13 @@ public class POP3MailBox {
 	 */
 	public ReadBuffer getHeader( String uidl ) {
 		synchronized( synchronizer ) {
+			try {
+				// we must be connected to know the UIDL to ID mapping
+				checkConnection();
+			} catch (IOException ioe) {
+				Debug.debug( Debug.DEBUG, "Error fetching: " + ioe);
+				return null;
+			}
 			int id = getIDfromUIDL(uidl);
 			if (id < 0)
 				return null;
@@ -140,6 +147,13 @@ public class POP3MailBox {
 	 */
 	public ReadBuffer getBody( String uidl ) {
 		synchronized( synchronizer ) {
+			try {
+				// we must be connected to know the UIDL to ID mapping
+				checkConnection();
+			} catch (IOException ioe) {
+				Debug.debug( Debug.DEBUG, "Error fetching: " + ioe);
+				return null;
+			}
 			int id = getIDfromUIDL(uidl);
 			if (id < 0)
 				return null;
@@ -157,6 +171,13 @@ public class POP3MailBox {
 	public void getBodies(Collection<FetchRequest> requests) {
 		List<SendRecv> srs = new ArrayList<SendRecv>(requests.size());
 		synchronized( synchronizer ) {
+			try {
+				// we must be connected to know the UIDL to ID mapping
+				checkConnection();
+			} catch (IOException ioe) {
+				Debug.debug( Debug.DEBUG, "Error fetching: " + ioe);
+				return;
+			}
 			for (FetchRequest fr : requests) {
 				int id = getIDfromUIDL(fr.getUIDL());
 				if (id < 0)
@@ -208,6 +229,7 @@ public class POP3MailBox {
 	}
 
 	/**
+	 * Call performDelete() after this or they will come back
 	 * 
 	 * @param uidl
 	 * @return Success of delete operation: true if successful.
@@ -216,10 +238,60 @@ public class POP3MailBox {
 	{
 		Debug.debug(Debug.DEBUG, "delete(" + uidl + ")");
 		synchronized( synchronizer ) {
+			try {
+				// we must be connected to know the UIDL to ID mapping
+				checkConnection();
+			} catch (IOException ioe) {
+				Debug.debug( Debug.DEBUG, "Error deleting: " + ioe);
+				return false;
+			}
 			int id = getIDfromUIDL(uidl);
 			if (id < 0)
 				return false;
 			return delete(id);
+		}
+	}
+
+	/**
+	 * Delete all at once, close and reconnect
+	 * Do NOT call performDelete() after this
+	 * Does not provide any success/failure result
+	 * 
+	 * @since 0.9.13
+	 */
+	public void delete(Collection<String> uidls) {
+		List<SendRecv> srs = new ArrayList<SendRecv>(uidls.size() + 1);
+		synchronized( synchronizer ) {
+			try {
+				// we must be connected to know the UIDL to ID mapping
+				checkConnection();
+			} catch (IOException ioe) {
+				Debug.debug( Debug.DEBUG, "Error deleting: " + ioe);
+				return;
+			}
+			for (String uidl : uidls) {
+				int id = getIDfromUIDL(uidl);
+				if (id < 0)
+					continue;
+				SendRecv sr = new SendRecv("DELE " + id, Mode.A1);
+				srs.add(sr);
+			}
+			if (srs.isEmpty())
+				return;
+			SendRecv sr = new SendRecv("QUIT", Mode.A1);
+			srs.add(sr);
+			try {
+				sendCmds(srs);
+				try {
+					socket.close();
+				} catch (IOException e) {}
+				clear();
+				// why reconnect?
+				//connect();
+			} catch (IOException ioe) {
+				Debug.debug( Debug.DEBUG, "Error deleting: " + ioe);
+				// todo maybe
+			}
 		}
 	}
 	
@@ -281,13 +353,11 @@ public class POP3MailBox {
 	}
 
 	/**
-	 * check whether connection is still alive
+	 * Is the connection is still alive
 	 * 
 	 * @return true or false
 	 */
 	public boolean isConnected() {
-		Debug.debug(Debug.DEBUG, "isConnected()");
-
 		if (socket == null
 			|| !socket.isConnected()
 			|| socket.isInputShutdown()
@@ -296,6 +366,22 @@ public class POP3MailBox {
 			connected = false;
 		}
 		return connected;
+	}
+
+	/**
+	 * If not connected, connect now.
+	 * Should be called from all public methods before sending a command.
+	 * Caller must sync.
+	 * 
+	 * @return true or false
+	 */
+	private void checkConnection() throws IOException {
+		Debug.debug(Debug.DEBUG, "checkConnection()");
+		if (!isConnected()) {
+			connect();
+			if (!isConnected())
+				throw new IOException("Cannot connect");
+		}
 	}
 
 	/**
@@ -381,7 +467,7 @@ public class POP3MailBox {
 	 */
 	public void refresh() {
 		synchronized( synchronizer ) {
-			close();
+			close(true);
 			connect();
 		}
 	}
@@ -403,6 +489,8 @@ public class POP3MailBox {
 	 */
 	private void connect() {
 		Debug.debug(Debug.DEBUG, "connect()");
+		if (Debug.getLevel() == Debug.DEBUG)
+			(new Exception()).printStackTrace();
 
 		clear();
 		
@@ -649,8 +737,6 @@ public class POP3MailBox {
 	private ReadBuffer sendCmdN(String cmd )
 	{
 		synchronized (synchronizer) {
-			if (!isConnected())
-				connect();
 			try {
 				return sendCmdNa(cmd);
 			} catch (IOException e) {
@@ -788,10 +874,9 @@ public class POP3MailBox {
 	public int getNumMails() {
 		synchronized( synchronizer ) {
 			Debug.debug(Debug.DEBUG, "getNumMails()");
-
-			if (!isConnected())
-				connect();
-
+			try {
+				checkConnection();
+			} catch (IOException ioe) {}
 			return connected ? mails : 0;
 		}
 	}
@@ -832,12 +917,11 @@ public class POP3MailBox {
 					else
 						sendCmd1aNoWait("QUIT");
 					socket.close();
-				} catch (IOException e) {
-					Debug.debug( Debug.DEBUG, "Error while closing connection: " + e);
-				}
+				} catch (IOException e) {}
 			}
 			socket = null;
 			connected = false;
+			clear();
 		}
 	}
 
@@ -877,11 +961,15 @@ public class POP3MailBox {
 ****/
 
 	/**
+	 * Only if connected. Does not force a connect.
+	 * If not connected, returns null.
 	 * 
 	 * @return A new array of the available UIDLs. No particular order.
 	 */
 	public String[] getUIDLs()
 	{
+		if (!isConnected())
+			return null;
 		synchronized( synchronizer ) {
 		       return uidlToID.keySet().toArray(new String[uidlToID.size()]);
 		}
@@ -908,7 +996,8 @@ public class POP3MailBox {
 	{
 		synchronized( synchronizer ) {
 			close(true);
-			connect();
+			// why reconnect?
+			//connect();
 		}
 	}
 

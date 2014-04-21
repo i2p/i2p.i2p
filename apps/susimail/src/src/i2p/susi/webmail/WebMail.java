@@ -45,6 +45,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
+import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
@@ -211,6 +212,10 @@ public class WebMail extends HttpServlet
 		public int compare(String arg0, String arg1) {
 			Mail a = mailCache.getMail( arg0, MailCache.FETCH_HEADER );
 			Mail b = mailCache.getMail( arg1, MailCache.FETCH_HEADER );
+			if (a == null)
+				return (b == null) ? 0 : 1;
+			if (b == null)
+				return -1;
 			return a.id - b.id;
 		}		
 	}
@@ -221,6 +226,7 @@ public class WebMail extends HttpServlet
 	 * @author susi
 	 */
 	private static class SenderSorter implements Comparator<String> {
+		private final Comparator collator = Collator.getInstance();
 		private final MailCache mailCache;
 		
 		/**
@@ -238,7 +244,11 @@ public class WebMail extends HttpServlet
 		public int compare(String arg0, String arg1) {
 			Mail a = mailCache.getMail( arg0, MailCache.FETCH_HEADER );
 			Mail b = mailCache.getMail( arg1, MailCache.FETCH_HEADER );
-			return a.formattedSender.compareToIgnoreCase( b.formattedSender );
+			if (a == null)
+				return (b == null) ? 0 : 1;
+			if (b == null)
+				return -1;
+			return collator.compare(a.formattedSender, b.formattedSender);
 		}		
 	}
 
@@ -248,6 +258,7 @@ public class WebMail extends HttpServlet
 	 */
 	private static class SubjectSorter implements Comparator<String> {
 
+		private final Comparator collator = Collator.getInstance();
 		private final MailCache mailCache;
 		/**
 		 * Set MailCache object, where to get Mails from
@@ -264,7 +275,11 @@ public class WebMail extends HttpServlet
 		public int compare(String arg0, String arg1) {
 			Mail a = mailCache.getMail( arg0, MailCache.FETCH_HEADER );
 			Mail b = mailCache.getMail( arg1, MailCache.FETCH_HEADER );
-			return a.formattedSubject.compareToIgnoreCase( b.formattedSubject );
+			if (a == null)
+				return (b == null) ? 0 : 1;
+			if (b == null)
+				return -1;
+			return collator.compare(a.formattedSubject, b.formattedSubject);
 		}		
 	}
 
@@ -290,6 +305,10 @@ public class WebMail extends HttpServlet
 		public int compare(String arg0, String arg1) {
 			Mail a = mailCache.getMail( arg0, MailCache.FETCH_HEADER );
 			Mail b = mailCache.getMail( arg1, MailCache.FETCH_HEADER );
+			if (a == null)
+				return (b == null) ? 0 : 1;
+			if (b == null)
+				return -1;
 			return a.date != null ? ( b.date != null ? a.date.compareTo( b.date ) : -1 ) : ( b.date != null ? 1 : 0 );
 		}		
 	}
@@ -315,6 +334,10 @@ public class WebMail extends HttpServlet
 		public int compare(String arg0, String arg1) {
 			Mail a = mailCache.getMail( arg0, MailCache.FETCH_HEADER );
 			Mail b = mailCache.getMail( arg1, MailCache.FETCH_HEADER );
+			if (a == null)
+				return (b == null) ? 0 : 1;
+			if (b == null)
+				return -1;
 			return a.size - b.size;
 		}		
 	}
@@ -990,7 +1013,9 @@ public class WebMail extends HttpServlet
 		}
 		if( buttonPressed( request, REFRESH ) ) {
 			sessionObject.mailbox.refresh();
-			sessionObject.folder.setElements( sessionObject.mailbox.getUIDLs() );
+			String[] uidls = sessionObject.mailbox.getUIDLs();
+			if (uidls != null)
+				sessionObject.folder.setElements(uidls);
 			sessionObject.pageChanged = true;
 		}
 	}
@@ -1114,9 +1139,8 @@ public class WebMail extends HttpServlet
 					 */
 					sessionObject.state = STATE_LIST;
 			}
-			sessionObject.mailbox.delete( sessionObject.showUIDL );
-			sessionObject.mailbox.performDelete();
-			sessionObject.folder.setElements( sessionObject.mailbox.getUIDLs() );
+			sessionObject.mailCache.delete( sessionObject.showUIDL );
+			sessionObject.folder.removeElement(sessionObject.showUIDL);
 			sessionObject.showUIDL = nextUIDL;
 		}
 		
@@ -1202,8 +1226,8 @@ public class WebMail extends HttpServlet
 				sessionObject.error += _("No messages marked for deletion.") + "<br>";
 		}
 		else {
-			int numberDeleted = 0;
 			if( buttonPressed( request, REALLYDELETE ) ) {
+				List<String> toDelete = new ArrayList<String>();
 				for( Enumeration<String> e = request.getParameterNames(); e.hasMoreElements(); ) {
 					String parameter = e.nextElement();
 					if( parameter.startsWith( "check" ) && request.getParameter( parameter ).equals("1")) {
@@ -1211,26 +1235,19 @@ public class WebMail extends HttpServlet
 						try {
 							int n = Integer.parseInt( number );
 							String uidl = sessionObject.folder.getElementAtPosXonCurrentPage( n );
-							if( uidl != null ) {
-								Mail mail = sessionObject.mailCache.getMail( uidl, MailCache.FETCH_HEADER );
-								if( mail != null ) {
-									if( sessionObject.mailbox.delete( uidl ) ) {
-										mail.markForDeletion = true;
-										numberDeleted++;
-									}
-									else
-										sessionObject.error += _("Error deleting message: {0}", sessionObject.mailbox.lastError()) + "<br>";
-								}
-							}
-						}
-						catch( NumberFormatException nfe ) {
-						}
+							if( uidl != null )
+								toDelete.add(uidl);
+						} catch( NumberFormatException nfe ) {}
 					}
 				}
-				sessionObject.mailbox.performDelete();
-				sessionObject.folder.setElements( sessionObject.mailbox.getUIDLs() );
-				sessionObject.pageChanged = true;
-				sessionObject.info += ngettext("1 message deleted.", "{0} messages deleted.", numberDeleted);
+				int numberDeleted = toDelete.size();
+				if (numberDeleted > 0) {
+					sessionObject.mailCache.delete(toDelete);
+					sessionObject.folder.removeElements(toDelete);
+					sessionObject.pageChanged = true;
+					sessionObject.info += ngettext("1 message deleted.", "{0} messages deleted.", numberDeleted);
+					//sessionObject.error += _("Error deleting message: {0}", sessionObject.mailbox.lastError()) + "<br>";
+				}
 			}
 			sessionObject.reallyDelete = false;
 		}
@@ -1418,8 +1435,11 @@ public class WebMail extends HttpServlet
 			/*
 			 * update folder content
 			 */
-			if( sessionObject.state != STATE_AUTH )
-				sessionObject.folder.setElements( sessionObject.mailbox.getUIDLs() );
+			if( sessionObject.state != STATE_AUTH ) {
+				String[] uidls = sessionObject.mailbox.getUIDLs();
+				if (uidls != null)
+					sessionObject.folder.setElements(uidls);
+			}
 
 			if( ! sendAttachment( sessionObject, response ) ) { 
 				PrintWriter out = response.getWriter();
