@@ -1415,8 +1415,6 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
                 //_log.error(getPrefix() + "Error generating keys to out", ioe);
                 //notifyEvent("genkeysResult", "error");
                 return;
-            } finally {
-                if(pubdest != null) try { pubdest.close(); } catch(IOException ioe) {}
             }
         } else if (args.length != 1) {
             l.log("genkeys <privkeyfile> [<pubkeyfile>]\n" +
@@ -1438,6 +1436,8 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
             l.log("Error generating keys - " + ioe.getMessage());
             //notifyEvent("genkeysResult", "error");
             //_log.error(getPrefix() + "Error generating keys", ioe);
+        } finally {
+            if(pubdest != null) try { pubdest.close(); } catch(IOException ioe) {}
         }
     }
 

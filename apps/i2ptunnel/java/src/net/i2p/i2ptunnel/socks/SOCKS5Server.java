@@ -575,8 +575,6 @@ public class SOCKS5Server extends SOCKSServer {
                 throw new SOCKSException("Outproxy rejected request, response = " + reply);
             // throw away the address in the response
             // todo pass the response through?
-            out.close();
-            in.close();
         } catch (IOException e) {
             try { destSock.close(); } catch (IOException ioe) {}
             throw e;
