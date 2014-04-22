@@ -52,6 +52,7 @@ public class POP3MailBox {
 	private int mails;
 
 	private boolean connected;
+	private boolean gotCAPA;
 	private boolean supportsPipelining;
 	private boolean supportsTOP;
 	private boolean supportsUIDL;
@@ -278,6 +279,7 @@ public class POP3MailBox {
 			}
 			if (srs.isEmpty())
 				return;
+			// TODO don't quit now, just set timer to quit later
 			SendRecv sr = new SendRecv("QUIT", Mode.A1);
 			srs.add(sr);
 			try {
@@ -490,7 +492,7 @@ public class POP3MailBox {
 	private void connect() {
 		Debug.debug(Debug.DEBUG, "connect()");
 		if (Debug.getLevel() == Debug.DEBUG)
-			(new Exception()).printStackTrace();
+			(new Exception("I did it")).printStackTrace();
 
 		clear();
 		
@@ -565,16 +567,17 @@ public class POP3MailBox {
 	 * @since 0.9.13
 	 */
 	private boolean doHandshake() throws IOException {
-		// can we always pipeline this ?
-		supportsPipelining = false;
-		supportsUIDL = false;
-		supportsTOP = false;
 		List<SendRecv> cmds = new ArrayList<SendRecv>(2);
 		cmds.add(new SendRecv(null, Mode.A1));
-		SendRecv capa = new SendRecv("CAPA", Mode.LS);
-		cmds.add(capa);
+		SendRecv capa = null;
+		if (gotCAPA) {
+			Debug.debug(Debug.DEBUG, "Skipping CAPA");
+		} else {
+			capa = new SendRecv("CAPA", Mode.LS);
+			cmds.add(capa);
+		}
 		boolean rv = sendCmds(cmds);
-		if (rv) {
+		if (rv && capa != null) {
 			if (capa.ls != null) {
 				for (String cap : capa.ls) {
 					String t = cap.trim();
@@ -586,10 +589,11 @@ public class POP3MailBox {
 						supportsTOP = true;
 				}
 			}
-		}
-		Debug.debug(Debug.DEBUG, "POP3 server caps: pipelining? " + supportsPipelining +
+			gotCAPA = true;
+			Debug.debug(Debug.DEBUG, "POP3 server caps: pipelining? " + supportsPipelining +
 		                                           " UIDL? " + supportsUIDL +
 		                                           " TOP? " + supportsTOP);
+		}
 		return rv;
 	}
 	

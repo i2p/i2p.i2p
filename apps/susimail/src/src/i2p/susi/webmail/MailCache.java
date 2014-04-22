@@ -23,10 +23,12 @@
  */
 package i2p.susi.webmail;
 
+import i2p.susi.debug.Debug;
 import i2p.susi.util.ReadBuffer;
 import i2p.susi.webmail.pop3.POP3MailBox;
 import i2p.susi.webmail.pop3.POP3MailBox.FetchRequest;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -43,6 +45,7 @@ class MailCache {
 	
 	private final POP3MailBox mailbox;
 	private final Hashtable<String, Mail> mails;
+	private final PersistentMailCache disk;
 	
 	/** Includes header, headers are generally 1KB to 1.5 KB,
 	 *  and bodies will compress well.
@@ -52,9 +55,18 @@ class MailCache {
 	/**
 	 * @param mailbox non-null
 	 */
-	MailCache( POP3MailBox mailbox ) {
+	MailCache(POP3MailBox mailbox, 
+		  String host, int port, String user, String pass) {
 		this.mailbox = mailbox;
 		mails = new Hashtable<String, Mail>();
+		PersistentMailCache pmc = null;
+		try {
+			pmc = new PersistentMailCache(host, port, user, pass);
+			// TODO pmc.getMails()
+		} catch (IOException ioe) {
+			Debug.debug(Debug.ERROR, "Error creating disk cache: " + ioe);
+		}
+		disk = pmc;
 	}
 
 	/**
@@ -80,11 +92,11 @@ class MailCache {
 		}
 		if( mail == null ) {
 			mail = newMail;
-			mail.size = mailbox.getSize( uidl );
+			mail.setSize(mailbox.getSize(uidl));
 		}
 		if (mail.markForDeletion)
 			return null;
-		if( mail.size <= FETCH_ALL_SIZE)
+		if(mail.getSize() <= FETCH_ALL_SIZE)
 			headerOnly = false;
 			
 		if( headerOnly ) {
@@ -93,6 +105,11 @@ class MailCache {
 		} else {
 			if(!mail.hasBody()) {
 				mail.setBody(mailbox.getBody(uidl));
+			}
+		}
+		if (disk != null) {
+			if (disk.saveMail(mail) && mail.hasBody()) {
+				// TODO delete on server
 			}
 		}
 		return mail;
@@ -126,20 +143,32 @@ class MailCache {
 			}
 			if( mail == null ) {
 				mail = newMail;
-				mail.size = mailbox.getSize( uidl );
+				mail.setSize(mailbox.getSize(uidl));
 			}
 			if (mail.markForDeletion)
 				continue;
 			mr.setMail(mail);
-			if( mail.size <= FETCH_ALL_SIZE)
+			if(mail.getSize() <= FETCH_ALL_SIZE)
 				headerOnly = false;
 			if( headerOnly ) {
 				if(!mail.hasHeader()) {
+					if (disk != null) {
+						if (disk.getMail(mail, true)) {
+							Debug.debug(Debug.DEBUG, "Loaded header from disk cache: " + uidl);
+							continue;  // found on disk, woo
+						}
+					}
 					POP3Request pr = new POP3Request(mr, mail, true);
 					fetches.add(pr);
 				}
 			} else {
 				if(!mail.hasBody()) {
+					if (disk != null) {
+						if (disk.getMail(mail, false)) {
+							Debug.debug(Debug.DEBUG, "Loaded body from disk cache: " + uidl);
+							continue;  // found on disk, woo
+						}
+					}
 					POP3Request pr = new POP3Request(mr, mail, false);
 					fetches.add(pr);
 				}
@@ -161,6 +190,11 @@ class MailCache {
 						mail.setHeader(rb);
 					} else {
 						mail.setBody(rb);
+					}
+					if (disk != null) {
+						if (disk.saveMail(mail) && mail.hasBody()) {
+							// TODO delete on server
+						}
 					}
 				}
 			}
@@ -188,6 +222,8 @@ class MailCache {
 	public void delete(Collection<String> uidls) {
 		List<String> toDelete = new ArrayList<String>(uidls.size());
 		for (String uidl : uidls) {
+			if (disk != null)
+				disk.deleteMail(uidl);
 			Mail mail = mails.get(uidl);
 			if (mail == null)
 				continue;

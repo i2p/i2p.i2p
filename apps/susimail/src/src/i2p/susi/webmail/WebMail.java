@@ -172,6 +172,7 @@ public class WebMail extends HttpServlet
 	private static final String CONFIG_COMPOSER_ROWS = "composer.rows";
 
 	private static final String CONFIG_BCC_TO_SELF = "composer.bcc.to.self";
+	private static final String CONFIG_LEAVE_ON_SERVER = "pop3.leave.on.server";
 	private static final String CONFIG_DEBUG = "debug";
 
 	private static final String RC_PROP_THEME = "routerconsole.theme";
@@ -194,21 +195,15 @@ public class WebMail extends HttpServlet
 	 * 
 	 * @author susi
 	 */
+/****
 	private static class IDSorter implements Comparator<String> {
 		private final MailCache mailCache;
 		
-		/**
-		 * Set MailCache object, where to get Mails from
-		 * @param mailCache
-		 */
 		public IDSorter( MailCache mailCache )
 		{
 			this.mailCache = mailCache;
 		}
 		
-		/* (non-Javadoc)
-		 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
-		 */
 		public int compare(String arg0, String arg1) {
 			Mail a = mailCache.getMail( arg0, MailCache.FETCH_HEADER );
 			Mail b = mailCache.getMail( arg1, MailCache.FETCH_HEADER );
@@ -219,6 +214,7 @@ public class WebMail extends HttpServlet
 			return a.id - b.id;
 		}		
 	}
+****/
 
 	/**
 	 * sorts Mail objects by sender field
@@ -338,7 +334,7 @@ public class WebMail extends HttpServlet
 				return (b == null) ? 0 : 1;
 			if (b == null)
 				return -1;
-			return a.size - b.size;
+			return a.getSize() - b.getSize();
 		}		
 	}
 	
@@ -425,7 +421,7 @@ public class WebMail extends HttpServlet
 	 */
 	private static String sortHeader( String name, String label, String imgPath )
 	{
-		return label + "&nbsp;<a href=\"" + myself + "?" + name + "=up\"><img src=\"" +
+		return label + "&nbsp;&nbsp;<a href=\"" + myself + "?" + name + "=up\"><img src=\"" +
 			imgPath + "3up.png\" border=\"0\" alt=\"^\"></a><a href=\"" + myself +
 			"?" + name + "=down\"><img src=\"" + imgPath + "3down.png\" border=\"0\" alt=\"v\"></a>";
 	}
@@ -556,6 +552,7 @@ public class WebMail extends HttpServlet
 			}
 			if( prepareAttachment ) {
 				if( html ) {
+					// TODO can we at least show images safely?
 					out.println( "<hr><p class=\"mailbody\">" );
 					out.println( "<a target=\"_blank\" href=\"" + myself + "?" + DOWNLOAD + "=" +
 						 mailPart.hashCode() + "\">" + _("Download attachment {0}", ident) + "</a>" +
@@ -671,9 +668,10 @@ public class WebMail extends HttpServlet
 						sessionObject.host = host;
 						sessionObject.smtpPort = smtpPortNo;
 						sessionObject.state = STATE_LIST;
-						MailCache mc = new MailCache(mailbox);
+						MailCache mc = new MailCache(mailbox, host, pop3PortNo, user, pass);
 						sessionObject.mailCache = mc;
 						sessionObject.folder = new Folder<String>();
+						// TODO get through cache so we have the disk-only ones too
 						String[] uidls = mailbox.getUIDLs();
 						sessionObject.folder.setElements(uidls);
 						if (uidls.length > 0) {
@@ -686,7 +684,7 @@ public class WebMail extends HttpServlet
 							mc.getMail(reqs);
 						}
 						
-						sessionObject.folder.addSorter( SORT_ID, new IDSorter( sessionObject.mailCache ) );
+						//sessionObject.folder.addSorter( SORT_ID, new IDSorter( sessionObject.mailCache ) );
 						sessionObject.folder.addSorter( SORT_SENDER, new SenderSorter( sessionObject.mailCache ) );
 						sessionObject.folder.addSorter( SORT_SUBJECT, new SubjectSorter( sessionObject.mailCache ) );
 						sessionObject.folder.addSorter( SORT_DATE, new DateSorter( sessionObject.mailCache ) );
@@ -1013,6 +1011,7 @@ public class WebMail extends HttpServlet
 		}
 		if( buttonPressed( request, REFRESH ) ) {
 			sessionObject.mailbox.refresh();
+			// TODO get through cache so we have the disk-only ones too
 			String[] uidls = sessionObject.mailbox.getUIDLs();
 			if (uidls != null)
 				sessionObject.folder.setElements(uidls);
@@ -1436,6 +1435,7 @@ public class WebMail extends HttpServlet
 			 * update folder content
 			 */
 			if( sessionObject.state != STATE_AUTH ) {
+				// TODO get through cache so we have the disk-only ones too
 				String[] uidls = sessionObject.mailbox.getUIDLs();
 				if (uidls != null)
 					sessionObject.folder.setElements(uidls);
@@ -1485,7 +1485,7 @@ public class WebMail extends HttpServlet
 					);
 				}
 				out.println( "</head>\n<body>\n" +
-					"<div class=\"page\"><p><img src=\"" + sessionObject.imgPath + "susimail.png\" alt=\"Susimail\"><br>&nbsp;</p>\n" +
+					"<div class=\"page\"><p><img src=\"" + sessionObject.imgPath + "susimail.png\" alt=\"Susimail\"></p>\n" +
 					"<form method=\"POST\" enctype=\"multipart/form-data\" action=\"" + myself + "\" accept-charset=\"UTF-8\">" );
 
 				if( sessionObject.error != null && sessionObject.error.length() > 0 ) {
@@ -1756,15 +1756,15 @@ public class WebMail extends HttpServlet
 		
 		out.println( "<table cellspacing=\"0\" cellpadding=\"5\">\n" +
 				"<tr><td colspan=\"2\" align=\"center\"><hr></td></tr>\n" +
-				"<tr><td align=\"right\">" + _("From:") + "</td><td align=\"left\"><input type=\"text\" size=\"80\" name=\"" + NEW_FROM + "\" value=\"" + from + "\" " + ( !fixed.equalsIgnoreCase("false") ? "disabled" : "" ) +"></td></tr>\n" +
-				"<tr><td align=\"right\">" + _("To:") + "</td><td align=\"left\"><input type=\"text\" size=\"80\" name=\"" + NEW_TO + "\" value=\"" + to + "\"></td></tr>\n" +
-				"<tr><td align=\"right\">" + _("Cc:") + "</td><td align=\"left\"><input type=\"text\" size=\"80\" name=\"" + NEW_CC + "\" value=\"" + cc + "\"></td></tr>\n" +
-				"<tr><td align=\"right\">" + _("Bcc:") + "</td><td align=\"left\"><input type=\"text\" size=\"80\" name=\"" + NEW_BCC + "\" value=\"" + bcc + "\"></td></tr>\n" +
+				"<tr><td align=\"right\">" + _("From") + ":</td><td align=\"left\"><input type=\"text\" size=\"80\" name=\"" + NEW_FROM + "\" value=\"" + from + "\" " + ( !fixed.equalsIgnoreCase("false") ? "disabled" : "" ) +"></td></tr>\n" +
+				"<tr><td align=\"right\">" + _("To") + ":</td><td align=\"left\"><input type=\"text\" size=\"80\" name=\"" + NEW_TO + "\" value=\"" + to + "\"></td></tr>\n" +
+				"<tr><td align=\"right\">" + _("Cc") + ":</td><td align=\"left\"><input type=\"text\" size=\"80\" name=\"" + NEW_CC + "\" value=\"" + cc + "\"></td></tr>\n" +
+				"<tr><td align=\"right\">" + _("Bcc") + ":</td><td align=\"left\"><input type=\"text\" size=\"80\" name=\"" + NEW_BCC + "\" value=\"" + bcc + "\"></td></tr>\n" +
 				"<tr><td align=\"right\">" + _("Bcc to self") + ": </td><td align=\"left\"><input type=\"checkbox\" class=\"optbox\" name=\"" + NEW_BCC_TO_SELF + "\" value=\"1\" " + (sessionObject.bccToSelf ? "checked" : "" ) + "></td></tr>\n" +
-				"<tr><td align=\"right\">" + _("Subject:") + "</td><td align=\"left\"><input type=\"text\" size=\"80\" name=\"" + NEW_SUBJECT + "\" value=\"" + subject + "\"></td></tr>\n" +
+				"<tr><td align=\"right\">" + _("Subject") + ":</td><td align=\"left\"><input type=\"text\" size=\"80\" name=\"" + NEW_SUBJECT + "\" value=\"" + subject + "\"></td></tr>\n" +
 				"<tr><td colspan=\"2\" align=\"center\"><textarea cols=\"" + Config.getProperty( CONFIG_COMPOSER_COLS, 80 )+ "\" rows=\"" + Config.getProperty( CONFIG_COMPOSER_ROWS, 10 )+ "\" name=\"" + NEW_TEXT + "\">" + text + "</textarea>" +
 				"<tr><td colspan=\"2\" align=\"center\"><hr></td></tr>\n" +
-				"<tr><td align=\"right\">" + _("Add Attachment:") + "</td><td align=\"left\"><input type=\"file\" size=\"50%\" name=\"" + NEW_FILENAME + "\" value=\"\"></td></tr>" +
+				"<tr><td align=\"right\">" + _("Add Attachment") + ":</td><td align=\"left\"><input type=\"file\" size=\"50%\" name=\"" + NEW_FILENAME + "\" value=\"\"></td></tr>" +
 				// TODO disable/hide in JS if no file selected
 				"<tr><td>&nbsp;</td><td align=\"left\">" + button(NEW_UPLOAD, _("Add another attachment")) + "</td></tr>");
 		
@@ -1772,7 +1772,7 @@ public class WebMail extends HttpServlet
 			boolean wroteHeader = false;
 			for( Attachment attachment : sessionObject.attachments ) {
 				if( !wroteHeader ) {
-					out.println("<tr><td align=\"right\">" + _("Attachments:") + "</td>");
+					out.println("<tr><td align=\"right\">" + _("Attachments") + ":</td>");
 					wroteHeader = true;
 				} else {
 					out.println("<tr><td align=\"right\">&nbsp;</td>");
@@ -1858,7 +1858,7 @@ public class WebMail extends HttpServlet
 
 		out.println("<table id=\"mailbox\" cellspacing=\"0\" cellpadding=\"5\">\n" +
 			"<tr><td colspan=\"8\"><hr></td></tr>\n<tr>" +
-			thSpacer + "<th>" + sortHeader( SORT_SENDER, _("Sender"), sessionObject.imgPath ) + "</th>" +
+			thSpacer + "<th>" + sortHeader( SORT_SENDER, _("From"), sessionObject.imgPath ) + "</th>" +
 			thSpacer + "<th>" + sortHeader( SORT_SUBJECT, _("Subject"), sessionObject.imgPath ) + "</th>" +
 			thSpacer + "<th>" + sortHeader( SORT_DATE, _("Date"), sessionObject.imgPath ) +
 			//sortHeader( SORT_ID, "", sessionObject.imgPath ) +
@@ -1893,7 +1893,7 @@ public class WebMail extends HttpServlet
 					link + mail.shortSender + "</a></td><td>&nbsp;</td><td>" + link + mail.shortSubject + "</a></td><td>&nbsp;</td><td>" +
 					// don't let date get split across lines
 					mail.localFormattedDate.replace(" ", "&nbsp;") + "</td><td>&nbsp;</td><td align=\"right\">" +
-					DataHelper.formatSize2(mail.size) + "B</td></tr>" );
+					DataHelper.formatSize2(mail.getSize()) + "B</td></tr>" );
 			bg = 1 - bg;
 			i++;
 		}
@@ -1907,7 +1907,7 @@ public class WebMail extends HttpServlet
 				button( CLEAR, _("Clear") ) +
 				"<br>");
 			out.println(
-				_("Page Size:") + "&nbsp;<input type=\"text\" style=\"text-align: right;\" name=\"" + PAGESIZE + "\" size=\"4\" value=\"" +  sessionObject.folder.getPageSize() + "\">" +
+				_("Page Size") + ":&nbsp;<input type=\"text\" style=\"text-align: right;\" name=\"" + PAGESIZE + "\" size=\"4\" value=\"" +  sessionObject.folder.getPageSize() + "\">" +
 				button( SETPAGESIZE, _("Set") ) );
 		}
 	}
@@ -1944,12 +1944,12 @@ public class WebMail extends HttpServlet
 		if( mail != null ) {
 			out.println( "<table cellspacing=\"0\" cellpadding=\"5\">\n" +
 					"<tr><td colspan=\"2\" align=\"center\"><hr></td></tr>\n" +
-					"<tr class=\"mailhead\"><td align=\"right\" valign=\"top\">" + _("From:") +
-					"</td><td align=\"left\">" + quoteHTML( mail.sender ) + "</td></tr>\n" +
-					"<tr class=\"mailhead\"><td align=\"right\" valign=\"top\">" + _("Subject:") +
-					"</td><td align=\"left\">" + quoteHTML( mail.formattedSubject ) + "</td></tr>\n" +
-					"<tr class=\"mailhead\"><td align=\"right\" valign=\"top\">" + _("Date:") +
-					"</td><td align=\"left\">" + mail.quotedDate + "</td></tr>\n" +
+					"<tr class=\"mailhead\"><td align=\"right\" valign=\"top\">" + _("From") +
+					":</td><td align=\"left\">" + quoteHTML( mail.sender ) + "</td></tr>\n" +
+					"<tr class=\"mailhead\"><td align=\"right\" valign=\"top\">" + _("Subject") +
+					":</td><td align=\"left\">" + quoteHTML( mail.formattedSubject ) + "</td></tr>\n" +
+					"<tr class=\"mailhead\"><td align=\"right\" valign=\"top\">" + _("Date") +
+					":</td><td align=\"left\">" + mail.quotedDate + "</td></tr>\n" +
 					"<tr><td colspan=\"2\" align=\"center\"><hr></td></tr>" );
 			if( mail.hasPart()) {
 				showPart( out, mail.getPart(), 0, SHOW_HTML );

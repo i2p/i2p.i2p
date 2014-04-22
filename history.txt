@@ -1,3 +1,17 @@
+2014-04-22 zzz
+ * SusiMail:
+   - Add persistent cache
+
+2014-04-21 zzz
+ * SusiMail:
+   - Pipeline all deletes and quit
+   - Don't reconnect after delete and quit
+   - Verify connected before each POP3 operation
+   - Don't clear messages if a reconnection fails
+   - Use locale-based sorting for strings
+   - Increase limit for full fetch again
+   - Increase default page size back again
+
 2014-04-21 dg
  * findbugs: mostly stream closure fixes in router, apps, core
 

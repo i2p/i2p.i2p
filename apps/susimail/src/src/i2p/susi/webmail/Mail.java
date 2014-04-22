@@ -54,7 +54,7 @@ class Mail {
 	
 	private static final String unknown = "unknown";
 
-	public int id, size;
+	private int size;
 	public String sender, reply, subject, dateString,
 		formattedSender, formattedSubject,
 		formattedDate,  // US Locale, UTC
@@ -108,6 +108,7 @@ class Mail {
 		if (header == null)
 			setHeader(rb);
 		body = rb;
+		size = rb.length;
 		try {
 			part = new MailPart(rb);
 		} catch (DecodingException de) {
@@ -125,6 +126,16 @@ class Mail {
 
 	public boolean hasPart() {
 		return part != null;
+	}
+
+	public int getSize() {
+		return size;
+	}
+
+	public void setSize(int size) {
+		if (body != null)
+			return;
+		this.size = size;
 	}
 
 	/**
