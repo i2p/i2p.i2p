@@ -1934,7 +1934,7 @@ public class WebMail extends HttpServlet
 					link + mail.shortSender + "</a></td><td>&nbsp;</td><td>" + link + mail.shortSubject + "</a></td><td>&nbsp;</td><td>" +
 					// don't let date get split across lines
 					mail.localFormattedDate.replace(" ", "&nbsp;") + "</td><td>&nbsp;</td><td align=\"right\">" +
-					((mail.getSize() > 0) : (DataHelper.formatSize2(mail.getSize()) + 'B') : "???") + "</td></tr>" );
+					((mail.getSize() > 0) ? (DataHelper.formatSize2(mail.getSize()) + 'B') : "???") + "</td></tr>" );
 			bg = 1 - bg;
 			i++;
 		}
