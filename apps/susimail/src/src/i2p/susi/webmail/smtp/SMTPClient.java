@@ -108,7 +108,7 @@ public class SMTPClient {
 			throw new IOException("no socket");
 		OutputStream out = socket.getOutputStream();
 		cmd += "\r\n";
-		out.write( cmd.getBytes() );
+		out.write(DataHelper.getASCII(cmd));
 	}
 	
 	/**
@@ -264,8 +264,8 @@ public class SMTPClient {
 			if (ok) {
 				if( body.indexOf( "\r\n.\r\n" ) != -1 )
 					body = body.replaceAll( "\r\n.\r\n", "\r\n..\r\n" );
-				socket.getOutputStream().write( body.getBytes() );
-				socket.getOutputStream().write("\r\n.\r\n".getBytes() );
+				socket.getOutputStream().write(DataHelper.getUTF8(body));
+				socket.getOutputStream().write(DataHelper.getASCII("\r\n.\r\n"));
 				int result = sendCmd(null);
 				if (result == 250)
 					mailSent = true;

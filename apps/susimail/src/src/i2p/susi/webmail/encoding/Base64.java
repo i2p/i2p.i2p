@@ -29,6 +29,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import net.i2p.data.DataHelper;
+
 /**
  * @author susi
  */
@@ -57,7 +59,7 @@ public class Base64 implements Encoding {
 	 */
 	public String encode(String str) throws EncodingException {
 		try {
-			return encode( new ByteArrayInputStream( str.getBytes() ) );
+			return encode( new ByteArrayInputStream( DataHelper.getUTF8(str) ) );
 		}catch (IOException e) {
 			throw new EncodingException( e.getMessage() );
 		}
@@ -174,7 +176,7 @@ public class Base64 implements Encoding {
 	 * @return Buffer containing a decoded String.
 	 */
 	public ReadBuffer decode(String text) throws DecodingException {
-		return text != null ? decode( text.getBytes() ) : null;
+		return text != null ? decode( DataHelper.getUTF8(text) ) : null;
 	}
 
 	/**

@@ -30,6 +30,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import net.i2p.data.DataHelper;
+
 /**
  * @author susi
  */
@@ -45,7 +47,7 @@ public class QuotedPrintable implements Encoding {
 	 * @see i2p.susi.webmail.encoding.Encoding#encode(java.lang.String)
 	 */
 	public String encode(String text) throws EncodingException {
-		return encode( text.getBytes() );
+		return encode( DataHelper.getUTF8(text) );
 	}
 	/**
 	 * 
@@ -111,7 +113,7 @@ public class QuotedPrintable implements Encoding {
 	 * @see i2p.susi.webmail.encoding.Encoding#decode(java.lang.String)
 	 */
 	public ReadBuffer decode(String text) {
-		return text != null ? decode( text.getBytes() ) : null;
+		return text != null ? decode( DataHelper.getUTF8(text) ) : null;
 	}
 
 	/* (non-Javadoc)

@@ -729,7 +729,7 @@ public class POP3MailBox {
 			msg = "PASS provided";
 		Debug.debug(Debug.DEBUG, "sendCmd1a(" + msg + ")");
 		cmd += "\r\n";
-		socket.getOutputStream().write(cmd.getBytes());
+		socket.getOutputStream().write(DataHelper.getASCII(cmd));
 	}
 
 	/**

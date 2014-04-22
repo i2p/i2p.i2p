@@ -1,6 +1,7 @@
 2014-04-22 zzz
  * SusiMail:
    - Add persistent cache
+   - Fix encoding in sent mails on non-UTF8 platforms
 
 2014-04-21 zzz
  * SusiMail:

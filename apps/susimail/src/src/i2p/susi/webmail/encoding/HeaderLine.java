@@ -32,6 +32,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Locale;
 
+import net.i2p.data.DataHelper;
+
 /**
  *  Ref:
  *  http://en.wikipedia.org/wiki/MIME#Encoded-Word
@@ -51,7 +53,7 @@ public class HeaderLine implements Encoding {
 	 * @see i2p.susi.webmail.encoding.Encoding#encode(java.lang.String)
 	 */
 	public String encode(String text) throws EncodingException {
-		return encode( text.getBytes() );
+		return encode( DataHelper.getUTF8(text) );
 	}
 	private static final int BUFSIZE = 2;
 	/* (non-Javadoc)
@@ -216,7 +218,7 @@ public class HeaderLine implements Encoding {
 													// decode string
 													String decoded = new String(tmp.content, tmp.offset, tmp.length, charset);
 													// encode string
-													byte[] utf8 = decoded.getBytes("UTF-8");
+													byte[] utf8 = DataHelper.getUTF8(decoded);
 													for( int j = 0; j < utf8.length; j++ ) {
 														byte d = utf8[j];
 														out[written++] = ( d == '_' ? 32 : d );
@@ -297,7 +299,7 @@ public class HeaderLine implements Encoding {
 	}
 
 	public ReadBuffer decode(String text) throws DecodingException {
-		return text != null ? decode( text.getBytes() ) : null;
+		return text != null ? decode( DataHelper.getUTF8(text) ) : null;
 	}
 
 	/* (non-Javadoc)

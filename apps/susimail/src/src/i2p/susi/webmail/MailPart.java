@@ -33,6 +33,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import net.i2p.data.DataHelper;
+
 /**
  * @author susi23
  */
@@ -145,7 +147,7 @@ class MailPart {
 		 */
 		int beginLastPart = -1;
 		if( multipart ) {
-			byte boundaryArray[] = boundary.getBytes();
+			byte boundaryArray[] = DataHelper.getUTF8(boundary);
 			for( int i = beginBody; i < end - 4; i++ ) {
 				if( buffer.content[i] == '\r' &&
 						buffer.content[i+1] == '\n' &&

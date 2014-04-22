@@ -25,6 +25,8 @@ package i2p.susi.webmail.encoding;
 
 import i2p.susi.util.ReadBuffer;
 
+import net.i2p.data.DataHelper;
+
 /**
  * @author susi
  */
@@ -84,7 +86,7 @@ public class SevenBit implements Encoding {
 	 * @see i2p.susi23.mail.encoding.Encoding#decode(java.lang.String)
 	 */
 	public ReadBuffer decode(String str) throws DecodingException {
-		return decode( str.getBytes() );
+		return decode( DataHelper.getUTF8(str) );
 	}
 
 	/* (non-Javadoc)

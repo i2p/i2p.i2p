@@ -177,8 +177,8 @@ input.delete, input.delete_attachment, input.really_delete {
 }
 
 input.download, input.lastpage {
-     background: #ddf url('/themes/console/images/arrow_down.png') no-repeat 4px center;
-     padding: 2px 3px 2px 24px;
+     background: #ddf url('/themes/console/images/arrow_down.png') no-repeat 1px center;
+     padding: 2px 3px 2px 19px;
      min-height: 22px;
 }
 
