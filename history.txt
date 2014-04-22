@@ -2,6 +2,11 @@
  * SusiMail:
    - Add persistent cache
    - Fix encoding in sent mails on non-UTF8 platforms
+   - Show sender name in folder view
+   - Add support for configured sender name
+   - Add HTML escaping of '&'
+   - Fix Folder sorting so UP is up and DOWN is down
+   - Fix capture by show page after back button
 
 2014-04-21 zzz
  * SusiMail:

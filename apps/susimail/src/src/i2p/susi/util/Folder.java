@@ -51,13 +51,17 @@ public class Folder<O extends Object> {
 	public static final String PAGESIZE = "pager.pagesize";
 	public static final int DEFAULT_PAGESIZE = 10;
 
-	public static final boolean DOWN = false;
-	public static final boolean UP = true;
+	public enum SortOrder {
+		/** lowest to highest */
+		DOWN,
+		/** reverse sort, highest  to lowest */
+		UP;
+	}
 
 	private int pages, pageSize, currentPage;
 	private O[] unsortedElements, elements;
 	private final Hashtable<String, Comparator<O>> sorter;
-	private boolean sortingDirection;
+	private SortOrder sortingDirection;
 	Comparator<O> currentSorter;
 	
 	public Folder()
@@ -65,7 +69,7 @@ public class Folder<O extends Object> {
 		pages = 1;
 		currentPage = 1;
 		sorter = new Hashtable<String, Comparator<O>>();
-		sortingDirection = UP;
+		sortingDirection = SortOrder.DOWN;
 	}
 	
 	/**
@@ -232,14 +236,9 @@ public class Folder<O extends Object> {
 		if( elements != null ) {
 			int pageSize = getPageSize();
 			int offset = ( currentPage - 1 ) * pageSize;
-			int step = 1;
-			if( sortingDirection == DOWN ) {
-				offset = elements.length - offset - 1;
-				step = -1;
-			}
 			for( int i = 0; i < pageSize && offset >= 0 && offset < elements.length; i++ ) {
 				list.add( elements[offset] );
-				offset += step;
+				offset++;
 			}			
 		}
 		return list.iterator();
@@ -303,6 +302,8 @@ public class Folder<O extends Object> {
 	public void sortBy( String id )
 	{
 		currentSorter = sorter.get( id );
+		if (sortingDirection == SortOrder.UP)
+			currentSorter = Collections.reverseOrder(currentSorter);
 		sort();
 	}
 	
@@ -318,12 +319,7 @@ public class Folder<O extends Object> {
 		if( elements != null ) {
 			int pageSize = getPageSize();
 			int offset = ( currentPage - 1 ) * pageSize;
-			int step = 1;
-			if( sortingDirection == DOWN ) {
-				offset = elements.length - offset - 1;
-				step = -1;
-			}
-			offset += x * step;			
+			offset += x;			
 			if( offset >= 0 && offset < elements.length )
 				result = elements[offset];
 		}
@@ -332,10 +328,11 @@ public class Folder<O extends Object> {
 
 	/**
 	 * Sets the sorting direction of the folder.
+	 * Does not re-sort. Caller must call sortBy()
 	 * 
 	 * @param direction @link UP or @link DOWN
 	 */
-	public void setSortingDirection( boolean direction )
+	public void setSortingDirection(SortOrder direction)
 	{
 		sortingDirection = direction;
 	}
@@ -347,9 +344,6 @@ public class Folder<O extends Object> {
 	 */
 	public O getFirstElement()
 	{
-		/*
-		 * sorting direction is taken into account from getElement
-		 */
 		return elements == null ? null : getElement( 0 );
 	}
 
@@ -360,9 +354,6 @@ public class Folder<O extends Object> {
 	 */
 	public O getLastElement()
 	{
-		/*
-		 * sorting direction is taken into account from getElement
-		 */
 		return elements == null ? null : getElement(  elements.length - 1 );
 	}
 	
@@ -384,7 +375,6 @@ public class Folder<O extends Object> {
 	
 	/**
 	 * Retrieves the next element in the sorted array.
-	 * Sorting direction is taken into account.
 	 * 
 	 * @param element
 	 * @return The next element
@@ -396,7 +386,7 @@ public class Folder<O extends Object> {
 		int i = getIndexOf( element );
 
 		if( i != -1 && elements != null ) {
-			i += sortingDirection == UP ? 1 : -1;
+			i++;
 			if( i >= 0 && i < elements.length )
 				result = elements[i];
 		}
@@ -405,7 +395,6 @@ public class Folder<O extends Object> {
 	
 	/**
 	 * Retrieves the previous element in the sorted array.
-	 * Sorting direction is taken into account.
 	 * 
 	 * @param element
 	 * @return The previous element
@@ -417,14 +406,14 @@ public class Folder<O extends Object> {
 		int i = getIndexOf( element );
 
 		if( i != -1 && elements != null ) {
-			i += sortingDirection == DOWN ? 1 : -1;
+			i--;
 			if( i >= 0 && i < elements.length )
 				result = elements[i];
 		}
 		return result;
 	}
 	/**
-	 * Retrieves element at index i. Depends on sorting direction.
+	 * Retrieves element at index i.
 	 * 
 	 * @param i
 	 * @return Element at index i
@@ -434,8 +423,6 @@ public class Folder<O extends Object> {
 		O result = null;
 		
 		if( elements != null ) {
-			if( sortingDirection == DOWN )
-				i = elements.length - i - 1;
 			result = elements[i];
 		}
 		return result;
@@ -459,7 +446,6 @@ public class Folder<O extends Object> {
 
 	/**
 	 * Returns true, if elements.equals( lastElementOfTheSortedArray ).
-	 * The sorting direction influences which element is taken for comparison.
 	 * 
 	 * @param element
 	 */
@@ -467,12 +453,11 @@ public class Folder<O extends Object> {
 	{
 		if( elements == null )
 			return false;
-		return elements[ sortingDirection == DOWN ? 0 : elements.length - 1 ].equals( element );
+		return elements[elements.length - 1].equals( element );
 	}
 	
 	/**
 	 * Returns true, if elements.equals( firstElementOfTheSortedArray ).
-	 * The sorting direction influences which element is taken for comparison.
 	 * 
 	 * @param element
 	 */
@@ -480,6 +465,6 @@ public class Folder<O extends Object> {
 	{
 		if( elements == null )
 			return false;
-		return elements[ sortingDirection == UP ? 0 : elements.length - 1 ].equals( element );
+		return elements[0].equals( element );
 	}
 }

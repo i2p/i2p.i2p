@@ -55,17 +55,20 @@ class Mail {
 	private static final String unknown = "unknown";
 
 	private int size;
-	public String sender, reply, subject, dateString,
-		formattedSender, formattedSubject,
+	public String sender,   // as received, trimmed only, not HTML escaped
+		reply, subject, dateString,
+		formattedSender,    // address only, enclosed with <>, not HTML escaped
+		formattedSubject,
 		formattedDate,  // US Locale, UTC
 		localFormattedDate,  // Current Locale, local time zone
-		shortSender, shortSubject,
+		shortSender,    // Either name or address but not both, HTML escaped, double-quotes removed, truncated with with hellip
+		shortSubject,   // HTML escaped, truncated with hellip
 		quotedDate;  // Current Locale, local time zone, longer format
 	public final String uidl;
 	public Date date;
 	private ReadBuffer header, body;
 	private MailPart part;
-	String[] to, cc;
+	String[] to, cc;        // addresses only, enclosed by <>
 
 	public String error;
 
@@ -165,7 +168,9 @@ class Mail {
 		}
 		return addresses == 1;
 	}
+
 	/**
+	 * Returns the first email address portion, enclosed by <>
 	 * @param address
 	 */
 	public static String getAddress(String address )
@@ -181,6 +186,16 @@ class Mail {
 		
 		return null;
 	}
+
+	/**
+	 * A little misnamed. Adds all addresses from the comma-separated
+	 * line in text to the recipients list.
+	 * 
+	 * @param text comma-separated
+	 * @param recipients out param
+	 * @param ok will be returned
+	 * @return true if ALL e-mail addresses are valid AND the in parameter was true
+	 */
 	public static boolean getRecipientsFromList( ArrayList<String> recipients, String text, boolean ok )
 	{
 		if( text != null && text.length() > 0 ) {			
@@ -203,6 +218,15 @@ class Mail {
 		}
 		return ok;
 	}
+
+	/**
+	 * Adds all items from the list
+	 * to the builder, separated by tabs.
+	 * 
+	 * @param text comma-separated
+	 * @param buf out param
+	 * @param prefix prepended to the addresses
+	 */
 	public static void appendRecipients( StringBuilder buf, ArrayList<String> recipients, String prefix )
 	{
 		for( String recipient : recipients ) {
@@ -212,6 +236,7 @@ class Mail {
 			buf.append( "\r\n" );
 		}
 	}
+
 	public void parseHeaders()
 	{
 		DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm");
@@ -258,11 +283,18 @@ class Mail {
 						if( line.startsWith( "From:" ) ) {
 							sender = line.substring( 5 ).trim();
 							formattedSender = getAddress( sender );
-							shortSender = formattedSender.trim();
-							if( shortSender.length() > 40 ) {
-								shortSender = shortSender.substring( 0, 37 ).trim() + "&hellip;";
-							}
+							shortSender = sender.replace("\"", "").trim();
+							int lt = shortSender.indexOf('<');
+							if (lt > 0)
+								shortSender = shortSender.substring(0, lt).trim();
+							else if (lt < 0 && shortSender.contains("@"))
+								shortSender = '<' + shortSender + '>';  // add missing <> (but thunderbird doesn't...)
+							boolean trim = shortSender.length() > 40;
+							if (trim)
+								shortSender = shortSender.substring( 0, 37 ).trim();
 							shortSender = html.encode( shortSender );
+							if (trim)
+								shortSender += "&hellip;";  // must be after html encode
 						}
 						else if( line.startsWith( "Date:" ) ) {
 							dateString = line.substring( 5 ).trim();
@@ -282,9 +314,12 @@ class Mail {
 							subject = line.substring( 8 ).trim();
 							formattedSubject = subject;
 							shortSubject = formattedSubject;
-							if( formattedSubject.length() > 60 )
-								shortSubject = formattedSubject.substring( 0, 57 ).trim() + "&hellip;";
+							boolean trim = formattedSubject.length() > 60;
+							if (trim)
+								shortSubject = formattedSubject.substring( 0, 57 ).trim();
 							shortSubject = html.encode( shortSubject );
+							if (trim)
+								shortSubject += "&hellip;";  // must be after html encode
 						}
 						else if( line.toLowerCase(Locale.US).startsWith( "reply-to:" ) ) {
 							reply = getAddress( line.substring( 9 ).trim() );

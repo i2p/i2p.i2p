@@ -263,7 +263,7 @@ public class SMTPClient {
 			}
 			if (ok) {
 				if( body.indexOf( "\r\n.\r\n" ) != -1 )
-					body = body.replaceAll( "\r\n.\r\n", "\r\n..\r\n" );
+					body = body.replace( "\r\n.\r\n", "\r\n..\r\n" );
 				socket.getOutputStream().write(DataHelper.getUTF8(body));
 				socket.getOutputStream().write(DataHelper.getASCII("\r\n.\r\n"));
 				int result = sendCmd(null);

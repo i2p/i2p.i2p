@@ -167,6 +167,7 @@ public class WebMail extends HttpServlet
 
 	private static final String CONFIG_SENDER_FIXED = "sender.fixed";
 	private static final String CONFIG_SENDER_DOMAIN = "sender.domain";
+	private static final String CONFIG_SENDER_NAME = "sender.name";
 	
 	private static final String CONFIG_COMPOSER_COLS = "composer.cols";
 	private static final String CONFIG_COMPOSER_ROWS = "composer.rows";
@@ -244,7 +245,9 @@ public class WebMail extends HttpServlet
 				return (b == null) ? 0 : 1;
 			if (b == null)
 				return -1;
-			return collator.compare(a.formattedSender, b.formattedSender);
+			String as = a.sender.replace("\"", "").replace("<", "").replace(">", "");
+			String bs = b.sender.replace("\"", "").replace("<", "").replace(">", "");
+			return collator.compare(as, bs);
 		}		
 	}
 
@@ -578,7 +581,7 @@ public class WebMail extends HttpServlet
 	static String quoteHTML( String line )
 	{
 		if( line != null )
-			line = line.replaceAll( "<", "&lt;" ).replaceAll( ">", "&gt;" );
+			line = line.replace("&", "&amp;").replace( "<", "&lt;" ).replace( ">", "&gt;" );
 		else
 			line = "";
 		return line;
@@ -689,7 +692,8 @@ public class WebMail extends HttpServlet
 						sessionObject.folder.addSorter( SORT_SUBJECT, new SubjectSorter( sessionObject.mailCache ) );
 						sessionObject.folder.addSorter( SORT_DATE, new DateSorter( sessionObject.mailCache ) );
 						sessionObject.folder.addSorter( SORT_SIZE, new SizeSorter( sessionObject.mailCache ) );
-						sessionObject.folder.setSortingDirection( Folder.DOWN );
+						// reverse sort, latest mail first
+						sessionObject.folder.setSortingDirection(Folder.SortOrder.UP);
 						sessionObject.folder.sortBy(SORT_DATE);
 						sessionObject.reallyDelete = false;
 						Debug.debug(Debug.DEBUG, "CONNECTED, YAY");
@@ -816,6 +820,22 @@ public class WebMail extends HttpServlet
 		if( sessionObject.state == STATE_SHOW ) {
 			if( buttonPressed( request, LIST ) ) { 
 				sessionObject.state = STATE_LIST;
+			} else if (buttonPressed( request, CANCEL ) ||
+			    buttonPressed( request, PREVPAGE ) ||    // All these buttons are not shown but we could be lost
+			    buttonPressed( request, NEXTPAGE ) ||
+			    buttonPressed( request, FIRSTPAGE ) ||
+			    buttonPressed( request, LASTPAGE ) ||
+			    buttonPressed( request, SETPAGESIZE ) ||
+			    buttonPressed( request, MARKALL ) ||
+			    buttonPressed( request, CLEAR ) ||
+			    buttonPressed( request, INVERT ) ||
+			    buttonPressed( request, SORT_ID ) ||
+			    buttonPressed( request, SORT_SENDER ) ||
+			    buttonPressed( request, SORT_SUBJECT ) ||
+			    buttonPressed( request, SORT_DATE ) ||
+			    buttonPressed( request, SORT_SIZE ) ||
+			    buttonPressed( request, REFRESH )) {
+				sessionObject.state = STATE_LIST;
 			}
 		}
 		/*
@@ -865,9 +885,9 @@ public class WebMail extends HttpServlet
 					if (part != null) {
 						if( reply || replyAll ) {
 							if( mail.reply != null && Mail.validateAddress( mail.reply ) )
-								sessionObject.replyTo = Mail.getAddress( mail.reply );
+								sessionObject.replyTo = mail.reply;
 							else if( mail.sender != null && Mail.validateAddress( mail.sender ) )
-								sessionObject.replyTo = Mail.getAddress( mail.sender );
+								sessionObject.replyTo = mail.sender;
 							sessionObject.subject = "Re: " + mail.formattedSubject;
 							StringWriter text = new StringWriter();
 							PrintWriter pw = new PrintWriter( text );
@@ -1274,11 +1294,10 @@ public class WebMail extends HttpServlet
 		String str = request.getParameter( sort_id );
 		if( str != null ) {
 			if( str.equalsIgnoreCase("up")) {
-				sessionObject.folder.setSortingDirection( Folder.UP );
+				sessionObject.folder.setSortingDirection(Folder.SortOrder.UP);
 				sessionObject.folder.sortBy( sort_id );
-			}
-			if( str.equalsIgnoreCase("down")) {
-				sessionObject.folder.setSortingDirection( Folder.DOWN );
+			} else 	if( str.equalsIgnoreCase("down")) {
+				sessionObject.folder.setSortingDirection(Folder.SortOrder.DOWN);
 				sessionObject.folder.sortBy( sort_id );
 			}
 		}
@@ -1550,7 +1569,7 @@ public class WebMail extends HttpServlet
 						name = part.name;
 					else
 						name = "part" + part.hashCode();
-					String name2 = name.replaceAll( "\\.", "_" );
+					String name2 = name.replace( "\\.", "_" );
 					response.setContentType( "application/zip; name=\"" + name2 + ".zip\"" );
 					response.addHeader( "Content-Disposition:", "attachment; filename=\"" + name2 + ".zip\"" );
 					ZipEntry entry = new ZipEntry( name );
@@ -1740,8 +1759,23 @@ public class WebMail extends HttpServlet
 		String fixed = Config.getProperty( CONFIG_SENDER_FIXED, "true" );
 		
 		if( from == null || !fixed.equalsIgnoreCase("false")) {
+			String user = sessionObject.user;
+			String name = Config.getProperty(CONFIG_SENDER_NAME);
+			if (name != null) {
+				name = name.trim();
+				if (name.contains(" "))
+					from = '"' + name + "\" ";
+				else
+					from = name + ' ';
+			} else {
+				from = "";
+			}
+			if (user.contains("@")) {
 				String domain = Config.getProperty( CONFIG_SENDER_DOMAIN, "mail.i2p" );
-				from = "<" + sessionObject.user + "@" + domain + ">";
+				from += '<' + user + '@' + domain + '>';
+			} else {
+				from += '<' + user + '>';
+			}
 		}
 		
 		String to = request.getParameter( NEW_TO, sessionObject.replyTo != null ? sessionObject.replyTo : "" );

@@ -50,7 +50,10 @@ public class HTML implements Encoding {
 	 */
 	public String encode(String str) throws EncodingException
 	{
-		return str.replaceAll( "<", "&lt;" ).replaceAll( ">", "&gt;" ).replaceAll( "\r{0,1}\n", "<br>\r\n" );
+		return  str.replace("&", "&amp;")  // must be first
+			   .replace( "<", "&lt;" )
+			   .replace( ">", "&gt;" )
+			   .replaceAll( "\r{0,1}\n", "<br>\r\n" );
 	}
 
 	/* (non-Javadoc)
