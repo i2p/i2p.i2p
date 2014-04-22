@@ -7,6 +7,8 @@
    - Add HTML escaping of '&'
    - Fix Folder sorting so UP is up and DOWN is down
    - Fix capture by show page after back button
+   - Load all mails from disk at startup
+   - Add offline mode
 
 2014-04-21 zzz
  * SusiMail:

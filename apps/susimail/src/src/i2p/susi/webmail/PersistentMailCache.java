@@ -69,7 +69,7 @@ class PersistentMailCache {
 	/**
 	 * Fetch all mails from disk.
 	 * 
-	 * @return An e-mail or null
+	 * @return a new collection
 	 */
 	public Collection<Mail> getMails() {
 		List<Mail> rv = new ArrayList<Mail>();

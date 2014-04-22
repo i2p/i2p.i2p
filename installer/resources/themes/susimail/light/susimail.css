@@ -182,9 +182,15 @@ input.download, input.lastpage {
      min-height: 22px;
 }
 
-input.firstpage, input.list {
+input.firstpage {
      background: #ddf url('/themes/console/images/arrow_up.png') no-repeat 1px center;
      padding: 2px 3px 2px 19px;
+     min-height: 22px;
+}
+
+input.list, input.offline {
+     background: #ddf url('/themes/console/images/folder.png') no-repeat 4px center;
+     padding: 2px 3px 2px 24px;
      min-height: 22px;
 }
 

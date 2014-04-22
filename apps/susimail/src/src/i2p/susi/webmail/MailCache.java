@@ -32,8 +32,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author user
@@ -62,11 +64,36 @@ class MailCache {
 		PersistentMailCache pmc = null;
 		try {
 			pmc = new PersistentMailCache(host, port, user, pass);
-			// TODO pmc.getMails()
 		} catch (IOException ioe) {
 			Debug.debug(Debug.ERROR, "Error creating disk cache: " + ioe);
 		}
 		disk = pmc;
+		if (disk != null)
+			loadFromDisk();
+	}
+
+	/**
+	 * 
+	 * @since 0.9.13
+	 */
+	private void loadFromDisk() {
+		Collection<Mail> dmails = disk.getMails();
+		for (Mail mail : dmails) {
+			mails.put(mail.uidl, mail);
+		}
+	}
+
+	/**
+	 * The ones known locally, which will include any known on the server, if connected.
+	 * 
+	 * @since 0.9.13
+	 */
+	public String[] getUIDLs() {
+		List<String> uidls = new ArrayList<String>(mails.size());
+		synchronized(mails) {
+			uidls.addAll(mails.keySet());
+		}
+		return uidls.toArray(new String[uidls.size()]);
 	}
 
 	/**
@@ -96,7 +123,8 @@ class MailCache {
 		}
 		if (mail.markForDeletion)
 			return null;
-		if(mail.getSize() <= FETCH_ALL_SIZE)
+		int sz = mail.getSize();
+		if (sz > 0 && sz <= FETCH_ALL_SIZE)
 			headerOnly = false;
 			
 		if( headerOnly ) {
@@ -148,7 +176,8 @@ class MailCache {
 			if (mail.markForDeletion)
 				continue;
 			mr.setMail(mail);
-			if(mail.getSize() <= FETCH_ALL_SIZE)
+			int sz = mail.getSize();
+			if (sz > 0 && sz <= FETCH_ALL_SIZE)
 				headerOnly = false;
 			if( headerOnly ) {
 				if(!mail.hasHeader()) {

@@ -67,6 +67,8 @@ public class POP3MailBox {
 	private final Object synchronizer;
 
 	/**
+	 * Does not connect. Caller must call connectToServer() if desired.
+	 *
 	 * @param host
 	 * @param port
 	 * @param user
@@ -85,7 +87,6 @@ public class POP3MailBox {
 		synchronizer = new Object();
 		// this appears in the UI so translate
 		lastLine = _("No response from server");
-		connect();
 	}
 
 	/**
@@ -482,6 +483,22 @@ public class POP3MailBox {
 		uidlToID.clear();
 		sizes.clear();
 		mails = 0;
+	}
+
+	/**
+	 * Connect to pop3 server if not connected.
+	 * Does nothing if already connected.
+	 *
+	 * @return true if connected
+	 * @since 0.9.13
+	 */
+	public boolean connectToServer() {
+		synchronized( synchronizer ) {
+			if (isConnected())
+				return true;
+			connect();
+			return isConnected();
+		}
 	}
 
 	/**

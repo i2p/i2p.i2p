@@ -98,6 +98,7 @@ public class WebMail extends HttpServlet
 	 * form keys on login page
 	 */
 	private static final String LOGIN = "login";
+	private static final String OFFLINE = "offline";
 	private static final String USER = "user";
 	private static final String PASS = "pass";
 	private static final String HOST = "host";
@@ -610,7 +611,8 @@ public class WebMail extends HttpServlet
 			/*
 			 * security :(
 			 */
-			if( buttonPressed( request, LOGIN ) ) {
+			boolean offline = buttonPressed(request, OFFLINE);
+			if (buttonPressed(request, LOGIN) || offline) {
 				
 				if( user == null || user.length() == 0 ) {
 					sessionObject.error += _("Need username for authentication.") + "<br>";
@@ -664,7 +666,7 @@ public class WebMail extends HttpServlet
 				}
 				if( doContinue ) {
 					POP3MailBox mailbox = new POP3MailBox( host, pop3PortNo, user, pass );
-					if (mailbox.isConnected() ) {
+					if (offline || mailbox.connectToServer()) {
 						sessionObject.mailbox = mailbox;
 						sessionObject.user = user;
 						sessionObject.pass = pass;
@@ -674,10 +676,10 @@ public class WebMail extends HttpServlet
 						MailCache mc = new MailCache(mailbox, host, pop3PortNo, user, pass);
 						sessionObject.mailCache = mc;
 						sessionObject.folder = new Folder<String>();
-						// TODO get through cache so we have the disk-only ones too
-						String[] uidls = mailbox.getUIDLs();
+						// get through cache so we have the disk-only ones too
+						String[] uidls = mc.getUIDLs();
 						sessionObject.folder.setElements(uidls);
-						if (uidls.length > 0) {
+						if (uidls.length > 0 && !offline) {
 							// prime the cache, request all headers at once
 							// otherwise they are pulled one at a time by sortBy() below
 							List<MailCache.MailRequest> reqs = new ArrayList<MailCache.MailRequest>(uidls.length);
@@ -696,7 +698,10 @@ public class WebMail extends HttpServlet
 						sessionObject.folder.setSortingDirection(Folder.SortOrder.UP);
 						sessionObject.folder.sortBy(SORT_DATE);
 						sessionObject.reallyDelete = false;
-						Debug.debug(Debug.DEBUG, "CONNECTED, YAY");
+						if (offline)
+							Debug.debug(Debug.DEBUG, "OFFLINE MODE");
+						else
+							Debug.debug(Debug.DEBUG, "CONNECTED, YAY");
 					}
 					else {
 						sessionObject.error += mailbox.lastError();
@@ -1031,8 +1036,8 @@ public class WebMail extends HttpServlet
 		}
 		if( buttonPressed( request, REFRESH ) ) {
 			sessionObject.mailbox.refresh();
-			// TODO get through cache so we have the disk-only ones too
-			String[] uidls = sessionObject.mailbox.getUIDLs();
+			// get through cache so we have the disk-only ones too
+			String[] uidls = sessionObject.mailCache.getUIDLs();
 			if (uidls != null)
 				sessionObject.folder.setElements(uidls);
 			sessionObject.pageChanged = true;
@@ -1454,8 +1459,8 @@ public class WebMail extends HttpServlet
 			 * update folder content
 			 */
 			if( sessionObject.state != STATE_AUTH ) {
-				// TODO get through cache so we have the disk-only ones too
-				String[] uidls = sessionObject.mailbox.getUIDLs();
+				// get through cache so we have the disk-only ones too
+				String[] uidls = sessionObject.mailCache.getUIDLs();
 				if (uidls != null)
 					sessionObject.folder.setElements(uidls);
 			}
@@ -1846,7 +1851,9 @@ public class WebMail extends HttpServlet
 		}
 		out.println(
 			"<tr><td colspan=\"2\">&nbsp;</td></tr>\n" +
-			"<tr><td></td><td align=\"left\">" + button( LOGIN, _("Login") ) + spacer + " <input class=\"cancel\" type=\"reset\" value=\"" + _("Reset") + "\"></td></tr>\n" +
+			"<tr><td></td><td align=\"left\">" + button( LOGIN, _("Login") ) + spacer +
+			  button(OFFLINE, _("View Mail Offline") ) + spacer +
+			 " <input class=\"cancel\" type=\"reset\" value=\"" + _("Reset") + "\"></td></tr>\n" +
 			"<tr><td colspan=\"2\">&nbsp;</td></tr>\n" +
 			"<tr><td></td><td align=\"left\"><a href=\"http://hq.postman.i2p/?page_id=14\">" + _("Learn about I2P mail") + "</a></td></tr>\n" +
 			"<tr><td></td><td align=\"left\"><a href=\"http://hq.postman.i2p/?page_id=16\">" + _("Create Account") + "</a></td></tr>\n" +
@@ -1927,7 +1934,7 @@ public class WebMail extends HttpServlet
 					link + mail.shortSender + "</a></td><td>&nbsp;</td><td>" + link + mail.shortSubject + "</a></td><td>&nbsp;</td><td>" +
 					// don't let date get split across lines
 					mail.localFormattedDate.replace(" ", "&nbsp;") + "</td><td>&nbsp;</td><td align=\"right\">" +
-					DataHelper.formatSize2(mail.getSize()) + "B</td></tr>" );
+					((mail.getSize() > 0) : (DataHelper.formatSize2(mail.getSize()) + 'B') : "???") + "</td></tr>" );
 			bg = 1 - bg;
 			i++;
 		}
