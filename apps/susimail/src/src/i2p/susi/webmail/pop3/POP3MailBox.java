@@ -66,6 +66,7 @@ public class POP3MailBox {
 
 	private Socket socket;
 	private final AtomicLong lastActive;
+	private final AtomicLong lastChecked;
 
 	private final Object synchronizer;
 	private final DelayedDeleter delayedDeleter;
@@ -92,6 +93,7 @@ public class POP3MailBox {
 		// this appears in the UI so translate
 		lastLine = _("No response from server");
 		lastActive = new AtomicLong(System.currentTimeMillis());
+		lastChecked = new AtomicLong();
 		delayedDeleter = new DelayedDeleter(this);
 	}
 
@@ -270,8 +272,18 @@ public class POP3MailBox {
 	 */
 	public void queueForDeletion(Collection<String> uidls) {
 		for (String uidl : uidls) {
-			delayedDeleter.queueDelete(uidl);
+			queueForDeletion(uidl);
 		}
+	}
+
+	/**
+	 * Queue for later deletion. Non-blocking.
+	 * 
+	 * @since 0.9.13
+	 */
+	public void queueForDeletion(String uidl) {
+		Debug.debug(Debug.DEBUG, "Queueing for deletion: " + uidl);
+		delayedDeleter.queueDelete(uidl);
 	}
 
 	/**
@@ -446,6 +458,15 @@ public class POP3MailBox {
 	}
 
 	/**
+	 * Timestamp. When we last successfully got the UIDL list.
+	 * 
+	 * @since 0.9.13
+	 */
+	long getLastChecked() {
+		return lastChecked.get();
+	}
+
+	/**
 	 * 
 	 * @param response line starting with +OK
 	 */
@@ -489,6 +510,7 @@ public class POP3MailBox {
 						}
 					}
 				}
+				lastChecked.set(System.currentTimeMillis());
 			} else {
 				Debug.debug(Debug.DEBUG, "Error getting UIDL list from server.");
 			}
@@ -1085,12 +1107,12 @@ public class POP3MailBox {
 	 * 
 	 * @return A new array of the available UIDLs. No particular order.
 	 */
-	public String[] getUIDLs()
+	public Collection<String> getUIDLs()
 	{
 		if (!isConnected())
 			return null;
 		synchronized( synchronizer ) {
-		       return uidlToID.keySet().toArray(new String[uidlToID.size()]);
+		       return new ArrayList(uidlToID.keySet());
 		}
 	}
 

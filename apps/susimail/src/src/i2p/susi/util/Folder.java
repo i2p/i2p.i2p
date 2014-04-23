@@ -59,7 +59,7 @@ public class Folder<O extends Object> {
 	}
 
 	private int pages, pageSize, currentPage;
-	private O[] unsortedElements, elements;
+	private O[] elements;
 	private final Hashtable<String, Comparator<O>> sorter;
 	private SortOrder sortingDirection;
 	Comparator<O> currentSorter;
@@ -74,6 +74,7 @@ public class Folder<O extends Object> {
 	
 	/**
 	 * Returns the current page.
+	 * Starts at 1, even if empty.
 	 * 
 	 * @return Returns the current page.
 	 */
@@ -83,6 +84,7 @@ public class Folder<O extends Object> {
 
 	/**
 	 * Sets the current page to the given parameter.
+	 * Starts at 1.
 	 * 
 	 * @param currentPage The current page to set.
 	 */
@@ -102,6 +104,7 @@ public class Folder<O extends Object> {
 
 	/**
 	 * Returns the number of pages in the folder.
+         * Minimum of 1 even if empty.
 	 * @return Returns the number of pages.
 	 */
 	public synchronized int getPages() {
@@ -130,20 +133,6 @@ public class Folder<O extends Object> {
 	}
 
 	/**
-	 * Creates a copy of an array by copying its elements.
-	 * 
-	 * @param source Array to copy.
-	 * @return Copy of source.
-	 */
-	@SuppressWarnings("unchecked")
-	private O[] copyArray( O[] source )
-	{
-		Object[] destination = new Object[source.length];
-		for( int i = 0; i < source.length; i++ )
-			destination[i] = source[i];
-		return (O[])destination;
-	}
-	/**
 	 * Recalculates variables.
 	 */
 	private void update() {
@@ -166,30 +155,25 @@ public class Folder<O extends Object> {
 	 */
 	private void sort()
 	{
-		if( currentSorter != null ) {
-			elements = copyArray( unsortedElements );
+		if( currentSorter != null )
 			Arrays.sort( elements, currentSorter );
-		}
-		else {
-			elements = unsortedElements;
-		}
 	}
 	
 	/**
 	 * Set the array of objects the folder should manage.
+	 * Does NOT copy the array.
 	 * 
 	 * @param elements Array of Os.
 	 */
 	public synchronized void setElements( O[] elements )
 	{
 		if (elements.length > 0) {
-			this.unsortedElements = elements;
+			this.elements = elements;
 			if( currentSorter != null )
 				sort();
-			else
-				this.elements = elements;
-		} else
+		} else {
 			this.elements = null;
+		}
 		update();
 	}
 
@@ -198,7 +182,7 @@ public class Folder<O extends Object> {
 	 * 
 	 * @param element to remove
 	 */
-	public synchronized void removeElement(O element) {
+	public void removeElement(O element) {
 		removeElements(Collections.singleton(element));
 	}
 	
@@ -211,19 +195,49 @@ public class Folder<O extends Object> {
 	public synchronized void removeElements(Collection<O> elems) {
 		if (elements != null) {
 			List<O> list = new ArrayList<O>(Arrays.asList(elements));
+			boolean shouldUpdate = false;
 			for (O e : elems) {
-				list.remove(e);
+				if (list.remove(e))
+					shouldUpdate = true;
 			}
-			elements = (O[]) list.toArray(new Object[list.size()]);
+			if (shouldUpdate) {
+				elements = (O[]) list.toArray(new Object[list.size()]);
+				update();  // will still be sorted
+			}
 		}
-		if (unsortedElements != null) {
-			List<O> list = new ArrayList<O>(Arrays.asList(unsortedElements));
+	}
+
+	/**
+	 * Add an element only if it does not already exist
+	 * 
+	 * @param element to add
+	 */
+	public void addElement(O element) {
+		addElements(Collections.singleton(element));
+	}
+	
+	/**
+	 * Add elements only if it they do not already exist
+	 * 
+	 * @param elems to adde
+	 */
+	@SuppressWarnings("unchecked")
+	public synchronized void addElements(Collection<O> elems) {
+		if (elements != null) {
+			List<O> list = new ArrayList<O>(Arrays.asList(elements));
+			boolean shouldUpdate = false;
 			for (O e : elems) {
-				list.remove(e);
+				if (!list.contains(e)) {
+					list.add(e);
+					shouldUpdate = true;
+				}
 			}
-			unsortedElements = (O[]) list.toArray(new Object[list.size()]);
+			if (shouldUpdate) {
+				elements = (O[]) list.toArray(new Object[list.size()]);
+				sort();
+				update();
+			}
 		}
-		update();
 	}
 	
 	/**

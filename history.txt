@@ -2,6 +2,7 @@
  * SusiMail:
    - Queue deletions for a later thread
    - Synch all folder access
+   - Fix fetching of new mail
 
 2014-04-22 zzz
  * SusiMail:
