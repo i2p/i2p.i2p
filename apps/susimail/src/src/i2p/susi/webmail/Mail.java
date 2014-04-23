@@ -223,7 +223,6 @@ class Mail {
 	 * Adds all items from the list
 	 * to the builder, separated by tabs.
 	 * 
-	 * @param text comma-separated
 	 * @param buf out param
 	 * @param prefix prepended to the addresses
 	 */

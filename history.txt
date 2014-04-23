@@ -1,3 +1,8 @@
+2014-04-23 zzz
+ * SusiMail:
+   - Queue deletions for a later thread
+   - Synch all folder access
+
 2014-04-22 zzz
  * SusiMail:
    - Add persistent cache

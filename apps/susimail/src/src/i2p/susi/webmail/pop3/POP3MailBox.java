@@ -36,6 +36,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicLong;
 
 import net.i2p.data.DataHelper;
 
@@ -63,8 +65,10 @@ public class POP3MailBox {
 	private final HashMap<String, Integer> uidlToID;
 
 	private Socket socket;
+	private final AtomicLong lastActive;
 
 	private final Object synchronizer;
+	private final DelayedDeleter delayedDeleter;
 
 	/**
 	 * Does not connect. Caller must call connectToServer() if desired.
@@ -87,6 +91,8 @@ public class POP3MailBox {
 		synchronizer = new Object();
 		// this appears in the UI so translate
 		lastLine = _("No response from server");
+		lastActive = new AtomicLong(System.currentTimeMillis());
+		delayedDeleter = new DelayedDeleter(this);
 	}
 
 	/**
@@ -232,10 +238,12 @@ public class POP3MailBox {
 
 	/**
 	 * Call performDelete() after this or they will come back
+	 * UNUSED
 	 * 
 	 * @param uidl
 	 * @return Success of delete operation: true if successful.
 	 */
+/****
 	public boolean delete( String uidl )
 	{
 		Debug.debug(Debug.DEBUG, "delete(" + uidl + ")");
@@ -253,15 +261,28 @@ public class POP3MailBox {
 			return delete(id);
 		}
 	}
+****/
 
 	/**
-	 * Delete all at once, close and reconnect
-	 * Do NOT call performDelete() after this
-	 * Does not provide any success/failure result
+	 * Queue for later deletion. Non-blocking.
 	 * 
 	 * @since 0.9.13
 	 */
-	public void delete(Collection<String> uidls) {
+	public void queueForDeletion(Collection<String> uidls) {
+		for (String uidl : uidls) {
+			delayedDeleter.queueDelete(uidl);
+		}
+	}
+
+	/**
+	 * Delete all at once and close. Does not reconnect.
+	 * Do NOT call performDelete() after this.
+	 * Returns all UIDLs successfully deleted OR were not known by the server.
+	 * 
+	 * @since 0.9.13
+	 */
+	Collection<String> delete(Collection<String> uidls) {
+		List<String> rv = new ArrayList<String>(uidls.size());
 		List<SendRecv> srs = new ArrayList<SendRecv>(uidls.size() + 1);
 		synchronized( synchronizer ) {
 			try {
@@ -269,26 +290,41 @@ public class POP3MailBox {
 				checkConnection();
 			} catch (IOException ioe) {
 				Debug.debug( Debug.DEBUG, "Error deleting: " + ioe);
-				return;
+				return rv;
 			}
 			for (String uidl : uidls) {
 				int id = getIDfromUIDL(uidl);
-				if (id < 0)
+				if (id < 0) {
+					// presumed already deleted
+					rv.add(uidl);
 					continue;
+				}
 				SendRecv sr = new SendRecv("DELE " + id, Mode.A1);
+				sr.savedObject = uidl;
 				srs.add(sr);
 			}
 			if (srs.isEmpty())
-				return;
+				return rv;
 			// TODO don't quit now, just set timer to quit later
-			SendRecv sr = new SendRecv("QUIT", Mode.A1);
-			srs.add(sr);
+			SendRecv quit = new SendRecv("QUIT", Mode.A1);
+			srs.add(quit);
 			try {
 				sendCmds(srs);
+				// do NOT call close() here, we included QUIT above
 				try {
 					socket.close();
 				} catch (IOException e) {}
 				clear();
+				// result of QUIT
+				boolean success = srs.get(srs.size() - 1).result;
+				if (success) {
+					for (int i = 0; i < srs.size() - 1; i++) {
+						SendRecv sr = srs.get(i);
+						// ignore sr.result, if it failed it's because
+						// it's already deleted
+						rv.add((String) sr.savedObject);
+					}
+				}
 				// why reconnect?
 				//connect();
 			} catch (IOException ioe) {
@@ -296,14 +332,17 @@ public class POP3MailBox {
 				// todo maybe
 			}
 		}
+		return rv;
 	}
 	
 	/**
 	 * delete message on pop3 server
+	 * UNUSED
 	 * 
 	 * @param id message id
 	 * @return Success of delete operation: true if successful.
 	 */
+/****
 	private boolean delete(int id)
 	{
 		Debug.debug(Debug.DEBUG, "delete(" + id + ")");
@@ -320,6 +359,7 @@ public class POP3MailBox {
 		}
 		return result;
 	}
+****/
 
 	/**
 	 * Get cached size of a message (via previous LIST command).
@@ -385,6 +425,24 @@ public class POP3MailBox {
 			if (!isConnected())
 				throw new IOException("Cannot connect");
 		}
+	}
+
+	/**
+	 * Timestamp.
+	 * 
+	 * @since 0.9.13
+	 */
+	private void updateActivity() {
+		lastActive.set(System.currentTimeMillis());
+	}
+
+	/**
+	 * Timestamp.
+	 * 
+	 * @since 0.9.13
+	 */
+	long getLastActivity() {
+		return lastActive.get();
 	}
 
 	/**
@@ -628,6 +686,7 @@ public class POP3MailBox {
 		sendCmd1aNoWait(cmd);
 		socket.getOutputStream().flush();
 		String foo = DataHelper.readLine(socket.getInputStream());
+		updateActivity();
 		// Debug.debug(Debug.DEBUG, "sendCmd1a: read " + read + " bytes");
 		if (foo != null) {
 			lastLine = foo;
@@ -684,6 +743,7 @@ public class POP3MailBox {
 				}
 			}
 			String foo = DataHelper.readLine(in);
+			updateActivity();
 			if (foo == null) {
 				lastError = _("No response from server");
 				throw new IOException(lastError);
@@ -747,6 +807,7 @@ public class POP3MailBox {
 		Debug.debug(Debug.DEBUG, "sendCmd1a(" + msg + ")");
 		cmd += "\r\n";
 		socket.getOutputStream().write(DataHelper.getASCII(cmd));
+		updateActivity();
 	}
 
 	/**
@@ -829,6 +890,7 @@ public class POP3MailBox {
 		StringBuilder buf = new StringBuilder(512);
 		ByteArrayOutputStream baos = new ByteArrayOutputStream(4096);
 		while (DataHelper.readLine(input, buf)) {
+			updateActivity();
 			int len = buf.length();
 			if (len == 0)
 				break; // huh? no \r?
@@ -867,6 +929,7 @@ public class POP3MailBox {
 		long startTime = System.currentTimeMillis();
 		StringBuilder buf = new StringBuilder(512);
 		while (DataHelper.readLine(input, buf)) {
+			updateActivity();
 			int len = buf.length();
 			if (len == 0)
 				break; // huh? no \r?
@@ -918,14 +981,25 @@ public class POP3MailBox {
 	}
 
 	/**
-	 *  Close without waiting for response
+	 *  Close without waiting for response,
+	 *  and remove any delayed tasks and resources.
+	 */
+	public void destroy() {
+		delayedDeleter.cancel();
+		close(false);
+	}
+
+	/**
+	 *  Close without waiting for response.
+	 *  Deletes all queued deletions.
 	 */
 	public void close() {
 		close(false);
 	}
 
 	/**
-	 *  Close and optionally waiting for response
+	 *  Close and optionally wait for response.
+	 *  Deletes all queued deletions.
 	 *  @since 0.9.13
 	 */
 	private void close(boolean shouldWait) {
@@ -933,10 +1007,34 @@ public class POP3MailBox {
 			Debug.debug(Debug.DEBUG, "close()");
 			if (socket != null && socket.isConnected()) {
 				try {
-					if (shouldWait)
-						sendCmd1a("QUIT");
-					else
+					Collection<String> toDelete = delayedDeleter.getQueued();
+					Map<String, Integer> sendDelete = new HashMap<String, Integer>(toDelete.size());
+					for (String uidl : toDelete) {
+						int id = getIDfromUIDL(uidl);
+						if (id >= 0) {
+							sendDelete.put(uidl, Integer.valueOf(id));
+						}
+					}
+					if (shouldWait) {
+						if (!sendDelete.isEmpty()) {
+							// Verify deleted, remove from the delete queue
+							// this does the quit and close
+							Collection<String> deleted = delete(sendDelete.keySet());
+							for (String uidl : deleted) {
+								delayedDeleter.removeQueued(uidl);
+							}
+						} else {
+							sendCmd1a("QUIT");
+						}
+					} else {
+						if (!sendDelete.isEmpty()) {
+							// spray and pray the deletions, don't remove from delete queue
+							for (Integer id : sendDelete.values()) {
+								sendCmd1aNoWait("DELE " + id);
+							}
+						}
 						sendCmd1aNoWait("QUIT");
+					}
 					socket.close();
 				} catch (IOException e) {}
 			}
@@ -1012,7 +1110,9 @@ public class POP3MailBox {
 
 	/**
 	 *  Close and reconnect. Takes a while.
+	 *  UNUSED
 	 */
+/****
 	public void performDelete()
 	{
 		synchronized( synchronizer ) {
@@ -1021,7 +1121,9 @@ public class POP3MailBox {
 			//connect();
 		}
 	}
+****/
 
+	/** for SendRecv */
 	private enum Mode {
 		/** no extra lines (sendCmd1a) */
 		A1,

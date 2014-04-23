@@ -261,7 +261,7 @@ class MailCache {
 		}
 		if (toDelete.isEmpty())
 			return;
-		mailbox.delete(toDelete);
+		mailbox.queueForDeletion(toDelete);
 	}
 
 	/**

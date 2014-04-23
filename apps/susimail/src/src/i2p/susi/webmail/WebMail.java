@@ -886,7 +886,7 @@ public class WebMail extends HttpServlet
 					/*
 					 * extract original sender from Reply-To: or From:
 					 */
-					MailPart part = mail.getPart();
+					MailPart part = mail != null ? mail.getPart() : null;
 					if (part != null) {
 						if( reply || replyAll ) {
 							if( mail.reply != null && Mail.validateAddress( mail.reply ) )
@@ -1173,7 +1173,7 @@ public class WebMail extends HttpServlet
 			try {
 				int hashCode = Integer.parseInt( str );
 				Mail mail = sessionObject.mailCache.getMail( sessionObject.showUIDL, MailCache.FETCH_ALL );
-				MailPart part = getMailPartFromHashCode( mail.getPart(), hashCode );
+				MailPart part = mail != null ? getMailPartFromHashCode( mail.getPart(), hashCode ) : null;
 				if( part != null )
 					sessionObject.showAttachment = part;
 			}
@@ -1910,6 +1910,8 @@ public class WebMail extends HttpServlet
 		for( Iterator<String> it = sessionObject.folder.currentPageIterator(); it != null && it.hasNext(); ) {
 			String uidl = it.next();
 			Mail mail = sessionObject.mailCache.getMail( uidl, MailCache.FETCH_HEADER );
+			if (mail == null)
+				continue;
 			String link = "<a href=\"" + myself + "?" + SHOW + "=" + i + "\">";
 			
 			boolean idChecked = false;

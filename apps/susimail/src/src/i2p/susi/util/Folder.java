@@ -42,7 +42,7 @@ import java.util.List;
  * and then fetch the content of the current page with
  * currentPageIterator().
  * 
- * Warning - unsynchronized - not thread safe
+ * All public methods are synchronized.
  * 
  * @author susi
  */
@@ -77,7 +77,7 @@ public class Folder<O extends Object> {
 	 * 
 	 * @return Returns the current page.
 	 */
-	public int getCurrentPage() {
+	public synchronized int getCurrentPage() {
 		return currentPage;
 	}
 
@@ -86,7 +86,7 @@ public class Folder<O extends Object> {
 	 * 
 	 * @param currentPage The current page to set.
 	 */
-	public void setCurrentPage(int currentPage) {
+	public synchronized void setCurrentPage(int currentPage) {
 		if( currentPage >= 1 && currentPage <= pages )
 			this.currentPage = currentPage;
 	}
@@ -96,7 +96,7 @@ public class Folder<O extends Object> {
 	 * 
 	 * @return Returns the size of the folder.
 	 */
-	public int getSize() {
+	public synchronized int getSize() {
 		return elements != null ? elements.length : 0;
 	}
 
@@ -104,7 +104,7 @@ public class Folder<O extends Object> {
 	 * Returns the number of pages in the folder.
 	 * @return Returns the number of pages.
 	 */
-	public int getPages() {
+	public synchronized int getPages() {
 		return pages;
 	}
 
@@ -114,7 +114,7 @@ public class Folder<O extends Object> {
 	 * 
 	 * @return Returns the pageSize.
 	 */
-	public int getPageSize() {
+	public synchronized int getPageSize() {
 		return pageSize > 0 ? pageSize : Config.getProperty( PAGESIZE, DEFAULT_PAGESIZE );
 	}
 
@@ -123,7 +123,7 @@ public class Folder<O extends Object> {
 	 * 
 	 * @param pageSize The page size to set.
 	 */
-	public void setPageSize(int pageSize) {
+	public synchronized void setPageSize(int pageSize) {
 		if( pageSize > 0 )
 			this.pageSize = pageSize;
 		update();
@@ -180,7 +180,7 @@ public class Folder<O extends Object> {
 	 * 
 	 * @param elements Array of Os.
 	 */
-	public void setElements( O[] elements )
+	public synchronized void setElements( O[] elements )
 	{
 		if (elements.length > 0) {
 			this.unsortedElements = elements;
@@ -198,17 +198,17 @@ public class Folder<O extends Object> {
 	 * 
 	 * @param element to remove
 	 */
-	public void removeElement(O element) {
+	public synchronized void removeElement(O element) {
 		removeElements(Collections.singleton(element));
 	}
 	
 	/**
 	 * Remove elements
 	 * 
-	 * @param elements to remove
+	 * @param elems to remove
 	 */
 	@SuppressWarnings("unchecked")
-	public void removeElements(Collection<O> elems) {
+	public synchronized void removeElements(Collection<O> elems) {
 		if (elements != null) {
 			List<O> list = new ArrayList<O>(Arrays.asList(elements));
 			for (O e : elems) {
@@ -228,9 +228,14 @@ public class Folder<O extends Object> {
 	
 	/**
 	 * Returns an iterator containing the elements on the current page.
+         * This iterator is over a copy of the current page, and so
+         * is thread safe w.r.t. other operations on this folder,
+         * but will not reflect subsequent changes, and iter.remove()
+         * will not change the folder.
+         *
 	 * @return Iterator containing the elements on the current page.
 	 */
-	public Iterator<O> currentPageIterator()
+	public synchronized Iterator<O> currentPageIterator()
 	{
 		ArrayList<O> list = new ArrayList<O>();
 		if( elements != null ) {
@@ -247,7 +252,7 @@ public class Folder<O extends Object> {
 	/**
 	 * Turns folder to next page.
 	 */
-	public void nextPage()
+	public synchronized void nextPage()
 	{
 		currentPage++;
 		if( currentPage > pages )
@@ -257,7 +262,7 @@ public class Folder<O extends Object> {
 	/**
 	 * Turns folder to previous page.
 	 */
-	public void previousPage()
+	public synchronized void previousPage()
 	{
 		currentPage--;
 		if( currentPage < 1 )
@@ -267,7 +272,7 @@ public class Folder<O extends Object> {
 	/**
 	 * Sets folder to display first page.
 	 */
-	public void firstPage()
+	public synchronized void firstPage()
 	{
 		currentPage = 1;
 	}
@@ -275,7 +280,7 @@ public class Folder<O extends Object> {
 	/**
 	 * Sets folder to display last page.
 	 */
-	public void lastPage()
+	public synchronized void lastPage()
 	{
 		currentPage = pages;
 	}
@@ -287,7 +292,7 @@ public class Folder<O extends Object> {
 	 * @param id ID to identify the Comparator with @link sortBy()
 	 * @param sorter a Comparator to sort the Array given by @link setElements()
 	 */
-	public void addSorter( String id, Comparator<O> sorter )
+	public synchronized void addSorter( String id, Comparator<O> sorter )
 	{
 		this.sorter.put( id, sorter );
 	}
@@ -299,7 +304,7 @@ public class Folder<O extends Object> {
 	 * 
 	 * @param id ID to identify the Comparator stored with @link addSorter()
 	 */
-	public void sortBy( String id )
+	public synchronized void sortBy( String id )
 	{
 		currentSorter = sorter.get( id );
 		if (sortingDirection == SortOrder.UP)
@@ -313,7 +318,7 @@ public class Folder<O extends Object> {
 	 * @param x Position of the element on the current page.
 	 * @return Element on the current page on the given position.
 	 */
-	public O getElementAtPosXonCurrentPage( int x )
+	public synchronized O getElementAtPosXonCurrentPage( int x )
 	{
 		O result = null;
 		if( elements != null ) {
@@ -332,7 +337,7 @@ public class Folder<O extends Object> {
 	 * 
 	 * @param direction @link UP or @link DOWN
 	 */
-	public void setSortingDirection(SortOrder direction)
+	public synchronized void setSortingDirection(SortOrder direction)
 	{
 		sortingDirection = direction;
 	}
@@ -342,7 +347,7 @@ public class Folder<O extends Object> {
 	 * 
 	 * @return First element.
 	 */
-	public O getFirstElement()
+	public synchronized O getFirstElement()
 	{
 		return elements == null ? null : getElement( 0 );
 	}
@@ -352,7 +357,7 @@ public class Folder<O extends Object> {
 	 * 
 	 * @return Last element.
 	 */
-	public O getLastElement()
+	public synchronized O getLastElement()
 	{
 		return elements == null ? null : getElement(  elements.length - 1 );
 	}
@@ -379,7 +384,7 @@ public class Folder<O extends Object> {
 	 * @param element
 	 * @return The next element
 	 */
-	public O getNextElement( O element )
+	public synchronized O getNextElement( O element )
 	{
 		O result = null;
 		
@@ -399,7 +404,7 @@ public class Folder<O extends Object> {
 	 * @param element
 	 * @return The previous element
 	 */
-	public O getPreviousElement( O element )
+	public synchronized O getPreviousElement( O element )
 	{
 		O result = null;
 		
@@ -431,7 +436,7 @@ public class Folder<O extends Object> {
 	/**
 	 * Returns true, if folder shows points to the last page.
 	 */
-	public boolean isLastPage()
+	public synchronized boolean isLastPage()
 	{
 		return currentPage == pages;
 	}
@@ -439,7 +444,7 @@ public class Folder<O extends Object> {
 	/**
 	 * Returns true, if folder shows points to the first page.
 	 */
-	public boolean isFirstPage()
+	public synchronized boolean isFirstPage()
 	{
 		return currentPage == 1;
 	}
@@ -449,7 +454,7 @@ public class Folder<O extends Object> {
 	 * 
 	 * @param element
 	 */
-	public boolean isLastElement( O element )
+	public synchronized boolean isLastElement( O element )
 	{
 		if( elements == null )
 			return false;
@@ -461,7 +466,7 @@ public class Folder<O extends Object> {
 	 * 
 	 * @param element
 	 */
-	public boolean isFirstElement( O element )
+	public synchronized boolean isFirstElement( O element )
 	{
 		if( elements == null )
 			return false;
