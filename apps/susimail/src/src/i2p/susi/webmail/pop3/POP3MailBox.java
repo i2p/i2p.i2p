@@ -25,6 +25,9 @@ package i2p.susi.webmail.pop3;
 
 import i2p.susi.debug.Debug;
 import i2p.susi.webmail.Messages;
+import i2p.susi.webmail.NewMailListener;
+import i2p.susi.webmail.WebMail;
+import i2p.susi.util.Config;
 import i2p.susi.util.ReadBuffer;
 
 import java.io.ByteArrayOutputStream;
@@ -44,7 +47,7 @@ import net.i2p.data.DataHelper;
 /**
  * @author susi23
  */
-public class POP3MailBox {
+public class POP3MailBox implements NewMailListener {
 
 	private final String host, user, pass;
 
@@ -70,6 +73,11 @@ public class POP3MailBox {
 
 	private final Object synchronizer;
 	private final DelayedDeleter delayedDeleter;
+	// instantiated after first successful connection
+	private BackgroundChecker backgroundChecker;
+	// instantiated after every successful connection
+	private IdleCloser idleCloser;
+	private volatile NewMailListener newMailListener;
 
 	/**
 	 * Does not connect. Caller must call connectToServer() if desired.
@@ -109,7 +117,7 @@ public class POP3MailBox {
 				// we must be connected to know the UIDL to ID mapping
 				checkConnection();
 			} catch (IOException ioe) {
-				Debug.debug( Debug.DEBUG, "Error fetching: " + ioe);
+				Debug.debug( Debug.DEBUG, "Error fetching header: " + ioe);
 				return null;
 			}
 			int id = getIDfromUIDL(uidl);
@@ -161,7 +169,7 @@ public class POP3MailBox {
 				// we must be connected to know the UIDL to ID mapping
 				checkConnection();
 			} catch (IOException ioe) {
-				Debug.debug( Debug.DEBUG, "Error fetching: " + ioe);
+				Debug.debug( Debug.DEBUG, "Error fetching body: " + ioe);
 				return null;
 			}
 			int id = getIDfromUIDL(uidl);
@@ -205,6 +213,7 @@ public class POP3MailBox {
 			try {
 				sendCmds(srs);
 			} catch (IOException ioe) {
+				Debug.debug( Debug.DEBUG, "Error fetching bodies: " + ioe);
 				// todo maybe
 			}
 		}
@@ -602,6 +611,7 @@ public class POP3MailBox {
 			lastError = e.toString();
 			return;
 		} catch (IOException e) {
+			Debug.debug( Debug.DEBUG, "Error connecting: " + e);
 			lastError = e.toString();
 			return;
 		}
@@ -609,12 +619,14 @@ public class POP3MailBox {
 			try {
 				// pipeline 2 commands
 				lastError = "";
+				socket.setSoTimeout(120*1000);
 				boolean ok = doHandshake();
 				if (ok) {
 					// TODO APOP (unsupported by postman)
 					List<SendRecv> cmds = new ArrayList<SendRecv>(4);
 					cmds.add(new SendRecv("USER " + user, Mode.A1));
 					cmds.add(new SendRecv("PASS " + pass, Mode.A1));
+					socket.setSoTimeout(60*1000);
 					ok =  sendCmds(cmds);
 				}
 				if (ok) {
@@ -627,7 +639,8 @@ public class POP3MailBox {
 					SendRecv list = new SendRecv("LIST", Mode.LS);
 					cmds.add(list);
 					// check individual responses
-					sendCmds(cmds);
+					socket.setSoTimeout(120*1000);
+					ok = sendCmds(cmds);
 					if (stat.result)
 						updateMailCount(stat.response);
 					else
@@ -640,6 +653,12 @@ public class POP3MailBox {
 						updateSizes(list.ls);
 					else
 						Debug.debug(Debug.DEBUG, "LIST failed");
+					socket.setSoTimeout(300*1000);
+					if (ok && backgroundChecker == null &&
+						Boolean.parseBoolean(Config.getProperty(WebMail.CONFIG_BACKGROUND_CHECK)))
+						backgroundChecker = new BackgroundChecker(this);
+					if (ok && idleCloser == null)
+						idleCloser = new IdleCloser(this);
 				} else {
 					if (lastError.equals(""))
 						lastError = _("Error connecting to server");
@@ -790,6 +809,7 @@ public class POP3MailBox {
 						sr.rb = getResultNa();
 						sr.result = true;
 					} catch (IOException ioe) {
+						Debug.debug( Debug.DEBUG, "Error getting RB: " + ioe);
 						result = false;
 						sr.result = false;
 					}
@@ -800,6 +820,7 @@ public class POP3MailBox {
 						sr.ls = getResultNl();
 						sr.result = true;
 					} catch (IOException ioe) {
+						Debug.debug( Debug.DEBUG, "Error getting LS: " + ioe);
 						result = false;
 						sr.result = false;
 					}
@@ -975,7 +996,6 @@ public class POP3MailBox {
 	 * Warning - forces a connection.
 	 *
 	 * @return The amount of e-mails available.
-	 * @deprecated unused
 	 */
 	public int getNumMails() {
 		synchronized( synchronizer ) {
@@ -1002,13 +1022,58 @@ public class POP3MailBox {
 		return e;
 	}
 
+
+	/**
+	 *  Relay from the checker to the webmail session object,
+	 *  which relays to MailCache, which will fetch the mail from us
+	 *  in a big circle
+	 *
+	 *  @since 0.9.13
+	 */
+	public void setNewMailListener(NewMailListener nml) {
+		newMailListener = nml;
+	}
+
+	/**
+	 *  Relay from the checker to the webmail session object,
+	 *  which relays to MailCache, which will fetch the mail from us
+	 *  in a big circle
+	 *
+	 *  @since 0.9.13
+	 */
+	public void foundNewMail() {
+		NewMailListener  nml = newMailListener;
+		if (nml != null)
+			nml.foundNewMail();
+	}
+
 	/**
 	 *  Close without waiting for response,
 	 *  and remove any delayed tasks and resources.
 	 */
 	public void destroy() {
 		delayedDeleter.cancel();
-		close(false);
+		synchronized( synchronizer ) {
+			if (backgroundChecker != null)
+				backgroundChecker.cancel();
+			close(false);
+		}
+	}
+
+	/**
+	 *  For helper threads to lock
+	 *  @since 0.9.13
+	 */
+	Object getLock() {
+		return synchronizer;
+	}
+
+	/**
+	 *  Do we have UIDLs to delete?
+	 *  @since 0.9.13
+	 */
+	boolean hasQueuedDeletions() {
+		return !delayedDeleter.getQueued().isEmpty();
 	}
 
 	/**
@@ -1024,9 +1089,11 @@ public class POP3MailBox {
 	 *  Deletes all queued deletions.
 	 *  @since 0.9.13
 	 */
-	private void close(boolean shouldWait) {
+	void close(boolean shouldWait) {
 		synchronized( synchronizer ) {
 			Debug.debug(Debug.DEBUG, "close()");
+			if (idleCloser != null)
+				idleCloser.cancel();
 			if (socket != null && socket.isConnected()) {
 				try {
 					Collection<String> toDelete = delayedDeleter.getQueued();
@@ -1058,7 +1125,9 @@ public class POP3MailBox {
 						sendCmd1aNoWait("QUIT");
 					}
 					socket.close();
-				} catch (IOException e) {}
+				} catch (IOException e) {
+					Debug.debug( Debug.DEBUG, "error closing: " + e);
+				}
 			}
 			socket = null;
 			connected = false;

@@ -1,3 +1,13 @@
+2014-04-24 zzz
+ * SusiMail:
+   - Add background mail checker
+   - Add idle timeout connection closer
+   - Rely on idle checker for most delayed deletions
+   - Cleanup resources better when shutting down session
+   - Don't add deleted mails to folder
+   - Set socket soTimeouts
+   - Display errors after check mail button pushed
+
 2014-04-23 zzz
  * SusiMail:
    - Queue deletions for a later thread

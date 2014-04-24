@@ -219,6 +219,7 @@ public class SMTPClient {
 			// Pipelining ref: RFC 2920
 			// AUTH ref: RFC 4954
 			if (ok) {
+				socket.setSoTimeout(120*1000);
 				int result = sendCmd(null);
 				if (result != 220) {
 					error += _("Server refused connection") + " (" + result +  ")<br>";
@@ -228,6 +229,7 @@ public class SMTPClient {
 			if (ok) {
 				sendCmdNoWait( "EHLO localhost" );
 				socket.getOutputStream().flush();
+				socket.setSoTimeout(60*1000);
 				Result r = getFullResult();
 				if (r.result == 250) {
 					supportsPipelining = r.recv.contains("PIPELINING");
@@ -266,6 +268,7 @@ public class SMTPClient {
 					body = body.replace( "\r\n.\r\n", "\r\n..\r\n" );
 				socket.getOutputStream().write(DataHelper.getUTF8(body));
 				socket.getOutputStream().write(DataHelper.getASCII("\r\n.\r\n"));
+				socket.setSoTimeout(0);
 				int result = sendCmd(null);
 				if (result == 250)
 					mailSent = true;

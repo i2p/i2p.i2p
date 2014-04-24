@@ -14,7 +14,10 @@ import net.i2p.util.SimpleTimer2;
 
 
 /**
- *  Queue UIDLs for later deletion
+ *  Queue UIDLs for later deletion.
+ *  We send deletions at close time but we don't wait around
+ *  for the answer. Also, the user may delete mails when offline.
+ *  So we queue them here and reconnect to delete.
  *
  *  @since 0.9.13
  */
@@ -26,8 +29,8 @@ class DelayedDeleter {
 	private volatile boolean isDeleting;
 	private volatile boolean isDead;
 
-	private final long CHECK_TIME = 5*60*1000;
-	private final long MIN_IDLE = 5*60*1000;
+	private static final long CHECK_TIME = 16*60*1000;
+	private static final long MIN_IDLE = 60*60*1000;
 
 	public DelayedDeleter(POP3MailBox mailbox) {
 		this.mailbox = mailbox;

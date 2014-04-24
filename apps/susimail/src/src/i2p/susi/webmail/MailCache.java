@@ -86,13 +86,17 @@ class MailCache {
 
 	/**
 	 * The ones known locally, which will include any known on the server, if connected.
+	 * Will not include any marked for deletion.
 	 * 
 	 * @since 0.9.13
 	 */
 	public String[] getUIDLs() {
 		List<String> uidls = new ArrayList<String>(mails.size());
 		synchronized(mails) {
-			uidls.addAll(mails.keySet());
+			for (Mail mail : mails.values()) {
+				if (!mail.markForDeletion)
+					uidls.add(mail.uidl);
+			}
 		}
 		return uidls.toArray(new String[uidls.size()]);
 	}

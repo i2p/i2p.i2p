@@ -64,6 +64,7 @@ class PersistentMailCache {
 	 */
 	public PersistentMailCache(String host, int port, String user, String pass) throws IOException {
 		_cacheDir = makeCacheDirs(host, port, user, pass);
+		// TODO static locking
 	}
 
 	/**

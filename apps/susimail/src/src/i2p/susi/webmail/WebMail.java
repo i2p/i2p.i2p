@@ -175,6 +175,9 @@ public class WebMail extends HttpServlet
 
 	private static final String CONFIG_BCC_TO_SELF = "composer.bcc.to.self";
 	static final String CONFIG_LEAVE_ON_SERVER = "pop3.leave.on.server";
+	public static final String CONFIG_BACKGROUND_CHECK = "pop3.check.enable";
+	public static final String CONFIG_CHECK_MINUTES = "pop3.check.interval.minutes";
+	public static final String CONFIG_IDLE_SECONDS = "pop3.idle.timeout.seconds";
 	private static final String CONFIG_DEBUG = "debug";
 
 	private static final String RC_PROP_THEME = "routerconsole.theme";
@@ -346,7 +349,7 @@ public class WebMail extends HttpServlet
 	 * data structure to hold any persistent data (to store them in session dictionary)
 	 * @author susi
 	 */
-	private static class SessionObject implements HttpSessionBindingListener {
+	private static class SessionObject implements HttpSessionBindingListener, NewMailListener {
 		boolean pageChanged, markAll, clear, invert;
 		int state, smtpPort;
 		POP3MailBox mailbox;
@@ -380,8 +383,26 @@ public class WebMail extends HttpServlet
 			Debug.debug(Debug.DEBUG, "Session unbound: " + event.getSession().getId());
 			POP3MailBox mbox = mailbox;
 			if (mbox != null) {
-				mbox.close();
+				mbox.destroy();
 				mailbox = null;
+			}
+		}
+
+		/**
+		 *  Relay from the checker to the webmail session object,
+		 *  which relays to MailCache, which will fetch the mail from us
+		 *  in a big circle
+		 *
+		 *  @since 0.9.13
+		 */
+		public void foundNewMail() {
+			MailCache mc = mailCache;
+			Folder<String> f = folder;
+			if (mc != null && f != null) {
+				if (mc.getMail(true)) {
+					String[] uidls = mc.getUIDLs();
+					f.setElements(uidls);
+				}
 			}
 		}
 	}
@@ -517,7 +538,9 @@ public class WebMail extends HttpServlet
 					String charset = mailPart.charset;
 					if( charset == null ) {
 						charset = "US-ASCII";
-						reason += _("Warning: no charset found, fallback to US-ASCII.") + br;
+						// don't show this in text mode which is used to include the mail in the reply or forward
+						if (html)
+							reason += _("Warning: no charset found, fallback to US-ASCII.") + br;
 					}
 					try {
 						ReadBuffer decoded = mailPart.decode(0);
@@ -698,11 +721,17 @@ public class WebMail extends HttpServlet
 							Debug.debug(Debug.DEBUG, "OFFLINE MODE");
 						else
 							Debug.debug(Debug.DEBUG, "CONNECTED, YAY");
-					}
-					else {
+						// we do this after the initial priming above
+						mailbox.setNewMailListener(sessionObject);
+					} else {
 						sessionObject.error += mailbox.lastError();
-						mailbox.close();
+						Debug.debug(Debug.DEBUG, "LOGIN FAIL, REMOVING SESSION");
+						HttpSession session = request.getSession();
+						session.removeAttribute( "sessionObject" );
+						session.invalidate();
+						mailbox.destroy();
 						sessionObject.mailbox = null;
+						sessionObject.mailCache = null;
 						Debug.debug(Debug.DEBUG, "NOT CONNECTED, BOO");
 					}
 				}
@@ -718,14 +747,15 @@ public class WebMail extends HttpServlet
 	private static void processLogout( SessionObject sessionObject, RequestWrapper request )
 	{
 		if( buttonPressed( request, LOGOUT ) ) {
-			Debug.debug(Debug.DEBUG, "REMOVING SESSION");
+			Debug.debug(Debug.DEBUG, "LOGOUT, REMOVING SESSION");
 			HttpSession session = request.getSession();
 			session.removeAttribute( "sessionObject" );
 			session.invalidate();
 			POP3MailBox mailbox = sessionObject.mailbox;
 			if (mailbox != null) {
-				mailbox.close();
+				mailbox.destroy();
 				sessionObject.mailbox = null;
+				sessionObject.mailCache = null;
 			}
 			sessionObject.info += _("User logged out.") + "<br>";
 			sessionObject.state = STATE_AUTH;
@@ -1008,6 +1038,7 @@ public class WebMail extends HttpServlet
 		}
 		if( buttonPressed( request, REFRESH ) ) {
 			sessionObject.mailbox.refresh();
+			sessionObject.error += sessionObject.mailbox.lastError();
 			sessionObject.mailCache.getMail(true);
 			// get through cache so we have the disk-only ones too
 			String[] uidls = sessionObject.mailCache.getUIDLs();
