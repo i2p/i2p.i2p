@@ -69,6 +69,7 @@ class Mail {
 	private ReadBuffer header, body;
 	private MailPart part;
 	String[] to, cc;        // addresses only, enclosed by <>
+	private boolean isNew, isSpam;
 
 	public String error;
 
@@ -139,6 +140,18 @@ class Mail {
 		if (body != null)
 			return;
 		this.size = size;
+	}
+
+	public boolean isSpam() {
+		return isSpam;
+	}
+
+	public boolean isNew() {
+		return isNew;
+	}
+
+	public void setNew(boolean isNew) {
+		this.isNew = isNew;
 	}
 
 	/**
@@ -332,6 +345,9 @@ class Mail {
 							ArrayList<String> list = new ArrayList<String>();
 							getRecipientsFromList( list, line.substring( 3 ).trim(), true );
 							cc = list.toArray(new String[list.size()]);
+						} else if(line.equals( "X-Spam-Flag: YES" )) {
+							// TODO trust.spam.headers config
+							isSpam = true;
 						}
 					}
 				}

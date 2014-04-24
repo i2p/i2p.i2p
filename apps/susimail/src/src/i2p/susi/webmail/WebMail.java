@@ -1916,9 +1916,18 @@ public class WebMail extends HttpServlet
 		for( Iterator<String> it = sessionObject.folder.currentPageIterator(); it != null && it.hasNext(); ) {
 			String uidl = it.next();
 			Mail mail = sessionObject.mailCache.getMail( uidl, MailCache.FETCH_HEADER );
-			if (mail == null)
+			if (mail == null) {
+				i++;
 				continue;
-			String link = "<a href=\"" + myself + "?" + SHOW + "=" + i + "\">";
+			}
+			String type;
+			if (mail.isSpam())
+				type = "linkspam";
+			else if (mail.isNew())
+				type = "linknew";
+			else
+				type = "linkold";
+			String link = "<a href=\"" + myself + "?" + SHOW + "=" + i + "\" class=\"" + type + "\">";
 			
 			boolean idChecked = false;
 			String checkId = sessionObject.pageChanged ? null : request.getParameter( "check" + i );
@@ -2001,6 +2010,7 @@ public class WebMail extends HttpServlet
 					":</td><td align=\"left\">" + mail.quotedDate + "</td></tr>\n" +
 					"<tr><td colspan=\"2\" align=\"center\"><hr></td></tr>" );
 			if( mail.hasPart()) {
+				mail.setNew(false);
 				showPart( out, mail.getPart(), 0, SHOW_HTML );
 			}
 			else {

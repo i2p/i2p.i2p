@@ -227,6 +227,8 @@ class MailCache {
 				ReadBuffer rb = pr.buf;
 				if (rb != null) {
 					Mail mail = pr.mail;
+					if (!mail.hasHeader())
+						mail.setNew(true);
 					if (pr.getHeaderOnly()) {
 						mail.setHeader(rb);
 					} else {

@@ -87,6 +87,18 @@ a {
      font-weight: bold;
 }
 
+a.linkspam {
+     color:#927B40;
+}
+
+a.linknew {
+     color:#327B40;
+}
+
+a.linkold {
+     color:#327BBF;
+}
+
 a:hover {
      text-decoration:underline;
 }
