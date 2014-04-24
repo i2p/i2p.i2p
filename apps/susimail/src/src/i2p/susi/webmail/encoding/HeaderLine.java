@@ -28,6 +28,7 @@ import i2p.susi.util.HexTable;
 import i2p.susi.util.ReadBuffer;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Locale;
@@ -150,17 +151,19 @@ public class HeaderLine implements Encoding {
 		}
 		return out.toString();
 	}
+
 	/* (non-Javadoc)
 	 * @see i2p.susi.webmail.encoding.Encoding#decode(java.lang.String)
 	 */
 	public ReadBuffer decode( byte in[] ) throws DecodingException {
 		return decode( in, 0, in.length );
 	}
+
 	/* (non-Javadoc)
 	 * @see i2p.susi.webmail.encoding.Encoding#decode(java.lang.String)
 	 */
 	public ReadBuffer decode( byte in[], int offset, int length ) throws DecodingException {
-		byte[] out = new byte[length];
+		ByteArrayOutputStream out = new ByteArrayOutputStream(4096);
 		int written = 0;
 		int end = offset + length;
 		if( end > in.length )
@@ -212,7 +215,7 @@ public class HeaderLine implements Encoding {
 												if (clc.equals("utf-8") || clc.equals("utf8")) {
 													for( int j = 0; j < tmp.length; j++ ) {
 														byte d = tmp.content[ tmp.offset + j ];
-														out[written++] = ( d == '_' ? 32 : d );
+														out.write( d == '_' ? 32 : d );
 													}
 												} else {
 													// decode string
@@ -221,7 +224,7 @@ public class HeaderLine implements Encoding {
 													byte[] utf8 = DataHelper.getUTF8(decoded);
 													for( int j = 0; j < utf8.length; j++ ) {
 														byte d = utf8[j];
-														out[written++] = ( d == '_' ? 32 : d );
+														out.write( d == '_' ? 32 : d );
 													}
 												}
 												int distance = f4 + 2 - offset;
@@ -246,6 +249,11 @@ public class HeaderLine implements Encoding {
 					 * delay linebreak in case of long line
 					 */
 					linebreak = true;
+					// The ReadBuffer can contain the body too.
+					// If we just had a linebreak, we are done...
+					// don't keep parsing!
+					if( length > 2 && in[offset+1] == '\r' && in[offset+2] == '\n')
+						break;
 					length--;
 					offset++;
 					continue;
@@ -258,13 +266,13 @@ public class HeaderLine implements Encoding {
 					 * new line does not start with whitespace, so its not a new part of a
 					 * long line
 					 */
-					out[written++] = '\r';
-					out[written++] = '\n';
+					out.write('\r');
+					out.write('\n');
 					lastSkip = 0;
 				}
 				else {
 					if( !lastCharWasQuoted )
-						out[written++] = ' ';
+						out.write(' ');
 					/*
 					 * skip whitespace
 					 */
@@ -286,16 +294,15 @@ public class HeaderLine implements Encoding {
 			/*
 			 * print out everything else literally
 			 */
-			out[written++] = c;
+			out.write(c);
 			lastCharWasQuoted = false;
 		}
 		if( linebreak ) {
-			out[written++] = '\r';
-			out[written++] = '\n';
-			lastSkip = 0;
+			out.write('\r');
+			out.write('\n');
 		}
 			
-		return new ReadBuffer(out, 0, written);
+		return new ReadBuffer(out.toByteArray(), 0, out.size());
 	}
 
 	public ReadBuffer decode(String text) throws DecodingException {
