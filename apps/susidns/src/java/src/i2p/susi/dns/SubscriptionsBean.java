@@ -41,7 +41,7 @@ import net.i2p.util.SecureFileOutputStream;
 public class SubscriptionsBean extends BaseBean
 {
 	private String fileName, content;
-	private static final String SUBS_FILE = "config.txt";
+	private static final String SUBS_FILE = "subscriptions.txt";
 	
 	public String getFileName()
 	{
