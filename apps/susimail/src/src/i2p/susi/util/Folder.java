@@ -29,9 +29,10 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Folder object manages a array Object[] to support
@@ -60,15 +61,16 @@ public class Folder<O extends Object> {
 
 	private int pages, pageSize, currentPage;
 	private O[] elements;
-	private final Hashtable<String, Comparator<O>> sorter;
+	private final Map<String, Comparator<O>> sorter;
 	private SortOrder sortingDirection;
-	Comparator<O> currentSorter;
+	private Comparator<O> currentSorter;
+	private String currentSortID;
 	
 	public Folder()
 	{
 		pages = 1;
 		currentPage = 1;
-		sorter = new Hashtable<String, Comparator<O>>();
+		sorter = new HashMap<String, Comparator<O>>();
 		sortingDirection = SortOrder.DOWN;
 	}
 	
@@ -321,9 +323,27 @@ public class Folder<O extends Object> {
 	public synchronized void sortBy( String id )
 	{
 		currentSorter = sorter.get( id );
-		if (sortingDirection == SortOrder.UP)
-			currentSorter = Collections.reverseOrder(currentSorter);
-		sort();
+		if (currentSorter != null) {
+			if (sortingDirection == SortOrder.UP)
+				currentSorter = Collections.reverseOrder(currentSorter);
+				currentSortID = id;
+		} else {
+			currentSortID = null;
+		}
+	}
+	
+	/**
+	 * @since 0.9.13
+	 */
+	public synchronized String getCurrentSortBy() {
+		return currentSortID;
+	}
+	
+	/**
+	 * @since 0.9.13
+	 */
+	public synchronized SortOrder getCurrentSortingDirection() {
+		return sortingDirection;
 	}
 	
 	/**

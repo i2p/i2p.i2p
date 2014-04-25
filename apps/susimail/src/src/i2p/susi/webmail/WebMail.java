@@ -252,7 +252,10 @@ public class WebMail extends HttpServlet
 				return -1;
 			String as = a.sender.replace("\"", "").replace("<", "").replace(">", "");
 			String bs = b.sender.replace("\"", "").replace("<", "").replace(">", "");
-			return collator.compare(as, bs);
+			int rv = collator.compare(as, bs);
+			if (rv != 0)
+				return rv;
+			return DateSorter.compare(a, b);
 		}		
 	}
 
@@ -283,7 +286,16 @@ public class WebMail extends HttpServlet
 				return (b == null) ? 0 : 1;
 			if (b == null)
 				return -1;
-			return collator.compare(a.formattedSubject, b.formattedSubject);
+			String as = a.formattedSubject;
+			String bs = b.formattedSubject;
+			if (as.startsWith("Re:"))
+				as = as.substring(3).trim();
+			if (bs.startsWith("Re:"))
+				bs = bs.substring(3).trim();
+			int rv = collator.compare(as, bs);
+			if (rv != 0)
+				return rv;
+			return DateSorter.compare(a, b);
 		}		
 	}
 
@@ -313,6 +325,15 @@ public class WebMail extends HttpServlet
 				return (b == null) ? 0 : 1;
 			if (b == null)
 				return -1;
+			return compare(a, b);
+		}
+
+		/**
+		 * Use as fallback in other sorters
+		 * @param a non-null
+		 * @param b non-null
+		 */
+		public static int compare(Mail a, Mail b) {
 			return a.date != null ? ( b.date != null ? a.date.compareTo( b.date ) : -1 ) : ( b.date != null ? 1 : 0 );
 		}		
 	}
@@ -342,7 +363,10 @@ public class WebMail extends HttpServlet
 				return (b == null) ? 0 : 1;
 			if (b == null)
 				return -1;
-			return a.getSize() - b.getSize();
+			int rv = a.getSize() - b.getSize();
+			if (rv != 0)
+				return rv;
+			return DateSorter.compare(a, b);
 		}		
 	}
 	
@@ -436,6 +460,7 @@ public class WebMail extends HttpServlet
 	{
 		return "<input type=\"submit\" name=\"" + name + "\" value=\"" + label + "\" disabled>";
 	}
+
 	/**
 	 * returns a html string of the label and two imaged links using the parameter name
 	 * (used for sorting buttons in folder view)
@@ -444,12 +469,27 @@ public class WebMail extends HttpServlet
 	 * @param label
 	 * @return the string
 	 */
-	private static String sortHeader( String name, String label, String imgPath )
+	private static String sortHeader( String name, String label, String imgPath, String currentName, Folder.SortOrder currentOrder)
 	{
-		return label + "&nbsp;&nbsp;<a href=\"" + myself + "?" + name + "=up\"><img src=\"" +
-			imgPath + "3up.png\" border=\"0\" alt=\"^\"></a><a href=\"" + myself +
-			"?" + name + "=down\"><img src=\"" + imgPath + "3down.png\" border=\"0\" alt=\"v\"></a>";
+		StringBuilder buf = new StringBuilder(128);
+		buf.append(label).append("&nbsp;&nbsp;");
+		if (name.equals(currentName) && currentOrder == Folder.SortOrder.UP) {
+			buf.append("<img src=\"").append(imgPath).append("3up.png\" border=\"0\" alt=\"^\">\n");
+		} else {
+			buf.append("<a href=\"").append(myself).append('?').append(name).append("=up\">");
+			buf.append("<img src=\"").append(imgPath).append("3up.png\" border=\"0\" alt=\"^\" style=\"opacity: 0.6;\">");
+			buf.append("</a>\n");
+		}
+		if (name.equals(currentName) && currentOrder == Folder.SortOrder.DOWN) {
+			buf.append("<img src=\"").append(imgPath).append("3down.png\" border=\"0\" alt=\"v\">");
+		} else {
+			buf.append("<a href=\"").append(myself).append('?').append(name).append("=down\">");
+			buf.append("<img src=\"").append(imgPath).append("3down.png\" border=\"0\" alt=\"v\" style=\"opacity: 0.6;\">");
+			buf.append("</a>");
+		}
+		return buf.toString();
 	}
+
 	/**
 	 * check, if a given button "was pressed" in the received http request
 	 * 
@@ -1977,15 +2017,17 @@ public class WebMail extends HttpServlet
 				);
 		}
 
+		String curSort = sessionObject.folder.getCurrentSortBy();
+		Folder.SortOrder curOrder = sessionObject.folder.getCurrentSortingDirection();
 		out.println("<table id=\"mailbox\" cellspacing=\"0\" cellpadding=\"5\">\n" +
 			"<tr><td colspan=\"9\"><hr></td></tr>\n<tr>" +
 			thSpacer +
-			thSpacer + "<th>" + sortHeader( SORT_SENDER, _("From"), sessionObject.imgPath ) + "</th>" +
-			thSpacer + "<th>" + sortHeader( SORT_SUBJECT, _("Subject"), sessionObject.imgPath ) + "</th>" +
-			thSpacer + "<th>" + sortHeader( SORT_DATE, _("Date"), sessionObject.imgPath ) +
+			thSpacer + "<th>" + sortHeader( SORT_SENDER, _("From"), sessionObject.imgPath, curSort, curOrder ) + "</th>" +
+			thSpacer + "<th>" + sortHeader( SORT_SUBJECT, _("Subject"), sessionObject.imgPath, curSort, curOrder ) + "</th>" +
+			thSpacer + "<th>" + sortHeader( SORT_DATE, _("Date"), sessionObject.imgPath, curSort, curOrder ) +
 			//sortHeader( SORT_ID, "", sessionObject.imgPath ) +
 			"</th>" +
-			thSpacer + "<th>" + sortHeader( SORT_SIZE, _("Size"), sessionObject.imgPath ) + "</th></tr>" );
+			thSpacer + "<th>" + sortHeader( SORT_SIZE, _("Size"), sessionObject.imgPath, curSort, curOrder ) + "</th></tr>" );
 		int bg = 0;
 		int i = 0;
 		for( Iterator<String> it = sessionObject.folder.currentPageIterator(); it != null && it.hasNext(); ) {
