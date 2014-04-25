@@ -74,7 +74,7 @@ class DelayedDeleter {
 					isDeleting = true;
 					t.start();
 				} else {
-					Debug.debug(Debug.DEBUG, "Not deleting, only idle " + idle);
+					Debug.debug(Debug.DEBUG, "Not deleting " + toDelete.size() + ", only idle " + idle);
 				}
 			} else {
 				Debug.debug(Debug.DEBUG, "Nothing to delete");

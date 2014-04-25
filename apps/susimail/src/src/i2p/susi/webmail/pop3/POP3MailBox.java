@@ -1115,6 +1115,7 @@ public class POP3MailBox implements NewMailListener {
 						} else {
 							sendCmd1a("QUIT");
 						}
+						Debug.debug( Debug.DEBUG, "close() with wait complete");
 					} else {
 						if (!sendDelete.isEmpty()) {
 							// spray and pray the deletions, don't remove from delete queue

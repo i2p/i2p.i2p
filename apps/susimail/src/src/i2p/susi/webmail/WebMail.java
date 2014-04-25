@@ -91,7 +91,10 @@ public class WebMail extends HttpServlet
 	private static final int STATE_LIST = 2;
 	private static final int STATE_SHOW = 3;
 	private static final int STATE_NEW = 4;
+	// TODO
+	private static final int STATE_CONFIG = 5;
 	
+	// TODO generate from servlet name to allow for renaming or multiple instances
 	private static final String myself = "/susimail/susimail";
 	
 	/*
@@ -477,14 +480,14 @@ public class WebMail extends HttpServlet
 			buf.append("<img src=\"").append(imgPath).append("3up.png\" border=\"0\" alt=\"^\">\n");
 		} else {
 			buf.append("<a href=\"").append(myself).append('?').append(name).append("=up\">");
-			buf.append("<img src=\"").append(imgPath).append("3up.png\" border=\"0\" alt=\"^\" style=\"opacity: 0.6;\">");
+			buf.append("<img src=\"").append(imgPath).append("3up.png\" border=\"0\" alt=\"^\" style=\"opacity: 0.4;\">");
 			buf.append("</a>\n");
 		}
 		if (name.equals(currentName) && currentOrder == Folder.SortOrder.DOWN) {
 			buf.append("<img src=\"").append(imgPath).append("3down.png\" border=\"0\" alt=\"v\">");
 		} else {
 			buf.append("<a href=\"").append(myself).append('?').append(name).append("=down\">");
-			buf.append("<img src=\"").append(imgPath).append("3down.png\" border=\"0\" alt=\"v\" style=\"opacity: 0.6;\">");
+			buf.append("<img src=\"").append(imgPath).append("3down.png\" border=\"0\" alt=\"v\" style=\"opacity: 0.4;\">");
 			buf.append("</a>");
 		}
 		return buf.toString();
@@ -1098,10 +1101,17 @@ public class WebMail extends HttpServlet
 	 */
 	private static void processGenericButtons(SessionObject sessionObject, RequestWrapper request)
 	{
+		// these two buttons are only on the folder view now
 		if( buttonPressed( request, RELOAD ) ) {
 			Config.reloadConfiguration();
+			int oldPageSize = sessionObject.folder.getPageSize();
+			int pageSize = Config.getProperty( Folder.PAGESIZE, Folder.DEFAULT_PAGESIZE );
+			if( pageSize != oldPageSize )
+				sessionObject.folder.setPageSize( pageSize );
+			sessionObject.info = _("Configuration reloaded");
 		}
 		if( buttonPressed( request, REFRESH ) ) {
+			// TODO how to do a "No new mail" message?
 			sessionObject.mailbox.refresh();
 			sessionObject.error += sessionObject.mailbox.lastError();
 			sessionObject.mailCache.getMail(MailCache.FETCH_HEADER);
@@ -1295,11 +1305,9 @@ public class WebMail extends HttpServlet
 		/*
 		 * process paging buttons
 		 */
-		String str = request.getParameter( PAGESIZE );
-		if( str != null && str.length() > 0 ) {
+		if (buttonPressed(request, PAGESIZE) && !buttonPressed(request, RELOAD)) {
 			try {
-				// limit max to 100 as it makes the startup really slow
-				int pageSize = Math.min(100, Math.max(5, Integer.parseInt( str )));
+				int pageSize = Math.max(5, Integer.parseInt(request.getParameter(PAGESIZE)));
 				int oldPageSize = sessionObject.folder.getPageSize();
 				if( pageSize != oldPageSize )
 					sessionObject.folder.setPageSize( pageSize );
@@ -1571,8 +1579,15 @@ public class WebMail extends HttpServlet
 					// Not only does it slow things down, but a failure causes all our messages to "vanish"
 					//subtitle = ngettext("1 Message", "{0} Messages", sessionObject.mailbox.getNumMails());
 					subtitle = ngettext("1 Message", "{0} Messages", sessionObject.folder.getSize());
-				} else if( sessionObject.state == STATE_SHOW )
-					subtitle = _("Show Message");
+				} else if( sessionObject.state == STATE_SHOW ) {
+					Mail mail = sessionObject.mailCache.getMail(sessionObject.showUIDL, MailCache.FETCH_HEADER);
+					if (mail != null && mail.shortSubject != null)
+						subtitle = mail.shortSubject;
+					else
+						subtitle = _("Show Message");
+				} else if( sessionObject.state == STATE_NEW ) {
+					subtitle = _("New Message");
+				}
 
 				response.setContentType( "text/html" );
 
@@ -1987,20 +2002,8 @@ public class WebMail extends HttpServlet
 			out.println(button( RELOAD, _("Reload Config") ) + spacer);
 		out.println(button( LOGOUT, _("Logout") ));
 
-		if (sessionObject.folder.getPages() > 1) {
-			out.println(
-				"<br>" +
-				( sessionObject.folder.isFirstPage() ?
-									button2( FIRSTPAGE, _("First") ) + "&nbsp;" + button2( PREVPAGE, _("Previous") ) :
-									button( FIRSTPAGE, _("First") ) + "&nbsp;" + button( PREVPAGE, _("Previous") ) ) +
-				" &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
-				_("Page {0} of {1}", sessionObject.folder.getCurrentPage(), sessionObject.folder.getPages()) +
-				"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; " +
-				( sessionObject.folder.isLastPage() ? 
-									button2( NEXTPAGE, _("Next") ) + "&nbsp;" + button2( LASTPAGE, _("Last") ) :
-									button( NEXTPAGE, _("Next") ) + "&nbsp;" + button( LASTPAGE, _("Last") ) )
-				);
-		}
+		if (sessionObject.folder.getPages() > 1)
+			showPageButtons(out, sessionObject.folder);
 
 		String curSort = sessionObject.folder.getCurrentSortBy();
 		Folder.SortOrder curOrder = sessionObject.folder.getCurrentSortingDirection();
@@ -2050,11 +2053,11 @@ public class WebMail extends HttpServlet
 			//		", clear=" + sessionObject.clear );
 			out.println( "<tr class=\"list" + bg + "\"><td><input type=\"checkbox\" class=\"optbox\" name=\"check" + i + "\" value=\"1\"" + 
 					( idChecked ? "checked" : "" ) + ">" + "</td><td>" +
-					(mail.isNew() ? "<img src=\"/susimail/icons/flag_green.png\" alt=\"\">" : "&nbsp;") + "</td><td>" +
+					(mail.isNew() ? "<img src=\"/susimail/icons/flag_green.png\" alt=\"\" title=\"" + _("Message is new") + "\">" : "&nbsp;") + "</td><td>" +
 					link + mail.shortSender + "</a></td><td>" +
-					(mail.hasAttachment() ? "<img src=\"/susimail/icons/attach.png\" alt=\"\">" : "&nbsp;") + "</td><td>" +
+					(mail.hasAttachment() ? "<img src=\"/susimail/icons/attach.png\" alt=\"\" title=\"" + _("Message has an attachment") + "\">" : "&nbsp;") + "</td><td>" +
 					link + mail.shortSubject + "</a></td><td>" +
-					(mail.isSpam() ? "<img src=\"/susimail/icons/flag_red.png\" alt=\"\">" : "&nbsp;") + "</td><td>" +
+					(mail.isSpam() ? "<img src=\"/susimail/icons/flag_red.png\" alt=\"\" title=\"" + _("Message is spam") + "\">" : "&nbsp;") + "</td><td>" +
 					// don't let date get split across lines
 					mail.localFormattedDate.replace(" ", "&nbsp;") + "</td><td>&nbsp;</td><td align=\"right\">" +
 					((mail.getSize() > 0) ? (DataHelper.formatSize2(mail.getSize()) + 'B') : "???") + "</td></tr>" );
@@ -2065,6 +2068,12 @@ public class WebMail extends HttpServlet
 			out.println("<tr><td colspan=\"9\" align=\"center\"><i>" + _("No messages") + "</i></td></tr>\n</table>");
 		if (i > 0) {
 			out.println( "<tr><td colspan=\"9\"><hr></td></tr>");
+			if (sessionObject.folder.getPages() > 1 && i > 30) {
+				// show the buttons again if page is big
+				out.println("<tr><td colspan=\"9\" align=\"center\">");
+				showPageButtons(out, sessionObject.folder);
+				out.println("</td></tr>");
+			}
 			out.println("<tr><td colspan=\"5\" align=\"left\">");
 			if( sessionObject.reallyDelete ) {
 				// TODO ngettext
@@ -2091,6 +2100,25 @@ public class WebMail extends HttpServlet
 		}
 		out.println( "</table>");
 	}
+
+	/**
+	 *  first prev next last
+	 */
+	private static void showPageButtons(PrintWriter out, Folder folder) {
+		out.println(
+			"<br>" +
+			( folder.isFirstPage() ?
+						button2( FIRSTPAGE, _("First") ) + "&nbsp;" + button2( PREVPAGE, _("Previous") ) :
+						button( FIRSTPAGE, _("First") ) + "&nbsp;" + button( PREVPAGE, _("Previous") ) ) +
+			" &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
+			_("Page {0} of {1}", folder.getCurrentPage(), folder.getPages()) +
+			"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; " +
+			( folder.isLastPage() ? 
+						button2( NEXTPAGE, _("Next") ) + "&nbsp;" + button2( LASTPAGE, _("Last") ) :
+						button( NEXTPAGE, _("Next") ) + "&nbsp;" + button( LASTPAGE, _("Last") ) )
+		);
+	}
+
 	/**
 	 * 
 	 * @param out

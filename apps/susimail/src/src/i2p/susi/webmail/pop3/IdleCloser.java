@@ -101,7 +101,7 @@ class IdleCloser {
 						// If we have items to delete, wait for the response code,
 						// otherwise the DelayedDeleter thread will have to run later.
 						// Since we are threaded we can do that here.
-						boolean shouldWait = !mailbox.hasQueuedDeletions();
+						boolean shouldWait = mailbox.hasQueuedDeletions();
 						mailbox.close(shouldWait);
 						isDead = true;
 					} else {

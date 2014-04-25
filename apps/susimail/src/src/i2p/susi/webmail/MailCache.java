@@ -195,22 +195,44 @@ class MailCache {
 					if (disk != null) {
 						if (disk.getMail(mail, true)) {
 							Debug.debug(Debug.DEBUG, "Loaded header from disk cache: " + uidl);
+							// note that disk loaded the full body if it had it
+							if (mail.hasBody() &&
+								!Boolean.parseBoolean(Config.getProperty(WebMail.CONFIG_LEAVE_ON_SERVER))) {
+								// we already have it, send delete
+								mailbox.queueForDeletion(mail.uidl);
+							}
 							continue;  // found on disk, woo
 						}
 					}
 					POP3Request pr = new POP3Request(mail, true);
 					fetches.add(pr);
+				} else {
+					if (mail.hasBody() &&
+						!Boolean.parseBoolean(Config.getProperty(WebMail.CONFIG_LEAVE_ON_SERVER))) {
+						// we already have it, send delete
+						mailbox.queueForDeletion(mail.uidl);
+					}
 				}
 			} else {
 				if(!mail.hasBody()) {
 					if (disk != null) {
 						if (disk.getMail(mail, false)) {
 							Debug.debug(Debug.DEBUG, "Loaded body from disk cache: " + uidl);
+							// note that disk loaded the full body if it had it
+							if (!Boolean.parseBoolean(Config.getProperty(WebMail.CONFIG_LEAVE_ON_SERVER))) {
+								// we already have it, send delete
+								mailbox.queueForDeletion(mail.uidl);
+							}
 							continue;  // found on disk, woo
 						}
 					}
 					POP3Request pr = new POP3Request(mail, false);
 					fetches.add(pr);
+				} else {
+					if (!Boolean.parseBoolean(Config.getProperty(WebMail.CONFIG_LEAVE_ON_SERVER))) {
+						// we already have it, send delete
+						mailbox.queueForDeletion(mail.uidl);
+					}
 				}
 			}
 		}
