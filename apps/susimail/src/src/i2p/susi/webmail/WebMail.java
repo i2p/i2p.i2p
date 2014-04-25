@@ -119,6 +119,7 @@ public class WebMail extends HttpServlet
 	private static final String REALLYDELETE = "really_delete";
 	private static final String SHOW = "show";
 	private static final String DOWNLOAD = "download";
+	private static final String RAW_ATTACHMENT = "att";
 	
 	private static final String MARKALL = "markall";
 	private static final String CLEAR = "clearselection";
@@ -358,7 +359,6 @@ public class WebMail extends HttpServlet
 		String user, pass, host, error, info;
 		String replyTo, replyCC;
 		String subject, body, showUIDL;
-		public MailPart showAttachment;
 		public String sentMail;
 		public ArrayList<Attachment> attachments;
 		public boolean reallyDelete;
@@ -480,7 +480,7 @@ public class WebMail extends HttpServlet
 		
 		if( html ) {
 			out.println( "<!-- " );
-		
+			out.println( "Debug: Mail Part headers follow");
 			for( int i = 0; i < mailPart.headerLines.length; i++ ) {
 				// fix Content-Type: multipart/alternative; boundary="----------8CDE39ECAF2633"
 				out.println( mailPart.headerLines[i].replace("--", "&mdash;") );
@@ -579,11 +579,27 @@ public class WebMail extends HttpServlet
 			}
 			if( prepareAttachment ) {
 				if( html ) {
-					// TODO can we at least show images safely?
 					out.println( "<hr><p class=\"mailbody\">" );
-					out.println( "<a target=\"_blank\" href=\"" + myself + "?" + DOWNLOAD + "=" +
-						 mailPart.hashCode() + "\">" + _("Download attachment {0}", ident) + "</a>" +
-						 " (" + _("File is packed into a zipfile for security reasons.") + ')');
+					String type = mailPart.type;
+					if (type != null && type.startsWith("image/")) {
+						// we at least show images safely...
+						out.println("<img src=\"" + myself + "?" + RAW_ATTACHMENT + "=" +
+							 mailPart.hashCode() + "\">");
+					} else if (type != null && (
+						// type list from snark
+						type.startsWith("audio/") || type.equals("application/ogg") ||
+					        type.startsWith("video/") ||
+						type.equals("application/zip") || type.equals("application/x-gtar") ||
+						type.equals("application/compress") || type.equals("application/gzip") ||
+						type.equals("application/x-7z-compressed") || type.equals("application/x-rar-compressed") ||
+						type.equals("application/x-tar") || type.equals("application/x-bzip2"))) {
+						out.println( "<a href=\"" + myself + "?" + RAW_ATTACHMENT + "=" +
+							 mailPart.hashCode() + "\">" + _("Download attachment {0}", ident) + "</a>");
+					} else {
+						out.println( "<a target=\"_blank\" href=\"" + myself + "?" + DOWNLOAD + "=" +
+							 mailPart.hashCode() + "\">" + _("Download attachment {0}", ident) + "</a>" +
+							 " (" + _("File is packed into a zipfile for security reasons.") + ')');
+					}
 					out.println( "</p>" );					
 				}
 				else {
@@ -1135,6 +1151,7 @@ public class WebMail extends HttpServlet
 			}			
 		}
 	}
+
 	/**
 	 * process buttons of message view
 	 * @param sessionObject
@@ -1175,21 +1192,43 @@ public class WebMail extends HttpServlet
 			sessionObject.folder.removeElement(sessionObject.showUIDL);
 			sessionObject.showUIDL = nextUIDL;
 		}
-		
-		String str = request.getParameter( DOWNLOAD );
+	}		
+
+	/**
+	 * process download link in message view
+	 * @param sessionObject
+	 * @param request
+	 * @return If true, we sent an attachment or 404, do not send any other response
+	 */
+	private static boolean processDownloadLink(SessionObject sessionObject, RequestWrapper request, HttpServletResponse response)
+	{
+		String str = request.getParameter(DOWNLOAD);
+		boolean isRaw = false;
+		if (str == null) {
+			str = request.getParameter(RAW_ATTACHMENT);
+			isRaw = str != null;
+		}       	
 		if( str != null ) {
 			try {
 				int hashCode = Integer.parseInt( str );
 				Mail mail = sessionObject.mailCache.getMail( sessionObject.showUIDL, MailCache.FETCH_ALL );
 				MailPart part = mail != null ? getMailPartFromHashCode( mail.getPart(), hashCode ) : null;
-				if( part != null )
-					sessionObject.showAttachment = part;
-			}
-			catch( NumberFormatException nfe ) {
-				sessionObject.error += _("Error parsing download parameter.");
+				if( part != null ) {
+					if (sendAttachment(sessionObject, part, response, isRaw))
+						return true;
+				}
+			} catch( NumberFormatException nfe ) {}
+			// error if we get here
+			sessionObject.error += _("Attachment not found.");
+			if (isRaw) {
+				try {
+					response.sendError(404, _("Attachment not found."));
+				} catch (IOException ioe) {}
 			}
 		}
+		return isRaw;
 	}
+
 	/**
 	 * @param hashCode
 	 * @return the part or null
@@ -1418,7 +1457,6 @@ public class WebMail extends HttpServlet
 			sessionObject.error = "";
 			sessionObject.info = "";
 			sessionObject.pageChanged = false;
-			sessionObject.showAttachment = null;
 			sessionObject.themePath = "/themes/susimail/" + theme + '/';
 			sessionObject.imgPath = sessionObject.themePath + "images/";
 			sessionObject.isMobile = isMobile;
@@ -1463,6 +1501,12 @@ public class WebMail extends HttpServlet
 			if( sessionObject.state == STATE_SHOW ) {
 				if (isPOST)
 					processMessageButtons( sessionObject, request );
+				// ?download=nnn link should be valid in any state
+				// but depends on current UIDL
+				if (processDownloadLink(sessionObject, request, response)) {
+					// download or raw view sent, or 404
+					return;
+				}
 				// If the last message has just been deleted then
 				// sessionObject.state = STATE_LIST and
 				// sessionObject.showUIDL = null
@@ -1487,7 +1531,6 @@ public class WebMail extends HttpServlet
 				}
 			}
 
-			if( ! sendAttachment( sessionObject, response ) ) { 
 				PrintWriter out = response.getWriter();
 				
 				/*
@@ -1558,21 +1601,20 @@ public class WebMail extends HttpServlet
 				//out.println( "</form><div id=\"footer\"><hr><p class=\"footer\">susimail v0." + version +" " + ( RELEASE ? "release" : "development" ) + " &copy; 2004-2005 <a href=\"mailto:susi23@mail.i2p\">susi</a></div></div></body>\n</html>");				
 				out.println( "</form><div id=\"footer\"><hr><p class=\"footer\">susimail &copy; 2004-2005 susi</div></div></body>\n</html>");				
 				out.flush();
-			}
 		}
 	}
 
 	/**
 	 * @param sessionObject
 	 * @param response
+	 * @param isRaw if true, don't zip it
 	 * @return success
 	 */
-	private static boolean sendAttachment(SessionObject sessionObject, HttpServletResponse response)
+	private static boolean sendAttachment(SessionObject sessionObject, MailPart part,
+						 HttpServletResponse response, boolean isRaw)
 	{
 		boolean shown = false;
-		if( sessionObject.showAttachment != null ) {
-			
-			MailPart part = sessionObject.showAttachment;
+		if(part != null) {
 			ReadBuffer content = part.buffer;
 			
 			if( part.encoding != null ) {
@@ -1585,7 +1627,20 @@ public class WebMail extends HttpServlet
 						content = null;
 					}
 			}
-			if( content != null ) {
+			if(content == null)
+				return false;
+			if (isRaw) {
+				try {
+					if (part.type != null)
+						response.setContentType(part.type);
+					response.setContentLength(content.length);
+					// cache-control?
+					response.getOutputStream().write(content.content, content.offset, content.length);
+					shown = true;
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			} else {
 				ZipOutputStream zip = null;
 				try {
 					zip = new ZipOutputStream( response.getOutputStream() );
@@ -2006,6 +2061,7 @@ public class WebMail extends HttpServlet
 		Mail mail = sessionObject.mailCache.getMail( sessionObject.showUIDL, MailCache.FETCH_ALL );
 		if(!RELEASE && mail != null && mail.hasBody()) {
 			out.println( "<!--" );
+			out.println( "Debug: Mail header and body follow");
 			// FIXME encoding, escaping --, etc... but disabled.
 			ReadBuffer body = mail.getBody();
 			out.println( quoteHTML( new String(body.content, body.offset, body.length ) ) );
@@ -2071,7 +2127,7 @@ public class WebMail extends HttpServlet
      * Get all themes
      * @return String[] -- Array of all the themes found.
      */
-    public String[] getThemes() {
+    private static String[] getThemes() {
             String[] themes = null;
             // "docs/themes/susimail/"
             File dir = new File(I2PAppContext.getGlobalContext().getBaseDir(), "docs/themes/susimail");
