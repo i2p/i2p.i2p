@@ -160,7 +160,8 @@ class Mail {
 		// if part != null query parts instead?
 		return contentType != null &&
 			!contentType.contains("text/plain") &&
-			!contentType.contains("multipart/alternative");
+			!contentType.contains("multipart/alternative") &&
+			!contentType.contains("multipart/signed");
 	}
 
 	/**

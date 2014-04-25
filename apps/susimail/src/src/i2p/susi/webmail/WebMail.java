@@ -1917,7 +1917,8 @@ public class WebMail extends HttpServlet
 		}
 
 		out.println("<table id=\"mailbox\" cellspacing=\"0\" cellpadding=\"5\">\n" +
-			"<tr><td colspan=\"8\"><hr></td></tr>\n<tr>" +
+			"<tr><td colspan=\"9\"><hr></td></tr>\n<tr>" +
+			thSpacer +
 			thSpacer + "<th>" + sortHeader( SORT_SENDER, _("From"), sessionObject.imgPath ) + "</th>" +
 			thSpacer + "<th>" + sortHeader( SORT_SUBJECT, _("Subject"), sessionObject.imgPath ) + "</th>" +
 			thSpacer + "<th>" + sortHeader( SORT_DATE, _("Date"), sessionObject.imgPath ) +
@@ -1961,6 +1962,7 @@ public class WebMail extends HttpServlet
 			//		", clear=" + sessionObject.clear );
 			out.println( "<tr class=\"list" + bg + "\"><td><input type=\"checkbox\" class=\"optbox\" name=\"check" + i + "\" value=\"1\"" + 
 					( idChecked ? "checked" : "" ) + ">" + "</td><td>" +
+					(mail.isNew() ? "<img src=\"/susimail/icons/flag_green.png\" alt=\"\">" : "&nbsp;") + "</td><td>" +
 					link + mail.shortSender + "</a></td><td>" +
 					(mail.hasAttachment() ? "<img src=\"/susimail/icons/attach.png\" alt=\"\">" : "&nbsp;") + "</td><td>" +
 					link + mail.shortSubject + "</a></td><td>" +
@@ -1972,8 +1974,8 @@ public class WebMail extends HttpServlet
 			i++;
 		}
 		if (i == 0)
-			out.println("<tr><td colspan=\"8\" align=\"center\"><i>" + _("No messages") + "</i></td></tr>\n</table>");
-		out.println( "<tr><td colspan=\"8\"><hr></td></tr>\n</table>");
+			out.println("<tr><td colspan=\"9\" align=\"center\"><i>" + _("No messages") + "</i></td></tr>\n</table>");
+		out.println( "<tr><td colspan=\"9\"><hr></td></tr>\n</table>");
 		if (i > 0) {
 			out.println(
 				button( MARKALL, _("Mark All") ) +
