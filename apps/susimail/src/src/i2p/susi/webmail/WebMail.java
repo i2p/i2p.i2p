@@ -1211,6 +1211,7 @@ public class WebMail extends HttpServlet
 		}
 		return null;
 	}
+
 	/**
 	 * process buttons of folder view
 	 * @param sessionObject
@@ -1287,16 +1288,20 @@ public class WebMail extends HttpServlet
 		sessionObject.markAll = buttonPressed( request, MARKALL );
 		sessionObject.clear = buttonPressed( request, CLEAR );
 		sessionObject.invert = buttonPressed( request, INVERT );
+	}
 
-		/*
-		 * process sorting buttons
-		 */
-		processSortingButton( sessionObject, request, SORT_ID );
+	/*
+	 * process sorting buttons
+	 */
+	private static void processSortingButtons(SessionObject sessionObject, RequestWrapper request)
+	{
+		//processSortingButton( sessionObject, request, SORT_ID );
 		processSortingButton( sessionObject, request, SORT_SENDER );
 		processSortingButton( sessionObject, request, SORT_SUBJECT );
 		processSortingButton( sessionObject, request, SORT_DATE );
 		processSortingButton( sessionObject, request, SORT_SIZE );		
 	}
+
 	/**
 	 * @param sessionObject
 	 * @param request
@@ -1444,6 +1449,7 @@ public class WebMail extends HttpServlet
 			if( sessionObject.state == STATE_LIST ) {
 				if (isPOST)
 					processFolderButtons( sessionObject, request );
+				processSortingButtons( sessionObject, request );
 				for( Iterator<String> it = sessionObject.folder.currentPageIterator(); it != null && it.hasNext(); ) {
 					String uidl = it.next();
 					Mail mail = sessionObject.mailCache.getMail( uidl, MailCache.FETCH_HEADER );
