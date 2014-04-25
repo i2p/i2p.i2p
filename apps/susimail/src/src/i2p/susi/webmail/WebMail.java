@@ -291,10 +291,34 @@ public class WebMail extends HttpServlet
 				return -1;
 			String as = a.formattedSubject;
 			String bs = b.formattedSubject;
-			if (as.startsWith("Re:"))
+			if (as.toLowerCase().startsWith("re:")) {
 				as = as.substring(3).trim();
-			if (bs.startsWith("Re:"))
+			} else if (as.toLowerCase().startsWith("fwd:")) {
+				as = as.substring(4).trim();
+			} else {
+				String xre = _("Re:").toLowerCase();
+				if (as.toLowerCase().startsWith(xre)) {
+					as = as.substring(xre.length()).trim();
+				} else {
+					String xfwd = _("Fwd:").toLowerCase();
+					if (as.toLowerCase().startsWith(xfwd))
+						as = as.substring(xfwd.length()).trim();
+				}
+			}
+			if (bs.toLowerCase().startsWith("re:")) {
 				bs = bs.substring(3).trim();
+			} else if (bs.toLowerCase().startsWith("fwd:")) {
+				bs = bs.substring(4).trim();
+			} else {
+				String xre = _("Re:").toLowerCase();
+				if (bs.toLowerCase().startsWith(xre)) {
+					bs = bs.substring(xre.length()).trim();
+				} else {
+					String xfwd = _("Fwd:").toLowerCase();
+					if (bs.toLowerCase().startsWith(xfwd))
+						bs = bs.substring(xfwd.length()).trim();
+				}
+			}
 			int rv = collator.compare(as, bs);
 			if (rv != 0)
 				return rv;
@@ -961,7 +985,7 @@ public class WebMail extends HttpServlet
 								sessionObject.replyTo = mail.reply;
 							else if( mail.sender != null && Mail.validateAddress( mail.sender ) )
 								sessionObject.replyTo = mail.sender;
-							sessionObject.subject = "Re: " + mail.formattedSubject;
+							sessionObject.subject = _("Re:") + ' ' + mail.formattedSubject;
 							StringWriter text = new StringWriter();
 							PrintWriter pw = new PrintWriter( text );
 							pw.println( _("On {0} {1} wrote:", mail.formattedDate + " UTC", sessionObject.replyTo) );
@@ -999,7 +1023,7 @@ public class WebMail extends HttpServlet
 								sessionObject.replyCC = buf.toString();
 						}
 						if( forward ) {
-							sessionObject.subject = "FWD: " + mail.formattedSubject;
+							sessionObject.subject = _("Fwd:") + ' ' + mail.formattedSubject;
 							String sender = null;
 							if( mail.reply != null && Mail.validateAddress( mail.reply ) )
 								sender = Mail.getAddress( mail.reply );
