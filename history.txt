@@ -1,3 +1,15 @@
+2014-04-25 zzz
+ * SusiMail:
+   - Add icons for new messages, attachments, and spam
+   - Different colors for new mail and spam
+   - Tweak sort button display based on current sort
+   - Display image attachments inline
+   - Don't rezip certain attachment types, just offer link
+   - Move delete and confirmation buttons
+   - Increase max size for full download again
+   - Fix repeated re-saves of mail to disk
+   - Enable auto-deletion of downloaded mails
+
 2014-04-24 zzz
  * SusiMail:
    - Add background mail checker

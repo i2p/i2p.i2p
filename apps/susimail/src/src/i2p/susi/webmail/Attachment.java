@@ -23,65 +23,35 @@
  */
 package i2p.susi.webmail;
 
-import i2p.susi.util.ReadBuffer;
-
 /**
  * @author user
  */
 class Attachment {
-	private String fileName, contentType, transferEncoding;
-	private ReadBuffer buffer;
-	private String data;
+	private final String fileName, contentType, transferEncoding;
+	private final String data;
+
+	Attachment(String name, String type, String encoding, String data) {
+		fileName = name;
+		contentType = type;
+		transferEncoding = encoding;
+		this.data = data;
+	}
+
 	/**
 	 * @return Returns the fileName.
 	 */
 	public String getFileName() {
 		return fileName;
 	}
-	/**
-	 * @param fileName The fileName to set.
-	 */
-	public void setFileName(String fileName) {
-		this.fileName = fileName;
-	}
-	/**
-	 * @return Returns the buffer.
-	 */
-	public ReadBuffer getBuffer() {
-		return buffer;
-	}
-	/**
-	 * @param buffer The buffer to set.
-	 */
-	public void setBuffer(ReadBuffer buffer) {
-		this.buffer = buffer;
-	}
 
 	public String getTransferEncoding() {
-		// TODO Auto-generated method stub
 		return transferEncoding;
 	}
 
 	public String getContentType() {
-		// TODO Auto-generated method stub
 		return contentType;
 	}
-	/**
-	 * @param contentType The contentType to set.
-	 */
-	public void setContentType(String contentType) {
-		this.contentType = contentType;
-	}
-	/**
-	 * @param transferEncoding The transferEncoding to set.
-	 */
-	public void setTransferEncoding(String transferEncoding) {
-		this.transferEncoding = transferEncoding;
-	}
 
-	public void setData(String data ) {
-		this.data = data;
-	}
 	/**
 	 * @return Returns the data.
 	 */

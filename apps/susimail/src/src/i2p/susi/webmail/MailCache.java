@@ -53,7 +53,7 @@ class MailCache {
 	/** Includes header, headers are generally 1KB to 1.5 KB,
 	 *  and bodies will compress well.
          */
-	private static final int FETCH_ALL_SIZE = 4096;
+	private static final int FETCH_ALL_SIZE = 8192;
 
 	/**
 	 * @param mailbox non-null
@@ -137,14 +137,14 @@ class MailCache {
 				mail.setHeader(mailbox.getHeader(uidl));
 		} else {
 			if(!mail.hasBody()) {
-				mail.setBody(mailbox.getBody(uidl));
-			}
-		}
-		if (disk != null) {
-			if (disk.saveMail(mail) && mail.hasBody() &&
-				false && // TO ENABLE
-			    !Boolean.parseBoolean(Config.getProperty(WebMail.CONFIG_LEAVE_ON_SERVER))) {
-				mailbox.queueForDeletion(mail.uidl);
+				ReadBuffer rb = mailbox.getBody(uidl);
+				if (rb != null) {
+					mail.setBody(rb);
+					if (disk != null && disk.saveMail(mail) &&
+					    !Boolean.parseBoolean(Config.getProperty(WebMail.CONFIG_LEAVE_ON_SERVER))) {
+						mailbox.queueForDeletion(mail.uidl);
+					}
+				}
 			}
 		}
 		return mail;
@@ -237,7 +237,6 @@ class MailCache {
 					rv = true;
 					if (disk != null) {
 						if (disk.saveMail(mail) && mail.hasBody() &&
-							false && // TO ENABLE
 						    !Boolean.parseBoolean(Config.getProperty(WebMail.CONFIG_LEAVE_ON_SERVER))) {
 							mailbox.queueForDeletion(mail.uidl);
 						}

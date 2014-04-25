@@ -934,8 +934,13 @@ public class WebMail extends HttpServlet
 				 */
 				String uidl = null;
 				if( sessionObject.state == STATE_LIST ) {
-					int pos = getCheckedMessage( request );
-					uidl = sessionObject.folder.getElementAtPosXonCurrentPage( pos );
+					// these buttons are now hidden on the folder page,
+					// but the idea is to use the first checked message
+					List<Integer> items = getCheckedItems(request);
+					if (!items.isEmpty()) {
+						int pos = items.get(0).intValue();
+						uidl = sessionObject.folder.getElementAtPosXonCurrentPage( pos );
+					}
 				}
 				else {
 					uidl = sessionObject.showUIDL;
@@ -1067,26 +1072,26 @@ public class WebMail extends HttpServlet
 			}
 		}
 	}
+
 	/**
+	 * Returns e.g. 3,5 for ?check3=1&check5=1 (or POST equivalent)
 	 * @param request
-	 * @return message number or -1
+	 * @return non-null
 	 */
-	private static int getCheckedMessage(RequestWrapper request) {
+	private static List<Integer> getCheckedItems(RequestWrapper request) {
+		List<Integer> rv = new ArrayList<Integer>(8);
 		for( Enumeration<String> e = request.getParameterNames(); e.hasMoreElements(); ) {
 			String parameter = e.nextElement();
 			if( parameter.startsWith( "check" ) && request.getParameter( parameter ).equals("1")) {
 				String number = parameter.substring( 5 );
 				try {
-					int n = Integer.parseInt( number );
-					return n;
-				}
-				catch( NumberFormatException nfe ) {
-					
-				}
+					rv.add(Integer.valueOf(number));
+				} catch( NumberFormatException nfe ) {}
 			}
 		}
-		return -1;
+		return rv;
 	}
+
 	/**
 	 * @param sessionObject
 	 * @param request
@@ -1136,8 +1141,6 @@ public class WebMail extends HttpServlet
 					if( l > 0 ) {
 						byte buf[] = new byte[l];
 						in.read( buf );
-						Attachment attachment = new Attachment();
-						attachment.setFileName( filename );
 						String contentType = request.getContentType( NEW_FILENAME );
 						Encoding encoding;
 						String encodeTo;
@@ -1148,12 +1151,12 @@ public class WebMail extends HttpServlet
 						encoding = EncodingFactory.getEncoding( encodeTo );
 						try {
 							if( encoding != null ) {
-								attachment.setData( encoding.encode( buf ) );
-								attachment.setTransferEncoding( encodeTo );
-								attachment.setContentType( contentType );
+								String data = encoding.encode(buf);
 								if( sessionObject.attachments == null )
 									sessionObject.attachments = new ArrayList<Attachment>();
-								sessionObject.attachments.add( attachment );
+								sessionObject.attachments.add(
+									new Attachment(filename, contentType, encodeTo, data)
+								);
 							}
 							else {
 								sessionObject.error += _("No Encoding found for {0}", encodeTo) + "<br>";
@@ -1170,22 +1173,13 @@ public class WebMail extends HttpServlet
 			}
 		}
 		else if( sessionObject.attachments != null && buttonPressed( request, DELETE_ATTACHMENT ) ) {
-			for( Enumeration<String> e = request.getParameterNames(); e.hasMoreElements(); ) {
-				String parameter = e.nextElement();
-				if( parameter.startsWith( "check" ) && request.getParameter( parameter ).equals("1")) {
-					String number = parameter.substring( 5 );
-					try {
-						int n = Integer.parseInt( number );
-						for( int i = 0; i < sessionObject.attachments.size(); i++ ) {
-							Attachment attachment = (Attachment)sessionObject.attachments.get( i );
-							if( attachment.hashCode() == n ) {
-								sessionObject.attachments.remove( i );
-								break;
-							}
-						}
-					}
-					catch( NumberFormatException nfe ) {
-						
+			for (Integer item : getCheckedItems(request)) {
+				int n = item.intValue();
+				for( int i = 0; i < sessionObject.attachments.size(); i++ ) {
+					Attachment attachment = (Attachment)sessionObject.attachments.get( i );
+					if( attachment.hashCode() == n ) {
+						sessionObject.attachments.remove( i );
+						break;
 					}
 				}
 			}			
@@ -1331,8 +1325,8 @@ public class WebMail extends HttpServlet
 			sessionObject.folder.lastPage();
 		}
 		else if( buttonPressed( request, DELETE ) ) {
-			int m = getCheckedMessage( request );
-			if( m != -1 )
+			int m = getCheckedItems(request).size();
+			if (m > 0)
 				sessionObject.reallyDelete = true;
 			else
 				sessionObject.error += _("No messages marked for deletion.") + "<br>";
@@ -1340,17 +1334,11 @@ public class WebMail extends HttpServlet
 		else {
 			if( buttonPressed( request, REALLYDELETE ) ) {
 				List<String> toDelete = new ArrayList<String>();
-				for( Enumeration<String> e = request.getParameterNames(); e.hasMoreElements(); ) {
-					String parameter = e.nextElement();
-					if( parameter.startsWith( "check" ) && request.getParameter( parameter ).equals("1")) {
-						String number = parameter.substring( 5 );
-						try {
-							int n = Integer.parseInt( number );
-							String uidl = sessionObject.folder.getElementAtPosXonCurrentPage( n );
-							if( uidl != null )
-								toDelete.add(uidl);
-						} catch( NumberFormatException nfe ) {}
-					}
+				for (Integer item : getCheckedItems(request)) {
+					int n = item.intValue();
+					String uidl = sessionObject.folder.getElementAtPosXonCurrentPage( n );
+					if( uidl != null )
+						toDelete.add(uidl);
 				}
 				int numberDeleted = toDelete.size();
 				if (numberDeleted > 0) {
@@ -1987,16 +1975,13 @@ public class WebMail extends HttpServlet
 	 */
 	private static void showFolder( PrintWriter out, SessionObject sessionObject, RequestWrapper request )
 	{
-		if( sessionObject.reallyDelete ) {
-			out.println( "<p class=\"error\">" + _("Really delete the marked messages?") + " " + button( REALLYDELETE, _("Yes, really delete them!") ) + "</p>" );
-		}
 		out.println( button( NEW, _("New") ) + spacer +
 			// In theory, these are valid and will apply to the first checked message,
 			// but that's not obvious and did it work?
 			//button( REPLY, _("Reply") ) +
 			//button( REPLYALL, _("Reply All") ) +
 			//button( FORWARD, _("Forward") ) + spacer +
-			button( DELETE, _("Delete") ) + spacer +
+			//button( DELETE, _("Delete") ) + spacer +
 			button( REFRESH, _("Check Mail") ) + spacer);
 		if (Config.hasConfigFile())
 			out.println(button( RELOAD, _("Reload Config") ) + spacer);
@@ -2006,14 +1991,14 @@ public class WebMail extends HttpServlet
 			out.println(
 				"<br>" +
 				( sessionObject.folder.isFirstPage() ?
-									button2( FIRSTPAGE, _("First") ) + button2( PREVPAGE, _("Previous") ) :
-									button( FIRSTPAGE, _("First") ) + button( PREVPAGE, _("Previous") ) ) +
+									button2( FIRSTPAGE, _("First") ) + "&nbsp;" + button2( PREVPAGE, _("Previous") ) :
+									button( FIRSTPAGE, _("First") ) + "&nbsp;" + button( PREVPAGE, _("Previous") ) ) +
 				" &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
 				_("Page {0} of {1}", sessionObject.folder.getCurrentPage(), sessionObject.folder.getPages()) +
 				"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; " +
 				( sessionObject.folder.isLastPage() ? 
-									button2( NEXTPAGE, _("Next") ) + button2( LASTPAGE, _("Last") ) :
-									button( NEXTPAGE, _("Next") ) + button( LASTPAGE, _("Last") ) )
+									button2( NEXTPAGE, _("Next") ) + "&nbsp;" + button2( LASTPAGE, _("Last") ) :
+									button( NEXTPAGE, _("Next") ) + "&nbsp;" + button( LASTPAGE, _("Last") ) )
 				);
 		}
 
@@ -2078,17 +2063,33 @@ public class WebMail extends HttpServlet
 		}
 		if (i == 0)
 			out.println("<tr><td colspan=\"9\" align=\"center\"><i>" + _("No messages") + "</i></td></tr>\n</table>");
-		out.println( "<tr><td colspan=\"9\"><hr></td></tr>\n</table>");
 		if (i > 0) {
-			out.println(
-				button( MARKALL, _("Mark All") ) +
-				button( INVERT, _("Invert Selection") ) +
-				button( CLEAR, _("Clear") ) +
-				"<br>");
-			out.println(
+			out.println( "<tr><td colspan=\"9\"><hr></td></tr>");
+			out.println("<tr><td colspan=\"5\" align=\"left\">");
+			if( sessionObject.reallyDelete ) {
+				// TODO ngettext
+				out.println("<p class=\"error\">" + _("Really delete the marked messages?") +
+						"</p>" + button( REALLYDELETE, _("Yes, really delete them!") ) +
+						"<br>" + button( CLEAR, _("Cancel")));
+			} else {
+				// TODO js
+				out.println(button( DELETE, _("Delete Selected") ) + "<br>");
+				out.print(
+					button( CLEAR, _("Clear All") ) +
+					"&nbsp;" +
+					button( MARKALL, _("Mark All") ));
+					//"<br>" + 
+					//button( INVERT, _("Invert Selection") ) +
+					//"<br>");
+			}
+			out.print("</td>\n<td colspan=\"4\" align=\"right\">");
+			out.print(
 				_("Page Size") + ":&nbsp;<input type=\"text\" style=\"text-align: right;\" name=\"" + PAGESIZE + "\" size=\"4\" value=\"" +  sessionObject.folder.getPageSize() + "\">" +
+				"&nbsp;" + 
 				button( SETPAGESIZE, _("Set") ) );
+			out.println("</td>");
 		}
+		out.println( "</table>");
 	}
 	/**
 	 * 
