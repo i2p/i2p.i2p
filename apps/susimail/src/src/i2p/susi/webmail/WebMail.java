@@ -399,7 +399,7 @@ public class WebMail extends HttpServlet
 			MailCache mc = mailCache;
 			Folder<String> f = folder;
 			if (mc != null && f != null) {
-				if (mc.getMail(true)) {
+				if (MailCache.FETCH_HEADER) {
 					String[] uidls = mc.getUIDLs();
 					f.setElements(uidls);
 				}
@@ -702,7 +702,7 @@ public class WebMail extends HttpServlet
 						if (!offline) {
 							// prime the cache, request all headers at once
 							// otherwise they are pulled one at a time by sortBy() below
-							mc.getMail(true);
+							mc.getMail(MailCache.FETCH_HEADER);
 						}
 						// get through cache so we have the disk-only ones too
 						String[] uidls = mc.getUIDLs();
@@ -767,25 +767,27 @@ public class WebMail extends HttpServlet
 	}
 	/**
 	 * Process all buttons, which possibly change internal state.
+	 * Also processes ?show=x for a GET
 	 * 
 	 * @param sessionObject
 	 * @param request
+	 * @param isPOST disallow button pushes if false
 	 */
-	private static void processStateChangeButtons(SessionObject sessionObject, RequestWrapper request )
+	private static void processStateChangeButtons(SessionObject sessionObject, RequestWrapper request, boolean isPOST )
 	{
 		/*
 		 * LOGIN/LOGOUT
 		 */
-		if( sessionObject.state == STATE_AUTH )
+		if( sessionObject.state == STATE_AUTH && isPOST )
 			processLogin( sessionObject, request );
 
-		if( sessionObject.state != STATE_AUTH )
+		if( sessionObject.state != STATE_AUTH && isPOST )
 			processLogout( sessionObject, request );
 
 		/*
 		 *  compose dialog
 		 */
-		if( sessionObject.state == STATE_NEW ) {
+		if( sessionObject.state == STATE_NEW && isPOST ) {
 			// We have to make sure to get the state right even if
 			// the user hit the back button previously
 			if( buttonPressed( request, SEND ) ) {
@@ -824,7 +826,7 @@ public class WebMail extends HttpServlet
 		/*
 		 * message dialog
 		 */
-		if( sessionObject.state == STATE_SHOW ) {
+		if( sessionObject.state == STATE_SHOW && isPOST ) {
 			if( buttonPressed( request, LIST ) ) { 
 				sessionObject.state = STATE_LIST;
 			} else if (buttonPressed( request, CANCEL ) ||
@@ -849,7 +851,7 @@ public class WebMail extends HttpServlet
 		 * buttons on both folder and message dialog
 		 */
 		if( sessionObject.state == STATE_SHOW || sessionObject.state == STATE_LIST ) {
-			if( buttonPressed( request, NEW ) ) {
+			if( isPOST && buttonPressed( request, NEW ) ) {
 				sessionObject.state = STATE_NEW;
 			}
 			
@@ -979,8 +981,10 @@ public class WebMail extends HttpServlet
 				}
 			}
 		}
+
 		/*
 		 * folder view
+		 * SHOW is the one parameter that's a link, not a button, so we allow it for GET
 		 */
 		if( sessionObject.state == STATE_LIST || sessionObject.state == STATE_SHOW) {
 			/*
@@ -1039,7 +1043,7 @@ public class WebMail extends HttpServlet
 		if( buttonPressed( request, REFRESH ) ) {
 			sessionObject.mailbox.refresh();
 			sessionObject.error += sessionObject.mailbox.lastError();
-			sessionObject.mailCache.getMail(true);
+			sessionObject.mailCache.getMail(MailCache.FETCH_HEADER);
 			// get through cache so we have the disk-only ones too
 			String[] uidls = sessionObject.mailCache.getUIDLs();
 			if (uidls != null)
@@ -1360,13 +1364,15 @@ public class WebMail extends HttpServlet
                                ua.startsWith("Vodafone"));
     }
 	/**
+	 * The entry point for all web page loads
 	 * 
 	 * @param httpRequest
 	 * @param response
+	 * @param isPOST disallow button pushes if false
 	 * @throws IOException
 	 * @throws ServletException
 	 */
-	private void processRequest( HttpServletRequest httpRequest, HttpServletResponse response )
+	private void processRequest( HttpServletRequest httpRequest, HttpServletResponse response, boolean isPOST )
 	throws IOException, ServletException
 	{
 		String theme = Config.getProperty(CONFIG_THEME, DEFAULT_THEME);
@@ -1418,7 +1424,7 @@ public class WebMail extends HttpServlet
 				processComposeButtons( sessionObject, request );
 		
 			int oldState = sessionObject.state;
-			processStateChangeButtons( sessionObject, request );
+			processStateChangeButtons( sessionObject, request, isPOST );
 			int newState = sessionObject.state;
 			if (oldState != newState)
 				Debug.debug(Debug.DEBUG, "STATE CHANGE from " + oldState + " to " + newState);
@@ -1430,11 +1436,14 @@ public class WebMail extends HttpServlet
 			//	Debug.debug(Debug.DEBUG, "Changed idle from " + oldIdle + " to " + newIdle);
 			//}
 			
-			if( sessionObject.state != STATE_AUTH )
-				processGenericButtons( sessionObject, request );
+			if( sessionObject.state != STATE_AUTH ) {
+				if (isPOST)
+				       processGenericButtons( sessionObject, request );
+			}
 			
 			if( sessionObject.state == STATE_LIST ) {
-				processFolderButtons( sessionObject, request );
+				if (isPOST)
+					processFolderButtons( sessionObject, request );
 				for( Iterator<String> it = sessionObject.folder.currentPageIterator(); it != null && it.hasNext(); ) {
 					String uidl = it.next();
 					Mail mail = sessionObject.mailCache.getMail( uidl, MailCache.FETCH_HEADER );
@@ -1446,7 +1455,8 @@ public class WebMail extends HttpServlet
 			}
 			
 			if( sessionObject.state == STATE_SHOW ) {
-				processMessageButtons( sessionObject, request );
+				if (isPOST)
+					processMessageButtons( sessionObject, request );
 				// If the last message has just been deleted then
 				// sessionObject.state = STATE_LIST and
 				// sessionObject.showUIDL = null
@@ -1734,6 +1744,7 @@ public class WebMail extends HttpServlet
 		}
 		return ok;
 	}
+
 	/**
 	 * 
 	 */
@@ -1741,8 +1752,9 @@ public class WebMail extends HttpServlet
 	public void doGet( HttpServletRequest request, HttpServletResponse response )
 	throws IOException, ServletException
 	{
-		processRequest( request, response );		
+		processRequest( request, response, false );		
 	}
+
 	/**
 	 * 
 	 */
@@ -1750,8 +1762,9 @@ public class WebMail extends HttpServlet
 	public void doPost( HttpServletRequest request, HttpServletResponse response )
 	throws IOException, ServletException
 	{
-		processRequest( request, response );
+		processRequest( request, response, true );
 	}
+
 	/**
 	 * 
 	 * @param out
@@ -1948,7 +1961,10 @@ public class WebMail extends HttpServlet
 			//		", clear=" + sessionObject.clear );
 			out.println( "<tr class=\"list" + bg + "\"><td><input type=\"checkbox\" class=\"optbox\" name=\"check" + i + "\" value=\"1\"" + 
 					( idChecked ? "checked" : "" ) + ">" + "</td><td>" +
-					link + mail.shortSender + "</a></td><td>&nbsp;</td><td>" + link + mail.shortSubject + "</a></td><td>&nbsp;</td><td>" +
+					link + mail.shortSender + "</a></td><td>" +
+					(mail.hasAttachment() ? "<img src=\"/susimail/icons/attach.png\" alt=\"\">" : "&nbsp;") + "</td><td>" +
+					link + mail.shortSubject + "</a></td><td>" +
+					(mail.isSpam() ? "<img src=\"/susimail/icons/flag_red.png\" alt=\"\">" : "&nbsp;") + "</td><td>" +
 					// don't let date get split across lines
 					mail.localFormattedDate.replace(" ", "&nbsp;") + "</td><td>&nbsp;</td><td align=\"right\">" +
 					((mail.getSize() > 0) ? (DataHelper.formatSize2(mail.getSize()) + 'B') : "???") + "</td></tr>" );

@@ -70,6 +70,7 @@ class Mail {
 	private MailPart part;
 	String[] to, cc;        // addresses only, enclosed by <>
 	private boolean isNew, isSpam;
+	public String contentType;
 
 	public String error;
 
@@ -152,6 +153,14 @@ class Mail {
 
 	public void setNew(boolean isNew) {
 		this.isNew = isNew;
+	}
+
+	public boolean hasAttachment() {
+		// this isn't right but good enough to start
+		// if part != null query parts instead?
+		return contentType != null &&
+			!contentType.contains("text/plain") &&
+			!contentType.contains("multipart/alternative");
 	}
 
 	/**
@@ -348,6 +357,11 @@ class Mail {
 						} else if(line.equals( "X-Spam-Flag: YES" )) {
 							// TODO trust.spam.headers config
 							isSpam = true;
+						} else if(line.toLowerCase(Locale.US).startsWith("content-type:" )) {
+							// this is duplicated in MailPart but
+							// we want to know if we have attachments, even if
+							// we haven't fetched the body
+							contentType = line.substring(13).trim();
 						}
 					}
 				}

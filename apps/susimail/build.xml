@@ -62,6 +62,10 @@
         <!-- set if unset -->
         <property name="workspace.changes.tr" value="" />
         <copy file="src/susimail.properties" todir="src/WEB-INF/classes" />
+        <mkdir dir="src/WEB-INF/classes/icons" />
+        <copy todir="src/WEB-INF/classes/icons" >
+            <fileset dir="src/icons" />
+        </copy>	
         <war destfile="susimail.war" webxml="src/WEB-INF/web.xml"
              basedir="src/" excludes="WEB-INF/web.xml LICENSE src/**/*">
             <manifest>
