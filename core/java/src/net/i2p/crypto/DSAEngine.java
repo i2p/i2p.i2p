@@ -506,8 +506,8 @@ public class DSAEngine {
             return altVerifySigSHA1(signature, data, offset, len, verifyingKey);
 
         java.security.Signature jsig;
-        if (type == SigType.EdDSA_SHA512_25519)
-            jsig = new net.i2p.crypto.eddsa.EdDSAEngine(java.security.MessageDigest.getInstance("SHA-512"));
+        if (type.getBaseAlgorithm() == SigAlgo.EdDSA)
+            jsig = new net.i2p.crypto.eddsa.EdDSAEngine(type.getDigestInstance());
         else
             jsig = java.security.Signature.getInstance(type.getAlgorithmName());
         PublicKey pubKey = SigUtil.toJavaKey(verifyingKey);
@@ -587,8 +587,8 @@ public class DSAEngine {
             return altSignSHA1(data, offset, len, privateKey);
 
         java.security.Signature jsig;
-        if (type == SigType.EdDSA_SHA512_25519)
-            jsig = new net.i2p.crypto.eddsa.EdDSAEngine(java.security.MessageDigest.getInstance("SHA-512"));
+        if (type.getBaseAlgorithm() == SigAlgo.EdDSA)
+            jsig = new net.i2p.crypto.eddsa.EdDSAEngine(type.getDigestInstance());
         else
             jsig = java.security.Signature.getInstance(type.getAlgorithmName());
         PrivateKey privKey = SigUtil.toJavaKey(privateKey);
