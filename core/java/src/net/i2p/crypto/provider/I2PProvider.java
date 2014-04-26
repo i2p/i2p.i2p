@@ -33,5 +33,10 @@ public final class I2PProvider extends Provider {
         //put("Mac.HmacMD5-I2P", "net.i2p.crypto.provider.MacSpi");
         put("MessageDigest.SHA-1", "net.i2p.crypto.SHA1");
         //put("Signature.SHA1withDSA", "net.i2p.crypto.provider.SignatureSpi");
+
+        // EdDSA
+        put("KeyFactory.EdDSA", "net.i2p.crypto.eddsa.KeyFactory");
+        put("KeyPairGenerator.EdDSA", "net.i2p.crypto.eddsa.KeyPairGenerator");
+        put("Signature.SHA512withEdDSA", "net.i2p.crypto.eddsa.EdDSAEngine");
     }
 }

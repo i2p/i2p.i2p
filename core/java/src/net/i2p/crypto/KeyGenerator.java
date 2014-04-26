@@ -216,8 +216,11 @@ public class KeyGenerator {
     public SimpleDataStructure[] generateSigningKeys(SigType type) throws GeneralSecurityException {
         if (type == SigType.DSA_SHA1)
             return generateSigningKeys();
-        KeyPairGenerator kpg = KeyPairGenerator.getInstance(type.getBaseAlgorithm().getName());
         KeyPair kp;
+        if (type == SigType.EdDSA_SHA512_25519) {
+            kp = new net.i2p.crypto.eddsa.KeyPairGenerator().generateKeyPair();
+        } else {
+        KeyPairGenerator kpg = KeyPairGenerator.getInstance(type.getBaseAlgorithm().getName());
         try {
             kpg.initialize(type.getParams(), _context.random());
             kp = kpg.generateKeyPair();
@@ -251,6 +254,7 @@ public class KeyGenerator {
                 // throw original exception
                 throw new GeneralSecurityException(pname + " KPG for " + type, pe);
             }
+        }
         }
         java.security.PublicKey pubkey = kp.getPublic();
         java.security.PrivateKey privkey = kp.getPrivate();

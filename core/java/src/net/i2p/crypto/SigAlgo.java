@@ -9,6 +9,7 @@ public enum SigAlgo {
 
     DSA("DSA"),
     EC("EC"),
+    EdDSA("EdDSA"),
     RSA("RSA")
     ;
 

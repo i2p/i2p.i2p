@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.IOException;
-
 import java.math.BigInteger;
 import java.security.GeneralSecurityException;
 import java.security.InvalidKeyException;
@@ -33,6 +32,11 @@ import java.security.spec.RSAPublicKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Map;
 
+import net.i2p.crypto.eddsa.EdDSAPrivateKey;
+import net.i2p.crypto.eddsa.EdDSAPublicKey;
+import net.i2p.crypto.eddsa.spec.EdDSAParameterSpec;
+import net.i2p.crypto.eddsa.spec.EdDSAPrivateKeySpec;
+import net.i2p.crypto.eddsa.spec.EdDSAPublicKeySpec;
 import net.i2p.data.Signature;
 import net.i2p.data.SigningPrivateKey;
 import net.i2p.data.SigningPublicKey;
@@ -62,6 +66,8 @@ public class SigUtil {
                 return toJavaDSAKey(pk);
             case EC:
                 return toJavaECKey(pk);
+            case EdDSA:
+                return toJavaEdDSAKey(pk);
             case RSA:
                 return toJavaRSAKey(pk);
             default:
@@ -79,6 +85,8 @@ public class SigUtil {
                 return toJavaDSAKey(pk);
             case EC:
                 return toJavaECKey(pk);
+            case EdDSA:
+                return toJavaEdDSAKey(pk);
             case RSA:
                 return toJavaRSAKey(pk);
             default:
@@ -96,6 +104,8 @@ public class SigUtil {
                 return fromJavaKey((DSAPublicKey) pk);
             case EC:
                 return fromJavaKey((ECPublicKey) pk, type);
+            case EdDSA:
+                return fromJavaKey((EdDSAPublicKey) pk, type);
             case RSA:
                 return fromJavaKey((RSAPublicKey) pk, type);
             default:
@@ -113,6 +123,8 @@ public class SigUtil {
                 return fromJavaKey((DSAPrivateKey) pk);
             case EC:
                 return fromJavaKey((ECPrivateKey) pk, type);
+            case EdDSA:
+                return fromJavaKey((EdDSAPrivateKey) pk, type);
             case RSA:
                 return fromJavaKey((RSAPrivateKey) pk, type);
             default:
@@ -194,6 +206,34 @@ public class SigUtil {
         int len = type.getPrivkeyLen();
         byte[] bs = rectify(s, len);
         return new SigningPrivateKey(type, bs);
+    }
+
+    /**
+     *  @return JAVA EdDSA public key!
+     */
+    public static EdDSAPublicKey toJavaEdDSAKey(SigningPublicKey pk)
+                              throws GeneralSecurityException {
+        return new EdDSAPublicKey(new EdDSAPublicKeySpec(
+                pk.getData(), (EdDSAParameterSpec) pk.getType().getParams()));
+    }
+
+    /**
+     *  @return JAVA EdDSA private key!
+     */
+    public static EdDSAPrivateKey toJavaEdDSAKey(SigningPrivateKey pk)
+                              throws GeneralSecurityException {
+        return new EdDSAPrivateKey(new EdDSAPrivateKeySpec(
+                pk.getData(), (EdDSAParameterSpec) pk.getType().getParams()));
+    }
+
+    public static SigningPublicKey fromJavaKey(EdDSAPublicKey pk, SigType type)
+            throws GeneralSecurityException {
+        return new SigningPublicKey(type, pk.getAbyte());
+    }
+
+    public static SigningPrivateKey fromJavaKey(EdDSAPrivateKey pk, SigType type)
+            throws GeneralSecurityException {
+        return new SigningPrivateKey(type, pk.getSeed());
     }
 
     public static DSAPublicKey toJavaDSAKey(SigningPublicKey pk)
@@ -290,8 +330,8 @@ public class SigUtil {
      *  @return ASN.1 representation
      */
     public static byte[] toJavaSig(Signature sig) {
-        // RSA sigs are not ASN encoded
-        if (sig.getType().getBaseAlgorithm() == SigAlgo.RSA)
+        // RSA and EdDSA sigs are not ASN encoded
+        if (sig.getType().getBaseAlgorithm() == SigAlgo.RSA || sig.getType().getBaseAlgorithm() == SigAlgo.EdDSA)
             return sig.getData();
         return sigBytesToASN1(sig.getData());
     }
@@ -302,8 +342,8 @@ public class SigUtil {
      */
     public static Signature fromJavaSig(byte[] asn, SigType type)
                               throws SignatureException {
-        // RSA sigs are not ASN encoded
-        if (type.getBaseAlgorithm() == SigAlgo.RSA)
+        // RSA and EdDSA sigs are not ASN encoded
+        if (type.getBaseAlgorithm() == SigAlgo.RSA || type.getBaseAlgorithm() == SigAlgo.EdDSA)
             return new Signature(type, asn);
         return new Signature(type, aSN1ToSigBytes(asn, type.getSigLen()));
     }
