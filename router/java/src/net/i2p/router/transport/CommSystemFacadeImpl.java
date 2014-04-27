@@ -202,8 +202,15 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
      */
     @Override
     public void notifyReplaceAddress(RouterAddress udpAddr) {
-        byte[] ip = udpAddr != null ? udpAddr.getIP() : null;
-        int port = udpAddr != null ? udpAddr.getPort() : 0;
+        byte[] ip = null;
+        int port = 0;
+        // Don't pass IP along if address has introducers
+        // Right now we publish the direct UDP address, even if publishing introducers,
+        // we probably shouldn't, see UDPTransport rebuildExternalAddress() TODO
+        if (udpAddr != null && udpAddr.getOption("ihost0") == null) {
+            ip = udpAddr.getIP();
+            port = udpAddr.getPort();
+        }
         if (port < 0) {
             Transport udp = _manager.getTransport(UDPTransport.STYLE);
             if (udp != null)

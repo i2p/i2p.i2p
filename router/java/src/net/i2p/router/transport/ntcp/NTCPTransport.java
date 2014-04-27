@@ -578,6 +578,7 @@ public class NTCPTransport extends TransportImpl {
      *
      *  Doesn't actually restart unless addr is non-null and
      *  the port is different from the current listen port.
+     *  If addr is null, removes all addresses.
      *
      *  If we had interface addresses before, we lost them.
      *
@@ -591,6 +592,8 @@ public class NTCPTransport extends TransportImpl {
             else
                 replaceAddress(addr);
             // UDPTransport.rebuildExternalAddress() calls router.rebuildRouterInfo()
+        } else {
+            replaceAddress(null);
         }
     }
 
@@ -942,14 +945,14 @@ public class NTCPTransport extends TransportImpl {
                 nport = Integer.toString(port);
         }
         if (_log.shouldLog(Log.INFO))
-            _log.info("old: " + oport + " config: " + cport + " new: " + nport);
-        if (nport == null || nport.length() <= 0)
-            return;
+            _log.info("old port: " + oport + " config: " + cport + " new: " + nport);
+        //if (nport == null || nport.length() <= 0)
+        //    return;
         // 0.9.6 change
         // Don't have NTCP "chase" SSU's external port,
         // as it may change, possibly frequently.
         //if (oport == null || ! oport.equals(nport)) {
-        if (oport == null) {
+        if (oport == null && nport != null && nport.length() > 0) {
             newProps.setProperty(RouterAddress.PROP_PORT, nport);
             changed = true;
         }
@@ -993,7 +996,7 @@ public class NTCPTransport extends TransportImpl {
             // but we probably only get here if the port is auto,
             // otherwise createNTCPAddress() would have done it already
             if (_log.shouldLog(Log.INFO))
-                _log.info("old: " + ohost + " config: " + name + " new: " + name);
+                _log.info("old host: " + ohost + " config: " + name + " new: " + name);
             newProps.setProperty(RouterAddress.PROP_HOST, name);
             changed = true;
         } else if (ohost == null || ohost.length() <= 0) {
@@ -1004,7 +1007,7 @@ public class NTCPTransport extends TransportImpl {
             // because UPnP was successful, but a subsequent SSU Peer Test determines
             // we are still firewalled (SW firewall, bad UPnP indication, etc.)
             if (_log.shouldLog(Log.INFO))
-                _log.info("old: " + ohost + " config: " + name + " new: null");
+                _log.info("old host: " + ohost + " config: " + name + " new: null");
             newAddr = null;
             changed = true;
         }
