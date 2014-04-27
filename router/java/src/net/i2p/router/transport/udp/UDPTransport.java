@@ -91,6 +91,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     
     /** do we need to rebuild our external router address asap? */
     private boolean _needsRebuild;
+    private final Object _rebuildLock = new Object();
     
     /** introduction key */
     private SessionKey _introKey;
@@ -1159,8 +1160,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         if (oldEstablishedOn > 0)
             _context.statManager().addRateData("udp.alreadyConnected", oldEstablishedOn, 0);
         
-        if (needsRebuild())
-            rebuildExternalAddress();
+        rebuildIfNecessary();
         
         if (getReachabilityStatus() != CommSystemFacade.STATUS_OK) {
             _testEvent.forceRun();
@@ -1303,8 +1303,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         synchronized(_addDropLock) {
             locked_dropPeer(peer, shouldBanlist, why);
         }
-        if (needsRebuild())
-            rebuildExternalAddress();
+        rebuildIfNecessary();
     }
 
     private void locked_dropPeer(PeerState peer, boolean shouldBanlist, String why) {
@@ -1349,9 +1348,16 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     }
     
     /**
-     *  Does the IPv4 external address need to be rebuilt?
+     *  Rebuild the IPv4 external address if required
      */
-    private boolean needsRebuild() {
+    private void rebuildIfNecessary() {
+        synchronized (_rebuildLock) {
+            if (locked_needsRebuild())
+                rebuildExternalAddress();
+        }
+    }
+
+    private boolean locked_needsRebuild() {
         if (_needsRebuild) return true; // simple enough
         if (_context.router().isHidden()) return false;
         RouterAddress addr = getCurrentAddress(false);
@@ -1367,21 +1373,29 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 if (peer != null)
                     valid++;
             }
+            long sinceSelected = _context.clock().now() - _introducersSelectedOn;
             if (valid >= PUBLIC_RELAY_COUNT) {
                 // try to shift 'em around every 10 minutes or so
-                if (_introducersSelectedOn < _context.clock().now() - 10*60*1000) {
+                if (sinceSelected > 10*60*1000) {
                     if (_log.shouldLog(Log.WARN))
-                        _log.warn("Our introducers are valid, but havent changed in a while, so lets rechoose");
+                        _log.warn("Our introducers are valid, but haven't changed in " + DataHelper.formatDuration(sinceSelected) + ", so lets rechoose");
                     return true;
                 } else {
                     if (_log.shouldLog(Log.INFO))
-                        _log.info("Our introducers are valid and haven't changed in a while");
+                        _log.info("Our introducers are valid and were selected " + DataHelper.formatDuration(sinceSelected) + " ago");
                     return false;
                 }
-            } else {
+            } else if (sinceSelected > 2*60*1000) {
+                // Rate limit to prevent rapid churn after transition to firewalled or at startup
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Need more introducers (have " +valid + " need " + PUBLIC_RELAY_COUNT + ')');
                 return true;
+            } else {
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Need more introducers (have " +valid + " need " + PUBLIC_RELAY_COUNT + ')' +
+                              " but we just chose them " + DataHelper.formatDuration(sinceSelected) + " ago so wait");
+                // TODO also check to see if we actually have more available
+                return false;
             }
         } else {
             byte[] externalListenHost = addr != null ? addr.getIP() : null;
@@ -1792,6 +1806,12 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      *  @since IPv6
      */
     private RouterAddress rebuildExternalAddress(String host, int port, boolean allowRebuildRouterInfo) {
+        synchronized (_rebuildLock) {
+            return locked_rebuildExternalAddress(host, port, allowRebuildRouterInfo);
+        }
+    }
+
+    private RouterAddress locked_rebuildExternalAddress(String host, int port, boolean allowRebuildRouterInfo) {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("REA4 " + host + ':' + port);
         if (_context.router().isHidden())
@@ -1802,6 +1822,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         // DNS name assumed IPv4
         boolean isIPv6 = host != null && host.contains(":");
         if (allowDirectUDP() && port > 0 && host != null) {
+            // TODO don't add these if we have (or require?) introducers
             options.setProperty(UDPAddress.PROP_PORT, String.valueOf(port));
             options.setProperty(UDPAddress.PROP_HOST, host);
             directIncluded = true;
@@ -2948,6 +2969,12 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     }
     
     void setReachabilityStatus(short status) { 
+        synchronized (_rebuildLock) {
+            locked_setReachabilityStatus(status);
+        }
+    }
+
+    private void locked_setReachabilityStatus(short status) { 
         short old = _reachabilityStatus;
         long now = _context.clock().now();
         switch (status) {
@@ -2997,6 +3024,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 rebuildExternalAddress();
         }
     }
+
     private static final String PROP_REACHABILITY_STATUS_OVERRIDE = "i2np.udp.status";
 
     @Override

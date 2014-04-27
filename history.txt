@@ -1,3 +1,18 @@
+2014-04-27 zzz
+ * NTCP: Remove published NTCP address if SSU becomes firewalled,
+         to fix the "Firewalled with NTCP enabled" message
+ * Router: Set killVMOnEnd before runRouter() (for azi2phelper)
+ * RoutingKeyGenerator: Don't assume UTC (for azi2phelper)
+ * SusiMail:
+   - Add locking for disk cache
+   - Remove cancel button from login page
+   - New configuration page
+   - Move set page form to configuration page
+   - Theme and js enhancements
+ * UDP:
+   - Locking fixes on rebuilding address
+   - Don't rapidly churn address when we don't have enough introducers
+
 2014-04-25 zzz
  * SusiMail:
    - Add icons for new messages, attachments, and spam
@@ -9,6 +24,7 @@
    - Increase max size for full download again
    - Fix repeated re-saves of mail to disk
    - Enable auto-deletion of downloaded mails
+   - Send delete to server for mails already downloaded
 
 2014-04-24 zzz
  * SusiMail:
