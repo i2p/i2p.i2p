@@ -57,8 +57,8 @@ public class ConfigNetHandler extends FormHandler {
     protected void processForm() {
         if (_saveRequested || ( (_action != null) && (_("Save changes").equals(_action)) )) {
             saveChanges();
-        } else if (_recheckReachabilityRequested) {
-            recheckReachability();
+        //} else if (_recheckReachabilityRequested) {
+        //    recheckReachability();
         } else {
             // noop
         }
@@ -137,10 +137,12 @@ public class ConfigNetHandler extends FormHandler {
         _ipv6Mode = mode;
     }
     
+/****
     private void recheckReachability() {
         _context.commSystem().recheckReachability();
         addFormNotice(_("Rechecking router reachability..."));
     }
+****/
     
     /**
      * The user made changes to the network config and wants to save them, so

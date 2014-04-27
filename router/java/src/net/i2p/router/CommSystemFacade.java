@@ -53,7 +53,12 @@ public abstract class CommSystemFacade implements Service {
      *
      */
     public short getReachabilityStatus() { return STATUS_OK; }
+
+    /**
+     * @deprecated unused
+     */
     public void recheckReachability() {}
+
     public boolean isBacklogged(Hash dest) { return false; }
     public boolean wasUnreachable(Hash dest) { return false; }
     public boolean isEstablished(Hash dest) { return false; }

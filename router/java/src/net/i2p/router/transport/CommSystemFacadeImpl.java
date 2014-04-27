@@ -173,6 +173,10 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
             return STATUS_OK;
         return rv; 
     }
+
+    /**
+     * @deprecated unused
+     */
     @Override
     public void recheckReachability() { _manager.recheckReachability(); }
 

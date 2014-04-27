@@ -132,7 +132,12 @@ public interface Transport {
     
     public void renderStatusHTML(Writer out, String urlBase, int sortFlags) throws IOException;
     public short getReachabilityStatus();
+
+    /**
+     * @deprecated unused
+     */
     public void recheckReachability();
+
     public boolean isBacklogged(Hash peer);
 
     /**

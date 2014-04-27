@@ -308,6 +308,9 @@ public class TransportManager implements TransportEventListener {
         return rv;
     }
 
+    /**
+     * @deprecated unused
+     */
     public void recheckReachability() { 
         for (Transport t : _transports.values())
             t.recheckReachability();

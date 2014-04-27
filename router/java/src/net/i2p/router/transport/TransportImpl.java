@@ -703,7 +703,12 @@ public abstract class TransportImpl implements Transport {
     public void renderStatusHTML(Writer out, String urlBase, int sortFlags) throws IOException { renderStatusHTML(out); }
 
     public short getReachabilityStatus() { return CommSystemFacade.STATUS_UNKNOWN; }
+
+    /**
+     * @deprecated unused
+     */
     public void recheckReachability() {}
+
     public boolean isBacklogged(Hash dest) { return false; }
     public boolean isEstablished(Hash dest) { return false; }
 
