@@ -171,7 +171,8 @@ public enum SigType {
             return true;
         try {
             getParams();
-            Signature.getInstance(getAlgorithmName());
+            if (getBaseAlgorithm() != SigAlgo.EdDSA)
+                Signature.getInstance(getAlgorithmName());
             getDigestInstance();
             getHashInstance();
         } catch (Exception e) {
