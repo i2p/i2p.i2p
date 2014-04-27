@@ -53,6 +53,8 @@ import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Properties;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -91,7 +93,6 @@ public class WebMail extends HttpServlet
 	private static final int STATE_LIST = 2;
 	private static final int STATE_SHOW = 3;
 	private static final int STATE_NEW = 4;
-	// TODO
 	private static final int STATE_CONFIG = 5;
 	
 	// TODO generate from servlet name to allow for renaming or multiple instances
@@ -113,7 +114,9 @@ public class WebMail extends HttpServlet
 	 */
 	private static final String LOGOUT = "logout";
 	private static final String RELOAD = "reload";
+	private static final String SAVE = "save";
 	private static final String REFRESH = "refresh";
+	private static final String CONFIGURE = "configure";
 	private static final String NEW = "new";
 	private static final String REPLY = "reply";
 	private static final String REPLYALL = "replyall";
@@ -157,6 +160,8 @@ public class WebMail extends HttpServlet
 	private static final String SORT_SUBJECT = "sort_subject";
 	private static final String SORT_DATE = "sort_date";
 	private static final String SORT_SIZE = "sort_size";
+
+	private static final String CONFIG_TEXT = "config_text";
 
 	private static final boolean SHOW_HTML = true;
 	private static final boolean TEXT_ONLY = false;
@@ -827,9 +832,9 @@ public class WebMail extends HttpServlet
 	 * @param sessionObject
 	 * @param request
 	 */
-	private static void processLogout( SessionObject sessionObject, RequestWrapper request )
+	private static void processLogout( SessionObject sessionObject, RequestWrapper request, boolean isPOST )
 	{
-		if( buttonPressed( request, LOGOUT ) ) {
+		if( buttonPressed( request, LOGOUT ) && isPOST) {
 			Debug.debug(Debug.DEBUG, "LOGOUT, REMOVING SESSION");
 			HttpSession session = request.getSession();
 			session.removeAttribute( "sessionObject" );
@@ -842,12 +847,12 @@ public class WebMail extends HttpServlet
 			}
 			sessionObject.info += _("User logged out.") + "<br>";
 			sessionObject.state = STATE_AUTH;
-		}
-		else if( sessionObject.mailbox == null ) {
+		} else if( sessionObject.mailbox == null ) {
 			sessionObject.error += _("Internal error, lost connection.") + "<br>";
 			sessionObject.state = STATE_AUTH;
 		}
 	}
+
 	/**
 	 * Process all buttons, which possibly change internal state.
 	 * Also processes ?show=x for a GET
@@ -864,8 +869,8 @@ public class WebMail extends HttpServlet
 		if( sessionObject.state == STATE_AUTH && isPOST )
 			processLogin( sessionObject, request );
 
-		if( sessionObject.state != STATE_AUTH && isPOST )
-			processLogout( sessionObject, request );
+		if( sessionObject.state != STATE_AUTH && sessionObject.state != STATE_CONFIG )
+			processLogout( sessionObject, request, isPOST );
 
 		/*
 		 *  compose dialog
@@ -907,9 +912,9 @@ public class WebMail extends HttpServlet
 			}
 		}
 		/*
-		 * message dialog
+		 * message dialog or config
 		 */
-		if( sessionObject.state == STATE_SHOW && isPOST ) {
+		if((sessionObject.state == STATE_SHOW || sessionObject.state == STATE_CONFIG) && isPOST ) {
 			if( buttonPressed( request, LIST ) ) { 
 				sessionObject.state = STATE_LIST;
 			} else if (buttonPressed( request, CANCEL ) ||
@@ -930,6 +935,18 @@ public class WebMail extends HttpServlet
 				sessionObject.state = STATE_LIST;
 			}
 		}
+
+		/*
+		 * config
+		 */
+		if (sessionObject.state == STATE_CONFIG && isPOST) {
+			if (buttonPressed(request, OFFLINE)) {       // lost
+				sessionObject.state = STATE_AUTH;
+			} else if (buttonPressed(request, LOGIN)) {  // lost
+				sessionObject.state = STATE_AUTH;
+			}
+		}
+
 		/*
 		 * buttons on both folder and message dialog
 		 */
@@ -1329,7 +1346,7 @@ public class WebMail extends HttpServlet
 		/*
 		 * process paging buttons
 		 */
-		if (buttonPressed(request, PAGESIZE) && !buttonPressed(request, RELOAD)) {
+		if (buttonPressed(request, SETPAGESIZE)) {
 			try {
 				int pageSize = Math.max(5, Integer.parseInt(request.getParameter(PAGESIZE)));
 				int oldPageSize = sessionObject.folder.getPageSize();
@@ -1419,6 +1436,59 @@ public class WebMail extends HttpServlet
 			}
 		}
 	}
+
+	/*
+	 * process config buttons, both entering and exiting
+	 */
+	private static void processConfigButtons(SessionObject sessionObject, RequestWrapper request) {
+		if (buttonPressed(request, SAVE)) {
+			try {
+				String raw = request.getParameter(CONFIG_TEXT);
+				if (raw == null)
+					return;
+				Properties props = new Properties();
+				DataHelper.loadProps(props, new ByteArrayInputStream(DataHelper.getUTF8(raw)));
+				Config.saveConfiguration(props);
+				String ps = props.getProperty(Folder.PAGESIZE);
+				if (sessionObject.folder != null && ps != null) {
+					try {
+						int pageSize = Math.max(5, Integer.parseInt(request.getParameter(PAGESIZE)));
+						int oldPageSize = sessionObject.folder.getPageSize();
+						if( pageSize != oldPageSize )
+							sessionObject.folder.setPageSize( pageSize );
+					} catch( NumberFormatException nfe ) {}
+				}
+				sessionObject.state = sessionObject.folder != null ? STATE_LIST : STATE_AUTH;
+				sessionObject.info = _("Configuration saved");
+			} catch (IOException ioe) {
+				sessionObject.error = ioe.toString();
+			}
+		} else if (buttonPressed(request, SETPAGESIZE)) {
+			try {
+				int pageSize = Math.max(5, Integer.parseInt(request.getParameter(PAGESIZE)));
+				Properties props = Config.getProperties();
+				props.setProperty(Folder.PAGESIZE, String.valueOf(pageSize));
+				Config.saveConfiguration(props);
+				if (sessionObject.folder != null) {
+					int oldPageSize = sessionObject.folder.getPageSize();
+					if( pageSize != oldPageSize )
+						sessionObject.folder.setPageSize( pageSize );
+					sessionObject.state = STATE_LIST;
+				} else {
+					sessionObject.state = STATE_AUTH;
+				}
+			} catch (IOException ioe) {
+				sessionObject.error = ioe.toString();
+			} catch( NumberFormatException nfe ) {
+				sessionObject.error += _("Invalid pagesize number, resetting to default value.") + "<br>";
+			}
+		} else if (buttonPressed(request, CANCEL)) {
+			sessionObject.state = (sessionObject.folder != null) ? STATE_LIST : STATE_AUTH;
+		} else if (buttonPressed(request, CONFIGURE)) {
+			sessionObject.state = STATE_CONFIG;
+		}
+	}
+
 	/**
 	 * @param httpSession
 	 * @return non-null
@@ -1437,6 +1507,7 @@ public class WebMail extends HttpServlet
 		}
 		return sessionObject;
 	}
+
     /**
      * Copied from net.i2p.router.web.CSSHelper
      * @since 0.9.7
@@ -1528,6 +1599,8 @@ public class WebMail extends HttpServlet
 		
 			int oldState = sessionObject.state;
 			processStateChangeButtons( sessionObject, request, isPOST );
+			if (isPOST)
+				processConfigButtons( sessionObject, request );
 			int newState = sessionObject.state;
 			if (oldState != newState)
 				Debug.debug(Debug.DEBUG, "STATE CHANGE from " + oldState + " to " + newState);
@@ -1582,7 +1655,7 @@ public class WebMail extends HttpServlet
 			/*
 			 * update folder content
 			 */
-			if( sessionObject.state != STATE_AUTH ) {
+			if( sessionObject.state == STATE_LIST ) {
 				// get through cache so we have the disk-only ones too
 				String[] uidls = sessionObject.mailCache.getUIDLs();
 				if (uidls != null) {
@@ -1611,6 +1684,8 @@ public class WebMail extends HttpServlet
 						subtitle = _("Show Message");
 				} else if( sessionObject.state == STATE_NEW ) {
 					subtitle = _("New Message");
+				} else if( sessionObject.state == STATE_CONFIG ) {
+					subtitle = _("Configuration");
 				}
 
 				response.setContentType( "text/html" );
@@ -1648,7 +1723,7 @@ public class WebMail extends HttpServlet
 					out.println( "<p class=\"error\">" + sessionObject.error + "</p>" );
 				}
 				if( sessionObject.info != null && sessionObject.info.length() > 0 ) {
-					out.println( "<p class=\"info\">" + sessionObject.info + "</p>" );
+					out.println( "<p class=\"info\"><b>" + sessionObject.info + "</b></p>" );
 				}
 				/*
 				 * now write body
@@ -1664,6 +1739,9 @@ public class WebMail extends HttpServlet
 				
 				else if( sessionObject.state == STATE_NEW )
 					showCompose( out, sessionObject, request );
+				
+				else if( sessionObject.state == STATE_CONFIG )
+					showConfig(out, sessionObject);
 				
 				//out.println( "</form><div id=\"footer\"><hr><p class=\"footer\">susimail v0." + version +" " + ( RELEASE ? "release" : "development" ) + " &copy; 2004-2005 <a href=\"mailto:susi23@mail.i2p\">susi</a></div></div></body>\n</html>");				
 				out.println( "</form><div id=\"footer\"><hr><p class=\"footer\">susimail &copy; 2004-2005 susi</div></div></body>\n</html>");				
@@ -1972,6 +2050,7 @@ public class WebMail extends HttpServlet
 		}
 		out.println( "</table>" );
 	}
+
 	/**
 	 * 
 	 * @param out
@@ -1999,13 +2078,18 @@ public class WebMail extends HttpServlet
 		out.println(
 			"<tr><td colspan=\"2\">&nbsp;</td></tr>\n" +
 			"<tr><td></td><td align=\"left\">" + button( LOGIN, _("Login") ) + spacer +
-			  button(OFFLINE, _("Read Mail Offline") ) + spacer +
-			 " <input class=\"cancel\" type=\"reset\" value=\"" + _("Reset") + "\"></td></tr>\n" +
+			 button(OFFLINE, _("Read Mail Offline") ) +
+			 //spacer +
+			 //" <input class=\"cancel\" type=\"reset\" value=\"" + _("Reset") + "\">" +
+			 spacer +
+			 button(CONFIGURE, _("Settings")) +
+			"</td></tr>\n" +
 			"<tr><td colspan=\"2\">&nbsp;</td></tr>\n" +
 			"<tr><td></td><td align=\"left\"><a href=\"http://hq.postman.i2p/?page_id=14\">" + _("Learn about I2P mail") + "</a></td></tr>\n" +
 			"<tr><td></td><td align=\"left\"><a href=\"http://hq.postman.i2p/?page_id=16\">" + _("Create Account") + "</a></td></tr>\n" +
 			"</table>");
 	}
+
 	/**
 	 * 
 	 * @param out
@@ -2014,16 +2098,16 @@ public class WebMail extends HttpServlet
 	 */
 	private static void showFolder( PrintWriter out, SessionObject sessionObject, RequestWrapper request )
 	{
-		out.println( button( NEW, _("New") ) + spacer +
+		out.println( button( NEW, _("New") ) + spacer);
 			// In theory, these are valid and will apply to the first checked message,
 			// but that's not obvious and did it work?
 			//button( REPLY, _("Reply") ) +
 			//button( REPLYALL, _("Reply All") ) +
 			//button( FORWARD, _("Forward") ) + spacer +
 			//button( DELETE, _("Delete") ) + spacer +
-			button( REFRESH, _("Check Mail") ) + spacer);
-		if (Config.hasConfigFile())
-			out.println(button( RELOAD, _("Reload Config") ) + spacer);
+		out.println(button( REFRESH, _("Check Mail") ) + spacer);
+		//if (Config.hasConfigFile())
+		//	out.println(button( RELOAD, _("Reload Config") ) + spacer);
 		out.println(button( LOGOUT, _("Logout") ));
 
 		if (sessionObject.folder.getPages() > 1)
@@ -2057,6 +2141,7 @@ public class WebMail extends HttpServlet
 			else
 				type = "linkold";
 			String link = "<a href=\"" + myself + "?" + SHOW + "=" + i + "\" class=\"" + type + "\">";
+			String jslink = " onclick=\"document.location='" + myself + '?' + SHOW + '=' + i + "';\" ";
 			
 			boolean idChecked = false;
 			String checkId = sessionObject.pageChanged ? null : request.getParameter( "check" + i );
@@ -2075,15 +2160,16 @@ public class WebMail extends HttpServlet
 			//		", markAll=" + sessionObject.markAll +
 			//		", invert=" + sessionObject.invert +
 			//		", clear=" + sessionObject.clear );
-			out.println( "<tr class=\"list" + bg + "\"><td><input type=\"checkbox\" class=\"optbox\" name=\"check" + i + "\" value=\"1\"" + 
-					( idChecked ? "checked" : "" ) + ">" + "</td><td>" +
-					(mail.isNew() ? "<img src=\"/susimail/icons/flag_green.png\" alt=\"\" title=\"" + _("Message is new") + "\">" : "&nbsp;") + "</td><td>" +
-					link + mail.shortSender + "</a></td><td>" +
-					(mail.hasAttachment() ? "<img src=\"/susimail/icons/attach.png\" alt=\"\" title=\"" + _("Message has an attachment") + "\">" : "&nbsp;") + "</td><td>" +
-					link + mail.shortSubject + "</a></td><td>" +
-					(mail.isSpam() ? "<img src=\"/susimail/icons/flag_red.png\" alt=\"\" title=\"" + _("Message is spam") + "\">" : "&nbsp;") + "</td><td>" +
+			out.println( "<tr class=\"list" + bg + "\">" +
+					"<td><input type=\"checkbox\" class=\"optbox\" name=\"check" + i + "\" value=\"1\"" + 
+					( idChecked ? "checked" : "" ) + ">" + "</td><td " + jslink + ">" +
+					(mail.isNew() ? "<img src=\"/susimail/icons/flag_green.png\" alt=\"\" title=\"" + _("Message is new") + "\">" : "&nbsp;") + "</td><td " + jslink + ">" +
+					link + mail.shortSender + "</a></td><td " + jslink + ">" +
+					(mail.hasAttachment() ? "<img src=\"/susimail/icons/attach.png\" alt=\"\" title=\"" + _("Message has an attachment") + "\">" : "&nbsp;") + "</td><td " + jslink + ">" +
+					link + mail.shortSubject + "</a></td><td " + jslink + ">" +
+					(mail.isSpam() ? "<img src=\"/susimail/icons/flag_red.png\" alt=\"\" title=\"" + _("Message is spam") + "\">" : "&nbsp;") + "</td><td " + jslink + ">" +
 					// don't let date get split across lines
-					mail.localFormattedDate.replace(" ", "&nbsp;") + "</td><td>&nbsp;</td><td align=\"right\">" +
+					mail.localFormattedDate.replace(" ", "&nbsp;") + "</td><td " + jslink + ">&nbsp;</td><td align=\"right\" " + jslink + ">" +
 					((mail.getSize() > 0) ? (DataHelper.formatSize2(mail.getSize()) + 'B') : "???") + "</td></tr>" );
 			bg = 1 - bg;
 			i++;
@@ -2108,18 +2194,21 @@ public class WebMail extends HttpServlet
 				// TODO js
 				out.println(button( DELETE, _("Delete Selected") ) + "<br>");
 				out.print(
-					button( CLEAR, _("Clear All") ) +
+					button( MARKALL, _("Mark All") ) +
 					"&nbsp;" +
-					button( MARKALL, _("Mark All") ));
+					button( CLEAR, _("Clear All") ));
 					//"<br>" + 
 					//button( INVERT, _("Invert Selection") ) +
 					//"<br>");
 			}
 			out.print("</td>\n<td colspan=\"4\" align=\"right\">");
-			out.print(
-				_("Page Size") + ":&nbsp;<input type=\"text\" style=\"text-align: right;\" name=\"" + PAGESIZE + "\" size=\"4\" value=\"" +  sessionObject.folder.getPageSize() + "\">" +
-				"&nbsp;" + 
-				button( SETPAGESIZE, _("Set") ) );
+			// moved to config page
+			//out.print(
+			//	_("Page Size") + ":&nbsp;<input type=\"text\" style=\"text-align: right;\" name=\"" + PAGESIZE + "\" size=\"4\" value=\"" +  sessionObject.folder.getPageSize() + "\">" +
+			//	"&nbsp;" + 
+			//	button( SETPAGESIZE, _("Set") ) );
+			out.print("<br>");
+			out.print(button(CONFIGURE, _("Settings")));
 			out.println("</td>");
 		}
 		out.println( "</table>");
@@ -2196,6 +2285,37 @@ public class WebMail extends HttpServlet
 			out.println( "<tr class=\"mailbody\"><td colspan=\"2\" align=\"center\"><p class=\"error\">" + _("Could not fetch mail.") + "</p></td></tr>" );
 		}
 		out.println( "<tr><td colspan=\"2\" align=\"center\"><hr></td></tr>\n</table>" );
+	}
+
+	/**
+	 *  Simple configure page
+	 *
+	 *  @since 0.9.13
+	 */
+	private static void showConfig(PrintWriter out, SessionObject sessionObject) {
+		int sz;
+		if (sessionObject.folder != null)
+			sz = sessionObject.folder.getPageSize();
+		else
+			sz = Config.getProperty(Folder.PAGESIZE, Folder.DEFAULT_PAGESIZE);
+		out.println(
+			_("Folder Page Size") + ":&nbsp;<input type=\"text\" style=\"text-align: right;\" name=\"" + PAGESIZE +
+			"\" size=\"4\" value=\"" +  sz + "\">" +
+			"&nbsp;" + 
+			button( SETPAGESIZE, _("Set") ) );
+		out.println("<p>");
+		out.print(_("Advanced Configuration"));
+		out.print(":</p><textarea cols=\"80\" rows=\"20\" spellcheck=\"false\" name=\"" + CONFIG_TEXT + "\">");
+		Properties config = Config.getProperties();
+		for (Map.Entry<Object, Object> e : config.entrySet()) {
+			out.print(e.getKey());
+			out.print('=');
+			out.println(e.getValue());
+		}
+		out.println("</textarea>");
+		out.println("</br>");
+		out.println(button(SAVE, _("Save Configuration")));
+		out.println(button(CANCEL, _("Cancel")));
 	}
 
 	/** translate */

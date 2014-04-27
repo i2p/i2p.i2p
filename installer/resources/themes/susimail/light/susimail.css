@@ -114,11 +114,27 @@ td {
 }
 
 tr.list0 {
-     background-color:#e0e0e0;
+     background-color:#ececec;
 }
 
 tr.list1 {
-     background-color:#ffffff;
+     background-color:#f4f4f4;
+}
+
+tr.list0:hover {
+     background-color:#e0e0f4;
+}
+
+tr.list1:hover {
+     background-color:#e0e0f4;
+}
+
+tr.list0 a:link {
+     text-decoration: none;
+}
+
+tr.list1 a:link {
+     text-decoration: none;
 }
 
 .iframed tr.list1 {
@@ -242,8 +258,14 @@ input.prevpage, input.prev {
      min-height: 22px;
 }
 
-input.send, input.setpagesize {
+input.send, input.setpagesize, input.save {
      background: #ddf url('/themes/console/images/accept.png') no-repeat 4px center;
+     padding: 2px 3px 2px 24px;
+     min-height: 22px;
+}
+
+input.configure {
+     background: #ddf url('/susimail/icons/wrench.png') no-repeat 4px center;
      padding: 2px 3px 2px 24px;
      min-height: 22px;
 }

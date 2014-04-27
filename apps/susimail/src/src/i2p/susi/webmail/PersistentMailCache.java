@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -46,6 +47,15 @@ import net.i2p.util.SecureFileOutputStream;
  */
 class PersistentMailCache {
 	
+	/**
+	 *  One lock for each user in the whole JVM, to protect against multiple sessions.
+	 *  One big lock for the whole cache dir, not one for each file or subdir.
+	 *  Never expired.
+	 *  Sure, if we did a maildir format we wouldn't need this.
+	 */
+	private static final ConcurrentHashMap<String, Object> _locks = new ConcurrentHashMap<String, Object>();
+
+	private final Object _lock;
 	private final File _cacheDir;
 
 	private static final String DIR_SUSI = "susimail";
@@ -63,8 +73,10 @@ class PersistentMailCache {
 	 *  @param pass ignored
 	 */
 	public PersistentMailCache(String host, int port, String user, String pass) throws IOException {
-		_cacheDir = makeCacheDirs(host, port, user, pass);
-		// TODO static locking
+		_lock = getLock(host, port, user, pass);
+		synchronized(_lock) {
+			_cacheDir = makeCacheDirs(host, port, user, pass);
+		}
 	}
 
 	/**
@@ -73,6 +85,12 @@ class PersistentMailCache {
 	 * @return a new collection
 	 */
 	public Collection<Mail> getMails() {
+		synchronized(_lock) {
+			return locked_getMails();
+		}
+	}
+
+	private Collection<Mail> locked_getMails() {
 		List<Mail> rv = new ArrayList<Mail>();
 		for (int j = 0; j < B64.length(); j++) {
 			File subdir = new File(_cacheDir, DIR_PREFIX + B64.charAt(j));
@@ -97,6 +115,12 @@ class PersistentMailCache {
 	 * @return success
 	 */
 	public boolean getMail(Mail mail, boolean headerOnly) {
+		synchronized(_lock) {
+			return locked_getMail(mail, headerOnly);
+		}
+	}
+
+	private boolean locked_getMail(Mail mail, boolean headerOnly) {
 		File f = getFullFile(mail.uidl);
 		if (f.exists()) {
 			ReadBuffer rb = read(f);
@@ -122,6 +146,12 @@ class PersistentMailCache {
 	 * @return success
 	 */
 	public boolean saveMail(Mail mail) {
+		synchronized(_lock) {
+			return locked_saveMail(mail);
+		}
+	}
+
+	private boolean locked_saveMail(Mail mail) {
 		ReadBuffer rb = mail.getBody();
 		if (rb != null) {
 			File f = getFullFile(mail.uidl);
@@ -156,8 +186,16 @@ class PersistentMailCache {
 	 * Delete data from disk.
 	 */
 	public void deleteMail(String uidl) {
-		getFullFile(uidl).delete();
-		getHeaderFile(uidl).delete();
+		synchronized(_lock) {
+			getFullFile(uidl).delete();
+			getHeaderFile(uidl).delete();
+		}
+	}
+
+	private static Object getLock(String host, int port, String user, String pass) {
+		Object lock = new Object();
+		Object old = _locks.putIfAbsent(user + host + port, lock);
+		return (old != null) ? old : lock;
 	}
 
 	/**

@@ -233,8 +233,13 @@ input.prevpage, input.prev {
      min-height: 22px;
 }
 
-input.send, input.setpagesize {
+input.send, input.setpagesize, input.save {
      background: #000 url('/themes/console/images/accept.png') no-repeat 2px center;
+     min-height: 22px;
+}
+
+input.configure {
+     background: #000 url('/susimail/icons/wrench.png') no-repeat 2px center;
      min-height: 22px;
 }
 

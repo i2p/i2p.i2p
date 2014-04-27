@@ -29,10 +29,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.IOException;
+import java.util.Map;
 import java.util.Properties;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
+import net.i2p.util.OrderedProperties;
 
 /**
  * Warning - static - not for use by multiple applications or prefixes
@@ -48,7 +50,7 @@ public class Config {
 	 * 
 	 * @param name
 	 */
-	public static String getProperty( String name )
+	public synchronized static String getProperty( String name )
 	{
 		if( configPrefix != null )
 			name = configPrefix + name;
@@ -79,7 +81,7 @@ public class Config {
 	 *  Don't bother showing a reload config button if this returns false.
 	 *  @since 0.9.13
 	 */
-	public static boolean hasConfigFile() {
+	public synchronized static boolean hasConfigFile() {
 		File cfg = new File(I2PAppContext.getGlobalContext().getConfigDir(), "susimail.config");
 		return cfg.exists();
 	}
@@ -88,7 +90,7 @@ public class Config {
 	 * 
 	 *
 	 */
-	public static void reloadConfiguration()
+	public synchronized static void reloadConfiguration()
 	{
 		// DEBUG level logging won't work here since we haven't loaded the config yet...
 		properties = new Properties();
@@ -104,7 +106,7 @@ public class Config {
 		try {
 			File cfg = new File(I2PAppContext.getGlobalContext().getConfigDir(), "susimail.config");
 			if (cfg.exists()) {
-				config = new Properties();
+				config = new OrderedProperties();
 				DataHelper.loadProps(config, cfg);
 			}
 		} catch (Exception e) {
@@ -113,21 +115,74 @@ public class Config {
 	}
 
 	/**
-	 * 
-	 * @param name
-	 * @param defaultValue
+	 * Returns the properties, sorted, WITHOUT the prefix
+	 *
+	 * @since 0.9.13
 	 */
-	public static String getProperty( String name, String defaultValue )
-	{
-		String result = getProperty( name );
-		return result != null ? result : defaultValue;
+	public synchronized static Properties getProperties() {
+		Properties rv = new OrderedProperties();
+		if (properties != null) {
+			if (configPrefix == null) {
+				rv.putAll(properties);
+			} else {
+				for (Map.Entry<Object, Object> e : properties.entrySet()) {
+					String k = (String) e.getKey();
+					if (k.startsWith(configPrefix))
+						rv.put(k.substring(configPrefix.length()), e.getValue());
+				}
+			}
+		}
+		if (config != null) {
+			if (configPrefix == null) {
+				rv.putAll(config);
+			} else {
+				for (Map.Entry<Object, Object> e : config.entrySet()) {
+					String k = (String) e.getKey();
+					if (k.startsWith(configPrefix))
+						rv.put(k.substring(configPrefix.length()), e.getValue());
+				}
+			}
+		}
+		return rv;
 	}
+
+	/**
+	 * Saves the properties. A property not in newProps will be removed but
+	 * will not override the default in the resource.
+	 *
+	 * @param newProps non-null WITHOUT the prefix
+	 * @since 0.9.13
+	 */
+	public synchronized static void saveConfiguration(Properties newProps) throws IOException {
+		Properties toSave = new OrderedProperties();
+		for (Map.Entry<Object, Object> e : newProps.entrySet()) {
+			Object k = e.getKey();
+			if (configPrefix != null)
+				k = configPrefix + k;
+			toSave.put(k, e.getValue());
+		}
+		config = toSave;
+		File cfg = new File(I2PAppContext.getGlobalContext().getConfigDir(), "susimail.config");
+		DataHelper.storeProps(toSave, cfg);
+	}
+
 	/**
 	 * 
 	 * @param name
 	 * @param defaultValue
 	 */
-	public static int getProperty( String name, int defaultValue )
+	public synchronized static String getProperty( String name, String defaultValue )
+	{
+		String result = getProperty( name );
+		return result != null ? result : defaultValue;
+	}
+
+	/**
+	 * 
+	 * @param name
+	 * @param defaultValue
+	 */
+	public synchronized static int getProperty( String name, int defaultValue )
 	{
 		int result = defaultValue;
 		
@@ -148,7 +203,7 @@ public class Config {
 	 * Static! Not for use by multiple applications!
 	 * @param prefix
 	 */
-	public static void setPrefix( String prefix )
+	public synchronized static void setPrefix( String prefix )
 	{
 		configPrefix = prefix.endsWith( "." ) ? prefix : prefix + ".";
 	}
