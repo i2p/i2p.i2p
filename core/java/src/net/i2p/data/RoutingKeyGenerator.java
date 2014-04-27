@@ -13,6 +13,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Locale;
 import java.util.TimeZone;
 
 import net.i2p.I2PAppContext;
@@ -64,7 +65,11 @@ public class RoutingKeyGenerator {
     private final static Calendar _cal = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT"));
     private static final String FORMAT = "yyyyMMdd";
     private static final int LENGTH = FORMAT.length();
-    private final static SimpleDateFormat _fmt = new SimpleDateFormat(FORMAT);
+    private final static SimpleDateFormat _fmt = new SimpleDateFormat(FORMAT, Locale.US);
+    static {
+        // make sure GMT is set, azi2phelper Vuze plugin is disabling static JVM TZ setting in Router.java
+        _fmt.setCalendar(_cal);
+    }
 
     /**
      *  The current (today's) mod data.

@@ -138,11 +138,27 @@ public class Router implements RouterClock.ClockShiftListener {
      */
     public Router() { this(null, null); }
 
+    /**
+     *  Instantiation only. Starts no threads. Does not install updates.
+     *  RouterContext is created but not initialized.
+     *  You must call runRouter() after any constructor to start things up.
+     */
     public Router(Properties envProps) { this(null, envProps); }
 
+    /**
+     *  Instantiation only. Starts no threads. Does not install updates.
+     *  RouterContext is created but not initialized.
+     *  You must call runRouter() after any constructor to start things up.
+     */
     public Router(String configFilename) { this(configFilename, null); }
 
+    /**
+     *  Instantiation only. Starts no threads. Does not install updates.
+     *  RouterContext is created but not initialized.
+     *  You must call runRouter() after any constructor to start things up.
+     */
     public Router(String configFilename, Properties envProps) {
+        _killVMOnEnd = true;
         _gracefulExitCode = -1;
         _config = new ConcurrentHashMap<String, String>();
 
@@ -307,7 +323,6 @@ public class Router implements RouterClock.ClockShiftListener {
         _log = _context.logManager().getLog(Router.class);
         _log.info("New router created with config file " + _configFilename);
         //_sessionKeyPersistenceHelper = new SessionKeyPersistenceHelper(_context);
-        _killVMOnEnd = true;
         _oomListener = new OOMListener(_context);
 
         _shutdownHook = new ShutdownHook(_context);
@@ -333,7 +348,7 @@ public class Router implements RouterClock.ClockShiftListener {
     /**
      * Configure the router to kill the JVM when the router shuts down, as well
      * as whether to explicitly halt the JVM during the hard fail process.
-     *
+     * Defaults to true. Set to false for embedded before calling runRouter()
      */
     public void setKillVMOnEnd(boolean shouldDie) { _killVMOnEnd = shouldDie; }
 
@@ -429,7 +444,10 @@ public class Router implements RouterClock.ClockShiftListener {
     /**
      *  This must be called after instantiation.
      *  Starts the threads. Does not install updates.
-     *  Most users will just call main() instead.
+     *  This is for embedded use.
+     *  Standard standalone installation uses main() instead, which
+     *  checks for updates and then calls this.
+     *
      *  @since public as of 0.9 for Android and other embedded uses
      */
     public synchronized void runRouter() {
@@ -1108,6 +1126,8 @@ public class Router implements RouterClock.ClockShiftListener {
     /**
      *  Usage: Router [rebuild]
      *  No other options allowed, for now
+     *  Instantiates Router(), and either installs updates and exits,
+     *  or calls runRouter().
      *
      *  @param args null ok
      *  @throws IllegalArgumentException
