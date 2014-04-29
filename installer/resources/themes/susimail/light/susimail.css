@@ -56,7 +56,7 @@ p.footer {
      line-height:10pt;
 }
 
-.iframed #footer {
+.iframed .footer {
      display: none;
 }
 
@@ -67,7 +67,7 @@ p.mailbody {
       text-align: left;
 }
 
-.iframed p img {
+.iframed .header {
      display: none;
 }
 

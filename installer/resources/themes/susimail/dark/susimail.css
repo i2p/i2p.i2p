@@ -88,6 +88,11 @@ p.mailbody {
      text-align: left;
 }
 
+.iframed .header {
+     display: none;
+}
+
+
 .mailbody {
      display: block !important;
 }

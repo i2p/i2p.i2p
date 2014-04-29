@@ -1,0 +1,27 @@
+.header, .footer, .topbuttons, .bottombuttons {
+	display: none;
+}
+
+p.error, p.info {
+	display: none;
+}
+
+a.sort, img.sort {
+	display: none;
+}
+
+input.optbox {
+	display: none;
+}
+
+div.page, table {
+	width: 100%;
+	margin: 0;
+	float: none;
+}
+
+textarea, input[type=text] {
+	border-style: none;
+	border-color: Transparent;
+	overflow: auto;
+}

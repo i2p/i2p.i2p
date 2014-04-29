@@ -11,3 +11,7 @@
 #mailbox .optbox {
      float: left;
 }
+
+div.header, div.footer {
+     display: none;
+}

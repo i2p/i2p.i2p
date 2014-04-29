@@ -506,17 +506,17 @@ public class WebMail extends HttpServlet
 		StringBuilder buf = new StringBuilder(128);
 		buf.append(label).append("&nbsp;&nbsp;");
 		if (name.equals(currentName) && currentOrder == Folder.SortOrder.UP) {
-			buf.append("<img src=\"").append(imgPath).append("3up.png\" border=\"0\" alt=\"^\">\n");
+			buf.append("<img class=\"sort\" src=\"").append(imgPath).append("3up.png\" border=\"0\" alt=\"^\">\n");
 		} else {
-			buf.append("<a href=\"").append(myself).append('?').append(name).append("=up\">");
-			buf.append("<img src=\"").append(imgPath).append("3up.png\" border=\"0\" alt=\"^\" style=\"opacity: 0.4;\">");
+			buf.append("<a class=\"sort\" href=\"").append(myself).append('?').append(name).append("=up\">");
+			buf.append("<img class=\"sort\" src=\"").append(imgPath).append("3up.png\" border=\"0\" alt=\"^\" style=\"opacity: 0.4;\">");
 			buf.append("</a>\n");
 		}
 		if (name.equals(currentName) && currentOrder == Folder.SortOrder.DOWN) {
-			buf.append("<img src=\"").append(imgPath).append("3down.png\" border=\"0\" alt=\"v\">");
+			buf.append("<img class=\"sort\" src=\"").append(imgPath).append("3down.png\" border=\"0\" alt=\"v\">");
 		} else {
-			buf.append("<a href=\"").append(myself).append('?').append(name).append("=down\">");
-			buf.append("<img src=\"").append(imgPath).append("3down.png\" border=\"0\" alt=\"v\" style=\"opacity: 0.4;\">");
+			buf.append("<a class=\"sort\" href=\"").append(myself).append('?').append(name).append("=down\">");
+			buf.append("<img class=\"sort\" src=\"").append(imgPath).append("3down.png\" border=\"0\" alt=\"v\" style=\"opacity: 0.4;\">");
 			buf.append("</a>");
 		}
 		return buf.toString();
@@ -711,8 +711,8 @@ public class WebMail extends HttpServlet
 			String host = request.getParameter( HOST );
 			String pop3Port = request.getParameter( POP3 );
 			String smtpPort = request.getParameter( SMTP );
-			String fixedPorts = Config.getProperty( CONFIG_PORTS_FIXED, "true" );
-			if( !fixedPorts.equalsIgnoreCase("false")) {
+			boolean fixedPorts = Boolean.parseBoolean(Config.getProperty( CONFIG_PORTS_FIXED, "true" ));
+			if (fixedPorts) {
 				host = Config.getProperty( CONFIG_HOST, DEFAULT_HOST );
 				pop3Port = Config.getProperty( CONFIG_PORTS_POP3, "" + DEFAULT_POP3PORT );
 				smtpPort = Config.getProperty( CONFIG_PORTS_SMTP, "" + DEFAULT_SMTPPORT );
@@ -1702,21 +1702,23 @@ public class WebMail extends HttpServlet
 					out.println( "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes\" />\n" +
 						"<link rel=\"stylesheet\" type=\"text/css\" href=\"" + sessionObject.themePath + "mobile.css\" />\n" );
 				}
+				if(sessionObject.state != STATE_AUTH)
+					out.println("<link rel=\"stylesheet\" href=\"/susimail/css/print.css\" type=\"text/css\" media=\"print\" />");
 				if (sessionObject.state == STATE_NEW) {
 					// TODO cancel if to and body are empty
 					out.println(
-						"<script type = \"text/javascript\">" +
+						"<script type = \"text/javascript\">\n" +
 							"window.onbeforeunload = function () {" +
 								"return \"" + _("Message has not been sent. Do you want to discard it?") + "\";" +
-							"};" +
+							"};\n" +
 							"function cancelPopup() {" +
 								"window.onbeforeunload = null;" +
-							"};" +
+							"};\n" +
 						"</script>"
 					);
 				}
 				out.println( "</head>\n<body>\n" +
-					"<div class=\"page\"><p><img src=\"" + sessionObject.imgPath + "susimail.png\" alt=\"Susimail\"></p>\n" +
+					"<div class=\"page\"><div class=\"header\"><img class=\"header\" src=\"" + sessionObject.imgPath + "susimail.png\" alt=\"Susimail\"></div>\n" +
 					"<form method=\"POST\" enctype=\"multipart/form-data\" action=\"" + myself + "\" accept-charset=\"UTF-8\">" );
 
 				if( sessionObject.error != null && sessionObject.error.length() > 0 ) {
@@ -1744,7 +1746,7 @@ public class WebMail extends HttpServlet
 					showConfig(out, sessionObject);
 				
 				//out.println( "</form><div id=\"footer\"><hr><p class=\"footer\">susimail v0." + version +" " + ( RELEASE ? "release" : "development" ) + " &copy; 2004-2005 <a href=\"mailto:susi23@mail.i2p\">susi</a></div></div></body>\n</html>");				
-				out.println( "</form><div id=\"footer\"><hr><p class=\"footer\">susimail &copy; 2004-2005 susi</div></div></body>\n</html>");				
+				out.println( "</form><div class=\"footer\"><hr><p class=\"footer\">susimail &copy; 2004-2005 susi</p></div></div></body>\n</html>");				
 				out.flush();
 		}
 	}
@@ -1831,9 +1833,9 @@ public class WebMail extends HttpServlet
 		String subject = request.getParameter( NEW_SUBJECT, _("no subject") );
 		String text = request.getParameter( NEW_TEXT, "" );
 
-		String prop = Config.getProperty( CONFIG_SENDER_FIXED, "true" );
-		String domain = Config.getProperty( CONFIG_SENDER_DOMAIN, "mail.i2p" );
-		if( !prop.equalsIgnoreCase("false")) {
+		boolean fixed = Boolean.parseBoolean(Config.getProperty( CONFIG_SENDER_FIXED, "true" ));
+		if (fixed) {
+			String domain = Config.getProperty( CONFIG_SENDER_DOMAIN, "mail.i2p" );
 			from = "<" + sessionObject.user + "@" + domain + ">";
 		}
 		ArrayList<String> toList = new ArrayList<String>();
@@ -1979,16 +1981,18 @@ public class WebMail extends HttpServlet
 	 */
 	private static void showCompose( PrintWriter out, SessionObject sessionObject, RequestWrapper request )
 	{
+		out.println("<div class=\"topbuttons\">");
 		out.println( button( SEND, _("Send") ) + spacer +
 				button( CANCEL, _("Cancel") ));
+		out.println("</div>");
 		//if (Config.hasConfigFile())
 		//	out.println(button( RELOAD, _("Reload Config") ) + spacer);
 		//out.println(button( LOGOUT, _("Logout") ) );
 
 		String from = request.getParameter( NEW_FROM );
-		String fixed = Config.getProperty( CONFIG_SENDER_FIXED, "true" );
+		boolean fixed = Boolean.parseBoolean(Config.getProperty( CONFIG_SENDER_FIXED, "true" ));
 		
-		if( from == null || !fixed.equalsIgnoreCase("false")) {
+		if (from == null || !fixed) {
 			String user = sessionObject.user;
 			String name = Config.getProperty(CONFIG_SENDER_NAME);
 			if (name != null) {
@@ -2001,10 +2005,12 @@ public class WebMail extends HttpServlet
 				from = "";
 			}
 			if (user.contains("@")) {
-				String domain = Config.getProperty( CONFIG_SENDER_DOMAIN, "mail.i2p" );
-				from += '<' + user + '@' + domain + '>';
-			} else {
 				from += '<' + user + '>';
+			} else {
+				String domain = Config.getProperty( CONFIG_SENDER_DOMAIN, "mail.i2p" );
+				if (from.length() == 0)
+					from = user + ' ';
+				from += '<' + user + '@' + domain + '>';
 			}
 		}
 		
@@ -2020,17 +2026,17 @@ public class WebMail extends HttpServlet
 		
 		out.println( "<table cellspacing=\"0\" cellpadding=\"5\">\n" +
 				"<tr><td colspan=\"2\" align=\"center\"><hr></td></tr>\n" +
-				"<tr><td align=\"right\">" + _("From") + ":</td><td align=\"left\"><input type=\"text\" size=\"80\" name=\"" + NEW_FROM + "\" value=\"" + from + "\" " + ( !fixed.equalsIgnoreCase("false") ? "disabled" : "" ) +"></td></tr>\n" +
+				"<tr><td align=\"right\">" + _("From") + ":</td><td align=\"left\"><input type=\"text\" size=\"80\" name=\"" + NEW_FROM + "\" value=\"" + from + "\" " + ( fixed ? "disabled" : "" ) +"></td></tr>\n" +
 				"<tr><td align=\"right\">" + _("To") + ":</td><td align=\"left\"><input type=\"text\" size=\"80\" name=\"" + NEW_TO + "\" value=\"" + to + "\"></td></tr>\n" +
 				"<tr><td align=\"right\">" + _("Cc") + ":</td><td align=\"left\"><input type=\"text\" size=\"80\" name=\"" + NEW_CC + "\" value=\"" + cc + "\"></td></tr>\n" +
 				"<tr><td align=\"right\">" + _("Bcc") + ":</td><td align=\"left\"><input type=\"text\" size=\"80\" name=\"" + NEW_BCC + "\" value=\"" + bcc + "\"></td></tr>\n" +
 				"<tr><td align=\"right\">" + _("Bcc to self") + ": </td><td align=\"left\"><input type=\"checkbox\" class=\"optbox\" name=\"" + NEW_BCC_TO_SELF + "\" value=\"1\" " + (sessionObject.bccToSelf ? "checked" : "" ) + "></td></tr>\n" +
 				"<tr><td align=\"right\">" + _("Subject") + ":</td><td align=\"left\"><input type=\"text\" size=\"80\" name=\"" + NEW_SUBJECT + "\" value=\"" + subject + "\"></td></tr>\n" +
 				"<tr><td colspan=\"2\" align=\"center\"><textarea cols=\"" + Config.getProperty( CONFIG_COMPOSER_COLS, 80 )+ "\" rows=\"" + Config.getProperty( CONFIG_COMPOSER_ROWS, 10 )+ "\" name=\"" + NEW_TEXT + "\">" + text + "</textarea>" +
-				"<tr><td colspan=\"2\" align=\"center\"><hr></td></tr>\n" +
-				"<tr><td align=\"right\">" + _("Add Attachment") + ":</td><td align=\"left\"><input type=\"file\" size=\"50%\" name=\"" + NEW_FILENAME + "\" value=\"\"></td></tr>" +
+				"<tr class=\"bottombuttons\"><td colspan=\"2\" align=\"center\"><hr></td></tr>\n" +
+				"<tr class=\"bottombuttons\"><td align=\"right\">" + _("Add Attachment") + ":</td><td align=\"left\"><input type=\"file\" size=\"50%\" name=\"" + NEW_FILENAME + "\" value=\"\"></td></tr>" +
 				// TODO disable/hide in JS if no file selected
-				"<tr><td>&nbsp;</td><td align=\"left\">" + button(NEW_UPLOAD, _("Add another attachment")) + "</td></tr>");
+				"<tr class=\"bottombuttons\"><td>&nbsp;</td><td align=\"left\">" + button(NEW_UPLOAD, _("Add another attachment")) + "</td></tr>");
 		
 		if( sessionObject.attachments != null && !sessionObject.attachments.isEmpty() ) {
 			boolean wroteHeader = false;
@@ -2044,7 +2050,7 @@ public class WebMail extends HttpServlet
 				out.println("<td align=\"left\"><input type=\"checkbox\" class=\"optbox\" name=\"check" + attachment.hashCode() + "\" value=\"1\">&nbsp;" + attachment.getFileName() + "</td></tr>");
 			}
 			// TODO disable in JS if none selected
-			out.println("<tr><td>&nbsp;</td><td align=\"left\">" +
+			out.println("<tr class=\"bottombuttons\"><td>&nbsp;</td><td align=\"left\">" +
 			            button( DELETE_ATTACHMENT, _("Delete selected attachments") ) +
 				    "</td></tr>");
 		}
@@ -2057,8 +2063,7 @@ public class WebMail extends HttpServlet
 	 */
 	private static void showLogin( PrintWriter out )
 	{
-		String fixedPorts = Config.getProperty( CONFIG_PORTS_FIXED, "true" );
-		boolean fixed = !fixedPorts.equalsIgnoreCase("false");
+		boolean fixed = Boolean.parseBoolean(Config.getProperty( CONFIG_PORTS_FIXED, "true" ));
 		String host = Config.getProperty( CONFIG_HOST, DEFAULT_HOST );
 		String pop3 = Config.getProperty( CONFIG_PORTS_POP3, "" + DEFAULT_POP3PORT );
 		String smtp = Config.getProperty( CONFIG_PORTS_SMTP, "" + DEFAULT_SMTPPORT );
@@ -2098,6 +2103,7 @@ public class WebMail extends HttpServlet
 	 */
 	private static void showFolder( PrintWriter out, SessionObject sessionObject, RequestWrapper request )
 	{
+		out.println("<div class=\"topbuttons\">");
 		out.println( button( NEW, _("New") ) + spacer);
 			// In theory, these are valid and will apply to the first checked message,
 			// but that's not obvious and did it work?
@@ -2109,9 +2115,10 @@ public class WebMail extends HttpServlet
 		//if (Config.hasConfigFile())
 		//	out.println(button( RELOAD, _("Reload Config") ) + spacer);
 		out.println(button( LOGOUT, _("Logout") ));
-
 		if (sessionObject.folder.getPages() > 1)
 			showPageButtons(out, sessionObject.folder);
+		out.println("</div>");
+
 
 		String curSort = sessionObject.folder.getCurrentSortBy();
 		Folder.SortOrder curOrder = sessionObject.folder.getCurrentSortingDirection();
@@ -2177,14 +2184,14 @@ public class WebMail extends HttpServlet
 		if (i == 0)
 			out.println("<tr><td colspan=\"9\" align=\"center\"><i>" + _("No messages") + "</i></td></tr>\n</table>");
 		if (i > 0) {
-			out.println( "<tr><td colspan=\"9\"><hr></td></tr>");
+			out.println( "<tr class=\"bottombuttons\"><td colspan=\"9\"><hr></td></tr>");
 			if (sessionObject.folder.getPages() > 1 && i > 30) {
 				// show the buttons again if page is big
-				out.println("<tr><td colspan=\"9\" align=\"center\">");
+				out.println("<tr class=\"bottombuttons\"><td colspan=\"9\" align=\"center\">");
 				showPageButtons(out, sessionObject.folder);
 				out.println("</td></tr>");
 			}
-			out.println("<tr><td colspan=\"5\" align=\"left\">");
+			out.println("<tr class=\"bottombuttons\"><td colspan=\"5\" align=\"left\">");
 			if( sessionObject.reallyDelete ) {
 				// TODO ngettext
 				out.println("<p class=\"error\">" + _("Really delete the marked messages?") +
@@ -2209,7 +2216,7 @@ public class WebMail extends HttpServlet
 			//	button( SETPAGESIZE, _("Set") ) );
 			out.print("<br>");
 			out.print(button(CONFIGURE, _("Settings")));
-			out.println("</td>");
+			out.println("</td></tr>");
 		}
 		out.println( "</table>");
 	}
@@ -2251,6 +2258,7 @@ public class WebMail extends HttpServlet
 			out.println( quoteHTML( new String(body.content, body.offset, body.length ) ) );
 			out.println( "-->" );
 		}
+		out.println("<div class=\"topbuttons\">");
 		out.println( button( NEW, _("New") ) + spacer +
 			button( REPLY, _("Reply") ) +
 			button( REPLYALL, _("Reply All") ) +
@@ -2260,6 +2268,7 @@ public class WebMail extends HttpServlet
 			( sessionObject.folder.isFirstElement( sessionObject.showUIDL ) ? button2( PREV, _("Previous") ) : button( PREV, _("Previous") ) ) + spacer +
 			button( LIST, _("Back to Folder") ) + spacer +
 			( sessionObject.folder.isLastElement( sessionObject.showUIDL ) ? button2( NEXT, _("Next") ) : button( NEXT, _("Next") ) ));
+		out.println("</div>");
 		//if (Config.hasConfigFile())
 		//	out.println(button( RELOAD, _("Reload Config") ) + spacer);
 		//out.println(button( LOGOUT, _("Logout") ) );
@@ -2298,24 +2307,28 @@ public class WebMail extends HttpServlet
 			sz = sessionObject.folder.getPageSize();
 		else
 			sz = Config.getProperty(Folder.PAGESIZE, Folder.DEFAULT_PAGESIZE);
+		out.println("<div class=\"topbuttons\">");
 		out.println(
 			_("Folder Page Size") + ":&nbsp;<input type=\"text\" style=\"text-align: right;\" name=\"" + PAGESIZE +
 			"\" size=\"4\" value=\"" +  sz + "\">" +
 			"&nbsp;" + 
 			button( SETPAGESIZE, _("Set") ) );
 		out.println("<p>");
+		out.println("</div>");
 		out.print(_("Advanced Configuration"));
-		out.print(":</p><textarea cols=\"80\" rows=\"20\" spellcheck=\"false\" name=\"" + CONFIG_TEXT + "\">");
 		Properties config = Config.getProperties();
+		out.print(":</p><textarea cols=\"80\" rows=\"" + Math.max(8, config.size() + 2) + "\" spellcheck=\"false\" name=\"" + CONFIG_TEXT + "\">");
 		for (Map.Entry<Object, Object> e : config.entrySet()) {
 			out.print(e.getKey());
 			out.print('=');
 			out.println(e.getValue());
 		}
 		out.println("</textarea>");
-		out.println("</br>");
+		out.println("<div id=\"bottombuttons\">");
+		out.println("<br>");
 		out.println(button(SAVE, _("Save Configuration")));
 		out.println(button(CANCEL, _("Cancel")));
+		out.println("</div>");
 	}
 
 	/** translate */
