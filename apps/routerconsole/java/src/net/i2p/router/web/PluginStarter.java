@@ -49,8 +49,11 @@ import org.eclipse.jetty.server.handler.ContextHandlerCollection;
  */
 public class PluginStarter implements Runnable {
     protected RouterContext _context;
+    private static final String CONFIG_FILE = "plugins.config";
     public static final String PREFIX = "plugin.";
+    // false, true, or deleted
     public static final String ENABLED = ".startOnLoad";
+    public static final String DELETED = "deleted";
     public static final String PLUGIN_DIR = "plugins";
     private static final String[] STANDARD_WEBAPPS = { "i2psnark", "i2ptunnel", "susidns",
                                                        "susimail", "addressbook", "routerconsole" };
@@ -71,6 +74,7 @@ public class PluginStarter implements Runnable {
     }
 
     public void run() {
+        deferredDeletePlugins(_context);
         if (_context.getBooleanPropertyDefaultTrue("plugins.autoUpdate") &&
             !NewsHelper.isUpdateInProgress()) {
             String prev = _context.getProperty("router.previousVersion");
@@ -183,10 +187,10 @@ public class PluginStarter implements Runnable {
     static void startPlugins(RouterContext ctx) {
         Log log = ctx.logManager().getLog(PluginStarter.class);
         Properties props = pluginProperties();
-        for (Iterator iter = props.keySet().iterator(); iter.hasNext(); ) {
-            String name = (String)iter.next();
+        for (Map.Entry<Object, Object> e : props.entrySet()) {
+            String name = (String)e.getKey();
             if (name.startsWith(PREFIX) && name.endsWith(ENABLED)) {
-                if (Boolean.parseBoolean(props.getProperty(name))) {
+                if (Boolean.parseBoolean((String) e.getValue())) {
                     String app = name.substring(PREFIX.length(), name.lastIndexOf(ENABLED));
                     // plugins could have been started after update
                     if (isPluginRunning(app, ctx))
@@ -194,12 +198,48 @@ public class PluginStarter implements Runnable {
                     try {
                         if (!startPlugin(ctx, app))
                             log.error("Failed to start plugin: " + app);
-                    } catch (Throwable e) {
-                        log.error("Failed to start plugin: " + app, e);
+                    } catch (Throwable t) {
+                        log.error("Failed to start plugin: " + app, t);
                     }
                 }
             }
         }
+    }
+
+    /**
+     *  Deferred deletion of plugins that we failed to delete before.
+     *
+     *  @since 0.9.13
+     */
+    private static void deferredDeletePlugins(RouterContext ctx) {
+        Log log = ctx.logManager().getLog(PluginStarter.class);
+        boolean changed = false;
+        Properties props = pluginProperties();
+        for (Iterator<Map.Entry<Object, Object>> iter = props.entrySet().iterator(); iter.hasNext(); ) {
+            Map.Entry<Object, Object> e = iter.next();
+            String name = (String)e.getKey();
+            if (name.startsWith(PREFIX) && name.endsWith(ENABLED)) {
+                // deferred deletion of a plugin
+                if (e.getValue().equals(DELETED)) {
+                    String app = name.substring(PREFIX.length(), name.lastIndexOf(ENABLED));
+                    // shouldn't happen, this is run early
+                    if (isPluginRunning(app, ctx))
+                        continue;
+                    File pluginDir = new File(ctx.getConfigDir(), PLUGIN_DIR + '/' + app);
+                    boolean deleted = FileUtil.rmdir(pluginDir, false);
+                    if (deleted) {
+                        log.logAlways(Log.WARN, "Deferred deletion of " + pluginDir + " successful");
+                        iter.remove();
+                        changed = true;
+                    } else {
+                        if (log.shouldLog(Log.WARN))
+                            log.warn("Deferred deletion of " + pluginDir + " failed");
+                    }
+                }
+            }
+        }
+        if (changed)
+            storePluginProperties(props);
     }
 
     /**
@@ -473,12 +513,18 @@ public class PluginStarter implements Runnable {
             ctx.router().saveConfig(changes, removes);
         }
 
-        FileUtil.rmdir(pluginDir, false);
+        boolean deleted = FileUtil.rmdir(pluginDir, false);
         Properties props = pluginProperties();
         for (Iterator iter = props.keySet().iterator(); iter.hasNext(); ) {
             String name = (String)iter.next();
             if (name.startsWith(PREFIX + appName + '.'))
                 iter.remove();
+        }
+        if (!deleted) {
+            // This happens on Windows when there are plugin jars in classpath
+            // Mark it as deleted, we will try again after restart
+            log.logAlways(Log.WARN, "Deletion of " + pluginDir + " failed, will try again at restart");
+            props.setProperty(PREFIX + appName + ENABLED, DELETED);
         }
         storePluginProperties(props);
         return true;
@@ -496,18 +542,18 @@ public class PluginStarter implements Runnable {
 
     /**
      *  plugins.config
-     *  this auto-adds a propery for every dir in the plugin directory
+     *  this auto-adds a property for every dir in the plugin directory
      */
     public static Properties pluginProperties() {
         File dir = I2PAppContext.getGlobalContext().getConfigDir();
         Properties rv = new Properties();
-        File cfgFile = new File(dir, "plugins.config");
+        File cfgFile = new File(dir, CONFIG_FILE);
         
         try {
             DataHelper.loadProps(rv, cfgFile);
         } catch (IOException ioe) {}
 
-        List<String> names = getPlugins();
+        List<String> names = getAllPlugins();
         for (String name : names) {
             String prop = PREFIX + name + ENABLED;
             if (rv.getProperty(prop) == null)
@@ -543,9 +589,29 @@ public class PluginStarter implements Runnable {
     }
 
     /**
-     *  all installed plugins whether enabled or not
+     *  all installed plugins whether enabled or not,
+     *  but does NOT include plugins marked as deleted.
+     *  @return non-null, sorted, modifiable
      */
     public static List<String> getPlugins() {
+        List<String> rv = getAllPlugins();
+        Properties props = pluginProperties();
+        for (Iterator<String> iter = rv.iterator(); iter.hasNext(); ) {
+            String app = iter.next();
+            if (DELETED.equals(props.getProperty(PREFIX + app + ENABLED)))
+                iter.remove();
+        }
+        Collections.sort(rv); // ensure the list is in sorted order.
+        return rv;
+    }
+
+    /**
+     *  all installed plugins whether enabled or not,
+     *  DOES include plugins marked as deleted.
+     *  @return non-null, unsorted, modifiable
+     *  @since 0.9.13
+     */
+    private static List<String> getAllPlugins() {
         List<String> rv = new ArrayList<String>();
         File pluginDir = new File(I2PAppContext.getGlobalContext().getConfigDir(), PLUGIN_DIR);
         File[] files = pluginDir.listFiles();
@@ -555,7 +621,6 @@ public class PluginStarter implements Runnable {
             if (files[i].isDirectory())
                 rv.add(files[i].getName());
         }
-        Collections.sort(rv); // ensure the list is in sorted order.
         return rv;
     }
 
@@ -581,7 +646,7 @@ public class PluginStarter implements Runnable {
      *  plugins.config
      */
     public static void storePluginProperties(Properties props) {
-        File cfgFile = new File(I2PAppContext.getGlobalContext().getConfigDir(), "plugins.config");
+        File cfgFile = new File(I2PAppContext.getGlobalContext().getConfigDir(), CONFIG_FILE);
         try {
             DataHelper.storeProps(props, cfgFile);
         } catch (IOException ioe) {}

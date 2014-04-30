@@ -1,3 +1,17 @@
+2014-04-30 zzz
+ * Plugins: Retry deletion at restart if it fails (ticket #1257)
+
+2014-04-29 zzz
+ * SusiMail:
+   - Add print css
+   - Hide header and footer in mobile css
+   - Fix 'from' address in compose
+
+2014-04-28 zzz
+ * UDP:
+   - Locking fixes on peer testing
+   - Slow down peer test frequency, esp. when firewalled
+
 2014-04-27 zzz
  * NTCP: Remove published NTCP address if SSU becomes firewalled,
          to fix the "Firewalled with NTCP enabled" message
@@ -6,7 +20,7 @@
  * SusiMail:
    - Add locking for disk cache
    - Remove cancel button from login page
-   - New configuration page
+   - New configuration page (ticket #1158)
    - Move set page form to configuration page
    - Theme and js enhancements
  * UDP:

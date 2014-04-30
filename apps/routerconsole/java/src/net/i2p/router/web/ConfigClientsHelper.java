@@ -177,6 +177,8 @@ public class ConfigClientsHelper extends HelperBase {
             if (name.startsWith(PluginStarter.PREFIX) && name.endsWith(PluginStarter.ENABLED)) {
                 String app = name.substring(PluginStarter.PREFIX.length(), name.lastIndexOf(PluginStarter.ENABLED));
                 String val = props.getProperty(name);
+                if (val.equals(PluginStarter.DELETED))
+                    continue;
                 Properties appProps = PluginStarter.pluginProperties(_context, app);
                 if (appProps.isEmpty())
                     continue;
