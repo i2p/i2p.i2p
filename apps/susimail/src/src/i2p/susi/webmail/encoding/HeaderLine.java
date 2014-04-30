@@ -317,14 +317,15 @@ public class HeaderLine implements Encoding {
 	}
 
 /*****
+TODO put UTF-8 back and move to a unit test
 	public static void main( String[] args ) throws EncodingException {
 		String text = "Subject: test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test \r\n" +
-		"From: Smörebröd <smoerebroed@mail.i2p>\r\n" +
-		"To: äöüß <lalala@mail.i2p>\r\n";
+		"From: UTF8 <smoerebroed@mail.i2p>\r\n" +
+		"To: UTF8 <lalala@mail.i2p>\r\n";
 		HeaderLine hl = new HeaderLine();
 		System.out.println( hl.encode( text ) );
-		System.out.println( hl.encode( "test ÄÖÜ" ) );
-		System.out.println( hl.encode( "Здравствуйте" ) );
+		System.out.println( hl.encode( "test UTF8" ) );
+		System.out.println( hl.encode( "UTF8" ) );
 	}
 ****/
 }
