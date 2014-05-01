@@ -1692,17 +1692,18 @@ public class WebMail extends HttpServlet
 				if (sessionObject.state == STATE_NEW) {
 					// TODO cancel if to and body are empty
 					out.println(
-						"<script type = \"text/javascript\">\n" +
+						"<script type=\"text/javascript\">\n" +
 							"window.onbeforeunload = function () {" +
 								"return \"" + _("Message has not been sent. Do you want to discard it?") + "\";" +
 							"};\n" +
-							"function cancelPopup() {" +
-								"window.onbeforeunload = null;" +
-							"};\n" +
 						"</script>"
 					);
+					out.println("<script src=\"/susimail/js/compose.js\" type=\"text/javascript\"></script>");
+				} else if (sessionObject.state == STATE_LIST) {
+					out.println("<script src=\"/susimail/js/folder.js\" type=\"text/javascript\"></script>");
 				}
-				out.println( "</head>\n<body>\n" +
+				out.print("</head>\n<body" + (sessionObject.state == STATE_LIST ? " onload=\"deleteboxclicked()\">" : ">"));
+				out.println(
 					"<div class=\"page\"><div class=\"header\"><img class=\"header\" src=\"" + sessionObject.imgPath + "susimail.png\" alt=\"Susimail\"></div>\n" +
 					"<form method=\"POST\" enctype=\"multipart/form-data\" action=\"" + myself + "\" accept-charset=\"UTF-8\">" );
 
@@ -2154,6 +2155,7 @@ public class WebMail extends HttpServlet
 			//		", clear=" + sessionObject.clear );
 			out.println( "<tr class=\"list" + bg + "\">" +
 					"<td><input type=\"checkbox\" class=\"optbox\" name=\"check" + i + "\" value=\"1\"" + 
+					" onclick=\"deleteboxclicked();\" " +
 					( idChecked ? "checked" : "" ) + ">" + "</td><td " + jslink + ">" +
 					(mail.isNew() ? "<img src=\"/susimail/icons/flag_green.png\" alt=\"\" title=\"" + _("Message is new") + "\">" : "&nbsp;") + "</td><td " + jslink + ">" +
 					link + mail.shortSender + "</a></td><td " + jslink + ">" +
@@ -2183,7 +2185,6 @@ public class WebMail extends HttpServlet
 						"</p>" + button( REALLYDELETE, _("Yes, really delete them!") ) +
 						"<br>" + button( CLEAR, _("Cancel")));
 			} else {
-				// TODO js
 				out.println(button( DELETE, _("Delete Selected") ) + "<br>");
 				out.print(
 					button( MARKALL, _("Mark All") ) +
