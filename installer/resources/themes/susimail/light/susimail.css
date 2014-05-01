@@ -9,6 +9,10 @@ body.iframed {
      margin: 5px 0 0 0;
 }
 
+div.header {
+     padding: 8px 5px 12px 5px;
+}
+
 li {
      color:#001;
      line-height:12pt;
