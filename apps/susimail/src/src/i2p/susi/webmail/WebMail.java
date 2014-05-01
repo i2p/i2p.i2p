@@ -231,25 +231,24 @@ public class WebMail extends HttpServlet
 ****/
 
 	/**
-	 * sorts Mail objects by sender field
+	 * Base for the various sorters
 	 * 
-	 * @author susi
+	 * @since 0.9.13
 	 */
-	private static class SenderSorter implements Comparator<String> {
-		private final Comparator collator = Collator.getInstance();
+	private abstract static class SorterBase implements Comparator<String> {
 		private final MailCache mailCache;
 		
 		/**
 		 * Set MailCache object, where to get Mails from
 		 * @param mailCache
 		 */
-		public SenderSorter( MailCache mailCache )
+		protected SorterBase( MailCache mailCache )
 		{
 			this.mailCache = mailCache;
 		}
 		
-		/* (non-Javadoc)
-		 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+		/**
+		 *  Gets mail from the cache, checks for null, then compares
 		 */
 		public int compare(String arg0, String arg1) {
 			Mail a = mailCache.getMail( arg0, MailCache.FETCH_HEADER );
@@ -258,12 +257,45 @@ public class WebMail extends HttpServlet
 				return (b == null) ? 0 : 1;
 			if (b == null)
 				return -1;
-			String as = a.sender.replace("\"", "").replace("<", "").replace(">", "");
-			String bs = b.sender.replace("\"", "").replace("<", "").replace(">", "");
-			int rv = collator.compare(as, bs);
+			int rv = compare(a, b);
 			if (rv != 0)
 				return rv;
-			return DateSorter.compare(a, b);
+			return fallbackCompare(a, b);
+		}		
+
+		/**
+		 * @param a non-null
+		 * @param b non-null
+		 */
+		protected abstract int compare(Mail a, Mail b);
+
+		/**
+		 * @param a non-null
+		 * @param b non-null
+		 */
+		private int fallbackCompare(Mail a, Mail b) {
+			return DateSorter.scompare(a, b);
+		}
+	}
+
+	/**
+	 * sorts Mail objects by sender field
+	 * 
+	 * @author susi
+	 */
+	private static class SenderSorter extends SorterBase {
+
+		private final Comparator collator = Collator.getInstance();
+
+		public SenderSorter( MailCache mailCache )
+		{
+			super(mailCache);
+		}
+		
+		protected int compare(Mail a, Mail b) {
+			String as = a.sender.replace("\"", "").replace("<", "").replace(">", "");
+			String bs = b.sender.replace("\"", "").replace("<", "").replace(">", "");
+			return collator.compare(as, bs);
 		}		
 	}
 
@@ -271,29 +303,15 @@ public class WebMail extends HttpServlet
 	 * sorts Mail objects by subject field
 	 * @author susi
 	 */
-	private static class SubjectSorter implements Comparator<String> {
-
+	private static class SubjectSorter extends SorterBase {
 		private final Comparator collator = Collator.getInstance();
-		private final MailCache mailCache;
-		/**
-		 * Set MailCache object, where to get Mails from
-		 * @param mailCache
-		 */
+
 		public SubjectSorter( MailCache mailCache )
 		{
-			this.mailCache = mailCache;
+			super(mailCache);
 		}
 		
-		/* (non-Javadoc)
-		 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
-		 */
-		public int compare(String arg0, String arg1) {
-			Mail a = mailCache.getMail( arg0, MailCache.FETCH_HEADER );
-			Mail b = mailCache.getMail( arg1, MailCache.FETCH_HEADER );
-			if (a == null)
-				return (b == null) ? 0 : 1;
-			if (b == null)
-				return -1;
+		protected int compare(Mail a, Mail b) {
 			String as = a.formattedSubject;
 			String bs = b.formattedSubject;
 			if (as.toLowerCase().startsWith("re:")) {
@@ -324,10 +342,7 @@ public class WebMail extends HttpServlet
 						bs = bs.substring(xfwd.length()).trim();
 				}
 			}
-			int rv = collator.compare(as, bs);
-			if (rv != 0)
-				return rv;
-			return DateSorter.compare(a, b);
+			return collator.compare(as, bs);
 		}		
 	}
 
@@ -335,29 +350,15 @@ public class WebMail extends HttpServlet
 	 * sorts Mail objects by date field
 	 * @author susi
 	 */
-	private static class DateSorter implements Comparator<String> {
+	private static class DateSorter extends SorterBase {
 
-		private final MailCache mailCache;
-		/**
-		 * Set MailCache object, where to get Mails from
-		 * @param mailCache
-		 */
 		public DateSorter( MailCache mailCache )
 		{
-			this.mailCache = mailCache;
+			super(mailCache);
 		}
 		
-		/* (non-Javadoc)
-		 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
-		 */
-		public int compare(String arg0, String arg1) {
-			Mail a = mailCache.getMail( arg0, MailCache.FETCH_HEADER );
-			Mail b = mailCache.getMail( arg1, MailCache.FETCH_HEADER );
-			if (a == null)
-				return (b == null) ? 0 : 1;
-			if (b == null)
-				return -1;
-			return compare(a, b);
+		protected int compare(Mail a, Mail b) {
+			return scompare(a, b);
 		}
 
 		/**
@@ -365,40 +366,24 @@ public class WebMail extends HttpServlet
 		 * @param a non-null
 		 * @param b non-null
 		 */
-		public static int compare(Mail a, Mail b) {
+		public static int scompare(Mail a, Mail b) {
 			return a.date != null ? ( b.date != null ? a.date.compareTo( b.date ) : -1 ) : ( b.date != null ? 1 : 0 );
 		}		
 	}
+
 	/**
 	 * sorts Mail objects by message size
 	 * @author susi
 	 */
-	private static class SizeSorter implements Comparator<String> {
+	private static class SizeSorter extends SorterBase {
 
-		private final MailCache mailCache;
-		/**
-		 * Set MailCache object, where to get Mails from
-		 * @param mailCache
-		 */
 		public SizeSorter( MailCache mailCache )
 		{
-			this.mailCache = mailCache;
+			super(mailCache);
 		}
 		
-		/* (non-Javadoc)
-		 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
-		 */
-		public int compare(String arg0, String arg1) {
-			Mail a = mailCache.getMail( arg0, MailCache.FETCH_HEADER );
-			Mail b = mailCache.getMail( arg1, MailCache.FETCH_HEADER );
-			if (a == null)
-				return (b == null) ? 0 : 1;
-			if (b == null)
-				return -1;
-			int rv = a.getSize() - b.getSize();
-			if (rv != 0)
-				return rv;
-			return DateSorter.compare(a, b);
+		protected int compare(Mail a, Mail b) {
+			return a.getSize() - b.getSize();
 		}		
 	}
 	
