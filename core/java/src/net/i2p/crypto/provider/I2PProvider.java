@@ -5,8 +5,8 @@ import java.security.PrivilegedAction;
 import java.security.Provider;
 
 public final class I2PProvider extends Provider {
-    public static String PROVIDER_NAME = "I2P";
-    private static String info = "I2P Security Provider v0.1, implementing" +
+    public static final String PROVIDER_NAME = "I2P";
+    private static final String INFO = "I2P Security Provider v0.1, implementing" +
             "several algorithms used by I2P.";
 
     /**
@@ -15,7 +15,7 @@ public final class I2PProvider extends Provider {
      * <code>Security.addProvider()</code> mechanism.
      */
     public I2PProvider() {
-        super(PROVIDER_NAME, 0.1, info);
+        super(PROVIDER_NAME, 0.1, INFO);
 
         AccessController.doPrivileged(new PrivilegedAction<Void>() {
             @Override
