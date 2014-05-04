@@ -51,8 +51,10 @@ import net.i2p.util.NativeBigInteger;
  */
 public class SigUtil {
 
-    private static final Map<SigningPublicKey, ECPublicKey> _pubkeyCache = new LHMCache<SigningPublicKey, ECPublicKey>(64);
-    private static final Map<SigningPrivateKey, ECPrivateKey> _privkeyCache = new LHMCache<SigningPrivateKey, ECPrivateKey>(16);
+    private static final Map<SigningPublicKey, ECPublicKey> _ECPubkeyCache = new LHMCache<SigningPublicKey, ECPublicKey>(64);
+    private static final Map<SigningPrivateKey, ECPrivateKey> _ECPrivkeyCache = new LHMCache<SigningPrivateKey, ECPrivateKey>(16);
+    private static final Map<SigningPublicKey, EdDSAPublicKey> _EdPubkeyCache = new LHMCache<SigningPublicKey, EdDSAPublicKey>(64);
+    private static final Map<SigningPrivateKey, EdDSAPrivateKey> _EdPrivkeyCache = new LHMCache<SigningPrivateKey, EdDSAPrivateKey>(16);
 
     private SigUtil() {}
 
@@ -138,14 +140,14 @@ public class SigUtil {
     public static ECPublicKey toJavaECKey(SigningPublicKey pk)
                               throws GeneralSecurityException {
         ECPublicKey rv;
-        synchronized (_pubkeyCache) {
-            rv = _pubkeyCache.get(pk);
+        synchronized (_ECPubkeyCache) {
+            rv = _ECPubkeyCache.get(pk);
         }
         if (rv != null)
             return rv;
         rv = cvtToJavaECKey(pk);
-        synchronized (_pubkeyCache) {
-            _pubkeyCache.put(pk, rv);
+        synchronized (_ECPubkeyCache) {
+            _ECPubkeyCache.put(pk, rv);
         }
         return rv;
     }
@@ -156,14 +158,14 @@ public class SigUtil {
     public static ECPrivateKey toJavaECKey(SigningPrivateKey pk)
                               throws GeneralSecurityException {
         ECPrivateKey rv;
-        synchronized (_privkeyCache) {
-            rv = _privkeyCache.get(pk);
+        synchronized (_ECPrivkeyCache) {
+            rv = _ECPrivkeyCache.get(pk);
         }
         if (rv != null)
             return rv;
         rv = cvtToJavaECKey(pk);
-        synchronized (_privkeyCache) {
-            _privkeyCache.put(pk, rv);
+        synchronized (_ECPrivkeyCache) {
+            _ECPrivkeyCache.put(pk, rv);
         }
         return rv;
     }
@@ -213,14 +215,44 @@ public class SigUtil {
      */
     public static EdDSAPublicKey toJavaEdDSAKey(SigningPublicKey pk)
                               throws GeneralSecurityException {
-        return new EdDSAPublicKey(new EdDSAPublicKeySpec(
-                pk.getData(), (EdDSAParameterSpec) pk.getType().getParams()));
+        EdDSAPublicKey rv;
+        synchronized (_EdPubkeyCache) {
+            rv = _EdPubkeyCache.get(pk);
+        }
+        if (rv != null)
+            return rv;
+        rv = cvtToJavaEdDSAKey(pk);
+        synchronized (_EdPubkeyCache) {
+            _EdPubkeyCache.put(pk, rv);
+        }
+        return rv;
     }
 
     /**
      *  @return JAVA EdDSA private key!
      */
     public static EdDSAPrivateKey toJavaEdDSAKey(SigningPrivateKey pk)
+                              throws GeneralSecurityException {
+        EdDSAPrivateKey rv;
+        synchronized (_EdPrivkeyCache) {
+            rv = _EdPrivkeyCache.get(pk);
+        }
+        if (rv != null)
+            return rv;
+        rv = cvtToJavaEdDSAKey(pk);
+        synchronized (_EdPrivkeyCache) {
+            _EdPrivkeyCache.put(pk, rv);
+        }
+        return rv;
+    }
+
+    private static EdDSAPublicKey cvtToJavaEdDSAKey(SigningPublicKey pk)
+                              throws GeneralSecurityException {
+        return new EdDSAPublicKey(new EdDSAPublicKeySpec(
+                pk.getData(), (EdDSAParameterSpec) pk.getType().getParams()));
+    }
+
+    private static EdDSAPrivateKey cvtToJavaEdDSAKey(SigningPrivateKey pk)
                               throws GeneralSecurityException {
         return new EdDSAPrivateKey(new EdDSAPrivateKeySpec(
                 pk.getData(), (EdDSAParameterSpec) pk.getType().getParams()));
@@ -570,11 +602,17 @@ public class SigUtil {
     }
 
     public static void clearCaches() {
-        synchronized(_pubkeyCache) {
-            _pubkeyCache.clear();
+        synchronized(_ECPubkeyCache) {
+            _ECPubkeyCache.clear();
         }
-        synchronized(_privkeyCache) {
-            _privkeyCache.clear();
+        synchronized(_ECPrivkeyCache) {
+            _ECPrivkeyCache.clear();
+        }
+        synchronized(_EdPubkeyCache) {
+            _EdPubkeyCache.clear();
+        }
+        synchronized(_EdPrivkeyCache) {
+            _EdPrivkeyCache.clear();
         }
     }
 }
