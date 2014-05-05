@@ -248,14 +248,22 @@ public class SigUtil {
 
     private static EdDSAPublicKey cvtToJavaEdDSAKey(SigningPublicKey pk)
                               throws GeneralSecurityException {
-        return new EdDSAPublicKey(new EdDSAPublicKeySpec(
+        try {
+            return new EdDSAPublicKey(new EdDSAPublicKeySpec(
                 pk.getData(), (EdDSAParameterSpec) pk.getType().getParams()));
+        } catch (IllegalArgumentException iae) {
+            throw new InvalidKeyException(iae);
+        }
     }
 
     private static EdDSAPrivateKey cvtToJavaEdDSAKey(SigningPrivateKey pk)
                               throws GeneralSecurityException {
-        return new EdDSAPrivateKey(new EdDSAPrivateKeySpec(
+        try {
+            return new EdDSAPrivateKey(new EdDSAPrivateKeySpec(
                 pk.getData(), (EdDSAParameterSpec) pk.getType().getParams()));
+        } catch (IllegalArgumentException iae) {
+            throw new InvalidKeyException(iae);
+        }
     }
 
     public static SigningPublicKey fromJavaKey(EdDSAPublicKey pk, SigType type)
