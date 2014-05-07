@@ -123,8 +123,10 @@ class BasicServlet extends HttpServlet
      *  Files are served from here
      */
     protected void setResourceBase(File base) throws UnavailableException {
-        if (!base.isDirectory())
+        if (!base.isDirectory()) {
+            _log.log(Log.CRIT, "Configured i2psnark directory " + base + " does not exist");
             throw new UnavailableException("Resource base does not exist: " + base);
+        }
         _resourceBase = base;
         if (_log.shouldLog(Log.INFO))
             _log.info("Resource base is " + _resourceBase);
