@@ -183,7 +183,7 @@ public class ConfigClientsHandler extends FormHandler {
         for (int cur = 0; cur < clients.size(); cur++) {
             ClientAppConfig ca = clients.get(cur);
             Object val = _settings.get(cur + ".enabled");
-            if (! ("webConsole".equals(ca.clientName) || "Web console".equals(ca.clientName)))
+            if (! (RouterConsoleRunner.class.getName().equals(ca.className)))
                 ca.disabled = val == null;
             // edit of an existing entry
             String desc = getJettyString("desc" + cur);

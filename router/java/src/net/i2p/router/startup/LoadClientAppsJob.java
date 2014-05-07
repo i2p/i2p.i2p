@@ -38,14 +38,23 @@ public class LoadClientAppsJob extends JobImpl {
         }
         List<ClientAppConfig> apps = ClientAppConfig.getClientApps(getContext());
         if (apps.isEmpty()) {
-            _log.error("Warning - No client apps or router console configured - we are just a router");
+            _log.logAlways(Log.WARN, "Warning - No client apps or router console configured - we are just a router");
             System.err.println("Warning - No client apps or router console configured - we are just a router");
             return;
         }
         for(int i = 0; i < apps.size(); i++) {
             ClientAppConfig app = (ClientAppConfig) apps.get(i);
-            if (app.disabled)
+            if (app.disabled) {
+                if ("net.i2p.router.web.RouterConsoleRunner".equals(app.className)) {
+                    String s = "Warning - Router console is disabled. To enable,\n edit the file " +
+                               ClientAppConfig.configFile(getContext()) +
+                               ",\n change the line \"clientApp." + i + ".startOnLoad=false\"" +
+                               " to \"clientApp." + i + ".startOnLoad=true\",\n and restart.";
+                    _log.logAlways(Log.WARN, s);
+                    System.err.println(s);
+                }
                 continue;
+            }
             String argVal[] = parseArgs(app.args);
             if (app.delay <= 0) {
                 // run this guy now
