@@ -1347,7 +1347,14 @@ public class I2PSnarkServlet extends BasicServlet {
         }
 
         // Torrent name column
-        out.write("</td><td class=\"snarkTorrentName\">");
+        out.write("</td><td class=\"snarkTorrentName\"");
+        if (isMultiFile) {
+            // link on the whole td
+            String jsec = encodedBaseName.replace("'", "\\'");
+            out.write(" onclick=\"document.location='" + encodedBaseName + "/';\">");
+        } else {
+            out.write('>');
+        }
         if (remaining == 0 || isMultiFile) {
             StringBuilder buf = new StringBuilder(128);
             buf.append("<a href=\"").append(encodedBaseName);
