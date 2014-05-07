@@ -109,7 +109,7 @@ public class HMACGenerator {
         mac.doFinal(rv, 0);
         release(mac);
         
-        boolean eq = DataHelper.eq(rv, 0, origMAC, origMACOffset, origMACLength);
+        boolean eq = DataHelper.eqCT(rv, 0, origMAC, origMACOffset, origMACLength);
         releaseTmp(rv);
         return eq;
     }

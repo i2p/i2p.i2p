@@ -983,6 +983,8 @@ public class DataHelper {
      * This treats (null == null) as true, (null == (!null)) as false, 
      * and unequal length arrays as false.
      *
+     * Variable time.
+     *
      * @return Arrays.equals(lhs, rhs)
      */
     public final static boolean eq(byte lhs[], byte rhs[]) {
@@ -1018,22 +1020,40 @@ public class DataHelper {
 
     /**
      *  Unlike eq(byte[], byte[]), this returns false if either lhs or rhs is null.
-     *  @throws AIOOBE if either array isn't long enough
+     *  Variable time.
+     *
+     *  @throws ArrayIndexOutOfBoundsException if either array isn't long enough
      */
     public final static boolean eq(byte lhs[], int offsetLeft, byte rhs[], int offsetRight, int length) {
         if ( (lhs == null) || (rhs == null) ) return false;
-        if (length <= 0) return true;
         for (int i = 0; i < length; i++) {
             if (lhs[offsetLeft + i] != rhs[offsetRight + i]) 
                 return false;
         }
         return true;
     }
+
+    /**
+     *  Unlike eq(), this throws NPE if either lhs or rhs is null.
+     *  Constant time.
+     *
+     *  @throws NullPointerException if lhs or rhs is null
+     *  @throws ArrayIndexOutOfBoundsException if either array isn't long enough
+     *  @since 0.9.13
+     */
+    public final static boolean eqCT(byte lhs[], int offsetLeft, byte rhs[], int offsetRight, int length) {
+        int r = 0;
+        for (int i = 0; i < length; i++) {
+            r |=  lhs[offsetLeft + i] ^ rhs[offsetRight + i];
+        }
+        return r == 0;
+    }
     
     /**
      *  Big endian compare, treats bytes as unsigned.
      *  Shorter arg is lesser.
      *  Args may be null, null is less than non-null.
+     *  Variable time.
      */
     public final static int compareTo(byte lhs[], byte rhs[]) {
         if ((rhs == null) && (lhs == null)) return 0;
