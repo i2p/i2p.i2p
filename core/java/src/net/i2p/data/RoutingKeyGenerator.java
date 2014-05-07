@@ -12,6 +12,7 @@ package net.i2p.data;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Arrays;
 import java.util.GregorianCalendar;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -149,7 +150,7 @@ public class RoutingKeyGenerator {
         long now = _context.clock().now();
         setCalToPreviousMidnight(now);
         byte[] mod = generateModDataFromCal();
-        boolean changed = !DataHelper.eq(_currentModData, mod);
+        boolean changed = !Arrays.equals(_currentModData, mod);
         if (changed) {
             // add a day and store next midnight and mod data for convenience
             _cal.add(Calendar.DATE, 1);

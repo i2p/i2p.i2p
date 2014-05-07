@@ -13,6 +13,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Arrays;
 
 import net.i2p.crypto.SHA256Generator;
 
@@ -125,7 +126,7 @@ public class KeysAndCert extends DataStructureImpl {
         return
                DataHelper.eq(_signingKey, ident._signingKey)
                && DataHelper.eq(_publicKey, ident._publicKey)
-               && DataHelper.eq(_padding, ident._padding)
+               && Arrays.equals(_padding, ident._padding)
                && DataHelper.eq(_certificate, ident._certificate);
     }
     

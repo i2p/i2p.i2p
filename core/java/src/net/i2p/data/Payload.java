@@ -12,6 +12,7 @@ package net.i2p.data;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Arrays;
 
 /**
  * Defines the actual payload of a message being delivered, including the 
@@ -108,8 +109,8 @@ public class Payload extends DataStructureImpl {
         if (object == this) return true;
         if ((object == null) || !(object instanceof Payload)) return false;
         Payload p = (Payload) object;
-        return DataHelper.eq(_unencryptedData, p.getUnencryptedData())
-               && DataHelper.eq(_encryptedData, p.getEncryptedData());
+        return Arrays.equals(_unencryptedData, p.getUnencryptedData())
+               && Arrays.equals(_encryptedData, p.getEncryptedData());
     }
     
     @Override

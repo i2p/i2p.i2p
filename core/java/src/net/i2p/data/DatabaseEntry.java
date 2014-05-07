@@ -9,6 +9,8 @@ package net.i2p.data;
  *
  */
 
+import java.util.Arrays;
+
 import net.i2p.crypto.DSAEngine;
 
 /**
@@ -108,7 +110,7 @@ public abstract class DatabaseEntry extends DataStructureImpl {
     public Hash getRoutingKey() {
         RoutingKeyGenerator gen = RoutingKeyGenerator.getInstance();
         byte[] mod = gen.getModData();
-        if (!DataHelper.eq(mod, _routingKeyGenMod)) {
+        if (!Arrays.equals(mod, _routingKeyGenMod)) {
             _currentRoutingKey = gen.getRoutingKey(getHash());
             _routingKeyGenMod = mod;
         }

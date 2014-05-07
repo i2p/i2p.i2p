@@ -12,6 +12,7 @@ package net.i2p.data;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Arrays;
 
 /**
  * Defines a certificate that can be attached to various I2P structures, such
@@ -231,7 +232,7 @@ public class Certificate extends DataStructureImpl {
         if (object == this) return true;
         if ((object == null) || !(object instanceof Certificate)) return false;
         Certificate cert = (Certificate) object;
-        return _type == cert.getCertificateType() && DataHelper.eq(_payload, cert.getPayload());
+        return _type == cert.getCertificateType() && Arrays.equals(_payload, cert.getPayload());
     }
 
     @Override

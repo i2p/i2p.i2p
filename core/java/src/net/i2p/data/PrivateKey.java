@@ -9,6 +9,8 @@ package net.i2p.data;
  *
  */
 
+import java.util.Arrays;
+
 import net.i2p.crypto.KeyGenerator;
 
 /**
@@ -56,7 +58,6 @@ public class PrivateKey extends SimpleDataStructure {
     /**
      * We assume the data has enough randomness in it, so use the last 4 bytes for speed.
      * Overridden since we use short exponents, so the first 227 bytes are all zero.
-     * Not that we are storing PrivateKeys in any Sets or Maps anywhere.
      */
     @Override
     public int hashCode() {
@@ -72,6 +73,6 @@ public class PrivateKey extends SimpleDataStructure {
     public boolean equals(Object obj) {
         if (obj == this) return true;
         if ((obj == null) || !(obj instanceof PrivateKey)) return false;
-        return DataHelper.eq(_data, ((PrivateKey) obj)._data);
+        return Arrays.equals(_data, ((PrivateKey) obj)._data);
     }
 }

@@ -7,6 +7,7 @@ package net.i2p.data;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Arrays;
 
 import net.i2p.crypto.SHA256Generator;
 
@@ -183,6 +184,6 @@ public abstract class SimpleDataStructure extends DataStructureImpl {
     public boolean equals(Object obj) {
         if (obj == this) return true;
         if ((obj == null) || !(obj instanceof SimpleDataStructure)) return false;
-        return DataHelper.eq(_data, ((SimpleDataStructure) obj)._data);
+        return Arrays.equals(_data, ((SimpleDataStructure) obj)._data);
     }
 }
