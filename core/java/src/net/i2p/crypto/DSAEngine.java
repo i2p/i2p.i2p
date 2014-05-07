@@ -389,7 +389,6 @@ public class DSAEngine {
             throw new IllegalArgumentException("Bad key type " + signingKey.getType());
         long start = _context.clock().now();
 
-        Signature sig = new Signature();
         BigInteger k;
 
         boolean ok = false;
@@ -452,14 +451,13 @@ public class DSAEngine {
             for (int i = 0; i < sbytes.length; i++)
                 out[i + 20 + 20 - sbytes.length] = sbytes[i];
         }
-        sig.setData(out);
 
         long diff = _context.clock().now() - start;
         if (diff > 1000) {
             if (_log.shouldLog(Log.WARN)) _log.warn("Took too long to sign (" + diff + "ms)");
         }
 
-        return sig;
+        return new Signature(out);
     }
     
     /**
@@ -645,7 +643,7 @@ public class DSAEngine {
             case RSA:
                 return "NONEwithRSA";
             default:
-                throw new IllegalArgumentException();
+                throw new UnsupportedOperationException("Raw signatures unsupported for " + type);
         }
     }
 
@@ -657,7 +655,7 @@ public class DSAEngine {
             return "NONEwithECDSA";
         if (key instanceof RSAKey)
             return "NONEwithRSA";
-        throw new IllegalArgumentException();
+        throw new UnsupportedOperationException("Raw signatures unsupported for " + key.getClass().getName());
     }
 
     //private static final int RUNS = 1000;
