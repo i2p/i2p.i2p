@@ -1,3 +1,18 @@
+2014-05-07 zzz
+ * Console:
+   - Add hiddengate.i2p
+   - Fix console getting disabled when saving client config (ticket #1260)
+ * Router: Add warning at startup if console is disabled
+ * SSU: Extend establishment phase retx timeout
+ * SusiMail:
+   - Don't fetch headers from folder sorters
+   - Update debug setting when saving config
+ * Transports: Use constant time method for HMAC verification
+ * Tunnels: Revert expl. OB default back to 2 + 0-1 for now
+
+2014-05-01 zzz
+ * SusiMail: js enhancements, build cleanups, css tweaks
+
 2014-04-30 zzz
  * Plugins: Retry deletion at restart if it fails (ticket #1257)
 
@@ -14,7 +29,8 @@
 
 2014-04-27 zzz
  * NTCP: Remove published NTCP address if SSU becomes firewalled,
-         to fix the "Firewalled with NTCP enabled" message
+         to fix the "Firewalled with NTCP enabled" message,
+         broken during IPv6 implementation in 0.9.8
  * Router: Set killVMOnEnd before runRouter() (for azi2phelper)
  * RoutingKeyGenerator: Don't assume UTC (for azi2phelper)
  * SusiMail:
