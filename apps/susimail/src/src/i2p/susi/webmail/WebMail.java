@@ -251,8 +251,8 @@ public class WebMail extends HttpServlet
 		 *  Gets mail from the cache, checks for null, then compares
 		 */
 		public int compare(String arg0, String arg1) {
-			Mail a = mailCache.getMail( arg0, MailCache.FETCH_HEADER );
-			Mail b = mailCache.getMail( arg1, MailCache.FETCH_HEADER );
+			Mail a = mailCache.getMail( arg0, MailCache.FetchMode.CACHE_ONLY );
+			Mail b = mailCache.getMail( arg1, MailCache.FetchMode.CACHE_ONLY );
 			if (a == null)
 				return (b == null) ? 0 : 1;
 			if (b == null)
@@ -440,10 +440,8 @@ public class WebMail extends HttpServlet
 			MailCache mc = mailCache;
 			Folder<String> f = folder;
 			if (mc != null && f != null) {
-				if (MailCache.FETCH_HEADER) {
-					String[] uidls = mc.getUIDLs();
-					f.setElements(uidls);
-				}
+				String[] uidls = mc.getUIDLs();
+				f.setElements(uidls);
 			}
 		}
 	}
@@ -775,7 +773,7 @@ public class WebMail extends HttpServlet
 						if (!offline) {
 							// prime the cache, request all headers at once
 							// otherwise they are pulled one at a time by sortBy() below
-							mc.getMail(MailCache.FETCH_HEADER);
+							mc.getMail(MailCache.FetchMode.HEADER);
 						}
 						// get through cache so we have the disk-only ones too
 						String[] uidls = mc.getUIDLs();
@@ -976,7 +974,7 @@ public class WebMail extends HttpServlet
 				}
 				
 				if( uidl != null ) {
-					Mail mail = sessionObject.mailCache.getMail( uidl, MailCache.FETCH_ALL );
+					Mail mail = sessionObject.mailCache.getMail( uidl, MailCache.FetchMode.ALL );
 					/*
 					 * extract original sender from Reply-To: or From:
 					 */
@@ -1140,7 +1138,7 @@ public class WebMail extends HttpServlet
 			// TODO how to do a "No new mail" message?
 			sessionObject.mailbox.refresh();
 			sessionObject.error += sessionObject.mailbox.lastError();
-			sessionObject.mailCache.getMail(MailCache.FETCH_HEADER);
+			sessionObject.mailCache.getMail(MailCache.FetchMode.HEADER);
 			// get through cache so we have the disk-only ones too
 			String[] uidls = sessionObject.mailCache.getUIDLs();
 			if (uidls != null)
@@ -1281,7 +1279,7 @@ public class WebMail extends HttpServlet
 		if( str != null ) {
 			try {
 				int hashCode = Integer.parseInt( str );
-				Mail mail = sessionObject.mailCache.getMail( sessionObject.showUIDL, MailCache.FETCH_ALL );
+				Mail mail = sessionObject.mailCache.getMail( sessionObject.showUIDL, MailCache.FetchMode.ALL );
 				MailPart part = mail != null ? getMailPartFromHashCode( mail.getPart(), hashCode ) : null;
 				if( part != null ) {
 					if (sendAttachment(sessionObject, part, response, isRaw))
@@ -1443,6 +1441,8 @@ public class WebMail extends HttpServlet
 							sessionObject.folder.setPageSize( pageSize );
 					} catch( NumberFormatException nfe ) {}
 				}
+				boolean release = !Boolean.parseBoolean(props.getProperty(CONFIG_DEBUG));
+				Debug.setLevel( release ? Debug.ERROR : Debug.DEBUG );
 				sessionObject.state = sessionObject.folder != null ? STATE_LIST : STATE_AUTH;
 				sessionObject.info = _("Configuration saved");
 			} catch (IOException ioe) {
@@ -1608,7 +1608,7 @@ public class WebMail extends HttpServlet
 				processSortingButtons( sessionObject, request );
 				for( Iterator<String> it = sessionObject.folder.currentPageIterator(); it != null && it.hasNext(); ) {
 					String uidl = it.next();
-					Mail mail = sessionObject.mailCache.getMail( uidl, MailCache.FETCH_HEADER );
+					Mail mail = sessionObject.mailCache.getMail( uidl, MailCache.FetchMode.HEADER );
 					if( mail != null && mail.error.length() > 0 ) {
 						sessionObject.error += mail.error;
 						mail.error = "";
@@ -1629,7 +1629,7 @@ public class WebMail extends HttpServlet
 				// sessionObject.state = STATE_LIST and
 				// sessionObject.showUIDL = null
 				if ( sessionObject.showUIDL != null ) {
-					Mail mail = sessionObject.mailCache.getMail( sessionObject.showUIDL, MailCache.FETCH_ALL );
+					Mail mail = sessionObject.mailCache.getMail( sessionObject.showUIDL, MailCache.FetchMode.ALL );
 					if( mail != null && mail.error.length() > 0 ) {
 						sessionObject.error += mail.error;
 						mail.error = "";
@@ -1662,7 +1662,7 @@ public class WebMail extends HttpServlet
 					//subtitle = ngettext("1 Message", "{0} Messages", sessionObject.mailbox.getNumMails());
 					subtitle = ngettext("1 Message", "{0} Messages", sessionObject.folder.getSize());
 				} else if( sessionObject.state == STATE_SHOW ) {
-					Mail mail = sessionObject.mailCache.getMail(sessionObject.showUIDL, MailCache.FETCH_HEADER);
+					Mail mail = sessionObject.mailCache.getMail(sessionObject.showUIDL, MailCache.FetchMode.HEADER);
 					if (mail != null && mail.shortSubject != null)
 						subtitle = mail.shortSubject;
 					else
@@ -2121,7 +2121,7 @@ public class WebMail extends HttpServlet
 		int i = 0;
 		for( Iterator<String> it = sessionObject.folder.currentPageIterator(); it != null && it.hasNext(); ) {
 			String uidl = it.next();
-			Mail mail = sessionObject.mailCache.getMail( uidl, MailCache.FETCH_HEADER );
+			Mail mail = sessionObject.mailCache.getMail( uidl, MailCache.FetchMode.HEADER );
 			if (mail == null) {
 				i++;
 				continue;
@@ -2235,7 +2235,7 @@ public class WebMail extends HttpServlet
 		if( sessionObject.reallyDelete ) {
 			out.println( "<p class=\"error\">" + _("Really delete this message?") + " " + button( REALLYDELETE, _("Yes, really delete it!") ) + "</p>" );
 		}
-		Mail mail = sessionObject.mailCache.getMail( sessionObject.showUIDL, MailCache.FETCH_ALL );
+		Mail mail = sessionObject.mailCache.getMail( sessionObject.showUIDL, MailCache.FetchMode.ALL );
 		if(!RELEASE && mail != null && mail.hasBody()) {
 			out.println( "<!--" );
 			out.println( "Debug: Mail header and body follow");

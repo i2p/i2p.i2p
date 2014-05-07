@@ -43,8 +43,9 @@ import java.util.Set;
  */
 class MailCache {
 	
-	public static final boolean FETCH_HEADER = true;
-	public static final boolean FETCH_ALL = false;
+	public enum FetchMode {
+		HEADER, ALL, CACHE_ONLY
+	}
 	
 	private final POP3MailBox mailbox;
 	private final Hashtable<String, Mail> mails;
@@ -105,10 +106,10 @@ class MailCache {
 	 * Fetch any needed data from pop3 server.
 	 * 
 	 * @param uidl message id to get
-	 * @param headerOnly fetch only header lines?
+	 * @param mode CACHE_ONLY to not pull from pop server
 	 * @return An e-mail or null
 	 */
-	public Mail getMail( String uidl, boolean headerOnly ) {
+	public Mail getMail(String uidl, FetchMode mode) {
 		
 		Mail mail = null, newMail = null;
 
@@ -129,13 +130,13 @@ class MailCache {
 		if (mail.markForDeletion)
 			return null;
 		int sz = mail.getSize();
-		if (sz > 0 && sz <= FETCH_ALL_SIZE)
-			headerOnly = false;
+		if (mode == FetchMode.HEADER && sz > 0 && sz <= FETCH_ALL_SIZE)
+			mode = FetchMode.ALL;
 			
-		if( headerOnly ) {
+		if (mode == FetchMode.HEADER) {
 			if(!mail.hasHeader())
 				mail.setHeader(mailbox.getHeader(uidl));
-		} else {
+		} else if (mode == FetchMode.ALL) {
 			if(!mail.hasBody()) {
 				ReadBuffer rb = mailbox.getBody(uidl);
 				if (rb != null) {
@@ -146,6 +147,8 @@ class MailCache {
 					}
 				}
 			}
+		} else {
+			// else if it wasn't in cache, too bad
 		}
 		return mail;
 	}
@@ -156,10 +159,14 @@ class MailCache {
 	 * After this, call getUIDLs() to get all known mail UIDLs.
 	 * MUST already be connected, otherwise returns false.
 	 * 
+	 * @param mode HEADER or ALL only
 	 * @return true if any were fetched
 	 * @since 0.9.13
 	 */
-	public boolean getMail(boolean hOnly) {
+	public boolean getMail(FetchMode mode) {
+		if (mode == FetchMode.CACHE_ONLY)
+			throw new IllegalArgumentException();
+		boolean hOnly = mode == FetchMode.HEADER;
 		
 		Collection<String> popKnown = mailbox.getUIDLs();
 		if (popKnown == null)
