@@ -490,6 +490,16 @@ public class IndexBean {
                 return "<font color=\"red\">" +
                        _("Warning - ports less than 1024 are not recommended") +
                        ": " + port + "</font>";
+            // dup check, O(n**2)
+            List<TunnelController> controllers = _group.getControllers();
+            for (int i = 0; i < controllers.size(); i++) {
+                if (i == tunnel)
+                    continue;
+                if (port.equals(controllers.get(i).getListenPort()))
+                    return "<font color=\"red\">" +
+                           _("Warning - duplicate port") +
+                           ": " + port + "</font>";
+            }
             return port;
         }
         return "<font color=\"red\">" + _("Port not set") + "</font>";
