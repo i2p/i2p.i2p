@@ -1505,9 +1505,14 @@
         <delete file="i2pupdate.su2" />
         <!-- make this a lot easier by putting release.privkey=/path/to/privkey in override.properties -->
         <input message="Enter private signing key file:" addproperty="release.privkey" />
-        <fail message="You must enter a path." >
+        <fail message="You must enter an existing file path." >
             <condition>
-                <equals arg1="${release.privkey}" arg2=""/>
+                <or>
+                    <equals arg1="${release.privkey}" arg2=""/>
+                    <not>
+                        <length file="${release.privkey}" when="greater" length="0" />
+                    </not>
+                </or>
             </condition>
         </fail>
         <echo message="Key file is ${release.privkey}" />
@@ -1579,9 +1584,14 @@
         </java>
         <!-- now build and verify the packed su3 from the packed zip -->
         <input message="Enter su3 private signing key store:" addproperty="release.privkey.su3" />
-        <fail message="You must enter a path." >
+        <fail message="You must enter an existing file path." >
             <condition>
-                <equals arg1="${release.privkey.su3}" arg2=""/>
+                <or>
+                    <equals arg1="${release.privkey.su3}" arg2=""/>
+                    <not>
+                        <length file="${release.privkey.su3}" when="greater" length="0" />
+                    </not>
+                </or>
             </condition>
         </fail>
         <input message="Enter key name (you@mail.i2p):" addproperty="release.signer.su3" />
@@ -1650,23 +1660,37 @@
             <arg value="i2p-${release.number}/" />
         </exec>
         <echo message="Sign the files:" />
+        <input message="Enter GPG key ID (e.g. 0x12345678) for signing:" addproperty="release.gpg.keyid" />
+        <fail message="You must enter a key ID." >
+            <condition>
+                <equals arg1="${release.gpg.keyid}" arg2=""/>
+            </condition>
+        </fail>
         <delete file="i2pinstall_${release.number}_windows.exe.sig" />
         <delete file="i2pinstall_${release.number}.jar.sig" />
         <delete file="i2psource_${release.number}.tar.bz2.sig" />
         <delete file="i2pupdate_${release.number}.zip.sig" />
         <exec executable="gpg" failonerror="true">
+            <arg value="--default-key" />
+            <arg value="${release.gpg.keyid}" />
             <arg value="-b" />
             <arg value="i2pinstall_${release.number}_windows.exe" />
         </exec>
         <exec executable="gpg" failonerror="true">
+            <arg value="--default-key" />
+            <arg value="${release.gpg.keyid}" />
             <arg value="-b" />
             <arg value="i2pinstall_${release.number}.jar" />
         </exec>
         <exec executable="gpg" failonerror="true">
+            <arg value="--default-key" />
+            <arg value="${release.gpg.keyid}" />
             <arg value="-b" />
             <arg value="i2psource_${release.number}.tar.bz2" />
         </exec>
         <exec executable="gpg" failonerror="true">
+            <arg value="--default-key" />
+            <arg value="${release.gpg.keyid}" />
             <arg value="-b" />
             <arg value="i2pupdate_${release.number}.zip" />
         </exec>
