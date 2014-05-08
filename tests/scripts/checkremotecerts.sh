@@ -65,10 +65,16 @@ for HOST in $RESEEDHOSTS; do
         # If we end up here it's for one of two probable reasons:
         # 1) the the CN in the certificate doesn't match the hostname.
         # 2) the certificate is invalid
-        openssl x509 -in "$CERTHOME/ssl/$HOST.crt" -fingerprint -noout > "$WORK/$HOST.expected.finger"
-        openssl x509 -in "$WORK/$HOST.test" -fingerprint -noout > "$WORK/$HOST.real.finger"
-        if [ "$(cat "$WORK/$HOST.expected.finger")" != "$(cat "$WORK/$HOST.real.finger")" ]; then
-            echo -n "invalid certificate for $HOST"
+        if [ -e "$CERTHOME/ssl/$HOST.crt" ]; then
+            openssl x509 -in "$CERTHOME/ssl/$HOST.crt" -fingerprint -noout > "$WORK/$HOST.expected.finger"
+            openssl x509 -in "$WORK/$HOST.test" -fingerprint -noout > "$WORK/$HOST.real.finger"
+            if [ "$(cat "$WORK/$HOST.expected.finger")" != "$(cat "$WORK/$HOST.real.finger")" ]; then
+                echo -n "invalid certificate for $HOST"
+                FAIL=1
+                echo $HOST >> $WORK/bad
+            fi
+        else
+            echo "Untrusted certficate and certificate not found at $CERTHOME/ssl" >&2
             FAIL=1
             echo $HOST >> $WORK/bad
         fi
