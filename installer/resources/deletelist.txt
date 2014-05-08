@@ -80,3 +80,8 @@ certificates/netdb.i2p2.no.crt
 certificates/reseed.info.crt
 certificates/reseed.pkol.de.crt
 certificates/www.cacert.org.crt
+# renamed to match the hostname
+certificates/ssl/i2pprojekt.de.crt
+# no longer used
+certificates/ssl/netdb.i2p2.de.crt
+certificates/ssl/netdb.i2p2.no.crt
