@@ -16,6 +16,8 @@ public abstract class SystemVersion {
     private static final boolean _isWin = System.getProperty("os.name").startsWith("Win");
     private static final boolean _isMac = System.getProperty("os.name").startsWith("Mac");
     private static final boolean _isArm = System.getProperty("os.arch").startsWith("arm");
+    private static final boolean _isX86 = System.getProperty("os.arch").contains("86") ||
+                                          System.getProperty("os.arch").equals("amd64");
     private static final boolean _isAndroid;
     private static final boolean _isApache;
     private static final boolean _isGNU;
@@ -23,6 +25,7 @@ public abstract class SystemVersion {
     private static final boolean _hasWrapper = System.getProperty("wrapper.version") != null;
 
     private static final boolean _oneDotSix;
+    private static final boolean _oneDotSeven;
     private static final int _androidSDK;
 
     static {
@@ -56,8 +59,10 @@ public abstract class SystemVersion {
 
         if (_isAndroid) {
             _oneDotSix = _androidSDK >= 9;
+            _oneDotSeven = _androidSDK >= 19;
         } else {
             _oneDotSix = VersionComparator.comp(System.getProperty("java.version"), "1.6") >= 0;
+            _oneDotSeven = VersionComparator.comp(System.getProperty("java.version"), "1.7") >= 0;
         }
     }
 
@@ -95,6 +100,13 @@ public abstract class SystemVersion {
     }
 
     /**
+     *  @since 0.9.14
+     */
+    public static boolean isX86() {
+        return _isX86;
+    }
+
+    /**
      *  Better than (new VersionComparator()).compare(System.getProperty("java.version"), "1.6") >= 0
      *  as it handles Android also, where java.version = "0".
      *
@@ -102,6 +114,17 @@ public abstract class SystemVersion {
      */
     public static boolean isJava6() {
         return _oneDotSix;
+    }
+
+    /**
+     *  Better than (new VersionComparator()).compare(System.getProperty("java.version"), "1.7") >= 0
+     *  as it handles Android also, where java.version = "0".
+     *
+     *  @return true if Java 1.7 or higher, or Android API 19 or higher
+     *  @since 0.9.14
+     */
+    public static boolean isJava7() {
+        return _oneDotSeven;
     }
 
     /**

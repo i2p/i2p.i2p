@@ -62,4 +62,10 @@ public interface CPUInfo
      * @return true iff the CPU support the SSE4A instruction set.
      */
     public boolean hasSSE4A();
+
+    /**
+     * @return true iff the CPU supports the AES-NI instruction set.
+     * @since 0.9.14
+     */
+    public boolean hasAES();
 }

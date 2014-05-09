@@ -12,16 +12,21 @@ package net.i2p.crypto;
 import java.security.InvalidKeyException;
 
 // for using system version
-//import java.security.GeneralSecurityException;
-//import javax.crypto.Cipher;
-//import javax.crypto.spec.IvParameterSpec;
-//import javax.crypto.spec.SecretKeySpec;
+import java.security.GeneralSecurityException;
+import javax.crypto.Cipher;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
+
+import freenet.support.CPUInformation.CPUID;
+import freenet.support.CPUInformation.CPUInfo;
+import freenet.support.CPUInformation.UnknownCPUException;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
 import net.i2p.data.SessionKey;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleByteCache;
+import net.i2p.util.SystemVersion;
 
 /** 
  * Wrapper for AES cypher operation using Cryptix's Rijndael implementation.  Implements
@@ -37,28 +42,47 @@ public class CryptixAESEngine extends AESEngine {
     // keys are now cached in the SessionKey objects
     //private CryptixAESKeyCache _cache;
     
-/**** see comments for main() below
     private static final boolean USE_SYSTEM_AES;
     static {
         boolean systemOK = false;
-        try {
-            systemOK = Cipher.getMaxAllowedKeyLength("AES") >= 256;
-        } catch (GeneralSecurityException gse) {
-            // a NoSuchAlgorithmException
-        } catch (NoSuchMethodError nsme) {
-            // JamVM, gij
+        if (hasAESNI()) {
             try {
-                Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");
-                SecretKeySpec key = new SecretKeySpec(new byte[32], "AES");
-                cipher.init(Cipher.ENCRYPT_MODE, key);
-                systemOK = true;
+                systemOK = Cipher.getMaxAllowedKeyLength("AES") >= 256;
             } catch (GeneralSecurityException gse) {
+                // a NoSuchAlgorithmException
+            } catch (NoSuchMethodError nsme) {
+                // JamVM, gij
+                try {
+                    Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");
+                    SecretKeySpec key = new SecretKeySpec(new byte[32], "AES");
+                    cipher.init(Cipher.ENCRYPT_MODE, key);
+                    systemOK = true;
+                } catch (GeneralSecurityException gse) {
+                }
             }
         }
         USE_SYSTEM_AES = systemOK;
         //System.out.println("Using system AES? " + systemOK);
     }
-****/
+
+    /**
+     *  Do we have AES-NI support in the processor and JVM?
+     *  Only on 64-bit x86 Java 7 fast JVMs, with AES-NI support.
+     *  See comments in main() below.
+     *  @since 0.9.14
+     */
+    private static boolean hasAESNI() {
+        if (SystemVersion.isX86() && SystemVersion.is64Bit() && SystemVersion.isJava7() &&
+            !SystemVersion.isApache() && !SystemVersion.isGNU()) {
+            try {
+                return CPUID.getInfo().hasAES();
+            } catch (UnknownCPUException e) {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
 
     /** */
     public CryptixAESEngine(I2PAppContext context) {
@@ -104,7 +128,6 @@ public class CryptixAESEngine extends AESEngine {
             return;
         }
 
-/****
         if (USE_SYSTEM_AES) {
             try {
                 SecretKeySpec key = new SecretKeySpec(sessionKey.getData(), "AES");
@@ -118,7 +141,6 @@ public class CryptixAESEngine extends AESEngine {
                     _log.warn("Java encrypt fail", gse);
             }
         }
-****/
 
         int numblock = length / 16;
         
@@ -159,7 +181,6 @@ public class CryptixAESEngine extends AESEngine {
             return ;
         }
 
-/****
         if (USE_SYSTEM_AES) {
             try {
                 SecretKeySpec key = new SecretKeySpec(sessionKey.getData(), "AES");
@@ -173,7 +194,6 @@ public class CryptixAESEngine extends AESEngine {
                     _log.warn("Java decrypt fail", gse);
             }
         }
-****/
 
         int numblock = length / 16;
         if (length % 16 != 0) {
@@ -261,8 +281,8 @@ public class CryptixAESEngine extends AESEngine {
     }
     
 /******
-    private static final int MATCH_RUNS = 5000;
-    private static final int TIMING_RUNS = 10000;
+    private static final int MATCH_RUNS = 11000;
+    private static final int TIMING_RUNS = 100000;
 ******/
 
     /**
@@ -281,6 +301,15 @@ public class CryptixAESEngine extends AESEngine {
      * gij	51130		761693 (!)
      * jrockit	 9780		n/a
      *</pre>
+     *
+     * Speed ups with AES-NI:
+     * May 2014 AMD Hexcore 100K runs:
+     *<pre>
+     *  JVM		Cryptix (ms)	System (ms)
+     * OpenJDK 6	3314		  5030
+     * OpenJDK 7	3285		  2476
+     *</pre>
+     *
      *
      */
 /*******

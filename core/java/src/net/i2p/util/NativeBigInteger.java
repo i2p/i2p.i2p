@@ -181,8 +181,7 @@ public class NativeBigInteger extends BigInteger {
      */
     private static final boolean _is64 = SystemVersion.is64Bit();
 
-    private static final boolean _isX86 = System.getProperty("os.arch").contains("86") ||
-	                                 System.getProperty("os.arch").equals("amd64");
+    private static final boolean _isX86 = SystemVersion.isX86();
 
     private static final boolean _isArm = SystemVersion.isARM();
 
