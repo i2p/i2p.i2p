@@ -42,6 +42,8 @@ public class CryptixAESEngine extends AESEngine {
     // keys are now cached in the SessionKey objects
     //private CryptixAESKeyCache _cache;
     
+    /** see test results below */
+    private static final int MIN_SYSTEM_AES_LENGTH = 704;
     private static final boolean USE_SYSTEM_AES;
     static {
         boolean systemOK = false;
@@ -128,7 +130,7 @@ public class CryptixAESEngine extends AESEngine {
             return;
         }
 
-        if (USE_SYSTEM_AES) {
+        if (USE_SYSTEM_AES && length >= MIN_SYSTEM_AES_LENGTH) {
             try {
                 SecretKeySpec key = new SecretKeySpec(sessionKey.getData(), "AES");
                 IvParameterSpec ivps = new IvParameterSpec(iv, ivOffset, 16);
@@ -181,7 +183,7 @@ public class CryptixAESEngine extends AESEngine {
             return ;
         }
 
-        if (USE_SYSTEM_AES) {
+        if (USE_SYSTEM_AES && length >= MIN_SYSTEM_AES_LENGTH) {
             try {
                 SecretKeySpec key = new SecretKeySpec(sessionKey.getData(), "AES");
                 IvParameterSpec ivps = new IvParameterSpec(iv, ivOffset, 16);
@@ -292,6 +294,8 @@ public class CryptixAESEngine extends AESEngine {
      *  And we can't get rid of Cryptix because AES-256 is unavailable
      *  in several JVMs.
      *  Make USE_SYSTEM_AES above non-final to run this.
+     *  You also must comment out the length check in encrypt() and decrypt() above.
+     *
      *<pre>
      *  JVM	Cryptix (ms)	System (ms)
      *  Sun	 8662		n/a
@@ -303,14 +307,14 @@ public class CryptixAESEngine extends AESEngine {
      *</pre>
      *
      * Speed ups with AES-NI:
-     * May 2014 AMD Hexcore 100K runs:
+     * May 2014 AMD Hexcore 100K runs (1024 bytes):
      *<pre>
      *  JVM		Cryptix (ms)	System (ms)
      * OpenJDK 6	3314		  5030
      * OpenJDK 7	3285		  2476
      *</pre>
      *
-     *
+     * Cryptix is faster for data smaller than 704 bytes.
      */
 /*******
     public static void main(String args[]) {
@@ -325,23 +329,31 @@ public class CryptixAESEngine extends AESEngine {
             if (canTestSystem) {
                 System.out.println("Start Cryptix vs. System verification run of " + MATCH_RUNS);
                 for (int i = 0; i < MATCH_RUNS; i++) {
-                    testED(ctx, false, true);
-                    testED(ctx, true, false);
+                    testED(ctx, false, true, 1024);
+                    testED(ctx, true, false, 1024);
                 }
             }
-            System.out.println("Start Cryptix run of " + TIMING_RUNS);
-            long start = System.currentTimeMillis();
-            for (int i = 0; i < TIMING_RUNS; i++) {
-                testED(ctx, false, false);
-            }
-            System.out.println("Cryptix took " + (System.currentTimeMillis() - start));
-            if (canTestSystem) {
-                System.out.println("Start System run of " + TIMING_RUNS);
-                start = System.currentTimeMillis();
+            for (int len = 512; len <= 1024; len += 32) {
+                System.out.println("Start Cryptix run of " + TIMING_RUNS + " length " + len);
+                long start = System.currentTimeMillis();
                 for (int i = 0; i < TIMING_RUNS; i++) {
-                    testED(ctx, true, true);
+                    testED(ctx, false, false, len);
                 }
-                System.out.println("System took " + (System.currentTimeMillis() - start));
+                long cryptix = System.currentTimeMillis() - start;
+                System.out.println("Cryptix took " + cryptix);
+                if (canTestSystem) {
+                    System.out.println("Start System run of " + TIMING_RUNS + " length " + len);
+                    start = System.currentTimeMillis();
+                    for (int i = 0; i < TIMING_RUNS; i++) {
+                        testED(ctx, true, true, len);
+                    }
+                    long system = System.currentTimeMillis() - start;
+                    System.out.println("System took " + system);
+                    if (system < cryptix)
+                        System.out.println("***System is " + (100 - (system * 100 / cryptix)) + "% better");
+                    else
+                        System.out.println("***System is " + ((system * 100 / cryptix) - 100) + "% worse");
+                }
             }
             //testFake(ctx);
             //testNull(ctx);
@@ -356,16 +368,16 @@ public class CryptixAESEngine extends AESEngine {
     private static byte[] _encrypted = new byte[1024];
     private static byte[] _decrypted = new byte[1024];
 
-    private static void testED(I2PAppContext ctx, boolean systemEnc, boolean systemDec) {
+    private static void testED(I2PAppContext ctx, boolean systemEnc, boolean systemDec, int len) {
         SessionKey key = ctx.keyGenerator().generateSessionKey();
         ctx.random().nextBytes(_iv);
         ctx.random().nextBytes(_orig);
         CryptixAESEngine aes = new CryptixAESEngine(ctx);
         USE_SYSTEM_AES = systemEnc;
-        aes.encrypt(_orig, 0, _encrypted, 0, key, _iv, _orig.length);
+        aes.encrypt(_orig, 0, _encrypted, 0, key, _iv, len);
         USE_SYSTEM_AES = systemDec;
-        aes.decrypt(_encrypted, 0, _decrypted, 0, key, _iv, _encrypted.length);
-        if (!DataHelper.eq(_decrypted,_orig))
+        aes.decrypt(_encrypted, 0, _decrypted, 0, key, _iv, len);
+        if (!DataHelper.eq(_decrypted, 0, _orig, 0, len))
             throw new RuntimeException("full D(E(orig)) != orig");
         //else
         //    System.out.println("full D(E(orig)) == orig");
