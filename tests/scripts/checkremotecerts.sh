@@ -30,7 +30,7 @@ else
     OPENSSL_BIN="openssl"
 fi
 
-if check_for_prog certtool1; then
+if check_for_prog certtool; then
     CERTTOOL=1
     echo "-- Checking certificates with GnuTLS --"
 elif check_for_prog openssl; then
