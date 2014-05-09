@@ -2,26 +2,46 @@
 set -e
 set -u
 
-if ! which openssl > /dev/null 2>&1 || ! which gnutls-cli > /dev/null 2>&1; then
-    echo "This script (currently) requires both gnutls and openssl" >&2
-    exit
-fi
-
-if pidof /usr/bin/tor > /dev/null 2>&1 && which torify > /dev/null 2>&1; then
-    echo "-- Detected Tor, will try using it --"
-    GNUTLS="torify gnutls-cli"
-else
-    GNUTLS="gnutls-cli"
-fi
-
 BASEDIR="$(dirname $0)/../../"
 cd "$BASEDIR"
 RESEEDHOSTS=$(sed -e '/\s\+"https:\/\/[-a-z0-9.]/!d' -e 's/.*"https:\/\/\([-a-z0-9.]\+\).*/\1/' router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java)
+CERTHOME="installer/resources/certificates"
 CACERTS=$(mktemp)
 WORK=$(mktemp -d)
 FAIL=0
-CERTHOME="installer/resources/certificates"
+MAX=5
+OPENSSL=0
+CERTTOOL=0
 
+check_for_prog() {
+    if which $1 > /dev/null 2>&1 ; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+if pidof /usr/bin/tor > /dev/null 2>&1 && check_for_prog torify; then
+    echo "-- Detected Tor, will try using it --"
+    GNUTLS_BIN="torify gnutls-cli"
+    OPENSSL_BIN="torify openssl"
+else
+    GNUTLS_BIN="gnutls-cli"
+    OPENSSL_BIN="openssl"
+fi
+
+if check_for_prog certtool1; then
+    CERTTOOL=1
+    echo "-- Checking certificates with GnuTLS --"
+elif check_for_prog openssl; then
+    OPENSSL=1
+    echo "-- Checking certificates with OpenSSL --"
+fi
+
+if [ $CERTTOOL -ne 1 ] && [ $OPENSSL -ne 1 ]; then
+    echo "ERROR: This script requires either gnutls or openssl" >&2
+    exit
+fi
 
 assemble_ca() {
     # Combine system certificates with the certificates shipped with I2P into
@@ -52,39 +72,75 @@ retry ()
 }
 
 normalize(){
-    # The format displayed by gnutls-cli. This function is not used yet.
+    # Convert fingerprint to the format output by GnuTLS
     sed -e 's/^.*=//;s/://g;y/ABCDEF/abcdef/'
 }
 
-check() {
-for HOST in $RESEEDHOSTS; do
-    echo -n "Checking $HOST..."
-    # Using --insecure here for those cases in which our
-    retry $GNUTLS --insecure --print-cert --x509cafile="$CACERTS" "$HOST"  < /dev/null > "$WORK/$HOST.test"
-    if $(grep -q 'The certificate issuer is unknown' "$WORK/$HOST.test"); then
-        # If we end up here it's for one of two probable reasons:
-        # 1) the the CN in the certificate doesn't match the hostname.
-        # 2) the certificate is invalid
-        if [ -e "$CERTHOME/ssl/$HOST.crt" ]; then
-            openssl x509 -in "$CERTHOME/ssl/$HOST.crt" -fingerprint -noout > "$WORK/$HOST.expected.finger"
-            openssl x509 -in "$WORK/$HOST.test" -fingerprint -noout > "$WORK/$HOST.real.finger"
-            if [ "$(cat "$WORK/$HOST.expected.finger")" != "$(cat "$WORK/$HOST.real.finger")" ]; then
-                echo -n "invalid certificate for $HOST"
-                FAIL=1
-                echo $HOST >> $WORK/bad
-            fi
-        else
-            echo "Untrusted certficate and certificate not found at $CERTHOME/ssl" >&2
+connect() {
+    if [ $OPENSSL -eq 1 ]; then
+        retry $OPENSSL_BIN s_client -connect "$1:443" -no_ign_eof -CAfile $CACERTS -servername $1 < /dev/null 2>/dev/null
+    else
+        retry $GNUTLS_BIN --insecure --print-cert --x509cafile "$CACERTS" "$1"  < /dev/null 2>/dev/null
+    fi
+}
+
+extract_finger() {
+    if [ $CERTTOOL -eq 1 ]; then
+        # Roughly equivalent to "grep -A1 "SHA-1 fingerprint" | head -n 2 | grep -o '[a-f0-9]{40}'"
+        certtool -i < $1 | sed -n '/SHA-1 fingerprint/{n;p;q}' | sed 's/\s\+\([a-f0-9]\{40\}\)/\1/'
+    else
+        openssl x509 -in $1 -fingerprint -noout | normalize
+    fi
+}
+
+verify_fingerprint() {
+    if [ -e "$CERTHOME/ssl/$1.crt" ]; then
+        EXPECTED=$(extract_finger "$CERTHOME/ssl/$1.crt")
+        FOUND=$(extract_finger "$WORK/$1")
+        if [ "$EXPECTED" != "$FOUND" ]; then
+            echo -n "invalid certificate. Expected $EXPECTED, got $FOUND"
             FAIL=1
             echo $HOST >> $WORK/bad
         fi
+    else
+        echo "Untrusted certficate and certificate not found at $CERTHOME/ssl" >&2
+        FAIL=1
+        echo $HOST >> $WORK/bad
     fi
-    echo
-done
+}
+
+cleanup() {
+    rm -rf $CACERTS $WORK
+    exit $FAIL
+}
+
+check_hosts() {
+    for HOST in $RESEEDHOSTS; do
+        echo -n "Checking $HOST..."
+        connect "$HOST"  < /dev/null > "$WORK/$HOST"
+
+        # OpenSSL returns "return code: 0 (ok)"
+        # GnuTLS returns "certificate is trusted"
+        # GnuTLS v2 has the word "Peer" before certificate, v3 has the word "The" before it
+        if ! grep -q 'Verify return code: 0 (ok)\|certificate is trusted' "$WORK/$HOST"; then
+            # If we end up here it's for one of two probable reasons:
+            # 1) the the CN in the certificate doesn't match the hostname.
+            # 2) the certificate is invalid
+
+            # OpenSSL returns code 21 with self-signed certs.
+            # GnuTLS returns "certificate issuer is unknown"
+            # As noted above, GnuTLS v2 has the word "Peer" before certificate, v3 has the word "The" before it
+
+            # If the CN just doesn't match the hostname, pass
+            if ! grep -q 'Verify return code: 21\|certificate issuer is unknown' "$WORK/$HOST"; then : ;else
+                verify_fingerprint $HOST
+            fi
+        fi
+        echo
+    done
 }
 
 assemble_ca
-check
+check_hosts
+cleanup
 
-rm -rf $CACERTS $WORK
-exit $FAIL
