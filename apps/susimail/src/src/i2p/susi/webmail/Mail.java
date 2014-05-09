@@ -61,7 +61,7 @@ class Mail {
 		formattedSubject,
 		formattedDate,  // US Locale, UTC
 		localFormattedDate,  // Current Locale, local time zone
-		shortSender,    // Either name or address but not both, HTML escaped, double-quotes removed, truncated with with hellip
+		shortSender,    // Either name or address but not both, HTML escaped, double-quotes removed, truncated with hellip
 		shortSubject,   // HTML escaped, truncated with hellip
 		quotedDate;  // Current Locale, local time zone, longer format
 	public final String uidl;
@@ -88,26 +88,26 @@ class Mail {
 		error = "";
 	}
 
-	public ReadBuffer getHeader() {
+	public synchronized ReadBuffer getHeader() {
 		return header;
 	}
 
-	public void setHeader(ReadBuffer rb) {
+	public synchronized void setHeader(ReadBuffer rb) {
 		if (rb == null)
 			return;
 		header = rb;
 		parseHeaders();
 	}
 
-	public boolean hasHeader() {
+	public synchronized boolean hasHeader() {
 		return header != null;
 	}
 
-	public ReadBuffer getBody() {
+	public synchronized ReadBuffer getBody() {
 		return body;
 	}
 
-	public void setBody(ReadBuffer rb) {
+	public synchronized void setBody(ReadBuffer rb) {
 		if (rb == null)
 			return;
 		if (header == null)
@@ -121,41 +121,41 @@ class Mail {
 		}
 	}
 
-	public boolean hasBody() {
+	public synchronized boolean hasBody() {
 		return body != null;
 	}
 
-	public MailPart getPart() {
+	public synchronized MailPart getPart() {
 		return part;
 	}
 
-	public boolean hasPart() {
+	public synchronized boolean hasPart() {
 		return part != null;
 	}
 
-	public int getSize() {
+	public synchronized int getSize() {
 		return size;
 	}
 
-	public void setSize(int size) {
+	public synchronized void setSize(int size) {
 		if (body != null)
 			return;
 		this.size = size;
 	}
 
-	public boolean isSpam() {
+	public synchronized boolean isSpam() {
 		return isSpam;
 	}
 
-	public boolean isNew() {
+	public synchronized boolean isNew() {
 		return isNew;
 	}
 
-	public void setNew(boolean isNew) {
+	public synchronized void setNew(boolean isNew) {
 		this.isNew = isNew;
 	}
 
-	public boolean hasAttachment() {
+	public synchronized boolean hasAttachment() {
 		// this isn't right but good enough to start
 		// if part != null query parts instead?
 		return contentType != null &&
@@ -259,7 +259,7 @@ class Mail {
 		}
 	}
 
-	public void parseHeaders()
+	private void parseHeaders()
 	{
 		DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 		DateFormat localDateFormatter = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
