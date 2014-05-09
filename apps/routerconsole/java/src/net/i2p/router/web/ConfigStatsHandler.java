@@ -101,7 +101,7 @@ public class ConfigStatsHandler extends FormHandler {
         
         StringBuilder stats = new StringBuilder();
         for (int i = 0; i < _stats.size(); i++) {
-            stats.append((String)_stats.get(i));
+            stats.append(_stats.get(i));
             if (i + 1 < _stats.size())
                 stats.append(',');
         }

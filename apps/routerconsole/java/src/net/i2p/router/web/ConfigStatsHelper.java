@@ -97,7 +97,7 @@ public class ConfigStatsHelper extends HelperBase {
         if (_stats.isEmpty())
             return false;
         _currentIsGraphed = false;
-        _currentStatName = (String)_stats.remove(0);
+        _currentStatName = _stats.remove(0);
         RateStat rs = _context.statManager().getRate(_currentStatName);
         if (rs != null) {
             _currentStatDescription = rs.getDescription();
