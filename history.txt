@@ -1,3 +1,14 @@
+2014-05-10 zzz
+ * NTCP: Fix NPE (ticket #996)
+ * SusiMail: Remove deleted mails from memory
+
+2014-05-09 zzz
+ * SusiMail: Add more locking (ticket #1269)
+
+2014-05-08 zzz
+ * i2psnark: Add log message if directory does not exist (ticket #1263)
+ * i2ptunnel: Display warning for duplicate client ports (ticket #1265)
+
 2014-05-07 zzz
  * Console:
    - Add hiddengate.i2p
