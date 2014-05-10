@@ -107,166 +107,166 @@ public class InternalSocket extends Socket {
     /** @deprecated unsupported */
     @Override
     public void bind(SocketAddress endpoint) {
-        throw new IllegalArgumentException("unsupported");
+        throw new UnsupportedOperationException();
     }
     /** @deprecated unsupported */
     @Override
     public void connect(SocketAddress endpoint) {
-        throw new IllegalArgumentException("unsupported");
+        throw new UnsupportedOperationException();
     }
     /** @deprecated unsupported */
     @Override
     public void connect(SocketAddress endpoint, int timeout) {
-        throw new IllegalArgumentException("unsupported");
+        throw new UnsupportedOperationException();
     }
     /** @deprecated unsupported */
     @Override
     public SocketChannel getChannel() {
-        throw new IllegalArgumentException("unsupported");
+        throw new UnsupportedOperationException();
     }
     /** @deprecated unsupported */
     @Override
     public InetAddress getInetAddress() {
-        throw new IllegalArgumentException("unsupported");
+        throw new UnsupportedOperationException();
     }
     /** @deprecated unsupported */
     @Override
     public boolean getKeepAlive() {
-        throw new IllegalArgumentException("unsupported");
+        throw new UnsupportedOperationException();
     }
     /** @deprecated unsupported */
     @Override
     public InetAddress getLocalAddress() {
-        throw new IllegalArgumentException("unsupported");
+        throw new UnsupportedOperationException();
     }
     /** @deprecated unsupported */
     @Override
     public int getLocalPort() {
-        throw new IllegalArgumentException("unsupported");
+        throw new UnsupportedOperationException();
     }
     /** @deprecated unsupported */
     @Override
     public SocketAddress getLocalSocketAddress() {
-        throw new IllegalArgumentException("unsupported");
+        throw new UnsupportedOperationException();
     }
     /** @deprecated unsupported */
     @Override
     public boolean getOOBInline() {
-        throw new IllegalArgumentException("unsupported");
+        throw new UnsupportedOperationException();
     }
     /** @deprecated unsupported */
     @Override
     public int getPort() {
-        throw new IllegalArgumentException("unsupported");
+        throw new UnsupportedOperationException();
     }
     /** @deprecated unsupported */
     @Override
     public int getReceiveBufferSize() {
-        throw new IllegalArgumentException("unsupported");
+        throw new UnsupportedOperationException();
     }
     /** @deprecated unsupported */
     @Override
     public SocketAddress getRemoteSocketAddress() {
-        throw new IllegalArgumentException("unsupported");
+        throw new UnsupportedOperationException();
     }
     /** @deprecated unsupported */
     @Override
     public boolean getReuseAddress() {
-        throw new IllegalArgumentException("unsupported");
+        throw new UnsupportedOperationException();
     }
     /** @deprecated unsupported */
     @Override
     public int getSendBufferSize() {
-        throw new IllegalArgumentException("unsupported");
+        throw new UnsupportedOperationException();
     }
     /** @deprecated unsupported */
     @Override
     public int getSoLinger() {
-        throw new IllegalArgumentException("unsupported");
+        throw new UnsupportedOperationException();
     }
     /** @deprecated unsupported */
     @Override
     public boolean getTcpNoDelay() {
-        throw new IllegalArgumentException("unsupported");
+        throw new UnsupportedOperationException();
     }
     /** @deprecated unsupported */
     @Override
     public int getTrafficClass() {
-        throw new IllegalArgumentException("unsupported");
+        throw new UnsupportedOperationException();
     }
     /** @deprecated unsupported */
     @Override
     public boolean isBound() {
-        throw new IllegalArgumentException("unsupported");
+        throw new UnsupportedOperationException();
     }
     /** @deprecated unsupported */
     @Override
     public boolean isConnected() {
-        throw new IllegalArgumentException("unsupported");
+        throw new UnsupportedOperationException();
     }
     /** @deprecated unsupported */
     @Override
     public boolean isInputShutdown() {
-        throw new IllegalArgumentException("unsupported");
+        throw new UnsupportedOperationException();
     }
     /** @deprecated unsupported */
     @Override
     public boolean isOutputShutdown() {
-        throw new IllegalArgumentException("unsupported");
+        throw new UnsupportedOperationException();
     }
     /** @deprecated unsupported */
     @Override
     public void sendUrgentData(int data) {
-        throw new IllegalArgumentException("unsupported");
+        throw new UnsupportedOperationException();
     }
     /** @deprecated unsupported */
     @Override
     public void setKeepAlive(boolean on) {
-        throw new IllegalArgumentException("unsupported");
+        throw new UnsupportedOperationException();
     }
     /** @deprecated unsupported */
     @Override
     public void setOOBInline(boolean on) {
-        throw new IllegalArgumentException("unsupported");
+        throw new UnsupportedOperationException();
     }
     /** @deprecated unsupported */
     @Override
     public void setReceiveBufferSize(int size) {
-        throw new IllegalArgumentException("unsupported");
+        throw new UnsupportedOperationException();
     }
     /** @deprecated unsupported */
     @Override
     public void setReuseAddress(boolean on) {
-        throw new IllegalArgumentException("unsupported");
+        throw new UnsupportedOperationException();
     }
     /** @deprecated unsupported */
     @Override
     public void setSendBufferSize(int size) {
-        throw new IllegalArgumentException("unsupported");
+        throw new UnsupportedOperationException();
     }
     /** @deprecated unsupported */
     @Override
     public void setSoLinger(boolean on, int linger) {
-        throw new IllegalArgumentException("unsupported");
+        throw new UnsupportedOperationException();
     }
     /** @deprecated unsupported */
     @Override
     public void setTcpNoDelay(boolean on) {
-        throw new IllegalArgumentException("unsupported");
+        throw new UnsupportedOperationException();
     }
     /** @deprecated unsupported */
     @Override
     public void setTrafficClass(int cize) {
-        throw new IllegalArgumentException("unsupported");
+        throw new UnsupportedOperationException();
     }
     /** @deprecated unsupported */
     @Override
     public void shutdownInput() {
-        throw new IllegalArgumentException("unsupported");
+        throw new UnsupportedOperationException();
     }
     /** @deprecated unsupported */
     @Override
     public void shutdownOutput() {
-        throw new IllegalArgumentException("unsupported");
+        throw new UnsupportedOperationException();
     }
 }
