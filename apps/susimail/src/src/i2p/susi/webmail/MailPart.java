@@ -173,8 +173,8 @@ class MailPart {
 							
 							k += 2;
 							
-							int endLastPart = i + 2;
 							if( beginLastPart != -1 ) {
+								int endLastPart = Math.min(i + 2, end);
 								MailPart newPart = new MailPart( buffer, beginLastPart, endLastPart - beginLastPart );
 								parts.add( newPart );
 							}
