@@ -1,6 +1,9 @@
 2014-05-13 zzz
  * BOB, SAM, i2psnark: Fix datagram NPE (ticket #1275)
- * SusiMail: Fix AIOOBE (ticket #1269)
+ * i2psnark: Escaping fixes on details page
+ * SusiMail:
+   - Fix AIOOBE (ticket #1269)
+   - Don't let an exception on one mail break others
 
 2014-05-10 zzz
  * NTCP: Fix NPE (ticket #996)
