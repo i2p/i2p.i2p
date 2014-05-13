@@ -186,7 +186,7 @@ class MailPart {
 			}
 		}
 		else if( message ) {
-			MailPart newPart = new MailPart(buffer, beginBody, end);
+			MailPart newPart = new MailPart(buffer, beginBody, end - beginBody);
 			parts.add( newPart );			
 		}
 	}
