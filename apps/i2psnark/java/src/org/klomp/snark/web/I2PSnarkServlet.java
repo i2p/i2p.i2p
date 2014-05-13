@@ -2509,6 +2509,7 @@ public class I2PSnarkServlet extends BasicServlet {
             String path=addPaths(base,encoded);
             if (item.isDirectory() && !path.endsWith("/"))
                 path=addPaths(path,"/");
+            path = urlEncode(path);
             String icon = toIcon(item);
 
             buf.append("<TD class=\"snarkFileIcon\">");
@@ -2529,7 +2530,7 @@ public class I2PSnarkServlet extends BasicServlet {
             buf.append("</TD><TD class=\"snarkFileName\">");
             if (complete)
                 buf.append("<a href=\"").append(path).append("\">");
-            buf.append(item.getName());
+            buf.append(item.getName().replace("&", "&amp;"));
             if (complete)
                 buf.append("</a>");
             buf.append("</TD><TD ALIGN=right class=\"snarkFileSize\">");
