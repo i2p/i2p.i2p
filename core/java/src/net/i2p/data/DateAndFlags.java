@@ -21,6 +21,8 @@ import java.util.Date;
  * be designed so that a flags value of 0 is the default, for
  * compatibility with an 8-byte Date.
  *
+ * See extending class net.i2p.client.SendMessageOptions for more info.
+ *
  * If we really need some more bits we could use the first few bits
  * of the third byte.
  *
@@ -37,6 +39,8 @@ public class DateAndFlags extends DataStructureImpl {
      *  @param flags 0 - 65535
      */
     public DateAndFlags(long date, int flags) {
+        if (flags < 0 || flags > 65535)
+            throw new IllegalArgumentException();
         _flags = flags;
         _date = date;
     }
@@ -45,6 +49,8 @@ public class DateAndFlags extends DataStructureImpl {
      *  @param flags 0 - 65535
      */
     public DateAndFlags(Date date, int flags) {
+        if (flags < 0 || flags > 65535)
+            throw new IllegalArgumentException();
         _flags = flags;
         _date = date.getTime();
     }
@@ -57,6 +63,8 @@ public class DateAndFlags extends DataStructureImpl {
      *  @param flags 0 - 65535
      */
     public void setFlags(int flags) {
+        if (flags < 0 || flags > 65535)
+            throw new IllegalArgumentException();
         _flags = flags;
     }
 

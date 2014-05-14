@@ -48,6 +48,16 @@ public class SendMessageOptions extends DateAndFlags {
                                              35, 45, 57, 72, 92, 117, 147, 192
                                            };
 
+    /**
+     *  Reliability bits 9-10
+     *  @since 0.9.14
+     */
+    public enum Reliability { DEFAULT, BEST_EFFORT, GUARANTEED, UNDEFINED }
+
+    private static final int BEST_EFFORT_MASK = 0x0200;
+    private static final int GUARANTEED_MASK = 0x0400;
+    private static final int RELIABILITY_MASK = BEST_EFFORT_MASK | GUARANTEED_MASK;
+
     /** default true */
     public void setSendLeaseSet(boolean yes) {
         if (yes)
@@ -140,5 +150,59 @@ public class SendMessageOptions extends DateAndFlags {
 
     private static int codeToVal(int code, int[] codes) {
         return codes[code];
+    }
+
+    /**
+     *  default Reliability.DEFAULT
+     *  @since 0.9.14
+     */
+    public void setReliability(Reliability r) {
+        _flags &= ~RELIABILITY_MASK;
+        switch (r) {
+          case BEST_EFFORT:
+            _flags |= BEST_EFFORT_MASK;
+            break;
+
+          case GUARANTEED:
+            _flags |= GUARANTEED_MASK;
+            break;
+
+          case UNDEFINED:
+            _flags |= RELIABILITY_MASK;
+            break;
+
+          case DEFAULT:
+          default:
+            break;
+        }
+    }
+
+    /**
+     *  default Reliability.DEFAULT
+     *  @since 0.9.14
+     */
+    public Reliability getReliability() {
+        return getReliability(_flags);
+    }
+
+    /**
+     *  default Reliability.DEFAULT
+     *  @since 0.9.14
+     */
+    public static Reliability getReliability(int flags) {
+        switch (flags & RELIABILITY_MASK) {
+          case BEST_EFFORT_MASK:
+            return Reliability.BEST_EFFORT;
+
+          case GUARANTEED_MASK:
+            return Reliability.GUARANTEED;
+
+          default:
+          case RELIABILITY_MASK:
+            return Reliability.UNDEFINED;
+
+          case 0:
+            return Reliability.DEFAULT;
+        }
     }
 }
