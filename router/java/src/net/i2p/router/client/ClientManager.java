@@ -265,9 +265,12 @@ class ClientManager {
 
     /**
      * Distribute message to a local or remote destination.
+     * @param msgId the router's ID for this message
+     * @param messageNonce the client's ID for this message
      * @param flags ignored for local
      */
-    void distributeMessage(Destination fromDest, Destination toDest, Payload payload, MessageId msgId, long expiration, int flags) { 
+    void distributeMessage(Destination fromDest, Destination toDest, Payload payload,
+                           MessageId msgId, long messageNonce, long expiration, int flags) { 
         // check if there is a runner for it
         ClientConnectionRunner runner = getRunner(toDest);
         if (runner != null) {
@@ -279,7 +282,7 @@ class ClientManager {
                 return;
             }
             // TODO can we just run this inline instead?
-            _ctx.jobQueue().addJob(new DistributeLocal(toDest, runner, sender, fromDest, payload, msgId));
+            _ctx.jobQueue().addJob(new DistributeLocal(toDest, runner, sender, fromDest, payload, msgId, messageNonce));
         } else {
             // remote.  w00t
             if (_log.shouldLog(Log.DEBUG))
@@ -291,7 +294,7 @@ class ClientManager {
             }
             ClientMessage msg = new ClientMessage(toDest, payload, runner.getConfig(),
                                                   runner.getConfig().getDestination(), msgId,
-                                                  expiration, flags);
+                                                  messageNonce, expiration, flags);
             _ctx.clientMessagePool().add(msg, true);
         }
     }
@@ -303,8 +306,14 @@ class ClientManager {
         private final Destination _fromDest;
         private final Payload _payload;
         private final MessageId _msgId;
+        private final long _messageNonce;
         
-        public DistributeLocal(Destination toDest, ClientConnectionRunner to, ClientConnectionRunner from, Destination fromDest, Payload payload, MessageId id) {
+        /**
+         * @param msgId the router's ID for this message
+         * @param messageNonce the client's ID for this message
+         */
+        public DistributeLocal(Destination toDest, ClientConnectionRunner to, ClientConnectionRunner from,
+                               Destination fromDest, Payload payload, MessageId id, long messageNonce) {
             super(_ctx);
             _toDest = toDest;
             _to = to;
@@ -312,6 +321,7 @@ class ClientManager {
             _fromDest = fromDest;
             _payload = payload;
             _msgId = id;
+            _messageNonce = messageNonce;
         }
 
         public String getName() { return "Distribute local message"; }
@@ -319,7 +329,7 @@ class ClientManager {
         public void runJob() {
             _to.receiveMessage(_toDest, _fromDest, _payload);
             if (_from != null) {
-                _from.updateMessageDeliveryStatus(_msgId, MessageStatusMessage.STATUS_SEND_SUCCESS_LOCAL);
+                _from.updateMessageDeliveryStatus(_msgId, _messageNonce, MessageStatusMessage.STATUS_SEND_SUCCESS_LOCAL);
             }
         }
     }
@@ -437,15 +447,17 @@ class ClientManager {
     }
     
     /**
+     *  @param id the router's ID for this message
+     *  @param messageNonce the client's ID for this message
      *  @param status see I2CP MessageStatusMessage for success/failure codes
      */
-    public void messageDeliveryStatusUpdate(Destination fromDest, MessageId id, int status) {
+    public void messageDeliveryStatusUpdate(Destination fromDest, MessageId id, long messageNonce, int status) {
         ClientConnectionRunner runner = getRunner(fromDest);
         if (runner != null) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Delivering status " + status + " to " 
                            + fromDest.calculateHash() + " for message " + id);
-            runner.updateMessageDeliveryStatus(id, status);
+            runner.updateMessageDeliveryStatus(id, messageNonce, status);
         } else {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Cannot deliver status " + status + " to " 

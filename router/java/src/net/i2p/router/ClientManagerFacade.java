@@ -70,9 +70,12 @@ public abstract class ClientManagerFacade implements Service {
     public abstract boolean isLocal(Hash destHash);
 
     /**
+     *  @param id the router's ID for this message
+     *  @param messageNonce the client's ID for this message
      *  @param status see I2CP MessageStatusMessage for success/failure codes
      */
-    public abstract void messageDeliveryStatusUpdate(Destination fromDest, MessageId id, int status);
+    public abstract void messageDeliveryStatusUpdate(Destination fromDest, MessageId id,
+                                                     long messageNonce, int status);
     
     public abstract void messageReceived(ClientMessage msg);
     

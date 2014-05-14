@@ -769,7 +769,8 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
     
         clearCaches();
         getContext().messageHistory().sendPayloadMessage(_clientMessageId.getMessageId(), false, sendTime);
-        getContext().clientManager().messageDeliveryStatusUpdate(_from, _clientMessageId, status);
+        getContext().clientManager().messageDeliveryStatusUpdate(_from, _clientMessageId,
+                                                                 _clientMessage.getMessageNonce(), status);
         getContext().statManager().updateFrequency("client.sendMessageFailFrequency");
     }
     
@@ -917,7 +918,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
             
             //long dataMsgId = _cloveId;   // fake ID 99999
             getContext().messageHistory().sendPayloadMessage(99999, true, sendTime);
-            getContext().clientManager().messageDeliveryStatusUpdate(_from, _clientMessageId,
+            getContext().clientManager().messageDeliveryStatusUpdate(_from, _clientMessageId, _clientMessage.getMessageNonce(),
                                                                      MessageStatusMessage.STATUS_SEND_GUARANTEED_SUCCESS);
             // unused
             //_lease.setNumSuccess(_lease.getNumSuccess()+1);

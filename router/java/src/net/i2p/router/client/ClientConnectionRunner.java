@@ -66,14 +66,20 @@ class ClientConnectionRunner {
     /** user's config */
     private SessionConfig _config;
     private String _clientVersion;
-    /** static mapping of MessageId to Payload, storing messages for retrieval */
+    /**
+     *  Mapping of MessageId to Payload, storing messages for retrieval.
+     *  Unused for i2cp.fastReceive = "true" (_dontSendMSMOnRecive = true)
+     */
     private final Map<MessageId, Payload> _messages; 
     /** lease set request state, or null if there is no request pending on at the moment */
     private LeaseRequestState _leaseRequest;
     private int _consecutiveLeaseRequestFails;
     /** currently allocated leaseSet, or null if none is allocated */
     private LeaseSet _currentLeaseSet;
-    /** set of messageIds created but not yet ACCEPTED */
+    /**
+     *  Set of messageIds created but not yet ACCEPTED.
+     *  Unused for i2cp.messageReliability = "none" (_dontSendMSM = true)
+     */
     private final Set<MessageId> _acceptedPending;
     /** thingy that does stuff */
     protected I2CPMessageReader _reader;
@@ -323,12 +329,14 @@ class ClientConnectionRunner {
      *
      *  Do not use for status = STATUS_SEND_ACCEPTED; use ackSendMessage() for that.
      *
+     *  @param id the router's ID for this message
+     *  @param messageNonce the client's ID for this message
      *  @param status see I2CP MessageStatusMessage for success/failure codes
      */
-    void updateMessageDeliveryStatus(MessageId id, int status) {
-        if (_dead || _dontSendMSM)
+    void updateMessageDeliveryStatus(MessageId id, long messageNonce, int status) {
+        if (_dead || messageNonce <= 0)
             return;
-        _context.jobQueue().addJob(new MessageDeliveryStatusUpdate(id, status));
+        _context.jobQueue().addJob(new MessageDeliveryStatusUpdate(id, messageNonce, status));
     }
 
     /** 
@@ -414,7 +422,7 @@ class ClientConnectionRunner {
             expiration = msg.getExpirationTime();
             flags = msg.getFlags();
         }
-        if (message.getNonce() != 0 && !_dontSendMSM)
+        if ((!_dontSendMSM) && message.getNonce() != 0)
             _acceptedPending.add(id);
 
         if (_log.shouldLog(Log.DEBUG))
@@ -424,7 +432,8 @@ class ClientConnectionRunner {
         // the following blocks as described above
         SessionConfig cfg = _config;
         if (cfg != null)
-            _manager.distributeMessage(cfg.getDestination(), dest, payload, id, expiration, flags);
+            _manager.distributeMessage(cfg.getDestination(), dest, payload,
+                                       id, message.getNonce(), expiration, flags);
         // else log error?
         //long timeToDistribute = _context.clock().now() - beforeDistribute;
         //if (_log.shouldLog(Log.DEBUG))
@@ -687,6 +696,7 @@ class ClientConnectionRunner {
     
     private class MessageDeliveryStatusUpdate extends JobImpl {
         private final MessageId _messageId;
+        private final long _messageNonce;
         private final int _status;
         private long _lastTried;
         private int _requeueCount;
@@ -694,11 +704,14 @@ class ClientConnectionRunner {
         /**
          *  Do not use for status = STATUS_SEND_ACCEPTED; use ackSendMessage() for that.
          *
+         *  @param id the router's ID for this message
+         *  @param messageNonce the client's ID for this message
          *  @param status see I2CP MessageStatusMessage for success/failure codes
          */
-        public MessageDeliveryStatusUpdate(MessageId id, int status) {
+        public MessageDeliveryStatusUpdate(MessageId id, long messageNonce, int status) {
             super(ClientConnectionRunner.this._context);
             _messageId = id;
+            _messageNonce = messageNonce;
             _status = status;
         }
 
@@ -714,7 +727,7 @@ class ClientConnectionRunner {
             msg.setMessageId(_messageId.getMessageId());
             msg.setSessionId(_sessionId.getSessionId());
             // has to be >= 0, it is initialized to -1
-            msg.setNonce(2);
+            msg.setNonce(_messageNonce);
             msg.setSize(0);
             msg.setStatus(_status);
 

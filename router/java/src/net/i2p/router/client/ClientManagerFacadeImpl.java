@@ -179,11 +179,13 @@ public class ClientManagerFacadeImpl extends ClientManagerFacade implements Inte
     public boolean shouldPublishLeaseSet(Hash destinationHash) { return _manager.shouldPublishLeaseSet(destinationHash); }
     
     /**
+     *  @param id the router's ID for this message
+     *  @param messageNonce the client's ID for this message
      *  @param status see I2CP MessageStatusMessage for success/failure codes
      */
-    public void messageDeliveryStatusUpdate(Destination fromDest, MessageId id, int status) {
+    public void messageDeliveryStatusUpdate(Destination fromDest, MessageId id, long messageNonce, int status) {
         if (_manager != null)
-            _manager.messageDeliveryStatusUpdate(fromDest, id, status);
+            _manager.messageDeliveryStatusUpdate(fromDest, id, messageNonce, status);
         else
             _log.error("Null manager on messageDeliveryStatusUpdate!");
     }

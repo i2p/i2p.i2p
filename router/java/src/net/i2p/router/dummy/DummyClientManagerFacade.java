@@ -43,7 +43,7 @@ public class DummyClientManagerFacade extends ClientManagerFacade {
     public void shutdown(String msg) {}
     public void restart() {}
     
-    public void messageDeliveryStatusUpdate(Destination fromDest, MessageId id, int status) {}
+    public void messageDeliveryStatusUpdate(Destination fromDest, MessageId id, long msgNonce, int status) {}
     
     public SessionConfig getClientSessionConfig(Destination _dest) { return null; }
     public SessionKeyManager getClientSessionKeyManager(Hash _dest) { return null; }

@@ -29,22 +29,26 @@ public class ClientMessage {
     private final SessionConfig _senderConfig;
     private final Hash _destinationHash;
     private final MessageId _messageId;
+    private final long _messageNonce;
     private final long _expiration;
     /** only for outbound messages */
     private final int _flags;
     
     /**
      *  For outbound (locally originated)
+     *  @param msgID the router's ID for this message
+     *  @param messageNonce the client's ID for this message
      *  @since 0.9.9
      */
     public ClientMessage(Destination toDest, Payload payload, SessionConfig config, Destination fromDest,
-                         MessageId msgID, long expiration, int flags) {
+                         MessageId msgID, long messageNonce, long expiration, int flags) {
         _destination = toDest;
         _destinationHash = null;
         _payload = payload;
         _senderConfig = config;
         _fromDestination = fromDest;
         _messageId = msgID;
+        _messageNonce = messageNonce;
         _expiration = expiration;
         _flags = flags;
     }
@@ -60,6 +64,7 @@ public class ClientMessage {
         _senderConfig = null;
         _fromDestination = null;
         _messageId = null;
+        _messageNonce = 0;
         _expiration = 0;
         _flags = 0;
     }
@@ -93,6 +98,12 @@ public class ClientMessage {
      * Valid for outbound; null for inbound.
      */
     public MessageId getMessageId() { return _messageId; }
+    
+    /**
+     * Valid for outbound; 0 for inbound.
+     * @since 0.9.14
+     */
+    public long getMessageNonce() { return _messageNonce; }
     
     /**
      * Retrieve the information regarding how the router received this message.  Only
