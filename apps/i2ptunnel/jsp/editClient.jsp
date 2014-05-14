@@ -449,7 +449,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
             </div>
          <% } %>
            
-         <% if (editBean.isAdvanced()) { %>
+         <% if (true /* editBean.isAdvanced() */ ) { %>
             <div id="tunnelOptionsField" class="rowItem">
                 <label>
                     <%=intl._("Signature type")%>
