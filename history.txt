@@ -1,3 +1,6 @@
+2014-05-14 kytv
+ * Update the UserAgent that we send for users that go out through the outproxy
+
 2014-05-13 zzz
  * BOB, SAM, i2psnark: Fix datagram NPE (ticket #1275)
  * i2psnark: Escaping fixes on details page
