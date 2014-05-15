@@ -193,21 +193,7 @@ class I2PSessionMuxedImpl extends I2PSessionImpl2 {
                                SessionKey keyUsed, Set tagsSent, long expires,
                                int proto, int fromPort, int toPort, int flags)
                    throws I2PSessionException {
-        if (isClosed()) throw new I2PSessionException("Already closed");
-        updateActivity();
-
-        boolean sc = shouldCompress(size);
-        if (sc)
-            payload = DataHelper.compress(payload, offset, size);
-        else
-            payload = DataHelper.compress(payload, offset, size, DataHelper.NO_COMPRESSION);
-
-        setProto(payload, proto);
-        setFromPort(payload, fromPort);
-        setToPort(payload, toPort);
-
-        _context.statManager().addRateData("i2cp.tx.msgCompressed", payload.length, 0);
-        _context.statManager().addRateData("i2cp.tx.msgExpanded", size, 0);
+        payload = prepPayload(payload, offset, size, proto, fromPort, toPort);
         if (_noEffort)
             return sendNoEffort(dest, payload, expires, flags);
         else
@@ -232,11 +218,48 @@ class I2PSessionMuxedImpl extends I2PSessionImpl2 {
     @Override
     public boolean sendMessage(Destination dest, byte[] payload, int offset, int size,
                                int proto, int fromPort, int toPort, SendMessageOptions options) throws I2PSessionException {
+        payload = prepPayload(payload, offset, size, proto, fromPort, toPort);
+        //if (_noEffort) {
+            sendNoEffort(dest, payload, options);
+            return true;
+        //} else {
+            // unimplemented
+            //return sendBestEffort(dest, payload, options);
+        //}
+    }
+
+    /**
+     * Send a message and request an asynchronous notification of delivery status.
+     *
+     * See I2PSessionMuxedImpl for proto/port details.
+     * See SendMessageOptions for option details.
+     *
+     * @return the message ID to be used for later notification to the listener
+     * @throws I2PSessionException on all errors
+     * @since 0.9.14
+     */
+    @Override
+    public long sendMessage(Destination dest, byte[] payload, int offset, int size,
+                            int proto, int fromPort, int toPort,
+                            SendMessageOptions options, SendMessageStatusListener listener) throws I2PSessionException {
+        payload = prepPayload(payload, offset, size, proto, fromPort, toPort);
+        long nonce = _sendMessageNonce.incrementAndGet();
+        long expires = Math.max(_context.clock().now() + 60*1000L, options.getTime());
+        MessageState state = new MessageState(_context, nonce, this, expires, listener);
+        _sendingStates.put(Long.valueOf(nonce), state);
+        _producer.sendMessage(this, dest, nonce, payload, options);
+        return nonce;
+    }
+
+    /**
+     * @return gzip compressed payload, ready to send
+     * @since 0.9.14
+     */
+    private byte[] prepPayload(byte[] payload, int offset, int size, int proto, int fromPort, int toPort) throws I2PSessionException {
         if (isClosed()) throw new I2PSessionException("Already closed");
         updateActivity();
 
-        boolean sc = shouldCompress(size);
-        if (sc)
+        if (shouldCompress(size))
             payload = DataHelper.compress(payload, offset, size);
         else
             payload = DataHelper.compress(payload, offset, size, DataHelper.NO_COMPRESSION);
@@ -245,15 +268,9 @@ class I2PSessionMuxedImpl extends I2PSessionImpl2 {
         setFromPort(payload, fromPort);
         setToPort(payload, toPort);
 
-        _context.statManager().addRateData("i2cp.tx.msgCompressed", payload.length, 0);
-        _context.statManager().addRateData("i2cp.tx.msgExpanded", size, 0);
-        //if (_noEffort) {
-            sendNoEffort(dest, payload, options);
-            return true;
-        //} else {
-            // unimplemented
-            //return sendBestEffort(dest, payload, options);
-        //}
+        _context.statManager().addRateData("i2cp.tx.msgCompressed", payload.length);
+        _context.statManager().addRateData("i2cp.tx.msgExpanded", size);
+        return payload;
     }
 
     /**

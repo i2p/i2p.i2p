@@ -47,10 +47,21 @@ public interface I2PSession {
      */
     public boolean sendMessage(Destination dest, byte[] payload) throws I2PSessionException;
 
+    /** Send a new message to the given destination, containing the specified
+     * payload, returning true if the router feels confident that the message
+     * was delivered.
+     *
+     * WARNING: It is recommended that you use a method that specifies the protocol and ports.
+     *
+     * @param dest location to send the message
+     * @param payload body of the message to be sent (unencrypted)
+     * @return success
+     */
     public boolean sendMessage(Destination dest, byte[] payload, int offset, int size) throws I2PSessionException;
 
     /**
      * See I2PSessionMuxedImpl for proto/port details.
+     * @return success
      * @since 0.7.1
      */
     public boolean sendMessage(Destination dest, byte[] payload, int proto, int fromport, int toport) throws I2PSessionException;
@@ -83,6 +94,7 @@ public interface I2PSession {
      * @param tagsSent UNUSED, IGNORED. Set of tags delivered to the peer and associated with the keyUsed.  This is also an output parameter -
      *                 the contents of the set is ignored during the call, but afterwards it contains a set of SessionTag 
      *                 objects that were sent along side the given keyUsed.
+     * @return success
      */
     public boolean sendMessage(Destination dest, byte[] payload, SessionKey keyUsed, Set tagsSent) throws I2PSessionException;
 
@@ -90,6 +102,7 @@ public interface I2PSession {
      * End-to-End Crypto is disabled, tags and keys are ignored.
      * @param keyUsed UNUSED, IGNORED.
      * @param tagsSent UNUSED, IGNORED.
+     * @return success
      */
     public boolean sendMessage(Destination dest, byte[] payload, int offset, int size, SessionKey keyUsed, Set tagsSent) throws I2PSessionException;
 
@@ -98,6 +111,7 @@ public interface I2PSession {
      * @param keyUsed UNUSED, IGNORED.
      * @param tagsSent UNUSED, IGNORED.
      * @param expire absolute expiration timestamp, NOT interval from now
+     * @return success
      * @since 0.7.1
      */
     public boolean sendMessage(Destination dest, byte[] payload, int offset, int size, SessionKey keyUsed, Set tagsSent, long expire) throws I2PSessionException;
@@ -107,6 +121,14 @@ public interface I2PSession {
      * End-to-End Crypto is disabled, tags and keys are ignored.
      * @param keyUsed UNUSED, IGNORED.
      * @param tagsSent UNUSED, IGNORED.
+     * @param proto 1-254 or 0 for unset; recommended:
+     *         I2PSession.PROTO_UNSPECIFIED
+     *         I2PSession.PROTO_STREAMING
+     *         I2PSession.PROTO_DATAGRAM
+     *         255 disallowed
+     * @param fromPort 1-65535 or 0 for unset
+     * @param toPort 1-65535 or 0 for unset
+     * @return success
      * @since 0.7.1
      */
     public boolean sendMessage(Destination dest, byte[] payload, int offset, int size, SessionKey keyUsed, Set tagsSent,
@@ -118,6 +140,14 @@ public interface I2PSession {
      * @param keyUsed UNUSED, IGNORED.
      * @param tagsSent UNUSED, IGNORED.
      * @param expire absolute expiration timestamp, NOT interval from now
+     * @param proto 1-254 or 0 for unset; recommended:
+     *         I2PSession.PROTO_UNSPECIFIED
+     *         I2PSession.PROTO_STREAMING
+     *         I2PSession.PROTO_DATAGRAM
+     *         255 disallowed
+     * @param fromPort 1-65535 or 0 for unset
+     * @param toPort 1-65535 or 0 for unset
+     * @return success
      * @since 0.7.1
      */
     public boolean sendMessage(Destination dest, byte[] payload, int offset, int size, SessionKey keyUsed, Set tagsSent, long expire,
@@ -129,6 +159,14 @@ public interface I2PSession {
      * @param keyUsed UNUSED, IGNORED.
      * @param tagsSent UNUSED, IGNORED.
      * @param expire absolute expiration timestamp, NOT interval from now
+     * @param proto 1-254 or 0 for unset; recommended:
+     *         I2PSession.PROTO_UNSPECIFIED
+     *         I2PSession.PROTO_STREAMING
+     *         I2PSession.PROTO_DATAGRAM
+     *         255 disallowed
+     * @param fromPort 1-65535 or 0 for unset
+     * @param toPort 1-65535 or 0 for unset
+     * @return success
      * @since 0.8.4
      */
     public boolean sendMessage(Destination dest, byte[] payload, int offset, int size, SessionKey keyUsed, Set tagsSent, long expire,
@@ -137,10 +175,44 @@ public interface I2PSession {
     /**
      * See I2PSessionMuxedImpl for proto/port details.
      * See SendMessageOptions for option details.
+     *
+     * @param proto 1-254 or 0 for unset; recommended:
+     *         I2PSession.PROTO_UNSPECIFIED
+     *         I2PSession.PROTO_STREAMING
+     *         I2PSession.PROTO_DATAGRAM
+     *         255 disallowed
+     * @param fromPort 1-65535 or 0 for unset
+     * @param toPort 1-65535 or 0 for unset
+     * @param options to be passed to the router
+     * @return success
      * @since 0.9.2
      */
     public boolean sendMessage(Destination dest, byte[] payload, int offset, int size,
                                int proto, int fromport, int toport, SendMessageOptions options) throws I2PSessionException;
+
+    /**
+     * Send a message and request an asynchronous notification of delivery status.
+     * Notifications will be delivered at least up to the expiration specified in the options,
+     * or 60 seconds if not specified.
+     *
+     * See I2PSessionMuxedImpl for proto/port details.
+     * See SendMessageOptions for option details.
+     *
+     * @param proto 1-254 or 0 for unset; recommended:
+     *         I2PSession.PROTO_UNSPECIFIED
+     *         I2PSession.PROTO_STREAMING
+     *         I2PSession.PROTO_DATAGRAM
+     *         255 disallowed
+     * @param fromPort 1-65535 or 0 for unset
+     * @param toPort 1-65535 or 0 for unset
+     * @param options to be passed to the router
+     * @return the message ID to be used for later notification to the listener
+     * @throws I2PSessionException on all errors
+     * @since 0.9.14
+     */
+    public long sendMessage(Destination dest, byte[] payload, int offset, int size,
+                               int proto, int fromport, int toport,
+                               SendMessageOptions options, SendMessageStatusListener listener) throws I2PSessionException;
 
     /** Receive a message that the router has notified the client about, returning
      * the payload.

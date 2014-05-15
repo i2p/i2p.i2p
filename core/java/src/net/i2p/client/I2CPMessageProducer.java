@@ -301,7 +301,7 @@ class I2CPMessageProducer {
      * @param key unused - no end-to-end crypto
      * @param newKey unused - no end-to-end crypto
      */
-    private Payload createPayload(Destination dest, byte[] payload, SessionTag tag, SessionKey key, Set tags,
+    private Payload createPayload(Destination dest, byte[] payload, SessionTag tag, SessionKey key, Set<SessionTag> tags,
                                   SessionKey newKey) throws I2PSessionException {
         if (dest == null) throw new I2PSessionException("No destination specified");
         if (payload == null) throw new I2PSessionException("No payload specified");
@@ -346,8 +346,8 @@ class I2CPMessageProducer {
      * to the router
      * 
      */
-    public void createLeaseSet(I2PSessionImpl session, LeaseSet leaseSet, SigningPrivateKey signingPriv, PrivateKey priv)
-                                                                                                                         throws I2PSessionException {
+    public void createLeaseSet(I2PSessionImpl session, LeaseSet leaseSet, SigningPrivateKey signingPriv,
+                               PrivateKey priv) throws I2PSessionException {
         CreateLeaseSetMessage msg = new CreateLeaseSetMessage();
         msg.setLeaseSet(leaseSet);
         msg.setPrivateKey(priv);

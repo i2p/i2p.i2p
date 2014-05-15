@@ -51,7 +51,7 @@ import net.i2p.util.I2PSSLSocketFactory;
 import net.i2p.util.LHMCache;
 import net.i2p.util.Log;
 import net.i2p.util.OrderedProperties;
-import net.i2p.util.SimpleTimer;
+import net.i2p.util.SimpleTimer2;
 import net.i2p.util.VersionComparator;
 
 /**
@@ -618,20 +618,24 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     }
 
     /**
-     *  Fire up a periodic task to check for unclamed messages
+     *  Fire up a periodic task to check for unclaimed messages
      *  @since 0.9.1
      */
-    private void startVerifyUsage() {
-        _context.simpleScheduler().addEvent(new VerifyUsage(), VERIFY_USAGE_TIME);
+    protected void startVerifyUsage() {
+        new VerifyUsage();
     }
 
     /**
      *  Check for unclaimed messages, without wastefully setting a timer for each
-     *  message. Just copy all unclaimed ones and check 30 seconds later.
+     *  message. Just copy all unclaimed ones and check some time later.
      */
-    private class VerifyUsage implements SimpleTimer.TimedEvent {
+    private class VerifyUsage extends SimpleTimer2.TimedEvent {
         private final List<Long> toCheck = new ArrayList<Long>();
         
+        public VerifyUsage() {
+             super(_context.simpleTimer2(), VERIFY_USAGE_TIME);
+        }
+
         public void timeReached() {
             if (isClosed())
                 return;
@@ -641,12 +645,12 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
                 for (Long msgId : toCheck) {
                     MessagePayloadMessage removed = _availableMessages.remove(msgId);
                     if (removed != null)
-                        _log.error("Message NOT removed!  id=" + msgId + ": " + removed);
+                        _log.error(getPrefix() + " Client not responding? Message not processed! id=" + msgId + ": " + removed);
                 }
                 toCheck.clear();
             }
             toCheck.addAll(_availableMessages.keySet());
-            _context.simpleScheduler().addEvent(this, VERIFY_USAGE_TIME);
+            schedule(VERIFY_USAGE_TIME);
         }
     }
 
