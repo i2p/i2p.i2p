@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-02-06 18:27+0000\n"
-"PO-Revision-Date: 2014-03-18 11:32+0000\n"
+"PO-Revision-Date: 2014-04-02 02:04+0000\n"
 "Last-Translator: kingu <comradekingu@gmail.com>\n"
 "Language-Team: Norwegian Bokmål (http://www.transifex.com/projects/p/I2P/language/nb/)\n"
 "MIME-Version: 1.0\n"
@@ -2314,7 +2314,7 @@ msgstr ""
 
 #: ../java/src/net/i2p/router/web/ConfigUIHelper.java:88
 msgid "Japanese"
-msgstr ""
+msgstr "Japansk"
 
 #: ../java/src/net/i2p/router/web/ConfigUIHelper.java:89
 msgid "Dutch"
@@ -2322,7 +2322,7 @@ msgstr ""
 
 #: ../java/src/net/i2p/router/web/ConfigUIHelper.java:90
 msgid "Norwegian Bokmaal"
-msgstr ""
+msgstr "Norsk Bokmål"
 
 #: ../java/src/net/i2p/router/web/ConfigUIHelper.java:91
 msgid "Polish"
