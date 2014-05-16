@@ -84,4 +84,3 @@ certificates/www.cacert.org.crt
 certificates/ssl/i2pprojekt.de.crt
 # no longer used
 certificates/ssl/netdb.i2p2.de.crt
-certificates/ssl/netdb.i2p2.no.crt
