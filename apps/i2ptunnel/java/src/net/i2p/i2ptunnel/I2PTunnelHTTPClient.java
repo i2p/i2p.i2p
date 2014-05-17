@@ -457,10 +457,9 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                         if(_log.shouldLog(Log.WARN)) {
                             _log.warn(getPrefix(requestId) + "Bad request [" + request + "]", use);
                         }
-                        if(out != null) {
-                            out.write(getErrorPage("baduri", ERR_BAD_URI));
-                            writeFooter(out);
-                        }
+                        out.write(getErrorPage("baduri", ERR_BAD_URI));
+                        writeFooter(out);
+                        reader.drain();
                         s.close();
                         return;
                     }
@@ -638,7 +637,6 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
 
                             // Did addresshelper key conflict?
                             if(ahelperConflict) {
-                                if(out != null) {
                                     // convert ahelperKey to b32
                                     String alias = getHostName(ahelperKey);
                                     if(alias.equals("i2p")) {
@@ -662,8 +660,8 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                                         out.write(_("To visit the destination in your host database, click <a href=\"{0}\">here</a>. To visit the conflicting addresshelper destination, click <a href=\"{1}\">here</a>.", trustedURL, conflictURL).getBytes("UTF-8"));
                                         out.write(("</p></div>").getBytes());
                                         writeFooter(out);
-                                    }
                                 }
+                                reader.drain();
                                 s.close();
                                 return;
                             }
@@ -694,10 +692,9 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                     } else if(hostLowerCase.equals("localhost") || host.equals("127.0.0.1") ||
                             host.startsWith("192.168.") || host.equals("[::1]")) {
                         // if somebody is trying to get to 192.168.example.com, oh well
-                        if(out != null) {
-                            out.write(getErrorPage("localhost", ERR_LOCALHOST));
-                            writeFooter(out);
-                        }
+                        out.write(getErrorPage("localhost", ERR_LOCALHOST));
+                        writeFooter(out);
+                        reader.drain();
                         s.close();
                         return;
                     } else if(host.contains(".") || host.startsWith("[")) {
@@ -743,10 +740,9 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                                     _log.warn(getPrefix(requestId) + "Host wants to be outproxied, but we dont have any!");
                                 }
                                 l.log("No outproxy found for the request.");
-                                if(out != null) {
-                                    out.write(getErrorPage("noproxy", _ERR_NO_OUTPROXY));
-                                    writeFooter(out);
-                                }
+                                out.write(getErrorPage("noproxy", _ERR_NO_OUTPROXY));
+                                writeFooter(out);
+                                reader.drain();
                                 s.close();
                                 return;
                             }
@@ -765,10 +761,9 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                         if(_log.shouldLog(Log.WARN)) {
                             _log.warn("NODOTS, NOI2P: " + request);
                         }
-                        if(out != null) {
-                            out.write(getErrorPage("denied", ERR_REQUEST_DENIED));
-                            writeFooter(out);
-                        }
+                        out.write(getErrorPage("denied", ERR_REQUEST_DENIED));
+                        writeFooter(out);
+                        reader.drain();
                         s.close();
                         return;
                     }   // end host name processing
@@ -909,14 +904,12 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
 
             if(method == null || (destination == null && !usingInternalOutproxy)) {
                 //l.log("No HTTP method found in the request.");
-                if(out != null) {
-                    if(protocol != null && "http".equals(protocol.toLowerCase(Locale.US))) {
-                        out.write(getErrorPage("denied", ERR_REQUEST_DENIED));
-                    } else {
-                        out.write(getErrorPage("protocol", ERR_BAD_PROTOCOL));
-                    }
-                    writeFooter(out);
+                if (protocol != null && "http".equals(protocol.toLowerCase(Locale.US))) {
+                    out.write(getErrorPage("denied", ERR_REQUEST_DENIED));
+                } else {
+                    out.write(getErrorPage("protocol", ERR_BAD_PROTOCOL));
                 }
+                writeFooter(out);
                 s.close();
                 return;
             }
@@ -1090,13 +1083,6 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                 byte[] data = newRequest.toString().getBytes("ISO-8859-1");
                 new I2PTunnelHTTPClientRunner(s, i2ps, sockLock, data, mySockets, onTimeout);
             }
-        } catch (SocketException ex) {
-            if (_log.shouldLog(Log.INFO)) {
-                _log.info(getPrefix(requestId) + "Error trying to connect", ex);
-            }
-            //l.log("Error connecting: " + ex.getMessage());
-            handleHTTPClientException(ex, out, targetRequest, usingWWWProxy, currentProxy, requestId);
-            closeSocket(s);
         } catch(IOException ex) {
             if(_log.shouldLog(Log.INFO)) {
                 _log.info(getPrefix(requestId) + "Error trying to connect", ex);
@@ -1206,6 +1192,22 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
         //if (_br == null)
         //    _br = new BufferedReader(new InputStreamReader(_s, "ISO-8859-1"));
         //return _br.readLine();
+        }
+
+        /**
+         *  Read the rest of the headers, which keeps firefox
+         *  from complaining about connection reset after
+         *  an error on the first line.
+         *  @since 0.9.14
+         */
+        public void drain() {
+            try {
+                String line;
+                do {
+                    line = DataHelper.readLine(_s);
+                    // \r not stripped so length == 1 is empty
+                } while (line != null && line.length() > 1);
+            } catch (IOException ioe) {}
         }
     }
 
