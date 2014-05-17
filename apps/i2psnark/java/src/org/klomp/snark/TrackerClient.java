@@ -866,7 +866,7 @@ public class TrackerClient implements Runnable {
     } catch (MalformedURLException mue) {
         return null;
     }
-    if (url.getPort() >= 0 || !url.getProtocol().equals("http"))
+    if (!url.getProtocol().equals("http"))
         return null;
     String host = url.getHost();
     if (host.endsWith(".i2p"))
