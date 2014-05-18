@@ -21,11 +21,16 @@ import net.i2p.util.Log;
  * and the server should echo it.  However, both broken and malicious
  * servers could ignore that, potentially confusing the user.
  *
+ *  Warning - not maintained as a stable API for external use.
  */
 public class I2PTunnelHTTPClientRunner extends I2PTunnelRunner {
+
+    /**
+     *  Does NOT start itself. Caller must call start().
+     */
     public I2PTunnelHTTPClientRunner(Socket s, I2PSocket i2ps, Object slock, byte[] initialI2PData,
-                                     List<I2PSocket> sockList, Runnable onTimeout) {
-        super(s, i2ps, slock, initialI2PData, sockList, onTimeout);
+                                     List<I2PSocket> sockList, FailCallback onFail) {
+        super(s, i2ps, slock, initialI2PData, null, sockList, onFail);
     }
 
     @Override

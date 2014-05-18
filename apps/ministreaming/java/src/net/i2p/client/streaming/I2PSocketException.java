@@ -2,11 +2,13 @@ package net.i2p.client.streaming;
 
 import java.net.SocketException;
 
+import net.i2p.I2PAppContext;
 import net.i2p.client.SendMessageStatusListener;
 import net.i2p.data.i2cp.MessageStatusMessage;
+import net.i2p.util.Translate;
 
 /**
- *  An I2P-specific IOException thrown from input and output streams.
+ *  An I2P-specific IOException thrown from input and output streams,
  *  with a stored status code to be used for programmatic responses.
  *
  *  @since 0.9.14
@@ -15,6 +17,7 @@ public class I2PSocketException extends SocketException {
 
     private final int _status;
     private static final int CUSTOM = -1;
+    private static final String BUNDLE_NAME = "net.i2p.client.streaming.messages";
 
     /**
      *  Use canned message for this status code
@@ -52,55 +55,55 @@ public class I2PSocketException extends SocketException {
         switch (_status) {
             case MessageStatusMessage.STATUS_SEND_BEST_EFFORT_FAILURE:
             case MessageStatusMessage.STATUS_SEND_GUARANTEED_FAILURE:
-                return "Message timeout";
+                return _x("Message timeout");
 
             case MessageStatusMessage.STATUS_SEND_FAILURE_LOCAL:
-                return "Failed delivery to local destination";
+                return _x("Failed delivery to local destination");
 
             case MessageStatusMessage.STATUS_SEND_FAILURE_ROUTER:
-                return "Local router failure";
+                return _x("Local router failure");
 
             case MessageStatusMessage.STATUS_SEND_FAILURE_NETWORK:
-                return "Local network failure";
+                return _x("Local network failure");
 
             case MessageStatusMessage.STATUS_SEND_FAILURE_BAD_SESSION:
-                return "Session closed";
+                return _x("Session closed");
 
             case MessageStatusMessage.STATUS_SEND_FAILURE_BAD_MESSAGE:
-                return "Invalid message";
+                return _x("Invalid message");
 
             case MessageStatusMessage.STATUS_SEND_FAILURE_BAD_OPTIONS:
-                return "Invalid message options";
+                return _x("Invalid message options");
 
             case MessageStatusMessage.STATUS_SEND_FAILURE_OVERFLOW:
-                return "Buffer overflow";
+                return _x("Buffer overflow");
 
             case MessageStatusMessage.STATUS_SEND_FAILURE_EXPIRED:
-                return "Message expired";
+                return _x("Message expired");
 
             case MessageStatusMessage.STATUS_SEND_FAILURE_LOCAL_LEASESET:
-                return "Local lease set invalid";
+                return _x("Local lease set invalid");
 
             case MessageStatusMessage.STATUS_SEND_FAILURE_NO_TUNNELS:
-                return "No local tunnels";
+                return _x("No local tunnels");
 
             case MessageStatusMessage.STATUS_SEND_FAILURE_UNSUPPORTED_ENCRYPTION:
-                return "Unsupported encryption options";
+                return _x("Unsupported encryption options");
 
             case MessageStatusMessage.STATUS_SEND_FAILURE_DESTINATION:
-                return "Invalid destination";
+                return _x("Invalid destination");
 
             case MessageStatusMessage.STATUS_SEND_FAILURE_BAD_LEASESET:
-                return "Local router failure";
+                return _x("Local router failure");
 
             case MessageStatusMessage.STATUS_SEND_FAILURE_EXPIRED_LEASESET:
-                return "Destination lease set expired";
+                return _x("Destination lease set expired");
 
             case MessageStatusMessage.STATUS_SEND_FAILURE_NO_LEASESET:
-                return "Destination lease set not found";
+                return _x("Destination lease set not found");
 
             case SendMessageStatusListener.STATUS_CANCELLED:
-                return "Local destination shutdown";
+                return _x("Local destination shutdown");
 
             case CUSTOM:
                 return super.getMessage();
@@ -108,5 +111,23 @@ public class I2PSocketException extends SocketException {
             default:
                 return "Failure code: " + _status;
         }
+    }
+
+    /**
+     *  Translated
+     */
+    @Override
+    public String getLocalizedMessage() {
+        String s = getMessage();
+        if (s == null)
+            return null;
+        return Translate.getString(s, I2PAppContext.getGlobalContext(), BUNDLE_NAME);
+    }
+
+    /**
+     *  Tag for translation
+     */
+    private static String _x(String s) {
+        return s;
     }
 }

@@ -59,18 +59,6 @@ public class I2PTunnelConnectClient extends I2PTunnelHTTPClientBase implements R
 
     public static final String AUTH_REALM = "I2P SSL Proxy";
 
-    private final static byte[] ERR_DESTINATION_UNKNOWN =
-        ("HTTP/1.1 503 Service Unavailable\r\n"+
-         "Content-Type: text/html; charset=iso-8859-1\r\n"+
-         "Cache-control: no-cache\r\n"+
-         "\r\n"+
-         "<html><body><H1>I2P ERROR: DESTINATION NOT FOUND</H1>"+
-         "That I2P Destination was not found. "+
-         "The host (or the outproxy, if you're using one) could also "+
-	 "be temporarily offline.  You may want to <b>retry</b>.  "+
-         "Could not find the following Destination:<BR><BR><div>")
-        .getBytes();
-    
     private final static byte[] ERR_BAD_PROTOCOL =
         ("HTTP/1.1 405 Bad Method\r\n"+
          "Content-Type: text/html; charset=iso-8859-1\r\n"+
@@ -293,9 +281,9 @@ public class I2PTunnelConnectClient extends I2PTunnelHTTPClientBase implements R
             if (clientDest == null) {
                 byte[] header;
                 if (usingWWWProxy)
-                    header = getErrorPage("dnfp-header.ht", ERR_DESTINATION_UNKNOWN);
+                    header = getErrorPage("dnfp", ERR_DESTINATION_UNKNOWN);
                 else
-                    header = getErrorPage("dnfh-header.ht", ERR_DESTINATION_UNKNOWN);
+                    header = getErrorPage("dnfh", ERR_DESTINATION_UNKNOWN);
                 writeErrorMessage(header, out, targetRequest, usingWWWProxy, destination);
                 s.close();
                 return;
@@ -308,89 +296,29 @@ public class I2PTunnelConnectClient extends I2PTunnelHTTPClientBase implements R
                 data = newRequest.toString().getBytes("ISO-8859-1");
             else
                 response = SUCCESS_RESPONSE;
-            Runnable onTimeout = new OnTimeout(s, s.getOutputStream(), targetRequest, usingWWWProxy, currentProxy, requestId);
-            // starts itself
-            new I2PTunnelRunner(s, i2ps, sockLock, data, response, mySockets, onTimeout);
-        } catch (SocketException ex) {
-            _log.info(getPrefix(requestId) + "Error trying to connect", ex);
-            handleConnectClientException(ex, out, targetRequest, usingWWWProxy, currentProxy, requestId);
-            closeSocket(s);
+            OnTimeout onTimeout = new OnTimeout(s, s.getOutputStream(), targetRequest, usingWWWProxy, currentProxy, requestId);
+            Thread t = new I2PTunnelRunner(s, i2ps, sockLock, data, response, mySockets, onTimeout);
+            t.start();
         } catch (IOException ex) {
             _log.info(getPrefix(requestId) + "Error trying to connect", ex);
-            handleConnectClientException(ex, out, targetRequest, usingWWWProxy, currentProxy, requestId);
+            handleClientException(ex, out, targetRequest, usingWWWProxy, currentProxy, requestId);
             closeSocket(s);
         } catch (I2PException ex) {
             _log.info("getPrefix(requestId) + Error trying to connect", ex);
-            handleConnectClientException(ex, out, targetRequest, usingWWWProxy, currentProxy, requestId);
+            handleClientException(ex, out, targetRequest, usingWWWProxy, currentProxy, requestId);
             closeSocket(s);
         } catch (OutOfMemoryError oom) {
             IOException ex = new IOException("OOM");
             _log.info("getPrefix(requestId) + Error trying to connect", ex);
-            handleConnectClientException(ex, out, targetRequest, usingWWWProxy, currentProxy, requestId);
+            handleClientException(ex, out, targetRequest, usingWWWProxy, currentProxy, requestId);
             closeSocket(s);
         }
     }
 
-    private static class OnTimeout implements Runnable {
-        private final Socket _socket;
-        private final OutputStream _out;
-        private final String _target;
-        private final boolean _usingProxy;
-        private final String _wwwProxy;
-        private final long _requestId;
-
-        public OnTimeout(Socket s, OutputStream out, String target, boolean usingProxy, String wwwProxy, long id) {
-            _socket = s;
-            _out = out;
-            _target = target;
-            _usingProxy = usingProxy;
-            _wwwProxy = wwwProxy;
-            _requestId = id;
-        }
-
-        public void run() {
-            //if (_log.shouldLog(Log.DEBUG))
-            //    _log.debug("Timeout occured requesting " + _target);
-            handleConnectClientException(new RuntimeException("Timeout"), _out, 
-                                      _target, _usingProxy, _wwwProxy, _requestId);
-            closeSocket(_socket);
-        }
-    }
-    
     private static void writeErrorMessage(byte[] errMessage, OutputStream out) throws IOException {
         if (out == null)
             return;
         out.write(errMessage);
-        out.write("\n</body></html>\n".getBytes());
-        out.flush();
-    }
-
-    private static void writeErrorMessage(byte[] errMessage, OutputStream out, String targetRequest,
-                                          boolean usingWWWProxy, String wwwProxy) throws IOException {
-        if (out != null) {
-            out.write(errMessage);
-            if (targetRequest != null) {
-                out.write(targetRequest.getBytes());
-                if (usingWWWProxy)
-                    out.write(("<br />WWW proxy: " + wwwProxy).getBytes());
-            }
-            out.write("</div>".getBytes());
-            out.write("\n</body></html>\n".getBytes());
-            out.flush();
-        }
-    }
-
-    private static void handleConnectClientException(Exception ex, OutputStream out, String targetRequest,
-                                                  boolean usingWWWProxy, String wwwProxy, long requestId) {
-        if (out == null)
-            return;
-        byte[] header;
-        if (usingWWWProxy)
-            header = getErrorPage(I2PAppContext.getGlobalContext(), "dnfp-header.ht", ERR_DESTINATION_UNKNOWN);
-        else
-            header = getErrorPage(I2PAppContext.getGlobalContext(), "dnf-header.ht", ERR_DESTINATION_UNKNOWN);
-        try {
-            writeErrorMessage(header, out, targetRequest, usingWWWProxy, wwwProxy);
-        } catch (IOException ioe) {}
+        writeFooter(out);
     }
 }

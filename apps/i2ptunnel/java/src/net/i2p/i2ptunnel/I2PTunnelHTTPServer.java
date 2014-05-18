@@ -307,7 +307,9 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                         Thread.currentThread().getName()+".hc");
                 req.start();
             } else {
-                new I2PTunnelRunner(s, socket, slock, null, modifiedHeader.getBytes(), null);
+                Thread t = new I2PTunnelRunner(s, socket, slock, null, modifiedHeader.getBytes(),
+                                               null, (I2PTunnelRunner.FailCallback) null);
+                t.start();
             }
 
             long afterHandle = getTunnel().getContext().clock().now();

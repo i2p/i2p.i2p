@@ -10,7 +10,6 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Date;
 import java.util.Locale;
 import java.util.Properties;
 import java.util.StringTokenizer;
@@ -35,7 +34,6 @@ import net.i2p.i2ptunnel.localServer.LocalHTTPServer;
 import net.i2p.util.EventDispatcher;
 import net.i2p.util.Log;
 import net.i2p.util.PortMapper;
-import net.i2p.util.Translate;
 
 /**
  * Act as a mini HTTP proxy, handling various different types of requests,
@@ -93,17 +91,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
             "\r\n" +
             "<html><body><H1>I2P ERROR: REQUEST DENIED</H1>" +
             "You attempted to connect to a non-I2P website or location.<BR>").getBytes();
-    private final static byte[] ERR_DESTINATION_UNKNOWN =
-                                ("HTTP/1.1 503 Service Unavailable\r\n" +
-            "Content-Type: text/html; charset=iso-8859-1\r\n" +
-            "Cache-control: no-cache\r\n" +
-            "\r\n" +
-            "<html><body><H1>I2P ERROR: DESTINATION NOT FOUND</H1>" +
-            "That I2P Destination was not found. Perhaps you pasted in the " +
-            "wrong BASE64 I2P Destination or the link you are following is " +
-            "bad. The host (or the WWW proxy, if you're using one) could also " +
-            "be temporarily offline.  You may want to <b>retry</b>.  " +
-            "Could not find the following Destination:<BR><BR><div>").getBytes();
+
     /*****
     private final static byte[] ERR_TIMEOUT =
     ("HTTP/1.1 504 Gateway Timeout\r\n"+
@@ -642,7 +630,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                                     if(alias.equals("i2p")) {
                                         // bad ahelperKey
                                         byte[] header = getErrorPage("dnfb", ERR_DESTINATION_UNKNOWN);
-                                        writeErrorMessage(header, out, targetRequest, false, destination, null);
+                                        writeErrorMessage(header, out, targetRequest, false, destination);
                                     } else {
                                         String trustedURL = requestURI.toASCIIString();
                                         URI conflictURI;
@@ -951,7 +939,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
             // no destination, going to outproxy plugin
             if (usingInternalOutproxy) {
                 Socket outSocket = outproxy.connect(host, remotePort);
-                Runnable onTimeout = new OnTimeout(s, s.getOutputStream(), targetRequest, usingWWWProxy, currentProxy, requestId);
+                OnTimeout onTimeout = new OnTimeout(s, s.getOutputStream(), targetRequest, usingWWWProxy, currentProxy, requestId);
                 byte[] data;
                 byte[] response;
                 if (method.toUpperCase(Locale.US).equals("CONNECT")) {
@@ -961,7 +949,8 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                     data = newRequest.toString().getBytes("ISO-8859-1");
                     response = null;
                 }
-                new I2PTunnelOutproxyRunner(s, outSocket, sockLock, data, response, onTimeout);
+                Thread t = new I2PTunnelOutproxyRunner(s, outSocket, sockLock, data, response, onTimeout);
+                t.start();
                 return;
             }
 
@@ -980,7 +969,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                         _log.warn(getPrefix(requestId) + "Could not find destination for " + addressHelper);
                     }
                     byte[] header = getErrorPage("ahelper-notfound", ERR_AHELPER_NOTFOUND);
-                    writeErrorMessage(header, out, targetRequest, false, destination, null);
+                    writeErrorMessage(header, out, targetRequest, false, destination);
                     s.close();
                     return;
                 }
@@ -1018,7 +1007,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                 } else if(ahelperPresent) {
                     header = getErrorPage("dnfb", ERR_DESTINATION_UNKNOWN);
                 } else if(destination.length() == 60 && destination.toLowerCase(Locale.US).endsWith(".b32.i2p")) {
-                    header = getErrorPage("dnf", ERR_DESTINATION_UNKNOWN);
+                    header = getErrorPage("nols", ERR_DESTINATION_UNKNOWN);
                 } else {
                     header = getErrorPage("dnfh", ERR_DESTINATION_UNKNOWN);
                     jumpServers = getTunnel().getClientOptions().getProperty(PROP_JUMP_SERVERS);
@@ -1067,7 +1056,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
             if (remotePort > 0)
                 sktOpts.setPort(remotePort);
             I2PSocket i2ps = createI2PSocket(clientDest, sktOpts);
-            Runnable onTimeout = new OnTimeout(s, s.getOutputStream(), targetRequest, usingWWWProxy, currentProxy, requestId);
+            OnTimeout onTimeout = new OnTimeout(s, s.getOutputStream(), targetRequest, usingWWWProxy, currentProxy, requestId);
             if (method.toUpperCase(Locale.US).equals("CONNECT")) {
                 byte[] data;
                 byte[] response;
@@ -1078,30 +1067,32 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                     data = null;
                     response = I2PTunnelConnectClient.SUCCESS_RESPONSE;
                 }
-                new I2PTunnelRunner(s, i2ps, sockLock, data, response, mySockets, onTimeout);
+                Thread t = new I2PTunnelRunner(s, i2ps, sockLock, data, response, mySockets, onTimeout);
+                t.start();
             } else {
                 byte[] data = newRequest.toString().getBytes("ISO-8859-1");
-                new I2PTunnelHTTPClientRunner(s, i2ps, sockLock, data, mySockets, onTimeout);
+                Thread t = new I2PTunnelHTTPClientRunner(s, i2ps, sockLock, data, mySockets, onTimeout);
+                t.start();
             }
         } catch(IOException ex) {
             if(_log.shouldLog(Log.INFO)) {
                 _log.info(getPrefix(requestId) + "Error trying to connect", ex);
             }
             //l.log("Error connecting: " + ex.getMessage());
-            handleHTTPClientException(ex, out, targetRequest, usingWWWProxy, currentProxy, requestId);
+            handleClientException(ex, out, targetRequest, usingWWWProxy, currentProxy, requestId);
             closeSocket(s);
         } catch(I2PException ex) {
             if(_log.shouldLog(Log.INFO)) {
                 _log.info("getPrefix(requestId) + Error trying to connect", ex);
             }
             //l.log("Error connecting: " + ex.getMessage());
-            handleHTTPClientException(ex, out, targetRequest, usingWWWProxy, currentProxy, requestId);
+            handleClientException(ex, out, targetRequest, usingWWWProxy, currentProxy, requestId);
             closeSocket(s);
         } catch(OutOfMemoryError oom) {
             IOException ex = new IOException("OOM");
             _log.error("getPrefix(requestId) + Error trying to connect", oom);
             //l.log("Error connecting: " + ex.getMessage());
-            handleHTTPClientException(ex, out, targetRequest, usingWWWProxy, currentProxy, requestId);
+            handleClientException(ex, out, targetRequest, usingWWWProxy, currentProxy, requestId);
             closeSocket(s);
         }
     }
@@ -1229,144 +1220,12 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
         return Base32.encode(_dest.calculateHash().getData()) + ".b32.i2p";
     }
 
-    /**
-     *  Public only for LocalHTTPServer, not for general use
-     */
-    public static void writeFooter(OutputStream out) throws IOException {
-        // the css is hiding this div for now, but we'll keep it here anyway
-        out.write("<div class=\"proxyfooter\"><p><i>I2P HTTP Proxy Server<br>Generated on: ".getBytes());
-        out.write(new Date().toString().getBytes());
-        out.write("</i></div></body></html>\n".getBytes());
-        out.flush();
-    }
-
-    private static class OnTimeout implements Runnable {
-
-        private final Socket _socket;
-        private final OutputStream _out;
-        private final String _target;
-        private final boolean _usingProxy;
-        private final String _wwwProxy;
-        private final long _requestId;
-
-        public OnTimeout(Socket s, OutputStream out, String target, boolean usingProxy, String wwwProxy, long id) {
-            _socket = s;
-            _out = out;
-            _target = target;
-            _usingProxy = usingProxy;
-            _wwwProxy = wwwProxy;
-            _requestId = id;
-        }
-
-        public void run() {
-            //if (_log.shouldLog(Log.DEBUG))
-            //    _log.debug("Timeout occured requesting " + _target);
-            handleHTTPClientException(new RuntimeException("Timeout"), _out,
-                    _target, _usingProxy, _wwwProxy, _requestId);
-            closeSocket(_socket);
-        }
-    }
     public static final String DEFAULT_JUMP_SERVERS =
                                "http://i2host.i2p/cgi-bin/i2hostjump?," +
             "http://stats.i2p/cgi-bin/jump.cgi?a=," +
 	    "http://no.i2p/jump/," +
 	    "http://i2pjump.i2p/jump/";
             //"http://i2jump.i2p/";
-
-    /**
-     *  @param jumpServers comma- or space-separated list, or null
-     */
-    private static void writeErrorMessage(byte[] errMessage, OutputStream out, String targetRequest,
-                                          boolean usingWWWProxy, String wwwProxy, String jumpServers) throws IOException {
-        if(out != null) {
-            out.write(errMessage);
-            if(targetRequest != null) {
-                String uri = targetRequest.replace("&", "&amp;");
-                out.write("<a href=\"".getBytes());
-                out.write(uri.getBytes());
-                out.write("\">".getBytes());
-                out.write(uri.getBytes());
-                out.write("</a>".getBytes());
-                if(usingWWWProxy) {
-                    out.write(("<br><br><b>").getBytes());
-                    out.write(_("HTTP Outproxy").getBytes("UTF-8"));
-                    out.write((":</b> " + wwwProxy).getBytes());
-                }
-                if(jumpServers != null && jumpServers.length() > 0) {
-                    boolean first = true;
-                    if(uri.startsWith("http://")) {
-                        uri = uri.substring(7);
-                    }
-                    StringTokenizer tok = new StringTokenizer(jumpServers, ", ");
-                    while(tok.hasMoreTokens()) {
-                        String jurl = tok.nextToken();
-                        String jumphost;
-                        try {
-                            URI jURI = new URI(jurl);
-                            String proto = jURI.getScheme();
-                            jumphost = jURI.getHost();
-                            if (proto == null || jumphost == null ||
-                                !proto.toLowerCase(Locale.US).equals("http"))
-                                continue;
-                            jumphost = jumphost.toLowerCase(Locale.US);
-                            if (!jumphost.endsWith(".i2p"))
-                                continue;
-                        } catch(URISyntaxException use) {
-                            continue;
-                        }
-                        // Skip jump servers we don't know
-                        if(!jumphost.endsWith(".b32.i2p")) {
-                            Destination dest = I2PAppContext.getGlobalContext().namingService().lookup(jumphost);
-                            if(dest == null) {
-                                continue;
-                            }
-                        }
-
-                        if (first) {
-                            first = false;
-                            out.write("<br><br>".getBytes());
-                            out.write(_("Click a link below to look for an address helper by using a \"jump\" service:").getBytes("UTF-8"));
-                            out.write("<br>\n".getBytes());
-                        }
-                        out.write("<br><a href=\"".getBytes());
-                        out.write(jurl.getBytes());
-                        out.write(uri.getBytes());
-                        out.write("\">".getBytes());
-                        // Translators: parameter is a host name
-                        out.write(_("{0} jump service", jumphost).getBytes());
-                        out.write("</a>\n".getBytes());
-                    }
-                }
-            }
-            out.write("</div>".getBytes());
-            writeFooter(out);
-        }
-    }
-
-    private static void handleHTTPClientException(Exception ex, OutputStream out, String targetRequest,
-                                                  boolean usingWWWProxy, String wwwProxy, long requestId) {
-
-        // static
-        //if (_log.shouldLog(Log.WARN))
-        //    _log.warn(getPrefix(requestId) + "Error sending to " + wwwProxy + " (proxy? " + usingWWWProxy + ", request: " + targetRequest, ex);
-        if(out != null) {
-            try {
-                byte[] header;
-                if(usingWWWProxy) {
-                    header = getErrorPage(I2PAppContext.getGlobalContext(), "dnfp", ERR_DESTINATION_UNKNOWN);
-                } else {
-                    header = getErrorPage(I2PAppContext.getGlobalContext(), "dnf", ERR_DESTINATION_UNKNOWN);
-                }
-                writeErrorMessage(header, out, targetRequest, usingWWWProxy, wwwProxy, null);
-            } catch(IOException ioe) {
-                // static
-                //_log.warn(getPrefix(requestId) + "Error writing out the 'destination was unknown' " + "message", ioe);
-            }
-        } else {
-            // static
-            //_log.warn(getPrefix(requestId) + "Client disconnected before we could say that destination " + "was unknown", ex);
-        }
-    }
 
     /** @param host ignored */
     private static boolean isSupportedAddress(String host, String protocol) {
@@ -1526,22 +1385,4 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
     }
     }
      ****/
-
-    /** these strings go in the jar, not the war */
-    private static final String BUNDLE_NAME = "net.i2p.i2ptunnel.proxy.messages";
-
-    /** lang in routerconsole.lang property, else current locale */
-    protected static String _(String key) {
-        return Translate.getString(key, I2PAppContext.getGlobalContext(), BUNDLE_NAME);
-    }
-
-    /** {0} */
-    protected static String _(String key, Object o) {
-        return Translate.getString(key, o, I2PAppContext.getGlobalContext(), BUNDLE_NAME);
-    }
-
-    /** {0} and {1} */
-    protected static String _(String key, Object o, Object o2) {
-        return Translate.getString(key, o, o2, I2PAppContext.getGlobalContext(), BUNDLE_NAME);
-    }
 }

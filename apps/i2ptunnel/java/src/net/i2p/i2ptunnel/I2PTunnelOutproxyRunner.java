@@ -26,6 +26,8 @@ import net.i2p.util.Log;
 /**
  *  Like I2PTunnelRunner but socket-to-socket
  *
+ *  Warning - not maintained as a stable API for external use.
+ *
  *  @since 0.9.11
  */
 public class I2PTunnelOutproxyRunner extends I2PAppThread {
@@ -54,22 +56,22 @@ public class I2PTunnelOutproxyRunner extends I2PAppThread {
     /** when the runner started up */
     private final long startedOn;
     /** if we die before receiving any data, run this job */
-    private final Runnable onTimeout;
+    private final I2PTunnelRunner.FailCallback onTimeout;
     private long totalSent;
     private long totalReceived;
 
     private static final AtomicLong __forwarderId = new AtomicLong();
     
     /**
-     *  Starts itself (fixme)
+     *  Does NOT start itself. Caller must call start().
      *
      *  @param slock the socket lock, non-null
      *  @param initialI2PData may be null
-     *  @param onTimeout May be null. If non-null and no data (except initial data) was sent or received,
+     *  @param onTimeout May be null. If non-null and no data (except initial data) was received,
                          it will be run before closing s.
      */
     public I2PTunnelOutproxyRunner(Socket s, Socket i2ps, Object slock, byte[] initialI2PData,
-                                   byte[] initialSocketData, Runnable onTimeout) {
+                                   byte[] initialSocketData, I2PTunnelRunner.FailCallback onTimeout) {
         this.s = s;
         this.i2ps = i2ps;
         this.slock = slock;
@@ -83,7 +85,6 @@ public class I2PTunnelOutproxyRunner extends I2PAppThread {
             _log.info("OutproxyRunner started");
         _runnerId = __runnerId.incrementAndGet();
         setName("OutproxyRunner " + _runnerId);
-        start();
     }
 
     /** 
@@ -144,6 +145,9 @@ public class I2PTunnelOutproxyRunner extends I2PAppThread {
                 in = new BufferedInputStream(in, 2*NETWORK_BUFFER_SIZE);
             Thread t1 = new StreamForwarder(in, i2pout, true);
             Thread t2 = new StreamForwarder(i2pin, out, false);
+            // TODO can we run one of these inline and save a thread?
+            t1.start();
+            t2.start();
             synchronized (finishLock) {
                 while (!finished) {
                     finishLock.wait();
@@ -159,7 +163,7 @@ public class I2PTunnelOutproxyRunner extends I2PAppThread {
                                + " totalSent = " + totalSent + " job = " + onTimeout);
                 // Run even if totalSent > 0, as that's probably POST data.
                 if (totalReceived <= 0)
-                    onTimeout.run();
+                    onTimeout.onFail(null);
             }
             
             // now one connection is dead - kill the other as well, after making sure we flush
@@ -242,6 +246,9 @@ public class I2PTunnelOutproxyRunner extends I2PAppThread {
         }
     }
     
+    /**
+     *  Forward data in one direction
+     */
     private class StreamForwarder extends I2PAppThread {
 
         private final InputStream in;
@@ -250,6 +257,9 @@ public class I2PTunnelOutproxyRunner extends I2PAppThread {
         private final boolean _toI2P;
         private final ByteCache _cache;
 
+        /**
+         *  Does not start itself. Caller must start()
+         */
         private StreamForwarder(InputStream in, OutputStream out, boolean toI2P) {
             this.in = in;
             this.out = out;
@@ -257,7 +267,6 @@ public class I2PTunnelOutproxyRunner extends I2PAppThread {
             direction = (toI2P ? "toOutproxy" : "fromOutproxy");
             _cache = ByteCache.getInstance(32, NETWORK_BUFFER_SIZE);
             setName("OutproxyForwarder " + _runnerId + '.' + __forwarderId.incrementAndGet());
-            start();
         }
 
         @Override

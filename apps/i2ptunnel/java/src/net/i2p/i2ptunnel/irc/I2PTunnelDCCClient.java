@@ -75,7 +75,8 @@ public class I2PTunnelDCCClient extends I2PTunnelClientBase {
         opts.setPort(_remotePort);
         try {
             i2ps = createI2PSocket(dest, opts);
-            new Runner(s, i2ps);
+            Thread t = new Runner(s, i2ps);
+            t.start();
         } catch (Exception ex) {
             _log.error("Could not make DCC connection to " + _dest + ':' + _remotePort, ex);
             closeSocket(s);
@@ -115,9 +116,11 @@ public class I2PTunnelDCCClient extends I2PTunnelClientBase {
      */
     private class Runner extends I2PTunnelRunner {
 
+        /**
+         *  Does NOT start itself. Caller must call start().
+         */
         public Runner(Socket s, I2PSocket i2ps) {
-            // super calls start()
-            super(s, i2ps, sockLock, null, mySockets);
+            super(s, i2ps, sockLock, null, null, mySockets, (FailCallback) null);
         }
 
         @Override

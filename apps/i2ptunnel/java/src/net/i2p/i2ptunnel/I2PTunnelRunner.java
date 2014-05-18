@@ -25,6 +25,11 @@ import net.i2p.util.I2PAppThread;
 import net.i2p.util.InternalSocket;
 import net.i2p.util.Log;
 
+/**
+ *  A thread that starts two more threads, one to forward traffic in each direction.
+ *
+ *  Warning - not maintained as a stable API for external use.
+ */
 public class I2PTunnelRunner extends I2PAppThread implements I2PSocket.SocketErrorListener {
     protected final Log _log;
 
@@ -43,7 +48,7 @@ public class I2PTunnelRunner extends I2PAppThread implements I2PSocket.SocketErr
     private final Socket s;
     private final I2PSocket i2ps;
     private final Object slock, finishLock = new Object();
-    volatile boolean finished = false;
+    private volatile boolean finished;
     private final byte[] initialI2PData;
     private final byte[] initialSocketData;
     /** when the last data was sent/received (or -1 if never) */
@@ -53,24 +58,35 @@ public class I2PTunnelRunner extends I2PAppThread implements I2PSocket.SocketErr
     private final List<I2PSocket> sockList;
     /** if we die before receiving any data, run this job */
     private final Runnable onTimeout;
+    private final FailCallback _onFail;
     private long totalSent;
     private long totalReceived;
 
     private static final AtomicLong __forwarderId = new AtomicLong();
     
+    /**
+     *  For use in new constructor
+     *  @since 0.9.14
+     */
+    public interface FailCallback {
+        /**
+         *  @param e may be null
+         */
+        public void onFail(Exception e);
+    }
+
+    /**
+     *  Starts itself
+     *
+     *  @param slock the socket lock, non-null
+     *  @param initialI2PData may be null
+     *  @param sockList may be null. Caller must add i2ps to the list! It will be removed here on completion.
+     *                               Will synchronize on slock when removing.
+     *  @deprecated use FailCallback constructor
+     */
     public I2PTunnelRunner(Socket s, I2PSocket i2ps, Object slock, byte[] initialI2PData,
                            List<I2PSocket> sockList) {
-        this(s, i2ps, slock, initialI2PData, null, sockList, null);
-    }
-
-    public I2PTunnelRunner(Socket s, I2PSocket i2ps, Object slock, byte[] initialI2PData,
-                           byte[] initialSocketData, List<I2PSocket> sockList) {
-        this(s, i2ps, slock, initialI2PData, initialSocketData, sockList, null);
-    }
-
-    public I2PTunnelRunner(Socket s, I2PSocket i2ps, Object slock, byte[] initialI2PData,
-                           List<I2PSocket> sockList, Runnable onTimeout) {
-        this(s, i2ps, slock, initialI2PData, null, sockList, onTimeout);
+        this(s, i2ps, slock, initialI2PData, null, sockList, null, null, true);
     }
 
     /**
@@ -81,11 +97,78 @@ public class I2PTunnelRunner extends I2PAppThread implements I2PSocket.SocketErr
      *  @param initialSocketData may be null
      *  @param sockList may be null. Caller must add i2ps to the list! It will be removed here on completion.
      *                               Will synchronize on slock when removing.
-     *  @param onTimeout May be null. If non-null and no data (except initial data) was sent or received,
-                         it will be run before closing s.
+     *  @deprecated use FailCallback constructor
+     */
+    public I2PTunnelRunner(Socket s, I2PSocket i2ps, Object slock, byte[] initialI2PData,
+                           byte[] initialSocketData, List<I2PSocket> sockList) {
+        this(s, i2ps, slock, initialI2PData, initialSocketData, sockList, null, null, true);
+    }
+
+    /**
+     *  Starts itself
+     *
+     *  @param slock the socket lock, non-null
+     *  @param initialI2PData may be null
+     *  @param sockList may be null. Caller must add i2ps to the list! It will be removed here on completion.
+     *                               Will synchronize on slock when removing.
+     *  @param onTimeout May be null. If non-null and no data (except initial data) was received,
+     *                   it will be run before closing s.
+     *  @deprecated use FailCallback constructor
+     */
+    public I2PTunnelRunner(Socket s, I2PSocket i2ps, Object slock, byte[] initialI2PData,
+                           List<I2PSocket> sockList, Runnable onTimeout) {
+        this(s, i2ps, slock, initialI2PData, null, sockList, onTimeout, null, true);
+    }
+
+    /**
+     *  Starts itself
+     *
+     *  @param slock the socket lock, non-null
+     *  @param initialI2PData may be null
+     *  @param initialSocketData may be null
+     *  @param sockList may be null. Caller must add i2ps to the list! It will be removed here on completion.
+     *                               Will synchronize on slock when removing.
+     *  @param onTimeout May be null. If non-null and no data (except initial data) was received,
+     *                   it will be run before closing s.
+     *  @deprecated use FailCallback constructor
      */
     public I2PTunnelRunner(Socket s, I2PSocket i2ps, Object slock, byte[] initialI2PData,
                            byte[] initialSocketData, List<I2PSocket> sockList, Runnable onTimeout) {
+        this(s, i2ps, slock, initialI2PData, null, sockList, onTimeout, null, true);
+    }
+
+    /**
+     *  Recommended new constructor. Does NOT start itself. Caller must call start().
+     *
+     *  @param slock the socket lock, non-null
+     *  @param initialI2PData may be null
+     *  @param initialSocketData may be null
+     *  @param sockList may be null. Caller must add i2ps to the list! It will be removed here on completion.
+     *                               Will synchronize on slock when removing.
+     *  @param onFail May be null. If non-null and no data (except initial data) was received,
+     *                it will be run before closing s.
+     */
+    public I2PTunnelRunner(Socket s, I2PSocket i2ps, Object slock, byte[] initialI2PData,
+                           byte[] initialSocketData, List<I2PSocket> sockList, FailCallback onFail) {
+        this(s, i2ps, slock, initialI2PData, null, sockList, null, onFail, false);
+    }
+
+    /**
+     *  Base constructor
+     *
+     *  @param slock the socket lock, non-null
+     *  @param initialI2PData may be null
+     *  @param initialSocketData may be null
+     *  @param sockList may be null. Caller must add i2ps to the list! It will be removed here on completion.
+     *                               Will synchronize on slock when removing.
+     *  @param onTimeout May be null. If non-null and no data (except initial data) was received,
+     *                   it will be run before closing s.
+     *  @param onFail Trumps onTimeout
+     *  @param shouldStart should thread be started in constructor (bad, false recommended)
+     */
+    private I2PTunnelRunner(Socket s, I2PSocket i2ps, Object slock, byte[] initialI2PData,
+                            byte[] initialSocketData, List<I2PSocket> sockList, Runnable onTimeout,
+                            FailCallback onFail, boolean shouldStart) {
         this.sockList = sockList;
         this.s = s;
         this.i2ps = i2ps;
@@ -93,6 +176,7 @@ public class I2PTunnelRunner extends I2PAppThread implements I2PSocket.SocketErr
         this.initialI2PData = initialI2PData;
         this.initialSocketData = initialSocketData;
         this.onTimeout = onTimeout;
+        _onFail = onFail;
         lastActivityOn = -1;
         startedOn = Clock.getInstance().now();
         _log = I2PAppContext.getGlobalContext().logManager().getLog(getClass());
@@ -100,7 +184,8 @@ public class I2PTunnelRunner extends I2PAppThread implements I2PSocket.SocketErr
             _log.info("I2PTunnelRunner started");
         _runnerId = __runnerId.incrementAndGet();
         setName("I2PTunnelRunner " + _runnerId);
-        start();
+        if (shouldStart)
+            start();
     }
 
     /** 
@@ -181,8 +266,11 @@ public class I2PTunnelRunner extends I2PAppThread implements I2PSocket.SocketErr
                            + " written to the socket, starting forwarders");
             if (!(s instanceof InternalSocket))
                 in = new BufferedInputStream(in, 2*NETWORK_BUFFER_SIZE);
-            Thread t1 = new StreamForwarder(in, i2pout, true);
-            Thread t2 = new StreamForwarder(i2pin, out, false);
+            StreamForwarder toI2P = new StreamForwarder(in, i2pout, true);
+            StreamForwarder fromI2P = new StreamForwarder(i2pin, out, false);
+            // TODO can we run one of these inline and save a thread?
+            toI2P.start();
+            fromI2P.start();
             synchronized (finishLock) {
                 while (!finished) {
                     finishLock.wait();
@@ -192,7 +280,7 @@ public class I2PTunnelRunner extends I2PAppThread implements I2PSocket.SocketErr
                 _log.debug("At least one forwarder completed, closing and joining");
             
             // this task is useful for the httpclient
-            if (onTimeout != null) {
+            if (onTimeout != null || _onFail != null) {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("runner has a timeout job, totalReceived = " + totalReceived
                                + " totalSent = " + totalSent + " job = " + onTimeout);
@@ -200,12 +288,20 @@ public class I2PTunnelRunner extends I2PAppThread implements I2PSocket.SocketErr
                 // This will be run even if initialSocketData != null, it's the timeout job's
                 // responsibility to know that and decide whether or not to write to the socket.
                 // HTTPClient never sets initialSocketData.
-                if (totalReceived <= 0)
-                    onTimeout.run();
+                if (totalReceived <= 0) {
+                    if (_onFail != null) {
+                        Exception e = fromI2P.getFailure();
+                        if (e == null)
+                            e = toI2P.getFailure();
+                        _onFail.onFail(e);
+                    } else {
+                        onTimeout.run();
+                    }
+                }
             }
             
             // now one connection is dead - kill the other as well, after making sure we flush
-            close(out, in, i2pout, i2pin, s, i2ps, t1, t2);
+            close(out, in, i2pout, i2pin, s, i2ps, toI2P, fromI2P);
         } catch (InterruptedException ex) {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Interrupted", ex);
@@ -291,6 +387,9 @@ public class I2PTunnelRunner extends I2PAppThread implements I2PSocket.SocketErr
         t2.join(30*1000);
     }
     
+    /**
+     * Deprecated, unimplemented in streaming, never called.
+     */
     public void errorOccurred() {
         synchronized (finishLock) {
             finished = true;
@@ -306,6 +405,9 @@ public class I2PTunnelRunner extends I2PAppThread implements I2PSocket.SocketErr
         }
     }
     
+    /**
+     *  Forward data in one direction
+     */
     private class StreamForwarder extends I2PAppThread {
 
         private final InputStream in;
@@ -313,15 +415,18 @@ public class I2PTunnelRunner extends I2PAppThread implements I2PSocket.SocketErr
         private final String direction;
         private final boolean _toI2P;
         private final ByteCache _cache;
+        private volatile Exception _failure;
 
-        private StreamForwarder(InputStream in, OutputStream out, boolean toI2P) {
+        /**
+         *  Does not start itself. Caller must start()
+         */
+        public StreamForwarder(InputStream in, OutputStream out, boolean toI2P) {
             this.in = in;
             this.out = out;
             _toI2P = toI2P;
             direction = (toI2P ? "toI2P" : "fromI2P");
             _cache = ByteCache.getInstance(32, NETWORK_BUFFER_SIZE);
             setName("StreamForwarder " + _runnerId + '.' + __forwarderId.incrementAndGet());
-            start();
         }
 
         @Override
@@ -377,10 +482,12 @@ public class I2PTunnelRunner extends I2PAppThread implements I2PSocket.SocketErr
                                        ex);
                     }
                 }
+                _failure = ex;
             } catch (InterruptedIOException ex) {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn(direction + ": Closing connection due to timeout (error: \""
                               + ex.getMessage() + "\")");
+                _failure = ex;
             } catch (IOException ex) {
                 if (!finished) {
                     if (_log.shouldLog(Log.WARN))
@@ -388,6 +495,7 @@ public class I2PTunnelRunner extends I2PAppThread implements I2PSocket.SocketErr
                 }
                 //else
                 //    _log.warn("You may ignore this", ex);
+                _failure = ex;
             } finally {
                 _cache.release(ba);
                 if (_log.shouldLog(Log.INFO)) {
@@ -408,7 +516,7 @@ public class I2PTunnelRunner extends I2PAppThread implements I2PSocket.SocketErr
                     // DON'T close if we have a timeout job and we haven't received anything,
                     // or else the timeout job can't write the error message to the stream.
                     // close() above will close it after the timeout job is run.
-                    if (!(onTimeout != null && (!_toI2P) && totalReceived <= 0))
+                    if (!((onTimeout != null || _onFail != null) && (!_toI2P) && totalReceived <= 0))
                         out.close();
                     else if (_log.shouldLog(Log.INFO))
                         _log.info(direction + ": not closing so we can write the error message");
@@ -422,6 +530,13 @@ public class I2PTunnelRunner extends I2PAppThread implements I2PSocket.SocketErr
                     // the main thread will close sockets etc. now
                 }
             }
+        }
+
+        /**
+         *  @since 0.9.14
+         */
+        public Exception getFailure() {
+            return _failure;
         }
     }
 }

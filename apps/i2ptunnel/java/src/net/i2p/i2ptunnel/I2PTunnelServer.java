@@ -314,7 +314,7 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
         return readTimeout;
     }
 
-    public boolean close(boolean forced) {
+    public synchronized boolean close(boolean forced) {
         if (!open) return true;
         if (task != null) {
             task.close(forced);
@@ -523,7 +523,9 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
             socket.setReadTimeout(readTimeout);
             Socket s = getSocket(socket.getPeerDestination().calculateHash(), socket.getLocalPort());
             afterSocket = getTunnel().getContext().clock().now();
-            new I2PTunnelRunner(s, socket, slock, null, null);
+            Thread t = new I2PTunnelRunner(s, socket, slock, null, null,
+                                           null, (I2PTunnelRunner.FailCallback) null);
+            t.start();
 
             long afterHandle = getTunnel().getContext().clock().now();
             long timeToHandle = afterHandle - afterAccept;
