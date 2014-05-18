@@ -165,6 +165,7 @@ class MessageState {
             case MessageStatusMessage.STATUS_SEND_SUCCESS_LOCAL:
                 // trumps all
                 _state = State.SUCCESS;
+                break;
 
             default:
                 break;

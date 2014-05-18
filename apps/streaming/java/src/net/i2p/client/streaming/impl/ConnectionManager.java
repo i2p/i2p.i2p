@@ -617,6 +617,7 @@ class ConnectionManager {
         disconnectAllHard();
         _tcbShare.stop();
         _timer.stop();
+        _outboundQueue.close();
     }
     
     /**
