@@ -72,15 +72,19 @@ public class ConfigServiceHandler extends FormHandler {
                     ContextHelper.getContext(null).router().killKeys();
                 if (_tellWrapper) {
                     int wait = WAIT;
-                    Properties props = WrapperManager.getProperties();
-                    String tmout = props.getProperty("wrapper.jvm_exit.timeout");
-                    if (tmout != null) {
-                        try {
-                            int cwait = Integer.parseInt(tmout) * 1000;
-                            if (cwait > wait)
-                                wait = cwait;
-                        } catch (NumberFormatException nfe) {}
-                    }
+                    // getProperties() not available on old wrappers,
+                    // TODO find out what version and test
+                    try {
+                        Properties props = WrapperManager.getProperties();
+                        String tmout = props.getProperty("wrapper.jvm_exit.timeout");
+                        if (tmout != null) {
+                            try {
+                                int cwait = Integer.parseInt(tmout) * 1000;
+                                if (cwait > wait)
+                                    wait = cwait;
+                            } catch (NumberFormatException nfe) {}
+                        }
+                    } catch (Throwable t) {}
                     WrapperManager.signalStopping(wait);
                 }
             } catch (Throwable t) {
