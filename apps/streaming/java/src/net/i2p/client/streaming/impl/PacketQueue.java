@@ -247,7 +247,8 @@ class PacketQueue implements SendMessageStatusListener {
     public void messageStatus(I2PSession session, long msgId, int status) {
         if (_dead)
             return;
-        Connection con = _messageStatusMap.get(Long.valueOf(msgId));
+        Long id = Long.valueOf(msgId);
+        Connection con = _messageStatusMap.get(id);
         if (con == null) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Rcvd status " + status + " for msg " + msgId + " on unknown connection");
@@ -256,10 +257,13 @@ class PacketQueue implements SendMessageStatusListener {
 
         switch (status) {
             case MessageStatusMessage.STATUS_SEND_BEST_EFFORT_FAILURE:
+            // not really guaranteed
             case MessageStatusMessage.STATUS_SEND_GUARANTEED_FAILURE:
-                _messageStatusMap.remove(Long.valueOf(msgId));
+            // no tunnels may fix itself, allow retx
+            case MessageStatusMessage.STATUS_SEND_FAILURE_NO_TUNNELS:
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Rcvd soft failure status " + status + " for msg " + msgId + " on " + con);
+                _messageStatusMap.remove(id);
                 break;
 
             case MessageStatusMessage.STATUS_SEND_FAILURE_LOCAL:
@@ -271,20 +275,19 @@ class PacketQueue implements SendMessageStatusListener {
             case MessageStatusMessage.STATUS_SEND_FAILURE_OVERFLOW:
             case MessageStatusMessage.STATUS_SEND_FAILURE_EXPIRED:
             case MessageStatusMessage.STATUS_SEND_FAILURE_LOCAL_LEASESET:
-            case MessageStatusMessage.STATUS_SEND_FAILURE_NO_TUNNELS:
             case MessageStatusMessage.STATUS_SEND_FAILURE_UNSUPPORTED_ENCRYPTION:
             case MessageStatusMessage.STATUS_SEND_FAILURE_DESTINATION:
             case MessageStatusMessage.STATUS_SEND_FAILURE_BAD_LEASESET:
             case MessageStatusMessage.STATUS_SEND_FAILURE_EXPIRED_LEASESET:
             case MessageStatusMessage.STATUS_SEND_FAILURE_NO_LEASESET:
             case SendMessageStatusListener.STATUS_CANCELLED:
-                IOException ioe = new I2PSocketException(status);
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Rcvd hard failure status " + status + " for msg " + msgId + " on " + con);
-                _messageStatusMap.remove(Long.valueOf(msgId));
+                _messageStatusMap.remove(id);
+                IOException ioe = new I2PSocketException(status);
                 con.getOutputStream().streamErrorOccurred(ioe);
                 con.getInputStream().streamErrorOccurred(ioe);
-                con.setConnectionError("barf boof bazzle code " + status);
+                con.setConnectionError("failure code " + status);
                 con.disconnect(false);
                 break;
 
@@ -293,7 +296,7 @@ class PacketQueue implements SendMessageStatusListener {
             case MessageStatusMessage.STATUS_SEND_SUCCESS_LOCAL:
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Rcvd success status " + status + " for msg " + msgId + " on " + con);
-                _messageStatusMap.remove(Long.valueOf(msgId));
+                _messageStatusMap.remove(id);
                 break;
 
             case MessageStatusMessage.STATUS_SEND_ACCEPTED:
@@ -304,10 +307,9 @@ class PacketQueue implements SendMessageStatusListener {
             default:
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Rcvd unknown status " + status + " for msg " + msgId + " on " + con);
-                _messageStatusMap.remove(Long.valueOf(msgId));
+                _messageStatusMap.remove(id);
                 break;
         }
-    
     }
 
     /**
