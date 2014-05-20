@@ -530,7 +530,7 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
     }
 
     /**
-     *  @since 0.9.14 moved from superclasses
+     *  @since 0.9.14 moved from subclasses
      */
     protected class OnTimeout implements I2PTunnelRunner.FailCallback {
         private final Socket _socket;
@@ -562,7 +562,7 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
     }
 
     /**
-     *  @since 0.9.14 moved from superclasses
+     *  @since 0.9.14 moved from subclasses
      */
     protected void handleClientException(Exception ex, OutputStream out, String targetRequest,
                                          boolean usingWWWProxy, String wwwProxy, long requestId) {
@@ -615,7 +615,7 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
     /**
      *  No extra message
      *  @param jumpServers comma- or space-separated list, or null
-     *  @since 0.9.14 moved from superclasses
+     *  @since 0.9.14 moved from subclasses
      */
     protected void writeErrorMessage(byte[] errMessage, OutputStream out, String targetRequest,
                                      boolean usingWWWProxy, String wwwProxy, String jumpServers) throws IOException {
