@@ -1,3 +1,7 @@
+2014-05-20 zzz
+ * Fixes after code review
+ * SSU: Fix peer test deadlock (ticket #1286)
+
 2014-05-15 kytv
  * Translations, imported from Transifex:
    - Dutch, French, German, Italian, Japanese, Norwegian Bokmål, and Ukrainian
