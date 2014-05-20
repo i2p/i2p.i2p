@@ -31,7 +31,7 @@ abstract class ExtensionHandler {
     public static final int ID_DHT = 3;
     /** not using the option bit since the compact format is different */
     public static final String TYPE_DHT = "i2p_dht";
-    /** Pieces * SHA1 Hash length, + 25% extra for file names, benconding overhead, etc */
+    /** Pieces * SHA1 Hash length, + 25% extra for file names, bencoding overhead, etc */
     private static final int MAX_METADATA_SIZE = Storage.MAX_PIECES * 20 * 5 / 4;
     private static final int PARALLEL_REQUESTS = 3;
 

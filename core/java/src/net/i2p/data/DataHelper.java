@@ -525,7 +525,7 @@ public class DataHelper {
         return toString(buf, buf.length);
     }
 
-    private static final byte[] EMPTY_BUFFER = "".getBytes();
+    private static final byte[] EMPTY_BUFFER = new byte[0];
     
     /**
      *  Lower-case hex with leading zeros.
@@ -551,10 +551,18 @@ public class DataHelper {
         return out.toString();
     }
 
+    /**
+     *  Positive decimal without leading zeros.
+     *  @param data may be null (returns "0")
+     *  @param len unused
+     *  @return (new BigInteger(1, buf)).toString()
+     *  @deprecated unused
+     */
     public static String toDecimalString(byte buf[], int len) {
-        if (buf == null) buf = EMPTY_BUFFER;
+        if (buf == null)
+            return "0";
         BigInteger val = new BigInteger(1, buf);
-        return val.toString(10);
+        return val.toString();
     }
 
     /**
@@ -568,6 +576,11 @@ public class DataHelper {
         return bi.toString(16);
     }
 
+    /**
+     *  @param val non-null, may have leading minus sign
+     *  @return minimum-length representation (with possible leading 0 byte)
+     *  @deprecated unused
+     */
     public final static byte[] fromHexString(String val) {
         BigInteger bv = new BigInteger(val, 16);
         return bv.toByteArray();
