@@ -30,7 +30,7 @@ input.default {
 <form action="" method="POST">
  <input type="hidden" name="nonce" value="<%=pageNonce%>" >
  <input type="hidden" name="group" value="0">
- <input type="checkbox" name="oldHome" <jsp:getProperty name="homehelper" property="configHome" />
+ <input type="checkbox" name="oldHome" <jsp:getProperty name="homehelper" property="configHome" /> >
  <%=intl._("Use old home page")%>
  <input type="submit" name="action" class="accept" value="<%=intl._("Save")%>" >
 </form>

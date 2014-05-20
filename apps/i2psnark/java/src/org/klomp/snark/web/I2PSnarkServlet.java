@@ -1351,7 +1351,7 @@ public class I2PSnarkServlet extends BasicServlet {
         if (isMultiFile) {
             // link on the whole td
             String jsec = encodedBaseName.replace("'", "\\'");
-            out.write(" onclick=\"document.location='" + encodedBaseName + "/';\">");
+            out.write(" onclick=\"document.location='" + jsec + "/';\">");
         } else {
             out.write('>');
         }
