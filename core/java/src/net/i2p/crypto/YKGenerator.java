@@ -41,7 +41,7 @@ class YKGenerator {
     private final int MAX_NUM_BUILDERS;
     private final int CALC_DELAY;
     private final LinkedBlockingQueue<BigInteger[]> _values;
-    private final Thread _precalcThread;
+    private Thread _precalcThread;
     private final I2PAppContext ctx;
     private volatile boolean _isRunning;
 
@@ -52,6 +52,10 @@ class YKGenerator {
     public final static int DEFAULT_YK_PRECALC_MAX = 50;
     public final static int DEFAULT_YK_PRECALC_DELAY = 200;
 
+    /**
+     *  Caller must also call start() to start the background precalc thread.
+     *  Unit tests will still work without calling start().
+     */
     public YKGenerator(I2PAppContext context) {
         ctx = context;
 
@@ -72,6 +76,19 @@ class YKGenerator {
 
         ctx.statManager().createRateStat("crypto.YKUsed", "Need a YK from the queue", "Encryption", new long[] { 60*60*1000 });
         ctx.statManager().createRateStat("crypto.YKEmpty", "YK queue empty", "Encryption", new long[] { 60*60*1000 });
+    }
+
+    /**
+     *  Start the background precalc thread.
+     *  Must be called for normal operation.
+     *  If not called, all generation happens in the foreground.
+     *  Not required for unit tests.
+     *
+     *  @since 0.9.14
+     */
+    public synchronized void start() {
+        if (_isRunning)
+            return;
         _precalcThread = new I2PThread(new YKPrecalcRunner(MIN_NUM_BUILDERS, MAX_NUM_BUILDERS),
                                        "YK Precalc", true);
         _precalcThread.setPriority(Thread.MIN_PRIORITY);
@@ -80,13 +97,16 @@ class YKGenerator {
     }
 
     /**
-     *  Note that this stops the precalc thread
-     *  and it cannot be restarted.
+     *  Stop the background precalc thread.
+     *  Can be restarted.
+     *  Not required for unit tests.
+     *
      *  @since 0.8.8
      */
-    public void shutdown() {
+    public synchronized void shutdown() {
         _isRunning = false;
-        _precalcThread.interrupt();
+        if (_precalcThread != null)
+            _precalcThread.interrupt();
         _values.clear();
     }
 
@@ -101,11 +121,11 @@ class YKGenerator {
 
     /** @return rv[0] = Y; rv[1] = K */
     public BigInteger[] getNextYK() {
-        ctx.statManager().addRateData("crypto.YKUsed", 1, 0);
+        ctx.statManager().addRateData("crypto.YKUsed", 1);
         BigInteger[] rv = _values.poll();
         if (rv != null)
             return rv;
-        ctx.statManager().addRateData("crypto.YKEmpty", 1, 0);
+        ctx.statManager().addRateData("crypto.YKEmpty", 1);
         return generateYK();
     }
 

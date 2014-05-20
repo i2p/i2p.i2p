@@ -73,6 +73,7 @@ public class ElGamalEngine {
         _context = context;
         _log = context.logManager().getLog(ElGamalEngine.class);
         _ykgen = new YKGenerator(context);
+        _ykgen.start();
     }
 
     /**
