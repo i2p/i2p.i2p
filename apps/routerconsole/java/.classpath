@@ -8,6 +8,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/jetty"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jrobin"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/systray"/>
-	<classpathentry kind="lib" path="/lib/wrapper/all/wrapper.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/installer"/>
 	<classpathentry kind="output" path="build/obj"/>
 </classpath>
