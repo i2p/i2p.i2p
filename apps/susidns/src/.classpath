@@ -2,8 +2,8 @@
 <classpath>
 	<classpathentry kind="src" path="java/src"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/i2p_sdk"/>
-	<classpathentry kind="lib" path="WEB-INF/lib/jstl.jar"/>
-	<classpathentry kind="lib" path="WEB-INF/lib/standard.jar"/>
+	<classpathentry exported="true" kind="lib" path="WEB-INF/lib/jstl.jar"/>
+	<classpathentry exported="true" kind="lib" path="WEB-INF/lib/standard.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="output" path="WEB-INF/classes"/>
 </classpath>
