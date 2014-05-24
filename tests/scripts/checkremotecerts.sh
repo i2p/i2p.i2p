@@ -126,18 +126,9 @@ check_hosts() {
             # GnuTLS returns "certificate is trusted"
             # GnuTLS v2 has the word "Peer" before certificate, v3 has the word "The" before it
             if ! grep -q 'Verify return code: 0 (ok)\|certificate is trusted' "$WORK/$HOST"; then
-                # If we end up here it's for one of two probable reasons:
-                # 1) the the CN in the certificate doesn't match the hostname.
-                # 2) the certificate is invalid
-
-                # OpenSSL returns code 21 with self-signed certs.
-                # GnuTLS returns "certificate issuer is unknown"
-                # As noted above, GnuTLS v2 has the word "Peer" before certificate, v3 has the word "The" before it
-
-                # If the CN just doesn't match the hostname, pass
-                if ! grep -q 'Verify return code: 21\|certificate issuer is unknown\|self signed' "$WORK/$HOST"; then : ;else
-                    verify_fingerprint $HOST
-                fi
+                # If we end up here, it's possible that the certificate is valid, but CA: false is set in the certificate.
+                # The OpenSSL binary is "picky" about this. GnuTLS doesn't seem to be.
+                verify_fingerprint $HOST
             fi
             echo
         else
