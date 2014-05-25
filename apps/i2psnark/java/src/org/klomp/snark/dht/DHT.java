@@ -36,7 +36,7 @@ public interface DHT {
     public void ping(Destination dest, int port);
 
     /**
-     *  Get peers for a torrent, and announce to the closest node we find.
+     *  Get peers for a torrent, and announce to the closest annMax nodes we find.
      *  Blocking!
      *  Caller should run in a thread.
      *

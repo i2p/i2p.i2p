@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -305,7 +306,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
     }
 
     /**
-     *  Get peers for a torrent, and announce to the closest node we find.
+     *  Get peers for a torrent, and announce to the closest annMax nodes we find.
      *  This is an iterative lookup in the DHT.
      *  Blocking!
      *  Caller should run in a thread.
@@ -821,16 +822,20 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
     // All errors use the response port.
 
     /**
+     *  Unused
+     *
      *  @param nInfo who to send it to
      *  @return success
      */
     private boolean sendError(NodeInfo nInfo, MsgID msgID, int err, String msg) {
         if (_log.shouldLog(Log.INFO))
             _log.info("Sending error " + msg + " to: " + nInfo);
-        Map<String, Object> map = new HashMap<String, Object>();
-        Map<String, Object> resps = new HashMap<String, Object>();
-        map.put("r", resps);
-        return sendResponse(nInfo, msgID, map);
+        Map<String, Object> map = new HashMap<String, Object>(4);
+        List<Object> error = new ArrayList(2);
+        error.add(Integer.valueOf(err));
+        error.add(msg);
+        map.put("e", error);
+        return sendError(nInfo, msgID, map);
     }
 
     // Low-level send methods
@@ -917,7 +922,8 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
     }
 
     /**
-     *  @param toPort the query port, we will increment here
+     *  Unused
+     *
      *  @return success
      */
     private boolean sendError(NodeInfo nInfo, MsgID msgID, Map<String, Object> map) {
@@ -1250,8 +1256,11 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
              _log.info("Stored new OB token: " + token + " for: " + nInfo);
 
         List<Hash> peers = _tracker.getPeers(ih, MAX_WANT);
+        // Check this before removing him, so we don't needlessly send nodes
+        // if he's the only one on the torrent.
+        boolean noPeers = peers.isEmpty();
         peers.remove(nInfo.getHash());   // him
-        if (peers.isEmpty()) {
+        if (noPeers) {
             // similar to find node, but with token
             // get closest from DHT
             List<NodeInfo> nodes = _knownNodes.findClosest(ih, K);
@@ -1263,9 +1272,14 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
             }
             sendNodes(nInfo, msgID, token, nodeArray);
         } else {
-            List<byte[]> hashes = new ArrayList<byte[]>(peers.size());
-            for (Hash peer : peers) {
-                 hashes.add(peer.getData());
+            List<byte[]> hashes;
+            if (peers.isEmpty()) {
+                hashes = Collections.EMPTY_LIST;
+            } else {
+                hashes = new ArrayList<byte[]>(peers.size());
+                for (Hash peer : peers) {
+                     hashes.add(peer.getData());
+                }
             }
             sendPeers(nInfo, msgID, token, hashes);
         }
@@ -1406,6 +1420,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
     // Errors.....
 
     /**
+     *  @param error 1st item is error code, 2nd is message string
      *  @throws NPE, and others too
      */
     private void receiveError(ReplyWaiter waiter, List<BEValue> error) throws InvalidBEncodingException {
