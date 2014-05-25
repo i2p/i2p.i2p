@@ -34,7 +34,8 @@ class DHTTracker {
 
     /** stagger with other cleaners */
     private static final long CLEAN_TIME = 199*1000;
-    private static final long MAX_EXPIRE_TIME = 45*60*1000;
+    /** no guidance in BEP 5; Vuze is 8h */
+    private static final long MAX_EXPIRE_TIME = 3*60*60*1000L;
     private static final long MIN_EXPIRE_TIME = 15*60*1000;
     private static final long DELTA_EXPIRE_TIME = 3*60*1000;
     private static final int MAX_PEERS = 2000;

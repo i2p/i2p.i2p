@@ -82,7 +82,9 @@ public class TrackerClient implements Runnable {
   private final static int MAX_CONSEC_FAILS = 5;    // slow down after this
   private final static int LONG_SLEEP = 30*60*1000; // sleep a while after lots of fails
   private final static long MIN_TRACKER_ANNOUNCE_INTERVAL = 15*60*1000;
-  private final static long MIN_DHT_ANNOUNCE_INTERVAL = 10*60*1000;
+  private final static long MIN_DHT_ANNOUNCE_INTERVAL = 39*60*1000;
+  /** No guidance in BEP 5; standard practice is K (=8) */
+  private static final int DHT_ANNOUNCE_PEERS = 4;
   public static final int PORT = 6881;
   private static final int MAX_TRACKERS = 12;
 
@@ -651,7 +653,7 @@ public class TrackerClient implements Runnable {
                 else
                     numwant = _util.getMaxConnections();
                 Collection<Hash> hashes = dht.getPeersAndAnnounce(snark.getInfoHash(), numwant,
-                                                                  5*60*1000, 1, 3*60*1000,
+                                                                  5*60*1000, DHT_ANNOUNCE_PEERS, 3*60*1000,
                                                                   coordinator.completed());
                 if (!hashes.isEmpty()) {
                     runStarted = true;
