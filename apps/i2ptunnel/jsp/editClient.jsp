@@ -448,6 +448,40 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                 <hr />
             </div>
          <% } %>
+
+         <% if ("httpclient".equals(tunnelType)) { %>
+            <div id="optionsField" class="rowItem">
+                <label><%=intl._("Pass User-Agent header through")%>:</label>
+            </div>
+            <div id="portField" class="rowItem">
+                <label><%=intl._("Enable")%>:</label>
+                <input value="1" type="checkbox" id="startOnLoad" name="allowUserAgent" title="Do not spoof user agent string when checked"<%=(editBean.getAllowUserAgent(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />                
+            </div><br />
+            <div id="optionsField" class="rowItem">
+                <label><%=intl._("Pass Referer header through")%>:</label>
+            </div>
+            <div id="portField" class="rowItem">
+                <label><%=intl._("Enable")%>:</label>
+                <input value="1" type="checkbox" id="startOnLoad" name="allowReferer" title="Do not block referer header when checked"<%=(editBean.getAllowReferer(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />                
+            </div><br />
+            <div id="optionsField" class="rowItem">
+                <label><%=intl._("Pass Accept headers through")%>:</label>
+            </div>
+            <div id="portField" class="rowItem">
+                <label><%=intl._("Enable")%>:</label>
+                <input value="1" type="checkbox" id="startOnLoad" name="allowAccept" title="Do not block accept headers when checked"<%=(editBean.getAllowAccept(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />                
+            </div><br />
+            <div id="optionsField" class="rowItem">
+                <label><%=intl._("Allow SSL to I2P addresses")%>:</label>
+            </div>
+            <div id="portField" class="rowItem">
+                <label><%=intl._("Enable")%>:</label>
+                <input value="1" type="checkbox" id="startOnLoad" name="allowInternalSSL" title="Allow SSL to I2P addresses when checked"<%=(editBean.getAllowInternalSSL(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />                
+            </div>
+            <div class="subdivider">
+                <hr />
+            </div>
+         <% } // if httpclient %>
            
          <% if (true /* editBean.isAdvanced() */ ) { %>
             <div id="tunnelOptionsField" class="rowItem">

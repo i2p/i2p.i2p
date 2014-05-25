@@ -549,8 +549,11 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
             _requestId = id;
         }
 
+        /**
+         *  @param ex may be null
+         */
         public void onFail(Exception ex) {
-            Throwable cause = ex.getCause();
+            Throwable cause = ex != null ? ex.getCause() : null;
             if (cause != null && cause instanceof I2PSocketException) {
                 I2PSocketException ise = (I2PSocketException) cause;
                 handleI2PSocketException(ise, _out, _target, _usingProxy, _wwwProxy);
@@ -562,6 +565,7 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
     }
 
     /**
+     *  @param ex may be null
      *  @since 0.9.14 moved from subclasses
      */
     protected void handleClientException(Exception ex, OutputStream out, String targetRequest,
@@ -582,13 +586,14 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
      *  Generate an error page based on the status code
      *  in our custom exception.
      *
+     *  @param ise may be null
      *  @since 0.9.14
      */
     protected void handleI2PSocketException(I2PSocketException ise, OutputStream out, String targetRequest,
                                             boolean usingWWWProxy, String wwwProxy) {
         if (out == null)
             return;
-        int status = ise.getStatus();
+        int status = ise != null ? ise.getStatus() : -1;
         String error;
         //TODO MessageStatusMessage.STATUS_SEND_FAILURE_UNSUPPORTED_ENCRYPTION
         if (status == MessageStatusMessage.STATUS_SEND_FAILURE_NO_LEASESET) {

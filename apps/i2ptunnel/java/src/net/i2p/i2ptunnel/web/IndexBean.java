@@ -892,6 +892,26 @@ public class IndexBean {
         }
     }
 
+    /** @since 0.9.14 */
+    public void setAllowUserAgent(String moo) {
+        _booleanOptions.add(I2PTunnelHTTPClient.PROP_USER_AGENT);
+    }
+
+    /** @since 0.9.14 */
+    public void setAllowReferer(String moo) {
+        _booleanOptions.add(I2PTunnelHTTPClient.PROP_REFERER);
+    }
+
+    /** @since 0.9.14 */
+    public void setAllowAccept(String moo) {
+        _booleanOptions.add(I2PTunnelHTTPClient.PROP_ACCEPT);
+    }
+
+    /** @since 0.9.14 */
+    public void setAllowInternalSSL(String moo) {
+        _booleanOptions.add(I2PTunnelHTTPClient.PROP_INTERNAL_SSL);
+    }
+
     /** all proxy auth @since 0.8.2 */
     public void setProxyAuth(String s) {
         if (s != null)
@@ -1269,7 +1289,11 @@ public class IndexBean {
         };
     private static final String _booleanProxyOpts[] = {
         I2PTunnelHTTPClientBase.PROP_OUTPROXY_AUTH,
-        I2PTunnelHTTPClient.PROP_USE_OUTPROXY_PLUGIN
+        I2PTunnelHTTPClient.PROP_USE_OUTPROXY_PLUGIN,
+        I2PTunnelHTTPClient.PROP_USER_AGENT,
+        I2PTunnelHTTPClient.PROP_REFERER,
+        I2PTunnelHTTPClient.PROP_ACCEPT,
+        I2PTunnelHTTPClient.PROP_INTERNAL_SSL
         };
     private static final String _booleanServerOpts[] = {
         "i2cp.reduceOnIdle", "i2cp.encryptLeaseSet", PROP_ENABLE_ACCESS_LIST, PROP_ENABLE_BLACKLIST,

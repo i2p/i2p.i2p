@@ -134,7 +134,7 @@ public class I2PTunnelRunner extends I2PAppThread implements I2PSocket.SocketErr
      */
     public I2PTunnelRunner(Socket s, I2PSocket i2ps, Object slock, byte[] initialI2PData,
                            byte[] initialSocketData, List<I2PSocket> sockList, Runnable onTimeout) {
-        this(s, i2ps, slock, initialI2PData, null, sockList, onTimeout, null, true);
+        this(s, i2ps, slock, initialI2PData, initialSocketData, sockList, onTimeout, null, true);
     }
 
     /**
@@ -150,7 +150,7 @@ public class I2PTunnelRunner extends I2PAppThread implements I2PSocket.SocketErr
      */
     public I2PTunnelRunner(Socket s, I2PSocket i2ps, Object slock, byte[] initialI2PData,
                            byte[] initialSocketData, List<I2PSocket> sockList, FailCallback onFail) {
-        this(s, i2ps, slock, initialI2PData, null, sockList, null, onFail, false);
+        this(s, i2ps, slock, initialI2PData, initialSocketData, sockList, null, onFail, false);
     }
 
     /**

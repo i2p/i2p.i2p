@@ -238,7 +238,27 @@ public class EditBean extends IndexBean {
     public boolean getDelayOpen(int tunnel) {
         return getBooleanProperty(tunnel, "i2cp.delayOpen");
     }
-    
+
+    /** @since 0.9.14 */
+    public boolean getAllowUserAgent(int tunnel) {
+        return getBooleanProperty(tunnel, I2PTunnelHTTPClient.PROP_USER_AGENT);
+    }
+
+    /** @since 0.9.14 */
+    public boolean getAllowReferer(int tunnel) {
+        return getBooleanProperty(tunnel, I2PTunnelHTTPClient.PROP_REFERER);
+    }
+
+    /** @since 0.9.14 */
+    public boolean getAllowAccept(int tunnel) {
+        return getBooleanProperty(tunnel, I2PTunnelHTTPClient.PROP_ACCEPT);
+    }
+
+    /** @since 0.9.14 */
+    public boolean getAllowInternalSSL(int tunnel) {
+        return getBooleanProperty(tunnel, I2PTunnelHTTPClient.PROP_INTERNAL_SSL);
+    }
+
     /** all proxy auth @since 0.8.2 */
     public boolean getProxyAuth(int tunnel) {
         return getProperty(tunnel, I2PTunnelHTTPClientBase.PROP_AUTH, "false") != "false";

@@ -105,7 +105,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
     "the following Destination:<BR><BR>")
     .getBytes();
      *****/
-    private final static byte[] _ERR_NO_OUTPROXY =
+    private final static byte[] ERR_NO_OUTPROXY =
                                 ("HTTP/1.1 503 Service Unavailable\r\n" +
             "Content-Type: text/html; charset=iso-8859-1\r\n" +
             "Cache-control: no-cache\r\n" +
@@ -113,6 +113,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
             "<html><body><H1>I2P ERROR: No outproxy found</H1>" +
             "Your request was for a site outside of I2P, but you have no " +
             "HTTP outproxy configured.  Please configure an outproxy in I2PTunnel").getBytes();
+
     private final static byte[] ERR_AHELPER_CONFLICT =
                                 ("HTTP/1.1 409 Conflict\r\n" +
             "Content-Type: text/html; charset=iso-8859-1\r\n" +
@@ -127,6 +128,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
             "and either discarding the addresshelper link, " +
             "discarding the host entry from your host database, " +
             "or naming one of them differently.<p>").getBytes();
+
     private final static byte[] ERR_AHELPER_NOTFOUND =
                                 ("HTTP/1.1 404 Not Found\r\n" +
             "Content-Type: text/html; charset=iso-8859-1\r\n" +
@@ -136,6 +138,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
             "The helper key you put for i2paddresshelper= is not resolvable. " +
             "It seems to be garbage data, or a mistyped b32. Check your URL " +
             "to try and fix the helper key to be either a b32 or a base64.").getBytes();
+
     private final static byte[] ERR_AHELPER_NEW =
                                 ("HTTP/1.1 409 New Address\r\n" +
             "Content-Type: text/html; charset=iso-8859-1\r\n" +
@@ -146,6 +149,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
             "You may either save the destination for this host name to your address book, or remember it only until your router restarts. " +
             "If you save it to your address book, you will not see this message again. " +
             "If you do not wish to visit this host, click the \"back\" button on your browser.").getBytes();
+
     private final static byte[] ERR_BAD_PROTOCOL =
                                 ("HTTP/1.1 403 Bad Protocol\r\n" +
             "Content-Type: text/html; charset=iso-8859-1\r\n" +
@@ -154,6 +158,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
             "<html><body><H1>I2P ERROR: NON-HTTP PROTOCOL</H1>" +
             "The request uses a bad protocol. " +
             "The I2P HTTP Proxy supports HTTP and HTTPS requests only. Other protocols such as FTP are not allowed.<BR>").getBytes();
+
     private final static byte[] ERR_BAD_URI =
                                 ("HTTP/1.1 403 Bad URI\r\n" +
             "Content-Type: text/html; charset=iso-8859-1\r\n" +
@@ -162,6 +167,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
             "<html><body><H1>I2P ERROR: INVALID REQUEST URI</H1>" +
             "The request URI is invalid, and probably contains illegal characters. " +
             "If you clicked e.g. a forum link, check the end of the URI for any characters the browser has mistakenly added on.<BR>").getBytes();
+
     private final static byte[] ERR_LOCALHOST =
                                 ("HTTP/1.1 403 Access Denied\r\n" +
             "Content-Type: text/html; charset=iso-8859-1\r\n" +
@@ -169,6 +175,15 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
             "\r\n" +
             "<html><body><H1>I2P ERROR: REQUEST DENIED</H1>" +
             "Your browser is misconfigured. Do not use the proxy to access the router console or other localhost destinations.<BR>").getBytes();
+
+    private final static byte[] ERR_INTERNAL_SSL =
+                                ("HTTP/1.1 403 SSL Rejected\r\n" +
+            "Content-Type: text/html; charset=iso-8859-1\r\n" +
+            "Cache-control: no-cache\r\n" +
+            "\r\n" +
+            "<html><body><H1>I2P ERROR: SSL to I2P address rejected</H1>" +
+            "SSL for to .i2p addresses denied by configuration." +
+            "You may change the configuration in I2PTunnel").getBytes();
 
     /**
      *  This constructor always starts the tunnel (ignoring the i2cp.delayOpen option).
@@ -317,6 +332,10 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
     public static final String PROP_USE_OUTPROXY_PLUGIN = "i2ptunnel.useLocalOutproxy";
     /** @since 0.9.11 */
     public static final String PROP_SSL_OUTPROXIES = "i2ptunnel.httpclient.SSLOutproxies";
+    /** @since 0.9.14 */
+    public static final String PROP_ACCEPT = "i2ptunnel.httpclient.sendAccept";
+    /** @since 0.9.14 */
+    public static final String PROP_INTERNAL_SSL = "i2ptunnel.httpclient.allowInternalSSL";
 
     protected void clientConnectionRun(Socket s) {
         OutputStream out = null;
@@ -728,7 +747,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                                     _log.warn(getPrefix(requestId) + "Host wants to be outproxied, but we dont have any!");
                                 }
                                 l.log("No outproxy found for the request.");
-                                out.write(getErrorPage("noproxy", _ERR_NO_OUTPROXY));
+                                out.write(getErrorPage("noproxy", ERR_NO_OUTPROXY));
                                 writeFooter(out);
                                 reader.drain();
                                 s.close();
@@ -800,8 +819,10 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                     } else if(lowercaseLine.startsWith("accept")) {
                         // strip the accept-blah headers, as they vary dramatically from
                         // browser to browser
-                        line = null;
-                        continue;
+                        if(!Boolean.parseBoolean(getTunnel().getClientOptions().getProperty(PROP_ACCEPT))) {
+                            line = null;
+                            continue;
+                        }
                     } else if (lowercaseLine.startsWith("referer: ")) {
                         // save for address helper form below
                         referer = line.substring(9);
@@ -850,7 +871,8 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                         // according to rfc2616 s14.3, this *should* force identity, even if
                         // an explicit q=0 for gzip doesn't.  tested against orion.i2p, and it
                         // seems to work.
-                        newRequest.append("Accept-Encoding: \r\n");
+                        if(!Boolean.parseBoolean(getTunnel().getClientOptions().getProperty(PROP_ACCEPT)))
+                            newRequest.append("Accept-Encoding: \r\n");
                         if (!usingInternalOutproxy)
                             newRequest.append("X-Accept-Encoding: x-i2p-gzip;q=1.0, identity;q=0.5, deflate;q=0, gzip;q=0, *;q=0\r\n");
                     }
@@ -1002,12 +1024,14 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                 }
                 byte[] header;
                 String jumpServers = null;
+                String extraMessage = null;
                 if(usingWWWProxy) {
                     header = getErrorPage("dnfp", ERR_DESTINATION_UNKNOWN);
                 } else if(ahelperPresent) {
                     header = getErrorPage("dnfb", ERR_DESTINATION_UNKNOWN);
                 } else if(destination.length() == 60 && destination.toLowerCase(Locale.US).endsWith(".b32.i2p")) {
                     header = getErrorPage("nols", ERR_DESTINATION_UNKNOWN);
+                    extraMessage = _("Destination lease set not found");
                 } else {
                     header = getErrorPage("dnfh", ERR_DESTINATION_UNKNOWN);
                     jumpServers = getTunnel().getClientOptions().getProperty(PROP_JUMP_SERVERS);
@@ -1015,8 +1039,18 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                         jumpServers = DEFAULT_JUMP_SERVERS;
                     }
                 }
-                writeErrorMessage(header, out, targetRequest, usingWWWProxy, destination, jumpServers);
+                writeErrorMessage(header, extraMessage, out, targetRequest, usingWWWProxy, destination, jumpServers);
                 s.close();
+                return;
+            }
+
+            if (method.toUpperCase(Locale.US).equals("CONNECT") &&
+                !usingWWWProxy &&
+                !Boolean.parseBoolean(getTunnel().getClientOptions().getProperty(PROP_INTERNAL_SSL))) {
+                writeErrorMessage(ERR_INTERNAL_SSL, out, targetRequest, false, destination);
+                s.close();
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("SSL to i2p destinations denied by configuration: " + targetRequest);
                 return;
             }
 
