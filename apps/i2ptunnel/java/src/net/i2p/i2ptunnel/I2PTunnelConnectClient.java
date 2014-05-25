@@ -78,12 +78,6 @@ public class I2PTunnelConnectClient extends I2PTunnelHTTPClientBase implements R
          "Your browser is misconfigured. Do not use the proxy to access the router console or other localhost destinations.<BR>")
         .getBytes();
     
-    final static byte[] SUCCESS_RESPONSE =
-        ("HTTP/1.1 200 Connection Established\r\n"+
-         "Proxy-agent: I2P\r\n"+
-         "\r\n")
-        .getBytes();
-    
     /**
      * @throws IllegalArgumentException if the I2PTunnel does not contain
      *                                  valid config to contact the router

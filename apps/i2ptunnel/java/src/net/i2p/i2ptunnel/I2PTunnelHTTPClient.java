@@ -966,7 +966,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                 byte[] response;
                 if (method.toUpperCase(Locale.US).equals("CONNECT")) {
                     data = null;
-                    response = I2PTunnelConnectClient.SUCCESS_RESPONSE;
+                    response = SUCCESS_RESPONSE;
                 } else {
                     data = newRequest.toString().getBytes("ISO-8859-1");
                     response = null;
@@ -1099,7 +1099,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                     response = null;
                 } else {
                     data = null;
-                    response = I2PTunnelConnectClient.SUCCESS_RESPONSE;
+                    response = SUCCESS_RESPONSE;
                 }
                 Thread t = new I2PTunnelRunner(s, i2ps, sockLock, data, response, mySockets, onTimeout);
                 t.start();

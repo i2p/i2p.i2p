@@ -93,6 +93,12 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
             "be temporarily offline.  You may want to <b>retry</b>.  " +
             "Could not find the following Destination:<BR><BR><div>").getBytes();
 
+    protected final static byte[] SUCCESS_RESPONSE =
+        ("HTTP/1.1 200 Connection Established\r\n"+
+         "Proxy-agent: I2P\r\n"+
+         "\r\n")
+        .getBytes();
+
     private final byte[] _proxyNonce;
     private final ConcurrentHashMap<String, NonceInfo> _nonces;
     private final AtomicInteger _nonceCleanCounter = new AtomicInteger();
