@@ -1495,9 +1495,12 @@ public class WebMail extends HttpServlet
 
     /**
      * Copied from net.i2p.router.web.CSSHelper
+     * @param ua null ok
      * @since 0.9.7
      */
     private static boolean isMobile(String ua) {
+        if (ua == null)
+            return false;
         return
                                // text
                               (ua.startsWith("Lynx") || ua.startsWith("w3m") ||
