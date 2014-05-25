@@ -650,7 +650,9 @@ public class TrackerClient implements Runnable {
                     numwant = 1;
                 else
                     numwant = _util.getMaxConnections();
-                Collection<Hash> hashes = dht.getPeersAndAnnounce(snark.getInfoHash(), numwant, 5*60*1000, 1, 3*60*1000);
+                Collection<Hash> hashes = dht.getPeersAndAnnounce(snark.getInfoHash(), numwant,
+                                                                  5*60*1000, 1, 3*60*1000,
+                                                                  coordinator.completed());
                 if (!hashes.isEmpty()) {
                     runStarted = true;
                     lastDHTAnnounce = _util.getContext().clock().now();

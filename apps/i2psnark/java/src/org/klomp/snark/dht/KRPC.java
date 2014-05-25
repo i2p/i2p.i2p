@@ -315,9 +315,12 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
      *  @param maxWait the maximum time to wait (ms) must be > 0
      *  @param annMax the number of peers to announce to
      *  @param annMaxWait the maximum total time to wait for announces, may be 0 to return immediately without waiting for acks
+     *  @param isSeed true if seed, false if leech
      *  @return possibly empty (never null)
      */
-    public Collection<Hash> getPeersAndAnnounce(byte[] ih, int max, long maxWait, int annMax, long annMaxWait) {
+    public Collection<Hash> getPeersAndAnnounce(byte[] ih, int max, long maxWait,
+                                                int annMax, long annMaxWait,
+                                                boolean isSeed) {
         // check local tracker first
         InfoHash iHash = new InfoHash(ih);
         Collection<Hash> rv = _tracker.getPeers(iHash, max);
@@ -424,7 +427,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Announcing to closest from get peers: " + annTo);
                 long toWait = annMaxWait > 0 ? Math.min(annMaxWait, 60*1000) : 0;
-                if (announce(ih, annTo, toWait))
+                if (announce(ih, annTo, toWait, isSeed))
                     annCnt++;
                 if (annMaxWait > 0) {
                     annMaxWait -= _context.clock().now() - start;
@@ -437,7 +440,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
             // so this is essentially just a retry
             if (_log.shouldLog(Log.INFO))
                _log.info("Announcing to closest in kbuckets after get peers failed");
-            announce(ih, annMax, annMaxWait);
+            announce(ih, annMax, annMaxWait, isSeed);
         }
         if (_log.shouldLog(Log.INFO)) {
             _log.info("Finished get Peers, returning " + rv.size());
@@ -460,7 +463,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
     }
 
     /**
-     *  Announce somebody else we know about.
+     *  Announce somebody else we know about to ourselves.
      *  Non-blocking.
      *
      *  @param ih the Info Hash (torrent)
@@ -500,9 +503,10 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
      *  @param ih the Info Hash (torrent)
      *  @param max maximum number of peers to announce to
      *  @param maxWait the maximum total time to wait (ms) or 0 to do all in parallel and return immediately.
+     *  @param isSeed true if seed, false if leech
      *  @return the number of successful announces, not counting ourselves.
      */
-    public int announce(byte[] ih, int max, long maxWait) {
+    public int announce(byte[] ih, int max, long maxWait, boolean isSeed) {
         announce(ih);
         int rv = 0;
         long start = _context.clock().now();
@@ -513,7 +517,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
         for (NodeInfo nInfo : nodes) {
             if (!_isRunning)
                 break;
-            if (announce(ih, nInfo, Math.min(maxWait, 60*1000)))
+            if (announce(ih, nInfo, Math.min(maxWait, 60*1000), isSeed))
                 rv++;
             maxWait -= _context.clock().now() - start;
             if (maxWait < 1000)
@@ -531,9 +535,10 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
      *  @param ih the Info Hash (torrent)
      *  @param nInfo the peer to announce to
      *  @param maxWait the maximum time to wait (ms) or 0 to return immediately.
+     *  @param isSeed true if seed, false if leech
      *  @return success
      */
-    private boolean announce(byte[] ih, NodeInfo nInfo, long maxWait) {
+    private boolean announce(byte[] ih, NodeInfo nInfo, long maxWait, boolean isSeed) {
         InfoHash iHash = new InfoHash(ih);
         // it isn't clear from BEP 5 if a token is bound to a single infohash?
         // for now, just bind to the NID
@@ -580,7 +585,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
         }
 
         // send and wait on rcv msg lock unless maxWait <= 0
-        ReplyWaiter waiter = sendAnnouncePeer(nInfo, iHash, token);
+        ReplyWaiter waiter = sendAnnouncePeer(nInfo, iHash, token, isSeed);
         if (waiter == null)
             return false;
         if (maxWait <= 0)
@@ -743,9 +748,10 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
      *  Non-blocking, will fail if we don't have the dest for the nodeinfo
      *
      *  @param nInfo who to send it to
+     *  @param isSeed true if seed, false if leech
      *  @return null on error
      */
-    private ReplyWaiter sendAnnouncePeer(NodeInfo nInfo, InfoHash ih, Token token) {
+    private ReplyWaiter sendAnnouncePeer(NodeInfo nInfo, InfoHash ih, Token token, boolean isSeed) {
         if (_log.shouldLog(Log.INFO))
             _log.info("Sending announce of " + ih + " to: " + nInfo);
         Map<String, Object> map = new HashMap<String, Object>();
@@ -755,6 +761,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
         // port ignored
         args.put("port", Integer.valueOf(TrackerClient.PORT));
         args.put("token", token.getData());
+        args.put("seed", Integer.valueOf(isSeed ? 1 : 0));
         map.put("a", args);
         // an announce need not be signed, we have a token
         ReplyWaiter rv = sendQuery(nInfo, map, false);

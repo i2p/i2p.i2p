@@ -220,7 +220,9 @@ public class MetaInfo
         Object o = val.getValue();
         // Is it supposed to be a number or a string?
         // i2psnark does it as a string. BEP 27 doesn't say.
-        // Transmission does numbers.
+        // Transmission does numbers. So does libtorrent.
+        // We handle both as of 0.9.9.
+        // We switch to storing as number as of 0.9.14.
         privateTorrent = "1".equals(o) ||
                          ((o instanceof Number) && ((Number) o).intValue() == 1);
     } else {
@@ -621,7 +623,9 @@ public class MetaInfo
         info.put("name.utf-8", new BEValue(DataHelper.getUTF8(name_utf8)));
     // BEP 27
     if (privateTorrent)
-        info.put("private", new BEValue(DataHelper.getUTF8("1")));
+        // switched to number in 0.9.14
+        //info.put("private", new BEValue(DataHelper.getUTF8("1")));
+        info.put("private", new BEValue(Integer.valueOf(1)));
 
     info.put("piece length", new BEValue(Integer.valueOf(piece_length)));
     info.put("pieces", new BEValue(piece_hashes));
