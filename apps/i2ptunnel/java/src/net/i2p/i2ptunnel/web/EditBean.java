@@ -399,7 +399,7 @@ public class EditBean extends IndexBean {
 
     /** @since 0.9.12 */
     public boolean isAdvanced() {
-        return _context.getBooleanProperty("routerconsole.advanced");
+        return _context.getBooleanProperty(PROP_ADVANCED);
     }
 
     public String getI2CPHost(int tunnel) {
@@ -427,8 +427,8 @@ public class EditBean extends IndexBean {
         if (tun != null) {
             Properties opts = getOptions(tun);
             if (opts == null) return "";
-            boolean isMD5Proxy = "httpclient".equals(tun.getType()) ||
-                                 "connectclient".equals(tun.getType());
+            boolean isMD5Proxy = TunnelController.TYPE_HTTP_CLIENT.equals(tun.getType()) ||
+                                 TunnelController.TYPE_CONNECT.equals(tun.getType());
             Map<String, String> sorted = new TreeMap<String, String>();
             for (Map.Entry<Object, Object> e : opts.entrySet()) {
                 String key = (String)e.getKey();

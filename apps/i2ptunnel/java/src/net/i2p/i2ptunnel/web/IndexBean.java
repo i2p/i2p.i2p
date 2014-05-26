@@ -113,6 +113,7 @@ public class IndexBean {
     public static final String PROP_CSS_DISABLED = "routerconsole.css.disabled";
     public static final String PROP_JS_DISABLED = "routerconsole.javascript.disabled";
     private static final String PROP_PW_ENABLE = "routerconsole.auth.enable";
+    private static final String OPT = TunnelController.PFX_OPTION;
     
     public IndexBean() {
         _context = I2PAppContext.getGlobalContext();
@@ -445,13 +446,13 @@ public class IndexBean {
     }
 
     public static boolean isClient(String type) {
-        return ( ("client".equals(type)) || 
-        		("httpclient".equals(type)) ||
-        		("sockstunnel".equals(type)) ||
-        		("socksirctunnel".equals(type)) ||
-        		("connectclient".equals(type)) ||
-        		("streamrclient".equals(type)) ||
-        		("ircclient".equals(type)));
+        return ( (TunnelController.TYPE_STD_CLIENT.equals(type)) || 
+        		(TunnelController.TYPE_HTTP_CLIENT.equals(type)) ||
+        		(TunnelController.TYPE_SOCKS.equals(type)) ||
+        		(TunnelController.TYPE_SOCKS_IRC.equals(type)) ||
+        		(TunnelController.TYPE_CONNECT.equals(type)) ||
+        		(TunnelController.TYPE_STREAMR_CLIENT.equals(type)) ||
+        		(TunnelController.TYPE_IRC_CLIENT.equals(type)));
     }
     
     public String getTunnelName(int tunnel) {
@@ -514,18 +515,18 @@ public class IndexBean {
     }
     
     public String getTypeName(String internalType) {
-        if ("client".equals(internalType)) return _("Standard client");
-        else if ("httpclient".equals(internalType)) return _("HTTP/HTTPS client");
-        else if ("ircclient".equals(internalType)) return _("IRC client");
-        else if ("server".equals(internalType)) return _("Standard server");
-        else if ("httpserver".equals(internalType)) return _("HTTP server");
-        else if ("sockstunnel".equals(internalType)) return _("SOCKS 4/4a/5 proxy");
-        else if ("socksirctunnel".equals(internalType)) return _("SOCKS IRC proxy");
-        else if ("connectclient".equals(internalType)) return _("CONNECT/SSL/HTTPS proxy");
-        else if ("ircserver".equals(internalType)) return _("IRC server");
-        else if ("streamrclient".equals(internalType)) return _("Streamr client");
-        else if ("streamrserver".equals(internalType)) return _("Streamr server");
-        else if ("httpbidirserver".equals(internalType)) return _("HTTP bidir");
+        if (TunnelController.TYPE_STD_CLIENT.equals(internalType)) return _("Standard client");
+        else if (TunnelController.TYPE_HTTP_CLIENT.equals(internalType)) return _("HTTP/HTTPS client");
+        else if (TunnelController.TYPE_IRC_CLIENT.equals(internalType)) return _("IRC client");
+        else if (TunnelController.TYPE_STD_SERVER.equals(internalType)) return _("Standard server");
+        else if (TunnelController.TYPE_HTTP_SERVER.equals(internalType)) return _("HTTP server");
+        else if (TunnelController.TYPE_SOCKS.equals(internalType)) return _("SOCKS 4/4a/5 proxy");
+        else if (TunnelController.TYPE_SOCKS_IRC.equals(internalType)) return _("SOCKS IRC proxy");
+        else if (TunnelController.TYPE_CONNECT.equals(internalType)) return _("CONNECT/SSL/HTTPS proxy");
+        else if (TunnelController.TYPE_IRC_SERVER.equals(internalType)) return _("IRC server");
+        else if (TunnelController.TYPE_STREAMR_CLIENT.equals(internalType)) return _("Streamr client");
+        else if (TunnelController.TYPE_STREAMR_SERVER.equals(internalType)) return _("Streamr server");
+        else if (TunnelController.TYPE_HTTP_BIDIR_SERVER.equals(internalType)) return _("HTTP bidir");
         else return internalType;
     }
     
@@ -580,8 +581,9 @@ public class IndexBean {
         TunnelController tun = getController(tunnel);
         if (tun == null) return "";
         String rv;
-        if ("client".equals(tun.getType()) || "ircclient".equals(tun.getType()) ||
-            "streamrclient".equals(tun.getType()))
+        if (TunnelController.TYPE_STD_CLIENT.equals(tun.getType()) ||
+            TunnelController.TYPE_IRC_CLIENT.equals(tun.getType()) ||
+            TunnelController.TYPE_STREAMR_CLIENT.equals(tun.getType()))
             rv = tun.getTargetDestination();
         else
             rv = tun.getProxyList();
@@ -595,7 +597,7 @@ public class IndexBean {
     public boolean isServerTargetLinkValid(int tunnel) {
         TunnelController tun = getController(tunnel);
         return tun != null &&
-               "httpserver".equals(tun.getType()) &&
+               TunnelController.TYPE_HTTP_SERVER.equals(tun.getType()) &&
                tun.getTargetHost() != null &&
                tun.getTargetPort() != null;
     }
@@ -665,7 +667,7 @@ public class IndexBean {
     public boolean getIsUsingOutproxyPlugin(int tunnel) {
         TunnelController tun = getController(tunnel);
         if (tun != null) {
-            if ("httpclient".equals(tun.getType())) {
+            if (TunnelController.TYPE_HTTP_CLIENT.equals(tun.getType())) {
                 Properties opts = tun.getClientOptionProps();
                 if (Boolean.parseBoolean(opts.getProperty(I2PTunnelHTTPClient.PROP_USE_OUTPROXY_PLUGIN, "true"))) {
                     ClientAppManager mgr = _context.clientAppManager();
@@ -1100,9 +1102,9 @@ public class IndexBean {
                 String signerPKF = null;
                 for (int i = 0; i < getTunnelCount(); i++) {
                     TunnelController c = getController(i);
-                    if (_certSigner.equals(c.getConfig("").getProperty("name")) ||
-                        _certSigner.equals(c.getConfig("").getProperty("spoofedHost"))) {
-                        signerPKF = c.getConfig("").getProperty("privKeyFile");
+                    if (_certSigner.equals(c.getConfig("").getProperty(TunnelController.PROP_NAME)) ||
+                        _certSigner.equals(c.getConfig("").getProperty(TunnelController.PROP_SPOOFED_HOST))) {
+                        signerPKF = c.getConfig("").getProperty(TunnelController.PROP_FILE);
                         break;
                     }
                 }
@@ -1160,62 +1162,63 @@ public class IndexBean {
         Properties config = new Properties();
         updateConfigGeneric(config);
         
-        if ((isClient(_type) && !"streamrclient".equals(_type)) || "streamrserver".equals(_type)) {
+        if ((isClient(_type) && !TunnelController.TYPE_STREAMR_CLIENT.equals(_type)) ||
+            TunnelController.TYPE_STREAMR_SERVER.equals(_type)) {
             // streamrserver uses interface
             if (_reachableBy != null)
-                config.setProperty("interface", _reachableBy);
+                config.setProperty(TunnelController.PROP_INTFC, _reachableBy);
             else
-                config.setProperty("interface", "");
+                config.setProperty(TunnelController.PROP_INTFC, "");
         } else {
             // streamrclient uses targetHost
             if (_targetHost != null)
-                config.setProperty("targetHost", _targetHost);
+                config.setProperty(TunnelController.PROP_TARGET_HOST, _targetHost);
         }
 
         if (isClient(_type)) {
             // generic client stuff
             if (_port != null)
-                config.setProperty("listenPort", _port);
-            config.setProperty("sharedClient", _sharedClient + "");
+                config.setProperty(TunnelController.PROP_LISTEN_PORT, _port);
+            config.setProperty(TunnelController.PROP_SHARED, _sharedClient + "");
             for (String p : _booleanClientOpts)
-                config.setProperty("option." + p, "" + _booleanOptions.contains(p));
+                config.setProperty(OPT + p, "" + _booleanOptions.contains(p));
             for (String p : _otherClientOpts)
                 if (_otherOptions.containsKey(p))
-                    config.setProperty("option." + p, _otherOptions.get(p));
+                    config.setProperty(OPT + p, _otherOptions.get(p));
         } else {
             // generic server stuff
             if (_targetPort != null)
-                config.setProperty("targetPort", _targetPort);
+                config.setProperty(TunnelController.PROP_TARGET_PORT, _targetPort);
             for (String p : _booleanServerOpts)
-                config.setProperty("option." + p, "" + _booleanOptions.contains(p));
+                config.setProperty(OPT + p, "" + _booleanOptions.contains(p));
             for (String p : _otherServerOpts)
                 if (_otherOptions.containsKey(p))
-                    config.setProperty("option." + p, _otherOptions.get(p));
+                    config.setProperty(OPT + p, _otherOptions.get(p));
         }
 
         // generic proxy stuff
-        if ("httpclient".equals(_type) || "connectclient".equals(_type) || 
-            "sockstunnel".equals(_type) ||"socksirctunnel".equals(_type)) {
+        if (TunnelController.TYPE_HTTP_CLIENT.equals(_type) || TunnelController.TYPE_CONNECT.equals(_type) || 
+            TunnelController.TYPE_SOCKS.equals(_type) ||TunnelController.TYPE_SOCKS_IRC.equals(_type)) {
             for (String p : _booleanProxyOpts)
-                config.setProperty("option." + p, "" + _booleanOptions.contains(p));
+                config.setProperty(OPT + p, "" + _booleanOptions.contains(p));
             if (_proxyList != null)
-                config.setProperty("proxyList", _proxyList);
+                config.setProperty(TunnelController.PROP_PROXIES, _proxyList);
         }
 
         // Proxy auth including migration to MD5
-        if ("httpclient".equals(_type) || "connectclient".equals(_type)) {
+        if (TunnelController.TYPE_HTTP_CLIENT.equals(_type) || TunnelController.TYPE_CONNECT.equals(_type)) {
             // Migrate even if auth is disabled
             // go get the old from custom options that updateConfigGeneric() put in there
-            String puser = "option." + I2PTunnelHTTPClientBase.PROP_USER;
+            String puser = OPT + I2PTunnelHTTPClientBase.PROP_USER;
             String user = config.getProperty(puser);
-            String ppw = "option." + I2PTunnelHTTPClientBase.PROP_PW;
+            String ppw = OPT + I2PTunnelHTTPClientBase.PROP_PW;
             String pw = config.getProperty(ppw);
             if (user != null && pw != null && user.length() > 0 && pw.length() > 0) {
-                String pmd5 = "option." + I2PTunnelHTTPClientBase.PROP_PROXY_DIGEST_PREFIX +
+                String pmd5 = OPT + I2PTunnelHTTPClientBase.PROP_PROXY_DIGEST_PREFIX +
                               user + I2PTunnelHTTPClientBase.PROP_PROXY_DIGEST_SUFFIX;
                 if (config.getProperty(pmd5) == null) {
                     // not in there, migrate
-                    String realm = _type.equals("httpclient") ? I2PTunnelHTTPClient.AUTH_REALM
+                    String realm = _type.equals(TunnelController.TYPE_HTTP_CLIENT) ? I2PTunnelHTTPClient.AUTH_REALM
                                                               : I2PTunnelConnectClient.AUTH_REALM;
                     String hex = PasswordManager.md5Hex(realm, user, pw);
                     if (hex != null) {
@@ -1230,9 +1233,9 @@ public class IndexBean {
             if (auth != null && !auth.equals("false")) {
                 if (_newProxyUser != null && _newProxyPW != null &&
                     _newProxyUser.length() > 0 && _newProxyPW.length() > 0) {
-                    String pmd5 = "option." + I2PTunnelHTTPClientBase.PROP_PROXY_DIGEST_PREFIX +
+                    String pmd5 = OPT + I2PTunnelHTTPClientBase.PROP_PROXY_DIGEST_PREFIX +
                                   _newProxyUser + I2PTunnelHTTPClientBase.PROP_PROXY_DIGEST_SUFFIX;
-                    String realm = _type.equals("httpclient") ? I2PTunnelHTTPClient.AUTH_REALM
+                    String realm = _type.equals(TunnelController.TYPE_HTTP_CLIENT) ? I2PTunnelHTTPClient.AUTH_REALM
                                                               : I2PTunnelConnectClient.AUTH_REALM;
                     String hex = PasswordManager.md5Hex(realm, _newProxyUser, _newProxyPW);
                     if (hex != null)
@@ -1241,37 +1244,40 @@ public class IndexBean {
             }
         }
 
-        if ("ircclient".equals(_type) || "client".equals(_type) || "streamrclient".equals(_type)) {
+        if (TunnelController.TYPE_IRC_CLIENT.equals(_type) ||
+            TunnelController.TYPE_STD_CLIENT.equals(_type) ||
+            TunnelController.TYPE_STREAMR_CLIENT.equals(_type)) {
             if (_targetDestination != null)
-                config.setProperty("targetDestination", _targetDestination);
-        } else if ("httpserver".equals(_type) || "httpbidirserver".equals(_type)) {
+                config.setProperty(TunnelController.PROP_DEST, _targetDestination);
+        } else if (TunnelController.TYPE_HTTP_SERVER.equals(_type) ||
+                   TunnelController.TYPE_HTTP_BIDIR_SERVER.equals(_type)) {
             if (_spoofedHost != null)
-                config.setProperty("spoofedHost", _spoofedHost);
+                config.setProperty(TunnelController.PROP_SPOOFED_HOST, _spoofedHost);
             for (String p : _httpServerOpts)
                 if (_otherOptions.containsKey(p))
-                    config.setProperty("option." + p, _otherOptions.get(p));
+                    config.setProperty(OPT + p, _otherOptions.get(p));
         }
-        if ("httpbidirserver".equals(_type)) {
+        if (TunnelController.TYPE_HTTP_BIDIR_SERVER.equals(_type)) {
             if (_port != null)
-                config.setProperty("listenPort", _port);
+                config.setProperty(TunnelController.PROP_LISTEN_PORT, _port);
             if (_reachableBy != null)
-                config.setProperty("interface", _reachableBy);
+                config.setProperty(TunnelController.PROP_INTFC, _reachableBy);
             else if (_targetHost != null)
-                config.setProperty("interface", _targetHost);
+                config.setProperty(TunnelController.PROP_INTFC, _targetHost);
             else
-                config.setProperty("interface", "");
+                config.setProperty(TunnelController.PROP_INTFC, "");
         }
 
-        if ("ircclient".equals(_type)) {
+        if (TunnelController.TYPE_IRC_CLIENT.equals(_type)) {
             boolean dcc = _booleanOptions.contains(I2PTunnelIRCClient.PROP_DCC);
-            config.setProperty("option." + I2PTunnelIRCClient.PROP_DCC,
+            config.setProperty(OPT + I2PTunnelIRCClient.PROP_DCC,
                                "" + dcc);
             // add some sane server options since they aren't in the GUI (yet)
             if (dcc) {
-                config.setProperty("option." + PROP_MAX_CONNS_MIN, "3");
-                config.setProperty("option." + PROP_MAX_CONNS_HOUR, "10");
-                config.setProperty("option." + PROP_MAX_TOTAL_CONNS_MIN, "5");
-                config.setProperty("option." + PROP_MAX_TOTAL_CONNS_HOUR, "25");
+                config.setProperty(OPT + PROP_MAX_CONNS_MIN, "3");
+                config.setProperty(OPT + PROP_MAX_CONNS_HOUR, "10");
+                config.setProperty(OPT + PROP_MAX_TOTAL_CONNS_MIN, "5");
+                config.setProperty(OPT + PROP_MAX_TOTAL_CONNS_HOUR, "25");
             }
         }
 
@@ -1346,22 +1352,22 @@ public class IndexBean {
     }
 
     private void updateConfigGeneric(Properties config) {
-        config.setProperty("type", _type);
+        config.setProperty(TunnelController.PROP_TYPE, _type);
         if (_name != null)
-            config.setProperty("name", _name);
+            config.setProperty(TunnelController.PROP_NAME, _name);
         if (_description != null)
-            config.setProperty("description", _description);
+            config.setProperty(TunnelController.PROP_DESCR, _description);
         if (!_context.isRouterContext()) {
             if (_i2cpHost != null)
-                config.setProperty("i2cpHost", _i2cpHost);
+                config.setProperty(TunnelController.PROP_I2CP_HOST, _i2cpHost);
             if ( (_i2cpPort != null) && (_i2cpPort.trim().length() > 0) ) {
-                config.setProperty("i2cpPort", _i2cpPort);
+                config.setProperty(TunnelController.PROP_I2CP_PORT, _i2cpPort);
             } else {
-                config.setProperty("i2cpPort", "7654");
+                config.setProperty(TunnelController.PROP_I2CP_PORT, "7654");
             }
         }
         if (_privKeyFile != null)
-            config.setProperty("privKeyFile", _privKeyFile);
+            config.setProperty(TunnelController.PROP_FILE, _privKeyFile);
         
         if (_customOptions != null) {
             StringTokenizer tok = new StringTokenizer(_customOptions);
@@ -1375,16 +1381,16 @@ public class IndexBean {
                     continue;
                 // leave in for HTTP and Connect so it can get migrated to MD5
                 // hide for SOCKS until migrated to MD5
-                if ((!"httpclient".equals(_type)) &&
-                    (! "connectclient".equals(_type)) &&
+                if ((!TunnelController.TYPE_HTTP_CLIENT.equals(_type)) &&
+                    (!TunnelController.TYPE_CONNECT.equals(_type)) &&
                     _nonProxyNoShowSet.contains(key))
                     continue;
                 String val = pair.substring(eq+1);
-                config.setProperty("option." + key, val);
+                config.setProperty(OPT + key, val);
             }
         }
 
-        config.setProperty("startOnLoad", _startOnLoad + "");
+        config.setProperty(TunnelController.PROP_START, _startOnLoad + "");
 
         if (_tunnelQuantity != null) {
             config.setProperty("option.inbound.quantity", _tunnelQuantity);

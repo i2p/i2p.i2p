@@ -45,6 +45,45 @@ public class TunnelController implements Logging {
     
     public static final String KEY_BACKUP_DIR = "i2ptunnel-keyBackup";
 
+    /** all of these @since 0.9.14 */
+    public static final String PROP_DESCR = "description";
+    public static final String PROP_DEST = "targetDestination";
+    public static final String PROP_I2CP_HOST = "i2cpHost";
+    public static final String PROP_I2CP_PORT = "i2cpPort";
+    public static final String PROP_INTFC = "interface";
+    public static final String PROP_FILE = "privKeyFile";
+    public static final String PROP_LISTEN_PORT = "listenPort";
+    public static final String PROP_NAME = "name";
+    public static final String PROP_PROXIES = "proxyList";
+    public static final String PROP_SHARED = "sharedClient";
+    public static final String PROP_SPOOFED_HOST = "spoofedHost";
+    public static final String PROP_START = "startOnLoad";
+    public static final String PROP_TARGET_HOST = "targetHost";
+    public static final String PROP_TARGET_PORT = "targetPort";
+    public static final String PROP_TYPE = "type";
+
+    /** @since 0.9.14 */
+    public static final String PFX_OPTION = "option.";
+
+    private static final String OPT_PERSISTENT = PFX_OPTION + "persistentClientKey";
+    private static final String OPT_BUNDLE_REPLY = PFX_OPTION + "shouldBundleReplyInfo";
+    private static final String OPT_TAGS_SEND = PFX_OPTION + "crypto.tagsToSend";
+    private static final String OPT_LOW_TAGS = PFX_OPTION + "crypto.lowTagThreshold";
+
+    /** all of these @since 0.9.14 */
+    public static final String TYPE_CONNECT = "connectclient";
+    public static final String TYPE_HTTP_BIDIR_SERVER = "httpbidirserver";
+    public static final String TYPE_HTTP_CLIENT = "httpclient";
+    public static final String TYPE_HTTP_SERVER = "httpserver";
+    public static final String TYPE_IRC_CLIENT = "ircclient";
+    public static final String TYPE_IRC_SERVER = "ircserver";
+    public static final String TYPE_SOCKS = "sockstunnel";
+    public static final String TYPE_SOCKS_IRC = "socksirctunnel";
+    public static final String TYPE_STD_CLIENT = "client";
+    public static final String TYPE_STD_SERVER = "server";
+    public static final String TYPE_STREAMR_CLIENT = "streamrclient";
+    public static final String TYPE_STREAMR_SERVER = "streamrserver";
+
     /**
      * Create a new controller for a tunnel out of the specific config options.
      * The config may contain a large number of options - only ones that begin in
@@ -104,7 +143,7 @@ public class TunnelController implements Logging {
         try {
             fos = new SecureFileOutputStream(keyFile);
             SigType stype = I2PClient.DEFAULT_SIGTYPE;
-            String st = _config.getProperty("option." + I2PClient.PROP_SIGTYPE);
+            String st = _config.getProperty(PFX_OPTION + I2PClient.PROP_SIGTYPE);
             if (st != null) {
                 SigType type = SigType.parseSigType(st);
                 if (type != null)
@@ -193,29 +232,29 @@ public class TunnelController implements Logging {
         }
         setI2CPOptions();
         setSessionOptions();
-        if ("httpclient".equals(type)) {
+        if (TYPE_HTTP_CLIENT.equals(type)) {
             startHttpClient();
-        } else if("ircclient".equals(type)) {
+        } else if(TYPE_IRC_CLIENT.equals(type)) {
             startIrcClient();
-        } else if("sockstunnel".equals(type)) {
+        } else if(TYPE_SOCKS.equals(type)) {
             startSocksClient();
-        } else if("socksirctunnel".equals(type)) {
+        } else if(TYPE_SOCKS_IRC.equals(type)) {
             startSocksIRCClient();
-        } else if("connectclient".equals(type)) {
+        } else if(TYPE_CONNECT.equals(type)) {
             startConnectClient();
-        } else if ("client".equals(type)) {
+        } else if (TYPE_STD_CLIENT.equals(type)) {
             startClient();
-        } else if ("streamrclient".equals(type)) {
+        } else if (TYPE_STREAMR_CLIENT.equals(type)) {
             startStreamrClient();
-        } else if ("server".equals(type)) {
+        } else if (TYPE_STD_SERVER.equals(type)) {
             startServer();
-        } else if ("httpserver".equals(type)) {
+        } else if (TYPE_HTTP_SERVER.equals(type)) {
             startHttpServer();
-        } else if ("httpbidirserver".equals(type)) {
+        } else if (TYPE_HTTP_BIDIR_SERVER.equals(type)) {
             startHttpBidirServer();
-        } else if ("ircserver".equals(type)) {
+        } else if (TYPE_IRC_SERVER.equals(type)) {
             startIrcServer();
-        } else if ("streamrserver".equals(type)) {
+        } else if (TYPE_STREAMR_SERVER.equals(type)) {
             startStreamrServer();
         } else {
             if (_log.shouldLog(Log.ERROR))
@@ -428,8 +467,8 @@ public class TunnelController implements Logging {
         Properties opts = new Properties();
         for (Map.Entry<Object, Object> e : _config.entrySet()) {
             String key = (String) e.getKey();
-            if (key.startsWith("option.")) {
-                key = key.substring("option.".length());
+            if (key.startsWith(PFX_OPTION)) {
+                key = key.substring(PFX_OPTION.length());
                 String val = (String) e.getValue();
                 opts.setProperty(key, val);
             }
@@ -444,11 +483,11 @@ public class TunnelController implements Logging {
         // as a "spoofed" option. Since 0.9.9.
         String target = getTargetDestination();
         if (target != null)
-            opts.setProperty("targetDestination", target);
+            opts.setProperty(PROP_DEST, target);
         // Ditto outproxy list. Since 0.9.12.
         String proxies = getProxyList();
         if (proxies != null)
-            opts.setProperty("proxyList", proxies);
+            opts.setProperty(PROP_PROXIES, proxies);
         _tunnel.setClientOptions(opts);
     }
     
@@ -504,15 +543,15 @@ public class TunnelController implements Logging {
         // is done in the I2PTunnelServer constructor.
         String type = getType();
         if (type != null) {
-            if (type.equals("httpserver") || type.equals("streamrserver")) {
-                if (!_config.containsKey("option.shouldBundleReplyInfo"))
-                    _config.setProperty("option.shouldBundleReplyInfo", "false");
-            } else if (type.contains("irc") || type.equals("streamrclient")) {
+            if (type.equals(TYPE_HTTP_SERVER) || type.equals(TYPE_STREAMR_SERVER)) {
+                if (!_config.containsKey(OPT_BUNDLE_REPLY))
+                    _config.setProperty(OPT_BUNDLE_REPLY, "false");
+            } else if (type.contains("irc") || type.equals(TYPE_STREAMR_CLIENT)) {
                 // maybe a bad idea for ircclient if DCC is enabled
-                if (!_config.containsKey("option.crypto.tagsToSend"))
-                    _config.setProperty("option.crypto.tagsToSend", "20");
-                if (!_config.containsKey("option.crypto.lowTagThreshold"))
-                    _config.setProperty("option.crypto.lowTagThreshold", "14");
+                if (!_config.containsKey(OPT_TAGS_SEND))
+                    _config.setProperty(OPT_TAGS_SEND, "20");
+                if (!_config.containsKey(OPT_LOW_TAGS))
+                    _config.setProperty(OPT_LOW_TAGS, "14");
             }
         }
 
@@ -541,11 +580,11 @@ public class TunnelController implements Logging {
         return rv;
     }
 
-    public String getType() { return _config.getProperty("type"); }
-    public String getName() { return _config.getProperty("name"); }
-    public String getDescription() { return _config.getProperty("description"); }
-    public String getI2CPHost() { return _config.getProperty("i2cpHost"); }
-    public String getI2CPPort() { return _config.getProperty("i2cpPort"); }
+    public String getType() { return _config.getProperty(PROP_TYPE); }
+    public String getName() { return _config.getProperty(PROP_NAME); }
+    public String getDescription() { return _config.getProperty(PROP_DESCR); }
+    public String getI2CPHost() { return _config.getProperty(PROP_I2CP_HOST); }
+    public String getI2CPPort() { return _config.getProperty(PROP_I2CP_PORT); }
 
     /**
      *  These are the ones with a prefix of "option."
@@ -557,8 +596,8 @@ public class TunnelController implements Logging {
         StringBuilder opts = new StringBuilder(64);
         for (Map.Entry<Object, Object> e : _config.entrySet()) {
             String key = (String) e.getKey();
-            if (key.startsWith("option.")) {
-                key = key.substring("option.".length());
+            if (key.startsWith(PFX_OPTION)) {
+                key = key.substring(PFX_OPTION.length());
                 String val = (String) e.getValue();
                 if (opts.length() > 0) opts.append(' ');
                 opts.append(key).append('=').append(val);
@@ -567,19 +606,19 @@ public class TunnelController implements Logging {
         return opts.toString();
     }
 
-    public String getListenOnInterface() { return _config.getProperty("interface"); }
-    public String getTargetHost() { return _config.getProperty("targetHost"); }
-    public String getTargetPort() { return _config.getProperty("targetPort"); }
-    public String getSpoofedHost() { return _config.getProperty("spoofedHost"); }
-    public String getPrivKeyFile() { return _config.getProperty("privKeyFile"); }
-    public String getListenPort() { return _config.getProperty("listenPort"); }
-    public String getTargetDestination() { return _config.getProperty("targetDestination"); }
-    public String getProxyList() { return _config.getProperty("proxyList"); }
+    public String getListenOnInterface() { return _config.getProperty(PROP_INTFC); }
+    public String getTargetHost() { return _config.getProperty(PROP_TARGET_HOST); }
+    public String getTargetPort() { return _config.getProperty(PROP_TARGET_PORT); }
+    public String getSpoofedHost() { return _config.getProperty(PROP_SPOOFED_HOST); }
+    public String getPrivKeyFile() { return _config.getProperty(PROP_FILE); }
+    public String getListenPort() { return _config.getProperty(PROP_LISTEN_PORT); }
+    public String getTargetDestination() { return _config.getProperty(PROP_DEST); }
+    public String getProxyList() { return _config.getProperty(PROP_PROXIES); }
     /** default true */
-    public String getSharedClient() { return _config.getProperty("sharedClient", "true"); }
+    public String getSharedClient() { return _config.getProperty(PROP_SHARED, "true"); }
     /** default true */
-    public boolean getStartOnLoad() { return Boolean.parseBoolean(_config.getProperty("startOnLoad", "true")); }
-    public boolean getPersistentClientKey() { return Boolean.parseBoolean(_config.getProperty("option.persistentClientKey")); }
+    public boolean getStartOnLoad() { return Boolean.parseBoolean(_config.getProperty(PROP_START, "true")); }
+    public boolean getPersistentClientKey() { return Boolean.parseBoolean(_config.getProperty(OPT_PERSISTENT)); }
 
     public String getMyDestination() {
         if (_tunnel != null) {
