@@ -854,8 +854,7 @@ public class TrackerClient implements Runnable {
        return false;
     }
     return url.getProtocol().equals("http") &&
-           (url.getHost().endsWith(".i2p") || url.getHost().equals("i2p")) &&
-           url.getPort() < 0;
+           (url.getHost().endsWith(".i2p") || url.getHost().equals("i2p"));
   }
 
   /**
