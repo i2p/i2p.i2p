@@ -381,7 +381,7 @@ public class I2PSnarkServlet extends BasicServlet {
         String ua = req.getHeader("User-Agent");
         boolean isDegraded = ua != null && (ua.startsWith("Lynx") || ua.startsWith("w3m") ||
                                             ua.startsWith("ELinks") || ua.startsWith("Links") ||
-                                            ua.startsWith("Dillo"));
+                                            ua.startsWith("Dillo") || ua.startsWith("Emacs-w3m"));
         boolean noThinsp = isDegraded || (ua != null && ua.startsWith("Opera"));
 
         // pages

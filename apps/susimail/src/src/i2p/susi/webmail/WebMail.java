@@ -1502,7 +1502,7 @@ public class WebMail extends HttpServlet
                                // text
                               (ua.startsWith("Lynx") || ua.startsWith("w3m") ||
                                ua.startsWith("ELinks") || ua.startsWith("Links") ||
-                               ua.startsWith("Dillo") ||
+                               ua.startsWith("Dillo") || ua.startsWith("Emacs-w3m") ||
                                // mobile
                                // http://www.zytrax.com/tech/web/mobile_ids.html
                                // Android tablet UAs don't have "Mobile" in them
