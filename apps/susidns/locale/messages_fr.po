@@ -17,7 +17,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-02-06 18:27+0000\n"
-"PO-Revision-Date: 2014-02-19 16:09+0000\n"
+"PO-Revision-Date: 2014-04-30 06:52+0000\n"
 "Last-Translator: Towatowa441\n"
 "Language-Team: French (http://www.transifex.com/projects/p/I2P/language/fr/)\n"
 "MIME-Version: 1.0\n"
@@ -626,7 +626,7 @@ msgstr "Elle actualise votre fichier hosts.txt à intervalle régulier à partir
 msgid ""
 "In the default configuration, the address book is only subscribed to "
 "www.i2p2.i2p."
-msgstr "Dans sa configuration par défaut, le carnet d'adresses est seulement abonné à www.i2p2.i2p."
+msgstr "Dans sa configuration par défaut, le carnet d'adresses est abonné seulement à www.i2p2.i2p."
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:138
 msgid ""
@@ -702,7 +702,7 @@ msgstr "Ces URLs font référence aux fichiers hosts.txt des autres utilisateurs
 msgid ""
 "The default subscription is the hosts.txt from www.i2p2.i2p, which is "
 "updated infrequently."
-msgstr "L'abonnement par défaut est le fichier hosts.txt de www.i2p2.i2p, mais il est très peu actualisé."
+msgstr "L'abonnement par défaut est le fichier hosts.txt de www.i2p2.i2p, mais il est très peu souvent actualisé."
 
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:151
 msgid ""

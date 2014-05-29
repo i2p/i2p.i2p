@@ -237,9 +237,15 @@ public class POP3MailBox implements NewMailListener {
 			Integer idObj = Integer.valueOf(id);
 			ReadBuffer body = null;
 			if (id >= 1 && id <= mails) {
-				body = sendCmdN( "RETR " + id );
-				if (body == null)
-					Debug.debug( Debug.DEBUG, "RETR returned null" );
+				try {
+					body = sendCmdN( "RETR " + id );
+					if (body == null)
+						Debug.debug( Debug.DEBUG, "RETR returned null" );
+				} catch (OutOfMemoryError oom) {
+					Debug.debug( Debug.ERROR, "OOM fetching mail" );
+					lastError = oom.toString();
+					close();
+				}
 			}
 			else {
 				lastError = "Message id out of range.";

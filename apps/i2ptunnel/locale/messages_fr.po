@@ -15,7 +15,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-02-06 18:27+0000\n"
-"PO-Revision-Date: 2014-03-13 20:13+0000\n"
+"PO-Revision-Date: 2014-05-11 17:33+0000\n"
 "Last-Translator: Towatowa441\n"
 "Language-Team: French (http://www.transifex.com/projects/p/I2P/language/fr/)\n"
 "MIME-Version: 1.0\n"
@@ -896,13 +896,13 @@ msgstr "La première chose à décider est de savoir si vous voulez créer un se
 msgid ""
 "If you need to connect to a remote service, such as an IRC server inside I2P"
 " or a code repository, then you will require a CLIENT tunnel."
-msgstr "Si vous avez besoin de se connecter à un service distant, comme un serveur IRC intérieur I2P ou un code repository (site d'hébergement de code source), alors vous aurez besoin d'un tunnel CLIENT."
+msgstr "Si vous avez besoin de vous connecter à un service distant, tel qu'un serveur IRC à l'intérieur de I2P ou un code repository (site d'hébergement de code source), alors vous aurez besoin d'un tunnel CLIENT."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:195
 msgid ""
 "On the other hand, if you wish to host a service for others to connect to "
 "you'll need to create a SERVER tunnel."
-msgstr "D'autre part, si vous souhaitez héberger un service pour se connecter à d'autres, vous aurez besoin de créer un tunnel SERVEUR."
+msgstr "D'autre part, si vous souhaitez héberger un service afin que d'autres se connectent à vous, alors vous aurez besoin de créer un tunnel SERVEUR."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:197
 msgid "Server Tunnel"
@@ -925,7 +925,7 @@ msgstr "Tunnel de base pour la connexion à un service unique à l'intérieur de
 msgid ""
 "Try this if none of the tunnel types below fit your requirements, or you "
 "don't know what type of tunnel you need."
-msgstr "Essayez ceci si aucun des types de tunnel ci-dessous ne convient à vos besoins, ou vous ne savez pas de quel type de tunnel que vous avez besoin."
+msgstr "Essayez ceci si aucun des types de tunnel ci-dessous ne convient à vos besoins, ou vous ne savez pas de quel type de tunnel vous avez besoin."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:229
 msgid "Tunnel that acts as an HTTP proxy for reaching eepsites inside I2P."
@@ -1016,7 +1016,7 @@ msgstr "Un tunnel de serveur de base pour héberger un service générique à l'
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:271
 msgid "A server tunnel that is customised for HTTP connections."
-msgstr "Un tunnel de serveur qui est adapté pour les connexions HTTP."
+msgstr "Un tunnel de serveur qui est adapté aux connexions HTTP."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:273
 msgid "Use this tunnel type if you want to host an eepsite."
@@ -1030,17 +1030,17 @@ msgstr "Un tunnel serveur personnalisé qui peut à la fois servir des données 
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:277
 msgid "This tunnel type is predominantly used when running a Seedless server."
-msgstr "Ce type de tunnel est principalement utilisé lors de l'exécution d'un serveur sans pépins (seedless)."
+msgstr "Ce type de tunnel est principalement utilisé lors de l'exécution d'un serveur Seedless."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:279
 msgid "A customised server tunnel for hosting IRC networks inside I2P."
-msgstr "Un tunnel serveur personnalisées pour l'hébergement de réseaux IRC à l'intérieur de I2P."
+msgstr "Un tunnel serveur personnalisé afin d'héberger des réseaux IRC à l'intérieur de I2P."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:281
 msgid ""
 "Usually, a separate tunnel needs to be created for each IRC server that is "
 "to be accessible inside I2P."
-msgstr "Habituellement, un tunnel séparé doit être créé pour chaque serveur IRC qui doit être accessible à l'intérieur de I2P."
+msgstr "Habituellement, un tunnel séparé doit être créé pour chaque serveur IRC devant être accessible à l'intérieur de I2P."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:283
 msgid "A customised server tunnel for Streamr."
@@ -1054,7 +1054,7 @@ msgstr "Choisir un nom et une description pour votre tunnel."
 msgid ""
 "These can be anything you want - they are just for ease of identifying the "
 "tunnel in the routerconsole."
-msgstr "Ceux-ci peuvent être tout ce que vous voulez - ils sont juste pour faciliter l'identification du tunnel dans la console routeur."
+msgstr "Ceux-ci peuvent être tout ce que vous voulez - ils sont simplement là pour faciliter l'identification du tunnel dans la console routeur."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:354
 msgid ""
@@ -1117,7 +1117,7 @@ msgid ""
 "This can be useful for frequently-used tunnels (especially server tunnels), "
 "but for tunnels that are only used occassionally it would mean that the I2P "
 "router is creating and maintaining unnecessary tunnels."
-msgstr "Cela peut être utile pour les tunnels fréquemment utilisés (en particulier les tunnels serveur), mais pour les tunnels qui sont seulement utilisées occasionnellement, cela signifierait que le routeur I2P crée et maintien des tunnels inutiles."
+msgstr "Cela peut être utile pour les tunnels fréquemment utilisés (en particulier les tunnels serveur), mais pour les tunnels qui sont seulement utilisées occasionnellement, cela signifierait que le routeur I2P crée et maintient des tunnels inutiles."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:546
 msgid "The wizard has now collected enough information to create your tunnel."
@@ -1166,7 +1166,7 @@ msgid ""
 "The wizard will set reasonably sensible default values for these, but you "
 "can view and/or edit these by clicking on the tunnel's name in the main "
 "I2PTunnel page."
-msgstr "L'assistant va définir des valeurs par défaut plus raisonnable pour ces derniers, mais vous pouvez consulter et / ou modifier celles-ci en cliquant sur le nom du tunnel dans la page principale I2PTunnel."
+msgstr "L'assistant va définir des valeurs par défaut plus raisonnables pour ces derniers, mais vous pouvez consulter et/ou modifier celles-ci en cliquant sur le nom du tunnel dans la page principale I2PTunnel."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:707
 msgid "Previous"

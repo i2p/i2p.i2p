@@ -1,3 +1,39 @@
+* 2014-05-22 0.9.13 released
+
+2014-05-20 zzz
+ * Fixes after code review
+ * SSU: Fix peer test deadlock (ticket #1286)
+
+2014-05-15 kytv
+ * Translations, imported from Transifex:
+   - Dutch, French, German, Italian, Japanese, Norwegian Bokmål, and Ukrainian
+     translation updates
+   - Start of Slovak language translation
+ * Updates to geoip.txt and geoipv6.dat.gz based on Maxmind GeoLite Country
+   database from 2014-05-06.
+
+2014-05-14 kytv
+ * Update the UserAgent that we send for users that go out through the outproxy
+   to match that of the current Tor Browser Bundle.
+
+2014-05-13 zzz
+ * BOB, SAM, i2psnark: Fix datagram NPE (ticket #1275)
+ * i2psnark: Escaping fixes on details page
+ * SusiMail:
+   - Fix AIOOBE (ticket #1269)
+   - Don't let an exception on one mail break others
+
+2014-05-10 zzz
+ * NTCP: Fix NPE (ticket #996)
+ * SusiMail: Remove deleted mails from memory
+
+2014-05-09 zzz
+ * SusiMail: Add more locking (ticket #1269)
+
+2014-05-08 zzz
+ * i2psnark: Add log message if directory does not exist (ticket #1263)
+ * i2ptunnel: Display warning for duplicate client ports (ticket #1265)
+
 2014-05-07 zzz
  * Console:
    - Add hiddengate.i2p

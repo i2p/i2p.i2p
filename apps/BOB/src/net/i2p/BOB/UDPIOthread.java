@@ -106,8 +106,10 @@ public class UDPIOthread implements I2PSessionListener, Runnable {
 		//		_log.debug("Message available: id = " + msgId + " size = " + size);
 		try {
 			byte msg[] = session.receiveMessage(msgId);
-			out.write(msg);
-			out.flush();
+			if (msg != null) {
+				out.write(msg);
+				out.flush();
+			}
 		} catch (I2PSessionException ise) {
 			up = false;
 		} catch (IOException ioe) {

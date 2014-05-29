@@ -2,26 +2,26 @@
 # Copyright (C) 2009 The I2P Project
 # This file is distributed under the same license as the i2ptunnel package.
 # To contribute translations, see http://www.i2p2.de/newdevelopers
-#
+# 
 # Translators:
-#   <badcluster@i2pmail.org>, 2012.
-#   <bovas85@gmail.com>, 2012.
-#   <colomboi2p@ymail.com>, 2012.
-#   <jokjok@hotmail.it>, 2011.
-# Tony Goodyear <fswitch20@hotmail.com>, 2012.
+# BadCluster <badcluster@i2pmail.org>, 2012
+# Leelium <bovas85@gmail.com>, 2012
+#   <colomboi2p@ymail.com>, 2012
+# giuseppep <anubisteam01@gmail.com>, 2014
+# mkkid <jokjok@hotmail.it>, 2011
+# Tony Goodyear <fswitch20@hotmail.com>, 2012
 msgid ""
 msgstr ""
-"Project-Id-Version: I2P i2ptunnel\n"
+"Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-12-01 20:02+0000\n"
-"PO-Revision-Date: 2012-11-18 22:16+0000\n"
-"Last-Translator: Tony Goodyear <fswitch20@hotmail.com>\n"
-"Language-Team: Italian (http://www.transifex.com/projects/p/I2P/language/"
-"it/)\n"
-"Language: it\n"
+"POT-Creation-Date: 2014-02-06 18:27+0000\n"
+"PO-Revision-Date: 2014-04-21 22:54+0000\n"
+"Last-Translator: giuseppep <anubisteam01@gmail.com>\n"
+"Language-Team: Italian (http://www.transifex.com/projects/p/I2P/language/it/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: it\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: ../java/build/Proxy.java:5 ../java/build/Proxy.java:11
@@ -97,8 +97,8 @@ msgstr ""
 #: ../java/build/Proxy.java:15
 #, java-format
 msgid ""
-"If you continue to have trouble you may want to edit your outproxy list {0}"
-"here{1}."
+"If you continue to have trouble you may want to edit your outproxy list "
+"{0}here{1}."
 msgstr ""
 
 #: ../java/build/Proxy.java:16 ../java/build/Proxy.java:38
@@ -108,11 +108,11 @@ msgstr "Destinazione tunnel"
 
 #: ../java/build/Proxy.java:17
 msgid "Error: Request Denied"
-msgstr ""
+msgstr "Errore: Richiesta negata"
 
 #: ../java/build/Proxy.java:23
 msgid "Error: Local Access"
-msgstr ""
+msgstr "Errore: Accesso locale"
 
 #: ../java/build/Proxy.java:24
 msgid "Your browser is misconfigured."
@@ -147,8 +147,8 @@ msgstr ""
 
 #: ../java/build/Proxy.java:36
 msgid ""
-"Otherwise, find a Base 32 or address helper link, or use a jump service link "
-"below."
+"Otherwise, find a Base 32 or address helper link, or use a jump service link"
+" below."
 msgstr ""
 
 #: ../java/build/Proxy.java:37
@@ -184,8 +184,8 @@ msgstr ""
 
 #: ../java/build/Proxy.java:56
 msgid ""
-"Perhaps you pasted in the wrong Base 64 string or the link you are following "
-"is bad."
+"Perhaps you pasted in the wrong Base 64 string or the link you are following"
+" is bad."
 msgstr ""
 
 #: ../java/build/Proxy.java:57
@@ -231,8 +231,8 @@ msgstr ""
 
 #: ../java/build/Proxy.java:85
 msgid ""
-"Someone could be trying to impersonate another eepsite, or people have given "
-"two eepsites identical names."
+"Someone could be trying to impersonate another eepsite, or people have given"
+" two eepsites identical names."
 msgstr ""
 
 #: ../java/build/Proxy.java:86
@@ -251,7 +251,8 @@ msgid "I2P HTTP Proxy Authorization Required"
 msgstr "Autorizzazione Outproxy"
 
 #: ../java/build/Proxy.java:89
-msgid "This proxy is configured to require a username and password for access."
+msgid ""
+"This proxy is configured to require a username and password for access."
 msgstr ""
 
 #: ../java/build/Proxy.java:90
@@ -264,8 +265,9 @@ msgstr ""
 #: ../java/build/Proxy.java:91
 #, java-format
 msgid ""
-"To disable authorization, remove the configuration {0}i2ptunnel.proxy."
-"auth=basic{1}, then stop and restart the HTTP Proxy tunnel."
+"To disable authorization, remove the configuration "
+"{0}i2ptunnel.proxy.auth=basic{1}, then stop and restart the HTTP Proxy "
+"tunnel."
 msgstr ""
 
 #: ../java/build/Proxy.java:92 ../java/build/Proxy.java:98
@@ -307,8 +309,8 @@ msgstr ""
 
 #: ../java/build/Proxy.java:113
 msgid ""
-"If you do not save it, the host name will be forgotten after the next router "
-"restart."
+"If you do not save it, the host name will be forgotten after the next router"
+" restart."
 msgstr ""
 
 #: ../java/build/Proxy.java:114
@@ -345,82 +347,74 @@ msgid "The request uses a bad protocol."
 msgstr ""
 
 #: ../java/build/Proxy.java:133
-#, java-format
-msgid "The I2P HTTP Proxy supports {0}http://{1} requests ONLY."
+msgid "The I2P HTTP Proxy supports HTTP and HTTPS requests only."
 msgstr ""
 
 #: ../java/build/Proxy.java:134
-#, java-format
-msgid ""
-"Other protocols such as {0}https://{1} and {0}ftp://{1} are not allowed."
+msgid "Other protocols such as FTP are not allowed."
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:571
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:595
 msgid "This seems to be a bad destination:"
 msgstr "Questa non sembra essere una buona destinazione:"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:571
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:595
 msgid "i2paddresshelper cannot help you with a destination like that!"
 msgstr "i2paddresshelper non ti può aiutare con una destinazione del genere!"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:638
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:662
 #, java-format
 msgid ""
-"To visit the destination in your host database, click <a href=\"{0}\">here</"
-"a>. To visit the conflicting addresshelper destination, click <a href="
-"\"{1}\">here</a>."
-msgstr ""
-"Per visitare la destinazione nel tuo database host, cliccare <a href="
-"\"{0}\">qui</a>. \n"
-"Per visitare la destinazione addresshelper in conflitto, cliccare <a href="
-"\"{1}\">qui</a>."
+"To visit the destination in your host database, click <a "
+"href=\"{0}\">here</a>. To visit the conflicting addresshelper destination, "
+"click <a href=\"{1}\">here</a>."
+msgstr "Per visitare la destinazione nel tuo database host, cliccare <a href=\"{0}\">qui</a>. \nPer visitare la destinazione addresshelper in conflitto, cliccare <a href=\"{1}\">qui</a>."
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1042
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1151
 msgid "Host"
 msgstr "Host"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1046
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1155
 msgid "Base 32"
 msgstr "Base 32"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1050
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1159
 msgid "Destination"
 msgstr "Destinazione"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1056
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1165
 #, java-format
 msgid "Continue to {0} without saving"
 msgstr "Continua a {0} senza salvare"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1061
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1170
 #, java-format
 msgid "Save {0} to router address book and continue to eepsite"
 msgstr "Salva {0} nella rubrica del router e continua verso l'eepsite"
 
 #. only blockfile supports multiple books
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1064
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1173
 #, java-format
 msgid "Save {0} to master address book and continue to eepsite"
 msgstr "Salva {0} nella rubrica master e continua verso l'eepsite"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1065
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1174
 #, java-format
 msgid "Save {0} to private address book and continue to eepsite"
 msgstr "Salva {0} nella rubrica privata e continua verso l'eepsite"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1180
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1290
 msgid "HTTP Outproxy"
 msgstr "Ourproxy HTTP"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1216
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1326
 msgid ""
-"Click a link below to look for an address helper by using a \"jump\" service:"
-msgstr ""
-"Cliccare un link quì sotto per cercare un address helper usando un servizio "
-"di \"salto\":"
+"Click a link below to look for an address helper by using a \"jump\" "
+"service:"
+msgstr "Cliccare un link quì sotto per cercare un address helper usando un servizio di \"salto\":"
 
 #. Translators: parameter is a host name
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1224
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1334
 #, java-format
 msgid "{0} jump service"
 msgstr "{0} salta al servizio"
@@ -436,7 +430,7 @@ msgstr "Aggiunto con address helper"
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:187
 msgid "router"
-msgstr ""
+msgstr "router"
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:189
 msgid "master"
@@ -444,7 +438,7 @@ msgstr ""
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:191
 msgid "private"
-msgstr ""
+msgstr "privato"
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:198
 #, java-format

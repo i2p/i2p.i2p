@@ -282,6 +282,9 @@ class PersistentMailCache {
 		} catch (IOException ioe) {
 			Debug.debug(Debug.ERROR, "Error reading: " + f + ": " + ioe);
 			return null;
+		} catch (OutOfMemoryError oom) {
+			Debug.debug(Debug.ERROR, "Error reading: " + f + ": " + oom);
+			return null;
 		} finally {
 			if (in != null) 
 				try { in.close(); } catch (IOException ioe) {}

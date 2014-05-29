@@ -617,3 +617,43 @@ Debian wrapper.config to try to prevent confusion.
 -msgstr "Aby uruchomić jako root, edytuj i2prouter i ustaw ALLOW_ROOT=true."
 +msgid "To run as root anyway, edit /etc/default/i2p and set ALLOW_ROOT=true."
 +msgstr "Aby uruchomić jako root, edytuj /etc/default/i2p i ustaw ALLOW_ROOT=true."
+--- a/installer/resources/locale/po/messages_ja.po
++++ b/installer/resources/locale/po/messages_ja.po
+@@ -186,13 +186,13 @@
+ msgstr "起動中の場合、 Java スレッドダンプを要求"
+ 
+ #: ../i2prouter:1807
+-msgid "Please edit i2prouter and set the variable RUN_AS_USER"
+-msgstr "i2prouter を編集して、変数 RUN_AS_USER を設定してください"
++msgid "Please edit /etc/default/i2p and set the variable RUN_AS_USER"
++msgstr "/etc/default/i2p を編集して、変数 RUN_AS_USER を設定してください"
+ 
+ #: ../i2prouter:1812
+ msgid "Running I2P as the root user is *not* recommended."
+ msgstr "root ユーザーとしての I2P の起動は推奨され*ません*。"
+ 
+ #: ../i2prouter:1815
+-msgid "To run as root anyway, edit i2prouter and set ALLOW_ROOT=true."
+-msgstr "とにかく root として起動し、 i2prouter を編集して、ALLOW_ROOT=true と設定する。"
++msgid "To run as root anyway, edit /etc/default/i2p and set ALLOW_ROOT=true."
++msgstr "とにかく root として起動し、/etc/default/i2p を編集して、ALLOW_ROOT=true と設定する。"
+--- a/installer/resources/locale/po/messages_sk.po
++++ b/installer/resources/locale/po/messages_sk.po
+@@ -187,13 +187,13 @@
+ msgstr "Vyžiadať zrušenie vlákna Javy, ak je spustený."
+ 
+ #: ../i2prouter:1807
+-msgid "Please edit i2prouter and set the variable RUN_AS_USER"
+-msgstr "Prosím upravte i2prouter a nastavte premennú RUN_AS_USER"
++msgid "Please edit /etc/default/i2p and set the variable RUN_AS_USER"
++msgstr "Prosím upravte /etc/default/i2p a nastavte premennú RUN_AS_USER"
+ 
+ #: ../i2prouter:1812
+ msgid "Running I2P as the root user is *not* recommended."
+ msgstr "Spúšťať I2P ako root *nie* je odporúčané."
+ 
+ #: ../i2prouter:1815
+-msgid "To run as root anyway, edit i2prouter and set ALLOW_ROOT=true."
+-msgstr "Ak ho chcete spustiť ako root aj tak, upravte i2prouter a nastavte ALLOW_ROOT=true."
++msgid "To run as root anyway, edit /etc/default/i2p and set ALLOW_ROOT=true."
++msgstr "Ak ho chcete spustiť ako root aj tak, upravte /etc/default/i2p a nastavte ALLOW_ROOT=true."

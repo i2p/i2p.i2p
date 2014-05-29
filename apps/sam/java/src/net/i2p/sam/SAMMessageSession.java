@@ -234,6 +234,8 @@ public abstract class SAMMessageSession {
             }
             try {
                 byte msg[] = session.receiveMessage(msgId);
+                if (msg == null)
+                    return;
                 if (_log.shouldLog(Log.DEBUG)) {
                     _log.debug("Content of message " + msgId + ":\n"
                                + HexDump.dump(msg));

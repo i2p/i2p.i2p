@@ -1558,6 +1558,8 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
         // TODO throttle
         try {
             byte[] payload = session.receiveMessage(msgId);
+            if (payload == null)
+                return;
             _rxPkts.incrementAndGet();
             _rxBytes.addAndGet(payload.length);
             if (toPort == _qPort) {

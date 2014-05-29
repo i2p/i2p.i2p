@@ -1,0 +1,198 @@
+# I2P
+# Copyright (C) 2012 The I2P Project
+# This file is distributed under the same license as the routerconsole package.
+# To contribute translations, see http://www.i2p2.de/newdevelopers
+# 
+# Translators:
+# plazmism <gomidori@live.jp>, 2014
+msgid ""
+msgstr ""
+"Project-Id-Version: I2P\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2013-11-19 23:51+0000\n"
+"PO-Revision-Date: 2014-02-13 11:19+0000\n"
+"Last-Translator: plazmism <gomidori@live.jp>\n"
+"Language-Team: Japanese (http://www.transifex.com/projects/p/I2P/language/ja/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: ja\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: ../i2prouter:203
+msgid "Failed to load the wrapper"
+msgstr "ラッパーの読み込みに失敗"
+
+#: ../i2prouter:925 ../i2prouter:949 ../i2prouter:1023 ../i2prouter:1051
+#: ../i2prouter:1072
+#, sh-format
+msgid "$APP_LONG_NAME is already running."
+msgstr "$APP_LONG_NAME がすでに起動中です。"
+
+#: ../i2prouter:936
+#, sh-format
+msgid "Running $APP_LONG_NAME"
+msgstr "$APP_LONG_NAME を起動中"
+
+#: ../i2prouter:956
+#, sh-format
+msgid "Waiting for $APP_LONG_NAME"
+msgstr "$APP_LONG_NAME を待機中"
+
+#: ../i2prouter:1003
+#, sh-format
+msgid "WARNING: $APP_LONG_NAME may have failed to start."
+msgstr "警告: $APP_LONG_NAME は開始に失敗したかもしれません。"
+
+#: ../i2prouter:1017 ../i2prouter:1045 ../i2prouter:1251 ../i2prouter:1540
+msgid "Must be root to perform this action."
+msgstr "このアクションを実行するには、rootである必要があります。"
+
+#: ../i2prouter:1061
+#, sh-format
+msgid "Starting $APP_LONG_NAME"
+msgstr "$APP_LONG_NAME を起動中"
+
+#: ../i2prouter:1083
+#, sh-format
+msgid "Stopping $APP_LONG_NAME"
+msgstr "$APP_LONG_NAME を停止中"
+
+#: ../i2prouter:1087 ../i2prouter:1155 ../i2prouter:1708
+#, sh-format
+msgid "$APP_LONG_NAME was not running."
+msgstr "$APP_LONG_NAME は起動していませんでした。"
+
+#: ../i2prouter:1100 ../i2prouter:1108 ../i2prouter:1170 ../i2prouter:1178
+#, sh-format
+msgid "Unable to stop $APP_LONG_NAME."
+msgstr "$APP_LONG_NAME を停止できません。"
+
+#: ../i2prouter:1126
+#, sh-format
+msgid "Waiting for $APP_LONG_NAME to exit"
+msgstr "$APP_LONG_NAME が終了するのを待っています"
+
+#: ../i2prouter:1140
+#, sh-format
+msgid "Failed to stop $APP_LONG_NAME."
+msgstr "$APP_LONG_NAME の停止に失敗しました。"
+
+#: ../i2prouter:1143
+#, sh-format
+msgid "Stopped $APP_LONG_NAME."
+msgstr "$APP_LONG_NAME が停止しました。"
+
+#: ../i2prouter:1151
+#, sh-format
+msgid "Stopping $APP_LONG_NAME gracefully"
+msgstr "$APP_LONG_NAME を適切に停止中"
+
+#: ../i2prouter:1197
+#, sh-format
+msgid "$APP_LONG_NAME is not running."
+msgstr "$APP_LONG_NAME は起動していません。"
+
+#: ../i2prouter:1202
+#, sh-format
+msgid "$APP_LONG_NAME is running: PID:$pid"
+msgstr "$APP_LONG_NAME は起動しています: PID:$pid"
+
+#: ../i2prouter:1205
+#, sh-format
+msgid "$APP_LONG_NAME is running: PID:$pid, Wrapper:$STATUS, Java:$JAVASTATUS"
+msgstr "$APP_LONG_NAME は起動しています: PID:$pid、 ラッパー:$STATUS、 Java:$JAVASTATUS"
+
+#: ../i2prouter:1258 ../i2prouter:1270 ../i2prouter:1289 ../i2prouter:1306
+#: ../i2prouter:1373 ../i2prouter:1393 ../i2prouter:1407 ../i2prouter:1421
+#: ../i2prouter:1449 ../i2prouter:1487 ../i2prouter:1522
+#, sh-format
+msgid "The $APP_LONG_NAME daemon is already installed."
+msgstr "$APP_LONG_NAME デーモンはすでにインストールされています。"
+
+#: ../i2prouter:1261 ../i2prouter:1276 ../i2prouter:1378 ../i2prouter:1410
+#: ../i2prouter:1424 ../i2prouter:1438 ../i2prouter:1452 ../i2prouter:1490
+#: ../i2prouter:1525
+#, sh-format
+msgid "Installing the $APP_LONG_NAME daemon"
+msgstr "$APP_LONG_NAME のデーモンをインストール中"
+
+#: ../i2prouter:1532
+#, sh-format
+msgid "Install not currently supported for $DIST_OS"
+msgstr "$DIST_OS に現在サポートされていないインストール"
+
+#: ../i2prouter:1548 ../i2prouter:1561 ../i2prouter:1575 ../i2prouter:1584
+#: ../i2prouter:1594 ../i2prouter:1618 ../i2prouter:1631 ../i2prouter:1643
+#: ../i2prouter:1661 ../i2prouter:1674 ../i2prouter:1688
+#, sh-format
+msgid "Removing $APP_LONG_NAME daemon"
+msgstr "$APP_LONG_NAME デーモンを削除中"
+
+#: ../i2prouter:1554 ../i2prouter:1569 ../i2prouter:1578 ../i2prouter:1588
+#: ../i2prouter:1599 ../i2prouter:1612 ../i2prouter:1624 ../i2prouter:1637
+#: ../i2prouter:1655 ../i2prouter:1668 ../i2prouter:1682 ../i2prouter:1693
+#, sh-format
+msgid "The $APP_LONG_NAME daemon is not currently installed."
+msgstr "$APP_LONG_NAME daemon は現在インストールされていません。"
+
+#: ../i2prouter:1697
+#, sh-format
+msgid "Remove not currently supported for $DIST_OS"
+msgstr "$DIST_OS に現在サポートされていない削除"
+
+#: ../i2prouter:1784
+msgid "Commands:"
+msgstr "コマンド:"
+
+#: ../i2prouter:1785
+msgid "Launch in the current console."
+msgstr "現在のコンソールで起動。"
+
+#: ../i2prouter:1786
+msgid "Start in the background as a daemon process."
+msgstr "デーモンプロセスとしてバックグラウンドで開始"
+
+#: ../i2prouter:1787
+msgid "Stop if running as a daemon or in another console."
+msgstr "デーモンとして、あるいは他のコンソールで起動中の場合停止"
+
+#: ../i2prouter:1788
+msgid "Stop gracefully, may take up to 11 minutes."
+msgstr "適切に停、最大11分掛かる恐れがあります。"
+
+#: ../i2prouter:1789
+msgid "Stop if running and then start."
+msgstr "起動中の場合、停止してから起動"
+
+#: ../i2prouter:1790
+msgid "Restart only if already running."
+msgstr "すでに起動中の場合のみ再起動。"
+
+#: ../i2prouter:1791
+msgid "Query the current status."
+msgstr "現在の状態を問い合わせ"
+
+#: ../i2prouter:1792
+msgid "Install to start automatically when system boots."
+msgstr "インストールして、システムのブート時に自動的に起動する。"
+
+#: ../i2prouter:1793
+msgid "Uninstall."
+msgstr "アンインストール。"
+
+#: ../i2prouter:1794
+msgid "Request a Java thread dump if running."
+msgstr "起動中の場合、 Java スレッドダンプを要求"
+
+#: ../i2prouter:1807
+msgid "Please edit i2prouter and set the variable RUN_AS_USER"
+msgstr "i2prouter を編集して、変数 RUN_AS_USER を設定してください"
+
+#: ../i2prouter:1812
+msgid "Running I2P as the root user is *not* recommended."
+msgstr "root ユーザーとしての I2P の起動は推奨され*ません*。"
+
+#: ../i2prouter:1815
+msgid "To run as root anyway, edit i2prouter and set ALLOW_ROOT=true."
+msgstr "とにかく root として起動し、 i2prouter を編集して、ALLOW_ROOT=true と設定する。"

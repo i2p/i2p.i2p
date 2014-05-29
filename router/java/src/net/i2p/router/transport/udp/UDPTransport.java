@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.Vector;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -3127,7 +3128,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private class PeerTestEvent extends SimpleTimer2.TimedEvent {
         private boolean _alive;
         /** when did we last test our reachability */
-        private long _lastTested;
+        private final AtomicLong _lastTested = new AtomicLong();
         private boolean _forceRun;
 
         PeerTestEvent() {
@@ -3136,7 +3137,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         
         public synchronized void timeReached() {
             if (shouldTest()) {
-                long sinceRun = _context.clock().now() - _lastTested;
+                long sinceRun = _context.clock().now() - _lastTested.get();
                 if ( (_forceRun && sinceRun >= MIN_TEST_FREQUENCY) || (sinceRun >= TEST_FREQUENCY) ) {
                     locked_runTest();
                 }
@@ -3153,7 +3154,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Running periodic test with bob = " + bob);
                 _testManager.runTest(bob.getRemoteIPAddress(), bob.getRemotePort(), bob.getCurrentCipherKey(), bob.getCurrentMACKey());
-                _lastTested = _context.clock().now();
+                setLastTested();
                 _forceRun = false;
                 return;
             }
@@ -3178,7 +3179,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
          *  @since 0.9.13
          */
         public synchronized void forceRunImmediately() {
-            _lastTested = 0;
+            _lastTested.set(0);
             _forceRun = true;
             reschedule(5*1000);
         }
@@ -3197,8 +3198,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
          *  Set the last-tested timer to now
          *  @since 0.9.13
          */
-        public synchronized void setLastTested() {
-            _lastTested = _context.clock().now();
+        public void setLastTested() {
+            // do not synchronize - deadlock with PeerTestManager
+            _lastTested.set(_context.clock().now());
         }
         
     }

@@ -880,7 +880,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                         if(!Boolean.parseBoolean(getTunnel().getClientOptions().getProperty(PROP_USER_AGENT))) {
                             // let's not advertise to external sites that we are from I2P
                             if(usingWWWProxy || usingInternalOutproxy) {
-                                newRequest.append("User-Agent: Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.2.6) Gecko/20100625 Firefox/3.6.6\r\n");
+                                newRequest.append("User-Agent: Mozilla/5.0 (Windows NT 6.1; rv:24.0) Gecko/20100101 Firefox/24.0\r\n");
                             } else {
                                 newRequest.append("User-Agent: MYOB/6.66 (AN/ON)\r\n");
                             }

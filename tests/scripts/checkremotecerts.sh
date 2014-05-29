@@ -61,7 +61,7 @@ retry ()
     i=1
     while ! "$@"
     do
-        echo "$0: try $i of $MAX failed for command $@"
+        echo "try $i of $MAX failed for command $@" >&2
         if [ $i -ge $MAX ]
         then
             break
@@ -69,6 +69,9 @@ retry ()
         i=$(expr $i + 1)
         sleep 15
     done
+    if [ $i = $MAX ]; then
+        return 1
+    fi
 }
 
 normalize(){
@@ -78,9 +81,9 @@ normalize(){
 
 connect() {
     if [ $OPENSSL -eq 1 ]; then
-        retry $OPENSSL_BIN s_client -connect "$1:443" -no_ign_eof -CAfile $CACERTS -servername $1 < /dev/null 2>/dev/null
+        $OPENSSL_BIN s_client -connect "$1:443" -CAfile $CACERTS -servername $1 < /dev/null 2> /dev/null
     else
-        retry $GNUTLS_BIN --insecure --print-cert --x509cafile "$CACERTS" "$1"  < /dev/null 2>/dev/null
+        $GNUTLS_BIN --insecure --print-cert --x509cafile "$CACERTS" "$1"  < /dev/null 2>/dev/null
     fi
 }
 
@@ -117,26 +120,21 @@ cleanup() {
 check_hosts() {
     for HOST in $RESEEDHOSTS; do
         echo -n "Checking $HOST..."
-        connect "$HOST"  < /dev/null > "$WORK/$HOST"
+        if retry connect "$HOST"  < /dev/null 1> "$WORK/$HOST"; then
 
-        # OpenSSL returns "return code: 0 (ok)"
-        # GnuTLS returns "certificate is trusted"
-        # GnuTLS v2 has the word "Peer" before certificate, v3 has the word "The" before it
-        if ! grep -q 'Verify return code: 0 (ok)\|certificate is trusted' "$WORK/$HOST"; then
-            # If we end up here it's for one of two probable reasons:
-            # 1) the the CN in the certificate doesn't match the hostname.
-            # 2) the certificate is invalid
-
-            # OpenSSL returns code 21 with self-signed certs.
-            # GnuTLS returns "certificate issuer is unknown"
-            # As noted above, GnuTLS v2 has the word "Peer" before certificate, v3 has the word "The" before it
-
-            # If the CN just doesn't match the hostname, pass
-            if ! grep -q 'Verify return code: 21\|certificate issuer is unknown' "$WORK/$HOST"; then : ;else
+            # OpenSSL returns "return code: 0 (ok)"
+            # GnuTLS returns "certificate is trusted"
+            # GnuTLS v2 has the word "Peer" before certificate, v3 has the word "The" before it
+            if ! grep -q 'Verify return code: 0 (ok)\|certificate is trusted' "$WORK/$HOST"; then
+                # If we end up here, it's possible that the certificate is valid, but CA: false is set in the certificate.
+                # The OpenSSL binary is "picky" about this. GnuTLS doesn't seem to be.
                 verify_fingerprint $HOST
             fi
+            echo
+        else
+            echo "failed to connect to $HOST" >&2
+            FAIL=1
         fi
-        echo
     done
 }
 

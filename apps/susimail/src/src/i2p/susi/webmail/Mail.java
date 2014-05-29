@@ -118,6 +118,8 @@ class Mail {
 			part = new MailPart(rb);
 		} catch (DecodingException de) {
 			Debug.debug(Debug.ERROR, "Decode error: " + de);
+		} catch (Exception e) {
+			Debug.debug(Debug.ERROR, "Parse error: " + e);
 		}
 	}
 

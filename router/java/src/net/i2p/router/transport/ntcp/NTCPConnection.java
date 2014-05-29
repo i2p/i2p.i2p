@@ -119,7 +119,8 @@ class NTCPConnection {
     private long _lastReceiveTime;
     private long _lastRateUpdated;
     private final long _created;
-    private long _nextMetaTime;
+    // prevent sending meta before established
+    private long _nextMetaTime = Long.MAX_VALUE;
     private int _consecutiveZeroReads;
 
     private static final int BLOCK_SIZE = 16;

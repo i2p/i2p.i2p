@@ -4,6 +4,7 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
 # Translators:
+# bassmax, 2014
 # aylham <aylham@gmail.com>, 2011
 # aylham <aylham@gmail.com>, 2011
 # Boxoa590, 2012-2013
@@ -21,7 +22,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-02-06 18:27+0000\n"
-"PO-Revision-Date: 2014-03-23 12:02+0000\n"
+"PO-Revision-Date: 2014-04-30 21:10+0000\n"
 "Last-Translator: Towatowa441\n"
 "Language-Team: French (http://www.transifex.com/projects/p/I2P/language/fr/)\n"
 "MIME-Version: 1.0\n"
@@ -55,7 +56,7 @@ msgstr[1] "{0,number,####} ms"
 msgid "1 sec"
 msgid_plural "{0} sec"
 msgstr[0] "{0}s"
-msgstr[1] "{0} sec"
+msgstr[1] "{0} s"
 
 #. minutes
 #. alternates: mins, min. 'minutes' is probably too long.
@@ -95,7 +96,7 @@ msgstr "Banni(s) par hachage routeur: {0}"
 
 #: ../../../router/java/src/net/i2p/router/Blocklist.java:146
 msgid "Banned by router hash"
-msgstr "Banni via hachage du routeur"
+msgstr "Banni par hachage du routeur"
 
 #. Temporary reason, until the job finishes
 #: ../../../router/java/src/net/i2p/router/Blocklist.java:712
@@ -1390,7 +1391,7 @@ msgstr "Site web"
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:226
 msgid "Update link"
-msgstr "Mise à jour du lien"
+msgstr "Lien de mise à jour"
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:279
 msgid "Stop"

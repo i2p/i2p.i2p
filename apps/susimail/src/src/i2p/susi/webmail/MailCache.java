@@ -299,10 +299,16 @@ class MailCache {
 		for (String uidl : uidls) {
 			if (disk != null)
 				disk.deleteMail(uidl);
-			Mail mail = mails.get(uidl);
-			if (mail == null)
-				continue;
-			mail.markForDeletion = true;
+			synchronized(mails) {
+				Mail mail = mails.get(uidl);
+				if (mail == null)
+					continue;
+				mail.markForDeletion = true;
+				// now replace it with an empty one to save memory
+				mail = new Mail(uidl);
+				mail.markForDeletion = true;
+				mails.put(uidl, mail);
+			}
 			toDelete.add(uidl);
 		}
 		if (toDelete.isEmpty())

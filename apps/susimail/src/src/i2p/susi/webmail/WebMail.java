@@ -1505,7 +1505,7 @@ public class WebMail extends HttpServlet
                                // text
                               (ua.startsWith("Lynx") || ua.startsWith("w3m") ||
                                ua.startsWith("ELinks") || ua.startsWith("Links") ||
-                               ua.startsWith("Dillo") ||
+                               ua.startsWith("Dillo") || ua.startsWith("Emacs-w3m") ||
                                // mobile
                                // http://www.zytrax.com/tech/web/mobile_ids.html
                                // Android tablet UAs don't have "Mobile" in them
@@ -2251,9 +2251,12 @@ public class WebMail extends HttpServlet
 		out.println( button( NEW, _("New") ) + spacer +
 			button( REPLY, _("Reply") ) +
 			button( REPLYALL, _("Reply All") ) +
-			button( FORWARD, _("Forward") ) + spacer +
-			button( DELETE, _("Delete") ) + spacer +
-			"<br>" +
+			button( FORWARD, _("Forward") ) + spacer);
+		if (sessionObject.reallyDelete)
+			out.println(button2(DELETE, _("Delete")));
+		else
+			out.println(button(DELETE, _("Delete")));
+		out.println("<br>" +
 			( sessionObject.folder.isFirstElement( sessionObject.showUIDL ) ? button2( PREV, _("Previous") ) : button( PREV, _("Previous") ) ) + spacer +
 			button( LIST, _("Back to Folder") ) + spacer +
 			( sessionObject.folder.isLastElement( sessionObject.showUIDL ) ? button2( NEXT, _("Next") ) : button( NEXT, _("Next") ) ));

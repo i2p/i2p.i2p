@@ -1,0 +1,57 @@
+# I2P
+# Copyright (C) 2009 The I2P Project
+# This file is distributed under the same license as the desktopgui package.
+# To contribute translations, see http://www.i2p2.de/newdevelopers
+# 
+# Translators:
+# Krantišek <jaksrn@gmail.com>, 2014
+# Svistwarrior273 <romanbeno273@gmail.com>, 2014
+msgid ""
+msgstr ""
+"Project-Id-Version: I2P\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2014-01-09 19:27+0000\n"
+"PO-Revision-Date: 2014-04-20 09:56+0000\n"
+"Last-Translator: Svistwarrior273 <romanbeno273@gmail.com>\n"
+"Language-Team: Slovak (http://www.transifex.com/projects/p/I2P/language/sk/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: sk\n"
+"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
+
+#: src/net/i2p/desktopgui/ExternalTrayManager.java:23
+msgid "Start I2P"
+msgstr "Spustiť I2P"
+
+#: src/net/i2p/desktopgui/ExternalTrayManager.java:38
+msgid "I2P is starting!"
+msgstr "I2P sa spúšťa!"
+
+#: src/net/i2p/desktopgui/ExternalTrayManager.java:38
+msgid "Starting"
+msgstr "Spúšťa sa"
+
+#: src/net/i2p/desktopgui/InternalTrayManager.java:26
+msgid "Launch I2P Browser"
+msgstr "Spustiť I2P prehliadač"
+
+#: src/net/i2p/desktopgui/InternalTrayManager.java:50
+msgid "Configure desktopgui"
+msgstr "Nakonfigurovať desktopgui"
+
+#: src/net/i2p/desktopgui/InternalTrayManager.java:67
+msgid "Restart I2P"
+msgstr "Reštartovať I2P"
+
+#: src/net/i2p/desktopgui/InternalTrayManager.java:85
+msgid "Stop I2P"
+msgstr "Zastaviť I2P"
+
+#: src/net/i2p/desktopgui/gui/DesktopguiConfigurationFrame.java:43
+msgid "Tray icon configuration"
+msgstr "Konfigurácia ikony v lište"
+
+#: src/net/i2p/desktopgui/gui/DesktopguiConfigurationFrame.java:46
+msgid "Should tray icon be enabled?"
+msgstr "Mala by byť ikona v lište povolená?"

@@ -1,3 +1,10 @@
+i2p (0.9.13-1) UNRELEASED; urgency=medium
+
+  * New upstream release
+  * debconf: Slovak translation
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Thu, 15 May 2014 23:11:36 +0000
+
 i2p (0.9.12-1) unstable; urgency=medium
 
   * New upstream release

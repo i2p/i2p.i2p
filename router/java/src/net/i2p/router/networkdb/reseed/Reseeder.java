@@ -70,7 +70,8 @@ public class Reseeder {
               "http://netdb.i2p2.no/" + "," +
               "http://reseed.info/"  + "," +
               "http://reseed.pkol.de/" + "," +
-              "http://uk.reseed.i2p2.no/" + "," +
+              //Temp disabled (ticket #1276)
+              //"http://uk.reseed.i2p2.no/" + "," +
               "http://i2p-netdb.innovatio.no/" + "," +
               "http://ieb9oopo.mooo.com";
               // Temp disabled since h2ik have been AWOL since 06-03-2013
@@ -87,7 +88,8 @@ public class Reseeder {
               "https://netdb.i2p2.no/" + "," +
               "https://reseed.info/"  + "," +
               "https://reseed.pkol.de/" + "," +
-              "https://uk.reseed.i2p2.no/" + "," +
+               //Temp disabled (ticket #1276)
+              //"https://uk.reseed.i2p2.no/" + "," +
               "https://i2p-netdb.innovatio.no/" + "," +
               "https://ieb9oopo.mooo.com";
               // Temp disabled since h2ik have been AWOL since 06-03-2013

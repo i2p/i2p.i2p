@@ -1,0 +1,199 @@
+# I2P
+# Copyright (C) 2012 The I2P Project
+# This file is distributed under the same license as the routerconsole package.
+# To contribute translations, see http://www.i2p2.de/newdevelopers
+# 
+# Translators:
+# Krantišek <jaksrn@gmail.com>, 2014
+# Svistwarrior273 <romanbeno273@gmail.com>, 2014
+msgid ""
+msgstr ""
+"Project-Id-Version: I2P\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2013-11-19 23:51+0000\n"
+"PO-Revision-Date: 2014-04-15 15:38+0000\n"
+"Last-Translator: Svistwarrior273 <romanbeno273@gmail.com>\n"
+"Language-Team: Slovak (http://www.transifex.com/projects/p/I2P/language/sk/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: sk\n"
+"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
+
+#: ../i2prouter:203
+msgid "Failed to load the wrapper"
+msgstr "Nepodarilo sa načítať wrapper"
+
+#: ../i2prouter:925 ../i2prouter:949 ../i2prouter:1023 ../i2prouter:1051
+#: ../i2prouter:1072
+#, sh-format
+msgid "$APP_LONG_NAME is already running."
+msgstr "$APP_LONG_NAME je už spustená."
+
+#: ../i2prouter:936
+#, sh-format
+msgid "Running $APP_LONG_NAME"
+msgstr "Spúšťa sa $APP_LONG_NAME"
+
+#: ../i2prouter:956
+#, sh-format
+msgid "Waiting for $APP_LONG_NAME"
+msgstr "Čaká sa na $APP_LONG_NAME"
+
+#: ../i2prouter:1003
+#, sh-format
+msgid "WARNING: $APP_LONG_NAME may have failed to start."
+msgstr "UPOZORNENIE: $APP_LONG_NAME môže pri štarte zlyhať."
+
+#: ../i2prouter:1017 ../i2prouter:1045 ../i2prouter:1251 ../i2prouter:1540
+msgid "Must be root to perform this action."
+msgstr "Pre vykonanie tejto akcie musíš byť root."
+
+#: ../i2prouter:1061
+#, sh-format
+msgid "Starting $APP_LONG_NAME"
+msgstr "Spúšťa sa $APP_LONG_NAME"
+
+#: ../i2prouter:1083
+#, sh-format
+msgid "Stopping $APP_LONG_NAME"
+msgstr "Zastavuje sa $APP_LONG_NAME"
+
+#: ../i2prouter:1087 ../i2prouter:1155 ../i2prouter:1708
+#, sh-format
+msgid "$APP_LONG_NAME was not running."
+msgstr "$APP_LONG_NAME nebola sputená."
+
+#: ../i2prouter:1100 ../i2prouter:1108 ../i2prouter:1170 ../i2prouter:1178
+#, sh-format
+msgid "Unable to stop $APP_LONG_NAME."
+msgstr "Nemožno zastaviť $APP_LONG_NAME."
+
+#: ../i2prouter:1126
+#, sh-format
+msgid "Waiting for $APP_LONG_NAME to exit"
+msgstr "Čakám na $APP_LONG_NAME pre ukončenie"
+
+#: ../i2prouter:1140
+#, sh-format
+msgid "Failed to stop $APP_LONG_NAME."
+msgstr "Nepodarilo sa zastaviť $APP_LONG_NAME."
+
+#: ../i2prouter:1143
+#, sh-format
+msgid "Stopped $APP_LONG_NAME."
+msgstr "Zastavené $APP_LONG_NAME."
+
+#: ../i2prouter:1151
+#, sh-format
+msgid "Stopping $APP_LONG_NAME gracefully"
+msgstr "Zastavuje sa $APP_LONG_NAME elegantne"
+
+#: ../i2prouter:1197
+#, sh-format
+msgid "$APP_LONG_NAME is not running."
+msgstr "$APP_LONG_NAME nie je spustená."
+
+#: ../i2prouter:1202
+#, sh-format
+msgid "$APP_LONG_NAME is running: PID:$pid"
+msgstr "$APP_LONG_NAME je spustená: PID:$pid"
+
+#: ../i2prouter:1205
+#, sh-format
+msgid "$APP_LONG_NAME is running: PID:$pid, Wrapper:$STATUS, Java:$JAVASTATUS"
+msgstr "$APP_LONG_NAME je spustená: PID:$pid, Wrapper:$STATUS, Java:$JAVASTATUS"
+
+#: ../i2prouter:1258 ../i2prouter:1270 ../i2prouter:1289 ../i2prouter:1306
+#: ../i2prouter:1373 ../i2prouter:1393 ../i2prouter:1407 ../i2prouter:1421
+#: ../i2prouter:1449 ../i2prouter:1487 ../i2prouter:1522
+#, sh-format
+msgid "The $APP_LONG_NAME daemon is already installed."
+msgstr "$APP_LONG_NAME daemon je už nainštalovaný."
+
+#: ../i2prouter:1261 ../i2prouter:1276 ../i2prouter:1378 ../i2prouter:1410
+#: ../i2prouter:1424 ../i2prouter:1438 ../i2prouter:1452 ../i2prouter:1490
+#: ../i2prouter:1525
+#, sh-format
+msgid "Installing the $APP_LONG_NAME daemon"
+msgstr "Inštaluje sa $APP_LONG_NAME daemon"
+
+#: ../i2prouter:1532
+#, sh-format
+msgid "Install not currently supported for $DIST_OS"
+msgstr "Inštalácia momentálne nie je podporovaná pre $DIST_OS"
+
+#: ../i2prouter:1548 ../i2prouter:1561 ../i2prouter:1575 ../i2prouter:1584
+#: ../i2prouter:1594 ../i2prouter:1618 ../i2prouter:1631 ../i2prouter:1643
+#: ../i2prouter:1661 ../i2prouter:1674 ../i2prouter:1688
+#, sh-format
+msgid "Removing $APP_LONG_NAME daemon"
+msgstr "Odstraňuje sa $APP_LONG_NAME daemon"
+
+#: ../i2prouter:1554 ../i2prouter:1569 ../i2prouter:1578 ../i2prouter:1588
+#: ../i2prouter:1599 ../i2prouter:1612 ../i2prouter:1624 ../i2prouter:1637
+#: ../i2prouter:1655 ../i2prouter:1668 ../i2prouter:1682 ../i2prouter:1693
+#, sh-format
+msgid "The $APP_LONG_NAME daemon is not currently installed."
+msgstr "$APP_LONG_NAME daemon momentálne nie je nainštalovaný."
+
+#: ../i2prouter:1697
+#, sh-format
+msgid "Remove not currently supported for $DIST_OS"
+msgstr "Odstránenie momentálne nie je podporované pre $DIST_OS"
+
+#: ../i2prouter:1784
+msgid "Commands:"
+msgstr "Príkazy:"
+
+#: ../i2prouter:1785
+msgid "Launch in the current console."
+msgstr "Spustiť v aktuálnej konzole."
+
+#: ../i2prouter:1786
+msgid "Start in the background as a daemon process."
+msgstr "Spustiť na pozadí ako daemon proces."
+
+#: ../i2prouter:1787
+msgid "Stop if running as a daemon or in another console."
+msgstr "Zastaviť, ak je spustený ako daemon alebo v inej konzoli."
+
+#: ../i2prouter:1788
+msgid "Stop gracefully, may take up to 11 minutes."
+msgstr "Zastaviť jemným spôsobom, môže to zabrať až 11 minút."
+
+#: ../i2prouter:1789
+msgid "Stop if running and then start."
+msgstr "Zastaviť, ak je spustený a potom znova spustiť."
+
+#: ../i2prouter:1790
+msgid "Restart only if already running."
+msgstr "Reštartovať, iba ak je už spustený."
+
+#: ../i2prouter:1791
+msgid "Query the current status."
+msgstr "Poslať požiadavku na zistenie súčasného stavu."
+
+#: ../i2prouter:1792
+msgid "Install to start automatically when system boots."
+msgstr "Nainštalovať tak, aby sa spustil automaticky pri boote systému."
+
+#: ../i2prouter:1793
+msgid "Uninstall."
+msgstr "Odinštalovať."
+
+#: ../i2prouter:1794
+msgid "Request a Java thread dump if running."
+msgstr "Vyžiadať zrušenie vlákna Javy, ak je spustený."
+
+#: ../i2prouter:1807
+msgid "Please edit i2prouter and set the variable RUN_AS_USER"
+msgstr "Prosím upravte i2prouter a nastavte premennú RUN_AS_USER"
+
+#: ../i2prouter:1812
+msgid "Running I2P as the root user is *not* recommended."
+msgstr "Spúšťať I2P ako root *nie* je odporúčané."
+
+#: ../i2prouter:1815
+msgid "To run as root anyway, edit i2prouter and set ALLOW_ROOT=true."
+msgstr "Ak ho chcete spustiť ako root aj tak, upravte i2prouter a nastavte ALLOW_ROOT=true."

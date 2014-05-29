@@ -381,7 +381,7 @@ public class I2PSnarkServlet extends BasicServlet {
         String ua = req.getHeader("User-Agent");
         boolean isDegraded = ua != null && (ua.startsWith("Lynx") || ua.startsWith("w3m") ||
                                             ua.startsWith("ELinks") || ua.startsWith("Links") ||
-                                            ua.startsWith("Dillo"));
+                                            ua.startsWith("Dillo") || ua.startsWith("Emacs-w3m"));
         boolean noThinsp = isDegraded || (ua != null && ua.startsWith("Opera"));
 
         // pages
@@ -1351,7 +1351,7 @@ public class I2PSnarkServlet extends BasicServlet {
         if (isMultiFile) {
             // link on the whole td
             String jsec = encodedBaseName.replace("'", "\\'");
-            out.write(" onclick=\"document.location='" + encodedBaseName + "/';\">");
+            out.write(" onclick=\"document.location='" + jsec + "/';\">");
         } else {
             out.write('>');
         }
@@ -2509,6 +2509,7 @@ public class I2PSnarkServlet extends BasicServlet {
             String path=addPaths(base,encoded);
             if (item.isDirectory() && !path.endsWith("/"))
                 path=addPaths(path,"/");
+            path = urlEncode(path);
             String icon = toIcon(item);
 
             buf.append("<TD class=\"snarkFileIcon\">");
@@ -2529,7 +2530,7 @@ public class I2PSnarkServlet extends BasicServlet {
             buf.append("</TD><TD class=\"snarkFileName\">");
             if (complete)
                 buf.append("<a href=\"").append(path).append("\">");
-            buf.append(item.getName());
+            buf.append(item.getName().replace("&", "&amp;"));
             if (complete)
                 buf.append("</a>");
             buf.append("</TD><TD ALIGN=right class=\"snarkFileSize\">");
