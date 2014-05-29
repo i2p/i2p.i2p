@@ -69,8 +69,6 @@ public class Snark
   "Commands: 'info', 'list', 'quit'.";
 ****/
 
-  // String indicating main activity
-  String activity = "Not started";
   
 /****
   private static class OOMListener implements I2PThread.OOMEventListener {
@@ -227,7 +225,7 @@ public class Snark
   private final CompleteListener completeListener;
   private volatile boolean stopped;
   private volatile boolean starting;
-  private byte[] id;
+  private final byte[] id;
   private final byte[] infoHash;
   private String additionalTrackerURL;
   protected final I2PSnarkUtil _util;
@@ -236,6 +234,8 @@ public class Snark
   private volatile String trackerProblems;
   private volatile int trackerSeenPeers;
   private volatile boolean _autoStoppable;
+  // String indicating main activity
+  private volatile String activity = "Not started";
 
 
   /** from main() via parseArguments() single torrent */
@@ -317,7 +317,6 @@ public class Snark
 */
 
     // Figure out what the torrent argument represents.
-    meta = null;
     File f = null;
     InputStream in = null;
     byte[] x_infoHash = null;
@@ -1152,8 +1151,8 @@ public class Snark
     //  System.out.println(); // We have all the disk space we need.
   }
 
-  private boolean allChecked = false;
-  private boolean checking = false;
+  private boolean allChecked;
+  private boolean checking;
   //private boolean prechecking = true;
 
   public void storageChecked(Storage storage, int num, boolean checked)
@@ -1230,6 +1229,7 @@ public class Snark
    */
   final static int MIN_TOTAL_UPLOADERS = 4;
   final static int MAX_TOTAL_UPLOADERS = 10;
+
   public boolean overUploadLimit(int uploaders) {
     if (_peerCoordinatorSet == null || uploaders <= 0)
       return false;
