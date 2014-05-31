@@ -1,3 +1,50 @@
+2014-05-31 zzz
+Prop from i2p.i2p.zzz.test2:
+ * Console: Fix shutdown error on old wrappers (ticket #1285)
+ * CPUID:
+   - Add hasAES()
+   - Fix bugs in unused hasSSE3(), hasSSE41(), hasSSE42()
+ * Crypto:
+   - Use JVM AES when faster
+   - Don't start YK thread in constructor (ticket #973)
+ * HTTP client:
+   - Fix 'connection reset' browser messages
+     after an error in the first line (ticket #1277)
+  - Add GUI options for user-agent, referer, accept
+  - Disable SSL to i2p addresses by default, add GUI option
+  - Fix NPE in error handler
+ * I2CP: Per-message reliability settings (ticket #788):
+   - Store message nonce in ClientMessage, so we may send
+     a MessageStatusMessage with a failure code to the client
+     without sending an ACCEPTED MessageStatusMessage first.
+     All MessageStatusMessages sent in response to outbound messages will now have a valid nonce.
+   - Clean up and reuse MessageState for asynch notification
+   - New I2PSession sendMessage() method and listener
+   - Move VerifyUsage from SimpleScheduler to SimpleTimer2 for efficiency
+   - New I2PSessionException
+   - Streaming PacketQueue requests status for SYNs on outbound conns
+   - PacketQueue throws I2PSessionException in streams
+ * i2psnark:
+   - Support ports in announce URLs (ticket #1283)
+   - Change "private" value in infohash from string to number,
+     to match what everybody else does
+   - Send seed/leech status in DHT announces (ticket #1280)
+   - Extend DHT tracker expire time from 45m to 3h
+   - Extend DHT announce interval from 10m to 40m
+   - Increase announces from 1 peer to 4 (ticket #1281)
+   - Respond to get_peers with an empty peers list instead of
+     a nodes list if the requester was the only peer (ticket #1279)
+   - Fix sendError() (still unused)
+ * i2ptunnel:
+   - Show key cert settings
+   - Display custom error pages for I2PSocketExceptions (ticket #788)
+   - Tag I2PSocketException text for translation (no bundles yet)
+   - Move methods from superclasses to I2PTunnelHTTPClientBase
+   - Fix connect client error pages, but they aren't displayed anyway
+   - Don't start I2PTunnelRunner threads in constructor (ticket #973)
+ * SusiMail: fix NPE (ticket #1296)
+ * SystemVersion: Add isJava7() and isX86()
+
 * 2014-05-22 0.9.13 released
 
 2014-05-20 zzz
