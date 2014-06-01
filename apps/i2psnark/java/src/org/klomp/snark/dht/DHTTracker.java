@@ -60,7 +60,7 @@ class DHTTracker {
         _isRunning = false;
     }
 
-    void announce(InfoHash ih, Hash hash) {
+    void announce(InfoHash ih, Hash hash, boolean isSeed) {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Announce " + hash + " for " + ih);
         Peers peers = _torrents.get(ih);
@@ -79,6 +79,9 @@ class DHTTracker {
             if (peer2 != null)
                 peer = peer2;
             peer.setLastSeen(_context.clock().now());
+            // don't let false trump true, as not all sources know the seed status
+            if (isSeed)
+                peer.setSeed(true);
         } else {
             // We could update setLastSeen if he is already
             // in there, but that would tend to keep
@@ -94,26 +97,42 @@ class DHTTracker {
         Peers peers = _torrents.get(ih);
         if (peers == null)
             return;
-        Peer peer = new Peer(hash.getData());
-        peers.remove(peer);
+        peers.remove(hash);
     }
 
     /**
      *  Caller's responsibility to remove himself from the list
+     *
+     *  @param noSeeds true if we do not want seeds in the result
      *  @return list or empty list (never null)
      */
-    List<Hash> getPeers(InfoHash ih, int max) {
+    List<Hash> getPeers(InfoHash ih, int max, boolean noSeeds) {
         Peers peers = _torrents.get(ih);
-        if (peers == null)
+        if (peers == null || max <= 0)
             return Collections.emptyList();
 
-        int size = peers.size();
-        List<Hash> rv = new ArrayList<Hash>(peers.values());
-        if (max < size) {
-                Collections.shuffle(rv, _context.random());
+        List<Peer> rv = new ArrayList<Peer>(peers.values());
+        int size = rv.size();
+        if (max < size)
+            Collections.shuffle(rv, _context.random());
+        if (noSeeds) {
+            int i = 0;
+            for (Iterator<Peer> iter = rv.iterator(); iter.hasNext(); ) {
+                if (iter.next().isSeed())
+                    iter.remove();
+                else if (++i >= max)
+                    break;
+            }
+            if (max < rv.size())
+                rv = rv.subList(0, max);
+        } else {
+            if (max < size)
                 rv = rv.subList(0, max);
         }
-        return rv;
+        // a Peer is a Hash
+        List rv1 = rv;
+        List<Hash> rv2 = rv1;
+        return rv2;
     }
 
     /**

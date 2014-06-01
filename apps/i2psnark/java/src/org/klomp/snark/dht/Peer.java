@@ -14,7 +14,9 @@ import net.i2p.data.Hash;
  */
 class Peer extends Hash {
 
-    private long lastSeen;
+    private volatile long lastSeen;
+    // todo we could pack this into the upper bit of lastSeen
+    private volatile boolean isSeed;
 
     public Peer(byte[] data) {
         super(data);
@@ -26,5 +28,15 @@ class Peer extends Hash {
 
     public void setLastSeen(long now) {
         lastSeen = now;
+    }
+
+    /** @since 0.9.14 */
+    public boolean isSeed() {
+        return isSeed;
+    }
+
+    /** @since 0.9.14 */
+    public void setSeed(boolean isSeed) {
+        this.isSeed = isSeed;
     }
 }

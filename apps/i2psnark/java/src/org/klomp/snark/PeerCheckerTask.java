@@ -221,7 +221,8 @@ class PeerCheckerTask implements Runnable
                 peer.keepAlive();
             // announce them to local tracker (TrackerClient does this too)
             if (dht != null && (_runCount % 5) == 0) {
-                dht.announce(coordinator.getInfoHash(), peer.getPeerID().getDestHash());
+                dht.announce(coordinator.getInfoHash(), peer.getPeerID().getDestHash(),
+                             peer.isCompleted());
             }
           }
 
@@ -270,7 +271,7 @@ class PeerCheckerTask implements Runnable
 
         // announce ourselves to local tracker (TrackerClient does this too)
         if (dht != null && (_runCount % 16) == 0) {
-            dht.announce(coordinator.getInfoHash());
+            dht.announce(coordinator.getInfoHash(), coordinator.completed());
         }
   }
 }

@@ -71,6 +71,7 @@ public class TrackerClient implements Runnable {
   private static final String COMPLETED_EVENT = "completed";
   private static final String STOPPED_EVENT = "stopped";
   private static final String NOT_REGISTERED  = "torrent not registered"; //bytemonsoon
+  private static final String NOT_REGISTERED_2  = "torrent not found";    // diftracker
   /** this is our equivalent to router.utorrent.com for bootstrap */
   private static final String DEFAULT_BACKUP_TRACKER = "http://tracker.welterde.i2p/a";
 
@@ -109,6 +110,8 @@ public class TrackerClient implements Runnable {
   // these 2 used in loop()
   private volatile boolean runStarted;
   private volatile  int consecutiveFails;
+  // if we don't want anything else.
+  // Not necessarily seeding, as we may have skipped some files.
   private boolean completed;
   private volatile boolean _fastUnannounce;
   private long lastDHTAnnounce;
@@ -391,7 +394,7 @@ public class TrackerClient implements Runnable {
             // Local DHT tracker announce
             DHT dht = _util.getDHT();
             if (dht != null && (meta == null || !meta.isPrivate()))
-                dht.announce(snark.getInfoHash());
+                dht.announce(snark.getInfoHash(), coordinator.completed());
 
             int oldSeenPeers = snark.getTrackerSeenPeers();
             int maxSeenPeers = 0;
@@ -539,7 +542,8 @@ public class TrackerClient implements Runnable {
                     DHT dht = _util.getDHT();
                     if (dht != null) {
                         for (Peer peer : peers) {
-                            dht.announce(snark.getInfoHash(), peer.getPeerID().getDestHash());
+                            dht.announce(snark.getInfoHash(), peer.getPeerID().getDestHash(),
+                                         false);  // TODO actual seed/leech status
                         }
                     }
 
@@ -572,13 +576,15 @@ public class TrackerClient implements Runnable {
                     // don't show secondary tracker problems to the user
                     if (tr.isPrimary)
                       snark.setTrackerProblems(tr.trackerProblems);
-                    if (tr.trackerProblems.toLowerCase(Locale.US).startsWith(NOT_REGISTERED)) {
+                    String tplc = tr.trackerProblems.toLowerCase(Locale.US);
+                    if (tplc.startsWith(NOT_REGISTERED) || tplc.startsWith(NOT_REGISTERED_2)) {
                       // Give a guy some time to register it if using opentrackers too
                       //if (trckrs.size() == 1) {
                       //  stop = true;
                       //  snark.stopTorrent();
                       //} else { // hopefully each on the opentrackers list is really open
-                        if (tr.registerFails++ > MAX_REGISTER_FAILS)
+                        if (tr.registerFails++ > MAX_REGISTER_FAILS ||
+                            (!tr.isPrimary && tr.registerFails > MAX_REGISTER_FAILS / 2))
                           tr.stop = true;
                       //
                     }
@@ -654,7 +660,7 @@ public class TrackerClient implements Runnable {
                     numwant = _util.getMaxConnections();
                 Collection<Hash> hashes = dht.getPeersAndAnnounce(snark.getInfoHash(), numwant,
                                                                   5*60*1000, DHT_ANNOUNCE_PEERS, 3*60*1000,
-                                                                  coordinator.completed());
+                                                                  coordinator.completed(), numwant <= 1);
                 if (!hashes.isEmpty()) {
                     runStarted = true;
                     lastDHTAnnounce = _util.getContext().clock().now();

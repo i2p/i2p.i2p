@@ -1,3 +1,8 @@
+2014-06-01 zzz
+ * i2psnark:
+   - Store seed/leech status in DHT tracker (ticket #1280)
+   - Increase max received DHT nodes (Vuze sends more)
+
 2014-05-31 zzz
 Prop from i2p.i2p.zzz.test2:
  * Console: Fix shutdown error on old wrappers (ticket #1285)
