@@ -49,19 +49,20 @@ class LocalClientManager extends ClientManager {
      * @param flags ignored for local
      */
     @Override
-    void distributeMessage(Destination fromDest, Destination toDest, Payload payload, MessageId msgId, long expiration, int flags) { 
+    void distributeMessage(Destination fromDest, Destination toDest, Payload payload,
+                           MessageId msgId, long messageNonce, long expiration, int flags) { 
         // check if there is a runner for it
         ClientConnectionRunner sender = getRunner(fromDest);
         ClientConnectionRunner runner = getRunner(toDest);
         if (runner != null) {
             runner.receiveMessage(toDest, fromDest, payload);
             if (sender != null)
-                sender.updateMessageDeliveryStatus(msgId, MessageStatusMessage.STATUS_SEND_SUCCESS_LOCAL);
+                sender.updateMessageDeliveryStatus(msgId, messageNonce, MessageStatusMessage.STATUS_SEND_SUCCESS_LOCAL);
         } else {
             // remote.  ignore.
             System.out.println("Message " + msgId + " is targeting a REMOTE destination - DROPPED");
             if (sender != null)
-                sender.updateMessageDeliveryStatus(msgId, MessageStatusMessage.STATUS_SEND_GUARANTEED_FAILURE);
+                sender.updateMessageDeliveryStatus(msgId, messageNonce, MessageStatusMessage.STATUS_SEND_GUARANTEED_FAILURE);
         }
     }
 
