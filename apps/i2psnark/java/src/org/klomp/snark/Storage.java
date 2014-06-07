@@ -518,7 +518,9 @@ public class Storage
         // Create base as file.
         if (_log.shouldLog(Log.INFO))
             _log.info("Creating/Checking file: " + base);
-        if (!base.createNewFile() && !base.exists())
+        // createNewFile() can throw a "Permission denied" IOE even if the file exists???
+        // so do it second
+        if (!base.exists() && !base.createNewFile())
           throw new IOException("Could not create file " + base);
 
         _torrentFiles.add(new TorrentFile(base, base, metainfo.getTotalLength()));
@@ -714,7 +716,9 @@ public class Storage
                 f = new File(base, name);
             else
                 f = new SecureFile(base, name);
-            if (!f.createNewFile() && !f.exists())
+            // createNewFile() can throw a "Permission denied" IOE even if the file exists???
+            // so do it second
+            if (!f.exists() && !f.createNewFile())
               throw new IOException("Could not create file " + f);
           }
       }
