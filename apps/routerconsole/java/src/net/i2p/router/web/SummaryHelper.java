@@ -158,8 +158,13 @@ public class SummaryHelper extends HelperBase {
         switch (status) {
             case CommSystemFacade.STATUS_OK:
                 RouterAddress ra = routerInfo.getTargetAddress("NTCP");
+                if (ra == null)
+                    return _("OK");
+                byte[] ip = ra.getIP();
+                if (ip == null)
+                    return _("ERR-Unresolved TCP Address");
                 // TODO set IPv6 arg based on configuration?
-                if (ra == null || TransportUtil.isPubliclyRoutable(ra.getIP(), true))
+                if (TransportUtil.isPubliclyRoutable(ip, true))
                     return _("OK");
                 return _("ERR-Private TCP Address");
             case CommSystemFacade.STATUS_DIFFERENT:
