@@ -1,3 +1,14 @@
+2014-06-07 zzz
+ * Console: Fix NPE in summary bar
+ * Eepsite: Updated French help page (thx hummingbird)
+ * i2psnark: Fix errors when checking read-only files
+ * NetDB: Reduce negative lookup cache time
+ * OCMOSJ:
+   - Increase timeout if we must lookup leaseset
+ * Streaming:
+   - Shorter expire time in TCBCache
+   - Don't fail a connection once it is up
+
 2014-06-01 zzz
  * i2psnark:
    - Store seed/leech status in DHT tracker (ticket #1280)

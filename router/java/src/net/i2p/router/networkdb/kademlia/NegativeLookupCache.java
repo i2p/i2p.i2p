@@ -13,7 +13,7 @@ import net.i2p.util.SimpleTimer;
 class NegativeLookupCache {
     private final ObjectCounter<Hash> counter;
     private static final int MAX_FAILS = 3;
-    private static final long CLEAN_TIME = 4*60*1000;
+    private static final long CLEAN_TIME = 2*60*1000;
 
     public NegativeLookupCache() {
         this.counter = new ObjectCounter<Hash>();

@@ -80,6 +80,9 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
     public final static String OVERALL_TIMEOUT_MS_PARAM = "clientMessageTimeout";
     private final static long OVERALL_TIMEOUT_MS_DEFAULT = 60*1000;
     private final static long OVERALL_TIMEOUT_MS_MIN = 8*1000;
+    private final static long OVERALL_TIMEOUT_MS_MAX = 90*1000;
+    private final static long LS_LOOKUP_TIMEOUT = 15*1000;
+    private final static long OVERALL_TIMEOUT_NOLS_MIN = OVERALL_TIMEOUT_MS_MIN + LS_LOOKUP_TIMEOUT;
     private final static long REPLY_TIMEOUT_MS_MIN = OVERALL_TIMEOUT_MS_DEFAULT - 5*1000;
     
     /**
@@ -123,6 +126,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
      */
     public OutboundClientMessageOneShotJob(RouterContext ctx, OutboundCache cache, ClientMessage msg) {
         super(ctx);
+        _start = ctx.clock().now();
         _cache = cache;
         _log = ctx.logManager().getLog(OutboundClientMessageOneShotJob.class);
         
@@ -132,9 +136,11 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         _clientMessageSize = msg.getPayload().getSize();
         _from = msg.getFromDestination();
         _to = msg.getDestination();
-        _hashPair = new OutboundCache.HashPair(_from.calculateHash(), _to.calculateHash());
-        _toString = _to.calculateHash().toBase64().substring(0,4);
-        _start = getContext().clock().now();
+        Hash toHash = _to.calculateHash();
+        _hashPair = new OutboundCache.HashPair(_from.calculateHash(), toHash);
+        _toString = toHash.toBase64().substring(0,4);
+        // we look up here rather than runJob() so we may adjust the timeout
+        _leaseSet = ctx.netDb().lookupLeaseSetLocally(toHash);
         
         // use expiration requested by client if available, otherwise session config,
         // otherwise router config, otherwise default
@@ -147,8 +153,10 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
             }
             // Unless it's already expired, set a min and max expiration
             if (overallExpiration > _start) {
-                overallExpiration = Math.max(overallExpiration, _start + OVERALL_TIMEOUT_MS_MIN);
-                overallExpiration = Math.min(overallExpiration, _start + OVERALL_TIMEOUT_MS_DEFAULT);
+                // extend the minimum timeout if we must lookup LS
+                long minTimeout = _leaseSet != null ? OVERALL_TIMEOUT_MS_MIN : OVERALL_TIMEOUT_NOLS_MIN;
+                overallExpiration = Math.max(overallExpiration, _start + minTimeout);
+                overallExpiration = Math.min(overallExpiration, _start + OVERALL_TIMEOUT_MS_MAX);
                 if (_log.shouldLog(Log.INFO))
                     _log.info(getJobId() + ": Message Expiration (ms): " + (overallExpiration - _start));
             } else {
@@ -157,6 +165,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
                 // runJob() will call dieFatal()
             }
         } else {
+            // undocumented until 0.9.14, unused
             String param = msg.getSenderConfig().getOptions().getProperty(OVERALL_TIMEOUT_MS_PARAM);
             if (param == null)
                 param = ctx.router().getConfigSetting(OVERALL_TIMEOUT_MS_PARAM);
@@ -185,7 +194,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         ctx.statManager().createRateStat("client.timeoutCongestionTunnel", "How lagged our tunnels are when a send times out?", "ClientMessages", new long[] { 60*1000l, 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
         ctx.statManager().createRateStat("client.timeoutCongestionMessage", "How fast we process messages locally when a send times out?", "ClientMessages", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
         ctx.statManager().createRateStat("client.timeoutCongestionInbound", "How much faster we are receiving data than our average bps when a send times out?", "ClientMessages", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
-        ctx.statManager().createRateStat("client.leaseSetFoundLocally", "How often we tried to look for a leaseSet and found it locally?", "ClientMessages", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        //ctx.statManager().createRateStat("client.leaseSetFoundLocally", "How often we tried to look for a leaseSet and found it locally?", "ClientMessages", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
         ctx.statManager().createRateStat("client.leaseSetFoundRemoteTime", "How long we tried to look for a remote leaseSet (when we succeeded)?", "ClientMessages", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
         ctx.statManager().createRateStat("client.leaseSetFailedRemoteTime", "How long we tried to look for a remote leaseSet (when we failed)?", "ClientMessages", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
         ctx.statManager().createRateStat("client.dispatchPrepareTime", "How long until we've queued up the dispatch job (since we started)?", "ClientMessages", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
@@ -208,12 +217,11 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         //if (_log.shouldLog(Log.DEBUG))
         //    _log.debug(getJobId() + ": Send outbound client message job beginning" +
         //               ": preparing to search for the leaseSet for " + _toString);
-        long timeoutMs = _overallExpiration - now;
-        Hash key = _to.calculateHash();
         SendJob success = new SendJob(getContext());
-        _leaseSet = getContext().netDb().lookupLeaseSetLocally(key);
+        // set in constructor
+        //_leaseSet = getContext().netDb().lookupLeaseSetLocally(key);
         if (_leaseSet != null) {
-            getContext().statManager().addRateData("client.leaseSetFoundLocally", 1);
+            //getContext().statManager().addRateData("client.leaseSetFoundLocally", 1);
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug(getJobId() + ": Send outbound client message - leaseSet found locally for " + _toString);
             success.runJob();
@@ -222,7 +230,8 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug(getJobId() + ": Send outbound client message - sending off leaseSet lookup job for " + _toString);
             LookupLeaseSetFailedJob failed = new LookupLeaseSetFailedJob(getContext());
-            getContext().netDb().lookupLeaseSet(key, success, failed, timeoutMs, _from.calculateHash());
+            Hash key = _to.calculateHash();
+            getContext().netDb().lookupLeaseSet(key, success, failed, LS_LOOKUP_TIMEOUT, _from.calculateHash());
         }
     }
     
@@ -413,7 +422,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         public void runJob() {
             if (_leaseSetLookupBegin > 0) {
                 long lookupTime = getContext().clock().now() - _leaseSetLookupBegin;
-                getContext().statManager().addRateData("client.leaseSetFailedRemoteTime", lookupTime, lookupTime);
+                getContext().statManager().addRateData("client.leaseSetFailedRemoteTime", lookupTime);
             }
             
             //if (_finished == Result.NONE) {
@@ -514,11 +523,10 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         SessionKey sessKey = new SessionKey();
         Set<SessionTag> tags = new HashSet<SessionTag>();
 
-        long msgExpiration = _overallExpiration; // getContext().clock().now() + OVERALL_TIMEOUT_MS_DEFAULT;
         // Per-message flag > 0 overrides per-session option
         int tagsToSend = SendMessageOptions.getTagsToSend(sendFlags);
         GarlicMessage msg = OutboundClientMessageJobHelper.createGarlicMessage(getContext(), token, 
-                                                                               msgExpiration, key, 
+                                                                               _overallExpiration, key, 
                                                                                clove, _from.calculateHash(), 
                                                                                _to, _inTunnel, tagsToSend,
                                                                                tagsRequired, sessKey, tags, 

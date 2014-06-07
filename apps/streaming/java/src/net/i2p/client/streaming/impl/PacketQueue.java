@@ -281,27 +281,36 @@ class PacketQueue implements SendMessageStatusListener {
             case MessageStatusMessage.STATUS_SEND_FAILURE_EXPIRED_LEASESET:
             case MessageStatusMessage.STATUS_SEND_FAILURE_NO_LEASESET:
             case SendMessageStatusListener.STATUS_CANCELLED:
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Rcvd hard failure status " + status + " for msg " + msgId + " on " + con);
-                _messageStatusMap.remove(id);
-                IOException ioe = new I2PSocketException(status);
-                con.getOutputStream().streamErrorOccurred(ioe);
-                con.getInputStream().streamErrorOccurred(ioe);
-                con.setConnectionError("failure code " + status);
-                con.disconnect(false);
+                if (con.getHighestAckedThrough() >= 0) {
+                    // a retxed SYN succeeded before the first SYN failed
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Rcvd hard failure but already connected, status " + status + " for msg " + msgId + " on " + con);
+                } else if (!con.getIsConnected()) {
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Rcvd hard failure but already closed, status " + status + " for msg " + msgId + " on " + con);
+                } else {
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Rcvd hard failure status " + status + " for msg " + msgId + " on " + con);
+                    _messageStatusMap.remove(id);
+                    IOException ioe = new I2PSocketException(status);
+                    con.getOutputStream().streamErrorOccurred(ioe);
+                    con.getInputStream().streamErrorOccurred(ioe);
+                    con.setConnectionError("failure code " + status);
+                    con.disconnect(false);
+                }
                 break;
 
             case MessageStatusMessage.STATUS_SEND_BEST_EFFORT_SUCCESS:
             case MessageStatusMessage.STATUS_SEND_GUARANTEED_SUCCESS:
             case MessageStatusMessage.STATUS_SEND_SUCCESS_LOCAL:
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Rcvd success status " + status + " for msg " + msgId + " on " + con);
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Rcvd success status " + status + " for msg " + msgId + " on " + con);
                 _messageStatusMap.remove(id);
                 break;
 
             case MessageStatusMessage.STATUS_SEND_ACCEPTED:
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Rcvd accept status " + status + " for msg " + msgId + " on " + con);
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Rcvd accept status " + status + " for msg " + msgId + " on " + con);
                 break;
 
             default:
