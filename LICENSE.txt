@@ -182,7 +182,7 @@ Applications:
    By welterde.
    See licenses/LICENSE-GPLv2.txt
 
-   Jetty 8.1.14.v20131031:
+   Jetty 8.1.15.v20140411:
    See licenses/ABOUT-Jetty.html
    See licenses/NOTICE-Jetty.html
    See licenses/LICENSE-Apache2.0.txt
@@ -248,8 +248,8 @@ Applications:
       Bundles systray4j-2.4.1:
       See licenses/LICENSE-LGPLv2.1.txt
 
-   Tomcat 6.0.37:
-   Copyright 1999-2013 The Apache Software Foundation
+   Tomcat 6.0.41:
+   Copyright 1999-2014 The Apache Software Foundation
    See licenses/LICENSE-Apache2.0.txt
    See licenses/NOTICE-Tomcat.txt
 
