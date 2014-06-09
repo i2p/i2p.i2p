@@ -1689,18 +1689,19 @@ public class I2PSnarkServlet extends BasicServlet {
     private String getShortTrackerLink(String announce, byte[] infohash) {
         StringBuilder buf = new StringBuilder(128);
         String trackerLinkUrl = getTrackerLinkUrl(announce, infohash);
-        if (trackerLinkUrl != null)
-            buf.append(trackerLinkUrl);
         if (announce.startsWith("http://"))
             announce = announce.substring(7);
         int slsh = announce.indexOf('/');
         if (slsh > 0)
             announce = announce.substring(0, slsh);
+        if (trackerLinkUrl != null)
+            buf.append(trackerLinkUrl);
+        else
+            buf.append("<a href=\"http://").append(announce).append("/\">");
         if (announce.length() > 67)
             announce = announce.substring(0, 40) + "&hellip;" + announce.substring(announce.length() - 8);
         buf.append(announce);
-        if (trackerLinkUrl != null)
-            buf.append("</a>");
+        buf.append("</a>");
         return buf.toString();
     }
 
@@ -2324,6 +2325,7 @@ public class I2PSnarkServlet extends BasicServlet {
             if (meta != null) {
                 String announce = meta.getAnnounce();
                 if (announce != null) {
+                    announce = DataHelper.stripHTML(announce);
                     buf.append("<tr><td>");
                     String trackerLink = getTrackerLink(announce, snark.getInfoHash());
                     if (trackerLink != null)
@@ -2346,7 +2348,7 @@ public class I2PSnarkServlet extends BasicServlet {
                                 buf.append(' ');
                             else
                                 more = true;
-                            buf.append(getShortTrackerLink(s, snark.getInfoHash()));
+                            buf.append(getShortTrackerLink(DataHelper.stripHTML(s), snark.getInfoHash()));
                         }
                         buf.append("] ");
                     }
