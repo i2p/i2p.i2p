@@ -89,9 +89,12 @@ class NewsFetcher extends UpdateRunner {
                 get.addStatusListener(this);
                 long start = _context.clock().now();
                 if (get.fetch()) {
-                    _context.router().saveConfig(NewsHelper.PROP_LAST_CHECKED,
+                    int status = get.getStatusCode();
+                    if (status == 200 || status == 304) {
+                        _context.router().saveConfig(NewsHelper.PROP_LAST_CHECKED,
                                                  Long.toString(start));
-                    return;
+                        return;
+                    }
                 }
             } catch (Throwable t) {
                 _log.error("Error fetching the news", t);
