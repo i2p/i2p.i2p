@@ -10,6 +10,9 @@
     <property name="javac.compilerargs" value="" />
     <property name="javac.version" value="1.6" />
     <property name="tomcat.lib" value="apache-tomcat-deployer/lib" />
+    <property name="tomcat.ver" value="6.0.41" />
+    <property name="tomcat2.lib" value="apache-tomcat-${tomcat.ver}/lib" />
+    <property name="tomcat2.lib.small" value="apache-tomcat/lib" />
 
     <target name="all" depends="build" />
 
@@ -152,6 +155,23 @@
         <ant target="copyTomcatLib" />
     </target>
 
+    <!-- Tomcat util jar.
+         As of Tomcat 6.0.39, the deployer does not contain some classes that are required
+         to precompile jsps with tags (SusiDNS and i2p-bote).
+         These classes are in the main Tomcat package, in lib/tomcat-coyote.jar.
+         As the jar is 800 KB and we only need 12 KB of that, we extract the required classes
+         to a new jar, created and checked in using this target.
+         Apparently this is only required for precompilation of jsps, so this is put in
+         with the JspC compiler jasper-runtime.jar below.
+     -->
+    <target name="buildTomcatUtilJar" >
+        <!-- take only what we need from the tomcat-coyote jar -->
+        <jar destfile="${tomcat2.lib.small}/tomcat-coyote-util.jar" >
+            <zipfileset src="${tomcat2.lib}/tomcat-coyote.jar"
+             includes="org/apache/tomcat/util/descriptor/* org/apache/tomcat/util/res/*" />
+        </jar>
+    </target>
+
     <!-- Tomcat.
          The glassfish jars bundled in Jetty 6 are way too old.
          For compatibility with very old I2P installations where the classpath
@@ -170,6 +190,7 @@
     <target name="copyTomcatLib" >
         <jar destfile="jettylib/jasper-runtime.jar" filesetmanifest="merge" >
             <zipfileset excludes="META-INF/LICENSE META-INF/NOTICE" src="${tomcat.lib}/jasper.jar" />
+            <zipfileset src="${tomcat2.lib.small}/tomcat-coyote-util.jar" />
         </jar>
         <jar destfile="jettylib/commons-el.jar" duplicate="preserve" filesetmanifest="merge" >
             <zipfileset excludes="META-INF/LICENSE META-INF/NOTICE" src="${tomcat.lib}/jasper-el.jar" />
