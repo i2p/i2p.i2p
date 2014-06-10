@@ -21,6 +21,7 @@
 package org.klomp.snark.bencode;
 
 import java.io.EOFException;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
@@ -232,10 +233,8 @@ public class BDecoder
 
     if (c == '-')
       {
-        c = read();
-        if (c == '0')
-          throw new InvalidBEncodingException("Negative zero not allowed");
         chars.append((char)c);
+        c = read();
       }
 
     if (c < '1' || c > '9')
@@ -376,4 +375,21 @@ public class BDecoder
     return result;
   }
 
+  /**
+   *  prints out the decoded data
+   *  @since 0.9.14
+   */
+  public static void main(String[] args) {
+    if (args.length != 1) {
+        System.err.println("Usage: BDecoder file.torrent");
+        System.exit(1);
+    }
+    try {
+        BEValue bev = bdecode(new FileInputStream(args[0]));
+        System.out.println(bev.toString());
+    } catch (IOException ioe) {
+        ioe.printStackTrace();
+        System.exit(1);
+    }
+  }
 }

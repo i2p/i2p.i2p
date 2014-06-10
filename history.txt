@@ -1,3 +1,7 @@
+2014-06-10 zzz
+ * i2psnark: Fix decoding of negative numbers (ticket #1307)
+ * NewsFetcher: Only treat correct status codes as success
+
 2014-06-09 zzz
  * i2psnark:
    - Show client version if available
