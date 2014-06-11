@@ -63,7 +63,7 @@ cp $wrapperpath/libwrapper.so ./lib/
 cp $wrapperpath/wrapper.jar ./lib/
 cp $wrapperpath/i2psvc .
 rm -rf ./lib/wrapper
-chmod 744 ./i2psvc
+chmod 755 ./i2psvc
 
 echo
 echo "Installation finished."
