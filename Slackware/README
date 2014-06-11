@@ -1,25 +1,45 @@
-ou will need atleast monotone > = 0.41 to get the most recent build source
-and connect it to an already running i2p router.
+Getting the sources
+===================
 
-OR:
+Monotone
+--------
 
-You may download the actual "stable" source from
-http://code.google.com/p/i2p/downloads/list
+The bleeding-edge source code is available both within and outside of I2P. The
+I2P project uses Monotone to maintain the codebase.
 
-You will need to follwing tools to build the i2p and i2p-base packages:
+Information on retrieving the source with monotone is available within I2P at
+http://i2p-projekt.i2p/monotone and from the internet at https://geti2p.net/monotone.
+
+Monotone 1.0 Slackbuilds are available at http://slackbuilds.org/.
+
+Git
+---
+
+Git is also an option to retrieve the I2P source code. That said, Monotone is *the*
+authoritative source. Known Git repositories with the I2P source include
+
+- https://github.com/i2p/i2p.i2p
+- http://git.repo.i2p/w/i2p.i2p.git (mirrored from Github)
+- http://sourceforge.net/p/i2p/code/
+
+Tarball
+-------
+
+The latest stable release is always available from the I2P homepage at
+https://geti2p.net/get/.
+
+Building the SlackBuild
+=======================
+
+The following is needed to build the i2p and i2p-base packages:
 
 bash >= 3.1.017
-requiredbuilder >= 0.16.3 ( http://www.stabellini.net/requiredbuilder.html )
-jre >= 6u11
-jdk >= 6u11
+jre >= 7u55
+jdk >= 7u55
 apache-ant >= 1.7.1
-perl >= 5.10.0
-python >= 2.5.2
 
-Reccomended:
-monotone >= 0.41 ( http://pkgs.dr.ea.ms )
-
-See also:
+See also
+========
 
 i2p/readme.txt
 
@@ -27,4 +47,4 @@ AND
 
 i2p-base/readme.txt
 
-for information and handy tips.
+for additional information and tips.
