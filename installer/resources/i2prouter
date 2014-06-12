@@ -241,16 +241,6 @@ failed() {
     exit 1
 }
 
-if $(which ldd > /dev/null 2>&1); then
-    # This should cover every *NIX other than OSX since OSX doesn't have ldd.
-    # OSX has otool. Is otool on every OSX installation? Is otool's output the same as ldd's?
-    # The wrapper we ship for OSX are for PPC and Intel, so maybe we don't need to worry about OSX?
-    if (ldd "$WRAPPER_CMD" |grep -q 'not found') > /dev/null 2>&1 || \
-                         ! (ldd "$WRAPPER_CMD" > /dev/null 2>&1); then
-        failed
-    fi
-fi
-
 if [ -n "$FIXED_COMMAND" ]
 then
     COMMAND="$FIXED_COMMAND"
@@ -433,7 +423,7 @@ else
                 DIST_BITS="32"
             fi
             ;;
-        'amd64' | 'x86_64')
+        amdfx* | 'amd64' | 'x86_64')
             DIST_ARCH="x86"
             DIST_BITS="64"
             ;;
@@ -612,6 +602,17 @@ if [ ! -r "${WRAPPER_CMD}" ]; then
     echo
     exit 1
 fi
+
+if $(which ldd > /dev/null 2>&1); then
+    # This should cover every *NIX other than OSX since OSX doesn't have ldd.
+    # OSX has otool. Is otool on every OSX installation? Is otool's output the same as ldd's?
+    # The wrapper we ship for OSX are for PPC and Intel, so maybe we don't need to worry about OSX?
+    if (ldd "$WRAPPER_CMD" |grep -q 'not found') > /dev/null 2>&1 || \
+                         ! (ldd "$WRAPPER_CMD" > /dev/null 2>&1); then
+        failed
+    fi
+fi
+
 
 # Build the nice clause
 if [ "X$PRIORITY" = "X" ]
