@@ -37,8 +37,8 @@ class PeerMonitorTask implements Runnable
 
   private final PeerCoordinator coordinator;
 
-  private long lastDownloaded = 0;
-  private long lastUploaded = 0;
+  //private long lastDownloaded = 0;
+  //private long lastUploaded = 0;
 
   PeerMonitorTask(PeerCoordinator coordinator)
   {

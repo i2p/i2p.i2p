@@ -29,4 +29,9 @@ public class RouterIdentity extends KeysAndCert {
     public boolean isHidden() {
         return (_certificate != null) && (_certificate.getCertificateType() == Certificate.CERTIFICATE_TYPE_HIDDEN);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        return super.equals(o) && (o instanceof LeaseSet);
+    }
 }

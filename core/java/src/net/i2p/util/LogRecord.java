@@ -80,4 +80,9 @@ class LogRecord {
                ((_throwable == null && r._throwable == null) ||
                 (_throwable != null && r._throwable != null && _throwable.getClass() == r._throwable.getClass()));
     }
+
+    @Override
+    public int hashCode() {
+        return _message != null ? _message.hashCode() : 0;
+    }
 }

@@ -32,10 +32,10 @@ class BackgroundChecker {
 	private static final int MIN_CHECK_MINUTES = 15;
 	// short for testing
 	//private static final long MIN_IDLE = 10*60*1000;
-	private final long MIN_IDLE = 30*60*1000;
+	private static final long MIN_IDLE = 30*60*1000;
 	// short for testing
 	//private static final long MIN_SINCE = 10*60*1000;
-	private final long MIN_SINCE = 60*60*1000;
+	private static final long MIN_SINCE = 60*60*1000;
 
 	public BackgroundChecker(POP3MailBox mailbox) {
 		this.mailbox = mailbox;

@@ -805,4 +805,10 @@ public class NativeBigInteger extends BigInteger {
         // use linux as the default, don't throw exception
         return "jbigi-linux-";
     }
+
+    @Override
+    public boolean equals(Object o) {
+        // for findbugs
+        return super.equals(o);
+    }
 }

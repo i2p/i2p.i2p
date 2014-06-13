@@ -1580,6 +1580,11 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
         }
 
         @Override
+        public boolean equals(Object o) {
+            return super.equals(o) && (o instanceof VersionAvailable);
+        }
+
+        @Override
         public String toString() {
             return "VersionAvailable \"" + version + "\" " + sourceMap +
                    (constraint != null ? (" \"" + constraint + '"') : "");

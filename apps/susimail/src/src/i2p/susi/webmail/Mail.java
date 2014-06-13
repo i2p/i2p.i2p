@@ -57,7 +57,7 @@ class Mail {
 	private int size;
 	public String sender,   // as received, trimmed only, not HTML escaped
 		reply, subject, dateString,
-		formattedSender,    // address only, enclosed with <>, not HTML escaped
+		//formattedSender,    // address only, enclosed with <>, not HTML escaped
 		formattedSubject,
 		formattedDate,  // US Locale, UTC
 		localFormattedDate,  // Current Locale, local time zone
@@ -78,7 +78,7 @@ class Mail {
 	
 	public Mail(String uidl) {
 		this.uidl = uidl;
-		formattedSender = unknown;
+		//formattedSender = unknown;
 		formattedSubject = unknown;
 		formattedDate = unknown;
 		localFormattedDate = unknown;
@@ -306,7 +306,7 @@ class Mail {
 
 						if( line.startsWith( "From:" ) ) {
 							sender = line.substring( 5 ).trim();
-							formattedSender = getAddress( sender );
+							//formattedSender = getAddress( sender );
 							shortSender = sender.replace("\"", "").trim();
 							int lt = shortSender.indexOf('<');
 							if (lt > 0)

@@ -136,7 +136,6 @@ public class POP3MailBox implements NewMailListener {
 	 */
 	private ReadBuffer getHeader( int id ) {
 			Debug.debug(Debug.DEBUG, "getHeader(" + id + ")");
-			Integer idObj = Integer.valueOf(id);
 			ReadBuffer header = null;
 			if (id >= 1 && id <= mails) {
 				/*
@@ -234,7 +233,6 @@ public class POP3MailBox implements NewMailListener {
 	 */
 	private ReadBuffer getBody(int id) {
 			Debug.debug(Debug.DEBUG, "getBody(" + id + ")");
-			Integer idObj = Integer.valueOf(id);
 			ReadBuffer body = null;
 			if (id >= 1 && id <= mails) {
 				try {

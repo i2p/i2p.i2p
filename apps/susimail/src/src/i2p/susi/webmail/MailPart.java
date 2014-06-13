@@ -113,9 +113,9 @@ class MailPart {
 				str = getHeaderLineAttribute( headerLines[i], "boundary" );
 				if( str != null )
 					boundary = str;
-				if( x_type != null && x_type.startsWith( "multipart" ) && boundary != null )
+				if (x_type.startsWith( "multipart" ) && boundary != null )
 					x_multipart = true;
-				if( x_type != null && x_type.startsWith( "message" ) )
+				if (x_type.startsWith( "message" ) )
 					x_message = true;
 				str = getHeaderLineAttribute( headerLines[i], "name" );
 				if( str != null )

@@ -255,7 +255,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
             // Port-specific spoofhost
             String spoofHost;
             int ourPort = socket.getLocalPort();
-            if (ourPort != 80 && ourPort > 0 && ourPort <= 65535 && opts != null) {
+            if (ourPort != 80 && ourPort > 0 && ourPort <= 65535) {
                 String portSpoof = opts.getProperty("spoofedHost." + ourPort);
                 if (portSpoof != null)
                     spoofHost = portSpoof.trim();
@@ -284,11 +284,9 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
             // server, reads the response headers, rewriting to include Content-encoding: x-i2p-gzip
             // if it was one of the Accept-encoding: values, and gzip the payload       
             boolean allowGZIP = true;
-            if (opts != null) {
-                String val = opts.getProperty("i2ptunnel.gzip");
-                if ( (val != null) && (!Boolean.parseBoolean(val)) ) 
-                    allowGZIP = false;
-            }
+            String val = opts.getProperty("i2ptunnel.gzip");
+            if ( (val != null) && (!Boolean.parseBoolean(val)) ) 
+                allowGZIP = false;
             if (_log.shouldLog(Log.INFO))
                 _log.info("HTTP server encoding header: " + enc + "/" + altEnc);
             boolean alt = (altEnc != null) && (altEnc.indexOf("x-i2p-gzip") >= 0);

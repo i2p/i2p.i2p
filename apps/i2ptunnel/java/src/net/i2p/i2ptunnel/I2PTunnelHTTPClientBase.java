@@ -608,7 +608,7 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
             error = usingWWWProxy ? "dnfp" : "dnf";
         }
         byte[] header = getErrorPage(error, ERR_DESTINATION_UNKNOWN);
-        String message = ise.getLocalizedMessage();
+        String message = ise != null ? ise.getLocalizedMessage() : "unknown error";
         try {
             writeErrorMessage(header, message, out, targetRequest, usingWWWProxy, wwwProxy);
         } catch(IOException ioe) {}

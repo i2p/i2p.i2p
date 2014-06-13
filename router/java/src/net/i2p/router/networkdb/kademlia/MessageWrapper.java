@@ -187,6 +187,7 @@ public class MessageWrapper {
      *  The recipient can then send us an AES-encrypted message,
      *  avoiding ElGamal.
      *
+     *  @return non-null
      *  @since 0.9.9
      */
     public static OneTimeSession generateSession(RouterContext ctx, SessionKeyManager skm) {

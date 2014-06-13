@@ -49,7 +49,7 @@ public class I2PSnarkServlet extends BasicServlet {
     /** generally "i2psnark" */
     private String _contextName;
     private SnarkManager _manager;
-    private static long _nonce;
+    private long _nonce;
     private String _themePath;
     private String _imgPath;
     private String _lastAnnounceURL;

@@ -181,4 +181,9 @@ public class Destination extends KeysAndCert {
             _cache.clear();
         }
     }
+
+    @Override
+    public boolean equals(Object o) {
+        return super.equals(o) && (o instanceof Destination);
+    }
 }

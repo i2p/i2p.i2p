@@ -260,8 +260,6 @@ class OutboundClientMessageJobHelper {
         // remembering that key+tag so that we can decrypt it later.  this means we can do the
         // garlic encryption without any ElGamal (yay)
         MessageWrapper.OneTimeSession sess = MessageWrapper.generateSession(ctx, skm);
-        if (sess == null)
-            return null;
         GarlicMessage msg = MessageWrapper.wrap(ctx, dsm, sess);
         return msg;
     }

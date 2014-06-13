@@ -235,11 +235,11 @@ public class PcapWriter {
             seq = 0xffffffff;
         else
             seq = pkt.getSequenceNum();
+        DataHelper.writeLong(_fos, 4, seq);
         long acked = 0;
         if (con != null) {
             acked = getLowestAckedThrough(pkt, con);
         }
-        DataHelper.writeLong(_fos, 4, pkt.getSequenceNum());
         DataHelper.writeLong(_fos, 4, acked);
 
         // offset and flags 2 bytes
