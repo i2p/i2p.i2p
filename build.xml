@@ -319,7 +319,7 @@
         <copy file="apps/addressbook/dist/addressbook.war" todir="build/" />
     </target>
 
-    <target name="jbigi-list-changes" depends="checkForMtn" if="mtn.available" >
+    <target name="jbigi-list-changes" depends="checkForMtn" if="mtn.available">
         <exec executable="mtn" outputproperty="workspace.changes.jbigi" errorproperty="mtn.error.jbigi" failifexecutionfails="false" >
             <arg value="list" />
             <arg value="changed" />
@@ -333,7 +333,7 @@
         </exec>
     </target>
 
-    <target name="jbigi" depends="buildProperties, jbigi-list-changes" >
+    <target name="jbigi" depends="buildProperties, jbigi-list-changes">
         <!-- set if unset -->
         <property name="workspace.changes.jbigi.tr" value="" />
         <mkdir dir="./build" />
@@ -348,7 +348,7 @@
         </jar>
     </target>
 
-    <target name="jbigi-nowindows" depends="buildProperties, jbigi-list-changes" >
+    <target name="jbigi-nowindows" depends="buildProperties, jbigi-list-changes">
         <!-- set if unset -->
         <property name="workspace.changes.jbigi.tr" value="" />
         <jar destfile="build/jbigi.jar" whenmanifestonly="fail" >
@@ -363,7 +363,7 @@
     </target>
 
     <!-- Now system-specific jbigis in alphabetical order -->
-    <target name="jbigi-freebsd-only"  depends="buildProperties, jbigi-list-changes" >
+    <target name="jbigi-freebsd-only"  depends="buildProperties, jbigi-list-changes">
         <!-- set if unset -->
         <property name="workspace.changes.jbigi.tr" value="" />
         <jar destfile="build/jbigi.jar"  whenmanifestonly="fail" >
@@ -377,7 +377,7 @@
         </jar>
     </target>
 
-    <target name="jbigi-linux-only"  depends="buildProperties, jbigi-list-changes" >
+    <target name="jbigi-linux-only"  depends="buildProperties, jbigi-list-changes">
         <!-- set if unset -->
         <property name="workspace.changes.jbigi.tr" value="" />
         <jar destfile="build/jbigi.jar"  whenmanifestonly="fail" >
@@ -391,7 +391,22 @@
         </jar>
     </target>
 
-    <target name="jbigi-linux-nonx86-only"  depends="buildProperties, jbigi-list-changes" >
+    <target name="jbigi-linux-x86-only"  depends="buildProperties, jbigi-list-changes">
+        <!-- set if unset -->
+        <property name="workspace.changes.jbigi.tr" value="" />
+        <jar destfile="build/jbigi.jar"  whenmanifestonly="fail" >
+            <fileset dir="installer/lib/jbigi" includes="*linux*.so" excludes="*linux-arm*.so,*linux-ppc*.so" />
+            <manifest>
+                <attribute name="Built-By" value="${build.built-by}" />
+                <attribute name="Build-Date" value="${build.timestamp}" />
+                <attribute name="Base-Revision" value="${workspace.version}" />
+                <attribute name="Workspace-Changes" value="${workspace.changes.jbigi.tr}" />
+            </manifest>
+        </jar>
+    </target>
+
+
+    <target name="jbigi-linux-nonx86-only"  depends="buildProperties, jbigi-list-changes">
         <!-- set if unset -->
         <property name="workspace.changes.jbigi.tr" value="" />
         <jar destfile="build/jbigi.jar"  whenmanifestonly="fail" >
