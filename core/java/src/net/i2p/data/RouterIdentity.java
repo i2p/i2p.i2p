@@ -32,6 +32,6 @@ public class RouterIdentity extends KeysAndCert {
 
     @Override
     public boolean equals(Object o) {
-        return super.equals(o) && (o instanceof LeaseSet);
+        return super.equals(o) && (o instanceof RouterIdentity);
     }
 }
