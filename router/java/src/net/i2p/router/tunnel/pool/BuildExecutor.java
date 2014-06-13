@@ -339,8 +339,15 @@ class BuildExecutor implements Runnable {
                     if ( (allowed > 0) && (!wanted.isEmpty()) ) {
                         if (wanted.size() > 1) {
                             Collections.shuffle(wanted, _context.random());
+                            // We generally prioritize pools with no tunnels,
+                            // but sometimes (particularly at startup), the paired tunnel endpoint
+                            // can start dropping the build messages... or hit connection limits,
+                            // or be broken in other ways. So we allow other pools to go
+                            // to the front of the line sometimes, to prevent being "locked up"
+                            // for several minutes.
+                            boolean preferEmpty = _context.random().nextInt(4) != 0;
                             try {
-                                Collections.sort(wanted, new TunnelPoolComparator());
+                                Collections.sort(wanted, new TunnelPoolComparator(preferEmpty));
                             } catch (IllegalArgumentException iae) {
                                 // Java 7 TimSort - see info in TunnelPoolComparator
                                 continue;
@@ -430,15 +437,24 @@ class BuildExecutor implements Runnable {
      *  during the sort. This will cause Java 7 sort to throw an IAE.
      */
     private static class TunnelPoolComparator implements Comparator<TunnelPool> {
+
+        private final boolean _preferEmpty;
+
+        public TunnelPoolComparator(boolean preferEmptyPools) {
+            _preferEmpty = preferEmptyPools;
+        }
+
         public int compare(TunnelPool tpl, TunnelPool tpr) {
             if (tpl.getSettings().isExploratory() && !tpr.getSettings().isExploratory())
                 return -1;
             if (tpr.getSettings().isExploratory() && !tpl.getSettings().isExploratory())
                 return 1;
-            if (tpl.getTunnelCount() <= 0 && tpr.getTunnelCount() > 0)
-                return -1;
-            if (tpr.getTunnelCount() <= 0 && tpl.getTunnelCount() > 0)
-                return 1;
+            if (_preferEmpty) {
+                if (tpl.getTunnelCount() <= 0 && tpr.getTunnelCount() > 0)
+                    return -1;
+                if (tpr.getTunnelCount() <= 0 && tpl.getTunnelCount() > 0)
+                    return 1;
+            }
             return 0;
         }
     }
