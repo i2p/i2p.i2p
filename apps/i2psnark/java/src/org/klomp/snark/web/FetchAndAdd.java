@@ -178,7 +178,10 @@ public class FetchAndAdd extends Snark implements EepGet.StatusListener, Runnabl
                 // This may take a LONG time to create the storage.
                 _mgr.copyAndAddTorrent(file, canonical);
                 snark = _mgr.getTorrentByBaseName(originalName);
-                snark.startTorrent();
+                if (snark != null)
+                    snark.startTorrent();
+                else
+                    throw new IOException("Unknown error - check logs");
             }
         } catch (IOException ioe) {
             _mgr.addMessage(_("Torrent at {0} was not valid", urlify(_url)) + ": " + ioe.getMessage());
