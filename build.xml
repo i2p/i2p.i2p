@@ -42,7 +42,7 @@
         <echo message="  justBOB:  generate a standalone BOB-one.jar" />
         <echo message="  javadoc:   generate javadoc for the entire project into ./build/javadoc and ./javadoc.zip" />
         <echo message="  javadoc-test: Javadocs for unit test classes (build/javadoc-test)" />
-        <echo message="  slackpkg:  generate Slackware packages in ./Slackware/i2p and ./Slackware/i2p-base" />
+        <echo message="  slackpkg:  generate Slackware package in ./Slackware/i2p" />
         <echo message="  debianhowto: instructions on building Debian packages" />
         <echo message="  debian: generate Debian packages in ../" />
         <echo message="          run &quot;ant debianhowto&quot; for instructions" />
@@ -1437,9 +1437,7 @@
         <copy file="apps/i2psnark/java/i2psnark-standalone.zip" todir="." />
     </target>
     <target name="slackpkg">
-        <echo message="Building Slackware package." />
         <ant dir="Slackware/i2p/" target="slackpkg" />
-        <ant dir="Slackware/i2p-base/" target="slackpkg" />
     </target>
     <target name="justBOB" depends="builddepSmall, jbigi">
         <ant dir="apps/BOB/" target="onejar" />

@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
-<project basedir="." default="slackpkg">
-    <target name="slackpkg">
-        <echo message="Building Slackware package." />
-        <exec executable="./i2p-base.SlackBuild">
-        </exec>
-    </target>
-</project>

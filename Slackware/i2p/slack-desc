@@ -6,7 +6,7 @@
 # leave one space after the ':'.
 
    |-----handy-ruler----------------------------------------------------------|
-i2p: i2p (an anonymizing network)
+i2p: I2P (an anonymizing network)
 i2p:
 i2p: I2P is an anonymizing network, offering a simple layer that
 i2p: identity-sensitive applications can use to securely communicate. All
@@ -14,6 +14,6 @@ i2p: data is wrapped with several layers of encryption, and the network is
 i2p: both distributed and dynamic, with no trusted parties.
 i2p: Many applications are available that interface with I2P, including 
 i2p: mail, peer-peer file sharing, IRC chat, and others.
-i2p: WARNING: To upgrade installpkg FIRST _THEN_ removepkg.
-i2p: For more information, see:  http://www.i2p2.de/
+i2p: 
+i2p: For more information, see:  https://geti2p.net/
 i2p:

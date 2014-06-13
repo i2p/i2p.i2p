@@ -1,4 +1,2 @@
-jre >= 5
-i2p-base >= 0.0.1
-bash >= 3.1.017
-
+jre >= 6
+gettext

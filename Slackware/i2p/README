@@ -1,46 +1,89 @@
-Building:
-The i2p package will be installed to /opt/i2p
+The I2P package will be installed to /opt/i2p.
 
-If you want to change installation dir, change the variable INSTALL_DIR
-in i2p.SlackBuild and rebuild the package. You will also need to do the same
-in the base-i2p package.
+To install to another location, set the variable INSTALL_DIR in i2p.SlackBuild
+and rebuild the package.
 
-Installation and Upgrade:
-Probably you will never have to update i2p packages. However if you do,
-be sure to installpkg first, then removepkg or custom config files can
-be lost with upgradepkg. I2P has an auto-update function. However using
-installpkg then removepkg lowers the demand on the I2P network as a
-whole, and is by far faster.
 
-After installpkg command, doinst.sh will execute a postinstallation script
-needed by I2P.  Be sure to also install the base-i2p package.
+Installing and Upgrading:
+=========================
 
-Optional:
+I2P has an auto-update function but generally speaking packages are managed by
+packaging systems. Changing a package's files outside of the package system can
+cause problems. To upgrade when there's a new I2P release, retrieve the new
+source, re-run the SlackBuild, then use upgradepkg to update.
 
-chmod +x /etc/rc.d/rc.i2p only if you want it to start on boot and stop on
-shutdown.
+To ignore all this and upgrade "in-network", simply change the permissions of the installation
+directory (/opt/i2p by default). Something like the following would suffice:
 
-How to start I2P:
+    chown -R USERNAME /opt/i2p
 
-Start the I2P service with-
-sh /etc/rc.d/rc.i2p start
 
-Now tell your browser to use this proxy: 127.0.0.1 on port 4444 and open
-this page: http://127.0.0.1:7657
-Here you can configure I2P, watch network status and navigate anonymously.
-It's suggested to subscribe to various addressbook hosts so that you can
-get to the many available eepsites and other service on I2P. These are not
-set up by default for security reasons.
+Starting and using I2P
+======================
 
-Please see the faqs at http://i2p-projekt.i2p/faq or https://geti2p.net/faq for information about
+Using the initscript
+--------------------
+
+To start I2P at boot, set the executable bit on /etc/rc.d/rc.i2p, add this
+script to rc.local*, and set the variable "RUN_AS_USER" in /etc/rc.d/rc.i2p.
+
+Optionally, create a new user/group with limited rights to run I2P.
+
+Something like the following would work to start I2P at system boot, running under the
+"i2p" account:
+
+     echo '[ -x /etc/rc.d/rc.i2p ] && /etc/rc.d/rc.i2p start' >> /etc/rc.d/rc.local
+     echo '[ -x /etc/rc.d/rc.i2p ] && /etc/rc.d/rc.i2p stop' >> /etc/.rc.d/rc.local_shutdown
+     sed -i .bak 's/^.*\(RUN_AS_USER\)=.*/\1=i2p/' /etc/rc.d/rc.i2p
+     chmod 755 /etc/rc.d/rc.i2p
+
+Unless running as a user named "i2psvc", I2P's config directory defaults to
+$HOME/.i2p. In the case of the "i2psvc" user, the default config directory is
+/var/lib/i2p/i2p-config.
+
+It should not need to be said that using the "root" account is not recommended.
+
+When running using the initscript, I2P will write its logs to /var/log/i2p.
+
+Starting I2P "on-demand"
+------------------------
+
+As with a normal installation, I2P can be started with "i2prouter start". The
+i2prouter and eepget scripts hve been installed to /usr/bin so they'll be
+accessible in the default system PATH.
+
+When running using the i2prouter script, I2P will write its logs to $HOME/.i2p.
+
+
+Configuring your browser
+------------------------
+
+In order to access eepSites (I2P-internal web sites) your web browser needs to
+be configured. Set the HTTP Proxy to 127.0.0.1 and port 4444. For more information, see
+https://geti2p.net/en/about/browser-config
+
+The I2P router console is reachable at http://127.0.0.1:7657.
+
+
+Addressbook subscriptions
+-------------------------
+
+Please see the FAQs at http://i2p-projekt.i2p/faq or https://geti2p.net/faq for information about
 the various addressbook services.
 
-To stop I2P:
- /etc/rc.d/rc.i2p stop
+
+Chatting on IRC
+---------------
+
+I2P comes preconfigured with a tunnel pointing to the I2P-only IRC network,
+Irc2P.  Signing on is easy, just connect to 127.0.0.1 on port 6668. Do not
+configure a proxy in your IRC client.
 
 
-For any additional information:
+Additional information
+======================
 
-Within I2P- http://i2p-projekt.i2p/, http://forum.i2p/, http://zzz.i2p
+Within I2P: http://i2p-projekt.i2p/, http://forum.i2p/, http://zzz.i2p/, http://trac.i2p2.i2p/
+On the Internet:  https://geti2p.net/, https://trac.i2p2.de
+Manpages: i2prouter(1), eepget(1)
 
-Internet (not reccomended!) - https://geti2p.net/

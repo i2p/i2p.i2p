@@ -1,0 +1,185 @@
+#!/bin/sh
+
+# Abort on errors
+set -e
+
+##
+# This *must* be configured. Set this to the user that will run I2P.
+# Note: If you don't want I2P to start automatically at boot,
+# use "i2prouter start" as a non-root user to start I2P.
+#RUN_AS_USER=
+##
+
+##
+# Set the locale as desired.
+# Note: this is not the same as the language shown in the I2P router console.
+# This affects the locale used in wrapper.log. For best results, use a
+# unicode enabled locale (especially important for foreign language torrents).
+#
+# If not set the user's configured locale will be used.
+#RCLOCALE=
+##
+
+#####################################################
+# Nothing below this point should need to be edited #
+#####################################################
+# %INST_DIR is set by i2p.SlackBuild
+INSTALL_DIR="%INST_DIR"
+# Make sure the package is installed and that the wrapper can be found
+[ -d $INSTALL_DIR ] && [ -x $INSTALL_DIR/i2psvc ] || (echo "The I2P package is not installed" >&2 ; exit 1)
+
+if [ -z $RUN_AS_USER ]; then
+    echo "ERROR: RUN_AS_USER not configured in $0" >&2
+    exit 1
+fi
+
+if [ $(id -ur) -ne 0 ]; then
+    echo 'ERROR: You must be root to start this service.' >&2
+    echo
+    exit 1
+fi
+
+if [ -z $RCLOCALE ]; then
+    if [ ! $(locale -a |grep -q "en_US\.utf8") ]; then
+        RCLOCALE="en_US.utf8"
+    fi
+fi
+
+# abort script if any variables are unset
+set -u
+
+if $(uname -m |grep -q '64'); then
+    BITS='64'
+else
+    BITS=''
+fi
+
+PATH="$PATH:/usr/lib$BITS/java/bin:/usr/lib$BITS/java/jre/bin"
+RUN=/var/run/i2p
+PIDFILE="$RUN/i2p.pid"
+WRAPPER_CONF="$INSTALL_DIR/wrapper.config"
+WRAPPERLOG=/var/log/i2p/wrapper.log
+I2PTEMP="/tmp/i2p-daemon"
+DESC="The I2P daemon"
+JAVABINARY=$(awk -F'=' '/^ *wrapper\.java\.command/{print $2}' "$WRAPPER_CONF")
+
+if [ ! $(which $JAVABINARY 2>/dev/null) ]; then
+    for rc in /etc/profile.d/*jdk*.sh /etc/profile.d/*java*.sh; do
+        [ -r $rc ] && . $rc
+    done
+    if [ ! $(which $JAVABINARY 2>/dev/null) ]; then
+        echo "ERROR: Cannot find java. Please set the path to java in $WRAPPER_CONF" >&2
+        exit 1
+    fi
+fi
+
+JAVA=$(which $JAVABINARY 2>/dev/null)
+
+I2P_ARGS="$WRAPPER_CONF \
+ wrapper.java.additional.1=-DloggerFilenameOverride=/var/log/i2p/log-router-@.txt \
+ wrapper.java.additional.10=-Dwrapper.logfile=$WRAPPERLOG \
+ wrapper.java.additional.11=-Di2p.dir.pid=$RUN \
+ wrapper.java.additional.12=-Di2p.dir.temp=$I2PTEMP \
+ wrapper.java.command=$JAVA \
+ wrapper.logfile=$WRAPPERLOG \
+ wrapper.pidfile=$PIDFILE \
+ wrapper.daemonize=TRUE"
+
+LC_ALL=$RCLOCALE
+LANG=$RCLOCALE
+export LC_ALL LANG
+
+is_running() {
+    if [ -r $PIDFILE ]; then
+        PID="$(cat ${PIDFILE})" 2>/dev/null 2>&1
+        if ! kill -0 $PID >/dev/null 2>&1; then
+            rm "$PIDFILE"
+            return 1
+        else
+            return 0
+        fi
+    else
+        return 1
+    fi
+}
+
+start() {
+    if is_running; then
+        echo "ERROR: $DESC is already running." >&2
+    fi
+
+    for DIR in $RUN $I2PTEMP; do
+        test -d $DIR && rm -rf $DIR
+        mkdir -p $DIR
+        chown -R $RUN_AS_USER $DIR
+    done
+    [ -d /var/log/i2p ] || mkdir /var/log/i2p
+    chown -R $RUN_AS_USER /var/log/i2p
+
+    echo -n "Starting $DESC..."
+    TZ=UTC su $RUN_AS_USER -c "$INSTALL_DIR/i2psvc $I2P_ARGS"
+    is_running
+    echo "[pid: $PID]"
+}
+
+stop(){
+    if is_running; then
+        echo -n "Stopping $DESC [pid: $PID] (this could take a while)."
+        kill "$PID" >/dev/null 2>&1
+        while kill -0 "$PID" > /dev/null 2>&1; do
+            echo -n .
+            sleep 1
+        done
+        rm -rf "$RUN" "$I2PTEMP"
+        echo done.
+        return 0
+    else
+        echo "$DESC is not running." >&2
+        return 1
+    fi
+}
+
+
+# Unset +u to allow the 'usage' text to be displayed
+set +u
+case "$1" in
+    start)
+        start
+        ;;
+    status)
+        if is_running; then
+            echo "$DESC is running [pid: $PID]" >&2
+        else
+            echo "$DESC is not running." >&2
+        fi
+        ;;
+    stop)
+        stop
+        ;;
+    graceful)
+        if is_running; then
+            kill -HUP $PID
+            echo "Graceful shutdown of $DESC initiated." >&2
+            echo "This may take up to 11 minutes." >&2
+        fi
+        ;;
+    dump)
+        if is_running; then
+            kill -3 $PID
+            echo "Threads dumped to $WRAPPERLOG" >&2
+        else
+            echo "$DESC is not running." >&2
+        fi
+        ;;
+    restart)
+        if is_running; then
+            stop
+            start
+        else
+            echo "$DESC is not running." >&2
+        fi
+        ;;
+    *)
+        echo "usage: $0 start|stop|status|restart|graceful|dump"
+        ;;
+esac

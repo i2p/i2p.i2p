@@ -3,135 +3,139 @@
 # Heavily based on the Slackware 12.2 SlackBuild
 # Slackware build script for I2P
 #
-# PLEASE READ THIS:
-# Probably you will never have to update I2P packages with upgradepkg,
-# just because I2P has an auto-update function.
-# Really you should not ever use any "upgrade" method.
+# Packages are generally prohibited from being updated outside
+# of the package manager; this I2P SlackBuild is no different.
 #
-# The correct way to upgrade is to: 
-# 1: install the upgrade
-# 2: remove the old package
+# If you'd like to use the I2P "in-network" updates anyway, you'll need to
+# grant the user that I2P will run as write permission to the installation directory
+# (/opt/i2p by default).
 #
-# It is a terrible shame that upgradepkg doesn't do this, infact, 
-# it would actually be the correct way for *any* package!
-#
-#
+# For safety's sake, a user's I2P config files will *never* be overwritten by any upgrade method.
+# In the future this SlackBuild may alert when a default config file is updated
+##
 
-BUILD=1sponge
+# Make sure makepkg and friends can be found
+PATH=$PATH:/sbin
+
+# abort on error and unset variables (same as set -e and set -u, respectively)
+set -o errexit
+set -o nounset
+
+if [ $(id -ur) -ne 0 ]; then
+    echo "ERROR: SlackBuilds require root access." >&2
+    exit 1
+fi
+
+BUILD=1kytv
 # INSTALL_DIR is referenced from /, don't prefix it with a '/'
 INSTALL_DIR=opt
 NAME=i2p
 ARCH=noarch
 
-# Less than slackware 13?
-SLKPLT=$(cat /etc/slackware-version | sed -re "s/(Slackware )([0-9]*)(.*)/\2/")
-if [ $SLKPLT -lt 13 ] ; then
-	EXT=tgz
-else
-	EXT=txz
-fi
-
-
-#
-# This mess is here due to the totally moronic way i2p does versioning.
-# We correct it here.
-#
-ROUTER=$(echo -ne "_")$(cat ../../router/java/src/net/i2p/router/RouterVersion.java | grep -e "public final static long BUILD" | cut -f2 -d"=" | cut -f1 -d";" | sed -re "s/ //g")
-if [ "$ROUTER" == "_" ] ;  then
-	ROUTER="_0"
-fi
-
-#
-# That was the easy one, now for the tough one.
-#
-
-CORE=$(cat ../../core/java/src/net/i2p/CoreVersion.java | grep -e "public final static String VERSION" | cut -f2 -d'"' | sed -re "s/ //g")
-CORE1=$(echo -n $CORE.x.x | sed -re "s/(.*)\.(.*)\.(.*)\.(.*)/\1/")
-CORE2=$(echo -n $CORE.x | sed -re "s/(.*)\.(.*)\.(.*)\.(.*)/\1/")
-
-if [ "$CORE.x.x" == "$CORE1" ] ; then
-	CORE=$(echo -ne $CORE".0.0")
-fi
-if [ "$CORE.x" == "$CORE2" ] ; then
-	CORE=$(echo -ne $CORE".0")
-fi
-
-VERSION=$(echo $CORE$ROUTER)
-#
-# Whew!
-# OK, let's build i2p
-#
-
-CWD=$(pwd)
+CWD=$(readlink -m $(dirname $0))
+I2PSRC=$(readlink -m $CWD/../../)
 TMP=/tmp
-
 PKG=$TMP/package-i2p
-rm -rf $PKG
-mkdir -p $PKG
 
-cd $CWD/../../
+if [ -e "/etc/slackware-version" ]; then
+    # Older than Slackware 13?
+    SLACKVER=$(sed -e "s/Slackware\s\+\([0-9]\+\)\.\?\([0-9]\+\)\?/\1/" /etc/slackware-version)
+    if [ $SLACKVER -lt 13 ] ; then
+        EXT=tgz
+    else
+        EXT=txz
+    fi
+else
+    echo "ERROR: This script is only intended for use on Slackware systems.">&2
+    exit 1
+fi
 
+# Extract version strings
+I2PBUILD=$(sed -e '/^.\+long\s\+BUILD/!d' -e 's/^.\+long\s\+BUILD\s\+=\s\+\([0-9]\+\);/\1/' $I2PSRC/router/java/src/net/i2p/router/RouterVersion.java)
+CORE=$(awk -F'"' '/static\s+String\s+VERSION/{print $2}' $I2PSRC/core/java/src/net/i2p/CoreVersion.java)
+# Temporarily change the field separator to '.' so the version string can be split up
+OLDIFS=$IFS
+IFS="."
+# split x.y.z into $1 $2 $3
+set -- $CORE
+# Restore the field separator to the previous value
+IFS=$OLDIFS
+# With an I2P version string like x.y.z, $1 = x, $2 = y, $3 = z.
+# $3 won't be reachable if the version is of the form x.y, so we'll temporarily set +u to prevent aborting if this variable isn't set
+set +u
+if [ -z $3 ]; then
+    # If CORE is a value like 0.9, we'll set CORE equal to 0.9.0 to match the old behaviour
+    CORE=${CORE}.0
+fi
+
+# From this point forward, unset variables are *unacceptable*
+set -o nounset
+
+VERSION="${CORE}_${I2PBUILD}"
+
+[ -d $PKG ] && rm -rf $PKG
+mkdir -p $PKG/$INSTALL_DIR $PKG/install
+
+cd "$I2PSRC"
 ant distclean
-#ant dist
-ant tarball
+ant jbigi-linux-x86-only preppkg-unix
 
-tar xjvf i2p.tar.bz2 -C $TMP
+chown -R root:root $I2PSRC/pkg-temp
+cp -a $I2PSRC/pkg-temp $PKG/$INSTALL_DIR/i2p
 
-cd $TMP/i2p
-chown -R root:root .
-
-mkdir -p $PKG/$INSTALL_DIR/
-cp -a ../i2p $PKG/$INSTALL_DIR/
-
-mkdir -p $PKG/install
-
-#############################################################################
-# Preconfigureation to make package smaller, and...
-# we keep as much as reasonable in the installation directory.
-# This makes the install map fairly well to the standard installation.
-# It also makes it easier to find the log and pid files!
-#############################################################################
+# $INSTALL_DIR is used by this SlackBuild.
+# [%$]INSTALL_PATH , [%$]SYSTEM_java_io_tmpdir, and [%$]USER_HOME have the correct paths set
+# by the IzPack installer.
 cd $PKG/$INSTALL_DIR/i2p
+for file in wrapper.config eepget i2prouter runplain.sh; do
+    sed -i "s|[%$]INSTALL_PATH|/$INSTALL_DIR/i2p|g;s|[$%]SYSTEM_java_io_tmpdir|$TMP|g;s/[%$]USER_HOME/\$HOME/g" $file
+done
+mv wrapper.config wrapper.config.new
 
-# wrapper.config $INSTALL_PATH and $SYSTEM_java_io_tmpdir
-sed "s|\$INSTALL_PATH|/$INSTALL_DIR/i2p|g" wrapper.config > a
-sed "s|\$SYSTEM_java_io_tmpdir|/$INSTALL_DIR/i2p|g" a > wrapper.config
-# eepget %INSTALL_PATH
-sed "s|\$INSTALL_PATH|/$INSTALL_DIR/i2p|g" eepget > a
-rm eepget
-mv a eepget
-# runplain.sh %INSTALL_PATH and %SYSTEM_java_io_tmpdir
-sed "s|%INSTALL_PATH|/$INSTALL_DIR/i2p|g" runplain.sh > a
-sed "s|%SYSTEM_java_io_tmpdir|/$INSTALL_DIR/i2p|g" a > runplain.sh
-# i2prouter %INSTALL_PATH and %SYSTEM_java_io_tmpdir
-sed "s|%INSTALL_PATH|/$INSTALL_DIR/i2p|g" i2prouter > a
-rm i2prouter
-mv a i2prouter
-sed "s|%SYSTEM_java_io_tmpdir|/$INSTALL_DIR/i2p|g" i2prouter > a
-sed "s|#ALLOW_ROOT=true|ALLOW_ROOT=true|g" a > i2prouter
+install -d $PKG/usr/bin
+install -d $PKG/usr/doc/$NAME-$VERSION
+install -d $PKG/etc/rc.d
+mv licenses LICENSE.txt -t $PKG/usr/doc/$NAME-$VERSION
 
-chmod 744 ./i2prouter
-chmod 744 ./osid
-chmod 744 ./runplain.sh
-chmod 744 ./eepget
-chmod 744 ./scripts/i2pbench.sh
-chmod 744 ./scripts/i2ptest.sh
-rm -Rf ./lib/*.dll ./*.bat ./*.exe ./installer ./icons ./a postinstall.sh
+# runplain will live in the installation directory. eepget and i2prouter will go to /usr/bin
+# with symlinks in INST_DIR (created in doinst.sh)
+install -m755 i2prouter $PKG/usr/bin
+install -m755 eepget $PKG/usr/bin
+chmod 755  ./runplain.sh
 
-mv $PKG/$INSTALL_DIR/i2p/*.config $PKG/install
-mv $PKG/$INSTALL_DIR/i2p/blocklist.txt $PKG/$INSTALL_DIR/i2p/blocklist.txt.new
-find $PKG/$INSTALL_DIR/i2p -name "*.xml" -exec mv {} {}.new \;
-mv $PKG/$INSTALL_DIR/i2p/eepsite/docroot/index.html $PKG/$INSTALL_DIR/i2p/eepsite/docroot/index.html.new
-mv $PKG/$INSTALL_DIR/i2p/eepsite/docroot/favicon.ico $PKG/$INSTALL_DIR/i2p/eepsite/docroot/favicon.ico.new
-sed "s|directory|/$INSTALL_DIR/i2p/|g" $CWD/doinst.sh > $PKG/install/doinst.sh
-cat $CWD/slack-desc > $PKG/install/slack-desc
+if [ $INSTALL_DIR != 'opt' ]; then
+    sed "s|\(The I2P package\)\s\+will be\s\+\(installed to\).+|\1 has been \2 $INSTALL_DIR/i2p|g" $CWD/README > $PKG/usr/doc/$NAME-$VERSION/README
+else
+    sed "s|will be installed|has been installed|" $CWD/README > $PKG/usr/doc/$NAME-$VERSION/README
+fi
+
+install -d $PKG/usr/man/man1
+gzip -9 man/*.1
+install -m644 man/*.1.gz $PKG/usr/man/man1
+rm -rf ./man
+
+# We install all x86 wrapper binaries.
+# The i2prouter script will try to determine the OS (linux), the bits (32 VS 64) and should be able
+# to figure out the correct wrapper binary to use.
+
+# Howver: In case the i2prouter script's detection fails, "$INST_DIR/i2psvc" will point to
+# what 'we' think the correct binary is.
+#
+# A good reason for installing all binaries: in case the user, for whatever reason, switches from an
+# x64 JRE to an x86 JRE, I2P should continue to work without needing to be reinstalled.
+install -m755 $I2PSRC/installer/lib/wrapper/linux/i2psvc ./i2psvc-linux-x86-32
+install -m644 $I2PSRC/installer/lib/wrapper/linux/libwrapper.so ./lib/libwrapper-linux-x86-32.so
+install -m755 $I2PSRC/installer/lib/wrapper/linux64/i2psvc ./i2psvc-linux-x86-64
+install -m644 $I2PSRC/installer/lib/wrapper/linux64/libwrapper.so ./lib/libwrapper-linux-x86-64.so
+install -m644 $I2PSRC/installer/lib/wrapper/all/wrapper.jar ./lib/wrapper.jar
+install -m644 $I2PSRC/build/jbigi.jar $PKG/$INSTALL_DIR/i2p/lib/jbigi.jar
+
+rm -f ./postinstall.sh ./osid ./INSTALL-*.txt
+sed "s|directory|/$INSTALL_DIR/i2p|" $CWD/doinst.sh > $PKG/install/doinst.sh
+sed -i "s|%pkg|$NAME-$VERSION|" $PKG/install/doinst.sh
+sed "s|%INST_DIR|/$INSTALL_DIR/i2p|" $CWD/rc.i2p> $PKG/etc/rc.d/rc.i2p.new
+cp $CWD/slack-desc $PKG/install/slack-desc
 
 cd $PKG
-#
-# requiredbuilder messes up REALLY bad, and thinks java is perl?!
-# It also did not catch the shell requirements! BOOOOOOOOOOO! HISSSSSSSS!
-#
-# requiredbuilder -v -y -s $CWD $PKG
-#
-cat $CWD/slack-required > $PKG/install/slack-required
+cp $CWD/slack-required $PKG/install/slack-required
 makepkg -l y -c n $CWD/${NAME}-$VERSION-$ARCH-$BUILD.$EXT

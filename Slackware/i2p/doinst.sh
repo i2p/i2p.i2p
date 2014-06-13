@@ -1,72 +1,59 @@
-#!/bin/bash
+#!/bin/sh
 
+# Abort on error or unset variables
+set -e
+set -u
+
+# This is changed by i2p.SlackBuild
 INST_DIR=directory
+PKGNAME="%pkg"
 
-( cd install
+config() {
+    NEW="$1"
+    OLD="$(dirname $NEW)/$(basename $NEW .new)"
+    if [ ! -r $NEW ]; then
+        # Flaw in the packaging, this shouldn't happen. Just return.
+        return
+    fi
 
-echo
-for i in *.config ; {
-	if [ -f $INST_DIR/$i ] ; then
-		echo "Please check ${INST_DIR}${i}, as there is a new version."
-		cp $i $INST_DIR/$i.new
-	else
-		cp $i $INST_DIR/$i
-	fi
+    # If this file doesn't exist yet, drop the .new extension
+    if [ ! -r $OLD ]; then
+        mv $NEW $OLD
+        return
+    elif [ "$(md5sum $OLD | cut -d' ' -f1)" = "$(md5sum $NEW | cut -d' ' -f1)" ]; then
+        # If there are no differences in the files, remove the new one
+        rm $NEW
+        return
+    fi
+    # If they differ alert the admin (but let's not be terribly obnoxious about it)
+    echo "WARNING: The files $OLD and $NEW differ." >&2
 }
 
-)
+# Unlike previous versions of the package, we install i2prouter and eepget to /usr/bin
+# to make them available within the system PATH.
 
-( cd $INST_DIR
-	if [ -f blocklist.txt ] ; then
-		echo "Please check ${INST_DIR}blocklist.txt, as there is a new version."
-	else
-		mv blocklist.txt.new blocklist.txt
-	fi
-)
+# Users might still want to /opt/i2p/i2prouter or /opt/i2p/eepget so we'll create symlinks
+# in the installation directory.
+ln -sf /usr/bin/eepget $INST_DIR
+ln -sf /usr/bin/i2prouter $INST_DIR
+(cd /usr/doc/$PKGNAME; ln -sf $INST_DIR/history.txt changelog)
 
-( cd $INST_DIR/eepsite
-	if [ -f jetty.xml ] ; then
-		echo "Please check ${INST_DIR}/eepsite, as there are new files."
-	else
-		find $PKG/$INSTALL_DIR/i2p -name "*.xml.new" -exec sh -c 'mv "$0" "${0/.new}"' {} \;
-	fi
-)
-
-( cd $INST_DIR/eepsite/docroot
-	if [ -f index.html ] ; then
-		rm index.html.new
-	else
-		mv index.html.new index.html
-	fi
-	if [ -f favicon.ico ] ; then
-		rm favicon.ico.new
-	else
-		mv favicon.ico.new favicon.ico
-	fi
-)
-
-echo
-echo "FINISHING I2P INSTALLATION. PLEASE WAIT."
-
-cd $INST_DIR
-
-
-
-OS_ARCH=`uname -m`
-X86_64=`echo "$OS_ARCH" | grep x86_64`
-if [ "X$X86_64" = "X" ]; then
-        wrapperpath="./lib/wrapper/linux"
+if $(uname -m | grep -q '64'); then
+    (cd $INST_DIR; ln -sf i2psvc-linux-x86-64 i2psvc)
 else
-        wrapperpath="./lib/wrapper/linux64"
+    (cd $INST_DIR; ln -sf i2psvc-linux-x86-32 i2psvc)
 fi
-cp $wrapperpath/libwrapper.so ./lib/
-cp $wrapperpath/wrapper.jar ./lib/
-cp $wrapperpath/i2psvc .
-rm -rf ./lib/wrapper
-chmod 755 ./i2psvc
 
-echo
-echo "Installation finished."
-echo
+config /etc/rc.d/rc.i2p.new
+config $INST_DIR/wrapper.config.new
 
-exit
+if [ -e /var/log/packages/i2p-base* ]; then
+    echo "Warning: This package supercedes the 'i2p-base' package." >&2
+    echo
+    echo "You may want to 'removepkg i2p-base'" >&2
+    echo "and check the contents of /etc/rc.d/rc.local*" >&2
+    echo "for correctness" >&2
+fi
+
+# Remove extraneous 'sh' from sponge's set-up
+sed -i 's|sh /etc/rc\.d/rc\.i2p|/etc/rc.d/rc.i2p|g' /etc/rc.d/rc.local*

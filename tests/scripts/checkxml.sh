@@ -57,7 +57,6 @@ XMLFILES="\
 ./installer/resources/eepsite/jetty.xml
 ./installer/resources/shortcutSpec.xml \
 ./router/java/build.xml \
-./Slackware/i2p-base/build.xml \
 ./Slackware/i2p/build.xml"
 
 HTMLFILES="\

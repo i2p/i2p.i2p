@@ -15,12 +15,15 @@ Monotone 1.0 Slackbuilds are available at http://slackbuilds.org/.
 Git
 ---
 
-Git is also an option to retrieve the I2P source code. That said, Monotone is *the*
-authoritative source. Known Git repositories with the I2P source include
+Git is also an option to retrieve the I2P source code. That said, the I2P
+Monotone servers are *the* authoritative source.
+
+Public Git repositories hosting the I2P source and managed by I2P project team members include
 
 - https://github.com/i2p/i2p.i2p
 - http://git.repo.i2p/w/i2p.i2p.git (mirrored from Github)
 - http://sourceforge.net/p/i2p/code/
+
 
 Tarball
 -------
@@ -28,23 +31,40 @@ Tarball
 The latest stable release is always available from the I2P homepage at
 https://geti2p.net/get/.
 
-Building the SlackBuild
-=======================
 
-The following is needed to build the i2p and i2p-base packages:
+This SlackBuild
+===============
 
-bash >= 3.1.017
-jre >= 7u55
-jdk >= 7u55
-apache-ant >= 1.7.1
+Requirements
+-------------
+
+The following are needed to build the i2p package:
+
+* jre >= 6
+* jdk >= 6
+* gettext
+* apache-ant >= 1.7.1
+
+If you don't care about bundling the translations, the gettext requirement can
+be avoided by adding -Drequire.gettext=false to the ant lines in
+i2p/i2p.SlackBuild
+
+A JRE >= v6 is the only requirement to run I2P.
+
+Building
+--------
+
+As the root user, run either $I2PSRC/Slackware/i2p/i2p.SlackBuild or `ant slackpkg` to create a package
+in $I2PSRC/Slackware/i2p which can be installed using the Slackware packaging tools.
 
 See also
 ========
 
-i2p/readme.txt
+Please also take a look at
 
-AND
-
-i2p-base/readme.txt
+* i2p/README
+* eepget(1)
+* i2prouter(1)
+* http://i2p-projekt.i2p / https://geti2p.net
 
 for additional information and tips.

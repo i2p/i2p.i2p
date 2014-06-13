@@ -43,6 +43,9 @@ SCRIPTFILES="\
 	./installer/resources/runplain.sh \
 	./installer/resources/uninstall_i2p_service_osx.command
 	./installer/resources/uninstall_i2p_service_unix \
+	./Slackware/i2p/i2p.SlackBuild \
+	./Slackware/i2p/doinst.sh \
+	./Slackware/i2p/rc.i2p \
 	./tests/scripts/checkcerts.sh \
 	./tests/scripts/checkpo.sh \
 	./tests/scripts/checkutf8.sh \
