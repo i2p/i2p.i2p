@@ -124,6 +124,8 @@ public abstract class TransportUtil {
             // Assigned to UK Ministry of Defence
             // http://blog.logmein.com/products/changes-to-hamachi-on-november-19th
             if (a0 == 25) return false;
+            // Carrier Grade NAT RFC 6598
+            if (a0 == 100 && a1 >= 64 && a1 <= 127) return false;
             return true; // or at least possible to be true
         } else if (addr.length == 16) {
             if (allowIPv6) {
