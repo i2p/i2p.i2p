@@ -404,16 +404,7 @@ then
     APP_PLIST_BASE=${PLIST_DOMAIN}.${APP_NAME}
     APP_PLIST=${APP_PLIST_BASE}.plist
 else
-    DIST_ARCH=
-    DIST_ARCH=`uname -p 2>/dev/null | $TREXE "[A-Z]" "[a-z]" | $TREXE -d ' '`
-    if [ "X$DIST_ARCH" = "X" ]
-    then
-        DIST_ARCH="unknown"
-    fi
-    if [ "$DIST_ARCH" = "unknown" ]
-    then
-        DIST_ARCH=`uname -m 2>/dev/null | $TREXE "[A-Z]" "[a-z]" | $TREXE -d ' '`
-    fi
+    DIST_ARCH=`uname -m 2>/dev/null | $TREXE "[A-Z]" "[a-z]" | $TREXE -d ' '`
     case "$DIST_ARCH" in
         'athlon' | 'i386' | 'i486' | 'i586' | 'i686')
             DIST_ARCH="x86"
@@ -479,10 +470,10 @@ else
             DIST_BITS="64"
             ;;
         armv*)
-            if [ -z "`readelf -A /proc/self/exe | grep Tag_ABI_VFP_args`" ] ; then 
+            if [ -z "`readelf -A /proc/self/exe | grep Tag_ABI_VFP_args`" ] ; then
                 DIST_ARCH="armel"
                 DIST_BITS="32"
-            else 
+            else
                 DIST_ARCH="armhf"
                 DIST_BITS="32"
             fi
