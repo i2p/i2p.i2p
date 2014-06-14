@@ -52,25 +52,10 @@ fi
 
 # Extract version strings
 I2PBUILD=$(sed -e '/^.\+long\s\+BUILD/!d' -e 's/^.\+long\s\+BUILD\s\+=\s\+\([0-9]\+\);/\1/' $I2PSRC/router/java/src/net/i2p/router/RouterVersion.java)
-CORE=$(awk -F'"' '/static\s+String\s+VERSION/{print $2}' $I2PSRC/core/java/src/net/i2p/CoreVersion.java)
-# Temporarily change the field separator to '.' so the version string can be split up
-OLDIFS=$IFS
-IFS="."
-# split x.y.z into $1 $2 $3
-set -- $CORE
-# Restore the field separator to the previous value
-IFS=$OLDIFS
-# With an I2P version string like x.y.z, $1 = x, $2 = y, $3 = z.
-# $3 won't be reachable if the version is of the form x.y, so we'll temporarily set +u to prevent aborting if this variable isn't set
-set +u
-if [ -z $3 ]; then
-    # If CORE is a value like 0.9, we'll set CORE equal to 0.9.0 to match the old behaviour
-    CORE=${CORE}.0
-fi
-
-# From this point forward, unset variables are *unacceptable*
-set -o nounset
-
+# Thanks to user "ihavei2p" for the second awk statement
+# If the version is x.y, it'll be set to x.y.0. Otherwise the version string will be unchanged
+CORE=$(awk -F'"' '/static\s+String\s+VERSION/{print $2}' $I2PSRC/core/java/src/net/i2p/CoreVersion.java | \
+	awk -F. '{ if (NF > 3) { print; exit } else if ($3 == "") { $3=0; print $1"."$2"."$3 } else print }')
 VERSION="${CORE}_${I2PBUILD}"
 
 [ -d $PKG ] && rm -rf $PKG
