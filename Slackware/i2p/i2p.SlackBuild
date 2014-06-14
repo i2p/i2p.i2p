@@ -11,7 +11,7 @@
 # (/opt/i2p by default).
 #
 # For safety's sake, a user's I2P config files will *never* be overwritten by any upgrade method.
-# In the future this SlackBuild may alert when a default config file is updated
+# In the future this SlackBuild may alert when a default config file is updated.
 ##
 
 # Make sure makepkg and friends can be found
@@ -55,7 +55,7 @@ I2PBUILD=$(sed -e '/^.\+long\s\+BUILD/!d' -e 's/^.\+long\s\+BUILD\s\+=\s\+\([0-9
 # Thanks to user "ihavei2p" for the second awk statement
 # If the version is x.y, it'll be set to x.y.0. Otherwise the version string will be unchanged
 CORE=$(awk -F'"' '/static\s+String\s+VERSION/{print $2}' $I2PSRC/core/java/src/net/i2p/CoreVersion.java | \
-	awk -F. '{ if (NF > 3) { print; exit } else if ($3 == "") { $3=0; print $1"."$2"."$3 } else print }')
+        awk -F. '{ if (NF > 3) { print; exit } else if ($3 == "") { $3=0; print $1"."$2"."$3 } else print }')
 VERSION="${CORE}_${I2PBUILD}"
 
 [ -d $PKG ] && rm -rf $PKG
@@ -82,7 +82,7 @@ install -d $PKG/usr/doc/$NAME-$VERSION
 install -d $PKG/etc/rc.d
 mv licenses LICENSE.txt -t $PKG/usr/doc/$NAME-$VERSION
 
-# runplain will live in the installation directory. eepget and i2prouter will go to /usr/bin
+# runplain.sh will live in the installation directory. eepget and i2prouter will go to /usr/bin
 # with symlinks in INST_DIR (created in doinst.sh)
 install -m755 i2prouter $PKG/usr/bin
 install -m755 eepget $PKG/usr/bin
@@ -103,7 +103,7 @@ rm -rf ./man
 # The i2prouter script will try to determine the OS (linux), the bits (32 VS 64) and should be able
 # to figure out the correct wrapper binary to use.
 
-# Howver: In case the i2prouter script's detection fails, "$INST_DIR/i2psvc" will point to
+# However: In case the i2prouter script's detection fails, "$INST_DIR/i2psvc" will point to
 # what 'we' think the correct binary is.
 #
 # A good reason for installing all binaries: in case the user, for whatever reason, switches from an

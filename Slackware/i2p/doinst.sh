@@ -12,20 +12,21 @@ config() {
     NEW="$1"
     OLD="$(dirname $NEW)/$(basename $NEW .new)"
     if [ ! -r $NEW ]; then
-        # Flaw in the packaging, this shouldn't happen. Just return.
+        # If we get here there's a flaw in the packaging. We'll just return so that
+        # we don't emit a spurious error for the user. (It's not the user's problem).
         return
     fi
 
-    # If this file doesn't exist yet, drop the .new extension
+    # If this file doesn't exist yet, drop the .new extension.
     if [ ! -r $OLD ]; then
         mv $NEW $OLD
         return
     elif [ "$(md5sum $OLD | cut -d' ' -f1)" = "$(md5sum $NEW | cut -d' ' -f1)" ]; then
-        # If there are no differences in the files, remove the new one
+        # If there are no differences in the files, remove the file with the .new extension.
         rm $NEW
         return
     fi
-    # If they differ alert the admin (but let's not be terribly obnoxious about it)
+    # Alert the admin if they differ, but let's not be terribly obnoxious about it.
     echo "WARNING: The files $OLD and $NEW differ." >&2
 }
 

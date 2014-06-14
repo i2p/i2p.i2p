@@ -14,7 +14,7 @@ set -e
 # Set the locale as desired.
 # Note: this is not the same as the language shown in the I2P router console.
 # This affects the locale used in wrapper.log. For best results, use a
-# unicode enabled locale (especially important for foreign language torrents).
+# unicode enabled locale. This is especially important for foreign language torrents.
 #
 # If not set the user's configured locale will be used.
 #RCLOCALE=
@@ -45,7 +45,7 @@ if [ -z $RCLOCALE ]; then
     fi
 fi
 
-# abort script if any variables are unset
+# Abort this script if any referenced variables haven't been set
 set -u
 
 if $(uname -m |grep -q '64'); then
