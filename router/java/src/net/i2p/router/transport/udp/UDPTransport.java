@@ -1,6 +1,7 @@
 package net.i2p.router.transport.udp;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.io.Writer;
 import java.net.InetAddress;
 import java.net.SocketException;
@@ -2240,59 +2241,59 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private static final int FLAG_DEBUG = 99;
     
     private static Comparator<PeerState> getComparator(int sortFlags) {
-        Comparator<PeerState> rv = null;
+        Comparator<PeerState> rv;
         switch (Math.abs(sortFlags)) {
             case FLAG_IDLE_IN:
-                rv = IdleInComparator.instance();
+                rv = new IdleInComparator();
                 break;
             case FLAG_IDLE_OUT:
-                rv = IdleOutComparator.instance();
+                rv = new IdleOutComparator();
                 break;
             case FLAG_RATE_IN:
-                rv = RateInComparator.instance();
+                rv = new RateInComparator();
                 break;
             case FLAG_RATE_OUT:
-                rv = RateOutComparator.instance();
+                rv = new RateOutComparator();
                 break;
             case FLAG_UPTIME:
-                rv = UptimeComparator.instance();
+                rv = new UptimeComparator();
                 break;
             case FLAG_SKEW:
-                rv = SkewComparator.instance();
+                rv = new SkewComparator();
                 break;
             case FLAG_CWND:
-                rv = CwndComparator.instance();
+                rv = new CwndComparator();
                 break;
             case FLAG_SSTHRESH:
-                rv = SsthreshComparator.instance();
+                rv = new SsthreshComparator();
                 break;
             case FLAG_RTT:
-                rv = RTTComparator.instance();
+                rv = new RTTComparator();
                 break;
             //case FLAG_DEV:
-            //    rv = DevComparator.instance();
+            //    rv = new DevComparator();
             //    break;
             case FLAG_RTO:
-                rv = RTOComparator.instance();
+                rv = new RTOComparator();
                 break;
             case FLAG_MTU:
-                rv = MTUComparator.instance();
+                rv = new MTUComparator();
                 break;
             case FLAG_SEND:
-                rv = SendCountComparator.instance();
+                rv = new SendCountComparator();
                 break;
             case FLAG_RECV:
-                rv = RecvCountComparator.instance();
+                rv = new RecvCountComparator();
                 break;
             case FLAG_RESEND:
-                rv = ResendComparator.instance();
+                rv = new ResendComparator();
                 break;
             case FLAG_DUP:
-                rv = DupComparator.instance();
+                rv = new DupComparator();
                 break;
             case FLAG_ALPHA:
             default:
-                rv = AlphaComparator.instance();
+                rv = new AlphaComparator();
                 break;
         }
         if (sortFlags < 0)
@@ -2301,12 +2302,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     }
 
     private static class AlphaComparator extends PeerComparator {
-        private static final AlphaComparator _instance = new AlphaComparator();
-        public static final AlphaComparator instance() { return _instance; }
     }
+
     private static class IdleInComparator extends PeerComparator {
-        private static final IdleInComparator _instance = new IdleInComparator();
-        public static final IdleInComparator instance() { return _instance; }
         @Override
         public int compare(PeerState l, PeerState r) {
             long rv = r.getLastReceiveTime() - l.getLastReceiveTime();
@@ -2316,9 +2314,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 return (int)rv;
         }
     }
+
     private static class IdleOutComparator extends PeerComparator {
-        private static final IdleOutComparator _instance = new IdleOutComparator();
-        public static final IdleOutComparator instance() { return _instance; }
         @Override
         public int compare(PeerState l, PeerState r) {
             long rv = r.getLastSendTime() - l.getLastSendTime();
@@ -2328,9 +2325,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 return (int)rv;
         }
     }
+
     private static class RateInComparator extends PeerComparator {
-        private static final RateInComparator _instance = new RateInComparator();
-        public static final RateInComparator instance() { return _instance; }
         @Override
         public int compare(PeerState l, PeerState r) {
             int rv = l.getReceiveBps() - r.getReceiveBps();
@@ -2340,9 +2336,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 return rv;
         }
     }
+
     private static class RateOutComparator extends PeerComparator {
-        private static final RateOutComparator _instance = new RateOutComparator();
-        public static final RateOutComparator instance() { return _instance; }
         @Override
         public int compare(PeerState l, PeerState r) {
             int rv = l.getSendBps() - r.getSendBps();
@@ -2352,9 +2347,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 return rv;
         }
     }
+
     private static class UptimeComparator extends PeerComparator {
-        private static final UptimeComparator _instance = new UptimeComparator();
-        public static final UptimeComparator instance() { return _instance; }
         @Override
         public int compare(PeerState l, PeerState r) {
             long rv = r.getKeyEstablishedTime() - l.getKeyEstablishedTime();
@@ -2364,9 +2358,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 return (int)rv;
         }
     }
+
     private static class SkewComparator extends PeerComparator {
-        private static final SkewComparator _instance = new SkewComparator();
-        public static final SkewComparator instance() { return _instance; }
         @Override
         public int compare(PeerState l, PeerState r) {
             long rv = Math.abs(l.getClockSkew()) - Math.abs(r.getClockSkew());
@@ -2376,9 +2369,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 return (int)rv;
         }
     }
+
     private static class CwndComparator extends PeerComparator {
-        private static final CwndComparator _instance = new CwndComparator();
-        public static final CwndComparator instance() { return _instance; }
         @Override
         public int compare(PeerState l, PeerState r) {
             int rv = l.getSendWindowBytes() - r.getSendWindowBytes();
@@ -2388,9 +2380,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 return rv;
         }
     }
+
     private static class SsthreshComparator extends PeerComparator {
-        private static final SsthreshComparator _instance = new SsthreshComparator();
-        public static final SsthreshComparator instance() { return _instance; }
         @Override
         public int compare(PeerState l, PeerState r) {
             int rv = l.getSlowStartThreshold() - r.getSlowStartThreshold();
@@ -2400,9 +2391,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 return rv;
         }
     }
+
     private static class RTTComparator extends PeerComparator {
-        private static final RTTComparator _instance = new RTTComparator();
-        public static final RTTComparator instance() { return _instance; }
         @Override
         public int compare(PeerState l, PeerState r) {
             int rv = l.getRTT() - r.getRTT();
@@ -2430,8 +2420,6 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
 
     /** */
     private static class RTOComparator extends PeerComparator {
-        private static final RTOComparator _instance = new RTOComparator();
-        public static final RTOComparator instance() { return _instance; }
         @Override
         public int compare(PeerState l, PeerState r) {
             int rv = l.getRTO() - r.getRTO();
@@ -2441,9 +2429,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 return rv;
         }
     }
+
     private static class MTUComparator extends PeerComparator {
-        private static final MTUComparator _instance = new MTUComparator();
-        public static final MTUComparator instance() { return _instance; }
         @Override
         public int compare(PeerState l, PeerState r) {
             int rv = l.getMTU() - r.getMTU();
@@ -2453,9 +2440,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 return rv;
         }
     }
+
     private static class SendCountComparator extends PeerComparator {
-        private static final SendCountComparator _instance = new SendCountComparator();
-        public static final SendCountComparator instance() { return _instance; }
         @Override
         public int compare(PeerState l, PeerState r) {
             long rv = l.getPacketsTransmitted() - r.getPacketsTransmitted();
@@ -2465,9 +2451,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 return (int)rv;
         }
     }
+
     private static class RecvCountComparator extends PeerComparator {
-        private static final RecvCountComparator _instance = new RecvCountComparator();
-        public static final RecvCountComparator instance() { return _instance; }
         @Override
         public int compare(PeerState l, PeerState r) {
             long rv = l.getPacketsReceived() - r.getPacketsReceived();
@@ -2477,9 +2462,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 return (int)rv;
         }
     }
+
     private static class ResendComparator extends PeerComparator {
-        private static final ResendComparator _instance = new ResendComparator();
-        public static final ResendComparator instance() { return _instance; }
         @Override
         public int compare(PeerState l, PeerState r) {
             long rv = l.getPacketsRetransmitted() - r.getPacketsRetransmitted();
@@ -2489,9 +2473,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 return (int)rv;
         }
     }
+
     private static class DupComparator extends PeerComparator {
-        private static final DupComparator _instance = new DupComparator();
-        public static final DupComparator instance() { return _instance; }
         @Override
         public int compare(PeerState l, PeerState r) {
             long rv = l.getPacketsReceivedDuplicate() - r.getPacketsReceivedDuplicate();
@@ -2502,7 +2485,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         }
     }
     
-    private static class PeerComparator implements Comparator<PeerState> {
+    private static class PeerComparator implements Comparator<PeerState>, Serializable {
         public int compare(PeerState l, PeerState r) {
             return DataHelper.compareTo(l.getRemotePeer().getData(), r.getRemotePeer().getData());
         }

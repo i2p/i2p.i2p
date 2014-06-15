@@ -84,16 +84,17 @@ import net.i2p.util.SystemVersion;
  */
 class BasicServlet extends HttpServlet
 {   
-    protected final I2PAppContext _context;
-    protected final Log _log;
+    private static final long serialVersionUID = 1L;
+    protected transient final I2PAppContext _context;
+    protected transient final Log _log;
     protected File _resourceBase;
     private String _warBase;
     
-    private final MimeTypes _mimeTypes;
+    private transient final MimeTypes _mimeTypes;
     
     /** same as PeerState.PARTSIZE */
     private static final int BUFSIZE = 16*1024;
-    private ByteCache _cache = ByteCache.getInstance(16, BUFSIZE);
+    private transient ByteCache _cache = ByteCache.getInstance(16, BUFSIZE);
 
     private static final int WAR_CACHE_CONTROL_SECS = 24*60*60;
     private static final int FILE_CACHE_CONTROL_SECS = 24*60*60;

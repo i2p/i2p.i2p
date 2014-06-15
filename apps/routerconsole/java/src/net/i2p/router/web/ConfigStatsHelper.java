@@ -1,7 +1,7 @@
 package net.i2p.router.web;
 
-import java.util.ArrayList;
 import java.text.Collator;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
@@ -171,6 +171,7 @@ public class ConfigStatsHelper extends HelperBase {
 
     /**
      *  Translated sort
+     *  Inner class, can't be Serializable
      *  @since 0.9.4
      */
     private class AlphaComparator implements Comparator<String> {

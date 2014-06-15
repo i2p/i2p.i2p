@@ -3,6 +3,7 @@ package org.klomp.snark.dht;
  *  From zzzot, modded and relicensed to GPLv2
  */
 
+import java.io.Serializable;
 import java.util.Comparator;
 
 import net.i2p.crypto.SHA1Hash;
@@ -15,7 +16,7 @@ import net.i2p.data.DataHelper;
  * @since 0.9.2
  * @author zzz
  */
-class NodeInfoComparator implements Comparator<NodeInfo> {
+class NodeInfoComparator implements Comparator<NodeInfo>, Serializable {
     private final byte[] _base;
 
     public NodeInfoComparator(SHA1Hash h) {

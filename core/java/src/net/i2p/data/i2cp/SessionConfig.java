@@ -35,7 +35,6 @@ import net.i2p.util.OrderedProperties;
  * @author jrandom
  */
 public class SessionConfig extends DataStructureImpl {
-    private final Log _log = I2PAppContext.getGlobalContext().logManager().getLog(SessionConfig.class);
     private Destination _destination;
     private Signature _signature;
     private Date _creationDate;
@@ -125,31 +124,32 @@ public class SessionConfig extends DataStructureImpl {
      */
     public boolean verifySignature() {
         if (getSignature() == null) {
-            if (_log.shouldLog(Log.WARN)) _log.warn("Signature is null!");
+            //if (_log.shouldLog(Log.WARN)) _log.warn("Signature is null!");
             return false;
         }
         if (getDestination() == null) {
-            if (_log.shouldLog(Log.WARN)) _log.warn("Destination is null!");
+            //if (_log.shouldLog(Log.WARN)) _log.warn("Destination is null!");
             return false;
         }
         if (getCreationDate() == null) {
-            if (_log.shouldLog(Log.WARN)) _log.warn("Date is null!");
+            //if (_log.shouldLog(Log.WARN)) _log.warn("Date is null!");
             return false;
         }
         if (tooOld()) {
-            if (_log.shouldLog(Log.WARN)) _log.warn("Too old!");
+            //if (_log.shouldLog(Log.WARN)) _log.warn("Too old!");
             return false;
         }
         byte data[] = getBytes();
         if (data == null) {
-            if (_log.shouldLog(Log.WARN)) _log.warn("Bytes could not be found - wtf?");
+            //if (_log.shouldLog(Log.WARN)) _log.warn("Bytes could not be found - wtf?");
             return false;
         }
 
         boolean ok = DSAEngine.getInstance().verifySignature(getSignature(), data,
                                                              getDestination().getSigningPublicKey());
         if (!ok) {
-            if (_log.shouldLog(Log.WARN)) _log.warn("DSA signature failed!");
+            Log log = I2PAppContext.getGlobalContext().logManager().getLog(SessionConfig.class);
+            if (log.shouldLog(Log.WARN)) log.warn("DSA signature failed!");
         }
         return ok;
     }
@@ -177,10 +177,12 @@ public class SessionConfig extends DataStructureImpl {
             DataHelper.writeProperties(out, _options, true);  // UTF-8
             DataHelper.writeDate(out, _creationDate);
         } catch (IOException ioe) {
-            _log.error("IOError signing", ioe);
+            Log log = I2PAppContext.getGlobalContext().logManager().getLog(SessionConfig.class);
+            log.error("IOError signing", ioe);
             return null;
         } catch (DataFormatException dfe) {
-            _log.error("Error writing out the bytes for signing/verification", dfe);
+            Log log = I2PAppContext.getGlobalContext().logManager().getLog(SessionConfig.class);
+            log.error("Error writing out the bytes for signing/verification", dfe);
             return null;
         }
         return out.toByteArray();

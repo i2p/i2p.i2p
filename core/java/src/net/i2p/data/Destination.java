@@ -186,4 +186,10 @@ public class Destination extends KeysAndCert {
     public boolean equals(Object o) {
         return super.equals(o) && (o instanceof Destination);
     }
+
+    @Override
+    public int hashCode() {
+        // findbugs
+        return super.hashCode();
+    }
 }

@@ -1,5 +1,6 @@
 package net.i2p.crypto;
 
+import java.io.Serializable;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
@@ -52,21 +53,26 @@ public final class CryptixAESKeyCache {
     
     public static final KeyCacheEntry createNew() {
         KeyCacheEntry e = new KeyCacheEntry();
-        e.Ke = new int[ROUNDS + 1][BC]; // encryption round keys
-        e.Kd = new int[ROUNDS + 1][BC]; // decryption round keys
-        e.tk = new int[KC];
-        e.key = new Object[] { e.Ke, e.Kd };
         return e;
     }
     
     /**
      * all the data alloc'ed in a makeKey call
      */
-    public static final class KeyCacheEntry {
-        int[][] Ke;
-        int[][] Kd;
-        int[]   tk;
-        
-        Object[] key;
+    public static class KeyCacheEntry implements Serializable {
+        /** encryption round keys */
+        final int[][] Ke;
+        /** decryption round keys */
+        final int[][] Kd;
+        final int[]   tk;
+        /** Ke, Kd */
+        final Object[] key;
+
+        public KeyCacheEntry() {
+            Ke = new int[ROUNDS + 1][BC];
+            Kd = new int[ROUNDS + 1][BC];
+            tk = new int[KC];
+            key = new Object[] { Ke, Kd };
+        }
     }
 }

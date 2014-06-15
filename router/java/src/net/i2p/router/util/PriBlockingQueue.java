@@ -1,5 +1,6 @@
 package net.i2p.router.util;
 
+import java.io.Serializable;
 import java.util.Comparator;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -19,8 +20,9 @@ import net.i2p.util.Log;
  */
 public class PriBlockingQueue<E extends PQEntry> extends PriorityBlockingQueue<E> {
 
-    protected final I2PAppContext _context;
-    protected final Log _log;
+    private static final long serialVersionUID = 1L;
+    protected transient final I2PAppContext _context;
+    protected transient final Log _log;
     protected final String _name;
     private final AtomicLong _seqNum = new AtomicLong();
 
@@ -114,7 +116,7 @@ public class PriBlockingQueue<E extends PQEntry> extends PriorityBlockingQueue<E
     /**
      *  highest priority first, then lowest sequence number first
      */
-    private static class PriorityComparator<E extends PQEntry> implements Comparator<E> {
+    private static class PriorityComparator<E extends PQEntry> implements Comparator<E>, Serializable {
         public int compare(E l, E r) {
             int d = r.getPriority() - l.getPriority();
             if (d != 0)

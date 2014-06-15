@@ -1585,6 +1585,12 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
         }
 
         @Override
+        public int hashCode() {
+            // findbugs
+            return super.hashCode();
+        }
+
+        @Override
         public String toString() {
             return "VersionAvailable \"" + version + "\" " + sourceMap +
                    (constraint != null ? (" \"" + constraint + '"') : "");

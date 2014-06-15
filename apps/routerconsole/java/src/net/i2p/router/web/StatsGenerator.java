@@ -252,6 +252,7 @@ public class StatsGenerator {
 
     /**
      *  Translated sort
+     *  Inner class, can't be Serializable
      *  @since 0.9.3
      */
     private class AlphaComparator implements Comparator<String> {

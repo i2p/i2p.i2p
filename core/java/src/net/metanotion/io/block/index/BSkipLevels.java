@@ -29,6 +29,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 package net.metanotion.io.block.index;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.Comparator;
 import java.util.Set;
 import java.util.TreeSet;
@@ -311,7 +312,7 @@ public class BSkipLevels extends SkipLevels {
          *  Sorts in REVERSE order.
 	 *  @since 0.8.8
 	 */
-	private static class LevelComparator implements Comparator<SkipLevels> {
+	private static class LevelComparator implements Comparator<SkipLevels>, Serializable {
 		public int compare(SkipLevels l, SkipLevels r) {
 			Comparable lk = l.key();
 			Comparable rk = r.key();

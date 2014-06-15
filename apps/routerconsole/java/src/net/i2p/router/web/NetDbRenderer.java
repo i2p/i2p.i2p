@@ -9,6 +9,7 @@ package net.i2p.router.web;
  */
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.io.Writer;
 import java.math.BigInteger;         // debug
 import java.text.Collator;
@@ -46,6 +47,9 @@ public class NetDbRenderer {
         _context = ctx;
     }
 
+    /**
+     *  Inner class, can't be Serializable
+     */
     private class LeaseSetComparator implements Comparator<LeaseSet> {
          public int compare(LeaseSet l, LeaseSet r) {
              Destination dl = l.getDestination();
@@ -59,7 +63,7 @@ public class NetDbRenderer {
     }
 
     /** for debugging @since 0.7.14 */
-    private static class LeaseSetRoutingKeyComparator implements Comparator<LeaseSet> {
+    private static class LeaseSetRoutingKeyComparator implements Comparator<LeaseSet>, Serializable {
          private final Hash _us;
          public LeaseSetRoutingKeyComparator(Hash us) {
              _us = us;
@@ -69,7 +73,7 @@ public class NetDbRenderer {
         }
     }
 
-    private static class RouterInfoComparator implements Comparator<RouterInfo> {
+    private static class RouterInfoComparator implements Comparator<RouterInfo>, Serializable {
          public int compare(RouterInfo l, RouterInfo r) {
              return l.getIdentity().getHash().toBase64().compareTo(r.getIdentity().getHash().toBase64());
         }
@@ -365,9 +369,13 @@ public class NetDbRenderer {
         return Translate.getString(name, _context, Messages.COUNTRY_BUNDLE_NAME);
     }
 
-    /** sort by translated country name using rules for the current language setting */
+    /**
+     *  Sort by translated country name using rules for the current language setting
+     *  Inner class, can't be Serializable
+     */
     private class CountryComparator implements Comparator<String> {
-         Collator coll;
+         private static final long serialVersionUID = 1L;
+         private final Collator coll;
 
          public CountryComparator() {
              super();

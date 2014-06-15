@@ -3,6 +3,7 @@ package net.i2p.router.web;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.io.Serializable;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -204,14 +205,14 @@ public class JobQueueHelper extends HelperBase {
     }
 
     /** @since 0.8.9 */
-    private static class JobStatsComparator implements Comparator<JobStats> {
+    private static class JobStatsComparator implements Comparator<JobStats>, Serializable {
          public int compare(JobStats l, JobStats r) {
              return l.getName().compareTo(r.getName());
         }
     }
 
     /** @since 0.9.5 */
-    private static class JobCountComparator implements Comparator<String> {
+    private static class JobCountComparator implements Comparator<String>, Serializable {
          private final ObjectCounter<String> _counter;
 
          public JobCountComparator(ObjectCounter<String> counter) {

@@ -1,5 +1,6 @@
 package net.i2p.util;
 
+import java.io.Serializable;
 import java.util.Comparator;
 
 /**
@@ -9,7 +10,7 @@ import java.util.Comparator;
  * Moved from TrustedUpdate.java
  * @since 0.7.10
  */
-public class VersionComparator implements Comparator<String> {
+public class VersionComparator implements Comparator<String>, Serializable {
 
     public int compare(String l, String r) {
         return comp(l, r);

@@ -24,6 +24,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.security.MessageDigest;
@@ -1463,7 +1464,7 @@ public class DataHelper {
      * See sortStructures() comments.
      * @since 0.8.3
      */
-    private static class DataStructureComparator implements Comparator<DataStructure> {
+    private static class DataStructureComparator implements Comparator<DataStructure>, Serializable {
         public int compare(DataStructure l, DataStructure r) {
             return l.calculateHash().toBase64().compareTo(r.calculateHash().toBase64());
         }

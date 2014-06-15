@@ -25,8 +25,10 @@ import net.i2p.crypto.EntropyHarvester;
  * @author jrandom
  */
 public class RandomSource extends SecureRandom implements EntropyHarvester {
+
+    private static final long serialVersionUID = 1L;
     private final EntropyHarvester _entropyHarvester;
-    protected final I2PAppContext _context;
+    protected transient final I2PAppContext _context;
 
     /**
      *  Deprecated - do not instantiate this directly, as you won't get the

@@ -1,6 +1,7 @@
 package net.i2p.router.transport.ntcp;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.InetSocketAddress;
 import java.net.InetAddress;
 import java.net.Inet6Address;
@@ -1275,7 +1276,7 @@ public class NTCPTransport extends TransportImpl {
         public static final AlphaComparator instance() { return _instance; }
     }
 
-    private static class PeerComparator implements Comparator<NTCPConnection> {
+    private static class PeerComparator implements Comparator<NTCPConnection>, Serializable {
         public int compare(NTCPConnection l, NTCPConnection r) {
             if (l == null || r == null)
                 throw new IllegalArgumentException();

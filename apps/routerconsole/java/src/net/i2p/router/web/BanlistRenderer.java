@@ -9,6 +9,7 @@ package net.i2p.router.web;
  */
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.io.Writer;
 import java.util.Comparator;
 import java.util.Map;
@@ -30,7 +31,7 @@ public class BanlistRenderer {
         _context = context;
     }
     
-    private static class HashComparator implements Comparator<Hash> {
+    private static class HashComparator implements Comparator<Hash>, Serializable {
          public int compare(Hash l, Hash r) {
              return l.toBase64().compareTo(r.toBase64());
         }

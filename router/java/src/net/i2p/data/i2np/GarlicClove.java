@@ -29,8 +29,10 @@ import net.i2p.util.Log;
  * @author jrandom
  */
 public class GarlicClove extends DataStructureImpl {
+
     //private final Log _log;
-    private final I2PAppContext _context;
+    private static final long serialVersionUID = 1L;
+    private transient final I2PAppContext _context;
     private DeliveryInstructions _instructions;
     private I2NPMessage _msg;
     private long _cloveId;

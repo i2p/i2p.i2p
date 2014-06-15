@@ -1,5 +1,6 @@
 package net.i2p.router.web;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
@@ -238,7 +239,7 @@ public class HomeHelper extends HelperBase {
     }
 
     /** ignore case, current locale */
-    private static class AppComparator implements Comparator<App> {
+    private static class AppComparator implements Comparator<App>, Serializable {
         public int compare(App l, App r) {
             return l.name.toLowerCase().compareTo(r.name.toLowerCase());
         }

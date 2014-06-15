@@ -1488,6 +1488,7 @@
             <arg value="build/i2psnark.war"/>
             <arg value="build/i2ptunnel.jar"/>
             <arg value="build/i2ptunnel.war"/>
+            <arg value="build/jetty-i2p.jar"/>
             <arg value="build/mstreaming.jar"/>
             <arg value="build/router.jar/"/>
             <arg value="build/desktopgui.jar"/>

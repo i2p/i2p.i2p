@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -1969,7 +1970,7 @@ public class SnarkManager implements CompleteListener {
      *  ignore case, current locale
      *  @since 0.9
      */
-    private static class IgnoreCaseComparator implements Comparator<Tracker> {
+    private static class IgnoreCaseComparator implements Comparator<Tracker>, Serializable {
         public int compare(Tracker l, Tracker r) {
             return l.name.toLowerCase().compareTo(r.name.toLowerCase());
         }

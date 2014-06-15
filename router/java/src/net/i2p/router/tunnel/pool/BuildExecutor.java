@@ -1,5 +1,6 @@
 package net.i2p.router.tunnel.pool;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -436,7 +437,7 @@ class BuildExecutor implements Runnable {
      *  WARNING - this sort may be unstable, as a pool's tunnel count may change
      *  during the sort. This will cause Java 7 sort to throw an IAE.
      */
-    private static class TunnelPoolComparator implements Comparator<TunnelPool> {
+    private static class TunnelPoolComparator implements Comparator<TunnelPool>, Serializable {
 
         private final boolean _preferEmpty;
 

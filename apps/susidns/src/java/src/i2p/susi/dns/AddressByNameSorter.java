@@ -24,9 +24,10 @@
 
 package i2p.susi.dns;
 
+import java.io.Serializable;
 import java.util.Comparator;
 
-public 	class AddressByNameSorter implements Comparator<AddressBean>
+public class AddressByNameSorter implements Comparator<AddressBean>, Serializable
 {
 	public int compare(AddressBean a, AddressBean b)
 	{

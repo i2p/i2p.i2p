@@ -41,7 +41,9 @@ import javax.servlet.http.HttpServletResponse;
  *
  */
 public class Servlet extends HttpServlet {
-    private DaemonThread thread;
+
+    private static final long serialVersionUID = 1L;
+    private transient DaemonThread thread;
     //private String nonce;
     //private static final String PROP_NONCE = "addressbook.nonce";
 

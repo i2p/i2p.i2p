@@ -811,4 +811,10 @@ public class NativeBigInteger extends BigInteger {
         // for findbugs
         return super.equals(o);
     }
+
+    @Override
+    public int hashCode() {
+        // for findbugs
+        return super.hashCode();
+    }
 }

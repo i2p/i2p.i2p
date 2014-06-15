@@ -1,5 +1,6 @@
 package net.i2p.util;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.ConcurrentModificationException;
@@ -38,7 +39,7 @@ public class CachedIteratorArrayList<E> extends ArrayList<E> {
         return iterator;
     }
 
-    private class CachedIterator implements Iterator<E> {
+    private class CachedIterator implements Iterator<E>, Serializable {
         /**
          * Index of element to be returned by subsequent call to next.
          */

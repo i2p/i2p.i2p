@@ -15,8 +15,9 @@ import net.i2p.data.DataHelper;
  */
 public class I2PSocketAddress extends SocketAddress {
 
+    private static final long serialVersionUID = 1L;
     private final int _port;
-    private Destination _dest;
+    private transient Destination _dest;
     private final String _host;
 
     /**

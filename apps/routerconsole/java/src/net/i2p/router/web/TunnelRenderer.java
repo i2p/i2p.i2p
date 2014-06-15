@@ -1,6 +1,7 @@
 package net.i2p.router.web;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -133,7 +134,7 @@ public class TunnelRenderer {
         out.write("</div>");
     }
     
-    private static class TunnelComparator implements Comparator<HopConfig> {
+    private static class TunnelComparator implements Comparator<HopConfig>, Serializable {
          public int compare(HopConfig l, HopConfig r) {
              return (r.getProcessedMessagesCount() - l.getProcessedMessagesCount());
         }

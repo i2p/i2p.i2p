@@ -461,7 +461,10 @@ public class SummaryHelper extends HelperBase {
         return buf.toString();
     }
     
-    /** compare translated nicknames - put "shared clients" first in the sort */
+    /**
+     *  Compare translated nicknames - put "shared clients" first in the sort
+     *  Inner class, can't be Serializable
+     */
     private class AlphaComparator implements Comparator<Destination> {
         private final String xsc = _("shared clients");
 

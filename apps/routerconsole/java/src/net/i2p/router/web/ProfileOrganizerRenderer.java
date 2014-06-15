@@ -1,6 +1,7 @@
 package net.i2p.router.web;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.io.Writer;
 import java.text.DecimalFormat;
 import java.util.Comparator;
@@ -330,7 +331,7 @@ class ProfileOrganizerRenderer {
      *  Used for floodfill-only page
      *  @since 0.9.8
      */
-    private static class HashComparator implements Comparator<PeerProfile> {
+    private static class HashComparator implements Comparator<PeerProfile>, Serializable {
         public int compare(PeerProfile left, PeerProfile right) {
             return left.getPeer().toBase64().compareTo(right.getPeer().toBase64());
         }

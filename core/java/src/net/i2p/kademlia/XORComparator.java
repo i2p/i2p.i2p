@@ -1,5 +1,6 @@
 package net.i2p.kademlia;
 
+import java.io.Serializable;
 import java.util.Comparator;
 
 import net.i2p.data.SimpleDataStructure;
@@ -9,7 +10,7 @@ import net.i2p.data.SimpleDataStructure;
  *
  * @since 0.9.2 in i2psnark, moved to core in 0.9.10
  */
-public class XORComparator<T extends SimpleDataStructure> implements Comparator<T> {
+public class XORComparator<T extends SimpleDataStructure> implements Comparator<T>, Serializable {
     private final byte[] _base;
 
     /**

@@ -12,6 +12,7 @@ package net.i2p.data.i2cp;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -28,9 +29,12 @@ import net.i2p.data.TunnelId;
  * @author jrandom
  */
 public class RequestLeaseSetMessage extends I2CPMessageImpl {
+
+    private static final long serialVersionUID = 1L;
     public final static int MESSAGE_TYPE = 21;
     private SessionId _sessionId;
-    private final List<TunnelEndpoint> _endpoints;
+    // ArrayList is Serializable, List is not
+    private final ArrayList<TunnelEndpoint> _endpoints;
     private Date _end;
 
     public RequestLeaseSetMessage() {
@@ -139,7 +143,8 @@ public class RequestLeaseSetMessage extends I2CPMessageImpl {
         return buf.toString();
     }
 
-    private static class TunnelEndpoint {
+    private static class TunnelEndpoint implements Serializable {
+        private static final long serialVersionUID = 1L;
         private final Hash _router;
         private final TunnelId _tunnelId;
 

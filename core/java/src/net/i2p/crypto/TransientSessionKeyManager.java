@@ -10,6 +10,7 @@ package net.i2p.crypto;
  */
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -798,7 +799,7 @@ public class TransientSessionKeyManager extends SessionKeyManager {
      *  Just for the HTML method above so we can see what's going on easier
      *  Earliest first
      */
-    private static class TagSetComparator implements Comparator<TagSet> {
+    private static class TagSetComparator implements Comparator<TagSet>, Serializable {
          public int compare(TagSet l, TagSet r) {
              int rv = (int) (l.getDate() - r.getDate());
              if (rv != 0)

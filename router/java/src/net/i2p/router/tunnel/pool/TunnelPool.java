@@ -1,5 +1,6 @@
 package net.i2p.router.tunnel.pool;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -640,7 +641,7 @@ public class TunnelPool {
      * but we use latest expiration first, since we need to sort them by that anyway.
      *
      */
-    private static class LeaseComparator implements Comparator<Lease> {
+    private static class LeaseComparator implements Comparator<Lease>, Serializable {
          public int compare(Lease l, Lease r) {
              return r.getEndDate().compareTo(l.getEndDate());
         }
@@ -651,7 +652,7 @@ public class TunnelPool {
      *
      * @since 0.8.10
      */
-    private static class TunnelInfoComparator implements Comparator<TunnelInfo> {
+    private static class TunnelInfoComparator implements Comparator<TunnelInfo>, Serializable {
         private final byte[] _base;
         private final boolean _avoidZero;
 

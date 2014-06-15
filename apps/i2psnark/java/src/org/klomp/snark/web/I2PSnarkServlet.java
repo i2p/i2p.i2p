@@ -3,6 +3,7 @@ package org.klomp.snark.web;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.Serializable;
 import java.text.Collator;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -44,11 +45,13 @@ import org.klomp.snark.dht.DHT;
  *  Refactored to eliminate Jetty dependencies.
  */
 public class I2PSnarkServlet extends BasicServlet {
+
+    private static final long serialVersionUID = 1L;
     /** generally "/i2psnark" */
     private String _contextPath;
     /** generally "i2psnark" */
     private String _contextName;
-    private SnarkManager _manager;
+    private transient SnarkManager _manager;
     private long _nonce;
     private String _themePath;
     private String _imgPath;
@@ -1111,8 +1114,7 @@ public class I2PSnarkServlet extends BasicServlet {
      *  (I guess this is worth it, a lot of torrents start with "The "
      *  @since 0.7.14
      */
-    private static class TorrentNameComparator implements Comparator<Snark> {
-        private final Comparator collator = Collator.getInstance();
+    private static class TorrentNameComparator implements Comparator<Snark>, Serializable {
 
         public int compare(Snark l, Snark r) {
             // put downloads and magnets first
@@ -1128,7 +1130,7 @@ public class I2PSnarkServlet extends BasicServlet {
             String rlc = rs.toLowerCase(Locale.US);
             if (rlc.startsWith("the ") || rlc.startsWith("the.") || rlc.startsWith("the_"))
                 rs = rs.substring(4);
-            return collator.compare(ls, rs);
+            return Collator.getInstance().compare(ls, rs);
         }
     }
 
@@ -1627,7 +1629,8 @@ public class I2PSnarkServlet extends BasicServlet {
      *  Sort by completeness (seeds first), then by ID
      *  @since 0.8.1
      */
-    private static class PeerComparator implements Comparator<Peer> {
+    private static class PeerComparator implements Comparator<Peer>, Serializable {
+
         public int compare(Peer l, Peer r) {
             int diff = r.completed() - l.completed();      // reverse
             if (diff != 0)
@@ -2211,15 +2214,14 @@ public class I2PSnarkServlet extends BasicServlet {
      *  directories first
      *  @since 0.9.6
      */
-    private static class ListingComparator implements Comparator<File> {
-        private final Comparator collator = Collator.getInstance();
+    private static class ListingComparator implements Comparator<File>, Serializable {
 
         public int compare(File l, File r) {
             if (l.isDirectory() && !r.isDirectory())
                 return -1;
             if (r.isDirectory() && !l.isDirectory())
                 return 1;
-            return collator.compare(l.getName(), r.getName());
+            return Collator.getInstance().compare(l.getName(), r.getName());
         }
     }
 

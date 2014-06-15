@@ -9,6 +9,7 @@ package net.i2p.util;
  *
  */
 
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Map;
@@ -46,7 +47,7 @@ public class OrderedProperties extends Properties {
         return Collections.unmodifiableSortedSet(rv);
     }
 
-    private static class EntryComparator implements Comparator<Map.Entry<Object, Object>> {
+    private static class EntryComparator implements Comparator<Map.Entry<Object, Object>>, Serializable {
          public int compare(Map.Entry<Object, Object> l, Map.Entry<Object, Object> r) {
              return ((String)l.getKey()).compareTo(((String)r.getKey()));
         }

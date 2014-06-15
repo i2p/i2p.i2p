@@ -1,5 +1,6 @@
 package net.i2p.router.tunnel.pool;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -525,7 +526,7 @@ public abstract class TunnelPeerSelector {
      *  Now:
      *     d((H(l+h), h) - d(H(r+h), h)
      */
-    private static class HashComparator implements Comparator<Hash> {
+    private static class HashComparator implements Comparator<Hash>, Serializable {
         private final Hash _hash, tmp;
         private final byte[] data;
 

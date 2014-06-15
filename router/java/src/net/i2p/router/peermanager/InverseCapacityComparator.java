@@ -1,5 +1,6 @@
 package net.i2p.router.peermanager;
 
+import java.io.Serializable;
 import java.util.Comparator;
 
 import net.i2p.data.DataHelper;
@@ -8,7 +9,7 @@ import net.i2p.data.DataHelper;
  * Order profiles by their capacity, but backwards (highest capacity / value first).
  *
  */
-class InverseCapacityComparator implements Comparator<PeerProfile> {
+class InverseCapacityComparator implements Comparator<PeerProfile>, Serializable {
     /**
      * Compare the two objects backwards.  The standard comparator returns
      * -1 if lhs is less than rhs, 1 if lhs is greater than rhs, or 0 if they're

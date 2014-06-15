@@ -43,6 +43,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.io.Serializable;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.text.Collator;
@@ -235,7 +236,7 @@ public class WebMail extends HttpServlet
 	 * 
 	 * @since 0.9.13
 	 */
-	private abstract static class SorterBase implements Comparator<String> {
+	private abstract static class SorterBase implements Comparator<String>, Serializable {
 		private final MailCache mailCache;
 		
 		/**

@@ -9,6 +9,7 @@ package net.i2p.router.transport;
  */
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.io.Writer;
 import java.net.InetAddress;
 import java.util.ArrayList;
@@ -627,7 +628,7 @@ public abstract class TransportImpl implements Transport {
      *  Lowest cost (most preferred) first.
      *  @since IPv6
      */
-    private static class AddrComparator implements Comparator<RouterAddress> {
+    private static class AddrComparator implements Comparator<RouterAddress>, Serializable {
         private final int adj;
 
         public AddrComparator(int ipv6Adjustment) {

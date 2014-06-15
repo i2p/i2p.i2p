@@ -1,6 +1,7 @@
 package net.i2p.router.web;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.io.Writer;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -440,7 +441,7 @@ public class GraphHelper extends FormHandler {
         }
     }
 
-    private static class AlphaComparator implements Comparator<SummaryListener> {
+    private static class AlphaComparator implements Comparator<SummaryListener>, Serializable {
         public int compare(SummaryListener l, SummaryListener r) {
             String lName = l.getRate().getRateStat().getName();
             String rName = r.getRate().getRateStat().getName();

@@ -41,6 +41,7 @@ package gnu.crypto.prng;
 // do so, delete this exception statement from your version.
 // ----------------------------------------------------------------------------
 
+import java.io.Serializable;
 import java.util.Map;
 
 /**
@@ -49,7 +50,7 @@ import java.util.Map;
  * Modified slightly by jrandom for I2P (removing unneeded exceptions)
  * @version $Revision: 1.1 $
  */
-public abstract class BasePRNGStandalone implements IRandomStandalone {
+public abstract class BasePRNGStandalone implements IRandomStandalone, Serializable {
 
    // Constants and variables
    // -------------------------------------------------------------------------

@@ -9,6 +9,7 @@ package net.i2p.router;
  */
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.io.Writer;
 import java.util.Collection;
 import java.util.Collections;
@@ -658,7 +659,7 @@ public class JobQueue {
      *  Ensure different jobs with the same timing are different so they aren't removed.
      *  @since 0.8.9
      */
-    private static class JobComparator implements Comparator<Job> {
+    private static class JobComparator implements Comparator<Job>, Serializable {
          public int compare(Job l, Job r) {
              // equals first, Jobs generally don't override so this should be fast
              // And this MUST be first so we can remove a job even if its timing has changed.

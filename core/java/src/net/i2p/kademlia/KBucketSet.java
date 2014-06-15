@@ -8,6 +8,7 @@ package net.i2p.kademlia;
  *
  */
 
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -750,7 +751,7 @@ public class KBucketSet<T extends SimpleDataStructure> {
      *  For Collections.binarySearch.
      *  Returns equal for any overlap.
      */
-    private static class BucketComparator<T extends SimpleDataStructure> implements Comparator<KBucket<T>> {
+    private static class BucketComparator<T extends SimpleDataStructure> implements Comparator<KBucket<T>>, Serializable {
         public int compare(KBucket<T> l, KBucket<T> r) {
             if (l.getRangeEnd() < r.getRangeBegin())
                 return -1;
