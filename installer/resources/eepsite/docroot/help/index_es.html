@@ -1,0 +1,133 @@
+<html>
+ <head>
+  <title>Servidor web anónimo I2P| Bienvenido a tu eepsite</title>
+  <link rel="shortcut icon" href="favicon.ico" />
+    <link rel="stylesheet" type="text/css" href="lib/eepsite.css" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+ </head>
+ <body>
+<div class="fairylights">
+<div class="main">
+ <h1>Servidor web anónimo I2P</h1>
+<div class="langbar">
+<!-- Most of these languages listed here are yet to be translated -->
+<a href="index.html"><img src="lib/us.png" title="English" alt="English"></a>
+<a href="index_na.html"><img src="lib/cn.png" title="中文" alt="中文"></a> 
+<a href="index_de.html"><img src="lib/de.png" title="Deutsch" alt="Deutsch"></a> 
+<a href="index_fr.html"><img src="lib/fr.png" title="Français" alt="Français"></a>
+<a href="index_na.html"><img src="lib/it.png" title="Italiano" alt="Italiano"></a>
+<a href="index_nl.html"><img src="lib/nl.png" title="Nederlands" alt="Nederlands"></a> 
+<a href="index_ru.html"><img src="lib/ru.png" title="Русский" alt="Русский"></a> 
+<a href="index_sv.html"><img src="lib/se.png" title="Svenska" alt="Svenska"></a> 
+<a href="index_na.html"><img src="lib/ir.png" title="فارسی" alt="فارسی"></a>
+<a href="index_na.html"><img src="lib/jp.png" title="日本語" alt="日本語"></a>
+</div>
+<h2>Guía rápida para crear el servidor web en I2P</h2>
+ <p>Esta es tu eepsite, tu propio servidor web anónimo en I2P - simplemente edita los archivos dentro de <code>~/.i2p/eepsite/docroot/</code> (en Linux) o <code>%APPDATA%\I2P\eepsite\docroot\</code> (en Windows)
+ y podrá ser vistas por otras personas una vez que hayas seguido lo pasos de más abajo.
+ En I2P las eepsites se indican con una 'key o 'clave', la cual se representa como una larga cadena de texto en Base64.
+ (La 'key' es de alguna manera análoga a in dirección IP, y se muestra en la
+ <a href="http://127.0.0.1:7657/i2ptunnel/edit.jsp?tunnel=3">página de configuración</a>) de la eepsite.
+ Las instrucciones de más abajo detallan como asignar un nombre como "miweb.i2p" a tu clave y cómo arrancar tu eepsite.</p>
+ <p>Puedes acceder a tu eepsite localmente a través 
+ <a href="http://127.0.0.1:7658/">http://127.0.0.1:7658/</a>.
+</p>
+
+ <h2>Cómo configurar y anunciar tu eepsite</h2>
+ Tu eepsite por defecto está apagada.
+ Después de arrancarla será difícil que otras personas la encuentren porque
+ no tiene un nombre y porque ellos no tienen la clave Base64.
+ Podrías simplemente decir a la gente tu clave Base64, pero afortunadamente I2P tiene
+ una libreta de direcciones y varias formas fáciles de indicar a la gente como alcanzar tu eepsite.
+ Aquí están las instrucciones detalladas.
+ <ul>
+ <li>Selecciona un nombre para tu eepsite (<i>algo</i>.i2p). Usa sólo minúsculas.
+     Deberías comprobar primero si el nombre ya existe en tu libreta de direcciones
+     <a href="http://127.0.0.1:7657/susidns/addressbook.jsp?book=router&amp;filter=none">aquí</a>,
+     o en el archivo <code>i2p/hosts.txt</code> .
+     Escribe el nuevo nombre para tu eepsite en la página
+     <a href="http://127.0.0.1:7657/i2ptunnel/edit.jsp?tunnel=3">eepsite i2ptunnel configuration</a>
+     donde pone "Nombre de la página web". Esto reemplazará el nombre por defecto de "miweb.i2p".
+     Además activa el botón de "Auto Start/Iniciar automáticamente". A partir de ahora tu eepsite se iniciará cada vez que inicies tu rúter.
+     Asegúrate de pulsar "Save/Guardar".</li>
+ <li>Pulsa en el botón de iniciar tu eepsite en la página
+     <a href="http://127.0.0.1:7657/i2ptunnel/index.jsp">main i2ptunnel configuration</a>.
+     Ahora deberías ver "eepsite" listado bajo las "Destinaciones locales/Local Destinations" en la parte izquierda de la
+     <a href="http://127.0.0.1:7657/index.jsp">consola del ruter I2P</a>.
+     Tu eepsite ya está funcionando.</li>
+ <li>Selecciona completamente la clave "Destino local/Local destination" en la página
+     <a href="http://127.0.0.1:7657/i2ptunnel/edit.jsp?tunnel=3">eepsite i2ptunnel configuration</a>.
+     y cópiala para pegarla después.
+     Asegúrate de que la has copiado entera - son más de 500 caracteres y debe acabar en "AAAA".</li>
+ <li>Escribe el nombre y pega la clave de destino en tu 
+     <a href="http://127.0.0.1:7657/susidns/addressbook.jsp?book=master">libreta de direcciones maestras</a>.
+     Pulsa "Add/Añadir" para añadir la destinación a tu libreta de direcciones.</li>
+ <li>Escribe el nombre de la eepsite en tu navegador (<i>algo</i>.i2p) y deberías
+ verla inmediatamente.</li>
+ <li>Antes de anunciar tu nueva eepsite al mundo, deberías añadir contenido.
+ Ves a <code>~/.i2p/eepsite/docroot/</code> (en Linux) o <code>%APPDATA%\I2P\eepsite\docroot\</code> (en Windows)
+ y reemplaza la página de redirección index.html con tu contenido. Las carpetas virtuales funcionan, por lo que puedes hospedar 
+ archivos desde un subdirectorio sin la necesidad de proveer explícitamente una página con enlaces a los archivos.
+ Si necesitas una plantilla para una web básica, puedes utilizar y adaptar <a href="pagetemplate.html">esta página</a>
+ y <a href="lib/">su contenido</a></li>
+</ul>
+<h2>Registra tu propio dominio .I2P</h2><ul>
+ <li>Ahora es el momento de añadir tu eepsite a una libreta de direcciones de I2P
+     alojada en una web como <a href="http://stats.i2p/">stats.i2p</a>.
+     Debes ingresar el nombre de tu eepsite y la clave en una o más de estas webs.
+     Aquí tienes <a href="http://stats.i2p/i2p/addkey.html">el formulario en stats.i2p</a>.
+     De nuevo, tu clave es la "Destinación local/Local destination" completa en la página
+     <a href="http://127.0.0.1:7657/i2ptunnel/edit.jsp?tunnel=3">eepsite i2ptunnel configuration</a>.
+     Asegúrate de obtener la destinación completa, terminada en "AAAA".
+     No olvides en pulsar "add a key/añadir una clave".
+     Comprueba que ha indicado que la clave ha sido añadida.
+     Ya que muchos ruters periódicamente obtienen las direcciones de estas webs, en unas cuantas horas
+     otros usuarios serán capaces de encontrar tu eepsite simplemente escribiendo <i>algo</i>.i2p en sus navegadores.</li>
+</ul>
+<h2>Añadiendo suscripciones a otras libretas de direcciones</h2><ul>
+ <li>Ya que hablamos de las actualizaciones de las libretas de direcciones, este es buen 
+     momento para añadir más libretas de direcciones a tu propia 
+     <a href="http://127.0.0.1:7657/susidns/subscriptions.jsp">lista de suscripciones</a>.
+     Ves a tu página de configuración de suscripciones y añade algunas de estas para la
+     actualización automática de nuevas eepsites:<ul>
+     <li><a href="http://tino.i2p/hosts.txt">http://tino.i2p/hosts.txt</a></li>
+     <li><a href="http://stats.i2p/cgi-bin/newhosts.txt">http://stats.i2p/cgi-bin/newhosts.txt</a></li>
+     <li><a href="http://i2host.i2p/cgi-bin/i2hostetag">http://i2host.i2p/cgi-bin/i2hostetag</a></li></ul>
+ <li>Si tienes prisa y no puedes esperar unas horas, puedes decir a la gente que use los servicios de ayuda de
+     redirección "saltos/jump".
+     Esto hará que funcione en unos minutos tras haber incluido la clave en la libreta de direcciones de 
+     dicha web. Puedes probarlo tu mismo escribiendo <code>http://stats.i2p/cgi-bin/jump.cgi?a=<i>algo</i>.i2p</code>
+     o <code>http://i2host.i2p/cgi-bin/i2hostjump?<i>algo</i>.i2p</code> en tu navegador.
+     Una vez que ya funcione ya puedes avisar a otros para que lo utilicen.</li>
+ <li>Algunas personas comprueban listas de eepsites como
+ <a href="http://inproxy.tino.i2p/status.php">inproxy.tino.i2p/status.php</a> o <a href="http://perv.i2p">perv.i2p</a> en busca 
+     de nuevas eepsites, con lo cual puede ser que empiece a visitarla gente.
+     Pero hay muchas otras formas de avisar a la gente. Aquí tienes unas cuantas ideas:</li>
+     <ul>
+     <li>Escribe un mensaje en el <a href="http://forum.i2p/viewforum.php?f=16">foro de anuncio de Eepsites</a>
+     en <a href="http://forum.i2p/">forum.i2p</a>.</li>
+     <li>Cuéntale a la gente sobre la eepsite en los canales #i2p o #i2p-chat en el IRC.</li>
+     <li>Escribe una nueva entrada en <a href="http://syndie.i2p2.de/">el nuevo Syndie</a>.</li>
+     <li>Escribe en la <a href="http://ugha.i2p/EepsiteIndex">Wiki de Ugha</a></li>
+     </ul>
+     Date cuenta que algunas webs recomiendan pegar esa clave de destino Base64 larga.
+     Pero si has conseguido poner tu clave en un servicio 'add-key/añadido-de-clave', haberla probado
+     usando un servicio de 'salto', y esperado 24 horas para que se propague por
+     las libretas de direcciones de otros, esto no debería ser necesario.</ul>
+<h2>Más ayuda</h2><ul>
+    <li>Si tienes alguna pregunta, puedes mirar en los siguientes sitios para obtener ayuda:</li>
+<ul>
+<li>Nuestro canal de soporte en el IRC: <ul><li><a href="irc://irc.freenode.net/i2p">#i2p en Freenode</a></li>
+<li>Anónimamente a través de nuestro <a href="irc://127.0.0.1:6668/i2p-help">túnel de IRC en I2P</a>.</li></ul>
+	<li><a href="http://forum.i2p/viewforum.php?f=10">La sección de problemas técnicos</a> en
+     <a href="http://forum.i2p/">forum.i2p</a>.</li></ul>
+ </ul><div class="notify">
+<b>Nota:</b> Esta web y la consola necesitan ser traducidas a TU idioma si esto no ha sido sido hecho ya
+   o está en progreso de traducirse. Por favor, considere ayudar al crecimiento del proyecto
+   <a href="http://www.i2p2.i2p/getinvolved.html">ayudando</a> a traducir. Contacta con el proyecto a través 
+   del canal de IRC mostrado más abajo. ¡Gracias!</div>
+<hr><div class="footnote">	
+Documento editado por última vez en: Noviembre del 2010.</div>
+</div></div>
+ </body>
+</html>
