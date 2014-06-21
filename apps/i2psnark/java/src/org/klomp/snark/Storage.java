@@ -498,11 +498,11 @@ public class Storage
       {
         // Create base as file.
         if (_log.shouldLog(Log.INFO))
-            _log.info("Creating/Checking file: " + base);
+            _log.info("Creating/Checking file: " + _base);
         // createNewFile() can throw a "Permission denied" IOE even if the file exists???
         // so do it second
-        if (!base.exists() && !base.createNewFile())
-          throw new IOException("Could not create file " + base);
+        if (!_base.exists() && !_base.createNewFile())
+          throw new IOException("Could not create file " + _base);
 
         _torrentFiles.add(new TorrentFile(_base, _base, metainfo.getTotalLength()));
         if (useSavedBitField) {
