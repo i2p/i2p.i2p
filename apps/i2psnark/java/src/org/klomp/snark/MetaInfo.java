@@ -517,9 +517,10 @@ public class MetaInfo
 
     sha1.update(bs, off, length);
     byte[] hash = sha1.digest();
-    for (int i = 0; i < 20; i++)
+    for (int i = 0; i < 20; i++) {
       if (hash[i] != piece_hashes[20 * piece + i])
         return false;
+    }
     return true;
   }
   
@@ -539,9 +540,10 @@ public class MetaInfo
         _log.warn("Error checking", ioe);
         return false;
     }
-    for (int i = 0; i < 20; i++)
+    for (int i = 0; i < 20; i++) {
       if (hash[i] != piece_hashes[20 * piece + i])
         return false;
+    }
     return true;
   }
 

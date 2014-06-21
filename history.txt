@@ -1,3 +1,10 @@
+2014-06-21 zzz
+ * i2psnark:
+   - Display webapp name in html title (ticket #1311)
+   - Use tracker from magnet link in display (ticket #1313)
+   - Clarify auto-start (ticket #1293)
+   - Include tracker in magnet link on details page (ticket #964)
+
 2014-06-13 zzz
  * i2psnark: Fix NPE when fetching invalid torrent (ticket #1307)
  * Transports: Disallow Carrier Grade NAT (RFC 6598) addresses

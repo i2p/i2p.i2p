@@ -248,7 +248,15 @@ public class I2PSnarkServlet extends BasicServlet {
         out.write(DOCTYPE + "<html>\n" +
                   "<head><link rel=\"shortcut icon\" href=\"" + _themePath + "favicon.ico\">\n" +
                   "<title>");
-        out.write(_("I2PSnark - Anonymous BitTorrent Client"));
+        if (_contextName.equals(DEFAULT_NAME))
+            out.write(_("I2PSnark"));
+        else
+            out.write(_contextName);
+        out.write(" - ");
+        if (isConfigure)
+            out.write(_("Configuration"));
+        else
+            out.write(_("Anonymous BitTorrent Client"));
         if ("2".equals(peerParam))
             out.write(" | Debug Mode");
         out.write("</title>\n");
@@ -1305,20 +1313,16 @@ public class I2PSnarkServlet extends BasicServlet {
 
         // (i) icon column
         out.write("<td>");
-        if (isValid && meta.getAnnounce() != null) {
-            // Link to local details page - note that trailing slash on a single-file torrent
-            // gets us to the details page instead of the file.
-            //StringBuilder buf = new StringBuilder(128);
-            //buf.append("<a href=\"").append(snark.getBaseName())
-            //   .append("/\" title=\"").append(_("Torrent details"))
-            //   .append("\"><img alt=\"").append(_("Info")).append("\" border=\"0\" src=\"")
-            //   .append(_imgPath).append("details.png\"></a>");
-            //out.write(buf.toString());
-
-            // Link to tracker details page
-            String trackerLink = getTrackerLink(meta.getAnnounce(), snark.getInfoHash());
-            if (trackerLink != null)
-                out.write(trackerLink);
+        if (isValid) {
+            String announce = meta.getAnnounce();
+            if (announce == null)
+                announce = snark.getTrackerURL();
+            if (announce != null) {
+                // Link to tracker details page
+                String trackerLink = getTrackerLink(announce, snark.getInfoHash());
+                if (trackerLink != null)
+                    out.write(trackerLink);
+            }
         }
 
         String encodedBaseName = urlEncode(fullBasename);
@@ -1850,7 +1854,7 @@ public class I2PSnarkServlet extends BasicServlet {
         out.write("\" >" +
 
                   "<tr><td>");
-        out.write(_("Auto start"));
+        out.write(_("Auto start torrents"));
         out.write(": <td><input type=\"checkbox\" class=\"optbox\" name=\"autoStart\" value=\"true\" " 
                   + (autoStart ? "checked " : "") 
                   + "title=\"");
@@ -2323,9 +2327,12 @@ public class I2PSnarkServlet extends BasicServlet {
                .append(fullPath)
                .append("</a></td></tr>\n");
 
+            String announce = null;
             MetaInfo meta = snark.getMetaInfo();
             if (meta != null) {
-                String announce = meta.getAnnounce();
+                announce = meta.getAnnounce();
+                if (announce == null)
+                    announce = snark.getTrackerURL();
                 if (announce != null) {
                     announce = DataHelper.stripHTML(announce);
                     buf.append("<tr><td>");
@@ -2393,11 +2400,20 @@ public class I2PSnarkServlet extends BasicServlet {
             String hex = I2PSnarkUtil.toHex(snark.getInfoHash());
             if (meta == null || !meta.isPrivate()) {
                 buf.append("<tr><td><a href=\"")
-                   .append(MagnetURI.MAGNET_FULL).append(hex).append("\">")
+                   .append(MagnetURI.MAGNET_FULL).append(hex);
+                if (announce != null)
+                    buf.append("&amp;tr=").append(announce);
+                buf.append("\">")
                    .append(toImg("magnet", _("Magnet link")))
                    .append("</a> <b>Magnet:</b> <a href=\"")
-                   .append(MagnetURI.MAGNET_FULL).append(hex).append("\">")
-                   .append(MagnetURI.MAGNET_FULL).append(hex).append("</a>")
+                   .append(MagnetURI.MAGNET_FULL).append(hex);
+                if (announce != null)
+                    buf.append("&amp;tr=").append(announce);
+                buf.append("\">")
+                   .append(MagnetURI.MAGNET_FULL).append(hex);
+                if (announce != null)
+                    buf.append("&amp;tr=").append(announce);
+                buf.append("</a>")
                    .append("</td></tr>\n");
             } else {
                 buf.append("<tr><td>")
@@ -2653,7 +2669,8 @@ public class I2PSnarkServlet extends BasicServlet {
                  mime.equals("text/x-sfv") ||
                  mime.equals("application/rtf") ||
                  mime.equals("application/epub+zip") ||
-                 mime.equals("application/x-mobipocket-ebook"))
+                 mime.equals("application/x-mobipocket-ebook") ||
+                 plc.endsWith(".azw4"))
             icon = "page";
         else if (mime.equals("application/java-archive") ||
                  plc.endsWith(".deb"))
