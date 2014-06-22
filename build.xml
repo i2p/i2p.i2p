@@ -933,16 +933,6 @@
         <copy file="apps/susidns/src/WEB-INF/lib/jstl.jar" todir="pkg-temp/lib/" />
         <copy file="apps/susidns/src/WEB-INF/lib/standard.jar" todir="pkg-temp/lib/" />
         <copy file="build/i2psnark.war" todir="pkg-temp/webapps/" />
-	<!--
-	     Disabling per zzz's statement on IRC: jetty-i2psnark.xml is for an obscure feature that is broken anyway,
-	     					   you can remove the file, the link, and the patch from the package
-
-		     So I'm going one further: I'm disabling it in build.xml
-		     +++kytv
-		     -->
-	<!--
-	<copy file="apps/i2psnark/jetty-i2psnark.xml" todir="pkg-temp/" />
-	-->
         <copy file="apps/i2psnark/i2psnark.config" todir="pkg-temp/" />
         <copy file="installer/resources/blocklist.txt" todir="pkg-temp/" />
         <copy file="installer/resources/clients.config" todir="pkg-temp/" />
@@ -1003,6 +993,7 @@
     </target>
 
     <!-- this is no longer required, izpack 4.3.0 supports headless installs with java -jar i2pinstall.exe -console -->
+    <!-- and this is no longer used by the SlackBuild -->
     <target name="tarball" depends="preppkg">
         <tar compression="bzip2" destfile="i2p.tar.bz2">
             <tarfileset dir="pkg-temp" includes="**/*" prefix="i2p" />
@@ -1379,12 +1370,12 @@
     <target name="clover.report" depends="buildProperties" if="with.clover">
         <ant dir="core/java/" target="clover.report" />
         <ant dir="router/java/" target="clover.report" />
-	<ant dir="apps/streaming/java" target="clover.report" />
+        <ant dir="apps/streaming/java" target="clover.report" />
     </target>
     <target name="cobertura.report" depends="buildProperties" if="with.cobertura">
         <ant dir="core/java/" target="cobertura.report" />
         <ant dir="router/java/" target="cobertura.report" />
-	<ant dir="apps/streaming/java" target="cobertura.report" />
+        <ant dir="apps/streaming/java" target="cobertura.report" />
     </target>
     <target name="test.report" depends="junit.report, scalatest.report, clover.report, cobertura.report"/>
     <target name="fulltest" depends="buildProperties, jbigi" >
@@ -1654,7 +1645,7 @@
             <arg value="showversion" />
             <arg value="i2pupdate.su3" />
         </java>
-        <!-- will this use the monotonerc file in the current workspace? -->
+        <!-- this will use the monotonerc file in the current workspace -->
         <echo message="Checking out fresh copy into ../i2p-${release.number} for tarballing:" />
         <delete dir="../i2p-${release.number}" />
         <exec executable="mtn" failonerror="true">
@@ -1833,7 +1824,7 @@
     </target>
 
     <target name="debian-tarball" depends="getExtendedVersion">
-        <!-- will this use the monotonerc file in the current workspace? -->
+        <!-- this will use the monotonerc file in the current workspace -->
         <fail message="This target cannot be used without Monotone! Use &quot;fakeroot debian/rules get-orig-source&quot; instead.">
             <condition>
                 <not>
