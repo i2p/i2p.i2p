@@ -295,7 +295,7 @@ class PacketQueue implements SendMessageStatusListener {
                     IOException ioe = new I2PSocketException(status);
                     con.getOutputStream().streamErrorOccurred(ioe);
                     con.getInputStream().streamErrorOccurred(ioe);
-                    con.setConnectionError("failure code " + status);
+                    con.setConnectionError(ioe.getLocalizedMessage());
                     con.disconnect(false);
                 }
                 break;
