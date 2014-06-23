@@ -271,6 +271,10 @@ trans.ru_RU = core/java/src/gnu/getopt/MessagesBundle_ru.properties
 trans.sk = core/java/src/gnu/getopt/MessagesBundle_sk.properties
 trans.zh_CN = core/java/src/gnu/getopt/MessagesBundle_zh.properties
 
+[I2P.streaming]
+source_file = apps/ministreaming/locale/messages_en.po
+source_lang = en
+
 [main]
 host = https://www.transifex.com
 

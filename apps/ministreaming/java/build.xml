@@ -19,7 +19,14 @@
             </classpath>
         </depend>
     </target>
+
     <property name="javac.compilerargs" value="" />
+    <property name="require.gettext" value="true" />
+
+    <condition property="no.bundle">
+        <isfalse value="${require.gettext}" />
+    </condition>
+
     <target name="compile" depends="depend">
         <mkdir dir="./build" />
         <mkdir dir="./build/obj" />
@@ -62,7 +69,7 @@
         </exec>
     </target>
 
-    <target name="jar" depends="compile, jarUpToDate, listChangedFiles" unless="jar.uptodate" >
+    <target name="jar" depends="compile, bundle, jarUpToDate, listChangedFiles" unless="jar.uptodate" >
         <!-- set if unset -->
         <property name="workspace.changes.tr" value="" />
         <jar destfile="./build/mstreaming.jar" basedir="./build/obj" includes="**/*.class" >
@@ -88,6 +95,35 @@
                 <isset property="mtn.available" />
             </and>
         </condition>
+    </target>
+    
+    <target name="bundle" depends="compile" unless="no.bundle">
+        <exec executable="sh" osfamily="unix" failifexecutionfails="true" failonerror="${require.gettext}" >
+            <env key="JAVA_HOME" value="${java.home}" />
+            <arg value="./bundle-messages.sh" />
+        </exec>
+        <exec executable="sh" osfamily="mac" failifexecutionfails="true" failonerror="${require.gettext}" >
+            <arg value="./bundle-messages.sh" />
+        </exec>
+        <exec executable="sh" osfamily="windows" failifexecutionfails="false" >
+            <arg value="./bundle-messages.sh" />
+        </exec>
+    </target>
+
+    <target name="poupdate" depends="builddep, compile">
+        <!-- Update the messages_*.po files.  -->
+        <exec executable="sh" osfamily="unix" failifexecutionfails="true" failonerror="true" >
+            <arg value="./bundle-messages.sh" />
+            <arg value="-p" />
+        </exec>
+        <exec executable="sh" osfamily="mac" failifexecutionfails="true" failonerror="true" >
+            <arg value="./bundle-messages.sh" />
+            <arg value="-p" />
+        </exec>
+        <exec executable="sh" osfamily="windows" failifexecutionfails="true" failonerror="true" >
+            <arg value="./bundle-messages.sh" />
+            <arg value="-p" />
+        </exec>
     </target>
 
     <target name="javadoc">
