@@ -134,10 +134,10 @@
             <%
             if (("httpserver".equals(indexBean.getInternalType(curServer)) || ("httpbidirserver".equals(indexBean.getInternalType(curServer)))) && indexBean.getTunnelStatus(curServer) == IndexBean.RUNNING) {
           %><label><%=intl._("Preview")%>:</label>    
-            <a class="control" title="Test HTTP server through I2P" href="http://<%=indexBean.getDestHashBase32(curServer)%>.b32.i2p" target="_top"><%=intl._("Preview")%></a>
+            <a class="control" title="Test HTTP server through I2P" href="http://<%=indexBean.getDestHashBase32(curServer)%>" target="_top"><%=intl._("Preview")%></a>
             <%
             } else if (indexBean.getTunnelStatus(curServer) == IndexBean.RUNNING) {
-          %><span class="text"><%=intl._("Base32 Address")%>:<br /><%=indexBean.getDestHashBase32(curServer)%>.b32.i2p</span>
+          %><span class="text"><%=intl._("Base32 Address")%>:<br /><%=indexBean.getDestHashBase32(curServer)%></span>
         <%
             } else {
           %><span class="comment"><%=intl._("No Preview")%></span>

@@ -173,6 +173,19 @@ public class Destination extends KeysAndCert {
     }
 
     /**
+     *  For convenience.
+     *  @return "{52 chars}.b32.i2p" or null if fields not set.
+     *  @since 0.9.14
+     */
+    public String toBase32() {
+        try {
+            return Base32.encode(getHash().getData()) + ".b32.i2p";
+        } catch (IllegalStateException ise) {
+            return null;
+        }
+    }
+
+    /**
      *  Clear the cache.
      *  @since 0.9.9
      */

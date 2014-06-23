@@ -1,7 +1,6 @@
 package net.i2p.i2ptunnel.socks;
 
 import net.i2p.I2PAppContext;
-import net.i2p.data.Base32;
 import net.i2p.data.Destination;
 
 /**
@@ -44,7 +43,7 @@ public class SOCKSHeader {
     }
     
     private static final byte[] beg = {0,0,0,3,60};
-    private static final byte[] end = {'.','b','3','2','.','i','2','p',0,0};
+    private static final byte[] end = {0,0};
 
     /**
      *  Make a dummy header from a dest,
@@ -52,11 +51,11 @@ public class SOCKSHeader {
      *  Unused for now.
      */
     public SOCKSHeader(Destination dest) {
-        this.header = new byte[beg.length + 52 + end.length];
+        this.header = new byte[beg.length + 60 + end.length];
         System.arraycopy(this.header, 0, beg, 0, beg.length);
-        String b32 = Base32.encode(dest.calculateHash().getData());
-        System.arraycopy(this.header, beg.length, b32.getBytes(), 0, 52);
-        System.arraycopy(this.header, beg.length + 52, end, 0, end.length);
+        String b32 = dest.toBase32();
+        System.arraycopy(this.header, beg.length, b32.getBytes(), 0, 60);
+        System.arraycopy(this.header, beg.length + 60, end, 0, end.length);
     }
     
     public String getHost() {

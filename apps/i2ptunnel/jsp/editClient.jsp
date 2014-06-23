@@ -440,7 +440,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                 </div>
                 <div id="destinationField" class="rowItem">
                     <label><%=intl._("Local Base 32")%>:</label>
-                    <%=editBean.getDestHashBase32(curTunnel)%>.b32.i2p
+                    <%=editBean.getDestHashBase32(curTunnel)%>
                 </div>
          <% } // if destb64  %>
 

@@ -14,7 +14,6 @@ import net.i2p.client.I2PClient;
 import net.i2p.client.I2PClientFactory;
 import net.i2p.client.I2PSession;
 import net.i2p.crypto.SigType;
-import net.i2p.data.Base32;
 import net.i2p.data.Destination;
 import net.i2p.i2ptunnel.socks.I2PSOCKSTunnel;
 import net.i2p.util.FileUtil;
@@ -156,7 +155,7 @@ public class TunnelController implements Logging {
             log("Private key created and saved in " + keyFile.getAbsolutePath());
             log("You should backup this file in a secure place.");
             log("New destination: " + destStr);
-            String b32 = Base32.encode(dest.calculateHash().getData()) + ".b32.i2p";
+            String b32 = dest.toBase32();
             log("Base32: " + b32);
             File backupDir = new SecureFile(I2PAppContext.getGlobalContext().getConfigDir(), KEY_BACKUP_DIR);
             if (backupDir.isDirectory() || backupDir.mkdir()) {
@@ -633,6 +632,9 @@ public class TunnelController implements Logging {
         return null;
     }
     
+    /**
+     *  @return "{52 chars}.b32.i2p" or null
+     */
     public String getMyDestHashBase32() {
         if (_tunnel != null) {
             List<I2PSession> sessions = _tunnel.getSessions();
@@ -640,7 +642,7 @@ public class TunnelController implements Logging {
                 I2PSession session = sessions.get(i);
                 Destination dest = session.getMyDestination();
                 if (dest != null)
-                    return Base32.encode(dest.calculateHash().getData());
+                    return dest.toBase32();
             }
         }
         return null;

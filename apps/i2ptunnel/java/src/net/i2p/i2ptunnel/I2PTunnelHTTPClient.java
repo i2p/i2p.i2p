@@ -1247,11 +1247,10 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
         if(host.length() == 60 && host.toLowerCase(Locale.US).endsWith(".b32.i2p")) {
             return host;
         }
-        Destination _dest = _context.namingService().lookup(host);
-        if(_dest == null) {
+        Destination dest = _context.namingService().lookup(host);
+        if (dest == null)
             return "i2p";
-        }
-        return Base32.encode(_dest.calculateHash().getData()) + ".b32.i2p";
+        return dest.toBase32();
     }
 
     public static final String DEFAULT_JUMP_SERVERS =

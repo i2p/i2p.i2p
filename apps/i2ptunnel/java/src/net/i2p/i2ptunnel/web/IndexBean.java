@@ -25,7 +25,6 @@ import net.i2p.I2PAppContext;
 import net.i2p.app.ClientAppManager;
 import net.i2p.app.Outproxy;
 import net.i2p.client.I2PClient;
-import net.i2p.data.Base32;
 import net.i2p.data.Certificate;
 import net.i2p.data.Destination;
 import net.i2p.data.PrivateKeyFile;
@@ -649,6 +648,9 @@ public class IndexBean {
         return "";
     }
     
+    /**
+     *  @return "{52 chars}.b32.i2p" or ""
+     */
     public String getDestHashBase32(int tunnel) {
         TunnelController tun = getController(tunnel);
         if (tun != null) {
@@ -1127,7 +1129,7 @@ public class IndexBean {
             return "Modification failed: " + e;
         }
         return "Destination modified - " +
-               "New Base32 is " + Base32.encode(newdest.calculateHash().getData()) + ".b32.i2p " +
+               "New Base32 is " + newdest.toBase32() +
                "New Destination is " + newdest.toBase64();
      }
 
