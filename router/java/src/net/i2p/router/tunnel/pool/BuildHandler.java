@@ -593,7 +593,13 @@ class BuildHandler implements Runnable {
         long now = (_context.clock().now() / (60l*60l*1000l)) * (60*60*1000);
         int ourSlot = -1;
 
-        int response = _context.throttle().acceptTunnelRequest();
+        int response;
+        if (_context.router().isHidden()) {
+            _context.throttle().setTunnelStatus(_x("Rejecting tunnels: Hidden mode"));
+            response = TunnelHistory.TUNNEL_REJECT_BANDWIDTH;
+        } else {
+            response = _context.throttle().acceptTunnelRequest();
+        }
 
         // This only checked OUR tunnels, so the log message was wrong.
         // Now checked by TunnelDispatcher.joinXXX()
@@ -609,6 +615,7 @@ class BuildHandler implements Runnable {
         //    response = TunnelHistory.TUNNEL_REJECT_PROBABALISTIC_REJECT;
         
         long recvDelay = _context.clock().now()-state.recvTime;
+
         if (response == 0) {
             // unused
             //int proactiveDrops = countProactiveDrops();

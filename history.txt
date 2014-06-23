@@ -1,3 +1,9 @@
+2014-06-23 zzz
+ * Streaming:
+   - Bundle new socket messages for translation
+   - Fix connection error message
+ * Tunnels: Reject participating tunnels when hidden (ticket #1314)
+
 2014-06-21 zzz
  * i2psnark:
    - Display webapp name in html title (ticket #1311)
