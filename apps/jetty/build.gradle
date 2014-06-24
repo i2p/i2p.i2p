@@ -19,4 +19,12 @@ dependencies {
     compile 'org.eclipse.jetty:jetty-server:' + jettyVersion
     compile 'org.eclipse.jetty:jetty-util:' + jettyVersion
     compile 'org.eclipse.jetty:jetty-xml:' + jettyVersion
+    runtime 'org.eclipse.jetty:jetty-continuation:' + jettyVersion
+    runtime 'org.eclipse.jetty:jetty-deploy:' + jettyVersion
+    runtime 'org.eclipse.jetty:jetty-jmx:' + jettyVersion
+    runtime 'org.eclipse.jetty:jetty-rewrite:' + jettyVersion
+    runtime 'org.eclipse.jetty:jetty-servlet:' + jettyVersion
+    runtime 'org.eclipse.jetty:jetty-servlets:' + jettyVersion
+    runtime 'org.eclipse.jetty:jetty-start:' + jettyVersion
+    runtime 'org.eclipse.jetty:jetty-webapp:' + jettyVersion
 }

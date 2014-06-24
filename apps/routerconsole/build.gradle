@@ -1,0 +1,20 @@
+apply plugin: 'war'
+
+sourceSets {
+    main {
+        java {
+            srcDir 'java/src'
+        }
+    }
+}
+
+dependencies {
+    compile project(':core')
+    compile project(':router')
+    providedCompile project(':apps:jetty')
+}
+
+war {
+    from 'jsp'
+    webXml = file('jsp/web.xml')
+}
