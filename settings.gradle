@@ -1,1 +1,1 @@
-include 'core', 'router', 'apps:ministreaming', 'apps:streaming', 'apps:jetty', 'apps:routerconsole'
+include 'core', 'router', 'apps:ministreaming', 'apps:streaming', 'apps:jetty', 'apps:routerconsole', 'apps:BOB', 'apps:sam'
