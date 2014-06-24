@@ -8,23 +8,23 @@ sourceSets {
     }
 }
 
-jettyVersion = '8.1.15.v20140411'
 dependencies {
+    ext.jettyVersion = '8.1.15.v20140411'
     compile project(':core')
     compile 'commons-logging:commons-logging:1.0.4'
     compile 'org.eclipse.jetty.orbit:javax.servlet.jsp:2.2.0.v201112011158'
-    compile 'org.eclipse.jetty:jetty-http:' + jettyVersion
-    compile 'org.eclipse.jetty:jetty-io:' + jettyVersion
-    compile 'org.eclipse.jetty:jetty-security:' + jettyVersion
-    compile 'org.eclipse.jetty:jetty-server:' + jettyVersion
-    compile 'org.eclipse.jetty:jetty-util:' + jettyVersion
-    compile 'org.eclipse.jetty:jetty-xml:' + jettyVersion
-    runtime 'org.eclipse.jetty:jetty-continuation:' + jettyVersion
-    runtime 'org.eclipse.jetty:jetty-deploy:' + jettyVersion
-    runtime 'org.eclipse.jetty:jetty-jmx:' + jettyVersion
-    runtime 'org.eclipse.jetty:jetty-rewrite:' + jettyVersion
-    runtime 'org.eclipse.jetty:jetty-servlet:' + jettyVersion
-    runtime 'org.eclipse.jetty:jetty-servlets:' + jettyVersion
-    runtime 'org.eclipse.jetty:jetty-start:' + jettyVersion
-    runtime 'org.eclipse.jetty:jetty-webapp:' + jettyVersion
+    compile 'org.eclipse.jetty:jetty-http:' + ext.jettyVersion
+    compile 'org.eclipse.jetty:jetty-io:' + ext.jettyVersion
+    compile 'org.eclipse.jetty:jetty-security:' + ext.jettyVersion
+    compile 'org.eclipse.jetty:jetty-server:' + ext.jettyVersion
+    compile 'org.eclipse.jetty:jetty-util:' + ext.jettyVersion
+    compile 'org.eclipse.jetty:jetty-xml:' + ext.jettyVersion
+    runtime 'org.eclipse.jetty:jetty-continuation:' + ext.jettyVersion
+    runtime 'org.eclipse.jetty:jetty-deploy:' + ext.jettyVersion
+    runtime 'org.eclipse.jetty:jetty-jmx:' + ext.jettyVersion
+    runtime 'org.eclipse.jetty:jetty-rewrite:' + ext.jettyVersion
+    runtime 'org.eclipse.jetty:jetty-servlet:' + ext.jettyVersion
+    runtime 'org.eclipse.jetty:jetty-servlets:' + ext.jettyVersion
+    runtime 'org.eclipse.jetty:jetty-start:' + ext.jettyVersion
+    runtime 'org.eclipse.jetty:jetty-webapp:' + ext.jettyVersion
 }
