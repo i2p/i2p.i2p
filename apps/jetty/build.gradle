@@ -1,0 +1,22 @@
+archivesBaseName = 'jetty-i2p'
+
+sourceSets {
+    main {
+        java {
+            srcDir 'java/src'
+        }
+    }
+}
+
+jettyVersion = '8.1.15.v20140411'
+dependencies {
+    compile project(':core')
+    compile 'commons-logging:commons-logging:1.0.4'
+    compile 'org.eclipse.jetty.orbit:javax.servlet.jsp:2.2.0.v201112011158'
+    compile 'org.eclipse.jetty:jetty-http:' + jettyVersion
+    compile 'org.eclipse.jetty:jetty-io:' + jettyVersion
+    compile 'org.eclipse.jetty:jetty-security:' + jettyVersion
+    compile 'org.eclipse.jetty:jetty-server:' + jettyVersion
+    compile 'org.eclipse.jetty:jetty-util:' + jettyVersion
+    compile 'org.eclipse.jetty:jetty-xml:' + jettyVersion
+}
