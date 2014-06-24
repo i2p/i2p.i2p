@@ -1,0 +1,18 @@
+archivesBaseName = 'i2p'
+
+sourceSets {
+    main {
+        java {
+            srcDir 'java/src'
+        }
+    }
+    test {
+        java {
+            srcDir 'java/test/junit'
+        }
+    }
+}
+
+dependencies {
+    testCompile 'junit:junit:4.+'
+}
