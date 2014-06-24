@@ -11,7 +11,11 @@ sourceSets {
 dependencies {
     compile project(':core')
     compile project(':router')
+    compile project(':installer')
+    providedCompile project(':apps:desktopgui')
+    providedCompile project(':apps:systray')
     providedCompile project(':apps:jetty')
+    providedCompile files('../jrobin/jrobin-1.5.9.1.jar')
 }
 
 war {

@@ -1,1 +1,1 @@
-include 'core', 'router', 'apps:ministreaming', 'apps:streaming', 'apps:jetty', 'apps:routerconsole', 'apps:BOB', 'apps:sam'
+include 'core', 'router', 'installer', 'apps:ministreaming', 'apps:streaming', 'apps:desktopgui', 'apps:systray', 'apps:jetty', 'apps:routerconsole', 'apps:BOB', 'apps:sam'
