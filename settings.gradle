@@ -1,1 +1,1 @@
-include 'core', 'router'
+include 'core', 'router', 'apps:ministreaming', 'apps:streaming'

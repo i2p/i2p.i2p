@@ -1,0 +1,18 @@
+sourceSets {
+    main {
+        java {
+            srcDir 'java/src'
+        }
+    }
+    test {
+        java {
+            srcDir 'java/test/junit'
+        }
+    }
+}
+
+dependencies {
+    compile project(':core')
+    compile project(':apps:ministreaming')
+    testCompile 'junit:junit:4.+'
+}
