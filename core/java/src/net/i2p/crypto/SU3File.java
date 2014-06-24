@@ -515,6 +515,10 @@ public class SU3File {
         StringBuilder buf = new StringBuilder(256);
         buf.append("Available signature types:\n");
         for (SigType t : EnumSet.allOf(SigType.class)) {
+            if (!t.isAvailable())
+                continue;
+            if (t == SigType.EdDSA_SHA512_25519)
+                continue; // not supported by keytool, and does double hashing right now
             buf.append("      ").append(t).append("\t(code: ").append(t.getCode()).append(')');
             if (t.getCode() == DEFAULT_SIG_CODE)
                 buf.append(" DEFAULT");

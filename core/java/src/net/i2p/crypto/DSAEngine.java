@@ -42,6 +42,7 @@ import java.security.interfaces.ECKey;
 import java.security.interfaces.RSAKey;
 
 import net.i2p.I2PAppContext;
+import net.i2p.crypto.eddsa.EdDSAKey;
 import net.i2p.data.Hash;
 import net.i2p.data.Signature;
 import net.i2p.data.SigningPrivateKey;
@@ -503,7 +504,11 @@ public class DSAEngine {
         if (type == SigType.DSA_SHA1)
             return altVerifySigSHA1(signature, data, offset, len, verifyingKey);
 
-        java.security.Signature jsig = java.security.Signature.getInstance(type.getAlgorithmName());
+        java.security.Signature jsig;
+        if (type.getBaseAlgorithm() == SigAlgo.EdDSA)
+            jsig = new net.i2p.crypto.eddsa.EdDSAEngine(type.getDigestInstance());
+        else
+            jsig = java.security.Signature.getInstance(type.getAlgorithmName());
         PublicKey pubKey = SigUtil.toJavaKey(verifyingKey);
         jsig.initVerify(pubKey);
         jsig.update(data, offset, len);
@@ -543,7 +548,11 @@ public class DSAEngine {
             throw new IllegalArgumentException("type mismatch hash=" + hash.getClass() + " key=" + type);
 
         String algo = getRawAlgo(type);
-        java.security.Signature jsig = java.security.Signature.getInstance(algo);
+        java.security.Signature jsig;
+        if (type.getBaseAlgorithm() == SigAlgo.EdDSA)
+            jsig = new net.i2p.crypto.eddsa.EdDSAEngine(); // Ignore algo, EdDSAKey includes a hash specification.
+        else
+            jsig = java.security.Signature.getInstance(algo);
         jsig.initVerify(pubKey);
         jsig.update(hash.getData());
         boolean rv = jsig.verify(SigUtil.toJavaSig(signature));
@@ -580,7 +589,11 @@ public class DSAEngine {
         if (type == SigType.DSA_SHA1)
             return altSignSHA1(data, offset, len, privateKey);
 
-        java.security.Signature jsig = java.security.Signature.getInstance(type.getAlgorithmName());
+        java.security.Signature jsig;
+        if (type.getBaseAlgorithm() == SigAlgo.EdDSA)
+            jsig = new net.i2p.crypto.eddsa.EdDSAEngine(type.getDigestInstance());
+        else
+            jsig = java.security.Signature.getInstance(type.getAlgorithmName());
         PrivateKey privKey = SigUtil.toJavaKey(privateKey);
         jsig.initSign(privKey, _context.random());
         jsig.update(data, offset, len);
@@ -613,7 +626,11 @@ public class DSAEngine {
         if (type.getHashLen() != hashlen)
             throw new IllegalArgumentException("type mismatch hash=" + hash.getClass() + " key=" + type);
 
-        java.security.Signature jsig = java.security.Signature.getInstance(algo);
+        java.security.Signature jsig;
+        if (type.getBaseAlgorithm() == SigAlgo.EdDSA)
+            jsig = new net.i2p.crypto.eddsa.EdDSAEngine(); // Ignore algo, EdDSAKey includes a hash specification.
+        else
+            jsig = java.security.Signature.getInstance(algo);
         jsig.initSign(privKey, _context.random());
         jsig.update(hash.getData());
         return SigUtil.fromJavaSig(jsig.sign(), type);
@@ -640,6 +657,8 @@ public class DSAEngine {
                 return "NONEwithDSA";
             case EC:
                 return "NONEwithECDSA";
+            case EdDSA:
+                return "NONEwithEdDSA";
             case RSA:
                 return "NONEwithRSA";
             default:
@@ -653,6 +672,8 @@ public class DSAEngine {
             return "NONEwithDSA";
         if (key instanceof ECKey)
             return "NONEwithECDSA";
+        if (key instanceof EdDSAKey)
+            return "NONEwithEdDSA";
         if (key instanceof RSAKey)
             return "NONEwithRSA";
         throw new UnsupportedOperationException("Raw signatures unsupported for " + key.getClass().getName());

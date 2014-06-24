@@ -512,6 +512,12 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                 <label>ECDSA-P521</label>
                 <input value="3" type="radio" id="startOnLoad" name="sigType" title="Advanced users only"<%=(editBean.getSigType(curTunnel)==3 ? " checked=\"checked\"" : "")%> class="tickbox" />                
               </div>
+           <% }
+              if (editBean.isSigTypeAvailable(7)) { %>
+              <div id="portField" class="rowItem">
+                <label>Ed25519-SHA-512</label>
+                <input value="7" type="radio" id="startOnLoad" name="sigType" title="Advanced users only"<%=(editBean.getSigType(curTunnel)==7 ? " checked=\"checked\"" : "")%> class="tickbox" />                
+              </div>
            <% }   // isAvailable %>
             </div>
                  

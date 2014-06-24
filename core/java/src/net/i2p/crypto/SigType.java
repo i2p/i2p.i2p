@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import net.i2p.crypto.eddsa.spec.EdDSANamedCurveTable;
 import net.i2p.data.Hash;
 import net.i2p.data.SimpleDataStructure;
 
@@ -47,7 +48,8 @@ public enum SigType {
 
     // TESTING....................
 
-
+    /** Pubkey 32 bytes; privkey 32 bytes; hash 64 bytes; sig 64 bytes; */
+    EdDSA_SHA512_25519(7, 32, 32, 64, 64, SigAlgo.EdDSA, "SHA-512", "SHA512withEdDSA", EdDSANamedCurveTable.getByName("ed25519-sha-512"));
 
     // others..........
 
@@ -169,7 +171,8 @@ public enum SigType {
             return true;
         try {
             getParams();
-            Signature.getInstance(getAlgorithmName());
+            if (getBaseAlgorithm() != SigAlgo.EdDSA)
+                Signature.getInstance(getAlgorithmName());
             getDigestInstance();
             getHashInstance();
         } catch (Exception e) {
