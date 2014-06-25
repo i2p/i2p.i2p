@@ -1,0 +1,27 @@
+apply plugin: 'war'
+
+sourceSets {
+    main {
+        java {
+            srcDir 'src/src'
+        }
+    }
+}
+
+dependencies {
+    compile project(':core')
+    providedCompile project(':apps:jetty')
+}
+
+war {
+    from 'src'
+    exclude 'WEB-INF/web.xml'
+    exclude 'LICENSE'
+    exclude 'src'
+    exclude 'susimail.properties'
+    webInf {
+        into 'classes'
+        from 'src/susimail.properties'
+    }
+    webXml = file('src/WEB-INF/web.xml')
+}

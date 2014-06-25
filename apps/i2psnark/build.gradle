@@ -1,0 +1,26 @@
+apply plugin: 'war'
+
+sourceSets {
+    main {
+        java {
+            srcDir 'java/src'
+        }
+    }
+}
+
+dependencies {
+    compile project(':core')
+    providedCompile project(':apps:ministreaming')
+    providedCompile project(':apps:jetty')
+}
+
+war {
+    into '.icons', {
+        from 'icons'
+    }
+    webInf {
+        into 'classes/org/klomp/snark/web'
+        from 'mime.properties'
+    }
+    webXml = file('web.xml')
+}

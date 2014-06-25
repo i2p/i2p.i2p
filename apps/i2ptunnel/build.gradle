@@ -1,0 +1,27 @@
+apply plugin: 'war'
+
+sourceSets {
+    main {
+        java {
+            srcDir 'java/src'
+        }
+    }
+    test {
+        java {
+            srcDir 'java/test/junit'
+        }
+    }
+}
+
+dependencies {
+    compile project(':core')
+    providedCompile project(':apps:ministreaming')
+    providedCompile project(':apps:jetty')
+    testCompile 'junit:junit:4.+'
+}
+
+war {
+    from 'jsp'
+    exclude 'jsp/web.xml'
+    webXml = file('jsp/web.xml')
+}
