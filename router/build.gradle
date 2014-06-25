@@ -13,5 +13,5 @@ sourceSets {
 
 dependencies {
     compile project(':core')
-    testCompile 'junit:junit:4.+'
+    testCompile project(path: ':core', configuration: 'tests')
 }

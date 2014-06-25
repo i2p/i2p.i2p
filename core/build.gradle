@@ -13,6 +13,14 @@ sourceSets {
     }
 }
 
-dependencies {
-    testCompile 'junit:junit:4.+'
+configurations {
+    tests
+}
+task testJar(type: Jar) {
+    baseName = 'i2p-test'
+    dependsOn classes
+    from sourceSets.test.output
+}
+artifacts {
+    tests testJar
 }

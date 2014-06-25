@@ -15,5 +15,16 @@ sourceSets {
 
 dependencies {
     compile project(':core')
-    testCompile 'junit:junit:4.+'
+}
+
+configurations {
+    tests
+}
+task testJar(type: Jar) {
+    baseName = 'mstreaming-test'
+    dependsOn classes
+    from sourceSets.test.output
+}
+artifacts {
+    tests testJar
 }

@@ -14,5 +14,4 @@ sourceSets {
 dependencies {
     compile project(':core')
     compile project(':apps:ministreaming')
-    testCompile 'junit:junit:4.+'
 }

@@ -1,14 +1,19 @@
 subprojects {
     apply plugin: 'java'
 
+    repositories {
+        mavenCentral()
+    }
+
+
+    dependencies {
+        testCompile 'junit:junit:4.+'
+    }
+
     sourceCompatibility = 1.5
     jar {
         manifest {
             attributes 'Implementation-Version': '0.9.13-8'
         }
-    }
-
-    repositories {
-        mavenCentral()
     }
 }
