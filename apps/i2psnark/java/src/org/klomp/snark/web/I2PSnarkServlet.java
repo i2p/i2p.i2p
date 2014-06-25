@@ -58,6 +58,7 @@ public class I2PSnarkServlet extends BasicServlet {
     
     private static final String DEFAULT_NAME = "i2psnark";
     public static final String PROP_CONFIG_FILE = "i2psnark.configFile";
+    private static final String WARBASE = "/.icons/";
  
     public I2PSnarkServlet() {
         super();
@@ -83,7 +84,7 @@ public class I2PSnarkServlet extends BasicServlet {
         _manager.start();
         loadMimeMap("org/klomp/snark/web/mime");
         setResourceBase(_manager.getDataDir());
-        setWarBase("/.icons/");
+        setWarBase(WARBASE);
     }
     
     @Override
@@ -94,17 +95,35 @@ public class I2PSnarkServlet extends BasicServlet {
     }
 
     /**
-     *  We override this instead of passing a resource base to super(), because
-     *  if a resource base is set, super.getResource() always uses that base,
-     *  and we can't get any resources (like icons) out of the .war
+     *  We override this to set the file relative to the storage dirctory
+     *  for the torrent.
+     *
+     *  @param pathInContext should always start with /
      */
     @Override
     public File getResource(String pathInContext)
     {
         if (pathInContext == null || pathInContext.equals("/") || pathInContext.equals("/index.jsp") ||
-            pathInContext.equals("/index.html") || pathInContext.startsWith("/.icons/"))
+            !pathInContext.startsWith("/") || pathInContext.length() == 0 ||
+            pathInContext.equals("/index.html") || pathInContext.startsWith(WARBASE))
             return super.getResource(pathInContext);
         // files in the i2psnark/ directory
+        // get top level
+        pathInContext = pathInContext.substring(1);
+        File top = new File(pathInContext);
+        File parent;
+        while ((parent = top.getParentFile()) != null) {
+            top = parent;
+        }
+        Snark snark = _manager.getTorrentByBaseName(top.getPath());
+        if (snark != null) {
+            Storage storage = snark.getStorage();
+            if (storage != null) {
+                File sbase = storage.getBase();
+                String child = pathInContext.substring(top.getPath().length());
+                return new File(sbase, child);
+            }
+        }
         return new File(_resourceBase, pathInContext);
     }
 
@@ -185,6 +204,14 @@ public class I2PSnarkServlet extends BasicServlet {
             writeMessages(out, false, peerString);
             writeTorrents(out, req);
             return;
+        }
+
+        // in-war icons etc.
+        if (path != null && path.startsWith(WARBASE)) {
+            if (method.equals("GET") || method.equals("HEAD"))
+                super.doGet(req, resp);
+            else  // no POST either
+                resp.sendError(405);
         }
 
         boolean isConfigure = "/configure".equals(path);
@@ -2251,14 +2278,14 @@ public class I2PSnarkServlet extends BasicServlet {
      * </pre>
      *
      * Get the resource list as a HTML directory listing.
-     * @param r The Resource
+     * @param xxxr The Resource unused
      * @param base The base URL
      * @param parent True if the parent directory should be included
      * @param postParams map of POST parameters or null if not a POST
      * @return String of HTML or null if postParams != null
      * @since 0.7.14
      */
-    private String getListHTML(File r, String base, boolean parent, Map<String, String[]> postParams)
+    private String getListHTML(File xxxr, String base, boolean parent, Map<String, String[]> postParams)
         throws IOException
     {
         String title = decodePath(base);
@@ -2268,11 +2295,15 @@ public class I2PSnarkServlet extends BasicServlet {
 
         // Get the snark associated with this directory
         String torrentName;
+        String pathInTorrent;
         int slash = title.indexOf('/');
-        if (slash > 0)
+        if (slash > 0) {
             torrentName = title.substring(0, slash);
-        else
+            pathInTorrent = title.substring(slash);
+        } else {
             torrentName = title;
+            pathInTorrent = "/";
+        }
         Snark snark = _manager.getTorrentByBaseName(torrentName);
 
         if (snark != null && postParams != null) {
@@ -2288,6 +2319,23 @@ public class I2PSnarkServlet extends BasicServlet {
             return null;
         }
 
+        File r;
+        if (snark != null) {
+            Storage storage = snark.getStorage();
+            if (storage != null) {
+                File sbase = storage.getBase();
+                if (pathInTorrent.equals("/"))
+                    r = sbase;
+                else
+                    r = new File(sbase, pathInTorrent);
+            } else {
+                // magnet, dummy
+                r = new File("");
+            }
+        } else {
+            // dummy
+            r = new File("");
+        }
         StringBuilder buf=new StringBuilder(4096);
         buf.append(DOCTYPE).append("<HTML><HEAD><TITLE>");
         if (title.endsWith("/"))

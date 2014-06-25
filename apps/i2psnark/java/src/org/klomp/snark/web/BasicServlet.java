@@ -181,11 +181,10 @@ class BasicServlet extends HttpServlet
         HttpContent r = null;
         if (_warBase != null && pathInContext.startsWith(_warBase)) {
             r = new JarContent(pathInContext);
-        } else if (!pathInContext.contains("..") &&
-                   !pathInContext.endsWith("/")) {
-            File f = new File(_resourceBase, pathInContext);
+        } else {
+            File f = getResource(pathInContext);
             // exists && !directory
-            if (f.isFile())
+            if (f != null && f.isFile())
                 r = new FileContent(f);
         }
         return r;
