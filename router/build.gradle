@@ -15,3 +15,10 @@ dependencies {
     compile project(':core')
     testCompile project(path: ':core', configuration: 'tests')
 }
+
+jar {
+    manifest {
+        // so people with very old wrapper.config files will still work with Jetty 6
+        attributes 'Class-Path': 'jetty-i2p.jar jetty-java5-threadpool.jar jetty-rewrite-handler.jar jetty-sslengine.jar jetty-start.jar jetty-util.jar'
+    }
+}

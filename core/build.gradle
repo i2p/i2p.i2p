@@ -5,6 +5,10 @@ sourceSets {
         java {
             srcDir 'java/src'
         }
+        resources {
+            srcDir 'java/src'
+            include 'gnu/getopt/*.properties'
+        }
     }
     test {
         java {
