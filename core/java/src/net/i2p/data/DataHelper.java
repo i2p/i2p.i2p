@@ -554,7 +554,7 @@ public class DataHelper {
 
     /**
      *  Positive decimal without leading zeros.
-     *  @param data may be null (returns "0")
+     *  @param buf may be null (returns "0")
      *  @param len unused
      *  @return (new BigInteger(1, buf)).toString()
      *  @deprecated unused
