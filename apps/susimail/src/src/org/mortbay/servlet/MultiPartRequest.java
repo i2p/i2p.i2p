@@ -290,7 +290,7 @@ public class MultiPartRequest
                 {
                     String key = line.substring(0,c).trim().toLowerCase();
                     String value = line.substring(c+1,line.length()).trim();
-                    String ev = (String) part._headers.get(key);
+                    String ev = part._headers.get(key);
                     part._headers.put(key,(ev!=null)?(ev+';'+value):value);
                     //if(log.isDebugEnabled())log.debug(key+": "+value);
                     if (key.equals("content-disposition"))

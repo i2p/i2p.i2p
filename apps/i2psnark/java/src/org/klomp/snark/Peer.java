@@ -194,9 +194,8 @@ public class Peer implements Comparable<Peer>
    * Compares the PeerIDs.
    * @deprecated unused?
    */
-  public int compareTo(Peer o)
+  public int compareTo(Peer p)
   {
-    Peer p = (Peer)o;
     int rv = peerID.compareTo(p.peerID);
     if (rv == 0) {
         if (_id > p._id) return 1;

@@ -240,7 +240,7 @@ public class MultiRouter {
         while (true) {
             int alive = 0;
             for (int i = 0; i < _routers.size(); i++) {
-                Router r = (Router)_routers.get(i);
+                Router r = _routers.get(i);
                 if (!r.isAlive()) {
                 	_out.println("Router " + i + " is dead");
                 } else {

@@ -317,7 +317,7 @@ public class FortunaStandalone extends BasePRNGStandalone implements Serializabl
       seeded = false;
       Arrays.fill(key, (byte) 0);
       Arrays.fill(counter, (byte) 0);
-      byte[] seed = (byte[]) attributes.get(SEED);
+      byte[] seed = attributes.get(SEED);
       if (seed != null)
         addRandomBytes(seed);
     }

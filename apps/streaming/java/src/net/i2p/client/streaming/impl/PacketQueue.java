@@ -216,7 +216,7 @@ class PacketQueue implements SendMessageStatusListener {
             _connectionManager.getPacketHandler().displayPacket(packet, "SEND", suffix);
             if (I2PSocketManagerFull.pcapWriter != null &&
                 _context.getBooleanProperty(I2PSocketManagerFull.PROP_PCAP))
-                ((PacketLocal)packet).logTCPDump();
+                packet.logTCPDump();
         }
         
         if ( (packet.getSequenceNum() == 0) && (!packet.isFlagSet(Packet.FLAG_SYNCHRONIZE)) ) {

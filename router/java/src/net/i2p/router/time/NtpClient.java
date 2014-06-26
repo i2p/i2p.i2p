@@ -70,7 +70,7 @@ class NtpClient {
             names.add(serverNames[i]);
         Collections.shuffle(names);
         for (int i = 0; i < names.size(); i++) {
-            long now = currentTime((String)names.get(i));
+            long now = currentTime(names.get(i));
             if (now > 0)
                 return now;
         }
@@ -92,7 +92,7 @@ class NtpClient {
             names.add(serverNames[i]);
         Collections.shuffle(names);
         for (int i = 0; i < names.size(); i++) {
-            long[] rv = currentTimeAndStratum((String)names.get(i));
+            long[] rv = currentTimeAndStratum(names.get(i));
             if (rv != null && rv[0] > 0)
                 return rv;
         }
