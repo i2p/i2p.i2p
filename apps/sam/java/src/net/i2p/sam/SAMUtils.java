@@ -77,31 +77,27 @@ class SAMUtils {
             return false;
         }
     }
-    
-    public static class InvalidDestinationException extends Exception {
-    	private static final long serialVersionUID = 0x1;
-    }
-
 
     /**
      * Check whether a base64-encoded {dest,privkey,signingprivkey} is valid
      *
      * @param dest The base64-encoded destination and keys to be checked (same format as PrivateKeyFile)
-     *
-     * @throws InvalidDestination if invalid
+     * @return true if valid
      */
-    public static void checkPrivateDestination(String dest) throws InvalidDestinationException {
+    public static boolean checkPrivateDestination(String dest) {
     	ByteArrayInputStream destKeyStream = new ByteArrayInputStream(Base64.decode(dest));
-
     	try {
     		Destination d = new Destination();
     		d.readBytes(destKeyStream);
     		new PrivateKey().readBytes(destKeyStream);
     		SigningPrivateKey spk = new SigningPrivateKey(d.getSigningPublicKey().getType());
     		spk.readBytes(destKeyStream);
-    	} catch (Exception e) {
-    		throw new InvalidDestinationException();
+    	} catch (DataFormatException e) {
+                return false;
+    	} catch (IOException e) {
+                return false;
     	}
+        return destKeyStream.available() == 0;
     }
 
 

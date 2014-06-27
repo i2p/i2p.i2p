@@ -500,11 +500,8 @@ class SAMv3Handler extends SAMv1Handler
 						_log.debug("Custom destination specified [" + dest + "]");
 				}
 
-				try {
-					SAMUtils.checkPrivateDestination(dest);
-				} catch ( SAMUtils.InvalidDestinationException e ) {
-                    return writeString("SESSION STATUS RESULT=INVALID_KEY\n");
-				}
+				if (!SAMUtils.checkPrivateDestination(dest))
+					return writeString("SESSION STATUS RESULT=INVALID_KEY\n");
 
 				nick = props.getProperty("ID");
 				if (nick == null) {
