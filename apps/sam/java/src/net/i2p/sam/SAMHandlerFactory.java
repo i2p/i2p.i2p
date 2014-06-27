@@ -46,10 +46,9 @@ class SAMHandlerFactory {
             }
             tok = new StringTokenizer(line.trim(), " ");
         } catch (IOException e) {
-            throw new SAMException("Error reading from socket: "
-                                   + e.getMessage());
+            throw new SAMException("Error reading from socket", e);
         } catch (Exception e) {
-            throw new SAMException("Unexpected error: " + e.getMessage());
+            throw new SAMException("Unexpected error", e);
         }
 
         // Message format: HELLO VERSION MIN=v1 MAX=v2

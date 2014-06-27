@@ -250,13 +250,14 @@ class SAMv3Handler extends SAMv1Handler
 
 	public static class SessionsDB
 	{
-		static final long serialVersionUID = 0x1 ;
+		private static final long serialVersionUID = 0x1;
 
-		static class ExistingId   extends Exception {
-			static final long serialVersionUID = 0x1 ;
+		static class ExistingIdException   extends Exception {
+			private static final long serialVersionUID = 0x1;
 		}
-		static class ExistingDest extends Exception {
-			static final long serialVersionUID = 0x1 ;
+
+		static class ExistingDestException extends Exception {
+			private static final long serialVersionUID = 0x1;
 		}
 		
 		private final HashMap<String, SessionRecord> map;
@@ -265,14 +266,15 @@ class SAMv3Handler extends SAMv1Handler
 			map = new HashMap<String, SessionRecord>() ;
 		}
 
-		synchronized public boolean put( String nick, SessionRecord session ) throws ExistingId, ExistingDest
+		synchronized public boolean put( String nick, SessionRecord session )
+			throws ExistingIdException, ExistingDestException
 		{
 			if ( map.containsKey(nick) ) {
-				throw new ExistingId();
+				throw new ExistingIdException();
 			}
 			for ( SessionRecord r : map.values() ) {
 				if (r.getDest().equals(session.getDest())) {
-					throw new ExistingDest();
+					throw new ExistingDestException();
 				}
 			}
 
@@ -316,7 +318,7 @@ class SAMv3Handler extends SAMv1Handler
 	
 	private boolean stolenSocket;
 	private boolean streamForwardingSocket;
-	
+
 	public void stealSocket()
 	{
 		stolenSocket = true ;
@@ -501,7 +503,7 @@ class SAMv3Handler extends SAMv1Handler
 
 				try {
 					SAMUtils.checkPrivateDestination(dest);
-				} catch ( SAMUtils.InvalidDestination e ) {
+				} catch ( SAMUtils.InvalidDestinationException e ) {
                     return writeString("SESSION STATUS RESULT=INVALID_KEY\n");
 				}
 
@@ -535,11 +537,11 @@ class SAMv3Handler extends SAMv1Handler
 
 				try {
 					sSessionsHash.put( nick, new SessionRecord(dest, allProps, this) ) ;
-				} catch (SessionsDB.ExistingId e) {
+				} catch (SessionsDB.ExistingIdException e) {
 					if (_log.shouldLog(Log.DEBUG))
 						_log.debug("SESSION ID parameter already in use");
 					return writeString("SESSION STATUS RESULT=DUPLICATED_ID\n");
-				} catch (SessionsDB.ExistingDest e) {
+				} catch (SessionsDB.ExistingDestException e) {
 					return writeString("SESSION STATUS RESULT=DUPLICATED_DEST\n");
 				}
 

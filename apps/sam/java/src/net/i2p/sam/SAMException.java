@@ -15,7 +15,7 @@ package net.i2p.sam;
  */
 class SAMException extends Exception {
 
-	static final long serialVersionUID = 1 ;
+    private static final long serialVersionUID = 1;
 
     public SAMException() {
     	super();
@@ -23,5 +23,10 @@ class SAMException extends Exception {
     
     public SAMException(String s) {
     	super(s);
+    }
+    
+    /** @since 0.9.14 */
+    public SAMException(String s, Throwable cause) {
+        super(s, cause);
     }
 }

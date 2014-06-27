@@ -78,10 +78,10 @@ class SAMUtils {
         }
     }
     
-    public static class InvalidDestination extends Exception {
+    public static class InvalidDestinationException extends Exception {
     	static final long serialVersionUID = 0x1 ;
     }
-    public static void checkPrivateDestination(String dest) throws InvalidDestination {
+    public static void checkPrivateDestination(String dest) throws InvalidDestinationException {
     	ByteArrayInputStream destKeyStream = new ByteArrayInputStream(Base64.decode(dest));
 
     	try {
@@ -89,7 +89,7 @@ class SAMUtils {
     		new PrivateKey().readBytes(destKeyStream);
     		new SigningPrivateKey().readBytes(destKeyStream);
     	} catch (Exception e) {
-    		throw new InvalidDestination();
+    		throw new InvalidDestinationException();
     	}
     }
 

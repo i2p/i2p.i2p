@@ -341,7 +341,7 @@ public class SAMBridge implements Runnable, ClientApp {
 
     ////// end ClientApp helpers
 
-    static class HelpRequested extends Exception {static final long serialVersionUID=0x1;}
+    private static class HelpRequestedException extends Exception {static final long serialVersionUID=0x1;}
 
     /**
      * Usage:
@@ -439,11 +439,11 @@ public class SAMBridge implements Runnable, ClientApp {
         return new Options(host, port, opts, keyfile);
     }
 
-    private static Properties parseOptions(String args[], int startArgs) throws HelpRequested {
+    private static Properties parseOptions(String args[], int startArgs) throws HelpRequestedException {
         Properties props = new Properties();
         // skip over first few options
         for (int i = startArgs; i < args.length; i++) {
-        	if (args[i].equals("-h")) throw new HelpRequested();
+        	if (args[i].equals("-h")) throw new HelpRequestedException();
             int eq = args[i].indexOf('=');
             if (eq <= 0) continue;
             if (eq >= args[i].length()-1) continue;
