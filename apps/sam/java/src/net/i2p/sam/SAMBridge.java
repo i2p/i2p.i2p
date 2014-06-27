@@ -33,6 +33,7 @@ import net.i2p.util.Log;
 
 /**
  * SAM bridge implementation.
+ * This is the main entry point for SAM.
  *
  * @author human
  */

@@ -37,7 +37,7 @@ import net.i2p.util.Log;
  * @author mkvore
  */
 
-public class SAMv2StreamSession extends SAMStreamSession
+class SAMv2StreamSession extends SAMStreamSession
 {
 
 		/**

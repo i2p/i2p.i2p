@@ -18,7 +18,7 @@ import net.i2p.util.Log;
  * @author MKVore
  *
  */
-public class SAMv3RawSession extends SAMRawSession  implements SAMv3Handler.Session, SAMRawReceiver {
+class SAMv3RawSession extends SAMRawSession  implements SAMv3Handler.Session, SAMRawReceiver {
 	
 	private final String nick;
 	private final SAMv3Handler handler;

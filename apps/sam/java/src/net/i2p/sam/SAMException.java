@@ -13,7 +13,7 @@ package net.i2p.sam;
  *
  * @author human
  */
-public class SAMException extends Exception {
+class SAMException extends Exception {
 
 	static final long serialVersionUID = 1 ;
 

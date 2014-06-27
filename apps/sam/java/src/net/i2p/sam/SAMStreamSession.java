@@ -46,7 +46,7 @@ import net.i2p.util.Log;
  *
  * @author human
  */
-public class SAMStreamSession {
+class SAMStreamSession {
 
     protected final Log _log;
 

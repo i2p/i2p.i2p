@@ -13,7 +13,7 @@ import java.io.IOException;
 /**
  * Interface for sending raw data to a SAM client
  */
-public interface SAMRawReceiver {
+interface SAMRawReceiver {
 
     /**
      * Send a byte array to a SAM client, without informations

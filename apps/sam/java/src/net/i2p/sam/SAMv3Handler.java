@@ -41,7 +41,7 @@ import net.i2p.util.I2PAppThread;
  * @author mkvore
  */
 
-public class SAMv3Handler extends SAMv1Handler
+class SAMv3Handler extends SAMv1Handler
 {
 	
 	private Session session;

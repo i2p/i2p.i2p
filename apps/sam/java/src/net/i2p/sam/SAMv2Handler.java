@@ -21,7 +21,7 @@ import net.i2p.util.Log;
  * @author mkvore
  */
 
-public class SAMv2Handler extends SAMv1Handler implements SAMRawReceiver, SAMDatagramReceiver, SAMStreamReceiver
+class SAMv2Handler extends SAMv1Handler implements SAMRawReceiver, SAMDatagramReceiver, SAMStreamReceiver
 {
 
 

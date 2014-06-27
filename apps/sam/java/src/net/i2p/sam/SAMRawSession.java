@@ -21,7 +21,7 @@ import net.i2p.util.Log;
  *
  * @author human
  */
-public class SAMRawSession extends SAMMessageSession {
+class SAMRawSession extends SAMMessageSession {
 
     public static final int RAW_SIZE_MAX = 32*1024;
 

@@ -34,7 +34,7 @@ import java.nio.channels.SocketChannel;
  * @author mkvore
  */
 
-public class SAMv3StreamSession  extends SAMStreamSession implements SAMv3Handler.Session
+class SAMv3StreamSession  extends SAMStreamSession implements SAMv3Handler.Session
 {
 
 		private static final int BUFFER_SIZE = 1024 ;

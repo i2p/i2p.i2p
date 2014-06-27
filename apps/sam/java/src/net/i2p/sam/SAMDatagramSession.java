@@ -25,7 +25,7 @@ import net.i2p.util.Log;
  *
  * @author human
  */
-public class SAMDatagramSession extends SAMMessageSession {
+class SAMDatagramSession extends SAMMessageSession {
 
     public static final int DGRAM_SIZE_MAX = 31*1024;
 

@@ -21,7 +21,7 @@ import net.i2p.util.Log;
 /**
  * SAM handler factory class.
  */
-public class SAMHandlerFactory {
+class SAMHandlerFactory {
 
 
     /**

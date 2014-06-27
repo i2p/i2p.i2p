@@ -17,7 +17,7 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress ;
 import java.nio.ByteBuffer;
 
-public class SAMv3DatagramSession extends SAMDatagramSession implements SAMv3Handler.Session, SAMDatagramReceiver {
+class SAMv3DatagramSession extends SAMDatagramSession implements SAMv3Handler.Session, SAMDatagramReceiver {
 	
 	private final SAMv3Handler handler;
 	private final SAMv3Handler.DatagramServer server;

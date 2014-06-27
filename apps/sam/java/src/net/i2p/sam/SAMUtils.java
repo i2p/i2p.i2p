@@ -32,7 +32,7 @@ import net.i2p.util.Log;
  *
  * @author human
  */
-public class SAMUtils {
+class SAMUtils {
 
     //private final static Log _log = new Log(SAMUtils.class);
 
