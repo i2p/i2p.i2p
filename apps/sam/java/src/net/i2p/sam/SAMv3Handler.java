@@ -45,6 +45,9 @@ class SAMv3Handler extends SAMv1Handler
 {
 	
 	private Session session;
+	public static final SessionsDB sSessionsHash = new SessionsDB();
+	private boolean stolenSocket;
+	private boolean streamForwardingSocket;
 
 	
 	interface Session {
@@ -219,7 +222,7 @@ class SAMv3Handler extends SAMv1Handler
 			m_handler = in.getHandler();
 		}
 
-		synchronized public String getDest()
+		public String getDest()
 		{
 			return m_dest;
 		}
@@ -231,7 +234,7 @@ class SAMv3Handler extends SAMv1Handler
 			return m_props;
 		}
 
-		synchronized public SAMv3Handler getHandler()
+		public SAMv3Handler getHandler()
 		{
 			return m_handler ;
 		}
@@ -309,16 +312,11 @@ class SAMv3Handler extends SAMv1Handler
 		}
 	}
 
-	public static final SessionsDB sSessionsHash = new SessionsDB() ;
-
 	public String getClientIP()
 	{
 		return this.socket.socket().getInetAddress().getHostAddress();
 	}
 	
-	private boolean stolenSocket;
-	private boolean streamForwardingSocket;
-
 	public void stealSocket()
 	{
 		stolenSocket = true ;
