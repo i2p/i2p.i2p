@@ -519,13 +519,8 @@ public class SAMBridge implements Runnable, ClientApp {
                         } catch (SAMException e) {
                             if (_log.shouldLog(Log.ERROR))
                                 _log.error("SAM error: " + e.getMessage(), e);
-                            try {
-                                String reply = "HELLO REPLY RESULT=I2P_ERROR MESSAGE=\"" + e.getMessage() + "\"\n";
-                                s.write(ByteBuffer.wrap(reply.getBytes("ISO-8859-1")));
-                            } catch (IOException ioe) {
-                                if (_log.shouldLog(Log.ERROR))
-                                    _log.error("SAM Error sending error reply", ioe);
-                            }
+                            String reply = "HELLO REPLY RESULT=I2P_ERROR MESSAGE=\"" + e.getMessage() + "\"\n";
+                            SAMHandler.writeString(reply, s);
                             try { s.close(); } catch (IOException ioe) {}
                         } catch (Exception ee) {
                             try { s.close(); } catch (IOException ioe) {}

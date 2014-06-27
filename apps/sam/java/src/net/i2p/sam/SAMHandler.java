@@ -13,6 +13,7 @@ import java.nio.channels.SocketChannel;
 import java.nio.ByteBuffer;
 import java.util.Properties;
 
+import net.i2p.data.DataHelper;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 
@@ -132,10 +133,11 @@ abstract class SAMHandler implements Runnable {
         }
     }
 
+    /** @return success */
     public static boolean writeString(String str, SocketChannel out)
     {
     	try {
-            writeBytes(ByteBuffer.wrap(str.getBytes("ISO-8859-1")), out);
+            writeBytes(ByteBuffer.wrap(DataHelper.getASCII(str)), out);
         } catch (IOException e) {
             //_log.debug("Caught IOException", e);
             return false;

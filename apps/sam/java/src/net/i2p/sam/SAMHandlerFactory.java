@@ -84,23 +84,13 @@ class SAMHandlerFactory {
 
         String ver = chooseBestVersion(minVer, maxVer);
 
-        try {
-            if (ver == null) {
-            	s.write(ByteBuffer.wrap(("HELLO REPLY RESULT=NOVERSION\n").getBytes("ISO-8859-1")));
-            	return null ;
-            }
-            // Let's answer positively
-            s.write(ByteBuffer.wrap(("HELLO REPLY RESULT=OK VERSION="
-                       + ver + "\n").getBytes("ISO-8859-1")));
-        } catch (UnsupportedEncodingException e) {
-            log.error("Caught UnsupportedEncodingException ("
-                       + e.getMessage() + ")");
-            throw new SAMException("Character encoding error: "
-                                   + e.getMessage());
-        } catch (IOException e) {
-            throw new SAMException("Error writing to socket: "
-                                   + e.getMessage());       
+        if (ver == null) {
+            SAMHandler.writeString("HELLO REPLY RESULT=NOVERSION\n", s);
+            return null;
         }
+        // Let's answer positively
+        if (!SAMHandler.writeString("HELLO REPLY RESULT=OK VERSION=" + ver + "\n", s))
+            throw new SAMException("Error writing to socket");       
 
         // ...and instantiate the right SAM handler
         int verMajor = getMajor(ver);

@@ -10,6 +10,7 @@ import java.util.Properties;
 
 import net.i2p.client.I2PSessionException;
 import net.i2p.data.DataFormatException;
+import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.util.Log;
 
@@ -76,7 +77,7 @@ class SAMv3DatagramSession extends SAMDatagramSession implements SAMv3Handler.Se
 		} else {
 			String msg = sender.toBase64()+"\n";
 			ByteBuffer msgBuf = ByteBuffer.allocate(msg.length()+data.length);
-			msgBuf.put(msg.getBytes("ISO-8859-1"));
+			msgBuf.put(DataHelper.getASCII(msg));
 			msgBuf.put(data);
 			msgBuf.flip();
 			this.server.send(this.clientAddress, msgBuf);

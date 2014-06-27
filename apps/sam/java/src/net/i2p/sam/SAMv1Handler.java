@@ -782,9 +782,8 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
         ByteArrayOutputStream msg = new ByteArrayOutputStream();
 
         String msgText = "RAW RECEIVED SIZE=" + data.length + "\n";
-        msg.write(msgText.getBytes("ISO-8859-1"));
+        msg.write(DataHelper.getASCII(msgText));
         msg.write(data);
-        msg.flush();
         
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("sending to client: " + msgText);
@@ -820,7 +819,7 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
 
         String msgText = "DATAGRAM RECEIVED DESTINATION=" + sender.toBase64()
                          + " SIZE=" + data.length + "\n";
-        msg.write(msgText.getBytes("ISO-8859-1"));
+        msg.write(DataHelper.getASCII(msgText));
         
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("sending to client: " + msgText);
@@ -926,7 +925,7 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("sending to client: " + msgText);
         
-        ByteBuffer prefix = ByteBuffer.wrap(msgText.getBytes("ISO-8859-1"));
+        ByteBuffer prefix = ByteBuffer.wrap(DataHelper.getASCII(msgText));
         
         Object writeLock = getWriteLock();
         synchronized (writeLock) {
