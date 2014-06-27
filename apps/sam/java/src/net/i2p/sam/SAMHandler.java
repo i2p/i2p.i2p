@@ -23,7 +23,7 @@ import net.i2p.util.Log;
  *
  * @author human
  */
-public abstract class SAMHandler implements Runnable {
+abstract class SAMHandler implements Runnable {
 
     protected final Log _log;
 

@@ -30,7 +30,7 @@ import net.i2p.util.Log;
  *
  * @author human
  */
-public abstract class SAMMessageSession {
+abstract class SAMMessageSession {
 
     protected final Log _log;
 
