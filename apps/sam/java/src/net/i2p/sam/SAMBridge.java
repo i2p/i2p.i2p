@@ -495,12 +495,14 @@ public class SAMBridge implements Runnable, ClientApp {
                                + s.socket().getPort());
 
                 class HelloHandler implements Runnable {
-                	SocketChannel s ;
-                	SAMBridge parent ;
+                        private final SocketChannel s;
+                        private final SAMBridge parent;
+
                 	HelloHandler(SocketChannel s, SAMBridge parent) { 
                 		this.s = s ;
                 		this.parent = parent ;
                 	}
+
                 	public void run() {
                         try {
                             SAMHandler handler = SAMHandlerFactory.createSAMHandler(s, i2cpProps);
