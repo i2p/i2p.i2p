@@ -17,12 +17,14 @@ import java.util.StringTokenizer;
 
 import net.i2p.data.DataHelper;
 import net.i2p.util.Log;
+import net.i2p.util.VersionComparator;
 
 /**
  * SAM handler factory class.
  */
 class SAMHandlerFactory {
 
+    private static final String VERSION = "3.0";
 
     /**
      * Return the right SAM handler depending on the protocol version
@@ -66,9 +68,8 @@ class SAMHandlerFactory {
             }
         }
 
-        Properties props;
-        props = SAMUtils.parseParams(tok);
-        if (props == null) {
+        Properties props = SAMUtils.parseParams(tok);
+        if (props.isEmpty()) {
             throw new SAMException("No parameters in HELLO VERSION message");
         }
 
@@ -79,7 +80,9 @@ class SAMHandlerFactory {
 
         String maxVer = props.getProperty("MAX");
         if (maxVer == null) {
-            throw new SAMException("Missing MAX parameter in HELLO VERSION message");
+            //throw new SAMException("Missing MAX parameter in HELLO VERSION message");
+            // MAX optional as of 0.9.14
+            maxVer = "99.99";
         }
 
         String ver = chooseBestVersion(minVer, maxVer);
@@ -119,30 +122,28 @@ class SAMHandlerFactory {
         return handler;
     }
 
-    /* Return the best version we can use, or null on failure */
+    /*
+     * @return "x.y" the best version we can use, or null on failure
+     */
     private static String chooseBestVersion(String minVer, String maxVer) {
-    	
-        int minMajor = getMajor(minVer), minMinor = getMinor(minVer);
-        int maxMajor = getMajor(maxVer), maxMinor = getMinor(maxVer);
-
-        // Consistency checks
-        if ((minMajor == -1) || (minMinor == -1)
-            || (maxMajor == -1) || (maxMinor == -1)) {
-            return null;
+        // in VersionComparator, "3" < "3.0" so
+        // use comparisons carefully
+        if (VersionComparator.comp("3.0", minVer) >= 0) {
+            // Documentation said:
+            // In order to force protocol version 3.0, the values of $min and $max
+            // must be "3.0".
+            int maxcomp = VersionComparator.comp("3", maxVer);
+            if (maxcomp == 0 || maxVer.equals("3.0"))
+                return "3.0";  // spoof version
+            if (maxcomp < 0)
+                return VERSION;
         }
-
-	if ((minMinor >= 10) || (maxMinor >= 10)) return null ;
-	
-	float fminVer = minMajor + (float) minMinor / 10 ;
-	float fmaxVer = maxMajor + (float) maxMinor / 10 ;
-	
-
-	if ( ( fminVer <=  3.0 ) && ( fmaxVer >= 3.0 ) ) return "3.0" ;
-
-	if ( ( fminVer <=  2.0 ) && ( fmaxVer >= 2.0 ) ) return "2.0" ;
-	
-	if ( ( fminVer <=  1.0 ) && ( fmaxVer >= 1.0 ) ) return "1.0" ;
-        
+        if (VersionComparator.comp("2.0", minVer) >= 0 &&
+            VersionComparator.comp("2", maxVer) <= 0)
+            return "2.0";
+        if (VersionComparator.comp("1.0", minVer) >= 0 &&
+            VersionComparator.comp("1", maxVer) <= 0)
+            return "1.0";
         return null;
     }
 

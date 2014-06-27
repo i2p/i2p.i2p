@@ -55,9 +55,10 @@ class SAMv2Handler extends SAMv1Handler implements SAMRawReceiver, SAMDatagramRe
 			super ( s, verMajor, verMinor, i2cpProps );
 		}
 		
+		@Override
 		public boolean verifVersion()
 		{
-			return (verMajor == 2 && verMinor == 0) ;
+			return (verMajor == 2);
 		}
 
 		SAMStreamSession newSAMStreamSession(String destKeystream, String direction, Properties props )

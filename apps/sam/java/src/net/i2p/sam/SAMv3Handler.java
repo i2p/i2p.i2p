@@ -88,9 +88,10 @@ class SAMv3Handler extends SAMv1Handler
 			_log.debug("SAM version 3 handler instantiated");
 	}
 
+	@Override
 	public boolean verifVersion()
 	{
-		return (verMajor == 3 && verMinor == 0) ;
+		return (verMajor == 3);
 	}
 
 	public static class DatagramServer  {

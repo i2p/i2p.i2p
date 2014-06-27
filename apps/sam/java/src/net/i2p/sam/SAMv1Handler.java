@@ -85,9 +85,9 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
         }
     }
 
-  public boolean verifVersion() {
-    return ( verMajor == 1 && verMinor == 0 ) ;
-  }
+    public boolean verifVersion() {
+        return (verMajor == 1);
+    }
 
     public void handle() {
         String msg = null;

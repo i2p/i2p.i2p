@@ -159,26 +159,34 @@ class SAMUtils {
      * @param tok A StringTokenizer pointing to the SAM parameters
      *
      * @throws SAMException if the data was formatted incorrectly
-     * @return Properties with the parsed SAM params
+     * @return Properties with the parsed SAM params, never null
      */
     public static Properties parseParams(StringTokenizer tok) throws SAMException {
-        int pos, ntoks = tok.countTokens();
-        String token, param;
+        int ntoks = tok.countTokens();
         Properties props = new Properties();
         
         StringBuilder value = new StringBuilder();
         for (int i = 0; i < ntoks; ++i) {
-            token = tok.nextToken();
+            String token = tok.nextToken();
 
-            pos = token.indexOf("=");
-            if (pos == -1) {
+            int pos = token.indexOf("=");
+            if (pos <= 0) {
                 //_log.debug("Error in params format");
-                throw new SAMException("Bad formatting for param [" + token + "]");
+                if (pos == 0) {
+                    throw new SAMException("No param specified [" + token + "]");
+                } else {
+                    throw new SAMException("Bad formatting for param [" + token + "]");
+                }
             }
-            param = token.substring(0, pos);
+            
+            String param = token.substring(0, pos);
             value.append(token.substring(pos+1));
             if (value.length() == 0)
-                throw new SAMException("Empty value for param "+param);
+                throw new SAMException("Empty value for param " + param);
+            
+            // FIXME: The following code does not take into account that there
+            // may have been multiple subsequent space chars in the input that
+            // StringTokenizer treates as one.
             if (value.charAt(0) == '"') {
                 while ( (i < ntoks) && (value.lastIndexOf("\"") <= 0) ) {
                     value.append(' ').append(tok.nextToken());
