@@ -61,15 +61,19 @@ public class SAMStreamSend {
     }
     
     public void startup() {
-        _log.debug("Starting up");
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Starting up");
         boolean ok = connect();
-        _log.debug("Connected: " + ok);
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Connected: " + ok);
         if (ok) {
             _reader = new SAMReader(_context, _samIn, _eventHandler);
             _reader.startReading();
-            _log.debug("Reader created");
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Reader created");
             String ourDest = handshake();
-            _log.debug("Handshake complete.  we are " + ourDest);
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Handshake complete.  we are " + ourDest);
             if (ourDest != null) {
                 send();
             }
@@ -85,7 +89,8 @@ public class SAMStreamSend {
             }
             if (sender != null) {
                 sender.closed();
-                _log.debug("Connection " + sender.getConnectionId() + " closed to " + sender.getDestination());
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Connection " + sender.getConnectionId() + " closed to " + sender.getDestination());
             } else {
                 _log.error("wtf, not connected to " + id + " but we were just closed?");
             }
@@ -109,24 +114,30 @@ public class SAMStreamSend {
             try {
                 _samOut.write("HELLO VERSION MIN=1.0 MAX=1.0\n".getBytes());
                 _samOut.flush();
-                _log.debug("Hello sent");
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Hello sent");
                 boolean ok = _eventHandler.waitForHelloReply();
-                _log.debug("Hello reply found: " + ok);
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Hello reply found: " + ok);
                 if (!ok) 
                     throw new IOException("wtf, hello failed?");
                 String req = "SESSION CREATE STYLE=STREAM DESTINATION=TRANSIENT " + _conOptions + "\n";
                 _samOut.write(req.getBytes());
                 _samOut.flush();
-                _log.debug("Session create sent");
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Session create sent");
                 ok = _eventHandler.waitForSessionCreateReply();
-                _log.debug("Session create reply found: " + ok);
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Session create reply found: " + ok);
 
                 req = "NAMING LOOKUP NAME=ME\n";
                 _samOut.write(req.getBytes());
                 _samOut.flush();
-                _log.debug("Naming lookup sent");
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Naming lookup sent");
                 String destination = _eventHandler.waitForNamingReply("ME");
-                _log.debug("Naming lookup reply found: " + destination);
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Naming lookup reply found: " + destination);
                 if (destination == null) {
                     _log.error("No naming lookup reply found!");
                     return null;
@@ -213,10 +224,12 @@ public class SAMStreamSend {
                     int read = _in.read(data);
                     long now = _context.clock().now();
                     if (read == -1) {
-                        _log.debug("EOF from the data for " + _connectionId + " after " + (now-lastSend));
+                        if (_log.shouldLog(Log.DEBUG))
+                            _log.debug("EOF from the data for " + _connectionId + " after " + (now-lastSend));
                         break;
                     } else if (read > 0) {
-                        _log.debug("Sending " + read + " on " + _connectionId + " after " + (now-lastSend));
+                        if (_log.shouldLog(Log.DEBUG))
+                            _log.debug("Sending " + read + " on " + _connectionId + " after " + (now-lastSend));
                         lastSend = now;
                         
                         byte msg[] = ("STREAM SEND ID=" + _connectionId + " SIZE=" + read + "\n").getBytes();
