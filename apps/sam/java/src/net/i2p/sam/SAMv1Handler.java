@@ -219,7 +219,7 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
                         _log.debug("Trying to create a session, but one still exists");
                     return writeString("SESSION STATUS RESULT=I2P_ERROR MESSAGE=\"Session already exists\"\n");
                 }
-                if (props == null) {
+                if (props.isEmpty()) {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("No parameters specified in SESSION CREATE message");
                     return writeString("SESSION STATUS RESULT=I2P_ERROR MESSAGE=\"No parameters for SESSION CREATE\"\n");
@@ -356,7 +356,7 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
     /* Parse and execute a NAMING message */
   protected boolean execNamingMessage(String opcode, Properties props) {
         if (opcode.equals("LOOKUP")) {
-            if (props == null) {
+            if (props.isEmpty()) {
                 _log.debug("No parameters specified in NAMING LOOKUP message");
                 return false;
             }
@@ -413,7 +413,7 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
         }
 
         if (opcode.equals("SEND")) {
-            if (props == null) {
+            if (props.isEmpty()) {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("No parameters specified in DATAGRAM SEND message");
                 return false;
@@ -493,7 +493,7 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
         }
 
         if (opcode.equals("SEND")) {
-            if (props == null) {
+            if (props.isEmpty()) {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("No parameters specified in RAW SEND message");
                 return false;
@@ -587,7 +587,7 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
     }
             
   protected boolean execStreamSend(Properties props) {
-        if (props == null) {
+        if (props.isEmpty()) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("No parameters specified in STREAM SEND message");
             return false;
@@ -657,7 +657,7 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
     }
 
   protected boolean execStreamConnect(Properties props) {
-        if (props == null) {
+        if (props.isEmpty()) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("No parameters specified in STREAM CONNECT message");
             return false;
@@ -733,7 +733,7 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
     }
     
   protected boolean execStreamClose(Properties props) {
-        if (props == null) {
+        if (props.isEmpty()) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("No parameters specified in STREAM CLOSE message");
             return false;

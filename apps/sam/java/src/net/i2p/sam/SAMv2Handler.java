@@ -69,6 +69,7 @@ class SAMv2Handler extends SAMv1Handler implements SAMRawReceiver, SAMDatagramRe
 		
 		
 		/* Parse and execute a STREAM message */
+		@Override
 		protected boolean execStreamMessage ( String opcode, Properties props )
 		{
 			if ( getStreamSession() == null )
@@ -108,7 +109,7 @@ class SAMv2Handler extends SAMv1Handler implements SAMRawReceiver, SAMDatagramRe
 		
 		private boolean execStreamReceive ( Properties props )
 		{
-			if ( props == null )
+			if (props.isEmpty())
 			{
 				if (_log.shouldLog(Log.DEBUG))
 					_log.debug ( "No parameters specified in STREAM RECEIVE message" );

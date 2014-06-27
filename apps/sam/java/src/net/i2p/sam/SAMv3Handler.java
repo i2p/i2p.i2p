@@ -473,7 +473,7 @@ class SAMv3Handler extends SAMv1Handler
 						_log.debug("Trying to create a session, but one still exists");
 					return writeString("SESSION STATUS RESULT=I2P_ERROR MESSAGE=\"Session already exists\"\n");
 				}
-				if (props == null) {
+				if (props.isEmpty()) {
 					if (_log.shouldLog(Log.DEBUG))
 						_log.debug("No parameters specified in SESSION CREATE message");
 					return writeString("SESSION STATUS RESULT=I2P_ERROR MESSAGE=\"No parameters for SESSION CREATE\"\n");
@@ -602,25 +602,26 @@ class SAMv3Handler extends SAMv1Handler
 	/**
 	 * @throws NPE if login nickname is not registered
 	 */
-	private SAMv3StreamSession newSAMStreamSession(String login )
-	throws IOException, DataFormatException, SAMException
+	private static SAMv3StreamSession newSAMStreamSession(String login )
+			throws IOException, DataFormatException, SAMException
 	{
 		return new SAMv3StreamSession( login ) ;
 	}
 
-	private SAMv3RawSession newSAMRawSession(String login )
-	throws IOException, DataFormatException, SAMException, I2PSessionException
+	private static SAMv3RawSession newSAMRawSession(String login )
+			throws IOException, DataFormatException, SAMException, I2PSessionException
 	{
 		return new SAMv3RawSession( login ) ;
 	}
 
-	private SAMv3DatagramSession newSAMDatagramSession(String login )
-	throws IOException, DataFormatException, SAMException, I2PSessionException
+	private static SAMv3DatagramSession newSAMDatagramSession(String login )
+			throws IOException, DataFormatException, SAMException, I2PSessionException
 	{
 		return new SAMv3DatagramSession( login ) ;
 	}
 
 	/* Parse and execute a STREAM message */
+	@Override
 	protected boolean execStreamMessage ( String opcode, Properties props )
 	{
 		String nick = null ;
@@ -693,10 +694,10 @@ class SAMv3Handler extends SAMv1Handler
 		}
 	}
 
-	
+	@Override
 	protected boolean execStreamConnect( Properties props) {
 		try {
-			if (props == null) {
+			if (props.isEmpty()) {
 				notifyStreamResult(true,"I2P_ERROR","No parameters specified in STREAM CONNECT message");
 				if (_log.shouldLog(Log.DEBUG))
 					_log.debug("No parameters specified in STREAM CONNECT message");
