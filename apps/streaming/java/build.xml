@@ -20,13 +20,17 @@
             </classpath>
         </depend>
     </target>
+
+    <!-- only used if not set by a higher build.xml -->
     <property name="javac.compilerargs" value="" />
+    <property name="javac.version" value="1.6" />
+
     <target name="compile" depends="depend">
         <mkdir dir="./build" />
         <mkdir dir="./build/obj" />
         <javac 
             srcdir="./src" 
-            debug="true" deprecation="on" source="1.5" target="1.5" 
+            debug="true" deprecation="on" source="${javac.version}" target="${javac.version}" 
             includeAntRuntime="false"
             destdir="./build/obj" 
             classpath="../../../core/java/build/i2p.jar:../../ministreaming/java/build/mstreaming.jar" >
@@ -51,7 +55,7 @@
  
        <javac 
             srcdir="./test/junit" 
-            debug="true" deprecation="on" source="1.5" target="1.5" 
+            debug="true" deprecation="on" source="${javac.version}" target="${javac.version}" 
             includeAntRuntime="false"
             destdir="./build/obj" >
 	   <classpath>
