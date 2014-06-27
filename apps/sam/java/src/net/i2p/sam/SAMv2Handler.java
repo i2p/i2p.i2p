@@ -94,7 +94,8 @@ class SAMv2Handler extends SAMv1Handler implements SAMRawReceiver, SAMDatagramRe
 			}
 			else
 			{
-				_log.debug ( "Unrecognized RAW message opcode: \""
+				if (_log.shouldLog(Log.DEBUG))
+					_log.debug ( "Unrecognized RAW message opcode: \""
 						+ opcode + "\"" );
 				return false;
 			}
@@ -108,7 +109,8 @@ class SAMv2Handler extends SAMv1Handler implements SAMRawReceiver, SAMDatagramRe
 		{
 			if ( props == null )
 			{
-				_log.debug ( "No parameters specified in STREAM RECEIVE message" );
+				if (_log.shouldLog(Log.DEBUG))
+					_log.debug ( "No parameters specified in STREAM RECEIVE message" );
 				return false;
 			}
 
@@ -119,7 +121,8 @@ class SAMv2Handler extends SAMv1Handler implements SAMRawReceiver, SAMDatagramRe
 
 				if ( strid == null )
 				{
-					_log.debug ( "ID not specified in STREAM RECEIVE message" );
+					if (_log.shouldLog(Log.DEBUG))
+						_log.debug ( "ID not specified in STREAM RECEIVE message" );
 					return false;
 				}
 
@@ -129,7 +132,8 @@ class SAMv2Handler extends SAMv1Handler implements SAMRawReceiver, SAMDatagramRe
 				}
 				catch ( NumberFormatException e )
 				{
-					_log.debug ( "Invalid STREAM RECEIVE ID specified: " + strid );
+					if (_log.shouldLog(Log.DEBUG))
+						_log.debug ( "Invalid STREAM RECEIVE ID specified: " + strid );
 					return false;
 				}
 			}
@@ -142,7 +146,8 @@ class SAMv2Handler extends SAMv1Handler implements SAMRawReceiver, SAMDatagramRe
 
 				if ( strsize == null )
 				{
-					_log.debug ( "Limit not specified in STREAM RECEIVE message" );
+					if (_log.shouldLog(Log.DEBUG))
+						_log.debug ( "Limit not specified in STREAM RECEIVE message" );
 					return false;
 				}
 
@@ -158,13 +163,15 @@ class SAMv2Handler extends SAMv1Handler implements SAMRawReceiver, SAMDatagramRe
 					}
 					catch ( NumberFormatException e )
 					{
-						_log.debug ( "Invalid STREAM RECEIVE size specified: " + strsize );
+						if (_log.shouldLog(Log.DEBUG))
+							_log.debug ( "Invalid STREAM RECEIVE size specified: " + strsize );
 						return false;
 					}
 
 					if ( limit < 0 )
 					{
-						_log.debug ( "Specified limit (" + limit
+						if (_log.shouldLog(Log.DEBUG))
+							_log.debug ( "Specified limit (" + limit
 								+ ") is out of protocol limits" );
 						return false;
 					}

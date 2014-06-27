@@ -57,7 +57,8 @@ class SAMv3RawSession extends SAMRawSession  implements SAMv3Handler.Session, SA
         
     	String portStr = props.getProperty("PORT") ;
     	if ( portStr==null ) {
-    		_log.debug("receiver port not specified. Current socket will be used.");
+		if (_log.shouldLog(Log.DEBUG))
+    			_log.debug("receiver port not specified. Current socket will be used.");
     		this.clientAddress = null;
     	}
     	else {
@@ -67,7 +68,8 @@ class SAMv3RawSession extends SAMRawSession  implements SAMv3Handler.Session, SA
     		if ( host==null ) {
     			host = rec.getHandler().getClientIP();
 
-    			_log.debug("no host specified. Taken from the client socket : " + host +':'+port);
+			if (_log.shouldLog(Log.DEBUG))
+	    			_log.debug("no host specified. Taken from the client socket : " + host +':'+port);
     		}
 
     	
