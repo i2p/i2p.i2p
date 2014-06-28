@@ -28,6 +28,7 @@ import java.util.StringTokenizer;
 import net.i2p.I2PException;
 import net.i2p.client.I2PClient;
 import net.i2p.client.I2PSessionException;
+import net.i2p.crypto.SigType;
 import net.i2p.data.Base64;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
@@ -487,21 +488,32 @@ class SAMv3Handler extends SAMv1Handler
 				}
 				props.remove("DESTINATION");
 
-
 				if (dest.equals("TRANSIENT")) {
 					if (_log.shouldLog(Log.DEBUG))
 						_log.debug("TRANSIENT destination requested");
-					ByteArrayOutputStream priv = new ByteArrayOutputStream(640);
-					SAMUtils.genRandomKey(priv, null);
+					String sigTypeStr = props.getProperty("SIGNATURE_TYPE");
+					SigType sigType;
+					if (sigTypeStr != null) {
+						sigType = SigType.parseSigType(sigTypeStr);
+						if (sigType == null) {
+							return writeString("SESSION STATUS RESULT=I2P_ERROR MESSAGE=\"SIGNATURE_TYPE "
+							                   + sigTypeStr + " unsupported\"\n");
+						}
+						props.remove("SIGNATURE_TYPE");
+					} else {
+						sigType = SigType.DSA_SHA1;
+					}
+					ByteArrayOutputStream priv = new ByteArrayOutputStream(663);
+					SAMUtils.genRandomKey(priv, null, sigType);
 
 					dest = Base64.encode(priv.toByteArray());
 				} else {
 					if (_log.shouldLog(Log.DEBUG))
 						_log.debug("Custom destination specified [" + dest + "]");
+					if (!SAMUtils.checkPrivateDestination(dest))
+						return writeString("SESSION STATUS RESULT=INVALID_KEY\n");
 				}
 
-				if (!SAMUtils.checkPrivateDestination(dest))
-					return writeString("SESSION STATUS RESULT=INVALID_KEY\n");
 
 				nick = props.getProperty("ID");
 				if (nick == null) {

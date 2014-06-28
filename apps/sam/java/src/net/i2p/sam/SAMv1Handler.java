@@ -24,6 +24,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import net.i2p.I2PException;
 import net.i2p.client.I2PClient;
 import net.i2p.client.I2PSessionException;
+import net.i2p.crypto.SigType;
 import net.i2p.data.Base64;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
@@ -320,7 +321,7 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
     }
 
 		
-  SAMStreamSession newSAMStreamSession(String destKeystream, String direction, Properties props )
+  private SAMStreamSession newSAMStreamSession(String destKeystream, String direction, Properties props )
     throws IOException, DataFormatException, SAMException
   {
     return new SAMStreamSession(destKeystream, direction, props, this) ;
@@ -330,16 +331,23 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
   protected boolean execDestMessage(String opcode, Properties props) {
 
         if (opcode.equals("GENERATE")) {
-            if (!props.isEmpty()) {
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Properties specified in DEST GENERATE message");
-                return false;
+            String sigTypeStr = props.getProperty("SIGNATURE_TYPE");
+            SigType sigType;
+            if (sigTypeStr != null) {
+                sigType = SigType.parseSigType(sigTypeStr);
+                if (sigType == null) {
+                    writeString("DEST REPLY RESULT=I2P_ERROR MESSAGE=\"SIGNATURE_TYPE " +
+                                sigTypeStr + " unsupported\"\n");
+                    return false;
+                }
+            } else {
+                sigType = SigType.DSA_SHA1;
             }
 
-            ByteArrayOutputStream priv = new ByteArrayOutputStream();
-            ByteArrayOutputStream pub = new ByteArrayOutputStream();
+            ByteArrayOutputStream priv = new ByteArrayOutputStream(663);
+            ByteArrayOutputStream pub = new ByteArrayOutputStream(387);
             
-            SAMUtils.genRandomKey(priv, pub);
+            SAMUtils.genRandomKey(priv, pub, sigType);
             return writeString("DEST REPLY"
                                + " PUB="
                                + Base64.encode(pub.toByteArray())
@@ -347,6 +355,7 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
                                + Base64.encode(priv.toByteArray())
                                + "\n");
         } else {
+            writeString("DEST REPLY RESULT=I2P_ERROR MESSAGE=\"DEST GENERATE required\"");
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Unrecognized DEST message opcode: \"" + opcode + "\"");
             return false;

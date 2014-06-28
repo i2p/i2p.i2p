@@ -24,7 +24,7 @@ import net.i2p.util.VersionComparator;
  */
 class SAMHandlerFactory {
 
-    private static final String VERSION = "3.0";
+    private static final String VERSION = "3.1";
 
     /**
      * Return the right SAM handler depending on the protocol version
@@ -53,29 +53,22 @@ class SAMHandlerFactory {
             throw new SAMException("Unexpected error", e);
         }
 
-        // Message format: HELLO VERSION MIN=v1 MAX=v2
-        if (tok.countTokens() != 4) {
-            throw new SAMException("Bad format in HELLO message");
+        // Message format: HELLO VERSION [MIN=v1] [MAX=v2]
+        if (tok.countTokens() < 2) {
+            throw new SAMException("Must start with HELLO VERSION");
         }
-        if (!tok.nextToken().equals("HELLO")) {
-            throw new SAMException("Bad domain in HELLO message");
-        }
-        {
-            String opcode;
-            if (!(opcode = tok.nextToken()).equals("VERSION")) {
-                throw new SAMException("Unrecognized HELLO message opcode: '"
-                                       + opcode + "'");
-            }
+        if (!tok.nextToken().equals("HELLO") ||
+            !tok.nextToken().equals("VERSION")) {
+            throw new SAMException("Must start with HELLO VERSION");
         }
 
         Properties props = SAMUtils.parseParams(tok);
-        if (props.isEmpty()) {
-            throw new SAMException("No parameters in HELLO VERSION message");
-        }
 
         String minVer = props.getProperty("MIN");
         if (minVer == null) {
-            throw new SAMException("Missing MIN parameter in HELLO VERSION message");
+            //throw new SAMException("Missing MIN parameter in HELLO VERSION message");
+            // MIN optional as of 0.9.14
+            minVer = "1";
         }
 
         String maxVer = props.getProperty("MAX");
@@ -126,18 +119,14 @@ class SAMHandlerFactory {
      * @return "x.y" the best version we can use, or null on failure
      */
     private static String chooseBestVersion(String minVer, String maxVer) {
+        if (VersionComparator.comp(VERSION, minVer) >= 0 &&
+            VersionComparator.comp(VERSION, maxVer) <= 0)
+            return VERSION;
         // in VersionComparator, "3" < "3.0" so
         // use comparisons carefully
-        if (VersionComparator.comp("3.0", minVer) >= 0) {
-            // Documentation said:
-            // In order to force protocol version 3.0, the values of $min and $max
-            // must be "3.0".
-            int maxcomp = VersionComparator.comp("3", maxVer);
-            if (maxcomp == 0 || maxVer.equals("3.0"))
-                return "3.0";  // spoof version
-            if (maxcomp < 0)
-                return VERSION;
-        }
+        if (VersionComparator.comp("3.0", minVer) >= 0 &&
+            VersionComparator.comp("3", maxVer) <= 0)
+            return "3.0";
         if (VersionComparator.comp("2.0", minVer) >= 0 &&
             VersionComparator.comp("2", maxVer) <= 0)
             return "2.0";
@@ -147,21 +136,23 @@ class SAMHandlerFactory {
         return null;
     }
 
-    /* Get the major protocol version from a string */
+    /* Get the major protocol version from a string, or -1 */
     private static int getMajor(String ver) {
-        if ( (ver == null) || (ver.indexOf('.') < 0) )
+        if (ver == null)
             return -1;
+        int dot = ver.indexOf(".");
+        if (dot == 0)
+            return -1;
+        if (dot > 0)
+            ver = ver.substring(0, dot);
         try {
-            String major = ver.substring(0, ver.indexOf("."));
-            return Integer.parseInt(major);
+            return Integer.parseInt(ver);
         } catch (NumberFormatException e) {
-            return -1;
-        } catch (ArrayIndexOutOfBoundsException e) {
             return -1;
         }
     }
 
-    /* Get the minor protocol version from a string */
+    /* Get the minor protocol version from a string, or -1 */
     private static int getMinor(String ver) {
         if ( (ver == null) || (ver.indexOf('.') < 0) )
             return -1;

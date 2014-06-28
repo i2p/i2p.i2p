@@ -20,6 +20,7 @@ import net.i2p.I2PException;
 import net.i2p.client.I2PClient;
 import net.i2p.client.I2PClientFactory;
 import net.i2p.client.naming.NamingService;
+import net.i2p.crypto.SigType;
 import net.i2p.data.Base64;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.Destination;
@@ -37,16 +38,30 @@ class SAMUtils {
     //private final static Log _log = new Log(SAMUtils.class);
 
     /**
-     * Generate a random destination key
+     * Generate a random destination key using DSA_SHA1 signature type.
+     * Caller must close streams. Fails silently.
      *
-     * @param priv Stream used to write the private key
-     * @param pub Stream used to write the public key (may be null)
+     * @param priv Stream used to write the destination and private keys
+     * @param pub Stream used to write the destination (may be null)
      */
     public static void genRandomKey(OutputStream priv, OutputStream pub) {
+        genRandomKey(priv, pub, SigType.DSA_SHA1);
+    }
+
+    /**
+     * Generate a random destination key.
+     * Caller must close streams. Fails silently.
+     *
+     * @param priv Stream used to write the destination and private keys
+     * @param pub Stream used to write the destination (may be null)
+     * @param sigType what signature type
+     * @since 0.9.14
+     */
+    public static void genRandomKey(OutputStream priv, OutputStream pub, SigType sigType) {
         //_log.debug("Generating random keys...");
         try {
             I2PClient c = I2PClientFactory.createClient();
-            Destination d = c.createDestination(priv);
+            Destination d = c.createDestination(priv, sigType);
             priv.flush();
 
             if (pub != null) {
@@ -85,7 +100,10 @@ class SAMUtils {
      * @return true if valid
      */
     public static boolean checkPrivateDestination(String dest) {
-    	ByteArrayInputStream destKeyStream = new ByteArrayInputStream(Base64.decode(dest));
+        byte[] b = Base64.decode(dest);
+        if (b == null || b.length < 663)
+            return false;
+    	ByteArrayInputStream destKeyStream = new ByteArrayInputStream(b);
     	try {
     		Destination d = new Destination();
     		d.readBytes(destKeyStream);

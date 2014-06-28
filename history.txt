@@ -1,3 +1,14 @@
+2014-06-28 zzz
+ * SAM:
+   - Support SIGNATURE_TYPE, bump to 3.1 (ticket #1318)
+   - Private key checking fixes (ticket #1318)
+   - Parameter parsing fixes (ticket #1325)
+   - Cleanups
+
+2014-06-24 zzz
+ * Streaming; Drop the preliminary channel implementations,
+   as they don't work and can't ever work as designed.
+
 2014-06-23 zzz
  * Streaming:
    - Bundle new socket messages for translation
