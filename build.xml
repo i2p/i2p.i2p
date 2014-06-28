@@ -139,22 +139,28 @@
 
     <target name="buildBOB" depends="buildStreaming" >
         <ant dir="apps/BOB/" target="jar" />
+        <copy file="apps/BOB/dist/BOB.jar" todir="build/" />
     </target>
 
     <target name="buildSAM" depends="buildStreaming" >
         <ant dir="apps/sam/java/" target="jar" />
+        <copy file="apps/sam/java/build/sam.jar" todir="build/" />
     </target>
 
     <target name="buildSusiMail" depends="buildCore, buildJetty" >
         <ant dir="apps/susimail/" target="war" />
+        <copy file="apps/susimail/susimail.war" todir="build/" />
     </target>
 
     <target name="buildSusiDNS" depends="buildCore, buildJetty" >
         <ant dir="apps/susidns/src" target="all" />
+        <copy file="apps/susidns/src/susidns.war" todir="build/" />
     </target>
 
     <target name="buildI2PSnark" depends="buildStreaming, buildJetty" >
         <ant dir="apps/i2psnark/java/" target="war" />
+        <copy file="apps/i2psnark/i2psnark.war" todir="build/" />
+        <copy file="apps/i2psnark/java/build/i2psnark.jar" todir="build/" />
     </target>
 
     <!-- jar (not war) for Android -->
@@ -164,15 +170,19 @@
 
     <target name="buildAddressbook" depends="buildCore, buildJetty" >
         <ant dir="apps/addressbook/" target="war" />
+        <copy file="apps/addressbook/dist/addressbook.war" todir="build/" />
     </target>
 
     <!-- jar only (no war) for Android -->
     <target name="buildI2PTunnelJar" depends="buildStreaming" >
         <ant dir="apps/i2ptunnel/java/" target="jar" />
+        <copy file="apps/i2ptunnel/java/build/i2ptunnel.jar" todir="build/" />
     </target>
 
     <target name="buildI2PTunnel" depends="buildStreaming, buildJetty" >
         <ant dir="apps/i2ptunnel/java/" target="build" />
+        <copy file="apps/i2ptunnel/java/build/i2ptunnel.jar" todir="build/" />
+        <copy file="apps/i2ptunnel/java/build/i2ptunnel.war" todir="build/" />
     </target>
 
     <target name="buildDesktopGui" depends="buildCore, buildrouter" >
@@ -180,6 +190,7 @@
         <ant dir="apps/desktopgui" target="clean" />
 -->
         <ant dir="apps/desktopgui" target="jar" />
+        <copy file="apps/desktopgui/dist/desktopgui.jar" todir="build/" />
     </target>
 
     <target name="buildRouterConsole" depends="buildrouter, buildSystray, buildDesktopGui, buildJetty" >
@@ -188,18 +199,24 @@
 
     <target name="buildJetty" depends="buildCore" >
         <ant dir="apps/jetty" target="build" />
+        <copy todir="build/" >
+            <fileset dir="apps/jetty/jettylib" excludes="ant.jar" />
+        </copy>
     </target>
 
     <target name="buildSystray" depends="buildCore" >
         <ant dir="apps/systray/java/" target="jar" />
+        <copy file="apps/systray/java/build/systray.jar" todir="build/" />
     </target>
 
     <target name="buildStreaming" depends="buildMinistreaming" >
         <ant dir="apps/streaming/java/" target="jar" />
+        <copy file="apps/streaming/java/build/streaming.jar" todir="build/" />
     </target>
 
     <target name="buildMinistreaming" depends="buildCore" >
         <ant dir="apps/ministreaming/java/" target="jar" />
+        <copy file="apps/ministreaming/java/build/mstreaming.jar" todir="build/" />
     </target>
 
     <target name="buildRouter" depends="buildrouter" />
@@ -222,9 +239,26 @@
                 <attribute name="Built-By" value="${build.built-by}" />
                 <attribute name="Build-Date" value="${build.timestamp}" />
                 <attribute name="Base-Revision" value="${workspace.version}" />
-	    </manifest>
+            </manifest>
         </jar>
     </target>
+
+    <target name="buildProperties" depends="getMtnRev, getReleaseNumber, getBuildNumber" >
+        <!-- default if not set above -->
+        <property name="workspace.version" value="unknown" />
+        <tstamp>
+            <format property="build.timestamp" pattern="yyyy-MM-dd HH:mm:ss z" timezone="UTC" locale="en" />
+        </tstamp>
+        <property name="full.version" value="${release.number}-${i2p.build.number}${build.extra}" />
+        <echo message="Building version ${full.version} (mtn rev ${workspace.version})" />
+    </target>
+
+    <target name="buildWEB" depends="buildRouterConsole" >
+        <copy file="apps/routerconsole/java/build/routerconsole.jar" todir="build/" />
+        <copy file="apps/routerconsole/java/build/routerconsole.war" todir="build/" />
+    </target>
+
+    <!-- end of sub-build.xml targets -->
 
     <target name="checkForMtn" >
         <available property="mtn.available" file="_MTN" type="dir" />
@@ -283,26 +317,6 @@
             match='(^\s+public\s+final\s+static\s+long\s+BUILD\s+=\s+)[0-9]+;' replace='\1${new.i2p.build.number};'/>
     </target>
 
-    <target name="buildProperties" depends="getMtnRev, getReleaseNumber, getBuildNumber" >
-        <!-- default if not set above -->
-        <property name="workspace.version" value="unknown" />
-        <tstamp>
-            <format property="build.timestamp" pattern="yyyy-MM-dd HH:mm:ss z" timezone="UTC" locale="en" />
-        </tstamp>
-        <property name="full.version" value="${release.number}-${i2p.build.number}${build.extra}" />
-        <echo message="Building version ${full.version} (mtn rev ${workspace.version})" />
-    </target>
-
-    <!-- end of sub-build.xml targets -->
-
-    <target name="buildWEB" depends="buildRouterConsole" >
-        <copy file="apps/routerconsole/java/build/routerconsole.jar" todir="build/" />
-        <copy file="apps/routerconsole/java/build/routerconsole.war" todir="build/" />
-        <copy todir="build/" >
-            <fileset dir="apps/jetty/jettylib" excludes="ant.jar" />
-        </copy>
-    </target>
-
     <condition property="noExe">
         <not>
             <!-- We only have launch4j binaries for the following systems -->
@@ -346,40 +360,15 @@
                  classpath="${basedir}/installer/lib/launch4j/launch4j.jar:${basedir}/installer/lib/launch4j/lib/xstream.jar" />
      </target>
 
-    <target name="jar" depends="jarSmall" >
-        <copy file="apps/BOB/dist/BOB.jar" todir="build/" />
-        <copy file="apps/sam/java/build/sam.jar" todir="build/" />
-        <copy file="apps/susimail/susimail.war" todir="build/" />
-        <copy file="apps/susidns/src/susidns.war" todir="build/" />
-        <copy file="apps/i2psnark/i2psnark.war" todir="build/" />
-        <copy file="apps/i2psnark/java/build/i2psnark.jar" todir="build/" />
-
-    </target>
-    <target name="jarSmall" depends="builddepSmall, buildJrobin" >
-        <copy file="core/java/build/i2p.jar" todir="build/" />
-        <copy file="router/java/build/router.jar" todir="build/" />
-        <copy file="apps/ministreaming/java/build/mstreaming.jar" todir="build/" />
-        <copy file="apps/streaming/java/build/streaming.jar" todir="build/" />
-        <copy file="apps/i2ptunnel/java/build/i2ptunnel.jar" todir="build/" />
-        <copy file="apps/i2ptunnel/java/build/i2ptunnel.war" todir="build/" />
-        <copy file="apps/systray/java/build/systray.jar" todir="build/" />
-        <copy file="apps/desktopgui/dist/desktopgui.jar" todir="build/" />
-        <copy file="apps/addressbook/dist/addressbook.war" todir="build/" />
-    </target>
+     <!--
+          the files are now copied to the build directory
+          in the build* targets
+      -->
+     <target name="jar" depends="jarSmall" />
+     <target name="jarSmall" depends="builddepSmall, buildJrobin" />
 
     <!-- Custom target to collect the jars that I2P-Bote needs to compile, so it can compile from source. -->
-    <!-- TODO eww, we should not need to do this -->
     <target name="jarBote" depends="buildRouter, buildStreaming, buildJetty" >
-        <copy file="core/java/build/i2p.jar" todir="build/" />
-        <copy file="router/java/build/router.jar" todir="build/" />
-        <copy file="apps/ministreaming/java/build/mstreaming.jar" todir="build/" />
-        <copy file="apps/streaming/java/build/streaming.jar" todir="build/" />
-        <copy file="apps/jetty/jettylib/org.mortbay.jetty.jar" todir="build/" />
-        <copy file="apps/jetty/jettylib/jasper-compiler.jar" todir="build/" />
-        <copy file="apps/jetty/jettylib/jasper-runtime.jar" todir="build/" />
-        <copy file="apps/jetty/jettylib/javax.servlet.jar" todir="build/" />
-        <copy file="apps/jetty/jettylib/commons-logging.jar" todir="build/" />
-        <copy file="apps/jetty/jettylib/commons-el.jar" todir="build/" />
         <copy file="apps/susidns/src/WEB-INF/lib/jstl.jar" todir="build/" />
         <copy file="apps/susidns/src/WEB-INF/lib/standard.jar" todir="build/" />
     </target>
