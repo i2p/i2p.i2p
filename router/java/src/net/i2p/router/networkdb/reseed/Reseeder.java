@@ -94,7 +94,8 @@ public class Reseeder {
               "https://193.150.121.66/netDb/" + "," +
               "https://netdb.i2p2.no/" + "," +
               "https://reseed.info/"  + "," +
-              "https://reseed.pkol.de/" + "," +
+              //Temp disabled (ticket #1326)
+              //"https://reseed.pkol.de/" + "," +
                //Temp disabled (ticket #1276)
               //"https://uk.reseed.i2p2.no/" + "," +
               "https://i2p-netdb.innovatio.no/" + "," +
