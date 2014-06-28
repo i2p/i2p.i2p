@@ -4,7 +4,7 @@ set -u
 
 BASEDIR="$(dirname $0)/../../"
 cd "$BASEDIR"
-RESEEDHOSTS=$(sed -e '/\s\+"https:\/\/[-a-z0-9.]/!d' -e 's/.*"https:\/\/\([-a-z0-9.]\+\).*/\1/' router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java)
+RESEEDHOSTS=$(sed -e '/^\s\+"https:\/\/[-a-z0-9.]/!d' -e 's/.*"https:\/\/\([-a-z0-9.]\+\).*/\1/' router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java)
 CERTHOME="installer/resources/certificates"
 CACERTS=$(mktemp)
 WORK=$(mktemp -d)
