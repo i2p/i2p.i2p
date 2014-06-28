@@ -367,6 +367,23 @@
         <copy file="apps/addressbook/dist/addressbook.war" todir="build/" />
     </target>
 
+    <!-- Custom target to collect the jars that I2P-Bote needs to compile, so it can compile from source. -->
+    <!-- TODO eww, we should not need to do this -->
+    <target name="jarBote" depends="buildRouter, buildStreaming, buildJetty" >
+        <copy file="core/java/build/i2p.jar" todir="build/" />
+        <copy file="router/java/build/router.jar" todir="build/" />
+        <copy file="apps/ministreaming/java/build/mstreaming.jar" todir="build/" />
+        <copy file="apps/streaming/java/build/streaming.jar" todir="build/" />
+        <copy file="apps/jetty/jettylib/org.mortbay.jetty.jar" todir="build/" />
+        <copy file="apps/jetty/jettylib/jasper-compiler.jar" todir="build/" />
+        <copy file="apps/jetty/jettylib/jasper-runtime.jar" todir="build/" />
+        <copy file="apps/jetty/jettylib/javax.servlet.jar" todir="build/" />
+        <copy file="apps/jetty/jettylib/commons-logging.jar" todir="build/" />
+        <copy file="apps/jetty/jettylib/commons-el.jar" todir="build/" />
+        <copy file="apps/susidns/src/WEB-INF/lib/jstl.jar" todir="build/" />
+        <copy file="apps/susidns/src/WEB-INF/lib/standard.jar" todir="build/" />
+    </target>
+
     <target name="jbigi-list-changes" depends="checkForMtn" if="mtn.available">
         <exec executable="mtn" outputproperty="workspace.changes.jbigi" errorproperty="mtn.error.jbigi" failifexecutionfails="false" >
             <arg value="list" />
