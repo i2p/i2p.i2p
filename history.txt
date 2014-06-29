@@ -1,3 +1,6 @@
+2014-06-29 zzz
+ * NetDB: Fix handling reseed URLs with ports (ticket #1278)
+
 2014-06-28 zzz
  * NetDB: Add support for reseeding with su3 files (ticket #934)
  * SAM:

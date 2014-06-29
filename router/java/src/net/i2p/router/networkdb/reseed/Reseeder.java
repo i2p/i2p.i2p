@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -267,7 +268,7 @@ public class Reseeder {
         * @return count of routerinfos successfully fetched
         */
         private int reseed(boolean echoStatus) {
-            List<String> URLList = new ArrayList<String>();
+            List<URL> URLList = new ArrayList<URL>();
             String URLs = _context.getProperty(PROP_RESEED_URL);
             boolean defaulted = URLs == null;
             boolean SSLDisable = _context.getBooleanProperty(PROP_SSL_DISABLE);
@@ -279,24 +280,33 @@ public class Reseeder {
                     URLs = DEFAULT_SSL_SEED_URL;
             }
             StringTokenizer tok = new StringTokenizer(URLs, " ,");
-            while (tok.hasMoreTokens())
-                URLList.add(tok.nextToken().trim());
+            while (tok.hasMoreTokens()) {
+                try {
+                    URLList.add(new URL(tok.nextToken().trim()));
+                } catch (MalformedURLException mue) {}
+            }
             Collections.shuffle(URLList, _context.random());
             if (defaulted && !SSLDisable && !SSLRequired) {
                 // put the non-SSL at the end of the SSL
-                List<String> URLList2 = new ArrayList<String>();
+                List<URL> URLList2 = new ArrayList<URL>();
                 tok = new StringTokenizer(DEFAULT_SEED_URL, " ,");
-                while (tok.hasMoreTokens())
-                    URLList2.add(tok.nextToken().trim());
+                while (tok.hasMoreTokens()) {
+                    try {
+                        URLList2.add(new URL(tok.nextToken().trim()));
+                    } catch (MalformedURLException mue) {}
+                }
                 Collections.shuffle(URLList2, _context.random());
                 URLList.addAll(URLList2);
             }
             int total = 0;
             for (int i = 0; i < URLList.size() && _isRunning; i++) {
-                String url = URLList.get(i);
+                URL url = URLList.get(i);
                 int dl = 0;
-                if (ENABLE_SU3)
-                    dl = reseedSU3(url + SU3_FILENAME, echoStatus);
+                if (ENABLE_SU3) {
+                    try {
+                        dl = reseedSU3(new URL(url.toString() + SU3_FILENAME), echoStatus);
+                    } catch (MalformedURLException mue) {}
+                }
                 if (dl <= 0)
                     dl = reseedOne(url, echoStatus);
                 if (dl > 0) {
@@ -304,15 +314,13 @@ public class Reseeder {
                     // Don't go on to the next URL if we have enough
                     if (total >= 100)
                         break;
-                    // remove alternate version if we haven't tried it yet
-                    String alt;
-                    if (url.startsWith("http://"))
-                        alt = url.replace("http://", "https://");
-                    else
-                        alt = url.replace("https://", "http://");
-                    int idx = URLList.indexOf(alt);
-                    if (idx > i)
-                        URLList.remove(i);
+                    // remove alternate versions if we haven't tried them yet
+                    for (int j = i + 1; j < URLList.size(); ) {
+                        if (url.getHost().equals(URLList.get(j).getHost()))
+                            URLList.remove(j);
+                        else
+                            j++;
+                    }
                 }
             }
             return total;
@@ -339,14 +347,13 @@ public class Reseeder {
          * @param echoStatus apparently always false
          * @return count of routerinfos successfully fetched
          **/
-        private int reseedOne(String seedURL, boolean echoStatus) {
+        private int reseedOne(URL seedURL, boolean echoStatus) {
             try {
                 // Don't use context clock as we may be adjusting the time
                 final long timeLimit = System.currentTimeMillis() + MAX_TIME_PER_HOST;
                 _checker.setStatus(_("Reseeding: fetching seed URL."));
                 System.err.println("Reseeding from " + seedURL);
-                URL dir = new URL(seedURL);
-                byte contentRaw[] = readURL(dir);
+                byte contentRaw[] = readURL(seedURL);
                 if (contentRaw == null) {
                     // Logging deprecated here since attemptFailed() provides better info
                     _log.warn("Failed reading seed URL: " + seedURL);
@@ -403,7 +410,7 @@ public class Reseeder {
                         _checker.setStatus(
                             _("Reseeding: fetching router info from seed URL ({0} successful, {1} errors).", fetched, errors));
 
-                        if (!fetchSeed(seedURL, iter.next()))
+                        if (!fetchSeed(seedURL.toString(), iter.next()))
                             continue;
                         fetched++;
                         if (echoStatus) {
@@ -442,15 +449,14 @@ public class Reseeder {
          *  @return count of routerinfos successfully fetched
          *  @since 0.9.14
          **/
-        private int reseedSU3(String seedURL, boolean echoStatus) {
+        private int reseedSU3(URL seedURL, boolean echoStatus) {
             File contentRaw = null;
             File zip = null;
             File tmpDir = null;
             try {
                 _checker.setStatus(_("Reseeding: fetching seed URL."));
                 System.err.println("Reseeding from " + seedURL);
-                URL dir = new URL(seedURL);
-                contentRaw = fetchURL(dir);
+                contentRaw = fetchURL(seedURL);
                 if (contentRaw == null) {
                     // Logging deprecated here since attemptFailed() provides better info
                     _log.warn("Failed reading seed URL: " + seedURL);
