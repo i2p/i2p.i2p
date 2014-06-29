@@ -498,6 +498,8 @@ public class Reseeder {
                         name.equals(ourB64) ||
                         f.length() > 10*1024 ||
                         f.lastModified() < minTime ||
+                        !name.startsWith(ROUTERINFO_PREFIX) ||
+                        !name.endsWith(ROUTERINFO_SUFFIX) ||
                         !f.isFile()) {
                         if (_log.shouldLog(Log.WARN))
                             _log.warn("Skipping " + f);
