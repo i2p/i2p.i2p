@@ -1,3 +1,12 @@
+2014-07-03 kytv
+ * Update Java Service Wrapper to v3.5.25
+    - Windows: x86 and x64 versions self-compiled with VS2010 in
+      Windows 7. The icon has been changed from Tanuki's default to Itoopie.
+    - Linux ARMv6: Compiled on a RaspberryPi using gcc 4.6.3-14+rpi1,
+      Oracle Java 1.7.0+update40 and stripped
+    - All other binaries are from the "community edition" deltapack offered by
+      Tanuki.
+
 2014-06-29 zzz
  * NetDB: Fix handling reseed URLs with ports (ticket #1278)
 
