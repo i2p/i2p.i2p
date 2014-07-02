@@ -1,4 +1,4 @@
-2014-07-03 kytv
+2014-07-02 kytv
  * Update Java Service Wrapper to v3.5.25
     - Windows: x86 and x64 versions self-compiled with VS2010 in
       Windows 7. The icon has been changed from Tanuki's default to Itoopie.
