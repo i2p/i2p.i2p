@@ -37,7 +37,7 @@ import net.i2p.util.RandomSource;
  *     - Cert. length (2 bytes)
  *     - Certificate if length != 0
  *  - Private key (256 bytes)
- *  - Signing Private key (20 bytes)
+ *  - Signing Private key (20 bytes, or length specified by key certificate)
  * Total 663 bytes
  *</pre>
  *
@@ -45,6 +45,15 @@ import net.i2p.util.RandomSource;
  */
 
 public class PrivateKeyFile {
+    
+    private static final int HASH_EFFORT = VerifiedDestination.MIN_HASHCASH_EFFORT;
+    
+    private final File file;
+    private final I2PClient client;
+    private Destination dest;
+    private PrivateKey privKey;
+    private SigningPrivateKey signingPrivKey; 
+
     /**
      *  Create a new PrivateKeyFile, or modify an existing one, with various
      *  types of Certificates.
@@ -188,9 +197,6 @@ public class PrivateKeyFile {
     public PrivateKeyFile(File file, I2PClient client) {
         this.file = file;
         this.client = client;
-        this.dest = null;
-        this.privKey = null;
-        this.signingPrivKey = null;
     }
     
     /** @since 0.8.9 */
@@ -198,8 +204,13 @@ public class PrivateKeyFile {
         this(file, session.getMyDestination(), session.getDecryptionKey(), session.getPrivateKey());
     }
     
-    /** @since 0.8.9 */
+    /**
+     *  @throws IllegalArgumentException on mismatch of spubkey and spk types
+     *  @since 0.8.9
+     */
     public PrivateKeyFile(File file, Destination dest, PrivateKey pk, SigningPrivateKey spk) {
+        if (dest.getSigningPublicKey().getType() != spk.getType())
+            throw new IllegalArgumentException("Signing key type mismatch");
         this.file = file;
         this.client = null;
         this.dest = dest;
@@ -207,9 +218,14 @@ public class PrivateKeyFile {
         this.signingPrivKey = spk;
     }
     
-    /** @since 0.8.9 */
+    /**
+     *  @throws IllegalArgumentException on mismatch of spubkey and spk types
+     *  @since 0.8.9
+     */
     public PrivateKeyFile(File file, PublicKey pubkey, SigningPublicKey spubkey, Certificate cert,
                           PrivateKey pk, SigningPrivateKey spk) {
+        if (spubkey.getType() != spk.getType())
+            throw new IllegalArgumentException("Signing key type mismatch");
         this.file = file;
         this.client = null;
         this.dest = new Destination();
@@ -382,6 +398,7 @@ public class PrivateKeyFile {
     public PrivateKey getPrivKey() {
         return this.privKey;
     }
+
     public SigningPrivateKey getSigningPrivKey() {
         return this.signingPrivKey;
     }
@@ -544,13 +561,4 @@ public class PrivateKeyFile {
     public static boolean checkSignature(Signature s, byte[] data, SigningPublicKey spk) {
         return DSAEngine.getInstance().verifySignature(s, data, spk);
     }
-    
-    
-    private static final int HASH_EFFORT = VerifiedDestination.MIN_HASHCASH_EFFORT;
-    
-    private final File file;
-    private final I2PClient client;
-    private Destination dest;
-    private PrivateKey privKey;
-    private SigningPrivateKey signingPrivKey; 
 }
