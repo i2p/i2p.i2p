@@ -144,4 +144,43 @@ public class EventLog {
         }
         return rv;
     }
+
+    /**
+     *  All events since a given time.
+     *  Does not cache. Fails silently.
+     *  Values in the returned map have the format "event[ info]".
+     *  Events do not contain spaces.
+     *
+     *  @param since since this time, 0 for all
+     *  @return non-null, Map of times to info strings, sorted, earliest first, unmodifiable
+     *  @since 0.9.14
+     */
+    public synchronized SortedMap<Long, String> getEvents(long since) {
+        SortedMap<Long, String> rv = new TreeMap<Long, String>();
+        BufferedReader br = null;
+        try {
+            br = new BufferedReader(new InputStreamReader(
+                    new FileInputStream(_file), "UTF-8"));
+            String line = null;
+            while ( (line = br.readLine()) != null) {
+                try {
+                    String[] s = line.split(" ", 2);
+                    if (s.length < 2)
+                        continue;
+                    long time = Long.parseLong(s[0]);
+                    if (time <= since)
+                        continue;
+                    Long ltime = Long.valueOf(time);
+                    rv.put(ltime, s[1]);
+                } catch (IndexOutOfBoundsException ioobe) {
+                } catch (NumberFormatException nfe) {
+                }
+            }
+            rv = Collections.unmodifiableSortedMap(rv);
+        } catch (IOException ioe) {
+        } finally {
+            if (br != null) try { br.close(); } catch (IOException ioe) {}
+        }
+        return rv;
+    }
 }

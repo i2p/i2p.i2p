@@ -1,3 +1,12 @@
+2014-07-03 zzz
+ * Base64:
+  - Catch numerous decoding errors that were previously misdecoded (ticket #1318)
+  - Improve decoding efficiency, reduce copies
+  - encode(String) now uses UTF-8 encoding
+  - decode() now accepts short strings without trailing '='
+  - whitespace in decode will now cause an error, was previously ignored
+ * Console: Add event log viewer (ticket #1117)
+
 2014-07-02 kytv
  * Update Java Service Wrapper to v3.5.25
     - Windows: x86 and x64 versions self-compiled with VS2010 in
