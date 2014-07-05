@@ -61,8 +61,9 @@ public class Reseeder {
     private static final boolean ENABLE_SU3 = true;
 
     /**
-     *  NOTE - URLs that are in both the standard and SSL groups must use the same hostname and path,
+     *  NOTE - URLs that are in both the standard and SSL groups must use the same hostname,
      *         so the reseed process will not download from both.
+     *         Ports are supported as of 0.9.14.
      *
      *  NOTE - Each seedURL must be a directory, it must end with a '/',
      *         it can't end with 'index.html', for example. Both because of how individual file
@@ -82,7 +83,7 @@ public class Reseeder {
               "http://uk.reseed.i2p2.no/" + "," +
               "http://jp.reseed.i2p2.no/" + "," +
               "http://i2p-netdb.innovatio.no/" + "," +
-              "http://ieb9oopo.mooo.com";
+              "http://ieb9oopo.mooo.com/";
               // Temp disabled since h2ik have been AWOL since 06-03-2013
               //"http://i2p.feared.eu/";
 
@@ -101,7 +102,7 @@ public class Reseeder {
               "https://uk.reseed.i2p2.no:444/" + "," +
               "https://jp.reseed.i2p2.no:444/" + "," +
               "https://i2p-netdb.innovatio.no/" + "," +
-              "https://ieb9oopo.mooo.com";
+              "https://ieb9oopo.mooo.com/";
               // Temp disabled since h2ik have been AWOL since 06-03-2013
               //"https://i2p.feared.eu/";
 
@@ -282,8 +283,11 @@ public class Reseeder {
             }
             StringTokenizer tok = new StringTokenizer(URLs, " ,");
             while (tok.hasMoreTokens()) {
+                String u = tok.nextToken().trim();
+                if (!u.endsWith("/"))
+                    u = u + '/';
                 try {
-                    URLList.add(new URL(tok.nextToken().trim()));
+                    URLList.add(new URL(u));
                 } catch (MalformedURLException mue) {}
             }
             Collections.shuffle(URLList, _context.random());
@@ -292,8 +296,11 @@ public class Reseeder {
                 List<URL> URLList2 = new ArrayList<URL>();
                 tok = new StringTokenizer(DEFAULT_SEED_URL, " ,");
                 while (tok.hasMoreTokens()) {
+                    String u = tok.nextToken().trim();
+                    if (!u.endsWith("/"))
+                        u = u + '/';
                     try {
-                        URLList2.add(new URL(tok.nextToken().trim()));
+                        URLList2.add(new URL(u));
                     } catch (MalformedURLException mue) {}
                 }
                 Collections.shuffle(URLList2, _context.random());
@@ -451,6 +458,8 @@ public class Reseeder {
          *  @since 0.9.14
          **/
         private int reseedSU3(URL seedURL, boolean echoStatus) {
+            int fetched = 0;
+            int errors = 0;
             File contentRaw = null;
             File zip = null;
             File tmpDir = null;
@@ -483,8 +492,6 @@ public class Reseeder {
                 List<File> fList = Arrays.asList(files);
                 Collections.shuffle(fList, _context.random());
                 long minTime = _context.clock().now() - MAX_FILE_AGE;
-                int fetched = 0;
-                int errors = 0;
                 File netDbDir = new SecureDirectory(_context.getRouterDir(), "netDb");
                 if (!netDbDir.exists())
                     netDbDir.mkdirs();
@@ -517,17 +524,8 @@ public class Reseeder {
                     if (errors >= 5)
                         break;
                 }
-                _checker.setStatus(
-                    _("Reseeding: fetching router info from seed URL ({0} successful, {1} errors).", fetched, errors));
-                System.err.println("Reseed got " + fetched + " router infos from " + seedURL + " with " + errors + " errors");
-
-                if (fetched > 0)
-                    _context.netDb().rescan();
-                return fetched;
             } catch (Throwable t) {
                 _log.warn("Error reseeding", t);
-                System.err.println("Reseed got no router infos from " + seedURL);
-                return 0;
             } finally {
                 if (contentRaw != null)
                     contentRaw.delete();
@@ -536,6 +534,12 @@ public class Reseeder {
                 if (tmpDir != null)
                     FileUtil.rmdir(tmpDir, false);
             }
+            _checker.setStatus(
+                _("Reseeding: fetching router info from seed URL ({0} successful, {1} errors).", fetched, errors));
+            System.err.println("Reseed got " + fetched + " router infos from " + seedURL + " with " + errors + " errors");
+            if (fetched > 0)
+                _context.netDb().rescan();
+            return fetched;
         }
     
         /**
