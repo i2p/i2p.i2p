@@ -117,27 +117,34 @@ public class EepGet {
         this(ctx, false, null, -1, numRetries, outputFile, url, allowCaching, null);
     }
 
-    public EepGet(I2PAppContext ctx, boolean shouldProxy, String proxyHost, int proxyPort, int numRetries, String outputFile, String url) {
+    public EepGet(I2PAppContext ctx, boolean shouldProxy, String proxyHost, int proxyPort,
+                  int numRetries, String outputFile, String url) {
         this(ctx, shouldProxy, proxyHost, proxyPort, numRetries, outputFile, url, true, null);
     }
 
-    public EepGet(I2PAppContext ctx, boolean shouldProxy, String proxyHost, int proxyPort, int numRetries, String outputFile, String url, String postData) {
+    public EepGet(I2PAppContext ctx, boolean shouldProxy, String proxyHost, int proxyPort,
+                  int numRetries, String outputFile, String url, String postData) {
         this(ctx, shouldProxy, proxyHost, proxyPort, numRetries, -1, -1, outputFile, null, url, true, null, postData);
     }
 
-    public EepGet(I2PAppContext ctx, boolean shouldProxy, String proxyHost, int proxyPort, int numRetries, String outputFile, String url, boolean allowCaching, String etag) {
+    public EepGet(I2PAppContext ctx, boolean shouldProxy, String proxyHost, int proxyPort,
+                  int numRetries, String outputFile, String url, boolean allowCaching, String etag) {
         this(ctx, shouldProxy, proxyHost, proxyPort, numRetries, -1, -1, outputFile, null, url, allowCaching, etag, null);
     }
 
-    public EepGet(I2PAppContext ctx, boolean shouldProxy, String proxyHost, int proxyPort, int numRetries, String outputFile, String url, boolean allowCaching, String etag, String lastModified) {
+    public EepGet(I2PAppContext ctx, boolean shouldProxy, String proxyHost, int proxyPort,
+                  int numRetries, String outputFile, String url, boolean allowCaching, String etag, String lastModified) {
         this(ctx, shouldProxy, proxyHost, proxyPort, numRetries, -1, -1, outputFile, null, url, allowCaching, etag, lastModified, null);
     }
 
-    public EepGet(I2PAppContext ctx, boolean shouldProxy, String proxyHost, int proxyPort, int numRetries, long minSize, long maxSize, String outputFile, OutputStream outputStream, String url, boolean allowCaching, String etag, String postData) {
+    public EepGet(I2PAppContext ctx, boolean shouldProxy, String proxyHost, int proxyPort,
+                  int numRetries, long minSize, long maxSize, String outputFile, OutputStream outputStream,
+                  String url, boolean allowCaching, String etag, String postData) {
         this(ctx, shouldProxy, proxyHost, proxyPort, numRetries, minSize, maxSize, outputFile, outputStream, url, allowCaching, etag, null, postData);
     }
 
-    public EepGet(I2PAppContext ctx, boolean shouldProxy, String proxyHost, int proxyPort, int numRetries, long minSize, long maxSize,
+    public EepGet(I2PAppContext ctx, boolean shouldProxy, String proxyHost, int proxyPort,
+                  int numRetries, long minSize, long maxSize,
                   String outputFile, OutputStream outputStream, String url, boolean allowCaching,
                   String etag, String lastModified, String postData) {
         _context = ctx;
@@ -1254,12 +1261,27 @@ public class EepGet {
             buf.append("Cache-control: no-cache\r\n" +
                        "Pragma: no-cache\r\n");
         }
-        if ((_etag != null) && (_alreadyTransferred <= 0)) {
+        boolean uaOverridden = false;
+        boolean etagOverridden = false;
+        boolean lastmodOverridden = false;
+        if (_extraHeaders != null) {
+            for (String hdr : _extraHeaders) {
+                String hlc = hdr.toLowerCase(Locale.US);
+                if (hlc.startsWith("user-agent: "))
+                    uaOverridden = true;
+                else if (hlc.startsWith("if-none-match: "))
+                    etagOverridden = true;
+                else if (hlc.startsWith("if-modified-since: "))
+                    lastmodOverridden = true;
+                buf.append(hdr).append("\r\n");
+            }
+        }
+        if ((_etag != null) && (_alreadyTransferred <= 0) && !etagOverridden) {
             buf.append("If-None-Match: ");
             buf.append(_etag);
             buf.append("\r\n");
         }
-        if ((_lastModified != null) && (_alreadyTransferred <= 0)) {
+        if ((_lastModified != null) && (_alreadyTransferred <= 0) && !lastmodOverridden) {
             buf.append("If-Modified-Since: ");
             buf.append(_lastModified);
             buf.append("\r\n");
@@ -1274,14 +1296,6 @@ public class EepGet {
             (!path.endsWith(".gz")) && (!path.endsWith(".tgz")))
             buf.append("gzip");
         buf.append("\r\n");
-        boolean uaOverridden = false;
-        if (_extraHeaders != null) {
-            for (String hdr : _extraHeaders) {
-                if (hdr.toLowerCase(Locale.US).startsWith("user-agent: "))
-                    uaOverridden = true;
-                buf.append(hdr).append("\r\n");
-            }
-        }
         if(!uaOverridden)
             buf.append("User-Agent: " + USER_AGENT + "\r\n");
         if (_authState != null && _shouldProxy && _authState.authMode != AUTH_MODE.NONE) {
@@ -1366,6 +1380,8 @@ public class EepGet {
      *  Must be called before fetch().
      *  Not supported by EepHead.
      *  As of 0.9.10, If name is User-Agent, this will replace the default User-Agent header.
+     *  As of 0.9.14, If name is If-None-Match or If-Modified-Since,
+     *  this will replace the etag or last-modified value given in the constructor.
      *  Note that headers may be subsequently modified or removed in the I2PTunnel HTTP Client proxy.
      *
      *  @since 0.8.8

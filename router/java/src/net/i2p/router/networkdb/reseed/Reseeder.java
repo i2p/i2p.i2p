@@ -575,7 +575,6 @@ public class Reseeder {
         /** @return null on error */
         private byte[] readURL(URL url) throws IOException {
             ByteArrayOutputStream baos = new ByteArrayOutputStream(4*1024);
-
             EepGet get;
             boolean ssl = url.toString().startsWith("https");
             if (ssl) {
@@ -602,6 +601,10 @@ public class Reseeder {
                         pass != null && pass.length() > 0)
                         get.addAuthorization(user, pass);
                 }
+            }
+            if (!url.toString().endsWith("/")) {
+                String minLastMod = RFC822Date.to822Date(_context.clock().now() - MAX_FILE_AGE);
+                get.addHeader("If-Modified-Since", minLastMod);
             }
             get.addStatusListener(ReseedRunner.this);
             if (get.fetch() && get.getStatusCode() == 200)
@@ -643,6 +646,10 @@ public class Reseeder {
                         pass != null && pass.length() > 0)
                         get.addAuthorization(user, pass);
                 }
+            }
+            if (!url.toString().endsWith("/")) {
+                String minLastMod = RFC822Date.to822Date(_context.clock().now() - MAX_FILE_AGE);
+                get.addHeader("If-Modified-Since", minLastMod);
             }
             get.addStatusListener(ReseedRunner.this);
             if (get.fetch() && get.getStatusCode() == 200)
