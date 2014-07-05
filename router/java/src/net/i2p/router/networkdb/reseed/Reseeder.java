@@ -479,6 +479,17 @@ public class Reseeder {
                 int type = su3.getContentType();
                 if (type != SU3File.CONTENT_RESEED)
                     throw new IOException("Bad content type " + type);
+                String version = su3.getVersionString();
+                try {
+                    Long ver = Long.parseLong(version.trim());
+                    if (ver >= 1400000000L) {
+                        // preliminary code was using "3"
+                        // new format is date +%s
+                        ver *= 1000;
+                        if (ver < _context.clock().now() - MAX_FILE_AGE)
+                            throw new IOException("su3 file too old");
+                    }
+                } catch (NumberFormatException nfe) {}
                 tmpDir = new File(_context.getTempDir(), "reseeds-" + _context.random().nextInt());
                 if (!FileUtil.extractZip(zip, tmpDir))
                     throw new IOException("Bad zip file");
