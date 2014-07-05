@@ -6,6 +6,8 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.Enumeration;
 
+import net.i2p.I2PAppContext;
+import net.i2p.util.Log;
 import net.i2p.util.SystemVersion;
 
 /**
@@ -20,6 +22,12 @@ abstract class MTU {
     /**
      * The MTU for the socket interface, if available.
      * Not available for Java 5.
+     *
+     * Note that we don't return the value for the default interface if
+     * we can't find the address. Finding the default interface is hard,
+     * altough we could perhaps just look for the first non-loopback address.
+     * But the MTU of the default route probably isn't relevant.
+     *
      * @param ia null ok
      * @return 0 if Java 5, or if not bound to an address;
      *         limited to range MIN_MTU to LARGE_MTU.
@@ -43,7 +51,14 @@ abstract class MTU {
                             // testing
                             //return ifc.getMTU();
                             boolean isIPv6 = addr instanceof Inet6Address;
-                            return rectify(isIPv6, ifc.getMTU());
+                            int mtu = ifc.getMTU();
+                            if ((isIPv6 && mtu < PeerState.MIN_IPV6_MTU) ||
+                                (!isIPv6 && mtu < PeerState.MIN_MTU)) {
+                                Log log = I2PAppContext.getGlobalContext().logManager().getLog(MTU.class);
+                                log.logAlways(Log.WARN, "Unusually low MTU " + mtu + " for interface " + ia +
+                                                        ", consider disabling");
+                            }
+                            return rectify(isIPv6, mtu);
                         } catch (SocketException se) {
                             // ignore
                         } catch (Throwable t) {
