@@ -25,7 +25,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import net.i2p.client.I2PClient;
 import net.i2p.crypto.SessionKeyManager;
-import net.i2p.crypto.TransientSessionKeyManager;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
@@ -43,6 +42,7 @@ import net.i2p.data.i2cp.SessionId;
 import net.i2p.router.Job;
 import net.i2p.router.JobImpl;
 import net.i2p.router.RouterContext;
+import net.i2p.router.crypto.TransientSessionKeyManager;
 import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
