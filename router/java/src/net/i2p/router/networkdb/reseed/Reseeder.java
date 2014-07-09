@@ -78,7 +78,6 @@ public class Reseeder {
               "http://193.150.121.66/netDb/" + "," +
               "http://netdb.i2p2.no/" + "," +
               "http://reseed.info/"  + "," +
-              "http://reseed.pkol.de/" + "," +
               "http://us.reseed.i2p2.no/" + "," +
               "http://uk.reseed.i2p2.no/" + "," +
               "http://jp.reseed.i2p2.no/" + "," +
@@ -97,7 +96,6 @@ public class Reseeder {
               "https://193.150.121.66/netDb/" + "," +
               "https://netdb.i2p2.no/" + "," +
               "https://reseed.info/"  + "," +
-              "https://reseed.pkol.de/" + "," +
               "https://us.reseed.i2p2.no:444/" + "," +
               "https://uk.reseed.i2p2.no:444/" + "," +
               "https://jp.reseed.i2p2.no:444/" + "," +
