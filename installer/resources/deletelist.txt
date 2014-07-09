@@ -4,6 +4,7 @@ certificates/r31453.ovh.net
 certificates/75.145.125.59.crt
 certificates/forum.i2p2.de.crt
 certificates/cowpuncher.drollette.com.crt
+certificates/ssl/reseed.pkol.de.crt
 # old translated proxy error pages
 docs/ahelper-conflict-header_ar.ht
 docs/ahelper-conflict-header_de.ht
