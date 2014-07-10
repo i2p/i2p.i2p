@@ -60,26 +60,33 @@ public class SAMStreamSink {
     }
     
     public void startup() {
-        _log.debug("Starting up");
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Starting up");
         boolean ok = connect();
-        _log.debug("Connected: " + ok);
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Connected: " + ok);
         if (ok) {
             _reader = new SAMReader(_context, _samIn, _eventHandler);
             _reader.startReading();
-            _log.debug("Reader created");
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Reader created");
             String ourDest = handshake();
-            _log.debug("Handshake complete.  we are " + ourDest);
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Handshake complete.  we are " + ourDest);
             if (ourDest != null) {
                 //boolean written = 
-                	writeDest(ourDest);
-                _log.debug("Dest written");
+               	writeDest(ourDest);
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Dest written");
             }
         }
     }
     
     private class SinkEventHandler extends SAMEventHandler {
+
         public SinkEventHandler(I2PAppContext ctx) { super(ctx); }
-		@Override
+
+        @Override
         public void streamClosedReceived(String result, int id, String message) {
             Sink sink = null;
             synchronized (_remotePeers) {
@@ -87,12 +94,14 @@ public class SAMStreamSink {
             }
             if (sink != null) {
                 sink.closed();
-                _log.debug("Connection " + sink.getConnectionId() + " closed to " + sink.getDestination());
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Connection " + sink.getConnectionId() + " closed to " + sink.getDestination());
             } else {
                 _log.error("wtf, not connected to " + id + " but we were just closed?");
             }
         }
-		@Override
+
+        @Override
         public void streamDataReceived(int id, byte data[], int offset, int length) {
             Sink sink = null;
             synchronized (_remotePeers) {
@@ -104,9 +113,11 @@ public class SAMStreamSink {
                 _log.error("wtf, not connected to " + id + " but we received " + length + "?");
             }
         }
-		@Override
+
+        @Override
         public void streamConnectedReceived(String dest, int id) {  
-            _log.debug("Connection " + id + " received from " + dest);
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Connection " + id + " received from " + dest);
 
             try {
                 Sink sink = new Sink(id, dest);
@@ -136,24 +147,30 @@ public class SAMStreamSink {
             try {
                 _samOut.write("HELLO VERSION MIN=1.0 MAX=1.0\n".getBytes());
                 _samOut.flush();
-                _log.debug("Hello sent");
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Hello sent");
                 boolean ok = _eventHandler.waitForHelloReply();
-                _log.debug("Hello reply found: " + ok);
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Hello reply found: " + ok);
                 if (!ok) 
                     throw new IOException("wtf, hello failed?");
                 String req = "SESSION CREATE STYLE=STREAM DESTINATION=" + _destFile + " " + _conOptions + "\n";
                 _samOut.write(req.getBytes());
                 _samOut.flush();
-                _log.debug("Session create sent");
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Session create sent");
                 ok = _eventHandler.waitForSessionCreateReply();
-                _log.debug("Session create reply found: " + ok);
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Session create reply found: " + ok);
 
                 req = "NAMING LOOKUP NAME=ME\n";
                 _samOut.write(req.getBytes());
                 _samOut.flush();
-                _log.debug("Naming lookup sent");
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Naming lookup sent");
                 String destination = _eventHandler.waitForNamingReply("ME");
-                _log.debug("Naming lookup reply found: " + destination);
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Naming lookup reply found: " + destination);
                 if (destination == null) {
                     _log.error("No naming lookup reply found!");
                     return null;
@@ -230,7 +247,8 @@ public class SAMStreamSink {
                 closed();
                 return;
             }
-            _log.debug("Received " + len + " on " + _connectionId + " after " + (_context.clock().now()-_lastReceivedOn)
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Received " + len + " on " + _connectionId + " after " + (_context.clock().now()-_lastReceivedOn)
                        + "ms with " + _remoteDestination.substring(0,6));
             
             _lastReceivedOn = _context.clock().now();

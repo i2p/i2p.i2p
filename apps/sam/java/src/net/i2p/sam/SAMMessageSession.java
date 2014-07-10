@@ -30,7 +30,7 @@ import net.i2p.util.Log;
  *
  * @author human
  */
-public abstract class SAMMessageSession {
+abstract class SAMMessageSession {
 
     protected final Log _log;
 
@@ -41,7 +41,7 @@ public abstract class SAMMessageSession {
     /**
      * Initialize a new SAM message-based session.
      *
-     * @param dest Base64-encoded destination (private key)
+     * @param dest Base64-encoded destination and private keys (same format as PrivateKeyFile)
      * @param props Properties to setup the I2P session
      * @throws IOException
      * @throws DataFormatException
@@ -56,7 +56,7 @@ public abstract class SAMMessageSession {
     /**
      * Initialize a new SAM message-based session.
      *
-     * @param destStream Input stream containing the destination keys
+     * @param destStream Input stream containing the destination and private keys (same format as PrivateKeyFile)
      * @param props Properties to setup the I2P session
      * @throws IOException
      * @throws DataFormatException
@@ -68,7 +68,8 @@ public abstract class SAMMessageSession {
     }
 
     private void initSAMMessageSession (InputStream destStream, Properties props) throws IOException, DataFormatException, I2PSessionException {
-        _log.debug("Initializing SAM message-based session");
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Initializing SAM message-based session");
 
         handler = new SAMMessageSessionHandler(destStream, props);
 
@@ -155,7 +156,7 @@ public abstract class SAMMessageSession {
      *
      * @author human
      */
-    public class SAMMessageSessionHandler implements Runnable, I2PSessionListener {
+    class SAMMessageSessionHandler implements Runnable, I2PSessionListener {
 
         private final Object runningLock = new Object();
         private volatile boolean stillRunning = true;
@@ -168,14 +169,17 @@ public abstract class SAMMessageSession {
 	 * @throws I2PSessionException 
          */
         public SAMMessageSessionHandler(InputStream destStream, Properties props) throws I2PSessionException {
-            _log.debug("Instantiating new SAM message-based session handler");
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Instantiating new SAM message-based session handler");
 
             I2PClient client = I2PClientFactory.createClient();
             session = client.createSession(destStream, props);
 
-            _log.debug("Connecting I2P session...");
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Connecting I2P session...");
             session.connect();
-            _log.debug("I2P session connected");
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("I2P session connected");
 
             session.setSessionListener(this);
         }
@@ -193,7 +197,8 @@ public abstract class SAMMessageSession {
 
         public void run() {
 
-            _log.debug("SAM message-based session handler running");
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("SAM message-based session handler running");
 
             synchronized (runningLock) {
                 while (stillRunning) {
@@ -203,27 +208,32 @@ public abstract class SAMMessageSession {
                 }
             }
 
-            _log.debug("Shutting down SAM message-based session handler");
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Shutting down SAM message-based session handler");
             
             shutDown();
             
             try {
-                _log.debug("Destroying I2P session...");
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Destroying I2P session...");
                 session.destroySession();
-                _log.debug("I2P session destroyed");
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("I2P session destroyed");
             } catch (I2PSessionException e) {
                     _log.error("Error destroying I2P session", e);
             }
         }
         
         public void disconnected(I2PSession session) {
-            _log.debug("I2P session disconnected");
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("I2P session disconnected");
             stopRunning();
         }
 
         public void errorOccurred(I2PSession session, String message,
                                   Throwable error) {
-            _log.debug("I2P error: " + message, error);
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("I2P error: " + message, error);
             stopRunning();
         }
             

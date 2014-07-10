@@ -52,7 +52,7 @@ public class VMCommSystem extends CommSystemFacade {
      */
     public void processMessage(OutNetMessage msg) {
         Hash peer = msg.getTarget().getIdentity().getHash();
-        VMCommSystem peerSys = (VMCommSystem)_commSystemFacades.get(peer);
+        VMCommSystem peerSys = _commSystemFacades.get(peer);
 
         long now = _context.clock().now();
         long sendTime = now - msg.getSendBegin();

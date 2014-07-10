@@ -20,6 +20,7 @@ import net.i2p.I2PException;
 import net.i2p.client.I2PClient;
 import net.i2p.client.I2PClientFactory;
 import net.i2p.client.naming.NamingService;
+import net.i2p.crypto.SigType;
 import net.i2p.data.Base64;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.Destination;
@@ -32,21 +33,35 @@ import net.i2p.util.Log;
  *
  * @author human
  */
-public class SAMUtils {
+class SAMUtils {
 
     //private final static Log _log = new Log(SAMUtils.class);
 
     /**
-     * Generate a random destination key
+     * Generate a random destination key using DSA_SHA1 signature type.
+     * Caller must close streams. Fails silently.
      *
-     * @param priv Stream used to write the private key
-     * @param pub Stream used to write the public key (may be null)
+     * @param priv Stream used to write the destination and private keys
+     * @param pub Stream used to write the destination (may be null)
      */
     public static void genRandomKey(OutputStream priv, OutputStream pub) {
+        genRandomKey(priv, pub, SigType.DSA_SHA1);
+    }
+
+    /**
+     * Generate a random destination key.
+     * Caller must close streams. Fails silently.
+     *
+     * @param priv Stream used to write the destination and private keys
+     * @param pub Stream used to write the destination (may be null)
+     * @param sigType what signature type
+     * @since 0.9.14
+     */
+    public static void genRandomKey(OutputStream priv, OutputStream pub, SigType sigType) {
         //_log.debug("Generating random keys...");
         try {
             I2PClient c = I2PClientFactory.createClient();
-            Destination d = c.createDestination(priv);
+            Destination d = c.createDestination(priv, sigType);
             priv.flush();
 
             if (pub != null) {
@@ -77,20 +92,30 @@ public class SAMUtils {
             return false;
         }
     }
-    
-    public static class InvalidDestination extends Exception {
-    	static final long serialVersionUID = 0x1 ;
-    }
-    public static void checkPrivateDestination(String dest) throws InvalidDestination {
-    	ByteArrayInputStream destKeyStream = new ByteArrayInputStream(Base64.decode(dest));
 
+    /**
+     * Check whether a base64-encoded {dest,privkey,signingprivkey} is valid
+     *
+     * @param dest The base64-encoded destination and keys to be checked (same format as PrivateKeyFile)
+     * @return true if valid
+     */
+    public static boolean checkPrivateDestination(String dest) {
+        byte[] b = Base64.decode(dest);
+        if (b == null || b.length < 663)
+            return false;
+    	ByteArrayInputStream destKeyStream = new ByteArrayInputStream(b);
     	try {
-    		new Destination().readBytes(destKeyStream);
+    		Destination d = new Destination();
+    		d.readBytes(destKeyStream);
     		new PrivateKey().readBytes(destKeyStream);
-    		new SigningPrivateKey().readBytes(destKeyStream);
-    	} catch (Exception e) {
-    		throw new InvalidDestination();
+    		SigningPrivateKey spk = new SigningPrivateKey(d.getSigningPublicKey().getType());
+    		spk.readBytes(destKeyStream);
+    	} catch (DataFormatException e) {
+                return false;
+    	} catch (IOException e) {
+                return false;
     	}
+        return destKeyStream.available() == 0;
     }
 
 
@@ -148,26 +173,34 @@ public class SAMUtils {
      * @param tok A StringTokenizer pointing to the SAM parameters
      *
      * @throws SAMException if the data was formatted incorrectly
-     * @return Properties with the parsed SAM params
+     * @return Properties with the parsed SAM params, never null
      */
     public static Properties parseParams(StringTokenizer tok) throws SAMException {
-        int pos, ntoks = tok.countTokens();
-        String token, param;
+        int ntoks = tok.countTokens();
         Properties props = new Properties();
         
         StringBuilder value = new StringBuilder();
         for (int i = 0; i < ntoks; ++i) {
-            token = tok.nextToken();
+            String token = tok.nextToken();
 
-            pos = token.indexOf("=");
-            if (pos == -1) {
+            int pos = token.indexOf("=");
+            if (pos <= 0) {
                 //_log.debug("Error in params format");
-                throw new SAMException("Bad formatting for param [" + token + "]");
+                if (pos == 0) {
+                    throw new SAMException("No param specified [" + token + "]");
+                } else {
+                    throw new SAMException("Bad formatting for param [" + token + "]");
+                }
             }
-            param = token.substring(0, pos);
+            
+            String param = token.substring(0, pos);
             value.append(token.substring(pos+1));
             if (value.length() == 0)
-                throw new SAMException("Empty value for param "+param);
+                throw new SAMException("Empty value for param " + param);
+            
+            // FIXME: The following code does not take into account that there
+            // may have been multiple subsequent space chars in the input that
+            // StringTokenizer treates as one.
             if (value.charAt(0) == '"') {
                 while ( (i < ntoks) && (value.lastIndexOf("\"") <= 0) ) {
                     value.append(' ').append(tok.nextToken());

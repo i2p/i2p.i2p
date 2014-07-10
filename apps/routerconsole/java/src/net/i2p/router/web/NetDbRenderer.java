@@ -24,7 +24,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import net.i2p.data.Base32;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
@@ -172,7 +171,7 @@ public class NetDbRenderer {
                         median = dist;
                 }
                 buf.append(" Dist: <b>").append(fmt.format(biLog2(dist))).append("</b><br>");
-                buf.append(Base32.encode(key.getData())).append(".b32.i2p<br>");
+                buf.append(dest.toBase32()).append("<br>");
                 buf.append("Sig type: ").append(dest.getSigningPublicKey().getType()).append("<br>");
                 buf.append("Routing Key: ").append(ls.getRoutingKey().toBase64());
                 buf.append("<br>");

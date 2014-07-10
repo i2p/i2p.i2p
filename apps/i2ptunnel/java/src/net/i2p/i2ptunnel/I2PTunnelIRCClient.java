@@ -10,7 +10,6 @@ import java.util.StringTokenizer;
 
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.client.streaming.I2PSocketAddress;
-import net.i2p.data.Base32;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.i2ptunnel.irc.DCCClientManager;
@@ -239,7 +238,7 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase {
     }
 
     public String getB32Hostname() {
-        return Base32.encode(sockMgr.getSession().getMyDestination().calculateHash().getData()) + ".b32.i2p";
+        return sockMgr.getSession().getMyDestination().toBase32();
     }
 
     public byte[] getLocalAddress() {

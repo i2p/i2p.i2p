@@ -30,7 +30,6 @@ import net.i2p.util.ByteCache;
 import net.i2p.util.EventDispatcher;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
-import net.i2p.data.Base32;
 
 /**
  * Simple extension to the I2PTunnelServer that filters the HTTP
@@ -249,7 +248,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
             }
             
             addEntry(headers, HASH_HEADER, peerHash.toBase64());
-            addEntry(headers, DEST32_HEADER, Base32.encode(peerHash.getData()) + ".b32.i2p");
+            addEntry(headers, DEST32_HEADER, socket.getPeerDestination().toBase32());
             addEntry(headers, DEST64_HEADER, socket.getPeerDestination().toBase64());
 
             // Port-specific spoofhost

@@ -1,7 +1,5 @@
 package net.i2p.client.streaming;
 
-import net.i2p.client.streaming.I2PSocket;
-import net.i2p.client.streaming.I2PSocketManager;
 import net.i2p.I2PException;
 import java.net.ConnectException;
 import java.nio.channels.SelectableChannel;
@@ -11,6 +9,8 @@ import java.nio.channels.SelectableChannel;
  *  until we implement an I2P SocketAddress class.		
  *
  *  Warning, this interface and implementation is preliminary and subject to change without notice.
+ *
+ *  Unimplemented, unlikely to ever be implemented.
  *
  *  @since 0.8.11
  */

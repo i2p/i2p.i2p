@@ -1211,7 +1211,7 @@ public class WebMail extends HttpServlet
 			for (Integer item : getCheckedItems(request)) {
 				int n = item.intValue();
 				for( int i = 0; i < sessionObject.attachments.size(); i++ ) {
-					Attachment attachment = (Attachment)sessionObject.attachments.get( i );
+					Attachment attachment = sessionObject.attachments.get(i);
 					if( attachment.hashCode() == n ) {
 						sessionObject.attachments.remove( i );
 						break;

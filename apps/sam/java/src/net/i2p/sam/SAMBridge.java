@@ -33,6 +33,7 @@ import net.i2p.util.Log;
 
 /**
  * SAM bridge implementation.
+ * This is the main entry point for SAM.
  *
  * @author human
  */
@@ -340,7 +341,7 @@ public class SAMBridge implements Runnable, ClientApp {
 
     ////// end ClientApp helpers
 
-    static class HelpRequested extends Exception {static final long serialVersionUID=0x1;}
+    private static class HelpRequestedException extends Exception {static final long serialVersionUID=0x1;}
 
     /**
      * Usage:
@@ -438,11 +439,11 @@ public class SAMBridge implements Runnable, ClientApp {
         return new Options(host, port, opts, keyfile);
     }
 
-    private static Properties parseOptions(String args[], int startArgs) throws HelpRequested {
+    private static Properties parseOptions(String args[], int startArgs) throws HelpRequestedException {
         Properties props = new Properties();
         // skip over first few options
         for (int i = startArgs; i < args.length; i++) {
-        	if (args[i].equals("-h")) throw new HelpRequested();
+        	if (args[i].equals("-h")) throw new HelpRequestedException();
             int eq = args[i].indexOf('=');
             if (eq <= 0) continue;
             if (eq >= args[i].length()-1) continue;
@@ -494,12 +495,14 @@ public class SAMBridge implements Runnable, ClientApp {
                                + s.socket().getPort());
 
                 class HelloHandler implements Runnable {
-                	SocketChannel s ;
-                	SAMBridge parent ;
+                        private final SocketChannel s;
+                        private final SAMBridge parent;
+
                 	HelloHandler(SocketChannel s, SAMBridge parent) { 
                 		this.s = s ;
                 		this.parent = parent ;
                 	}
+
                 	public void run() {
                         try {
                             SAMHandler handler = SAMHandlerFactory.createSAMHandler(s, i2cpProps);
@@ -516,13 +519,8 @@ public class SAMBridge implements Runnable, ClientApp {
                         } catch (SAMException e) {
                             if (_log.shouldLog(Log.ERROR))
                                 _log.error("SAM error: " + e.getMessage(), e);
-                            try {
-                                String reply = "HELLO REPLY RESULT=I2P_ERROR MESSAGE=\"" + e.getMessage() + "\"\n";
-                                s.write(ByteBuffer.wrap(reply.getBytes("ISO-8859-1")));
-                            } catch (IOException ioe) {
-                                if (_log.shouldLog(Log.ERROR))
-                                    _log.error("SAM Error sending error reply", ioe);
-                            }
+                            String reply = "HELLO REPLY RESULT=I2P_ERROR MESSAGE=\"" + e.getMessage() + "\"\n";
+                            SAMHandler.writeString(reply, s);
                             try { s.close(); } catch (IOException ioe) {}
                         } catch (Exception ee) {
                             try { s.close(); } catch (IOException ioe) {}

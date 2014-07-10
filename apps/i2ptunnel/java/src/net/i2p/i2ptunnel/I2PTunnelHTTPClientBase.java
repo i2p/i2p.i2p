@@ -646,7 +646,7 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
 
     /**
      *  @param jumpServers comma- or space-separated list, or null
-     *  @param msg extra message
+     *  @param extraMessage extra message
      *  @since 0.9.14
      */
     protected void writeErrorMessage(byte[] errMessage, String extraMessage,

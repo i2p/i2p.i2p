@@ -62,7 +62,7 @@ class TrackerInfo
   private TrackerInfo(Map<String, BEValue> m, byte[] my_id, byte[] infohash, MetaInfo metainfo, I2PSnarkUtil util)
     throws IOException
   {
-    BEValue reason = (BEValue)m.get("failure reason");
+    BEValue reason = m.get("failure reason");
     if (reason != null)
       {
         failure_reason = reason.getString();
@@ -72,13 +72,13 @@ class TrackerInfo
     else
       {
         failure_reason = null;
-        BEValue beInterval = (BEValue)m.get("interval");
+        BEValue beInterval = m.get("interval");
         if (beInterval == null)
           throw new InvalidBEncodingException("No interval given");
         else
           interval = beInterval.getInt();
 
-        BEValue bePeers = (BEValue)m.get("peers");
+        BEValue bePeers = m.get("peers");
         if (bePeers == null) {
           peers = Collections.emptySet();
         } else {
@@ -93,14 +93,14 @@ class TrackerInfo
             peers = p;
         }
 
-        BEValue bev = (BEValue)m.get("complete");
+        BEValue bev = m.get("complete");
         if (bev != null) try {
           complete = bev.getInt();
           if (complete < 0)
               complete = 0;
         } catch (InvalidBEncodingException ibe) {}
 
-        bev = (BEValue)m.get("incomplete");
+        bev = m.get("incomplete");
         if (bev != null) try {
           incomplete = bev.getInt();
           if (incomplete < 0)

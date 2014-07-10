@@ -4,7 +4,7 @@ set -u
 
 BASEDIR="$(dirname $0)/../../"
 cd "$BASEDIR"
-RESEEDHOSTS=$(sed -e '/\s\+"https:\/\/[-a-z0-9.]/!d' -e 's/.*"https:\/\/\([-a-z0-9.]\+\).*/\1/' router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java)
+RESEEDHOSTS=$(sed -e '/^\s\+"https:\/\/[-a-z0-9.]/!d' -e 's/.*"https:\/\/\([-a-z0-9.:]\+\).*/\1/' router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java)
 CERTHOME="installer/resources/certificates"
 CACERTS=$(mktemp)
 WORK=$(mktemp -d)
@@ -81,9 +81,9 @@ normalize(){
 
 connect() {
     if [ $OPENSSL -eq 1 ]; then
-        $OPENSSL_BIN s_client -connect "$1:443" -CAfile $CACERTS -servername $1 < /dev/null 2> /dev/null
+        $OPENSSL_BIN s_client -connect "$1:$2" -CAfile $CACERTS -servername $1 < /dev/null 2> /dev/null
     else
-        $GNUTLS_BIN --insecure --print-cert --x509cafile "$CACERTS" "$1"  < /dev/null 2>/dev/null
+        $GNUTLS_BIN --insecure --print-cert --x509cafile "$CACERTS" "$1" -p "$2"  < /dev/null 2>/dev/null
     fi
 }
 
@@ -119,8 +119,20 @@ cleanup() {
 
 check_hosts() {
     for HOST in $RESEEDHOSTS; do
-        echo -n "Checking $HOST..."
-        if retry connect "$HOST"  < /dev/null 1> "$WORK/$HOST"; then
+        if $(echo $HOST | grep -q ':'); then
+            OLDIFS=$IFS
+            IFS=":"
+            set -- $HOST
+            HOSTNAME=$1
+            PORT=$2
+            IFS=$OLDIFS
+        else
+            HOSTNAME=$HOST
+            PORT=443
+        fi
+
+        echo -n "Checking $HOSTNAME:$PORT..."
+        if retry connect "$HOSTNAME" "$PORT"  < /dev/null 1> "$WORK/$HOST"; then
 
             # OpenSSL returns "return code: 0 (ok)"
             # GnuTLS returns "certificate is trusted"

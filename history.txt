@@ -1,3 +1,42 @@
+2014-07-03 zzz
+ * Base64:
+  - Catch numerous decoding errors that were previously misdecoded (ticket #1318)
+  - Improve decoding efficiency, reduce copies
+  - encode(String) now uses UTF-8 encoding
+  - decode() now accepts short strings without trailing '='
+  - whitespace in decode will now cause an error, was previously ignored
+ * Console: Add event log viewer (ticket #1117)
+
+2014-07-02 kytv
+ * Update Java Service Wrapper to v3.5.25
+    - Windows: x86 and x64 versions self-compiled with VS2010 in
+      Windows 7. The icon has been changed from Tanuki's default to Itoopie.
+    - Linux ARMv6: Compiled on a RaspberryPi using gcc 4.6.3-14+rpi1,
+      Oracle Java 1.7.0+update40 and stripped
+    - All other binaries are from the "community edition" deltapack offered by
+      Tanuki.
+
+2014-06-29 zzz
+ * NetDB: Fix handling reseed URLs with ports (ticket #1278)
+
+2014-06-28 zzz
+ * NetDB: Add support for reseeding with su3 files (ticket #934)
+ * SAM:
+   - Support SIGNATURE_TYPE, bump to 3.1 (ticket #1318)
+   - Private key checking fixes (ticket #1318)
+   - Parameter parsing fixes (ticket #1325)
+   - Cleanups
+
+2014-06-24 zzz
+ * Streaming; Drop the preliminary channel implementations,
+   as they don't work and can't ever work as designed.
+
+2014-06-23 zzz
+ * Streaming:
+   - Bundle new socket messages for translation
+   - Fix connection error message
+ * Tunnels: Reject participating tunnels when hidden (ticket #1314)
+
 2014-06-21 zzz
  * i2psnark:
    - Display webapp name in html title (ticket #1311)

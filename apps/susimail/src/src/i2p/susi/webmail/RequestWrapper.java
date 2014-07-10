@@ -154,7 +154,7 @@ class RequestWrapper {
 	{
 		String result = defaultValue;
 		if( multiPartRequest != null ) {
-			String str = (String)cache.get( name );
+			String str = cache.get(name);
 			if( str != null ) {
 				result = str;
 			}

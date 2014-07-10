@@ -30,6 +30,14 @@ public class Hash extends SimpleDataStructure {
 
     /**
      * Pull from cache or return new
+     *
+     *  WARNING - If the SDS is found in the cache, the passed-in
+     *  byte array will be returned to the SimpleByteCache for reuse.
+     *  Do NOT save a reference to the passed-in data, or use or modify it,
+     *  after this call.
+     *
+     *  Ignore this warning and you WILL corrupt the cache or other data structures.
+     *
      * @throws IllegalArgumentException if data is not the correct number of bytes
      * @since 0.8.3
      */

@@ -980,6 +980,11 @@ public class NTCPTransport extends TransportImpl {
             _log.info("old: " + ohost + " config: " + name + " auto: " + enabled + " ssuOK? " + ssuOK);
         if (enabled.equals("always") ||
             (Boolean.parseBoolean(enabled) && ssuOK)) {
+            if (!ssuOK) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("null address with always config", new Exception());
+                return;
+            }
             // ip non-null
             String nhost = Addresses.toString(ip);
             if (_log.shouldLog(Log.INFO))

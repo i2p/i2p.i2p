@@ -22,17 +22,27 @@ import net.i2p.data.SessionTag;
  * Manage the session keys and session tags used for encryption and decryption.
  * This base implementation simply ignores sessions and acts as if everything is
  * unknown (and hence always forces a full ElGamal encryption for each message).
- * A more intelligent subclass should manage and persist keys and tags.
+ * See TransientSessionKeyManager subclass which manages and persists keys and tags.
  *
- * TODO if we aren't going to use this for testing, make it abstract.
  */
 public class SessionKeyManager {
 
     /**
-     *  Make this public if you need a dummy SessionKeyManager for testing
+     *  A dummy SessionKeyManager for testing or for passing to
+     *  ElGamalAESEngine.encrypt()
+     *
+     *  @since 0.9.14
      */
-    protected SessionKeyManager(I2PAppContext context) { // nop
-    }
+    public SessionKeyManager() {}
+
+    /**
+     *  A dummy SessionKeyManager for testing or for passing to
+     *  ElGamalAESEngine.encrypt()
+     *
+     *  @param context unused
+     *  @since public since 0.9.14; protected before that
+     */
+    public SessionKeyManager(I2PAppContext context) {}
     
     /**
      * Retrieve the session key currently associated with encryption to the target,

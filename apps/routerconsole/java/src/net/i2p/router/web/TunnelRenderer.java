@@ -78,7 +78,7 @@ public class TunnelRenderer {
         int inactive = 0;
         int displayed = 0;
         for (int i = 0; i < participating.size(); i++) {
-            HopConfig cfg = (HopConfig)participating.get(i);
+            HopConfig cfg = participating.get(i);
             long count = cfg.getProcessedMessagesCount();
             if (count <= 0) {
                 inactive++;

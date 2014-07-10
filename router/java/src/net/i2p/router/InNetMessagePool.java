@@ -379,8 +379,8 @@ public class InNetMessagePool implements Service {
             Hash from = null;
             synchronized (_pendingDataMessages) {
                 if (!_pendingDataMessages.isEmpty()) {
-                    msg = (I2NPMessage)_pendingDataMessages.remove(0);
-                    from = (Hash)_pendingDataMessagesFrom.remove(0);
+                    msg = _pendingDataMessages.remove(0);
+                    from = _pendingDataMessagesFrom.remove(0);
                 }
                 remaining = _pendingDataMessages.size();
             }
@@ -402,7 +402,7 @@ public class InNetMessagePool implements Service {
             int remaining = 0;
             synchronized (_pendingGatewayMessages) {
                 if (!_pendingGatewayMessages.isEmpty())
-                    msg = (I2NPMessage)_pendingGatewayMessages.remove(0);
+                    msg = _pendingGatewayMessages.remove(0);
                 remaining = _pendingGatewayMessages.size();
             }
             if (msg != null)
@@ -422,7 +422,7 @@ public class InNetMessagePool implements Service {
                         if (_pendingGatewayMessages.isEmpty())
                             _pendingGatewayMessages.wait();
                         else
-                            msg = (I2NPMessage)_pendingGatewayMessages.remove(0);
+                            msg = _pendingGatewayMessages.remove(0);
                     }
                     if (msg != null) {
                         long before = _context.clock().now();
@@ -453,8 +453,8 @@ public class InNetMessagePool implements Service {
                         if (_pendingDataMessages.isEmpty()) {
                             _pendingDataMessages.wait();
                         } else {
-                            msg = (I2NPMessage)_pendingDataMessages.remove(0);
-                            from = (Hash)_pendingDataMessagesFrom.remove(0);
+                            msg = _pendingDataMessages.remove(0);
+                            from = _pendingDataMessagesFrom.remove(0);
                         }
                     }
                     if (msg != null) {

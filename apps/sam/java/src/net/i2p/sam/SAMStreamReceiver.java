@@ -17,7 +17,7 @@ import net.i2p.data.Destination;
  * Interface for sending streaming data to a SAM client
  */
 
-public interface SAMStreamReceiver {
+interface SAMStreamReceiver {
     /**
      * Sends the result of a stream send operation
      * @param id Stream ID

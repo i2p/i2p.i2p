@@ -204,8 +204,7 @@ public class I2PSnarkServlet extends BasicServlet {
                     resp.sendError(404);
                 } else {
                     String base = addPaths(req.getRequestURI(), "/");
-                    @SuppressWarnings("unchecked") // TODO-Java6: Remove cast, return type is correct
-                    String listing = getListHTML(resource, base, true, method.equals("POST") ? (Map<String, String[]>) req.getParameterMap() : null);
+                    String listing = getListHTML(resource, base, true, method.equals("POST") ? req.getParameterMap() : null);
                     if (method.equals("POST")) {
                         // P-R-G
                         sendRedirect(req, resp, "");
@@ -547,7 +546,7 @@ public class I2PSnarkServlet extends BasicServlet {
 
         String stParamStr = stParam == null ? "" : "&amp;st=" + stParam;
         for (int i = 0; i < total; i++) {
-            Snark snark = (Snark)snarks.get(i);
+            Snark snark = snarks.get(i);
             boolean showPeers = showDebug || "1".equals(peerParam) || Base64.encode(snark.getInfoHash()).equals(peerParam);
             boolean hide = i < start || i >= start + pageSize;
             displaySnark(out, snark, uri, i, stats, showPeers, isDegraded, noThinsp, showDebug, hide, stParamStr);

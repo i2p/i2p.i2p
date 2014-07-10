@@ -22,7 +22,6 @@ class I2PSocketFull implements I2PSocket {
     private volatile Connection _connection;
     private final Destination _remotePeer;
     private final Destination _localPeer;
-    private volatile MessageChannel _channel;
     private final AtomicBoolean _closed = new AtomicBoolean();
     
     public I2PSocketFull(Connection con, I2PAppContext context) {
@@ -89,12 +88,14 @@ class I2PSocketFull implements I2PSocket {
     }
 
     /**
+     *  Unimplemented, unlikely to ever be implemented.
+     *
+     *  @deprecated
+     *  @return null always
      *  @since 0.8.9
      */
     public synchronized SelectableChannel getChannel() {
-        if (_channel == null)
-            _channel = new MessageChannel(this);
-        return _channel;
+        return null;
     }
     
     /**

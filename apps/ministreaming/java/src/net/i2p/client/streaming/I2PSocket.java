@@ -43,6 +43,10 @@ public interface I2PSocket extends Closeable {
     public OutputStream getOutputStream() throws IOException;
 
     /**
+     *  Unimplemented, unlikely to ever be implemented.
+     *
+     *  @deprecated
+     *  @return null always
      *  @since 0.8.9
      */
     public SelectableChannel getChannel() throws IOException;

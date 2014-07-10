@@ -425,7 +425,7 @@ public class BlockFile {
 	 */
 	public BSkipList getIndex(String name, Serializer key, Serializer val) throws IOException {
 		// added I2P
-		BSkipList bsl = (BSkipList) openIndices.get(name);
+		BSkipList bsl = openIndices.get(name);
 		if (bsl != null)
 			return bsl;
 
@@ -465,7 +465,7 @@ public class BlockFile {
 	 *  Added I2P
 	 */
 	public void closeIndex(String name) {
-		BSkipList bsl = (BSkipList) openIndices.remove(name);
+		BSkipList bsl = openIndices.remove(name);
 		if (bsl != null)
 			bsl.flush();
 	}

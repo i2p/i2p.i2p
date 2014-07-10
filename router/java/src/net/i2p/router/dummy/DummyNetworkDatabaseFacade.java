@@ -49,12 +49,12 @@ public class DummyNetworkDatabaseFacade extends NetworkDatabaseFacade {
         else
             _context.jobQueue().addJob(onFindJob);
     }
-    public RouterInfo lookupRouterInfoLocally(Hash key) { return (RouterInfo)_routers.get(key); }
+    public RouterInfo lookupRouterInfoLocally(Hash key) { return _routers.get(key); }
     public void publish(LeaseSet localLeaseSet) {}
     public void publish(RouterInfo localRouterInfo) {}
     public LeaseSet store(Hash key, LeaseSet leaseSet) { return leaseSet; }
     public RouterInfo store(Hash key, RouterInfo routerInfo) {
-        RouterInfo rv = (RouterInfo)_routers.put(key, routerInfo);
+        RouterInfo rv = _routers.put(key, routerInfo);
         return rv;
     }
     public void unpublish(LeaseSet localLeaseSet) {}

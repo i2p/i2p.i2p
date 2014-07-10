@@ -159,6 +159,7 @@ public class KeyGenerator {
     /** Convert a PrivateKey to its corresponding PublicKey
      * @param priv PrivateKey object
      * @return the corresponding PublicKey object
+     * @throws IllegalArgumentException on bad key
      */
     public static PublicKey getPublicKey(PrivateKey priv) {
         BigInteger a = new NativeBigInteger(1, priv.toByteArray());
@@ -271,8 +272,11 @@ public class KeyGenerator {
      *
      * @param priv a SigningPrivateKey object
      * @return a SigningPublicKey object
+     * @throws IllegalArgumentException on bad key
      */
     public static SigningPublicKey getSigningPublicKey(SigningPrivateKey priv) {
+        if (priv.getType() != SigType.DSA_SHA1)
+            throw new IllegalArgumentException();
         BigInteger x = new NativeBigInteger(1, priv.toByteArray());
         BigInteger y = CryptoConstants.dsag.modPow(x, CryptoConstants.dsap);
         SigningPublicKey pub = new SigningPublicKey();

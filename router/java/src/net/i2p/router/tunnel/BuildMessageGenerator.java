@@ -152,7 +152,7 @@ public abstract class BuildMessageGenerator {
         // encrypt the records so that the right elements will be visible at the right time
         for (int i = 0; i < msg.getRecordCount(); i++) {
             ByteArray rec = msg.getRecord(i);
-            Integer hopNum = (Integer)order.get(i);
+            Integer hopNum = order.get(i);
             int hop = hopNum.intValue();
             if ( (isBlank(cfg, hop)) || (!cfg.isInbound() && hop == 1) ) {
                 //if (log.shouldLog(Log.DEBUG))

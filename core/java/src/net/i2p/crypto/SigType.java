@@ -210,7 +210,7 @@ public enum SigType {
                 return getByCode(code);
             } catch (NumberFormatException nfe) {
                 return null;
-             }
+            }
         }
     }
 }

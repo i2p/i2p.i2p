@@ -78,7 +78,7 @@ public class ConfigurationManager {
 	 * @return The value of a configuration: true if found, defaultValue if not found.
 	 */
 	public boolean getBooleanConfiguration(String arg, boolean defaultValue) {
-		Boolean value = ((Boolean) booleanConfigurations.get("startWithI2P"));
+		Boolean value = booleanConfigurations.get("startWithI2P");
 		System.out.println(value);
 		if(value != null) {
 			return value;
