@@ -25,7 +25,7 @@ import net.i2p.util.Log;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
-import java.nio.ByteBuffer ;
+import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 
 /**
@@ -34,7 +34,7 @@ import java.nio.channels.SocketChannel;
  * @author mkvore
  */
 
-public class SAMv3StreamSession  extends SAMStreamSession implements SAMv3Handler.Session
+class SAMv3StreamSession  extends SAMStreamSession implements SAMv3Handler.Session
 {
 
 		private static final int BUFFER_SIZE = 1024 ;
@@ -97,7 +97,8 @@ public class SAMv3StreamSession  extends SAMStreamSession implements SAMv3Handle
 	        if (props.getProperty(I2PSocketOptions.PROP_CONNECT_TIMEOUT) == null)
 	            opts.setConnectTimeout(60 * 1000);
 
-	        _log.debug("Connecting new I2PSocket...");
+	        if (_log.shouldLog(Log.DEBUG))
+	            _log.debug("Connecting new I2PSocket...");
 
 	        // blocking connection (SAMv3)
 
@@ -142,7 +143,8 @@ public class SAMv3StreamSession  extends SAMStreamSession implements SAMv3Handle
 	    	synchronized( this.socketServerLock )
 	    	{
 	    		if (this.socketServer!=null) {
-	    			_log.debug("a socket server is already defined for this destination");
+	                	if (_log.shouldLog(Log.DEBUG))
+	   				_log.debug("a socket server is already defined for this destination");
 	    			throw new SAMException("a socket server is already defined for this destination");
 	    		}
 	    		this.socketServer = this.socketMgr.getServerSocket();
@@ -183,7 +185,8 @@ public class SAMv3StreamSession  extends SAMStreamSession implements SAMv3Handle
 	        
 	    	String portStr = props.getProperty("PORT") ;
 	    	if ( portStr==null ) {
-	    		_log.debug("receiver port not specified");
+	                if (_log.shouldLog(Log.DEBUG))
+	    			_log.debug("receiver port not specified");
 	    		throw new SAMException("receiver port not specified");
 	    	}
 	    	int port = Integer.parseInt(portStr);
@@ -191,14 +194,16 @@ public class SAMv3StreamSession  extends SAMStreamSession implements SAMv3Handle
 	    	String host = props.getProperty("HOST");
 	    	if ( host==null ) {
 	    		host = rec.getHandler().getClientIP();
-	    		_log.debug("no host specified. Taken from the client socket : " + host +':'+port);
+	                if (_log.shouldLog(Log.DEBUG))
+		    		_log.debug("no host specified. Taken from the client socket : " + host +':'+port);
 	    	}
 
 	    	
 	    	synchronized( this.socketServerLock )
 	    	{
 	    		if (this.socketServer!=null) {
-	    			_log.debug("a socket server is already defined for this destination");
+		                if (_log.shouldLog(Log.DEBUG))
+		    			_log.debug("a socket server is already defined for this destination");
 	    			throw new SAMException("a socket server is already defined for this destination");
     			}
 	    		this.socketServer = this.socketMgr.getServerSocket();
@@ -337,12 +342,14 @@ public class SAMv3StreamSession  extends SAMStreamSession implements SAMv3Handle
 	    	synchronized( this.socketServerLock )
 	    	{
 	    		if (this.socketServer==null) {
-	    			_log.debug("no socket server is defined for this destination");
+		                if (_log.shouldLog(Log.DEBUG))
+		    			_log.debug("no socket server is defined for this destination");
 	    			throw new SAMException("no socket server is defined for this destination");
     			}
 	    		server = this.socketServer ;
 	    		this.socketServer = null ;
-	    		_log.debug("nulling socketServer in stopForwardingIncoming. Object " + this );
+	                if (_log.shouldLog(Log.DEBUG))
+		    		_log.debug("nulling socketServer in stopForwardingIncoming. Object " + this );
 	    	}
 	    	try {
 	    		server.close();

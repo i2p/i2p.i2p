@@ -513,14 +513,16 @@ public class SU3File {
     /** @since 0.9.9 */
     private static String dumpTypes() {
         StringBuilder buf = new StringBuilder(256);
-        buf.append("Available signature types:\n");
+        buf.append("Available signature types (-t):\n");
         for (SigType t : EnumSet.allOf(SigType.class)) {
             buf.append("      ").append(t).append("\t(code: ").append(t.getCode()).append(')');
             if (t.getCode() == DEFAULT_SIG_CODE)
                 buf.append(" DEFAULT");
+            if (!t.isAvailable())
+                buf.append(" UNAVAILABLE");
             buf.append('\n');
         }
-        buf.append("Available content types:\n");
+        buf.append("Available content types (-c):\n");
         for (ContentType t : EnumSet.allOf(ContentType.class)) {
             buf.append("      ").append(t).append("\t(code: ").append(t.getCode()).append(')');
             if (t == DEFAULT_CONTENT_TYPE)

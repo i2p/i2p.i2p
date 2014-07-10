@@ -1,4 +1,4 @@
-Changes may be needed for newer versions than 3.5.23.
+Changes may be needed for newer versions than 3.5.25.
 
 Copy Makefile-windows-x86-64.nmake to src\c.
 

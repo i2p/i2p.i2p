@@ -15,7 +15,7 @@ import net.i2p.data.Destination;
 /**
  * Interface for sending raw data to a SAM client
  */
-public interface SAMDatagramReceiver {
+interface SAMDatagramReceiver {
 
     /**
      * Send a byte array to a SAM client.

@@ -85,7 +85,7 @@ public class EepGetNamingService extends DummyNamingService {
 
         // lookup
         for (int i = 0; i < URLs.size(); i++) { 
-            String url = (String)URLs.get(i);
+            String url = URLs.get(i);
             String key = fetchAddr(url, hostname);	  	
             if (key != null) {
                 _log.error("Success: " + url + hostname);

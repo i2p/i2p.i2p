@@ -43,7 +43,7 @@ public class LoadClientAppsJob extends JobImpl {
             return;
         }
         for(int i = 0; i < apps.size(); i++) {
-            ClientAppConfig app = (ClientAppConfig) apps.get(i);
+            ClientAppConfig app = apps.get(i);
             if (app.disabled) {
                 if ("net.i2p.router.web.RouterConsoleRunner".equals(app.className)) {
                     String s = "Warning - Router console is disabled. To enable,\n edit the file " +

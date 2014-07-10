@@ -14,7 +14,6 @@ import net.i2p.client.streaming.I2PSocketManager;
  */
 class I2PServerSocketFull implements I2PServerSocket {
     private final I2PSocketManagerFull _socketManager;
-    private volatile AcceptingChannel _channel;
     
     public I2PServerSocketFull(I2PSocketManagerFull mgr) {
         _socketManager = mgr;
@@ -32,12 +31,14 @@ class I2PServerSocketFull implements I2PServerSocket {
     }
 
     /**
+     *  Unimplemented, unlikely to ever be implemented.
+     *
+     *  @deprecated
+     *  @return null always
      *  @since 0.8.11
      */
     public synchronized AcceptingChannel getChannel() {
-        if (_channel == null)
-            _channel = new AcceptingChannelImpl(_socketManager);
-        return _channel;
+        return null;
     }
     
     public long getSoTimeout() {

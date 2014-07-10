@@ -37,6 +37,7 @@ public abstract class DataStructureImpl implements DataStructure, Serializable {
     public void fromBase64(String data) throws DataFormatException {
         if (data == null) throw new DataFormatException("Null data passed in");
         byte bytes[] = Base64.decode(data);
+        if (bytes == null) throw new DataFormatException("Bad Base64 \"" + data + '"');
         fromByteArray(bytes);
     }
 

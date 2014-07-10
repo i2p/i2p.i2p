@@ -4,23 +4,21 @@
 #
 # postinstall
 # 2004 The I2P Project
-# http://www.i2p2.de/
+# https://geti2p.net
 # This code is public domain.
 #
 # author: hypercubus
 #
 # Installs the appropriate set of Java Service Wrapper support files for the
-# user's OS then launches the I2P router as a background service.
+# user's OS
 
 if [ ! "X$1" = "X" ]; then
     cd $1
 fi
 
 chmod 755 ./i2prouter
-# chmod 755 ./install_i2p_service_unix
 chmod 755 ./osid
 chmod 755 ./runplain.sh
-# chmod 755 ./uninstall_i2p_service_unix
 
 ERROR_MSG="Cannot determine operating system type. From the subdirectory in lib/wrapper matching your operating system, please move i2psvc to your base I2P directory, and move the remaining two files to the lib directory."
 LOGFILE=./postinstall.log
@@ -44,36 +42,30 @@ case $HOST_OS in
         # Wrapper we built for Raspberry Pi does not work on Trimslice armv7.
         if [ `echo $OS_ARCH |grep armv7` ]; then
             wrapperpath="./lib/wrapper/linux-armv5"
-            cp ${wrapperpath}/libwrapper.so ./lib/
         elif [ `echo $OS_ARCH |grep armv6` ]; then
             wrapperpath="./lib/wrapper/linux-armv6"
-            cp ${wrapperpath}/libwrapper.so ./lib/
         elif [ `echo $OS_ARCH |grep arm` ]; then
             wrapperpath="./lib/wrapper/linux-armv5"
-            cp ${wrapperpath}/libwrapper.so ./lib/
         elif [ `echo $OS_ARCH |grep ppc` ]; then
             wrapperpath="./lib/wrapper/linux-ppc"
-            cp ${wrapperpath}/libwrapper.so ./lib/
         elif [ "X$X86_64" = "X" ]; then
             wrapperpath="./lib/wrapper/linux"
-            cp ${wrapperpath}/libwrapper.so ./lib/
         else
             wrapperpath="./lib/wrapper/linux64"
-            cp ${wrapperpath}/libwrapper.so ./lib
             # the 32bit libwrapper.so will be needed if a 32 bit jvm is used
             cp ./lib/wrapper/linux/libwrapper.so ./lib/libwrapper-linux-x86-32.so
         fi
+        cp ${wrapperpath}/libwrapper.so ./lib/
         ;;
     freebsd )
         if [ ! `echo $OS_ARCH | grep amd64` ]; then
             wrapperpath="./lib/wrapper/freebsd"
-            cp ${wrapperpath}/libwrapper.so ./lib/
         else
             wrapperpath="./lib/wrapper/freebsd64"
-            cp ${wrapperpath}/libwrapper.so ./lib/
             # the 32bit libwrapper.so will be needed if a 32 bit jvm is used
             cp ./lib/wrapper/freebsd/libwrapper.so ./lib/libwrapper-freebsd-x86-32.so
         fi
+        cp ${wrapperpath}/libwrapper.so ./lib/
         ;;
     osx )
         wrapperpath="./lib/wrapper/macosx"
@@ -90,7 +82,7 @@ case $HOST_OS in
         # FIXME
         # This isn't displayed when installing, but if we fall back to the "*)"
         # choice, no cleanup happens and users are advised to copy the wrapper
-        # in place...but there is no wrapper. Figuring how how to display this,
+        # in place...but there is no wrapper. Figuring out how to display this,
         # such as when doing a headless installation would be good.
         echo "The java wrapper is not supported on this platform."
         echo "Please use `pwd`/runplain.sh to start I2P."
@@ -111,13 +103,8 @@ if [ ! "X$wrapperpath" = "x" ]; then
 fi
 
 chmod 755 ./eepget
-rm -rf ./icons
-rm -rf ./lib/wrapper
-rm -f ./lib/*.dll
-rm -f ./*.bat
-rm -f ./*.cmd
-rm -f ./*.exe
-rm -rf ./utility.jar
+rm -rf ./icons ./lib/wrapper
+rm -f ./lib/*.dll /*.bat ./*.cmd ./*.exe ./utility.jar
 
 if [ ! `echo $HOST_OS  |grep osx` ]; then
     rm -rf ./Start\ I2P\ Router.app

@@ -17,12 +17,14 @@ import java.util.StringTokenizer;
 
 import net.i2p.data.DataHelper;
 import net.i2p.util.Log;
+import net.i2p.util.VersionComparator;
 
 /**
  * SAM handler factory class.
  */
-public class SAMHandlerFactory {
+class SAMHandlerFactory {
 
+    private static final String VERSION = "3.1";
 
     /**
      * Return the right SAM handler depending on the protocol version
@@ -46,62 +48,45 @@ public class SAMHandlerFactory {
             }
             tok = new StringTokenizer(line.trim(), " ");
         } catch (IOException e) {
-            throw new SAMException("Error reading from socket: "
-                                   + e.getMessage());
+            throw new SAMException("Error reading from socket", e);
         } catch (Exception e) {
-            throw new SAMException("Unexpected error: " + e.getMessage());
+            throw new SAMException("Unexpected error", e);
         }
 
-        // Message format: HELLO VERSION MIN=v1 MAX=v2
-        if (tok.countTokens() != 4) {
-            throw new SAMException("Bad format in HELLO message");
+        // Message format: HELLO VERSION [MIN=v1] [MAX=v2]
+        if (tok.countTokens() < 2) {
+            throw new SAMException("Must start with HELLO VERSION");
         }
-        if (!tok.nextToken().equals("HELLO")) {
-            throw new SAMException("Bad domain in HELLO message");
-        }
-        {
-            String opcode;
-            if (!(opcode = tok.nextToken()).equals("VERSION")) {
-                throw new SAMException("Unrecognized HELLO message opcode: '"
-                                       + opcode + "'");
-            }
+        if (!tok.nextToken().equals("HELLO") ||
+            !tok.nextToken().equals("VERSION")) {
+            throw new SAMException("Must start with HELLO VERSION");
         }
 
-        Properties props;
-        props = SAMUtils.parseParams(tok);
-        if (props == null) {
-            throw new SAMException("No parameters in HELLO VERSION message");
-        }
+        Properties props = SAMUtils.parseParams(tok);
 
         String minVer = props.getProperty("MIN");
         if (minVer == null) {
-            throw new SAMException("Missing MIN parameter in HELLO VERSION message");
+            //throw new SAMException("Missing MIN parameter in HELLO VERSION message");
+            // MIN optional as of 0.9.14
+            minVer = "1";
         }
 
         String maxVer = props.getProperty("MAX");
         if (maxVer == null) {
-            throw new SAMException("Missing MAX parameter in HELLO VERSION message");
+            //throw new SAMException("Missing MAX parameter in HELLO VERSION message");
+            // MAX optional as of 0.9.14
+            maxVer = "99.99";
         }
 
         String ver = chooseBestVersion(minVer, maxVer);
 
-        try {
-            if (ver == null) {
-            	s.write(ByteBuffer.wrap(("HELLO REPLY RESULT=NOVERSION\n").getBytes("ISO-8859-1")));
-            	return null ;
-            }
-            // Let's answer positively
-            s.write(ByteBuffer.wrap(("HELLO REPLY RESULT=OK VERSION="
-                       + ver + "\n").getBytes("ISO-8859-1")));
-        } catch (UnsupportedEncodingException e) {
-            log.error("Caught UnsupportedEncodingException ("
-                       + e.getMessage() + ")");
-            throw new SAMException("Character encoding error: "
-                                   + e.getMessage());
-        } catch (IOException e) {
-            throw new SAMException("Error writing to socket: "
-                                   + e.getMessage());       
+        if (ver == null) {
+            SAMHandler.writeString("HELLO REPLY RESULT=NOVERSION\n", s);
+            return null;
         }
+        // Let's answer positively
+        if (!SAMHandler.writeString("HELLO REPLY RESULT=OK VERSION=" + ver + "\n", s))
+            throw new SAMException("Error writing to socket");       
 
         // ...and instantiate the right SAM handler
         int verMajor = getMajor(ver);
@@ -130,48 +115,44 @@ public class SAMHandlerFactory {
         return handler;
     }
 
-    /* Return the best version we can use, or null on failure */
+    /*
+     * @return "x.y" the best version we can use, or null on failure
+     */
     private static String chooseBestVersion(String minVer, String maxVer) {
-    	
-        int minMajor = getMajor(minVer), minMinor = getMinor(minVer);
-        int maxMajor = getMajor(maxVer), maxMinor = getMinor(maxVer);
-
-        // Consistency checks
-        if ((minMajor == -1) || (minMinor == -1)
-            || (maxMajor == -1) || (maxMinor == -1)) {
-            return null;
-        }
-
-	if ((minMinor >= 10) || (maxMinor >= 10)) return null ;
-	
-	float fminVer = minMajor + (float) minMinor / 10 ;
-	float fmaxVer = maxMajor + (float) maxMinor / 10 ;
-	
-
-	if ( ( fminVer <=  3.0 ) && ( fmaxVer >= 3.0 ) ) return "3.0" ;
-
-	if ( ( fminVer <=  2.0 ) && ( fmaxVer >= 2.0 ) ) return "2.0" ;
-	
-	if ( ( fminVer <=  1.0 ) && ( fmaxVer >= 1.0 ) ) return "1.0" ;
-        
+        if (VersionComparator.comp(VERSION, minVer) >= 0 &&
+            VersionComparator.comp(VERSION, maxVer) <= 0)
+            return VERSION;
+        // in VersionComparator, "3" < "3.0" so
+        // use comparisons carefully
+        if (VersionComparator.comp("3.0", minVer) >= 0 &&
+            VersionComparator.comp("3", maxVer) <= 0)
+            return "3.0";
+        if (VersionComparator.comp("2.0", minVer) >= 0 &&
+            VersionComparator.comp("2", maxVer) <= 0)
+            return "2.0";
+        if (VersionComparator.comp("1.0", minVer) >= 0 &&
+            VersionComparator.comp("1", maxVer) <= 0)
+            return "1.0";
         return null;
     }
 
-    /* Get the major protocol version from a string */
+    /* Get the major protocol version from a string, or -1 */
     private static int getMajor(String ver) {
-        if ( (ver == null) || (ver.indexOf('.') < 0) )
+        if (ver == null)
             return -1;
+        int dot = ver.indexOf(".");
+        if (dot == 0)
+            return -1;
+        if (dot > 0)
+            ver = ver.substring(0, dot);
         try {
-            String major = ver.substring(0, ver.indexOf("."));
-            return Integer.parseInt(major);
+            return Integer.parseInt(ver);
         } catch (NumberFormatException e) {
-            return -1;
-        } catch (ArrayIndexOutOfBoundsException e) {
             return -1;
         }
     }
 
-    /* Get the minor protocol version from a string */
+    /* Get the minor protocol version from a string, or -1 */
     private static int getMinor(String ver) {
         if ( (ver == null) || (ver.indexOf('.') < 0) )
             return -1;

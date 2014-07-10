@@ -21,7 +21,7 @@ import net.i2p.util.Log;
  *
  * @author human
  */
-public class SAMRawSession extends SAMMessageSession {
+class SAMRawSession extends SAMMessageSession {
 
     public static final int RAW_SIZE_MAX = 32*1024;
 
@@ -31,7 +31,7 @@ public class SAMRawSession extends SAMMessageSession {
     /**
      * Create a new SAM RAW session.
      *
-     * @param dest Base64-encoded destination (private key)
+     * @param dest Base64-encoded destination and private keys (same format as PrivateKeyFile)
      * @param props Properties to setup the I2P session
      * @param recv Object that will receive incoming data
      * @throws IOException
@@ -48,7 +48,7 @@ public class SAMRawSession extends SAMMessageSession {
     /**
      * Create a new SAM RAW session.
      *
-     * @param destStream Input stream containing the destination keys
+     * @param destStream Input stream containing the destination and private keys (same format as PrivateKeyFile)
      * @param props Properties to setup the I2P session
      * @param recv Object that will receive incoming data
      * @throws IOException

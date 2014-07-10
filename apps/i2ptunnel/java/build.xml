@@ -25,6 +25,7 @@
         <isfalse value="${require.gettext}" />
     </condition>
 
+    <!-- only used if not set by a higher build.xml -->
     <property name="javac.compilerargs" value="" />
     <property name="javac.version" value="1.6" />
     <property name="require.gettext" value="true" />
@@ -34,7 +35,7 @@
         <mkdir dir="./build/obj" />
         <javac 
             srcdir="./src" 
-            debug="true" deprecation="on" source="1.5" target="1.5" 
+            debug="true" deprecation="on" source="${javac.version}" target="${javac.version}" 
             destdir="./build/obj" 
             includeAntRuntime="false"
             classpath="../../../core/java/build/i2p.jar:../../ministreaming/java/build/mstreaming.jar" >
@@ -281,7 +282,7 @@
         <mkdir dir="./build" />
         <mkdir dir="./build/obj" />
         <!-- We need the ant runtime, as it includes junit -->
-        <javac srcdir="./src:./test/junit" debug="true" source="1.5" target="1.5"
+        <javac srcdir="./src:./test/junit" debug="true" source="${javac.version}" target="${javac.version}"
                includeAntRuntime="true"
                deprecation="on" destdir="./build/obj" >
             <compilerarg line="${javac.compilerargs}" />

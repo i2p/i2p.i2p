@@ -68,7 +68,7 @@ class StandardSocket extends Socket {
     }
 
     /**
-     *  @return null always, see MessageChannel for more info
+     *  @return null always, unimplemented
      */
     @Override
     public SocketChannel getChannel() {

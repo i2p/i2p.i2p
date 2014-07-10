@@ -132,7 +132,7 @@ public interface I2PSession {
      * @since 0.7.1
      */
     public boolean sendMessage(Destination dest, byte[] payload, int offset, int size, SessionKey keyUsed, Set tagsSent,
-                               int proto, int fromport, int toport) throws I2PSessionException;
+                               int proto, int fromPort, int toPort) throws I2PSessionException;
 
     /**
      * See I2PSessionMuxedImpl for proto/port details.
@@ -151,7 +151,7 @@ public interface I2PSession {
      * @since 0.7.1
      */
     public boolean sendMessage(Destination dest, byte[] payload, int offset, int size, SessionKey keyUsed, Set tagsSent, long expire,
-                               int proto, int fromport, int toport) throws I2PSessionException;
+                               int proto, int fromPort, int toPort) throws I2PSessionException;
 
     /**
      * See I2PSessionMuxedImpl for proto/port details.
@@ -170,7 +170,7 @@ public interface I2PSession {
      * @since 0.8.4
      */
     public boolean sendMessage(Destination dest, byte[] payload, int offset, int size, SessionKey keyUsed, Set tagsSent, long expire,
-                               int proto, int fromport, int toport, int flags) throws I2PSessionException;
+                               int proto, int fromPort, int toPort, int flags) throws I2PSessionException;
 
     /**
      * See I2PSessionMuxedImpl for proto/port details.
@@ -188,7 +188,7 @@ public interface I2PSession {
      * @since 0.9.2
      */
     public boolean sendMessage(Destination dest, byte[] payload, int offset, int size,
-                               int proto, int fromport, int toport, SendMessageOptions options) throws I2PSessionException;
+                               int proto, int fromPort, int toPort, SendMessageOptions options) throws I2PSessionException;
 
     /**
      * Send a message and request an asynchronous notification of delivery status.
@@ -211,7 +211,7 @@ public interface I2PSession {
      * @since 0.9.14
      */
     public long sendMessage(Destination dest, byte[] payload, int offset, int size,
-                               int proto, int fromport, int toport,
+                               int proto, int fromPort, int toPort,
                                SendMessageOptions options, SendMessageStatusListener listener) throws I2PSessionException;
 
     /** Receive a message that the router has notified the client about, returning

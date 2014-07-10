@@ -67,6 +67,54 @@
             <echo message="Once the dependencies are installed, run &quot;ant debian&quot;"/>
             <echo message="to patch the source and build the packages." />
     </target>
+
+    <macrodef name="gpgsign">
+        <attribute name="file" />
+        <sequential>
+            <delete file="@{file}.sig" quiet="true" />
+            <exec executable="gpg" failonerror="true">
+                <arg value="--default-key" />
+                <arg value="${release.gpg.keyid}" />
+                <arg value="-b" />
+                <arg value="@{file}" />
+            </exec>
+            <chmod type="file" perm="444">
+                <fileset dir="${basedir}">
+                    <include name="@{file} @{file}.sig" />
+                </fileset>
+            </chmod>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="mktorrent">
+        <attribute name="file" />
+        <sequential>
+            <delete file="@{file}.torrent" quiet="true"/>
+            <java classname="org.klomp.snark.Storage" fork="true" failonerror="true">
+                <classpath>
+                    <pathelement location="build/i2p.jar" />
+                    <pathelement location="build/i2psnark.jar" />
+                </classpath>
+                <arg value="@{file}" />
+                <arg value="http://tracker2.postman.i2p/announce.php" />
+            </java>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="sha256sum">
+        <attribute name="file" />
+        <sequential>
+            <!--
+                 Note: "local" only works with ant 1.8+. This limitation shouldn't be
+                 a big deal since this macro is only called by the release
+                 target.
+             -->
+            <local name="file-sum"/>
+            <checksum format="MD5SUM" file="@{file}" property="file-sum" algorithm="sha-256"/>
+            <echo message="${file-sum}  @{file}" />
+        </sequential>
+    </macrodef>
+
     <target name="dist" depends="pkg, javadoc" />
     <target name="dist200" depends="pkg200, javadoc" />
     <target name="build" depends="build2">
@@ -91,22 +139,28 @@
 
     <target name="buildBOB" depends="buildStreaming" >
         <ant dir="apps/BOB/" target="jar" />
+        <copy file="apps/BOB/dist/BOB.jar" todir="build/" />
     </target>
 
     <target name="buildSAM" depends="buildStreaming" >
         <ant dir="apps/sam/java/" target="jar" />
+        <copy file="apps/sam/java/build/sam.jar" todir="build/" />
     </target>
 
     <target name="buildSusiMail" depends="buildCore, buildJetty" >
         <ant dir="apps/susimail/" target="war" />
+        <copy file="apps/susimail/susimail.war" todir="build/" />
     </target>
 
     <target name="buildSusiDNS" depends="buildCore, buildJetty" >
         <ant dir="apps/susidns/src" target="all" />
+        <copy file="apps/susidns/src/susidns.war" todir="build/" />
     </target>
 
     <target name="buildI2PSnark" depends="buildStreaming, buildJetty" >
         <ant dir="apps/i2psnark/java/" target="war" />
+        <copy file="apps/i2psnark/i2psnark.war" todir="build/" />
+        <copy file="apps/i2psnark/java/build/i2psnark.jar" todir="build/" />
     </target>
 
     <!-- jar (not war) for Android -->
@@ -116,15 +170,19 @@
 
     <target name="buildAddressbook" depends="buildCore, buildJetty" >
         <ant dir="apps/addressbook/" target="war" />
+        <copy file="apps/addressbook/dist/addressbook.war" todir="build/" />
     </target>
 
     <!-- jar only (no war) for Android -->
     <target name="buildI2PTunnelJar" depends="buildStreaming" >
         <ant dir="apps/i2ptunnel/java/" target="jar" />
+        <copy file="apps/i2ptunnel/java/build/i2ptunnel.jar" todir="build/" />
     </target>
 
     <target name="buildI2PTunnel" depends="buildStreaming, buildJetty" >
         <ant dir="apps/i2ptunnel/java/" target="build" />
+        <copy file="apps/i2ptunnel/java/build/i2ptunnel.jar" todir="build/" />
+        <copy file="apps/i2ptunnel/java/build/i2ptunnel.war" todir="build/" />
     </target>
 
     <target name="buildDesktopGui" depends="buildCore, buildrouter" >
@@ -132,6 +190,7 @@
         <ant dir="apps/desktopgui" target="clean" />
 -->
         <ant dir="apps/desktopgui" target="jar" />
+        <copy file="apps/desktopgui/dist/desktopgui.jar" todir="build/" />
     </target>
 
     <target name="buildRouterConsole" depends="buildrouter, buildSystray, buildDesktopGui, buildJetty" >
@@ -140,18 +199,24 @@
 
     <target name="buildJetty" depends="buildCore" >
         <ant dir="apps/jetty" target="build" />
+        <copy todir="build/" >
+            <fileset dir="apps/jetty/jettylib" excludes="ant.jar" />
+        </copy>
     </target>
 
     <target name="buildSystray" depends="buildCore" >
         <ant dir="apps/systray/java/" target="jar" />
+        <copy file="apps/systray/java/build/systray.jar" todir="build/" />
     </target>
 
     <target name="buildStreaming" depends="buildMinistreaming" >
         <ant dir="apps/streaming/java/" target="jar" />
+        <copy file="apps/streaming/java/build/streaming.jar" todir="build/" />
     </target>
 
     <target name="buildMinistreaming" depends="buildCore" >
         <ant dir="apps/ministreaming/java/" target="jar" />
+        <copy file="apps/ministreaming/java/build/mstreaming.jar" todir="build/" />
     </target>
 
     <target name="buildRouter" depends="buildrouter" />
@@ -174,9 +239,26 @@
                 <attribute name="Built-By" value="${build.built-by}" />
                 <attribute name="Build-Date" value="${build.timestamp}" />
                 <attribute name="Base-Revision" value="${workspace.version}" />
-	    </manifest>
+            </manifest>
         </jar>
     </target>
+
+    <target name="buildProperties" depends="getMtnRev, getReleaseNumber, getBuildNumber" >
+        <!-- default if not set above -->
+        <property name="workspace.version" value="unknown" />
+        <tstamp>
+            <format property="build.timestamp" pattern="yyyy-MM-dd HH:mm:ss z" timezone="UTC" locale="en" />
+        </tstamp>
+        <property name="full.version" value="${release.number}-${i2p.build.number}${build.extra}" />
+        <echo message="Building version ${full.version} (mtn rev ${workspace.version})" />
+    </target>
+
+    <target name="buildWEB" depends="buildRouterConsole" >
+        <copy file="apps/routerconsole/java/build/routerconsole.jar" todir="build/" />
+        <copy file="apps/routerconsole/java/build/routerconsole.war" todir="build/" />
+    </target>
+
+    <!-- end of sub-build.xml targets -->
 
     <target name="checkForMtn" >
         <available property="mtn.available" file="_MTN" type="dir" />
@@ -235,26 +317,6 @@
             match='(^\s+public\s+final\s+static\s+long\s+BUILD\s+=\s+)[0-9]+;' replace='\1${new.i2p.build.number};'/>
     </target>
 
-    <target name="buildProperties" depends="getMtnRev, getReleaseNumber, getBuildNumber" >
-        <!-- default if not set above -->
-        <property name="workspace.version" value="unknown" />
-        <tstamp>
-            <format property="build.timestamp" pattern="yyyy-MM-dd HH:mm:ss z" timezone="UTC" locale="en" />
-        </tstamp>
-        <property name="full.version" value="${release.number}-${i2p.build.number}${build.extra}" />
-        <echo message="Building version ${full.version} (mtn rev ${workspace.version})" />
-    </target>
-
-    <!-- end of sub-build.xml targets -->
-
-    <target name="buildWEB" depends="buildRouterConsole" >
-        <copy file="apps/routerconsole/java/build/routerconsole.jar" todir="build/" />
-        <copy file="apps/routerconsole/java/build/routerconsole.war" todir="build/" />
-        <copy todir="build/" >
-            <fileset dir="apps/jetty/jettylib" excludes="ant.jar" />
-        </copy>
-    </target>
-
     <condition property="noExe">
         <not>
             <!-- We only have launch4j binaries for the following systems -->
@@ -298,25 +360,17 @@
                  classpath="${basedir}/installer/lib/launch4j/launch4j.jar:${basedir}/installer/lib/launch4j/lib/xstream.jar" />
      </target>
 
-    <target name="jar" depends="jarSmall" >
-        <copy file="apps/BOB/dist/BOB.jar" todir="build/" />
-        <copy file="apps/sam/java/build/sam.jar" todir="build/" />
-        <copy file="apps/susimail/susimail.war" todir="build/" />
-        <copy file="apps/susidns/src/susidns.war" todir="build/" />
-        <copy file="apps/i2psnark/i2psnark.war" todir="build/" />
-        <copy file="apps/i2psnark/java/build/i2psnark.jar" todir="build/" />
+     <!--
+          the files are now copied to the build directory
+          in the build* targets
+      -->
+     <target name="jar" depends="jarSmall" />
+     <target name="jarSmall" depends="builddepSmall, buildJrobin" />
 
-    </target>
-    <target name="jarSmall" depends="builddepSmall, buildJrobin" >
-        <copy file="core/java/build/i2p.jar" todir="build/" />
-        <copy file="router/java/build/router.jar" todir="build/" />
-        <copy file="apps/ministreaming/java/build/mstreaming.jar" todir="build/" />
-        <copy file="apps/streaming/java/build/streaming.jar" todir="build/" />
-        <copy file="apps/i2ptunnel/java/build/i2ptunnel.jar" todir="build/" />
-        <copy file="apps/i2ptunnel/java/build/i2ptunnel.war" todir="build/" />
-        <copy file="apps/systray/java/build/systray.jar" todir="build/" />
-        <copy file="apps/desktopgui/dist/desktopgui.jar" todir="build/" />
-        <copy file="apps/addressbook/dist/addressbook.war" todir="build/" />
+    <!-- Custom target to collect the jars that I2P-Bote needs to compile, so it can compile from source. -->
+    <target name="jarBote" depends="buildRouter, buildStreaming, buildJetty" >
+        <copy file="apps/susidns/src/WEB-INF/lib/jstl.jar" todir="build/" />
+        <copy file="apps/susidns/src/WEB-INF/lib/standard.jar" todir="build/" />
     </target>
 
     <target name="jbigi-list-changes" depends="checkForMtn" if="mtn.available">
@@ -466,6 +520,7 @@
         <ant dir="apps/susimail/" target="poupdate" />
         <ant dir="apps/desktopgui" target="poupdate" />
         <ant dir="installer/resources/locale" target="poupdate" />
+        <ant dir="apps/ministreaming/" target="poupdate" />
     </target>
 
     <condition property="no.bundle">
@@ -543,8 +598,8 @@
                 <pathelement location="apps/jrobin/jrobin-1.5.9.1.jar" />
                 <pathelement location="installer/lib/wrapper/all/wrapper.jar" />
             </classpath>
-	    <!-- These variables are stored in build.properties. 
-		 End-users can override by creating the file override.properties -->
+            <!-- These variables are stored in build.properties.
+                  End-users can override by creating the file override.properties -->
             <link offline="true" href="${javasedocs.url}" packagelistLoc="installer/resources/package-lists/java/" />
             <link offline="true" href="${javaeedocs.url}" packagelistLoc="installer/resources/package-lists/javaee/" />
             <link offline="true" href="${jettydocs.url}" packagelistLoc="installer/resources/package-lists/jetty/" />
@@ -552,7 +607,9 @@
             <link offline="true" href="${wrapperdocs.url}" packagelistLoc="installer/resources/package-lists/wrapper/" />
         </javadoc>
         <echo message="Warning, javadoc embeds timestamps in the output, run with 'TZ=UTC ant javadoc' if you plan to distribute" />
-	<zip destfile="javadoc.zip" basedir="build" level="9" includes="javadoc\**" />
+    </target>
+    <target name="javadoc-zip" depends="javadoc">
+        <zip destfile="javadoc.zip" basedir="build" level="9" includes="javadoc\**" />
     </target>
 
     <target name="javadoc-test" depends="buildRouter, javadoc" >
@@ -580,8 +637,10 @@
                 <pathelement location="build/router.jar" />
                 <pathelement location="${junit.home}/junit4.jar" />
             </classpath>
-            <!-- These variables are stored in build.properties.
-         End-users can override by creating the file override.properties -->
+            <!--
+                 These variables are stored in build.properties.
+                 End-users can override by creating the file override.properties
+            -->
             <link offline="true" href="${javasedocs.url}" packagelistLoc="installer/resources/package-lists/java/" />
             <link offline="true" href="${junitdocs.url}" packagelistLoc="installer/resources/package-lists/junit/" />
             <link offline="true" href="${i2pdocs.url}" packagelistLoc="build/javadoc/" />
@@ -696,7 +755,7 @@
 
     <target name="distclean" depends="clean">
         <delete failonerror="false" quiet="true">
-            <fileset dir="." includes="i2pinstall* *.deb i2p_*.bz2 i2pupdate* i2psource*" />
+            <fileset dir="." includes="i2pinstall* *.deb i2p_*.bz2 i2pupdate* i2psource* *.sig *.torrent" />
         </delete>
         <ant dir="core/java/" target="distclean" />
         <ant dir="router/java/" target="distclean" />
@@ -1321,7 +1380,7 @@
         <izpack input="${basedir}/installer/install.xml" output="${basedir}/install.jar" installerType="standard" basedir="${basedir}" />
         <ant target="installerexe" />
         <delete file="${basedir}/install.jar" />
-        <move file="${basedir}/i2pinstall.exe" tofile="${basedir}/i2pinstall_${full.version}_windows-only.exe" />
+        <move file="${basedir}/i2pinstall.exe" tofile="${basedir}/i2pinstall_${full.version}_windows.exe" />
     </target>
 
     <!-- this is broken as installer-xxx targets may delete (or not delete) things in pkg-temp -->
@@ -1501,11 +1560,11 @@
 <!--
     <target name="release" depends="distclean, updaterWithJettyFixesAndJbigi , updater200WithJettyFixes, preppkg, installer, getReleaseNumber" >
 -->
-    <target name="release" depends="verifyReleaseBuildNumbers, -pre-release, distclean, testscripts, updaterWithJettyRepack, updater200WithJetty, delete-j6-update, installer-nowindows, delete-nonwindows, installer-windows" >
+    <target name="release" depends="verifyReleaseBuildNumbers, -pre-release, distclean, testscripts, updaterWithJettyRepack, updater200WithJetty, delete-j6-update, installer-nowindows, delete-nonwindows, installer-windows">
         <echo message="New version number is ${release.number}" />
         <copy file="i2pupdate.zip" tofile="i2pupdate_${release.number}.zip" />
-        <copy file="i2pinstall_${full.version}_windows-only.exe" tofile="i2pinstall_${release.number}_windows.exe" />
         <copy file="i2pinstall_${full.version}.jar" tofile="i2pinstall_${release.number}.jar" />
+        <copy file="i2pinstall_${full.version}_windows.exe" tofile="i2pinstall_${release.number}_windows.exe" />
         <delete file="i2pupdate.sud" />
         <delete file="i2pupdate.su2" />
         <!-- make this a lot easier by putting release.privkey=/path/to/privkey in override.properties -->
@@ -1671,48 +1730,20 @@
                 <equals arg1="${release.gpg.keyid}" arg2=""/>
             </condition>
         </fail>
-        <delete file="i2pinstall_${release.number}_windows.exe.sig" />
-        <delete file="i2pinstall_${release.number}.jar.sig" />
-        <delete file="i2psource_${release.number}.tar.bz2.sig" />
-        <delete file="i2pupdate_${release.number}.zip.sig" />
-        <exec executable="gpg" failonerror="true">
-            <arg value="--default-key" />
-            <arg value="${release.gpg.keyid}" />
-            <arg value="-b" />
-            <arg value="i2pinstall_${release.number}_windows.exe" />
-        </exec>
-        <exec executable="gpg" failonerror="true">
-            <arg value="--default-key" />
-            <arg value="${release.gpg.keyid}" />
-            <arg value="-b" />
-            <arg value="i2pinstall_${release.number}.jar" />
-        </exec>
-        <exec executable="gpg" failonerror="true">
-            <arg value="--default-key" />
-            <arg value="${release.gpg.keyid}" />
-            <arg value="-b" />
-            <arg value="i2psource_${release.number}.tar.bz2" />
-        </exec>
-        <exec executable="gpg" failonerror="true">
-            <arg value="--default-key" />
-            <arg value="${release.gpg.keyid}" />
-            <arg value="-b" />
-            <arg value="i2pupdate_${release.number}.zip" />
-        </exec>
-        <exec executable="chmod" failonerror="true">
-            <arg value="444" />
-            <arg value="i2pinstall_${release.number}_windows.exe" />
-            <arg value="i2pinstall_${release.number}.jar" />
-            <arg value="i2psource_${release.number}.tar.bz2" />
-            <arg value="i2pupdate_${release.number}.zip" />
-            <arg value="i2pupdate.su2" />
-            <arg value="i2pupdate.su3" />
-            <arg value="i2pupdate.sud" />
-            <arg value="i2pinstall_${release.number}_windows.exe.sig" />
-            <arg value="i2pinstall_${release.number}.jar.sig" />
-            <arg value="i2psource_${release.number}.tar.bz2.sig" />
-            <arg value="i2pupdate_${release.number}.zip.sig" />
-        </exec>
+
+        <!-- the gpgsign macro sets the permission of signed files and the sigs themselves to 444 -->
+        <gpgsign file="i2pinstall_${release.number}_windows.exe" />
+        <gpgsign file="i2pinstall_${release.number}.jar" />
+        <gpgsign file="i2psource_${release.number}.tar.bz2" />
+        <gpgsign file="i2pupdate_${release.number}.zip" />
+
+        <chmod perm="444" type="file">
+            <fileset dir="${basedir}">
+                <include name="i2pupdate.su2" />
+                <include name="i2pupdate.su3" />
+                <include name="i2pupdate.sud" />
+            </fileset>
+        </chmod>
         <echo message="File sizes:" />
         <exec executable="ls" failonerror="true">
             <arg value="-l" />
@@ -1729,43 +1760,20 @@
             <arg value="i2pupdate_${release.number}.zip.sig" />
         </exec>
         <echo message="SHA256 sums:" />
-        <exec executable="sha256sum" failonerror="true">
-            <arg value="i2pinstall_${release.number}_windows.exe" />
-            <arg value="i2pinstall_${release.number}.jar" />
-            <arg value="i2psource_${release.number}.tar.bz2" />
-            <arg value="i2pupdate_${release.number}.zip" />
-            <arg value="i2pupdate.su2" />
-            <arg value="i2pupdate.su3" />
-            <arg value="i2pupdate.sud" />
-        </exec>
+        <sha256sum file="i2pinstall_${release.number}_windows.exe" />
+        <sha256sum file="i2pinstall_${release.number}.jar" />
+        <sha256sum file="i2psource_${release.number}.tar.bz2" />
+        <sha256sum file="i2pupdate_${release.number}.zip" />
+        <sha256sum file="i2pupdate.su2" />
+        <sha256sum file="i2pupdate.su3" />
+        <sha256sum file="i2pupdate.sud" />
         <!-- make torrent files -->
         <copy file="i2pupdate.sud" tofile="i2pupdate-${release.number}.sud" />
-        <java classname="org.klomp.snark.Storage" fork="true" failonerror="true">
-            <classpath>
-                <pathelement location="build/i2p.jar" />
-                <pathelement location="build/i2psnark.jar" />
-            </classpath>
-            <arg value="i2pupdate-${release.number}.sud" />
-            <arg value="http://tracker2.postman.i2p/announce.php" />
-        </java>
+        <mktorrent file="i2pupdate-${release.number}.sud" />
         <copy file="i2pupdate.su2" tofile="i2pupdate-${release.number}.su2" />
-        <java classname="org.klomp.snark.Storage" fork="true" failonerror="true">
-            <classpath>
-                <pathelement location="build/i2p.jar" />
-                <pathelement location="build/i2psnark.jar" />
-            </classpath>
-            <arg value="i2pupdate-${release.number}.su2" />
-            <arg value="http://tracker2.postman.i2p/announce.php" />
-        </java>
+        <mktorrent file="i2pupdate-${release.number}.su2" />
         <copy file="i2pupdate.su3" tofile="i2pupdate-${release.number}.su3" />
-        <java classname="org.klomp.snark.Storage" fork="true" failonerror="true">
-            <classpath>
-                <pathelement location="build/i2p.jar" />
-                <pathelement location="build/i2psnark.jar" />
-            </classpath>
-            <arg value="i2pupdate-${release.number}.su3" />
-            <arg value="http://tracker2.postman.i2p/announce.php" />
-        </java>
+        <mktorrent file="i2pupdate-${release.number}.su3" />
         <echo message="Don't forget to mtn tag w: i2p-${release.number}" />
         <echo message="... and mtn cert t:i2p-${release.number} branch i2p.i2p.release" />
     </target>

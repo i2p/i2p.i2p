@@ -13,6 +13,9 @@ import java.util.TreeSet;
 import net.i2p.data.DataHelper;
 import net.i2p.stat.Rate;
 
+/**
+ *  /graphs.jsp, including form, and /graph.jsp
+ */
 public class GraphHelper extends FormHandler {
     protected Writer _out;
     private int _periodCount;
@@ -31,7 +34,7 @@ public class GraphHelper extends FormHandler {
     private static final String PROP_EVENTS = "routerconsole.graphEvents";
     public static final int DEFAULT_X = 250;
     public static final int DEFAULT_Y = 100;
-    private static final int DEFAULT_REFRESH = 60;
+    private static final int DEFAULT_REFRESH = 5*60;
     private static final int DEFAULT_PERIODS = 60;
     static final int MAX_X = 2048;
     static final int MAX_Y = 1024;

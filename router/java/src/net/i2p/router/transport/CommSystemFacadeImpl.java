@@ -115,7 +115,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         // Sum skew values
         long sum = 0;
         for (int i = first; i <= last; i++) {
-            long value = ((Long) (skews.get(i))).longValue();
+            long value = skews.get(i).longValue();
             //if (_log.shouldLog(Log.DEBUG))
             //    _log.debug("Adding clock skew " + i + " valued " + value + " s.");
             sum = sum + value;

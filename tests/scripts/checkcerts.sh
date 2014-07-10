@@ -95,7 +95,7 @@ checkcert() {
         # Certtool's format: Mon Mar 07 16:08:35 UTC 2022
         DATA=$(certtool -i < "$1" | sed -e '/Not\sAfter/!d' -e 's/^.*:\s\(.*\)/\1/')
         # The formatting is normalized for passing to the date2julian function (if needed)
-        set -- `echo $DATA`
+        set -- $DATA
         DATA="$2 $3 $4 $6 GMT"
     fi
     echo $DATA
@@ -128,7 +128,7 @@ compute_dates() {
         SECS=$(date -u -d "$EXPIRES" '+%s')
         DAYS="$(expr \( $SECS - $NOW \) / 86400)"
     else
-        set -- `echo $EXPIRES`
+        set -- $EXPIRES
         # date2julian needs the format mm dd yyyy
         SECS=$(date2julian `getmonth $1` $2 $4)
         DAYS=$(expr $SECS - $NOW)

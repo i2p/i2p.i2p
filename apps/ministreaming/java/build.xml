@@ -19,12 +19,21 @@
             </classpath>
         </depend>
     </target>
+
+    <!-- only used if not set by a higher build.xml -->
     <property name="javac.compilerargs" value="" />
+    <property name="javac.version" value="1.6" />
+    <property name="require.gettext" value="true" />
+
+    <condition property="no.bundle">
+        <isfalse value="${require.gettext}" />
+    </condition>
+
     <target name="compile" depends="depend">
         <mkdir dir="./build" />
         <mkdir dir="./build/obj" />
         <!-- half of this is deprecated classes so turn deprecation off -->
-        <javac srcdir="./src" debug="true" deprecation="off" source="1.5" target="1.5"
+        <javac srcdir="./src" debug="true" deprecation="off" source="${javac.version}" target="${javac.version}"
                includeAntRuntime="false"
                destdir="./build/obj" classpath="../../../core/java/build/i2p.jar" >
             <compilerarg line="${javac.compilerargs}" />
@@ -36,7 +45,7 @@
 	<mkdir dir="./buildTest/obj" />
         <javac
             srcdir="./test/junit"
-            debug="true" deprecation="on" source="1.5" target="1.5"
+            debug="true" deprecation="on" source="${javac.version}" target="${javac.version}"
             includeAntRuntime="false"
             destdir="./buildTest/obj"
             classpath="../../../core/java/build/i2p.jar:./build/mstreaming.jar" >
@@ -62,7 +71,7 @@
         </exec>
     </target>
 
-    <target name="jar" depends="compile, jarUpToDate, listChangedFiles" unless="jar.uptodate" >
+    <target name="jar" depends="compile, bundle, jarUpToDate, listChangedFiles" unless="jar.uptodate" >
         <!-- set if unset -->
         <property name="workspace.changes.tr" value="" />
         <jar destfile="./build/mstreaming.jar" basedir="./build/obj" includes="**/*.class" >
@@ -88,6 +97,35 @@
                 <isset property="mtn.available" />
             </and>
         </condition>
+    </target>
+    
+    <target name="bundle" depends="compile" unless="no.bundle">
+        <exec executable="sh" osfamily="unix" failifexecutionfails="true" failonerror="${require.gettext}" >
+            <env key="JAVA_HOME" value="${java.home}" />
+            <arg value="./bundle-messages.sh" />
+        </exec>
+        <exec executable="sh" osfamily="mac" failifexecutionfails="true" failonerror="${require.gettext}" >
+            <arg value="./bundle-messages.sh" />
+        </exec>
+        <exec executable="sh" osfamily="windows" failifexecutionfails="false" >
+            <arg value="./bundle-messages.sh" />
+        </exec>
+    </target>
+
+    <target name="poupdate" depends="builddep, compile">
+        <!-- Update the messages_*.po files.  -->
+        <exec executable="sh" osfamily="unix" failifexecutionfails="true" failonerror="true" >
+            <arg value="./bundle-messages.sh" />
+            <arg value="-p" />
+        </exec>
+        <exec executable="sh" osfamily="mac" failifexecutionfails="true" failonerror="true" >
+            <arg value="./bundle-messages.sh" />
+            <arg value="-p" />
+        </exec>
+        <exec executable="sh" osfamily="windows" failifexecutionfails="true" failonerror="true" >
+            <arg value="./bundle-messages.sh" />
+            <arg value="-p" />
+        </exec>
     </target>
 
     <target name="javadoc">

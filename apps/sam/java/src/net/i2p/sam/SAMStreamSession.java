@@ -46,7 +46,7 @@ import net.i2p.util.Log;
  *
  * @author human
  */
-public class SAMStreamSession {
+class SAMStreamSession {
 
     protected final Log _log;
 
@@ -80,7 +80,7 @@ public class SAMStreamSession {
     /**
      * Create a new SAM STREAM session.
      *
-     * @param dest Base64-encoded destination (private key)
+     * @param dest Base64-encoded destination and private keys (same format as PrivateKeyFile)
      * @param dir Session direction ("RECEIVE", "CREATE" or "BOTH")
      * @param props Properties to setup the I2P session
      * @param recv Object that will receive incoming data
@@ -96,7 +96,7 @@ public class SAMStreamSession {
     /**
      * Create a new SAM STREAM session.
      *
-     * @param destStream Input stream containing the destination keys
+     * @param destStream Input stream containing the destination and private keys (same format as PrivateKeyFile)
      * @param dir Session direction ("RECEIVE", "CREATE" or "BOTH")
      * @param props Properties to setup the I2P session
      * @param recv Object that will receive incoming data
@@ -108,7 +108,8 @@ public class SAMStreamSession {
                             Properties props,  SAMStreamReceiver recv) throws IOException, DataFormatException, SAMException {
         this.recv = recv;
         _log = new Log(getClass());
-        _log.debug("SAM STREAM session instantiated");
+        if (_log.shouldLog(Log.DEBUG))
+	        _log.debug("SAM STREAM session instantiated");
 
         Properties allprops = (Properties) System.getProperties().clone();
         allprops.putAll(props);
@@ -122,7 +123,8 @@ public class SAMStreamSession {
             throw new SAMException("Invalid I2CP port specified [" + port + "]");
         }
 
-        _log.debug("Creating I2PSocketManager...");
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Creating I2PSocketManager...");
         socketMgr = I2PSocketManagerFactory.createManager(destStream,
                                                           i2cpHost,
                                                           i2cpPort, 
@@ -193,12 +195,14 @@ public class SAMStreamSession {
      */
     public boolean connect ( int id, String dest, Properties props ) throws I2PException, ConnectException, NoRouteToHostException, DataFormatException, InterruptedIOException, SAMInvalidDirectionException, IOException {
         if (!canCreate) {
-            _log.debug("Trying to create an outgoing connection using a receive-only session");
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Trying to create an outgoing connection using a receive-only session");
             throw new SAMInvalidDirectionException("Trying to create connections through a receive-only session");
         }
 
         if (checkSocketHandlerId(id)) {
-            _log.debug("The specified id (" + id + ") is already in use");
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("The specified id (" + id + ") is already in use");
             return false;
         }
 
@@ -209,7 +213,8 @@ public class SAMStreamSession {
         if (props.getProperty(I2PSocketOptions.PROP_CONNECT_TIMEOUT) == null)
             opts.setConnectTimeout(60 * 1000);
 
-        _log.debug("Connecting new I2PSocket...");
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Connecting new I2PSocket...");
 
 	// blocking connection (SAMv1)
 
@@ -271,7 +276,8 @@ public class SAMStreamSession {
      */
     public boolean closeConnection(int id) {
         if (!checkSocketHandlerId(id)) {
-            _log.debug("The specified id (" + id + ") does not exist!");
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("The specified id (" + id + ") does not exist!");
             return false;
         }
         removeSocketHandler(id);
@@ -368,7 +374,8 @@ public class SAMStreamSession {
             reader.stopRunning();
         if (sender != null)
             sender.shutDownGracefully();
-        _log.debug("Removed SAM STREAM session socket handler (gracefully) " + id);
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Removed SAM STREAM session socket handler (gracefully) " + id);
     }
 
     /**
@@ -413,7 +420,8 @@ public class SAMStreamSession {
          *
          */
         public SAMStreamSessionServer() {
-            _log.debug("Instantiating new SAM STREAM session server");
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Instantiating new SAM STREAM session server");
 
             serverSocket = socketMgr.getServerSocket();
         }
@@ -423,7 +431,8 @@ public class SAMStreamSession {
          *
          */
         public void stopRunning() {
-            _log.debug("SAMStreamSessionServer.stopRunning() invoked");
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("SAMStreamSessionServer.stopRunning() invoked");
             synchronized (runningLock) {
                 if (stillRunning) {
                     stillRunning = false;
@@ -437,7 +446,8 @@ public class SAMStreamSession {
         }
 
         public void run() {
-            _log.debug("SAM STREAM session server running");
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("SAM STREAM session server running");
             I2PSocket i2ps;
 
             while (stillRunning) {
@@ -446,7 +456,8 @@ public class SAMStreamSession {
                     if (i2ps == null)
                         break;
 
-                    _log.debug("New incoming connection");
+                   if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("New incoming connection");
 
                     int id = createSocketHandler(i2ps, 0);
                     if (id == 0) {
@@ -455,14 +466,17 @@ public class SAMStreamSession {
                         continue;
                     }
 
-                    _log.debug("New connection id: " + id);
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("New connection id: " + id);
 
                     recv.notifyStreamIncomingConnection ( id, i2ps.getPeerDestination() );
                 } catch (I2PException e) {
-                    _log.debug("Caught I2PException", e);
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("Caught I2PException", e);
                     break;
                 } catch (IOException e) {
-                    _log.debug("Caught IOException", e);
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("Caught IOException", e);
                     break;
                 }
             }
@@ -470,12 +484,14 @@ public class SAMStreamSession {
             try {
                 serverSocket.close(); // In case it wasn't closed, yet
             } catch (I2PException e) {
-                _log.debug("Caught I2PException", e);
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Caught I2PException", e);
             }
             
             close();
 
-            _log.debug("Shutting down SAM STREAM session server");
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Shutting down SAM STREAM session server");
         }
                 
     }
@@ -483,7 +499,8 @@ public class SAMStreamSession {
 
     boolean setReceiveLimit ( int id, long limit, boolean nolimit )
     {
-        _log.debug ( "Protocol v1 does not support a receive limit for streams" );
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug ( "Protocol v1 does not support a receive limit for streams" );
 	return false ;
     }
 
@@ -540,7 +557,8 @@ public class SAMStreamSession {
 
         public SAMv1StreamSessionSocketReader ( I2PSocket s, int id ) throws IOException {
             super(s, id);
-            _log.debug("Instantiating new SAM STREAM session socket reader");
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Instantiating new SAM STREAM session socket reader");
         }
 
         /**
@@ -549,7 +567,8 @@ public class SAMStreamSession {
          */
         @Override
         public void stopRunning() {
-            _log.debug("stopRunning() invoked on socket reader " + id);
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("stopRunning() invoked on socket reader " + id);
             synchronized (runningLock) {
                 if (stillRunning) {
                     stillRunning = false;
@@ -560,7 +579,8 @@ public class SAMStreamSession {
 
         @Override
         public void run() {
-            _log.debug("run() called for socket reader " + id);
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("run() called for socket reader " + id);
 
             int read = -1;
             ByteBuffer data = ByteBuffer.allocate(SOCKET_HANDLER_BUF_SIZE);
@@ -572,20 +592,23 @@ public class SAMStreamSession {
                 	data.clear();
                     read = Channels.newChannel(in).read(data);
                     if (read == -1) {
-                        _log.debug("Handler " + id + ": connection closed");
+                        if (_log.shouldLog(Log.DEBUG))
+                            _log.debug("Handler " + id + ": connection closed");
                         break;
                     }
                     data.flip();
                     recv.receiveStreamBytes(id, data);
                 }
             } catch (IOException e) {
-                _log.debug("Caught IOException", e);
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Caught IOException", e);
             }
             
             try {
                 i2pSocket.close();
             } catch (IOException e) {
-                _log.debug("Caught IOException", e);
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Caught IOException", e);
             }
 
             if (stillRunning) {
@@ -594,12 +617,14 @@ public class SAMStreamSession {
                 try {
                     recv.notifyStreamDisconnection(id, "OK", null);
                 } catch (IOException e) {
-                    _log.debug("Error sending disconnection notice for handler "
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("Error sending disconnection notice for handler "
                                + id, e);
                 }
             }
 
-            _log.debug("Shutting down SAM STREAM session socket handler " +id);
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Shutting down SAM STREAM session socket handler " +id);
         }
     }
     
@@ -691,14 +716,16 @@ public class SAMStreamSession {
          */
         @Override
         public void stopRunning() {
-            _log.debug("stopRunning() invoked on socket sender " + _id);
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("stopRunning() invoked on socket sender " + _id);
             synchronized (runningLock) {
                 if (_stillRunning) {
                     _stillRunning = false;
                     try {
                         i2pSocket.close();
                     } catch (IOException e) {
-                        _log.debug("Caught IOException", e);
+                        if (_log.shouldLog(Log.DEBUG))
+                            _log.debug("Caught IOException", e);
                     }
                     synchronized (_data) {
                         _data.clear();
@@ -714,13 +741,15 @@ public class SAMStreamSession {
          */
         @Override
         public void shutDownGracefully() {
-            _log.debug("shutDownGracefully() invoked on socket sender " + _id);
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("shutDownGracefully() invoked on socket sender " + _id);
             _shuttingDownGracefully = true;
         }
 
         @Override
         public void run() {
-            _log.debug("run() called for socket sender " + _id);
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("run() called for socket sender " + _id);
             ByteArray data = null;
             while (_stillRunning) {
                 data = null;

@@ -15,13 +15,16 @@
             destdir="./build/obj" >
         </depend>
     </target>
+
     <!-- only used if not set by a higher build.xml -->
     <property name="javac.compilerargs" value="" />
     <property name="javac.classpath" value="" />
+    <property name="javac.version" value="1.6" />
+
     <target name="compile" depends="depend">
         <mkdir dir="./build" />
         <mkdir dir="./build/obj" />
-        <javac srcdir="./src" debug="true" source="1.5" target="1.5" deprecation="on"
+        <javac srcdir="./src" debug="true" source="${javac.version}" target="${javac.version}" deprecation="on"
             includeAntRuntime="false"
             destdir="./build/obj" classpath="${javac.classpath}:../../core/java/build/obj" >
             <compilerarg line="${javac.compilerargs}" />

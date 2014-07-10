@@ -240,7 +240,7 @@ public class BlockfileNamingService extends DummyNamingService {
                             if (line.length() < split + 1)
                                 continue;
                         }
-                        String b64 = line.substring(split+1);   //.trim() ??????????????
+                        String b64 = line.substring(split+1).trim();
                         Destination d = lookupBase64(b64);
                         if (d != null) {
                             addEntry(rv, hostsfile, key, d, sourceMsg);

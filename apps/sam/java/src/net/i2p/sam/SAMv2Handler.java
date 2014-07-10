@@ -21,7 +21,7 @@ import net.i2p.util.Log;
  * @author mkvore
  */
 
-public class SAMv2Handler extends SAMv1Handler implements SAMRawReceiver, SAMDatagramReceiver, SAMStreamReceiver
+class SAMv2Handler extends SAMv1Handler implements SAMRawReceiver, SAMDatagramReceiver, SAMStreamReceiver
 {
 
 
@@ -55,9 +55,10 @@ public class SAMv2Handler extends SAMv1Handler implements SAMRawReceiver, SAMDat
 			super ( s, verMajor, verMinor, i2cpProps );
 		}
 		
+		@Override
 		public boolean verifVersion()
 		{
-			return (verMajor == 2 && verMinor == 0) ;
+			return (verMajor == 2);
 		}
 
 		SAMStreamSession newSAMStreamSession(String destKeystream, String direction, Properties props )
@@ -68,6 +69,7 @@ public class SAMv2Handler extends SAMv1Handler implements SAMRawReceiver, SAMDat
 		
 		
 		/* Parse and execute a STREAM message */
+		@Override
 		protected boolean execStreamMessage ( String opcode, Properties props )
 		{
 			if ( getStreamSession() == null )
@@ -94,7 +96,8 @@ public class SAMv2Handler extends SAMv1Handler implements SAMRawReceiver, SAMDat
 			}
 			else
 			{
-				_log.debug ( "Unrecognized RAW message opcode: \""
+				if (_log.shouldLog(Log.DEBUG))
+					_log.debug ( "Unrecognized RAW message opcode: \""
 						+ opcode + "\"" );
 				return false;
 			}
@@ -106,9 +109,10 @@ public class SAMv2Handler extends SAMv1Handler implements SAMRawReceiver, SAMDat
 		
 		private boolean execStreamReceive ( Properties props )
 		{
-			if ( props == null )
+			if (props.isEmpty())
 			{
-				_log.debug ( "No parameters specified in STREAM RECEIVE message" );
+				if (_log.shouldLog(Log.DEBUG))
+					_log.debug ( "No parameters specified in STREAM RECEIVE message" );
 				return false;
 			}
 
@@ -119,7 +123,8 @@ public class SAMv2Handler extends SAMv1Handler implements SAMRawReceiver, SAMDat
 
 				if ( strid == null )
 				{
-					_log.debug ( "ID not specified in STREAM RECEIVE message" );
+					if (_log.shouldLog(Log.DEBUG))
+						_log.debug ( "ID not specified in STREAM RECEIVE message" );
 					return false;
 				}
 
@@ -129,7 +134,8 @@ public class SAMv2Handler extends SAMv1Handler implements SAMRawReceiver, SAMDat
 				}
 				catch ( NumberFormatException e )
 				{
-					_log.debug ( "Invalid STREAM RECEIVE ID specified: " + strid );
+					if (_log.shouldLog(Log.DEBUG))
+						_log.debug ( "Invalid STREAM RECEIVE ID specified: " + strid );
 					return false;
 				}
 			}
@@ -142,7 +148,8 @@ public class SAMv2Handler extends SAMv1Handler implements SAMRawReceiver, SAMDat
 
 				if ( strsize == null )
 				{
-					_log.debug ( "Limit not specified in STREAM RECEIVE message" );
+					if (_log.shouldLog(Log.DEBUG))
+						_log.debug ( "Limit not specified in STREAM RECEIVE message" );
 					return false;
 				}
 
@@ -158,13 +165,15 @@ public class SAMv2Handler extends SAMv1Handler implements SAMRawReceiver, SAMDat
 					}
 					catch ( NumberFormatException e )
 					{
-						_log.debug ( "Invalid STREAM RECEIVE size specified: " + strsize );
+						if (_log.shouldLog(Log.DEBUG))
+							_log.debug ( "Invalid STREAM RECEIVE size specified: " + strsize );
 						return false;
 					}
 
 					if ( limit < 0 )
 					{
-						_log.debug ( "Specified limit (" + limit
+						if (_log.shouldLog(Log.DEBUG))
+							_log.debug ( "Specified limit (" + limit
 								+ ") is out of protocol limits" );
 						return false;
 					}

@@ -267,4 +267,14 @@ public abstract class FormHandler {
     public String _(String s, Object o, Object o2) {
         return Messages.getString(s, o, o2, _context);
     }
+
+    /**
+     *  Mark a string for extraction by xgettext and translation.
+     *  Use this only in static initializers.
+     *  It does not translate!
+     *  @return s
+     */
+    public static String _x(String s) {
+        return s;
+    }
 }

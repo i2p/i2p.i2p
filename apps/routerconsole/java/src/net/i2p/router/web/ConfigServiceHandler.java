@@ -25,6 +25,7 @@ public class ConfigServiceHandler extends FormHandler {
     private static WrapperListener _wrapperListener;
 
     private static final String LISTENER_AVAILABLE = "3.2.0";
+    private static final String PROPERTIES_AVAILABLE = "3.2.0";
 
     /**
      *  Register two shutdown hooks, one to rekey and/or tell the wrapper we are stopping,
@@ -72,19 +73,20 @@ public class ConfigServiceHandler extends FormHandler {
                     ContextHelper.getContext(null).router().killKeys();
                 if (_tellWrapper) {
                     int wait = WAIT;
-                    // getProperties() not available on old wrappers,
-                    // TODO find out what version and test
-                    try {
-                        Properties props = WrapperManager.getProperties();
-                        String tmout = props.getProperty("wrapper.jvm_exit.timeout");
-                        if (tmout != null) {
-                            try {
-                                int cwait = Integer.parseInt(tmout) * 1000;
-                                if (cwait > wait)
-                                    wait = cwait;
-                            } catch (NumberFormatException nfe) {}
-                        }
-                    } catch (Throwable t) {}
+                    String wv = System.getProperty("wrapper.version");
+                    if (wv != null && VersionComparator.comp(wv, PROPERTIES_AVAILABLE) >= 0) {
+                        try {
+                            Properties props = WrapperManager.getProperties();
+                            String tmout = props.getProperty("wrapper.jvm_exit.timeout");
+                            if (tmout != null) {
+                                try {
+                                    int cwait = Integer.parseInt(tmout) * 1000;
+                                    if (cwait > wait)
+                                        wait = cwait;
+                                } catch (NumberFormatException nfe) {}
+                            }
+                        } catch (Throwable t) {}
+                    }
                     WrapperManager.signalStopping(wait);
                 }
             } catch (Throwable t) {
