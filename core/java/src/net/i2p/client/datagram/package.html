@@ -10,6 +10,9 @@ in turn, use the {@link net.i2p.client.datagram.I2PDatagramMaker} to build a
 message that can be parsed. </p>
 
 <p>The datagram format implemented here includes
-the sender's {@link net.i2p.data.Destination}, the payload, and a hash of the 
-payload (signed by the sender's {@link net.i2p.data.SigningPrivateKey}).</p>
+the sender's {@link net.i2p.data.Destination}, the payload, and a signature
+(signed by the sender's {@link net.i2p.data.SigningPrivateKey}).
+For DSA_SHA1 destinations, the signature is of the SHA-256 Hash of the payload.
+For other destination types, the signature is of the payload itself.
+</p>
 </body></html>
