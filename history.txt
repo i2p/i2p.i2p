@@ -1,3 +1,6 @@
+2014-07-15 str4d
+ * I2CP: Stubs for I2CP connections over Unix domain sockets
+
 2014-07-03 zzz
  * Base64:
   - Catch numerous decoding errors that were previously misdecoded (ticket #1318)
