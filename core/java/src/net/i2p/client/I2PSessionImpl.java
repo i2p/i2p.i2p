@@ -160,7 +160,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
 
     /**
      * Use Unix domain socket (or similar) to connect to a router
-     * @since 0.9.15
+     * @since 0.9.14
      */
     protected static final String PROP_DOMAIN_SOCKET = "i2cp.domainSocket";
 

@@ -8,10 +8,12 @@ import net.i2p.router.RouterContext;
 
 /**
  * Unix domain socket version of ClientListenerRunner.
+ * <p/>
  * This is a stub that does nothing.
  * This class is replaced in the Android build.
  *
- * @since 0.9.15
+ * @author str4d
+ * @since 0.9.14
  */
 public class DomainClientListenerRunner extends ClientListenerRunner {
     public DomainClientListenerRunner(RouterContext context, ClientManager manager) {

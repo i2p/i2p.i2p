@@ -13,7 +13,7 @@ import net.i2p.I2PAppContext;
  * This class is replaced in the Android build.
  *
  * @author str4d
- * @since 0.9.15
+ * @since 0.9.14
  */
 public class DomainSocketFactory {
     public static String I2CP_SOCKET_ADDRESS = "net.i2p.client.i2cp";
