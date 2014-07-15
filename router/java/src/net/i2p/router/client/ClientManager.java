@@ -48,7 +48,7 @@ import net.i2p.util.SystemVersion;
  */
 class ClientManager {
     private final Log _log;
-    protected List<ClientListenerRunner> _listeners;
+    protected final List<ClientListenerRunner> _listeners;
     // Destination --> ClientConnectionRunner
     // Locked for adds/removes but not lookups
     private final Map<Destination, ClientConnectionRunner>  _runners;
