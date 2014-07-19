@@ -1,6 +1,7 @@
 2014-07-19 zzz
  * i2psnark: Don't prefer leeches during end game, to
    prevent slowdowns or stalls
+ * SAM: Add support for RAW on the bridge socket in v3 (ticket #1334)
  * Streaming; Disable fail-fast for now.
 
 2014-07-15 str4d
