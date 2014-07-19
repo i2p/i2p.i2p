@@ -1,3 +1,8 @@
+2014-07-19 zzz
+ * i2psnark: Don't prefer leeches during end game, to
+   prevent slowdowns or stalls
+ * Streaming; Disable fail-fast for now.
+
 2014-07-15 str4d
  * I2CP: Stubs for I2CP connections over Unix domain sockets
 
