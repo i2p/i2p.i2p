@@ -614,7 +614,7 @@ public class WebMail extends HttpServlet
 					}
 					catch (Exception e1) {
 						showBody = false;
-						reason += _("Part ({0}) not shown, because of {1}", ident, e1.getClass().getName()) + br;
+						reason += _("Part ({0}) not shown, because of {1}", ident, e1.toString()) + br;
 					}
 			}
 			if( html )
