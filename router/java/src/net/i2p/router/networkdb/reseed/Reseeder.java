@@ -535,6 +535,7 @@ public class Reseeder {
                 }
             } catch (Throwable t) {
                 _log.warn("Error reseeding", t);
+                errors++;
             } finally {
                 if (contentRaw != null)
                     contentRaw.delete();
