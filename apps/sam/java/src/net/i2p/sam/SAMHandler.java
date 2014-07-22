@@ -13,6 +13,7 @@ import java.nio.channels.SocketChannel;
 import java.nio.ByteBuffer;
 import java.util.Properties;
 
+import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
@@ -54,7 +55,7 @@ abstract class SAMHandler implements Runnable {
      */
     protected SAMHandler(SocketChannel s,
                          int verMajor, int verMinor, Properties i2cpProps) throws IOException {
-        _log = new Log(getClass());
+        _log = I2PAppContext.getGlobalContext().logManager().getLog(getClass());
         socket = s;
 
         this.verMajor = verMajor;

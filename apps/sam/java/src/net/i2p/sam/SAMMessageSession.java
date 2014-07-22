@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+import net.i2p.I2PAppContext;
 import net.i2p.client.I2PClient;
 import net.i2p.client.I2PClientFactory;
 import net.i2p.client.I2PSession;
@@ -33,10 +34,8 @@ import net.i2p.util.Log;
 abstract class SAMMessageSession {
 
     protected final Log _log;
-
-    private I2PSession session = null;
-
-    private SAMMessageSessionHandler handler = null;
+    private I2PSession session;
+    private SAMMessageSessionHandler handler;
 
     /**
      * Initialize a new SAM message-based session.
@@ -48,7 +47,7 @@ abstract class SAMMessageSession {
      * @throws I2PSessionException 
      */
     protected SAMMessageSession(String dest, Properties props) throws IOException, DataFormatException, I2PSessionException {
-        _log = new Log(getClass());
+        _log = I2PAppContext.getGlobalContext().logManager().getLog(getClass());
         ByteArrayInputStream bais = new ByteArrayInputStream(Base64.decode(dest));
         initSAMMessageSession(bais, props);
     }
@@ -103,11 +102,15 @@ abstract class SAMMessageSession {
      *
      * @param dest Destination
      * @param data Bytes to be sent
+     * @param proto I2CP protocol
+     * @param fromPort I2CP from port
+     * @param toPort I2CP to port
      *
      * @return True if the data was sent, false otherwise
-     * @throws DataFormatException 
+     * @throws DataFormatException on unknown / bad dest
      */
-    protected boolean sendBytesThroughMessageSession(String dest, byte[] data) throws DataFormatException {
+    protected boolean sendBytesThroughMessageSession(String dest, byte[] data,
+                                                     int proto, int fromPort, int toPort) throws DataFormatException {
 	Destination d = SAMUtils.getDest(dest);
 
 	if (_log.shouldLog(Log.DEBUG)) {
@@ -115,7 +118,7 @@ abstract class SAMMessageSession {
 	}
 
 	try {
-	    return session.sendMessage(d, data);
+	    return session.sendMessage(d, data, proto, fromPort, toPort);
 	} catch (I2PSessionException e) {
 	    _log.error("I2PSessionException while sending data", e);
 	    return false;
