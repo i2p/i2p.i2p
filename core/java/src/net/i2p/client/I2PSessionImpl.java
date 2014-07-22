@@ -52,6 +52,7 @@ import net.i2p.util.LHMCache;
 import net.i2p.util.Log;
 import net.i2p.util.OrderedProperties;
 import net.i2p.util.SimpleTimer2;
+import net.i2p.util.SystemVersion;
 import net.i2p.util.VersionComparator;
 
 /**
@@ -156,6 +157,12 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     protected static final String PROP_ENABLE_SSL = "i2cp.SSL";
     protected static final String PROP_USER = "i2cp.username";
     protected static final String PROP_PW = "i2cp.password";
+
+    /**
+     * Use Unix domain socket (or similar) to connect to a router
+     * @since 0.9.14
+     */
+    protected static final String PROP_DOMAIN_SOCKET = "i2cp.domainSocket";
 
     private static final long VERIFY_USAGE_TIME = 60*1000;
 
@@ -279,6 +286,10 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
         if (_context.isRouterContext())
             // just for logging
             return "[internal connection]";
+        else if (SystemVersion.isAndroid() &&
+                Boolean.parseBoolean(_options.getProperty(PROP_DOMAIN_SOCKET)))
+            // just for logging
+            return "[Domain socket connection]";
         return _options.getProperty(I2PClient.PROP_TCP_HOST, "127.0.0.1");
     }
 
@@ -287,7 +298,9 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
      * @since 0.9.7 was in loadConfig()
      */
     private int getPort() {
-        if (_context.isRouterContext())
+        if (_context.isRouterContext() ||
+                (SystemVersion.isAndroid() &&
+                        Boolean.parseBoolean(_options.getProperty(PROP_DOMAIN_SOCKET))))
             // just for logging
             return 0;
         String portNum = _options.getProperty(I2PClient.PROP_TCP_PORT, LISTEN_PORT + "");
@@ -447,7 +460,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
         try {
             // protect w/ closeSocket()
             synchronized(_stateLock) {
-                // If we are in the router JVM, connect using the interal queue
+                // If we are in the router JVM, connect using the internal queue
                 if (_context.isRouterContext()) {
                     // _socket and _writer remain null
                     InternalClientManager mgr = _context.internalClientManager();
@@ -457,7 +470,11 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
                     _queue = mgr.connect();
                     _reader = new QueuedI2CPMessageReader(_queue, this);
                 } else {
-                    if (Boolean.parseBoolean(_options.getProperty(PROP_ENABLE_SSL))) {
+                    if (SystemVersion.isAndroid() &&
+                            Boolean.parseBoolean(_options.getProperty(PROP_DOMAIN_SOCKET))) {
+                        final DomainSocketFactory fact = new DomainSocketFactory(_context);
+                        _socket = fact.createSocket(DomainSocketFactory.I2CP_SOCKET_ADDRESS);
+                    } else if (Boolean.parseBoolean(_options.getProperty(PROP_ENABLE_SSL))) {
                         try {
                             I2PSSLSocketFactory fact = new I2PSSLSocketFactory(_context, false, "certificates/i2cp");
                             _socket = fact.createSocket(_hostname, _portNum);

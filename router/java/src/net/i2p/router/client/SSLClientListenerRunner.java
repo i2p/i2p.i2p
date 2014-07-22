@@ -181,7 +181,7 @@ class SSLClientListenerRunner extends ClientListenerRunner {
      * Create (if necessary) and load the key store, then run.
      */
     @Override
-    public void runServer() {
+    protected void runServer() {
         File keyStore = new File(_context.getConfigDir(), "keystore/i2cp.ks");
         if (verifyKeyStore(keyStore) && initializeFactory(keyStore)) {
             super.runServer();

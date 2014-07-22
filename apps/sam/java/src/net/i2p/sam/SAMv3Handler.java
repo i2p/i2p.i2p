@@ -391,7 +391,11 @@ class SAMv3Handler extends SAMv1Handler
 				} else if (domain.equals("NAMING")) {
 					canContinue = execNamingMessage(opcode, props);
 				} else if (domain.equals("DATAGRAM")) {
+					// TODO not yet overridden, ID is ignored, most recent DATAGRAM session is used
 					canContinue = execDatagramMessage(opcode, props);
+				} else if (domain.equals("RAW")) {
+					// TODO not yet overridden, ID is ignored, most recent RAW session is used
+					canContinue = execRawMessage(opcode, props);
 				} else {
 					if (_log.shouldLog(Log.DEBUG))
 						_log.debug("Unrecognized message domain: \""
@@ -694,10 +698,10 @@ class SAMv3Handler extends SAMv1Handler
 		else
 		{
 			if (_log.shouldLog(Log.DEBUG))
-				_log.debug ( "Unrecognized RAW message opcode: \""
+				_log.debug ( "Unrecognized STREAM message opcode: \""
 					+ opcode + "\"" );
 			try {
-				notifyStreamResult(true, "I2P_ERROR",  "Unrecognized RAW message opcode: "+opcode );
+				notifyStreamResult(true, "I2P_ERROR",  "Unrecognized STREAM message opcode: "+opcode );
 			} catch (IOException e) {}
 			return false;
 		}
@@ -716,9 +720,9 @@ class SAMv3Handler extends SAMv1Handler
 		
 			String dest = props.getProperty("DESTINATION");
 			if (dest == null) {
-				notifyStreamResult(verbose, "I2P_ERROR", "Destination not specified in RAW SEND message");
+				notifyStreamResult(verbose, "I2P_ERROR", "Destination not specified in STREAM CONNECT message");
 				if (_log.shouldLog(Log.DEBUG))
-					_log.debug("Destination not specified in RAW SEND message");
+					_log.debug("Destination not specified in STREAM CONNECT message");
 				return false;
 			}
 			props.remove("DESTINATION");

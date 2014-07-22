@@ -44,6 +44,7 @@ class PacketQueue implements SendMessageStatusListener {
     private static final int FINAL_TAGS_TO_SEND = 4;
     private static final int FINAL_TAG_THRESHOLD = 2;
     private static final long REMOVE_EXPIRED_TIME = 67*1000;
+    private static final boolean ENABLE_STATUS_LISTEN = false;
 
     public PacketQueue(I2PAppContext context, I2PSession session, ConnectionManager mgr) {
         _context = context;
@@ -134,7 +135,7 @@ class PacketQueue implements SendMessageStatusListener {
                 if (con != null) {
                     if (con.isInbound())
                         options.setSendLeaseSet(false);
-                    else
+                    else if (ENABLE_STATUS_LISTEN)
                         listenForStatus = true;
                 }
                 options.setTagsToSend(INITIAL_TAGS_TO_SEND);
