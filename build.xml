@@ -520,7 +520,7 @@
         <ant dir="apps/susimail/" target="poupdate" />
         <ant dir="apps/desktopgui" target="poupdate" />
         <ant dir="installer/resources/locale" target="poupdate" />
-        <ant dir="apps/ministreaming/" target="poupdate" />
+        <ant dir="apps/ministreaming/java" target="poupdate" />
     </target>
 
     <condition property="no.bundle">
