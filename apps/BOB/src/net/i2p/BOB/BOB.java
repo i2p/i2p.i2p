@@ -119,15 +119,16 @@ public class BOB implements Runnable, ClientApp {
 	public final static String PROP_BOB_HOST = "BOB.host";
 	public final static String PROP_CFG_VER = "BOB.CFG.VER";
 
+	/** unused when started via the ClientApp interface */
 	private static BOB _bob;
 
-	private NamedDB database;
-	private Properties props = new Properties();
-	private AtomicBoolean spin = new AtomicBoolean(true);
+	private final NamedDB database;
+	private final Properties props = new Properties();
+	private final AtomicBoolean spin = new AtomicBoolean(true);
 	private static final String P_RUNNING = "RUNNING";
 	private static final String P_STARTING = "STARTING";
 	private static final String P_STOPPING = "STOPPING";
-	private AtomicBoolean lock = new AtomicBoolean(false);
+	private final AtomicBoolean lock = new AtomicBoolean(false);
 	// no longer used.
 	// private static int maxConnections = 0;
 
@@ -143,8 +144,9 @@ public class BOB implements Runnable, ClientApp {
 	 * Stop BOB gracefully
 	 * @deprecated unused
 	 */
-	public static void stop() {
-		_bob.shutdown(null);
+	public synchronized static void stop() {
+		if (_bob != null)
+			_bob.shutdown(null);
 	}
 
 	/**
@@ -189,7 +191,7 @@ public class BOB implements Runnable, ClientApp {
 	 *
 	 * @param args
 	 */
-	public static void main(String[] args) {
+	public synchronized static void main(String[] args) {
 		try {
 			_bob = new BOB(I2PAppContext.getGlobalContext(), null, args);
 			_bob.startup();
