@@ -4,14 +4,15 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
 # Translators:
+# testsubject67 <deborinha97@hotmail.com>, 2014
 # blueboy, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-03 18:29+0000\n"
-"PO-Revision-Date: 2013-11-23 16:31+0000\n"
-"Last-Translator: blueboy\n"
+"POT-Creation-Date: 2014-01-09 19:27+0000\n"
+"PO-Revision-Date: 2014-07-05 17:40+0000\n"
+"Last-Translator: testsubject67 <deborinha97@hotmail.com>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/projects/p/I2P/language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -33,11 +34,11 @@ msgstr "Conectando"
 
 #: src/net/i2p/desktopgui/InternalTrayManager.java:26
 msgid "Launch I2P Browser"
-msgstr ""
+msgstr "Lançar o navegador I2P "
 
 #: src/net/i2p/desktopgui/InternalTrayManager.java:50
 msgid "Configure desktopgui"
-msgstr ""
+msgstr "Configurar desktopgui"
 
 #: src/net/i2p/desktopgui/InternalTrayManager.java:67
 msgid "Restart I2P"
@@ -47,10 +48,10 @@ msgstr "Reinicializar o roteador I2P"
 msgid "Stop I2P"
 msgstr "Interromper o roteador I2P"
 
-#: src/net/i2p/desktopgui/gui/DesktopguiConfigurationFrame.java:44
+#: src/net/i2p/desktopgui/gui/DesktopguiConfigurationFrame.java:43
 msgid "Tray icon configuration"
-msgstr ""
+msgstr "Configuração de ícone de bandeja"
 
-#: src/net/i2p/desktopgui/gui/DesktopguiConfigurationFrame.java:47
+#: src/net/i2p/desktopgui/gui/DesktopguiConfigurationFrame.java:46
 msgid "Should tray icon be enabled?"
-msgstr ""
+msgstr "Ativar ícone de bandeja?"

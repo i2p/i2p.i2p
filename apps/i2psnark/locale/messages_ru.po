@@ -4,22 +4,23 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
 # Translators:
-# IOException <opexob@yandex.ru>, 2013
+# Aleksey Orekhov <opexob@yandex.ru>, 2013
 # mama__1 <inactive+mama__1@transifex.com>, 2013
 # ducki2p <ducki2p@gmail.com>, 2011
-# varnav, 2013
+# Eugene, 2013
 # foo <foo@bar>, 2009
 # mama__1 <inactive+mama__1@transifex.com>, 2013
-# Роман Азаренко <transifex@basicxp.ru>, 2013
+# Roman A. <transifex@basicxp.ru>, 2013
 # sr4d <sr4d@bitmessage.ch>, 2014
-# Роман Азаренко <transifex@basicxp.ru>, 2013
+# Roman A. <transifex@basicxp.ru>, 2013
+# yume, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-01-09 19:27+0000\n"
-"PO-Revision-Date: 2014-01-11 08:49+0000\n"
-"Last-Translator: sr4d <sr4d@bitmessage.ch>\n"
+"PO-Revision-Date: 2014-07-19 18:13+0000\n"
+"Last-Translator: yume\n"
 "Language-Team: Russian (Russia) (http://www.transifex.com/projects/p/I2P/language/ru_RU/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -824,7 +825,7 @@ msgstr "Простаивает"
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1292
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1293
 msgid "No Peers"
-msgstr "Нет Пиров"
+msgstr "Нет пиров"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1295
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1296

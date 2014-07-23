@@ -11,7 +11,7 @@
 # ducki2p <ducki2p@gmail.com>, 2011
 # Ettore Atalan <atalanttore@googlemail.com>, 2014
 # foo <foo@bar>, 2009
-# echeloni2p <echelon@i2pmail.org>, 2014
+# Lars Schimmer <echelon@i2pmail.org>, 2014
 # Ashoka <martin.tastler@posteo.de>, 2013
 # mixxy, 2011
 # nextloop <ga25day@mytum.de>, 2013
@@ -22,7 +22,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-02-06 18:27+0000\n"
-"PO-Revision-Date: 2014-04-15 18:21+0000\n"
+"PO-Revision-Date: 2014-05-21 20:41+0000\n"
 "Last-Translator: blabla <blabla@trash-mail.com>\n"
 "Language-Team: German (http://www.transifex.com/projects/p/I2P/language/de/)\n"
 "MIME-Version: 1.0\n"
@@ -79,14 +79,14 @@ msgstr[1] "{0} Stunden"
 #: ../../../core/java/src/net/i2p/data/DataHelper.java:1498
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:342
 msgid "n/a"
-msgstr "Nicht verfügbar"
+msgstr "nicht verfügbar"
 
 #. days
 #: ../../../core/java/src/net/i2p/data/DataHelper.java:1501
 #, java-format
 msgid "1 day"
 msgid_plural "{0} days"
-msgstr[0] "1 Tag"
+msgstr[0] "einen Tag"
 msgstr[1] "{0} Tage"
 
 #: ../../../router/java/src/net/i2p/router/Blocklist.java:144
@@ -143,32 +143,32 @@ msgstr "Weise Tunnelanfragen ab: Initialisieren"
 
 #: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:159
 msgid "Rejecting tunnels: High message delay"
-msgstr "Weise Tunnelanfragen zurück: Hohe Nachrichtenlatenz"
+msgstr "Weise Tunnelanfragen zurück: hohe Nachrichtenlatenz"
 
 #. hard to do {0} from here
 #. setTunnelStatus("Rejecting " + (100 - (int) probAccept*100) + "% of
 #. tunnels: High number of requests");
 #: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:196
 msgid "Rejecting most tunnels: High number of requests"
-msgstr "Weise Tunnelanfragen zurück: Hohe Anzahl an Anfragen"
+msgstr "Weise Tunnelanfragen zurück: hohe Anzahl an Anfragen"
 
 #: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:247
 msgid "Rejecting tunnels: Limit reached"
-msgstr "Weise Tunnelanfragen zurück: Limit erreicht"
+msgstr "Weise Tunnelanfragen zurück: Begrenzung erreicht"
 
 #. .067KBps
 #. * also limited to 90% - see below
 #. always leave at least 4KBps free when allowing
 #: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:310
 msgid "Rejecting tunnels: Bandwidth limit"
-msgstr "Weise Tunnelanfragen zurück: Bandbreitenlimit erreicht"
+msgstr "Weise Tunnelanfragen zurück: Bandbreitenbeschränkung erreicht"
 
 #. hard to do {0} from here
 #. setTunnelStatus("Rejecting " + ((int)(100.0*probReject)) + "% of tunnels:
 #. Bandwidth limit");
 #: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:380
 msgid "Rejecting most tunnels: Bandwidth limit"
-msgstr "Weise die meisten Tunnelanfragen zurück: Bandbreitenlimit erreicht"
+msgstr "Weise die meisten Tunnelanfragen zurück: Bandbreitenbeschränkung erreicht"
 
 #. hard to do {0} from here
 #. setTunnelStatus("Accepting " + (100-(int)(100.0*probReject)) + "% of
@@ -322,11 +322,11 @@ msgstr "Richtung"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:589
 msgid "Inbound connection"
-msgstr "Eingehende Verbindungen"
+msgstr "eingehende Verbindungen"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:591
 msgid "Outbound connection"
-msgstr "Ausgehende Verbindungen"
+msgstr "ausgehende Verbindungen"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:593
 msgid "They offered to introduce us (help other peers traverse our firewall)"
@@ -339,20 +339,20 @@ msgstr "Wir bieten an, sie bekannt zu machen (anderen Teilnehmern helfen, ihre F
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:596
 msgid "How long since a packet has been received / sent"
-msgstr "Vergangene Zeit seit ein Paket empfangen/gesendet wurde"
+msgstr "vergangene Zeit seit ein Paket empfangen/gesendet wurde"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:596
 #: ../../../router/java/src/net/i2p/router/transport/ntcp/NTCPTransport.java:1124
 #: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2530
 msgid "Idle"
-msgstr "Untätig"
+msgstr "untätig"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:597
 #: ../../../router/java/src/net/i2p/router/transport/ntcp/NTCPTransport.java:1125
 #: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2535
 #: ../java/src/net/i2p/router/web/TunnelRenderer.java:161
 msgid "In/Out"
-msgstr "Ein-/Ausgehend"
+msgstr "ein-/ausgehend"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:597
 msgid "The smoothed inbound / outbound transfer rate (KBytes per second)"
@@ -360,14 +360,14 @@ msgstr "Die geglättete ein-/ausgehende Transferrate (KBytes pro Sekunde)"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:598
 msgid "How long ago this connection was established"
-msgstr "Wie lange die Verbindung schon besteht"
+msgstr "wie lange die Verbindung schon besteht"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:598
 #: ../../../router/java/src/net/i2p/router/transport/ntcp/NTCPTransport.java:1126
 #: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2540
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:877
 msgid "Up"
-msgstr "Verbunden"
+msgstr "verbunden"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:599
 #: ../../../router/java/src/net/i2p/router/transport/ntcp/NTCPTransport.java:1127
@@ -377,7 +377,7 @@ msgstr "Differenz"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:599
 msgid "The difference between the peer's clock and your own"
-msgstr "Der Unterschied zwischen Ihrer und der Uhr des Teilnehmers"
+msgstr "Unterschied zwischen Ihrer und der Uhr des Teilnehmers"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:600
 msgid ""
@@ -387,42 +387,42 @@ msgstr "Der Pufferspeicher, der angibt, wieviele Bytes Sie ohne Bestätigung sen
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:601
 msgid "The number of sent messages awaiting acknowledgement"
-msgstr "Die Anzahl der gesendeten Nachrichten, die auf Bestätigung warten"
+msgstr "Anzahl der gesendeten Nachrichten, die auf Bestätigung warten"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:602
 msgid "The maximum number of concurrent messages to send"
-msgstr "Die maximale Anzahl von gleichzeitig sendbaren Nachrichten"
+msgstr "maximale Anzahl von gleichzeitig sendbaren Nachrichten"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:603
 msgid "The number of pending sends which exceed congestion window"
-msgstr "Die Anzahl der ausstehenden Sendeanforderungen, die den Pufferspeicher überschreiten."
+msgstr "Anzahl der ausstehenden Sendeanforderungen, die den Pufferspeicher überschreiten."
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:604
 msgid "The slow start threshold"
-msgstr "Der Grenzwert zum verzögertem Starten"
+msgstr "Grenzwert zum verzögertem Starten"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:605
 msgid "The round trip time in milliseconds"
-msgstr "Die Rundenzeit zum Server und zurück in Millisekunden"
+msgstr "Rundenzeit zum Server und zurück in Millisekunden"
 
 #. "<b id=\"def.dev\">").append(_("Dev")).append("</b>: ").append(_("The
 #. standard deviation of the round trip time in
 #. milliseconds")).append("<br>\n" +
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:607
 msgid "The retransmit timeout in milliseconds"
-msgstr "Der Timeout beim erneuten Senden (in Millisekunden)"
+msgstr "Timeout beim erneuten Senden (in Millisekunden)"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:608
 msgid ""
 "Current maximum send packet size / estimated maximum receive packet size "
 "(bytes)"
-msgstr "Derzeit maximale Größe der gesendeten Pakete / geschätzte maximale Größe der empfangenen Pakete (Bytes)"
+msgstr "derzeit maximale Größe der gesendeten Pakete / geschätzte maximale Größe der empfangenen Pakete (Bytes)"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:609
 #: ../../../router/java/src/net/i2p/router/transport/ntcp/NTCPTransport.java:1128
 #: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2559
 msgid "TX"
-msgstr "Gesendet"
+msgstr "gesendet"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:609
 msgid "The total number of packets sent to the peer"
@@ -432,7 +432,7 @@ msgstr "Gesamtanzahl der an den Teilnehmer gesendeten Pakete"
 #: ../../../router/java/src/net/i2p/router/transport/ntcp/NTCPTransport.java:1129
 #: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2561
 msgid "RX"
-msgstr "Empfangen"
+msgstr "empfangen"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:610
 msgid "The total number of packets received from the peer"
@@ -441,7 +441,7 @@ msgstr "Gesamtanzahl der vom Teilnehmer empfangenen Pakete"
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:611
 #: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2564
 msgid "Dup TX"
-msgstr "Mehrfach gesendet"
+msgstr "mehrfach gesendet"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:611
 msgid "The total number of packets retransmitted to the peer"
@@ -450,7 +450,7 @@ msgstr "Gesamtanzahl der an den Teilnehmer erneut gesendeten Pakete"
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:612
 #: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2566
 msgid "Dup RX"
-msgstr "Mehrfach empfangen"
+msgstr "mehrfach empfangen"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:612
 msgid "The total number of duplicate packets received from the peer"
@@ -581,7 +581,7 @@ msgstr "UPnP ist nicht aktiviert."
 #: ../../../router/java/src/net/i2p/router/transport/ntcp/EstablishState.java:632
 #, java-format
 msgid "Excessive clock skew: {0}"
-msgstr "Zu hohe Abweichung der Uhrzeit: {0}"
+msgstr "zu hohe Abweichung der Uhrzeit: {0}"
 
 #: ../../../router/java/src/net/i2p/router/transport/ntcp/NTCPTransport.java:1116
 msgid "NTCP connections"
@@ -590,7 +590,7 @@ msgstr "NTCP-Verbindungen"
 #: ../../../router/java/src/net/i2p/router/transport/ntcp/NTCPTransport.java:1117
 #: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2520
 msgid "Limit"
-msgstr "Obere Grenze"
+msgstr "obere Grenze"
 
 #: ../../../router/java/src/net/i2p/router/transport/ntcp/NTCPTransport.java:1118
 #: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2521
@@ -636,7 +636,7 @@ msgstr "UDP-Verbindungen"
 
 #: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2526
 msgid "Sort by peer hash"
-msgstr "Nach Router Prüfsumme sortieren"
+msgstr "Nach Router-Prüfsumme sortieren"
 
 #: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2528
 msgid "Direction/Introduction"
