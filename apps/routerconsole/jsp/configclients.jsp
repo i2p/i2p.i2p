@@ -39,7 +39,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
  <%=intl._("All changes require restart to take effect.")%></i>
  </p><hr><div class="formaction">
  <input type="submit" class="cancel" name="foo" value="<%=intl._("Cancel")%>" />
-<% if (request.getParameter("edit") == null) { %>
+<% if (false && request.getParameter("edit") == null) { %>
  <input type="submit" name="edit" class="add" value="<%=intl._("Add Client")%>" />
 <% } %>
  <input type="submit" class="accept" name="action" value="<%=intl._("Save Client Configuration")%>" />
