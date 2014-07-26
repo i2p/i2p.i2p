@@ -1,3 +1,5 @@
+* 2014-07-26 0.9.14 released
+
 2014-07-26 zzz
  * Console:
    - Fix several XSS issues (thx Aaron Portnoy of Exodus Intel)
