@@ -25,6 +25,8 @@
         request.setCharacterEncoding("UTF-8");
 
     response.setHeader("X-Frame-Options", "SAMEORIGIN");
+    response.setHeader("Content-Security-Policy", "default-src 'self'");
+    response.setHeader("X-XSS-Protection", "1; mode=block");
 
 %>
 <%@page pageEncoding="UTF-8"%>
@@ -73,6 +75,7 @@
     if (detail == null) {
         %><p>No host specified</p><%
     } else {
+        detail = net.i2p.data.DataHelper.stripHTML(detail);
         i2p.susi.dns.AddressBean addr = book.getLookup();
         if (addr == null) {
             %><p>Not found: <%=detail%></p><%

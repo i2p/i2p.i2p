@@ -1,3 +1,15 @@
+2014-07-26 zzz
+ * Console:
+   - Fix several XSS issues (thx Aaron Portnoy of Exodus Intel)
+   - Add Content-Security-Policy and X-XSS-Protection headers
+   - Disable changing news feed URL from UI
+   - Disable plugin install from UI
+   - Disable setting unsigned update URL from UI
+   - Disable /configadvanced
+ * DataHelper: Disallow \r in storeProps() (thx joernchen of Phenoelit)
+ * ExecNamingService: Disable (thx joernchen of Phenoelit)
+ * Startup: Add susimail.config to migrated files
+
 2014-07-23 kytv
  * Updates to geoip.txt and geoipv6.dat.gz based on Maxmind GeoLite Country
    database from 2014-07-02.

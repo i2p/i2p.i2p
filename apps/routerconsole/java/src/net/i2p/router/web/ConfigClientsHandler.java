@@ -54,7 +54,8 @@ public class ConfigClientsHandler extends FormHandler {
             return;
         }
         if (_action.equals(_("Install Plugin"))) {
-            installPlugin();
+            //installPlugin();
+            addFormError("Plugin installation disabled");
             return;
         }
         if (_action.equals(_("Update All Installed Plugins"))) {

@@ -159,6 +159,8 @@ public class I2PSnarkServlet extends BasicServlet {
         // this is the part after /i2psnark
         String path = req.getServletPath();
         resp.setHeader("X-Frame-Options", "SAMEORIGIN");
+        resp.setHeader("Content-Security-Policy", "default-src 'self'");
+        resp.setHeader("X-XSS-Protection", "1; mode=block");
 
         String peerParam = req.getParameter("p");
         String stParam = req.getParameter("st");
@@ -167,9 +169,10 @@ public class I2PSnarkServlet extends BasicServlet {
             peerParam.replaceAll("[a-zA-Z0-9~=-]", "").length() > 0) {  // XSS
             peerString = "";
         } else {
-            peerString = "?p=" + peerParam;
+            peerString = "?p=" + DataHelper.stripHTML(peerParam);
         }
         if (stParam != null && !stParam.equals("0")) {
+            stParam = DataHelper.stripHTML(stParam);
             if (peerString.length() > 0)
                 peerString += "&amp;st=" + stParam;
             else

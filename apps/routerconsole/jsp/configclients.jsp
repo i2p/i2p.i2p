@@ -117,6 +117,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
  <input type="submit" name="action" class="accept" value="<%=intl._("Save Plugin Configuration")%>" />
 </div></form></div>
 
+<!--
 <h3><a name="plugin"></a><%=intl._("Plugin Installation")%></h3><p>
  <%=intl._("Look for available plugins on {0}.", "<a href=\"http://plugins.i2p\">plugins.i2p</a>")%>
  <%=intl._("To install a plugin, enter the download URL:")%>
@@ -132,5 +133,6 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
 </div><hr><div class="formaction">
  <input type="submit" name="action" class="reload" value="<%=intl._("Update All Installed Plugins")%>" />
  </div></form></div>
+-->
 <% } %>
 </div></div></body></html>

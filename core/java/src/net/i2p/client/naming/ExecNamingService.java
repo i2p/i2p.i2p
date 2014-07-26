@@ -57,6 +57,8 @@ public class ExecNamingService extends DummyNamingService {
      */
     public ExecNamingService(I2PAppContext context) {
         super(context);
+        // disable for now
+        throw new UnsupportedOperationException();
     }
     
     @Override

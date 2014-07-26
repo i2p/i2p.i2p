@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.i2p.data.DataHelper;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
 
@@ -50,8 +51,8 @@ public abstract class FormHandler {
         }
     }
 
-    public void setNonce(String val) { _nonce = val; }
-    public void setAction(String val) { _action = val; }
+    public void setNonce(String val) { _nonce = DataHelper.stripHTML(val); }
+    public void setAction(String val) { _action = DataHelper.stripHTML(val); }
 
     /**
      * For many forms, it's easiest just to put all the parameters here.

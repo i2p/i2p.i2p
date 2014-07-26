@@ -21,7 +21,8 @@ public class ConfigAdvancedHandler extends FormHandler {
     @Override
     protected void processForm() {
         if (_shouldSave) {
-            saveChanges();
+            //saveChanges();
+            addFormError("Save disabled, edit the router.config file to make changes") ;
         } else {
             // noop
         }

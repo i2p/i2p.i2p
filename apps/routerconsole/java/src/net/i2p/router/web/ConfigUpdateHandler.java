@@ -173,10 +173,11 @@ public class ConfigUpdateHandler extends FormHandler {
                 _newsThroughProxy = false;
             String oldURL = ConfigUpdateHelper.getNewsURL(_context);
             if ( (oldURL == null) || (!_newsURL.equals(oldURL)) ) {
-                changes.put(PROP_NEWS_URL, _newsURL);
+                //changes.put(PROP_NEWS_URL, _newsURL);
                 // this invalidates the news
-                changes.put(NewsHelper.PROP_LAST_CHECKED, "0");
-                addFormNotice(_("Updating news URL to {0}", _newsURL));
+                //changes.put(NewsHelper.PROP_LAST_CHECKED, "0");
+                //addFormNotice(_("Updating news URL to {0}", _newsURL));
+                addFormError("Changing news URL disabled");
             }
         }
         
@@ -240,8 +241,9 @@ public class ConfigUpdateHandler extends FormHandler {
         if ( (_zipURL != null) && (_zipURL.length() > 0) ) {
             String oldURL = _context.router().getConfigSetting(PROP_ZIP_URL);
             if ( (oldURL == null) || (!_zipURL.equals(oldURL)) ) {
-                changes.put(PROP_ZIP_URL, _zipURL);
-                addFormNotice(_("Updating unsigned update URL to {0}", _zipURL));
+                //changes.put(PROP_ZIP_URL, _zipURL);
+                //addFormNotice(_("Updating unsigned update URL to {0}", _zipURL));
+                addFormError("Changing unsigned update URL disabled");
             }
         }
         

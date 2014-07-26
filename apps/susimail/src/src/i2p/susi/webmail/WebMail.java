@@ -1562,6 +1562,8 @@ public class WebMail extends HttpServlet
 		httpRequest.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
                 response.setHeader("X-Frame-Options", "SAMEORIGIN");
+                response.setHeader("Content-Security-Policy", "default-src 'self'");
+                response.setHeader("X-XSS-Protection", "1; mode=block");
 		RequestWrapper request = new RequestWrapper( httpRequest );
 		
 		SessionObject sessionObject = null;

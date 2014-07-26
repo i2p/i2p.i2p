@@ -57,7 +57,7 @@ public class CSSHelper extends HelperBase {
      */
     public void setLang(String lang) {
         // Protected with nonce in css.jsi
-        if (lang != null && lang.length() > 0) {
+        if (lang != null && lang.length() > 0 && lang.length() <= 6) {
             Map m = new HashMap(2);
             int under = lang.indexOf('_');
             if (under < 0) {
@@ -105,9 +105,9 @@ public class CSSHelper extends HelperBase {
         try {
             if (Integer.parseInt(r) < MIN_REFRESH)
                 r = "" + MIN_REFRESH;
+            _context.router().saveConfig(PROP_REFRESH, r);
         } catch (Exception e) {
         }
-        _context.router().saveConfig(PROP_REFRESH, r);
     }
 
     /** @return refresh time in seconds, as a string */
@@ -117,6 +117,7 @@ public class CSSHelper extends HelperBase {
             if (Integer.parseInt(r) < MIN_REFRESH)
                 r = "" + MIN_REFRESH;
         } catch (Exception e) {
+            r = "" + MIN_REFRESH;
         }
         return r;
     }

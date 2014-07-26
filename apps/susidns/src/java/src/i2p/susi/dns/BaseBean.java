@@ -142,7 +142,7 @@ public class BaseBean
      * @since 0.9.13 moved from subclasses
      */
     public void setAction(String action) {
-        this.action = action;
+        this.action = DataHelper.stripHTML(action);
     }
 
     /**
@@ -158,7 +158,7 @@ public class BaseBean
      * @since 0.9.13 moved from subclasses
      */
     public void setSerial(String serial) {
-        this.serial = serial;
+        this.serial = DataHelper.stripHTML(serial);
     }
 
     /**

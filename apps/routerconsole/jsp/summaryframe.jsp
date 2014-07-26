@@ -22,12 +22,13 @@
                            "Shutdown immediately".equals(action) || "Restart immediately".equals(action);
     if (!shutdownSoon) {
         if (d == null || "".equals(d)) {
-            d = intl.getRefresh();
+            // set below
         } else {
             d = net.i2p.data.DataHelper.stripHTML(d);  // XSS
             intl.setRefresh(d);
             intl.setDisableRefresh(d);
         }
+        d = intl.getRefresh();
         // we probably don't get here if d == "0" since caught in summary.jsi, but just
         // to be sure...
         if (!intl.getDisableRefresh()) {
@@ -46,7 +47,7 @@
             long delay = 60;
             try { delay = Long.parseLong(d); } catch (NumberFormatException nfe) {}
             if (delay*1000 < timeleft + 5000)
-                out.print("<meta http-equiv=\"refresh\" content=\"" + d + ";url=/summaryframe.jsp\" >\n");
+                out.print("<meta http-equiv=\"refresh\" content=\"" + delay + ";url=/summaryframe.jsp\" >\n");
             else
                 shutdownSoon = true;
         }
