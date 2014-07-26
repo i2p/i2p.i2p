@@ -10,10 +10,13 @@ import javax.servlet.http.HttpServletRequestWrapper;
 import net.i2p.I2PAppContext;
 import net.i2p.util.Log;
 
+/**
+ *  @since 0.9.14
+ */
 public class XSSRequestWrapper extends HttpServletRequestWrapper {
     // Adapted from https://owasp-esapi-java.googlecode.com/svn/trunk/configuration/esapi/ESAPI.properties
-    private static Pattern parameterValuePattern = Pattern.compile("^[a-zA-Z0-9.,:\\-\\/+=@_ \r\n]*$");
-    private static Pattern headerValuePattern = Pattern.compile("^[a-zA-Z0-9()\\-=\\*\\.\\?;,+\\/:&_ ]*$");
+    private static final Pattern parameterValuePattern = Pattern.compile("^[\\p{L}\\p{Nd}.,:\\-\\/+=~\\[\\]?@_ \r\n]*$");
+    private static final Pattern headerValuePattern = Pattern.compile("^[a-zA-Z0-9()\\-=\\*\\.\\?;,+\\/:&_ ]*$");
 
     public XSSRequestWrapper(HttpServletRequest servletRequest) {
         super(servletRequest);

@@ -10,6 +10,9 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
+/**
+ *  @since 0.9.14
+ */
 public class XSSFilter implements Filter {
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
