@@ -159,7 +159,7 @@ public class I2PSnarkServlet extends BasicServlet {
         // this is the part after /i2psnark
         String path = req.getServletPath();
         resp.setHeader("X-Frame-Options", "SAMEORIGIN");
-        resp.setHeader("Content-Security-Policy", "default-src 'self'");
+        resp.setHeader("Content-Security-Policy", "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'");
         resp.setHeader("X-XSS-Protection", "1; mode=block");
 
         String peerParam = req.getParameter("p");
