@@ -1628,8 +1628,8 @@ public class DataHelper {
         return rv;
     }
 
-    private static final String escapeChars[] = {"&", "\"", "<", ">"};
-    private static final String escapeCodes[] = {"&amp;", "&quot;", "&lt;", "&gt;"};
+    private static final String escapeChars[] = {"&", "\"", "<", ">", "\"", "'"};
+    private static final String escapeCodes[] = {"&amp;", "&quot;", "&lt;", "&gt;", "&quot;", "&apos;"};
 
     /**
      * Escape a string for inclusion in HTML

@@ -283,14 +283,14 @@ class Mail {
 			Encoding html = EncodingFactory.getEncoding( "HTML" );
 			
 			if( html == null ) {
-				error += "HTML encoder not found.<br>";
+				error += "HTML encoder not found.\n";
 				ok = false;
 			}
 			
 			Encoding hl = EncodingFactory.getEncoding( "HEADERLINE" );
 
 			if( hl == null ) {
-				error += "Header line encoder not found.<br>";
+				error += "Header line encoder not found.\n";
 				ok = false;
 			}
 
@@ -369,7 +369,7 @@ class Mail {
 					}
 				}
 				catch( Exception e ) {
-					error += "Error parsing mail header: " + e.getClass().getName() + "<br>";
+					error += "Error parsing mail header: " + e.getClass().getName() + '\n';
 				}		
 			}
 		}
