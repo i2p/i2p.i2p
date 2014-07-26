@@ -1,5 +1,9 @@
 package net.i2p.servlet.filters;
 
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
@@ -32,10 +36,25 @@ public class XSSRequestWrapper extends HttpServletRequestWrapper {
 
         int count = values.length;
         String[] encodedValues = new String[count];
+        int good = 0;
         for (int i = 0; i < count; i++) {
-            encodedValues[i] = stripXSS(values[i], parameterValuePattern);
+            String value = values[i];
+            String v2 = stripXSS(value, parameterValuePattern);
+            if (v2 != null) {
+                encodedValues[good++] = v2;
+            } else if (value != null) {
+                Log log = I2PAppContext.getGlobalContext().logManager().getLog(XSSRequestWrapper.class);
+                log.logAlways(Log.WARN, "URL \"" + getServletPath() + "\" Stripped param \"" + parameter + "\" : \"" + value + '"');
+            }
         }
-
+        if (good <= 0)
+            return null;
+        if (good < count) {
+            // shrink array
+            String[] rv = new String[good];
+            System.arraycopy(encodedValues, 0, rv, 0, good);
+            encodedValues = rv;
+        }
         return encodedValues;
     }
 
@@ -51,6 +70,18 @@ public class XSSRequestWrapper extends HttpServletRequestWrapper {
     }
 
     @Override
+    public Map getParameterMap() {
+        Map rv = new HashMap();
+        for (Enumeration keys = getParameterNames(); keys.hasMoreElements(); ) {
+             String k = (String) keys.nextElement();
+             String[] v = getParameterValues(k);
+             if (v != null)
+                 rv.put(k, v);
+        }
+        return Collections.unmodifiableMap(rv);
+    }
+
+    @Override
     public String getHeader(String name) {
         String value = super.getHeader(name);
         String rv = stripXSS(value, headerValuePattern);
@@ -61,7 +92,7 @@ public class XSSRequestWrapper extends HttpServletRequestWrapper {
         return rv;
     }
 
-    private String stripXSS(String value, Pattern whitelistPattern) {
+    private static String stripXSS(String value, Pattern whitelistPattern) {
         if (value != null) {
             // NOTE: It's highly recommended to use the ESAPI library and uncomment the following line to
             // avoid encoded attacks.
