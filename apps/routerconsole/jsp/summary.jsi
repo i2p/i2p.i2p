@@ -17,9 +17,14 @@
         if (d == null || "".equals(d))
             d = intl.getRefresh();
         else {
-            d = net.i2p.data.DataHelper.stripHTML(d);  // XSS
+            long delay;
+            try {
+                delay = Long.parseLong(d);
+            } catch (NumberFormatException nfe) {
+                delay = 60;
+            }
             // pass the new delay parameter to the iframe
-            newDelay = "?refresh=" + d;
+            newDelay = "?refresh=" + delay;
             // update disable boolean
             intl.setDisableRefresh(d);
         }

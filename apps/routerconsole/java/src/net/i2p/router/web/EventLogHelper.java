@@ -160,6 +160,7 @@ public class EventLogHelper extends FormHandler {
         String xev = _xevents.get(_event);
         if (xev == null)
             xev = _event;
+        xev = DataHelper.escapeHTML(xev);
         if (events.isEmpty()) {
             if (isAll) {
                 if (_age == 0)

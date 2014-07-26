@@ -23,7 +23,7 @@
     if (!shutdownSoon) {
         if (d == null || "".equals(d)) {
             // set below
-        } else {
+        } else if (intl.getNonce().equals(conNonceParam)) {
             d = net.i2p.data.DataHelper.stripHTML(d);  // XSS
             intl.setRefresh(d);
             intl.setDisableRefresh(d);
