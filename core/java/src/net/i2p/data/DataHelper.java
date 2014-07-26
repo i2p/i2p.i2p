@@ -1624,7 +1624,8 @@ public class DataHelper {
         if (orig == null) return "";
         String t1 = orig.replace('<', ' ');
         String rv = t1.replace('>', ' ');
-        rv = rv.replace("\"", "%22");
+        rv = rv.replace('\"', ' ');
+        rv = rv.replace('\'', ' ');
         return rv;
     }
 

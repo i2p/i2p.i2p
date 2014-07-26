@@ -118,18 +118,18 @@ public class ConfigClientsHelper extends HelperBase {
                        //"webConsole".equals(ca.clientName) || "Web console".equals(ca.clientName),
                        false, RouterConsoleRunner.class.getName().equals(ca.className),
                        // description, edit
-                       ca.className + ((ca.args != null) ? " " + ca.args : ""), (""+cur).equals(_edit),
+                       ca.className + ((ca.args != null) ? " " + ca.args : ""), /* (""+cur).equals(_edit) */ false,
                        // show edit button, show update button
                        // Don't allow edit if it's running, or else we would lose the "handle" to the ClientApp to stop it.
-                       !showStop, false, 
+                       /* !showStop */ false, false, 
                        // show stop button
                        showStop,
                        // show delete button, show start button
                        !isConsole, showStart);
         }
         
-        if ("new".equals(_edit))
-            renderForm(buf, "" + clients.size(), "", false, false, false, false, "", true, false, false, false, false, false);
+        //if ("new".equals(_edit))
+        //    renderForm(buf, "" + clients.size(), "", false, false, false, false, "", true, false, false, false, false, false);
         buf.append("</table>\n");
         return buf.toString();
     }
@@ -291,9 +291,9 @@ public class ConfigClientsHelper extends HelperBase {
         if (showStopButton && (!edit))
             buf.append("<button type=\"submit\" class=\"Xstop\" name=\"action\" value=\"Stop ").append(index).append("\" >")
                .append(_("Stop")).append("<span class=hide> ").append(index).append("</span></button>");
-        if (showEditButton && (!edit) && !ro)
-            buf.append("<button type=\"submit\" class=\"Xadd\" name=\"edit\" value=\"Edit ").append(index).append("\" >")
-               .append(_("Edit")).append("<span class=hide> ").append(index).append("</span></button>");
+        //if (showEditButton && (!edit) && !ro)
+        //    buf.append("<button type=\"submit\" class=\"Xadd\" name=\"edit\" value=\"Edit ").append(index).append("\" >")
+        //       .append(_("Edit")).append("<span class=hide> ").append(index).append("</span></button>");
         if (showUpdateButton && (!edit) && !ro) {
             buf.append("<button type=\"submit\" class=\"Xcheck\" name=\"action\" value=\"Check ").append(index).append("\" >")
                .append(_("Check for updates")).append("<span class=hide> ").append(index).append("</span></button>");

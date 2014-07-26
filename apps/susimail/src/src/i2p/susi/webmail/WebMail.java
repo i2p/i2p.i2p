@@ -1670,7 +1670,7 @@ public class WebMail extends HttpServlet
 				} else if( sessionObject.state == STATE_SHOW ) {
 					Mail mail = sessionObject.mailCache.getMail(sessionObject.showUIDL, MailCache.FetchMode.HEADER);
 					if (mail != null && mail.shortSubject != null)
-						subtitle = quoteHTML(mail.shortSubject);
+						subtitle = mail.shortSubject; // already HTML encoded
 					else
 						subtitle = _("Show Message");
 				} else if( sessionObject.state == STATE_NEW ) {
@@ -2164,9 +2164,10 @@ public class WebMail extends HttpServlet
 					" onclick=\"deleteboxclicked();\" " +
 					( idChecked ? "checked" : "" ) + ">" + "</td><td " + jslink + ">" +
 					(mail.isNew() ? "<img src=\"/susimail/icons/flag_green.png\" alt=\"\" title=\"" + _("Message is new") + "\">" : "&nbsp;") + "</td><td " + jslink + ">" +
-					link + quoteHTML(mail.shortSender) + "</a></td><td " + jslink + ">" +
+                                        // mail.shortSender and mail.shortSubject already html encoded
+					link + mail.shortSender + "</a></td><td " + jslink + ">" +
 					(mail.hasAttachment() ? "<img src=\"/susimail/icons/attach.png\" alt=\"\" title=\"" + _("Message has an attachment") + "\">" : "&nbsp;") + "</td><td " + jslink + ">" +
-					link + quoteHTML(mail.shortSubject) + "</a></td><td " + jslink + ">" +
+					link + mail.shortSubject + "</a></td><td " + jslink + ">" +
 					(mail.isSpam() ? "<img src=\"/susimail/icons/flag_red.png\" alt=\"\" title=\"" + _("Message is spam") + "\">" : "&nbsp;") + "</td><td " + jslink + ">" +
 					// don't let date get split across lines
 					mail.localFormattedDate.replace(" ", "&nbsp;") + "</td><td " + jslink + ">&nbsp;</td><td align=\"right\" " + jslink + ">" +

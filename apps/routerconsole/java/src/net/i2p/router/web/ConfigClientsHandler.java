@@ -187,6 +187,8 @@ public class ConfigClientsHandler extends FormHandler {
             if (! (RouterConsoleRunner.class.getName().equals(ca.className)))
                 ca.disabled = val == null;
             // edit of an existing entry
+            // disabled
+/****
             String desc = getJettyString("desc" + cur);
             if (desc != null) {
                 int spc = desc.indexOf(" ");
@@ -200,8 +202,11 @@ public class ConfigClientsHandler extends FormHandler {
                 ca.args = args;
                 ca.clientName = getJettyString("name" + cur);
             }
+****/
         }
 
+        // disabled
+/****
         int newClient = clients.size();
         String newDesc = getJettyString("desc" + newClient);
         if (newDesc != null && newDesc.trim().length() > 0) {
@@ -220,6 +225,7 @@ public class ConfigClientsHandler extends FormHandler {
             clients.add(ca);
             addFormNotice(_("New client added") + ": " + name + " (" + clss + ").");
         }
+****/
 
         ClientAppConfig.writeClientAppConfig(_context, clients);
         addFormNotice(_("Client configuration saved successfully"));
