@@ -7,6 +7,9 @@ import javax.servlet.http.HttpServletRequestWrapper;
 
 //import org.owasp.esapi.ESAPI;
 
+import net.i2p.I2PAppContext;
+import net.i2p.util.Log;
+
 public class XSSRequestWrapper extends HttpServletRequestWrapper {
     // Adapted from https://owasp-esapi-java.googlecode.com/svn/trunk/configuration/esapi/ESAPI.properties
     private static Pattern parameterValuePattern = Pattern.compile("^[a-zA-Z0-9.,:\\-\\/+=@_ \r\n]*$");
@@ -36,14 +39,23 @@ public class XSSRequestWrapper extends HttpServletRequestWrapper {
     @Override
     public String getParameter(String parameter) {
         String value = super.getParameter(parameter);
-
-        return stripXSS(value, parameterValuePattern);
+        String rv = stripXSS(value, parameterValuePattern);
+        if (value != null && rv == null) {
+            Log log = I2PAppContext.getGlobalContext().logManager().getLog(XSSRequestWrapper.class);
+            log.logAlways(Log.WARN, "URL \"" + getServletPath() + "\" Stripped param \"" + parameter + "\" : \"" + value + '"');
+        }
+        return rv;
     }
 
     @Override
     public String getHeader(String name) {
         String value = super.getHeader(name);
-        return stripXSS(value, headerValuePattern);
+        String rv = stripXSS(value, headerValuePattern);
+        if (value != null && rv == null) {
+            Log log = I2PAppContext.getGlobalContext().logManager().getLog(XSSRequestWrapper.class);
+            log.logAlways(Log.WARN, "URL \"" + getServletPath() + "\" Stripped header \"" + name + "\" : \"" + value + '"');
+        }
+        return rv;
     }
 
     private String stripXSS(String value, Pattern whitelistPattern) {
