@@ -2,7 +2,7 @@
 
 2014-07-26 zzz
  * Console:
-   - Fix several XSS issues (thx Aaron Portnoy of Exodus Intel)
+   - Fix several XSS issues (thx Exodus Intelligence)
    - Add Content-Security-Policy and X-XSS-Protection headers
    - Disable changing news feed URL from UI
    - Disable plugin install from UI
