@@ -1,3 +1,7 @@
+2014-07-31 zzz
+ * ExecNamingService: Remove
+ * Plugins: Add whitelist of keys
+
 * 2014-07-26 0.9.14 released
 
 2014-07-26 zzz
