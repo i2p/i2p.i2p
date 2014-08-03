@@ -173,11 +173,14 @@ public class ConfigUpdateHandler extends FormHandler {
                 _newsThroughProxy = false;
             String oldURL = ConfigUpdateHelper.getNewsURL(_context);
             if ( (oldURL == null) || (!_newsURL.equals(oldURL)) ) {
-                //changes.put(PROP_NEWS_URL, _newsURL);
-                // this invalidates the news
-                //changes.put(NewsHelper.PROP_LAST_CHECKED, "0");
-                //addFormNotice(_("Updating news URL to {0}", _newsURL));
-                addFormError("Changing news URL disabled");
+                if (isAdvanced()) {
+                    changes.put(PROP_NEWS_URL, _newsURL);
+                    // this invalidates the news
+                    changes.put(NewsHelper.PROP_LAST_CHECKED, "0");
+                    addFormNotice(_("Updating news URL to {0}", _newsURL));
+                } else {
+                    addFormError("Changing news URL disabled");
+                }
             }
         }
         
@@ -199,7 +202,8 @@ public class ConfigUpdateHandler extends FormHandler {
         
         changes.put(PROP_SHOULD_PROXY, Boolean.toString(_updateThroughProxy));
         changes.put(PROP_SHOULD_PROXY_NEWS, Boolean.toString(_newsThroughProxy));
-        changes.put(PROP_UPDATE_UNSIGNED, Boolean.toString(_updateUnsigned));
+        if (isAdvanced())
+            changes.put(PROP_UPDATE_UNSIGNED, Boolean.toString(_updateUnsigned));
         
         String oldFreqStr = _context.getProperty(PROP_REFRESH_FREQUENCY, DEFAULT_REFRESH_FREQUENCY);
         long oldFreq = DEFAULT_REFRESH_FREQ;
@@ -233,17 +237,24 @@ public class ConfigUpdateHandler extends FormHandler {
             oldKeys = oldKeys.replace("\r\n", ",");
             if (!_trustedKeys.equals(oldKeys)) {
                 // note that keys are not validated here and no console error message will be generated
-                changes.put(PROP_TRUSTED_KEYS, _trustedKeys);
-                addFormNotice(_("Updating trusted keys."));
+                if (isAdvanced()) {
+                    changes.put(PROP_TRUSTED_KEYS, _trustedKeys);
+                    addFormNotice(_("Updating trusted keys."));
+                } else {
+                    addFormError("Changing trusted keys disabled");
+                }
             }
         }
         
         if ( (_zipURL != null) && (_zipURL.length() > 0) ) {
             String oldURL = _context.router().getConfigSetting(PROP_ZIP_URL);
             if ( (oldURL == null) || (!_zipURL.equals(oldURL)) ) {
-                //changes.put(PROP_ZIP_URL, _zipURL);
-                //addFormNotice(_("Updating unsigned update URL to {0}", _zipURL));
-                addFormError("Changing unsigned update URL disabled");
+                if (isAdvanced()) {
+                    changes.put(PROP_ZIP_URL, _zipURL);
+                    addFormNotice(_("Updating unsigned update URL to {0}", _zipURL));
+                } else {
+                    addFormError("Changing unsigned update URL disabled");
+                }
             }
         }
         

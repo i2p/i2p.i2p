@@ -52,7 +52,7 @@
 <tr><td class="mediumtags" align="right"><b><%=intl._("HTTP Proxy Username")%>:</b></td>
 <td><input name="username" type="text" value="<jsp:getProperty name="reseedHelper" property="username" />" ></td></tr>
 <tr><td class="mediumtags" align="right"><b><%=intl._("HTTP Proxy Password")%>:</b></td>
-<td><input name="password" type="password" value="<jsp:getProperty name="reseedHelper" property="password" />" ></td></tr>
+<td><input name="nofilter_password" type="password" value="<jsp:getProperty name="reseedHelper" property="nofilter_password" />" ></td></tr>
 
 <!-- TODO Need SSLEepGet support
 <tr><td class="mediumtags" align="right"><b><%=intl._("Enable HTTPS Proxy?")%></b></td>
@@ -67,7 +67,7 @@
 <tr><td class="mediumtags" align="right"><b><%=intl._("HTTPS Proxy Username")%>:</b></td>
 <td><input name="susername" type="text" value="<jsp:getProperty name="reseedHelper" property="susername" />" ></td></tr>
 <tr><td class="mediumtags" align="right"><b><%=intl._("HTTPS Proxy Password")%>:</b></td>
-<td><input name="spassword" type="password" value="<jsp:getProperty name="reseedHelper" property="spassword" />" ></td></tr>
+<td><input name="nofilter_spassword" type="password" value="<jsp:getProperty name="reseedHelper" property="nofilter_spassword" />" ></td></tr>
 -->
 
 </table></div>

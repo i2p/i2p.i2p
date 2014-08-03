@@ -26,7 +26,7 @@ public class ConfigReseedHelper extends HelperBase {
     }
 
     /** @since 0.8.9 */
-    public String getPassword() {
+    public String getNofilter_password() {
         return _context.getProperty(Reseeder.PROP_PROXY_PASSWORD, "");
     }
 
@@ -46,7 +46,7 @@ public class ConfigReseedHelper extends HelperBase {
     }
 
     /** @since 0.8.9 */
-    public String getSpassword() {
+    public String getNofilter_spassword() {
         return _context.getProperty(Reseeder.PROP_SPROXY_PASSWORD, "");
     }
 

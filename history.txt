@@ -1,3 +1,14 @@
+2014-08-03 zzz
+ * Console:
+   - Fix update buttons
+   - Don't filter parameter names starting with "nofilter_"
+   - Re-allow configadvanced, news URL, and unsigned update URL if routerconsole.advanced=true
+   - Re-allow plugin install if routerconsole.advanced=true or routerconsole.enablePluginInstall=true
+   - Only allow whitelisted plugin signers, unless routerconsole.allowUntrustedPlugins=true
+   - Re-allow clients.config changes if routerconsole.advanced=true or routerconsole.enableClientChange=true
+   - More escaping
+ * i2psnark: Fix add torrent form
+
 2014-07-31 zzz
  * ExecNamingService: Remove
  * Plugins: Add whitelist of keys

@@ -21,14 +21,20 @@ public class XSSRequestWrapper extends HttpServletRequestWrapper {
     // Adapted from https://owasp-esapi-java.googlecode.com/svn/trunk/configuration/esapi/ESAPI.properties
     private static final Pattern parameterValuePattern = Pattern.compile("^[\\p{L}\\p{Nd}.,:\\-\\/+=~\\[\\]?@_ \r\n]*$");
     private static final Pattern headerValuePattern = Pattern.compile("^[a-zA-Z0-9()\\-=\\*\\.\\?;,+\\/:&_ ]*$");
+    private static final String NOFILTER = "nofilter_";
 
     public XSSRequestWrapper(HttpServletRequest servletRequest) {
         super(servletRequest);
     }
 
+    /**
+     *  Parameter names starting with "nofilter_" will not be filtered.
+     */
     @Override
     public String[] getParameterValues(String parameter) {
         String[] values = super.getParameterValues(parameter);
+        if (parameter.startsWith(NOFILTER))
+            return values;
 
         if (values == null) {
             return null;
@@ -58,9 +64,14 @@ public class XSSRequestWrapper extends HttpServletRequestWrapper {
         return encodedValues;
     }
 
+    /**
+     *  Parameter names starting with "nofilter_" will not be filtered.
+     */
     @Override
     public String getParameter(String parameter) {
         String value = super.getParameter(parameter);
+        if (parameter.startsWith(NOFILTER))
+            return value;
         String rv = stripXSS(value, parameterValuePattern);
         if (value != null && rv == null) {
             Log log = I2PAppContext.getGlobalContext().logManager().getLog(XSSRequestWrapper.class);
@@ -69,6 +80,9 @@ public class XSSRequestWrapper extends HttpServletRequestWrapper {
         return rv;
     }
 
+    /**
+     *  Parameter names starting with "nofilter_" will not be filtered.
+     */
     @Override
     public Map getParameterMap() {
         Map rv = new HashMap();

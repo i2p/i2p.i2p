@@ -39,7 +39,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
  <%=intl._("All changes require restart to take effect.")%></i>
  </p><hr><div class="formaction">
  <input type="submit" class="cancel" name="foo" value="<%=intl._("Cancel")%>" />
-<% if (false && request.getParameter("edit") == null) { %>
+<% if (clientshelper.isClientChangeEnabled() && request.getParameter("edit") == null) { %>
  <input type="submit" name="edit" class="add" value="<%=intl._("Add Client")%>" />
 <% } %>
  <input type="submit" class="accept" name="action" value="<%=intl._("Save Client Configuration")%>" />
@@ -80,7 +80,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
 <%=intl._("Username")%>:
 <input name="user" type="text" value="" /><br>
 <%=intl._("Password")%>:
-<input name="pw" type="password" value="" /><br>
+<input name="nofilter_pw" type="password" value="" /><br>
 </p><p><b><%=intl._("The default settings will work for most people.")%></b>
 <%=intl._("Any changes made here must also be configured in the external client.")%>
 <%=intl._("Many clients do not support SSL or authorization.")%>
@@ -117,7 +117,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
  <input type="submit" name="action" class="accept" value="<%=intl._("Save Plugin Configuration")%>" />
 </div></form></div>
 
-<!--
+<% if (clientshelper.isPluginInstallEnabled()) { %>
 <h3><a name="plugin"></a><%=intl._("Plugin Installation")%></h3><p>
  <%=intl._("Look for available plugins on {0}.", "<a href=\"http://plugins.i2p\">plugins.i2p</a>")%>
  <%=intl._("To install a plugin, enter the download URL:")%>
@@ -133,6 +133,8 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
 </div><hr><div class="formaction">
  <input type="submit" name="action" class="reload" value="<%=intl._("Update All Installed Plugins")%>" />
  </div></form></div>
--->
-<% } %>
+<%
+     } // pluginInstallEnabled
+ } // showPlugins
+%>
 </div></div></body></html>

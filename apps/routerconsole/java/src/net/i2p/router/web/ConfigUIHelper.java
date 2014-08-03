@@ -183,7 +183,7 @@ public class ConfigUIHelper extends HelperBase {
                    "</td><td align=\"left\"><input type=\"text\" name=\"name\">" +
                    "</td><td align=\"left\"><b>");
         buf.append(_("Password")).append(":</b> " +
-                   "<input type=\"password\" size=\"40\" name=\"pw\"></td></tr>" +
+                   "<input type=\"password\" size=\"40\" name=\"nofilter_pw\"></td></tr>" +
                    "</table>\n");
         return buf.toString();
     }

@@ -57,7 +57,8 @@ public class CSSHelper extends HelperBase {
      */
     public void setLang(String lang) {
         // Protected with nonce in css.jsi
-        if (lang != null && lang.length() > 0 && lang.length() <= 6) {
+        if (lang != null && lang.length() >= 2 && lang.length() <= 6 &&
+            lang.replaceAll("[a-zA-Z_]", "").length() == 0) {
             Map m = new HashMap(2);
             int under = lang.indexOf('_');
             if (under < 0) {

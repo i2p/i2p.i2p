@@ -818,19 +818,19 @@ public class SummaryHelper extends HelperBase {
     /* below here is stuff we need to get from summarynoframe.jsp to SummaryBarRenderer */
 
     private String _action;
-    public void setAction(String s) { _action = DataHelper.stripHTML(s); }
+    public void setAction(String s) { _action = s == null ? null : DataHelper.stripHTML(s); }
     public String getAction() { return _action; }
 
     private String _consoleNonce;
-    public void setConsoleNonce(String s) { _consoleNonce = DataHelper.stripHTML(s); }
+    public void setConsoleNonce(String s) { _consoleNonce = s == null ? null : DataHelper.stripHTML(s); }
     public String getConsoleNonce() { return _consoleNonce; }
 
     private String _updateNonce;
-    public void setUpdateNonce(String s) { _updateNonce = DataHelper.stripHTML(s); }
+    public void setUpdateNonce(String s) { _updateNonce = s == null ? null : DataHelper.stripHTML(s); }
     public String getUpdateNonce() { return _updateNonce; }
 
     private String _requestURI;
-    public void setRequestURI(String s) { _requestURI = DataHelper.stripHTML(s); }
+    public void setRequestURI(String s) { _requestURI = s == null ? null : DataHelper.stripHTML(s); }
 
     /**
      * @return non-null; "/home" if (strangely) not set by jsp

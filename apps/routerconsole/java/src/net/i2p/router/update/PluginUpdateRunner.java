@@ -54,6 +54,7 @@ class PluginUpdateRunner extends UpdateRunner {
     private static final String XPI2P = "app.xpi2p";
     private static final String ZIP = XPI2P + ".zip";
     public static final String PLUGIN_DIR = PluginStarter.PLUGIN_DIR;
+    private static final String PROP_ALLOW_NEW_KEYS = "routerconsole.allowUntrustedPlugins";
 
     public PluginUpdateRunner(RouterContext ctx, ConsoleUpdateManager mgr, List<URI> uris,
                               String appName, String oldVersion ) {
@@ -162,7 +163,7 @@ class PluginUpdateRunner extends UpdateRunner {
 
             // ok, now we check sigs and deal with a bad sig
             String pubkey = props.getProperty("key");
-            String signer = props.getProperty("signer");
+            String signer = DataHelper.stripHTML(props.getProperty("signer"));
             if (pubkey == null || signer == null || pubkey.length() != 172 || signer.length() <= 0) {
                 f.delete();
                 to.delete();
@@ -175,6 +176,14 @@ class PluginUpdateRunner extends UpdateRunner {
             // will be discovered and rejected
             Map<String, String> existingKeys = PluginStarter.getPluginKeys(_context);
             for (Map.Entry<String, String> e : existingKeys.entrySet()) {
+                // ignore dups/bad keys
+                up.addKey(e.getKey(), e.getValue());
+            }
+
+            // add all trusted plugin keys, so any conflicts with trusted keys
+            // will be discovered and rejected
+            Map<String, String> trustedKeys = TrustedPluginKeys.getKeys();
+            for (Map.Entry<String, String> e : trustedKeys.entrySet()) {
                 // ignore dups/bad keys
                 up.addKey(e.getKey(), e.getValue());
             }
@@ -194,7 +203,7 @@ class PluginUpdateRunner extends UpdateRunner {
                     statusDone("<b>" + _("Plugin signature verification of {0} failed", url) + "</b>");
                     return;
                 }
-            } else {
+            } else if (_context.getBooleanProperty(PROP_ALLOW_NEW_KEYS)) {
                 // add to keyring...
                 if(!up.addKey(pubkey, signer)) {
                     // bad or duplicate key
@@ -218,6 +227,14 @@ class PluginUpdateRunner extends UpdateRunner {
                     statusDone("<b>" + _("Plugin signature verification of {0} failed", url) + "</b>");
                     return;
                 }
+            } else {
+                // unknown key
+                f.delete();
+                to.delete();
+                _log.error("Untrusted plugin key \"" + pubkey + "\" for plugin signer \"" + signer + "\"");
+                // don't display signer, we're really checking the key not the signer name
+                statusDone("<b>" + _("Plugin not installed - signer is untrusted") + "</b>");
+                return;
             }
 
             String sudVersion = TrustedUpdate.getVersionString(f);

@@ -14,10 +14,11 @@
 <div class="main" id="main"><div class="wideload">
 <%
     String peerB64 = request.getParameter("peer");
-    if (peerB64 == null || peerB64.length() <= 0) {
+    if (peerB64 == null || peerB64.length() <= 0 ||
+        peerB64.replaceAll("[a-zA-Z0-9~=-]", "").length() != 0) {
         out.print("No peer specified");
     } else {
-        peerB64 = net.i2p.data.DataHelper.stripHTML(peerB64);  // XSS
+
 %>
 <jsp:useBean id="stathelper" class="net.i2p.router.web.StatHelper" />
 <jsp:setProperty name="stathelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />

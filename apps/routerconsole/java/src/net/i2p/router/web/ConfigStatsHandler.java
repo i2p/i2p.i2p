@@ -122,7 +122,7 @@ public class ConfigStatsHandler extends FormHandler {
             addFormNotice(_("Restart required to take effect"));
         }
         if (graphsChanged)
-            addFormNotice(_("Graph list updated, may take up to 60s to be reflected on the {0}Graphs Page{1}", "<a href=\"graphs\">", "</a>"));
+            addFormNoticeNoEscape(_("Graph list updated, may take up to 60s to be reflected on the {0}Graphs Page{1}", "<a href=\"graphs\">", "</a>"));
     }
     
 }

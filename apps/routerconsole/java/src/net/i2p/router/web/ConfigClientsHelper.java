@@ -26,8 +26,21 @@ public class ConfigClientsHelper extends HelperBase {
     public static final String PROP_ENABLE_SSL = "i2cp.SSL";
     /** from ClientMessageEventListener */
     public static final String PROP_AUTH = "i2cp.auth";
+    public static final String PROP_ENABLE_CLIENT_CHANGE = "routerconsole.enableClientChange";
+    public static final String PROP_ENABLE_PLUGIN_INSTALL = "routerconsole.enablePluginInstall";
 
     public ConfigClientsHelper() {}
+
+    /** @since 0.9.14.1 */
+    public boolean isClientChangeEnabled() {
+        return _context.getBooleanProperty(PROP_ENABLE_CLIENT_CHANGE) || isAdvanced();
+    }
+
+    /** @since 0.9.14.1 */
+    public boolean isPluginInstallEnabled() {
+        return PluginStarter.pluginsEnabled(_context) &&
+               (_context.getBooleanProperty(PROP_ENABLE_PLUGIN_INSTALL) || isAdvanced());
+    }
 
     /** @since 0.8.3 */
     public String getPort() {
@@ -96,6 +109,7 @@ public class ConfigClientsHelper extends HelperBase {
            .append(_("Control")).append("</th><th align=\"left\">")
            .append(_("Class and arguments")).append("</th></tr>\n");
         
+        boolean allowEdit = isClientChangeEnabled();
         List<ClientAppConfig> clients = ClientAppConfig.getClientApps(_context);
         for (int cur = 0; cur < clients.size(); cur++) {
             ClientAppConfig ca = clients.get(cur);
@@ -117,19 +131,21 @@ public class ConfigClientsHelper extends HelperBase {
                        // dangerous, but allow editing the console args too
                        //"webConsole".equals(ca.clientName) || "Web console".equals(ca.clientName),
                        false, RouterConsoleRunner.class.getName().equals(ca.className),
-                       // description, edit
-                       ca.className + ((ca.args != null) ? " " + ca.args : ""), /* (""+cur).equals(_edit) */ false,
+                       // description
+                       ca.className + ((ca.args != null) ? " " + ca.args : ""),
+                       // edit
+                       allowEdit && (""+cur).equals(_edit),
                        // show edit button, show update button
                        // Don't allow edit if it's running, or else we would lose the "handle" to the ClientApp to stop it.
-                       /* !showStop */ false, false, 
+                       allowEdit && !showStop, false, 
                        // show stop button
                        showStop,
                        // show delete button, show start button
                        !isConsole, showStart);
         }
         
-        //if ("new".equals(_edit))
-        //    renderForm(buf, "" + clients.size(), "", false, false, false, false, "", true, false, false, false, false, false);
+        if (allowEdit && "new".equals(_edit))
+            renderForm(buf, "" + clients.size(), "", false, false, false, false, "", true, false, false, false, false, false);
         buf.append("</table>\n");
         return buf.toString();
     }
@@ -291,9 +307,9 @@ public class ConfigClientsHelper extends HelperBase {
         if (showStopButton && (!edit))
             buf.append("<button type=\"submit\" class=\"Xstop\" name=\"action\" value=\"Stop ").append(index).append("\" >")
                .append(_("Stop")).append("<span class=hide> ").append(index).append("</span></button>");
-        //if (showEditButton && (!edit) && !ro)
-        //    buf.append("<button type=\"submit\" class=\"Xadd\" name=\"edit\" value=\"Edit ").append(index).append("\" >")
-        //       .append(_("Edit")).append("<span class=hide> ").append(index).append("</span></button>");
+        if (isClientChangeEnabled() && showEditButton && (!edit) && !ro)
+            buf.append("<button type=\"submit\" class=\"Xadd\" name=\"edit\" value=\"Edit ").append(index).append("\" >")
+               .append(_("Edit")).append("<span class=hide> ").append(index).append("</span></button>");
         if (showUpdateButton && (!edit) && !ro) {
             buf.append("<button type=\"submit\" class=\"Xcheck\" name=\"action\" value=\"Check ").append(index).append("\" >")
                .append(_("Check for updates")).append("<span class=hide> ").append(index).append("</span></button>");

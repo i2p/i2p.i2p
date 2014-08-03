@@ -49,17 +49,28 @@ public class ConfigClientsHandler extends FormHandler {
             saveWebAppChanges();
             return;
         }
+        boolean pluginsEnabled = PluginStarter.pluginsEnabled(_context);
         if (_action.equals(_("Save Plugin Configuration"))) {
-            savePluginChanges();
+            if (pluginsEnabled)
+                savePluginChanges();
+            else
+                addFormError("Plugins disabled");
             return;
         }
         if (_action.equals(_("Install Plugin"))) {
-            //installPlugin();
-            addFormError("Plugin installation disabled");
+            if (pluginsEnabled &&
+                (_context.getBooleanProperty(ConfigClientsHelper.PROP_ENABLE_PLUGIN_INSTALL) ||
+                 isAdvanced()))
+                installPlugin();
+            else
+                addFormError("Plugins disabled");
             return;
         }
         if (_action.equals(_("Update All Installed Plugins"))) {
-            updateAllPlugins();
+            if (pluginsEnabled)
+                updateAllPlugins();
+            else
+                addFormError("Plugins disabled");
             return;
         }
         // value
@@ -73,10 +84,14 @@ public class ConfigClientsHandler extends FormHandler {
                 startClient(appnum);
             } else {
                 List<String> plugins = PluginStarter.getPlugins();
-                if (plugins.contains(app))
-                    startPlugin(app);
-                else
+                if (plugins.contains(app)) {
+                    if (pluginsEnabled)
+                        startPlugin(app);
+                    else
+                        addFormError("Plugins disabled");
+                } else {
                     startWebApp(app);
+                }
             }
             return;
         }
@@ -90,7 +105,7 @@ public class ConfigClientsHandler extends FormHandler {
             } catch (NumberFormatException nfe) {}
             if (appnum >= 0) {
                 deleteClient(appnum);
-            } else {
+            } else if (pluginsEnabled) {
                 try {
                     PluginStarter.stopPlugin(_context, app);
                 } catch (ClassNotFoundException cnfe) {
@@ -108,6 +123,8 @@ public class ConfigClientsHandler extends FormHandler {
                     addFormError(_("Error deleting plugin {0}", app) + ": " + e);
                     _log.error("Error deleting plugin " + app,  e);
                 }
+            } else {
+                addFormError("Plugins disabled");
             }
             return;
         }
@@ -126,8 +143,12 @@ public class ConfigClientsHandler extends FormHandler {
                 List<String> plugins = PluginStarter.getPlugins();
                 if (plugins.contains(app)) {
                     try {
-                        PluginStarter.stopPlugin(_context, app);
-                        addFormNotice(_("Stopped plugin {0}", app));
+                        if (pluginsEnabled) {
+                            PluginStarter.stopPlugin(_context, app);
+                            addFormNotice(_("Stopped plugin {0}", app));
+                        } else {
+                            addFormError("Plugins disabled");
+                        }
                     } catch (Throwable e) {
                         addFormError(_("Error stopping plugin {0}", app) + ": " + e);
                         _log.error("Error stopping plugin " + app,  e);
@@ -142,15 +163,23 @@ public class ConfigClientsHandler extends FormHandler {
 
         // value
         if (_action.startsWith("Update ")) {
-            String app = _action.substring(7);
-            updatePlugin(app);
+            if (pluginsEnabled) {
+                String app = _action.substring(7);
+                updatePlugin(app);
+            } else {
+                addFormError("Plugins disabled");
+            }
             return;
         }
 
         // value
         if (_action.startsWith("Check ")) {
-            String app = _action.substring(6);
-            checkPlugin(app);
+            if (pluginsEnabled) {
+                String app = _action.substring(6);
+                checkPlugin(app);
+            } else {
+                addFormError("Plugins disabled");
+            }
             return;
         }
 
@@ -168,10 +197,14 @@ public class ConfigClientsHandler extends FormHandler {
                 startClient(appnum);
             } else {
                 List<String> plugins = PluginStarter.getPlugins();
-                if (plugins.contains(app))
-                    startPlugin(app);
-                else
+                if (plugins.contains(app)) {
+                    if (pluginsEnabled)
+                        startPlugin(app);
+                    else
+                        addFormError("Plugins disabled");
+                } else {
                     startWebApp(app);
+                }
             }
         } else {
             //addFormError(_("Unsupported") + ' ' + _action + '.');
@@ -187,45 +220,46 @@ public class ConfigClientsHandler extends FormHandler {
             if (! (RouterConsoleRunner.class.getName().equals(ca.className)))
                 ca.disabled = val == null;
             // edit of an existing entry
-            // disabled
-/****
-            String desc = getJettyString("desc" + cur);
-            if (desc != null) {
-                int spc = desc.indexOf(" ");
-                String clss = desc;
-                String args = null;
-                if (spc >= 0) {
-                    clss = desc.substring(0, spc);
-                    args = desc.substring(spc + 1);
+            if (_context.getBooleanProperty(ConfigClientsHelper.PROP_ENABLE_CLIENT_CHANGE) ||
+                isAdvanced()) {
+                String desc = getJettyString("desc" + cur);
+                if (desc != null) {
+                    int spc = desc.indexOf(" ");
+                    String clss = desc;
+                    String args = null;
+                    if (spc >= 0) {
+                        clss = desc.substring(0, spc);
+                        args = desc.substring(spc + 1);
+                    }
+                    ca.className = clss;
+                    ca.args = args;
+                    ca.clientName = getJettyString("name" + cur);
                 }
-                ca.className = clss;
-                ca.args = args;
-                ca.clientName = getJettyString("name" + cur);
             }
-****/
         }
 
-        // disabled
-/****
-        int newClient = clients.size();
-        String newDesc = getJettyString("desc" + newClient);
-        if (newDesc != null && newDesc.trim().length() > 0) {
-            // new entry
-            int spc = newDesc.indexOf(" ");
-            String clss = newDesc;
-            String args = null;
-            if (spc >= 0) {
-                clss = newDesc.substring(0, spc);
-                args = newDesc.substring(spc + 1);
+        // new client
+        if (_context.getBooleanProperty(ConfigClientsHelper.PROP_ENABLE_CLIENT_CHANGE) ||
+            isAdvanced()) {
+            int newClient = clients.size();
+            String newDesc = getJettyString("desc" + newClient);
+            if (newDesc != null && newDesc.trim().length() > 0) {
+                // new entry
+                int spc = newDesc.indexOf(" ");
+                String clss = newDesc;
+                String args = null;
+                if (spc >= 0) {
+                    clss = newDesc.substring(0, spc);
+                    args = newDesc.substring(spc + 1);
+                }
+                String name = getJettyString("name" + newClient);
+                if (name == null || name.trim().length() <= 0) name = "new client";
+                ClientAppConfig ca = new ClientAppConfig(clss, name, args, 2*60*1000,
+                                                         _settings.get(newClient + ".enabled") != null);
+                clients.add(ca);
+                addFormNotice(_("New client added") + ": " + name + " (" + clss + ").");
             }
-            String name = getJettyString("name" + newClient);
-            if (name == null || name.trim().length() <= 0) name = "new client";
-            ClientAppConfig ca = new ClientAppConfig(clss, name, args, 2*60*1000,
-                                                     _settings.get(newClient + ".enabled") != null);
-            clients.add(ca);
-            addFormNotice(_("New client added") + ": " + name + " (" + clss + ").");
         }
-****/
 
         ClientAppConfig.writeClientAppConfig(_context, clients);
         addFormNotice(_("Client configuration saved successfully"));
@@ -330,7 +364,7 @@ public class ConfigClientsHandler extends FormHandler {
                         File path = new File(_context.getBaseDir(), "webapps");
                         path = new File(path, app + ".war");
                         WebAppStarter.startWebApp(_context, s, app, path.getAbsolutePath());
-                        addFormNotice(_("WebApp") + " <a href=\"/" + app + "/\">" + _(app) + "</a> " + _("started") + '.');
+                        addFormNoticeNoEscape(_("WebApp") + " <a href=\"/" + app + "/\">" + _(app) + "</a> " + _("started") + '.');
                     } catch (Throwable e) {
                         addFormError(_("Failed to start") + ' ' + _(app) + " " + e + '.');
                         _log.error("Failed to start webapp " + app, e);
@@ -440,7 +474,7 @@ public class ConfigClientsHandler extends FormHandler {
         if (intfc != null)
             changes.put(ClientManagerFacadeImpl.PROP_CLIENT_HOST, intfc);
         String user = getJettyString("user");
-        String pw = getJettyString("pw");
+        String pw = getJettyString("nofilter_pw");
         if (user != null && pw != null && user.length() > 0 && pw.length() > 0) {
             ConsolePasswordManager mgr = new ConsolePasswordManager(_context);
             mgr.saveHash(ConfigClientsHelper.PROP_AUTH, user, pw);

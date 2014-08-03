@@ -540,7 +540,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                 <label>
                     <%=intl._("Password")%>:
                 </label>
-                <input type="password" id="clientPort" name="proxyPassword" title="Set password for this service" value="" class="freetext" />                
+                <input type="password" id="clientPort" name="nofilter_proxyPassword" title="Set password for this service" value="" class="freetext" />                
             </div>
             <div class="subdivider">
                 <hr />
@@ -564,7 +564,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                 <label>
                     <%=intl._("Password")%>:
                 </label>
-                <input type="password" id="clientPort" name="outproxyPassword" title="Enter password required by outproxy" value="<%=editBean.getOutproxyPassword(curTunnel)%>" class="freetext" />                
+                <input type="password" id="clientPort" name="nofilter_outproxyPassword" title="Enter password required by outproxy" value="<%=editBean.getOutproxyPassword(curTunnel)%>" class="freetext" />                
             </div>
             <div class="subdivider">
                 <hr />
