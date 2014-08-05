@@ -212,9 +212,9 @@ riCe6OlAEiNpcc6mMyIYYWFICbrDFTrDR3wXqwc/Jkcx6L5VVWoagpSzbo3yGhc=
     }
 
     /**
-     *  @since 0.9.8
+     *  @since 0.9.8, public since 0.9.14.1
      */
-    Map<SigningPublicKey, String> getKeys() {
+    public Map<SigningPublicKey, String> getKeys() {
         return Collections.unmodifiableMap(_trustedKeys);
     }
 

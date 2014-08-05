@@ -10,7 +10,9 @@ import java.util.Properties;
 
 import net.i2p.CoreVersion;
 import net.i2p.crypto.TrustedUpdate;
+import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
+import net.i2p.data.SigningPublicKey;
 import net.i2p.router.RouterContext;
 import net.i2p.router.web.ConfigClientsHelper;
 import net.i2p.router.web.ConfigUpdateHandler;
@@ -171,6 +173,15 @@ class PluginUpdateRunner extends UpdateRunner {
                 statusDone("<b>" + _("Plugin from {0} contains an invalid key", url) + "</b>");
                 return;
             }
+            SigningPublicKey spk;
+            try {
+                spk = new SigningPublicKey(pubkey);
+            } catch (DataFormatException dfe) {
+                f.delete();
+                to.delete();
+                statusDone("<b>" + _("Plugin from {0} contains an invalid key", url) + "</b>");
+                return;
+            }
 
             // add all existing plugin keys, so any conflicts with existing keys
             // will be discovered and rejected
@@ -192,8 +203,9 @@ class PluginUpdateRunner extends UpdateRunner {
                 // the key is already in the TrustedUpdate keyring
                 // verify the sig and verify that it is signed by the signer in the plugin.config file
                 // Allow "" as the previously-known signer
-                String signingKeyName = up.verifyAndGetSigner(f);
-                if (!(signer.equals(signingKeyName) || "".equals(signingKeyName))) {
+                boolean ok = up.verify(f, spk);
+                String signingKeyName = up.getKeys().get(spk);
+                if ((!ok) || !(signer.equals(signingKeyName) || "".equals(signingKeyName))) {
                     f.delete();
                     to.delete();
                     if (signingKeyName == null)
