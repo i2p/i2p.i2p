@@ -728,7 +728,7 @@ public class IndexBean {
         _tunnelBackupQuantity = (tunnelBackupQuantity != null ? tunnelBackupQuantity.trim() : null);
     }
     /** what I2P session overrides should be used */
-    public void setCustomOptions(String customOptions) { 
+    public void setNofilter_customOptions(String customOptions) { 
         _customOptions = (customOptions != null ? customOptions.trim() : null);
     }
     /** what HTTP outproxies should be used (httpclient specific) */

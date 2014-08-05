@@ -17,6 +17,7 @@ import java.util.TreeMap;
 import net.i2p.client.I2PClient;
 import net.i2p.crypto.SigType;
 import net.i2p.data.Base64;
+import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.PrivateKeyFile;
 import net.i2p.data.Signature;
@@ -452,7 +453,7 @@ public class EditBean extends IndexBean {
                     space = true;
                 buf.append(e.getKey()).append('=').append(e.getValue());
             }
-            return buf.toString();
+            return DataHelper.escapeHTML(buf.toString());
         } else {
             return "";
         }
