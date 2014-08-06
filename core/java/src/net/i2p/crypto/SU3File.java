@@ -49,6 +49,7 @@ public class SU3File {
     private int _versionLength;
     private String _signer;
     private int _signerLength;
+    private int _fileType = -1;
     private ContentType _contentType;
     private long _contentLength;
     private PublicKey _signerPubkey;
@@ -60,18 +61,21 @@ public class SU3File {
     private static final int MIN_VERSION_BYTES = 16;
     private static final int VERSION_OFFSET = 40; // Signature.SIGNATURE_BYTES; avoid early ctx init
 
-    private static final int TYPE_ZIP = 0;
+    public static final int TYPE_ZIP = 0;
+    public static final int TYPE_XML = 1;
 
     public static final int CONTENT_UNKNOWN = 0;
     public static final int CONTENT_ROUTER = 1;
     public static final int CONTENT_PLUGIN = 2;
     public static final int CONTENT_RESEED = 3;
+    public static final int CONTENT_NEWS = 4;
 
     private enum ContentType {
         UNKNOWN(CONTENT_UNKNOWN, "unknown"),
         ROUTER(CONTENT_ROUTER, "router"),
         PLUGIN(CONTENT_PLUGIN, "plugin"),
-        RESEED(CONTENT_RESEED, "reseed")
+        RESEED(CONTENT_RESEED, "reseed"),
+        NEWS(CONTENT_NEWS, "news")
         ;
 
         private final int code;
@@ -154,6 +158,15 @@ public class SU3File {
     }
 
     /**
+     *  @return -1 if unknown
+     *  @since 0.9.15
+     */
+    public int getFileType() throws IOException {
+        verifyHeader();
+        return _fileType;
+    }
+
+    /**
      *  Throws IOE if verify vails.
      */
     public void verifyHeader() throws IOException {
@@ -204,9 +217,9 @@ public class SU3File {
         if (_contentLength <= 0)
             throw new IOException("bad content length");
         skip(in, 1);
-        foo = in.read();
-        if (foo != TYPE_ZIP)
-            throw new IOException("bad type");
+        _fileType = in.read();
+        if (_fileType != TYPE_ZIP && _fileType != TYPE_XML)
+            throw new IOException("bad file type");
         skip(in, 1);
         int cType = in.read();
         _contentType = BY_CODE.get(Integer.valueOf(cType));
@@ -352,11 +365,12 @@ public class SU3File {
      *  Throws on all errors.
      *
      *  @param content the input file, probably in zip format
-     *  @param contentType 0-255, 0 for zip
+     *  @param fileType 0-255, 0 for zip
+     *  @param contentType 0-255
      *  @param version 1-255 bytes when converted to UTF-8
      *  @param signer ID of the public key, 1-255 bytes when converted to UTF-8
      */
-    public void write(File content, int contentType, String version,
+    public void write(File content, int fileType, int contentType, String version,
                       String signer, PrivateKey privkey, SigType sigType) throws IOException {
         InputStream in = null;
         DigestOutputStream out = null;
@@ -386,7 +400,9 @@ public class SU3File {
                 throw new IllegalArgumentException("No content");
             DataHelper.writeLong(out, 8, contentLength);
             out.write((byte) 0);
-            out.write((byte) TYPE_ZIP);
+            if (fileType < 0 || fileType > 255)
+                throw new IllegalArgumentException("bad content type");
+            out.write((byte) fileType);
             out.write((byte) 0);
             if (contentType < 0 || contentType > 255)
                 throw new IllegalArgumentException("bad content type");
@@ -443,8 +459,9 @@ public class SU3File {
             // defaults
             String stype = null;
             String ctype = null;
+            String ftype = null;
             boolean error = false;
-            Getopt g = new Getopt("SU3File", args, "t:c:");
+            Getopt g = new Getopt("SU3File", args, "t:c:f:");
             int c;
             while ((c = g.getopt()) != -1) {
               switch (c) {
@@ -454,6 +471,10 @@ public class SU3File {
 
                 case 'c':
                     ctype = g.getOptarg();
+                    break;
+
+                case 'f':
+                    ftype = g.getOptarg();
                     break;
 
                 case '?':
@@ -476,7 +497,7 @@ public class SU3File {
                 Properties props = new Properties();
                 props.setProperty("prng.bufferSize", "16384");
                 new I2PAppContext(props);
-                ok = signCLI(stype, ctype, a.get(0), a.get(1), a.get(2), a.get(3), a.get(4), "");
+                ok = signCLI(stype, ctype, ftype, a.get(0), a.get(1), a.get(2), a.get(3), a.get(4), "");
             } else if ("bulksign".equals(cmd)) {
                 Properties props = new Properties();
                 props.setProperty("prng.bufferSize", "16384");
@@ -502,11 +523,11 @@ public class SU3File {
 
     private static final void showUsageCLI() {
         System.err.println("Usage: SU3File keygen       [-t type|code] publicKeyFile keystore.ks you@mail.i2p");
-        System.err.println("       SU3File sign         [-c type|code] [-t type|code] inputFile.zip signedFile.su3 keystore.ks version you@mail.i2p");
-        System.err.println("       SU3File bulksign     [-c type|code] [-t type|code] directory keystore.ks version you@mail.i2p");
+        System.err.println("       SU3File sign         [-t type|code] [-c type|code] [-f type|code] inputFile.zip signedFile.su3 keystore.ks version you@mail.i2p");
+        System.err.println("       SU3File bulksign     [-t type|code] [-c type|code] directory keystore.ks version you@mail.i2p");
         System.err.println("       SU3File showversion  signedFile.su3");
         System.err.println("       SU3File verifysig    signedFile.su3");
-        System.err.println("       SU3File extract      signedFile.su3 outFile.zip");
+        System.err.println("       SU3File extract      signedFile.su3 outFile");
         System.err.println(dumpTypes());
     }
 
@@ -529,6 +550,9 @@ public class SU3File {
                 buf.append(" DEFAULT");
             buf.append('\n');
         }
+        buf.append("Available file types (-f):\n");
+        buf.append("      ZIP\t(code: 0) DEFAULT\n");
+        buf.append("      XML\t(code: 1)\n");
         return buf.toString();
     }
 
@@ -574,6 +598,7 @@ public class SU3File {
     }
 
     /**
+     *  Zip only
      *  @return success
      *  @since 0.9.9
      */
@@ -608,7 +633,7 @@ public class SU3File {
             if (!inputFile.endsWith(".zip"))
                 continue;
             String signedFile = inputFile.substring(0, inputFile.length() - 4) + ".su3";
-            boolean rv = signCLI(stype, ctype, inputFile, signedFile, privateKeyFile, version, signerName, keypw);
+            boolean rv = signCLI(stype, ctype, null, inputFile, signedFile, privateKeyFile, version, signerName, keypw);
             if (!rv)
                 return false;
             success++;
@@ -622,7 +647,7 @@ public class SU3File {
      *  @return success
      *  @since 0.9.9
      */
-    private static final boolean signCLI(String stype, String ctype, String inputFile, String signedFile,
+    private static final boolean signCLI(String stype, String ctype, String ftype, String inputFile, String signedFile,
                                          String privateKeyFile, String version, String signerName, String keypw) {
         SigType type = stype == null ? SigType.getByCode(Integer.valueOf(DEFAULT_SIG_CODE)) : SigType.parseSigType(stype);
         if (type == null) {
@@ -634,14 +659,32 @@ public class SU3File {
             System.out.println("Content type " + ctype + " is not supported");
             return false;
         }
-        return signCLI(type, ct, inputFile, signedFile, privateKeyFile, version, signerName, keypw);
+        int ft = TYPE_ZIP;
+        if (ftype != null) {
+            if (ftype.equalsIgnoreCase("ZIP")) {
+                ft = TYPE_ZIP;
+            } else if (ftype.equalsIgnoreCase("XML")) {
+                ft = TYPE_XML;
+            } else {
+                try {
+                    ft = Integer.parseInt(ftype);
+                } catch (NumberFormatException nfe) {
+                    ft = -1;
+                }
+                if (ft != TYPE_ZIP && ft != TYPE_XML) {
+                    System.out.println("File type " + ftype + " is not supported");
+                    return false;
+                }
+            }
+        }
+        return signCLI(type, ct, ft, inputFile, signedFile, privateKeyFile, version, signerName, keypw);
     }
 
     /**
      *  @return success
      *  @since 0.9.9
      */
-    private static final boolean signCLI(SigType type, ContentType ctype, String inputFile, String signedFile,
+    private static final boolean signCLI(SigType type, ContentType ctype, int ftype, String inputFile, String signedFile,
                                          String privateKeyFile, String version, String signerName, String keypw) {
         try {
             while (keypw.length() < 6) {
@@ -657,7 +700,7 @@ public class SU3File {
                 return false;
             }
             SU3File file = new SU3File(signedFile);
-            file.write(new File(inputFile), ctype.getCode(), version, signerName, pk, type);
+            file.write(new File(inputFile), ftype, ctype.getCode(), version, signerName, pk, type);
             System.out.println("Input file '" + inputFile + "' signed and written to '" + signedFile + "'");
             return true;
         } catch (GeneralSecurityException gse) {
