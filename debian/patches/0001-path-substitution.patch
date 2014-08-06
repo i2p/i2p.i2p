@@ -89,7 +89,7 @@ Debian wrapper.config to try to prevent confusion.
 -    fi
 -fi
 -
--WRAPPER_URL="http://www.i2p2.de/manualwrapper"
+-WRAPPER_URL="https://geti2p.net/en/misc/manual-wrapper"
 -unsupported() {
 -    echo "The most likely reason is that a supported version of the java"
 -    echo "wrapper is not available in the I2P installation package for your"
