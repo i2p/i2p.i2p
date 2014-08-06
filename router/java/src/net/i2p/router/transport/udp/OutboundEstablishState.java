@@ -99,6 +99,8 @@ class OutboundEstablishState {
     /** max delay including backoff */
     private static final long MAX_DELAY = 15*1000;
 
+    private static final long WAIT_FOR_HOLE_PUNCH_DELAY = 500;
+
     /**
      *  @param claimedAddress an IP/port based RemoteHostId, or null if unknown
      *  @param remoteHostId non-null, == claimedAddress if direct, or a hash-based one if indirect
@@ -556,7 +558,7 @@ class OutboundEstablishState {
     public synchronized void introduced(byte bobIP[], int bobPort) {
         if (_currentState != OutboundState.OB_STATE_PENDING_INTRO)
             return; // we've already successfully been introduced, so don't overwrite old settings
-        _nextSend = _context.clock().now() + 500; // wait briefly for the hole punching
+        _nextSend = _context.clock().now() + WAIT_FOR_HOLE_PUNCH_DELAY; // wait briefly for the hole punching
         _currentState = OutboundState.OB_STATE_INTRODUCED;
         if (_claimedAddress != null && bobPort == _bobPort && DataHelper.eq(bobIP, _bobIP)) {
             // he's who he said he was
@@ -569,6 +571,24 @@ class OutboundEstablishState {
         }
         if (_log.shouldLog(Log.INFO))
             _log.info("Introduced to " + _remoteHostId + ", now lets get on with establishing");
+    }
+
+    /**
+     *  Accelerate response to RelayResponse if we haven't sent it yet.
+     *
+     *  @return true if we should send the SessionRequest now
+     *  @since 0.9.15
+     */
+    synchronized boolean receiveHolePunch() {
+        if (_currentState != OutboundState.OB_STATE_INTRODUCED)
+            return false;
+        if (_requestSentCount > 0)
+            return false;
+        long now = _context.clock().now();
+        if (_log.shouldLog(Log.WARN))
+            _log.warn(toString() + " accelerating SessionRequest by " + (_nextSend - now) + " ms");
+        _nextSend = now;
+        return true;
     }
     
     /** how long have we been trying to establish this session? */
