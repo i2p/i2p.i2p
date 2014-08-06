@@ -38,6 +38,6 @@
  <br><b><%=intl._("NOTE")%>:</b> <%=intl._("Some changes may require a restart to take effect.")%>
  </div></form>
 <% } else { %>
-To make changes, edit the router.config file.
+<%=intl._("To make changes, edit the file {0}.", "<tt>" + advancedhelper.getConfigFileName() + "</tt>")%>
 <% }  // isAdvanced %>
 </div></div></div></body></html>

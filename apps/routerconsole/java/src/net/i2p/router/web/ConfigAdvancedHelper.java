@@ -19,4 +19,9 @@ public class ConfigAdvancedHelper extends HelperBase {
         }
         return buf.toString();
     }
+
+    /** @since 0.9.14.1 */
+    public String getConfigFileName() {
+        return _context.router().getConfigFilename();
+    }
 }
