@@ -255,7 +255,7 @@ public class SU3File {
         }
 
         if (_signerPubkey == null)
-            throw new IOException("unknown signer: " + _signer);
+            throw new IOException("unknown signer: " + _signer + " for content type: " + _contentType.getName());
         _headerVerified = true;
     }
 
@@ -325,7 +325,7 @@ public class SU3File {
             else
                 skip(in, getContentOffset());
             if (_signerPubkey == null)
-                throw new IOException("unknown signer: " + _signer);
+                throw new IOException("unknown signer: " + _signer + " for content type: " + _contentType.getName());
             if (migrateTo != null)  // else verify only
                 out = new FileOutputStream(migrateTo);
             byte[] buf = new byte[16*1024];
