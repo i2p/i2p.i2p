@@ -1,6 +1,7 @@
 package net.i2p.router.update;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.IllegalArgumentException;
 import java.net.URI;
@@ -9,6 +10,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import net.i2p.CoreVersion;
+import net.i2p.crypto.SU3File;
 import net.i2p.crypto.TrustedUpdate;
 import net.i2p.data.DataHelper;
 import net.i2p.router.RouterContext;
@@ -118,7 +120,6 @@ class PluginUpdateRunner extends UpdateRunner {
 
         @Override
         public void transferComplete(long alreadyTransferred, long bytesTransferred, long bytesRemaining, String url, String outputFile, boolean notModified) {
-            boolean update = false;
             updateStatus("<b>" + _("Plugin downloaded") + "</b>");
             File f = new File(_updateFile);
             File appDir = new SecureDirectory(_context.getConfigDir(), PLUGIN_DIR);
@@ -127,7 +128,43 @@ class PluginUpdateRunner extends UpdateRunner {
                 statusDone("<b>" + _("Cannot create plugin directory {0}", appDir.getAbsolutePath()) + "</b>");
                 return;
             }
+            boolean isSU3;
+            try {
+                isSU3 = isSU3File(f);
+            } catch (IOException ioe) {
+                f.delete();
+                statusDone("<b>" + ioe + "</b>");
+                return;
+            }
+            if (isSU3)
+                processSU3(f, appDir, url);
+            else
+                processSUD(f, appDir, url);
+        }
 
+        /**
+         *  @since 0.9.15
+         *  @return if SU3
+         */
+        private static boolean isSU3File(File f) throws IOException {
+            FileInputStream fis = null;
+            try {
+                fis = new FileInputStream(f);
+                for (int i = 0; i < SU3File.MAGIC.length(); i++) {
+                    if (fis.read() != SU3File.MAGIC.charAt(i))
+                        return false;
+                }
+                return true;
+            } finally {
+                if (fis != null) try { fis.close(); } catch (IOException ioe) {}
+            }
+        }
+
+        /**
+         *  @since 0.9.15
+         *  @return success
+         */
+        private void processSUD(File f, File appDir, String url) {
             TrustedUpdate up = new TrustedUpdate(_context);
             File to = new File(_context.getTempDir(), "tmp" + _context.random().nextInt() + ZIP);
             // extract to a zip file whether the sig is good or not, so we can get the properties file
@@ -222,7 +259,21 @@ class PluginUpdateRunner extends UpdateRunner {
 
             String sudVersion = TrustedUpdate.getVersionString(f);
             f.delete();
+            processFinal(to, appDir, tempDir, url, props, sudVersion, pubkey, signer);
+        }
 
+        /**
+         *  @since 0.9.15
+         */
+        private void processSU3(File f, File appDir, String url) {
+            // TODO
+        }
+
+        /**
+         *  @since 0.9.15
+         */
+        private void processFinal(File to, File appDir, File tempDir, String url, Properties props, String sudVersion, String pubkey, String signer) {
+            boolean update = false;
             String appName = props.getProperty("name");
             String version = props.getProperty("version");
             if (appName == null || version == null || appName.length() <= 0 || version.length() <= 0 ||

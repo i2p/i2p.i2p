@@ -56,7 +56,8 @@ public class SU3File {
     private boolean _headerVerified;
     private SigType _sigType;
 
-    private static final byte[] MAGIC = DataHelper.getUTF8("I2Psu3");
+    public static final String MAGIC = "I2Psu3";
+    private static final byte[] MAGIC_BYTES = DataHelper.getASCII(MAGIC);
     private static final int FILE_VERSION = 0;
     private static final int MIN_VERSION_BYTES = 16;
     private static final int VERSION_OFFSET = 40; // Signature.SIGNATURE_BYTES; avoid early ctx init
@@ -189,9 +190,9 @@ public class SU3File {
      *  Throws if verify vails.
      */
     private void verifyHeader(InputStream in) throws IOException, DataFormatException {
-        byte[] magic = new byte[MAGIC.length];
+        byte[] magic = new byte[MAGIC_BYTES.length];
         DataHelper.read(in, magic);
-        if (!DataHelper.eq(magic, MAGIC))
+        if (!DataHelper.eq(magic, MAGIC_BYTES))
             throw new IOException("Not an su3 file");
         skip(in, 1);
         int foo = in.read();
@@ -300,9 +301,9 @@ public class SU3File {
             // read 10 bytes to get the sig type
             in.mark(10);
             // following is a dup of that in verifyHeader()
-            byte[] magic = new byte[MAGIC.length];
+            byte[] magic = new byte[MAGIC_BYTES.length];
             DataHelper.read(in, magic);
-            if (!DataHelper.eq(magic, MAGIC))
+            if (!DataHelper.eq(magic, MAGIC_BYTES))
                 throw new IOException("Not an su3 file");
             skip(in, 1);
             int foo = in.read();
@@ -379,7 +380,7 @@ public class SU3File {
             in = new BufferedInputStream(new FileInputStream(content));
             MessageDigest md = sigType.getDigestInstance();
             out = new DigestOutputStream(new BufferedOutputStream(new FileOutputStream(_file)), md);
-            out.write(MAGIC);
+            out.write(MAGIC_BYTES);
             out.write((byte) 0);
             out.write((byte) FILE_VERSION);
             DataHelper.writeLong(out, 2, sigType.getCode());
