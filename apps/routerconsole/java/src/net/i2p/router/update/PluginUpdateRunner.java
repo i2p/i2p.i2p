@@ -254,6 +254,10 @@ class PluginUpdateRunner extends UpdateRunner {
             String signingKeyName;
             try {
                 su3.verifyAndMigrate(to);
+                if (su3.getFileType() != SU3File.TYPE_ZIP)
+                    throw new IOException("bad file type");
+                if (su3.getContentType() != SU3File.CONTENT_PLUGIN)
+                    throw new IOException("bad content type");
                 sudVersion = su3.getVersionString();
                 signingKeyName = su3.getSignerString();
             } catch (IOException ioe) {
@@ -265,9 +269,8 @@ class PluginUpdateRunner extends UpdateRunner {
             Properties props = getPluginConfig(f, to, url);
             if (props == null)
                 return;
-            String pubkey = props.getProperty("key");
             String signer = props.getProperty("signer");
-            if (pubkey == null || signer == null || pubkey.length() != 172 || signer.length() <= 0) {
+            if (signer == null || signer.length() <= 0) {
                 f.delete();
                 to.delete();
                 statusDone("<b>" + _("Plugin from {0} contains an invalid key", url) + "</b>");
@@ -284,7 +287,7 @@ class PluginUpdateRunner extends UpdateRunner {
                 statusDone("<b>" + _("Plugin signature verification of {0} failed", url) + "</b>");
                 return;
             }
-            processFinal(to, appDir, url, props, sudVersion, pubkey, signer);
+            processFinal(to, appDir, url, props, sudVersion, null, signer);
         }
 
         /**
@@ -317,6 +320,7 @@ class PluginUpdateRunner extends UpdateRunner {
         }
 
         /**
+         *  @param pubkey null OK for su3
          *  @since 0.9.15
          */
         private void processFinal(File to, File appDir, String url, Properties props, String sudVersion, String pubkey, String signer) {
@@ -377,7 +381,7 @@ class PluginUpdateRunner extends UpdateRunner {
                 String oldPubkey = oldProps.getProperty("key");
                 String oldKeyName = oldProps.getProperty("signer");
                 String oldAppName = oldProps.getProperty("name");
-                if ((!pubkey.equals(oldPubkey)) || (!signer.equals(oldKeyName)) || (!appName.equals(oldAppName))) {
+                if ((pubkey != null && !pubkey.equals(oldPubkey)) || (!signer.equals(oldKeyName)) || (!appName.equals(oldAppName))) {
                     to.delete();
                     statusDone("<b>" + _("Signature of downloaded plugin does not match installed plugin") + "</b>");
                     return;

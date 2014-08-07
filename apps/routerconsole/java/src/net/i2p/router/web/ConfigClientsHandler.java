@@ -344,7 +344,9 @@ public class ConfigClientsHandler extends FormHandler {
 
     private void updatePlugin(String app) {
         Properties props = PluginStarter.pluginProperties(_context, app);
-        String url = props.getProperty("updateURL");
+        String url = props.getProperty("updateURL.su3");
+        if (url == null)
+            url = props.getProperty("updateURL");
         if (url == null) {
             addFormError(_("No update URL specified for {0}",app));
             return;

@@ -43,7 +43,9 @@ class PluginUpdateHandler implements Checker, Updater {
 
         Properties props = PluginStarter.pluginProperties(_context, appName);
         String oldVersion = props.getProperty("version");
-        String xpi2pURL = props.getProperty("updateURL");
+        String xpi2pURL = props.getProperty("updateURL.su3");
+        if (xpi2pURL == null)
+            xpi2pURL = props.getProperty("updateURL");
         List<URI> updateSources = null;
         if (xpi2pURL != null) {
             try {
