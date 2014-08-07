@@ -1570,7 +1570,7 @@ public class SnarkManager implements CompleteListener {
         if (meta.getFiles() != null)
             buf.append('/');
         buf.append("\">").append(storage.getBaseName()).append("</a>");
-        addMessage(_("Download finished: {0}", buf.toString())); //  + " (" + _("size: {0}B", DataHelper.formatSize2(len)) + ')');
+        addMessageNoEscape(_("Download finished: {0}", buf.toString())); //  + " (" + _("size: {0}B", DataHelper.formatSize2(len)) + ')');
         updateStatus(snark);
     }
     
