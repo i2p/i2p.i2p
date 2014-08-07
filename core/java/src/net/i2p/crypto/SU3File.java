@@ -619,7 +619,12 @@ public class SU3File {
         try {
             while (keypw.length() < 6) {
                 System.out.print("Enter password for key \"" + signerName + "\": ");
-                keypw = DataHelper.readLine(System.in).trim();
+                keypw = DataHelper.readLine(System.in);
+                if (keypw == null) {
+                    System.out.println("\nEOF reading password");
+                    return false;
+                }
+                keypw = keypw.trim();
                 if (keypw.length() > 0 && keypw.length() < 6)
                     System.out.println("Key password must be at least 6 characters");
             }
@@ -690,7 +695,12 @@ public class SU3File {
         try {
             while (keypw.length() < 6) {
                 System.out.print("Enter password for key \"" + signerName + "\": ");
-                keypw = DataHelper.readLine(System.in).trim();
+                keypw = DataHelper.readLine(System.in);
+                if (keypw == null) {
+                    System.out.println("\nEOF reading password");
+                    return false;
+                }
+                keypw = keypw.trim();
                 if (keypw.length() > 0 && keypw.length() < 6)
                     System.out.println("Key password must be at least 6 characters");
             }
@@ -784,11 +794,21 @@ public class SU3File {
         try {
             while (alias.length() == 0) {
                 System.out.print("Enter key name (example@mail.i2p): ");
-                alias = DataHelper.readLine(System.in).trim();
+                alias = DataHelper.readLine(System.in);
+                if (alias == null) {
+                    System.out.println("\nEOF reading key name");
+                    return false;
+                }
+                alias = alias.trim();
             }
             while (keypw.length() < 6) {
                 System.out.print("Enter new key password: ");
-                keypw = DataHelper.readLine(System.in).trim();
+                keypw = DataHelper.readLine(System.in);
+                if (keypw == null) {
+                    System.out.println("\nEOF reading password");
+                    return false;
+                }
+                keypw = keypw.trim();
                 if (keypw.length() > 0 && keypw.length() < 6)
                     System.out.println("Key password must be at least 6 characters");
             }
