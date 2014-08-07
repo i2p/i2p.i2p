@@ -175,27 +175,9 @@ class PluginUpdateRunner extends UpdateRunner {
                 to.delete();
                 return;
             }
-            File tempDir = new File(_context.getTempDir(), "tmp" + _context.random().nextInt() + "-unzip");
-            if (!FileUtil.extractZip(to, tempDir, Log.ERROR)) {
-                f.delete();
-                to.delete();
-                FileUtil.rmdir(tempDir, false);
-                statusDone("<b>" + _("Plugin from {0} is corrupt", url) + "</b>");
+            Properties props = getPluginConfig(f, to, url);
+            if (props == null)
                 return;
-            }
-            File installProps = new File(tempDir, "plugin.config");
-            Properties props = new OrderedProperties();
-            try {
-                DataHelper.loadProps(props, installProps);
-            } catch (IOException ioe) {
-                f.delete();
-                to.delete();
-                FileUtil.rmdir(tempDir, false);
-                statusDone("<b>" + _("Plugin from {0} does not contain the required configuration file", url) + "</b>");
-                return;
-            }
-            // we don't need this anymore, we will unzip again
-            FileUtil.rmdir(tempDir, false);
 
             // ok, now we check sigs and deal with a bad sig
             String pubkey = props.getProperty("key");
@@ -259,20 +241,85 @@ class PluginUpdateRunner extends UpdateRunner {
 
             String sudVersion = TrustedUpdate.getVersionString(f);
             f.delete();
-            processFinal(to, appDir, tempDir, url, props, sudVersion, pubkey, signer);
+            processFinal(to, appDir, url, props, sudVersion, pubkey, signer);
         }
 
         /**
          *  @since 0.9.15
          */
         private void processSU3(File f, File appDir, String url) {
-            // TODO
+            SU3File su3 = new SU3File(_context, f);
+            File to = new File(_context.getTempDir(), "tmp" + _context.random().nextInt() + ZIP);
+            String sudVersion;
+            String signingKeyName;
+            try {
+                su3.verifyAndMigrate(to);
+                sudVersion = su3.getVersionString();
+                signingKeyName = su3.getSignerString();
+            } catch (IOException ioe) {
+                statusDone("<b>" + ioe + ' ' + _("from {0}", url) + " </b>");
+                f.delete();
+                to.delete();
+                return;
+            }
+            Properties props = getPluginConfig(f, to, url);
+            if (props == null)
+                return;
+            String pubkey = props.getProperty("key");
+            String signer = props.getProperty("signer");
+            if (pubkey == null || signer == null || pubkey.length() != 172 || signer.length() <= 0) {
+                f.delete();
+                to.delete();
+                statusDone("<b>" + _("Plugin from {0} contains an invalid key", url) + "</b>");
+                return;
+            }
+            if (!signer.equals(signingKeyName)) {
+                f.delete();
+                to.delete();
+                if (signingKeyName == null)
+                    _log.error("Failed to verify plugin signature, corrupt plugin or bad signature, signed by: " + signer);
+                else
+                    // shouldn't happen
+                    _log.error("Plugin signer \"" + signer + "\" does not match new signer in plugin.config file \"" + signingKeyName + "\"");
+                statusDone("<b>" + _("Plugin signature verification of {0} failed", url) + "</b>");
+                return;
+            }
+            processFinal(to, appDir, url, props, sudVersion, pubkey, signer);
+        }
+
+        /**
+         *  @since 0.9.15
+         *  @return null on error
+         */
+        private Properties getPluginConfig(File f, File to, String url) {
+            File tempDir = new File(_context.getTempDir(), "tmp" + _context.random().nextInt() + "-unzip");
+            if (!FileUtil.extractZip(to, tempDir, Log.ERROR)) {
+                f.delete();
+                to.delete();
+                FileUtil.rmdir(tempDir, false);
+                statusDone("<b>" + _("Plugin from {0} is corrupt", url) + "</b>");
+                return null;
+            }
+            File installProps = new File(tempDir, "plugin.config");
+            Properties props = new OrderedProperties();
+            try {
+                DataHelper.loadProps(props, installProps);
+            } catch (IOException ioe) {
+                f.delete();
+                to.delete();
+                statusDone("<b>" + _("Plugin from {0} does not contain the required configuration file", url) + "</b>");
+                return null;
+            } finally {
+                // we don't need this anymore, we will unzip again
+                FileUtil.rmdir(tempDir, false);
+            }
+            return props;
         }
 
         /**
          *  @since 0.9.15
          */
-        private void processFinal(File to, File appDir, File tempDir, String url, Properties props, String sudVersion, String pubkey, String signer) {
+        private void processFinal(File to, File appDir, String url, Properties props, String sudVersion, String pubkey, String signer) {
             boolean update = false;
             String appName = props.getProperty("name");
             String version = props.getProperty("version");
@@ -324,7 +371,6 @@ class PluginUpdateRunner extends UpdateRunner {
                     DataHelper.loadProps(oldProps, oldPropFile);
                 } catch (IOException ioe) {
                     to.delete();
-                    FileUtil.rmdir(tempDir, false);
                     statusDone("<b>" + _("Installed plugin does not contain the required configuration file", url) + "</b>");
                     return;
                 }
