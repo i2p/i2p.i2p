@@ -11,6 +11,7 @@ package net.i2p.router.client;
 import java.util.Properties;
 
 import net.i2p.CoreVersion;
+import net.i2p.crypto.SigType;
 import net.i2p.data.Hash;
 import net.i2p.data.Payload;
 import net.i2p.data.i2cp.BandwidthLimitsMessage;
@@ -195,10 +196,16 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Signature verified correctly on create session message");
         } else {
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("Signature verification *FAILED* on a create session message.  Hijack attempt?");
             // For now, we do NOT send a SessionStatusMessage - see javadoc above
-            _runner.disconnectClient("Invalid signature on CreateSessionMessage");
+            int itype = in.getDestination().getCertificate().getCertificateType();
+            SigType stype = SigType.getByCode(itype);
+            if (stype == null || !stype.isAvailable()) {
+                _log.error("Client requested unsupported signature type " + itype);
+                _runner.disconnectClient("Unsupported signature type " + itype);
+            } else {
+                _log.error("Signature verification failed on a create session message");
+                _runner.disconnectClient("Invalid signature on CreateSessionMessage");
+            }
             return;
         }
 
