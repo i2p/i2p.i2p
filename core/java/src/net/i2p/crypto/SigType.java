@@ -178,6 +178,29 @@ public enum SigType {
         return true;
     }
 
+    /**
+     *  @return true if supported in this JVM
+     *  @since 0.9.15
+     */
+    public static boolean isAvailable(int code) {
+        SigType type = getByCode(code);
+        if (type == null)
+            return false;
+        return type.isAvailable();
+    }
+
+    /**
+     *  @param stype number or name
+     *  @return true if supported in this JVM
+     *  @since 0.9.15
+     */
+    public static boolean isAvailable(String stype) {
+        SigType type = parseSigType(stype);
+        if (type == null)
+            return false;
+        return type.isAvailable();
+    }
+
     private static final Map<Integer, SigType> BY_CODE = new HashMap<Integer, SigType>();
 
     static {

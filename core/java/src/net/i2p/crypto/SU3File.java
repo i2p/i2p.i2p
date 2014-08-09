@@ -15,6 +15,8 @@ import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
@@ -55,6 +57,8 @@ public class SU3File {
     private PublicKey _signerPubkey;
     private boolean _headerVerified;
     private SigType _sigType;
+    private boolean _verifySignature = true;
+    private File _certFile;
 
     public static final String MAGIC = "I2Psu3";
     private static final byte[] MAGIC_BYTES = DataHelper.getASCII(MAGIC);
@@ -130,17 +134,44 @@ public class SU3File {
         _file = file;
     }
 
+    /**
+     *  Should the signature be verified? Default true
+     *  @since 0.9.15
+     */
+    public void setVerifySignature(boolean shouldVerify) {
+        _verifySignature = shouldVerify;
+    }
+
+    /**
+     *  Use this X.509 cert file for verification instead of $I2P/certificates/content_type/foo_at_mail.i2p
+     *  @since 0.9.15
+     */
+    private void setPublicKeyCertificate(File certFile) {
+        _certFile = certFile;
+    }
+
+    /**
+     *  This does not check the signature, but it will fail if the signer is unknown,
+     *  unless setVerifySignature(false) has been called.
+     */
     public String getVersionString() throws IOException {
         verifyHeader();
         return _version;
     }
 
+    /**
+     *  This does not check the signature, but it will fail if the signer is unknown,
+     *  unless setVerifySignature(false) has been called.
+     */
     public String getSignerString() throws IOException {
         verifyHeader();
         return _signer;
     }
 
     /**
+     *  This does not check the signature, but it will fail if the signer is unknown,
+     *  unless setVerifySignature(false) has been called.
+     *
      *  @return null if unknown
      *  @since 0.9.9
      */
@@ -150,6 +181,9 @@ public class SU3File {
     }
 
     /**
+     *  This does not check the signature, but it will fail if the signer is unknown,
+     *  unless setVerifySignature(false) has been called.
+     *
      *  @return -1 if unknown
      *  @since 0.9.9
      */
@@ -159,6 +193,9 @@ public class SU3File {
     }
 
     /**
+     *  This does not check the signature, but it will fail if the signer is unknown,
+     *  unless setVerifySignature(false) has been called.
+     *
      *  @return -1 if unknown
      *  @since 0.9.15
      */
@@ -168,6 +205,9 @@ public class SU3File {
     }
 
     /**
+     *  This does not check the signature, but it will fail if the signer is unknown,
+     *  unless setVerifySignature(false) has been called.
+     *
      *  Throws IOE if verify vails.
      */
     public void verifyHeader() throws IOException {
@@ -245,17 +285,22 @@ public class SU3File {
             throw new EOFException();
         _signer = DataHelper.getUTF8(data);
 
-        KeyRing ring = new DirKeyRing(new File(_context.getBaseDir(), "certificates"));
-        try {
-            _signerPubkey = ring.getKey(_signer, _contentType.getName(), _sigType);
-        } catch (GeneralSecurityException gse) {
-            IOException ioe = new IOException("keystore error");
-            ioe.initCause(gse);
-            throw ioe;
+        if (_verifySignature) {
+            if (_certFile != null) {
+                _signerPubkey = loadKey(_certFile);
+            } else {
+                KeyRing ring = new DirKeyRing(new File(_context.getBaseDir(), "certificates"));
+                try {
+                    _signerPubkey = ring.getKey(_signer, _contentType.getName(), _sigType);
+                } catch (GeneralSecurityException gse) {
+                    IOException ioe = new IOException("keystore error");
+                    ioe.initCause(gse);
+                    throw ioe;
+                }
+                if (_signerPubkey == null)
+                    throw new IOException("unknown signer: " + _signer + " for content type: " + _contentType.getName());
+            }
         }
-
-        if (_signerPubkey == null)
-            throw new IOException("unknown signer: " + _signer + " for content type: " + _contentType.getName());
         _headerVerified = true;
     }
 
@@ -324,8 +369,10 @@ public class SU3File {
                 verifyHeader(in);
             else
                 skip(in, getContentOffset());
-            if (_signerPubkey == null)
-                throw new IOException("unknown signer: " + _signer + " for content type: " + _contentType.getName());
+            if (_verifySignature) {
+                if (_signerPubkey == null)
+                    throw new IOException("unknown signer: " + _signer + " for content type: " + _contentType.getName());
+            }
             if (migrateTo != null)  // else verify only
                 out = new FileOutputStream(migrateTo);
             byte[] buf = new byte[16*1024];
@@ -338,15 +385,19 @@ public class SU3File {
                     out.write(buf, 0, read);
                 tot += read;
             }
-            byte[] sha = md.digest();
-            din.on(false);
-            Signature signature = new Signature(_sigType);
-            signature.readBytes(in);
-            SimpleDataStructure hash = _sigType.getHashInstance();
-            hash.setData(sha);
-            //System.out.println("hash\n" + HexDump.dump(sha));
-            //System.out.println("sig\n" + HexDump.dump(signature.getData()));
-            rv = _context.dsa().verifySignature(signature, hash, _signerPubkey);
+            if (_verifySignature) {
+                byte[] sha = md.digest();
+                din.on(false);
+                Signature signature = new Signature(_sigType);
+                signature.readBytes(in);
+                SimpleDataStructure hash = _sigType.getHashInstance();
+                hash.setData(sha);
+                //System.out.println("hash\n" + HexDump.dump(sha));
+                //System.out.println("sig\n" + HexDump.dump(signature.getData()));
+                rv = _context.dsa().verifySignature(signature, hash, _signerPubkey);
+            } else {
+                rv = true;
+            }
         } catch (DataFormatException dfe) {
             IOException ioe = new IOException("foo");
             ioe.initCause(dfe);
@@ -461,8 +512,10 @@ public class SU3File {
             String stype = null;
             String ctype = null;
             String ftype = null;
+            String kfile = null;
             boolean error = false;
-            Getopt g = new Getopt("SU3File", args, "t:c:f:");
+            boolean shouldVerify = true;
+            Getopt g = new Getopt("SU3File", args, "t:c:f:k:x");
             int c;
             while ((c = g.getopt()) != -1) {
               switch (c) {
@@ -476,6 +529,14 @@ public class SU3File {
 
                 case 'f':
                     ftype = g.getOptarg();
+                    break;
+
+                case 'k':
+                    kfile = g.getOptarg();
+                    break;
+
+                case 'x':
+                    shouldVerify = false;
                     break;
 
                 case '?':
@@ -505,11 +566,11 @@ public class SU3File {
                 new I2PAppContext(props);
                 ok = bulkSignCLI(stype, ctype, a.get(0), a.get(1), a.get(2), a.get(3));
             } else if ("verifysig".equals(cmd)) {
-                ok = verifySigCLI(a.get(0));
+                ok = verifySigCLI(a.get(0), kfile);
             } else if ("keygen".equals(cmd)) {
                 ok = genKeysCLI(stype, a.get(0), a.get(1), a.get(2));
             } else if ("extract".equals(cmd)) {
-                ok = extractCLI(a.get(0), a.get(1));
+                ok = extractCLI(a.get(0), a.get(1), shouldVerify);
             } else {
                 showUsageCLI();
             }
@@ -527,8 +588,8 @@ public class SU3File {
         System.err.println("       SU3File sign         [-t type|code] [-c type|code] [-f type|code] inputFile.zip signedFile.su3 keystore.ks version you@mail.i2p");
         System.err.println("       SU3File bulksign     [-t type|code] [-c type|code] directory keystore.ks version you@mail.i2p");
         System.err.println("       SU3File showversion  signedFile.su3");
-        System.err.println("       SU3File verifysig    signedFile.su3");
-        System.err.println("       SU3File extract      signedFile.su3 outFile");
+        System.err.println("       SU3File verifysig    [-k file.crt] signedFile.su3  ## -k use this pubkey cert for verification");
+        System.err.println("       SU3File extract      [-x] [-k file.crt] signedFile.su3 outFile   ## -x don't check sig");
         System.err.println(dumpTypes());
     }
 
@@ -579,6 +640,7 @@ public class SU3File {
     private static final boolean showVersionCLI(String signedFile) {
         try {
             SU3File file = new SU3File(signedFile);
+            file.setVerifySignature(false);
             String versionString = file.getVersionString();
             if (versionString.equals(""))
                 System.out.println("No version string found in file '" + signedFile + "'");
@@ -726,10 +788,12 @@ public class SU3File {
     }
 
     /** @return valid */
-    private static final boolean verifySigCLI(String signedFile) {
+    private static final boolean verifySigCLI(String signedFile, String pkFile) {
         InputStream in = null;
         try {
             SU3File file = new SU3File(signedFile);
+            if (pkFile != null)
+                file.setPublicKeyCertificate(new File(pkFile));
             boolean isValidSignature = file.verify();
             if (isValidSignature)
                 System.out.println("Signature VALID (signed by " + file.getSignerString() + ' ' + file._sigType + ')');
@@ -747,10 +811,11 @@ public class SU3File {
      *  @return success
      *  @since 0.9.9
      */
-    private static final boolean extractCLI(String signedFile, String outFile) {
+    private static final boolean extractCLI(String signedFile, String outFile, boolean verifySig) {
         InputStream in = null;
         try {
             SU3File file = new SU3File(signedFile);
+            file.setVerifySignature(verifySig);
             File out = new File(outFile);
             boolean ok = file.verifyAndMigrate(out);
             if (ok)
@@ -835,5 +900,27 @@ public class SU3File {
             return false;
         }
         return true;
+    }
+
+    /**
+     *  For the -k CLI option
+     *  @return non-null, throws IOE on all errors
+     *  @since 0.9.15
+     */
+    private static PublicKey loadKey(File kd) throws IOException {
+        InputStream fis = null;
+        try {
+            fis = new FileInputStream(kd);
+            CertificateFactory cf = CertificateFactory.getInstance("X.509");
+            X509Certificate cert = (X509Certificate)cf.generateCertificate(fis);
+            cert.checkValidity();
+            return cert.getPublicKey();
+        } catch (GeneralSecurityException gse) {
+            IOException ioe = new IOException("cert error");
+            ioe.initCause(gse);
+            throw ioe;
+        } finally {
+            try { if (fis != null) fis.close(); } catch (IOException foo) {}
+        }
     }
 }
