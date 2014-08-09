@@ -298,9 +298,9 @@ public class ConfigNetHelper extends HelperBase {
         StringBuilder buf = new StringBuilder(256);
         buf.append("<select style=\"text-align: right !important;\" name=\"sharePercentage\">\n");
         boolean found = false;
-        for (int i = 30; i <= 110; i += 10) {
+        for (int i = 100; i >= -10; i -= 10) {
             int val = i;
-            if (i == 110) {
+            if (i == -10) {
                 if (found)
                     break;
                 else
