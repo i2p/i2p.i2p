@@ -104,7 +104,12 @@ public class ConfigClientsHandler extends FormHandler {
                 appnum = Integer.parseInt(app);
             } catch (NumberFormatException nfe) {}
             if (appnum >= 0) {
-                deleteClient(appnum);
+                if (_context.getBooleanProperty(ConfigClientsHelper.PROP_ENABLE_CLIENT_CHANGE) ||
+                    isAdvanced()) {
+                    deleteClient(appnum);
+                } else {
+                    addFormError("Delete client disabled");
+                }
             } else if (pluginsEnabled) {
                 try {
                     PluginStarter.stopPlugin(_context, app);

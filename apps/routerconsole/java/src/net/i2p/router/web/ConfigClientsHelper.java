@@ -141,7 +141,7 @@ public class ConfigClientsHelper extends HelperBase {
                        // show stop button
                        showStop,
                        // show delete button, show start button
-                       !isConsole, showStart);
+                       allowEdit && !isConsole, showStart);
         }
         
         if (allowEdit && "new".equals(_edit))
