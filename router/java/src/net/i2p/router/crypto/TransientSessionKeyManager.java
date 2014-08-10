@@ -1,4 +1,4 @@
-package net.i2p.crypto;
+package net.i2p.router.crypto;
 
 /*
  * free (adj.): unencumbered; not under the control of others
@@ -25,6 +25,8 @@ import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import net.i2p.I2PAppContext;
+import net.i2p.crypto.SessionKeyManager;
+import net.i2p.crypto.TagSetHandle;
 import net.i2p.data.DataHelper;
 import net.i2p.data.PublicKey;
 import net.i2p.data.SessionKey;

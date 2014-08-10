@@ -968,6 +968,32 @@ class EstablishmentManager {
     }
 
     /**
+     *  Called from UDPReceiver.
+     *  Accelerate response to RelayResponse if we haven't sent it yet.
+     *
+     *  @since 0.9.15
+     */
+    void receiveHolePunch(InetAddress from, int fromPort) {
+        RemoteHostId id = new RemoteHostId(from.getAddress(), fromPort);
+        OutboundEstablishState state = _outboundStates.get(id);
+        if (state != null) {
+            boolean sendNow = state.receiveHolePunch();
+            if (sendNow) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Hole punch from " + state + ", sending SessionRequest now");
+                notifyActivity();
+            } else {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Hole punch from " + state + ", already sent SessionRequest");
+            }
+        } else {
+            // HolePunch received before RelayResponse, and we didn't know the IP/port, or it changed
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("No state found for hole punch from " + from + " port " + fromPort);
+        }
+    }
+
+    /**
      *  Are IP and port valid? This is only for checking the relay response.
      *  Reject all IPv6, for now, even if we are configured for it.
      *  Refuse anybody in the same /16

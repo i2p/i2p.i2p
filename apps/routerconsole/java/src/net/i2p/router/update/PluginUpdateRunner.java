@@ -1,6 +1,7 @@
 package net.i2p.router.update;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.IllegalArgumentException;
 import java.net.URI;
@@ -9,6 +10,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import net.i2p.CoreVersion;
+import net.i2p.crypto.SU3File;
 import net.i2p.crypto.TrustedUpdate;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
@@ -121,7 +123,6 @@ class PluginUpdateRunner extends UpdateRunner {
 
         @Override
         public void transferComplete(long alreadyTransferred, long bytesTransferred, long bytesRemaining, String url, String outputFile, boolean notModified) {
-            boolean update = false;
             updateStatus("<b>" + _("Plugin downloaded") + "</b>");
             File f = new File(_updateFile);
             File appDir = new SecureDirectory(_context.getConfigDir(), PLUGIN_DIR);
@@ -130,7 +131,43 @@ class PluginUpdateRunner extends UpdateRunner {
                 statusDone("<b>" + _("Cannot create plugin directory {0}", appDir.getAbsolutePath()) + "</b>");
                 return;
             }
+            boolean isSU3;
+            try {
+                isSU3 = isSU3File(f);
+            } catch (IOException ioe) {
+                f.delete();
+                statusDone("<b>" + ioe + "</b>");
+                return;
+            }
+            if (isSU3)
+                processSU3(f, appDir, url);
+            else
+                processSUD(f, appDir, url);
+        }
 
+        /**
+         *  @since 0.9.15
+         *  @return if SU3
+         */
+        private static boolean isSU3File(File f) throws IOException {
+            FileInputStream fis = null;
+            try {
+                fis = new FileInputStream(f);
+                for (int i = 0; i < SU3File.MAGIC.length(); i++) {
+                    if (fis.read() != SU3File.MAGIC.charAt(i))
+                        return false;
+                }
+                return true;
+            } finally {
+                if (fis != null) try { fis.close(); } catch (IOException ioe) {}
+            }
+        }
+
+        /**
+         *  @since 0.9.15
+         *  @return success
+         */
+        private void processSUD(File f, File appDir, String url) {
             TrustedUpdate up = new TrustedUpdate(_context);
             File to = new File(_context.getTempDir(), "tmp" + _context.random().nextInt() + ZIP);
             // extract to a zip file whether the sig is good or not, so we can get the properties file
@@ -141,27 +178,9 @@ class PluginUpdateRunner extends UpdateRunner {
                 to.delete();
                 return;
             }
-            File tempDir = new File(_context.getTempDir(), "tmp" + _context.random().nextInt() + "-unzip");
-            if (!FileUtil.extractZip(to, tempDir, Log.ERROR)) {
-                f.delete();
-                to.delete();
-                FileUtil.rmdir(tempDir, false);
-                statusDone("<b>" + _("Plugin from {0} is corrupt", url) + "</b>");
+            Properties props = getPluginConfig(f, to, url);
+            if (props == null)
                 return;
-            }
-            File installProps = new File(tempDir, "plugin.config");
-            Properties props = new OrderedProperties();
-            try {
-                DataHelper.loadProps(props, installProps);
-            } catch (IOException ioe) {
-                f.delete();
-                to.delete();
-                FileUtil.rmdir(tempDir, false);
-                statusDone("<b>" + _("Plugin from {0} does not contain the required configuration file", url) + "</b>");
-                return;
-            }
-            // we don't need this anymore, we will unzip again
-            FileUtil.rmdir(tempDir, false);
 
             // ok, now we check sigs and deal with a bad sig
             String pubkey = props.getProperty("key");
@@ -251,7 +270,90 @@ class PluginUpdateRunner extends UpdateRunner {
 
             String sudVersion = TrustedUpdate.getVersionString(f);
             f.delete();
+            processFinal(to, appDir, url, props, sudVersion, pubkey, signer);
+        }
 
+        /**
+         *  @since 0.9.15
+         */
+        private void processSU3(File f, File appDir, String url) {
+            SU3File su3 = new SU3File(_context, f);
+            File to = new File(_context.getTempDir(), "tmp" + _context.random().nextInt() + ZIP);
+            String sudVersion;
+            String signingKeyName;
+            try {
+                su3.verifyAndMigrate(to);
+                if (su3.getFileType() != SU3File.TYPE_ZIP)
+                    throw new IOException("bad file type");
+                if (su3.getContentType() != SU3File.CONTENT_PLUGIN)
+                    throw new IOException("bad content type");
+                sudVersion = su3.getVersionString();
+                signingKeyName = su3.getSignerString();
+            } catch (IOException ioe) {
+                statusDone("<b>" + ioe + ' ' + _("from {0}", url) + " </b>");
+                f.delete();
+                to.delete();
+                return;
+            }
+            Properties props = getPluginConfig(f, to, url);
+            if (props == null)
+                return;
+            String signer = props.getProperty("signer");
+            if (signer == null || signer.length() <= 0) {
+                f.delete();
+                to.delete();
+                statusDone("<b>" + _("Plugin from {0} contains an invalid key", url) + "</b>");
+                return;
+            }
+            if (!signer.equals(signingKeyName)) {
+                f.delete();
+                to.delete();
+                if (signingKeyName == null)
+                    _log.error("Failed to verify plugin signature, corrupt plugin or bad signature, signed by: " + signer);
+                else
+                    // shouldn't happen
+                    _log.error("Plugin signer \"" + signer + "\" does not match new signer in plugin.config file \"" + signingKeyName + "\"");
+                statusDone("<b>" + _("Plugin signature verification of {0} failed", url) + "</b>");
+                return;
+            }
+            processFinal(to, appDir, url, props, sudVersion, null, signer);
+        }
+
+        /**
+         *  @since 0.9.15
+         *  @return null on error
+         */
+        private Properties getPluginConfig(File f, File to, String url) {
+            File tempDir = new File(_context.getTempDir(), "tmp" + _context.random().nextInt() + "-unzip");
+            if (!FileUtil.extractZip(to, tempDir, Log.ERROR)) {
+                f.delete();
+                to.delete();
+                FileUtil.rmdir(tempDir, false);
+                statusDone("<b>" + _("Plugin from {0} is corrupt", url) + "</b>");
+                return null;
+            }
+            File installProps = new File(tempDir, "plugin.config");
+            Properties props = new OrderedProperties();
+            try {
+                DataHelper.loadProps(props, installProps);
+            } catch (IOException ioe) {
+                f.delete();
+                to.delete();
+                statusDone("<b>" + _("Plugin from {0} does not contain the required configuration file", url) + "</b>");
+                return null;
+            } finally {
+                // we don't need this anymore, we will unzip again
+                FileUtil.rmdir(tempDir, false);
+            }
+            return props;
+        }
+
+        /**
+         *  @param pubkey null OK for su3
+         *  @since 0.9.15
+         */
+        private void processFinal(File to, File appDir, String url, Properties props, String sudVersion, String pubkey, String signer) {
+            boolean update = false;
             String appName = props.getProperty("name");
             String version = props.getProperty("version");
             if (appName == null || version == null || appName.length() <= 0 || version.length() <= 0 ||
@@ -302,14 +404,13 @@ class PluginUpdateRunner extends UpdateRunner {
                     DataHelper.loadProps(oldProps, oldPropFile);
                 } catch (IOException ioe) {
                     to.delete();
-                    FileUtil.rmdir(tempDir, false);
                     statusDone("<b>" + _("Installed plugin does not contain the required configuration file", url) + "</b>");
                     return;
                 }
                 String oldPubkey = oldProps.getProperty("key");
                 String oldKeyName = oldProps.getProperty("signer");
                 String oldAppName = oldProps.getProperty("name");
-                if ((!pubkey.equals(oldPubkey)) || (!signer.equals(oldKeyName)) || (!appName.equals(oldAppName))) {
+                if ((pubkey != null && !pubkey.equals(oldPubkey)) || (!signer.equals(oldKeyName)) || (!appName.equals(oldAppName))) {
                     to.delete();
                     statusDone("<b>" + _("Signature of downloaded plugin does not match installed plugin") + "</b>");
                     return;
