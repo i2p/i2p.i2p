@@ -66,7 +66,8 @@ class IdleChecker extends SimpleTimer2.TimedEvent {
                     if (_log.shouldLog(Log.WARN))
                         _log.warn("Closing tunnels on idle");
                     _util.disconnect();
-                    _mgr.addMessage(_util.getString("I2P tunnel closed."));
+                    _mgr.addMessage(_util.getString("No more torrents running.") + ' ' +
+                                    _util.getString("I2P tunnel closed."));
                     schedule(3 * CHECK_TIME);
                     return;
                 }

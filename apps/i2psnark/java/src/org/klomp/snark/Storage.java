@@ -32,7 +32,9 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedSet;
 import java.util.StringTokenizer;
+import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -52,6 +54,7 @@ public class Storage
 {
   private final MetaInfo metainfo;
   private final List<TorrentFile> _torrentFiles;
+  private final File _base;
   private final StorageListener listener;
   private final I2PSnarkUtil _util;
   private final Log _log;
@@ -83,15 +86,18 @@ public class Storage
   private static final ByteCache _cache = ByteCache.getInstance(16, BUFSIZE);
 
   /**
-   * Creates a new storage based on the supplied MetaInfo.  This will
+   * Creates a new storage based on the supplied MetaInfo.
+   *
+   * Does not check storage. Caller MUST call check(), which will
    * try to create and/or check all needed files in the MetaInfo.
    *
-   * Does not check storage. Caller MUST call check()
+   * @param baseFile the torrent data file or dir
    */
-  public Storage(I2PSnarkUtil util, MetaInfo metainfo, StorageListener listener)
+  public Storage(I2PSnarkUtil util, File baseFile, MetaInfo metainfo, StorageListener listener)
   {
     _util = util;
     _log = util.getContext().logManager().getLog(Storage.class);
+    _base = baseFile;
     this.metainfo = metainfo;
     this.listener = listener;
     needed = metainfo.getPieces();
@@ -121,6 +127,7 @@ public class Storage
     throws IOException
   {
     _util = util;
+    _base = baseFile;
     _log = util.getContext().logManager().getLog(Storage.class);
     this.listener = listener;
     // Create names, rafs and lengths arrays.
@@ -305,24 +312,15 @@ public class Storage
   }
 
   /**
-   *  @param file canonical path (non-directory)
+   *  @param file non-canonical path (non-directory)
    *  @return number of bytes remaining; -1 if unknown file
    *  @since 0.7.14
    */
-  public long remaining(String file) {
+  public long remaining(File file) {
       long bytes = 0;
       for (TorrentFile tf : _torrentFiles) {
           File f = tf.RAFfile;
-          // use canonical in case snark dir or sub dirs are symlinked
-          String canonical = null;
-          if (f != null) {
-              try {
-                  canonical = f.getCanonicalPath();
-              } catch (IOException ioe) {
-                  f = null;
-              }
-          }
-          if (f != null && canonical.equals(file)) {
+          if (f.equals(file)) {
               if (complete())
                   return 0;
               int psz = piece_size;
@@ -348,22 +346,16 @@ public class Storage
   }
 
   /**
-   *  @param file canonical path (non-directory)
+   *  @param file non-canonical path (non-directory)
    *  @since 0.8.1
    */
-  public int getPriority(String file) {
+  public int getPriority(File file) {
       if (complete() || metainfo.getFiles() == null)
           return 0;
       for (TorrentFile tf : _torrentFiles) {
           File f = tf.RAFfile;
-          // use canonical in case snark dir or sub dirs are symlinked
-          if (f != null) {
-              try {
-                  String canonical = f.getCanonicalPath();
-                  if (canonical.equals(file))
-                      return tf.priority;
-              } catch (IOException ioe) {}
-          }
+          if (f.equals(file))
+              return tf.priority;
       }
       return 0;
   }
@@ -371,24 +363,18 @@ public class Storage
   /**
    *  Must call Snark.updatePiecePriorities()
    *  (which calls getPiecePriorities()) after calling this.
-   *  @param file canonical path (non-directory)
+   *  @param file non-canonical path (non-directory)
    *  @param pri default 0; <0 to disable
    *  @since 0.8.1
    */
-  public void setPriority(String file, int pri) {
+  public void setPriority(File file, int pri) {
       if (complete() || metainfo.getFiles() == null)
           return;
       for (TorrentFile tf : _torrentFiles) {
           File f = tf.RAFfile;
-          // use canonical in case snark dir or sub dirs are symlinked
-          if (f != null) {
-              try {
-                  String canonical = f.getCanonicalPath();
-                  if (canonical.equals(file)) {
-                      tf.priority = pri;
-                      return;
-                  }
-              } catch (IOException ioe) {}
+          if (f.equals(file)) {
+              tf.priority = pri;
+              return;
           }
       }
   }
@@ -490,9 +476,9 @@ public class Storage
    * Creates (and/or checks) all files from the metainfo file list.
    * Only call this once, and only after the constructor with the metainfo.
    */
-  public void check(String rootDir) throws IOException
+  public void check() throws IOException
   {
-    check(rootDir, 0, null);
+    check(0, null);
   }
 
   /**
@@ -500,14 +486,9 @@ public class Storage
    * Use a saved bitfield and timestamp from a config file.
    * Only call this once, and only after the constructor with the metainfo.
    */
-  public void check(String rootDir, long savedTime, BitField savedBitField) throws IOException
+  public void check(long savedTime, BitField savedBitField) throws IOException
   {
-    File base;
     boolean areFilesPublic = _util.getFilesPublic();
-    if (areFilesPublic)
-        base = new File(rootDir, filterName(metainfo.getName()));
-    else
-        base = new SecureFile(rootDir, filterName(metainfo.getName()));
     boolean useSavedBitField = savedTime > 0 && savedBitField != null;
 
     if (!_torrentFiles.isEmpty())
@@ -517,18 +498,18 @@ public class Storage
       {
         // Create base as file.
         if (_log.shouldLog(Log.INFO))
-            _log.info("Creating/Checking file: " + base);
+            _log.info("Creating/Checking file: " + _base);
         // createNewFile() can throw a "Permission denied" IOE even if the file exists???
         // so do it second
-        if (!base.exists() && !base.createNewFile())
-          throw new IOException("Could not create file " + base);
+        if (!_base.exists() && !_base.createNewFile())
+          throw new IOException("Could not create file " + _base);
 
-        _torrentFiles.add(new TorrentFile(base, base, metainfo.getTotalLength()));
+        _torrentFiles.add(new TorrentFile(_base, _base, metainfo.getTotalLength()));
         if (useSavedBitField) {
-            long lm = base.lastModified();
+            long lm = _base.lastModified();
             if (lm <= 0 || lm > savedTime)
                 useSavedBitField = false;
-            else if (base.length() != metainfo.getTotalLength())
+            else if (_base.length() != metainfo.getTotalLength())
                 useSavedBitField = false;
         }
       }
@@ -536,9 +517,9 @@ public class Storage
       {
         // Create base as dir.
         if (_log.shouldLog(Log.INFO))
-            _log.info("Creating/Checking directory: " + base);
-        if (!base.mkdir() && !base.isDirectory())
-          throw new IOException("Could not create directory " + base);
+            _log.info("Creating/Checking directory: " + _base);
+        if (!_base.mkdir() && !_base.isDirectory())
+          throw new IOException("Could not create directory " + _base);
 
         List<Long> ls = metainfo.getLengths();
         int size = files.size();
@@ -546,7 +527,7 @@ public class Storage
         for (int i = 0; i < size; i++)
           {
             List<String> path = files.get(i);
-            File f = createFileFromNames(base, path, areFilesPublic);
+            File f = createFileFromNames(_base, path, areFilesPublic);
             // dup file name check after filtering
             for (int j = 0; j < i; j++) {
                 if (f.equals(_torrentFiles.get(j).RAFfile)) {
@@ -562,12 +543,12 @@ public class Storage
                     else
                         lastPath = '_' + lastPath;
                     path.set(last, lastPath);
-                    f = createFileFromNames(base, path, areFilesPublic);
+                    f = createFileFromNames(_base, path, areFilesPublic);
                     j = 0;
                 }
             }
             long len = ls.get(i).longValue();
-            _torrentFiles.add(new TorrentFile(base, f, len));
+            _torrentFiles.add(new TorrentFile(_base, f, len));
             total += len;
             if (useSavedBitField) {
                 long lm = f.lastModified();
@@ -614,7 +595,7 @@ public class Storage
    * @param rootDir ignored
    * @throws IOE on fail
    */
-  public void reopen(String rootDir) throws IOException
+  public void reopen() throws IOException
   {
       if (_torrentFiles.isEmpty())
           throw new IOException("Storage not checked yet");
@@ -690,6 +671,8 @@ public class Storage
    *  Note that filtering each path element individually may lead to
    *  things going in the wrong place if there are duplicates
    *  in intermediate path elements after filtering.
+   *
+   *  @param names path elements
    */
   private static File createFileFromNames(File base, List<String> names, boolean areFilesPublic) throws IOException
   {
@@ -725,15 +708,47 @@ public class Storage
     return f;
   }
 
-  public static File getFileFromNames(File base, List<String> names)
-  {
-    Iterator<String> it = names.iterator();
-    while (it.hasNext())
-      {
-        String name = filterName(it.next());
-        base = new File(base, name);
+  /**
+   *  The base file or directory.
+   *  @return the File
+   *  @since 0.9.11
+   */
+  public File getBase() {
+      return _base;
+  }
+
+  /**
+   *  Does not include directories. Unsorted.
+   *  @return a new List
+   *  @since 0.9.11
+   */
+  public List<File> getFiles() {
+      List<File> rv = new ArrayList<File>(_torrentFiles.size());
+      for (TorrentFile tf : _torrentFiles) {
+          rv.add(tf.RAFfile);
       }
-    return base;
+      return rv;
+  }
+
+  /**
+   *  Includes the base for a multi-file torrent.
+   *  Sorted bottom-up for easy deletion.
+   *  Slow. Use for deletion only.
+   *  @since 0.9.11
+   *  @return a new Set or null for a single-file torrent
+   */
+  public SortedSet<File> getDirectories() {
+      if (!_base.isDirectory())
+          return null;
+      SortedSet<File> rv = new TreeSet<File>(Collections.reverseOrder());
+      rv.add(_base);
+      for (TorrentFile tf : _torrentFiles) {
+          File f = tf.RAFfile;
+          do {
+              f = f.getParentFile();
+          } while (f != null && rv.add(f));
+      }
+      return rv;
   }
 
   /**

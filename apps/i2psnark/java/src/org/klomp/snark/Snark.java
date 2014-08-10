@@ -34,6 +34,7 @@ import net.i2p.I2PAppContext;
 import net.i2p.client.streaming.I2PServerSocket;
 import net.i2p.data.Destination;
 import net.i2p.util.Log;
+import net.i2p.util.SecureFile;
 
 /**
  * Main Snark program startup class.
@@ -221,7 +222,7 @@ public class Snark
   private PeerCoordinator coordinator;
   private ConnectionAcceptor acceptor;
   private TrackerClient trackerclient;
-  private String rootDataDir = ".";
+  private final File rootDataDir;
   private final CompleteListener completeListener;
   private volatile boolean stopped;
   private volatile boolean starting;
@@ -238,13 +239,21 @@ public class Snark
   private volatile String activity = "Not started";
 
 
-  /** from main() via parseArguments() single torrent */
+  /**
+   * from main() via parseArguments() single torrent
+   *
+   * @deprecated unused
+   */
   Snark(I2PSnarkUtil util, String torrent, String ip, int user_port,
         StorageListener slistener, CoordinatorListener clistener) { 
     this(util, torrent, ip, user_port, slistener, clistener, null, null, null, true, "."); 
   }
 
-  /** single torrent - via router */
+  /**
+   * single torrent - via router
+   *
+   * @deprecated unused
+   */
   public Snark(I2PAppContext ctx, Properties opts, String torrent,
                StorageListener slistener, boolean start, String rootDir) { 
     this(new I2PSnarkUtil(ctx), torrent, null, -1, slistener, null, null, null, null, false, rootDir);
@@ -275,11 +284,28 @@ public class Snark
         this.startTorrent();
   }
 
-  /** multitorrent */
+  /**
+   * multitorrent
+   */
   public Snark(I2PSnarkUtil util, String torrent, String ip, int user_port,
         StorageListener slistener, CoordinatorListener clistener,
         CompleteListener complistener, PeerCoordinatorSet peerCoordinatorSet,
         ConnectionAcceptor connectionAcceptor, boolean start, String rootDir)
+  {
+      this(util, torrent, ip, user_port, slistener, clistener, complistener,
+           peerCoordinatorSet, connectionAcceptor, start, rootDir, null);
+  }
+
+  /**
+   * multitorrent
+   *
+   * @param baseFile if null, use rootDir/torrentName; if non-null, use it instead
+   * @since 0.9.11
+   */
+  public Snark(I2PSnarkUtil util, String torrent, String ip, int user_port,
+        StorageListener slistener, CoordinatorListener clistener,
+        CompleteListener complistener, PeerCoordinatorSet peerCoordinatorSet,
+        ConnectionAcceptor connectionAcceptor, boolean start, String rootDir, File baseFile)
   {
     if (slistener == null)
       slistener = this;
@@ -291,7 +317,7 @@ public class Snark
     acceptor = connectionAcceptor;
 
     this.torrent = torrent;
-    this.rootDataDir = rootDir;
+    this.rootDataDir = new File(rootDir);
 
     stopped = true;
     activity = "Network setup";
@@ -394,13 +420,19 @@ public class Snark
         try
           {
             activity = "Checking storage";
-            storage = new Storage(_util, meta, slistener);
+            if (baseFile == null) {
+                String base = Storage.filterName(meta.getName());
+                if (_util.getFilesPublic())
+                    baseFile = new File(rootDataDir, base);
+                else
+                    baseFile = new SecureFile(rootDataDir, base);
+            }
+            storage = new Storage(_util, baseFile, meta, slistener);
             if (completeListener != null) {
-                storage.check(rootDataDir,
-                              completeListener.getSavedTorrentTime(this),
+                storage.check(completeListener.getSavedTorrentTime(this),
                               completeListener.getSavedTorrentBitField(this));
             } else {
-                storage.check(rootDataDir);
+                storage.check();
             }
             // have to figure out when to reopen
             // if (!start)
@@ -452,7 +484,7 @@ public class Snark
     this.torrent = torrent;
     this.infoHash = ih;
     this.additionalTrackerURL = trackerURL;
-    this.rootDataDir = rootDir;
+    this.rootDataDir = new File(rootDir);
     stopped = true;
     id = generateID();
 
@@ -547,7 +579,7 @@ public class Snark
     } else if (trackerclient.halted()) {
         if (storage != null) {
             try {
-                 storage.reopen(rootDataDir);
+                 storage.reopen();
              }   catch (IOException ioe) {
                  try { storage.close(); } catch (IOException ioee) {
                      ioee.printStackTrace();
@@ -1102,9 +1134,15 @@ public class Snark
    */
   public void gotMetaInfo(PeerCoordinator coordinator, MetaInfo metainfo) {
       try {
+          String base = Storage.filterName(metainfo.getName());
+          File baseFile;
+          if (_util.getFilesPublic())
+              baseFile = new File(rootDataDir, base);
+          else
+              baseFile = new SecureFile(rootDataDir, base);
           // The following two may throw IOE...
-          storage = new Storage(_util, metainfo, this);
-          storage.check(rootDataDir);
+          storage = new Storage(_util, baseFile, metainfo, this);
+          storage.check();
           // ... so don't set meta until here
           meta = metainfo;
           if (completeListener != null) {
