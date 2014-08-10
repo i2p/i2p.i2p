@@ -1,0 +1,90 @@
+# I2P
+# Copyright (C) 2014 The I2P Project
+# This file is distributed under the same license as the streaming package.
+# To contribute translations, see http://www.i2p2.de/newdevelopers
+# 
+# Translators:
+# YF <yfdyh000@gmail.com>, 2014
+msgid ""
+msgstr ""
+"Project-Id-Version: I2P\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2014-06-23 17:55+0000\n"
+"PO-Revision-Date: 2014-06-24 22:23+0000\n"
+"Last-Translator: YF <yfdyh000@gmail.com>\n"
+"Language-Team: Chinese (China) (http://www.transifex.com/projects/p/I2P/language/zh_CN/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: zh_CN\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:58
+msgid "Message timeout"
+msgstr "消息超时"
+
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:61
+msgid "Failed delivery to local destination"
+msgstr "传送到本地目标失败"
+
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:64
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:97
+msgid "Local router failure"
+msgstr "本地路由故障"
+
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:67
+msgid "Local network failure"
+msgstr "本地网络故障"
+
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:70
+msgid "Session closed"
+msgstr "会话已关闭"
+
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:73
+msgid "Invalid message"
+msgstr "无效消息"
+
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:76
+msgid "Invalid message options"
+msgstr "无效消息选项"
+
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:79
+msgid "Buffer overflow"
+msgstr "缓冲区溢出"
+
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:82
+msgid "Message expired"
+msgstr "消息已过期"
+
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:85
+msgid "Local lease set invalid"
+msgstr "本地租赁无效"
+
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:88
+msgid "No local tunnels"
+msgstr "没有本地隧道"
+
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:91
+msgid "Unsupported encryption options"
+msgstr "不支持的加密选项"
+
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:94
+msgid "Invalid destination"
+msgstr "无效目标"
+
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:100
+msgid "Destination lease set expired"
+msgstr "目标租赁已过期"
+
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:103
+msgid "Destination lease set not found"
+msgstr "找不到目标租赁"
+
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:106
+msgid "Local destination shutdown"
+msgstr "本地目标关机"
+
+#. Translate this one here, can't do it later
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:113
+msgid "Failure code"
+msgstr "失败代码"
