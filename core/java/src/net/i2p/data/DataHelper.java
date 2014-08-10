@@ -478,12 +478,14 @@ public class DataHelper {
                 String val = (String) entry.getValue();
                 if (name.contains("#") ||
                     name.contains("=") ||
+                    name.contains("\r") ||
                     name.contains("\n") ||
                     name.startsWith(";") ||
                     val.contains("#") ||
+                    val.contains("\r") ||
                     val.contains("\n")) {
                     if (iae == null)
-                        iae = new IllegalArgumentException("Invalid character (one of \"#;=\\n\") in key or value: \"" +
+                        iae = new IllegalArgumentException("Invalid character (one of \"#;=\\r\\n\") in key or value: \"" +
                                                            name + "\" = \"" + val + '\"');
                     continue;
                 }
@@ -1622,11 +1624,13 @@ public class DataHelper {
         if (orig == null) return "";
         String t1 = orig.replace('<', ' ');
         String rv = t1.replace('>', ' ');
+        rv = rv.replace('\"', ' ');
+        rv = rv.replace('\'', ' ');
         return rv;
     }
 
-    private static final String escapeChars[] = {"&", "\"", "<", ">"};
-    private static final String escapeCodes[] = {"&amp;", "&quot;", "&lt;", "&gt;"};
+    private static final String escapeChars[] = {"&", "\"", "<", ">", "\"", "'"};
+    private static final String escapeCodes[] = {"&amp;", "&quot;", "&lt;", "&gt;", "&quot;", "&apos;"};
 
     /**
      * Escape a string for inclusion in HTML

@@ -1202,22 +1202,23 @@ class PeerCoordinator implements PeerListener
                  boolean skipped = false;
                  for(Piece piece : wantedPieces) {
                      if (piece.getId() == savedPiece) {
-                         if (peer.isCompleted() && piece.getPeerCount() > 1) {
+                         if (peer.isCompleted() && piece.getPeerCount() > 1 &&
+                             wantedPieces.size() > 2*END_GAME_THRESHOLD) {
                              // Try to preserve rarest-first
-                             // by not requesting a partial piece that non-seeders also have
+                             // by not requesting a partial piece that at least two non-seeders also have
                              // from a seeder
-                             boolean nonSeeds = false;
+                             int nonSeeds = 0;
                              for (Peer pr : peers) {
                                  PeerState state = pr.state;
                                  if (state == null) continue;
                                  BitField bf = state.bitfield;
                                  if (bf == null) continue;
                                  if (bf.get(savedPiece) && !pr.isCompleted()) {
-                                     nonSeeds = true;
-                                     break;
+                                     if (++nonSeeds > 1)
+                                         break;
                                  }
                              }
-                             if (nonSeeds) {
+                             if (nonSeeds > 1) {
                                  skipped = true;
                                  break;
                              }

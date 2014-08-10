@@ -29,7 +29,7 @@ public class SessionKeyManager {
 
     /**
      *  A dummy SessionKeyManager for testing or for passing to
-     *  ElGamalAESEngine.encrypt()
+     *  ElGamalAESEngine.decrypt()
      *
      *  @since 0.9.14
      */
@@ -37,7 +37,7 @@ public class SessionKeyManager {
 
     /**
      *  A dummy SessionKeyManager for testing or for passing to
-     *  ElGamalAESEngine.encrypt()
+     *  ElGamalAESEngine.decrypt()
      *
      *  @param context unused
      *  @since public since 0.9.14; protected before that

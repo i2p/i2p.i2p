@@ -2,6 +2,8 @@
     // NOTE: Do the header carefully so there is no whitespace before the <?xml... line
 
     response.setHeader("X-Frame-Options", "SAMEORIGIN");
+    response.setHeader("Content-Security-Policy", "default-src 'self'; style-src 'self' 'unsafe-inline'");
+    response.setHeader("X-XSS-Protection", "1; mode=block");
 
 %><%@page pageEncoding="UTF-8"
 %><%@page trimDirectiveWhitespaces="true"

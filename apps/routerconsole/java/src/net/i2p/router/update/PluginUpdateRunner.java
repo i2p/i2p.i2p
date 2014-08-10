@@ -10,7 +10,9 @@ import java.util.Properties;
 
 import net.i2p.CoreVersion;
 import net.i2p.crypto.TrustedUpdate;
+import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
+import net.i2p.data.SigningPublicKey;
 import net.i2p.router.RouterContext;
 import net.i2p.router.web.ConfigClientsHelper;
 import net.i2p.router.web.ConfigUpdateHandler;
@@ -54,6 +56,7 @@ class PluginUpdateRunner extends UpdateRunner {
     private static final String XPI2P = "app.xpi2p";
     private static final String ZIP = XPI2P + ".zip";
     public static final String PLUGIN_DIR = PluginStarter.PLUGIN_DIR;
+    private static final String PROP_ALLOW_NEW_KEYS = "routerconsole.allowUntrustedPlugins";
 
     public PluginUpdateRunner(RouterContext ctx, ConsoleUpdateManager mgr, List<URI> uris,
                               String appName, String oldVersion ) {
@@ -162,11 +165,20 @@ class PluginUpdateRunner extends UpdateRunner {
 
             // ok, now we check sigs and deal with a bad sig
             String pubkey = props.getProperty("key");
-            String signer = props.getProperty("signer");
+            String signer = DataHelper.stripHTML(props.getProperty("signer"));
             if (pubkey == null || signer == null || pubkey.length() != 172 || signer.length() <= 0) {
                 f.delete();
                 to.delete();
                 //updateStatus("<b>" + "Plugin contains an invalid key" + ' ' + pubkey + ' ' + signer + "</b>");
+                statusDone("<b>" + _("Plugin from {0} contains an invalid key", url) + "</b>");
+                return;
+            }
+            SigningPublicKey spk;
+            try {
+                spk = new SigningPublicKey(pubkey);
+            } catch (DataFormatException dfe) {
+                f.delete();
+                to.delete();
                 statusDone("<b>" + _("Plugin from {0} contains an invalid key", url) + "</b>");
                 return;
             }
@@ -179,12 +191,21 @@ class PluginUpdateRunner extends UpdateRunner {
                 up.addKey(e.getKey(), e.getValue());
             }
 
+            // add all trusted plugin keys, so any conflicts with trusted keys
+            // will be discovered and rejected
+            Map<String, String> trustedKeys = TrustedPluginKeys.getKeys();
+            for (Map.Entry<String, String> e : trustedKeys.entrySet()) {
+                // ignore dups/bad keys
+                up.addKey(e.getKey(), e.getValue());
+            }
+
             if (up.haveKey(pubkey)) {
                 // the key is already in the TrustedUpdate keyring
                 // verify the sig and verify that it is signed by the signer in the plugin.config file
                 // Allow "" as the previously-known signer
-                String signingKeyName = up.verifyAndGetSigner(f);
-                if (!(signer.equals(signingKeyName) || "".equals(signingKeyName))) {
+                boolean ok = up.verify(f, spk);
+                String signingKeyName = up.getKeys().get(spk);
+                if ((!ok) || !(signer.equals(signingKeyName) || "".equals(signingKeyName))) {
                     f.delete();
                     to.delete();
                     if (signingKeyName == null)
@@ -194,7 +215,7 @@ class PluginUpdateRunner extends UpdateRunner {
                     statusDone("<b>" + _("Plugin signature verification of {0} failed", url) + "</b>");
                     return;
                 }
-            } else {
+            } else if (_context.getBooleanProperty(PROP_ALLOW_NEW_KEYS)) {
                 // add to keyring...
                 if(!up.addKey(pubkey, signer)) {
                     // bad or duplicate key
@@ -218,6 +239,14 @@ class PluginUpdateRunner extends UpdateRunner {
                     statusDone("<b>" + _("Plugin signature verification of {0} failed", url) + "</b>");
                     return;
                 }
+            } else {
+                // unknown key
+                f.delete();
+                to.delete();
+                _log.error("Untrusted plugin key \"" + pubkey + "\" for plugin signer \"" + signer + "\"");
+                // don't display signer, we're really checking the key not the signer name
+                statusDone("<b>" + _("Plugin not installed - signer is untrusted") + "</b>");
+                return;
             }
 
             String sudVersion = TrustedUpdate.getVersionString(f);

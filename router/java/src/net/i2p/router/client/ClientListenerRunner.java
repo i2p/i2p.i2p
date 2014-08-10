@@ -64,7 +64,9 @@ class ClientListenerRunner implements Runnable {
             return new ServerSocket(_port, 0, InetAddress.getByName(listenInterface));
         }
     }
-                
+
+    public void run() { runServer(); }
+
     /** 
      * Start up the socket listener, listens for connections, and
      * fires those connections off via {@link #runConnection runConnection}.  
@@ -72,7 +74,7 @@ class ClientListenerRunner implements Runnable {
      * failure.
      *
      */
-    public void runServer() {
+    protected void runServer() {
         _running = true;
         int curDelay = 1000;
         while (_running) {
@@ -173,5 +175,4 @@ class ClientListenerRunner implements Runnable {
             _socket = null;
         } catch (IOException ioe) {}
     }
-    public void run() { runServer(); }
 }

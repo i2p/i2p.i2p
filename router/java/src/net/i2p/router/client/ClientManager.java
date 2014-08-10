@@ -10,8 +10,10 @@ package net.i2p.router.client;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -37,6 +39,7 @@ import net.i2p.router.JobImpl;
 import net.i2p.router.RouterContext;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
+import net.i2p.util.SystemVersion;
 
 /**
  * Coordinate connections and various tasks
@@ -45,7 +48,7 @@ import net.i2p.util.Log;
  */
 class ClientManager {
     private final Log _log;
-    protected ClientListenerRunner _listener;
+    protected final List<ClientListenerRunner> _listeners;
     // Destination --> ClientConnectionRunner
     // Locked for adds/removes but not lookups
     private final Map<Destination, ClientConnectionRunner>  _runners;
@@ -87,6 +90,7 @@ class ClientManager {
         //                                      "How large are messages received by the client?", 
         //                                      "ClientMessages", 
         //                                      new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
+        _listeners = new ArrayList<ClientListenerRunner>();
         _runners = new ConcurrentHashMap<Destination, ClientConnectionRunner>();
         _runnersByHash = new ConcurrentHashMap<Hash, ClientConnectionRunner>();
         _pendingRunners = new HashSet<ClientConnectionRunner>();
@@ -105,14 +109,22 @@ class ClientManager {
 
     /** Todo: Start a 3rd listener for IPV6? */
     protected void startListeners() {
+        ClientListenerRunner listener;
+        if (SystemVersion.isAndroid()) {
+            listener = new DomainClientListenerRunner(_ctx, this);
+            Thread t = new I2PThread(listener, "DomainClientListener", true);
+            t.start();
+            _listeners.add(listener);
+        }
         if (!_ctx.getBooleanProperty(PROP_DISABLE_EXTERNAL)) {
             // there's no option to start both an SSL and non-SSL listener
             if (_ctx.getBooleanProperty(PROP_ENABLE_SSL))
-                _listener = new SSLClientListenerRunner(_ctx, this, _port);
+                listener = new SSLClientListenerRunner(_ctx, this, _port);
             else
-                _listener = new ClientListenerRunner(_ctx, this, _port);
-            Thread t = new I2PThread(_listener, "ClientListener:" + _port, true);
+                listener = new ClientListenerRunner(_ctx, this, _port);
+            Thread t = new I2PThread(listener, "ClientListener:" + _port, true);
             t.start();
+            _listeners.add(listener);
         }
         _isStarted = true;
     }
@@ -132,8 +144,9 @@ class ClientManager {
     public synchronized void shutdown(String msg) {
         _isStarted = false;
         _log.info("Shutting down the ClientManager");
-        if (_listener != null)
-            _listener.stopListening();
+        for (ClientListenerRunner listener : _listeners)
+            listener.stopListening();
+        _listeners.clear();
         Set<ClientConnectionRunner> runners = new HashSet<ClientConnectionRunner>();
         synchronized (_runners) {
             for (ClientConnectionRunner runner : _runners.values()) {
@@ -169,8 +182,13 @@ class ClientManager {
         return hisQueue;
     }
 
-    public boolean isAlive() {
-        return _isStarted && (_listener == null || _listener.isListening());
+    public synchronized boolean isAlive() {
+        boolean listening = true;
+        if (!_listeners.isEmpty()) {
+            for (ClientListenerRunner listener : _listeners)
+                listening = listening && listener.isListening();
+        }
+        return _isStarted && (_listeners.isEmpty() || listening);
     }
 
     public void registerConnection(ClientConnectionRunner runner) {

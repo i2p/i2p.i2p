@@ -520,7 +520,7 @@
         <ant dir="apps/susimail/" target="poupdate" />
         <ant dir="apps/desktopgui" target="poupdate" />
         <ant dir="installer/resources/locale" target="poupdate" />
-        <ant dir="apps/ministreaming/" target="poupdate" />
+        <ant dir="apps/ministreaming/java" target="poupdate" />
     </target>
 
     <condition property="no.bundle">
@@ -558,7 +558,7 @@
             <group title="I2PSnark Application" packages="org.klomp.snark:org.klomp.snark.*" />
             <group title="I2PTunnel Application" packages="net.i2p.i2ptunnel:net.i2p.i2ptunnel.*" />
             <group title="Installer Utilities" packages="net.i2p.installer" />
-            <group title="Jetty Starter and Logging" packages="net.i2p.jetty" />
+            <group title="Jetty Starter and Logging" packages="net.i2p.jetty:net.i2p.servlet:net.i2p.servlet.*" />
             <group title="SAM Bridge" packages="net.i2p.sam" />
             <group title="SAM Demos" packages="net.i2p.sam.client" />
             <group title="SusiDNS Application" packages="i2p.susi.dns" />

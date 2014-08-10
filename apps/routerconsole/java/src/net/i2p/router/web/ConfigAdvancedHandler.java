@@ -21,7 +21,10 @@ public class ConfigAdvancedHandler extends FormHandler {
     @Override
     protected void processForm() {
         if (_shouldSave) {
-            saveChanges();
+            if (isAdvanced())
+                saveChanges();
+            else
+                addFormError("Save disabled, edit the router.config file to make changes") ;
         } else {
             // noop
         }
@@ -30,7 +33,7 @@ public class ConfigAdvancedHandler extends FormHandler {
     public void setShouldsave(String moo) { _shouldSave = true; }
     //public void setRestart(String moo) { _forceRestart = true; }
     
-    public void setConfig(String val) {
+    public void setNofilter_config(String val) {
         _config = val;
     }
     

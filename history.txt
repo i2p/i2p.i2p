@@ -1,3 +1,57 @@
+* 2014-08-09 0.9.14.1 released
+
+2014-08-07 kytv
+ * Updates to geoip.txt and geoipv6.dat.gz based on Maxmind GeoLite Country
+   database from 2014-08-06.
+
+2014-08-03 zzz
+ * Console:
+   - Fix update buttons
+   - Don't filter parameter names starting with "nofilter_"
+   - Re-allow configadvanced, news URL, and unsigned update URL if routerconsole.advanced=true
+   - Re-allow plugin install if routerconsole.advanced=true or routerconsole.enablePluginInstall=true
+   - Only allow whitelisted plugin signers, unless routerconsole.allowUntrustedPlugins=true
+   - Re-allow clients.config changes if routerconsole.advanced=true or routerconsole.enableClientChange=true
+   - More escaping
+ * i2psnark: Fix add torrent form
+
+2014-07-31 zzz
+ * ExecNamingService: Remove
+ * Plugins: Add whitelist of keys
+
+* 2014-07-26 0.9.14 released
+
+2014-07-26 zzz
+ * Console:
+   - Fix several XSS issues (thx Exodus Intelligence)
+   - Add Content-Security-Policy and X-XSS-Protection headers
+   - Disable changing news feed URL from UI
+   - Disable plugin install from UI
+   - Disable setting unsigned update URL from UI
+   - Disable /configadvanced
+ * DataHelper: Disallow \r in storeProps() (thx joernchen of Phenoelit)
+ * ExecNamingService: Disable (thx joernchen of Phenoelit)
+ * Startup: Add susimail.config to migrated files
+
+2014-07-23 kytv
+ * Updates to geoip.txt and geoipv6.dat.gz based on Maxmind GeoLite Country
+   database from 2014-07-02.
+
+2014-07-19 zzz
+ * i2psnark: Don't prefer leeches during end game, to
+   prevent slowdowns or stalls
+ * SAM: Add support for RAW on the bridge socket in v3 (ticket #1334)
+ * Streaming; Disable fail-fast for now.
+ * SusiMail: Better error message on decode fail
+
+2014-07-15 str4d
+ * I2CP: Stubs for I2CP connections over Unix domain sockets
+
+2014-07-11 zzz
+ * Datagrams:
+  - Redefine the repliable datagram signature for non-DSA_SHA1 sig types;
+    was the sig of the SHA-256 of the payload, now the sig of the payload itself.
+
 2014-07-03 zzz
  * Base64:
   - Catch numerous decoding errors that were previously misdecoded (ticket #1318)

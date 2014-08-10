@@ -671,9 +671,9 @@ public class PluginStarter implements Runnable {
         for(ClientAppConfig app : apps) {
             // If the client is a running ClientApp that we want to stop,
             // bypass all the logic below.
-            ClientApp ca = ctx.routerAppManager().getClientApp(app.className, LoadClientAppsJob.parseArgs(app.args));
-            if (ca != null && ca.getState() == ClientAppState.RUNNING) {
-                if (action.equals("stop")) {
+            if (action.equals("stop")) {
+                ClientApp ca = ctx.routerAppManager().getClientApp(app.className, LoadClientAppsJob.parseArgs(app.args));
+                if (ca != null && ca.getState() == ClientAppState.RUNNING) {
                     try {
                         ca.shutdown(LoadClientAppsJob.parseArgs(app.stopargs));
                     } catch (Throwable t) {

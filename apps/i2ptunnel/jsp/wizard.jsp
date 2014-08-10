@@ -6,6 +6,8 @@
         request.setCharacterEncoding("UTF-8");
 
     response.setHeader("X-Frame-Options", "SAMEORIGIN");
+    response.setHeader("Content-Security-Policy", "default-src 'self'; style-src 'self' 'unsafe-inline'");
+    response.setHeader("X-XSS-Protection", "1; mode=block");
 
 %><%@page pageEncoding="UTF-8"
 %><%@page contentType="text/html" import="net.i2p.i2ptunnel.web.EditBean"
@@ -39,6 +41,7 @@
    /* Fetch and format a couple of regularly-used values */
    boolean tunnelIsClient = Boolean.valueOf(request.getParameter("isClient"));
    String tunnelType = request.getParameter("type");
+   tunnelType = net.i2p.data.DataHelper.stripHTML(tunnelType);
    /* Special case - don't display page 4 for server tunnels */
    if (curPage == 4 && !tunnelIsClient) {
      if ("Previous page".equals(request.getParameter("action"))) {
@@ -224,17 +227,17 @@
                 <label for="name" accesskey="N">
                     <%=intl._("Name")%>:(<span class="accessKey">N</span>)
                 </label>
-                <input type="text" size="30" maxlength="50" name="name" id="name" title="Tunnel Name" value="<%=(!"null".equals(request.getParameter("name")) ? request.getParameter("name") : "" ) %>" class="freetext" />
+                <input type="text" size="30" maxlength="50" name="name" id="name" title="Tunnel Name" value="<%=(!"null".equals(request.getParameter("name")) ? net.i2p.data.DataHelper.stripHTML(request.getParameter("name")) : "" ) %>" class="freetext" />
             </div>
             <div id="descriptionField" class="rowItem">
                 <label for="description" accesskey="e">
                     <%=intl._("Description")%>:(<span class="accessKey">E</span>)
                 </label>
-                <input type="text" size="60" maxlength="80" name="description"  id="description" title="Tunnel Description" value="<%=(!"null".equals(request.getParameter("description")) ? request.getParameter("description") : "" ) %>" class="freetext" />
+                <input type="text" size="60" maxlength="80" name="description"  id="description" title="Tunnel Description" value="<%=(!"null".equals(request.getParameter("description")) ? net.i2p.data.DataHelper.stripHTML(request.getParameter("description")) : "" ) %>" class="freetext" />
             </div><%
             } else {
-            %><input type="hidden" name="name" value="<%=request.getParameter("name")%>" />
-            <input type="hidden" name="description" value="<%=request.getParameter("description")%>" /><%
+            %><input type="hidden" name="name" value="<%=net.i2p.data.DataHelper.stripHTML(request.getParameter("name"))%>" />
+            <input type="hidden" name="description" value="<%=net.i2p.data.DataHelper.stripHTML(request.getParameter("description"))%>" /><%
             } /* curPage 3 */
 
                /* End page 3 */ %>
@@ -252,10 +255,10 @@
                 <label for="proxyList" accesskey="x">
                     <%=intl._("Outproxies")%>(<span class="accessKey">x</span>):
                 </label>
-                <input type="text" size="30" id="proxyList" name="proxyList" title="List of Outproxy I2P destinations" value="<%=(!"null".equals(request.getParameter("proxyList")) ? request.getParameter("proxyList") : "" ) %>" class="freetext" />
+                <input type="text" size="30" id="proxyList" name="proxyList" title="List of Outproxy I2P destinations" value="<%=(!"null".equals(request.getParameter("proxyList")) ? net.i2p.data.DataHelper.stripHTML(request.getParameter("proxyList")) : "" ) %>" class="freetext" />
             </div><%
                 } else {
-            %><input type="hidden" name="proxyList" value="<%=request.getParameter("proxyList")%>" /><%
+            %><input type="hidden" name="proxyList" value="<%=net.i2p.data.DataHelper.stripHTML(request.getParameter("proxyList"))%>" /><%
                 } /* curPage 4 */
               } else if ("client".equals(tunnelType) || "ircclient".equals(tunnelType) || "streamrclient".equals(tunnelType)) {
                 if (curPage == 4) {
@@ -267,7 +270,7 @@
                 <label for="targetDestination" accesskey="T">
                     <%=intl._("Tunnel Destination")%>(<span class="accessKey">T</span>):
                 </label>
-                <input type="text" size="30" id="targetDestination" name="targetDestination" title="Destination of the Tunnel" value="<%=(!"null".equals(request.getParameter("targetDestination")) ? request.getParameter("targetDestination") : "" ) %>" class="freetext" />
+                <input type="text" size="30" id="targetDestination" name="targetDestination" title="Destination of the Tunnel" value="<%=(!"null".equals(request.getParameter("targetDestination")) ? net.i2p.data.DataHelper.stripHTML(request.getParameter("targetDestination")) : "" ) %>" class="freetext" />
                 <span class="comment">(<%=intl._("name, name:port, or destination")%>
                      <% if ("streamrclient".equals(tunnelType)) { /* deferred resolution unimplemented in streamr client */ %>
                          - <%=intl._("b32 not recommended")%>
@@ -275,7 +278,7 @@
                 </span>
             </div><%
                 } else {
-            %><input type="hidden" name="targetDestination" value="<%=request.getParameter("targetDestination")%>" /><%
+            %><input type="hidden" name="targetDestination" value="<%=net.i2p.data.DataHelper.stripHTML(request.getParameter("targetDestination"))%>" /><%
                 } /* curPage 4 */
               }
             } /* tunnelIsClient */
@@ -294,10 +297,10 @@
                 <label for="targetHost" accesskey="H">
                     <%=intl._("Host")%>(<span class="accessKey">H</span>):
                 </label>
-                <input type="text" size="20" id="targetHost" name="targetHost" title="Target Hostname or IP" value="<%=(!"null".equals(request.getParameter("targetHost")) ? request.getParameter("targetHost") : "127.0.0.1" ) %>" class="freetext" />
+                <input type="text" size="20" id="targetHost" name="targetHost" title="Target Hostname or IP" value="<%=(!"null".equals(request.getParameter("targetHost")) ? net.i2p.data.DataHelper.stripHTML(request.getParameter("targetHost")) : "127.0.0.1" ) %>" class="freetext" />
             </div><%
               } else {
-            %><input type="hidden" name="targetHost" value="<%=request.getParameter("targetHost")%>" /><%
+            %><input type="hidden" name="targetHost" value="<%=net.i2p.data.DataHelper.stripHTML(request.getParameter("targetHost"))%>" /><%
               } /* curPage 5 */
             } /* streamrclient or !streamrserver */ %>
             <%
@@ -310,10 +313,10 @@
                 <label for="targetPort" accesskey="P">
                     <%=intl._("Port")%>(<span class="accessKey">P</span>):
                 </label>
-                <input type="text" size="6" maxlength="5" id="targetPort" name="targetPort" title="Target Port Number" value="<%=(!"null".equals(request.getParameter("targetPort")) ? request.getParameter("targetPort") : "" ) %>" class="freetext" />
+                <input type="text" size="6" maxlength="5" id="targetPort" name="targetPort" title="Target Port Number" value="<%=(!"null".equals(request.getParameter("targetPort")) ? net.i2p.data.DataHelper.stripHTML(request.getParameter("targetPort")) : "" ) %>" class="freetext" />
             </div><%
               } else {
-            %><input type="hidden" name="targetPort" value="<%=request.getParameter("targetPort")%>" /><%
+            %><input type="hidden" name="targetPort" value="<%=net.i2p.data.DataHelper.stripHTML(request.getParameter("targetPort"))%>" /><%
               } /* curPage 5 */
             } /* !tunnelIsClient */ %>
             <%
@@ -327,10 +330,10 @@
                 <label for="port" accesskey="P">
                     <span class="accessKey">P</span>ort:
                 </label>
-                <input type="text" size="6" maxlength="5" id="port" name="port" title="Access Port Number" value="<%=(!"null".equals(request.getParameter("port")) ? request.getParameter("port") : "" ) %>" class="freetext" />
+                <input type="text" size="6" maxlength="5" id="port" name="port" title="Access Port Number" value="<%=(!"null".equals(request.getParameter("port")) ? net.i2p.data.DataHelper.stripHTML(request.getParameter("port")) : "" ) %>" class="freetext" />
             </div><%
               } else {
-            %><input type="hidden" name="port" value="<%=request.getParameter("port")%>" /><%
+            %><input type="hidden" name="port" value="<%=net.i2p.data.DataHelper.stripHTML(request.getParameter("port"))%>" /><%
               } /* curPage 5 */
             } /* tunnelIsClient or httpbidirserver */ %>
             <%
@@ -366,7 +369,7 @@
                 </select>
             </div><%
               } else {
-            %><input type="hidden" name="reachableBy" value="<%=request.getParameter("reachableBy")%>" /><%
+            %><input type="hidden" name="reachableBy" value="<%=net.i2p.data.DataHelper.stripHTML(request.getParameter("reachableBy"))%>" /><%
               } /* curPage 5 */
             } /* (tunnelIsClient && !streamrclient) ||  httpbidirserver || streamrserver */
 
@@ -388,7 +391,7 @@
             </div><%
             } else {
               if ("1".equals(request.getParameter("startOnLoad"))) {
-            %><input type="hidden" name="startOnLoad" value="<%=request.getParameter("startOnLoad")%>" /><%
+            %><input type="hidden" name="startOnLoad" value="<%=net.i2p.data.DataHelper.stripHTML(request.getParameter("startOnLoad"))%>" /><%
               }
             } /* curPage 6 */
 
@@ -436,30 +439,30 @@
                 } %>
                 </td></tr>
                 <tr><td><%=intl._("Tunnel name and description")%></td><td>
-                    <%=request.getParameter("name")%><br />
-                    <%=request.getParameter("description")%>
+                    <%=net.i2p.data.DataHelper.stripHTML(request.getParameter("name"))%><br />
+                    <%=net.i2p.data.DataHelper.stripHTML(request.getParameter("description"))%>
                 </td></tr><%
                 if (tunnelIsClient) { %>
                 <tr><td><%=intl._("Tunnel destination")%></td><td><%
                   if ("httpclient".equals(tunnelType) || "connectclient".equals(tunnelType) || "sockstunnel".equals(tunnelType) || "socksirctunnel".equals(tunnelType)) { %>
-                    <%=request.getParameter("proxyList")%><%
+                    <%=net.i2p.data.DataHelper.stripHTML(request.getParameter("proxyList"))%><%
                   } else if ("client".equals(tunnelType) || "ircclient".equals(tunnelType) || "streamrclient".equals(tunnelType)) { %>
-                    <%=request.getParameter("targetDestination")%><%
+                    <%=net.i2p.data.DataHelper.stripHTML(request.getParameter("targetDestination"))%><%
                   } %>
                 </td></tr><%
                 } %>
                 <tr><td><%=intl._("Binding address and port")%></td><td><%
                 if ((tunnelIsClient && "streamrclient".equals(tunnelType)) || (!tunnelIsClient && !"streamrserver".equals(tunnelType))) { %>
-                    <%=request.getParameter("targetHost")%><br /><%
+                    <%=net.i2p.data.DataHelper.stripHTML(request.getParameter("targetHost"))%><br /><%
                 }
                 if (!tunnelIsClient) { %>
-                    <%=request.getParameter("targetPort")%><br /><%
+                    <%=net.i2p.data.DataHelper.stripHTML(request.getParameter("targetPort"))%><br /><%
                 }
                 if (tunnelIsClient || "httpbidirserver".equals(tunnelType)) { %>
-                    <br /><%=request.getParameter("port")%><%
+                    <br /><%=net.i2p.data.DataHelper.stripHTML(request.getParameter("port"))%><%
                 }
                 if ((tunnelIsClient && !"streamrclient".equals(tunnelType)) || "httpbidirserver".equals(tunnelType) || "streamrserver".equals(tunnelType)) { %>
-                    <br /><%=request.getParameter("reachableBy")%><%
+                    <br /><%=net.i2p.data.DataHelper.stripHTML(request.getParameter("reachableBy"))%><%
                 } %>
                 </td></tr>
                 <tr><td><%=intl._("Tunnel auto-start")%></td><td><%

@@ -728,7 +728,7 @@ public class IndexBean {
         _tunnelBackupQuantity = (tunnelBackupQuantity != null ? tunnelBackupQuantity.trim() : null);
     }
     /** what I2P session overrides should be used */
-    public void setCustomOptions(String customOptions) { 
+    public void setNofilter_customOptions(String customOptions) { 
         _customOptions = (customOptions != null ? customOptions.trim() : null);
     }
     /** what HTTP outproxies should be used (httpclient specific) */
@@ -927,7 +927,7 @@ public class IndexBean {
             _newProxyUser = s.trim();
     }
     
-    public void setProxyPassword(String s) {
+    public void setNofilter_proxyPassword(String s) {
         if (s != null)
             _newProxyPW = s.trim();
     }
@@ -941,7 +941,7 @@ public class IndexBean {
             _otherOptions.put(I2PTunnelHTTPClientBase.PROP_OUTPROXY_USER, s.trim());
     }
     
-    public void setOutproxyPassword(String s) {
+    public void setNofilter_outproxyPassword(String s) {
         if (s != null)
             _otherOptions.put(I2PTunnelHTTPClientBase.PROP_OUTPROXY_PW, s.trim());
     }

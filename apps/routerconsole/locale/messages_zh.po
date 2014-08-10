@@ -5,7 +5,7 @@
 # 
 # Translators:
 # ducki2p <ducki2p@gmail.com>, 2011
-# nametooshort <oiiu19@yahoo.com>, 2013-2014
+# linloveliang <oiiu19@yahoo.com>, 2013-2014
 # xtoaster <zhazhenzhong@gmail.com>, 2012
 # walking <walking@i2pmail.org>, 2011
 # walking <walking@i2pmail.org>, 2011
@@ -13,7 +13,7 @@
 # walking <walking@i2pmail.org>, 2011
 # wwj402 <wwj402@gmail.com>, 2013
 # xtoaster <zhazhenzhong@gmail.com>, 2012
-# Y.F Yang <yfdyh000@gmail.com>, 2014
+# YF <yfdyh000@gmail.com>, 2014
 # xtoaster <zhazhenzhong@gmail.com>, 2012
 # xtoaster <zhazhenzhong@gmail.com>, 2012
 msgid ""
@@ -21,8 +21,8 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-02-06 18:27+0000\n"
-"PO-Revision-Date: 2014-03-01 14:52+0000\n"
-"Last-Translator: Y.F Yang <yfdyh000@gmail.com>\n"
+"PO-Revision-Date: 2014-05-18 21:16+0000\n"
+"Last-Translator: YF <yfdyh000@gmail.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/projects/p/I2P/language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -783,7 +783,7 @@ msgstr "传输 {0} 的数据失败"
 #: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1243
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:671
 msgid "Update downloaded"
-msgstr "升更新已下载"
+msgstr "更新已下载"
 
 #: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1199
 #: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1243

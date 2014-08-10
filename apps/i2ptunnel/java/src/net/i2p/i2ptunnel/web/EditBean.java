@@ -17,6 +17,7 @@ import java.util.TreeMap;
 import net.i2p.client.I2PClient;
 import net.i2p.crypto.SigType;
 import net.i2p.data.Base64;
+import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.PrivateKeyFile;
 import net.i2p.data.Signature;
@@ -57,7 +58,7 @@ public class EditBean extends IndexBean {
     public String getTargetHost(int tunnel) {
         TunnelController tun = getController(tunnel);
         if (tun != null && tun.getTargetHost() != null)
-            return tun.getTargetHost();
+            return DataHelper.escapeHTML(tun.getTargetHost());
         else
             return "127.0.0.1";
     }
@@ -65,7 +66,7 @@ public class EditBean extends IndexBean {
     public String getTargetPort(int tunnel) {
         TunnelController tun = getController(tunnel);
         if (tun != null && tun.getTargetPort() != null)
-            return tun.getTargetPort();
+            return DataHelper.escapeHTML(tun.getTargetPort());
         else
             return "";
     }
@@ -73,7 +74,7 @@ public class EditBean extends IndexBean {
     public String getSpoofedHost(int tunnel) {
         TunnelController tun = getController(tunnel);
         if (tun != null && tun.getSpoofedHost() != null)
-            return tun.getSpoofedHost();
+            return DataHelper.escapeHTML(tun.getSpoofedHost());
         else
             return "";
     }
@@ -294,44 +295,44 @@ public class EditBean extends IndexBean {
     }
 
     /** all of these are @since 0.8.3 */
-    public String getLimitMinute(int tunnel) {
-        return getProperty(tunnel, PROP_MAX_CONNS_MIN, "0");
+    public int getLimitMinute(int tunnel) {
+        return getProperty(tunnel, PROP_MAX_CONNS_MIN, 0);
     }
 
-    public String getLimitHour(int tunnel) {
-        return getProperty(tunnel, PROP_MAX_CONNS_HOUR, "0");
+    public int getLimitHour(int tunnel) {
+        return getProperty(tunnel, PROP_MAX_CONNS_HOUR, 0);
     }
 
-    public String getLimitDay(int tunnel) {
-        return getProperty(tunnel, PROP_MAX_CONNS_DAY, "0");
+    public int getLimitDay(int tunnel) {
+        return getProperty(tunnel, PROP_MAX_CONNS_DAY, 0);
     }
 
-    public String getTotalMinute(int tunnel) {
-        return getProperty(tunnel, PROP_MAX_TOTAL_CONNS_MIN, "0");
+    public int getTotalMinute(int tunnel) {
+        return getProperty(tunnel, PROP_MAX_TOTAL_CONNS_MIN, 0);
     }
 
-    public String getTotalHour(int tunnel) {
-        return getProperty(tunnel, PROP_MAX_TOTAL_CONNS_HOUR, "0");
+    public int getTotalHour(int tunnel) {
+        return getProperty(tunnel, PROP_MAX_TOTAL_CONNS_HOUR, 0);
     }
 
-    public String getTotalDay(int tunnel) {
-        return getProperty(tunnel, PROP_MAX_TOTAL_CONNS_DAY, "0");
+    public int getTotalDay(int tunnel) {
+        return getProperty(tunnel, PROP_MAX_TOTAL_CONNS_DAY, 0);
     }
 
-    public String getMaxStreams(int tunnel) {
-        return getProperty(tunnel, PROP_MAX_STREAMS, "0");
+    public int getMaxStreams(int tunnel) {
+        return getProperty(tunnel, PROP_MAX_STREAMS, 0);
     }
 
     /**
      * POST limits
      * @since 0.9.9
      */
-    public String getPostMax(int tunnel) {
-        return getProperty(tunnel, I2PTunnelHTTPServer.OPT_POST_MAX, "0");
+    public int getPostMax(int tunnel) {
+        return getProperty(tunnel, I2PTunnelHTTPServer.OPT_POST_MAX, 0);
     }
 
-    public String getPostTotalMax(int tunnel) {
-        return getProperty(tunnel, I2PTunnelHTTPServer.OPT_POST_TOTAL_MAX, "0");
+    public int getPostTotalMax(int tunnel) {
+        return getProperty(tunnel, I2PTunnelHTTPServer.OPT_POST_TOTAL_MAX, 0);
     }
 
     public int getPostCheckTime(int tunnel) {
@@ -370,8 +371,11 @@ public class EditBean extends IndexBean {
         TunnelController tun = getController(tunnel);
         if (tun != null) {
             Properties opts = getOptions(tun);
-            if (opts != null)
-                return opts.getProperty(prop, def);
+            if (opts != null) {
+                String rv = opts.getProperty(prop);
+                if (rv != null)
+                    return DataHelper.escapeHTML(rv);
+            }
         }
         return def;
     }
@@ -452,7 +456,7 @@ public class EditBean extends IndexBean {
                     space = true;
                 buf.append(e.getKey()).append('=').append(e.getValue());
             }
-            return buf.toString();
+            return DataHelper.escapeHTML(buf.toString());
         } else {
             return "";
         }

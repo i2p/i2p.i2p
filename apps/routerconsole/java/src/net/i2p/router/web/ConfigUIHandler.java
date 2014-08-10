@@ -35,8 +35,12 @@ public class ConfigUIHandler extends FormHandler {
     
     /** note - lang change is handled in CSSHelper but we still need to save it here */
     private void saveChanges() {
-        if (_config == null)
+        if (_config == null || _config.length() <= 0)
             return;
+        if (_config.replaceAll("[a-zA-Z0-9_-]", "").length() != 0) {
+            addFormError("Bad theme name");
+            return;
+        }
         Map<String, String> changes = new HashMap<String, String>();
         List<String> removes = new ArrayList<String>();
         String oldTheme = _context.getProperty(CSSHelper.PROP_THEME_NAME, CSSHelper.DEFAULT_THEME);
@@ -76,7 +80,7 @@ public class ConfigUIHandler extends FormHandler {
             addFormError(_("No user name entered"));
             return;
         }
-        String pw = getJettyString("pw");
+        String pw = getJettyString("nofilter_pw");
         if (pw == null || pw.length() <= 0) {
             addFormError(_("No password entered"));
             return;

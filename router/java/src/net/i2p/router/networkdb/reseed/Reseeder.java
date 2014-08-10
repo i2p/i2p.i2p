@@ -100,6 +100,7 @@ public class Reseeder {
               "https://uk.reseed.i2p2.no:444/" + "," +
               "https://jp.reseed.i2p2.no:444/" + "," +
               "https://i2p-netdb.innovatio.no/" + "," +
+              "https://ssl.webpack.de/ivae2he9.sg4.e-plaza.de/" + "," + // Only HTTPS and SU3 (v2) support
               "https://ieb9oopo.mooo.com/";
               // Temp disabled since h2ik have been AWOL since 06-03-2013
               //"https://i2p.feared.eu/";
@@ -194,7 +195,7 @@ public class Reseeder {
                 _checker.setError(_("Reseed failed.") + ' '  +
                                                _("See {0} for help.",
                                                  "<a target=\"_top\" href=\"/configreseed\">" + _("reseed configuration page") + "</a>"));
-            }	
+            }
             _isRunning = false;
             _checker.setStatus("");
             _context.router().eventLog().addEvent(EventLog.RESEED, Integer.toString(total));
@@ -534,7 +535,9 @@ public class Reseeder {
                         break;
                 }
             } catch (Throwable t) {
-                _log.warn("Error reseeding", t);
+                System.err.println("Error reseeding: " + t);
+                _log.error("Error reseeding", t);
+                errors++;
             } finally {
                 if (contentRaw != null)
                     contentRaw.delete();
@@ -550,7 +553,7 @@ public class Reseeder {
                 _context.netDb().rescan();
             return fetched;
         }
-    
+
         /**
          *  Always throws an exception if something fails.
          *  We do NOT validate the received data here - that is done in PersistentDataStore
@@ -620,7 +623,7 @@ public class Reseeder {
                 return baos.toByteArray();
             return null;
         }
-    
+
         /**
          *  Fetch a URL to a file.
          *
@@ -666,7 +669,7 @@ public class Reseeder {
             out.delete();
             return null;
         }
-    
+
         /**
          *  @param name valid Base64 hash
          *  @return true on success, false if skipped

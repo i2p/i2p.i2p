@@ -24,13 +24,20 @@
 <%@include file="formhandler.jsi" %>
  <div class="configure">
  <div class="wideload">
+<% if (advancedhelper.isAdvanced()) { %>
  <form action="" method="POST">
  <input type="hidden" name="nonce" value="<%=pageNonce%>" >
  <input type="hidden" name="action" value="blah" >
+<% }  // isAdvanced %>
  <h3><%=intl._("Advanced I2P Configuration")%></h3>
- <textarea rows="32" cols="60" name="config" wrap="off" spellcheck="false"><jsp:getProperty name="advancedhelper" property="settings" /></textarea><br><hr>
+ <textarea rows="32" cols="60" name="nofilter_config" wrap="off" spellcheck="false" <% if (!advancedhelper.isAdvanced()) { %>readonly="readonly"<% } %>><jsp:getProperty name="advancedhelper" property="settings" /></textarea><br><hr>
+<% if (advancedhelper.isAdvanced()) { %>
       <div class="formaction">
         <input type="reset" class="cancel" value="<%=intl._("Cancel")%>" >
         <input type="submit" name="shouldsave" class="accept" value="<%=intl._("Save changes")%>" >
  <br><b><%=intl._("NOTE")%>:</b> <%=intl._("Some changes may require a restart to take effect.")%>
- </div></form></div></div></div></body></html>
+ </div></form>
+<% } else { %>
+<%=intl._("To make changes, edit the file {0}.", "<tt>" + advancedhelper.getConfigFileName() + "</tt>")%>
+<% }  // isAdvanced %>
+</div></div></div></body></html>

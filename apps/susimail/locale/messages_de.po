@@ -5,19 +5,20 @@
 # 
 # Translators:
 # blabla, 2011
+# blabla <blabla@trash-mail.com>, 2014
 # blabla <blabla@trash-mail.com>, 2011, 2012
 # D.A. Loader, 2012
 # ducki2p <ducki2p@gmail.com>, 2011
 # foo <foo@bar>, 2009
-# echeloni2p <echelon@i2pmail.org>, 2014
+# Lars Schimmer <echelon@i2pmail.org>, 2014
 # mixxy, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-05-01 11:45+0000\n"
-"PO-Revision-Date: 2014-05-08 11:27+0000\n"
-"Last-Translator: echeloni2p <echelon@i2pmail.org>\n"
+"PO-Revision-Date: 2014-05-21 18:05+0000\n"
+"Last-Translator: blabla <blabla@trash-mail.com>\n"
 "Language-Team: German (http://www.transifex.com/projects/p/I2P/language/de/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -34,7 +35,7 @@ msgstr "kein Kodierer für Kodierung \\''{0}\\'' gefunden"
 #: src/src/i2p/susi/webmail/WebMail.java:318
 #: src/src/i2p/susi/webmail/WebMail.java:1005
 msgid "Re:"
-msgstr "Re:"
+msgstr "Aw:"
 
 #: src/src/i2p/susi/webmail/WebMail.java:308
 #: src/src/i2p/susi/webmail/WebMail.java:322
@@ -64,7 +65,7 @@ msgstr "Teil ({0}) aufgrund von {1} nicht angezeigt"
 #: src/src/i2p/susi/webmail/WebMail.java:672
 #, java-format
 msgid "Download attachment {0}"
-msgstr "Anhang runterladen {0}"
+msgstr "Anhang herunterladen {0}"
 
 #: src/src/i2p/susi/webmail/WebMail.java:673
 msgid "File is packed into a zipfile for security reasons."
@@ -101,7 +102,7 @@ msgstr "ungültiger POP3-Port"
 
 #: src/src/i2p/susi/webmail/WebMail.java:761
 msgid "Need port number for smtp connect."
-msgstr "SMTP-Port für die SMTP-Verbindung benötigt"
+msgstr "Port für die SMTP-Verbindung benötigt"
 
 #: src/src/i2p/susi/webmail/WebMail.java:768
 msgid "SMTP port number is not in range 0..65535."
@@ -267,15 +268,15 @@ msgstr "Absender"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2030
 msgid "To"
-msgstr "An"
+msgstr "Empfänger"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2031
 msgid "Cc"
-msgstr "Cc"
+msgstr "Kopie"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2032
 msgid "Bcc"
-msgstr "Bcc"
+msgstr "Blindkopie"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2033
 msgid "Bcc to self"
@@ -289,7 +290,7 @@ msgstr "Betreff"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2037
 msgid "Add Attachment"
-msgstr "Anhang anfügen"
+msgstr "Anhang hinzufügen"
 
 #. TODO disable/hide in JS if no file selected
 #: src/src/i2p/susi/webmail/WebMail.java:2039
@@ -319,11 +320,11 @@ msgstr "Host"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2080
 msgid "POP3 Port"
-msgstr "POP3 Port"
+msgstr "POP3-Port"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2081
 msgid "SMTP Port"
-msgstr "SMTP Port"
+msgstr "SMTP-Port"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2086
 msgid "Read Mail Offline"
@@ -336,7 +337,7 @@ msgstr "Einstellungen"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2093
 msgid "Learn about I2P mail"
-msgstr "Erfahre etwas über I2P-Mail"
+msgstr "Mehr über I2P-Mail"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2094
 msgid "Create Account"
@@ -395,12 +396,12 @@ msgstr "Sollen die markierten Nachrichten wirklich gelöscht werden?"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2198
 msgid "Yes, really delete them!"
-msgstr "Ja, löschen"
+msgstr "Ja, löschen!"
 
 #. TODO js
 #: src/src/i2p/susi/webmail/WebMail.java:2202
 msgid "Delete Selected"
-msgstr "Selektierte löschen"
+msgstr "Ausgewählte Emails löschen"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2204
 msgid "Mark All"
@@ -408,7 +409,7 @@ msgstr "Alles markieren"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2206
 msgid "Clear All"
-msgstr "Alles entfernen"
+msgstr "Alle Markierungen aufheben"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2231
 #: src/src/i2p/susi/webmail/WebMail.java:2232
@@ -504,7 +505,7 @@ msgstr "Fehler beim Öffnen der Mailbox"
 #: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:1021
 #: src/src/i2p/susi/webmail/smtp/SMTPClient.java:249
 msgid "Login failed"
-msgstr "Login gescheitert"
+msgstr "Anmeldung fehlgeschlagen"
 
 #: src/src/i2p/susi/webmail/smtp/SMTPClient.java:214
 msgid "Cannot connect"
@@ -513,7 +514,7 @@ msgstr "Verbindung nicht möglich"
 #: src/src/i2p/susi/webmail/smtp/SMTPClient.java:225
 #: src/src/i2p/susi/webmail/smtp/SMTPClient.java:237
 msgid "Server refused connection"
-msgstr "Server hat Verbindung abgelehnt"
+msgstr "Der Server hat Verbindung abgelehnt."
 
 #. TODO which recipient?
 #: src/src/i2p/susi/webmail/smtp/SMTPClient.java:262

@@ -86,7 +86,7 @@ public class FetchAndAdd extends Snark implements EepGet.StatusListener, Runnabl
      *  Set off by startTorrent()
      */
     public void run() {
-        _mgr.addMessage(_("Fetching {0}", urlify(_url)));
+        _mgr.addMessageNoEscape(_("Fetching {0}", urlify(_url)));
         File file = get();
         if (!_isRunning)  // stopped?
             return;
@@ -96,7 +96,7 @@ public class FetchAndAdd extends Snark implements EepGet.StatusListener, Runnabl
             _mgr.deleteMagnet(this);
             add(file);
         } else {
-            _mgr.addMessage(_("Torrent was not retrieved from {0}", urlify(_url)) +
+            _mgr.addMessageNoEscape(_("Torrent was not retrieved from {0}", urlify(_url)) +
                             ((_failCause != null) ? (": " + DataHelper.stripHTML(_failCause)) : ""));
         }
         if (file != null)
@@ -150,7 +150,7 @@ public class FetchAndAdd extends Snark implements EepGet.StatusListener, Runnabl
      *  This Snark may then be deleted.
      */
     private void add(File file) {
-        _mgr.addMessage(_("Torrent fetched from {0}", urlify(_url)));
+        _mgr.addMessageNoEscape(_("Torrent fetched from {0}", urlify(_url)));
         FileInputStream in = null;
         try {
             in = new FileInputStream(file);
@@ -184,9 +184,9 @@ public class FetchAndAdd extends Snark implements EepGet.StatusListener, Runnabl
                     throw new IOException("Unknown error - check logs");
             }
         } catch (IOException ioe) {
-            _mgr.addMessage(_("Torrent at {0} was not valid", urlify(_url)) + ": " + ioe.getMessage());
+            _mgr.addMessageNoEscape(_("Torrent at {0} was not valid", urlify(_url)) + ": " + DataHelper.stripHTML(ioe.getMessage()));
         } catch (OutOfMemoryError oom) {
-            _mgr.addMessage(_("ERROR - Out of memory, cannot create torrent from {0}", urlify(_url)) + ": " + oom.getMessage());
+            _mgr.addMessageNoEscape(_("ERROR - Out of memory, cannot create torrent from {0}", urlify(_url)) + ": " + DataHelper.stripHTML(oom.getMessage()));
         } finally {
             try { if (in != null) in.close(); } catch (IOException ioe) {}
         }

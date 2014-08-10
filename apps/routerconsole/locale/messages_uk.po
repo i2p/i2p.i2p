@@ -5,17 +5,18 @@
 # 
 # Translators:
 # naeto <a89393@rmqkr.net>, 2012
-# azb <azb.0x7dc@gmail.com>, 2014
-# Денис Лысенко <gribua@gmail.com>, 2011
-# Денис Лысенко <gribua@gmail.com>, 2011
+# Anton Zub <azb.0x7dc@gmail.com>, 2014
+# Denis Blank <gribua@gmail.com>, 2011
+# Denis Blank <gribua@gmail.com>, 2011
 # jonny_nut, 2014
+# LinuxChata, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-02-06 18:27+0000\n"
-"PO-Revision-Date: 2014-04-19 19:00+0000\n"
-"Last-Translator: azb <azb.0x7dc@gmail.com>\n"
+"PO-Revision-Date: 2014-07-20 08:53+0000\n"
+"Last-Translator: LinuxChata\n"
 "Language-Team: Ukrainian (Ukraine) (http://www.transifex.com/projects/p/I2P/language/uk_UA/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -397,11 +398,11 @@ msgstr ""
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:604
 msgid "The slow start threshold"
-msgstr ""
+msgstr "Поріг повільного старту"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:605
 msgid "The round trip time in milliseconds"
-msgstr ""
+msgstr "Час між відправленням запиту й одержанням відповіді у мілісекундах"
 
 #. "<b id=\"def.dev\">").append(_("Dev")).append("</b>: ").append(_("The
 #. standard deviation of the round trip time in
@@ -420,39 +421,39 @@ msgstr ""
 #: ../../../router/java/src/net/i2p/router/transport/ntcp/NTCPTransport.java:1128
 #: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2559
 msgid "TX"
-msgstr ""
+msgstr "Передано"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:609
 msgid "The total number of packets sent to the peer"
-msgstr ""
+msgstr "Загальна кількість пакетів, відправлених до вузла"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:610
 #: ../../../router/java/src/net/i2p/router/transport/ntcp/NTCPTransport.java:1129
 #: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2561
 msgid "RX"
-msgstr ""
+msgstr "Прийнято"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:610
 msgid "The total number of packets received from the peer"
-msgstr ""
+msgstr "Загальна кількість пакетів, отриманих від вузла"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:611
 #: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2564
 msgid "Dup TX"
-msgstr ""
+msgstr "Повт. передано"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:611
 msgid "The total number of packets retransmitted to the peer"
-msgstr ""
+msgstr "Загальна кількість пакетів, повторно відправлених до вузла"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:612
 #: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2566
 msgid "Dup RX"
-msgstr ""
+msgstr "Повт. прийнято"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:612
 msgid "The total number of duplicate packets received from the peer"
-msgstr ""
+msgstr "Загальна кількість пакетів, повторно отриманих від вузла"
 
 #: ../../../router/java/src/net/i2p/router/transport/UPnP.java:525
 #: ../java/src/net/i2p/router/web/ConfigNavHelper.java:20

@@ -41,7 +41,7 @@
             <% } %></td></tr>
         <tr><td colspan="2"><br></td></tr>
         <tr><td class="mediumtags" align="right"><b><%=intl._("News URL")%>:</b></td>
-          <td><input type="text" size="60" name="newsURL" value="<jsp:getProperty name="updatehelper" property="newsURL" />"></td>
+          <td><input type="text" size="60" name="newsURL" <% if (!updatehelper.isAdvanced()) { %>readonly="readonly"<% } %> value="<jsp:getProperty name="updatehelper" property="newsURL" />"></td>
         </tr><tr><td class="mediumtags" align="right"><b><%=intl._("Refresh frequency")%>:</b>
           <td><jsp:getProperty name="updatehelper" property="refreshFrequencySelectBox" /></td></tr>
     <% if (updatehelper.canInstall()) { %>
@@ -64,11 +64,11 @@
           <td><textarea cols="60" rows="6" name="updateURL" wrap="off" spellcheck="false"><jsp:getProperty name="updatehelper" property="updateURL" /></textarea></td>
         </tr><tr><td class="mediumtags" align="right"><b><%=intl._("Trusted keys")%>:</b></td>
           <td><textarea cols="60" rows="6" name="trustedKeys" wrap="off" spellcheck="false"><jsp:getProperty name="updatehelper" property="trustedKeys" /></textarea></td></tr>
-      <% }   // if isAdvanced %>
         <tr><td id="unsignedbuild" class="mediumtags" align="right"><b><%=intl._("Update with unsigned development builds?")%></b></td>
           <td><jsp:getProperty name="updatehelper" property="updateUnsigned" /></td>
         </tr><tr><td class="mediumtags" align="right"><b><%=intl._("Unsigned Build URL")%>:</b></td>
           <td><input type="text" size="60" name="zipURL" value="<jsp:getProperty name="updatehelper" property="zipURL" />"></td></tr>
+      <% }   // if isAdvanced %>
     <% } else { %>
         <tr><td class="mediumtags" align="center" colspan="2"><b><%=intl._("Updates will be dispatched via your package manager.")%></b></td></tr>
     <% }   // if canInstall %>

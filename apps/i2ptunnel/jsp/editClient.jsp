@@ -52,10 +52,10 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                   %><h4><%=intl._("Edit proxy settings")%></h4><% 
                 } else {
                     tunnelTypeName = editBean.getTypeName(request.getParameter("type"));
-                    tunnelType = request.getParameter("type");
+                    tunnelType = net.i2p.data.DataHelper.stripHTML(request.getParameter("type"));
                   %><h4><%=intl._("New proxy settings")%></h4><% 
                 } %>
-                <input type="hidden" name="tunnel" value="<%=request.getParameter("tunnel")%>" />
+                <input type="hidden" name="tunnel" value="<%=curTunnel%>" />
                 <input type="hidden" name="nonce" value="<%=editBean.getNextNonce()%>" />
                 <input type="hidden" name="type" value="<%=tunnelType%>" />
                 <input type="submit" class="default" name="action" value="Save changes" />
@@ -546,7 +546,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                 <label>
                     <%=intl._("Password")%>:
                 </label>
-                <input type="password" id="clientPort" name="proxyPassword" title="Set password for this service" value="" class="freetext" />                
+                <input type="password" id="clientPort" name="nofilter_proxyPassword" title="Set password for this service" value="" class="freetext" />                
             </div>
             <div class="subdivider">
                 <hr />
@@ -570,7 +570,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                 <label>
                     <%=intl._("Password")%>:
                 </label>
-                <input type="password" id="clientPort" name="outproxyPassword" title="Enter password required by outproxy" value="<%=editBean.getOutproxyPassword(curTunnel)%>" class="freetext" />                
+                <input type="password" id="clientPort" name="nofilter_outproxyPassword" title="Enter password required by outproxy" value="<%=editBean.getOutproxyPassword(curTunnel)%>" class="freetext" />                
             </div>
             <div class="subdivider">
                 <hr />
@@ -593,7 +593,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                 <label for="customOptions" accesskey="u">
                     <%=intl._("Custom options")%>(<span class="accessKey">u</span>):
                 </label>
-                <input type="text" id="customOptions" name="customOptions" size="60" title="Custom Options" value="<%=editBean.getCustomOptions(curTunnel)%>" class="freetext" />                
+                <input type="text" id="customOptions" name="nofilter_customOptions" size="60" title="Custom Options" value="<%=editBean.getCustomOptions(curTunnel)%>" class="freetext" />                
             </div>
             
             <div class="footer">

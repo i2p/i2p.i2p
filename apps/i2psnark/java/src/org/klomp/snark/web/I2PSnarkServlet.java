@@ -159,6 +159,8 @@ public class I2PSnarkServlet extends BasicServlet {
         // this is the part after /i2psnark
         String path = req.getServletPath();
         resp.setHeader("X-Frame-Options", "SAMEORIGIN");
+        resp.setHeader("Content-Security-Policy", "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'");
+        resp.setHeader("X-XSS-Protection", "1; mode=block");
 
         String peerParam = req.getParameter("p");
         String stParam = req.getParameter("st");
@@ -167,9 +169,10 @@ public class I2PSnarkServlet extends BasicServlet {
             peerParam.replaceAll("[a-zA-Z0-9~=-]", "").length() > 0) {  // XSS
             peerString = "";
         } else {
-            peerString = "?p=" + peerParam;
+            peerString = "?p=" + DataHelper.stripHTML(peerParam);
         }
         if (stParam != null && !stParam.equals("0")) {
+            stParam = DataHelper.stripHTML(stParam);
             if (peerString.length() > 0)
                 peerString += "&amp;st=" + stParam;
             else
@@ -708,7 +711,7 @@ public class I2PSnarkServlet extends BasicServlet {
         //    return;
         //}
         if ("Add".equals(action)) {
-            String newURL = req.getParameter("newURL");
+            String newURL = req.getParameter("nofilter_newURL");
          /******
             // NOTE - newFile currently disabled in HTML form - see below
             File f = null;
@@ -744,7 +747,13 @@ public class I2PSnarkServlet extends BasicServlet {
             } else
           *****/
             if (newURL != null) {
-                if (newURL.startsWith("http://")) {
+                if (newURL.contains("<") || newURL.contains(">") ||
+                    newURL.contains("%3C") || newURL.contains("%3E") ||
+                    newURL.contains("%3c") || newURL.contains("%3e") ||
+                    newURL.contains("\"") || newURL.contains("'") ||
+                    newURL.contains("%22") || newURL.contains("%27")) {
+                    _manager.addMessage("Invalid URL");
+                } else if (newURL.startsWith("http://")) {
                     FetchAndAdd fetch = new FetchAndAdd(_context, _manager, newURL);
                     _manager.addDownloader(fetch);
                 } else if (newURL.startsWith(MagnetURI.MAGNET) || newURL.startsWith(MagnetURI.MAGGOT)) {
@@ -934,7 +943,7 @@ public class I2PSnarkServlet extends BasicServlet {
                         if (k.startsWith("backup_")) {
                             String url = k.substring(7);
                             if (!url.equals(announceURL))
-                                backupURLs.add(url);
+                                backupURLs.add(DataHelper.stripHTML(url));
                         }
                     }
                     List<List<String>> announceList = null;
@@ -1033,7 +1042,7 @@ public class I2PSnarkServlet extends BasicServlet {
                      Tracker t;
                      if ((t = trackers.remove(k)) != null) {
                         removed.add(t.announceURL);
-                        _manager.addMessage(_("Removed") + ": " + k);
+                        _manager.addMessage(_("Removed") + ": " + DataHelper.stripHTML(k));
                         changed = true;
                      }
                 } else if (k.startsWith("open_")) {
@@ -1067,9 +1076,9 @@ public class I2PSnarkServlet extends BasicServlet {
             String hurl = req.getParameter("thurl");
             String aurl = req.getParameter("taurl");
             if (name != null && hurl != null && aurl != null) {
-                name = name.trim();
-                hurl = hurl.trim();
-                aurl = aurl.trim().replace("=", "&#61;");
+                name = DataHelper.stripHTML(name.trim());
+                hurl = DataHelper.stripHTML(hurl.trim());
+                aurl = DataHelper.stripHTML(aurl.trim()).replace("=", "&#61;");
                 if (name.length() > 0 && hurl.startsWith("http://") && TrackerClient.isValidAnnounce(aurl)) {
                     Map<String, Tracker> trackers = _manager.getTrackerMap();
                     trackers.put(name, new Tracker(name, aurl, hurl));
@@ -1713,7 +1722,7 @@ public class I2PSnarkServlet extends BasicServlet {
 
     private void writeAddForm(PrintWriter out, HttpServletRequest req) throws IOException {
         // display incoming parameter if a GET so links will work
-        String newURL = req.getParameter("newURL");
+        String newURL = req.getParameter("nofilter_newURL");
         if (newURL == null || newURL.trim().length() <= 0 || req.getMethod().equals("POST"))
             newURL = "";
         else
@@ -1729,13 +1738,13 @@ public class I2PSnarkServlet extends BasicServlet {
         // don't lose peer setting
         String peerParam = req.getParameter("p");
         if (peerParam != null)
-            out.write("<input type=\"hidden\" name=\"p\" value=\"" + peerParam + "\" >\n");
+            out.write("<input type=\"hidden\" name=\"p\" value=\"" + DataHelper.stripHTML(peerParam) + "\" >\n");
         out.write("<div class=\"addtorrentsection\"><span class=\"snarkConfigTitle\">");
         out.write("<img alt=\"\" border=\"0\" src=\"" + _imgPath + "add.png\"> ");
         out.write(_("Add Torrent"));
         out.write("</span><hr>\n<table border=\"0\"><tr><td>");
         out.write(_("From URL"));
-        out.write(":<td><input type=\"text\" name=\"newURL\" size=\"85\" value=\"" + newURL + "\" spellcheck=\"false\"");
+        out.write(":<td><input type=\"text\" name=\"nofilter_newURL\" size=\"85\" value=\"" + newURL + "\" spellcheck=\"false\"");
         out.write(" title=\"");
         out.write(_("Enter the torrent file download URL (I2P only), magnet link, maggot link, or info hash"));
         out.write("\"> \n");
@@ -1767,7 +1776,7 @@ public class I2PSnarkServlet extends BasicServlet {
         // don't lose peer setting
         String peerParam = req.getParameter("p");
         if (peerParam != null)
-            out.write("<input type=\"hidden\" name=\"p\" value=\"" + peerParam + "\" >\n");
+            out.write("<input type=\"hidden\" name=\"p\" value=\"" + DataHelper.stripHTML(peerParam) + "\" >\n");
         out.write("<span class=\"snarkConfigTitle\">");
         out.write("<img alt=\"\" border=\"0\" src=\"" + _imgPath + "create.png\"> ");
         out.write(_("Create Torrent"));
@@ -2199,6 +2208,7 @@ public class I2PSnarkServlet extends BasicServlet {
     /** @since 0.8.13 */
     private static String urlEncode(String s) {
         return s.replace(";", "%3B").replace("&", "&amp;").replace(" ", "%20")
+                .replace("<", "&lt;").replace(">", "&gt;")
                 .replace("[", "%5B").replace("]", "%5D");
     }
 

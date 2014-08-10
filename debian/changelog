@@ -1,9 +1,48 @@
-i2p (0.9.13-1) UNRELEASED; urgency=medium
+i2p (0.9.14-1) unstable; urgency=high
 
-  * New upstream release
-  * debconf: Slovak translation
+  * New upstream release, 0.9.14
+  * Fix several XSS issues
+    - Disable changing news feed URL from UI
+    - Disable plugin install
+    - Disable setting unsigned update URL from UI
+    - Disable clients.config editing from the UI
+    - Add Content-Security-Policy and X-XSS-Protection headers
+    - Disable unused ExecNamingService (thx joernchen of Phenoelit)
+  * Bug fixes
+    - Fix tunnel building so it doesn't get "stuck" on a single pool
+    - Reject participating tunnels when hidden
+    - Several i2psnark improvements and fixes (GUI and DHT), including changes
+      for better compatibility with Vuze
+  * Other
+    - Reseeding now fetches a signed zip file containing router infos for security and speed
+    - Use JVM's AES implementation if it is faster
+    - More advanced options shown in the i2ptunnel edit pages
+    - Per-message reliabilitiy settings in I2CP and error propagation back from router to client
+    - Lots of findbugs fixes and cleanups
+    - Support signature types in SAM, bump rev to 3.1
+    - New event log page in console
+    - Jetty 8.1.15.v20140411
+    - Tomcat 6.0.41
 
- -- Kill Your TV <killyourtv@i2pmail.org>  Thu, 15 May 2014 23:11:36 +0000
+ -- Kill Your TV <killyourtv@i2pmail.org>  Sat, 26 Jul 2014 23:23:36 +0000
+
+i2p (0.9.13-1) unstable; urgency=medium
+
+  * New Upstream release
+  * debconf: New Slovak translation
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Thu, 22 May 2014 19:08:45 +0000
+
+i2p (0.9.12-2) unstable; urgency=low
+
+  * Re-enable i2p-docs package
+  * Have libjbigi package depend on i2p-router
+  * Remove ${misc:Depends} from the i2p dependencies to avoid hard-depending
+    on i2p-router (= ${source:Version}. This prevents users from trying dev
+    builds using "dpkg -i i2p-router-${devbuild}_all.deb. The i2p package
+    already depended on i2p-router.
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Sun, 06 Apr 2014 16:27:31 +0000
 
 i2p (0.9.12-1) unstable; urgency=medium
 
@@ -11,12 +50,10 @@ i2p (0.9.12-1) unstable; urgency=medium
 
  -- Kill Your TV <killyourtv@i2pmail.org>  Mon, 31 Mar 2014 19:07:54 +0000
 
-i2p (0.9.11-2) UNRELEASED; urgency=medium
+i2p (0.9.11-3) unstable; urgency=medium
 
-  * systemd support in Ubuntu Saucy (and newer) and Debian unstable (ticket
-    #1208)
-  * Set homepage address to geti2p.net
-  * Bump standards version (no source changes needed)
+  * Enable systemd for unstable and saucy|trusty
+  * Fix postinst
 
  -- Kill Your TV <killyourtv@i2pmail.org>  Tue, 11 Mar 2014 00:45:52 +0000
 

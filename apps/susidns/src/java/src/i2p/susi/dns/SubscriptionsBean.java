@@ -160,7 +160,7 @@ public class SubscriptionsBean extends BaseBean
 
 	public void setContent(String content) {
 		// will come from form with \r\n line endings
-		this.content = content;
+		this.content = DataHelper.stripHTML(content);
 	}
 
 	public String getContent()

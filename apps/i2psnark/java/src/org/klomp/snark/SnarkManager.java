@@ -241,7 +241,20 @@ public class SnarkManager implements CompleteListener {
 
     private static final int MAX_MESSAGES = 100;
 
+    /**
+     *  Use if it does not include a link.
+     *  Escapes '<' and '>' before queueing
+     */
     public void addMessage(String message) {
+        addMessageNoEscape(message.replace("<", "&lt;").replace(">", "&gt;"));
+    }
+
+    /**
+     * Use if it includes a link.
+     * Does not escape '<' and '>' before queueing
+     * @since 0.9.14.1
+     */
+    public void addMessageNoEscape(String message) {
         _messages.offer(message);
         while (_messages.size() > MAX_MESSAGES) {
             _messages.poll();
@@ -579,7 +592,7 @@ public class SnarkManager implements CompleteListener {
         }
 
         if (dataDir != null && !dataDir.equals(getDataDir().getAbsolutePath())) {
-            dataDir = dataDir.trim();
+            dataDir = DataHelper.stripHTML(dataDir.trim());
             File dd = new File(dataDir);
             if (!dd.isAbsolute()) {
                 addMessage(_("Data directory must be an absolute path") + ": " + dataDir);
@@ -609,7 +622,7 @@ public class SnarkManager implements CompleteListener {
             }
 
             Map<String, String> opts = new HashMap<String, String>();
-            if (i2cpOpts == null) i2cpOpts = "";
+            i2cpOpts = DataHelper.stripHTML(i2cpOpts);
             StringTokenizer tok = new StringTokenizer(i2cpOpts, " \t\n");
             while (tok.hasMoreTokens()) {
                 String pair = tok.nextToken();
@@ -1557,7 +1570,7 @@ public class SnarkManager implements CompleteListener {
         if (meta.getFiles() != null)
             buf.append('/');
         buf.append("\">").append(storage.getBaseName()).append("</a>");
-        addMessage(_("Download finished: {0}", buf.toString())); //  + " (" + _("size: {0}B", DataHelper.formatSize2(len)) + ')');
+        addMessageNoEscape(_("Download finished: {0}", buf.toString())); //  + " (" + _("size: {0}B", DataHelper.formatSize2(len)) + ')');
         updateStatus(snark);
     }
     

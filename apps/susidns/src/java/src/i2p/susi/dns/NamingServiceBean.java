@@ -30,6 +30,7 @@ import java.util.Properties;
 
 import net.i2p.client.naming.NamingService;
 import net.i2p.data.DataFormatException;
+import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 
 /**
@@ -322,7 +323,7 @@ public class NamingServiceBean extends AddressbookBean
 	}
 
 	public void setH(String h) {
-		this.detail = h;
+		this.detail = DataHelper.stripHTML(h);
 	}
 
 	public AddressBean getLookup() {
