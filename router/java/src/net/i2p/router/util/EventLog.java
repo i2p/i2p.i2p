@@ -32,15 +32,17 @@ public class EventLog {
 
     /** for convenience, not required */
     public static final String ABORTED = "aborted";
+    public static final String BECAME_FLOODFILL = "becameFloodfill";
     public static final String CHANGE_IP = "changeIP";
     public static final String CHANGE_PORT = "changePort";
     public static final String CLOCK_SHIFT = "clockShift";
     public static final String CRASHED = "crashed";
     public static final String CRITICAL = "critical";
     public static final String INSTALLED = "installed";
-    public static final String INSTALL_FAILED = "intallFailed";
+    public static final String INSTALL_FAILED = "installFailed";
     public static final String NETWORK = "network";
     public static final String NEW_IDENT = "newIdent";
+    public static final String NOT_FLOODFILL = "disabledFloodfill";
     public static final String OOM = "oom";
     public static final String REKEYED = "rekeyed";
     public static final String RESEED = "reseed";

@@ -9,6 +9,7 @@ import net.i2p.router.JobImpl;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.router.peermanager.PeerProfile;
+import net.i2p.router.util.EventLog;
 import net.i2p.util.Log;
 
 /**
@@ -42,8 +43,14 @@ class FloodfillMonitorJob extends JobImpl {
         boolean wasFF = _facade.floodfillEnabled();
         boolean ff = shouldBeFloodfill();
         _facade.setFloodfillEnabled(ff);
-        if (ff != wasFF)
+        if (ff != wasFF) {
+			if(ff) {
+				getContext().router().eventLog().addEvent(EventLog.BECAME_FLOODFILL);
+			} else {
+				getContext().router().eventLog().addEvent(EventLog.NOT_FLOODFILL);
+			}
             getContext().router().rebuildRouterInfo();
+        }
         if (_log.shouldLog(Log.INFO))
             _log.info("Should we be floodfill? " + ff);
         int delay = (REQUEUE_DELAY / 2) + getContext().random().nextInt(REQUEUE_DELAY);
