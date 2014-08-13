@@ -484,7 +484,7 @@ public class Snark
     this.torrent = torrent;
     this.infoHash = ih;
     this.additionalTrackerURL = trackerURL;
-    this.rootDataDir = new File(rootDir);
+    this.rootDataDir = rootDir != null ? new File(rootDir) : null;   // null only for FetchAndAdd extension
     stopped = true;
     id = generateID();
 
