@@ -1,7 +1,14 @@
-2014-08-13 zzz, dg
+2014-08-15 zzz
+ * Console: Escaping fix (ticket #1348)
+ * I2CP: Lookup synch cleanups
+
+2014-08-13 dg
+ * Console, EventLog: add BECAME_FLOODFILL and NOT_FLOODFILL, they are now shown
+   at the /events page when the router changes its floodfill state
+
+2014-08-13 zzz
  * Console: Escaping fix (ticket #1346)
  * i2psnark: Fix add torrent NPE
- * Console, EventLog: add BECAME_FLOODFILL and NOT_FLOODFILL, they are now shown at the /events page when the router changes its floodfill state
 
 2014-08-10 zzz
 Prop from i2p.i2p.zzz.snarkconfig:
