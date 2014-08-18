@@ -160,7 +160,8 @@ class InboundMessageDistributor implements GarlicMessageReceiver.CloveReceiver {
         } else {
             // ok, they want us to send it remotely, but that'd bust our anonymity,
             // so we send it out a tunnel first
-            TunnelInfo out = _context.tunnelManager().selectOutboundTunnel(_client);
+            // TODO use the OCMOSJ cache to pick OB tunnel we are already using?
+            TunnelInfo out = _context.tunnelManager().selectOutboundTunnel(_client, target);
             if (out == null) {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("no outbound tunnel to send the client message for " + _client + ": " + msg);

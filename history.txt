@@ -1,3 +1,10 @@
+2014-08-18 zzz
+ * i2psnark:
+   - Don't send HTML-only headers for icons
+   - Catch IllegalStateException for icons
+ * Tunnels: Use consistent tunnel pair for Delivery Status Message
+   to reduce network connections (ticket #1350)
+
 2014-08-15 zzz
  * Console: Escaping fix (ticket #1348)
  * I2CP: Lookup synch cleanups

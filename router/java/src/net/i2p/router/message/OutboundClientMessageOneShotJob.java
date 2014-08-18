@@ -729,7 +729,8 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
      *
      */
     private TunnelInfo selectInboundTunnel() {
-        return getContext().tunnelManager().selectInboundTunnel(_from.calculateHash());
+        // Use tunnel EP closest to his hash, as a simple cache to minimize connections
+        return getContext().tunnelManager().selectInboundTunnel(_from.calculateHash(), _to.calculateHash());
     }
     
     /**
