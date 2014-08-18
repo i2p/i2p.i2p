@@ -172,10 +172,19 @@ public class I2PSnarkServlet extends BasicServlet {
         //    _log.debug("Service " + req.getMethod() + " \"" + req.getContextPath() + "\" \"" + req.getServletPath() + "\" \"" + req.getPathInfo() + '"');
         // since we are not overriding handle*(), do this here
         String method = req.getMethod();
-        _themePath = "/themes/snark/" + _manager.getTheme() + '/';
-        _imgPath = _themePath + "images/";
         // this is the part after /i2psnark
         String path = req.getServletPath();
+
+        // in-war icons etc.
+        if (path != null && path.startsWith(WARBASE)) {
+            if (method.equals("GET") || method.equals("HEAD"))
+                super.doGet(req, resp);
+            else  // no POST either
+                resp.sendError(405);
+        }
+
+        _themePath = "/themes/snark/" + _manager.getTheme() + '/';
+        _imgPath = _themePath + "images/";
         resp.setHeader("X-Frame-Options", "SAMEORIGIN");
         resp.setHeader("Content-Security-Policy", "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'");
         resp.setHeader("X-XSS-Protection", "1; mode=block");
@@ -207,14 +216,6 @@ public class I2PSnarkServlet extends BasicServlet {
             writeMessages(out, false, peerString);
             writeTorrents(out, req);
             return;
-        }
-
-        // in-war icons etc.
-        if (path != null && path.startsWith(WARBASE)) {
-            if (method.equals("GET") || method.equals("HEAD"))
-                super.doGet(req, resp);
-            else  // no POST either
-                resp.sendError(405);
         }
 
         boolean isConfigure = "/configure".equals(path);

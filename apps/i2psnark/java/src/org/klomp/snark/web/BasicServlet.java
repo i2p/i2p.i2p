@@ -282,7 +282,12 @@ class BasicServlet extends HttpServlet
                 {
                     if (content.getLastModified()/1000 <= ifmsl/1000)
                     {
-                        response.reset();
+                        try {
+                            response.reset();
+                        } catch (IllegalStateException ise) {
+                            // committed
+                            return true;
+                        }
                         response.setStatus(304);
                         response.flushBuffer();
                         return false;
