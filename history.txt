@@ -1,3 +1,14 @@
+2014-08-19 zzz
+ * i2psnark:
+   - Don't filter create torrent form, and
+     fix exception on ':' in file names (ticket #1342)
+   - Don't remap file names on torrents we created, and
+     save remap setting in torrent config file (tickets #571, 771)
+   - Escaping fixes since names may not be remapped
+   - Use better encodePath() from Jetty
+   - Don't say create torrent succeeded when it didn't
+   - Add more sanity checks for base path of created torrent
+
 2014-08-18 zzz
  * i2psnark:
    - Don't send HTML-only headers for icons

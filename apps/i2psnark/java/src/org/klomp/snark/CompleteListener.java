@@ -57,4 +57,5 @@ public interface CompleteListener {
     // not really listeners but the easiest way to get back to an optional SnarkManager
     public long getSavedTorrentTime(Snark snark);
     public BitField getSavedTorrentBitField(Snark snark);
+    public boolean getSavedPreserveNamesSetting(Snark snark);
 }

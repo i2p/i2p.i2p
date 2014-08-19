@@ -9,6 +9,7 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -73,6 +74,7 @@ public class I2PSnarkServlet extends BasicServlet {
         _nonce = _context.random().nextLong();
         // limited protection against overwriting other config files or directories
         // in case you named your war "router.war"
+        // We don't handle bad characters in the context path. Don't do that.
         String configName = _contextName;
         if (!configName.equals(DEFAULT_NAME))
             configName = DEFAULT_NAME + '_' + _contextName;
@@ -942,7 +944,7 @@ public class I2PSnarkServlet extends BasicServlet {
             if (taction != null)
                 processTrackerForm(taction, req);
         } else if ("Create".equals(action)) {
-            String baseData = req.getParameter("baseFile");
+            String baseData = req.getParameter("nofilter_baseFile");
             if (baseData != null && baseData.trim().length() > 0) {
                 File baseFile = new File(baseData.trim());
                 if (!baseFile.isAbsolute())
@@ -954,6 +956,40 @@ public class I2PSnarkServlet extends BasicServlet {
                 //    announceURL = announceURLOther;
 
                 if (baseFile.exists()) {
+                    String torrentName = baseFile.getName();
+                    if (torrentName.toLowerCase(Locale.US).endsWith(".torrent")) {
+                        _manager.addMessage(_("Cannot add a torrent ending in \".torrent\": {0}", baseFile.getAbsolutePath()));
+                        return;
+                    }
+                    Snark snark = _manager.getTorrentByBaseName(torrentName);
+                    if (snark != null) {
+                        _manager.addMessage(_("Torrent with this name is already running: {0}", torrentName));
+                        return;
+                    }
+                    if (isParentOf(baseFile,_manager.getDataDir()) ||
+                        isParentOf(baseFile, _manager.util().getContext().getBaseDir()) ||
+                        isParentOf(baseFile, _manager.util().getContext().getConfigDir())) {
+                        _manager.addMessage(_("Cannot add a torrent including an I2P directory: {0}", baseFile.getAbsolutePath()));
+                        return;
+                    }
+                    Collection<Snark> snarks = _manager.getTorrents();
+                    for (Snark s : snarks) {
+                        Storage storage = s.getStorage();
+                        if (storage == null)
+                            continue;
+                        File sbase = storage.getBase();
+                        if (isParentOf(sbase, baseFile)) {
+                            _manager.addMessage(_("Cannot add torrent {0} inside another torrent: {1}",
+                                                  baseFile.getAbsolutePath(), sbase));
+                            return;
+                        }
+                        if (isParentOf(baseFile, sbase)) {
+                            _manager.addMessage(_("Cannot add torrent {0} including another torrent: {1}",
+                                                  baseFile.getAbsolutePath(), sbase));
+                            return;
+                        }
+                    }
+
                     if (announceURL.equals("none"))
                         announceURL = null;
                     _lastAnnounceURL = announceURL;
@@ -1006,7 +1042,9 @@ public class I2PSnarkServlet extends BasicServlet {
                         File torrentFile = new File(_manager.getDataDir(), s.getBaseName() + ".torrent");
                         // FIXME is the storage going to stay around thanks to the info reference?
                         // now add it, but don't automatically start it
-                        _manager.addTorrent(info, s.getBitField(), torrentFile.getAbsolutePath(), baseFile, true);
+                        boolean ok = _manager.addTorrent(info, s.getBitField(), torrentFile.getAbsolutePath(), baseFile, true);
+                        if (!ok)
+                            return;
                         _manager.addMessage(_("Torrent created for \"{0}\"", baseFile.getName()) + ": " + torrentFile.getAbsolutePath());
                         if (announceURL != null && !_manager.util().getOpenTrackers().contains(announceURL))
                             _manager.addMessage(_("Many I2P trackers require you to register new torrents before seeding - please do so before starting \"{0}\"", baseFile.getName()));
@@ -1357,7 +1395,7 @@ public class I2PSnarkServlet extends BasicServlet {
             }
         }
 
-        String encodedBaseName = urlEncode(fullBasename);
+        String encodedBaseName = encodePath(fullBasename);
         // File type icon column
         out.write("</td>\n<td>");
         if (isValid) {
@@ -1407,7 +1445,7 @@ public class I2PSnarkServlet extends BasicServlet {
             buf.append("\">");
             out.write(buf.toString());
         }
-        out.write(basename);
+        out.write(DataHelper.escapeHTML(basename));
         if (remaining == 0 || isMultiFile)
             out.write("</a>");
 
@@ -1786,12 +1824,6 @@ public class I2PSnarkServlet extends BasicServlet {
     }
     
     private void writeSeedForm(PrintWriter out, HttpServletRequest req, List<Tracker> sortedTrackers) throws IOException {
-        String baseFile = req.getParameter("baseFile");
-        if (baseFile == null || baseFile.trim().length() <= 0)
-            baseFile = "";
-        else
-            baseFile = DataHelper.stripHTML(baseFile);    // XSS
-        
         out.write("<a name=\"add\"></a><div class=\"newtorrentsection\"><div class=\"snarkNewTorrent\">\n");
         // *not* enctype="multipart/form-data", so that the input type=file sends the filename, not the file
         out.write("<form action=\"_post\" method=\"POST\">\n");
@@ -1808,7 +1840,7 @@ public class I2PSnarkServlet extends BasicServlet {
         //out.write("From file: <input type=\"file\" name=\"newFile\" size=\"50\" value=\"" + newFile + "\" /><br>\n");
         out.write(_("Data to seed"));
         out.write(":<td>"
-                  + "<input type=\"text\" name=\"baseFile\" size=\"58\" value=\"" + baseFile 
+                  + "<input type=\"text\" name=\"nofilter_baseFile\" size=\"58\" value=\""
                   + "\" spellcheck=\"false\" title=\"");
         out.write(_("File or directory to seed (full path or within the directory {0} )",
                     _manager.getDataDir().getAbsolutePath() + File.separatorChar));
@@ -2211,26 +2243,35 @@ public class I2PSnarkServlet extends BasicServlet {
             return ((bytes + 512*1024*1024)/(1024*1024*1024)) + "&nbsp;GB";
     }
     
-    /** @since 0.7.14 */
+    /**
+     * This is for a full URL. For a path only, use encodePath().
+     * @since 0.7.14
+     */
     static String urlify(String s) {
         return urlify(s, 100);
     }
     
-    /** @since 0.9 */
+    /**
+     * This is for a full URL. For a path only, use encodePath().
+     * @since 0.9
+     */
     private static String urlify(String s, int max) {
         StringBuilder buf = new StringBuilder(256);
         // browsers seem to work without doing this but let's be strict
         String link = urlEncode(s);
         String display;
         if (s.length() <= max)
-            display = link;
+            display = DataHelper.escapeHTML(link);
         else
-            display = urlEncode(s.substring(0, max)) + "&hellip;";
+            display = DataHelper.escapeHTML(s.substring(0, max)) + "&hellip;";
         buf.append("<a href=\"").append(link).append("\">").append(display).append("</a>");
         return buf.toString();
     }
     
-    /** @since 0.8.13 */
+    /**
+     * This is for a full URL. For a path only, use encodePath().
+     * @since 0.8.13
+     */
     private static String urlEncode(String s) {
         return s.replace(";", "%3B").replace("&", "&amp;").replace(" ", "%20")
                 .replace("<", "&lt;").replace(">", "&gt;")
@@ -2289,7 +2330,7 @@ public class I2PSnarkServlet extends BasicServlet {
      *
      * Get the resource list as a HTML directory listing.
      * @param xxxr The Resource unused
-     * @param base The base URL
+     * @param base The encoded base URL
      * @param parent True if the parent directory should be included
      * @param postParams map of POST parameters or null if not a POST
      * @return String of HTML or null if postParams != null
@@ -2298,7 +2339,8 @@ public class I2PSnarkServlet extends BasicServlet {
     private String getListHTML(File xxxr, String base, boolean parent, Map<String, String[]> postParams)
         throws IOException
     {
-        String title = decodePath(base);
+        String decodedBase = decodePath(base);
+        String title = decodedBase;
         String cpath = _contextPath + '/';
         if (title.startsWith(cpath))
             title = title.substring(cpath.length());
@@ -2351,7 +2393,7 @@ public class I2PSnarkServlet extends BasicServlet {
         if (title.endsWith("/"))
             title = title.substring(0, title.length() - 1);
         String directory = title;
-        title = _("Torrent") + ": " + title;
+        title = _("Torrent") + ": " + DataHelper.escapeHTML(title);
         buf.append(title);
         buf.append("</TITLE>").append(HEADER_A).append(_themePath).append(HEADER_B).append("<link rel=\"shortcut icon\" href=\"" + _themePath + "favicon.ico\">" +
              "</HEAD><BODY>\n<center><div class=\"snarknavbar\"><a href=\"").append(_contextPath).append("/\" title=\"Torrents\"");
@@ -2376,22 +2418,22 @@ public class I2PSnarkServlet extends BasicServlet {
             buf.append("<tr><th><b>")
                .append(_("Torrent"))
                .append(":</b> ")
-               .append(snark.getBaseName())
+               .append(DataHelper.escapeHTML(snark.getBaseName()))
                .append("</th></tr>\n");
 
             String fullPath = snark.getName();
-            String baseName = urlEncode((new File(fullPath)).getName());
+            String baseName = encodePath((new File(fullPath)).getName());
             buf.append("<tr><td>")
                .append("<img alt=\"\" border=\"0\" src=\"").append(_imgPath).append("file.png\" >&nbsp;<b>")
                .append(_("Torrent file"))
                .append(":</b> <a href=\"").append(_contextPath).append('/').append(baseName).append("\">")
-               .append(fullPath)
+               .append(DataHelper.escapeHTML(fullPath))
                .append("</a></td></tr>\n");
             buf.append("<tr><td>")
                .append("<img alt=\"\" border=\"0\" src=\"").append(_imgPath).append("file.png\" >&nbsp;<b>")
                .append(_("Data location"))
                .append(":</b> ")
-               .append(urlEncode(snark.getStorage().getBase().getPath()))
+               .append(DataHelper.escapeHTML(snark.getStorage().getBase().getPath()))
                .append("</td></tr>\n");
 
             String announce = null;
@@ -2593,7 +2635,7 @@ public class I2PSnarkServlet extends BasicServlet {
                .append("\"></th>\n");
         buf.append("</tr>\n</thead>\n");
         buf.append("<tr><td colspan=\"" + (showPriority ? '5' : '4') + "\" class=\"ParentDir\"><A HREF=\"");
-        buf.append(addPaths(base,"../"));
+        URIUtil.encodePath(buf, addPaths(decodedBase,"../"));
         buf.append("\"><img alt=\"\" border=\"0\" src=\"").append(_imgPath).append("up.png\"> ")
            .append(_("Up to higher level directory"))
            .append("</A></td></tr>\n");
@@ -2604,7 +2646,7 @@ public class I2PSnarkServlet extends BasicServlet {
         boolean showSaveButton = false;
         for (int i=0 ; i< ls.length ; i++)
         {   
-            String encoded = encodePath(ls[i].getName());
+            //String encoded = encodePath(ls[i].getName());
             // bugfix for I2P - Backport from Jetty 6 (zero file lengths and last-modified times)
             // http://jira.codehaus.org/browse/JETTY-361?page=com.atlassian.jira.plugin.system.issuetabpanels%3Achangehistory-tabpanel#issue-tabs
             // See resource.diff attachment
@@ -2653,10 +2695,10 @@ public class I2PSnarkServlet extends BasicServlet {
                 }
             }
 
-            String path=addPaths(base,encoded);
+            String path = addPaths(decodedBase, ls[i].getName());
             if (item.isDirectory() && !path.endsWith("/"))
                 path=addPaths(path,"/");
-            path = urlEncode(path);
+            path = encodePath(path);
             String icon = toIcon(item);
 
             buf.append("<TD class=\"snarkFileIcon\">");
@@ -2677,7 +2719,7 @@ public class I2PSnarkServlet extends BasicServlet {
             buf.append("</TD><TD class=\"snarkFileName\">");
             if (complete)
                 buf.append("<a href=\"").append(path).append("\">");
-            buf.append(item.getName().replace("&", "&amp;"));
+            buf.append(DataHelper.escapeHTML(item.getName()));
             if (complete)
                 buf.append("</a>");
             buf.append("</TD><TD ALIGN=right class=\"snarkFileSize\">");
@@ -2808,6 +2850,36 @@ public class I2PSnarkServlet extends BasicServlet {
             }
         }
          snark.updatePiecePriorities();
-        _manager.saveTorrentStatus(snark.getMetaInfo(), storage.getBitField(), storage.getFilePriorities(), storage.getBase());
+        _manager.saveTorrentStatus(snark);
+    }
+
+    /**
+     *  Is "a" equal to "b",
+     *  or is "a" a directory and a parent of file or directory "b",
+     *  canonically speaking?
+     *
+     *  @since 0.9.15
+     */
+    private static boolean isParentOf(File a, File b) {
+        try {
+            a = a.getCanonicalFile();
+            b = b.getCanonicalFile();
+        } catch (IOException ioe) {
+            return false;
+        }
+        if (a.equals(b))
+            return true;
+        if (!a.isDirectory())
+            return false;
+        // easy case
+        if (!b.getPath().startsWith(a.getPath()))
+            return false;
+        // dir by dir
+        while (!a.equals(b)) {
+            b = b.getParentFile();
+            if (b == null)
+                return false;
+        }
+        return true;
     }
 }

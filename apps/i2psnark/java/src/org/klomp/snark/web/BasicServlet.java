@@ -559,14 +559,17 @@ class BasicServlet extends HttpServlet
     /**
      *  Simple version of URIUtil.encodePath()
      */
-    protected static String encodePath(String path) throws MalformedURLException {
-        try {
-            URI uri = new URI(null, null, path, null);
-            return uri.toString();
-        } catch (URISyntaxException use) {
-            // for ease of use, since a USE is not an IOE but a MUE is...
-            throw new MalformedURLException(use.getMessage());
-        }
+    protected static String encodePath(String path) /* throws MalformedURLException */ {
+        // Does NOT handle a ':' correctly, throws MUE.
+        // Can't convert to %3a before hand or the % gets escaped
+        //try {
+        //    URI uri = new URI(null, null, path, null);
+        //    return uri.toString();
+        //} catch (URISyntaxException use) {
+        //    // for ease of use, since a USE is not an IOE but a MUE is...
+        //    throw new MalformedURLException(use.getMessage());
+        //}
+        return URIUtil.encodePath(path);
     }
 
     /**

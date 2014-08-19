@@ -66,6 +66,7 @@ public class Storage
   private final int piece_size;
   private final int pieces;
   private final long total_length;
+  private final boolean _preserveFileNames;
   private boolean changed;
   private volatile boolean _isChecking;
   private final AtomicInteger _allocateCount = new AtomicInteger();
@@ -92,8 +93,9 @@ public class Storage
    * try to create and/or check all needed files in the MetaInfo.
    *
    * @param baseFile the torrent data file or dir
+   * @param preserveFileNames if true, do not remap names to a 'safe' charset
    */
-  public Storage(I2PSnarkUtil util, File baseFile, MetaInfo metainfo, StorageListener listener)
+  public Storage(I2PSnarkUtil util, File baseFile, MetaInfo metainfo, StorageListener listener, boolean preserveFileNames)
   {
     _util = util;
     _log = util.getContext().logManager().getLog(Storage.class);
@@ -108,6 +110,7 @@ public class Storage
     List<List<String>> files = metainfo.getFiles();
     int sz = files != null ? files.size() : 1;
     _torrentFiles = new ArrayList<TorrentFile>(sz);
+    _preserveFileNames = preserveFileNames;
   }
 
   /**
@@ -130,6 +133,7 @@ public class Storage
     _base = baseFile;
     _log = util.getContext().logManager().getLog(Storage.class);
     this.listener = listener;
+    _preserveFileNames = true;
     // Create names, rafs and lengths arrays.
     _torrentFiles = getFiles(baseFile);
     
@@ -469,7 +473,12 @@ public class Storage
    *  @since 0.7.14
    */
   public String getBaseName() {
-      return filterName(metainfo.getName());
+      return optFilterName(metainfo.getName());
+  }
+
+  /** @since 0.9.15 */
+  public boolean getPreserveFileNames() {
+      return _preserveFileNames;
   }
 
   /**
@@ -619,6 +628,19 @@ public class Storage
      };
 
   /**
+   *  Filter the name, but only if configured to do so.
+   *  We will do so on torrents received from others, but not
+   *  on those we created ourselves, so we do not lose track of files.
+   *
+   *  @since 0.9.15
+   */
+  private String optFilterName(String name) {
+      if (_preserveFileNames)
+          return name;
+      return filterName(name);
+  }
+
+  /**
    * Removes 'suspicious' characters from the given file name.
    * http://msdn.microsoft.com/en-us/library/aa365247%28VS.85%29.aspx
    * Then replace chars not supported in the charset.
@@ -674,13 +696,13 @@ public class Storage
    *
    *  @param names path elements
    */
-  private static File createFileFromNames(File base, List<String> names, boolean areFilesPublic) throws IOException
+  private File createFileFromNames(File base, List<String> names, boolean areFilesPublic) throws IOException
   {
     File f = null;
     Iterator<String> it = names.iterator();
     while (it.hasNext())
       {
-        String name = filterName(it.next());
+        String name = optFilterName(it.next());
         if (it.hasNext())
           {
             // Another dir in the hierarchy.

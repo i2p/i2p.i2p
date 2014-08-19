@@ -420,14 +420,17 @@ public class Snark
         try
           {
             activity = "Checking storage";
+            boolean shouldPreserve = completeListener != null && completeListener.getSavedPreserveNamesSetting(this);
             if (baseFile == null) {
-                String base = Storage.filterName(meta.getName());
+                String base = meta.getName();
+                if (!shouldPreserve)
+                    base = Storage.filterName(base);
                 if (_util.getFilesPublic())
                     baseFile = new File(rootDataDir, base);
                 else
                     baseFile = new SecureFile(rootDataDir, base);
             }
-            storage = new Storage(_util, baseFile, meta, slistener);
+            storage = new Storage(_util, baseFile, meta, slistener, shouldPreserve);
             if (completeListener != null) {
                 storage.check(completeListener.getSavedTorrentTime(this),
                               completeListener.getSavedTorrentBitField(this));
@@ -1141,7 +1144,7 @@ public class Snark
           else
               baseFile = new SecureFile(rootDataDir, base);
           // The following two may throw IOE...
-          storage = new Storage(_util, baseFile, metainfo, this);
+          storage = new Storage(_util, baseFile, metainfo, this, false);
           storage.check();
           // ... so don't set meta until here
           meta = metainfo;
