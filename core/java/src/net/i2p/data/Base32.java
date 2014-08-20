@@ -56,6 +56,7 @@ public class Base32 {
     };
 
     private final static byte BAD_ENCODING = -9; // Indicates error in encoding
+
     /** Defeats instantiation. */
     private Base32() { // nop
     }
@@ -136,6 +137,9 @@ public class Base32 {
     }
 
     /**
+     *  Returns lower case.
+     *  Does not add trailing '='.
+     *
      *  @param source if null will return ""
      */
     public static String encode(String source) {
@@ -143,6 +147,9 @@ public class Base32 {
     }
 
     /**
+     * Returns lower case.
+     * Does not add trailing '='.
+     *
      * @param source The data to convert non-null
      */
     public static String encode(byte[] source) {
@@ -182,6 +189,8 @@ public class Base32 {
     /**
      * Decodes data from Base32 notation and
      * returns it as a string.
+     * Case-insensitive.
+     * Does not allow trailing '='.
      *
      * @param s the string to decode, if null returns null
      * @return The data as a string or null on failure
@@ -194,6 +203,9 @@ public class Base32 {
     }
 
     /**
+     * Case-insensitive.
+     * Does not allow trailing '='.
+     *
      * @param s non-null
      * @return decoded data, null on error
      */

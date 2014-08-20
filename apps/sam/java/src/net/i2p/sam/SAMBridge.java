@@ -161,6 +161,7 @@ public class SAMBridge implements Runnable, ClientApp {
      *
      * @param name name of the destination
      * @return null if the name does not exist, or if it is improperly formatted
+     * @deprecated unused
      */
     public Destination getDestination(String name) {
         synchronized (nameToPrivKeys) {

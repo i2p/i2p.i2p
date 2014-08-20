@@ -13,6 +13,7 @@ import net.i2p.data.Hash;
 import net.i2p.data.RouterInfo;
 import net.i2p.internal.InternalClientManager;
 import net.i2p.router.client.ClientManagerFacadeImpl;
+import net.i2p.router.crypto.TransientSessionKeyManager;
 import net.i2p.router.dummy.*;
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import net.i2p.router.peermanager.PeerManagerFacadeImpl;
@@ -67,7 +68,7 @@ public class RouterContext extends I2PAppContext {
     private final Set<Runnable> _finalShutdownTasks;
     // split up big lock on this to avoid deadlocks
     private volatile boolean _initialized;
-    private final Object _lock1 = new Object(), _lock2 = new Object();
+    private final Object _lock1 = new Object(), _lock2 = new Object(), _lock3 = new Object();
 
     private static final List<RouterContext> _contexts = new CopyOnWriteArrayList<RouterContext>();
     
@@ -564,5 +565,21 @@ public class RouterContext extends I2PAppContext {
      */
     public RouterAppManager routerAppManager() {
         return _appManager;
+    }
+
+    /**
+     *  As of 0.9.15, this returns a dummy SessionKeyManager in I2PAppContext.
+     *  Overridden in RouterContext to return the full TransientSessionKeyManager.
+     *
+     *  @since 0.9.15
+     */
+    @Override
+    protected void initializeSessionKeyManager() {
+        synchronized (_lock3) {
+            if (_sessionKeyManager == null) 
+                //_sessionKeyManager = new PersistentSessionKeyManager(this);
+                _sessionKeyManager = new TransientSessionKeyManager(this);
+            _sessionKeyManagerInitialized = true;
+        }
     }
 }

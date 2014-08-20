@@ -40,6 +40,7 @@ import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleTimer2;
 
+import org.klomp.snark.SnarkManager;
 import org.klomp.snark.TrackerClient;
 import org.klomp.snark.bencode.BDecoder;
 import org.klomp.snark.bencode.BEncoder;
@@ -152,7 +153,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
     private static final long CLEAN_TIME = 63*1000;
     private static final long EXPLORE_TIME = 877*1000;
     private static final long BLACKLIST_CLEAN_TIME = 17*60*1000;
-    private static final String DHT_FILE_SUFFIX = ".dht.dat";
+    public static final String DHT_FILE_SUFFIX = ".dht.dat";
 
     private static final int SEND_CRYPTO_TAGS = 8;
     private static final int LOW_CRYPTO_TAGS = 4;
@@ -185,8 +186,14 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
             _myNID = new NID(_myID);
         }
         _myNodeInfo = new NodeInfo(_myNID, session.getMyDestination(), _qPort);
-        _dhtFile = new File(ctx.getConfigDir(), baseName + DHT_FILE_SUFFIX);
-        _backupDhtFile = baseName.equals("i2psnark") ? null : new File(ctx.getConfigDir(), "i2psnark" + DHT_FILE_SUFFIX);
+        File conf = new File(ctx.getConfigDir(), baseName + ".config" + SnarkManager.CONFIG_DIR_SUFFIX);
+        _dhtFile = new File(conf, "i2psnark" + DHT_FILE_SUFFIX);
+        if (baseName.equals("i2psnark")) {
+            _backupDhtFile = null;
+        } else {
+            File bconf = new File(ctx.getConfigDir(), "i2psnark.config" + SnarkManager.CONFIG_DIR_SUFFIX);
+            _backupDhtFile = new File(bconf, "i2psnark" + DHT_FILE_SUFFIX);
+        }
         _knownNodes = new DHTNodes(ctx, _myNID);
 
         start();

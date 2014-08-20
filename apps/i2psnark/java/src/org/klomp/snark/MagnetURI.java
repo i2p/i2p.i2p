@@ -42,7 +42,7 @@ public class MagnetURI {
             name = util.getString("Magnet") + ' ' + ihash;
             String dn = getParam("dn", url);
             if (dn != null)
-                name += " (" + Storage.filterName(dn) + ')';
+                name += " (" + dn + ')';
         } else if (url.startsWith(MAGGOT)) {
             // maggot://0691e40aae02e552cfcb57af1dca56214680c0c5:0b557bbdf8718e95d352fbe994dec3a383e2ede7
             ihash = url.substring(MAGGOT.length()).trim();
@@ -82,7 +82,7 @@ public class MagnetURI {
     }
 
     /**
-     *  @return pretty name or null
+     *  @return pretty name or null, NOT HTML escaped
      */
     public String getName() {
         return _name;

@@ -184,7 +184,7 @@
      <%=intl._("I2P detected that you are firewalled by a Symmetric NAT.")%>
      <%=intl._("I2P does not work well behind this type of firewall. You will probably not be able to accept inbound connections, which will limit your participation in the network.")%>
 <li class="tidylist"><b><%=intl._("ERR - UDP Port In Use - Set i2np.udp.internalPort=xxxx in advanced config and restart")%></b> -
-     <%=intl._("I2P was unable to bind to port 8887 or other configured port.")%>
+     <%=intl._("I2P was unable to bind to the configured port noted on the advanced network configuration page .")%>
      <%=intl._("Check to see if another program is using the configured port. If so, stop that program or configure I2P to use a different port.")%> 
      <%=intl._("This may be a transient error, if the other program is no longer using the port.")%> 
      <%=intl._("However, a restart is always required after this error.")%>

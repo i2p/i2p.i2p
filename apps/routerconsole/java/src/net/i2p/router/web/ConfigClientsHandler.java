@@ -104,7 +104,12 @@ public class ConfigClientsHandler extends FormHandler {
                 appnum = Integer.parseInt(app);
             } catch (NumberFormatException nfe) {}
             if (appnum >= 0) {
-                deleteClient(appnum);
+                if (_context.getBooleanProperty(ConfigClientsHelper.PROP_ENABLE_CLIENT_CHANGE) ||
+                    isAdvanced()) {
+                    deleteClient(appnum);
+                } else {
+                    addFormError("Delete client disabled");
+                }
             } else if (pluginsEnabled) {
                 try {
                     PluginStarter.stopPlugin(_context, app);
@@ -385,7 +390,9 @@ public class ConfigClientsHandler extends FormHandler {
 
     private void updatePlugin(String app) {
         Properties props = PluginStarter.pluginProperties(_context, app);
-        String url = props.getProperty("updateURL");
+        String url = props.getProperty("updateURL.su3");
+        if (url == null)
+            url = props.getProperty("updateURL");
         if (url == null) {
             addFormError(_("No update URL specified for {0}",app));
             return;

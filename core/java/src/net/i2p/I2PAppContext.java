@@ -22,7 +22,6 @@ import net.i2p.crypto.HMACGenerator;
 import net.i2p.crypto.KeyGenerator;
 import net.i2p.crypto.SHA256Generator;
 import net.i2p.crypto.SessionKeyManager;
-import net.i2p.crypto.TransientSessionKeyManager;
 import net.i2p.data.Base64;
 import net.i2p.data.RoutingKeyGenerator;
 import net.i2p.internal.InternalClientManager;
@@ -76,7 +75,7 @@ public class I2PAppContext {
     protected final I2PProperties _overrideProps;
     
     private StatManager _statManager;
-    private SessionKeyManager _sessionKeyManager;
+    protected SessionKeyManager _sessionKeyManager;
     private NamingService _namingService;
     private ElGamalEngine _elGamalEngine;
     private ElGamalAESEngine _elGamalAESEngine;
@@ -96,7 +95,7 @@ public class I2PAppContext {
     private SimpleTimer2 _simpleTimer2;
     private final PortMapper _portMapper;
     private volatile boolean _statManagerInitialized;
-    private volatile boolean _sessionKeyManagerInitialized;
+    protected volatile boolean _sessionKeyManagerInitialized;
     private volatile boolean _namingServiceInitialized;
     private volatile boolean _elGamalEngineInitialized;
     private volatile boolean _elGamalAESEngineInitialized;
@@ -599,6 +598,9 @@ public class I2PAppContext {
      * For client crypto within the router,
      * use RouterContext.clientManager.getClientSessionKeyManager(dest)
      *
+     * As of 0.9.15, this returns a dummy SessionKeyManager in I2PAppContext.
+     * The dummy SKM does NOT handle session tags.
+     * Overridden in RouterContext to return the full TransientSessionKeyManager.
      */
     public SessionKeyManager sessionKeyManager() { 
         if (!_sessionKeyManagerInitialized)
@@ -606,11 +608,11 @@ public class I2PAppContext {
         return _sessionKeyManager;
     }
 
-    private void initializeSessionKeyManager() {
+    protected void initializeSessionKeyManager() {
         synchronized (_lock3) {
             if (_sessionKeyManager == null) 
                 //_sessionKeyManager = new PersistentSessionKeyManager(this);
-                _sessionKeyManager = new TransientSessionKeyManager(this);
+                _sessionKeyManager = new SessionKeyManager(this);
             _sessionKeyManagerInitialized = true;
         }
     }

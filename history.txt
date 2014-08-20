@@ -1,3 +1,80 @@
+2014-08-19 zzz
+ * i2psnark:
+   - Don't filter create torrent form, and
+     fix exception on ':' in file names (ticket #1342)
+   - Don't remap file names on torrents we created, and
+     save remap setting in torrent config file (tickets #571, 771)
+   - Escaping fixes since names may not be remapped
+   - Use better encodePath() from Jetty
+   - Don't say create torrent succeeded when it didn't
+   - Add more sanity checks for base path of created torrent
+
+2014-08-18 zzz
+ * i2psnark:
+   - Don't send HTML-only headers for icons
+   - Catch IllegalStateException for icons
+ * Tunnels: Use consistent tunnel pair for Delivery Status Message
+   to reduce network connections (ticket #1350)
+
+2014-08-15 zzz
+ * Console: Escaping fix (ticket #1348)
+ * I2CP: Lookup synch cleanups
+
+2014-08-13 dg
+ * Console, EventLog: add BECAME_FLOODFILL and NOT_FLOODFILL, they are now shown
+   at the /events page when the router changes its floodfill state
+
+2014-08-13 zzz
+ * Console: Escaping fix (ticket #1346)
+ * i2psnark: Fix add torrent NPE
+
+2014-08-10 zzz
+Prop from i2p.i2p.zzz.snarkconfig:
+ * i2psnark:
+   - Move config file and DHT persistence file to a config dir
+   - Move per-torrent configuration from "zmeta" in the main config file
+     to a per-torrent config file (ticket #1132)
+   - Split timestamp and bitfield into separate configs
+   - Fix misspelling of autoStart config
+   - Remove two unused SnarkManager methods
+   - Refactor file deletion in prep for better file name handling (ticket #571)
+   - Don't use canonical files in directory listings,
+     for speed and to avoid file comparison problems (tickets #1079, #1148)
+   - Set base file/dir in Storage constructor, make final,
+     in prep for arbitrary locations (ticket #1028)
+   - Add missing nonce protection for file priority setting
+   - Add torrent mime type
+
+2014-08-10 zzz
+Prop from i2p.i2p.zzz.test2:
+ * Console: Show share options below 30% (ticket #1329)
+ * Crypto: Move TransientSessionKeyManager from core to router.
+   I2PAppContext will return the dummy SessionKeyManager which
+   is sufficient for non-tag uses (e.g. Bote).
+   Client use of end-to-end encryption using SessionTags was
+   disabled in release 0.6, 2005-07-27.
+ * KeysAndCert: Change hashcode to prevent possible collisions
+   caused by apps with zeroed pubkey
+ * Plugins: Start of SU3 support (ticket #1227)
+ * SAM:
+   - Don't spawn a thread for each transmitted datagram
+   - Set protocol field for raw and signed datagrams
+   - Enforce a 60s timeout for HELLO
+   - Use naming service cache to reduce Destination object churn
+   - Get Log object from the log manager
+ * SigType: Add static isAvailable() methods
+ * SSU: Speed up introductions by responding to HolePunch (ticket #1333)
+ * SU3File:
+   - Add support for XML and NEWS types
+   - Fix NPE on EOF reading input
+   - Add -x option to bypass signature verification
+   - Add -k option to use specified private key cert for verification
+   - Don't verify signature in showversion
+ * UPnP: Disable external entities in XML parser
+
+2014-08-10 zzz
+ * Console: Hide client delete buttons unless advanced on /configclients
+
 * 2014-08-09 0.9.14.1 released
 
 2014-08-07 kytv

@@ -210,7 +210,7 @@ public class ConfigUpdateHandler extends FormHandler {
         try { oldFreq = Long.parseLong(oldFreqStr); } catch (NumberFormatException nfe) {}
         if (_refreshFrequency != oldFreq) {
             changes.put(PROP_REFRESH_FREQUENCY, ""+_refreshFrequency);
-            addFormNotice(_("Updating refresh frequency to {0}",
+            addFormNoticeNoEscape(_("Updating refresh frequency to {0}",
                             _refreshFrequency <= 0 ? _("Never") : DataHelper.formatDuration2(_refreshFrequency)));
         }
 

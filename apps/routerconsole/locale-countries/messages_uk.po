@@ -1,0 +1,764 @@
+# I2P
+# Copyright (C) 2009 The I2P Project
+# This file is distributed under the same license as the routerconsole package.
+# To contribute translations, see http://www.i2p2.de/newdevelopers
+# 
+# Translators:
+# LinuxChata, 2014
+msgid ""
+msgstr ""
+"Project-Id-Version: I2P\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2013-10-14 13:33+0000\n"
+"PO-Revision-Date: 2014-07-18 21:09+0000\n"
+"Last-Translator: LinuxChata\n"
+"Language-Team: Ukrainian (Ukraine) (http://www.transifex.com/projects/p/I2P/language/uk_UA/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: uk_UA\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+
+msgid "Anonymous Proxy"
+msgstr "Анонімні проксі"
+
+msgid "Satellite Provider"
+msgstr "Супутниковий провайдер"
+
+msgid "Andorra"
+msgstr "Андорра"
+
+msgid "United Arab Emirates"
+msgstr "Об'єднані Арабські Емірати"
+
+msgid "Afghanistan"
+msgstr "Афганістан"
+
+msgid "Antigua and Barbuda"
+msgstr "Антиґуа і Барбуда"
+
+msgid "Anguilla"
+msgstr "Анґілла"
+
+msgid "Albania"
+msgstr "Албанія"
+
+msgid "Armenia"
+msgstr "Вірменія"
+
+msgid "Netherlands Antilles"
+msgstr "Нідерландські Антильські острови"
+
+msgid "Angola"
+msgstr "Ангола"
+
+msgid "Antarctica"
+msgstr "Антарктика"
+
+msgid "Argentina"
+msgstr "Аргентина"
+
+msgid "American Samoa"
+msgstr "Американське Самоа"
+
+msgid "Austria"
+msgstr "Австрія"
+
+msgid "Australia"
+msgstr "Австралія"
+
+msgid "Aruba"
+msgstr "Аруба"
+
+msgid "Åland Islands"
+msgstr "Аландські острови"
+
+msgid "Azerbaijan"
+msgstr "Азербайджан"
+
+msgid "Bosnia and Herzegovina"
+msgstr "Боснія і Герцеґовина"
+
+msgid "Barbados"
+msgstr "Барбадос"
+
+msgid "Bangladesh"
+msgstr "Бангладеш"
+
+msgid "Belgium"
+msgstr "Бельгія"
+
+msgid "Burkina Faso"
+msgstr "Буркіна Фасо"
+
+msgid "Bulgaria"
+msgstr "Болгарія"
+
+msgid "Bahrain"
+msgstr "Бахрейн"
+
+msgid "Burundi"
+msgstr "Бурунді"
+
+msgid "Benin"
+msgstr "Бенін"
+
+msgid "Bermuda"
+msgstr "Бермуда"
+
+msgid "Brunei Darussalam"
+msgstr "Бруней Даруссалам"
+
+msgid "Bolivia"
+msgstr "Болівія"
+
+msgid "Brazil"
+msgstr "Бразилія"
+
+msgid "Bahamas"
+msgstr "Багами"
+
+msgid "Bhutan"
+msgstr "Бутан"
+
+msgid "Bouvet Island"
+msgstr "Буве"
+
+msgid "Botswana"
+msgstr "Ботсвана"
+
+msgid "Belarus"
+msgstr "Білорусія"
+
+msgid "Belize"
+msgstr "Беліз"
+
+msgid "Canada"
+msgstr "Канада"
+
+msgid "Cocos (Keeling) Islands"
+msgstr "Кокосові (Кілінгові) острови"
+
+msgid "The Democratic Republic of the Congo"
+msgstr "Демократична Республіка Конго"
+
+msgid "Central African Republic"
+msgstr "Центральна Африканська Республіка"
+
+msgid "Congo"
+msgstr "Конго"
+
+msgid "Switzerland"
+msgstr "Швейцарія"
+
+msgid "Cote D'Ivoire"
+msgstr "Кот д'Івуар"
+
+msgid "Cook Islands"
+msgstr "Острови Кука"
+
+msgid "Chile"
+msgstr "Чилі"
+
+msgid "Cameroon"
+msgstr "Камерун"
+
+msgid "China"
+msgstr "Китай"
+
+msgid "Colombia"
+msgstr "Колумбія"
+
+msgid "Costa Rica"
+msgstr "Коста Ріка"
+
+msgid "Serbia and Montenegro"
+msgstr "Сербія та Чорногорія"
+
+msgid "Cuba"
+msgstr "Куба"
+
+msgid "Cape Verde"
+msgstr "Кабо-Верде"
+
+msgid "Curaçao"
+msgstr "Кюрасао"
+
+msgid "Christmas Island"
+msgstr "Острів Різдва"
+
+msgid "Cyprus"
+msgstr "Кіпр"
+
+msgid "Czech Republic"
+msgstr "Чеська Республіка"
+
+msgid "Germany"
+msgstr "Німеччина"
+
+msgid "Djibouti"
+msgstr "Джибуті"
+
+msgid "Denmark"
+msgstr "Данія"
+
+msgid "Dominica"
+msgstr "Домініка"
+
+msgid "Dominican Republic"
+msgstr "Домініканська Республіка"
+
+msgid "Algeria"
+msgstr "Алжир"
+
+msgid "Ecuador"
+msgstr "Еквадор"
+
+msgid "Estonia"
+msgstr "Естонія"
+
+msgid "Egypt"
+msgstr "Єгипет"
+
+msgid "Western Sahara"
+msgstr "Західна Сахара"
+
+msgid "Eritrea"
+msgstr "Еритрея"
+
+msgid "Spain"
+msgstr "Іспанія"
+
+msgid "Ethiopia"
+msgstr "Ефіопія"
+
+msgid "European Union"
+msgstr "Європейський Союз"
+
+msgid "Finland"
+msgstr "Фінляндія"
+
+msgid "Fiji"
+msgstr "Фіджі"
+
+msgid "Falkland Islands (Malvinas)"
+msgstr "Фолклендські острови (Мальвінські)"
+
+msgid "Federated States of Micronesia"
+msgstr "Федеративні Штати Мікронезії"
+
+msgid "Faroe Islands"
+msgstr "Фарерські острови"
+
+msgid "France"
+msgstr "Франція"
+
+msgid "Gabon"
+msgstr "Ґабон"
+
+msgid "United Kingdom"
+msgstr "Об'єднане Королівство"
+
+msgid "Grenada"
+msgstr "Ґренада"
+
+msgid "Georgia"
+msgstr "Грузія"
+
+msgid "French Guiana"
+msgstr "Французька Гвіана"
+
+msgid "Guernsey"
+msgstr "Гернсі"
+
+msgid "Ghana"
+msgstr "Ґана"
+
+msgid "Gibraltar"
+msgstr "Ґібралтар"
+
+msgid "Greenland"
+msgstr "Ґренландія"
+
+msgid "Gambia"
+msgstr "Ґамбія"
+
+msgid "Guinea"
+msgstr "Ґвінея"
+
+msgid "Guadeloupe"
+msgstr "Ґваделупа"
+
+msgid "Equatorial Guinea"
+msgstr "Екваторіальна Ґвінея"
+
+msgid "Greece"
+msgstr "Греція"
+
+msgid "South Georgia and the South Sandwich Islands"
+msgstr "Південна Джорджія та Південні Сандвічеві острови"
+
+msgid "Guatemala"
+msgstr "Ґватемала"
+
+msgid "Guam"
+msgstr "Ґуам"
+
+msgid "Guinea-Bissau"
+msgstr "Ґвінея-Біссау"
+
+msgid "Guyana"
+msgstr "Ґвіана"
+
+msgid "Hong Kong"
+msgstr "Гон-Конґ"
+
+msgid "Honduras"
+msgstr "Гондурас"
+
+msgid "Croatia"
+msgstr "Хорватія"
+
+msgid "Haiti"
+msgstr "Гаїті"
+
+msgid "Hungary"
+msgstr "Угорщина"
+
+msgid "Indonesia"
+msgstr "Індонезія"
+
+msgid "Ireland"
+msgstr "Ірландія"
+
+msgid "Israel"
+msgstr "Ізраїль"
+
+msgid "Isle of Man"
+msgstr "Острів Мен"
+
+msgid "India"
+msgstr "Індія"
+
+msgid "British Indian Ocean Territory"
+msgstr "Британська територія в Індійському океані"
+
+msgid "Iraq"
+msgstr "Ірак"
+
+msgid "Islamic Republic of Iran"
+msgstr "Ісламська Республіка Іран"
+
+msgid "Iceland"
+msgstr "Ісландія"
+
+msgid "Italy"
+msgstr "Італія"
+
+msgid "Jersey"
+msgstr "Джерсі (острів)"
+
+msgid "Jamaica"
+msgstr "Ямайка"
+
+msgid "Jordan"
+msgstr "Іорданія"
+
+msgid "Japan"
+msgstr "Японія"
+
+msgid "Kenya"
+msgstr "Кенія"
+
+msgid "Kyrgyzstan"
+msgstr "Киргизстан"
+
+msgid "Cambodia"
+msgstr "Камбоджа"
+
+msgid "Kiribati"
+msgstr "Кірібаті"
+
+msgid "Comoros"
+msgstr "Комори"
+
+msgid "Saint Kitts and Nevis"
+msgstr "Федерація Сент-Кіттс і Невіс"
+
+msgid "The Democratic People's Republic of Korea"
+msgstr "Корейська Народно-Демократична Республіка"
+
+msgid "Republic of Korea"
+msgstr "Республіка Корея"
+
+msgid "Kuwait"
+msgstr "Кувейт"
+
+msgid "Cayman Islands"
+msgstr "Кайманові острови"
+
+msgid "Kazakhstan"
+msgstr "Казахстан"
+
+msgid "Lao People's Democratic Republic"
+msgstr "Лаоська Народно-Демократична Республіка"
+
+msgid "Lebanon"
+msgstr "Ливан"
+
+msgid "Saint Lucia"
+msgstr "Санта Люсія"
+
+msgid "Liechtenstein"
+msgstr "Ліхтенштейн"
+
+msgid "Sri Lanka"
+msgstr "Шрі Ланка"
+
+msgid "Liberia"
+msgstr "Ліберія"
+
+msgid "Lesotho"
+msgstr "Лесото"
+
+msgid "Lithuania"
+msgstr "Литва"
+
+msgid "Luxembourg"
+msgstr "Люксембург"
+
+msgid "Latvia"
+msgstr "Латвія"
+
+msgid "Libyan Arab Jamahiriya"
+msgstr "Лівія"
+
+msgid "Morocco"
+msgstr "Марокко"
+
+msgid "Monaco"
+msgstr "Монако"
+
+msgid "Republic of Moldova"
+msgstr "Республіка Молдова"
+
+msgid "Montenegro"
+msgstr "Чорногорія "
+
+msgid "Saint Martin"
+msgstr "Сен-Ма́ртен"
+
+msgid "Madagascar"
+msgstr "Мадагаскар"
+
+msgid "Marshall Islands"
+msgstr "Маршаллові острови"
+
+msgid "The Former Yugoslav Republic of Macedonia"
+msgstr "Македонія"
+
+msgid "Mali"
+msgstr "Малі"
+
+msgid "Myanmar"
+msgstr "М'янма"
+
+msgid "Mongolia"
+msgstr "Монголія"
+
+msgid "Macao"
+msgstr "Аоминь"
+
+msgid "Northern Mariana Islands"
+msgstr "Північні Маріанські острови"
+
+msgid "Martinique"
+msgstr "Мартиніка"
+
+msgid "Mauritania"
+msgstr "Мавританія"
+
+msgid "Montserrat"
+msgstr "Монтсеррат"
+
+msgid "Malta"
+msgstr "Мальта"
+
+msgid "Mauritius"
+msgstr "Маврикій"
+
+msgid "Maldives"
+msgstr "Мальдиви"
+
+msgid "Malawi"
+msgstr "Малаві"
+
+msgid "Mexico"
+msgstr "Мексика"
+
+msgid "Malaysia"
+msgstr "Малайзія"
+
+msgid "Mozambique"
+msgstr "Мозамбік"
+
+msgid "Namibia"
+msgstr "Намібія"
+
+msgid "New Caledonia"
+msgstr "Нова Каледонія"
+
+msgid "Niger"
+msgstr "Нігер"
+
+msgid "Norfolk Island"
+msgstr "Острів Норфолк"
+
+msgid "Nigeria"
+msgstr "Нігерія"
+
+msgid "Nicaragua"
+msgstr "Нікарагуа"
+
+msgid "Netherlands"
+msgstr "Нідерланди"
+
+msgid "Norway"
+msgstr "Норвегія"
+
+msgid "Nepal"
+msgstr "Непал"
+
+msgid "Nauru"
+msgstr "Науру"
+
+msgid "Niue"
+msgstr "Науру"
+
+msgid "New Zealand"
+msgstr "Нова Зеландія"
+
+msgid "Oman"
+msgstr "Оман"
+
+msgid "Panama"
+msgstr "Панама"
+
+msgid "Peru"
+msgstr "Перу"
+
+msgid "French Polynesia"
+msgstr "Французька Полінезія"
+
+msgid "Papua New Guinea"
+msgstr "Папуа Нова Ґвінея"
+
+msgid "Philippines"
+msgstr "Філіппіни"
+
+msgid "Pakistan"
+msgstr "Пакістан"
+
+msgid "Poland"
+msgstr "Польща"
+
+msgid "Saint Pierre and Miquelon"
+msgstr "Сен-П'єр і Мікелон"
+
+msgid "Pitcairn Islands"
+msgstr "Острови Піткерн"
+
+msgid "Puerto Rico"
+msgstr "Пуерто Ріко"
+
+msgid "Palestinian Territory"
+msgstr "Ізраїль"
+
+msgid "Portugal"
+msgstr "Португалія"
+
+msgid "Palau"
+msgstr "Палау"
+
+msgid "Paraguay"
+msgstr "Парагвай"
+
+msgid "Qatar"
+msgstr "Катар"
+
+msgid "Réunion"
+msgstr "Реуніон"
+
+msgid "Romania"
+msgstr "Румунія"
+
+msgid "Serbia"
+msgstr "Сербія"
+
+msgid "Russian Federation"
+msgstr "Російська Федерація"
+
+msgid "Rwanda"
+msgstr "Руанда"
+
+msgid "Saudi Arabia"
+msgstr "Саудівська Аравія"
+
+msgid "Solomon Islands"
+msgstr "Соломонові острови"
+
+msgid "Seychelles"
+msgstr "Сейшели"
+
+msgid "Sudan"
+msgstr "Судан"
+
+msgid "Sweden"
+msgstr "Швеція"
+
+msgid "Singapore"
+msgstr "Сингапур"
+
+msgid "Saint Helena"
+msgstr "Острів Святої Єлени"
+
+msgid "Slovenia"
+msgstr "Словенія"
+
+msgid "Svalbard and Jan Mayen"
+msgstr "Шпіцберген і Ян-Маєн"
+
+msgid "Slovakia"
+msgstr "Словаччина"
+
+msgid "Sierra Leone"
+msgstr "Сьєрра Леоне"
+
+msgid "San Marino"
+msgstr "Сан Маріно"
+
+msgid "Senegal"
+msgstr "Сенегал"
+
+msgid "Somalia"
+msgstr "Сомалі"
+
+msgid "Suriname"
+msgstr "Сурінам"
+
+msgid "Sao Tome and Principe"
+msgstr "Сан-Томе і Принсіпі"
+
+msgid "El Salvador"
+msgstr "Ель Сальвадор"
+
+msgid "Syrian Arab Republic"
+msgstr "Сирійська Арабська республіка"
+
+msgid "Swaziland"
+msgstr "Свазиленд"
+
+msgid "Turks and Caicos Islands"
+msgstr "Острови Теркс і Кайкос"
+
+msgid "Chad"
+msgstr "Чад"
+
+msgid "French Southern Territories"
+msgstr "Французькі Південні території"
+
+msgid "Togo"
+msgstr "Тоґо"
+
+msgid "Thailand"
+msgstr "Таїланд"
+
+msgid "Tajikistan"
+msgstr "Таджикістан"
+
+msgid "Tokelau"
+msgstr "Токелау"
+
+msgid "Timor-Leste"
+msgstr "Східний Тимор"
+
+msgid "Turkmenistan"
+msgstr "Туркменістан"
+
+msgid "Tunisia"
+msgstr "Туніс"
+
+msgid "Tonga"
+msgstr "Тонґа"
+
+msgid "Turkey"
+msgstr "Туреччина"
+
+msgid "Trinidad and Tobago"
+msgstr "Тринідад і Тобаґо"
+
+msgid "Tuvalu"
+msgstr "Тувалу"
+
+msgid "Taiwan"
+msgstr "Тайвань"
+
+msgid "United Republic of Tanzania"
+msgstr "Об'єднана Республіка Танзанія"
+
+msgid "Ukraine"
+msgstr "Україна"
+
+msgid "Uganda"
+msgstr "Уґанда"
+
+msgid "United States Minor Outlying Islands"
+msgstr "Зовнішні малі острови США"
+
+msgid "United States"
+msgstr "США"
+
+msgid "Uruguay"
+msgstr "Уругвай"
+
+msgid "Uzbekistan"
+msgstr "Узбекістан"
+
+msgid "Holy See (Vatican City State)"
+msgstr "Святий Престол (Ватикан)"
+
+msgid "Saint Vincent and the Grenadines"
+msgstr "Сент Вінсент і Ґренадіни"
+
+msgid "Venezuela"
+msgstr "Венесуела"
+
+msgid "Virgin Islands"
+msgstr "Віргінські острови"
+
+msgid "Viet Nam"
+msgstr "В'єтнам"
+
+msgid "Vanuatu"
+msgstr "Вануату"
+
+msgid "Wallis and Futuna"
+msgstr "Волліс і Футуна"
+
+msgid "Samoa"
+msgstr "Самоа"
+
+msgid "Yemen"
+msgstr "Ємен"
+
+msgid "Mayotte"
+msgstr "Майотта"
+
+msgid "South Africa"
+msgstr "Південна Африка"
+
+msgid "Zambia"
+msgstr "Замбія"
+
+msgid "Zimbabwe"
+msgstr "Зимбабве"

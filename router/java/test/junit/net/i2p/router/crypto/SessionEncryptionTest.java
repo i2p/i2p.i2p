@@ -1,4 +1,4 @@
-package net.i2p.crypto;
+package net.i2p.router.crypto;
 /*
  * free (adj.): unencumbered; not under the control of others
  * Written by jrandom in 2003 and released into the public domain
@@ -13,6 +13,9 @@ import java.util.Set;
 
 import junit.framework.TestCase;
 import net.i2p.I2PAppContext;
+import net.i2p.crypto.KeyGenerator;
+import net.i2p.crypto.SessionKeyManager;
+import net.i2p.crypto.TagSetHandle;
 import net.i2p.data.DataHelper;
 import net.i2p.data.PrivateKey;
 import net.i2p.data.PublicKey;
@@ -25,10 +28,10 @@ import net.i2p.data.SessionTag;
  *
  */
 public class SessionEncryptionTest extends TestCase{
-    private static I2PAppContext _context = I2PAppContext.getGlobalContext();
+    private I2PAppContext _context;
     
     protected void setUp(){
-        _context = new I2PAppContext();
+        _context = I2PAppContext.getGlobalContext();
     }
     
     protected void tearDown() {
@@ -40,12 +43,13 @@ public class SessionEncryptionTest extends TestCase{
         Object keys[] = KeyGenerator.getInstance().generatePKIKeypair();
         PublicKey pubKey = (PublicKey)keys[0];
         PrivateKey privKey = (PrivateKey)keys[1];
-        SessionKey curKey = _context.sessionKeyManager().createSession(pubKey);
+        SessionKeyManager skm = new TransientSessionKeyManager(_context);
+        SessionKey curKey = skm.createSession(pubKey);
         
         byte[] msg = "msg 1".getBytes();
         
         byte emsg[] = _context.elGamalAESEngine().encrypt(msg, pubKey, curKey, 64);
-        byte dmsg[] = _context.elGamalAESEngine().decrypt(emsg, privKey);
+        byte dmsg[] = _context.elGamalAESEngine().decrypt(emsg, privKey, skm);
         assertTrue(DataHelper.eq(dmsg, msg));
     }
     
@@ -53,12 +57,13 @@ public class SessionEncryptionTest extends TestCase{
         Object keys[] = KeyGenerator.getInstance().generatePKIKeypair();
         PublicKey pubKey = (PublicKey)keys[0];
         PrivateKey privKey = (PrivateKey)keys[1];
-        SessionKey curKey = _context.sessionKeyManager().createSession(pubKey);
+        SessionKeyManager skm = new TransientSessionKeyManager(_context);
+        SessionKey curKey = skm.createSession(pubKey);
         
         byte[] msg = "msg 2".getBytes();
         
         byte emsg[] = _context.elGamalAESEngine().encrypt(msg, pubKey, curKey, 64);
-        byte dmsg[] = _context.elGamalAESEngine().decrypt(emsg, privKey);
+        byte dmsg[] = _context.elGamalAESEngine().decrypt(emsg, privKey, skm);
         assertTrue(DataHelper.eq(dmsg, msg));
     }
     
@@ -74,7 +79,8 @@ public class SessionEncryptionTest extends TestCase{
         Object keys[] = KeyGenerator.getInstance().generatePKIKeypair();
         PublicKey pubKey = (PublicKey)keys[0];
         PrivateKey privKey = (PrivateKey)keys[1];
-        SessionKey curKey = _context.sessionKeyManager().createSession(pubKey);
+        SessionKeyManager skm = new TransientSessionKeyManager(_context);
+        SessionKey curKey = skm.createSession(pubKey);
         
         SessionTag tag1 = new SessionTag(true);
         SessionTag tag2 = new SessionTag(true);
@@ -97,64 +103,64 @@ public class SessionEncryptionTest extends TestCase{
         
         byte emsg1[] = _context.elGamalAESEngine().encrypt(msg1, pubKey, curKey, firstTags, 64);
         
-        byte dmsg1[] = _context.elGamalAESEngine().decrypt(emsg1, privKey);
+        byte dmsg1[] = _context.elGamalAESEngine().decrypt(emsg1, privKey, skm);
         assertTrue(DataHelper.eq(dmsg1, msg1));
         
         
         
-        TagSetHandle tsh = _context.sessionKeyManager().tagsDelivered(pubKey, curKey, firstTags);
-        _context.sessionKeyManager().tagsAcked(pubKey, curKey, tsh);
+        TagSetHandle tsh = skm.tagsDelivered(pubKey, curKey, firstTags);
+        skm.tagsAcked(pubKey, curKey, tsh);
         
-        curKey = _context.sessionKeyManager().getCurrentKey(pubKey);
-        SessionTag curTag = _context.sessionKeyManager().consumeNextAvailableTag(pubKey, curKey);
+        curKey = skm.getCurrentKey(pubKey);
+        SessionTag curTag = skm.consumeNextAvailableTag(pubKey, curKey);
         
         assertNotNull(curTag);
         
         byte emsg2[] = _context.elGamalAESEngine().encrypt(msg2, pubKey, curKey, null, curTag, 64);
         
-        byte dmsg2[] = _context.elGamalAESEngine().decrypt(emsg2, privKey);
+        byte dmsg2[] = _context.elGamalAESEngine().decrypt(emsg2, privKey, skm);
         assertTrue(DataHelper.eq(dmsg2, msg2));
         
         
         
         
-        curKey = _context.sessionKeyManager().getCurrentKey(pubKey);
-        curTag = _context.sessionKeyManager().consumeNextAvailableTag(pubKey, curKey);
+        curKey = skm.getCurrentKey(pubKey);
+        curTag = skm.consumeNextAvailableTag(pubKey, curKey);
         
         assertNotNull(curTag);
         assertNotNull(curKey);
         
         byte emsg3[] = _context.elGamalAESEngine().encrypt(msg3, pubKey, curKey, secondTags, curTag, 64);
         
-        byte dmsg3[] = _context.elGamalAESEngine().decrypt(emsg3, privKey);
+        byte dmsg3[] = _context.elGamalAESEngine().decrypt(emsg3, privKey, skm);
         assertTrue(DataHelper.eq(dmsg3, msg3));
         
         
         
-        tsh = _context.sessionKeyManager().tagsDelivered(pubKey, curKey, secondTags);
-        _context.sessionKeyManager().tagsAcked(pubKey, curKey, tsh);
+        tsh = skm.tagsDelivered(pubKey, curKey, secondTags);
+        skm.tagsAcked(pubKey, curKey, tsh);
         
-        curKey = _context.sessionKeyManager().getCurrentKey(pubKey);
-        curTag = _context.sessionKeyManager().consumeNextAvailableTag(pubKey, curKey);
+        curKey = skm.getCurrentKey(pubKey);
+        curTag = skm.consumeNextAvailableTag(pubKey, curKey);
         
         assertNotNull(curTag);
         assertNotNull(curKey);
         
         byte emsg4[] = _context.elGamalAESEngine().encrypt(msg4, pubKey, curKey, null, curTag, 64);
         
-        byte dmsg4[] = _context.elGamalAESEngine().decrypt(emsg4, privKey);
+        byte dmsg4[] = _context.elGamalAESEngine().decrypt(emsg4, privKey, skm);
         assertTrue(DataHelper.eq(dmsg4, msg4));
         
         
-        curKey = _context.sessionKeyManager().getCurrentKey(pubKey);
-        curTag = _context.sessionKeyManager().consumeNextAvailableTag(pubKey, curKey);
+        curKey = skm.getCurrentKey(pubKey);
+        curTag = skm.consumeNextAvailableTag(pubKey, curKey);
         
         assertNotNull(curTag);
         assertNotNull(curKey);
         
         byte emsg5[] = _context.elGamalAESEngine().encrypt(msg5, pubKey, curKey, null, curTag, 64);
         
-        byte dmsg5[] = _context.elGamalAESEngine().decrypt(emsg5, privKey);
+        byte dmsg5[] = _context.elGamalAESEngine().decrypt(emsg5, privKey, skm);
         assertTrue(DataHelper.eq(dmsg5, msg5));
         
         
@@ -172,7 +178,8 @@ public class SessionEncryptionTest extends TestCase{
         Object keys[] = KeyGenerator.getInstance().generatePKIKeypair();
         PublicKey pubKey = (PublicKey)keys[0];
         PrivateKey privKey = (PrivateKey)keys[1];
-        SessionKey curKey = _context.sessionKeyManager().createSession(pubKey);
+        SessionKeyManager skm = new TransientSessionKeyManager(_context);
+        SessionKey curKey = skm.createSession(pubKey);
         SessionKey nextKey = KeyGenerator.getInstance().generateSessionKey();
         
         SessionTag tag1 = new SessionTag(true);
@@ -196,64 +203,64 @@ public class SessionEncryptionTest extends TestCase{
         
         byte emsg1[] = _context.elGamalAESEngine().encrypt(msg1, pubKey, curKey, firstTags, 64);
         
-        byte dmsg1[] = _context.elGamalAESEngine().decrypt(emsg1, privKey);
+        byte dmsg1[] = _context.elGamalAESEngine().decrypt(emsg1, privKey, skm);
         assertTrue(DataHelper.eq(dmsg1, msg1));
         
         
         
-        TagSetHandle tsh = _context.sessionKeyManager().tagsDelivered(pubKey, curKey, firstTags);
-        _context.sessionKeyManager().tagsAcked(pubKey, curKey, tsh);
+        TagSetHandle tsh = skm.tagsDelivered(pubKey, curKey, firstTags);
+        skm.tagsAcked(pubKey, curKey, tsh);
         
-        curKey = _context.sessionKeyManager().getCurrentKey(pubKey);
-        SessionTag curTag = _context.sessionKeyManager().consumeNextAvailableTag(pubKey, curKey);
+        curKey = skm.getCurrentKey(pubKey);
+        SessionTag curTag = skm.consumeNextAvailableTag(pubKey, curKey);
         
         assertNotNull(curTag);
         
         byte emsg2[] = _context.elGamalAESEngine().encrypt(msg2, pubKey, curKey, null, curTag, 64);
         
-        byte dmsg2[] = _context.elGamalAESEngine().decrypt(emsg2, privKey);
+        byte dmsg2[] = _context.elGamalAESEngine().decrypt(emsg2, privKey, skm);
         assertTrue(DataHelper.eq(dmsg2, msg2));
         
         
         
-        curKey = _context.sessionKeyManager().getCurrentKey(pubKey);
-        curTag = _context.sessionKeyManager().consumeNextAvailableTag(pubKey, curKey);
+        curKey = skm.getCurrentKey(pubKey);
+        curTag = skm.consumeNextAvailableTag(pubKey, curKey);
         
         assertNotNull(curTag);
         assertNotNull(curKey);
         
         byte emsg3[] = _context.elGamalAESEngine().encrypt(msg3, pubKey, curKey, secondTags, curTag, nextKey, 64);
         
-        byte dmsg3[] = _context.elGamalAESEngine().decrypt(emsg3, privKey);
+        byte dmsg3[] = _context.elGamalAESEngine().decrypt(emsg3, privKey, skm);
         assertTrue(DataHelper.eq(dmsg3, msg3));
         
         
         
-        tsh = _context.sessionKeyManager().tagsDelivered(pubKey, nextKey, secondTags); // note nextKey not curKey
-        _context.sessionKeyManager().tagsAcked(pubKey, nextKey, tsh);
+        tsh = skm.tagsDelivered(pubKey, nextKey, secondTags); // note nextKey not curKey
+        skm.tagsAcked(pubKey, nextKey, tsh);
         
-        curKey = _context.sessionKeyManager().getCurrentKey(pubKey);
-        curTag = _context.sessionKeyManager().consumeNextAvailableTag(pubKey, curKey);
+        curKey = skm.getCurrentKey(pubKey);
+        curTag = skm.consumeNextAvailableTag(pubKey, curKey);
         
         assertNotNull(curTag);
         assertNotNull(curKey);
         
         byte emsg4[] = _context.elGamalAESEngine().encrypt(msg4, pubKey, curKey, null, curTag, 64);
         
-        byte dmsg4[] = _context.elGamalAESEngine().decrypt(emsg4, privKey);
+        byte dmsg4[] = _context.elGamalAESEngine().decrypt(emsg4, privKey, skm);
         assertTrue(DataHelper.eq(dmsg4, msg4));
         
         
         
-        curKey = _context.sessionKeyManager().getCurrentKey(pubKey);
-        curTag = _context.sessionKeyManager().consumeNextAvailableTag(pubKey, curKey);
+        curKey = skm.getCurrentKey(pubKey);
+        curTag = skm.consumeNextAvailableTag(pubKey, curKey);
         
         assertNotNull(curTag);
         assertNotNull(curKey);
         
         byte emsg5[] = _context.elGamalAESEngine().encrypt(msg5, pubKey, curKey, null, curTag, 64);
         
-        byte dmsg5[] = _context.elGamalAESEngine().decrypt(emsg5, privKey);
+        byte dmsg5[] = _context.elGamalAESEngine().decrypt(emsg5, privKey, skm);
         assertTrue(DataHelper.eq(dmsg5, msg5));
         
         
@@ -268,15 +275,16 @@ public class SessionEncryptionTest extends TestCase{
         Object keys[] = KeyGenerator.getInstance().generatePKIKeypair();
         PublicKey pubKey = (PublicKey)keys[0];
         PrivateKey privKey = (PrivateKey)keys[1];
-        SessionKey curKey = _context.sessionKeyManager().createSession(pubKey);
+        SessionKeyManager skm = new TransientSessionKeyManager(_context);
+        SessionKey curKey = skm.createSession(pubKey);
         
         for (int i = 0; i < 1000; i++) {
             Set<SessionTag> tags = null;
             SessionKey nextKey = null;
-            curKey = _context.sessionKeyManager().getCurrentKey(pubKey);
-            SessionTag curTag = _context.sessionKeyManager().consumeNextAvailableTag(pubKey, curKey);
+            curKey = skm.getCurrentKey(pubKey);
+            SessionTag curTag = skm.consumeNextAvailableTag(pubKey, curKey);
             
-            int availTags = _context.sessionKeyManager().getAvailableTags(pubKey, curKey);
+            int availTags = skm.getAvailableTags(pubKey, curKey);
             if ((availTags < 1)) {
                 tags = generateNewTags(50);
             } 
@@ -287,16 +295,16 @@ public class SessionEncryptionTest extends TestCase{
             
             byte emsg[] = _context.elGamalAESEngine().encrypt(msg, pubKey, curKey, tags, curTag, nextKey, 64);
             
-            byte dmsg[] = _context.elGamalAESEngine().decrypt(emsg, privKey);
+            byte dmsg[] = _context.elGamalAESEngine().decrypt(emsg, privKey, skm);
             assertTrue(DataHelper.eq(dmsg, msg));
             
             if ( (tags != null) && (tags.size() > 0) ) {
                 if (nextKey == null) {
-                    TagSetHandle tsh = _context.sessionKeyManager().tagsDelivered(pubKey, curKey, tags);
-                    _context.sessionKeyManager().tagsAcked(pubKey, curKey, tsh);
+                    TagSetHandle tsh = skm.tagsDelivered(pubKey, curKey, tags);
+                    skm.tagsAcked(pubKey, curKey, tsh);
                 } else {
-                    TagSetHandle tsh = _context.sessionKeyManager().tagsDelivered(pubKey, nextKey, tags);
-                    _context.sessionKeyManager().tagsAcked(pubKey, nextKey, tsh);
+                    TagSetHandle tsh = skm.tagsDelivered(pubKey, nextKey, tags);
+                    skm.tagsAcked(pubKey, nextKey, tsh);
                 }
             }
         }

@@ -149,7 +149,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
      *  Since 0.9.11, key is either a Hash or a String
      *  @since 0.8.9
      */
-    private static final Map<Object, Destination> _lookupCache = new LHMCache<Object, Destination>(16);
+    private static final Map<Object, Destination> _lookupCache = new LHMCache<Object, Destination>(64);
     private static final String MIN_HOST_LOOKUP_VERSION = "0.9.11";
     private static final boolean TEST_LOOKUP = false;
 
@@ -1029,6 +1029,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     /**
      *  Called by the message handler
      *  on reception of DestReplyMessage
+     *  @param d non-null
      */
     void destReceived(Destination d) {
         Hash h = d.calculateHash();
@@ -1037,8 +1038,8 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
         }
         for (LookupWaiter w : _pendingLookups) {
             if (h.equals(w.hash)) {
-                w.destination = d;
                 synchronized (w) {
+                    w.destination = d;
                     w.notifyAll();
                 }
             }
@@ -1048,6 +1049,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     /**
      *  Called by the message handler
      *  on reception of DestReplyMessage
+     *  @param h non-null
      */
     void destLookupFailed(Hash h) {
         for (LookupWaiter w : _pendingLookups) {
@@ -1062,21 +1064,21 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     /**
      *  Called by the message handler
      *  on reception of HostReplyMessage
+     *  @param d non-null
      *  @since 0.9.11
      */
     void destReceived(long nonce, Destination d) {
-        // notify by hash
-        destReceived(d);
-        // notify by nonce
+        // notify by nonce and hash
+        Hash h = d.calculateHash();
         for (LookupWaiter w : _pendingLookups) {
-            if (nonce == w.nonce) {
-                w.destination = d;
-                if (w.name != null) {
-                    synchronized (_lookupCache) {
+            if (nonce == w.nonce || h.equals(w.hash)) {
+                synchronized (_lookupCache) {
+                    if (w.name != null)
                         _lookupCache.put(w.name, d);
-                    }
+                    _lookupCache.put(h, d);
                 }
                 synchronized (w) {
+                    w.destination = d;
                     w.notifyAll();
                 }
             }
@@ -1117,8 +1119,8 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
         public final String name;
         /** the request (nonce mode) */
         public final long nonce;
-        /** the reply */
-        public volatile Destination destination;
+        /** the reply; synch on this */
+        public Destination destination;
 
         public LookupWaiter(Hash h) {
             this(h, -1);
@@ -1178,6 +1180,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
             waiter = new LookupWaiter(h);
         }
         _pendingLookups.offer(waiter);
+        Destination rv = null;
         try {
             if (_routerSupportsHostLookup) {
                 if (_log.shouldLog(Log.INFO))
@@ -1194,6 +1197,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
             try {
                 synchronized (waiter) {
                     waiter.wait(maxWait);
+                    rv = waiter.destination;
                 }
             } catch (InterruptedException ie) {
                 throw new I2PSessionException("Interrupted", ie);
@@ -1201,7 +1205,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
         } finally {
             _pendingLookups.remove(waiter);
         }
-        return waiter.destination;
+        return rv;
     }
 
     /**
@@ -1269,6 +1273,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
         int nonce = _lookupID.incrementAndGet() & 0x7fffffff;
         LookupWaiter waiter = new LookupWaiter(name, nonce);
         _pendingLookups.offer(waiter);
+        Destination rv = null;
         try {
             if (_log.shouldLog(Log.INFO))
                 _log.info("Sending HostLookup for " + name);
@@ -1279,6 +1284,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
             try {
                 synchronized (waiter) {
                     waiter.wait(maxWait);
+                    rv = waiter.destination;
                 }
             } catch (InterruptedException ie) {
                 throw new I2PSessionException("Interrupted", ie);
@@ -1286,7 +1292,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
         } finally {
             _pendingLookups.remove(waiter);
         }
-        return waiter.destination;
+        return rv;
     }
 
     /**

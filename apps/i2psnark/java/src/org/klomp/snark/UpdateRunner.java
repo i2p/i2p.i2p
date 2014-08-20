@@ -290,6 +290,10 @@ class UpdateRunner implements UpdateTask, CompleteListener {
         return _smgr.getSavedTorrentBitField(snark);
     }
 
+    public boolean getSavedPreserveNamesSetting(Snark snark) {
+        return _smgr.getSavedPreserveNamesSetting(snark);
+    }
+
     //////// end CompleteListener methods
 
     private static String linkify(String url) {

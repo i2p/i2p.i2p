@@ -123,26 +123,12 @@ class SAMUtils {
      * Resolved the specified hostname.
      *
      * @param name Hostname to be resolved
-     * @param pubKey A stream to write the Destination public key (may be null)
      *
      * @return the Destination for the specified hostname, or null if not found
      */
-    public static Destination lookupHost(String name, OutputStream pubKey) {
+    private static Destination lookupHost(String name) {
         NamingService ns = I2PAppContext.getGlobalContext().namingService();
         Destination dest = ns.lookup(name);
-
-        if ((pubKey != null) && (dest != null)) {
-            try {
-                dest.writeBytes(pubKey);
-            } catch (IOException e) {
-                e.printStackTrace();
-                return null;
-            } catch (DataFormatException e) {
-                e.printStackTrace();
-                return null;
-            }
-        }
-
         return dest;
     }
     
@@ -151,20 +137,26 @@ class SAMUtils {
      *
      * @param s Hostname or key to be resolved
      *
-     * @return the Destination for the specified hostname, or null if not found
+     * @return the Destination for the specified hostname, non-null
+     * @throws DataFormatException on bad Base 64 or name not found
      */
     public static Destination getDest(String s) throws DataFormatException
     {
-    	Destination d = new Destination() ;
-    	try {
-    		d.fromBase64(s);
-    	} catch (DataFormatException e) {
-    		d = lookupHost(s, null);
-    		if ( d==null ) {
-    			throw e ;
-    		}
-    	}
-    	return d ;
+        // NamingService caches b64 so just use it for everything
+        // TODO: Add a static local cache here so SAM doesn't flush the
+        // NamingService cache
+    	Destination d = lookupHost(s);
+        if (d == null) {
+            String msg;
+            if (s.length() >= 516)
+                msg = "Bad Base64 dest: ";
+            else if (s.length() == 60 && s.endsWith(".b32.i2p"))
+                msg = "Lease set not found: ";
+            else
+                msg = "Host name not found: ";
+            throw new DataFormatException(msg + s);
+        }
+    	return d;
     }
 
     /**

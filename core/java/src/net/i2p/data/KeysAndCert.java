@@ -130,17 +130,19 @@ public class KeysAndCert extends DataStructureImpl {
                && DataHelper.eq(_certificate, ident._certificate);
     }
     
-    /** the public key has enough randomness in it to use it by itself for speed */
+    /** the signing key has enough randomness in it to use it by itself for speed */
     @Override
     public int hashCode() {
-        if (_publicKey == null)
+        // don't use public key, some app devs thinking of using
+        // an all-zeros or leading-zeros public key for destinations
+        if (_signingKey == null)
             return 0;
-        return _publicKey.hashCode();
+        return _signingKey.hashCode();
     }
     
     @Override
     public String toString() {
-        StringBuilder buf = new StringBuilder(64);
+        StringBuilder buf = new StringBuilder(256);
         buf.append('[').append(getClass().getSimpleName()).append(": ");
         buf.append("\n\tHash: ").append(getHash().toBase64());
         buf.append("\n\tCertificate: ").append(_certificate);

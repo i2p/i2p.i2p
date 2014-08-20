@@ -25,6 +25,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
 import net.i2p.client.I2PClient;
 import net.i2p.client.streaming.I2PServerSocket;
@@ -107,9 +108,9 @@ class SAMStreamSession {
     public SAMStreamSession(InputStream destStream, String dir,
                             Properties props,  SAMStreamReceiver recv) throws IOException, DataFormatException, SAMException {
         this.recv = recv;
-        _log = new Log(getClass());
+        _log = I2PAppContext.getGlobalContext().logManager().getLog(getClass());
         if (_log.shouldLog(Log.DEBUG))
-	        _log.debug("SAM STREAM session instantiated");
+            _log.debug("SAM STREAM session instantiated");
 
         Properties allprops = (Properties) System.getProperties().clone();
         allprops.putAll(props);

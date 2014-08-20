@@ -25,6 +25,7 @@ import java.util.Properties;
 import java.util.HashMap;
 import java.util.StringTokenizer;
 
+import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
 import net.i2p.client.I2PClient;
 import net.i2p.client.I2PSessionException;
@@ -159,7 +160,13 @@ class SAMv3Handler extends SAMv1Handler
 					ByteBuffer outBuf = ByteBuffer.wrap(new byte[inBuf.remaining()]);
 					outBuf.put(inBuf);
 					outBuf.flip();
-					new I2PAppThread(new MessageDispatcher(outBuf.array()), "MessageDispatcher").start();
+					// A new thread for every message is wildly inefficient...
+					//new I2PAppThread(new MessageDispatcher(outBuf.array()), "MessageDispatcher").start();
+					// inline
+					// Even though we could be sending messages through multiple sessions,
+					// that isn't a common use case, and blocking should be rare.
+					// Inside router context, I2CP drops on overflow.
+					(new MessageDispatcher(outBuf.array())).run();
 				}
 			}
 		}
@@ -194,9 +201,15 @@ class SAMv3Handler extends SAMv1Handler
 				SessionRecord rec = sSessionsHash.get(nick);
 				if (rec!=null) {
 					rec.getHandler().session.sendBytes(dest,data);
+				} else {
+					Log log = I2PAppContext.getGlobalContext().logManager().getLog(SAMv3Handler.class);
+					if (log.shouldLog(Log.WARN))
+						log.warn("Dropping datagram, no session for " + nick);
 				}
 			} catch (Exception e) {
-				// FIXME log? throw?
+				Log log = I2PAppContext.getGlobalContext().logManager().getLog(SAMv3Handler.class);
+				if (log.shouldLog(Log.WARN))
+					log.warn("Error handling datagram", e);
 			}
 		}
 	}

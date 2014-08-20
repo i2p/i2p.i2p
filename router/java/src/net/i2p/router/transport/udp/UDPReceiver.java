@@ -1,6 +1,7 @@
 package net.i2p.router.transport.udp;
 
 import java.io.IOException;
+import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.util.Arrays;
 
@@ -220,11 +221,12 @@ class UDPReceiver {
                 //    _socketChanged = false;
                 //}
                 UDPPacket packet = UDPPacket.acquire(_context, true);
+                DatagramPacket dpacket = packet.getPacket();
 
                 // Android ICS bug
                 // http://code.google.com/p/android/issues/detail?id=24748
                 if (_isAndroid)
-                    packet.getPacket().setLength(UDPPacket.MAX_PACKET_SIZE);
+                    dpacket.setLength(UDPPacket.MAX_PACKET_SIZE);
                 
                 // block before we read...
                 //if (_log.shouldLog(Log.DEBUG))
@@ -236,9 +238,9 @@ class UDPReceiver {
                     //if (_log.shouldLog(Log.INFO))
                     //    _log.info("Before blocking socket.receive on " + System.identityHashCode(packet));
                     //synchronized (Runner.this) {
-                        _socket.receive(packet.getPacket());
+                        _socket.receive(dpacket);
                     //}
-                    int size = packet.getPacket().getLength();
+                    int size = dpacket.getLength();
                     if (_log.shouldLog(Log.INFO))
                         _log.info("After blocking socket.receive: packet is " + size + " bytes on " + System.identityHashCode(packet));
                     packet.resetBegin();
@@ -266,7 +268,8 @@ class UDPReceiver {
                         _context.statManager().addRateData("udp.receiveHolePunch", 1);
                         // nat hole punch packets are 0 bytes
                         if (_log.shouldLog(Log.INFO))
-                            _log.info("Received a 0 byte udp packet from " + packet.getPacket().getAddress() + ":" + packet.getPacket().getPort());
+                            _log.info("Received a 0 byte udp packet from " + dpacket.getAddress() + ":" + dpacket.getPort());
+                        _transport.getEstablisher().receiveHolePunch(dpacket.getAddress(), dpacket.getPort());
                         packet.release();
                     }
                 } catch (IOException ioe) {

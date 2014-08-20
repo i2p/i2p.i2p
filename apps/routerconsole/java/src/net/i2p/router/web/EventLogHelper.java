@@ -32,6 +32,7 @@ public class EventLogHelper extends FormHandler {
     private static final String ALL = "all";
     private static final String[] _events = new String[] {
         EventLog.ABORTED, _x("Aborted startup"),
+        EventLog.BECAME_FLOODFILL, _x("Enabled floodfill"),
         EventLog.CHANGE_IP, _x("Changed IP"),
         EventLog.CHANGE_PORT, _x("Changed port"),
         EventLog.CLOCK_SHIFT, _x("Clock shifted"),
@@ -41,6 +42,7 @@ public class EventLogHelper extends FormHandler {
         EventLog.INSTALL_FAILED, _x("Install failed"),
         EventLog.NETWORK, _x("Network error"),
         EventLog.NEW_IDENT, _x("New router identity"),
+        EventLog.NOT_FLOODFILL, _x("Disabled floodfill"),
         EventLog.OOM, _x("Out of memory error"),
         EventLog.REKEYED, _x("New router identity"),
         EventLog.RESEED, _x("Reseeded router"),

@@ -141,7 +141,7 @@ public class ConfigClientsHelper extends HelperBase {
                        // show stop button
                        showStop,
                        // show delete button, show start button
-                       !isConsole, showStart);
+                       allowEdit && !isConsole, showStart);
         }
         
         if (allowEdit && "new".equals(_edit))
@@ -248,7 +248,9 @@ public class ConfigClientsHelper extends HelperBase {
                     desc.append("<tr><td>")
                         .append("<a href=\"").append(s).append("\">").append(_("Website")).append("</a><td>&nbsp;");
                 }
-                String updateURL = stripHTML(appProps, "updateURL");
+                String updateURL = stripHTML(appProps, "updateURL.su3");
+                if (updateURL == null)
+                    updateURL = stripHTML(appProps, "updateURL");
                 if (updateURL != null) {
                     desc.append("<tr><td>")
                         .append("<a href=\"").append(updateURL).append("\">").append(_("Update link")).append("</a><td>&nbsp;");

@@ -60,12 +60,12 @@ public class ConfigUIHandler extends FormHandler {
         boolean ok = _context.router().saveConfig(changes, removes);
         if (ok) {
             if (!oldTheme.equals(_config))
-                addFormNotice(_("Theme change saved.") +
+                addFormNoticeNoEscape(_("Theme change saved.") +
                               " <a href=\"configui\">" +
                               _("Refresh the page to view.") +
                               "</a>");
             if (oldForceMobileConsole != _forceMobileConsole)
-                addFormNotice(_("Mobile console option saved.") +
+                addFormNoticeNoEscape(_("Mobile console option saved.") +
                               " <a href=\"configui\">" +
                               _("Refresh the page to view.") +
                               "</a>");

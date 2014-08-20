@@ -9,12 +9,13 @@ package net.i2p.sam;
  */
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.net.Socket;
+import java.net.SocketTimeoutException;
 import java.nio.channels.SocketChannel;
-import java.nio.ByteBuffer;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
+import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
 import net.i2p.util.Log;
 import net.i2p.util.VersionComparator;
@@ -26,6 +27,8 @@ class SAMHandlerFactory {
 
     private static final String VERSION = "3.1";
 
+    private static final int HELLO_TIMEOUT = 60*1000;
+
     /**
      * Return the right SAM handler depending on the protocol version
      * required by the client.
@@ -36,17 +39,21 @@ class SAMHandlerFactory {
      * @return A SAM protocol handler, or null if the client closed before the handshake
      */
     public static SAMHandler createSAMHandler(SocketChannel s, Properties i2cpProps) throws SAMException {
-        String line;
         StringTokenizer tok;
-        Log log = new Log(SAMHandlerFactory.class);
+        Log log = I2PAppContext.getGlobalContext().logManager().getLog(SAMHandlerFactory.class);
 
         try {
-            line = DataHelper.readLine(s.socket().getInputStream());
+            Socket sock = s.socket();
+            sock.setSoTimeout(HELLO_TIMEOUT);
+            String line = DataHelper.readLine(sock.getInputStream());
+            sock.setSoTimeout(0);
             if (line == null) {
                 log.debug("Connection closed by client");
                 return null;
             }
             tok = new StringTokenizer(line.trim(), " ");
+        } catch (SocketTimeoutException e) {
+            throw new SAMException("Timeout waiting for HELLO VERSION", e);
         } catch (IOException e) {
             throw new SAMException("Error reading from socket", e);
         } catch (Exception e) {

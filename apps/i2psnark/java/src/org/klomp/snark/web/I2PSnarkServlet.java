@@ -9,6 +9,7 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -18,7 +19,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.TreeSet;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -59,6 +59,7 @@ public class I2PSnarkServlet extends BasicServlet {
     
     private static final String DEFAULT_NAME = "i2psnark";
     public static final String PROP_CONFIG_FILE = "i2psnark.configFile";
+    private static final String WARBASE = "/.icons/";
  
     public I2PSnarkServlet() {
         super();
@@ -73,6 +74,7 @@ public class I2PSnarkServlet extends BasicServlet {
         _nonce = _context.random().nextLong();
         // limited protection against overwriting other config files or directories
         // in case you named your war "router.war"
+        // We don't handle bad characters in the context path. Don't do that.
         String configName = _contextName;
         if (!configName.equals(DEFAULT_NAME))
             configName = DEFAULT_NAME + '_' + _contextName;
@@ -84,7 +86,7 @@ public class I2PSnarkServlet extends BasicServlet {
         _manager.start();
         loadMimeMap("org/klomp/snark/web/mime");
         setResourceBase(_manager.getDataDir());
-        setWarBase("/.icons/");
+        setWarBase(WARBASE);
     }
     
     @Override
@@ -95,17 +97,35 @@ public class I2PSnarkServlet extends BasicServlet {
     }
 
     /**
-     *  We override this instead of passing a resource base to super(), because
-     *  if a resource base is set, super.getResource() always uses that base,
-     *  and we can't get any resources (like icons) out of the .war
+     *  We override this to set the file relative to the storage dirctory
+     *  for the torrent.
+     *
+     *  @param pathInContext should always start with /
      */
     @Override
     public File getResource(String pathInContext)
     {
         if (pathInContext == null || pathInContext.equals("/") || pathInContext.equals("/index.jsp") ||
-            pathInContext.equals("/index.html") || pathInContext.startsWith("/.icons/"))
+            !pathInContext.startsWith("/") || pathInContext.length() == 0 ||
+            pathInContext.equals("/index.html") || pathInContext.startsWith(WARBASE))
             return super.getResource(pathInContext);
         // files in the i2psnark/ directory
+        // get top level
+        pathInContext = pathInContext.substring(1);
+        File top = new File(pathInContext);
+        File parent;
+        while ((parent = top.getParentFile()) != null) {
+            top = parent;
+        }
+        Snark snark = _manager.getTorrentByBaseName(top.getPath());
+        if (snark != null) {
+            Storage storage = snark.getStorage();
+            if (storage != null) {
+                File sbase = storage.getBase();
+                String child = pathInContext.substring(top.getPath().length());
+                return new File(sbase, child);
+            }
+        }
         return new File(_resourceBase, pathInContext);
     }
 
@@ -154,10 +174,19 @@ public class I2PSnarkServlet extends BasicServlet {
         //    _log.debug("Service " + req.getMethod() + " \"" + req.getContextPath() + "\" \"" + req.getServletPath() + "\" \"" + req.getPathInfo() + '"');
         // since we are not overriding handle*(), do this here
         String method = req.getMethod();
-        _themePath = "/themes/snark/" + _manager.getTheme() + '/';
-        _imgPath = _themePath + "images/";
         // this is the part after /i2psnark
         String path = req.getServletPath();
+
+        // in-war icons etc.
+        if (path != null && path.startsWith(WARBASE)) {
+            if (method.equals("GET") || method.equals("HEAD"))
+                super.doGet(req, resp);
+            else  // no POST either
+                resp.sendError(405);
+        }
+
+        _themePath = "/themes/snark/" + _manager.getTheme() + '/';
+        _imgPath = _themePath + "images/";
         resp.setHeader("X-Frame-Options", "SAMEORIGIN");
         resp.setHeader("Content-Security-Policy", "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'");
         resp.setHeader("X-XSS-Protection", "1; mode=block");
@@ -193,7 +222,8 @@ public class I2PSnarkServlet extends BasicServlet {
 
         boolean isConfigure = "/configure".equals(path);
         // index.jsp doesn't work, it is grabbed by the war handler before here
-        if (!(path == null || path.equals("/") || path.equals("/index.jsp") || path.equals("/index.html") || path.equals("/_post") || isConfigure)) {
+        if (!(path == null || path.equals("/") || path.equals("/index.jsp") ||
+              path.equals("/index.html") || path.equals("/_post") || isConfigure)) {
             if (path.endsWith("/")) {
                 // Listing of a torrent (torrent detail page)
                 // bypass the horrid Resource.getListHTML()
@@ -848,42 +878,36 @@ public class I2PSnarkServlet extends BasicServlet {
                                     _manager.addMessage(_("Data file could not be deleted: {0}", f.getAbsolutePath()));
                                 break;
                             }
+                            Storage storage = snark.getStorage();
+                            if (storage == null)
+                                break;
                             // step 1 delete files
-                            for (int i = 0; i < files.size(); i++) {
-                                // multifile torrents have the getFiles() return lists of lists of filenames, but
-                                // each of those lists just contain a single file afaict...
-                                File df = Storage.getFileFromNames(f, files.get(i));
+                            for (File df : storage.getFiles()) {
                                 if (df.delete()) {
                                     //_manager.addMessage(_("Data file deleted: {0}", df.getAbsolutePath()));
                                 } else {
                                     _manager.addMessage(_("Data file could not be deleted: {0}", df.getAbsolutePath()));
                                 }
                             }
-                            // step 2 make Set of dirs with reverse sort
-                            Set<File> dirs = new TreeSet<File>(Collections.reverseOrder());
-                            for (List<String> list : files) {
-                                for (int i = 1; i < list.size(); i++) {
-                                    dirs.add(Storage.getFileFromNames(f, list.subList(0, i)));
-                                }
-                            }
-                            // step 3 delete dirs bottom-up
+                            // step 2 delete dirs bottom-up
+                            Set<File> dirs = storage.getDirectories();
+                            if (_log.shouldLog(Log.INFO))
+                                _log.info("Dirs to delete: " + DataHelper.toString(dirs));
+                            boolean ok = false;
                             for (File df : dirs) {
                                 if (df.delete()) {
+                                    ok = true;
                                     //_manager.addMessage(_("Data dir deleted: {0}", df.getAbsolutePath()));
                                 } else {
+                                    ok = false;
                                     _manager.addMessage(_("Directory could not be deleted: {0}", df.getAbsolutePath()));
                                     if (_log.shouldLog(Log.WARN))
                                         _log.warn("Could not delete dir " + df);
                                 }
                             }
-                            // step 4 delete base
-                            if (f.delete()) {
-                                _manager.addMessage(_("Directory deleted: {0}", f.getAbsolutePath()));
-                            } else {
-                                _manager.addMessage(_("Directory could not be deleted: {0}", f.getAbsolutePath()));
-                                if (_log.shouldLog(Log.WARN))
-                                    _log.warn("Could not delete dir " + f);
-                            }
+                            // step 3 message for base (last one)
+                            if (ok)
+                                _manager.addMessage(_("Directory deleted: {0}", storage.getBase()));
                             break;
                         }
                     }
@@ -920,9 +944,11 @@ public class I2PSnarkServlet extends BasicServlet {
             if (taction != null)
                 processTrackerForm(taction, req);
         } else if ("Create".equals(action)) {
-            String baseData = req.getParameter("baseFile");
+            String baseData = req.getParameter("nofilter_baseFile");
             if (baseData != null && baseData.trim().length() > 0) {
-                File baseFile = new File(_manager.getDataDir(), baseData);
+                File baseFile = new File(baseData.trim());
+                if (!baseFile.isAbsolute())
+                    baseFile = new File(_manager.getDataDir(), baseData);
                 String announceURL = req.getParameter("announceURL");
                 // make the user add a tracker on the config form now
                 //String announceURLOther = req.getParameter("announceURLOther");
@@ -930,6 +956,40 @@ public class I2PSnarkServlet extends BasicServlet {
                 //    announceURL = announceURLOther;
 
                 if (baseFile.exists()) {
+                    String torrentName = baseFile.getName();
+                    if (torrentName.toLowerCase(Locale.US).endsWith(".torrent")) {
+                        _manager.addMessage(_("Cannot add a torrent ending in \".torrent\": {0}", baseFile.getAbsolutePath()));
+                        return;
+                    }
+                    Snark snark = _manager.getTorrentByBaseName(torrentName);
+                    if (snark != null) {
+                        _manager.addMessage(_("Torrent with this name is already running: {0}", torrentName));
+                        return;
+                    }
+                    if (isParentOf(baseFile,_manager.getDataDir()) ||
+                        isParentOf(baseFile, _manager.util().getContext().getBaseDir()) ||
+                        isParentOf(baseFile, _manager.util().getContext().getConfigDir())) {
+                        _manager.addMessage(_("Cannot add a torrent including an I2P directory: {0}", baseFile.getAbsolutePath()));
+                        return;
+                    }
+                    Collection<Snark> snarks = _manager.getTorrents();
+                    for (Snark s : snarks) {
+                        Storage storage = s.getStorage();
+                        if (storage == null)
+                            continue;
+                        File sbase = storage.getBase();
+                        if (isParentOf(sbase, baseFile)) {
+                            _manager.addMessage(_("Cannot add torrent {0} inside another torrent: {1}",
+                                                  baseFile.getAbsolutePath(), sbase));
+                            return;
+                        }
+                        if (isParentOf(baseFile, sbase)) {
+                            _manager.addMessage(_("Cannot add torrent {0} including another torrent: {1}",
+                                                  baseFile.getAbsolutePath(), sbase));
+                            return;
+                        }
+                    }
+
                     if (announceURL.equals("none"))
                         announceURL = null;
                     _lastAnnounceURL = announceURL;
@@ -982,7 +1042,9 @@ public class I2PSnarkServlet extends BasicServlet {
                         File torrentFile = new File(_manager.getDataDir(), s.getBaseName() + ".torrent");
                         // FIXME is the storage going to stay around thanks to the info reference?
                         // now add it, but don't automatically start it
-                        _manager.addTorrent(info, s.getBitField(), torrentFile.getAbsolutePath(), true);
+                        boolean ok = _manager.addTorrent(info, s.getBitField(), torrentFile.getAbsolutePath(), baseFile, true);
+                        if (!ok)
+                            return;
                         _manager.addMessage(_("Torrent created for \"{0}\"", baseFile.getName()) + ": " + torrentFile.getAbsolutePath());
                         if (announceURL != null && !_manager.util().getOpenTrackers().contains(announceURL))
                             _manager.addMessage(_("Many I2P trackers require you to register new torrents before seeding - please do so before starting \"{0}\"", baseFile.getName()));
@@ -1333,7 +1395,7 @@ public class I2PSnarkServlet extends BasicServlet {
             }
         }
 
-        String encodedBaseName = urlEncode(fullBasename);
+        String encodedBaseName = encodePath(fullBasename);
         // File type icon column
         out.write("</td>\n<td>");
         if (isValid) {
@@ -1383,7 +1445,7 @@ public class I2PSnarkServlet extends BasicServlet {
             buf.append("\">");
             out.write(buf.toString());
         }
-        out.write(basename);
+        out.write(DataHelper.escapeHTML(basename));
         if (remaining == 0 || isMultiFile)
             out.write("</a>");
 
@@ -1762,12 +1824,6 @@ public class I2PSnarkServlet extends BasicServlet {
     }
     
     private void writeSeedForm(PrintWriter out, HttpServletRequest req, List<Tracker> sortedTrackers) throws IOException {
-        String baseFile = req.getParameter("baseFile");
-        if (baseFile == null || baseFile.trim().length() <= 0)
-            baseFile = "";
-        else
-            baseFile = DataHelper.stripHTML(baseFile);    // XSS
-        
         out.write("<a name=\"add\"></a><div class=\"newtorrentsection\"><div class=\"snarkNewTorrent\">\n");
         // *not* enctype="multipart/form-data", so that the input type=file sends the filename, not the file
         out.write("<form action=\"_post\" method=\"POST\">\n");
@@ -1783,10 +1839,11 @@ public class I2PSnarkServlet extends BasicServlet {
         out.write("</span><hr>\n<table border=\"0\"><tr><td>");
         //out.write("From file: <input type=\"file\" name=\"newFile\" size=\"50\" value=\"" + newFile + "\" /><br>\n");
         out.write(_("Data to seed"));
-        out.write(":<td><code>" + _manager.getDataDir().getAbsolutePath() + File.separatorChar 
-                  + "</code><input type=\"text\" name=\"baseFile\" size=\"58\" value=\"" + baseFile 
+        out.write(":<td>"
+                  + "<input type=\"text\" name=\"nofilter_baseFile\" size=\"58\" value=\""
                   + "\" spellcheck=\"false\" title=\"");
-        out.write(_("File or directory to seed (must be within the specified path)"));
+        out.write(_("File or directory to seed (full path or within the directory {0} )",
+                    _manager.getDataDir().getAbsolutePath() + File.separatorChar));
         out.write("\" ><tr><td>\n");
         out.write(_("Trackers"));
         out.write(":<td><table style=\"width: 30%;\"><tr><td></td><td align=\"center\">");
@@ -2186,26 +2243,35 @@ public class I2PSnarkServlet extends BasicServlet {
             return ((bytes + 512*1024*1024)/(1024*1024*1024)) + "&nbsp;GB";
     }
     
-    /** @since 0.7.14 */
+    /**
+     * This is for a full URL. For a path only, use encodePath().
+     * @since 0.7.14
+     */
     static String urlify(String s) {
         return urlify(s, 100);
     }
     
-    /** @since 0.9 */
+    /**
+     * This is for a full URL. For a path only, use encodePath().
+     * @since 0.9
+     */
     private static String urlify(String s, int max) {
         StringBuilder buf = new StringBuilder(256);
         // browsers seem to work without doing this but let's be strict
         String link = urlEncode(s);
         String display;
         if (s.length() <= max)
-            display = link;
+            display = DataHelper.escapeHTML(link);
         else
-            display = urlEncode(s.substring(0, max)) + "&hellip;";
+            display = DataHelper.escapeHTML(s.substring(0, max)) + "&hellip;";
         buf.append("<a href=\"").append(link).append("\">").append(display).append("</a>");
         return buf.toString();
     }
     
-    /** @since 0.8.13 */
+    /**
+     * This is for a full URL. For a path only, use encodePath().
+     * @since 0.8.13
+     */
     private static String urlEncode(String s) {
         return s.replace(";", "%3B").replace("&", "&amp;").replace(" ", "%20")
                 .replace("<", "&lt;").replace(">", "&gt;")
@@ -2230,9 +2296,11 @@ public class I2PSnarkServlet extends BasicServlet {
     private static class ListingComparator implements Comparator<File>, Serializable {
 
         public int compare(File l, File r) {
-            if (l.isDirectory() && !r.isDirectory())
+            boolean ld = l.isDirectory();
+            boolean rd = r.isDirectory();
+            if (ld && !rd)
                 return -1;
-            if (r.isDirectory() && !l.isDirectory())
+            if (rd && !ld)
                 return 1;
             return Collator.getInstance().compare(l.getName(), r.getName());
         }
@@ -2261,52 +2329,75 @@ public class I2PSnarkServlet extends BasicServlet {
      * </pre>
      *
      * Get the resource list as a HTML directory listing.
-     * @param r The Resource
-     * @param base The base URL
+     * @param xxxr The Resource unused
+     * @param base The encoded base URL
      * @param parent True if the parent directory should be included
      * @param postParams map of POST parameters or null if not a POST
      * @return String of HTML or null if postParams != null
      * @since 0.7.14
      */
-    private String getListHTML(File r, String base, boolean parent, Map<String, String[]> postParams)
+    private String getListHTML(File xxxr, String base, boolean parent, Map<String, String[]> postParams)
         throws IOException
     {
-        File[] ls = null;
-        if (r.isDirectory()) {
-            ls = r.listFiles();
-            Arrays.sort(ls, new ListingComparator());
-        }  // if r is not a directory, we are only showing torrent info section
-        
-        String title = decodePath(base);
+        String decodedBase = decodePath(base);
+        String title = decodedBase;
         String cpath = _contextPath + '/';
         if (title.startsWith(cpath))
             title = title.substring(cpath.length());
 
         // Get the snark associated with this directory
         String torrentName;
+        String pathInTorrent;
         int slash = title.indexOf('/');
-        if (slash > 0)
+        if (slash > 0) {
             torrentName = title.substring(0, slash);
-        else
+            pathInTorrent = title.substring(slash);
+        } else {
             torrentName = title;
+            pathInTorrent = "/";
+        }
         Snark snark = _manager.getTorrentByBaseName(torrentName);
 
         if (snark != null && postParams != null) {
             // caller must P-R-G
-            savePriorities(snark, postParams);
+            String[] val = postParams.get("nonce");
+            if (val != null) {
+                String nonce = val[0];
+                if (String.valueOf(_nonce).equals(nonce))
+                    savePriorities(snark, postParams);
+                else
+                    _manager.addMessage("Please retry form submission (bad nonce)");
+            }
             return null;
         }
 
+        File r;
+        if (snark != null) {
+            Storage storage = snark.getStorage();
+            if (storage != null) {
+                File sbase = storage.getBase();
+                if (pathInTorrent.equals("/"))
+                    r = sbase;
+                else
+                    r = new File(sbase, pathInTorrent);
+            } else {
+                // magnet, dummy
+                r = new File("");
+            }
+        } else {
+            // dummy
+            r = new File("");
+        }
         StringBuilder buf=new StringBuilder(4096);
         buf.append(DOCTYPE).append("<HTML><HEAD><TITLE>");
         if (title.endsWith("/"))
             title = title.substring(0, title.length() - 1);
         String directory = title;
-        title = _("Torrent") + ": " + title;
+        title = _("Torrent") + ": " + DataHelper.escapeHTML(title);
         buf.append(title);
         buf.append("</TITLE>").append(HEADER_A).append(_themePath).append(HEADER_B).append("<link rel=\"shortcut icon\" href=\"" + _themePath + "favicon.ico\">" +
              "</HEAD><BODY>\n<center><div class=\"snarknavbar\"><a href=\"").append(_contextPath).append("/\" title=\"Torrents\"");
-        buf.append(" class=\"snarkRefresh\"><img alt=\"\" border=\"0\" src=\"" + _imgPath + "arrow_refresh.png\">&nbsp;&nbsp;");
+        buf.append(" class=\"snarkRefresh\"><img alt=\"\" border=\"0\" src=\"").append(_imgPath).append("arrow_refresh.png\">&nbsp;&nbsp;");
         if (_contextName.equals(DEFAULT_NAME))
             buf.append(_("I2PSnark"));
         else
@@ -2315,26 +2406,35 @@ public class I2PSnarkServlet extends BasicServlet {
         
         if (parent)  // always true
             buf.append("<div class=\"page\"><div class=\"mainsection\">");
-        boolean showPriority = ls != null && snark != null && snark.getStorage() != null && !snark.getStorage().complete();
-        if (showPriority)
+        boolean showPriority = snark != null && snark.getStorage() != null && !snark.getStorage().complete() &&
+                               r.isDirectory();
+        if (showPriority) {
             buf.append("<form action=\"").append(base).append("\" method=\"POST\">\n");
+            buf.append("<input type=\"hidden\" name=\"nonce\" value=\"").append(_nonce).append("\" >\n");
+        }
         if (snark != null) {
             // first table - torrent info
             buf.append("<table class=\"snarkTorrentInfo\">\n");
             buf.append("<tr><th><b>")
                .append(_("Torrent"))
                .append(":</b> ")
-               .append(snark.getBaseName())
+               .append(DataHelper.escapeHTML(snark.getBaseName()))
                .append("</th></tr>\n");
 
             String fullPath = snark.getName();
-            String baseName = urlEncode((new File(fullPath)).getName());
+            String baseName = encodePath((new File(fullPath)).getName());
             buf.append("<tr><td>")
-               .append("<img alt=\"\" border=\"0\" src=\"" + _imgPath + "file.png\" >&nbsp;<b>")
+               .append("<img alt=\"\" border=\"0\" src=\"").append(_imgPath).append("file.png\" >&nbsp;<b>")
                .append(_("Torrent file"))
                .append(":</b> <a href=\"").append(_contextPath).append('/').append(baseName).append("\">")
-               .append(fullPath)
+               .append(DataHelper.escapeHTML(fullPath))
                .append("</a></td></tr>\n");
+            buf.append("<tr><td>")
+               .append("<img alt=\"\" border=\"0\" src=\"").append(_imgPath).append("file.png\" >&nbsp;<b>")
+               .append(_("Data location"))
+               .append(":</b> ")
+               .append(DataHelper.escapeHTML(snark.getStorage().getBase().getPath()))
+               .append("</td></tr>\n");
 
             String announce = null;
             MetaInfo meta = snark.getMetaInfo();
@@ -2435,40 +2535,40 @@ public class I2PSnarkServlet extends BasicServlet {
             //   .append(MAGGOT).append(hex).append(':').append(hex).append("</a></td></tr>");
 
             buf.append("<tr><td>")
-               .append("<img alt=\"\" border=\"0\" src=\"" + _imgPath + "size.png\" >&nbsp;<b>")
+               .append("<img alt=\"\" border=\"0\" src=\"").append(_imgPath).append("size.png\" >&nbsp;<b>")
                .append(_("Size"))
                .append(":</b> ")
                .append(formatSize(snark.getTotalLength()));
             int pieces = snark.getPieces();
             double completion = (pieces - snark.getNeeded()) / (double) pieces;
             if (completion < 1.0)
-                buf.append("&nbsp;<img alt=\"\" border=\"0\" src=\"" + _imgPath + "head_rx.png\" >&nbsp;<b>")
+                buf.append("&nbsp;<img alt=\"\" border=\"0\" src=\"").append(_imgPath).append("head_rx.png\" >&nbsp;<b>")
                    .append(_("Completion"))
                    .append(":</b> ")
                    .append((new DecimalFormat("0.00%")).format(completion));
             else
-                buf.append("&nbsp;<img alt=\"\" border=\"0\" src=\"" + _imgPath + "head_rx.png\" >&nbsp;")
+                buf.append("&nbsp;<img alt=\"\" border=\"0\" src=\"").append(_imgPath).append("head_rx.png\" >&nbsp;")
                    .append(_("Complete"));
             // else unknown
             long needed = snark.getNeededLength();
             if (needed > 0)
-                buf.append("&nbsp;<img alt=\"\" border=\"0\" src=\"" + _imgPath + "head_rx.png\" >&nbsp;<b>")
+                buf.append("&nbsp;<img alt=\"\" border=\"0\" src=\"").append(_imgPath).append("head_rx.png\" >&nbsp;<b>")
                    .append(_("Remaining"))
                    .append(":</b> ")
                    .append(formatSize(needed));
             if (meta != null) {
                 List<List<String>> files = meta.getFiles();
                 int fileCount = files != null ? files.size() : 1;
-                buf.append("&nbsp;<img alt=\"\" border=\"0\" src=\"" + _imgPath + "file.png\" >&nbsp;<b>")
+                buf.append("&nbsp;<img alt=\"\" border=\"0\" src=\"").append(_imgPath).append("file.png\" >&nbsp;<b>")
                    .append(_("Files"))
                    .append(":</b> ")
                    .append(fileCount);
             }
-            buf.append("&nbsp;<img alt=\"\" border=\"0\" src=\"" + _imgPath + "file.png\" >&nbsp;<b>")
+            buf.append("&nbsp;<img alt=\"\" border=\"0\" src=\"").append(_imgPath).append("file.png\" >&nbsp;<b>")
                .append(_("Pieces"))
                .append(":</b> ")
                .append(pieces);
-            buf.append("&nbsp;<img alt=\"\" border=\"0\" src=\"" + _imgPath + "file.png\" >&nbsp;<b>")
+            buf.append("&nbsp;<img alt=\"\" border=\"0\" src=\"").append(_imgPath).append("file.png\" >&nbsp;<b>")
                .append(_("Piece size"))
                .append(":</b> ")
                .append(formatSize(snark.getPieceLength(0)))
@@ -2481,6 +2581,22 @@ public class I2PSnarkServlet extends BasicServlet {
                .append("\"</th></tr>\n");
         }
         buf.append("</table>\n");
+
+        if (snark != null && !r.exists()) {
+            // fixup TODO
+            buf.append("<p>Does not exist<br>resource=\"").append(r.toString())
+               .append("\"<br>base=\"").append(base)
+               .append("\"<br>torrent=\"").append(torrentName)
+               .append("\"</p></div></div></BODY></HTML>");
+            return buf.toString();
+        }
+
+        File[] ls = null;
+        if (r.isDirectory()) {
+            ls = r.listFiles();
+            Arrays.sort(ls, new ListingComparator());
+        }  // if r is not a directory, we are only showing torrent info section
+        
         if (ls == null) {
             // We are only showing the torrent info section
             buf.append("</div></div></BODY></HTML>");
@@ -2491,7 +2607,7 @@ public class I2PSnarkServlet extends BasicServlet {
         buf.append("<table class=\"snarkDirInfo\"><thead>\n");
         buf.append("<tr>\n")
            .append("<th colspan=2>")
-           .append("<img border=\"0\" src=\"" + _imgPath + "file.png\" title=\"")
+           .append("<img border=\"0\" src=\"").append(_imgPath).append("file.png\" title=\"")
            .append(_("Directory"))
            .append(": ")
            .append(directory)
@@ -2499,28 +2615,28 @@ public class I2PSnarkServlet extends BasicServlet {
            .append(_("Directory"))
            .append("\"></th>\n");
         buf.append("<th align=\"right\">")
-           .append("<img border=\"0\" src=\"" + _imgPath + "size.png\" title=\"")
+           .append("<img border=\"0\" src=\"").append(_imgPath).append("size.png\" title=\"")
            .append(_("Size"))
            .append("\" alt=\"")
            .append(_("Size"))
            .append("\"></th>\n");
         buf.append("<th class=\"headerstatus\">")
-           .append("<img border=\"0\" src=\"" + _imgPath + "status.png\" title=\"")
+           .append("<img border=\"0\" src=\"").append(_imgPath).append("status.png\" title=\"")
            .append(_("Status"))
            .append("\" alt=\"")
            .append(_("Status"))
            .append("\"></th>\n");
         if (showPriority)
             buf.append("<th class=\"headerpriority\">")
-               .append("<img border=\"0\" src=\"" + _imgPath + "priority.png\" title=\"")
+               .append("<img border=\"0\" src=\"").append(_imgPath).append("priority.png\" title=\"")
                .append(_("Priority"))
                .append("\" alt=\"")
                .append(_("Priority"))
                .append("\"></th>\n");
         buf.append("</tr>\n</thead>\n");
         buf.append("<tr><td colspan=\"" + (showPriority ? '5' : '4') + "\" class=\"ParentDir\"><A HREF=\"");
-        buf.append(addPaths(base,"../"));
-        buf.append("\"><img alt=\"\" border=\"0\" src=\"" + _imgPath + "up.png\"> ")
+        URIUtil.encodePath(buf, addPaths(decodedBase,"../"));
+        buf.append("\"><img alt=\"\" border=\"0\" src=\"").append(_imgPath).append("up.png\"> ")
            .append(_("Up to higher level directory"))
            .append("</A></td></tr>\n");
 
@@ -2530,7 +2646,7 @@ public class I2PSnarkServlet extends BasicServlet {
         boolean showSaveButton = false;
         for (int i=0 ; i< ls.length ; i++)
         {   
-            String encoded = encodePath(ls[i].getName());
+            //String encoded = encodePath(ls[i].getName());
             // bugfix for I2P - Backport from Jetty 6 (zero file lengths and last-modified times)
             // http://jira.codehaus.org/browse/JETTY-361?page=com.atlassian.jira.plugin.system.issuetabpanels%3Achangehistory-tabpanel#issue-tabs
             // See resource.diff attachment
@@ -2544,6 +2660,7 @@ public class I2PSnarkServlet extends BasicServlet {
             boolean complete = false;
             String status = "";
             long length = item.length();
+            int priority = 0;
             if (item.isDirectory()) {
                 complete = true;
                 //status = toImg("tick") + ' ' + _("Directory");
@@ -2554,9 +2671,8 @@ public class I2PSnarkServlet extends BasicServlet {
                     status = toImg("cancel") + ' ' + _("Torrent not found?");
                 } else {
                     Storage storage = snark.getStorage();
-                    try {
-                        File f = item;
-                            long remaining = storage.remaining(f.getCanonicalPath());
+
+                            long remaining = storage.remaining(item);
                             if (remaining < 0) {
                                 complete = true;
                                 status = toImg("cancel") + ' ' + _("File not found in torrent?");
@@ -2564,7 +2680,7 @@ public class I2PSnarkServlet extends BasicServlet {
                                 complete = true;
                                 status = toImg("tick") + ' ' + _("Complete");
                             } else {
-                                int priority = storage.getPriority(f.getCanonicalPath());
+                                priority = storage.getPriority(item);
                                 if (priority < 0)
                                     status = toImg("cancel");
                                 else if (priority == 0)
@@ -2575,16 +2691,14 @@ public class I2PSnarkServlet extends BasicServlet {
                                          (100 * (length - remaining) / length) + "% " + _("complete") +
                                          " (" + DataHelper.formatSize2(remaining) + "B " + _("remaining") + ")";
                             }
-                    } catch (IOException ioe) {
-                        status = "Not a file? " + ioe;
-                    }
+
                 }
             }
 
-            String path=addPaths(base,encoded);
+            String path = addPaths(decodedBase, ls[i].getName());
             if (item.isDirectory() && !path.endsWith("/"))
                 path=addPaths(path,"/");
-            path = urlEncode(path);
+            path = encodePath(path);
             String icon = toIcon(item);
 
             buf.append("<TD class=\"snarkFileIcon\">");
@@ -2605,7 +2719,7 @@ public class I2PSnarkServlet extends BasicServlet {
             buf.append("</TD><TD class=\"snarkFileName\">");
             if (complete)
                 buf.append("<a href=\"").append(path).append("\">");
-            buf.append(item.getName().replace("&", "&amp;"));
+            buf.append(DataHelper.escapeHTML(item.getName()));
             if (complete)
                 buf.append("</a>");
             buf.append("</TD><TD ALIGN=right class=\"snarkFileSize\">");
@@ -2617,21 +2731,19 @@ public class I2PSnarkServlet extends BasicServlet {
             buf.append("</TD>");
             if (showPriority) {
                 buf.append("<td class=\"priority\">");
-                File f = item;
                 if ((!complete) && (!item.isDirectory())) {
-                    int pri = snark.getStorage().getPriority(f.getCanonicalPath());
-                    buf.append("<input type=\"radio\" value=\"5\" name=\"pri.").append(f.getCanonicalPath()).append("\" ");
-                    if (pri > 0)
+                    buf.append("<input type=\"radio\" value=\"5\" name=\"pri.").append(item).append("\" ");
+                    if (priority > 0)
                         buf.append("checked=\"true\"");
                     buf.append('>').append(_("High"));
 
-                    buf.append("<input type=\"radio\" value=\"0\" name=\"pri.").append(f.getCanonicalPath()).append("\" ");
-                    if (pri == 0)
+                    buf.append("<input type=\"radio\" value=\"0\" name=\"pri.").append(item).append("\" ");
+                    if (priority == 0)
                         buf.append("checked=\"true\"");
                     buf.append('>').append(_("Normal"));
 
-                    buf.append("<input type=\"radio\" value=\"-9\" name=\"pri.").append(f.getCanonicalPath()).append("\" ");
-                    if (pri < 0)
+                    buf.append("<input type=\"radio\" value=\"-9\" name=\"pri.").append(item).append("\" ");
+                    if (priority < 0)
                         buf.append("checked=\"true\"");
                     buf.append('>').append(_("Skip"));
                     showSaveButton = true;
@@ -2703,6 +2815,8 @@ public class I2PSnarkServlet extends BasicServlet {
             icon = "application";
         else if (plc.endsWith(".iso"))
             icon = "cd";
+        else if (mime.equals("application/x-bittorrent"))
+            icon = "magnet";
         else
             icon = "page_white";
         return icon;
@@ -2727,7 +2841,7 @@ public class I2PSnarkServlet extends BasicServlet {
             String key = entry.getKey();
             if (key.startsWith("pri.")) {
                 try {
-                    String file = key.substring(4);
+                    File file = new File(key.substring(4));
                     String val = entry.getValue()[0];   // jetty arrays
                     int pri = Integer.parseInt(val);
                     storage.setPriority(file, pri);
@@ -2736,6 +2850,36 @@ public class I2PSnarkServlet extends BasicServlet {
             }
         }
          snark.updatePiecePriorities();
-        _manager.saveTorrentStatus(snark.getMetaInfo(), storage.getBitField(), storage.getFilePriorities());
+        _manager.saveTorrentStatus(snark);
+    }
+
+    /**
+     *  Is "a" equal to "b",
+     *  or is "a" a directory and a parent of file or directory "b",
+     *  canonically speaking?
+     *
+     *  @since 0.9.15
+     */
+    private static boolean isParentOf(File a, File b) {
+        try {
+            a = a.getCanonicalFile();
+            b = b.getCanonicalFile();
+        } catch (IOException ioe) {
+            return false;
+        }
+        if (a.equals(b))
+            return true;
+        if (!a.isDirectory())
+            return false;
+        // easy case
+        if (!b.getPath().startsWith(a.getPath()))
+            return false;
+        // dir by dir
+        while (!a.equals(b)) {
+            b = b.getParentFile();
+            if (b == null)
+                return false;
+        }
+        return true;
     }
 }

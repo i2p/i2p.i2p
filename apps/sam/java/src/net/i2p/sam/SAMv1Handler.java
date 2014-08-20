@@ -246,7 +246,7 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
                     destKeystream = bridge.getKeystream(dest);
                     if (destKeystream == null) {
                         if (_log.shouldLog(Log.DEBUG))
-                            _log.debug("Custom destination specified [" + dest + "] but it isnt know, creating a new one");
+                            _log.debug("Custom destination specified [" + dest + "] but it isn't known, creating a new one");
                         ByteArrayOutputStream baos = new ByteArrayOutputStream(640);
                         SAMUtils.genRandomKey(baos, null);
                         destKeystream = Base64.encode(baos.toByteArray());
@@ -284,7 +284,7 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
                     if (!dir.equals("CREATE") && !dir.equals("RECEIVE")
                         && !dir.equals("BOTH")) {
                         if (_log.shouldLog(Log.DEBUG))
-                            _log.debug("Unknow DIRECTION parameter value: [" + dir + "]");
+                            _log.debug("Unknown DIRECTION parameter value: [" + dir + "]");
                         return writeString("SESSION STATUS RESULT=I2P_ERROR MESSAGE=\"Unknown DIRECTION parameter\"\n");
                     }
                     props.remove("DIRECTION");
