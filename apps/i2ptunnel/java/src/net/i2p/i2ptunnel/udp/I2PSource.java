@@ -6,6 +6,7 @@ import java.util.concurrent.BlockingQueue;
 import net.i2p.client.I2PSession;
 import net.i2p.client.I2PSessionListener;
 import net.i2p.client.datagram.I2PDatagramDissector;
+import net.i2p.util.I2PAppThread;
 
 /**
  *
@@ -33,7 +34,7 @@ public class I2PSource implements Source, Runnable {
         this.sess.setSessionListener(new Listener());
         
         // create thread
-        this.thread = new Thread(this);
+        this.thread = new I2PAppThread(this);
     }
     
     public void setSink(Sink sink) {

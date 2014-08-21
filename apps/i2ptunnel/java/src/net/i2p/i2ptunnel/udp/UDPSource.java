@@ -3,6 +3,8 @@ package net.i2p.i2ptunnel.udp;
 import java.net.DatagramSocket;
 import java.net.DatagramPacket;
 
+import net.i2p.util.I2PAppThread;
+
 /**
  *
  * @author welterde
@@ -19,13 +21,13 @@ public class UDPSource implements Source, Runnable {
         }
         
         // create thread
-        this.thread = new Thread(this);
+        this.thread = new I2PAppThread(this);
     }
 
     /** use socket from UDPSink */
     public UDPSource(DatagramSocket sock) {
         this.sock = sock;
-        this.thread = new Thread(this);
+        this.thread = new I2PAppThread(this);
     }
     
     public void setSink(Sink sink) {

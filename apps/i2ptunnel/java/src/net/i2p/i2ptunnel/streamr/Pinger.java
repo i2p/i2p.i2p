@@ -1,6 +1,7 @@
 package net.i2p.i2ptunnel.streamr;
 
 import net.i2p.i2ptunnel.udp.*;
+import net.i2p.util.I2PAppThread;
 
 /**
  *
@@ -9,7 +10,7 @@ import net.i2p.i2ptunnel.udp.*;
 public class Pinger implements Source, Runnable {
 
     public Pinger() {
-        this.thread = new Thread(this);
+        this.thread = new I2PAppThread(this);
     }
 
     public void setSink(Sink sink) {
