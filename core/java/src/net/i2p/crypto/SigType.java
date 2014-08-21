@@ -49,7 +49,7 @@ public enum SigType {
     // TESTING....................
 
     /** Pubkey 32 bytes; privkey 32 bytes; hash 64 bytes; sig 64 bytes; */
-    EdDSA_SHA512_25519(7, 32, 32, 64, 64, SigAlgo.EdDSA, "SHA-512", "SHA512withEdDSA", EdDSANamedCurveTable.getByName("ed25519-sha-512"));
+    EdDSA_SHA512_Ed25519(4, 32, 32, 64, 64, SigAlgo.EdDSA, "SHA-512", "SHA512withEdDSA", EdDSANamedCurveTable.getByName("ed25519-sha-512"));
 
     // others..........
 
