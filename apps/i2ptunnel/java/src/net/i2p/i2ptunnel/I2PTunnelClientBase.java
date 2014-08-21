@@ -24,6 +24,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicLong;
 
+import javax.net.ssl.SSLServerSocketFactory;
+
 import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
 import net.i2p.client.I2PSession;
@@ -85,6 +87,8 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
     private static volatile ThreadPoolExecutor _executor;
     private static int _executorThreadCount;
     private static final Object _executorLock = new Object();
+
+    public static final String PROP_USE_SSL = I2PTunnelServer.PROP_USE_SSL;
 
     /**
      *  This constructor always starts the tunnel (ignoring the i2cp.delayOpen option).
@@ -599,7 +603,24 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
                 }
                 return;
             }
-            ss = new ServerSocket(localPort, 0, addr);
+            Properties opts = getTunnel().getClientOptions();
+            boolean useSSL = Boolean.parseBoolean(opts.getProperty(PROP_USE_SSL));
+            if (useSSL) {
+                // was already done in web/IndexBean.java when saving the config
+                boolean wasCreated = SSLClientUtil.verifyKeyStore(opts);
+                if (wasCreated) {
+                    // From here, we can't save the config.
+                    // We shouldn't get here, as SSL isn't the default, so it would
+                    // be enabled via the GUI only.
+                    // If it was done manually, the keys will be regenerated at every startup,
+                    // which is bad.
+                    _log.logAlways(Log.WARN, "Created new i2ptunnel SSL keys but can't save the config, disable and enable via i2ptunnel GUI");
+                }
+                SSLServerSocketFactory fact = SSLClientUtil.initializeFactory(opts);
+                ss = fact.createServerSocket(localPort, 0, addr);
+            } else {
+                ss = new ServerSocket(localPort, 0, addr);
+            }
 
             // If a free port was requested, find out what we got
             if (localPort == 0) {

@@ -140,6 +140,14 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                 </select>                
          <% } /* streamrclient */ %>
             </div> 
+         <% if ("client".equals(tunnelType) || "ircclient".equals(tunnelType)) {
+          %><div id="portField" class="rowItem">
+                <label>
+                    <%=intl._("Use SSL?")%>
+                </label>
+                <input value="1" type="checkbox" id="startOnLoad" name="useSSL" title="Clients use SSL to connect" <%=(editBean.isSSLEnabled(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />                
+            </div>
+         <% } /* tunnel types */ %>
 
             <div class="subdivider">
                 <hr />

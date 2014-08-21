@@ -1,3 +1,9 @@
+2014-08-21 zzz
+ * i2psnark:
+   - Escape control chars in encodePath()
+   - Increase max piece size to 8 MB (ticket #1347)
+ * i2ptunnel: Add local SSL support for std. and IRC client tunnels (ticket #1107)
+
 2014-08-19 zzz
  * i2psnark:
    - Don't filter create torrent form, and

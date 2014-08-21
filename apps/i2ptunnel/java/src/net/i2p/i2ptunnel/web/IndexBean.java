@@ -26,15 +26,18 @@ import net.i2p.app.ClientAppManager;
 import net.i2p.app.Outproxy;
 import net.i2p.client.I2PClient;
 import net.i2p.data.Certificate;
+import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.PrivateKeyFile;
 import net.i2p.data.SessionKey;
+import net.i2p.i2ptunnel.I2PTunnelClientBase;
 import net.i2p.i2ptunnel.I2PTunnelConnectClient;
 import net.i2p.i2ptunnel.I2PTunnelHTTPClient;
 import net.i2p.i2ptunnel.I2PTunnelHTTPClientBase;
 import net.i2p.i2ptunnel.I2PTunnelHTTPServer;
 import net.i2p.i2ptunnel.I2PTunnelIRCClient;
 import net.i2p.i2ptunnel.I2PTunnelServer;
+import net.i2p.i2ptunnel.SSLClientUtil;
 import net.i2p.i2ptunnel.TunnelController;
 import net.i2p.i2ptunnel.TunnelControllerGroup;
 import net.i2p.util.Addresses;
@@ -255,7 +258,7 @@ public class IndexBean {
         // give the messages a chance to make it to the window
         try { Thread.sleep(1000); } catch (InterruptedException ie) {}
         // and give them something to look at in any case
-        return _("Starting tunnel") + ' ' + getTunnelName(_tunnel) + "&hellip;";
+        return _("Starting tunnel") + ' ' + getTunnelName(_tunnel) + "...";
     }
     
     private String stop() {
@@ -268,7 +271,7 @@ public class IndexBean {
         // give the messages a chance to make it to the window
         try { Thread.sleep(1000); } catch (InterruptedException ie) {}
         // and give them something to look at in any case
-        return _("Stopping tunnel") + ' ' + getTunnelName(_tunnel) + "&hellip;";
+        return _("Stopping tunnel") + ' ' + getTunnelName(_tunnel) + "...";
     }
     
     private String saveChanges() {
@@ -276,7 +279,27 @@ public class IndexBean {
         TunnelController cur = getController(_tunnel);
         
         Properties config = getConfig();
-        
+
+        String ksMsg = null;
+        String type = config.getProperty(TunnelController.PROP_TYPE);
+        if (TunnelController.TYPE_STD_CLIENT.equals(type) || TunnelController.TYPE_IRC_CLIENT.equals(type)) {
+            //
+            // If we switch to SSL, create the keystore here, so we can store the new properties.
+            // Down in I2PTunnelClientBase it's very hard to save the config.
+            //
+            if (Boolean.parseBoolean(config.getProperty(OPT + I2PTunnelClientBase.PROP_USE_SSL))) {
+                try {
+                    boolean created = SSLClientUtil.verifyKeyStore(config, OPT);
+                    if (created) {
+                        // config now contains new keystore props
+                        ksMsg = "Created new self-signed certificate for tunnel " + getTunnelName(_tunnel);
+                    }        
+                } catch (IOException ioe) {       
+                    ksMsg = "Failed to create new self-signed certificate for tunnel " +
+                            getTunnelName(_tunnel) + ", check logs: " + ioe;
+                }        
+            }        
+        }        
         if (cur == null) {
             // creating new
             cur = new TunnelController(config, "", true);
@@ -327,6 +350,8 @@ public class IndexBean {
         }
         
         List<String> msgs = doSave();
+        if (ksMsg != null)
+            msgs.add(ksMsg);
         return getMessages(msgs);
     }
 
@@ -397,6 +422,7 @@ public class IndexBean {
      * Executes any action requested (start/stop/etc) and dump out the 
      * messages.
      *
+     * @return HTML escaped
      */
     public String getMessages() {
         if (_group == null)
@@ -405,13 +431,14 @@ public class IndexBean {
         StringBuilder buf = new StringBuilder(512);
         if (_action != null) {
             try {
-                buf.append(processAction()).append("\n");
+                buf.append(processAction()).append('\n');
             } catch (Exception e) {
                 _log.log(Log.CRIT, "Error processing " + _action, e);
+                buf.append("Error: ").append(e.toString()).append('\n');
             }
         }
         getMessages(_group.clearAllMessages(), buf);
-        return buf.toString();
+        return DataHelper.escapeHTML(buf.toString());
     }
     
     ////
@@ -1293,7 +1320,8 @@ public class IndexBean {
         I2PTunnelIRCClient.PROP_DCC
         };
     private static final String _booleanClientOpts[] = {
-        "i2cp.reduceOnIdle", "i2cp.closeOnIdle", "i2cp.newDestOnResume", "persistentClientKey", "i2cp.delayOpen"
+        "i2cp.reduceOnIdle", "i2cp.closeOnIdle", "i2cp.newDestOnResume", "persistentClientKey", "i2cp.delayOpen",
+        I2PTunnelClientBase.PROP_USE_SSL,
         };
     private static final String _booleanProxyOpts[] = {
         I2PTunnelHTTPClientBase.PROP_OUTPROXY_AUTH,
