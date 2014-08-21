@@ -25,7 +25,15 @@ import net.i2p.util.Log;
  */
 public class I2PSocketManagerFactory {
 
+    /**
+     *  Ignored since 0.9.12, cannot be changed via properties.
+     *  @deprecated
+     */
     public static final String PROP_MANAGER = "i2p.streaming.manager";
+
+    /**
+     *  The one and only manager.
+     */
     public static final String DEFAULT_MANAGER = "net.i2p.client.streaming.impl.I2PSocketManagerFull";
 
     /**

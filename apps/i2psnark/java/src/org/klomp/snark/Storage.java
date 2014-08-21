@@ -601,7 +601,6 @@ public class Storage
    * Doesn't really reopen the file descriptors for a restart.
    * Just does an existence check but no length check or data reverification
    *
-   * @param rootDir ignored
    * @throws IOE on fail
    */
   public void reopen() throws IOException
