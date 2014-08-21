@@ -1,8 +1,8 @@
 package net.i2p.crypto.eddsa.math.ed25519;
 
-import net.i2p.crypto.eddsa.TestUtils;
 import net.i2p.crypto.eddsa.math.Field;
 import net.i2p.crypto.eddsa.math.FieldElement;
+import net.i2p.data.DataHelper;
 
 /**
  * An element t, entries t[0]...t[9], represents the integer
@@ -961,11 +961,11 @@ public class Ed25519FieldElement extends FieldElement {
         Ed25519FieldElement fe = (Ed25519FieldElement) obj;
         // XXX why does direct byte[] comparison fail?
         // TODO should this be constant time?
-        return TestUtils.getHex(toByteArray()).equals(TestUtils.getHex(fe.toByteArray()));
+        return DataHelper.toString(toByteArray()).equals(DataHelper.toString(fe.toByteArray()));
     }
 
     @Override
     public String toString() {
-        return "[Ed25519FieldElement val="+TestUtils.getHex(toByteArray())+"]";
+        return "[Ed25519FieldElement val="+DataHelper.toString(toByteArray())+"]";
     }
 }
