@@ -11,8 +11,8 @@ import net.i2p.router.RouterContext;
  *
  */
 class BatchedRouterPreprocessor extends BatchedPreprocessor {
-    private TunnelCreatorConfig _config;
-    protected HopConfig _hopConfig;
+    private final TunnelCreatorConfig _config;
+    protected final HopConfig _hopConfig;
     private final long _sendDelay;
     
     /** 
@@ -34,12 +34,14 @@ class BatchedRouterPreprocessor extends BatchedPreprocessor {
     public BatchedRouterPreprocessor(RouterContext ctx, TunnelCreatorConfig cfg) {
         super(ctx, getName(cfg));
         _config = cfg;
+        _hopConfig = null;
         _sendDelay = initialSendDelay();
     }
 
     /** for IBGWs */
     public BatchedRouterPreprocessor(RouterContext ctx, HopConfig cfg) {
         super(ctx, getName(cfg));
+        _config = null;
         _hopConfig = cfg;
         _sendDelay = initialSendDelay();
     }
