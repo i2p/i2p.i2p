@@ -17,8 +17,11 @@ import net.i2p.util.SimpleByteCache;
  * optimal throughput.
  *
  * See FragmentHandler Javadoc for tunnel message fragment format
+ *
+ * Not instantiated directly except in unit tests; see BatchedPreprocessor
+ *
  */
-abstract class TrivialPreprocessor implements TunnelGateway.QueuePreprocessor {
+class TrivialPreprocessor implements TunnelGateway.QueuePreprocessor {
     protected final RouterContext _context;
     protected final Log _log;
     
