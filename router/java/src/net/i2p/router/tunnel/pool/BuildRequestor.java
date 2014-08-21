@@ -8,7 +8,7 @@ import net.i2p.data.ByteArray;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.PublicKey;
-import net.i2p.data.RouterInfo;
+import net.i2p.data.router.RouterInfo;
 import net.i2p.data.TunnelId;
 import net.i2p.data.i2np.TunnelBuildMessage;
 import net.i2p.data.i2np.VariableTunnelBuildMessage;

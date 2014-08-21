@@ -9,7 +9,7 @@ import net.i2p.data.Base64;
 import net.i2p.data.ByteArray;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
-import net.i2p.data.RouterIdentity;
+import net.i2p.data.router.RouterIdentity;
 import net.i2p.data.SessionKey;
 import net.i2p.data.Signature;
 import net.i2p.router.OutNetMessage;

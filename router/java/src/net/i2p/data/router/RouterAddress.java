@@ -1,4 +1,4 @@
-package net.i2p.data;
+package net.i2p.data.router;
 
 /*
  * free (adj.): unencumbered; not under the control of others
@@ -17,6 +17,9 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Properties;
 
+import net.i2p.data.DataFormatException;
+import net.i2p.data.DataHelper;
+import net.i2p.data.DataStructureImpl;
 import net.i2p.util.Addresses;
 import net.i2p.util.OrderedProperties;
 
@@ -36,6 +39,7 @@ import net.i2p.util.OrderedProperties;
  * several releases for the change to propagate as it is backwards-incompatible.
  * Restored as of 0.9.12.
  *
+ * @since 0.9.16 moved from net.i2p.data
  * @author jrandom
  */
 public class RouterAddress extends DataStructureImpl {

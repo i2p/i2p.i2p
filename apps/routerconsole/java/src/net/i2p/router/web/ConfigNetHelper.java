@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import net.i2p.data.DataHelper;
-import net.i2p.data.RouterAddress;
+import net.i2p.data.router.RouterAddress;
 import net.i2p.router.CommSystemFacade;
 import net.i2p.router.Router;
 import net.i2p.router.transport.TransportManager;

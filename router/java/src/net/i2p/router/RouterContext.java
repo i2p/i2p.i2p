@@ -10,7 +10,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import net.i2p.I2PAppContext;
 import net.i2p.app.ClientAppManager;
 import net.i2p.data.Hash;
-import net.i2p.data.RouterInfo;
+import net.i2p.data.router.RouterInfo;
 import net.i2p.internal.InternalClientManager;
 import net.i2p.router.client.ClientManagerFacadeImpl;
 import net.i2p.router.crypto.TransientSessionKeyManager;

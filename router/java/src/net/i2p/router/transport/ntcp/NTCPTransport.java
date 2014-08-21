@@ -25,9 +25,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
-import net.i2p.data.RouterAddress;
-import net.i2p.data.RouterIdentity;
-import net.i2p.data.RouterInfo;
+import net.i2p.data.router.RouterAddress;
+import net.i2p.data.router.RouterIdentity;
+import net.i2p.data.router.RouterInfo;
 import net.i2p.data.i2np.DatabaseStoreMessage;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.router.CommSystemFacade;

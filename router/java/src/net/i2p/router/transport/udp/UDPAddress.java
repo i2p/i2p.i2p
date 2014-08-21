@@ -5,7 +5,7 @@ import java.net.UnknownHostException;
 import java.util.Map;
 
 import net.i2p.data.Base64;
-import net.i2p.data.RouterAddress;
+import net.i2p.data.router.RouterAddress;
 import net.i2p.data.SessionKey;
 import net.i2p.util.LHMCache;
 import net.i2p.util.SystemVersion;

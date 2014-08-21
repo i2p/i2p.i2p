@@ -13,7 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
-import net.i2p.data.RouterInfo;
+import net.i2p.data.router.RouterInfo;
 import net.i2p.data.i2np.DatabaseLookupMessage;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.kademlia.KBucketSet;

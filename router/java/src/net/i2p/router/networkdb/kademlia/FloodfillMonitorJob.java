@@ -3,8 +3,8 @@ package net.i2p.router.networkdb.kademlia;
 import java.util.List;
 
 import net.i2p.data.Hash;
-import net.i2p.data.RouterAddress;
-import net.i2p.data.RouterInfo;
+import net.i2p.data.router.RouterAddress;
+import net.i2p.data.router.RouterInfo;
 import net.i2p.router.JobImpl;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;

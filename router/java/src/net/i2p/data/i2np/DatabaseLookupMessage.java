@@ -17,7 +17,7 @@ import java.util.Set;
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
-import net.i2p.data.RouterInfo;
+import net.i2p.data.router.RouterInfo;
 import net.i2p.data.SessionKey;
 import net.i2p.data.SessionTag;
 import net.i2p.data.TunnelId;
