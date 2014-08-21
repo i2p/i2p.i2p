@@ -244,6 +244,8 @@
          <%
                String cPort= indexBean.getClientPort2(curClient);
                out.write(cPort);
+               if (indexBean.isSSLEnabled(curClient))
+                   out.write(" SSL");
           %>
             </span>
         </div>

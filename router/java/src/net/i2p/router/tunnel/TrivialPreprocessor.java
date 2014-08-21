@@ -17,6 +17,9 @@ import net.i2p.util.SimpleByteCache;
  * optimal throughput.
  *
  * See FragmentHandler Javadoc for tunnel message fragment format
+ *
+ * Not instantiated directly except in unit tests; see BatchedPreprocessor
+ *
  */
 class TrivialPreprocessor implements TunnelGateway.QueuePreprocessor {
     protected final RouterContext _context;
@@ -48,7 +51,7 @@ class TrivialPreprocessor implements TunnelGateway.QueuePreprocessor {
      * NOTE: Unused here, see BatchedPreprocessor override, super is not called.
      */
     public boolean preprocessQueue(List<PendingGatewayMessage> pending, TunnelGateway.Sender sender, TunnelGateway.Receiver rec) {
-        throw new IllegalArgumentException("unused, right?");
+        throw new UnsupportedOperationException("unused, right?");
     }
     
     protected void notePreprocessing(long messageId, int numFragments, int totalLength, List<Long> messageIds, String msg) {}
@@ -265,7 +268,7 @@ class TrivialPreprocessor implements TunnelGateway.QueuePreprocessor {
      *  Does NOT include 4 for the message ID if the message will be fragmented;
      *  call getInstructionAugmentationSize() for that.
      */
-    protected int getInstructionsSize(PendingGatewayMessage msg) {
+    protected static int getInstructionsSize(PendingGatewayMessage msg) {
         if (msg.getFragmentNumber() > 0) 
             return 7;
         // control byte
@@ -283,7 +286,7 @@ class TrivialPreprocessor implements TunnelGateway.QueuePreprocessor {
     }
     
     /** @return 0 or 4 */
-    protected int getInstructionAugmentationSize(PendingGatewayMessage msg, int offset, int instructionsSize) {
+    protected static int getInstructionAugmentationSize(PendingGatewayMessage msg, int offset, int instructionsSize) {
         int payloadLength = msg.getData().length - msg.getOffset();
         if (offset + payloadLength + instructionsSize + IV_SIZE + 1 + 4 > PREPROCESSED_SIZE) {
             // requires fragmentation, so include the messageId

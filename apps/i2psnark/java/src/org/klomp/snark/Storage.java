@@ -74,7 +74,7 @@ public class Storage
   /** The default piece size. */
   private static final int DEFAULT_PIECE_SIZE = 256*1024;
   /** bigger than this will be rejected */
-  public static final int MAX_PIECE_SIZE = 4*1024*1024;
+  public static final int MAX_PIECE_SIZE = 8*1024*1024;
   /** The maximum number of pieces in a torrent. */
   public static final int MAX_PIECES = 10*1024;
   public static final long MAX_TOTAL_SIZE = MAX_PIECE_SIZE * (long) MAX_PIECES;
@@ -601,7 +601,6 @@ public class Storage
    * Doesn't really reopen the file descriptors for a restart.
    * Just does an existence check but no length check or data reverification
    *
-   * @param rootDir ignored
    * @throws IOE on fail
    */
   public void reopen() throws IOException

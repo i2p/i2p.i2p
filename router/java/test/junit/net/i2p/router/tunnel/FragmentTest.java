@@ -66,8 +66,8 @@ public class FragmentTest {
 
         try {
             pre.preprocessQueue(messages, new SenderImpl(), receiver);
-            fail("should have thrown IAE");
-        } catch (IllegalArgumentException expected){}
+            fail("should have thrown UOE");
+        } catch (UnsupportedOperationException expected){}
     }
     
     /**
@@ -89,8 +89,8 @@ public class FragmentTest {
             
         try {
             pre.preprocessQueue(messages, new SenderImpl(), receiver);
-            fail("should have thrown IAE");
-        } catch (IllegalArgumentException expected){}
+            fail("should have thrown UOE");
+        } catch (UnsupportedOperationException expected){}
     }
     
     /**
