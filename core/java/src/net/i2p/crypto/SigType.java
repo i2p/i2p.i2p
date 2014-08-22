@@ -29,27 +29,30 @@ public enum SigType {
      *  Pubkey 128 bytes; privkey 20 bytes; hash 20 bytes; sig 40 bytes
      *  @since 0.9.8
      */
-    DSA_SHA1(0, 128, 20, 20, 40, SigAlgo.DSA, "SHA-1", "SHA1withDSA", CryptoConstants.DSA_SHA1_SPEC),
+    DSA_SHA1(0, 128, 20, 20, 40, SigAlgo.DSA, "SHA-1", "SHA1withDSA", CryptoConstants.DSA_SHA1_SPEC, "0"),
     /**  Pubkey 64 bytes; privkey 32 bytes; hash 32 bytes; sig 64 bytes */
-    ECDSA_SHA256_P256(1, 64, 32, 32, 64, SigAlgo.EC, "SHA-256", "SHA256withECDSA", ECConstants.P256_SPEC),
+    ECDSA_SHA256_P256(1, 64, 32, 32, 64, SigAlgo.EC, "SHA-256", "SHA256withECDSA", ECConstants.P256_SPEC, "0.9.12"),
     /**  Pubkey 96 bytes; privkey 48 bytes; hash 48 bytes; sig 96 bytes */
-    ECDSA_SHA384_P384(2, 96, 48, 48, 96, SigAlgo.EC, "SHA-384", "SHA384withECDSA", ECConstants.P384_SPEC),
+    ECDSA_SHA384_P384(2, 96, 48, 48, 96, SigAlgo.EC, "SHA-384", "SHA384withECDSA", ECConstants.P384_SPEC, "0.9.12"),
     /**  Pubkey 132 bytes; privkey 66 bytes; hash 64 bytes; sig 132 bytes */
-    ECDSA_SHA512_P521(3, 132, 66, 64, 132, SigAlgo.EC, "SHA-512", "SHA512withECDSA", ECConstants.P521_SPEC),
+    ECDSA_SHA512_P521(3, 132, 66, 64, 132, SigAlgo.EC, "SHA-512", "SHA512withECDSA", ECConstants.P521_SPEC, "0.9.12"),
 
     /**  Pubkey 256 bytes; privkey 512 bytes; hash 32 bytes; sig 256 bytes */
-    RSA_SHA256_2048(4, 256, 512, 32, 256, SigAlgo.RSA, "SHA-256", "SHA256withRSA", RSAConstants.F4_2048_SPEC),
+    RSA_SHA256_2048(4, 256, 512, 32, 256, SigAlgo.RSA, "SHA-256", "SHA256withRSA", RSAConstants.F4_2048_SPEC, "0.9.12"),
     /**  Pubkey 384 bytes; privkey 768 bytes; hash 48 bytes; sig 384 bytes */
-    RSA_SHA384_3072(5, 384, 768, 48, 384, SigAlgo.RSA, "SHA-384", "SHA384withRSA", RSAConstants.F4_3072_SPEC),
+    RSA_SHA384_3072(5, 384, 768, 48, 384, SigAlgo.RSA, "SHA-384", "SHA384withRSA", RSAConstants.F4_3072_SPEC, "0.9.12"),
     /**  Pubkey 512 bytes; privkey 1024 bytes; hash 64 bytes; sig 512 bytes */
-    RSA_SHA512_4096(6, 512, 1024, 64, 512, SigAlgo.RSA, "SHA-512", "SHA512withRSA", RSAConstants.F4_4096_SPEC),
+    RSA_SHA512_4096(6, 512, 1024, 64, 512, SigAlgo.RSA, "SHA-512", "SHA512withRSA", RSAConstants.F4_4096_SPEC, "0.9.12"),
 
+    /**
+     *  Pubkey 32 bytes; privkey 32 bytes; hash 64 bytes; sig 64 bytes
+     *  @since 0.9.15
+     */
+    EdDSA_SHA512_Ed25519(7, 32, 32, 64, 64, SigAlgo.EdDSA, "SHA-512", "SHA512withEdDSA", EdDSANamedCurveTable.getByName("ed25519-sha-512"), "0.9.15");
 
 
     // TESTING....................
 
-    /** Pubkey 32 bytes; privkey 32 bytes; hash 64 bytes; sig 64 bytes; */
-    EdDSA_SHA512_Ed25519(4, 32, 32, 64, 64, SigAlgo.EdDSA, "SHA-512", "SHA512withEdDSA", EdDSANamedCurveTable.getByName("ed25519-sha-512"));
 
     // others..........
 
@@ -90,11 +93,11 @@ public enum SigType {
 
     private final int code, pubkeyLen, privkeyLen, hashLen, sigLen;
     private final SigAlgo base;
-    private final String digestName, algoName;
+    private final String digestName, algoName, since;
     private final AlgorithmParameterSpec params;
 
     SigType(int cod, int pubLen, int privLen, int hLen, int sLen, SigAlgo baseAlgo,
-            String mdName, String aName, AlgorithmParameterSpec pSpec) {
+            String mdName, String aName, AlgorithmParameterSpec pSpec, String supportedSince) {
         code = cod;
         pubkeyLen = pubLen;
         privkeyLen = privLen;
@@ -104,6 +107,7 @@ public enum SigType {
         digestName = mdName;
         algoName = aName;
         params = pSpec;
+        since = supportedSince;
     }
 
     /** the unique identifier for this type */
@@ -163,6 +167,15 @@ public enum SigType {
     }
 
     /**
+     *  The router version in which this type was first supported.
+     *
+     *  @since 0.9.15
+     */
+    public String getSupportedSince() {
+        return since;
+    }
+
+    /**
      *  @since 0.9.12
      *  @return true if supported in this JVM
      */
@@ -208,7 +221,8 @@ public enum SigType {
 
     static {
         for (SigType type : SigType.values()) {
-            BY_CODE.put(Integer.valueOf(type.getCode()), type);
+            if (BY_CODE.put(Integer.valueOf(type.getCode()), type) != null)
+                throw new IllegalStateException("Duplicate SigType code");
         }
     }
 
@@ -226,7 +240,11 @@ public enum SigType {
      */
     public static SigType parseSigType(String stype) {
         try {
-            return valueOf(stype.toUpperCase(Locale.US));
+            String uc = stype.toUpperCase(Locale.US);
+            // handle mixed-case enum
+            if (uc.equals("EDDSA_SHA512_ED25519"))
+                return EdDSA_SHA512_Ed25519;
+            return valueOf(uc);
         } catch (IllegalArgumentException iae) {
             try {
                 int code = Integer.parseInt(stype);

@@ -1,3 +1,13 @@
+2014-08-22 zzz
+ * SigTypes:
+   - Add isSupportedSince(), use in floodfill selection
+   - Handle mixed-case 25519 enum
+   - Fix 25519 type code
+   - Add dup type code check
+
+2014-08-21 str4d
+ * Add Ed25519 SigType
+
 2014-08-21 zzz
  * i2psnark:
    - Escape control chars in encodePath()

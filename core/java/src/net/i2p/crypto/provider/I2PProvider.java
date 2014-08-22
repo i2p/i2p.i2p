@@ -4,6 +4,9 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.security.Provider;
 
+/**
+ *  @since 0.9.15
+ */
 public final class I2PProvider extends Provider {
     public static final String PROVIDER_NAME = "I2P";
     private static final String INFO = "I2P Security Provider v0.1, implementing" +

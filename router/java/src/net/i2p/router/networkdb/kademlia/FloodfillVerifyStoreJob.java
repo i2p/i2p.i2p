@@ -171,21 +171,23 @@ class FloodfillVerifyStoreJob extends JobImpl {
     private Hash pickTarget() {
         Hash rkey = getContext().routingKeyGenerator().getRoutingKey(_key);
         FloodfillPeerSelector sel = (FloodfillPeerSelector)_facade.getPeerSelector();
-        boolean isKeyCert = false;
+        Certificate keyCert = null;
         if (!_isRouterInfo) {
             LeaseSet ls = _facade.lookupLeaseSetLocally(_key);
-            if (ls != null &&
-                ls.getDestination().getCertificate().getCertificateType() == Certificate.CERTIFICATE_TYPE_KEY)
-                isKeyCert = true;
+            if (ls != null) {
+                Certificate cert = ls.getDestination().getCertificate();
+                if (cert.getCertificateType() == Certificate.CERTIFICATE_TYPE_KEY)
+                    keyCert = cert;
+            }
         }
-        if (isKeyCert) {
+        if (keyCert != null) {
             while (true) {
                 List<Hash> peers = sel.selectFloodfillParticipants(rkey, 1, _ignore, _facade.getKBuckets());
                 if (peers.isEmpty())
                     break;
                 Hash peer = peers.get(0);
                 RouterInfo ri = _facade.lookupRouterInfoLocally(peer);
-                if (ri != null && StoreJob.supportsKeyCerts(ri))
+                if (ri != null && StoreJob.supportsCert(ri, keyCert))
                     return peer;
                 if (_log.shouldLog(Log.INFO))
                     _log.info(getJobId() + ": Skipping verify w/ router that doesn't support key certs " + peer);
