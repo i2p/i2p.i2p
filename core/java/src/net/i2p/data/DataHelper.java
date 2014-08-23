@@ -628,13 +628,17 @@ public class DataHelper {
      * Integers are a fixed number of bytes (numBytes), stored as unsigned integers in network byte order.
      * @param value value to write out, non-negative
      * @param rawStream stream to write to
-     * @param numBytes number of bytes to write the number into (padding as necessary)
-     * @throws DataFormatException if value is negative
+     * @param numBytes number of bytes to write the number into, 1-8 (padding as necessary)
+     * @throws DataFormatException if value is negative or if numBytes not 1-8
      * @throws IOException if there is an IO error writing to the stream
      */
     public static void writeLong(OutputStream rawStream, int numBytes, long value) 
         throws DataFormatException, IOException {
-        if (value < 0) throw new DataFormatException("Value is negative (" + value + ")");
+        if (numBytes <= 0 || numBytes > 8)
+            // probably got the args backwards
+            throw new DataFormatException("Bad byte count " + numBytes);
+        if (value < 0)
+            throw new DataFormatException("Value is negative (" + value + ")");
         for (int i = (numBytes - 1) * 8; i >= 0; i -= 8) {
             byte cur = (byte) (value >> i);
             rawStream.write(cur);
