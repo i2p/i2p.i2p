@@ -19,7 +19,7 @@ Proxy-Connection: close
 <h3>_("Warning: Eepsite Unreachable")</h3>
 <p>
 _("The eepsite was not reachable, because its lease set was not found.")
-_("The eepsite is probably down.")
+_("The eepsite is probably down, but there could also be network congestion.")
 _("You may want to {0}retry{1}.", "<a href=\"javascript:window.location.reload()\">", "</a>")</p>
 <hr>
 <p><b>_("Could not find the following destination:")</b>

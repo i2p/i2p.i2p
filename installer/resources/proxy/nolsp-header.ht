@@ -19,7 +19,7 @@ Proxy-Connection: close
 <h3>_("Warning: Outproxy Not Found")</h3>
 <p>
 _("The HTTP outproxy was not reachable, because its lease set was not found.")
-_("The outproxy is probably down.")
+_("The outproxy is probably down, but there could also be network congestion.")
 _("You may want to {0}retry{1} as this will randomly reselect an outproxy from the pool you have defined {2}here{3} (if you have more than one configured).", "<a href=\"javascript:parent.window.location.reload()\">", "</a>", "<a href=\"http://127.0.0.1:7657/i2ptunnel/index.jsp\">", "</a>")
 _("If you continue to have trouble you may want to edit your outproxy list {0}here{1}.", "<a href=\"http://127.0.0.1:7657/i2ptunnel/edit.jsp?tunnel=0\">", "</a>")
 </p>
