@@ -196,6 +196,9 @@ class TrackerInfo
     return complete;
   }
 
+  /**
+   *  Not HTML escaped.
+   */
   public String getFailureReason()
   {
     return failure_reason;

@@ -60,6 +60,7 @@ public class I2PSnarkServlet extends BasicServlet {
     private static final String DEFAULT_NAME = "i2psnark";
     public static final String PROP_CONFIG_FILE = "i2psnark.configFile";
     private static final String WARBASE = "/.icons/";
+    private static final char HELLIP = '\u2026';
  
     public I2PSnarkServlet() {
         super();
@@ -1256,7 +1257,7 @@ public class I2PSnarkServlet extends BasicServlet {
             String start = basename.substring(0, MAX_DISPLAYED_FILENAME_LENGTH);
             if (start.indexOf(" ") < 0 && start.indexOf("-") < 0) {
                 // browser has nowhere to break it
-                basename = start + "&hellip;";
+                basename = start + HELLIP;
             }
         }
         // includes skipped files, -1 for magnet mode
@@ -1307,7 +1308,9 @@ public class I2PSnarkServlet extends BasicServlet {
                                ngettext("1 peer", "{0} peers", knownPeers);
             else {
                 if (err.length() > MAX_DISPLAYED_ERROR_LENGTH)
-                    err = err.substring(0, MAX_DISPLAYED_ERROR_LENGTH) + "&hellip;";
+                    err = DataHelper.escapeHTML(err.substring(0, MAX_DISPLAYED_ERROR_LENGTH)) + "&hellip;";
+                else
+                    err = DataHelper.escapeHTML(err);
                 statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "trackererror.png\" title=\"" + err + "\"></td>" +
                                "<td class=\"snarkTorrentStatus\">" + _("Tracker Error");
             }
@@ -1729,8 +1732,8 @@ public class I2PSnarkServlet extends BasicServlet {
                       (announce.startsWith("http://lnQ6yoBT") && aURL.startsWith("http://tracker2.postman.i2p/")) ||
                       (announce.startsWith("http://ahsplxkbhemefwvvml7qovzl5a2b5xo5i7lyai7ntdunvcyfdtna.b32.i2p/") && aURL.startsWith("http://tracker2.postman.i2p/"))))
                     continue;
-                String baseURL = t.baseURL;
-                String name = t.name;
+                String baseURL = urlEncode(t.baseURL);
+                String name = DataHelper.escapeHTML(t.name);
                 StringBuilder buf = new StringBuilder(128);
                 buf.append("<a href=\"").append(baseURL).append("details.php?dllist=1&amp;filelist=1&amp;info_hash=")
                    .append(TrackerClient.urlencode(infohash))
@@ -1774,9 +1777,11 @@ public class I2PSnarkServlet extends BasicServlet {
         if (trackerLinkUrl != null)
             buf.append(trackerLinkUrl);
         else
-            buf.append("<a href=\"http://").append(announce).append("/\">");
+            // TODO encode
+            buf.append("<a href=\"http://").append(urlEncode(announce)).append("/\">");
         if (announce.length() > 67)
-            announce = announce.substring(0, 40) + "&hellip;" + announce.substring(announce.length() - 8);
+            announce = DataHelper.escapeHTML(announce.substring(0, 40)) + "&hellip;" +
+                       DataHelper.escapeHTML(announce.substring(announce.length() - 8));
         buf.append(announce);
         buf.append("</a>");
         return buf.toString();
@@ -2274,7 +2279,7 @@ public class I2PSnarkServlet extends BasicServlet {
      */
     private static String urlEncode(String s) {
         return s.replace(";", "%3B").replace("&", "&amp;").replace(" ", "%20")
-                .replace("<", "&lt;").replace(">", "&gt;")
+                .replace("<", "%3C").replace(">", "%3E")
                 .replace("[", "%5B").replace("]", "%5D");
     }
 

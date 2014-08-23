@@ -6,6 +6,7 @@ import java.util.List;
 
 import net.i2p.I2PAppContext;
 import net.i2p.crypto.TrustedUpdate;
+import net.i2p.data.DataHelper;
 import net.i2p.update.*;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleTimer2;
@@ -297,9 +298,10 @@ class UpdateRunner implements UpdateTask, CompleteListener {
     //////// end CompleteListener methods
 
     private static String linkify(String url) {
-        String durl = url.length() <= 28 ? url :
-                                           url.substring(0, 25) + "&hellip;";
-        return "<a target=\"_blank\" href=\"" + url + "\"/>" + durl + "</a>";
+        String durl = url.length() <= 28 ? DataHelper.escapeHTML(url) :
+                                           DataHelper.escapeHTML(url.substring(0, 25)) + "&hellip;";
+        // TODO urlEncode instead
+        return "<a target=\"_blank\" href=\"" + DataHelper.escapeHTML(url) + "\"/>" + durl + "</a>";
     }
 
     private void updateStatus(String s) {

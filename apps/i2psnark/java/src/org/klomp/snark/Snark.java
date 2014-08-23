@@ -797,6 +797,7 @@ public class Snark
     }
 
     /**
+     *  Not HTML escaped.
      *  @return String returned from tracker, or null if no error
      *  @since 0.8.4
      */
