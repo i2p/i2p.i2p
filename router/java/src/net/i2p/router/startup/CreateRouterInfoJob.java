@@ -12,16 +12,21 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.security.GeneralSecurityException;
 import java.util.Properties;
 
+import net.i2p.crypto.SigType;
 import net.i2p.data.Certificate;
 import net.i2p.data.DataFormatException;
+import net.i2p.data.DataHelper;
+import net.i2p.data.KeyCertificate;
 import net.i2p.data.PrivateKey;
 import net.i2p.data.PublicKey;
 import net.i2p.data.router.RouterIdentity;
 import net.i2p.data.router.RouterInfo;
 import net.i2p.data.SigningPrivateKey;
 import net.i2p.data.SigningPublicKey;
+import net.i2p.data.SimpleDataStructure;
 import net.i2p.router.Job;
 import net.i2p.router.JobImpl;
 import net.i2p.router.Router;
@@ -40,7 +45,16 @@ public class CreateRouterInfoJob extends JobImpl {
     private final Log _log;
     private final Job _next;
     
-    public CreateRouterInfoJob(RouterContext ctx, Job next) {
+    public static final String INFO_FILENAME = "router.info";
+    static final String KEYS_FILENAME = "router.keys";
+    static final String KEYS2_FILENAME = "router.keys2";
+    private static final String PROP_ROUTER_SIGTYPE = "router.sigType";
+    /** TODO when changing, check isAvailable() and fallback to DSA_SHA1 */
+    private static final SigType DEFAULT_SIGTYPE = SigType.DSA_SHA1;
+    static final byte[] KEYS2_MAGIC = DataHelper.getASCII("I2Pkeys2");
+    static final int KEYS2_UNUSED_BYTES = 28;
+
+    CreateRouterInfoJob(RouterContext ctx, Job next) {
         super(ctx);
         _next = next;
         _log = ctx.logManager().getLog(CreateRouterInfoJob.class);
@@ -59,9 +73,24 @@ public class CreateRouterInfoJob extends JobImpl {
     
     /**
      *  Writes 6 files: router.info (standard RI format),
-     *  router,keys, and 4 individual key files under keyBackup/
+     *  router.keys2, and 4 individual key files under keyBackup/
      *
-     *  router.keys file format: Note that this is NOT the
+     *  router.keys2 file format: Note that this is NOT the
+     *  same "eepPriv.dat" format used by the client code.
+     *<pre>
+     *   - Magic "I2Pkeys2"
+     *   - 2 byte crypto type, always 0000 for now
+     *   - 2 byte sig type, see SigType
+     *   - 28 bytes unused
+     *   - Private key (256 bytes)
+     *   - Signing Private key (20 bytes or see SigType)
+     *   - Public key (256 bytes)
+     *   - Random padding for Signing Public Key if less than 128 bytes
+     *   - Signing Public key (128 bytes or see SigTpe)
+     *  Total 660 bytes
+     *</pre>
+     *
+     *  Old router.keys file format: Note that this is NOT the
      *  same "eepPriv.dat" format used by the client code.
      *<pre>
      *   - Private key (256 bytes)
@@ -74,6 +103,7 @@ public class CreateRouterInfoJob extends JobImpl {
      *  Caller must hold Router.routerInfoFileLock.
      */
     RouterInfo createRouterInfo() {
+        SigType type = getSigTypeConfig(getContext());
         RouterInfo info = new RouterInfo();
         OutputStream fos1 = null;
         OutputStream fos2 = null;
@@ -86,21 +116,26 @@ public class CreateRouterInfoJob extends JobImpl {
             // not necessary, in constructor
             //info.setPeers(new HashSet());
             info.setPublished(getCurrentPublishDate(getContext()));
-            RouterIdentity ident = new RouterIdentity();
-            Certificate cert = getContext().router().createCertificate();
-            ident.setCertificate(cert);
-            PublicKey pubkey = null;
-            PrivateKey privkey = null;
-            SigningPublicKey signingPubKey = null;
-            SigningPrivateKey signingPrivKey = null;
             Object keypair[] = getContext().keyGenerator().generatePKIKeypair();
-            pubkey = (PublicKey)keypair[0];
-            privkey = (PrivateKey)keypair[1];
-            Object signingKeypair[] = getContext().keyGenerator().generateSigningKeypair();
-            signingPubKey = (SigningPublicKey)signingKeypair[0];
-            signingPrivKey = (SigningPrivateKey)signingKeypair[1];
+            PublicKey pubkey = (PublicKey)keypair[0];
+            PrivateKey privkey = (PrivateKey)keypair[1];
+            SimpleDataStructure signingKeypair[] = getContext().keyGenerator().generateSigningKeys(type);
+            SigningPublicKey signingPubKey = (SigningPublicKey)signingKeypair[0];
+            SigningPrivateKey signingPrivKey = (SigningPrivateKey)signingKeypair[1];
+            RouterIdentity ident = new RouterIdentity();
+            Certificate cert = createCertificate(getContext(), signingPubKey);
+            ident.setCertificate(cert);
             ident.setPublicKey(pubkey);
             ident.setSigningPublicKey(signingPubKey);
+            byte[] padding;
+            int padLen = SigningPublicKey.KEYSIZE_BYTES - signingPubKey.length();
+            if (padLen > 0) {
+                padding = new byte[padLen];
+                getContext().random().nextBytes(padding);
+                ident.setPadding(padding);
+            } else {
+                padding = null;
+            }
             info.setIdentity(ident);
             
             info.sign(signingPrivKey);
@@ -108,23 +143,35 @@ public class CreateRouterInfoJob extends JobImpl {
             if (!info.isValid())
                 throw new DataFormatException("RouterInfo we just built is invalid: " + info);
             
-            String infoFilename = getContext().getProperty(Router.PROP_INFO_FILENAME, Router.PROP_INFO_FILENAME_DEFAULT);
-            File ifile = new File(getContext().getRouterDir(), infoFilename);
+            // remove router.keys
+            (new File(getContext().getRouterDir(), KEYS_FILENAME)).delete();
+
+            // write router.info
+            File ifile = new File(getContext().getRouterDir(), INFO_FILENAME);
             fos1 = new BufferedOutputStream(new SecureFileOutputStream(ifile));
             info.writeBytes(fos1);
             
-            String keyFilename = getContext().getProperty(Router.PROP_KEYS_FILENAME, Router.PROP_KEYS_FILENAME_DEFAULT);
-            File kfile = new File(getContext().getRouterDir(), keyFilename);
+            // write router.keys2
+            File kfile = new File(getContext().getRouterDir(), KEYS2_FILENAME);
             fos2 = new BufferedOutputStream(new SecureFileOutputStream(kfile));
+            fos2.write(KEYS2_MAGIC);
+            DataHelper.writeLong(fos2, 2, 0);
+            DataHelper.writeLong(fos2, 2, type.getCode());
+            fos2.write(new byte[KEYS2_UNUSED_BYTES]);
             privkey.writeBytes(fos2);
             signingPrivKey.writeBytes(fos2);
             pubkey.writeBytes(fos2);
+            if (padding != null)
+                fos2.write(padding);
             signingPubKey.writeBytes(fos2);
             
             getContext().keyManager().setKeys(pubkey, privkey, signingPubKey, signingPrivKey);
             
-            _log.info("Router info created and stored at " + ifile.getAbsolutePath() + " with private keys stored at " + kfile.getAbsolutePath() + " [" + info + "]");
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Router info created and stored at " + ifile.getAbsolutePath() + " with private keys stored at " + kfile.getAbsolutePath() + " [" + info + "]");
             getContext().router().eventLog().addEvent(EventLog.REKEYED, ident.calculateHash().toBase64());
+        } catch (GeneralSecurityException gse) {
+            _log.log(Log.CRIT, "Error building the new router information", gse);
         } catch (DataFormatException dfe) {
             _log.log(Log.CRIT, "Error building the new router information", dfe);
         } catch (IOException ioe) {
@@ -136,6 +183,20 @@ public class CreateRouterInfoJob extends JobImpl {
         return info;
     }
     
+    /**
+     *  The configured SigType to expect on read-in
+     *  @since 0.9.16
+     */
+    public static SigType getSigTypeConfig(RouterContext ctx) {
+        SigType cstype = CreateRouterInfoJob.DEFAULT_SIGTYPE;
+        String sstype = ctx.getProperty(PROP_ROUTER_SIGTYPE);
+        if (sstype != null) {
+            SigType ntype = SigType.parseSigType(sstype);
+            if (ntype != null && ntype.isAvailable())
+                cstype = ntype;
+        }
+        return cstype;
+    }
     
     /**
      * We probably don't want to expose the exact time at which a router published its info.
@@ -145,5 +206,23 @@ public class CreateRouterInfoJob extends JobImpl {
     static long getCurrentPublishDate(RouterContext context) {
         //_log.info("Setting published date to /now/");
         return context.clock().now();
+    }
+
+    /**
+     *  Only called at startup via LoadRouterInfoJob and RebuildRouterInfoJob.
+     *  Not called by periodic RepublishLocalRouterInfoJob.
+     *  We don't want to change the cert on the fly as it changes the router hash.
+     *  RouterInfo.isHidden() checks the capability, but RouterIdentity.isHidden() checks the cert.
+     *  There's no reason to ever add a hidden cert?
+     *
+     *  @return the certificate for a new RouterInfo - probably a null cert.
+     *  @since 0.9.16 moved from Router
+     */
+    static Certificate createCertificate(RouterContext ctx, SigningPublicKey spk) {
+        if (spk.getType() != SigType.DSA_SHA1)
+            return new KeyCertificate(spk);
+        if (ctx.getBooleanProperty(Router.PROP_HIDDEN))
+            return new Certificate(Certificate.CERTIFICATE_TYPE_HIDDEN, null);
+        return Certificate.NULL_CERT;
     }
 }

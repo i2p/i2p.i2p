@@ -12,7 +12,7 @@ import net.i2p.router.JobImpl;
 import net.i2p.router.RouterContext;
 
 /** start up the peer manager */
-public class BootPeerManagerJob extends JobImpl {
+class BootPeerManagerJob extends JobImpl {
     
     public BootPeerManagerJob(RouterContext ctx) {
         super(ctx);

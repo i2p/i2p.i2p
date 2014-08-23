@@ -15,7 +15,9 @@ import java.io.InputStream;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import net.i2p.crypto.SigType;
 import net.i2p.data.DataFormatException;
+import net.i2p.data.DataHelper;
 import net.i2p.data.PrivateKey;
 import net.i2p.data.PublicKey;
 import net.i2p.data.router.RouterInfo;
@@ -26,7 +28,11 @@ import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
 
-public class LoadRouterInfoJob extends JobImpl {
+/**
+ *  Run once or twice at startup by StartupJob,
+ *  and then runs BootCommSystemJob
+ */
+class LoadRouterInfoJob extends JobImpl {
     private final Log _log;
     private RouterInfo _us;
     private static final AtomicBoolean _keyLengthChecked = new AtomicBoolean();
@@ -45,6 +51,7 @@ public class LoadRouterInfoJob extends JobImpl {
         if (_us == null) {
             RebuildRouterInfoJob r = new RebuildRouterInfoJob(getContext());
             r.rebuildRouterInfo(false);
+            // run a second time
             getContext().jobQueue().addJob(this);
             return;
         } else {
@@ -54,15 +61,19 @@ public class LoadRouterInfoJob extends JobImpl {
         }
     }
     
+    /**
+     *  Loads router.info and router.keys2 or router.keys.
+     *
+     *  See CreateRouterInfoJob for file formats
+     */
     private void loadRouterInfo() {
-        String routerInfoFile = getContext().getProperty(Router.PROP_INFO_FILENAME, Router.PROP_INFO_FILENAME_DEFAULT);
         RouterInfo info = null;
-        String keyFilename = getContext().getProperty(Router.PROP_KEYS_FILENAME, Router.PROP_KEYS_FILENAME_DEFAULT);
-        
-        File rif = new File(getContext().getRouterDir(), routerInfoFile);
+        File rif = new File(getContext().getRouterDir(), CreateRouterInfoJob.INFO_FILENAME);
         boolean infoExists = rif.exists();
-        File rkf = new File(getContext().getRouterDir(), keyFilename);
+        File rkf = new File(getContext().getRouterDir(), CreateRouterInfoJob.KEYS_FILENAME);
         boolean keysExist = rkf.exists();
+        File rkf2 = new File(getContext().getRouterDir(), CreateRouterInfoJob.KEYS2_FILENAME);
+        boolean keys2Exist = rkf2.exists();
         
         InputStream fis1 = null;
         InputStream fis2 = null;
@@ -73,7 +84,7 @@ public class LoadRouterInfoJob extends JobImpl {
             // CRIT   ...sport.udp.EstablishmentManager: Error in the establisher java.lang.NullPointerException
             // at net.i2p.router.transport.udp.PacketBuilder.buildSessionConfirmedPacket(PacketBuilder.java:574)
             // so pretend the RI isn't there if there is no keyfile
-            if (infoExists && keysExist) {
+            if (infoExists && (keys2Exist || keysExist)) {
                 fis1 = new BufferedInputStream(new FileInputStream(rif));
                 info = new RouterInfo();
                 info.readBytes(fis1);
@@ -85,11 +96,37 @@ public class LoadRouterInfoJob extends JobImpl {
                 _us = info;
             }
             
-            if (keysExist) {
-                fis2 = new BufferedInputStream(new FileInputStream(rkf));
+            if (keys2Exist || keysExist) {
+                SigType stype;
+                if (keys2Exist) {
+                    fis2 = new BufferedInputStream(new FileInputStream(rkf2));
+                    // read keys2 headers
+                    byte[] magic = new byte[CreateRouterInfoJob.KEYS2_MAGIC.length];
+                    DataHelper.read(fis2, magic);
+                    if (!DataHelper.eq(magic, CreateRouterInfoJob.KEYS2_MAGIC))
+                        throw new IOException("Bad magic");
+                    int ctype = (int) DataHelper.readLong(fis2, 2);
+                    if (ctype != 0)
+                        throw new IOException("Unsupported RI crypto type " + ctype);
+                    int sstype = (int) DataHelper.readLong(fis2, 2);
+                    stype = SigType.getByCode(sstype);
+                    if (stype == null || !stype.isAvailable())
+                        throw new IOException("Unsupported RI sig type " + stype);
+                    DataHelper.skip(fis2, CreateRouterInfoJob.KEYS2_UNUSED_BYTES);
+                } else {
+                    fis2 = new BufferedInputStream(new FileInputStream(rkf));
+                    stype = SigType.DSA_SHA1;
+                }
+
+                // check if the sigtype config changed
+                SigType cstype = CreateRouterInfoJob.getSigTypeConfig(getContext());
+                boolean sigTypeChanged = stype != cstype;
+
                 PrivateKey privkey = new PrivateKey();
                 privkey.readBytes(fis2);
-                if (shouldRebuild(privkey)) {
+                if (sigTypeChanged || shouldRebuild(privkey)) {
+                    if (sigTypeChanged)
+                        _log.logAlways(Log.WARN, "Rebuilding RouterInfo with new signature type " + cstype);
                     _us = null;
                     // windows... close before deleting
                     if (fis1 != null) {
@@ -100,13 +137,19 @@ public class LoadRouterInfoJob extends JobImpl {
                     fis2 = null;
                     rif.delete();
                     rkf.delete();
+                    rkf2.delete();
                     return;
                 }
-                SigningPrivateKey signingPrivKey = new SigningPrivateKey();
+                SigningPrivateKey signingPrivKey = new SigningPrivateKey(stype);
                 signingPrivKey.readBytes(fis2);
                 PublicKey pubkey = new PublicKey();
                 pubkey.readBytes(fis2);
-                SigningPublicKey signingPubKey = new SigningPublicKey();
+                SigningPublicKey signingPubKey = new SigningPublicKey(stype);
+                int padLen = SigningPublicKey.KEYSIZE_BYTES - signingPubKey.length();
+                if (padLen > 0) {
+                    // we lose the padding as keymanager doesn't store it, what to do?
+                    DataHelper.skip(fis2, padLen);
+                }
                 signingPubKey.readBytes(fis2);
                 
                 getContext().keyManager().setKeys(pubkey, privkey, signingPubKey, signingPrivKey);
@@ -125,6 +168,7 @@ public class LoadRouterInfoJob extends JobImpl {
             }
             rif.delete();
             rkf.delete();
+            rkf2.delete();
         } catch (DataFormatException dfe) {
             _log.log(Log.CRIT, "Corrupt router info or keys at " + rif.getAbsolutePath() + " / " + rkf.getAbsolutePath(), dfe);
             _us = null;
@@ -139,6 +183,7 @@ public class LoadRouterInfoJob extends JobImpl {
             }
             rif.delete();
             rkf.delete();
+            rkf2.delete();
         } finally {
             if (fis1 != null) try { fis1.close(); } catch (IOException ioe) {}
             if (fis2 != null) try { fis2.close(); } catch (IOException ioe) {}

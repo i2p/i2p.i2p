@@ -36,6 +36,7 @@ import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.KeysAndCert;
 import net.i2p.data.Signature;
+import net.i2p.data.SimpleDataStructure;
 import net.i2p.util.Clock;
 import net.i2p.util.Log;
 import net.i2p.util.OrderedProperties;
@@ -525,17 +526,20 @@ public class RouterInfo extends DatabaseEntry {
     public void readBytes(InputStream in, boolean verifySig) throws DataFormatException, IOException {
         if (_signature != null)
             throw new IllegalStateException();
+        _identity = new RouterIdentity();
+        _identity.readBytes(in);
+        // can't set the digest until we know the sig type
         InputStream din;
         MessageDigest digest;
         if (verifySig) {
-            digest = SHA1.getInstance();
+            digest = _identity.getSigningPublicKey().getType().getDigestInstance();
+            // TODO any better way?
+            digest.update(_identity.toByteArray());
             din = new DigestInputStream(in, digest);
         } else {
             digest = null;
             din = in;
         }
-        _identity = new RouterIdentity();
-        _identity.readBytes(din);
         // avoid thrashing objects
         //Date when = DataHelper.readDate(in);
         //if (when == null)
@@ -565,7 +569,8 @@ public class RouterInfo extends DatabaseEntry {
         _signature.readBytes(in);
 
         if (verifySig) {
-            SHA1Hash hash = new SHA1Hash(digest.digest());
+            SimpleDataStructure hash = _identity.getSigningPublicKey().getType().getHashInstance();
+            hash.setData(digest.digest());
             _isValid = DSAEngine.getInstance().verifySignature(_signature, hash, _identity.getSigningPublicKey());
             _validated = true;
             if (!_isValid) {

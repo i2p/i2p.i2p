@@ -114,6 +114,8 @@ public class KeysAndCert extends DataStructureImpl {
         _publicKey.writeBytes(out);
         if (_padding != null)
             out.write(_padding);
+        else if (_signingKey.length() < SigningPublicKey.KEYSIZE_BYTES)
+            throw new DataFormatException("No padding set");
         _signingKey.writeTruncatedBytes(out);
         _certificate.writeBytes(out);
     }
