@@ -584,6 +584,13 @@ class PeerTestManager {
                         _log.warn("Too many active tests, droppping from Alice " + Addresses.toString(fromIP, fromPort));
                     return;
                 }
+                if (_transport.getPeerState(from) == null) {
+                    // Require an existing session to start a test,
+                    // as a way of preventing trouble
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("No session, dropping new test from Alice " + Addresses.toString(fromIP, fromPort));
+                    return;
+                }
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("test IP/port are blank coming from " + from + ", assuming we are Bob and they are alice");
                 receiveFromAliceAsBob(from, testInfo, nonce, null);
