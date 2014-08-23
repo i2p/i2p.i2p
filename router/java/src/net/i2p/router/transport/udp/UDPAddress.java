@@ -17,7 +17,7 @@ class UDPAddress {
     private final String _host;
     private InetAddress _hostAddress;
     private final int _port;
-    private byte[] _introKey;
+    private final byte[] _introKey;
     private String _introHosts[];
     private InetAddress _introAddresses[];
     private int _introPorts[];
@@ -62,6 +62,7 @@ class UDPAddress {
         if (addr == null) {
             _host = null;
             _port = 0;
+            _introKey = null;
             return;
         }
         _host = addr.getOption(PROP_HOST);
@@ -78,6 +79,10 @@ class UDPAddress {
             byte[] ik = Base64.decode(key.trim());
             if (ik != null && ik.length == SessionKey.KEYSIZE_BYTES)
                 _introKey = ik;
+            else
+                _introKey = null;
+        } else {
+            _introKey = null;
         }
         
         for (int i = MAX_INTRODUCERS - 1; i >= 0; i--) {
@@ -167,6 +172,9 @@ class UDPAddress {
      */
     public int getPort() { return _port; }
 
+    /**
+     *  @return shouldn't be null but will be if invalid
+     */
     byte[] getIntroKey() { return _introKey; }
     
     int getIntroducerCount() { return (_introAddresses == null ? 0 : _introAddresses.length); }

@@ -218,9 +218,12 @@ class IntroductionManager {
                 _log.info("Picking introducer: " + cur);
             cur.setIntroducerTime();
             UDPAddress ura = new UDPAddress(ra);
+            byte[] ikey = ura.getIntroKey();
+            if (ikey == null)
+                continue;
             ssuOptions.setProperty(UDPAddress.PROP_INTRO_HOST_PREFIX + found, Addresses.toString(ip));
             ssuOptions.setProperty(UDPAddress.PROP_INTRO_PORT_PREFIX + found, String.valueOf(port));
-            ssuOptions.setProperty(UDPAddress.PROP_INTRO_KEY_PREFIX + found, Base64.encode(ura.getIntroKey()));
+            ssuOptions.setProperty(UDPAddress.PROP_INTRO_KEY_PREFIX + found, Base64.encode(ikey));
             ssuOptions.setProperty(UDPAddress.PROP_INTRO_TAG_PREFIX + found, String.valueOf(cur.getTheyRelayToUsAs()));
             found++;
         }
