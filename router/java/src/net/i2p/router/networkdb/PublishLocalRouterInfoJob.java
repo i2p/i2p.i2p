@@ -38,7 +38,7 @@ public class PublishLocalRouterInfoJob extends JobImpl {
      *  floodfills since we store directly.
      *  Too long and the floodfill will drop us - timeout is 60 minutes.
      */
-    private static final long PUBLISH_DELAY = MIN_PUBLISH_DELAY * 5 / 3;
+    private static final long PUBLISH_DELAY = MIN_PUBLISH_DELAY * 2;
 
     /** this needs to be long enough to give us time to start up,
         but less than 20m (when we start accepting tunnels and could be a IBGW)
