@@ -184,7 +184,6 @@ public class ProfileOrganizer {
         if (profile == null) return null;
 
         Hash peer = profile.getPeer();
-        if (peer == null) return null;
 
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("New profile created for " + peer);
