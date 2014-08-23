@@ -4,6 +4,7 @@ import java.util.Iterator;
 import java.util.Properties;
 import java.util.Set;
 
+import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.router.TunnelPoolSettings;
 
@@ -46,7 +47,7 @@ public class ConfigTunnelsHelper extends HelperBase {
                 name = dest.calculateHash().toBase64().substring(0,6);
         
             String prefix = dest.calculateHash().toBase64().substring(0,4);
-            renderForm(buf, cur, prefix, _("Client tunnels for {0}", _(name)), in, out);
+            renderForm(buf, cur, prefix, _("Client tunnels for {0}", DataHelper.escapeHTML(_(name))), in, out);
             cur++;
         }
         

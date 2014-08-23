@@ -10,16 +10,12 @@ import net.i2p.util.Log;
 
 /**
  * Handler to deal with form submissions from the tunnel config form and act
- * upon the values.  Holy crap, this is UUUUGLY
+ * upon the values.
  *
  */
 public class ConfigTunnelsHandler extends FormHandler {
-    private Map _settings;
+
     private boolean _shouldSave;
-    
-    public ConfigTunnelsHandler() {
-        _shouldSave = false;
-    }
     
     @Override
     protected void processForm() {
@@ -34,8 +30,6 @@ public class ConfigTunnelsHandler extends FormHandler {
         if ( (moo != null) && (moo.equals(_("Save changes"))) )
             _shouldSave = true; 
     }
-    
-    public void setSettings(Map settings) { _settings = new HashMap(settings); }
     
     /**
      * The user made changes to the network config and wants to save them, so
@@ -143,6 +137,7 @@ public class ConfigTunnelsHandler extends FormHandler {
                 addFormError(_("Error saving the configuration (applied but not saved) - please see the error logs."));
         }
     }
+
     private static final int getInt(Object val) { 
         if (val == null) return 0;
         String str = null;

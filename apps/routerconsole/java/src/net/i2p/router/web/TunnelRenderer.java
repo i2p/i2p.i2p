@@ -57,7 +57,7 @@ public class TunnelRenderer {
             if (name == null)
                 name = client.toBase64().substring(0,4);
             out.write("<h2><a name=\"" + client.toBase64().substring(0,4)
-                      + "\" ></a>" + _("Client tunnels for") + ' ' + _(name));
+                      + "\" ></a>" + _("Client tunnels for") + ' ' + DataHelper.escapeHTML(_(name)));
             if (isLocal)
                 out.write(" (<a href=\"/configtunnels#" + client.toBase64().substring(0,4) +"\">" + _("configure") + "</a>)</h2>\n");
             else

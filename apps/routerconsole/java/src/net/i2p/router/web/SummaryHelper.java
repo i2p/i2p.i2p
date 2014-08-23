@@ -433,9 +433,9 @@ public class SummaryHelper extends HelperBase {
                 buf.append("</td><td align=\"left\"><b><a href=\"tunnels#").append(h.toBase64().substring(0,4));
                 buf.append("\" target=\"_top\" title=\"").append(_("Show tunnels")).append("\">");
                 if (name.length() < 18)
-                    buf.append(name);
+                    buf.append(DataHelper.escapeHTML(name));
                 else
-                    buf.append(name.substring(0,15)).append("&hellip;");
+                    buf.append(DataHelper.escapeHTML(name.substring(0,15))).append("&hellip;");
                 buf.append("</a></b></td>\n");
                 LeaseSet ls = _context.netDb().lookupLeaseSetLocally(h);
                 if (ls != null && _context.tunnelManager().getOutboundClientTunnelCount(h) > 0) {
