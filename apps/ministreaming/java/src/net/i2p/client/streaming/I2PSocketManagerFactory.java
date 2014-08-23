@@ -278,7 +278,7 @@ public class I2PSocketManagerFactory {
             String st = opts.getProperty(I2PClient.PROP_SIGTYPE);
             if (st != null) {
                 SigType rv = SigType.parseSigType(st);
-                if (rv != null)
+                if (rv != null && rv.isAvailable())
                     return rv;
                 getLog().error("Unsupported sig type " + st);
             }
