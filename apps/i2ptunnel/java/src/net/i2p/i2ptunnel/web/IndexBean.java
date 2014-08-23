@@ -484,7 +484,7 @@ public class IndexBean {
     public String getTunnelName(int tunnel) {
         TunnelController tun = getController(tunnel);
         if (tun != null && tun.getName() != null)
-            return tun.getName();
+            return DataHelper.escapeHTML(tun.getName());
         else
             return _("New Tunnel");
     }
@@ -590,7 +590,7 @@ public class IndexBean {
     public String getTunnelDescription(int tunnel) {
         TunnelController tun = getController(tunnel);
         if (tun != null && tun.getDescription() != null)
-            return tun.getDescription();
+            return DataHelper.escapeHTML(tun.getDescription());
         else
             return "";
     }
