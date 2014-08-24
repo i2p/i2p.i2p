@@ -34,6 +34,7 @@ import net.i2p.data.SigningPrivateKey;
 import net.i2p.data.i2np.GarlicMessage;
 import net.i2p.router.message.GarlicMessageHandler;
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
+import net.i2p.router.startup.CreateRouterInfoJob;
 import net.i2p.router.startup.StartupJob;
 import net.i2p.router.startup.WorkingDir;
 import net.i2p.router.tasks.*;
@@ -679,16 +680,18 @@ public class Router implements RouterClock.ClockShiftListener {
      * Ugly list of files that we need to kill if we are building a new identity
      *
      */
-    private static final String _rebuildFiles[] = new String[] { "router.info", 
-                                                                 "router.keys",
-                                                                 "netDb/my.info",      // no longer used
-                                                                 "connectionTag.keys", // never used?
-                                                                 "keyBackup/privateEncryption.key",
-                                                                 "keyBackup/privateSigning.key",
-                                                                 "keyBackup/publicEncryption.key",
-                                                                 "keyBackup/publicSigning.key",
-                                                                 "sessionKeys.dat"     // no longer used
-                                                               };
+    private static final String _rebuildFiles[] = new String[] {
+        CreateRouterInfoJob.INFO_FILENAME,
+        CreateRouterInfoJob.KEYS_FILENAME,
+        CreateRouterInfoJob.KEYS2_FILENAME,
+        "netDb/my.info",      // no longer used
+        "connectionTag.keys", // never used?
+        KeyManager.DEFAULT_KEYDIR + '/' + KeyManager.KEYFILE_PRIVATE_ENC,
+        KeyManager.DEFAULT_KEYDIR + '/' + KeyManager.KEYFILE_PUBLIC_ENC,
+        KeyManager.DEFAULT_KEYDIR + '/' + KeyManager.KEYFILE_PRIVATE_SIGNING,
+        KeyManager.DEFAULT_KEYDIR + '/' + KeyManager.KEYFILE_PUBLIC_SIGNING,
+        "sessionKeys.dat"     // no longer used
+    };
 
     public void killKeys() {
         //new Exception("Clearing identity files").printStackTrace();

@@ -8,11 +8,8 @@ package net.i2p.router.startup;
  *
  */
 
-import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.InputStream;
 import java.io.IOException;
 import java.util.Properties;
 
@@ -29,6 +26,7 @@ import net.i2p.data.SigningPublicKey;
 import net.i2p.router.JobImpl;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
+import net.i2p.router.startup.LoadRouterInfoJob.KeyData;
 import net.i2p.util.Log;
 import net.i2p.util.SecureFileOutputStream;
 
@@ -96,61 +94,16 @@ class RebuildRouterInfoJob extends JobImpl {
             // ok, no need to rebuild a brand new identity, just update what we can
             RouterInfo oldinfo = getContext().router().getRouterInfo();
             if (oldinfo == null) {
-                info = new RouterInfo();
-                InputStream fis = null;
                 try {
-                    SigType stype;
-                    if (keyFile2.exists()) {
-                        fis = new BufferedInputStream(new FileInputStream(keyFile2));
-                        byte[] magic = new byte[CreateRouterInfoJob.KEYS2_MAGIC.length];
-                        DataHelper.read(fis, magic);
-                        if (!DataHelper.eq(magic, CreateRouterInfoJob.KEYS2_MAGIC))
-                            throw new IOException("Bad magic");
-                        int ctype = (int) DataHelper.readLong(fis, 2);
-                        if (ctype != 0)
-                            throw new IOException("Unsupported RI crypto type " + ctype);
-                        int sstype = (int) DataHelper.readLong(fis, 2);
-                        stype = SigType.getByCode(sstype);
-                        if (stype == null || !stype.isAvailable())
-                            throw new IOException("Unsupported RI sig type " + stype);
-                        DataHelper.skip(fis, CreateRouterInfoJob.KEYS2_UNUSED_BYTES);
-                    } else {
-                        fis = new BufferedInputStream(new FileInputStream(keyFile));
-                        stype = SigType.DSA_SHA1;
-                    }
-                    PrivateKey privkey = new PrivateKey();
-                    privkey.readBytes(fis);
-                    SigningPrivateKey signingPrivKey = new SigningPrivateKey(stype);
-                    signingPrivKey.readBytes(fis);
-                    PublicKey pubkey = new PublicKey();
-                    pubkey.readBytes(fis);
-                    SigningPublicKey signingPubKey = new SigningPublicKey(stype);
-                    byte[] padding;
-                    int padLen = SigningPublicKey.KEYSIZE_BYTES - signingPubKey.length();
-                    if (padLen > 0) {
-                        padding = new byte[padLen];
-                        DataHelper.read(fis, padding);
-                    } else {
-                        padding = null;
-                    }
-                    signingPubKey.readBytes(fis);
-                    RouterIdentity ident = new RouterIdentity();
-                    Certificate cert = CreateRouterInfoJob.createCertificate(getContext(), signingPubKey);
-                    ident.setCertificate(cert);
-                    ident.setPublicKey(pubkey);
-                    ident.setSigningPublicKey(signingPubKey);
-                    if (padding != null)
-                        ident.setPadding(padding);
-                    info.setIdentity(ident);
+                    KeyData kd = LoadRouterInfoJob.readKeyData(keyFile, keyFile2);
+                    info = new RouterInfo();
+                    info.setIdentity(kd.routerIdentity);
                 } catch (Exception e) {
                     _log.log(Log.CRIT, "Error reading in the key data from " + keyFile.getAbsolutePath(), e);
-                    if (fis != null) try { fis.close(); } catch (IOException ioe) {}
-                    fis = null;
                     keyFile.delete();
+                    keyFile2.delete();
                     rebuildRouterInfo(alreadyRunning);
                     return;
-                } finally {
-                    if (fis != null) try { fis.close(); } catch (IOException ioe) {}
                 }
             } else {
                 // Make a new RI from the old identity, or else info.setAddresses() will throw an ISE

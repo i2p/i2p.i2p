@@ -16,13 +16,16 @@ import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import net.i2p.crypto.SigType;
+import net.i2p.data.Certificate;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.PrivateKey;
 import net.i2p.data.PublicKey;
-import net.i2p.data.router.RouterInfo;
 import net.i2p.data.SigningPrivateKey;
 import net.i2p.data.SigningPublicKey;
+import net.i2p.data.router.RouterIdentity;
+import net.i2p.data.router.RouterInfo;
+import net.i2p.data.router.RouterPrivateKeyFile;
 import net.i2p.router.JobImpl;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
@@ -76,7 +79,6 @@ class LoadRouterInfoJob extends JobImpl {
         boolean keys2Exist = rkf2.exists();
         
         InputStream fis1 = null;
-        InputStream fis2 = null;
         try {
             // if we have a routerinfo but no keys, things go bad in a hurry:
             // CRIT   ...rkdb.PublishLocalRouterInfoJob: Internal error - signing private key not known?  rescheduling publish for 30s
@@ -97,33 +99,17 @@ class LoadRouterInfoJob extends JobImpl {
             }
             
             if (keys2Exist || keysExist) {
-                SigType stype;
-                if (keys2Exist) {
-                    fis2 = new BufferedInputStream(new FileInputStream(rkf2));
-                    // read keys2 headers
-                    byte[] magic = new byte[CreateRouterInfoJob.KEYS2_MAGIC.length];
-                    DataHelper.read(fis2, magic);
-                    if (!DataHelper.eq(magic, CreateRouterInfoJob.KEYS2_MAGIC))
-                        throw new IOException("Bad magic");
-                    int ctype = (int) DataHelper.readLong(fis2, 2);
-                    if (ctype != 0)
-                        throw new IOException("Unsupported RI crypto type " + ctype);
-                    int sstype = (int) DataHelper.readLong(fis2, 2);
-                    stype = SigType.getByCode(sstype);
-                    if (stype == null || !stype.isAvailable())
-                        throw new IOException("Unsupported RI sig type " + stype);
-                    DataHelper.skip(fis2, CreateRouterInfoJob.KEYS2_UNUSED_BYTES);
-                } else {
-                    fis2 = new BufferedInputStream(new FileInputStream(rkf));
-                    stype = SigType.DSA_SHA1;
-                }
+                KeyData kd = readKeyData(rkf, rkf2);
+                PublicKey pubkey = kd.routerIdentity.getPublicKey();
+                SigningPublicKey signingPubKey = kd.routerIdentity.getSigningPublicKey();
+                PrivateKey privkey = kd.privateKey;
+                SigningPrivateKey signingPrivKey = kd.signingPrivateKey;
+                SigType stype = signingPubKey.getType();
 
                 // check if the sigtype config changed
                 SigType cstype = CreateRouterInfoJob.getSigTypeConfig(getContext());
                 boolean sigTypeChanged = stype != cstype;
 
-                PrivateKey privkey = new PrivateKey();
-                privkey.readBytes(fis2);
                 if (sigTypeChanged || shouldRebuild(privkey)) {
                     if (sigTypeChanged)
                         _log.logAlways(Log.WARN, "Rebuilding RouterInfo with new signature type " + cstype);
@@ -133,24 +119,11 @@ class LoadRouterInfoJob extends JobImpl {
                         try { fis1.close(); } catch (IOException ioe) {}
                         fis1 = null;
                     }
-                    try { fis2.close(); } catch (IOException ioe) {}
-                    fis2 = null;
                     rif.delete();
                     rkf.delete();
                     rkf2.delete();
                     return;
                 }
-                SigningPrivateKey signingPrivKey = new SigningPrivateKey(stype);
-                signingPrivKey.readBytes(fis2);
-                PublicKey pubkey = new PublicKey();
-                pubkey.readBytes(fis2);
-                SigningPublicKey signingPubKey = new SigningPublicKey(stype);
-                int padLen = SigningPublicKey.KEYSIZE_BYTES - signingPubKey.length();
-                if (padLen > 0) {
-                    // we lose the padding as keymanager doesn't store it, what to do?
-                    DataHelper.skip(fis2, padLen);
-                }
-                signingPubKey.readBytes(fis2);
                 
                 getContext().keyManager().setKeys(pubkey, privkey, signingPubKey, signingPrivKey);
             }
@@ -161,10 +134,6 @@ class LoadRouterInfoJob extends JobImpl {
             if (fis1 != null) {
                 try { fis1.close(); } catch (IOException ioe2) {}
                 fis1 = null;
-            }
-            if (fis2 != null) {
-                try { fis2.close(); } catch (IOException ioe2) {}
-                fis2 = null;
             }
             rif.delete();
             rkf.delete();
@@ -177,16 +146,11 @@ class LoadRouterInfoJob extends JobImpl {
                 try { fis1.close(); } catch (IOException ioe) {}
                 fis1 = null;
             }
-            if (fis2 != null) {
-                try { fis2.close(); } catch (IOException ioe) {}
-                fis2 = null;
-            }
             rif.delete();
             rkf.delete();
             rkf2.delete();
         } finally {
             if (fis1 != null) try { fis1.close(); } catch (IOException ioe) {}
-            if (fis2 != null) try { fis2.close(); } catch (IOException ioe) {}
         }
     }
 
@@ -218,5 +182,56 @@ class LoadRouterInfoJob extends JobImpl {
         if (!uselong && haslong)
             _log.logAlways(Log.WARN, "Rebuilding RouterInfo with faster key");
         return uselong != haslong;
+    }
+
+    /** @since 0.9.16 */
+    public static class KeyData {
+        public final RouterIdentity routerIdentity;
+        public final PrivateKey privateKey;
+        public final SigningPrivateKey signingPrivateKey;
+
+        public KeyData(RouterIdentity ri, PrivateKey pk, SigningPrivateKey spk) {
+            routerIdentity = ri;
+            privateKey = pk;
+            signingPrivateKey = spk;
+        }
+    }
+
+    /**
+     *  @param rkf1 in router.keys format, tried second
+     *  @param rkf2 in eepPriv.dat format, tried first
+     *  @return non-null, throws IOE if neither exisits
+     *  @since 0.9.16
+     */
+    public static KeyData readKeyData(File rkf1, File rkf2) throws DataFormatException, IOException {
+        RouterIdentity ri;
+        PrivateKey privkey;
+        SigningPrivateKey signingPrivKey;
+        if (rkf2.exists()) {
+            RouterPrivateKeyFile pkf = new RouterPrivateKeyFile(rkf2);
+            ri = pkf.getRouterIdentity();
+            privkey = pkf.getPrivKey();
+            signingPrivKey = pkf.getSigningPrivKey();
+        } else {
+            InputStream fis = null;
+            try {
+                fis = new BufferedInputStream(new FileInputStream(rkf1));
+                privkey = new PrivateKey();
+                privkey.readBytes(fis);
+                signingPrivKey = new SigningPrivateKey();
+                signingPrivKey.readBytes(fis);
+                PublicKey pubkey = new PublicKey();
+                pubkey.readBytes(fis);
+                SigningPublicKey signingPubKey = new SigningPublicKey();
+                signingPubKey.readBytes(fis);
+                ri = new RouterIdentity();
+                ri.setPublicKey(pubkey);
+                ri.setSigningPublicKey(signingPubKey);
+                ri.setCertificate(Certificate.NULL_CERT);
+            } finally {
+                if (fis != null) try { fis.close(); } catch (IOException ioe) {}
+            }
+        }
+        return new KeyData(ri, privkey, signingPrivKey);
     }
 }

@@ -21,6 +21,7 @@ import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.KeyCertificate;
 import net.i2p.data.PrivateKey;
+import net.i2p.data.PrivateKeyFile;
 import net.i2p.data.PublicKey;
 import net.i2p.data.router.RouterIdentity;
 import net.i2p.data.router.RouterInfo;
@@ -46,13 +47,11 @@ public class CreateRouterInfoJob extends JobImpl {
     private final Job _next;
     
     public static final String INFO_FILENAME = "router.info";
-    static final String KEYS_FILENAME = "router.keys";
-    static final String KEYS2_FILENAME = "router.keys2";
+    public static final String KEYS_FILENAME = "router.keys";
+    public static final String KEYS2_FILENAME = "router.keys.dat";
     private static final String PROP_ROUTER_SIGTYPE = "router.sigType";
     /** TODO when changing, check isAvailable() and fallback to DSA_SHA1 */
     private static final SigType DEFAULT_SIGTYPE = SigType.DSA_SHA1;
-    static final byte[] KEYS2_MAGIC = DataHelper.getASCII("I2Pkeys2");
-    static final int KEYS2_UNUSED_BYTES = 28;
 
     CreateRouterInfoJob(RouterContext ctx, Job next) {
         super(ctx);
@@ -75,20 +74,9 @@ public class CreateRouterInfoJob extends JobImpl {
      *  Writes 6 files: router.info (standard RI format),
      *  router.keys2, and 4 individual key files under keyBackup/
      *
-     *  router.keys2 file format: Note that this is NOT the
-     *  same "eepPriv.dat" format used by the client code.
-     *<pre>
-     *   - Magic "I2Pkeys2"
-     *   - 2 byte crypto type, always 0000 for now
-     *   - 2 byte sig type, see SigType
-     *   - 28 bytes unused
-     *   - Private key (256 bytes)
-     *   - Signing Private key (20 bytes or see SigType)
-     *   - Public key (256 bytes)
-     *   - Random padding for Signing Public Key if less than 128 bytes
-     *   - Signing Public key (128 bytes or see SigTpe)
-     *  Total 660 bytes
-     *</pre>
+     *  router.keys2 file format: This is the
+     *  same "eepPriv.dat" format used by the client code,
+     *  as documented in PrivateKeyFile.
      *
      *  Old router.keys file format: Note that this is NOT the
      *  same "eepPriv.dat" format used by the client code.
@@ -106,7 +94,6 @@ public class CreateRouterInfoJob extends JobImpl {
         SigType type = getSigTypeConfig(getContext());
         RouterInfo info = new RouterInfo();
         OutputStream fos1 = null;
-        OutputStream fos2 = null;
         try {
             info.setAddresses(getContext().commSystem().createAddresses());
             Properties stats = getContext().statPublisher().publishStatistics();
@@ -151,19 +138,11 @@ public class CreateRouterInfoJob extends JobImpl {
             fos1 = new BufferedOutputStream(new SecureFileOutputStream(ifile));
             info.writeBytes(fos1);
             
-            // write router.keys2
+            // write router.keys.dat
             File kfile = new File(getContext().getRouterDir(), KEYS2_FILENAME);
-            fos2 = new BufferedOutputStream(new SecureFileOutputStream(kfile));
-            fos2.write(KEYS2_MAGIC);
-            DataHelper.writeLong(fos2, 2, 0);
-            DataHelper.writeLong(fos2, 2, type.getCode());
-            fos2.write(new byte[KEYS2_UNUSED_BYTES]);
-            privkey.writeBytes(fos2);
-            signingPrivKey.writeBytes(fos2);
-            pubkey.writeBytes(fos2);
-            if (padding != null)
-                fos2.write(padding);
-            signingPubKey.writeBytes(fos2);
+            PrivateKeyFile pkf = new PrivateKeyFile(kfile, pubkey, signingPubKey, cert,
+                                                    privkey, signingPrivKey, padding);
+            pkf.write();
             
             getContext().keyManager().setKeys(pubkey, privkey, signingPubKey, signingPrivKey);
             
@@ -178,7 +157,6 @@ public class CreateRouterInfoJob extends JobImpl {
             _log.log(Log.CRIT, "Error writing out the new router information", ioe);
         } finally {
             if (fos1 != null) try { fos1.close(); } catch (IOException ioe) {}
-            if (fos2 != null) try { fos2.close(); } catch (IOException ioe) {}
         }
         return info;
     }

@@ -49,10 +49,10 @@ public class KeyManager {
     
     public final static String PROP_KEYDIR = "router.keyBackupDir";
     public final static String DEFAULT_KEYDIR = "keyBackup";
-    private final static String KEYFILE_PRIVATE_ENC = "privateEncryption.key";
-    private final static String KEYFILE_PUBLIC_ENC = "publicEncryption.key";
-    private final static String KEYFILE_PRIVATE_SIGNING = "privateSigning.key";
-    private final static String KEYFILE_PUBLIC_SIGNING = "publicSigning.key";
+    public final static String KEYFILE_PRIVATE_ENC = "privateEncryption.key";
+    public final static String KEYFILE_PUBLIC_ENC = "publicEncryption.key";
+    public final static String KEYFILE_PRIVATE_SIGNING = "privateSigning.key";
+    public final static String KEYFILE_PUBLIC_SIGNING = "publicSigning.key";
     
     public KeyManager(RouterContext context) {
         _context = context;
