@@ -596,14 +596,22 @@ class PacketBuilder {
         off += 4;
         DataHelper.toLong(data, off, 4, state.getSentSignedOnTime());
         off += 4;
-        System.arraycopy(state.getSentSignature().getData(), 0, data, off, Signature.SIGNATURE_BYTES);
-        off += Signature.SIGNATURE_BYTES;
-        // ok, we need another 8 bytes of random padding
-        // (ok, this only gives us 63 bits, not 64)
-        long l = _context.random().nextLong();
-        if (l < 0) l = 0 - l;
-        DataHelper.toLong(data, off, 8, l);
-        off += 8;
+
+        // handle variable signature size
+        Signature sig = state.getSentSignature();
+        int siglen = sig.length();
+        System.arraycopy(sig.getData(), 0, data, off, siglen);
+        off += siglen;
+        // ok, we need another few bytes of random padding
+        int rem = siglen % 16;
+        int padding;
+        if (rem > 0) {
+            padding = 16 - rem;
+            _context.random().nextBytes(data, off, padding);
+            off += padding;
+        } else {
+            padding = 0;
+        }
         
         if (_log.shouldLog(Log.DEBUG)) {
             StringBuilder buf = new StringBuilder(128);
@@ -612,9 +620,9 @@ class PacketBuilder {
             buf.append(" Bob: ").append(Addresses.toString(state.getReceivedOurIP(), externalPort));
             buf.append(" RelayTag: ").append(state.getSentRelayTag());
             buf.append(" SignedOn: ").append(state.getSentSignedOnTime());
-            buf.append(" signature: ").append(Base64.encode(state.getSentSignature().getData()));
+            buf.append(" signature: ").append(Base64.encode(sig.getData()));
             buf.append("\nRawCreated: ").append(Base64.encode(data, 0, off)); 
-            buf.append("\nsignedTime: ").append(Base64.encode(data, off-8-Signature.SIGNATURE_BYTES-4, 4));
+            buf.append("\nsignedTime: ").append(Base64.encode(data, off - padding - siglen - 4, 4));
             _log.debug(buf.toString());
         }
         
@@ -623,7 +631,7 @@ class PacketBuilder {
         byte[] iv = SimpleByteCache.acquire(UDPPacket.IV_SIZE);
         _context.random().nextBytes(iv);
         
-        int encrWrite = Signature.SIGNATURE_BYTES + 8;
+        int encrWrite = siglen + padding;
         int sigBegin = off - encrWrite;
         _context.aes().encrypt(data, sigBegin, data, sigBegin, state.getCipherKey(), iv, encrWrite);
         
@@ -774,8 +782,11 @@ class PacketBuilder {
             DataHelper.toLong(data, off, 4, state.getSentSignedOnTime());
             off += 4;
             
+            // handle variable signature size
             // we need to pad this so we're at the encryption boundary
-            int mod = (off + Signature.SIGNATURE_BYTES) & 0x0f;
+            Signature sig = state.getSentSignature();
+            int siglen = sig.length();
+            int mod = (off + siglen) & 0x0f;
             if (mod != 0) {
                 int paddingRequired = 16 - mod;
                 // add an arbitrary number of 16byte pad blocks too ???
@@ -787,8 +798,8 @@ class PacketBuilder {
             // so trailing non-mod-16 data is ignored. That truncates the sig.
             
             // BUG: NPE here if null signature
-            System.arraycopy(state.getSentSignature().getData(), 0, data, off, Signature.SIGNATURE_BYTES);
-            off += Signature.SIGNATURE_BYTES;
+            System.arraycopy(sig.getData(), 0, data, off, siglen);
+            off += siglen;
         } else {
             // We never get here (see above)
 

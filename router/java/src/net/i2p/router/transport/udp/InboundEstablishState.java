@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import net.i2p.crypto.SigType;
 import net.i2p.data.Base64;
 import net.i2p.data.ByteArray;
 import net.i2p.data.DataFormatException;
@@ -47,6 +48,9 @@ class InboundEstablishState {
     private long _receivedSignedOnTime;
     private byte _receivedSignature[];
     private boolean _verificationAttempted;
+    // sig not verified
+    private RouterIdentity _receivedUnconfirmedIdentity;
+    // identical to uncomfirmed, but sig now verified
     private RouterIdentity _receivedConfirmedIdentity;
     // general status 
     private final long _establishBegin;
@@ -295,9 +299,28 @@ class InboundEstablishState {
         
         if (cur == _receivedIdentity.length-1) {
             _receivedSignedOnTime = conf.readFinalFragmentSignedOnTime();
-            if (_receivedSignature == null)
-                _receivedSignature = new byte[Signature.SIGNATURE_BYTES];
-            conf.readFinalSignature(_receivedSignature, 0);
+            // TODO verify time to prevent replay attacks
+            buildIdentity();
+            if (_receivedUnconfirmedIdentity != null) {
+                SigType type = _receivedUnconfirmedIdentity.getSigningPublicKey().getType();
+                if (type != null) {
+                    int sigLen = type.getSigLen();
+                    if (_receivedSignature == null)
+                        _receivedSignature = new byte[sigLen];
+                    conf.readFinalSignature(_receivedSignature, 0, sigLen);
+                } else {
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Unsupported sig type from: " + toString());
+                    // _x() in UDPTransport
+                    _context.banlist().banlistRouterForever(_receivedUnconfirmedIdentity.calculateHash(),
+                                                            "Unsupported signature type");
+                    fail();
+                }
+            } else {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Bad ident from: " + toString());
+                fail();
+            }
         }
         
         if ( (_currentState == InboundState.IB_STATE_UNKNOWN) || 
@@ -318,9 +341,10 @@ class InboundEstablishState {
      */
     private boolean confirmedFullyReceived() {
         if (_receivedIdentity != null) {
-            for (int i = 0; i < _receivedIdentity.length; i++)
+            for (int i = 0; i < _receivedIdentity.length; i++) {
                 if (_receivedIdentity[i] == null)
                     return false;
+            }
             return true;
         } else {
             return false;
@@ -339,7 +363,51 @@ class InboundEstablishState {
         }
         return _receivedConfirmedIdentity;
     }
-    
+
+    /**
+     *  Construct Alice's RouterIdentity.
+     *  Must have received all fragments.
+     *  Sets _receivedUnconfirmedIdentity, unless invalid.
+     *
+     *  Caller must synch on this.
+     *
+     *  @since 0.9.16 was in verifyIdentity()
+     */
+    private void buildIdentity() {
+        if (_receivedUnconfirmedIdentity != null)
+            return;   // dup pkt?
+        int frags = _receivedIdentity.length;
+        byte[] ident;
+        if (frags > 1) {
+            int identSize = 0;
+            for (int i = 0; i < _receivedIdentity.length; i++)
+                identSize += _receivedIdentity[i].length;
+            ident = new byte[identSize];
+            int off = 0;
+            for (int i = 0; i < _receivedIdentity.length; i++) {
+                int len = _receivedIdentity[i].length;
+                System.arraycopy(_receivedIdentity[i], 0, ident, off, len);
+                off += len;
+            }
+        } else {
+            // no need to copy
+            ident = _receivedIdentity[0];
+        }
+        ByteArrayInputStream in = new ByteArrayInputStream(ident); 
+        RouterIdentity peer = new RouterIdentity();
+        try {
+            peer.readBytes(in);
+            _receivedUnconfirmedIdentity = peer;
+        } catch (DataFormatException dfe) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Improperly formatted yet fully received ident", dfe);
+        } catch (IOException ioe) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Improperly formatted yet fully received ident", ioe);
+        }
+    }
+            
+
     /**
      * Determine if Alice sent us a valid confirmation packet.  The 
      * identity signs: Alice's IP + Alice's port + Bob's IP + Bob's port
@@ -351,21 +419,11 @@ class InboundEstablishState {
      * Caller must synch on this.
      */
     private void verifyIdentity() {
-        int identSize = 0;
-        for (int i = 0; i < _receivedIdentity.length; i++)
-            identSize += _receivedIdentity[i].length;
-        byte ident[] = new byte[identSize];
-        int off = 0;
-        for (int i = 0; i < _receivedIdentity.length; i++) {
-            int len = _receivedIdentity[i].length;
-            System.arraycopy(_receivedIdentity[i], 0, ident, off, len);
-            off += len;
-        }
-        ByteArrayInputStream in = new ByteArrayInputStream(ident); 
-        RouterIdentity peer = new RouterIdentity();
-        try {
-            peer.readBytes(in);
-            
+            if (_receivedUnconfirmedIdentity == null)
+                return;   // either not yet recvd or bad ident
+            if (_receivedSignature == null)
+                return;   // either not yet recvd or bad sig
+
             byte signed[] = new byte[256+256 // X + Y
                                      + _aliceIP.length + 2
                                      + _bobIP.length + 2
@@ -373,7 +431,7 @@ class InboundEstablishState {
                                      + 4 // signed on time
                                      ];
 
-            off = 0;
+            int off = 0;
             System.arraycopy(_receivedX, 0, signed, off, _receivedX.length);
             off += _receivedX.length;
             getSentY();
@@ -391,22 +449,15 @@ class InboundEstablishState {
             off += 4;
             DataHelper.toLong(signed, off, 4, _receivedSignedOnTime);
             Signature sig = new Signature(_receivedSignature);
-            boolean ok = _context.dsa().verifySignature(sig, signed, peer.getSigningPublicKey());
+            boolean ok = _context.dsa().verifySignature(sig, signed, _receivedUnconfirmedIdentity.getSigningPublicKey());
             if (ok) {
                 // todo partial spoof detection - get peer.calculateHash(),
                 // lookup in netdb locally, if not equal, fail?
-                _receivedConfirmedIdentity = peer;
+                _receivedConfirmedIdentity = _receivedUnconfirmedIdentity;
             } else {
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn("Signature failed from " + peer);
+                    _log.warn("Signature failed from " + _receivedUnconfirmedIdentity);
             }
-        } catch (DataFormatException dfe) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Improperly formatted yet fully received ident", dfe);
-        } catch (IOException ioe) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Improperly formatted yet fully received ident", ioe);
-        }
     }
     
     private void packetReceived() {

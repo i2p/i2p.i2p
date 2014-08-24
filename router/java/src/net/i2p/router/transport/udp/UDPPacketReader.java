@@ -203,9 +203,10 @@ class UDPPacketReader {
             return rv;
         }
         
-        public void readEncryptedSignature(byte target[], int targetOffset) {
+        /** @param size the amount to be copied, including padding to mod 16 */
+        public void readEncryptedSignature(byte target[], int targetOffset, int size) {
             int offset = readBodyOffset() + Y_LENGTH + 1 + readIPSize() + 2 + 4 + 4;
-            System.arraycopy(_message, offset, target, targetOffset, Signature.SIGNATURE_BYTES + 8);
+            System.arraycopy(_message, offset, target, targetOffset, size);
         }
         
         public void readIV(byte target[], int targetOffset) {
@@ -239,7 +240,11 @@ class UDPPacketReader {
             System.arraycopy(_message, readOffset, target, targetOffset, len);
         }
         
-        /** read the time at which the signature was generated */
+        /**
+         *  Read the time at which the signature was generated.
+         *  TODO must be completely in final fragment.
+         *  Time and sig cannot be split across fragments.
+         */
         public long readFinalFragmentSignedOnTime() {
             if (readCurrentFragmentNum() != readTotalFragmentNum()-1)
                 throw new IllegalStateException("This is not the final fragment");
@@ -247,12 +252,19 @@ class UDPPacketReader {
             return DataHelper.fromLong(_message, readOffset, 4);
         }
         
-        /** read the signature from the final sessionConfirmed packet */
-        public void readFinalSignature(byte target[], int targetOffset) {
+        /**
+         *  Read the signature from the final sessionConfirmed packet.
+         *  TODO must be completely in final fragment.
+         *  Time and sig cannot be split across fragments.
+         *  @param size not including padding
+         */
+        public void readFinalSignature(byte target[], int targetOffset, int size) {
             if (readCurrentFragmentNum() != readTotalFragmentNum()-1)
                 throw new IllegalStateException("This is not the final fragment");
-            int readOffset = _payloadBeginOffset + _payloadLength - Signature.SIGNATURE_BYTES;
-            System.arraycopy(_message, readOffset, target, targetOffset, Signature.SIGNATURE_BYTES);
+            int readOffset = _payloadBeginOffset + _payloadLength - size;
+            if (readOffset < readBodyOffset() + (1 + 2 + 4))
+                throw new IllegalStateException("Sig split across fragments");
+            System.arraycopy(_message, readOffset, target, targetOffset, size);
         }
     }
     

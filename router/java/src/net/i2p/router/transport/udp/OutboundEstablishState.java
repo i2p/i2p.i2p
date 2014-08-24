@@ -3,6 +3,7 @@ package net.i2p.router.transport.udp;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import net.i2p.crypto.SigType;
 import net.i2p.data.Base64;
 import net.i2p.data.ByteArray;
 import net.i2p.data.DataHelper;
@@ -41,6 +42,7 @@ class OutboundEstablishState {
     private SessionKey _sessionKey;
     private SessionKey _macKey;
     private Signature _receivedSignature;
+    // includes trailing padding to mod 16
     private byte[] _receivedEncryptedSignature;
     private byte[] _receivedIV;
     // SessionConfirmed messages
@@ -104,6 +106,7 @@ class OutboundEstablishState {
     /**
      *  @param claimedAddress an IP/port based RemoteHostId, or null if unknown
      *  @param remoteHostId non-null, == claimedAddress if direct, or a hash-based one if indirect
+     *  @param remotePeer must have supported sig type
      *  @param introKey Bob's introduction key, as published in the netdb
      *  @param addr non-null
      */
@@ -247,8 +250,20 @@ class OutboundEstablishState {
         _alicePort = reader.readPort();
         _receivedRelayTag = reader.readRelayTag();
         _receivedSignedOnTime = reader.readSignedOnTime();
-        _receivedEncryptedSignature = new byte[Signature.SIGNATURE_BYTES + 8];
-        reader.readEncryptedSignature(_receivedEncryptedSignature, 0);
+        // handle variable signature size
+        SigType type = _remotePeer.getSigningPublicKey().getType();
+        if (type == null) {
+            // shouldn't happen, we only connect to supported peers
+            fail();
+            packetReceived();
+            return;
+        }
+        int sigLen = type.getSigLen();
+        int mod = sigLen % 16;
+        int pad = (mod == 0) ? 0 : (16 - mod);
+        int esigLen = sigLen + pad;
+        _receivedEncryptedSignature = new byte[esigLen];
+        reader.readEncryptedSignature(_receivedEncryptedSignature, 0, esigLen);
         _receivedIV = new byte[UDPPacket.IV_SIZE];
         reader.readIV(_receivedIV, 0);
         
@@ -353,7 +368,9 @@ class OutboundEstablishState {
      * decrypt the signature (and subsequent pad bytes) with the 
      * additional layer of encryption using the negotiated key along side
      * the packet's IV
+     *
      *  Caller must synch on this.
+     *  Only call this once! Decrypts in-place.
      */
     private void decryptSignature() {
         if (_receivedEncryptedSignature == null) throw new NullPointerException("encrypted signature is null! this=" + this.toString());
@@ -361,11 +378,20 @@ class OutboundEstablishState {
         if (_receivedIV == null) throw new NullPointerException("IV is null!");
         _context.aes().decrypt(_receivedEncryptedSignature, 0, _receivedEncryptedSignature, 0, 
                                _sessionKey, _receivedIV, _receivedEncryptedSignature.length);
-        byte signatureBytes[] = new byte[Signature.SIGNATURE_BYTES];
-        System.arraycopy(_receivedEncryptedSignature, 0, signatureBytes, 0, Signature.SIGNATURE_BYTES);
-        _receivedSignature = new Signature(signatureBytes);
+        // handle variable signature size
+        SigType type = _remotePeer.getSigningPublicKey().getType();
+        // if type == null throws NPE
+        int sigLen = type.getSigLen();
+        int mod = sigLen % 16;
+        if (mod != 0) {
+            byte signatureBytes[] = new byte[sigLen];
+            System.arraycopy(_receivedEncryptedSignature, 0, signatureBytes, 0, sigLen);
+            _receivedSignature = new Signature(type, signatureBytes);
+        } else {
+            _receivedSignature = new Signature(type, _receivedEncryptedSignature);
+        }
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Decrypted received signature: " + Base64.encode(signatureBytes));
+            _log.debug("Decrypted received signature: " + Base64.encode(_receivedSignature.getData()));
     }
 
     /**

@@ -362,6 +362,12 @@ public class NTCPTransport extends TransportImpl {
             return null;
         }
 
+        // Check for supported sig type
+        if (toAddress.getIdentity().getSigningPublicKey().getType() == null) {
+            markUnreachable(peer);
+            return null;
+        }
+
         if (!allowConnection()) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("no bid when trying to send to " + peer + ", max connection limit reached");

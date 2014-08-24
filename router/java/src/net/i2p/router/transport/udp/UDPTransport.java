@@ -1550,6 +1550,12 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 return null;
             }
 
+            // Check for supported sig type
+            if (toAddress.getIdentity().getSigningPublicKey().getType() == null) {
+                markUnreachable(to);
+                return null;
+            }
+
             if (!allowConnection())
                 return _cachedBid[TRANSIENT_FAIL_BID];
 
