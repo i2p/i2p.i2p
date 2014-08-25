@@ -53,7 +53,7 @@ public class PrivateKeyFile {
     
     protected final File file;
     private final I2PClient client;
-    private Destination dest;
+    protected Destination dest;
     protected PrivateKey privKey;
     protected SigningPrivateKey signingPrivKey; 
 
@@ -452,6 +452,23 @@ public class PrivateKeyFile {
             if (out != null) {
                 try { out.close(); } catch (IOException ioe) {}
             }
+        }
+    }
+
+    /**
+     *  Verify that the PublicKey matches the PrivateKey, and
+     *  the SigningPublicKey matches the SigningPrivateKey.
+     *
+     *  @return success
+     *  @since 0.9.16
+     */
+    public boolean validateKeyPairs() {
+        try {
+            if (!dest.getPublicKey().equals(KeyGenerator.getPublicKey(privKey)))
+                return false;
+            return dest.getSigningPublicKey().equals(KeyGenerator.getSigningPublicKey(signingPrivKey));
+        } catch (IllegalArgumentException iae) {
+            return false;
         }
     }
 

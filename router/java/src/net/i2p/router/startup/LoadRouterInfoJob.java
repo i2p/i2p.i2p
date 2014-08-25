@@ -15,6 +15,7 @@ import java.io.InputStream;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import net.i2p.crypto.KeyGenerator;
 import net.i2p.crypto.SigType;
 import net.i2p.data.Certificate;
 import net.i2p.data.DataFormatException;
@@ -210,6 +211,8 @@ class LoadRouterInfoJob extends JobImpl {
         if (rkf2.exists()) {
             RouterPrivateKeyFile pkf = new RouterPrivateKeyFile(rkf2);
             ri = pkf.getRouterIdentity();
+            if (!pkf.validateKeyPairs())
+                throw new DataFormatException("Key pairs invalid");
             privkey = pkf.getPrivKey();
             signingPrivKey = pkf.getSigningPrivKey();
         } else {
@@ -224,6 +227,17 @@ class LoadRouterInfoJob extends JobImpl {
                 pubkey.readBytes(fis);
                 SigningPublicKey signingPubKey = new SigningPublicKey();
                 signingPubKey.readBytes(fis);
+
+                // validate
+                try {
+                    if (!pubkey.equals(KeyGenerator.getPublicKey(privkey)))
+                        throw new DataFormatException("Key pairs invalid");
+                    if (!signingPubKey.equals(KeyGenerator.getSigningPublicKey(signingPrivKey)))
+                        throw new DataFormatException("Key pairs invalid");
+                } catch (IllegalArgumentException iae) {
+                    throw new DataFormatException("Key pairs invalid", iae);
+                }
+
                 ri = new RouterIdentity();
                 ri.setPublicKey(pubkey);
                 ri.setSigningPublicKey(signingPubKey);

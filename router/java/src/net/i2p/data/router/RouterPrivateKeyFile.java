@@ -9,6 +9,7 @@ import java.io.IOException;
 
 import net.i2p.crypto.SigType;
 import net.i2p.data.DataFormatException;
+import net.i2p.data.Destination;
 import net.i2p.data.PrivateKey;
 import net.i2p.data.PrivateKeyFile;
 import net.i2p.data.SigningPrivateKey;
@@ -42,6 +43,14 @@ public class RouterPrivateKeyFile extends PrivateKeyFile {
                 throw new DataFormatException("Unknown sig type");
             signingPrivKey = new SigningPrivateKey(type);
             signingPrivKey.readBytes(in);
+
+            // set it a Destination, so we may call validateKeyPairs()
+            // or other methods
+            dest = new Destination();
+            dest.setPublicKey(ri.getPublicKey());
+            dest.setSigningPublicKey(ri.getSigningPublicKey());
+            dest.setCertificate(ri.getCertificate());
+
             return ri;
         } finally {
             if (in != null) {
