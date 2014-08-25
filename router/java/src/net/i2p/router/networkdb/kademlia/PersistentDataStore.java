@@ -29,7 +29,7 @@ import net.i2p.data.Base64;
 import net.i2p.data.DatabaseEntry;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.Hash;
-import net.i2p.data.RouterInfo;
+import net.i2p.data.router.RouterInfo;
 import net.i2p.router.JobImpl;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
@@ -523,6 +523,11 @@ class PersistentDataStore extends TransientDataStore {
                 } catch (IOException ioe) {
                     if (_log.shouldLog(Log.INFO))
                         _log.info("Unable to read the router reference in " + _routerFile.getName(), ioe);
+                    corrupt = true;
+                } catch (Exception e) {
+                    // key certificate problems, etc., don't let one bad RI kill the whole thing
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("Unable to read the router reference in " + _routerFile.getName(), e);
                     corrupt = true;
                 } finally {
                     if (fis != null) try { fis.close(); } catch (IOException ioe) {}

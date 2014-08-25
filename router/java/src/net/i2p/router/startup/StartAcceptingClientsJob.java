@@ -12,7 +12,7 @@ import net.i2p.router.JobImpl;
 import net.i2p.router.RouterContext;
 
 /** start I2CP interface */
-public class StartAcceptingClientsJob extends JobImpl {
+class StartAcceptingClientsJob extends JobImpl {
     
     public StartAcceptingClientsJob(RouterContext context) {
         super(context);

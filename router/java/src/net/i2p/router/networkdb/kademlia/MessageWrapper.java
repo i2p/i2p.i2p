@@ -8,7 +8,7 @@ import net.i2p.crypto.TagSetHandle;
 import net.i2p.data.Certificate;
 import net.i2p.data.Hash;
 import net.i2p.data.PublicKey;
-import net.i2p.data.RouterInfo;
+import net.i2p.data.router.RouterInfo;
 import net.i2p.data.SessionKey;
 import net.i2p.data.SessionTag;
 import net.i2p.data.i2np.DeliveryInstructions;

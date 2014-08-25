@@ -29,8 +29,8 @@ import net.i2p.data.Destination;
 import net.i2p.data.Hash;
 import net.i2p.data.Lease;
 import net.i2p.data.LeaseSet;
-import net.i2p.data.RouterAddress;
-import net.i2p.data.RouterInfo;
+import net.i2p.data.router.RouterAddress;
+import net.i2p.data.router.RouterInfo;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelPoolSettings;
 import net.i2p.router.util.HashDistance;   // debug
@@ -415,7 +415,9 @@ public class NetDbRenderer {
             // shouldnt happen
             buf.append("<b>" + _("Published") + ":</b> in ").append(DataHelper.formatDuration2(0-age)).append("???<br>\n");
         }
-        buf.append("<b>" + _("Address(es)") + ":</b> ");
+        buf.append("<b>").append(_("Signing Key")).append(":</b> ")
+           .append(info.getIdentity().getSigningPublicKey().getType().toString());
+        buf.append("<br>\n<b>" + _("Address(es)") + ":</b> ");
         String country = _context.commSystem().getCountry(info.getIdentity().getHash());
         if(country != null) {
             buf.append("<img height=\"11\" width=\"16\" alt=\"").append(country.toUpperCase(Locale.US)).append('\"');
