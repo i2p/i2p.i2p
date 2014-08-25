@@ -78,6 +78,13 @@ public class KeysAndCert extends DataStructureImpl {
     }
     
     /**
+     * @since 0.9.16
+     */
+    public byte[] getPadding() {
+        return _padding;
+    }
+    
+    /**
      * @throws IllegalStateException if was already set
      * @since 0.9.12
      */

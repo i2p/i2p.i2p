@@ -50,6 +50,7 @@ public class RouterPrivateKeyFile extends PrivateKeyFile {
             dest.setPublicKey(ri.getPublicKey());
             dest.setSigningPublicKey(ri.getSigningPublicKey());
             dest.setCertificate(ri.getCertificate());
+            dest.setPadding(ri.getPadding());
 
             return ri;
         } finally {
