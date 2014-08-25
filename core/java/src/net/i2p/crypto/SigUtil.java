@@ -331,7 +331,7 @@ public class SigUtil {
     }
 
     /**
-     *  @deprecated unused
+     *
      */
     public static RSAPrivateKey toJavaRSAKey(SigningPrivateKey pk)
                               throws GeneralSecurityException {
@@ -344,7 +344,7 @@ public class SigUtil {
     }
 
     /**
-     *  @deprecated unused
+     *
      */
     public static SigningPublicKey fromJavaKey(RSAPublicKey pk, SigType type)
                               throws GeneralSecurityException {
