@@ -265,6 +265,7 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
      *  Copy input stream to a byte array, so we can retry
      *  @since 0.7.10
      */
+/****
     private static ByteArrayInputStream copyOfInputStream(InputStream is) throws IOException {
         byte[] buf = new byte[128];
         ByteArrayOutputStream os = new ByteArrayOutputStream(768);
@@ -279,6 +280,7 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
         }
         return new ByteArrayInputStream(os.toByteArray());
     }
+****/
     
     /**
      * Start running the I2PTunnelServer.
