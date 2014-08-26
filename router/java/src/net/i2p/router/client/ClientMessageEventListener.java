@@ -12,6 +12,7 @@ import java.util.Properties;
 
 import net.i2p.CoreVersion;
 import net.i2p.crypto.SigType;
+import net.i2p.data.Destination;
 import net.i2p.data.Hash;
 import net.i2p.data.Payload;
 import net.i2p.data.i2cp.BandwidthLimitsMessage;
@@ -37,6 +38,7 @@ import net.i2p.data.i2cp.SessionId;
 import net.i2p.data.i2cp.SessionStatusMessage;
 import net.i2p.data.i2cp.SetDateMessage;
 import net.i2p.router.ClientTunnelSettings;
+import net.i2p.router.LeaseSetKeys;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
 import net.i2p.util.PasswordManager;
@@ -367,8 +369,31 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
             _runner.disconnectClient("Invalid CreateLeaseSetMessage");
             return;
         }
-
-        _context.keyManager().registerKeys(message.getLeaseSet().getDestination(), message.getSigningPrivateKey(), message.getPrivateKey());
+        Destination dest = _runner.getConfig().getDestination();
+        Destination ndest = message.getLeaseSet().getDestination();
+        if (!dest.equals(ndest)) {
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("Different destination in LS");
+            _runner.disconnectClient("Different destination in LS");
+            return;
+        }
+        LeaseSetKeys keys = _context.keyManager().getKeys(dest);
+        if (keys == null ||
+            !message.getPrivateKey().equals(keys.getDecryptionKey())) {
+            // Verify and register crypto keys if new or if changed
+            // Private crypto key should never change
+            if (!message.getPrivateKey().toPublic().equals(dest.getPublicKey())) {
+                if (_log.shouldLog(Log.ERROR))
+                    _log.error("Private/public crypto key mismatch in LS");
+                _runner.disconnectClient("Private/public crypto key mismatch in LS");
+                return;
+            }
+            // just register new SPK, don't verify, unused
+            _context.keyManager().registerKeys(dest, message.getSigningPrivateKey(), message.getPrivateKey());
+        } else if (!message.getSigningPrivateKey().equals(keys.getRevocationKey())) {
+            // just register new SPK, don't verify, unused
+            _context.keyManager().registerKeys(dest, message.getSigningPrivateKey(), message.getPrivateKey());
+        }
         try {
             _context.netDb().publish(message.getLeaseSet());
         } catch (IllegalArgumentException iae) {

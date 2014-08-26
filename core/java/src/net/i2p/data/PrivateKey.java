@@ -50,6 +50,7 @@ public class PrivateKey extends SimpleDataStructure {
     /** derives a new PublicKey object derived from the secret contents
      * of this PrivateKey
      * @return a PublicKey object
+     * @throws IllegalArgumentException on bad key
      */
     public PublicKey toPublic() {
         return KeyGenerator.getPublicKey(this);

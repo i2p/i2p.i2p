@@ -30,6 +30,7 @@ import net.i2p.crypto.DSAEngine;
 import net.i2p.crypto.SHA1;
 import net.i2p.crypto.SHA1Hash;
 import net.i2p.crypto.SHA256Generator;
+import net.i2p.crypto.SigType;
 import net.i2p.data.DatabaseEntry;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
@@ -532,10 +533,17 @@ public class RouterInfo extends DatabaseEntry {
         InputStream din;
         MessageDigest digest;
         if (verifySig) {
-            digest = _identity.getSigningPublicKey().getType().getDigestInstance();
-            // TODO any better way?
-            digest.update(_identity.toByteArray());
-            din = new DigestInputStream(in, digest);
+            SigType type = _identity.getSigningPublicKey().getType();
+            if (type != SigType.EdDSA_SHA512_Ed25519) {
+                // This won't work for EdDSA
+                digest = _identity.getSigningPublicKey().getType().getDigestInstance();
+                // TODO any better way?
+                digest.update(_identity.toByteArray());
+                din = new DigestInputStream(in, digest);
+            } else {
+                digest = null;
+                din = in;
+            }
         } else {
             digest = null;
             din = in;
@@ -569,10 +577,16 @@ public class RouterInfo extends DatabaseEntry {
         _signature.readBytes(in);
 
         if (verifySig) {
-            SimpleDataStructure hash = _identity.getSigningPublicKey().getType().getHashInstance();
-            hash.setData(digest.digest());
-            _isValid = DSAEngine.getInstance().verifySignature(_signature, hash, _identity.getSigningPublicKey());
-            _validated = true;
+            SigType type = _identity.getSigningPublicKey().getType();
+            if (type != SigType.EdDSA_SHA512_Ed25519) {
+                // This won't work for EdDSA
+                SimpleDataStructure hash = _identity.getSigningPublicKey().getType().getHashInstance();
+                hash.setData(digest.digest());
+                _isValid = DSAEngine.getInstance().verifySignature(_signature, hash, _identity.getSigningPublicKey());
+                _validated = true;
+            } else {
+                doValidate();
+            }
             if (!_isValid) {
                 throw new DataFormatException("Bad sig");
             }

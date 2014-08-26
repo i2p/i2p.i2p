@@ -170,9 +170,12 @@ public class CreateRouterInfoJob extends JobImpl {
         String sstype = ctx.getProperty(PROP_ROUTER_SIGTYPE);
         if (sstype != null) {
             SigType ntype = SigType.parseSigType(sstype);
-            if (ntype != null && ntype.isAvailable())
+            if (ntype != null)
                 cstype = ntype;
         }
+        // fallback?
+        if (cstype != SigType.DSA_SHA1 && !cstype.isAvailable())
+            cstype = SigType.DSA_SHA1;
         return cstype;
     }
     
