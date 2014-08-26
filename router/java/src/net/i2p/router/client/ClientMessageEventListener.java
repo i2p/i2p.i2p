@@ -15,6 +15,7 @@ import net.i2p.crypto.SigType;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
 import net.i2p.data.Payload;
+import net.i2p.data.PublicKey;
 import net.i2p.data.i2cp.BandwidthLimitsMessage;
 import net.i2p.data.i2cp.CreateLeaseSetMessage;
 import net.i2p.data.i2cp.CreateSessionMessage;
@@ -381,8 +382,18 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
         if (keys == null ||
             !message.getPrivateKey().equals(keys.getDecryptionKey())) {
             // Verify and register crypto keys if new or if changed
-            // Private crypto key should never change
-            if (!message.getPrivateKey().toPublic().equals(dest.getPublicKey())) {
+            // Private crypto key should never change, and if it does,
+            // one of the checks below will fail
+            PublicKey pk;
+            try {
+                pk = message.getPrivateKey().toPublic();
+            } catch (IllegalArgumentException iae) {
+                if (_log.shouldLog(Log.ERROR))
+                    _log.error("Bad private key in LS");
+                _runner.disconnectClient("Bad private key in LS");
+                return;
+            }
+            if (!pk.equals(dest.getPublicKey())) {
                 if (_log.shouldLog(Log.ERROR))
                     _log.error("Private/public crypto key mismatch in LS");
                 _runner.disconnectClient("Private/public crypto key mismatch in LS");
