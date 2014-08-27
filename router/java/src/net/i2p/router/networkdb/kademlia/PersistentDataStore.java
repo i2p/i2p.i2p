@@ -524,6 +524,11 @@ class PersistentDataStore extends TransientDataStore {
                     if (_log.shouldLog(Log.INFO))
                         _log.info("Unable to read the router reference in " + _routerFile.getName(), ioe);
                     corrupt = true;
+                } catch (Exception e) {
+                    // key certificate problems, etc., don't let one bad RI kill the whole thing
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("Unable to read the router reference in " + _routerFile.getName(), e);
+                    corrupt = true;
                 } finally {
                     if (fis != null) try { fis.close(); } catch (IOException ioe) {}
                 }
