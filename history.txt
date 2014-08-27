@@ -1,5 +1,12 @@
 2014-08-27 zzz
- * i2psnark: Persist uploaded count (tickets #1034, #1298)
+ * i2psnark:
+   - Persist uploaded count (tickets #1034, #1298)
+   - Don't retry announce if we get back HTML
+   - Recognize Vuze tracker rejections
+   - Don't retry rejected announces unless seeding
+   - Better UI handling of announces with ports or full destination
+ * NetDB: Don't abort initialization on an unsupported RI sig type
+ * Streaming: Fix P521 and RSA sig types
 
 2014-08-23 zzz
  * Console, i2psnark, i2ptunnel: Escape fixes and cleanups
