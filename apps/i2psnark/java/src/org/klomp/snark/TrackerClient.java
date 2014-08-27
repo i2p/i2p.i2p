@@ -72,6 +72,7 @@ public class TrackerClient implements Runnable {
   private static final String STOPPED_EVENT = "stopped";
   private static final String NOT_REGISTERED  = "torrent not registered"; //bytemonsoon
   private static final String NOT_REGISTERED_2  = "torrent not found";    // diftracker
+  private static final String NOT_REGISTERED_3  = "torrent unauthorised"; // vuze
   /** this is our equivalent to router.utorrent.com for bootstrap */
   private static final String DEFAULT_BACKUP_TRACKER = "http://tracker.welterde.i2p/a";
 
@@ -577,14 +578,19 @@ public class TrackerClient implements Runnable {
                     if (tr.isPrimary)
                       snark.setTrackerProblems(tr.trackerProblems);
                     String tplc = tr.trackerProblems.toLowerCase(Locale.US);
-                    if (tplc.startsWith(NOT_REGISTERED) || tplc.startsWith(NOT_REGISTERED_2)) {
+                    if (tplc.startsWith(NOT_REGISTERED) || tplc.startsWith(NOT_REGISTERED_2) ||
+                        tplc.startsWith(NOT_REGISTERED_3)) {
                       // Give a guy some time to register it if using opentrackers too
                       //if (trckrs.size() == 1) {
                       //  stop = true;
                       //  snark.stopTorrent();
                       //} else { // hopefully each on the opentrackers list is really open
                         if (tr.registerFails++ > MAX_REGISTER_FAILS ||
+                            !completed ||              // no use retrying if we aren't seeding
                             (!tr.isPrimary && tr.registerFails > MAX_REGISTER_FAILS / 2))
+                          if (_log.shouldLog(Log.WARN))
+                              _log.warn("Not longer announcing to " + tr.announce + " : " +
+                                        tr.trackerProblems + " after " + tr.registerFails + " failures");
                           tr.stop = true;
                       //
                     }
