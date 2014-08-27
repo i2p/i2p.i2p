@@ -498,7 +498,7 @@ public class I2PSnarkServlet extends BasicServlet {
         out.write(_("RX"));
         out.write("\">");
         out.write("</th>\n<th align=\"right\">");
-        if (_manager.util().connected() && !snarks.isEmpty()) {
+        if (!snarks.isEmpty()) {
             out.write("<img border=\"0\" src=\"" + _imgPath + "head_tx.png\" title=\"");
             out.write(_("Uploaded"));
             out.write("\" alt=\"");
@@ -1465,15 +1465,15 @@ public class I2PSnarkServlet extends BasicServlet {
         //    out.write("??");  // no meta size yet
         out.write("</td>\n\t");
         out.write("<td align=\"right\" class=\"snarkTorrentUploaded\">");
-        if(isRunning && isValid)
+        if (isValid && uploaded > 0)
            out.write(formatSize(uploaded));
         out.write("</td>\n\t");
         out.write("<td align=\"right\" class=\"snarkTorrentRateDown\">");
-        if(isRunning && needed > 0)
+        if (isRunning && needed > 0)
             out.write(formatSize(downBps) + "ps");
         out.write("</td>\n\t");
         out.write("<td align=\"right\" class=\"snarkTorrentRateUp\">");
-        if(isRunning && isValid)
+        if (isRunning && isValid)
             out.write(formatSize(upBps) + "ps");
         out.write("</td>\n\t");
         out.write("<td align=\"center\" class=\"snarkTorrentAction\">");

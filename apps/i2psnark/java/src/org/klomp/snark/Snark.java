@@ -237,6 +237,7 @@ public class Snark
   private volatile boolean _autoStoppable;
   // String indicating main activity
   private volatile String activity = "Not started";
+  private final long savedUploaded;
 
 
   /**
@@ -463,6 +464,7 @@ public class Snark
     trackerclient = new TrackerClient(meta, coordinator);
 */
     
+    savedUploaded = (completeListener != null) ? completeListener.getSavedUploaded(this) : 0;
     if (start)
         startTorrent();
   }
@@ -488,6 +490,7 @@ public class Snark
     this.infoHash = ih;
     this.additionalTrackerURL = trackerURL;
     this.rootDataDir = rootDir != null ? new File(rootDir) : null;   // null only for FetchAndAdd extension
+    savedUploaded = 0;
     stopped = true;
     id = generateID();
 
@@ -556,6 +559,7 @@ public class Snark
             _log.info("Starting PeerCoordinator, ConnectionAcceptor, and TrackerClient");
         activity = "Collecting pieces";
         coordinator = new PeerCoordinator(_util, id, infoHash, meta, storage, this, this);
+        coordinator.setUploaded(savedUploaded);
         if (_peerCoordinatorSet != null) {
             // multitorrent
             _peerCoordinatorSet.add(coordinator);
@@ -619,7 +623,7 @@ public class Snark
         pc.halt();
     Storage st = storage;
     if (st != null) {
-        boolean changed = storage.isChanged();
+        boolean changed = storage.isChanged() || getUploaded() != savedUploaded;
         try { 
             storage.close(); 
         } catch (IOException ioe) {
@@ -773,7 +777,7 @@ public class Snark
         PeerCoordinator coord = coordinator;
         if (coord != null)
             return coord.getUploaded();
-        return 0;
+        return savedUploaded;
     }
 
     /**

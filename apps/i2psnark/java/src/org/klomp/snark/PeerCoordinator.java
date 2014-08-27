@@ -282,6 +282,14 @@ class PeerCoordinator implements PeerListener
   }
 
   /**
+   *  Sets the initial total of uploaded bytes of all peers (from a saved status)
+   *  @since 0.9.15
+   */
+  public void setUploaded(long up) {
+      uploaded = up;
+  }
+
+  /**
    * Returns the total number of downloaded bytes of all peers.
    */
   public long getDownloaded()

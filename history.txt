@@ -1,3 +1,10 @@
+2014-08-27 zzz
+ * i2psnark: Persist uploaded count (tickets #1034, #1298)
+
+2014-08-23 zzz
+ * Console, i2psnark, i2ptunnel: Escape fixes and cleanups
+ * SSU: Drop peer tests as Bob from unestablished Alices
+
 2014-08-22 zzz
  * SigTypes:
    - Add isSupportedSince(), use in floodfill selection
