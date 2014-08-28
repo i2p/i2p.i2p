@@ -1,3 +1,6 @@
+2014-08-28 zzz
+ * Streaming: Fix verify of Ed25519 signatures in CLOSE packets
+
 2014-08-27 zzz
  * i2psnark:
    - Persist uploaded count (tickets #1034, #1298)
