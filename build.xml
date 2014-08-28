@@ -1017,6 +1017,9 @@
             <fileset dir="installer/resources/icons/flags/" includes="cn.png de.png es.png fr.png ir.png it.png jp.png nl.png ru.png se.png us.png" />
         </copy>
         <copy file="installer/resources/themes/console/images/favicon.ico" tofile="pkg-temp/eepsite/docroot/favicon.ico" />
+        <copy todir="pkg-temp/docs/icons/flags" >
+          <fileset dir="installer/resources/icons/flags" />
+        </copy>
     </target>
 
     <target name="preplicenses">
@@ -1237,11 +1240,6 @@
         <copy file="installer/resources/geoip.txt" todir="pkg-temp/geoip/" />
         <copy file="installer/resources/geoipv6.dat.gz" todir="pkg-temp/geoip/" />
         <copy file="installer/resources/countries.txt" todir="pkg-temp/geoip/" />
-      <!--
-        <copy todir="pkg-temp/docs/icons/flags" >
-          <fileset dir="installer/resources/icons/flags" />
-        </copy>
-       -->
     </target>
 
     <!-- All jetty jars required for update.
