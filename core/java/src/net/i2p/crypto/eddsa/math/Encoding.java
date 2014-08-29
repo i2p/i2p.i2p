@@ -22,7 +22,7 @@ public abstract class Encoding {
     /**
      * Decode a FieldElement from its (b-1)-bit encoding.
      * The highest bit is masked out.
-     * @param val the (b-1)-bit encoding of a FieldElement.
+     * @param in the (b-1)-bit encoding of a FieldElement.
      * @return the FieldElement represented by 'val'.
      */
     public abstract FieldElement decode(byte[] in);
@@ -33,7 +33,7 @@ public abstract class Encoding {
      * than the (b-1)-bit encoding of -x. If q is an odd prime and the encoding
      * is the little-endian representation of {0, 1,..., q-1} then the negative
      * elements of F_q are {1, 3, 5,..., q-2}.
-     * @return
+     * @return true if negative
      */
     public abstract boolean isNegative(FieldElement x);
 }

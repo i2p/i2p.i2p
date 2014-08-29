@@ -489,7 +489,7 @@ public class GroupElement implements Serializable {
      *
      * @param pos = i/2 for i in {0, 2, 4,..., 62}
      * @param b = r_i
-     * @return
+     * @return the GroupElement
      */
     GroupElement select(int pos, int b) {
         // Is r_i negative?
@@ -522,7 +522,7 @@ public class GroupElement implements Serializable {
      * Preconditions: (TODO: Check this applies here)
      *   a[31] <= 127
      * @param a = a[0]+256*a[1]+...+256^31 a[31]
-     * @return
+     * @return the GroupElement
      */
     public GroupElement scalarMultiply(byte[] a) {
         GroupElement t;
@@ -603,7 +603,7 @@ public class GroupElement implements Serializable {
      * @param A in P3 representation.
      * @param a = a[0]+256*a[1]+...+256^31 a[31]
      * @param b = b[0]+256*b[1]+...+256^31 b[31]
-     * @return
+     * @return the GroupElement
      */
     public GroupElement doubleScalarMultiplyVariableTime(GroupElement A, byte[] a, byte[] b) {
         byte[] aslide = slide(a);
@@ -645,7 +645,6 @@ public class GroupElement implements Serializable {
 
     /**
      * Verify that a point is on its curve.
-     * @param P The point to check.
      * @return true if the point lies on its curve.
      */
     public boolean isOnCurve() {
