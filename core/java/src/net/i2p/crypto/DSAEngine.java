@@ -42,6 +42,7 @@ import java.security.interfaces.ECKey;
 import java.security.interfaces.RSAKey;
 
 import net.i2p.I2PAppContext;
+import net.i2p.crypto.eddsa.EdDSAEngine;
 import net.i2p.crypto.eddsa.EdDSAKey;
 import net.i2p.data.Hash;
 import net.i2p.data.Signature;
@@ -517,7 +518,7 @@ public class DSAEngine {
 
         java.security.Signature jsig;
         if (type.getBaseAlgorithm() == SigAlgo.EdDSA)
-            jsig = new net.i2p.crypto.eddsa.EdDSAEngine(type.getDigestInstance());
+            jsig = new EdDSAEngine(type.getDigestInstance());
         else
             jsig = java.security.Signature.getInstance(type.getAlgorithmName());
         PublicKey pubKey = SigUtil.toJavaKey(verifyingKey);
@@ -566,7 +567,7 @@ public class DSAEngine {
         String algo = getRawAlgo(type);
         java.security.Signature jsig;
         if (type.getBaseAlgorithm() == SigAlgo.EdDSA)
-            jsig = new net.i2p.crypto.eddsa.EdDSAEngine(); // Ignore algo, EdDSAKey includes a hash specification.
+            jsig = new EdDSAEngine(); // Ignore algo, EdDSAKey includes a hash specification.
         else
             jsig = java.security.Signature.getInstance(algo);
         jsig.initVerify(pubKey);
@@ -608,7 +609,7 @@ public class DSAEngine {
 
         java.security.Signature jsig;
         if (type.getBaseAlgorithm() == SigAlgo.EdDSA)
-            jsig = new net.i2p.crypto.eddsa.EdDSAEngine(type.getDigestInstance());
+            jsig = new EdDSAEngine(type.getDigestInstance());
         else
             jsig = java.security.Signature.getInstance(type.getAlgorithmName());
         PrivateKey privKey = SigUtil.toJavaKey(privateKey);
@@ -651,7 +652,7 @@ public class DSAEngine {
 
         java.security.Signature jsig;
         if (type.getBaseAlgorithm() == SigAlgo.EdDSA)
-            jsig = new net.i2p.crypto.eddsa.EdDSAEngine(); // Ignore algo, EdDSAKey includes a hash specification.
+            jsig = new EdDSAEngine(); // Ignore algo, EdDSAKey includes a hash specification.
         else
             jsig = java.security.Signature.getInstance(algo);
         jsig.initSign(privKey, _context.random());

@@ -1,5 +1,10 @@
 package net.i2p.crypto.eddsa.math;
 
+/**
+ *
+ * @since 0.9.15
+ *
+ */
 public abstract class FieldElement {
     protected final Field f;
 

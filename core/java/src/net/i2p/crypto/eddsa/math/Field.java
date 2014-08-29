@@ -4,6 +4,8 @@ import java.io.Serializable;
 
 /**
  * An EdDSA finite field. Includes several pre-computed values.
+ *
+ * @since 0.9.15
  * @author str4d
  *
  */

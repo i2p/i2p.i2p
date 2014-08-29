@@ -16,6 +16,7 @@ import net.i2p.crypto.eddsa.math.GroupElement;
 import net.i2p.crypto.eddsa.math.ScalarOps;
 
 /**
+ * @since 0.9.15
  * @author str4d
  *
  */

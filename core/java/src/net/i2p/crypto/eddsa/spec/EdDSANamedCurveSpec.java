@@ -6,6 +6,8 @@ import net.i2p.crypto.eddsa.math.ScalarOps;
 
 /**
  * EdDSA Curve specification that can also be referred to by name.
+ *
+ * @since 0.9.15
  * @author str4d
  *
  */

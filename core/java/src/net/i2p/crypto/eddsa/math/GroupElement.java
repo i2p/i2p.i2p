@@ -6,6 +6,8 @@ import net.i2p.crypto.eddsa.Utils;
 
 /**
  * A point (x,y) on an EdDSA curve.
+ *
+ * @since 0.9.15
  * @author str4d
  *
  */

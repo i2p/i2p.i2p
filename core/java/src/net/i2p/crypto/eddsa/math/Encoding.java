@@ -3,6 +3,8 @@ package net.i2p.crypto.eddsa.math;
 /**
  * Common interface for all (b-1)-bit encodings of elements
  * of EdDSA finite fields.
+ *
+ * @since 0.9.15
  * @author str4d
  *
  */

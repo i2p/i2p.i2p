@@ -8,6 +8,8 @@ import java.util.Arrays;
 import net.i2p.crypto.eddsa.math.GroupElement;
 
 /**
+ *
+ * @since 0.9.15
  * @author str4d
  *
  */

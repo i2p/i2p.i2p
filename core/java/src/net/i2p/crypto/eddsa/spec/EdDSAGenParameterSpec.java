@@ -5,6 +5,8 @@ import java.security.spec.AlgorithmParameterSpec;
 /**
  * Implementation of AlgorithmParameterSpec that holds the name of a named
  * EdDSA curve specification.
+ *
+ * @since 0.9.15
  * @author str4d
  *
  */

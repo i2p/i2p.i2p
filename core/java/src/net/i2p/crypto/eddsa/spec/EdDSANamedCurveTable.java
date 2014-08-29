@@ -10,6 +10,8 @@ import net.i2p.crypto.eddsa.math.ed25519.Ed25519ScalarOps;
 
 /**
  * The named EdDSA curves.
+ *
+ * @since 0.9.15
  * @author str4d
  *
  */
