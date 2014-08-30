@@ -30,6 +30,7 @@ import net.i2p.crypto.DSAEngine;
 import net.i2p.crypto.SHA1;
 import net.i2p.crypto.SHA1Hash;
 import net.i2p.crypto.SHA256Generator;
+import net.i2p.crypto.SigType;
 import net.i2p.util.Clock;
 import net.i2p.util.Log;
 import net.i2p.util.OrderedProperties;
@@ -518,17 +519,27 @@ public class RouterInfo extends DatabaseEntry {
     public void readBytes(InputStream in, boolean verifySig) throws DataFormatException, IOException {
         if (_signature != null)
             throw new IllegalStateException();
+        _identity = new RouterIdentity();
+        _identity.readBytes(in);
+        // can't set the digest until we know the sig type
         InputStream din;
         MessageDigest digest;
         if (verifySig) {
-            digest = SHA1.getInstance();
-            din = new DigestInputStream(in, digest);
+            SigType type = _identity.getSigningPublicKey().getType();
+            if (type != SigType.EdDSA_SHA512_Ed25519) {
+                // This won't work for EdDSA
+                digest = _identity.getSigningPublicKey().getType().getDigestInstance();
+                // TODO any better way?
+                digest.update(_identity.toByteArray());
+                din = new DigestInputStream(in, digest);
+            } else {
+                digest = null;
+                din = in;
+            }
         } else {
             digest = null;
             din = in;
         }
-        _identity = new RouterIdentity();
-        _identity.readBytes(din);
         // avoid thrashing objects
         //Date when = DataHelper.readDate(in);
         //if (when == null)
@@ -558,9 +569,16 @@ public class RouterInfo extends DatabaseEntry {
         _signature.readBytes(in);
 
         if (verifySig) {
-            SHA1Hash hash = new SHA1Hash(digest.digest());
-            _isValid = DSAEngine.getInstance().verifySignature(_signature, hash, _identity.getSigningPublicKey());
-            _validated = true;
+            SigType type = _identity.getSigningPublicKey().getType();
+            if (type != SigType.EdDSA_SHA512_Ed25519) {
+                // This won't work for EdDSA
+                SimpleDataStructure hash = _identity.getSigningPublicKey().getType().getHashInstance();
+                hash.setData(digest.digest());
+                _isValid = DSAEngine.getInstance().verifySignature(_signature, hash, _identity.getSigningPublicKey());
+                _validated = true;
+            } else {
+                doValidate();
+            }
             if (!_isValid) {
                 throw new DataFormatException("Bad sig");
             }
