@@ -292,7 +292,14 @@ public class ControlPoint implements HTTPRequestListener
 		DeviceList devList = new DeviceList();
 		int nRoots = devNodeList.size();
 		for (int n=0; n<nRoots; n++) {
-			Node rootNode = devNodeList.getNode(n);
+			// AIOOB was thrown from here, maybe would be better to
+			// copy the list before traversal?
+			Node rootNode;
+			try {
+				rootNode = devNodeList.getNode(n);
+			} catch (ArrayIndexOutOfBoundsException aioob) {
+				break;
+			}
 			Device dev = getDevice(rootNode);
 			if (dev == null)
 				continue;
