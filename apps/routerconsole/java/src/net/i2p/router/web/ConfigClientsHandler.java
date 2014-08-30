@@ -59,7 +59,7 @@ public class ConfigClientsHandler extends FormHandler {
         }
         if (_action.equals(_("Install Plugin"))) {
             if (pluginsEnabled &&
-                (_context.getBooleanProperty(ConfigClientsHelper.PROP_ENABLE_PLUGIN_INSTALL) ||
+                (_context.getBooleanPropertyDefaultTrue(ConfigClientsHelper.PROP_ENABLE_PLUGIN_INSTALL) ||
                  isAdvanced()))
                 installPlugin();
             else

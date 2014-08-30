@@ -39,7 +39,12 @@ public class ConfigClientsHelper extends HelperBase {
     /** @since 0.9.14.1 */
     public boolean isPluginInstallEnabled() {
         return PluginStarter.pluginsEnabled(_context) &&
-               (_context.getBooleanProperty(PROP_ENABLE_PLUGIN_INSTALL) || isAdvanced());
+               (_context.getBooleanPropertyDefaultTrue(PROP_ENABLE_PLUGIN_INSTALL) || isAdvanced());
+    }
+
+    /** @since 0.9.15 */
+    public boolean isPluginUpdateEnabled() {
+        return !PluginStarter.getPlugins().isEmpty();
     }
 
     /** @since 0.8.3 */
