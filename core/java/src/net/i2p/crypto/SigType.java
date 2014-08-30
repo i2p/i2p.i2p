@@ -95,6 +95,7 @@ public enum SigType {
     private final SigAlgo base;
     private final String digestName, algoName, since;
     private final AlgorithmParameterSpec params;
+    private final boolean isAvail;
 
     SigType(int cod, int pubLen, int privLen, int hLen, int sLen, SigAlgo baseAlgo,
             String mdName, String aName, AlgorithmParameterSpec pSpec, String supportedSince) {
@@ -108,6 +109,7 @@ public enum SigType {
         algoName = aName;
         params = pSpec;
         since = supportedSince;
+        isAvail = x_isAvailable();
     }
 
     /** the unique identifier for this type */
@@ -180,6 +182,10 @@ public enum SigType {
      *  @return true if supported in this JVM
      */
     public boolean isAvailable() {
+        return isAvail;
+    }
+
+    private boolean x_isAvailable() {
         if (DSA_SHA1 == this)
             return true;
         try {
