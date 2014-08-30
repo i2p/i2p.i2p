@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.i2p.I2PAppContext;
+import net.i2p.crypto.SigType;
 import net.i2p.util.FileUtil;
 import net.i2p.util.VersionComparator;
 
@@ -27,6 +28,17 @@ public class LogsHelper extends HelperBase {
     /** @since 0.8.13 */
     public static String jettyVersion() {
         return Server.getVersion();
+    }
+
+    /** @since 0.9.15 */
+    public String getUnavailableCrypto() {
+        StringBuilder buf = new StringBuilder(128);
+        for (SigType t : SigType.values()) {
+            if (!t.isAvailable()) {
+                buf.append("<b>Crypto:</b> ").append(t.toString()).append(" unavailable<br>");
+            }
+        }
+        return buf.toString();
     }
 
     /**

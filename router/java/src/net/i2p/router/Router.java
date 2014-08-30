@@ -317,6 +317,7 @@ public class Router implements RouterClock.ClockShiftListener {
             if (f.exists())
                 SecureFileOutputStream.setPerms(f);
         }
+        CryptoChecker.warnUnavailableCrypto(_context);
 
         _routerInfo = null;
         _higherVersionSeen = false;
