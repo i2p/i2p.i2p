@@ -1,3 +1,11 @@
+2014-08-30 zzz
+ * Console:
+  - Re-enable plugin installation by default
+  - Don't show configuration section or update-all button if no plugins installed
+  - Show unavailable crypto on /logs
+ * Router: Log warnings for unavailable crypto at startup
+ * RouterInfo: Backport fix for verification of EdDSA RI sig type
+
 2014-08-28 zzz
  * Streaming: Fix verify of Ed25519 signatures in CLOSE packets
 
