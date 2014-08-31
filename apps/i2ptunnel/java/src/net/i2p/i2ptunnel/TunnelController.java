@@ -487,6 +487,17 @@ public class TunnelController implements Logging {
         String proxies = getProxyList();
         if (proxies != null)
             opts.setProperty(PROP_PROXIES, proxies);
+        // Ditto spoof host. Since 0.9.15.
+        String spoofhost = getSpoofedHost();
+        if (spoofhost != null)
+            opts.setProperty(PROP_SPOOFED_HOST, spoofhost);
+        // Ditto target host/port. Since 0.9.15.
+        String targethost = getTargetHost();
+        if (targethost != null)
+            opts.setProperty(PROP_TARGET_HOST, targethost);
+        String targetport = getTargetPort();
+        if (targetport != null)
+            opts.setProperty(PROP_TARGET_PORT, targetport);
         _tunnel.setClientOptions(opts);
     }
     

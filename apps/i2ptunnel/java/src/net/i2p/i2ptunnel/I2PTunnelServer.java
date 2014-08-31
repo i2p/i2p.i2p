@@ -16,6 +16,7 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
 import java.security.GeneralSecurityException;
 import java.util.Map;
 import java.util.Properties;
@@ -50,8 +51,8 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
     protected final Object slock = new Object();
     protected final Object sslLock = new Object();
 
-    protected final InetAddress remoteHost;
-    protected final int remotePort;
+    protected InetAddress remoteHost;
+    protected int remotePort;
     private final boolean _usePool;
     protected final Logging l;
     private I2PSSLSocketFactory _sslFactory;
@@ -350,6 +351,7 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
 
     /**
      *  Update the I2PSocketManager.
+     *  And since 0.9.15, the target host and port.
      *
      *  @since 0.9.1
      */
@@ -359,6 +361,27 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
             return;
         Properties props = tunnel.getClientOptions();
         sockMgr.setDefaultOptions(sockMgr.buildOptions(props));
+        // see TunnelController.setSessionOptions()
+        String h = props.getProperty(TunnelController.PROP_TARGET_HOST);
+        if (h != null) {
+            try {
+                remoteHost = InetAddress.getByName(h);
+            } catch (UnknownHostException uhe) {
+                l.log("Unknown host: " + h);
+            }
+        }
+        String p = props.getProperty(TunnelController.PROP_TARGET_PORT);
+        if (p != null) {
+            try {
+                int port = Integer.parseInt(p);
+                if (port > 0 && port <= 65535)
+                    remotePort = port;
+                else
+                    l.log("Bad port: " + port);
+            } catch (NumberFormatException nfe) {
+                l.log("Bad port: " + p);
+            }
+        }
         buildSocketMap(props);
     }
 
