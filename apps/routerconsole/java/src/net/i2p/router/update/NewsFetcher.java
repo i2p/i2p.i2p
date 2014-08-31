@@ -124,6 +124,7 @@ class NewsFetcher extends UpdateRunner {
      *  Parse the installed (not the temp) news file for the latest version.
      *  TODO: Real XML parsing
      *  TODO: Check minVersion, use backup URLs specified
+     *  TODO: SU3
      */
     void checkForUpdates() {
         FileInputStream in = null;

@@ -32,6 +32,7 @@ public class ConfigUpdateHelper extends HelperBase {
     /** hack to replace the old news location with the new one, even if they have saved
         the update page at some point */
     public static String getNewsURL(I2PAppContext ctx) {
+        // TODO SU3
         String url = ctx.getProperty(ConfigUpdateHandler.PROP_NEWS_URL);
         if (url != null && !url.equals(ConfigUpdateHandler.OLD_DEFAULT_NEWS_URL))
             return url;
