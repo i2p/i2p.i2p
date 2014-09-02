@@ -1,3 +1,8 @@
+2014-08-31 zzz
+ * Build: Add support for bundling router infos in the package
+ * I2PTunnel: Allow changing of spoof host and target host/port without
+              restarting server tunnel
+
 2014-08-30 zzz
  * Console:
   - Re-enable plugin installation by default
