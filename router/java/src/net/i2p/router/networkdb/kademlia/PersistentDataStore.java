@@ -787,14 +787,22 @@ class PersistentDataStore extends TransientDataStore {
                     continue;
                 }
                 boolean hasIntro = false;
+                boolean hasIPv4 = false;
                 for (RouterAddress addr : addrs) {
                     if ("SSU".equals(addr.getTransportStyle()) && addr.getOption("ihost0") != null) {
                         hasIntro = true;
                         break;
                     }
+                    String host = addr.getHost();
+                    if (host != null && host.contains("."))
+                        hasIPv4 = true;
                 }
                 if (hasIntro) {
                     System.out.println("Skipping introduced " + key);
+                    continue;
+                }
+                if (!hasIPv4) {
+                    System.out.println("Skipping IPv6-only " + key);
                     continue;
                 }
                 File toFile = new File(toDir, file.getName());
