@@ -258,6 +258,7 @@ public class IndexBean {
         // give the messages a chance to make it to the window
         try { Thread.sleep(1000); } catch (InterruptedException ie) {}
         // and give them something to look at in any case
+        // FIXME name will be HTML escaped twice
         return _("Starting tunnel") + ' ' + getTunnelName(_tunnel) + "...";
     }
     
@@ -271,6 +272,7 @@ public class IndexBean {
         // give the messages a chance to make it to the window
         try { Thread.sleep(1000); } catch (InterruptedException ie) {}
         // and give them something to look at in any case
+        // FIXME name will be HTML escaped twice
         return _("Stopping tunnel") + ' ' + getTunnelName(_tunnel) + "...";
     }
     
@@ -352,6 +354,7 @@ public class IndexBean {
         List<String> msgs = doSave();
         if (ksMsg != null)
             msgs.add(ksMsg);
+        // FIXME name will be HTML escaped twice
         return getMessages(msgs);
     }
 
@@ -402,7 +405,8 @@ public class IndexBean {
                             name = Long.toString(_context.clock().now());
                     }
                 }
-                name = "i2ptunnel-deleted-" + name.replace(' ', '_') + '-' + _context.clock().now() + "-privkeys.dat";
+                name = name.replace(' ', '_').replace(':', '_').replace("..", "_").replace('/', '_').replace('\\', '_');
+                name = "i2ptunnel-deleted-" + name + '-' + _context.clock().now() + "-privkeys.dat";
                 File backupDir = new SecureFile(_context.getConfigDir(), TunnelController.KEY_BACKUP_DIR);
                 File to;
                 if (backupDir.isDirectory() || backupDir.mkdir())
@@ -451,13 +455,11 @@ public class IndexBean {
     }
 
     public boolean allowCSS() {
-        String css = _context.getProperty(PROP_CSS_DISABLED);
-        return (css == null);
+        return !_context.getBooleanProperty(PROP_CSS_DISABLED);
     }
     
     public boolean allowJS() {
-        String js = _context.getProperty(PROP_JS_DISABLED);
-        return (js == null);
+        return !_context.getBooleanProperty(PROP_JS_DISABLED);
     }
     
     public int getTunnelCount() {
@@ -727,8 +729,9 @@ public class IndexBean {
         _name = (name != null ? name.trim() : null);
     }
     /** one line description */
-    public void setDescription(String description) { 
-        _description = (description != null ? description.trim() : null);
+    public void setNofilter_description(String description) { 
+        // '#' will blow up DataHelper.storeProps()
+        _description = (description != null ? description.replace('#', ' ').trim() : null);
     }
     /** I2CP host the router is on, ignored when in router context */
     public void setClientHost(String host) {

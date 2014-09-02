@@ -79,7 +79,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                 <label for="description" accesskey="e">
                     <%=intl._("Description")%>(<span class="accessKey">e</span>):
                 </label>
-                <input type="text" size="60" maxlength="80" name="description"  id="description" title="Tunnel Description" value="<%=editBean.getTunnelDescription(curTunnel)%>" class="freetext" />                
+                <input type="text" size="60" maxlength="80" name="nofilter_description"  id="description" title="Tunnel Description" value="<%=editBean.getTunnelDescription(curTunnel)%>" class="freetext" />                
             </div>
             <div id="startupField" class="rowItem">
                 <label for="startOnLoad" accesskey="a">
