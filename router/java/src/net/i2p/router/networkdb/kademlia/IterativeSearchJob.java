@@ -13,9 +13,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
-import net.i2p.data.router.RouterInfo;
 import net.i2p.data.i2np.DatabaseLookupMessage;
 import net.i2p.data.i2np.I2NPMessage;
+import net.i2p.data.router.RouterInfo;
 import net.i2p.kademlia.KBucketSet;
 import net.i2p.kademlia.XORComparator;
 import net.i2p.router.CommSystemFacade;
@@ -28,6 +28,8 @@ import net.i2p.router.TunnelInfo;
 import net.i2p.router.TunnelManagerFacade;
 import net.i2p.router.util.RandomIterator;
 import net.i2p.util.Log;
+import net.i2p.util.NativeBigInteger;
+import net.i2p.util.SystemVersion;
 
 /**
  * A traditional Kademlia search that continues to search
@@ -88,8 +90,13 @@ class IterativeSearchJob extends FloodSearchJob {
      */
     private static final int MAX_CONCURRENT = 1;
 
-    /** testing */
     private static final String PROP_ENCRYPT_RI = "router.encryptRouterLookups";
+
+    /** only on fast boxes, for now */
+    private static final boolean DEFAULT_ENCRYPT_RI =
+            SystemVersion.isX86() && SystemVersion.is64Bit() &&
+            !SystemVersion.isApache() && !SystemVersion.isGNU() &&
+            NativeBigInteger.isNative();
 
     /**
      *  Lookup using exploratory tunnels
@@ -315,7 +322,7 @@ class IterativeSearchJob extends FloodSearchJob {
             _sentTime.put(peer, Long.valueOf(now));
 
             I2NPMessage outMsg = null;
-            if (_isLease || getContext().getBooleanProperty(PROP_ENCRYPT_RI)) {
+            if (_isLease || getContext().getProperty(PROP_ENCRYPT_RI, DEFAULT_ENCRYPT_RI)) {
                 // Full ElG is fairly expensive so only do it for LS lookups
                 // if we have the ff RI, garlic encrypt it
                 RouterInfo ri = getContext().netDb().lookupRouterInfoLocally(peer);
