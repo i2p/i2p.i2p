@@ -17,7 +17,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -26,13 +25,10 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.concurrent.ConcurrentHashMap;
 
-import gnu.getopt.Getopt;
-
 import net.i2p.data.Base64;
 import net.i2p.data.DatabaseEntry;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.Hash;
-import net.i2p.data.RouterAddress;
 import net.i2p.data.RouterInfo;
 import net.i2p.router.JobImpl;
 import net.i2p.router.Router;
@@ -58,8 +54,8 @@ class PersistentDataStore extends TransientDataStore {
     
     private final static int READ_DELAY = 2*60*1000;
     private static final String PROP_FLAT = "router.networkDatabase.flat";
-    private static final String DIR_PREFIX = "r";
-    private static final String B64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-~";
+    static final String DIR_PREFIX = "r";
+    static final String B64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-~";
     
     /**
      *  @param dbDir relative path
@@ -618,7 +614,7 @@ class PersistentDataStore extends TransientDataStore {
         return DIR_PREFIX + b64.charAt(0) + File.separatorChar + ROUTERINFO_PREFIX + b64 + ROUTERINFO_SUFFIX;
     }
     
-    private static Hash getRouterInfoHash(String filename) {
+    static Hash getRouterInfoHash(String filename) {
         return getHash(filename, ROUTERINFO_PREFIX, ROUTERINFO_SUFFIX);
     }
     
@@ -655,7 +651,7 @@ class PersistentDataStore extends TransientDataStore {
         }
     }
     
-    private final static class RouterInfoFilter implements FilenameFilter {
+    static class RouterInfoFilter implements FilenameFilter {
         private static final FilenameFilter _instance = new RouterInfoFilter();
         public static final FilenameFilter getInstance() { return _instance; }
         public boolean accept(File dir, String name) {
@@ -663,170 +659,5 @@ class PersistentDataStore extends TransientDataStore {
             name = name.toUpperCase(Locale.US);
             return (name.startsWith(ROUTERINFO_PREFIX.toUpperCase(Locale.US)) && name.endsWith(ROUTERINFO_SUFFIX.toUpperCase(Locale.US)));
         }
-    }
-
-    /**
-     *  Usage: PersistentDataStore -i configDir -o toDir -c count
-     *
-     *  Copy a random selection of 'count' router infos from configDir/netDb
-     *  to 'toDir'. Skip your own router info, and old, hidden, unreachable, and
-     *  introduced routers.
-     *
-     *  Used in the build process, do not comment out.
-     *
-     *  @since 0.9.15
-     */
-    public static void main(String[] args) {
-        Getopt g = new Getopt("PersistentDataStore", args, "i:o:c:");
-        String in = System.getProperty("user.home") + "/.i2p";
-        String out = "netDb";
-        int count = 200;
-        boolean error = false;
-        int c;
-        while ((c = g.getopt()) != -1) {
-          switch (c) {
-            case 'i':
-                in = g.getOptarg();
-                break;
-
-            case 'o':
-                out = g.getOptarg();
-                break;
-
-            case 'c':
-                String scount = g.getOptarg();
-                try {
-                    count = Integer.parseInt(scount);
-                } catch (NumberFormatException nfe) {
-                    error = true;
-                }
-                break;
-
-            case '?':
-            case ':':
-            default:
-                error = true;
-          }
-        }
-        if (error) {
-            usage();
-            System.exit(1);
-        }
-
-        File confDir = new File(in);
-        File dbDir = new File(confDir, "netDb");
-        if (!dbDir.exists()) {
-            System.out.println("NetDB directory " + dbDir + " does not exist");
-            System.exit(1);
-        }
-        File myFile = new File(confDir, "router.info");
-        File toDir = new File(out);
-        toDir.mkdirs();
-        InputStream fis = null;
-        Hash me = null;
-        try {
-            fis = new BufferedInputStream(new FileInputStream(myFile));
-            RouterInfo ri = new RouterInfo();
-            ri.readBytes(fis, true);  // true = verify sig on read
-            me = ri.getIdentity().getHash();
-        } catch (Exception e) {
-            //System.out.println("Can't determine our identity");
-        } finally {
-            if (fis != null) try { fis.close(); } catch (IOException ioe) {}
-        }
-
-        int routerCount = 0;
-        List<File> toRead = new ArrayList<File>(2048);
-        for (int j = 0; j < B64.length(); j++) {
-            File subdir = new File(dbDir, DIR_PREFIX + B64.charAt(j));
-            File[] files = subdir.listFiles(RouterInfoFilter.getInstance());
-            if (files == null)
-                continue;
-            routerCount += files.length;
-            for (int i = 0; i < files.length; i++) {
-                toRead.add(files[i]);
-            }
-        }
-        if (toRead.isEmpty()) {
-            System.out.println("No files to copy in " + dbDir);
-            System.exit(1);
-        }
-        Collections.shuffle(toRead);
-        int copied = 0;
-        long tooOld = System.currentTimeMillis() - 7*24*60*60*1000L;
-        for (File file : toRead) {
-            if (copied >= count)
-                break;
-            Hash key = getRouterInfoHash(file.getName());
-            if (key == null) {
-                System.out.println("Skipping bad " + file);
-                continue;
-            }
-            if (key.equals(me)) {
-                System.out.println("Skipping my RI");
-                continue;
-            }
-            fis = null;
-            try {
-                fis = new BufferedInputStream(new FileInputStream(file));
-                RouterInfo ri = new RouterInfo();
-                ri.readBytes(fis, true);  // true = verify sig on read
-                try { fis.close(); } catch (IOException ioe) {}
-                fis = null;
-                if (ri.getPublished() < tooOld) {
-                    System.out.println("Skipping too old " + key);
-                    continue;
-                }
-                if (ri.getCapabilities().contains("U")) {
-                    System.out.println("Skipping unreachable " + key);
-                    continue;
-                }
-                Collection<RouterAddress> addrs = ri.getAddresses();
-                if (addrs.isEmpty()) {
-                    System.out.println("Skipping hidden " + key);
-                    continue;
-                }
-                boolean hasIntro = false;
-                boolean hasIPv4 = false;
-                for (RouterAddress addr : addrs) {
-                    if ("SSU".equals(addr.getTransportStyle()) && addr.getOption("ihost0") != null) {
-                        hasIntro = true;
-                        break;
-                    }
-                    String host = addr.getHost();
-                    if (host != null && host.contains("."))
-                        hasIPv4 = true;
-                }
-                if (hasIntro) {
-                    System.out.println("Skipping introduced " + key);
-                    continue;
-                }
-                if (!hasIPv4) {
-                    System.out.println("Skipping IPv6-only " + key);
-                    continue;
-                }
-                File toFile = new File(toDir, file.getName());
-                // We could call ri.write() to avoid simultaneous change by the router
-                boolean ok = FileUtil.copy(file, toFile, true, true);
-                if (ok)
-                    copied++;
-                else
-                    System.out.println("Failed copy of " + file + " to " + toDir);
-            } catch (Exception e) {
-                System.out.println("Skipping bad " + file);
-            } finally {
-                if (fis != null) try { fis.close(); } catch (IOException ioe) {}
-            }
-        }
-        if (copied > 0) {
-            System.out.println("Copied " + copied + " router info files to " + toDir);
-        } else {
-            System.out.println("Failed to copy any files to " + toDir);
-            System.exit(1);
-        }
-    }
-
-    private static void usage() {
-        System.err.println("Usage: PersistentDataStore [-i $HOME/.i2p] [-o netDb/] [-c 200]");
     }
 }
