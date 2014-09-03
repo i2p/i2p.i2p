@@ -90,10 +90,10 @@ class IterativeSearchJob extends FloodSearchJob {
      */
     private static final int MAX_CONCURRENT = 1;
 
-    private static final String PROP_ENCRYPT_RI = "router.encryptRouterLookups";
+    public static final String PROP_ENCRYPT_RI = "router.encryptRouterLookups";
 
     /** only on fast boxes, for now */
-    private static final boolean DEFAULT_ENCRYPT_RI =
+    public static final boolean DEFAULT_ENCRYPT_RI =
             SystemVersion.isX86() && SystemVersion.is64Bit() &&
             !SystemVersion.isApache() && !SystemVersion.isGNU() &&
             NativeBigInteger.isNative();

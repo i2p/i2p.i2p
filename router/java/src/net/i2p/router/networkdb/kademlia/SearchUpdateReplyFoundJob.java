@@ -18,24 +18,26 @@ import net.i2p.util.Log;
 /**
  * Called after a match to a db search is found
  *
+ * Used only by SearchJob which is only used by ExploreJob
  */
 class SearchUpdateReplyFoundJob extends JobImpl implements ReplyJob {
-    private Log _log;
+    private final Log _log;
     private I2NPMessage _message;
-    private Hash _peer;
-    private SearchState _state;
-    private KademliaNetworkDatabaseFacade _facade;
-    private SearchJob _job;
-    private TunnelInfo _outTunnel;
-    private TunnelInfo _replyTunnel;
-    private boolean _isFloodfillPeer;
-    private long _sentOn;
+    private final Hash _peer;
+    private final SearchState _state;
+    private final KademliaNetworkDatabaseFacade _facade;
+    private final SearchJob _job;
+    private final TunnelInfo _outTunnel;
+    private final TunnelInfo _replyTunnel;
+    private final boolean _isFloodfillPeer;
+    private final long _sentOn;
     
     public SearchUpdateReplyFoundJob(RouterContext context, RouterInfo peer, 
                                      SearchState state, KademliaNetworkDatabaseFacade facade, 
                                      SearchJob job) {
         this(context, peer, state, facade, job, null, null);
     }
+
     public SearchUpdateReplyFoundJob(RouterContext context, RouterInfo peer, 
                                      SearchState state, KademliaNetworkDatabaseFacade facade, 
                                      SearchJob job, TunnelInfo outTunnel, TunnelInfo replyTunnel) {
@@ -52,6 +54,7 @@ class SearchUpdateReplyFoundJob extends JobImpl implements ReplyJob {
     }
     
     public String getName() { return "Update Reply Found for Kademlia Search"; }
+
     public void runJob() {
         if (_isFloodfillPeer)
             _job.decrementOutstandingFloodfillSearches();
@@ -59,7 +62,7 @@ class SearchUpdateReplyFoundJob extends JobImpl implements ReplyJob {
         I2NPMessage message = _message;
         if (_log.shouldLog(Log.INFO))
             _log.info(getJobId() + ": Reply from " + _peer.toBase64() 
-                      + " with message " + message.getClass().getName());
+                      + " with message " + message.getClass().getSimpleName());
         
         long howLong = System.currentTimeMillis() - _sentOn;
         // assume requests are 1KB (they're almost always much smaller, but tunnels have a fixed size)
