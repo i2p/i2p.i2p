@@ -22,6 +22,9 @@ public class CryptoChecker {
     //private static String JRE7 = "http://www.oracle.com/technetwork/java/javase/documentation/java-se-7-doc-download-435117.html";
     //private static String JRE8 = "http://www.oracle.com/technetwork/java/javase/documentation/jdk8-doc-downloads-2133158.html";
 
+    /**
+     *  @param ctx if null, logs only to System.out (called from main)
+     */
     public static void warnUnavailableCrypto(RouterContext ctx) {
         if (SystemVersion.isAndroid())
             return;
@@ -31,17 +34,20 @@ public class CryptoChecker {
             if (!t.isAvailable()) {
                 if (!unavail) {
                     unavail = true;
-                    log = ctx.logManager().getLog(CryptoChecker.class);
+                    if (ctx != null)
+                        log = ctx.logManager().getLog(CryptoChecker.class);
                 }
                 String s = "Crypto " + t + " is not available";
-                log.logAlways(log.WARN, s);
+                if (log != null)
+                    log.logAlways(log.WARN, s);
                 System.out.println("Warning: " + s);
             }
         }
         if (unavail) {
             if (!SystemVersion.isJava7()) {
                 String s = "Java version: " + System.getProperty("java.version") + " Please consider upgrading to Java 7";
-                log.logAlways(log.WARN, s);
+                if (log != null)
+                    log.logAlways(log.WARN, s);
                 System.out.println(s);
             }
             if (!isUnlimited()) {
@@ -52,12 +58,17 @@ public class CryptoChecker {
                 //    s  += JRE7;
                 //else
                     s  += JRE6;
-                log.logAlways(log.WARN, s);
+                if (log != null)
+                    log.logAlways(log.WARN, s);
                 System.out.println(s);
             }
             String s = "This crypto will be required in a future release";
-            log.logAlways(log.WARN, s);
+            if (log != null)
+                log.logAlways(log.WARN, s);
             System.out.println("Warning: " + s);
+        } else if (ctx == null) {
+            // called from main()
+            System.out.println("All crypto available");
         }
     }
 
@@ -81,6 +92,10 @@ public class CryptoChecker {
             }
         }
         return true;
+    }
+
+    public static void main(String[] args) {
+        warnUnavailableCrypto(null);
     }
 }
 
