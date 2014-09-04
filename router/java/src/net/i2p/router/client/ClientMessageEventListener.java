@@ -84,8 +84,8 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
             _log.debug("Message received: \n" + message);
         int type = message.getType();
         if (!_authorized) {
-            // TODO change to default true
-            boolean strict = _context.getBooleanProperty(PROP_AUTH_STRICT);
+            // Default true as of 0.9.16
+            boolean strict = _context.getBooleanPropertyDefaultTrue(PROP_AUTH_STRICT);
             if ((strict && type != GetDateMessage.MESSAGE_TYPE) ||
                 (type != CreateSessionMessage.MESSAGE_TYPE &&
                  type != GetDateMessage.MESSAGE_TYPE &&
