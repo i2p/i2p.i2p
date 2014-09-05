@@ -202,22 +202,29 @@ class SearchJob extends JobImpl {
                 _log.debug(getJobId() + ": Already completed");
             return;
         }
+        if (_state.isAborted()) {
+            if (_log.shouldLog(Log.INFO))
+                _log.info(getJobId() + ": Search aborted");
+            _state.complete();
+            fail();
+            return;
+        }
         if (_log.shouldLog(Log.INFO))
             _log.info(getJobId() + ": Searching: " + _state);
         if (isLocal()) {
             if (_log.shouldLog(Log.INFO))
                 _log.info(getJobId() + ": Key found locally");
-            _state.complete(true);
+            _state.complete();
             succeed();
         } else if (isExpired()) {
             if (_log.shouldLog(Log.INFO))
                 _log.info(getJobId() + ": Key search expired");
-            _state.complete(true);
+            _state.complete();
             fail();
         } else if (_state.getAttempted().size() > MAX_PEERS_QUERIED) {
             if (_log.shouldLog(Log.INFO))
                 _log.info(getJobId() + ": Too many peers quried");
-            _state.complete(true);
+            _state.complete();
             fail();
         } else {
             //_log.debug("Continuing search");

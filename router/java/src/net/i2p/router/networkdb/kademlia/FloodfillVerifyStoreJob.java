@@ -6,6 +6,7 @@ import java.util.Set;
 
 import net.i2p.data.Certificate;
 import net.i2p.data.DatabaseEntry;
+import net.i2p.data.Destination;
 import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
 import net.i2p.data.router.RouterInfo;
@@ -173,9 +174,9 @@ class FloodfillVerifyStoreJob extends JobImpl {
         FloodfillPeerSelector sel = (FloodfillPeerSelector)_facade.getPeerSelector();
         Certificate keyCert = null;
         if (!_isRouterInfo) {
-            LeaseSet ls = _facade.lookupLeaseSetLocally(_key);
-            if (ls != null) {
-                Certificate cert = ls.getDestination().getCertificate();
+            Destination dest = _facade.lookupDestinationLocally(_key);
+            if (dest != null) {
+                Certificate cert = dest.getCertificate();
                 if (cert.getCertificateType() == Certificate.CERTIFICATE_TYPE_KEY)
                     keyCert = cert;
             }

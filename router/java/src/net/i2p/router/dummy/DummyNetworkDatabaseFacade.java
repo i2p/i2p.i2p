@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Set;
 
 import net.i2p.data.DatabaseEntry;
+import net.i2p.data.Destination;
 import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
 import net.i2p.data.router.RouterInfo;
@@ -23,8 +24,8 @@ import net.i2p.router.NetworkDatabaseFacade;
 import net.i2p.router.RouterContext;
 
 public class DummyNetworkDatabaseFacade extends NetworkDatabaseFacade {
-    private Map<Hash, RouterInfo> _routers;
-    private RouterContext _context;
+    private final Map<Hash, RouterInfo> _routers;
+    private final RouterContext _context;
     
     public DummyNetworkDatabaseFacade(RouterContext ctx) {
         _routers = Collections.synchronizedMap(new HashMap<Hash, RouterInfo>());
@@ -42,6 +43,11 @@ public class DummyNetworkDatabaseFacade extends NetworkDatabaseFacade {
     public void lookupLeaseSet(Hash key, Job onFindJob, Job onFailedLookupJob, long timeoutMs) {}
     public void lookupLeaseSet(Hash key, Job onFindJob, Job onFailedLookupJob, long timeoutMs, Hash fromLocalDest) {}
     public LeaseSet lookupLeaseSetLocally(Hash key) { return null; }
+
+    public void lookupDestination(Hash key, Job onFinishedJob, long timeoutMs, Hash fromLocalDest) {}
+
+    public Destination lookupDestinationLocally(Hash key) { return null; }
+
     public void lookupRouterInfo(Hash key, Job onFindJob, Job onFailedLookupJob, long timeoutMs) {
         RouterInfo info = lookupRouterInfoLocally(key);
         if (info == null) 
@@ -50,13 +56,16 @@ public class DummyNetworkDatabaseFacade extends NetworkDatabaseFacade {
             _context.jobQueue().addJob(onFindJob);
     }
     public RouterInfo lookupRouterInfoLocally(Hash key) { return _routers.get(key); }
+
     public void publish(LeaseSet localLeaseSet) {}
     public void publish(RouterInfo localRouterInfo) {}
+
     public LeaseSet store(Hash key, LeaseSet leaseSet) { return leaseSet; }
     public RouterInfo store(Hash key, RouterInfo routerInfo) {
         RouterInfo rv = _routers.put(key, routerInfo);
         return rv;
     }
+
     public void unpublish(LeaseSet localLeaseSet) {}
     public void fail(Hash dbEntry) {
         _routers.remove(dbEntry);
