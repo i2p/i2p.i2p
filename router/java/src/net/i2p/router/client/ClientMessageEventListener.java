@@ -393,7 +393,7 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
                 _runner.disconnectClient("Bad private key in LS");
                 return;
             }
-            if (!pk.equals(dest.getPublicKey())) {
+            if (!pk.equals(message.getLeaseSet().getEncryptionKey())) {
                 if (_log.shouldLog(Log.ERROR))
                     _log.error("Private/public crypto key mismatch in LS");
                 _runner.disconnectClient("Private/public crypto key mismatch in LS");
