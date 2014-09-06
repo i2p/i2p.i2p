@@ -164,6 +164,14 @@ do
     else
        compute_dates
     fi
+    if grep '\s$' $i > /dev/null 2>&1; then
+        echo "********* Trailing whitespace found in file $i *********"
+        FAIL=1
+    fi
+    if grep '^\s' $i > /dev/null 2>&1; then
+        echo "********* Leading whitespace found in file $i *********"
+        FAIL=1
+    fi
 done
 
 if [ -n "$FAIL" ]; then
