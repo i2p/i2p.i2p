@@ -25,8 +25,8 @@ import gnu.getopt.Getopt;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.Hash;
-import net.i2p.data.RouterAddress;
-import net.i2p.data.RouterInfo;
+import net.i2p.data.router.RouterAddress;
+import net.i2p.data.router.RouterInfo;
 import net.i2p.router.transport.BadCountries;
 import net.i2p.router.transport.GeoIP;
 import net.i2p.util.FileUtil;
