@@ -2795,10 +2795,14 @@ public class I2PSnarkServlet extends BasicServlet {
         }
         if (showSaveButton) {
             buf.append("<thead><tr><th colspan=\"4\">&nbsp;</th><th class=\"headerpriority\">" +
-                       "<a class=\"control\" id=\"setallhigh\" href=\"javascript:void(null);\" onclick=\"setallhigh();\">").append(_("Set all high")).append("</a>\n" +
-                       "<a class=\"control\" id=\"setallnorm\" href=\"javascript:void(null);\" onclick=\"setallnorm();\">").append(_("Set all normal")).append("</a>\n" +
-                       "<a class=\"control\" id=\"setallskip\" href=\"javascript:void(null);\" onclick=\"setallskip();\">").append(_("Skip all")).append("</a>\n" +
-                       "<br><input type=\"submit\" class=\"accept\" value=\"").append(_("Save priorities")).append("\" name=\"savepri\" >\n" +
+                       "<a class=\"control\" id=\"setallhigh\" href=\"javascript:void(null);\" onclick=\"setallhigh();\">")
+               .append(toImg("clock_red")).append(_("Set all high")).append("</a>\n" +
+                       "<a class=\"control\" id=\"setallnorm\" href=\"javascript:void(null);\" onclick=\"setallnorm();\">")
+               .append(toImg("clock")).append(_("Set all normal")).append("</a>\n" +
+                       "<a class=\"control\" id=\"setallskip\" href=\"javascript:void(null);\" onclick=\"setallskip();\">")
+               .append(toImg("cancel")).append(_("Skip all")).append("</a>\n" +
+                       "<br><br><input type=\"submit\" class=\"accept\" value=\"").append(_("Save priorities"))
+               .append("\" name=\"savepri\" >\n" +
                        "</th></tr></thead>\n");
         }
         buf.append("</table>\n");

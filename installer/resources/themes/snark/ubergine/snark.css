@@ -543,6 +543,10 @@ a.controld {
      font-weight: normal;
 }
 
+a.controld img {
+     display: none;
+}
+
 a.control:hover {
      background-color: #f60;
      border: 1px outset #bbb;
