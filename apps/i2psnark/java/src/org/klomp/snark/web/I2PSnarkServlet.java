@@ -59,7 +59,7 @@ public class I2PSnarkServlet extends BasicServlet {
     
     private static final String DEFAULT_NAME = "i2psnark";
     public static final String PROP_CONFIG_FILE = "i2psnark.configFile";
-    private static final String WARBASE = "/.icons/";
+    private static final String WARBASE = "/.resources/";
     private static final char HELLIP = '\u2026';
  
     public I2PSnarkServlet() {
@@ -2393,6 +2393,10 @@ public class I2PSnarkServlet extends BasicServlet {
             // dummy
             r = new File("");
         }
+
+        boolean showPriority = snark != null && snark.getStorage() != null && !snark.getStorage().complete() &&
+                               r.isDirectory();
+
         StringBuilder buf=new StringBuilder(4096);
         buf.append(DOCTYPE).append("<HTML><HEAD><TITLE>");
         if (title.endsWith("/"))
@@ -2400,8 +2404,14 @@ public class I2PSnarkServlet extends BasicServlet {
         String directory = title;
         title = _("Torrent") + ": " + DataHelper.escapeHTML(title);
         buf.append(title);
-        buf.append("</TITLE>").append(HEADER_A).append(_themePath).append(HEADER_B).append("<link rel=\"shortcut icon\" href=\"" + _themePath + "favicon.ico\">" +
-             "</HEAD><BODY>\n<center><div class=\"snarknavbar\"><a href=\"").append(_contextPath).append("/\" title=\"Torrents\"");
+        buf.append("</TITLE>\n").append(HEADER_A).append(_themePath).append(HEADER_B)
+            .append("<link rel=\"shortcut icon\" href=\"" + _themePath + "favicon.ico\">\n");
+        if (showPriority)
+            buf.append("<script src=\"").append(_contextPath).append(WARBASE + "js/folder.js\" type=\"text/javascript\"></script>\n");
+        buf.append("</HEAD><BODY");
+        if (showPriority)
+            buf.append(" onload=\"setupbuttons()\"");
+        buf.append(">\n<center><div class=\"snarknavbar\"><a href=\"").append(_contextPath).append("/\" title=\"Torrents\"");
         buf.append(" class=\"snarkRefresh\"><img alt=\"\" border=\"0\" src=\"").append(_imgPath).append("arrow_refresh.png\">&nbsp;&nbsp;");
         if (_contextName.equals(DEFAULT_NAME))
             buf.append(_("I2PSnark"));
@@ -2411,8 +2421,6 @@ public class I2PSnarkServlet extends BasicServlet {
         
         if (parent)  // always true
             buf.append("<div class=\"page\"><div class=\"mainsection\">");
-        boolean showPriority = snark != null && snark.getStorage() != null && !snark.getStorage().complete() &&
-                               r.isDirectory();
         if (showPriority) {
             buf.append("<form action=\"").append(base).append("\" method=\"POST\">\n");
             buf.append("<input type=\"hidden\" name=\"nonce\" value=\"").append(_nonce).append("\" >\n");
@@ -2737,19 +2745,19 @@ public class I2PSnarkServlet extends BasicServlet {
             if (showPriority) {
                 buf.append("<td class=\"priority\">");
                 if ((!complete) && (!item.isDirectory())) {
-                    buf.append("<input type=\"radio\" value=\"5\" name=\"pri.").append(item).append("\" ");
+                    buf.append("\n<input type=\"radio\" onclick=\"priorityclicked();\" class=\"prihigh\" value=\"5\" name=\"pri.").append(item).append("\" ");
                     if (priority > 0)
-                        buf.append("checked=\"true\"");
+                        buf.append("checked=\"checked\"");
                     buf.append('>').append(_("High"));
 
-                    buf.append("<input type=\"radio\" value=\"0\" name=\"pri.").append(item).append("\" ");
+                    buf.append("\n<input type=\"radio\" onclick=\"priorityclicked();\" class=\"prinorm\" value=\"0\" name=\"pri.").append(item).append("\" ");
                     if (priority == 0)
-                        buf.append("checked=\"true\"");
+                        buf.append("checked=\"checked\"");
                     buf.append('>').append(_("Normal"));
 
-                    buf.append("<input type=\"radio\" value=\"-9\" name=\"pri.").append(item).append("\" ");
+                    buf.append("\n<input type=\"radio\" onclick=\"priorityclicked();\" class=\"priskip\" value=\"-9\" name=\"pri.").append(item).append("\" ");
                     if (priority < 0)
-                        buf.append("checked=\"true\"");
+                        buf.append("checked=\"checked\"");
                     buf.append('>').append(_("Skip"));
                     showSaveButton = true;
                 }
@@ -2758,9 +2766,12 @@ public class I2PSnarkServlet extends BasicServlet {
             buf.append("</TR>\n");
         }
         if (showSaveButton) {
-            buf.append("<thead><tr><th colspan=\"4\">&nbsp;</th><th class=\"headerpriority\"><input type=\"submit\" value=\"");
-            buf.append(_("Save priorities"));
-            buf.append("\" name=\"foo\" ></th></tr></thead>\n");
+            buf.append("<thead><tr><th colspan=\"4\">&nbsp;</th><th class=\"headerpriority\">" +
+                       "<a class=\"control\" id=\"setallhigh\" href=\"javascript:void(null);\" onclick=\"setallhigh();\">").append(_("Set all high")).append("</a>\n" +
+                       "<a class=\"control\" id=\"setallnorm\" href=\"javascript:void(null);\" onclick=\"setallnorm();\">").append(_("Set all normal")).append("</a>\n" +
+                       "<a class=\"control\" id=\"setallskip\" href=\"javascript:void(null);\" onclick=\"setallskip();\">").append(_("Skip all")).append("</a>\n" +
+                       "<br><input type=\"submit\" class=\"accept\" value=\"").append(_("Save priorities")).append("\" name=\"savepri\" >\n" +
+                       "</th></tr></thead>\n");
         }
         buf.append("</table>\n");
         if (showPriority)
@@ -2829,12 +2840,12 @@ public class I2PSnarkServlet extends BasicServlet {
     
     /** @since 0.7.14 */
     private String toImg(String icon) {
-        return "<img alt=\"\" height=\"16\" width=\"16\" src=\"" + _contextPath + "/.icons/" + icon + ".png\">";
+        return "<img alt=\"\" height=\"16\" width=\"16\" src=\"" + _contextPath + WARBASE + "icons/" + icon + ".png\">";
     }
 
     /** @since 0.8.2 */
     private String toImg(String icon, String altText) {
-        return "<img alt=\"" + altText + "\" height=\"16\" width=\"16\" src=\"" + _contextPath + "/.icons/" + icon + ".png\">";
+        return "<img alt=\"" + altText + "\" height=\"16\" width=\"16\" src=\"" + _contextPath + WARBASE + "icons/" + icon + ".png\">";
     }
 
     /** @since 0.8.1 */
