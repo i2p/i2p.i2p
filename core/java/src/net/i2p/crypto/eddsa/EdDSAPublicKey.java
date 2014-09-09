@@ -8,6 +8,8 @@ import net.i2p.crypto.eddsa.spec.EdDSAPublicKeySpec;
 
 /**
  * An EdDSA public key.
+ *
+ * @since 0.9.15
  * @author str4d
  *
  */

@@ -1,8 +1,8 @@
 package net.i2p.crypto.eddsa.math.ed25519;
 
+import net.i2p.crypto.eddsa.Utils;
 import net.i2p.crypto.eddsa.math.Field;
 import net.i2p.crypto.eddsa.math.FieldElement;
-import net.i2p.data.DataHelper;
 
 /**
  * An element t, entries t[0]...t[9], represents the integer
@@ -26,11 +26,7 @@ public class Ed25519FieldElement extends FieldElement {
 
     public boolean isNonZero() {
         byte[] s = toByteArray();
-        int result = 0;
-        for (int i = 0; i < 32; i++) {
-            result |= s[i] ^ zero[i];
-        }
-        return result != 0;
+        return Utils.equal(s, zero) == 1;
     }
 
     /**
@@ -959,13 +955,11 @@ public class Ed25519FieldElement extends FieldElement {
         if (!(obj instanceof Ed25519FieldElement))
             return false;
         Ed25519FieldElement fe = (Ed25519FieldElement) obj;
-        // XXX why does direct byte[] comparison fail?
-        // TODO should this be constant time?
-        return DataHelper.toString(toByteArray()).equals(DataHelper.toString(fe.toByteArray()));
+        return 1==Utils.equal(toByteArray(), fe.toByteArray());
     }
 
     @Override
     public String toString() {
-        return "[Ed25519FieldElement val="+DataHelper.toString(toByteArray())+"]";
+        return "[Ed25519FieldElement val="+Utils.bytesToHex(toByteArray())+"]";
     }
 }

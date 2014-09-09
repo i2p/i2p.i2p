@@ -475,7 +475,7 @@ public class NativeBigInteger extends BigInteger {
             }
             if (!_nativeOk) {
                 warn("Native BigInteger library jbigi not loaded - using pure Java - " +
-                     "poor performance may result - see http://www.i2p2.i2p/jbigi for help");
+                     "poor performance may result - see http://i2p-projekt.i2p/jbigi for help");
             }
         } catch(Exception e) {
             warn("Native BigInteger library jbigi not loaded, using pure java", e);

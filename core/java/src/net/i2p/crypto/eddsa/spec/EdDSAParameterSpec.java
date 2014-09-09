@@ -12,6 +12,8 @@ import java.io.Serializable;
 
 /**
  * Parameter specification for an EdDSA algorithm.
+ *
+ * @since 0.9.15
  * @author str4d
  *
  */

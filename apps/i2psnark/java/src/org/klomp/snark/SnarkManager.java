@@ -92,6 +92,7 @@ public class SnarkManager implements CompleteListener {
     private static final String PROP_META_BITFIELD = "bitfield";
     private static final String PROP_META_PRIORITY = "priority";
     private static final String PROP_META_PRESERVE_NAMES = "preserveFileNames";
+    private static final String PROP_META_UPLOADED = "uploaded";
     //private static final String PROP_META_BITFIELD_SUFFIX = ".bitfield";
     //private static final String PROP_META_PRIORITY_SUFFIX = ".priority";
     private static final String PROP_META_MAGNET_PREFIX = "i2psnark.magnet.";
@@ -128,6 +129,9 @@ public class SnarkManager implements CompleteListener {
     /**
      *  "name", "announceURL=websiteURL" pairs
      *  '=' in announceURL must be escaped as &#44;
+     *
+     *  Please use host name, not b32 or full dest, in announce URL. Ensure in default hosts.txt.
+     *  Please use host name, not b32 or full dest, in website URL. Ensure in default hosts.txt.
      */
     private static final String DEFAULT_TRACKERS[] = { 
 //       "Postman", "http://YRgrgTLGnbTq2aZOZDJQ~o6Uk5k6TK-OZtx0St9pb0G-5EGYURZioxqYG8AQt~LgyyI~NCj6aYWpPO-150RcEvsfgXLR~CxkkZcVpgt6pns8SRc3Bi-QSAkXpJtloapRGcQfzTtwllokbdC-aMGpeDOjYLd8b5V9Im8wdCHYy7LRFxhEtGb~RL55DA8aYOgEXcTpr6RPPywbV~Qf3q5UK55el6Kex-6VCxreUnPEe4hmTAbqZNR7Fm0hpCiHKGoToRcygafpFqDw5frLXToYiqs9d4liyVB-BcOb0ihORbo0nS3CLmAwZGvdAP8BZ7cIYE3Z9IU9D1G8JCMxWarfKX1pix~6pIA-sp1gKlL1HhYhPMxwyxvuSqx34o3BqU7vdTYwWiLpGM~zU1~j9rHL7x60pVuYaXcFQDR4-QVy26b6Pt6BlAZoFmHhPcAuWfu-SFhjyZYsqzmEmHeYdAwa~HojSbofg0TMUgESRXMw6YThK1KXWeeJVeztGTz25sL8AAAA.i2p/announce.php=http://tracker.postman.i2p/"
@@ -1357,7 +1361,7 @@ public class SnarkManager implements CompleteListener {
                 return false;
             }
             // so addTorrent won't recheck
-            saveTorrentStatus(metainfo, bitfield, null, baseFile, true); // no file priorities
+            saveTorrentStatus(metainfo, bitfield, null, baseFile, true, 0); // no file priorities
             try {
                 locked_writeMetaInfo(metainfo, filename, areFilesPublic());
                 // hold the lock for a long time
@@ -1522,6 +1526,21 @@ public class SnarkManager implements CompleteListener {
         Properties config = getConfig(snark);
         return Boolean.parseBoolean(config.getProperty(PROP_META_PRESERVE_NAMES));
     }
+
+    /**
+     * Get setting for a torrent from the config file.
+     * @return setting, 0 if not found
+     * @since 0.9.15
+     */
+    public long getSavedUploaded(Snark snark) {
+        Properties config = getConfig(snark);
+        if (config != null) {
+            try {
+                return Long.parseLong(config.getProperty(PROP_META_UPLOADED));
+            } catch (NumberFormatException nfe) {}
+        }
+        return 0;
+    }
     
     /**
      * Save the completion status of a torrent and other data in the config file
@@ -1535,7 +1554,8 @@ public class SnarkManager implements CompleteListener {
         if (meta == null || storage == null)
             return;
         saveTorrentStatus(meta, storage.getBitField(), storage.getFilePriorities(),
-                          storage.getBase(), storage.getPreserveFileNames());
+                          storage.getBase(), storage.getPreserveFileNames(),
+                          snark.getUploaded());
     }
 
     /**
@@ -1550,14 +1570,14 @@ public class SnarkManager implements CompleteListener {
      * @param base may be null
      */
     private void saveTorrentStatus(MetaInfo metainfo, BitField bitfield, int[] priorities,
-                                   File base, boolean preserveNames) {
+                                   File base, boolean preserveNames, long uploaded) {
         synchronized (_configLock) {
-            locked_saveTorrentStatus(metainfo, bitfield, priorities, base, preserveNames);
+            locked_saveTorrentStatus(metainfo, bitfield, priorities, base, preserveNames, uploaded);
         }
     }
 
     private void locked_saveTorrentStatus(MetaInfo metainfo, BitField bitfield, int[] priorities,
-                                          File base, boolean preserveNames) {
+                                          File base, boolean preserveNames, long uploaded) {
         byte[] ih = metainfo.getInfoHash();
         String bfs;
         if (bitfield.complete()) {
@@ -1570,6 +1590,7 @@ public class SnarkManager implements CompleteListener {
         config.setProperty(PROP_META_STAMP, Long.toString(System.currentTimeMillis()));
         config.setProperty(PROP_META_BITFIELD, bfs);
         config.setProperty(PROP_META_PRESERVE_NAMES, Boolean.toString(preserveNames));
+        config.setProperty(PROP_META_UPLOADED, Long.toString(uploaded));
         if (base != null)
             config.setProperty(PROP_META_BASE, base.getAbsolutePath());
 
@@ -1826,7 +1847,7 @@ public class SnarkManager implements CompleteListener {
         Storage storage = snark.getStorage();
         if (meta != null && storage != null)
             saveTorrentStatus(meta, storage.getBitField(), storage.getFilePriorities(),
-                              storage.getBase(), storage.getPreserveFileNames());
+                              storage.getBase(), storage.getPreserveFileNames(), snark.getUploaded());
     }
     
     /**
@@ -1849,7 +1870,7 @@ public class SnarkManager implements CompleteListener {
                 return null;
             }
             saveTorrentStatus(meta, storage.getBitField(), null,
-                              storage.getBase(), storage.getPreserveFileNames()); // no file priorities
+                              storage.getBase(), storage.getPreserveFileNames(), 0);
             // temp for addMessage() in case canonical throws
             String name = storage.getBaseName();
             try {

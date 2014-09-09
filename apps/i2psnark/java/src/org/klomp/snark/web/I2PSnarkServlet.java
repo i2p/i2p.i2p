@@ -25,8 +25,10 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import net.i2p.data.Base32;
 import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
+import net.i2p.data.Hash;
 import net.i2p.util.Log;
 
 import org.klomp.snark.I2PSnarkUtil;
@@ -498,7 +500,7 @@ public class I2PSnarkServlet extends BasicServlet {
         out.write(_("RX"));
         out.write("\">");
         out.write("</th>\n<th align=\"right\">");
-        if (_manager.util().connected() && !snarks.isEmpty()) {
+        if (!snarks.isEmpty()) {
             out.write("<img border=\"0\" src=\"" + _imgPath + "head_tx.png\" title=\"");
             out.write(_("Uploaded"));
             out.write("\" alt=\"");
@@ -1430,8 +1432,7 @@ public class I2PSnarkServlet extends BasicServlet {
         out.write("</td><td class=\"snarkTorrentName\"");
         if (isMultiFile) {
             // link on the whole td
-            String jsec = encodedBaseName.replace("'", "\\'");
-            out.write(" onclick=\"document.location='" + jsec + "/';\">");
+            out.write(" onclick=\"document.location='" + encodedBaseName + "/';\">");
         } else {
             out.write('>');
         }
@@ -1465,15 +1466,15 @@ public class I2PSnarkServlet extends BasicServlet {
         //    out.write("??");  // no meta size yet
         out.write("</td>\n\t");
         out.write("<td align=\"right\" class=\"snarkTorrentUploaded\">");
-        if(isRunning && isValid)
+        if (isValid && uploaded > 0)
            out.write(formatSize(uploaded));
         out.write("</td>\n\t");
         out.write("<td align=\"right\" class=\"snarkTorrentRateDown\">");
-        if(isRunning && needed > 0)
+        if (isRunning && needed > 0)
             out.write(formatSize(downBps) + "ps");
         out.write("</td>\n\t");
         out.write("<td align=\"right\" class=\"snarkTorrentRateUp\">");
-        if(isRunning && isValid)
+        if (isRunning && isValid)
             out.write(formatSize(upBps) + "ps");
         out.write("</td>\n\t");
         out.write("<td align=\"center\" class=\"snarkTorrentAction\">");
@@ -1717,8 +1718,10 @@ public class I2PSnarkServlet extends BasicServlet {
     }
 
     /**
-     *  Start of anchor only, caller must add anchor text or img and close anchor
-     *  @return string or null
+     *  Generate link to details page if we know it supports it.
+     *  Start of anchor only, caller must add anchor text or img and close anchor.
+     *
+     *  @return string or null if unknown tracker
      *  @since 0.8.4
      */
     private String getTrackerLinkUrl(String announce, byte[] infohash) {
@@ -1745,8 +1748,8 @@ public class I2PSnarkServlet extends BasicServlet {
     }
 
     /**
-     *  Full anchor with img
-     *  @return string or null
+     *  Full link to details page with img
+     *  @return string or null if details page unsupported
      *  @since 0.8.4
      */
     private String getTrackerLink(String announce, byte[] infohash) {
@@ -1762,7 +1765,7 @@ public class I2PSnarkServlet extends BasicServlet {
     }
 
     /**
-     *  Full anchor with shortened URL as anchor text
+     *  Full anchor to home page or details page with shortened host name as anchor text
      *  @return string, non-null
      *  @since 0.9.5
      */
@@ -1771,14 +1774,37 @@ public class I2PSnarkServlet extends BasicServlet {
         String trackerLinkUrl = getTrackerLinkUrl(announce, infohash);
         if (announce.startsWith("http://"))
             announce = announce.substring(7);
+        // strip path
         int slsh = announce.indexOf('/');
         if (slsh > 0)
             announce = announce.substring(0, slsh);
-        if (trackerLinkUrl != null)
+        if (trackerLinkUrl != null) {
             buf.append(trackerLinkUrl);
-        else
-            // TODO encode
-            buf.append("<a href=\"http://").append(urlEncode(announce)).append("/\">");
+        } else {
+            // browsers don't like a full b64 dest, so convert it to b32
+            String host = announce;
+            if (host.length() >= 516) {
+                int colon = announce.indexOf(':');
+                String port = "";
+                if (colon > 0) {
+                    port = host.substring(colon);
+                    host = host.substring(0, colon);
+                }
+                if (host.endsWith(".i2p"))
+                    host = host.substring(0, host.length() - 4);
+                byte[] b = Base64.decode(host);
+                if (b != null) {
+                    Hash h = _context.sha().calculateHash(b);
+                    // should we add the port back or strip it?
+                    host = Base32.encode(h.getData()) + ".b32.i2p" + port;
+                }
+            }
+            buf.append("<a href=\"http://").append(urlEncode(host)).append("/\">");
+        }
+        // strip port
+        int colon = announce.indexOf(':');
+        if (colon > 0)
+            announce = announce.substring(0, colon);
         if (announce.length() > 67)
             announce = DataHelper.escapeHTML(announce.substring(0, 40)) + "&hellip;" +
                        DataHelper.escapeHTML(announce.substring(announce.length() - 8));
@@ -2673,6 +2699,7 @@ public class I2PSnarkServlet extends BasicServlet {
             boolean complete = false;
             String status = "";
             long length = item.length();
+            int fileIndex = -1;
             int priority = 0;
             if (item.isDirectory()) {
                 complete = true;
@@ -2684,8 +2711,9 @@ public class I2PSnarkServlet extends BasicServlet {
                     status = toImg("cancel") + ' ' + _("Torrent not found?");
                 } else {
                     Storage storage = snark.getStorage();
+                    fileIndex = storage.indexOf(item);
 
-                            long remaining = storage.remaining(item);
+                            long remaining = storage.remaining(fileIndex);
                             if (remaining < 0) {
                                 complete = true;
                                 status = toImg("cancel") + ' ' + _("File not found in torrent?");
@@ -2693,7 +2721,7 @@ public class I2PSnarkServlet extends BasicServlet {
                                 complete = true;
                                 status = toImg("tick") + ' ' + _("Complete");
                             } else {
-                                priority = storage.getPriority(item);
+                                priority = storage.getPriority(fileIndex);
                                 if (priority < 0)
                                     status = toImg("cancel");
                                 else if (priority == 0)
@@ -2745,17 +2773,17 @@ public class I2PSnarkServlet extends BasicServlet {
             if (showPriority) {
                 buf.append("<td class=\"priority\">");
                 if ((!complete) && (!item.isDirectory())) {
-                    buf.append("\n<input type=\"radio\" onclick=\"priorityclicked();\" class=\"prihigh\" value=\"5\" name=\"pri.").append(item).append("\" ");
+                    buf.append("\n<input type=\"radio\" onclick=\"priorityclicked();\" class=\"prihigh\" value=\"5\" name=\"pri.").append(fileIndex).append("\" ");
                     if (priority > 0)
                         buf.append("checked=\"checked\"");
                     buf.append('>').append(_("High"));
 
-                    buf.append("\n<input type=\"radio\" onclick=\"priorityclicked();\" class=\"prinorm\" value=\"0\" name=\"pri.").append(item).append("\" ");
+                    buf.append("\n<input type=\"radio\" onclick=\"priorityclicked();\" class=\"prinorm\" value=\"0\" name=\"pri.").append(fileIndex).append("\" ");
                     if (priority == 0)
                         buf.append("checked=\"checked\"");
                     buf.append('>').append(_("Normal"));
 
-                    buf.append("\n<input type=\"radio\" onclick=\"priorityclicked();\" class=\"priskip\" value=\"-9\" name=\"pri.").append(item).append("\" ");
+                    buf.append("\n<input type=\"radio\" onclick=\"priorityclicked();\" class=\"priskip\" value=\"-9\" name=\"pri.").append(fileIndex).append("\" ");
                     if (priority < 0)
                         buf.append("checked=\"checked\"");
                     buf.append('>').append(_("Skip"));
@@ -2857,10 +2885,10 @@ public class I2PSnarkServlet extends BasicServlet {
             String key = entry.getKey();
             if (key.startsWith("pri.")) {
                 try {
-                    File file = new File(key.substring(4));
+                    int fileIndex = Integer.parseInt(key.substring(4));
                     String val = entry.getValue()[0];   // jetty arrays
                     int pri = Integer.parseInt(val);
-                    storage.setPriority(file, pri);
+                    storage.setPriority(fileIndex, pri);
                     //System.err.println("Priority now " + pri + " for " + file);
                 } catch (Throwable t) { t.printStackTrace(); }
             }

@@ -271,6 +271,8 @@ public class WorkingDir {
         // We don't currently have a default addressbook/ in the base distribution,
         // but distros might put one in
         "addressbook,eepsite," +
+        // 0.9.15 support bundled router infos
+        "netDb," +
         // base install - files
         // We don't currently have a default router.config, logger.config, susimail.config, or webapps.config in the base distribution,
         // but distros might put one in

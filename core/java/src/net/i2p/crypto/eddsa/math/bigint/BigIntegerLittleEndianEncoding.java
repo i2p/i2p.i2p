@@ -65,7 +65,7 @@ public class BigIntegerLittleEndianEncoding extends Encoding implements Serializ
      * than the (b-1)-bit encoding of -x. If q is an odd prime and the encoding
      * is the little-endian representation of {0, 1,..., q-1} then the negative
      * elements of F_q are {1, 3, 5,..., q-2}.
-     * @return
+     * @return true if negative
      */
     public boolean isNegative(FieldElement x) {
         return ((BigIntegerFieldElement)x).bi.testBit(0);

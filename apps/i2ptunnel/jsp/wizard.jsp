@@ -233,11 +233,11 @@
                 <label for="description" accesskey="e">
                     <%=intl._("Description")%>:(<span class="accessKey">E</span>)
                 </label>
-                <input type="text" size="60" maxlength="80" name="description"  id="description" title="Tunnel Description" value="<%=(!"null".equals(request.getParameter("description")) ? net.i2p.data.DataHelper.stripHTML(request.getParameter("description")) : "" ) %>" class="freetext" />
+                <input type="text" size="60" maxlength="80" name="nofilter_description"  id="description" title="Tunnel Description" value="<%=(!"null".equals(request.getParameter("description")) ? net.i2p.data.DataHelper.stripHTML(request.getParameter("description")) : "" ) %>" class="freetext" />
             </div><%
             } else {
             %><input type="hidden" name="name" value="<%=net.i2p.data.DataHelper.stripHTML(request.getParameter("name"))%>" />
-            <input type="hidden" name="description" value="<%=net.i2p.data.DataHelper.stripHTML(request.getParameter("description"))%>" /><%
+            <input type="hidden" name="nofilter_description" value="<%=net.i2p.data.DataHelper.stripHTML(request.getParameter("description"))%>" /><%
             } /* curPage 3 */
 
                /* End page 3 */ %>
@@ -484,7 +484,7 @@
             <input type="hidden" name="tunnelBackupQuantity" value="0" />
             <input type="hidden" name="clientHost" value="internal" />
             <input type="hidden" name="clientport" value="internal" />
-            <input type="hidden" name="customOptions" value="" />
+            <input type="hidden" name="nofilter_customOptions" value="" />
 
             <%
               if (!"streamrclient".equals(tunnelType)) {
@@ -501,9 +501,9 @@
                 }
                 if ("httpclient".equals(tunnelType) || "connectclient".equals(tunnelType) || "sockstunnel".equals(tunnelType) || "socksirctunnel".equals(tunnelType)) {
             %><input type="hidden" name="proxyUsername" value="" />
-            <input type="hidden" name="proxyPassword" value="" />
+            <input type="hidden" name="nofilter_proxyPassword" value="" />
             <input type="hidden" name="outproxyUsername" value="" />
-            <input type="hidden" name="outproxyPassword" value="" /><%
+            <input type="hidden" name="nofilter_outproxyPassword" value="" /><%
                 }
                 if ("httpclient".equals(tunnelType)) {
             %><input type="hidden" name="jumpList" value="http://i2host.i2p/cgi-bin/i2hostjump?

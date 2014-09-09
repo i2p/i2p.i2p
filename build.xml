@@ -960,7 +960,7 @@
         <copy file="installer/lib/wrapper/all/wrapper.jar" todir="pkg-temp/lib" />
     </target>
 
-    <target name="preppkg-base" depends="build, preplicenses, prepConsoleDocs, prepthemeupdates, prepCertificates">
+    <target name="preppkg-base" depends="build, preplicenses, prepConsoleDocs, prepthemeupdates, prepCertificates, prepRouterInfos">
         <!-- if updater200 was run previously, it left *.pack files in pkg-temp -->
         <!-- Also remove deletelist.txt used for updater only -->
         <delete>
@@ -1017,6 +1017,9 @@
             <fileset dir="installer/resources/icons/flags/" includes="cn.png de.png es.png fr.png ir.png it.png jp.png nl.png ru.png se.png us.png" />
         </copy>
         <copy file="installer/resources/themes/console/images/favicon.ico" tofile="pkg-temp/eepsite/docroot/favicon.ico" />
+        <copy todir="pkg-temp/docs/icons/flags" >
+          <fileset dir="installer/resources/icons/flags" />
+        </copy>
     </target>
 
     <target name="preplicenses">
@@ -1049,6 +1052,26 @@
         <copy todir="pkg-temp/certificates/" >
           <fileset dir="installer/resources/certificates/" />
         </copy>
+    </target>
+
+    <condition property="no.bundle.routerInfos">
+        <isfalse value="${bundle.routerInfos}" />
+    </condition>
+
+    <target name="prepRouterInfos" depends="buildrouter" unless="no.bundle.routerInfos">
+        <mkdir dir="pkg-temp/netDb" />
+        <java classname="net.i2p.router.networkdb.kademlia.PersistentDataStore" fork="true" failonerror="true">
+            <classpath>
+                <pathelement location="build/i2p.jar" />
+                <pathelement location="build/router.jar" />
+            </classpath>
+            <arg value="-i" />
+            <arg value="${bundle.routerInfos.i2pConfigDir}" />
+            <arg value="-o" />
+            <arg value="pkg-temp/netDb" />
+            <arg value="-c" />
+            <arg value="${bundle.routerInfos.count}" />
+        </java>
     </target>
 
     <!-- this is no longer required, izpack 4.3.0 supports headless installs with java -jar i2pinstall.exe -console -->
@@ -1237,11 +1260,6 @@
         <copy file="installer/resources/geoip.txt" todir="pkg-temp/geoip/" />
         <copy file="installer/resources/geoipv6.dat.gz" todir="pkg-temp/geoip/" />
         <copy file="installer/resources/countries.txt" todir="pkg-temp/geoip/" />
-      <!--
-        <copy todir="pkg-temp/docs/icons/flags" >
-          <fileset dir="installer/resources/icons/flags" />
-        </copy>
-       -->
     </target>
 
     <!-- All jetty jars required for update.

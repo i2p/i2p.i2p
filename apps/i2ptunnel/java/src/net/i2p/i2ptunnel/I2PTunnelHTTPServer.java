@@ -182,6 +182,10 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
         if (getTunnel() != tunnel)
             return;
         setupPostThrottle();
+        Properties props = tunnel.getClientOptions();
+        // see TunnelController.setSessionOptions()
+        String spoofHost = props.getProperty(TunnelController.PROP_SPOOFED_HOST);
+        _spoofHost = (spoofHost != null && spoofHost.trim().length() > 0) ? spoofHost.trim() : null;
         super.optionsUpdated(tunnel);
     }
 

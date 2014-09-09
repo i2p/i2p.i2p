@@ -13,6 +13,7 @@ import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.Signature;
 import net.i2p.data.SigningPrivateKey;
+import net.i2p.data.SigningPublicKey;
 import net.i2p.util.Log;
 
 /**
@@ -314,10 +315,16 @@ class Packet {
 
     private void setFlags(int flags) { _flags = flags; } 
 
-    /** the signature on the packet (only included if the flag for it is set)
+    /**
+     * The signature on the packet (only included if the flag for it is set)
+     *
+     * Warning, may be typed wrong on incoming packets for EdDSA
+     * before verifySignature() is called.
+     *
      * @return signature on the packet if the flag for signatures is set
      */
     public Signature getOptionalSignature() { return _optionSignature; }
+
     public void setOptionalSignature(Signature sig) { 
         setFlag(FLAG_SIGNATURE_INCLUDED, sig != null);
         _optionSignature = sig; 
@@ -327,6 +334,7 @@ class Packet {
      * @return the sending Destination
      */
     public Destination getOptionalFrom() { return _optionFrom; }
+
     public void setOptionalFrom(Destination from) { 
         setFlag(FLAG_FROM_INCLUDED, from != null);
         if (from == null) throw new RuntimeException("from is null!?");
@@ -340,6 +348,7 @@ class Packet {
      * @return How long the sender wants the recipient to wait before sending any more data in ms.
      */
     public int getOptionalDelay() { return _optionDelay; }
+
     public void setOptionalDelay(int delayMs) {
         if (delayMs > MAX_DELAY_REQUEST)
             _optionDelay = MAX_DELAY_REQUEST;
@@ -507,20 +516,21 @@ class Packet {
      * @throws IllegalStateException 
      */
     private int writtenSize() {
-        int size = 0;
-        size += 4; // _sendStreamId.length;
-        size += 4; // _receiveStreamId.length;
-        size += 4; // sequenceNum
-        size += 4; // ackThrough
+        //int size = 0;
+        //size += 4; // _sendStreamId.length;
+        //size += 4; // _receiveStreamId.length;
+        //size += 4; // sequenceNum
+        //size += 4; // ackThrough
+        //    size++; // nacks length
+        //size++; // resendDelay
+        //size += 2; // flags
+        //size += 2; // option size
+        int size = 22;
+
         if (_nacks != null) {
-            size++; // nacks length
             // if max win is ever > 255, limit to 255
             size += 4 * _nacks.length;
-        } else {
-            size++; // nacks length
         }
-        size++; // resendDelay
-        size += 2; // flags
 
         if (isFlagSet(FLAG_DELAY_REQUESTED))
             size += 2;
@@ -530,8 +540,6 @@ class Packet {
             size += 2;
         if (isFlagSet(FLAG_SIGNATURE_INCLUDED))
             size += _optionSignature.length();
-        
-        size += 2; // option size
         
         if (_payload != null) {
             size += _payload.getValid();
@@ -632,6 +640,9 @@ class Packet {
                 // super cheat for now, look for correct type,
                 // assume no more options. If we add to the options
                 // we will have to ask the manager.
+                // We will get this wrong for Ed25519, same length as P256...
+                // See verifySignature() below where we will recast the signature to
+                // the correct type if necessary
                 int siglen = payloadBegin - cur;
                 SigType type = null;
                 for (SigType t : SigType.values()) {
@@ -677,12 +688,27 @@ class Packet {
         
         if (buffer == null)
             buffer = new byte[size];
-        int written = writePacket(buffer, 0, from.getSigningPublicKey().getType().getSigLen());
+        SigningPublicKey spk = from.getSigningPublicKey();
+        SigType type = spk.getType();
+        if (type == null) {
+            Log l = ctx.logManager().getLog(Packet.class);
+            if (l.shouldLog(Log.WARN))
+                l.warn("Unknown sig type in " + from + " cannot verify " + toString());
+            return false;
+        }
+        int written = writePacket(buffer, 0, type.getSigLen());
         if (written != size) {
             ctx.logManager().getLog(Packet.class).error("Written " + written + " size " + size + " for " + toString(), new Exception("moo"));
             return false;
         }
-        boolean ok = ctx.dsa().verifySignature(_optionSignature, buffer, 0, size, from.getSigningPublicKey());
+
+        // Fixup of signature if we guessed wrong on the type in readPacket(), which could happen
+        // on a close or reset packet where we have a signature without a FROM
+        if (type != _optionSignature.getType() &&
+            type.getSigLen() == _optionSignature.length())
+            _optionSignature = new Signature(type, _optionSignature.getData());
+
+        boolean ok = ctx.dsa().verifySignature(_optionSignature, buffer, 0, size, spk);
         if (!ok) {
             Log l = ctx.logManager().getLog(Packet.class);
             if (l.shouldLog(Log.WARN))

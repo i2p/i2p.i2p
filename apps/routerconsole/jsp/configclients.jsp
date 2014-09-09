@@ -105,7 +105,10 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
  <input type="submit" name="action" class="accept" value="<%=intl._("Save WebApp Configuration")%>" />
 </div></form></div>
 
-<% if (clientshelper.showPlugins()) { %>
+<%
+   if (clientshelper.showPlugins()) {
+       if (clientshelper.isPluginUpdateEnabled()) {
+%>
 <h3><a name="pconfig"></a><%=intl._("Plugin Configuration")%></h3><p>
  <%=intl._("The plugins listed below are started by the webConsole client.")%>
  </p><div class="wideload">
@@ -116,25 +119,47 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
  <input type="submit" class="cancel" name="foo" value="<%=intl._("Cancel")%>" />
  <input type="submit" name="action" class="accept" value="<%=intl._("Save Plugin Configuration")%>" />
 </div></form></div>
-
-<% if (clientshelper.isPluginInstallEnabled()) { %>
+<%
+       } // pluginUpdateEnabled
+       if (clientshelper.isPluginInstallEnabled()) {
+%>
 <h3><a name="plugin"></a><%=intl._("Plugin Installation")%></h3><p>
  <%=intl._("Look for available plugins on {0}.", "<a href=\"http://plugins.i2p\">plugins.i2p</a>")%>
  <%=intl._("To install a plugin, enter the download URL:")%>
- </p><div class="wideload">
+ </p>
+<%
+       } // pluginInstallEnabled
+       if (clientshelper.isPluginInstallEnabled() || clientshelper.isPluginUpdateEnabled()) {
+%>
+<div class="wideload">
 <form action="configclients" method="POST">
 <input type="hidden" name="nonce" value="<%=pageNonce%>" >
+<%
+           if (clientshelper.isPluginInstallEnabled()) {
+%>
 <p>
  <input type="text" size="60" name="pluginURL" >
  </p><hr><div class="formaction">
  <input type="submit" name="action" class="default" value="<%=intl._("Install Plugin")%>" />
  <input type="submit" class="cancel" name="foo" value="<%=intl._("Cancel")%>" />
  <input type="submit" name="action" class="download" value="<%=intl._("Install Plugin")%>" />
-</div><hr><div class="formaction">
- <input type="submit" name="action" class="reload" value="<%=intl._("Update All Installed Plugins")%>" />
- </div></form></div>
+</div>
 <%
-     } // pluginInstallEnabled
- } // showPlugins
+           } // pluginInstallEnabled
+%>
+</div>
+<%
+           if (clientshelper.isPluginUpdateEnabled()) {
+%>
+<hr><div class="formaction">
+ <input type="submit" name="action" class="reload" value="<%=intl._("Update All Installed Plugins")%>" />
+</div>
+<%
+           } // pluginUpdateEnabled
+%>
+</form></div>
+<%
+       } // pluginInstallEnabled || pluginUpdateEnabled
+   } // showPlugins
 %>
 </div></div></body></html>

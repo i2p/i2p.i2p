@@ -72,6 +72,8 @@ public class TrackerClient implements Runnable {
   private static final String STOPPED_EVENT = "stopped";
   private static final String NOT_REGISTERED  = "torrent not registered"; //bytemonsoon
   private static final String NOT_REGISTERED_2  = "torrent not found";    // diftracker
+  private static final String NOT_REGISTERED_3  = "torrent unauthorised"; // vuze
+  private static final String ERROR_GOT_HTML  = "received html";             // fake return
   /** this is our equivalent to router.utorrent.com for bootstrap */
   private static final String DEFAULT_BACKUP_TRACKER = "http://tracker.welterde.i2p/a";
 
@@ -577,14 +579,20 @@ public class TrackerClient implements Runnable {
                     if (tr.isPrimary)
                       snark.setTrackerProblems(tr.trackerProblems);
                     String tplc = tr.trackerProblems.toLowerCase(Locale.US);
-                    if (tplc.startsWith(NOT_REGISTERED) || tplc.startsWith(NOT_REGISTERED_2)) {
+                    if (tplc.startsWith(NOT_REGISTERED) || tplc.startsWith(NOT_REGISTERED_2) ||
+                        tplc.startsWith(NOT_REGISTERED_3) || tplc.startsWith(ERROR_GOT_HTML)) {
                       // Give a guy some time to register it if using opentrackers too
                       //if (trckrs.size() == 1) {
                       //  stop = true;
                       //  snark.stopTorrent();
                       //} else { // hopefully each on the opentrackers list is really open
                         if (tr.registerFails++ > MAX_REGISTER_FAILS ||
+                            !completed ||              // no use retrying if we aren't seeding
+                            tplc.startsWith(ERROR_GOT_HTML) ||   // fake msg from doRequest()
                             (!tr.isPrimary && tr.registerFails > MAX_REGISTER_FAILS / 2))
+                          if (_log.shouldLog(Log.WARN))
+                              _log.warn("Not longer announcing to " + tr.announce + " : " +
+                                        tr.trackerProblems + " after " + tr.registerFails + " failures");
                           tr.stop = true;
                       //
                     }
@@ -797,10 +805,15 @@ public class TrackerClient implements Runnable {
     tr.lastRequestTime = System.currentTimeMillis();
     // Don't wait for a response to stopped when shutting down
     boolean fast = _fastUnannounce && event.equals(STOPPED_EVENT);
-    byte[] fetched = _util.get(s, true, fast ? -1 : 0, small ? 128 : 1024, small ? 1024 : 8*1024);
-    if (fetched == null) {
-        throw new IOException("Error fetching " + s);
-    }
+    byte[] fetched = _util.get(s, true, fast ? -1 : 0, small ? 128 : 1024, small ? 1024 : 32*1024);
+    if (fetched == null)
+        throw new IOException("Error fetching");
+    if (fetched.length == 0)
+        throw new IOException("No data");
+    // The HTML check only works if we didn't exceed the maxium fetch size specified in get(),
+    // otherwise we already threw an IOE.
+    if (fetched[0] == '<')
+        throw new IOException(ERROR_GOT_HTML);
     
         InputStream in = new ByteArrayInputStream(fetched);
 

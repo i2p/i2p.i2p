@@ -79,7 +79,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                 <label for="description" accesskey="e">
                     <%=intl._("Description")%>:(<span class="accessKey">E</span>)
                 </label>
-                <input type="text" size="60" maxlength="80" name="description"  id="description" title="Tunnel Description" value="<%=editBean.getTunnelDescription(curTunnel)%>" class="freetext" />                
+                <input type="text" size="60" maxlength="80" name="nofilter_description"  id="description" title="Tunnel Description" value="<%=editBean.getTunnelDescription(curTunnel)%>" class="freetext" />                
             </div>
                  
             <div class="subdivider">
@@ -341,6 +341,23 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
             <div class="subdivider">
                 <hr />
             </div>
+
+            <div id="optionsField" class="rowItem">
+                <label for="reduce" accesskey="c">
+                    <%=intl._("Delay tunnel open until required")%>(<span class="accessKey">D</span>):
+                </label>
+            </div>
+            <div id="portField" class="rowItem">
+                <label for="access" accesskey="c">
+                    <%=intl._("Enable")%>:
+                </label>
+                <input value="1" type="checkbox" id="startOnLoad" name="delayOpen" title="Delay Tunnel Open"<%=(editBean.getDelayOpen(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />                
+            </div>
+         <% } // !streamrclient %>
+                 
+            <div class="subdivider">
+                <hr />
+            </div>
            
             <div id="optionsField" class="rowItem">
                 <label for="reduce" accesskey="d">
@@ -400,23 +417,6 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                 </label>
                 <input type="text" id="port" name="closeTime" size="4" maxlength="4" title="Close Tunnel Idle Time" value="<%=editBean.getCloseTime(curTunnel)%>" class="freetext" />                
             </div>
-                 
-            <div class="subdivider">
-                <hr />
-            </div>
-
-            <div id="optionsField" class="rowItem">
-                <label for="reduce" accesskey="c">
-                    <%=intl._("Delay tunnel open until required")%>(<span class="accessKey">D</span>):
-                </label>
-            </div>
-            <div id="portField" class="rowItem">
-                <label for="access" accesskey="c">
-                    <%=intl._("Enable")%>:
-                </label>
-                <input value="1" type="checkbox" id="startOnLoad" name="delayOpen" title="Delay Tunnel Open"<%=(editBean.getDelayOpen(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />                
-            </div>
-         <% } // !streamrclient %>
                  
             <div class="subdivider">
                 <hr />

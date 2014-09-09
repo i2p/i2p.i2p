@@ -16,6 +16,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import net.i2p.I2PAppContext;
 import net.i2p.data.Hash;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
@@ -38,11 +39,9 @@ import net.i2p.util.Log;
  *
  * @author zzz
  */
-class GeoIP {
+public class GeoIP {
     private final Log _log;
-    // change to test with main()
-    //private final I2PAppContext _context;
-    private final RouterContext _context;
+    private final I2PAppContext _context;
     private final Map<String, String> _codeToName;
     /** code to itself to prevent String proliferation */
     private final Map<String, String> _codeCache;
@@ -56,8 +55,10 @@ class GeoIP {
     private final AtomicBoolean _lock;
     private int _lookupRunCount;
     
-    //public GeoIP(I2PAppContext context) {
-    public GeoIP(RouterContext context) {
+    /**
+     *  @param context RouterContext in production, I2PAppContext for testing only
+     */
+    public GeoIP(I2PAppContext context) {
         _context = context;
         _log = context.logManager().getLog(GeoIP.class);
         _codeToName = new ConcurrentHashMap<String, String>(512);
@@ -71,6 +72,7 @@ class GeoIP {
     }
     
     static final String PROP_GEOIP_ENABLED = "routerconsole.geoip.enable";
+    public static final String PROP_GEOIP_DIR = "geoip.dir";
     static final String GEOIP_DIR_DEFAULT = "geoip";
     static final String GEOIP_FILE_DEFAULT = "geoip.txt";
     static final String COUNTRY_FILE_DEFAULT = "countries.txt";
@@ -187,7 +189,10 @@ class GeoIP {
     *
     */
     private void readCountryFile() {
-        File geoFile = new File(_context.getBaseDir(), GEOIP_DIR_DEFAULT);
+        String geoDir = _context.getProperty(PROP_GEOIP_DIR, GEOIP_DIR_DEFAULT);
+        File geoFile = new File(geoDir);
+        if (!geoFile.isAbsolute())
+            geoFile = new File(_context.getBaseDir(), geoDir);
         geoFile = new File(geoFile, COUNTRY_FILE_DEFAULT);
         if (!geoFile.exists()) {
             if (_log.shouldLog(Log.WARN))
@@ -246,7 +251,10 @@ class GeoIP {
     *
     */
     private String[] readGeoIPFile(Long[] search) {
-        File geoFile = new File(_context.getBaseDir(), GEOIP_DIR_DEFAULT);
+        String geoDir = _context.getProperty(PROP_GEOIP_DIR, GEOIP_DIR_DEFAULT);
+        File geoFile = new File(geoDir);
+        if (!geoFile.isAbsolute())
+            geoFile = new File(_context.getBaseDir(), geoDir);
         geoFile = new File(geoFile, GEOIP_FILE_DEFAULT);
         if (!geoFile.exists()) {
             if (_log.shouldLog(Log.WARN))
@@ -300,24 +308,28 @@ class GeoIP {
     /**
      *  Put our country code in the config, where others (such as Timestamper) can get it,
      *  and it will be there next time at startup.
+     *
+     *  Does nothing in I2PAppContext
      */
     private void updateOurCountry() {
-        /**** comment out to test with main() */
-        String oldCountry = _context.router().getConfigSetting(PROP_IP_COUNTRY);
-        Hash ourHash = _context.routerHash();
+        if (! (_context instanceof RouterContext))
+            return;
+        RouterContext ctx = (RouterContext) _context;
+        String oldCountry = ctx.router().getConfigSetting(PROP_IP_COUNTRY);
+        Hash ourHash = ctx.routerHash();
         // we should always have a RouterInfo by now, but we had one report of an NPE here
         if (ourHash == null)
             return;
-        String country = _context.commSystem().getCountry(ourHash);
+        String country = ctx.commSystem().getCountry(ourHash);
         if (country != null && !country.equals(oldCountry)) {
-            _context.router().saveConfig(PROP_IP_COUNTRY, country);
-            if (_context.commSystem().isInBadCountry() && _context.getProperty(Router.PROP_HIDDEN_HIDDEN) == null) {
+            ctx.router().saveConfig(PROP_IP_COUNTRY, country);
+            if (ctx.commSystem().isInBadCountry() && ctx.getProperty(Router.PROP_HIDDEN_HIDDEN) == null) {
                 String name = fullName(country);
                 if (name == null)
                     name = country;
                 _log.logAlways(Log.WARN, "Setting hidden mode to protect you in " + name +
                                          ", you may override on the network configuration page");
-                _context.router().rebuildRouterInfo();
+                ctx.router().rebuildRouterInfo();
             }
         }
         /****/

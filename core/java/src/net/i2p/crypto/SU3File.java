@@ -67,12 +67,16 @@ public class SU3File {
     private static final int VERSION_OFFSET = 40; // Signature.SIGNATURE_BYTES; avoid early ctx init
 
     public static final int TYPE_ZIP = 0;
+    /** @since 0.9.15 */
     public static final int TYPE_XML = 1;
+    /** @since 0.9.15 */
+    public static final int TYPE_HTML = 2;
 
     public static final int CONTENT_UNKNOWN = 0;
     public static final int CONTENT_ROUTER = 1;
     public static final int CONTENT_PLUGIN = 2;
     public static final int CONTENT_RESEED = 3;
+    /** @since 0.9.15 */
     public static final int CONTENT_NEWS = 4;
 
     private enum ContentType {

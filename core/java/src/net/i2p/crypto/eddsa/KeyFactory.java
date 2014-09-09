@@ -12,6 +12,7 @@ import net.i2p.crypto.eddsa.spec.EdDSAPrivateKeySpec;
 import net.i2p.crypto.eddsa.spec.EdDSAPublicKeySpec;
 
 /**
+ * @since 0.9.15
  * @author str4d
  *
  */

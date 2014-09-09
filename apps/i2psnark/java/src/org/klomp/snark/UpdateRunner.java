@@ -295,6 +295,10 @@ class UpdateRunner implements UpdateTask, CompleteListener {
         return _smgr.getSavedPreserveNamesSetting(snark);
     }
 
+    public long getSavedUploaded(Snark snark) {
+        return _smgr.getSavedUploaded(snark);
+    }
+
     //////// end CompleteListener methods
 
     private static String linkify(String url) {

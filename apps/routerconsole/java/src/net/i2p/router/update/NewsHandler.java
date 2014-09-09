@@ -29,6 +29,7 @@ class NewsHandler extends UpdateHandler implements Checker {
      *  @since 0.7.14 not configurable
      */
     private static final String BACKUP_NEWS_URL = "http://avviiexdngd32ccoy4kuckvc3mkf53ycvzbz6vz75vzhv4tbpk5a.b32.i2p/news.xml";
+    private static final String BACKUP_NEWS_URL_SU3 = "http://avviiexdngd32ccoy4kuckvc3mkf53ycvzbz6vz75vzhv4tbpk5a.b32.i2p/news.su3";
 
     public NewsHandler(RouterContext ctx, ConsoleUpdateManager mgr) {
         super(ctx, mgr);
@@ -41,14 +42,17 @@ class NewsHandler extends UpdateHandler implements Checker {
      */
     public UpdateTask check(UpdateType type, UpdateMethod method,
                             String id, String currentVersion, long maxTime) {
-        if ((type != ROUTER_SIGNED && type != NEWS) ||
+        if ((type != ROUTER_SIGNED && type != NEWS && type != NEWS_SU3) ||
             method != HTTP)
             return null;
         List<URI> updateSources = new ArrayList<URI>(2);
         try {
+            // TODO SU3
             updateSources.add(new URI(ConfigUpdateHelper.getNewsURL(_context)));
         } catch (URISyntaxException use) {}
         try {
+            // TODO
+            //updateSources.add(new URI(BACKUP_NEWS_URL_SU3));
             updateSources.add(new URI(BACKUP_NEWS_URL));
         } catch (URISyntaxException use) {}
         UpdateRunner update = new NewsFetcher(_context, _mgr, updateSources);

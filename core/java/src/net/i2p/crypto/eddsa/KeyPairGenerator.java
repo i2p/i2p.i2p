@@ -17,6 +17,8 @@ import net.i2p.crypto.eddsa.spec.EdDSAPublicKeySpec;
 
 /**
  *  Default strength is 256
+ *
+ *  @since 0.9.15
  */
 public class KeyPairGenerator extends KeyPairGeneratorSpi {
     private static final int DEFAULT_STRENGTH = 256;

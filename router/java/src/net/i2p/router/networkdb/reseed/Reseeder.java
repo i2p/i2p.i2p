@@ -74,8 +74,7 @@ public class Reseeder {
               "http://reseed.i2p-projekt.de/" + "," +
              //"http://euve5653.vserver.de/netDb/" +  "," +
               "http://cowpuncher.drollette.com/netdb/" + "," +
-              //Temp disabled (#1351)
-              //"http://i2p.mooo.com/netDb/" + "," +
+              "http://i2p.mooo.com/netDb/" + "," +
               "http://193.150.121.66/netDb/" + "," +
               "http://netdb.i2p2.no/" + "," +
               "http://reseed.info/"  + "," +
@@ -93,8 +92,7 @@ public class Reseeder {
               "https://reseed.i2p-projekt.de/" + "," +
               //"https://euve5653.vserver.de/netDb/" + "," +
               "https://cowpuncher.drollette.com/netdb/" + "," +
-              //Temp disabled (#1351)
-              //"https://i2p.mooo.com/netDb/" + "," +
+              "https://i2p.mooo.com/netDb/" + "," +
               "https://193.150.121.66/netDb/" + "," +
               "https://netdb.i2p2.no/" + "," +
               "https://reseed.info/"  + "," +

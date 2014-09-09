@@ -1,3 +1,36 @@
+2014-09-09 zzz
+ * i2psnark: Escape fixes
+
+2014-08-31 zzz
+ * Build: Add support for bundling router infos in the package
+ * I2PTunnel: Allow changing of spoof host and target host/port without
+              restarting server tunnel
+
+2014-08-30 zzz
+ * Console:
+  - Re-enable plugin installation by default
+  - Don't show configuration section or update-all button if no plugins installed
+  - Show unavailable crypto on /logs
+ * Router: Log warnings for unavailable crypto at startup
+ * RouterInfo: Backport fix for verification of EdDSA RI sig type
+
+2014-08-28 zzz
+ * Streaming: Fix verify of Ed25519 signatures in CLOSE packets
+
+2014-08-27 zzz
+ * i2psnark:
+   - Persist uploaded count (tickets #1034, #1298)
+   - Don't retry announce if we get back HTML
+   - Recognize Vuze tracker rejections
+   - Don't retry rejected announces unless seeding
+   - Better UI handling of announces with ports or full destination
+ * NetDB: Don't abort initialization on an unsupported RI sig type
+ * Streaming: Fix P521 and RSA sig types
+
+2014-08-23 zzz
+ * Console, i2psnark, i2ptunnel: Escape fixes and cleanups
+ * SSU: Drop peer tests as Bob from unestablished Alices
+
 2014-08-22 zzz
  * SigTypes:
    - Add isSupportedSince(), use in floodfill selection

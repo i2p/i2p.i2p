@@ -54,8 +54,8 @@ class PersistentDataStore extends TransientDataStore {
     
     private final static int READ_DELAY = 2*60*1000;
     private static final String PROP_FLAT = "router.networkDatabase.flat";
-    private static final String DIR_PREFIX = "r";
-    private static final String B64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-~";
+    static final String DIR_PREFIX = "r";
+    static final String B64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-~";
     
     /**
      *  @param dbDir relative path
@@ -614,7 +614,7 @@ class PersistentDataStore extends TransientDataStore {
         return DIR_PREFIX + b64.charAt(0) + File.separatorChar + ROUTERINFO_PREFIX + b64 + ROUTERINFO_SUFFIX;
     }
     
-    private static Hash getRouterInfoHash(String filename) {
+    static Hash getRouterInfoHash(String filename) {
         return getHash(filename, ROUTERINFO_PREFIX, ROUTERINFO_SUFFIX);
     }
     
@@ -651,7 +651,7 @@ class PersistentDataStore extends TransientDataStore {
         }
     }
     
-    private final static class RouterInfoFilter implements FilenameFilter {
+    static class RouterInfoFilter implements FilenameFilter {
         private static final FilenameFilter _instance = new RouterInfoFilter();
         public static final FilenameFilter getInstance() { return _instance; }
         public boolean accept(File dir, String name) {

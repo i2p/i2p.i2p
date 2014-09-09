@@ -1,6 +1,10 @@
 package net.i2p.crypto.eddsa;
 
 /**
+ * Basic utilities for eddsa.
+ * Not for external use, not maintained as a public API.
+ *
+ * @since 0.9.15
  * @author str4d
  *
  */
@@ -19,6 +23,18 @@ public class Utils {
     }
 
     /**
+     * Constant-time byte[] comparison.
+     * @return 1 if b and c are equal, 0 otherwise.
+     */
+    public static int equal(byte[] b, byte[] c) {
+        int result = 0;
+        for (int i = 0; i < 32; i++) {
+            result |= b[i] ^ c[i];
+        }
+        return ~equal(result, 0) & 0x01;
+    }
+
+    /**
      * Constant-time determine if byte is negative.
      * @param b the byte to check.
      * @return 1 if the byte is negative, 0 otherwise.
@@ -34,7 +50,7 @@ public class Utils {
      * @return 0 or 1, the value of the i'th bit in h
      */
     public static int bit(byte[] h, int i) {
-        return (h[i/8] >> (i%8)) & 1;
+        return (h[i >> 3] >> (i & 7)) & 1;
     }
 
     /**
@@ -51,4 +67,22 @@ public class Utils {
         }
         return data;
     }
+
+    /**
+     * Converts bytes to a hex string.
+     * @param raw the byte[] to be converted.
+     * @return the hex representation as a string.
+     */
+    public static String bytesToHex(byte[] raw) {
+        if ( raw == null ) {
+            return null;
+        }
+        final StringBuilder hex = new StringBuilder(2 * raw.length);
+        for (final byte b : raw) {
+            hex.append(Character.forDigit((b & 0xF0) >> 4, 16))
+            .append(Character.forDigit((b & 0x0F), 16));
+        }
+        return hex.toString();
+    }
+
 }

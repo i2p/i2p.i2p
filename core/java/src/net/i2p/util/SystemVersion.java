@@ -26,6 +26,7 @@ public abstract class SystemVersion {
 
     private static final boolean _oneDotSix;
     private static final boolean _oneDotSeven;
+    private static final boolean _oneDotEight;
     private static final int _androidSDK;
 
     static {
@@ -60,9 +61,11 @@ public abstract class SystemVersion {
         if (_isAndroid) {
             _oneDotSix = _androidSDK >= 9;
             _oneDotSeven = _androidSDK >= 19;
+            _oneDotEight = false;
         } else {
             _oneDotSix = VersionComparator.comp(System.getProperty("java.version"), "1.6") >= 0;
-            _oneDotSeven = VersionComparator.comp(System.getProperty("java.version"), "1.7") >= 0;
+            _oneDotSeven = _oneDotSix && VersionComparator.comp(System.getProperty("java.version"), "1.7") >= 0;
+            _oneDotEight = _oneDotSeven && VersionComparator.comp(System.getProperty("java.version"), "1.8") >= 0;
         }
     }
 
@@ -125,6 +128,15 @@ public abstract class SystemVersion {
      */
     public static boolean isJava7() {
         return _oneDotSeven;
+    }
+
+    /**
+     *
+     *  @return true if Java 1.8 or higher, false for Android.
+     *  @since 0.9.15
+     */
+    public static boolean isJava8() {
+        return _oneDotEight;
     }
 
     /**

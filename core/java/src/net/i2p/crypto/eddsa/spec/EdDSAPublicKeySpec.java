@@ -5,6 +5,8 @@ import java.security.spec.KeySpec;
 import net.i2p.crypto.eddsa.math.GroupElement;
 
 /**
+ *
+ * @since 0.9.15
  * @author str4d
  *
  */
