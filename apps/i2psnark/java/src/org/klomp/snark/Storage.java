@@ -316,15 +316,34 @@ public class Storage
   }
 
   /**
+   *  Get index to pass to remaining(), getPriority(), setPriority()
+   *
    *  @param file non-canonical path (non-directory)
+   *  @return internal index of file; -1 if unknown file
+   *  @since 0.9.15
+   */
+  public int indexOf(File file) {
+      for (int i = 0; i < _torrentFiles.size(); i++) {
+          File f = _torrentFiles.get(i).RAFfile;
+          if (f.equals(file))
+              return i;
+      }
+      return -1;
+  }
+
+  /**
+   *  @param fileIndex as obtained from indexOf
    *  @return number of bytes remaining; -1 if unknown file
    *  @since 0.7.14
    */
-  public long remaining(File file) {
+  public long remaining(int fileIndex) {
+      if (fileIndex < 0 || fileIndex >= _torrentFiles.size())
+          return -1;
       long bytes = 0;
-      for (TorrentFile tf : _torrentFiles) {
-          File f = tf.RAFfile;
-          if (f.equals(file)) {
+      for (int i = 0; i < _torrentFiles.size(); i++) {
+          TorrentFile tf = _torrentFiles.get(i);
+          if (i == fileIndex) {
+              File f = tf.RAFfile;
               if (complete())
                   return 0;
               int psz = piece_size;
@@ -350,37 +369,30 @@ public class Storage
   }
 
   /**
-   *  @param file non-canonical path (non-directory)
+   *  @param fileIndex as obtained from indexOf
    *  @since 0.8.1
    */
-  public int getPriority(File file) {
+  public int getPriority(int fileIndex) {
       if (complete() || metainfo.getFiles() == null)
           return 0;
-      for (TorrentFile tf : _torrentFiles) {
-          File f = tf.RAFfile;
-          if (f.equals(file))
-              return tf.priority;
-      }
-      return 0;
+      if (fileIndex < 0 || fileIndex >= _torrentFiles.size())
+          return 0;
+      return _torrentFiles.get(fileIndex).priority;
   }
 
   /**
    *  Must call Snark.updatePiecePriorities()
    *  (which calls getPiecePriorities()) after calling this.
-   *  @param file non-canonical path (non-directory)
+   *  @param fileIndex as obtained from indexOf
    *  @param pri default 0; <0 to disable
    *  @since 0.8.1
    */
-  public void setPriority(File file, int pri) {
+  public void setPriority(int fileIndex, int pri) {
       if (complete() || metainfo.getFiles() == null)
           return;
-      for (TorrentFile tf : _torrentFiles) {
-          File f = tf.RAFfile;
-          if (f.equals(file)) {
-              tf.priority = pri;
-              return;
-          }
-      }
+      if (fileIndex < 0 || fileIndex >= _torrentFiles.size())
+          return;
+      _torrentFiles.get(fileIndex).priority = pri;
   }
 
   /**

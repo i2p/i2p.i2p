@@ -1432,8 +1432,7 @@ public class I2PSnarkServlet extends BasicServlet {
         out.write("</td><td class=\"snarkTorrentName\"");
         if (isMultiFile) {
             // link on the whole td
-            String jsec = encodedBaseName.replace("'", "\\'");
-            out.write(" onclick=\"document.location='" + jsec + "/';\">");
+            out.write(" onclick=\"document.location='" + encodedBaseName + "/';\">");
         } else {
             out.write('>');
         }
@@ -2692,6 +2691,7 @@ public class I2PSnarkServlet extends BasicServlet {
             boolean complete = false;
             String status = "";
             long length = item.length();
+            int fileIndex = -1;
             int priority = 0;
             if (item.isDirectory()) {
                 complete = true;
@@ -2703,8 +2703,9 @@ public class I2PSnarkServlet extends BasicServlet {
                     status = toImg("cancel") + ' ' + _("Torrent not found?");
                 } else {
                     Storage storage = snark.getStorage();
+                    fileIndex = storage.indexOf(item);
 
-                            long remaining = storage.remaining(item);
+                            long remaining = storage.remaining(fileIndex);
                             if (remaining < 0) {
                                 complete = true;
                                 status = toImg("cancel") + ' ' + _("File not found in torrent?");
@@ -2712,7 +2713,7 @@ public class I2PSnarkServlet extends BasicServlet {
                                 complete = true;
                                 status = toImg("tick") + ' ' + _("Complete");
                             } else {
-                                priority = storage.getPriority(item);
+                                priority = storage.getPriority(fileIndex);
                                 if (priority < 0)
                                     status = toImg("cancel");
                                 else if (priority == 0)
@@ -2764,17 +2765,17 @@ public class I2PSnarkServlet extends BasicServlet {
             if (showPriority) {
                 buf.append("<td class=\"priority\">");
                 if ((!complete) && (!item.isDirectory())) {
-                    buf.append("<input type=\"radio\" value=\"5\" name=\"pri.").append(item).append("\" ");
+                    buf.append("<input type=\"radio\" value=\"5\" name=\"pri.").append(fileIndex).append("\" ");
                     if (priority > 0)
                         buf.append("checked=\"true\"");
                     buf.append('>').append(_("High"));
 
-                    buf.append("<input type=\"radio\" value=\"0\" name=\"pri.").append(item).append("\" ");
+                    buf.append("<input type=\"radio\" value=\"0\" name=\"pri.").append(fileIndex).append("\" ");
                     if (priority == 0)
                         buf.append("checked=\"true\"");
                     buf.append('>').append(_("Normal"));
 
-                    buf.append("<input type=\"radio\" value=\"-9\" name=\"pri.").append(item).append("\" ");
+                    buf.append("<input type=\"radio\" value=\"-9\" name=\"pri.").append(fileIndex).append("\" ");
                     if (priority < 0)
                         buf.append("checked=\"true\"");
                     buf.append('>').append(_("Skip"));
@@ -2873,10 +2874,10 @@ public class I2PSnarkServlet extends BasicServlet {
             String key = entry.getKey();
             if (key.startsWith("pri.")) {
                 try {
-                    File file = new File(key.substring(4));
+                    int fileIndex = Integer.parseInt(key.substring(4));
                     String val = entry.getValue()[0];   // jetty arrays
                     int pri = Integer.parseInt(val);
-                    storage.setPriority(file, pri);
+                    storage.setPriority(fileIndex, pri);
                     //System.err.println("Priority now " + pri + " for " + file);
                 } catch (Throwable t) { t.printStackTrace(); }
             }

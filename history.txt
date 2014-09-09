@@ -1,3 +1,6 @@
+2014-09-09 zzz
+ * i2psnark: Escape fixes
+
 2014-08-31 zzz
  * Build: Add support for bundling router infos in the package
  * I2PTunnel: Allow changing of spoof host and target host/port without
