@@ -2,7 +2,7 @@ function setupbuttons() {
 	updatesetallbuttons();
 	var form = document.forms[0];
 	form.savepri.disabled = true;
-	form.savepri.className = 'foo';
+	form.savepri.className = 'disabled';
 }
 
 function priorityclicked() {
