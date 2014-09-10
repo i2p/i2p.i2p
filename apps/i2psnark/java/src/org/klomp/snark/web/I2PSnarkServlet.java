@@ -194,22 +194,8 @@ public class I2PSnarkServlet extends BasicServlet {
         resp.setHeader("Content-Security-Policy", "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'");
         resp.setHeader("X-XSS-Protection", "1; mode=block");
 
-        String peerParam = req.getParameter("p");
-        String stParam = req.getParameter("st");
-        String peerString;
-        if (peerParam == null || (!_manager.util().connected()) ||
-            peerParam.replaceAll("[a-zA-Z0-9~=-]", "").length() > 0) {  // XSS
-            peerString = "";
-        } else {
-            peerString = "?p=" + DataHelper.stripHTML(peerParam);
-        }
-        if (stParam != null && !stParam.equals("0")) {
-            stParam = DataHelper.stripHTML(stParam);
-            if (peerString.length() > 0)
-                peerString += "&amp;st=" + stParam;
-            else
-                peerString =  "?st="+ stParam;
-        }
+        String pOverride = _manager.util().connected() ? null : "";
+        String peerString = getQueryString(req, pOverride, null, null);
 
         // AJAX for mainsection
         if ("/.ajax/xhr1.html".equals(path)) {
@@ -292,6 +278,7 @@ public class I2PSnarkServlet extends BasicServlet {
             out.write(_("Configuration"));
         else
             out.write(_("Anonymous BitTorrent Client"));
+        String peerParam = req.getParameter("p");
         if ("2".equals(peerParam))
             out.write(" | Debug Mode");
         out.write("</title>\n");
@@ -413,13 +400,7 @@ public class I2PSnarkServlet extends BasicServlet {
         boolean isForm = _manager.util().connected() || !snarks.isEmpty();
         if (isForm) {
             out.write("<form action=\"_post\" method=\"POST\">\n");
-            out.write("<input type=\"hidden\" name=\"nonce\" value=\"" + _nonce + "\" >\n");
-            // don't lose peer setting
-            if (peerParam != null)
-                out.write("<input type=\"hidden\" name=\"p\" value=\"" + peerParam + "\" >\n");
-            // ...or st setting
-            if (stParam != null)
-                out.write("<input type=\"hidden\" name=\"st\" value=\"" + stParam + "\" >\n");
+            writeHiddenInputs(out, req, null);
         }
         out.write(TABLE_HEADER);
 
@@ -441,18 +422,19 @@ public class I2PSnarkServlet extends BasicServlet {
         }
         int pageSize = Math.max(_manager.getPageSize(), 5);
 
-        out.write("<tr><th><img border=\"0\" src=\"" + _imgPath + "status.png\" title=\"");
+        String currentSort = req.getParameter("sort");
+        out.write("<tr><th>");
+        String sort = ("2".equals(currentSort)) ? "-2" : "2";
+        out.write("<a href=\"" + _contextPath + '/' + getQueryString(req, null, null, sort));
+        out.write("\"><img border=\"0\" src=\"" + _imgPath + "status.png\" title=\"");
         out.write(_("Status"));
         out.write("\" alt=\"");
         out.write(_("Status"));
-        out.write("\"></th>\n<th>");
+        out.write("\"></a></th>\n<th>");
         if (_manager.util().connected() && !snarks.isEmpty()) {
             out.write(" <a href=\"" + _contextPath + '/');
             if (peerParam != null) {
-                if (stParam != null) {
-                    out.write("?st=");
-                    out.write(stParam);
-                }
+                // disable peer view
                 out.write("\">");
                 out.write("<img border=\"0\" src=\"" + _imgPath + "hidepeers.png\" title=\"");
                 out.write(_("Hide Peers"));
@@ -460,11 +442,8 @@ public class I2PSnarkServlet extends BasicServlet {
                 out.write(_("Hide Peers"));
                 out.write("\">");
             } else {
-                out.write("?p=1");
-                if (stParam != null) {
-                    out.write("&amp;st=");
-                    out.write(stParam);
-                }
+                // enable peer view
+                out.write(getQueryString(req, "1", null, null));
                 out.write("\">");
                 out.write("<img border=\"0\" src=\"" + _imgPath + "showpeers.png\" title=\"");
                 out.write(_("Show Peers"));
@@ -475,56 +454,69 @@ public class I2PSnarkServlet extends BasicServlet {
             out.write("</a><br>\n"); 
         }
         out.write("</th>\n<th colspan=\"2\" align=\"left\">");
-        out.write("<img border=\"0\" src=\"" + _imgPath + "torrent.png\" title=\"");
+        sort = (currentSort == null || "0".equals(currentSort) || "1".equals(currentSort)) ? "-1" : "";
+        out.write("<a href=\"" + _contextPath + '/' + getQueryString(req, null, null, sort));
+        out.write("\"><img border=\"0\" src=\"" + _imgPath + "torrent.png\" title=\"");
         out.write(_("Torrent"));
         out.write("\" alt=\"");
         out.write(_("Torrent"));
-        out.write("\"></th>\n<th align=\"center\">");
+        out.write("\"></a></th>\n<th align=\"center\">");
         if (total > 0 && (start > 0 || total > pageSize)) {
-            writePageNav(out, start, pageSize, total, peerParam, noThinsp);
+            writePageNav(out, req, start, pageSize, total, noThinsp);
         }
         out.write("</th>\n<th align=\"right\">");
         if (_manager.util().connected() && !snarks.isEmpty()) {
-            out.write("<img border=\"0\" src=\"" + _imgPath + "eta.png\" title=\"");
+            sort = ("4".equals(currentSort)) ? "-4" : "4";
+            out.write("<a href=\"" + _contextPath + '/' + getQueryString(req, null, null, sort));
+            out.write("\"><img border=\"0\" src=\"" + _imgPath + "eta.png\" title=\"");
             out.write(_("Estimated time remaining"));
             out.write("\" alt=\"");
             // Translators: Please keep short or translate as " "
             out.write(_("ETA"));
-            out.write("\">");
+            out.write("\"></a>");
         }
         out.write("</th>\n<th align=\"right\">");
-        out.write("<img border=\"0\" src=\"" + _imgPath + "head_rx.png\" title=\"");
+        // sort by size, not downloaded
+        sort = ("5".equals(currentSort)) ? "-5" : "5";
+        out.write("<a href=\"" + _contextPath + '/' + getQueryString(req, null, null, sort));
+        out.write("\"><img border=\"0\" src=\"" + _imgPath + "head_rx.png\" title=\"");
         out.write(_("Downloaded"));
         out.write("\" alt=\"");
         // Translators: Please keep short or translate as " "
         out.write(_("RX"));
-        out.write("\">");
+        out.write("\"></a>");
         out.write("</th>\n<th align=\"right\">");
         if (!snarks.isEmpty()) {
-            out.write("<img border=\"0\" src=\"" + _imgPath + "head_tx.png\" title=\"");
+            sort = ("7".equals(currentSort)) ? "-7" : "7";
+            out.write("<a href=\"" + _contextPath + '/' + getQueryString(req, null, null, sort));
+            out.write("\"><img border=\"0\" src=\"" + _imgPath + "head_tx.png\" title=\"");
             out.write(_("Uploaded"));
             out.write("\" alt=\"");
             // Translators: Please keep short or translate as " "
             out.write(_("TX"));
-            out.write("\">");
+            out.write("\"></a>");
         }
         out.write("</th>\n<th align=\"right\">");
         if (_manager.util().connected() && !snarks.isEmpty()) {
-            out.write("<img border=\"0\" src=\"" + _imgPath + "head_rxspeed.png\" title=\"");
+            sort = ("8".equals(currentSort)) ? "-8" : "8";
+            out.write("<a href=\"" + _contextPath + '/' + getQueryString(req, null, null, sort));
+            out.write("\"><img border=\"0\" src=\"" + _imgPath + "head_rxspeed.png\" title=\"");
             out.write(_("Down Rate"));
             out.write("\" alt=\"");
             // Translators: Please keep short or translate as " "
             out.write(_("RX Rate"));
-            out.write(" \">");
+            out.write("\"></a>");
         }
         out.write("</th>\n<th align=\"right\">");
         if (_manager.util().connected() && !snarks.isEmpty()) {
-            out.write("<img border=\"0\" src=\"" + _imgPath + "head_txspeed.png\" title=\"");
+            sort = ("9".equals(currentSort)) ? "-9" : "9";
+            out.write("<a href=\"" + _contextPath + '/' + getQueryString(req, null, null, sort));
+            out.write("\"><img border=\"0\" src=\"" + _imgPath + "head_txspeed.png\" title=\"");
             out.write(_("Up Rate"));
             out.write("\" alt=\"");
             // Translators: Please keep short or translate as " "
             out.write(_("TX Rate"));
-            out.write(" \">");
+            out.write("\"></a>");
         }
         out.write("</th>\n<th align=\"center\">");
 
@@ -580,12 +572,11 @@ public class I2PSnarkServlet extends BasicServlet {
         String uri = _contextPath + '/';
         boolean showDebug = "2".equals(peerParam);
 
-        String stParamStr = stParam == null ? "" : "&amp;st=" + stParam;
         for (int i = 0; i < total; i++) {
             Snark snark = snarks.get(i);
             boolean showPeers = showDebug || "1".equals(peerParam) || Base64.encode(snark.getInfoHash()).equals(peerParam);
             boolean hide = i < start || i >= start + pageSize;
-            displaySnark(out, snark, uri, i, stats, showPeers, isDegraded, noThinsp, showDebug, hide, stParamStr);
+            displaySnark(out, req, snark, uri, i, stats, showPeers, isDegraded, noThinsp, showDebug, hide);
         }
 
         if (total == 0) {
@@ -637,16 +628,104 @@ public class I2PSnarkServlet extends BasicServlet {
     }
     
     /**
+     *  hidden inputs for nonce and paramters p, st, and sort
+     *
+     *  @param out writes to it
+     *  @param action if non-null, add it as the action
+     *  @since 0.9.16
+     */
+    private void writeHiddenInputs(PrintWriter out, HttpServletRequest req, String action) {
+        StringBuilder buf = new StringBuilder(256);
+        writeHiddenInputs(buf, req, action);
+        out.write(buf.toString());
+    }
+    
+    /**
+     *  hidden inputs for nonce and paramters p, st, and sort
+     *
+     *  @param out appends to it
+     *  @param action if non-null, add it as the action
+     *  @since 0.9.16
+     */
+    private void writeHiddenInputs(StringBuilder buf, HttpServletRequest req, String action) {
+        buf.append("<input type=\"hidden\" name=\"nonce\" value=\"")
+           .append(_nonce).append("\" >\n");
+        String peerParam = req.getParameter("p");
+        if (peerParam != null) {
+            buf.append("<input type=\"hidden\" name=\"p\" value=\"")
+               .append(DataHelper.stripHTML(peerParam)).append("\" >\n");
+        }
+        String stParam = req.getParameter("st");
+        if (stParam != null) {
+            buf.append("<input type=\"hidden\" name=\"st\" value=\"")
+               .append(DataHelper.stripHTML(stParam)).append("\" >\n");
+        }
+        String soParam = req.getParameter("sort");
+        if (soParam != null) {
+            buf.append("<input type=\"hidden\" name=\"sort\" value=\"")
+               .append(DataHelper.stripHTML(soParam)).append("\" >\n");
+        }
+        if (action != null) {
+            buf.append("<input type=\"hidden\" name=\"action\" value=\"")
+               .append(action).append("\" >\n");
+        }
+    }
+    
+    /**
+     *  Build HTML-escaped and stripped query string
+     *
+     *  @param p override or "" for default or null to keep the same as in req
+     *  @param st override or "" for default or null to keep the same as in req
+     *  @param so override or "" for default or null to keep the same as in req
+     *  @return non-null, possibly empty
+     *  @since 0.9.16
+     */
+    private static String getQueryString(HttpServletRequest req, String p, String st, String so) {
+        StringBuilder buf = new StringBuilder(64);
+        if (p == null) {
+            p = req.getParameter("p");
+            if (p != null)
+                p = DataHelper.stripHTML(p);
+        }
+        if (p != null && !p.equals(""))
+            buf.append("?p=").append(p);
+        if (so == null) {
+            so = req.getParameter("sort");
+            if (so != null)
+                so = DataHelper.stripHTML(so);
+        }
+        if (so != null && !so.equals("")) {
+            if (buf.length() <= 0)
+                buf.append("?sort=");
+            else
+                buf.append("&amp;sort=");
+            buf.append(so);
+        }
+        if (st == null) {
+            st = req.getParameter("st");
+            if (st != null)
+                st = DataHelper.stripHTML(st);
+        }
+        if (st != null && !st.equals("")) {
+            if (buf.length() <= 0)
+                buf.append("?st=");
+            else
+                buf.append("&amp;st=");
+            buf.append(st);
+        }
+        return buf.toString();
+    }
+    
+    /**
      *  @since 0.9.6
      */
-    private void writePageNav(PrintWriter out, int start, int pageSize, int total,
-                              String peerParam, boolean noThinsp) {
+    private void writePageNav(PrintWriter out, HttpServletRequest req, int start, int pageSize, int total,
+                              boolean noThinsp) {
             // Page nav
             if (start > 0) {
                 // First
                 out.write("<a href=\"" + _contextPath);
-                if (peerParam != null)
-                    out.write("?p=" + peerParam);
+                out.write(getQueryString(req, null, "", null));
                 out.write("\">" +
                           "<img alt=\"" + _("First") + "\" title=\"" + _("First page") + "\" border=\"0\" src=\"" +
                           _imgPath + "control_rewind_blue.png\">" +
@@ -655,9 +734,9 @@ public class I2PSnarkServlet extends BasicServlet {
                 //if (prev > 0) {
                 if (true) {
                     // Back
-                    out.write("&nbsp;<a href=\"" + _contextPath +  "?st=" + prev);
-                    if (peerParam != null)
-                        out.write("&amp;p=" + peerParam);
+                    out.write("&nbsp;<a href=\"" + _contextPath);
+                    String sprev = (prev > 0) ? Integer.toString(prev) : "";
+                    out.write(getQueryString(req, null, sprev, null));
                     out.write("\">" +
                           "<img alt=\"" + _("Prev") + "\" title=\"" + _("Previous page") + "\" border=\"0\" src=\"" +
                           _imgPath + "control_back_blue.png\">" +
@@ -690,9 +769,8 @@ public class I2PSnarkServlet extends BasicServlet {
                 //if (next + pageSize < total) {
                 if (true) {
                     // Next
-                    out.write("&nbsp;<a href=\"" + _contextPath +  "?st=" + next);
-                    if (peerParam != null)
-                        out.write("&amp;p=" + peerParam);
+                    out.write("&nbsp;<a href=\"" + _contextPath);
+                    out.write(getQueryString(req, null, Integer.toString(next), null));
                     out.write("\">" +
                           "<img alt=\"" + _("Next") + "\" title=\"" + _("Next page") + "\" border=\"0\" src=\"" +
                           _imgPath + "control_play_blue.png\">" +
@@ -700,9 +778,8 @@ public class I2PSnarkServlet extends BasicServlet {
                 }
                 // Last
                 int last = ((total - 1) / pageSize) * pageSize;
-                out.write("&nbsp;<a href=\"" + _contextPath +  "?st=" + last);
-                if (peerParam != null)
-                    out.write("&amp;p=" + peerParam);
+                out.write("&nbsp;<a href=\"" + _contextPath);
+                out.write(getQueryString(req, null, Integer.toString(last), null));
                 out.write("\">" +
                           "<img alt=\"" + _("Last") + "\" title=\"" + _("Last page") + "\" border=\"0\" src=\"" +
                           _imgPath + "control_fastforward_blue.png\">" +
@@ -1190,34 +1267,16 @@ public class I2PSnarkServlet extends BasicServlet {
         return buf.toString();
     }
 
-    /**
-     *  Sort alphabetically in current locale, ignore case, ignore leading "the "
-     *  (I guess this is worth it, a lot of torrents start with "The "
-     *  @since 0.7.14
-     */
-    private static class TorrentNameComparator implements Comparator<Snark>, Serializable {
-
-        public int compare(Snark l, Snark r) {
-            // put downloads and magnets first
-            if (l.getStorage() == null && r.getStorage() != null)
-                return -1;
-            if (l.getStorage() != null && r.getStorage() == null)
-                return 1;
-            String ls = l.getBaseName();
-            String llc = ls.toLowerCase(Locale.US);
-            if (llc.startsWith("the ") || llc.startsWith("the.") || llc.startsWith("the_"))
-                ls = ls.substring(4);
-            String rs = r.getBaseName();
-            String rlc = rs.toLowerCase(Locale.US);
-            if (rlc.startsWith("the ") || rlc.startsWith("the.") || rlc.startsWith("the_"))
-                rs = rs.substring(4);
-            return Collator.getInstance().compare(ls, rs);
-        }
-    }
-
     private List<Snark> getSortedSnarks(HttpServletRequest req) {
         ArrayList<Snark> rv = new ArrayList<Snark>(_manager.getTorrents());
-        Collections.sort(rv, new TorrentNameComparator());
+        int sort = 0;
+        String ssort = req.getParameter("sort");
+        if (ssort != null) {
+            try {
+                sort = Integer.parseInt(ssort);
+            } catch (NumberFormatException nfe) {}
+        }
+        Collections.sort(rv, Sorters.getComparator(sort));
         return rv;
     }
 
@@ -1229,11 +1288,11 @@ public class I2PSnarkServlet extends BasicServlet {
      *
      *  @param stats in/out param (totals)
      *  @param statsOnly if true, output nothing, update stats only
-     *  @param stParam non null; empty or e.g. &amp;st=10
      */
-    private void displaySnark(PrintWriter out, Snark snark, String uri, int row, long stats[], boolean showPeers,
-                              boolean isDegraded, boolean noThinsp, boolean showDebug, boolean statsOnly,
-                              String stParam) throws IOException {
+    private void displaySnark(PrintWriter out, HttpServletRequest req,
+                              Snark snark, String uri, int row, long stats[], boolean showPeers,
+                              boolean isDegraded, boolean noThinsp, boolean showDebug, boolean statsOnly)
+                              throws IOException {
         // stats
         long uploaded = snark.getUploaded();
         stats[0] += snark.getDownloaded();
@@ -1335,7 +1394,7 @@ public class I2PSnarkServlet extends BasicServlet {
                 if (curPeers > 0 && !showPeers)
                     statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + img + ".png\" title=\"" + txt + "\"></td>" +
                                "<td class=\"snarkTorrentStatus\">" + txt +
-                               ": <a href=\"" + uri + "?p=" + Base64.encode(snark.getInfoHash()) + stParam + "\">" +
+                               ": <a href=\"" + uri + getQueryString(req, Base64.encode(snark.getInfoHash()), null, null) + "\">" +
                                curPeers + thinsp(noThinsp) +
                                ngettext("1 peer", "{0} peers", knownPeers) + "</a>";
                 else
@@ -1351,7 +1410,7 @@ public class I2PSnarkServlet extends BasicServlet {
             if (isRunning && curPeers > 0 && downBps > 0 && !showPeers)
                 statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "downloading.png\" title=\"" + _("OK") + "\"></td>" +
                                "<td class=\"snarkTorrentStatus\">" + _("OK") +
-                               ": <a href=\"" + uri + "?p=" + Base64.encode(snark.getInfoHash()) + stParam + "\">" +
+                               ": <a href=\"" + uri + getQueryString(req, Base64.encode(snark.getInfoHash()), null, null) + "\">" +
                                curPeers + thinsp(noThinsp) +
                                ngettext("1 peer", "{0} peers", knownPeers) + "</a>";
             else if (isRunning && curPeers > 0 && downBps > 0)
@@ -1362,7 +1421,7 @@ public class I2PSnarkServlet extends BasicServlet {
             else if (isRunning && curPeers > 0 && !showPeers)
                 statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "stalled.png\" title=\"" + _("Stalled") + "\"></td>" +
                                "<td class=\"snarkTorrentStatus\">" + _("Stalled") +
-                               ": <a href=\"" + uri + "?p=" + Base64.encode(snark.getInfoHash()) + stParam + "\">" +
+                               ": <a href=\"" + uri + getQueryString(req, Base64.encode(snark.getInfoHash()), null, null) + "\">" +
                                curPeers + thinsp(noThinsp) +
                                ngettext("1 peer", "{0} peers", knownPeers) + "</a>";
             else if (isRunning && curPeers > 0)
@@ -1484,7 +1543,8 @@ public class I2PSnarkServlet extends BasicServlet {
         } else if (isRunning) {
             // Stop Button
             if (isDegraded)
-                out.write("<a href=\"" + _contextPath + "/?action=Stop_" + b64 + "&amp;nonce=" + _nonce + stParam + "\"><img title=\"");
+                out.write("<a href=\"" + _contextPath + "/?action=Stop_" + b64 + "&amp;nonce=" + _nonce +
+                          getQueryString(req, "", null, null).replace("?", "&amp;") + "\"><img title=\"");
             else
                 out.write("<input type=\"image\" name=\"action_Stop_" + b64 + "\" value=\"foo\" title=\"");
             out.write(_("Stop the torrent"));
@@ -1498,7 +1558,8 @@ public class I2PSnarkServlet extends BasicServlet {
                 // Start Button
                 // This works in Opera but it's displayed a little differently, so use noThinsp here too so all 3 icons are consistent
                 if (noThinsp)
-                    out.write("<a href=\"" + _contextPath + "/?action=Start_" + b64 + "&amp;nonce=" + _nonce + stParam + "\"><img title=\"");
+                    out.write("<a href=\"" + _contextPath + "/?action=Start_" + b64 + "&amp;nonce=" + _nonce +
+                              getQueryString(req, "", null, null).replace("?", "&amp;") + "\"><img title=\"");
                 else
                     out.write("<input type=\"image\" name=\"action_Start_" + b64 + "\" value=\"foo\" title=\"");
                 out.write(_("Start the torrent"));
@@ -1512,7 +1573,8 @@ public class I2PSnarkServlet extends BasicServlet {
                 // Remove Button
                 // Doesnt work with Opera so use noThinsp instead of isDegraded
                 if (noThinsp)
-                    out.write("<a href=\"" + _contextPath + "/?action=Remove_" + b64 + "&amp;nonce=" + _nonce + stParam + "\"><img title=\"");
+                    out.write("<a href=\"" + _contextPath + "/?action=Remove_" + b64 + "&amp;nonce=" + _nonce +
+                              getQueryString(req, "", null, null).replace("?", "&amp;") + "\"><img title=\"");
                 else
                     out.write("<input type=\"image\" name=\"action_Remove_" + b64 + "\" value=\"foo\" title=\"");
                 out.write(_("Remove the torrent from the active list, deleting the .torrent file"));
@@ -1532,7 +1594,8 @@ public class I2PSnarkServlet extends BasicServlet {
             // Delete Button
             // Doesnt work with Opera so use noThinsp instead of isDegraded
             if (noThinsp)
-                out.write("<a href=\"" + _contextPath + "/?action=Delete_" + b64 + "&amp;nonce=" + _nonce + stParam + "\"><img title=\"");
+                out.write("<a href=\"" + _contextPath + "/?action=Delete_" + b64 + "&amp;nonce=" + _nonce +
+                          getQueryString(req, "", null, null).replace("?", "&amp;") + "\"><img title=\"");
             else
                 out.write("<input type=\"image\" name=\"action_Delete_" + b64 + "\" value=\"foo\" title=\"");
             out.write(_("Delete the .torrent file and the associated data file(s)"));
@@ -1826,12 +1889,7 @@ public class I2PSnarkServlet extends BasicServlet {
         out.write("<div class=\"snarkNewTorrent\">\n");
         // *not* enctype="multipart/form-data", so that the input type=file sends the filename, not the file
         out.write("<form action=\"_post\" method=\"POST\">\n");
-        out.write("<input type=\"hidden\" name=\"nonce\" value=\"" + _nonce + "\" >\n");
-        out.write("<input type=\"hidden\" name=\"action\" value=\"Add\" >\n");
-        // don't lose peer setting
-        String peerParam = req.getParameter("p");
-        if (peerParam != null)
-            out.write("<input type=\"hidden\" name=\"p\" value=\"" + DataHelper.stripHTML(peerParam) + "\" >\n");
+        writeHiddenInputs(out, req, "Add");
         out.write("<div class=\"addtorrentsection\"><span class=\"snarkConfigTitle\">");
         out.write("<img alt=\"\" border=\"0\" src=\"" + _imgPath + "add.png\"> ");
         out.write(_("Add Torrent"));
@@ -1858,12 +1916,7 @@ public class I2PSnarkServlet extends BasicServlet {
         out.write("<a name=\"add\"></a><div class=\"newtorrentsection\"><div class=\"snarkNewTorrent\">\n");
         // *not* enctype="multipart/form-data", so that the input type=file sends the filename, not the file
         out.write("<form action=\"_post\" method=\"POST\">\n");
-        out.write("<input type=\"hidden\" name=\"nonce\" value=\"" + _nonce + "\" >\n");
-        out.write("<input type=\"hidden\" name=\"action\" value=\"Create\" >\n");
-        // don't lose peer setting
-        String peerParam = req.getParameter("p");
-        if (peerParam != null)
-            out.write("<input type=\"hidden\" name=\"p\" value=\"" + DataHelper.stripHTML(peerParam) + "\" >\n");
+        writeHiddenInputs(out, req, "Create");
         out.write("<span class=\"snarkConfigTitle\">");
         out.write("<img alt=\"\" border=\"0\" src=\"" + _imgPath + "create.png\"> ");
         out.write(_("Create Torrent"));
@@ -1929,10 +1982,9 @@ public class I2PSnarkServlet extends BasicServlet {
         //int seedPct = 0;
        
         out.write("<form action=\"" + _contextPath + "/configure\" method=\"POST\">\n" +
-                  "<div class=\"configsectionpanel\"><div class=\"snarkConfig\">\n" +
-                  "<input type=\"hidden\" name=\"nonce\" value=\"" + _nonce + "\" >\n" +
-                  "<input type=\"hidden\" name=\"action\" value=\"Save\" >\n" +
-                  "<span class=\"snarkConfigTitle\">" +
+                  "<div class=\"configsectionpanel\"><div class=\"snarkConfig\">\n");
+        writeHiddenInputs(out, req, "Save");
+        out.write("<span class=\"snarkConfigTitle\">" +
                   "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "config.png\"> ");
         out.write(_("Configuration"));
         out.write("</span><hr>\n"   +
@@ -2115,10 +2167,9 @@ public class I2PSnarkServlet extends BasicServlet {
     private void writeTrackerForm(PrintWriter out, HttpServletRequest req) throws IOException {
         StringBuilder buf = new StringBuilder(1024);
         buf.append("<form action=\"" + _contextPath + "/configure\" method=\"POST\">\n" +
-                  "<div class=\"configsectionpanel\"><div class=\"snarkConfig\">\n" +
-                  "<input type=\"hidden\" name=\"nonce\" value=\"" + _nonce + "\" >\n" +
-                  "<input type=\"hidden\" name=\"action\" value=\"Save2\" >\n" +
-                  "<span class=\"snarkConfigTitle\">" +
+                   "<div class=\"configsectionpanel\"><div class=\"snarkConfig\">\n");
+        writeHiddenInputs(buf, req, "Save2");
+        buf.append("<span class=\"snarkConfigTitle\">" +
                   "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "config.png\"> ");
         buf.append(_("Trackers"));
         buf.append("</span><hr>\n"   +
