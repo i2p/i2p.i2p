@@ -464,14 +464,26 @@ public class I2PSnarkServlet extends BasicServlet {
             out.write("</a><br>\n"); 
         }
         out.write("</th>\n<th colspan=\"2\" align=\"left\">");
+        // cycle through sort by name or type
+        boolean isTypeSort = false;
         if (showSort) {
-            sort = (currentSort == null || "0".equals(currentSort) || "1".equals(currentSort)) ? "-1" : "";
+            if (currentSort == null || "0".equals(currentSort) || "1".equals(currentSort)) {
+                sort = "-1";
+            } else if ("-1".equals(currentSort)) {
+                sort = "12";
+                isTypeSort = true;
+            } else if ("12".equals(currentSort)) {
+                sort = "-12";
+                isTypeSort = true;
+            } else {
+                sort = "";
+            }
             out.write("<a href=\"" + _contextPath + '/' + getQueryString(req, null, null, sort));
             out.write("\">");
         }
         out.write("<img border=\"0\" src=\"" + _imgPath + "torrent.png\" title=\"");
         if (showSort)
-            out.write(_("Sort by {0}", _("Torrent")));
+            out.write(_("Sort by {0}", (isTypeSort ? _("File type") : _("Torrent"))));
         else
             out.write(_("Torrent"));
         out.write("\" alt=\"");
@@ -1365,7 +1377,7 @@ public class I2PSnarkServlet extends BasicServlet {
                 } catch (NumberFormatException nfe) {}
             }
             try {
-                Collections.sort(rv, Sorters.getComparator(sort));
+                Collections.sort(rv, Sorters.getComparator(sort, this));
             } catch (IllegalArgumentException iae) {
                 // Java 7 TimSort - may be unstable
             }
@@ -2977,7 +2989,12 @@ public class I2PSnarkServlet extends BasicServlet {
         return buf.toString();
     }
 
-    /** @since 0.7.14 */
+    /**
+     *  Pick an icon; try to catch the common types in an i2p environment.
+     *
+     *  @return file name not including ".png"
+     *  @since 0.7.14
+     */
     private String toIcon(File item) {
         if (item.isDirectory())
             return "folder";
@@ -2986,10 +3003,12 @@ public class I2PSnarkServlet extends BasicServlet {
 
     /**
      *  Pick an icon; try to catch the common types in an i2p environment
+     *  Pkg private for FileTypeSorter.
+     *
      *  @return file name not including ".png"
      *  @since 0.7.14
      */
-    private String toIcon(String path) {
+    String toIcon(String path) {
         String icon;
         // Note that for this to work well, our custom mime.properties file must be loaded.
         String plc = path.toLowerCase(Locale.US);

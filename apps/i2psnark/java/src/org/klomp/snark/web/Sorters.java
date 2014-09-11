@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Locale;
 
+import org.klomp.snark.MetaInfo;
 import org.klomp.snark.Snark;
 
 /**
@@ -30,9 +31,12 @@ class Sorters {
      *<li>9: Up rate
      *<li>10: Remaining (needed)
      *<li>11: Upload ratio
+     *<li>11: File type
      *</ul>
+     *
+     *  @param servlet for file type callback only
      */
-    public static Comparator<Snark> getComparator(int type) {
+    public static Comparator<Snark> getComparator(int type, I2PSnarkServlet servlet) {
         boolean rev = type < 0;
         Comparator<Snark> rv;
         switch (type) {
@@ -94,6 +98,11 @@ class Sorters {
           case -11:
           case 11:
               rv = new RatioComparator(rev);
+              break;
+
+          case -12:
+          case 12:
+              rv = new FileTypeComparator(rev, servlet);
               break;
 
         }
@@ -301,6 +310,32 @@ class Sorters {
             long rt = r.getTotalLength();
             long rd = rt > 0 ? ((M * r.getUploaded()) / rt) : 0;
             return compLong(ld, rd);
+        }
+    }
+
+    private static class FileTypeComparator extends Sort {
+
+        private final I2PSnarkServlet servlet;
+
+        public FileTypeComparator(boolean rev, I2PSnarkServlet servlet) {
+            super(rev);
+            this.servlet = servlet;
+        }
+
+        public int compareIt(Snark l, Snark r) {
+            String ls = toName(l);
+            String rs = toName(r);
+            return ls.compareTo(rs);
+        }
+
+        private String toName(Snark snark) {
+            MetaInfo meta = snark.getMetaInfo();
+            if (meta == null)
+                return "0";
+            if (meta.getFiles() != null)
+                return "1";
+            // arbitrary sort based on icon name
+            return servlet.toIcon(meta.getName());
         }
     }
 }
