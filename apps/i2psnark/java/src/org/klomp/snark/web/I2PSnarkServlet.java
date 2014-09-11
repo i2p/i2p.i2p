@@ -427,7 +427,7 @@ public class I2PSnarkServlet extends BasicServlet {
         String sort = ("2".equals(currentSort)) ? "-2" : "2";
         out.write("<a href=\"" + _contextPath + '/' + getQueryString(req, null, null, sort));
         out.write("\"><img border=\"0\" src=\"" + _imgPath + "status.png\" title=\"");
-        out.write(_("Status"));
+        out.write(_("Sort by {0}", _("Status")));
         out.write("\" alt=\"");
         out.write(_("Status"));
         out.write("\"></a></th>\n<th>");
@@ -457,7 +457,7 @@ public class I2PSnarkServlet extends BasicServlet {
         sort = (currentSort == null || "0".equals(currentSort) || "1".equals(currentSort)) ? "-1" : "";
         out.write("<a href=\"" + _contextPath + '/' + getQueryString(req, null, null, sort));
         out.write("\"><img border=\"0\" src=\"" + _imgPath + "torrent.png\" title=\"");
-        out.write(_("Torrent"));
+        out.write(_("Sort by {0}", _("Torrent")));
         out.write("\" alt=\"");
         out.write(_("Torrent"));
         out.write("\"></a></th>\n<th align=\"center\">");
@@ -469,7 +469,7 @@ public class I2PSnarkServlet extends BasicServlet {
             sort = ("4".equals(currentSort)) ? "-4" : "4";
             out.write("<a href=\"" + _contextPath + '/' + getQueryString(req, null, null, sort));
             out.write("\"><img border=\"0\" src=\"" + _imgPath + "eta.png\" title=\"");
-            out.write(_("Estimated time remaining"));
+            out.write(_("Sort by {0}", _("Estimated time remaining")));
             out.write("\" alt=\"");
             // Translators: Please keep short or translate as " "
             out.write(_("ETA"));
@@ -480,7 +480,7 @@ public class I2PSnarkServlet extends BasicServlet {
         sort = ("5".equals(currentSort)) ? "-5" : "5";
         out.write("<a href=\"" + _contextPath + '/' + getQueryString(req, null, null, sort));
         out.write("\"><img border=\"0\" src=\"" + _imgPath + "head_rx.png\" title=\"");
-        out.write(_("Downloaded"));
+        out.write(_("Sort by {0}", _("Size")));
         out.write("\" alt=\"");
         // Translators: Please keep short or translate as " "
         out.write(_("RX"));
@@ -490,7 +490,7 @@ public class I2PSnarkServlet extends BasicServlet {
             sort = ("7".equals(currentSort)) ? "-7" : "7";
             out.write("<a href=\"" + _contextPath + '/' + getQueryString(req, null, null, sort));
             out.write("\"><img border=\"0\" src=\"" + _imgPath + "head_tx.png\" title=\"");
-            out.write(_("Uploaded"));
+            out.write(_("Sort by {0}", _("Uploaded")));
             out.write("\" alt=\"");
             // Translators: Please keep short or translate as " "
             out.write(_("TX"));
@@ -501,7 +501,7 @@ public class I2PSnarkServlet extends BasicServlet {
             sort = ("8".equals(currentSort)) ? "-8" : "8";
             out.write("<a href=\"" + _contextPath + '/' + getQueryString(req, null, null, sort));
             out.write("\"><img border=\"0\" src=\"" + _imgPath + "head_rxspeed.png\" title=\"");
-            out.write(_("Down Rate"));
+            out.write(_("Sort by {0}", _("Down Rate")));
             out.write("\" alt=\"");
             // Translators: Please keep short or translate as " "
             out.write(_("RX Rate"));
@@ -512,7 +512,7 @@ public class I2PSnarkServlet extends BasicServlet {
             sort = ("9".equals(currentSort)) ? "-9" : "9";
             out.write("<a href=\"" + _contextPath + '/' + getQueryString(req, null, null, sort));
             out.write("\"><img border=\"0\" src=\"" + _imgPath + "head_txspeed.png\" title=\"");
-            out.write(_("Up Rate"));
+            out.write(_("Sort by {0}", _("Up Rate")));
             out.write("\" alt=\"");
             // Translators: Please keep short or translate as " "
             out.write(_("TX Rate"));

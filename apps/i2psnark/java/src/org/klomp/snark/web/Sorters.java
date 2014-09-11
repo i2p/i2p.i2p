@@ -11,10 +11,26 @@ import org.klomp.snark.Snark;
 /**
  *  Comparators for various columns
  *
- *  @since 0.9.16 moved from I2PSnarkservlet
+ *  @since 0.9.16 from TorrentNameComparator, moved from I2PSnarkservlet
  */
 class Sorters {
 
+    /**
+     *  Negative is reverse
+     *
+     *<ul>
+     *<li>0, 1: Name
+     *<li>2: Status
+     *<li>3: Peers
+     *<li>4: ETA
+     *<li>5: Size
+     *<li>6: Downloaded
+     *<li>7: Uploaded
+     *<li>8: Down rate
+     *<li>9: Up rate
+     *<li>10: Remaining (needed)
+     *</ul>
+     */
     public static Comparator<Snark> getComparator(int type) {
         boolean rev = type < 0;
         Comparator<Snark> rv;
@@ -143,7 +159,11 @@ class Sorters {
         private StatusComparator(boolean rev) { super(rev); }
 
         public int compareIt(Snark l, Snark r) {
-            return getStatus(l) - getStatus(r);
+            int rv = getStatus(l) - getStatus(r);
+            if (rv != 0)
+                return rv;
+            // use reverse remaining as first tie break
+            return compLong(r.getNeededLength(), l.getNeededLength());
         }
 
         private static int getStatus(Snark snark) {
@@ -204,14 +224,15 @@ class Sorters {
 
         private static long eta(Snark snark) {
             long needed = snark.getNeededLength(); 
+            if (needed <= 0)
+                return 0;
             long total = snark.getTotalLength();
             if (needed > total)
                 needed = total;
-            long remainingSeconds;
             long downBps = snark.getDownloadRate();
-            if (downBps > 0 && needed > 0)
+            if (downBps > 0)
                 return needed / downBps;
-            return -1;
+            return Long.MAX_VALUE;
         }
     }
 
