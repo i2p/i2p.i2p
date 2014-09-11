@@ -250,12 +250,15 @@ class Sorters {
             return compLong(l.getTotalLength(), r.getTotalLength());
         }
     }
+
     private static class DownloadedComparator extends Sort {
 
         public DownloadedComparator(boolean rev) { super(rev); }
 
         public int compareIt(Snark l, Snark r) {
-            return compLong(l.getDownloaded(), r.getDownloaded());
+            long ld = l.getTotalLength() - l.getRemainingLength();
+            long rd = r.getTotalLength() - r.getRemainingLength();
+            return compLong(ld, rd);
         }
     }
 
