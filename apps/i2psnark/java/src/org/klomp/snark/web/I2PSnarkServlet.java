@@ -1328,14 +1328,20 @@ public class I2PSnarkServlet extends BasicServlet {
 
     private List<Snark> getSortedSnarks(HttpServletRequest req) {
         ArrayList<Snark> rv = new ArrayList<Snark>(_manager.getTorrents());
-        int sort = 0;
-        String ssort = req.getParameter("sort");
-        if (ssort != null) {
+        if (rv.size() > 1) {
+            int sort = 0;
+            String ssort = req.getParameter("sort");
+            if (ssort != null) {
+                try {
+                    sort = Integer.parseInt(ssort);
+                } catch (NumberFormatException nfe) {}
+            }
             try {
-                sort = Integer.parseInt(ssort);
-            } catch (NumberFormatException nfe) {}
+                Collections.sort(rv, Sorters.getComparator(sort));
+            } catch (IllegalArgumentException iae) {
+                // Java 7 TimSort - may be unstable
+            }
         }
-        Collections.sort(rv, Sorters.getComparator(sort));
         return rv;
     }
 
@@ -2982,7 +2988,7 @@ public class I2PSnarkServlet extends BasicServlet {
     
     /** @since 0.7.14 */
     private String toImg(String icon) {
-        return "<img alt=\"\" height=\"16\" width=\"16\" src=\"" + _contextPath + WARBASE + "icons/" + icon + ".png\">";
+        return toImg(icon, "");
     }
 
     /** @since 0.8.2 */

@@ -29,6 +29,7 @@ class Sorters {
      *<li>8: Down rate
      *<li>9: Up rate
      *<li>10: Remaining (needed)
+     *<li>11: Upload ratio
      *</ul>
      */
     public static Comparator<Snark> getComparator(int type) {
@@ -88,6 +89,11 @@ class Sorters {
           case -10:
           case 10:
               rv = new RemainingComparator(rev);
+              break;
+
+          case -11:
+          case 11:
+              rv = new RatioComparator(rev);
               break;
 
         }
@@ -277,6 +283,19 @@ class Sorters {
 
         public int compareIt(Snark l, Snark r) {
             return compLong(l.getUploadRate(), r.getUploadRate());
+        }
+    }
+
+    private static class RatioComparator extends Sort {
+
+        public RatioComparator(boolean rev) { super(rev); }
+
+        public int compareIt(Snark l, Snark r) {
+            long lt = l.getTotalLength();
+            long ld = lt > 0 ? ((4096 * l.getUploaded()) / (4096 * lt)) : 0;
+            long rt = r.getTotalLength();
+            long rd = rt > 0 ? ((4096 * r.getUploaded()) / (4096 * rt)) : 0;
+            return compLong(ld, rd);
         }
     }
 }
