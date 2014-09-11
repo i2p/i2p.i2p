@@ -288,13 +288,15 @@ class Sorters {
 
     private static class RatioComparator extends Sort {
 
+        private static final long M = 128 * 1024 * 1024;
+
         public RatioComparator(boolean rev) { super(rev); }
 
         public int compareIt(Snark l, Snark r) {
             long lt = l.getTotalLength();
-            long ld = lt > 0 ? ((4096 * l.getUploaded()) / (4096 * lt)) : 0;
+            long ld = lt > 0 ? ((M * l.getUploaded()) / lt) : 0;
             long rt = r.getTotalLength();
-            long rd = rt > 0 ? ((4096 * r.getUploaded()) / (4096 * rt)) : 0;
+            long rd = rt > 0 ? ((M * r.getUploaded()) / rt) : 0;
             return compLong(ld, rd);
         }
     }

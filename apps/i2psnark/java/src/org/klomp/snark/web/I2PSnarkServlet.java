@@ -503,15 +503,26 @@ public class I2PSnarkServlet extends BasicServlet {
                 out.write("</a>");
         }
         out.write("</th>\n<th align=\"right\">");
-        // sort by size, not downloaded
+        // cycle through sort by size or downloaded
+        boolean isDlSort = false;
         if (showSort) {
-            sort = ("5".equals(currentSort)) ? "-5" : "5";
+            if ("5".equals(currentSort)) {
+                sort = "-5";
+            } else if ("-5".equals(currentSort)) {
+                sort = "6";
+                isDlSort = true;
+            } else if ("6".equals(currentSort)) {
+                sort = "-6";
+                isDlSort = true;
+            } else {
+                sort = "5";
+            }
             out.write("<a href=\"" + _contextPath + '/' + getQueryString(req, null, null, sort));
             out.write("\">");
         }
         out.write("<img border=\"0\" src=\"" + _imgPath + "head_rx.png\" title=\"");
         if (showSort)
-            out.write(_("Sort by {0}", _("Size")));
+            out.write(_("Sort by {0}", (isDlSort ? _("Downloaded") : _("Size"))));
         else
             out.write(_("Downloaded"));
         out.write("\" alt=\"");
@@ -521,15 +532,32 @@ public class I2PSnarkServlet extends BasicServlet {
         if (showSort)
             out.write("</a>");
         out.write("</th>\n<th align=\"right\">");
+        boolean isRatSort = false;
         if (!snarks.isEmpty()) {
+            // cycle through sort by uploaded or ratio
+            boolean nextRatSort = false;
             if (showSort) {
-                sort = ("7".equals(currentSort)) ? "-7" : "7";
+                if ("7".equals(currentSort)) {
+                    sort = "-7";
+                } else if ("-7".equals(currentSort)) {
+                    sort = "11";
+                    nextRatSort = true;
+                } else if ("11".equals(currentSort)) {
+                    sort = "-11";
+                    nextRatSort = true;
+                    isRatSort = true;
+                } else if ("-11".equals(currentSort)) {
+                    sort = "7";
+                    isRatSort = true;
+                } else {
+                    sort = "7";
+                }
                 out.write("<a href=\"" + _contextPath + '/' + getQueryString(req, null, null, sort));
                 out.write("\">");
             }
             out.write("<img border=\"0\" src=\"" + _imgPath + "head_tx.png\" title=\"");
             if (showSort)
-                out.write(_("Sort by {0}", _("Uploaded")));
+                out.write(_("Sort by {0}", (nextRatSort ? _("Upload ratio") : _("Uploaded"))));
             else
                 out.write(_("Uploaded"));
             out.write("\" alt=\"");
@@ -635,7 +663,7 @@ public class I2PSnarkServlet extends BasicServlet {
             Snark snark = snarks.get(i);
             boolean showPeers = showDebug || "1".equals(peerParam) || Base64.encode(snark.getInfoHash()).equals(peerParam);
             boolean hide = i < start || i >= start + pageSize;
-            displaySnark(out, req, snark, uri, i, stats, showPeers, isDegraded, noThinsp, showDebug, hide);
+            displaySnark(out, req, snark, uri, i, stats, showPeers, isDegraded, noThinsp, showDebug, hide, isRatSort);
         }
 
         if (total == 0) {
@@ -1356,8 +1384,8 @@ public class I2PSnarkServlet extends BasicServlet {
      */
     private void displaySnark(PrintWriter out, HttpServletRequest req,
                               Snark snark, String uri, int row, long stats[], boolean showPeers,
-                              boolean isDegraded, boolean noThinsp, boolean showDebug, boolean statsOnly)
-                              throws IOException {
+                              boolean isDegraded, boolean noThinsp, boolean showDebug, boolean statsOnly,
+                              boolean showRatios) throws IOException {
         // stats
         long uploaded = snark.getUploaded();
         stats[0] += snark.getDownloaded();
@@ -1590,8 +1618,17 @@ public class I2PSnarkServlet extends BasicServlet {
         //    out.write("??");  // no meta size yet
         out.write("</td>\n\t");
         out.write("<td align=\"right\" class=\"snarkTorrentUploaded\">");
-        if (isValid && uploaded > 0)
-           out.write(formatSize(uploaded));
+        if (isValid) {
+            if (showRatios) {
+                if (total > 0) {
+                    double ratio = uploaded / ((double) total);
+                    out.write((new DecimalFormat("0.000")).format(ratio));
+                    out.write("&nbsp;x");
+                }
+            } else if (uploaded > 0) {
+                out.write(formatSize(uploaded));
+            }
+        }
         out.write("</td>\n\t");
         out.write("<td align=\"right\" class=\"snarkTorrentRateDown\">");
         if (isRunning && needed > 0)
@@ -2702,9 +2739,20 @@ public class I2PSnarkServlet extends BasicServlet {
                    .append(":</b> ")
                    .append((new DecimalFormat("0.00%")).format(completion));
             else
-                buf.append("&nbsp;<img alt=\"\" border=\"0\" src=\"").append(_imgPath).append("head_rx.png\" >&nbsp;")
-                   .append(_("Complete"));
-            // else unknown
+                buf.append("&nbsp;<img alt=\"\" border=\"0\" src=\"").append(_imgPath).append("head_rx.png\" >&nbsp;<b>")
+                   .append(_("Complete")).append("</b>");
+            // up ratio
+            buf.append("&nbsp;<img alt=\"\" border=\"0\" src=\"").append(_imgPath).append("head_tx.png\" >&nbsp;<b>")
+               .append(_("Upload ratio"))
+               .append(":</b> ");
+            long uploaded = snark.getUploaded();
+            if (uploaded > 0) {
+                double ratio = uploaded / ((double) snark.getTotalLength());
+                buf.append((new DecimalFormat("0.000")).format(ratio));
+                buf.append("&nbsp;x");
+            } else {
+                buf.append('0');
+            }
             long needed = snark.getNeededLength();
             if (needed > 0)
                 buf.append("&nbsp;<img alt=\"\" border=\"0\" src=\"").append(_imgPath).append("head_rx.png\" >&nbsp;<b>")
