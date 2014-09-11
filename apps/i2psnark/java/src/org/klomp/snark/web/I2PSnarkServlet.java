@@ -423,14 +423,24 @@ public class I2PSnarkServlet extends BasicServlet {
         int pageSize = Math.max(_manager.getPageSize(), 5);
 
         String currentSort = req.getParameter("sort");
+        boolean showSort = total > 1;
         out.write("<tr><th>");
         String sort = ("2".equals(currentSort)) ? "-2" : "2";
-        out.write("<a href=\"" + _contextPath + '/' + getQueryString(req, null, null, sort));
-        out.write("\"><img border=\"0\" src=\"" + _imgPath + "status.png\" title=\"");
-        out.write(_("Sort by {0}", _("Status")));
+        if (showSort) {
+            out.write("<a href=\"" + _contextPath + '/' + getQueryString(req, null, null, sort));
+            out.write("\">");
+        }
+        out.write("<img border=\"0\" src=\"" + _imgPath + "status.png\" title=\"");
+        if (showSort)
+            out.write(_("Sort by {0}", _("Status")));
+        else
+            out.write(_("Status"));
         out.write("\" alt=\"");
         out.write(_("Status"));
-        out.write("\"></a></th>\n<th>");
+        out.write("\">");
+        if (showSort)
+            out.write("</a>");
+        out.write("</th>\n<th>");
         if (_manager.util().connected() && !snarks.isEmpty()) {
             out.write(" <a href=\"" + _contextPath + '/');
             if (peerParam != null) {
@@ -454,69 +464,118 @@ public class I2PSnarkServlet extends BasicServlet {
             out.write("</a><br>\n"); 
         }
         out.write("</th>\n<th colspan=\"2\" align=\"left\">");
-        sort = (currentSort == null || "0".equals(currentSort) || "1".equals(currentSort)) ? "-1" : "";
-        out.write("<a href=\"" + _contextPath + '/' + getQueryString(req, null, null, sort));
-        out.write("\"><img border=\"0\" src=\"" + _imgPath + "torrent.png\" title=\"");
-        out.write(_("Sort by {0}", _("Torrent")));
+        if (showSort) {
+            sort = (currentSort == null || "0".equals(currentSort) || "1".equals(currentSort)) ? "-1" : "";
+            out.write("<a href=\"" + _contextPath + '/' + getQueryString(req, null, null, sort));
+            out.write("\">");
+        }
+        out.write("<img border=\"0\" src=\"" + _imgPath + "torrent.png\" title=\"");
+        if (showSort)
+            out.write(_("Sort by {0}", _("Torrent")));
+        else
+            out.write(_("Torrent"));
         out.write("\" alt=\"");
         out.write(_("Torrent"));
-        out.write("\"></a></th>\n<th align=\"center\">");
+        out.write("\">");
+        if (showSort)
+            out.write("</a>");
+        out.write("</th>\n<th align=\"center\">");
         if (total > 0 && (start > 0 || total > pageSize)) {
             writePageNav(out, req, start, pageSize, total, noThinsp);
         }
         out.write("</th>\n<th align=\"right\">");
         if (_manager.util().connected() && !snarks.isEmpty()) {
-            sort = ("4".equals(currentSort)) ? "-4" : "4";
-            out.write("<a href=\"" + _contextPath + '/' + getQueryString(req, null, null, sort));
-            out.write("\"><img border=\"0\" src=\"" + _imgPath + "eta.png\" title=\"");
-            out.write(_("Sort by {0}", _("Estimated time remaining")));
+            if (showSort) {
+                sort = ("4".equals(currentSort)) ? "-4" : "4";
+                out.write("<a href=\"" + _contextPath + '/' + getQueryString(req, null, null, sort));
+                out.write("\">");
+            }
+            out.write("<img border=\"0\" src=\"" + _imgPath + "eta.png\" title=\"");
+            if (showSort)
+                out.write(_("Sort by {0}", _("Estimated time remaining")));
+            else
+                out.write(_("Estimated time remaining"));
             out.write("\" alt=\"");
             // Translators: Please keep short or translate as " "
             out.write(_("ETA"));
-            out.write("\"></a>");
+            out.write("\">");
+            if (showSort)
+                out.write("</a>");
         }
         out.write("</th>\n<th align=\"right\">");
         // sort by size, not downloaded
-        sort = ("5".equals(currentSort)) ? "-5" : "5";
-        out.write("<a href=\"" + _contextPath + '/' + getQueryString(req, null, null, sort));
-        out.write("\"><img border=\"0\" src=\"" + _imgPath + "head_rx.png\" title=\"");
-        out.write(_("Sort by {0}", _("Size")));
+        if (showSort) {
+            sort = ("5".equals(currentSort)) ? "-5" : "5";
+            out.write("<a href=\"" + _contextPath + '/' + getQueryString(req, null, null, sort));
+            out.write("\">");
+        }
+        out.write("<img border=\"0\" src=\"" + _imgPath + "head_rx.png\" title=\"");
+        if (showSort)
+            out.write(_("Sort by {0}", _("Size")));
+        else
+            out.write(_("Downloaded"));
         out.write("\" alt=\"");
         // Translators: Please keep short or translate as " "
         out.write(_("RX"));
-        out.write("\"></a>");
+        out.write("\">");
+        if (showSort)
+            out.write("</a>");
         out.write("</th>\n<th align=\"right\">");
         if (!snarks.isEmpty()) {
-            sort = ("7".equals(currentSort)) ? "-7" : "7";
-            out.write("<a href=\"" + _contextPath + '/' + getQueryString(req, null, null, sort));
-            out.write("\"><img border=\"0\" src=\"" + _imgPath + "head_tx.png\" title=\"");
-            out.write(_("Sort by {0}", _("Uploaded")));
+            if (showSort) {
+                sort = ("7".equals(currentSort)) ? "-7" : "7";
+                out.write("<a href=\"" + _contextPath + '/' + getQueryString(req, null, null, sort));
+                out.write("\">");
+            }
+            out.write("<img border=\"0\" src=\"" + _imgPath + "head_tx.png\" title=\"");
+            if (showSort)
+                out.write(_("Sort by {0}", _("Uploaded")));
+            else
+                out.write(_("Uploaded"));
             out.write("\" alt=\"");
             // Translators: Please keep short or translate as " "
             out.write(_("TX"));
-            out.write("\"></a>");
+            out.write("\">");
+            if (showSort)
+                out.write("</a>");
         }
         out.write("</th>\n<th align=\"right\">");
         if (_manager.util().connected() && !snarks.isEmpty()) {
-            sort = ("8".equals(currentSort)) ? "-8" : "8";
-            out.write("<a href=\"" + _contextPath + '/' + getQueryString(req, null, null, sort));
-            out.write("\"><img border=\"0\" src=\"" + _imgPath + "head_rxspeed.png\" title=\"");
-            out.write(_("Sort by {0}", _("Down Rate")));
+            if (showSort) {
+                sort = ("8".equals(currentSort)) ? "-8" : "8";
+                out.write("<a href=\"" + _contextPath + '/' + getQueryString(req, null, null, sort));
+                out.write("\">");
+            }
+            out.write("<img border=\"0\" src=\"" + _imgPath + "head_rxspeed.png\" title=\"");
+            if (showSort)
+                out.write(_("Sort by {0}", _("Down Rate")));
+            else
+                out.write(_("Down Rate"));
             out.write("\" alt=\"");
             // Translators: Please keep short or translate as " "
             out.write(_("RX Rate"));
-            out.write("\"></a>");
+            out.write("\">");
+            if (showSort)
+                out.write("</a>");
         }
         out.write("</th>\n<th align=\"right\">");
         if (_manager.util().connected() && !snarks.isEmpty()) {
-            sort = ("9".equals(currentSort)) ? "-9" : "9";
-            out.write("<a href=\"" + _contextPath + '/' + getQueryString(req, null, null, sort));
-            out.write("\"><img border=\"0\" src=\"" + _imgPath + "head_txspeed.png\" title=\"");
-            out.write(_("Sort by {0}", _("Up Rate")));
+            if (showSort) {
+                sort = ("9".equals(currentSort)) ? "-9" : "9";
+                out.write("<a href=\"" + _contextPath + '/' + getQueryString(req, null, null, sort));
+                out.write("\">");
+            }
+            out.write("<img border=\"0\" src=\"" + _imgPath + "head_txspeed.png\" title=\"");
+            if (showSort)
+                out.write(_("Sort by {0}", _("Up Rate")));
+            else
+                out.write(_("Up Rate"));
             out.write("\" alt=\"");
             // Translators: Please keep short or translate as " "
             out.write(_("TX Rate"));
-            out.write("\"></a>");
+            out.write("\">");
+            if (showSort)
+                out.write("</a>");
         }
         out.write("</th>\n<th align=\"center\">");
 
