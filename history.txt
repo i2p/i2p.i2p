@@ -1,3 +1,7 @@
+2014-09-12 zzz
+ * i2psnark: Escape fixes
+ * i2ptunnel: Fix updating session options on a running delay-open client tunnel
+
 2014-09-09 zzz
  * i2psnark: Escape fixes
 

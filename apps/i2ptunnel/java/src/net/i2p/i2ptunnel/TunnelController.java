@@ -567,12 +567,34 @@ public class TunnelController implements Logging {
 
         // tell i2ptunnel, who will tell the TunnelTask, who will tell the SocketManager
         setSessionOptions();
-        if (_running && _sessions != null) {
-            for (I2PSession s : _sessions) {
+
+        // we use the tunnel sessions, not _sessions, as
+        // _sessions will be null for delay-open tunnels - see acquire().
+        // We want the current sessions.
+        //List<I2PSession> sessions = _sessions;
+        List<I2PSession> sessions = _tunnel.getSessions();
+        if (_running && sessions != null) {
+            if (sessions.isEmpty()) {
+                 if (_log.shouldLog(Log.DEBUG))
+                     _log.debug("Running but no sessions to update");
+            }
+            for (I2PSession s : sessions) {
                 // tell the router via the session
                 if (!s.isClosed()) {
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("Session is open, updating: " + s);
                     s.updateOptions(_tunnel.getClientOptions());
+                } else {
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("Session is closed, not updating: " + s);
                 }
+            }
+        } else {
+            if (_log.shouldLog(Log.DEBUG)) {
+                if (!_running)
+                    _log.debug("Not running, not updating sessions");
+                if (sessions == null)
+                    _log.debug("null sessions, nothing to update");
             }
         }
     }
