@@ -1520,7 +1520,8 @@ public class I2PSnarkServlet extends BasicServlet {
                 // Can't figure out how to escape double quotes inside the onclick string.
                 // Single quotes in translate strings with parameters must be doubled.
                 // Then the remaining single quote must be escaped
-                out.write(_("Are you sure you want to delete the file \\''{0}\\'' (downloaded data will not be deleted) ?", snark.getName()));
+                out.write(_("Are you sure you want to delete the file \\''{0}\\'' (downloaded data will not be deleted) ?",
+                            escapeJSString(snark.getName())));
                 out.write("')) { return false; }\"");
                 out.write(" src=\"" + _imgPath + "remove.png\" alt=\"");
                 out.write(_("Remove"));
@@ -1540,7 +1541,8 @@ public class I2PSnarkServlet extends BasicServlet {
             // Can't figure out how to escape double quotes inside the onclick string.
             // Single quotes in translate strings with parameters must be doubled.
             // Then the remaining single quote must be escaped
-            out.write(_("Are you sure you want to delete the torrent \\''{0}\\'' and all downloaded data?", fullBasename));
+            out.write(_("Are you sure you want to delete the torrent \\''{0}\\'' and all downloaded data?",
+                        escapeJSString(fullBasename)));
             out.write("')) { return false; }\"");
             out.write(" src=\"" + _imgPath + "delete.png\" alt=\"");
             out.write(_("Delete"));
@@ -1650,6 +1652,20 @@ public class I2PSnarkServlet extends BasicServlet {
                     out.write("<tr class=\"" + rowClass + "\"><td></td><td colspan=\"10\" align=\"right\">" + peer.getSocket() + "</td></tr>");
             }
         }
+    }
+
+    /**
+     *  Make it JS and HTML-safe
+     *  @since 0.9.15
+     *  http://stackoverflow.com/questions/8749001/escaping-html-entities-in-javascript-string-literals-within-the-script-block
+     */
+    private static String escapeJSString(String s) {
+        return s.replace("\\", "\\u005c")
+                .replace("<", "\\u003c")
+                .replace(">", "\\u003e")
+                .replace("\"", "\\u0022")
+                .replace("'", "\\u0027")
+                .replace("&", "\\u0026");
     }
 
     /**
