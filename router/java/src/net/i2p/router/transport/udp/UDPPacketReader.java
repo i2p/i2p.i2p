@@ -279,26 +279,33 @@ class UDPPacketReader {
         public boolean readACKsIncluded() {
             return flagSet(UDPPacket.DATA_FLAG_EXPLICIT_ACK);
         }
+
         public boolean readACKBitfieldsIncluded() {
             return flagSet(UDPPacket.DATA_FLAG_ACK_BITFIELDS);
         }
+
         public boolean readECN() {
             return flagSet(UDPPacket.DATA_FLAG_ECN);
         }
+
         public boolean readWantPreviousACKs() {
             return flagSet(UDPPacket.DATA_FLAG_WANT_ACKS);
         }
+
         public boolean readReplyRequested() { 
             return flagSet(UDPPacket.DATA_FLAG_WANT_REPLY);
         }
+
         public boolean readExtendedDataIncluded() {
             return flagSet(UDPPacket.DATA_FLAG_EXTENDED);
         }
+
         public int readACKCount() {
             if (!readACKsIncluded()) return 0;
             int off = readBodyOffset() + 1;
             return (int)DataHelper.fromLong(_message, off, 1);
         }
+
         public long readACK(int index) {
             if (!readACKsIncluded()) return -1;
             int off = readBodyOffset() + 1;
@@ -306,6 +313,7 @@ class UDPPacketReader {
             off++;
             return DataHelper.fromLong(_message, off + (4 * index), 4);
         }
+
         public ACKBitfield[] readACKBitfields() {
             if (!readACKBitfieldsIncluded()) return null;
             int off = readBodyOffset() + 1;
@@ -354,28 +362,29 @@ class UDPPacketReader {
             int fragmentBegin = getFragmentBegin(fragmentNum);
             return DataHelper.fromLong(_message, fragmentBegin, 4);
         }
+
         public int readMessageFragmentNum(int fragmentNum) {
             int off = getFragmentBegin(fragmentNum);
             off += 4; // messageId
             return (_message[off] & 0xFF) >>> 1;
         }
+
         public boolean readMessageIsLast(int fragmentNum) {
             int off = getFragmentBegin(fragmentNum);
             off += 4; // messageId
             return ((_message[off] & 1) != 0);
         }
+
         public int readMessageFragmentSize(int fragmentNum) {
             int off = getFragmentBegin(fragmentNum);
-            off += 4; // messageId
-            off++; // fragment info
+            off += 5; // messageId + fragment info
             return ((int)DataHelper.fromLong(_message, off, 2)) & 0x3FFF;
         }
 
         public void readMessageFragment(int fragmentNum, byte target[], int targetOffset)
                                                       throws ArrayIndexOutOfBoundsException {
             int off = getFragmentBegin(fragmentNum);
-            off += 4; // messageId
-            off++; // fragment info
+            off += 5; // messageId + fragment info
             int size = ((int)DataHelper.fromLong(_message, off, 2)) & 0x3FFF;
             off += 2;
             System.arraycopy(_message, off, target, targetOffset, size);
@@ -405,16 +414,14 @@ class UDPPacketReader {
             }
             off++; // # fragments
             
-            if (fragmentNum == 0) {
-                return off;
-            } else {
+            if (fragmentNum > 0) {
                 for (int i = 0; i < fragmentNum; i++) {
                     off += 5; // messageId+info
                     off += ((int)DataHelper.fromLong(_message, off, 2)) & 0x3FFF;
                     off += 2;
                 }
-                return off;
             }
+            return off;
         }
 
         private boolean flagSet(byte flag) {
@@ -477,10 +484,9 @@ class UDPPacketReader {
                 buf.append(" isLast? ").append(isLast);
                 buf.append(" info ").append(_message[off-1]);
                 int size = ((int)DataHelper.fromLong(_message, off, 2)) & 0x3FFF;
-                buf.append(" with ").append(size).append(" bytes");
-                buf.append(' ');
-                off += size;
                 off += 2;
+                buf.append(" with ").append(size).append(" bytes; ");
+                off += size;
             }
             
             return buf.toString();

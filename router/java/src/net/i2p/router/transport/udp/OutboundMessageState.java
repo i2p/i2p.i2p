@@ -30,7 +30,10 @@ class OutboundMessageState implements CDPQEntry {
     private int _fragmentSize;
     /** size of the I2NP message */
     private int _totalSize;
-    /** sends[i] is how many times the fragment has been sent, or -1 if ACKed */
+    /** sends[i] is how many times the fragment has been sent, or -1 if ACKed
+     *  TODO this may not accurately track the number of retransmissions per-fragment,
+     *  and we don't make any use of it anyway, so we should just make it a bitfield.
+     */
     private short _fragmentSends[];
     private final long _startedOn;
     private long _nextSendTime;
@@ -205,7 +208,6 @@ class OutboundMessageState implements CDPQEntry {
     }
 
     public boolean needsSending(int fragment) {
-        
         short sends[] = _fragmentSends;
         if ( (sends == null) || (fragment >= sends.length) || (fragment < 0) )
             return false;
@@ -225,10 +227,12 @@ class OutboundMessageState implements CDPQEntry {
     public boolean acked(ACKBitfield bitfield) {
         // stupid brute force, but the cardinality should be trivial
         short sends[] = _fragmentSends;
-        if (sends != null)
-            for (int i = 0; i < bitfield.fragmentCount() && i < sends.length; i++)
+        if (sends != null) {
+            for (int i = 0; i < bitfield.fragmentCount() && i < sends.length; i++) {
                 if (bitfield.received(i))
                     sends[i] = (short)-1;
+            }
+        }
         
         boolean rv = isComplete();
       /****
@@ -263,7 +267,10 @@ class OutboundMessageState implements CDPQEntry {
      */
     public int getPushCount() { return _pushCount; }
 
-    /** note that we have pushed the message fragments */
+    /**
+     * Note that we have pushed the message fragments.
+     * Increments push count (and max sends... why?)
+     */
     public void push() { 
         // these will never be different...
         _pushCount++; 
@@ -272,7 +279,7 @@ class OutboundMessageState implements CDPQEntry {
         if (_fragmentSends != null)
             for (int i = 0; i < _fragmentSends.length; i++)
                 if (_fragmentSends[i] >= (short)0)
-                    _fragmentSends[i] = (short)(1 + _fragmentSends[i]);
+                    _fragmentSends[i]++;
         
     }
 
@@ -342,12 +349,15 @@ class OutboundMessageState implements CDPQEntry {
      * Throws NPE before then.
      *
      * Caller should synchronize
+     *
+     * @return true if fragment is not acked yet
      */
     public boolean shouldSend(int fragmentNum) { return _fragmentSends[fragmentNum] >= (short)0; }
 
     /**
      * This assumes fragment(int size) has been called
      * @param fragmentNum the number of the fragment 
+     *
      * @return the size of the fragment specified by the number
      */
     public int fragmentSize(int fragmentNum) {
