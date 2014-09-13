@@ -533,7 +533,7 @@ a.control, a.controld {
      color: #000;
      font-weight: bold;
      margin: 2px 4px;
-     padding: 2px;
+     padding: 3px 4px;	
      text-shadow: 0px 0px #410;
      white-space: nowrap;
 }
