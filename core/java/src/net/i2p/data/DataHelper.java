@@ -480,12 +480,17 @@ public class DataHelper {
                     name.contains("=") ||
                     name.contains("\r") ||
                     name.contains("\n") ||
-                    name.startsWith(";") ||
-                    val.contains("#") ||
+                    name.startsWith(";")) {
+                    if (iae == null)
+                        iae = new IllegalArgumentException("Invalid character (one of \"#;=\\r\\n\") in key: \"" +
+                                                           name + "\" = \"" + val + '\"');
+                    continue;
+                }
+                if (val.contains("#") ||
                     val.contains("\r") ||
                     val.contains("\n")) {
                     if (iae == null)
-                        iae = new IllegalArgumentException("Invalid character (one of \"#;=\\r\\n\") in key or value: \"" +
+                        iae = new IllegalArgumentException("Invalid character (one of \"#\\r\\n\") in value: \"" +
                                                            name + "\" = \"" + val + '\"');
                     continue;
                 }
