@@ -13,7 +13,7 @@ import net.i2p.I2PAppContext;
 import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
-import net.i2p.data.RouterIdentity;
+import net.i2p.data.router.RouterIdentity;
 import net.i2p.data.SessionKey;
 import net.i2p.data.Signature;
 import net.i2p.util.Addresses;
@@ -130,8 +130,10 @@ class PacketBuilder {
     /** if no extended options or rekey data, which we don't support  = 37 */
     public static final int HEADER_SIZE = UDPPacket.MAC_SIZE + UDPPacket.IV_SIZE + 1 + 4;
 
+    /** 4 byte msg ID + 3 byte fragment info */
+    public static final int FRAGMENT_HEADER_SIZE = 7;
     /** not including acks. 46 */
-    public static final int DATA_HEADER_SIZE = HEADER_SIZE + 9;
+    public static final int DATA_HEADER_SIZE = HEADER_SIZE + 2 + FRAGMENT_HEADER_SIZE;
 
     /** IPv4 only */
     public static final int IP_HEADER_SIZE = 20;
@@ -177,6 +179,49 @@ class PacketBuilder {
         return buildPacket(state, fragment, peer, null, null);
     }
 ****/
+
+    /**
+     *  Class for passing multiple fragments to buildPacket()
+     *
+     *  @since 0.9.16
+     */
+    public static class Fragment {
+        public final OutboundMessageState state;
+        public final int num;
+
+        public Fragment(OutboundMessageState state, int num) {
+            this.state = state;
+            this.num = num;
+        }
+
+        @Override
+        public String toString() {
+            return "Fragment " + num + " (" + state.fragmentSize(num) + " bytes) of " + state;
+        }
+    }
+
+    /**
+     *  Will a packet to 'peer' that already has 'numFragments' fragments
+     *  totalling 'curDataSize' bytes fit another fragment of size 'newFragSize' ??
+     *
+     *  This doesn't leave anything for acks.
+     *
+     *  @param numFragments >= 1
+     *  @since 0.9.16
+     */
+    public static int getMaxAdditionalFragmentSize(PeerState peer, int numFragments, int curDataSize) {
+        int available = peer.getMTU() - curDataSize;
+        if (peer.isIPv6())
+            available -= MIN_IPV6_DATA_PACKET_OVERHEAD;
+        else
+            available -= MIN_DATA_PACKET_OVERHEAD;
+        // OVERHEAD above includes 1 * FRAGMENT+HEADER_SIZE;
+        // this adds for the others, plus the new one.
+        available -= numFragments * FRAGMENT_HEADER_SIZE;
+        //if (_log.shouldLog(Log.DEBUG))
+        //    _log.debug("now: " + numFragments + " / " + curDataSize + " avail: " + available);
+        return available;
+    }
 
     /**
      * This builds a data packet (PAYLOAD_TYPE_DATA).
@@ -231,36 +276,64 @@ class PacketBuilder {
     public UDPPacket buildPacket(OutboundMessageState state, int fragment, PeerState peer,
                                  List<Long> ackIdsRemaining, int newAckCount,
                                  List<ACKBitfield> partialACKsRemaining) {
+        List<Fragment> frags = Collections.singletonList(new Fragment(state, fragment));
+        return buildPacket(frags, peer, ackIdsRemaining, newAckCount, partialACKsRemaining);
+    }
+
+    /*
+     *  Multiple fragments
+     *
+     *  @since 0.9.16
+     */
+    public UDPPacket buildPacket(List<Fragment> fragments, PeerState peer,
+                                 List<Long> ackIdsRemaining, int newAckCount,
+                                 List<ACKBitfield> partialACKsRemaining) {
+        StringBuilder msg = null;
+        if (_log.shouldLog(Log.INFO)) {
+            msg = new StringBuilder(256);
+            msg.append("Data pkt to ").append(peer.getRemotePeer().toBase64());
+        }
+
+        // calculate data size
+        int numFragments = fragments.size();
+        int dataSize = 0;
+        for (int i = 0; i < numFragments; i++) {
+            Fragment frag = fragments.get(i);
+            OutboundMessageState state = frag.state;
+            int fragment = frag.num;
+            int sz = state.fragmentSize(fragment);
+            dataSize += sz;
+            if (msg != null) {
+                msg.append(" Fragment ").append(i);
+                msg.append(": msg ").append(state.getMessageId()).append(' ').append(fragment);
+                msg.append('/').append(state.getFragmentCount());
+                msg.append(' ').append(sz);
+            }
+        }
+        
+        if (dataSize < 0)
+            return null;
+
+        // calculate size available for acks
+        int currentMTU = peer.getMTU();
+        int availableForAcks = currentMTU - dataSize;
+        int ipHeaderSize;
+        if (peer.isIPv6()) {
+            availableForAcks -= MIN_IPV6_DATA_PACKET_OVERHEAD;
+            ipHeaderSize = IPV6_HEADER_SIZE;
+        } else {
+            availableForAcks -= MIN_DATA_PACKET_OVERHEAD;
+            ipHeaderSize = IP_HEADER_SIZE;
+        }
+        if (numFragments > 1)
+            availableForAcks -= (numFragments - 1) * FRAGMENT_HEADER_SIZE;
+        int availableForExplicitAcks = availableForAcks;
+
+        // make the packet
         UDPPacket packet = buildPacketHeader((byte)(UDPPacket.PAYLOAD_TYPE_DATA << 4));
         DatagramPacket pkt = packet.getPacket();
         byte data[] = pkt.getData();
         int off = HEADER_SIZE;
-
-        StringBuilder msg = null;
-        if (_log.shouldLog(Log.INFO)) {
-            msg = new StringBuilder(128);
-            msg.append("Data pkt to ").append(peer.getRemotePeer().toBase64());
-            msg.append(" msg ").append(state.getMessageId()).append(" frag:").append(fragment);
-            msg.append('/').append(state.getFragmentCount());
-        }
-        
-        int dataSize = state.fragmentSize(fragment);
-        if (dataSize < 0) {
-            packet.release();
-            return null;
-        }
-
-        int currentMTU = peer.getMTU();
-        int availableForAcks = currentMTU - dataSize;
-        int ipHeaderSize;
-        if (peer.getRemoteIP().length == 4) {
-            availableForAcks -= MIN_DATA_PACKET_OVERHEAD;
-            ipHeaderSize = IP_HEADER_SIZE;
-        } else {
-            availableForAcks -= MIN_IPV6_DATA_PACKET_OVERHEAD;
-            ipHeaderSize = IPV6_HEADER_SIZE;
-        }
-        int availableForExplicitAcks = availableForAcks;
 
         // ok, now for the body...
         
@@ -299,7 +372,7 @@ class PacketBuilder {
         off++;
 
         if (msg != null) {
-            msg.append(" data: ").append(dataSize).append(" bytes, mtu: ")
+            msg.append(" Total data: ").append(dataSize).append(" bytes, mtu: ")
                .append(currentMTU).append(", ")
                .append(newAckCount).append(" new full acks requested, ")
                .append(ackIdsRemaining.size() - newAckCount).append(" resend acks requested, ")
@@ -325,7 +398,7 @@ class PacketBuilder {
                 DataHelper.toLong(data, off, 4, ackId.longValue());
                 off += 4;        
                 if (msg != null) // logging it
-                    msg.append(" full ack: ").append(ackId.longValue());
+                    msg.append(' ').append(ackId.longValue());
             }
             //acksIncluded = true;
         }
@@ -357,7 +430,7 @@ class PacketBuilder {
                 }
                 iter.remove();
                 if (msg != null) // logging it
-                    msg.append(" partial ack: ").append(bitfield);
+                    msg.append(' ').append(bitfield);
             }
             //acksIncluded = true;
             // now jump back and fill in the number of bitfields *actually* included
@@ -367,30 +440,42 @@ class PacketBuilder {
         //if ( (msg != null) && (acksIncluded) )
         //  _log.debug(msg.toString());
         
-        DataHelper.toLong(data, off, 1, 1); // only one fragment in this message
+        DataHelper.toLong(data, off, 1, numFragments);
         off++;
         
-        DataHelper.toLong(data, off, 4, state.getMessageId());
-        off += 4;
+        // now write each fragment
+        int sizeWritten = 0;
+        for (int i = 0; i < numFragments; i++) {
+            Fragment frag = fragments.get(i);
+            OutboundMessageState state = frag.state;
+            int fragment = frag.num;
+
+            DataHelper.toLong(data, off, 4, state.getMessageId());
+            off += 4;
         
-        data[off] |= fragment << 1;
-        if (fragment == state.getFragmentCount() - 1)
-            data[off] |= 1; // isLast
-        off++;
+            data[off] |= fragment << 1;
+            if (fragment == state.getFragmentCount() - 1)
+                data[off] |= 1; // isLast
+            off++;
         
-        DataHelper.toLong(data, off, 2, dataSize);
-        data[off] &= (byte)0x3F; // 2 highest bits are reserved
-        off += 2;
+            int fragSize = state.fragmentSize(fragment);
+            DataHelper.toLong(data, off, 2, fragSize);
+            data[off] &= (byte)0x3F; // 2 highest bits are reserved
+            off += 2;
         
-        int sizeWritten = state.writeFragment(data, off, fragment);
+            int sz = state.writeFragment(data, off, fragment);
+            off += sz;
+            sizeWritten += sz;
+        }
+
         if (sizeWritten != dataSize) {
             if (sizeWritten < 0) {
                 // probably already freed from OutboundMessageState
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn("Write failed for fragment " + fragment + " of " + state.getMessageId());
+                    _log.warn("Write failed for " + DataHelper.toString(fragments));
             } else {
-                _log.error("Size written: " + sizeWritten + " but size: " + dataSize 
-                           + " for fragment " + fragment + " of " + state.getMessageId());
+                _log.error("Size written: " + sizeWritten + " but size: " + dataSize +
+                           " for " + DataHelper.toString(fragments));
             }
             packet.release();
             return null;
@@ -398,31 +483,44 @@ class PacketBuilder {
         //    _log.debug("Size written: " + sizeWritten + " for fragment " + fragment 
         //               + " of " + state.getMessageId());
         }
+
         // put this after writeFragment() since dataSize will be zero for use-after-free
         if (dataSize == 0) {
             // OK according to the protocol but if we send it, it's a bug
-            _log.error("Sending zero-size fragment " + fragment + " of " + state + " for " + peer);
+            _log.error("Sending zero-size fragment??? for " + DataHelper.toString(fragments));
         }
-        off += dataSize;
-
         
         // pad up so we're on the encryption boundary
         off = pad1(data, off);
         off = pad2(data, off, currentMTU - (ipHeaderSize + UDP_HEADER_SIZE));
         pkt.setLength(off);
 
-        authenticate(packet, peer.getCurrentCipherKey(), peer.getCurrentMACKey());
-        setTo(packet, peer.getRemoteIPAddress(), peer.getRemotePort());
-        
-        if (_log.shouldLog(Log.INFO)) {
+        if (msg != null) {
+            // verify multi-fragment packet
+            //if (numFragments > 1) {
+            //    msg.append("\nDataReader dump\n:");
+            //    UDPPacketReader reader = new UDPPacketReader(_context);
+            //    reader.initialize(packet);
+            //    UDPPacketReader.DataReader dreader = reader.getDataReader();
+            //    try {
+            //        msg.append(dreader.toString());
+            //    } catch (Exception e) {
+            //        _log.info("blowup, dump follows", e);
+            //        msg.append('\n');
+            //        msg.append(net.i2p.util.HexDump.dump(data, 0, off));
+            //    }
+            //}
             msg.append(" pkt size ").append(off + (ipHeaderSize + UDP_HEADER_SIZE));
             _log.info(msg.toString());
         }
+
+        authenticate(packet, peer.getCurrentCipherKey(), peer.getCurrentMACKey());
+        setTo(packet, peer.getRemoteIPAddress(), peer.getRemotePort());
+        
         // the packet could have been built before the current mtu got lowered, so
         // compare to LARGE_MTU
         if (off + (ipHeaderSize + UDP_HEADER_SIZE) > PeerState.LARGE_MTU) {
             _log.error("Size is " + off + " for " + packet +
-                       " fragment " + fragment +
                        " data size " + dataSize +
                        " pkt size " + (off + (ipHeaderSize + UDP_HEADER_SIZE)) +
                        " MTU " + currentMTU +
@@ -430,7 +528,7 @@ class PacketBuilder {
                        availableForExplicitAcks + " for full acks " + 
                        explicitToSend + " full acks included " +
                        partialAcksToSend + " partial acks included " +
-                       " OMS " + state, new Exception());
+                       " Fragments: " + DataHelper.toString(fragments), new Exception());
         }
         
         return packet;
@@ -596,14 +694,22 @@ class PacketBuilder {
         off += 4;
         DataHelper.toLong(data, off, 4, state.getSentSignedOnTime());
         off += 4;
-        System.arraycopy(state.getSentSignature().getData(), 0, data, off, Signature.SIGNATURE_BYTES);
-        off += Signature.SIGNATURE_BYTES;
-        // ok, we need another 8 bytes of random padding
-        // (ok, this only gives us 63 bits, not 64)
-        long l = _context.random().nextLong();
-        if (l < 0) l = 0 - l;
-        DataHelper.toLong(data, off, 8, l);
-        off += 8;
+
+        // handle variable signature size
+        Signature sig = state.getSentSignature();
+        int siglen = sig.length();
+        System.arraycopy(sig.getData(), 0, data, off, siglen);
+        off += siglen;
+        // ok, we need another few bytes of random padding
+        int rem = siglen % 16;
+        int padding;
+        if (rem > 0) {
+            padding = 16 - rem;
+            _context.random().nextBytes(data, off, padding);
+            off += padding;
+        } else {
+            padding = 0;
+        }
         
         if (_log.shouldLog(Log.DEBUG)) {
             StringBuilder buf = new StringBuilder(128);
@@ -612,9 +718,9 @@ class PacketBuilder {
             buf.append(" Bob: ").append(Addresses.toString(state.getReceivedOurIP(), externalPort));
             buf.append(" RelayTag: ").append(state.getSentRelayTag());
             buf.append(" SignedOn: ").append(state.getSentSignedOnTime());
-            buf.append(" signature: ").append(Base64.encode(state.getSentSignature().getData()));
+            buf.append(" signature: ").append(Base64.encode(sig.getData()));
             buf.append("\nRawCreated: ").append(Base64.encode(data, 0, off)); 
-            buf.append("\nsignedTime: ").append(Base64.encode(data, off-8-Signature.SIGNATURE_BYTES-4, 4));
+            buf.append("\nsignedTime: ").append(Base64.encode(data, off - padding - siglen - 4, 4));
             _log.debug(buf.toString());
         }
         
@@ -623,7 +729,7 @@ class PacketBuilder {
         byte[] iv = SimpleByteCache.acquire(UDPPacket.IV_SIZE);
         _context.random().nextBytes(iv);
         
-        int encrWrite = Signature.SIGNATURE_BYTES + 8;
+        int encrWrite = siglen + padding;
         int sigBegin = off - encrWrite;
         _context.aes().encrypt(data, sigBegin, data, sigBegin, state.getCipherKey(), iv, encrWrite);
         
@@ -774,8 +880,11 @@ class PacketBuilder {
             DataHelper.toLong(data, off, 4, state.getSentSignedOnTime());
             off += 4;
             
+            // handle variable signature size
             // we need to pad this so we're at the encryption boundary
-            int mod = (off + Signature.SIGNATURE_BYTES) & 0x0f;
+            Signature sig = state.getSentSignature();
+            int siglen = sig.length();
+            int mod = (off + siglen) & 0x0f;
             if (mod != 0) {
                 int paddingRequired = 16 - mod;
                 // add an arbitrary number of 16byte pad blocks too ???
@@ -787,8 +896,8 @@ class PacketBuilder {
             // so trailing non-mod-16 data is ignored. That truncates the sig.
             
             // BUG: NPE here if null signature
-            System.arraycopy(state.getSentSignature().getData(), 0, data, off, Signature.SIGNATURE_BYTES);
-            off += Signature.SIGNATURE_BYTES;
+            System.arraycopy(sig.getData(), 0, data, off, siglen);
+            off += siglen;
         } else {
             // We never get here (see above)
 

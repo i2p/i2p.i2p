@@ -1,11 +1,13 @@
 package net.i2p.data;
 
 
+import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.security.GeneralSecurityException;
 import java.util.Locale;
 import java.util.Map;
@@ -24,6 +26,7 @@ import net.i2p.crypto.DSAEngine;
 import net.i2p.crypto.KeyGenerator;
 import net.i2p.crypto.SigType;
 import net.i2p.util.RandomSource;
+import net.i2p.util.SecureFileOutputStream;
 
 /**
  * This helper class reads and writes files in the
@@ -48,11 +51,11 @@ public class PrivateKeyFile {
     
     private static final int HASH_EFFORT = VerifiedDestination.MIN_HASHCASH_EFFORT;
     
-    private final File file;
+    protected final File file;
     private final I2PClient client;
-    private Destination dest;
-    private PrivateKey privKey;
-    private SigningPrivateKey signingPrivKey; 
+    protected Destination dest;
+    protected PrivateKey privKey;
+    protected SigningPrivateKey signingPrivKey; 
 
     /**
      *  Create a new PrivateKeyFile, or modify an existing one, with various
@@ -224,6 +227,16 @@ public class PrivateKeyFile {
      */
     public PrivateKeyFile(File file, PublicKey pubkey, SigningPublicKey spubkey, Certificate cert,
                           PrivateKey pk, SigningPrivateKey spk) {
+        this(file, pubkey, spubkey, cert, pk, spk, null);
+    }
+    
+    /**
+     *  @param padding null OK, must be non-null if spubkey length < 128
+     *  @throws IllegalArgumentException on mismatch of spubkey and spk types
+     *  @since 0.9.16
+     */
+    public PrivateKeyFile(File file, PublicKey pubkey, SigningPublicKey spubkey, Certificate cert,
+                          PrivateKey pk, SigningPrivateKey spk, byte[] padding) {
         if (spubkey.getType() != spk.getType())
             throw new IllegalArgumentException("Signing key type mismatch");
         this.file = file;
@@ -232,6 +245,8 @@ public class PrivateKeyFile {
         this.dest.setPublicKey(pubkey);
         this.dest.setSigningPublicKey(spubkey);
         this.dest.setCertificate(cert);
+        if (padding != null)
+            this.dest.setPadding(padding);
         this.privKey = pk;
         this.signingPrivKey = spk;
     }
@@ -241,9 +256,9 @@ public class PrivateKeyFile {
      */
     public Destination createIfAbsent() throws I2PException, IOException, DataFormatException {
         if(!this.file.exists()) {
-            FileOutputStream out = null;
+            OutputStream out = null;
             try {
-                out = new FileOutputStream(this.file);
+                out = new SecureFileOutputStream(this.file);
                 if (this.client != null)
                     this.client.createDestination(out);
                 else
@@ -257,7 +272,10 @@ public class PrivateKeyFile {
         return getDestination();
     }
     
-    /** Also sets the local privKey and signingPrivKey */
+    /**
+     *  If the destination is not set, read it in from the file.
+     *  Also sets the local privKey and signingPrivKey.
+     */
     public Destination getDestination() throws I2PSessionException, IOException, DataFormatException {
         if (dest == null) {
             I2PSession s = open();
@@ -408,9 +426,9 @@ public class PrivateKeyFile {
     }
 
     public I2PSession open(Properties opts) throws I2PSessionException, IOException {
-        FileInputStream in = null;
+        InputStream in = null;
         try {
-            in = new FileInputStream(this.file);
+            in = new BufferedInputStream(new FileInputStream(this.file));
             I2PSession s = this.client.createSession(in, opts);
             return s;
         } finally {
@@ -424,17 +442,33 @@ public class PrivateKeyFile {
      *  Copied from I2PClientImpl.createDestination()
      */
     public void write() throws IOException, DataFormatException {
-        FileOutputStream out = null;
+        OutputStream out = null;
         try {
-            out = new FileOutputStream(this.file);
+            out = new SecureFileOutputStream(this.file);
             this.dest.writeBytes(out);
             this.privKey.writeBytes(out);
             this.signingPrivKey.writeBytes(out);
-            out.flush();
         } finally {
             if (out != null) {
                 try { out.close(); } catch (IOException ioe) {}
             }
+        }
+    }
+
+    /**
+     *  Verify that the PublicKey matches the PrivateKey, and
+     *  the SigningPublicKey matches the SigningPrivateKey.
+     *
+     *  @return success
+     *  @since 0.9.16
+     */
+    public boolean validateKeyPairs() {
+        try {
+            if (!dest.getPublicKey().equals(KeyGenerator.getPublicKey(privKey)))
+                return false;
+            return dest.getSigningPublicKey().equals(KeyGenerator.getSigningPublicKey(signingPrivKey));
+        } catch (IllegalArgumentException iae) {
+            return false;
         }
     }
 

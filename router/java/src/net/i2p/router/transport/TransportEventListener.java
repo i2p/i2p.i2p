@@ -9,7 +9,7 @@ package net.i2p.router.transport;
  */
 
 import net.i2p.data.Hash;
-import net.i2p.data.RouterIdentity;
+import net.i2p.data.router.RouterIdentity;
 import net.i2p.data.i2np.I2NPMessage;
 
 public interface TransportEventListener {

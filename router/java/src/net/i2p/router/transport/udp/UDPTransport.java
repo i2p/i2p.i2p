@@ -25,9 +25,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import net.i2p.data.DatabaseEntry;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
-import net.i2p.data.RouterAddress;
-import net.i2p.data.RouterIdentity;
-import net.i2p.data.RouterInfo;
+import net.i2p.data.router.RouterAddress;
+import net.i2p.data.router.RouterIdentity;
+import net.i2p.data.router.RouterInfo;
 import net.i2p.data.SessionKey;
 import net.i2p.data.i2np.DatabaseStoreMessage;
 import net.i2p.data.i2np.I2NPMessage;
@@ -1546,6 +1546,12 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             // Validate his SSU address
             RouterAddress addr = getTargetAddress(toAddress);
             if (addr == null) {
+                markUnreachable(to);
+                return null;
+            }
+
+            // Check for supported sig type
+            if (toAddress.getIdentity().getSigningPublicKey().getType() == null) {
                 markUnreachable(to);
                 return null;
             }

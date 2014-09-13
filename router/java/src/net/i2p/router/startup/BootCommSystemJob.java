@@ -16,7 +16,7 @@ import net.i2p.router.tasks.ReadConfigJob;
 import net.i2p.util.Log;
 
 /** This actually boots almost everything */
-public class BootCommSystemJob extends JobImpl {
+class BootCommSystemJob extends JobImpl {
     private Log _log;
     
     public static final String PROP_USE_TRUSTED_LINKS = "router.trustedLinks";

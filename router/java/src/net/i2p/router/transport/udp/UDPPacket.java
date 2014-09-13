@@ -166,7 +166,11 @@ class UDPPacket implements CDQEntry {
     int getMessageType() { return _messageType; }
     /** only for debugging and stats, does not go on the wire */
     void setMessageType(int type) { _messageType = type; }
+
+    /** only for debugging and stats */
     int getFragmentCount() { return _fragmentCount; }
+
+    /** only for debugging and stats */
     void setFragmentCount(int count) { _fragmentCount = count; }
 
     RemoteHostId getRemoteHost() {

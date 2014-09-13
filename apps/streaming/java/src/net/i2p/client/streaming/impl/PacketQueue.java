@@ -44,7 +44,7 @@ class PacketQueue implements SendMessageStatusListener {
     private static final int FINAL_TAGS_TO_SEND = 4;
     private static final int FINAL_TAG_THRESHOLD = 2;
     private static final long REMOVE_EXPIRED_TIME = 67*1000;
-    private static final boolean ENABLE_STATUS_LISTEN = false;
+    private static final boolean ENABLE_STATUS_LISTEN = true;
 
     public PacketQueue(I2PAppContext context, I2PSession session, ConnectionManager mgr) {
         _context = context;
@@ -267,6 +267,20 @@ class PacketQueue implements SendMessageStatusListener {
                 _messageStatusMap.remove(id);
                 break;
 
+            case MessageStatusMessage.STATUS_SEND_FAILURE_NO_LEASESET:
+                // Ideally we would like to make this a hard failure,
+                // but it caused far too many fast-fails that were then
+                // resolved by the user clicking reload in his browser.
+                // Until the LS fetch is faster and more reliable,
+                // or we increase the timeout for it,
+                // we can't treat this one as a hard fail.
+                // Let the streaming retransmission paper over the problem.
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("LS lookup (soft) failure for msg " + msgId + " on " + con);
+                _messageStatusMap.remove(id);
+                break;
+
+
             case MessageStatusMessage.STATUS_SEND_FAILURE_LOCAL:
             case MessageStatusMessage.STATUS_SEND_FAILURE_ROUTER:
             case MessageStatusMessage.STATUS_SEND_FAILURE_NETWORK:
@@ -280,7 +294,6 @@ class PacketQueue implements SendMessageStatusListener {
             case MessageStatusMessage.STATUS_SEND_FAILURE_DESTINATION:
             case MessageStatusMessage.STATUS_SEND_FAILURE_BAD_LEASESET:
             case MessageStatusMessage.STATUS_SEND_FAILURE_EXPIRED_LEASESET:
-            case MessageStatusMessage.STATUS_SEND_FAILURE_NO_LEASESET:
             case SendMessageStatusListener.STATUS_CANCELLED:
                 if (con.getHighestAckedThrough() >= 0) {
                     // a retxed SYN succeeded before the first SYN failed

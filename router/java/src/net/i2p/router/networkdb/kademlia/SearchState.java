@@ -19,15 +19,16 @@ import net.i2p.router.RouterContext;
  */
 class SearchState {
     private final RouterContext _context;
-    private final HashSet<Hash> _pendingPeers;
+    private final Set<Hash> _pendingPeers;
     private final Map<Hash, Long> _pendingPeerTimes;
-    private final HashSet<Hash> _attemptedPeers;
-    private final HashSet<Hash> _failedPeers;
-    private final HashSet<Hash> _successfulPeers;
-    private final HashSet<Hash> _repliedPeers;
+    private final Set<Hash> _attemptedPeers;
+    private final Set<Hash> _failedPeers;
+    private final Set<Hash> _successfulPeers;
+    private final Set<Hash> _repliedPeers;
     private final Hash _searchKey;
     private volatile long _completed;
     private volatile long _started;
+    private volatile boolean _aborted;
     
     public SearchState(RouterContext context, Hash key) {
         _context = context;
@@ -87,10 +88,19 @@ class SearchState {
             return new HashSet<Hash>(_failedPeers);
         }
     }
+
     public boolean completed() { return _completed != -1; }
-    public void complete(boolean completed) {
-        if (completed)
-            _completed = _context.clock().now();
+
+    public void complete() {
+        _completed = _context.clock().now();
+    }
+
+    /** @since 0.9.16 */
+    public boolean isAborted() { return _aborted; }
+
+    /** @since 0.9.16 */
+    public void abort() {
+        _aborted = true;
     }
     
     public long getWhenStarted() { return _started; }
@@ -177,6 +187,8 @@ class SearchState {
             buf.append(" completed? false ");
         else
             buf.append(" completed on ").append(new Date(_completed));
+        if (_aborted)
+            buf.append("  (Aborted)");
         buf.append("\n\tAttempted: ");
         synchronized (_attemptedPeers) {
             buf.append(_attemptedPeers.size()).append(' ');

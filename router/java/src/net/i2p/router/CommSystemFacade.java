@@ -13,7 +13,7 @@ import java.io.Writer;
 import java.util.Collections;
 import java.util.List;
 import net.i2p.data.Hash;
-import net.i2p.data.RouterAddress;
+import net.i2p.data.router.RouterAddress;
 
 /**
  * Manages the communication subsystem between peers, including connections, 

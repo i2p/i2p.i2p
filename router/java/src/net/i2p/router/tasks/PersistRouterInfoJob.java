@@ -13,10 +13,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 import net.i2p.data.DataFormatException;
-import net.i2p.data.RouterInfo;
+import net.i2p.data.router.RouterInfo;
 import net.i2p.router.JobImpl;
-import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
+import net.i2p.router.startup.CreateRouterInfoJob;
 import net.i2p.util.Log;
 import net.i2p.util.SecureFileOutputStream;
 
@@ -37,8 +37,7 @@ public class PersistRouterInfoJob extends JobImpl {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Persisting updated router info");
 
-        String infoFilename = getContext().getProperty(Router.PROP_INFO_FILENAME, Router.PROP_INFO_FILENAME_DEFAULT);
-        File infoFile = new File(getContext().getRouterDir(), infoFilename);
+        File infoFile = new File(getContext().getRouterDir(), CreateRouterInfoJob.INFO_FILENAME);
 
         RouterInfo info = getContext().router().getRouterInfo();
 

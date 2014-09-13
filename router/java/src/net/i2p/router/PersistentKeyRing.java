@@ -70,9 +70,8 @@ public class PersistentKeyRing extends KeyRing {
             Hash h = e.getKey();
             buf.append(h.toBase64().substring(0, 6)).append("&hellip;");
             buf.append("<td>");
-            LeaseSet ls = _ctx.netDb().lookupLeaseSetLocally(h);
-            if (ls != null) {
-                Destination dest = ls.getDestination();
+            Destination dest = _ctx.netDb().lookupDestinationLocally(h);
+            if (dest != null) {
                 if (_ctx.clientManager().isLocal(dest)) {
                     TunnelPoolSettings in = _ctx.tunnelManager().getInboundSettings(h);
                     if (in != null && in.getDestinationNickname() != null)

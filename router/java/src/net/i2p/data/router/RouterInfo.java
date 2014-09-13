@@ -1,4 +1,4 @@
-package net.i2p.data;
+package net.i2p.data.router;
 
 /*
  * free (adj.): unencumbered; not under the control of others
@@ -31,6 +31,13 @@ import net.i2p.crypto.SHA1;
 import net.i2p.crypto.SHA1Hash;
 import net.i2p.crypto.SHA256Generator;
 import net.i2p.crypto.SigType;
+import net.i2p.data.DatabaseEntry;
+import net.i2p.data.DataFormatException;
+import net.i2p.data.DataHelper;
+import net.i2p.data.Hash;
+import net.i2p.data.KeysAndCert;
+import net.i2p.data.Signature;
+import net.i2p.data.SimpleDataStructure;
 import net.i2p.util.Clock;
 import net.i2p.util.Log;
 import net.i2p.util.OrderedProperties;
@@ -47,6 +54,7 @@ import net.i2p.util.SystemVersion;
  * To ensure integrity of the RouterInfo, methods that change an element of the
  * RouterInfo will throw an IllegalStateException after the RouterInfo is signed.
  *
+ * @since 0.9.16 moved from net.i2p.data
  * @author jrandom
  */
 public class RouterInfo extends DatabaseEntry {
@@ -190,7 +198,7 @@ public class RouterInfo extends DatabaseEntry {
                 // WARNING this sort algorithm cannot be changed, as it must be consistent
                 // network-wide. The signature is not checked at readin time, but only
                 // later, and the addresses are stored in a Set, not a List.
-                DataHelper.sortStructureList(_addresses);
+                SortHelper.sortStructureList(_addresses);
             }
         }
     }
@@ -308,7 +316,7 @@ public class RouterInfo extends DatabaseEntry {
                     // WARNING this sort algorithm cannot be changed, as it must be consistent
                     // network-wide. The signature is not checked at readin time, but only
                     // later, and the hashes are stored in a Set, not a List.
-                    peers = (Collection<Hash>) DataHelper.sortStructures(peers);
+                    peers = (Collection<Hash>) SortHelper.sortStructures(peers);
                 for (Hash peerHash : peers) {
                     peerHash.writeBytes(out);
                 }

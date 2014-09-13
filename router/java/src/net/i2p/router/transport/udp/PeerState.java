@@ -242,6 +242,9 @@ class PeerState {
     private static final int MINIMUM_WINDOW_BYTES = DEFAULT_SEND_WINDOW_BYTES;
     private static final int MAX_SEND_WINDOW_BYTES = 1024*1024;
 
+    /** max number of msgs returned from allocateSend() */
+    private static final int MAX_ALLOCATE_SEND = 2;
+
     /**
      *  Was 32 before 0.9.2, but since the streaming lib goes up to 128,
      *  we would just drop our own msgs right away during slow start.
@@ -1563,15 +1566,16 @@ class PeerState {
     }
     
     /**
-     * Pick a message we want to send and allocate it out of our window
+     * Pick one or more messages we want to send and allocate them out of our window
      * High usage -
      * OutboundMessageFragments.getNextVolley() calls this 2nd, if finishMessages() returned > 0.
      * TODO combine finishMessages(), allocateSend(), and getNextDelay() so we don't iterate 3 times.
      *
-     * @return allocated message to send, or null if no messages or no resources
+     * @return allocated messages to send (never empty), or null if no messages or no resources
      */
-    public OutboundMessageState allocateSend() {
+    public List<OutboundMessageState> allocateSend() {
         if (_dead) return null;
+        List<OutboundMessageState> rv = null;
         synchronized (_outboundMessages) {
             for (OutboundMessageState state : _outboundMessages) {
                 // We have 3 return values, because if allocateSendingBytes() returns false,
@@ -1588,44 +1592,54 @@ class PeerState {
                             msg.timestamp("not reached for allocation " + msgs.size() + " other peers");
                     }
                      */
-                    return state;
+                    if (rv == null)
+                        rv = new ArrayList<OutboundMessageState>(MAX_ALLOCATE_SEND);
+                    rv.add(state);
+                    if (rv.size() >= MAX_ALLOCATE_SEND)
+                        return rv;
                 } else if (should == ShouldSend.NO_BW) {
                     // no more bandwidth available
                     // we don't bother looking for a smaller msg that would fit.
                     // By not looking further, we keep strict sending order, and that allows
                     // some efficiency in acked() below.
-                    if (_log.shouldLog(Log.DEBUG))
+                    if (rv == null && _log.shouldLog(Log.DEBUG))
                         _log.debug("Nothing to send (BW) to " + _remotePeer + ", with " + _outboundMessages.size() +
                                    " / " + _outboundQueue.size() + " remaining");
-                    return null;
+                    return rv;
                 } /* else {
                     OutNetMessage msg = state.getMessage();
                     if (msg != null)
                         msg.timestamp("passed over for allocation with " + msgs.size() + " peers");
                 } */
             }
+
             // Peek at head of _outboundQueue and see if we can send it.
             // If so, pull it off, put it in _outbundMessages, test
             // again for bandwidth if necessary, and return it.
-            OutboundMessageState state = _outboundQueue.peek();
-            if (state != null && ShouldSend.YES == locked_shouldSend(state)) {
+            OutboundMessageState state;
+            while ((state = _outboundQueue.peek()) != null &&
+                   ShouldSend.YES == locked_shouldSend(state)) {
                 // we could get a different state, or null, when we poll,
                 // due to AQM drops, so we test again if necessary
                 OutboundMessageState dequeuedState = _outboundQueue.poll();
                 if (dequeuedState != null) {
                     _outboundMessages.add(dequeuedState);
-                    if (dequeuedState == state || ShouldSend.YES == locked_shouldSend(dequeuedState)) {
+                    if (dequeuedState == state || ShouldSend.YES == locked_shouldSend(state)) {
                         if (_log.shouldLog(Log.DEBUG))
                             _log.debug("Allocate sending (NEW) to " + _remotePeer + ": " + dequeuedState.getMessageId());
-                        return dequeuedState;
+                        if (rv == null)
+                            rv = new ArrayList<OutboundMessageState>(MAX_ALLOCATE_SEND);
+                        rv.add(state);
+                        if (rv.size() >= MAX_ALLOCATE_SEND)
+                            return rv;
                     }
                 }
             }
         }
-        if (_log.shouldLog(Log.DEBUG))
+        if ( rv == null && _log.shouldLog(Log.DEBUG))
             _log.debug("Nothing to send to " + _remotePeer + ", with " + _outboundMessages.size() +
                        " / " + _outboundQueue.size() + " remaining");
-        return null;
+        return rv;
     }
     
     /**

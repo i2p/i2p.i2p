@@ -146,10 +146,10 @@ public class BuildRequestRecord {
         return (_data.getData()[_data.getOffset() + OFF_FLAG] & FLAG_OUTBOUND_ENDPOINT) != 0;
     }
     /**
-     * Time that the request was sent, truncated to the nearest hour
+     * Time that the request was sent (ms), truncated to the nearest hour
      */
     public long readRequestTime() {
-        return DataHelper.fromLong(_data.getData(), _data.getOffset() + OFF_REQ_TIME, 4) * 60l * 60l * 1000l;
+        return DataHelper.fromLong(_data.getData(), _data.getOffset() + OFF_REQ_TIME, 4) * (60 * 60 * 1000L);
     }
     /**
      * What message ID should we send the request to the next hop with.  If this is the outbound tunnel endpoint,
@@ -250,6 +250,8 @@ public class BuildRequestRecord {
         else if (isOutEndpoint)
             buf[OFF_FLAG] |= FLAG_OUTBOUND_ENDPOINT;
         long truncatedHour = ctx.clock().now();
+        // prevent hop identification at top of the hour
+        truncatedHour -= ctx.random().nextInt(90*1000);
         truncatedHour /= (60l*60l*1000l);
         DataHelper.toLong(buf, OFF_REQ_TIME, 4, truncatedHour);
         DataHelper.toLong(buf, OFF_SEND_MSG_ID, 4, nextMsgId);

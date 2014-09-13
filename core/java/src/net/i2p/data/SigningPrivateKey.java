@@ -75,8 +75,12 @@ public class SigningPrivateKey extends SimpleDataStructure {
         return _type;
     }
 
-    /** converts this signing private key to its public equivalent
-     * @return a SigningPublicKey object derived from this private key
+    /**
+     *  Converts this signing private key to its public equivalent.
+     *  As of 0.9.16, supports all key types.
+     *
+     *  @return a SigningPublicKey object derived from this private key
+     *  @throws IllegalArgumentException on bad key or unknown or unsupported type
      */
     public SigningPublicKey toPublic() {
         return KeyGenerator.getSigningPublicKey(this);

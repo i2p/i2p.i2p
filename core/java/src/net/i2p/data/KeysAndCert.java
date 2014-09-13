@@ -78,6 +78,13 @@ public class KeysAndCert extends DataStructureImpl {
     }
     
     /**
+     * @since 0.9.16
+     */
+    public byte[] getPadding() {
+        return _padding;
+    }
+    
+    /**
      * @throws IllegalStateException if was already set
      * @since 0.9.12
      */
@@ -114,6 +121,8 @@ public class KeysAndCert extends DataStructureImpl {
         _publicKey.writeBytes(out);
         if (_padding != null)
             out.write(_padding);
+        else if (_signingKey.length() < SigningPublicKey.KEYSIZE_BYTES)
+            throw new DataFormatException("No padding set");
         _signingKey.writeTruncatedBytes(out);
         _certificate.writeBytes(out);
     }

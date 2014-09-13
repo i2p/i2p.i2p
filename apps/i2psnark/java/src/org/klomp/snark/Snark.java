@@ -27,7 +27,6 @@ import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
-import java.util.Random;
 import java.util.StringTokenizer;
 
 import net.i2p.I2PAppContext;
@@ -245,16 +244,19 @@ public class Snark
    *
    * @deprecated unused
    */
+/****
   Snark(I2PSnarkUtil util, String torrent, String ip, int user_port,
         StorageListener slistener, CoordinatorListener clistener) { 
     this(util, torrent, ip, user_port, slistener, clistener, null, null, null, true, "."); 
   }
+****/
 
   /**
    * single torrent - via router
    *
    * @deprecated unused
    */
+/****
   public Snark(I2PAppContext ctx, Properties opts, String torrent,
                StorageListener slistener, boolean start, String rootDir) { 
     this(new I2PSnarkUtil(ctx), torrent, null, -1, slistener, null, null, null, null, false, rootDir);
@@ -284,6 +286,7 @@ public class Snark
     if (start)
         this.startTorrent();
   }
+****/
 
   /**
    * multitorrent
@@ -515,18 +518,13 @@ public class Snark
 
     // Create a new ID and fill it with something random.  First nine
     // zeros bytes, then three bytes filled with snark and then
-    // sixteen random bytes.
+    // eight random bytes.
     byte snark = (((3 + 7 + 10) * (1000 - 8)) / 992) - 17;
     byte[] rv = new byte[20];
-    Random random = I2PAppContext.getGlobalContext().random();
-    int i;
-    for (i = 0; i < 9; i++)
-      rv[i] = 0;
-    rv[i++] = snark;
-    rv[i++] = snark;
-    rv[i++] = snark;
-    while (i < 20)
-      rv[i++] = (byte)random.nextInt(256);
+    rv[9] = snark;
+    rv[10] = snark;
+    rv[11] = snark;
+    I2PAppContext.getGlobalContext().random().nextBytes(rv, 12, 8);
     return rv;
   }
 
@@ -958,6 +956,7 @@ public class Snark
    * non-valid argument list.  The given listeners will be
    * passed to all components that take one.
    */
+/****
   private static Snark parseArguments(String[] args,
                               StorageListener slistener,
                               CoordinatorListener clistener)
@@ -972,6 +971,7 @@ public class Snark
     int i = 0;
     while (i < args.length)
       {
+****/
 /*
         if (args[i].equals("--debug"))
           {
@@ -993,7 +993,9 @@ public class Snark
                 catch (NumberFormatException nfe) { }
               }
           }
-        else */ if (args[i].equals("--port"))
+        else */
+/****
+          if (args[i].equals("--port"))
           {
             if (args.length - 1 < i + 1)
               usage("--port needs port number to listen on");
@@ -1099,6 +1101,7 @@ public class Snark
     System.out.println
       ("         \tor (with --share) a file to share.");
   }
+****/
 
   /**
    * Aborts program abnormally.

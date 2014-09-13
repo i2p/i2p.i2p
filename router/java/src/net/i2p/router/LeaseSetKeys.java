@@ -40,7 +40,7 @@ public class LeaseSetKeys {
     /**
      * Key with which a LeaseSet can be revoked (by republishing it with no Leases)
      *
-     * @deprecated unused
+     * Deprecated, unused
      */
     public SigningPrivateKey getRevocationKey() { return _revocationKey; }
 

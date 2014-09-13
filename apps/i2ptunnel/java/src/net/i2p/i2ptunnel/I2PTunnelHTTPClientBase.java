@@ -601,9 +601,12 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
             return;
         int status = ise != null ? ise.getStatus() : -1;
         String error;
-        //TODO MessageStatusMessage.STATUS_SEND_FAILURE_UNSUPPORTED_ENCRYPTION
         if (status == MessageStatusMessage.STATUS_SEND_FAILURE_NO_LEASESET) {
+            // We won't get this one unless it is treated as a hard failure
+            // in streaming. See PacketQueue.java
             error = usingWWWProxy ? "nolsp" : "nols";
+        } else if (status == MessageStatusMessage.STATUS_SEND_FAILURE_UNSUPPORTED_ENCRYPTION) {
+            error = usingWWWProxy ? "encp" : "enc";
         } else {
             error = usingWWWProxy ? "dnfp" : "dnf";
         }

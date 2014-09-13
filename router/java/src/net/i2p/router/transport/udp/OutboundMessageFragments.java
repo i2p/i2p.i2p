@@ -1,14 +1,19 @@
 package net.i2p.router.transport.udp;
 
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
-import net.i2p.data.RouterInfo;
+import net.i2p.data.router.RouterInfo;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
+import net.i2p.router.transport.udp.PacketBuilder.Fragment;
 import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.Log;
 
@@ -74,6 +79,7 @@ class OutboundMessageFragments {
         _context.statManager().createRateStat("udp.sendVolleyTime", "Long it takes to send a full volley", "udp", UDPTransport.RATES);
         _context.statManager().createRateStat("udp.sendConfirmTime", "How long it takes to send a message and get the ACK", "udp", UDPTransport.RATES);
         _context.statManager().createRateStat("udp.sendConfirmFragments", "How many fragments are included in a fully ACKed message", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.sendFragmentsPerPacket", "How many fragments are sent in a data packet", "udp", UDPTransport.RATES);
         _context.statManager().createRateStat("udp.sendConfirmVolley", "How many times did fragments need to be sent before ACK", "udp", UDPTransport.RATES);
         _context.statManager().createRateStat("udp.sendFailed", "How many sends a failed message was pushed", "udp", UDPTransport.RATES);
         _context.statManager().createRateStat("udp.sendAggressiveFailed", "How many volleys was a packet sent before we gave up", "udp", UDPTransport.RATES);
@@ -81,7 +87,7 @@ class OutboundMessageFragments {
         _context.statManager().createRateStat("udp.outboundActivePeers", "How many peers we are actively sending to", "udp", UDPTransport.RATES);
         _context.statManager().createRateStat("udp.sendRejected", "What volley are we on when the peer was throttled", "udp", UDPTransport.RATES);
         _context.statManager().createRateStat("udp.partialACKReceived", "How many fragments were partially ACKed", "udp", UDPTransport.RATES);
-        _context.statManager().createRateStat("udp.sendSparse", "How many fragments were partially ACKed and hence not resent (time == message lifetime)", "udp", UDPTransport.RATES);
+        //_context.statManager().createRateStat("udp.sendSparse", "How many fragments were partially ACKed and hence not resent (time == message lifetime)", "udp", UDPTransport.RATES);
         _context.statManager().createRateStat("udp.sendPiggyback", "How many acks were piggybacked on a data packet (time == message lifetime)", "udp", UDPTransport.RATES);
         _context.statManager().createRateStat("udp.sendPiggybackPartial", "How many partial acks were piggybacked on a data packet (time == message lifetime)", "udp", UDPTransport.RATES);
         _context.statManager().createRequiredRateStat("udp.packetsRetransmitted", "Lifetime of packets during retransmission (ms)", "udp", UDPTransport.RATES);
@@ -236,19 +242,17 @@ class OutboundMessageFragments {
     /**
      * Fetch all the packets for a message volley, blocking until there is a
      * message which can be fully transmitted (or the transport is shut down).
-     * The returned array may be sparse, with null packets taking the place of
-     * already ACKed fragments.
      *
      * NOT thread-safe. Called by the PacketPusher thread only.
      *
      * @return null only on shutdown
      */
-    public UDPPacket[] getNextVolley() {
+    public List<UDPPacket> getNextVolley() {
         PeerState peer = null;
-        OutboundMessageState state = null;
+        List<OutboundMessageState> states = null;
         // Keep track of how many we've looked at, since we don't start the iterator at the beginning.
         int peersProcessed = 0;
-        while (_alive && (state == null) ) {
+        while (_alive && (states == null) ) {
             int nextSendDelay = Integer.MAX_VALUE;
             // no, not every time - O(n**2) - do just before waiting below
             //finishMessages();
@@ -275,8 +279,8 @@ class OutboundMessageFragments {
                             continue;
                         }
                         peersProcessed++;
-                        state = peer.allocateSend();
-                        if (state != null) {
+                        states = peer.allocateSend();
+                        if (states != null) {
                             // we have something to send and we will be returning it
                             break;
                         } else if (peersProcessed >= _activePeers.size()) {
@@ -292,13 +296,13 @@ class OutboundMessageFragments {
                         }
                     }
 
-                    if (peer != null && _log.shouldLog(Log.DEBUG))
-                        _log.debug("Done looping, next peer we are sending for: " +
-                                   peer.getRemotePeer());
+                    //if (peer != null && _log.shouldLog(Log.DEBUG))
+                    //    _log.debug("Done looping, next peer we are sending for: " +
+                    //               peer.getRemotePeer());
 
                     // if we've gone all the way through the loop, wait
                     // ... unless nextSendDelay says we have more ready now
-                    if (state == null && peersProcessed >= _activePeers.size() && nextSendDelay > 0) {
+                    if (states == null && peersProcessed >= _activePeers.size() && nextSendDelay > 0) {
                         _isWaiting = true;
                         peersProcessed = 0;
                         // why? we do this in the loop one at a time
@@ -328,9 +332,9 @@ class OutboundMessageFragments {
         } // while alive && state == null
 
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Sending " + state);
+            _log.debug("Sending " + DataHelper.toString(states));
 
-        UDPPacket packets[] = preparePackets(state, peer);
+        List<UDPPacket> packets = preparePackets(states, peer);
 
       /****
         if ( (state != null) && (state.getMessage() != null) ) {
@@ -352,58 +356,108 @@ class OutboundMessageFragments {
     /**
      *  @return null if state or peer is null
      */
-    private UDPPacket[] preparePackets(OutboundMessageState state, PeerState peer) {
-        if ( (state != null) && (peer != null) ) {
-            int fragments = state.getFragmentCount();
-            if (fragments < 0)
-                return null;
+    private List<UDPPacket> preparePackets(List<OutboundMessageState> states, PeerState peer) {
+        if (states == null || peer == null)
+            return null;
 
-            // ok, simplest possible thing is to always tack on the bitfields if
-            List<Long> msgIds = peer.getCurrentFullACKs();
-            int newFullAckCount = msgIds.size();
-            msgIds.addAll(peer.getCurrentResendACKs());
-            List<ACKBitfield> partialACKBitfields = new ArrayList<ACKBitfield>();
-            peer.fetchPartialACKs(partialACKBitfields);
-            int piggybackedPartialACK = partialACKBitfields.size();
-            // getCurrentFullACKs() already makes a copy, do we need to copy again?
-            // YES because buildPacket() now removes them (maybe)
-            List<Long> remaining = new ArrayList<Long>(msgIds);
-            int sparseCount = 0;
-            UDPPacket rv[] = new UDPPacket[fragments]; //sparse
+        // ok, simplest possible thing is to always tack on the bitfields if
+        List<Long> msgIds = peer.getCurrentFullACKs();
+        int newFullAckCount = msgIds.size();
+        msgIds.addAll(peer.getCurrentResendACKs());
+        List<ACKBitfield> partialACKBitfields = new ArrayList<ACKBitfield>();
+        peer.fetchPartialACKs(partialACKBitfields);
+        int piggybackedPartialACK = partialACKBitfields.size();
+        // getCurrentFullACKs() already makes a copy, do we need to copy again?
+        // YES because buildPacket() now removes them (maybe)
+        List<Long> remaining = new ArrayList<Long>(msgIds);
+
+        // build the list of fragments to send
+        List<Fragment> toSend = new ArrayList<Fragment>(8);
+        for (OutboundMessageState state : states) {
+            int fragments = state.getFragmentCount();
+            int queued = 0;
             for (int i = 0; i < fragments; i++) {
                 if (state.needsSending(i)) {
-                    int before = remaining.size();
-                    try {
-                        rv[i] = _builder.buildPacket(state, i, peer, remaining, newFullAckCount, partialACKBitfields);
-                    } catch (ArrayIndexOutOfBoundsException aioobe) {
-                        _log.log(Log.CRIT, "Corrupt trying to build a packet - please tell jrandom: " +
-                                 partialACKBitfields + " / " + remaining + " / " + msgIds);
-                        sparseCount++;
-                        continue;
-                    }
-                    int after = remaining.size();
-                    newFullAckCount = Math.max(0, newFullAckCount - (before - after));
-                    if (rv[i] == null) {
-                        sparseCount++;
-                        continue;
-                    }
-                    rv[i].setFragmentCount(fragments);
-                    OutNetMessage msg = state.getMessage();
-                    if (msg != null)
-                        rv[i].setMessageType(msg.getMessageTypeId());
-                    else
-                        rv[i].setMessageType(-1);
-                } else {
-                    sparseCount++;
+                    toSend.add(new Fragment(state, i));
+                    queued++;
                 }
             }
-            if (sparseCount > 0)
-                remaining.clear();
+            // per-state stats
+            if (queued > 0 && state.getPushCount() > 1) {
+                peer.messageRetransmitted(queued);
+                // _packetsRetransmitted += toSend; // lifetime for the transport
+                _context.statManager().addRateData("udp.peerPacketsRetransmitted", peer.getPacketsRetransmitted(), peer.getPacketsTransmitted());
+                _context.statManager().addRateData("udp.packetsRetransmitted", state.getLifetime(), peer.getPacketsTransmitted());
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Retransmitting " + state + " to " + peer);
+                _context.statManager().addRateData("udp.sendVolleyTime", state.getLifetime(), queued);
+            }
+        }
+
+        if (toSend.isEmpty())
+            return null;
+
+        int fragmentsToSend = toSend.size();
+        // sort by size, biggest first
+        // don't bother unless more than one state (fragments are already sorted within a state)
+        if (fragmentsToSend > 1 && states.size() > 1)
+            Collections.sort(toSend, new FragmentComparator());
+
+        List<Fragment> sendNext = new ArrayList<Fragment>(Math.min(toSend.size(), 4));
+        List<UDPPacket> rv = new ArrayList<UDPPacket>(toSend.size());
+        for (int i = 0; i < toSend.size(); i++) {
+            Fragment next = toSend.get(i);
+            sendNext.add(next);
+            OutboundMessageState state = next.state;
+            OutNetMessage msg = state.getMessage();
+            int msgType = (msg != null) ? msg.getMessageTypeId() : -1;
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Building packet for " + next + " to " + peer);
+            int curTotalDataSize = state.fragmentSize(next.num);
+            // now stuff in more fragments if they fit
+            if (i +1 < toSend.size()) {
+                int maxAvail = PacketBuilder.getMaxAdditionalFragmentSize(peer, sendNext.size(), curTotalDataSize);
+                for (int j = i + 1; j < toSend.size(); j++) {
+                    next = toSend.get(j);
+                    int nextDataSize = next.state.fragmentSize(next.num);
+                    //if (PacketBuilder.canFitAnotherFragment(peer, sendNext.size(), curTotalDataSize, nextDataSize)) {
+                    //if (_builder.canFitAnotherFragment(peer, sendNext.size(), curTotalDataSize, nextDataSize)) {
+                    if (nextDataSize <= maxAvail) {
+                        // add it
+                        toSend.remove(j);
+                        j--;
+                        sendNext.add(next);
+                        curTotalDataSize += nextDataSize;
+                        maxAvail = PacketBuilder.getMaxAdditionalFragmentSize(peer, sendNext.size(), curTotalDataSize);
+                        if (_log.shouldLog(Log.INFO))
+                            _log.info("Adding in additional " + next + " to " + peer);
+                    }  // else too big
+                }
+            }
+
+            int before = remaining.size();
+            UDPPacket pkt = _builder.buildPacket(sendNext, peer, remaining, newFullAckCount, partialACKBitfields);
+            if (pkt != null) {
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Built packet with " + sendNext.size() + " fragments totalling " + curTotalDataSize +
+                              " data bytes to " + peer);
+                _context.statManager().addRateData("udp.sendFragmentsPerPacket", sendNext.size());
+            }
+            sendNext.clear();
+            if (pkt == null) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.info("Build packet FAIL for " + DataHelper.toString(sendNext) + " to " + peer);
+                continue;
+            }
+            rv.add(pkt);
+
+            int after = remaining.size();
+            newFullAckCount = Math.max(0, newFullAckCount - (before - after));
 
             int piggybackedAck = 0;
             if (msgIds.size() != remaining.size()) {
-                for (int i = 0; i < msgIds.size(); i++) {
-                    Long id = msgIds.get(i);
+                for (int j = 0; j < msgIds.size(); j++) {
+                    Long id = msgIds.get(j);
                     if (!remaining.contains(id)) {
                         peer.removeACKMessage(id);
                         piggybackedAck++;
@@ -411,29 +465,36 @@ class OutboundMessageFragments {
                 }
             }
 
-            if (sparseCount > 0)
-                _context.statManager().addRateData("udp.sendSparse", sparseCount, state.getLifetime());
             if (piggybackedAck > 0)
-                _context.statManager().addRateData("udp.sendPiggyback", piggybackedAck, state.getLifetime());
+                _context.statManager().addRateData("udp.sendPiggyback", piggybackedAck);
             if (piggybackedPartialACK - partialACKBitfields.size() > 0)
                 _context.statManager().addRateData("udp.sendPiggybackPartial", piggybackedPartialACK - partialACKBitfields.size(), state.getLifetime());
-            if (_log.shouldLog(Log.INFO))
-                _log.info("Building packet for " + state + " to " + peer + " with sparse count: " + sparseCount);
-            peer.packetsTransmitted(fragments - sparseCount);
-            if (state.getPushCount() > 1) {
-                int toSend = fragments-sparseCount;
-                peer.messageRetransmitted(toSend);
-                // _packetsRetransmitted += toSend; // lifetime for the transport
-                _context.statManager().addRateData("udp.peerPacketsRetransmitted", peer.getPacketsRetransmitted(), peer.getPacketsTransmitted());
-                _context.statManager().addRateData("udp.packetsRetransmitted", state.getLifetime(), peer.getPacketsTransmitted());
-                if (_log.shouldLog(Log.INFO))
-                    _log.info("Retransmitting " + state + " to " + peer);
-                _context.statManager().addRateData("udp.sendVolleyTime", state.getLifetime(), toSend);
-            }
-            return rv;
-        } else {
-            // !alive
-            return null;
+
+            // following for debugging and stats
+            pkt.setFragmentCount(sendNext.size());
+            pkt.setMessageType(msgType);  //type of first fragment
+        }
+
+
+
+        int sent = rv.size();
+        peer.packetsTransmitted(sent);
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Sent " + fragmentsToSend + " fragments of " + states.size() +
+                      " messages in " + sent + " packets to " + peer);
+
+        return rv;
+    }
+
+    /**
+     *  Biggest first
+     *  @since 0.9.16
+     */
+    private static class FragmentComparator implements Comparator<Fragment>, Serializable {
+
+        public int compare(Fragment l, Fragment r) {
+            // reverse
+            return r.state.fragmentSize(r.num) - l.state.fragmentSize(l.num);
         }
     }
 

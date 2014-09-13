@@ -12,11 +12,25 @@ package net.i2p.crypto;
 import java.math.BigInteger;
 import java.security.GeneralSecurityException;
 import java.security.InvalidKeyException;
+import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.ProviderException;
+import java.security.interfaces.ECPrivateKey;
+import java.security.interfaces.ECPublicKey;
+import java.security.interfaces.RSAPrivateKey;
+import java.security.interfaces.RSAPublicKey;
+import java.security.spec.ECParameterSpec;
+import java.security.spec.ECPoint;
+import java.security.spec.ECPublicKeySpec;
+import java.security.spec.EllipticCurve;
+import java.security.spec.RSAKeyGenParameterSpec;
+import java.security.spec.RSAPublicKeySpec;
 
 import net.i2p.I2PAppContext;
+import net.i2p.crypto.eddsa.EdDSAPrivateKey;
+import net.i2p.crypto.eddsa.EdDSAPublicKey;
+import net.i2p.crypto.eddsa.spec.EdDSAPublicKeySpec;
 import net.i2p.data.Hash;
 import net.i2p.data.PrivateKey;
 import net.i2p.data.PublicKey;
@@ -268,24 +282,56 @@ public class KeyGenerator {
     }
 
     /** Convert a SigningPrivateKey to a SigningPublicKey.
-     * DSA-SHA1 only.
+     *  As of 0.9.16, supports all key types.
      *
      * @param priv a SigningPrivateKey object
      * @return a SigningPublicKey object
-     * @throws IllegalArgumentException on bad key
+     * @throws IllegalArgumentException on bad key or unknown type
      */
     public static SigningPublicKey getSigningPublicKey(SigningPrivateKey priv) {
-        if (priv.getType() != SigType.DSA_SHA1)
-            throw new IllegalArgumentException();
-        BigInteger x = new NativeBigInteger(1, priv.toByteArray());
-        BigInteger y = CryptoConstants.dsag.modPow(x, CryptoConstants.dsap);
-        SigningPublicKey pub = new SigningPublicKey();
+        SigType type = priv.getType();
+        if (type == null)
+            throw new IllegalArgumentException("Unknown type");
         try {
-            pub.setData(SigUtil.rectify(y, SigningPublicKey.KEYSIZE_BYTES));
-        } catch (InvalidKeyException ike) {
-            throw new IllegalArgumentException(ike);
+            switch (type.getBaseAlgorithm()) {
+              case DSA:
+                BigInteger x = new NativeBigInteger(1, priv.toByteArray());
+                BigInteger y = CryptoConstants.dsag.modPow(x, CryptoConstants.dsap);
+                SigningPublicKey pub = new SigningPublicKey();
+                pub.setData(SigUtil.rectify(y, SigningPublicKey.KEYSIZE_BYTES));
+                return pub;
+
+              case EC:
+                ECPrivateKey ecpriv = SigUtil.toJavaECKey(priv);
+                BigInteger s = ecpriv.getS();
+                ECParameterSpec spec = (ECParameterSpec) type.getParams();
+                EllipticCurve curve = spec.getCurve();
+                ECPoint g = spec.getGenerator();
+                ECPoint w = ECUtil.scalarMult(g, s, curve);
+                ECPublicKeySpec ecks = new ECPublicKeySpec(w, ecpriv.getParams());
+                KeyFactory eckf = KeyFactory.getInstance("EC");
+                ECPublicKey ecpub = (ECPublicKey) eckf.generatePublic(ecks);
+                return SigUtil.fromJavaKey(ecpub, type);
+
+              case RSA:
+                RSAPrivateKey rsapriv = SigUtil.toJavaRSAKey(priv);
+                BigInteger exp = ((RSAKeyGenParameterSpec)type.getParams()).getPublicExponent();
+                RSAPublicKeySpec rsaks = new RSAPublicKeySpec(rsapriv.getModulus(), exp);
+                KeyFactory rsakf = KeyFactory.getInstance("RSA");
+                RSAPublicKey rsapub = (RSAPublicKey) rsakf.generatePublic(rsaks);
+                return SigUtil.fromJavaKey(rsapub, type);
+
+              case EdDSA:
+                EdDSAPrivateKey epriv = SigUtil.toJavaEdDSAKey(priv);
+                EdDSAPublicKey epub = new EdDSAPublicKey(new EdDSAPublicKeySpec(epriv.getA(), epriv.getParams()));
+                return SigUtil.fromJavaKey(epub, type);
+
+              default:
+                throw new IllegalArgumentException("Unsupported algorithm");
+            }
+        } catch (GeneralSecurityException gse) {
+            throw new IllegalArgumentException("Conversion failed", gse);
         }
-        return pub;
     }
 
     public static void main(String args[]) {
@@ -322,14 +368,20 @@ public class KeyGenerator {
         long stime = 0;
         long vtime = 0;
         SimpleDataStructure keys[] = KeyGenerator.getInstance().generateSigningKeys(type);
-        //System.out.println("pubkey " + keys[0]);
+        SigningPublicKey pubkey = (SigningPublicKey) keys[0];
+        SigningPrivateKey privkey = (SigningPrivateKey) keys[1];
+        SigningPublicKey pubkey2 = getSigningPublicKey(privkey);
+        if (pubkey.equals(pubkey2))
+            System.out.println(type + " private-to-public test PASSED");
+        else
+            System.out.println(type + " private-to-public test FAILED");
         //System.out.println("privkey " + keys[1]);
         for (int i = 0; i < runs; i++) {
             RandomSource.getInstance().nextBytes(src);
             long start = System.nanoTime();
-            Signature sig = DSAEngine.getInstance().sign(src, (SigningPrivateKey) keys[1]);
+            Signature sig = DSAEngine.getInstance().sign(src, privkey);
             long mid = System.nanoTime();
-            boolean ok = DSAEngine.getInstance().verifySignature(sig, src, (SigningPublicKey) keys[0]);
+            boolean ok = DSAEngine.getInstance().verifySignature(sig, src, pubkey);
             long end = System.nanoTime();
             stime += mid - start;
             vtime += end - mid;

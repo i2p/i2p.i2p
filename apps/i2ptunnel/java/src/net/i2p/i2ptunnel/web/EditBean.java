@@ -188,8 +188,7 @@ public class EditBean extends IndexBean {
     
     /** @since 0.9.12 */
     public boolean isSigTypeAvailable(int code) {
-        SigType type = SigType.getByCode(code);
-        return type != null && type.isAvailable();
+        return SigType.isAvailable(code);
     }
     
     /** @since 0.8.9 */
