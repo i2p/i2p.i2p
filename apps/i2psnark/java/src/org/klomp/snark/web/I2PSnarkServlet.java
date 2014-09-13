@@ -2764,14 +2764,20 @@ public class I2PSnarkServlet extends BasicServlet {
             } else {
                 buf.append('0');
             }
+            // not including skipped files, but -1 when not running
             long needed = snark.getNeededLength();
-            if (needed > 0)
+            if (needed < 0) {
+                // including skipped files, valid when not running
+                needed = snark.getRemainingLength();
+            }
+            if (needed > 0) {
                 buf.append("&nbsp;");
                 toThemeImg(buf, "head_rx");
                 buf.append("&nbsp;<b>")
                    .append(_("Remaining"))
                    .append(":</b> ")
                    .append(formatSize(needed));
+            }
             if (meta != null) {
                 List<List<String>> files = meta.getFiles();
                 int fileCount = files != null ? files.size() : 1;
