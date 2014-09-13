@@ -310,7 +310,8 @@ public class I2PSnarkServlet extends BasicServlet {
             out.write("<div class=\"snarknavbar\"><a href=\"" + _contextPath + "/\" title=\"");
             out.write(_("Torrents"));
             out.write("\" class=\"snarkRefresh\">");
-            out.write("<img alt=\"\" border=\"0\" src=\"" + _imgPath + "arrow_refresh.png\">&nbsp;&nbsp;");
+            out.write(toThemeImg("arrow_refresh"));
+            out.write(">&nbsp;&nbsp;");
             if (_contextName.equals(DEFAULT_NAME))
                 out.write(_("I2PSnark"));
             else
@@ -320,7 +321,8 @@ public class I2PSnarkServlet extends BasicServlet {
             out.write("<div class=\"snarknavbar\"><a href=\"" + _contextPath + '/' + peerString + "\" title=\"");
             out.write(_("Refresh page"));
             out.write("\" class=\"snarkRefresh\">");
-            out.write("<img alt=\"\" border=\"0\" src=\"" + _imgPath + "arrow_refresh.png\">&nbsp;&nbsp;");
+            out.write(toThemeImg("arrow_refresh"));
+            out.write(">&nbsp;&nbsp;");
             if (_contextName.equals(DEFAULT_NAME))
                 out.write(_("I2PSnark"));
             else
@@ -375,9 +377,10 @@ public class I2PSnarkServlet extends BasicServlet {
                 out.write(peerString + "&amp;");
             else
                 out.write("?");
-            out.write("action=Clear&amp;nonce=" + _nonce + "\">" +
-                      "<img src=\"" + _imgPath + "delete.png\" title=\"" + _("clear messages") +
-                      "\" alt=\"" + _("clear messages") + "\"></a>" +
+            out.write("action=Clear&amp;nonce=" + _nonce + "\">");
+            String tx = _("clear messages");
+            out.write(toThemeImg("delete", tx, tx));
+            out.write("</a>" +
                       "<ul>");
             for (int i = msgs.size()-1; i >= 0; i--) {
                 String msg = msgs.get(i);
@@ -430,14 +433,10 @@ public class I2PSnarkServlet extends BasicServlet {
             out.write("<a href=\"" + _contextPath + '/' + getQueryString(req, null, null, sort));
             out.write("\">");
         }
-        out.write("<img border=\"0\" src=\"" + _imgPath + "status.png\" title=\"");
-        if (showSort)
-            out.write(_("Sort by {0}", _("Status")));
-        else
-            out.write(_("Status"));
-        out.write("\" alt=\"");
-        out.write(_("Status"));
-        out.write("\">");
+        String tx = _("Status");
+        out.write(toThemeImg("status", tx,
+                             showSort ? _("Sort by {0}", tx)
+                                      : tx));
         if (showSort)
             out.write("</a>");
         out.write("</th>\n<th>");
@@ -446,20 +445,14 @@ public class I2PSnarkServlet extends BasicServlet {
             if (peerParam != null) {
                 // disable peer view
                 out.write("\">");
-                out.write("<img border=\"0\" src=\"" + _imgPath + "hidepeers.png\" title=\"");
-                out.write(_("Hide Peers"));
-                out.write("\" alt=\"");
-                out.write(_("Hide Peers"));
-                out.write("\">");
+                tx = _("Hide Peers");
+                out.write(toThemeImg("hidepeers", tx, tx));
             } else {
                 // enable peer view
                 out.write(getQueryString(req, "1", null, null));
                 out.write("\">");
-                out.write("<img border=\"0\" src=\"" + _imgPath + "showpeers.png\" title=\"");
-                out.write(_("Show Peers"));
-                out.write("\" alt=\"");
-                out.write(_("Show Peers"));
-                out.write("\">");
+                tx = _("Show Peers");
+                out.write(toThemeImg("showpeers", tx, tx));
             }
             out.write("</a><br>\n"); 
         }
@@ -481,14 +474,10 @@ public class I2PSnarkServlet extends BasicServlet {
             out.write("<a href=\"" + _contextPath + '/' + getQueryString(req, null, null, sort));
             out.write("\">");
         }
-        out.write("<img border=\"0\" src=\"" + _imgPath + "torrent.png\" title=\"");
-        if (showSort)
-            out.write(_("Sort by {0}", (isTypeSort ? _("File type") : _("Torrent"))));
-        else
-            out.write(_("Torrent"));
-        out.write("\" alt=\"");
-        out.write(_("Torrent"));
-        out.write("\">");
+        tx = _("Torrent");
+        out.write(toThemeImg("torrent", tx,
+                             showSort ? _("Sort by {0}", (isTypeSort ? _("File type") : tx))
+                                      : tx));
         if (showSort)
             out.write("</a>");
         out.write("</th>\n<th align=\"center\">");
@@ -502,15 +491,11 @@ public class I2PSnarkServlet extends BasicServlet {
                 out.write("<a href=\"" + _contextPath + '/' + getQueryString(req, null, null, sort));
                 out.write("\">");
             }
-            out.write("<img border=\"0\" src=\"" + _imgPath + "eta.png\" title=\"");
-            if (showSort)
-                out.write(_("Sort by {0}", _("Estimated time remaining")));
-            else
-                out.write(_("Estimated time remaining"));
-            out.write("\" alt=\"");
             // Translators: Please keep short or translate as " "
-            out.write(_("ETA"));
-            out.write("\">");
+            tx = _("ETA");
+            out.write(toThemeImg("eta", tx,
+                                 showSort ? _("Sort by {0}", _("Estimated time remaining"))
+                                          : _("Estimated time remaining")));
             if (showSort)
                 out.write("</a>");
         }
@@ -532,15 +517,11 @@ public class I2PSnarkServlet extends BasicServlet {
             out.write("<a href=\"" + _contextPath + '/' + getQueryString(req, null, null, sort));
             out.write("\">");
         }
-        out.write("<img border=\"0\" src=\"" + _imgPath + "head_rx.png\" title=\"");
-        if (showSort)
-            out.write(_("Sort by {0}", (isDlSort ? _("Downloaded") : _("Size"))));
-        else
-            out.write(_("Downloaded"));
-        out.write("\" alt=\"");
         // Translators: Please keep short or translate as " "
-        out.write(_("RX"));
-        out.write("\">");
+        tx = _("RX");
+        out.write(toThemeImg("head_rx", tx,
+                             showSort ? _("Sort by {0}", (isDlSort ? _("Downloaded") : _("Size")))
+                                      : _("Downloaded")));
         if (showSort)
             out.write("</a>");
         out.write("</th>\n<th align=\"right\">");
@@ -567,15 +548,11 @@ public class I2PSnarkServlet extends BasicServlet {
                 out.write("<a href=\"" + _contextPath + '/' + getQueryString(req, null, null, sort));
                 out.write("\">");
             }
-            out.write("<img border=\"0\" src=\"" + _imgPath + "head_tx.png\" title=\"");
-            if (showSort)
-                out.write(_("Sort by {0}", (nextRatSort ? _("Upload ratio") : _("Uploaded"))));
-            else
-                out.write(_("Uploaded"));
-            out.write("\" alt=\"");
             // Translators: Please keep short or translate as " "
-            out.write(_("TX"));
-            out.write("\">");
+            tx = _("TX");
+            out.write(toThemeImg("head_tx", tx,
+                                 showSort ? _("Sort by {0}", (nextRatSort ? _("Upload ratio") : _("Uploaded")))
+                                          : _("Uploaded")));
             if (showSort)
                 out.write("</a>");
         }
@@ -586,15 +563,11 @@ public class I2PSnarkServlet extends BasicServlet {
                 out.write("<a href=\"" + _contextPath + '/' + getQueryString(req, null, null, sort));
                 out.write("\">");
             }
-            out.write("<img border=\"0\" src=\"" + _imgPath + "head_rxspeed.png\" title=\"");
-            if (showSort)
-                out.write(_("Sort by {0}", _("Down Rate")));
-            else
-                out.write(_("Down Rate"));
-            out.write("\" alt=\"");
             // Translators: Please keep short or translate as " "
-            out.write(_("RX Rate"));
-            out.write("\">");
+            tx = _("RX Rate");
+            out.write(toThemeImg("head_rxspeed", tx,
+                                 showSort ? _("Sort by {0}", _("Down Rate"))
+                                          : _("Down Rate")));
             if (showSort)
                 out.write("</a>");
         }
@@ -605,15 +578,11 @@ public class I2PSnarkServlet extends BasicServlet {
                 out.write("<a href=\"" + _contextPath + '/' + getQueryString(req, null, null, sort));
                 out.write("\">");
             }
-            out.write("<img border=\"0\" src=\"" + _imgPath + "head_txspeed.png\" title=\"");
-            if (showSort)
-                out.write(_("Sort by {0}", _("Up Rate")));
-            else
-                out.write(_("Up Rate"));
-            out.write("\" alt=\"");
             // Translators: Please keep short or translate as " "
-            out.write(_("TX Rate"));
-            out.write("\">");
+            tx = _("TX Rate");
+            out.write(toThemeImg("head_txspeed", tx,
+                                 showSort ? _("Sort by {0}", _("Up Rate"))
+                                          : _("Up Rate")));
             if (showSort)
                 out.write("</a>");
         }
@@ -825,10 +794,9 @@ public class I2PSnarkServlet extends BasicServlet {
                 // First
                 out.write("<a href=\"" + _contextPath);
                 out.write(getQueryString(req, null, "", null));
-                out.write("\">" +
-                          "<img alt=\"" + _("First") + "\" title=\"" + _("First page") + "\" border=\"0\" src=\"" +
-                          _imgPath + "control_rewind_blue.png\">" +
-                          "</a>&nbsp;");
+                out.write("\">");
+                out.write(toThemeImg("control_rewind_blue", _("First"), _("First page")));
+                out.write("</a>&nbsp;");
                 int prev = Math.max(0, start - pageSize);
                 //if (prev > 0) {
                 if (true) {
@@ -836,10 +804,9 @@ public class I2PSnarkServlet extends BasicServlet {
                     out.write("&nbsp;<a href=\"" + _contextPath);
                     String sprev = (prev > 0) ? Integer.toString(prev) : "";
                     out.write(getQueryString(req, null, sprev, null));
-                    out.write("\">" +
-                          "<img alt=\"" + _("Prev") + "\" title=\"" + _("Previous page") + "\" border=\"0\" src=\"" +
-                          _imgPath + "control_back_blue.png\">" +
-                          "</a>&nbsp;");
+                    out.write("\">");
+                    out.write(toThemeImg("control_back_blue", _("Prev"), _("Previous page")));
+                    out.write("</a>&nbsp;");
                 }
             } else {
                 out.write(
@@ -870,19 +837,17 @@ public class I2PSnarkServlet extends BasicServlet {
                     // Next
                     out.write("&nbsp;<a href=\"" + _contextPath);
                     out.write(getQueryString(req, null, Integer.toString(next), null));
-                    out.write("\">" +
-                          "<img alt=\"" + _("Next") + "\" title=\"" + _("Next page") + "\" border=\"0\" src=\"" +
-                          _imgPath + "control_play_blue.png\">" +
-                          "</a>&nbsp;");
+                    out.write("\">");
+                    out.write(toThemeImg("control_play_blue", _("Next"), _("Next page")));
+                    out.write("</a>&nbsp;");
                 }
                 // Last
                 int last = ((total - 1) / pageSize) * pageSize;
                 out.write("&nbsp;<a href=\"" + _contextPath);
                 out.write(getQueryString(req, null, Integer.toString(last), null));
-                out.write("\">" +
-                          "<img alt=\"" + _("Last") + "\" title=\"" + _("Last page") + "\" border=\"0\" src=\"" +
-                          _imgPath + "control_fastforward_blue.png\">" +
-                          "</a>&nbsp;");
+                out.write("\">");
+                out.write(toThemeImg("control_fastforward_blue", _("Last"), _("Last page")));
+                out.write("</a>&nbsp;");
             } else {
                 out.write("&nbsp;" +
                           "<img alt=\"\" border=\"0\" class=\"disable\" src=\"" +
@@ -1451,10 +1416,10 @@ public class I2PSnarkServlet extends BasicServlet {
         String rowClass = (row % 2 == 0 ? "snarkTorrentEven" : "snarkTorrentOdd");
         String statusString;
         if (snark.isChecking()) {
-            statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "stalled.png\" title=\"" + _("Checking") + "\"></td>" +
+            statusString = toThemeImg("stalled", "", _("Checking")) + "</td>" +
                            "<td class=\"snarkTorrentStatus\">" + _("Checking");
         } else if (snark.isAllocating()) {
-            statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "stalled.png\" title=\"" + _("Allocating") + "\"></td>" +
+            statusString = toThemeImg("stalled", "", _("Allocating")) + "</td>" +
                            "<td class=\"snarkTorrentStatus\">" + _("Allocating");
         } else if (err != null && curPeers == 0) {
             // Also don't show if seeding... but then we won't see the not-registered error
@@ -1468,7 +1433,7 @@ public class I2PSnarkServlet extends BasicServlet {
             //                   ngettext("1 peer", "{0} peers", knownPeers) + "</a>";
             //else if (isRunning)
             if (isRunning)
-                statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "trackererror.png\" title=\"" + err + "\"></td>" +
+                statusString = toThemeImg("trackererror", "", err) + "</td>" +
                                "<td class=\"snarkTorrentStatus\">" + _("Tracker Error") +
                                ": " + curPeers + thinsp(noThinsp) +
                                ngettext("1 peer", "{0} peers", knownPeers);
@@ -1477,11 +1442,11 @@ public class I2PSnarkServlet extends BasicServlet {
                     err = DataHelper.escapeHTML(err.substring(0, MAX_DISPLAYED_ERROR_LENGTH)) + "&hellip;";
                 else
                     err = DataHelper.escapeHTML(err);
-                statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "trackererror.png\" title=\"" + err + "\"></td>" +
+                statusString = toThemeImg("trackererror", "", err) + "</td>" +
                                "<td class=\"snarkTorrentStatus\">" + _("Tracker Error");
             }
         } else if (snark.isStarting()) {
-            statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "stalled.png\" title=\"" + _("Starting") + "\"></td>" +
+            statusString = toThemeImg("stalled", "", _("Starting")) + "</td>" +
                            "<td class=\"snarkTorrentStatus\">" + _("Starting");
         } else if (remaining == 0 || needed == 0) {  // < 0 means no meta size yet
             // partial complete or seeding
@@ -1497,52 +1462,52 @@ public class I2PSnarkServlet extends BasicServlet {
                     txt = _("Complete");
                 }
                 if (curPeers > 0 && !showPeers)
-                    statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + img + ".png\" title=\"" + txt + "\"></td>" +
+                    statusString = toThemeImg(img, "", txt) + "</td>" +
                                "<td class=\"snarkTorrentStatus\">" + txt +
                                ": <a href=\"" + uri + getQueryString(req, Base64.encode(snark.getInfoHash()), null, null) + "\">" +
                                curPeers + thinsp(noThinsp) +
                                ngettext("1 peer", "{0} peers", knownPeers) + "</a>";
                 else
-                    statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + img + ".png\" title=\"" + txt + "\"></td>" +
+                    statusString = toThemeImg(img, "", txt) + "</td>" +
                                "<td class=\"snarkTorrentStatus\">" + txt +
                                ": " + curPeers + thinsp(noThinsp) +
                                ngettext("1 peer", "{0} peers", knownPeers);
             } else {
-                statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "complete.png\" title=\"" + _("Complete") + "\"></td>" +
+                statusString = toThemeImg("complete", "", _("Complete")) + "</td>" +
                                "<td class=\"snarkTorrentStatus\">" + _("Complete");
             }
         } else {
             if (isRunning && curPeers > 0 && downBps > 0 && !showPeers)
-                statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "downloading.png\" title=\"" + _("OK") + "\"></td>" +
+                statusString = toThemeImg("downloading", "", _("OK")) + "</td>" +
                                "<td class=\"snarkTorrentStatus\">" + _("OK") +
                                ": <a href=\"" + uri + getQueryString(req, Base64.encode(snark.getInfoHash()), null, null) + "\">" +
                                curPeers + thinsp(noThinsp) +
                                ngettext("1 peer", "{0} peers", knownPeers) + "</a>";
             else if (isRunning && curPeers > 0 && downBps > 0)
-                statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "downloading.png\" title=\"" + _("OK") + "\"></td>" +
+                statusString = toThemeImg("downloading", "", _("OK")) + "</td>" +
                                "<td class=\"snarkTorrentStatus\">" + _("OK") +
                                ": " + curPeers + thinsp(noThinsp) +
                                ngettext("1 peer", "{0} peers", knownPeers);
             else if (isRunning && curPeers > 0 && !showPeers)
-                statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "stalled.png\" title=\"" + _("Stalled") + "\"></td>" +
+                statusString = toThemeImg("stalled", "", _("Stalled")) + "</td>" +
                                "<td class=\"snarkTorrentStatus\">" + _("Stalled") +
                                ": <a href=\"" + uri + getQueryString(req, Base64.encode(snark.getInfoHash()), null, null) + "\">" +
                                curPeers + thinsp(noThinsp) +
                                ngettext("1 peer", "{0} peers", knownPeers) + "</a>";
             else if (isRunning && curPeers > 0)
-                statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "stalled.png\" title=\"" + _("Stalled") + "\"></td>" +
+                statusString = toThemeImg("stalled", "", _("Stalled")) + "</td>" +
                                "<td class=\"snarkTorrentStatus\">" + _("Stalled") +
                                ": " + curPeers + thinsp(noThinsp) +
                                ngettext("1 peer", "{0} peers", knownPeers);
             else if (isRunning && knownPeers > 0)
-                statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "nopeers.png\" title=\"" + _("No Peers") + "\"></td>" +
+                statusString = toThemeImg("nopeers", "", _("No Peers")) + "</td>" +
                                "<td class=\"snarkTorrentStatus\">" + _("No Peers") +
                                ": 0" + thinsp(noThinsp) + knownPeers ;
             else if (isRunning)
-                statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "nopeers.png\" title=\"" + _("No Peers") + "\"></td>" +
+                statusString = toThemeImg("nopeers", "", _("No Peers")) + "</td>" +
                                "<td class=\"snarkTorrentStatus\">" + _("No Peers");
             else
-                statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "stopped.png\" title=\"" + _("Stopped") + "\"></td>" +
+                statusString = toThemeImg("stopped", "", _("Stopped")) + "</td>" +
                                "<td class=\"snarkTorrentStatus\">" + _("Stopped");
         }
         
@@ -1949,9 +1914,9 @@ public class I2PSnarkServlet extends BasicServlet {
         String linkUrl = getTrackerLinkUrl(announce, infohash);
         if (linkUrl != null) {
             StringBuilder buf = new StringBuilder(128);
-            buf.append(linkUrl)
-               .append("<img alt=\"").append(_("Info")).append("\" border=\"0\" src=\"")
-               .append(_imgPath).append("details.png\"></a>");
+            buf.append(linkUrl);
+            toThemeImg(buf, "details", _("Info"), "");
+            buf.append("</a>");
             return buf.toString();
         }
         return null;
@@ -2021,7 +1986,8 @@ public class I2PSnarkServlet extends BasicServlet {
         out.write("<form action=\"_post\" method=\"POST\">\n");
         writeHiddenInputs(out, req, "Add");
         out.write("<div class=\"addtorrentsection\"><span class=\"snarkConfigTitle\">");
-        out.write("<img alt=\"\" border=\"0\" src=\"" + _imgPath + "add.png\"> ");
+        out.write(toThemeImg("add"));
+        out.write(' ');
         out.write(_("Add Torrent"));
         out.write("</span><hr>\n<table border=\"0\"><tr><td>");
         out.write(_("From URL"));
@@ -2048,7 +2014,8 @@ public class I2PSnarkServlet extends BasicServlet {
         out.write("<form action=\"_post\" method=\"POST\">\n");
         writeHiddenInputs(out, req, "Create");
         out.write("<span class=\"snarkConfigTitle\">");
-        out.write("<img alt=\"\" border=\"0\" src=\"" + _imgPath + "create.png\"> ");
+        out.write(toThemeImg("create"));
+        out.write(' ');
         out.write(_("Create Torrent"));
         out.write("</span><hr>\n<table border=\"0\"><tr><td>");
         //out.write("From file: <input type=\"file\" name=\"newFile\" size=\"50\" value=\"" + newFile + "\" /><br>\n");
@@ -2114,8 +2081,9 @@ public class I2PSnarkServlet extends BasicServlet {
         out.write("<form action=\"" + _contextPath + "/configure\" method=\"POST\">\n" +
                   "<div class=\"configsectionpanel\"><div class=\"snarkConfig\">\n");
         writeHiddenInputs(out, req, "Save");
-        out.write("<span class=\"snarkConfigTitle\">" +
-                  "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "config.png\"> ");
+        out.write("<span class=\"snarkConfigTitle\">");
+        out.write(toThemeImg("config"));
+        out.write(' ');
         out.write(_("Configuration"));
         out.write("</span><hr>\n"   +
                   "<table border=\"0\"><tr><td>");
@@ -2299,8 +2267,9 @@ public class I2PSnarkServlet extends BasicServlet {
         buf.append("<form action=\"" + _contextPath + "/configure\" method=\"POST\">\n" +
                    "<div class=\"configsectionpanel\"><div class=\"snarkConfig\">\n");
         writeHiddenInputs(buf, req, "Save2");
-        buf.append("<span class=\"snarkConfigTitle\">" +
-                  "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "config.png\"> ");
+        buf.append("<span class=\"snarkConfigTitle\">");
+        toThemeImg(buf, "config");
+        buf.append(' ');
         buf.append(_("Trackers"));
         buf.append("</span><hr>\n"   +
                    "<table class=\"trackerconfig\"><tr><th>")
@@ -2366,8 +2335,9 @@ public class I2PSnarkServlet extends BasicServlet {
 
     private void writeConfigLink(PrintWriter out) throws IOException {
         out.write("<div class=\"configsection\"><span class=\"snarkConfig\">\n" +
-                  "<span class=\"snarkConfigTitle\"><a href=\"configure\">" +
-                  "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "config.png\"> ");
+                  "<span class=\"snarkConfigTitle\"><a href=\"configure\">");
+        out.write(toThemeImg("config"));
+        out.write(' ');
         out.write(_("Configuration"));
         out.write("</a></span></span></div>\n");
     }
@@ -2619,7 +2589,9 @@ public class I2PSnarkServlet extends BasicServlet {
         if (showPriority)
             buf.append(" onload=\"setupbuttons()\"");
         buf.append(">\n<center><div class=\"snarknavbar\"><a href=\"").append(_contextPath).append("/\" title=\"Torrents\"");
-        buf.append(" class=\"snarkRefresh\"><img alt=\"\" border=\"0\" src=\"").append(_imgPath).append("arrow_refresh.png\">&nbsp;&nbsp;");
+        buf.append(" class=\"snarkRefresh\">");
+        toThemeImg(buf, "arrow_refresh");
+        buf.append("&nbsp;&nbsp;");
         if (_contextName.equals(DEFAULT_NAME))
             buf.append(_("I2PSnark"));
         else
@@ -2643,14 +2615,16 @@ public class I2PSnarkServlet extends BasicServlet {
 
             String fullPath = snark.getName();
             String baseName = encodePath((new File(fullPath)).getName());
-            buf.append("<tr><td>")
-               .append("<img alt=\"\" border=\"0\" src=\"").append(_imgPath).append("file.png\" >&nbsp;<b>")
+            buf.append("<tr><td>");
+            toThemeImg(buf, "file");
+            buf.append("&nbsp;<b>")
                .append(_("Torrent file"))
                .append(":</b> <a href=\"").append(_contextPath).append('/').append(baseName).append("\">")
                .append(DataHelper.escapeHTML(fullPath))
                .append("</a></td></tr>\n");
-            buf.append("<tr><td>")
-               .append("<img alt=\"\" border=\"0\" src=\"").append(_imgPath).append("file.png\" >&nbsp;<b>")
+            buf.append("<tr><td>");
+            toThemeImg(buf, "file");
+            buf.append("&nbsp;<b>")
                .append(_("Data location"))
                .append(":</b> ")
                .append(DataHelper.escapeHTML(snark.getStorage().getBase().getPath()))
@@ -2667,17 +2641,19 @@ public class I2PSnarkServlet extends BasicServlet {
                     buf.append("<tr><td>");
                     String trackerLink = getTrackerLink(announce, snark.getInfoHash());
                     if (trackerLink != null)
-                        buf.append(trackerLink).append(' ');
-                    buf.append("<b>").append(_("Primary Tracker")).append(":</b> ");
+                        buf.append(trackerLink);
+                    else
+                        toThemeImg(buf, "details");
+                    buf.append(" <b>").append(_("Primary Tracker")).append(":</b> ");
                     buf.append(getShortTrackerLink(announce, snark.getInfoHash()));
                     buf.append("</td></tr>");
                 }
                 List<List<String>> alist = meta.getAnnounceList();
                 if (alist != null) {
-                    buf.append("<tr><td>" +
-                               "<img alt=\"\" border=\"0\" src=\"")
-                       .append(_imgPath).append("details.png\"> <b>");
-                    buf.append(_("Tracker List")).append(":</b> ");
+                    buf.append("<tr><td>");
+                    toThemeImg(buf, "details");
+                    buf.append(" <b>")
+                       .append(_("Tracker List")).append(":</b> ");
                     for (List<String> alist2 : alist) {
                         buf.append('[');
                         boolean more = false;
@@ -2699,8 +2675,9 @@ public class I2PSnarkServlet extends BasicServlet {
                 if (com != null) {
                     if (com.length() > 1024)
                         com = com.substring(0, 1024);
-                    buf.append("<tr><td><img alt=\"\" border=\"0\" src=\"")
-                       .append(_imgPath).append("details.png\"> <b>")
+                    buf.append("<tr><td>");
+                    toThemeImg(buf, "details");
+                    buf.append(" <b>")
                        .append(_("Comment")).append(":</b> ")
                        .append(DataHelper.stripHTML(com))
                        .append("</td></tr>\n");
@@ -2708,8 +2685,9 @@ public class I2PSnarkServlet extends BasicServlet {
                 long dat = meta.getCreationDate();
                 if (dat > 0) {
                     String date = (new SimpleDateFormat("yyyy-MM-dd HH:mm")).format(new Date(dat));
-                    buf.append("<tr><td><img alt=\"\" border=\"0\" src=\"")
-                       .append(_imgPath).append("details.png\"> <b>")
+                    buf.append("<tr><td>");
+                    toThemeImg(buf, "details");
+                    buf.append(" <b>")
                        .append(_("Created")).append(":</b> ")
                        .append(date).append(" UTC")
                        .append("</td></tr>\n");
@@ -2718,8 +2696,9 @@ public class I2PSnarkServlet extends BasicServlet {
                 if (cby != null) {
                     if (cby.length() > 128)
                         cby = com.substring(0, 128);
-                    buf.append("<tr><td><img alt=\"\" border=\"0\" src=\"")
-                       .append(_imgPath).append("details.png\"> <b>")
+                    buf.append("<tr><td>");
+                    toThemeImg(buf, "details");
+                    buf.append(" <b>")
                        .append(_("Created By")).append(":</b> ")
                        .append(DataHelper.stripHTML(cby))
                        .append("</td></tr>\n");
@@ -2754,23 +2733,27 @@ public class I2PSnarkServlet extends BasicServlet {
             //buf.append("<tr><td>").append(_("Maggot link")).append(": <a href=\"").append(MAGGOT).append(hex).append(':').append(hex).append("\">")
             //   .append(MAGGOT).append(hex).append(':').append(hex).append("</a></td></tr>");
 
-            buf.append("<tr><td>")
-               .append("<img alt=\"\" border=\"0\" src=\"").append(_imgPath).append("size.png\" >&nbsp;<b>")
+            buf.append("<tr><td>");
+            toThemeImg(buf, "size");
+            buf.append("&nbsp;<b>")
                .append(_("Size"))
                .append(":</b> ")
                .append(formatSize(snark.getTotalLength()));
             int pieces = snark.getPieces();
             double completion = (pieces - snark.getNeeded()) / (double) pieces;
+            buf.append("&nbsp;");
+            toThemeImg(buf, "head_rx");
+            buf.append("&nbsp;<b>");
             if (completion < 1.0)
-                buf.append("&nbsp;<img alt=\"\" border=\"0\" src=\"").append(_imgPath).append("head_rx.png\" >&nbsp;<b>")
-                   .append(_("Completion"))
+                buf.append(_("Completion"))
                    .append(":</b> ")
                    .append((new DecimalFormat("0.00%")).format(completion));
             else
-                buf.append("&nbsp;<img alt=\"\" border=\"0\" src=\"").append(_imgPath).append("head_rx.png\" >&nbsp;<b>")
-                   .append(_("Complete")).append("</b>");
+                buf.append(_("Complete")).append("</b>");
             // up ratio
-            buf.append("&nbsp;<img alt=\"\" border=\"0\" src=\"").append(_imgPath).append("head_tx.png\" >&nbsp;<b>")
+            buf.append("&nbsp;");
+            toThemeImg(buf, "head_tx");
+            buf.append("&nbsp;<b>")
                .append(_("Upload ratio"))
                .append(":</b> ");
             long uploaded = snark.getUploaded();
@@ -2783,23 +2766,31 @@ public class I2PSnarkServlet extends BasicServlet {
             }
             long needed = snark.getNeededLength();
             if (needed > 0)
-                buf.append("&nbsp;<img alt=\"\" border=\"0\" src=\"").append(_imgPath).append("head_rx.png\" >&nbsp;<b>")
+                buf.append("&nbsp;");
+                toThemeImg(buf, "head_rx");
+                buf.append("&nbsp;<b>")
                    .append(_("Remaining"))
                    .append(":</b> ")
                    .append(formatSize(needed));
             if (meta != null) {
                 List<List<String>> files = meta.getFiles();
                 int fileCount = files != null ? files.size() : 1;
-                buf.append("&nbsp;<img alt=\"\" border=\"0\" src=\"").append(_imgPath).append("file.png\" >&nbsp;<b>")
+                buf.append("&nbsp;");
+                toThemeImg(buf, "file");
+                buf.append("&nbsp;<b>")
                    .append(_("Files"))
                    .append(":</b> ")
                    .append(fileCount);
             }
-            buf.append("&nbsp;<img alt=\"\" border=\"0\" src=\"").append(_imgPath).append("file.png\" >&nbsp;<b>")
+            buf.append("&nbsp;");
+            toThemeImg(buf, "file");
+            buf.append("&nbsp;<b>")
                .append(_("Pieces"))
                .append(":</b> ")
                .append(pieces);
-            buf.append("&nbsp;<img alt=\"\" border=\"0\" src=\"").append(_imgPath).append("file.png\" >&nbsp;<b>")
+            buf.append("&nbsp;");
+            toThemeImg(buf, "file");
+            buf.append("&nbsp;<b>")
                .append(_("Piece size"))
                .append(":</b> ")
                .append(formatSize(snark.getPieceLength(0)))
@@ -2837,37 +2828,26 @@ public class I2PSnarkServlet extends BasicServlet {
         // second table - dir info
         buf.append("<table class=\"snarkDirInfo\"><thead>\n");
         buf.append("<tr>\n")
-           .append("<th colspan=2>")
-           .append("<img border=\"0\" src=\"").append(_imgPath).append("file.png\" title=\"")
-           .append(_("Directory"))
-           .append(": ")
-           .append(directory)
-           .append("\" alt=\"")
-           .append(_("Directory"))
-           .append("\"></th>\n");
-        buf.append("<th align=\"right\">")
-           .append("<img border=\"0\" src=\"").append(_imgPath).append("size.png\" title=\"")
-           .append(_("Size"))
-           .append("\" alt=\"")
-           .append(_("Size"))
-           .append("\"></th>\n");
-        buf.append("<th class=\"headerstatus\">")
-           .append("<img border=\"0\" src=\"").append(_imgPath).append("status.png\" title=\"")
-           .append(_("Status"))
-           .append("\" alt=\"")
-           .append(_("Status"))
-           .append("\"></th>\n");
-        if (showPriority)
-            buf.append("<th class=\"headerpriority\">")
-               .append("<img border=\"0\" src=\"").append(_imgPath).append("priority.png\" title=\"")
-               .append(_("Priority"))
-               .append("\" alt=\"")
-               .append(_("Priority"))
-               .append("\"></th>\n");
-        buf.append("</tr>\n</thead>\n");
+           .append("<th colspan=2>");
+        String tx = _("Directory");
+        toThemeImg(buf, "file", tx, tx + ": " + directory);
+        buf.append("</th>\n<th align=\"right\">");
+        tx = _("Size");
+        toThemeImg(buf, "size", tx, tx);
+        buf.append("</th>\n<th class=\"headerstatus\">");
+        tx = _("Status");
+        toThemeImg(buf, "status", tx, tx);
+        if (showPriority) {
+            buf.append("</th>\n<th class=\"headerpriority\">");
+            tx = _("Priority");
+            toThemeImg(buf, "priority", tx, tx);
+        }
+        buf.append("</th>\n</tr>\n</thead>\n");
         buf.append("<tr><td colspan=\"" + (showPriority ? '5' : '4') + "\" class=\"ParentDir\"><A HREF=\"");
         URIUtil.encodePath(buf, addPaths(decodedBase,"../"));
-        buf.append("\"><img alt=\"\" border=\"0\" src=\"").append(_imgPath).append("up.png\"> ")
+        buf.append("\">");
+        toThemeImg(buf, "up");
+        buf.append(' ')
            .append(_("Up to higher level directory"))
            .append("</A></td></tr>\n");
 
@@ -3069,14 +3049,73 @@ public class I2PSnarkServlet extends BasicServlet {
         return icon;
     }
     
-    /** @since 0.7.14 */
+    /**
+     *  Icon file in the .war. Always 16x16.
+     *
+     *  @param icon name without the ".png"
+     *  @since 0.7.14
+     */
     private String toImg(String icon) {
         return toImg(icon, "");
     }
 
-    /** @since 0.8.2 */
+    /**
+     *  Icon file in the .war. Always 16x16.
+     *
+     *  @param icon name without the ".png"
+     *  @since 0.8.2
+     */
     private String toImg(String icon, String altText) {
         return "<img alt=\"" + altText + "\" height=\"16\" width=\"16\" src=\"" + _contextPath + WARBASE + "icons/" + icon + ".png\">";
+    }
+    
+    /**
+     *  Image file in the theme.
+     *
+     *  @param image name without the ".png"
+     *  @since 0.9.16
+     */
+    private String toThemeImg(String image) {
+        return toThemeImg(image, "", "");
+    }
+    
+    /**
+     *  Image file in the theme.
+     *
+     *  @param image name without the ".png"
+     *  @since 0.9.16
+     */
+    private void toThemeImg(StringBuilder buf, String image) {
+        toThemeImg(buf, image, "", "");
+    }
+
+    /**
+     *  Image file in the theme.
+     *
+     *  @param image name without the ".png"
+     *  @param altText non-null
+     *  @param titleText non-null
+     *  @since 0.9.16
+     */
+    private String toThemeImg(String image, String altText, String titleText) {
+        StringBuilder buf = new StringBuilder(128);
+        toThemeImg(buf, image, altText, titleText);
+        return buf.toString();
+    }
+
+    /**
+     *  Image file in the theme.
+     *
+     *  @param image name without the ".png"
+     *  @param altText non-null
+     *  @param titleText non-null
+     *  @since 0.9.16
+     */
+    private void toThemeImg(StringBuilder buf, String image, String altText, String titleText) {
+        buf.append("<img alt=\"").append(altText).append("\" src=\"").append(_imgPath).append(image).append(".png\"");
+        if (titleText.length() > 0)
+            buf.append(" title=\"").append(altText).append('"');
+        buf.append('>');
     }
 
     /** @since 0.8.1 */
