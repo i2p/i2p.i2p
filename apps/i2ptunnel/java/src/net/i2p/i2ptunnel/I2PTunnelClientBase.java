@@ -346,6 +346,10 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
             } else {
                 if (_log.shouldLog(Log.INFO))
                     _log.info(tunnel.getClientOptions().getProperty("inbound.nickname") + ": Not building a new socket manager since the old one is open [s=" + s + "]");
+                // If some other tunnel created the session, we need to add it
+                // as our session too.
+                // It's a Set in I2PTunnel
+                tunnel.addSession(s);
             }
         } else {
             if (_log.shouldLog(Log.INFO))
@@ -767,6 +771,12 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
                 if (!chained) {
                     I2PSession session = sockMgr.getSession();
                     getTunnel().removeSession(session);
+                    if (_ownDest) {
+                        try {
+                            session.destroySession();
+                        } catch (I2PException ex) {}
+                    }
+                    // TCG will try to destroy it too
                 } // else the app chaining to this one closes it!
             }
             l.log("Stopping client " + toString());

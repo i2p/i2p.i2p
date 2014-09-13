@@ -43,6 +43,7 @@ import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -306,19 +307,33 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
             "    -w, -wait, --wait   :  do not run the command line interface or GUI";
     }
 
-    /** @return A copy, non-null */
+    /**
+     *  @return A copy, unmodifiable, non-null
+     */
     List<I2PSession> getSessions() { 
-            return new ArrayList<I2PSession>(_sessions); 
+        if (_sessions.isEmpty())
+            return Collections.emptyList();
+        return new ArrayList<I2PSession>(_sessions); 
     }
 
+    /**
+     *  @param session null ok
+     */
     void addSession(I2PSession session) { 
         if (session == null) return;
-        _sessions.add(session);
+        boolean added = _sessions.add(session);
+        if (added && _log.shouldLog(Log.INFO))
+            _log.info(getPrefix() + " session added: " + session, new Exception());
     }
 
+    /**
+     *  @param session null ok
+     */
     void removeSession(I2PSession session) { 
         if (session == null) return;
-        _sessions.remove(session);
+        boolean removed = _sessions.remove(session);
+        if (removed && _log.shouldLog(Log.INFO))
+            _log.info(getPrefix() + " session removed: " + session, new Exception());
     }
     
     /**
@@ -334,6 +349,11 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
             tsk.setId(next_task_id);
             next_task_id++;
             tasks.add(tsk);
+            if (_log.shouldLog(Log.INFO))
+                _log.info(getPrefix() + " adding task: " + tsk);
+        } else {
+            if (_log.shouldLog(Log.INFO))
+                _log.info(getPrefix() + " not adding task that isn't open: " + tsk);
         }
     }
 
@@ -1521,6 +1541,10 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
             }
             if (args[argindex].equalsIgnoreCase("all")) {
                 boolean error = false;
+                if (tasks.isEmpty()) {
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info(getPrefix() + " runClose(all) no tasks");
+                }
                 for (I2PTunnelTask t : tasks) {
                     if (!closetask(t, forced, l)) {
                         notifyEvent("closeResult", "error");
@@ -1693,7 +1717,8 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
      */
     public void log(String s) {
         System.out.println(s);
-        _log.info(getPrefix() + "Display: " + s);
+        if (_log.shouldLog(Log.INFO))
+            _log.info(getPrefix() + "Display: " + s);
     }
 
     /**

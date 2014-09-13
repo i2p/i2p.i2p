@@ -4,9 +4,12 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
@@ -387,10 +390,9 @@ public class TunnelController implements Logging {
      * Note the fact that we are no longer using some sessions, and if
      * no other tunnels are using them, close them.
      */
-    private void release() {
-        if (_sessions != null && !_sessions.isEmpty()) {
-            for (int i = 0; i < _sessions.size(); i++) {
-                I2PSession s = _sessions.get(i);
+    private void release(Collection<I2PSession> sessions) {
+        if (!sessions.isEmpty()) {
+            for (I2PSession s : sessions) {
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Releasing session " + s);
                 TunnelControllerGroup group = TunnelControllerGroup.getInstance();
@@ -402,6 +404,22 @@ public class TunnelController implements Logging {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("No sessions to release? for " + getName());
         }
+    }
+
+    /** 
+     *  Get all the sessions we may be using.
+     *
+     *  @return a copy, non-null
+     *  @since 0.9.15
+     */
+    private Collection<I2PSession> getAllSessions() {
+        // We use _sessions AND the tunnel sessions as
+        // _sessions will be null for delay-open tunnels - see acquire().
+        // We want the current sessions.
+        Set<I2PSession> sessions = new HashSet(_tunnel.getSessions());
+        if (_sessions != null)
+            sessions.addAll(_sessions);
+        return sessions;
     }
     
     private void startClient() {
@@ -522,8 +540,11 @@ public class TunnelController implements Logging {
     }
 
     public void stopTunnel() {
+        // I2PTunnel removes the session in close(),
+        // so save the sessions to pass to release() and TCG
+        Collection<I2PSession> sessions = getAllSessions();
         _tunnel.runClose(new String[] { "forced", "all" }, this);
-        release();
+        release(sessions);
         _running = false;
     }
     
@@ -568,12 +589,8 @@ public class TunnelController implements Logging {
         // tell i2ptunnel, who will tell the TunnelTask, who will tell the SocketManager
         setSessionOptions();
 
-        // we use the tunnel sessions, not _sessions, as
-        // _sessions will be null for delay-open tunnels - see acquire().
-        // We want the current sessions.
-        //List<I2PSession> sessions = _sessions;
-        List<I2PSession> sessions = _tunnel.getSessions();
-        if (_running && sessions != null) {
+        if (_running) {
+            Collection<I2PSession> sessions = getAllSessions();
             if (sessions.isEmpty()) {
                  if (_log.shouldLog(Log.DEBUG))
                      _log.debug("Running but no sessions to update");
@@ -591,10 +608,7 @@ public class TunnelController implements Logging {
             }
         } else {
             if (_log.shouldLog(Log.DEBUG)) {
-                if (!_running)
-                    _log.debug("Not running, not updating sessions");
-                if (sessions == null)
-                    _log.debug("null sessions, nothing to update");
+                _log.debug("Not running, not updating sessions");
             }
         }
     }
@@ -683,6 +697,7 @@ public class TunnelController implements Logging {
     
     public boolean getIsRunning() { return _running; }
     public boolean getIsStarting() { return _starting; }
+
     /** if running but no open sessions, we are in standby */
     public boolean getIsStandby() {
         if (!_running)
@@ -834,5 +849,13 @@ public class TunnelController implements Logging {
             _messages.clear();
         }
         return rv;
+    }
+
+    /**
+     * @since 0.9.15
+     */
+    @Override
+    public String toString() { 
+        return "TC " + getType() + ' ' + getName() + " for " + _tunnel;
     }
 }

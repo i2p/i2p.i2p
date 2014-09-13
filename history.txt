@@ -1,3 +1,8 @@
+2014-09-13 zzz
+ * i2ptunnel:
+   - Fixes for stopping client tunnels
+   - Fix status display for shared clients
+
 2014-09-12 zzz
  * i2psnark: Escape fixes
  * i2ptunnel: Fix updating session options on a running delay-open client tunnel
