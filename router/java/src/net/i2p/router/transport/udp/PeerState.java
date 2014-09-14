@@ -1089,7 +1089,7 @@ class PeerState {
             return _msgId == ((ACKBitfield)o).getMessageId();
         }
         @Override
-        public String toString() { return "Full ACK of " + _msgId; }
+        public String toString() { return "Full ACK " + _msgId; }
     }
         
     /**

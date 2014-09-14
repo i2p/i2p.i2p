@@ -151,7 +151,8 @@ class OutboundMessageState implements CDPQEntry {
      */
     public synchronized boolean acked(ACKBitfield bitfield) {
         // stupid brute force, but the cardinality should be trivial
-        for (int i = 0; i < bitfield.fragmentCount() && i < _numFragments; i++) {
+        int highest = bitfield.highestReceived();
+        for (int i = 0; i <= highest && i < _numFragments; i++) {
             if (bitfield.received(i))
                 _fragmentAcks &= ~mask(i);
         }
