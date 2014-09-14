@@ -600,10 +600,10 @@ public class SnarkManager implements CompleteListener {
 
     /**
      * Get all themes
-     * @return String[] -- Array of all the themes found.
+     * @return String[] -- Array of all the themes found, non-null, unsorted
      */
     public String[] getThemes() {
-            String[] themes = null;
+            String[] themes;
             // "docs/themes/snark/"
             File dir = new File(_context.getBaseDir(), "docs/themes/snark");
             FileFilter fileFilter = new FileFilter() { public boolean accept(File file) { return file.isDirectory(); } };
@@ -614,6 +614,8 @@ public class SnarkManager implements CompleteListener {
                 for(int i = 0; i < dirnames.length; i++) {
                     themes[i] = dirnames[i].getName();
                 }
+            } else {
+                themes = new String[0];
             }
             // return the map.
             return themes;

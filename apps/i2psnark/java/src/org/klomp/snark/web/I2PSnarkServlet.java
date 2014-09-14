@@ -2115,6 +2115,7 @@ public class I2PSnarkServlet extends BasicServlet {
         out.write(": <td><select name='theme'>");
         String theme = _manager.getTheme();
         String[] themes = _manager.getThemes();
+        Arrays.sort(themes);
         for(int i = 0; i < themes.length; i++) {
             if(themes[i].equals(theme))
                 out.write("\n<OPTION value=\"" + themes[i] + "\" SELECTED>" + themes[i]);
