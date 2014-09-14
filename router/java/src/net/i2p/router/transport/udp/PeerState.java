@@ -1541,7 +1541,6 @@ class PeerState {
         for (int i = 0; succeeded != null && i < succeeded.size(); i++) {
             OutboundMessageState state = succeeded.get(i);
             _transport.succeeded(state);
-            state.releaseResources();
             OutNetMessage msg = state.getMessage();
             if (msg != null)
                 msg.timestamp("sending complete");
@@ -1559,7 +1558,6 @@ class PeerState {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Unable to send a direct message: " + state);
             }
-            state.releaseResources();
         }
         
         return rv + _outboundQueue.size();
@@ -1708,7 +1706,7 @@ class PeerState {
      *  how much payload data can we shove in there?
      *  @return MTU - 87, i.e. 533 or 1397 (IPv4), MTU - 107 (IPv6)
      */
-    private int fragmentSize() {
+    public int fragmentSize() {
         // 46 + 20 + 8 + 13 = 74 + 13 = 87 (IPv4)
         // 46 + 40 + 8 + 13 = 74 + 13 = 107 (IPv6)
         return _mtu -
@@ -1727,16 +1725,6 @@ class PeerState {
     private ShouldSend locked_shouldSend(OutboundMessageState state) {
         long now = _context.clock().now();
         if (state.getNextSendTime() <= now) {
-            if (!state.isFragmented()) {
-                state.fragment(fragmentSize());
-                if (state.getMessage() != null)
-                    state.getMessage().timestamp("fragment into " + state.getFragmentCount());
-
-                if (_log.shouldLog(Log.INFO))
-                    _log.info("Fragmenting " + state);
-            }
-
-            
             OutboundMessageState retrans = _retransmitter;
             if ( (retrans != null) && ( (retrans.isExpired() || retrans.isComplete()) ) ) {
                 _retransmitter = null;
@@ -1858,7 +1846,6 @@ class PeerState {
             //if (getSendWindowBytesRemaining() > 0)
             //    _throttle.unchoke(peer.getRemotePeer());
             
-            state.releaseResources();
         } else {
             // dupack, likely
             //if (_log.shouldLog(Log.DEBUG))
@@ -1935,7 +1922,6 @@ class PeerState {
                 //if (state.getPeer().getSendWindowBytesRemaining() > 0)
                 //    _throttle.unchoke(state.getPeer().getRemotePeer());
 
-                state.releaseResources();
             } else {
                 //if (state.getMessage() != null)
                 //    state.getMessage().timestamp("partial ack after " + numSends + ": " + bitfield.toString());
