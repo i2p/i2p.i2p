@@ -24,4 +24,11 @@ interface ACKBitfield {
      *  @since 0.9.16
      */
     public int ackCount();
+
+    /**
+     *  Highest fragment number acked in this bitfield.
+     *  @return highest fragment number acked, or -1 if none
+     *  @since 0.9.16
+     */
+    public int highestReceived();
 }

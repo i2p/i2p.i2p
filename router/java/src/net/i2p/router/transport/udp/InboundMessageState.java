@@ -39,6 +39,9 @@ class InboundMessageState implements CDQEntry {
     private static final long MAX_RECEIVE_TIME = 10*1000;
     public static final int MAX_FRAGMENTS = 64;
     
+    /** 10 */
+    public static final int MAX_PARTIAL_BITFIELD_BYTES = (MAX_FRAGMENTS / 7) + 1;
+
     private static final int MAX_FRAGMENT_SIZE = UDPPacket.MAX_PACKET_SIZE;
     private static final ByteCache _fragmentCache = ByteCache.getInstance(64, MAX_FRAGMENT_SIZE);
     
@@ -232,6 +235,7 @@ class InboundMessageState implements CDQEntry {
         private final long _bitfieldMessageId;
         private final int _fragmentCount;
         private final int _ackCount;
+        private final int _highestReceived;
         // bitfield, 1 for acked
         private final long _fragmentAcks;
         
@@ -244,16 +248,19 @@ class InboundMessageState implements CDQEntry {
                 throw new IllegalArgumentException();
             _bitfieldMessageId = messageId;
             int ackCount = 0;
+            int highestReceived = -1;
             long acks = 0;
             for (int i = 0; i < size; i++) {
                 if (data[i] != null) {
                     acks |= mask(i);
                     ackCount++;
+                    highestReceived = i;
                 }
             }
             _fragmentAcks = acks;
             _fragmentCount = size;
             _ackCount = ackCount;
+            _highestReceived = highestReceived;
         }
 
         /**
@@ -266,6 +273,8 @@ class InboundMessageState implements CDQEntry {
         public int fragmentCount() { return _fragmentCount; }
 
         public int ackCount() { return _ackCount; }
+
+        public int highestReceived() { return _highestReceived; }
 
         public long getMessageId() { return _bitfieldMessageId; }
 
@@ -280,14 +289,15 @@ class InboundMessageState implements CDQEntry {
         @Override
         public String toString() { 
             StringBuilder buf = new StringBuilder(64);
-            buf.append("Partial ACK of ");
+            buf.append("OB Partial ACK of ");
             buf.append(_bitfieldMessageId);
-            buf.append(" with ACKs for: ");
+            buf.append(" highest: ").append(_highestReceived);
+            buf.append(" with ").append(_ackCount).append(" ACKs for: [");
             for (int i = 0; i < _fragmentCount; i++) {
                 if (received(i))
-                    buf.append(i).append(" ");
+                    buf.append(i).append(' ');
             }
-            buf.append(" / ").append(_fragmentCount);
+            buf.append("] / ").append(_fragmentCount);
             return buf.toString();
         }
     }

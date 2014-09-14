@@ -519,8 +519,10 @@ class UDPPacketReader {
             int bfsz = 1;
             // bitfield is an array of bytes where the high bit is 1 if 
             // further bytes in the bitfield follow
-            while ((_message[_bitfieldStart + bfsz - 1] & UDPPacket.BITFIELD_CONTINUATION) != 0x0)
-                bfsz++;
+            while ((_message[_bitfieldStart + bfsz - 1] & UDPPacket.BITFIELD_CONTINUATION) != 0x0) {
+                if (++bfsz > InboundMessageState.MAX_PARTIAL_BITFIELD_BYTES)
+                    throw new IllegalArgumentException();
+            }
             _bitfieldSize = bfsz;
         }
 
@@ -549,6 +551,28 @@ class UDPPacketReader {
             return rv;
         }
 
+        /**
+         *  Highest fragment number acked in this bitfield.
+         *  @return highest fragment number acked, or -1 if none
+         *  @since 0.9.16
+         */
+        public int highestReceived() {
+            int count = fragmentCount();
+            int rv = -1;
+            for (int i = 0; i < _bitfieldSize; i++) {
+                byte b = _message[_bitfieldStart + i];
+                b &= 0x7f;
+                int j = 0;
+                while (b != 0 && j++ < 7) {
+                    if ((b & 0x01) != 0)
+                        rv = (7 * i) + j;
+                    b >>= 1;
+                    b &= 0x7f;
+                }
+            }
+            return rv;
+        }
+
         public boolean received(int fragmentNum) {
             if ( (fragmentNum < 0) || (fragmentNum >= _bitfieldSize*7) )
                 return false;
@@ -561,16 +585,17 @@ class UDPPacketReader {
         @Override
         public String toString() { 
             StringBuilder buf = new StringBuilder(64);
-            buf.append("Read partial ACK of ");
+            buf.append("IB Partial ACK of ");
             buf.append(getMessageId());
-            buf.append(" with ACKs for: ");
+            buf.append(" highest: ").append(highestReceived());
+            buf.append(" with ACKs for: [");
             int numFrags = fragmentCount();
             for (int i = 0; i < numFrags; i++) {
-                if (received(i))
-                    buf.append(i).append(" ");
-                else
-                    buf.append('!').append(i).append(" ");
+                if (!received(i))
+                    buf.append('!');
+                buf.append(i).append(' ');
             }
+            buf.append("] / ").append(numFrags);
             return buf.toString();
         }
     }

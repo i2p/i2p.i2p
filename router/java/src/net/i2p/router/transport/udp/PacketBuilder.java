@@ -349,7 +349,15 @@ class PacketBuilder {
                     break;  // ack count
                 if (bf.receivedComplete())
                     continue;
-                int acksz = 4 + (bf.fragmentCount() / 7) + 1;
+                // only send what we have to
+                //int acksz = 4 + (bf.fragmentCount() / 7) + 1;
+                int bits = bf.highestReceived() + 1;
+                if (bits <= 0)
+                    continue;
+                int acksz = bits / 7;
+                if (bits % 7 > 0)
+                    acksz++;
+                acksz += 4;
                 if (partialAcksToSend == 0)
                     acksz++;  // ack count
                 if (availableForExplicitAcks >= acksz) {
@@ -414,10 +422,16 @@ class PacketBuilder {
             for (int i = 0; i < partialAcksToSend && iter.hasNext(); i++) {
                 ACKBitfield bitfield = iter.next();
                 if (bitfield.receivedComplete()) continue;
+                // only send what we have to
+                //int bits = bitfield.fragmentCount();
+                int bits = bitfield.highestReceived() + 1;
+                if (bits <= 0)
+                    continue;
+                int size = bits / 7;
+                if (bits % 7 > 0)
+                    size++;
                 DataHelper.toLong(data, off, 4, bitfield.getMessageId());
                 off += 4;
-                int bits = bitfield.fragmentCount();
-                int size = (bits / 7) + 1;
                 for (int curByte = 0; curByte < size; curByte++) {
                     if (curByte + 1 < size)
                         data[off] |= (byte)(1 << 7);
@@ -430,7 +444,7 @@ class PacketBuilder {
                 }
                 iter.remove();
                 if (msg != null) // logging it
-                    msg.append(' ').append(bitfield);
+                    msg.append(' ').append(bitfield).append(" with ack bytes: ").append(size);
             }
             //acksIncluded = true;
             // now jump back and fill in the number of bitfields *actually* included
@@ -607,11 +621,16 @@ class PacketBuilder {
             off++;
             for (int i = 0; i < ackBitfields.size(); i++) {
                 ACKBitfield bitfield = ackBitfields.get(i);
-                if (bitfield.receivedComplete()) continue;
+                // no, this will corrupt the packet
+                //if (bitfield.receivedComplete()) continue;
                 DataHelper.toLong(data, off, 4, bitfield.getMessageId());
                 off += 4;
-                int bits = bitfield.fragmentCount();
-                int size = (bits / 7) + 1;
+                // only send what we have to
+                //int bits = bitfield.fragmentCount();
+                int bits = bitfield.highestReceived() + 1;
+                int size = bits / 7;
+                if (bits == 0 || bits % 7 > 0)
+                    size++;
                 for (int curByte = 0; curByte < size; curByte++) {
                     if (curByte + 1 < size)
                         data[off] |= (byte)(1 << 7);
@@ -624,7 +643,7 @@ class PacketBuilder {
                 }
                 
                 if (msg != null) // logging it
-                    msg.append(" partial ack: ").append(bitfield);
+                    msg.append(" partial ack: ").append(bitfield).append(" with ack bytes: ").append(size);
             }
         }
         

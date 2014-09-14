@@ -1075,8 +1075,9 @@ class PeerState {
 
         public FullACKBitfield(long id) { _msgId = id; }
 
-        public int fragmentCount() { return 0; }
-        public int ackCount() { return 0; }
+        public int fragmentCount() { return 1; }
+        public int ackCount() { return 1; }
+        public int highestReceived() { return 0; }
         public long getMessageId() { return _msgId; }
         public boolean received(int fragmentNum) { return true; }
         public boolean receivedComplete() { return true; }
@@ -1709,7 +1710,7 @@ class PeerState {
      */
     public int fragmentSize() {
         // 46 + 20 + 8 + 13 = 74 + 13 = 87 (IPv4)
-        // 46 + 40 + 8 + 13 = 74 + 13 = 107 (IPv6)
+        // 46 + 40 + 8 + 13 = 94 + 13 = 107 (IPv6)
         return _mtu -
                (_remoteIP.length == 4 ? PacketBuilder.MIN_DATA_PACKET_OVERHEAD : PacketBuilder.MIN_IPV6_DATA_PACKET_OVERHEAD) -
                MIN_ACK_SIZE;
