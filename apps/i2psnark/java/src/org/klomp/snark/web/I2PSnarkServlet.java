@@ -1251,10 +1251,13 @@ public class I2PSnarkServlet extends BasicServlet {
                         _manager.addMessage(_("Removed") + ": " + DataHelper.stripHTML(k));
                         changed = true;
                      }
-                } else if (k.startsWith("open_")) {
-                     open.add(k.substring(5));
-                } else if (k.startsWith("private_")) {
-                     priv.add(k.substring(8));
+                } else if (k.startsWith("ttype_")) {
+                     String val = req.getParameter(k);
+                     k = k.substring(6);
+                     if ("1".equals(val))
+                         open.add(k);
+                     else if ("2".equals(val))
+                         priv.add(k);
                 }
             }
             if (changed) {
@@ -1289,12 +1292,12 @@ public class I2PSnarkServlet extends BasicServlet {
                     Map<String, Tracker> trackers = _manager.getTrackerMap();
                     trackers.put(name, new Tracker(name, aurl, hurl));
                     _manager.saveTrackerMap();
-                    // open trumps private
-                    if (req.getParameter("_add_open_") != null) {
+                    String type = req.getParameter("add_tracker_type");
+                    if ("1".equals(type)) {
                         List<String> newOpen = new ArrayList<String>(_manager.util().getOpenTrackers());
                         newOpen.add(aurl);
                         _manager.saveOpenTrackers(newOpen);
-                    } else if (req.getParameter("_add_private_") != null) {
+                    } else if ("2".equals(type)) {
                         List<String> newPriv = new ArrayList<String>(_manager.getPrivateTrackers());
                         newPriv.add(aurl);
                         _manager.savePrivateTrackers(newPriv);
@@ -2279,6 +2282,8 @@ public class I2PSnarkServlet extends BasicServlet {
            .append("</th><th>")
            .append(_("Website URL"))
            .append("</th><th>")
+           .append(_("Standard"))
+           .append("</th><th>")
            .append(_("Open"))
            .append("</th><th>")
            .append(_("Private"))
@@ -2291,18 +2296,25 @@ public class I2PSnarkServlet extends BasicServlet {
             String name = t.name;
             String homeURL = t.baseURL;
             String announceURL = t.announceURL.replace("&#61;", "=");
+            boolean isOpen = openTrackers.contains(t.announceURL);
+            boolean isPrivate = privateTrackers.contains(t.announceURL);
             buf.append("<tr><td><input type=\"checkbox\" class=\"optbox\" name=\"delete_")
                .append(name).append("\" title=\"").append(_("Delete")).append("\">" +
                        "</td><td>").append(name)
                .append("</td><td>").append(urlify(homeURL, 35))
-               .append("</td><td><input type=\"checkbox\" class=\"optbox\" name=\"open_")
+               .append("</td><td><input type=\"radio\" class=\"optbox\" value=\"0\" name=\"ttype_")
                .append(announceURL).append("\"");
-            if (openTrackers.contains(t.announceURL))
+            if (!(isOpen || isPrivate))
                 buf.append(" checked=\"checked\"");
             buf.append(">" +
-                       "</td><td><input type=\"checkbox\" class=\"optbox\" name=\"private_")
+                       "</td><td><input type=\"radio\" class=\"optbox\" value=\"1\" name=\"ttype_")
                .append(announceURL).append("\"");
-            if (privateTrackers.contains(t.announceURL)) {
+            if (isOpen)
+                buf.append(" checked=\"checked\"");
+            buf.append(">" +
+                       "</td><td><input type=\"radio\" class=\"optbox\" value=\"2\" name=\"ttype_")
+               .append(announceURL).append("\"");
+            if (isPrivate) {
                 buf.append(" checked=\"checked\"");
             } else {
                 if (SnarkManager.DEFAULT_TRACKER_ANNOUNCES.contains(t.announceURL))
@@ -2316,19 +2328,20 @@ public class I2PSnarkServlet extends BasicServlet {
            .append(_("Add")).append(":</b></td>" +
                    "<td><input type=\"text\" class=\"trackername\" name=\"tname\" spellcheck=\"false\"></td>" +
                    "<td><input type=\"text\" class=\"trackerhome\" name=\"thurl\" spellcheck=\"false\"></td>" +
-                   "<td><input type=\"checkbox\" class=\"optbox\" name=\"_add_open_\"></td>" +
-                   "<td><input type=\"checkbox\" class=\"optbox\" name=\"_add_private_\"></td>" +
+                   "<td><input type=\"radio\" class=\"optbox\" value=\"0\" name=\"add_tracker_type\" checked=\"checked\"></td>" +
+                   "<td><input type=\"radio\" class=\"optbox\" value=\"1\" name=\"add_tracker_type\"></td>" +
+                   "<td><input type=\"radio\" class=\"optbox\" value=\"2\" name=\"add_tracker_type\"></td>" +
                    "<td><input type=\"text\" class=\"trackerannounce\" name=\"taurl\" spellcheck=\"false\"></td></tr>\n" +
-                   "<tr><td colspan=\"6\">&nbsp;</td></tr>\n" +  // spacer
-                   "<tr><td colspan=\"2\"></td><td colspan=\"4\">\n" +
+                   "<tr><td colspan=\"7\">&nbsp;</td></tr>\n" +  // spacer
+                   "<tr><td colspan=\"2\"></td><td colspan=\"5\">\n" +
                    "<input type=\"submit\" name=\"taction\" class=\"default\" value=\"").append(_("Add tracker")).append("\">\n" +
                    "<input type=\"submit\" name=\"taction\" class=\"delete\" value=\"").append(_("Delete selected")).append("\">\n" +
+                   "<input type=\"submit\" name=\"taction\" class=\"add\" value=\"").append(_("Add tracker")).append("\">\n" +
                    "<input type=\"submit\" name=\"taction\" class=\"accept\" value=\"").append(_("Save tracker configuration")).append("\">\n" +
                    // "<input type=\"reset\" class=\"cancel\" value=\"").append(_("Cancel")).append("\">\n" +
                    "<input type=\"submit\" name=\"taction\" class=\"reload\" value=\"").append(_("Restore defaults")).append("\">\n" +
-                   "<input type=\"submit\" name=\"taction\" class=\"add\" value=\"").append(_("Add tracker")).append("\">\n" +
                    "</td></tr>" +
-                   "<tr><td colspan=\"6\">&nbsp;</td></tr>\n" +  // spacer
+                   "<tr><td colspan=\"7\">&nbsp;</td></tr>\n" +  // spacer
                    "</table></div></div></form>\n");
         out.write(buf.toString());
     }
