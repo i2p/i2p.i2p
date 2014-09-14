@@ -1035,7 +1035,7 @@ class PeerState {
      *            no full bitfields are included.
      */
     void fetchPartialACKs(List<ACKBitfield> rv) {
-        InboundMessageState states[] = null;
+        List<InboundMessageState> states = null;
         int curState = 0;
         synchronized (_inboundMessages) {
             int numMessages = _inboundMessages.size();
@@ -1052,17 +1052,17 @@ class PeerState {
                 } else {
                     if (!state.isComplete()) {
                         if (states == null)
-                            states = new InboundMessageState[numMessages];
-                        states[curState++] = state;
+                            states = new ArrayList<InboundMessageState>(numMessages);
+                        states.add(state);
                     }
                 }
             }
         }
         if (states != null) {
-            // _inboundMessages is a Map (unordered), so why bother going backwards?
-            for (int i = curState-1; i >= 0; i--) {
-                if (states[i] != null)
-                    rv.add(states[i].createACKBitfield());
+            for (InboundMessageState ims : states) {
+                ACKBitfield abf = ims.createACKBitfield();
+                if (!abf.receivedComplete())
+                    rv.add(abf);
             }
         }
     }
@@ -1076,6 +1076,7 @@ class PeerState {
         public FullACKBitfield(long id) { _msgId = id; }
 
         public int fragmentCount() { return 0; }
+        public int ackCount() { return 0; }
         public long getMessageId() { return _msgId; }
         public boolean received(int fragmentNum) { return true; }
         public boolean receivedComplete() { return true; }
@@ -1895,12 +1896,7 @@ class PeerState {
         if (state != null) {
             int numSends = state.getMaxSends();
                         
-            int bits = bitfield.fragmentCount();
-            int numACKed = 0;
-            for (int i = 0; i < bits; i++)
-                if (bitfield.received(i))
-                    numACKed++;
-            
+            int numACKed = bitfield.ackCount();
             _context.statManager().addRateData("udp.partialACKReceived", numACKed);
             
             if (_log.shouldLog(Log.INFO))

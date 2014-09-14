@@ -220,47 +220,62 @@ class InboundMessageState implements CDQEntry {
     }
 
     public ACKBitfield createACKBitfield() {
-        return new PartialBitfield(_messageId, _fragments);
+        int sz = (_lastFragment >= 0) ? _lastFragment + 1 : _fragments.length;
+        return new PartialBitfield(_messageId, _fragments, sz);
     }
     
     /**
-     *  A true partial bitfield that is not complete.
+     *  A true partial bitfield that is probably not complete.
+     *  fragmentCount() will return 64 if unknown.
      */
     private static final class PartialBitfield implements ACKBitfield {
         private final long _bitfieldMessageId;
-        private final boolean _fragmentsReceived[];
+        private final int _fragmentCount;
+        private final int _ackCount;
+        // bitfield, 1 for acked
+        private final long _fragmentAcks;
         
         /**
          *  @param data each element is non-null or null for received or not
+         *  @param lastFragment size of data to use
          */
-        public PartialBitfield(long messageId, Object data[]) {
+        public PartialBitfield(long messageId, Object data[], int size) {
+            if (size > MAX_FRAGMENTS)
+                throw new IllegalArgumentException();
             _bitfieldMessageId = messageId;
-            boolean fragmentsRcvd[] = null;
-            for (int i = data.length - 1; i >= 0; i--) {
+            int ackCount = 0;
+            long acks = 0;
+            for (int i = 0; i < size; i++) {
                 if (data[i] != null) {
-                    if (fragmentsRcvd == null)
-                        fragmentsRcvd = new boolean[i+1];
-                    fragmentsRcvd[i] = true;
+                    acks |= mask(i);
+                    ackCount++;
                 }
             }
-            if (fragmentsRcvd == null)
-                _fragmentsReceived = new boolean[0];
-            else
-                _fragmentsReceived = fragmentsRcvd;
+            _fragmentAcks = acks;
+            _fragmentCount = size;
+            _ackCount = ackCount;
         }
 
-        public int fragmentCount() { return _fragmentsReceived.length; }
+        /**
+         *  @param fragment 0-63
+         */
+        private static long mask(int fragment) {
+            return 1L << fragment;
+        }
+
+        public int fragmentCount() { return _fragmentCount; }
+
+        public int ackCount() { return _ackCount; }
 
         public long getMessageId() { return _bitfieldMessageId; }
 
         public boolean received(int fragmentNum) { 
-            if ( (fragmentNum < 0) || (fragmentNum >= _fragmentsReceived.length) )
+            if (fragmentNum < 0 || fragmentNum >= _fragmentCount)
                 return false;
-            return _fragmentsReceived[fragmentNum];
+            return (_fragmentAcks & mask(fragmentNum)) != 0;
         }
 
-        /** @return false always */
-        public boolean receivedComplete() { return false; }
+        public boolean receivedComplete() { return _ackCount == _fragmentCount; }
         
         @Override
         public String toString() { 
@@ -268,9 +283,11 @@ class InboundMessageState implements CDQEntry {
             buf.append("Partial ACK of ");
             buf.append(_bitfieldMessageId);
             buf.append(" with ACKs for: ");
-            for (int i = 0; i < _fragmentsReceived.length; i++)
-                if (_fragmentsReceived[i])
+            for (int i = 0; i < _fragmentCount; i++) {
+                if (received(i))
                     buf.append(i).append(" ");
+            }
+            buf.append(" / ").append(_fragmentCount);
             return buf.toString();
         }
     }

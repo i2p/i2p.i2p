@@ -529,6 +529,26 @@ class UDPPacketReader {
         public int fragmentCount() { return _bitfieldSize * 7; }
         public boolean receivedComplete() { return false; }
 
+        /**
+         *  Number of fragments acked in this bitfield.
+         *  Faster than looping through received()
+         *  @since 0.9.16
+         */
+        public int ackCount() {
+            int rv = 0;
+            for (int i = _bitfieldStart; i < _bitfieldStart + _bitfieldSize; i++) {
+                byte b = _message[i];
+                if ((b & 0x7f) != 0) {
+                    for (int j = 0; j < 7; j++) {
+                        if ((b & 0x01) != 0)
+                            rv++;
+                        b >>= 1;
+                    }
+                }
+            }
+            return rv;
+        }
+
         public boolean received(int fragmentNum) {
             if ( (fragmentNum < 0) || (fragmentNum >= _bitfieldSize*7) )
                 return false;
