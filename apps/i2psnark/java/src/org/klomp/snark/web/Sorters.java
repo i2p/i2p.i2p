@@ -31,7 +31,7 @@ class Sorters {
      *<li>9: Up rate
      *<li>10: Remaining (needed)
      *<li>11: Upload ratio
-     *<li>11: File type
+     *<li>12: File type
      *</ul>
      *
      *  @param servlet for file type callback only
