@@ -666,7 +666,7 @@ public class DataHelper {
      * @param value non-negative
      */
     public static void toLong(byte target[], int offset, int numBytes, long value) throws IllegalArgumentException {
-        if (numBytes <= 0) throw new IllegalArgumentException("Invalid number of bytes");
+        if (numBytes <= 0 || numBytes > 8) throw new IllegalArgumentException("Invalid number of bytes");
         if (value < 0) throw new IllegalArgumentException("Negative value not allowed");
 
         for (int i = offset + numBytes - 1; i >= offset; i--) {
