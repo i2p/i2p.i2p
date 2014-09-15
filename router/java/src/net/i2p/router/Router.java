@@ -1070,7 +1070,7 @@ public class Router implements RouterClock.ClockShiftListener {
             return;
         _eventLog.addEvent(EventLog.CLOCK_SHIFT, Long.toString(delta));
         // update the routing key modifier
-        _context.routingKeyGenerator().generateDateBasedModData();
+        _context.routerKeyGenerator().generateDateBasedModData();
         if (_context.commSystem().countActivePeers() <= 0)
             return;
         if (delta > 0)

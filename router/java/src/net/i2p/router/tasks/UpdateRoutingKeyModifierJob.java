@@ -8,7 +8,7 @@ package net.i2p.router.tasks;
  *
  */
 
-import net.i2p.data.RoutingKeyGenerator;
+import net.i2p.data.router.RouterKeyGenerator;
 import net.i2p.router.JobImpl;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
@@ -33,7 +33,7 @@ public class UpdateRoutingKeyModifierJob extends JobImpl {
     public String getName() { return "Update Routing Key Modifier"; }
 
     public void runJob() {
-        RoutingKeyGenerator gen = getContext().routingKeyGenerator();
+        RouterKeyGenerator gen = getContext().routerKeyGenerator();
         // make sure we requeue quickly if just before midnight
         long delay = Math.max(5, Math.min(MAX_DELAY_FAILSAFE, gen.getTimeTillMidnight()));
         // TODO tell netdb if mod data changed?

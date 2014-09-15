@@ -13,6 +13,7 @@ import net.i2p.data.TunnelId;
 import net.i2p.data.i2np.DatabaseLookupMessage;
 import net.i2p.data.i2np.DatabaseStoreMessage;
 import net.i2p.data.router.RouterInfo;
+import net.i2p.data.router.RouterKeyGenerator;
 import net.i2p.router.Job;
 import net.i2p.router.JobImpl;
 import net.i2p.router.OutNetMessage;
@@ -176,16 +177,17 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
      */
     public void flood(DatabaseEntry ds) {
         Hash key = ds.getHash();
-        Hash rkey = _context.routingKeyGenerator().getRoutingKey(key);
+        RouterKeyGenerator gen = _context.routerKeyGenerator();
+        Hash rkey = gen.getRoutingKey(key);
         FloodfillPeerSelector sel = (FloodfillPeerSelector)getPeerSelector();
         List<Hash> peers = sel.selectFloodfillParticipants(rkey, MAX_TO_FLOOD, getKBuckets());
         // todo key cert skip?
-        long until = _context.routingKeyGenerator().getTimeTillMidnight();
+        long until = gen.getTimeTillMidnight();
         if (until < NEXT_RKEY_LS_ADVANCE_TIME ||
             (ds.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO && until < NEXT_RKEY_RI_ADVANCE_TIME)) {
-            // to avoid lookup failures after midnight, also flood to some closest to the
+            // to avoid lookup faulures after midnight, also flood to some closest to the
             // next routing key for a period of time before midnight.
-            Hash nkey = _context.routingKeyGenerator().getNextRoutingKey(key);
+            Hash nkey = gen.getNextRoutingKey(key);
             List<Hash> nextPeers = sel.selectFloodfillParticipants(nkey, NEXT_FLOOD_QTY, getKBuckets());
             int i = 0;
             for (Hash h : nextPeers) {

@@ -86,7 +86,6 @@ public class I2PAppContext {
     private SHA256Generator _sha;
     protected Clock _clock; // overridden in RouterContext
     private DSAEngine _dsa;
-    private RoutingKeyGenerator _routingKeyGenerator;
     private RandomSource _random;
     private KeyGenerator _keyGenerator;
     protected KeyRing _keyRing; // overridden in RouterContext
@@ -106,7 +105,6 @@ public class I2PAppContext {
     private volatile boolean _shaInitialized;
     protected volatile boolean _clockInitialized; // used in RouterContext
     private volatile boolean _dsaInitialized;
-    private volatile boolean _routingKeyGeneratorInitialized;
     private volatile boolean _randomInitialized;
     private volatile boolean _keyGeneratorInitialized;
     protected volatile boolean _keyRingInitialized; // used in RouterContext
@@ -126,7 +124,7 @@ public class I2PAppContext {
     private final Object _lock1 = new Object(), _lock2 = new Object(), _lock3 = new Object(), _lock4 = new Object(),
                          _lock5 = new Object(), _lock6 = new Object(), _lock7 = new Object(), _lock8 = new Object(),
                          _lock9 = new Object(), _lock10 = new Object(), _lock11 = new Object(), _lock12 = new Object(),
-                         _lock13 = new Object(), _lock14 = new Object(), _lock15 = new Object(), _lock16 = new Object(),
+                         _lock13 = new Object(), _lock14 = new Object(), _lock16 = new Object(),
                          _lock17 = new Object(), _lock18 = new Object(), _lock19 = new Object(), _lock20 = new Object();
 
     /**
@@ -851,19 +849,13 @@ public class I2PAppContext {
      * may want to test out how things react when peers don't agree on 
      * how to skew.
      *
+     * As of 0.9.16, returns null in I2PAppContext.
+     * You must be in RouterContext to get a generator.
+     *
+     * @return null always
      */
     public RoutingKeyGenerator routingKeyGenerator() {
-        if (!_routingKeyGeneratorInitialized)
-            initializeRoutingKeyGenerator();
-        return _routingKeyGenerator;
-    }
-
-    private void initializeRoutingKeyGenerator() {
-        synchronized (_lock15) {
-            if (_routingKeyGenerator == null)
-                _routingKeyGenerator = new RoutingKeyGenerator(this);
-            _routingKeyGeneratorInitialized = true;
-        }
+        return null;
     }
     
     /**
