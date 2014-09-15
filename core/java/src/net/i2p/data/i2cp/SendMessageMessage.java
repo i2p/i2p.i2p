@@ -101,9 +101,12 @@ public class SendMessageMessage extends I2CPMessageImpl {
         }
     }
 
+    /**
+     *  @throws UnsupportedOperationException always
+     */
     @Override
     protected byte[] doWriteMessage() throws I2CPMessageException, IOException {
-        throw new RuntimeException("wtf, dont run me");
+        throw new UnsupportedOperationException();
     }
 
     /**
