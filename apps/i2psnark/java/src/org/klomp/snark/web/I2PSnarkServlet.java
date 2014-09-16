@@ -186,6 +186,7 @@ public class I2PSnarkServlet extends BasicServlet {
                 super.doGet(req, resp);
             else  // no POST either
                 resp.sendError(405);
+            return;
         }
 
         _themePath = "/themes/snark/" + _manager.getTheme() + '/';

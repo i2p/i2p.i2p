@@ -1,3 +1,6 @@
+2014-09-16 zzz
+ * i2psnark: Don't send HTML-only headers for icons (2nd try)
+
 2014-09-13 zzz
  * i2ptunnel:
    - Fixes for stopping client tunnels
