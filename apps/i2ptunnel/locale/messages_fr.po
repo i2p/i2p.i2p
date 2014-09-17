@@ -9,14 +9,14 @@
 # foo <foo@bar>, 2009
 # Boxoa590, 2013
 # Boxoa590, 2012
-# Towatowa441, 2013-2014
+# Towinet, 2013-2014
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-02-06 18:27+0000\n"
-"PO-Revision-Date: 2014-05-11 17:33+0000\n"
-"Last-Translator: Towatowa441\n"
+"PO-Revision-Date: 2014-09-01 08:56+0000\n"
+"Last-Translator: Towinet\n"
 "Language-Team: French (http://www.transifex.com/projects/p/I2P/language/fr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -571,7 +571,7 @@ msgstr "Nom du site web"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:226
 msgid "(leave blank for outproxies)"
-msgstr "(laisser vide pour les mandataires sortants)"
+msgstr "(pour les mandataires sortants le laisser vide)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:231
 msgid "Private key file"
@@ -869,7 +869,7 @@ msgstr "Destination du tunnel"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:163
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:626
 msgid "Binding address and port"
-msgstr "Reliure (binding) adresse et port"
+msgstr "Adresse et port de reliure (binding)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:169
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:652
@@ -1090,7 +1090,7 @@ msgstr "Il s'agit du port sur lequel le service accepte les connexions."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:453
 msgid "This is the port that the client tunnel will be accessed from locally."
-msgstr "Il s'agit du port auquel le tunnel client sera accessible localement."
+msgstr "Il s'agit du port par lequel le tunnel client sera accessible localement."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:455
 msgid "This is also the client port for the HTTPBidir server tunnel."
@@ -1100,7 +1100,7 @@ msgstr "C'est aussi le port du client pour le serveur tunnel HTTPBidir."
 msgid ""
 "How do you want this tunnel to be accessed? By just this machine, your "
 "entire subnet, or external internet?"
-msgstr "Comment voulez-vous que ce tunnel soit accessible ? Par juste cette machine, votre sous-réseau entier, ou l'Internet externe?"
+msgstr "Comment voulez-vous que ce tunnel soit accessible ? Par cette machine seulement, votre sous-réseau entier, ou l'Internet externe ?"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:476
 msgid "You will most likely want to just allow 127.0.0.1"
@@ -1110,7 +1110,7 @@ msgstr "Vous souhaiterez probablement juste permettre 127.0.0.1"
 msgid ""
 "The I2P router can automatically start this tunnel for you when the router "
 "is started."
-msgstr "Le routeur I2P peut démarrer automatiquement ce tunnel pour vous lorsque le routeur est démarré."
+msgstr "Le routeur I2P peut démarrer automatiquement ce tunnel pour vous lors du démarrage du routeur."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:520
 msgid ""
@@ -1127,7 +1127,7 @@ msgstr "L'assistant a recueilli suffisamment d'informations pour créer votre tu
 msgid ""
 "Upon clicking the Save button below, the wizard will set up the tunnel, and "
 "take you back to the main I2PTunnel page."
-msgstr "Après avoir cliqué sur le bouton Enregistrer ci-dessous, l'assistant va configurer le tunnel et vous ramènera à la page principale I2PTunnel."
+msgstr "Après avoir cliqué sur le bouton Sauvegarder ci-dessous, l'assistant va configurer le tunnel et vous ramènera à la page principale d'I2PTunnel."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:553
 msgid ""

@@ -1,6 +1,9 @@
 2014-09-17 kytv
  * Updates to geoip.txt and geoipv6.dat.gz based on Maxmind GeoLite Country
    database from 2014-09-04.
+ * Translations:
+   - updates pulled from Transifex (cs, es, fi, fr, ja, nb, pl, ro, ru, uk)
+   - en po files updated and pushed to Transifex
 
 2014-09-16 zzz
  * i2psnark: Don't send HTML-only headers for icons (2nd try)
