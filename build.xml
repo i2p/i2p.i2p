@@ -1060,7 +1060,7 @@
 
     <target name="prepRouterInfos" depends="buildrouter" unless="no.bundle.routerInfos">
         <mkdir dir="pkg-temp/netDb" />
-        <java classname="net.i2p.router.networkdb.kademlia.PersistentDataStore" fork="true" failonerror="true">
+        <java classname="net.i2p.router.networkdb.kademlia.BundleRouterInfos" fork="true" failonerror="true">
             <classpath>
                 <pathelement location="build/i2p.jar" />
                 <pathelement location="build/router.jar" />
