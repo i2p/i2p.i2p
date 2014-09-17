@@ -186,21 +186,19 @@ public class I2PSnarkServlet extends BasicServlet {
                 super.doGet(req, resp);
             else  // no POST either
                 resp.sendError(405);
+            return;
         }
 
         _themePath = "/themes/snark/" + _manager.getTheme() + '/';
         _imgPath = _themePath + "images/";
-        resp.setHeader("X-Frame-Options", "SAMEORIGIN");
-        resp.setHeader("Content-Security-Policy", "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'");
-        resp.setHeader("X-XSS-Protection", "1; mode=block");
+        req.setCharacterEncoding("UTF-8");
 
         String pOverride = _manager.util().connected() ? null : "";
         String peerString = getQueryString(req, pOverride, null, null);
 
         // AJAX for mainsection
         if ("/.ajax/xhr1.html".equals(path)) {
-            resp.setCharacterEncoding("UTF-8");
-            resp.setContentType("text/html; charset=UTF-8");
+            setHTMLHeaders(resp);
             PrintWriter out = resp.getWriter();
             //if (_log.shouldLog(Log.DEBUG))
             //    _manager.addMessage((_context.clock().now() / 1000) + " xhr1 p=" + req.getParameter("p"));
@@ -218,9 +216,6 @@ public class I2PSnarkServlet extends BasicServlet {
                 // bypass the horrid Resource.getListHTML()
                 String pathInfo = req.getPathInfo();
                 String pathInContext = addPaths(path, pathInfo);
-                req.setCharacterEncoding("UTF-8");
-                resp.setCharacterEncoding("UTF-8");
-                resp.setContentType("text/html; charset=UTF-8");
                 File resource = getResource(pathInContext);
                 if (resource == null) {
                     resp.sendError(404);
@@ -231,6 +226,7 @@ public class I2PSnarkServlet extends BasicServlet {
                         // P-R-G
                         sendRedirect(req, resp, "");
                     } else if (listing != null) {
+                        setHTMLHeaders(resp);
                         resp.getWriter().write(listing);
                     } else { // shouldn't happen
                         resp.sendError(404);
@@ -250,10 +246,6 @@ public class I2PSnarkServlet extends BasicServlet {
 
         // Either the main page or /configure
 
-        req.setCharacterEncoding("UTF-8");
-        resp.setCharacterEncoding("UTF-8");
-        resp.setContentType("text/html; charset=UTF-8");
-        
         String nonce = req.getParameter("nonce");
         if (nonce != null) {
             if (nonce.equals(String.valueOf(_nonce)))
@@ -265,6 +257,7 @@ public class I2PSnarkServlet extends BasicServlet {
             return;	
         }
         
+        setHTMLHeaders(resp);
         PrintWriter out = resp.getWriter();
         out.write(DOCTYPE + "<html>\n" +
                   "<head><link rel=\"shortcut icon\" href=\"" + _themePath + "favicon.ico\">\n" +
@@ -364,6 +357,22 @@ public class I2PSnarkServlet extends BasicServlet {
             out.write("</div>\n");
         }
         out.write(FOOTER);
+    }
+
+    /**
+     *  The standard HTTP headers for all HTML pages
+     *
+     *  @since 0.9.16 moved from doGetAndPost()
+     */
+    private static void setHTMLHeaders(HttpServletResponse resp) {
+        resp.setCharacterEncoding("UTF-8");
+        resp.setContentType("text/html; charset=UTF-8");
+        resp.setHeader("Cache-Control", "no-store, max-age=0, no-cache, must-revalidate");
+        resp.setHeader("Content-Security-Policy", "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'");
+        resp.setDateHeader("Expires", 0);
+        resp.setHeader("Pragma", "no-cache");
+        resp.setHeader("X-Frame-Options", "SAMEORIGIN");
+        resp.setHeader("X-XSS-Protection", "1; mode=block");
     }
 
     private void writeMessages(PrintWriter out, boolean isConfigure, String peerString) throws IOException {
