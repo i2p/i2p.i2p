@@ -10,7 +10,10 @@ import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.router.peermanager.PeerProfile;
 import net.i2p.router.util.EventLog;
+import net.i2p.stat.Rate;
+import net.i2p.stat.RateStat;
 import net.i2p.util.Log;
+import net.i2p.util.SystemVersion;
 
 /**
  * Simple job to monitor the floodfill pool.
@@ -77,6 +80,10 @@ class FloodfillMonitorJob extends JobImpl {
             return false;
 
         // auto from here down
+
+        // ARM ElG decrypt is too slow
+        if (SystemVersion.isARM())
+            return false;
 
         // Only if up a while...
         if (getContext().router().getUptime() < MIN_UPTIME)
@@ -148,12 +155,22 @@ class FloodfillMonitorJob extends JobImpl {
                    happy = false;
             }
         }
-        
+
+        double elG = 0;
+        RateStat stat = getContext().statManager().getRate("crypto.elGamal.decrypt");
+        if (stat != null) {
+            Rate rate = stat.getRate(60*60*1000L);
+            if (rate != null) {
+                elG = rate.getAvgOrLifetimeAvg();
+                happy = happy && elG <= 40.0d;
+            }
+        }
+
         if (_log.shouldLog(Log.DEBUG)) {
             final RouterContext rc = getContext();
             final String log = String.format(
                     "FF criteria breakdown: happy=%b, capabilities=%s, maxLag=%d, known=%d, " +
-                    "active=%d, participating=%d, offset=%d, ssuAddr=%s",
+                    "active=%d, participating=%d, offset=%d, ssuAddr=%s ElG=%f",
                     happy, 
                     rc.router().getRouterInfo().getCapabilities(),
                     rc.jobQueue().getMaxLag(),
@@ -161,7 +178,8 @@ class FloodfillMonitorJob extends JobImpl {
                     rc.commSystem().countActivePeers(),
                     rc.tunnelManager().getParticipatingCount(),
                     Math.abs(rc.clock().getOffset()),
-                    rc.router().getRouterInfo().getTargetAddress("SSU").toString()
+                    rc.router().getRouterInfo().getTargetAddress("SSU").toString(),
+                    elG
                     );
             _log.debug(log);
         }
