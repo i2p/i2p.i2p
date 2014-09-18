@@ -776,6 +776,17 @@ public class NTCPTransport extends TransportImpl {
     }
 
     /**
+     * Return an unused DH key builder
+     * to be put back onto the queue for reuse.
+     *
+     * @param builder must not have a peerPublicValue set
+     * @since 0.9.16
+     */
+    void returnUnused(DHSessionKeyBuilder builder) {
+        _dhFactory.returnUnused(builder);
+    }
+
+    /**
      * how long from initial connection attempt (accept() or connect()) until
      * the con must be established to avoid premature close()ing
      */

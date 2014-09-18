@@ -436,6 +436,15 @@ public class DHSessionKeyBuilder {
          * or pulls a prebuilt one from the queue.
          */
         public DHSessionKeyBuilder getBuilder();
+
+        /**
+         * Return an unused DH key builder
+         * to be put back onto the queue for reuse.
+         *
+         * @param builder must not have a peerPublicValue set
+         * @since 0.9.16
+         */
+        public void returnUnused(DHSessionKeyBuilder builder);
     }
 
     public static class PrecalcRunner extends I2PThread implements Factory {
@@ -457,6 +466,7 @@ public class DHSessionKeyBuilder {
             ctx.statManager().createRateStat("crypto.dhGeneratePublicTime", "How long it takes to create x and X", "Encryption", new long[] { 60*60*1000 });
             //ctx.statManager().createRateStat("crypto.dhCalculateSessionTime", "How long it takes to create the session key", "Encryption", new long[] { 60*60*1000 });        
             ctx.statManager().createRateStat("crypto.DHUsed", "Need a DH from the queue", "Encryption", new long[] { 60*60*1000 });
+            ctx.statManager().createRateStat("crypto.DHReused", "Unused DH requeued", "Encryption", new long[] { 60*60*1000 });
             ctx.statManager().createRateStat("crypto.DHEmpty", "DH queue empty", "Encryption", new long[] { 60*60*1000 });
 
             // add to the defaults for every 128MB of RAM, up to 512MB
@@ -536,11 +546,11 @@ public class DHSessionKeyBuilder {
          * @since 0.9 moved from DHSKB
          */
         public DHSessionKeyBuilder getBuilder() {
-            _context.statManager().addRateData("crypto.DHUsed", 1, 0);
+            _context.statManager().addRateData("crypto.DHUsed", 1);
             DHSessionKeyBuilder builder = _builders.poll();
             if (builder == null) {
                 if (_log.shouldLog(Log.INFO)) _log.info("No more builders, creating one now");
-                _context.statManager().addRateData("crypto.DHEmpty", 1, 0);
+                _context.statManager().addRateData("crypto.DHEmpty", 1);
                 builder = precalc();
             }
             return builder;
@@ -551,7 +561,7 @@ public class DHSessionKeyBuilder {
             DHSessionKeyBuilder builder = new DHSessionKeyBuilder(_context);
             long end = System.currentTimeMillis();
             long diff = end - start;
-            _context.statManager().addRateData("crypto.dhGeneratePublicTime", diff, diff);
+            _context.statManager().addRateData("crypto.dhGeneratePublicTime", diff);
             if (diff > 1000) {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Took more than a second (" + diff + "ms) to generate local DH value");
@@ -559,6 +569,23 @@ public class DHSessionKeyBuilder {
                 if (_log.shouldLog(Log.DEBUG)) _log.debug("Took " + diff + "ms to generate local DH value");
             }
             return builder;
+        }
+
+        /**
+         * Return an unused DH key builder
+         * to be put back onto the queue for reuse.
+         *
+         * @param builder must not have a peerPublicValue set
+         * @since 0.9.16
+         */
+        public void returnUnused(DHSessionKeyBuilder builder) {
+            if (builder.getPeerPublicValue() != null) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("builder returned used");
+                return;
+            }
+            _context.statManager().addRateData("crypto.DHReused", 1);
+            _builders.offer(builder);
         }
 
         /** @return true if successful, false if full */
