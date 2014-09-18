@@ -124,14 +124,6 @@ public class DHSessionKeyBuilder {
         if (read != 256) {
             return null;
         }
-        if (1 == (Y[0] & 0x80)) {
-            // high bit set, need to inject an additional byte to keep 2s complement
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("High bit set");
-            byte Y2[] = new byte[257];
-            System.arraycopy(Y, 0, Y2, 1, 256);
-            Y = Y2;
-        }
         return new NativeBigInteger(1, Y);
     }
 ****/
@@ -217,17 +209,7 @@ public class DHSessionKeyBuilder {
     public void setPeerPublicValue(byte val[]) throws InvalidPublicParameterException {
         if (val.length != 256)
             throw new IllegalArgumentException("Peer public value must be exactly 256 bytes");
-
-        if (1 == (val[0] & 0x80)) {
-            // high bit set, need to inject an additional byte to keep 2s complement
-            //if (_log.shouldLog(Log.DEBUG))
-            //    _log.debug("High bit set");
-            byte val2[] = new byte[257];
-            System.arraycopy(val, 0, val2, 1, 256);
-            val = val2;
-        }
         setPeerPublicValue(new NativeBigInteger(1, val));
-        //_peerValue = new NativeBigInteger(val);
     }
 
     public synchronized BigInteger getPeerPublicValue() {
