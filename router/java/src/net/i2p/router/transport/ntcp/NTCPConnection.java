@@ -371,10 +371,21 @@ class NTCPConnection {
         }
     }
     
+    /**
+     *  Close and release EstablishState resources.
+     *  @param e may be null
+     *  @since 0.9.16
+     */
+    public void closeOnTimeout(String cause, Exception e) {
+        EstablishState es = _establishState;
+        close();
+        es.close(cause, e);
+    }
+
     private synchronized NTCPConnection locked_close(boolean allowRequeue) {
         if (_chan != null) try { _chan.close(); } catch (IOException ioe) { }
         if (_conKey != null) _conKey.cancel();
-        _establishState = EstablishState.VERIFIED;
+        _establishState = EstablishState.FAILED;
         NTCPConnection old = _transport.removeCon(this);
         _transport.getReader().connectionClosed(this);
         _transport.getWriter().connectionClosed(this);

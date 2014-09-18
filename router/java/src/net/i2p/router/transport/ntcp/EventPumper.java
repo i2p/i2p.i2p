@@ -532,14 +532,14 @@ class EventPumper implements Runnable {
                 con.outboundConnected();
                 _context.statManager().addRateData("ntcp.connectSuccessful", 1);
             } else {
-                con.close();
+                con.closeOnTimeout("connect failed", null);
                 _transport.markUnreachable(con.getRemotePeer().calculateHash());
                 _context.statManager().addRateData("ntcp.connectFailedTimeout", 1);
             }
         } catch (IOException ioe) {   // this is the usual failure path for a timeout or connect refused
             if (_log.shouldLog(Log.INFO))
                 _log.info("Failed outbound " + con, ioe);
-            con.close();
+            con.closeOnTimeout("connect failed", ioe);
             //_context.banlist().banlistRouter(con.getRemotePeer().calculateHash(), "Error connecting", NTCPTransport.STYLE);
             _transport.markUnreachable(con.getRemotePeer().calculateHash());
             _context.statManager().addRateData("ntcp.connectFailedTimeoutIOE", 1);

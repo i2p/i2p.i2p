@@ -64,6 +64,7 @@ import net.i2p.util.SimpleByteCache;
 class EstablishState {
     
     public static final VerifiedEstablishState VERIFIED = new VerifiedEstablishState();
+    public static final FailedEstablishState FAILED = new FailedEstablishState();
     
     private final RouterContext _context;
     private final Log _log;
@@ -120,7 +121,7 @@ class EstablishState {
     private static final int HXY_SIZE = 32;  //Hash.HASH_LENGTH;
     private static final int HXY_TSB_PAD_SIZE = HXY_SIZE + 4 + 12;  // 48
 
-    private State _state;
+    protected State _state;
 
     private enum State {
         OB_INIT,
@@ -163,7 +164,6 @@ class EstablishState {
         _transport = null;
         _con = null;
         _e_hXY_tsB = null;
-        _state = State.VERIFIED;
     }
 
     public EstablishState(RouterContext ctx, NTCPTransport transport, NTCPConnection con) {
@@ -900,6 +900,15 @@ class EstablishState {
      */
     public synchronized byte[] getExtraBytes() { return _extra; }
 
+    /**
+     *  Release resources on timeout.
+     *  @param e may be null
+     *  @since 0.9.16
+     */
+    public synchronized void close(String reason, Exception e) {
+        fail(reason, e);
+    }
+
     /** Caller must synch. */
     private void fail(String reason) { fail(reason, null); }
 
@@ -919,7 +928,10 @@ class EstablishState {
         releaseBufs();
     }
 
-    /** Only call once. Caller must synch. */
+    /**
+     *  Only call once. Caller must synch.
+     *  @since 0.9.16
+     */
     private void releaseBufs() {
         // null or longer for OB
         if (_prevEncrypted != null && _prevEncrypted.length == AES_SIZE)
@@ -927,8 +939,12 @@ class EstablishState {
         SimpleByteCache.release(_curEncrypted);
         SimpleByteCache.release(_curDecrypted);
         SimpleByteCache.release(_hX_xor_bobIdentHash);
-        SimpleByteCache.release(_X);
-        SimpleByteCache.release(_Y);
+        if (_dh.getPeerPublicValue() == null)
+            _transport.returnUnused(_dh);
+        if (_con.isInbound())
+            SimpleByteCache.release(_X);
+        else
+            SimpleByteCache.release(_Y);
     }
 
     public synchronized String getError() { return _err; }
@@ -1024,12 +1040,36 @@ class EstablishState {
      *  @since 0.9.8
      */
     private static class VerifiedEstablishState extends EstablishState {
-        @Override public boolean isComplete() { return true; }
+
+        public VerifiedEstablishState() {
+            super();
+            _state = State.VERIFIED;
+        }
+
         @Override public void prepareOutbound() {
             Log log =RouterContext.getCurrentContext().logManager().getLog(VerifiedEstablishState.class);
             log.warn("prepareOutbound() on verified state, doing nothing!");
         }
-        @Override public String toString() { return "VerfiedEstablishState";}
+
+        @Override public String toString() { return "VerifiedEstablishState";}
+    }
+
+    /**
+     *  @since 0.9.16
+     */
+    private static class FailedEstablishState extends EstablishState {
+
+        public FailedEstablishState() {
+            super();
+            _state = State.CORRUPT;
+        }
+
+        @Override public void prepareOutbound() {
+            Log log =RouterContext.getCurrentContext().logManager().getLog(VerifiedEstablishState.class);
+            log.warn("prepareOutbound() on verified state, doing nothing!");
+        }
+
+        @Override public String toString() { return "FailedEstablishState";}
     }
 
     /** @deprecated unused */
