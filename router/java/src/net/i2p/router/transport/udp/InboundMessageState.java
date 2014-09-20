@@ -89,7 +89,7 @@ class InboundMessageState implements CDQEntry {
      *
      * @return true if the data was ok, false if it was corrupt
      */
-    public boolean receiveFragment(UDPPacketReader.DataReader data, int dataFragment) {
+    public boolean receiveFragment(UDPPacketReader.DataReader data, int dataFragment) throws DataFormatException {
         int fragmentNum = data.readMessageFragmentNum(dataFragment);
         if ( (fragmentNum < 0) || (fragmentNum >= _fragments.length)) {
             if (_log.shouldLog(Log.WARN))
@@ -233,7 +233,6 @@ class InboundMessageState implements CDQEntry {
      */
     private static final class PartialBitfield implements ACKBitfield {
         private final long _bitfieldMessageId;
-        private final int _fragmentCount;
         private final int _ackCount;
         private final int _highestReceived;
         // bitfield, 1 for acked
@@ -241,7 +240,7 @@ class InboundMessageState implements CDQEntry {
         
         /**
          *  @param data each element is non-null or null for received or not
-         *  @param lastFragment size of data to use
+         *  @param size size of data to use
          */
         public PartialBitfield(long messageId, Object data[], int size) {
             if (size > MAX_FRAGMENTS)
@@ -258,7 +257,6 @@ class InboundMessageState implements CDQEntry {
                 }
             }
             _fragmentAcks = acks;
-            _fragmentCount = size;
             _ackCount = ackCount;
             _highestReceived = highestReceived;
         }
@@ -270,7 +268,7 @@ class InboundMessageState implements CDQEntry {
             return 1L << fragment;
         }
 
-        public int fragmentCount() { return _fragmentCount; }
+        public int fragmentCount() { return _highestReceived + 1; }
 
         public int ackCount() { return _ackCount; }
 
@@ -279,12 +277,12 @@ class InboundMessageState implements CDQEntry {
         public long getMessageId() { return _bitfieldMessageId; }
 
         public boolean received(int fragmentNum) { 
-            if (fragmentNum < 0 || fragmentNum >= _fragmentCount)
+            if (fragmentNum < 0 || fragmentNum > _highestReceived)
                 return false;
             return (_fragmentAcks & mask(fragmentNum)) != 0;
         }
 
-        public boolean receivedComplete() { return _ackCount == _fragmentCount; }
+        public boolean receivedComplete() { return _ackCount == _highestReceived + 1; }
         
         @Override
         public String toString() { 
@@ -293,11 +291,11 @@ class InboundMessageState implements CDQEntry {
             buf.append(_bitfieldMessageId);
             buf.append(" highest: ").append(_highestReceived);
             buf.append(" with ").append(_ackCount).append(" ACKs for: [");
-            for (int i = 0; i < _fragmentCount; i++) {
+            for (int i = 0; i <= _highestReceived; i++) {
                 if (received(i))
                     buf.append(i).append(' ');
             }
-            buf.append("] / ").append(_fragmentCount);
+            buf.append("] / ").append(_highestReceived + 1);
             return buf.toString();
         }
     }
