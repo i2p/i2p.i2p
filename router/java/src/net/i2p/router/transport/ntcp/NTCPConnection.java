@@ -266,6 +266,8 @@ class NTCPConnection {
     /** 
      * @param clockSkew alice's clock minus bob's clock in seconds (may be negative, obviously, but |val| should
      *                  be under 1 minute)
+     * @param prevWriteEnd exactly 16 bytes, not copied, do not corrupt
+     * @param prevReadEnd 16 or more bytes, last 16 bytes copied
      */
     public void finishInboundEstablishment(SessionKey key, long clockSkew, byte prevWriteEnd[], byte prevReadEnd[]) {
         NTCPConnection toClose = locked_finishInboundEstablishment(key, clockSkew, prevWriteEnd, prevReadEnd);
@@ -278,6 +280,12 @@ class NTCPConnection {
         enqueueInfoMessage();
     }
     
+    /** 
+     * @param clockSkew alice's clock minus bob's clock in seconds (may be negative, obviously, but |val| should
+     *                  be under 1 minute)
+     * @param prevWriteEnd exactly 16 bytes, not copied, do not corrupt
+     * @param prevReadEnd 16 or more bytes, last 16 bytes copied
+     */
     private synchronized NTCPConnection locked_finishInboundEstablishment(
             SessionKey key, long clockSkew, byte prevWriteEnd[], byte prevReadEnd[]) {
         _sessionKey = key;
@@ -582,6 +590,8 @@ class NTCPConnection {
     /** 
      * @param clockSkew alice's clock minus bob's clock in seconds (may be negative, obviously, but |val| should
      *                  be under 1 minute)
+     * @param prevWriteEnd exactly 16 bytes, not copied, do not corrupt
+     * @param prevReadEnd 16 or more bytes, last 16 bytes copied
      */
     public synchronized void finishOutboundEstablishment(SessionKey key, long clockSkew, byte prevWriteEnd[], byte prevReadEnd[]) {
         if (_log.shouldLog(Log.DEBUG))

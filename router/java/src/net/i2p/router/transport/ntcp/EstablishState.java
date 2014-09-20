@@ -640,9 +640,8 @@ class EstablishState {
                         prepareExtra(src);
                         byte nextWriteIV[] = _curEncrypted; // reuse buf
                         System.arraycopy(_prevEncrypted, _prevEncrypted.length-AES_SIZE, nextWriteIV, 0, AES_SIZE);
-                        byte nextReadIV[] = _curDecrypted;  // reuse buf
-                        System.arraycopy(_e_bobSig, _e_bobSig.length-AES_SIZE, nextReadIV, 0, nextReadIV.length);
-                        _con.finishOutboundEstablishment(_dh.getSessionKey(), (_tsA-_tsB), nextWriteIV, nextReadIV); // skew in seconds
+                        // this does not copy the nextWriteIV, do not release to cache
+                        _con.finishOutboundEstablishment(_dh.getSessionKey(), (_tsA-_tsB), nextWriteIV, _e_bobSig); // skew in seconds
                         releaseBufs();
                         // if socket gets closed this will be null - prevent NPE
                         InetAddress ia = _con.getChannel().socket().getInetAddress();
@@ -821,8 +820,9 @@ class EstablishState {
                 _con.setRemotePeer(_aliceIdent);
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug(prefix()+"e_bobSig is " + _e_bobSig.length + " bytes long");
-                byte iv[] = _curDecrypted;  // reuse buf
+                byte iv[] = _curEncrypted;  // reuse buf
                 System.arraycopy(_e_bobSig, _e_bobSig.length-AES_SIZE, iv, 0, AES_SIZE);
+                // this does not copy the IV, do not release to cache
                 _con.finishInboundEstablishment(_dh.getSessionKey(), (tsA-_tsB), iv, _prevEncrypted); // skew in seconds
                 releaseBufs();
                 if (_log.shouldLog(Log.INFO))
@@ -936,7 +936,10 @@ class EstablishState {
         // null or longer for OB
         if (_prevEncrypted != null && _prevEncrypted.length == AES_SIZE)
             SimpleByteCache.release(_prevEncrypted);
-        SimpleByteCache.release(_curEncrypted);
+        // Do not release _curEncrypted if verified, it is passed to
+        // NTCPConnection to use as the IV
+        if (_state != State.VERIFIED)
+            SimpleByteCache.release(_curEncrypted);
         SimpleByteCache.release(_curDecrypted);
         SimpleByteCache.release(_hX_xor_bobIdentHash);
         if (_dh.getPeerPublicValue() == null)
