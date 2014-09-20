@@ -365,12 +365,12 @@ public class SnarkManager implements CompleteListener {
     /**
      *  Migrate the old flat config file to the new config dir
      *  containing the config file minus the per-torrent entries,
-     *  the dht file, and 16 subdirs for per-torrent config files
+     *  the dht file, and 64 subdirs for per-torrent config files
      *  Caller must synch.
      *
      *  @return the new config directory, non-null
      *  @throws RuntimeException on creation fail
-     *  @since 0.9.11
+     *  @since 0.9.15
      */
     private File migrateConfig(File oldFile) {
         File dir = new SecureDirectory(oldFile + CONFIG_DIR_SUFFIX);
@@ -478,7 +478,7 @@ public class SnarkManager implements CompleteListener {
     /**
      *  The config for a torrent
      *  @return non-null, possibly empty
-     *  @since 0.9.11
+     *  @since 0.9.15
      */
     private Properties getConfig(Snark snark) {
         return getConfig(snark.getInfoHash());
@@ -488,7 +488,7 @@ public class SnarkManager implements CompleteListener {
      *  The config for a torrent
      *  @param ih 20-byte infohash
      *  @return non-null, possibly empty
-     *  @since 0.9.11
+     *  @since 0.9.15
      */
     private Properties getConfig(byte[] ih) {
         Properties rv = new OrderedProperties();
@@ -505,7 +505,7 @@ public class SnarkManager implements CompleteListener {
      *  The config file for a torrent
      *  @param confDir the config directory
      *  @param ih 20-byte infohash
-     *  @since 0.9.11
+     *  @since 0.9.15
      */
     private static File configFile(File confDir, byte[] ih) {
         String hex = I2PSnarkUtil.toHex(ih);
@@ -1507,7 +1507,7 @@ public class SnarkManager implements CompleteListener {
     /**
      * Get the base location for a torrent from the config file.
      * @return File or null, doesn't necessarily exist
-     * @since 0.9.11
+     * @since 0.9.15
      */
     private File getSavedBaseFile(byte[] ih) {
         Properties config = getConfig(ih);

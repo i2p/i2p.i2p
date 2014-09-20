@@ -744,7 +744,7 @@ public class Storage
   /**
    *  The base file or directory.
    *  @return the File
-   *  @since 0.9.11
+   *  @since 0.9.15
    */
   public File getBase() {
       return _base;
@@ -753,7 +753,7 @@ public class Storage
   /**
    *  Does not include directories. Unsorted.
    *  @return a new List
-   *  @since 0.9.11
+   *  @since 0.9.15
    */
   public List<File> getFiles() {
       List<File> rv = new ArrayList<File>(_torrentFiles.size());
@@ -767,8 +767,8 @@ public class Storage
    *  Includes the base for a multi-file torrent.
    *  Sorted bottom-up for easy deletion.
    *  Slow. Use for deletion only.
-   *  @since 0.9.11
    *  @return a new Set or null for a single-file torrent
+   *  @since 0.9.15
    */
   public SortedSet<File> getDirectories() {
       if (!_base.isDirectory())
