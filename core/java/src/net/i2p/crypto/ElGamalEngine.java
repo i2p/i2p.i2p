@@ -56,6 +56,9 @@ public class ElGamalEngine {
     private final Log _log;
     private final I2PAppContext _context;
     private final YKGenerator _ykgen;
+
+    private static final BigInteger ELGPM1 = CryptoConstants.elgp.subtract(BigInteger.ONE);
+
     
     /** 
      * The ElGamal engine should only be constructed and accessed through the 
@@ -171,9 +174,10 @@ public class ElGamalEngine {
             if (_log.shouldLog(Log.WARN)) _log.warn("Took too long to encrypt ElGamal block (" + diff + "ms)");
         }
 
-        _context.statManager().addRateData("crypto.elGamal.encrypt", diff, 0);
+        _context.statManager().addRateData("crypto.elGamal.encrypt", diff);
         return out;
     }
+
 
     /** Decrypt the data
      * @param encrypted encrypted data, must be exactly 514 bytes
@@ -184,26 +188,26 @@ public class ElGamalEngine {
      * @return unencrypted data or null on failure
      */
     public byte[] decrypt(byte encrypted[], PrivateKey privateKey) {
-        // actually it must be exactly 514 bytes or the arraycopy below will AIOOBE
-        if ((encrypted == null) || (encrypted.length > 514))
-            throw new IllegalArgumentException("Data to decrypt must be <= 514 bytes at the moment");
+        if ((encrypted == null) || (encrypted.length != 514))
+            throw new IllegalArgumentException("Data to decrypt must be exactly 514 bytes");
         long start = _context.clock().now();
 
-        byte[] ybytes = new byte[257];
-        byte[] dbytes = new byte[257];
-        System.arraycopy(encrypted, 0, ybytes, 0, 257);
-        System.arraycopy(encrypted, 257, dbytes, 0, 257);
-        BigInteger y = new NativeBigInteger(1, ybytes);
-        BigInteger d = new NativeBigInteger(1, dbytes);
         BigInteger a = new NativeBigInteger(1, privateKey.getData());
-        BigInteger y1p = CryptoConstants.elgp.subtract(BigInteger.ONE).subtract(a);
+        BigInteger y1p = ELGPM1.subtract(a);
+        // we use this buf first for Y, then for D, then for the hash
+        byte[] buf = SimpleByteCache.acquire(257);
+        System.arraycopy(encrypted, 0, buf, 0, 257);
+        BigInteger y = new NativeBigInteger(1, buf);
         BigInteger ya = y.modPow(y1p, CryptoConstants.elgp);
+        System.arraycopy(encrypted, 257, buf, 0, 257);
+        BigInteger d = new NativeBigInteger(1, buf);
         BigInteger m = ya.multiply(d);
         m = m.mod(CryptoConstants.elgp);
         byte val[] = m.toByteArray();
-        int i = 0;
-        for (i = 0; i < val.length; i++)
+        int i;
+        for (i = 0; i < val.length; i++) {
             if (val[i] != (byte) 0x00) break;
+        }
 
         int payloadLen = val.length - i - 1 - Hash.HASH_LENGTH;
         if (payloadLen < 0) {
@@ -220,10 +224,10 @@ public class ElGamalEngine {
         byte rv[] = new byte[payloadLen];
         System.arraycopy(val, i + 1 + Hash.HASH_LENGTH, rv, 0, rv.length);
 
-        byte[] calcHash = SimpleByteCache.acquire(Hash.HASH_LENGTH);
-        _context.sha().calculateHash(rv, 0, payloadLen, calcHash, 0);
-        boolean ok = DataHelper.eq(calcHash, 0, val, i + 1, Hash.HASH_LENGTH);
-        SimpleByteCache.release(calcHash);
+        // we reuse buf here for the calculated hash
+        _context.sha().calculateHash(rv, 0, payloadLen, buf, 0);
+        boolean ok = DataHelper.eq(buf, 0, val, i + 1, Hash.HASH_LENGTH);
+        SimpleByteCache.release(buf);
         
         long end = _context.clock().now();
 
@@ -233,7 +237,7 @@ public class ElGamalEngine {
                 _log.warn("Took too long to decrypt and verify ElGamal block (" + diff + "ms)");
         }
 
-        _context.statManager().addRateData("crypto.elGamal.decrypt", diff, 0);
+        _context.statManager().addRateData("crypto.elGamal.decrypt", diff);
 
         if (ok) {
             //_log.debug("Hash matches: " + DataHelper.toString(hash.getData(), hash.getData().length));
