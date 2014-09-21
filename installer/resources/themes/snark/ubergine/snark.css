@@ -366,6 +366,10 @@ table.snarkTorrents tbody tr:hover, table.snarkDirInfo tbody tr:hover {
      width: 16px;
 }
 
+td.snarkFileIcon:first-child {
+     text-align: center;
+}
+
 .snarkFileName {
      padding: 4px 0px !important; 
      text-align: left !important;
