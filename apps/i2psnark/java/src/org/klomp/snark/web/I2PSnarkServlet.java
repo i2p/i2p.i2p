@@ -3062,7 +3062,12 @@ public class I2PSnarkServlet extends BasicServlet {
             icon = "music";
         else if (mime.startsWith("video/"))
             icon = "film";
-        else if (mime.equals("application/zip") || mime.equals("application/x-gtar") ||
+        else if (mime.equals("application/zip")) {
+            if (plc.endsWith(".su3") || plc.endsWith(".su2") || plc.endsWith(".sud"))
+                icon = "itoopie_xxsm";
+            else
+                icon = "compress";
+        } else if (mime.equals("application/x-gtar") ||
                  mime.equals("application/compress") || mime.equals("application/gzip") ||
                  mime.equals("application/x-7z-compressed") || mime.equals("application/x-rar-compressed") ||
                  mime.equals("application/x-tar") || mime.equals("application/x-bzip2"))
