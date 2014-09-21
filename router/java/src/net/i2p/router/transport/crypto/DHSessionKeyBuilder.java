@@ -265,7 +265,7 @@ public class DHSessionKeyBuilder {
      * Side effect - sets extraExchangedBytes to the next 32 bytes.
      */
     private final SessionKey calculateSessionKey(BigInteger myPrivateValue, BigInteger publicPeerValue) {
-        //long start = System.currentTimeMillis();
+        long start = System.currentTimeMillis();
         SessionKey key = new SessionKey();
         BigInteger exchangedKey = publicPeerValue.modPow(myPrivateValue, CryptoConstants.elgp);
         // surprise! leading zero byte half the time!
@@ -294,10 +294,10 @@ public class DHSessionKeyBuilder {
             //    _log.debug("Storing " + remaining.length + " bytes from the end of the DH exchange");
         }
         key.setData(val);
-        //long end = System.currentTimeMillis();
-        //long diff = end - start;
+        long end = System.currentTimeMillis();
+        long diff = end - start;
         
-        //_context.statManager().addRateData("crypto.dhCalculateSessionTime", diff, diff);
+        I2PAppContext.getGlobalContext().statManager().addRateData("crypto.dhCalculateSessionTime", diff);
         //if (diff > 1000) {
         //    if (_log.shouldLog(Log.WARN)) _log.warn("Generating session key took too long (" + diff + " ms");
         //} else {
@@ -446,7 +446,7 @@ public class DHSessionKeyBuilder {
             _context = ctx;
             _log = ctx.logManager().getLog(DHSessionKeyBuilder.class);
             ctx.statManager().createRateStat("crypto.dhGeneratePublicTime", "How long it takes to create x and X", "Encryption", new long[] { 60*60*1000 });
-            //ctx.statManager().createRateStat("crypto.dhCalculateSessionTime", "How long it takes to create the session key", "Encryption", new long[] { 60*60*1000 });        
+            ctx.statManager().createRateStat("crypto.dhCalculateSessionTime", "How long it takes to create the session key", "Encryption", new long[] { 60*60*1000 });        
             ctx.statManager().createRateStat("crypto.DHUsed", "Need a DH from the queue", "Encryption", new long[] { 60*60*1000 });
             ctx.statManager().createRateStat("crypto.DHReused", "Unused DH requeued", "Encryption", new long[] { 60*60*1000 });
             ctx.statManager().createRateStat("crypto.DHEmpty", "DH queue empty", "Encryption", new long[] { 60*60*1000 });
