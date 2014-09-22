@@ -2611,6 +2611,10 @@ public class I2PSnarkServlet extends BasicServlet {
         if (showPriority) {
             buf.append("<form action=\"").append(base).append("\" method=\"POST\">\n");
             buf.append("<input type=\"hidden\" name=\"nonce\" value=\"").append(_nonce).append("\" >\n");
+            if (sortParam != null) {
+                buf.append("<input type=\"hidden\" name=\"sort\" value=\"")
+                   .append(DataHelper.stripHTML(sortParam)).append("\" >\n");
+            }
         }
         if (snark != null) {
             // first table - torrent info
@@ -2843,7 +2847,9 @@ public class I2PSnarkServlet extends BasicServlet {
         for (int i = 0; i < ls.length; i++) {
             fileList.add(new Sorters.FileAndIndex(ls[i], storage));
         }
-        if (fileList.size() > 1) {
+
+        boolean showSort = fileList.size() > 1;
+        if (showSort) {
             int sort = 0;
             if (sortParam != null) {
                 try {
@@ -2858,17 +2864,63 @@ public class I2PSnarkServlet extends BasicServlet {
         buf.append("<tr>\n")
            .append("<th colspan=2>");
         String tx = _("Directory");
-        toThemeImg(buf, "file", tx, tx + ": " + directory);
+        // cycle through sort by name or type
+        String sort;
+        boolean isTypeSort = false;
+        if (showSort) {
+            if (sortParam == null || "0".equals(sortParam) || "1".equals(sortParam)) {
+                sort = "-1";
+            } else if ("-1".equals(sortParam)) {
+                sort = "12";
+                isTypeSort = true;
+            } else if ("12".equals(sortParam)) {
+                sort = "-12";
+                isTypeSort = true;
+            } else {
+                sort = "";
+            }
+            buf.append("<a href=\"").append(base)
+               .append(getQueryString(sort)).append("\">");
+        }
+        toThemeImg(buf, "file", tx,
+                   showSort ? _("Sort by {0}", (isTypeSort ? _("File type") : _("Name")))
+                            : tx + ": " + directory);
+        if (showSort)
+            buf.append("</a>");
         buf.append("</th>\n<th align=\"right\">");
+        if (showSort) {
+            sort = ("5".equals(sortParam)) ? "-5" : "5";
+            buf.append("<a href=\"").append(base)
+               .append(getQueryString(sort)).append("\">");
+        }
         tx = _("Size");
-        toThemeImg(buf, "size", tx, tx);
+        toThemeImg(buf, "size", tx,
+                   showSort ? _("Sort by {0}", tx) : tx);
+        if (showSort)
+            buf.append("</a>");
         buf.append("</th>\n<th class=\"headerstatus\">");
+        if (showSort) {
+            sort = ("10".equals(sortParam)) ? "-10" : "10";
+            buf.append("<a href=\"").append(base)
+               .append(getQueryString(sort)).append("\">");
+        }
         tx = _("Status");
-        toThemeImg(buf, "status", tx, tx);
+        toThemeImg(buf, "status", tx,
+                   showSort ? _("Sort by {0}", _("Remaining")) : tx);
+        if (showSort)
+            buf.append("</a>");
         if (showPriority) {
             buf.append("</th>\n<th class=\"headerpriority\">");
+            if (showSort) {
+                sort = ("13".equals(sortParam)) ? "-13" : "13";
+                buf.append("<a href=\"").append(base)
+                   .append(getQueryString(sort)).append("\">");
+            }
             tx = _("Priority");
-            toThemeImg(buf, "priority", tx, tx);
+            toThemeImg(buf, "priority", tx,
+                       showSort ? _("Sort by {0}", tx) : tx);
+            if (showSort)
+                buf.append("</a>");
         }
         buf.append("</th>\n</tr>\n</thead>\n");
         buf.append("<tr><td colspan=\"" + (showPriority ? '5' : '4') + "\" class=\"ParentDir\"><A HREF=\"");
@@ -3014,6 +3066,17 @@ public class I2PSnarkServlet extends BasicServlet {
     }
 
     /**
+     *  @param null ok
+     *  @return query string or ""
+     *  @since 0.9.16
+     */
+    private static String getQueryString(String so) {
+        if (so != null && !so.equals(""))
+            return "?sort=" + DataHelper.stripHTML(so);
+        return "";
+    }
+
+    /**
      *  Pick an icon; try to catch the common types in an i2p environment.
      *
      *  @return file name not including ".png"
@@ -3147,7 +3210,7 @@ public class I2PSnarkServlet extends BasicServlet {
     private void toThemeImg(StringBuilder buf, String image, String altText, String titleText) {
         buf.append("<img alt=\"").append(altText).append("\" src=\"").append(_imgPath).append(image).append(".png\"");
         if (titleText.length() > 0)
-            buf.append(" title=\"").append(altText).append('"');
+            buf.append(" title=\"").append(titleText).append('"');
         buf.append('>');
     }
 

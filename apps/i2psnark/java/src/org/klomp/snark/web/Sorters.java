@@ -368,7 +368,7 @@ class Sorters {
             } else {
                 isDirectory = file.isDirectory();
                 remaining = -1;
-                priority = 0;
+                priority = -999;
             }
             length = isDirectory ? 0 : file.length();
         }
