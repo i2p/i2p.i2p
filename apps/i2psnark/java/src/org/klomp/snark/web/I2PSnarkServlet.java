@@ -221,7 +221,8 @@ public class I2PSnarkServlet extends BasicServlet {
                     resp.sendError(404);
                 } else {
                     String base = addPaths(req.getRequestURI(), "/");
-                    String listing = getListHTML(resource, base, true, method.equals("POST") ? req.getParameterMap() : null);
+                    String listing = getListHTML(resource, base, true, method.equals("POST") ? req.getParameterMap() : null,
+                                                 req.getParameter("sort"));
                     if (method.equals("POST")) {
                         // P-R-G
                         sendRedirect(req, resp, "");
@@ -2493,23 +2494,6 @@ public class I2PSnarkServlet extends BasicServlet {
 
     private static final String FOOTER = "</div></center></body></html>";
 
-    /**
-     *  Sort alphabetically in current locale, ignore case,
-     *  directories first
-     *  @since 0.9.6
-     */
-    private static class ListingComparator implements Comparator<File>, Serializable {
-
-        public int compare(File l, File r) {
-            boolean ld = l.isDirectory();
-            boolean rd = r.isDirectory();
-            if (ld && !rd)
-                return -1;
-            if (rd && !ld)
-                return 1;
-            return Collator.getInstance().compare(l.getName(), r.getName());
-        }
-    }
 
     /**
      * Modded heavily from the Jetty version in Resource.java,
@@ -2538,10 +2522,11 @@ public class I2PSnarkServlet extends BasicServlet {
      * @param base The encoded base URL
      * @param parent True if the parent directory should be included
      * @param postParams map of POST parameters or null if not a POST
+     * @param sortParam may be null
      * @return String of HTML or null if postParams != null
      * @since 0.7.14
      */
-    private String getListHTML(File xxxr, String base, boolean parent, Map<String, String[]> postParams)
+    private String getListHTML(File xxxr, String base, boolean parent, Map<String, String[]> postParams, String sortParam)
         throws IOException
     {
         String decodedBase = decodePath(base);
@@ -2845,13 +2830,27 @@ public class I2PSnarkServlet extends BasicServlet {
         File[] ls = null;
         if (r.isDirectory()) {
             ls = r.listFiles();
-            Arrays.sort(ls, new ListingComparator());
         }  // if r is not a directory, we are only showing torrent info section
         
         if (ls == null) {
             // We are only showing the torrent info section
             buf.append("</div></div></BODY></HTML>");
             return buf.toString();
+        }
+
+        Storage storage = snark != null ? snark.getStorage() : null;
+        List<Sorters.FileAndIndex> fileList = new ArrayList<Sorters.FileAndIndex>(ls.length);
+        for (int i = 0; i < ls.length; i++) {
+            fileList.add(new Sorters.FileAndIndex(ls[i], storage));
+        }
+        if (fileList.size() > 1) {
+            int sort = 0;
+            if (sortParam != null) {
+                try {
+                    sort = Integer.parseInt(sortParam);
+                } catch (NumberFormatException nfe) {}
+            }
+            Collections.sort(fileList, Sorters.getFileComparator(sort, this));
         }
 
         // second table - dir info
@@ -2884,25 +2883,27 @@ public class I2PSnarkServlet extends BasicServlet {
         //DateFormat dfmt=DateFormat.getDateTimeInstance(DateFormat.MEDIUM,
         //                                               DateFormat.MEDIUM);
         boolean showSaveButton = false;
-        for (int i=0 ; i< ls.length ; i++)
+        boolean rowEven = true;
+        for (Sorters.FileAndIndex fai : fileList)
         {   
             //String encoded = encodePath(ls[i].getName());
             // bugfix for I2P - Backport from Jetty 6 (zero file lengths and last-modified times)
             // http://jira.codehaus.org/browse/JETTY-361?page=com.atlassian.jira.plugin.system.issuetabpanels%3Achangehistory-tabpanel#issue-tabs
             // See resource.diff attachment
             //Resource item = addPath(encoded);
-            File item = ls[i];
+            File item = fai.file;
             
-            String rowClass = (i % 2 == 0 ? "snarkTorrentEven" : "snarkTorrentOdd");
+            String rowClass = (rowEven ? "snarkTorrentEven" : "snarkTorrentOdd");
+            rowEven = !rowEven;
             buf.append("<TR class=\"").append(rowClass).append("\">");
             
             // Get completeness and status string
             boolean complete = false;
             String status = "";
             long length = item.length();
-            int fileIndex = -1;
+            int fileIndex = fai.index;
             int priority = 0;
-            if (item.isDirectory()) {
+            if (fai.isDirectory) {
                 complete = true;
                 //status = toImg("tick") + ' ' + _("Directory");
             } else {
@@ -2911,10 +2912,8 @@ public class I2PSnarkServlet extends BasicServlet {
                     complete = true;
                     status = toImg("cancel") + ' ' + _("Torrent not found?");
                 } else {
-                    Storage storage = snark.getStorage();
-                    fileIndex = storage.indexOf(item);
 
-                            long remaining = storage.remaining(fileIndex);
+                            long remaining = fai.remaining;
                             if (remaining < 0) {
                                 complete = true;
                                 status = toImg("cancel") + ' ' + _("File not found in torrent?");
@@ -2922,7 +2921,7 @@ public class I2PSnarkServlet extends BasicServlet {
                                 complete = true;
                                 status = toImg("tick") + ' ' + _("Complete");
                             } else {
-                                priority = storage.getPriority(fileIndex);
+                                priority = fai.priority;
                                 if (priority < 0)
                                     status = toImg("cancel");
                                 else if (priority == 0)
@@ -2937,7 +2936,7 @@ public class I2PSnarkServlet extends BasicServlet {
                 }
             }
 
-            String path = addPaths(decodedBase, ls[i].getName());
+            String path = addPaths(decodedBase, item.getName());
             if (item.isDirectory() && !path.endsWith("/"))
                 path=addPaths(path,"/");
             path = encodePath(path);

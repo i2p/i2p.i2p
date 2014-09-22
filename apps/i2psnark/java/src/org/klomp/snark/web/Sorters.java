@@ -1,5 +1,6 @@
 package org.klomp.snark.web;
 
+import java.io.File;
 import java.io.Serializable;
 import java.text.Collator;
 import java.util.Collections;
@@ -8,6 +9,7 @@ import java.util.Locale;
 
 import org.klomp.snark.MetaInfo;
 import org.klomp.snark.Snark;
+import org.klomp.snark.Storage;
 
 /**
  *  Comparators for various columns
@@ -336,6 +338,194 @@ class Sorters {
                 return "1";
             // arbitrary sort based on icon name
             return servlet.toIcon(meta.getName());
+        }
+    }
+
+    ////////////// Comparators for details page below
+
+    /**
+     *  Class to precompute and efficiently sort data
+     *  on a torrent file entry.
+     */
+    public static class FileAndIndex {
+        public final File file;
+        public final boolean isDirectory;
+        public final long length;
+        public final long remaining;
+        public final int priority;
+        public final int index;
+
+        /**
+         *  @param storage may be null
+         */
+        public FileAndIndex(File file, Storage storage) {
+            this.file = file;
+            index = storage != null ? storage.indexOf(file) : -1;
+            if (index >= 0) {
+                isDirectory = false;
+                remaining = storage.remaining(index);
+                priority = storage.getPriority(index);
+            } else {
+                isDirectory = file.isDirectory();
+                remaining = -1;
+                priority = 0;
+            }
+            length = isDirectory ? 0 : file.length();
+        }
+    }
+
+
+    /**
+     *  Negative is reverse
+     *
+     *<ul>
+     *<li>0, 1: Name
+     *<li>5: Size
+     *<li>10: Remaining (needed)
+     *<li>12: File type
+     *<li>13: Priority
+     *</ul>
+     *
+     *  @param servlet for file type callback only
+     */
+    public static Comparator<FileAndIndex> getFileComparator(int type, I2PSnarkServlet servlet) {
+        boolean rev = type < 0;
+        Comparator<FileAndIndex> rv;
+
+        switch (type) {
+
+          case -1:
+          case 0:
+          case 1:
+          default:
+              rv = new FileNameComparator();
+              if (rev)
+                  rv = Collections.reverseOrder(rv);
+              break;
+
+          case -5:
+          case 5:
+              rv = new FAISizeComparator(rev);
+              break;
+
+          case -10:
+          case 10:
+              rv = new FAIRemainingComparator(rev);
+              break;
+
+          case -12:
+          case 12:
+              rv = new FAITypeComparator(rev, servlet);
+              break;
+
+          case -13:
+          case 13:
+              rv = new FAIPriorityComparator(rev);
+              break;
+
+        }
+        return rv;
+    }
+
+    /**
+     *  Sort alphabetically in current locale, ignore case,
+     *  directories first
+     *  @since 0.9.6 moved from I2PSnarkServlet in 0.9.16
+     */
+    private static class FileNameComparator implements Comparator<FileAndIndex>, Serializable {
+
+        public int compare(FileAndIndex l, FileAndIndex r) {
+            return comp(l, r);
+        }
+
+        public static int comp(FileAndIndex l, FileAndIndex r) {
+            boolean ld = l.isDirectory;
+            boolean rd = r.isDirectory;
+            if (ld && !rd)
+                return -1;
+            if (rd && !ld)
+                return 1;
+            return Collator.getInstance().compare(l.file.getName(), r.file.getName());
+        }
+    }
+
+    /**
+     *  Forward or reverse sort, but the fallback is always forward
+     */
+    private static abstract class FAISort implements Comparator<FileAndIndex>, Serializable {
+
+        private final boolean _rev;
+
+        public FAISort(boolean rev) {
+            _rev = rev;
+        }
+
+        public int compare(FileAndIndex l, FileAndIndex r) {
+            int rv = compareIt(l, r);
+            if (rv != 0)
+                return _rev ? 0 - rv : rv;
+            return FileNameComparator.comp(l, r);
+        }
+
+        protected abstract int compareIt(FileAndIndex l, FileAndIndex r);
+
+        protected static int compLong(long l, long r) {
+            if (l < r)
+                return -1;
+            if (l > r)
+                return 1;
+            return 0;
+        }
+    }
+
+    private static class FAIRemainingComparator extends FAISort {
+
+        public FAIRemainingComparator(boolean rev) { super(rev); }
+
+        public int compareIt(FileAndIndex l, FileAndIndex r) {
+            return compLong(l.remaining, r.remaining);
+        }
+    }
+
+    private static class FAISizeComparator extends FAISort {
+
+        public FAISizeComparator(boolean rev) { super(rev); }
+
+        public int compareIt(FileAndIndex l, FileAndIndex r) {
+            return compLong(l.length, r.length);
+        }
+    }
+
+    private static class FAITypeComparator extends FAISort {
+
+        private final I2PSnarkServlet servlet;
+
+        public FAITypeComparator(boolean rev, I2PSnarkServlet servlet) {
+            super(rev);
+            this.servlet = servlet;
+        }
+
+        public int compareIt(FileAndIndex l, FileAndIndex r) {
+            String ls = toName(l);
+            String rs = toName(r);
+            return ls.compareTo(rs);
+        }
+
+        private String toName(FileAndIndex fai) {
+            if (fai.isDirectory)
+                return "0";
+            // arbitrary sort based on icon name
+            return servlet.toIcon(fai.file.getName());
+        }
+    }
+
+    private static class FAIPriorityComparator extends FAISort {
+
+        public FAIPriorityComparator(boolean rev) { super(rev); }
+
+        /** highest first */
+        public int compareIt(FileAndIndex l, FileAndIndex r) {
+            return r.priority - l.priority;
         }
     }
 }
