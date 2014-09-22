@@ -125,17 +125,19 @@ public class JaxpParser extends Parser
 			factory.setNamespaceAware(true);
 			factory.setExpandEntityReferences(false);
 			try {
-			    factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
-			} catch (ParserConfigurationException pce) {}
-			try {
-			    factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-			} catch (ParserConfigurationException pce) {}
-			try {
-			    factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
-			} catch (ParserConfigurationException pce) {}
-			try {
-			    factory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
-			} catch (ParserConfigurationException pce) {}
+				try {
+				    factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+				} catch (ParserConfigurationException pce) {}
+				try {
+				    factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+				} catch (ParserConfigurationException pce) {}
+				try {
+				    factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+				} catch (ParserConfigurationException pce) {}
+				try {
+				    factory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+				} catch (ParserConfigurationException pce) {}
+			} catch (AbstractMethodError ame) {}   // FreeBSD
 			DocumentBuilder builder = factory.newDocumentBuilder();
 			builder.setEntityResolver(new BlankingResolver());
 			InputSource inSrc = new InputSource(new NullFilterInputStream(inStream));

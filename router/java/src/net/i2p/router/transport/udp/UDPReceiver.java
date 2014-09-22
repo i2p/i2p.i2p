@@ -281,6 +281,8 @@ class UDPReceiver {
                             _log.warn("Error receiving", ioe);
                     //}
                     packet.release();
+                    // TODO count consecutive errors, give up after too many?
+                    try { Thread.sleep(100); } catch (InterruptedException ie) {}
                 }
             }
             if (_log.shouldLog(Log.DEBUG))

@@ -1,3 +1,7 @@
+2014-09-22 zzz
+ * SSU: Fix 100% CPU after socket failure
+ * UPnP: Catch reported error on FreeBSD
+
 * 2014-09-20 0.9.15 released
 
 2014-09-17 kytv
