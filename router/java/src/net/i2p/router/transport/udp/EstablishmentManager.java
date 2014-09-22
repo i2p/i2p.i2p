@@ -1363,6 +1363,7 @@ class EstablishmentManager {
             _transport.markUnreachable(peer);
             _transport.dropPeer(peer, false, err);
             //_context.profileManager().commErrorOccurred(peer);
+            outboundState.fail();
         } else {
             OutNetMessage msg;
             while ((msg = outboundState.getNextQueuedMessage()) != null) {

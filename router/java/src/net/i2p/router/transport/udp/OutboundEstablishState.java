@@ -201,14 +201,16 @@ class OutboundEstablishState {
     /** caller must synch - only call once */
     private void prepareSessionRequest() {
         _keyBuilder = _keyFactory.getBuilder();
-        _sentX = new byte[UDPPacketReader.SessionRequestReader.X_LENGTH];
         byte X[] = _keyBuilder.getMyPublicValue().toByteArray();
-        if (X.length == 257)
+        if (X.length == 257) {
+            _sentX = new byte[256];
             System.arraycopy(X, 1, _sentX, 0, _sentX.length);
-        else if (X.length == 256)
-            System.arraycopy(X, 0, _sentX, 0, _sentX.length);
-        else
+        } else if (X.length == 256) {
+            _sentX = X;
+        } else {
+            _sentX = new byte[256];
             System.arraycopy(X, 0, _sentX, _sentX.length - X.length, X.length);
+        }
     }
 
     public synchronized byte[] getSentX() {
@@ -219,7 +221,7 @@ class OutboundEstablishState {
         return _sentX;
     }
 
-    /**
+    /**x
      * The remote side (Bob) - note that in some places he's called Charlie.
      * Warning - may change after introduction. May be null before introduction.
      */
@@ -339,6 +341,11 @@ class OutboundEstablishState {
         _receivedEncryptedSignature = null;
         _receivedIV = null;
         _receivedSignature = null;
+        if (_keyBuilder != null) {
+            if (_keyBuilder.getPeerPublicValue() == null)
+                _keyFactory.returnUnused(_keyBuilder);
+            _keyBuilder = null;
+        }
         // sure, there's a chance the packet was corrupted, but in practice
         // this means that Bob doesn't know his external port, so give up.
         _currentState = OutboundState.OB_STATE_VALIDATION_FAILED;
