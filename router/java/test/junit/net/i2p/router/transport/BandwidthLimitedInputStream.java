@@ -12,7 +12,7 @@ import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import net.i2p.data.RouterIdentity;
+import net.i2p.data.router.RouterIdentity;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
 

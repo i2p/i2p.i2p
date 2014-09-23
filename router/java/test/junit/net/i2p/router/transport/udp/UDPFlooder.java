@@ -3,7 +3,7 @@ package net.i2p.router.transport.udp;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.i2p.data.RouterInfo;
+import net.i2p.data.router.RouterInfo;
 import net.i2p.data.i2np.DataMessage;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.router.OutNetMessage;

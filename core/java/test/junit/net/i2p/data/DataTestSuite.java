@@ -23,9 +23,6 @@ public class DataTestSuite {
         suite.addTestSuite(PayloadTest.class);
         suite.addTestSuite(PrivateKeyTest.class);
         suite.addTestSuite(PublicKeyTest.class);
-        suite.addTestSuite(RouterAddressTest.class);
-        suite.addTestSuite(RouterIdentityTest.class);
-        suite.addTestSuite(RouterInfoTest.class);
         suite.addTestSuite(SessionKeyTest.class);
         suite.addTestSuite(SignatureTest.class);
         suite.addTestSuite(SigningPrivateKeyTest.class);
