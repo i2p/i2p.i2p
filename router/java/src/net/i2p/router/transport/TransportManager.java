@@ -22,8 +22,8 @@ import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 
 import net.i2p.data.Hash;
-import net.i2p.data.RouterAddress;
-import net.i2p.data.RouterIdentity;
+import net.i2p.data.router.RouterAddress;
+import net.i2p.data.router.RouterIdentity;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.router.CommSystemFacade;
 import net.i2p.router.OutNetMessage;
@@ -59,6 +59,7 @@ public class TransportManager implements TransportEventListener {
         _context = context;
         _log = _context.logManager().getLog(TransportManager.class);
         _context.statManager().createRateStat("transport.banlistOnUnreachable", "Add a peer to the banlist since none of the transports can reach them", "Transport", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
+        _context.statManager().createRateStat("transport.banlistOnUsupportedSigType", "Add a peer to the banlist since signature type is unsupported", "Transport", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("transport.noBidsYetNotAllUnreachable", "Add a peer to the banlist since none of the transports can reach them", "Transport", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("transport.bidFailBanlisted", "Could not attempt to bid on message, as they were banlisted", "Transport", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("transport.bidFailSelf", "Could not attempt to bid on message, as it targeted ourselves", "Transport", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
@@ -499,8 +500,11 @@ public class TransportManager implements TransportEventListener {
             }
         }
         if (unreachableTransports >= _transports.size()) {
-            // Don't banlist if we aren't talking to anybody, as we may have a network connection issue
-            if (unreachableTransports >= _transports.size() && countActivePeers() > 0) {
+            if (msg.getTarget().getIdentity().getSigningPublicKey().getType() == null) {
+                _context.statManager().addRateData("transport.banlistOnUnsupportedSigType", 1);
+                _context.banlist().banlistRouterForever(peer, _x("Unsupported signature type"));
+            } else if (unreachableTransports >= _transports.size() && countActivePeers() > 0) {
+                // Don't banlist if we aren't talking to anybody, as we may have a network connection issue
                 _context.statManager().addRateData("transport.banlistOnUnreachable", msg.getLifetime(), msg.getLifetime());
                 _context.banlist().banlistRouter(peer, _x("Unreachable on any transport"));
             }

@@ -64,10 +64,11 @@ class ConfigParser {
         if (inputLine.startsWith(";")) {
             return "";
         }
-        if (inputLine.split("#").length > 0) {
-            return inputLine.split("#")[0];
+        int hash = inputLine.indexOf('#');
+        if (hash >= 0) {
+            return inputLine.substring(0, hash);
         } else {
-            return "";
+            return inputLine;
         }
     }
 

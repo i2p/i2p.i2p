@@ -242,6 +242,9 @@ class PeerState {
     private static final int MINIMUM_WINDOW_BYTES = DEFAULT_SEND_WINDOW_BYTES;
     private static final int MAX_SEND_WINDOW_BYTES = 1024*1024;
 
+    /** max number of msgs returned from allocateSend() */
+    private static final int MAX_ALLOCATE_SEND = 2;
+
     /**
      *  Was 32 before 0.9.2, but since the streaming lib goes up to 128,
      *  we would just drop our own msgs right away during slow start.
@@ -1032,7 +1035,7 @@ class PeerState {
      *            no full bitfields are included.
      */
     void fetchPartialACKs(List<ACKBitfield> rv) {
-        InboundMessageState states[] = null;
+        List<InboundMessageState> states = null;
         int curState = 0;
         synchronized (_inboundMessages) {
             int numMessages = _inboundMessages.size();
@@ -1049,17 +1052,17 @@ class PeerState {
                 } else {
                     if (!state.isComplete()) {
                         if (states == null)
-                            states = new InboundMessageState[numMessages];
-                        states[curState++] = state;
+                            states = new ArrayList<InboundMessageState>(numMessages);
+                        states.add(state);
                     }
                 }
             }
         }
         if (states != null) {
-            // _inboundMessages is a Map (unordered), so why bother going backwards?
-            for (int i = curState-1; i >= 0; i--) {
-                if (states[i] != null)
-                    rv.add(states[i].createACKBitfield());
+            for (InboundMessageState ims : states) {
+                ACKBitfield abf = ims.createACKBitfield();
+                if (!abf.receivedComplete())
+                    rv.add(abf);
             }
         }
     }
@@ -1072,7 +1075,9 @@ class PeerState {
 
         public FullACKBitfield(long id) { _msgId = id; }
 
-        public int fragmentCount() { return 0; }
+        public int fragmentCount() { return 1; }
+        public int ackCount() { return 1; }
+        public int highestReceived() { return 0; }
         public long getMessageId() { return _msgId; }
         public boolean received(int fragmentNum) { return true; }
         public boolean receivedComplete() { return true; }
@@ -1084,7 +1089,7 @@ class PeerState {
             return _msgId == ((ACKBitfield)o).getMessageId();
         }
         @Override
-        public String toString() { return "Full ACK of " + _msgId; }
+        public String toString() { return "Full ACK " + _msgId; }
     }
         
     /**
@@ -1538,7 +1543,6 @@ class PeerState {
         for (int i = 0; succeeded != null && i < succeeded.size(); i++) {
             OutboundMessageState state = succeeded.get(i);
             _transport.succeeded(state);
-            state.releaseResources();
             OutNetMessage msg = state.getMessage();
             if (msg != null)
                 msg.timestamp("sending complete");
@@ -1556,22 +1560,22 @@ class PeerState {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Unable to send a direct message: " + state);
             }
-            state.releaseResources();
         }
         
         return rv + _outboundQueue.size();
     }
     
     /**
-     * Pick a message we want to send and allocate it out of our window
+     * Pick one or more messages we want to send and allocate them out of our window
      * High usage -
      * OutboundMessageFragments.getNextVolley() calls this 2nd, if finishMessages() returned > 0.
      * TODO combine finishMessages(), allocateSend(), and getNextDelay() so we don't iterate 3 times.
      *
-     * @return allocated message to send, or null if no messages or no resources
+     * @return allocated messages to send (never empty), or null if no messages or no resources
      */
-    public OutboundMessageState allocateSend() {
+    public List<OutboundMessageState> allocateSend() {
         if (_dead) return null;
+        List<OutboundMessageState> rv = null;
         synchronized (_outboundMessages) {
             for (OutboundMessageState state : _outboundMessages) {
                 // We have 3 return values, because if allocateSendingBytes() returns false,
@@ -1588,44 +1592,54 @@ class PeerState {
                             msg.timestamp("not reached for allocation " + msgs.size() + " other peers");
                     }
                      */
-                    return state;
+                    if (rv == null)
+                        rv = new ArrayList<OutboundMessageState>(MAX_ALLOCATE_SEND);
+                    rv.add(state);
+                    if (rv.size() >= MAX_ALLOCATE_SEND)
+                        return rv;
                 } else if (should == ShouldSend.NO_BW) {
                     // no more bandwidth available
                     // we don't bother looking for a smaller msg that would fit.
                     // By not looking further, we keep strict sending order, and that allows
                     // some efficiency in acked() below.
-                    if (_log.shouldLog(Log.DEBUG))
+                    if (rv == null && _log.shouldLog(Log.DEBUG))
                         _log.debug("Nothing to send (BW) to " + _remotePeer + ", with " + _outboundMessages.size() +
                                    " / " + _outboundQueue.size() + " remaining");
-                    return null;
+                    return rv;
                 } /* else {
                     OutNetMessage msg = state.getMessage();
                     if (msg != null)
                         msg.timestamp("passed over for allocation with " + msgs.size() + " peers");
                 } */
             }
+
             // Peek at head of _outboundQueue and see if we can send it.
             // If so, pull it off, put it in _outbundMessages, test
             // again for bandwidth if necessary, and return it.
-            OutboundMessageState state = _outboundQueue.peek();
-            if (state != null && ShouldSend.YES == locked_shouldSend(state)) {
+            OutboundMessageState state;
+            while ((state = _outboundQueue.peek()) != null &&
+                   ShouldSend.YES == locked_shouldSend(state)) {
                 // we could get a different state, or null, when we poll,
                 // due to AQM drops, so we test again if necessary
                 OutboundMessageState dequeuedState = _outboundQueue.poll();
                 if (dequeuedState != null) {
                     _outboundMessages.add(dequeuedState);
-                    if (dequeuedState == state || ShouldSend.YES == locked_shouldSend(dequeuedState)) {
+                    if (dequeuedState == state || ShouldSend.YES == locked_shouldSend(state)) {
                         if (_log.shouldLog(Log.DEBUG))
                             _log.debug("Allocate sending (NEW) to " + _remotePeer + ": " + dequeuedState.getMessageId());
-                        return dequeuedState;
+                        if (rv == null)
+                            rv = new ArrayList<OutboundMessageState>(MAX_ALLOCATE_SEND);
+                        rv.add(state);
+                        if (rv.size() >= MAX_ALLOCATE_SEND)
+                            return rv;
                     }
                 }
             }
         }
-        if (_log.shouldLog(Log.DEBUG))
+        if ( rv == null && _log.shouldLog(Log.DEBUG))
             _log.debug("Nothing to send to " + _remotePeer + ", with " + _outboundMessages.size() +
                        " / " + _outboundQueue.size() + " remaining");
-        return null;
+        return rv;
     }
     
     /**
@@ -1694,9 +1708,9 @@ class PeerState {
      *  how much payload data can we shove in there?
      *  @return MTU - 87, i.e. 533 or 1397 (IPv4), MTU - 107 (IPv6)
      */
-    private int fragmentSize() {
+    public int fragmentSize() {
         // 46 + 20 + 8 + 13 = 74 + 13 = 87 (IPv4)
-        // 46 + 40 + 8 + 13 = 74 + 13 = 107 (IPv6)
+        // 46 + 40 + 8 + 13 = 94 + 13 = 107 (IPv6)
         return _mtu -
                (_remoteIP.length == 4 ? PacketBuilder.MIN_DATA_PACKET_OVERHEAD : PacketBuilder.MIN_IPV6_DATA_PACKET_OVERHEAD) -
                MIN_ACK_SIZE;
@@ -1713,16 +1727,6 @@ class PeerState {
     private ShouldSend locked_shouldSend(OutboundMessageState state) {
         long now = _context.clock().now();
         if (state.getNextSendTime() <= now) {
-            if (!state.isFragmented()) {
-                state.fragment(fragmentSize());
-                if (state.getMessage() != null)
-                    state.getMessage().timestamp("fragment into " + state.getFragmentCount());
-
-                if (_log.shouldLog(Log.INFO))
-                    _log.info("Fragmenting " + state);
-            }
-
-            
             OutboundMessageState retrans = _retransmitter;
             if ( (retrans != null) && ( (retrans.isExpired() || retrans.isComplete()) ) ) {
                 _retransmitter = null;
@@ -1844,7 +1848,6 @@ class PeerState {
             //if (getSendWindowBytesRemaining() > 0)
             //    _throttle.unchoke(peer.getRemotePeer());
             
-            state.releaseResources();
         } else {
             // dupack, likely
             //if (_log.shouldLog(Log.DEBUG))
@@ -1894,12 +1897,7 @@ class PeerState {
         if (state != null) {
             int numSends = state.getMaxSends();
                         
-            int bits = bitfield.fragmentCount();
-            int numACKed = 0;
-            for (int i = 0; i < bits; i++)
-                if (bitfield.received(i))
-                    numACKed++;
-            
+            int numACKed = bitfield.ackCount();
             _context.statManager().addRateData("udp.partialACKReceived", numACKed);
             
             if (_log.shouldLog(Log.INFO))
@@ -1921,7 +1919,6 @@ class PeerState {
                 //if (state.getPeer().getSendWindowBytesRemaining() > 0)
                 //    _throttle.unchoke(state.getPeer().getRemotePeer());
 
-                state.releaseResources();
             } else {
                 //if (state.getMessage() != null)
                 //    state.getMessage().timestamp("partial ack after " + numSends + ": " + bitfield.toString());

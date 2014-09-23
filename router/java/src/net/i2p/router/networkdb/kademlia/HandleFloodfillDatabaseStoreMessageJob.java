@@ -14,9 +14,9 @@ import java.util.Date;
 import net.i2p.data.DatabaseEntry;
 import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
-import net.i2p.data.RouterAddress;
-import net.i2p.data.RouterIdentity;
-import net.i2p.data.RouterInfo;
+import net.i2p.data.router.RouterAddress;
+import net.i2p.data.router.RouterIdentity;
+import net.i2p.data.router.RouterInfo;
 import net.i2p.data.i2np.DatabaseStoreMessage;
 import net.i2p.data.i2np.DeliveryStatusMessage;
 import net.i2p.router.JobImpl;
@@ -51,6 +51,8 @@ public class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
         long recvBegin = System.currentTimeMillis();
         
         String invalidMessage = null;
+        // set if invalid store but not his fault
+        boolean dontBlamePeer = false;
         boolean wasNew = false;
         RouterInfo prevNetDb = null;
         Hash key = _message.getKey();
@@ -72,6 +74,7 @@ public class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                 if (getContext().clientManager().isLocal(key)) {
                     //getContext().statManager().addRateData("netDb.storeLocalLeaseSetAttempt", 1, 0);
                     // throw rather than return, so that we send the ack below (prevent easy attack)
+                    dontBlamePeer = true;
                     throw new IllegalArgumentException("Peer attempted to store local leaseSet: " +
                                                        key.toBase64().substring(0, 4));
                 }
@@ -114,6 +117,9 @@ public class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                     //if (!ls.getReceivedAsReply())
                     //    match.setReceivedAsPublished(true);
                 }
+            } catch (UnsupportedCryptoException uce) {
+                invalidMessage = uce.getMessage();
+                dontBlamePeer = true;
             } catch (IllegalArgumentException iae) {
                 invalidMessage = iae.getMessage();
             }
@@ -131,8 +137,10 @@ public class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                 if (getContext().routerHash().equals(key)) {
                     //getContext().statManager().addRateData("netDb.storeLocalRouterInfoAttempt", 1, 0);
                     // throw rather than return, so that we send the ack below (prevent easy attack)
+                    dontBlamePeer = true;
                     throw new IllegalArgumentException("Peer attempted to store our RouterInfo");
                 }
+                getContext().profileManager().heardAbout(key);
                 prevNetDb = getContext().netDb().store(key, ri);
                 wasNew = ((null == prevNetDb) || (prevNetDb.getPublished() < ri.getPublished()));
                 // Check new routerinfo address against blocklist
@@ -152,7 +160,9 @@ public class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                                 _log.warn("New address received, Blocklisting old peer " + key + ' ' + ri);
                     }
                 }
-                getContext().profileManager().heardAbout(key);
+            } catch (UnsupportedCryptoException uce) {
+                invalidMessage = uce.getMessage();
+                dontBlamePeer = true;
             } catch (IllegalArgumentException iae) {
                 invalidMessage = iae.getMessage();
             }
@@ -165,14 +175,16 @@ public class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
         long recvEnd = System.currentTimeMillis();
         getContext().statManager().addRateData("netDb.storeRecvTime", recvEnd-recvBegin);
         
-        if (_message.getReplyToken() > 0) 
+        // ack even if invalid or unsupported
+        // TODO any cases where we shouldn't?
+        if (_message.getReplyToken() > 0)
             sendAck();
         long ackEnd = System.currentTimeMillis();
         
         if (_from != null)
             _fromHash = _from.getHash();
         if (_fromHash != null) {
-            if (invalidMessage == null) {
+            if (invalidMessage == null || dontBlamePeer) {
                 getContext().profileManager().dbStoreReceived(_fromHash, wasNew);
                 getContext().statManager().addRateData("netDb.storeHandled", ackEnd-recvEnd);
             } else {
@@ -180,7 +192,7 @@ public class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Peer " + _fromHash.toBase64() + " sent bad data: " + invalidMessage);
             }
-        } else if (invalidMessage != null) {
+        } else if (invalidMessage != null && !dontBlamePeer) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Unknown peer sent bad data: " + invalidMessage);
         }

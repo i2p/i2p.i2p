@@ -1,5 +1,6 @@
 package net.i2p.router.transport.ntcp;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
@@ -7,11 +8,12 @@ import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 
 import net.i2p.I2PAppContext;
+import net.i2p.crypto.SigType;
 import net.i2p.data.Base64;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
-import net.i2p.data.RouterIdentity;
+import net.i2p.data.router.RouterIdentity;
 import net.i2p.data.Signature;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
@@ -62,6 +64,7 @@ import net.i2p.util.SimpleByteCache;
 class EstablishState {
     
     public static final VerifiedEstablishState VERIFIED = new VerifiedEstablishState();
+    public static final FailedEstablishState FAILED = new FailedEstablishState();
     
     private final RouterContext _context;
     private final Log _log;
@@ -70,13 +73,14 @@ class EstablishState {
     private final byte _X[];
     private final byte _hX_xor_bobIdentHash[];
     private int _aliceIdentSize;
+    private RouterIdentity _aliceIdent;
     /** contains the decrypted aliceIndexSize + aliceIdent + tsA + padding + aliceSig */
     private ByteArrayOutputStream _sz_aliceIdent_tsA_padding_aliceSig;
     /** how long we expect _sz_aliceIdent_tsA_padding_aliceSig to be when its full */
     private int _sz_aliceIdent_tsA_padding_aliceSigSize;
     // alice receives (and bob sends)
-    private byte _Y[];
-    private transient byte _e_hXY_tsB[];
+    private final byte _Y[];
+    private final byte _e_hXY_tsB[];
     /** Bob's Timestamp in seconds */
     private transient long _tsB;
     /** Alice's Timestamp in seconds */
@@ -85,7 +89,7 @@ class EstablishState {
 
     /** previously received encrypted block (or the IV) */
     private byte _prevEncrypted[];
-    /** current encrypted block we are reading */
+    /** current encrypted block we are reading (IB only) or an IV buf used at the end for OB */
     private byte _curEncrypted[];
     /**
      * next index in _curEncrypted to write to (equals _curEncrypted length if the block is
@@ -103,24 +107,63 @@ class EstablishState {
 
     private final NTCPTransport _transport;
     private final NTCPConnection _con;
-    private boolean _corrupt;
     /** error causing the corruption */
     private String _err;
     /** exception causing the error */
     private Exception _e;
-    private boolean _verified;
-    private boolean _confirmWritten;
     private boolean _failedBySkew;
     
+    private static final int MIN_RI_SIZE = 387;
+    private static final int MAX_RI_SIZE = 2048;
+
+    private static final int AES_SIZE = 16;
+    private static final int XY_SIZE = 256;
+    private static final int HXY_SIZE = 32;  //Hash.HASH_LENGTH;
+    private static final int HXY_TSB_PAD_SIZE = HXY_SIZE + 4 + 12;  // 48
+
+    protected State _state;
+
+    private enum State {
+        OB_INIT,
+        /** sent 1 */
+        OB_SENT_X,
+        /** sent 1, got 2 partial */
+        OB_GOT_Y,
+        /** sent 1, got 2 */
+        OB_GOT_HXY,
+        /** sent 1, got 2, sent 3 */
+        OB_SENT_RI,
+        /** sent 1, got 2, sent 3, got 4 */
+        OB_GOT_SIG,
+
+        IB_INIT,
+        /** got 1 partial */
+        IB_GOT_X,
+        /** got 1 */
+        IB_GOT_HX,
+        /** got 1, sent 2 */
+        IB_SENT_Y,
+        /** got 1, sent 2, got partial 3 */
+        IB_GOT_RI_SIZE,
+        /** got 1, sent 2, got 3 */
+        IB_GOT_RI,
+
+        /** OB: got and verified 4; IB: got and verified 3 and sent 4 */
+        VERIFIED,
+        CORRUPT
+    }
+
     private EstablishState() {
         _context = null;
         _log = null;
         _X = null;
+        _Y = null;
         _hX_xor_bobIdentHash = null;
         _curDecrypted = null;
         _dh = null;
         _transport = null;
         _con = null;
+        _e_hXY_tsB = null;
     }
 
     public EstablishState(RouterContext ctx, NTCPTransport transport, NTCPConnection con) {
@@ -129,20 +172,25 @@ class EstablishState {
         _transport = transport;
         _con = con;
         _dh = _transport.getDHBuilder();
-        _hX_xor_bobIdentHash = new byte[Hash.HASH_LENGTH];
+        _hX_xor_bobIdentHash = SimpleByteCache.acquire(HXY_SIZE);
         if (_con.isInbound()) {
-            _X = new byte[256];
+            _X = SimpleByteCache.acquire(XY_SIZE);
+            _Y = _dh.getMyPublicValueBytes();
             _sz_aliceIdent_tsA_padding_aliceSig = new ByteArrayOutputStream(512);
+            _prevEncrypted = SimpleByteCache.acquire(AES_SIZE);
+            _state = State.IB_INIT;
         } else {
             _X = _dh.getMyPublicValueBytes();
-            _Y = new byte[256];
-            ctx.sha().calculateHash(_X, 0, _X.length, _hX_xor_bobIdentHash, 0);
+            _Y = SimpleByteCache.acquire(XY_SIZE);
+            ctx.sha().calculateHash(_X, 0, XY_SIZE, _hX_xor_bobIdentHash, 0);
             xor32(con.getRemotePeer().calculateHash().getData(), _hX_xor_bobIdentHash);
+            // _prevEncrypted will be created later
+            _state = State.OB_INIT;
         }
 
-        _prevEncrypted = new byte[16];
-        _curEncrypted = new byte[16];
-        _curDecrypted = new byte[16];
+        _e_hXY_tsB = new byte[HXY_TSB_PAD_SIZE];
+        _curEncrypted = SimpleByteCache.acquire(AES_SIZE);
+        _curDecrypted = SimpleByteCache.acquire(AES_SIZE);
     }
 
     /**
@@ -154,14 +202,14 @@ class EstablishState {
      * All data must be copied out of the buffer as Reader.processRead()
      * will return it to the pool.
      */
-    public void receive(ByteBuffer src) {
-        if (_corrupt || _verified)
-            throw new IllegalStateException(prefix() + "received after completion [corrupt?" + _corrupt + " verified? " + _verified + "] on " + _con);
+    public synchronized void receive(ByteBuffer src) {
+        if (_state == State.VERIFIED || _state == State.CORRUPT)
+            throw new IllegalStateException(prefix() + "received unexpected data on " + _con);
         if (!src.hasRemaining())
             return; // nothing to receive
 
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug(prefix()+"receive " + src);
+            _log.debug(prefix() + "Receiving: " + src.remaining() + " Received: " + _received);
         if (_con.isInbound())
             receiveInbound(src);
         else
@@ -169,12 +217,9 @@ class EstablishState {
     }
 
     /**
-     * we have written all of the data required to confirm the connection
-     * establishment
+     *  Was this connection failed because of clock skew?
      */
-    public boolean confirmWritten() { return _confirmWritten; }
-
-    public boolean getFailedBySkew() { return _failedBySkew; }
+    public synchronized boolean getFailedBySkew() { return _failedBySkew; }
 
     /**
      *  we are Bob, so receive these bytes as part of an inbound connection
@@ -182,11 +227,11 @@ class EstablishState {
      *
      *  All data must be copied out of the buffer as Reader.processRead()
      *  will return it to the pool.
+     *
+     *  Caller must synch.
      */
     private void receiveInbound(ByteBuffer src) {
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug(prefix()+"Receiving inbound: prev received=" + _received + " src.remaining=" + src.remaining());
-        while (_received < _X.length && src.hasRemaining()) {
+        while (_state == State.IB_INIT && src.hasRemaining()) {
             byte c = src.get();
             _X[_received++] = c;
             //if (_log.shouldLog(Log.DEBUG)) _log.debug("recv x" + (int)c + " received=" + _received);
@@ -197,24 +242,28 @@ class EstablishState {
             //        return;
             //    }
             //}
+            if (_received >= XY_SIZE)
+                _state = State.IB_GOT_X;
         }
-        while (_received < _X.length + _hX_xor_bobIdentHash.length && src.hasRemaining()) {
-            int i = _received-_X.length;
+        while (_state == State.IB_GOT_X && src.hasRemaining()) {
+            int i = _received - XY_SIZE;
             _received++;
             byte c = src.get();
             _hX_xor_bobIdentHash[i] = c;
             //if (_log.shouldLog(Log.DEBUG)) _log.debug("recv bih" + (int)c + " received=" + _received);
+            if (i >= HXY_SIZE - 1)
+                _state = State.IB_GOT_HX;
         }
 
-        if (_received >= _X.length + _hX_xor_bobIdentHash.length) {
-            if (_dh.getSessionKey() == null) {
+        if (_state == State.IB_GOT_HX) {
+
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug(prefix()+"Enough data for a DH received");
 
                 // first verify that Alice knows who she is trying to talk with and that the X
                 // isn't corrupt
-                byte[] realXor = SimpleByteCache.acquire(Hash.HASH_LENGTH);
-                _context.sha().calculateHash(_X, 0, _X.length, realXor, 0);
+                byte[] realXor = SimpleByteCache.acquire(HXY_SIZE);
+                _context.sha().calculateHash(_X, 0, XY_SIZE, realXor, 0);
                 xor32(_context.routerHash().getData(), realXor);
                 //if (_log.shouldLog(Log.DEBUG)) {
                     //_log.debug(prefix()+"_X = " + Base64.encode(_X));
@@ -240,43 +289,43 @@ class EstablishState {
                     // ok, they're actually trying to talk to us, and we got their (unauthenticated) X
                     _dh.setPeerPublicValue(_X);
                     _dh.getSessionKey(); // force the calc
-                    System.arraycopy(realXor, 16, _prevEncrypted, 0, _prevEncrypted.length);
+                    System.arraycopy(_hX_xor_bobIdentHash, AES_SIZE, _prevEncrypted, 0, AES_SIZE);
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug(prefix()+"DH session key calculated (" + _dh.getSessionKey().toBase64() + ")");
 
                     // now prepare our response: Y+E(H(X+Y)+tsB+padding, sk, Y[239:255])
-                    _Y = _dh.getMyPublicValueBytes();
-                    byte xy[] = new byte[_X.length+_Y.length];
-                    System.arraycopy(_X, 0, xy, 0, _X.length);
-                    System.arraycopy(_Y, 0, xy, _X.length, _Y.length);
-                    byte[] hxy = SimpleByteCache.acquire(Hash.HASH_LENGTH);
-                    _context.sha().calculateHash(xy, 0, xy.length, hxy, 0);
+                    byte xy[] = new byte[XY_SIZE + XY_SIZE];
+                    System.arraycopy(_X, 0, xy, 0, XY_SIZE);
+                    System.arraycopy(_Y, 0, xy, XY_SIZE, XY_SIZE);
+                    byte[] hxy = SimpleByteCache.acquire(HXY_SIZE);
+                    _context.sha().calculateHash(xy, 0, XY_SIZE + XY_SIZE, hxy, 0);
                     _tsB = (_context.clock().now() + 500) / 1000l; // our (Bob's) timestamp in seconds
-                    byte toEncrypt[] = new byte[hxy.length + (4 + 12)];  // 48
-                    System.arraycopy(hxy, 0, toEncrypt, 0, hxy.length);
+                    byte toEncrypt[] = new byte[HXY_TSB_PAD_SIZE];  // 48
+                    System.arraycopy(hxy, 0, toEncrypt, 0, HXY_SIZE);
                     byte tsB[] = DataHelper.toLong(4, _tsB);
-                    System.arraycopy(tsB, 0, toEncrypt, hxy.length, tsB.length);
+                    System.arraycopy(tsB, 0, toEncrypt, HXY_SIZE, tsB.length);
                     //DataHelper.toLong(toEncrypt, hxy.getData().length, 4, _tsB);
-                    _context.random().nextBytes(toEncrypt, hxy.length + 4, 12);
+                    _context.random().nextBytes(toEncrypt, HXY_SIZE + 4, 12);
                     if (_log.shouldLog(Log.DEBUG)) {
                         //_log.debug(prefix()+"Y="+Base64.encode(_Y));
                         //_log.debug(prefix()+"x+y="+Base64.encode(xy));
                         _log.debug(prefix()+"h(x+y)="+Base64.encode(hxy));
-                        _log.debug(prefix()+"tsb="+Base64.encode(tsB));
+                        _log.debug(prefix() + "tsb = " + _tsB);
                         _log.debug(prefix()+"unencrypted H(X+Y)+tsB+padding: " + Base64.encode(toEncrypt));
-                        _log.debug(prefix()+"encryption iv= " + Base64.encode(_Y, _Y.length-16, 16));
+                        _log.debug(prefix()+"encryption iv= " + Base64.encode(_Y, XY_SIZE-AES_SIZE, AES_SIZE));
                         _log.debug(prefix()+"encryption key= " + _dh.getSessionKey().toBase64());
                     }
                     SimpleByteCache.release(hxy);
-                    _e_hXY_tsB = new byte[toEncrypt.length];
-                    _context.aes().encrypt(toEncrypt, 0, _e_hXY_tsB, 0, _dh.getSessionKey(), _Y, _Y.length-16, toEncrypt.length);
+                    _context.aes().encrypt(toEncrypt, 0, _e_hXY_tsB, 0, _dh.getSessionKey(),
+                                           _Y, XY_SIZE-AES_SIZE, HXY_TSB_PAD_SIZE);
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug(prefix()+"encrypted H(X+Y)+tsB+padding: " + Base64.encode(_e_hXY_tsB));
-                    byte write[] = new byte[_Y.length + _e_hXY_tsB.length];
-                    System.arraycopy(_Y, 0, write, 0, _Y.length);
-                    System.arraycopy(_e_hXY_tsB, 0, write, _Y.length, _e_hXY_tsB.length);
+                    byte write[] = new byte[XY_SIZE + HXY_TSB_PAD_SIZE];
+                    System.arraycopy(_Y, 0, write, 0, XY_SIZE);
+                    System.arraycopy(_e_hXY_tsB, 0, write, XY_SIZE, HXY_TSB_PAD_SIZE);
 
                     // ok, now that is prepared, we want to actually send it, so make sure we are up for writing
+                    _state = State.IB_SENT_Y;
                     _transport.getPumper().wantsWrite(_con, write);
                     if (!src.hasRemaining()) return;
                 } catch (DHSessionKeyBuilder.InvalidPublicParameterException e) {
@@ -284,73 +333,116 @@ class EstablishState {
                     fail("Invalid X", e);
                     return;
                 }
-            }
 
-            // ok, we are onto the encrypted area
-            while (src.hasRemaining() && !_corrupt) {
+        }
+
+        // ok, we are onto the encrypted area, i.e. Message #3
+        while ((_state == State.IB_SENT_Y ||
+                _state == State.IB_GOT_RI_SIZE ||
+                _state == State.IB_GOT_RI) && src.hasRemaining()) {
+
                 //if (_log.shouldLog(Log.DEBUG))
                 //    _log.debug(prefix()+"Encrypted bytes available (" + src.hasRemaining() + ")");
-                while (_curEncryptedOffset < _curEncrypted.length && src.hasRemaining()) {
+                // Collect a 16-byte block
+                while (_curEncryptedOffset < AES_SIZE && src.hasRemaining()) {
                     _curEncrypted[_curEncryptedOffset++] = src.get();
                     _received++;
                 }
-                if (_curEncryptedOffset >= _curEncrypted.length) {
-                    _context.aes().decrypt(_curEncrypted, 0, _curDecrypted, 0, _dh.getSessionKey(), _prevEncrypted, 0, _curEncrypted.length);
+                // Decrypt the 16-byte block
+                if (_curEncryptedOffset >= AES_SIZE) {
+                    _context.aes().decrypt(_curEncrypted, 0, _curDecrypted, 0, _dh.getSessionKey(),
+                                           _prevEncrypted, 0, AES_SIZE);
                     //if (_log.shouldLog(Log.DEBUG))
-                    //    _log.debug(prefix()+"full block read and decrypted: " + Base64.encode(_curDecrypted));
+                    //    _log.debug(prefix() + "full block read and decrypted: ");
 
-                    byte swap[] = new byte[16];
+                    byte swap[] = _prevEncrypted;
                     _prevEncrypted = _curEncrypted;
                     _curEncrypted = swap;
                     _curEncryptedOffset = 0;
 
-                    if (_aliceIdentSize <= 0) { // we are on the first decrypted block
-                        _aliceIdentSize = (int)DataHelper.fromLong(_curDecrypted, 0, 2);
-                        _sz_aliceIdent_tsA_padding_aliceSigSize = 2 + _aliceIdentSize + 4 + Signature.SIGNATURE_BYTES;
-                        int rem = (_sz_aliceIdent_tsA_padding_aliceSigSize % 16);
-                        int padding = 0;
-                        if (rem > 0)
-                            padding = 16-rem;
-                        _sz_aliceIdent_tsA_padding_aliceSigSize += padding;
-                        try {
-                            _sz_aliceIdent_tsA_padding_aliceSig.write(_curDecrypted);
-                        } catch (IOException ioe) {
-                            if (_log.shouldLog(Log.ERROR)) _log.error(prefix()+"Error writing to the baos?", ioe);
+                    if (_state == State.IB_SENT_Y) { // we are on the first decrypted block
+                        int sz = (int)DataHelper.fromLong(_curDecrypted, 0, 2);
+                        if (sz < MIN_RI_SIZE || sz > MAX_RI_SIZE) {
+                            _context.statManager().addRateData("ntcp.invalidInboundSize", sz);
+                            fail("size is invalid", new Exception("size is " + sz));
+                            return;
                         }
                         if (_log.shouldLog(Log.DEBUG))
-                            _log.debug(prefix()+"alice ident size decrypted as " + _aliceIdentSize + ", making the padding at " + padding + " and total size at " + _sz_aliceIdent_tsA_padding_aliceSigSize);
-                    } else {
-                        // subsequent block...
-                        try {
-                            _sz_aliceIdent_tsA_padding_aliceSig.write(_curDecrypted);
-                        } catch (IOException ioe) {
-                            if (_log.shouldLog(Log.ERROR)) _log.error(prefix()+"Error writing to the baos?", ioe);
-                        }
-                        //if (_log.shouldLog(Log.DEBUG))
-                        //    _log.debug(prefix()+"subsequent block decrypted (" + _sz_aliceIdent_tsA_padding_aliceSig.size() + ")");
+                            _log.debug(prefix() + "got the RI size: " + sz);
+                        _aliceIdentSize  = sz;
+                        _state = State.IB_GOT_RI_SIZE;
 
-                        if (_sz_aliceIdent_tsA_padding_aliceSig.size() >= _sz_aliceIdent_tsA_padding_aliceSigSize) {
+                        // We must defer the calculations for total size of the message until
+                        //  we get the full alice ident so
+                        // we can determine how long the signature is.
+                        // See below
+
+                    }
+                    try {
+                        _sz_aliceIdent_tsA_padding_aliceSig.write(_curDecrypted);
+                    } catch (IOException ioe) {
+                        if (_log.shouldLog(Log.ERROR)) _log.error(prefix()+"Error writing to the baos?", ioe);
+                    }
+                    //if (_log.shouldLog(Log.DEBUG))
+                    //    _log.debug(prefix()+"subsequent block decrypted (" + _sz_aliceIdent_tsA_padding_aliceSig.size() + ")");
+
+                    if (_state == State.IB_GOT_RI_SIZE &&
+                        _sz_aliceIdent_tsA_padding_aliceSig.size() >= 2 + _aliceIdentSize) {
+                        // we have enough to get Alice's RI and determine the sig+padding length
+                        readAliceRouterIdentity();
+                        if (_log.shouldLog(Log.DEBUG))
+                            _log.debug(prefix() + "got the RI");
+                        if (_aliceIdent == null) {
+                            // readAliceRouterIdentity already called fail
+                            return;
+                        }
+                        SigType type = _aliceIdent.getSigningPublicKey().getType();
+                        if (type == null) {
+                            fail("Unsupported sig type");
+                            return;
+                        }
+                        _state = State.IB_GOT_RI;
+                        // handle variable signature size
+                        _sz_aliceIdent_tsA_padding_aliceSigSize = 2 + _aliceIdentSize + 4 + type.getSigLen();
+                        int rem = (_sz_aliceIdent_tsA_padding_aliceSigSize % AES_SIZE);
+                        int padding = 0;
+                        if (rem > 0)
+                            padding = AES_SIZE-rem;
+                        _sz_aliceIdent_tsA_padding_aliceSigSize += padding;
+                        if (_log.shouldLog(Log.DEBUG))
+                            _log.debug(prefix() + "alice ident size decrypted as " + _aliceIdentSize +
+                                       ", making the padding at " + padding + " and total size at " +
+                                       _sz_aliceIdent_tsA_padding_aliceSigSize);
+                    }
+
+                    if (_state == State.IB_GOT_RI &&
+                        _sz_aliceIdent_tsA_padding_aliceSig.size() >= _sz_aliceIdent_tsA_padding_aliceSigSize) {
+                        // we have the remainder of Message #3, i.e. the padding+signature
+                        // Time to verify.
+
+                            if (_log.shouldLog(Log.DEBUG))
+                                _log.debug(prefix() + "got the sig");
                             verifyInbound();
-                            if (!_corrupt && _verified && src.hasRemaining())
+                            if (_state == State.VERIFIED && src.hasRemaining())
                                 prepareExtra(src);
                             if (_log.shouldLog(Log.DEBUG))
                                 _log.debug(prefix()+"verifying size (sz=" + _sz_aliceIdent_tsA_padding_aliceSig.size()
                                            + " expected=" + _sz_aliceIdent_tsA_padding_aliceSigSize
-                                           + " corrupt=" + _corrupt
-                                           + " verified=" + _verified + " extra=" + (_extra != null ? _extra.length : 0) + ")");
+                                           + ' ' + _state
+                                           + " extra=" + (_extra != null ? _extra.length : 0) + ")");
                             return;
-                        }
                     }
                 } else {
                     // no more bytes available in the buffer, and only a partial
                     // block was read, so we can't decrypt it.
                     if (_log.shouldLog(Log.DEBUG))
-                        _log.debug(prefix()+"end of available data with only a partial block read (" + _curEncryptedOffset + ", " + _received + ")");
+                        _log.debug(prefix() + "end of available data with only a partial block read (" +
+                                   _curEncryptedOffset + ", " + _received + ")");
                 }
-            }
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug(prefix()+"done with the data, not yet complete or corrupt");
         }
+
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug(prefix()+"done with the data, not yet complete or corrupt");
     }
 
     /**
@@ -359,22 +451,22 @@ class EstablishState {
      *
      *  All data must be copied out of the buffer as Reader.processRead()
      *  will return it to the pool.
+     *
+     *  Caller must synch.
      */
     private void receiveOutbound(ByteBuffer src) {
-        if (_log.shouldLog(Log.DEBUG)) _log.debug(prefix()+"Receive outbound " + src + " received=" + _received);
-
         // recv Y+E(H(X+Y)+tsB, sk, Y[239:255])
-        while (_received < _Y.length && src.hasRemaining()) {
+        while (_state == State.OB_SENT_X && src.hasRemaining()) {
             byte c = src.get();
             _Y[_received++] = c;
             //if (_log.shouldLog(Log.DEBUG)) _log.debug("recv x" + (int)c + " received=" + _received);
-            if (_received >= _Y.length) {
+            if (_received >= XY_SIZE) {
                 try {
                     _dh.setPeerPublicValue(_Y);
                     _dh.getSessionKey(); // force the calc
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug(prefix()+"DH session key calculated (" + _dh.getSessionKey().toBase64() + ")");
-                    _e_hXY_tsB = new byte[Hash.HASH_LENGTH+4+12];
+                    _state = State.OB_GOT_Y;
                 } catch (DHSessionKeyBuilder.InvalidPublicParameterException e) {
                     _context.statManager().addRateData("ntcp.invalidDH", 1);
                     fail("Invalid X", e);
@@ -382,34 +474,34 @@ class EstablishState {
                 }
             }
         }
-        if (_e_hXY_tsB == null) return; // !src.hasRemaining
 
-        while (_received < _Y.length + _e_hXY_tsB.length && src.hasRemaining()) {
-            int i = _received-_Y.length;
+        while (_state == State.OB_GOT_Y && src.hasRemaining()) {
+            int i = _received-XY_SIZE;
             _received++;
             byte c = src.get();
             _e_hXY_tsB[i] = c;
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug(prefix() + "recv _e_hXY_tsB " + (int)c + " received=" + _received);
-            if (i+1 >= _e_hXY_tsB.length) {
+            //if (_log.shouldLog(Log.DEBUG))
+            //    _log.debug(prefix() + "recv _e_hXY_tsB " + (int)c + " received=" + _received);
+            if (i+1 >= HXY_TSB_PAD_SIZE) {
                 if (_log.shouldLog(Log.DEBUG)) _log.debug(prefix() + "received _e_hXY_tsB fully");
-                byte hXY_tsB[] = new byte[_e_hXY_tsB.length];
-                _context.aes().decrypt(_e_hXY_tsB, 0, hXY_tsB, 0, _dh.getSessionKey(), _Y, _Y.length-16, _e_hXY_tsB.length);
-                byte XY[] = new byte[_X.length + _Y.length];
-                System.arraycopy(_X, 0, XY, 0, _X.length);
-                System.arraycopy(_Y, 0, XY, _X.length, _Y.length);
-                byte[] h = SimpleByteCache.acquire(Hash.HASH_LENGTH);
-                _context.sha().calculateHash(XY, 0, XY.length, h, 0);
+                byte hXY_tsB[] = new byte[HXY_TSB_PAD_SIZE];
+                _context.aes().decrypt(_e_hXY_tsB, 0, hXY_tsB, 0, _dh.getSessionKey(), _Y, XY_SIZE-AES_SIZE, HXY_TSB_PAD_SIZE);
+                byte XY[] = new byte[XY_SIZE + XY_SIZE];
+                System.arraycopy(_X, 0, XY, 0, XY_SIZE);
+                System.arraycopy(_Y, 0, XY, XY_SIZE, XY_SIZE);
+                byte[] h = SimpleByteCache.acquire(HXY_SIZE);
+                _context.sha().calculateHash(XY, 0, XY_SIZE + XY_SIZE, h, 0);
                 //if (_log.shouldLog(Log.DEBUG))
                 //    _log.debug(prefix() + "h(XY)=" + h.toBase64());
-                if (!DataHelper.eq(h, 0, hXY_tsB, 0, Hash.HASH_LENGTH)) {
+                if (!DataHelper.eq(h, 0, hXY_tsB, 0, HXY_SIZE)) {
                     SimpleByteCache.release(h);
                     _context.statManager().addRateData("ntcp.invalidHXY", 1);
                     fail("Invalid H(X+Y) - mitm attack attempted?");
                     return;
                 }
                 SimpleByteCache.release(h);
-                _tsB = DataHelper.fromLong(hXY_tsB, Hash.HASH_LENGTH, 4); // their (Bob's) timestamp in seconds
+                _state = State.OB_GOT_HXY;
+                _tsB = DataHelper.fromLong(hXY_tsB, HXY_SIZE, 4); // their (Bob's) timestamp in seconds
                 _tsA = (_context.clock().now() + 500) / 1000; // our (Alice's) timestamp in seconds
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug(prefix()+"h(X+Y) is correct, tsA-tsB=" + (_tsA-_tsB));
@@ -439,13 +531,13 @@ class EstablishState {
 
                 // now prepare and send our response
                 // send E(#+Alice.identity+tsA+padding+S(X+Y+Bob.identHash+tsA+tsB), sk, hX_xor_Bob.identHash[16:31])
-                int sigSize = _X.length+_Y.length+Hash.HASH_LENGTH+4+4;//+12;
+                int sigSize = XY_SIZE + XY_SIZE + HXY_SIZE + 4+4;//+12;
                 byte preSign[] = new byte[sigSize];
-                System.arraycopy(_X, 0, preSign, 0, _X.length);
-                System.arraycopy(_Y, 0, preSign, _X.length, _Y.length);
-                System.arraycopy(_con.getRemotePeer().calculateHash().getData(), 0, preSign, _X.length+_Y.length, Hash.HASH_LENGTH);
-                DataHelper.toLong(preSign, _X.length+_Y.length+Hash.HASH_LENGTH, 4, _tsA);
-                DataHelper.toLong(preSign, _X.length+_Y.length+Hash.HASH_LENGTH+4, 4, _tsB);
+                System.arraycopy(_X, 0, preSign, 0, XY_SIZE);
+                System.arraycopy(_Y, 0, preSign, XY_SIZE, XY_SIZE);
+                System.arraycopy(_con.getRemotePeer().calculateHash().getData(), 0, preSign, XY_SIZE + XY_SIZE, HXY_SIZE);
+                DataHelper.toLong(preSign, XY_SIZE + XY_SIZE + HXY_SIZE, 4, _tsA);
+                DataHelper.toLong(preSign, XY_SIZE + XY_SIZE + HXY_SIZE + 4, 4, _tsB);
                 // hXY_tsB has 12 bytes of padding (size=48, tsB=4 + hXY=32)
                 //System.arraycopy(hXY_tsB, hXY_tsB.length-12, preSign, _X.length+_Y.length+Hash.HASH_LENGTH+4+4, 12);
                 //byte sigPad[] = new byte[padSig];
@@ -458,80 +550,99 @@ class EstablishState {
                 //}
 
                 byte ident[] = _context.router().getRouterInfo().getIdentity().toByteArray();
-                int min = 2+ident.length+4+Signature.SIGNATURE_BYTES;
-                int rem = min % 16;
+                // handle variable signature size
+                int min = 2 + ident.length + 4 + sig.length();
+                int rem = min % AES_SIZE;
                 int padding = 0;
                 if (rem > 0)
-                    padding = 16 - rem;
+                    padding = AES_SIZE - rem;
                 byte preEncrypt[] = new byte[min+padding];
                 DataHelper.toLong(preEncrypt, 0, 2, ident.length);
                 System.arraycopy(ident, 0, preEncrypt, 2, ident.length);
                 DataHelper.toLong(preEncrypt, 2+ident.length, 4, _tsA);
                 if (padding > 0)
                     _context.random().nextBytes(preEncrypt, 2 + ident.length + 4, padding);
-                System.arraycopy(sig.getData(), 0, preEncrypt, 2+ident.length+4+padding, Signature.SIGNATURE_BYTES);
+                System.arraycopy(sig.getData(), 0, preEncrypt, 2+ident.length+4+padding, sig.length());
 
                 _prevEncrypted = new byte[preEncrypt.length];
-                _context.aes().encrypt(preEncrypt, 0, _prevEncrypted, 0, _dh.getSessionKey(), _hX_xor_bobIdentHash, _hX_xor_bobIdentHash.length-16, preEncrypt.length);
+                _context.aes().encrypt(preEncrypt, 0, _prevEncrypted, 0, _dh.getSessionKey(),
+                                       _hX_xor_bobIdentHash, _hX_xor_bobIdentHash.length-AES_SIZE, preEncrypt.length);
 
                 //if (_log.shouldLog(Log.DEBUG)) {
                     //_log.debug(prefix() + "unencrypted response to Bob: " + Base64.encode(preEncrypt));
                     //_log.debug(prefix() + "encrypted response to Bob: " + Base64.encode(_prevEncrypted));
                 //}
                 // send 'er off (when the bw limiter says, etc)
+                _state = State.OB_SENT_RI;
                 _transport.getPumper().wantsWrite(_con, _prevEncrypted);
             }
         }
-        if (_received >= _Y.length + _e_hXY_tsB.length && src.hasRemaining()) {
+        if (_state == State.OB_SENT_RI && src.hasRemaining()) {
             // we are receiving their confirmation
 
             // recv E(S(X+Y+Alice.identHash+tsA+tsB)+padding, sk, prev)
             int off = 0;
             if (_e_bobSig == null) {
-                _e_bobSig = new byte[48];
+                // handle variable signature size
+                int siglen = _con.getRemotePeer().getSigningPublicKey().getType().getSigLen();
+                int rem = siglen % AES_SIZE;
+                int padding;
+                if (rem > 0)
+                    padding = AES_SIZE - rem;
+                else
+                    padding = 0;
+                _e_bobSig = new byte[siglen + padding];
                 if (_log.shouldLog(Log.DEBUG))
-                    _log.debug(prefix() + "receiving E(S(X+Y+Alice.identHash+tsA+tsB)+padding, sk, prev) (remaining? " + src.hasRemaining() + ")");
+                    _log.debug(prefix() + "receiving E(S(X+Y+Alice.identHash+tsA+tsB)+padding, sk, prev) (remaining? " +
+                               src.hasRemaining() + ")");
             } else {
-                off = _received - _Y.length - _e_hXY_tsB.length;
+                off = _received - XY_SIZE - HXY_TSB_PAD_SIZE;
                 if (_log.shouldLog(Log.DEBUG))
-                    _log.debug(prefix() + "continuing to receive E(S(X+Y+Alice.identHash+tsA+tsB)+padding, sk, prev) (remaining? " + src.hasRemaining() + " off=" + off + " recv=" + _received + ")");
+                    _log.debug(prefix() + "continuing to receive E(S(X+Y+Alice.identHash+tsA+tsB)+padding, sk, prev) (remaining? " +
+                               src.hasRemaining() + " off=" + off + " recv=" + _received + ")");
             }
-            while (src.hasRemaining() && off < _e_bobSig.length) {
-                if (_log.shouldLog(Log.DEBUG)) _log.debug(prefix()+"recv bobSig received=" + _received);
+            while (_state == State.OB_SENT_RI && src.hasRemaining()) {
+                //if (_log.shouldLog(Log.DEBUG)) _log.debug(prefix()+"recv bobSig received=" + _received);
                 _e_bobSig[off++] = src.get();
                 _received++;
 
                 if (off >= _e_bobSig.length) {
+                    _state = State.OB_GOT_SIG;
                     //if (_log.shouldLog(Log.DEBUG))
                     //    _log.debug(prefix() + "received E(S(X+Y+Alice.identHash+tsA+tsB)+padding, sk, prev): " + Base64.encode(_e_bobSig));
                     byte bobSig[] = new byte[_e_bobSig.length];
-                    _context.aes().decrypt(_e_bobSig, 0, bobSig, 0, _dh.getSessionKey(), _e_hXY_tsB, _e_hXY_tsB.length-16, _e_bobSig.length);
+                    _context.aes().decrypt(_e_bobSig, 0, bobSig, 0, _dh.getSessionKey(),
+                                           _e_hXY_tsB, HXY_TSB_PAD_SIZE - AES_SIZE, _e_bobSig.length);
                     // ignore the padding
-                    byte bobSigData[] = new byte[Signature.SIGNATURE_BYTES];
-                    System.arraycopy(bobSig, 0, bobSigData, 0, Signature.SIGNATURE_BYTES);
-                    Signature sig = new Signature(bobSigData);
+                    // handle variable signature size
+                    SigType type = _con.getRemotePeer().getSigningPublicKey().getType();
+                    int siglen = type.getSigLen();
+                    byte bobSigData[] = new byte[siglen];
+                    System.arraycopy(bobSig, 0, bobSigData, 0, siglen);
+                    Signature sig = new Signature(type, bobSigData);
 
-                    byte toVerify[] = new byte[_X.length+_Y.length+Hash.HASH_LENGTH+4+4];
+                    byte toVerify[] = new byte[XY_SIZE + XY_SIZE + HXY_SIZE +4+4];
                     int voff = 0;
-                    System.arraycopy(_X, 0, toVerify, voff, _X.length); voff += _X.length;
-                    System.arraycopy(_Y, 0, toVerify, voff, _Y.length); voff += _Y.length;
-                    System.arraycopy(_context.routerHash().getData(), 0, toVerify, voff, Hash.HASH_LENGTH); voff += Hash.HASH_LENGTH;
+                    System.arraycopy(_X, 0, toVerify, voff, XY_SIZE); voff += XY_SIZE;
+                    System.arraycopy(_Y, 0, toVerify, voff, XY_SIZE); voff += XY_SIZE;
+                    System.arraycopy(_context.routerHash().getData(), 0, toVerify, voff, HXY_SIZE); voff += HXY_SIZE;
                     DataHelper.toLong(toVerify, voff, 4, _tsA); voff += 4;
                     DataHelper.toLong(toVerify, voff, 4, _tsB); voff += 4;
 
-                    _verified = _context.dsa().verifySignature(sig, toVerify, _con.getRemotePeer().getSigningPublicKey());
-                    if (!_verified) {
+                    boolean ok = _context.dsa().verifySignature(sig, toVerify, _con.getRemotePeer().getSigningPublicKey());
+                    if (!ok) {
                         _context.statManager().addRateData("ntcp.invalidSignature", 1);
                         fail("Signature was invalid - attempt to spoof " + _con.getRemotePeer().calculateHash().toBase64() + "?");
                     } else {
+                        _state = State.VERIFIED;
                         if (_log.shouldLog(Log.DEBUG))
                             _log.debug(prefix() + "signature verified from Bob.  done!");
                         prepareExtra(src);
-                        byte nextWriteIV[] = new byte[16];
-                        System.arraycopy(_prevEncrypted, _prevEncrypted.length-16, nextWriteIV, 0, 16);
-                        byte nextReadIV[] = new byte[16];
-                        System.arraycopy(_e_bobSig, _e_bobSig.length-16, nextReadIV, 0, nextReadIV.length);
-                        _con.finishOutboundEstablishment(_dh.getSessionKey(), (_tsA-_tsB), nextWriteIV, nextReadIV); // skew in seconds
+                        byte nextWriteIV[] = _curEncrypted; // reuse buf
+                        System.arraycopy(_prevEncrypted, _prevEncrypted.length-AES_SIZE, nextWriteIV, 0, AES_SIZE);
+                        // this does not copy the nextWriteIV, do not release to cache
+                        _con.finishOutboundEstablishment(_dh.getSessionKey(), (_tsA-_tsB), nextWriteIV, _e_bobSig); // skew in seconds
+                        releaseBufs();
                         // if socket gets closed this will be null - prevent NPE
                         InetAddress ia = _con.getChannel().socket().getInetAddress();
                         if (ia != null)
@@ -544,9 +655,10 @@ class EstablishState {
     }
 
     /** did the handshake fail for some reason? */
-    public boolean isCorrupt() { return _err != null; }
+    public synchronized boolean isCorrupt() { return _state == State.CORRUPT; }
+
     /** @return is the handshake complete and valid? */
-    public boolean isComplete() { return _verified; }
+    public synchronized boolean isComplete() { return _state == State.VERIFIED; }
 
     /**
      * We are Alice.
@@ -554,47 +666,90 @@ class EstablishState {
      * queueing up the write of the first part of the handshake
      * This method sends message #1 to Bob.
      */
-    public void prepareOutbound() {
-        if (_received <= 0) {
+    public synchronized void prepareOutbound() {
+        if (_state == State.OB_INIT) {
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug(prefix() + "write out the first part of our handshake");
-            byte toWrite[] = new byte[_X.length + _hX_xor_bobIdentHash.length];
-            System.arraycopy(_X, 0, toWrite, 0, _X.length);
-            System.arraycopy(_hX_xor_bobIdentHash, 0, toWrite, _X.length, _hX_xor_bobIdentHash.length);
+                _log.debug(prefix() + "send X");
+            byte toWrite[] = new byte[XY_SIZE + _hX_xor_bobIdentHash.length];
+            System.arraycopy(_X, 0, toWrite, 0, XY_SIZE);
+            System.arraycopy(_hX_xor_bobIdentHash, 0, toWrite, XY_SIZE, _hX_xor_bobIdentHash.length);
+            _state = State.OB_SENT_X;
             _transport.getPumper().wantsWrite(_con, toWrite);
         } else {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug(prefix()+"prepare outbound with received=" + _received);
+            if (_log.shouldLog(Log.WARN))
+                _log.warn(prefix() + "unexpected prepareOutbound()");
         }
     }
 
     /**
-     * We are Bob. Verify message #3 from Alice, then send message #4 to Alice.
+     * We are Bob. We have received enough of message #3 from Alice
+     * to get Alice's RouterIdentity.
      *
-     * Make sure the signatures are correct, and if they are, update the
-     * NIOConnection with the session key / peer ident / clock skew / iv.
-     * The NIOConnection itself is responsible for registering with the
-     * transport
+     * _aliceIdentSize must be set.
+     * _sz_aliceIdent_tsA_padding_aliceSig must contain at least 2 + _aliceIdentSize bytes.
+     *
+     * Sets _aliceIdent so that we
+     * may determine the signature and padding sizes.
+     *
+     * After all of message #3 is received including the signature and
+     * padding, verifyIdentity() must be called.
+     *
+     *  State must be IB_GOT_RI_SIZE.
+     *  Caller must synch.
+     *
+     * @since 0.9.16 pulled out of verifyInbound()
      */
-    private void verifyInbound() {
-        if (_corrupt) return;
+    private void readAliceRouterIdentity() {
         byte b[] = _sz_aliceIdent_tsA_padding_aliceSig.toByteArray();
         //if (_log.shouldLog(Log.DEBUG))
         //    _log.debug(prefix()+"decrypted sz(etc) data: " + Base64.encode(b));
 
         try {
-            RouterIdentity alice = new RouterIdentity();
-            int sz = (int)DataHelper.fromLong(b, 0, 2); // TO-DO: Hey zzz... Throws an NPE for me... see below, for my "quick fix", need to find out the real reason
-            if ( (sz <= 0) || (sz > b.length-2-4-Signature.SIGNATURE_BYTES) ) {
+            int sz = _aliceIdentSize;
+            if (sz < MIN_RI_SIZE || sz > MAX_RI_SIZE ||
+                sz > b.length-2) {
                 _context.statManager().addRateData("ntcp.invalidInboundSize", sz);
                 fail("size is invalid", new Exception("size is " + sz));
                 return;
             }
-            byte aliceData[] = new byte[sz];
-            System.arraycopy(b, 2, aliceData, 0, sz);
-            alice.fromByteArray(aliceData);
-            long tsA = DataHelper.fromLong(b, 2+sz, 4);
+            RouterIdentity alice = new RouterIdentity();
+            ByteArrayInputStream bais = new ByteArrayInputStream(b, 2, sz);
+            alice.readBytes(bais);
+            _aliceIdent = alice;
+        } catch (IOException ioe) {
+            _context.statManager().addRateData("ntcp.invalidInboundIOE", 1);
+            fail("Error verifying peer", ioe);
+        } catch (DataFormatException dfe) {
+            _context.statManager().addRateData("ntcp.invalidInboundDFE", 1);
+            fail("Error verifying peer", dfe);
+        }
+    }
 
+
+    /**
+     * We are Bob. Verify message #3 from Alice, then send message #4 to Alice.
+     *
+     * _aliceIdentSize and _aliceIdent must be set.
+     * _sz_aliceIdent_tsA_padding_aliceSig must contain at least
+     *  (2 + _aliceIdentSize + 4 + padding + sig) bytes.
+     *
+     * Sets _aliceIdent so that we
+     *
+     * readAliceRouterIdentity() must have been called previously
+     *
+     * Make sure the signatures are correct, and if they are, update the
+     * NIOConnection with the session key / peer ident / clock skew / iv.
+     * The NIOConnection itself is responsible for registering with the
+     * transport
+     *
+     *  State must be IB_GOT_RI.
+     *  Caller must synch.
+     */
+    private void verifyInbound() {
+        byte b[] = _sz_aliceIdent_tsA_padding_aliceSig.toByteArray();
+        try {
+            int sz = _aliceIdentSize;
+            long tsA = DataHelper.fromLong(b, 2+sz, 4);
             ByteArrayOutputStream baos = new ByteArrayOutputStream(768);
             baos.write(_X);
             baos.write(_Y);
@@ -604,31 +759,37 @@ class EstablishState {
             //baos.write(b, 2+sz+4, b.length-2-sz-4-Signature.SIGNATURE_BYTES);
 
             byte toVerify[] = baos.toByteArray();
-            if (_log.shouldLog(Log.DEBUG)) {
-                _log.debug(prefix()+"checking " + Base64.encode(toVerify, 0, 16));
-                //_log.debug(prefix()+"check pad " + Base64.encode(b, 2+sz+4, 12));
-            }
+            //if (_log.shouldLog(Log.DEBUG)) {
+            //    _log.debug(prefix()+"checking " + Base64.encode(toVerify, 0, AES_SIZE));
+            //    //_log.debug(prefix()+"check pad " + Base64.encode(b, 2+sz+4, 12));
+            //}
 
-            byte s[] = new byte[Signature.SIGNATURE_BYTES];
+            // handle variable signature size
+            SigType type = _aliceIdent.getSigningPublicKey().getType();
+            if (type == null) {
+                fail("unsupported sig type");
+                return;
+            }
+            byte s[] = new byte[type.getSigLen()];
             System.arraycopy(b, b.length-s.length, s, 0, s.length);
-            Signature sig = new Signature(s);
-            _verified = _context.dsa().verifySignature(sig, toVerify, alice.getSigningPublicKey());
-            if (_verified) {
+            Signature sig = new Signature(type, s);
+            boolean ok = _context.dsa().verifySignature(sig, toVerify, _aliceIdent.getSigningPublicKey());
+            if (ok) {
                 // get inet-addr
                 InetAddress addr = this._con.getChannel().socket().getInetAddress();
                 byte[] ip = (addr == null) ? null : addr.getAddress();
-                if (_context.banlist().isBanlistedForever(alice.calculateHash())) {
+                if (_context.banlist().isBanlistedForever(_aliceIdent.calculateHash())) {
                     if (_log.shouldLog(Log.WARN))
-                        _log.warn("Dropping inbound connection from permanently banlisted peer: " + alice.calculateHash().toBase64());
+                        _log.warn("Dropping inbound connection from permanently banlisted peer: " + _aliceIdent.calculateHash());
                     // So next time we will not accept the con from this IP,
                     // rather than doing the whole handshake
                     if(ip != null)
                        _context.blocklist().add(ip);
-                    fail("Peer is banlisted forever: " + alice.calculateHash().toBase64());
+                    fail("Peer is banlisted forever: " + _aliceIdent.calculateHash());
                     return;
                 }
                 if(ip != null)
-                   _transport.setIP(alice.calculateHash(), ip);
+                   _transport.setIP(_aliceIdent.calculateHash(), ip);
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug(prefix() + "verification successful for " + _con);
 
@@ -642,10 +803,10 @@ class EstablishState {
                         _log.logAlways(Log.WARN, "NTP failure, NTCP adjusting clock by " + DataHelper.formatDuration(diff));
                 } else if (diff >= Router.CLOCK_FUDGE_FACTOR) {
                     _context.statManager().addRateData("ntcp.invalidInboundSkew", diff);
-                    _transport.markReachable(alice.calculateHash(), true);
+                    _transport.markReachable(_aliceIdent.calculateHash(), true);
                     // Only banlist if we know what time it is
                     _context.banlist().banlistRouter(DataHelper.formatDuration(diff),
-                                                       alice.calculateHash(),
+                                                       _aliceIdent.calculateHash(),
                                                        _x("Excessive clock skew: {0}"));
                     _transport.setLastBadSkew(tsA- _tsB);
                     fail("Clocks too skewed (" + diff + " ms)", null, true);
@@ -654,50 +815,60 @@ class EstablishState {
                     _log.debug(prefix()+"Clock skew: " + diff + " ms");
                 }
 
-                sendInboundConfirm(alice, tsA);
-                _con.setRemotePeer(alice);
+                _state = State.VERIFIED;
+                sendInboundConfirm(_aliceIdent, tsA);
+                _con.setRemotePeer(_aliceIdent);
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug(prefix()+"e_bobSig is " + _e_bobSig.length + " bytes long");
-                byte iv[] = new byte[16];
-                System.arraycopy(_e_bobSig, _e_bobSig.length-16, iv, 0, 16);
+                byte iv[] = _curEncrypted;  // reuse buf
+                System.arraycopy(_e_bobSig, _e_bobSig.length-AES_SIZE, iv, 0, AES_SIZE);
+                // this does not copy the IV, do not release to cache
                 _con.finishInboundEstablishment(_dh.getSessionKey(), (tsA-_tsB), iv, _prevEncrypted); // skew in seconds
+                releaseBufs();
                 if (_log.shouldLog(Log.INFO))
-                    _log.info(prefix()+"Verified remote peer as " + alice.calculateHash().toBase64());
+                    _log.info(prefix()+"Verified remote peer as " + _aliceIdent.calculateHash());
             } else {
                 _context.statManager().addRateData("ntcp.invalidInboundSignature", 1);
-                fail("Peer verification failed - spoof of " + alice.calculateHash().toBase64() + "?");
+                fail("Peer verification failed - spoof of " + _aliceIdent.calculateHash() + "?");
             }
         } catch (IOException ioe) {
             _context.statManager().addRateData("ntcp.invalidInboundIOE", 1);
             fail("Error verifying peer", ioe);
-        } catch (DataFormatException dfe) {
-            _context.statManager().addRateData("ntcp.invalidInboundDFE", 1);
-            fail("Error verifying peer", dfe);
-        } catch(NullPointerException npe) {
-            fail("Error verifying peer", npe); // TO-DO: zzz This is that quick-fix. -- Sponge
         }
     }
 
     /**
      *  We are Bob. Send message #4 to Alice.
+     *
+     *  State must be VERIFIED.
+     *  Caller must synch.
      */
     private void sendInboundConfirm(RouterIdentity alice, long tsA) {
         // send Alice E(S(X+Y+Alice.identHash+tsA+tsB), sk, prev)
-        byte toSign[] = new byte[256+256+32+4+4];
+        byte toSign[] = new byte[XY_SIZE + XY_SIZE + 32+4+4];
         int off = 0;
-        System.arraycopy(_X, 0, toSign, off, 256); off += 256;
-        System.arraycopy(_Y, 0, toSign, off, 256); off += 256;
+        System.arraycopy(_X, 0, toSign, off, XY_SIZE); off += XY_SIZE;
+        System.arraycopy(_Y, 0, toSign, off, XY_SIZE); off += XY_SIZE;
         Hash h = alice.calculateHash();
         System.arraycopy(h.getData(), 0, toSign, off, 32); off += 32;
         DataHelper.toLong(toSign, off, 4, tsA); off += 4;
         DataHelper.toLong(toSign, off, 4, _tsB); off += 4;
 
+        // handle variable signature size
         Signature sig = _context.dsa().sign(toSign, _context.keyManager().getSigningPrivateKey());
-        byte preSig[] = new byte[Signature.SIGNATURE_BYTES+8];
-        System.arraycopy(sig.getData(), 0, preSig, 0, Signature.SIGNATURE_BYTES);
-        _context.random().nextBytes(preSig, Signature.SIGNATURE_BYTES, 8);
+        int siglen = sig.length();
+        int rem = siglen % AES_SIZE;
+        int padding;
+        if (rem > 0)
+            padding = AES_SIZE - rem;
+        else
+            padding = 0;
+        byte preSig[] = new byte[siglen + padding];
+        System.arraycopy(sig.getData(), 0, preSig, 0, siglen);
+        if (padding > 0)
+            _context.random().nextBytes(preSig, siglen, padding);
         _e_bobSig = new byte[preSig.length];
-        _context.aes().encrypt(preSig, 0, _e_bobSig, 0, _dh.getSessionKey(), _e_hXY_tsB, _e_hXY_tsB.length-16, _e_bobSig.length);
+        _context.aes().encrypt(preSig, 0, _e_bobSig, 0, _dh.getSessionKey(), _e_hXY_tsB, HXY_TSB_PAD_SIZE - AES_SIZE, _e_bobSig.length);
 
         if (_log.shouldLog(Log.DEBUG))
             _log.debug(prefix() + "Sending encrypted inbound confirmation");
@@ -708,6 +879,9 @@ class EstablishState {
      *
      *  All data must be copied out of the buffer as Reader.processRead()
      *  will return it to the pool.
+     *
+     *  State must be VERIFIED.
+     *  Caller must synch.
      */
     private void prepareExtra(ByteBuffer buf) {
         int remaining = buf.remaining();
@@ -724,21 +898,61 @@ class EstablishState {
      * if complete, this will contain any bytes received as part of the
      * handshake that were after the actual handshake.  This may return null.
      */
-    public byte[] getExtraBytes() { return _extra; }
+    public synchronized byte[] getExtraBytes() { return _extra; }
 
+    /**
+     *  Release resources on timeout.
+     *  @param e may be null
+     *  @since 0.9.16
+     */
+    public synchronized void close(String reason, Exception e) {
+        fail(reason, e);
+    }
+
+    /** Caller must synch. */
     private void fail(String reason) { fail(reason, null); }
+
+    /** Caller must synch. */
     private void fail(String reason, Exception e) { fail(reason, e, false); }
+
+    /** Caller must synch. */
     private void fail(String reason, Exception e, boolean bySkew) {
-        _corrupt = true;
+        if (_state == State.CORRUPT || _state == State.VERIFIED)
+            return;
+        _state = State.CORRUPT;
         _failedBySkew = bySkew;
         _err = reason;
         _e = e;
         if (_log.shouldLog(Log.WARN))
             _log.warn(prefix()+"Failed to establish: " + _err, e);
+        releaseBufs();
     }
 
-    public String getError() { return _err; }
-    public Exception getException() { return _e; }
+    /**
+     *  Only call once. Caller must synch.
+     *  @since 0.9.16
+     */
+    private void releaseBufs() {
+        // null or longer for OB
+        if (_prevEncrypted != null && _prevEncrypted.length == AES_SIZE)
+            SimpleByteCache.release(_prevEncrypted);
+        // Do not release _curEncrypted if verified, it is passed to
+        // NTCPConnection to use as the IV
+        if (_state != State.VERIFIED)
+            SimpleByteCache.release(_curEncrypted);
+        SimpleByteCache.release(_curDecrypted);
+        SimpleByteCache.release(_hX_xor_bobIdentHash);
+        if (_dh.getPeerPublicValue() == null)
+            _transport.returnUnused(_dh);
+        if (_con.isInbound())
+            SimpleByteCache.release(_X);
+        else
+            SimpleByteCache.release(_Y);
+    }
+
+    public synchronized String getError() { return _err; }
+
+    public synchronized Exception getException() { return _e; }
     
     /**
      *  XOR a into b. Modifies b. a is unmodified.
@@ -757,11 +971,12 @@ class EstablishState {
     @Override
     public String toString() {
         StringBuilder buf = new StringBuilder(64);
-        buf.append("est").append(System.identityHashCode(this));
-        if (_con.isInbound()) buf.append(" inbound");
-        else buf.append(" outbound");
-        if (_corrupt) buf.append(" corrupt");
-        if (_verified) buf.append(" verified");
+        if (_con.isInbound())
+            buf.append("IBES ");
+        else
+            buf.append("OBES ");
+        buf.append(System.identityHashCode(this));
+        buf.append(' ').append(_state);
         if (_con.isEstablished()) buf.append(" established");
         buf.append(": ");
         return buf.toString();
@@ -828,12 +1043,36 @@ class EstablishState {
      *  @since 0.9.8
      */
     private static class VerifiedEstablishState extends EstablishState {
-        @Override public boolean isComplete() { return true; }
+
+        public VerifiedEstablishState() {
+            super();
+            _state = State.VERIFIED;
+        }
+
         @Override public void prepareOutbound() {
             Log log =RouterContext.getCurrentContext().logManager().getLog(VerifiedEstablishState.class);
             log.warn("prepareOutbound() on verified state, doing nothing!");
         }
-        @Override public String toString() { return "VerfiedEstablishState";}
+
+        @Override public String toString() { return "VerifiedEstablishState";}
+    }
+
+    /**
+     *  @since 0.9.16
+     */
+    private static class FailedEstablishState extends EstablishState {
+
+        public FailedEstablishState() {
+            super();
+            _state = State.CORRUPT;
+        }
+
+        @Override public void prepareOutbound() {
+            Log log =RouterContext.getCurrentContext().logManager().getLog(VerifiedEstablishState.class);
+            log.warn("prepareOutbound() on verified state, doing nothing!");
+        }
+
+        @Override public String toString() { return "FailedEstablishState";}
     }
 
     /** @deprecated unused */

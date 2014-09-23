@@ -13,7 +13,7 @@ import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.i2p.data.RouterAddress;
+import net.i2p.data.router.RouterAddress;
 import net.i2p.router.RouterContext;
 
 /**

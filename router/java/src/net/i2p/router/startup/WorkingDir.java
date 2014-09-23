@@ -147,7 +147,7 @@ public class WorkingDir {
         // Check for a router.keys file or logs dir, if either exists it's an old install,
         // and only migrate the data files if told to do so
         // (router.keys could be deleted later by a killkeys())
-        test = new File(oldDirf, "router.keys");
+        test = new File(oldDirf, CreateRouterInfoJob.KEYS_FILENAME);
         boolean oldInstall = test.exists();
         if (!oldInstall) {
             test = new File(oldDirf, "logs");

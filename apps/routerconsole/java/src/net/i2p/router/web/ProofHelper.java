@@ -3,8 +3,8 @@ package net.i2p.router.web;
 import java.util.Date;
 
 import net.i2p.data.DataHelper;
-import net.i2p.data.RouterAddress;
-import net.i2p.data.RouterInfo;
+import net.i2p.data.router.RouterAddress;
+import net.i2p.data.router.RouterInfo;
 import net.i2p.data.Signature;
 
 /**

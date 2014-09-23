@@ -29,11 +29,12 @@ import net.i2p.data.Certificate;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
-import net.i2p.data.RouterInfo;
+import net.i2p.data.router.RouterInfo;
 import net.i2p.data.SigningPrivateKey;
 import net.i2p.data.i2np.GarlicMessage;
 import net.i2p.router.message.GarlicMessageHandler;
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
+import net.i2p.router.startup.CreateRouterInfoJob;
 import net.i2p.router.startup.StartupJob;
 import net.i2p.router.startup.WorkingDir;
 import net.i2p.router.tasks.*;
@@ -98,10 +99,6 @@ public class Router implements RouterClock.ClockShiftListener {
     /** this does not put an 'H' in your routerInfo **/
     public final static String PROP_HIDDEN_HIDDEN = "router.isHidden";
     public final static String PROP_DYNAMIC_KEYS = "router.dynamicKeys";
-    public final static String PROP_INFO_FILENAME = "router.info.location";
-    public final static String PROP_INFO_FILENAME_DEFAULT = "router.info";
-    public final static String PROP_KEYS_FILENAME = "router.keys.location";
-    public final static String PROP_KEYS_FILENAME_DEFAULT = "router.keys";
     public final static String PROP_SHUTDOWN_IN_PROGRESS = "__shutdownInProgress";
     public final static String DNS_CACHE_TIME = "" + (5*60);
     private static final String EVENTLOG = "eventlog.txt";
@@ -672,20 +669,6 @@ public class Router implements RouterClock.ClockShiftListener {
             return Boolean.parseBoolean(h);
         return _context.commSystem().isInBadCountry();
     }
-
-    /**
-     *  Only called at startup via LoadRouterInfoJob and RebuildRouterInfoJob.
-     *  Not called by periodic RepublishLocalRouterInfoJob.
-     *  We don't want to change the cert on the fly as it changes the router hash.
-     *  RouterInfo.isHidden() checks the capability, but RouterIdentity.isHidden() checks the cert.
-     *  There's no reason to ever add a hidden cert?
-     *  @return the certificate for a new RouterInfo - probably a null cert.
-     */
-    public Certificate createCertificate() {
-        if (_context.getBooleanProperty(PROP_HIDDEN))
-            return new Certificate(Certificate.CERTIFICATE_TYPE_HIDDEN, null);
-        return Certificate.NULL_CERT;
-    }
     
     /**
      *  @since 0.9.3
@@ -698,16 +681,18 @@ public class Router implements RouterClock.ClockShiftListener {
      * Ugly list of files that we need to kill if we are building a new identity
      *
      */
-    private static final String _rebuildFiles[] = new String[] { "router.info", 
-                                                                 "router.keys",
-                                                                 "netDb/my.info",      // no longer used
-                                                                 "connectionTag.keys", // never used?
-                                                                 "keyBackup/privateEncryption.key",
-                                                                 "keyBackup/privateSigning.key",
-                                                                 "keyBackup/publicEncryption.key",
-                                                                 "keyBackup/publicSigning.key",
-                                                                 "sessionKeys.dat"     // no longer used
-                                                               };
+    private static final String _rebuildFiles[] = new String[] {
+        CreateRouterInfoJob.INFO_FILENAME,
+        CreateRouterInfoJob.KEYS_FILENAME,
+        CreateRouterInfoJob.KEYS2_FILENAME,
+        "netDb/my.info",      // no longer used
+        "connectionTag.keys", // never used?
+        KeyManager.DEFAULT_KEYDIR + '/' + KeyManager.KEYFILE_PRIVATE_ENC,
+        KeyManager.DEFAULT_KEYDIR + '/' + KeyManager.KEYFILE_PUBLIC_ENC,
+        KeyManager.DEFAULT_KEYDIR + '/' + KeyManager.KEYFILE_PRIVATE_SIGNING,
+        KeyManager.DEFAULT_KEYDIR + '/' + KeyManager.KEYFILE_PUBLIC_SIGNING,
+        "sessionKeys.dat"     // no longer used
+    };
 
     public void killKeys() {
         //new Exception("Clearing identity files").printStackTrace();
@@ -1085,7 +1070,7 @@ public class Router implements RouterClock.ClockShiftListener {
             return;
         _eventLog.addEvent(EventLog.CLOCK_SHIFT, Long.toString(delta));
         // update the routing key modifier
-        _context.routingKeyGenerator().generateDateBasedModData();
+        _context.routerKeyGenerator().generateDateBasedModData();
         if (_context.commSystem().countActivePeers() <= 0)
             return;
         if (delta > 0)

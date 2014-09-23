@@ -40,6 +40,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.lang.reflect.Constructor;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -256,7 +257,15 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
         }
 
         if (gui) {
-            new I2PTunnelGUI(this);
+            // removed from source, now in i2p.scripts
+            //new I2PTunnelGUI(this);
+            try {
+                Class<?> cls = Class.forName("net.i2p.i2ptunnel.I2PTunnelGUI");
+                Constructor<?> con = cls.getConstructor(I2PTunnel.class);
+                con.newInstance(this);
+            } catch (Throwable t) {
+                throw new UnsupportedOperationException("GUI is not available, try -cli", t);
+            }
         } else if (cli) {
             try {
                 System.out.println("Enter 'help' for help.");

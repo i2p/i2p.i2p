@@ -61,7 +61,7 @@ public class I2PSnarkServlet extends BasicServlet {
     
     private static final String DEFAULT_NAME = "i2psnark";
     public static final String PROP_CONFIG_FILE = "i2psnark.configFile";
-    private static final String WARBASE = "/.icons/";
+    private static final String WARBASE = "/.resources/";
     private static final char HELLIP = '\u2026';
  
     public I2PSnarkServlet() {
@@ -191,31 +191,14 @@ public class I2PSnarkServlet extends BasicServlet {
 
         _themePath = "/themes/snark/" + _manager.getTheme() + '/';
         _imgPath = _themePath + "images/";
-        resp.setHeader("X-Frame-Options", "SAMEORIGIN");
-        resp.setHeader("Content-Security-Policy", "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'");
-        resp.setHeader("X-XSS-Protection", "1; mode=block");
+        req.setCharacterEncoding("UTF-8");
 
-        String peerParam = req.getParameter("p");
-        String stParam = req.getParameter("st");
-        String peerString;
-        if (peerParam == null || (!_manager.util().connected()) ||
-            peerParam.replaceAll("[a-zA-Z0-9~=-]", "").length() > 0) {  // XSS
-            peerString = "";
-        } else {
-            peerString = "?p=" + DataHelper.stripHTML(peerParam);
-        }
-        if (stParam != null && !stParam.equals("0")) {
-            stParam = DataHelper.stripHTML(stParam);
-            if (peerString.length() > 0)
-                peerString += "&amp;st=" + stParam;
-            else
-                peerString =  "?st="+ stParam;
-        }
+        String pOverride = _manager.util().connected() ? null : "";
+        String peerString = getQueryString(req, pOverride, null, null);
 
         // AJAX for mainsection
         if ("/.ajax/xhr1.html".equals(path)) {
-            resp.setCharacterEncoding("UTF-8");
-            resp.setContentType("text/html; charset=UTF-8");
+            setHTMLHeaders(resp);
             PrintWriter out = resp.getWriter();
             //if (_log.shouldLog(Log.DEBUG))
             //    _manager.addMessage((_context.clock().now() / 1000) + " xhr1 p=" + req.getParameter("p"));
@@ -233,19 +216,18 @@ public class I2PSnarkServlet extends BasicServlet {
                 // bypass the horrid Resource.getListHTML()
                 String pathInfo = req.getPathInfo();
                 String pathInContext = addPaths(path, pathInfo);
-                req.setCharacterEncoding("UTF-8");
-                resp.setCharacterEncoding("UTF-8");
-                resp.setContentType("text/html; charset=UTF-8");
                 File resource = getResource(pathInContext);
                 if (resource == null) {
                     resp.sendError(404);
                 } else {
                     String base = addPaths(req.getRequestURI(), "/");
-                    String listing = getListHTML(resource, base, true, method.equals("POST") ? req.getParameterMap() : null);
+                    String listing = getListHTML(resource, base, true, method.equals("POST") ? req.getParameterMap() : null,
+                                                 req.getParameter("sort"));
                     if (method.equals("POST")) {
                         // P-R-G
                         sendRedirect(req, resp, "");
                     } else if (listing != null) {
+                        setHTMLHeaders(resp);
                         resp.getWriter().write(listing);
                     } else { // shouldn't happen
                         resp.sendError(404);
@@ -265,10 +247,6 @@ public class I2PSnarkServlet extends BasicServlet {
 
         // Either the main page or /configure
 
-        req.setCharacterEncoding("UTF-8");
-        resp.setCharacterEncoding("UTF-8");
-        resp.setContentType("text/html; charset=UTF-8");
-        
         String nonce = req.getParameter("nonce");
         if (nonce != null) {
             if (nonce.equals(String.valueOf(_nonce)))
@@ -280,6 +258,7 @@ public class I2PSnarkServlet extends BasicServlet {
             return;	
         }
         
+        setHTMLHeaders(resp);
         PrintWriter out = resp.getWriter();
         out.write(DOCTYPE + "<html>\n" +
                   "<head><link rel=\"shortcut icon\" href=\"" + _themePath + "favicon.ico\">\n" +
@@ -293,6 +272,7 @@ public class I2PSnarkServlet extends BasicServlet {
             out.write(_("Configuration"));
         else
             out.write(_("Anonymous BitTorrent Client"));
+        String peerParam = req.getParameter("p");
         if ("2".equals(peerParam))
             out.write(" | Debug Mode");
         out.write("</title>\n");
@@ -324,7 +304,8 @@ public class I2PSnarkServlet extends BasicServlet {
             out.write("<div class=\"snarknavbar\"><a href=\"" + _contextPath + "/\" title=\"");
             out.write(_("Torrents"));
             out.write("\" class=\"snarkRefresh\">");
-            out.write("<img alt=\"\" border=\"0\" src=\"" + _imgPath + "arrow_refresh.png\">&nbsp;&nbsp;");
+            out.write(toThemeImg("arrow_refresh"));
+            out.write(">&nbsp;&nbsp;");
             if (_contextName.equals(DEFAULT_NAME))
                 out.write(_("I2PSnark"));
             else
@@ -334,7 +315,8 @@ public class I2PSnarkServlet extends BasicServlet {
             out.write("<div class=\"snarknavbar\"><a href=\"" + _contextPath + '/' + peerString + "\" title=\"");
             out.write(_("Refresh page"));
             out.write("\" class=\"snarkRefresh\">");
-            out.write("<img alt=\"\" border=\"0\" src=\"" + _imgPath + "arrow_refresh.png\">&nbsp;&nbsp;");
+            out.write(toThemeImg("arrow_refresh"));
+            out.write(">&nbsp;&nbsp;");
             if (_contextName.equals(DEFAULT_NAME))
                 out.write(_("I2PSnark"));
             else
@@ -378,6 +360,22 @@ public class I2PSnarkServlet extends BasicServlet {
         out.write(FOOTER);
     }
 
+    /**
+     *  The standard HTTP headers for all HTML pages
+     *
+     *  @since 0.9.16 moved from doGetAndPost()
+     */
+    private static void setHTMLHeaders(HttpServletResponse resp) {
+        resp.setCharacterEncoding("UTF-8");
+        resp.setContentType("text/html; charset=UTF-8");
+        resp.setHeader("Cache-Control", "no-store, max-age=0, no-cache, must-revalidate");
+        resp.setHeader("Content-Security-Policy", "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'");
+        resp.setDateHeader("Expires", 0);
+        resp.setHeader("Pragma", "no-cache");
+        resp.setHeader("X-Frame-Options", "SAMEORIGIN");
+        resp.setHeader("X-XSS-Protection", "1; mode=block");
+    }
+
     private void writeMessages(PrintWriter out, boolean isConfigure, String peerString) throws IOException {
         List<String> msgs = _manager.getMessages();
         if (!msgs.isEmpty()) {
@@ -389,9 +387,10 @@ public class I2PSnarkServlet extends BasicServlet {
                 out.write(peerString + "&amp;");
             else
                 out.write("?");
-            out.write("action=Clear&amp;nonce=" + _nonce + "\">" +
-                      "<img src=\"" + _imgPath + "delete.png\" title=\"" + _("clear messages") +
-                      "\" alt=\"" + _("clear messages") + "\"></a>" +
+            out.write("action=Clear&amp;nonce=" + _nonce + "\">");
+            String tx = _("clear messages");
+            out.write(toThemeImg("delete", tx, tx));
+            out.write("</a>" +
                       "<ul>");
             for (int i = msgs.size()-1; i >= 0; i--) {
                 String msg = msgs.get(i);
@@ -414,13 +413,7 @@ public class I2PSnarkServlet extends BasicServlet {
         boolean isForm = _manager.util().connected() || !snarks.isEmpty();
         if (isForm) {
             out.write("<form action=\"_post\" method=\"POST\">\n");
-            out.write("<input type=\"hidden\" name=\"nonce\" value=\"" + _nonce + "\" >\n");
-            // don't lose peer setting
-            if (peerParam != null)
-                out.write("<input type=\"hidden\" name=\"p\" value=\"" + peerParam + "\" >\n");
-            // ...or st setting
-            if (stParam != null)
-                out.write("<input type=\"hidden\" name=\"st\" value=\"" + stParam + "\" >\n");
+            writeHiddenInputs(out, req, null);
         }
         out.write(TABLE_HEADER);
 
@@ -442,90 +435,166 @@ public class I2PSnarkServlet extends BasicServlet {
         }
         int pageSize = Math.max(_manager.getPageSize(), 5);
 
-        out.write("<tr><th><img border=\"0\" src=\"" + _imgPath + "status.png\" title=\"");
-        out.write(_("Status"));
-        out.write("\" alt=\"");
-        out.write(_("Status"));
-        out.write("\"></th>\n<th>");
+        String currentSort = req.getParameter("sort");
+        boolean showSort = total > 1;
+        out.write("<tr><th>");
+        String sort = ("2".equals(currentSort)) ? "-2" : "2";
+        if (showSort) {
+            out.write("<a href=\"" + _contextPath + '/' + getQueryString(req, null, null, sort));
+            out.write("\">");
+        }
+        String tx = _("Status");
+        out.write(toThemeImg("status", tx,
+                             showSort ? _("Sort by {0}", tx)
+                                      : tx));
+        if (showSort)
+            out.write("</a>");
+        out.write("</th>\n<th>");
         if (_manager.util().connected() && !snarks.isEmpty()) {
             out.write(" <a href=\"" + _contextPath + '/');
             if (peerParam != null) {
-                if (stParam != null) {
-                    out.write("?st=");
-                    out.write(stParam);
-                }
+                // disable peer view
                 out.write("\">");
-                out.write("<img border=\"0\" src=\"" + _imgPath + "hidepeers.png\" title=\"");
-                out.write(_("Hide Peers"));
-                out.write("\" alt=\"");
-                out.write(_("Hide Peers"));
-                out.write("\">");
+                tx = _("Hide Peers");
+                out.write(toThemeImg("hidepeers", tx, tx));
             } else {
-                out.write("?p=1");
-                if (stParam != null) {
-                    out.write("&amp;st=");
-                    out.write(stParam);
-                }
+                // enable peer view
+                out.write(getQueryString(req, "1", null, null));
                 out.write("\">");
-                out.write("<img border=\"0\" src=\"" + _imgPath + "showpeers.png\" title=\"");
-                out.write(_("Show Peers"));
-                out.write("\" alt=\"");
-                out.write(_("Show Peers"));
-                out.write("\">");
+                tx = _("Show Peers");
+                out.write(toThemeImg("showpeers", tx, tx));
             }
             out.write("</a><br>\n"); 
         }
         out.write("</th>\n<th colspan=\"2\" align=\"left\">");
-        out.write("<img border=\"0\" src=\"" + _imgPath + "torrent.png\" title=\"");
-        out.write(_("Torrent"));
-        out.write("\" alt=\"");
-        out.write(_("Torrent"));
-        out.write("\"></th>\n<th align=\"center\">");
+        // cycle through sort by name or type
+        boolean isTypeSort = false;
+        if (showSort) {
+            if (currentSort == null || "0".equals(currentSort) || "1".equals(currentSort)) {
+                sort = "-1";
+            } else if ("-1".equals(currentSort)) {
+                sort = "12";
+                isTypeSort = true;
+            } else if ("12".equals(currentSort)) {
+                sort = "-12";
+                isTypeSort = true;
+            } else {
+                sort = "";
+            }
+            out.write("<a href=\"" + _contextPath + '/' + getQueryString(req, null, null, sort));
+            out.write("\">");
+        }
+        tx = _("Torrent");
+        out.write(toThemeImg("torrent", tx,
+                             showSort ? _("Sort by {0}", (isTypeSort ? _("File type") : tx))
+                                      : tx));
+        if (showSort)
+            out.write("</a>");
+        out.write("</th>\n<th align=\"center\">");
         if (total > 0 && (start > 0 || total > pageSize)) {
-            writePageNav(out, start, pageSize, total, peerParam, noThinsp);
+            writePageNav(out, req, start, pageSize, total, noThinsp);
         }
         out.write("</th>\n<th align=\"right\">");
         if (_manager.util().connected() && !snarks.isEmpty()) {
-            out.write("<img border=\"0\" src=\"" + _imgPath + "eta.png\" title=\"");
-            out.write(_("Estimated time remaining"));
-            out.write("\" alt=\"");
+            if (showSort) {
+                sort = ("4".equals(currentSort)) ? "-4" : "4";
+                out.write("<a href=\"" + _contextPath + '/' + getQueryString(req, null, null, sort));
+                out.write("\">");
+            }
             // Translators: Please keep short or translate as " "
-            out.write(_("ETA"));
-            out.write("\">");
+            tx = _("ETA");
+            out.write(toThemeImg("eta", tx,
+                                 showSort ? _("Sort by {0}", _("Estimated time remaining"))
+                                          : _("Estimated time remaining")));
+            if (showSort)
+                out.write("</a>");
         }
         out.write("</th>\n<th align=\"right\">");
-        out.write("<img border=\"0\" src=\"" + _imgPath + "head_rx.png\" title=\"");
-        out.write(_("Downloaded"));
-        out.write("\" alt=\"");
+        // cycle through sort by size or downloaded
+        boolean isDlSort = false;
+        if (showSort) {
+            if ("5".equals(currentSort)) {
+                sort = "-5";
+            } else if ("-5".equals(currentSort)) {
+                sort = "6";
+                isDlSort = true;
+            } else if ("6".equals(currentSort)) {
+                sort = "-6";
+                isDlSort = true;
+            } else {
+                sort = "5";
+            }
+            out.write("<a href=\"" + _contextPath + '/' + getQueryString(req, null, null, sort));
+            out.write("\">");
+        }
         // Translators: Please keep short or translate as " "
-        out.write(_("RX"));
-        out.write("\">");
+        tx = _("RX");
+        out.write(toThemeImg("head_rx", tx,
+                             showSort ? _("Sort by {0}", (isDlSort ? _("Downloaded") : _("Size")))
+                                      : _("Downloaded")));
+        if (showSort)
+            out.write("</a>");
         out.write("</th>\n<th align=\"right\">");
+        boolean isRatSort = false;
         if (!snarks.isEmpty()) {
-            out.write("<img border=\"0\" src=\"" + _imgPath + "head_tx.png\" title=\"");
-            out.write(_("Uploaded"));
-            out.write("\" alt=\"");
+            // cycle through sort by uploaded or ratio
+            boolean nextRatSort = false;
+            if (showSort) {
+                if ("7".equals(currentSort)) {
+                    sort = "-7";
+                } else if ("-7".equals(currentSort)) {
+                    sort = "11";
+                    nextRatSort = true;
+                } else if ("11".equals(currentSort)) {
+                    sort = "-11";
+                    nextRatSort = true;
+                    isRatSort = true;
+                } else if ("-11".equals(currentSort)) {
+                    sort = "7";
+                    isRatSort = true;
+                } else {
+                    sort = "7";
+                }
+                out.write("<a href=\"" + _contextPath + '/' + getQueryString(req, null, null, sort));
+                out.write("\">");
+            }
             // Translators: Please keep short or translate as " "
-            out.write(_("TX"));
-            out.write("\">");
+            tx = _("TX");
+            out.write(toThemeImg("head_tx", tx,
+                                 showSort ? _("Sort by {0}", (nextRatSort ? _("Upload ratio") : _("Uploaded")))
+                                          : _("Uploaded")));
+            if (showSort)
+                out.write("</a>");
         }
         out.write("</th>\n<th align=\"right\">");
         if (_manager.util().connected() && !snarks.isEmpty()) {
-            out.write("<img border=\"0\" src=\"" + _imgPath + "head_rxspeed.png\" title=\"");
-            out.write(_("Down Rate"));
-            out.write("\" alt=\"");
+            if (showSort) {
+                sort = ("8".equals(currentSort)) ? "-8" : "8";
+                out.write("<a href=\"" + _contextPath + '/' + getQueryString(req, null, null, sort));
+                out.write("\">");
+            }
             // Translators: Please keep short or translate as " "
-            out.write(_("RX Rate"));
-            out.write(" \">");
+            tx = _("RX Rate");
+            out.write(toThemeImg("head_rxspeed", tx,
+                                 showSort ? _("Sort by {0}", _("Down Rate"))
+                                          : _("Down Rate")));
+            if (showSort)
+                out.write("</a>");
         }
         out.write("</th>\n<th align=\"right\">");
         if (_manager.util().connected() && !snarks.isEmpty()) {
-            out.write("<img border=\"0\" src=\"" + _imgPath + "head_txspeed.png\" title=\"");
-            out.write(_("Up Rate"));
-            out.write("\" alt=\"");
+            if (showSort) {
+                sort = ("9".equals(currentSort)) ? "-9" : "9";
+                out.write("<a href=\"" + _contextPath + '/' + getQueryString(req, null, null, sort));
+                out.write("\">");
+            }
             // Translators: Please keep short or translate as " "
-            out.write(_("TX Rate"));
-            out.write(" \">");
+            tx = _("TX Rate");
+            out.write(toThemeImg("head_txspeed", tx,
+                                 showSort ? _("Sort by {0}", _("Up Rate"))
+                                          : _("Up Rate")));
+            if (showSort)
+                out.write("</a>");
         }
         out.write("</th>\n<th align=\"center\">");
 
@@ -581,12 +650,11 @@ public class I2PSnarkServlet extends BasicServlet {
         String uri = _contextPath + '/';
         boolean showDebug = "2".equals(peerParam);
 
-        String stParamStr = stParam == null ? "" : "&amp;st=" + stParam;
         for (int i = 0; i < total; i++) {
             Snark snark = snarks.get(i);
             boolean showPeers = showDebug || "1".equals(peerParam) || Base64.encode(snark.getInfoHash()).equals(peerParam);
             boolean hide = i < start || i >= start + pageSize;
-            displaySnark(out, snark, uri, i, stats, showPeers, isDegraded, noThinsp, showDebug, hide, stParamStr);
+            displaySnark(out, req, snark, uri, i, stats, showPeers, isDegraded, noThinsp, showDebug, hide, isRatSort);
         }
 
         if (total == 0) {
@@ -638,31 +706,117 @@ public class I2PSnarkServlet extends BasicServlet {
     }
     
     /**
+     *  hidden inputs for nonce and paramters p, st, and sort
+     *
+     *  @param out writes to it
+     *  @param action if non-null, add it as the action
+     *  @since 0.9.16
+     */
+    private void writeHiddenInputs(PrintWriter out, HttpServletRequest req, String action) {
+        StringBuilder buf = new StringBuilder(256);
+        writeHiddenInputs(buf, req, action);
+        out.write(buf.toString());
+    }
+    
+    /**
+     *  hidden inputs for nonce and paramters p, st, and sort
+     *
+     *  @param out appends to it
+     *  @param action if non-null, add it as the action
+     *  @since 0.9.16
+     */
+    private void writeHiddenInputs(StringBuilder buf, HttpServletRequest req, String action) {
+        buf.append("<input type=\"hidden\" name=\"nonce\" value=\"")
+           .append(_nonce).append("\" >\n");
+        String peerParam = req.getParameter("p");
+        if (peerParam != null) {
+            buf.append("<input type=\"hidden\" name=\"p\" value=\"")
+               .append(DataHelper.stripHTML(peerParam)).append("\" >\n");
+        }
+        String stParam = req.getParameter("st");
+        if (stParam != null) {
+            buf.append("<input type=\"hidden\" name=\"st\" value=\"")
+               .append(DataHelper.stripHTML(stParam)).append("\" >\n");
+        }
+        String soParam = req.getParameter("sort");
+        if (soParam != null) {
+            buf.append("<input type=\"hidden\" name=\"sort\" value=\"")
+               .append(DataHelper.stripHTML(soParam)).append("\" >\n");
+        }
+        if (action != null) {
+            buf.append("<input type=\"hidden\" name=\"action\" value=\"")
+               .append(action).append("\" >\n");
+        }
+    }
+    
+    /**
+     *  Build HTML-escaped and stripped query string
+     *
+     *  @param p override or "" for default or null to keep the same as in req
+     *  @param st override or "" for default or null to keep the same as in req
+     *  @param so override or "" for default or null to keep the same as in req
+     *  @return non-null, possibly empty
+     *  @since 0.9.16
+     */
+    private static String getQueryString(HttpServletRequest req, String p, String st, String so) {
+        StringBuilder buf = new StringBuilder(64);
+        if (p == null) {
+            p = req.getParameter("p");
+            if (p != null)
+                p = DataHelper.stripHTML(p);
+        }
+        if (p != null && !p.equals(""))
+            buf.append("?p=").append(p);
+        if (so == null) {
+            so = req.getParameter("sort");
+            if (so != null)
+                so = DataHelper.stripHTML(so);
+        }
+        if (so != null && !so.equals("")) {
+            if (buf.length() <= 0)
+                buf.append("?sort=");
+            else
+                buf.append("&amp;sort=");
+            buf.append(so);
+        }
+        if (st == null) {
+            st = req.getParameter("st");
+            if (st != null)
+                st = DataHelper.stripHTML(st);
+        }
+        if (st != null && !st.equals("")) {
+            if (buf.length() <= 0)
+                buf.append("?st=");
+            else
+                buf.append("&amp;st=");
+            buf.append(st);
+        }
+        return buf.toString();
+    }
+    
+    /**
      *  @since 0.9.6
      */
-    private void writePageNav(PrintWriter out, int start, int pageSize, int total,
-                              String peerParam, boolean noThinsp) {
+    private void writePageNav(PrintWriter out, HttpServletRequest req, int start, int pageSize, int total,
+                              boolean noThinsp) {
             // Page nav
             if (start > 0) {
                 // First
                 out.write("<a href=\"" + _contextPath);
-                if (peerParam != null)
-                    out.write("?p=" + peerParam);
-                out.write("\">" +
-                          "<img alt=\"" + _("First") + "\" title=\"" + _("First page") + "\" border=\"0\" src=\"" +
-                          _imgPath + "control_rewind_blue.png\">" +
-                          "</a>&nbsp;");
+                out.write(getQueryString(req, null, "", null));
+                out.write("\">");
+                out.write(toThemeImg("control_rewind_blue", _("First"), _("First page")));
+                out.write("</a>&nbsp;");
                 int prev = Math.max(0, start - pageSize);
                 //if (prev > 0) {
                 if (true) {
                     // Back
-                    out.write("&nbsp;<a href=\"" + _contextPath +  "?st=" + prev);
-                    if (peerParam != null)
-                        out.write("&amp;p=" + peerParam);
-                    out.write("\">" +
-                          "<img alt=\"" + _("Prev") + "\" title=\"" + _("Previous page") + "\" border=\"0\" src=\"" +
-                          _imgPath + "control_back_blue.png\">" +
-                          "</a>&nbsp;");
+                    out.write("&nbsp;<a href=\"" + _contextPath);
+                    String sprev = (prev > 0) ? Integer.toString(prev) : "";
+                    out.write(getQueryString(req, null, sprev, null));
+                    out.write("\">");
+                    out.write(toThemeImg("control_back_blue", _("Prev"), _("Previous page")));
+                    out.write("</a>&nbsp;");
                 }
             } else {
                 out.write(
@@ -691,23 +845,19 @@ public class I2PSnarkServlet extends BasicServlet {
                 //if (next + pageSize < total) {
                 if (true) {
                     // Next
-                    out.write("&nbsp;<a href=\"" + _contextPath +  "?st=" + next);
-                    if (peerParam != null)
-                        out.write("&amp;p=" + peerParam);
-                    out.write("\">" +
-                          "<img alt=\"" + _("Next") + "\" title=\"" + _("Next page") + "\" border=\"0\" src=\"" +
-                          _imgPath + "control_play_blue.png\">" +
-                          "</a>&nbsp;");
+                    out.write("&nbsp;<a href=\"" + _contextPath);
+                    out.write(getQueryString(req, null, Integer.toString(next), null));
+                    out.write("\">");
+                    out.write(toThemeImg("control_play_blue", _("Next"), _("Next page")));
+                    out.write("</a>&nbsp;");
                 }
                 // Last
                 int last = ((total - 1) / pageSize) * pageSize;
-                out.write("&nbsp;<a href=\"" + _contextPath +  "?st=" + last);
-                if (peerParam != null)
-                    out.write("&amp;p=" + peerParam);
-                out.write("\">" +
-                          "<img alt=\"" + _("Last") + "\" title=\"" + _("Last page") + "\" border=\"0\" src=\"" +
-                          _imgPath + "control_fastforward_blue.png\">" +
-                          "</a>&nbsp;");
+                out.write("&nbsp;<a href=\"" + _contextPath);
+                out.write(getQueryString(req, null, Integer.toString(last), null));
+                out.write("\">");
+                out.write(toThemeImg("control_fastforward_blue", _("Last"), _("Last page")));
+                out.write("</a>&nbsp;");
             } else {
                 out.write("&nbsp;" +
                           "<img alt=\"\" border=\"0\" class=\"disable\" src=\"" +
@@ -1111,10 +1261,13 @@ public class I2PSnarkServlet extends BasicServlet {
                         _manager.addMessage(_("Removed") + ": " + DataHelper.stripHTML(k));
                         changed = true;
                      }
-                } else if (k.startsWith("open_")) {
-                     open.add(k.substring(5));
-                } else if (k.startsWith("private_")) {
-                     priv.add(k.substring(8));
+                } else if (k.startsWith("ttype_")) {
+                     String val = req.getParameter(k);
+                     k = k.substring(6);
+                     if ("1".equals(val))
+                         open.add(k);
+                     else if ("2".equals(val))
+                         priv.add(k);
                 }
             }
             if (changed) {
@@ -1149,12 +1302,12 @@ public class I2PSnarkServlet extends BasicServlet {
                     Map<String, Tracker> trackers = _manager.getTrackerMap();
                     trackers.put(name, new Tracker(name, aurl, hurl));
                     _manager.saveTrackerMap();
-                    // open trumps private
-                    if (req.getParameter("_add_open_") != null) {
+                    String type = req.getParameter("add_tracker_type");
+                    if ("1".equals(type)) {
                         List<String> newOpen = new ArrayList<String>(_manager.util().getOpenTrackers());
                         newOpen.add(aurl);
                         _manager.saveOpenTrackers(newOpen);
-                    } else if (req.getParameter("_add_private_") != null) {
+                    } else if ("2".equals(type)) {
                         List<String> newPriv = new ArrayList<String>(_manager.getPrivateTrackers());
                         newPriv.add(aurl);
                         _manager.savePrivateTrackers(newPriv);
@@ -1191,34 +1344,22 @@ public class I2PSnarkServlet extends BasicServlet {
         return buf.toString();
     }
 
-    /**
-     *  Sort alphabetically in current locale, ignore case, ignore leading "the "
-     *  (I guess this is worth it, a lot of torrents start with "The "
-     *  @since 0.7.14
-     */
-    private static class TorrentNameComparator implements Comparator<Snark>, Serializable {
-
-        public int compare(Snark l, Snark r) {
-            // put downloads and magnets first
-            if (l.getStorage() == null && r.getStorage() != null)
-                return -1;
-            if (l.getStorage() != null && r.getStorage() == null)
-                return 1;
-            String ls = l.getBaseName();
-            String llc = ls.toLowerCase(Locale.US);
-            if (llc.startsWith("the ") || llc.startsWith("the.") || llc.startsWith("the_"))
-                ls = ls.substring(4);
-            String rs = r.getBaseName();
-            String rlc = rs.toLowerCase(Locale.US);
-            if (rlc.startsWith("the ") || rlc.startsWith("the.") || rlc.startsWith("the_"))
-                rs = rs.substring(4);
-            return Collator.getInstance().compare(ls, rs);
-        }
-    }
-
     private List<Snark> getSortedSnarks(HttpServletRequest req) {
         ArrayList<Snark> rv = new ArrayList<Snark>(_manager.getTorrents());
-        Collections.sort(rv, new TorrentNameComparator());
+        if (rv.size() > 1) {
+            int sort = 0;
+            String ssort = req.getParameter("sort");
+            if (ssort != null) {
+                try {
+                    sort = Integer.parseInt(ssort);
+                } catch (NumberFormatException nfe) {}
+            }
+            try {
+                Collections.sort(rv, Sorters.getComparator(sort, this));
+            } catch (IllegalArgumentException iae) {
+                // Java 7 TimSort - may be unstable
+            }
+        }
         return rv;
     }
 
@@ -1230,11 +1371,11 @@ public class I2PSnarkServlet extends BasicServlet {
      *
      *  @param stats in/out param (totals)
      *  @param statsOnly if true, output nothing, update stats only
-     *  @param stParam non null; empty or e.g. &amp;st=10
      */
-    private void displaySnark(PrintWriter out, Snark snark, String uri, int row, long stats[], boolean showPeers,
+    private void displaySnark(PrintWriter out, HttpServletRequest req,
+                              Snark snark, String uri, int row, long stats[], boolean showPeers,
                               boolean isDegraded, boolean noThinsp, boolean showDebug, boolean statsOnly,
-                              String stParam) throws IOException {
+                              boolean showRatios) throws IOException {
         // stats
         long uploaded = snark.getUploaded();
         stats[0] += snark.getDownloaded();
@@ -1288,10 +1429,10 @@ public class I2PSnarkServlet extends BasicServlet {
         String rowClass = (row % 2 == 0 ? "snarkTorrentEven" : "snarkTorrentOdd");
         String statusString;
         if (snark.isChecking()) {
-            statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "stalled.png\" title=\"" + _("Checking") + "\"></td>" +
+            statusString = toThemeImg("stalled", "", _("Checking")) + "</td>" +
                            "<td class=\"snarkTorrentStatus\">" + _("Checking");
         } else if (snark.isAllocating()) {
-            statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "stalled.png\" title=\"" + _("Allocating") + "\"></td>" +
+            statusString = toThemeImg("stalled", "", _("Allocating")) + "</td>" +
                            "<td class=\"snarkTorrentStatus\">" + _("Allocating");
         } else if (err != null && curPeers == 0) {
             // Also don't show if seeding... but then we won't see the not-registered error
@@ -1305,7 +1446,7 @@ public class I2PSnarkServlet extends BasicServlet {
             //                   ngettext("1 peer", "{0} peers", knownPeers) + "</a>";
             //else if (isRunning)
             if (isRunning)
-                statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "trackererror.png\" title=\"" + err + "\"></td>" +
+                statusString = toThemeImg("trackererror", "", err) + "</td>" +
                                "<td class=\"snarkTorrentStatus\">" + _("Tracker Error") +
                                ": " + curPeers + thinsp(noThinsp) +
                                ngettext("1 peer", "{0} peers", knownPeers);
@@ -1314,11 +1455,11 @@ public class I2PSnarkServlet extends BasicServlet {
                     err = DataHelper.escapeHTML(err.substring(0, MAX_DISPLAYED_ERROR_LENGTH)) + "&hellip;";
                 else
                     err = DataHelper.escapeHTML(err);
-                statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "trackererror.png\" title=\"" + err + "\"></td>" +
+                statusString = toThemeImg("trackererror", "", err) + "</td>" +
                                "<td class=\"snarkTorrentStatus\">" + _("Tracker Error");
             }
         } else if (snark.isStarting()) {
-            statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "stalled.png\" title=\"" + _("Starting") + "\"></td>" +
+            statusString = toThemeImg("stalled", "", _("Starting")) + "</td>" +
                            "<td class=\"snarkTorrentStatus\">" + _("Starting");
         } else if (remaining == 0 || needed == 0) {  // < 0 means no meta size yet
             // partial complete or seeding
@@ -1334,52 +1475,52 @@ public class I2PSnarkServlet extends BasicServlet {
                     txt = _("Complete");
                 }
                 if (curPeers > 0 && !showPeers)
-                    statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + img + ".png\" title=\"" + txt + "\"></td>" +
+                    statusString = toThemeImg(img, "", txt) + "</td>" +
                                "<td class=\"snarkTorrentStatus\">" + txt +
-                               ": <a href=\"" + uri + "?p=" + Base64.encode(snark.getInfoHash()) + stParam + "\">" +
+                               ": <a href=\"" + uri + getQueryString(req, Base64.encode(snark.getInfoHash()), null, null) + "\">" +
                                curPeers + thinsp(noThinsp) +
                                ngettext("1 peer", "{0} peers", knownPeers) + "</a>";
                 else
-                    statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + img + ".png\" title=\"" + txt + "\"></td>" +
+                    statusString = toThemeImg(img, "", txt) + "</td>" +
                                "<td class=\"snarkTorrentStatus\">" + txt +
                                ": " + curPeers + thinsp(noThinsp) +
                                ngettext("1 peer", "{0} peers", knownPeers);
             } else {
-                statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "complete.png\" title=\"" + _("Complete") + "\"></td>" +
+                statusString = toThemeImg("complete", "", _("Complete")) + "</td>" +
                                "<td class=\"snarkTorrentStatus\">" + _("Complete");
             }
         } else {
             if (isRunning && curPeers > 0 && downBps > 0 && !showPeers)
-                statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "downloading.png\" title=\"" + _("OK") + "\"></td>" +
+                statusString = toThemeImg("downloading", "", _("OK")) + "</td>" +
                                "<td class=\"snarkTorrentStatus\">" + _("OK") +
-                               ": <a href=\"" + uri + "?p=" + Base64.encode(snark.getInfoHash()) + stParam + "\">" +
+                               ": <a href=\"" + uri + getQueryString(req, Base64.encode(snark.getInfoHash()), null, null) + "\">" +
                                curPeers + thinsp(noThinsp) +
                                ngettext("1 peer", "{0} peers", knownPeers) + "</a>";
             else if (isRunning && curPeers > 0 && downBps > 0)
-                statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "downloading.png\" title=\"" + _("OK") + "\"></td>" +
+                statusString = toThemeImg("downloading", "", _("OK")) + "</td>" +
                                "<td class=\"snarkTorrentStatus\">" + _("OK") +
                                ": " + curPeers + thinsp(noThinsp) +
                                ngettext("1 peer", "{0} peers", knownPeers);
             else if (isRunning && curPeers > 0 && !showPeers)
-                statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "stalled.png\" title=\"" + _("Stalled") + "\"></td>" +
+                statusString = toThemeImg("stalled", "", _("Stalled")) + "</td>" +
                                "<td class=\"snarkTorrentStatus\">" + _("Stalled") +
-                               ": <a href=\"" + uri + "?p=" + Base64.encode(snark.getInfoHash()) + stParam + "\">" +
+                               ": <a href=\"" + uri + getQueryString(req, Base64.encode(snark.getInfoHash()), null, null) + "\">" +
                                curPeers + thinsp(noThinsp) +
                                ngettext("1 peer", "{0} peers", knownPeers) + "</a>";
             else if (isRunning && curPeers > 0)
-                statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "stalled.png\" title=\"" + _("Stalled") + "\"></td>" +
+                statusString = toThemeImg("stalled", "", _("Stalled")) + "</td>" +
                                "<td class=\"snarkTorrentStatus\">" + _("Stalled") +
                                ": " + curPeers + thinsp(noThinsp) +
                                ngettext("1 peer", "{0} peers", knownPeers);
             else if (isRunning && knownPeers > 0)
-                statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "nopeers.png\" title=\"" + _("No Peers") + "\"></td>" +
+                statusString = toThemeImg("nopeers", "", _("No Peers")) + "</td>" +
                                "<td class=\"snarkTorrentStatus\">" + _("No Peers") +
                                ": 0" + thinsp(noThinsp) + knownPeers ;
             else if (isRunning)
-                statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "nopeers.png\" title=\"" + _("No Peers") + "\"></td>" +
+                statusString = toThemeImg("nopeers", "", _("No Peers")) + "</td>" +
                                "<td class=\"snarkTorrentStatus\">" + _("No Peers");
             else
-                statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "stopped.png\" title=\"" + _("Stopped") + "\"></td>" +
+                statusString = toThemeImg("stopped", "", _("Stopped")) + "</td>" +
                                "<td class=\"snarkTorrentStatus\">" + _("Stopped");
         }
         
@@ -1467,8 +1608,17 @@ public class I2PSnarkServlet extends BasicServlet {
         //    out.write("??");  // no meta size yet
         out.write("</td>\n\t");
         out.write("<td align=\"right\" class=\"snarkTorrentUploaded\">");
-        if (isValid && uploaded > 0)
-           out.write(formatSize(uploaded));
+        if (isValid) {
+            if (showRatios) {
+                if (total > 0) {
+                    double ratio = uploaded / ((double) total);
+                    out.write((new DecimalFormat("0.000")).format(ratio));
+                    out.write("&nbsp;x");
+                }
+            } else if (uploaded > 0) {
+                out.write(formatSize(uploaded));
+            }
+        }
         out.write("</td>\n\t");
         out.write("<td align=\"right\" class=\"snarkTorrentRateDown\">");
         if (isRunning && needed > 0)
@@ -1485,7 +1635,8 @@ public class I2PSnarkServlet extends BasicServlet {
         } else if (isRunning) {
             // Stop Button
             if (isDegraded)
-                out.write("<a href=\"" + _contextPath + "/?action=Stop_" + b64 + "&amp;nonce=" + _nonce + stParam + "\"><img title=\"");
+                out.write("<a href=\"" + _contextPath + "/?action=Stop_" + b64 + "&amp;nonce=" + _nonce +
+                          getQueryString(req, "", null, null).replace("?", "&amp;") + "\"><img title=\"");
             else
                 out.write("<input type=\"image\" name=\"action_Stop_" + b64 + "\" value=\"foo\" title=\"");
             out.write(_("Stop the torrent"));
@@ -1499,7 +1650,8 @@ public class I2PSnarkServlet extends BasicServlet {
                 // Start Button
                 // This works in Opera but it's displayed a little differently, so use noThinsp here too so all 3 icons are consistent
                 if (noThinsp)
-                    out.write("<a href=\"" + _contextPath + "/?action=Start_" + b64 + "&amp;nonce=" + _nonce + stParam + "\"><img title=\"");
+                    out.write("<a href=\"" + _contextPath + "/?action=Start_" + b64 + "&amp;nonce=" + _nonce +
+                              getQueryString(req, "", null, null).replace("?", "&amp;") + "\"><img title=\"");
                 else
                     out.write("<input type=\"image\" name=\"action_Start_" + b64 + "\" value=\"foo\" title=\"");
                 out.write(_("Start the torrent"));
@@ -1513,7 +1665,8 @@ public class I2PSnarkServlet extends BasicServlet {
                 // Remove Button
                 // Doesnt work with Opera so use noThinsp instead of isDegraded
                 if (noThinsp)
-                    out.write("<a href=\"" + _contextPath + "/?action=Remove_" + b64 + "&amp;nonce=" + _nonce + stParam + "\"><img title=\"");
+                    out.write("<a href=\"" + _contextPath + "/?action=Remove_" + b64 + "&amp;nonce=" + _nonce +
+                              getQueryString(req, "", null, null).replace("?", "&amp;") + "\"><img title=\"");
                 else
                     out.write("<input type=\"image\" name=\"action_Remove_" + b64 + "\" value=\"foo\" title=\"");
                 out.write(_("Remove the torrent from the active list, deleting the .torrent file"));
@@ -1534,7 +1687,8 @@ public class I2PSnarkServlet extends BasicServlet {
             // Delete Button
             // Doesnt work with Opera so use noThinsp instead of isDegraded
             if (noThinsp)
-                out.write("<a href=\"" + _contextPath + "/?action=Delete_" + b64 + "&amp;nonce=" + _nonce + stParam + "\"><img title=\"");
+                out.write("<a href=\"" + _contextPath + "/?action=Delete_" + b64 + "&amp;nonce=" + _nonce +
+                          getQueryString(req, "", null, null).replace("?", "&amp;") + "\"><img title=\"");
             else
                 out.write("<input type=\"image\" name=\"action_Delete_" + b64 + "\" value=\"foo\" title=\"");
             out.write(_("Delete the .torrent file and the associated data file(s)"));
@@ -1773,9 +1927,9 @@ public class I2PSnarkServlet extends BasicServlet {
         String linkUrl = getTrackerLinkUrl(announce, infohash);
         if (linkUrl != null) {
             StringBuilder buf = new StringBuilder(128);
-            buf.append(linkUrl)
-               .append("<img alt=\"").append(_("Info")).append("\" border=\"0\" src=\"")
-               .append(_imgPath).append("details.png\"></a>");
+            buf.append(linkUrl);
+            toThemeImg(buf, "details", _("Info"), "");
+            buf.append("</a>");
             return buf.toString();
         }
         return null;
@@ -1843,14 +1997,10 @@ public class I2PSnarkServlet extends BasicServlet {
         out.write("<div class=\"snarkNewTorrent\">\n");
         // *not* enctype="multipart/form-data", so that the input type=file sends the filename, not the file
         out.write("<form action=\"_post\" method=\"POST\">\n");
-        out.write("<input type=\"hidden\" name=\"nonce\" value=\"" + _nonce + "\" >\n");
-        out.write("<input type=\"hidden\" name=\"action\" value=\"Add\" >\n");
-        // don't lose peer setting
-        String peerParam = req.getParameter("p");
-        if (peerParam != null)
-            out.write("<input type=\"hidden\" name=\"p\" value=\"" + DataHelper.stripHTML(peerParam) + "\" >\n");
+        writeHiddenInputs(out, req, "Add");
         out.write("<div class=\"addtorrentsection\"><span class=\"snarkConfigTitle\">");
-        out.write("<img alt=\"\" border=\"0\" src=\"" + _imgPath + "add.png\"> ");
+        out.write(toThemeImg("add"));
+        out.write(' ');
         out.write(_("Add Torrent"));
         out.write("</span><hr>\n<table border=\"0\"><tr><td>");
         out.write(_("From URL"));
@@ -1875,14 +2025,10 @@ public class I2PSnarkServlet extends BasicServlet {
         out.write("<a name=\"add\"></a><div class=\"newtorrentsection\"><div class=\"snarkNewTorrent\">\n");
         // *not* enctype="multipart/form-data", so that the input type=file sends the filename, not the file
         out.write("<form action=\"_post\" method=\"POST\">\n");
-        out.write("<input type=\"hidden\" name=\"nonce\" value=\"" + _nonce + "\" >\n");
-        out.write("<input type=\"hidden\" name=\"action\" value=\"Create\" >\n");
-        // don't lose peer setting
-        String peerParam = req.getParameter("p");
-        if (peerParam != null)
-            out.write("<input type=\"hidden\" name=\"p\" value=\"" + DataHelper.stripHTML(peerParam) + "\" >\n");
+        writeHiddenInputs(out, req, "Create");
         out.write("<span class=\"snarkConfigTitle\">");
-        out.write("<img alt=\"\" border=\"0\" src=\"" + _imgPath + "create.png\"> ");
+        out.write(toThemeImg("create"));
+        out.write(' ');
         out.write(_("Create Torrent"));
         out.write("</span><hr>\n<table border=\"0\"><tr><td>");
         //out.write("From file: <input type=\"file\" name=\"newFile\" size=\"50\" value=\"" + newFile + "\" /><br>\n");
@@ -1946,11 +2092,11 @@ public class I2PSnarkServlet extends BasicServlet {
         //int seedPct = 0;
        
         out.write("<form action=\"" + _contextPath + "/configure\" method=\"POST\">\n" +
-                  "<div class=\"configsectionpanel\"><div class=\"snarkConfig\">\n" +
-                  "<input type=\"hidden\" name=\"nonce\" value=\"" + _nonce + "\" >\n" +
-                  "<input type=\"hidden\" name=\"action\" value=\"Save\" >\n" +
-                  "<span class=\"snarkConfigTitle\">" +
-                  "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "config.png\"> ");
+                  "<div class=\"configsectionpanel\"><div class=\"snarkConfig\">\n");
+        writeHiddenInputs(out, req, "Save");
+        out.write("<span class=\"snarkConfigTitle\">");
+        out.write(toThemeImg("config"));
+        out.write(' ');
         out.write(_("Configuration"));
         out.write("</span><hr>\n"   +
                   "<table border=\"0\"><tr><td>");
@@ -1979,6 +2125,7 @@ public class I2PSnarkServlet extends BasicServlet {
         out.write(": <td><select name='theme'>");
         String theme = _manager.getTheme();
         String[] themes = _manager.getThemes();
+        Arrays.sort(themes);
         for(int i = 0; i < themes.length; i++) {
             if(themes[i].equals(theme))
                 out.write("\n<OPTION value=\"" + themes[i] + "\" SELECTED>" + themes[i]);
@@ -2132,11 +2279,11 @@ public class I2PSnarkServlet extends BasicServlet {
     private void writeTrackerForm(PrintWriter out, HttpServletRequest req) throws IOException {
         StringBuilder buf = new StringBuilder(1024);
         buf.append("<form action=\"" + _contextPath + "/configure\" method=\"POST\">\n" +
-                  "<div class=\"configsectionpanel\"><div class=\"snarkConfig\">\n" +
-                  "<input type=\"hidden\" name=\"nonce\" value=\"" + _nonce + "\" >\n" +
-                  "<input type=\"hidden\" name=\"action\" value=\"Save2\" >\n" +
-                  "<span class=\"snarkConfigTitle\">" +
-                  "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "config.png\"> ");
+                   "<div class=\"configsectionpanel\"><div class=\"snarkConfig\">\n");
+        writeHiddenInputs(buf, req, "Save2");
+        buf.append("<span class=\"snarkConfigTitle\">");
+        toThemeImg(buf, "config");
+        buf.append(' ');
         buf.append(_("Trackers"));
         buf.append("</span><hr>\n"   +
                    "<table class=\"trackerconfig\"><tr><th>")
@@ -2145,6 +2292,8 @@ public class I2PSnarkServlet extends BasicServlet {
            .append(_("Name"))
            .append("</th><th>")
            .append(_("Website URL"))
+           .append("</th><th>")
+           .append(_("Standard"))
            .append("</th><th>")
            .append(_("Open"))
            .append("</th><th>")
@@ -2158,18 +2307,25 @@ public class I2PSnarkServlet extends BasicServlet {
             String name = t.name;
             String homeURL = t.baseURL;
             String announceURL = t.announceURL.replace("&#61;", "=");
+            boolean isOpen = openTrackers.contains(t.announceURL);
+            boolean isPrivate = privateTrackers.contains(t.announceURL);
             buf.append("<tr><td><input type=\"checkbox\" class=\"optbox\" name=\"delete_")
                .append(name).append("\" title=\"").append(_("Delete")).append("\">" +
                        "</td><td>").append(name)
                .append("</td><td>").append(urlify(homeURL, 35))
-               .append("</td><td><input type=\"checkbox\" class=\"optbox\" name=\"open_")
+               .append("</td><td><input type=\"radio\" class=\"optbox\" value=\"0\" name=\"ttype_")
                .append(announceURL).append("\"");
-            if (openTrackers.contains(t.announceURL))
+            if (!(isOpen || isPrivate))
                 buf.append(" checked=\"checked\"");
             buf.append(">" +
-                       "</td><td><input type=\"checkbox\" class=\"optbox\" name=\"private_")
+                       "</td><td><input type=\"radio\" class=\"optbox\" value=\"1\" name=\"ttype_")
                .append(announceURL).append("\"");
-            if (privateTrackers.contains(t.announceURL)) {
+            if (isOpen)
+                buf.append(" checked=\"checked\"");
+            buf.append(">" +
+                       "</td><td><input type=\"radio\" class=\"optbox\" value=\"2\" name=\"ttype_")
+               .append(announceURL).append("\"");
+            if (isPrivate) {
                 buf.append(" checked=\"checked\"");
             } else {
                 if (SnarkManager.DEFAULT_TRACKER_ANNOUNCES.contains(t.announceURL))
@@ -2183,27 +2339,29 @@ public class I2PSnarkServlet extends BasicServlet {
            .append(_("Add")).append(":</b></td>" +
                    "<td><input type=\"text\" class=\"trackername\" name=\"tname\" spellcheck=\"false\"></td>" +
                    "<td><input type=\"text\" class=\"trackerhome\" name=\"thurl\" spellcheck=\"false\"></td>" +
-                   "<td><input type=\"checkbox\" class=\"optbox\" name=\"_add_open_\"></td>" +
-                   "<td><input type=\"checkbox\" class=\"optbox\" name=\"_add_private_\"></td>" +
+                   "<td><input type=\"radio\" class=\"optbox\" value=\"0\" name=\"add_tracker_type\" checked=\"checked\"></td>" +
+                   "<td><input type=\"radio\" class=\"optbox\" value=\"1\" name=\"add_tracker_type\"></td>" +
+                   "<td><input type=\"radio\" class=\"optbox\" value=\"2\" name=\"add_tracker_type\"></td>" +
                    "<td><input type=\"text\" class=\"trackerannounce\" name=\"taurl\" spellcheck=\"false\"></td></tr>\n" +
-                   "<tr><td colspan=\"6\">&nbsp;</td></tr>\n" +  // spacer
-                   "<tr><td colspan=\"2\"></td><td colspan=\"4\">\n" +
+                   "<tr><td colspan=\"7\">&nbsp;</td></tr>\n" +  // spacer
+                   "<tr><td colspan=\"2\"></td><td colspan=\"5\">\n" +
                    "<input type=\"submit\" name=\"taction\" class=\"default\" value=\"").append(_("Add tracker")).append("\">\n" +
                    "<input type=\"submit\" name=\"taction\" class=\"delete\" value=\"").append(_("Delete selected")).append("\">\n" +
+                   "<input type=\"submit\" name=\"taction\" class=\"add\" value=\"").append(_("Add tracker")).append("\">\n" +
                    "<input type=\"submit\" name=\"taction\" class=\"accept\" value=\"").append(_("Save tracker configuration")).append("\">\n" +
                    // "<input type=\"reset\" class=\"cancel\" value=\"").append(_("Cancel")).append("\">\n" +
                    "<input type=\"submit\" name=\"taction\" class=\"reload\" value=\"").append(_("Restore defaults")).append("\">\n" +
-                   "<input type=\"submit\" name=\"taction\" class=\"add\" value=\"").append(_("Add tracker")).append("\">\n" +
                    "</td></tr>" +
-                   "<tr><td colspan=\"6\">&nbsp;</td></tr>\n" +  // spacer
+                   "<tr><td colspan=\"7\">&nbsp;</td></tr>\n" +  // spacer
                    "</table></div></div></form>\n");
         out.write(buf.toString());
     }
 
     private void writeConfigLink(PrintWriter out) throws IOException {
         out.write("<div class=\"configsection\"><span class=\"snarkConfig\">\n" +
-                  "<span class=\"snarkConfigTitle\"><a href=\"configure\">" +
-                  "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "config.png\"> ");
+                  "<span class=\"snarkConfigTitle\"><a href=\"configure\">");
+        out.write(toThemeImg("config"));
+        out.write(' ');
         out.write(_("Configuration"));
         out.write("</a></span></span></div>\n");
     }
@@ -2336,23 +2494,6 @@ public class I2PSnarkServlet extends BasicServlet {
 
     private static final String FOOTER = "</div></center></body></html>";
 
-    /**
-     *  Sort alphabetically in current locale, ignore case,
-     *  directories first
-     *  @since 0.9.6
-     */
-    private static class ListingComparator implements Comparator<File>, Serializable {
-
-        public int compare(File l, File r) {
-            boolean ld = l.isDirectory();
-            boolean rd = r.isDirectory();
-            if (ld && !rd)
-                return -1;
-            if (rd && !ld)
-                return 1;
-            return Collator.getInstance().compare(l.getName(), r.getName());
-        }
-    }
 
     /**
      * Modded heavily from the Jetty version in Resource.java,
@@ -2381,10 +2522,11 @@ public class I2PSnarkServlet extends BasicServlet {
      * @param base The encoded base URL
      * @param parent True if the parent directory should be included
      * @param postParams map of POST parameters or null if not a POST
+     * @param sortParam may be null
      * @return String of HTML or null if postParams != null
      * @since 0.7.14
      */
-    private String getListHTML(File xxxr, String base, boolean parent, Map<String, String[]> postParams)
+    private String getListHTML(File xxxr, String base, boolean parent, Map<String, String[]> postParams, String sortParam)
         throws IOException
     {
         String decodedBase = decodePath(base);
@@ -2436,6 +2578,10 @@ public class I2PSnarkServlet extends BasicServlet {
             // dummy
             r = new File("");
         }
+
+        boolean showPriority = snark != null && snark.getStorage() != null && !snark.getStorage().complete() &&
+                               r.isDirectory();
+
         StringBuilder buf=new StringBuilder(4096);
         buf.append(DOCTYPE).append("<HTML><HEAD><TITLE>");
         if (title.endsWith("/"))
@@ -2443,9 +2589,17 @@ public class I2PSnarkServlet extends BasicServlet {
         String directory = title;
         title = _("Torrent") + ": " + DataHelper.escapeHTML(title);
         buf.append(title);
-        buf.append("</TITLE>").append(HEADER_A).append(_themePath).append(HEADER_B).append("<link rel=\"shortcut icon\" href=\"" + _themePath + "favicon.ico\">" +
-             "</HEAD><BODY>\n<center><div class=\"snarknavbar\"><a href=\"").append(_contextPath).append("/\" title=\"Torrents\"");
-        buf.append(" class=\"snarkRefresh\"><img alt=\"\" border=\"0\" src=\"").append(_imgPath).append("arrow_refresh.png\">&nbsp;&nbsp;");
+        buf.append("</TITLE>\n").append(HEADER_A).append(_themePath).append(HEADER_B)
+            .append("<link rel=\"shortcut icon\" href=\"" + _themePath + "favicon.ico\">\n");
+        if (showPriority)
+            buf.append("<script src=\"").append(_contextPath).append(WARBASE + "js/folder.js\" type=\"text/javascript\"></script>\n");
+        buf.append("</HEAD><BODY");
+        if (showPriority)
+            buf.append(" onload=\"setupbuttons()\"");
+        buf.append(">\n<center><div class=\"snarknavbar\"><a href=\"").append(_contextPath).append("/\" title=\"Torrents\"");
+        buf.append(" class=\"snarkRefresh\">");
+        toThemeImg(buf, "arrow_refresh");
+        buf.append("&nbsp;&nbsp;");
         if (_contextName.equals(DEFAULT_NAME))
             buf.append(_("I2PSnark"));
         else
@@ -2454,11 +2608,13 @@ public class I2PSnarkServlet extends BasicServlet {
         
         if (parent)  // always true
             buf.append("<div class=\"page\"><div class=\"mainsection\">");
-        boolean showPriority = snark != null && snark.getStorage() != null && !snark.getStorage().complete() &&
-                               r.isDirectory();
         if (showPriority) {
             buf.append("<form action=\"").append(base).append("\" method=\"POST\">\n");
             buf.append("<input type=\"hidden\" name=\"nonce\" value=\"").append(_nonce).append("\" >\n");
+            if (sortParam != null) {
+                buf.append("<input type=\"hidden\" name=\"sort\" value=\"")
+                   .append(DataHelper.stripHTML(sortParam)).append("\" >\n");
+            }
         }
         if (snark != null) {
             // first table - torrent info
@@ -2471,14 +2627,16 @@ public class I2PSnarkServlet extends BasicServlet {
 
             String fullPath = snark.getName();
             String baseName = encodePath((new File(fullPath)).getName());
-            buf.append("<tr><td>")
-               .append("<img alt=\"\" border=\"0\" src=\"").append(_imgPath).append("file.png\" >&nbsp;<b>")
+            buf.append("<tr><td>");
+            toThemeImg(buf, "file");
+            buf.append("&nbsp;<b>")
                .append(_("Torrent file"))
                .append(":</b> <a href=\"").append(_contextPath).append('/').append(baseName).append("\">")
                .append(DataHelper.escapeHTML(fullPath))
                .append("</a></td></tr>\n");
-            buf.append("<tr><td>")
-               .append("<img alt=\"\" border=\"0\" src=\"").append(_imgPath).append("file.png\" >&nbsp;<b>")
+            buf.append("<tr><td>");
+            toThemeImg(buf, "file");
+            buf.append("&nbsp;<b>")
                .append(_("Data location"))
                .append(":</b> ")
                .append(DataHelper.escapeHTML(snark.getStorage().getBase().getPath()))
@@ -2495,17 +2653,19 @@ public class I2PSnarkServlet extends BasicServlet {
                     buf.append("<tr><td>");
                     String trackerLink = getTrackerLink(announce, snark.getInfoHash());
                     if (trackerLink != null)
-                        buf.append(trackerLink).append(' ');
-                    buf.append("<b>").append(_("Primary Tracker")).append(":</b> ");
+                        buf.append(trackerLink);
+                    else
+                        toThemeImg(buf, "details");
+                    buf.append(" <b>").append(_("Primary Tracker")).append(":</b> ");
                     buf.append(getShortTrackerLink(announce, snark.getInfoHash()));
                     buf.append("</td></tr>");
                 }
                 List<List<String>> alist = meta.getAnnounceList();
                 if (alist != null) {
-                    buf.append("<tr><td>" +
-                               "<img alt=\"\" border=\"0\" src=\"")
-                       .append(_imgPath).append("details.png\"> <b>");
-                    buf.append(_("Tracker List")).append(":</b> ");
+                    buf.append("<tr><td>");
+                    toThemeImg(buf, "details");
+                    buf.append(" <b>")
+                       .append(_("Tracker List")).append(":</b> ");
                     for (List<String> alist2 : alist) {
                         buf.append('[');
                         boolean more = false;
@@ -2527,8 +2687,9 @@ public class I2PSnarkServlet extends BasicServlet {
                 if (com != null) {
                     if (com.length() > 1024)
                         com = com.substring(0, 1024);
-                    buf.append("<tr><td><img alt=\"\" border=\"0\" src=\"")
-                       .append(_imgPath).append("details.png\"> <b>")
+                    buf.append("<tr><td>");
+                    toThemeImg(buf, "details");
+                    buf.append(" <b>")
                        .append(_("Comment")).append(":</b> ")
                        .append(DataHelper.stripHTML(com))
                        .append("</td></tr>\n");
@@ -2536,8 +2697,9 @@ public class I2PSnarkServlet extends BasicServlet {
                 long dat = meta.getCreationDate();
                 if (dat > 0) {
                     String date = (new SimpleDateFormat("yyyy-MM-dd HH:mm")).format(new Date(dat));
-                    buf.append("<tr><td><img alt=\"\" border=\"0\" src=\"")
-                       .append(_imgPath).append("details.png\"> <b>")
+                    buf.append("<tr><td>");
+                    toThemeImg(buf, "details");
+                    buf.append(" <b>")
                        .append(_("Created")).append(":</b> ")
                        .append(date).append(" UTC")
                        .append("</td></tr>\n");
@@ -2546,8 +2708,9 @@ public class I2PSnarkServlet extends BasicServlet {
                 if (cby != null) {
                     if (cby.length() > 128)
                         cby = com.substring(0, 128);
-                    buf.append("<tr><td><img alt=\"\" border=\"0\" src=\"")
-                       .append(_imgPath).append("details.png\"> <b>")
+                    buf.append("<tr><td>");
+                    toThemeImg(buf, "details");
+                    buf.append(" <b>")
                        .append(_("Created By")).append(":</b> ")
                        .append(DataHelper.stripHTML(cby))
                        .append("</td></tr>\n");
@@ -2582,41 +2745,70 @@ public class I2PSnarkServlet extends BasicServlet {
             //buf.append("<tr><td>").append(_("Maggot link")).append(": <a href=\"").append(MAGGOT).append(hex).append(':').append(hex).append("\">")
             //   .append(MAGGOT).append(hex).append(':').append(hex).append("</a></td></tr>");
 
-            buf.append("<tr><td>")
-               .append("<img alt=\"\" border=\"0\" src=\"").append(_imgPath).append("size.png\" >&nbsp;<b>")
+            buf.append("<tr><td>");
+            toThemeImg(buf, "size");
+            buf.append("&nbsp;<b>")
                .append(_("Size"))
                .append(":</b> ")
                .append(formatSize(snark.getTotalLength()));
             int pieces = snark.getPieces();
             double completion = (pieces - snark.getNeeded()) / (double) pieces;
+            buf.append("&nbsp;");
+            toThemeImg(buf, "head_rx");
+            buf.append("&nbsp;<b>");
             if (completion < 1.0)
-                buf.append("&nbsp;<img alt=\"\" border=\"0\" src=\"").append(_imgPath).append("head_rx.png\" >&nbsp;<b>")
-                   .append(_("Completion"))
+                buf.append(_("Completion"))
                    .append(":</b> ")
                    .append((new DecimalFormat("0.00%")).format(completion));
             else
-                buf.append("&nbsp;<img alt=\"\" border=\"0\" src=\"").append(_imgPath).append("head_rx.png\" >&nbsp;")
-                   .append(_("Complete"));
-            // else unknown
+                buf.append(_("Complete")).append("</b>");
+            // up ratio
+            buf.append("&nbsp;");
+            toThemeImg(buf, "head_tx");
+            buf.append("&nbsp;<b>")
+               .append(_("Upload ratio"))
+               .append(":</b> ");
+            long uploaded = snark.getUploaded();
+            if (uploaded > 0) {
+                double ratio = uploaded / ((double) snark.getTotalLength());
+                buf.append((new DecimalFormat("0.000")).format(ratio));
+                buf.append("&nbsp;x");
+            } else {
+                buf.append('0');
+            }
+            // not including skipped files, but -1 when not running
             long needed = snark.getNeededLength();
-            if (needed > 0)
-                buf.append("&nbsp;<img alt=\"\" border=\"0\" src=\"").append(_imgPath).append("head_rx.png\" >&nbsp;<b>")
+            if (needed < 0) {
+                // including skipped files, valid when not running
+                needed = snark.getRemainingLength();
+            }
+            if (needed > 0) {
+                buf.append("&nbsp;");
+                toThemeImg(buf, "head_rx");
+                buf.append("&nbsp;<b>")
                    .append(_("Remaining"))
                    .append(":</b> ")
                    .append(formatSize(needed));
+            }
             if (meta != null) {
                 List<List<String>> files = meta.getFiles();
                 int fileCount = files != null ? files.size() : 1;
-                buf.append("&nbsp;<img alt=\"\" border=\"0\" src=\"").append(_imgPath).append("file.png\" >&nbsp;<b>")
+                buf.append("&nbsp;");
+                toThemeImg(buf, "file");
+                buf.append("&nbsp;<b>")
                    .append(_("Files"))
                    .append(":</b> ")
                    .append(fileCount);
             }
-            buf.append("&nbsp;<img alt=\"\" border=\"0\" src=\"").append(_imgPath).append("file.png\" >&nbsp;<b>")
+            buf.append("&nbsp;");
+            toThemeImg(buf, "file");
+            buf.append("&nbsp;<b>")
                .append(_("Pieces"))
                .append(":</b> ")
                .append(pieces);
-            buf.append("&nbsp;<img alt=\"\" border=\"0\" src=\"").append(_imgPath).append("file.png\" >&nbsp;<b>")
+            buf.append("&nbsp;");
+            toThemeImg(buf, "file");
+            buf.append("&nbsp;<b>")
                .append(_("Piece size"))
                .append(":</b> ")
                .append(formatSize(snark.getPieceLength(0)))
@@ -2642,7 +2834,6 @@ public class I2PSnarkServlet extends BasicServlet {
         File[] ls = null;
         if (r.isDirectory()) {
             ls = r.listFiles();
-            Arrays.sort(ls, new ListingComparator());
         }  // if r is not a directory, we are only showing torrent info section
         
         if (ls == null) {
@@ -2651,40 +2842,92 @@ public class I2PSnarkServlet extends BasicServlet {
             return buf.toString();
         }
 
+        Storage storage = snark != null ? snark.getStorage() : null;
+        List<Sorters.FileAndIndex> fileList = new ArrayList<Sorters.FileAndIndex>(ls.length);
+        for (int i = 0; i < ls.length; i++) {
+            fileList.add(new Sorters.FileAndIndex(ls[i], storage));
+        }
+
+        boolean showSort = fileList.size() > 1;
+        if (showSort) {
+            int sort = 0;
+            if (sortParam != null) {
+                try {
+                    sort = Integer.parseInt(sortParam);
+                } catch (NumberFormatException nfe) {}
+            }
+            Collections.sort(fileList, Sorters.getFileComparator(sort, this));
+        }
+
         // second table - dir info
         buf.append("<table class=\"snarkDirInfo\"><thead>\n");
         buf.append("<tr>\n")
-           .append("<th colspan=2>")
-           .append("<img border=\"0\" src=\"").append(_imgPath).append("file.png\" title=\"")
-           .append(_("Directory"))
-           .append(": ")
-           .append(directory)
-           .append("\" alt=\"")
-           .append(_("Directory"))
-           .append("\"></th>\n");
-        buf.append("<th align=\"right\">")
-           .append("<img border=\"0\" src=\"").append(_imgPath).append("size.png\" title=\"")
-           .append(_("Size"))
-           .append("\" alt=\"")
-           .append(_("Size"))
-           .append("\"></th>\n");
-        buf.append("<th class=\"headerstatus\">")
-           .append("<img border=\"0\" src=\"").append(_imgPath).append("status.png\" title=\"")
-           .append(_("Status"))
-           .append("\" alt=\"")
-           .append(_("Status"))
-           .append("\"></th>\n");
-        if (showPriority)
-            buf.append("<th class=\"headerpriority\">")
-               .append("<img border=\"0\" src=\"").append(_imgPath).append("priority.png\" title=\"")
-               .append(_("Priority"))
-               .append("\" alt=\"")
-               .append(_("Priority"))
-               .append("\"></th>\n");
-        buf.append("</tr>\n</thead>\n");
+           .append("<th colspan=2>");
+        String tx = _("Directory");
+        // cycle through sort by name or type
+        String sort;
+        boolean isTypeSort = false;
+        if (showSort) {
+            if (sortParam == null || "0".equals(sortParam) || "1".equals(sortParam)) {
+                sort = "-1";
+            } else if ("-1".equals(sortParam)) {
+                sort = "12";
+                isTypeSort = true;
+            } else if ("12".equals(sortParam)) {
+                sort = "-12";
+                isTypeSort = true;
+            } else {
+                sort = "";
+            }
+            buf.append("<a href=\"").append(base)
+               .append(getQueryString(sort)).append("\">");
+        }
+        toThemeImg(buf, "file", tx,
+                   showSort ? _("Sort by {0}", (isTypeSort ? _("File type") : _("Name")))
+                            : tx + ": " + directory);
+        if (showSort)
+            buf.append("</a>");
+        buf.append("</th>\n<th align=\"right\">");
+        if (showSort) {
+            sort = ("5".equals(sortParam)) ? "-5" : "5";
+            buf.append("<a href=\"").append(base)
+               .append(getQueryString(sort)).append("\">");
+        }
+        tx = _("Size");
+        toThemeImg(buf, "size", tx,
+                   showSort ? _("Sort by {0}", tx) : tx);
+        if (showSort)
+            buf.append("</a>");
+        buf.append("</th>\n<th class=\"headerstatus\">");
+        if (showSort) {
+            sort = ("10".equals(sortParam)) ? "-10" : "10";
+            buf.append("<a href=\"").append(base)
+               .append(getQueryString(sort)).append("\">");
+        }
+        tx = _("Status");
+        toThemeImg(buf, "status", tx,
+                   showSort ? _("Sort by {0}", _("Remaining")) : tx);
+        if (showSort)
+            buf.append("</a>");
+        if (showPriority) {
+            buf.append("</th>\n<th class=\"headerpriority\">");
+            if (showSort) {
+                sort = ("13".equals(sortParam)) ? "-13" : "13";
+                buf.append("<a href=\"").append(base)
+                   .append(getQueryString(sort)).append("\">");
+            }
+            tx = _("Priority");
+            toThemeImg(buf, "priority", tx,
+                       showSort ? _("Sort by {0}", tx) : tx);
+            if (showSort)
+                buf.append("</a>");
+        }
+        buf.append("</th>\n</tr>\n</thead>\n");
         buf.append("<tr><td colspan=\"" + (showPriority ? '5' : '4') + "\" class=\"ParentDir\"><A HREF=\"");
         URIUtil.encodePath(buf, addPaths(decodedBase,"../"));
-        buf.append("\"><img alt=\"\" border=\"0\" src=\"").append(_imgPath).append("up.png\"> ")
+        buf.append("\">");
+        toThemeImg(buf, "up");
+        buf.append(' ')
            .append(_("Up to higher level directory"))
            .append("</A></td></tr>\n");
 
@@ -2692,25 +2935,27 @@ public class I2PSnarkServlet extends BasicServlet {
         //DateFormat dfmt=DateFormat.getDateTimeInstance(DateFormat.MEDIUM,
         //                                               DateFormat.MEDIUM);
         boolean showSaveButton = false;
-        for (int i=0 ; i< ls.length ; i++)
+        boolean rowEven = true;
+        for (Sorters.FileAndIndex fai : fileList)
         {   
             //String encoded = encodePath(ls[i].getName());
             // bugfix for I2P - Backport from Jetty 6 (zero file lengths and last-modified times)
             // http://jira.codehaus.org/browse/JETTY-361?page=com.atlassian.jira.plugin.system.issuetabpanels%3Achangehistory-tabpanel#issue-tabs
             // See resource.diff attachment
             //Resource item = addPath(encoded);
-            File item = ls[i];
+            File item = fai.file;
             
-            String rowClass = (i % 2 == 0 ? "snarkTorrentEven" : "snarkTorrentOdd");
+            String rowClass = (rowEven ? "snarkTorrentEven" : "snarkTorrentOdd");
+            rowEven = !rowEven;
             buf.append("<TR class=\"").append(rowClass).append("\">");
             
             // Get completeness and status string
             boolean complete = false;
             String status = "";
             long length = item.length();
-            int fileIndex = -1;
+            int fileIndex = fai.index;
             int priority = 0;
-            if (item.isDirectory()) {
+            if (fai.isDirectory) {
                 complete = true;
                 //status = toImg("tick") + ' ' + _("Directory");
             } else {
@@ -2719,10 +2964,8 @@ public class I2PSnarkServlet extends BasicServlet {
                     complete = true;
                     status = toImg("cancel") + ' ' + _("Torrent not found?");
                 } else {
-                    Storage storage = snark.getStorage();
-                    fileIndex = storage.indexOf(item);
 
-                            long remaining = storage.remaining(fileIndex);
+                            long remaining = fai.remaining;
                             if (remaining < 0) {
                                 complete = true;
                                 status = toImg("cancel") + ' ' + _("File not found in torrent?");
@@ -2730,7 +2973,7 @@ public class I2PSnarkServlet extends BasicServlet {
                                 complete = true;
                                 status = toImg("tick") + ' ' + _("Complete");
                             } else {
-                                priority = storage.getPriority(fileIndex);
+                                priority = fai.priority;
                                 if (priority < 0)
                                     status = toImg("cancel");
                                 else if (priority == 0)
@@ -2745,7 +2988,7 @@ public class I2PSnarkServlet extends BasicServlet {
                 }
             }
 
-            String path = addPaths(decodedBase, ls[i].getName());
+            String path = addPaths(decodedBase, item.getName());
             if (item.isDirectory() && !path.endsWith("/"))
                 path=addPaths(path,"/");
             path = encodePath(path);
@@ -2782,19 +3025,19 @@ public class I2PSnarkServlet extends BasicServlet {
             if (showPriority) {
                 buf.append("<td class=\"priority\">");
                 if ((!complete) && (!item.isDirectory())) {
-                    buf.append("<input type=\"radio\" value=\"5\" name=\"pri.").append(fileIndex).append("\" ");
+                    buf.append("\n<input type=\"radio\" onclick=\"priorityclicked();\" class=\"prihigh\" value=\"5\" name=\"pri.").append(fileIndex).append("\" ");
                     if (priority > 0)
-                        buf.append("checked=\"true\"");
+                        buf.append("checked=\"checked\"");
                     buf.append('>').append(_("High"));
 
-                    buf.append("<input type=\"radio\" value=\"0\" name=\"pri.").append(fileIndex).append("\" ");
+                    buf.append("\n<input type=\"radio\" onclick=\"priorityclicked();\" class=\"prinorm\" value=\"0\" name=\"pri.").append(fileIndex).append("\" ");
                     if (priority == 0)
-                        buf.append("checked=\"true\"");
+                        buf.append("checked=\"checked\"");
                     buf.append('>').append(_("Normal"));
 
-                    buf.append("<input type=\"radio\" value=\"-9\" name=\"pri.").append(fileIndex).append("\" ");
+                    buf.append("\n<input type=\"radio\" onclick=\"priorityclicked();\" class=\"priskip\" value=\"-9\" name=\"pri.").append(fileIndex).append("\" ");
                     if (priority < 0)
-                        buf.append("checked=\"true\"");
+                        buf.append("checked=\"checked\"");
                     buf.append('>').append(_("Skip"));
                     showSaveButton = true;
                 }
@@ -2803,9 +3046,16 @@ public class I2PSnarkServlet extends BasicServlet {
             buf.append("</TR>\n");
         }
         if (showSaveButton) {
-            buf.append("<thead><tr><th colspan=\"4\">&nbsp;</th><th class=\"headerpriority\"><input type=\"submit\" value=\"");
-            buf.append(_("Save priorities"));
-            buf.append("\" name=\"foo\" ></th></tr></thead>\n");
+            buf.append("<thead><tr><th colspan=\"4\">&nbsp;</th><th class=\"headerpriority\">" +
+                       "<a class=\"control\" id=\"setallhigh\" href=\"javascript:void(null);\" onclick=\"setallhigh();\">")
+               .append(toImg("clock_red")).append(_("Set all high")).append("</a>\n" +
+                       "<a class=\"control\" id=\"setallnorm\" href=\"javascript:void(null);\" onclick=\"setallnorm();\">")
+               .append(toImg("clock")).append(_("Set all normal")).append("</a>\n" +
+                       "<a class=\"control\" id=\"setallskip\" href=\"javascript:void(null);\" onclick=\"setallskip();\">")
+               .append(toImg("cancel")).append(_("Skip all")).append("</a>\n" +
+                       "<br><br><input type=\"submit\" class=\"accept\" value=\"").append(_("Save priorities"))
+               .append("\" name=\"savepri\" >\n" +
+                       "</th></tr></thead>\n");
         }
         buf.append("</table>\n");
         if (showPriority)
@@ -2815,7 +3065,23 @@ public class I2PSnarkServlet extends BasicServlet {
         return buf.toString();
     }
 
-    /** @since 0.7.14 */
+    /**
+     *  @param null ok
+     *  @return query string or ""
+     *  @since 0.9.16
+     */
+    private static String getQueryString(String so) {
+        if (so != null && !so.equals(""))
+            return "?sort=" + DataHelper.stripHTML(so);
+        return "";
+    }
+
+    /**
+     *  Pick an icon; try to catch the common types in an i2p environment.
+     *
+     *  @return file name not including ".png"
+     *  @since 0.7.14
+     */
     private String toIcon(File item) {
         if (item.isDirectory())
             return "folder";
@@ -2824,10 +3090,12 @@ public class I2PSnarkServlet extends BasicServlet {
 
     /**
      *  Pick an icon; try to catch the common types in an i2p environment
+     *  Pkg private for FileTypeSorter.
+     *
      *  @return file name not including ".png"
      *  @since 0.7.14
      */
-    private String toIcon(String path) {
+    String toIcon(String path) {
         String icon;
         // Note that for this to work well, our custom mime.properties file must be loaded.
         String plc = path.toLowerCase(Locale.US);
@@ -2856,7 +3124,12 @@ public class I2PSnarkServlet extends BasicServlet {
             icon = "music";
         else if (mime.startsWith("video/"))
             icon = "film";
-        else if (mime.equals("application/zip") || mime.equals("application/x-gtar") ||
+        else if (mime.equals("application/zip")) {
+            if (plc.endsWith(".su3") || plc.endsWith(".su2") || plc.endsWith(".sud"))
+                icon = "itoopie_xxsm";
+            else
+                icon = "compress";
+        } else if (mime.equals("application/x-gtar") ||
                  mime.equals("application/compress") || mime.equals("application/gzip") ||
                  mime.equals("application/x-7z-compressed") || mime.equals("application/x-rar-compressed") ||
                  mime.equals("application/x-tar") || mime.equals("application/x-bzip2"))
@@ -2872,14 +3145,73 @@ public class I2PSnarkServlet extends BasicServlet {
         return icon;
     }
     
-    /** @since 0.7.14 */
+    /**
+     *  Icon file in the .war. Always 16x16.
+     *
+     *  @param icon name without the ".png"
+     *  @since 0.7.14
+     */
     private String toImg(String icon) {
-        return "<img alt=\"\" height=\"16\" width=\"16\" src=\"" + _contextPath + "/.icons/" + icon + ".png\">";
+        return toImg(icon, "");
     }
 
-    /** @since 0.8.2 */
+    /**
+     *  Icon file in the .war. Always 16x16.
+     *
+     *  @param icon name without the ".png"
+     *  @since 0.8.2
+     */
     private String toImg(String icon, String altText) {
-        return "<img alt=\"" + altText + "\" height=\"16\" width=\"16\" src=\"" + _contextPath + "/.icons/" + icon + ".png\">";
+        return "<img alt=\"" + altText + "\" height=\"16\" width=\"16\" src=\"" + _contextPath + WARBASE + "icons/" + icon + ".png\">";
+    }
+    
+    /**
+     *  Image file in the theme.
+     *
+     *  @param image name without the ".png"
+     *  @since 0.9.16
+     */
+    private String toThemeImg(String image) {
+        return toThemeImg(image, "", "");
+    }
+    
+    /**
+     *  Image file in the theme.
+     *
+     *  @param image name without the ".png"
+     *  @since 0.9.16
+     */
+    private void toThemeImg(StringBuilder buf, String image) {
+        toThemeImg(buf, image, "", "");
+    }
+
+    /**
+     *  Image file in the theme.
+     *
+     *  @param image name without the ".png"
+     *  @param altText non-null
+     *  @param titleText non-null
+     *  @since 0.9.16
+     */
+    private String toThemeImg(String image, String altText, String titleText) {
+        StringBuilder buf = new StringBuilder(128);
+        toThemeImg(buf, image, altText, titleText);
+        return buf.toString();
+    }
+
+    /**
+     *  Image file in the theme.
+     *
+     *  @param image name without the ".png"
+     *  @param altText non-null
+     *  @param titleText non-null
+     *  @since 0.9.16
+     */
+    private void toThemeImg(StringBuilder buf, String image, String altText, String titleText) {
+        buf.append("<img alt=\"").append(altText).append("\" src=\"").append(_imgPath).append(image).append(".png\"");
+        if (titleText.length() > 0)
+            buf.append(" title=\"").append(titleText).append('"');
+        buf.append('>');
     }
 
     /** @since 0.8.1 */

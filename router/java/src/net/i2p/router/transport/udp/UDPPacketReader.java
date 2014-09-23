@@ -2,6 +2,7 @@ package net.i2p.router.transport.udp;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.Base64;
+import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.SessionKey;
 import net.i2p.data.Signature;
@@ -11,6 +12,9 @@ import net.i2p.util.Log;
  * To read a packet, initialize this reader with the data and fetch out
  * the appropriate fields.  If the interesting bits are in message specific
  * elements, grab the appropriate subreader.
+ *
+ * Many of the methods here and in the subclasses will throw AIOOBE on
+ * malformed packets, that should be caught also.
  *
  */
 class UDPPacketReader {
@@ -203,9 +207,10 @@ class UDPPacketReader {
             return rv;
         }
         
-        public void readEncryptedSignature(byte target[], int targetOffset) {
+        /** @param size the amount to be copied, including padding to mod 16 */
+        public void readEncryptedSignature(byte target[], int targetOffset, int size) {
             int offset = readBodyOffset() + Y_LENGTH + 1 + readIPSize() + 2 + 4 + 4;
-            System.arraycopy(_message, offset, target, targetOffset, Signature.SIGNATURE_BYTES + 8);
+            System.arraycopy(_message, offset, target, targetOffset, size);
         }
         
         public void readIV(byte target[], int targetOffset) {
@@ -239,7 +244,11 @@ class UDPPacketReader {
             System.arraycopy(_message, readOffset, target, targetOffset, len);
         }
         
-        /** read the time at which the signature was generated */
+        /**
+         *  Read the time at which the signature was generated.
+         *  TODO must be completely in final fragment.
+         *  Time and sig cannot be split across fragments.
+         */
         public long readFinalFragmentSignedOnTime() {
             if (readCurrentFragmentNum() != readTotalFragmentNum()-1)
                 throw new IllegalStateException("This is not the final fragment");
@@ -247,12 +256,19 @@ class UDPPacketReader {
             return DataHelper.fromLong(_message, readOffset, 4);
         }
         
-        /** read the signature from the final sessionConfirmed packet */
-        public void readFinalSignature(byte target[], int targetOffset) {
+        /**
+         *  Read the signature from the final sessionConfirmed packet.
+         *  TODO must be completely in final fragment.
+         *  Time and sig cannot be split across fragments.
+         *  @param size not including padding
+         */
+        public void readFinalSignature(byte target[], int targetOffset, int size) {
             if (readCurrentFragmentNum() != readTotalFragmentNum()-1)
                 throw new IllegalStateException("This is not the final fragment");
-            int readOffset = _payloadBeginOffset + _payloadLength - Signature.SIGNATURE_BYTES;
-            System.arraycopy(_message, readOffset, target, targetOffset, Signature.SIGNATURE_BYTES);
+            int readOffset = _payloadBeginOffset + _payloadLength - size;
+            if (readOffset < readBodyOffset() + (1 + 2 + 4))
+                throw new IllegalStateException("Sig split across fragments");
+            System.arraycopy(_message, readOffset, target, targetOffset, size);
         }
     }
     
@@ -267,26 +283,33 @@ class UDPPacketReader {
         public boolean readACKsIncluded() {
             return flagSet(UDPPacket.DATA_FLAG_EXPLICIT_ACK);
         }
+
         public boolean readACKBitfieldsIncluded() {
             return flagSet(UDPPacket.DATA_FLAG_ACK_BITFIELDS);
         }
+
         public boolean readECN() {
             return flagSet(UDPPacket.DATA_FLAG_ECN);
         }
+
         public boolean readWantPreviousACKs() {
             return flagSet(UDPPacket.DATA_FLAG_WANT_ACKS);
         }
+
         public boolean readReplyRequested() { 
             return flagSet(UDPPacket.DATA_FLAG_WANT_REPLY);
         }
+
         public boolean readExtendedDataIncluded() {
             return flagSet(UDPPacket.DATA_FLAG_EXTENDED);
         }
+
         public int readACKCount() {
             if (!readACKsIncluded()) return 0;
             int off = readBodyOffset() + 1;
             return (int)DataHelper.fromLong(_message, off, 1);
         }
+
         public long readACK(int index) {
             if (!readACKsIncluded()) return -1;
             int off = readBodyOffset() + 1;
@@ -294,7 +317,8 @@ class UDPPacketReader {
             off++;
             return DataHelper.fromLong(_message, off + (4 * index), 4);
         }
-        public ACKBitfield[] readACKBitfields() {
+
+        public ACKBitfield[] readACKBitfields() throws DataFormatException {
             if (!readACKBitfieldsIncluded()) return null;
             int off = readBodyOffset() + 1;
             if (readACKsIncluded()) {
@@ -314,7 +338,7 @@ class UDPPacketReader {
             return rv;
         }
         
-        public int readFragmentCount() {
+        public int readFragmentCount() throws DataFormatException {
             int off = readBodyOffset() + 1;
             if (readACKsIncluded()) {
                 int numACKs = (int)DataHelper.fromLong(_message, off, 1);
@@ -338,38 +362,39 @@ class UDPPacketReader {
             return _message[off];
         }
         
-        public long readMessageId(int fragmentNum) {
+        public long readMessageId(int fragmentNum) throws DataFormatException {
             int fragmentBegin = getFragmentBegin(fragmentNum);
             return DataHelper.fromLong(_message, fragmentBegin, 4);
         }
-        public int readMessageFragmentNum(int fragmentNum) {
+
+        public int readMessageFragmentNum(int fragmentNum) throws DataFormatException {
             int off = getFragmentBegin(fragmentNum);
             off += 4; // messageId
             return (_message[off] & 0xFF) >>> 1;
         }
-        public boolean readMessageIsLast(int fragmentNum) {
+
+        public boolean readMessageIsLast(int fragmentNum) throws DataFormatException {
             int off = getFragmentBegin(fragmentNum);
             off += 4; // messageId
             return ((_message[off] & 1) != 0);
         }
-        public int readMessageFragmentSize(int fragmentNum) {
+
+        public int readMessageFragmentSize(int fragmentNum) throws DataFormatException {
             int off = getFragmentBegin(fragmentNum);
-            off += 4; // messageId
-            off++; // fragment info
+            off += 5; // messageId + fragment info
             return ((int)DataHelper.fromLong(_message, off, 2)) & 0x3FFF;
         }
 
         public void readMessageFragment(int fragmentNum, byte target[], int targetOffset)
-                                                      throws ArrayIndexOutOfBoundsException {
+                                                      throws DataFormatException {
             int off = getFragmentBegin(fragmentNum);
-            off += 4; // messageId
-            off++; // fragment info
+            off += 5; // messageId + fragment info
             int size = ((int)DataHelper.fromLong(_message, off, 2)) & 0x3FFF;
             off += 2;
             System.arraycopy(_message, off, target, targetOffset, size);
         }
         
-        private int getFragmentBegin(int fragmentNum) {
+        private int getFragmentBegin(int fragmentNum) throws DataFormatException {
             int off = readBodyOffset() + 1;
             if (readACKsIncluded()) {
                 int numACKs = (int)DataHelper.fromLong(_message, off, 1);
@@ -393,16 +418,14 @@ class UDPPacketReader {
             }
             off++; // # fragments
             
-            if (fragmentNum == 0) {
-                return off;
-            } else {
+            if (fragmentNum > 0) {
                 for (int i = 0; i < fragmentNum; i++) {
                     off += 5; // messageId+info
                     off += ((int)DataHelper.fromLong(_message, off, 2)) & 0x3FFF;
                     off += 2;
                 }
-                return off;
             }
+            return off;
         }
 
         private boolean flagSet(byte flag) {
@@ -433,10 +456,15 @@ class UDPPacketReader {
                 off++;
                 buf.append("with partial ACKs for ");
 
-                for (int i = 0; i < numBitfields; i++) {
-                    PacketACKBitfield bf = new PacketACKBitfield(off);
-                    buf.append(bf.getMessageId()).append(' ');
-                    off += bf.getByteLength();
+                try {
+                    for (int i = 0; i < numBitfields; i++) {
+                        PacketACKBitfield bf = new PacketACKBitfield(off);
+                        buf.append(bf.getMessageId()).append(' ');
+                        off += bf.getByteLength();
+                    }
+                } catch (DataFormatException dfe) {
+                    buf.append("CORRUPT");
+                    return buf.toString();
                 }
             }
             if (readExtendedDataIncluded()) {
@@ -465,16 +493,15 @@ class UDPPacketReader {
                 buf.append(" isLast? ").append(isLast);
                 buf.append(" info ").append(_message[off-1]);
                 int size = ((int)DataHelper.fromLong(_message, off, 2)) & 0x3FFF;
-                buf.append(" with ").append(size).append(" bytes");
-                buf.append(' ');
-                off += size;
                 off += 2;
+                buf.append(" with ").append(size).append(" bytes; ");
+                off += size;
             }
             
             return buf.toString();
         }
         
-        public void toRawString(StringBuilder buf) { 
+        public void toRawString(StringBuilder buf) throws DataFormatException { 
             UDPPacketReader.this.toRawString(buf); 
             buf.append(" payload: ");
                   
@@ -495,14 +522,19 @@ class UDPPacketReader {
         private final int _bitfieldStart;
         private final int _bitfieldSize;
 
-        public PacketACKBitfield(int start) {
+        public PacketACKBitfield(int start) throws DataFormatException {
             _start = start;
             _bitfieldStart = start + 4;
             int bfsz = 1;
             // bitfield is an array of bytes where the high bit is 1 if 
             // further bytes in the bitfield follow
-            while ((_message[_bitfieldStart + bfsz - 1] & UDPPacket.BITFIELD_CONTINUATION) != 0x0)
+            while ((_message[_bitfieldStart + bfsz - 1] & UDPPacket.BITFIELD_CONTINUATION) != 0x0) {
                 bfsz++;
+                //if (bfsz > InboundMessageState.MAX_PARTIAL_BITFIELD_BYTES)
+                //    throw new DataFormatException();
+            }
+            if (bfsz > InboundMessageState.MAX_PARTIAL_BITFIELD_BYTES)
+                throw new DataFormatException("bitfield size: " + bfsz);
             _bitfieldSize = bfsz;
         }
 
@@ -510,6 +542,46 @@ class UDPPacketReader {
         public int getByteLength() { return 4 + _bitfieldSize; }
         public int fragmentCount() { return _bitfieldSize * 7; }
         public boolean receivedComplete() { return false; }
+
+        /**
+         *  Number of fragments acked in this bitfield.
+         *  Faster than looping through received()
+         *  @since 0.9.16
+         */
+        public int ackCount() {
+            int rv = 0;
+            for (int i = _bitfieldStart; i < _bitfieldStart + _bitfieldSize; i++) {
+                byte b = _message[i];
+                if ((b & 0x7f) != 0) {
+                    for (int j = 0; j < 7; j++) {
+                        if ((b & 0x01) != 0)
+                            rv++;
+                        b >>= 1;
+                    }
+                }
+            }
+            return rv;
+        }
+
+        /**
+         *  Highest fragment number acked in this bitfield.
+         *  @return highest fragment number acked, or -1 if none
+         *  @since 0.9.16
+         */
+        public int highestReceived() {
+            int count = fragmentCount();
+            for (int i = _bitfieldSize - 1; i >= 0; i--) {
+                byte b = _message[_bitfieldStart + i];
+                if ((b & 0x7f) == 0)
+                    continue;
+                for (int j = 6; j >= 0; j--) {
+                    if ((b & 0x40) != 0)
+                        return (7 * i) + j;
+                    b <<= 1;
+                }
+            }
+            return -1;
+        }
 
         public boolean received(int fragmentNum) {
             if ( (fragmentNum < 0) || (fragmentNum >= _bitfieldSize*7) )
@@ -523,16 +595,17 @@ class UDPPacketReader {
         @Override
         public String toString() { 
             StringBuilder buf = new StringBuilder(64);
-            buf.append("Read partial ACK of ");
+            buf.append("IB Partial ACK of ");
             buf.append(getMessageId());
-            buf.append(" with ACKs for: ");
+            buf.append(" highest: ").append(highestReceived());
+            buf.append(" with ACKs for: [");
             int numFrags = fragmentCount();
             for (int i = 0; i < numFrags; i++) {
-                if (received(i))
-                    buf.append(i).append(" ");
-                else
-                    buf.append('!').append(i).append(" ");
+                if (!received(i))
+                    buf.append('!');
+                buf.append(i).append(' ');
             }
+            buf.append("] / ").append(numFrags);
             return buf.toString();
         }
     }

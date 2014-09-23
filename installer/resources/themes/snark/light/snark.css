@@ -513,6 +513,40 @@ a:active {
      color: #77b;
 }
 
+a.control, a.controld {
+     background: #fff;
+     border: 1px inset #191;
+     border-radius: 4px;
+     color: #359;
+     font-weight: bold;
+     margin: 2px 4px;
+     padding: 3px 4px;	
+     text-shadow: 0px 0px #410;
+     white-space: nowrap;
+}
+
+a.controld {
+     color: #459;
+     font-weight: normal;
+}
+
+a.control img, a.controld img {
+     display: none;
+}
+
+a.control:hover {
+     background-color: #559;
+     border: 1px outset #559;
+     color: #fff;
+     text-shadow: 0px 1px 5px #410;
+}
+
+a.control:active {
+     background: #f60 !important;
+     color: #fff !important;
+     text-shadow: 0 !important;
+}
+
 input {
      font-size: 9pt;
      font-weight: bold;
@@ -593,6 +627,14 @@ input[type=radio] {
 }
 
 input.default { width: 1px; height: 1px; visibility: hidden; }
+
+input.disabled, input.disabled:hover {
+     background-color: #fff;
+     border: 1px inset #191;
+     color: #459;
+     font-weight: normal;
+     text-shadow: 0px 0px 0px #410;
+}
 
 select {
      background: #fff !important;

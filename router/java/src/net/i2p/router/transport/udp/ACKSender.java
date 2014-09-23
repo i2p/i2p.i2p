@@ -177,7 +177,7 @@ class ACKSender implements Runnable {
                     ack.setMessageType(PacketBuilder.TYPE_ACK);
                     
                     if (_log.shouldLog(Log.INFO))
-                        _log.info("Sending ACK for " + ackBitfields);
+                        _log.info("Sending " + ackBitfields + " to " + peer);
                     // locking issues, we ignore the result, and acks are small,
                     // so don't even bother allocating
                     //peer.allocateSendingBytes(ack.getPacket().getLength(), true);

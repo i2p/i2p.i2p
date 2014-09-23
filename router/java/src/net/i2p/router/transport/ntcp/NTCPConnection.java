@@ -17,9 +17,9 @@ import java.util.zip.Adler32;
 import net.i2p.data.Base64;
 import net.i2p.data.ByteArray;
 import net.i2p.data.DataHelper;
-import net.i2p.data.RouterAddress;
-import net.i2p.data.RouterIdentity;
-import net.i2p.data.RouterInfo;
+import net.i2p.data.router.RouterAddress;
+import net.i2p.data.router.RouterIdentity;
+import net.i2p.data.router.RouterInfo;
 import net.i2p.data.SessionKey;
 import net.i2p.data.i2np.DatabaseStoreMessage;
 import net.i2p.data.i2np.I2NPMessage;
@@ -266,6 +266,8 @@ class NTCPConnection {
     /** 
      * @param clockSkew alice's clock minus bob's clock in seconds (may be negative, obviously, but |val| should
      *                  be under 1 minute)
+     * @param prevWriteEnd exactly 16 bytes, not copied, do not corrupt
+     * @param prevReadEnd 16 or more bytes, last 16 bytes copied
      */
     public void finishInboundEstablishment(SessionKey key, long clockSkew, byte prevWriteEnd[], byte prevReadEnd[]) {
         NTCPConnection toClose = locked_finishInboundEstablishment(key, clockSkew, prevWriteEnd, prevReadEnd);
@@ -278,6 +280,12 @@ class NTCPConnection {
         enqueueInfoMessage();
     }
     
+    /** 
+     * @param clockSkew alice's clock minus bob's clock in seconds (may be negative, obviously, but |val| should
+     *                  be under 1 minute)
+     * @param prevWriteEnd exactly 16 bytes, not copied, do not corrupt
+     * @param prevReadEnd 16 or more bytes, last 16 bytes copied
+     */
     private synchronized NTCPConnection locked_finishInboundEstablishment(
             SessionKey key, long clockSkew, byte prevWriteEnd[], byte prevReadEnd[]) {
         _sessionKey = key;
@@ -371,10 +379,21 @@ class NTCPConnection {
         }
     }
     
+    /**
+     *  Close and release EstablishState resources.
+     *  @param e may be null
+     *  @since 0.9.16
+     */
+    public void closeOnTimeout(String cause, Exception e) {
+        EstablishState es = _establishState;
+        close();
+        es.close(cause, e);
+    }
+
     private synchronized NTCPConnection locked_close(boolean allowRequeue) {
         if (_chan != null) try { _chan.close(); } catch (IOException ioe) { }
         if (_conKey != null) _conKey.cancel();
-        _establishState = EstablishState.VERIFIED;
+        _establishState = EstablishState.FAILED;
         NTCPConnection old = _transport.removeCon(this);
         _transport.getReader().connectionClosed(this);
         _transport.getWriter().connectionClosed(this);
@@ -571,6 +590,8 @@ class NTCPConnection {
     /** 
      * @param clockSkew alice's clock minus bob's clock in seconds (may be negative, obviously, but |val| should
      *                  be under 1 minute)
+     * @param prevWriteEnd exactly 16 bytes, not copied, do not corrupt
+     * @param prevReadEnd 16 or more bytes, last 16 bytes copied
      */
     public synchronized void finishOutboundEstablishment(SessionKey key, long clockSkew, byte prevWriteEnd[], byte prevReadEnd[]) {
         if (_log.shouldLog(Log.DEBUG))

@@ -14,7 +14,7 @@ import java.util.List;
 
 import net.i2p.data.Certificate;
 import net.i2p.data.PublicKey;
-import net.i2p.data.RouterInfo;
+import net.i2p.data.router.RouterInfo;
 import net.i2p.data.i2np.DeliveryInstructions;
 
 /**

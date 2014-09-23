@@ -7,11 +7,13 @@ import java.util.Map;
 import java.util.Set;
 
 import net.i2p.data.DatabaseEntry;
+import net.i2p.data.Destination;
 import net.i2p.data.Hash;
-import net.i2p.data.RouterInfo;
 import net.i2p.data.TunnelId;
 import net.i2p.data.i2np.DatabaseLookupMessage;
 import net.i2p.data.i2np.DatabaseStoreMessage;
+import net.i2p.data.router.RouterInfo;
+import net.i2p.data.router.RouterKeyGenerator;
 import net.i2p.router.Job;
 import net.i2p.router.JobImpl;
 import net.i2p.router.OutNetMessage;
@@ -31,7 +33,6 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
     private final Set<Hash> _verifiesInProgress;
     private FloodThrottler _floodThrottler;
     private LookupThrottler _lookupThrottler;
-    private NegativeLookupCache _negativeCache;
 
     /**
      *  This is the flood redundancy. Entries are
@@ -65,7 +66,6 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
         _context.statManager().createRateStat("netDb.searchReplyNotValidated", "How many search replies we get that we are NOT able to validate (fetch)", "NetworkDatabase", new long[] { 5*60*1000l, 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
         _context.statManager().createRateStat("netDb.searchReplyValidationSkipped", "How many search replies we get from unreliable peers that we skip?", "NetworkDatabase", new long[] { 5*60*1000l, 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
         _context.statManager().createRateStat("netDb.republishQuantity", "How many peers do we need to send a found leaseSet to?", "NetworkDatabase", new long[] { 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
-        _context.statManager().createRateStat("netDb.negativeCache", "Aborted lookup, already cached", "NetworkDatabase", new long[] { 60*60*1000l });
     }
 
     @Override
@@ -73,7 +73,6 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
         super.startup();
         _context.jobQueue().addJob(new FloodfillMonitorJob(_context, this));
         _lookupThrottler = new LookupThrottler();
-        _negativeCache = new NegativeLookupCache();
 
         // refresh old routers
         Job rrj = new RefreshRoutersJob(_context, this);
@@ -172,41 +171,23 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
     }
 
     /**
-     *  Increment in the negative lookup cache
-     *  @since 0.9.4
-     */
-    void lookupFailed(Hash key) {
-        _negativeCache.lookupFailed(key);
-    }
-
-    /**
-     *  Is the key in the negative lookup cache?
-     *  @since 0.9.4
-     */
-    boolean isNegativeCached(Hash key) {
-        boolean rv = _negativeCache.isCached(key);
-        if (rv)
-            _context.statManager().addRateData("netDb.negativeCache", 1);
-        return rv;
-    }
-
-    /**
      *  Send to a subset of all floodfill peers.
      *  We do this to implement Kademlia within the floodfills, i.e.
      *  we flood to those closest to the key.
      */
     public void flood(DatabaseEntry ds) {
         Hash key = ds.getHash();
-        Hash rkey = _context.routingKeyGenerator().getRoutingKey(key);
+        RouterKeyGenerator gen = _context.routerKeyGenerator();
+        Hash rkey = gen.getRoutingKey(key);
         FloodfillPeerSelector sel = (FloodfillPeerSelector)getPeerSelector();
         List<Hash> peers = sel.selectFloodfillParticipants(rkey, MAX_TO_FLOOD, getKBuckets());
         // todo key cert skip?
-        long until = _context.routingKeyGenerator().getTimeTillMidnight();
+        long until = gen.getTimeTillMidnight();
         if (until < NEXT_RKEY_LS_ADVANCE_TIME ||
             (ds.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO && until < NEXT_RKEY_RI_ADVANCE_TIME)) {
-            // to avoid lookup failures after midnight, also flood to some closest to the
+            // to avoid lookup faulures after midnight, also flood to some closest to the
             // next routing key for a period of time before midnight.
-            Hash nkey = _context.routingKeyGenerator().getNextRoutingKey(key);
+            Hash nkey = gen.getNextRoutingKey(key);
             List<Hash> nextPeers = sel.selectFloodfillParticipants(nkey, NEXT_FLOOD_QTY, getKBuckets());
             int i = 0;
             for (Hash h : nextPeers) {
@@ -301,7 +282,9 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
     }
     
     /**
-     * Lookup using exploratory tunnels
+     * Lookup using exploratory tunnels.
+     *
+     * Caller should check negative cache and/or banlist before calling.
      *
      * Begin a kademlia style search for the key specified, which can take up to timeoutMs and
      * will fire the appropriate jobs on success or timeout (or if the kademlia search completes
@@ -315,7 +298,10 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
     }
 
     /**
-     * Lookup using the client's tunnels
+     * Lookup using the client's tunnels.
+     *
+     * Caller should check negative cache and/or banlist before calling.
+     *
      * @param fromLocalDest use these tunnels for the lookup, or null for exploratory
      * @return null always
      * @since 0.9.10
@@ -473,6 +459,7 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
         // should we skip the search?
         if (_floodfillEnabled ||
             _context.jobQueue().getMaxLag() > 500 ||
+            _context.banlist().isBanlistedForever(peer) ||
             getKBucketSetSize() > MAX_DB_BEFORE_SKIPPING_SEARCH) {
             // don't try to overload ourselves (e.g. failing 3000 router refs at
             // once, and then firing off 3000 netDb lookup tasks)

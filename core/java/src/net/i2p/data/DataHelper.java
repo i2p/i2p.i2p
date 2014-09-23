@@ -24,20 +24,15 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
@@ -638,13 +633,17 @@ public class DataHelper {
      * Integers are a fixed number of bytes (numBytes), stored as unsigned integers in network byte order.
      * @param value value to write out, non-negative
      * @param rawStream stream to write to
-     * @param numBytes number of bytes to write the number into (padding as necessary)
-     * @throws DataFormatException if value is negative
+     * @param numBytes number of bytes to write the number into, 1-8 (padding as necessary)
+     * @throws DataFormatException if value is negative or if numBytes not 1-8
      * @throws IOException if there is an IO error writing to the stream
      */
     public static void writeLong(OutputStream rawStream, int numBytes, long value) 
         throws DataFormatException, IOException {
-        if (value < 0) throw new DataFormatException("Value is negative (" + value + ")");
+        if (numBytes <= 0 || numBytes > 8)
+            // probably got the args backwards
+            throw new DataFormatException("Bad byte count " + numBytes);
+        if (value < 0)
+            throw new DataFormatException("Value is negative (" + value + ")");
         for (int i = (numBytes - 1) * 8; i >= 0; i -= 8) {
             byte cur = (byte) (value >> i);
             rawStream.write(cur);
@@ -667,7 +666,7 @@ public class DataHelper {
      * @param value non-negative
      */
     public static void toLong(byte target[], int offset, int numBytes, long value) throws IllegalArgumentException {
-        if (numBytes <= 0) throw new IllegalArgumentException("Invalid number of bytes");
+        if (numBytes <= 0 || numBytes > 8) throw new IllegalArgumentException("Invalid number of bytes");
         if (value < 0) throw new IllegalArgumentException("Negative value not allowed");
 
         for (int i = offset + numBytes - 1; i >= offset; i--) {
@@ -1423,58 +1422,6 @@ public class DataHelper {
     public static void write(OutputStream out, byte data[], MessageDigest hash) throws IOException {
         hash.update(data);
         out.write(data);
-    }
-
-    /**
-     *  Sort based on the Hash of the DataStructure.
-     *  Warning - relatively slow.
-     *  WARNING - this sort order must be consistent network-wide, so while the order is arbitrary,
-     *  it cannot be changed.
-     *  Why? Just because it has to be consistent so signing will work.
-     *  How to spec as returning the same type as the param?
-     *  DEPRECATED - Only used by RouterInfo.
-     *
-     *  @return a new list
-     */
-    public static List<? extends DataStructure> sortStructures(Collection<? extends DataStructure> dataStructures) {
-        if (dataStructures == null) return Collections.emptyList();
-
-        // This used to use Hash.toString(), which is insane, since a change to toString()
-        // would break the whole network. Now use Hash.toBase64().
-        // Note that the Base64 sort order is NOT the same as the raw byte sort order,
-        // despite what you may read elsewhere.
-
-        //ArrayList<DataStructure> rv = new ArrayList(dataStructures.size());
-        //TreeMap<String, DataStructure> tm = new TreeMap();
-        //for (DataStructure struct : dataStructures) {
-        //    tm.put(struct.calculateHash().toString(), struct);
-        //}
-        //for (DataStructure struct : tm.values()) {
-        //    rv.add(struct);
-        //}
-        ArrayList<DataStructure> rv = new ArrayList<DataStructure>(dataStructures);
-        sortStructureList(rv);
-        return rv;
-    }
-
-    /**
-     *  See above.
-     *  DEPRECATED - Only used by RouterInfo.
-     *
-     *  @since 0.9
-     */
-    static void sortStructureList(List<? extends DataStructure> dataStructures) {
-        Collections.sort(dataStructures, new DataStructureComparator());
-    }
-
-    /**
-     * See sortStructures() comments.
-     * @since 0.8.3
-     */
-    private static class DataStructureComparator implements Comparator<DataStructure>, Serializable {
-        public int compare(DataStructure l, DataStructure r) {
-            return l.calculateHash().toBase64().compareTo(r.calculateHash().toBase64());
-        }
     }
 
     /**

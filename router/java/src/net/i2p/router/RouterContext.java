@@ -10,7 +10,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import net.i2p.I2PAppContext;
 import net.i2p.app.ClientAppManager;
 import net.i2p.data.Hash;
-import net.i2p.data.RouterInfo;
+import net.i2p.data.RoutingKeyGenerator;
+import net.i2p.data.router.RouterInfo;
+import net.i2p.data.router.RouterKeyGenerator;
 import net.i2p.internal.InternalClientManager;
 import net.i2p.router.client.ClientManagerFacadeImpl;
 import net.i2p.router.crypto.TransientSessionKeyManager;
@@ -65,6 +67,7 @@ public class RouterContext extends I2PAppContext {
     //private MessageStateMonitor _messageStateMonitor;
     private RouterThrottle _throttle;
     private RouterAppManager _appManager;
+    private RouterKeyGenerator _routingKeyGenerator;
     private final Set<Runnable> _finalShutdownTasks;
     // split up big lock on this to avoid deadlocks
     private volatile boolean _initialized;
@@ -183,6 +186,7 @@ public class RouterContext extends I2PAppContext {
         _messageHistory = new MessageHistory(this);
         _messageRegistry = new OutboundMessageRegistry(this);
         //_messageStateMonitor = new MessageStateMonitor(this);
+        _routingKeyGenerator = new RouterKeyGenerator(this);
         if (!getBooleanProperty("i2p.dummyNetDb"))
             _netDb = new FloodfillNetworkDatabaseFacade(this); // new KademliaNetworkDatabaseFacade(this);
         else
@@ -581,5 +585,36 @@ public class RouterContext extends I2PAppContext {
                 _sessionKeyManager = new TransientSessionKeyManager(this);
             _sessionKeyManagerInitialized = true;
         }
+    }
+    
+    /**
+     * Determine how much do we want to mess with the keys to turn them 
+     * into something we can route.  This is context specific because we 
+     * may want to test out how things react when peers don't agree on 
+     * how to skew.
+     *
+     * Returns same thing as routerKeyGenerator()
+     *
+     * @return non-null
+     * @since 0.9.16 Overrides I2PAppContext. Returns non-null in RouterContext and null in I2PAppcontext.
+     */
+    @Override
+    public RoutingKeyGenerator routingKeyGenerator() {
+        return _routingKeyGenerator;
+    }
+
+    /**
+     * Determine how much do we want to mess with the keys to turn them 
+     * into something we can route.  This is context specific because we 
+     * may want to test out how things react when peers don't agree on 
+     * how to skew.
+     *
+     * Returns same thing as routingKeyGenerator()
+     *
+     * @return non-null
+     * @since 0.9.16
+     */
+    public RouterKeyGenerator routerKeyGenerator() {
+        return _routingKeyGenerator;
     }
 }

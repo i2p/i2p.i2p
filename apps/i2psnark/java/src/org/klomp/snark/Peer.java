@@ -57,8 +57,8 @@ public class Peer implements Comparable<Peer>
   private DataOutputStream dout;
 
   /** running counters */
-  private long downloaded;
-  private long uploaded;
+  private final AtomicLong downloaded = new AtomicLong();
+  private final AtomicLong uploaded = new AtomicLong();
 
   // Keeps state for in/out connections.  Non-null when the handshake
   // was successful, the connection setup and runs
@@ -618,7 +618,7 @@ public class Peer implements Comparable<Peer>
    * @since 0.8.4
    */
   public void downloaded(int size) {
-      downloaded += size;
+      downloaded.addAndGet(size);
   }
 
   /**
@@ -626,7 +626,7 @@ public class Peer implements Comparable<Peer>
    * @since 0.8.4
    */
   public void uploaded(int size) {
-      uploaded += size;
+      uploaded.addAndGet(size);
   }
 
   /**
@@ -635,7 +635,7 @@ public class Peer implements Comparable<Peer>
    */
   public long getDownloaded()
   {
-      return downloaded;
+      return downloaded.get();
   }
 
   /**
@@ -644,7 +644,7 @@ public class Peer implements Comparable<Peer>
    */
   public long getUploaded()
   {
-      return uploaded;
+      return uploaded.get();
   }
 
   /**
@@ -652,8 +652,8 @@ public class Peer implements Comparable<Peer>
    */
   public void resetCounters()
   {
-      downloaded = 0;
-      uploaded = 0;
+      downloaded.set(0);
+      uploaded.set(0);
   }
   
   public long getInactiveTime() {

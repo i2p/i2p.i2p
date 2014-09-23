@@ -17,11 +17,12 @@ import net.i2p.data.DatabaseEntry;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
-import net.i2p.data.RouterInfo;
 import net.i2p.data.TunnelId;
 import net.i2p.data.i2np.DatabaseLookupMessage;
 import net.i2p.data.i2np.DatabaseSearchReplyMessage;
 import net.i2p.data.i2np.DatabaseStoreMessage;
+import net.i2p.data.i2np.I2NPMessage;
+import net.i2p.data.router.RouterInfo;
 import net.i2p.router.Job;
 import net.i2p.router.JobImpl;
 import net.i2p.router.OutNetMessage;
@@ -201,22 +202,29 @@ class SearchJob extends JobImpl {
                 _log.debug(getJobId() + ": Already completed");
             return;
         }
+        if (_state.isAborted()) {
+            if (_log.shouldLog(Log.INFO))
+                _log.info(getJobId() + ": Search aborted");
+            _state.complete();
+            fail();
+            return;
+        }
         if (_log.shouldLog(Log.INFO))
             _log.info(getJobId() + ": Searching: " + _state);
         if (isLocal()) {
             if (_log.shouldLog(Log.INFO))
                 _log.info(getJobId() + ": Key found locally");
-            _state.complete(true);
+            _state.complete();
             succeed();
         } else if (isExpired()) {
             if (_log.shouldLog(Log.INFO))
                 _log.info(getJobId() + ": Key search expired");
-            _state.complete(true);
+            _state.complete();
             fail();
         } else if (_state.getAttempted().size() > MAX_PEERS_QUERIED) {
             if (_log.shouldLog(Log.INFO))
                 _log.info(getJobId() + ": Too many peers quried");
-            _state.complete(true);
+            _state.complete();
             fail();
         } else {
             //_log.debug("Continuing search");
@@ -424,7 +432,7 @@ class SearchJob extends JobImpl {
         int timeout = getPerPeerTimeoutMs(to);
         long expiration = getContext().clock().now() + timeout;
 
-        DatabaseLookupMessage msg = buildMessage(inTunnelId, inTunnel.getPeer(0), expiration);	
+        I2NPMessage msg = buildMessage(inTunnelId, inTunnel.getPeer(0), expiration, router);	
 	
         TunnelInfo outTunnel = getContext().tunnelManager().selectOutboundExploratoryTunnel(to);
         if (outTunnel == null) {
@@ -437,9 +445,9 @@ class SearchJob extends JobImpl {
 	
         if (_log.shouldLog(Log.DEBUG))
             _log.debug(getJobId() + ": Sending search to " + to
-                       + " for " + msg.getSearchKey().toBase64() + " w/ replies through [" 
-                       + msg.getFrom().toBase64() + "] via tunnel [" 
-                       + msg.getReplyTunnel() + "]");
+                       + " for " + getState().getTarget() + " w/ replies through " 
+                       + inTunnel.getPeer(0) + " via tunnel " 
+                       + inTunnelId);
 
         SearchMessageSelector sel = new SearchMessageSelector(getContext(), router, _expiration, _state);
         SearchUpdateReplyFoundJob reply = new SearchUpdateReplyFoundJob(getContext(), router, _state, _facade, 
@@ -482,8 +490,11 @@ class SearchJob extends JobImpl {
      * @param replyTunnelId tunnel to receive replies through
      * @param replyGateway gateway for the reply tunnel
      * @param expiration when the search should stop 
+     * @param peer unused here; see ExploreJob extension
+     *
+     * @return a DatabaseLookupMessage
      */
-    protected DatabaseLookupMessage buildMessage(TunnelId replyTunnelId, Hash replyGateway, long expiration) {
+    protected I2NPMessage buildMessage(TunnelId replyTunnelId, Hash replyGateway, long expiration, RouterInfo peer) {
         DatabaseLookupMessage msg = new DatabaseLookupMessage(getContext(), true);
         msg.setSearchKey(_state.getTarget());
         //msg.setFrom(replyGateway.getIdentity().getHash());

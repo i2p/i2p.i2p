@@ -7,7 +7,7 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import net.i2p.data.Hash;
-import net.i2p.data.RouterInfo;
+import net.i2p.data.router.RouterInfo;
 import net.i2p.data.i2np.DatabaseLookupMessage;
 import net.i2p.router.JobImpl;
 import net.i2p.router.OutNetMessage;

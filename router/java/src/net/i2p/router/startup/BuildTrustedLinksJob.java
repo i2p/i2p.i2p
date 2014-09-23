@@ -15,7 +15,7 @@ import net.i2p.router.RouterContext;
 /**
  *  For future restricted routes. Does nothing now.
  */
-public class BuildTrustedLinksJob extends JobImpl {
+class BuildTrustedLinksJob extends JobImpl {
     private final Job _next;
     
     public BuildTrustedLinksJob(RouterContext context, Job next) {

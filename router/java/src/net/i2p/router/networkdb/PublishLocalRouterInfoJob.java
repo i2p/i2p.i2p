@@ -12,7 +12,7 @@ import java.util.Date;
 import java.util.Properties;
 
 import net.i2p.data.DataFormatException;
-import net.i2p.data.RouterInfo;
+import net.i2p.data.router.RouterInfo;
 import net.i2p.data.SigningPrivateKey;
 import net.i2p.router.JobImpl;
 import net.i2p.router.Router;

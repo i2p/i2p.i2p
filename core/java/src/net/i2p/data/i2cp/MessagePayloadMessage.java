@@ -70,9 +70,12 @@ public class MessagePayloadMessage extends I2CPMessageImpl {
         }
     }
 
+    /**
+     *  @throws UnsupportedOperationException always
+     */
     @Override
     protected byte[] doWriteMessage() throws I2CPMessageException, IOException {
-        throw new RuntimeException("go away, we dont want any");
+        throw new UnsupportedOperationException();
     }
     
     /**

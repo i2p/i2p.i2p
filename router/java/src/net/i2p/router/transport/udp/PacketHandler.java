@@ -8,6 +8,7 @@ import java.util.concurrent.BlockingQueue;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.router.util.CoDelBlockingQueue;
+import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.util.I2PThread;
 import net.i2p.util.LHMCache;
@@ -691,33 +692,35 @@ class PacketHandler {
                         state = _establisher.receiveData(outState);
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Received new DATA packet from " + state + ": " + packet);
+                    UDPPacketReader.DataReader dr = reader.getDataReader();
                     if (state != null) {
-                        UDPPacketReader.DataReader dr = reader.getDataReader();
                         if (_log.shouldLog(Log.DEBUG)) {
                             StringBuilder msg = new StringBuilder(512);
                             msg.append("Receive ").append(System.identityHashCode(packet));
                             msg.append(" from ").append(state.getRemotePeer().toBase64()).append(" ").append(state.getRemoteHostId());
-                            for (int i = 0; i < dr.readFragmentCount(); i++) {
-                                msg.append(" msg ").append(dr.readMessageId(i));
-                                msg.append(":").append(dr.readMessageFragmentNum(i));
-                                if (dr.readMessageIsLast(i))
-                                    msg.append("*");
-                            }
+                            try {
+                                int count = dr.readFragmentCount();
+                                for (int i = 0; i < count; i++) {
+                                    msg.append(" msg ").append(dr.readMessageId(i));
+                                    msg.append(":").append(dr.readMessageFragmentNum(i));
+                                    if (dr.readMessageIsLast(i))
+                                        msg.append("*");
+                                }
+                            } catch (DataFormatException dfe) {}
                             msg.append(": ").append(dr.toString());
                             _log.debug(msg.toString());
                         }
                         //packet.beforeReceiveFragments();
                         _inbound.receiveData(state, dr);
                         _context.statManager().addRateData("udp.receivePacketSize.dataKnown", packet.getPacket().getLength(), packet.getLifetime());
-                        if (dr.readFragmentCount() <= 0)
-                            _context.statManager().addRateData("udp.receivePacketSize.dataKnownAck", packet.getPacket().getLength(), packet.getLifetime());
                     } else {
                         // doesn't happen
                         _context.statManager().addRateData("udp.receivePacketSize.dataUnknown", packet.getPacket().getLength(), packet.getLifetime());
-                        UDPPacketReader.DataReader dr = reader.getDataReader();
+                    }
+                    try {
                         if (dr.readFragmentCount() <= 0)
                             _context.statManager().addRateData("udp.receivePacketSize.dataUnknownAck", packet.getPacket().getLength(), packet.getLifetime());
-                    }
+                    } catch (DataFormatException dfe) {}
                     break;
                 case UDPPacket.PAYLOAD_TYPE_TEST:
                     _state = 51;

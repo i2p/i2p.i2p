@@ -9,8 +9,8 @@ import net.i2p.data.Base64;
 import net.i2p.data.ByteArray;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
-import net.i2p.data.RouterIdentity;
-import net.i2p.data.RouterInfo;
+import net.i2p.data.router.RouterIdentity;
+import net.i2p.data.router.RouterInfo;
 import net.i2p.data.TunnelId;
 import net.i2p.data.i2np.BuildRequestRecord;
 import net.i2p.data.i2np.BuildResponseRecord;
@@ -85,6 +85,11 @@ class BuildHandler implements Runnable {
      */
     private static final int NEXT_HOP_SEND_TIMEOUT = 25*1000;
 
+    private static final long MAX_REQUEST_FUTURE = 5*60*1000;
+    /** must be > 1 hour due to rouding down */
+    private static final long MAX_REQUEST_AGE = 65*60*1000;
+
+
     public BuildHandler(RouterContext ctx, TunnelPoolManager manager, BuildExecutor exec) {
         _context = ctx;
         _log = ctx.logManager().getLog(getClass());
@@ -101,8 +106,10 @@ class BuildHandler implements Runnable {
         _context.statManager().createRateStat("tunnel.reject.50", "How often we reject a tunnel because of a critical issue (shutdown, etc)", "Tunnels", new long[] { 60*1000, 10*60*1000 });
 
         _context.statManager().createRequiredRateStat("tunnel.decryptRequestTime", "Time to decrypt a build request (ms)", "Tunnels", new long[] { 60*1000, 10*60*1000 });
-        _context.statManager().createRequiredRateStat("tunnel.rejectTimeout", "Reject tunnel count (unknown next hop)", "Tunnels", new long[] { 60*1000, 10*60*1000 });
-        _context.statManager().createRequiredRateStat("tunnel.rejectTimeout2", "Reject tunnel count (can't contact next hop)", "Tunnels", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("tunnel.rejectTooOld", "Reject tunnel count (too old)", "Tunnels", new long[] { 3*60*60*1000 });
+        _context.statManager().createRateStat("tunnel.rejectFuture", "Reject tunnel count (time in future)", "Tunnels", new long[] { 3*60*60*1000 });
+        _context.statManager().createRateStat("tunnel.rejectTimeout", "Reject tunnel count (unknown next hop)", "Tunnels", new long[] { 60*60*1000 });
+        _context.statManager().createRateStat("tunnel.rejectTimeout2", "Reject tunnel count (can't contact next hop)", "Tunnels", new long[] { 60*60*1000 });
         _context.statManager().createRequiredRateStat("tunnel.rejectDupID", "Part. tunnel dup ID", "Tunnels", new long[] { 24*60*60*1000 });
         _context.statManager().createRequiredRateStat("tunnel.ownDupID", "Our tunnel dup. ID", "Tunnels", new long[] { 24*60*60*1000 });
         _context.statManager().createRequiredRateStat("tunnel.rejectHostile", "Reject malicious tunnel", "Tunnels", new long[] { 24*60*60*1000 });
@@ -587,11 +594,24 @@ class BuildHandler implements Runnable {
             }
         }
 
-        // time is in hours, and only for log below - what's the point?
-        // tunnel-alt-creation.html specifies that this is enforced +/- 1 hour but it is not.
+        // time is in hours, rounded down.
+        // tunnel-alt-creation.html specifies that this is enforced +/- 1 hour but it was not.
+        // As of 0.9.16, allow + 5 minutes to - 65 minutes.
         long time = req.readRequestTime();
         long now = (_context.clock().now() / (60l*60l*1000l)) * (60*60*1000);
-        int ourSlot = -1;
+        long timeDiff = now - time;
+        if (timeDiff > MAX_REQUEST_AGE) {
+            _context.statManager().addRateData("tunnel.rejectTooOld", 1);
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Dropping build request too old... replay attack? " + DataHelper.formatDuration(timeDiff));
+            return;
+        }
+        if (timeDiff < 0 - MAX_REQUEST_FUTURE) {
+            _context.statManager().addRateData("tunnel.rejectFuture", 1);
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Dropping build request too far in future " + DataHelper.formatDuration(0 - timeDiff));
+            return;
+        }
 
         int response;
         if (_context.router().isHidden()) {
@@ -764,6 +784,7 @@ class BuildHandler implements Runnable {
 
         byte reply[] = BuildResponseRecord.create(_context, response, req.readReplyKey(), req.readReplyIV(), state.msg.getUniqueId());
         int records = state.msg.getRecordCount();
+        int ourSlot = -1;
         for (int j = 0; j < records; j++) {
             if (state.msg.getRecord(j) == null) {
                 ourSlot = j;
@@ -780,7 +801,7 @@ class BuildHandler implements Runnable {
                       + " accepted? " + response + " receiving on " + ourId 
                       + " sending to " + nextId
                       + " on " + nextPeer
-                      + " inGW? " + isInGW + " outEnd? " + isOutEnd + " time difference " + (now-time)
+                      + " inGW? " + isInGW + " outEnd? " + isOutEnd
                       + " recvDelay " + recvDelay + " replyMessage " + req.readReplyMessageId()
                       + " replyKey " + req.readReplyKey() + " replyIV " + Base64.encode(req.readReplyIV()));
 
