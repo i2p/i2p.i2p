@@ -1,3 +1,104 @@
+2014-09-23 zzz
+Prop from i2p.i2p.zzz.test2:
+ * Addressbook: Improve parser efficiency
+ * Data structures: Move several router-only classes from i2p.jar to
+   net.i2p.data.router in router.jar. This will break existing
+   versions of the itoopie plugin.
+ * HTTP Client: Add error page for unsupported encryption
+ * I2CP:
+   - Verify crypto key pair in LS
+   - Verfiy same dest as before in LS
+   - Enforce strict authorization when auth is enabled
+ * i2psnark:
+   - Set-all priority buttons (ticket #1376)
+   - Comment out command-line code
+   - Consolidate and clean up parameters code
+   - Click to sort by column
+   - Display upload ratio when sorted by ratio, and on details page (ticket #1298)
+   - Consolidate code for creating img entities
+   - Switch from checkbox to radio for tracker configuration form
+   - Sort themes in config form
+   - Consolidate HTML header code
+   - Set no-cache headers
+   - Don't set HTML headers for redirects
+ * I2PTunnelGUI: Test tool deleted, moved to i2p.scripts
+ * Jetty 8.1.16.v20140903
+ * KeyGenerator: Add support for converting
+   all signing key types from private to public
+ * NetDB:
+   - Encrypt RI lookups and request encrypted reply on
+     faster boxes, to prevent scraping by OBEPs and IBGWs
+   - Encrypt exploratory lookups too
+   - Better handling of unsupported encryption in destinations
+   - Implement handling of unsupported encryption in router identities
+   - Banlist forever all RIs with unsupported encryption
+   - New negative cache of all dests with unsupported encryption
+   - New methods for destination lookup that will succeed even if
+     the LS is expired or encryption is unsupported
+   - Use new dest lookup so client will get the right error code
+     later, rather than failing with no LS when we really got it
+     but just couldn't verify it.
+   - Don't auto-enable floodfill if ARM or if ElG decrypt is too slow
+ * NTCP EstablishState:
+   - Prep for future enhancements by refactoring to a state machine model
+   - Reduce object churn; use SimpleByteCache
+   - Synchronization
+ * OCMOSJ: Detect unsupported encryption on dest and return the correct failure code
+     through I2CP to streaming to i2ptunnel
+ * PrivateKeyFile:
+   - New constructor with padding
+   - New router extension to add getRouterIdentity()
+   - Add validateKeyPairs()
+ * Router:
+   - New router.sigType config
+   - Generate / regenerate router keys based on config
+   - New router.keys.dat file in PKF format for sig types and padding
+   - Fix RouterInfo.readBytes() signature verification with sig types
+   - Catch unset padding in KeysAndCert.writeBytes()
+   - Catch key errors in ReadRouterJob
+   - Show RI sig type on /netdb in console
+   - Move some things from Router to startup classes
+   - Startup classes package private
+   - Buffer readin of key files
+   - Remove configurability of router.info and router.keys file locations
+   - Consolidate router keys readin code
+   - Update killKeys file list
+   - Validate router key pairs read in from file
+   - Don't try to use an unavailable sig type for the router,
+     even if it's the default
+ * RoutingKeyGenerator:
+   - Move from core to RouterKeyGenerator in router.jar
+   - Leave RoutingKeyGenerator as a simple abstract class
+   - DatabaseEntry now uses timestamp instead of mod data
+     to determine if mod data has changed. Don't expose
+     mod data to DatabaseEntry any more.
+   - I2PAppContext.routingKeyGenerator() now returns null;
+     you must be in RouterContext to get a generator.
+ * SSU:
+   - Implement bundling of multiple fragments in a single data message.
+     This has always been in the spec and implemented in the receive side
+     since the beginning, so it is compatible with all versions.
+   - OutboundMessageState: Fix SSU Output Queue errors in PacketBuilder:
+     Remove all buffer caching as it can't be made thread-safe.
+     Just allocate buffer in constructor and let GC handle it
+     Do fragmenting in constructor and make all fragment fields final
+     Don't track per-fragment retransmissions as it wasn't used
+     Move ack tracking from an array to a long
+     Sync all ack methods; Entire class now thread-safe
+   - InboundMessageState: Rewrite PartialBitfield for efficiency, less space and object churn
+   - PeerState.fetchPartialACKs() improvements
+   - Don't allow more than 10 bytes when reading in bitfield
+   - Don't send a corrupt ack packet if the partial ack got completed (race)
+ * Streaming: Re-enable message status override, but treat LS lookup failure
+     as a soft failure for now.
+ * Transports:
+   - Handle RI sig types
+   - Banlist unsupported RI sig types
+   - Return unused DH keypairs to the pool
+ * Tunnels:
+   - Enforce request record timestamp
+   - Randomize timestamp to prevent hop detection at top of hour
+
 2014-09-22 zzz
  * SSU: Fix 100% CPU after socket failure
  * UPnP: Catch reported error on FreeBSD
