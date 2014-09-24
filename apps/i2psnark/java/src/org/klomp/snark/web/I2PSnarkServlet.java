@@ -2899,15 +2899,16 @@ public class I2PSnarkServlet extends BasicServlet {
         if (showSort)
             buf.append("</a>");
         buf.append("</th>\n<th class=\"headerstatus\">");
-        if (showSort) {
+        boolean showRemainingSort = showSort && showPriority;
+        if (showRemainingSort) {
             sort = ("10".equals(sortParam)) ? "-10" : "10";
             buf.append("<a href=\"").append(base)
                .append(getQueryString(sort)).append("\">");
         }
         tx = _("Status");
         toThemeImg(buf, "status", tx,
-                   showSort ? _("Sort by {0}", _("Remaining")) : tx);
-        if (showSort)
+                   showRemainingSort ? _("Sort by {0}", _("Remaining")) : tx);
+        if (showRemainingSort)
             buf.append("</a>");
         if (showPriority) {
             buf.append("</th>\n<th class=\"headerpriority\">");
