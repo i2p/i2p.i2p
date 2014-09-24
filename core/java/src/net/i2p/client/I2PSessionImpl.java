@@ -899,6 +899,8 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
      * Close the socket carefully.
      */
     private void closeSocket() {
+        if (_log.shouldLog(Log.INFO))
+            _log.info(getPrefix() + "Closing the socket", new Exception("closeSocket"));
         synchronized(_stateLock) {
             changeState(State.CLOSING);
             locked_closeSocket();
@@ -911,7 +913,6 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
      * Caller must change state.
      */
     private void locked_closeSocket() {
-        if (_log.shouldLog(Log.INFO)) _log.info(getPrefix() + "Closing the socket", new Exception("closeSocket"));
         if (_reader != null) {
             _reader.stopReading();
             _reader = null;
