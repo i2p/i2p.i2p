@@ -2634,12 +2634,22 @@ public class I2PSnarkServlet extends BasicServlet {
                .append(":</b> <a href=\"").append(_contextPath).append('/').append(baseName).append("\">")
                .append(DataHelper.escapeHTML(fullPath))
                .append("</a></td></tr>\n");
+            if (snark.getStorage() != null) {
+                buf.append("<tr><td>");
+                toThemeImg(buf, "file");
+                buf.append("&nbsp;<b>")
+                   .append(_("Data location"))
+                   .append(":</b> ")
+                   .append(DataHelper.escapeHTML(snark.getStorage().getBase().getPath()))
+                   .append("</td></tr>\n");
+            }
+            String hex = I2PSnarkUtil.toHex(snark.getInfoHash());
             buf.append("<tr><td>");
-            toThemeImg(buf, "file");
+            toThemeImg(buf, "details");
             buf.append("&nbsp;<b>")
-               .append(_("Data location"))
+               .append(_("Info hash"))
                .append(":</b> ")
-               .append(DataHelper.escapeHTML(snark.getStorage().getBase().getPath()))
+               .append(hex)
                .append("</td></tr>\n");
 
             String announce = null;
@@ -2717,7 +2727,6 @@ public class I2PSnarkServlet extends BasicServlet {
                 }
             }
 
-            String hex = I2PSnarkUtil.toHex(snark.getInfoHash());
             if (meta == null || !meta.isPrivate()) {
                 buf.append("<tr><td><a href=\"")
                    .append(MagnetURI.MAGNET_FULL).append(hex);
