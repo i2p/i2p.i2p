@@ -22,6 +22,7 @@ import net.i2p.data.router.RouterInfo;
 import net.i2p.router.CommSystemFacade;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
+import net.i2p.router.transport.crypto.DHSessionKeyBuilder;
 import net.i2p.router.transport.udp.UDPTransport;
 import net.i2p.router.util.EventLog;
 import net.i2p.util.Addresses;
@@ -221,6 +222,47 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
                 port = udp.getRequestedPort();
         }
         _manager.externalAddressReceived(Transport.AddressSource.SOURCE_SSU, ip, port);
+    }
+
+    /**
+     *  Pluggable transports. Not for NTCP or SSU.
+     *
+     *  Do not call from transport constructor. Transport must be ready to be started.
+     *
+     *  Following transport methods will be called:
+     *    setListener()
+     *    externalAddressReceived() (zero or more times, one for each known address)
+     *    startListening();
+     *
+     *  @since 0.9.16
+     */
+    @Override
+    public void registerTransport(Transport t) {
+        _manager.registerAndStart(t);
+    }
+
+    /**
+     *  Pluggable transports. Not for NTCP or SSU.
+     *
+     *  Following transport methods will be called:
+     *    setListener(null)
+     *    stoptListening();
+     *
+     *  @since 0.9.16
+     */
+    @Override
+    public void unregisterTransport(Transport t) {
+        _manager.stopAndUnregister(t);
+    }
+
+    /**
+     *  Hook for pluggable transport creation.
+     *
+     *  @since 0.9.16
+     */
+    @Override
+    public DHSessionKeyBuilder.Factory getDHFactory() {
+        return _manager.getDHFactory();
     }
     
     /*
