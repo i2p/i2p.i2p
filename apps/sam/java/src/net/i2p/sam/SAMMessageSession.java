@@ -176,6 +176,10 @@ abstract class SAMMessageSession {
                 _log.debug("Instantiating new SAM message-based session handler");
 
             I2PClient client = I2PClientFactory.createClient();
+            if (!props.containsKey("inbound.nickname") && !props.containsKey("outbound.nickname")) {
+                props.setProperty("inbound.nickname", "SAM UDP Client");
+                props.setProperty("outbound.nickname", "SAM UDP Client");
+            }
             session = client.createSession(destStream, props);
 
             if (_log.shouldLog(Log.DEBUG))

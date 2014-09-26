@@ -67,7 +67,7 @@ class SAMStreamSession {
     private final AtomicInteger lastNegativeId = new AtomicInteger();;
 
     // Can we create outgoing connections?
-    protected boolean canCreate;
+    protected final boolean canCreate;
 
     /** 
      * should we flush every time we get a STREAM SEND, or leave that up to
@@ -109,6 +109,23 @@ class SAMStreamSession {
                             Properties props,  SAMStreamReceiver recv) throws IOException, DataFormatException, SAMException {
         this.recv = recv;
         _log = I2PAppContext.getGlobalContext().logManager().getLog(getClass());
+
+        boolean canReceive;
+        if (dir.equals("BOTH")) {
+            canCreate = true;
+            canReceive = true;
+        } else if (dir.equals("CREATE")) {
+            canCreate = true;
+            canReceive = false;
+        } else if (dir.equals("RECEIVE")) {
+            canCreate = false;
+            canReceive = true;
+        } else {
+            _log.error("BUG! Wrong direction passed to SAMStreamSession: "
+                       + dir);
+            throw new SAMException("BUG! Wrong direction specified!");
+        }
+
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("SAM STREAM session instantiated");
 
@@ -122,6 +139,12 @@ class SAMStreamSession {
             i2cpPort = Integer.parseInt(port);
         } catch (NumberFormatException nfe) {
             throw new SAMException("Invalid I2CP port specified [" + port + "]");
+        }
+        if (!canReceive)
+            allprops.setProperty("i2cp.dontPublishLeaseSet", "true");
+        if (!allprops.containsKey("inbound.nickname") && !allprops.containsKey("outbound.nickname")) {
+            allprops.setProperty("inbound.nickname", "SAM TCP Client");
+            allprops.setProperty("outbound.nickname", "SAM TCP Client");
         }
 
         if (_log.shouldLog(Log.DEBUG))
@@ -138,19 +161,6 @@ class SAMStreamSession {
 
         forceFlush = Boolean.parseBoolean(allprops.getProperty(PROP_FORCE_FLUSH, DEFAULT_FORCE_FLUSH));
         
-        boolean canReceive = false;
-        if (dir.equals("BOTH")) {
-            canCreate = true;
-            canReceive = true;
-        } else if (dir.equals("CREATE")) {
-            canCreate = true;
-        } else if (dir.equals("RECEIVE")) {
-            canReceive = true;
-        } else {
-            _log.error("BUG! Wrong direction passed to SAMStreamSession: "
-                       + dir);
-            throw new SAMException("BUG! Wrong direction specified!");
-        }
 
         if (canReceive) {
             server = new SAMStreamSessionServer();
