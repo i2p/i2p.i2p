@@ -2232,15 +2232,15 @@ public class I2PSnarkServlet extends BasicServlet {
         out.write("<tr><td>");
         out.write(_("Inbound Settings"));
         out.write(":<td>");
-        out.write(renderOptions(1, 6, options.remove("inbound.quantity"), "inbound.quantity", TUNNEL));
+        out.write(renderOptions(1, 6, 3, options.remove("inbound.quantity"), "inbound.quantity", TUNNEL));
         out.write("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
-        out.write(renderOptions(0, 4, options.remove("inbound.length"), "inbound.length", HOP));
+        out.write(renderOptions(0, 4, 3, options.remove("inbound.length"), "inbound.length", HOP));
         out.write("<tr><td>");
         out.write(_("Outbound Settings"));
         out.write(":<td>");
-        out.write(renderOptions(1, 6, options.remove("outbound.quantity"), "outbound.quantity", TUNNEL));
+        out.write(renderOptions(1, 6, 3, options.remove("outbound.quantity"), "outbound.quantity", TUNNEL));
         out.write("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
-        out.write(renderOptions(0, 4, options.remove("outbound.length"), "outbound.length", HOP));
+        out.write(renderOptions(0, 4, 3, options.remove("outbound.length"), "outbound.length", HOP));
 
         if (!_context.isRouterContext()) {
             out.write("<tr><td>");
@@ -2393,8 +2393,8 @@ public class I2PSnarkServlet extends BasicServlet {
     private static final String DUMMY1 = "1 ";
 
     /** modded from ConfigTunnelsHelper @since 0.7.14 */
-    private String renderOptions(int min, int max, String strNow, String selName, String name) {
-        int now = 2;
+    private String renderOptions(int min, int max, int dflt, String strNow, String selName, String name) {
+        int now = dflt;
         try {
             now = Integer.parseInt(strNow);
         } catch (Throwable t) {}

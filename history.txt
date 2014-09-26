@@ -1,9 +1,18 @@
+2014-09-27 zzz
+ * EdDSA: Use our PRNG by default for keygen
+ * i2psnark:
+   - Increase default to 3 hops (ticket #966)
+   - Show info hash on details page
+ * NetDB: Increase max age of RIs to reduce number refreshed after restart
+ * Tests: Fix junit compile fails due to data structure moves
+ * Transport: Hooks for pluggable transports (ticket #1170)
+
 2014-09-23 zzz
 Prop from i2p.i2p.zzz.test2:
  * Addressbook: Improve parser efficiency
  * Data structures: Move several router-only classes from i2p.jar to
    net.i2p.data.router in router.jar. This will break existing
-   versions of the itoopie plugin.
+   versions of the i2pcontrol plugin.
  * HTTP Client: Add error page for unsupported encryption
  * I2CP:
    - Verify crypto key pair in LS
