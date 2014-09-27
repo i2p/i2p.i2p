@@ -24,8 +24,8 @@ import net.i2p.util.SystemVersion;
 
 /**
  * A class for retrieveing details about the CPU using the CPUID assembly instruction.
- * A good resource for information about the CPUID instruction can be found here:
- * http://www.paradicesoftware.com/specs/cpuid/index.htm
+ *
+ * Ref: http://en.wikipedia.org/wiki/Cpuid
  *
  * @author Iakin
 */
@@ -124,51 +124,75 @@ public class CPUID {
 
         return sb.toString();
     }
+
+    /** @return 0-15 */
     static int getCPUFamily()
     {
         CPUIDResult c = doCPUID(1);
         return (c.EAX >> 8) & 0xf;
     }
+
+    /** @return 0-15 */
     static int getCPUModel()
     {
         CPUIDResult c = doCPUID(1);
         return (c.EAX >> 4) & 0xf;
     }
+
+    /**
+     *  Only valid if family == 15.
+     *  Left shift by 4 and then add model to get full model.
+     *  @return 0-15
+     */
     static int getCPUExtendedModel()
     {
         CPUIDResult c = doCPUID(1);
         return (c.EAX >> 16) & 0xf;
     }
+
+    /** @return 0-15 */
     static int getCPUType()
     {
         CPUIDResult c = doCPUID(1);
         return (c.EAX >> 12) & 0xf;
     }
+
+    /**
+     *  Only valid if family == 15.
+     *  Add family to get full family.
+     *  @return 0-255
+     */
     static int getCPUExtendedFamily()
     {
         CPUIDResult c = doCPUID(1);
         return (c.EAX >> 20) & 0xff;
     }
+
+    /** @return 0-15 */
     static int getCPUStepping()
     {
         CPUIDResult c = doCPUID(1);
         return c.EAX & 0xf;
     }
+
     static int getEDXCPUFlags()
     {
         CPUIDResult c = doCPUID(1);
         return c.EDX;
     }
+
     static int getECXCPUFlags()
     {
         CPUIDResult c = doCPUID(1);
         return c.ECX;
     }
+
     static int getExtendedEBXCPUFlags()
     {
         CPUIDResult c = doCPUID(0x80000001);
         return c.EBX;
     }
+
     static int getExtendedECXCPUFlags()
     {
         CPUIDResult c = doCPUID(0x80000001);

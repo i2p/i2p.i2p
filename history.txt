@@ -1,9 +1,23 @@
 2014-09-27 zzz
+ * CPUID:
+   - Fix model and family calculations
+   - Fix most AMD family 15 IDs
+   - Add AMD Llano, Jaguar, Bulldozer 2
+   - Add Intel Ivy Bridge, Haswell, Broadwell, Penryn,
+     Pineview, Cedarview, Bay Trail, Avoton, and others
+   - Set best-guess capabilities for most Intel processors
+   - Supply best-guess model string in most cases
+   - Processors listed above, and some others, may see crypto speedups as a result
+
+2014-09-26 zzz
  * EdDSA: Use our PRNG by default for keygen
  * i2psnark:
    - Increase default to 3 hops (ticket #966)
    - Show info hash on details page
  * NetDB: Increase max age of RIs to reduce number refreshed after restart
+ * SAM:
+   - Don't publish LS for DIRECTION=CREATE
+   - Set default tunnel name
  * Tests: Fix junit compile fails due to data structure moves
  * Transport: Hooks for pluggable transports (ticket #1170)
 
