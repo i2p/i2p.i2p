@@ -227,7 +227,7 @@ class IntelInfoImpl extends CPUIDCPUInfo implements IntelCPUInfo
                     case 0x17:
                         modelString = "Core 2 (45nm)";
                         break;
-                    // Nahalem 45 nm
+                    // Nehalem 45 nm
                     case 0x1a:
                         isCoreiCompatible = true;
                         modelString = "Core i7 (45nm)";
@@ -246,7 +246,7 @@ class IntelInfoImpl extends CPUIDCPUInfo implements IntelCPUInfo
                         isCoreiCompatible = true;
                         modelString = "Xeon MP (45nm)";
                         break;
-                    // Nahalem 45 nm
+                    // Nehalem 45 nm
                     case 0x1e:
                         isCoreiCompatible = true;
                         modelString = "Core i5/i7 (45nm)";
@@ -282,7 +282,7 @@ class IntelInfoImpl extends CPUIDCPUInfo implements IntelCPUInfo
                     case 0x2d:
                         modelString = "Sandy Bridge EP";
                         break;
-                    // Nahalem 45 nm
+                    // Nehalem 45 nm
                     case 0x2e:
                         modelString = "Xeon MP (45nm)";
                         break;

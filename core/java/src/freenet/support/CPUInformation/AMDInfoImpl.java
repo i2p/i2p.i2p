@@ -364,6 +364,9 @@ class AMDInfoImpl extends CPUIDCPUInfo implements AMDCPUInfo
 
         // APUs
         // http://en.wikipedia.org/wiki/List_of_AMD_Accelerated_Processing_Unit_microprocessors
+        // 1st gen Llano high perf / Brazos low power
+        // 2nd gen Trinity high perf / Brazos 2 low power
+        // 3rd gen Kaveri high perf / Kabini/Temash low power
           case 18: {
             isK6Compatible = true;
             isK6_2_Compatible = true;
@@ -371,7 +374,7 @@ class AMDInfoImpl extends CPUIDCPUInfo implements AMDCPUInfo
             isAthlonCompatible = true;
             isAthlon64Compatible = true;
             isX64 = true;
-            modelString = "AMD Llano/Trinity/Brazos model " + model;
+            modelString = "AMD APU model " + model;
           }
           break;
 
@@ -388,10 +391,10 @@ class AMDInfoImpl extends CPUIDCPUInfo implements AMDCPUInfo
                 case 1:                    
                 // Case 3 is uncertain but most likely a Bobcat APU
                 case 3:
-                    modelString = "Bobcat APU";
+                    modelString = "AMD Bobcat APU";
                     break;
                 default:
-                    modelString = "AMD Bobcat model " + model;
+                    modelString = "AMD Bobcat APU model " + model;
                     break;
             }
           }
@@ -408,8 +411,17 @@ class AMDInfoImpl extends CPUIDCPUInfo implements AMDCPUInfo
             isBulldozerCompatible = true;
             isX64 = true;
             switch (model) {
+                // 32 nm
                 case 1:                    
-                    modelString = "Bulldozer FX-6000/8000";
+                    modelString = "Bulldozer FX-6100/8100";
+                    break;
+                // 32 nm
+                case 2:                    
+                    modelString = "Bulldozer FX-6300/8300";
+                    break;
+                // 28 nm ?
+                case 3:                    
+                    modelString = "Bulldozer FX-6500/8500";
                     break;
                 default:
                     modelString = "AMD Bulldozer model " + model;
@@ -427,7 +439,14 @@ class AMDInfoImpl extends CPUIDCPUInfo implements AMDCPUInfo
             isAthlon64Compatible = true;
             isBobcatCompatible = true;
             isX64 = true;
-            modelString = "AMD Jaguar model " + model;
+            switch (model) {
+                case 0:                    
+                    modelString = "Athlon 5350 APU";
+                    break;
+                default:
+                    modelString = "AMD Jaguar APU model " + model;
+                    break;
+            }
           }
           break;
         }

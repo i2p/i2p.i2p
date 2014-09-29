@@ -79,8 +79,11 @@ public class CPUID {
     {
         loadNative();
     }
-    //A class that can (amongst other things I assume) represent the state of the
-    //different CPU registers after a call to the CPUID assembly method
+
+    /**
+     *  A class that can (amongst other things I assume) represent the state of the
+     *  different CPU registers after a call to the CPUID assembly method
+     */
     protected static class CPUIDResult {
         final int EAX;
         final int EBX;
@@ -207,6 +210,40 @@ public class CPUID {
     }
 
     /**
+     *  The model name string, up to 48 characters, as reported by
+     *  the processor itself.
+     *
+     *  @return trimmed string, null if unsupported
+     *  @since 0.9.16
+     */
+    static String getCPUModelName() {
+        CPUIDResult c = doCPUID(0x80000000);
+        long maxSupported = c.EAX & 0xFFFFFFFFL;
+        if (maxSupported < 0x80000004L)
+            return null;
+        StringBuilder buf = new StringBuilder(48);
+        int[] regs = new int[4];
+        for (int fn = 0x80000002; fn <= 0x80000004; fn++) {
+            c = doCPUID(fn);
+            regs[0] = c.EAX;
+            regs[1] = c.EBX;
+            regs[2] = c.ECX;
+            regs[3] = c.EDX;
+            for (int i = 0; i < 4; i++) {
+                int reg = regs[i];
+                for (int j = 0; j < 4; j++) {
+                    char ch = (char) (reg & 0xff);
+                    if (ch == 0)
+                        return buf.toString().trim();
+                    buf.append(ch);
+                    reg >>= 8;
+                }
+            }
+        }
+        return buf.toString().trim();
+    }
+
+    /**
      * Returns a CPUInfo item for the current type of CPU
      * If I could I would declare this method in a interface named
      * CPUInfoProvider and implement that interface in this class.
@@ -237,9 +274,19 @@ public class CPUID {
             System.out.println("**Failed to retrieve CPUInfo. Please verify the existence of jcpuid dll/so**");
         }
         System.out.println(" **CPUInfo**");
+        String mname = getCPUModelName();
+        if (mname != null)
+            System.out.println("CPU Model Name: " + mname);
         System.out.println("CPU Vendor: " + getCPUVendorID());
-        System.out.println("CPU Family: " + getCPUFamily());
-        System.out.println("CPU Model: " + getCPUModel());
+        // http://en.wikipedia.org/wiki/Cpuid
+        int family = getCPUFamily();
+        int model = getCPUModel();
+        if (family == 15) {
+            family += getCPUExtendedFamily();
+            model += getCPUExtendedModel() << 4;
+        }
+        System.out.println("CPU Family: " + family);
+        System.out.println("CPU Model: " + model);
         System.out.println("CPU Stepping: " + getCPUStepping());
         System.out.println("CPU Flags: 0x" + Integer.toHexString(getEDXCPUFlags()));
 
@@ -253,6 +300,7 @@ public class CPUID {
         System.out.println("CPU has SSE4.1: " + c.hasSSE41());
         System.out.println("CPU has SSE4.2: " + c.hasSSE42());
         System.out.println("CPU has SSE4A: " + c.hasSSE4A());
+        System.out.println("CPU has AES-NI: " + c.hasAES());
         if(c instanceof IntelCPUInfo){
             System.out.println("\n **Intel-info**");
             System.out.println("Is PII-compatible: "+((IntelCPUInfo)c).IsPentium2Compatible());
