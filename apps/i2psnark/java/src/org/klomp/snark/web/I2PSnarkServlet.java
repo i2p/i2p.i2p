@@ -2896,6 +2896,11 @@ public class I2PSnarkServlet extends BasicServlet {
                             : tx + ": " + directory);
         if (showSort)
             buf.append("</a>");
+        int dirSlash = directory.indexOf("/");
+        if (dirSlash > 0) {
+            buf.append("&nbsp;");
+            buf.append(DataHelper.escapeHTML(directory.substring(dirSlash + 1)));
+        }
         buf.append("</th>\n<th align=\"right\">");
         if (showSort) {
             sort = ("5".equals(sortParam)) ? "-5" : "5";
