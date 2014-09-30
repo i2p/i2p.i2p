@@ -1,3 +1,14 @@
+2014-09-30 zzz
+ * Logs: Fix displayed filename when empty (ticket #1386)
+ * SAM: Fix v3 LS publish, broken in -4 (ticket #1390)
+
+2014-09-29 zzz
+ * CPUID:
+   - Fix main() model and family calculation
+   - Add model string fetch from processor
+   - AMD model string tweaks
+ * i2psnark: Show subdirectory in table header on details page
+
 2014-09-27 zzz
  * CPUID:
    - Fix model and family calculations
