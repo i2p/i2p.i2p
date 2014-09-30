@@ -140,10 +140,13 @@ class LogWriter implements Runnable {
     /**
      *  File may not exist or have old logs in it if not opened yet
      */
-    public String currentFile() {
-        return _currentFile != null ? _currentFile.getAbsolutePath()
-                                    //: "uninitialized";
-                                    : getNextFile(_manager.getBaseLogfilename()).getAbsolutePath();
+    public synchronized String currentFile() {
+        if (_currentFile != null)
+            return _currentFile.getAbsolutePath();
+        String rv = getNextFile().getAbsolutePath();
+        // so it doesn't increment every time we call this
+        _rotationNum = -1;
+        return rv;
     }
 
     private void rereadConfig() {
@@ -173,7 +176,7 @@ class LogWriter implements Runnable {
         }
     }
 
-    private void writeRecord(String val) {
+    private synchronized void writeRecord(String val) {
         if (val == null) return;
         if (_currentOut == null) {
             rotateFile();
@@ -200,10 +203,10 @@ class LogWriter implements Runnable {
     /**
      * Rotate to the next file (or the first file if this is the first call)
      *
+     * Caller must synch
      */
     private void rotateFile() {
-        String pattern = _manager.getBaseLogfilename();
-        File f = getNextFile(pattern);
+        File f = getNextFile();
         _currentFile = f;
         _numBytesInCurrentFile = 0;
         File parent = f.getParentFile();
@@ -242,8 +245,10 @@ class LogWriter implements Runnable {
     /**
      * Get the next file in the rotation
      *
+     * Caller must synch
      */
-    private File getNextFile(String pattern) {
+    private File getNextFile() {
+        String pattern = _manager.getBaseLogfilename();
         File f = new File(pattern);
         File base = null;
         if (!f.isAbsolute())
@@ -274,6 +279,7 @@ class LogWriter implements Runnable {
     /**
      * Retrieve the first file, updating the rotation number accordingly
      *
+     * Caller must synch
      */
     private File getFirstFile(File base, String pattern, int max) {
         for (int i = 0; i < max; i++) {
