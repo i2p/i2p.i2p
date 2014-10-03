@@ -136,7 +136,7 @@ public class NetDbRenderer {
         for (LeaseSet ls : leases) {
             Destination dest = ls.getDestination();
             Hash key = dest.calculateHash();
-            buf.append("<b>").append(_("LeaseSet")).append(": ").append(key.toBase64());
+            buf.append("<b>").append(_("LeaseSet")).append(": ").append(key.toBase64()).append("</b>\n");
             if (_context.clientManager().isLocal(dest)) {
                 buf.append(" (<a href=\"tunnels#" + key.toBase64().substring(0,4) + "\">" + _("Local") + "</a> ");
                 if (! _context.clientManager().shouldPublishLeaseSet(key))
@@ -147,15 +147,20 @@ public class NetDbRenderer {
                     buf.append(in.getDestinationNickname());
                 else
                     buf.append(dest.toBase64().substring(0, 6));
+                buf.append(")<br>\n");
             } else {
-                buf.append(" (" + _("Destination") + ' ');
+                buf.append(" (").append(_("Destination")).append(' ');
                 String host = _context.namingService().reverseLookup(dest);
-                if (host != null)
-                    buf.append(host);
-                else
-                    buf.append(dest.toBase64().substring(0, 6));
+                if (host != null) {
+                    buf.append("<a href=\"http://").append(host).append("/\">").append(host).append("</a>)<br>\n");
+                } else {
+                    String b32 = dest.toBase32();
+                    buf.append(dest.toBase64().substring(0, 6)).append(")<br>\n" +
+                               "<a href=\"http://").append(b32).append("\">").append(b32).append("</a><br>\n" +
+                               "<a href=\"/susidns/addressbook.jsp?book=private&amp;destination=")
+                       .append(dest.toBase64()).append("#add\">").append(_("Add to local addressbook")).append("</a><br>\n");    
+                }
             }
-            buf.append(")</b><br>\n");
             long exp = ls.getLatestLeaseDate()-now;
             if (exp > 0)
                 buf.append(_("Expires in {0}", DataHelper.formatDuration2(exp)));
@@ -171,7 +176,7 @@ public class NetDbRenderer {
                         median = dist;
                 }
                 buf.append(" Dist: <b>").append(fmt.format(biLog2(dist))).append("</b><br>");
-                buf.append(dest.toBase32()).append("<br>");
+                //buf.append(dest.toBase32()).append("<br>");
                 buf.append("Sig type: ").append(dest.getSigningPublicKey().getType()).append("<br>");
                 buf.append("Routing Key: ").append(ls.getRoutingKey().toBase64());
                 buf.append("<br>");
