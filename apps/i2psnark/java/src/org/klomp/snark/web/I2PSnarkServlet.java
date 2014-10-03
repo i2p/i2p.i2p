@@ -931,13 +931,7 @@ public class I2PSnarkServlet extends BasicServlet {
             } else
           *****/
             if (newURL != null) {
-                if (newURL.contains("<") || newURL.contains(">") ||
-                    newURL.contains("%3C") || newURL.contains("%3E") ||
-                    newURL.contains("%3c") || newURL.contains("%3e") ||
-                    newURL.contains("\"") || newURL.contains("'") ||
-                    newURL.contains("%22") || newURL.contains("%27")) {
-                    _manager.addMessage("Invalid URL");
-                } else if (newURL.startsWith("http://")) {
+                if (newURL.startsWith("http://")) {
                     FetchAndAdd fetch = new FetchAndAdd(_context, _manager, newURL);
                     _manager.addDownloader(fetch);
                 } else if (newURL.startsWith(MagnetURI.MAGNET) || newURL.startsWith(MagnetURI.MAGGOT)) {
