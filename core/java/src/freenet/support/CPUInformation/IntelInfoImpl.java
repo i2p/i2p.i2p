@@ -59,12 +59,18 @@ class IntelInfoImpl extends CPUIDCPUInfo implements IntelCPUInfo
     private static String identifyCPU()
     {
         // http://en.wikipedia.org/wiki/Cpuid
+        // http://web.archive.org/web/20110307080258/http://www.intel.com/Assets/PDF/appnote/241618.pdf
+        // http://www.intel.com/content/dam/www/public/us/en/documents/manuals/64-ia-32-architectures-software-developer-vol-2a-manual.pdf
         String modelString = null;
         int family = CPUID.getCPUFamily();
         int model = CPUID.getCPUModel();
+        if (family == 15 || family == 6) {
+            // Intel uses extended model for family = 15 or family = 6,
+            // which is not what wikipedia says
+            model += CPUID.getCPUExtendedModel() << 4;
+        }
         if (family == 15) {
             family += CPUID.getCPUExtendedFamily();
-            model += CPUID.getCPUExtendedModel() << 4;
         }
 
         switch (family) {
@@ -159,6 +165,17 @@ class IntelInfoImpl extends CPUIDCPUInfo implements IntelCPUInfo
                         break;
                     case 1:
                         modelString = "Pentium Pro";
+                        break;
+                    // Nehalem 45 nm
+                    // As reported; can't find in any CPUID charts
+                    case 2:
+                        isPentium2Compatible = true;
+                        isPentium3Compatible = true;
+                        isPentiumMCompatible = true;
+                        isCore2Compatible = true;
+                        isCoreiCompatible = true;
+                        isX64 = true;
+                        modelString = "Core i7 (45nm)";
                         break;
                     case 3:
                         isPentium2Compatible = true;

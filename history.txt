@@ -1,3 +1,8 @@
+2014-10-03 zzz
+ * Console: New add-to-addressbook links on leaseset page
+ * CPUID: Fix Intel processor identification
+ * i2psnark: Fix adding magnet links with % encoding (ticket #1391)
+
 2014-09-30 zzz
  * Logs: Fix displayed filename when empty (ticket #1386)
  * SAM: Fix v3 LS publish, broken in -4 (ticket #1390)

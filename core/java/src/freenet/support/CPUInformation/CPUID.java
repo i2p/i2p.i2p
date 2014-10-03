@@ -277,13 +277,19 @@ public class CPUID {
         String mname = getCPUModelName();
         if (mname != null)
             System.out.println("CPU Model Name: " + mname);
-        System.out.println("CPU Vendor: " + getCPUVendorID());
+        String vendor = getCPUVendorID();
+        System.out.println("CPU Vendor: " + vendor);
         // http://en.wikipedia.org/wiki/Cpuid
+        // http://web.archive.org/web/20110307080258/http://www.intel.com/Assets/PDF/appnote/241618.pdf
+        // http://www.intel.com/content/dam/www/public/us/en/documents/manuals/64-ia-32-architectures-software-developer-vol-2a-manual.pdf
         int family = getCPUFamily();
         int model = getCPUModel();
+        if (family == 15 ||
+            (family == 6 && "GenuineIntel".equals(vendor))) {
+            model += getCPUExtendedModel() << 4;
+        }
         if (family == 15) {
             family += getCPUExtendedFamily();
-            model += getCPUExtendedModel() << 4;
         }
         System.out.println("CPU Family: " + family);
         System.out.println("CPU Model: " + model);
