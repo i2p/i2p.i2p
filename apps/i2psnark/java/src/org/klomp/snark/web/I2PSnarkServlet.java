@@ -2311,11 +2311,16 @@ public class I2PSnarkServlet extends BasicServlet {
                .append(announceURL).append("\"");
             if (!(isOpen || isPrivate))
                 buf.append(" checked=\"checked\"");
+            else if (t.announceURL.equals("http://tracker.welterde.i2p/a"))
+                buf.append(" disabled=\"disabled\"");
             buf.append(">" +
                        "</td><td><input type=\"radio\" class=\"optbox\" value=\"1\" name=\"ttype_")
                .append(announceURL).append("\"");
             if (isOpen)
                 buf.append(" checked=\"checked\"");
+            else if (t.announceURL.equals("http://diftracker.i2p/announce.php") ||
+                     t.announceURL.equals("http://tracker2.postman.i2p/announce.php"))
+                buf.append(" disabled=\"disabled\"");
             buf.append(">" +
                        "</td><td><input type=\"radio\" class=\"optbox\" value=\"2\" name=\"ttype_")
                .append(announceURL).append("\"");
