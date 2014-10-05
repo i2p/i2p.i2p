@@ -13,7 +13,7 @@ public class Ed25519FieldElement extends FieldElement {
     /**
      * Variable is package private for encoding.
      */
-    int[] t;
+    final int[] t;
 
     public Ed25519FieldElement(Field f, int[] t) {
         super(f);
@@ -22,11 +22,11 @@ public class Ed25519FieldElement extends FieldElement {
         this.t = t;
     }
 
-    private static final byte[] zero = new byte[32];
+    private static final byte[] ZERO = new byte[32];
 
     public boolean isNonZero() {
         byte[] s = toByteArray();
-        return Utils.equal(s, zero) == 1;
+        return Utils.equal(s, ZERO) == 1;
     }
 
     /**
@@ -42,47 +42,10 @@ public class Ed25519FieldElement extends FieldElement {
      */
     public FieldElement add(FieldElement val) {
         int[] g = ((Ed25519FieldElement)val).t;
-        int f0 = t[0];
-        int f1 = t[1];
-        int f2 = t[2];
-        int f3 = t[3];
-        int f4 = t[4];
-        int f5 = t[5];
-        int f6 = t[6];
-        int f7 = t[7];
-        int f8 = t[8];
-        int f9 = t[9];
-        int g0 = g[0];
-        int g1 = g[1];
-        int g2 = g[2];
-        int g3 = g[3];
-        int g4 = g[4];
-        int g5 = g[5];
-        int g6 = g[6];
-        int g7 = g[7];
-        int g8 = g[8];
-        int g9 = g[9];
-        int h0 = f0 + g0;
-        int h1 = f1 + g1;
-        int h2 = f2 + g2;
-        int h3 = f3 + g3;
-        int h4 = f4 + g4;
-        int h5 = f5 + g5;
-        int h6 = f6 + g6;
-        int h7 = f7 + g7;
-        int h8 = f8 + g8;
-        int h9 = f9 + g9;
         int[] h = new int[10];
-        h[0] = h0;
-        h[1] = h1;
-        h[2] = h2;
-        h[3] = h3;
-        h[4] = h4;
-        h[5] = h5;
-        h[6] = h6;
-        h[7] = h7;
-        h[8] = h8;
-        h[9] = h9;
+        for (int i = 0; i < 10; i++) {
+            h[i] = t[i] + g[i];
+        }
         return new Ed25519FieldElement(f, h);
     }
 
@@ -99,47 +62,10 @@ public class Ed25519FieldElement extends FieldElement {
      **/
     public FieldElement subtract(FieldElement val) {
         int[] g = ((Ed25519FieldElement)val).t;
-        int f0 = t[0];
-        int f1 = t[1];
-        int f2 = t[2];
-        int f3 = t[3];
-        int f4 = t[4];
-        int f5 = t[5];
-        int f6 = t[6];
-        int f7 = t[7];
-        int f8 = t[8];
-        int f9 = t[9];
-        int g0 = g[0];
-        int g1 = g[1];
-        int g2 = g[2];
-        int g3 = g[3];
-        int g4 = g[4];
-        int g5 = g[5];
-        int g6 = g[6];
-        int g7 = g[7];
-        int g8 = g[8];
-        int g9 = g[9];
-        int h0 = f0 - g0;
-        int h1 = f1 - g1;
-        int h2 = f2 - g2;
-        int h3 = f3 - g3;
-        int h4 = f4 - g4;
-        int h5 = f5 - g5;
-        int h6 = f6 - g6;
-        int h7 = f7 - g7;
-        int h8 = f8 - g8;
-        int h9 = f9 - g9;
         int[] h = new int[10];
-        h[0] = h0;
-        h[1] = h1;
-        h[2] = h2;
-        h[3] = h3;
-        h[4] = h4;
-        h[5] = h5;
-        h[6] = h6;
-        h[7] = h7;
-        h[8] = h8;
-        h[9] = h9;
+        for (int i = 0; i < 10; i++) {
+            h[i] = t[i] - g[i];
+        }
         return new Ed25519FieldElement(f, h);
     }
 
@@ -153,37 +79,10 @@ public class Ed25519FieldElement extends FieldElement {
      *    |h| bounded by 1.1*2^25,1.1*2^24,1.1*2^25,1.1*2^24,etc.
      */
     public FieldElement negate() {
-        int f0 = t[0];
-        int f1 = t[1];
-        int f2 = t[2];
-        int f3 = t[3];
-        int f4 = t[4];
-        int f5 = t[5];
-        int f6 = t[6];
-        int f7 = t[7];
-        int f8 = t[8];
-        int f9 = t[9];
-        int h0 = -f0;
-        int h1 = -f1;
-        int h2 = -f2;
-        int h3 = -f3;
-        int h4 = -f4;
-        int h5 = -f5;
-        int h6 = -f6;
-        int h7 = -f7;
-        int h8 = -f8;
-        int h9 = -f9;
         int[] h = new int[10];
-        h[0] = h0;
-        h[1] = h1;
-        h[2] = h2;
-        h[3] = h3;
-        h[4] = h4;
-        h[5] = h5;
-        h[6] = h6;
-        h[7] = h7;
-        h[8] = h8;
-        h[9] = h9;
+        for (int i = 0; i < 10; i++) {
+            h[i] = - t[i];
+        }
         return new Ed25519FieldElement(f, h);
     }
 

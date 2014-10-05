@@ -1,22 +1,10 @@
 package net.i2p.crypto.eddsa.math.ed25519;
 
 import net.i2p.crypto.eddsa.math.ScalarOps;
+import static net.i2p.crypto.eddsa.math.ed25519.Ed25519LittleEndianEncoding.load_3;
+import static net.i2p.crypto.eddsa.math.ed25519.Ed25519LittleEndianEncoding.load_4;
 
 public class Ed25519ScalarOps implements ScalarOps {
-    private static long load_3(byte[] in, int offset) {
-        int result = in[offset++] & 0xff;
-        result |= (in[offset++] & 0xff) << 8;
-        result |= (in[offset] & 0xff) << 16;
-        return result;
-    }
-
-    private static long load_4(byte[] in, int offset) {
-        int result = in[offset++] & 0xff;
-        result |= (in[offset++] & 0xff) << 8;
-        result |= (in[offset++] & 0xff) << 16;
-        result |= in[offset] << 24;
-        return ((long)result) & 0xffffffffL;
-    }
 
     /**
      * Input:<br>
@@ -75,7 +63,8 @@ public class Ed25519ScalarOps implements ScalarOps {
         s14 -= s23 * 997805;
         s15 += s23 * 136657;
         s16 -= s23 * 683901;
-        s23 = 0;
+        // not used again
+        //s23 = 0;
 
         s10 += s22 * 666643;
         s11 += s22 * 470296;
@@ -83,7 +72,8 @@ public class Ed25519ScalarOps implements ScalarOps {
         s13 -= s22 * 997805;
         s14 += s22 * 136657;
         s15 -= s22 * 683901;
-        s22 = 0;
+        // not used again
+        //s22 = 0;
 
         s9 += s21 * 666643;
         s10 += s21 * 470296;
@@ -91,7 +81,8 @@ public class Ed25519ScalarOps implements ScalarOps {
         s12 -= s21 * 997805;
         s13 += s21 * 136657;
         s14 -= s21 * 683901;
-        s21 = 0;
+        // not used again
+        //s21 = 0;
 
         s8 += s20 * 666643;
         s9 += s20 * 470296;
@@ -99,7 +90,8 @@ public class Ed25519ScalarOps implements ScalarOps {
         s11 -= s20 * 997805;
         s12 += s20 * 136657;
         s13 -= s20 * 683901;
-        s20 = 0;
+        // not used again
+        //s20 = 0;
 
         s7 += s19 * 666643;
         s8 += s19 * 470296;
@@ -107,7 +99,8 @@ public class Ed25519ScalarOps implements ScalarOps {
         s10 -= s19 * 997805;
         s11 += s19 * 136657;
         s12 -= s19 * 683901;
-        s19 = 0;
+        // not used again
+        //s19 = 0;
 
         s6 += s18 * 666643;
         s7 += s18 * 470296;
@@ -115,7 +108,8 @@ public class Ed25519ScalarOps implements ScalarOps {
         s9 -= s18 * 997805;
         s10 += s18 * 136657;
         s11 -= s18 * 683901;
-        s18 = 0;
+        // not used again
+        //s18 = 0;
 
         carry6 = (s6 + (1<<20)) >> 21; s7 += carry6; s6 -= carry6 << 21;
         carry8 = (s8 + (1<<20)) >> 21; s9 += carry8; s8 -= carry8 << 21;
@@ -136,7 +130,8 @@ public class Ed25519ScalarOps implements ScalarOps {
         s8 -= s17 * 997805;
         s9 += s17 * 136657;
         s10 -= s17 * 683901;
-        s17 = 0;
+        // not used again
+        //s17 = 0;
 
         s4 += s16 * 666643;
         s5 += s16 * 470296;
@@ -144,7 +139,8 @@ public class Ed25519ScalarOps implements ScalarOps {
         s7 -= s16 * 997805;
         s8 += s16 * 136657;
         s9 -= s16 * 683901;
-        s16 = 0;
+        // not used again
+        //s16 = 0;
 
         s3 += s15 * 666643;
         s4 += s15 * 470296;
@@ -152,7 +148,8 @@ public class Ed25519ScalarOps implements ScalarOps {
         s6 -= s15 * 997805;
         s7 += s15 * 136657;
         s8 -= s15 * 683901;
-        s15 = 0;
+        // not used again
+        //s15 = 0;
 
         s2 += s14 * 666643;
         s3 += s14 * 470296;
@@ -160,7 +157,8 @@ public class Ed25519ScalarOps implements ScalarOps {
         s5 -= s14 * 997805;
         s6 += s14 * 136657;
         s7 -= s14 * 683901;
-        s14 = 0;
+        // not used again
+        //s14 = 0;
 
         s1 += s13 * 666643;
         s2 += s13 * 470296;
@@ -168,7 +166,8 @@ public class Ed25519ScalarOps implements ScalarOps {
         s4 -= s13 * 997805;
         s5 += s13 * 136657;
         s6 -= s13 * 683901;
-        s13 = 0;
+        // not used again
+        //s13 = 0;
 
         s0 += s12 * 666643;
         s1 += s12 * 470296;
@@ -176,7 +175,8 @@ public class Ed25519ScalarOps implements ScalarOps {
         s3 -= s12 * 997805;
         s4 += s12 * 136657;
         s5 -= s12 * 683901;
-        s12 = 0;
+        // set below
+        //s12 = 0;
 
         carry0 = (s0 + (1<<20)) >> 21; s1 += carry0; s0 -= carry0 << 21;
         carry2 = (s2 + (1<<20)) >> 21; s3 += carry2; s2 -= carry2 << 21;
@@ -190,7 +190,8 @@ public class Ed25519ScalarOps implements ScalarOps {
         carry5 = (s5 + (1<<20)) >> 21; s6 += carry5; s5 -= carry5 << 21;
         carry7 = (s7 + (1<<20)) >> 21; s8 += carry7; s7 -= carry7 << 21;
         carry9 = (s9 + (1<<20)) >> 21; s10 += carry9; s9 -= carry9 << 21;
-        carry11 = (s11 + (1<<20)) >> 21; s12 += carry11; s11 -= carry11 << 21;
+        //carry11 = (s11 + (1<<20)) >> 21; s12 += carry11; s11 -= carry11 << 21;
+        carry11 = (s11 + (1<<20)) >> 21; s12 = carry11; s11 -= carry11 << 21;
 
         s0 += s12 * 666643;
         s1 += s12 * 470296;
@@ -198,7 +199,8 @@ public class Ed25519ScalarOps implements ScalarOps {
         s3 -= s12 * 997805;
         s4 += s12 * 136657;
         s5 -= s12 * 683901;
-        s12 = 0;
+        // set below
+        //s12 = 0;
 
         carry0 = s0 >> 21; s1 += carry0; s0 -= carry0 << 21;
         carry1 = s1 >> 21; s2 += carry1; s1 -= carry1 << 21;
@@ -211,7 +213,8 @@ public class Ed25519ScalarOps implements ScalarOps {
         carry8 = s8 >> 21; s9 += carry8; s8 -= carry8 << 21;
         carry9 = s9 >> 21; s10 += carry9; s9 -= carry9 << 21;
         carry10 = s10 >> 21; s11 += carry10; s10 -= carry10 << 21;
-        carry11 = s11 >> 21; s12 += carry11; s11 -= carry11 << 21;
+        //carry11 = s11 >> 21; s12 += carry11; s11 -= carry11 << 21;
+        carry11 = s11 >> 21; s12 = carry11; s11 -= carry11 << 21;
 
         s0 += s12 * 666643;
         s1 += s12 * 470296;
@@ -219,7 +222,8 @@ public class Ed25519ScalarOps implements ScalarOps {
         s3 -= s12 * 997805;
         s4 += s12 * 136657;
         s5 -= s12 * 683901;
-        s12 = 0;
+        // not used again
+        //s12 = 0;
 
         carry0 = s0 >> 21; s1 += carry0; s0 -= carry0 << 21;
         carry1 = s1 >> 21; s2 += carry1; s1 -= carry1 << 21;
@@ -234,7 +238,7 @@ public class Ed25519ScalarOps implements ScalarOps {
         carry10 = s10 >> 21; s11 += carry10; s10 -= carry10 << 21;
 
         byte[] result = new byte[32];
-        result[0] = (byte) (s0 >> 0);
+        result[0] = (byte) s0;
         result[1] = (byte) (s0 >> 8);
         result[2] = (byte) ((s0 >> 16) | (s1 << 5));
         result[3] = (byte) (s1 >> 3);
@@ -255,7 +259,7 @@ public class Ed25519ScalarOps implements ScalarOps {
         result[18] = (byte) ((s6 >> 18) | (s7 << 3));
         result[19] = (byte) (s7 >> 5);
         result[20] = (byte) (s7 >> 13);
-        result[21] = (byte) (s8 >> 0);
+        result[21] = (byte) s8;
         result[22] = (byte) (s8 >> 8);
         result[23] = (byte) ((s8 >> 16) | (s9 << 5));
         result[24] = (byte) (s9 >> 3);
@@ -388,7 +392,8 @@ public class Ed25519ScalarOps implements ScalarOps {
         s20 = a9*b11 + a10*b10 + a11*b9;
         s21 = a10*b11 + a11*b10;
         s22 = a11*b11;
-        s23 = 0;
+        // set below
+        //s23 = 0;
 
         carry0 = (s0 + (1<<20)) >> 21; s1 += carry0; s0 -= carry0 << 21;
         carry2 = (s2 + (1<<20)) >> 21; s3 += carry2; s2 -= carry2 << 21;
@@ -401,7 +406,8 @@ public class Ed25519ScalarOps implements ScalarOps {
         carry16 = (s16 + (1<<20)) >> 21; s17 += carry16; s16 -= carry16 << 21;
         carry18 = (s18 + (1<<20)) >> 21; s19 += carry18; s18 -= carry18 << 21;
         carry20 = (s20 + (1<<20)) >> 21; s21 += carry20; s20 -= carry20 << 21;
-        carry22 = (s22 + (1<<20)) >> 21; s23 += carry22; s22 -= carry22 << 21;
+        //carry22 = (s22 + (1<<20)) >> 21; s23 += carry22; s22 -= carry22 << 21;
+        carry22 = (s22 + (1<<20)) >> 21; s23 = carry22; s22 -= carry22 << 21;
 
         carry1 = (s1 + (1<<20)) >> 21; s2 += carry1; s1 -= carry1 << 21;
         carry3 = (s3 + (1<<20)) >> 21; s4 += carry3; s3 -= carry3 << 21;
@@ -421,7 +427,8 @@ public class Ed25519ScalarOps implements ScalarOps {
         s14 -= s23 * 997805;
         s15 += s23 * 136657;
         s16 -= s23 * 683901;
-        s23 = 0;
+        // not used again
+        //s23 = 0;
 
         s10 += s22 * 666643;
         s11 += s22 * 470296;
@@ -429,7 +436,8 @@ public class Ed25519ScalarOps implements ScalarOps {
         s13 -= s22 * 997805;
         s14 += s22 * 136657;
         s15 -= s22 * 683901;
-        s22 = 0;
+        // not used again
+        //s22 = 0;
 
         s9 += s21 * 666643;
         s10 += s21 * 470296;
@@ -437,7 +445,8 @@ public class Ed25519ScalarOps implements ScalarOps {
         s12 -= s21 * 997805;
         s13 += s21 * 136657;
         s14 -= s21 * 683901;
-        s21 = 0;
+        // not used again
+        //s21 = 0;
 
         s8 += s20 * 666643;
         s9 += s20 * 470296;
@@ -445,7 +454,8 @@ public class Ed25519ScalarOps implements ScalarOps {
         s11 -= s20 * 997805;
         s12 += s20 * 136657;
         s13 -= s20 * 683901;
-        s20 = 0;
+        // not used again
+        //s20 = 0;
 
         s7 += s19 * 666643;
         s8 += s19 * 470296;
@@ -453,7 +463,8 @@ public class Ed25519ScalarOps implements ScalarOps {
         s10 -= s19 * 997805;
         s11 += s19 * 136657;
         s12 -= s19 * 683901;
-        s19 = 0;
+        // not used again
+        //s19 = 0;
 
         s6 += s18 * 666643;
         s7 += s18 * 470296;
@@ -461,7 +472,8 @@ public class Ed25519ScalarOps implements ScalarOps {
         s9 -= s18 * 997805;
         s10 += s18 * 136657;
         s11 -= s18 * 683901;
-        s18 = 0;
+        // not used again
+        //s18 = 0;
 
         carry6 = (s6 + (1<<20)) >> 21; s7 += carry6; s6 -= carry6 << 21;
         carry8 = (s8 + (1<<20)) >> 21; s9 += carry8; s8 -= carry8 << 21;
@@ -482,7 +494,8 @@ public class Ed25519ScalarOps implements ScalarOps {
         s8 -= s17 * 997805;
         s9 += s17 * 136657;
         s10 -= s17 * 683901;
-        s17 = 0;
+        // not used again
+        //s17 = 0;
 
         s4 += s16 * 666643;
         s5 += s16 * 470296;
@@ -490,7 +503,8 @@ public class Ed25519ScalarOps implements ScalarOps {
         s7 -= s16 * 997805;
         s8 += s16 * 136657;
         s9 -= s16 * 683901;
-        s16 = 0;
+        // not used again
+        //s16 = 0;
 
         s3 += s15 * 666643;
         s4 += s15 * 470296;
@@ -498,7 +512,8 @@ public class Ed25519ScalarOps implements ScalarOps {
         s6 -= s15 * 997805;
         s7 += s15 * 136657;
         s8 -= s15 * 683901;
-        s15 = 0;
+        // not used again
+        //s15 = 0;
 
         s2 += s14 * 666643;
         s3 += s14 * 470296;
@@ -506,7 +521,8 @@ public class Ed25519ScalarOps implements ScalarOps {
         s5 -= s14 * 997805;
         s6 += s14 * 136657;
         s7 -= s14 * 683901;
-        s14 = 0;
+        // not used again
+        //s14 = 0;
 
         s1 += s13 * 666643;
         s2 += s13 * 470296;
@@ -514,7 +530,8 @@ public class Ed25519ScalarOps implements ScalarOps {
         s4 -= s13 * 997805;
         s5 += s13 * 136657;
         s6 -= s13 * 683901;
-        s13 = 0;
+        // not used again
+        //s13 = 0;
 
         s0 += s12 * 666643;
         s1 += s12 * 470296;
@@ -522,7 +539,8 @@ public class Ed25519ScalarOps implements ScalarOps {
         s3 -= s12 * 997805;
         s4 += s12 * 136657;
         s5 -= s12 * 683901;
-        s12 = 0;
+        // set below
+        //s12 = 0;
 
         carry0 = (s0 + (1<<20)) >> 21; s1 += carry0; s0 -= carry0 << 21;
         carry2 = (s2 + (1<<20)) >> 21; s3 += carry2; s2 -= carry2 << 21;
@@ -536,7 +554,8 @@ public class Ed25519ScalarOps implements ScalarOps {
         carry5 = (s5 + (1<<20)) >> 21; s6 += carry5; s5 -= carry5 << 21;
         carry7 = (s7 + (1<<20)) >> 21; s8 += carry7; s7 -= carry7 << 21;
         carry9 = (s9 + (1<<20)) >> 21; s10 += carry9; s9 -= carry9 << 21;
-        carry11 = (s11 + (1<<20)) >> 21; s12 += carry11; s11 -= carry11 << 21;
+        //carry11 = (s11 + (1<<20)) >> 21; s12 += carry11; s11 -= carry11 << 21;
+        carry11 = (s11 + (1<<20)) >> 21; s12 = carry11; s11 -= carry11 << 21;
 
         s0 += s12 * 666643;
         s1 += s12 * 470296;
@@ -544,7 +563,8 @@ public class Ed25519ScalarOps implements ScalarOps {
         s3 -= s12 * 997805;
         s4 += s12 * 136657;
         s5 -= s12 * 683901;
-        s12 = 0;
+        // set below
+        //s12 = 0;
 
         carry0 = s0 >> 21; s1 += carry0; s0 -= carry0 << 21;
         carry1 = s1 >> 21; s2 += carry1; s1 -= carry1 << 21;
@@ -557,7 +577,8 @@ public class Ed25519ScalarOps implements ScalarOps {
         carry8 = s8 >> 21; s9 += carry8; s8 -= carry8 << 21;
         carry9 = s9 >> 21; s10 += carry9; s9 -= carry9 << 21;
         carry10 = s10 >> 21; s11 += carry10; s10 -= carry10 << 21;
-        carry11 = s11 >> 21; s12 += carry11; s11 -= carry11 << 21;
+        //carry11 = s11 >> 21; s12 += carry11; s11 -= carry11 << 21;
+        carry11 = s11 >> 21; s12 = carry11; s11 -= carry11 << 21;
 
         s0 += s12 * 666643;
         s1 += s12 * 470296;
@@ -565,7 +586,8 @@ public class Ed25519ScalarOps implements ScalarOps {
         s3 -= s12 * 997805;
         s4 += s12 * 136657;
         s5 -= s12 * 683901;
-        s12 = 0;
+        // not used again
+        //s12 = 0;
 
         carry0 = s0 >> 21; s1 += carry0; s0 -= carry0 << 21;
         carry1 = s1 >> 21; s2 += carry1; s1 -= carry1 << 21;
@@ -580,7 +602,7 @@ public class Ed25519ScalarOps implements ScalarOps {
         carry10 = s10 >> 21; s11 += carry10; s10 -= carry10 << 21;
 
         byte[] result = new byte[32];
-        result[0] = (byte) (s0 >> 0);
+        result[0] = (byte) s0;
         result[1] = (byte) (s0 >> 8);
         result[2] = (byte) ((s0 >> 16) | (s1 << 5));
         result[3] = (byte) (s1 >> 3);
@@ -601,7 +623,7 @@ public class Ed25519ScalarOps implements ScalarOps {
         result[18] = (byte) ((s6 >> 18) | (s7 << 3));
         result[19] = (byte) (s7 >> 5);
         result[20] = (byte) (s7 >> 13);
-        result[21] = (byte) (s8 >> 0);
+        result[21] = (byte) s8;
         result[22] = (byte) (s8 >> 8);
         result[23] = (byte) ((s8 >> 16) | (s9 << 5));
         result[24] = (byte) (s9 >> 3);
