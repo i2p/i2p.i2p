@@ -46,8 +46,7 @@ public class ReadConfigJob extends JobImpl {
             if (log.shouldLog(Log.WARN))
                 log.warn("Reloaded " + configFile);
         }
-        getTiming().setStartAfter(getContext().clock().now() + DELAY);
-        getContext().jobQueue().addJob(this);
+        requeue(DELAY);
     }
     
     private boolean shouldReread(File configFile) {
