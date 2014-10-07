@@ -31,15 +31,18 @@ class UDPReceiver {
     private final Runner _runner;
     private final UDPTransport _transport;
     private final PacketHandler _handler;
+    private final SocketListener _endpoint;
 
     private static final boolean _isAndroid = SystemVersion.isAndroid();
 
-    public UDPReceiver(RouterContext ctx, UDPTransport transport, DatagramSocket socket, String name) {
+    public UDPReceiver(RouterContext ctx, UDPTransport transport, DatagramSocket socket, String name,
+                       SocketListener lsnr) {
         _context = ctx;
         _log = ctx.logManager().getLog(UDPReceiver.class);
         _name = name;
         _socket = socket;
         _transport = transport;
+        _endpoint = lsnr;
         _handler = transport.getPacketHandler();
         if (_handler == null)
             throw new IllegalStateException();
@@ -51,6 +54,9 @@ class UDPReceiver {
         _context.statManager().createRateStat("udp.ignorePacketFromDroplist", "Packet lifetime for those dropped on the drop list", "udp", UDPTransport.RATES);
     }
     
+    /**
+     *  Cannot be restarted (socket is final)
+     */
     public synchronized void startup() {
         //adjustDropProbability();
         _keepRunning = true;
@@ -281,12 +287,19 @@ class UDPReceiver {
                             _log.warn("Error receiving", ioe);
                     //}
                     packet.release();
-                    // TODO count consecutive errors, give up after too many?
-                    try { Thread.sleep(100); } catch (InterruptedException ie) {}
+                    if (_socket.isClosed()) {
+                        if (_keepRunning) {
+                            _keepRunning = false;
+                            _endpoint.fail();
+                        }
+                    } else if (_keepRunning) {
+                        // TODO count consecutive errors, give up after too many?
+                        try { Thread.sleep(100); } catch (InterruptedException ie) {}
+                    }
                 }
             }
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Stop receiving...");
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Stop receiving on " + _endpoint);
         }
         
      /******

@@ -15,7 +15,7 @@ import net.i2p.util.Log;
  * Coordinate the low-level datagram socket, creating and managing the UDPSender and
  * UDPReceiver.
  */
-class UDPEndpoint {
+class UDPEndpoint implements SocketListener {
     private final RouterContext _context;
     private final Log _log;
     private int _listenPort;
@@ -42,7 +42,11 @@ class UDPEndpoint {
         _isIPv6 = bindAddress == null || bindAddress instanceof Inet6Address;
     }
     
-    /** caller should call getListenPort() after this to get the actual bound port and determine success */
+    /**
+     *  Caller should call getListenPort() after this to get the actual bound port and determine success .
+     *
+     *  Can be restarted.
+     */
     public synchronized void startup() throws SocketException {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Starting up the UDP endpoint");
@@ -53,10 +57,10 @@ class UDPEndpoint {
             throw new SocketException("SSU Unable to bind to a port on " + _bindAddress);
         }
         int count = _counter.incrementAndGet();
-        _sender = new UDPSender(_context, _socket, "UDPSender " + count);
+        _sender = new UDPSender(_context, _socket, "UDPSender " + count, this);
         _sender.startup();
         if (_transport != null) {
-            _receiver = new UDPReceiver(_context, _transport, _socket, "UDPReceiver " + count);
+            _receiver = new UDPReceiver(_context, _transport, _socket, "UDPReceiver " + count, this);
             _receiver.startup();
         }
     }
@@ -207,5 +211,26 @@ class UDPEndpoint {
      */
     public boolean isIPv6() {
         return _isIPv6;
+    }
+
+    /**
+     *  @since 0.9.16
+     */
+    public void fail() {
+        shutdown();
+        _transport.fail(this);
+    }
+
+    /**
+     *  @since 0.9.16
+     */
+    @Override
+    public String toString() {
+        StringBuilder buf = new StringBuilder(64);
+        buf.append("UDP Socket ");
+        if (_bindAddress != null)
+            buf.append(_bindAddress.toString()).append(' ');
+        buf.append("port ").append(_listenPort);
+        return buf.toString();
     }
 }

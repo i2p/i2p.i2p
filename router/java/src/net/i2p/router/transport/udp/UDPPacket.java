@@ -323,9 +323,9 @@ class UDPPacket implements CDQEntry {
         if (_fragmentCount > 0)
             buf.append(" fragCount=").append(_fragmentCount);
 
-        if (_enqueueTime >= 0)
+        if (_enqueueTime > 0)
             buf.append(" sinceEnqueued=").append(_context.clock().now() - _enqueueTime);
-        if (_receivedTime >= 0)
+        if (_receivedTime > 0)
             buf.append(" sinceReceived=").append(_context.clock().now() - _receivedTime);
         //buf.append(" beforeReceiveFragments=").append((_beforeReceiveFragments > 0 ? _context.clock().now()-_beforeReceiveFragments : -1));
         //buf.append(" sinceHandled=").append((_afterHandlingTime > 0 ? _context.clock().now()-_afterHandlingTime : -1));

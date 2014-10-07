@@ -1,3 +1,17 @@
+2014-10-07 zzz
+ * CPUID: Remove Intel model 2 again, this is spoofed in the VM
+ * Graphs: Catch an error caused by missing fonts
+ * i2ptunnel: Handle named sig types from i2ptunnel.config in the GUI
+ * SSU: Improve handling of socket that gets closed (ticket #1385)
+ * Startup: Delay ReadConfigJob another minute
+
+2014-10-05 zzz
+ * Crypto: EdDSA cleanup
+
+2014-10-04 zzz
+ * i2psnark: Disable changing types for predefined trackers
+ * i2ptunnel: Fix js confirm for delete button
+
 2014-10-03 zzz
  * Console: New add-to-addressbook links on leaseset page
  * CPUID: Fix Intel processor identification
