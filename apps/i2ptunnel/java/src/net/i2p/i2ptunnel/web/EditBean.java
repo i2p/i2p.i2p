@@ -183,7 +183,13 @@ public class EditBean extends IndexBean {
     
     /** @since 0.9.12 */
     public int getSigType(int tunnel) {
-        return getProperty(tunnel, I2PClient.PROP_SIGTYPE, 0);
+        String stype = getProperty(tunnel, I2PClient.PROP_SIGTYPE, "0");
+        if (stype.equals("0"))
+            return 0;
+        SigType type = SigType.parseSigType(stype);
+        if (type == null)
+            return 0;
+        return type.getCode();
     }
     
     /** @since 0.9.12 */
