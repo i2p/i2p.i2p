@@ -846,7 +846,11 @@ public class Ed25519FieldElement extends FieldElement {
 
     @Override
     public int hashCode() {
-        return t.hashCode(); // TODO should this be something else?
+        int rv = 0;
+        for (int i = 0; i < 10; i++) {
+            rv ^= t[i];
+        }
+        return rv;
     }
 
     @Override

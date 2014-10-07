@@ -16,7 +16,7 @@ import net.i2p.I2PAppContext;
  * @since 0.9.14
  */
 public class DomainSocketFactory {
-    public static String I2CP_SOCKET_ADDRESS = "net.i2p.client.i2cp";
+    public static final String I2CP_SOCKET_ADDRESS = "net.i2p.client.i2cp";
 
     /**
      * @throws UnsupportedOperationException always

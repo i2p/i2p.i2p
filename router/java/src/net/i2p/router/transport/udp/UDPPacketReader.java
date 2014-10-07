@@ -569,7 +569,6 @@ class UDPPacketReader {
          *  @since 0.9.16
          */
         public int highestReceived() {
-            int count = fragmentCount();
             for (int i = _bitfieldSize - 1; i >= 0; i--) {
                 byte b = _message[_bitfieldStart + i];
                 if ((b & 0x7f) == 0)
