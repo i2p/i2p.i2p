@@ -280,7 +280,10 @@ public class I2PSocketManagerFactory {
                 SigType rv = SigType.parseSigType(st);
                 if (rv != null && rv.isAvailable())
                     return rv;
-                getLog().error("Unsupported sig type " + st);
+                if (rv != null)
+                    st = rv.toString();
+                getLog().logAlways(Log.WARN, "Unsupported sig type " + st +
+                                             ", reverting to " + I2PClient.DEFAULT_SIGTYPE);
             }
         }
         return I2PClient.DEFAULT_SIGTYPE;
