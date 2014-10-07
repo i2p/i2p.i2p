@@ -192,8 +192,22 @@ public class StatSummarizer implements Runnable {
             try {
                 _sem.acquire();
             } catch (InterruptedException ie) {}
-            return locked_renderPng(rate, out, width, height, hideLegend, hideGrid, hideTitle, showEvents,
+            try {
+                return locked_renderPng(rate, out, width, height, hideLegend, hideGrid, hideTitle, showEvents,
                                     periodCount, end, showCredit);
+            } catch (NoClassDefFoundError ncdfe) {
+                //  java.lang.NoClassDefFoundError: Could not initialize class sun.awt.X11FontManager
+                //  at java.lang.Class.forName0(Native Method)
+                //  at java.lang.Class.forName(Class.java:270)
+                //  at sun.font.FontManagerFactory$1.run(FontManagerFactory.java:82)
+                _isDisabled = true;
+                _isRunning = false;
+                String s = "Error rendering - disabling graph generation. Install ttf-dejavu font package?";
+                _log.logAlways(Log.WARN, s);
+                IOException ioe = new IOException(s);
+                ioe.initCause(ncdfe);
+                throw ioe;
+            }
         } finally {
             _sem.release();
         }
@@ -268,8 +282,22 @@ public class StatSummarizer implements Runnable {
             try {
                 _sem.acquire();
             } catch (InterruptedException ie) {}
-            return locked_renderRatePng(out, width, height, hideLegend, hideGrid, hideTitle, showEvents,
+            try {
+                return locked_renderRatePng(out, width, height, hideLegend, hideGrid, hideTitle, showEvents,
                                         periodCount, end, showCredit);
+            } catch (NoClassDefFoundError ncdfe) {
+                //  java.lang.NoClassDefFoundError: Could not initialize class sun.awt.X11FontManager
+                //  at java.lang.Class.forName0(Native Method)
+                //  at java.lang.Class.forName(Class.java:270)
+                //  at sun.font.FontManagerFactory$1.run(FontManagerFactory.java:82)
+                _isDisabled = true;
+                _isRunning = false;
+                String s = "Error rendering - disabling graph generation. Install ttf-dejavu font package?";
+                _log.logAlways(Log.WARN, s);
+                IOException ioe = new IOException(s);
+                ioe.initCause(ncdfe);
+                throw ioe;
+            }
         } finally {
             _sem.release();
         }
