@@ -229,10 +229,10 @@ public class UPnP
 		
 		String[] parserClass = new String[]{
 				System.getProperty(XML_CLASS_PROPERTTY),
-				"org.cybergarage.xml.parser.XmlPullParser",
-				"org.cybergarage.xml.parser.JaxpParser",
-				"org.cybergarage.xml.parser.kXML2Parser",
-				"org.cybergarage.xml.parser.XercesParser"
+				//"org.cybergarage.xml.parser.XmlPullParser",
+				"org.cybergarage.xml.parser.JaxpParser"
+				//"org.cybergarage.xml.parser.kXML2Parser",
+				//"org.cybergarage.xml.parser.XercesParser"
 		};
 		
 		for (int i = 0; i < parserClass.length; i++) {
