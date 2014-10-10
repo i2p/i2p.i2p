@@ -83,9 +83,9 @@ public class Banlist {
                 }
             } catch (IllegalStateException ise) {} // next time...
             for (Hash peer : _toUnbanlist) {
-                PeerProfile prof = _context.profileOrganizer().getProfile(peer);
-                if (prof != null)
-                    prof.unbanlist();
+                //PeerProfile prof = _context.profileOrganizer().getProfile(peer);
+                //if (prof != null)
+                //    prof.unbanlist();
                 _context.messageHistory().unbanlist(peer);
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Unbanlisting router (expired) " + peer.toBase64());
@@ -155,11 +155,11 @@ public class Banlist {
             e.expireOn = _context.clock().now() + BANLIST_DURATION_PARTIAL;
         } else {
             long period = BANLIST_DURATION_MS + _context.random().nextLong(BANLIST_DURATION_MS / 4);
-            PeerProfile prof = _context.profileOrganizer().getProfile(peer);
-            if (prof != null) {
-                period = BANLIST_DURATION_MS << prof.incrementBanlists();
-                period += _context.random().nextLong(period);
-            }
+            //PeerProfile prof = _context.profileOrganizer().getProfile(peer);
+            //if (prof != null) {
+            //    period = BANLIST_DURATION_MS << prof.incrementBanlists();
+            //    period += _context.random().nextLong(period);
+            //}
        
             if (period > BANLIST_DURATION_MAX)
                 period = BANLIST_DURATION_MAX;
@@ -234,11 +234,11 @@ public class Banlist {
         }
 
         if (fully) {
-            if (realUnbanlist) {
-                PeerProfile prof = _context.profileOrganizer().getProfile(peer);
-                if (prof != null)
-                    prof.unbanlist();
-            }
+            //if (realUnbanlist) {
+            //    PeerProfile prof = _context.profileOrganizer().getProfile(peer);
+            //    if (prof != null)
+            //        prof.unbanlist();
+            //}
             _context.messageHistory().unbanlist(peer);
             if (_log.shouldLog(Log.INFO) && e != null)
                 _log.info("Unbanlisting router " + peer.toBase64()
@@ -266,9 +266,9 @@ public class Banlist {
         }
         
         if (unbanlist) {
-            PeerProfile prof = _context.profileOrganizer().getProfile(peer);
-            if (prof != null)
-                prof.unbanlist();
+            //PeerProfile prof = _context.profileOrganizer().getProfile(peer);
+            //if (prof != null)
+            //    prof.unbanlist();
             _context.messageHistory().unbanlist(peer);
             if (_log.shouldLog(Log.INFO))
                 _log.info("Unbanlisting router (expired) " + peer.toBase64());
