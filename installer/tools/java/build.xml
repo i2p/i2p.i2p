@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="all" name="tooljar">
+    <target name="all" depends="clean, build" />
+    <target name="build" depends="builddep, jar" />
+    <target name="builddep">
+        <!-- noop, since the core doesnt depend on anything -->
+    </target>
+    <condition property="depend.available">
+        <typefound name="depend" />
+    </condition>
+    <target name="depend" if="depend.available">
+        <depend
+            cache="../../../build"
+            srcdir="./src"
+            destdir="./build/obj" >
+        </depend>
+    </target>
+
+    <!-- only used if not set by a higher build.xml -->
+    <property name="javac.compilerargs" value="" />
+    <property name="javac.classpath" value="" />
+    <property name="javac.version" value="1.6" />
+
+    <target name="compile" depends="depend">
+        <mkdir dir="./build" />
+        <mkdir dir="./build/obj" />
+        <javac srcdir="./src" debug="true" source="${javac.version}" target="${javac.version}" deprecation="on"
+            includeAntRuntime="false"
+            destdir="./build/obj" classpath="${javac.classpath}:../../../build/i2p.jar:../../../build/router.jar" >
+            <compilerarg line="${javac.compilerargs}" />
+        </javac>
+    </target>
+
+    <target name="jar" depends="compile">
+        <jar destfile="build/tools.jar">
+            <fileset dir="./build/obj" includes="**" />
+            <manifest>
+                <attribute name="Built-By" value="${build.built-by}" />
+                <attribute name="Build-Date" value="${build.timestamp}" />
+                <attribute name="Base-Revision" value="${workspace.version}" />
+            </manifest>
+        </jar>
+    </target>
+
+    <target name="clean">
+        <delete dir="./build" />
+    </target>
+    <target name="cleandep" depends="clean">
+        <!-- noop, since the core doesn't depend on anything -->
+    </target>
+    <target name="distclean" depends="clean">
+        <!-- noop, since the core doesn't depend on anything -->
+    </target>
+</project>
