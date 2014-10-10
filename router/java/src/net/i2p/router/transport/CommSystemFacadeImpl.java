@@ -343,15 +343,42 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
      *  Are we in a bad place
      *  @since 0.8.13
      */
+    @Override
     public boolean isInBadCountry() {
         String us = getOurCountry();
-        return us != null && (BadCountries.contains(us) || _context.getBooleanProperty("router.forceBadCountry"));
+        return (us != null && BadCountries.contains(us)) || _context.getBooleanProperty("router.forceBadCountry");
+    }
+
+    /**
+     *  Are they in a bad place
+     *  @param peer non-null
+     *  @since 0.9.16
+     */
+    @Override
+    public boolean isInBadCountry(Hash peer) {
+        String c = getCountry(peer);
+        return c != null && BadCountries.contains(c);
+    }
+
+    /**
+     *  Are they in a bad place
+     *  @param ri non-null
+     *  @since 0.9.16
+     */
+    @Override
+    public boolean isInBadCountry(RouterInfo ri) {
+        byte[] ip = getIP(ri);
+        if (ip == null)
+            return false;
+        String c = _geoIP.get(ip);
+        return c != null && BadCountries.contains(c);
     }
 
     /**
      *  Uses the transport IP first because that lookup is fast,
      *  then the IP from the netDb.
      *
+     *  @param peer not ourselves - use getOurCountry() for that
      *  @return two-letter lower-case country code or null
      */
     @Override

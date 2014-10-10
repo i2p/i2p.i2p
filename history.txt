@@ -1,3 +1,14 @@
+2014-10-10 zzz
+ * Banlist: Remove unused banlist tracking in the profile
+   causing deadlock (ticket #1394)
+ * GeoIP:
+   - Don't rate peers in some countries as high capacity
+   - Don't enable auto-floodfill in some countries
+   - Don't prefer floodfills in some countries
+
+2014-10-08 zzz
+ * UPnP: Comment out unused parsers
+
 2014-10-07 zzz
  * CPUID: Remove Intel model 2 again, this is spoofed in the VM
  * Graphs: Catch an error caused by missing fonts

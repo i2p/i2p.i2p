@@ -1404,7 +1404,8 @@ public class ProfileOrganizer {
             // if not selectable for a tunnel (banlisted for example),
             // don't allow them in the high-cap pool, what would the point of that be?
             if (_thresholdCapacityValue <= profile.getCapacityValue() &&
-                isSelectable(peer)) {
+                isSelectable(peer) &&
+                !_context.commSystem().isInBadCountry(peer)) {
                 _highCapacityPeers.put(peer, profile);
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("High capacity: \t" + peer);

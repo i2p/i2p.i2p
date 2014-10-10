@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.List;
 import net.i2p.data.Hash;
 import net.i2p.data.router.RouterAddress;
+import net.i2p.data.router.RouterInfo;
 import net.i2p.router.transport.Transport;
 import net.i2p.router.transport.crypto.DHSessionKeyBuilder;
 
@@ -72,6 +73,12 @@ public abstract class CommSystemFacade implements Service {
 
     /** @since 0.8.13 */
     public boolean isInBadCountry() { return false; }
+
+    /** @since 0.9.16 */
+    public boolean isInBadCountry(Hash peer) { return false; }
+
+    /** @since 0.9.16 */
+    public boolean isInBadCountry(RouterInfo ri) { return false; }
 
     public String getCountry(Hash peer) { return null; }
     public String getCountryName(String code) { return code; }
