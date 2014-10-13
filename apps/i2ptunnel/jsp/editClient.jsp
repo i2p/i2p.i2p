@@ -44,8 +44,8 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
         <div id="tunnelEditPanel" class="panel">
             <div class="header">
                 <%
-                String tunnelTypeName = "";
-                String tunnelType = "";
+                String tunnelTypeName;
+                String tunnelType;
                 if (curTunnel >= 0) {
                     tunnelTypeName = editBean.getTunnelType(curTunnel);
                     tunnelType = editBean.getInternalType(curTunnel);
@@ -491,7 +491,9 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
             </div>
          <% } // if httpclient %>
            
-         <% if (true /* editBean.isAdvanced() */ ) { %>
+         <% if (true /* editBean.isAdvanced() */ ) {
+                int currentSigType = editBean.getSigType(curTunnel, tunnelType);
+           %>
             <div id="tunnelOptionsField" class="rowItem">
                 <label>
                     <%=intl._("Signature type")%>
@@ -501,30 +503,30 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
             <div id="hostField" class="rowItem">
               <div id="portField" class="rowItem">
                 <label>DSA-SHA1</label>
-                <input value="0" type="radio" id="startOnLoad" name="sigType" title="Default"<%=(editBean.getSigType(curTunnel)==0 ? " checked=\"checked\"" : "")%> class="tickbox" />                
+                <input value="0" type="radio" id="startOnLoad" name="sigType" title="Default"<%=(currentSigType==0 ? " checked=\"checked\"" : "")%> class="tickbox" />                
               </div>
            <% if (editBean.isSigTypeAvailable(1)) { %>
               <div id="portField" class="rowItem">
                 <label>ECDSA-P256</label>
-                <input value="1" type="radio" id="startOnLoad" name="sigType" title="Advanced users only"<%=(editBean.getSigType(curTunnel)==1 ? " checked=\"checked\"" : "")%> class="tickbox" />                
+                <input value="1" type="radio" id="startOnLoad" name="sigType" title="Advanced users only"<%=(currentSigType==1 ? " checked=\"checked\"" : "")%> class="tickbox" />                
               </div>
            <% }
               if (editBean.isSigTypeAvailable(2)) { %>
               <div id="portField" class="rowItem">
                 <label>ECDSA-P384</label>
-                <input value="2" type="radio" id="startOnLoad" name="sigType" title="Advanced users only"<%=(editBean.getSigType(curTunnel)==2 ? " checked=\"checked\"" : "")%> class="tickbox" />                
+                <input value="2" type="radio" id="startOnLoad" name="sigType" title="Advanced users only"<%=(currentSigType==2 ? " checked=\"checked\"" : "")%> class="tickbox" />                
               </div>
            <% }
               if (editBean.isSigTypeAvailable(3)) { %>
               <div id="portField" class="rowItem">
                 <label>ECDSA-P521</label>
-                <input value="3" type="radio" id="startOnLoad" name="sigType" title="Advanced users only"<%=(editBean.getSigType(curTunnel)==3 ? " checked=\"checked\"" : "")%> class="tickbox" />                
+                <input value="3" type="radio" id="startOnLoad" name="sigType" title="Advanced users only"<%=(currentSigType==3 ? " checked=\"checked\"" : "")%> class="tickbox" />                
               </div>
            <% }
               if (editBean.isSigTypeAvailable(7)) { %>
               <div id="portField" class="rowItem">
                 <label>Ed25519-SHA-512</label>
-                <input value="7" type="radio" id="startOnLoad" name="sigType" title="Advanced users only"<%=(editBean.getSigType(curTunnel)==7 ? " checked=\"checked\"" : "")%> class="tickbox" />                
+                <input value="7" type="radio" id="startOnLoad" name="sigType" title="Advanced users only"<%=(currentSigType==7 ? " checked=\"checked\"" : "")%> class="tickbox" />                
               </div>
            <% }   // isAvailable %>
             </div>

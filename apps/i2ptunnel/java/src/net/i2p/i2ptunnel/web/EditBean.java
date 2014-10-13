@@ -181,14 +181,35 @@ public class EditBean extends IndexBean {
         return getBooleanProperty(tunnel, "i2cp.encryptLeaseSet");
     }
     
-    /** @since 0.9.12 */
-    public int getSigType(int tunnel) {
-        String stype = getProperty(tunnel, I2PClient.PROP_SIGTYPE, "0");
-        if (stype.equals("0"))
-            return 0;
-        SigType type = SigType.parseSigType(stype);
-        if (type == null)
-            return 0;
+    /**
+     *  @param newTunnelType used if tunnel < 0
+     *  @since 0.9.12
+     */
+    public int getSigType(int tunnel, String newTunnelType) {
+        SigType type;
+        String ttype;
+        boolean isShared;
+        if (tunnel >= 0) {
+            String stype = getProperty(tunnel, I2PClient.PROP_SIGTYPE, null);
+            type = stype != null ? SigType.parseSigType(stype) : null;
+            ttype = getTunnelType(tunnel);
+            isShared = isSharedClient(tunnel);
+        } else {
+            type = null;
+            ttype = newTunnelType;
+            isShared = false;
+        }
+        if (type == null) {
+            // same default logic as in TunnelController.setConfig()
+            if ((TunnelController.TYPE_IRC_CLIENT.equals(ttype) ||
+                 TunnelController.TYPE_SOCKS_IRC.equals(ttype) ||
+                 TunnelController.TYPE_STD_CLIENT.equals(ttype)) &&
+                !isShared &&
+                SigType.ECDSA_SHA256_P256.isAvailable())
+                type = SigType.ECDSA_SHA256_P256;
+            else
+                type = SigType.DSA_SHA1;
+        }
         return type.getCode();
     }
     

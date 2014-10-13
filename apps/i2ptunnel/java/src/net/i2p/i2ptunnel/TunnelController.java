@@ -71,6 +71,7 @@ public class TunnelController implements Logging {
     private static final String OPT_BUNDLE_REPLY = PFX_OPTION + "shouldBundleReplyInfo";
     private static final String OPT_TAGS_SEND = PFX_OPTION + "crypto.tagsToSend";
     private static final String OPT_LOW_TAGS = PFX_OPTION + "crypto.lowTagThreshold";
+    private static final String OPT_SIG_TYPE = PFX_OPTION + I2PClient.PROP_SIGTYPE;
 
     /** all of these @since 0.9.14 */
     public static final String TYPE_CONNECT = "connectclient";
@@ -145,13 +146,13 @@ public class TunnelController implements Logging {
         try {
             fos = new SecureFileOutputStream(keyFile);
             SigType stype = I2PClient.DEFAULT_SIGTYPE;
-            String st = _config.getProperty(PFX_OPTION + I2PClient.PROP_SIGTYPE);
+            String st = _config.getProperty(OPT_SIG_TYPE);
             if (st != null) {
                 SigType type = SigType.parseSigType(st);
                 if (type != null)
                     stype = type;
                 else
-                    log("Unsupported sig type " + st);
+                    log("Unsupported sig type " + st + ", reverting to " + stype);
             }
             Destination dest = client.createDestination(fos, stype);
             String destStr = dest.toBase64();
@@ -583,6 +584,13 @@ public class TunnelController implements Logging {
                     _config.setProperty(OPT_TAGS_SEND, "20");
                 if (!_config.containsKey(OPT_LOW_TAGS))
                     _config.setProperty(OPT_LOW_TAGS, "14");
+            }
+            // same default logic as in EditBean.getSigType()
+            if ((type.equals(TYPE_IRC_CLIENT) || type.equals(TYPE_STD_CLIENT) || type.equals(TYPE_SOCKS_IRC))
+                && !Boolean.valueOf(getSharedClient())) {
+                if (!_config.containsKey(OPT_SIG_TYPE) &&
+                    SigType.ECDSA_SHA256_P256.isAvailable())
+                    _config.setProperty(OPT_SIG_TYPE, "ECDSA_SHA256_P256");
             }
         }
 
