@@ -62,7 +62,6 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     /** Clock independent time of when we started up */
     private long _started;
     private StartExplorersJob _exploreJob;
-    private HarvesterJob _harvestJob;
     /** when was the last time an exploration found something new? */
     private long _lastExploreNew;
     protected final PeerSelector _peerSelector;
@@ -308,10 +307,6 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             // No rush, it only runs every 30m.
             _exploreJob.getTiming().setStartAfter(_context.clock().now() + EXPLORE_JOB_DELAY);
             _context.jobQueue().addJob(_exploreJob);
-            // if configured to do so, periodically try to get newer routerInfo stats
-            if (_harvestJob == null && _context.getBooleanProperty(HarvesterJob.PROP_ENABLED))
-                _harvestJob = new HarvesterJob(_context, this);
-            _context.jobQueue().addJob(_harvestJob);
         } else {
             _log.warn("Operating in quiet mode - not exploring or pushing data proactively, simply reactively");
             _log.warn("This should NOT be used in production");
