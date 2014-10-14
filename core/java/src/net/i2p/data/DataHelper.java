@@ -18,6 +18,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -40,6 +41,7 @@ import java.util.zip.Deflater;
 
 import net.i2p.I2PAppContext;
 import net.i2p.util.ByteCache;
+import net.i2p.util.FileUtil;
 import net.i2p.util.OrderedProperties;
 import net.i2p.util.ReusableGZIPInputStream;
 import net.i2p.util.ReusableGZIPOutputStream;
@@ -465,8 +467,10 @@ public class DataHelper {
     public static void storeProps(Properties props, File file) throws IOException {
         PrintWriter out = null;
         IllegalArgumentException iae = null;
+        File tmpFile = new File(file.getPath() + ".tmp");
         try {
-            out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new SecureFileOutputStream(file), "UTF-8")));
+            FileOutputStream fos = new SecureFileOutputStream(tmpFile);
+            out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(fos, "UTF-8")));
             out.println("# NOTE: This I2P config file must use UTF-8 encoding");
             for (Map.Entry<Object, Object> entry : props.entrySet()) {
                 String name = (String) entry.getKey();
@@ -491,6 +495,12 @@ public class DataHelper {
                 }
                 out.println(name + "=" + val);
             }
+            out.flush();
+            fos.getFD().sync();
+            out.close();
+            out = null;
+            if (!FileUtil.rename(tmpFile, file))
+                throw new IOException("Failed rename from " + tmpFile + " to " + file);
         } finally {
             if (out != null) out.close();
         }
