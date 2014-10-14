@@ -1,3 +1,6 @@
+2014-10-14 zzz
+ * I2NP: Implement DatabaseLookupMessage search type field
+
 2014-10-13 zzz
  * i2ptunnel: Set default sig type to ECDSA-P256 for client types
    Standard, IRC, and Socks IRC, if non-shared.

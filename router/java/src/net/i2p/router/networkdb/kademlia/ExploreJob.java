@@ -99,6 +99,8 @@ class ExploreJob extends SearchJob {
             if (dontIncludePeers.add(Hash.FAKE_HASH))
                 available--;
         }
+        // supported as of 0.9.16. TODO remove fake hash above
+        msg.setSearchType(DatabaseLookupMessage.Type.EXPL);
 
         KBucketSet<Hash> ks = _facade.getKBuckets();
         Hash rkey = getContext().routingKeyGenerator().getRoutingKey(getState().getTarget());

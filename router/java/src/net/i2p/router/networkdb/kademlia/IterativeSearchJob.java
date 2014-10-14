@@ -307,6 +307,7 @@ class IterativeSearchJob extends FloodSearchJob {
             dlm.setMessageExpiration(getContext().clock().now() + SINGLE_SEARCH_MSG_TIME);
             dlm.setReplyTunnel(replyTunnel.getReceiveTunnelId(0));
             dlm.setSearchKey(_key);
+            dlm.setSearchType(_isLease ? DatabaseLookupMessage.Type.LS : DatabaseLookupMessage.Type.RI);
             
             if (_log.shouldLog(Log.INFO)) {
                 int tries;
