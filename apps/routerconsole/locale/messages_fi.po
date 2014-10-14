@@ -5,14 +5,15 @@
 # 
 # Translators:
 # kytv <killyourtv@i2pmail.org>, 2011, 2012
+# oselotti, 2014
 # outolumo <outolumo@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-01-09 19:27+0000\n"
-"PO-Revision-Date: 2014-01-10 11:42+0000\n"
-"Last-Translator: kytv <killyourtv@i2pmail.org>\n"
+"POT-Creation-Date: 2014-02-06 18:27+0000\n"
+"PO-Revision-Date: 2014-08-22 17:54+0000\n"
+"Last-Translator: oselotti\n"
 "Language-Team: Finnish (http://www.transifex.com/projects/p/I2P/language/fi/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -179,36 +180,36 @@ msgstr "Torjutaan käytäviä: Järjestelmää suljetaan"
 msgid "Rejecting tunnels"
 msgstr "Torjutaan käytäviä"
 
-#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:158
+#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:162
 #: ../java/src/net/i2p/router/web/ConfigNavHelper.java:22
 msgid "Reseeding"
 msgstr ""
 
-#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:170
+#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:174
 #, java-format
 msgid "Reseed fetched only 1 router."
 msgid_plural "Reseed fetched only {0} routers."
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:177
+#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:181
 msgid "Reseed failed."
 msgstr ""
 
-#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:178
+#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:182
 #, java-format
 msgid "See {0} for help."
 msgstr "Lisätietoja kohdasta {0}."
 
-#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:179
+#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:183
 msgid "reseed configuration page"
 msgstr ""
 
-#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:325
+#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:329
 msgid "Reseeding: fetching seed URL."
 msgstr ""
 
-#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:383
+#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:387
 #, java-format
 msgid ""
 "Reseeding: fetching router info from seed URL ({0} successful, {1} errors)."
@@ -460,13 +461,13 @@ msgstr ""
 #: ../../../router/java/src/net/i2p/router/transport/UPnP.java:564
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:91
 msgid "Status"
-msgstr ""
+msgstr "Tila"
 
 #: ../../../router/java/src/net/i2p/router/transport/UPnP.java:530
 #: ../../../router/java/src/net/i2p/router/transport/UPnP.java:541
 #: ../../../router/java/src/net/i2p/router/transport/UPnP.java:558
 msgid "Type"
-msgstr ""
+msgstr "Tyyppi"
 
 #: ../../../router/java/src/net/i2p/router/transport/UPnP.java:532
 #: ../../../router/java/src/net/i2p/router/transport/UPnP.java:543
@@ -485,7 +486,7 @@ msgstr ""
 #: ../../../router/java/src/net/i2p/router/transport/UPnP.java:547
 #: ../../../router/java/src/net/i2p/router/transport/UPnP.java:559
 msgid "External IP"
-msgstr ""
+msgstr "Ulkoinen IP"
 
 #: ../../../router/java/src/net/i2p/router/transport/UPnP.java:551
 msgid "Layer 3 Forwarding"
@@ -513,7 +514,7 @@ msgstr ""
 
 #: ../../../router/java/src/net/i2p/router/transport/UPnP.java:606
 msgid "UPnP Status"
-msgstr ""
+msgstr "UPnP tila"
 
 #: ../../../router/java/src/net/i2p/router/transport/UPnP.java:610
 msgid "Disabled UPnP Devices"
@@ -749,60 +750,60 @@ msgstr "Pudotetaan käytäväpyyntöjä: Raskas kuorma"
 msgid "Dropping tunnel requests: Queue time"
 msgstr "Pudotetaan käytäväpyyntöjä: Jonotusaika"
 
-#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:760
+#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:762
 #, java-format
 msgid "New plugin version {0} is available"
 msgstr ""
 
-#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:838
+#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:840
 #, java-format
 msgid "Update check failed for plugin {0}"
 msgstr ""
 
-#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:840
+#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:842
 #, java-format
 msgid "No new version is available for plugin {0}"
 msgstr ""
 
-#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:863
+#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:865
 #, java-format
 msgid "{0}B transferred"
 msgstr ""
 
-#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:916
+#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:918
 #: ../java/src/net/i2p/router/update/UpdateRunner.java:288
 #, java-format
 msgid "Transfer failed from {0}"
 msgstr ""
 
-#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1153
-#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1217
-#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1241
+#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1155
+#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1219
+#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1243
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:671
 msgid "Update downloaded"
 msgstr ""
 
-#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1197
-#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1241
+#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1199
+#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1243
 msgid "Restarting"
 msgstr ""
 
-#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1197
+#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1199
 msgid "Update verified"
 msgstr ""
 
-#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1206
+#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1208
 #: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:136
 #, java-format
 msgid "from {0}"
 msgstr ""
 
-#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1221
+#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1223
 #, java-format
 msgid "Unsigned update file from {0} is corrupt"
 msgstr ""
 
-#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1250
+#: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1252
 #, java-format
 msgid "Failed copy to {0}"
 msgstr ""
@@ -1155,13 +1156,13 @@ msgid "Save Plugin Configuration"
 msgstr ""
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:56
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:586
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:590
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:589
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:593
 msgid "Install Plugin"
 msgstr "Asenna lisäosa"
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:60
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:592
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:595
 msgid "Update All Installed Plugins"
 msgstr ""
 
@@ -1541,7 +1542,7 @@ msgstr "Sallittuja tasoja ovat DEBUG, INFO, WARN, ERROR, CRIT"
 #. http://www.dhs.gov/xinfoshare/programs/Copy_of_press_release_0046.shtm
 #. but pink instead of yellow for WARN
 #: ../java/src/net/i2p/router/web/ConfigLoggingHelper.java:68
-#: ../java/src/net/i2p/router/web/LogsHelper.java:117
+#: ../java/src/net/i2p/router/web/LogsHelper.java:129
 msgid "CRIT"
 msgstr "CRIT"
 
@@ -1550,22 +1551,22 @@ msgid "DEBUG"
 msgstr "DEBUG"
 
 #: ../java/src/net/i2p/router/web/ConfigLoggingHelper.java:68
-#: ../java/src/net/i2p/router/web/LogsHelper.java:119
+#: ../java/src/net/i2p/router/web/LogsHelper.java:131
 msgid "ERROR"
 msgstr "ERROR"
 
 #: ../java/src/net/i2p/router/web/ConfigLoggingHelper.java:68
-#: ../java/src/net/i2p/router/web/LogsHelper.java:123
+#: ../java/src/net/i2p/router/web/LogsHelper.java:135
 msgid "INFO"
 msgstr "INFO"
 
 #: ../java/src/net/i2p/router/web/ConfigLoggingHelper.java:68
-#: ../java/src/net/i2p/router/web/LogsHelper.java:121
+#: ../java/src/net/i2p/router/web/LogsHelper.java:133
 msgid "WARN"
 msgstr "WARN"
 
 #: ../java/src/net/i2p/router/web/ConfigLoggingHelper.java:88
-#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:144
+#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:145
 #: ../java/src/net/i2p/router/web/HomeHelper.java:195
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:851
 msgid "Remove"
@@ -2301,77 +2302,81 @@ msgid "French"
 msgstr "Ranska"
 
 #: ../java/src/net/i2p/router/web/ConfigUIHelper.java:85
-msgid "Hungarian"
+msgid "Hebrew"
 msgstr ""
 
 #: ../java/src/net/i2p/router/web/ConfigUIHelper.java:86
+msgid "Hungarian"
+msgstr ""
+
+#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:87
 msgid "Italian"
 msgstr "Italia"
 
-#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:87
+#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:88
 msgid "Japanese"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:88
+#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:89
 msgid "Dutch"
 msgstr "Hollanti"
 
-#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:89
+#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:90
 msgid "Norwegian Bokmaal"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:90
+#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:91
 msgid "Polish"
 msgstr "Puola"
 
-#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:91
 #: ../java/src/net/i2p/router/web/ConfigUIHelper.java:92
+#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:93
 msgid "Portuguese"
 msgstr "Portugali"
 
-#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:93
+#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:94
 msgid "Romanian"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:94
+#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:95
 msgid "Russian"
 msgstr "Venäjä"
 
-#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:95
+#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:96
 msgid "Swedish"
 msgstr "Ruotsi"
 
-#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:96
+#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:97
 msgid "Turkish"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:97
+#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:98
 msgid "Ukrainian"
 msgstr "Ukraina"
 
-#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:98
+#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:99
 msgid "Vietnamese"
 msgstr "Vietnam"
 
-#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:99
+#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:100
 msgid "Chinese"
 msgstr "Kiina"
 
-#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:140
+#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:141
 msgid "Add a user and password to enable."
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:146
+#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:147
 msgid "User Name"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:157
+#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:158
 #: ../java/src/net/i2p/router/web/HomeHelper.java:217
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:899
 msgid "Add"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:160
+#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:161
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:534
 msgid "Password"
 msgstr ""
@@ -2640,7 +2645,7 @@ msgstr ""
 #: ../java/src/net/i2p/router/web/HomeHelper.java:31
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:162
 msgid "Email"
-msgstr ""
+msgstr "Sähköposti"
 
 #: ../java/src/net/i2p/router/web/HomeHelper.java:32
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:268
@@ -2665,7 +2670,7 @@ msgstr "torrentit"
 #: ../java/src/net/i2p/router/web/HomeHelper.java:35
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:172
 msgid "Local web server"
-msgstr ""
+msgstr "Paikallinen web-palvelin"
 
 #: ../java/src/net/i2p/router/web/HomeHelper.java:39
 msgid "Bug Reports"
@@ -2831,7 +2836,7 @@ msgstr ""
 
 #: ../java/src/net/i2p/router/web/HomeHelper.java:199
 msgid "URL"
-msgstr ""
+msgstr "URL"
 
 #: ../java/src/net/i2p/router/web/JobQueueHelper.java:50
 msgid "I2P Job Queue"
@@ -2918,23 +2923,23 @@ msgstr ""
 msgid "Summary"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/LogsHelper.java:32
-#: ../java/src/net/i2p/router/web/LogsHelper.java:79
+#: ../java/src/net/i2p/router/web/LogsHelper.java:37
+#: ../java/src/net/i2p/router/web/LogsHelper.java:91
 msgid "File location"
 msgstr "Tiedoston sijainti"
 
-#: ../java/src/net/i2p/router/web/LogsHelper.java:76
+#: ../java/src/net/i2p/router/web/LogsHelper.java:88
 msgid "File not found"
 msgstr "Tiedostoa ei löydy"
 
-#: ../java/src/net/i2p/router/web/LogsHelper.java:94
+#: ../java/src/net/i2p/router/web/LogsHelper.java:106
 msgid "No log messages"
 msgstr "Ei lokiviestejä"
 
 #. 0
 #: ../java/src/net/i2p/router/web/NetDbHelper.java:15
 msgid "Local Router"
-msgstr ""
+msgstr "Paikallinen reititin"
 
 #. 1
 #: ../java/src/net/i2p/router/web/NetDbHelper.java:16
@@ -2944,7 +2949,7 @@ msgstr ""
 #. 2
 #: ../java/src/net/i2p/router/web/NetDbHelper.java:17
 msgid "All Routers"
-msgstr ""
+msgstr "Kaikki reitittimet"
 
 #. 3
 #: ../java/src/net/i2p/router/web/NetDbHelper.java:18
@@ -3056,7 +3061,7 @@ msgstr "Päivitetty"
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:403
 #, java-format
 msgid "{0} ago"
-msgstr ""
+msgstr "{0} sitten"
 
 #. shouldnt happen
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:402
@@ -3098,50 +3103,50 @@ msgstr "NTCP, SSU ja esittelijät"
 
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:448
 msgid "IPv6 Only SSU, introducers"
-msgstr ""
+msgstr "IPv6 vain SSU, esittelijät"
 
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:448
 msgid "IPv6 SSU"
-msgstr ""
+msgstr "IPv6 SSU"
 
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:448
 msgid "IPv6 SSU, introducers"
-msgstr ""
+msgstr "IPv6 SSU, esittelijät"
 
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:449
 msgid "IPv6 NTCP"
-msgstr ""
+msgstr "IPv6 NTCP"
 
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:449
 msgid "IPv6 NTCP, SSU"
-msgstr ""
+msgstr "IPv6 NTCP, SSU"
 
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:449
 msgid "IPv6 NTCP, SSU, introducers"
-msgstr ""
+msgstr "IPv6 NTCP, SSU, esittelijät"
 
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:449
 msgid "IPv6 Only NTCP, SSU, introducers"
-msgstr ""
+msgstr "IPv6 vain NTCP, SSU, esittelijät"
 
 #: ../java/src/net/i2p/router/web/NewsHelper.java:252
 #, java-format
 msgid "News last updated {0} ago."
-msgstr ""
+msgstr "Uutiset viimeksi päivitetty {0} sitten."
 
 #: ../java/src/net/i2p/router/web/NewsHelper.java:258
 #, java-format
 msgid "News last checked {0} ago."
-msgstr ""
+msgstr "Uutiset viimeksi tarkistettu {0} sitten."
 
 #: ../java/src/net/i2p/router/web/NewsHelper.java:267
 msgid "Hide news"
-msgstr ""
+msgstr "Piilota uutiset"
 
 #: ../java/src/net/i2p/router/web/NewsHelper.java:270
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:650
 msgid "Show news"
-msgstr ""
+msgstr "Näytä uutiset"
 
 #: ../java/src/net/i2p/router/web/PluginStarter.java:133
 msgid "Checking for plugin updates"
@@ -3591,7 +3596,7 @@ msgstr ""
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:278
 msgid "Local Identity"
-msgstr ""
+msgstr "Paikallinen identiteetti"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:282
 msgid "Your unique I2P router identity is"
@@ -3603,7 +3608,7 @@ msgstr "älä koskaan paljasta sitä kenellekään"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:288
 msgid "show"
-msgstr ""
+msgstr "näytä"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:292
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:318
@@ -3808,7 +3813,7 @@ msgstr "Palomuurissa"
 
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:176
 msgid "Disconnected - check network cable"
-msgstr ""
+msgstr "Katkaistu - tarkista verkkokaapeli"
 
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:178
 msgid ""
@@ -4520,7 +4525,7 @@ msgstr ""
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:546
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:562
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:576
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:588
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:591
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confighome_jsp.java:470
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confighome_jsp.java:490
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confighome_jsp.java:506
@@ -4676,6 +4681,11 @@ msgid "Plugin Installation"
 msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:582
+#, java-format
+msgid "Look for available plugins on {0}."
+msgstr ""
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:585
 msgid "To install a plugin, enter the download URL:"
 msgstr ""
 
@@ -4700,7 +4710,7 @@ msgid "Recommended Eepsites"
 msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confighome_jsp.java:496
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/home_jsp.java:409
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/home_jsp.java:411
 msgid "Local Services"
 msgstr ""
 
@@ -5859,8 +5869,8 @@ msgstr ""
 msgid "home"
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/console_jsp.java:396
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/home_jsp.java:377
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/console_jsp.java:398
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/home_jsp.java:379
 msgid "Welcome to I2P"
 msgstr ""
 
@@ -5976,11 +5986,11 @@ msgid ""
 "change it later."
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/home_jsp.java:385
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/home_jsp.java:387
 msgid "Search I2P"
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/home_jsp.java:405
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/home_jsp.java:407
 msgid "Eepsites of Interest"
 msgstr ""
 

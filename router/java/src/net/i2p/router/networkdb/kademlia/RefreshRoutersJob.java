@@ -32,7 +32,7 @@ class RefreshRoutersJob extends JobImpl {
      *  Don't go faster as this overloads the expl. OBEP / IBGW
      */
     private final static long RERUN_DELAY_MS = 3*1000;
-    private final static long EXPIRE = 60*60*1000;
+    private final static long EXPIRE = 2*60*60*1000;
     
     public RefreshRoutersJob(RouterContext ctx, FloodfillNetworkDatabaseFacade facade) {
         super(ctx);

@@ -264,6 +264,8 @@ public class Base64 {
 
     private static void decode(InputStream in, OutputStream out) throws IOException {
         byte decoded[] = decode(new String(read(in)));
+        if (decoded == null)
+            throw new IOException("Invalid base 64 string");
         out.write(decoded);
     }
 

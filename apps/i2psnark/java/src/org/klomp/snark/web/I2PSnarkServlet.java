@@ -931,13 +931,7 @@ public class I2PSnarkServlet extends BasicServlet {
             } else
           *****/
             if (newURL != null) {
-                if (newURL.contains("<") || newURL.contains(">") ||
-                    newURL.contains("%3C") || newURL.contains("%3E") ||
-                    newURL.contains("%3c") || newURL.contains("%3e") ||
-                    newURL.contains("\"") || newURL.contains("'") ||
-                    newURL.contains("%22") || newURL.contains("%27")) {
-                    _manager.addMessage("Invalid URL");
-                } else if (newURL.startsWith("http://")) {
+                if (newURL.startsWith("http://")) {
                     FetchAndAdd fetch = new FetchAndAdd(_context, _manager, newURL);
                     _manager.addDownloader(fetch);
                 } else if (newURL.startsWith(MagnetURI.MAGNET) || newURL.startsWith(MagnetURI.MAGGOT)) {
@@ -2232,15 +2226,15 @@ public class I2PSnarkServlet extends BasicServlet {
         out.write("<tr><td>");
         out.write(_("Inbound Settings"));
         out.write(":<td>");
-        out.write(renderOptions(1, 6, options.remove("inbound.quantity"), "inbound.quantity", TUNNEL));
+        out.write(renderOptions(1, 6, 3, options.remove("inbound.quantity"), "inbound.quantity", TUNNEL));
         out.write("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
-        out.write(renderOptions(0, 4, options.remove("inbound.length"), "inbound.length", HOP));
+        out.write(renderOptions(0, 4, 3, options.remove("inbound.length"), "inbound.length", HOP));
         out.write("<tr><td>");
         out.write(_("Outbound Settings"));
         out.write(":<td>");
-        out.write(renderOptions(1, 6, options.remove("outbound.quantity"), "outbound.quantity", TUNNEL));
+        out.write(renderOptions(1, 6, 3, options.remove("outbound.quantity"), "outbound.quantity", TUNNEL));
         out.write("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
-        out.write(renderOptions(0, 4, options.remove("outbound.length"), "outbound.length", HOP));
+        out.write(renderOptions(0, 4, 3, options.remove("outbound.length"), "outbound.length", HOP));
 
         if (!_context.isRouterContext()) {
             out.write("<tr><td>");
@@ -2317,11 +2311,16 @@ public class I2PSnarkServlet extends BasicServlet {
                .append(announceURL).append("\"");
             if (!(isOpen || isPrivate))
                 buf.append(" checked=\"checked\"");
+            else if (t.announceURL.equals("http://tracker.welterde.i2p/a"))
+                buf.append(" disabled=\"disabled\"");
             buf.append(">" +
                        "</td><td><input type=\"radio\" class=\"optbox\" value=\"1\" name=\"ttype_")
                .append(announceURL).append("\"");
             if (isOpen)
                 buf.append(" checked=\"checked\"");
+            else if (t.announceURL.equals("http://diftracker.i2p/announce.php") ||
+                     t.announceURL.equals("http://tracker2.postman.i2p/announce.php"))
+                buf.append(" disabled=\"disabled\"");
             buf.append(">" +
                        "</td><td><input type=\"radio\" class=\"optbox\" value=\"2\" name=\"ttype_")
                .append(announceURL).append("\"");
@@ -2393,8 +2392,8 @@ public class I2PSnarkServlet extends BasicServlet {
     private static final String DUMMY1 = "1 ";
 
     /** modded from ConfigTunnelsHelper @since 0.7.14 */
-    private String renderOptions(int min, int max, String strNow, String selName, String name) {
-        int now = 2;
+    private String renderOptions(int min, int max, int dflt, String strNow, String selName, String name) {
+        int now = dflt;
         try {
             now = Integer.parseInt(strNow);
         } catch (Throwable t) {}
@@ -2634,12 +2633,22 @@ public class I2PSnarkServlet extends BasicServlet {
                .append(":</b> <a href=\"").append(_contextPath).append('/').append(baseName).append("\">")
                .append(DataHelper.escapeHTML(fullPath))
                .append("</a></td></tr>\n");
+            if (snark.getStorage() != null) {
+                buf.append("<tr><td>");
+                toThemeImg(buf, "file");
+                buf.append("&nbsp;<b>")
+                   .append(_("Data location"))
+                   .append(":</b> ")
+                   .append(DataHelper.escapeHTML(snark.getStorage().getBase().getPath()))
+                   .append("</td></tr>\n");
+            }
+            String hex = I2PSnarkUtil.toHex(snark.getInfoHash());
             buf.append("<tr><td>");
-            toThemeImg(buf, "file");
+            toThemeImg(buf, "details");
             buf.append("&nbsp;<b>")
-               .append(_("Data location"))
+               .append(_("Info hash"))
                .append(":</b> ")
-               .append(DataHelper.escapeHTML(snark.getStorage().getBase().getPath()))
+               .append(hex)
                .append("</td></tr>\n");
 
             String announce = null;
@@ -2717,7 +2726,6 @@ public class I2PSnarkServlet extends BasicServlet {
                 }
             }
 
-            String hex = I2PSnarkUtil.toHex(snark.getInfoHash());
             if (meta == null || !meta.isPrivate()) {
                 buf.append("<tr><td><a href=\"")
                    .append(MagnetURI.MAGNET_FULL).append(hex);
@@ -2887,6 +2895,11 @@ public class I2PSnarkServlet extends BasicServlet {
                             : tx + ": " + directory);
         if (showSort)
             buf.append("</a>");
+        int dirSlash = directory.indexOf("/");
+        if (dirSlash > 0) {
+            buf.append("&nbsp;");
+            buf.append(DataHelper.escapeHTML(directory.substring(dirSlash + 1)));
+        }
         buf.append("</th>\n<th align=\"right\">");
         if (showSort) {
             sort = ("5".equals(sortParam)) ? "-5" : "5";
@@ -2899,15 +2912,16 @@ public class I2PSnarkServlet extends BasicServlet {
         if (showSort)
             buf.append("</a>");
         buf.append("</th>\n<th class=\"headerstatus\">");
-        if (showSort) {
+        boolean showRemainingSort = showSort && showPriority;
+        if (showRemainingSort) {
             sort = ("10".equals(sortParam)) ? "-10" : "10";
             buf.append("<a href=\"").append(base)
                .append(getQueryString(sort)).append("\">");
         }
         tx = _("Status");
         toThemeImg(buf, "status", tx,
-                   showSort ? _("Sort by {0}", _("Remaining")) : tx);
-        if (showSort)
+                   showRemainingSort ? _("Sort by {0}", _("Remaining")) : tx);
+        if (showRemainingSort)
             buf.append("</a>");
         if (showPriority) {
             buf.append("</th>\n<th class=\"headerpriority\">");

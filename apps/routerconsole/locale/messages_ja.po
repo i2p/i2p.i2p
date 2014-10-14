@@ -4,16 +4,16 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
 # Translators:
-# plazmism <gomidori@live.jp>, 2013-2014
+# タカハシ <gomidori@live.jp>, 2013-2014
 # luixxiul, 2013
-# luixxiul, 2013
+# Suguru Hirahara, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-02-06 18:27+0000\n"
-"PO-Revision-Date: 2014-04-01 11:12+0000\n"
-"Last-Translator: plazmism <gomidori@live.jp>\n"
+"PO-Revision-Date: 2014-07-27 01:51+0000\n"
+"Last-Translator: タカハシ <gomidori@live.jp>\n"
 "Language-Team: Japanese (http://www.transifex.com/projects/p/I2P/language/ja/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -92,11 +92,11 @@ msgstr "blocklist.txt のエントリ {0} でIP禁止"
 
 #: ../../../router/java/src/net/i2p/router/Blocklist.java:824
 msgid "IPs Banned Until Restart"
-msgstr ""
+msgstr "再起動まで禁止された IP"
 
 #: ../../../router/java/src/net/i2p/router/Blocklist.java:861
 msgid "IPs Permanently Banned"
-msgstr ""
+msgstr "永久に禁止された IP"
 
 #: ../../../router/java/src/net/i2p/router/Blocklist.java:863
 #: ../java/src/net/i2p/router/web/TunnelRenderer.java:70
@@ -124,7 +124,7 @@ msgstr "なし"
 #: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:120
 #: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:497
 msgid "Rejecting tunnels: Starting up"
-msgstr ""
+msgstr "トンネルを拒否: 起動中"
 
 #: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:159
 msgid "Rejecting tunnels: High message delay"
@@ -215,23 +215,23 @@ msgstr "リシード中: シード URL ({0} 成功、 {1} エラー) からル�
 #. Please keep relatively short so it will fit on the graphs.
 #: ../../../router/java/src/net/i2p/router/tasks/CoalesceStatsEvent.java:33
 msgid "Message receive rate (bytes/sec)"
-msgstr ""
+msgstr "通信受信速度 (バイト/秒)"
 
 #: ../../../router/java/src/net/i2p/router/tasks/CoalesceStatsEvent.java:34
 msgid "Message send rate (bytes/sec)"
-msgstr ""
+msgstr "通信送信速度 (バイト/秒)"
 
 #: ../../../router/java/src/net/i2p/router/tasks/CoalesceStatsEvent.java:35
 msgid "Low-level send rate (bytes/sec)"
-msgstr ""
+msgstr "低レベル送信速度 (バイト/秒)"
 
 #: ../../../router/java/src/net/i2p/router/tasks/CoalesceStatsEvent.java:36
 msgid "Low-level receive rate (bytes/sec)"
-msgstr ""
+msgstr "低レベル受信速度 (バイト/秒)"
 
 #: ../../../router/java/src/net/i2p/router/tasks/CoalesceStatsEvent.java:37
 msgid "How many peers we are actively talking with"
-msgstr ""
+msgstr "活発に対話しているピアの数"
 
 #: ../../../router/java/src/net/i2p/router/tasks/CoalesceStatsEvent.java:40
 msgid "Known fast peers"
@@ -447,7 +447,7 @@ msgstr "サービス"
 
 #: ../../../router/java/src/net/i2p/router/transport/UPnP.java:527
 msgid "WAN Common Interface Configuration"
-msgstr ""
+msgstr "WAN 共通インターフェース設定"
 
 #: ../../../router/java/src/net/i2p/router/transport/UPnP.java:528
 #: ../../../router/java/src/net/i2p/router/transport/UPnP.java:539
@@ -461,87 +461,87 @@ msgstr "ステータス"
 #: ../../../router/java/src/net/i2p/router/transport/UPnP.java:541
 #: ../../../router/java/src/net/i2p/router/transport/UPnP.java:558
 msgid "Type"
-msgstr ""
+msgstr "タイプ"
 
 #: ../../../router/java/src/net/i2p/router/transport/UPnP.java:532
 #: ../../../router/java/src/net/i2p/router/transport/UPnP.java:543
 msgid "Upstream"
-msgstr ""
+msgstr "アップストリーム"
 
 #: ../../../router/java/src/net/i2p/router/transport/UPnP.java:534
 #: ../../../router/java/src/net/i2p/router/transport/UPnP.java:545
 msgid "Downstream"
-msgstr ""
+msgstr "ダウンストリーム"
 
 #: ../../../router/java/src/net/i2p/router/transport/UPnP.java:538
 msgid "WAN PPP Connection"
-msgstr ""
+msgstr "WAN PPP 接続"
 
 #: ../../../router/java/src/net/i2p/router/transport/UPnP.java:547
 #: ../../../router/java/src/net/i2p/router/transport/UPnP.java:559
 msgid "External IP"
-msgstr ""
+msgstr "外部 IP"
 
 #: ../../../router/java/src/net/i2p/router/transport/UPnP.java:551
 msgid "Layer 3 Forwarding"
-msgstr ""
+msgstr "レイヤ3 フォワーディング"
 
 #: ../../../router/java/src/net/i2p/router/transport/UPnP.java:552
 msgid "Default Connection Service"
-msgstr ""
+msgstr "デフォルトの接続サービス"
 
 #: ../../../router/java/src/net/i2p/router/transport/UPnP.java:556
 msgid "WAN IP Connection"
-msgstr ""
+msgstr "WAN IP 接続"
 
 #: ../../../router/java/src/net/i2p/router/transport/UPnP.java:563
 msgid "WAN Ethernet Link Configuration"
-msgstr ""
+msgstr "WAN イーサネットリンク設定"
 
 #: ../../../router/java/src/net/i2p/router/transport/UPnP.java:583
 msgid "Found Device"
-msgstr ""
+msgstr "デバイスを検出"
 
 #: ../../../router/java/src/net/i2p/router/transport/UPnP.java:585
 msgid "Subdevice"
-msgstr ""
+msgstr "サブデバイス"
 
 #: ../../../router/java/src/net/i2p/router/transport/UPnP.java:606
 msgid "UPnP Status"
-msgstr ""
+msgstr "UPnP 状態"
 
 #: ../../../router/java/src/net/i2p/router/transport/UPnP.java:610
 msgid "Disabled UPnP Devices"
-msgstr ""
+msgstr "UPnP を無効化"
 
 #: ../../../router/java/src/net/i2p/router/transport/UPnP.java:624
 msgid ""
 "UPnP has been disabled; Do you have more than one UPnP Internet Gateway "
 "Device on your LAN ?"
-msgstr ""
+msgstr "UPnP は無効化されました。 LAN 上に2つ以上の UPnP インターネットゲートウェイデバイスがありますか？"
 
 #: ../../../router/java/src/net/i2p/router/transport/UPnP.java:627
 msgid "UPnP has not found any UPnP-aware, compatible device on your LAN."
-msgstr ""
+msgstr "UpNP は LAN 上に UPnP を認識し、互換性のあるデバイスを検出しませんでした。"
 
 #: ../../../router/java/src/net/i2p/router/transport/UPnP.java:635
 #, java-format
 msgid "The current external IP address reported by UPnP is {0}"
-msgstr ""
+msgstr "UPnP が報告した現在の外部 IP アドレスは {0}"
 
 #: ../../../router/java/src/net/i2p/router/transport/UPnP.java:637
 msgid "The current external IP address is not available."
-msgstr ""
+msgstr "現在の外部 IP アドレスは利用できません。"
 
 #: ../../../router/java/src/net/i2p/router/transport/UPnP.java:641
 #, java-format
 msgid "UPnP reports the maximum downstream bit rate is {0}bits/sec"
-msgstr ""
+msgstr "UPnP は、最大ダウンストリームビット速度が {0} ビット/秒だと報告しています"
 
 #: ../../../router/java/src/net/i2p/router/transport/UPnP.java:643
 #, java-format
 msgid "UPnP reports the maximum upstream bit rate is {0}bits/sec"
-msgstr ""
+msgstr "UPnP は最大アップストリームビット速度が {0} ビット/秒だと報告しています"
 
 #. {0} is TCP or UDP
 #. {1,number,#####} prevents 12345 from being output as 12,345 in the English
@@ -550,16 +550,16 @@ msgstr ""
 #: ../../../router/java/src/net/i2p/router/transport/UPnP.java:651
 #, java-format
 msgid "{0} port {1,number,#####} was successfully forwarded by UPnP."
-msgstr ""
+msgstr "{0} ポート {1,number,#####} は UPnP によって、正常に転送されました。"
 
 #: ../../../router/java/src/net/i2p/router/transport/UPnP.java:653
 #, java-format
 msgid "{0} port {1,number,#####} was not forwarded by UPnP."
-msgstr ""
+msgstr "{0} ポート {1,number,#####} は UPnP によって転送されませんでした。"
 
 #: ../../../router/java/src/net/i2p/router/transport/UPnPManager.java:197
 msgid "UPnP is not enabled"
-msgstr ""
+msgstr "UPnP は有効ではありません"
 
 #: ../../../router/java/src/net/i2p/router/transport/ntcp/EstablishState.java:415
 #: ../../../router/java/src/net/i2p/router/transport/ntcp/EstablishState.java:632
@@ -584,11 +584,11 @@ msgstr "タイムアウト"
 #: ../../../router/java/src/net/i2p/router/transport/ntcp/NTCPTransport.java:1123
 #: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2529
 msgid "IPv6"
-msgstr ""
+msgstr "IPv6"
 
 #: ../../../router/java/src/net/i2p/router/transport/ntcp/NTCPTransport.java:1130
 msgid "Out Queue"
-msgstr ""
+msgstr "キュー外"
 
 #: ../../../router/java/src/net/i2p/router/transport/ntcp/NTCPTransport.java:1131
 msgid "Backlogged?"
@@ -623,7 +623,7 @@ msgstr "ピアハッシュでソート"
 
 #: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2528
 msgid "Direction/Introduction"
-msgstr ""
+msgstr "説明/指示"
 
 #: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2531
 msgid "Sort by idle inbound"
@@ -715,7 +715,7 @@ msgstr "禁止されました"
 
 #: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2668
 msgid "backlogged"
-msgstr ""
+msgstr "バッグログされました"
 
 #: ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java:213
 msgid "Dropping tunnel requests: Too slow"
@@ -807,7 +807,7 @@ msgstr "ネットワーク内アップデートが無効になりました。パ
 
 #: ../java/src/net/i2p/router/update/NewsFetcher.java:146
 msgid "No write permission for I2P install directory."
-msgstr ""
+msgstr "I2P のインストールディレクトリに対する書き込み権限がありません。"
 
 #: ../java/src/net/i2p/router/update/NewsFetcher.java:154
 #, java-format
@@ -835,17 +835,17 @@ msgstr "更新中"
 #: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:81
 #, java-format
 msgid "Attempting to install from file {0}"
-msgstr ""
+msgstr "ファイル {0} からインストールを試みています"
 
 #: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:85
 #, java-format
 msgid "No file specified {0}"
-msgstr ""
+msgstr "指定された {0} ファイルなし"
 
 #: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:92
 #, java-format
 msgid "Failed to install from file {0}, copy failed."
-msgstr ""
+msgstr "ファイル {0} からインストール出来ませんでした。コピー失敗。 "
 
 #: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:96
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:390
@@ -949,11 +949,11 @@ msgstr "プラグインには Jetty のバージョン {0} 以前が必要です
 #: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:330
 #, java-format
 msgid "Cannot copy plugin to directory {0}"
-msgstr ""
+msgstr "ディレクトリ {0} にプラグインをコピーできません"
 
 #: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:340
 msgid "Plugin will be installed on next restart."
-msgstr ""
+msgstr "次の再起動時にプラグインはインストールされます"
 
 #: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:358
 msgid "Plugin is for upgrades only, but the plugin is not installed"
@@ -1157,7 +1157,7 @@ msgstr "プラグインをインストール"
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:60
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:595
 msgid "Update All Installed Plugins"
-msgstr ""
+msgstr "全てのインストール済みプラグインをアップデート"
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:100
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:131
@@ -1197,7 +1197,7 @@ msgstr "新規クライアントが追加されました"
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:224
 msgid "Client configuration saved successfully"
-msgstr ""
+msgstr "正常にクライアントの構成を保存しました。"
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:234
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:260
@@ -1213,7 +1213,7 @@ msgstr "クライアント {0} が停止しました"
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:265
 #, java-format
 msgid "Client {0} started"
-msgstr ""
+msgstr "クライアント {0} 起動しました"
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:280
 #, java-format
@@ -1261,12 +1261,12 @@ msgstr "プラグインまたはアップデートのダウンロードはすで
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:361
 msgid "Updating all plugins"
-msgstr ""
+msgstr "全てのプラグインをアップデート中"
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:386
 #, java-format
 msgid "Bad URL {0}"
-msgstr ""
+msgstr "不正な URL {0}"
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:406
 #, java-format
@@ -1287,11 +1287,11 @@ msgstr "プラグイン {0} を起動する際にエラー"
 #: ../java/src/net/i2p/router/web/ConfigUIHandler.java:89
 #, java-format
 msgid "Added user {0}"
-msgstr ""
+msgstr "ユーザー {0} を追加"
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:455
 msgid "Interface configuration saved"
-msgstr ""
+msgstr "インターフェースの構成を保存しました"
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:456
 #: ../java/src/net/i2p/router/web/ConfigNetHandler.java:335
@@ -1299,7 +1299,7 @@ msgstr ""
 #: ../java/src/net/i2p/router/web/ConfigUIHandler.java:90
 #: ../java/src/net/i2p/router/web/ConfigUIHandler.java:114
 msgid "Restart required to take effect"
-msgstr ""
+msgstr "再起動するまで有効になりません"
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:76
 #: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:281
@@ -1421,14 +1421,14 @@ msgstr "選択削除"
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confighome_jsp.java:502
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confighome_jsp.java:510
 msgid "Add item"
-msgstr ""
+msgstr "アイテムを追加"
 
 #: ../java/src/net/i2p/router/web/ConfigHomeHandler.java:23
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confighome_jsp.java:472
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confighome_jsp.java:492
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confighome_jsp.java:508
 msgid "Restore defaults"
-msgstr ""
+msgstr "デフォルトに戻す"
 
 #: ../java/src/net/i2p/router/web/ConfigHomeHandler.java:24
 #: ../java/src/net/i2p/router/web/ConfigSummaryHandler.java:26
@@ -1436,33 +1436,33 @@ msgstr ""
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configsidebar_jsp.java:458
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:504
 msgid "Save"
-msgstr ""
+msgstr "保存"
 
 #: ../java/src/net/i2p/router/web/ConfigHomeHandler.java:29
 msgid "Home page changed"
-msgstr ""
+msgstr "ホームページが変更されました"
 
 #: ../java/src/net/i2p/router/web/ConfigHomeHandler.java:51
 msgid "Restored default settings"
-msgstr ""
+msgstr "デフォルトの設定に戻されました"
 
 #: ../java/src/net/i2p/router/web/ConfigHomeHandler.java:63
 msgid "No name entered"
-msgstr ""
+msgstr "名前が入力されていません"
 
 #: ../java/src/net/i2p/router/web/ConfigHomeHandler.java:68
 msgid "No URL entered"
-msgstr ""
+msgstr "URL が入力されていません"
 
 #: ../java/src/net/i2p/router/web/ConfigHomeHandler.java:81
 #: ../java/src/net/i2p/router/web/ConfigSummaryHandler.java:81
 msgid "Added"
-msgstr ""
+msgstr "追加されました"
 
 #: ../java/src/net/i2p/router/web/ConfigHomeHandler.java:98
 #: ../java/src/net/i2p/router/web/ConfigSummaryHandler.java:107
 msgid "Removed"
-msgstr ""
+msgstr "削除されました"
 
 #: ../java/src/net/i2p/router/web/ConfigKeyringHandler.java:18
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:477
@@ -1577,7 +1577,7 @@ msgstr "帯域幅"
 
 #: ../java/src/net/i2p/router/web/ConfigNavHelper.java:19
 msgid "Home Page"
-msgstr ""
+msgstr "ホームページ"
 
 #: ../java/src/net/i2p/router/web/ConfigNavHelper.java:19
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:345
@@ -1628,7 +1628,7 @@ msgstr "ネットワーク"
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/viewprofile_jsp.java:284
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/webmail_jsp.java:302
 msgid "Summary Bar"
-msgstr ""
+msgstr "略式バー"
 
 #: ../java/src/net/i2p/router/web/ConfigNavHelper.java:19
 msgid "UI"
@@ -1694,7 +1694,7 @@ msgstr "IP アドレスを更新中"
 
 #: ../java/src/net/i2p/router/web/ConfigNetHandler.java:227
 msgid "Updating IPv6 setting"
-msgstr ""
+msgstr "IPv6 の設定を更新中"
 
 #: ../java/src/net/i2p/router/web/ConfigNetHandler.java:244
 msgid "Disabling TCP completely"
@@ -1703,7 +1703,7 @@ msgstr "完全に TCP を無効化中"
 #: ../java/src/net/i2p/router/web/ConfigNetHandler.java:249
 #, java-format
 msgid "Updating TCP address to {0}"
-msgstr ""
+msgstr "TCP アドレスを {0} に更新中"
 
 #: ../java/src/net/i2p/router/web/ConfigNetHandler.java:256
 msgid "Disabling inbound TCP"
@@ -1716,17 +1716,17 @@ msgstr "着信 TCP アドレスをオートに更新中"
 #: ../java/src/net/i2p/router/web/ConfigNetHandler.java:271
 #, java-format
 msgid "Updating TCP port to {0}"
-msgstr ""
+msgstr "TCP ポートを {0} に更新中"
 
 #: ../java/src/net/i2p/router/web/ConfigNetHandler.java:273
 #: ../java/src/net/i2p/router/web/ConfigNetHandler.java:298
 msgid "Warning - ports less than 1024 are not recommended"
-msgstr ""
+msgstr "警告 - 1024番未満のポートは推奨されません"
 
 #: ../java/src/net/i2p/router/web/ConfigNetHandler.java:277
 #: ../java/src/net/i2p/router/web/ConfigNetHandler.java:304
 msgid "Invalid port"
-msgstr ""
+msgstr "無効なポート"
 
 #: ../java/src/net/i2p/router/web/ConfigNetHandler.java:282
 msgid "Updating inbound TCP port to auto"
@@ -1735,7 +1735,7 @@ msgstr "着信 TCP ポートをオートに更新中"
 #: ../java/src/net/i2p/router/web/ConfigNetHandler.java:296
 #, java-format
 msgid "Updating UDP port to {0}"
-msgstr ""
+msgstr "UDP ポートを {0} に更新中"
 
 #: ../java/src/net/i2p/router/web/ConfigNetHandler.java:321
 msgid "Gracefully restarting into Hidden Router Mode"
@@ -1747,11 +1747,11 @@ msgstr "グレースフルに再起動し、隠されたルーターモードを
 
 #: ../java/src/net/i2p/router/web/ConfigNetHandler.java:332
 msgid "Enabling UPnP"
-msgstr ""
+msgstr "UPnP を有効にしています"
 
 #: ../java/src/net/i2p/router/web/ConfigNetHandler.java:334
 msgid "Disabling UPnP"
-msgstr ""
+msgstr "UPnP を無効にしています"
 
 #: ../java/src/net/i2p/router/web/ConfigNetHandler.java:343
 msgid "Enabling laptop mode"
@@ -1763,11 +1763,11 @@ msgstr "ラップトップモードを無効化中"
 
 #: ../java/src/net/i2p/router/web/ConfigNetHandler.java:352
 msgid "Disabling UDP"
-msgstr ""
+msgstr "UDP を無効にしています"
 
 #: ../java/src/net/i2p/router/web/ConfigNetHandler.java:354
 msgid "Enabling UDP"
-msgstr ""
+msgstr "UDP を有効にしています"
 
 #: ../java/src/net/i2p/router/web/ConfigNetHandler.java:361
 msgid "Requiring SSU introducers"
@@ -1775,7 +1775,7 @@ msgstr "SSU イントロデューサーを要求中"
 
 #: ../java/src/net/i2p/router/web/ConfigNetHandler.java:419
 msgid "Invalid address"
-msgstr ""
+msgstr "無効なアドレス"
 
 #: ../java/src/net/i2p/router/web/ConfigNetHandler.java:425
 #, java-format
@@ -1802,7 +1802,7 @@ msgstr "毎秒ビット"
 #: ../java/src/net/i2p/router/web/ConfigNetHelper.java:241
 #, java-format
 msgid "or {0} bytes per month maximum"
-msgstr "{0} または、最大毎月バイト"
+msgstr ""
 
 #: ../java/src/net/i2p/router/web/ConfigPeerHandler.java:20
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configpeer_jsp.java:468
@@ -1923,7 +1923,7 @@ msgstr "{0} でシャットダウン"
 #, java-format
 msgid "Please wait for routing commitment to expire for {0} tunnel"
 msgid_plural "Please wait for routing commitments to expire for {0} tunnels"
-msgstr[0] ""
+msgstr[0] "ルーティングコミットメントが {0} 個のトンネル に対し期限切れになるのを待っています"
 
 #: ../java/src/net/i2p/router/web/ConfigRestartBean.java:82
 #, java-format
@@ -2000,7 +2000,7 @@ msgstr "スレッドをダンプ"
 #: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:215
 #, java-format
 msgid "Threads dumped to {0}"
-msgstr ""
+msgstr "スレッドが {0} にダンプされました"
 
 #: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:216
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:521
@@ -2023,11 +2023,11 @@ msgstr "コンソールはスタートアップ時に表示されません"
 #: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:222
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:509
 msgid "Force GC"
-msgstr ""
+msgstr "GC を強制"
 
 #: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:224
 msgid "Full garbage collection requested"
-msgstr ""
+msgstr "完全なガベージコレクションが要求されました"
 
 #: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:233
 msgid "Service installed"
@@ -2051,81 +2051,81 @@ msgstr "統計フィルターとロケーションが正常に更新されまし
 
 #: ../java/src/net/i2p/router/web/ConfigStatsHandler.java:119
 msgid "Full statistics enabled"
-msgstr ""
+msgstr "完全な統計が有効になりました"
 
 #: ../java/src/net/i2p/router/web/ConfigStatsHandler.java:121
 msgid "Full statistics disabled"
-msgstr ""
+msgstr "完全な統計が無効になりました"
 
 #: ../java/src/net/i2p/router/web/ConfigStatsHandler.java:125
 #, java-format
 msgid ""
 "Graph list updated, may take up to 60s to be reflected on the {0}Graphs "
 "Page{1}"
-msgstr ""
+msgstr "グラフリストが更新されましたが、 {0}グラフページ{1} に反映されるまで最大60秒ほどかかる場合があります。"
 
 #: ../java/src/net/i2p/router/web/ConfigSummaryHandler.java:24
 msgid "Save order"
-msgstr ""
+msgstr "順番を保存"
 
 #: ../java/src/net/i2p/router/web/ConfigSummaryHandler.java:31
 msgid "Refresh interval changed"
-msgstr ""
+msgstr "更新間隔が変更されました"
 
 #: ../java/src/net/i2p/router/web/ConfigSummaryHandler.java:33
 #, java-format
 msgid "Refresh interval must be at least {0} seconds"
-msgstr ""
+msgstr "更新間隔は最低 {0} 秒以上でなければなりません"
 
 #: ../java/src/net/i2p/router/web/ConfigSummaryHandler.java:35
 msgid "Refresh interval must be a number"
-msgstr ""
+msgstr "更新間隔は数字でなければなりません"
 
 #: ../java/src/net/i2p/router/web/ConfigSummaryHandler.java:38
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configsidebar_jsp.java:466
 msgid "Restore full default"
-msgstr ""
+msgstr "完全なデフォルトに戻す"
 
 #: ../java/src/net/i2p/router/web/ConfigSummaryHandler.java:40
 msgid "Full summary bar default restored."
-msgstr ""
+msgstr "完全な略式バーのデフォルトに戻りました"
 
 #: ../java/src/net/i2p/router/web/ConfigSummaryHandler.java:41
 #: ../java/src/net/i2p/router/web/ConfigSummaryHandler.java:45
 #: ../java/src/net/i2p/router/web/ConfigSummaryHandler.java:137
 msgid "Summary bar will refresh shortly."
-msgstr ""
+msgstr "略式バーはすぐに更新します。"
 
 #: ../java/src/net/i2p/router/web/ConfigSummaryHandler.java:42
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configsidebar_jsp.java:468
 msgid "Restore minimal default"
-msgstr ""
+msgstr "最小のデフォルトに戻す"
 
 #: ../java/src/net/i2p/router/web/ConfigSummaryHandler.java:44
 msgid "Minimal summary bar default restored."
-msgstr ""
+msgstr "略式バーの最小のデフォルトに戻りました。"
 
 #: ../java/src/net/i2p/router/web/ConfigSummaryHandler.java:61
 #: ../java/src/net/i2p/router/web/ConfigSummaryHandler.java:83
 #: ../java/src/net/i2p/router/web/ConfigSummaryHandler.java:131
 msgid "Order must be an integer"
-msgstr ""
+msgstr "順番は整数値でなければなりません"
 
 #: ../java/src/net/i2p/router/web/ConfigSummaryHandler.java:68
 msgid "No section selected"
-msgstr ""
+msgstr "セクションが選択されていません"
 
 #: ../java/src/net/i2p/router/web/ConfigSummaryHandler.java:73
 msgid "No order entered"
-msgstr ""
+msgstr "順番が入力されていません"
 
 #: ../java/src/net/i2p/router/web/ConfigSummaryHandler.java:129
 msgid "Moved"
-msgstr ""
+msgstr "移動しました"
 
 #: ../java/src/net/i2p/router/web/ConfigSummaryHandler.java:136
 msgid "Saved order of sections."
-msgstr ""
+msgstr "セクションの順番が保存されました"
 
 #. the count isn't really correct anyway, since we don't check for actual
 #. changes
@@ -2168,7 +2168,7 @@ msgstr "予備トンネル"
 #: ../java/src/net/i2p/router/web/ConfigTunnelsHelper.java:49
 #, java-format
 msgid "Client tunnels for {0}"
-msgstr ""
+msgstr "{0} に対するクライアントトンネル"
 
 #: ../java/src/net/i2p/router/web/ConfigTunnelsHelper.java:78
 msgid "ANONYMITY WARNING - Settings include 0-hop tunnels."
@@ -2215,7 +2215,7 @@ msgstr "送信オプション"
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:444
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:450
 msgid "Add user"
-msgstr ""
+msgstr "ユーザーを追加"
 
 #: ../java/src/net/i2p/router/web/ConfigUIHandler.java:59
 msgid "Theme change saved."
@@ -2228,20 +2228,20 @@ msgstr "ページを更新表示"
 
 #: ../java/src/net/i2p/router/web/ConfigUIHandler.java:64
 msgid "Mobile console option saved."
-msgstr ""
+msgstr "モバイルコンソールオプションが保存されました。"
 
 #: ../java/src/net/i2p/router/web/ConfigUIHandler.java:76
 msgid "No user name entered"
-msgstr ""
+msgstr "ユーザー名が入力されていません"
 
 #: ../java/src/net/i2p/router/web/ConfigUIHandler.java:81
 msgid "No password entered"
-msgstr ""
+msgstr "パスワードが入力されていません"
 
 #: ../java/src/net/i2p/router/web/ConfigUIHandler.java:107
 #, java-format
 msgid "Removed user {0}"
-msgstr ""
+msgstr "ユーザー {0} を削除しました"
 
 #: ../java/src/net/i2p/router/web/ConfigUIHelper.java:25
 msgid "Set theme universally across all apps"

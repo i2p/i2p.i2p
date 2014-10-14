@@ -44,14 +44,21 @@ public class CryptoChecker {
             }
         }
         if (unavail) {
+            String s = "Java version: " + System.getProperty("java.version") +
+                       " OS: " + System.getProperty("os.name") + ' ' +
+                       System.getProperty("os.arch") + ' ' +
+                       System.getProperty("os.version");
+            if (log != null)
+                log.logAlways(log.WARN, s);
+            System.out.println("Warning: " + s);
             if (!SystemVersion.isJava7()) {
-                String s = "Java version: " + System.getProperty("java.version") + " Please consider upgrading to Java 7";
+                s = "Please consider upgrading to Java 7";
                 if (log != null)
                     log.logAlways(log.WARN, s);
                 System.out.println(s);
             }
             if (!isUnlimited()) {
-                String s = "Please consider installing the Java Cryptography Unlimited Strength Jurisdiction Policy Files from ";
+                s = "Please consider installing the Java Cryptography Unlimited Strength Jurisdiction Policy Files from ";
                 //if (SystemVersion.isJava8())
                 //    s  += JRE8;
                 //else if (SystemVersion.isJava7())
@@ -62,7 +69,7 @@ public class CryptoChecker {
                     log.logAlways(log.WARN, s);
                 System.out.println(s);
             }
-            String s = "This crypto will be required in a future release";
+            s = "This crypto will be required in a future release";
             if (log != null)
                 log.logAlways(log.WARN, s);
             System.out.println("Warning: " + s);

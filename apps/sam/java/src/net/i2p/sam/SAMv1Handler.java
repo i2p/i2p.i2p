@@ -280,14 +280,14 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
                         if (_log.shouldLog(Log.DEBUG))
                             _log.debug("No DIRECTION parameter in STREAM session, defaulting to BOTH");
                         dir = "BOTH";
-                    }
-                    if (!dir.equals("CREATE") && !dir.equals("RECEIVE")
-                        && !dir.equals("BOTH")) {
+                    } else if (!dir.equals("CREATE") && !dir.equals("RECEIVE")
+                               && !dir.equals("BOTH")) {
                         if (_log.shouldLog(Log.DEBUG))
                             _log.debug("Unknown DIRECTION parameter value: [" + dir + "]");
                         return writeString("SESSION STATUS RESULT=I2P_ERROR MESSAGE=\"Unknown DIRECTION parameter\"\n");
+                    } else {
+                        props.remove("DIRECTION");
                     }
-                    props.remove("DIRECTION");
                 
                     streamSession = newSAMStreamSession(destKeystream, dir,props);
                 } else {

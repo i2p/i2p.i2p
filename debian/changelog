@@ -1,3 +1,22 @@
+i2p (0.9.14.1-1) unstable; urgency=medium
+
+  * New upstream point release, 0.9.14.1
+    - Updates to geoip.txt and geoipv6.dat.gz based on Maxmind GeoLite Country
+      database from 2014-08-06.
+    - Console:
+      + Fix update buttons
+      + Don't filter parameter names starting with "nofilter_"
+      + Re-allow configadvanced, news URL, and unsigned update URL if routerconsole.advanced=true
+      + Re-allow plugin install if routerconsole.advanced=true or routerconsole.enablePluginInstall=true
+      + Only allow whitelisted plugin signers, unless routerconsole.allowUntrustedPlugins=true
+      + Re-allow clients.config changes if routerconsole.advanced=true or routerconsole.enableClientChange=true
+      + More escaping
+    - i2psnark: Fix add torrent form
+    - ExecNamingService: Remove
+    - Plugins: Add whitelist of keys
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Sat, 09 Aug 2014 23:09:33 +0000
+
 i2p (0.9.14-1) unstable; urgency=high
 
   * New upstream release, 0.9.14

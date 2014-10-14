@@ -1,4 +1,4 @@
-package net.i2p.data;
+package net.i2p.data.router;
 /*
  * free (adj.): unencumbered; not under the control of others
  * Written by jrandom in 2003 and released into the public domain 
@@ -9,6 +9,16 @@ package net.i2p.data;
  */
 
 import java.io.ByteArrayOutputStream;
+
+import net.i2p.data.Certificate;
+import net.i2p.data.CertificateTest;
+import net.i2p.data.DataFormatException;
+import net.i2p.data.DataStructure;
+import net.i2p.data.PublicKey;
+import net.i2p.data.PublicKeyTest;
+import net.i2p.data.SigningPublicKey;
+import net.i2p.data.SigningPublicKeyTest;
+import net.i2p.data.StructureTest;
 
 /**
  * Test harness for loading / storing Hash objects

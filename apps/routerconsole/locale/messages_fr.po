@@ -22,7 +22,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-02-06 18:27+0000\n"
-"PO-Revision-Date: 2014-05-31 18:55+0000\n"
+"PO-Revision-Date: 2014-09-06 22:44+0000\n"
 "Last-Translator: Towinet\n"
 "Language-Team: French (http://www.transifex.com/projects/p/I2P/language/fr/)\n"
 "MIME-Version: 1.0\n"
@@ -199,7 +199,7 @@ msgstr "Réamorçage"
 #, java-format
 msgid "Reseed fetched only 1 router."
 msgid_plural "Reseed fetched only {0} routers."
-msgstr[0] "Le réamorçage n'a trouvé qu'un seul routeur."
+msgstr[0] "Le réamorçage n''a trouvé qu''un seul routeur."
 msgstr[1] "Le réamorçage n''a trouvé que {0} routeurs."
 
 #: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:181
@@ -209,7 +209,7 @@ msgstr "Échec de réamorçage."
 #: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:182
 #, java-format
 msgid "See {0} for help."
-msgstr "Voir {0} pour l''aide."
+msgstr "Voir {0} pour l'aide."
 
 #: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:183
 msgid "reseed configuration page"
@@ -330,16 +330,16 @@ msgstr "Connexion sortante"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:593
 msgid "They offered to introduce us (help other peers traverse our firewall)"
-msgstr "A proposé de nous représenter (aide de la part d''autres pairs pour traverser notre pare-feu)"
+msgstr "A proposé de nous représenter (aide de la part d'autres pairs pour traverser notre pare-feu)"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:595
 msgid ""
 "We offered to introduce them (help other peers traverse their firewall)"
-msgstr "Nous avons proposé de le représenter (aide à d''autres pairs pour traverser passer leur pare-feu)"
+msgstr "Nous avons proposé de le représenter (aide à d'autres pairs pour traverser passer leur pare-feu)"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:596
 msgid "How long since a packet has been received / sent"
-msgstr "Temps écoulé depuis la dernière réception/émission d''un paquet "
+msgstr "Temps écoulé depuis la dernière réception/émission d'un paquet "
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:596
 #: ../../../router/java/src/net/i2p/router/transport/ntcp/NTCPTransport.java:1124
@@ -377,13 +377,13 @@ msgstr "Dérive"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:599
 msgid "The difference between the peer's clock and your own"
-msgstr "Écart de temps entre l''horloge du pair et la votre"
+msgstr "Écart de temps entre l'horloge du pair et la votre"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:600
 msgid ""
 "The congestion window, which is how many bytes can be sent without an "
 "acknowledgement"
-msgstr "Fenêtre de congestion, en nombre d''octets transmissibles sans acquittement"
+msgstr "Fenêtre de congestion, en nombre d'octets transmissibles sans acquittement"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:601
 msgid "The number of sent messages awaiting acknowledgement"
@@ -395,7 +395,7 @@ msgstr "Nombre maximum de messages simultanés à envoyer"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:603
 msgid "The number of pending sends which exceed congestion window"
-msgstr "Nombre d''envois en attente qui débordent de la fenêtre de congestion"
+msgstr "Nombre d'envois en attente qui débordent de la fenêtre de congestion"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:604
 msgid "The slow start threshold"
@@ -664,7 +664,7 @@ msgstr "Tri par durée de connexion"
 
 #: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2543
 msgid "Sort by clock skew"
-msgstr "Tri par décalage d''horloge"
+msgstr "Tri par décalage d'horloge"
 
 #: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2546
 msgid "Sort by congestion window"
@@ -676,7 +676,7 @@ msgstr "Tri par seuil de démarrage lent"
 
 #: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2551
 msgid "Sort by round trip time"
-msgstr "Tri par durée d''aller-retour"
+msgstr "Tri par durée d'aller-retour"
 
 #: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2555
 msgid "Sort by retransmission timeout"
@@ -822,6 +822,7 @@ msgstr "Échec de copie vers {0}"
 msgid "In-network updates disabled. Check package manager."
 msgstr "Mises à jour intra-réseau désactivées. Vérifiez le gestionnaire de paquet."
 
+
 #: ../java/src/net/i2p/router/update/NewsFetcher.java:146
 msgid "No write permission for I2P install directory."
 msgstr "Pas de permission d'écriture pour le répertoire d'installation I2P."
@@ -941,7 +942,7 @@ msgstr "La signature du greffon téléchargé ne correspond pas à celle de celu
 #: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:292
 #, java-format
 msgid "Downloaded plugin version {0} is not newer than installed plugin"
-msgstr "La version {0} du greffon téléchargé n''est pas plus récente que celle installée"
+msgstr "La version {0} du greffon téléchargé n'est pas plus récente que celle installée"
 
 #: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:299
 #, java-format
@@ -1940,8 +1941,8 @@ msgstr "Arrêt dans {0}"
 #, java-format
 msgid "Please wait for routing commitment to expire for {0} tunnel"
 msgid_plural "Please wait for routing commitments to expire for {0} tunnels"
-msgstr[0] "Veuillez attendre qu''expire l''engagement d''acheminement de {0} tunnel"
-msgstr[1] "Veuillez attendre qu''expirent les engagements d''acheminement de {0} tunnels"
+msgstr[0] "Veuillez attendre qu'expire l'engagement d'acheminement de {0} tunnel"
+msgstr[1] "Veuillez attendre qu'expirent les engagements d'acheminement de {0} tunnels"
 
 #: ../java/src/net/i2p/router/web/ConfigRestartBean.java:82
 #, java-format
@@ -2080,7 +2081,7 @@ msgstr "Statistiques complètes désactivées"
 msgid ""
 "Graph list updated, may take up to 60s to be reflected on the {0}Graphs "
 "Page{1}"
-msgstr "Liste de graphique mise à jour, peut prendre jusqu''à 60s pour être réfléchi sur la {0}Page graphiques{1}"
+msgstr "Liste de graphique mise à jour, cela peut prendre jusqu''à 60s pour que cela soit reflété sur la {0}Page graphiques{1}"
 
 #: ../java/src/net/i2p/router/web/ConfigSummaryHandler.java:24
 msgid "Save order"
@@ -4497,7 +4498,7 @@ msgstr "NOTE"
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:454
 #, java-format
 msgid "You have configured I2P to share only {0} KBps."
-msgstr "Vous avez configuré I2P pour qu''il ne partage que {0} ko/s."
+msgstr "Vous avez configuré I2P pour qu''il ne partage que {0} KO/s."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:457
 msgid "I2P requires at least 12KBps to enable sharing. "

@@ -258,6 +258,11 @@
         <copy file="apps/routerconsole/java/build/routerconsole.war" todir="build/" />
     </target>
 
+    <target name="buildTools" depends="buildrouter" >
+        <ant dir="installer/tools/java" target="jar" />
+        <copy file="installer/tools/java/build/tools.jar" todir="build/" />
+    </target>
+
     <!-- end of sub-build.xml targets -->
 
     <target name="checkForMtn" >
@@ -1058,12 +1063,13 @@
         <isfalse value="${bundle.routerInfos}" />
     </condition>
 
-    <target name="prepRouterInfos" depends="buildrouter" unless="no.bundle.routerInfos">
+    <target name="prepRouterInfos" depends="buildrouter, buildTools" unless="no.bundle.routerInfos">
         <mkdir dir="pkg-temp/netDb" />
-        <java classname="net.i2p.router.networkdb.kademlia.PersistentDataStore" fork="true" failonerror="true">
+        <java classname="net.i2p.router.networkdb.kademlia.BundleRouterInfos" fork="true" failonerror="true">
             <classpath>
                 <pathelement location="build/i2p.jar" />
                 <pathelement location="build/router.jar" />
+                <pathelement location="build/tools.jar" />
             </classpath>
             <arg value="-i" />
             <arg value="${bundle.routerInfos.i2pConfigDir}" />
@@ -1581,9 +1587,9 @@
          since preppkg puts too much stuff in pkg-temp -->
 <!--
     <target name="release" depends="distclean, updaterWithJettyFixesAndJbigi , updater200WithJettyFixes, preppkg, installer, getReleaseNumber" >
-    <target name="release" depends="verifyReleaseBuildNumbers, -pre-release, distclean, testscripts, updaterWithJettyRepack, updater200WithJetty, delete-j6-update, installer-nowindows, delete-nonwindows, installer-windows">
--->
     <target name="release" depends="verifyReleaseBuildNumbers, -pre-release, distclean, testscripts, updaterWithJettyAndGeoIPRepack, updater200WithJettyAndGeoIP, delete-j6-update, installer-nowindows, delete-nonwindows, installer-windows">
+-->
+    <target name="release" depends="verifyReleaseBuildNumbers, -pre-release, distclean, testscripts, updaterWithJettyRepack, updater200WithJetty, delete-j6-update, installer-nowindows, delete-nonwindows, installer-windows">
         <echo message="New version number is ${release.number}" />
         <copy file="i2pupdate.zip" tofile="i2pupdate_${release.number}.zip" />
         <copy file="i2pinstall_${full.version}.jar" tofile="i2pinstall_${release.number}.jar" />

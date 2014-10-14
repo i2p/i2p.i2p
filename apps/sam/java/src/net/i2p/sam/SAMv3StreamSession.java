@@ -48,7 +48,7 @@ class SAMv3StreamSession  extends SAMStreamSession implements SAMv3Handler.Sessi
 			return nick ;
 		}
 		
-		   /**
+	   /**
 	     * Create a new SAM STREAM session, according to information
 	     * registered with the given nickname
 	     *
@@ -61,7 +61,7 @@ class SAMv3StreamSession  extends SAMStreamSession implements SAMv3Handler.Sessi
 	    public SAMv3StreamSession(String login)
 	    		throws IOException, DataFormatException, SAMException
 	    {
-                super(getDB().get(login).getDest(), "CREATE",
+                super(getDB().get(login).getDest(), "BOTH",
                       getDB().get(login).getProps(),
                       getDB().get(login).getHandler());
 	    	this.nick = login ;

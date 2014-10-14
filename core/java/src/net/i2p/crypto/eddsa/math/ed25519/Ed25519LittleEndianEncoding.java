@@ -88,7 +88,7 @@ public class Ed25519LittleEndianEncoding extends Encoding {
         */
 
         byte[] s = new byte[32];
-        s[0] = (byte) (h0 >> 0);
+        s[0] = (byte) h0;
         s[1] = (byte) (h0 >> 8);
         s[2] = (byte) (h0 >> 16);
         s[3] = (byte) ((h0 >> 24) | (h1 << 2));
@@ -104,7 +104,7 @@ public class Ed25519LittleEndianEncoding extends Encoding {
         s[13] = (byte) (h4 >> 2);
         s[14] = (byte) (h4 >> 10);
         s[15] = (byte) (h4 >> 18);
-        s[16] = (byte) (h5 >> 0);
+        s[16] = (byte) h5;
         s[17] = (byte) (h5 >> 8);
         s[18] = (byte) (h5 >> 16);
         s[19] = (byte) ((h5 >> 24) | (h6 << 1));
@@ -123,14 +123,14 @@ public class Ed25519LittleEndianEncoding extends Encoding {
         return s;
     }
 
-    private static long load_3(byte[] in, int offset) {
+    static int load_3(byte[] in, int offset) {
         int result = in[offset++] & 0xff;
         result |= (in[offset++] & 0xff) << 8;
         result |= (in[offset] & 0xff) << 16;
         return result;
     }
 
-    private static long load_4(byte[] in, int offset) {
+    static long load_4(byte[] in, int offset) {
         int result = in[offset++] & 0xff;
         result |= (in[offset++] & 0xff) << 8;
         result |= (in[offset++] & 0xff) << 16;

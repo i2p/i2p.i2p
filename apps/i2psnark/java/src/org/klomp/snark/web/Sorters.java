@@ -185,7 +185,6 @@ class Sorters {
 
         private static int getStatus(Snark snark) {
             long remaining = snark.getRemainingLength(); 
-            long needed = snark.getNeededLength(); 
             if (snark.isStopped()) {
                 if (remaining < 0)
                     return 0;

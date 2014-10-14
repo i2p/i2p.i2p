@@ -14,6 +14,9 @@ import java.util.Collections;
 import java.util.List;
 import net.i2p.data.Hash;
 import net.i2p.data.router.RouterAddress;
+import net.i2p.data.router.RouterInfo;
+import net.i2p.router.transport.Transport;
+import net.i2p.router.transport.crypto.DHSessionKeyBuilder;
 
 /**
  * Manages the communication subsystem between peers, including connections, 
@@ -71,6 +74,12 @@ public abstract class CommSystemFacade implements Service {
     /** @since 0.8.13 */
     public boolean isInBadCountry() { return false; }
 
+    /** @since 0.9.16 */
+    public boolean isInBadCountry(Hash peer) { return false; }
+
+    /** @since 0.9.16 */
+    public boolean isInBadCountry(RouterInfo ri) { return false; }
+
     public String getCountry(Hash peer) { return null; }
     public String getCountryName(String code) { return code; }
     public String renderPeerHTML(Hash peer) {
@@ -84,6 +93,24 @@ public abstract class CommSystemFacade implements Service {
      * Tell other transports our address changed
      */
     public void notifyReplaceAddress(RouterAddress UDPAddr) {}
+
+    /**
+     *  Pluggable transport
+     *  @since 0.9.16
+     */
+    public void registerTransport(Transport t) {}
+
+    /**
+     *  Pluggable transport
+     *  @since 0.9.16
+     */
+    public void unregisterTransport(Transport t) {}
+
+    /**
+     *  Hook for pluggable transport creation.
+     *  @since 0.9.16
+     */
+    public DHSessionKeyBuilder.Factory getDHFactory() { return null; }
 
     /** 
      * These must be increasing in "badness" (see TransportManager.java),

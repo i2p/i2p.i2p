@@ -28,13 +28,14 @@ class UDPSender {
     private volatile boolean _keepRunning;
     private final Runner _runner;
     private final boolean _dummy;
+    private final SocketListener _endpoint;
 
     private static final int TYPE_POISON = 99999;
 
     private static final int MIN_QUEUE_SIZE = 64;
     private static final int MAX_QUEUE_SIZE = 384;
     
-    public UDPSender(RouterContext ctx, DatagramSocket socket, String name) {
+    public UDPSender(RouterContext ctx, DatagramSocket socket, String name, SocketListener lsnr) {
         _context = ctx;
         _dummy = false; // ctx.commSystem().isDummy();
         _log = ctx.logManager().getLog(UDPSender.class);
@@ -44,6 +45,7 @@ class UDPSender {
         _socket = socket;
         _runner = new Runner();
         _name = name;
+        _endpoint = lsnr;
         _context.statManager().createRateStat("udp.pushTime", "How long a UDP packet takes to get pushed out", "udp", UDPTransport.RATES);
         _context.statManager().createRateStat("udp.sendQueueSize", "How many packets are queued on the UDP sender", "udp", UDPTransport.RATES);
         _context.statManager().createRateStat("udp.sendQueueFailed", "How often it was unable to add a new packet to the queue", "udp", UDPTransport.RATES);
@@ -69,6 +71,9 @@ class UDPSender {
         _context.statManager().createRateStat("udp.sendPacketSize." + PacketBuilder.TYPE_CREAT, "session created packet size", "udp", UDPTransport.RATES);
     }
     
+    /**
+     *  Cannot be restarted (socket is final)
+     */
     public synchronized void startup() {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Starting the runner: " + _name);
@@ -78,6 +83,8 @@ class UDPSender {
     }
     
     public synchronized void shutdown() {
+        if (!_keepRunning)
+            return;
         _keepRunning = false;
         _outboundQueue.clear();
         UDPPacket poison = UDPPacket.acquire(_context, false);
@@ -265,16 +272,23 @@ class UDPSender {
                         _context.statManager().addRateData("udp.sendPacketSize", size, packet.getLifetime());
                     } catch (IOException ioe) {
                         if (_log.shouldLog(Log.WARN))
-                            _log.warn("Error sending", ioe);
+                            _log.warn("Error sending to " + packet.getPacket().getAddress(), ioe);
                         _context.statManager().addRateData("udp.sendException", 1, packet.getLifetime());
+                        if (_socket.isClosed()) {
+                            if (_keepRunning) {
+                                _keepRunning = false;
+                                _endpoint.fail();
+                            }
+                        }
                     }
                     
                     // back to the cache
                     packet.release();
                 }
             }
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Stop sending...");
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Stop sending on " + _endpoint);
+            _outboundQueue.clear();
         }
         
         /** @return next packet in queue. Will discard any packet older than MAX_HEAD_LIFETIME */

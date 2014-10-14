@@ -14,6 +14,7 @@ import net.i2p.crypto.eddsa.spec.EdDSANamedCurveTable;
 import net.i2p.crypto.eddsa.spec.EdDSAParameterSpec;
 import net.i2p.crypto.eddsa.spec.EdDSAPrivateKeySpec;
 import net.i2p.crypto.eddsa.spec.EdDSAPublicKeySpec;
+import net.i2p.util.RandomSource;
 
 /**
  *  Default strength is 256
@@ -60,7 +61,7 @@ public class KeyPairGenerator extends KeyPairGeneratorSpi {
 
     public KeyPair generateKeyPair() {
         if (!initialized)
-            initialize(DEFAULT_STRENGTH, new SecureRandom());
+            initialize(DEFAULT_STRENGTH, RandomSource.getInstance());
 
         byte[] seed = new byte[edParams.getCurve().getField().getb()/8];
         random.nextBytes(seed);

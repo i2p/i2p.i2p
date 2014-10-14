@@ -15,6 +15,7 @@
 
 package org.mortbay.util;
 
+import java.util.concurrent.atomic.AtomicInteger;
 
 /* ------------------------------------------------------------ */
 /** Byte Array Pool
@@ -29,7 +30,7 @@ public class ByteArrayPool
         Integer.getInteger("org.mortbay.util.ByteArrayPool.pool_size",8).intValue();
     
     public static final ThreadLocal __pools=new BAThreadLocal();
-    public static int __slot;
+    public static final AtomicInteger __slot = new AtomicInteger();
     
     /* ------------------------------------------------------------ */
     /** Get a byte array from the pool of known size.
@@ -94,7 +95,7 @@ public class ByteArrayPool
         }
 
         // slot.
-        int s = __slot++;
+        int s = __slot.getAndIncrement();
         if (s<0)s=-s;
         pool[s%pool.length]=b;
     }

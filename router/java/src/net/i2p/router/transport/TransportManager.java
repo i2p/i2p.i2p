@@ -13,6 +13,7 @@ import java.io.Writer;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -44,6 +45,8 @@ public class TransportManager implements TransportEventListener {
      * If we want more than one transport with the same style we will have to change this.
      */
     private final Map<String, Transport> _transports;
+    /** locking: this */
+    private final Map<String, Transport> _pluggableTransports;
     private final RouterContext _context;
     private final UPnPManager _upnpManager;
     private final DHSessionKeyBuilder.PrecalcRunner _dhThread;
@@ -66,22 +69,74 @@ public class TransportManager implements TransportEventListener {
         _context.statManager().createRateStat("transport.bidFailNoTransports", "Could not attempt to bid on message, as none of the transports could attempt it", "Transport", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("transport.bidFailAllTransports", "Could not attempt to bid on message, as all of the transports had failed", "Transport", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
         _transports = new ConcurrentHashMap<String, Transport>(2);
+        _pluggableTransports = new HashMap<String, Transport>(2);
         if (_context.getBooleanPropertyDefaultTrue(PROP_ENABLE_UPNP))
             _upnpManager = new UPnPManager(context, this);
         else
             _upnpManager = null;
         _dhThread = new DHSessionKeyBuilder.PrecalcRunner(context);
     }
+
+    /**
+     *  Pluggable transports. Not for NTCP or SSU.
+     *
+     *  @since 0.9.16
+     */
+    synchronized void registerAndStart(Transport t) {
+        String style = t.getStyle();
+        if (style.equals(NTCPTransport.STYLE) || style.equals(UDPTransport.STYLE))
+            throw new IllegalArgumentException("Builtin transport");
+        if (_transports.containsKey(style) || _pluggableTransports.containsKey(style))
+            throw new IllegalStateException("Dup transport");
+        boolean shouldStart = !_transports.isEmpty();
+        _pluggableTransports.put(style, t);
+        addTransport(t);
+        t.setListener(this);
+        if (shouldStart) {
+            initializeAddress(t);
+            t.startListening();
+            _context.router().rebuildRouterInfo();
+        } // else will be started by configTransports() (unlikely)
+    }
+
+    /**
+     *  Pluggable transports. Not for NTCP or SSU.
+     *
+     *  @since 0.9.16
+     */
+    synchronized void stopAndUnregister(Transport t) {
+        String style = t.getStyle();
+        if (style.equals(NTCPTransport.STYLE) || style.equals(UDPTransport.STYLE))
+            throw new IllegalArgumentException("Builtin transport");
+        t.setListener(null);
+        _pluggableTransports.remove(style);
+        removeTransport(t);
+        t.stopListening();
+        _context.router().rebuildRouterInfo();
+    }
+
+    /**
+     *  Hook for pluggable transport creation.
+     *
+     *  @since 0.9.16
+     */
+    DHSessionKeyBuilder.Factory getDHFactory() {
+        return _dhThread;
+    }
     
-    public void addTransport(Transport transport) {
+    private void addTransport(Transport transport) {
         if (transport == null) return;
-        _transports.put(transport.getStyle(), transport);
+        Transport old = _transports.put(transport.getStyle(), transport);
+        if (old != null && old != transport && _log.shouldLog(Log.WARN))
+            _log.warn("Replacing transport " + transport.getStyle());
         transport.setListener(this);
     }
     
-    public void removeTransport(Transport transport) {
+    private void removeTransport(Transport transport) {
         if (transport == null) return;
-        _transports.remove(transport.getStyle());
+        Transport old = _transports.remove(transport.getStyle());
+        if (old != null && _log.shouldLog(Log.WARN))
+            _log.warn("Removing transport " + transport.getStyle());
         transport.setListener(null);
     }
 
@@ -174,7 +229,10 @@ public class TransportManager implements TransportEventListener {
         tp = getTransport(UDPTransport.STYLE);
         if (tp != null)
             tps.add(tp);
-        //for (Transport t : _transports.values()) {
+        // now add any others (pluggable)
+        for (Transport t : _pluggableTransports.values()) {
+             tps.add(t);
+        }
         for (Transport t : tps) {
             t.startListening();
             if (_log.shouldLog(Log.DEBUG))

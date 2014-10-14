@@ -212,6 +212,7 @@ public class SigUtil {
 
     /**
      *  @return JAVA EdDSA public key!
+     *  @since 0.9.15
      */
     public static EdDSAPublicKey toJavaEdDSAKey(SigningPublicKey pk)
                               throws GeneralSecurityException {
@@ -230,6 +231,7 @@ public class SigUtil {
 
     /**
      *  @return JAVA EdDSA private key!
+     *  @since 0.9.15
      */
     public static EdDSAPrivateKey toJavaEdDSAKey(SigningPrivateKey pk)
                               throws GeneralSecurityException {
@@ -246,6 +248,9 @@ public class SigUtil {
         return rv;
     }
 
+    /**
+     *  @since 0.9.15
+     */
     private static EdDSAPublicKey cvtToJavaEdDSAKey(SigningPublicKey pk)
                               throws GeneralSecurityException {
         try {
@@ -256,6 +261,9 @@ public class SigUtil {
         }
     }
 
+    /**
+     *  @since 0.9.15
+     */
     private static EdDSAPrivateKey cvtToJavaEdDSAKey(SigningPrivateKey pk)
                               throws GeneralSecurityException {
         try {
@@ -266,11 +274,17 @@ public class SigUtil {
         }
     }
 
+    /**
+     *  @since 0.9.15
+     */
     public static SigningPublicKey fromJavaKey(EdDSAPublicKey pk, SigType type)
             throws GeneralSecurityException {
         return new SigningPublicKey(type, pk.getAbyte());
     }
 
+    /**
+     *  @since 0.9.15
+     */
     public static SigningPrivateKey fromJavaKey(EdDSAPrivateKey pk, SigType type)
             throws GeneralSecurityException {
         return new SigningPrivateKey(type, pk.getSeed());

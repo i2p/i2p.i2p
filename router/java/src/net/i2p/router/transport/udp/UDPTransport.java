@@ -370,7 +370,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         if (_log.shouldLog(Log.INFO))
             _log.info("Binding to the port: " + port);
         if (_endpoints.isEmpty()) {
-            // will always be empty since we are removing them above
+            // _endpoints will always be empty since we removed them above
             if (bindToAddrs.isEmpty()) {
                 UDPEndpoint endpoint = new UDPEndpoint(_context, this, port, null);
                 _endpoints.add(endpoint);
@@ -420,8 +420,11 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 if (newPort < 0 && endpoint.isIPv4()) {
                     newPort = endpoint.getListenPort();
                 }
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Started " + endpoint);
             } catch (SocketException se) {
                 _endpoints.remove(endpoint);
+                _log.error("Failed to start " + endpoint, se);
             }
         }
         if (_endpoints.isEmpty()) {
@@ -492,6 +495,23 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         _introManager.reset();
         UDPPacket.clearCache();
         UDPAddress.clearCache();
+    }
+
+    /**
+     *  The endpoint has failed. Remove it.
+     *
+     *  @since 0.9.16
+     */
+    public void fail(UDPEndpoint endpoint) {
+        if (_endpoints.remove(endpoint)) {
+            _log.log(Log.CRIT, "UDP port failure: " + endpoint);
+            if (_endpoints.isEmpty()) {
+                _log.log(Log.CRIT, "No more UDP sockets open");
+                setReachabilityStatus(CommSystemFacade.STATUS_HOSED);
+                // TODO restart?
+            }
+            rebuildExternalAddress();
+        }
     }
 
     /** @since IPv6 */

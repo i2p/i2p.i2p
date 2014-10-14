@@ -347,10 +347,10 @@ public class KeyGenerator {
         try { Thread.sleep(1000); } catch (InterruptedException ie) {}
         int runs = 200; // warmup
         for (int j = 0; j < 2; j++) {
-            for (int i = 0; i <= 100; i++) {
-                SigType type = SigType.getByCode(i);
-                if (type == null)
-                    break;
+            for (SigType type : SigType.values()) {
+                if (!type.isAvailable()) {
+                    System.out.println("Skipping unavailable: " + type);
+                }
                 try {
                     System.out.println("Testing " + type);
                     testSig(type, runs);
@@ -365,9 +365,19 @@ public class KeyGenerator {
 
     private static void testSig(SigType type, int runs) throws GeneralSecurityException {
         byte src[] = new byte[512];
+        double gtime = 0;
         long stime = 0;
         long vtime = 0;
-        SimpleDataStructure keys[] = KeyGenerator.getInstance().generateSigningKeys(type);
+        SimpleDataStructure keys[] = null;
+        long st = System.nanoTime();
+        // RSA super slow, limit to 5
+        int genruns = (type.getBaseAlgorithm() == SigAlgo.RSA) ? Math.min(runs, 5) : runs;
+        for (int i = 0; i < genruns; i++) {
+            keys = KeyGenerator.getInstance().generateSigningKeys(type);
+        }
+        long en = System.nanoTime();
+        gtime = ((en - st) / (1000*1000d)) / genruns;
+        System.out.println(type + " key gen " + genruns + " times: " + gtime + " ms each");
         SigningPublicKey pubkey = (SigningPublicKey) keys[0];
         SigningPrivateKey privkey = (SigningPrivateKey) keys[1];
         SigningPublicKey pubkey2 = getSigningPublicKey(privkey);

@@ -12,7 +12,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-02-06 18:27+0000\n"
-"PO-Revision-Date: 2014-06-22 10:21+0000\n"
+"PO-Revision-Date: 2014-08-30 09:54+0000\n"
 "Last-Translator: LinuxChata\n"
 "Language-Team: Ukrainian (Ukraine) (http://www.transifex.com/projects/p/I2P/language/uk_UA/)\n"
 "MIME-Version: 1.0\n"
@@ -30,25 +30,25 @@ msgstr "внутрішній"
 #, java-format
 msgid "{0} inbound, {0} outbound tunnel"
 msgid_plural "{0} inbound, {0} outbound tunnels"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "{0} вхідний, {0} вихідний тунель"
+msgstr[1] "{0} вхідних, {0} вихідних тунелів"
+msgstr[2] "{0} вхідних, {0} вихідних тунелів"
 
 #: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:453
 msgid "lower bandwidth and reliability"
-msgstr ""
+msgstr "нижча пропускна здатність і надійність"
 
 #: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:455
 msgid "standard bandwidth and reliability"
-msgstr ""
+msgstr "звичайна пропускна здатність і надійність"
 
 #: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:457
 msgid "higher bandwidth and reliability"
-msgstr ""
+msgstr "більш висока пропускна здатність і надійність"
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:123
 msgid "Tunnels are not initialized yet, please reload in two minutes."
-msgstr ""
+msgstr "Тунелі ще не створені, будь ласка перезавантажте за дві хвилини."
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:196
 msgid ""
@@ -60,7 +60,7 @@ msgstr "Неправильно передана форма, можливо ви 
 msgid ""
 "If the problem persists, verify that you have cookies enabled in your "
 "browser."
-msgstr ""
+msgstr "Якщо проблема не усунута, переконайтеся, що cookies увімкнені у вашому браузері."
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:244
 msgid "Configuration reloaded for all tunnels"
@@ -97,11 +97,11 @@ msgstr "Порт не заданий"
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:487
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:613
 msgid "Invalid port"
-msgstr ""
+msgstr "Невірний порт"
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:490
 msgid "Warning - ports less than 1024 are not recommended"
-msgstr ""
+msgstr "Попередження - порти менше, ніж 1024 не рекомендуються"
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:506
 msgid "Standard client"
@@ -109,7 +109,7 @@ msgstr "Звичайний клієнт"
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:507
 msgid "HTTP/HTTPS client"
-msgstr ""
+msgstr "HTTP/HTTPS клієнт"
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:508
 msgid "IRC client"
@@ -158,7 +158,7 @@ msgstr "Хост не заданий"
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:607
 msgid "Invalid address"
-msgstr ""
+msgstr "Невірна адреса"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:82
 msgid "I2P Tunnel Manager - Edit Client Tunnel"
@@ -230,11 +230,11 @@ msgstr "Список вихідних проксі (Outproxies)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:203
 msgid "SSL Outproxies"
-msgstr ""
+msgstr "Зовнішні SSL проксі"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:209
 msgid "Use Outproxy Plugin"
-msgstr ""
+msgstr "Використовувати модуль зовнішнього проксі"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:213
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:251
@@ -252,7 +252,7 @@ msgstr "Адреса Призначення  Тунелю"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:230
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:382
 msgid "name, name:port, or destination"
-msgstr ""
+msgstr "ім'я, назва: порт, або призначення"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:233
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:386
@@ -303,22 +303,22 @@ msgstr "Довжина"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:276
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:277
 msgid "0 hop tunnel (no anonymity)"
-msgstr ""
+msgstr "Тунель 0 стрибків (без анонімності)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:280
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:281
 msgid "1 hop tunnel (low anonymity)"
-msgstr ""
+msgstr "Тунель з 1 стрибком (низька анонімність)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:284
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:285
 msgid "2 hop tunnel (medium anonymity)"
-msgstr ""
+msgstr "Тунель з 2 стрибками (середня анонімність)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:288
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:289
 msgid "3 hop tunnel (high anonymity)"
-msgstr ""
+msgstr "Тунель з 3 стрибками (висока анонімність)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:296
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:297
@@ -502,7 +502,7 @@ msgstr "Локальний адрес призначення"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:482
 msgid "Local Base 32"
-msgstr ""
+msgstr "Локальний Base 32"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:491
 msgid "Local Authorization"
@@ -561,7 +561,7 @@ msgstr "Нові серверні настройки"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:179
 msgid "Use SSL?"
-msgstr ""
+msgstr "Використовувати SSL?"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:222
 msgid "Website name"
@@ -652,19 +652,19 @@ msgstr "Максимум одночасних зєднань (0=необмеже
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:477
 msgid "POST limits (0=unlimited)"
-msgstr ""
+msgstr "POST ліміти (0=необмежений)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:481
 msgid "Per period"
-msgstr ""
+msgstr "За період"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:485
 msgid "Ban minutes"
-msgstr ""
+msgstr "Хвилин блокування"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:495
 msgid "POST limit period (minutes)"
-msgstr ""
+msgstr "POST обмеження періоду (хвилини)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:516
 msgid "New Certificate type"
@@ -716,7 +716,7 @@ msgstr "Оновити"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:109
 msgid "Tunnel Wizard"
-msgstr ""
+msgstr "Майстер тунелів"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:113
 msgid "Stop All"
@@ -830,7 +830,7 @@ msgstr "Адреса призначення"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:395
 msgid "internal plugin"
-msgstr ""
+msgstr "внутрішній модуль"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:414
 msgid "none"
@@ -842,12 +842,12 @@ msgstr "Новий клієнтський тунель"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:119
 msgid "I2P Tunnel Manager - Tunnel Creation Wizard"
-msgstr ""
+msgstr "I2P менеджер тунелів - Майстер створення тунелів"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:139
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:567
 msgid "Server or client tunnel?"
-msgstr ""
+msgstr "Серверний або клієнтський тунель?"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:145
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:571
@@ -867,7 +867,7 @@ msgstr "Місце призначення тунелю"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:163
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:626
 msgid "Binding address and port"
-msgstr ""
+msgstr "Прив'язка адреса і порту"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:169
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:652
@@ -876,7 +876,7 @@ msgstr "Авто-старт тунелю"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:175
 msgid "Wizard completed"
-msgstr ""
+msgstr "Робота майстра завершена"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:189
 msgid ""
@@ -904,11 +904,11 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:197
 msgid "Server Tunnel"
-msgstr ""
+msgstr "Серверний тунель"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:199
 msgid "Client Tunnel"
-msgstr ""
+msgstr "Клієнтський тунель"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:217
 msgid "There are several types of tunnels to choose from:"

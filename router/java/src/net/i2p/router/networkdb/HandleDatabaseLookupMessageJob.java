@@ -9,6 +9,7 @@ package net.i2p.router.networkdb;
  */
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
 import net.i2p.data.DatabaseEntry;
@@ -82,9 +83,11 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
             return;
         }
 
+        DatabaseLookupMessage.Type lookupType = _message.getSearchType();
         // only lookup once, then cast to correct type
         DatabaseEntry dbe = getContext().netDb().lookupLocally(_message.getSearchKey());
-        if (dbe != null && dbe.getType() == DatabaseEntry.KEY_TYPE_LEASESET) {
+        if (dbe != null && dbe.getType() == DatabaseEntry.KEY_TYPE_LEASESET &&
+            (lookupType == DatabaseLookupMessage.Type.ANY || lookupType == DatabaseLookupMessage.Type.LS)) {
             LeaseSet ls = (LeaseSet) dbe;
             // We have to be very careful here to decide whether or not to send out the leaseSet,
             // to avoid anonymity vulnerabilities.
@@ -131,7 +134,7 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
                     if (_log.shouldLog(Log.INFO))
                         _log.info("We have local LS " + _message.getSearchKey() + ", NOT answering query, out of our keyspace");
                     getContext().statManager().addRateData("netDb.lookupsMatchedLocalNotClosest", 1);
-                    Set<Hash> routerHashSet = getNearestRouters();
+                    Set<Hash> routerHashSet = getNearestRouters(lookupType);
                     sendClosest(_message.getSearchKey(), routerHashSet, fromKey, _message.getReplyTunnel());
                 }
             } else {
@@ -144,10 +147,11 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
                                ", NOT answering query - local? " + isLocal + " shouldPublish? " + shouldPublishLocal +
                                " RAP? " + ls.getReceivedAsPublished() + " RAR? " + ls.getReceivedAsReply());
                 getContext().statManager().addRateData("netDb.lookupsMatchedRemoteNotClosest", 1);
-                Set<Hash> routerHashSet = getNearestRouters();
+                Set<Hash> routerHashSet = getNearestRouters(lookupType);
                 sendClosest(_message.getSearchKey(), routerHashSet, fromKey, _message.getReplyTunnel());
             }
-        } else if (dbe != null && dbe.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO) {
+        } else if (dbe != null && dbe.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO &&
+                   lookupType != DatabaseLookupMessage.Type.LS) {
             RouterInfo info = (RouterInfo) dbe;
             if (info.isCurrent(EXPIRE_DELAY)) {
                 if ( (info.getIdentity().isHidden()) || (isUnreachable(info) && !publishUnreachable()) ) {
@@ -172,7 +176,7 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
                 }
             } else {
                 // expired locally - return closest peer hashes
-                Set<Hash> routerHashSet = getNearestRouters();
+                Set<Hash> routerHashSet = getNearestRouters(lookupType);
 
                 // ERR: see above
                 // // Remove hidden nodes from set..
@@ -190,7 +194,7 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
             }
         } else {
             // not found locally - return closest peer hashes
-            Set<Hash> routerHashSet = getNearestRouters();
+            Set<Hash> routerHashSet = getNearestRouters(lookupType);
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("We do not have key " + _message.getSearchKey() + 
                            " locally.  sending back " + routerHashSet.size() + " peers to " + fromKey);
@@ -204,13 +208,23 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
      *  Will not include us.
      *  Side effect - adds us to the message's dontInclude set.
      */
-    private Set<Hash> getNearestRouters() {
+    private Set<Hash> getNearestRouters(DatabaseLookupMessage.Type lookupType) {
+        // convert the new EXPL type flag to the old-style FAKE_HASH
+        // to pass to findNearestRouters()
         Set<Hash> dontInclude = _message.getDontIncludePeers();
         Hash us = getContext().routerHash();
-        if (dontInclude == null)
-            dontInclude = Collections.singleton(us);
-        else
+        if (dontInclude == null && lookupType == DatabaseLookupMessage.Type.EXPL) {
+            dontInclude = new HashSet<Hash>(2);
             dontInclude.add(us);
+            dontInclude.add(Hash.FAKE_HASH);
+        } else if (dontInclude == null) {
+            dontInclude = Collections.singleton(us);
+        } else if (lookupType == DatabaseLookupMessage.Type.EXPL) {
+            dontInclude.add(us);
+            dontInclude.add(Hash.FAKE_HASH);
+        } else {
+            dontInclude.add(us);
+        }
         // Honor flag to exclude all floodfills
         //if (dontInclude.contains(Hash.FAKE_HASH)) {
         // This is handled in FloodfillPeerSelector

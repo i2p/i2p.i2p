@@ -85,6 +85,9 @@ class FloodfillMonitorJob extends JobImpl {
         if (SystemVersion.isARM())
             return false;
 
+        if (getContext().commSystem().isInBadCountry())
+            return false;
+
         // Only if up a while...
         if (getContext().router().getUptime() < MIN_UPTIME)
             return false;

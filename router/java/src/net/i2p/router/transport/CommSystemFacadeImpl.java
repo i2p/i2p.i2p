@@ -22,6 +22,7 @@ import net.i2p.data.router.RouterInfo;
 import net.i2p.router.CommSystemFacade;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
+import net.i2p.router.transport.crypto.DHSessionKeyBuilder;
 import net.i2p.router.transport.udp.UDPTransport;
 import net.i2p.router.util.EventLog;
 import net.i2p.util.Addresses;
@@ -222,6 +223,47 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         }
         _manager.externalAddressReceived(Transport.AddressSource.SOURCE_SSU, ip, port);
     }
+
+    /**
+     *  Pluggable transports. Not for NTCP or SSU.
+     *
+     *  Do not call from transport constructor. Transport must be ready to be started.
+     *
+     *  Following transport methods will be called:
+     *    setListener()
+     *    externalAddressReceived() (zero or more times, one for each known address)
+     *    startListening();
+     *
+     *  @since 0.9.16
+     */
+    @Override
+    public void registerTransport(Transport t) {
+        _manager.registerAndStart(t);
+    }
+
+    /**
+     *  Pluggable transports. Not for NTCP or SSU.
+     *
+     *  Following transport methods will be called:
+     *    setListener(null)
+     *    stoptListening();
+     *
+     *  @since 0.9.16
+     */
+    @Override
+    public void unregisterTransport(Transport t) {
+        _manager.stopAndUnregister(t);
+    }
+
+    /**
+     *  Hook for pluggable transport creation.
+     *
+     *  @since 0.9.16
+     */
+    @Override
+    public DHSessionKeyBuilder.Factory getDHFactory() {
+        return _manager.getDHFactory();
+    }
     
     /*
      * GeoIP stuff
@@ -301,15 +343,42 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
      *  Are we in a bad place
      *  @since 0.8.13
      */
+    @Override
     public boolean isInBadCountry() {
         String us = getOurCountry();
-        return us != null && (BadCountries.contains(us) || _context.getBooleanProperty("router.forceBadCountry"));
+        return (us != null && BadCountries.contains(us)) || _context.getBooleanProperty("router.forceBadCountry");
+    }
+
+    /**
+     *  Are they in a bad place
+     *  @param peer non-null
+     *  @since 0.9.16
+     */
+    @Override
+    public boolean isInBadCountry(Hash peer) {
+        String c = getCountry(peer);
+        return c != null && BadCountries.contains(c);
+    }
+
+    /**
+     *  Are they in a bad place
+     *  @param ri non-null
+     *  @since 0.9.16
+     */
+    @Override
+    public boolean isInBadCountry(RouterInfo ri) {
+        byte[] ip = getIP(ri);
+        if (ip == null)
+            return false;
+        String c = _geoIP.get(ip);
+        return c != null && BadCountries.contains(c);
     }
 
     /**
      *  Uses the transport IP first because that lookup is fast,
      *  then the IP from the netDb.
      *
+     *  @param peer not ourselves - use getOurCountry() for that
      *  @return two-letter lower-case country code or null
      */
     @Override

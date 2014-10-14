@@ -530,7 +530,7 @@ public class TrackerClient implements Runnable {
                         coordinator.getPeerCount() <= 0 &&
                         _util.getContext().clock().now() > _startedOn + 2*60*60*1000 &&
                         snark.getTotalLength() > 0 &&
-                        uploaded >= snark.getTotalLength() * 3 / 2) {
+                        uploaded >= snark.getTotalLength() * 5 / 4) {
                         if (_log.shouldLog(Log.WARN))
                             _log.warn("Auto stopping " + snark.getBaseName());
                         snark.setAutoStoppable(false);

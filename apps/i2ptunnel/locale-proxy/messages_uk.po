@@ -4,16 +4,17 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
 # Translators:
-# Денис Лысенко <gribua@gmail.com>, 2011
-# Денис Лысенко <gribua@gmail.com>, 2012
+# Denis Blank <gribua@gmail.com>, 2011
+# Denis Blank <gribua@gmail.com>, 2012
 # jonny_nut, 2014
+# puxud <puxud@alivance.com>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-12-01 20:06+0000\n"
-"PO-Revision-Date: 2014-01-23 16:58+0000\n"
-"Last-Translator: jonny_nut\n"
+"POT-Creation-Date: 2014-02-06 18:27+0000\n"
+"PO-Revision-Date: 2014-08-07 13:42+0000\n"
+"Last-Translator: puxud <puxud@alivance.com>\n"
 "Language-Team: Ukrainian (Ukraine) (http://www.transifex.com/projects/p/I2P/language/uk_UA/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -109,7 +110,7 @@ msgstr ""
 
 #: ../java/build/Proxy.java:23
 msgid "Error: Local Access"
-msgstr ""
+msgstr "Помилка: Локальний доступ"
 
 #: ../java/build/Proxy.java:24
 msgid "Your browser is misconfigured."
@@ -123,15 +124,15 @@ msgstr ""
 
 #: ../java/build/Proxy.java:26
 msgid "Warning: Eepsite Unknown"
-msgstr ""
+msgstr "Увага: Невідомий eep-сайт"
 
 #: ../java/build/Proxy.java:32
 msgid "Warning: Eepsite Not Found in Addressbook"
-msgstr ""
+msgstr "Увага: Eep-сайт не знайдене в адресній книзі"
 
 #: ../java/build/Proxy.java:33
 msgid "The eepsite was not found in your router's addressbook."
-msgstr ""
+msgstr "Eep-сайт не знайдене в адресній книзі вашого роутеру."
 
 #: ../java/build/Proxy.java:34
 msgid "Check the link or find a Base 32 or Base 64 address."
@@ -269,17 +270,17 @@ msgstr ""
 
 #: ../java/build/Proxy.java:92 ../java/build/Proxy.java:98
 msgid "Warning: Eepsite Unreachable"
-msgstr ""
+msgstr "Увага: Eep-сайт недоступний"
 
 #: ../java/build/Proxy.java:99
 msgid "The eepsite was not reachable."
-msgstr ""
+msgstr "Eep-сайт не доступний."
 
 #: ../java/build/Proxy.java:100
 msgid ""
 "The eepsite is offline, there is network congestion, or your router is not "
 "yet well-integrated with peers."
-msgstr ""
+msgstr "Eep-сайт вимкнений, мережа перевантажена, або ваш роутер недостатньо інтегрований із пірами."
 
 #: ../java/build/Proxy.java:103
 msgid "Information: New Host Name"
@@ -344,25 +345,22 @@ msgid "The request uses a bad protocol."
 msgstr ""
 
 #: ../java/build/Proxy.java:133
-#, java-format
-msgid "The I2P HTTP Proxy supports {0}http://{1} requests ONLY."
+msgid "The I2P HTTP Proxy supports HTTP and HTTPS requests only."
 msgstr ""
 
 #: ../java/build/Proxy.java:134
-#, java-format
-msgid ""
-"Other protocols such as {0}https://{1} and {0}ftp://{1} are not allowed."
+msgid "Other protocols such as FTP are not allowed."
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:571
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:595
 msgid "This seems to be a bad destination:"
 msgstr "Скоріше всього це поганий адрес призначення:"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:571
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:595
 msgid "i2paddresshelper cannot help you with a destination like that!"
 msgstr "i2paddresshelper не може допомогти Вам з місцем призначення як це!"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:638
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:662
 #, java-format
 msgid ""
 "To visit the destination in your host database, click <a "
@@ -370,51 +368,51 @@ msgid ""
 "click <a href=\"{1}\">here</a>."
 msgstr "Для того щоб перейти по локальному посиланню з локальної адресної книги, натисніть ось<a href=\"{0}\">тут</a>. Для переходу по новому addresshelper-посиланню, натисніть будь-ласка <a href=\"{1}\">тут</a>."
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1042
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1151
 msgid "Host"
 msgstr "Адрес"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1046
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1155
 msgid "Base 32"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1050
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1159
 msgid "Destination"
 msgstr "Адреса призначення"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1056
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1165
 #, java-format
 msgid "Continue to {0} without saving"
 msgstr "Продовжити до {0} без збереження"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1061
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1170
 #, java-format
 msgid "Save {0} to router address book and continue to eepsite"
 msgstr "Зберегти {0} в адресну книгу роутера и продовжити перехід до eep-сайту"
 
 #. only blockfile supports multiple books
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1064
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1173
 #, java-format
 msgid "Save {0} to master address book and continue to eepsite"
 msgstr "Зберегти {0} в основну адресну книгу і продовжити перехід до еер-сайту"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1065
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1174
 #, java-format
 msgid "Save {0} to private address book and continue to eepsite"
 msgstr "Зберегти {0} в приватну адресну книгу і продовжити перехід до еер-сайту."
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1180
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1290
 msgid "HTTP Outproxy"
 msgstr "Вихідний HTTP проксі"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1216
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1326
 msgid ""
 "Click a link below to look for an address helper by using a \"jump\" "
 "service:"
 msgstr "\"Jump\" сервіси, які, можливо, знають необхідне Вам addresshelper-посилання."
 
 #. Translators: parameter is a host name
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1224
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1334
 #, java-format
 msgid "{0} jump service"
 msgstr ""

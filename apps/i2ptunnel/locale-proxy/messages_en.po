@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P i2ptunnel\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-07-23 13:45+0000\n"
+"POT-Creation-Date: 2014-09-17 21:49+0000\n"
 "PO-Revision-Date: 2010-06-15 14:09+0100\n"
 "Last-Translator: duck <duck@mail.i2p>\n"
 "Language-Team: duck <duck@mail.i2p>\n"
@@ -167,7 +167,8 @@ msgid "The eepsite was not reachable, because its lease set was not found."
 msgstr ""
 
 #: ../java/build/Proxy.java:53
-msgid "The eepsite is probably down."
+msgid ""
+"The eepsite is probably down, but there could also be network congestion."
 msgstr ""
 
 #: ../java/build/Proxy.java:54 ../java/build/Proxy.java:83
@@ -319,7 +320,8 @@ msgid ""
 msgstr ""
 
 #: ../java/build/Proxy.java:137
-msgid "The outproxy is probably down."
+msgid ""
+"The outproxy is probably down, but there could also be network congestion."
 msgstr ""
 
 #: ../java/build/Proxy.java:138 ../java/build/Proxy.java:150

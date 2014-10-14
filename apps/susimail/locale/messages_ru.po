@@ -12,7 +12,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-05-01 11:45+0000\n"
-"PO-Revision-Date: 2014-05-30 17:16+0000\n"
+"PO-Revision-Date: 2014-07-25 21:21+0000\n"
 "Last-Translator: yume\n"
 "Language-Team: Russian (Russia) (http://www.transifex.com/projects/p/I2P/language/ru_RU/)\n"
 "MIME-Version: 1.0\n"
@@ -30,13 +30,13 @@ msgstr "Для кодировки \\''{0}\\'' не найден кодек."
 #: src/src/i2p/susi/webmail/WebMail.java:318
 #: src/src/i2p/susi/webmail/WebMail.java:1005
 msgid "Re:"
-msgstr ""
+msgstr "Re:"
 
 #: src/src/i2p/susi/webmail/WebMail.java:308
 #: src/src/i2p/susi/webmail/WebMail.java:322
 #: src/src/i2p/susi/webmail/WebMail.java:1043
 msgid "Fwd:"
-msgstr ""
+msgstr "Fwd:"
 
 #: src/src/i2p/susi/webmail/WebMail.java:594
 msgid "unknown"
@@ -469,7 +469,7 @@ msgstr "Не удалось скачать почту."
 
 #: src/src/i2p/susi/webmail/WebMail.java:2312
 msgid "Folder Page Size"
-msgstr ""
+msgstr "Количество писем на странице"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2315
 msgid "Set"

@@ -215,6 +215,7 @@ class FloodfillVerifyStoreJob extends JobImpl {
         m.setReplyTunnel(replyTunnelInfo.getReceiveTunnelId(0));
         m.setFrom(replyTunnelInfo.getPeer(0));
         m.setSearchKey(_key);
+        m.setSearchType(_isRouterInfo ? DatabaseLookupMessage.Type.RI : DatabaseLookupMessage.Type.LS);
         return m;
     }
     
