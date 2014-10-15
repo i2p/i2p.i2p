@@ -24,6 +24,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicLong;
 
+import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
 
 import net.i2p.I2PAppContext;
@@ -36,6 +37,7 @@ import net.i2p.client.streaming.I2PSocketOptions;
 import net.i2p.data.Destination;
 import net.i2p.util.EventDispatcher;
 import net.i2p.util.I2PAppThread;
+import net.i2p.util.I2PSSLSocketFactory;
 import net.i2p.util.Log;
 
 public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runnable {
@@ -622,6 +624,7 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
                 }
                 SSLServerSocketFactory fact = SSLClientUtil.initializeFactory(opts);
                 ss = fact.createServerSocket(localPort, 0, addr);
+                I2PSSLSocketFactory.setProtocolsAndCiphers((SSLServerSocket) ss);
             } else {
                 ss = new ServerSocket(localPort, 0, addr);
             }

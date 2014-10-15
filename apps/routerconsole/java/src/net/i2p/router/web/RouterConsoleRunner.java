@@ -37,6 +37,7 @@ import net.i2p.util.FileUtil;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.PortMapper;
 import net.i2p.util.SecureDirectory;
+import net.i2p.util.I2PSSLSocketFactory;
 import net.i2p.util.SystemVersion;
 import org.eclipse.jetty.security.HashLoginService;
 import org.eclipse.jetty.security.ConstraintMapping;
@@ -464,6 +465,10 @@ public class RouterConsoleRunner implements RouterApp {
                     sslFactory.setKeyStorePassword(_context.getProperty(PROP_KEYSTORE_PASSWORD, DEFAULT_KEYSTORE_PASSWORD));
                     // the X.509 cert password (if not present, verifyKeyStore() returned false)
                     sslFactory.setKeyManagerPassword(_context.getProperty(PROP_KEY_PASSWORD, "thisWontWork"));
+                    sslFactory.addExcludeProtocols(I2PSSLSocketFactory.EXCLUDE_PROTOCOLS.toArray(
+                                                   new String[I2PSSLSocketFactory.EXCLUDE_PROTOCOLS.size()]));
+                    sslFactory.addExcludeCipherSuites(I2PSSLSocketFactory.INCLUDE_CIPHERS.toArray(
+                                                      new String[I2PSSLSocketFactory.EXCLUDE_CIPHERS.size()]));
                     StringTokenizer tok = new StringTokenizer(_sslListenHost, " ,");
                     while (tok.hasMoreTokens()) {
                         String host = tok.nextToken().trim();
