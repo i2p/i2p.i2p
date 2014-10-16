@@ -121,6 +121,7 @@ class EstablishState {
     private static final int HXY_SIZE = 32;  //Hash.HASH_LENGTH;
     private static final int HXY_TSB_PAD_SIZE = HXY_SIZE + 4 + 12;  // 48
 
+    private static final Object _stateLock = new Object();
     protected State _state;
 
     private enum State {
@@ -193,6 +194,13 @@ class EstablishState {
         _curDecrypted = SimpleByteCache.acquire(AES_SIZE);
     }
 
+    /** @since 0.9.16 */
+    private void changeState(State state) {
+        synchronized (_stateLock) {
+            _state = state;
+        }
+    }
+
     /**
      * parse the contents of the buffer as part of the handshake.  if the
      * handshake is completed and there is more data remaining, the data are
@@ -203,8 +211,10 @@ class EstablishState {
      * will return it to the pool.
      */
     public synchronized void receive(ByteBuffer src) {
-        if (_state == State.VERIFIED || _state == State.CORRUPT)
-            throw new IllegalStateException(prefix() + "received unexpected data on " + _con);
+        synchronized(_stateLock) {    
+            if (_state == State.VERIFIED || _state == State.CORRUPT)
+                throw new IllegalStateException(prefix() + "received unexpected data on " + _con);
+        }
         if (!src.hasRemaining())
             return; // nothing to receive
 
@@ -229,6 +239,9 @@ class EstablishState {
      *  will return it to the pool.
      *
      *  Caller must synch.
+     *
+     *  FIXME none of the _state comparisons use _stateLock, but whole thing
+     *  is synchronized, should be OK. See isComplete()
      */
     private void receiveInbound(ByteBuffer src) {
         while (_state == State.IB_INIT && src.hasRemaining()) {
@@ -243,7 +256,7 @@ class EstablishState {
             //    }
             //}
             if (_received >= XY_SIZE)
-                _state = State.IB_GOT_X;
+                changeState(State.IB_GOT_X);
         }
         while (_state == State.IB_GOT_X && src.hasRemaining()) {
             int i = _received - XY_SIZE;
@@ -252,7 +265,7 @@ class EstablishState {
             _hX_xor_bobIdentHash[i] = c;
             //if (_log.shouldLog(Log.DEBUG)) _log.debug("recv bih" + (int)c + " received=" + _received);
             if (i >= HXY_SIZE - 1)
-                _state = State.IB_GOT_HX;
+                changeState(State.IB_GOT_HX);
         }
 
         if (_state == State.IB_GOT_HX) {
@@ -325,7 +338,7 @@ class EstablishState {
                     System.arraycopy(_e_hXY_tsB, 0, write, XY_SIZE, HXY_TSB_PAD_SIZE);
 
                     // ok, now that is prepared, we want to actually send it, so make sure we are up for writing
-                    _state = State.IB_SENT_Y;
+                    changeState(State.IB_SENT_Y);
                     _transport.getPumper().wantsWrite(_con, write);
                     if (!src.hasRemaining()) return;
                 } catch (DHSessionKeyBuilder.InvalidPublicParameterException e) {
@@ -370,7 +383,7 @@ class EstablishState {
                         if (_log.shouldLog(Log.DEBUG))
                             _log.debug(prefix() + "got the RI size: " + sz);
                         _aliceIdentSize  = sz;
-                        _state = State.IB_GOT_RI_SIZE;
+                        changeState(State.IB_GOT_RI_SIZE);
 
                         // We must defer the calculations for total size of the message until
                         //  we get the full alice ident so
@@ -401,7 +414,7 @@ class EstablishState {
                             fail("Unsupported sig type");
                             return;
                         }
-                        _state = State.IB_GOT_RI;
+                        changeState(State.IB_GOT_RI);
                         // handle variable signature size
                         _sz_aliceIdent_tsA_padding_aliceSigSize = 2 + _aliceIdentSize + 4 + type.getSigLen();
                         int rem = (_sz_aliceIdent_tsA_padding_aliceSigSize % AES_SIZE);
@@ -453,6 +466,9 @@ class EstablishState {
      *  will return it to the pool.
      *
      *  Caller must synch.
+     *
+     *  FIXME none of the _state comparisons use _stateLock, but whole thing
+     *  is synchronized, should be OK. See isComplete()
      */
     private void receiveOutbound(ByteBuffer src) {
         // recv Y+E(H(X+Y)+tsB, sk, Y[239:255])
@@ -466,7 +482,7 @@ class EstablishState {
                     _dh.getSessionKey(); // force the calc
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug(prefix()+"DH session key calculated (" + _dh.getSessionKey().toBase64() + ")");
-                    _state = State.OB_GOT_Y;
+                    changeState(State.OB_GOT_Y);
                 } catch (DHSessionKeyBuilder.InvalidPublicParameterException e) {
                     _context.statManager().addRateData("ntcp.invalidDH", 1);
                     fail("Invalid X", e);
@@ -500,7 +516,7 @@ class EstablishState {
                     return;
                 }
                 SimpleByteCache.release(h);
-                _state = State.OB_GOT_HXY;
+                changeState(State.OB_GOT_HXY);
                 _tsB = DataHelper.fromLong(hXY_tsB, HXY_SIZE, 4); // their (Bob's) timestamp in seconds
                 _tsA = (_context.clock().now() + 500) / 1000; // our (Alice's) timestamp in seconds
                 if (_log.shouldLog(Log.DEBUG))
@@ -573,7 +589,7 @@ class EstablishState {
                     //_log.debug(prefix() + "encrypted response to Bob: " + Base64.encode(_prevEncrypted));
                 //}
                 // send 'er off (when the bw limiter says, etc)
-                _state = State.OB_SENT_RI;
+                changeState(State.OB_SENT_RI);
                 _transport.getPumper().wantsWrite(_con, _prevEncrypted);
             }
         }
@@ -607,7 +623,7 @@ class EstablishState {
                 _received++;
 
                 if (off >= _e_bobSig.length) {
-                    _state = State.OB_GOT_SIG;
+                    changeState(State.OB_GOT_SIG);
                     //if (_log.shouldLog(Log.DEBUG))
                     //    _log.debug(prefix() + "received E(S(X+Y+Alice.identHash+tsA+tsB)+padding, sk, prev): " + Base64.encode(_e_bobSig));
                     byte bobSig[] = new byte[_e_bobSig.length];
@@ -634,7 +650,6 @@ class EstablishState {
                         _context.statManager().addRateData("ntcp.invalidSignature", 1);
                         fail("Signature was invalid - attempt to spoof " + _con.getRemotePeer().calculateHash().toBase64() + "?");
                     } else {
-                        _state = State.VERIFIED;
                         if (_log.shouldLog(Log.DEBUG))
                             _log.debug(prefix() + "signature verified from Bob.  done!");
                         prepareExtra(src);
@@ -647,6 +662,7 @@ class EstablishState {
                         InetAddress ia = _con.getChannel().socket().getInetAddress();
                         if (ia != null)
                             _transport.setIP(_con.getRemotePeer().calculateHash(), ia.getAddress());
+                        changeState(State.VERIFIED);
                     }
                     return;
                 }
@@ -655,10 +671,24 @@ class EstablishState {
     }
 
     /** did the handshake fail for some reason? */
-    public synchronized boolean isCorrupt() { return _state == State.CORRUPT; }
+    public boolean isCorrupt() {
+        synchronized(_stateLock) {
+            return _state == State.CORRUPT;
+        }
+    }
 
-    /** @return is the handshake complete and valid? */
-    public synchronized boolean isComplete() { return _state == State.VERIFIED; }
+    /**
+     *  If synchronized on this, fails with
+     *  deadlocks from all over via CSFI.isEstablished().
+     *  Also CSFI.getFramedAveragePeerClockSkew().
+     *
+     *  @return is the handshake complete and valid?
+     */
+    public boolean isComplete() {
+        synchronized(_stateLock) {
+            return _state == State.VERIFIED;
+        }
+    }
 
     /**
      * We are Alice.
@@ -667,13 +697,17 @@ class EstablishState {
      * This method sends message #1 to Bob.
      */
     public synchronized void prepareOutbound() {
-        if (_state == State.OB_INIT) {
+        boolean shouldSend;
+        synchronized(_stateLock) {    
+            shouldSend = _state == State.OB_INIT;
+        }
+        if (shouldSend) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug(prefix() + "send X");
             byte toWrite[] = new byte[XY_SIZE + _hX_xor_bobIdentHash.length];
             System.arraycopy(_X, 0, toWrite, 0, XY_SIZE);
             System.arraycopy(_hX_xor_bobIdentHash, 0, toWrite, XY_SIZE, _hX_xor_bobIdentHash.length);
-            _state = State.OB_SENT_X;
+            changeState(State.OB_SENT_X);
             _transport.getPumper().wantsWrite(_con, toWrite);
         } else {
             if (_log.shouldLog(Log.WARN))
@@ -815,7 +849,6 @@ class EstablishState {
                     _log.debug(prefix()+"Clock skew: " + diff + " ms");
                 }
 
-                _state = State.VERIFIED;
                 sendInboundConfirm(_aliceIdent, tsA);
                 _con.setRemotePeer(_aliceIdent);
                 if (_log.shouldLog(Log.DEBUG))
@@ -827,6 +860,7 @@ class EstablishState {
                 releaseBufs();
                 if (_log.shouldLog(Log.INFO))
                     _log.info(prefix()+"Verified remote peer as " + _aliceIdent.calculateHash());
+                changeState(State.VERIFIED);
             } else {
                 _context.statManager().addRateData("ntcp.invalidInboundSignature", 1);
                 fail("Peer verification failed - spoof of " + _aliceIdent.calculateHash() + "?");
@@ -917,9 +951,11 @@ class EstablishState {
 
     /** Caller must synch. */
     private void fail(String reason, Exception e, boolean bySkew) {
-        if (_state == State.CORRUPT || _state == State.VERIFIED)
-            return;
-        _state = State.CORRUPT;
+        synchronized(_stateLock) {    
+            if (_state == State.CORRUPT || _state == State.VERIFIED)
+                return;
+            changeState(State.CORRUPT);
+        }
         _failedBySkew = bySkew;
         _err = reason;
         _e = e;
@@ -938,8 +974,10 @@ class EstablishState {
             SimpleByteCache.release(_prevEncrypted);
         // Do not release _curEncrypted if verified, it is passed to
         // NTCPConnection to use as the IV
-        if (_state != State.VERIFIED)
-            SimpleByteCache.release(_curEncrypted);
+        synchronized(_stateLock) {    
+            if (_state != State.VERIFIED)
+                SimpleByteCache.release(_curEncrypted);
+        }
         SimpleByteCache.release(_curDecrypted);
         SimpleByteCache.release(_hX_xor_bobIdentHash);
         if (_dh.getPeerPublicValue() == null)

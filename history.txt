@@ -1,6 +1,11 @@
+2014-10-16 zzz
+ * NTCP: Deadlock fix 2nd try (ticket #1394)
+
 2014-10-15 zzz
  * Console, I2CP, i2ptunnel, SSLEepGet: Set allowed SSL
-   protocols and ciphers
+   protocols and ciphers. Disable SSLv3 and older ciphers.
+   Enable TLSv1.1 and TLSv1.2 on Java 7,
+   where it is disabled by default client-side.
 
 2014-10-14 zzz
  * I2NP: Implement DatabaseLookupMessage search type field
