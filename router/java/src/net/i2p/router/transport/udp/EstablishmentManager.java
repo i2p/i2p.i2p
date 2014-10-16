@@ -957,8 +957,8 @@ class EstablishmentManager {
             if (!oldId.equals(newId)) {
                 _outboundStates.remove(oldId);
                 _outboundStates.put(newId, state);
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("RR replaced " + oldId + " with " + newId + ", claimed address was " + claimed);
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("RR replaced " + oldId + " with " + newId + ", claimed address was " + claimed);
             }
             //
             if (claimed != null)
@@ -979,17 +979,17 @@ class EstablishmentManager {
         if (state != null) {
             boolean sendNow = state.receiveHolePunch();
             if (sendNow) {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Hole punch from " + state + ", sending SessionRequest now");
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Hole punch from " + state + ", sending SessionRequest now");
                 notifyActivity();
             } else {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Hole punch from " + state + ", already sent SessionRequest");
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Hole punch from " + state + ", already sent SessionRequest");
             }
         } else {
             // HolePunch received before RelayResponse, and we didn't know the IP/port, or it changed
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("No state found for hole punch from " + from + " port " + fromPort);
+            if (_log.shouldLog(Log.INFO))
+                _log.info("No state found for hole punch from " + from + " port " + fromPort);
         }
     }
 
