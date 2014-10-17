@@ -657,7 +657,7 @@ class EstablishState {
                         System.arraycopy(_prevEncrypted, _prevEncrypted.length-AES_SIZE, nextWriteIV, 0, AES_SIZE);
                         // this does not copy the nextWriteIV, do not release to cache
                         _con.finishOutboundEstablishment(_dh.getSessionKey(), (_tsA-_tsB), nextWriteIV, _e_bobSig); // skew in seconds
-                        releaseBufs();
+                        releaseBufs(true);
                         // if socket gets closed this will be null - prevent NPE
                         InetAddress ia = _con.getChannel().socket().getInetAddress();
                         if (ia != null)
@@ -857,7 +857,7 @@ class EstablishState {
                 System.arraycopy(_e_bobSig, _e_bobSig.length-AES_SIZE, iv, 0, AES_SIZE);
                 // this does not copy the IV, do not release to cache
                 _con.finishInboundEstablishment(_dh.getSessionKey(), (tsA-_tsB), iv, _prevEncrypted); // skew in seconds
-                releaseBufs();
+                releaseBufs(true);
                 if (_log.shouldLog(Log.INFO))
                     _log.info(prefix()+"Verified remote peer as " + _aliceIdent.calculateHash());
                 changeState(State.VERIFIED);
@@ -961,23 +961,21 @@ class EstablishState {
         _e = e;
         if (_log.shouldLog(Log.WARN))
             _log.warn(prefix()+"Failed to establish: " + _err, e);
-        releaseBufs();
+        releaseBufs(false);
     }
 
     /**
      *  Only call once. Caller must synch.
      *  @since 0.9.16
      */
-    private void releaseBufs() {
+    private void releaseBufs(boolean isVerified) {
         // null or longer for OB
         if (_prevEncrypted != null && _prevEncrypted.length == AES_SIZE)
             SimpleByteCache.release(_prevEncrypted);
         // Do not release _curEncrypted if verified, it is passed to
         // NTCPConnection to use as the IV
-        synchronized(_stateLock) {    
-            if (_state != State.VERIFIED)
-                SimpleByteCache.release(_curEncrypted);
-        }
+        if (!isVerified)
+            SimpleByteCache.release(_curEncrypted);
         SimpleByteCache.release(_curDecrypted);
         SimpleByteCache.release(_hX_xor_bobIdentHash);
         if (_dh.getPeerPublicValue() == null)
