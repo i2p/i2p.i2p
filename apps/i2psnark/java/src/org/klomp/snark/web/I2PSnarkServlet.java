@@ -305,7 +305,7 @@ public class I2PSnarkServlet extends BasicServlet {
             out.write(_("Torrents"));
             out.write("\" class=\"snarkRefresh\">");
             out.write(toThemeImg("arrow_refresh"));
-            out.write(">&nbsp;&nbsp;");
+            out.write("&nbsp;&nbsp;");
             if (_contextName.equals(DEFAULT_NAME))
                 out.write(_("I2PSnark"));
             else
@@ -316,7 +316,7 @@ public class I2PSnarkServlet extends BasicServlet {
             out.write(_("Refresh page"));
             out.write("\" class=\"snarkRefresh\">");
             out.write(toThemeImg("arrow_refresh"));
-            out.write(">&nbsp;&nbsp;");
+            out.write("&nbsp;&nbsp;");
             if (_contextName.equals(DEFAULT_NAME))
                 out.write(_("I2PSnark"));
             else
