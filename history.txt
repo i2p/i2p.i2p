@@ -1,3 +1,7 @@
+2014-10-20 zzz
+ * Console: Fix lockups (ticket #1395)
+ * Eepsite Jetty: Switch back to QueuedThreadPool (ticket #1395)
+
 2014-10-17 zzz
  * NTCP: Deadlock fix 3rd try (ticket #1394)
 
