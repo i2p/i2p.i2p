@@ -158,8 +158,7 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
         // right at instantiation if the news is already indicating a new version
         Checker c = new NewsHandler(_context, this);
         register(c, NEWS, HTTP, 0);
-        // TODO
-        //register(c, NEWS_SU3, HTTP, 0);
+        register(c, NEWS_SU3, HTTP, 0);
         register(c, ROUTER_SIGNED, HTTP, 0);  // news is an update checker for the router
         Updater u = new UpdateHandler(_context, this);
         register(u, ROUTER_SIGNED, HTTP, 0);

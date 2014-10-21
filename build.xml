@@ -197,6 +197,11 @@
         <ant dir="apps/routerconsole/java/" target="jar" />
     </target>
 
+    <!-- newsxml.jar only (subset of routerconsole, no war) for Android -->
+    <target name="buildNewsXMLJar" depends="buildRouter" >
+        <ant dir="apps/routerconsole/java/" target="newsxmljar" />
+    </target>
+
     <target name="buildJetty" depends="buildCore" >
         <ant dir="apps/jetty" target="build" />
         <copy todir="build/" >
@@ -554,7 +559,7 @@
             <group title="Core SDK (i2p.jar)" packages="net.i2p:net.i2p.*:net.i2p.client:net.i2p.client.*:net.i2p.internal:net.i2p.internal.*:freenet.support.CPUInformation:org.bouncycastle.oldcrypto:org.bouncycastle.oldcrypto.*:gnu.crypto.*:gnu.getopt:gnu.gettext:com.nettgryppa.security:net.metanotion:net.metanotion.*" />
             <group title="Streaming Library" packages="net.i2p.client.streaming:net.i2p.client.streaming.impl" />
             <group title="Router" packages="net.i2p.router:net.i2p.router.*:net.i2p.data.i2np:net.i2p.data.router:org.cybergarage.*:org.freenetproject:org.xlattice.crypto.filters" />
-            <group title="Router Console" packages="net.i2p.router.web:net.i2p.router.update" />
+            <group title="Router Console" packages="net.i2p.router.web:net.i2p.router.update:net.i2p.router.news" />
             <!-- apps and bridges starting here, alphabetical please -->
             <group title="Addressbook Application" packages="net.i2p.addressbook" />
             <group title="BOB Bridge" packages="net.i2p.BOB" />

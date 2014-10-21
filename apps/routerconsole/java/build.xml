@@ -81,6 +81,24 @@
         </javac>
     </target>
 
+    <!-- newsxml.jar only (subset of routerconsole, no war) for Android -->
+    <target name="compileNewsOnly" depends="prepare, depend, dependVersion">
+        <mkdir dir="./build" />
+        <mkdir dir="./build/obj" />
+        <javac 
+            srcdir="./src" 
+            includes="net/i2p/router/news/*.java"
+            debug="true" deprecation="on" source="${javac.version}" target="${javac.version}" 
+            includeAntRuntime="false"
+            destdir="./build/obj">
+            <compilerarg line="${javac.compilerargs}" />
+            <classpath>
+                <pathelement location="../../../core/java/build/i2p.jar" />
+                <pathelement location="../../../router/java/build/router.jar" />
+            </classpath>
+        </javac>
+    </target>
+
     <!-- the jar with the latest message classes from the jsps, and the war too -->
     <target name="jar" depends="jar1, war, bundle" />
 
@@ -116,6 +134,12 @@
                 <attribute name="Base-Revision" value="${workspace.version}" />
                 <attribute name="Workspace-Changes" value="${workspace.changes.j.tr}" />
             </manifest>
+        </jar>
+    </target>
+
+    <!-- newsxml.jar only (subset of routerconsole, no war) for Android -->
+    <target name="newsxmljar" depends="compileNewsOnly" >
+        <jar destfile="./build/newsxml.jar" basedir="./build/obj" includes="**/*.class">
         </jar>
     </target>
 

@@ -1,22 +1,37 @@
 package net.i2p.router.update;
 
+import java.io.BufferedWriter;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FilterInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.StringTokenizer;
 
+import net.i2p.crypto.SU3File;
 import net.i2p.crypto.TrustedUpdate;
 import net.i2p.data.DataHelper;
 import net.i2p.router.RouterContext;
 import net.i2p.router.RouterVersion;
+import net.i2p.router.news.NewsEntry;
+import net.i2p.router.news.NewsMetadata;
+import net.i2p.router.news.NewsXMLParser;
 import net.i2p.router.util.RFC822Date;
 import net.i2p.router.web.ConfigUpdateHandler;
 import net.i2p.router.web.NewsHelper;
@@ -26,6 +41,8 @@ import static net.i2p.update.UpdateMethod.*;
 import net.i2p.util.EepGet;
 import net.i2p.util.FileUtil;
 import net.i2p.util.Log;
+import net.i2p.util.ReusableGZIPInputStream;
+import net.i2p.util.SecureFileOutputStream;
 import net.i2p.util.SSLEepGet;
 import net.i2p.util.VersionComparator;
 
@@ -328,6 +345,10 @@ class NewsFetcher extends UpdateRunner {
         
         long now = _context.clock().now();
         if (_tempFile.exists()) {
+            if (url.endsWith(".su3")) {
+                processSU3();
+                return;
+            }
             boolean copied = FileUtil.copy(_tempFile, _newsFile, true, false);
             _tempFile.delete();
             if (copied) {
@@ -351,4 +372,111 @@ class NewsFetcher extends UpdateRunner {
     /** override to prevent status update */
     @Override
     public void transferFailed(String url, long bytesTransferred, long bytesRemaining, int currentAttempt) {}
+
+    /**
+     *  Process the fetched su3 news file _tempFile
+     *
+     *  @since 0.9.17
+     */
+    private void processSU3() {
+        SU3File su3 = new SU3File(_context, _tempFile);
+        File to1 = new File(_context.getTempDir(), "tmp-" + _context.random().nextInt() + ".xml");
+        File to2 = new File(_context.getTempDir(), "tmp2-" + _context.random().nextInt() + ".xml");
+        String sudVersion;
+        String signingKeyName;
+        try {
+            su3.verifyAndMigrate(to1);
+            int type = su3.getFileType();
+            if (type != SU3File.TYPE_XML && type != SU3File.TYPE_XML_GZ)
+                throw new IOException("bad file type");
+            if (su3.getContentType() != SU3File.CONTENT_NEWS)
+                throw new IOException("bad content type");
+            File xml;
+            if (type == SU3File.TYPE_XML_GZ) {
+                gunzip(to1, to2);
+                xml = to2;
+            } else {
+                xml = to1;
+            }
+            sudVersion = su3.getVersionString();
+            signingKeyName = su3.getSignerString();
+            NewsXMLParser parser = new NewsXMLParser(_context);
+            parser.parse(xml);
+            NewsMetadata data = parser.getMetadata();
+            List<NewsEntry> entries = parser.getEntries();
+            outputOldNewsXML(data, entries);
+        } catch (IOException ioe) {
+            // FIXME
+            //statusDone("<b>" + ioe + ' ' + _("from {0}", _currentURI.toString()) + " </b>");
+            _tempFile.delete();
+            to1.delete();
+            to2.delete();
+            return;
+        }
+    }
+
+    /**
+     *  Gunzip the file
+     *
+     *  @since 0.9.17
+     */
+    private static void gunzip(File from, File to) throws IOException {
+        ReusableGZIPInputStream in = ReusableGZIPInputStream.acquire();
+        OutputStream out = null;
+        try {
+            in.initialize(new FileInputStream(from));
+            out = new SecureFileOutputStream(to);
+            byte buf[] = new byte[4096];
+            int read;
+            while ((read = in.read(buf)) != -1) {
+                out.write(buf, 0, read);
+            }
+        } finally {
+            if (out != null) try { 
+                out.close(); 
+            } catch (IOException ioe) {}
+            ReusableGZIPInputStream.release(in);
+        }
+    }
+
+    /**
+     *  Output in the old format.
+     *  Yes there is a better way.
+     *
+     *  @since 0.9.17
+     */
+    private void outputOldNewsXML(NewsMetadata data, List<NewsEntry> entries) throws IOException {
+        Writer out = null;
+        try {
+            out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(_newsFile), "UTF-8"));
+            out.write("<!--\n");
+            out.write("<i2p.news date=\"$Date: 2014-09-20 00:00:00 $\">\n");
+            out.write("<i2p.release ");
+            if (data.i2pVersion != null)
+                out.write(" version=\"" + data.i2pVersion + '"');
+            if (data.minVersion != null)
+                out.write(" minVersion=\"" + data.minVersion + '"');
+            if (data.minJavaVersion != null)
+                out.write(" minJavaVersion=\"" + data.minJavaVersion + '"');
+            if (data.su2Torrent != null)
+                out.write(" su2Torrent=\"" + data.su2Torrent + '"');
+            if (data.su3Torrent != null)
+                out.write(" su3Torrent=\"" + data.su3Torrent + '"');
+            out.write("/>\n");
+            out.write("-->\n");
+            for (NewsEntry e : entries) {
+                if (e.title == null || e.content == null)
+                    continue;
+                out.write("<h3>");
+                out.write(e.title);
+                out.write("</h3>\n");
+                out.write(e.content);
+                out.write("\n\n");
+            }
+        } finally {
+            if (out != null) try { 
+                out.close(); 
+            } catch (IOException ioe) {}
+        }
+    }
 }

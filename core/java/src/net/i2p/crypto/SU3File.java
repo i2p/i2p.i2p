@@ -71,6 +71,8 @@ public class SU3File {
     public static final int TYPE_XML = 1;
     /** @since 0.9.15 */
     public static final int TYPE_HTML = 2;
+    /** @since 0.9.17 */
+    public static final int TYPE_XML_GZ = 3;
 
     public static final int CONTENT_UNKNOWN = 0;
     public static final int CONTENT_ROUTER = 1;

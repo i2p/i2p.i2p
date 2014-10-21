@@ -47,13 +47,12 @@ class NewsHandler extends UpdateHandler implements Checker {
             return null;
         List<URI> updateSources = new ArrayList<URI>(2);
         try {
-            // TODO SU3
+            // This may be su3 or xml
             updateSources.add(new URI(ConfigUpdateHelper.getNewsURL(_context)));
         } catch (URISyntaxException use) {}
         try {
-            // TODO
-            //updateSources.add(new URI(BACKUP_NEWS_URL_SU3));
-            updateSources.add(new URI(BACKUP_NEWS_URL));
+            //updateSources.add(new URI(BACKUP_NEWS_URL));
+            updateSources.add(new URI(BACKUP_NEWS_URL_SU3));
         } catch (URISyntaxException use) {}
         UpdateRunner update = new NewsFetcher(_context, _mgr, updateSources);
         return update;
