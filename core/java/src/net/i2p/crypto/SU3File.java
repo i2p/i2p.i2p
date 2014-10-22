@@ -66,6 +66,10 @@ public class SU3File {
     private static final int MIN_VERSION_BYTES = 16;
     private static final int VERSION_OFFSET = 40; // Signature.SIGNATURE_BYTES; avoid early ctx init
 
+    /**
+     *  The file type is advisory and is application-dependent.
+     *  The following values are defined but any value 0-255 is allowed.
+     */
     public static final int TYPE_ZIP = 0;
     /** @since 0.9.15 */
     public static final int TYPE_XML = 1;
@@ -81,6 +85,11 @@ public class SU3File {
     /** @since 0.9.15 */
     public static final int CONTENT_NEWS = 4;
 
+    /**
+     *  The ContentType is the trust domain for the content.
+     *  The signer and signature will be checked with the
+     *  trusted certificates for that type.
+     */
     private enum ContentType {
         UNKNOWN(CONTENT_UNKNOWN, "unknown"),
         ROUTER(CONTENT_ROUTER, "router"),
@@ -187,6 +196,10 @@ public class SU3File {
     }
 
     /**
+     *  The ContentType is the trust domain for the content.
+     *  The signer and signature will be checked with the
+     *  trusted certificates for that type.
+     *
      *  This does not check the signature, but it will fail if the signer is unknown,
      *  unless setVerifySignature(false) has been called.
      *
@@ -199,10 +212,13 @@ public class SU3File {
     }
 
     /**
+     *  The file type is advisory and is application-dependent.
+     *  The following values are defined but any value 0-255 is allowed.
+     *
      *  This does not check the signature, but it will fail if the signer is unknown,
      *  unless setVerifySignature(false) has been called.
      *
-     *  @return -1 if unknown
+     *  @return 0-255 or -1 if unknown
      *  @since 0.9.15
      */
     public int getFileType() throws IOException {
@@ -265,8 +281,9 @@ public class SU3File {
             throw new IOException("bad content length");
         skip(in, 1);
         _fileType = in.read();
-        if (_fileType != TYPE_ZIP && _fileType != TYPE_XML)
-            throw new IOException("bad file type");
+        // Allow any file type
+        //if (_fileType != TYPE_ZIP && _fileType != TYPE_XML)
+        //    throw new IOException("bad file type");
         skip(in, 1);
         int cType = in.read();
         _contentType = BY_CODE.get(Integer.valueOf(cType));
@@ -625,6 +642,9 @@ public class SU3File {
         buf.append("Available file types (-f):\n");
         buf.append("      ZIP\t(code: 0) DEFAULT\n");
         buf.append("      XML\t(code: 1)\n");
+        buf.append("      HTML\t(code: 2)\n");
+        buf.append("      XML_GZ\t(code: 3)\n");
+        buf.append("      (user defined)\t(code: 4-255)\n");
         return buf.toString();
     }
 
@@ -743,16 +763,22 @@ public class SU3File {
                 ft = TYPE_ZIP;
             } else if (ftype.equalsIgnoreCase("XML")) {
                 ft = TYPE_XML;
+            } else if (ftype.equalsIgnoreCase("HTML")) {
+                ft = TYPE_HTML;
+            } else if (ftype.equalsIgnoreCase("XML_GZ")) {
+                ft = TYPE_XML_GZ;
             } else {
                 try {
                     ft = Integer.parseInt(ftype);
                 } catch (NumberFormatException nfe) {
                     ft = -1;
                 }
-                if (ft != TYPE_ZIP && ft != TYPE_XML) {
+                if (ft < 0 || ft > 255) {
                     System.out.println("File type " + ftype + " is not supported");
                     return false;
                 }
+                if (ft  > TYPE_XML_GZ)
+                    System.out.println("Warning: File type " + ftype + " is undefined");
             }
         }
         return signCLI(type, ct, ft, inputFile, signedFile, privateKeyFile, version, signerName, keypw);

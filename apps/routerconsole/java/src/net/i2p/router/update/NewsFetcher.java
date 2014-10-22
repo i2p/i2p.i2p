@@ -16,6 +16,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -345,11 +346,19 @@ class NewsFetcher extends UpdateRunner {
         
         long now = _context.clock().now();
         if (_tempFile.exists()) {
+            File from;
             if (url.endsWith(".su3")) {
-                processSU3();
-                return;
+                try {
+                    from = processSU3();
+                } catch (IOException ioe) {
+                    _log.error("Failed to extract the news file", ioe);
+                    _tempFile.delete();
+                    return;
+                }
+            } else {
+                from = _tempFile;
             }
-            boolean copied = FileUtil.copy(_tempFile, _newsFile, true, false);
+            boolean copied = FileUtil.copy(from, _newsFile, true, false);
             _tempFile.delete();
             if (copied) {
                 String newVer = Long.toString(now);
@@ -374,44 +383,47 @@ class NewsFetcher extends UpdateRunner {
     public void transferFailed(String url, long bytesTransferred, long bytesRemaining, int currentAttempt) {}
 
     /**
-     *  Process the fetched su3 news file _tempFile
+     *  Process the fetched su3 news file _tempFile.
+     *  Handles 3 types of contained files: xml.gz (preferred), xml, and html (old format fake xml)
      *
+     *  @return the temp file contining the HTML-format news.xml
      *  @since 0.9.17
      */
-    private void processSU3() {
+    private File processSU3() throws IOException {
         SU3File su3 = new SU3File(_context, _tempFile);
+        // real xml, maybe gz, maybe not
         File to1 = new File(_context.getTempDir(), "tmp-" + _context.random().nextInt() + ".xml");
+        // real xml
         File to2 = new File(_context.getTempDir(), "tmp2-" + _context.random().nextInt() + ".xml");
-        String sudVersion;
-        String signingKeyName;
         try {
             su3.verifyAndMigrate(to1);
             int type = su3.getFileType();
-            if (type != SU3File.TYPE_XML && type != SU3File.TYPE_XML_GZ)
-                throw new IOException("bad file type");
             if (su3.getContentType() != SU3File.CONTENT_NEWS)
-                throw new IOException("bad content type");
+                throw new IOException("bad content type: " + su3.getContentType());
+            if (type == SU3File.TYPE_HTML)
+                return to1;
+            if (type != SU3File.TYPE_XML && type != SU3File.TYPE_XML_GZ)
+                throw new IOException("bad file type: " + type);
             File xml;
             if (type == SU3File.TYPE_XML_GZ) {
                 gunzip(to1, to2);
                 xml = to2;
+                to1.delete();
             } else {
                 xml = to1;
             }
-            sudVersion = su3.getVersionString();
-            signingKeyName = su3.getSignerString();
             NewsXMLParser parser = new NewsXMLParser(_context);
             parser.parse(xml);
+            xml.delete();
             NewsMetadata data = parser.getMetadata();
             List<NewsEntry> entries = parser.getEntries();
-            outputOldNewsXML(data, entries);
-        } catch (IOException ioe) {
-            // FIXME
-            //statusDone("<b>" + ioe + ' ' + _("from {0}", _currentURI.toString()) + " </b>");
-            _tempFile.delete();
-            to1.delete();
+            String sudVersion = su3.getVersionString();
+            String signingKeyName = su3.getSignerString();
+            File to3 = new File(_context.getTempDir(), "tmp3-" + _context.random().nextInt() + ".xml");
+            outputOldNewsXML(data, entries, sudVersion, signingKeyName, to3);
+            return to3;
+        } finally {
             to2.delete();
-            return;
         }
     }
 
@@ -441,15 +453,22 @@ class NewsFetcher extends UpdateRunner {
 
     /**
      *  Output in the old format.
-     *  Yes there is a better way.
      *
      *  @since 0.9.17
      */
-    private void outputOldNewsXML(NewsMetadata data, List<NewsEntry> entries) throws IOException {
+    private void outputOldNewsXML(NewsMetadata data, List<NewsEntry> entries,
+                                  String sudVersion, String signingKeyName, File to) throws IOException {
         Writer out = null;
         try {
-            out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(_newsFile), "UTF-8"));
+            out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(to), "UTF-8"));
             out.write("<!--\n");
+            // su3 and feed metadata
+            out.write("** News version:\t" + DataHelper.stripHTML(sudVersion) + '\n');
+            out.write("** Signed by:\t" + signingKeyName + '\n');
+            out.write("** Feed:\t" + DataHelper.stripHTML(data.feedTitle) + '\n');
+            out.write("** Feed ID:\t" + DataHelper.stripHTML(data.feedID) + '\n');
+            out.write("** Feed Date:\t" + (new Date(data.feedUpdated)) + "UTC\n");
+            // update metadata
             out.write("<i2p.news date=\"$Date: 2014-09-20 00:00:00 $\">\n");
             out.write("<i2p.release ");
             if (data.i2pVersion != null)
@@ -464,9 +483,12 @@ class NewsFetcher extends UpdateRunner {
                 out.write(" su3Torrent=\"" + data.su3Torrent + '"');
             out.write("/>\n");
             out.write("-->\n");
+            if (entries == null)
+                return;
             for (NewsEntry e : entries) {
                 if (e.title == null || e.content == null)
                     continue;
+                out.write("<!-- Entry Date: " + (new Date(e.updated)) + "UTC -->\n");
                 out.write("<h3>");
                 out.write(e.title);
                 out.write("</h3>\n");

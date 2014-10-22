@@ -15,6 +15,7 @@ import java.util.Set;
 
 import net.i2p.I2PAppContext;
 import net.i2p.util.Log;
+import org.cybergarage.util.Debug;
 import org.cybergarage.xml.Node;
 import org.cybergarage.xml.ParserException;
 import org.cybergarage.xml.parser.JaxpParser;
@@ -329,7 +330,9 @@ public class NewsXMLParser {
 
     public static void main(String[] args) {
         try {
-            NewsXMLParser parser = new NewsXMLParser(new I2PAppContext());
+            I2PAppContext ctx = new I2PAppContext();
+            Debug.initialize(ctx);
+            NewsXMLParser parser = new NewsXMLParser(ctx);
             parser.setXHTMLMode(XHTMLMode.ABORT);
             //parser.setXHTMLMode(XHTMLMode.REMOVE_ELEMENT);
             //parser.setXHTMLMode(XHTMLMode.SKIP_ENTRY);
