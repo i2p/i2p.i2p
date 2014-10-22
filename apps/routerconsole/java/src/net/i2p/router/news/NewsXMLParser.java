@@ -18,7 +18,6 @@ import net.i2p.util.Log;
 import org.cybergarage.util.Debug;
 import org.cybergarage.xml.Node;
 import org.cybergarage.xml.ParserException;
-import org.cybergarage.xml.parser.JaxpParser;
 
 /**
  *  Parse out the news.xml file which is in Atom format (RFC4287).
@@ -39,7 +38,9 @@ public class NewsXMLParser {
         "del", "ins", "em", "strong", "mark", "sub", "sup", "tt", "code", "strike", "s", "u",
         "h4", "h5", "h6",
         "ol", "ul", "li", "dl", "dt", "dd",
-        "table", "tr", "td", "th"
+        "table", "tr", "td", "th",
+        // put in by parser
+        XMLParser.TEXT_NAME
     }));
 
     /**
@@ -94,7 +95,7 @@ public class NewsXMLParser {
     public void parse(InputStream in) throws IOException {
         _entries = null;
         _metadata = null;
-        JaxpParser parser = new JaxpParser();
+        XMLParser parser = new XMLParser(_context);
         try {
             Node root = parser.parse(in);
             extract(root);
@@ -255,7 +256,7 @@ public class NewsXMLParser {
                     }
                     if (e == null)
                         break;
-                    buf.append(sn.toString());
+                    XMLParser.toString(buf, sn);
                 }
                 if (e == null)
                     continue;
