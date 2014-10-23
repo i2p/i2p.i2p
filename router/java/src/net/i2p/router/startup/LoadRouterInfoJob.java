@@ -66,7 +66,7 @@ class LoadRouterInfoJob extends JobImpl {
     }
     
     /**
-     *  Loads router.info and router.keys2 or router.keys.
+     *  Loads router.info and either router.keys.dat or router.keys.
      *
      *  See CreateRouterInfoJob for file formats
      */
