@@ -1,3 +1,10 @@
+2014-10-23 zzz
+ * SessionKeyManager:
+   - Raise inbound limit
+   - Delete oldest tagsets when limit is hit
+   - Don't delete recent tagsets when limit is hit
+ * SSL: Don't prohibit SSLv3 ciphers if that's all we have
+
 2014-10-20 zzz
  * Console: Fix lockups (ticket #1395)
  * Eepsite Jetty: Switch back to QueuedThreadPool (ticket #1395)
