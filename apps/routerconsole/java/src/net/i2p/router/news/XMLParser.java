@@ -146,8 +146,7 @@ public class XMLParser extends JaxpParser {
             return;
         }
         
-        String indentString = node.getIndentLevelString(indentLevel);
-        buf.append(indentString).append('<').append(name);
+        buf.append('<').append(name);
         int nAttributes = node.getNAttributes();
         for (int n = 0; n < nAttributes; n++) {
             Attribute attr = node.getAttribute(n);
@@ -157,18 +156,20 @@ public class XMLParser extends JaxpParser {
         // As in Node, output either the nodes or the value.
         // If mixed values and nodes, the values must be text nodes. See parser above.
         if (node.hasNodes()) {        
-            buf.append(">\n");
+            buf.append('>');
             int nChildNodes = node.getNNodes();
             for (int n = 0; n < nChildNodes; n++) {
                 Node cnode = node.getNode(n);
                 output(buf, cnode, indentLevel + 1);
             }
-            buf.append(indentString).append("</").append(name).append(">\n");
+            buf.append("</").append(name).append('>');
         } else {
-            if (value == null || value.length() == 0)
-                buf.append("/>");
-            else
+            if (value == null || value.length() == 0) {
+                // space for <br />
+                buf.append(" />");
+            } else {
                 buf.append('>').append(value).append("</").append(name).append('>');
+            }
         }
     }
 }
