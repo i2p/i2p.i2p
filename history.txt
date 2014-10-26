@@ -1,3 +1,9 @@
+2014-10-26 zzz
+ * SSU: Fix ACK Sender thread dying on corrupt packet
+
+2014-10-24 zzz
+ * i2ptunnel: Fix description entered via wizard
+
 2014-10-23 zzz
  * SessionKeyManager:
    - Raise inbound limit
