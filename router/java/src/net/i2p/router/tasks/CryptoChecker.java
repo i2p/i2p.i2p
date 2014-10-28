@@ -39,7 +39,7 @@ public class CryptoChecker {
                 }
                 String s = "Crypto " + t + " is not available";
                 if (log != null)
-                    log.logAlways(log.WARN, s);
+                    log.logAlways(Log.WARN, s);
                 System.out.println("Warning: " + s);
             }
         }
@@ -49,12 +49,12 @@ public class CryptoChecker {
                        System.getProperty("os.arch") + ' ' +
                        System.getProperty("os.version");
             if (log != null)
-                log.logAlways(log.WARN, s);
+                log.logAlways(Log.WARN, s);
             System.out.println("Warning: " + s);
             if (!SystemVersion.isJava7()) {
                 s = "Please consider upgrading to Java 7";
                 if (log != null)
-                    log.logAlways(log.WARN, s);
+                    log.logAlways(Log.WARN, s);
                 System.out.println(s);
             }
             if (!isUnlimited()) {
@@ -66,12 +66,12 @@ public class CryptoChecker {
                 //else
                     s  += JRE6;
                 if (log != null)
-                    log.logAlways(log.WARN, s);
+                    log.logAlways(Log.WARN, s);
                 System.out.println(s);
             }
             s = "This crypto will be required in a future release";
             if (log != null)
-                log.logAlways(log.WARN, s);
+                log.logAlways(Log.WARN, s);
             System.out.println("Warning: " + s);
         } else if (ctx == null) {
             // called from main()
