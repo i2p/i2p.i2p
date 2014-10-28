@@ -209,6 +209,7 @@ public class RouterConsoleRunner implements RouterApp {
     /** @since 0.9.4 */
     public synchronized void startup() {
         changeState(STARTING);
+        checkJavaVersion();
         startTrayApp(_context);
         startConsole();
     }
@@ -282,6 +283,22 @@ public class RouterConsoleRunner implements RouterApp {
             }
         } catch (Throwable t) {
             t.printStackTrace();
+        }
+    }
+
+    /** @since 0.9.17 */
+    private void checkJavaVersion() {
+        if (!SystemVersion.isJava7()) {
+            String s = "Java version: " + System.getProperty("java.version") +
+                       " OS: " + System.getProperty("os.name") + ' ' +
+                       System.getProperty("os.arch") + ' ' +
+                       System.getProperty("os.version");
+            net.i2p.util.Log log = _context.logManager().getLog(RouterConsoleRunner.class);
+            log.logAlways(net.i2p.util.Log.WARN, s);
+            System.out.println("Warning: " + s);
+            s = "Java 7 will be required by mid-2015, please upgrade soon";
+            log.logAlways(net.i2p.util.Log.WARN, s);
+            System.out.println("Warning: " + s);
         }
     }
 
