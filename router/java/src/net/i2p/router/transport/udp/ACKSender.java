@@ -84,7 +84,18 @@ class ACKSender implements Runnable {
     }
     
     public void run() {
+        try {
+            run2();
+        } finally {
+            // prevent OOM on thread death
+            if (_alive) {
+                _alive = false;
+                _log.error("ACK Sender died");
+            }
+        }
+    }
 
+    private void run2() {
         // we use a Set to strip out dups that come in on the Queue
         Set<PeerState> notYet = new HashSet<PeerState>();
         while (_alive) {
