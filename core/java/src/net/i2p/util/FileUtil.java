@@ -109,8 +109,12 @@ public class FileUtil {
             Enumeration<? extends ZipEntry> entries = zip.entries();
             while (entries.hasMoreElements()) {
                 ZipEntry entry = (ZipEntry)entries.nextElement();
-                if (entry.getName().indexOf("..") != -1) {
+                if (entry.getName().contains("..")) {
                     System.err.println("ERROR: Refusing to extract a zip entry with '..' in it [" + entry.getName() + "]");
+                    return false;
+                }
+                if (entry.getName().indexOf(0) >= 0) {
+                    System.err.println("ERROR: Refusing to extract a zip entry with null in it [" + entry.getName() + "]");
                     return false;
                 }
                 File target = new File(targetDir, entry.getName());
