@@ -1848,19 +1848,20 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             return null;
         
         OrderedProperties options = new OrderedProperties(); 
-        boolean directIncluded = false;
+        boolean directIncluded;
         // DNS name assumed IPv4
         boolean isIPv6 = host != null && host.contains(":");
-        if (allowDirectUDP() && port > 0 && host != null) {
-            // TODO don't add these if we have (or require?) introducers
+        boolean introducersRequired = (!isIPv6) && introducersRequired();
+        if (!introducersRequired && allowDirectUDP() && port > 0 && host != null) {
             options.setProperty(UDPAddress.PROP_PORT, String.valueOf(port));
             options.setProperty(UDPAddress.PROP_HOST, host);
             directIncluded = true;
+        } else {
+            directIncluded = false;
         }
         
-        boolean introducersRequired = (!isIPv6) && introducersRequired();
         boolean introducersIncluded = false;
-        if (introducersRequired || !directIncluded) {
+        if (introducersRequired) {
             // FIXME intro manager doesn't sort introducers, so
             // deepEquals() below can fail even with same introducers.
             // Only a problem when we have very very few peers to pick from.
@@ -1872,9 +1873,6 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 _introducersSelectedOn = _context.clock().now();
                 introducersIncluded = true;
             } else {
-                // FIXME
-                // maybe we should fail to publish an address at all in this case?
-                // YES that would be better
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Direct? " + directIncluded + " reqd? " + introducersRequired +
                               " no introducers");
