@@ -1260,8 +1260,7 @@ public class Router implements RouterClock.ClockShiftListener {
      *  libs will get loaded.
      */
     private void deleteJbigiFiles() {
-            String osArch = System.getProperty("os.arch");
-            boolean isX86 = osArch.contains("86") || osArch.equals("amd64");
+            boolean isX86 = SystemVersion.isX86();
             String osName = System.getProperty("os.name").toLowerCase(Locale.US);
             boolean isWin = SystemVersion.isWindows();
             boolean isMac = SystemVersion.isMac();
