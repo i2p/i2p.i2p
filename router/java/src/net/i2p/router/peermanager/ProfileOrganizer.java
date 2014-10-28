@@ -1355,7 +1355,7 @@ public class ProfileOrganizer {
             
         RouterInfo info = _context.netDb().lookupRouterInfoLocally(peer);
         if (null != info) {
-            if (info.getIdentity().isHidden()) {
+            if (info.isHidden()) {
                if (_log.shouldLog(Log.WARN))
                     _log.warn("Peer " + peer.toBase64() + " is marked as hidden, disallowing its use");
                 return false;

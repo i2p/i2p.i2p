@@ -131,7 +131,7 @@ class PeerSelector {
             RouterInfo info = _context.netDb().lookupRouterInfoLocally(entry);
             if (info == null)
                 return;
-            if (info.getIdentity().isHidden())
+            if (info.isHidden())
                 return;
             
             BigInteger diff = HashDistance.getDistance(_key, entry);

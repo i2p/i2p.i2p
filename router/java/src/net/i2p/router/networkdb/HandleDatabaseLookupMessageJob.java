@@ -154,19 +154,11 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
                    lookupType != DatabaseLookupMessage.Type.LS) {
             RouterInfo info = (RouterInfo) dbe;
             if (info.isCurrent(EXPIRE_DELAY)) {
-                if ( (info.getIdentity().isHidden()) || (isUnreachable(info) && !publishUnreachable()) ) {
+                if ( (info.isHidden()) || (isUnreachable(info) && !publishUnreachable()) ) {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Not answering a query for a netDb peer who isn't reachable");
                     Set<Hash> us = Collections.singleton(getContext().routerHash());
                     sendClosest(_message.getSearchKey(), us, fromKey, _message.getReplyTunnel());
-                //} else if (info.isHidden()) {
-                //    // Don't return hidden nodes
-                //    ERR: we don't want to explicitly reject lookups for hidden nodes, since they
-                //         may have just sent the hidden mode to only us and bundled a lookup with
-                //         a payload targetting some hidden destination (and if we refused to answer,
-                //         yet answered the bundled data message [e.g. HTTP GET], they'd know that
-                //         *we* were hosting that destination).  To operate safely,
-                //         perhaps we should refuse to honor lookups bundled down client tunnels?
                 } else {
                     // send that routerInfo to the _message.getFromHash peer
                     if (_log.shouldLog(Log.DEBUG))

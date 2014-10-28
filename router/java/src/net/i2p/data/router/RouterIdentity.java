@@ -29,6 +29,11 @@ public class RouterIdentity extends KeysAndCert {
      * nor queried for the netDb, and that disclosure of their contact information
      * should be limited.
      *
+     * This is ONLY if the certificate is a hidden type.
+     * Hidden mode may also be specified with a capability in the RouterInfo.
+     *
+     * Not recommended for direct use.
+     * Use of RouterInfo.isHidden() (which calls this) is preferred.
      */
     public boolean isHidden() {
         return (_certificate != null) && (_certificate.getCertificateType() == Certificate.CERTIFICATE_TYPE_HIDDEN);
