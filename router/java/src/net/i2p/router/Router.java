@@ -49,6 +49,7 @@ import net.i2p.util.FortunaRandomSource;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
+import net.i2p.util.NativeBigInteger;
 import net.i2p.util.OrderedProperties;
 import net.i2p.util.SecureFileOutputStream;
 import net.i2p.util.SimpleByteCache;
@@ -102,6 +103,7 @@ public class Router implements RouterClock.ClockShiftListener {
     public final static String PROP_SHUTDOWN_IN_PROGRESS = "__shutdownInProgress";
     public final static String DNS_CACHE_TIME = "" + (5*60);
     private static final String EVENTLOG = "eventlog.txt";
+    private static final String PROP_JBIGI = "jbigi.loadedResource";
         
     private static final String originalTimeZoneID;
     static {
@@ -750,6 +752,9 @@ public class Router implements RouterClock.ClockShiftListener {
         _context.random().nextBoolean();
         // Instantiate to fire up the YK refiller thread
         _context.elGamalEngine();
+        String loaded = NativeBigInteger.getLoadedResourceName();
+        if (loaded != null)
+            saveConfig(PROP_JBIGI, loaded);
     }
     
     private void startupQueue() {
