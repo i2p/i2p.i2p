@@ -872,7 +872,7 @@ public class Snark
     }
 
     /**
-     *  Bytes still wanted. DOES account for skipped files.
+     *  Bytes still wanted. DOES account for (i.e. does not include) skipped files.
      *  FIXME -1 when not running.
      *  @return exact value. or -1 if no storage yet or when not running.
      *  @since 0.9.1
@@ -885,7 +885,7 @@ public class Snark
     }
 
     /**
-     *  Does not account for skipped files.
+     *  Does not account (i.e. includes) for skipped files.
      *  @return number of pieces still needed (magnet mode or not), or -1 if unknown
      *  @since 0.8.4
      */
