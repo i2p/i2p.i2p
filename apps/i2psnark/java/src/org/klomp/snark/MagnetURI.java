@@ -175,18 +175,25 @@ public class MagnetURI {
     }
 
     /**
-     *  Decode %xx encoding, convert to UTF-8 if necessary
-     *  Copied from i2ptunnel LocalHTTPServer
+     *  Decode %xx encoding, convert to UTF-8 if necessary.
+     *  Copied from i2ptunnel LocalHTTPServer.
+     *  Also converts '+' to ' ' so the dn parameter comes out right
+     *  These are coming in via a application/x-www-form-urlencoded form so
+     *  the pluses are in there...
+     *  hopefully any real + is encoded as %2B.
+     *
      *  @since 0.9.1
      */
     private static String decode(String s) {
-        if (!s.contains("%"))
+        if (!(s.contains("%") || s.contains("+")))
             return s;
         StringBuilder buf = new StringBuilder(s.length());
         boolean utf8 = false;
         for (int i = 0; i < s.length(); i++) {
             char c = s.charAt(i);
-            if (c != '%') {
+            if (c == '+') {
+                buf.append(' ');
+            } else if (c != '%') {
                 buf.append(c);
             } else {
                 try {
