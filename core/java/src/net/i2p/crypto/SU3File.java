@@ -683,6 +683,20 @@ public class SU3File {
                 System.out.println("Signer:   " + signerString);
             if (file._sigType != null)
                 System.out.println("SigType:  " + file._sigType);
+            if (file._contentType != null)
+                System.out.println("Content:  " + file._contentType);
+            String ftype;
+            if (file._fileType == TYPE_ZIP)
+                ftype = "ZIP";
+            else if (file._fileType == TYPE_XML)
+                ftype = "XML";
+            else if (file._fileType == TYPE_HTML)
+                ftype = "HTML";
+            else if (file._fileType == TYPE_XML_GZ)
+                ftype = "XML_GZ";
+            else
+                ftype = Integer.toString(file._fileType);
+                System.out.println("FileType: " + ftype);
             return !versionString.equals("");
         } catch (IOException ioe) {
             ioe.printStackTrace();
