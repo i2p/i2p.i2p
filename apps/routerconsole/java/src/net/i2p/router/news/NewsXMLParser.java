@@ -351,6 +351,7 @@ public class NewsXMLParser {
             }
         } catch (IOException ioe) {
             ioe.printStackTrace();
+            System.exit(1);
         }
     }
 }

@@ -22,12 +22,6 @@
     net.i2p.router.RouterContext ctx = (net.i2p.router.RouterContext) net.i2p.I2PAppContext.getGlobalContext();
 
     /*
-     *  Print out the status for the NetDB
-     */
-    out.print("<h2>Router DHT</h2>");
-    ctx.netDb().renderStatusHTML(out);
-
-    /*
      *  Print out the status for the UpdateManager
      */
     net.i2p.app.ClientAppManager cmgr = ctx.clientAppManager();
@@ -58,5 +52,12 @@
             skm.renderStatusHTML(out);
         }
     }
+
+    /*
+     *  Print out the status for the NetDB
+     */
+    out.print("<h2>Router DHT</h2>");
+    ctx.netDb().renderStatusHTML(out);
+
 %>
 </div></body></html>

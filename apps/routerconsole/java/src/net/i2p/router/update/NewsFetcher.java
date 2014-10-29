@@ -358,11 +358,12 @@ class NewsFetcher extends UpdateRunner {
             } else {
                 from = _tempFile;
             }
-            boolean copied = FileUtil.copy(from, _newsFile, true, false);
+            boolean copied = FileUtil.rename(from, _newsFile);
             _tempFile.delete();
             if (copied) {
                 String newVer = Long.toString(now);
                 _context.router().saveConfig(NewsHelper.PROP_LAST_UPDATED, newVer);
+                // fixme su3 version ? but it will be older than file version, which is older than now.
                 _mgr.notifyVersionAvailable(this, _currentURI, NEWS, "", HTTP,
                                             null, newVer, "");
                 _isNewer = true;
@@ -462,14 +463,7 @@ class NewsFetcher extends UpdateRunner {
         try {
             out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(to), "UTF-8"));
             out.write("<!--\n");
-            // su3 and feed metadata
-            out.write("** News version:\t" + DataHelper.stripHTML(sudVersion) + '\n');
-            out.write("** Signed by:\t" + signingKeyName + '\n');
-            out.write("** Feed:\t" + DataHelper.stripHTML(data.feedTitle) + '\n');
-            out.write("** Feed ID:\t" + DataHelper.stripHTML(data.feedID) + '\n');
-            out.write("** Feed Date:\t" + (new Date(data.feedUpdated)) + "UTC\n");
-            // update metadata
-            out.write("<i2p.news date=\"$Date: 2014-09-20 00:00:00 $\">\n");
+            // update metadata in old format
             out.write("<i2p.release ");
             if (data.i2pVersion != null)
                 out.write(" version=\"" + data.i2pVersion + '"');
@@ -482,13 +476,19 @@ class NewsFetcher extends UpdateRunner {
             if (data.su3Torrent != null)
                 out.write(" su3Torrent=\"" + data.su3Torrent + '"');
             out.write("/>\n");
+            // su3 and feed metadata for debugging
+            out.write("** News version:\t" + DataHelper.stripHTML(sudVersion) + '\n');
+            out.write("** Signed by:\t" + signingKeyName + '\n');
+            out.write("** Feed:\t" + DataHelper.stripHTML(data.feedTitle) + '\n');
+            out.write("** Feed ID:\t" + DataHelper.stripHTML(data.feedID) + '\n');
+            out.write("** Feed Date:\t" + (new Date(data.feedUpdated)) + '\n');
             out.write("-->\n");
             if (entries == null)
                 return;
             for (NewsEntry e : entries) {
                 if (e.title == null || e.content == null)
                     continue;
-                out.write("<!-- Entry Date: " + (new Date(e.updated)) + "UTC -->\n");
+                out.write("<!-- Entry Date: " + (new Date(e.updated)) + " -->\n");
                 out.write("<h3>");
                 out.write(e.title);
                 out.write("</h3>\n");
