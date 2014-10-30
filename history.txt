@@ -1,3 +1,6 @@
+2014-10-30 zzz
+ * Router: Fix rare NPE building garlic message (ticket #1403)
+
 2014-10-26 zzz
  * SSU: Fix ACK Sender thread dying on corrupt packet
 
