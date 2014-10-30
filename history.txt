@@ -1,3 +1,9 @@
+2014-10-30 kytv
+ * Updates to geoip.txt and geoipv6.dat.gz based on Maxmind GeoLite Country
+   database from 2014-10-07.
+ * Arabic, Chinese, Czech, Dutch, French, German, Russian, and Spanish
+   translation updates from Transifex
+
 2014-10-23 zzz
  * SessionKeyManager:
    - Raise inbound limit
