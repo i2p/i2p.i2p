@@ -4,6 +4,15 @@
  * Arabic, Chinese, Czech, Dutch, French, German, Russian, and Spanish
    translation updates from Transifex
 
+2014-10-30 zzz
+ * Router: Fix rare NPE building garlic message (ticket #1403)
+
+2014-10-26 zzz
+ * SSU: Fix ACK Sender thread dying on corrupt packet
+
+2014-10-24 zzz
+ * i2ptunnel: Fix description entered via wizard
+
 2014-10-23 zzz
  * SessionKeyManager:
    - Raise inbound limit
@@ -539,7 +548,7 @@ Prop from i2p.i2p.zzz.test2:
 
 2014-05-15 kytv
  * Translations, imported from Transifex:
-   - Dutch, French, German, Italian, Japanese, Norwegian Bokmål, and Ukrainian
+   - Dutch, French, German, Italian, Japanese, Norwegian Bokml, and Ukrainian
      translation updates
    - Start of Slovak language translation
  * Updates to geoip.txt and geoipv6.dat.gz based on Maxmind GeoLite Country
@@ -2106,7 +2115,7 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
    transifex.
 
 2013-02-13 kytv
- * Flag for Curaçao (CW), public domain
+ * Flag for Curaao (CW), public domain
 
 2013-02-12 zzz
  * NetDB: Randomize delay before floodfill store verify
@@ -2133,8 +2142,8 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
      - Allow any domain name to be mapped, not just .i2p
 
 2013-01-31 kytv
- * Add Norwegian Bokmål language to the router console
- * Add Bokmål translations from Transifex
+ * Add Norwegian Bokml language to the router console
+ * Add Bokml translations from Transifex
 
 2013-01-31 zzz
  * EepGet:
@@ -5023,7 +5032,7 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
     * Reseed: Log tweak
 
 2011-04-02 m1xxy
-    * routerconsole, i2psnark, ...  I2P ahora también en español: ¡Bienvenidos los hispanohablantes!
+    * routerconsole, i2psnark, ...  I2P ahora tambin en espaol: Bienvenidos los hispanohablantes!
       - routerconsole, i2ptunnel, i2psnark, SusiDNS, Susimail fully translated into Spanish
         (thx to PunkiBastardo and user)
     * routerconsole, i2psnark, ...
@@ -7165,7 +7174,7 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
       - Java 5 cleanups
     * Console:
       - Put favicon on every page
-      - Make every page UTF-8, ☃ safe for snowmen
+      - Make every page UTF-8,  safe for snowmen
       - Remove options boxes on configtunnels.jsp
       - Fix UTF-8 form submission (i2ptunnel too)
       - Throw 403 instead of 404 from flags.jsp and viewstat.jsp
