@@ -5,14 +5,15 @@
 # 
 # Translators:
 # tengo <akin@rbcmail.ru>, 2013
+# rlagutin <rlagutin@tradingview.com>, 2014
 # tengo <akin@rbcmail.ru>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-07-13 21:46+0000\n"
-"PO-Revision-Date: 2014-02-25 11:14+0000\n"
-"Last-Translator: The_Keeper <alexdyomin@mail.ru>\n"
+"PO-Revision-Date: 2014-10-27 15:59+0000\n"
+"Last-Translator: rlagutin <rlagutin@tradingview.com>\n"
 "Language-Team: Russian (Russia) (http://www.transifex.com/projects/p/I2P/language/ru_RU/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -38,7 +39,7 @@ msgstr "Пока Вы ждете, самое время зайти в {2}сет�
 
 msgid ""
 "Also you can setup your browser to use the I2P proxy to reach eepsites."
-msgstr "Вы также можете настроить браузер на использование I2P-прокси чтобы иметь доступ к I2P-сайтам (eepsites)."
+msgstr "Вы также можете настроить браузер на использование I2P-прокси, чтобы иметь доступ к I2P-сайтам (eepsites)."
 
 msgid ""
 "Just enter 127.0.0.1 (or localhost) port 4444 as a http proxy into your "

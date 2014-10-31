@@ -1,3 +1,40 @@
+i2p (0.9.16-1) UNRELEASED; urgency=medium
+
+  * New upstream release
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Thu, 30 Oct 2014 20:07:50 +0000
+
+i2p (0.9.15-1) unstable; urgency=medium
+
+  * New Upstream release
+    - Add support for Ed25519 signatures
+    - i2psnark move to separate config file for each torrent to better support
+      per-torrent settings
+    - Add i2psnark support for data outside the i2psnark/ directory
+    - Enable stronger signatures (su3 format) for plugins
+    - Speed up SSU introductions by responding to hole punch messages
+    - Several improvements in SAM efficiency
+    - More HTML escaping and form submission fixes in the console and i2psnark
+    - Streaming fixes for long signatures
+    - i2psnark fixes for file name character mapping when seeding
+    - I2PTunnel fixes stopping client tunnels
+    - I2PTunnel fix updating options on a running delay-open client tunnel
+    - Re-enable plugin installation via the console, removed in 0.9.14
+    - i2psnark now remembers uploaded count across restarts
+    - i2psnark increase max piece size to 8 MB
+    - i2psnark several UI fixes
+    - Prohibit SSU peer test requests unless a connection is established
+    - i2ptunnel add support for local SSL connections for standard and IRC
+      client tunnels
+    - Console and log warnings for unavailable crypto
+    - More consistent routing for Delivery Status Messages to reduce network
+      connections
+    - Disable external entities in UPnP XML parser
+    - Translation updates
+    - Update GeoIP data
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Sun, 21 Sep 2014 00:07:36 +0000
+
 i2p (0.9.14.1-1) unstable; urgency=medium
 
   * New upstream point release, 0.9.14.1
@@ -6,10 +43,14 @@ i2p (0.9.14.1-1) unstable; urgency=medium
     - Console:
       + Fix update buttons
       + Don't filter parameter names starting with "nofilter_"
-      + Re-allow configadvanced, news URL, and unsigned update URL if routerconsole.advanced=true
-      + Re-allow plugin install if routerconsole.advanced=true or routerconsole.enablePluginInstall=true
-      + Only allow whitelisted plugin signers, unless routerconsole.allowUntrustedPlugins=true
-      + Re-allow clients.config changes if routerconsole.advanced=true or routerconsole.enableClientChange=true
+      + Re-allow configadvanced, news URL, and unsigned update URL if
+        routerconsole.advanced=true
+      + Re-allow plugin install if routerconsole.advanced=true or
+        routerconsole.enablePluginInstall=true
+      + Only allow whitelisted plugin signers, unless
+        routerconsole.allowUntrustedPlugins=true
+      + Re-allow clients.config changes if routerconsole.advanced=true or
+        routerconsole.enableClientChange=true
       + More escaping
     - i2psnark: Fix add torrent form
     - ExecNamingService: Remove
@@ -33,10 +74,12 @@ i2p (0.9.14-1) unstable; urgency=high
     - Several i2psnark improvements and fixes (GUI and DHT), including changes
       for better compatibility with Vuze
   * Other
-    - Reseeding now fetches a signed zip file containing router infos for security and speed
+    - Reseeding now fetches a signed zip file containing router infos for
+      security and speed
     - Use JVM's AES implementation if it is faster
     - More advanced options shown in the i2ptunnel edit pages
-    - Per-message reliabilitiy settings in I2CP and error propagation back from router to client
+    - Per-message reliabilitiy settings in I2CP and error propagation back
+      from router to client
     - Lots of findbugs fixes and cleanups
     - Support signature types in SAM, bump rev to 3.1
     - New event log page in console
