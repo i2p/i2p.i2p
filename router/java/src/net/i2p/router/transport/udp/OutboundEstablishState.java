@@ -221,7 +221,7 @@ class OutboundEstablishState {
         return _sentX;
     }
 
-    /**x
+    /**
      * The remote side (Bob) - note that in some places he's called Charlie.
      * Warning - may change after introduction. May be null before introduction.
      */
