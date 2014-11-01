@@ -12,9 +12,6 @@ import net.i2p.client.naming.NamingService;
 import net.i2p.crypto.AESEngine;
 import net.i2p.crypto.CryptixAESEngine;
 import net.i2p.crypto.DSAEngine;
-import net.i2p.crypto.DummyDSAEngine;
-import net.i2p.crypto.DummyElGamalEngine;
-//import net.i2p.crypto.DummyPooledRandomSource;
 import net.i2p.crypto.ElGamalAESEngine;
 import net.i2p.crypto.ElGamalEngine;
 import net.i2p.crypto.HMAC256Generator;
@@ -34,7 +31,6 @@ import net.i2p.util.FortunaRandomSource;
 import net.i2p.util.I2PProperties;
 import net.i2p.util.KeyRing;
 import net.i2p.util.LogManager;
-//import net.i2p.util.PooledRandomSource;
 import net.i2p.util.PortMapper;
 import net.i2p.util.RandomSource;
 import net.i2p.util.SecureDirectory;
@@ -651,12 +647,8 @@ public class I2PAppContext {
 
     private void initializeElGamalEngine() {
         synchronized (_lock5) {
-            if (_elGamalEngine == null) {
-                if ("off".equals(getProperty("i2p.encryption", "on")))
-                    _elGamalEngine = new DummyElGamalEngine(this);
-                else
-                    _elGamalEngine = new ElGamalEngine(this);
-            }
+            if (_elGamalEngine == null)
+                _elGamalEngine = new ElGamalEngine(this);
             _elGamalEngineInitialized = true;
         }
     }
@@ -796,12 +788,8 @@ public class I2PAppContext {
 
     private void initializeDSA() {
         synchronized (_lock12) {
-            if (_dsa == null) {
-                if ("off".equals(getProperty("i2p.encryption", "on")))
-                    _dsa = new DummyDSAEngine(this);
-                else
-                    _dsa = new DSAEngine(this);
-            }
+            if (_dsa == null)
+                _dsa = new DSAEngine(this);
             _dsaInitialized = true;
         }
     }
@@ -887,14 +875,8 @@ public class I2PAppContext {
 
     private void initializeRandom() {
         synchronized (_lock17) {
-            if (_random == null) {
-                //if (true)
-                    _random = new FortunaRandomSource(this);
-                //else if ("true".equals(getProperty("i2p.weakPRNG", "false")))
-                //    _random = new DummyPooledRandomSource(this);
-                //else
-                //    _random = new PooledRandomSource(this);
-            }
+            if (_random == null)
+                _random = new FortunaRandomSource(this);
             _randomInitialized = true;
         }
     }
