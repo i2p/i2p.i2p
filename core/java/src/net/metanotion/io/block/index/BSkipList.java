@@ -82,6 +82,8 @@ public class BSkipList extends SkipList {
 		size = bf.file.readUnsignedInt();
 		int spans = bf.file.readInt();
 		int levelCount = bf.file.readInt();
+                // two byte spansize as of version 1.2, ignore for now
+                // int ss = bf.file.readUnsignedShort(); if (ss > 0) ...
 		//System.out.println(size + " " + spans); 
 
 		this.fileOnly = fileOnly;
@@ -171,6 +173,8 @@ public class BSkipList extends SkipList {
 		bf.file.writeInt(0);
 		bf.file.writeInt(1);
 		bf.file.writeInt(1);
+                // added in version 1.2
+		bf.file.writeShort(spanSize);
 		BSkipSpan.init(bf, firstSpan, spanSize);
 		BSkipLevels.init(bf, firstLevel, firstSpan, 4);
 	}
