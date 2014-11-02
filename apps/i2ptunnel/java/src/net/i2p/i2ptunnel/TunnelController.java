@@ -84,8 +84,19 @@ public class TunnelController implements Logging {
     public static final String TYPE_SOCKS_IRC = "socksirctunnel";
     public static final String TYPE_STD_CLIENT = "client";
     public static final String TYPE_STD_SERVER = "server";
+    /** Client in the UI and I2P side but a server on the localhost side */
     public static final String TYPE_STREAMR_CLIENT = "streamrclient";
+    /** Server in the UI and I2P side but a client on the localhost side */
     public static final String TYPE_STREAMR_SERVER = "streamrserver";
+
+    /**
+     *  This is guaranteed to be available.
+     *  @since 0.9.17
+     */
+    public static final SigType PREFERRED_SIGTYPE = SigType.ECDSA_SHA256_P256.isAvailable() ?
+                                                    SigType.ECDSA_SHA256_P256 :
+                                                    SigType.DSA_SHA1;
+
 
     /**
      * Create a new controller for a tunnel out of the specific config options.
@@ -125,15 +136,12 @@ public class TunnelController implements Logging {
      */
     private boolean createPrivateKey() {
         I2PClient client = I2PClientFactory.createClient();
-        String filename = getPrivKeyFile();
-        if ( (filename == null) || (filename.trim().length() <= 0) ) {
+        File keyFile = getPrivateKeyFile();
+        if (keyFile == null) {
             log("No filename specified for the private key");
             return false;
         }
         
-        File keyFile = new File(getPrivKeyFile());
-        if (!keyFile.isAbsolute())
-            keyFile = new File(I2PAppContext.getGlobalContext().getConfigDir(), getPrivKeyFile());
         if (keyFile.exists()) {
             //log("Not overwriting existing private keys in " + keyFile.getAbsolutePath());
             return true;
@@ -145,11 +153,11 @@ public class TunnelController implements Logging {
         FileOutputStream fos = null;
         try {
             fos = new SecureFileOutputStream(keyFile);
-            SigType stype = I2PClient.DEFAULT_SIGTYPE;
+            SigType stype = PREFERRED_SIGTYPE;
             String st = _config.getProperty(OPT_SIG_TYPE);
             if (st != null) {
                 SigType type = SigType.parseSigType(st);
-                if (type != null)
+                if (type != null && type.isAvailable())
                     stype = type;
                 else
                     log("Unsupported sig type " + st + ", reverting to " + stype);
@@ -586,11 +594,12 @@ public class TunnelController implements Logging {
                     _config.setProperty(OPT_LOW_TAGS, "14");
             }
             // same default logic as in EditBean.getSigType()
-            if ((type.equals(TYPE_IRC_CLIENT) || type.equals(TYPE_STD_CLIENT) || type.equals(TYPE_SOCKS_IRC))
-                && !Boolean.valueOf(getSharedClient())) {
-                if (!_config.containsKey(OPT_SIG_TYPE) &&
-                    SigType.ECDSA_SHA256_P256.isAvailable())
-                    _config.setProperty(OPT_SIG_TYPE, "ECDSA_SHA256_P256");
+            if (!isClient(type) ||
+                ((type.equals(TYPE_IRC_CLIENT) || type.equals(TYPE_STD_CLIENT) ||
+                  type.equals(TYPE_SOCKS_IRC) || type.equals(TYPE_STREAMR_CLIENT))
+                 && !Boolean.valueOf(getSharedClient()))) {
+                if (!_config.containsKey(OPT_SIG_TYPE))
+                    _config.setProperty(OPT_SIG_TYPE, PREFERRED_SIGTYPE.name());
             }
         }
 
@@ -641,6 +650,34 @@ public class TunnelController implements Logging {
     public String getI2CPPort() { return _config.getProperty(PROP_I2CP_PORT); }
 
     /**
+     *  Is it a client or server in the UI and I2P side?
+     *  Note that a streamr client is a UI and I2P client but a server on the localhost side.
+     *  Note that a streamr server is a UI and I2P server but a client on the localhost side.
+     *
+     *  @since 0.9.17
+     */
+    public boolean isClient() {
+        return isClient(getType());
+    }
+
+    /**
+     *  Is it a client or server in the UI and I2P side?
+     *  Note that a streamr client is a UI and I2P client but a server on the localhost side.
+     *  Note that a streamr server is a UI and I2P server but a client on the localhost side.
+     *
+     *  @since 0.9.17 moved from IndexBean
+     */
+    public static boolean isClient(String type) {
+        return TYPE_STD_CLIENT.equals(type) || 
+               TYPE_HTTP_CLIENT.equals(type) ||
+               TYPE_SOCKS.equals(type) ||
+               TYPE_SOCKS_IRC.equals(type) ||
+               TYPE_CONNECT.equals(type) ||
+               TYPE_STREAMR_CLIENT.equals(type) ||
+               TYPE_IRC_CLIENT.equals(type);
+    }
+
+    /**
      *  These are the ones with a prefix of "option."
      *
      *  @return one big string of "key=val key=val ..."
@@ -664,7 +701,12 @@ public class TunnelController implements Logging {
     public String getTargetHost() { return _config.getProperty(PROP_TARGET_HOST); }
     public String getTargetPort() { return _config.getProperty(PROP_TARGET_PORT); }
     public String getSpoofedHost() { return _config.getProperty(PROP_SPOOFED_HOST); }
+
+    /**
+     *  Probably not absolute. May be null. getPrivateKeyFile() recommended.
+     */
     public String getPrivKeyFile() { return _config.getProperty(PROP_FILE); }
+
     public String getListenPort() { return _config.getProperty(PROP_LISTEN_PORT); }
     public String getTargetDestination() { return _config.getProperty(PROP_DEST); }
     public String getProxyList() { return _config.getProperty(PROP_PROXIES); }
@@ -674,30 +716,59 @@ public class TunnelController implements Logging {
     public boolean getStartOnLoad() { return Boolean.parseBoolean(_config.getProperty(PROP_START, "true")); }
     public boolean getPersistentClientKey() { return Boolean.parseBoolean(_config.getProperty(OPT_PERSISTENT)); }
 
+    /**
+     *  Does not necessarily exist.
+     *  @return absolute path or null if unset
+     *  @since 0.9.17
+     */
+    public File getPrivateKeyFile() {
+        String f = getPrivKeyFile();
+        if (f == null)
+            return null;
+        f = f.trim();
+        if (f.length() == 0)
+            return null;
+        File rv = new File(f);
+        if (!rv.isAbsolute())
+            rv = new File(I2PAppContext.getGlobalContext().getConfigDir(), f);
+        return rv;
+    }
+
+    /**
+     *  Returns null if not running.
+     *  @return Base64 or null
+     */
     public String getMyDestination() {
-        if (_tunnel != null) {
-            List<I2PSession> sessions = _tunnel.getSessions();
-            for (int i = 0; i < sessions.size(); i++) {
-                I2PSession session = sessions.get(i);
-                Destination dest = session.getMyDestination();
-                if (dest != null)
-                    return dest.toBase64();
-            }
-        }
+        Destination dest = getDestination();
+        if (dest != null)
+            return dest.toBase64();
         return null;
     }
     
     /**
+     *  Returns null if not running.
      *  @return "{52 chars}.b32.i2p" or null
      */
     public String getMyDestHashBase32() {
+        Destination dest = getDestination();
+        if (dest != null)
+            return dest.toBase32();
+        return null;
+    }
+    
+    /**
+     *  Returns null if not running.
+     *  @return Destination or null
+     *  @since 0.9.17
+     */
+    public Destination getDestination() {
         if (_tunnel != null) {
             List<I2PSession> sessions = _tunnel.getSessions();
             for (int i = 0; i < sessions.size(); i++) {
                 I2PSession session = sessions.get(i);
                 Destination dest = session.getMyDestination();
                 if (dest != null)
-                    return dest.toBase32();
+                    return dest;
             }
         }
         return null;

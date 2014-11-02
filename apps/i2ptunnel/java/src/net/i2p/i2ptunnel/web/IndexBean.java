@@ -467,20 +467,24 @@ public class IndexBean {
         return _group.getControllers().size();
     }
     
+    /**
+     *  Is it a client or server in the UI and I2P side?
+     *  Note that a streamr client is a UI and I2P client but a server on the localhost side.
+     *  Note that a streamr server is a UI and I2P server but a client on the localhost side.
+     */
     public boolean isClient(int tunnelNum) {
         TunnelController cur = getController(tunnelNum);
         if (cur == null) return false;
-        return isClient(cur.getType());
+        return cur.isClient();
     }
 
+    /**
+     *  Is it a client or server in the UI and I2P side?
+     *  Note that a streamr client is a UI and I2P client but a server on the localhost side.
+     *  Note that a streamr server is a UI and I2P server but a client on the localhost side.
+     */
     public static boolean isClient(String type) {
-        return ( (TunnelController.TYPE_STD_CLIENT.equals(type)) || 
-        		(TunnelController.TYPE_HTTP_CLIENT.equals(type)) ||
-        		(TunnelController.TYPE_SOCKS.equals(type)) ||
-        		(TunnelController.TYPE_SOCKS_IRC.equals(type)) ||
-        		(TunnelController.TYPE_CONNECT.equals(type)) ||
-        		(TunnelController.TYPE_STREAMR_CLIENT.equals(type)) ||
-        		(TunnelController.TYPE_IRC_CLIENT.equals(type)));
+        return TunnelController.isClient(type);
     }
     
     public String getTunnelName(int tunnel) {
@@ -657,36 +661,50 @@ public class IndexBean {
             return "";
     }
     
-    public String getDestinationBase64(int tunnel) {
+    /**
+     *  Works even if tunnel is not running.
+     *  @return Destination or null
+     *  @since 0.9.17
+     */
+    protected Destination getDestination(int tunnel) {
         TunnelController tun = getController(tunnel);
         if (tun != null) {
-            String rv = tun.getMyDestination();
+            Destination rv = tun.getDestination();
             if (rv != null)
                 return rv;
             // if not running, do this the hard way
-            String keyFile = tun.getPrivKeyFile();
-            if (keyFile != null && keyFile.trim().length() > 0) {
+            File keyFile = tun.getPrivateKeyFile();
+            if (keyFile != null) {
                 PrivateKeyFile pkf = new PrivateKeyFile(keyFile);
                 try {
-                    Destination d = pkf.getDestination();
-                    if (d != null)
-                        return d.toBase64();
+                    rv = pkf.getDestination();
+                    if (rv != null)
+                        return rv;
                 } catch (Exception e) {}
             }
         }
+        return null;
+    }
+    
+    /**
+     *  Works even if tunnel is not running.
+     *  @return Base64 or ""
+     */
+    public String getDestinationBase64(int tunnel) {
+        Destination d = getDestination(tunnel);
+        if (d != null)
+            return d.toBase64();
         return "";
     }
     
     /**
+     *  Works even if tunnel is not running.
      *  @return "{52 chars}.b32.i2p" or ""
      */
     public String getDestHashBase32(int tunnel) {
-        TunnelController tun = getController(tunnel);
-        if (tun != null) {
-            String rv = tun.getMyDestHashBase32();
-            if (rv != null)
-                return rv;
-        }
+        Destination d = getDestination(tunnel);
+        if (d != null)
+            return d.toBase32();
         return "";
     }
     

@@ -16,6 +16,7 @@ import java.io.OutputStream;
 import java.util.Arrays;
 
 import net.i2p.crypto.SHA256Generator;
+import net.i2p.crypto.SigType;
 
 /**
  * KeysAndCert has a public key, a signing key, and a certificate.
@@ -49,6 +50,22 @@ public class KeysAndCert extends DataStructureImpl {
         if (_certificate != null)
             throw new IllegalStateException();
         _certificate = cert;
+    }
+
+    /**
+     *  @return null if not set or unknown
+     *  @since 0.9.17
+     */
+    public SigType getSigType() {
+        if (_certificate == null)
+            return null;
+        if (_certificate.getCertificateType() == Certificate.CERTIFICATE_TYPE_KEY) {
+            try {
+                KeyCertificate kcert = _certificate.toKeyCertificate();
+                return kcert.getSigType();
+            } catch (DataFormatException dfe) {}
+        }
+        return SigType.DSA_SHA1;
     }
 
     public PublicKey getPublicKey() {

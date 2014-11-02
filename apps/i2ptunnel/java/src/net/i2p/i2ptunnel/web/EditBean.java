@@ -41,6 +41,11 @@ import net.i2p.util.Addresses;
 public class EditBean extends IndexBean {
     public EditBean() { super(); }
     
+    /**
+     *  Is it a client or server in the UI and I2P side?
+     *  Note that a streamr client is a UI and I2P client but a server on the localhost side.
+     *  Note that a streamr server is a UI and I2P server but a client on the localhost side.
+     */
     public static boolean staticIsClient(int tunnel) {
         TunnelControllerGroup group = TunnelControllerGroup.getInstance();
         if (group == null)
@@ -190,6 +195,12 @@ public class EditBean extends IndexBean {
         String ttype;
         boolean isShared;
         if (tunnel >= 0) {
+            Destination d = getDestination(tunnel);
+            if (d != null) {
+                type = d.getSigType();
+                if (type != null)
+                    return type.getCode();
+            }
             String stype = getProperty(tunnel, I2PClient.PROP_SIGTYPE, null);
             type = stype != null ? SigType.parseSigType(stype) : null;
             ttype = getTunnelType(tunnel);
@@ -201,12 +212,13 @@ public class EditBean extends IndexBean {
         }
         if (type == null) {
             // same default logic as in TunnelController.setConfig()
-            if ((TunnelController.TYPE_IRC_CLIENT.equals(ttype) ||
-                 TunnelController.TYPE_SOCKS_IRC.equals(ttype) ||
-                 TunnelController.TYPE_STD_CLIENT.equals(ttype)) &&
-                !isShared &&
-                SigType.ECDSA_SHA256_P256.isAvailable())
-                type = SigType.ECDSA_SHA256_P256;
+            if ((!TunnelController.isClient(ttype) ||
+                ((TunnelController.TYPE_IRC_CLIENT.equals(ttype) ||
+                  TunnelController.TYPE_SOCKS_IRC.equals(ttype) ||
+                  TunnelController.TYPE_STREAMR_CLIENT.equals(ttype) ||
+                  TunnelController.TYPE_STD_CLIENT.equals(ttype)) &&
+                 !isShared)))
+                type = TunnelController.PREFERRED_SIGTYPE;
             else
                 type = SigType.DSA_SHA1;
         }
