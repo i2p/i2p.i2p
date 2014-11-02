@@ -229,7 +229,12 @@ public class KeyStoreUtil {
             try {
                 cert.checkValidity();
             } catch (CertificateExpiredException cee) {
-                error("Rejecting expired X509 Certificate: " + file.getAbsolutePath(), cee);
+                String s = "Rejecting expired X509 Certificate: " + file.getAbsolutePath();
+                // Android often has old system certs
+                if (SystemVersion.isAndroid())
+                    warn(s, cee);
+                else
+                    error(s, cee);
                 return false;
             } catch (CertificateNotYetValidException cnyve) {
                 error("Rejecting X509 Certificate not yet valid: " + file.getAbsolutePath(), cnyve);
@@ -461,6 +466,11 @@ public class KeyStoreUtil {
 
     private static void info(String msg) {
         log(I2PAppContext.getGlobalContext(), Log.INFO, msg, null);
+    }
+
+    /** @since 0.9.17 */
+    private static void warn(String msg, Throwable t) {
+        log(I2PAppContext.getGlobalContext(), Log.WARN, msg, t);
     }
 
     private static void error(String msg, Throwable t) {
