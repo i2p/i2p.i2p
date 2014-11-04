@@ -1,3 +1,6 @@
+2014-11-04 zzz
+ * SSU: Fix corruption of ack-only packets containing bitfields
+
 * 2014-11-01 0.9.16 released
 
 2014-10-30 kytv
