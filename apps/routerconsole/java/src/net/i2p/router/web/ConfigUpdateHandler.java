@@ -35,7 +35,7 @@ public class ConfigUpdateHandler extends FormHandler {
     /** old default */
     public static final String DEFAULT_NEWS_URL = "http://echelon.i2p/i2p/news.xml";
     /** current default */
-    public static final String DEFAULT_NEWS_URL_SU3 = "http://echelon.i2p/i2p/news.su3";
+    public static final String DEFAULT_NEWS_URL_SU3 = "http://echelon.i2p/news/news.su3";
     public static final String PROP_REFRESH_FREQUENCY = "router.newsRefreshFrequency";
     public static final long DEFAULT_REFRESH_FREQ = 36*60*60*1000l;
     public static final String DEFAULT_REFRESH_FREQUENCY = Long.toString(DEFAULT_REFRESH_FREQ);
