@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.i2p.crypto.SigType;
 import net.i2p.data.DataHelper;
 import net.i2p.router.RouterContext;
 
@@ -346,6 +347,13 @@ public class SummaryBarRenderer {
            .append(": ")
            .append(_helper.getReachability())
            .append("</a></h4>\n");
+        if (!SigType.ECDSA_SHA256_P256.isAvailable()) {
+            buf.append("<hr>\n<h4><a href=\"/logs\" target=\"_top\" title=\"")
+               .append(_("See more information on the logs page"))
+               .append("\">")
+               .append(_("Warning: ECDSA is not available. Update your Java or OS"))
+               .append("</a></h4>\n");
+        }
         return buf.toString();
     }
 
