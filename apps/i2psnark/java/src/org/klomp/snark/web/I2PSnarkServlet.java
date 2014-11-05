@@ -1039,6 +1039,8 @@ public class I2PSnarkServlet extends BasicServlet {
                             }
                             // step 2 delete dirs bottom-up
                             Set<File> dirs = storage.getDirectories();
+                            if (dirs == null)
+                                break;  // directory deleted out from under us
                             if (_log.shouldLog(Log.INFO))
                                 _log.info("Dirs to delete: " + DataHelper.toString(dirs));
                             boolean ok = false;
