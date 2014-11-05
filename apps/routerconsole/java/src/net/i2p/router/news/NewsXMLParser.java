@@ -16,6 +16,7 @@ import java.util.Set;
 import net.i2p.I2PAppContext;
 import net.i2p.util.Log;
 import org.cybergarage.util.Debug;
+import org.cybergarage.xml.Attribute;
 import org.cybergarage.xml.Node;
 import org.cybergarage.xml.ParserException;
 
@@ -43,18 +44,34 @@ public class NewsXMLParser {
         XMLParser.TEXT_NAME
     }));
 
+    // http://www.w3.org/TR/html-markup/global-attributes.html#common.attrs.event-handler
+    private static final Set attributeBlacklist = new HashSet(Arrays.asList(new String[] {
+        "onabort", "onblur", "oncanplay", "oncanplaythrough", "onchange", "onclick",
+        "oncontextmenu", "ondblclick", "ondrag", "ondragend", "ondragenter", "ondragleave",
+        "ondragover", "ondragstart", "ondrop", "ondurationchange", "onemptied",
+        "onended", "onerror", "onfocus", "oninput", "onivalid", "onkeydown", "onkeypress",
+        "onkeyup", "onload", "onloadeddata", "onloadedmetadata", "onloadstart",
+        "onmousedown", "onmousemove", "onmouseout", "onmouseover", "onmouseup",
+        "onmousewheel", "onpause", "onplay", "onplaying", "onprogress", "onratechange",
+        "onreadystatechange", "onreset", "onscroll", "onseeked", "onseeking", "onselect",
+        "onshow", "onstalled", "onsubmit", "onsuspend",
+        "ontimeupdate", "onvolumechange", "onwaiting"
+    }));
+
     /**
      *  The action taken when encountering a non-whitelisted
-     *  XHTML element in the feed content.
+     *  XHTML element or blacklisted attribute in the feed content.
      */
     public enum XHTMLMode {
-        /** abort the parsing on any non-whitelisted element */
+        /** abort the parsing on any non-whitelisted element or blacklisted attribute */
         ABORT,
-        /** remove only the non-whitelisted element */
+        /** remove only the non-whitelisted element, or element containing a blacklisted attribute  */
         REMOVE_ELEMENT,
-        /** skip the feed entry containing the non-whitelisted element */
+        /** remove only the non-whitelisted element, remove only the blacklisted attribute  */
+        REMOVE_ATTRIBUTE,
+        /** skip the feed entry containing the non-whitelisted element or blacklisted attribute */
         SKIP_ENTRY,
-        /** disable whitelist checks */
+        /** disable all whitelist and blacklist checks */
         ALLOW_ALL
     }
 
@@ -245,6 +262,7 @@ public class NewsXMLParser {
                                 _log.warn("Skipping entry", ipe);
                             e = null;
                             break;
+                          case REMOVE_ATTRIBUTE:
                           case REMOVE_ELEMENT:
                             if (_log.shouldLog(Log.WARN))
                                 _log.warn("Removing element", ipe);
@@ -295,8 +313,8 @@ public class NewsXMLParser {
               case ABORT:
               case SKIP_ENTRY:
                 throw new I2PParserException("Invalid XHTML element \"" + name + '"');
+              case REMOVE_ATTRIBUTE:
               case REMOVE_ELEMENT:
-                // fixme this screws up the iteration
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Removing element: " + node);
                 node.getParentNode().removeNode(node);
@@ -305,6 +323,33 @@ public class NewsXMLParser {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Allowing non-whitelisted element by configuration: " + node);
                 break;
+            }
+        }
+        for (int i = 0; i < node.getNAttributes(); i++) {
+            Attribute attr = node.getAttribute(i);
+            String aname = attr.getName();
+            if (attributeBlacklist.contains(aname.toLowerCase(Locale.US))) {
+                switch (_mode) {
+                  case ABORT:
+                  case SKIP_ENTRY:
+                    throw new I2PParserException("Invalid XHTML element \"" + name + "\" due to attribute " + aname);
+                  case REMOVE_ELEMENT:
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Removing element: " + node + " due to attribute " + aname);
+                    node.getParentNode().removeNode(node);
+                    return true;
+                  case REMOVE_ATTRIBUTE:
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Removing attribute: " + aname + " from " + node);
+                    // sadly, no removeAttribute(int)
+                    if (node.removeAttribute(attr))
+                        i--;
+                    break;
+                  case ALLOW_ALL:
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Allowing blacklisted attribute by configuration: " + node);
+                    break;
+                }
             }
         }
         int count = node.getNNodes();
@@ -334,10 +379,12 @@ public class NewsXMLParser {
             I2PAppContext ctx = new I2PAppContext();
             Debug.initialize(ctx);
             NewsXMLParser parser = new NewsXMLParser(ctx);
-            parser.setXHTMLMode(XHTMLMode.ABORT);
-            //parser.setXHTMLMode(XHTMLMode.REMOVE_ELEMENT);
-            //parser.setXHTMLMode(XHTMLMode.SKIP_ENTRY);
-            //parser.setXHTMLMode(XHTMLMode.ALLOW_ALL);
+            if (args.length > 1) {
+                XHTMLMode mode = XHTMLMode.valueOf(args[1]);
+                parser.setXHTMLMode(mode);
+            } else {
+                parser.setXHTMLMode(XHTMLMode.ABORT);
+            }
             parser.parse(new File(args[0]));
             NewsMetadata ud = parser.getMetadata();
             List<NewsEntry> entries = parser.getEntries();
