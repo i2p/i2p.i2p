@@ -286,9 +286,14 @@ public class JobQueue {
             // we don't really *need* to answer DB lookup messages
             // This is pretty lame, there's actually a ton of different jobs we
             // could drop, but is it worth making a list?
-            if (cls == HandleFloodfillDatabaseLookupMessageJob.class)
-                return true;
-
+            if (cls == HandleFloodfillDatabaseLookupMessageJob.class) {
+                 JobTiming jt = job.getTiming();
+                 if (jt != null) {
+                     long lag =  _context.clock().now() - jt.getStartAfter();
+                     if (lag > 2*1000L)
+                         return true;
+                }
+            }
         }
         return false;
     }
