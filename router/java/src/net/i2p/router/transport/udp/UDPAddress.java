@@ -7,6 +7,7 @@ import java.util.Map;
 import net.i2p.data.Base64;
 import net.i2p.data.router.RouterAddress;
 import net.i2p.data.SessionKey;
+import net.i2p.router.transport.TransportUtil;
 import net.i2p.util.LHMCache;
 import net.i2p.util.SystemVersion;
 
@@ -100,7 +101,7 @@ class UDPAddress {
             int p;
             try { 
                 p = Integer.parseInt(port); 
-                if (p < UDPTransport.MIN_PEER_PORT || p > 65535) continue;
+                if (!TransportUtil.isValidPort(p)) continue;
             } catch (NumberFormatException nfe) {
                 continue;
             }

@@ -1,3 +1,48 @@
+2014-11-06 zzz
+Prop from i2p.i2p.zzz.test2:
+ * Blockfile:
+   - Add block size to superblock
+   - Add span size to skiplist block
+   - Bump version to 1.2
+ * Console:
+   - Log warnings for Java 6 or no Pack200
+   - Add ECDSA warning to sidebar
+   - Don't disable updates when restarting from /configupdate
+   - Recognize router.newsRefreshFrequency=0 as "never"
+ * Crypto: Drop dummy crypto stubs
+ * i2psnark:
+   - Convert '+' to ' ' in magnet dn param
+   - Fix NPE when deleting torrent if the data directory
+     was deleted out from under us (ticket #1407)
+   - Add new opentrackers, remove welterde
+   - Support multiple default opentrackers
+   - Don't link to opentrackers at the top
+ * i2ptunnel:
+   - ECDSA default for all new server tunnels
+   - ECDSA default for streamr client tunnels
+   - Fix display of server destination on edit page when not running (privkey file path wasn't absolute)
+   - Fix display of persistent client key b32 on edit page when not running
+   - Fix display of server sig type on edit page when we have a privkey file
+ * jbigi: Save and report extracted library name
+ * Reseed: SSL-only by default
+ * Router:
+   - Make recognition of a hidden router consistent,
+     whether specified in the caps or the cert
+   - Job Queue: Only drop lookup jobs if lagged
+ * SSU:
+   - Don't resend ACKS that are too old (ticket #772)
+   - Dont OOM if ACK sender dies
+   - Don't publish direct info if introducers are required
+ * SU3File: Show content and file types in showversion
+ * Transports:
+   - Consolidate port checking code
+   - Disallow SSDP port
+ * Update: Implement signed news in su3 format with trusted signers,
+   wrapping an Atom XML format
+ * Util:
+   - Use write-sync-close-rename for config file writing
+   - Null check in zip entry name
+
 2014-11-04 zzz
  * SSU: Fix corruption of ack-only packets containing bitfields
 
