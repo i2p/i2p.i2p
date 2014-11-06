@@ -26,7 +26,7 @@ public class Ed25519FieldElement extends FieldElement {
 
     public boolean isNonZero() {
         byte[] s = toByteArray();
-        return Utils.equal(s, ZERO) == 1;
+        return Utils.equal(s, ZERO) == 0;
     }
 
     /**
