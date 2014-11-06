@@ -13,12 +13,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.SSLContext;
 
 import net.i2p.client.I2PClient;
 import net.i2p.crypto.KeyStoreUtil;
 import net.i2p.router.RouterContext;
+import net.i2p.util.I2PSSLSocketFactory;
 import net.i2p.util.Log;
 import net.i2p.util.SecureDirectory;
 
@@ -174,6 +176,7 @@ class SSLClientListenerRunner extends ClientListenerRunner {
                 _log.info("Listening on port " + _port + " of the specific interface: " + listenInterface);
             rv = _factory.createServerSocket(_port, 0, InetAddress.getByName(listenInterface));
         }
+        I2PSSLSocketFactory.setProtocolsAndCiphers((SSLServerSocket) rv);
         return rv;
     }
 

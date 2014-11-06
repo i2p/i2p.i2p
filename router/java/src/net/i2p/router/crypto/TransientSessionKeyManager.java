@@ -110,10 +110,10 @@ public class TransientSessionKeyManager extends SessionKeyManager {
     private static final long SESSION_TAG_EXPIRATION_WINDOW = 90 * 1000;
 
     /**
-     * a few MB? how about 16MB!
+     * a few MB? how about 24 MB!
      * This is the max size of _inboundTagSets.
      */
-    public final static int MAX_INBOUND_SESSION_TAGS = 500 * 1000; // this will consume at most a few MB
+    public final static int MAX_INBOUND_SESSION_TAGS = 750 * 1000;
 
     /**
      *  This was 100 since 0.6.1.10 (50 before that). It's important because:
@@ -584,7 +584,7 @@ public class TransientSessionKeyManager extends SessionKeyManager {
         int recent = 0;
         int tags = 0;
         int toRemove = overage * 2;
-        _log.log(Log.CRIT, "TOO MANY SESSION TAGS! Starting cleanup, overage = " + overage);
+        _log.logAlways(Log.WARN, "TOO MANY SESSION TAGS! Starting cleanup, overage = " + overage);
         List<TagSet> removed = new ArrayList<TagSet>(toRemove);
         synchronized (_inboundTagSets) {
             for (TagSet set : _inboundTagSets.values()) {
@@ -593,12 +593,18 @@ public class TransientSessionKeyManager extends SessionKeyManager {
                     absurd++;
                 if (size > 100)
                     large++;
-                if (now >= set.getDate())
+                if (set.getDate() - now < 3*60*1000) {
+                    // expiration is 12 minutes, so these are older than 9 minutes
                     old++;
-                else if (set.getDate() - now > 10*60*1000)
+                    removed.add(set);
+                    continue;
+                } else if (set.getDate() - now > 8*60*1000) {
+                    // expiration is 12 minutes, so these were created in last 4 minutes
                     recent++;
+                    continue;
+                }
 
-                if ((removed.size() < (toRemove)) || (now >= set.getDate()))
+                if (removed.size() < toRemove)
                     removed.add(set);
             }
             for (int i = 0; i < removed.size(); i++) {
@@ -609,11 +615,10 @@ public class TransientSessionKeyManager extends SessionKeyManager {
                 }
             }
         }
-        if (_log.shouldLog(Log.CRIT))
-            _log.log(Log.CRIT, "TOO MANY SESSION TAGS!  removing " + removed 
+        _log.logAlways(Log.WARN, "TOO MANY SESSION TAGS!  removed " + removed.size() 
                      + " tag sets arbitrarily, with " + tags + " tags,"
                      + "where there are " + old + " long lasting sessions, "
-                     + recent + " ones created in the last minute, and "
+                     + recent + " ones created in the last few minutes, and "
                      + large + " sessions with more than 100 tags (and "
                      + absurd + " with more than 1000!), leaving a total of "
                      + _inboundTagSets.size() + " tags behind");

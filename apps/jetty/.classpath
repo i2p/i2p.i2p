@@ -11,7 +11,6 @@
 	<classpathentry exported="true" kind="lib" path="jettylib/jetty-continuation.jar"/>
 	<classpathentry exported="true" kind="lib" path="jettylib/jetty-deploy.jar"/>
 	<classpathentry exported="true" kind="lib" path="jettylib/jetty-http.jar"/>
-	<classpathentry exported="true" kind="lib" path="jettylib/jetty-i2p.jar"/>
 	<classpathentry exported="true" kind="lib" path="jettylib/jetty-io.jar"/>
 	<classpathentry exported="true" kind="lib" path="jettylib/jetty-java5-threadpool.jar"/>
 	<classpathentry exported="true" kind="lib" path="jettylib/jetty-rewrite-handler.jar"/>

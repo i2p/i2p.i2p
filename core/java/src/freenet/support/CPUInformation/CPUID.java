@@ -143,7 +143,7 @@ public class CPUID {
     }
 
     /**
-     *  Only valid if family == 15.
+     *  Only valid if family == 15, or, for Intel only, family == 6.
      *  Left shift by 4 and then add model to get full model.
      *  @return 0-15
      */

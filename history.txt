@@ -1,3 +1,46 @@
+2014-11-04 zzz
+ * SSU: Fix corruption of ack-only packets containing bitfields
+
+* 2014-11-01 0.9.16 released
+
+2014-10-30 kytv
+ * Updates to geoip.txt and geoipv6.dat.gz based on Maxmind GeoLite Country
+   database from 2014-10-07.
+ * Arabic, Chinese, Czech, Dutch, French, German, Russian, and Spanish
+   translation updates from Transifex
+
+2014-10-30 zzz
+ * Router: Fix rare NPE building garlic message (ticket #1403)
+
+2014-10-26 zzz
+ * SSU: Fix ACK Sender thread dying on corrupt packet
+
+2014-10-24 zzz
+ * i2ptunnel: Fix description entered via wizard
+
+2014-10-23 zzz
+ * SessionKeyManager:
+   - Raise inbound limit
+   - Delete oldest tagsets when limit is hit
+   - Don't delete recent tagsets when limit is hit
+ * SSL: Don't prohibit SSLv3 ciphers if that's all we have
+
+2014-10-20 zzz
+ * Console: Fix lockups (ticket #1395)
+ * Eepsite Jetty: Switch back to QueuedThreadPool (ticket #1395)
+
+2014-10-17 zzz
+ * NTCP: Deadlock fix 3rd try (ticket #1394)
+
+2014-10-16 zzz
+ * NTCP: Deadlock fix 2nd try (ticket #1394)
+
+2014-10-15 zzz
+ * Console, I2CP, i2ptunnel, SSLEepGet: Set allowed SSL
+   protocols and ciphers. Disable SSLv3 and older ciphers.
+   Enable TLSv1.1 and TLSv1.2 on Java 7,
+   where it is disabled by default client-side.
+
 2014-10-14 zzz
  * I2NP: Implement DatabaseLookupMessage search type field
 

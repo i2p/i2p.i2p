@@ -8,14 +8,14 @@
 # ducki2p <ducki2p@gmail.com>, 2011
 # foo <foo@bar>, 2009
 # Boxoa590, 2013
-# Towatowa441, 2013-2014
+# Towinet, 2013-2014
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-02-06 18:27+0000\n"
-"PO-Revision-Date: 2014-03-22 14:59+0000\n"
-"Last-Translator: Towatowa441\n"
+"POT-Creation-Date: 2014-09-17 21:49+0000\n"
+"PO-Revision-Date: 2014-09-18 16:32+0000\n"
+"Last-Translator: Towinet\n"
 "Language-Team: French (http://www.transifex.com/projects/p/I2P/language/fr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -23,245 +23,357 @@ msgstr ""
 "Language: fr\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: ../java/build/Proxy.java:5 ../java/build/Proxy.java:11
-msgid "Warning: Outproxy Not Found"
-msgstr "Avertissement : outproxy non trouvé"
+#: ../java/build/Proxy.java:5
+msgid "Information: New Host Name"
+msgstr "Information : nouveau nom d'hôte"
 
 #: ../java/build/Proxy.java:6 ../java/build/Proxy.java:18
-#: ../java/build/Proxy.java:27 ../java/build/Proxy.java:40
-#: ../java/build/Proxy.java:49 ../java/build/Proxy.java:61
-#: ../java/build/Proxy.java:69 ../java/build/Proxy.java:78
-#: ../java/build/Proxy.java:93 ../java/build/Proxy.java:104
-#: ../java/build/Proxy.java:116 ../java/build/Proxy.java:126
+#: ../java/build/Proxy.java:28 ../java/build/Proxy.java:38
+#: ../java/build/Proxy.java:46 ../java/build/Proxy.java:57
+#: ../java/build/Proxy.java:66 ../java/build/Proxy.java:75
+#: ../java/build/Proxy.java:86 ../java/build/Proxy.java:98
+#: ../java/build/Proxy.java:108 ../java/build/Proxy.java:121
+#: ../java/build/Proxy.java:130 ../java/build/Proxy.java:142
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:204
 msgid "Router Console"
 msgstr "Console du routeur"
 
 #: ../java/build/Proxy.java:7 ../java/build/Proxy.java:19
-#: ../java/build/Proxy.java:28 ../java/build/Proxy.java:41
-#: ../java/build/Proxy.java:50 ../java/build/Proxy.java:62
-#: ../java/build/Proxy.java:70 ../java/build/Proxy.java:79
-#: ../java/build/Proxy.java:94 ../java/build/Proxy.java:105
-#: ../java/build/Proxy.java:117 ../java/build/Proxy.java:127
+#: ../java/build/Proxy.java:29 ../java/build/Proxy.java:39
+#: ../java/build/Proxy.java:47 ../java/build/Proxy.java:58
+#: ../java/build/Proxy.java:67 ../java/build/Proxy.java:76
+#: ../java/build/Proxy.java:87 ../java/build/Proxy.java:99
+#: ../java/build/Proxy.java:109 ../java/build/Proxy.java:122
+#: ../java/build/Proxy.java:131 ../java/build/Proxy.java:143
 msgid "I2P Router Console"
 msgstr "Console du routeur I2P"
 
 #: ../java/build/Proxy.java:8 ../java/build/Proxy.java:20
-#: ../java/build/Proxy.java:29 ../java/build/Proxy.java:42
-#: ../java/build/Proxy.java:51 ../java/build/Proxy.java:63
-#: ../java/build/Proxy.java:71 ../java/build/Proxy.java:80
-#: ../java/build/Proxy.java:95 ../java/build/Proxy.java:106
-#: ../java/build/Proxy.java:118 ../java/build/Proxy.java:128
+#: ../java/build/Proxy.java:30 ../java/build/Proxy.java:40
+#: ../java/build/Proxy.java:48 ../java/build/Proxy.java:59
+#: ../java/build/Proxy.java:68 ../java/build/Proxy.java:77
+#: ../java/build/Proxy.java:88 ../java/build/Proxy.java:100
+#: ../java/build/Proxy.java:110 ../java/build/Proxy.java:123
+#: ../java/build/Proxy.java:132 ../java/build/Proxy.java:144
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:205
 msgid "Configuration"
 msgstr "Configuration"
 
 #: ../java/build/Proxy.java:9 ../java/build/Proxy.java:21
-#: ../java/build/Proxy.java:30 ../java/build/Proxy.java:43
-#: ../java/build/Proxy.java:52 ../java/build/Proxy.java:64
-#: ../java/build/Proxy.java:72 ../java/build/Proxy.java:81
-#: ../java/build/Proxy.java:96 ../java/build/Proxy.java:107
-#: ../java/build/Proxy.java:119 ../java/build/Proxy.java:129
+#: ../java/build/Proxy.java:31 ../java/build/Proxy.java:41
+#: ../java/build/Proxy.java:49 ../java/build/Proxy.java:60
+#: ../java/build/Proxy.java:69 ../java/build/Proxy.java:78
+#: ../java/build/Proxy.java:89 ../java/build/Proxy.java:101
+#: ../java/build/Proxy.java:111 ../java/build/Proxy.java:124
+#: ../java/build/Proxy.java:133 ../java/build/Proxy.java:145
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:205
 msgid "Help"
 msgstr "Aide"
 
 #: ../java/build/Proxy.java:10 ../java/build/Proxy.java:22
-#: ../java/build/Proxy.java:31 ../java/build/Proxy.java:44
-#: ../java/build/Proxy.java:53 ../java/build/Proxy.java:65
-#: ../java/build/Proxy.java:73 ../java/build/Proxy.java:82
-#: ../java/build/Proxy.java:97 ../java/build/Proxy.java:108
-#: ../java/build/Proxy.java:120 ../java/build/Proxy.java:130
+#: ../java/build/Proxy.java:32 ../java/build/Proxy.java:42
+#: ../java/build/Proxy.java:50 ../java/build/Proxy.java:61
+#: ../java/build/Proxy.java:70 ../java/build/Proxy.java:79
+#: ../java/build/Proxy.java:90 ../java/build/Proxy.java:102
+#: ../java/build/Proxy.java:112 ../java/build/Proxy.java:125
+#: ../java/build/Proxy.java:134 ../java/build/Proxy.java:146
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:205
 msgid "Addressbook"
 msgstr "Carnet d'adresses"
 
+#: ../java/build/Proxy.java:11
+msgid "Information: New Host Name with Address Helper"
+msgstr "Information : nouveau nom d'hôte avec assistant d'adresse"
+
 #: ../java/build/Proxy.java:12
-msgid "The HTTP Outproxy was not found."
-msgstr "Le proxy HTTP n'est pas en place"
+msgid ""
+"The address helper link you followed is for a new host name that is not in "
+"your address book."
+msgstr "Le lien d'assistant d'adresse que vous avez suivi est pour un nouveau nom d'hôte qui n'est pas dans votre carnet d'adresses."
 
 #: ../java/build/Proxy.java:13
-msgid ""
-"It is offline, there is network congestion, or your router is not yet well-"
-"integrated with peers."
-msgstr "Il est hors ligne, ou il y a congestion du réseau, ou votre routeur n'est pas encore bien intégré avec les pairs."
+msgid "You may save this host name to your local address book."
+msgstr "Il vous est possible d'enregistrer ce nom d'hôte à votre carnet d'adresses local."
 
 #: ../java/build/Proxy.java:14
-#, java-format
 msgid ""
-"You may want to {0}retry{1} as this will randomly reselect an outproxy from "
-"the pool you have defined {2}here{3} (if you have more than one configured)."
-msgstr "Vous pouvez vouloir {0}réessayer{1} car cela va re-sélectionner au hasard un outproxy parmi le pool que vous avez défini {2}ici{3} (si vous en avez plus d'un de configuré)."
+"If you save it to your address book, you will not see this message again."
+msgstr "Si vous l'enregistrez dans votre carnet d'adresses, vous ne verrez plus ce message."
 
 #: ../java/build/Proxy.java:15
-#, java-format
 msgid ""
-"If you continue to have trouble you may want to edit your outproxy list "
-"{0}here{1}."
-msgstr "Si vous continuez à avoir des dérangements vous pourriez vouloir modifier votre liste de outproxy {0}ici{1}."
+"If you do not save it, the host name will be forgotten after the next router"
+" restart."
+msgstr "Si vous n'enregistrez pas, le nom d'hôte sera oublié après le prochain redémarrage du routeur."
 
-#: ../java/build/Proxy.java:16 ../java/build/Proxy.java:38
-#: ../java/build/Proxy.java:59 ../java/build/Proxy.java:102
-msgid "Could not find the following destination:"
-msgstr "Destination du tunnel"
-
-#: ../java/build/Proxy.java:17
-msgid "Error: Request Denied"
-msgstr "Erreur : demande refusée"
-
-#: ../java/build/Proxy.java:23
-msgid "Error: Local Access"
-msgstr "Erreur : accès local"
-
-#: ../java/build/Proxy.java:24
-msgid "Your browser is misconfigured."
-msgstr "Votre navigateur n'est pas compatible iFrames."
-
-#: ../java/build/Proxy.java:25
+#: ../java/build/Proxy.java:16
 msgid ""
-"Do not use the proxy to access the router console, localhost, or local LAN "
-"destinations."
-msgstr "Ne pas utiliser le proxy pour accéder à la console du routeur, ni au localhost, ni vers des destinations de votre LAN local."
+"If you do not wish to visit this host, click the \"back\" button on your "
+"browser."
+msgstr "Si vous ne souhaitez pas visiter cet hôte, cliquez sur le bouton \"précédent\" de votre navigateur."
 
-#: ../java/build/Proxy.java:26
-msgid "Warning: Eepsite Unknown"
-msgstr "Avertissement : Eepsite inconnu"
-
-#: ../java/build/Proxy.java:32
-msgid "Warning: Eepsite Not Found in Addressbook"
-msgstr "Avertissement : Eepsite pas trouvé dans le carnet d'adresses"
-
-#: ../java/build/Proxy.java:33
-msgid "The eepsite was not found in your router's addressbook."
-msgstr "Le eepsite n'a pas été trouvé dans le carnet d'adresses de votre routeur."
-
-#: ../java/build/Proxy.java:34
-msgid "Check the link or find a Base 32 or Base 64 address."
-msgstr "Cliquez le lien ou trouvez une adresse base 32 ou base 64."
-
-#: ../java/build/Proxy.java:35
-#, java-format
-msgid "If you have the Base 64 address, {0}add it to your addressbook{1}."
-msgstr "Si vous avez l''adresse Base 64, {0}ajoutez-là à votre carnet d''adresse{1}."
-
-#: ../java/build/Proxy.java:36
-msgid ""
-"Otherwise, find a Base 32 or address helper link, or use a jump service link"
-" below."
-msgstr "Sinon, trouver un lien d'assistant d'adresse ou un lien Base 32, ou utiliser ci-dessous un lien service de saut."
-
-#: ../java/build/Proxy.java:37
-#, java-format
-msgid ""
-"Seeing this page often? See {0}the FAQ{1} for help in {2}adding some "
-"subscriptions{3} to your addressbook."
-msgstr "Voyez-vous cette page souvent ? Voyez {0}la FAQ{1} pour de l'aide afin d'{2}ajouter quelques abonnements{3} à votre carnet d'adresses."
-
-#: ../java/build/Proxy.java:39 ../java/build/Proxy.java:45
-msgid "Warning: Invalid Request URI"
-msgstr "Avertissement : demande invalide d'URI"
-
-#: ../java/build/Proxy.java:46
-msgid "The request URI is invalid, and probably contains illegal characters."
-msgstr "L'URI de la requête n'est pas valide, et contient probablement des caractères illégaux."
-
-#: ../java/build/Proxy.java:47
-msgid ""
-"If you clicked a link, check the end of the URI for any characters the "
-"browser has mistakenly added on."
-msgstr "Si vous avez cliqué sur un lien, vérifiez la fin de l'URI pour d'éventuels caractères que le navigateur aurait ajourté à tort."
-
-#: ../java/build/Proxy.java:48 ../java/build/Proxy.java:54
-msgid "Warning: Invalid Destination"
-msgstr "Avertissement : destination invalide"
-
-#: ../java/build/Proxy.java:55
-msgid ""
-"The eepsite destination specified was not valid, or was otherwise "
-"unreachable."
-msgstr "La destination vers l'eepsite spécifié n'était pas valide, ou autrement était inaccessible."
-
-#: ../java/build/Proxy.java:56
-msgid ""
-"Perhaps you pasted in the wrong Base 64 string or the link you are following"
-" is bad."
-msgstr "Peut-être que vous avez collé dans la mauvaise chaîne base 64, ou le lien que vous suivez est mauvais."
-
-#: ../java/build/Proxy.java:57
-msgid "The I2P host could also be offline."
-msgstr "L'hôte I2P pourrait également être déconnecté."
-
-#: ../java/build/Proxy.java:58 ../java/build/Proxy.java:101
-#, java-format
-msgid "You may want to {0}retry{1}."
-msgstr "Vous pouvez vouloir {0}réessayer{1}."
-
-#: ../java/build/Proxy.java:60 ../java/build/Proxy.java:66
-msgid "Warning: Request Denied"
-msgstr "Avertissement : demande refusée"
-
-#: ../java/build/Proxy.java:67
-msgid "You attempted to connect to a non-I2P website or location."
-msgstr "Vous avez tenté de vous connecter à un site ou emplacement non-I2P."
-
-#: ../java/build/Proxy.java:68 ../java/build/Proxy.java:74
-msgid "Warning: No Outproxy Configured"
-msgstr "Avertissement : pas de proxy sortant configuré"
-
-#: ../java/build/Proxy.java:75
-msgid ""
-"Your request was for a site outside of I2P, but you have no HTTP outproxy "
-"configured."
-msgstr "Votre demande était pour un site en dehors de I2P, mais vous n'avez aucun outproxy HTTP de configuré."
-
-#: ../java/build/Proxy.java:76
-msgid "Please configure an outproxy in I2PTunnel."
-msgstr "Veuillez configurer un outproxy dans I2PTunnel."
-
-#: ../java/build/Proxy.java:77 ../java/build/Proxy.java:83
+#: ../java/build/Proxy.java:17 ../java/build/Proxy.java:23
 msgid "Warning: Destination Key Conflict"
 msgstr "Avertissement : conflit de clé de destination"
 
-#: ../java/build/Proxy.java:84
+#: ../java/build/Proxy.java:24
 msgid ""
 "The addresshelper link you followed specifies a different destination key "
 "than a host entry in your host database."
 msgstr "Le lien d'assistant d'adresse que vous avez suivi spécifie une clé de destination différente de l'entrée d'hôte contenue dans votre base de données hôte."
 
-#: ../java/build/Proxy.java:85
+#: ../java/build/Proxy.java:25
 msgid ""
 "Someone could be trying to impersonate another eepsite, or people have given"
 " two eepsites identical names."
 msgstr "Quelqu'un pourrait essayer de se faire passer pour un autre eepsite, ou des gens ont donné des noms identiques à deux eepsites."
 
-#: ../java/build/Proxy.java:86
+#: ../java/build/Proxy.java:26
 msgid ""
 "You can resolve the conflict by considering which key you trust, and either "
 "discarding the addresshelper link, discarding the host entry from your host "
 "database, or naming one of them differently."
 msgstr "Vous pouvez résoudre le conflit en considérant à quelle clé vous faites confiance, et soit rejeter le lien de l'assistant d'adresse en rejetant l'entrée d'hôte hors de votre base de données hôte, ou nommer l'une d'elles différemment."
 
-#: ../java/build/Proxy.java:87
+#: ../java/build/Proxy.java:27 ../java/build/Proxy.java:33
+msgid "Warning: Bad Address Helper"
+msgstr "Avertissement : mauvais assistant d'adresse"
+
+#: ../java/build/Proxy.java:34
+#, java-format
+msgid "The helper key in the URL ({0}i2paddresshelper={1}) is not resolvable."
+msgstr "La clé auxiliaire dans l''URL ({0}i2paddresshelper={1}) n''est pas résoluble."
+
+#: ../java/build/Proxy.java:35
+msgid "It seems to be garbage data, or a mistyped Base 32 address."
+msgstr "Il semble y avoir des données incorrectes, ou une faute de frappe dans l'adresse Base 32."
+
+#: ../java/build/Proxy.java:36
+msgid ""
+"Check your URL to try and fix the helper key to be a valid Base 32 hostname "
+"or Base 64 key."
+msgstr "Vérifiez votre URL afin d'essayer de résoudre la clé d'assistance pour qu'elle soit un nom d'hôte Base 32 valide ou clé Base 64."
+
+#: ../java/build/Proxy.java:37 ../java/build/Proxy.java:43
+msgid "Warning: Request Denied"
+msgstr "Avertissement : demande refusée"
+
+#: ../java/build/Proxy.java:44
+msgid "You attempted to connect to a non-I2P website or location."
+msgstr "Vous avez tenté de vous connecter à un site ou emplacement non-I2P."
+
+#: ../java/build/Proxy.java:45 ../java/build/Proxy.java:51
+#: ../java/build/Proxy.java:74 ../java/build/Proxy.java:80
+msgid "Warning: Eepsite Unreachable"
+msgstr "Avertissement : Eepsite inaccessible"
+
+#: ../java/build/Proxy.java:52
+msgid "The eepsite was not reachable, because its lease set was not found."
+msgstr "L'eepsite n'était pas accessible, parce que son jeu de bail n'a pas été trouvé."
+
+#: ../java/build/Proxy.java:53
+msgid ""
+"The eepsite is probably down, but there could also be network congestion."
+msgstr "L'eepsite est probablement hors ligne, mais il pourrait également y avoir congestion du réseau."
+
+#: ../java/build/Proxy.java:54 ../java/build/Proxy.java:83
+#: ../java/build/Proxy.java:95
+#, java-format
+msgid "You may want to {0}retry{1}."
+msgstr "Vous pouvez vouloir {0}réessayer{1}."
+
+#: ../java/build/Proxy.java:55 ../java/build/Proxy.java:84
+#: ../java/build/Proxy.java:96 ../java/build/Proxy.java:119
+#: ../java/build/Proxy.java:140 ../java/build/Proxy.java:152
+msgid "Could not find the following destination:"
+msgstr "Destination du tunnel"
+
+#: ../java/build/Proxy.java:56
+msgid "Error: Request Denied"
+msgstr "Erreur : demande refusée"
+
+#: ../java/build/Proxy.java:62
+msgid "Error: Local Access"
+msgstr "Erreur : accès local"
+
+#: ../java/build/Proxy.java:63
+msgid "Your browser is misconfigured."
+msgstr "Votre navigateur n'est pas compatible iFrames."
+
+#: ../java/build/Proxy.java:64
+msgid ""
+"Do not use the proxy to access the router console, localhost, or local LAN "
+"destinations."
+msgstr "Ne pas utiliser le proxy pour accéder à la console du routeur, ni au localhost, ni vers des destinations de votre LAN local."
+
+#: ../java/build/Proxy.java:65 ../java/build/Proxy.java:71
+msgid "Warning: No Outproxy Configured"
+msgstr "Avertissement : pas de proxy sortant configuré"
+
+#: ../java/build/Proxy.java:72
+msgid ""
+"Your request was for a site outside of I2P, but you have no HTTP outproxy "
+"configured."
+msgstr "Votre demande était pour un site en dehors de I2P, mais vous n'avez aucun outproxy HTTP de configuré."
+
+#: ../java/build/Proxy.java:73
+msgid "Please configure an outproxy in I2PTunnel."
+msgstr "Veuillez configurer un outproxy dans I2PTunnel."
+
+#: ../java/build/Proxy.java:81
+msgid "The eepsite was not reachable."
+msgstr "Le eepsite n'était pas joignable."
+
+#: ../java/build/Proxy.java:82
+msgid ""
+"The eepsite is offline, there is network congestion, or your router is not "
+"yet well-integrated with peers."
+msgstr "Le eepsite est hors ligne, ou il y a congestion du réseau, ou votre routeur n'est pas encore bien intégré avec les pairs."
+
+#: ../java/build/Proxy.java:85 ../java/build/Proxy.java:91
+msgid "Warning: Invalid Destination"
+msgstr "Avertissement : destination invalide"
+
+#: ../java/build/Proxy.java:92
+msgid ""
+"The eepsite destination specified was not valid, or was otherwise "
+"unreachable."
+msgstr "La destination vers l'eepsite spécifié n'était pas valide, ou autrement était inaccessible."
+
+#: ../java/build/Proxy.java:93
+msgid ""
+"Perhaps you pasted in the wrong Base 64 string or the link you are following"
+" is bad."
+msgstr "Peut-être que vous avez collé dans la mauvaise chaîne base 64, ou le lien que vous suivez est mauvais."
+
+#: ../java/build/Proxy.java:94
+msgid "The I2P host could also be offline."
+msgstr "L'hôte I2P pourrait également être déconnecté."
+
+#: ../java/build/Proxy.java:97 ../java/build/Proxy.java:103
+msgid "Warning: Non-HTTP Protocol"
+msgstr "Avertissement : protocole non HTTP"
+
+#: ../java/build/Proxy.java:104
+msgid "The request uses a bad protocol."
+msgstr "La requête utilise un mauvais protocole."
+
+#: ../java/build/Proxy.java:105
+msgid "The I2P HTTP Proxy supports HTTP and HTTPS requests only."
+msgstr "Le proxy HTTP d'I2P soutient les requêtes HTTP et HTTPS seulement."
+
+#: ../java/build/Proxy.java:106
+msgid "Other protocols such as FTP are not allowed."
+msgstr "Les autres protocoles tel que le FTP ne sont pas permis."
+
+#: ../java/build/Proxy.java:107
+msgid "Warning: Eepsite Unknown"
+msgstr "Avertissement : Eepsite inconnu"
+
+#: ../java/build/Proxy.java:113
+msgid "Warning: Eepsite Not Found in Addressbook"
+msgstr "Avertissement : Eepsite pas trouvé dans le carnet d'adresses"
+
+#: ../java/build/Proxy.java:114
+msgid "The eepsite was not found in your router's addressbook."
+msgstr "Le eepsite n'a pas été trouvé dans le carnet d'adresses de votre routeur."
+
+#: ../java/build/Proxy.java:115
+msgid "Check the link or find a Base 32 or Base 64 address."
+msgstr "Cliquez le lien ou trouvez une adresse base 32 ou base 64."
+
+#: ../java/build/Proxy.java:116
+#, java-format
+msgid "If you have the Base 64 address, {0}add it to your addressbook{1}."
+msgstr "Si vous avez l''adresse Base 64, {0}ajoutez-là à votre carnet d''adresse{1}."
+
+#: ../java/build/Proxy.java:117
+msgid ""
+"Otherwise, find a Base 32 or address helper link, or use a jump service link"
+" below."
+msgstr "Sinon, trouver un lien d'assistant d'adresse ou un lien Base 32, ou utiliser ci-dessous un lien service de saut."
+
+#: ../java/build/Proxy.java:118
+#, java-format
+msgid ""
+"Seeing this page often? See {0}the FAQ{1} for help in {2}adding some "
+"subscriptions{3} to your addressbook."
+msgstr "Voyez-vous cette page souvent ? Voyez {0}la FAQ{1} pour de l'aide afin d'{2}ajouter quelques abonnements{3} à votre carnet d'adresses."
+
+#: ../java/build/Proxy.java:120 ../java/build/Proxy.java:126
+msgid "Warning: Invalid Request URI"
+msgstr "Avertissement : demande invalide d'URI"
+
+#: ../java/build/Proxy.java:127
+msgid "The request URI is invalid, and probably contains illegal characters."
+msgstr "L'URI de la requête n'est pas valide, et contient probablement des caractères illégaux."
+
+#: ../java/build/Proxy.java:128
+msgid ""
+"If you clicked a link, check the end of the URI for any characters the "
+"browser has mistakenly added on."
+msgstr "Si vous avez cliqué sur un lien, vérifiez la fin de l'URI pour d'éventuels caractères que le navigateur aurait ajourté à tort."
+
+#: ../java/build/Proxy.java:129 ../java/build/Proxy.java:135
+#: ../java/build/Proxy.java:141 ../java/build/Proxy.java:147
+msgid "Warning: Outproxy Not Found"
+msgstr "Avertissement : outproxy non trouvé"
+
+#: ../java/build/Proxy.java:136
+msgid ""
+"The HTTP outproxy was not reachable, because its lease set was not found."
+msgstr "L'outproxy HTTP n'était pas accessible, parce que son jeu de bail n'a pas été trouvé."
+
+#: ../java/build/Proxy.java:137
+msgid ""
+"The outproxy is probably down, but there could also be network congestion."
+msgstr "L'outproxy est probablement hors ligne, mais il pourrait également y avoir congestion du réseau."
+
+#: ../java/build/Proxy.java:138 ../java/build/Proxy.java:150
+#, java-format
+msgid ""
+"You may want to {0}retry{1} as this will randomly reselect an outproxy from "
+"the pool you have defined {2}here{3} (if you have more than one configured)."
+msgstr "Vous pouvez vouloir {0}réessayer{1} car cela va re-sélectionner au hasard un outproxy parmi le pool que vous avez défini {2}ici{3} (si vous en avez plus d'un de configuré)."
+
+#: ../java/build/Proxy.java:139 ../java/build/Proxy.java:151
+#, java-format
+msgid ""
+"If you continue to have trouble you may want to edit your outproxy list "
+"{0}here{1}."
+msgstr "Si vous continuez à avoir des dérangements vous pourriez vouloir modifier votre liste de outproxy {0}ici{1}."
+
+#: ../java/build/Proxy.java:148
+msgid "The HTTP Outproxy was not found."
+msgstr "Le proxy HTTP n'est pas en place"
+
+#: ../java/build/Proxy.java:149
+msgid ""
+"It is offline, there is network congestion, or your router is not yet well-"
+"integrated with peers."
+msgstr "Il est hors ligne, ou il y a congestion du réseau, ou votre routeur n'est pas encore bien intégré avec les pairs."
+
+#: ../java/build/Proxy.java:153
 msgid "Proxy Authorization Required"
 msgstr "Autorisation requise par le proxy"
 
-#: ../java/build/Proxy.java:88
+#: ../java/build/Proxy.java:154
 msgid "I2P HTTP Proxy Authorization Required"
 msgstr "Autorisation requise par le proxy HTTP de I2P"
 
-#: ../java/build/Proxy.java:89
+#: ../java/build/Proxy.java:155
 msgid ""
 "This proxy is configured to require a username and password for access."
 msgstr "Ce proxy est configuré pour exiger un nom d''utilisateur et un mot de passe pour y accéder."
 
-#: ../java/build/Proxy.java:90
+#: ../java/build/Proxy.java:156
 #, java-format
 msgid ""
 "Please enter your username and password, or check your {0}router "
 "configuration{1} or {2}I2PTunnel configuration{3}."
 msgstr "Veuillez saisir votre nom d''utilisateur et mot de passe, ou vérifier votre {0}configuration de routeur{1} ou {2}configuration de I2PTunnel{3}."
 
-#: ../java/build/Proxy.java:91
+#: ../java/build/Proxy.java:157
 #, java-format
 msgid ""
 "To disable authorization, remove the configuration "
@@ -269,99 +381,15 @@ msgid ""
 "tunnel."
 msgstr "Pour désactiver l''autorisation, supprimer la configuration {0}i2ptunnel.proxy.auth=basic{1}, puis arrêtez et redémarrez le tunnel du proxy HTTP."
 
-#: ../java/build/Proxy.java:92 ../java/build/Proxy.java:98
-msgid "Warning: Eepsite Unreachable"
-msgstr "Avertissement : Eepsite inaccessible"
-
-#: ../java/build/Proxy.java:99
-msgid "The eepsite was not reachable."
-msgstr "Le eepsite n'était pas joignable."
-
-#: ../java/build/Proxy.java:100
-msgid ""
-"The eepsite is offline, there is network congestion, or your router is not "
-"yet well-integrated with peers."
-msgstr "Le eepsite est hors ligne, ou il y a congestion du réseau, ou votre routeur n'est pas encore bien intégré avec les pairs."
-
-#: ../java/build/Proxy.java:103
-msgid "Information: New Host Name"
-msgstr "Information : nouveau nom d'hôte"
-
-#: ../java/build/Proxy.java:109
-msgid "Information: New Host Name with Address Helper"
-msgstr "Information : nouveau nom d'hôte avec assistant d'adresse"
-
-#: ../java/build/Proxy.java:110
-msgid ""
-"The address helper link you followed is for a new host name that is not in "
-"your address book."
-msgstr "Le lien d'assistant d'adresse que vous avez suivi est pour un nouveau nom d'hôte qui n'est pas dans votre carnet d'adresses."
-
-#: ../java/build/Proxy.java:111
-msgid "You may save this host name to your local address book."
-msgstr "Il vous est possible d'enregistrer ce nom d'hôte à votre carnet d'adresses local."
-
-#: ../java/build/Proxy.java:112
-msgid ""
-"If you save it to your address book, you will not see this message again."
-msgstr "Si vous l'enregistrez dans votre carnet d'adresses, vous ne verrez plus ce message."
-
-#: ../java/build/Proxy.java:113
-msgid ""
-"If you do not save it, the host name will be forgotten after the next router"
-" restart."
-msgstr "Si vous n'enregistrez pas, le nom d'hôte sera oublié après le prochain redémarrage du routeur."
-
-#: ../java/build/Proxy.java:114
-msgid ""
-"If you do not wish to visit this host, click the \"back\" button on your "
-"browser."
-msgstr "Si vous ne souhaitez pas visiter cet hôte, cliquez sur le bouton \"précédent\" de votre navigateur."
-
-#: ../java/build/Proxy.java:115 ../java/build/Proxy.java:121
-msgid "Warning: Bad Address Helper"
-msgstr "Avertissement : mauvais assistant d'adresse"
-
-#: ../java/build/Proxy.java:122
-#, java-format
-msgid "The helper key in the URL ({0}i2paddresshelper={1}) is not resolvable."
-msgstr "La clé auxiliaire dans l''URL ({0}i2paddresshelper={1}) n''est pas résoluble."
-
-#: ../java/build/Proxy.java:123
-msgid "It seems to be garbage data, or a mistyped Base 32 address."
-msgstr "Il semble y avoir des données incorrectes, ou une faute de frappe dans l'adresse Base 32."
-
-#: ../java/build/Proxy.java:124
-msgid ""
-"Check your URL to try and fix the helper key to be a valid Base 32 hostname "
-"or Base 64 key."
-msgstr "Vérifiez votre URL afin d'essayer de résoudre la clé d'assistance pour qu'elle soit un nom d'hôte Base 32 valide ou clé Base 64."
-
-#: ../java/build/Proxy.java:125 ../java/build/Proxy.java:131
-msgid "Warning: Non-HTTP Protocol"
-msgstr "Avertissement : protocole non HTTP"
-
-#: ../java/build/Proxy.java:132
-msgid "The request uses a bad protocol."
-msgstr "La requête utilise un mauvais protocole."
-
-#: ../java/build/Proxy.java:133
-msgid "The I2P HTTP Proxy supports HTTP and HTTPS requests only."
-msgstr "Le proxy HTTP d'I2P soutient les requêtes HTTP et HTTPS seulement."
-
-#: ../java/build/Proxy.java:134
-msgid "Other protocols such as FTP are not allowed."
-msgstr "Les autres protocoles tel que le FTP ne sont pas permis."
-
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:595
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:601
 msgid "This seems to be a bad destination:"
 msgstr "Cela semble être une mauvaise destination"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:595
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:601
 msgid "i2paddresshelper cannot help you with a destination like that!"
 msgstr "L'assistant d'adresse ne peut pas vous aider avec une destination comme cela !"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:662
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:667
 #, java-format
 msgid ""
 "To visit the destination in your host database, click <a "
@@ -369,54 +397,42 @@ msgid ""
 "click <a href=\"{1}\">here</a>."
 msgstr "Pour aller à la destination de votre base de données d''hôtes, cliquez <a href=\"{0}\">ici</a>. Pour aller à la destination de l''assistant d''adresse en conflit, cliquez <a href=\"{1}\">ici</a>."
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1151
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1034
+msgid "Destination lease set not found"
+msgstr "Le jeu de bail de la destination n'a pas été trouvé"
+
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1162
 msgid "Host"
 msgstr "Hôte"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1155
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1166
 msgid "Base 32"
 msgstr "Base 32"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1159
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1170
 msgid "Destination"
 msgstr "Destination"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1165
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1176
 #, java-format
 msgid "Continue to {0} without saving"
 msgstr "Aller sur le site i2p {0} sans enregistrer dans un carnet d''adresses. "
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1170
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1181
 #, java-format
 msgid "Save {0} to router address book and continue to eepsite"
 msgstr "Ajouter au carnet d''adresse du routeur {0} et aller sur le site i2p"
 
 #. only blockfile supports multiple books
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1173
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1184
 #, java-format
 msgid "Save {0} to master address book and continue to eepsite"
 msgstr "Ajouter au carnet d''adresse principal {0} et aller sur le site i2p"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1174
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1185
 #, java-format
 msgid "Save {0} to private address book and continue to eepsite"
 msgstr "Ajouter au carnet d''adresse privé {0} et aller sur le site i2p"
-
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1290
-msgid "HTTP Outproxy"
-msgstr "Proxy sortant HTTP"
-
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1326
-msgid ""
-"Click a link below to look for an address helper by using a \"jump\" "
-"service:"
-msgstr "Cliquez sur un des liens ci-dessous pour chercher une aide d'adresse en utilisant un \"service de saut\":"
-
-#. Translators: parameter is a host name
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1334
-#, java-format
-msgid "{0} jump service"
-msgstr "{0} jump service"
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:162
 #, java-format

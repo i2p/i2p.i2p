@@ -53,26 +53,50 @@
 
       <!-- PICK ONE -->
 
-      <!-- If you don't have or want threadpool
-           Requests above the max will be queued
+      <!--
+           Recommended.
+           Two threads are used for the Connector and Acceptor.
+           Concurrent requests above maxThreads + queue size - 2 will be rejected and logged.
+           Due to the way QTP works, queue size should be larger than maxThreads.
+           Increase all values for high-traffic eepsites.
+
+           ref:
+           https://wiki.eclipse.org/Jetty/Howto/High_Load
+           http://trac.i2p2.i2p/ticket/1395
        -->
-     <!--
       <New class="org.eclipse.jetty.util.thread.QueuedThreadPool">
-        <Set name="minThreads">1</Set>
-        <Set name="maxThreads">16</Set>
+        <Arg>
+           <New class="java.util.concurrent.LinkedBlockingQueue">
+              <Arg type="int">40</Arg>
+           </New>
+        </Arg>
+        <Set name="minThreads">3</Set>
+        <Set name="maxThreads">20</Set>
+        <Set name="maxIdleTimeMs">60000</Set>
+        <Set name="daemon">true</Set>
+        <Set name="name">Eepsite Jetty</Set>
       </New>
-     -->
 
       <!-- Optional Java 5 bounded threadpool with job queue 
            Requests above the max will be rejected and logged.
            High-traffic sites should increase maximumPoolSize.
+
+           Args are:
+             corePoolSize (should be at least 3)
+             maximumPoolSize
+             keepAliveTime (milliseconds)
+             timeout (TimeUnit)
+             queue (BlockingQueue)
+
+           Not recommended.
+           ref:
+           http://trac.i2p2.i2p/ticket/1395
+           http://docs.oracle.com/javase/6/docs/api/java/util/concurrent/ThreadPoolExecutor.html
        -->
+     <!--
       <New class="org.eclipse.jetty.util.thread.ExecutorThreadPool">
-        <!-- corePoolSize (should be at least 3) -->
         <Arg type="int">3</Arg>
-        <!-- maximumPoolSize -->
         <Arg type="int">20</Arg>
-        <!-- keepAliveTime (milliseconds) -->
         <Arg type="long">60000</Arg>
         <Arg>
             <Call class="java.util.concurrent.TimeUnit" name="valueOf" >
@@ -83,6 +107,7 @@
             <New class="java.util.concurrent.SynchronousQueue" />
         </Arg>
       </New>
+     -->
     </Set>
 
 

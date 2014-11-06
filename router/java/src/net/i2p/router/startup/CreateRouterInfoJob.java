@@ -72,9 +72,9 @@ public class CreateRouterInfoJob extends JobImpl {
     
     /**
      *  Writes 6 files: router.info (standard RI format),
-     *  router.keys2, and 4 individual key files under keyBackup/
+     *  router.keys.dat, and 4 individual key files under keyBackup/
      *
-     *  router.keys2 file format: This is the
+     *  router.keys.dat file format: This is the
      *  same "eepPriv.dat" format used by the client code,
      *  as documented in PrivateKeyFile.
      *

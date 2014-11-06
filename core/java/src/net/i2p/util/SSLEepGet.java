@@ -50,9 +50,13 @@ import java.security.KeyStore;
 import java.security.GeneralSecurityException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.Arrays;
 import java.util.Locale;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLHandshakeException;
+import javax.net.ssl.SSLParameters;
+import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
@@ -254,6 +258,50 @@ public class SSLEepGet extends EepGet {
             X509TrustManager defaultTrustManager = (X509TrustManager)tmf.getTrustManagers()[0];
             _stm = new SavingTrustManager(defaultTrustManager);
             sslc.init(null, new TrustManager[] {_stm}, null);
+            if (_log.shouldLog(Log.DEBUG)) {
+                SSLEngine eng = sslc.createSSLEngine();
+                SSLParameters params = sslc.getDefaultSSLParameters();
+                String[] s = eng.getSupportedProtocols();
+                Arrays.sort(s);
+                _log.debug("Supported protocols: " + s.length);
+                for (int i = 0; i < s.length; i++) {
+                     _log.debug(s[i]);
+                }
+                s = eng.getEnabledProtocols();
+                Arrays.sort(s);
+                _log.debug("Enabled protocols: " + s.length);
+                for (int i = 0; i < s.length; i++) {
+                     _log.debug(s[i]);
+                }
+                s = params.getProtocols();
+                if (s == null)
+                    s = new String[0];
+                _log.debug("Default protocols: " + s.length);
+                Arrays.sort(s);
+                for (int i = 0; i < s.length; i++) {
+                     _log.debug(s[i]);
+                }
+                s = eng.getSupportedCipherSuites();
+                Arrays.sort(s);
+                _log.debug("Supported ciphers: " + s.length);
+                for (int i = 0; i < s.length; i++) {
+                     _log.debug(s[i]);
+                }
+                s = eng.getEnabledCipherSuites();
+                Arrays.sort(s);
+                _log.debug("Enabled ciphers: " + s.length);
+                for (int i = 0; i < s.length; i++) {
+                     _log.debug(s[i]);
+                }
+                s = params.getCipherSuites();
+                if (s == null)
+                    s = new String[0];
+                _log.debug("Default ciphers: " + s.length);
+                Arrays.sort(s);
+                for (int i = 0; i < s.length; i++) {
+                     _log.debug(s[i]);
+                }
+            }
             return sslc;
         } catch (GeneralSecurityException gse) {
             _log.error("Key Store update error", gse);
@@ -505,6 +553,8 @@ public class SSLEepGet extends EepGet {
                     _proxy = _sslContext.getSocketFactory().createSocket(host, port);
                 else
                     _proxy = SSLSocketFactory.getDefault().createSocket(host, port);
+                SSLSocket socket = (SSLSocket) _proxy;
+                I2PSSLSocketFactory.setProtocolsAndCiphers(socket);
             } else {
                 throw new MalformedURLException("Only https supported: " + _actualURL);
             }
