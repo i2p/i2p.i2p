@@ -329,6 +329,8 @@ public class I2PSnarkServlet extends BasicServlet {
             for (Tracker t : sortedTrackers) {
                 if (t.baseURL == null || !t.baseURL.startsWith("http"))
                     continue;
+                if (_manager.util().isKnownOpenTracker(t.announceURL))
+                    continue;
                 out.write(" <a href=\"" + t.baseURL + "\" class=\"snarkRefresh\" target=\"_blank\">" + t.name + "</a>");
             }
         }
@@ -2305,6 +2307,7 @@ public class I2PSnarkServlet extends BasicServlet {
             String announceURL = t.announceURL.replace("&#61;", "=");
             boolean isOpen = openTrackers.contains(t.announceURL);
             boolean isPrivate = privateTrackers.contains(t.announceURL);
+            boolean isKnownOpen = _manager.util().isKnownOpenTracker(t.announceURL);
             buf.append("<tr><td><input type=\"checkbox\" class=\"optbox\" name=\"delete_")
                .append(name).append("\" title=\"").append(_("Delete")).append("\">" +
                        "</td><td>").append(name)
@@ -2313,7 +2316,7 @@ public class I2PSnarkServlet extends BasicServlet {
                .append(announceURL).append("\"");
             if (!(isOpen || isPrivate))
                 buf.append(" checked=\"checked\"");
-            else if (t.announceURL.equals("http://tracker.welterde.i2p/a"))
+            else if (isKnownOpen)
                 buf.append(" disabled=\"disabled\"");
             buf.append(">" +
                        "</td><td><input type=\"radio\" class=\"optbox\" value=\"1\" name=\"ttype_")
@@ -2329,7 +2332,7 @@ public class I2PSnarkServlet extends BasicServlet {
             if (isPrivate) {
                 buf.append(" checked=\"checked\"");
             } else {
-                if (SnarkManager.DEFAULT_TRACKER_ANNOUNCES.contains(t.announceURL))
+                if (isKnownOpen)
                     buf.append(" disabled=\"disabled\"");
             }
             buf.append(">" +

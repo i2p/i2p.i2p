@@ -74,8 +74,6 @@ public class TrackerClient implements Runnable {
   private static final String NOT_REGISTERED_2  = "torrent not found";    // diftracker
   private static final String NOT_REGISTERED_3  = "torrent unauthorised"; // vuze
   private static final String ERROR_GOT_HTML  = "received html";             // fake return
-  /** this is our equivalent to router.utorrent.com for bootstrap */
-  private static final String DEFAULT_BACKUP_TRACKER = "http://tracker.welterde.i2p/a";
 
   private final static int SLEEP = 5; // 5 minutes.
   private final static int DELAY_MIN = 2000; // 2 secs.
@@ -344,7 +342,9 @@ public class TrackerClient implements Runnable {
                 _log.debug("Backup announce: [" + url + "] for infoHash: " + infoHash);
         }
         if (backupTrackers.isEmpty()) {
-            backupTrackers.add(new TCTracker(DEFAULT_BACKUP_TRACKER, false));
+            backupTrackers.add(new TCTracker(SnarkManager.DEFAULT_BACKUP_TRACKER, false));
+        } else if (trackers.size() > 1) {
+            Collections.shuffle(backupTrackers, _util.getContext().random());
         }
     }
     this.completed = coordinator.getLeft() == 0;
