@@ -32,6 +32,9 @@ class InboundMessageDistributor implements GarlicMessageReceiver.CloveReceiver {
     private final Hash _client;
     private final GarlicMessageReceiver _receiver;
     
+    /**
+     *  @param client null for router tunnel
+     */
     public InboundMessageDistributor(RouterContext ctx, Hash client) {
         _context = ctx;
         _client = client;
