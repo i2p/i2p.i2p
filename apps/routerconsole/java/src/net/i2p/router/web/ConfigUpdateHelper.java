@@ -106,6 +106,8 @@ public class ConfigUpdateHelper extends HelperBase {
         long ms = ConfigUpdateHandler.DEFAULT_REFRESH_FREQ;
         try { 
             ms = Long.parseLong(freq);
+            if (ms <= 0)
+                ms = -1;
         } catch (NumberFormatException nfe) {}
 
         StringBuilder buf = new StringBuilder(256);

@@ -170,6 +170,9 @@ public class ConfigUpdateHandler extends FormHandler {
             return;
         }
 
+        if (!_action.equals(_("Save")))
+            return;
+
         Map<String, String> changes = new HashMap<String, String>();
 
         if ( (_newsURL != null) && (_newsURL.length() > 0) ) {
