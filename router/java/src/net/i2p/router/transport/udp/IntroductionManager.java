@@ -18,6 +18,7 @@ import net.i2p.router.RouterContext;
 import net.i2p.util.Addresses;
 import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.Log;
+import net.i2p.router.transport.TransportUtil;
 
 /**
  *  Keep track of inbound and outbound introductions.
@@ -119,7 +120,7 @@ class IntroductionManager {
     public void add(PeerState peer) {
         if (peer == null) return;
         // let's not use an introducer on a privileged port, sounds like trouble
-        if (peer.getRemotePort() < 1024)
+        if (!TransportUtil.isValidPort(peer.getRemotePort()))
             return;
         // Only allow relay as Bob or Charlie if the Bob-Charlie session is IPv4
         if (peer.getRemoteIP().length != 4)
@@ -451,8 +452,7 @@ class IntroductionManager {
      *  @since 0.9.3
      */
     private boolean isValid(byte[] ip, int port) {
-        return port >= UDPTransport.MIN_PEER_PORT &&
-               port <= 65535 &&
+        return TransportUtil.isValidPort(port) &&
                ip != null && ip.length == 4 &&
                _transport.isValid(ip) &&
                (!_transport.isTooClose(ip)) &&

@@ -9,6 +9,7 @@ import java.net.SocketException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import net.i2p.router.RouterContext;
+import net.i2p.router.transport.TransportUtil;
 import net.i2p.util.Log;
 
 /**
@@ -112,8 +113,8 @@ class UDPEndpoint implements SocketListener {
     private DatagramSocket getSocket() {
         DatagramSocket socket = null;
         int port = _listenPort;
-        if (port > 0 && port < 1024)
-            _log.logAlways(Log.WARN, "Specified UDP port is " + port + ", ports lower than 1024 not recommended");
+        if (port > 0 && !TransportUtil.isValidPort(port))
+            _log.error("Specified UDP port is " + port + ", ports lower than 1024 not recommended");
 
         for (int i = 0; i < MAX_PORT_RETRIES; i++) {
              if (port <= 0) {

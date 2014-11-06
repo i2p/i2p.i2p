@@ -169,4 +169,15 @@ public abstract class TransportUtil {
         }
         return false;
     }
+
+    /**
+     *  Is this a valid port for us or a remote router?
+     *
+     *  @since 0.9.17 moved from logic in individual transports
+     */
+    public static boolean isValidPort(int port) {
+        return port >= 1024 &&
+               port <= 65535 &&
+               port != 1900;    // UPnP SSDP
+    }
 }

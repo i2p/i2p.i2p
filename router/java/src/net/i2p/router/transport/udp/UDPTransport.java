@@ -121,19 +121,6 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      */
     public static final int DEFAULT_INTERNAL_PORT = 8887;
 
-    /**
-     *  To prevent trouble. 1024 as of 0.9.4.
-     *
-     *  @since 0.9.3
-     */
-    static final int MIN_PEER_PORT = 1024;
-
-    /** Limits on port told to us by others,
-     *  We should have an exception if it matches the existing low port.
-     */
-    private static final int MIN_EXTERNAL_PORT = 1024;
-    private static final int MAX_EXTERNAL_PORT = 65535;
-
     /** define this to explicitly set an external IP address */
     public static final String PROP_EXTERNAL_HOST = "i2np.udp.host";
     /** define this to explicitly set an external port */
@@ -765,7 +752,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         if (ourIP.length != 4)
             return;
         boolean isValid = isValid(ourIP) &&
-                          (ourPort >= MIN_EXTERNAL_PORT && ourPort <= MAX_EXTERNAL_PORT);
+                          TransportUtil.isValidPort(ourPort);
         boolean explicitSpecified = explicitAddressSpecified();
         boolean inboundRecent = _lastInboundReceivedOn + ALLOW_IP_CHANGE_INTERVAL > System.currentTimeMillis();
         if (_log.shouldLog(Log.INFO))
@@ -1620,7 +1607,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             if (addr.getOption("ihost0") == null) {
                 byte[] ip = addr.getIP();
                 int port = addr.getPort();
-                if (ip == null || port < MIN_PEER_PORT ||
+                if (ip == null || !TransportUtil.isValidPort(port) ||
                     (!isValid(ip)) ||
                     (Arrays.equals(ip, getExternalIP()) && !allowLocal())) {
                     continue;

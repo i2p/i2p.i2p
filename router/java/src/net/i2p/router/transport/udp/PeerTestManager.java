@@ -15,6 +15,7 @@ import net.i2p.data.SessionKey;
 import net.i2p.router.CommSystemFacade;
 import net.i2p.router.RouterContext;
 import static net.i2p.router.transport.udp.PeerTestState.Role.*;
+import net.i2p.router.transport.TransportUtil;
 import net.i2p.util.Addresses;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleTimer;
@@ -495,7 +496,7 @@ class PeerTestManager {
         _context.statManager().addRateData("udp.receiveTest", 1);
         byte[] fromIP = from.getIP();
         int fromPort = from.getPort();
-        if (fromPort < 1024 || fromPort > 65535 ||
+        if (!TransportUtil.isValidPort(fromPort) ||
             (!_transport.isValid(fromIP)) ||
             _transport.isTooClose(fromIP) ||
             _context.blocklist().isBlocklisted(fromIP)) {
@@ -514,7 +515,7 @@ class PeerTestManager {
             testInfo.readIP(testIP, 0);
         }
 
-        if ((testPort > 0 && (testPort < 1024 || testPort > 65535)) ||
+        if ((testPort > 0 && (!TransportUtil.isValidPort(testPort))) ||
             (testIP != null &&
                                ((!_transport.isValid(testIP)) ||
                                 testIP.length != 4 ||

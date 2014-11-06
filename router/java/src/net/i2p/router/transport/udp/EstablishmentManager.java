@@ -20,6 +20,7 @@ import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
+import net.i2p.router.transport.TransportUtil;
 import net.i2p.router.transport.crypto.DHSessionKeyBuilder;
 import static net.i2p.router.transport.udp.InboundEstablishState.InboundState.*;
 import static net.i2p.router.transport.udp.OutboundEstablishState.OutboundState.*;
@@ -425,7 +426,7 @@ class EstablishmentManager {
      *
      */
     void receiveSessionRequest(RemoteHostId from, UDPPacketReader reader) {
-        if (from.getPort() < UDPTransport.MIN_PEER_PORT || !_transport.isValid(from.getIP())) {
+        if (!TransportUtil.isValidPort(from.getPort()) || !_transport.isValid(from.getIP())) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Receive session request from invalid: " + from);
             return;
@@ -1000,8 +1001,7 @@ class EstablishmentManager {
      *  @since 0.9.3
      */
     private boolean isValid(byte[] ip, int port) {
-        return port >= UDPTransport.MIN_PEER_PORT &&
-               port <= 65535 &&
+        return TransportUtil.isValidPort(port) &&
                ip != null && ip.length == 4 &&
                _transport.isValid(ip) &&
                (!_transport.isTooClose(ip)) &&

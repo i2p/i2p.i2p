@@ -97,13 +97,6 @@ public class NTCPTransport extends TransportImpl {
     private long _lastBadSkew;
     private static final long[] RATES = { 10*60*1000 };
 
-    /**
-     *  To prevent trouble. 1024 as of 0.9.4.
-     *
-     *  @since 0.9.3
-     */
-    private static final int MIN_PEER_PORT = 1024;
-
     // Opera doesn't have the char, TODO check UA
     //private static final String THINSP = "&thinsp;/&thinsp;";
     private static final String THINSP = " / ";
@@ -402,7 +395,7 @@ public class NTCPTransport extends TransportImpl {
         for (int i = 0; i < addrs.size(); i++) {
             RouterAddress addr = addrs.get(i);
             byte[] ip = addr.getIP();
-            if (addr.getPort() < MIN_PEER_PORT || ip == null) {
+            if (!TransportUtil.isValidPort(addr.getPort()) || ip == null) {
                 //_context.statManager().addRateData("ntcp.connectFailedInvalidPort", 1);
                 //_context.banlist().banlistRouter(toAddress.getIdentity().calculateHash(), "Invalid NTCP address", STYLE);
                 //if (_log.shouldLog(Log.DEBUG))
@@ -695,8 +688,8 @@ public class NTCPTransport extends TransportImpl {
                     // FIXME just close and unregister
                     stopWaitAndRestart();
                 }
-                if (port < 1024)
-                    _log.logAlways(Log.WARN, "Specified NTCP port is " + port + ", ports lower than 1024 not recommended");
+                if (!TransportUtil.isValidPort(port))
+                    _log.error("Specified NTCP port is " + port + ", ports lower than 1024 not recommended");
                 ServerSocketChannel chan = ServerSocketChannel.open();
                 chan.configureBlocking(false);
                 chan.socket().bind(addr);
