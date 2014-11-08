@@ -1334,12 +1334,13 @@ public class ProfileOrganizer {
      *  others.
      *  @return 0-3
      */
-    private static int getSubTier(Hash peer, Hash randomKey) {
-        byte[] data = new byte[Hash.HASH_LENGTH + 4];
+    private int getSubTier(Hash peer, Hash randomKey) {
+        // input is first 36 bytes; output is last 32 bytes
+        byte[] data = new byte[Hash.HASH_LENGTH + 4 + Hash.HASH_LENGTH];
         System.arraycopy(peer.getData(), 0, data, 0, Hash.HASH_LENGTH);
         System.arraycopy(randomKey.getData(), 0, data, Hash.HASH_LENGTH, 4);
-        Hash rh = SHA256Generator.getInstance().calculateHash(data);
-        return rh.getData()[0] & 0x03;
+        _context.sha().calculateHash(data, 0, Hash.HASH_LENGTH + 4, data, Hash.HASH_LENGTH + 4);
+        return data[Hash.HASH_LENGTH + 4] & 0x03;
     }
 
     public boolean isSelectable(Hash peer) {
