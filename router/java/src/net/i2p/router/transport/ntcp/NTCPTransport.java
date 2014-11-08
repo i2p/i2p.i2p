@@ -23,6 +23,7 @@ import java.util.TreeSet;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 
+import net.i2p.crypto.SigType;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.router.RouterAddress;
@@ -47,6 +48,7 @@ import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.Log;
 import net.i2p.util.OrderedProperties;
 import net.i2p.util.SystemVersion;
+import net.i2p.util.VersionComparator;
 
 /**
  *  The NIO TCP transport
@@ -100,6 +102,12 @@ public class NTCPTransport extends TransportImpl {
     // Opera doesn't have the char, TODO check UA
     //private static final String THINSP = "&thinsp;/&thinsp;";
     private static final String THINSP = " / ";
+
+    /**
+     *  RI sigtypes supported in 0.9.16
+     */
+    private static final String MIN_SIGTYPE_VERSION = "0.9.16";
+
 
     public NTCPTransport(RouterContext ctx, DHSessionKeyBuilder.Factory dh) {
         super(ctx);
@@ -356,9 +364,23 @@ public class NTCPTransport extends TransportImpl {
         }
 
         // Check for supported sig type
-        if (toAddress.getIdentity().getSigningPublicKey().getType() == null) {
+        SigType type = toAddress.getIdentity().getSigType();
+        if (type == null || !type.isAvailable()) {
             markUnreachable(peer);
             return null;
+        }
+
+        // Can we connect to them if we are not DSA?
+        RouterInfo us = _context.router().getRouterInfo();
+        if (us != null) {
+            RouterIdentity id = us.getIdentity();
+            if (id.getSigType() != SigType.DSA_SHA1) {
+                String v = toAddress.getOption("router.version");
+                if (v != null && VersionComparator.comp(v, MIN_SIGTYPE_VERSION) < 0) {
+                    markUnreachable(peer);
+                    return null;
+                }
+            }
         }
 
         if (!allowConnection()) {
