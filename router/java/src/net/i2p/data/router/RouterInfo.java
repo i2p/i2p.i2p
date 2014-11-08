@@ -113,7 +113,7 @@ public class RouterInfo extends DatabaseEntry {
         return _published;
     }
 
-    protected KeysAndCert getKeysAndCert() {
+    public KeysAndCert getKeysAndCert() {
         return _identity;
     }
 
