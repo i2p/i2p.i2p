@@ -110,7 +110,7 @@ class UpdateRunner implements UpdateTask, CompleteListener {
                     _umgr.notifyAttemptFailed(this, "No tracker, no DHT, no OT", null);
                     continue;
                 }
-                _snark = _smgr.addMagnet(name, ih, trackerURL, true, true, this);
+                _snark = _smgr.addMagnet(name, ih, trackerURL, true, true, null, this);
                 if (_snark != null) {
                     updateStatus("<b>" + _smgr.util().getString("Updating from {0}", linkify(updateURL)) + "</b>");
                     new Timeout();

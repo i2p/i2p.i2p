@@ -50,6 +50,7 @@ public class FetchAndAdd extends Snark implements EepGet.StatusListener, Runnabl
     private final String _url;
     private final byte[] _fakeHash;
     private final String _name;
+    private final File _dataDir;
     private volatile long _remaining = -1;
     private volatile long _total = -1;
     private volatile long _transferred;
@@ -65,8 +66,10 @@ public class FetchAndAdd extends Snark implements EepGet.StatusListener, Runnabl
     /**
      *   Caller should call _mgr.addDownloader(this), which
      *   will start things off.
+     *
+     *   @param dataDir null to default to snark data directory
      */
-    public FetchAndAdd(I2PAppContext ctx, SnarkManager mgr, String url) {
+    public FetchAndAdd(I2PAppContext ctx, SnarkManager mgr, String url, File dataDir) {
         // magnet constructor
         super(mgr.util(), "Torrent download",
               null, null, null, null, null, false, null);
@@ -75,6 +78,7 @@ public class FetchAndAdd extends Snark implements EepGet.StatusListener, Runnabl
         _mgr = mgr;
         _url = url;
         _name = _("Download torrent file from {0}", url);
+        _dataDir = dataDir;
         byte[] fake = null;
         try {
             fake = SHA1.getInstance().digest(url.getBytes("ISO-8859-1"));
@@ -176,7 +180,7 @@ public class FetchAndAdd extends Snark implements EepGet.StatusListener, Runnabl
                     _mgr.addMessage(_("Torrent already in the queue: {0}", name));
             } else {
                 // This may take a LONG time to create the storage.
-                _mgr.copyAndAddTorrent(file, canonical);
+                _mgr.copyAndAddTorrent(file, canonical, _dataDir);
                 snark = _mgr.getTorrentByBaseName(originalName);
                 if (snark != null)
                     snark.startTorrent();

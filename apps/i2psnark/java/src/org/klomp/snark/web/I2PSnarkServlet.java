@@ -30,6 +30,7 @@ import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.util.Log;
+import net.i2p.util.SecureFile;
 
 import org.klomp.snark.I2PSnarkUtil;
 import org.klomp.snark.MagnetURI;
@@ -933,13 +934,41 @@ public class I2PSnarkServlet extends BasicServlet {
             } else
           *****/
             if (newURL != null) {
+                String newDir = req.getParameter("nofilter_newDir");
+                File dir = null;
+                if (newDir != null) {
+                    newDir = newDir.trim();
+                    if (newDir.length() > 0) {
+                        dir = new SecureFile(newDir);
+                        if (!dir.isAbsolute()) {
+                            _manager.addMessage(_("Data directory must be an absolute path") + ": " + dir);
+                            return;
+                        }
+                        if (!dir.isDirectory() && !dir.mkdirs()) {
+                            _manager.addMessage(_("Data directory cannot be created") + ": " + dir);
+                            return;
+                        }
+                        Collection<Snark> snarks = _manager.getTorrents();
+                        for (Snark s : snarks) {
+                            Storage storage = s.getStorage();
+                            if (storage == null)
+                                continue;
+                            File sbase = storage.getBase();
+                            if (isParentOf(sbase, dir)) {
+                                _manager.addMessage(_("Cannot add torrent {0} inside another torrent: {1}",
+                                                      dir.getAbsolutePath(), sbase));
+                                return;
+                            }
+                        }
+                    }
+                }
                 if (newURL.startsWith("http://")) {
-                    FetchAndAdd fetch = new FetchAndAdd(_context, _manager, newURL);
+                    FetchAndAdd fetch = new FetchAndAdd(_context, _manager, newURL, dir);
                     _manager.addDownloader(fetch);
                 } else if (newURL.startsWith(MagnetURI.MAGNET) || newURL.startsWith(MagnetURI.MAGGOT)) {
-                    addMagnet(newURL);
+                    addMagnet(newURL, dir);
                 } else if (newURL.length() == 40 && newURL.replaceAll("[a-fA-F0-9]", "").length() == 0) {
-                    addMagnet(MagnetURI.MAGNET_FULL + newURL);
+                    addMagnet(MagnetURI.MAGNET_FULL + newURL, dir);
                 } else {
                     _manager.addMessage(_("Invalid URL: Must start with \"http://\", \"{0}\", or \"{1}\"",
                                           MagnetURI.MAGNET, MagnetURI.MAGGOT));
@@ -2000,6 +2029,7 @@ public class I2PSnarkServlet extends BasicServlet {
         out.write(toThemeImg("add"));
         out.write(' ');
         out.write(_("Add Torrent"));
+
         out.write("</span><hr>\n<table border=\"0\"><tr><td>");
         out.write(_("From URL"));
         out.write(":<td><input type=\"text\" name=\"nofilter_newURL\" size=\"85\" value=\"" + newURL + "\" spellcheck=\"false\"");
@@ -2010,9 +2040,17 @@ public class I2PSnarkServlet extends BasicServlet {
         //out.write("From file: <input type=\"file\" name=\"newFile\" size=\"50\" value=\"" + newFile + "\" /><br>");
         out.write("<input type=\"submit\" class=\"add\" value=\"");
         out.write(_("Add torrent"));
-        out.write("\" name=\"foo\" ><br>\n");
+        out.write("\" name=\"foo\" ><br>\n" +
+
+                  "<tr><td>");
+        out.write(_("Data dir"));
+        out.write(":<td><input type=\"text\" name=\"nofilter_newDir\" size=\"85\" value=\"\" spellcheck=\"false\"");
+        out.write(" title=\"");
+        out.write(_("Enter the directory to save the data in (default {0})", _manager.getDataDir().getAbsolutePath()));
+        out.write("\"></td></tr>\n");
+
         out.write("<tr><td>&nbsp;<td><span class=\"snarkAddInfo\">");
-        out.write(_("You can also copy .torrent files to: {0}.", "<code>" + _manager.getDataDir().getAbsolutePath () + "</code>"));
+        out.write(_("You can also copy .torrent files to: {0}.", "<code>" + _manager.getDataDir().getAbsolutePath() + "</code>"));
         out.write("\n");
         out.write(_("Removing a .torrent will cause it to stop."));
         out.write("<br></span></table>\n");
@@ -2372,15 +2410,16 @@ public class I2PSnarkServlet extends BasicServlet {
 
     /**
      *  @param url in base32 or hex
+     *  @param dataDir null to default to snark data directory
      *  @since 0.8.4
      */
-    private void addMagnet(String url) {
+    private void addMagnet(String url, File dataDir) {
         try {
             MagnetURI magnet = new MagnetURI(_manager.util(), url);
             String name = magnet.getName();
             byte[] ih = magnet.getInfoHash();
             String trackerURL = magnet.getTrackerURL();
-            _manager.addMagnet(name, ih, trackerURL, true);
+            _manager.addMagnet(name, ih, trackerURL, true, dataDir);
         } catch (IllegalArgumentException iae) {
             _manager.addMessage(_("Invalid magnet URL {0}", url));
         }
