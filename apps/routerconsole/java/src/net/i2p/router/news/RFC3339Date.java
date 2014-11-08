@@ -99,8 +99,6 @@ public abstract class RFC3339Date {
 
     /**
      * Format is "yyyy-MM-ddTHH:mm:ssZ"
-     *
-     * @since 0.8.2
      */
     public synchronized static String to3339Date(long t) {
         return OUTPUT_FORMAT.format(new Date(t));
