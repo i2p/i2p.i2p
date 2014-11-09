@@ -603,7 +603,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                 <label for="customOptions" accesskey="u">
                     <%=intl._("Custom options")%>(<span class="accessKey">u</span>):
                 </label>
-                <input type="text" id="customOptions" name="nofilter_customOptions" size="60" title="Custom Options" value="<%=editBean.getCustomOptions(curTunnel)%>" class="freetext" />                
+                <input type="text" id="customOptions" name="nofilter_customOptions" size="60" title="Custom Options" value="<%=editBean.getCustomOptions(curTunnel)%>" class="freetext" spellcheck="false"/>                
             </div>
             
             <div class="footer">
