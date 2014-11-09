@@ -25,6 +25,7 @@ import net.i2p.I2PAppContext;
 import net.i2p.app.ClientAppManager;
 import net.i2p.app.Outproxy;
 import net.i2p.client.I2PClient;
+import net.i2p.data.Base64;
 import net.i2p.data.Certificate;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
@@ -1328,6 +1329,20 @@ public class IndexBean {
                 config.setProperty(OPT + PROP_MAX_CONNS_HOUR, "10");
                 config.setProperty(OPT + PROP_MAX_TOTAL_CONNS_MIN, "5");
                 config.setProperty(OPT + PROP_MAX_TOTAL_CONNS_HOUR, "25");
+            }
+        }
+
+        // As of 0.9.17, add a persistent random key if not present
+        if (!isClient(_type) || _booleanOptions.contains("persistentClientKey")) {
+            String p = OPT + "inbound.randomKey";
+            if (!config.containsKey(p)) {
+                // as of 0.9.17, add a random key if not previously present
+                byte[] rk = new byte[32];
+                _context.random().nextBytes(rk);
+                config.setProperty(OPT + p, Base64.encode(rk));
+                p = OPT + "outbound.randomKey";
+                _context.random().nextBytes(rk);
+                config.setProperty(OPT + p, Base64.encode(rk));
             }
         }
 

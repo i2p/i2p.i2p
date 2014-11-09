@@ -25,6 +25,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import gnu.getopt.Getopt;
 
+import net.i2p.data.Base64;
 import net.i2p.data.Certificate;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
@@ -101,6 +102,8 @@ public class Router implements RouterClock.ClockShiftListener {
     public final static String PROP_HIDDEN_HIDDEN = "router.isHidden";
     public final static String PROP_DYNAMIC_KEYS = "router.dynamicKeys";
     public final static String PROP_SHUTDOWN_IN_PROGRESS = "__shutdownInProgress";
+    private static final String PROP_IB_RANDOM_KEY = TunnelPoolSettings.PREFIX_INBOUND_EXPLORATORY + TunnelPoolSettings.PROP_RANDOM_KEY;
+    private static final String PROP_OB_RANDOM_KEY = TunnelPoolSettings.PREFIX_OUTBOUND_EXPLORATORY + TunnelPoolSettings.PROP_RANDOM_KEY;
     public final static String DNS_CACHE_TIME = "" + (5*60);
     private static final String EVENTLOG = "eventlog.txt";
     private static final String PROP_JBIGI = "jbigi.loadedResource";
@@ -486,6 +489,18 @@ public class Router implements RouterClock.ClockShiftListener {
         //_sessionKeyPersistenceHelper.startup();
         //_context.adminManager().startup();
         _context.blocklist().startup();
+
+        synchronized(_configFileLock) {
+            // persistent key for peer ordering since 0.9.17
+            if (!_config.containsKey(PROP_IB_RANDOM_KEY)) {
+                byte rk[] = new byte[32];
+                _context.random().nextBytes(rk);
+                _config.put(PROP_IB_RANDOM_KEY, Base64.encode(rk));
+                _context.random().nextBytes(rk);
+                _config.put(PROP_OB_RANDOM_KEY, Base64.encode(rk));
+                saveConfig();
+            }
+        }
         
         // let the timestamper get us sync'ed
         // this will block for quite a while on a disconnected machine
@@ -711,9 +726,11 @@ public class Router implements RouterClock.ClockShiftListener {
         }
 
         // now that we have random ports, keeping the same port would be bad
-        synchronized(this) {
+        synchronized(_configFileLock) {
             removeConfigSetting(UDPTransport.PROP_INTERNAL_PORT);
             removeConfigSetting(UDPTransport.PROP_EXTERNAL_PORT);
+            removeConfigSetting(PROP_IB_RANDOM_KEY);
+            removeConfigSetting(PROP_OB_RANDOM_KEY);
             saveConfig();
         }
     }

@@ -4,6 +4,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 
+import net.i2p.data.Base64;
 import net.i2p.data.Hash;
 import net.i2p.util.NativeBigInteger;
 import net.i2p.util.RandomSource;
@@ -28,7 +29,7 @@ public class TunnelPoolSettings {
     private boolean _allowZeroHop;
     private int _IPRestriction;
     private final Properties _unknownOptions;
-    private final Hash _randomKey;
+    private Hash _randomKey;
     private int _priority;
     
     /** prefix used to override the router's defaults for clients */
@@ -51,6 +52,8 @@ public class TunnelPoolSettings {
     public static final String  PROP_ALLOW_ZERO_HOP = "allowZeroHop";
     public static final String  PROP_IP_RESTRICTION = "IPRestriction";
     public static final String  PROP_PRIORITY = "priority";
+    /** @since 0.9.17 */
+    public static final String  PROP_RANDOM_KEY = "randomKey";
     
     public static final int     DEFAULT_QUANTITY = 2;
     public static final int     DEFAULT_BACKUP_QUANTITY = 0;
@@ -204,7 +207,11 @@ public class TunnelPoolSettings {
     /** what destination is this a client tunnel for (or null if exploratory) */
     public Hash getDestination() { return _destination; }
 
-    /** random key used for peer ordering */
+    /**
+     *  random key used for peer ordering
+     *
+     *  @return non-null
+     */
     public Hash getRandomKey() { return _randomKey; }
 
     /** what user supplied name was given to the client connected (can be null) */
@@ -265,6 +272,10 @@ public class TunnelPoolSettings {
                      int def = _isExploratory ? EXPLORATORY_PRIORITY : 0;
                      int max = _isExploratory ? EXPLORATORY_PRIORITY : MAX_PRIORITY;
                     _priority = Math.min(max, Math.max(MIN_PRIORITY, getInt(value, def)));
+                } else if (name.equalsIgnoreCase(prefix + PROP_RANDOM_KEY)) {
+                    byte[] rk = Base64.decode(value);
+                    if (rk != null && rk.length == Hash.HASH_LENGTH)
+                        _randomKey = new Hash(rk);
                 } else
                     _unknownOptions.setProperty(name.substring(prefix.length()), value);
             }
