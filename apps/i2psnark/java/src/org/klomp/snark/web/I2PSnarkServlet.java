@@ -2343,9 +2343,9 @@ public class I2PSnarkServlet extends BasicServlet {
             String name = t.name;
             String homeURL = t.baseURL;
             String announceURL = t.announceURL.replace("&#61;", "=");
-            boolean isOpen = openTrackers.contains(t.announceURL);
             boolean isPrivate = privateTrackers.contains(t.announceURL);
             boolean isKnownOpen = _manager.util().isKnownOpenTracker(t.announceURL);
+            boolean isOpen = isKnownOpen || openTrackers.contains(t.announceURL);
             buf.append("<tr><td><input type=\"checkbox\" class=\"optbox\" name=\"delete_")
                .append(name).append("\" title=\"").append(_("Delete")).append("\">" +
                        "</td><td>").append(name)
@@ -2369,9 +2369,10 @@ public class I2PSnarkServlet extends BasicServlet {
                .append(announceURL).append("\"");
             if (isPrivate) {
                 buf.append(" checked=\"checked\"");
-            } else {
-                if (isKnownOpen)
-                    buf.append(" disabled=\"disabled\"");
+            } else if (isKnownOpen ||
+                       t.announceURL.equals("http://diftracker.i2p/announce.php") ||
+                       t.announceURL.equals("http://tracker2.postman.i2p/announce.php")) {
+                buf.append(" disabled=\"disabled\"");
             }
             buf.append(">" +
                        "</td><td>").append(urlify(announceURL, 35))
