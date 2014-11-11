@@ -2070,7 +2070,7 @@ public class I2PSnarkServlet extends BasicServlet {
         //out.write("From file: <input type=\"file\" name=\"newFile\" size=\"50\" value=\"" + newFile + "\" /><br>\n");
         out.write(_("Data to seed"));
         out.write(":<td>"
-                  + "<input type=\"text\" name=\"nofilter_baseFile\" size=\"58\" value=\""
+                  + "<input type=\"text\" name=\"nofilter_baseFile\" size=\"85\" value=\""
                   + "\" spellcheck=\"false\" title=\"");
         out.write(_("File or directory to seed (full path or within the directory {0} )",
                     _manager.getDataDir().getAbsolutePath() + File.separatorChar));
