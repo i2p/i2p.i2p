@@ -1,3 +1,6 @@
+2014-11-12 zzz
+ * Plugins: Fix bug in stopping a ClientApp plugin with $parameters in the args
+
 2014-11-09 zzz
  * i2psnark: Fix tracker config form issues
  * Router, i2ptunnel: Add option for per-pool persistent random key,
