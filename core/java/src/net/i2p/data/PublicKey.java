@@ -68,4 +68,11 @@ public class PublicKey extends SimpleDataStructure {
     public int length() {
         return KEYSIZE_BYTES;
     }
+
+    /**
+     *  @since 0.9.17
+     */
+    public static void clearCache() {
+        _cache.clear();
+    }
 }

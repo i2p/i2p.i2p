@@ -25,14 +25,18 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import gnu.getopt.Getopt;
 
+import net.i2p.crypto.SigUtil;
 import net.i2p.data.Base64;
 import net.i2p.data.Certificate;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
-import net.i2p.data.router.RouterInfo;
+import net.i2p.data.Hash;
+import net.i2p.data.PublicKey;
 import net.i2p.data.SigningPrivateKey;
+import net.i2p.data.SigningPublicKey;
 import net.i2p.data.i2np.GarlicMessage;
+import net.i2p.data.router.RouterInfo;
 import net.i2p.router.message.GarlicMessageHandler;
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import net.i2p.router.startup.CreateRouterInfoJob;
@@ -346,6 +350,10 @@ public class Router implements RouterClock.ClockShiftListener {
         SimpleByteCache.clearAll();
         Destination.clearCache();
         Translate.clearCache();
+        Hash.clearCache();
+        PublicKey.clearCache();
+        SigningPublicKey.clearCache();
+        SigUtil.clearCaches();
     }
 
     /**
