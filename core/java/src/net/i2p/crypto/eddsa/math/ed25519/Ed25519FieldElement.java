@@ -1,13 +1,18 @@
 package net.i2p.crypto.eddsa.math.ed25519;
 
 import net.i2p.crypto.eddsa.Utils;
-import net.i2p.crypto.eddsa.math.Field;
-import net.i2p.crypto.eddsa.math.FieldElement;
+import net.i2p.crypto.eddsa.math.*;
+
+import java.util.Arrays;
 
 /**
+ * Class to represent a field element of the finite field p=2^255-19 elements.
+ * <p>
  * An element t, entries t[0]...t[9], represents the integer
  * t[0]+2^26 t[1]+2^51 t[2]+2^77 t[3]+2^102 t[4]+...+2^230 t[9].
  * Bounds on each t[i] vary depending on context.
+ * <p>
+ * Reviewed/commented by Bloody Rookie (nemproject@gmx.de)
  */
 public class Ed25519FieldElement extends FieldElement {
     /**
@@ -15,6 +20,12 @@ public class Ed25519FieldElement extends FieldElement {
      */
     final int[] t;
 
+    /**
+     * Creates a field element.
+     *
+     * @param f The underlying field, must be the finite field with p = 2^255 - 19 elements
+     * @param t The 2^25.5 bit representation of the field element.
+     */
     public Ed25519FieldElement(Field f, int[] t) {
         super(f);
         if (t.length != 10)
@@ -24,21 +35,32 @@ public class Ed25519FieldElement extends FieldElement {
 
     private static final byte[] ZERO = new byte[32];
 
+    /**
+     * Gets a value indicating whether or not the field element is non-zero.
+     *
+     * @return 1 if it is non-zero, 0 otherwise.
+     */
     public boolean isNonZero() {
-        byte[] s = toByteArray();
+        final byte[] s = toByteArray();
         return Utils.equal(s, ZERO) == 0;
     }
 
     /**
      * h = f + g
-     * Can overlap h with f or g.
-     *
+     * <p>
+     * TODO-CR BR: h is allocated via new, probably not a good idea. Do we need the copying into temp variables if we do that?
+     * <p>
      * Preconditions:
-     *    |f| bounded by 1.1*2^25,1.1*2^24,1.1*2^25,1.1*2^24,etc.
-     *    |g| bounded by 1.1*2^25,1.1*2^24,1.1*2^25,1.1*2^24,etc.
-     *
+     * <p><ul>
+     * <li>|f| bounded by 1.1*2^25,1.1*2^24,1.1*2^25,1.1*2^24,etc.
+     * <li>|g| bounded by 1.1*2^25,1.1*2^24,1.1*2^25,1.1*2^24,etc.
+     * </ul><p>
      * Postconditions:
-     *    |h| bounded by 1.1*2^26,1.1*2^25,1.1*2^26,1.1*2^25,etc.
+     * <p><ul>
+     * <li>|h| bounded by 1.1*2^26,1.1*2^25,1.1*2^26,1.1*2^25,etc.
+     *
+     * @param val The field element to add.
+     * @return The field element this + val.
      */
     public FieldElement add(FieldElement val) {
         int[] g = ((Ed25519FieldElement)val).t;
@@ -51,14 +73,22 @@ public class Ed25519FieldElement extends FieldElement {
 
     /**
      * h = f - g
+     * <p>
      * Can overlap h with f or g.
-     *
+     * <p>
+     * TODO-CR BR: See above.
+     * <p>
      * Preconditions:
-     *    |f| bounded by 1.1*2^25,1.1*2^24,1.1*2^25,1.1*2^24,etc.
-     *    |g| bounded by 1.1*2^25,1.1*2^24,1.1*2^25,1.1*2^24,etc.
-     *
+     * <p><ul>
+     * <li>|f| bounded by 1.1*2^25,1.1*2^24,1.1*2^25,1.1*2^24,etc.
+     * <li>|g| bounded by 1.1*2^25,1.1*2^24,1.1*2^25,1.1*2^24,etc.
+     * </ul><p>
      * Postconditions:
-     *    |h| bounded by 1.1*2^26,1.1*2^25,1.1*2^26,1.1*2^25,etc.
+     * <p><ul>
+     * <li>|h| bounded by 1.1*2^26,1.1*2^25,1.1*2^26,1.1*2^25,etc.
+     *
+     * @param val The field element to subtract.
+     * @return The field element this - val.
      **/
     public FieldElement subtract(FieldElement val) {
         int[] g = ((Ed25519FieldElement)val).t;
@@ -71,12 +101,18 @@ public class Ed25519FieldElement extends FieldElement {
 
     /**
      * h = -f
-     *
+     * <p>
+     * TODO-CR BR: see above.
+     * <p>
      * Preconditions:
-     *    |f| bounded by 1.1*2^25,1.1*2^24,1.1*2^25,1.1*2^24,etc.
-     *
+     * <p><ul>
+     * <li>|f| bounded by 1.1*2^25,1.1*2^24,1.1*2^25,1.1*2^24,etc.
+     * </ul><p>
      * Postconditions:
-     *    |h| bounded by 1.1*2^25,1.1*2^24,1.1*2^25,1.1*2^24,etc.
+     * <p><ul>
+     * <li>|h| bounded by 1.1*2^25,1.1*2^24,1.1*2^25,1.1*2^24,etc.
+     *
+     * @return The field element (-1) * this.
      */
     public FieldElement negate() {
         int[] h = new int[10];
@@ -87,32 +123,42 @@ public class Ed25519FieldElement extends FieldElement {
     }
 
     /**
-     * h = f * g Can overlap h with f or g.
-     * 
-     * Preconditions: |f| bounded by
-     * 1.65*2^26,1.65*2^25,1.65*2^26,1.65*2^25,etc. |g| bounded by
+     * h = f * g
+     * <p>
+     * Can overlap h with f or g.
+     * <p>
+     * Preconditions:
+     * <p><ul>
+     * <li>|f| bounded by
      * 1.65*2^26,1.65*2^25,1.65*2^26,1.65*2^25,etc.
-     * 
-     * Postconditions: |h| bounded by
+     * <li>|g| bounded by
+     * 1.65*2^26,1.65*2^25,1.65*2^26,1.65*2^25,etc.
+     * </ul><p>
+     * Postconditions:
+     * <p><ul>
+     * <li>|h| bounded by
      * 1.01*2^25,1.01*2^24,1.01*2^25,1.01*2^24,etc.
-     *
+     * </ul><p>
      * Notes on implementation strategy:
-     *
+     * <p>
      * Using schoolbook multiplication. Karatsuba would save a little in some
      * cost models.
-     *
+     * <p>
      * Most multiplications by 2 and 19 are 32-bit precomputations; cheaper than
      * 64-bit postcomputations.
-     *
+     * <p>
      * There is one remaining multiplication by 19 in the carry chain; one *19
      * precomputation can be merged into this, but the resulting data flow is
      * considerably less clean.
-     *
+     * <p>
      * There are 12 carries below. 10 of them are 2-way parallelizable and
      * vectorizable. Can get away with 11 carries, but then data flow is much
      * deeper.
-     *
+     * <p>
      * With tighter constraints on inputs can squeeze carries into int32.
+     *
+     * @param val The field element to multiply.
+     * @return The (reasonably reduced) field element this * val.
      */
     public FieldElement multiply(FieldElement val) {
         int[] g = ((Ed25519FieldElement)val).t;
@@ -230,16 +276,28 @@ public class Ed25519FieldElement extends FieldElement {
         long f9g7_38 = f9_2 * (long) g7_19;
         long f9g8_19 = t[9] * (long) g8_19;
         long f9g9_38 = f9_2 * (long) g9_19;
-        long h0 = f0g0+f1g9_38+f2g8_19+f3g7_38+f4g6_19+f5g5_38+f6g4_19+f7g3_38+f8g2_19+f9g1_38;
-        long h1 = f0g1+f1g0   +f2g9_19+f3g8_19+f4g7_19+f5g6_19+f6g5_19+f7g4_19+f8g3_19+f9g2_19;
-        long h2 = f0g2+f1g1_2 +f2g0   +f3g9_38+f4g8_19+f5g7_38+f6g6_19+f7g5_38+f8g4_19+f9g3_38;
-        long h3 = f0g3+f1g2   +f2g1   +f3g0   +f4g9_19+f5g8_19+f6g7_19+f7g6_19+f8g5_19+f9g4_19;
-        long h4 = f0g4+f1g3_2 +f2g2   +f3g1_2 +f4g0   +f5g9_38+f6g8_19+f7g7_38+f8g6_19+f9g5_38;
-        long h5 = f0g5+f1g4   +f2g3   +f3g2   +f4g1   +f5g0   +f6g9_19+f7g8_19+f8g7_19+f9g6_19;
-        long h6 = f0g6+f1g5_2 +f2g4   +f3g3_2 +f4g2   +f5g1_2 +f6g0   +f7g9_38+f8g8_19+f9g7_38;
-        long h7 = f0g7+f1g6   +f2g5   +f3g4   +f4g3   +f5g2   +f6g1   +f7g0   +f8g9_19+f9g8_19;
-        long h8 = f0g8+f1g7_2 +f2g6   +f3g5_2 +f4g4   +f5g3_2 +f6g2   +f7g1_2 +f8g0   +f9g9_38;
-        long h9 = f0g9+f1g8   +f2g7   +f3g6   +f4g5   +f5g4   +f6g3   +f7g2   +f8g1   +f9g0   ;
+
+        /**
+         * Remember: 2^255 congruent 19 modulo p.
+         * h = h0 * 2^0 + h1 * 2^26 + h2 * 2^(26+25) + h3 * 2^(26+25+26) + ... + h9 * 2^(5*26+5*25).
+         * So to get the real number we would have to multiply the coefficients with the corresponding powers of 2.
+         * To get an idea what is going on below, look at the calculation of h0:
+         * h0 is the coefficient to the power 2^0 so it collects (sums) all products that have the power 2^0.
+         * f0 * g0 really is f0 * 2^0 * g0 * 2^0 = (f0 * g0) * 2^0.
+         * f1 * g9 really is f1 * 2^26 * g9 * 2^230 = f1 * g9 * 2^256 = 2 * f1 * g9 * 2^255 congruent 2 * 19 * f1 * g9 * 2^0 modulo p.
+         * f2 * g8 really is f2 * 2^51 * g8 * 2^204 = f2 * g8 * 2^255 congruent 19 * f2 * g8 * 2^0 modulo p.
+         * and so on...
+         */
+        long h0 = f0g0 + f1g9_38 + f2g8_19 + f3g7_38 + f4g6_19 + f5g5_38 + f6g4_19 + f7g3_38 + f8g2_19 + f9g1_38;
+        long h1 = f0g1 + f1g0    + f2g9_19 + f3g8_19 + f4g7_19 + f5g6_19 + f6g5_19 + f7g4_19 + f8g3_19 + f9g2_19;
+        long h2 = f0g2 + f1g1_2  + f2g0    + f3g9_38 + f4g8_19 + f5g7_38 + f6g6_19 + f7g5_38 + f8g4_19 + f9g3_38;
+        long h3 = f0g3 + f1g2    + f2g1    + f3g0    + f4g9_19 + f5g8_19 + f6g7_19 + f7g6_19 + f8g5_19 + f9g4_19;
+        long h4 = f0g4 + f1g3_2  + f2g2    + f3g1_2  + f4g0    + f5g9_38 + f6g8_19 + f7g7_38 + f8g6_19 + f9g5_38;
+        long h5 = f0g5 + f1g4    + f2g3    + f3g2    + f4g1    + f5g0    + f6g9_19 + f7g8_19 + f8g7_19 + f9g6_19;
+        long h6 = f0g6 + f1g5_2  + f2g4    + f3g3_2  + f4g2    + f5g1_2  + f6g0    + f7g9_38 + f8g8_19 + f9g7_38;
+        long h7 = f0g7 + f1g6    + f2g5    + f3g4    + f4g3    + f5g2    + f6g1    + f7g0    + f8g9_19 + f9g8_19;
+        long h8 = f0g8 + f1g7_2  + f2g6    + f3g5_2  + f4g4    + f5g3_2  + f6g2    + f7g1_2  + f8g0    + f9g9_38;
+        long h9 = f0g9 + f1g8    + f2g7    + f3g6    + f4g5    + f5g4    + f6g3    + f7g2    + f8g1    + f9g0;
         long carry0;
         long carry1;
         long carry2;
@@ -317,16 +375,21 @@ public class Ed25519FieldElement extends FieldElement {
 
     /**
      * h = f * f
+     * <p>
      * Can overlap h with f.
-     *
+     * <p>
      * Preconditions:
-     *    |f| bounded by 1.65*2^26,1.65*2^25,1.65*2^26,1.65*2^25,etc.
-     *
+     * <p><ul>
+     * <li>|f| bounded by 1.65*2^26,1.65*2^25,1.65*2^26,1.65*2^25,etc.
+     * </ul><p>
      * Postconditions:
-     *    |h| bounded by 1.01*2^25,1.01*2^24,1.01*2^25,1.01*2^24,etc.
-     *
-     * See {@link Ed25519FieldElement#multiply(FieldElement)} for discussion
+     * <p><ul>
+     * <li>|h| bounded by 1.01*2^25,1.01*2^24,1.01*2^25,1.01*2^24,etc.
+     * </ul><p>
+     * See {@link #multiply(FieldElement)} for discussion
      * of implementation strategy.
+     *
+     * @return The (reasonably reduced) square of this field element.
      */
     public FieldElement square() {
         int f0 = t[0];
@@ -407,16 +470,21 @@ public class Ed25519FieldElement extends FieldElement {
         long f8f8_19 = f8   * (long) f8_19;
         long f8f9_38 = f8   * (long) f9_38;
         long f9f9_38 = f9   * (long) f9_38;
-        long h0 = f0f0  +f1f9_76+f2f8_38+f3f7_76+f4f6_38+f5f5_38;
-        long h1 = f0f1_2+f2f9_38+f3f8_38+f4f7_38+f5f6_38;
-        long h2 = f0f2_2+f1f1_2 +f3f9_76+f4f8_38+f5f7_76+f6f6_19;
-        long h3 = f0f3_2+f1f2_2 +f4f9_38+f5f8_38+f6f7_38;
-        long h4 = f0f4_2+f1f3_4 +f2f2   +f5f9_76+f6f8_38+f7f7_38;
-        long h5 = f0f5_2+f1f4_2 +f2f3_2 +f6f9_38+f7f8_38;
-        long h6 = f0f6_2+f1f5_4 +f2f4_2 +f3f3_2 +f7f9_76+f8f8_19;
-        long h7 = f0f7_2+f1f6_2 +f2f5_2 +f3f4_2 +f8f9_38;
-        long h8 = f0f8_2+f1f7_4 +f2f6_2 +f3f5_4 +f4f4   +f9f9_38;
-        long h9 = f0f9_2+f1f8_2 +f2f7_2 +f3f6_2 +f4f5_2;
+
+        /**
+         * Same procedure as in multiply, but this time we have a higher symmetry leading to less summands.
+         * e.g. f1f9_76 really stands for f1 * 2^26 * f9 * 2^230 + f9 * 2^230 + f1 * 2^26 congruent 2 * 2 * 19 * f1 * f9  2^0 modulo p.
+         */
+        long h0 = f0f0   + f1f9_76 + f2f8_38 + f3f7_76 + f4f6_38 + f5f5_38;
+        long h1 = f0f1_2 + f2f9_38 + f3f8_38 + f4f7_38 + f5f6_38;
+        long h2 = f0f2_2 + f1f1_2  + f3f9_76 + f4f8_38 + f5f7_76 + f6f6_19;
+        long h3 = f0f3_2 + f1f2_2  + f4f9_38 + f5f8_38 + f6f7_38;
+        long h4 = f0f4_2 + f1f3_4  + f2f2    + f5f9_76 + f6f8_38 + f7f7_38;
+        long h5 = f0f5_2 + f1f4_2  + f2f3_2  + f6f9_38 + f7f8_38;
+        long h6 = f0f6_2 + f1f5_4  + f2f4_2  + f3f3_2  + f7f9_76 + f8f8_19;
+        long h7 = f0f7_2 + f1f6_2  + f2f5_2  + f3f4_2  + f8f9_38;
+        long h8 = f0f8_2 + f1f7_4  + f2f6_2  + f3f5_4  + f4f4    + f9f9_38;
+        long h9 = f0f9_2 + f1f8_2  + f2f7_2  + f3f6_2  + f4f5_2;
         long carry0;
         long carry1;
         long carry2;
@@ -463,16 +531,21 @@ public class Ed25519FieldElement extends FieldElement {
 
     /**
      * h = 2 * f * f
+     * <p>
      * Can overlap h with f.
-     *
+     * <p>
      * Preconditions:
-     *    |f| bounded by 1.65*2^26,1.65*2^25,1.65*2^26,1.65*2^25,etc.
-     *
+     * <p><ul>
+     * <li>|f| bounded by 1.65*2^26,1.65*2^25,1.65*2^26,1.65*2^25,etc.
+     * </ul><p>
      * Postconditions:
-     *    |h| bounded by 1.01*2^25,1.01*2^24,1.01*2^25,1.01*2^24,etc.
-     *
-     * See {@link Ed25519FieldElement#multiply(FieldElement)} for discussion
+     * <p><ul>
+     * <li>|h| bounded by 1.01*2^25,1.01*2^24,1.01*2^25,1.01*2^24,etc.
+     * </ul><p>
+     * See {@link #multiply(FieldElement)} for discussion
      * of implementation strategy.
+     *
+     * @return The (reasonably reduced) square of this field element times 2.
      */
     public FieldElement squareAndDouble() {
         int f0 = t[0];
@@ -553,16 +626,16 @@ public class Ed25519FieldElement extends FieldElement {
         long f8f8_19 = f8   * (long) f8_19;
         long f8f9_38 = f8   * (long) f9_38;
         long f9f9_38 = f9   * (long) f9_38;
-        long h0 = f0f0  +f1f9_76+f2f8_38+f3f7_76+f4f6_38+f5f5_38;
-        long h1 = f0f1_2+f2f9_38+f3f8_38+f4f7_38+f5f6_38;
-        long h2 = f0f2_2+f1f1_2 +f3f9_76+f4f8_38+f5f7_76+f6f6_19;
-        long h3 = f0f3_2+f1f2_2 +f4f9_38+f5f8_38+f6f7_38;
-        long h4 = f0f4_2+f1f3_4 +f2f2   +f5f9_76+f6f8_38+f7f7_38;
-        long h5 = f0f5_2+f1f4_2 +f2f3_2 +f6f9_38+f7f8_38;
-        long h6 = f0f6_2+f1f5_4 +f2f4_2 +f3f3_2 +f7f9_76+f8f8_19;
-        long h7 = f0f7_2+f1f6_2 +f2f5_2 +f3f4_2 +f8f9_38;
-        long h8 = f0f8_2+f1f7_4 +f2f6_2 +f3f5_4 +f4f4   +f9f9_38;
-        long h9 = f0f9_2+f1f8_2 +f2f7_2 +f3f6_2 +f4f5_2;
+        long h0 = f0f0   + f1f9_76 + f2f8_38 + f3f7_76 + f4f6_38 + f5f5_38;
+        long h1 = f0f1_2 + f2f9_38 + f3f8_38 + f4f7_38 + f5f6_38;
+        long h2 = f0f2_2 + f1f1_2  + f3f9_76 + f4f8_38 + f5f7_76 + f6f6_19;
+        long h3 = f0f3_2 + f1f2_2  + f4f9_38 + f5f8_38 + f6f7_38;
+        long h4 = f0f4_2 + f1f3_4  + f2f2    + f5f9_76 + f6f8_38 + f7f7_38;
+        long h5 = f0f5_2 + f1f4_2  + f2f3_2  + f6f9_38 + f7f8_38;
+        long h6 = f0f6_2 + f1f5_4  + f2f4_2  + f3f3_2  + f7f9_76 + f8f8_19;
+        long h7 = f0f7_2 + f1f6_2  + f2f5_2  + f3f4_2  + f8f9_38;
+        long h8 = f0f8_2 + f1f7_4  + f2f6_2  + f3f5_4  + f4f4    + f9f9_38;
+        long h9 = f0f9_2 + f1f8_2  + f2f7_2  + f3f6_2  + f4f5_2;
         long carry0;
         long carry1;
         long carry2;
@@ -618,120 +691,162 @@ public class Ed25519FieldElement extends FieldElement {
         return new Ed25519FieldElement(f, h);
     }
 
+    /**
+     * Invert this field element.
+     * <p>
+     * The inverse is found via Fermat's little theorem:<br>
+     * a^p congruent a mod p and therefore a^(p-2) congruent a^-1 mod p
+     *
+     * @return The inverse of this field element.
+     */
     public FieldElement invert() {
         FieldElement t0, t1, t2, t3;
 
-        // z2 = z1^2^1
+        // 2 == 2 * 1
         t0 = square();
+
+        // TODO -CR BR: What is this? Is the author superstitious?
         for (int i = 1; i < 1; ++i) { // Don't remove this
             t0 = t0.square();
         }
 
-        // z8 = z2^2^2;
+        // 4 == 2 * 2
         t1 = t0.square();
+
+        // 8 == 2 * 4
         for (int i = 1; i < 2; ++i) {
             t1 = t1.square();
         }
 
-        // z9 = z1*z8
+        // 9 == 8 + 1
         t1 = multiply(t1);
 
-        // z11 = z2*z9
+        // 11 == 9 + 2
         t0 = t0.multiply(t1);
 
-        // z22 = z11^2^1
+        // 22 == 2 * 11
         t2 = t0.square();
+
+        // TODO -CR BR: see above
         for (int i = 1; i < 1; ++i) { // Don't remove this
             t2 = t2.square();
         }
 
-        // z_5_0 = z9*z22
+        // 31 == 22 + 9
         t1 = t1.multiply(t2);
 
-        // z_10_5 = z_5_0^2^5
+        // 2^6 - 2^1
         t2 = t1.square();
+
+        // 2^10 - 2^5
         for (int i = 1; i < 5; ++i) {
             t2 = t2.square();
         }
 
-        // z_10_0 = z_10_5*z_5_0
+        // 2^10 - 2^0
         t1 = t2.multiply(t1);
 
-        // z_20_10 = z_10_0^2^10
+        // 2^11 - 2^1
         t2 = t1.square();
+
+        // 2^20 - 2^10
         for (int i = 1; i < 10; ++i) {
             t2 = t2.square();
         }
 
-        // z_20_0 = z_20_10*z_10_0
+        // 2^20 - 2^0
         t2 = t2.multiply(t1);
 
-        // z_40_20 = z_20_0^2^20
+        // 2^21 - 2^1
         t3 = t2.square();
+
+        // 2^40 - 2^20
         for (int i = 1; i < 20; ++i) {
             t3 = t3.square();
         }
 
-        // z_40_0 = z_40_20*z_20_0
+        // 2^40 - 2^0
         t2 = t3.multiply(t2);
 
-        // z_50_10 = z_40_0^2^10
+        // 2^41 - 2^1
         t2 = t2.square();
+
+        // 2^50 - 2^10
         for (int i = 1; i < 10; ++i) {
             t2 = t2.square();
         }
 
-        // z_50_0 = z_50_10*z_10_0
+        // 2^50 - 2^0
         t1 = t2.multiply(t1);
 
-        // z_100_50 = z_50_0^2^50
+        // 2^51 - 2^1
         t2 = t1.square();
+
+        // 2^100 - 2^50
         for (int i = 1; i < 50; ++i) {
             t2 = t2.square();
         }
 
-        // z_100_0 = z_100_50*z_50_0
+        // 2^100 - 2^0
         t2 = t2.multiply(t1);
 
-        // z_200_100 = z_100_0^2^100
+        // 2^101 - 2^1
         t3 = t2.square();
+
+        // 2^200 - 2^100
         for (int i = 1; i < 100; ++i) {
             t3 = t3.square();
         }
 
-        // z_200_0 = z_200_100*z_100_0
+        // 2^200 - 2^0
         t2 = t3.multiply(t2);
 
-        // z_250_50 = z_200_0^2^50
+        // 2^201 - 2^1
         t2 = t2.square();
+
+        // 2^250 - 2^50
         for (int i = 1; i < 50; ++i) {
             t2 = t2.square();
         }
 
-        // z_250_0 = z_250_50*z_50_0
+        // 2^250 - 2^0
         t1 = t2.multiply(t1);
 
-        // z_255_5 = z_250_0^2^5
+        // 2^251 - 2^1
         t1 = t1.square();
+
+        // 2^255 - 2^5
         for (int i = 1; i < 5; ++i) {
             t1 = t1.square();
         }
 
-        // z_255_21 = z_255_5*z11
+        // 2^255 - 21
         return t1.multiply(t0);
     }
 
+    /**
+     * Gets this field element to the power of (2^252 - 3).
+     * This is a helper function for calculating the square root.
+     * <p>
+     * TODO-CR BR: I think it makes sense to have a sqrt function.
+     *
+     * @return This field element to the power of (2^252 - 3).
+     */
     public FieldElement pow22523() {
         FieldElement t0, t1, t2;
 
-        // z2 = z1^2^1
+        // 2 == 2 * 1
         t0 = square();
+
+        // TODO -CR BR: see invert
         for (int i = 1; i < 1; ++i) { // Don't remove this
             t0 = t0.square();
         }
 
-        // z8 = z2^2^2;
+        // 4 == 2 * 2
         t1 = t0.square();
+
+        // 8 == 2 * 4
         for (int i = 1; i < 2; ++i) {
             t1 = t1.square();
         }
@@ -739,98 +854,112 @@ public class Ed25519FieldElement extends FieldElement {
         // z9 = z1*z8
         t1 = multiply(t1);
 
-        // z11 = z2*z9
+        // 11 == 9 + 2
         t0 = t0.multiply(t1);
 
-        // z22 = z11^2^1
+        // 22 == 2 * 11
         t0 = t0.square();
+
+        // TODO -CR BR: see above
         for (int i = 1; i < 1; ++i) { // Don't remove this
             t0 = t0.square();
         }
 
-        // z_5_0 = z9*z22
+        // 31 == 22 + 9
         t0 = t1.multiply(t0);
 
-        // z_10_5 = z_5_0^2^5
+        // 2^6 - 2^1
         t1 = t0.square();
+
+        // 2^10 - 2^5
         for (int i = 1; i < 5; ++i) {
             t1 = t1.square();
         }
 
-        // z_10_0 = z_10_5*z_5_0
+        // 2^10 - 2^0
         t0 = t1.multiply(t0);
 
-        // z_20_10 = z_10_0^2^10
+        // 2^11 - 2^1
         t1 = t0.square();
+
+        // 2^20 - 2^10
         for (int i = 1; i < 10; ++i) {
             t1 = t1.square();
         }
 
-        // z_20_0 = z_20_10*z_10_0
+        // 2^20 - 2^0
         t1 = t1.multiply(t0);
 
-        // z_40_20 = z_20_0^2^20
+        // 2^21 - 2^1
         t2 = t1.square();
+
+        // 2^40 - 2^20
         for (int i = 1; i < 20; ++i) {
             t2 = t2.square();
         }
 
-        // z_40_0 = z_40_20*z_20_0
+        // 2^40 - 2^0
         t1 = t2.multiply(t1);
 
-        // z_50_10 = z_40_0^2^10
+        // 2^41 - 2^1
         t1 = t1.square();
+
+        // 2^50 - 2^10
         for (int i = 1; i < 10; ++i) {
             t1 = t1.square();
         }
 
-        // z_50_0 = z_50_10*z_10_0
+        // 2^50 - 2^0
         t0 = t1.multiply(t0);
 
-        // z_100_50 = z_50_0^2^50
+        // 2^51 - 2^1
         t1 = t0.square();
+
+        // 2^100 - 2^50
         for (int i = 1; i < 50; ++i) {
             t1 = t1.square();
         }
 
-        // z_100_0 = z_100_50*z_50_0
+        // 2^100 - 2^0
         t1 = t1.multiply(t0);
 
-        // z_200_100 = z_100_0^2^100
+        // 2^101 - 2^1
         t2 = t1.square();
+
+        // 2^200 - 2^100
         for (int i = 1; i < 100; ++i) {
             t2 = t2.square();
         }
 
-        // z_200_0 = z_200_100*z_100_0
+        // 2^200 - 2^0
         t1 = t2.multiply(t1);
 
-        // z_250_50 = z_200_0^2^50
+        // 2^201 - 2^1
         t1 = t1.square();
+
+        // 2^250 - 2^50
         for (int i = 1; i < 50; ++i) {
             t1 = t1.square();
         }
 
-        // z_250_0 = z_250_50*z_50_0
+        // 2^250 - 2^0
         t0 = t1.multiply(t0);
 
-        // z_252_2 = z_250_0^2^2
+        // 2^251 - 2^1
         t0 = t0.square();
+
+        // 2^252 - 2^2
         for (int i = 1; i < 2; ++i) {
             t0 = t0.square();
         }
 
-        // z_252_3 = z_252_2*z1
+        // 2^252 - 3
         return multiply(t0);
     }
 
     @Override
     public int hashCode() {
-        int rv = 0;
-        for (int i = 0; i < 10; i++) {
-            rv ^= t[i];
-        }
-        return rv;
+        return Arrays.hashCode(t);
     }
 
     @Override

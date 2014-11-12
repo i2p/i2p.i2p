@@ -31,6 +31,7 @@ public class Utils {
         for (int i = 0; i < 32; i++) {
             result |= b[i] ^ c[i];
         }
+
         return equal(result, 0);
     }
 

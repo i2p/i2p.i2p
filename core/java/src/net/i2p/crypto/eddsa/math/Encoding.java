@@ -32,7 +32,7 @@ public abstract class Encoding {
     public abstract FieldElement decode(byte[] in);
 
     /**
-     * From the Ed25519 paper:
+     * From the Ed25519 paper:<br>
      * x is negative if the (b-1)-bit encoding of x is lexicographically larger
      * than the (b-1)-bit encoding of -x. If q is an odd prime and the encoding
      * is the little-endian representation of {0, 1,..., q-1} then the negative

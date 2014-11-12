@@ -27,8 +27,8 @@ public class Curve implements Serializable {
         this.d2 = this.d.add(this.d);
         this.I = I;
 
-        FieldElement zero = f.zero;
-        FieldElement one = f.one;
+        FieldElement zero = f.ZERO;
+        FieldElement one = f.ONE;
         zeroP2 = GroupElement.p2(this, zero, one, one);
         zeroP3 = GroupElement.p3(this, zero, one, one, zero);
         zeroPrecomp = GroupElement.precomp(this, one, one, zero);
