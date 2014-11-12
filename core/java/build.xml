@@ -104,8 +104,13 @@
         <mkdir dir="./build" />
         <mkdir dir="./build/obj" />
         <!-- set hamcrest and junit homes to the old default unless overridden elsewhere -->
+        <echo message="[DEBUG] ant home is ${ant.home}" />
+        <echo message="[DEBUG] junit home before override is ${junit.home}" />
+        <echo message="[DEBUG] hamcrest home before override is ${hamcrest.home}" />
         <property name="hamcrest.home" value="${ant.home}/lib/" />
         <property name="junit.home" value="${ant.home}/lib/" />
+        <echo message="[DEBUG] junit home after override is ${junit.home}" />
+        <echo message="[DEBUG] hamcrest home after override is ${hamcrest.home}" />
         <javac srcdir="./test/junit" debug="true" source="${javac.version}" target="${javac.version}" deprecation="on"
                debuglevel="lines,vars,source"
                includeAntRuntime="true"
@@ -115,6 +120,7 @@
                 <pathelement location="${hamcrest.home}/hamcrest-core.jar" />
                 <pathelement location="${hamcrest.home}/hamcrest-library.jar" />
                 <pathelement location="${hamcrest.home}/hamcrest-integration.jar" />
+                <pathelement location="${hamcrest.home}/hamcrest-all.jar" />
                 <pathelement location="${junit.home}/junit4.jar" />
             </classpath>
             <compilerarg line="${javac.compilerargs}" />
@@ -224,6 +230,7 @@
                 <pathelement location="${hamcrest.home}/hamcrest-core.jar" />
                 <pathelement location="${hamcrest.home}/hamcrest-library.jar" />
                 <pathelement location="${hamcrest.home}/hamcrest-integration.jar" />
+                <pathelement location="${hamcrest.home}/hamcrest-all.jar" />
                 <pathelement location="${junit.home}/junit4.jar" />
                 <pathelement location="./build/obj_cobertura" />
                 <pathelement location="./build/obj" />
