@@ -91,9 +91,16 @@ public class SDSCache<V extends SimpleDataStructure> {
      */
     private class Shutdown implements Runnable {
         public void run() {
-            synchronized(_cache) {
-                _cache.clear();
-            }
+            clear();
+        }
+    }
+
+    /**
+     * @since 0.9.17
+     */
+    public void clear() {
+        synchronized(_cache) {
+            _cache.clear();
         }
     }
 

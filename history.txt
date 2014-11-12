@@ -1,4 +1,5 @@
 2014-11-12 zzz
+ * Data: Clear more caches when under memory pressure and at shutdown
  * Plugins: Fix bug in stopping a ClientApp plugin with $parameters in the args
 
 2014-11-09 zzz
