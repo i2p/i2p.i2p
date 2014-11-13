@@ -1,5 +1,7 @@
 package net.i2p.client.streaming.impl;
 
+import java.net.ConnectException;
+import java.net.SocketTimeoutException;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
@@ -43,16 +45,24 @@ class ConnectionHandler {
         _acceptTimeout = DEFAULT_ACCEPT_TIMEOUT;
     }
     
-    public void setActive(boolean active) { 
+    public synchronized void setActive(boolean active) { 
+        // FIXME active=false this only kills for one thread in accept()
+        // if they are more, they won't ket a poison packet.
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("setActive(" + active + ") called");
+        // if starting, clear any old poison
+        // if stopping, the accept() loop will clear any pending sockets
+        if (active && !_active)
+            _synQueue.clear();
+        boolean wasActive = _active;
         _active = active; 
-        if (!active) {
+        if (wasActive && !active) {
             try {
                 _synQueue.put(new PoisonPacket()); // so we break from the accept() - waits until space is available
             } catch (InterruptedException ie) {}
         }
     }
+
     public boolean getActive() { return _active; }
     
     /**
@@ -102,17 +112,21 @@ class ConnectionHandler {
      *
      * @param timeoutMs max amount of time to wait for a connection (if less 
      *                  than 1ms, wait indefinitely)
-     * @return connection received, or null if there was a timeout or the 
-     *                    handler was shut down
+     * @return connection received. Prior to 0.9.17, or null if there was a timeout or the 
+     *                  handler was shut down. As of 0.9.17, never null.
+     * @throws ConnectException since 0.9.17, returned null before;
+     *                  if the I2PServerSocket is closed, or if interrupted.
+     * @throws SocketTimeoutException since 0.9.17, returned null before;
+     *                  if a timeout was previously set with setSoTimeout and the timeout has been reached.
      */
-    public Connection accept(long timeoutMs) {
+    public Connection accept(long timeoutMs) throws ConnectException, SocketTimeoutException {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Accept("+ timeoutMs+") called");
 
         long expiration = timeoutMs + _context.clock().now();
         while (true) {
             if ( (timeoutMs > 0) && (expiration < _context.clock().now()) )
-                return null;
+                throw new SocketTimeoutException("accept() timed out");
             if (!_active) {
                 // fail all the ones we had queued up
                 while(true) {
@@ -121,7 +135,7 @@ class ConnectionHandler {
                         break;
                     sendReset(packet);
                 }
-                return null;
+                throw new ConnectException("ServerSocket closed");
             }
             
             Packet syn = null;
@@ -132,7 +146,11 @@ class ConnectionHandler {
                 if (timeoutMs <= 0) {
                     try {
                        syn = _synQueue.take(); // waits forever
-                    } catch (InterruptedException ie) { } // { break;}
+                    } catch (InterruptedException ie) {
+                       ConnectException ce = new ConnectException("Interrupted accept()");
+                       ce.initCause(ie);
+                       throw ce;
+                    }
                 } else {
                     long remaining = expiration - _context.clock().now();
                     // (dont think this applies anymore for LinkedBlockingQueue)
@@ -144,14 +162,18 @@ class ConnectionHandler {
                         break;
                     try {
                         syn = _synQueue.poll(remaining, TimeUnit.MILLISECONDS); // waits the specified time max
-                    } catch (InterruptedException ie) { }
+                    } catch (InterruptedException ie) {
+                       ConnectException ce = new ConnectException("Interrupted accept()");
+                       ce.initCause(ie);
+                       throw ce;
+                    }
                     break;
                 }
             }
 
             if (syn != null) {
                 if (syn.getOptionalDelay() == PoisonPacket.POISON_MAX_DELAY_REQUEST)
-                    return null;
+                    throw new ConnectException("ServerSocket closed");
 
                 // deal with forged / invalid syn packets in _manager.receiveConnection()
 

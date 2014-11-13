@@ -8,9 +8,15 @@ import net.i2p.util.EventDispatcher;
 import net.i2p.util.EventDispatcherImpl;
 
 /**
- * Either a Server or a Client.
+ *  Either a Server or a Client.
+ *
+ *  Use caution if extending externally.
+ *  This class should be maintained as a stable API,
+ *  but ask to be sure.
+ *
+ *  Note that there is no startRunning() method,
+ *  however all extending classes implement one.
  */
-
 public abstract class I2PTunnelTask extends EventDispatcherImpl {
 
     private int id;
@@ -56,12 +62,37 @@ public abstract class I2PTunnelTask extends EventDispatcherImpl {
         tunnel.routerDisconnected();
     }
 
+    /**
+     *  Note that the tunnel can be reopened after this by calling startRunning().
+     *  This may not release all resources. In particular, the I2PSocketManager remains
+     *  and it may have timer threads that continue running.
+     *
+     *  To release all resources permanently, call destroy().
+     *
+     *  @return success
+     */
     public abstract boolean close(boolean forced);
+
+    /**
+     *  Note that the tunnel cannot be reopened after this by calling startRunning(),
+     *  as it may destroy the underlying socket manager, depending on implementation.
+     *  This should release all resources.
+     *
+     *  The implementation here simply calls close(true).
+     *  Extending classes should override to release all resources.
+     *
+     *  @return success
+     *  @since 0.9.17
+     */
+    public boolean destroy() {
+        return close(true);
+    }
 
     /**
      *  Notify the task that I2PTunnel's options have been updated.
      *  Extending classes should override and call I2PTunnel.getClientOptions(),
      *  then update the I2PSocketManager.
+     *  Does nothing here.
      *
      *  @since 0.9.1
      */
@@ -80,9 +111,15 @@ public abstract class I2PTunnelTask extends EventDispatcherImpl {
         getTunnel().removeSession(session);
     }
 
+    /**
+     *  Does nothing here. Extending classes may override.
+     */
     public void errorOccurred(I2PSession session, String message, Throwable error) {
     }
 
+    /**
+     *  Does nothing here. Extending classes may override.
+     */
     public void reportAbuse(I2PSession session, int severity) {
     }
 

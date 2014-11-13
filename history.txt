@@ -1,3 +1,19 @@
+2014-11-13 zzz
+ * I2PTunnel:
+   - Fix bug that left server acceptor thread running after close
+   - Add destroy() methods to release all resources when closing a tunnel for good,
+     particularly the streaming timer threads
+   - Use COWAL to prevent concurrency problems
+ * PluginStarter: Simplify detection of active threads
+ * Streaming:
+   - Don't return null from accept() any more; actually throw
+     ConnectException as the Javadocs have always specified
+   - Throw ConnectException from accept() if interrupted; previously caught and ignored
+   - Throw exceptions from ConnectionHandler.accept(), not higher up
+   - Close ServerSocket when ConnectionManager is shut down
+   - Synchronize setActive(), clear queue when starting to accept,
+     better handling of calls that don't change state
+
 2014-11-12 zzz
  * Data: Clear more caches when under memory pressure and at shutdown
  * Plugins: Fix bug in stopping a ClientApp plugin with $parameters in the args

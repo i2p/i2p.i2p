@@ -268,7 +268,7 @@ public class TunnelControllerGroup implements ClientApp {
      *
      */
     public synchronized void unloadControllers() {
-        stopAllControllers();
+        destroyAllControllers();
         _controllers.clear();
         if (_log.shouldLog(Log.INFO))
             _log.info("All controllers stopped and unloaded");
@@ -296,7 +296,7 @@ public class TunnelControllerGroup implements ClientApp {
     }
     
     /**
-     * Stop all tunnels
+     * Stop all tunnels. May be restarted.
      *
      * @return list of messages the tunnels generate when stopped
      */
@@ -310,6 +310,21 @@ public class TunnelControllerGroup implements ClientApp {
         if (_log.shouldLog(Log.INFO))
             _log.info(_controllers.size() + " controllers stopped");
         return msgs;
+    }
+    
+    /**
+     *  Stop all tunnels. They may not be restarted, you must reload.
+     *  Caller must synch. Caller must clear controller list.
+     *
+     *  @since 0.9.17
+     */
+    private void destroyAllControllers() {
+        for (int i = 0; i < _controllers.size(); i++) {
+            TunnelController controller = _controllers.get(i);
+            controller.destroyTunnel();
+        }
+        if (_log.shouldLog(Log.INFO))
+            _log.info(_controllers.size() + " controllers stopped");
     }
     
     /**

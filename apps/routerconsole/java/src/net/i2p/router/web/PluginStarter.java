@@ -862,10 +862,22 @@ public class PluginStarter implements Runnable {
         ThreadGroup group = pluginThreadGroups.get(pluginName);
         if (group == null)
             return false;
+        boolean rv = group.activeCount() > 0;
         
-        Thread[] activeThreads = new Thread[1];
-        group.enumerate(activeThreads);
-        return activeThreads[0] != null;
+      /**** debugging to figure out active threads
+        if (rv) {
+            Thread[] activeThreads = new Thread[32];
+            int count = group.enumerate(activeThreads);
+            for (int i = 0; i < count; i++) {
+                if (activeThreads[i] != null) {
+                    System.err.println("Found " + activeThreads[i].getState() + " thread for " +
+                                       pluginName + ": " + activeThreads[i].getName());
+                }
+            }
+        }
+      ****/
+
+        return rv;
     }
     
     /**

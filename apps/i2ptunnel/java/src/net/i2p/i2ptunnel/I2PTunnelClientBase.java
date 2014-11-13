@@ -796,6 +796,22 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
         return true;
     }
 
+    /**
+     *  Note that the tunnel cannot be reopened after this by calling startRunning(),
+     *  as it will destroy the underlying socket manager.
+     *  This releases all resources if not a shared client.
+     *  For shared client, the router will kill all the remaining streaming timers at shutdown.
+     *
+     *  @since 0.9.17
+     */
+    @Override
+    public synchronized boolean destroy() {
+        close(true);
+        if (_ownDest)
+            sockMgr.destroySocketManager();
+        return true;
+    }
+
     public static void closeSocket(Socket s) {
         try {
             s.close();
