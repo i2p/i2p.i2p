@@ -29,7 +29,7 @@ public class BigIntegerFieldElementTest {
     static final FieldElement TWO = new BigIntegerFieldElement(ed25519Field, BigInteger.valueOf(2));
 
     /**
-     * Test method for {@link FieldElement#FieldElement(java.math.BigInteger)}.
+     * Test method for {@link BigIntegerFieldElement#BigIntegerFieldElement(Field, BigInteger)}.
      */
     @Test
     public void testFieldElementBigInteger() {
@@ -137,10 +137,10 @@ public class BigIntegerFieldElementTest {
     }
 
     /**
-     * Test method for {@link FieldElement#modPow(java.math.BigInteger, java.math.BigInteger)}.
+     * Test method for {@link FieldElement#pow22523()}.
      */
     @Test
-    public void testModPow() {
+    public void testPow22523() {
         //fail("Not yet implemented");
     }
 
