@@ -56,13 +56,21 @@ public class BigIntegerFieldElementTest {
         assertThat(ten, is(equalTo(BYTES_TEN)));
     }
 
-    /**
-     * Test method for {@link FieldElement#isNonZero()}.
-     */
+    // region isNonZero
+
     @Test
-    public void testIsNonZero() {
-        fail("Not yet implemented");
+    public void isNonZeroReturnsFalseIfFieldElementIsZero() {
+        // Assert:
+        assertThat(ZERO.isNonZero(), is(equalTo(false)));
     }
+
+    @Test
+    public void isNonZeroReturnsTrueIfFieldElementIsNonZero() {
+        // Assert:
+        assertThat(TWO.isNonZero(), is(equalTo(true)));
+    }
+
+    // endregion
 
     /**
      * Test method for {@link FieldElement#isNegative()}.
@@ -142,7 +150,6 @@ public class BigIntegerFieldElementTest {
     @Test
     public void testEqualsObject() {
         assertThat(new BigIntegerFieldElement(ed25519Field, BigInteger.ZERO), is(equalTo(ZERO)));
-        //assertThat(new BigIntegerFieldElement(ed25519Field, BYTES_ZERO), is(equalTo(ZERO)));
         assertThat(new BigIntegerFieldElement(ed25519Field, BigInteger.valueOf(1000)), is(equalTo(new BigIntegerFieldElement(ed25519Field, BigInteger.valueOf(1000)))));
         assertThat(ONE, is(not(equalTo(TWO))));
     }
