@@ -2,6 +2,7 @@ package net.i2p.crypto.eddsa;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -32,8 +33,10 @@ public class Ed25519TestVectors {
         List<TestTuple> testCases = new ArrayList<TestTuple>();
         BufferedReader file = null;
         try {
-            file = new BufferedReader(new InputStreamReader(
-                    Ed25519TestVectors.class.getResourceAsStream(fileName)));
+            InputStream is = Ed25519TestVectors.class.getResourceAsStream(fileName);
+            if (is == null)
+                throw new IOException("Resource not found: " + fileName);
+            file = new BufferedReader(new InputStreamReader(is));
             String line;
             while ((line = file.readLine()) != null) {
                 testCases.add(new TestTuple(line));

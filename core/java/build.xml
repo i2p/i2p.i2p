@@ -128,6 +128,7 @@
         <!-- EdDSA test vectors -->
         <copy todir="./build/obj">
             <fileset dir="./test/junit/">
+                <include name="net/i2p/crypto/eddsa/test.data"/>
                 <include name="net/i2p/crypto/eddsa/math/baseDblPrecmp"/>
                 <include name="net/i2p/crypto/eddsa/math/basePrecmp"/>
             </fileset>
@@ -154,7 +155,7 @@
         <!-- warning - The junit.test target below doesn't actually include i2ptest.jar in the classpath,
              only the build/obj directory.
           -->
-        <jar destfile="./build/i2ptest.jar" basedir="./build/obj" includes="**/*.class **/baseDblPrecmp **/basePrecmp" />
+        <jar destfile="./build/i2ptest.jar" basedir="./build/obj" includes="**/*.class **/test.data **/baseDblPrecmp **/basePrecmp" />
     </target>
     <!-- preparation of code coverage tool of choice -->
     <target name="prepareClover" depends="compile" if="with.clover">
