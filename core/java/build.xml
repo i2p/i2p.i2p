@@ -125,6 +125,13 @@
             </classpath>
             <compilerarg line="${javac.compilerargs}" />
         </javac>
+        <!-- EdDSA test vectors -->
+        <copy todir="./build/obj">
+            <fileset dir="./test/junit/">
+                <include name="net/i2p/crypto/eddsa/math/baseDblPrecmp"/>
+                <include name="net/i2p/crypto/eddsa/math/basePrecmp"/>
+            </fileset>
+        </copy>
     </target>
     <!-- jars with tests -->
     <target name="jarScalaTest" depends="scalatest.compileTest">
@@ -144,7 +151,10 @@
         <jar destfile="./build/i2pscalatest.jar" basedir="./build/obj_scala_jar" includes="**/*.class" />
     </target>
     <target name="jarTest" depends="junit.compileTest">
-        <jar destfile="./build/i2ptest.jar" basedir="./build/obj" includes="**/*.class" />
+        <!-- warning - The junit.test target below doesn't actually include i2ptest.jar in the classpath,
+             only the build/obj directory.
+          -->
+        <jar destfile="./build/i2ptest.jar" basedir="./build/obj" includes="**/*.class **/baseDblPrecmp **/basePrecmp" />
     </target>
     <!-- preparation of code coverage tool of choice -->
     <target name="prepareClover" depends="compile" if="with.clover">
