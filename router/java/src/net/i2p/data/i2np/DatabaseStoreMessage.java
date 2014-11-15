@@ -204,16 +204,14 @@ public class DatabaseStoreMessage extends FastI2NPMessageImpl {
         System.arraycopy(getKey().getData(), 0, out, curIndex, Hash.HASH_LENGTH);
         curIndex += Hash.HASH_LENGTH;
         out[curIndex++] = (byte) type;
-        byte tok[] = DataHelper.toLong(4, _replyToken);
-        System.arraycopy(tok, 0, out, curIndex, 4);
+        DataHelper.toLong(out, curIndex, 4, _replyToken);
         curIndex += 4;
         
         if (_replyToken > 0) {
             long replyTunnel = 0;
             if (_replyTunnel != null)
                 replyTunnel = _replyTunnel.getTunnelId();
-            byte id[] = DataHelper.toLong(4, replyTunnel);
-            System.arraycopy(id, 0, out, curIndex, 4);
+            DataHelper.toLong(out, curIndex, 4, replyTunnel);
             curIndex += 4;
             System.arraycopy(_replyGateway.getData(), 0, out, curIndex, Hash.HASH_LENGTH);
             curIndex += Hash.HASH_LENGTH;
@@ -221,9 +219,8 @@ public class DatabaseStoreMessage extends FastI2NPMessageImpl {
         
         // _byteCache initialized in calculateWrittenLength
         if (type == DatabaseEntry.KEY_TYPE_ROUTERINFO) {
-            byte len[] = DataHelper.toLong(2, _byteCache.length);
-            out[curIndex++] = len[0];
-            out[curIndex++] = len[1];
+            DataHelper.toLong(out, curIndex, 2, _byteCache.length);
+            curIndex += 2;
         }
         System.arraycopy(_byteCache, 0, out, curIndex, _byteCache.length);
         curIndex += _byteCache.length;

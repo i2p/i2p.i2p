@@ -404,33 +404,33 @@ public class DatabaseLookupMessage extends FastI2NPMessageImpl {
         System.arraycopy(_fromHash.getData(), 0, out, curIndex, Hash.HASH_LENGTH);
         curIndex += Hash.HASH_LENGTH;
         // Generate the flag byte
+        byte flag;
+        if (_replyKey != null)
+            flag = FLAG_ENCRYPT;
+        else
+            flag = 0;
+        switch (_type) {
+            case LS:
+                flag |= FLAG_TYPE_LS;
+                break;
+            case RI:
+                flag |= FLAG_TYPE_RI;
+                break;
+            case EXPL:
+                flag |= FLAG_TYPE_EXPL;
+                break;
+            case ANY:
+            default:
+                // lookup type bits are 0
+                break;
+        }
         if (_replyTunnel != null) {
-            byte flag = FLAG_TUNNEL;
-            if (_replyKey != null)
-                flag |= FLAG_ENCRYPT;
-            switch (_type) {
-                case LS:
-                    flag |= FLAG_TYPE_LS;
-                    break;
-                case RI:
-                    flag |= FLAG_TYPE_RI;
-                    break;
-                case EXPL:
-                    flag |= FLAG_TYPE_EXPL;
-                    break;
-                case ANY:
-                default:
-                    // flag is 0
-                    break;
-            }
+            flag |= FLAG_TUNNEL;
             out[curIndex++] = flag;
-            byte id[] = DataHelper.toLong(4, _replyTunnel.getTunnelId());
-            System.arraycopy(id, 0, out, curIndex, 4);
+            DataHelper.toLong(out, curIndex, 4, _replyTunnel.getTunnelId());
             curIndex += 4;
-        } else if (_replyKey != null) {
-            out[curIndex++] = FLAG_ENCRYPT;
         } else {
-            out[curIndex++] = 0x00;
+            out[curIndex++] = flag;
         }
         if ( (_dontIncludePeers == null) || (_dontIncludePeers.isEmpty()) ) {
             out[curIndex++] = 0x0;
@@ -439,9 +439,8 @@ public class DatabaseLookupMessage extends FastI2NPMessageImpl {
             int size = _dontIncludePeers.size();
             if (size > MAX_NUM_PEERS)
                 throw new I2NPMessageException("Too many peers: " + size);
-            byte len[] = DataHelper.toLong(2, size);
-            out[curIndex++] = len[0];
-            out[curIndex++] = len[1];
+            DataHelper.toLong(out, curIndex, 2, size);
+            curIndex += 2;
             for (Hash peer : _dontIncludePeers) {
                 System.arraycopy(peer.getData(), 0, out, curIndex, Hash.HASH_LENGTH);
                 curIndex += Hash.HASH_LENGTH;
