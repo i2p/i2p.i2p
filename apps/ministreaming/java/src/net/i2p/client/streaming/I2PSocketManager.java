@@ -57,6 +57,13 @@ public interface I2PSocketManager {
      */
     public I2PSocketOptions getDefaultOptions();
 
+    /**
+     *  Returns non-null socket.
+     *  This method does not throw exceptions, but methods on the returned socket
+     *  may throw exceptions if the socket or socket manager is closed.
+     *
+     *  @return non-null
+     */
     public I2PServerSocket getServerSocket();
     
     /**

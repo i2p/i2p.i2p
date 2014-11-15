@@ -672,8 +672,20 @@ public class PluginStarter implements Runnable {
             // If the client is a running ClientApp that we want to stop,
             // bypass all the logic below.
             if (action.equals("stop")) {
-                ClientApp ca = ctx.routerAppManager().getClientApp(app.className, LoadClientAppsJob.parseArgs(app.args));
-                if (ca != null && ca.getState() == ClientAppState.RUNNING) {
+                String[] argVal = LoadClientAppsJob.parseArgs(app.args);
+                // We must do all the substitution just as when started, so the
+                // argument array comparison in getClientApp() works.
+                // Do this after parsing so we don't need to worry about quoting
+                for (int i = 0; i < argVal.length; i++) {
+                    if (argVal[i].indexOf("$") >= 0) {
+                        argVal[i] = argVal[i].replace("$I2P", ctx.getBaseDir().getAbsolutePath());
+                        argVal[i] = argVal[i].replace("$CONFIG", ctx.getConfigDir().getAbsolutePath());
+                        argVal[i] = argVal[i].replace("$PLUGIN", pluginDir.getAbsolutePath());
+                    }
+                }
+                ClientApp ca = ctx.routerAppManager().getClientApp(app.className, argVal);
+                if (ca != null) {
+                    // even if (ca.getState() != ClientAppState.RUNNING), we do this, we don't want to fall thru
                     try {
                         ca.shutdown(LoadClientAppsJob.parseArgs(app.stopargs));
                     } catch (Throwable t) {
@@ -850,10 +862,22 @@ public class PluginStarter implements Runnable {
         ThreadGroup group = pluginThreadGroups.get(pluginName);
         if (group == null)
             return false;
+        boolean rv = group.activeCount() > 0;
         
-        Thread[] activeThreads = new Thread[1];
-        group.enumerate(activeThreads);
-        return activeThreads[0] != null;
+      /**** debugging to figure out active threads
+        if (rv) {
+            Thread[] activeThreads = new Thread[32];
+            int count = group.enumerate(activeThreads);
+            for (int i = 0; i < count; i++) {
+                if (activeThreads[i] != null) {
+                    System.err.println("Found " + activeThreads[i].getState() + " thread for " +
+                                       pluginName + ": " + activeThreads[i].getName());
+                }
+            }
+        }
+      ****/
+
+        return rv;
     }
     
     /**

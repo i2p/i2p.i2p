@@ -220,6 +220,11 @@ class OutboundClientMessageJobHelper {
         ackClove.setId(ctx.random().nextLong(I2NPMessage.MAX_ID_VALUE));
         DeliveryStatusMessage dsm = buildDSM(ctx, replyToken);
         GarlicMessage msg = wrapDSM(ctx, skm, dsm);
+        if (msg == null) {
+            if (log.shouldLog(Log.WARN))
+                log.warn("Failed to wrap ack clove");
+            return null;
+        }
         ackClove.setPayload(msg);
         // this does nothing, the clove is not separately encrypted
         //ackClove.setRecipient(ctx.router().getRouterInfo());

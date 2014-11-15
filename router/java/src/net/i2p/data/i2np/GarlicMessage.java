@@ -54,8 +54,7 @@ public class GarlicMessage extends FastI2NPMessageImpl {
     }
     /** write the message body to the output array, starting at the given index */
     protected int writeMessageBody(byte out[], int curIndex) throws I2NPMessageException {
-        byte len[] = DataHelper.toLong(4, _data.length);
-        System.arraycopy(len, 0, out, curIndex, 4);
+        DataHelper.toLong(out, curIndex, 4, _data.length);
         curIndex += 4;
         System.arraycopy(_data, 0, out, curIndex, _data.length);
         curIndex += _data.length;

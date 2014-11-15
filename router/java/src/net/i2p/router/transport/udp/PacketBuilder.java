@@ -434,7 +434,9 @@ class PacketBuilder {
                 off += 4;
                 for (int curByte = 0; curByte < size; curByte++) {
                     if (curByte + 1 < size)
-                        data[off] |= (byte)(1 << 7);
+                        data[off] = (byte)(1 << 7);
+                    else
+                        data[off] = 0;
                     
                     for (int curBit = 0; curBit < 7; curBit++) {
                         if (bitfield.received(curBit + 7*curByte))
@@ -467,7 +469,7 @@ class PacketBuilder {
             DataHelper.toLong(data, off, 4, state.getMessageId());
             off += 4;
         
-            data[off] |= fragment << 1;
+            data[off] = (byte) (fragment << 1);
             if (fragment == state.getFragmentCount() - 1)
                 data[off] |= 1; // isLast
             off++;
@@ -621,8 +623,7 @@ class PacketBuilder {
             off++;
             for (int i = 0; i < ackBitfields.size(); i++) {
                 ACKBitfield bitfield = ackBitfields.get(i);
-                // no, this will corrupt the packet
-                //if (bitfield.receivedComplete()) continue;
+                if (bitfield.receivedComplete()) continue;
                 DataHelper.toLong(data, off, 4, bitfield.getMessageId());
                 off += 4;
                 // only send what we have to
@@ -633,7 +634,9 @@ class PacketBuilder {
                     size++;
                 for (int curByte = 0; curByte < size; curByte++) {
                     if (curByte + 1 < size)
-                        data[off] |= (byte)(1 << 7);
+                        data[off] = (byte)(1 << 7);
+                    else
+                        data[off] = 0;
                     
                     for (int curBit = 0; curBit < 7; curBit++) {
                         if (bitfield.received(curBit + 7*curByte))
@@ -878,7 +881,7 @@ class PacketBuilder {
         }
         
         // now for the body
-        data[off] |= fragmentNum << 4;
+        data[off] = (byte) (fragmentNum << 4);
         data[off] |= (numFragments & 0xF);
         off++;
         

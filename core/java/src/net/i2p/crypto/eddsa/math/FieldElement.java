@@ -9,6 +9,9 @@ public abstract class FieldElement {
     protected final Field f;
 
     public FieldElement(Field f) {
+        if (null == f) {
+            throw new IllegalArgumentException("field cannot be null");
+        }
         this.f = f;
     }
 
@@ -29,13 +32,13 @@ public abstract class FieldElement {
     public abstract FieldElement add(FieldElement val);
 
     public FieldElement addOne() {
-        return add(f.one);
+        return add(f.ONE);
     }
 
     public abstract FieldElement subtract(FieldElement val);
 
     public FieldElement subtractOne() {
-        return subtract(f.one);
+        return subtract(f.ONE);
     }
 
     public abstract FieldElement negate();

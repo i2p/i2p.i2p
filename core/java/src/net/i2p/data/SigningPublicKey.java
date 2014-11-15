@@ -193,4 +193,11 @@ public class SigningPublicKey extends SimpleDataStructure {
         buf.append(']');
         return buf.toString();
     }
+
+    /**
+     *  @since 0.9.17
+     */
+    public static void clearCache() {
+        _cache.clear();
+    }
 }

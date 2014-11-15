@@ -448,7 +448,7 @@ class InboundEstablishState {
             DataHelper.toLong(signed, off, 4, _sentRelayTag);
             off += 4;
             DataHelper.toLong(signed, off, 4, _receivedSignedOnTime);
-            Signature sig = new Signature(_receivedSignature);
+            Signature sig = new Signature(_receivedUnconfirmedIdentity.getSigType(), _receivedSignature);
             boolean ok = _context.dsa().verifySignature(sig, signed, _receivedUnconfirmedIdentity.getSigningPublicKey());
             if (ok) {
                 // todo partial spoof detection - get peer.calculateHash(),

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P i2ptunnel\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-09-17 21:49+0000\n"
+"POT-Creation-Date: 2014-10-30 20:10+0000\n"
 "PO-Revision-Date: 2010-06-15 14:09+0100\n"
 "Last-Translator: duck <duck@mail.i2p>\n"
 "Language-Team: duck <duck@mail.i2p>\n"
@@ -26,9 +26,10 @@ msgstr ""
 #: ../java/build/Proxy.java:28 ../java/build/Proxy.java:38
 #: ../java/build/Proxy.java:46 ../java/build/Proxy.java:57
 #: ../java/build/Proxy.java:66 ../java/build/Proxy.java:75
-#: ../java/build/Proxy.java:86 ../java/build/Proxy.java:98
-#: ../java/build/Proxy.java:108 ../java/build/Proxy.java:121
-#: ../java/build/Proxy.java:130 ../java/build/Proxy.java:142
+#: ../java/build/Proxy.java:84 ../java/build/Proxy.java:95
+#: ../java/build/Proxy.java:107 ../java/build/Proxy.java:117
+#: ../java/build/Proxy.java:128 ../java/build/Proxy.java:141
+#: ../java/build/Proxy.java:150 ../java/build/Proxy.java:162
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:204
 msgid "Router Console"
 msgstr ""
@@ -37,9 +38,10 @@ msgstr ""
 #: ../java/build/Proxy.java:29 ../java/build/Proxy.java:39
 #: ../java/build/Proxy.java:47 ../java/build/Proxy.java:58
 #: ../java/build/Proxy.java:67 ../java/build/Proxy.java:76
-#: ../java/build/Proxy.java:87 ../java/build/Proxy.java:99
-#: ../java/build/Proxy.java:109 ../java/build/Proxy.java:122
-#: ../java/build/Proxy.java:131 ../java/build/Proxy.java:143
+#: ../java/build/Proxy.java:85 ../java/build/Proxy.java:96
+#: ../java/build/Proxy.java:108 ../java/build/Proxy.java:118
+#: ../java/build/Proxy.java:129 ../java/build/Proxy.java:142
+#: ../java/build/Proxy.java:151 ../java/build/Proxy.java:163
 msgid "I2P Router Console"
 msgstr ""
 
@@ -47,9 +49,10 @@ msgstr ""
 #: ../java/build/Proxy.java:30 ../java/build/Proxy.java:40
 #: ../java/build/Proxy.java:48 ../java/build/Proxy.java:59
 #: ../java/build/Proxy.java:68 ../java/build/Proxy.java:77
-#: ../java/build/Proxy.java:88 ../java/build/Proxy.java:100
-#: ../java/build/Proxy.java:110 ../java/build/Proxy.java:123
-#: ../java/build/Proxy.java:132 ../java/build/Proxy.java:144
+#: ../java/build/Proxy.java:86 ../java/build/Proxy.java:97
+#: ../java/build/Proxy.java:109 ../java/build/Proxy.java:119
+#: ../java/build/Proxy.java:130 ../java/build/Proxy.java:143
+#: ../java/build/Proxy.java:152 ../java/build/Proxy.java:164
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:205
 msgid "Configuration"
 msgstr ""
@@ -58,9 +61,10 @@ msgstr ""
 #: ../java/build/Proxy.java:31 ../java/build/Proxy.java:41
 #: ../java/build/Proxy.java:49 ../java/build/Proxy.java:60
 #: ../java/build/Proxy.java:69 ../java/build/Proxy.java:78
-#: ../java/build/Proxy.java:89 ../java/build/Proxy.java:101
-#: ../java/build/Proxy.java:111 ../java/build/Proxy.java:124
-#: ../java/build/Proxy.java:133 ../java/build/Proxy.java:145
+#: ../java/build/Proxy.java:87 ../java/build/Proxy.java:98
+#: ../java/build/Proxy.java:110 ../java/build/Proxy.java:120
+#: ../java/build/Proxy.java:131 ../java/build/Proxy.java:144
+#: ../java/build/Proxy.java:153 ../java/build/Proxy.java:165
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:205
 msgid "Help"
 msgstr ""
@@ -69,9 +73,10 @@ msgstr ""
 #: ../java/build/Proxy.java:32 ../java/build/Proxy.java:42
 #: ../java/build/Proxy.java:50 ../java/build/Proxy.java:61
 #: ../java/build/Proxy.java:70 ../java/build/Proxy.java:79
-#: ../java/build/Proxy.java:90 ../java/build/Proxy.java:102
-#: ../java/build/Proxy.java:112 ../java/build/Proxy.java:125
-#: ../java/build/Proxy.java:134 ../java/build/Proxy.java:146
+#: ../java/build/Proxy.java:88 ../java/build/Proxy.java:99
+#: ../java/build/Proxy.java:111 ../java/build/Proxy.java:121
+#: ../java/build/Proxy.java:132 ../java/build/Proxy.java:145
+#: ../java/build/Proxy.java:154 ../java/build/Proxy.java:166
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:205
 msgid "Addressbook"
 msgstr ""
@@ -158,7 +163,8 @@ msgid "You attempted to connect to a non-I2P website or location."
 msgstr ""
 
 #: ../java/build/Proxy.java:45 ../java/build/Proxy.java:51
-#: ../java/build/Proxy.java:74 ../java/build/Proxy.java:80
+#: ../java/build/Proxy.java:56 ../java/build/Proxy.java:62
+#: ../java/build/Proxy.java:83 ../java/build/Proxy.java:89
 msgid "Warning: Eepsite Unreachable"
 msgstr ""
 
@@ -171,203 +177,225 @@ msgid ""
 "The eepsite is probably down, but there could also be network congestion."
 msgstr ""
 
-#: ../java/build/Proxy.java:54 ../java/build/Proxy.java:83
-#: ../java/build/Proxy.java:95
+#: ../java/build/Proxy.java:54 ../java/build/Proxy.java:92
+#: ../java/build/Proxy.java:104
 #, java-format
 msgid "You may want to {0}retry{1}."
 msgstr ""
 
-#: ../java/build/Proxy.java:55 ../java/build/Proxy.java:84
-#: ../java/build/Proxy.java:96 ../java/build/Proxy.java:119
-#: ../java/build/Proxy.java:140 ../java/build/Proxy.java:152
+#: ../java/build/Proxy.java:55 ../java/build/Proxy.java:93
+#: ../java/build/Proxy.java:105 ../java/build/Proxy.java:139
+#: ../java/build/Proxy.java:160 ../java/build/Proxy.java:172
 msgid "Could not find the following destination:"
 msgstr ""
 
-#: ../java/build/Proxy.java:56
+#: ../java/build/Proxy.java:63
+msgid ""
+"The eepsite was not reachable, because it uses encryption options that are "
+"not supported by your I2P or Java version."
+msgstr ""
+
+#: ../java/build/Proxy.java:64 ../java/build/Proxy.java:126
+msgid "Could not connect to the following destination:"
+msgstr ""
+
+#: ../java/build/Proxy.java:65
 msgid "Error: Request Denied"
 msgstr ""
 
-#: ../java/build/Proxy.java:62
+#: ../java/build/Proxy.java:71
 msgid "Error: Local Access"
 msgstr ""
 
-#: ../java/build/Proxy.java:63
+#: ../java/build/Proxy.java:72
 msgid "Your browser is misconfigured."
 msgstr ""
 
-#: ../java/build/Proxy.java:64
+#: ../java/build/Proxy.java:73
 msgid ""
 "Do not use the proxy to access the router console, localhost, or local LAN "
 "destinations."
 msgstr ""
 
-#: ../java/build/Proxy.java:65 ../java/build/Proxy.java:71
+#: ../java/build/Proxy.java:74 ../java/build/Proxy.java:80
 msgid "Warning: No Outproxy Configured"
 msgstr ""
 
-#: ../java/build/Proxy.java:72
+#: ../java/build/Proxy.java:81
 msgid ""
 "Your request was for a site outside of I2P, but you have no HTTP outproxy "
 "configured."
 msgstr ""
 
-#: ../java/build/Proxy.java:73
+#: ../java/build/Proxy.java:82
 msgid "Please configure an outproxy in I2PTunnel."
 msgstr ""
 
-#: ../java/build/Proxy.java:81
+#: ../java/build/Proxy.java:90
 msgid "The eepsite was not reachable."
 msgstr ""
 
-#: ../java/build/Proxy.java:82
+#: ../java/build/Proxy.java:91
 msgid ""
 "The eepsite is offline, there is network congestion, or your router is not "
 "yet well-integrated with peers."
 msgstr ""
 
-#: ../java/build/Proxy.java:85 ../java/build/Proxy.java:91
+#: ../java/build/Proxy.java:94 ../java/build/Proxy.java:100
 msgid "Warning: Invalid Destination"
 msgstr ""
 
-#: ../java/build/Proxy.java:92
+#: ../java/build/Proxy.java:101
 msgid ""
 "The eepsite destination specified was not valid, or was otherwise "
 "unreachable."
 msgstr ""
 
-#: ../java/build/Proxy.java:93
+#: ../java/build/Proxy.java:102
 msgid ""
 "Perhaps you pasted in the wrong Base 64 string or the link you are following "
 "is bad."
 msgstr ""
 
-#: ../java/build/Proxy.java:94
+#: ../java/build/Proxy.java:103
 msgid "The I2P host could also be offline."
 msgstr ""
 
-#: ../java/build/Proxy.java:97 ../java/build/Proxy.java:103
+#: ../java/build/Proxy.java:106 ../java/build/Proxy.java:112
 msgid "Warning: Non-HTTP Protocol"
 msgstr ""
 
-#: ../java/build/Proxy.java:104
+#: ../java/build/Proxy.java:113
 msgid "The request uses a bad protocol."
 msgstr ""
 
-#: ../java/build/Proxy.java:105
+#: ../java/build/Proxy.java:114
 msgid "The I2P HTTP Proxy supports HTTP and HTTPS requests only."
 msgstr ""
 
-#: ../java/build/Proxy.java:106
+#: ../java/build/Proxy.java:115
 msgid "Other protocols such as FTP are not allowed."
 msgstr ""
 
-#: ../java/build/Proxy.java:107
-msgid "Warning: Eepsite Unknown"
+#: ../java/build/Proxy.java:116 ../java/build/Proxy.java:122
+msgid "Warning: Outproxy Unreachable"
 msgstr ""
 
-#: ../java/build/Proxy.java:113
-msgid "Warning: Eepsite Not Found in Addressbook"
-msgstr ""
-
-#: ../java/build/Proxy.java:114
-msgid "The eepsite was not found in your router's addressbook."
-msgstr ""
-
-#: ../java/build/Proxy.java:115
-msgid "Check the link or find a Base 32 or Base 64 address."
-msgstr ""
-
-#: ../java/build/Proxy.java:116
-#, java-format
-msgid "If you have the Base 64 address, {0}add it to your addressbook{1}."
-msgstr ""
-
-#: ../java/build/Proxy.java:117
+#: ../java/build/Proxy.java:123
 msgid ""
-"Otherwise, find a Base 32 or address helper link, or use a jump service link "
-"below."
+"The HTTP outproxy was not reachable, because it uses encryption options that "
+"are not supported by your I2P or Java version."
 msgstr ""
 
-#: ../java/build/Proxy.java:118
-#, java-format
-msgid ""
-"Seeing this page often? See {0}the FAQ{1} for help in {2}adding some "
-"subscriptions{3} to your addressbook."
-msgstr ""
-
-#: ../java/build/Proxy.java:120 ../java/build/Proxy.java:126
-msgid "Warning: Invalid Request URI"
-msgstr ""
-
-#: ../java/build/Proxy.java:127
-msgid "The request URI is invalid, and probably contains illegal characters."
-msgstr ""
-
-#: ../java/build/Proxy.java:128
-msgid ""
-"If you clicked a link, check the end of the URI for any characters the "
-"browser has mistakenly added on."
-msgstr ""
-
-#: ../java/build/Proxy.java:129 ../java/build/Proxy.java:135
-#: ../java/build/Proxy.java:141 ../java/build/Proxy.java:147
-msgid "Warning: Outproxy Not Found"
-msgstr ""
-
-#: ../java/build/Proxy.java:136
-msgid ""
-"The HTTP outproxy was not reachable, because its lease set was not found."
-msgstr ""
-
-#: ../java/build/Proxy.java:137
-msgid ""
-"The outproxy is probably down, but there could also be network congestion."
-msgstr ""
-
-#: ../java/build/Proxy.java:138 ../java/build/Proxy.java:150
+#: ../java/build/Proxy.java:124 ../java/build/Proxy.java:158
+#: ../java/build/Proxy.java:170
 #, java-format
 msgid ""
 "You may want to {0}retry{1} as this will randomly reselect an outproxy from "
 "the pool you have defined {2}here{3} (if you have more than one configured)."
 msgstr ""
 
-#: ../java/build/Proxy.java:139 ../java/build/Proxy.java:151
+#: ../java/build/Proxy.java:125 ../java/build/Proxy.java:159
+#: ../java/build/Proxy.java:171
 #, java-format
 msgid ""
 "If you continue to have trouble you may want to edit your outproxy list {0}"
 "here{1}."
 msgstr ""
 
+#: ../java/build/Proxy.java:127
+msgid "Warning: Eepsite Unknown"
+msgstr ""
+
+#: ../java/build/Proxy.java:133
+msgid "Warning: Eepsite Not Found in Addressbook"
+msgstr ""
+
+#: ../java/build/Proxy.java:134
+msgid "The eepsite was not found in your router's addressbook."
+msgstr ""
+
+#: ../java/build/Proxy.java:135
+msgid "Check the link or find a Base 32 or Base 64 address."
+msgstr ""
+
+#: ../java/build/Proxy.java:136
+#, java-format
+msgid "If you have the Base 64 address, {0}add it to your addressbook{1}."
+msgstr ""
+
+#: ../java/build/Proxy.java:137
+msgid ""
+"Otherwise, find a Base 32 or address helper link, or use a jump service link "
+"below."
+msgstr ""
+
+#: ../java/build/Proxy.java:138
+#, java-format
+msgid ""
+"Seeing this page often? See {0}the FAQ{1} for help in {2}adding some "
+"subscriptions{3} to your addressbook."
+msgstr ""
+
+#: ../java/build/Proxy.java:140 ../java/build/Proxy.java:146
+msgid "Warning: Invalid Request URI"
+msgstr ""
+
+#: ../java/build/Proxy.java:147
+msgid "The request URI is invalid, and probably contains illegal characters."
+msgstr ""
+
 #: ../java/build/Proxy.java:148
+msgid ""
+"If you clicked a link, check the end of the URI for any characters the "
+"browser has mistakenly added on."
+msgstr ""
+
+#: ../java/build/Proxy.java:149 ../java/build/Proxy.java:155
+#: ../java/build/Proxy.java:161 ../java/build/Proxy.java:167
+msgid "Warning: Outproxy Not Found"
+msgstr ""
+
+#: ../java/build/Proxy.java:156
+msgid ""
+"The HTTP outproxy was not reachable, because its lease set was not found."
+msgstr ""
+
+#: ../java/build/Proxy.java:157
+msgid ""
+"The outproxy is probably down, but there could also be network congestion."
+msgstr ""
+
+#: ../java/build/Proxy.java:168
 msgid "The HTTP Outproxy was not found."
 msgstr ""
 
-#: ../java/build/Proxy.java:149
+#: ../java/build/Proxy.java:169
 msgid ""
 "It is offline, there is network congestion, or your router is not yet well-"
 "integrated with peers."
 msgstr ""
 
-#: ../java/build/Proxy.java:153
+#: ../java/build/Proxy.java:173
 msgid "Proxy Authorization Required"
 msgstr ""
 
-#: ../java/build/Proxy.java:154
+#: ../java/build/Proxy.java:174
 msgid "I2P HTTP Proxy Authorization Required"
 msgstr ""
 
-#: ../java/build/Proxy.java:155
+#: ../java/build/Proxy.java:175
 msgid "This proxy is configured to require a username and password for access."
 msgstr ""
 
-#: ../java/build/Proxy.java:156
+#: ../java/build/Proxy.java:176
 #, java-format
 msgid ""
 "Please enter your username and password, or check your {0}router "
 "configuration{1} or {2}I2PTunnel configuration{3}."
 msgstr ""
 
-#: ../java/build/Proxy.java:157
+#: ../java/build/Proxy.java:177
 #, java-format
 msgid ""
 "To disable authorization, remove the configuration {0}i2ptunnel.proxy."

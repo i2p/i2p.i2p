@@ -72,10 +72,14 @@ class InboundMessageState implements CDQEntry {
         _log = ctx.logManager().getLog(InboundMessageState.class);
         _messageId = messageId;
         _from = from;
-        if (data.readMessageIsLast(dataFragment))
-            _fragments = new ByteArray[1 + data.readMessageFragmentNum(dataFragment)];
-        else
+        if (data.readMessageIsLast(dataFragment)) {
+            int num = 1 + data.readMessageFragmentNum(dataFragment);
+            if (num > MAX_FRAGMENTS)
+                throw new DataFormatException("corrupt - too many fragments: " + num);
+            _fragments = new ByteArray[num];
+        } else {
             _fragments = new ByteArray[MAX_FRAGMENTS];
+        }
         _lastFragment = -1;
         _completeSize = -1;
         _receiveBegin = ctx.clock().now();
@@ -222,8 +226,10 @@ class InboundMessageState implements CDQEntry {
         return _completeSize;
     }
 
+    /** FIXME synch here or PeerState.fetchPartialACKs() */
     public ACKBitfield createACKBitfield() {
-        int sz = (_lastFragment >= 0) ? _lastFragment + 1 : _fragments.length;
+        int last = _lastFragment;
+        int sz = (last >= 0) ? last + 1 : _fragments.length;
         return new PartialBitfield(_messageId, _fragments, sz);
     }
     

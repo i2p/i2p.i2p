@@ -221,7 +221,7 @@ class OutboundEstablishState {
         return _sentX;
     }
 
-    /**x
+    /**
      * The remote side (Bob) - note that in some places he's called Charlie.
      * Warning - may change after introduction. May be null before introduction.
      */
@@ -618,8 +618,8 @@ class OutboundEstablishState {
         if (_requestSentCount > 0)
             return false;
         long now = _context.clock().now();
-        if (_log.shouldLog(Log.WARN))
-            _log.warn(toString() + " accelerating SessionRequest by " + (_nextSend - now) + " ms");
+        if (_log.shouldLog(Log.INFO))
+            _log.info(toString() + " accelerating SessionRequest by " + (_nextSend - now) + " ms");
         _nextSend = now;
         return true;
     }

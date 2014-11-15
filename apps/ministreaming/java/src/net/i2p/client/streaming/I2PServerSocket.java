@@ -20,14 +20,15 @@ public interface I2PServerSocket {
      * Waits for the next socket connecting.  If a remote user tried to make a 
      * connection and the local application wasn't .accept()ing new connections,
      * they should get refused (if .accept() doesnt occur in some small period).
-     * Warning - unlike regular ServerSocket, may return null.
+     * Warning - unlike regular ServerSocket, may return null (through 0.9.16 only).
      *
-     * @return a connected I2PSocket OR NULL
+     * @return a connected I2PSocket OR NULL through 0.9.16; never null as of 0.9.17
      *
      * @throws I2PException if there is a problem with reading a new socket
-     *         from the data available (aka the I2PSession closed, etc)
-     * @throws ConnectException if the I2PServerSocket is closed
-     * @throws SocketTimeoutException 
+     *         from the data available (e.g. the I2PSession is closed)
+     * @throws ConnectException if the I2PServerSocket is closed, or if interrupted.
+     *         Not actually thrown through 0.9.16; thrown as of 0.9.17
+     * @throws SocketTimeoutException if a timeout was previously set with setSoTimeout and the timeout has been reached.
      */
     public I2PSocket accept() throws I2PException, ConnectException, SocketTimeoutException;
 

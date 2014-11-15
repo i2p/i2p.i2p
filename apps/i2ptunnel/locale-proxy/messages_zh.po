@@ -5,18 +5,19 @@
 # 
 # Translators:
 # ducki2p <ducki2p@gmail.com>, 2011
-# nametooshort <oiiu19@yahoo.com>, 2013-2014
+# linloveliang <oiiu19@yahoo.com>, 2013-2014
 # walking <walking@i2pmail.org>, 2011
 # walking <waling@mail.i2p>, 2013
 # walking <walking@i2pmail.org>, 2011
 # wwj402 <wwj402@gmail.com>, 2013
+# YF <yfdyh000@gmail.com>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-02-06 18:27+0000\n"
-"PO-Revision-Date: 2014-04-23 12:37+0000\n"
-"Last-Translator: nametooshort <oiiu19@yahoo.com>\n"
+"POT-Creation-Date: 2014-09-17 21:49+0000\n"
+"PO-Revision-Date: 2014-10-14 12:01+0000\n"
+"Last-Translator: YF <yfdyh000@gmail.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/projects/p/I2P/language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -24,245 +25,357 @@ msgstr ""
 "Language: zh_CN\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: ../java/build/Proxy.java:5 ../java/build/Proxy.java:11
-msgid "Warning: Outproxy Not Found"
-msgstr "警告：未找到出口代理"
+#: ../java/build/Proxy.java:5
+msgid "Information: New Host Name"
+msgstr "信息：新站点地址"
 
 #: ../java/build/Proxy.java:6 ../java/build/Proxy.java:18
-#: ../java/build/Proxy.java:27 ../java/build/Proxy.java:40
-#: ../java/build/Proxy.java:49 ../java/build/Proxy.java:61
-#: ../java/build/Proxy.java:69 ../java/build/Proxy.java:78
-#: ../java/build/Proxy.java:93 ../java/build/Proxy.java:104
-#: ../java/build/Proxy.java:116 ../java/build/Proxy.java:126
+#: ../java/build/Proxy.java:28 ../java/build/Proxy.java:38
+#: ../java/build/Proxy.java:46 ../java/build/Proxy.java:57
+#: ../java/build/Proxy.java:66 ../java/build/Proxy.java:75
+#: ../java/build/Proxy.java:86 ../java/build/Proxy.java:98
+#: ../java/build/Proxy.java:108 ../java/build/Proxy.java:121
+#: ../java/build/Proxy.java:130 ../java/build/Proxy.java:142
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:204
 msgid "Router Console"
 msgstr "路由控制台"
 
 #: ../java/build/Proxy.java:7 ../java/build/Proxy.java:19
-#: ../java/build/Proxy.java:28 ../java/build/Proxy.java:41
-#: ../java/build/Proxy.java:50 ../java/build/Proxy.java:62
-#: ../java/build/Proxy.java:70 ../java/build/Proxy.java:79
-#: ../java/build/Proxy.java:94 ../java/build/Proxy.java:105
-#: ../java/build/Proxy.java:117 ../java/build/Proxy.java:127
+#: ../java/build/Proxy.java:29 ../java/build/Proxy.java:39
+#: ../java/build/Proxy.java:47 ../java/build/Proxy.java:58
+#: ../java/build/Proxy.java:67 ../java/build/Proxy.java:76
+#: ../java/build/Proxy.java:87 ../java/build/Proxy.java:99
+#: ../java/build/Proxy.java:109 ../java/build/Proxy.java:122
+#: ../java/build/Proxy.java:131 ../java/build/Proxy.java:143
 msgid "I2P Router Console"
 msgstr "I2P 路由控制台"
 
 #: ../java/build/Proxy.java:8 ../java/build/Proxy.java:20
-#: ../java/build/Proxy.java:29 ../java/build/Proxy.java:42
-#: ../java/build/Proxy.java:51 ../java/build/Proxy.java:63
-#: ../java/build/Proxy.java:71 ../java/build/Proxy.java:80
-#: ../java/build/Proxy.java:95 ../java/build/Proxy.java:106
-#: ../java/build/Proxy.java:118 ../java/build/Proxy.java:128
+#: ../java/build/Proxy.java:30 ../java/build/Proxy.java:40
+#: ../java/build/Proxy.java:48 ../java/build/Proxy.java:59
+#: ../java/build/Proxy.java:68 ../java/build/Proxy.java:77
+#: ../java/build/Proxy.java:88 ../java/build/Proxy.java:100
+#: ../java/build/Proxy.java:110 ../java/build/Proxy.java:123
+#: ../java/build/Proxy.java:132 ../java/build/Proxy.java:144
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:205
 msgid "Configuration"
 msgstr "配置"
 
 #: ../java/build/Proxy.java:9 ../java/build/Proxy.java:21
-#: ../java/build/Proxy.java:30 ../java/build/Proxy.java:43
-#: ../java/build/Proxy.java:52 ../java/build/Proxy.java:64
-#: ../java/build/Proxy.java:72 ../java/build/Proxy.java:81
-#: ../java/build/Proxy.java:96 ../java/build/Proxy.java:107
-#: ../java/build/Proxy.java:119 ../java/build/Proxy.java:129
+#: ../java/build/Proxy.java:31 ../java/build/Proxy.java:41
+#: ../java/build/Proxy.java:49 ../java/build/Proxy.java:60
+#: ../java/build/Proxy.java:69 ../java/build/Proxy.java:78
+#: ../java/build/Proxy.java:89 ../java/build/Proxy.java:101
+#: ../java/build/Proxy.java:111 ../java/build/Proxy.java:124
+#: ../java/build/Proxy.java:133 ../java/build/Proxy.java:145
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:205
 msgid "Help"
 msgstr "帮助"
 
 #: ../java/build/Proxy.java:10 ../java/build/Proxy.java:22
-#: ../java/build/Proxy.java:31 ../java/build/Proxy.java:44
-#: ../java/build/Proxy.java:53 ../java/build/Proxy.java:65
-#: ../java/build/Proxy.java:73 ../java/build/Proxy.java:82
-#: ../java/build/Proxy.java:97 ../java/build/Proxy.java:108
-#: ../java/build/Proxy.java:120 ../java/build/Proxy.java:130
+#: ../java/build/Proxy.java:32 ../java/build/Proxy.java:42
+#: ../java/build/Proxy.java:50 ../java/build/Proxy.java:61
+#: ../java/build/Proxy.java:70 ../java/build/Proxy.java:79
+#: ../java/build/Proxy.java:90 ../java/build/Proxy.java:102
+#: ../java/build/Proxy.java:112 ../java/build/Proxy.java:125
+#: ../java/build/Proxy.java:134 ../java/build/Proxy.java:146
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:205
 msgid "Addressbook"
 msgstr "地址簿"
 
+#: ../java/build/Proxy.java:11
+msgid "Information: New Host Name with Address Helper"
+msgstr "信息：通过地址助手发现的新站点地址"
+
 #: ../java/build/Proxy.java:12
-msgid "The HTTP Outproxy was not found."
-msgstr "未找到 HTTP 出口代理。"
+msgid ""
+"The address helper link you followed is for a new host name that is not in "
+"your address book."
+msgstr "您打开的地址助手链接指向了一个新站点，您的I2P地址簿中尚未收录。"
 
 #: ../java/build/Proxy.java:13
-msgid ""
-"It is offline, there is network congestion, or your router is not yet well-"
-"integrated with peers."
-msgstr "它已经下线，遇到网络拥堵，或您的路由尚未完全整合至 I2P 网络中。"
+msgid "You may save this host name to your local address book."
+msgstr "您可以将此站点网址保存至您的本地地址簿中。"
 
 #: ../java/build/Proxy.java:14
-#, java-format
 msgid ""
-"You may want to {0}retry{1} as this will randomly reselect an outproxy from "
-"the pool you have defined {2}here{3} (if you have more than one configured)."
-msgstr "您可以{0}重试{1}，程序将从您在 {2}此处{3} 定义的出口代理列表中随机选择一个进行连接（如果您设置了多项代理）。"
+"If you save it to your address book, you will not see this message again."
+msgstr "在地址簿中保存后，此提示将不在显示。"
 
 #: ../java/build/Proxy.java:15
-#, java-format
 msgid ""
-"If you continue to have trouble you may want to edit your outproxy list "
-"{0}here{1}."
-msgstr "如果问题持续存在，您可能需要{0}在此{1}编辑出口代理列表。"
+"If you do not save it, the host name will be forgotten after the next router"
+" restart."
+msgstr "如果不保存，路由重启后，此站点地址将被遗忘。"
 
-#: ../java/build/Proxy.java:16 ../java/build/Proxy.java:38
-#: ../java/build/Proxy.java:59 ../java/build/Proxy.java:102
-msgid "Could not find the following destination:"
-msgstr "无法直到如下目标："
-
-#: ../java/build/Proxy.java:17
-msgid "Error: Request Denied"
-msgstr "错误：请求被拒绝"
-
-#: ../java/build/Proxy.java:23
-msgid "Error: Local Access"
-msgstr "错误：本地访问"
-
-#: ../java/build/Proxy.java:24
-msgid "Your browser is misconfigured."
-msgstr "您的浏览器配置有误。"
-
-#: ../java/build/Proxy.java:25
+#: ../java/build/Proxy.java:16
 msgid ""
-"Do not use the proxy to access the router console, localhost, or local LAN "
-"destinations."
-msgstr "请不要使用代理访问路由控制台，localhost 或局域网地址。"
+"If you do not wish to visit this host, click the \"back\" button on your "
+"browser."
+msgstr "如果您不像访问此站点，请点击浏览器的“后退”按钮。"
 
-#: ../java/build/Proxy.java:26
-msgid "Warning: Eepsite Unknown"
-msgstr "警告：未知 I2P 站点"
-
-#: ../java/build/Proxy.java:32
-msgid "Warning: Eepsite Not Found in Addressbook"
-msgstr "警告：地址簿中未找到该 I2P 站点"
-
-#: ../java/build/Proxy.java:33
-msgid "The eepsite was not found in your router's addressbook."
-msgstr "此 I2P 站点未存在于您路由器的地址簿中。"
-
-#: ../java/build/Proxy.java:34
-msgid "Check the link or find a Base 32 or Base 64 address."
-msgstr "请检查链接或找到其对应的 Base32 或 Base64 地址。"
-
-#: ../java/build/Proxy.java:35
-#, java-format
-msgid "If you have the Base 64 address, {0}add it to your addressbook{1}."
-msgstr "如果您拥有 Base64 地址，请{0}将其添加至您的地址簿{1}。"
-
-#: ../java/build/Proxy.java:36
-msgid ""
-"Otherwise, find a Base 32 or address helper link, or use a jump service link"
-" below."
-msgstr "否则，请找到其对应的 Base32 地址或地址助手链接，或使用下面列出的跳转服务之一。"
-
-#: ../java/build/Proxy.java:37
-#, java-format
-msgid ""
-"Seeing this page often? See {0}the FAQ{1} for help in {2}adding some "
-"subscriptions{3} to your addressbook."
-msgstr "经常碰到此页面？请参见 {0}常见问题集 FAQ{1} 查看如何为您的地址簿 {2}添加订阅{3}。"
-
-#: ../java/build/Proxy.java:39 ../java/build/Proxy.java:45
-msgid "Warning: Invalid Request URI"
-msgstr "警告：请求的 URI 无效。"
-
-#: ../java/build/Proxy.java:46
-msgid "The request URI is invalid, and probably contains illegal characters."
-msgstr "请求的 URI 无效或包含非法字符。"
-
-#: ../java/build/Proxy.java:47
-msgid ""
-"If you clicked a link, check the end of the URI for any characters the "
-"browser has mistakenly added on."
-msgstr "如果您点击的是链接，请检查 URI 结尾是否有浏览器错误添加的多余字符。"
-
-#: ../java/build/Proxy.java:48 ../java/build/Proxy.java:54
-msgid "Warning: Invalid Destination"
-msgstr "警告：无效目标"
-
-#: ../java/build/Proxy.java:55
-msgid ""
-"The eepsite destination specified was not valid, or was otherwise "
-"unreachable."
-msgstr "指定站点的目标密钥无效，或无法到达。"
-
-#: ../java/build/Proxy.java:56
-msgid ""
-"Perhaps you pasted in the wrong Base 64 string or the link you are following"
-" is bad."
-msgstr "或许您粘贴的 Base64 字符串有误或您打开的链接有问题。"
-
-#: ../java/build/Proxy.java:57
-msgid "The I2P host could also be offline."
-msgstr "也可能是 I2P 站点目前已下线。"
-
-#: ../java/build/Proxy.java:58 ../java/build/Proxy.java:101
-#, java-format
-msgid "You may want to {0}retry{1}."
-msgstr "您可能希望{0}重试{1}。"
-
-#: ../java/build/Proxy.java:60 ../java/build/Proxy.java:66
-msgid "Warning: Request Denied"
-msgstr "警告：请求被拒绝"
-
-#: ../java/build/Proxy.java:67
-msgid "You attempted to connect to a non-I2P website or location."
-msgstr "您尝试连接的网站非I2P站点或位置。"
-
-#: ../java/build/Proxy.java:68 ../java/build/Proxy.java:74
-msgid "Warning: No Outproxy Configured"
-msgstr "警告：没有配置出口代理"
-
-#: ../java/build/Proxy.java:75
-msgid ""
-"Your request was for a site outside of I2P, but you have no HTTP outproxy "
-"configured."
-msgstr "请求的站点在 I2P 网络之外，但您没有配置 HTTP 出口代理。"
-
-#: ../java/build/Proxy.java:76
-msgid "Please configure an outproxy in I2PTunnel."
-msgstr "请到 I2PTunnel 中配置出口代理。"
-
-#: ../java/build/Proxy.java:77 ../java/build/Proxy.java:83
+#: ../java/build/Proxy.java:17 ../java/build/Proxy.java:23
 msgid "Warning: Destination Key Conflict"
 msgstr "警告：目标密钥冲突"
 
-#: ../java/build/Proxy.java:84
+#: ../java/build/Proxy.java:24
 msgid ""
 "The addresshelper link you followed specifies a different destination key "
 "than a host entry in your host database."
 msgstr "您所打开的地址簿连接指定的目标密钥与您的地址簿中的记录不同。"
 
-#: ../java/build/Proxy.java:85
+#: ../java/build/Proxy.java:25
 msgid ""
 "Someone could be trying to impersonate another eepsite, or people have given"
 " two eepsites identical names."
 msgstr "可能有人正试图通过此链接伪装成此站点，或有人使用了相同的站点网址。"
 
-#: ../java/build/Proxy.java:86
+#: ../java/build/Proxy.java:26
 msgid ""
 "You can resolve the conflict by considering which key you trust, and either "
 "discarding the addresshelper link, discarding the host entry from your host "
 "database, or naming one of them differently."
 msgstr "您可以通过指定信任的密钥来解决冲突，或丢弃地址助手链接，或丢弃您地址簿中的记录，或为其中之一重命名其网址。"
 
-#: ../java/build/Proxy.java:87
+#: ../java/build/Proxy.java:27 ../java/build/Proxy.java:33
+msgid "Warning: Bad Address Helper"
+msgstr "警告：无效地址助手"
+
+#: ../java/build/Proxy.java:34
+#, java-format
+msgid "The helper key in the URL ({0}i2paddresshelper={1}) is not resolvable."
+msgstr "URL中的助手键值 ({0}i2paddresshelper={1}) 无法解析。"
+
+#: ../java/build/Proxy.java:35
+msgid "It seems to be garbage data, or a mistyped Base 32 address."
+msgstr "它看起来可能是无效数据或输入有误的 Base32 地址。"
+
+#: ../java/build/Proxy.java:36
+msgid ""
+"Check your URL to try and fix the helper key to be a valid Base 32 hostname "
+"or Base 64 key."
+msgstr "请检查您的链接尝试修复助手密钥为有效的 Base32 地址或 Base64 密钥。"
+
+#: ../java/build/Proxy.java:37 ../java/build/Proxy.java:43
+msgid "Warning: Request Denied"
+msgstr "警告：请求被拒绝"
+
+#: ../java/build/Proxy.java:44
+msgid "You attempted to connect to a non-I2P website or location."
+msgstr "您尝试连接的网站非I2P站点或位置。"
+
+#: ../java/build/Proxy.java:45 ../java/build/Proxy.java:51
+#: ../java/build/Proxy.java:74 ../java/build/Proxy.java:80
+msgid "Warning: Eepsite Unreachable"
+msgstr "警告：I2P 站点不可达"
+
+#: ../java/build/Proxy.java:52
+msgid "The eepsite was not reachable, because its lease set was not found."
+msgstr "该匿名网站不可达，因为找不到其租契。"
+
+#: ../java/build/Proxy.java:53
+msgid ""
+"The eepsite is probably down, but there could also be network congestion."
+msgstr "该匿名网站可能已下线，但也可能是由于网络拥堵。"
+
+#: ../java/build/Proxy.java:54 ../java/build/Proxy.java:83
+#: ../java/build/Proxy.java:95
+#, java-format
+msgid "You may want to {0}retry{1}."
+msgstr "您可能希望{0}重试{1}。"
+
+#: ../java/build/Proxy.java:55 ../java/build/Proxy.java:84
+#: ../java/build/Proxy.java:96 ../java/build/Proxy.java:119
+#: ../java/build/Proxy.java:140 ../java/build/Proxy.java:152
+msgid "Could not find the following destination:"
+msgstr "无法直到如下目标："
+
+#: ../java/build/Proxy.java:56
+msgid "Error: Request Denied"
+msgstr "错误：请求被拒绝"
+
+#: ../java/build/Proxy.java:62
+msgid "Error: Local Access"
+msgstr "错误：本地访问"
+
+#: ../java/build/Proxy.java:63
+msgid "Your browser is misconfigured."
+msgstr "您的浏览器配置有误。"
+
+#: ../java/build/Proxy.java:64
+msgid ""
+"Do not use the proxy to access the router console, localhost, or local LAN "
+"destinations."
+msgstr "请不要使用代理访问路由控制台，localhost 或局域网地址。"
+
+#: ../java/build/Proxy.java:65 ../java/build/Proxy.java:71
+msgid "Warning: No Outproxy Configured"
+msgstr "警告：没有配置出口代理"
+
+#: ../java/build/Proxy.java:72
+msgid ""
+"Your request was for a site outside of I2P, but you have no HTTP outproxy "
+"configured."
+msgstr "请求的站点在 I2P 网络之外，但您没有配置 HTTP 出口代理。"
+
+#: ../java/build/Proxy.java:73
+msgid "Please configure an outproxy in I2PTunnel."
+msgstr "请到 I2PTunnel 中配置出口代理。"
+
+#: ../java/build/Proxy.java:81
+msgid "The eepsite was not reachable."
+msgstr "此 I2P 站点不可达"
+
+#: ../java/build/Proxy.java:82
+msgid ""
+"The eepsite is offline, there is network congestion, or your router is not "
+"yet well-integrated with peers."
+msgstr "此 I2P 站点已经下线，遇到网络拥堵，或您的路由尚未完全整合至 I2P 网络中。"
+
+#: ../java/build/Proxy.java:85 ../java/build/Proxy.java:91
+msgid "Warning: Invalid Destination"
+msgstr "警告：无效目标"
+
+#: ../java/build/Proxy.java:92
+msgid ""
+"The eepsite destination specified was not valid, or was otherwise "
+"unreachable."
+msgstr "指定站点的目标密钥无效，或无法到达。"
+
+#: ../java/build/Proxy.java:93
+msgid ""
+"Perhaps you pasted in the wrong Base 64 string or the link you are following"
+" is bad."
+msgstr "或许您粘贴的 Base64 字符串有误或您打开的链接有问题。"
+
+#: ../java/build/Proxy.java:94
+msgid "The I2P host could also be offline."
+msgstr "也可能是 I2P 站点目前已下线。"
+
+#: ../java/build/Proxy.java:97 ../java/build/Proxy.java:103
+msgid "Warning: Non-HTTP Protocol"
+msgstr "警告：非 HTTP 协议"
+
+#: ../java/build/Proxy.java:104
+msgid "The request uses a bad protocol."
+msgstr "请求使用了无效协议。"
+
+#: ../java/build/Proxy.java:105
+msgid "The I2P HTTP Proxy supports HTTP and HTTPS requests only."
+msgstr "I2P HTTP 代理只支持HTTP和HTTPS请求。"
+
+#: ../java/build/Proxy.java:106
+msgid "Other protocols such as FTP are not allowed."
+msgstr "其他协议例如FTP不被支持。"
+
+#: ../java/build/Proxy.java:107
+msgid "Warning: Eepsite Unknown"
+msgstr "警告：未知 I2P 站点"
+
+#: ../java/build/Proxy.java:113
+msgid "Warning: Eepsite Not Found in Addressbook"
+msgstr "警告：地址簿中未找到该 I2P 站点"
+
+#: ../java/build/Proxy.java:114
+msgid "The eepsite was not found in your router's addressbook."
+msgstr "此 I2P 站点未存在于您路由器的地址簿中。"
+
+#: ../java/build/Proxy.java:115
+msgid "Check the link or find a Base 32 or Base 64 address."
+msgstr "请检查链接或找到其对应的 Base32 或 Base64 地址。"
+
+#: ../java/build/Proxy.java:116
+#, java-format
+msgid "If you have the Base 64 address, {0}add it to your addressbook{1}."
+msgstr "如果您拥有 Base64 地址，请{0}将其添加至您的地址簿{1}。"
+
+#: ../java/build/Proxy.java:117
+msgid ""
+"Otherwise, find a Base 32 or address helper link, or use a jump service link"
+" below."
+msgstr "否则，请找到其对应的 Base32 地址或地址助手链接，或使用下面列出的跳转服务之一。"
+
+#: ../java/build/Proxy.java:118
+#, java-format
+msgid ""
+"Seeing this page often? See {0}the FAQ{1} for help in {2}adding some "
+"subscriptions{3} to your addressbook."
+msgstr "经常碰到此页面？请参见 {0}常见问题集 FAQ{1} 查看如何为您的地址簿 {2}添加订阅{3}。"
+
+#: ../java/build/Proxy.java:120 ../java/build/Proxy.java:126
+msgid "Warning: Invalid Request URI"
+msgstr "警告：请求的 URI 无效。"
+
+#: ../java/build/Proxy.java:127
+msgid "The request URI is invalid, and probably contains illegal characters."
+msgstr "请求的 URI 无效或包含非法字符。"
+
+#: ../java/build/Proxy.java:128
+msgid ""
+"If you clicked a link, check the end of the URI for any characters the "
+"browser has mistakenly added on."
+msgstr "如果您点击的是链接，请检查 URI 结尾是否有浏览器错误添加的多余字符。"
+
+#: ../java/build/Proxy.java:129 ../java/build/Proxy.java:135
+#: ../java/build/Proxy.java:141 ../java/build/Proxy.java:147
+msgid "Warning: Outproxy Not Found"
+msgstr "警告：未找到出口代理"
+
+#: ../java/build/Proxy.java:136
+msgid ""
+"The HTTP outproxy was not reachable, because its lease set was not found."
+msgstr "HTTP 出口代理不可达，因为找不到其租契。"
+
+#: ../java/build/Proxy.java:137
+msgid ""
+"The outproxy is probably down, but there could also be network congestion."
+msgstr "出口代理可能已下线，但也可能是由于网络拥堵。"
+
+#: ../java/build/Proxy.java:138 ../java/build/Proxy.java:150
+#, java-format
+msgid ""
+"You may want to {0}retry{1} as this will randomly reselect an outproxy from "
+"the pool you have defined {2}here{3} (if you have more than one configured)."
+msgstr "您可以{0}重试{1}，程序将从您在 {2}此处{3} 定义的出口代理列表中随机选择一个进行连接（如果您设置了多项代理）。"
+
+#: ../java/build/Proxy.java:139 ../java/build/Proxy.java:151
+#, java-format
+msgid ""
+"If you continue to have trouble you may want to edit your outproxy list "
+"{0}here{1}."
+msgstr "如果问题持续存在，您可能需要{0}在此{1}编辑出口代理列表。"
+
+#: ../java/build/Proxy.java:148
+msgid "The HTTP Outproxy was not found."
+msgstr "未找到 HTTP 出口代理。"
+
+#: ../java/build/Proxy.java:149
+msgid ""
+"It is offline, there is network congestion, or your router is not yet well-"
+"integrated with peers."
+msgstr "它已经下线，遇到网络拥堵，或您的路由尚未完全整合至 I2P 网络中。"
+
+#: ../java/build/Proxy.java:153
 msgid "Proxy Authorization Required"
 msgstr "出口代理认证"
 
-#: ../java/build/Proxy.java:88
+#: ../java/build/Proxy.java:154
 msgid "I2P HTTP Proxy Authorization Required"
 msgstr "出口代理认证"
 
-#: ../java/build/Proxy.java:89
+#: ../java/build/Proxy.java:155
 msgid ""
 "This proxy is configured to require a username and password for access."
 msgstr "代理配置要求提供用户名和密码才能访问。"
 
-#: ../java/build/Proxy.java:90
+#: ../java/build/Proxy.java:156
 #, java-format
 msgid ""
 "Please enter your username and password, or check your {0}router "
 "configuration{1} or {2}I2PTunnel configuration{3}."
 msgstr "请输入您的用户名和密码，否则请检查您的 {0} 路由配置 {1} 或 {2} I2PTunnel 配置 {3}。"
 
-#: ../java/build/Proxy.java:91
+#: ../java/build/Proxy.java:157
 #, java-format
 msgid ""
 "To disable authorization, remove the configuration "
@@ -270,99 +383,15 @@ msgid ""
 "tunnel."
 msgstr "要禁用身份认证，请删除配置 {0}i2ptunnel.proxy.auth=basic{1}, 然后停止并重启 HTTP Proxy 隧道。"
 
-#: ../java/build/Proxy.java:92 ../java/build/Proxy.java:98
-msgid "Warning: Eepsite Unreachable"
-msgstr "警告：I2P 站点不可达"
-
-#: ../java/build/Proxy.java:99
-msgid "The eepsite was not reachable."
-msgstr "此 I2P 站点不可达"
-
-#: ../java/build/Proxy.java:100
-msgid ""
-"The eepsite is offline, there is network congestion, or your router is not "
-"yet well-integrated with peers."
-msgstr "此 I2P 站点已经下线，遇到网络拥堵，或您的路由尚未完全整合至 I2P 网络中。"
-
-#: ../java/build/Proxy.java:103
-msgid "Information: New Host Name"
-msgstr "信息：新站点地址"
-
-#: ../java/build/Proxy.java:109
-msgid "Information: New Host Name with Address Helper"
-msgstr "信息：通过地址助手发现的新站点地址"
-
-#: ../java/build/Proxy.java:110
-msgid ""
-"The address helper link you followed is for a new host name that is not in "
-"your address book."
-msgstr "您打开的地址助手链接指向了一个新站点，您的I2P地址簿中尚未收录。"
-
-#: ../java/build/Proxy.java:111
-msgid "You may save this host name to your local address book."
-msgstr "您可以将此站点网址保存至您的本地地址簿中。"
-
-#: ../java/build/Proxy.java:112
-msgid ""
-"If you save it to your address book, you will not see this message again."
-msgstr "在地址簿中保存后，此提示将不在显示。"
-
-#: ../java/build/Proxy.java:113
-msgid ""
-"If you do not save it, the host name will be forgotten after the next router"
-" restart."
-msgstr "如果不保存，路由重启后，此站点地址将被遗忘。"
-
-#: ../java/build/Proxy.java:114
-msgid ""
-"If you do not wish to visit this host, click the \"back\" button on your "
-"browser."
-msgstr "如果您不像访问此站点，请点击浏览器的“后退”按钮。"
-
-#: ../java/build/Proxy.java:115 ../java/build/Proxy.java:121
-msgid "Warning: Bad Address Helper"
-msgstr "警告：无效地址助手"
-
-#: ../java/build/Proxy.java:122
-#, java-format
-msgid "The helper key in the URL ({0}i2paddresshelper={1}) is not resolvable."
-msgstr "URL中的助手键值 ({0}i2paddresshelper={1}) 无法解析。"
-
-#: ../java/build/Proxy.java:123
-msgid "It seems to be garbage data, or a mistyped Base 32 address."
-msgstr "它看起来可能是无效数据或输入有误的 Base32 地址。"
-
-#: ../java/build/Proxy.java:124
-msgid ""
-"Check your URL to try and fix the helper key to be a valid Base 32 hostname "
-"or Base 64 key."
-msgstr "请检查您的链接尝试修复助手密钥为有效的 Base32 地址或 Base64 密钥。"
-
-#: ../java/build/Proxy.java:125 ../java/build/Proxy.java:131
-msgid "Warning: Non-HTTP Protocol"
-msgstr "警告：非 HTTP 协议"
-
-#: ../java/build/Proxy.java:132
-msgid "The request uses a bad protocol."
-msgstr "请求使用了无效协议。"
-
-#: ../java/build/Proxy.java:133
-msgid "The I2P HTTP Proxy supports HTTP and HTTPS requests only."
-msgstr "I2P HTTP 代理只支持HTTP和HTTPS请求。"
-
-#: ../java/build/Proxy.java:134
-msgid "Other protocols such as FTP are not allowed."
-msgstr "其他协议例如FTP不被支持。"
-
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:595
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:601
 msgid "This seems to be a bad destination:"
 msgstr "目标似乎无效："
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:595
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:601
 msgid "i2paddresshelper cannot help you with a destination like that!"
 msgstr "i2paddresshelper 对您输入的目标无能为力！"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:662
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:667
 #, java-format
 msgid ""
 "To visit the destination in your host database, click <a "
@@ -370,54 +399,42 @@ msgid ""
 "click <a href=\"{1}\">here</a>."
 msgstr "要访问您地址簿中设置的目标，请点击<a href=\"{0}\">这里</a>。要访问地址助手返回的目标，请点<a href=\"{1}\">这里</a>。"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1151
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1034
+msgid "Destination lease set not found"
+msgstr "找不到目标租赁"
+
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1162
 msgid "Host"
 msgstr "主机"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1155
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1166
 msgid "Base 32"
 msgstr "Base 32"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1159
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1170
 msgid "Destination"
 msgstr "目标"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1165
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1176
 #, java-format
 msgid "Continue to {0} without saving"
 msgstr "继续{0}，而不保存"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1170
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1181
 #, java-format
 msgid "Save {0} to router address book and continue to eepsite"
 msgstr "保存{0}至“路由器地址簿”并访问该 I2P 站点。"
 
 #. only blockfile supports multiple books
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1173
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1184
 #, java-format
 msgid "Save {0} to master address book and continue to eepsite"
 msgstr "保存{0}至“主地址簿”并访问该 I2P 站点。"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1174
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1185
 #, java-format
 msgid "Save {0} to private address book and continue to eepsite"
 msgstr "保存{0}至“私有地址簿”并访问该 I2P 站点。"
-
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1290
-msgid "HTTP Outproxy"
-msgstr "HTTP 出口代理"
-
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1326
-msgid ""
-"Click a link below to look for an address helper by using a \"jump\" "
-"service:"
-msgstr "请点击下面的链接通过跳转服务获得地址助手链接："
-
-#. Translators: parameter is a host name
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1334
-#, java-format
-msgid "{0} jump service"
-msgstr "{0} 跳转服务"
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:162
 #, java-format

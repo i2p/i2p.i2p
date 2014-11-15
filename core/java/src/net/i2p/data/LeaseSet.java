@@ -103,7 +103,7 @@ public class LeaseSet extends DatabaseEntry {
         return getEarliestLeaseDate();
     }
 
-    protected KeysAndCert getKeysAndCert() {
+    public KeysAndCert getKeysAndCert() {
         return _destination;
     }
 

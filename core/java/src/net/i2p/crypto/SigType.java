@@ -46,9 +46,13 @@ public enum SigType {
 
     /**
      *  Pubkey 32 bytes; privkey 32 bytes; hash 64 bytes; sig 64 bytes
+     *
+     *  Due to bugs in previous versions, minimum version is 0.9.17.
+     *
      *  @since 0.9.15
      */
-    EdDSA_SHA512_Ed25519(7, 32, 32, 64, 64, SigAlgo.EdDSA, "SHA-512", "SHA512withEdDSA", EdDSANamedCurveTable.getByName("ed25519-sha-512"), "0.9.15");
+    EdDSA_SHA512_Ed25519(7, 32, 32, 64, 64, SigAlgo.EdDSA, "SHA-512", "SHA512withEdDSA",
+                         EdDSANamedCurveTable.getByName("ed25519-sha-512"), "0.9.17");
 
 
     // TESTING....................
@@ -89,7 +93,6 @@ public enum SigType {
     // Pubkey 384 bytes; privkey 32 bytes; hash 32 bytes; sig 64 bytes
     //DSA_3072_256(3, 384, 32, 32, 64, "SHA-256", "?"),
 
-    ;   
 
     private final int code, pubkeyLen, privkeyLen, hashLen, sigLen;
     private final SigAlgo base;

@@ -11,7 +11,7 @@
     <target name="depend" if="depend.available">
         <depend
             cache="../../../build"
-            srcdir="./src:./test/junit" 
+            srcdir="./src:./test/junit"
             destdir="./build/obj" >
             <!-- Depend on classes instead of jars where available -->
             <classpath>
@@ -28,43 +28,44 @@
     <target name="compile" depends="depend">
         <mkdir dir="./build" />
         <mkdir dir="./build/obj" />
-        <javac 
-            srcdir="./src" 
-            debug="true" deprecation="on" source="${javac.version}" target="${javac.version}" 
+        <javac
+            srcdir="./src"
+            debug="true" deprecation="on" source="${javac.version}" target="${javac.version}"
             includeAntRuntime="false"
-            destdir="./build/obj" 
+            destdir="./build/obj"
             classpath="../../../core/java/build/i2p.jar:../../ministreaming/java/build/mstreaming.jar" >
             <compilerarg line="${javac.compilerargs}" />
         </javac>
     </target>
     <target name="builddeptest">
-	<ant dir="../../../core/java" target="jar" />
+        <ant dir="../../../core/java" target="jar" />
         <ant dir="../../../apps/ministreaming/java/" target="jarTest" />
     </target>
     <target name="junit.compileTest" depends="builddeptest, compile">
 
-	<echo message="[DEBUG] ant home is ${ant.home}" />
-	<echo message="[DEBUG] junit home before override is ${junit.home}" />
-	<echo message="[DEBUG] hamcrest home before override is ${hamcrest.home}" />
-    
-	<property name="junit.home" value="${ant.home}/lib" />
-	<property name="hamcrest.home" value="${ant.home}/lib" />
-   
-	<echo message="[DEBUG] junit home after override is ${junit.home}" />
-	<echo message="[DEBUG] hamcrest home after override is ${hamcrest.home}" />
- 
-       <javac 
-            srcdir="./test/junit" 
-            debug="true" deprecation="on" source="${javac.version}" target="${javac.version}" 
+        <echo message="[DEBUG] ant home is ${ant.home}" />
+        <echo message="[DEBUG] junit home before override is ${junit.home}" />
+        <echo message="[DEBUG] hamcrest home before override is ${hamcrest.home}" />
+
+        <property name="junit.home" value="${ant.home}/lib" />
+        <property name="hamcrest.home" value="${ant.home}/lib" />
+
+        <echo message="[DEBUG] junit home after override is ${junit.home}" />
+        <echo message="[DEBUG] hamcrest home after override is ${hamcrest.home}" />
+
+        <javac
+            srcdir="./test/junit"
+            debug="true" deprecation="on" source="${javac.version}" target="${javac.version}"
             includeAntRuntime="false"
             destdir="./build/obj" >
-	   <classpath>
-		<pathelement location="../../../core/java/build/i2p.jar" />
-		<pathelement location="../../ministreaming/java/build/mstreaming.jar" />
-		<pathelement location="../../ministreaming/java/build/mstreamingTest.jar" />
-		<pathelement location="${junit.home}/junit4.jar" />
-		<pathelement location="${hamcrest.home}/hamcrest.jar" />
-	   </classpath>
+            <classpath>
+                <pathelement location="../../../core/java/build/i2p.jar" />
+                <pathelement location="../../ministreaming/java/build/mstreaming.jar" />
+                <pathelement location="../../ministreaming/java/build/mstreamingTest.jar" />
+                <pathelement location="${junit.home}/junit4.jar" />
+                <pathelement location="${hamcrest.home}/hamcrest.jar" />
+                <pathelement location="${hamcrest.home}/hamcrest-all.jar" />
+            </classpath>
             <compilerarg line="${javac.compilerargs}" />
         </javac>
     </target>
@@ -102,8 +103,8 @@
             </fileset>
         </delete>
 
-	<property name="junit.home" value="${ant.home}/lib" />
-	<property name="hamcrest.home" value="${ant.home}/lib" />
+        <property name="junit.home" value="${ant.home}/lib" />
+        <property name="hamcrest.home" value="${ant.home}/lib" />
 
         <junit printsummary="withOutAndErr" fork="yes" showoutput="yes" >
             <sysproperty key="net.sourceforge.cobertura.datafile" file="./cobertura.ser" />
@@ -112,11 +113,12 @@
                 <pathelement location="${hamcrest.home}/hamcrest-core.jar" />
                 <pathelement location="${hamcrest.home}/hamcrest-library.jar" />
                 <pathelement location="${hamcrest.home}/hamcrest-integration.jar" />
+                <pathelement location="${hamcrest.home}/hamcrest-all.jar" />
                 <pathelement location="${junit.home}/junit4.jar" />
                 <pathelement location="./build/obj_cobertura" />
                 <pathelement location="./build/obj" />
                 <pathelement location="../../../core/java/build/i2ptest.jar" />
-		<pathelement location="../../../core/java/build/i2p.jar" />
+                <pathelement location="../../../core/java/build/i2p.jar" />
                 <pathelement location="../../ministreaming/java/build/mstreaming.jar" />
                 <pathelement location="../../ministreaming/java/build/mstreamingTest.jar" />
                 <pathelement location="../../build/jbigi.jar" />
@@ -216,11 +218,11 @@
     <target name="javadoc">
         <mkdir dir="./build" />
         <mkdir dir="./build/javadoc" />
-        <javadoc 
-            sourcepath="./src:../../../core/java/src:../../ministreaming/java/src" destdir="./build/javadoc" 
-            packagenames="*" 
-            use="true" 
-            splitindex="true" 
+        <javadoc
+            sourcepath="./src:../../../core/java/src:../../ministreaming/java/src" destdir="./build/javadoc"
+            packagenames="*"
+            use="true"
+            splitindex="true"
             windowtitle="Streaming" />
     </target>
     <target name="clean">

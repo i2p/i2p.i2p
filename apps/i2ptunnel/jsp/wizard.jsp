@@ -233,11 +233,11 @@
                 <label for="description" accesskey="e">
                     <%=intl._("Description")%>:(<span class="accessKey">E</span>)
                 </label>
-                <input type="text" size="60" maxlength="80" name="nofilter_description"  id="description" title="Tunnel Description" value="<%=(!"null".equals(request.getParameter("description")) ? net.i2p.data.DataHelper.stripHTML(request.getParameter("description")) : "" ) %>" class="freetext" />
+                <input type="text" size="60" maxlength="80" name="nofilter_description"  id="description" title="Tunnel Description" value="<%=(!"null".equals(request.getParameter("nofilter_description")) ? net.i2p.data.DataHelper.stripHTML(request.getParameter("nofilter_description")) : "" ) %>" class="freetext" />
             </div><%
             } else {
             %><input type="hidden" name="name" value="<%=net.i2p.data.DataHelper.stripHTML(request.getParameter("name"))%>" />
-            <input type="hidden" name="nofilter_description" value="<%=net.i2p.data.DataHelper.stripHTML(request.getParameter("description"))%>" /><%
+            <input type="hidden" name="nofilter_description" value="<%=net.i2p.data.DataHelper.stripHTML(request.getParameter("nofilter_description"))%>" /><%
             } /* curPage 3 */
 
                /* End page 3 */ %>
@@ -440,7 +440,7 @@
                 </td></tr>
                 <tr><td><%=intl._("Tunnel name and description")%></td><td>
                     <%=net.i2p.data.DataHelper.stripHTML(request.getParameter("name"))%><br />
-                    <%=net.i2p.data.DataHelper.stripHTML(request.getParameter("description"))%>
+                    <%=net.i2p.data.DataHelper.stripHTML(request.getParameter("nofilter_description"))%>
                 </td></tr><%
                 if (tunnelIsClient) { %>
                 <tr><td><%=intl._("Tunnel destination")%></td><td><%

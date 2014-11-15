@@ -590,10 +590,14 @@ class ConnectionManager {
     /**
      * Something b0rked hard, so kill all of our connections without mercy.
      * Don't bother sending close packets.
+     * This will not close the ServerSocket.
+     * This will not kill the timer threads.
      *
      * CAN continue to use the manager.
      */
     public void disconnectAllHard() {
+        //if (_log.shouldLog(Log.INFO))
+        //    _log.info("ConnMan hard disconnect", new Exception("I did it"));
         for (Iterator<Connection> iter = _connectionByInboundId.values().iterator(); iter.hasNext(); ) {
             Connection con = iter.next();
             con.disconnect(false, false);
@@ -603,21 +607,30 @@ class ConnectionManager {
             _recentlyClosed.clear();
         }
         _pendingPings.clear();
+        // FIXME
+        // Ideally we would like to stop all TCBShare and all the timer threads here,
+        // but leave them ready to restart when things resume.
+        // However that's quite difficult.
+        // So the timer threads will continue to run.
     }
     
     /**
      * Kill all connections and the timers.
      * Don't bother sending close packets.
+     * As of 0.9.17, this will close the ServerSocket, killing one thread in accept().
      *
      * CANNOT continue to use the manager or restart.
      *
      * @since 0.9.7
      */
     public void shutdown() {
+        //if (_log.shouldLog(Log.INFO))
+        //    _log.info("ConnMan shutdown", new Exception("I did it"));
         disconnectAllHard();
         _tcbShare.stop();
         _timer.stop();
         _outboundQueue.close();
+        _connectionHandler.setActive(false);
     }
     
     /**

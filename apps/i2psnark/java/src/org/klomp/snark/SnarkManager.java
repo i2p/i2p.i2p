@@ -170,7 +170,8 @@ public class SnarkManager implements CompleteListener {
         "tracker.thebland.i2p", "s5ikrdyjwbcgxmqetxb3nyheizftms7euacuub2hic7defkh3xhq.b32.i2p",
         "psi.i2p", "avviiexdngd32ccoy4kuckvc3mkf53ycvzbz6vz75vzhv4tbpk5a.b32.i2p",
         "opentracker.psi.i2p", "vmow3h54yljn7zvzbqepdddt5fmygijujycod2q6yznpy2rrzuwa.b32.i2p",
-        "tracker.killyourtv.i2p", "5mpvzxfbd4rtped3c7ln4ddw52e7i7t56s36ztky4ustxtxrjdpa.b32.i2p"
+        "tracker.killyourtv.i2p", "5mpvzxfbd4rtped3c7ln4ddw52e7i7t56s36ztky4ustxtxrjdpa.b32.i2p",
+        "opendiftracker.i2p", "bikpeyxci4zuyy36eau5ycw665dplun4yxamn7vmsastejdqtfoq.b32.i2p"
     }));
 
     static {
@@ -1119,21 +1120,23 @@ public class SnarkManager implements CompleteListener {
      *  Caller must verify this torrent is not already added.
      *
      *  @param filename the absolute path to save the metainfo to, generally ending in ".torrent"
-     *  @param baseFile may be null, if so look in rootDataDir
+     *  @param baseFile may be null, if so look in dataDir
      *  @throws RuntimeException via Snark.fatal()
      */
-    private void addTorrent(String filename) {
-        addTorrent(filename, null, false);
+    private void addTorrent(String filename, File baseFile, boolean dontAutoStart) {
+        addTorrent(filename, baseFile, dontAutoStart, null);
     }
 
     /**
      *  Caller must verify this torrent is not already added.
      *
      *  @param filename the absolute path to save the metainfo to, generally ending in ".torrent"
-     *  @param baseFile may be null, if so look in rootDataDir
+     *  @param baseFile may be null, if so look in dataDir
+     *  @param dataDir must exist, or null to default to snark data directory
      *  @throws RuntimeException via Snark.fatal()
+     *  @since 0.9.17
      */
-    private void addTorrent(String filename, File baseFile, boolean dontAutoStart) {
+    private void addTorrent(String filename, File baseFile, boolean dontAutoStart, File dataDir) {
         if ((!dontAutoStart) && !_util.connected()) {
             addMessage(_("Connecting to I2P"));
             boolean ok = _util.connect();
@@ -1150,7 +1153,8 @@ public class SnarkManager implements CompleteListener {
             addMessage(_("Error: Could not add the torrent {0}", filename) + ": " + ioe);
             return;
         }
-        File dataDir = getDataDir();
+        if (dataDir == null)
+            dataDir = getDataDir();
         Snark torrent = null;
         synchronized (_snarks) {
             torrent = _snarks.get(filename);
@@ -1266,7 +1270,25 @@ public class SnarkManager implements CompleteListener {
      */
     public void addMagnet(String name, byte[] ih, String trackerURL, boolean updateStatus) {
         // updateStatus is true from UI, false from config file bulk add
-        addMagnet(name, ih, trackerURL, updateStatus, updateStatus, this);
+        addMagnet(name, ih, trackerURL, updateStatus, updateStatus, null, this);
+    }
+    
+    /**
+     * Add a torrent with the info hash alone (magnet / maggot)
+     *
+     * @param name hex or b32 name from the magnet link
+     * @param ih 20 byte info hash
+     * @param trackerURL may be null
+     * @param updateStatus should we add this magnet to the config file,
+     *                     to save it across restarts, in case we don't get
+     *                     the metadata before shutdown?
+     * @param dataDir must exist, or null to default to snark data directory
+     * @throws RuntimeException via Snark.fatal()
+     * @since 0.9.17
+     */
+    public void addMagnet(String name, byte[] ih, String trackerURL, boolean updateStatus, File dataDir) {
+        // updateStatus is true from UI, false from config file bulk add
+        addMagnet(name, ih, trackerURL, updateStatus, updateStatus, dataDir, this);
     }
     
     /**
@@ -1279,16 +1301,18 @@ public class SnarkManager implements CompleteListener {
      * @param updateStatus should we add this magnet to the config file,
      *                     to save it across restarts, in case we don't get
      *                     the metadata before shutdown?
+     * @param dataDir must exist, or null to default to snark data directory
      * @param listener to intercept callbacks, should pass through to this
      * @return the new Snark or null on failure
      * @throws RuntimeException via Snark.fatal()
      * @since 0.9.4
      */
     public Snark addMagnet(String name, byte[] ih, String trackerURL, boolean updateStatus,
-                          boolean autoStart, CompleteListener listener) {
+                          boolean autoStart, File dataDir, CompleteListener listener) {
+        String dirPath = dataDir != null ? dataDir.getAbsolutePath() : getDataDir().getPath();
         Snark torrent = new Snark(_util, name, ih, trackerURL, listener,
                                   _peerCoordinatorSet, _connectionAcceptor,
-                                  false, getDataDir().getPath());
+                                  false, dirPath);
 
         synchronized (_snarks) {
             Snark snark = getTorrentByInfoHash(ih);
@@ -1407,10 +1431,11 @@ public class SnarkManager implements CompleteListener {
      * @param fromfile where the file is now, presumably in a temp directory somewhere
      * @param filename the absolute path to save the metainfo to, generally ending in ".torrent", which is also the name of the torrent
      *                 Must be a filesystem-safe name.
+     * @param dataDir must exist, or null to default to snark data directory
      * @throws RuntimeException via Snark.fatal()
      * @since 0.8.4
      */
-    public void copyAndAddTorrent(File fromfile, String filename) throws IOException {
+    public void copyAndAddTorrent(File fromfile, String filename, File dataDir) throws IOException {
         // prevent interference by DirMonitor
         synchronized (_snarks) {
             boolean success = FileUtil.copy(fromfile.getAbsolutePath(), filename, false);
@@ -1422,7 +1447,7 @@ public class SnarkManager implements CompleteListener {
             if (!areFilesPublic())
                 SecureFileOutputStream.setPerms(new File(filename));
             // hold the lock for a long time
-            addTorrent(filename);
+            addTorrent(filename, null, false, dataDir);
          }
     }
 

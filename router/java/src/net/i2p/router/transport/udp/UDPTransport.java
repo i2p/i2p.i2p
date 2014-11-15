@@ -22,6 +22,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import net.i2p.crypto.SigType;
 import net.i2p.data.DatabaseEntry;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
@@ -51,6 +52,7 @@ import net.i2p.util.Log;
 import net.i2p.util.OrderedProperties;
 import net.i2p.util.SimpleTimer;
 import net.i2p.util.SimpleTimer2;
+import net.i2p.util.VersionComparator;
 
 /**
  *  The SSU transport
@@ -197,6 +199,13 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     // Opera doesn't have the char, TODO check UA
     //private static final String THINSP = "&thinsp;/&thinsp;";
     private static final String THINSP = " / ";
+
+    /**
+     *  RI sigtypes supported in 0.9.16, but due to a bug in InboundEstablishState
+     *  fixed in 0.9.17, we cannot connect out to routers before that version.
+     */
+    private static final String MIN_SIGTYPE_VERSION = "0.9.17";
+
 
     public UDPTransport(RouterContext ctx, DHSessionKeyBuilder.Factory dh) {
         super(ctx);
@@ -1558,9 +1567,23 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             }
 
             // Check for supported sig type
-            if (toAddress.getIdentity().getSigningPublicKey().getType() == null) {
+            SigType type = toAddress.getIdentity().getSigType();
+            if (type == null || !type.isAvailable()) {
                 markUnreachable(to);
                 return null;
+            }
+
+            // Can we connect to them if we are not DSA?
+            RouterInfo us = _context.router().getRouterInfo();
+            if (us != null) {
+                RouterIdentity id = us.getIdentity();
+                if (id.getSigType() != SigType.DSA_SHA1) {
+                    String v = toAddress.getOption("router.version");
+                    if (v != null && VersionComparator.comp(v, MIN_SIGTYPE_VERSION) < 0) {
+                        markUnreachable(to);
+                        return null;
+                    }
+                }
             }
 
             if (!allowConnection())

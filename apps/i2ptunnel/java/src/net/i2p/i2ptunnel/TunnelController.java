@@ -548,11 +548,31 @@ public class TunnelController implements Logging {
         }
     }
 
+    /**
+     *  May be restarted with restartTunnel() or startTunnel() later.
+     *  This may not release all resources. In particular, the I2PSocketManager remains
+     *  and it may have timer threads that continue running.
+     */
     public void stopTunnel() {
         // I2PTunnel removes the session in close(),
         // so save the sessions to pass to release() and TCG
         Collection<I2PSession> sessions = getAllSessions();
         _tunnel.runClose(new String[] { "forced", "all" }, this);
+        release(sessions);
+        _running = false;
+    }
+
+    /**
+     *  May NOT be restarted with restartTunnel() or startTunnel() later.
+     *  This should release all resources.
+     *
+     *  @since 0.9.17
+     */
+    public void destroyTunnel() {
+        // I2PTunnel removes the session in close(),
+        // so save the sessions to pass to release() and TCG
+        Collection<I2PSession> sessions = getAllSessions();
+        _tunnel.runClose(new String[] { "destroy", "all" }, this);
         release(sessions);
         _running = false;
     }

@@ -70,8 +70,7 @@ public class DataMessage extends FastI2NPMessageImpl {
             out[curIndex++] = 0x0;
             out[curIndex++] = 0x0;
         } else {
-            byte len[] = DataHelper.toLong(4, _data.length);
-            System.arraycopy(len, 0, out, curIndex, 4);
+            DataHelper.toLong(out, curIndex, 4, _data.length);
             curIndex += 4;
             System.arraycopy(_data, 0, out, curIndex, _data.length);
             curIndex += _data.length;

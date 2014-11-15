@@ -52,6 +52,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -107,7 +108,7 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
 
     private static final String nocli_args[] = { "-nocli", "-die"};
 
-    private final List<I2PTunnelTask> tasks = new ArrayList<I2PTunnelTask>();
+    private final List<I2PTunnelTask> tasks = new CopyOnWriteArrayList<I2PTunnelTask>();
     private int next_task_id = 1;
 
     private final Set<ConnectionEventListener> listeners = new CopyOnWriteArraySet<ConnectionEventListener>();
@@ -122,6 +123,9 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
         new LongOpt("nogui", LongOpt.NO_ARGUMENT, null, NOGUI),
         new LongOpt("wait", LongOpt.NO_ARGUMENT, null, 'w')
     };
+
+    /** @since 0.9.17 */
+    private enum CloseMode { NORMAL, FORCED, DESTROY }
 
     public static void main(String[] args) {
         try {
@@ -455,7 +459,7 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
               "  auth <username> <password>\n" +
               "  client <port> <pubkey>[,<pubkey,...]|file:<pubkeyfile> [<sharedClient>]\n" +
               "  clientoptions [-acx] [key=value ]*\n" +
-              "  close [forced] <jobnumber>|all\n" +
+              "  close [forced|destroy] <jobnumber>|all\n" +
               "  config [-s] <i2phost> <i2pport>\n" +
               "  connectclient <port> [<sharedClient>] [<proxy>]\n" +
               "  genkeys <privkeyfile> [<pubkeyfile>]\n" +
@@ -1531,21 +1535,24 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
      *
      * Sets the event "closeResult" = "ok" after the closing is complete
      *
-     * @param args {jobNumber}, {"forced", jobNumber}, {"forced", "all"}
+     * @param args {jobNumber}, {"forced", jobNumber}, {"forced", "all"}, {"destroy", jobNumber}, {"destroy", "all"}
      * @param l logger to receive events and output
      */
     public void runClose(String args[], Logging l) {
         if (args.length == 0 || args.length > 2) {
-            l.log("close [forced] <jobnumber>|all\n" +
+            l.log("close [forced|destroy] <jobnumber>|all\n" +
                   "   stop running tasks. either only one or all.\n"
                   + "   use 'forced' to also stop tasks with active connections.\n"
                   + "   use the 'list' command to show the job numbers");
             notifyEvent("closeResult", "error");
         } else {
             int argindex = 0; // parse optional 'forced' keyword
-            boolean forced = false;
+            CloseMode mode = CloseMode.NORMAL;
             if (args[argindex].equalsIgnoreCase("forced")) {
-                forced = true;
+                mode = CloseMode.FORCED;
+                argindex++;
+            } else if (args[argindex].equalsIgnoreCase("destroy")) {
+                mode = CloseMode.DESTROY;
                 argindex++;
             }
             if (args[argindex].equalsIgnoreCase("all")) {
@@ -1555,7 +1562,7 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
                         _log.info(getPrefix() + " runClose(all) no tasks");
                 }
                 for (I2PTunnelTask t : tasks) {
-                    if (!closetask(t, forced, l)) {
+                    if (!closetask(t, mode, l)) {
                         notifyEvent("closeResult", "error");
                         error = true;
                     } else if (!error) { // If there's an error, don't hide it
@@ -1564,7 +1571,7 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
                 }
             } else {
                 try {
-                    if (!closetask(Integer.parseInt(args[argindex]), forced, l)) {
+                    if (!closetask(Integer.parseInt(args[argindex]), mode, l)) {
                         notifyEvent("closeResult", "error");
                     } else {
                         notifyEvent("closeResult", "ok");
@@ -1669,7 +1676,7 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
      * closure)
      *
      */
-    private boolean closetask(int num, boolean forced, Logging l) {
+    private boolean closetask(int num, CloseMode mode, Logging l) {
         boolean closed = false;
 
         _log.debug(getPrefix() + "closetask(): looking for task " + num);
@@ -1678,7 +1685,7 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug(getPrefix() + "closetask(): parsing task " + id + " (" + t.toString() + ")");
                 if (id == num) {
-                    closed = closetask(t, forced, l);
+                    closed = closetask(t, mode, l);
                     break;
                 } else if (id > num) {
                     break;
@@ -1692,17 +1699,23 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
      * (optionally forcing closure)
      *
      */
-    private boolean closetask(I2PTunnelTask t, boolean forced, Logging l) {
+    private boolean closetask(I2PTunnelTask t, CloseMode mode, Logging l) {
         if (_log.shouldLog(Log.INFO))
-            _log.info("Closing task " + t.getId() + (forced ? " forced..." : "..."));
+            _log.info("Closing task " + t.getId() + " mode: " + mode);
         //l.log("Closing task " + t.getId() + (forced ? " forced..." : "..."));
-        if (t.close(forced)) {
+        boolean success;
+        if (mode == CloseMode.NORMAL)
+            success = t.close(false);
+        else if (mode == CloseMode.FORCED)
+            success = t.close(true);
+        else  // DESTROY
+            success = t.destroy();
+        if (success) {
             if (_log.shouldLog(Log.INFO))
                 _log.info("Task " + t.getId() + " closed.");
             //l.log("Task " + t.getId() + " closed.");
-            return true;
         }
-        return false;
+        return success;
     }
 
     /**

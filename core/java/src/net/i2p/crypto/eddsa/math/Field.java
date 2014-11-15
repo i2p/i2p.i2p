@@ -12,12 +12,12 @@ import java.io.Serializable;
 public class Field implements Serializable {
     private static final long serialVersionUID = 8746587465875676L;
 
-    public final FieldElement zero;
-    public final FieldElement one;
-    public final FieldElement two;
-    public final FieldElement four;
-    public final FieldElement five;
-    public final FieldElement eight;
+    public final FieldElement ZERO;
+    public final FieldElement ONE;
+    public final FieldElement TWO;
+    public final FieldElement FOUR;
+    public final FieldElement FIVE;
+    public final FieldElement EIGHT;
 
     private final int b;
     private final FieldElement q;
@@ -39,16 +39,16 @@ public class Field implements Serializable {
         this.q = fromByteArray(q);
 
         // Set up constants
-        zero = fromByteArray(Constants.ZERO);
-        one = fromByteArray(Constants.ONE);
-        two = fromByteArray(Constants.TWO);
-        four = fromByteArray(Constants.FOUR);
-        five = fromByteArray(Constants.FIVE);
-        eight = fromByteArray(Constants.EIGHT);
+        ZERO = fromByteArray(Constants.ZERO);
+        ONE = fromByteArray(Constants.ONE);
+        TWO = fromByteArray(Constants.TWO);
+        FOUR = fromByteArray(Constants.FOUR);
+        FIVE = fromByteArray(Constants.FIVE);
+        EIGHT = fromByteArray(Constants.EIGHT);
 
         // Precompute values
-        qm2 = this.q.subtract(two);
-        qm5d8 = this.q.subtract(five).divide(eight);
+        qm2 = this.q.subtract(TWO);
+        qm5d8 = this.q.subtract(FIVE).divide(EIGHT);
     }
 
     public FieldElement fromByteArray(byte[] x) {

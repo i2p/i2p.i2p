@@ -68,9 +68,9 @@ public abstract class DatabaseEntry extends DataStructureImpl {
      * and getIdentity() in RouterInfo.
      *
      * @return KAC or null
-     * @since 0.8.2
+     * @since 0.8.2, public since 0.9.17
      */
-    protected abstract KeysAndCert getKeysAndCert();
+    public abstract KeysAndCert getKeysAndCert();
 
     /**
      * A common interface to the Hash of the two subclasses.
