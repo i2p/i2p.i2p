@@ -87,6 +87,10 @@ class FloodfillMonitorJob extends JobImpl {
 
         if (getContext().commSystem().isInBadCountry())
             return false;
+        String country = getContext().commSystem().getOurCountry();
+        // anonymous proxy, satellite provider (not in bad country list)
+        if ("a1".equals(country) || "a2".equals(country))
+            return false;
 
         // Only if up a while...
         if (getContext().router().getUptime() < MIN_UPTIME)
