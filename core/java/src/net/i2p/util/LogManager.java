@@ -61,6 +61,8 @@ public class LogManager {
     private static final String PROP_DROP = "logger.dropOnOverflow";
     /** @since 0.9.3 */
     private static final String PROP_DUP = "logger.dropDuplicates";
+    /** @since 0.9.18 */
+    private static final String PROP_FLUSH = "logger.flushInterval";
     public final static String PROP_RECORD_PREFIX = "logger.record.";
 
     public final static String DEFAULT_FORMAT = DATE + " " + PRIORITY + " [" + THREAD + "] " + CLASS + ": " + MESSAGE;
@@ -125,6 +127,8 @@ public class LogManager {
     private boolean _dropOnOverflow;
     private boolean _dropDuplicates;
     private final AtomicLong _droppedRecords = new AtomicLong();
+    // in seconds
+    private int _flushInterval = (int) (LogWriter.FLUSH_INTERVAL / 1000);
     
     private boolean _alreadyNoticedMissingConfig;
 
@@ -160,6 +164,7 @@ public class LogManager {
         if (_writer != null)
             return;
         _writer = new LogWriter(this);
+        _writer.setFlushInterval(_flushInterval * 1000);
         // if you enable logging in I2PThread again, you MUST change this back to Thread
         Thread t = new I2PThread(_writer, "LogWriter");
         t.setDaemon(true);
@@ -269,6 +274,10 @@ public class LogManager {
             try {
                 _records.put(record);
             } catch (InterruptedException ie) {}
+        } else if (_flushInterval <= 0) {
+            synchronized (_writer) {
+                _writer.notifyAll();
+            }
         }
     }
     
@@ -382,6 +391,17 @@ public class LogManager {
             String str = config.getProperty(PROP_LOG_BUFFER_SIZE);
             if (str != null)
                 _logBufferSize = Integer.parseInt(str);
+        } catch (NumberFormatException nfe) {}
+
+        try {
+            String str = config.getProperty(PROP_FLUSH);
+            if (str != null) {
+                _flushInterval = Integer.parseInt(str);
+                synchronized(this) {
+                    if (_writer != null)
+                        _writer.setFlushInterval(_flushInterval * 1000);
+                }
+            }
         } catch (NumberFormatException nfe) {}
 
         _dropOnOverflow = Boolean.parseBoolean(config.getProperty(PROP_DROP));
@@ -647,6 +667,7 @@ public class LogManager {
         rv.setProperty(PROP_DEFAULTLEVEL, Log.toLevelString(_defaultLimit));
         rv.setProperty(PROP_DISPLAYONSCREENLEVEL, Log.toLevelString(_onScreenLimit));
         rv.setProperty(PROP_CONSOLEBUFFERSIZE, Integer.toString(_consoleBufferSize));
+        rv.setProperty(PROP_FLUSH, Integer.toString(_flushInterval));
 
         for (LogLimit lim : _limits) {
             rv.setProperty(PROP_RECORD_PREFIX + lim.getRootName(), Log.toLevelString(lim.getLimit()));
