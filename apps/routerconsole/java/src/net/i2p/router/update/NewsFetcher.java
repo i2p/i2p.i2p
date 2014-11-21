@@ -469,13 +469,11 @@ class NewsFetcher extends UpdateRunner {
             String su3Torrent = "";
             String su2Torrent = "";
             for (NewsMetadata.Update update : latestRelease.updates) {
-                if (update.torrent.size() > 0) {
-                    // Only take the first torrent magnet
-                    // TODO handle multiple torrent magnetss
-                    if ("su3".equals(update.type) && su3Torrent.isEmpty())
-                        su3Torrent = update.torrent.get(0);
-                    else if ("su2".equals(update.type) && su2Torrent.isEmpty())
-                        su2Torrent = update.torrent.get(0);
+                if (update.torrent != null) {
+                    if ("su3".equals(update.type))
+                        su3Torrent = update.torrent;
+                    else if ("su2".equals(update.type))
+                        su2Torrent = update.torrent;
                 }
             }
             if (!su2Torrent.isEmpty())

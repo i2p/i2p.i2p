@@ -196,30 +196,32 @@ public class NewsXMLParser {
 
             List<NewsMetadata.Update> updates = new ArrayList<NewsMetadata.Update>();
             List<Node> updateNodes = getNodes(r, "i2p:update");
+            Set<String> types = new HashSet<String>();
             for (Node u : updateNodes) {
                 // returns "" for none
                 String type = u.getAttributeValue("type");
-                if (type.length() > 0) {
-                    NewsMetadata.Update update = new NewsMetadata.Update();
-                    update.type = type;
-                    int totalSources = 0;
+                if (type.isEmpty())
+                    throw new I2PParserException("update with no type");
+                if (types.contains(type))
+                    throw new I2PParserException("update with duplicate type");
+                NewsMetadata.Update update = new NewsMetadata.Update();
+                update.type = type;
+                types.add(type);
+                int totalSources = 0;
 
-                    List<String> torrents = new ArrayList<String>();
-                    List<Node> torrentNodes = getNodes(u, "i2p:torrent");
-                    for (Node t : torrentNodes) {
-                        // returns "" for none
-                        String href = t.getAttributeValue("href");
-                        if (href.length() > 0) {
-                            torrents.add(href);
-                        }
+                Node t = u.getNode("i2p:torrent");
+                if (t != null) {
+                    // returns "" for none
+                    String href = t.getAttributeValue("href");
+                    if (href.length() > 0) {
+                        update.torrent = href;
+                        totalSources += 1;
                     }
-                    update.torrent = torrents;
-                    totalSources += torrents.size();
-
-                    if (totalSources == 0)
-                        throw new I2PParserException("no sources for update type " + type);
-                    updates.add(update);
                 }
+
+                if (totalSources == 0)
+                    throw new I2PParserException("no sources for update type " + type);
+                updates.add(update);
             }
             Collections.sort(updates);
             release.updates = updates;

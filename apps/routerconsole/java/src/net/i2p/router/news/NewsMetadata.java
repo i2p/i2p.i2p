@@ -35,7 +35,7 @@ public class NewsMetadata {
 
     public static class Update implements Comparable<Update> {
         public String type;
-        public List<String> torrent;
+        public String torrent;
         public List<String> clearnet;
         public List<String> ssl;
 
