@@ -196,6 +196,8 @@ public class NewsXMLParser {
 
             List<NewsMetadata.Update> updates = new ArrayList<NewsMetadata.Update>();
             List<Node> updateNodes = getNodes(r, "i2p:update");
+            if (updateNodes.size() == 0)
+                throw new I2PParserException("no updates in release");
             Set<String> types = new HashSet<String>();
             for (Node u : updateNodes) {
                 // returns "" for none
