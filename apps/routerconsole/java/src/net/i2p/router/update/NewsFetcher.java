@@ -459,22 +459,35 @@ class NewsFetcher extends UpdateRunner {
      */
     private void outputOldNewsXML(NewsMetadata data, List<NewsEntry> entries,
                                   String sudVersion, String signingKeyName, File to) throws IOException {
+        NewsMetadata.Release latestRelease = data.releases.get(0);
         Writer out = null;
         try {
             out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(to), "UTF-8"));
             out.write("<!--\n");
             // update metadata in old format
             out.write("<i2p.release ");
-            if (data.i2pVersion != null)
-                out.write(" version=\"" + data.i2pVersion + '"');
-            if (data.minVersion != null)
-                out.write(" minVersion=\"" + data.minVersion + '"');
-            if (data.minJavaVersion != null)
-                out.write(" minJavaVersion=\"" + data.minJavaVersion + '"');
-            if (data.su2Torrent != null)
-                out.write(" su2Torrent=\"" + data.su2Torrent + '"');
-            if (data.su3Torrent != null)
-                out.write(" su3Torrent=\"" + data.su3Torrent + '"');
+            if (latestRelease.i2pVersion != null)
+                out.write(" version=\"" + latestRelease.i2pVersion + '"');
+            if (latestRelease.minVersion != null)
+                out.write(" minVersion=\"" + latestRelease.minVersion + '"');
+            if (latestRelease.minJavaVersion != null)
+                out.write(" minJavaVersion=\"" + latestRelease.minJavaVersion + '"');
+            String su3Torrent = "";
+            String su2Torrent = "";
+            for (NewsMetadata.Update update : latestRelease.updates) {
+                if (update.torrent.size() > 0) {
+                    // Only take the first torrent magnet
+                    // TODO handle multiple torrent magnetss
+                    if ("su3".equals(update.type) && su3Torrent.isEmpty())
+                        su3Torrent = update.torrent.get(0);
+                    else if ("su2".equals(update.type) && su2Torrent.isEmpty())
+                        su2Torrent = update.torrent.get(0);
+                }
+            }
+            if (!su2Torrent.isEmpty())
+                out.write(" su2Torrent=\"" + su2Torrent + '"');
+            if (!su3Torrent.isEmpty())
+                out.write(" su3Torrent=\"" + su3Torrent + '"');
             out.write("/>\n");
             // su3 and feed metadata for debugging
             out.write("** News version:\t" + DataHelper.stripHTML(sudVersion) + '\n');
