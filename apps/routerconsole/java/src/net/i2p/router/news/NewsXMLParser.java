@@ -35,7 +35,7 @@ public class NewsXMLParser {
     private NewsMetadata _metadata;
     private XHTMLMode _mode;
 
-    private static final Set xhtmlWhitelist = new HashSet(Arrays.asList(new String[] {
+    private static final Set<String> xhtmlWhitelist = new HashSet<String>(Arrays.asList(new String[] {
         "a", "b", "br", "div", "i", "p", "span", "font", "blockquote", "hr",
         "del", "ins", "em", "strong", "mark", "sub", "sup", "tt", "code", "strike", "s", "u",
         "h4", "h5", "h6",
@@ -46,7 +46,7 @@ public class NewsXMLParser {
     }));
 
     // http://www.w3.org/TR/html-markup/global-attributes.html#common.attrs.event-handler
-    private static final Set attributeBlacklist = new HashSet(Arrays.asList(new String[] {
+    private static final Set<String> attributeBlacklist = new HashSet<String>(Arrays.asList(new String[] {
         "onabort", "onblur", "oncanplay", "oncanplaythrough", "onchange", "onclick",
         "oncontextmenu", "ondblclick", "ondrag", "ondragend", "ondragenter", "ondragleave",
         "ondragover", "ondragstart", "ondrop", "ondurationchange", "onemptied",
