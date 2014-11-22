@@ -42,6 +42,13 @@ class ExploratoryPeerSelector extends TunnelPeerSelector {
         
         Set<Hash> exclude = getExclude(settings.isInbound(), true);
         exclude.add(ctx.routerHash());
+        // closest-hop restrictions
+        // Since we're applying orderPeers() later, we don't know
+        // which will be the closest hop, so just appply to all peers for now.
+        Set<Hash> moreExclude = getClosestHopExclude(settings.isInbound());
+        if (moreExclude != null)
+            exclude.addAll(moreExclude);
+
         // Don't use ff peers for exploratory tunnels to lessen exposure to netDb searches and stores
         // Hmm if they don't get explored they don't get a speed/capacity rating
         // so they don't get used for client tunnels either.
