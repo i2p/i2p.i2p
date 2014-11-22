@@ -1,6 +1,7 @@
 2014-11-22 zzz
  * PeerSelector: If non-DSA, don't use incompatible peers
    for exploratory tunnels or closest-hop in client tunnels
+ * SAM: Fix v3 bug accepting incoming connections
 
 2014-11-17 zzz
  * NetDB: Exclude A1/A2 "countries" from auto-floodfill
