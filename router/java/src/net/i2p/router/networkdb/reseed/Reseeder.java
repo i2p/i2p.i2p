@@ -70,9 +70,7 @@ public class Reseeder {
      *         URLs are constructed, and because SSLEepGet doesn't follow redirects.
      */
     public static final String DEFAULT_SEED_URL =
-              //http://netdb.i2p2.de/" + "," +
               "http://reseed.i2p-projekt.de/" + "," +
-             //"http://euve5653.vserver.de/netDb/" +  "," +
               "http://cowpuncher.drollette.com/netdb/" + "," +
               "http://i2p.mooo.com/netDb/" + "," +
               "http://193.150.121.66/netDb/" + "," +
@@ -83,14 +81,10 @@ public class Reseeder {
               "http://jp.reseed.i2p2.no/" + "," +
               "http://i2p-netdb.innovatio.no/" + "," +
               "http://ieb9oopo.mooo.com/";
-              // Temp disabled since h2ik have been AWOL since 06-03-2013
-              //"http://i2p.feared.eu/";
 
     /** @since 0.8.2 */
     public static final String DEFAULT_SSL_SEED_URL =
-              //"https://netdb.i2p2.de/" + "," +
               "https://reseed.i2p-projekt.de/" + "," +
-              //"https://euve5653.vserver.de/netDb/" + "," +
               "https://cowpuncher.drollette.com/netdb/" + "," +
               "https://i2p.mooo.com/netDb/" + "," +
               "https://193.150.121.66/netDb/" + "," +
@@ -101,9 +95,8 @@ public class Reseeder {
               "https://jp.reseed.i2p2.no:444/" + "," +
               "https://i2p-netdb.innovatio.no/" + "," +
               "https://ssl.webpack.de/ivae2he9.sg4.e-plaza.de/" + "," + // Only HTTPS and SU3 (v2) support
+              "https://link.mx24.eu/" + "," + // Only HTTPS and SU3 (v3) support
               "https://ieb9oopo.mooo.com/";
-              // Temp disabled since h2ik have been AWOL since 06-03-2013
-              //"https://i2p.feared.eu/";
 
     private static final String SU3_FILENAME = "i2pseeds.su3";
 
