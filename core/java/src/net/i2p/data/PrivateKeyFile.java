@@ -169,9 +169,11 @@ public class PrivateKeyFile {
                 usage();
                 return;
             }
-            System.out.println(pkf);
-            pkf.write();
-            verifySignature(pkf.getDestination());
+            if (mode != 0) {
+                System.out.println(pkf);
+                pkf.write();
+                verifySignature(pkf.getDestination());
+            }
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(1);
