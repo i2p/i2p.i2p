@@ -116,6 +116,7 @@ public class WebMail extends HttpServlet
 	private static final String LOGOUT = "logout";
 	private static final String RELOAD = "reload";
 	private static final String SAVE = "save";
+	private static final String SAVE_AS = "saveas";
 	private static final String REFRESH = "refresh";
 	private static final String CONFIGURE = "configure";
 	private static final String NEW = "new";
@@ -1298,6 +1299,33 @@ public class WebMail extends HttpServlet
 		return isRaw;
 	}
 
+
+	/**
+	 * Process save-as link in message view
+	 *
+	 * @param sessionObject
+	 * @param request
+	 * @return If true, we sent the file or 404, do not send any other response
+	 * @since 0.9.18
+	 */
+	private static boolean processSaveAsLink(SessionObject sessionObject, RequestWrapper request, HttpServletResponse response)
+	{
+		String str = request.getParameter(SAVE_AS);
+		if( str == null )
+			return false;
+		Mail mail = sessionObject.mailCache.getMail( sessionObject.showUIDL, MailCache.FetchMode.ALL );
+		if( mail != null ) {
+			if (sendMailSaveAs(sessionObject, mail, response))
+				return true;
+		}
+		// error if we get here
+		sessionObject.error += _("Message not found.");
+		try {
+			response.sendError(404, _("Message not found."));
+		} catch (IOException ioe) {}
+		return true;
+	}
+
 	/**
 	 * @param hashCode
 	 * @return the part or null
@@ -1631,6 +1659,10 @@ public class WebMail extends HttpServlet
 					// download or raw view sent, or 404
 					return;
 				}
+				if (processSaveAsLink(sessionObject, request, response)) {
+					// download or sent, or 404
+					return;
+				}
 				// If the last message has just been deleted then
 				// sessionObject.state = STATE_LIST and
 				// sessionObject.showUIDL = null
@@ -1790,7 +1822,7 @@ public class WebMail extends HttpServlet
 						name = part.name;
 					else
 						name = "part" + part.hashCode();
-					String name2 = name.replace( "\\.", "_" );
+					String name2 = sanitizeFilename(name);
 					response.setContentType( "application/zip; name=\"" + name2 + ".zip\"" );
 					response.addHeader( "Content-Disposition:", "attachment; filename=\"" + name2 + ".zip\"" );
 					ZipEntry entry = new ZipEntry( name );
@@ -1809,6 +1841,54 @@ public class WebMail extends HttpServlet
 		}
 		return shown;
 	}
+
+	/**
+	 * Send the mail to be saved by the browser
+	 *
+	 * @param sessionObject
+	 * @param response
+	 * @return success
+	 * @since 0.9.18
+	 */
+	private static boolean sendMailSaveAs(SessionObject sessionObject, Mail mail,
+						 HttpServletResponse response)
+	{
+		ReadBuffer content = mail.getBody();
+
+		if(content == null)
+			return false;
+		String name = mail.subject != null ? sanitizeFilename(mail.subject) : "message";
+		try {
+			response.setContentType("message/rfc822");
+			response.setContentLength(content.length);
+			// cache-control?
+			response.addHeader( "Content-Disposition:", "attachment; filename=\"" + name + ".eml\"" );
+			response.getOutputStream().write(content.content, content.offset, content.length);
+			return true;
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+	/**
+	 * Convert the UTF-8 to ISO-8859-1 suitable for inclusion in a header.
+	 * This will result in a bunch of ??? for non-Western languages.
+	 *
+	 * @param sessionObject
+	 * @param response
+	 * @return success
+	 * @since 0.9.18
+	 */
+	private static String sanitizeFilename(String name) {
+		try {
+			name = new String(name.getBytes("ISO-8859-1"), "ISO-8859-1");
+		} catch( UnsupportedEncodingException uee ) {}
+		// strip control chars?
+		name = name.replace('"', '_');
+		return name;
+	}
+
 	/**
 	 * @param sessionObject
 	 * @param request
@@ -2255,7 +2335,8 @@ public class WebMail extends HttpServlet
 		out.println( button( NEW, _("New") ) + spacer +
 			button( REPLY, _("Reply") ) +
 			button( REPLYALL, _("Reply All") ) +
-			button( FORWARD, _("Forward") ) + spacer);
+			button( FORWARD, _("Forward") ) + spacer +
+			button( SAVE_AS, _("Save As") ) + spacer);
 		if (sessionObject.reallyDelete)
 			out.println(button2(DELETE, _("Delete")));
 		else

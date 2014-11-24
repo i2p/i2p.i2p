@@ -88,6 +88,10 @@ class Mail {
 		error = "";
 	}
 
+	/**
+         *  This may or may not contain the body also.
+         *  @return may be null
+         */
 	public synchronized ReadBuffer getHeader() {
 		return header;
 	}
@@ -103,6 +107,10 @@ class Mail {
 		return header != null;
 	}
 
+	/**
+         *  This contains the header also.
+         *  @return may be null
+         */
 	public synchronized ReadBuffer getBody() {
 		return body;
 	}
