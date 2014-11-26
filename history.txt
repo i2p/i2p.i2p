@@ -1,3 +1,18 @@
+2014-11-26 zzz
+ * BuildRequestor: Reduce delay when client build can't find
+   a paired tunnel (ticket #1412)
+ * Data:
+   - Fix NPE on unknown sig type in destination
+   - Fix hashcode and equals for typed data
+ * Tunnels: Disallow changing allowZeroHop setting for exploratory
+
+2014-11-24 zzz
+ * i2ptunnel: Fix automatic setting of random key
+ * PrivateKeyFile: Don't rewrite file in main() if no options
+
+2014-11-23 zzz
+ * Reseed hosts update
+
 2014-11-22 zzz
  * PeerSelector: If non-DSA, don't use incompatible peers
    for exploratory tunnels or closest-hop in client tunnels
