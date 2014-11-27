@@ -348,7 +348,10 @@ public class SummaryBarRenderer {
            .append(_helper.getReachability())
            .append("</a></h4>\n");
         if (!SigType.ECDSA_SHA256_P256.isAvailable()) {
-            buf.append("<hr>\n<h4><a href=\"http://trac.i2p2.i2p/wiki/Crypto/ECDSA\" target=\"_top\" title=\"")
+            buf.append("<hr>\n<h4><a href=\"http://trac.i2p2.i2p/wiki/Crypto/ECDSA");
+            if ("ru".equals(Messages.getLanguage(_context)))
+                buf.append("-ru");
+            buf.append("\" target=\"_top\" title=\"")
                .append(_("See more information on the wiki"))
                .append("\">")
                .append(_("Warning: ECDSA is not available. Update your Java or OS"))
