@@ -9,6 +9,8 @@ package net.i2p.data;
  *
  */
 
+import java.util.Arrays;
+
 import net.i2p.crypto.KeyGenerator;
 import net.i2p.crypto.SigType;
 
@@ -103,5 +105,24 @@ public class SigningPrivateKey extends SimpleDataStructure {
         }
         buf.append(']');
         return buf.toString();
+    }
+
+    /**
+     *  @since 0.9.17
+     */
+    @Override
+    public int hashCode() {
+        return DataHelper.hashCode(_type) ^ super.hashCode();
+    }
+
+    /**
+     *  @since 0.9.17
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) return true;
+        if (obj == null || !(obj instanceof SigningPrivateKey)) return false;
+        SigningPrivateKey s = (SigningPrivateKey) obj;
+        return _type == s._type && Arrays.equals(_data, s._data);
     }
 }

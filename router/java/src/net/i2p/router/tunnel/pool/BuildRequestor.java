@@ -165,7 +165,10 @@ abstract class BuildRequestor {
             exec.buildComplete(cfg, pool);
             // Not even an exploratory tunnel? We are in big trouble.
             // Let's not spin through here too fast.
-            try { Thread.sleep(250); } catch (InterruptedException ie) {}
+            // But don't let a client tunnel waiting for exploratories slow things down too much,
+            // as there may be other tunnel pools who can build
+            int ms = pool.getSettings().isExploratory() ? 250 : 25;
+            try { Thread.sleep(ms); } catch (InterruptedException ie) {}
             return false;
         }
         

@@ -244,9 +244,10 @@ public class TunnelPoolSettings {
             String name = (String) e.getKey();
             String value = (String) e.getValue();
             if (name.startsWith(prefix)) {
-                if (name.equalsIgnoreCase(prefix + PROP_ALLOW_ZERO_HOP))
-                    _allowZeroHop = getBoolean(value, DEFAULT_ALLOW_ZERO_HOP);
-                else if (name.equalsIgnoreCase(prefix + PROP_BACKUP_QUANTITY))
+                if (name.equalsIgnoreCase(prefix + PROP_ALLOW_ZERO_HOP)) {
+                    if (!_isExploratory)
+                        _allowZeroHop = getBoolean(value, DEFAULT_ALLOW_ZERO_HOP);
+                } else if (name.equalsIgnoreCase(prefix + PROP_BACKUP_QUANTITY))
                     _backupQuantity = getInt(value, DEFAULT_BACKUP_QUANTITY);
                 //else if (name.equalsIgnoreCase(prefix + PROP_DURATION))
                 //    _duration = getInt(value, DEFAULT_DURATION);

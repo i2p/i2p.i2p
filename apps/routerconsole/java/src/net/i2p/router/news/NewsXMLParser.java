@@ -15,6 +15,7 @@ import java.util.Set;
 
 import net.i2p.I2PAppContext;
 import net.i2p.util.Log;
+
 import org.cybergarage.util.Debug;
 import org.cybergarage.xml.Attribute;
 import org.cybergarage.xml.Node;
@@ -34,7 +35,7 @@ public class NewsXMLParser {
     private NewsMetadata _metadata;
     private XHTMLMode _mode;
 
-    private static final Set xhtmlWhitelist = new HashSet(Arrays.asList(new String[] {
+    private static final Set<String> xhtmlWhitelist = new HashSet<String>(Arrays.asList(new String[] {
         "a", "b", "br", "div", "i", "p", "span", "font", "blockquote", "hr",
         "del", "ins", "em", "strong", "mark", "sub", "sup", "tt", "code", "strike", "s", "u",
         "h4", "h5", "h6",
@@ -45,7 +46,7 @@ public class NewsXMLParser {
     }));
 
     // http://www.w3.org/TR/html-markup/global-attributes.html#common.attrs.event-handler
-    private static final Set attributeBlacklist = new HashSet(Arrays.asList(new String[] {
+    private static final Set<String> attributeBlacklist = new HashSet<String>(Arrays.asList(new String[] {
         "onabort", "onblur", "oncanplay", "oncanplaythrough", "onchange", "onclick",
         "oncontextmenu", "ondblclick", "ondrag", "ondragend", "ondragenter", "ondragleave",
         "ondragover", "ondragstart", "ondrop", "ondurationchange", "onemptied",
@@ -169,38 +170,67 @@ public class NewsXMLParser {
             }
         }
 
-        Node r = feed.getNode("i2p:release");
-        if (r == null)
+        List<NewsMetadata.Release> releases = new ArrayList<NewsMetadata.Release>();
+        List<Node> releaseNodes = getNodes(feed, "i2p:release");
+        if (releaseNodes.size() == 0)
             throw new I2PParserException("no release data in XML");
-        // release attributes
-        String a = r.getAttributeValue("date");
-        if (a.length() > 0) {
-            long time = RFC3339Date.parse3339Date(a);
-            if (time > 0)
-                rv.date = time;
-        }
-        a = r.getAttributeValue("minVersion");
-        if (a.length() > 0)
-            rv.minVersion = a;
-        a = r.getAttributeValue("minJavaVersion");
-        if (a.length() > 0)
-            rv.minJavaVersion = a;
-        // release nodes
-        n = r.getNode("i2p:version");
-        if (n != null)
-            rv.i2pVersion = n.getValue();
-        List<Node> urls = getNodes(r, "i2p:torrent");
-        for (Node t : urls) {
-            // returns "" for none
-            String href = t.getAttributeValue("href");
-            if (href.length() > 0) {
-                String type = t.getAttributeValue("type");
-                if (type.equals("su2"))
-                    rv.su2Torrent = href;
-                else if (type.equals("su3"))
-                    rv.su3Torrent = href;
+        for (Node r : releaseNodes) {
+            NewsMetadata.Release release = new NewsMetadata.Release();
+            // release attributes
+            String a = r.getAttributeValue("date");
+            if (a.length() > 0) {
+                long time = RFC3339Date.parse3339Date(a);
+                if (time > 0)
+                    release.date = time;
             }
+            a = r.getAttributeValue("minVersion");
+            if (a.length() > 0)
+                release.minVersion = a;
+            a = r.getAttributeValue("minJavaVersion");
+            if (a.length() > 0)
+                release.minJavaVersion = a;
+            // release nodes
+            n = r.getNode("i2p:version");
+            if (n != null)
+                release.i2pVersion = n.getValue();
+
+            List<NewsMetadata.Update> updates = new ArrayList<NewsMetadata.Update>();
+            List<Node> updateNodes = getNodes(r, "i2p:update");
+            if (updateNodes.size() == 0)
+                throw new I2PParserException("no updates in release");
+            Set<String> types = new HashSet<String>();
+            for (Node u : updateNodes) {
+                // returns "" for none
+                String type = u.getAttributeValue("type");
+                if (type.isEmpty())
+                    throw new I2PParserException("update with no type");
+                if (types.contains(type))
+                    throw new I2PParserException("update with duplicate type");
+                NewsMetadata.Update update = new NewsMetadata.Update();
+                update.type = type;
+                types.add(type);
+                int totalSources = 0;
+
+                Node t = u.getNode("i2p:torrent");
+                if (t != null) {
+                    // returns "" for none
+                    String href = t.getAttributeValue("href");
+                    if (href.length() > 0) {
+                        update.torrent = href;
+                        totalSources += 1;
+                    }
+                }
+
+                if (totalSources == 0)
+                    throw new I2PParserException("no sources for update type " + type);
+                updates.add(update);
+            }
+            Collections.sort(updates);
+            release.updates = updates;
+            releases.add(release);
         }
+        Collections.sort(releases);
+        rv.releases = releases;
 
         return rv;
     }
@@ -388,8 +418,9 @@ public class NewsXMLParser {
             parser.parse(new File(args[0]));
             NewsMetadata ud = parser.getMetadata();
             List<NewsEntry> entries = parser.getEntries();
-            System.out.println("Latest version is " + ud.i2pVersion);
-            System.out.println("Release timestamp: " + ud.date);
+            NewsMetadata.Release latestRelease = ud.releases.get(0);
+            System.out.println("Latest version is " + latestRelease.i2pVersion);
+            System.out.println("Release timestamp: " + latestRelease.date);
             System.out.println("Feed timestamp: " + ud.feedUpdated);
             System.out.println("Found " + entries.size() + " news entries");
             for (int i = 0; i < entries.size(); i++) {

@@ -1339,10 +1339,10 @@ public class IndexBean {
                 // as of 0.9.17, add a random key if not previously present
                 byte[] rk = new byte[32];
                 _context.random().nextBytes(rk);
-                config.setProperty(OPT + p, Base64.encode(rk));
+                config.setProperty(p, Base64.encode(rk));
                 p = OPT + "outbound.randomKey";
                 _context.random().nextBytes(rk);
-                config.setProperty(OPT + p, Base64.encode(rk));
+                config.setProperty(p, Base64.encode(rk));
             }
         }
 
