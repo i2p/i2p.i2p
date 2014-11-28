@@ -61,7 +61,7 @@ class SAMv3StreamSession  extends SAMStreamSession implements SAMv3Handler.Sessi
 	    public SAMv3StreamSession(String login)
 	    		throws IOException, DataFormatException, SAMException
 	    {
-                super(getDB().get(login).getDest(), "BOTH",
+                super(getDB().get(login).getDest(), "__v3__",
                       getDB().get(login).getProps(),
                       getDB().get(login).getHandler());
 	    	this.nick = login ;

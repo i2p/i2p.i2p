@@ -41,7 +41,7 @@ public class NewsMetadata {
 
         @Override
         public int compareTo(Update other) {
-            return Integer.compare(getTypeOrder(), other.getTypeOrder());
+            return getTypeOrder() - other.getTypeOrder();
         }
 
         protected int getTypeOrder() {

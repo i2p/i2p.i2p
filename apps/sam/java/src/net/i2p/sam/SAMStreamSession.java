@@ -82,7 +82,7 @@ class SAMStreamSession {
      * Create a new SAM STREAM session.
      *
      * @param dest Base64-encoded destination and private keys (same format as PrivateKeyFile)
-     * @param dir Session direction ("RECEIVE", "CREATE" or "BOTH")
+     * @param dir Session direction ("RECEIVE", "CREATE" or "BOTH") or "__v3__" if extended by SAMv3StreamSession
      * @param props Properties to setup the I2P session
      * @param recv Object that will receive incoming data
      * @throws IOException
@@ -98,7 +98,7 @@ class SAMStreamSession {
      * Create a new SAM STREAM session.
      *
      * @param destStream Input stream containing the destination and private keys (same format as PrivateKeyFile)
-     * @param dir Session direction ("RECEIVE", "CREATE" or "BOTH")
+     * @param dir Session direction ("RECEIVE", "CREATE" or "BOTH") or "__v3__" if extended by SAMv3StreamSession
      * @param props Properties to setup the I2P session
      * @param recv Object that will receive incoming data
      * @throws IOException
@@ -111,15 +111,24 @@ class SAMStreamSession {
         _log = I2PAppContext.getGlobalContext().logManager().getLog(getClass());
 
         boolean canReceive;
+        boolean startAcceptor;
         if (dir.equals("BOTH")) {
             canCreate = true;
             canReceive = true;
+            startAcceptor = true;
+        } else if (dir.equals("__v3__")) {
+            // we are super to SAMv3StreamSession, don't start thread, he handles it
+            canCreate = true;
+            canReceive = true;
+            startAcceptor = false;
         } else if (dir.equals("CREATE")) {
             canCreate = true;
             canReceive = false;
+            startAcceptor = false;
         } else if (dir.equals("RECEIVE")) {
             canCreate = false;
             canReceive = true;
+            startAcceptor = true;
         } else {
             _log.error("BUG! Wrong direction passed to SAMStreamSession: "
                        + dir);
@@ -162,7 +171,7 @@ class SAMStreamSession {
         forceFlush = Boolean.parseBoolean(allprops.getProperty(PROP_FORCE_FLUSH, DEFAULT_FORCE_FLUSH));
         
 
-        if (canReceive) {
+        if (startAcceptor) {
             server = new SAMStreamSessionServer();
             Thread t = new I2PAppThread(server, "SAMStreamSessionServer");
 
