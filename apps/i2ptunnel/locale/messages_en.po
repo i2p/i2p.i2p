@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P i2ptunnel\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-10-30 20:10+0000\n"
+"POT-Creation-Date: 2014-11-19 21:48+0000\n"
 "PO-Revision-Date: 2010-06-15 14:09+0100\n"
 "Last-Translator: duck <duck@mail.i2p>\n"
 "Language-Team: duck <duck@mail.i2p>\n"
@@ -18,147 +18,147 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
-#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:437
-#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:447
+#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:449
+#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:459
 msgid "internal"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:523
+#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:535
 #, java-format
 msgid "{0} inbound, {0} outbound tunnel"
 msgid_plural "{0} inbound, {0} outbound tunnels"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:527
+#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:539
 msgid "lower bandwidth and reliability"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:529
+#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:541
 msgid "standard bandwidth and reliability"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:531
+#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:543
 msgid "higher bandwidth and reliability"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:127
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:128
 msgid "Tunnels are not initialized yet, please reload in two minutes."
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:200
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:201
 msgid ""
 "Invalid form submission, probably because you used the 'back' or 'reload' "
 "button on your browser. Please resubmit."
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:202
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:203
 msgid ""
 "If the problem persists, verify that you have cookies enabled in your "
 "browser."
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:248
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:249
 msgid "Configuration reloaded for all tunnels"
 msgstr ""
 
 #. and give them something to look at in any case
 #. FIXME name will be HTML escaped twice
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:262
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:263
 msgid "Starting tunnel"
 msgstr ""
 
 #. and give them something to look at in any case
 #. FIXME name will be HTML escaped twice
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:276
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:277
 msgid "Stopping tunnel"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:365
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:366
 msgid "Configuration changes saved"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:368
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:369
 msgid "Failed to save configuration"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:491
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:496
 msgid "New Tunnel"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:514
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:534
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:652
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:519
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:539
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:657
 msgid "Port not set"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:517
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:654
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:522
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:659
 msgid "Invalid port"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:520
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:525
 msgid "Warning - ports less than 1024 are not recommended"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:529
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:534
 msgid "Warning - duplicate port"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:546
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:551
 msgid "Standard client"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:547
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:552
 msgid "HTTP/HTTPS client"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:548
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:553
 msgid "IRC client"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:549
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:554
 msgid "Standard server"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:550
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:555
 msgid "HTTP server"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:551
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:556
 msgid "SOCKS 4/4a/5 proxy"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:552
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:557
 msgid "SOCKS IRC proxy"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:553
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:558
 msgid "CONNECT/SSL/HTTPS proxy"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:554
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:559
 msgid "IRC server"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:555
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:560
 msgid "Streamr client"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:556
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:561
 msgid "Streamr server"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:557
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:562
 msgid "HTTP bidir"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:646
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:651
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:317
 msgid "Host not set"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:648
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:653
 msgid "Invalid address"
 msgstr ""
 

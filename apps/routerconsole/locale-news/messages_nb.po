@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-07-13 21:46+0000\n"
-"PO-Revision-Date: 2014-05-01 19:52+0000\n"
+"PO-Revision-Date: 2014-11-20 12:07+0000\n"
 "Last-Translator: Allan Nordhøy <comradekingu@gmail.com>\n"
 "Language-Team: Norwegian Bokmål (http://www.transifex.com/projects/p/I2P/language/nb/)\n"
 "MIME-Version: 1.0\n"
@@ -20,7 +20,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 msgid "Congratulations on getting I2P installed!"
-msgstr ""
+msgstr "Til lykke med innstallasjon av I2P!"
 
 msgid "Welcome to I2P!"
 msgstr "Velkommen til I2P!"
@@ -33,33 +33,33 @@ msgstr "{0}vær tolmodig{1} i påvente av I2P-oppstart og tilknytning til likeme
 msgid ""
 "While you are waiting, please {0}adjust your bandwidth settings{1} on the "
 "{2}configuration page{3}."
-msgstr ""
+msgstr "Mens du venter, {0}gjør båndbreddeinnstillinger{1} på {2}oppsettssiden{3}."
 
 msgid ""
 "Also you can setup your browser to use the I2P proxy to reach eepsites."
-msgstr ""
+msgstr "Du kan også sette opp din nettleser for bruk med I2P-mellomtjener for å nå eep-sider"
 
 msgid ""
 "Just enter 127.0.0.1 (or localhost) port 4444 as a http proxy into your "
 "browser settings."
-msgstr ""
+msgstr "Skriv inn 127.0.0.1 (eller localhost) port 4444 som en http-mellomtjener i dine nettleserinnstillinger."
 
 msgid "Do not use SOCKS for this."
-msgstr ""
+msgstr "Ikke bruk SOCKS for dette."
 
 #, java-format
 msgid ""
 "More information can be found on the {0}I2P browser proxy setup page{1}."
-msgstr ""
+msgstr "Mer informasjon er å finne på {0}oppsettssiden for I2P-mellomtjener{1}."
 
 #, java-format
 msgid ""
 "Once you have a \"shared clients\" destination listed on the left, please "
 "{0}check out{1} our {2}FAQ{3}."
-msgstr ""
+msgstr "Når du har \"delte klienter\" mål opplistet til venstre, {0}sjekk{1} vår {2}O-S-S{3}."
 
 #, java-format
 msgid ""
 "Point your IRC client to {0}localhost:6668{1} and say hi to us on "
 "{2}#i2p{3}."
-msgstr ""
+msgstr "Rett din IRC-klient inn mot {0}localhost:6668{1} og si hei til oss på {2}#i2p{3}."
