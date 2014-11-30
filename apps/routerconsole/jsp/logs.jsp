@@ -33,6 +33,7 @@
 <b>Platform:</b> <%=System.getProperty("os.name")%> <%=System.getProperty("os.arch")%> <%=System.getProperty("os.version")%><br>
 <b>Processor:</b> <%=net.i2p.util.NativeBigInteger.cpuModel()%> (<%=net.i2p.util.NativeBigInteger.cpuType()%>)<br>
 <b>Jbigi:</b> <%=net.i2p.util.NativeBigInteger.loadStatus()%><br>
+<b>Jbigi version:</b> <%=net.i2p.util.NativeBigInteger.getJbigiVersion()%> GMP <%=net.i2p.util.NativeBigInteger.getLibGMPVersion()%><br>
 <b>Encoding:</b> <%=System.getProperty("file.encoding")%><br>
 <b>Charset:</b> <%=java.nio.charset.Charset.defaultCharset().name()%><br>
 </p>

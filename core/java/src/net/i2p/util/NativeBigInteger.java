@@ -97,6 +97,10 @@ import net.i2p.crypto.CryptoConstants;
 public class NativeBigInteger extends BigInteger {
     /** did we load the native lib correctly? */
     private static boolean _nativeOk;
+    /** is native lib loaded and at least version 3? */
+    private static boolean _nativeOk3;
+    private static int _jbigiVersion;
+    private static String _libGMPVersion = "unknown";
     private static String _loadStatus = "uninitialized";
     private static String _cpuModel = "uninitialized";
     private static String _extractedResource;
@@ -277,10 +281,118 @@ public class NativeBigInteger extends BigInteger {
      *            big endian twos complement representation of the exponent
      * @param modulus
      *            big endian twos complement representation of the modulus
+     * @throws ArithmeticException if modulus &lt;= 0 (since libjbigi version3)
      * @return big endian twos complement representation of (base ^ exponent) % modulus
      */
-    public native static byte[] nativeModPow(byte base[], byte exponent[], byte modulus[]);
+    private native static byte[] nativeModPow(byte base[], byte exponent[], byte modulus[]);
+
+    /**
+     * calculate (base ^ exponent) % modulus.
+     * Constant Time.
+     * 
+     * @param base
+     *            big endian twos complement representation of the base (but it must be positive)
+     * @param exponent
+     *            big endian twos complement representation of the exponent
+     * @param modulus
+     *            big endian twos complement representation of the modulus
+     * @return big endian twos complement representation of (base ^ exponent) % modulus
+     * @throws ArithmeticException if modulus &lt;= 0
+     * @since 0.9.18 and libjbigi version 3
+     */
+    private native static byte[] nativeModPowCT(byte base[], byte exponent[], byte modulus[]);
+
+    /**
+     *  @since 0.9.18 and libjbigi version 3
+     *  @throws ArithmeticException
+     */
+    private native static byte[] nativeModInverse(byte base[], byte d[]);
  
+    /**
+     *  Only for testing jbigi's negative conversion functions!
+     *  @since 0.9.18
+     */
+    //private native static byte[] nativeNeg(byte d[]);
+
+    /**
+     *  Get the jbigi version, only available since jbigi version 3
+     *  Caller must catch Throwable
+     *  @since 0.9.18
+     */
+    private native static int nativeJbigiVersion();
+ 
+    /**
+     *  Get the libmp version, only available since jbigi version 3
+     *  @since 0.9.18
+     */
+    private native static int nativeGMPMajorVersion();
+ 
+    /**
+     *  Get the libmp version, only available since jbigi version 3
+     *  @since 0.9.18
+     */
+    private native static int nativeGMPMinorVersion();
+ 
+    /**
+     *  Get the libmp version, only available since jbigi version 3
+     *  @since 0.9.18
+     */
+    private native static int nativeGMPPatchVersion();
+
+    /**
+     *  Get the jbigi version
+     *  @return 0 if no jbigi available, 2 if version not supported
+     *  @since 0.9.18
+     */
+    private static int fetchJbigiVersion() {
+        if (!_nativeOk)
+            return 0;
+        try {
+            return nativeJbigiVersion();
+        } catch (Throwable t) {
+            return 2;
+        }
+    }
+
+    /**
+     *  Set the jbigi and libgmp versions. Call after loading.
+     *  Sets _jbigiVersion, _nativeOK3, and _libGMPVersion.
+     *  @since 0.9.18
+     */
+    private static void setVersions() {
+        _jbigiVersion = fetchJbigiVersion();
+        _nativeOk3 = _jbigiVersion > 2;
+        if (_nativeOk3) {
+            try {
+                int maj = nativeGMPMajorVersion();
+                int min = nativeGMPMinorVersion();
+                int pat = nativeGMPPatchVersion();
+                _libGMPVersion = maj + "." + min + "." + pat;
+            } catch (Throwable t) {
+                warn("jbigi version " + _jbigiVersion + " but GMP version not available???", t);
+            }
+        }
+        warn("jbigi version: " + _jbigiVersion + "; GMP version: " + _libGMPVersion);
+    }
+
+    /**
+     *  Get the jbigi version
+     *  @return 0 if no jbigi available, 2 if version info not supported
+     *  @since 0.9.18
+     */
+    public static int getJbigiVersion() {
+        return _jbigiVersion;
+    }
+
+    /**
+     *  Get the libgmp version
+     *  @return "unknown" if no jbigi available or if version not supported
+     *  @since 0.9.18
+     */
+    public static String getLibGMPVersion() {
+        return _libGMPVersion;
+    }
+
     private byte[] cachedBa;
 
     public NativeBigInteger(byte[] val) {
@@ -316,17 +428,50 @@ public class NativeBigInteger extends BigInteger {
         this(integer.toByteArray());
     }
 
+    /**
+     *  @throws ArithmeticException if m &lt;= 0
+     */
     @Override
     public BigInteger modPow(BigInteger exponent, BigInteger m) {
-        // jbigi.c convert_j2mp() and convert_mp2j() do NOT currently support negative numbers
         // Where negative or zero values aren't legal in modPow() anyway, avoid native,
-        // as the Java code will throw an exception rather than silently fail
-        if (_nativeOk && signum() >= 0 && exponent.signum() >= 0 && m.signum() > 0)
+        // as the Java code will throw an exception rather than silently fail or crash the JVM
+        // Negative values supported as of version 3
+        if (_nativeOk3 || (_nativeOk && signum() >= 0 && exponent.signum() >= 0 && m.signum() > 0))
             return new NativeBigInteger(nativeModPow(toByteArray(), exponent.toByteArray(), m.toByteArray()));
         else
             return super.modPow(exponent, m);
     }
 
+    /**
+     *  @throws ArithmeticException if m &lt;= 0
+     *  @since 0.9.18 and libjbigi version 3
+     */
+    public BigInteger modPowCT(BigInteger exponent, BigInteger m) {
+        if (_nativeOk3)
+            return new NativeBigInteger(nativeModPowCT(toByteArray(), exponent.toByteArray(), m.toByteArray()));
+        else
+            return modPow(exponent, m);
+    }
+
+    /**
+     *  @throws ArithmeticException if not coprime with m, or m &lt;= 0
+     *  @since 0.9.18 and libjbigi version 3
+     */
+    @Override
+    public BigInteger modInverse(BigInteger m) {
+        // Where negative or zero values aren't legal in modInverse() anyway, avoid native,
+        // as the Java code will throw an exception rather than silently fail or crash the JVM
+        // Note that 'this' can be negative
+        // If this and m are not coprime, gmp will do a divide by zero exception and crash the JVM.
+        // super will throw an ArithmeticException
+//      if (_nativeOk3 && m.signum() > 0)
+        if (_nativeOk3)
+            return new NativeBigInteger(nativeModInverse(toByteArray(), m.toByteArray()));
+        else
+            return super.modInverse(m);
+    }
+
+    /** caches */
     @Override
     public byte[] toByteArray(){
         if(cachedBa == null) //Since we are immutable it is safe to never update the cached ba after it has initially been generated
@@ -378,12 +523,63 @@ public class NativeBigInteger extends BigInteger {
      */
     public static void main(String args[]) {
         _doLog = true;
-        runModPowTest(100);
+        //if (_nativeOk3)
+        //    testnegs();
+        runModPowTest(100, 1);
+        if (_nativeOk3) {
+            System.out.println("ModPowCT test:");
+            runModPowTest(100, 2);
+            System.out.println("ModInverse test:");
+            runModPowTest(10000, 3);
+        }
     }
 
-    private static void runModPowTest(int numRuns) {
+    /** version >= 3 only */
+/****
+    private static void testnegs() {
+        for (int i = -66000; i <= 66000; i++) {
+            testneg(i);
+        }
+        test(3, 11);
+        test(25, 4);
+    }
+
+    private static void testneg(long a) {
+        NativeBigInteger ba = new NativeBigInteger(Long.toString(a));
+        long r = ba.testNegate().longValue();
+        if (r != 0 - a)
+            warn("FAIL Neg test " + a + " = " + r);
+    }
+
+    private static void test(long a, long b) {
+        BigInteger ba = new NativeBigInteger(Long.toString(a));
+        BigInteger bb = new NativeBigInteger(Long.toString(b));
+        long r1 = a * b;
+        long r2 = ba.multiply(bb).longValue();
+        if (r1 != r2)
+            warn("FAIL Mul test " + a + ' ' + b + " = " + r2);
+        r1 = a / b;
+        r2 = ba.divide(bb).longValue();
+        if (r1 != r2)
+            warn("FAIL Div test " + a + ' ' + b + " = " + r2);
+        r1 = a % b;
+        r2 = ba.mod(bb).longValue();
+        if (r1 != r2)
+            warn("FAIL Mod test " + a + ' ' + b + " = " + r2);
+    }
+
+    private BigInteger testNegate() {
+        return new NativeBigInteger(nativeNeg(toByteArray()));
+    }
+
+****/
+
+    /**
+     *  @parm mode 1: modPow; 2: modPowCT 3: modInverse
+     */
+    private static void runModPowTest(int numRuns, int mode) {
         System.out.println("DEBUG: Warming up the random number generator...");
-        SecureRandom rand = new SecureRandom();
+        SecureRandom rand = RandomSource.getInstance();
         rand.nextBoolean();
         System.out.println("DEBUG: Random number generator warmed up");
 
@@ -392,22 +588,42 @@ public class NativeBigInteger extends BigInteger {
         byte[] _samplePrime = CryptoConstants.elgp.toByteArray();
 
         BigInteger jg = new BigInteger(_sampleGenerator);
+        NativeBigInteger ng = new NativeBigInteger(_sampleGenerator);
         BigInteger jp = new BigInteger(_samplePrime);
 
         long totalTime = 0;
         long javaTime = 0;
 
         int runsProcessed = 0;
+        for (int i = 0; i < 1000; i++) {
+            // JIT warmup
+            BigInteger bi = new NativeBigInteger(16, rand);
+            if (mode == 1)
+                jg.modPow(bi, jp);
+            else if (mode == 2)
+                ng.modPowCT(bi, jp);
+            else
+                bi.modInverse(jp);
+        }
         for (runsProcessed = 0; runsProcessed < numRuns; runsProcessed++) {
-            BigInteger bi = new BigInteger(226, rand); // 2048, rand); //
+            BigInteger bi = new BigInteger(2048, rand); // 2048, rand); //
             NativeBigInteger g = new NativeBigInteger(_sampleGenerator);
             NativeBigInteger p = new NativeBigInteger(_samplePrime);
             NativeBigInteger k = new NativeBigInteger(1, bi.toByteArray());
-            long beforeModPow = System.currentTimeMillis();
-            BigInteger myValue = g.modPow(k, p);
-            long afterModPow = System.currentTimeMillis();
-            BigInteger jval = jg.modPow(bi, jp);
-            long afterJavaModPow = System.currentTimeMillis();
+            BigInteger myValue, jval;
+            long beforeModPow = System.nanoTime();
+            if (mode == 1)
+                myValue = g.modPow(k, p);
+            else if (mode == 2)
+                myValue = g.modPowCT(bi, jp);
+            else
+                myValue = k.modInverse(p);
+            long afterModPow = System.nanoTime();
+            if (mode != 3)
+                jval = jg.modPow(bi, jp);
+            else
+                jval = bi.modInverse(jp);
+            long afterJavaModPow = System.nanoTime();
 
             totalTime += (afterModPow - beforeModPow);
             javaTime += (afterJavaModPow - afterModPow);
@@ -415,26 +631,37 @@ public class NativeBigInteger extends BigInteger {
                 System.err.println("ERROR: [" + runsProcessed + "]\tnative modPow != java modPow");
                 System.err.println("ERROR: native modPow value: " + myValue.toString());
                 System.err.println("ERROR: java modPow value: " + jval.toString());
-                System.err.println("ERROR: run time: " + totalTime + "ms (" + (totalTime / (runsProcessed + 1)) + "ms each)");
                 break;
-            } else {
-                System.out.println("DEBUG: current run time: " + (afterModPow - beforeModPow) + "ms (total: " 
-                                   + totalTime + "ms, " + (totalTime / (runsProcessed + 1)) + "ms each)");
+            //} else if (mode == 1) {
+            //    System.out.println(String.format("DEBUG: current run time: %7.3f ms (total: %9.3f ms, %7.3f ms each)",
+            //                                     (afterModPow - beforeModPow) / 1000000d,
+            //                                     totalTime / 1000000d,
+            //                                     totalTime / (1000000d * (runsProcessed + 1))));
             }
         }
-        System.out.println("INFO: run time: " + totalTime + "ms (" + (totalTime / (runsProcessed + 1)) + "ms each)");
+        double dtotal = totalTime / 1000000f;
+        double djava = javaTime / 1000000f;
+        System.out.println(String.format("INFO: run time: %.3f ms (%.3f ms each)",
+                                         dtotal, dtotal / (runsProcessed + 1)));
         if (numRuns == runsProcessed)
             System.out.println("INFO: " + runsProcessed + " runs complete without any errors");
         else
             System.out.println("ERROR: " + runsProcessed + " runs until we got an error");
 
         if (_nativeOk) {
-            System.out.println("native run time: \t" + totalTime + "ms (" + (totalTime / (runsProcessed + 1))
-                               + "ms each)");
-            System.out.println("java run time:   \t" + javaTime + "ms (" + (javaTime / (runsProcessed + 1)) + "ms each)");
-            System.out.println("native = " + ((totalTime * 100.0d) / javaTime) + "% of pure java time");
+            System.out.println(String.format("Native run time: \t%9.3f ms (%7.3f ms each)",
+                                             dtotal, dtotal / (runsProcessed + 1)));
+            System.out.println(String.format("Java run time:   \t%9.3f ms (%7.3f ms each)",
+                                             djava, djava / (runsProcessed + 1)));
+            System.out.println(String.format("Native = %.3f%% of pure Java time",
+                                             dtotal * 100.0d / djava));
+            if (dtotal < djava)
+                System.out.println(String.format("Native is BETTER by a factor of %.3f -- YAY!", djava / dtotal));
+            else
+                System.out.println(String.format("Native is WORSE by a factor of %.3f -- BOO!", dtotal / djava));
         } else {
-            System.out.println("java run time: \t" + javaTime + "ms (" + (javaTime / (runsProcessed + 1)) + "ms each)");
+            System.out.println(String.format("java run time: \t%.3f ms (%.3f ms each)",
+                                             djava, djava / (runsProcessed + 1)));
             System.out.println("However, we couldn't load the native library, so this doesn't test much");
         }
     }
@@ -497,6 +724,8 @@ public class NativeBigInteger extends BigInteger {
             if (!_nativeOk) {
                 warn("Native BigInteger library jbigi not loaded - using pure Java - " +
                      "poor performance may result - see http://i2p-projekt.i2p/jbigi for help");
+            } else {
+                setVersions();
             }
         } catch(Exception e) {
             warn("Native BigInteger library jbigi not loaded, using pure java", e);

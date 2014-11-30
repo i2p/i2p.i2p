@@ -1,9 +1,17 @@
 #!/bin/sh
+#
+# Run with BITS=32 to generate 32-bit libs on a 64-bit platform
+# On Ubuntu you will need sudo apt-get install gcc-multilib libc6-i386 libc6-dev-i386
+#
 
 # ON Solaris 11 (at least) this variable must be set.
 # Linux and *BSD will do the right thing.
 #
 #BITS=32
+
+#
+# look in configure file in gmp source for supported host CPUs, at about line 5000
+#
 
 # FIXME Is this all?
 DARWIN_PLATFORMS="core2 corei"
@@ -36,9 +44,19 @@ MISC_MINGW_PLATFORMS=""
 #
 # Are there any other X86 platforms that work on i2p? Add them here.
 #
-
 # Note! these build on 32bit as 32bit when operating as 32bit...
-X86_64_PLATFORMS="atom athlon64 core2 corei nano pentium4"
+# starting with k10 added for 6.0.0
+# As of GMP 6.0.0, libgmp 3,
+# the following architectures appear to build to identical code:
+#    core2 corei
+#    bulldozer piledriver streamroller excavator
+#    bobcat jaguar
+#    k62 k63
+#    viac32 pentium3
+#
+# Even more duplicates are in 32-bit mode, so it doesn't pay to have everything for 32 bit.
+#
+X86_64_PLATFORMS="atom athlon64 core2 corei nano pentium4 k10 bobcat jaguar bulldozer piledriver steamroller excavator"
 
 # Note! these are 32bit _ONLY_
 X86_PLATFORMS="pentium pentiummmx pentium2 pentium3 pentiumm k6 k62 k63 athlon geode viac3 viac32 ${X86_64_PLATFORMS}"

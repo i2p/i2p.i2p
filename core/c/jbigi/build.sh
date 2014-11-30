@@ -22,7 +22,9 @@ mkdir -p lib bin/local
 
 # Use 4.3.2 32bit CPUs.
 # Use 5.0.2 64bit CPUs.
-VER=4.3.2
+VER=6.0.0
+TARVER=${VER}a
+TAR=gmp-${TARVER}.tar.bz2
 
 # If JAVA_HOME isn't set, try to figure it out on our own
 [ -z $JAVA_HOME ] && . ../find-java-home
@@ -37,13 +39,14 @@ set -e
 
 download_gmp ()
 {
+URL="https://gmplib.org/download/gmp/${TAR}"
 if [ $(which wget) ]; then
-    echo "Downloading ftp://ftp.gmplib.org/pub/gmp-${VER}/${TAR}"
-    wget -N --progress=dot ftp://ftp.gmplib.org/pub/gmp-${VER}/${TAR}
+    echo "Downloading $URL"
+    wget -N --progress=dot $URL
 else
     echo "ERROR: Cannot find wget." >&2
     echo >&2
-    echo "Please download ftp://ftp.gmplib.org/pub/gmp-${VER}/${TAR}" >&2
+    echo "Please download $URL" >&2
     echo "manually and rerun this script." >&2
     exit 1
 fi
@@ -53,8 +56,6 @@ extract_gmp ()
 {
 tar -xjf ${TAR} > /dev/null 2>&1|| (rm -f ${TAR} && download_gmp && extract_gmp || exit 1)
 }
-
-TAR=gmp-${VER}.tar.bz2
 
 if [ "$1" != "dynamic" -a ! -d gmp-${VER} ]; then
     if [ ! -f $TAR ]; then

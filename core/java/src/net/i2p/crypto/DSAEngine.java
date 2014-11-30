@@ -234,7 +234,7 @@ public class DSAEngine {
             BigInteger s = new NativeBigInteger(1, sbytes);
             BigInteger r = new NativeBigInteger(1, rbytes);
             BigInteger y = new NativeBigInteger(1, verifyingKey.getData());
-            BigInteger w = null;
+            BigInteger w;
             try {
                 w = s.modInverse(CryptoConstants.dsaq);
             } catch (ArithmeticException ae) {
@@ -405,13 +405,13 @@ public class DSAEngine {
 
         boolean ok = false;
         do {
-            k = new BigInteger(160, _context.random());
+            k = new NativeBigInteger(160, _context.random());
             ok = k.compareTo(CryptoConstants.dsaq) != 1;
             ok = ok && !k.equals(BigInteger.ZERO);
             //System.out.println("K picked (ok? " + ok + "): " + k.bitLength() + ": " + k.toString());
         } while (!ok);
 
-        BigInteger r = CryptoConstants.dsag.modPow(k, CryptoConstants.dsap).mod(CryptoConstants.dsaq);
+        BigInteger r = CryptoConstants.dsag.modPowCT(k, CryptoConstants.dsap).mod(CryptoConstants.dsaq);
         BigInteger kinv = k.modInverse(CryptoConstants.dsaq);
 
         BigInteger M = new NativeBigInteger(1, hash.getData());
