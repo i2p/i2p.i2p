@@ -1,3 +1,5 @@
+* 2014-11-30 0.9.17 released
+
 2014-11-28 kytv
  * Updated PO files from Transifex
  * Updates to geoip.txt and geoipv6.dat.gz based on Maxmind GeoLite Country
