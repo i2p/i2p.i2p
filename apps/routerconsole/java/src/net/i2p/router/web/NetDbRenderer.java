@@ -148,6 +148,13 @@ public class NetDbRenderer {
                 else
                     buf.append(dest.toBase64().substring(0, 6));
                 buf.append(")<br>\n");
+                String b32 = dest.toBase32();
+                buf.append("<a href=\"http://").append(b32).append("\">").append(b32).append("</a><br>\n");
+                String host = _context.namingService().reverseLookup(dest);
+                if (host == null) {
+                    buf.append("<a href=\"/susidns/addressbook.jsp?book=private&amp;destination=")
+                       .append(dest.toBase64()).append("#add\">").append(_("Add to local addressbook")).append("</a><br>\n");    
+                }
             } else {
                 buf.append(" (").append(_("Destination")).append(' ');
                 String host = _context.namingService().reverseLookup(dest);
