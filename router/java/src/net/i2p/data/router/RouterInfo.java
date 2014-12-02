@@ -262,6 +262,18 @@ public class RouterInfo extends DatabaseEntry {
     }
 
     /**
+     * For convenience, the same as getOption("router.version"),
+     * but returns "0" if unset.
+     *
+     * @return non-null, "0" if unknown.
+     * @since 0.9.18
+     */
+    public String getVersion() {
+        String rv = _options.getProperty("router.version");
+        return rv != null ? rv : "0";
+    }
+
+    /**
      * Configure a set of options or statistics that the router can expose.
      * Makes a copy.
      *
