@@ -1232,7 +1232,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                     _context.simpleScheduler().addEvent(new RemoveDropList(remote), DROPLIST_PERIOD);
                 }
                 markUnreachable(peerHash);
-                _context.banlist().banlistRouter(peerHash, "Part of the wrong network, version = " + ((RouterInfo) entry).getOption("router.version"));
+                _context.banlist().banlistRouter(peerHash, "Part of the wrong network, version = " + ((RouterInfo) entry).getVersion());
                 //_context.banlist().banlistRouter(peerHash, "Part of the wrong network", STYLE);
                 dropPeer(peerHash, false, "wrong network");
                 if (_log.shouldLog(Log.WARN))
@@ -1578,8 +1578,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             if (us != null) {
                 RouterIdentity id = us.getIdentity();
                 if (id.getSigType() != SigType.DSA_SHA1) {
-                    String v = toAddress.getOption("router.version");
-                    if (v != null && VersionComparator.comp(v, MIN_SIGTYPE_VERSION) < 0) {
+                    String v = toAddress.getVersion();
+                    if (VersionComparator.comp(v, MIN_SIGTYPE_VERSION) < 0) {
                         markUnreachable(to);
                         return null;
                     }

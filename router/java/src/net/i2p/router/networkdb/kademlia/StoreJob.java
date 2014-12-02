@@ -513,9 +513,7 @@ class StoreJob extends JobImpl {
      * @since 0.7.10
      */
     private static boolean supportsEncryption(RouterInfo ri) {
-        String v = ri.getOption("router.version");
-        if (v == null)
-            return false;
+        String v = ri.getVersion();
         return VersionComparator.comp(v, MIN_ENCRYPTION_VERSION) >= 0;
     }
 
@@ -535,9 +533,7 @@ class StoreJob extends JobImpl {
         }
         if (type == null)
             return false;
-        String v = ri.getOption("router.version");
-        if (v == null)
-            return false;
+        String v = ri.getVersion();
         String since = type.getSupportedSince();
         return VersionComparator.comp(v, since) >= 0;
     }
@@ -549,9 +545,7 @@ class StoreJob extends JobImpl {
      * @since 0.9.12
      */
     public static boolean supportsBigLeaseSets(RouterInfo ri) {
-        String v = ri.getOption("router.version");
-        if (v == null)
-            return false;
+        String v = ri.getVersion();
         return VersionComparator.comp(v, MIN_BIGLEASESET_VERSION) >= 0;
     }
 

@@ -214,9 +214,8 @@ public class DatabaseLookupMessage extends FastI2NPMessageImpl {
     public static boolean supportsEncryptedReplies(RouterInfo to) {
         if (to == null)
             return false;
-        String v = to.getOption("router.version");
-        return v != null &&
-               VersionComparator.comp(v, MIN_ENCRYPTION_VERSION) >= 0;
+        String v = to.getVersion();
+        return VersionComparator.comp(v, MIN_ENCRYPTION_VERSION) >= 0;
     }
     
     /**

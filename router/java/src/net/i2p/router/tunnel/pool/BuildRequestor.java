@@ -238,9 +238,7 @@ abstract class BuildRequestor {
         RouterInfo ri = ctx.netDb().lookupRouterInfoLocally(h);
         if (ri == null)
             return false;
-        String v = ri.getOption("router.version");
-        if (v == null)
-            return false;
+        String v = ri.getVersion();
         return VersionComparator.comp(v, MIN_VARIABLE_VERSION) >= 0;
     }
 

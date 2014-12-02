@@ -697,9 +697,9 @@ public class ProfileOrganizer {
                 //     they probably don't have a TCP hole punched in their firewall either.
                 RouterInfo info = _context.netDb().lookupRouterInfoLocally(peer);
                 if (info != null) {
-                    String v = info.getOption("router.version");
+                    String v = info.getVersion();
                     // this only works if there is no 0.6.1.34!
-                    if (v != null && (!v.equals("0.6.1.33")) &&
+                    if ((!v.equals("0.6.1.33")) &&
                         v.startsWith("0.6.1.") && info.getTargetAddress("NTCP") == null)
                         l.add(peer);
                     else {

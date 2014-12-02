@@ -375,8 +375,8 @@ public class NTCPTransport extends TransportImpl {
         if (us != null) {
             RouterIdentity id = us.getIdentity();
             if (id.getSigType() != SigType.DSA_SHA1) {
-                String v = toAddress.getOption("router.version");
-                if (v != null && VersionComparator.comp(v, MIN_SIGTYPE_VERSION) < 0) {
+                String v = toAddress.getVersion();
+                if (VersionComparator.comp(v, MIN_SIGTYPE_VERSION) < 0) {
                     markUnreachable(peer);
                     return null;
                 }
