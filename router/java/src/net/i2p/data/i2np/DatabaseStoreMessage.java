@@ -105,7 +105,8 @@ public class DatabaseStoreMessage extends FastI2NPMessageImpl {
         _key = Hash.create(data, curIndex);
         curIndex += Hash.HASH_LENGTH;
         
-        type = (int)DataHelper.fromLong(data, curIndex, 1);
+        // as of 0.9.18, ignore other 7 bits of the type byte, in preparation for future options
+        int dbType = data[curIndex] & 0x01;
         curIndex++;
         
         _replyToken = DataHelper.fromLong(data, curIndex, 4);
@@ -124,7 +125,7 @@ public class DatabaseStoreMessage extends FastI2NPMessageImpl {
             _replyGateway = null;
         }
         
-        if (type == DatabaseEntry.KEY_TYPE_LEASESET) {
+        if (dbType == DatabaseEntry.KEY_TYPE_LEASESET) {
             _dbEntry = new LeaseSet();
             try {
                 _dbEntry.readBytes(new ByteArrayInputStream(data, curIndex, data.length-curIndex));
@@ -133,7 +134,7 @@ public class DatabaseStoreMessage extends FastI2NPMessageImpl {
             } catch (IOException ioe) {
                 throw new I2NPMessageException("Error reading the leaseSet", ioe);
             }
-        } else if (type == DatabaseEntry.KEY_TYPE_ROUTERINFO) {
+        } else {   // dbType == DatabaseEntry.KEY_TYPE_ROUTERINFO
             _dbEntry = new RouterInfo();
             int compressedSize = (int)DataHelper.fromLong(data, curIndex, 2);
             curIndex += 2;
@@ -154,8 +155,6 @@ public class DatabaseStoreMessage extends FastI2NPMessageImpl {
             } catch (IOException ioe) {
                 throw new I2NPMessageException("Corrupt compressed routerInfo size = " + compressedSize, ioe);
             }
-        } else {
-            throw new I2NPMessageException("Invalid type of key read from the structure - " + type);
         }
         //if (!key.equals(_dbEntry.getHash()))
         //    throw new I2NPMessageException("Hash mismatch in DSM");
