@@ -302,16 +302,16 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Modified header: [" + modifiedHeader + "]");
             
+            Runnable t;
             if (allowGZIP && useGZIP) {
-                I2PAppThread req = new I2PAppThread(
-                    new CompressedRequestor(s, socket, modifiedHeader, getTunnel().getContext(), _log),
-                        Thread.currentThread().getName()+".hc");
-                req.start();
+                t = new CompressedRequestor(s, socket, modifiedHeader, getTunnel().getContext(), _log);
             } else {
-                Thread t = new I2PTunnelRunner(s, socket, slock, null, modifiedHeader.getBytes(),
+                t = new I2PTunnelRunner(s, socket, slock, null, modifiedHeader.getBytes(),
                                                null, (I2PTunnelRunner.FailCallback) null);
-                t.start();
             }
+            // run in the unlimited client pool
+            //t.start();
+            _clientExecutor.execute(t);
 
             long afterHandle = getTunnel().getContext().clock().now();
             long timeToHandle = afterHandle - afterAccept;

@@ -9,6 +9,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.Executors;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.atomic.AtomicLong;
 
 import net.i2p.I2PAppContext;
 import net.i2p.app.*;
@@ -48,6 +55,21 @@ public class TunnelControllerGroup implements ClientApp {
      */
     private final Map<I2PSession, Set<TunnelController>> _sessions;
     
+    /**
+     *  We keep a pool of socket handlers for all clients,
+     *  as there is no need for isolation on the client side.
+     *  Extending classes may use it for other purposes.
+     *
+     *  May also be used by servers, carefully,
+     *  as there is no limit on threads.
+     */
+    private ThreadPoolExecutor _executor;
+    private static final AtomicLong _executorThreadCount = new AtomicLong();
+    private final Object _executorLock = new Object();
+    /** how long to wait before dropping an idle thread */
+    private static final long HANDLER_KEEPALIVE_MS = 2*60*1000;
+
+
     /**
      *  In I2PAppContext will instantiate if necessary and always return non-null.
      *  As of 0.9.4, when in RouterContext, will return null (except in Android)
@@ -206,8 +228,7 @@ public class TunnelControllerGroup implements ClientApp {
             if (_instance == this)
                 _instance = null;
         }
-/// fixme static
-        I2PTunnelClientBase.killClientExecutor();
+        killClientExecutor();
         changeState(STOPPED);
     }
     
@@ -498,6 +519,61 @@ public class TunnelControllerGroup implements ClientApp {
             } catch (I2PSessionException ise) {
                 _log.error("Error closing the client session", ise);
             }
+        }
+    }
+
+    /**
+     *  @return non-null
+     *  @since 0.8.8 Moved from I2PTunnelClientBase in 0.9.18
+     */
+    ThreadPoolExecutor getClientExecutor() {
+        synchronized (_executorLock) {
+            if (_executor == null)
+                _executor = new CustomThreadPoolExecutor();
+        }
+        return _executor;
+    }
+
+    /**
+     *  @since 0.8.8 Moved from I2PTunnelClientBase in 0.9.18
+     */
+    private void killClientExecutor() {
+        synchronized (_executorLock) {
+            if (_executor != null) {
+                _executor.setRejectedExecutionHandler(new ThreadPoolExecutor.DiscardPolicy());
+                _executor.shutdownNow();
+                _executor = null;
+            }
+        }
+        // kill the shared client, so that on restart in android
+        // we won't latch onto the old one
+        I2PTunnelClientBase.killSharedClient();
+    }
+
+    /**
+     *  Not really needed for now but in case we want to add some hooks like afterExecute().
+     *  Package private for fallback in case TCG.getInstance() is null, never instantiated
+     *  but a plugin still needs it... should be rare.
+     *
+     *  @since 0.9.18 Moved from I2PTunnelClientBase
+     */
+    static class CustomThreadPoolExecutor extends ThreadPoolExecutor {
+        public CustomThreadPoolExecutor() {
+             super(0, Integer.MAX_VALUE, HANDLER_KEEPALIVE_MS, TimeUnit.MILLISECONDS,
+                   new SynchronousQueue<Runnable>(), new CustomThreadFactory());
+        }
+    }
+
+    /**
+     *  Just to set the name and set Daemon
+     *  @since 0.9.18 Moved from I2PTunnelClientBase
+     */
+    private static class CustomThreadFactory implements ThreadFactory {
+        public Thread newThread(Runnable r) {
+            Thread rv = Executors.defaultThreadFactory().newThread(r);
+            rv.setName("I2PTunnel Client Runner " + _executorThreadCount.incrementAndGet());
+            rv.setDaemon(true);
+            return rv;
         }
     }
 }

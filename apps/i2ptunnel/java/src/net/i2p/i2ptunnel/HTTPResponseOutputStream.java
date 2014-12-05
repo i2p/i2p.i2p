@@ -21,6 +21,7 @@ import net.i2p.I2PAppContext;
 import net.i2p.data.ByteArray;
 import net.i2p.util.BigPipedInputStream;
 import net.i2p.util.ByteCache;
+import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 import net.i2p.util.ReusableGZIPInputStream;
 
@@ -251,16 +252,27 @@ class HTTPResponseOutputStream extends FilterOutputStream {
         //out.flush();
         PipedInputStream pi = BigPipedInputStream.getInstance();
         PipedOutputStream po = new PipedOutputStream(pi);
-        // Run in the client thread pool, as there should be an unused thread
-        // there after the accept().
-        // Overridden in I2PTunnelHTTPServer, where it does not use the client pool.
-        try {
-            I2PTunnelClientBase.getClientExecutor().execute(new Pusher(pi, out));
-        } catch (RejectedExecutionException ree) {
-            // shouldn't happen
-            throw ree;
-        }
+        Runnable r = new Pusher(pi, out);
         out = po;
+        // TODO we should be able to do this inline somehow
+        TunnelControllerGroup tcg = TunnelControllerGroup.getInstance();
+        if (tcg != null) {
+            // Run in the client thread pool, as there should be an unused thread
+            // there after the accept().
+            // Overridden in I2PTunnelHTTPServer, where it does not use the client pool.
+            try {
+                tcg.getClientExecutor().execute(r);
+            } catch (RejectedExecutionException ree) {
+                // shouldn't happen
+                throw ree;
+            }
+        } else {
+            // Fallback in case TCG.getInstance() is null, never instantiated
+            // and we were not started by TCG.
+            // Maybe a plugin loaded before TCG? Should be rare.
+            Thread t = new I2PAppThread(r, "Pusher");
+            t.start();
+        }
     }
     
     private class Pusher implements Runnable {

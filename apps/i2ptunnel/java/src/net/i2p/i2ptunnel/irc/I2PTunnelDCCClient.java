@@ -76,7 +76,9 @@ public class I2PTunnelDCCClient extends I2PTunnelClientBase {
         try {
             i2ps = createI2PSocket(dest, opts);
             Thread t = new Runner(s, i2ps);
-            t.start();
+            // we are called from an unlimited thread pool, so run inline
+            //t.start();
+            t.run();
         } catch (Exception ex) {
             _log.error("Could not make DCC connection to " + _dest + ':' + _remotePort, ex);
             closeSocket(s);
