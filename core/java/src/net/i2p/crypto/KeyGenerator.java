@@ -26,6 +26,9 @@ import java.security.spec.ECPublicKeySpec;
 import java.security.spec.EllipticCurve;
 import java.security.spec.RSAKeyGenParameterSpec;
 import java.security.spec.RSAPublicKeySpec;
+import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collection;
 
 import net.i2p.I2PAppContext;
 import net.i2p.crypto.eddsa.EdDSAPrivateKey;
@@ -334,6 +337,9 @@ public class KeyGenerator {
         }
     }
 
+    /**
+     *  Usage: KeyGenerator [sigtype...]
+     */
     public static void main(String args[]) {
         try {
              main2(args);
@@ -342,14 +348,35 @@ public class KeyGenerator {
         }
     }
 
-    public static void main2(String args[]) {
+    /**
+     *  Usage: KeyGenerator [sigtype...]
+     */
+    private static void main2(String args[]) {
         RandomSource.getInstance().nextBoolean();
         try { Thread.sleep(1000); } catch (InterruptedException ie) {}
         int runs = 200; // warmup
+        Collection<SigType> toTest;
+        if (args.length > 0) {
+            toTest = new ArrayList<SigType>();
+            for (int i = 0; i < args.length; i++) {
+                SigType type = SigType.parseSigType(args[i]);
+                if (type != null)
+                    toTest.add(type);
+                else
+                    System.out.println("Unknown type: " + args[i]);
+            }
+            if (toTest.isEmpty()) {
+                System.out.println("No types to test");
+                return;
+            }
+        } else {
+            toTest = Arrays.asList(SigType.values());
+        }
         for (int j = 0; j < 2; j++) {
-            for (SigType type : SigType.values()) {
+            for (SigType type : toTest) {
                 if (!type.isAvailable()) {
                     System.out.println("Skipping unavailable: " + type);
+                    continue;
                 }
                 try {
                     System.out.println("Testing " + type);
