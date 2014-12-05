@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import net.i2p.data.ByteArray;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.PublicKey;
@@ -90,7 +89,7 @@ abstract class BuildRequestor {
                 cfg.getConfig(i-1).setSendTunnelId(cfg.getConfig(i).getReceiveTunnelId());
             byte iv[] = new byte[16];
             ctx.random().nextBytes(iv);
-            cfg.getConfig(i).setReplyIV(new ByteArray(iv));
+            cfg.getConfig(i).setReplyIV(iv);
             cfg.getConfig(i).setReplyKey(ctx.keyGenerator().generateSessionKey());
         }
         // This is in BuildExecutor.buildTunnel() now
@@ -239,9 +238,7 @@ abstract class BuildRequestor {
         RouterInfo ri = ctx.netDb().lookupRouterInfoLocally(h);
         if (ri == null)
             return false;
-        String v = ri.getOption("router.version");
-        if (v == null)
-            return false;
+        String v = ri.getVersion();
         return VersionComparator.comp(v, MIN_VARIABLE_VERSION) >= 0;
     }
 

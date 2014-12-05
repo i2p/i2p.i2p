@@ -173,11 +173,22 @@ public abstract class TransportUtil {
     /**
      *  Is this a valid port for us or a remote router?
      *
+     *  ref: http://i2p-projekt.i2p/en/docs/ports
+     *
      *  @since 0.9.17 moved from logic in individual transports
      */
     public static boolean isValidPort(int port) {
+        // update log message in UDPEndpoint if you update this list
         return port >= 1024 &&
                port <= 65535 &&
-               port != 1900;    // UPnP SSDP
+               port != 1900 &&  // UPnP SSDP
+               port != 2827 &&  // BOB
+               port != 4444 &&  // HTTP
+               port != 4445 &&  // HTTPS
+               port != 6668 &&  // IRC
+               (!(port >= 7650 && port <= 7664)) && // standard I2P range
+               port != 8998 &&  // mtn
+               port != 31000 && // Wrapper
+               port != 32000;   // Wrapper
     }
 }

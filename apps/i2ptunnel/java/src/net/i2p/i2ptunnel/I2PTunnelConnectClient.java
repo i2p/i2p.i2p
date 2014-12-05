@@ -292,7 +292,9 @@ public class I2PTunnelConnectClient extends I2PTunnelHTTPClientBase implements R
                 response = SUCCESS_RESPONSE;
             OnTimeout onTimeout = new OnTimeout(s, s.getOutputStream(), targetRequest, usingWWWProxy, currentProxy, requestId);
             Thread t = new I2PTunnelRunner(s, i2ps, sockLock, data, response, mySockets, onTimeout);
-            t.start();
+            // we are called from an unlimited thread pool, so run inline
+            //t.start();
+            t.run();
         } catch (IOException ex) {
             _log.info(getPrefix(requestId) + "Error trying to connect", ex);
             handleClientException(ex, out, targetRequest, usingWWWProxy, currentProxy, requestId);

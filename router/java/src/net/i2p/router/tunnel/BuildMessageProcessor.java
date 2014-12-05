@@ -2,12 +2,13 @@ package net.i2p.router.tunnel;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.Base64;
-import net.i2p.data.ByteArray;
+import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.PrivateKey;
 import net.i2p.data.SessionKey;
 import net.i2p.data.i2np.BuildRequestRecord;
+import net.i2p.data.i2np.EncryptedBuildRecord;
 import net.i2p.data.i2np.TunnelBuildMessage;
 import net.i2p.router.util.DecayingBloomFilter;
 import net.i2p.router.util.DecayingHashSet;
@@ -32,7 +33,10 @@ public class BuildMessageProcessor {
      * message (so that the reply can be placed in that position after going through the decrypted
      * request record).
      *
-     * @return the current hop's decrypted record
+     * Note that this layer-decrypts the build records in-place.
+     * Do not call this more than once for a given message.
+     *
+     * @return the current hop's decrypted record or null on failure
      */
     public BuildRequestRecord decrypt(I2PAppContext ctx, TunnelBuildMessage msg, Hash ourHash, PrivateKey privKey) {
         Log log = ctx.logManager().getLog(getClass());
@@ -44,35 +48,33 @@ public class BuildMessageProcessor {
         long totalDup = 0;
         long beforeLoop = System.currentTimeMillis();
         for (int i = 0; i < msg.getRecordCount(); i++) {
-            ByteArray rec = msg.getRecord(i);
-            int off = rec.getOffset();
+            EncryptedBuildRecord rec = msg.getRecord(i);
             int len = BuildRequestRecord.PEER_SIZE;
             long beforeEq = System.currentTimeMillis();
-            boolean eq = DataHelper.eq(ourHash.getData(), 0, rec.getData(), off, len);
+            boolean eq = DataHelper.eq(ourHash.getData(), 0, rec.getData(), 0, len);
             totalEq += System.currentTimeMillis()-beforeEq;
             if (eq) {
                 long beforeIsDup = System.currentTimeMillis();
-                boolean isDup = _filter.add(rec.getData(), off + len, 32);
+                boolean isDup = _filter.add(rec.getData(), len, 32);
                 totalDup += System.currentTimeMillis()-beforeIsDup;
                 if (isDup) {
                     if (log.shouldLog(Log.WARN))
                         log.debug(msg.getUniqueId() + ": A record matching our hash was found, but it seems to be a duplicate");
-                    ctx.statManager().addRateData("tunnel.buildRequestDup", 1, 0);
+                    ctx.statManager().addRateData("tunnel.buildRequestDup", 1);
                     return null;
                 }
-                BuildRequestRecord req = new BuildRequestRecord();
                 beforeActualDecrypt = System.currentTimeMillis();
-                boolean ok = req.decryptRecord(ctx, privKey, ourHash, rec);
-                afterActualDecrypt = System.currentTimeMillis();
-                if (ok) {
+                try {
+                    BuildRequestRecord req = new BuildRequestRecord(ctx, privKey, rec);
                     if (log.shouldLog(Log.DEBUG))
                         log.debug(msg.getUniqueId() + ": A record matching our hash was found and decrypted");
                     rv = req;
-                } else {
+                } catch (DataFormatException dfe) {
                     if (log.shouldLog(Log.DEBUG))
                         log.debug(msg.getUniqueId() + ": A record matching our hash was found, but could not be decrypted");
                     return null; // our hop is invalid?  b0rkage
                 }
+                afterActualDecrypt = System.currentTimeMillis();
                 ourHop = i;
             }
         }
@@ -89,11 +91,12 @@ public class BuildMessageProcessor {
         int ivOff = 0;
         for (int i = 0; i < msg.getRecordCount(); i++) {
             if (i != ourHop) {
-                ByteArray data = msg.getRecord(i);
+                EncryptedBuildRecord data = msg.getRecord(i);
                 if (log.shouldLog(Log.DEBUG))
-                    log.debug("Encrypting record " + i + "/?/" + data.getOffset() + "/" + data.getValid() + " with replyKey " + replyKey.toBase64() + "/" + Base64.encode(iv, ivOff, 16));
-                ctx.aes().encrypt(data.getData(), data.getOffset(), data.getData(), data.getOffset(), replyKey, 
-                                  iv, ivOff, data.getValid());
+                    log.debug("Encrypting record " + i + "/? with replyKey " + replyKey.toBase64() + "/" + Base64.encode(iv, ivOff, 16));
+                // corrupts SDS
+                ctx.aes().encrypt(data.getData(), 0, data.getData(), 0, replyKey, 
+                                  iv, ivOff, data.length());
             }
         }
         long afterEncrypt = System.currentTimeMillis();

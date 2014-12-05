@@ -111,7 +111,9 @@ public class I2PTunnelDCCServer extends I2PTunnelServer {
                 _sockList.add(socket);
                 Thread t = new I2PTunnelRunner(s, socket, slock, null, null, _sockList,
                                                (I2PTunnelRunner.FailCallback) null);
-                t.start();
+                // run in the unlimited client pool
+                //t.start();
+                _clientExecutor.execute(t);
                 local.socket = socket;
                 local.expire = getTunnel().getContext().clock().now() + OUTBOUND_EXPIRE;
                 _active.put(Integer.valueOf(myPort), local);

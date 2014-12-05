@@ -368,6 +368,29 @@ public class ProfileOrganizer {
     }
     
     /**
+     *  Replaces integer subTierMode argument, for clarity
+     *
+     *  @since 0.9.18
+     */
+    public enum Slice {
+
+        SLICE_ALL(0x00, 0),
+        SLICE_0_1(0x02, 0),
+        SLICE_2_3(0x02, 2),
+        SLICE_0(0x03, 0),
+        SLICE_1(0x03, 1),
+        SLICE_2(0x03, 2),
+        SLICE_3(0x03, 3);
+
+        final int mask, val;
+
+        Slice(int mask, int val) {
+            this.mask = mask;
+            this.val = val;
+        }
+    }
+
+    /**
      * Return a set of Hashes for peers that are both fast and reliable.  If an insufficient
      * number of peers are both fast and reliable, fall back onto high capacity peers, and if that
      * doesn't contain sufficient peers, fall back onto not failing peers, and even THAT doesn't
@@ -388,15 +411,15 @@ public class ProfileOrganizer {
      *    7: return only from group 3
      *</pre>
      */
-    public void selectFastPeers(int howMany, Set<Hash> exclude, Set<Hash> matches, Hash randomKey, int subTierMode) {
+    public void selectFastPeers(int howMany, Set<Hash> exclude, Set<Hash> matches, Hash randomKey, Slice subTierMode) {
         getReadLock();
         try {
-            if (subTierMode > 0) {
+            if (subTierMode != Slice.SLICE_ALL) {
                 int sz = _fastPeers.size();
-                if (sz < 6 || (subTierMode >= 4 && sz < 12))
-                    subTierMode = 0;
+                if (sz < 6 || (subTierMode.mask >= 3 && sz < 12))
+                    subTierMode = Slice.SLICE_ALL;
             }
-            if (subTierMode > 0)
+            if (subTierMode != Slice.SLICE_ALL)
                 locked_selectPeers(_fastPeers, howMany, exclude, matches, randomKey, subTierMode);
             else
                 locked_selectPeers(_fastPeers, howMany, exclude, matches, 2);
@@ -674,9 +697,9 @@ public class ProfileOrganizer {
                 //     they probably don't have a TCP hole punched in their firewall either.
                 RouterInfo info = _context.netDb().lookupRouterInfoLocally(peer);
                 if (info != null) {
-                    String v = info.getOption("router.version");
+                    String v = info.getVersion();
                     // this only works if there is no 0.6.1.34!
-                    if (v != null && (!v.equals("0.6.1.33")) &&
+                    if ((!v.equals("0.6.1.33")) &&
                         v.startsWith("0.6.1.") && info.getTargetAddress("NTCP") == null)
                         l.add(peer);
                     else {
@@ -1302,7 +1325,8 @@ public class ProfileOrganizer {
      *    7: return only from group 3
      *</pre>
      */
-    private void locked_selectPeers(Map<Hash, PeerProfile> peers, int howMany, Set<Hash> toExclude, Set<Hash> matches, Hash randomKey, int subTierMode) {
+    private void locked_selectPeers(Map<Hash, PeerProfile> peers, int howMany, Set<Hash> toExclude,
+                                    Set<Hash> matches, Hash randomKey, Slice subTierMode) {
         List<Hash> all = new ArrayList<Hash>(peers.keySet());
         // use RandomIterator to avoid shuffling the whole thing
         for (Iterator<Hash> iter = new RandomIterator<Hash>(all); (matches.size() < howMany) && iter.hasNext(); ) {
@@ -1314,13 +1338,8 @@ public class ProfileOrganizer {
             if (_us.equals(peer))
                 continue;
             int subTier = getSubTier(peer, randomKey);
-            if (subTierMode >= 4) {
-                if (subTier != (subTierMode & 0x03))
-                    continue;
-            } else {
-                if ((subTier >> 1) != (subTierMode & 0x01))
-                    continue;
-            }
+            if ((subTier & subTierMode.mask) != subTierMode.val)
+                continue;
             boolean ok = isSelectable(peer);
             if (ok)
                 matches.add(peer);

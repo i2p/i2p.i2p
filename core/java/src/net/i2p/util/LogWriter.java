@@ -25,7 +25,9 @@ import java.util.Queue;
 class LogWriter implements Runnable {
     /** every 10 seconds? why? Just have the gui force a reread after a change?? */
     private final static long CONFIG_READ_INTERVAL = 50 * 1000;
-    private final static long FLUSH_INTERVAL = 29 * 1000;
+    final static long FLUSH_INTERVAL = 29 * 1000;
+    private final static long MIN_FLUSH_INTERVAL = 2*1000;
+    private final static long MAX_FLUSH_INTERVAL = 5*60*1000;
     private long _lastReadConfig;
     private long _numBytesInCurrentFile;
     // volatile as it changes on log file rotation
@@ -38,6 +40,8 @@ class LogWriter implements Runnable {
     private static final int MAX_DISKFULL_MESSAGES = 8;
     private int _diskFullMessageCount;
     private LogRecord _last;
+    // ms
+    private volatile long _flushInterval = FLUSH_INTERVAL;
     
     public LogWriter(LogManager manager) {
         _manager = manager;
@@ -46,6 +50,14 @@ class LogWriter implements Runnable {
 
     public void stopWriting() {
         _write = false;
+    }
+
+    /**
+     *  @param ms
+     *  @since 0.9.18
+     */
+    public void setFlushInterval(long interval) {
+        _flushInterval = Math.min(MAX_FLUSH_INTERVAL, Math.max(MIN_FLUSH_INTERVAL, interval));
     }
     
     public void run() {
@@ -109,7 +121,7 @@ class LogWriter implements Runnable {
             if (shouldWait) {
                 try { 
                     synchronized (this) {
-                        this.wait(FLUSH_INTERVAL); 
+                        this.wait(_flushInterval); 
                     }
                 } catch (InterruptedException ie) { // nop
                 }

@@ -55,9 +55,12 @@ public class I2PSOCKSIRCTunnel extends I2PSOCKSTunnel {
             Thread in = new I2PAppThread(new IrcInboundFilter(clientSock, destSock, expectedPong, _log),
                                          "SOCKS IRC Client " + id + " in", true);
             in.start();
-            Thread out = new I2PAppThread(new IrcOutboundFilter(clientSock, destSock, expectedPong, _log),
-                                          "SOCKS IRC Client " + id + " out", true);
-            out.start();
+            //Thread out = new I2PAppThread(new IrcOutboundFilter(clientSock, destSock, expectedPong, _log),
+            //                              "SOCKS IRC Client " + id + " out", true);
+            Runnable out = new IrcOutboundFilter(clientSock, destSock, expectedPong, _log);
+            // we are called from an unlimited thread pool, so run inline
+            //out.start();
+            out.run();
         } catch (SOCKSException e) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Error from SOCKS connection", e);

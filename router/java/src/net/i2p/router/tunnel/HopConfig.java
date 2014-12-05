@@ -1,6 +1,5 @@
 package net.i2p.router.tunnel;
 
-import net.i2p.data.ByteArray;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.SessionKey;
@@ -20,7 +19,7 @@ public class HopConfig {
     private SessionKey _layerKey;
     private SessionKey _ivKey;
     private SessionKey _replyKey;
-    private ByteArray _replyIV;
+    private byte[] _replyIV;
     private long _creation;
     private long _expiration;
     //private Map _options;
@@ -87,9 +86,23 @@ public class HopConfig {
     public SessionKey getReplyKey() { return _replyKey; }
     public void setReplyKey(SessionKey key) { _replyKey = key; }
     
-    /** iv used to encrypt the reply sent for the new tunnel creation crypto */
-    public ByteArray getReplyIV() { return _replyIV; }
-    public void setReplyIV(ByteArray iv) { _replyIV = iv; }
+    /**
+     *  IV used to encrypt the reply sent for the new tunnel creation crypto
+     *
+     *  @return 16 bytes
+     */
+    public byte[] getReplyIV() { return _replyIV; }
+
+    /**
+     *  IV used to encrypt the reply sent for the new tunnel creation crypto
+     *
+     *  @throws IllegalArgumentException if not 16 bytes
+     */
+    public void setReplyIV(byte[] iv) {
+        if (iv.length != REPLY_IV_LENGTH)
+            throw new IllegalArgumentException();
+        _replyIV = iv;
+    }
     
     /** when does this tunnel expire (in ms since the epoch)? */
     public long getExpiration() { return _expiration; }

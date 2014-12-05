@@ -122,9 +122,11 @@ public class I2PTunnelClient extends I2PTunnelClientBase {
             int port = addr.getPort();
             i2ps = createI2PSocket(clientDest, port);
             i2ps.setReadTimeout(readTimeout);
-            Thread t = new I2PTunnelRunner(s, i2ps, sockLock, null, null, mySockets,
+            I2PTunnelRunner t = new I2PTunnelRunner(s, i2ps, sockLock, null, null, mySockets,
                                 (I2PTunnelRunner.FailCallback) null);
-            t.start();
+            // we are called from an unlimited thread pool, so run inline
+            //t.start();
+            t.run();
         } catch (Exception ex) {
             if (_log.shouldLog(Log.INFO))
                 _log.info("Error connecting", ex);

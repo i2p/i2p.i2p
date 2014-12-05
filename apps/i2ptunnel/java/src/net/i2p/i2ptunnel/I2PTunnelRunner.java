@@ -62,8 +62,6 @@ public class I2PTunnelRunner extends I2PAppThread implements I2PSocket.SocketErr
     private long totalSent;
     private long totalReceived;
 
-    private static final AtomicLong __forwarderId = new AtomicLong();
-    
     /**
      *  For use in new constructor
      *  @since 0.9.14
@@ -268,9 +266,10 @@ public class I2PTunnelRunner extends I2PAppThread implements I2PSocket.SocketErr
                 in = new BufferedInputStream(in, 2*NETWORK_BUFFER_SIZE);
             StreamForwarder toI2P = new StreamForwarder(in, i2pout, true);
             StreamForwarder fromI2P = new StreamForwarder(i2pin, out, false);
-            // TODO can we run one of these inline and save a thread?
             toI2P.start();
-            fromI2P.start();
+            // We are already a thread, so run the second one inline
+            //fromI2P.start();
+            fromI2P.run();
             synchronized (finishLock) {
                 while (!finished) {
                     finishLock.wait();
@@ -384,7 +383,8 @@ public class I2PTunnelRunner extends I2PAppThread implements I2PSocket.SocketErr
             // ignore
         }
         t1.join(30*1000);
-        t2.join(30*1000);
+        // t2 = fromI2P now run inline
+        //t2.join(30*1000);
     }
     
     /**
@@ -426,7 +426,7 @@ public class I2PTunnelRunner extends I2PAppThread implements I2PSocket.SocketErr
             _toI2P = toI2P;
             direction = (toI2P ? "toI2P" : "fromI2P");
             _cache = ByteCache.getInstance(32, NETWORK_BUFFER_SIZE);
-            setName("StreamForwarder " + _runnerId + '.' + __forwarderId.incrementAndGet());
+            setName("StreamForwarder " + _runnerId + '.' + direction);
         }
 
         @Override

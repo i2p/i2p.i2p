@@ -425,7 +425,7 @@ public class TunnelController implements Logging {
         // We use _sessions AND the tunnel sessions as
         // _sessions will be null for delay-open tunnels - see acquire().
         // We want the current sessions.
-        Set<I2PSession> sessions = new HashSet(_tunnel.getSessions());
+        Set<I2PSession> sessions = new HashSet<I2PSession>(_tunnel.getSessions());
         if (_sessions != null)
             sessions.addAll(_sessions);
         return sessions;

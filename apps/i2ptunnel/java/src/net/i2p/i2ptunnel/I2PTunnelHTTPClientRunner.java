@@ -86,7 +86,8 @@ public class I2PTunnelHTTPClientRunner extends I2PTunnelRunner {
             // ignore
         }
         t1.join(30*1000);
-        t2.join(30*1000);
+        // t2 = fromI2P now run inline
+        //t2.join(30*1000);
     }
     
 }

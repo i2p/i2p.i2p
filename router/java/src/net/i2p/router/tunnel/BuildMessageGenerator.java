@@ -3,11 +3,11 @@ package net.i2p.router.tunnel;
 import java.util.List;
 
 import net.i2p.I2PAppContext;
-import net.i2p.data.ByteArray;
 import net.i2p.data.Hash;
 import net.i2p.data.PublicKey;
 import net.i2p.data.SessionKey;
 import net.i2p.data.i2np.BuildRequestRecord;
+import net.i2p.data.i2np.EncryptedBuildRecord;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.i2np.TunnelBuildMessage;
 
@@ -54,33 +54,41 @@ public abstract class BuildMessageGenerator {
      * containing the hop's configuration (as well as the reply info, if it is an outbound endpoint)
      *
      * @param msg out parameter
+     * @throws IllegalArgumentException if hop bigger than config
      */
     public static void createRecord(int recordNum, int hop, TunnelBuildMessage msg,
                                     TunnelCreatorConfig cfg, Hash replyRouter,
                                     long replyTunnel, I2PAppContext ctx, PublicKey peerKey) {
-        byte encrypted[] = new byte[TunnelBuildMessage.RECORD_SIZE];
         //Log log = ctx.logManager().getLog(BuildMessageGenerator.class);
+        EncryptedBuildRecord erec;
         if (peerKey != null) {
             BuildRequestRecord req = null;
             if ( (!cfg.isInbound()) && (hop + 1 == cfg.getLength()) ) //outbound endpoint
                 req = createUnencryptedRecord(ctx, cfg, hop, replyRouter, replyTunnel);
             else
                 req = createUnencryptedRecord(ctx, cfg, hop, null, -1);
+            if (req == null)
+                throw new IllegalArgumentException("hop bigger than config");
             Hash peer = cfg.getPeer(hop);
             //if (log.shouldLog(Log.DEBUG))
             //    log.debug("Record " + recordNum + "/" + hop + "/" + peer.toBase64() 
             //              + ": unencrypted = " + Base64.encode(req.getData().getData()));
-            req.encryptRecord(ctx, peerKey, peer, encrypted, 0);
+            erec = req.encryptRecord(ctx, peerKey, peer);
             //if (log.shouldLog(Log.DEBUG))
             //    log.debug("Record " + recordNum + "/" + hop + ": encrypted   = " + Base64.encode(encrypted));
         } else {
             //if (log.shouldLog(Log.DEBUG))
             //    log.debug("Record " + recordNum + "/" + hop + "/ is blank/random");
+            byte encrypted[] = new byte[TunnelBuildMessage.RECORD_SIZE];
             ctx.random().nextBytes(encrypted);
+            erec = new EncryptedBuildRecord(encrypted);
         }
-        msg.setRecord(recordNum, new ByteArray(encrypted));
+        msg.setRecord(recordNum, erec);
     }
     
+    /**
+     *  Returns null if hop >= cfg.length
+     */
     private static BuildRequestRecord createUnencryptedRecord(I2PAppContext ctx, TunnelCreatorConfig cfg, int hop,
                                                               Hash replyRouter, long replyTunnel) {
         //Log log = ctx.logManager().getLog(BuildMessageGenerator.class);
@@ -111,11 +119,11 @@ public abstract class BuildMessageGenerator {
             SessionKey layerKey = hopConfig.getLayerKey();
             SessionKey ivKey = hopConfig.getIVKey();
             SessionKey replyKey = hopConfig.getReplyKey();
-            byte iv[] = hopConfig.getReplyIV().getData();
-            if ( (iv == null) || (iv.length != BuildRequestRecord.IV_SIZE) ) {
+            byte iv[] = hopConfig.getReplyIV();
+            if (iv == null) {
                 iv = new byte[BuildRequestRecord.IV_SIZE];
                 ctx.random().nextBytes(iv);
-                hopConfig.getReplyIV().setData(iv);
+                hopConfig.setReplyIV(iv);
             }
             boolean isInGW = (cfg.isInbound() && (hop == 0));
             boolean isOutEnd = (!cfg.isInbound() && (hop + 1 >= cfg.getLength()));
@@ -132,9 +140,9 @@ public abstract class BuildMessageGenerator {
             //    log.debug("Hop " + hop + " has the next message ID of " + nextMsgId + " for " + cfg 
             //              + " with replyKey " + replyKey.toBase64() + " and replyIV " + Base64.encode(iv));
             
-            BuildRequestRecord rec= new BuildRequestRecord();
-            rec.createRecord(ctx, recvTunnelId, peer, nextTunnelId, nextPeer, nextMsgId, layerKey, ivKey, replyKey, 
-                             iv, isInGW, isOutEnd);
+            BuildRequestRecord rec= new BuildRequestRecord(ctx, recvTunnelId, peer, nextTunnelId, nextPeer,
+                                                           nextMsgId, layerKey, ivKey, replyKey, 
+                                                           iv, isInGW, isOutEnd);
 
             return rec;
         } else {
@@ -143,7 +151,11 @@ public abstract class BuildMessageGenerator {
     }
     
     /**
-     * Encrypt the records so their hop ident is visible at the appropriate times
+     * Encrypt the records so their hop ident is visible at the appropriate times.
+     *
+     * Note that this layer-encrypts the build records for the message in-place.
+     * Only call this onece for a given message.
+     *
      * @param order list of hop #s as Integers.  For instance, if (order.get(1) is 4), it is peer cfg.getPeer(4)
      */
     public static void layeredEncrypt(I2PAppContext ctx, TunnelBuildMessage msg,
@@ -151,7 +163,7 @@ public abstract class BuildMessageGenerator {
         //Log log = ctx.logManager().getLog(BuildMessageGenerator.class);
         // encrypt the records so that the right elements will be visible at the right time
         for (int i = 0; i < msg.getRecordCount(); i++) {
-            ByteArray rec = msg.getRecord(i);
+            EncryptedBuildRecord rec = msg.getRecord(i);
             Integer hopNum = order.get(i);
             int hop = hopNum.intValue();
             if ( (isBlank(cfg, hop)) || (!cfg.isInbound() && hop == 1) ) {
@@ -166,12 +178,12 @@ public abstract class BuildMessageGenerator {
             for (int j = hop-1; j >= stop; j--) {
                 HopConfig hopConfig = cfg.getConfig(j);
                 SessionKey key = hopConfig.getReplyKey();
-                byte iv[] = hopConfig.getReplyIV().getData();
-                int off = rec.getOffset();
+                byte iv[] = hopConfig.getReplyIV();
                 //if (log.shouldLog(Log.DEBUG))
                 //    log.debug(msg.getUniqueId() + ": pre-decrypting record " + i + "/" + hop + " for " + cfg 
                 //              + " with " + key.toBase64() + "/" + Base64.encode(iv));
-                ctx.aes().decrypt(rec.getData(), off, rec.getData(), off, key, iv, TunnelBuildMessage.RECORD_SIZE);
+                // corrupts the SDS
+                ctx.aes().decrypt(rec.getData(), 0, rec.getData(), 0, key, iv, TunnelBuildMessage.RECORD_SIZE);
             }
         }
         //if (log.shouldLog(Log.DEBUG))

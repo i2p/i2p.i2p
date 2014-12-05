@@ -56,7 +56,9 @@ public class I2PSOCKSTunnel extends I2PTunnelClientBase {
             I2PSocket destSock = serv.getDestinationI2PSocket(this);
             Thread t = new I2PTunnelRunner(clientSock, destSock, sockLock, null, null, mySockets,
                                            (I2PTunnelRunner.FailCallback) null);
-            t.start();
+            // we are called from an unlimited thread pool, so run inline
+            //t.start();
+            t.run();
         } catch (SOCKSException e) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Error from SOCKS connection", e);

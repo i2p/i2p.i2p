@@ -16,12 +16,8 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-import java.util.concurrent.Executors;
-import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicLong;
 
 import javax.net.ssl.SSLServerSocket;
@@ -77,18 +73,7 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
     // true if we are chained from a server.
     private boolean chained;
 
-    /** how long to wait before dropping an idle thread */
-    private static final long HANDLER_KEEPALIVE_MS = 2*60*1000;
-
-    /**
-     *  We keep a static pool of socket handlers for all clients,
-     *  as there is no need for isolation on the client side.
-     *  Extending classes may use it for other purposes.
-     *  Not for use by servers, as there is no limit on threads.
-     */
-    private static volatile ThreadPoolExecutor _executor;
-    private static int _executorThreadCount;
-    private static final Object _executorLock = new Object();
+    private volatile ThreadPoolExecutor _executor;
 
     public static final String PROP_USE_SSL = I2PTunnelServer.PROP_USE_SSL;
 
@@ -115,11 +100,6 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
         _context.statManager().createRateStat("i2ptunnel.client.manageTime", "How long it takes to accept a socket and fire it into an i2ptunnel runner (or queue it for the pool)?", "I2PTunnel", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("i2ptunnel.client.buildRunTime", "How long it takes to run a queued socket into an i2ptunnel runner?", "I2PTunnel", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
         _log = _context.logManager().getLog(getClass());
-
-        synchronized (_executorLock) {
-            if (_executor == null)
-                _executor = new CustomThreadPoolExecutor();
-        }
 
         Thread t = new I2PAppThread(this, "Client " + tunnel.listenHost + ':' + localPort);
         t.start();
@@ -183,11 +163,6 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
         _context.statManager().createRateStat("i2ptunnel.client.manageTime", "How long it takes to accept a socket and fire it into an i2ptunnel runner (or queue it for the pool)?", "I2PTunnel", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("i2ptunnel.client.buildRunTime", "How long it takes to run a queued socket into an i2ptunnel runner?", "I2PTunnel", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
         _log = _context.logManager().getLog(getClass());
-
-        synchronized (_executorLock) {
-            if (_executor == null)
-                _executor = new CustomThreadPoolExecutor();
-        }
 
         // normalize path so we can find it
         if (pkf != null) {
@@ -359,6 +334,16 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
             socketManager = buildSocketManager(tunnel, pkf);
         }
         return socketManager;
+    }
+
+    /**
+     *  Kill the shared client, so that on restart in android
+     *  we won't latch onto the old one
+     *
+     *  @since 0.9.18
+     */
+    protected static synchronized void killSharedClient() {
+        socketManager = null;
     }
 
     /**
@@ -653,6 +638,16 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
                 }
             }
 
+            TunnelControllerGroup tcg = TunnelControllerGroup.getInstance();
+            if (tcg != null) {
+                _executor = tcg.getClientExecutor();
+            } else {
+                // Fallback in case TCG.getInstance() is null, never instantiated
+                // and we were not started by TCG.
+                // Maybe a plugin loaded before TCG? Should be rare.
+                // Never shut down.
+                _executor = new TunnelControllerGroup.CustomThreadPoolExecutor();
+            }
             while (open) {
                 Socket s = ss.accept();
                 manageConnection(s);
@@ -669,30 +664,6 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
             synchronized (this) {
                 notifyAll();
             }
-        }
-    }
-
-    /**
-     *  @return may be null if no class has been instantiated
-     *  @since 0.8.8
-     */
-    static ThreadPoolExecutor getClientExecutor() {
-        return _executor;
-    }
-
-    /**
-     *  @since 0.8.8
-     */
-    static void killClientExecutor() {
-        synchronized (_executorLock) {
-            if (_executor != null) {
-                _executor.setRejectedExecutionHandler(new ThreadPoolExecutor.DiscardPolicy());
-                _executor.shutdownNow();
-                _executor = null;
-            }
-            // kill the shared client, so that on restart in android
-            // we won't latch onto the old one
-            socketManager = null;
         }
     }
 
@@ -718,26 +689,6 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
              try {
                  s.close();
              } catch (IOException ioe) {}
-        }
-    }
-
-    /**
-     * Not really needed for now but in case we want to add some hooks like afterExecute().
-     */
-    private static class CustomThreadPoolExecutor extends ThreadPoolExecutor {
-        public CustomThreadPoolExecutor() {
-             super(0, Integer.MAX_VALUE, HANDLER_KEEPALIVE_MS, TimeUnit.MILLISECONDS,
-                   new SynchronousQueue<Runnable>(), new CustomThreadFactory());
-        }
-    }
-
-    /** just to set the name and set Daemon */
-    private static class CustomThreadFactory implements ThreadFactory {
-        public Thread newThread(Runnable r) {
-            Thread rv = Executors.defaultThreadFactory().newThread(r);
-            rv.setName("I2PTunnel Client Runner " + (++_executorThreadCount));
-            rv.setDaemon(true);
-            return rv;
         }
     }
 
@@ -822,7 +773,10 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
     
     /**
      * Manage a connection in a separate thread. This only works if
-     * you do not override manageConnection()
+     * you do not override manageConnection().
+     *
+     * This is run in a thread from an unlimited-size thread pool,
+     * so it may block or run indefinitely.
      */
     protected abstract void clientConnectionRun(Socket s);
 }

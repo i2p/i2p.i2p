@@ -1,7 +1,6 @@
 package net.i2p.data.i2np;
 
 import net.i2p.I2PAppContext;
-import net.i2p.data.ByteArray;
 import net.i2p.data.DataHelper;
 
 /**
@@ -38,7 +37,7 @@ public class VariableTunnelBuildReplyMessage extends TunnelBuildReplyMessage {
         RECORD_COUNT = r;
         if (dataSize != calculateWrittenLength()) 
             throw new I2NPMessageException("Wrong length (expects " + calculateWrittenLength() + ", recv " + dataSize + ")");
-        _records = new ByteArray[RECORD_COUNT];
+        _records = new EncryptedBuildRecord[RECORD_COUNT];
         super.readMessage(data, offset + 1, dataSize, type);
     }
     
@@ -53,7 +52,7 @@ public class VariableTunnelBuildReplyMessage extends TunnelBuildReplyMessage {
         // can't call super, written length check will fail
         //return super.writeMessageBody(out, curIndex + 1);
         for (int i = 0; i < RECORD_COUNT; i++) {
-            System.arraycopy(_records[i].getData(), _records[i].getOffset(), out, curIndex, RECORD_SIZE);
+            System.arraycopy(_records[i].getData(), 0, out, curIndex, RECORD_SIZE);
             curIndex += RECORD_SIZE;
         }
         return curIndex;

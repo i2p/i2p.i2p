@@ -140,7 +140,9 @@ public class I2PTunnelIRCServer extends I2PTunnelServer implements Runnable {
             Socket s = getSocket(socket.getPeerDestination().calculateHash(), socket.getLocalPort());
             Thread t = new I2PTunnelRunner(s, socket, slock, null, modifiedRegistration.getBytes(),
                                            null, (I2PTunnelRunner.FailCallback) null);
-            t.start();
+            // run in the unlimited client pool
+            //t.start();
+            _clientExecutor.execute(t);
         } catch (SocketException ex) {
             try {
                 // Send a response so the user doesn't just see a disconnect

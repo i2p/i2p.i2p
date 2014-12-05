@@ -108,6 +108,9 @@ public class DataHelper {
      * for the value. Finally after that comes the literal UTF-8 character ';'. This key=value;
      * is repeated until there are no more bytes (not characters!) left as defined by the
      * first two byte integer.
+     *
+     *  As of 0.9.18, throws DataFormatException on duplicate key
+     *
      * @param rawStream stream to read the mapping from
      * @throws DataFormatException if the format is invalid
      * @throws IOException if there is a problem reading the data
@@ -122,7 +125,14 @@ public class DataHelper {
 
     /**
      *  Ditto, load into an existing properties
+     *
+     *  As of 0.9.18, throws DataFormatException on duplicate key
+     *
      *  @param props the Properties to load into
+     *  @param rawStream stream to read the mapping from
+     *  @throws DataFormatException if the format is invalid
+     *  @throws IOException if there is a problem reading the data
+     *  @return the parameter props
      *  @since 0.8.13
      */
     public static Properties readProperties(InputStream rawStream, Properties props) 
@@ -148,7 +158,9 @@ public class DataHelper {
             if ((read != semiBuf.length) || (!eq(semiBuf, SEMICOLON_BYTES))) {
                 throw new DataFormatException("Bad value");
             }
-            props.put(key, val);
+            Object old = props.put(key, val);
+            if (old != null)
+                throw new DataFormatException("Duplicate key " + key);
         }
         return props;
     }
@@ -299,6 +311,8 @@ public class DataHelper {
      * Warning - confusing method name, Properties is the target.
      * Strings must be UTF-8 encoded in the byte array.
      *
+     *  As of 0.9.18, throws DataFormatException on duplicate key
+     *
      * @param source source
      * @param target returned Properties
      * @return new offset
@@ -333,7 +347,9 @@ public class DataHelper {
             } catch (IOException ioe) {
                 throw new DataFormatException("Bad value", ioe);
             }
-            target.put(key, val);
+            Object old= target.put(key, val);
+            if (old != null)
+                throw new DataFormatException("Duplicate key " + key);
         }
         return offset + size;
     }
@@ -398,6 +414,9 @@ public class DataHelper {
      * - '=' is the only key-termination character (not ':' or whitespace)
      *
      * As of 0.9.10, an empty value is allowed.
+     *
+     * As in Java Properties, duplicate keys are allowed, last one wins.
+     *
      */
     public static void loadProps(Properties props, File file) throws IOException {
         loadProps(props, file, false);

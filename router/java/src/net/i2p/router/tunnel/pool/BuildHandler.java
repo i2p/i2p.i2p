@@ -6,7 +6,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import net.i2p.data.Base64;
-import net.i2p.data.ByteArray;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.router.RouterIdentity;
@@ -14,6 +13,7 @@ import net.i2p.data.router.RouterInfo;
 import net.i2p.data.TunnelId;
 import net.i2p.data.i2np.BuildRequestRecord;
 import net.i2p.data.i2np.BuildResponseRecord;
+import net.i2p.data.i2np.EncryptedBuildRecord;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.i2np.TunnelBuildMessage;
 import net.i2p.data.i2np.TunnelBuildReplyMessage;
@@ -782,13 +782,13 @@ class BuildHandler implements Runnable {
             return;
         }
 
-        byte reply[] = BuildResponseRecord.create(_context, response, req.readReplyKey(), req.readReplyIV(), state.msg.getUniqueId());
+        EncryptedBuildRecord reply = BuildResponseRecord.create(_context, response, req.readReplyKey(), req.readReplyIV(), state.msg.getUniqueId());
         int records = state.msg.getRecordCount();
         int ourSlot = -1;
         for (int j = 0; j < records; j++) {
             if (state.msg.getRecord(j) == null) {
                 ourSlot = j;
-                state.msg.setRecord(j, new ByteArray(reply));
+                state.msg.setRecord(j, reply);
                 //if (_log.shouldLog(Log.DEBUG))
                 //    _log.debug("Full reply record for slot " + ourSlot + "/" + ourId + "/" + nextId + "/" + req.readReplyMessageId()
                 //               + ": " + Base64.encode(reply));
