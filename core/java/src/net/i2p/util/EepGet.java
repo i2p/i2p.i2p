@@ -1312,18 +1312,32 @@ public class EepGet {
         return buf.toString();
     }
 
+    /**
+     *  After fetch, the received value from the server, or null if none.
+     *  Before fetch, and after some errors, may be the value passed in the constructor.
+     */
     public String getETag() {
         return _etag;
     }
     
+    /**
+     *  After fetch, the received value from the server, or null if none.
+     *  Before fetch, and after some errors, may be the value passed in the constructor.
+     */
     public String getLastModified() {
         return _lastModified;
     }
     
+    /**
+     *  @return true if the server returned 304
+     */
     public boolean getNotModified() {
         return _notModified;
     }
     
+    /**
+     *  After fetch, the received value from the server, or null if none.
+     */
     public String getContentType() {
         return _contentType;
     }
