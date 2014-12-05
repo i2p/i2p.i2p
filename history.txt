@@ -1,3 +1,37 @@
+2014-12-05 zzz
+Prop from i2p.i2p.zzz.test2:
+ * Console:
+   - Show b32 for local leasesets also on netdb LS tab
+ * Data:
+   - Disallow duplicate keys in a Mapping
+   - Add RouterInfo.getVersion()
+ * I2NP:
+   - Move some data structures away from ByteArray; offsets were always zero
+     - New BuildRequestRecord constructors
+     - BuildRequestRecord field becomes final byte[222]
+     - IV becomes byte[16]
+     - Build record becomes EncryptedBuildRecord
+   - Remove extra copy in BuildRequestRecord.encryptRecord()
+   - Remove unused BuildRequestRecord.readOurIdentityMatches()
+   - DatabaseStoreMessage: Mask the unused bits in the type field for future use
+ * i2psnark: Reduce auto-stop threshold for update torrent
+ * I2PTunnel: Reduce i2ptunnel threads, more thread pooling.
+   - Move client pool from static inI2PTunnelClientBase to TCG.
+   - Use client pool for some server threads
+   - Run some things inline that were formerly threads
+ * KeyGenerator: main() test improvements
+ * Logger: Configurable flush interval
+ * Plugins: Another fix for restarting a ClientApp plugin
+ * Profiles: Change slice selection argument from an int to an enum for clarity
+ * SusiMail:
+   - Add save-as button
+   - Fix encoding for filename in Content-Disposition header
+ * Transport:
+   - Disallow standard I2P application ports as the router port
+   - Increase default class O conn. limits to 350 NTCP, 1050 SSU
+ * Update: Use last-modified instead of last-checked for the next
+   if-modified-since fetch, to fix failing to fetch the latest news
+
 * 2014-11-30 0.9.17 released
 
 2014-11-28 kytv
