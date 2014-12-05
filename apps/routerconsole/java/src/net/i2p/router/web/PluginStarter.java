@@ -843,9 +843,10 @@ public class PluginStarter implements Runnable {
             }
         }
 
+        boolean isClientThreadRunning = isClientThreadRunning(pluginName, ctx);
         if (log.shouldLog(Log.DEBUG))
-            log.debug("plugin name = <" + pluginName + ">; threads running? " + isClientThreadRunning(pluginName) + "; webapp runing? " + isWarRunning + "; jobs running? " + isJobRunning);
-        return isClientThreadRunning(pluginName) || isWarRunning || isJobRunning;
+            log.debug("plugin name = <" + pluginName + ">; threads running? " + isClientThreadRunning + "; webapp runing? " + isWarRunning + "; jobs running? " + isJobRunning);
+        return isClientThreadRunning || isWarRunning || isJobRunning;
         //
         //if (log.shouldLog(Log.DEBUG))
         //    log.debug("plugin name = <" + pluginName + ">; threads running? " + isClientThreadRunning(pluginName) + "; webapp runing? " + WebAppStarter.isWebAppRunning(pluginName) + "; jobs running? " + isJobRunning);
@@ -858,24 +859,30 @@ public class PluginStarter implements Runnable {
      * @param pluginName
      * @return true if running
      */
-    private static boolean isClientThreadRunning(String pluginName) {
+    private static boolean isClientThreadRunning(String pluginName, RouterContext ctx) {
         ThreadGroup group = pluginThreadGroups.get(pluginName);
         if (group == null)
             return false;
         boolean rv = group.activeCount() > 0;
         
-      /**** debugging to figure out active threads
+        // Plugins start before the eepsite, and will create the static Timer thread
+        // in RolloverFileOutputStream, which never stops. Don't count it.
         if (rv) {
-            Thread[] activeThreads = new Thread[32];
+            Log log = ctx.logManager().getLog(PluginStarter.class);
+            Thread[] activeThreads = new Thread[128];
             int count = group.enumerate(activeThreads);
+            boolean notRollover = false;
             for (int i = 0; i < count; i++) {
                 if (activeThreads[i] != null) {
-                    System.err.println("Found " + activeThreads[i].getState() + " thread for " +
-                                       pluginName + ": " + activeThreads[i].getName());
+                    String name = activeThreads[i].getName();
+                    if (!"org.eclipse.jetty.util.RolloverFileOutputStream".equals(name))
+                        notRollover = true;
+                    if (log.shouldLog(Log.DEBUG))
+                        log.debug("Found " + activeThreads[i].getState() + " thread for " + pluginName + ": " + name);
                 }
             }
+            rv = notRollover;
         }
-      ****/
 
         return rv;
     }
