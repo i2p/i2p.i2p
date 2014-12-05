@@ -680,17 +680,21 @@ public class DataHelper {
     }
     
     /**
+     * Big endian.
+     *
      * @param numBytes 1-8
      * @param value non-negative
+     * @return an array of length numBytes
      */
     public static byte[] toLong(int numBytes, long value) throws IllegalArgumentException {
-        if (value < 0) throw new IllegalArgumentException("Negative value not allowed");
         byte val[] = new byte[numBytes];
         toLong(val, 0, numBytes, value);
         return val;
     }
     
     /**
+     * Big endian.
+     *
      * @param numBytes 1-8
      * @param value non-negative
      */
@@ -712,6 +716,7 @@ public class DataHelper {
      * @since 0.8.12
      */
     public static void toLongLE(byte target[], int offset, int numBytes, long value) {
+        if (numBytes <= 0 || numBytes > 8) throw new IllegalArgumentException("Invalid number of bytes");
         if (value < 0) throw new IllegalArgumentException("Negative value not allowed");
         int limit = offset + numBytes;
         for (int i = offset; i < limit; i++) {
@@ -721,6 +726,8 @@ public class DataHelper {
     }
     
     /**
+     * Big endian.
+     *
      * @param src if null returns 0
      * @param numBytes 1-8
      * @return non-negative
@@ -728,6 +735,7 @@ public class DataHelper {
      * @throws IllegalArgumentException if negative (only possible if numBytes = 8)
      */
     public static long fromLong(byte src[], int offset, int numBytes) {
+        if (numBytes <= 0 || numBytes > 8) throw new IllegalArgumentException("Invalid number of bytes");
         if ( (src == null) || (src.length == 0) )
             return 0;
         
@@ -752,6 +760,7 @@ public class DataHelper {
      * @since 0.8.12
      */
     public static long fromLongLE(byte src[], int offset, int numBytes) {
+        if (numBytes <= 0 || numBytes > 8) throw new IllegalArgumentException("Invalid number of bytes");
         long rv = 0;
         for (int i = offset + numBytes - 1; i >= offset; i--) {
             rv <<= 8;
