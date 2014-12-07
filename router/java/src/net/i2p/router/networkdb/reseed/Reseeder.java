@@ -74,11 +74,12 @@ public class Reseeder {
               "http://cowpuncher.drollette.com/netdb/" + "," +
               "http://i2p.mooo.com/netDb/" + "," +
               "http://193.150.121.66/netDb/" + "," +
-              "http://netdb.i2p2.no/" + "," +
+              "http://netdb.i2p2.no/" + "," + // Only SU3 (v3) support
               "http://reseed.info/"  + "," +
               "http://us.reseed.i2p2.no/" + "," +
               "http://uk.reseed.i2p2.no/" + "," +
-              "http://jp.reseed.i2p2.no/" + "," +
+              // (Temp?) disable due to extended downtime (ticket #1422)
+              //"http://jp.reseed.i2p2.no/" + "," +
               "http://i2p-netdb.innovatio.no/" + "," +
               "http://ieb9oopo.mooo.com/";
 
@@ -88,11 +89,12 @@ public class Reseeder {
               "https://cowpuncher.drollette.com/netdb/" + "," +
               "https://i2p.mooo.com/netDb/" + "," +
               "https://193.150.121.66/netDb/" + "," +
-              "https://netdb.i2p2.no/" + "," +
+              "https://netdb.i2p2.no/" + "," + // Only SU3 (v3) support
               "https://reseed.info/"  + "," +
               "https://us.reseed.i2p2.no:444/" + "," +
               "https://uk.reseed.i2p2.no:444/" + "," +
-              "https://jp.reseed.i2p2.no:444/" + "," +
+              // (Temp?) disable due to extended downtime (ticket #1422)
+              //"https://jp.reseed.i2p2.no:444/" + "," +
               "https://i2p-netdb.innovatio.no/" + "," +
               "https://ssl.webpack.de/ivae2he9.sg4.e-plaza.de/" + "," + // Only HTTPS and SU3 (v2) support
               "https://link.mx24.eu/" + "," + // Only HTTPS and SU3 (v3) support
