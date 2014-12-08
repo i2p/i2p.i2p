@@ -2693,7 +2693,7 @@ public class I2PSnarkServlet extends BasicServlet {
             buf.append("&nbsp;<b>")
                .append(_("Info hash"))
                .append(":</b> ")
-               .append(hex)
+               .append(hex.toUpperCase(Locale.US))
                .append("</td></tr>\n");
 
             String announce = null;
