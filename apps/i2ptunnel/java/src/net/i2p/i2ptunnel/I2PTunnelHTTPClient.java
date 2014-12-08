@@ -614,7 +614,8 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                                         // Store in local HashMap unless there is conflict
                                         String old = addressHelpers.putIfAbsent(destination.toLowerCase(Locale.US), ahelperKey);
                                         ahelperNew = old == null;
-                                        if((!ahelperNew) && !old.equals(ahelperKey)) {
+                                        // inr address helper links without trailing '=', so omit from comparison
+                                        if ((!ahelperNew) && !old.replace("=", "").equals(ahelperKey.replace("=", ""))) {
                                             // Conflict: handle when URL reconstruction done
                                             ahelperConflict = true;
                                             if(_log.shouldLog(Log.WARN)) {
@@ -1388,7 +1389,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                 }
                 keystart = i + 1;
                 valstart = -1;
-            } else if(c == '=') {
+            } else if (c == '=' && valstart < 0) {
                 // end of key
                 key = query.substring(keystart, i);
                 valstart = i + 1;
@@ -1398,28 +1399,30 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
     }
     /****
     private static String[] tests = {
-    "", "foo", "foo=bar", "&", "&=&", "===", "&&",
-    "i2paddresshelper=foo",
-    "i2paddresshelpe=foo",
-    "2paddresshelper=foo",
-    "i2paddresshelper=%66oo",
-    "%692paddresshelper=foo",
-    "i2paddresshelper=foo&a=b",
-    "a=b&i2paddresshelper=foo",
-    "a=b&i2paddresshelper&c=d",
-    "a=b&i2paddresshelper=foo&c=d",
-    "a=b;i2paddresshelper=foo;c=d",
-    "a=b&i2paddresshelper=foo&c"
+        "", "foo", "foo=bar", "&", "&=&", "===", "&&",
+        "i2paddresshelper=foo",
+        "i2paddresshelpe=foo",
+        "2paddresshelper=foo",
+        "i2paddresshelper=%66oo",
+        "%692paddresshelper=foo",
+        "i2paddresshelper=foo&a=b",
+        "a=b&i2paddresshelper=foo",
+        "a=b&i2paddresshelper&c=d",
+        "a=b&i2paddresshelper=foo&c=d",
+        "a=b;i2paddresshelper=foo;c=d",
+        "a=b&i2paddresshelper=foo&c",
+        "a=b&i2paddresshelper=foo==&c",
+        "a=b&i2paddresshelper=foo%3d%3d&c"
     };
 
     public static void main(String[] args) {
-    for (int i = 0; i < tests.length; i++) {
-    String[] s = removeHelper(tests[i]);
-    if (s != null)
-    System.out.println("Test \"" + tests[i] + "\" q=\"" + s[0] + "\" h=\"" + s[1] + "\"");
-    else
-    System.out.println("Test \"" + tests[i] + "\" no match");
-    }
+        for (int i = 0; i < tests.length; i++) {
+            String[] s = removeHelper(tests[i]);
+            if (s != null)
+                System.out.println("Test \"" + tests[i] + "\" q=\"" + s[0] + "\" h=\"" + s[1] + "\"");
+            else
+                System.out.println("Test \"" + tests[i] + "\" no match");
+        }
     }
      ****/
 }

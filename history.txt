@@ -1,3 +1,7 @@
+2014-12-08 zzz
+ * HTTP Proxy: Fix parsing of ECDSA address helper
+ * NetDB: Increase lookup throttle time
+
 2014-12-05 zzz
 Prop from i2p.i2p.zzz.test2:
  * Console:
