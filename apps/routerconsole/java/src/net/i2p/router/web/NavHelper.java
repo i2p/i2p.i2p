@@ -53,7 +53,7 @@ public class NavHelper {
             String tip = _tooltips.get(name);
             if (tip != null)
                 buf.append("title=\"").append(tip).append("\" ");
-            buf.append('>').append(name).append("</a>");
+            buf.append('>').append(name.replace(" ", "&nbsp;")).append("</a>");
         }
         return buf.toString();
     }

@@ -137,19 +137,19 @@ public class SummaryBarRenderer {
                    "<a href=\"/susimail/susimail\" target=\"_blank\" title=\"")
            .append(_("Anonymous webmail client"))
            .append("\">")
-           .append(_("Email"))
+           .append(nbsp(_("Email")))
            .append("</a>\n" +
 
                    "<a href=\"/i2psnark/\" target=\"_blank\" title=\"")
            .append(_("Built-in anonymous BitTorrent Client"))
            .append("\">")
-           .append(_("Torrents"))
+           .append(nbsp(_("Torrents")))
            .append("</a>\n" +
 
                    "<a href=\"http://127.0.0.1:7658/\" target=\"_blank\" title=\"")
            .append(_("Local web server"))
            .append("\">")
-           .append(_("Website"))
+           .append(nbsp(_("Website")))
            .append("</a>\n")
 
            .append(NavHelper.getClientAppLinks(_context))
@@ -171,31 +171,31 @@ public class SummaryBarRenderer {
                    "<a href=\"/tunnels\" target=\"_top\" title=\"")
            .append(_("View existing tunnels and tunnel build status"))
            .append("\">")
-           .append(_("Tunnels"))
+           .append(nbsp(_("Tunnels")))
            .append("</a>\n" +
 
                    "<a href=\"/peers\" target=\"_top\" title=\"")
            .append(_("Show all current peer connections"))
            .append("\">")
-           .append(_("Peers"))
+           .append(nbsp(_("Peers")))
            .append("</a>\n" +
 
                    "<a href=\"/profiles\" target=\"_top\" title=\"")
            .append(_("Show recent peer performance profiles"))
            .append("\">")
-           .append(_("Profiles"))
+           .append(nbsp(_("Profiles")))
            .append("</a>\n" +
 
                    "<a href=\"/netdb\" target=\"_top\" title=\"")
            .append(_("Show list of all known I2P routers"))
            .append("\">")
-           .append(_("NetDB"))
+           .append(nbsp(_("NetDB")))
            .append("</a>\n" +
 
                    "<a href=\"/logs\" target=\"_top\" title=\"")
            .append(_("Health Report"))
            .append("\">")
-           .append(_("Logs"))
+           .append(nbsp(_("Logs")))
            .append("</a>\n");
 
        //          "<a href=\"/jobs.jsp\" target=\"_top\" title=\"")
@@ -208,26 +208,26 @@ public class SummaryBarRenderer {
             buf.append("<a href=\"/graphs\" target=\"_top\" title=\"")
                .append(_("Graph router performance"))
                .append("\">")
-               .append(_("Graphs"))
+               .append(nbsp(_("Graphs")))
                .append("</a>\n");
         }
 
         buf.append("<a href=\"/stats\" target=\"_top\" title=\"")
            .append(_("Textual router performance statistics"))
            .append("\">")
-           .append(_("Stats"))
+           .append(nbsp(_("Stats")))
            .append("</a>\n" +
 
                     "<a href=\"/i2ptunnelmgr\" target=\"_top\" title=\"")
            .append(_("Local Destinations"))
            .append("\">")
-           .append(_("I2PTunnel"))
+           .append(nbsp(_("I2PTunnel")))
            .append("</a>\n" +
 
                    "<a href=\"/dns\" target=\"_top\" title=\"")
            .append(_("Manage your I2P hosts file here (I2P domain name resolution)"))
            .append("\">")
-           .append(_("Addressbook"))
+           .append(nbsp(_("Addressbook")))
            .append("</a>\n");
 
         if (_context.getBooleanProperty(HelperBase.PROP_ADVANCED))
@@ -652,5 +652,15 @@ public class SummaryBarRenderer {
     /** translate a string */
     private String _(String s) {
         return Messages.getString(s, _context);
+    }
+
+    /**
+     *  Where the translation is to two words or more,
+     *  prevent splitting across lines
+     *
+     *  @since 0.9.18
+     */
+    private static String nbsp(String s) {
+        return s.replace(" ", "&nbsp;");
     }
 }
