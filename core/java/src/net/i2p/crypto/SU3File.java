@@ -593,7 +593,7 @@ public class SU3File {
             } else if ("keygen".equals(cmd)) {
                 ok = genKeysCLI(stype, a.get(0), a.get(1), a.get(2));
             } else if ("extract".equals(cmd)) {
-                ok = extractCLI(a.get(0), a.get(1), shouldVerify);
+                ok = extractCLI(a.get(0), a.get(1), shouldVerify, kfile);
             } else {
                 showUsageCLI();
             }
@@ -861,10 +861,12 @@ public class SU3File {
      *  @return success
      *  @since 0.9.9
      */
-    private static final boolean extractCLI(String signedFile, String outFile, boolean verifySig) {
+    private static final boolean extractCLI(String signedFile, String outFile, boolean verifySig, String pkFile) {
         InputStream in = null;
         try {
             SU3File file = new SU3File(signedFile);
+            if (pkFile != null)
+                file.setPublicKeyCertificate(new File(pkFile));
             file.setVerifySignature(verifySig);
             File out = new File(outFile);
             boolean ok = file.verifyAndMigrate(out);
