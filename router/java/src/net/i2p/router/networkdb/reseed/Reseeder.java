@@ -70,8 +70,6 @@ public class Reseeder {
      *         URLs are constructed, and because SSLEepGet doesn't follow redirects.
      */
     public static final String DEFAULT_SEED_URL =
-              "http://reseed.i2p-projekt.de/" + "," +
-              "http://cowpuncher.drollette.com/netdb/" + "," +
               "http://i2p.mooo.com/netDb/" + "," +
               "http://193.150.121.66/netDb/" + "," +
               "http://netdb.i2p2.no/" + "," + // Only SU3 (v3) support
@@ -80,13 +78,12 @@ public class Reseeder {
               "http://uk.reseed.i2p2.no/" + "," +
               // (Temp?) disable due to extended downtime (ticket #1422)
               //"http://jp.reseed.i2p2.no/" + "," +
-              "http://i2p-netdb.innovatio.no/" + "," +
-              "http://ieb9oopo.mooo.com/";
+              "http://i2p-netdb.innovatio.no/";
 
     /** @since 0.8.2 */
     public static final String DEFAULT_SSL_SEED_URL =
-              "https://reseed.i2p-projekt.de/" + "," +
-              "https://cowpuncher.drollette.com/netdb/" + "," +
+              "https://reseed.i2p-projekt.de/" + "," + // Only HTTPS
+              "https://cowpuncher.drollette.com/netdb/" + "," + // Only HTTPS and SU3 (v3) support
               "https://i2p.mooo.com/netDb/" + "," +
               "https://193.150.121.66/netDb/" + "," +
               "https://netdb.i2p2.no/" + "," + // Only SU3 (v3) support
@@ -96,9 +93,9 @@ public class Reseeder {
               // (Temp?) disable due to extended downtime (ticket #1422)
               //"https://jp.reseed.i2p2.no:444/" + "," +
               "https://i2p-netdb.innovatio.no/" + "," +
-              "https://ssl.webpack.de/ivae2he9.sg4.e-plaza.de/" + "," + // Only HTTPS and SU3 (v2) support
+              "https://ssl.webpack.de/ivae2he9.sg4.e-plaza.de/" + "," + // Only HTTPS and SU3 (v3) support
               "https://link.mx24.eu/" + "," + // Only HTTPS and SU3 (v3) support
-              "https://ieb9oopo.mooo.com/";
+              "https://ieb9oopo.mooo.com/"; // Only HTTPS and SU3 (v3) support
 
     private static final String SU3_FILENAME = "i2pseeds.su3";
 
