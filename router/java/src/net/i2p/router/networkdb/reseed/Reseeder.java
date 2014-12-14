@@ -75,10 +75,11 @@ public class Reseeder {
               "http://netdb.i2p2.no/" + "," + // Only SU3 (v3) support
               "http://reseed.info/"  + "," +
               "http://us.reseed.i2p2.no/" + "," +
-              "http://uk.reseed.i2p2.no/" + "," +
               // (Temp?) disable due to extended downtime (ticket #1422)
               //"http://jp.reseed.i2p2.no/" + "," +
-              "http://i2p-netdb.innovatio.no/";
+              // Broken server config, no response
+              //"http://i2p-netdb.innovatio.no/"  + "," +
+              "http://uk.reseed.i2p2.no/";
 
     /** @since 0.8.2 */
     public static final String DEFAULT_SSL_SEED_URL =
@@ -92,7 +93,8 @@ public class Reseeder {
               "https://uk.reseed.i2p2.no:444/" + "," +
               // (Temp?) disable due to extended downtime (ticket #1422)
               //"https://jp.reseed.i2p2.no:444/" + "," +
-              "https://i2p-netdb.innovatio.no/" + "," +
+              // Broken server config, no response
+              //"https://i2p-netdb.innovatio.no/" + "," +
               "https://ssl.webpack.de/ivae2he9.sg4.e-plaza.de/" + "," + // Only HTTPS and SU3 (v3) support
               "https://link.mx24.eu/" + "," + // Only HTTPS and SU3 (v3) support
               "https://ieb9oopo.mooo.com/"; // Only HTTPS and SU3 (v3) support
