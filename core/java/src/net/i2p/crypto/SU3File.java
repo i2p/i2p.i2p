@@ -126,7 +126,7 @@ public class SU3File {
     private static final ContentType DEFAULT_CONTENT_TYPE = ContentType.UNKNOWN;
     // avoid early ctx init
     //private static final SigType DEFAULT_SIG_TYPE = SigType.DSA_SHA1;
-    private static final int DEFAULT_SIG_CODE = 0;
+    private static final int DEFAULT_SIG_CODE = 6;
 
     /**
      *
@@ -826,6 +826,11 @@ public class SU3File {
                 System.out.println("Private key for " + signerName + " not found in keystore " + privateKeyFile);
                 return false;
             }
+            // now fix the sig type based on the private key
+            SigType oldType = type;
+            type = SigUtil.fromJavaKey(pk).getType();
+            if (oldType != type)
+                System.out.println("Warning: Using private key type " + type + ", ignoring specified type " + oldType);
             SU3File file = new SU3File(signedFile);
             file.write(new File(inputFile), ftype, ctype.getCode(), version, signerName, pk, type);
             System.out.println("Input file '" + inputFile + "' signed and written to '" + signedFile + "'");
