@@ -50,6 +50,7 @@ public class SU3File {
     private String _version;
     private int _versionLength;
     private String _signer;
+    private int _signatureLength;
     private int _signerLength;
     private int _fileType = -1;
     private ContentType _contentType;
@@ -265,16 +266,16 @@ public class SU3File {
         // In verifyAndMigrate it reads this far then rewinds, but we don't need to here
         if (_sigType == null)
             throw new IOException("unknown sig type: " + sigTypeCode);
-        _signerLength = (int) DataHelper.readLong(in, 2);
-        if (_signerLength != _sigType.getSigLen())
+        _signatureLength = (int) DataHelper.readLong(in, 2);
+        if (_signatureLength != _sigType.getSigLen())
             throw new IOException("bad sig length");
         skip(in, 1);
         int _versionLength = in.read();
         if (_versionLength < MIN_VERSION_BYTES)
             throw new IOException("bad version length");
         skip(in, 1);
-        int signerLen = in.read();
-        if (signerLen <= 0)
+        _signerLength = in.read();
+        if (_signerLength <= 0)
             throw new IOException("bad signer length");
         _contentLength = DataHelper.readLong(in, 8);
         if (_contentLength <= 0)
@@ -302,9 +303,9 @@ public class SU3File {
         }
         _version = new String(data, 0, zbyte, "UTF-8");
 
-        data = new byte[signerLen];
+        data = new byte[_signerLength];
         bytesRead = DataHelper.read(in, data);
-        if (bytesRead != signerLen)
+        if (bytesRead != _signerLength)
             throw new EOFException();
         _signer = DataHelper.getUTF8(data);
 
@@ -413,6 +414,9 @@ public class SU3File {
                 din.on(false);
                 Signature signature = new Signature(_sigType);
                 signature.readBytes(in);
+                int avail = in.available();
+                if (avail > 0)
+                    throw new IOException(avail + " bytes data after sig");
                 SimpleDataStructure hash = _sigType.getHashInstance();
                 hash.setData(sha);
                 //System.out.println("hash\n" + HexDump.dump(sha));
