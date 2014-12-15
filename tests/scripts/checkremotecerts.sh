@@ -21,10 +21,10 @@ check_for_prog() {
     fi
 }
 
-if pidof /usr/bin/tor > /dev/null 2>&1 && check_for_prog torify; then
+if pidof /usr/bin/tor > /dev/null 2>&1 && check_for_prog torsocks; then
     echo "-- Detected Tor, will try using it --"
-    GNUTLS_BIN="torify gnutls-cli"
-    OPENSSL_BIN="torify openssl"
+    GNUTLS_BIN="torsocks gnutls-cli"
+    OPENSSL_BIN="torsocks openssl"
 else
     GNUTLS_BIN="gnutls-cli"
     OPENSSL_BIN="openssl"
