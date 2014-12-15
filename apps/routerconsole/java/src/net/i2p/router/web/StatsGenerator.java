@@ -219,10 +219,11 @@ public class StatsGenerator {
                 buf.append("\">").append(_("Graph Data")).append("</a> - ");
                 buf.append(" <a href=\"graph?stat=").append(name)
                    .append('.').append(periods[i]);
-                buf.append("&amp;showEvents=true\">").append(_("Graph Event Count")).append("</a> - ");
-                buf.append("<a href=\"viewstat.jsp?stat=").append(name);
-                buf.append("&amp;period=").append(periods[i]);
-                buf.append("&amp;format=xml\">").append(_("Export Data as XML")).append("</a>");
+                buf.append("&amp;showEvents=true\">").append(_("Graph Event Count")).append("</a>");
+                // This can really blow up your browser if you click on it
+                //buf.append(" - <a href=\"viewstat.jsp?stat=").append(name);
+                //buf.append("&amp;period=").append(periods[i]);
+                //buf.append("&amp;format=xml\">").append(_("Export Data as XML")).append("</a>");
             }
             buf.append("</li>\n");
         }
