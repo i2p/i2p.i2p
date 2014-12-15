@@ -25,14 +25,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Deque;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 import java.util.Random;
 import java.util.Set;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.LinkedBlockingDeque;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.ByteArray;
@@ -52,7 +52,7 @@ import org.klomp.snark.dht.DHT;
  */
 class PeerCoordinator implements PeerListener
 {
-  private final Log _log = I2PAppContext.getGlobalContext().logManager().getLog(PeerCoordinator.class);
+  private final Log _log;
 
   /**
    * External use by PeerMonitorTask only.
@@ -98,7 +98,7 @@ class PeerCoordinator implements PeerListener
    * This is a Queue, not a Set, because PeerCheckerTask keeps things in order for choking/unchoking.
    * External use by PeerMonitorTask only.
    */
-  final Queue<Peer> peers;
+  final Deque<Peer> peers;
 
   /**
    * Peers we heard about via PEX
@@ -144,6 +144,7 @@ class PeerCoordinator implements PeerListener
   {
     _util = util;
     _random = util.getContext().random();
+    _log = util.getContext().logManager().getLog(PeerCoordinator.class);
     this.id = id;
     this.infohash = infohash;
     this.metainfo = metainfo;
@@ -154,7 +155,7 @@ class PeerCoordinator implements PeerListener
     wantedPieces = new ArrayList<Piece>();
     setWantedPieces();
     partialPieces = new ArrayList<PartialPiece>(getMaxConnections() + 1);
-    peers = new LinkedBlockingQueue<Peer>();
+    peers = new LinkedBlockingDeque<Peer>();
     magnetState = new MagnetState(infohash, metainfo);
     pexPeers = new ConcurrentHashSet<PeerID>();
 
@@ -522,7 +523,10 @@ class PeerCoordinator implements PeerListener
             // Can't add to beginning since we converted from a List to a Queue
             // We can do this in Java 6 with a Deque
             //peers.add(0, peer);
-            peers.add(peer);
+            if (_util.getContext().random().nextInt(4) == 0)
+                peers.push(peer);
+            else
+                peers.add(peer);
             peerCount = peers.size();
             unchokePeer();
 
