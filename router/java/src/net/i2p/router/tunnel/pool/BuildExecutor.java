@@ -43,7 +43,7 @@ class BuildExecutor implements Runnable {
     private final ConcurrentHashMap<Long, PooledTunnelCreatorConfig> _recentlyBuildingMap;
     private volatile boolean _isRunning;
     private boolean _repoll;
-    private static final int MAX_CONCURRENT_BUILDS = 10;
+    private static final int MAX_CONCURRENT_BUILDS = 13;
     /** accept replies up to a minute after we gave up on them */
     private static final long GRACE_PERIOD = 60*1000;
 
@@ -129,8 +129,10 @@ class BuildExecutor implements Runnable {
                 }
             }
         }
-        if (allowed < 2) allowed = 2; // Never choke below 2 builds (but congestion may)
-        else if (allowed > MAX_CONCURRENT_BUILDS) allowed = MAX_CONCURRENT_BUILDS; // Never go beyond 10, that is uncharted territory (old limit was 5)
+        if (allowed < 2)
+            allowed = 2; // Never choke below 2 builds (but congestion may)
+        else if (allowed > MAX_CONCURRENT_BUILDS)
+             allowed = MAX_CONCURRENT_BUILDS;
         allowed = _context.getProperty("router.tunnelConcurrentBuilds", allowed);
 
         // expire any REALLY old requests
