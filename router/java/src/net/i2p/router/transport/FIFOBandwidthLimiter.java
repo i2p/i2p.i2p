@@ -34,8 +34,8 @@ import net.i2p.util.Log;
 public class FIFOBandwidthLimiter {
     private final Log _log;
     private final I2PAppContext _context;
-    private final List<Request> _pendingInboundRequests;
-    private final List<Request> _pendingOutboundRequests;
+    private final List<SimpleRequest> _pendingInboundRequests;
+    private final List<SimpleRequest> _pendingOutboundRequests;
     /** how many bytes we can consume for inbound transmission immediately */
     private final AtomicInteger _availableInbound = new AtomicInteger();
     /** how many bytes we can consume for outbound transmission immediately */
@@ -91,8 +91,8 @@ public class FIFOBandwidthLimiter {
         _context.statManager().createRateStat("bwLimiter.pendingInboundRequests", "How many inbound requests are ahead of the current one (ignoring ones with 0)?", "BandwidthLimiter", new long[] { 5*60*1000l, 60*60*1000l });
         _context.statManager().createRateStat("bwLimiter.outboundDelayedTime", "How long it takes to honor an outbound request (ignoring ones with that go instantly)?", "BandwidthLimiter", new long[] { 5*60*1000l, 60*60*1000l });
         _context.statManager().createRateStat("bwLimiter.inboundDelayedTime", "How long it takes to honor an inbound request (ignoring ones with that go instantly)?", "BandwidthLimiter", new long[] { 5*60*1000l, 60*60*1000l });
-        _pendingInboundRequests = new ArrayList<Request>(16);
-        _pendingOutboundRequests = new ArrayList<Request>(16);
+        _pendingInboundRequests = new ArrayList<SimpleRequest>(16);
+        _pendingOutboundRequests = new ArrayList<SimpleRequest>(16);
         _lastTotalSent = _totalAllocatedOutboundBytes.get();
         _lastTotalReceived = _totalAllocatedInboundBytes.get();
         _lastStatsUpdated = now();
@@ -450,7 +450,7 @@ public class FIFOBandwidthLimiter {
     private long locked_getLongestInboundWait() {
         long start = -1;
         for (int i = 0; i < _pendingInboundRequests.size(); i++) {
-            SimpleRequest req = (SimpleRequest)_pendingInboundRequests.get(i);
+            Request req = _pendingInboundRequests.get(i);
             if ( (start < 0) || (start > req.getRequestTime()) )
                 start = req.getRequestTime();
         }
@@ -464,7 +464,7 @@ public class FIFOBandwidthLimiter {
     private long locked_getLongestOutboundWait() {
         long start = -1;
         for (int i = 0; i < _pendingOutboundRequests.size(); i++) {
-            SimpleRequest req = (SimpleRequest)_pendingOutboundRequests.get(i);
+            Request req = _pendingOutboundRequests.get(i);
             if (req == null) continue;
             if ( (start < 0) || (start > req.getRequestTime()) )
                 start = req.getRequestTime();
@@ -481,7 +481,7 @@ public class FIFOBandwidthLimiter {
      */
     private final void locked_satisfyInboundUnlimited(List<Request> satisfied) {
         while (!_pendingInboundRequests.isEmpty()) {
-            SimpleRequest req = (SimpleRequest)_pendingInboundRequests.remove(0);
+            SimpleRequest req = _pendingInboundRequests.remove(0);
             int allocated = req.getPendingRequested();
             _totalAllocatedInboundBytes.addAndGet(allocated);
             req.allocateBytes(allocated);
@@ -506,7 +506,7 @@ public class FIFOBandwidthLimiter {
     private final void locked_satisfyInboundAvailable(List<Request> satisfied) {
         for (int i = 0; i < _pendingInboundRequests.size(); i++) {
             if (_availableInbound.get() <= 0) break;
-            SimpleRequest req = (SimpleRequest)_pendingInboundRequests.get(i);
+            SimpleRequest req = _pendingInboundRequests.get(i);
             long waited = now() - req.getRequestTime();
             if (req.getAborted()) {
                 // connection decided they dont want the data anymore
@@ -598,7 +598,7 @@ public class FIFOBandwidthLimiter {
      */
     private final void locked_satisfyOutboundUnlimited(List<Request> satisfied) {
         while (!_pendingOutboundRequests.isEmpty()) {
-            SimpleRequest req = (SimpleRequest)_pendingOutboundRequests.remove(0);
+            SimpleRequest req = _pendingOutboundRequests.remove(0);
             int allocated = req.getPendingRequested();
             _totalAllocatedOutboundBytes.addAndGet(allocated);
             req.allocateBytes(allocated);
@@ -624,7 +624,7 @@ public class FIFOBandwidthLimiter {
     private final void locked_satisfyOutboundAvailable(List<Request> satisfied) {
         for (int i = 0; i < _pendingOutboundRequests.size(); i++) {
             if (_availableOutbound.get() <= 0) break;
-            SimpleRequest req = (SimpleRequest)_pendingOutboundRequests.get(i);
+            SimpleRequest req = _pendingOutboundRequests.get(i);
             long waited = now() - req.getRequestTime();
             if (req.getAborted()) {
                 // connection decided they dont want the data anymore
