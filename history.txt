@@ -1,3 +1,15 @@
+2014-12-15 zzz
+ * Console: Prevent two-word translations from splitting across lines in summary bar
+ * EdDSA: Cleanups
+ * i2psnark: Unchoke new peer sooner
+ * SSU: reduce log level of uncaught errors processing I2NP message
+ * SU3:
+   - Don't require specification of sig type when signing
+   - Implement 'extract -k'
+   - Fix getContentOffset()
+   - Fail on excess data after signature
+ * Tunnels: Raise concurrent build limit
+
 2014-12-08 zzz
  * HTTP Proxy: Fix parsing of ECDSA address helper
  * NetDB: Increase lookup throttle time
