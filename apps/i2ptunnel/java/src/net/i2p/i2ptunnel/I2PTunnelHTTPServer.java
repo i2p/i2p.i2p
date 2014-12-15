@@ -220,8 +220,20 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                 (headers.containsKey("X-Forwarded-For") ||
                  headers.containsKey("X-Forwarded-Server") ||
                  headers.containsKey("X-Forwarded-Host"))) {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Refusing inproxy access: " + peerHash.toBase64());
+                if (_log.shouldLog(Log.WARN)) {
+                    StringBuilder buf = new StringBuilder();
+                    buf.append("Refusing inproxy access: ").append(peerHash.toBase64());
+                    List<String> h = headers.get("X-Forwarded-For");
+                    if (h != null)
+                        buf.append(" from: ").append(h.get(0));
+                    h = headers.get("X-Forwarded-Server");
+                    if (h != null)
+                        buf.append(" via: ").append(h.get(0));
+                    h = headers.get("X-Forwarded-Host");
+                    if (h != null)
+                        buf.append(" for: ").append(h.get(0));
+                    _log.warn(buf.toString());
+                }
                 try {
                     // Send a 403, so the user doesn't get an HTTP Proxy error message
                     // and blame his router or the network.
