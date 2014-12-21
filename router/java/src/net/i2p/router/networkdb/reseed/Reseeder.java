@@ -71,7 +71,8 @@ public class Reseeder {
      */
     public static final String DEFAULT_SEED_URL =
               "http://i2p.mooo.com/netDb/" + "," +
-              "http://193.150.121.66/netDb/" + "," +
+              // (Temp?) disable due to extended downtime
+              //"http://193.150.121.66/netDb/" + "," +
               "http://netdb.i2p2.no/" + "," + // Only SU3 (v3) support
               "http://reseed.info/"  + "," +
               "http://us.reseed.i2p2.no/" + "," +
@@ -84,9 +85,10 @@ public class Reseeder {
     /** @since 0.8.2 */
     public static final String DEFAULT_SSL_SEED_URL =
               "https://reseed.i2p-projekt.de/" + "," + // Only HTTPS
-              "https://cowpuncher.drollette.com/netdb/" + "," + // Only HTTPS and SU3 (v3) support
+              "https://netdb.rows.io:444/" + "," + // Only HTTPS and SU3 (v3) support
               "https://i2p.mooo.com/netDb/" + "," +
-              "https://193.150.121.66/netDb/" + "," +
+              // (Temp?) disable due to extended downtime
+              //"https://193.150.121.66/netDb/" + "," +
               "https://netdb.i2p2.no/" + "," + // Only SU3 (v3) support
               "https://reseed.info/"  + "," +
               "https://us.reseed.i2p2.no:444/" + "," +
