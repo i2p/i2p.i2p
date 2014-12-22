@@ -88,3 +88,5 @@ certificates/www.cacert.org.crt
 certificates/ssl/i2pprojekt.de.crt
 # no longer used
 certificates/ssl/netdb.i2p2.de.crt
+certificates/ssl/cloudflare.com.crt
+certificates/ssl/webpack.de.crt
