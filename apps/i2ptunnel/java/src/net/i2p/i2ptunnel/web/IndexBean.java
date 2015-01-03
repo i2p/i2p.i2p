@@ -10,6 +10,7 @@ package net.i2p.i2ptunnel.web;
 
 import java.io.File;
 import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -25,12 +26,15 @@ import net.i2p.I2PAppContext;
 import net.i2p.app.ClientAppManager;
 import net.i2p.app.Outproxy;
 import net.i2p.client.I2PClient;
+import net.i2p.crypto.KeyGenerator;
+import net.i2p.crypto.SigType;
 import net.i2p.data.Base64;
 import net.i2p.data.Certificate;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.PrivateKeyFile;
 import net.i2p.data.SessionKey;
+import net.i2p.data.SimpleDataStructure;
 import net.i2p.i2ptunnel.I2PTunnelClientBase;
 import net.i2p.i2ptunnel.I2PTunnelConnectClient;
 import net.i2p.i2ptunnel.I2PTunnelHTTPClient;
@@ -1113,6 +1117,30 @@ public class IndexBean {
         // Otherwise this only works on a new tunnel...
     }
 
+    /**
+     *  Random keys, hidden in forms
+     *  @since 0.9.18
+     */
+    public void setKey1(String s) {
+        if (s != null)
+            _otherOptions.put("inbound.randomKey", s.trim());
+    }
+
+    public void setKey2(String s) {
+        if (s != null)
+            _otherOptions.put("outbound.randomKey", s.trim());
+    }
+
+    public void setKey3(String s) {
+        if (s != null)
+            _otherOptions.put("i2cp.leaseSetSigningPrivateKey", s.trim());
+    }
+
+    public void setKey4(String s) {
+        if (s != null)
+            _otherOptions.put("i2cp.leaseSetPrivateKey", s.trim());
+    }
+
     /** Modify or create a destination */
     private String modifyDestination() {
         if (_privKeyFile == null || _privKeyFile.trim().length() <= 0)
@@ -1332,17 +1360,32 @@ public class IndexBean {
             }
         }
 
-        // As of 0.9.17, add a persistent random key if not present
         if (!isClient(_type) || _booleanOptions.contains("persistentClientKey")) {
+            // As of 0.9.17, add a persistent random key if not present
             String p = OPT + "inbound.randomKey";
             if (!config.containsKey(p)) {
-                // as of 0.9.17, add a random key if not previously present
                 byte[] rk = new byte[32];
                 _context.random().nextBytes(rk);
                 config.setProperty(p, Base64.encode(rk));
                 p = OPT + "outbound.randomKey";
                 _context.random().nextBytes(rk);
                 config.setProperty(p, Base64.encode(rk));
+            }
+            // As of 0.9.18, add persistent leaseset keys if not present
+            // but only if we know the sigtype
+            p = OPT + "i2cp.leaseSetSigningPrivateKey";
+            Destination dest = getDestination(_tunnel);
+            if (dest != null && !config.containsKey(p)) {
+                try {
+                    SigType type = dest.getSigType();
+                    SimpleDataStructure keys[] = KeyGenerator.getInstance().generateSigningKeys(type);
+                    config.setProperty(p, type.name() + ':' + keys[1].toBase64());
+                    p = OPT + "i2cp.leaseSetPrivateKey";
+                    keys = KeyGenerator.getInstance().generatePKIKeys();
+                    config.setProperty(p, "ELGAMAL_2048:" + keys[1].toBase64());
+                } catch (GeneralSecurityException gse) {
+                    // so much for that
+                }
             }
         }
 
@@ -1379,13 +1422,16 @@ public class IndexBean {
         I2PTunnelHTTPClient.PROP_JUMP_SERVERS,
         I2PTunnelHTTPClientBase.PROP_AUTH,
         I2PClient.PROP_SIGTYPE,
-        I2PTunnelHTTPClient.PROP_SSL_OUTPROXIES
+        I2PTunnelHTTPClient.PROP_SSL_OUTPROXIES,
+        // following are mostly server but could also be persistent client
+        "inbound.randomKey", "outbound.randomKey", "i2cp.leaseSetSigningPrivateKey", "i2cp.leaseSetPrivateKey"
         };
     private static final String _otherServerOpts[] = {
         "i2cp.reduceIdleTime", "i2cp.reduceQuantity", "i2cp.leaseSetKey", "i2cp.accessList",
          PROP_MAX_CONNS_MIN, PROP_MAX_CONNS_HOUR, PROP_MAX_CONNS_DAY,
          PROP_MAX_TOTAL_CONNS_MIN, PROP_MAX_TOTAL_CONNS_HOUR, PROP_MAX_TOTAL_CONNS_DAY,
-         PROP_MAX_STREAMS, I2PClient.PROP_SIGTYPE
+         PROP_MAX_STREAMS, I2PClient.PROP_SIGTYPE,
+        "inbound.randomKey", "outbound.randomKey", "i2cp.leaseSetSigningPrivateKey", "i2cp.leaseSetPrivateKey"
         };
     private static final String _httpServerOpts[] = {
         I2PTunnelHTTPServer.OPT_POST_WINDOW,

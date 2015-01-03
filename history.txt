@@ -1,6 +1,10 @@
+2015-01-03 zzz
+ * I2CP: Use configured leaseset keys if available
+ * I2PTunnel: Persist leaseset keys
+
 2014-12-15 zzz
  * Console: Prevent two-word translations from splitting across lines in summary bar
- * EdDSA: Cleanups
+ * Crypto: EdDSA cleanups
  * i2psnark: Unchoke new peer sooner
  * SSU: reduce log level of uncaught errors processing I2NP message
  * SU3:

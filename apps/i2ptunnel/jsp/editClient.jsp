@@ -58,6 +58,26 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                 <input type="hidden" name="tunnel" value="<%=curTunnel%>" />
                 <input type="hidden" name="nonce" value="<%=editBean.getNextNonce()%>" />
                 <input type="hidden" name="type" value="<%=tunnelType%>" />
+                <%
+                // these are four keys that are generated automatically on first save,
+                // and we want to persist in i2ptunnel.config, but don't want to
+                // show clogging up the custom options form.
+                String key = editBean.getKey1(curTunnel);
+                if (key != null && key.length() > 0) { %>
+                    <input type="hidden" name="key1" value="<%=key%>" />
+                <% }
+                key = editBean.getKey2(curTunnel);
+                if (key != null && key.length() > 0) { %>
+                    <input type="hidden" name="key2" value="<%=key%>" />
+                <% }
+                key = editBean.getKey3(curTunnel);
+                if (key != null && key.length() > 0) { %>
+                    <input type="hidden" name="key3" value="<%=key%>" />
+                <% }
+                key = editBean.getKey4(curTunnel);
+                if (key != null && key.length() > 0) { %>
+                    <input type="hidden" name="key4" value="<%=key%>" />
+                <% } %>
                 <input type="submit" class="default" name="action" value="Save changes" />
             </div>
       

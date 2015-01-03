@@ -74,22 +74,68 @@ class RequestLeaseSetMessageHandler extends HandlerImpl {
      *  Finish creating and signing the new LeaseSet
      *  @since 0.9.7
      */
-    protected void signLeaseSet(LeaseSet leaseSet, I2PSessionImpl session) {
+    protected synchronized void signLeaseSet(LeaseSet leaseSet, I2PSessionImpl session) {
+        Destination dest = session.getMyDestination();
         // also, if this session is connected to multiple routers, include other leases here
-        leaseSet.setDestination(session.getMyDestination());
+        leaseSet.setDestination(dest);
 
         // reuse the old keys for the client
-        LeaseInfo li = _existingLeaseSets.get(session.getMyDestination());
+        LeaseInfo li = _existingLeaseSets.get(dest);
         if (li == null) {
-            li = new LeaseInfo(session.getMyDestination());
-            _existingLeaseSets.put(session.getMyDestination(), li);
+            // [enctype:]b64 of private key
+            String spk = session.getOptions().getProperty("i2cp.leaseSetPrivateKey");
+            // [sigtype:]b64 of private key
+            String sspk = session.getOptions().getProperty("i2cp.leaseSetSigningPrivateKey");
+            PrivateKey privKey = null;
+            SigningPrivateKey signingPrivKey = null;
+            boolean useOldKeys;
+            if (spk != null && sspk != null) {
+                useOldKeys = true;
+                int colon = sspk.indexOf(':');
+                SigType type = dest.getSigType();
+                if (colon > 0) {
+                    String stype = sspk.substring(0, colon);
+                    SigType t = SigType.parseSigType(stype);
+                    if (t == type)
+                        sspk = sspk.substring(colon + 1);
+                    else
+                        useOldKeys = false;
+                }
+                colon = spk.indexOf(':');
+                // just ignore for now, no other types supported
+                if (colon >= 0)
+                    spk = spk.substring(colon + 1);
+                if (useOldKeys) {
+                    try {
+                        signingPrivKey = new SigningPrivateKey(type);
+                        signingPrivKey.fromBase64(sspk);
+                    } catch (DataFormatException iae) {
+                        useOldKeys = false;
+                    }
+                }
+                if (useOldKeys) {
+                    try {
+                        privKey = new PrivateKey();
+                        privKey.fromBase64(spk);
+                    } catch (DataFormatException iae) {
+                        useOldKeys = false;
+                    }
+                }
+            } else {
+                useOldKeys = false;
+            }
+            if (useOldKeys)
+                li = new LeaseInfo(privKey, signingPrivKey);
+            else
+                li = new LeaseInfo(dest);
+            _existingLeaseSets.put(dest, li);
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Creating new leaseInfo keys for "  
-                           + session.getMyDestination().calculateHash().toBase64());
+                           + dest + " using configured private keys? " + useOldKeys);
         } else {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Caching the old leaseInfo keys for " 
-                           + session.getMyDestination().calculateHash().toBase64());
+                           + dest);
         }
 
         leaseSet.setEncryptionKey(li.getPublicKey());
@@ -133,7 +179,7 @@ class RequestLeaseSetMessageHandler extends HandlerImpl {
         private final SigningPrivateKey _signingPrivKey;
 
         public LeaseInfo(Destination dest) {
-            Object encKeys[] = KeyGenerator.getInstance().generatePKIKeypair();
+            SimpleDataStructure encKeys[] = KeyGenerator.getInstance().generatePKIKeys();
             // must be same type as the Destination's signing key
             SimpleDataStructure signKeys[];
             try {
@@ -145,6 +191,16 @@ class RequestLeaseSetMessageHandler extends HandlerImpl {
             _privKey = (PrivateKey) encKeys[1];
             _signingPubKey = (SigningPublicKey) signKeys[0];
             _signingPrivKey = (SigningPrivateKey) signKeys[1];
+        }
+
+        /**
+         *  @since 0.9.18
+         */
+        public LeaseInfo(PrivateKey privKey, SigningPrivateKey signingPrivKey) {
+            _pubKey = KeyGenerator.getPublicKey(privKey);
+            _privKey = privKey;
+            _signingPubKey = KeyGenerator.getSigningPublicKey(signingPrivKey);
+            _signingPrivKey = signingPrivKey;
         }
 
         public PublicKey getPublicKey() {

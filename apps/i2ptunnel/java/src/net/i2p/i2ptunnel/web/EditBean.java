@@ -230,6 +230,26 @@ public class EditBean extends IndexBean {
         return SigType.isAvailable(code);
     }
     
+    /**
+     *  Random keys, hidden in forms
+     *  @since 0.9.18
+     */
+    public String getKey1(int tunnel) {
+        return getProperty(tunnel, "inbound.randomKey", "");
+    }
+
+    public String getKey2(int tunnel) {
+        return getProperty(tunnel, "outbound.randomKey", "");
+    }
+
+    public String getKey3(int tunnel) {
+        return getProperty(tunnel, "i2cp.leaseSetSigningPrivateKey", "");
+    }
+
+    public String getKey4(int tunnel) {
+        return getProperty(tunnel, "i2cp.leaseSetPrivateKey", "");
+    }
+
     /** @since 0.8.9 */
     public boolean getDCC(int tunnel) {
         return getBooleanProperty(tunnel, I2PTunnelIRCClient.PROP_DCC);
