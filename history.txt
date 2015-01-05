@@ -1,3 +1,13 @@
+2015-01-05 zzz
+ * Blocklist:
+   - Rewrite to read and merge multiple files
+   - Include in update, use version in base dir too
+   - Increase limits
+   - Bug fixes
+ * UrlLauncher:
+   - Configure browser with routerconsole.browser (ticket #1159)
+   - Convert to ClientApp interface
+
 2015-01-03 zzz
  * I2CP: Use configured leaseset keys if available
  * I2PTunnel: Persist leaseset keys
