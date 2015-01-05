@@ -232,7 +232,7 @@ public class PcapWriter {
         // wireshark wants the seq # in a SYN packet to be one less than the first data packet,
         // so let's set it to 0. ???????????
         if (pkt.isFlagSet(Packet.FLAG_SYNCHRONIZE))
-            seq = 0xffffffff;
+            seq = 0xffffffffL;
         else
             seq = pkt.getSequenceNum();
         DataHelper.writeLong(_fos, 4, seq);
