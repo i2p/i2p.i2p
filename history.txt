@@ -4,6 +4,10 @@
    - Include in update, use version in base dir too
    - Increase limits
    - Bug fixes
+ * Latency reduction all over:
+   - SSU: Reduce ack delay
+   - Streaming: Reduce min RTO and flusher delay
+   - Tunnels: Reduce GW batching time
  * UrlLauncher:
    - Configure browser with routerconsole.browser (ticket #1159)
    - Convert to ClientApp interface

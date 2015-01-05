@@ -50,7 +50,7 @@ class MessageOutputStream extends OutputStream {
      *  Since this is less than i2ptunnel's i2p.streaming.connectDelay default of 1000,
      *  we only wait 250 at the start. Guess that's ok, 1000 is too long anyway.
      */
-    private static final int DEFAULT_PASSIVE_FLUSH_DELAY = 250;
+    private static final int DEFAULT_PASSIVE_FLUSH_DELAY = 175;
 
 /****
     public MessageOutputStream(I2PAppContext ctx, DataReceiver receiver) {
