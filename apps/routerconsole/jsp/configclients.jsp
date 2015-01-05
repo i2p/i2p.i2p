@@ -56,8 +56,6 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
 <%=intl._("Enabled with SSL required")%><br>
 <input type="radio" class="optbox" name="mode" value="0" <%=clientshelper.i2cpModeChecked(0) %> >
 <%=intl._("Disabled - Clients outside this Java process may not connect")%><br>
-<%=intl._("I2CP Port")%>:
-<input name="port" type="text" size="5" maxlength="5" value="<jsp:getProperty name="clientshelper" property="port" />" ><br>
 <%=intl._("I2CP Interface")%>:
 <select name="interface">
 <%
@@ -74,6 +72,8 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
        }
 %>
 </select><br>
+<%=intl._("I2CP Port")%>:
+<input name="port" type="text" size="5" maxlength="5" value="<jsp:getProperty name="clientshelper" property="port" />" ><br>
 <b><%=intl._("Authorization")%></b><br>
 <input type="checkbox" class="optbox" name="auth" value="true" <jsp:getProperty name="clientshelper" property="auth" /> >
 <%=intl._("Require username and password")%><br>
