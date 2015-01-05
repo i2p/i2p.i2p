@@ -372,6 +372,9 @@ public class RouterInfo extends DatabaseEntry {
      */
     public int getNetworkId() {
         String id = _options.getProperty(PROP_NETWORK_ID);
+        // shortcut
+        if ("2".equals(id))
+            return 2;
         if (id != null) {
             try {
                 return Integer.parseInt(id);
