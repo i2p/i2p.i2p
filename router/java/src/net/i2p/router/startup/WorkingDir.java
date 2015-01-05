@@ -276,7 +276,8 @@ public class WorkingDir {
         // base install - files
         // We don't currently have a default router.config, logger.config, susimail.config, or webapps.config in the base distribution,
         // but distros might put one in
-        "blocklist.txt,hosts.txt,i2psnark.config,i2ptunnel.config,jetty-i2psnark.xml," +
+        // blocklist.txt now accessed in base dir, user can add another in config dir if desired
+        "hosts.txt,i2psnark.config,i2ptunnel.config,jetty-i2psnark.xml," +
         "logger.config,router.config,susimail.config,systray.config,webapps.config";
 
     private static boolean migrate(String list, File olddir, File todir) {

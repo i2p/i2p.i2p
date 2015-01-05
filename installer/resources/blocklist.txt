@@ -5,9 +5,18 @@
 # When running as a Linux daemon, the configuration directory is /var/lib/i2p
 # and the install directory is /usr/share/i2p .
 #
-# Blocking is now enabled by default.
-# To disable blocking, set router.blocklist.enable=false on configadvanced.jsp,
-# or simply delete this file or remove all the entries below, and restart.
+# The file in the install directory will be overwritten when you update I2P.
+# As of release 0.9.18, the router reads and merges the files in the install directory
+# and the config directory. Additionally, if the advanded configuration
+# router.blocklist.file=/path/to/otherlist.txt is set, this file will be
+# read in and merged as well.
+#
+# If there is no blocklist.txt file in the configuration directory, create it and
+# add entries as desired.
+#
+#
+# Blocking is enabled by default.
+# To disable blocking, set router.blocklist.enable=false on configadvanced.jsp.
 #
 # Add additional entries as desired, sorting not required.
 # This file is only read at router startup.
@@ -16,6 +25,7 @@
 # Please do not block too broadly, it will segment and harm the network.
 # For example, http://www.bluetack.co.uk/config/splist.zip is very broad and includes Tor users, it is not recommended.
 # A more reasonable list: http://www.bluetack.co.uk/config/level1.zip
+# Note: bluetack blocklists now require a subscription. See https://forum.transmissionbt.com/viewtopic.php?f=2&t=15652
 #
 # We have included the bogons from http://www.team-cymru.org/Services/Bogons/http.html ,
 # but you will have to update your blocklist manually if the bogon list changes.
