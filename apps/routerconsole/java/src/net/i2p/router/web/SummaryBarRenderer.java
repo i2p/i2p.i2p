@@ -218,16 +218,16 @@ public class SummaryBarRenderer {
            .append(nbsp(_("Stats")))
            .append("</a>\n" +
 
-                    "<a href=\"/i2ptunnelmgr\" target=\"_top\" title=\"")
-           .append(_("Hidden Services and Clients"))
-           .append("\">")
-           .append(nbsp(_("Hidden Services Manager")))
-           .append("</a>\n" +
-
                    "<a href=\"/dns\" target=\"_top\" title=\"")
            .append(_("Manage your I2P hosts file here (I2P domain name resolution)"))
            .append("\">")
            .append(nbsp(_("Addressbook")))
+           .append("</a>\n" +
+
+                    "<a href=\"/i2ptunnelmgr\" target=\"_top\" title=\"")
+           .append(_("Hidden Services and Clients"))
+           .append("\">")
+           .append(nbsp(_("Hidden Services Manager")))
            .append("</a>\n");
 
         if (_context.getBooleanProperty(HelperBase.PROP_ADVANCED))
