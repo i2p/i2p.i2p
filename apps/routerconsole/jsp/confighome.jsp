@@ -55,7 +55,7 @@ input.default {
    }  // shouldShowSearch()
 %>
 
-<h3><%=intl._("Recommended Eepsites")%></h3>
+<h3><%=intl._("Hidden Services of Interest")%></h3>
 <form action="" method="POST">
  <input type="hidden" name="nonce" value="<%=pageNonce%>" >
  <input type="hidden" name="group" value="1">

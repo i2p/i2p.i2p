@@ -16,7 +16,7 @@
 %>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-    <title><%=intl._("I2P Tunnel Manager - Edit Client Tunnel")%></title>
+    <title><%=intl._("Hidden Services Manager")%> - <%=intl._("Edit Client Tunnel")%></title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
     <link href="/themes/console/images/favicon.ico" type="image/x-icon" rel="shortcut icon" />

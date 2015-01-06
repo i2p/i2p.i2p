@@ -40,7 +40,7 @@ public class SummaryBarRenderer {
         aMap.put("Tunnels", "Tunnels");
         aMap.put("Congestion", "Congestion");
         aMap.put("TunnelStatus", "Tunnel Status");
-        aMap.put("Destinations", "Local Destinations");
+        aMap.put("Destinations", "Hidden Services and Clients");
         aMap.put("NewsHeadings", "News &amp; Updates");
         SECTION_NAMES = Collections.unmodifiableMap(aMap);
     }
@@ -219,9 +219,9 @@ public class SummaryBarRenderer {
            .append("</a>\n" +
 
                     "<a href=\"/i2ptunnelmgr\" target=\"_top\" title=\"")
-           .append(_("Local Destinations"))
+           .append(_("Hidden Services and Clients"))
            .append("\">")
-           .append(nbsp(_("I2PTunnel")))
+           .append(nbsp(_("Hidden Services Manager")))
            .append("</a>\n" +
 
                    "<a href=\"/dns\" target=\"_top\" title=\"")

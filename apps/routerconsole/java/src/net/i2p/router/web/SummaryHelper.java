@@ -416,7 +416,10 @@ public class SummaryHelper extends HelperBase {
         List<Destination> clients = new ArrayList<Destination>(_context.clientManager().listClients());
         
         StringBuilder buf = new StringBuilder(512);
-        buf.append("<h3><a href=\"/i2ptunnelmgr\" target=\"_top\" title=\"").append(_("Add/remove/edit &amp; control your client and server tunnels")).append("\">").append(_("Local Destinations")).append("</a></h3><hr class=\"b\"><div class=\"tunnels\">");
+        buf.append("<h3><a href=\"/i2ptunnelmgr\" target=\"_top\" title=\"")
+           .append(_("Add/remove/edit &amp; control your client and server tunnels"))
+           .append("\">").append(_("Hidden Services and Clients"))
+           .append("</a></h3><hr class=\"b\"><div class=\"tunnels\">");
         if (!clients.isEmpty()) {
             Collections.sort(clients, new AlphaComparator());
             buf.append("<table>");
@@ -427,7 +430,7 @@ public class SummaryHelper extends HelperBase {
                 
                 buf.append("<tr><td align=\"right\"><img src=\"/themes/console/images/");
                 if (_context.clientManager().shouldPublishLeaseSet(h))
-                    buf.append("server.png\" alt=\"Server\" title=\"").append(_("Server")).append("\">");
+                    buf.append("server.png\" alt=\"Server\" title=\"").append(_("Hidden Service")).append("\">");
                 else
                     buf.append("client.png\" alt=\"Client\" title=\"").append(_("Client")).append("\">");
                 buf.append("</td><td align=\"left\"><b><a href=\"tunnels#").append(h.toBase64().substring(0,4));

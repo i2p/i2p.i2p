@@ -4,10 +4,14 @@
    - Include in update, use version in base dir too
    - Increase limits
    - Bug fixes
+ * EepGet: Change command line default to 0 retries
  * Latency reduction all over:
    - SSU: Reduce ack delay
    - Streaming: Reduce min RTO and flusher delay
    - Tunnels: Reduce GW batching time
+ * Streaming:
+   - Add API for sending/receiving payload in ping/pong
+   - Fix PcapWriter
  * UrlLauncher:
    - Configure browser with routerconsole.browser (ticket #1159)
    - Convert to ClientApp interface
