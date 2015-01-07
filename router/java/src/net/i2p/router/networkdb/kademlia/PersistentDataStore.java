@@ -429,14 +429,21 @@ class PersistentDataStore extends TransientDataStore {
             }
             
             if (!_initialized) {
-                if (_facade.reseedChecker().checkReseed(routerCount))
+                if (_facade.reseedChecker().checkReseed(routerCount)) {
                     _lastReseed = _context.clock().now();
+                    // checkReseed will call wakeup() when done and we will run again
+                } else {
+                    _context.router().setNetDbReady();
+                }
                 _initialized = true;
             } else if (_lastReseed < _context.clock().now() - MIN_RESEED_INTERVAL) {
                 int count = Math.min(routerCount, size());
                 if (count < MIN_ROUTERS) {
                     if (_facade.reseedChecker().checkReseed(count))
                         _lastReseed = _context.clock().now();
+                        // checkReseed will call wakeup() when done and we will run again
+                } else {
+                    _context.router().setNetDbReady();
                 }
             }
         }

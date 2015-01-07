@@ -1,3 +1,8 @@
+2015-01-07 zzz
+ * ClientAppConfig: Start i2ptunnel sooner
+ * Router: Add startup/shutdown state machine
+ * Tunnels: Cleanup, catch more cases of zero-hop configuration
+
 2015-01-05 zzz
  * Blocklist:
    - Rewrite to read and merge multiple files

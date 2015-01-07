@@ -62,6 +62,10 @@ class BuildHandler implements Runnable {
     private final BuildReplyHandler _buildReplyHandler;
     private final AtomicInteger _currentLookups = new AtomicInteger();
     private volatile boolean _isRunning;
+    private final Object _startupLock = new Object();
+    private ExplState _explState = ExplState.NONE;
+
+    private enum ExplState { NONE, IB, OB, BOTH }
 
     /** TODO these may be too high, review and adjust */
     private static final int MIN_QUEUE = 18;
@@ -152,6 +156,30 @@ class BuildHandler implements Runnable {
         ctx.inNetMessagePool().registerHandlerJobBuilder(VariableTunnelBuildMessage.MESSAGE_TYPE, tbmhjb);
         ctx.inNetMessagePool().registerHandlerJobBuilder(VariableTunnelBuildReplyMessage.MESSAGE_TYPE, tbrmhjb);
     }
+
+    /**
+     *  Call the same time you start the threads
+     *
+     *  @since 0.9.18
+     */
+    void init() {
+        // fixup startup state if 0-hop exploratory is allowed in either direction
+        int ibl = _manager.getInboundSettings().getLength();
+        int ibv = _manager.getInboundSettings().getLengthVariance();
+        int obl = _manager.getOutboundSettings().getLength();
+        int obv = _manager.getOutboundSettings().getLengthVariance();
+        boolean ibz = ibl <= 0 || ibl + ibv <= 0;
+        boolean obz = obl <= 0 || obl + obv <= 0;
+        if (ibz && obz) {
+            _explState = ExplState.BOTH;
+            _context.router().setExplTunnelsReady();
+        } else if (ibz) {
+            _explState = ExplState.IB;
+        } else if (obz) {
+            _explState = ExplState.OB;
+        }
+    }
+
     
     /**
      *  @since 0.9
@@ -337,6 +365,38 @@ class BuildHandler implements Runnable {
                 // call buildComplete() after addTunnel() so we don't try another build.
                 _exec.buildComplete(cfg, cfg.getTunnelPool());
                 _exec.buildSuccessful(cfg);
+
+                if (cfg.getTunnelPool().getSettings().isExploratory()) {
+                    // Notify router that exploratory tunnels are ready
+                    boolean isIn = cfg.isInbound();
+                    synchronized(_startupLock) {
+                        switch (_explState) {
+                            case NONE:
+                                if (isIn)
+                                    _explState = ExplState.IB;
+                                else
+                                    _explState = ExplState.OB;
+                                break;
+
+                            case IB:
+                                if (!isIn) {
+                                    _explState = ExplState.BOTH;
+                                    _context.router().setExplTunnelsReady();
+                                }
+                                break;
+
+                            case OB:
+                                if (isIn) {
+                                    _explState = ExplState.BOTH;
+                                    _context.router().setExplTunnelsReady();
+                                }
+                                break;
+
+                            case BOTH:
+                                break;
+                        }
+                    }
+                }
                 
                 ExpireJob expireJob = new ExpireJob(_context, cfg, cfg.getTunnelPool());
                 cfg.setExpireJob(expireJob);

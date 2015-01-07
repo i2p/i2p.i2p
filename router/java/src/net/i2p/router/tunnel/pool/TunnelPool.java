@@ -89,7 +89,7 @@ public class TunnelPool {
         _lastRateUpdate = _started;
         _lastLifetimeProcessed = 0;
         _manager.getExecutor().repoll();
-        if (_settings.isInbound() && (_settings.getDestination() != null) ) {
+        if (_settings.isInbound() && !_settings.isExploratory()) {
             // we just reconnected and didn't require any new tunnel builders.
             // however, we /do/ want a leaseSet, so build one
             LeaseSet ls = null;
@@ -117,10 +117,8 @@ public class TunnelPool {
         }
     }
 
-    TunnelPoolManager getManager() { return _manager; }
-    
     void refreshSettings() {
-        if (_settings.getDestination() != null) {
+        if (!_settings.isExploratory()) {
             return; // don't override client specified settings
         } else {
             if (_settings.isExploratory()) {
@@ -160,7 +158,8 @@ public class TunnelPool {
     TunnelInfo selectTunnel() { return selectTunnel(true); }
 
     private TunnelInfo selectTunnel(boolean allowRecurseOnFail) {
-        boolean avoidZeroHop = ((getSettings().getLength() + getSettings().getLengthVariance()) > 0);
+        boolean avoidZeroHop = getSettings().getLength() > 0 &&
+                               getSettings().getLength() + getSettings().getLengthVariance() > 0;
         
         long period = curPeriod();
         synchronized (_tunnels) {
@@ -247,7 +246,8 @@ public class TunnelPool {
      * @since 0.8.10
      */
     TunnelInfo selectTunnel(Hash closestTo) {
-        boolean avoidZeroHop = ((getSettings().getLength() + getSettings().getLengthVariance()) > 0);
+        boolean avoidZeroHop = getSettings().getLength() > 0 &&
+                               getSettings().getLength() + getSettings().getLengthVariance() > 0;
         TunnelInfo rv = null;
         synchronized (_tunnels) {
             if (!_tunnels.isEmpty()) {
@@ -419,8 +419,7 @@ public class TunnelPool {
     public boolean isAlive() {
         return _alive &&
                (_settings.isExploratory() ||
-                (_settings.getDestination() != null &&
-                 _context.clientManager().isLocal(_settings.getDestination())));
+                 _context.clientManager().isLocal(_settings.getDestination()));
     }
 
     /** duplicate of getTunnelCount(), let's pick one */
@@ -439,7 +438,7 @@ public class TunnelPool {
         LeaseSet ls = null;
         synchronized (_tunnels) {
             _tunnels.add(info);
-            if (_settings.isInbound() && (_settings.getDestination() != null) )
+            if (_settings.isInbound() && !_settings.isExploratory())
                 ls = locked_buildNewLeaseSet();
         }
         
@@ -459,7 +458,7 @@ public class TunnelPool {
             boolean removed = _tunnels.remove(info);
             if (!removed)
                 return;
-            if (_settings.isInbound() && (_settings.getDestination() != null) )
+            if (_settings.isInbound() && !_settings.isExploratory())
                 ls = locked_buildNewLeaseSet();
             remaining = _tunnels.size();
             if (_lastSelected == info) {
@@ -478,7 +477,7 @@ public class TunnelPool {
         for (int i = 0; i < info.getLength(); i++)
             _context.profileManager().tunnelLifetimePushed(info.getPeer(i), lifetime, lifetimeConfirmed);
         
-        if (_alive && _settings.isInbound() && (_settings.getDestination() != null) ) {
+        if (_alive && _settings.isInbound() && !_settings.isExploratory()) {
             if (ls != null) {
                 _context.clientManager().requestLeaseSet(_settings.getDestination(), ls);
             } else {
@@ -528,7 +527,7 @@ public class TunnelPool {
             boolean removed = _tunnels.remove(cfg);
             if (!removed)
                 return;
-            if (_settings.isInbound() && (_settings.getDestination() != null) )
+            if (_settings.isInbound() && !_settings.isExploratory())
                 ls = locked_buildNewLeaseSet();
             if (_lastSelected == cfg) {
                 _lastSelected = null;
@@ -541,7 +540,7 @@ public class TunnelPool {
         _lifetimeProcessed += cfg.getProcessedMessagesCount();
         updateRate();
         
-        if (_settings.isInbound() && (_settings.getDestination() != null) ) {
+        if (_settings.isInbound() && !_settings.isExploratory()) {
             if (ls != null) {
                 _context.clientManager().requestLeaseSet(_settings.getDestination(), ls);
             }
@@ -590,7 +589,7 @@ public class TunnelPool {
 
     /** noop for outbound and exploratory */
     void refreshLeaseSet() {
-        if (_settings.isInbound() && (_settings.getDestination() != null) ) {
+        if (_settings.isInbound() && !_settings.isExploratory()) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug(toString() + ": refreshing leaseSet on tunnel expiration (but prior to grace timeout)");
             LeaseSet ls = null;
@@ -618,7 +617,7 @@ public class TunnelPool {
 
         if (_settings.getAllowZeroHop()) {
             if ( (_settings.getLength() + _settings.getLengthVariance() > 0) && 
-                 (_settings.getDestination() != null) &&
+                 (!_settings.isExploratory()) &&
                  (_context.profileOrganizer().countActivePeers() > 0) ) {
                 // if it is a client tunnel pool and our variance doesn't allow 0 hop, prefer failure to
                 // 0 hop operation (unless our router is offline)

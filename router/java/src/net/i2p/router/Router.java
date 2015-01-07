@@ -78,16 +78,15 @@ public class Router implements RouterClock.ClockShiftListener {
     private boolean _higherVersionSeen;
     //private SessionKeyPersistenceHelper _sessionKeyPersistenceHelper;
     private boolean _killVMOnEnd;
-    private volatile boolean _isAlive;
     private int _gracefulExitCode;
     private I2PThread.OOMEventListener _oomListener;
     private ShutdownHook _shutdownHook;
-    /** non-cancellable shutdown has begun */
-    private volatile boolean _shutdownInProgress;
     private I2PThread _gracefulShutdownDetector;
     private RouterWatchdog _watchdog;
     private Thread _watchdogThread;
     private final EventLog _eventLog;
+    private final Object _stateLock = new Object();
+    private State _state = State.UNINITIALIZED;
     
     public final static String PROP_CONFIG_FILE = "router.configLocation";
     
@@ -105,7 +104,8 @@ public class Router implements RouterClock.ClockShiftListener {
     /** this does not put an 'H' in your routerInfo **/
     public final static String PROP_HIDDEN_HIDDEN = "router.isHidden";
     public final static String PROP_DYNAMIC_KEYS = "router.dynamicKeys";
-    public final static String PROP_SHUTDOWN_IN_PROGRESS = "__shutdownInProgress";
+    /** deprecated, use gracefulShutdownInProgress() */
+    private final static String PROP_SHUTDOWN_IN_PROGRESS = "__shutdownInProgress";
     private static final String PROP_IB_RANDOM_KEY = TunnelPoolSettings.PREFIX_INBOUND_EXPLORATORY + TunnelPoolSettings.PROP_RANDOM_KEY;
     private static final String PROP_OB_RANDOM_KEY = TunnelPoolSettings.PREFIX_OUTBOUND_EXPLORATORY + TunnelPoolSettings.PROP_RANDOM_KEY;
     public final static String DNS_CACHE_TIME = "" + (5*60);
@@ -287,6 +287,7 @@ public class Router implements RouterClock.ClockShiftListener {
             _config.put("router.previousVersion", RouterVersion.VERSION);
             saveConfig();
         }
+        changeState(State.INITIALIZED);
         // *********  Start no threads before here ********* //
     }
 
@@ -459,11 +460,16 @@ public class Router implements RouterClock.ClockShiftListener {
      *  Standard standalone installation uses main() instead, which
      *  checks for updates and then calls this.
      *
+     *  This may take quite a while, especially if NTP fails.
+     *
      *  @since public as of 0.9 for Android and other embedded uses
      */
     public synchronized void runRouter() {
-        if (_isAlive)
-            throw new IllegalStateException();
+        synchronized(_stateLock) {
+            if (_state != State.INITIALIZED)
+                throw new IllegalStateException();
+            changeState(State.STARTING_1);
+        }
         String last = _config.get("router.previousFullVersion");
         if (last != null) {
             _eventLog.addEvent(EventLog.UPDATED, "from " + last + " to " + RouterVersion.FULL_VERSION);
@@ -471,7 +477,7 @@ public class Router implements RouterClock.ClockShiftListener {
         }
         _eventLog.addEvent(EventLog.STARTED, RouterVersion.FULL_VERSION);
         startupStuff();
-        _isAlive = true;
+        changeState(State.STARTING_2);
         _started = _context.clock().now();
         try {
             Runtime.getRuntime().addShutdownHook(_shutdownHook);
@@ -518,6 +524,7 @@ public class Router implements RouterClock.ClockShiftListener {
         if (_log.shouldLog(Log.INFO))
             _log.info("Waited " + waited + "ms to initialize");
 
+        changeState(State.STARTING_3);
         _context.jobQueue().addJob(new StartupJob(_context));
     }
     
@@ -573,9 +580,141 @@ public class Router implements RouterClock.ClockShiftListener {
         }
         return props;
     }
+
+    ////////// begin state management
     
-    public boolean isAlive() { return _isAlive; }
+    /**
+     *  Startup / shutdown states
+     *
+     *  @since 0.9.18
+     */
+    private enum State {
+        UNINITIALIZED,
+        /** constructor complete */
+        INITIALIZED,
+        /** runRouter() called */
+        STARTING_1,
+        /** startupStuff() complete, most of the time here is NTP */
+        STARTING_2,
+        /** NTP done, Job queue started, StartupJob queued, runRouter() returned */
+        STARTING_3,
+        /** RIs loaded. From STARTING_3 */
+        NETDB_READY,
+        /** Non-zero-hop expl. tunnels built. From STARTING_3 */
+        EXPL_TUNNELS_READY,
+        /** from NETDB_READY or EXPL_TUNNELS_READY */
+        RUNNING,
+        /**
+         *  A "soft" restart, primarily of the comm system, after
+         *  a port change or large step-change in system time.
+         *  Does not stop the whole JVM, so it is safe even in the absence
+         *  of the wrapper.
+         *  This is not a graceful restart - all peer connections are dropped immediately.
+         */
+        RESTARTING,
+        /** cancellable shutdown has begun */
+        GRACEFUL_SHUTDOWN,
+        /** In shutdown(). Non-cancellable shutdown has begun */
+        FINAL_SHUTDOWN_1,
+        /** In shutdown2(). Killing everything */
+        FINAL_SHUTDOWN_2,
+        /** In finalShutdown(). Final cleanup */
+        FINAL_SHUTDOWN_3,
+        /** all done */
+        STOPPED
+    }
     
+    /**
+     *  @since 0.9.18
+     */
+    private void changeState(State state) {
+        State oldState;
+        synchronized(_stateLock) {
+            oldState = _state;
+            _state = state;
+        }
+        if (_log != null && state != State.STOPPED && _log.shouldLog(Log.WARN))
+            _log.warn("Router state change from " + oldState + " to " + state /* , new Exception() */ );
+    }
+
+    /**
+     *  True during the initial start, but false during a soft restart.
+     */
+    public boolean isAlive() {
+        synchronized(_stateLock) {
+            return _state == State.RUNNING ||
+                   _state == State.GRACEFUL_SHUTDOWN ||
+                   _state == State.STARTING_1 ||
+                   _state == State.STARTING_2 ||
+                   _state == State.STARTING_3 ||
+                   _state == State.NETDB_READY ||
+                   _state == State.EXPL_TUNNELS_READY;
+        }
+    }
+
+    /**
+     *  Only for Restarter, after soft restart is complete
+     *  @since 0.8.12
+     */
+    public void setIsAlive() {
+        changeState(State.RUNNING);
+    }
+
+    /**
+     *  Only for NetDB, after RIs are loaded
+     *  @since 0.9.18
+     */
+    public void setNetDbReady() {
+        synchronized(_stateLock) {
+            if (_state == State.STARTING_3)
+                changeState(State.NETDB_READY);
+            else if (_state == State.EXPL_TUNNELS_READY)
+                changeState(State.RUNNING);
+        }
+    }
+
+    /**
+     *  Only for Tunnel Building, after we have non-zero-hop expl. tunnels
+     *  @since 0.9.18
+     */
+    public void setExplTunnelsReady() {
+        synchronized(_stateLock) {
+            if (_state == State.STARTING_3)
+                changeState(State.EXPL_TUNNELS_READY);
+            else if (_state == State.NETDB_READY)
+                changeState(State.RUNNING);
+        }
+    }
+
+    /**
+     * Is a graceful shutdown in progress? This may be cancelled.
+     * Note that this also returns true if an uncancellable final shutdown is in progress.
+     */
+    public boolean gracefulShutdownInProgress() {
+        synchronized(_stateLock) {
+            return _state == State.GRACEFUL_SHUTDOWN ||
+                   _state == State.FINAL_SHUTDOWN_1 ||
+                   _state == State.FINAL_SHUTDOWN_2 ||
+                   _state == State.FINAL_SHUTDOWN_3 ||
+                   _state == State.STOPPED;
+        }
+    }
+
+    /**
+     * Is a final shutdown in progress? This may not be cancelled.
+     * @since 0.8.12
+     */
+    public boolean isFinalShutdownInProgress() {
+        synchronized(_stateLock) {
+            return _state == State.FINAL_SHUTDOWN_1 ||
+                   _state == State.FINAL_SHUTDOWN_2 ||
+                   _state == State.FINAL_SHUTDOWN_3 ||
+                   _state == State.STOPPED;
+        }
+    }
+
+    ////////// end state management
+
     /**
      * Rebuild and republish our routerInfo since something significant 
      * has changed.
@@ -801,9 +940,14 @@ public class Router implements RouterClock.ClockShiftListener {
      *  Shutdown with no chance of cancellation
      */
     public synchronized void shutdown(int exitCode) {
-        if (_shutdownInProgress)
-            return;
-        _shutdownInProgress = true;
+        synchronized(_stateLock) {
+            if (_state == State.FINAL_SHUTDOWN_1 ||
+                _state == State.FINAL_SHUTDOWN_2 ||
+                _state == State.FINAL_SHUTDOWN_3 ||
+                _state == State.STOPPED)
+                return;
+            changeState(State.FINAL_SHUTDOWN_1);
+        }
         _context.throttle().setShutdownStatus();
         if (_shutdownHook != null) {
             try {
@@ -819,10 +963,10 @@ public class Router implements RouterClock.ClockShiftListener {
      *  NOT to be called by others, use shutdown().
      */
     public synchronized void shutdown2(int exitCode) {
+        changeState(State.FINAL_SHUTDOWN_2);
         // help us shut down esp. after OOM
         int priority = (exitCode == EXIT_OOM) ? Thread.MAX_PRIORITY - 1 : Thread.NORM_PRIORITY + 2;
         Thread.currentThread().setPriority(priority);
-        _shutdownInProgress = true;
         _log.log(Log.CRIT, "Starting final shutdown(" + exitCode + ')');
         // So we can get all the way to the end
         // No, you can't do Thread.currentThread.setDaemon(false)
@@ -832,7 +976,6 @@ public class Router implements RouterClock.ClockShiftListener {
             } catch (Throwable t) {}
         }
         ((RouterClock) _context.clock()).removeShiftListener(this);
-        _isAlive = false;
         _context.random().saveSeed();
         I2PThread.removeOOMEventListener(_oomListener);
         // Run the shutdown hooks first in case they want to send some goodbye messages
@@ -916,6 +1059,7 @@ public class Router implements RouterClock.ClockShiftListener {
      *  Cancel the JVM runtime hook before calling this.
      */
     private synchronized void finalShutdown(int exitCode) {
+        changeState(State.FINAL_SHUTDOWN_3);
         clearCaches();
         _log.log(Log.CRIT, "Shutdown(" + exitCode + ") complete"  /* , new Exception("Shutdown") */ );
         try { _context.logManager().shutdown(); } catch (Throwable t) { }
@@ -948,6 +1092,7 @@ public class Router implements RouterClock.ClockShiftListener {
         } else if (SystemVersion.isAndroid()) {
             Runtime.getRuntime().gc();
         }
+        changeState(State.STOPPED);
     }
     
     /**
@@ -962,13 +1107,21 @@ public class Router implements RouterClock.ClockShiftListener {
     public void shutdownGracefully() {
         shutdownGracefully(EXIT_GRACEFUL);
     }
+
     /**
      * Call this with EXIT_HARD or EXIT_HARD_RESTART for a non-blocking,
      * hard, non-graceful shutdown with a brief delay to allow a UI response
+     *
+     * Returns silently if a final shutdown is already in progress.
      */
     public void shutdownGracefully(int exitCode) {
+        synchronized(_stateLock) {
+            if (isFinalShutdownInProgress())
+                return; // too late
+            changeState(State.GRACEFUL_SHUTDOWN);
+        }
         _gracefulExitCode = exitCode;
-        _config.put(PROP_SHUTDOWN_IN_PROGRESS, "true");
+        //_config.put(PROP_SHUTDOWN_IN_PROGRESS, "true");
         _context.throttle().setShutdownStatus();
         synchronized (_gracefulShutdownDetector) {
             _gracefulShutdownDetector.notifyAll();
@@ -978,10 +1131,16 @@ public class Router implements RouterClock.ClockShiftListener {
     /**
      * Cancel any prior request to shut the router down gracefully.
      *
+     * Returns silently if a final shutdown is already in progress.
      */
     public void cancelGracefulShutdown() {
+        synchronized(_stateLock) {
+            if (isFinalShutdownInProgress())
+                return; // too late
+            changeState(State.RUNNING);
+        }
         _gracefulExitCode = -1;
-        _config.remove(PROP_SHUTDOWN_IN_PROGRESS);
+        //_config.remove(PROP_SHUTDOWN_IN_PROGRESS);
         _context.throttle().cancelShutdownStatus();
         synchronized (_gracefulShutdownDetector) {
             _gracefulShutdownDetector.notifyAll();
@@ -992,21 +1151,6 @@ public class Router implements RouterClock.ClockShiftListener {
      * What exit code do we plan on using when we shut down (or -1, if there isn't a graceful shutdown planned)
      */
     public int scheduledGracefulExitCode() { return _gracefulExitCode; }
-
-    /**
-     * Is a graceful shutdown in progress? This may be cancelled.
-     */
-    public boolean gracefulShutdownInProgress() {
-        return (null != _config.get(PROP_SHUTDOWN_IN_PROGRESS));
-    }
-
-    /**
-     * Is a final shutdown in progress? This may not be cancelled.
-     * @since 0.8.12
-     */
-    public boolean isFinalShutdownInProgress() {
-        return _shutdownInProgress;
-    }
 
     /** How long until the graceful shutdown will kill us?  */
     public long getShutdownTimeRemaining() {
@@ -1094,8 +1238,10 @@ public class Router implements RouterClock.ClockShiftListener {
      *  @since 0.8.8
      */
     public void clockShift(long delta) {
-        if (gracefulShutdownInProgress() || !_isAlive)
-            return;
+        synchronized(_stateLock) {
+            if (gracefulShutdownInProgress() || !isAlive())
+                return;
+        }
         if (delta > -60*1000 && delta < 60*1000)
             return;
         _eventLog.addEvent(EventLog.CLOCK_SHIFT, Long.toString(delta));
@@ -1121,23 +1267,17 @@ public class Router implements RouterClock.ClockShiftListener {
      *  Poll isAlive() if you need to know when the restart is complete.
      */
     public synchronized void restart() {
-        if (gracefulShutdownInProgress() || !_isAlive)
-            return;
+        synchronized(_stateLock) {
+            if (gracefulShutdownInProgress() || !isAlive())
+                return;
+            changeState(State.RESTARTING);
+        }
         ((RouterClock) _context.clock()).removeShiftListener(this);
-        _isAlive = false;
         _started = _context.clock().now();
         Thread t = new Thread(new Restarter(_context), "Router Restart");
         t.setPriority(Thread.NORM_PRIORITY + 1);
         t.start();
     }    
-
-    /**
-     *  Only for Restarter
-     *  @since 0.8.12
-     */
-    public void setIsAlive() {
-        _isAlive = true;
-    }
 
     /**
      *  Usage: Router [rebuild]

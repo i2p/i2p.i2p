@@ -66,7 +66,7 @@ class FloodfillMonitorJob extends JobImpl {
 
     private boolean shouldBeFloodfill() {
         // Only if not shutting down...
-        if (getContext().getProperty(Router.PROP_SHUTDOWN_IN_PROGRESS) != null)
+        if (getContext().router().gracefulShutdownInProgress())
             return false;
 
         // Hidden trumps netDb.floodfillParticipant=true

@@ -107,7 +107,7 @@ class RouterThrottleImpl implements RouterThrottle {
      *  @return 0 for accept or nonzero reject code
      */
     public int acceptTunnelRequest() { 
-        if (_context.getProperty(Router.PROP_SHUTDOWN_IN_PROGRESS) != null) {
+        if (_context.router().gracefulShutdownInProgress()) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Refusing tunnel request since we are shutting down ASAP");
             setShutdownStatus();
