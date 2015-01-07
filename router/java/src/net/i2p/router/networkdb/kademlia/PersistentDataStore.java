@@ -364,11 +364,12 @@ class PersistentDataStore extends TransientDataStore {
             }
             if (shouldScan) {
                 _log.info("Rereading new files");
-                _lastModified = now;
                 // synch with the writer job
                 synchronized (_dbDir) {
+                    // _lastModified must be 0 for the first run
                     readFiles();
                 }
+                _lastModified = now;
             }
             requeue(READ_DELAY);
         }
