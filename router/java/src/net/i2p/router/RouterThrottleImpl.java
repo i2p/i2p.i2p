@@ -28,7 +28,7 @@ class RouterThrottleImpl implements RouterThrottle {
     private static final String PROP_MAX_TUNNELS = "router.maxParticipatingTunnels";
     private static final int DEFAULT_MAX_TUNNELS = 5000;
     private static final String PROP_MAX_PROCESSINGTIME = "router.defaultProcessingTimeThrottle";
-    private static final long DEFAULT_REJECT_STARTUP_TIME = 20*60*1000;
+    private static final long DEFAULT_REJECT_STARTUP_TIME = 10*60*1000;
     private static final String PROP_REJECT_STARTUP_TIME = "router.rejectStartupTime";
 
     /**
