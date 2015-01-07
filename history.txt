@@ -1,6 +1,8 @@
 2015-01-07 zzz
- * ClientAppConfig: Start i2ptunnel sooner
+ * ClientAppConfig: Start i2ptunnel sooner (ticket #1162)
+ * NetDB: Possible fixes for reseed completion not recognized (ticket #1384)
  * Router: Add startup/shutdown state machine
+ * Startup: Accept tunnels after 10 minutes instead of 20 (ticket #1152)
  * Tunnels: Cleanup, catch more cases of zero-hop configuration
 
 2015-01-05 zzz
