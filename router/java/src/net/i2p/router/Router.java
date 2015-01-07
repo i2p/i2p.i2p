@@ -1273,7 +1273,8 @@ public class Router implements RouterClock.ClockShiftListener {
             changeState(State.RESTARTING);
         }
         ((RouterClock) _context.clock()).removeShiftListener(this);
-        _started = _context.clock().now();
+        // Let's not stop accepting tunnels, etc
+        //_started = _context.clock().now();
         Thread t = new Thread(new Restarter(_context), "Router Restart");
         t.setPriority(Thread.NORM_PRIORITY + 1);
         t.start();

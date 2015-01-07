@@ -52,6 +52,7 @@ public class TunnelPool {
     /** if less than one success in this many, reduce length (exploratory only) */
     private static final int BUILD_TRIES_LENGTH_OVERRIDE_1 = 10;
     private static final int BUILD_TRIES_LENGTH_OVERRIDE_2 = 18;
+    private static final long STARTUP_TIME = 30*60*1000;
     
     TunnelPool(RouterContext ctx, TunnelPoolManager mgr, TunnelPoolSettings settings, TunnelPeerSelector sel) {
         _context = ctx;
@@ -347,6 +348,10 @@ public class TunnelPool {
                     }
                 }
             }
+        }
+        if (_settings.isExploratory() && _context.router().getUptime() < STARTUP_TIME) {
+            // more exploratory during startup, when we are refreshing the netdb RIs
+            rv++;
         }
         return rv;
     }
