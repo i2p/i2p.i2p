@@ -131,8 +131,8 @@ msgstr "您所打开的地址簿连接指定的目标密钥与您的地址簿中
 
 #: ../java/build/Proxy.java:25
 msgid ""
-"Someone could be trying to impersonate another eepsite, or people have given"
-" two eepsites identical names."
+"Someone could be trying to impersonate another website, or people have given"
+" two websites identical names."
 msgstr "可能有人正试图通过此链接伪装成此站点，或有人使用了相同的站点网址。"
 
 #: ../java/build/Proxy.java:26
@@ -172,16 +172,16 @@ msgstr "您尝试连接的网站非I2P站点或位置。"
 #: ../java/build/Proxy.java:45 ../java/build/Proxy.java:51
 #: ../java/build/Proxy.java:56 ../java/build/Proxy.java:62
 #: ../java/build/Proxy.java:83 ../java/build/Proxy.java:89
-msgid "Warning: Eepsite Unreachable"
+msgid "Warning: Website Unreachable"
 msgstr "警告：I2P 站点不可达"
 
 #: ../java/build/Proxy.java:52
-msgid "The eepsite was not reachable, because its lease set was not found."
+msgid "The website was not reachable, because its lease set was not found."
 msgstr "该匿名网站不可达，因为找不到其租契。"
 
 #: ../java/build/Proxy.java:53
 msgid ""
-"The eepsite is probably down, but there could also be network congestion."
+"The website is probably down, but there could also be network congestion."
 msgstr "该匿名网站可能已下线，但也可能是由于网络拥堵。"
 
 #: ../java/build/Proxy.java:54 ../java/build/Proxy.java:92
@@ -198,7 +198,7 @@ msgstr "无法直到如下目标："
 
 #: ../java/build/Proxy.java:63
 msgid ""
-"The eepsite was not reachable, because it uses encryption options that are "
+"The website was not reachable, because it uses encryption options that are "
 "not supported by your I2P or Java version."
 msgstr "此匿名网站不可达，因为您使用的 I2P 或者 Java 版本不支持它使用的加密选项。"
 
@@ -239,12 +239,12 @@ msgid "Please configure an outproxy in I2PTunnel."
 msgstr "请到 I2PTunnel 中配置出口代理。"
 
 #: ../java/build/Proxy.java:90
-msgid "The eepsite was not reachable."
+msgid "The website was not reachable."
 msgstr "此 I2P 站点不可达"
 
 #: ../java/build/Proxy.java:91
 msgid ""
-"The eepsite is offline, there is network congestion, or your router is not "
+"The website is offline, there is network congestion, or your router is not "
 "yet well-integrated with peers."
 msgstr "此 I2P 站点已经下线，遇到网络拥堵，或您的路由尚未完全整合至 I2P 网络中。"
 
@@ -254,7 +254,7 @@ msgstr "警告：无效目标"
 
 #: ../java/build/Proxy.java:101
 msgid ""
-"The eepsite destination specified was not valid, or was otherwise "
+"The website destination specified was not valid, or was otherwise "
 "unreachable."
 msgstr "指定站点的目标密钥无效，或无法到达。"
 
@@ -311,15 +311,15 @@ msgid ""
 msgstr "如果问题持续存在，您可能需要{0}在此{1}编辑出口代理列表。"
 
 #: ../java/build/Proxy.java:127
-msgid "Warning: Eepsite Unknown"
+msgid "Warning: Website Unknown"
 msgstr "警告：未知 I2P 站点"
 
 #: ../java/build/Proxy.java:133
-msgid "Warning: Eepsite Not Found in Addressbook"
+msgid "Warning: Website Not Found in Addressbook"
 msgstr "警告：地址簿中未找到该 I2P 站点"
 
 #: ../java/build/Proxy.java:134
-msgid "The eepsite was not found in your router's addressbook."
+msgid "The website was not found in your router's addressbook."
 msgstr "此 I2P 站点未存在于您路由器的地址簿中。"
 
 #: ../java/build/Proxy.java:135
@@ -450,18 +450,18 @@ msgstr "继续{0}，而不保存"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1181
 #, java-format
-msgid "Save {0} to router address book and continue to eepsite"
+msgid "Save {0} to router address book and continue to website"
 msgstr "保存{0}至“路由器地址簿”并访问该 I2P 站点。"
 
 #. only blockfile supports multiple books
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1184
 #, java-format
-msgid "Save {0} to master address book and continue to eepsite"
+msgid "Save {0} to master address book and continue to website"
 msgstr "保存{0}至“主地址簿”并访问该 I2P 站点。"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1185
 #, java-format
-msgid "Save {0} to private address book and continue to eepsite"
+msgid "Save {0} to private address book and continue to website"
 msgstr "保存{0}至“私有地址簿”并访问该 I2P 站点。"
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:162

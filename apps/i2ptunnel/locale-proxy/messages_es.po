@@ -133,9 +133,9 @@ msgstr "El enlace de ayuda que ha pulsado tienen una clave de destino diferente 
 
 #: ../java/build/Proxy.java:25
 msgid ""
-"Someone could be trying to impersonate another eepsite, or people have given"
-" two eepsites identical names."
-msgstr "Alguien podría estar intentando hacerse pasar por otra eepsite, o la gente ha puesto nombres idénticos a varias eepsites."
+"Someone could be trying to impersonate another website, or people have given"
+" two websites identical names."
+msgstr "Alguien podría estar intentando hacerse pasar por otra website, o la gente ha puesto nombres idénticos a varias websites."
 
 #: ../java/build/Proxy.java:26
 msgid ""
@@ -174,17 +174,17 @@ msgstr "Ha intentado conectarse a una localización o una web no I2P."
 #: ../java/build/Proxy.java:45 ../java/build/Proxy.java:51
 #: ../java/build/Proxy.java:56 ../java/build/Proxy.java:62
 #: ../java/build/Proxy.java:83 ../java/build/Proxy.java:89
-msgid "Warning: Eepsite Unreachable"
-msgstr "Advertencia: Eepsite no accesible"
+msgid "Warning: Website Unreachable"
+msgstr "Advertencia: Website no accesible"
 
 #: ../java/build/Proxy.java:52
-msgid "The eepsite was not reachable, because its lease set was not found."
-msgstr "El eepsite no estaba accesible porque no se encontró su LeaseSet (grupo de túneles a un destino)"
+msgid "The website was not reachable, because its lease set was not found."
+msgstr "El website no estaba accesible porque no se encontró su LeaseSet (grupo de túneles a un destino)"
 
 #: ../java/build/Proxy.java:53
 msgid ""
-"The eepsite is probably down, but there could also be network congestion."
-msgstr "El eepsite probablemente estaba caído, pero también puedo haber congestión en la red."
+"The website is probably down, but there could also be network congestion."
+msgstr "El website probablemente estaba caído, pero también puedo haber congestión en la red."
 
 #: ../java/build/Proxy.java:54 ../java/build/Proxy.java:92
 #: ../java/build/Proxy.java:104
@@ -200,9 +200,9 @@ msgstr "No se pudo encontrar el siguiente destino:"
 
 #: ../java/build/Proxy.java:63
 msgid ""
-"The eepsite was not reachable, because it uses encryption options that are "
+"The website was not reachable, because it uses encryption options that are "
 "not supported by your I2P or Java version."
-msgstr "El eepsite no se pudo alcanzar, porque usa opciones de cifrado que no están soportadas por su versión de I2P o de Java."
+msgstr "El website no se pudo alcanzar, porque usa opciones de cifrado que no están soportadas por su versión de I2P o de Java."
 
 #: ../java/build/Proxy.java:64 ../java/build/Proxy.java:126
 msgid "Could not connect to the following destination:"
@@ -241,14 +241,14 @@ msgid "Please configure an outproxy in I2PTunnel."
 msgstr "Por favor, configure un proxy de salida en el I2PTunnel."
 
 #: ../java/build/Proxy.java:90
-msgid "The eepsite was not reachable."
-msgstr "No se ha podido acceder a la eepsite."
+msgid "The website was not reachable."
+msgstr "No se ha podido acceder a la website."
 
 #: ../java/build/Proxy.java:91
 msgid ""
-"The eepsite is offline, there is network congestion, or your router is not "
+"The website is offline, there is network congestion, or your router is not "
 "yet well-integrated with peers."
-msgstr "La eepsite está pagada, o hay congestión en la red, o su ruter no está aún bien integrado con los otros pares."
+msgstr "La website está pagada, o hay congestión en la red, o su ruter no está aún bien integrado con los otros pares."
 
 #: ../java/build/Proxy.java:94 ../java/build/Proxy.java:100
 msgid "Warning: Invalid Destination"
@@ -256,9 +256,9 @@ msgstr "Aviso: Destinación no válida."
 
 #: ../java/build/Proxy.java:101
 msgid ""
-"The eepsite destination specified was not valid, or was otherwise "
+"The website destination specified was not valid, or was otherwise "
 "unreachable."
-msgstr "La destinación de eepsite especificada no es válida, o quizás no se ha podido acceder a ella."
+msgstr "La destinación de website especificada no es válida, o quizás no se ha podido acceder a ella."
 
 #: ../java/build/Proxy.java:102
 msgid ""
@@ -313,16 +313,16 @@ msgid ""
 msgstr "Si aún sigue teniendo problemas puede ser que desee editar si lista de outproxies {0}aquí{1}."
 
 #: ../java/build/Proxy.java:127
-msgid "Warning: Eepsite Unknown"
-msgstr "Advertencia: Eepsite desconocida."
+msgid "Warning: Website Unknown"
+msgstr "Advertencia: Website desconocida."
 
 #: ../java/build/Proxy.java:133
-msgid "Warning: Eepsite Not Found in Addressbook"
-msgstr "Advertencia: Eepsite no encontrada en la libreta de direcciones"
+msgid "Warning: Website Not Found in Addressbook"
+msgstr "Advertencia: Website no encontrada en la libreta de direcciones"
 
 #: ../java/build/Proxy.java:134
-msgid "The eepsite was not found in your router's addressbook."
-msgstr "LA eepsite no se encontró en su libreta de direcciones."
+msgid "The website was not found in your router's addressbook."
+msgstr "LA website no se encontró en su libreta de direcciones."
 
 #: ../java/build/Proxy.java:135
 msgid "Check the link or find a Base 32 or Base 64 address."
@@ -452,18 +452,18 @@ msgstr "Acceder a {0} sin guardar"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1181
 #, java-format
-msgid "Save {0} to router address book and continue to eepsite"
+msgid "Save {0} to router address book and continue to website"
 msgstr "Guardar {0} a la libreta de direcciones del router y acceder al sitio i2p."
 
 #. only blockfile supports multiple books
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1184
 #, java-format
-msgid "Save {0} to master address book and continue to eepsite"
+msgid "Save {0} to master address book and continue to website"
 msgstr "Guardar {0} a la libreta de direcciones principal y acceder al sitio i2p."
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1185
 #, java-format
-msgid "Save {0} to private address book and continue to eepsite"
+msgid "Save {0} to private address book and continue to website"
 msgstr "Guardar {0} a la libreta de direcciones privada y acceder al sitio i2p."
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:162

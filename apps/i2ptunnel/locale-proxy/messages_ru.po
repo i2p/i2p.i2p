@@ -132,8 +132,8 @@ msgstr "Ссылка AddressHelper, по которой вы прошли, оп�
 
 #: ../java/build/Proxy.java:25
 msgid ""
-"Someone could be trying to impersonate another eepsite, or people have given"
-" two eepsites identical names."
+"Someone could be trying to impersonate another website, or people have given"
+" two websites identical names."
 msgstr "Кто-то может пытаться выдать себя за другой сайт или разные люди дали двум сайтам одинаковые имена."
 
 #: ../java/build/Proxy.java:26
@@ -173,17 +173,17 @@ msgstr "Вы попытались соединиться с сайтом не в
 #: ../java/build/Proxy.java:45 ../java/build/Proxy.java:51
 #: ../java/build/Proxy.java:56 ../java/build/Proxy.java:62
 #: ../java/build/Proxy.java:83 ../java/build/Proxy.java:89
-msgid "Warning: Eepsite Unreachable"
+msgid "Warning: Website Unreachable"
 msgstr "Предупреждение: Сайт I2P недоступен"
 
 #: ../java/build/Proxy.java:52
-msgid "The eepsite was not reachable, because its lease set was not found."
-msgstr "eepsite недоступен, так как его LeaseSet не был найден."
+msgid "The website was not reachable, because its lease set was not found."
+msgstr "website недоступен, так как его LeaseSet не был найден."
 
 #: ../java/build/Proxy.java:53
 msgid ""
-"The eepsite is probably down, but there could also be network congestion."
-msgstr "eepsite, вероятно, выключен, но также возможна перегрузка сети"
+"The website is probably down, but there could also be network congestion."
+msgstr "website, вероятно, выключен, но также возможна перегрузка сети"
 
 #: ../java/build/Proxy.java:54 ../java/build/Proxy.java:92
 #: ../java/build/Proxy.java:104
@@ -199,9 +199,9 @@ msgstr "Назначение туннеля"
 
 #: ../java/build/Proxy.java:63
 msgid ""
-"The eepsite was not reachable, because it uses encryption options that are "
+"The website was not reachable, because it uses encryption options that are "
 "not supported by your I2P or Java version."
-msgstr "Eepsite недоступен, так как использует настройки шифрования, которые не поддерживаются вашей версией I2P или Java."
+msgstr "Website недоступен, так как использует настройки шифрования, которые не поддерживаются вашей версией I2P или Java."
 
 #: ../java/build/Proxy.java:64 ../java/build/Proxy.java:126
 msgid "Could not connect to the following destination:"
@@ -240,12 +240,12 @@ msgid "Please configure an outproxy in I2PTunnel."
 msgstr "Пожалуйста, настройте выходной прокси-сервер в I2PTunnel."
 
 #: ../java/build/Proxy.java:90
-msgid "The eepsite was not reachable."
+msgid "The website was not reachable."
 msgstr "Сайт I2P недоступен."
 
 #: ../java/build/Proxy.java:91
 msgid ""
-"The eepsite is offline, there is network congestion, or your router is not "
+"The website is offline, there is network congestion, or your router is not "
 "yet well-integrated with peers."
 msgstr "Возможно, он отключен, сеть перегружена или ваш маршрутизатор недостаточно интегрирован с другими узлами."
 
@@ -255,7 +255,7 @@ msgstr "Локальный адрес назначения"
 
 #: ../java/build/Proxy.java:101
 msgid ""
-"The eepsite destination specified was not valid, or was otherwise "
+"The website destination specified was not valid, or was otherwise "
 "unreachable."
 msgstr "Указанный адрес недействителен или недоступен."
 
@@ -312,15 +312,15 @@ msgid ""
 msgstr "Если проблема продолжит появляться, вы можете изменить список прокси-серверов {0}здесь{1}."
 
 #: ../java/build/Proxy.java:127
-msgid "Warning: Eepsite Unknown"
+msgid "Warning: Website Unknown"
 msgstr "Предупреждение: Неизвестный сайт I2P"
 
 #: ../java/build/Proxy.java:133
-msgid "Warning: Eepsite Not Found in Addressbook"
+msgid "Warning: Website Not Found in Addressbook"
 msgstr "Предупреждение: Сайт I2P не найден в адресной книге"
 
 #: ../java/build/Proxy.java:134
-msgid "The eepsite was not found in your router's addressbook."
+msgid "The website was not found in your router's addressbook."
 msgstr "Сайт I2P не найден в адресной книге вашего маршрутизатора."
 
 #: ../java/build/Proxy.java:135
@@ -451,18 +451,18 @@ msgstr "Продолжить переход к {0} без сохранения"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1181
 #, java-format
-msgid "Save {0} to router address book and continue to eepsite"
+msgid "Save {0} to router address book and continue to website"
 msgstr "Сохранить {0} в адресную книгу роутера (router address book) и продолжить переход к eep-сайту"
 
 #. only blockfile supports multiple books
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1184
 #, java-format
-msgid "Save {0} to master address book and continue to eepsite"
+msgid "Save {0} to master address book and continue to website"
 msgstr "Сохранить {0} в основную (master) адресную книгу и продолжить переход к eep-сайту"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1185
 #, java-format
-msgid "Save {0} to private address book and continue to eepsite"
+msgid "Save {0} to private address book and continue to website"
 msgstr "Сохранить {0} в приватную адресную книгу и продолжить переход к eep-сайту"
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:162

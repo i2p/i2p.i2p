@@ -136,9 +136,9 @@ msgstr "Der von Ihnen gefolgte Adresshelfer Link definiert einen anderen Destina
 
 #: ../java/build/Proxy.java:25
 msgid ""
-"Someone could be trying to impersonate another eepsite, or people have given"
-" two eepsites identical names."
-msgstr "Jemand kann versuchen Ihnen eine gefälschte Eepsite darzubieten oder zwei Eepsites haben zufäälig den selben Namen."
+"Someone could be trying to impersonate another website, or people have given"
+" two websites identical names."
+msgstr "Jemand kann versuchen Ihnen eine gefälschte Website darzubieten oder zwei Websites haben zufäälig den selben Namen."
 
 #: ../java/build/Proxy.java:26
 msgid ""
@@ -177,17 +177,17 @@ msgstr "Sie haben versucht eine Webseite oder Adresse ausserhalb von I2P zu erre
 #: ../java/build/Proxy.java:45 ../java/build/Proxy.java:51
 #: ../java/build/Proxy.java:56 ../java/build/Proxy.java:62
 #: ../java/build/Proxy.java:83 ../java/build/Proxy.java:89
-msgid "Warning: Eepsite Unreachable"
-msgstr "Warnung: Eepsite unerreichbar"
+msgid "Warning: Website Unreachable"
+msgstr "Warnung: Website unerreichbar"
 
 #: ../java/build/Proxy.java:52
-msgid "The eepsite was not reachable, because its lease set was not found."
-msgstr "Die Eepsite wurde nicht erreicht, da deren Leaseset nicht gefunden wurde."
+msgid "The website was not reachable, because its lease set was not found."
+msgstr "Die Website wurde nicht erreicht, da deren Leaseset nicht gefunden wurde."
 
 #: ../java/build/Proxy.java:53
 msgid ""
-"The eepsite is probably down, but there could also be network congestion."
-msgstr "Die Eepsite ist wahrscheinlich nicht aktiv, aber es kann auch ein Problem im Netzwerk sein"
+"The website is probably down, but there could also be network congestion."
+msgstr "Die Website ist wahrscheinlich nicht aktiv, aber es kann auch ein Problem im Netzwerk sein"
 
 #: ../java/build/Proxy.java:54 ../java/build/Proxy.java:92
 #: ../java/build/Proxy.java:104
@@ -203,7 +203,7 @@ msgstr "Tunnel Ziel"
 
 #: ../java/build/Proxy.java:63
 msgid ""
-"The eepsite was not reachable, because it uses encryption options that are "
+"The website was not reachable, because it uses encryption options that are "
 "not supported by your I2P or Java version."
 msgstr "Diese Eepseite war nicht erreichbar, da die verwendeten Verschlüsselungseinstellungen nicht von deiner I2P- oder Java-Version unterstützt werden."
 
@@ -244,14 +244,14 @@ msgid "Please configure an outproxy in I2PTunnel."
 msgstr "Bitte stelle einen Ausgangsproxy in I2PTunnel ein"
 
 #: ../java/build/Proxy.java:90
-msgid "The eepsite was not reachable."
-msgstr "Die Eepsite ist nicht erreichbar."
+msgid "The website was not reachable."
+msgstr "Die Website ist nicht erreichbar."
 
 #: ../java/build/Proxy.java:91
 msgid ""
-"The eepsite is offline, there is network congestion, or your router is not "
+"The website is offline, there is network congestion, or your router is not "
 "yet well-integrated with peers."
-msgstr "Die Eepsite ist offline, das Netzwerk ist überlastet oder ihr Router ist nicht gut ins Netzwerk integriert. "
+msgstr "Die Website ist offline, das Netzwerk ist überlastet oder ihr Router ist nicht gut ins Netzwerk integriert. "
 
 #: ../java/build/Proxy.java:94 ../java/build/Proxy.java:100
 msgid "Warning: Invalid Destination"
@@ -259,9 +259,9 @@ msgstr "lokales Ziel"
 
 #: ../java/build/Proxy.java:101
 msgid ""
-"The eepsite destination specified was not valid, or was otherwise "
+"The website destination specified was not valid, or was otherwise "
 "unreachable."
-msgstr "Die genannte Eepsite Adresse ist nicht gültig, oder andersweitig unerreichbar."
+msgstr "Die genannte Website Adresse ist nicht gültig, oder andersweitig unerreichbar."
 
 #: ../java/build/Proxy.java:102
 msgid ""
@@ -316,16 +316,16 @@ msgid ""
 msgstr "Falls Sie weiterhin Probleme haben, können Sie {0}hier{1} Ihre Liste der Outproxies ändern."
 
 #: ../java/build/Proxy.java:127
-msgid "Warning: Eepsite Unknown"
-msgstr "Warnung: Eepsite unbekannt"
+msgid "Warning: Website Unknown"
+msgstr "Warnung: Website unbekannt"
 
 #: ../java/build/Proxy.java:133
-msgid "Warning: Eepsite Not Found in Addressbook"
-msgstr "Warnung: Eepsite Adresse nicht im Adressbuch gefunden"
+msgid "Warning: Website Not Found in Addressbook"
+msgstr "Warnung: Website Adresse nicht im Adressbuch gefunden"
 
 #: ../java/build/Proxy.java:134
-msgid "The eepsite was not found in your router's addressbook."
-msgstr "Die Eepsite wurde nicht im Adressbuch ihres Routers gefunden."
+msgid "The website was not found in your router's addressbook."
+msgstr "Die Website wurde nicht im Adressbuch ihres Routers gefunden."
 
 #: ../java/build/Proxy.java:135
 msgid "Check the link or find a Base 32 or Base 64 address."
@@ -455,18 +455,18 @@ msgstr "Weiter zu {0}, ohne zu speichern"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1181
 #, java-format
-msgid "Save {0} to router address book and continue to eepsite"
+msgid "Save {0} to router address book and continue to website"
 msgstr "{0} im Router-Adressbuch speichern und auf die Eepseite weiterleiten"
 
 #. only blockfile supports multiple books
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1184
 #, java-format
-msgid "Save {0} to master address book and continue to eepsite"
+msgid "Save {0} to master address book and continue to website"
 msgstr "{0} im Master-Adressbuch speichern und auf die Eepseite weiterleiten"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1185
 #, java-format
-msgid "Save {0} to private address book and continue to eepsite"
+msgid "Save {0} to private address book and continue to website"
 msgstr "{0} im privaten Adressbuch speichern und auf die Eepseite weiterleiten"
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:162

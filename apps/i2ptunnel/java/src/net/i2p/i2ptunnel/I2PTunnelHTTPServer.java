@@ -78,7 +78,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
          "\r\n"+
          "<html><head><title>503 Service Unavailable</title></head>\n"+
          "<body><h2>503 Service Unavailable</h2>\n" +
-         "<p>This I2P eepsite is unavailable. It may be down or undergoing maintenance.</p>\n" +
+         "<p>This I2P website is unavailable. It may be down or undergoing maintenance.</p>\n" +
          "</body></html>")
          .getBytes();
 

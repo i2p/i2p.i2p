@@ -122,8 +122,8 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
             "<html><body><H1>I2P ERROR: Destination key conflict</H1>" +
             "The addresshelper link you followed specifies a different destination key " +
             "than a host entry in your host database. " +
-            "Someone could be trying to impersonate another eepsite, " +
-            "or people have given two eepsites identical names.<p>" +
+            "Someone could be trying to impersonate another website, " +
+            "or people have given two websites identical names.<p>" +
             "You can resolve the conflict by considering which key you trust, " +
             "and either discarding the addresshelper link, " +
             "discarding the host entry from your host database, " +
@@ -1183,11 +1183,11 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                 "<input type=\"hidden\" name=\"host\" value=\"" + destination + "\">\n" +
                 "<input type=\"hidden\" name=\"dest\" value=\"" + ahelperKey + "\">\n" +
                 "<input type=\"hidden\" name=\"nonce\" value=\"" + _proxyNonce + "\">\n" +
-                "<button type=\"submit\" class=\"accept\" name=\"router\" value=\"router\">" + _("Save {0} to router address book and continue to eepsite", destination) + "</button><br>\n").getBytes("UTF-8"));
+                "<button type=\"submit\" class=\"accept\" name=\"router\" value=\"router\">" + _("Save {0} to router address book and continue to website", destination) + "</button><br>\n").getBytes("UTF-8"));
         if(_context.namingService().getName().equals("BlockfileNamingService")) {
             // only blockfile supports multiple books
-            out.write(("<br><button type=\"submit\" name=\"master\" value=\"master\">" + _("Save {0} to master address book and continue to eepsite", destination) + "</button><br>\n").getBytes("UTF-8"));
-            out.write(("<button type=\"submit\" name=\"private\" value=\"private\">" + _("Save {0} to private address book and continue to eepsite", destination) + "</button>\n").getBytes("UTF-8"));
+            out.write(("<br><button type=\"submit\" name=\"master\" value=\"master\">" + _("Save {0} to master address book and continue to website", destination) + "</button><br>\n").getBytes("UTF-8"));
+            out.write(("<button type=\"submit\" name=\"private\" value=\"private\">" + _("Save {0} to private address book and continue to website", destination) + "</button>\n").getBytes("UTF-8"));
         }
         // Firefox (and others?) don't send referer to meta refresh target, which is
         // what the jump servers use, so this isn't that useful.
