@@ -203,8 +203,12 @@ public class Reseeder {
             // Since readURL() runs an EepGet with 0 retries,
             // we can report errors with attemptFailed() instead of transferFailed().
             // It has the benefit of providing cause of failure, which helps resolve issues.
-            if (_log.shouldLog(Log.ERROR)) _log.error("EepGet failed on " + url, cause);
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("EepGet failed on " + url, cause);
+            else
+                _log.logAlways(Log.WARN, "EepGet failed on " + url + " : " + cause);
         }
+
         public void bytesTransferred(long alreadyTransferred, int currentWrite, long bytesTransferred, long bytesRemaining, String url) {}
         public void transferComplete(long alreadyTransferred, long bytesTransferred, long bytesRemaining, String url, String outputFile, boolean notModified) {}
         public void transferFailed(String url, long bytesTransferred, long bytesRemaining, int currentAttempt) {}
