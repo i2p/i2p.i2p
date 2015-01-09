@@ -1,9 +1,20 @@
+2015-01-09 zzz
+ * NetDB: Publish RI faster when costs change (ticket #1437)
+
+2015-01-08 zzz
+ * Console, i2ptunnel, proxy: Renaming of various things to "hidden services"
+
 2015-01-07 zzz
  * ClientAppConfig: Start i2ptunnel sooner (ticket #1162)
  * NetDB: Possible fixes for reseed completion not recognized (ticket #1384)
- * Router: Add startup/shutdown state machine
+ * Router:
+   - Add startup/shutdown state machine
+   - Don't reset uptime after a soft restart
  * Startup: Accept tunnels after 10 minutes instead of 20 (ticket #1152)
- * Tunnels: Cleanup, catch more cases of zero-hop configuration
+ * Tunnels:
+   - Cleanup, catch more cases of zero-hop configuration
+   - Temporarily increase exploratory tunnel quantity at startup,
+     so that netdb refresh will work better
 
 2015-01-05 zzz
  * Blocklist:
