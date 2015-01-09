@@ -10,10 +10,12 @@ import net.i2p.data.Hash;
 import net.i2p.data.SimpleDataStructure;
 
 /**
- * Defines the properties for various signature types
+ * PRELIMINARY - unused - subject to change
+ *
+ * Defines the properties for various encryption types
  * that I2P supports or may someday support.
  *
- * All Signatures, SigningPublicKeys, and SigningPrivateKeys have a type.
+ * All PublicKeys and PrivateKeys have a type.
  * Note that a EncType specifies both an algorithm and parameters, so that
  * we may change primes or curves for a given algorithm.
  *
