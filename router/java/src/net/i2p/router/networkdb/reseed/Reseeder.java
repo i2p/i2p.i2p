@@ -151,9 +151,12 @@ public class Reseeder {
         private SSLEepGet.SSLState _sslState;
         private int _gotDate;
         private long _attemptStarted;
+        /** bytes per sec for each su3 downloaded */
+        private final List<Long> _bandwidths;
         private static final int MAX_DATE_SETS = 2;
 
         public ReseedRunner() {
+            _bandwidths = new ArrayList<Long>(4);
         }
 
         /*
@@ -164,6 +167,7 @@ public class Reseeder {
                 run2();
             } finally {
                 _checker.done();
+                processBandwidths();
             }
         }
 
@@ -196,6 +200,22 @@ public class Reseeder {
             _isRunning = false;
             _checker.setStatus("");
             _context.router().eventLog().addEvent(EventLog.RESEED, Integer.toString(total));
+        }
+
+        /**
+         *  @since 0.9.18
+         */
+        private void processBandwidths() {
+            if (_bandwidths.isEmpty())
+                return;
+            long tot = 0;
+            for (Long sample : _bandwidths) {
+                tot += sample.longValue();
+            }
+            long avg = tot / _bandwidths.size();
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Bandwidth average: " + avg + " KBps from " + _bandwidths.size() + " samples");
+            // TODO _context.bandwidthLimiter().....
         }
 
         // EepGet status listeners
@@ -466,12 +486,23 @@ public class Reseeder {
             try {
                 _checker.setStatus(_("Reseeding: fetching seed URL."));
                 System.err.println("Reseeding from " + seedURL);
+                // don't use context time, as we may be step-changing it
+                // from the server header
+                long startTime = System.currentTimeMillis();
                 contentRaw = fetchURL(seedURL);
+                long totalTime = System.currentTimeMillis() - startTime;
                 if (contentRaw == null) {
                     // Logging deprecated here since attemptFailed() provides better info
                     _log.warn("Failed reading seed URL: " + seedURL);
                     System.err.println("Reseed got no router infos from " + seedURL);
                     return 0;
+                }
+                if (totalTime > 0) {
+                    long sz = contentRaw.length();
+                    long bw = 1000 * sz / totalTime;
+                    _bandwidths.add(Long.valueOf(bw));
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("Rcvd " + sz + " bytes in " + totalTime + " ms from " + seedURL);
                 }
                 SU3File su3 = new SU3File(_context, contentRaw);
                 zip = new File(_context.getTempDir(), "reseed-" + _context.random().nextInt() + ".zip");
