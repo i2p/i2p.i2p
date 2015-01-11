@@ -318,6 +318,11 @@ public class EditBean extends IndexBean {
         return getBooleanProperty(tunnel, I2PTunnelHTTPClient.PROP_INTERNAL_SSL);
     }
 
+    /** @since 0.9.18 */
+    public boolean getMultihome(int tunnel) {
+        return getBooleanProperty(tunnel, "shouldBundleReplyInfo");
+    }
+
     /** all proxy auth @since 0.8.2 */
     public boolean getProxyAuth(int tunnel) {
         return getProperty(tunnel, I2PTunnelHTTPClientBase.PROP_AUTH, "false") != "false";

@@ -435,6 +435,19 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                     <input value="1" type="checkbox" id="startOnLoad" name="uniqueLocal" title="Use unique IP addresses for each connecting client (local non-SSL servers only)"<%=(editBean.getUniqueLocal(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />                
                 </div>
             </div>
+            <div class="rowItem">
+                <div id="optionsField" class="rowItem">
+                    <label>
+                        <%=intl._("Optimize for Multihoming")%>:
+                    </label>
+                </div>
+                <div id="portField" class="rowItem">
+                    <label for="access" accesskey="d">
+                        <%=intl._("Enable")%>:
+                    </label>
+                    <input value="1" type="checkbox" id="startOnLoad" name="multihome" title="Only enable if you are hosting this service on multiple routers"<%=(editBean.getMultihome(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />                
+                </div>
+            </div>
             <div class="subdivider">
                 <hr />
             </div>

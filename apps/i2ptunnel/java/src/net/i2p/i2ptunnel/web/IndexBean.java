@@ -969,6 +969,11 @@ public class IndexBean {
         _booleanOptions.add(I2PTunnelHTTPClient.PROP_INTERNAL_SSL);
     }
 
+    /** @since 0.9.18 */
+    public void setMultihome(String moo) {
+        _booleanOptions.add("shouldBundleReplyInfo");
+    }
+
     /** all proxy auth @since 0.8.2 */
     public void setProxyAuth(String s) {
         if (s != null)
@@ -1261,18 +1266,20 @@ public class IndexBean {
             config.setProperty(TunnelController.PROP_SHARED, _sharedClient + "");
             for (String p : _booleanClientOpts)
                 config.setProperty(OPT + p, "" + _booleanOptions.contains(p));
-            for (String p : _otherClientOpts)
+            for (String p : _otherClientOpts) {
                 if (_otherOptions.containsKey(p))
                     config.setProperty(OPT + p, _otherOptions.get(p));
+            }
         } else {
             // generic server stuff
             if (_targetPort != null)
                 config.setProperty(TunnelController.PROP_TARGET_PORT, _targetPort);
             for (String p : _booleanServerOpts)
                 config.setProperty(OPT + p, "" + _booleanOptions.contains(p));
-            for (String p : _otherServerOpts)
+            for (String p : _otherServerOpts) {
                 if (_otherOptions.containsKey(p))
                     config.setProperty(OPT + p, _otherOptions.get(p));
+            }
         }
 
         // generic proxy stuff
@@ -1414,7 +1421,8 @@ public class IndexBean {
         "i2cp.reduceOnIdle", "i2cp.encryptLeaseSet", PROP_ENABLE_ACCESS_LIST, PROP_ENABLE_BLACKLIST,
         I2PTunnelServer.PROP_USE_SSL,
         I2PTunnelHTTPServer.OPT_REJECT_INPROXY,
-        I2PTunnelServer.PROP_UNIQUE_LOCAL
+        I2PTunnelServer.PROP_UNIQUE_LOCAL,
+        "shouldBundleReplyInfo"
         };
     private static final String _otherClientOpts[] = {
         "i2cp.reduceIdleTime", "i2cp.reduceQuantity", "i2cp.closeIdleTime",
