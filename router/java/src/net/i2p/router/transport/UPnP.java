@@ -134,9 +134,11 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 			} catch (InterruptedException ie) {}
 		}
 		super.stop();
-		_router = null;
-		_service = null;
-		_serviceLacksAPM = false;
+		synchronized(lock) {
+			_router = null;
+			_service = null;
+			_serviceLacksAPM = false;
+		}
 	}
 	
 	public DetectedIP[] getAddress() {
@@ -214,16 +216,6 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 			synchronized (lock) {
 				_otherUDNs.put(udn, name);
 			}
-			/********** seems a little drastic
-			isDisabled = true;
-			
-			synchronized(lock) {
-				_router = null;
-				_service = null;
-			}
-			
-			stop();
-			**************/
 			return;
 		}
 		
@@ -259,7 +251,7 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 			/// we should look for the next one
 			if(_service == null) {
 				_log.error("The IGD device we got isn't suiting our needs, let's disable the plugin");
-				isDisabled = true;
+				//isDisabled = true;
 				_router = null;
 				return;
 			}
@@ -388,7 +380,9 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 	 * @return whether we are behind an UPnP-enabled NAT/router
 	 */
 	private boolean isNATPresent() {
-	    return _router != null && _service != null;
+		synchronized(lock) {
+			return _router != null && _service != null;
+		}
 	}
 
 	/**
@@ -396,10 +390,14 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 	 * null if we can't find it.
 	 */
 	private String getNATAddress() {
-		if(!isNATPresent())
-			return null;
+		Service service;
+		synchronized(lock) {
+			if(!isNATPresent())
+				return null;
+			service = _service;
+		}
 
-		Action getIP = _service.getAction("GetExternalIPAddress");
+		Action getIP = service.getAction("GetExternalIPAddress");
 		if(getIP == null || !getIP.postControlAction())
 			return null;
 
@@ -414,10 +412,14 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 	 * @return the reported upstream bit rate in bits per second. -1 if it's not available. Blocking.
 	 */
 	private int getUpstreamMaxBitRate() {
-		if(!isNATPresent() || thinksWeAreDoubleNatted)
-			return -1;
+		Service service;
+		synchronized(lock) {
+			if(!isNATPresent() || thinksWeAreDoubleNatted)
+				return -1;
+			service = _service;
+		}
 
-		Action getIP = _service.getAction("GetLinkLayerMaxBitRates");
+		Action getIP = service.getAction("GetLinkLayerMaxBitRates");
 		if(getIP == null || !getIP.postControlAction())
 			return -1;
 
@@ -432,10 +434,14 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 	 * @return the reported downstream bit rate in bits per second. -1 if it's not available. Blocking.
 	 */
 	private int getDownstreamMaxBitRate() {
-		if(!isNATPresent() || thinksWeAreDoubleNatted)
-			return -1;
+		Service service;
+		synchronized(lock) {
+			if(!isNATPresent() || thinksWeAreDoubleNatted)
+				return -1;
+			service = _service;
+		}
 
-		Action getIP = _service.getAction("GetLinkLayerMaxBitRates");
+		Action getIP = service.getAction("GetLinkLayerMaxBitRates");
 		if(getIP == null || !getIP.postControlAction())
 			return -1;
 
@@ -697,16 +703,20 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 	 *  Blocking!
 	 */
 	private boolean addMapping(String protocol, int port, String description, ForwardPort fp) {
-		if(isDisabled || !isNATPresent() || _router == null) {
-                        _log.error("Can't addMapping: " + isDisabled + " " + isNATPresent() + " " + _router);
-			return false;
-                }
+		Service service;
+		synchronized(lock) {
+			if(isDisabled || !isNATPresent() || _router == null) {
+				_log.error("Can't addMapping: " + isDisabled + " " + isNATPresent() + " " + _router);
+				return false;
+			}
+			service = _service;
+		}
 		
 		// Just in case...
                 // this confuses my linksys? - zzz
 		//removeMapping(protocol, port, fp, true);
 		
-		Action add = _service.getAction("AddPortMapping");
+		Action add = service.getAction("AddPortMapping");
 		if(add == null) {
                     if (_serviceLacksAPM) {
 			if (_log.shouldLog(Log.WARN))
@@ -839,10 +849,16 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 
 	/** blocking */
 	private boolean removeMapping(String protocol, int port, ForwardPort fp, boolean noLog) {
-		if(isDisabled || !isNATPresent())
-			return false;
+		Service service;
+		synchronized(lock) {
+			if(isDisabled || !isNATPresent()) {
+				_log.error("Can't addMapping: " + isDisabled + " " + isNATPresent() + " " + _router);
+				return false;
+			}
+			service = _service;
+		}
 		
-		Action remove = _service.getAction("DeletePortMapping");
+		Action remove = service.getAction("DeletePortMapping");
 		if(remove == null) {
 		    if (_log.shouldLog(Log.WARN))
 			_log.warn("Couldn't find DeletePortMapping action!");
