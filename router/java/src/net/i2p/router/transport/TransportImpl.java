@@ -158,6 +158,9 @@ public abstract class TransportImpl implements Transport {
                     def *= 4;
                     break;
                 case Router.CAPABILITY_BW256:
+                // TODO
+                case Router.CAPABILITY_BW512:
+                case Router.CAPABILITY_BW_UNLIMITED:
                     def *= 7;
                     break;
             }

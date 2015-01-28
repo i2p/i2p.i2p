@@ -38,6 +38,7 @@ import net.i2p.data.Hash;
 import net.i2p.data.KeysAndCert;
 import net.i2p.data.Signature;
 import net.i2p.data.SimpleDataStructure;
+import net.i2p.router.Router;
 import net.i2p.util.Clock;
 import net.i2p.util.Log;
 import net.i2p.util.OrderedProperties;
@@ -84,9 +85,17 @@ public class RouterInfo extends DatabaseEntry {
     public static final String PROP_CAPABILITIES = "caps";
     public static final char CAPABILITY_HIDDEN = 'H';
 
-    // Public string of chars which serve as bandwidth capacity markers
-    // NOTE: individual chars defined in Router.java
-    public static final String BW_CAPABILITY_CHARS = "KLMNO";
+    /** Public string of chars which serve as bandwidth capacity markers
+     * NOTE: individual chars defined in Router.java
+     */
+    public static final String BW_CAPABILITY_CHARS = "" +
+        Router.CAPABILITY_BW12 +
+        Router.CAPABILITY_BW32 +
+        Router.CAPABILITY_BW64 +
+        Router.CAPABILITY_BW128 +
+        Router.CAPABILITY_BW256 +
+        Router.CAPABILITY_BW512 +
+        Router.CAPABILITY_BW_UNLIMITED;
     
     public RouterInfo() {
         _addresses = new ArrayList<RouterAddress>(2);

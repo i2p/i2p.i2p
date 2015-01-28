@@ -765,6 +765,10 @@ public class Router implements RouterClock.ClockShiftListener {
     public static final char CAPABILITY_BW64 = 'M';
     public static final char CAPABILITY_BW128 = 'N';
     public static final char CAPABILITY_BW256 = 'O';
+    /** @since 0.9.18 */
+    public static final char CAPABILITY_BW512 = 'P';
+    /** @since 0.9.18 */
+    public static final char CAPABILITY_BW_UNLIMITED = 'X';
     public static final String PROP_FORCE_BWCLASS = "router.forceBandwidthClass";
     
     public static final char CAPABILITY_REACHABLE = 'R';
@@ -793,6 +797,7 @@ public class Router implements RouterClock.ClockShiftListener {
         } else if (bwLim <= 128) {
             ri.addCapability(CAPABILITY_BW128);
         } else { // ok, more than 128KBps... aka "lots"
+            // TODO 512, unlimited
             ri.addCapability(CAPABILITY_BW256);
         }
         

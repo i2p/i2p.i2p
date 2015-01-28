@@ -61,6 +61,8 @@ class PeerManager {
         Router.CAPABILITY_BW64 +
         Router.CAPABILITY_BW128 +
         Router.CAPABILITY_BW256 +
+        Router.CAPABILITY_BW512 +
+        Router.CAPABILITY_BW_UNLIMITED +
         Router.CAPABILITY_REACHABLE +
         Router.CAPABILITY_UNREACHABLE;
 

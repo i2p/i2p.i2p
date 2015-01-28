@@ -1,6 +1,10 @@
 2015-01-28 zzz
  * UPnP:
   - Rescan for devices periodically and when reachability changes (tickets #661, #959)
+  - Callback when device removed
+  - Consolidate callbacks
+  - Clear ignored devices after primary device removed
+    to allow one to be promoted on rescan
   - Don't put "I2P" in registered protocol name
   - Add uptime to UPnP info
   - HTML escaping
