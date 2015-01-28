@@ -136,7 +136,7 @@ public class Blocklist {
             files.add(blFile);
         }
         Job job = new ReadinJob(files);
-        job.getTiming().setStartAfter(_context.clock().now() + 2*60*1000);
+        job.getTiming().setStartAfter(_context.clock().now() + 30*1000);
         _context.jobQueue().addJob(job);
     }
 
