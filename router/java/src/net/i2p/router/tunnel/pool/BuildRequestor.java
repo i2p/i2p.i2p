@@ -81,7 +81,7 @@ abstract class BuildRequestor {
                 else if (isIB && i == len - 1)
                     id = ctx.tunnelDispatcher().getNewIBEPID();
                 else
-                    id = ctx.random().nextLong(TunnelId.MAX_ID_VALUE);
+                    id = 1 + ctx.random().nextLong(TunnelId.MAX_ID_VALUE - 1);
                 cfg.getConfig(i).setReceiveTunnelId(DataHelper.toLong(4, id));
             }
             

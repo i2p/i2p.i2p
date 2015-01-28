@@ -18,6 +18,10 @@ import java.io.OutputStream;
  * the tunnel (otherwise they would get confused and send messages down the 
  * wrong one).
  *
+ * Note that a TunnelId must be greater than zero,
+ * as the DatabaseStoreMessage uses a zero ID to request
+ * a direct reply.
+ *
  * @author jrandom
  */
 public class TunnelId extends DataStructureImpl {
@@ -29,6 +33,10 @@ public class TunnelId extends DataStructureImpl {
         _tunnelId = -1;
     }
 
+    /**
+     *  @param id 1 to 0xffffffff
+     *  @throws IllegalArgumentException if less than or equal to zero
+     */
     public TunnelId(long id) { 
         if (id <= 0) throw new IllegalArgumentException("wtf, tunnelId " + id);
         _tunnelId = id;
@@ -36,6 +44,10 @@ public class TunnelId extends DataStructureImpl {
 
     public long getTunnelId() { return _tunnelId; }
 
+    /**
+     *  @param id 1 to 0xffffffff
+     *  @throws IllegalArgumentException if less than or equal to zero
+     */
     public void setTunnelId(long id) { 
         _tunnelId = id; 
         if (id <= 0) throw new IllegalArgumentException("wtf, tunnelId " + id);
