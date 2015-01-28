@@ -212,6 +212,7 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 			return; // ignore non-IGD devices
 		} else if(isNATPresent()) {
                         // maybe we should see if the old one went away before ignoring the new one?
+			// TODO if old one doesn't have an IP address but new one does, switch
 			_log.logAlways(Log.WARN, "UP&P ignoring additional device " + name + " UDN: " + udn);
 			synchronized (lock) {
 				_otherUDNs.put(udn, name);
@@ -337,6 +338,8 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
                 String udn = dev.getUDN();
 		if (_log.shouldLog(Log.WARN))
 			_log.warn("UP&P device removed : " + dev.getFriendlyName() + " UDN: " + udn);
+		ForwardPortCallback fpc = null;
+		Map<ForwardPort, ForwardPortStatus> removeMap = null;
 		synchronized (lock) {
 			if (udn != null)
 				_otherUDNs.remove(udn);
@@ -352,11 +355,26 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 				if (_log.shouldLog(Log.WARN))
 					_log.warn("UP&P IGD device removed : " + dev.getFriendlyName());
 				// TODO promote an IGD from _otherUDNs ??
+				// For now, just clear the others so they can be promoted later
+				// after a rescan.
+				_otherUDNs.clear();
 				_router = null;
 				_service = null;
 				_serviceLacksAPM = false;
+				if (!portsForwarded.isEmpty()) {
+					fpc = forwardCallback;
+					removeMap = new HashMap<ForwardPort, ForwardPortStatus>(portsForwarded.size());
+					for (ForwardPort port : portsForwarded) {
+						ForwardPortStatus fps = new ForwardPortStatus(ForwardPortStatus.DEFINITE_FAILURE,
+                                                                      "UPnP device removed",
+                                                                      port.portNumber);
+					}
+				}
 				portsForwarded.clear();
 			}
+		}
+		if (fpc != null) {
+			fpc.portForwardStatus(removeMap);
 		}
 	}
 	
@@ -863,7 +881,7 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 		    if (_log.shouldLog(Log.WARN))
 			_log.warn("Couldn't find DeletePortMapping action!");
 		    return false;
-	    }
+		}
 		
 		// remove.setArgumentValue("NewRemoteHost", "");
 		remove.setArgumentValue("NewExternalPort", port);
@@ -963,13 +981,15 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 		if (_serviceLacksAPM) {
                     if (_log.shouldLog(Log.WARN))
 			_log.warn("UPnP device does not support port forwarding");
+		    Map<ForwardPort, ForwardPortStatus> map =
+			new HashMap<ForwardPort, ForwardPortStatus>(portsToForwardNow.size());
 		    for (ForwardPort port : portsToForwardNow) {
 			ForwardPortStatus fps = new ForwardPortStatus(ForwardPortStatus.DEFINITE_FAILURE,
                                                                       "UPnP device does not support port forwarding",
                                                                       port.portNumber);
-			Map<ForwardPort, ForwardPortStatus> map = Collections.singletonMap(port, fps);
-			forwardCallback.portForwardStatus(map);
+			map.put(port, fps);
 		    }
+		    forwardCallback.portForwardStatus(map);
 		    return;
 		}
 		if (_log.shouldLog(Log.INFO))
@@ -988,6 +1008,8 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 		}
 
 		public void run() {
+			Map<ForwardPort, ForwardPortStatus> map =
+				new HashMap<ForwardPort, ForwardPortStatus>(portsToForwardNow.size());
 			for(ForwardPort port : portsToForwardNow) {
 				String proto = protoToString(port.protocol);
 				ForwardPortStatus fps;
@@ -998,13 +1020,9 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 				} else {
 					fps = new ForwardPortStatus(ForwardPortStatus.PROBABLE_FAILURE, "UPnP port forwarding apparently failed", port.portNumber);
 				}
-				Map<ForwardPort, ForwardPortStatus> map = Collections.singletonMap(port, fps);
-				try {
-					forwardCallback.portForwardStatus(map);
-				} catch (Exception e) {
-                                    _log.error("UPnP RPT error", e);
-				}
+				map.put(port, fps);
 			}
+			forwardCallback.portForwardStatus(map);
 		}
 	}
 
