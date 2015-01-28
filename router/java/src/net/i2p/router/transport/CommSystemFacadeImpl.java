@@ -390,19 +390,35 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         RouterInfo ri = _context.netDb().lookupRouterInfoLocally(peer);
         if (ri == null)
             return null;
-        ip = getIP(ri);
+        ip = getValidIP(ri);
         if (ip != null)
             return _geoIP.get(ip);
         return null;
     }
 
+    /**
+     *  Return first IP (v4 or v6) we find, any transport.
+     *  Not validated, may be local, etc.
+     */
     private static byte[] getIP(RouterInfo ri) {
-        // Return first IP (v4 or v6) we find, any transport
-        // Assume IPv6 doesn't have geoIP for now
         for (RouterAddress ra : ri.getAddresses()) {
             byte[] rv = ra.getIP();
-            //if (rv != null && rv.length == 4)
             if (rv != null)
+                return rv;
+        }
+        return null;
+    }
+
+    /**
+     *  Return first valid IP (v4 or v6) we find, any transport.
+     *  Local and other invalid IPs will not be returned.
+     *
+     *  @since 0.9.18
+     */
+    private static byte[] getValidIP(RouterInfo ri) {
+        for (RouterAddress ra : ri.getAddresses()) {
+            byte[] rv = ra.getIP();
+            if (rv != null && TransportUtil.isPubliclyRoutable(rv, true))
                 return rv;
         }
         return null;
