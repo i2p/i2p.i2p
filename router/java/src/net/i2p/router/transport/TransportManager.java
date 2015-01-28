@@ -593,8 +593,11 @@ public class TransportManager implements TransportEventListener {
     }
     
     public void transportAddressChanged() {
-        if (_upnpManager != null)
+        if (_upnpManager != null) {
+            _upnpManager.rescan();
+            // should really delay the following by 5 seconds?
             _upnpManager.update(getPorts());
+        }
     }
 
     public List<String> getMostRecentErrorMessages() { 
@@ -605,6 +608,10 @@ public class TransportManager implements TransportEventListener {
         return rv;
     }
     
+    /**
+     *  Warning - blocking, very slow, queries the active UPnP router,
+     *  will take many seconds if it has vanished.
+     */
     public void renderStatusHTML(Writer out, String urlBase, int sortFlags) throws IOException {
         TreeMap<String, Transport> transports = new TreeMap<String, Transport>();
         for (Transport t : _transports.values()) {

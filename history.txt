@@ -1,3 +1,18 @@
+2015-01-28 zzz
+ * UPnP:
+  - Rescan for devices periodically and when reachability changes (tickets #661, #959)
+  - Don't put "I2P" in registered protocol name
+  - Add uptime to UPnP info
+  - HTML escaping
+  - Remove static log on Android
+
+2015-01-11 zzz
+ * i2psnark: Skip incompatible welterde tracker if we are ECDSA
+ * I2PTunnel: Add option for multihoming optimization
+
+2015-01-10 zzz
+ * NetDB: Stubs for bandwidth estimation during reseed (ticket #935)
+
 2015-01-09 zzz
  * NetDB: Publish RI faster when costs change (ticket #1437)
 
