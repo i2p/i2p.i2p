@@ -1,5 +1,10 @@
 2015-01-29 zzz
- * SSU: Fix replaceExternalAddress churn when firewalled
+ * SSU:
+   - Fix replaceExternalAddress churn when firewalled
+   - Sort introducers in router address, so we won't force a republish
+     due to a different ordering of the same introducers
+   - Don't publish an address if we need introducers but don't have any,
+     so the user won't see a 'firewalled with inbound NTCP enabled' message
 
 2015-01-28 zzz
  * UPnP:

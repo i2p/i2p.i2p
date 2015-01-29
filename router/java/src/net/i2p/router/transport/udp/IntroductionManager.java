@@ -3,6 +3,7 @@ package net.i2p.router.transport.udp;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -176,6 +177,7 @@ class IntroductionManager {
         // if not too many to choose from, be less picky
         if (sz <= howMany + 2)
             inactivityCutoff -= UDPTransport.EXPIRE_TIMEOUT / 4;
+        List<Introducer> introducers = new ArrayList<Introducer>(howMany);
         for (int i = 0; i < sz && found < howMany; i++) {
             PeerState cur = peers.get((start + i) % sz);
             RouterInfo ri = _context.netDb().lookupRouterInfoLocally(cur.getRemotePeer());
@@ -222,17 +224,43 @@ class IntroductionManager {
             byte[] ikey = ura.getIntroKey();
             if (ikey == null)
                 continue;
-            ssuOptions.setProperty(UDPAddress.PROP_INTRO_HOST_PREFIX + found, Addresses.toString(ip));
-            ssuOptions.setProperty(UDPAddress.PROP_INTRO_PORT_PREFIX + found, String.valueOf(port));
-            ssuOptions.setProperty(UDPAddress.PROP_INTRO_KEY_PREFIX + found, Base64.encode(ikey));
-            ssuOptions.setProperty(UDPAddress.PROP_INTRO_TAG_PREFIX + found, String.valueOf(cur.getTheyRelayToUsAs()));
+            introducers.add(new Introducer(ip, port, ikey, cur.getTheyRelayToUsAs()));
             found++;
+        }
+
+        // we sort them so a change in order only won't happen, and won't cause a republish
+        Collections.sort(introducers);
+        for (int i = 0; i < found; i++) {
+            Introducer in = introducers.get(i);
+            ssuOptions.setProperty(UDPAddress.PROP_INTRO_HOST_PREFIX + i, in.sip);
+            ssuOptions.setProperty(UDPAddress.PROP_INTRO_PORT_PREFIX + i, in.sport);
+            ssuOptions.setProperty(UDPAddress.PROP_INTRO_KEY_PREFIX + i, in.skey);
+            ssuOptions.setProperty(UDPAddress.PROP_INTRO_TAG_PREFIX + i, in.stag);
         }
 
         // FIXME failsafe if found == 0, relax inactivityCutoff and try again?
 
         pingIntroducers();
         return found;
+    }
+
+    /**
+     *  So we can sort them
+     *  @since 0.9.18
+     */
+    private static class Introducer implements Comparable<Introducer> {
+        public final String sip, sport, skey, stag;
+
+        public Introducer(byte[] ip, int port, byte[] key, long tag) {
+            sip = Addresses.toString(ip);
+            sport = String.valueOf(port);
+            skey = Base64.encode(key);
+            stag = String.valueOf(tag);
+        }
+
+        public int compareTo(Introducer i) {
+            return skey.compareTo(i.skey);
+        }
     }
 
     /**

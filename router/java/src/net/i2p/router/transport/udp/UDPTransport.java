@@ -1878,9 +1878,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
 
         boolean introducersIncluded = false;
         if (introducersRequired) {
-            // FIXME intro manager doesn't sort introducers, so
-            // deepEquals() below can fail even with same introducers.
-            // Only a problem when we have very very few peers to pick from.
+            // intro manager now sorts introducers, so
+            // deepEquals() below will not fail even with same introducers.
+            // Was only a problem when we had very very few peers to pick from.
             int found = _introManager.pickInbound(options, PUBLIC_RELAY_COUNT);
             if (found > 0) {
                 if (_log.shouldLog(Log.INFO))
@@ -1974,6 +1974,15 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 _log.warn("Wanted to rebuild my SSU address, but couldn't specify either the direct or indirect info (needs introducers? " 
                            + introducersRequired + ")", new Exception("source"));
             _needsRebuild = true;
+            if (hasCurrentAddress()) {
+                // We must remove current address, otherwise the user will see
+                // "firewalled with inbound NTCP enabled" warning in console.
+                // Unfortunately this will remove any IPv6 also,
+                // but we don't have a method to remove just the IPv4 address. FIXME
+                replaceAddress(null);
+                if (allowRebuildRouterInfo)
+                    _context.router().rebuildRouterInfo();
+            }
             return null;
         }
     }
