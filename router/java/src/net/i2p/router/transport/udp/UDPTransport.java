@@ -1816,9 +1816,11 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 return rv;
             }
         } else {
-            RouterAddress cur = getCurrentAddress(false);
-            if (cur != null)
-                host = cur.getHost();
+            if (!introducersRequired()) {
+                RouterAddress cur = getCurrentExternalAddress(false);
+                if (cur != null)
+                    host = cur.getHost();
+            }
         }
         return rebuildExternalAddress(host, port, allowRebuildRouterInfo);
     }
@@ -1974,6 +1976,14 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 _log.warn("Wanted to rebuild my SSU address, but couldn't specify either the direct or indirect info (needs introducers? " 
                            + introducersRequired + ")", new Exception("source"));
             _needsRebuild = true;
+            // save the external address, even if we didn't publish it
+            if (port > 0 && host != null) {
+                OrderedProperties localOpts = new OrderedProperties(); 
+                localOpts.setProperty(UDPAddress.PROP_PORT, String.valueOf(port));
+                localOpts.setProperty(UDPAddress.PROP_HOST, host);
+                RouterAddress local = new RouterAddress(STYLE, localOpts, DEFAULT_COST);
+                replaceCurrentExternalAddress(local, isIPv6);
+            }
             if (hasCurrentAddress()) {
                 // We must remove current address, otherwise the user will see
                 // "firewalled with inbound NTCP enabled" warning in console.

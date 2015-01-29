@@ -5,6 +5,7 @@
      due to a different ordering of the same introducers
    - Don't publish an address if we need introducers but don't have any,
      so the user won't see a 'firewalled with inbound NTCP enabled' message
+   - Fix transition from firewalled to non-firewalled
 
 2015-01-28 zzz
  * UPnP:
