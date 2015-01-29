@@ -111,6 +111,10 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private Hash _lastFrom;
     private byte[] _lastOurIP;
     private int _lastOurPort;
+    /** since we don't publish our IP/port if introduced anymore, we need
+        to store it somewhere. */
+    private RouterAddress _currentOurV4Address;
+    private RouterAddress _currentOurV6Address;
 
     private static final int DROPLIST_PERIOD = 10*60*1000;
     public static final String STYLE = "SSU";
@@ -162,6 +166,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     /** override the "large" (max) MTU, default is PeerState.LARGE_MTU */
     private static final String PROP_DEFAULT_MTU = "i2np.udp.mtu";
         
+    private static final String CAP_TESTING = "" + UDPAddress.CAPACITY_TESTING;
+    private static final String CAP_TESTING_INTRO = "" + UDPAddress.CAPACITY_TESTING + UDPAddress.CAPACITY_INTRODUCER;
+
     /** how many relays offered to us will we use at a time? */
     public static final int PUBLIC_RELAY_COUNT = 3;
     
@@ -782,7 +789,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             //_context.banlist().banlistRouter(from, "They said we had an invalid IP", STYLE);
             return;
         }
-        RouterAddress addr = getCurrentAddress(false);
+
+        RouterAddress addr = getCurrentExternalAddress(false);
         if (inboundRecent && addr != null && addr.getPort() > 0 && addr.getHost() != null) {
             // use OS clock since its an ordering thing, not a time thing
             // Note that this fails us if we switch from one IP to a second, then back to the first,
@@ -833,7 +841,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         boolean fireTest = false;
 
         boolean isIPv6 = ourIP.length == 16;
-        RouterAddress current = getCurrentAddress(isIPv6);
+        RouterAddress current = getCurrentExternalAddress(isIPv6);
         byte[] externalListenHost = current != null ? current.getIP() : null;
         int externalListenPort = current != null ? current.getPort() : getRequestedPort(isIPv6);
 
@@ -1867,7 +1875,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         } else {
             directIncluded = false;
         }
-        
+
         boolean introducersIncluded = false;
         if (introducersRequired) {
             // FIXME intro manager doesn't sort introducers, so
@@ -1889,9 +1897,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         
         // if we have explicit external addresses, they had better be reachable
         if (introducersRequired)
-            options.setProperty(UDPAddress.PROP_CAPACITY, ""+UDPAddress.CAPACITY_TESTING);
+            options.setProperty(UDPAddress.PROP_CAPACITY, CAP_TESTING);
         else
-            options.setProperty(UDPAddress.PROP_CAPACITY, ""+UDPAddress.CAPACITY_TESTING + UDPAddress.CAPACITY_INTRODUCER);
+            options.setProperty(UDPAddress.PROP_CAPACITY, CAP_TESTING_INTRO);
 
         // MTU since 0.9.2
         int mtu;
@@ -1934,6 +1942,20 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             RouterAddress current = getCurrentAddress(isIPv6);
             boolean wantsRebuild = !addr.deepEquals(current);
 
+            // save the external address, even if we didn't publish it
+            if (port > 0 && host != null) {
+                RouterAddress local;
+                if (directIncluded) {
+                    local = addr;
+                } else {
+                    OrderedProperties localOpts = new OrderedProperties(); 
+                    localOpts.setProperty(UDPAddress.PROP_PORT, String.valueOf(port));
+                    localOpts.setProperty(UDPAddress.PROP_HOST, host);
+                    local = new RouterAddress(STYLE, localOpts, cost);
+                }
+                replaceCurrentExternalAddress(local, isIPv6);
+            }
+
             if (wantsRebuild) {
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Address rebuilt: " + addr);
@@ -1943,6 +1965,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             } else {
                 addr = null;
             }
+        
             if (!isIPv6)
                 _needsRebuild = false;
             return addr;
@@ -1952,6 +1975,35 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                            + introducersRequired + ")", new Exception("source"));
             _needsRebuild = true;
             return null;
+        }
+    }
+
+    /**
+     *  Simple storage of IP and port, since
+     *  we don't put them in the real, published RouterAddress anymore
+     *  if we are firewalled.
+     *
+     *  Caller must sync on _rebuildLock
+     *
+     *  @since 0.9.18
+     */
+    private void replaceCurrentExternalAddress(RouterAddress ra, boolean isIPv6) {
+        if (isIPv6)
+            _currentOurV6Address = ra;
+        else
+            _currentOurV4Address = ra;
+    }
+
+    /**
+     *  Simple fetch of stored IP and port, since
+     *  we don't put them in the real, published RouterAddress anymore
+     *  if we are firewalled.
+     *
+     *  @since 0.9.18
+     */
+    private RouterAddress getCurrentExternalAddress(boolean isIPv6) {
+        synchronized (_rebuildLock) {
+            return isIPv6 ? _currentOurV6Address : _currentOurV4Address;
         }
     }
 
