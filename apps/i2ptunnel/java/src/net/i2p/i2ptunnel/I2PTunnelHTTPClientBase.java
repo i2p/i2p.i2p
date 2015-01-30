@@ -706,11 +706,13 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
 
                     if (first) {
                         first = false;
-                        out.write("<br><br>".getBytes());
-                        out.write(_("Click a link below to look for an address helper by using a \"jump\" service:").getBytes("UTF-8"));
-                        out.write("<br>\n".getBytes());
+                        out.write("<br><br><h3>".getBytes());
+                        out.write(_("Click a link below for an address helper from a jump service").getBytes("UTF-8"));
+                        out.write("</h3>\n".getBytes());
+                    } else {
+                        out.write("<br>".getBytes());
                     }
-                    out.write("<br><a href=\"".getBytes());
+                    out.write("<a href=\"".getBytes());
                     out.write(jurl.getBytes());
                     out.write(uri.getBytes());
                     out.write("\">".getBytes());
