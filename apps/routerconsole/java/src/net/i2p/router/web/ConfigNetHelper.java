@@ -2,6 +2,7 @@ package net.i2p.router.web;
 
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 import net.i2p.data.DataHelper;
@@ -185,6 +186,12 @@ public class ConfigNetHelper extends HelperBase {
     /** @since IPv6 */
     public String getAddressSelector() {
         Set<String> addrs = getAddresses();
+        // isPubliclyRoutable() rejects some IPv6 addresses that getAddresses() allows
+        for (Iterator<String> iter = addrs.iterator(); iter.hasNext(); ) {
+            byte[] ip = Addresses.getIP(iter.next());
+            if (ip == null || !TransportUtil.isPubliclyRoutable(ip, true))
+                iter.remove();
+        }
         Set<String> configs;
         String cs = getUdphostname();
         if (cs.length() <= 0) {
