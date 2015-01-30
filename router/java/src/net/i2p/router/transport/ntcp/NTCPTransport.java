@@ -122,6 +122,7 @@ public class NTCPTransport extends TransportImpl {
         _context.statManager().createRateStat("ntcp.failsafeWrites", "How many times do we need to proactively add in an extra nio write to a peer at any given failsafe pass?", "ntcp", RATES);
         _context.statManager().createRateStat("ntcp.failsafeCloses", "How many times do we need to proactively close an idle connection to a peer at any given failsafe pass?", "ntcp", RATES);
         _context.statManager().createRateStat("ntcp.failsafeInvalid", "How many times do we close a connection to a peer to work around a JVM bug?", "ntcp", RATES);
+        _context.statManager().createRateStat("ntcp.failsafeThrottle", "Delay event pumper", "ntcp", RATES);
         _context.statManager().createRateStat("ntcp.accept", "", "ntcp", RATES);
         _context.statManager().createRateStat("ntcp.attemptBanlistedPeer", "", "ntcp", RATES);
         _context.statManager().createRateStat("ntcp.attemptUnreachablePeer", "", "ntcp", RATES);
@@ -245,7 +246,8 @@ public class NTCPTransport extends TransportImpl {
                 return;
             }
             if (isNew) {
-                con.send(msg); // doesn't do anything yet, just enqueues it
+                // doesn't do anything yet, just enqueues it
+                con.send(msg);
                 // As of 0.9.12, don't send our info if the first message is
                 // doing the same (common when connecting to a floodfill).
                 // Also, put the info message after whatever we are trying to send

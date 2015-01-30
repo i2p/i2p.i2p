@@ -283,6 +283,7 @@ class EventPumper implements Runnable {
                         if (_log.shouldLog(Log.WARN))
                             _log.warn("EventPumper throttle " + loopCount + " loops in " +
                                       (System.currentTimeMillis() - lastFailsafeIteration) + " ms");
+                        _context.statManager().addRateData("ntcp.failsafeThrottle", 1);
                         try {
                             Thread.sleep(25);
                         } catch (InterruptedException ie) {}
