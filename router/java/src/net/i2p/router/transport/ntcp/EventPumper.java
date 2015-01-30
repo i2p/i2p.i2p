@@ -277,7 +277,19 @@ class EventPumper implements Runnable {
                     } catch (ClosedSelectorException cse) {
                         continue;
                     }
+                } else {
+                    // another 100% CPU workaround 
+                    if ((loopCount % 128) == 127) {
+                        if (_log.shouldLog(Log.WARN))
+                            _log.warn("EventPumper throttle " + loopCount + " loops in " +
+                                      (System.currentTimeMillis() - lastFailsafeIteration) + " ms");
+                        try {
+                            Thread.sleep(25);
+                        } catch (InterruptedException ie) {}
+                    }
                 }
+
+
                 // Clear the cache if the user changes the setting,
                 // so we can test the effect.
                 boolean newUseDirect = _context.getBooleanProperty(PROP_DIRECT);

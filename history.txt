@@ -1,3 +1,7 @@
+2015-01-30 zzz
+ * HTTP Proxy: More error page changes
+ * NTCP: Throttle event pumper if looping too fast (tickets #551, #1075, #1411)
+
 2015-01-29 zzz
  * SSU:
    - Fix replaceExternalAddress churn when firewalled
