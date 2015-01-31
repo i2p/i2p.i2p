@@ -978,7 +978,7 @@ class Connection {
     
     public int getLastCongestionSeenAt() { return _lastCongestionSeenAt; }
 
-    void congestionOccurred() {
+    private void congestionOccurred() {
         // if we hit congestion and e.g. 5 packets are resent,
         // dont set the size to (winSize >> 4).  only set the
         if (_ackSinceCongestion.compareAndSet(true,false)) {
