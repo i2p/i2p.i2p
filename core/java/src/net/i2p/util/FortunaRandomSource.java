@@ -27,13 +27,18 @@ public class FortunaRandomSource extends RandomSource implements EntropyHarveste
     private double _nextGaussian;
     private boolean _haveNextGaussian;
 
+    /**
+     *  May block up to 10 seconds or forever
+     */
     public FortunaRandomSource(I2PAppContext context) {
         super(context);
         _fortuna = new AsyncFortunaStandalone(context);
         byte seed[] = new byte[1024];
+        // may block for 10 seconds
         if (initSeed(seed)) {
             _fortuna.seed(seed);
         } else {
+            // may block forever
             SecureRandom sr = new SecureRandom();
             sr.nextBytes(seed);
             _fortuna.seed(seed);

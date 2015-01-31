@@ -5,6 +5,7 @@
  * NetDb:
    - Encrypt lookups for 32-bit x86 also
    - Disable floodfill in laptop mode
+ * PRNG: Don't hang forever at startup waiting for SecureRandom init
  * Transport: Set 4 MBps max bw due to bloom filter
 
 2015-01-30 zzz

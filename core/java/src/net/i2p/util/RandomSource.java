@@ -145,6 +145,9 @@ public class RandomSource extends SecureRandom implements EntropyHarvester {
         }
     }
 
+    /**
+     *  May block up to 10 seconds
+     */
     public void loadSeed() {
         byte buf[] = new byte[1024];
         if (initSeed(buf))
@@ -172,12 +175,31 @@ public class RandomSource extends SecureRandom implements EntropyHarvester {
         }
     }
  
+    /**
+     *  May block up to 10 seconds
+     */
     public final boolean initSeed(byte buf[]) {
         boolean ok = false;
+
+        final byte[] tbuf = new byte[buf.length];
+        Thread t = new I2PThread(new SecureRandomInit(tbuf), "SecureRandomInit", true);
+        t.start();
         try {
-            SecureRandom.getInstance("SHA1PRNG").nextBytes(buf);
-            ok = true;
-        } catch (NoSuchAlgorithmException e) {}
+            t.join(10*1000);
+            synchronized(tbuf) {
+                for (int i = 0; i < tbuf.length; i++) {
+                    if (tbuf[i] != 0) {
+                        ok = true;
+                        break;
+                    }
+                }
+                if (ok)
+                    System.arraycopy(tbuf, 0, buf, 0, buf.length);
+                else
+                    System.out.println("SecureRandom init failed or took too long");
+            }
+        } catch (InterruptedException ie) {}
+
         // why urandom?  because /dev/random blocks
         ok = seedFromFile(new File("/dev/urandom"), buf) || ok;
         // we merge (XOR) in the data from /dev/urandom with our own seedfile
@@ -186,6 +208,31 @@ public class RandomSource extends SecureRandom implements EntropyHarvester {
         return ok;
     }
     
+    /**
+     *  Thread to prevent hanging on init,
+     *  presumably due to /dev/random blocking,
+     *  which is common in VMs.
+     *
+     *  @since 0.9.18
+     */
+    private static class SecureRandomInit implements Runnable {
+        private final byte[] buf;
+
+        public SecureRandomInit(byte[] buf) {
+            this.buf = buf;
+        }
+
+        public void run() {
+            byte[] buf2 = new byte[buf.length];
+            try {
+                SecureRandom.getInstance("SHA1PRNG").nextBytes(buf2);
+                synchronized(buf) {
+                    System.arraycopy(buf2, 0, buf, 0, buf.length);
+                }
+            } catch (NoSuchAlgorithmException e) {}
+        }
+    }
+
     /**
      *  XORs the seed into buf
      *
