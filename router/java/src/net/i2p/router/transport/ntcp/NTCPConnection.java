@@ -1183,7 +1183,8 @@ class NTCPConnection {
                 //    _log.debug("parse decrypted i2np block (remaining: " + buf.remaining() + ")");
                 boolean ok = recvUnencryptedI2NP();
                 if (!ok) {
-                    _log.error("Read buffer " + System.identityHashCode(buf) + " contained corrupt data");
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("Read buffer " + System.identityHashCode(buf) + " contained corrupt data");
                     _context.statManager().addRateData("ntcp.corruptDecryptedI2NP", 1);
                     return;
                 }
@@ -1231,7 +1232,8 @@ class NTCPConnection {
             }
             boolean ok = recvUnencryptedI2NP();
             if (!ok) {
-                _log.error("Read buffer " + System.identityHashCode(buf) + " contained corrupt data");
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Read buffer " + System.identityHashCode(buf) + " contained corrupt data");
                 _context.statManager().addRateData("ntcp.corruptDecryptedI2NP", 1);
                 return;
             }
@@ -1250,7 +1252,8 @@ class NTCPConnection {
         _curReadState.receiveBlock(_decryptBlockBuf);
         // FIXME move check to ReadState; must we close? possible attack vector?
         if (_curReadState.getSize() > BUFFER_SIZE) {
-            _log.error("I2NP message too big - size: " + _curReadState.getSize() + " Dropping " + toString());
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("I2NP message too big - size: " + _curReadState.getSize() + " Dropping " + toString());
             _context.statManager().addRateData("ntcp.corruptTooLargeI2NP", _curReadState.getSize());
             close();
             return false;
