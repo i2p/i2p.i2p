@@ -325,6 +325,10 @@ public class ConfigNetHelper extends HelperBase {
     }
 
     public static final int DEFAULT_SHARE_KBPS = 12;
+
+    /**
+     *  @return in KBytes per second
+     */
     public int getShareBandwidth() {
         int irateKBps = _context.bandwidthLimiter().getInboundKBytesPerSecond();
         int orateKBps = _context.bandwidthLimiter().getOutboundKBytesPerSecond();
