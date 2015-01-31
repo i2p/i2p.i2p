@@ -9,6 +9,7 @@ import net.i2p.router.JobImpl;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.router.peermanager.PeerProfile;
+import net.i2p.router.transport.udp.UDPTransport;
 import net.i2p.router.util.EventLog;
 import net.i2p.stat.Rate;
 import net.i2p.stat.RateStat;
@@ -83,6 +84,9 @@ class FloodfillMonitorJob extends JobImpl {
 
         // ARM ElG decrypt is too slow
         if (SystemVersion.isARM())
+            return false;
+
+        if (getContext().getBooleanProperty(UDPTransport.PROP_LAPTOP_MODE))
             return false;
 
         if (getContext().commSystem().isInBadCountry())
