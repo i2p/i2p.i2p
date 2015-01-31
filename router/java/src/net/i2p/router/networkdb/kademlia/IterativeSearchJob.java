@@ -94,7 +94,7 @@ class IterativeSearchJob extends FloodSearchJob {
 
     /** only on fast boxes, for now */
     public static final boolean DEFAULT_ENCRYPT_RI =
-            SystemVersion.isX86() && SystemVersion.is64Bit() &&
+            SystemVersion.isX86() && /* SystemVersion.is64Bit() && */
             !SystemVersion.isApache() && !SystemVersion.isGNU() &&
             NativeBigInteger.isNative();
 
