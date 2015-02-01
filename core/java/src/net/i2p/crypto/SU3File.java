@@ -980,6 +980,11 @@ public class SU3File {
             IOException ioe = new IOException("cert error");
             ioe.initCause(gse);
             throw ioe;
+        } catch (IllegalArgumentException iae) {
+            // java 1.8.0_40-b10, openSUSE
+            IOException ioe = new IOException("cert error");
+            ioe.initCause(iae);
+            throw ioe;
         } finally {
             try { if (fis != null) fis.close(); } catch (IOException foo) {}
         }

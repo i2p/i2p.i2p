@@ -61,6 +61,9 @@ class DirKeyRing implements KeyRing {
                     throw new GeneralSecurityException("CN mismatch: " + cn);
             }
             return cert.getPublicKey();
+        } catch (IllegalArgumentException iae) {
+            // java 1.8.0_40-b10, openSUSE
+            throw new GeneralSecurityException("Bad cert", iae);
         } finally {
             try { if (fis != null) fis.close(); } catch (IOException foo) {}
         }

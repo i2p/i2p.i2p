@@ -248,6 +248,12 @@ public class KeyStoreUtil {
         } catch (IOException ioe) {
             error("Error reading X509 Certificate: " + file.getAbsolutePath(), ioe);
             return false;
+        } catch (IllegalArgumentException iae) {
+            // java 1.8.0_40-b10, openSUSE
+            // Exception in thread "main" java.lang.IllegalArgumentException: Input byte array has wrong 4-byte ending unit
+            // at java.util.Base64$Decoder.decode0(Base64.java:704)
+            error("Error reading X509 Certificate: " + file.getAbsolutePath(), iae);
+            return false;
         } finally {
             try { if (fis != null) fis.close(); } catch (IOException foo) {}
         }
