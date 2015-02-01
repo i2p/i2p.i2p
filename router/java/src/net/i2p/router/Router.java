@@ -295,6 +295,9 @@ public class Router implements RouterClock.ClockShiftListener {
      *  Initializes the RouterContext.
      *  Starts some threads. Does not install updates.
      *  All this was in the constructor.
+     *
+     *  Could block for 10 seconds or forever if waiting for entropy
+     *
      *  @since 0.8.12
      */
     private void startupStuff() {
@@ -308,6 +311,11 @@ public class Router implements RouterClock.ClockShiftListener {
         // But context.isRouterContext() is even easier...
         // Both of these as of 0.7.9
         System.setProperty("router.version", RouterVersion.VERSION);
+
+        // crypto init may block for 10 seconds waiting for entropy
+        // we want to do this before context.initAll()
+        // which will fire up several things that could block on the PRNG init
+        warmupCrypto();
 
         // NOW we start all the activity
         _context.initAll();
@@ -460,7 +468,8 @@ public class Router implements RouterClock.ClockShiftListener {
      *  Standard standalone installation uses main() instead, which
      *  checks for updates and then calls this.
      *
-     *  This may take quite a while, especially if NTP fails.
+     *  This may take quite a while, especially if NTP fails
+     *  or the system lacks entropy
      *
      *  @since public as of 0.9 for Android and other embedded uses
      */
@@ -499,7 +508,6 @@ public class Router implements RouterClock.ClockShiftListener {
         //_context.jobQueue().addJob(new CoalesceStatsJob(_context));
         _context.simpleScheduler().addPeriodicEvent(new CoalesceStatsEvent(_context), COALESCE_TIME);
         _context.jobQueue().addJob(new UpdateRoutingKeyModifierJob(_context));
-        warmupCrypto();
         //_sessionKeyPersistenceHelper.startup();
         //_context.adminManager().startup();
         _context.blocklist().startup();
@@ -917,6 +925,9 @@ public class Router implements RouterClock.ClockShiftListener {
         finalShutdown(EXIT_HARD_RESTART);
     }
     
+    /**
+     *  Could block for 10 seconds or forever
+     */
     private void warmupCrypto() {
         _context.random().nextBoolean();
         // Instantiate to fire up the YK refiller thread
