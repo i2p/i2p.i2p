@@ -191,6 +191,11 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
             List<Hash> nextPeers = sel.selectFloodfillParticipants(nkey, NEXT_FLOOD_QTY, getKBuckets());
             int i = 0;
             for (Hash h : nextPeers) {
+                // Don't flood an RI back to itself
+                // Not necessary, a ff will do its own flooding (reply token == 0)
+                // But other implementations may not...
+                if (h.equals(key))
+                    continue;
                 // todo key cert skip?
                 if (!peers.contains(h)) {
                     peers.add(h);
@@ -206,10 +211,11 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
             RouterInfo target = lookupRouterInfoLocally(peer);
             if ( (target == null) || (_context.banlist().isBanlisted(peer)) )
                 continue;
-            // Don't flood a RI back to itself
+            // Don't flood an RI back to itself
             // Not necessary, a ff will do its own flooding (reply token == 0)
-            //if (peer.equals(target.getIdentity().getHash()))
-            //    continue;
+            // But other implementations may not...
+            if (ds.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO && peer.equals(key))
+                continue;
             if (peer.equals(_context.routerHash()))
                 continue;
             DatabaseStoreMessage msg = new DatabaseStoreMessage(_context);
