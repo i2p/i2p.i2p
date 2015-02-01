@@ -196,7 +196,7 @@ public class RandomSource extends SecureRandom implements EntropyHarvester {
                 if (ok)
                     System.arraycopy(tbuf, 0, buf, 0, buf.length);
                 else
-                    System.out.println("SecureRandom init failed or took too long");
+                    System.out.println("INFO: SecureRandom init failed or took too long");
             }
         } catch (InterruptedException ie) {}
 
