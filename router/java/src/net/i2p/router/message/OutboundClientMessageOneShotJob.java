@@ -727,8 +727,10 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
      * Anonymity issues?
      */
     private TunnelInfo selectOutboundTunnel() {
-        Hash gw = _lease.getGateway();
-        return getContext().tunnelManager().selectOutboundTunnel(_from.calculateHash(), gw);
+        // hurts reliability? let's try picking at random again
+        //Hash gw = _lease.getGateway();
+        //return getContext().tunnelManager().selectOutboundTunnel(_from.calculateHash(), gw);
+        return getContext().tunnelManager().selectOutboundTunnel(_from.calculateHash());
     }
 
     /**
