@@ -418,7 +418,7 @@ public class SummaryHelper extends HelperBase {
         StringBuilder buf = new StringBuilder(512);
         buf.append("<h3><a href=\"/i2ptunnelmgr\" target=\"_top\" title=\"")
            .append(_("Add/remove/edit &amp; control your client and server tunnels"))
-           .append("\">").append(_("Hidden Services and Clients"))
+           .append("\">").append(_("Local Tunnels"))
            .append("</a></h3><hr class=\"b\"><div class=\"tunnels\">");
         if (!clients.isEmpty()) {
             Collections.sort(clients, new AlphaComparator());

@@ -69,7 +69,7 @@ input.default {
  </div>
 </form>
 
-<h3><%=intl._("Local Services")%></h3>
+<h3><%=intl._("Applications and Configuration")%></h3>
 <form action="" method="POST">
  <input type="hidden" name="nonce" value="<%=pageNonce%>" >
  <input type="hidden" name="group" value="2">
