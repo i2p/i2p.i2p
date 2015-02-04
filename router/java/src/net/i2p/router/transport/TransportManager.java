@@ -640,9 +640,13 @@ public class TransportManager implements TransportEventListener {
         }
         buf.append("</pre>\n");
         out.write(buf.toString());
-        // newer androids crash w/ network on IO thread
-        if (_upnpManager != null && !SystemVersion.isAndroid())
+        if (SystemVersion.isAndroid()) {
+            // newer androids crash w/ network on IO thread
+        } else if (_upnpManager != null) {
             out.write(_upnpManager.renderStatusHTML());
+        } else {
+            out.write("<h3><a name=\"upnp\"></a>" + _("UPnP is not enabled") + "</h3>\n");
+        }
         out.write("</p>\n");
         out.flush();
     }
