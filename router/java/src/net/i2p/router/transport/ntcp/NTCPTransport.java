@@ -199,15 +199,16 @@ public class NTCPTransport extends TransportImpl {
 
     /**
      * @param con that is established
-     * @return the previous connection to the same peer, null if no such.
+     * @return the previous connection to the same peer, must be closed by caller, null if no such.
      */
     NTCPConnection inboundEstablished(NTCPConnection con) {
         _context.statManager().addRateData("ntcp.inboundEstablished", 1);
-        markReachable(con.getRemotePeer().calculateHash(), true);
+        Hash peer = con.getRemotePeer().calculateHash();
+        markReachable(peer, true);
         //_context.banlist().unbanlistRouter(con.getRemotePeer().calculateHash());
         NTCPConnection old;
         synchronized (_conLock) {
-            old = _conByIdent.put(con.getRemotePeer().calculateHash(), con);
+            old = _conByIdent.put(peer, con);
         }
         return old;
     }
@@ -477,6 +478,9 @@ public class NTCPTransport extends TransportImpl {
             return (con != null) && con.isEstablished() && con.tooBacklogged();
     }
 
+    /**
+     * @return usually the con passed in, but possibly a second connection with the same peer...
+     */
     NTCPConnection removeCon(NTCPConnection con) {
         NTCPConnection removed = null;
         RouterIdentity ident = con.getRemotePeer();
