@@ -77,13 +77,21 @@ class RouterThrottleImpl implements RouterThrottle {
         }
     }
 
+    /** 
+     * Should we accept any more data from the network for any sort of message, 
+     * taking into account our current load, or should we simply slow down?  
+     *
+     * FIXME only called by SSU Receiver, not NTCP!
+     * FIXME should put warning on the console
+     * FIXME or should we do this at all? We have Codel queues all over now...
+     */
     public boolean acceptNetworkMessage() {
         //if (true) return true;
         long lag = _context.jobQueue().getMaxLag();
         if ( (lag > JOB_LAG_LIMIT) && (_context.router().getUptime() > 60*1000) ) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Throttling network reader, as the job lag is " + lag);
-            _context.statManager().addRateData("router.throttleNetworkCause", lag, lag);
+            _context.statManager().addRateData("router.throttleNetworkCause", lag);
             return false;
         } else {
             return true;
@@ -96,7 +104,7 @@ class RouterThrottleImpl implements RouterThrottle {
         if (lag > JOB_LAG_LIMIT) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Refusing netDb request, as the job lag is " + lag);
-            _context.statManager().addRateData("router.throttleNetDbCause", lag, lag);
+            _context.statManager().addRateData("router.throttleNetDbCause", lag);
             return false;
         } else {
             return true;
