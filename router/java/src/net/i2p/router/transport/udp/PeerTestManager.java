@@ -345,8 +345,8 @@ class PeerTestManager {
                 if (test.getAlicePortFromCharlie() > 0)
                     testComplete(false);
             } catch (UnknownHostException uhe) {
-                if (_log.shouldLog(Log.ERROR))
-                    _log.error("Unable to get our IP (length " + ipSize +
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Unable to get our IP (length " + ipSize +
                                ") from bob's reply: " + from + ", " + testInfo, uhe);
                 _context.statManager().addRateData("udp.testBadIP", 1);
             }
