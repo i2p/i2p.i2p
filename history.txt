@@ -1,5 +1,7 @@
 2015-02-06 zzz
  * NetDB: Reduce max job lag for floodfill
+ * NTCP: Block IP for a while when incoming connection is dropped before
+   receiving a message. Possible workaround for tickets #551, #1075, #1411.
  * Transport:
    - Decrease DH refiller initial delay and increase buffer size
      to reduce chance of running out on high-bandwidth routers
