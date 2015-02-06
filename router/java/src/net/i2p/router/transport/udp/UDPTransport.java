@@ -2827,6 +2827,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         if ( (status != old) && (status != CommSystemFacade.STATUS_UNKNOWN) ) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Old status: " + old + " New status: " + status + " from: ", new Exception("traceback"));
+            if (old != CommSystemFacade.STATUS_UNKNOWN)
+                _context.router().eventLog().addEvent(EventLog.REACHABILITY, Integer.toString(status));
             // Always rebuild when the status changes, even if our address hasn't changed,
             // as rebuildExternalAddress() calls replaceAddress() which calls CSFI.notifyReplaceAddress()
             // which will start up NTCP inbound when we transition to OK.
@@ -2889,7 +2891,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             PeerState peer = iter.next();
             if ( (dontInclude != null) && (dontInclude.equals(peer.getRemoteHostId())) )
                 continue;
-            // enforce IPv4 connection for BOB
+            // enforce IPv4 connection if we are ALICE looking for a BOB
             byte[] ip = peer.getRemoteIP();
             if (peerRole == BOB && ip.length != 4)
                 continue;
@@ -2952,12 +2954,10 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                     _log.info("Running periodic test with bob = " + bob);
                 _testManager.runTest(bob.getRemoteIPAddress(), bob.getRemotePort(), bob.getCurrentCipherKey(), bob.getCurrentMACKey());
                 setLastTested();
-                _forceRun = false;
-                return;
+            } else {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Unable to run a periodic test, as there are no peers with the capacity required");
             }
-            
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Unable to run a periodic test, as there are no peers with the capacity required");
             _forceRun = false;
         }
         
