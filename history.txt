@@ -1,3 +1,18 @@
+2015-02-06 zzz
+ * NetDB: Reduce max job lag for floodfill
+ * Transport:
+   - Decrease DH refiller initial delay and increase buffer size
+     to reduce chance of running out on high-bandwidth routers
+   - Add event log for reachability change
+
+2015-02-01 zzz
+ * Crypto: Catch IAE in generateCertificate()
+ * NetDB: Don't flood an RI back to itself. While Java ffs self-flood,
+   other implementations may not.
+ * OCMOSJ: Pick a OB tunnel at random, not with the OBEP closest
+   to the lease, as that may be hurting connection reliability.
+ * Router: Call warmupCrypto() earlier in the initialization
+
 2015-01-31 zzz
  * Console:
    - Don't display invalid IPv6 addresses as options on /confignet

@@ -149,8 +149,9 @@ class FloodfillMonitorJob extends JobImpl {
             ffcount++;
         int good = ffcount - failcount;
         boolean happy = getContext().router().getRouterInfo().getCapabilities().indexOf("R") >= 0;
-        // Use the same job lag test as in RouterThrottleImpl
-        happy = happy && getContext().jobQueue().getMaxLag() < 2*1000;
+        // TODO - limit may still be too high
+        // TODO - use jobQueue.jobLag stat instead?
+        happy = happy && getContext().jobQueue().getMaxLag() < 100;
         // Only if we're pretty well integrated...
         happy = happy && _facade.getKnownRouters() >= 200;
         happy = happy && getContext().commSystem().countActivePeers() >= 50;
