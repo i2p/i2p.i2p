@@ -225,9 +225,10 @@ public class NetDbRenderer {
                 double log2 = biLog2(median);
                 buf.append("</b></p><p><b>Median distance (bits): ").append(fmt.format(log2));
                 // 2 for 4 floodfills... -1 for median
+                // this can be way off for unknown reasons
                 int total = (int) Math.round(Math.pow(2, 2 + 256 - 1 - log2));
                 buf.append("</b></p><p><b>Estimated total floodfills: ").append(total);
-                buf.append("</b></p><p><b>Estimated total leasesets: ").append(total * rapCount / 8);
+                buf.append("</b></p><p><b>Estimated total leasesets: ").append(total * rapCount / 4);
             } else {
                 buf.append("</b></p><p><b>Not floodfill or no data");
             }
