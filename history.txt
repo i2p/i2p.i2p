@@ -1,3 +1,7 @@
+2015-02-07 zzz
+ * SSU: Limit range for valid clock skew
+ * Transport: Ban routers if they are too old and we are non-DSA
+
 2015-02-06 zzz
  * NetDB: Reduce max job lag for floodfill
  * NTCP: Block IP for a while when incoming connection is dropped before

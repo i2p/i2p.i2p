@@ -47,6 +47,7 @@ class PacketHandler {
     private static final int MAX_NUM_HANDLERS = 1;
     /** let packets be up to 30s slow */
     private static final long GRACE_PERIOD = Router.CLOCK_FUDGE_FACTOR + 30*1000;
+    private static final long MAX_SKEW = 90*24*60*60*1000L;
     
     private enum AuthType { NONE, INTRO, BOBINTRO, SESSION }
 
@@ -610,17 +611,21 @@ class PacketHandler {
             long recvOn = packet.getBegin();
             long sendOn = reader.readTimestamp() * 1000;
             long skew = recvOn - sendOn;
+            int type = reader.readPayloadType();
+            // if it's a bad type, the whole packet is probably corrupt
+            boolean typeOK = type <= UDPPacket.MAX_PAYLOAD_TYPE;
+            boolean skewOK = skew < MAX_SKEW && skew > (0 - MAX_SKEW) && typeOK;
 
             // update skew whether or not we will be dropping the packet for excessive skew
             if (state != null) {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Received packet from " + state.getRemoteHostId().toString() + " with skew " + skew);
-                if (auth == AuthType.SESSION)
+                if (auth == AuthType.SESSION && typeOK && (skewOK || state.getMessagesReceived() <= 0))
                     state.adjustClockSkew(skew);
             }
-            _context.statManager().addRateData("udp.receivePacketSkew", skew, packet.getLifetime());
+            _context.statManager().addRateData("udp.receivePacketSkew", skew);
 
-            if (!_context.clock().getUpdatedSuccessfully()) {
+            if (skewOK && !_context.clock().getUpdatedSuccessfully()) {
                 // adjust the clock one time in desperation
                 // this doesn't seem to work for big skews, we never get anything back,
                 // so we have to wait for NTCP to do it
@@ -648,7 +653,6 @@ class PacketHandler {
             RemoteHostId from = packet.getRemoteHost();
             _state = 46;
             
-            int type = reader.readPayloadType();
             switch (type) {
                 case UDPPacket.PAYLOAD_TYPE_SESSION_REQUEST:
                     _state = 47;

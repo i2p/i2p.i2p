@@ -761,6 +761,8 @@ class PeerState {
     
     /** we received the message specified completely */
     public void messageFullyReceived(Long messageId, int bytes) { messageFullyReceived(messageId, bytes, false); }
+
+    /** FIXME synch */
     public void messageFullyReceived(Long messageId, int bytes, boolean isForACK) {
         if (bytes > 0) {
             _receiveBytes += bytes;
