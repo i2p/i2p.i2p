@@ -106,7 +106,7 @@ public class NTCPTransport extends TransportImpl {
     /**
      *  RI sigtypes supported in 0.9.16
      */
-    private static final String MIN_SIGTYPE_VERSION = "0.9.16";
+    public static final String MIN_SIGTYPE_VERSION = "0.9.16";
 
 
     public NTCPTransport(RouterContext ctx, DHSessionKeyBuilder.Factory dh) {

@@ -22,9 +22,11 @@ import java.util.TreeMap;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 
+import net.i2p.crypto.SigType;
 import net.i2p.data.Hash;
 import net.i2p.data.router.RouterAddress;
 import net.i2p.data.router.RouterIdentity;
+import net.i2p.data.router.RouterInfo;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.router.CommSystemFacade;
 import net.i2p.router.OutNetMessage;
@@ -37,6 +39,7 @@ import net.i2p.util.Addresses;
 import net.i2p.util.Log;
 import net.i2p.util.SystemVersion;
 import net.i2p.util.Translate;
+import net.i2p.util.VersionComparator;
 
 public class TransportManager implements TransportEventListener {
     private final Log _log;
@@ -58,6 +61,9 @@ public class TransportManager implements TransportEventListener {
     /** default true */
     public final static String PROP_ENABLE_UPNP = "i2np.upnp.enable";
     
+    /** not forever, since they may update */
+    private static final long SIGTYPE_BANLIST_DURATION = 36*60*60*1000L;
+
     public TransportManager(RouterContext context) {
         _context = context;
         _log = _context.logManager().getLog(TransportManager.class);
@@ -559,12 +565,31 @@ public class TransportManager implements TransportEventListener {
         }
         if (unreachableTransports >= _transports.size()) {
             if (msg.getTarget().getIdentity().getSigningPublicKey().getType() == null) {
+                // we don't support his crypto
                 _context.statManager().addRateData("transport.banlistOnUnsupportedSigType", 1);
                 _context.banlist().banlistRouterForever(peer, _x("Unsupported signature type"));
             } else if (unreachableTransports >= _transports.size() && countActivePeers() > 0) {
                 // Don't banlist if we aren't talking to anybody, as we may have a network connection issue
-                _context.statManager().addRateData("transport.banlistOnUnreachable", msg.getLifetime(), msg.getLifetime());
-                _context.banlist().banlistRouter(peer, _x("Unreachable on any transport"));
+                boolean incompat = false;
+                RouterInfo us = _context.router().getRouterInfo();
+                if (us != null) {
+                    RouterIdentity id = us.getIdentity();
+                    if (id.getSigType() != SigType.DSA_SHA1) {
+                        String v = msg.getTarget().getVersion();
+                        // NTCP is earlier than SSU, use that one
+                        if (VersionComparator.comp(v, NTCPTransport.MIN_SIGTYPE_VERSION) < 0)
+                            incompat = true;
+                    }
+                }
+                if (incompat) {
+                    // they don't support our crypto
+                    _context.statManager().addRateData("transport.banlistOnUnsupportedSigType", 1);
+                    _context.banlist().banlistRouter(peer, _x("No support for our signature type"), null, null,
+                                                     _context.clock().now() + SIGTYPE_BANLIST_DURATION);
+                } else {
+                    _context.statManager().addRateData("transport.banlistOnUnreachable", msg.getLifetime(), msg.getLifetime());
+                    _context.banlist().banlistRouter(peer, _x("Unreachable on any transport"));
+                }
             }
         } else if (rv == null) {
             _context.statManager().addRateData("transport.noBidsYetNotAllUnreachable", unreachableTransports, msg.getLifetime());
