@@ -74,7 +74,8 @@ public class Reseeder {
               // (Temp?) disable due to extended downtime
               //"http://193.150.121.66/netDb/" + "," +
               "http://netdb.i2p2.no/" + "," + // Only SU3 (v3) support
-              "http://us.reseed.i2p2.no/" + "," +
+              // Disable due to misconfiguation (ticket #1466)
+              //"http://us.reseed.i2p2.no/" + "," +
               // (Temp?) disable due to extended downtime (ticket #1422)
               //"http://jp.reseed.i2p2.no/" + "," +
               // Broken server config, no response
