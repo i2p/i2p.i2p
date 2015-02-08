@@ -163,7 +163,7 @@ public class Banlist {
             _log.error("wtf, why did we try to banlist null?", new Exception("banfaced"));
             return false;
         }
-        if (_context.routerHash().equals(peer)) {
+        if (peer.equals(_context.routerHash())) {
             _log.error("wtf, why did we try to banlist ourselves?", new Exception("banfaced"));
             return false;
         }
