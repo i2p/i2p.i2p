@@ -74,7 +74,6 @@ public class Reseeder {
               // (Temp?) disable due to extended downtime
               //"http://193.150.121.66/netDb/" + "," +
               "http://netdb.i2p2.no/" + "," + // Only SU3 (v3) support
-              "http://reseed.info/"  + "," +
               "http://us.reseed.i2p2.no/" + "," +
               // (Temp?) disable due to extended downtime (ticket #1422)
               //"http://jp.reseed.i2p2.no/" + "," +
@@ -91,7 +90,6 @@ public class Reseeder {
               // (Temp?) disable due to extended downtime
               //"https://193.150.121.66/netDb/" + "," +
               "https://netdb.i2p2.no/" + "," + // Only SU3 (v3) support
-              "https://reseed.info/"  + "," +
               "https://us.reseed.i2p2.no:444/" + "," +
               "https://uk.reseed.i2p2.no:444/" + "," +
               // (Temp?) disable due to extended downtime (ticket #1422)
