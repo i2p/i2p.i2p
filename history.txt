@@ -1,3 +1,6 @@
+2015-02-10 dg
+ * I2PSnark, Jetty, SAM, crypto: findbugs resource leaks.
+
 2015-02-07 zzz
  * SSU: Limit range for valid clock skew
  * Transport: Ban routers if they are too old and we are non-DSA

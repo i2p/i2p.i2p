@@ -26,6 +26,7 @@ import net.i2p.I2PAppContext;
 import net.i2p.app.*;
 import static net.i2p.app.ClientAppState.*;
 
+import java.io.InputStream;
 import org.eclipse.jetty.util.component.LifeCycle;
 import org.eclipse.jetty.util.resource.Resource;
 import org.eclipse.jetty.xml.XmlConfiguration;
@@ -68,9 +69,12 @@ public class JettyStart implements ClientApp {
     public void parseArgs(String[] args) throws Exception {
         Properties properties=new Properties();
         XmlConfiguration last=null;
+        InputStream in = null;
         for (int i = 0; i < args.length; i++) {
             if (args[i].toLowerCase().endsWith(".properties")) {
-                properties.load(Resource.newResource(args[i]).getInputStream());
+                in = Resource.newResource(args[i]).getInputStream();
+                properties.load(in);
+                in.close();
             } else {
                 XmlConfiguration configuration = new XmlConfiguration(Resource.newResource(args[i]).getURL());
                 if (last!=null)
