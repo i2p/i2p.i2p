@@ -1,3 +1,9 @@
+2015-02-15 dg
+ * FloodfillMonitorJob: 
+   - Use lifetime average value for job lag
+   - Change the job lag limit to less than 25ms
+   - Consider and set the limit of backlogged tunnels to less than 5
+
 2015-02-10 dg
  * I2PSnark, Jetty, SAM, crypto: findbugs resource leaks.
 

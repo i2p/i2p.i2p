@@ -150,8 +150,11 @@ class FloodfillMonitorJob extends JobImpl {
         int good = ffcount - failcount;
         boolean happy = getContext().router().getRouterInfo().getCapabilities().indexOf("R") >= 0;
         // TODO - limit may still be too high
-        // TODO - use jobQueue.jobLag stat instead?
-        happy = happy && getContext().jobQueue().getMaxLag() < 100;
+        // For reference, the avg lifetime job lag on my Pi is 6.
+        // Would per-hour or per-day be better than lifetime avg? A reference to avg. dropped ff jobs maybe?
+        RateStat lagStat = getContext().statManager().getRate("jobQueue.jobLag");
+        happy = happy && lagStat.getLifetimeAverageValue() < 25;
+        happy = happy && getContext().tunnelManager().getInboundBuildQueueSize() < 5;
         // Only if we're pretty well integrated...
         happy = happy && _facade.getKnownRouters() >= 200;
         happy = happy && getContext().commSystem().countActivePeers() >= 50;
