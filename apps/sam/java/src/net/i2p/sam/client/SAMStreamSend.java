@@ -174,7 +174,7 @@ public class SAMStreamSend {
         }
         
         public boolean openConnection() {
-			FileInputStream fin = null;
+            FileInputStream fin = null;
             try {
                 fin = new FileInputStream(_destFile);
                 byte dest[] = new byte[1024];

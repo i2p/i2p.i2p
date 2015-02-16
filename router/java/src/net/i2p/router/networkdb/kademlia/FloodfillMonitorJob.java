@@ -31,6 +31,7 @@ class FloodfillMonitorJob extends JobImpl {
     private static final int REQUEUE_DELAY = 60*60*1000;
     private static final long MIN_UPTIME = 2*60*60*1000;
     private static final long MIN_CHANGE_DELAY = 6*60*60*1000;
+
     private static final int MIN_FF = 5000;
     private static final int MAX_FF = 999999;
     private static final String PROP_FLOODFILL_PARTICIPANT = "router.floodfillParticipant";
@@ -151,9 +152,9 @@ class FloodfillMonitorJob extends JobImpl {
         boolean happy = getContext().router().getRouterInfo().getCapabilities().indexOf("R") >= 0;
         // TODO - limit may still be too high
         // For reference, the avg lifetime job lag on my Pi is 6.
-        // Would per-hour or per-day be better than lifetime avg? A reference to avg. dropped ff jobs maybe?
+        // Should we consider avg. dropped ff jobs?
         RateStat lagStat = getContext().statManager().getRate("jobQueue.jobLag");
-        happy = happy && lagStat.getLifetimeAverageValue() < 25;
+        happy = happy && lagStat.getRate(60*60*1000L).getAvgOrLifetimeAvg() < 25;
         happy = happy && getContext().tunnelManager().getInboundBuildQueueSize() < 5;
         // Only if we're pretty well integrated...
         happy = happy && _facade.getKnownRouters() >= 200;
