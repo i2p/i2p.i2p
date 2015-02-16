@@ -97,7 +97,6 @@ public class Reseeder {
               //"https://jp.reseed.i2p2.no:444/" + "," +
               // Broken server config, no response
               //"https://i2p-netdb.innovatio.no/" + "," +
-              "https://ssl.webpack.de/ivae2he9.sg4.e-plaza.de/" + "," + // Only HTTPS and SU3 (v3) support
               "https://link.mx24.eu/" + "," + // Only HTTPS and SU3 (v3) support
               "https://ieb9oopo.mooo.com/"; // Only HTTPS and SU3 (v3) support
 
