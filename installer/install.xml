@@ -129,6 +129,7 @@
               and the izpack docs for some guidance.
              -->
             <parsable targetfile="$INSTALL_PATH/wrapper.config" type="plain" />
+            <parsable targetfile="$INSTALL_PATH/scripts/home.i2p.i2prouter" type="plain"> <os family="unix" /> </parsable>
             <parsable targetfile="$INSTALL_PATH/i2prouter" type="shell"> <os family="unix" /> </parsable>
             <parsable targetfile="$INSTALL_PATH/eepget" type="shell"> <os family="unix" /> </parsable>
             <parsable targetfile="$INSTALL_PATH/eepget.bat" type="shell" os="windows" />
