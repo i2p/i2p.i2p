@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-10-30 20:10+0000\n"
-"PO-Revision-Date: 2014-10-30 20:11+0000\n"
+"POT-Creation-Date: 2015-02-06 18:28+0000\n"
+"PO-Revision-Date: 2015-02-06 18:33+0000\n"
 "Last-Translator: kytv <killyourtv@i2pmail.org>\n"
 "Language-Team: Norwegian Bokmål (http://www.transifex.com/projects/p/I2P/language/nb/)\n"
 "MIME-Version: 1.0\n"
@@ -166,7 +166,7 @@ msgstr ""
 #: ../java/build/Proxy.java:45 ../java/build/Proxy.java:51
 #: ../java/build/Proxy.java:56 ../java/build/Proxy.java:62
 #: ../java/build/Proxy.java:83 ../java/build/Proxy.java:89
-msgid "Warning: Website Unreachable"
+msgid "Website Unreachable"
 msgstr ""
 
 #: ../java/build/Proxy.java:52
@@ -279,7 +279,7 @@ msgid "Other protocols such as FTP are not allowed."
 msgstr ""
 
 #: ../java/build/Proxy.java:116 ../java/build/Proxy.java:122
-msgid "Warning: Outproxy Unreachable"
+msgid "Outproxy Unreachable"
 msgstr ""
 
 #: ../java/build/Proxy.java:123
@@ -305,11 +305,11 @@ msgid ""
 msgstr ""
 
 #: ../java/build/Proxy.java:127
-msgid "Warning: Website Unknown"
+msgid "Website Unknown"
 msgstr ""
 
 #: ../java/build/Proxy.java:133
-msgid "Warning: Website Not Found in Addressbook"
+msgid "Website Not Found in Addressbook"
 msgstr ""
 
 #: ../java/build/Proxy.java:134
@@ -354,7 +354,7 @@ msgstr ""
 
 #: ../java/build/Proxy.java:149 ../java/build/Proxy.java:155
 #: ../java/build/Proxy.java:161 ../java/build/Proxy.java:167
-msgid "Warning: Outproxy Not Found"
+msgid "Outproxy Not Found"
 msgstr ""
 
 #: ../java/build/Proxy.java:156
@@ -413,7 +413,7 @@ msgstr "Dette synes å være en dårlig destinasjon:"
 msgid "i2paddresshelper cannot help you with a destination like that!"
 msgstr "i2paddresshelper kan ikke hjelpe deg med en destinasjon som dette!"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:667
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:668
 #, java-format
 msgid ""
 "To visit the destination in your host database, click <a "
@@ -421,42 +421,42 @@ msgid ""
 "click <a href=\"{1}\">here</a>."
 msgstr "For å besøke destinasjonen i din vert database, klikk <a href=\"{0}\">her</a>. For å å besøke motstridende adressehjelper destinasjon, klikk <a href=\"{1}\">her</a>."
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1034
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1037
 msgid "Destination lease set not found"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1162
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1167
 msgid "Host"
 msgstr "Vert"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1166
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1171
 msgid "Base 32"
 msgstr "Base 32"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1170
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1175
 msgid "Destination"
 msgstr "Destinasjon"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1176
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1181
 #, java-format
 msgid "Continue to {0} without saving"
 msgstr "Fortsett til {0} uten å lagre"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1181
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1186
 #, java-format
 msgid "Save {0} to router address book and continue to website"
-msgstr "Lagre {0} til ruter adressebok og fortsett til website"
+msgstr ""
 
 #. only blockfile supports multiple books
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1184
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1189
 #, java-format
 msgid "Save {0} to master address book and continue to website"
-msgstr "Save {0} til hoved adressebok og fortsett til website"
+msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1185
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1190
 #, java-format
 msgid "Save {0} to private address book and continue to website"
-msgstr "Save {0} til privat adressebok og fortsett til website"
+msgstr ""
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:162
 #, java-format

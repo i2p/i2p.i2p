@@ -11,13 +11,13 @@
 # gmind, 2012-2013
 # Nikolay Parukhin <parukhin@gmail.com>, 2014
 # sfix <anon-9b36b2e@lycos.com>, 2013
-# yume, 2014
+# yume, 2014-2015
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-10-30 20:10+0000\n"
-"PO-Revision-Date: 2014-11-01 19:59+0000\n"
+"POT-Creation-Date: 2015-02-06 18:28+0000\n"
+"PO-Revision-Date: 2015-02-07 11:13+0000\n"
 "Last-Translator: yume\n"
 "Language-Team: Russian (Russia) (http://www.transifex.com/projects/p/I2P/language/ru_RU/)\n"
 "MIME-Version: 1.0\n"
@@ -134,7 +134,7 @@ msgstr "Ссылка AddressHelper, по которой вы прошли, оп�
 msgid ""
 "Someone could be trying to impersonate another website, or people have given"
 " two websites identical names."
-msgstr "Кто-то может пытаться выдать себя за другой сайт или разные люди дали двум сайтам одинаковые имена."
+msgstr "Возможно, кто-то пытается выдать себя за другой сайт или разные люди дали двум сайтам одинаковые имена."
 
 #: ../java/build/Proxy.java:26
 msgid ""
@@ -173,17 +173,17 @@ msgstr "Вы попытались соединиться с сайтом не в
 #: ../java/build/Proxy.java:45 ../java/build/Proxy.java:51
 #: ../java/build/Proxy.java:56 ../java/build/Proxy.java:62
 #: ../java/build/Proxy.java:83 ../java/build/Proxy.java:89
-msgid "Warning: Website Unreachable"
-msgstr "Предупреждение: Сайт I2P недоступен"
+msgid "Website Unreachable"
+msgstr "Сайт недоступен"
 
 #: ../java/build/Proxy.java:52
 msgid "The website was not reachable, because its lease set was not found."
-msgstr "website недоступен, так как его LeaseSet не был найден."
+msgstr "Сайт недоступен, так как его LeaseSet не был найден."
 
 #: ../java/build/Proxy.java:53
 msgid ""
 "The website is probably down, but there could also be network congestion."
-msgstr "website, вероятно, выключен, но также возможна перегрузка сети"
+msgstr "Сайт, вероятно, выключен, но также возможна перегрузка сети."
 
 #: ../java/build/Proxy.java:54 ../java/build/Proxy.java:92
 #: ../java/build/Proxy.java:104
@@ -201,7 +201,7 @@ msgstr "Назначение туннеля"
 msgid ""
 "The website was not reachable, because it uses encryption options that are "
 "not supported by your I2P or Java version."
-msgstr "Website недоступен, так как использует настройки шифрования, которые не поддерживаются вашей версией I2P или Java."
+msgstr "Сайт недоступен, так как использует настройки шифрования, которые не поддерживаются вашей версией I2P или Java."
 
 #: ../java/build/Proxy.java:64 ../java/build/Proxy.java:126
 msgid "Could not connect to the following destination:"
@@ -241,13 +241,13 @@ msgstr "Пожалуйста, настройте выходной прокси-�
 
 #: ../java/build/Proxy.java:90
 msgid "The website was not reachable."
-msgstr "Сайт I2P недоступен."
+msgstr "Сайт недоступен."
 
 #: ../java/build/Proxy.java:91
 msgid ""
 "The website is offline, there is network congestion, or your router is not "
 "yet well-integrated with peers."
-msgstr "Возможно, он отключен, сеть перегружена или ваш маршрутизатор недостаточно интегрирован с другими узлами."
+msgstr "Возможно, сайт отключен, сеть перегружена или ваш маршрутизатор недостаточно интегрирован с другими пирами."
 
 #: ../java/build/Proxy.java:94 ../java/build/Proxy.java:100
 msgid "Warning: Invalid Destination"
@@ -257,7 +257,7 @@ msgstr "Локальный адрес назначения"
 msgid ""
 "The website destination specified was not valid, or was otherwise "
 "unreachable."
-msgstr "Указанный адрес недействителен или недоступен."
+msgstr "Указанный адрес сайт недействителен или недоступен."
 
 #: ../java/build/Proxy.java:102
 msgid ""
@@ -286,8 +286,8 @@ msgid "Other protocols such as FTP are not allowed."
 msgstr "Другие протоколы, такие как FTP не допустимы."
 
 #: ../java/build/Proxy.java:116 ../java/build/Proxy.java:122
-msgid "Warning: Outproxy Unreachable"
-msgstr "Предупреждение: внешний прокси недоступен"
+msgid "Outproxy Unreachable"
+msgstr "Внешний прокси недоступен"
 
 #: ../java/build/Proxy.java:123
 msgid ""
@@ -312,16 +312,16 @@ msgid ""
 msgstr "Если проблема продолжит появляться, вы можете изменить список прокси-серверов {0}здесь{1}."
 
 #: ../java/build/Proxy.java:127
-msgid "Warning: Website Unknown"
-msgstr "Предупреждение: Неизвестный сайт I2P"
+msgid "Website Unknown"
+msgstr "Неизвестный сайт"
 
 #: ../java/build/Proxy.java:133
-msgid "Warning: Website Not Found in Addressbook"
-msgstr "Предупреждение: Сайт I2P не найден в адресной книге"
+msgid "Website Not Found in Addressbook"
+msgstr "Сайт не найден в адресной книге"
 
 #: ../java/build/Proxy.java:134
 msgid "The website was not found in your router's addressbook."
-msgstr "Сайт I2P не найден в адресной книге вашего маршрутизатора."
+msgstr "Сайт не найден в вашей адресной книге маршрутизатора."
 
 #: ../java/build/Proxy.java:135
 msgid "Check the link or find a Base 32 or Base 64 address."
@@ -361,8 +361,8 @@ msgstr "Если вы прошли по ссылке, проверьте кон�
 
 #: ../java/build/Proxy.java:149 ../java/build/Proxy.java:155
 #: ../java/build/Proxy.java:161 ../java/build/Proxy.java:167
-msgid "Warning: Outproxy Not Found"
-msgstr "Предупреждение: Выходной прокси-сервер недоступен"
+msgid "Outproxy Not Found"
+msgstr "Внешний прокси не найден"
 
 #: ../java/build/Proxy.java:156
 msgid ""
@@ -420,7 +420,7 @@ msgstr "Кажется это плохой адрес назначения:"
 msgid "i2paddresshelper cannot help you with a destination like that!"
 msgstr "С таким адресом назначения i2paddresshelper вам не поможет!"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:667
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:668
 #, java-format
 msgid ""
 "To visit the destination in your host database, click <a "
@@ -428,42 +428,42 @@ msgid ""
 "click <a href=\"{1}\">here</a>."
 msgstr "Для перехода по ссылке из локальной адресной книги, нажмите <a href=\"{0}\">здесь</a>. Для перехода по новой addresshelper-ссылке, нажмите <a href=\"{1}\">здесь</a>."
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1034
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1037
 msgid "Destination lease set not found"
 msgstr "LeaseSet для адреса назначения не найден"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1162
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1167
 msgid "Host"
 msgstr "Адрес"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1166
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1171
 msgid "Base 32"
 msgstr "Base 32"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1170
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1175
 msgid "Destination"
 msgstr "Адрес назначения"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1176
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1181
 #, java-format
 msgid "Continue to {0} without saving"
 msgstr "Продолжить переход к {0} без сохранения"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1181
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1186
 #, java-format
 msgid "Save {0} to router address book and continue to website"
-msgstr "Сохранить {0} в адресную книгу роутера (router address book) и продолжить переход к eep-сайту"
+msgstr "Сохранить {0} в адресную книгу маршрутизатора и перейти к сайту"
 
 #. only blockfile supports multiple books
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1184
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1189
 #, java-format
 msgid "Save {0} to master address book and continue to website"
-msgstr "Сохранить {0} в основную (master) адресную книгу и продолжить переход к eep-сайту"
+msgstr "Сохранить {0} в основную адресную книгу и перейти к сайту"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1185
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1190
 #, java-format
 msgid "Save {0} to private address book and continue to website"
-msgstr "Сохранить {0} в приватную адресную книгу и продолжить переход к eep-сайту"
+msgstr "Сохранить {0} в приватную адресную книгу и перейти к сайту"
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:162
 #, java-format

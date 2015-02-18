@@ -7,13 +7,14 @@
 # Denis Blank <gribua@gmail.com>, 2011
 # Denis Blank <gribua@gmail.com>, 2012
 # jonny_nut, 2014
+# madjong <madjong@i2pmail.org>, 2014
 # puxud <puxud@alivance.com>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-10-30 20:10+0000\n"
-"PO-Revision-Date: 2014-10-30 20:11+0000\n"
+"POT-Creation-Date: 2015-02-06 18:28+0000\n"
+"PO-Revision-Date: 2015-02-06 18:33+0000\n"
 "Last-Translator: kytv <killyourtv@i2pmail.org>\n"
 "Language-Team: Ukrainian (Ukraine) (http://www.transifex.com/projects/p/I2P/language/uk_UA/)\n"
 "MIME-Version: 1.0\n"
@@ -160,7 +161,7 @@ msgstr ""
 
 #: ../java/build/Proxy.java:37 ../java/build/Proxy.java:43
 msgid "Warning: Request Denied"
-msgstr ""
+msgstr "Попередження: запит відхилено"
 
 #: ../java/build/Proxy.java:44
 msgid "You attempted to connect to a non-I2P website or location."
@@ -169,8 +170,8 @@ msgstr ""
 #: ../java/build/Proxy.java:45 ../java/build/Proxy.java:51
 #: ../java/build/Proxy.java:56 ../java/build/Proxy.java:62
 #: ../java/build/Proxy.java:83 ../java/build/Proxy.java:89
-msgid "Warning: Website Unreachable"
-msgstr "Увага: Eep-сайт недоступний"
+msgid "Website Unreachable"
+msgstr ""
 
 #: ../java/build/Proxy.java:52
 msgid "The website was not reachable, because its lease set was not found."
@@ -185,7 +186,7 @@ msgstr ""
 #: ../java/build/Proxy.java:104
 #, java-format
 msgid "You may want to {0}retry{1}."
-msgstr ""
+msgstr "Не бажаєте {0}повторити спробу{1}?"
 
 #: ../java/build/Proxy.java:55 ../java/build/Proxy.java:93
 #: ../java/build/Proxy.java:105 ../java/build/Proxy.java:139
@@ -205,7 +206,7 @@ msgstr ""
 
 #: ../java/build/Proxy.java:65
 msgid "Error: Request Denied"
-msgstr ""
+msgstr "Помилка: запит відхилено"
 
 #: ../java/build/Proxy.java:71
 msgid "Error: Local Access"
@@ -219,11 +220,11 @@ msgstr ""
 msgid ""
 "Do not use the proxy to access the router console, localhost, or local LAN "
 "destinations."
-msgstr ""
+msgstr "Не використовуйте проксі для доступу до консолі роутеру, localhost чи будь-якого хосту у локальній мережі."
 
 #: ../java/build/Proxy.java:74 ../java/build/Proxy.java:80
 msgid "Warning: No Outproxy Configured"
-msgstr ""
+msgstr "Попередження: вихідний проксі не налаштовано"
 
 #: ../java/build/Proxy.java:81
 msgid ""
@@ -233,17 +234,17 @@ msgstr ""
 
 #: ../java/build/Proxy.java:82
 msgid "Please configure an outproxy in I2PTunnel."
-msgstr ""
+msgstr "Будь ласка, налаштуйте вихідний проксі у I2PTunnel."
 
 #: ../java/build/Proxy.java:90
 msgid "The website was not reachable."
-msgstr "Eep-сайт не доступний."
+msgstr ""
 
 #: ../java/build/Proxy.java:91
 msgid ""
 "The website is offline, there is network congestion, or your router is not "
 "yet well-integrated with peers."
-msgstr "Eep-сайт вимкнений, мережа перевантажена, або ваш роутер недостатньо інтегрований із пірами."
+msgstr ""
 
 #: ../java/build/Proxy.java:94 ../java/build/Proxy.java:100
 msgid "Warning: Invalid Destination"
@@ -282,14 +283,14 @@ msgid "Other protocols such as FTP are not allowed."
 msgstr ""
 
 #: ../java/build/Proxy.java:116 ../java/build/Proxy.java:122
-msgid "Warning: Outproxy Unreachable"
+msgid "Outproxy Unreachable"
 msgstr ""
 
 #: ../java/build/Proxy.java:123
 msgid ""
 "The HTTP outproxy was not reachable, because it uses encryption options that"
 " are not supported by your I2P or Java version."
-msgstr ""
+msgstr "Вихідний проксі HTTP недоступний, бо використовує опції шифрування, які не підтримуються вашим I2P або версією Java."
 
 #: ../java/build/Proxy.java:124 ../java/build/Proxy.java:158
 #: ../java/build/Proxy.java:170
@@ -308,16 +309,16 @@ msgid ""
 msgstr ""
 
 #: ../java/build/Proxy.java:127
-msgid "Warning: Website Unknown"
-msgstr "Увага: Невідомий eep-сайт"
+msgid "Website Unknown"
+msgstr ""
 
 #: ../java/build/Proxy.java:133
-msgid "Warning: Website Not Found in Addressbook"
-msgstr "Увага: Eep-сайт не знайдене в адресній книзі"
+msgid "Website Not Found in Addressbook"
+msgstr ""
 
 #: ../java/build/Proxy.java:134
 msgid "The website was not found in your router's addressbook."
-msgstr "Eep-сайт не знайдене в адресній книзі вашого роутеру."
+msgstr ""
 
 #: ../java/build/Proxy.java:135
 msgid "Check the link or find a Base 32 or Base 64 address."
@@ -326,7 +327,7 @@ msgstr ""
 #: ../java/build/Proxy.java:136
 #, java-format
 msgid "If you have the Base 64 address, {0}add it to your addressbook{1}."
-msgstr ""
+msgstr "Якщо ви маєте Base 64 адресу, то {0}додайте її до адресної книги{1}."
 
 #: ../java/build/Proxy.java:137
 msgid ""
@@ -357,7 +358,7 @@ msgstr ""
 
 #: ../java/build/Proxy.java:149 ../java/build/Proxy.java:155
 #: ../java/build/Proxy.java:161 ../java/build/Proxy.java:167
-msgid "Warning: Outproxy Not Found"
+msgid "Outproxy Not Found"
 msgstr ""
 
 #: ../java/build/Proxy.java:156
@@ -368,11 +369,11 @@ msgstr ""
 #: ../java/build/Proxy.java:157
 msgid ""
 "The outproxy is probably down, but there could also be network congestion."
-msgstr ""
+msgstr "Можливо, вихідний проксі не працює, або мережа перенавантажена."
 
 #: ../java/build/Proxy.java:168
 msgid "The HTTP Outproxy was not found."
-msgstr ""
+msgstr "Вихідний проксі для HTTP не знайдено."
 
 #: ../java/build/Proxy.java:169
 msgid ""
@@ -416,7 +417,7 @@ msgstr "Скоріше всього це поганий адрес призна�
 msgid "i2paddresshelper cannot help you with a destination like that!"
 msgstr "i2paddresshelper не може допомогти Вам з місцем призначення як це!"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:667
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:668
 #, java-format
 msgid ""
 "To visit the destination in your host database, click <a "
@@ -424,42 +425,42 @@ msgid ""
 "click <a href=\"{1}\">here</a>."
 msgstr "Для того щоб перейти по локальному посиланню з локальної адресної книги, натисніть ось<a href=\"{0}\">тут</a>. Для переходу по новому addresshelper-посиланню, натисніть будь-ласка <a href=\"{1}\">тут</a>."
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1034
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1037
 msgid "Destination lease set not found"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1162
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1167
 msgid "Host"
 msgstr "Адрес"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1166
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1171
 msgid "Base 32"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1170
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1175
 msgid "Destination"
 msgstr "Адреса призначення"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1176
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1181
 #, java-format
 msgid "Continue to {0} without saving"
 msgstr "Продовжити до {0} без збереження"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1181
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1186
 #, java-format
 msgid "Save {0} to router address book and continue to website"
-msgstr "Зберегти {0} в адресну книгу роутера и продовжити перехід до eep-сайту"
+msgstr ""
 
 #. only blockfile supports multiple books
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1184
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1189
 #, java-format
 msgid "Save {0} to master address book and continue to website"
-msgstr "Зберегти {0} в основну адресну книгу і продовжити перехід до еер-сайту"
+msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1185
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1190
 #, java-format
 msgid "Save {0} to private address book and continue to website"
-msgstr "Зберегти {0} в приватну адресну книгу і продовжити перехід до еер-сайту."
+msgstr ""
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:162
 #, java-format
@@ -472,7 +473,7 @@ msgstr "Додано через address helper"
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:187
 msgid "router"
-msgstr ""
+msgstr "роутер"
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:189
 msgid "master"

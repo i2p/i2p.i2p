@@ -10,13 +10,13 @@
 # walking <waling@mail.i2p>, 2013
 # walking <walking@i2pmail.org>, 2011
 # wwj402 <wwj402@gmail.com>, 2013
-# YF <yfdyh000@gmail.com>, 2014
+# YF <yfdyh000@gmail.com>, 2014-2015
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-10-30 20:10+0000\n"
-"PO-Revision-Date: 2014-10-30 23:29+0000\n"
+"POT-Creation-Date: 2015-02-06 18:28+0000\n"
+"PO-Revision-Date: 2015-02-07 03:54+0000\n"
 "Last-Translator: YF <yfdyh000@gmail.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/projects/p/I2P/language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -133,7 +133,7 @@ msgstr "您所打开的地址簿连接指定的目标密钥与您的地址簿中
 msgid ""
 "Someone could be trying to impersonate another website, or people have given"
 " two websites identical names."
-msgstr "可能有人正试图通过此链接伪装成此站点，或有人使用了相同的站点网址。"
+msgstr "有人可能在试图冒充另一个网站，或者人们给两个网站赋予了同一个名称。"
 
 #: ../java/build/Proxy.java:26
 msgid ""
@@ -172,17 +172,17 @@ msgstr "您尝试连接的网站非I2P站点或位置。"
 #: ../java/build/Proxy.java:45 ../java/build/Proxy.java:51
 #: ../java/build/Proxy.java:56 ../java/build/Proxy.java:62
 #: ../java/build/Proxy.java:83 ../java/build/Proxy.java:89
-msgid "Warning: Website Unreachable"
-msgstr "警告：I2P 站点不可达"
+msgid "Website Unreachable"
+msgstr "网站不可达"
 
 #: ../java/build/Proxy.java:52
 msgid "The website was not reachable, because its lease set was not found."
-msgstr "该匿名网站不可达，因为找不到其租契。"
+msgstr "该网站不可达，因为找不到其租契。"
 
 #: ../java/build/Proxy.java:53
 msgid ""
 "The website is probably down, but there could also be network congestion."
-msgstr "该匿名网站可能已下线，但也可能是由于网络拥堵。"
+msgstr "该网站可能已下线，但也可能是由于网络拥堵。"
 
 #: ../java/build/Proxy.java:54 ../java/build/Proxy.java:92
 #: ../java/build/Proxy.java:104
@@ -200,7 +200,7 @@ msgstr "无法直到如下目标："
 msgid ""
 "The website was not reachable, because it uses encryption options that are "
 "not supported by your I2P or Java version."
-msgstr "此匿名网站不可达，因为您使用的 I2P 或者 Java 版本不支持它使用的加密选项。"
+msgstr "此网站不可达，因为您使用的 I2P 或者 Java 版本不支持它使用的加密选项。"
 
 #: ../java/build/Proxy.java:64 ../java/build/Proxy.java:126
 msgid "Could not connect to the following destination:"
@@ -240,13 +240,13 @@ msgstr "请到 I2PTunnel 中配置出口代理。"
 
 #: ../java/build/Proxy.java:90
 msgid "The website was not reachable."
-msgstr "此 I2P 站点不可达"
+msgstr "该网站不可达。"
 
 #: ../java/build/Proxy.java:91
 msgid ""
 "The website is offline, there is network congestion, or your router is not "
 "yet well-integrated with peers."
-msgstr "此 I2P 站点已经下线，遇到网络拥堵，或您的路由尚未完全整合至 I2P 网络中。"
+msgstr "该网站已离线，可能由于网络拥堵，或者您的路由器未良好的与网络整合。"
 
 #: ../java/build/Proxy.java:94 ../java/build/Proxy.java:100
 msgid "Warning: Invalid Destination"
@@ -256,7 +256,7 @@ msgstr "警告：无效目标"
 msgid ""
 "The website destination specified was not valid, or was otherwise "
 "unreachable."
-msgstr "指定站点的目标密钥无效，或无法到达。"
+msgstr "指定的网站目标无效，或者不可达。"
 
 #: ../java/build/Proxy.java:102
 msgid ""
@@ -285,8 +285,8 @@ msgid "Other protocols such as FTP are not allowed."
 msgstr "其他协议例如FTP不被支持。"
 
 #: ../java/build/Proxy.java:116 ../java/build/Proxy.java:122
-msgid "Warning: Outproxy Unreachable"
-msgstr "警告：出口代理不可达"
+msgid "Outproxy Unreachable"
+msgstr "出口代理不可达"
 
 #: ../java/build/Proxy.java:123
 msgid ""
@@ -311,16 +311,16 @@ msgid ""
 msgstr "如果问题持续存在，您可能需要{0}在此{1}编辑出口代理列表。"
 
 #: ../java/build/Proxy.java:127
-msgid "Warning: Website Unknown"
-msgstr "警告：未知 I2P 站点"
+msgid "Website Unknown"
+msgstr "网站未知"
 
 #: ../java/build/Proxy.java:133
-msgid "Warning: Website Not Found in Addressbook"
-msgstr "警告：地址簿中未找到该 I2P 站点"
+msgid "Website Not Found in Addressbook"
+msgstr "未在地址簿中找到网站"
 
 #: ../java/build/Proxy.java:134
 msgid "The website was not found in your router's addressbook."
-msgstr "此 I2P 站点未存在于您路由器的地址簿中。"
+msgstr "未在您的地址簿中找到此网站。"
 
 #: ../java/build/Proxy.java:135
 msgid "Check the link or find a Base 32 or Base 64 address."
@@ -360,8 +360,8 @@ msgstr "如果您点击的是链接，请检查 URI 结尾是否有浏览器错�
 
 #: ../java/build/Proxy.java:149 ../java/build/Proxy.java:155
 #: ../java/build/Proxy.java:161 ../java/build/Proxy.java:167
-msgid "Warning: Outproxy Not Found"
-msgstr "警告：未找到出口代理"
+msgid "Outproxy Not Found"
+msgstr "出口代理未找到"
 
 #: ../java/build/Proxy.java:156
 msgid ""
@@ -419,7 +419,7 @@ msgstr "目标似乎无效："
 msgid "i2paddresshelper cannot help you with a destination like that!"
 msgstr "i2paddresshelper 对您输入的目标无能为力！"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:667
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:668
 #, java-format
 msgid ""
 "To visit the destination in your host database, click <a "
@@ -427,42 +427,42 @@ msgid ""
 "click <a href=\"{1}\">here</a>."
 msgstr "要访问您地址簿中设置的目标，请点击<a href=\"{0}\">这里</a>。要访问地址助手返回的目标，请点<a href=\"{1}\">这里</a>。"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1034
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1037
 msgid "Destination lease set not found"
 msgstr "找不到目标租赁"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1162
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1167
 msgid "Host"
 msgstr "主机"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1166
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1171
 msgid "Base 32"
 msgstr "Base 32"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1170
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1175
 msgid "Destination"
 msgstr "目标"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1176
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1181
 #, java-format
 msgid "Continue to {0} without saving"
 msgstr "继续{0}，而不保存"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1181
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1186
 #, java-format
 msgid "Save {0} to router address book and continue to website"
-msgstr "保存{0}至“路由器地址簿”并访问该 I2P 站点。"
+msgstr "保存 {0} 到路由器地址簿并继续访问网站"
 
 #. only blockfile supports multiple books
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1184
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1189
 #, java-format
 msgid "Save {0} to master address book and continue to website"
-msgstr "保存{0}至“主地址簿”并访问该 I2P 站点。"
+msgstr "保存 {0} 到主地址簿并继续访问网站"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1185
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1190
 #, java-format
 msgid "Save {0} to private address book and continue to website"
-msgstr "保存{0}至“私有地址簿”并访问该 I2P 站点。"
+msgstr "保存 {0} 到私有地址簿并继续访问网站"
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:162
 #, java-format

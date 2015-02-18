@@ -7,7 +7,7 @@
 # PolishAnon <b790979@klzlk.com>, 2011
 # Warton <businesshehe@yahoo.com>, 2012
 # foo <foo@bar>, 2009
-# polacco <polacco@i2pmail.org>, 2014
+# polacco <polacco@i2pmail.org>, 2014-2015
 # polacco <polacco@i2pmail.org>, 2012
 # seb, 2014
 # Smert i2p <Smert@safe-mail.net>, 2013
@@ -15,8 +15,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-11-19 21:48+0000\n"
-"PO-Revision-Date: 2014-11-23 18:19+0000\n"
+"POT-Creation-Date: 2015-02-06 18:28+0000\n"
+"PO-Revision-Date: 2015-02-17 20:52+0000\n"
 "Last-Translator: polacco <polacco@i2pmail.org>\n"
 "Language-Team: Polish (http://www.transifex.com/projects/p/I2P/language/pl/)\n"
 "MIME-Version: 1.0\n"
@@ -413,7 +413,7 @@ msgstr "Zatrzymywanie wszystkich torrentów i zamykanie tunelu I2P."
 msgid "Closing I2P tunnel after notifying trackers."
 msgstr "Zamknięcie tunelu I2P po powiadomieniu trackerów."
 
-#: ../java/src/org/klomp/snark/TrackerClient.java:240
+#: ../java/src/org/klomp/snark/TrackerClient.java:244
 #, java-format
 msgid "No valid trackers for {0} - enable opentrackers or DHT?"
 msgstr "Brak prawidłowych trackerów dla {0} – włączyć otwarte trackery lub DHT?"
@@ -478,7 +478,7 @@ msgstr "Anonimowy klient protokołu BitTorrent"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:289
 msgid "Router is down"
-msgstr "Ruter jest wyłączony"
+msgstr "Węzeł jest wyłączony"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:306
 msgid "Torrents"
@@ -1028,7 +1028,7 @@ msgstr "Podaj katalog do zapisu danych (domyślnie: {0})"
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2053
 #, java-format
 msgid "You can also copy .torrent files to: {0}."
-msgstr "Możesz także skopiować pliki .torrent do: {0}"
+msgstr "Możesz także skopiować pliki .torrent do: {0}."
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2055
 msgid "Removing a .torrent will cause it to stop."
@@ -1136,7 +1136,7 @@ msgstr "Zalecana połowa dostępnego pasma."
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2237
 msgid "View or change router bandwidth"
-msgstr "Zobacz lub zmień pasmo routera"
+msgstr "Zobacz lub zmień pasmo węzła"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2241
 msgid "Use open trackers also"

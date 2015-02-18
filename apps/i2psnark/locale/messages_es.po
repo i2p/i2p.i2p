@@ -19,9 +19,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-11-19 21:48+0000\n"
-"PO-Revision-Date: 2014-11-19 21:48+0000\n"
-"Last-Translator: kytv <killyourtv@i2pmail.org>\n"
+"POT-Creation-Date: 2015-02-06 18:28+0000\n"
+"PO-Revision-Date: 2014-12-01 03:03+0000\n"
+"Last-Translator: strel\n"
 "Language-Team: Spanish (http://www.transifex.com/projects/p/I2P/language/es/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -417,7 +417,7 @@ msgstr "Deteniendo todos los torrents y cerrando el túnel I2P."
 msgid "Closing I2P tunnel after notifying trackers."
 msgstr "Cerrando túnel I2P después de avisar a los trackers"
 
-#: ../java/src/org/klomp/snark/TrackerClient.java:240
+#: ../java/src/org/klomp/snark/TrackerClient.java:244
 #, java-format
 msgid "No valid trackers for {0} - enable opentrackers or DHT?"
 msgstr "No hay rastreadores válidos para {0}. ¿Quiere activar los rastreadores abiertos o la DHT?"
@@ -688,7 +688,7 @@ msgstr "Última página"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:948
 msgid "Data directory cannot be created"
-msgstr ""
+msgstr "No se pudo crear el directorio de datos"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:958
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1163
@@ -1018,12 +1018,12 @@ msgstr "Añadir torrent"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2046
 msgid "Data dir"
-msgstr ""
+msgstr "Dir de datos"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2049
 #, java-format
 msgid "Enter the directory to save the data in (default {0})"
-msgstr ""
+msgstr "Introduzca el directorio en el que guardar los datos (por defecto {0})"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2053
 #, java-format

@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-10-30 20:10+0000\n"
-"PO-Revision-Date: 2014-10-30 20:11+0000\n"
+"POT-Creation-Date: 2015-02-06 18:28+0000\n"
+"PO-Revision-Date: 2015-02-06 18:33+0000\n"
 "Last-Translator: kytv <killyourtv@i2pmail.org>\n"
 "Language-Team: Romanian (http://www.transifex.com/projects/p/I2P/language/ro/)\n"
 "MIME-Version: 1.0\n"
@@ -126,7 +126,7 @@ msgstr "Link-ul addresshelper ați specificat o cheie de destinație diferită d
 msgid ""
 "Someone could be trying to impersonate another website, or people have given"
 " two websites identical names."
-msgstr "Cineva ar putea fi încercă să imita un alt website, sau cineva au dat două nume website identice."
+msgstr ""
 
 #: ../java/build/Proxy.java:26
 msgid ""
@@ -165,8 +165,8 @@ msgstr "Ați încercat să vă conectați la un site sau locație non-I2P ."
 #: ../java/build/Proxy.java:45 ../java/build/Proxy.java:51
 #: ../java/build/Proxy.java:56 ../java/build/Proxy.java:62
 #: ../java/build/Proxy.java:83 ../java/build/Proxy.java:89
-msgid "Warning: Website Unreachable"
-msgstr "Atenție: Website indisponibil"
+msgid "Website Unreachable"
+msgstr ""
 
 #: ../java/build/Proxy.java:52
 msgid "The website was not reachable, because its lease set was not found."
@@ -233,13 +233,13 @@ msgstr "Vă rugăm să configurați un outproxy în I2PTunnel."
 
 #: ../java/build/Proxy.java:90
 msgid "The website was not reachable."
-msgstr "Website nu a fost accesibil."
+msgstr ""
 
 #: ../java/build/Proxy.java:91
 msgid ""
 "The website is offline, there is network congestion, or your router is not "
 "yet well-integrated with peers."
-msgstr "Website este deconectat, este congestionarea rețelei, sau router-ul nu este încă bine integrat cu colegii."
+msgstr ""
 
 #: ../java/build/Proxy.java:94 ../java/build/Proxy.java:100
 msgid "Warning: Invalid Destination"
@@ -249,7 +249,7 @@ msgstr "Atenție: Destinație incorecta"
 msgid ""
 "The website destination specified was not valid, or was otherwise "
 "unreachable."
-msgstr "Destinația website specificat nu a fost valabila, sau a fost inaccesibila."
+msgstr ""
 
 #: ../java/build/Proxy.java:102
 msgid ""
@@ -278,7 +278,7 @@ msgid "Other protocols such as FTP are not allowed."
 msgstr ""
 
 #: ../java/build/Proxy.java:116 ../java/build/Proxy.java:122
-msgid "Warning: Outproxy Unreachable"
+msgid "Outproxy Unreachable"
 msgstr ""
 
 #: ../java/build/Proxy.java:123
@@ -304,16 +304,16 @@ msgid ""
 msgstr "Dacă aveți în continuare probleme, este posibil să doriți să editați lista de outproxy {0} aici {1}."
 
 #: ../java/build/Proxy.java:127
-msgid "Warning: Website Unknown"
-msgstr "Atenție: Website Necunoscut"
+msgid "Website Unknown"
+msgstr ""
 
 #: ../java/build/Proxy.java:133
-msgid "Warning: Website Not Found in Addressbook"
-msgstr "Atenție: Website nu a fost găsit în Agenda"
+msgid "Website Not Found in Addressbook"
+msgstr ""
 
 #: ../java/build/Proxy.java:134
 msgid "The website was not found in your router's addressbook."
-msgstr "Website nu a fost gasit in Agenda ruterului."
+msgstr ""
 
 #: ../java/build/Proxy.java:135
 msgid "Check the link or find a Base 32 or Base 64 address."
@@ -353,8 +353,8 @@ msgstr "Dacă ați făcut clic pe un link, verificați sfârșitul URI pentru or
 
 #: ../java/build/Proxy.java:149 ../java/build/Proxy.java:155
 #: ../java/build/Proxy.java:161 ../java/build/Proxy.java:167
-msgid "Warning: Outproxy Not Found"
-msgstr "Atenție: Outproxy Nu a fost găsit"
+msgid "Outproxy Not Found"
+msgstr ""
 
 #: ../java/build/Proxy.java:156
 msgid ""
@@ -412,7 +412,7 @@ msgstr "Aceasta pare a fi o destinație rea:"
 msgid "i2paddresshelper cannot help you with a destination like that!"
 msgstr "i2paddresshelper nu vă poate ajuta cu o destinație de genul asta!"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:667
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:668
 #, java-format
 msgid ""
 "To visit the destination in your host database, click <a "
@@ -420,42 +420,42 @@ msgid ""
 "click <a href=\"{1}\">here</a>."
 msgstr "Pentru a vizita destinație în baza de date gazdă, click <a href=\"{0}\">aici</a>.Pentru a vizita destinația addresshelper conflict, click<a href=\"{1}\"> aici</a>"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1034
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1037
 msgid "Destination lease set not found"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1162
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1167
 msgid "Host"
 msgstr "Gazdă"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1166
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1171
 msgid "Base 32"
 msgstr "Base 32"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1170
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1175
 msgid "Destination"
 msgstr "Destinație"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1176
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1181
 #, java-format
 msgid "Continue to {0} without saving"
 msgstr "Continuați {0} fără salvare"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1181
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1186
 #, java-format
 msgid "Save {0} to router address book and continue to website"
-msgstr "Salvați {0} în agendă router și continuă la website"
+msgstr ""
 
 #. only blockfile supports multiple books
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1184
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1189
 #, java-format
 msgid "Save {0} to master address book and continue to website"
-msgstr "Salvați {0} în agenda master  și continuă la website"
+msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1185
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1190
 #, java-format
 msgid "Save {0} to private address book and continue to website"
-msgstr "Salvați {0} în agendă router privata și continuă la website"
+msgstr ""
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:162
 #, java-format
