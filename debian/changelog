@@ -1,8 +1,87 @@
-i2p (0.9.16-1) UNRELEASED; urgency=medium
+i2p (0.9.18-1) UNRELEASED; urgency=medium
 
   * New upstream release
+  * Confine with AppArmor
 
- -- Kill Your TV <killyourtv@i2pmail.org>  Thu, 30 Oct 2014 20:07:50 +0000
+ -- Kill Your TV <killyourtv@i2pmail.org>  Sun, 22 Feb 2015 00:00:00 +0000
+
+i2p (0.9.17-1) unstable; urgency=medium
+
+  * New Upstream Version
+    Changes
+    - Signed news
+    - ECDSA default for new server tunnels
+    - Reseeding now SSL-only by default
+    Bug Fixes
+    - Fix SSU sending corrupt ack-only packets with partial bitfields
+    - Fix SSU inbound connection fail from non-DSA router
+    - Don't select incompatible peers if we are a non-DSA router
+    - Fix EdDSA signature verification bug
+    - Set I2NP lookup type flags in all cases, not just when a reply tunnel is used
+    - Stop i2ptunnel server acceptor thread after close
+    - Fix bug preventing some plugins from stopping completely
+    - Fix SAM v3 bug causing failures in incoming connections
+    Other
+    - Add a warning in the console sidebar if ECDSA not supported
+    - Log warnings for Java 6 that we will eventually require Java 7
+    - Don't let proxied routers auto-floodfill
+    - Don't resend SSU acks that are too old
+    - Don't publish direct info in SSU address if introducers are required
+    - New default opentrackers in i2psnark
+    - Add support for specifiying data directory per-torrent in i2psnark
+    - Changes in streaming accept() error behavior
+    - Minor blockfile format changes
+    - New option for persistent random key to preserve peer ordering across restarts
+    - Translation updates
+    - Update GeoIP data
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Sun, 30 Nov 2014 22:20:06 +0000
+
+i2p (0.9.16-1) unstable; urgency=medium
+
+  * New Upstream Version
+    - Add support for stronger Router Info signatures
+    - Encrypt RI lookups and responses on faster boxes
+    - Require I2CP authorization for all messages when enabled (requires 0.9.11
+      or higher client)
+    - Disable TLSv3 and older ciphers for reseeding and other uses of SSL
+    - Use ECDSA by default for i2ptunnel IRC, SOCKS-IRC, and standard client
+      tunnels
+    - Don't prefer floodfills in some countries
+    - New column sorting, set-all priority buttons, and upload ratio display in
+      i2psnark
+    - Increase i2psnark tunnel default to 3 hops
+    - Implement bundling of multiple fragments in a single SSU message for
+      efficiency
+    - New add-to-addressbook links on netdb leaseset page
+    - Implement I2NP DatabaseLookupMessage search type field to improve lookup
+      efficiency
+    - CPUID fixes and updates for recent processors
+    - i2psnark fix magnet links with %-encoding
+    - Improve handling of SSU socket closing out from under us (hopefully fix
+      100% CPU)
+    - SSU bitfield handling fixes
+    - Fix HTTP header issues in i2psnark
+    - Fix rare NPE when building garlic message
+    - Fix console lockups (hopefully)
+    - Fix i2ptunnel js confirm-delete
+    - Move router data structures from i2p.jar to router.jar (breaks i2pcontrol
+      plugin)
+    - New router keys now stored in router.keys.dat (privKeys.dat format)
+      instead of router.keys
+    - Improve handling of unsupported encryption throughout
+    - More error checking of client I2CP messages by the router
+    - Initial work on hooks for pluggable transports
+    - Enforce request timestamp in tunnel build messages
+    - Re-enable message status in streaming, but treat no leaseset as a soft
+      failure for now
+    - Return unused DH keypairs to the pool for efficiency
+    - Raise failsafe tagset limit and improve deletion strategy when hit
+    - Change eepsite Jetty threadpool and queue configuration
+    - NTCP establishment refactoring in prep for NTCP2 and PT
+    - Jetty 8.1.16-v20140903
+    - Translation updates
+    - Update GeoIP data
 
 i2p (0.9.15-1) unstable; urgency=medium
 
