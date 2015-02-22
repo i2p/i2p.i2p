@@ -1,4 +1,6 @@
- 2015-02-18 kytv
+* 2015-02-22 0.9.18 released
+
+2015-02-18 kytv
  * Updates to geoip.txt and geoipv6.dat.gz based on Maxmind GeoLite Country
    database from 2015-02-04.
 
