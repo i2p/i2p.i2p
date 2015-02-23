@@ -870,7 +870,7 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 		Service service;
 		synchronized(lock) {
 			if(isDisabled || !isNATPresent()) {
-				_log.error("Can't addMapping: " + isDisabled + " " + isNATPresent() + " " + _router);
+				_log.error("Can't removeMapping: " + isDisabled + " " + isNATPresent() + " " + _router);
 				return false;
 			}
 			service = _service;
