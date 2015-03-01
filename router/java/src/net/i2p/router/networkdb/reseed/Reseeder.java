@@ -71,8 +71,7 @@ public class Reseeder {
      */
     public static final String DEFAULT_SEED_URL =
               "http://i2p.mooo.com/netDb/" + "," +
-              // (Temp?) disable due to extended downtime
-              //"http://193.150.121.66/netDb/" + "," +
+              "http://193.150.121.66/netDb/" + "," +
               "http://netdb.i2p2.no/" + "," + // Only SU3 (v3) support
               // Disable due to misconfiguation (ticket #1466)
               //"http://us.reseed.i2p2.no/" + "," +
@@ -87,8 +86,6 @@ public class Reseeder {
               "https://netdb.rows.io:444/" + "," + // Only HTTPS and SU3 (v3) support
               "https://i2pseed.zarrenspry.info/" + "," + // Only HTTPS and SU3 (v3) support
               "https://i2p.mooo.com/netDb/" + "," +
-              // (Temp?) disable due to extended downtime
-              //"https://193.150.121.66/netDb/" + "," +
               "https://netdb.i2p2.no/" + "," + // Only SU3 (v3) support
               "https://us.reseed.i2p2.no:444/" + "," +
               "https://uk.reseed.i2p2.no:444/" + "," +
