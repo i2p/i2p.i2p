@@ -76,8 +76,7 @@ public class Reseeder {
               "http://netdb.i2p2.no/" + "," + // Only SU3 (v3) support
               // Disable due to misconfiguation (ticket #1466)
               //"http://us.reseed.i2p2.no/" + "," +
-              // (Temp?) disable due to extended downtime (ticket #1422)
-              //"http://jp.reseed.i2p2.no/" + "," +
+              "http://jp.reseed.i2p2.no/" + "," +
               // Broken server config, no response
               //"http://i2p-netdb.innovatio.no/"  + "," +
               "http://uk.reseed.i2p2.no/";
@@ -93,8 +92,7 @@ public class Reseeder {
               "https://netdb.i2p2.no/" + "," + // Only SU3 (v3) support
               "https://us.reseed.i2p2.no:444/" + "," +
               "https://uk.reseed.i2p2.no:444/" + "," +
-              // (Temp?) disable due to extended downtime (ticket #1422)
-              //"https://jp.reseed.i2p2.no:444/" + "," +
+              "https://jp.reseed.i2p2.no:444/" + "," +
               // Broken server config, no response
               //"https://i2p-netdb.innovatio.no/" + "," +
               "https://link.mx24.eu/" + "," + // Only HTTPS and SU3 (v3) support
