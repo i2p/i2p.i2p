@@ -45,9 +45,10 @@ abstract class LogWriterBase implements Runnable {
     protected abstract void writeRecord(LogRecord rec, String formatted);
     /**
      * Write a single String verbatim to the writer.
+     * @param priority the level to log the line at.
      * @param line the String to write.
      */
-    protected abstract void writeRecord(String line);
+    protected abstract void writeRecord(int priority, String line);
     protected abstract void flushWriter();
     protected abstract void closeWriter();
 
@@ -95,7 +96,7 @@ abstract class LogWriterBase implements Runnable {
                         dupCount++;
                     } else {
                         if (dupCount > 0) {
-                            writeRecord(dupMessage(dupCount, _last, false));
+                            writeRecord(_last.getPriority(), dupMessage(dupCount, _last, false));
                             _manager.getBuffer().add(dupMessage(dupCount, _last, true));
                             dupCount = 0;
                         }
@@ -104,7 +105,7 @@ abstract class LogWriterBase implements Runnable {
                     _last = rec;
                 }
                 if (dupCount > 0) {
-                    writeRecord(dupMessage(dupCount, _last, false));
+                    writeRecord(_last.getPriority(), dupMessage(dupCount, _last, false));
                     _manager.getBuffer().add(dupMessage(dupCount, _last, true));
                 }
                 flushWriter();

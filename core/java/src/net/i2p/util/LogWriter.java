@@ -47,10 +47,10 @@ class LogWriter extends LogWriterBase {
     }
 
     protected void writeRecord(LogRecord rec, String formatted) {
-    	writeRecord(formatted);
+    	writeRecord(rec.getPriority(), formatted);
     }
 
-    protected synchronized void writeRecord(String val) {
+    protected synchronized void writeRecord(int priority, String val) {
         if (val == null) return;
         if (_currentOut == null) {
             rotateFile();
