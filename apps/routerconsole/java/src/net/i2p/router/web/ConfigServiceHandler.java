@@ -183,6 +183,15 @@ public class ConfigServiceHandler extends FormHandler {
         }
     }
 
+    /**
+     *  Should we show the cancel button?
+     *
+     *  @since 0.9.19
+     */
+    public boolean shouldShowCancelGraceful() {
+        return _context.router().gracefulShutdownInProgress();
+    }
+
     @Override
     protected void processForm() {
         if (_action == null) return;
