@@ -172,22 +172,29 @@ class RouterThrottleImpl implements RouterThrottle {
         
         int numTunnels = _context.tunnelManager().getParticipatingCount();
         int maxTunnels = _context.getProperty(PROP_MAX_TUNNELS, DEFAULT_MAX_TUNNELS);
+        if (numTunnels >= maxTunnels) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Refusing tunnel request since we are already participating in " 
+                          + numTunnels + " (our max is " + maxTunnels + ")");
+            _context.statManager().addRateData("router.throttleTunnelMaxExceeded", numTunnels);
+            setTunnelStatus(_x("Rejecting tunnels: Limit reached"));
+            return TunnelHistory.TUNNEL_REJECT_BANDWIDTH;
+        }
 
 	// Throttle tunnels if min. throttle level is exceeded and default max participating tunnels (or fewer) is used.
         if ((numTunnels > getMinThrottleTunnels()) && (DEFAULT_MAX_TUNNELS <= maxTunnels)) {
-            double tunnelGrowthFactor = getTunnelGrowthFactor();
             Rate avgTunnels = _context.statManager().getRate("tunnel.participatingTunnels").getRate(10*60*1000);
             if (avgTunnels != null) {
-                
                 double avg = avgTunnels.getAvgOrLifetimeAvg();
-                
+                double tunnelGrowthFactor = getTunnelGrowthFactor();
                 int min = getMinThrottleTunnels();
                 if (avg < min)
                     avg = min;
+                // if the current tunnel count is higher than 1.3 * the average...
                 if ( (avg > 0) && (avg*tunnelGrowthFactor < numTunnels) ) {
                     // we're accelerating, lets try not to take on too much too fast
                     double probAccept = (avg*tunnelGrowthFactor) / numTunnels;
-                    probAccept = probAccept * probAccept; // square the decelerator for tunnel counts
+                    probAccept *= probAccept; // square the decelerator for tunnel counts
                     int v = _context.random().nextInt(100);
                     if (v < probAccept*100) {
                         // ok
@@ -201,7 +208,12 @@ class RouterThrottleImpl implements RouterThrottle {
                         _context.statManager().addRateData("router.throttleTunnelProbTooFast", (long)(numTunnels-avg));
                         // hard to do {0} from here
                         //setTunnelStatus("Rejecting " + (100 - (int) probAccept*100) + "% of tunnels: High number of requests");
-                        setTunnelStatus(_x("Rejecting most tunnels: High number of requests"));
+                        if (probAccept <= 0.5)
+                            setTunnelStatus(_x("Rejecting most tunnels: High number of requests"));
+                        else if (probAccept <= 0.9)
+                            setTunnelStatus(_x("Accepting most tunnels"));
+                        else
+                            setTunnelStatus(_x("Accepting tunnels"));
                         return TunnelHistory.TUNNEL_REJECT_PROBABALISTIC_REJECT;
                     }
                 } else {
@@ -247,15 +259,6 @@ class RouterThrottleImpl implements RouterThrottle {
             }
         }
         
-        if (numTunnels >= maxTunnels) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Refusing tunnel request since we are already participating in " 
-                          + numTunnels + " (our max is " + maxTunnels + ")");
-            _context.statManager().addRateData("router.throttleTunnelMaxExceeded", numTunnels);
-            setTunnelStatus(_x("Rejecting tunnels: Limit reached"));
-            return TunnelHistory.TUNNEL_REJECT_BANDWIDTH;
-        }
-
         // ok, we're not hosed, but can we handle the bandwidth requirements 
         // of another tunnel?
         rs = _context.statManager().getRate("tunnel.participatingMessageCount");
