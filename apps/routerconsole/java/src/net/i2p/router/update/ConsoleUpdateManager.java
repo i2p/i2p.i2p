@@ -1271,11 +1271,11 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
             _context.router().saveConfig(NewsHelper.PROP_LAST_UPDATE_TIME, Long.toString(modtime));
 
             if ("install".equals(policy)) {
-                _log.log(Log.CRIT, "Update was VERIFIED, restarting to install it");
+                _log.log(Log.CRIT, "Update was downloaded and verified, restarting to install it");
                 updateStatus("<b>" + _("Update verified") + "</b><br>" + _("Restarting"));
                 restart();
             } else {
-                _log.log(Log.CRIT, "Update was VERIFIED, will be installed at next restart");
+                _log.logAlways(Log.WARN, "Update was downloaded and verified, will be installed at next restart");
                 // SummaryHelper will display restart info separately
                 updateStatus("");
             }
