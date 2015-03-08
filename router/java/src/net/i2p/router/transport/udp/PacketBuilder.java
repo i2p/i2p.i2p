@@ -16,6 +16,7 @@ import net.i2p.data.Hash;
 import net.i2p.data.router.RouterIdentity;
 import net.i2p.data.SessionKey;
 import net.i2p.data.Signature;
+import net.i2p.router.transport.TransportUtil;
 import net.i2p.util.Addresses;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleByteCache;
@@ -1222,7 +1223,7 @@ class PacketBuilder {
             byte ikey[] = addr.getIntroducerKey(i);
             long tag = addr.getIntroducerTag(i);
             // let's not use an introducer on a privileged port, sounds like trouble
-            if (ikey == null || iport < 1024 || iport > 65535 ||
+            if (ikey == null || !TransportUtil.isValidPort(iport) ||
                 iaddr == null || tag <= 0 ||
                 // must be IPv4 for now as we don't send Alice IP/port, see below
                 iaddr.getAddress().length != 4 ||

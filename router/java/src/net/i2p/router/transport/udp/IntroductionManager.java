@@ -141,8 +141,9 @@ class IntroductionManager {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("removing peer " + peer.getRemoteHostId() + ", weRelayToThemAs " 
                        + peer.getWeRelayToThemAs() + ", theyRelayToUsAs " + peer.getTheyRelayToUsAs());
-        if (peer.getWeRelayToThemAs() > 0) 
-            _outbound.remove(Long.valueOf(peer.getWeRelayToThemAs()));
+        long id = peer.getWeRelayToThemAs(); 
+        if (id > 0) 
+            _outbound.remove(Long.valueOf(id));
         if (peer.getTheyRelayToUsAs() > 0) {
             _inbound.remove(peer);
         }
@@ -306,6 +307,9 @@ class IntroductionManager {
      *  Send a HolePunch to Alice, who will soon be sending us a RelayRequest.
      *  We should already have a session with Bob, but probably not with Alice.
      *
+     *  If we don't have a session with Bob, we removed the relay tag from
+     *  our _outbound table, so this won't work.
+     *
      *  We do some throttling here.
      */
     void receiveRelayIntro(RemoteHostId bob, UDPPacketReader reader) {
@@ -432,7 +436,7 @@ class IntroductionManager {
             if (_log.shouldLog(Log.INFO))
                 _log.info("Receive relay request from " + alice 
                       + " with unknown tag");
-            _context.statManager().addRateData("udp.receiveRelayRequestBadTag", 1, 0);
+            _context.statManager().addRateData("udp.receiveRelayRequestBadTag", 1);
             return;
         }
         if (_log.shouldLog(Log.INFO))
@@ -442,7 +446,7 @@ class IntroductionManager {
 
         // TODO throttle based on alice identity and/or intro tag?
 
-        _context.statManager().addRateData("udp.receiveRelayRequest", 1, 0);
+        _context.statManager().addRateData("udp.receiveRelayRequest", 1);
 
         // send that peer an introduction for alice
         _transport.send(_builder.buildRelayIntro(alice, charlie, reader.getRelayRequestReader()));
