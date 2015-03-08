@@ -118,8 +118,8 @@ public class SnarkManager implements CompleteListener {
     public static final String PROP_PRIVATETRACKERS = "i2psnark.privatetrackers";
     private static final String PROP_USE_DHT = "i2psnark.enableDHT";
 
-    public static final int MIN_UP_BW = 2;
-    public static final int DEFAULT_MAX_UP_BW = 10;
+    public static final int MIN_UP_BW = 10;
+    public static final int DEFAULT_MAX_UP_BW = 25;
     public static final int DEFAULT_STARTUP_DELAY = 3; 
     public static final int DEFAULT_REFRESH_DELAY_SECS = 60;
     private static final int DEFAULT_PAGE_SIZE = 50;

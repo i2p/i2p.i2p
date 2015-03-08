@@ -75,6 +75,8 @@ class PeerCheckerTask implements Runnable
         List<Peer> removed = new ArrayList<Peer>();
         int uploadLimit = coordinator.allowedUploaders();
         boolean overBWLimit = coordinator.overUpBWLimit();
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("peers: " + peerList.size() + " limit: " + uploadLimit + " overBW? " + overBWLimit);
         DHT dht = _util.getDHT();
         for (Peer peer : peerList) {
 

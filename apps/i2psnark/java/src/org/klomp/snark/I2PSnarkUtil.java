@@ -74,7 +74,6 @@ public class I2PSnarkUtil {
     private static final int EEPGET_CONNECT_TIMEOUT_SHORT = 5*1000;
     public static final int DEFAULT_STARTUP_DELAY = 3;
     public static final boolean DEFAULT_USE_OPENTRACKERS = true;
-    public static final int DEFAULT_MAX_UP_BW = 8;  //KBps
     public static final int MAX_CONNECTIONS = 16; // per torrent
     public static final String PROP_MAX_BW = "i2cp.outboundBytesPerSecond";
     public static final boolean DEFAULT_USE_DHT = true;
@@ -97,7 +96,7 @@ public class I2PSnarkUtil {
         setI2CPConfig("127.0.0.1", 7654, null);
         _banlist = new ConcurrentHashSet<Hash>();
         _maxUploaders = Snark.MAX_TOTAL_UPLOADERS;
-        _maxUpBW = DEFAULT_MAX_UP_BW;
+        _maxUpBW = SnarkManager.DEFAULT_MAX_UP_BW;
         _maxConnections = MAX_CONNECTIONS;
         _startupDelay = DEFAULT_STARTUP_DELAY;
         _shouldUseOT = DEFAULT_USE_OPENTRACKERS;

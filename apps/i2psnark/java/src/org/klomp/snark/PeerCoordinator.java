@@ -1465,8 +1465,8 @@ class PeerCoordinator implements PeerListener
   public int allowedUploaders()
   {
     if (listener != null && listener.overUploadLimit(uploaders)) {
-        // if (_log.shouldLog(Log.DEBUG))
-        //   _log.debug("Over limit, uploaders was: " + uploaders);
+           if (_log.shouldLog(Log.DEBUG))
+             _log.debug("Over limit, uploaders was: " + uploaders);
         return uploaders - 1;
     } else if (uploaders < MAX_UPLOADERS)
         return uploaders + 1;
