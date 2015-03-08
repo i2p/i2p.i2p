@@ -1412,7 +1412,10 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
         "a=b;i2paddresshelper=foo;c=d",
         "a=b&i2paddresshelper=foo&c",
         "a=b&i2paddresshelper=foo==&c",
-        "a=b&i2paddresshelper=foo%3d%3d&c"
+        "a=b&i2paddresshelper=foo%3d%3d&c",
+        "a=b&i2paddresshelper=f%6f%6F==&c",
+        "a=b&i2paddresshelper=foo&i2paddresshelper=bar&c",
+        "a=b&i2paddresshelper=foo&c%3F%3f%26%3b%3B%3d%3Dc=x%3F%3f%26%3b%3B%3d%3Dx"
     };
 
     public static void main(String[] args) {
