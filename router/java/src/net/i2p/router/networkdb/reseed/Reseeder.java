@@ -76,8 +76,6 @@ public class Reseeder {
               // Disable due to misconfiguation (ticket #1466)
               //"http://us.reseed.i2p2.no/" + "," +
               "http://jp.reseed.i2p2.no/" + "," +
-              // Broken server config, no response
-              //"http://i2p-netdb.innovatio.no/"  + "," +
               "http://uk.reseed.i2p2.no/";
 
     /** @since 0.8.2 */
@@ -90,8 +88,6 @@ public class Reseeder {
               "https://us.reseed.i2p2.no:444/" + "," +
               "https://uk.reseed.i2p2.no:444/" + "," +
               "https://jp.reseed.i2p2.no:444/" + "," +
-              // Broken server config, no response
-              //"https://i2p-netdb.innovatio.no/" + "," +
               "https://link.mx24.eu/" + "," + // Only HTTPS and SU3 (v3) support
               "https://ieb9oopo.mooo.com/"; // Only HTTPS and SU3 (v3) support
 
