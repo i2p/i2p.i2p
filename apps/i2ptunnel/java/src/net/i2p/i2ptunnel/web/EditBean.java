@@ -27,6 +27,7 @@ import net.i2p.i2ptunnel.I2PTunnelHTTPClientBase;
 import net.i2p.i2ptunnel.I2PTunnelHTTPServer;
 import net.i2p.i2ptunnel.I2PTunnelIRCClient;
 import net.i2p.i2ptunnel.I2PTunnelServer;
+import net.i2p.i2ptunnel.TunnelConfig;
 import net.i2p.i2ptunnel.TunnelController;
 import net.i2p.i2ptunnel.TunnelControllerGroup;
 import net.i2p.util.Addresses;
@@ -359,31 +360,31 @@ public class EditBean extends IndexBean {
 
     /** all of these are @since 0.8.3 */
     public int getLimitMinute(int tunnel) {
-        return getProperty(tunnel, PROP_MAX_CONNS_MIN, 0);
+        return getProperty(tunnel, TunnelConfig.PROP_MAX_CONNS_MIN, 0);
     }
 
     public int getLimitHour(int tunnel) {
-        return getProperty(tunnel, PROP_MAX_CONNS_HOUR, 0);
+        return getProperty(tunnel, TunnelConfig.PROP_MAX_CONNS_HOUR, 0);
     }
 
     public int getLimitDay(int tunnel) {
-        return getProperty(tunnel, PROP_MAX_CONNS_DAY, 0);
+        return getProperty(tunnel, TunnelConfig.PROP_MAX_CONNS_DAY, 0);
     }
 
     public int getTotalMinute(int tunnel) {
-        return getProperty(tunnel, PROP_MAX_TOTAL_CONNS_MIN, 0);
+        return getProperty(tunnel, TunnelConfig.PROP_MAX_TOTAL_CONNS_MIN, 0);
     }
 
     public int getTotalHour(int tunnel) {
-        return getProperty(tunnel, PROP_MAX_TOTAL_CONNS_HOUR, 0);
+        return getProperty(tunnel, TunnelConfig.PROP_MAX_TOTAL_CONNS_HOUR, 0);
     }
 
     public int getTotalDay(int tunnel) {
-        return getProperty(tunnel, PROP_MAX_TOTAL_CONNS_DAY, 0);
+        return getProperty(tunnel, TunnelConfig.PROP_MAX_TOTAL_CONNS_DAY, 0);
     }
 
     public int getMaxStreams(int tunnel) {
-        return getProperty(tunnel, PROP_MAX_STREAMS, 0);
+        return getProperty(tunnel, TunnelConfig.PROP_MAX_STREAMS, 0);
     }
 
     /**
@@ -499,12 +500,12 @@ public class EditBean extends IndexBean {
             Map<String, String> sorted = new TreeMap<String, String>();
             for (Map.Entry<Object, Object> e : opts.entrySet()) {
                 String key = (String)e.getKey();
-                if (_noShowSet.contains(key))
+                if (TunnelConfig._noShowSet.contains(key))
                     continue;
                 // leave in for HTTP and Connect so it can get migrated to MD5
                 // hide for SOCKS until migrated to MD5
                 if ((!isMD5Proxy) &&
-                    _nonProxyNoShowSet.contains(key))
+                    TunnelConfig._nonProxyNoShowSet.contains(key))
                     continue;
                 sorted.put(key, (String)e.getValue());
             }
