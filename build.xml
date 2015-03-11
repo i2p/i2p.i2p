@@ -286,6 +286,7 @@
     <!-- jar (not war) for Android -->
     <target name="buildAddressbookJar" depends="buildCore" >
         <ant dir="apps/addressbook/" target="jar" />
+        <copy file="apps/addressbook/dist/addressbook.jar" todir="build/" />
     </target>
 
     <target name="buildAddressbook" depends="buildCore, buildJetty" >
@@ -293,10 +294,11 @@
         <copy file="apps/addressbook/dist/addressbook.war" todir="build/" />
     </target>
 
-    <!-- jar only (no war) for Android -->
-    <target name="buildI2PTunnelJar" depends="buildStreaming" >
-        <ant dir="apps/i2ptunnel/java/" target="jar" />
+    <!-- Both jars and no war, for Android -->
+    <target name="buildI2PTunnelJars" depends="buildStreaming" >
+        <ant dir="apps/i2ptunnel/java/" target="uiJar" />
         <copy file="apps/i2ptunnel/java/build/i2ptunnel.jar" todir="build/" />
+        <copy file="apps/i2ptunnel/java/build/i2ptunnel-ui.jar" todir="build/" />
     </target>
 
     <target name="buildI2PTunnel" depends="buildStreaming, buildJetty" >

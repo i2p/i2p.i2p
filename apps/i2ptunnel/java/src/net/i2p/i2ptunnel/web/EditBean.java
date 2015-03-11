@@ -27,9 +27,9 @@ import net.i2p.i2ptunnel.I2PTunnelHTTPClientBase;
 import net.i2p.i2ptunnel.I2PTunnelHTTPServer;
 import net.i2p.i2ptunnel.I2PTunnelIRCClient;
 import net.i2p.i2ptunnel.I2PTunnelServer;
-import net.i2p.i2ptunnel.TunnelConfig;
 import net.i2p.i2ptunnel.TunnelController;
 import net.i2p.i2ptunnel.TunnelControllerGroup;
+import net.i2p.i2ptunnel.ui.TunnelConfig;
 import net.i2p.util.Addresses;
 
 /**

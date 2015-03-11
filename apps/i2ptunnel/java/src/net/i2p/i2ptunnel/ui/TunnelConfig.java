@@ -1,4 +1,4 @@
-package net.i2p.i2ptunnel;
+package net.i2p.i2ptunnel.ui;
 
 import java.security.GeneralSecurityException;
 import java.util.Arrays;
@@ -16,6 +16,14 @@ import net.i2p.crypto.SigType;
 import net.i2p.data.Base64;
 import net.i2p.data.Destination;
 import net.i2p.data.SimpleDataStructure;
+import net.i2p.i2ptunnel.I2PTunnelClientBase;
+import net.i2p.i2ptunnel.I2PTunnelConnectClient;
+import net.i2p.i2ptunnel.I2PTunnelHTTPClient;
+import net.i2p.i2ptunnel.I2PTunnelHTTPClientBase;
+import net.i2p.i2ptunnel.I2PTunnelHTTPServer;
+import net.i2p.i2ptunnel.I2PTunnelIRCClient;
+import net.i2p.i2ptunnel.I2PTunnelServer;
+import net.i2p.i2ptunnel.TunnelController;
 import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.PasswordManager;
 
