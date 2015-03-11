@@ -864,14 +864,22 @@ public class IndexBean {
     protected static final String PROP_ENABLE_BLACKLIST = "i2cp.enableBlackList";
 
     public void setAccessMode(String val) {
-        _config.setAccessMode(val);
+        if (val != null) {
+            try {
+                _config.setAccessMode(Integer.parseInt(val.trim()));
+            } catch (NumberFormatException nfe) {}
+        }
     }
 
     public void setDelayOpen(String moo) {
         _config.setDelayOpen(true);
     }
     public void setNewDest(String val) {
-        _config.setNewDest(val);
+        if (val != null) {
+            try {
+                _config.setNewDest(Integer.parseInt(val.trim()));
+            } catch (NumberFormatException nfe) {}
+        }
     }
 
     public void setReduceTime(String val) {

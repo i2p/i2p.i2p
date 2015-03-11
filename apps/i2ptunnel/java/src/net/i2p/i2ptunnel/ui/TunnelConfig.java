@@ -223,11 +223,28 @@ public class TunnelConfig {
     protected static final String PROP_ENABLE_ACCESS_LIST = "i2cp.enableAccessList";
     protected static final String PROP_ENABLE_BLACKLIST = "i2cp.enableBlackList";
 
-    public void setAccessMode(String val) {
-        if ("1".equals(val))
+    /**
+     * Controls how other tunnels are checked for access.
+     * <p/>
+     * The list used for whitelisting/blacklisting can be set with
+     * {@link #setAccessList(String)}.
+     *
+     * @param mode 0 for no control, 1 for whitelist, 2 for blacklist 
+     */
+    public void setAccessMode(int mode) {
+        switch (mode) {
+        case 1:
             _booleanOptions.add(PROP_ENABLE_ACCESS_LIST);
-        else if ("2".equals(val))
+            _booleanOptions.remove(PROP_ENABLE_BLACKLIST);
+            break;
+        case 2:
+            _booleanOptions.remove(PROP_ENABLE_ACCESS_LIST);
             _booleanOptions.add(PROP_ENABLE_BLACKLIST);
+            break;
+        default:
+            _booleanOptions.remove(PROP_ENABLE_ACCESS_LIST);
+            _booleanOptions.remove(PROP_ENABLE_BLACKLIST);
+        }
     }
 
     public void setDelayOpen(boolean val) {
@@ -236,11 +253,28 @@ public class TunnelConfig {
         else
             _booleanOptions.remove("i2cp.delayOpen");
     }
-    public void setNewDest(String val) {
-        if ("1".equals(val))
+
+    /**
+     * Controls how ephemeral the I2P Destination of a client tunnel is.
+     * <p/>
+     * If {@link #setClose(boolean)} is set to true then mode 1 == mode 0.
+     * 
+     * @param mode 0 for new dest on restart, 1 for new dest on resume from idle, 2 for persistent key
+     */
+    public void setNewDest(int mode) {
+        switch (mode) {
+        case 1:
             _booleanOptions.add("i2cp.newDestOnResume");
-        else if ("2".equals(val))
+            _booleanOptions.remove("persistentClientKey");
+            break;
+        case 2:
+            _booleanOptions.remove("i2cp.newDestOnResume");
             _booleanOptions.add("persistentClientKey");
+            break;
+        default:
+            _booleanOptions.remove("i2cp.newDestOnResume");
+            _booleanOptions.remove("persistentClientKey");
+        }
     }
 
     public void setReduceTime(int val) {
