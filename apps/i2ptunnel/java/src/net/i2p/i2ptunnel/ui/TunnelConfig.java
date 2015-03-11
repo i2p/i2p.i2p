@@ -334,10 +334,15 @@ public class TunnelConfig {
             _booleanOptions.remove("shouldBundleReplyInfo");
     }
 
-    /** all proxy auth */
-    public void setProxyAuth(String s) {
-        if (s != null)
-            _otherOptions.put(I2PTunnelHTTPClientBase.PROP_AUTH, I2PTunnelHTTPClientBase.DIGEST_AUTH);
+    /**
+     * Sets whether authentication should be used for client proxy tunnels.
+     * Supported authentication types: "basic", "digest".
+     *
+     * @param authType the authentication type, or "false" for no authentication
+     */
+    public void setProxyAuth(String authType) {
+        if (authType != null)
+            _otherOptions.put(I2PTunnelHTTPClientBase.PROP_AUTH, authType.trim());
     }
     
     public void setProxyUsername(String s) {
@@ -350,8 +355,16 @@ public class TunnelConfig {
             _newProxyPW = s.trim();
     }
     
-    public void setOutproxyAuth(String s) {
-        _otherOptions.put(I2PTunnelHTTPClientBase.PROP_OUTPROXY_AUTH, I2PTunnelHTTPClientBase.DIGEST_AUTH);
+    /**
+     * Sets the authentication type required for configured outproxies. The
+     * same authentication type is assumed for all configured outproxies.
+     * Supported authentication types: "basic", "digest".
+     *
+     * @param authType the authentication type, or "false" for no authentication
+     */
+    public void setOutproxyAuth(String authType) {
+        if (authType != null)
+            _otherOptions.put(I2PTunnelHTTPClientBase.PROP_OUTPROXY_AUTH, authType.trim());
     }
     
     public void setOutproxyUsername(String s) {
@@ -440,7 +453,7 @@ public class TunnelConfig {
 
     public void setSigType(String val) {
         if (val != null)
-            _otherOptions.put(I2PClient.PROP_SIGTYPE, val);
+            _otherOptions.put(I2PClient.PROP_SIGTYPE, val.trim());
     }
 
     /**

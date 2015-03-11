@@ -25,6 +25,7 @@ import net.i2p.data.PrivateKeyFile;
 import net.i2p.data.SessionKey;
 import net.i2p.i2ptunnel.I2PTunnelClientBase;
 import net.i2p.i2ptunnel.I2PTunnelHTTPClient;
+import net.i2p.i2ptunnel.I2PTunnelHTTPClientBase;
 import net.i2p.i2ptunnel.I2PTunnelHTTPServer;
 import net.i2p.i2ptunnel.I2PTunnelServer;
 import net.i2p.i2ptunnel.SSLClientUtil;
@@ -943,7 +944,7 @@ public class IndexBean {
 
     /** all proxy auth @since 0.8.2 */
     public void setProxyAuth(String s) {
-        _config.setProxyAuth(s);
+        _config.setProxyAuth(I2PTunnelHTTPClientBase.DIGEST_AUTH);
     }
     
     public void setProxyUsername(String s) {
@@ -955,7 +956,7 @@ public class IndexBean {
     }
     
     public void setOutproxyAuth(String s) {
-        _config.setOutproxyAuth(s);
+        _config.setOutproxyAuth(I2PTunnelHTTPClientBase.DIGEST_AUTH);
     }
     
     public void setOutproxyUsername(String s) {
