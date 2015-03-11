@@ -811,23 +811,23 @@ public class IndexBean {
     }
 
     public void setReduce(String moo) {
-        _config.setReduce();
+        _config.setReduce(true);
     }
     public void setClose(String moo) {
-        _config.setClose();
+        _config.setClose(true);
     }
     public void setEncrypt(String moo) {
-        _config.setEncrypt();
+        _config.setEncrypt(true);
     }
 
     /** @since 0.8.9 */
     public void setDCC(String moo) {
-        _config.setDCC();
+        _config.setDCC(true);
     }
 
     /** @since 0.9.9 */
     public void setUseSSL(String moo) {
-        _config.setUseSSL();
+        _config.setUseSSL(true);
     }
 
     /** @since 0.9.9 */
@@ -842,7 +842,7 @@ public class IndexBean {
 
     /** @since 0.9.12 */
     public void setRejectInproxy(String moo) {
-        _config.setRejectInproxy();
+        _config.setRejectInproxy(true);
     }
 
     /** @since 0.9.12 */
@@ -857,7 +857,7 @@ public class IndexBean {
 
     /** @since 0.9.13 */
     public void setUniqueLocal(String moo) {
-        _config.setUniqueLocal();
+        _config.setUniqueLocal(true);
     }
 
     protected static final String PROP_ENABLE_ACCESS_LIST = "i2cp.enableAccessList";
@@ -868,7 +868,7 @@ public class IndexBean {
     }
 
     public void setDelayOpen(String moo) {
-        _config.setDelayOpen();
+        _config.setDelayOpen(true);
     }
     public void setNewDest(String val) {
         _config.setNewDest(val);
@@ -910,27 +910,27 @@ public class IndexBean {
 
     /** @since 0.9.14 */
     public void setAllowUserAgent(String moo) {
-        _config.setAllowUserAgent();
+        _config.setAllowUserAgent(true);
     }
 
     /** @since 0.9.14 */
     public void setAllowReferer(String moo) {
-        _config.setAllowReferer();
+        _config.setAllowReferer(true);
     }
 
     /** @since 0.9.14 */
     public void setAllowAccept(String moo) {
-        _config.setAllowAccept();
+        _config.setAllowAccept(true);
     }
 
     /** @since 0.9.14 */
     public void setAllowInternalSSL(String moo) {
-        _config.setAllowInternalSSL();
+        _config.setAllowInternalSSL(true);
     }
 
     /** @since 0.9.18 */
     public void setMultihome(String moo) {
-        _config.setMultihome();
+        _config.setMultihome(true);
     }
 
     /** all proxy auth @since 0.8.2 */
@@ -965,7 +965,7 @@ public class IndexBean {
 
     /** @since 0.9.11 */
     public void setUseOutproxyPlugin(String moo) {
-        _config.setUseOutproxyPlugin();
+        _config.setUseOutproxyPlugin(true);
     }
 
     public void setLimitMinute(String s) {

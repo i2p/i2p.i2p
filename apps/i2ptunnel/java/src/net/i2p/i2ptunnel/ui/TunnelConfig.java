@@ -177,26 +177,47 @@ public class TunnelConfig {
         _profile = profile; 
     }
 
-    public void setReduce() {
-        _booleanOptions.add("i2cp.reduceOnIdle");
+    public void setReduce(boolean val) {
+        if (val)
+            _booleanOptions.add("i2cp.reduceOnIdle");
+        else
+            _booleanOptions.remove("i2cp.reduceOnIdle");
     }
-    public void setClose() {
-        _booleanOptions.add("i2cp.closeOnIdle");
+    public void setClose(boolean val) {
+        if (val)
+            _booleanOptions.add("i2cp.closeOnIdle");
+        else
+            _booleanOptions.remove("i2cp.closeOnIdle");
     }
-    public void setEncrypt() {
-        _booleanOptions.add("i2cp.encryptLeaseSet");
+    public void setEncrypt(boolean val) {
+        if (val)
+            _booleanOptions.add("i2cp.encryptLeaseSet");
+        else
+            _booleanOptions.remove("i2cp.encryptLeaseSet");
     }
-    public void setDCC() {
-        _booleanOptions.add(I2PTunnelIRCClient.PROP_DCC);
+    public void setDCC(boolean val) {
+        if (val)
+            _booleanOptions.add(I2PTunnelIRCClient.PROP_DCC);
+        else
+            _booleanOptions.remove(I2PTunnelIRCClient.PROP_DCC);
     }
-    public void setUseSSL() {
-        _booleanOptions.add(I2PTunnelServer.PROP_USE_SSL);
+    public void setUseSSL(boolean val) {
+        if (val)
+            _booleanOptions.add(I2PTunnelServer.PROP_USE_SSL);
+        else
+            _booleanOptions.remove(I2PTunnelServer.PROP_USE_SSL);
     }
-    public void setRejectInproxy() {
-        _booleanOptions.add(I2PTunnelHTTPServer.OPT_REJECT_INPROXY);
+    public void setRejectInproxy(boolean val) {
+        if (val)
+            _booleanOptions.add(I2PTunnelHTTPServer.OPT_REJECT_INPROXY);
+        else
+            _booleanOptions.remove(I2PTunnelHTTPServer.OPT_REJECT_INPROXY);
     }
-    public void setUniqueLocal() {
-        _booleanOptions.add(I2PTunnelServer.PROP_UNIQUE_LOCAL);
+    public void setUniqueLocal(boolean val) {
+        if (val)
+            _booleanOptions.add(I2PTunnelServer.PROP_UNIQUE_LOCAL);
+        else
+            _booleanOptions.remove(I2PTunnelServer.PROP_UNIQUE_LOCAL);
     }
 
     protected static final String PROP_ENABLE_ACCESS_LIST = "i2cp.enableAccessList";
@@ -209,8 +230,11 @@ public class TunnelConfig {
             _booleanOptions.add(PROP_ENABLE_BLACKLIST);
     }
 
-    public void setDelayOpen() {
-        _booleanOptions.add("i2cp.delayOpen");
+    public void setDelayOpen(boolean val) {
+        if (val)
+            _booleanOptions.add("i2cp.delayOpen");
+        else
+            _booleanOptions.remove("i2cp.delayOpen");
     }
     public void setNewDest(String val) {
         if ("1".equals(val))
@@ -244,21 +268,36 @@ public class TunnelConfig {
         _otherOptions.put("i2cp.closeIdleTime", Integer.toString(val * 60*1000));
     }
 
-    public void setAllowUserAgent() {
-        _booleanOptions.add(I2PTunnelHTTPClient.PROP_USER_AGENT);
+    public void setAllowUserAgent(boolean val) {
+        if (val)
+            _booleanOptions.add(I2PTunnelHTTPClient.PROP_USER_AGENT);
+        else
+            _booleanOptions.remove(I2PTunnelHTTPClient.PROP_USER_AGENT);
     }
-    public void setAllowReferer() {
-        _booleanOptions.add(I2PTunnelHTTPClient.PROP_REFERER);
+    public void setAllowReferer(boolean val) {
+        if (val)
+            _booleanOptions.add(I2PTunnelHTTPClient.PROP_REFERER);
+        else
+            _booleanOptions.remove(I2PTunnelHTTPClient.PROP_REFERER);
     }
-    public void setAllowAccept() {
-        _booleanOptions.add(I2PTunnelHTTPClient.PROP_ACCEPT);
+    public void setAllowAccept(boolean val) {
+        if (val)
+            _booleanOptions.add(I2PTunnelHTTPClient.PROP_ACCEPT);
+        else
+            _booleanOptions.add(I2PTunnelHTTPClient.PROP_ACCEPT);
     }
-    public void setAllowInternalSSL() {
-        _booleanOptions.add(I2PTunnelHTTPClient.PROP_INTERNAL_SSL);
+    public void setAllowInternalSSL(boolean val) {
+        if (val)
+            _booleanOptions.add(I2PTunnelHTTPClient.PROP_INTERNAL_SSL);
+        else
+            _booleanOptions.remove(I2PTunnelHTTPClient.PROP_INTERNAL_SSL);
     }
 
-    public void setMultihome() {
-        _booleanOptions.add("shouldBundleReplyInfo");
+    public void setMultihome(boolean val) {
+        if (val)
+            _booleanOptions.add("shouldBundleReplyInfo");
+        else
+            _booleanOptions.remove("shouldBundleReplyInfo");
     }
 
     /** all proxy auth */
@@ -296,8 +335,11 @@ public class TunnelConfig {
             _otherOptions.put(I2PTunnelHTTPClient.PROP_SSL_OUTPROXIES, s.trim().replace(" ", ","));
     }
 
-    public void setUseOutproxyPlugin() {
-        _booleanOptions.add(I2PTunnelHTTPClient.PROP_USE_OUTPROXY_PLUGIN);
+    public void setUseOutproxyPlugin(boolean val) {
+        if (val)
+            _booleanOptions.add(I2PTunnelHTTPClient.PROP_USE_OUTPROXY_PLUGIN);
+        else
+            _booleanOptions.remove(I2PTunnelHTTPClient.PROP_USE_OUTPROXY_PLUGIN);
     }
     
     /**
