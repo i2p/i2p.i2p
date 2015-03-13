@@ -215,7 +215,7 @@
     <target name="war" depends="precompilejsp, bundle, warUpToDate, listChangedFiles2" unless="war.uptodate" > 
         <!-- set if unset -->
         <property name="workspace.changes.w.tr" value="" />
-    	<copy todir="../jsp/WEB-INF/classes/net/i2p/i2ptunnel">
+    	<copy todir="../jsp/WEB-INF/classes/net/i2p/i2ptunnel/ui">
     		<fileset dir="build/obj/net/i2p/i2ptunnel/ui" />
     	</copy>
         <copy file="build/obj/net/i2p/i2ptunnel/web/EditBean.class" todir="../jsp/WEB-INF/classes/net/i2p/i2ptunnel/web" />
