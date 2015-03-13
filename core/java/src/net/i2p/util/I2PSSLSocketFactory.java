@@ -337,7 +337,7 @@ public class I2PSSLSocketFactory {
             return enabledArr;
         }
         if (log.shouldLog(Log.DEBUG)) {
-            List<String> foo = new ArrayList(selected);
+            List<String> foo = new ArrayList<String>(selected);
             Collections.sort(foo);
             log.debug("Selected: " + foo);
         }

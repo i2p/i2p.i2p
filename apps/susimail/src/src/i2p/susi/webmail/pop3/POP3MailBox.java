@@ -1186,7 +1186,7 @@ public class POP3MailBox implements NewMailListener {
 		if (!isConnected())
 			return null;
 		synchronized( synchronizer ) {
-		       return new ArrayList(uidlToID.keySet());
+		       return new ArrayList<String>(uidlToID.keySet());
 		}
 	}
 

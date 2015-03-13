@@ -842,7 +842,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
         if (_log.shouldLog(Log.INFO))
             _log.info("Sending error " + msg + " to: " + nInfo);
         Map<String, Object> map = new HashMap<String, Object>(4);
-        List<Object> error = new ArrayList(2);
+        List<Object> error = new ArrayList<Object>(2);
         error.add(Integer.valueOf(err));
         error.add(msg);
         map.put("e", error);
@@ -1294,7 +1294,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
         } else {
             List<byte[]> hashes;
             if (peers.isEmpty()) {
-                hashes = Collections.EMPTY_LIST;
+                hashes = Collections.emptyList();
             } else {
                 hashes = new ArrayList<byte[]>(peers.size());
                 for (Hash peer : peers) {

@@ -117,7 +117,7 @@ public class Blocklist {
     public void startup() {
         if (! _context.getBooleanPropertyDefaultTrue(PROP_BLOCKLIST_ENABLED))
             return;
-        List<File> files = new ArrayList(3);
+        List<File> files = new ArrayList<File>(3);
 
         // install dir
         File blFile = new File(_context.getBaseDir(), BLOCKLIST_FILE_DEFAULT);

@@ -78,7 +78,7 @@ public class PublishLocalRouterInfoJob extends JobImpl {
             _log.debug("Old routerInfo contains " + oldRI.getAddresses().size() 
                        + " addresses and " + oldRI.getOptionsMap().size() + " options");
         try {
-            List<RouterAddress> oldAddrs = new ArrayList(oldRI.getAddresses());
+            List<RouterAddress> oldAddrs = new ArrayList<RouterAddress>(oldRI.getAddresses());
             List<RouterAddress> newAddrs = getContext().commSystem().createAddresses();
             int count = _runCount.incrementAndGet();
             if (_notFirstTime && (count % 4) != 0 && oldAddrs.size() == newAddrs.size()) {

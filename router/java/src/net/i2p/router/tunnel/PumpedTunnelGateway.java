@@ -63,6 +63,7 @@ class PumpedTunnelGateway extends TunnelGateway {
         super(context, preprocessor, sender, receiver);
         if (getClass() == PumpedTunnelGateway.class) {
             // Unbounded priority queue for outbound
+            // fixme lint PendingGatewayMessage is not a CDPQEntry
             _prequeue = new CoDelPriorityBlockingQueue(context, "OBGW", INITIAL_OB_QUEUE);
             _nextHop = receiver.getSendTo();
             _isInbound = false;
