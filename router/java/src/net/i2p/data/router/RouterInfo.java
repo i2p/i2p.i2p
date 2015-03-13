@@ -441,13 +441,14 @@ public class RouterInfo extends DatabaseEntry {
 
             String caps = _options.getProperty(PROP_CAPABILITIES);
             if (caps == null)
-                _options.setProperty(PROP_CAPABILITIES, ""+cap);
+                _options.setProperty(PROP_CAPABILITIES, String.valueOf(cap));
             else if (caps.indexOf(cap) == -1)
                 _options.setProperty(PROP_CAPABILITIES, caps + cap);
     }
 
     /**
      * @throws IllegalStateException if RouterInfo is already signed
+     * @deprecated unused
      */
     public void delCapability(char cap) {
         if (_signature != null)
