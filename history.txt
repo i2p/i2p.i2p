@@ -1,3 +1,11 @@
+2015-03-13 zzz
+ * i2psnark:
+   - Auto-reduce tunnel quantity based on peer count
+   - Increase max tunnels
+ * Job Queue:
+   - Drop garlic message decryption jobs on overload
+   - Decrease overload threshold
+
 2015-03-13 dg
  * Router: create router.integratedPeers (floodfills) stat, and 
    allow graphing of it.

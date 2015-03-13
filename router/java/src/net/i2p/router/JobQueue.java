@@ -25,6 +25,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import net.i2p.data.DataHelper;
+import net.i2p.router.message.HandleGarlicMessageJob;
 import net.i2p.router.networkdb.kademlia.HandleFloodfillDatabaseLookupMessageJob;
 import net.i2p.util.Clock;
 import net.i2p.util.I2PThread;
@@ -112,7 +113,9 @@ public class JobQueue {
     
     /** max ready and waiting jobs before we start dropping 'em */
     private int _maxWaitingJobs = DEFAULT_MAX_WAITING_JOBS;
-    private final static int DEFAULT_MAX_WAITING_JOBS = 100;
+    private final static int DEFAULT_MAX_WAITING_JOBS = 50;
+    private final static long MIN_LAG_TO_DROP = 1000;
+
     /** @deprecated unimplemented */
     private final static String PROP_MAX_WAITING_JOBS = "router.maxWaitingJobs";
 
@@ -286,11 +289,15 @@ public class JobQueue {
             // we don't really *need* to answer DB lookup messages
             // This is pretty lame, there's actually a ton of different jobs we
             // could drop, but is it worth making a list?
-            if (cls == HandleFloodfillDatabaseLookupMessageJob.class) {
+            //
+            // Garlic added in 0.9.19, floodfills were getting overloaded
+            // with encrypted lookups
+            if (cls == HandleFloodfillDatabaseLookupMessageJob.class ||
+                cls == HandleGarlicMessageJob.class) {
                  JobTiming jt = job.getTiming();
                  if (jt != null) {
                      long lag =  _context.clock().now() - jt.getStartAfter();
-                     if (lag > 2*1000L)
+                     if (lag >= MIN_LAG_TO_DROP)
                          return true;
                 }
             }
