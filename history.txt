@@ -1,3 +1,7 @@
+2015-03-13 dg
+ * Router: create router.integratedPeers (floodfills) stat, and 
+   allow graphing of it.
+
 2015-03-08 zzz
  * i2psnark: Increase min and default bandwidth
  * Throttle: Tweak messages during probabalistic rejection
