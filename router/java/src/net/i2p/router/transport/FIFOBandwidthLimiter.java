@@ -278,8 +278,8 @@ public class FIFOBandwidthLimiter {
      * @param maxBurstOut allow up to this many bytes in from the burst section for this time period (may be negative)
      */
     final void refillBandwidthQueues(List<Request> buf, long bytesInbound, long bytesOutbound, long maxBurstIn, long maxBurstOut) {
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Refilling the queues with " + bytesInbound + "/" + bytesOutbound + ": " + getStatus().toString());
+        //if (_log.shouldLog(Log.DEBUG))
+        //    _log.debug("Refilling the queues with " + bytesInbound + "/" + bytesOutbound + ": " + getStatus().toString());
 
         // Take some care throughout to minimize accesses to the atomics,
         // both for efficiency and to not let strange things happen if
@@ -289,8 +289,8 @@ public class FIFOBandwidthLimiter {
         // FIXME wrap - change to AtomicLong or detect
         int avi = _availableInbound.addAndGet((int) bytesInbound);
         if (avi > _maxInbound) {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("available inbound (" + avi + ") exceeds our inbound burst (" + _maxInbound + "), so no supplement");
+            //if (_log.shouldLog(Log.DEBUG))
+            //    _log.debug("available inbound (" + avi + ") exceeds our inbound burst (" + _maxInbound + "), so no supplement");
             int uib = _unavailableInboundBurst.addAndGet(avi - _maxInbound);
             _availableInbound.set(_maxInbound);
             if (uib > _maxInboundBurst) {
@@ -302,8 +302,8 @@ public class FIFOBandwidthLimiter {
             int want = (int)maxBurstIn;
             if (want > (_maxInbound - avi))
                 want = _maxInbound - avi;
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("want to pull " + want + " from the inbound burst (" + _unavailableInboundBurst + ") to supplement " + avi + " (max: " + _maxInbound + ")");
+            //if (_log.shouldLog(Log.DEBUG))
+            //    _log.debug("want to pull " + want + " from the inbound burst (" + _unavailableInboundBurst + ") to supplement " + avi + " (max: " + _maxInbound + ")");
             
             if (want > 0) {
                 int uib = _unavailableInboundBurst.get();
@@ -319,8 +319,8 @@ public class FIFOBandwidthLimiter {
         
         int avo = _availableOutbound.addAndGet((int) bytesOutbound);
         if (avo > _maxOutbound) {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("available outbound (" + avo + ") exceeds our outbound burst (" + _maxOutbound + "), so no supplement");
+            //if (_log.shouldLog(Log.DEBUG))
+            //    _log.debug("available outbound (" + avo + ") exceeds our outbound burst (" + _maxOutbound + "), so no supplement");
             int uob = _unavailableOutboundBurst.getAndAdd(avo - _maxOutbound);
             _availableOutbound.set(_maxOutbound);
 
@@ -333,8 +333,8 @@ public class FIFOBandwidthLimiter {
             int want = (int)maxBurstOut;
             if (want > (_maxOutbound - avo))
                 want = _maxOutbound - avo;
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("want to pull " + want + " from the outbound burst (" + _unavailableOutboundBurst + ") to supplement " + avo + " (max: " + _maxOutbound + ")");
+            //if (_log.shouldLog(Log.DEBUG))
+            //    _log.debug("want to pull " + want + " from the outbound burst (" + _unavailableOutboundBurst + ") to supplement " + avo + " (max: " + _maxOutbound + ")");
             
             if (want > 0) {
                 int uob = _unavailableOutboundBurst.get();
