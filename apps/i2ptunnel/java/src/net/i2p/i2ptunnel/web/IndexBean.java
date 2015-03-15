@@ -9,7 +9,6 @@ package net.i2p.i2ptunnel.web;
  */
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -23,19 +22,16 @@ import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.PrivateKeyFile;
 import net.i2p.data.SessionKey;
-import net.i2p.i2ptunnel.I2PTunnelClientBase;
 import net.i2p.i2ptunnel.I2PTunnelHTTPClient;
 import net.i2p.i2ptunnel.I2PTunnelHTTPClientBase;
 import net.i2p.i2ptunnel.I2PTunnelHTTPServer;
 import net.i2p.i2ptunnel.I2PTunnelServer;
-import net.i2p.i2ptunnel.SSLClientUtil;
 import net.i2p.i2ptunnel.TunnelController;
 import net.i2p.i2ptunnel.TunnelControllerGroup;
+import net.i2p.i2ptunnel.ui.GeneralHelper;
 import net.i2p.i2ptunnel.ui.TunnelConfig;
 import net.i2p.util.Addresses;
-import net.i2p.util.FileUtil;
 import net.i2p.util.Log;
-import net.i2p.util.SecureFile;
 
 /**
  * Simple accessor for exposing tunnel info, but also an ugly form handler
@@ -79,7 +75,6 @@ public class IndexBean {
     public static final String PROP_CSS_DISABLED = "routerconsole.css.disabled";
     public static final String PROP_JS_DISABLED = "routerconsole.javascript.disabled";
     private static final String PROP_PW_ENABLE = "routerconsole.auth.enable";
-    private static final String OPT = TunnelController.PFX_OPTION;
     
     public IndexBean() {
         _context = I2PAppContext.getGlobalContext();
@@ -240,83 +235,9 @@ public class IndexBean {
     }
     
     private String saveChanges() {
-        // Get current tunnel controller
-        TunnelController cur = getController(_tunnel);
-        
-        Properties config = getConfig();
-
-        String ksMsg = null;
-        String type = config.getProperty(TunnelController.PROP_TYPE);
-        if (TunnelController.TYPE_STD_CLIENT.equals(type) || TunnelController.TYPE_IRC_CLIENT.equals(type)) {
-            //
-            // If we switch to SSL, create the keystore here, so we can store the new properties.
-            // Down in I2PTunnelClientBase it's very hard to save the config.
-            //
-            if (Boolean.parseBoolean(config.getProperty(OPT + I2PTunnelClientBase.PROP_USE_SSL))) {
-                try {
-                    boolean created = SSLClientUtil.verifyKeyStore(config, OPT);
-                    if (created) {
-                        // config now contains new keystore props
-                        ksMsg = "Created new self-signed certificate for tunnel " + getTunnelName(_tunnel);
-                    }        
-                } catch (IOException ioe) {       
-                    ksMsg = "Failed to create new self-signed certificate for tunnel " +
-                            getTunnelName(_tunnel) + ", check logs: " + ioe;
-                }        
-            }        
-        }        
-        if (cur == null) {
-            // creating new
-            cur = new TunnelController(config, "", true);
-            _group.addController(cur);
-            if (cur.getStartOnLoad())
-                cur.startTunnelBackground();
-        } else {
-            cur.setConfig(config, "");
-        }
-        // Only modify other shared tunnels
-        // if the current tunnel is shared, and of supported type
-        if (Boolean.parseBoolean(cur.getSharedClient()) && isClient(cur.getType())) {
-            // all clients use the same I2CP session, and as such, use the same I2CP options
-            List<TunnelController> controllers = _group.getControllers();
-
-            for (int i = 0; i < controllers.size(); i++) {
-                TunnelController c = controllers.get(i);
-
-                // Current tunnel modified by user, skip
-                if (c == cur) continue;
-
-                // Only modify this non-current tunnel
-                // if it belongs to a shared destination, and is of supported type
-                if (Boolean.parseBoolean(c.getSharedClient()) && isClient(c.getType())) {
-                    Properties cOpt = c.getConfig("");
-                    _config.updateTunnelQuantities(config);
-                    cOpt.setProperty("option.inbound.nickname", TunnelConfig.SHARED_CLIENT_NICKNAME);
-                    cOpt.setProperty("option.outbound.nickname", TunnelConfig.SHARED_CLIENT_NICKNAME);
-                    
-                    c.setConfig(cOpt, "");
-                }
-            }
-        }
-        
-        List<String> msgs = doSave();
-        if (ksMsg != null)
-            msgs.add(ksMsg);
         // FIXME name will be HTML escaped twice
-        return getMessages(msgs);
+        return getMessages(GeneralHelper.saveTunnel(_context, _group, _tunnel, _config));
     }
-
-    private List<String> doSave() { 
-        List<String> rv = _group.clearAllMessages();
-        try {
-            _group.saveConfig();
-            rv.add(0, _("Configuration changes saved"));
-        } catch (IOException ioe) {
-            _log.error("Failed to save config file", ioe);
-            rv.add(0, _("Failed to save configuration") + ": " + ioe.toString());
-        }
-        return rv;
-    } 
 
     /**
      *  Stop the tunnel, delete from config,
@@ -325,49 +246,8 @@ public class IndexBean {
     private String deleteTunnel() {
         if (!_removeConfirmed)
             return "Please confirm removal";
-        
-        TunnelController cur = getController(_tunnel);
-        if (cur == null)
-            return "Invalid tunnel number";
-        
-        List<String> msgs = _group.removeController(cur);
-        msgs.addAll(doSave());
 
-        // Rename private key file if it was a default name in
-        // the default directory, so it doesn't get reused when a new
-        // tunnel is created.
-        // Use configured file name if available, not the one from the form.
-        String pk = cur.getPrivKeyFile();
-        if (pk == null)
-            pk = _config.getPrivKeyFile();
-        if (pk != null && pk.startsWith("i2ptunnel") && pk.endsWith("-privKeys.dat") &&
-            ((!isClient(cur.getType())) || cur.getPersistentClientKey())) {
-            File pkf = new File(_context.getConfigDir(), pk);
-            if (pkf.exists()) {
-                String name = cur.getName();
-                if (name == null) {
-                    name = cur.getDescription();
-                    if (name == null) {
-                        name = cur.getType();
-                        if (name == null)
-                            name = Long.toString(_context.clock().now());
-                    }
-                }
-                name = name.replace(' ', '_').replace(':', '_').replace("..", "_").replace('/', '_').replace('\\', '_');
-                name = "i2ptunnel-deleted-" + name + '-' + _context.clock().now() + "-privkeys.dat";
-                File backupDir = new SecureFile(_context.getConfigDir(), TunnelController.KEY_BACKUP_DIR);
-                File to;
-                if (backupDir.isDirectory() || backupDir.mkdir())
-                    to = new File(backupDir, name);
-                else
-                    to = new File(_context.getConfigDir(), name);
-                boolean success = FileUtil.rename(pkf, to);
-                if (success)
-                    msgs.add("Private key file " + pkf.getAbsolutePath() +
-                             " renamed to " + to.getAbsolutePath());
-            }
-        }
-        return getMessages(msgs);
+        return getMessages(GeneralHelper.deleteTunnel(_context, _group, _tunnel, _config));
     }
     
     /**
@@ -436,9 +316,9 @@ public class IndexBean {
     }
     
     public String getTunnelName(int tunnel) {
-        TunnelController tun = getController(tunnel);
-        if (tun != null && tun.getName() != null)
-            return DataHelper.escapeHTML(tun.getName());
+        String name = GeneralHelper.getTunnelName(_group, tunnel);
+        if (name != null)
+            return DataHelper.escapeHTML(name);
         else
             return _("New Tunnel");
     }
@@ -1240,13 +1120,7 @@ public class IndexBean {
     ///
     
     protected TunnelController getController(int tunnel) {
-        if (tunnel < 0) return null;
-        if (_group == null) return null;
-        List<TunnelController> controllers = _group.getControllers();
-        if (controllers.size() > tunnel)
-            return controllers.get(tunnel); 
-        else
-            return null;
+        return GeneralHelper.getController(_group, tunnel);
     }
     
     private static String getMessages(List<String> msgs) {
