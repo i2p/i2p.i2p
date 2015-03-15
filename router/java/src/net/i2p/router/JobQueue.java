@@ -51,7 +51,7 @@ public class JobQueue {
     /** SortedSet of jobs that are scheduled for running in the future, earliest first */
     private final Set<Job> _timedJobs;
     /** job name to JobStat for that job */
-    private final Map<String, JobStats> _jobStats;
+    private final ConcurrentHashMap<String, JobStats> _jobStats;
     private final QueuePumper _pumper;
     /** will we allow the # job runners to grow beyond 1? */
     private volatile boolean _allowParallelOperation;
@@ -113,8 +113,8 @@ public class JobQueue {
     
     /** max ready and waiting jobs before we start dropping 'em */
     private int _maxWaitingJobs = DEFAULT_MAX_WAITING_JOBS;
-    private final static int DEFAULT_MAX_WAITING_JOBS = 50;
-    private final static long MIN_LAG_TO_DROP = 1000;
+    private final static int DEFAULT_MAX_WAITING_JOBS = 25;
+    private final static long MIN_LAG_TO_DROP = 500;
 
     /** @deprecated unimplemented */
     private final static String PROP_MAX_WAITING_JOBS = "router.maxWaitingJobs";
@@ -218,6 +218,15 @@ public class JobQueue {
             _context.statManager().addRateData("jobQueue.droppedJobs", 1);
             _log.logAlways(Log.WARN, "Dropping job due to overload!  # ready jobs: " 
                           + numReady + ": job = " + job);
+            String key = job.getName();
+            JobStats stats = _jobStats.get(key);
+            if (stats == null) {
+                stats = new JobStats(key);
+                JobStats old = _jobStats.putIfAbsent(key, stats);
+                if (old != null)
+                    stats = old;
+            }
+            stats.jobDropped();
         }
     }
     
@@ -292,14 +301,23 @@ public class JobQueue {
             //
             // Garlic added in 0.9.19, floodfills were getting overloaded
             // with encrypted lookups
+            //
+            // Obviously we can only drop one-shot jobs, not those that requeue
+            //
             if (cls == HandleFloodfillDatabaseLookupMessageJob.class ||
                 cls == HandleGarlicMessageJob.class) {
-                 JobTiming jt = job.getTiming();
-                 if (jt != null) {
-                     long lag =  _context.clock().now() - jt.getStartAfter();
-                     if (lag >= MIN_LAG_TO_DROP)
-                         return true;
-                }
+                // this tail drops based on the lag at the tail, which
+                // makes no sense...
+                //JobTiming jt = job.getTiming();
+                //if (jt != null) {
+                //    long lag =  _context.clock().now() - jt.getStartAfter();
+                //    if (lag >= MIN_LAG_TO_DROP)
+                //        return true;
+                //}
+
+                // this tail drops based on the lag at the head
+                if (getMaxLag() >= MIN_LAG_TO_DROP)
+                    return true;
             }
         }
         return false;
@@ -611,10 +629,9 @@ public class JobQueue {
         JobStats stats = _jobStats.get(key);
         if (stats == null) {
             stats = new JobStats(key);
-            _jobStats.put(key, stats);
-            // yes, if two runners finish the same job at the same time, this could
-            // create an extra object.  but, who cares, its pushed out of the map
-            // immediately anyway.
+            JobStats old = _jobStats.putIfAbsent(key, stats);
+            if (old != null)
+                stats = old;
         }
         stats.jobRan(duration, lag);
 

@@ -140,11 +140,13 @@ public class JobQueueHelper extends HelperBase {
     private void getJobStats(StringBuilder buf) { 
         buf.append("<table>\n" +
                    "<tr><th>").append(_("Job")).append("</th><th>").append(_("Runs")).append("</th>" +
+                   "<th>").append(_("Dropped")).append("</th>" +
                    "<th>").append(_("Time")).append("</th><th><i>").append(_("Avg")).append("</i></th><th><i>")
            .append(_("Max")).append("</i></th><th><i>").append(_("Min")).append("</i></th>" +
                    "<th>").append(_("Pending")).append("</th><th><i>").append(_("Avg")).append("</i></th><th><i>")
            .append(_("Max")).append("</i></th><th><i>").append(_("Min")).append("</i></th></tr>\n");
         long totRuns = 0;
+        long totDropped = 0;
         long totExecTime = 0;
         long avgExecTime = 0;
         long maxExecTime = -1;
@@ -161,6 +163,7 @@ public class JobQueueHelper extends HelperBase {
             buf.append("<tr>");
             buf.append("<td><b>").append(stats.getName()).append("</b></td>");
             buf.append("<td align=\"right\">").append(stats.getRuns()).append("</td>");
+            buf.append("<td align=\"right\">").append(stats.getDropped()).append("</td>");
             buf.append("<td align=\"right\">").append(DataHelper.formatDuration2(stats.getTotalTime())).append("</td>");
             buf.append("<td align=\"right\">").append(DataHelper.formatDuration2(stats.getAvgTime())).append("</td>");
             buf.append("<td align=\"right\">").append(DataHelper.formatDuration2(stats.getMaxTime())).append("</td>");
@@ -171,6 +174,7 @@ public class JobQueueHelper extends HelperBase {
             buf.append("<td align=\"right\">").append(DataHelper.formatDuration2(stats.getMinPendingTime())).append("</td>");
             buf.append("</tr>\n");
             totRuns += stats.getRuns();
+            totDropped += stats.getDropped();
             totExecTime += stats.getTotalTime();
             if (stats.getMaxTime() > maxExecTime)
                 maxExecTime = stats.getMaxTime();
@@ -193,6 +197,7 @@ public class JobQueueHelper extends HelperBase {
         buf.append("<tr class=\"tablefooter\">");
         buf.append("<td><b>").append(_("Summary")).append("</b></td>");
         buf.append("<td align=\"right\">").append(totRuns).append("</td>");
+        buf.append("<td align=\"right\">").append(totDropped).append("</td>");
         buf.append("<td align=\"right\">").append(DataHelper.formatDuration2(totExecTime)).append("</td>");
         buf.append("<td align=\"right\">").append(DataHelper.formatDuration2(avgExecTime)).append("</td>");
         buf.append("<td align=\"right\">").append(DataHelper.formatDuration2(maxExecTime)).append("</td>");

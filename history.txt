@@ -1,3 +1,9 @@
+2015-03-15 zzz
+ * Job Queue:
+   - Fix overload dropping
+   - Add drop count to job stats
+   - Decrease overload threshold again
+
 2015-03-13 zzz
  * i2psnark:
    - Auto-reduce tunnel quantity based on peer count
