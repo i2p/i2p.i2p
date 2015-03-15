@@ -221,10 +221,12 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
             DatabaseStoreMessage msg = new DatabaseStoreMessage(_context);
             msg.setEntry(ds);
             OutNetMessage m = new OutNetMessage(_context, msg, _context.clock().now()+FLOOD_TIMEOUT, FLOOD_PRIORITY, target);
-            // note send failure but don't give credit on success
-            // might need to change this
             Job floodFail = new FloodFailedJob(_context, peer);
             m.setOnFailedSendJob(floodFail);
+            // we want to give credit on success, even if we aren't sure,
+            // because otherwise no use noting failure
+            Job floodGood = new FloodSuccessJob(_context, peer);
+            m.setOnSendJob(floodGood);
             _context.commSystem().processMessage(m);
             flooded++;
             if (_log.shouldLog(Log.INFO))
@@ -246,6 +248,23 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
         public String getName() { return "Flood failed"; }
         public void runJob() {
             getContext().profileManager().dbStoreFailed(_peer);
+        }
+    }
+
+    /**
+     *  Note in the profile that the store succeeded
+     *  @since 0.9.19
+     */
+    private static class FloodSuccessJob extends JobImpl {
+        private final Hash _peer;
+    
+        public FloodSuccessJob(RouterContext ctx, Hash peer) {
+            super(ctx);
+            _peer = peer;
+        }
+        public String getName() { return "Flood succeeded"; }
+        public void runJob() {
+            getContext().profileManager().dbStoreSuccessful(_peer);
         }
     }
 
