@@ -49,11 +49,11 @@ class FloodfillMonitorJob extends JobImpl {
         boolean ff = shouldBeFloodfill();
         _facade.setFloodfillEnabled(ff);
         if (ff != wasFF) {
-			if(ff) {
-				getContext().router().eventLog().addEvent(EventLog.BECAME_FLOODFILL);
-			} else {
-				getContext().router().eventLog().addEvent(EventLog.NOT_FLOODFILL);
-			}
+            if (ff) {
+                getContext().router().eventLog().addEvent(EventLog.BECAME_FLOODFILL);
+            } else {
+                getContext().router().eventLog().addEvent(EventLog.NOT_FLOODFILL);
+            }
             getContext().router().rebuildRouterInfo();
         }
         if (_log.shouldLog(Log.INFO))
@@ -157,9 +157,9 @@ class FloodfillMonitorJob extends JobImpl {
         happy = happy && lagStat.getRate(60*60*1000L).getAvgOrLifetimeAvg() < 25;
         happy = happy && getContext().tunnelManager().getInboundBuildQueueSize() < 5;
         // Only if we're pretty well integrated...
-        happy = happy && _facade.getKnownRouters() >= 200;
+        happy = happy && _facade.getKnownRouters() >= 400;
         happy = happy && getContext().commSystem().countActivePeers() >= 50;
-        happy = happy && getContext().tunnelManager().getParticipatingCount() >= 35;
+        happy = happy && getContext().tunnelManager().getParticipatingCount() >= 25;
         happy = happy && Math.abs(getContext().clock().getOffset()) < 10*1000;
         // We need an address and no introducers
         if (happy) {
