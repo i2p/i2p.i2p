@@ -160,6 +160,7 @@ public class TrackerClient implements Runnable {
       consecutiveFails = 0;
       runStarted = false;
       _fastUnannounce = false;
+      snark.setTrackerProblems(null);
       _thread = new I2PAppThread(this, _threadName + " #" + (++_runCount), true);
       _thread.start();
       started = true;
