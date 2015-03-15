@@ -257,7 +257,7 @@ public class TunnelConfig {
     /**
      * Controls how ephemeral the I2P Destination of a client tunnel is.
      * <p/>
-     * If {@link #setClose(boolean)} is set to true then mode 1 == mode 0.
+     * If {@link #setClose(boolean)} is set to false then mode 1 == mode 0.
      * 
      * @param mode 0 for new dest on restart, 1 for new dest on resume from idle, 2 for persistent key
      */
@@ -349,24 +349,25 @@ public class TunnelConfig {
         if (s != null)
             _newProxyUser = s.trim();
     }
-    
+
     public void setProxyPassword(String s) {
         if (s != null)
             _newProxyPW = s.trim();
     }
-    
+
     /**
-     * Sets the authentication type required for configured outproxies. The
-     * same authentication type is assumed for all configured outproxies.
-     * Supported authentication types: "basic", "digest".
+     * Sets whether authentication is required for any of the configured
+     * outproxies.
      *
-     * @param authType the authentication type, or "false" for no authentication
+     * @param val true if authentication is required, false otherwise
      */
-    public void setOutproxyAuth(String authType) {
-        if (authType != null)
-            _otherOptions.put(I2PTunnelHTTPClientBase.PROP_OUTPROXY_AUTH, authType.trim());
+    public void setOutproxyAuth(boolean val) {
+        if (val)
+            _booleanOptions.add(I2PTunnelHTTPClientBase.PROP_OUTPROXY_AUTH);
+        else
+            _booleanOptions.remove(I2PTunnelHTTPClientBase.PROP_OUTPROXY_AUTH);
     }
-    
+
     public void setOutproxyUsername(String s) {
         if (s != null)
             _otherOptions.put(I2PTunnelHTTPClientBase.PROP_OUTPROXY_USER, s.trim());

@@ -44,6 +44,7 @@ public class IndexBean {
     protected final I2PAppContext _context;
     protected final Log _log;
     protected final TunnelControllerGroup _group;
+    protected final GeneralHelper _helper;
     private final String _fatalError;
     private String _action;
     private int _tunnel;
@@ -58,10 +59,10 @@ public class IndexBean {
     private int _certType;
     private String _certSigner;
     
-    public static final int RUNNING = 1;
-    public static final int STARTING = 2;
-    public static final int NOT_RUNNING = 3;
-    public static final int STANDBY = 4;
+    public static final int RUNNING = GeneralHelper.RUNNING;
+    public static final int STARTING = GeneralHelper.STARTING;
+    public static final int NOT_RUNNING = GeneralHelper.NOT_RUNNING;
+    public static final int STANDBY = GeneralHelper.STANDBY;
     
     //static final String PROP_NONCE = IndexBean.class.getName() + ".nonce";
     //static final String PROP_NONCE_OLD = PROP_NONCE + '2';
@@ -90,6 +91,7 @@ public class IndexBean {
             error = iae.toString();
         }
         _group = tcg;
+        _helper = new GeneralHelper(_context, _group);
         _fatalError = error;
         _tunnel = -1;
         _curNonce = "-1";
@@ -236,7 +238,7 @@ public class IndexBean {
     
     private String saveChanges() {
         // FIXME name will be HTML escaped twice
-        return getMessages(GeneralHelper.saveTunnel(_context, _group, _tunnel, _config));
+        return getMessages(_helper.saveTunnel(_tunnel, _config));
     }
 
     /**
@@ -247,7 +249,7 @@ public class IndexBean {
         if (!_removeConfirmed)
             return "Please confirm removal";
 
-        return getMessages(GeneralHelper.deleteTunnel(_context, _group, _tunnel, _config));
+        return getMessages(_helper.deleteTunnel(_tunnel, _config.getPrivKeyFile()));
     }
     
     /**
@@ -316,7 +318,7 @@ public class IndexBean {
     }
     
     public String getTunnelName(int tunnel) {
-        String name = GeneralHelper.getTunnelName(_group, tunnel);
+        String name = _helper.getTunnelName(tunnel);
         if (name != null)
             return DataHelper.escapeHTML(name);
         else
@@ -391,42 +393,19 @@ public class IndexBean {
     }
     
     public String getInternalType(int tunnel) {
-        TunnelController tun = getController(tunnel);
-        if (tun != null)
-            return tun.getType();
-        else
-            return "";
+        return _helper.getTunnelType(tunnel);
     }
     
     public String getClientInterface(int tunnel) {
-        TunnelController tun = getController(tunnel);
-        if (tun != null) {
-            if ("streamrclient".equals(tun.getType()))
-                return tun.getTargetHost();
-            else
-                return tun.getListenOnInterface();
-        } else
-            return "127.0.0.1";
+        return _helper.getClientInterface(tunnel);
     }
     
     public int getTunnelStatus(int tunnel) {
-        TunnelController tun = getController(tunnel);
-        if (tun == null) return NOT_RUNNING;
-        if (tun.getIsRunning()) {
-            if (isClient(tunnel) && tun.getIsStandby())
-                return STANDBY;
-            else
-                return RUNNING;
-        } else if (tun.getIsStarting()) return STARTING;
-        else return NOT_RUNNING;
+        return _helper.getTunnelStatus(tunnel);
     }
     
     public String getTunnelDescription(int tunnel) {
-        TunnelController tun = getController(tunnel);
-        if (tun != null && tun.getDescription() != null)
-            return DataHelper.escapeHTML(tun.getDescription());
-        else
-            return "";
+        return DataHelper.escapeHTML(_helper.getTunnelDescription(tunnel));
     }
     
     public String getSharedClient(int tunnel) {
@@ -438,16 +417,7 @@ public class IndexBean {
     }
     
     public String getClientDestination(int tunnel) {
-        TunnelController tun = getController(tunnel);
-        if (tun == null) return "";
-        String rv;
-        if (TunnelController.TYPE_STD_CLIENT.equals(tun.getType()) ||
-            TunnelController.TYPE_IRC_CLIENT.equals(tun.getType()) ||
-            TunnelController.TYPE_STREAMR_CLIENT.equals(tun.getType()))
-            rv = tun.getTargetDestination();
-        else
-            rv = tun.getProxyList();
-        return rv != null ? rv : "";
+        return _helper.getClientDestination(tunnel);
     }
     
     /**
@@ -495,23 +465,7 @@ public class IndexBean {
      *  @since 0.9.17
      */
     protected Destination getDestination(int tunnel) {
-        TunnelController tun = getController(tunnel);
-        if (tun != null) {
-            Destination rv = tun.getDestination();
-            if (rv != null)
-                return rv;
-            // if not running, do this the hard way
-            File keyFile = tun.getPrivateKeyFile();
-            if (keyFile != null) {
-                PrivateKeyFile pkf = new PrivateKeyFile(keyFile);
-                try {
-                    rv = pkf.getDestination();
-                    if (rv != null)
-                        return rv;
-                } catch (Exception e) {}
-            }
-        }
-        return null;
+        return _helper.getDestination(tunnel);
     }
     
     /**
@@ -741,9 +695,6 @@ public class IndexBean {
         _config.setUniqueLocal(true);
     }
 
-    protected static final String PROP_ENABLE_ACCESS_LIST = "i2cp.enableAccessList";
-    protected static final String PROP_ENABLE_BLACKLIST = "i2cp.enableBlackList";
-
     public void setAccessMode(String val) {
         if (val != null) {
             try {
@@ -836,7 +787,7 @@ public class IndexBean {
     }
     
     public void setOutproxyAuth(String s) {
-        _config.setOutproxyAuth(I2PTunnelHTTPClientBase.DIGEST_AUTH);
+        _config.setOutproxyAuth(true);
     }
     
     public void setOutproxyUsername(String s) {
@@ -1120,7 +1071,7 @@ public class IndexBean {
     ///
     
     protected TunnelController getController(int tunnel) {
-        return GeneralHelper.getController(_group, tunnel);
+        return _helper.getController(tunnel);
     }
     
     private static String getMessages(List<String> msgs) {
