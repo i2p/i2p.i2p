@@ -324,10 +324,16 @@ public class TunnelPool {
      *  length settings. Although I guess inbound and outbound exploratory
      *  could be different too, and inbound is harder...
      *
+     *  As of 0.9.19, add more if exploratory and floodfill, as floodfills
+     *  generate a lot of exploratory traffic.
+     *  TODO high-bandwidth non-floodfills do also...
+     *
      *  @since 0.8.11
      */
     private int getAdjustedTotalQuantity() {
         int rv = _settings.getTotalQuantity();
+        if (_settings.isExploratory() && _context.netDb().floodfillEnabled())
+            rv += 3;
         if (_settings.isExploratory() && rv > 1) {
             RateStat e = _context.statManager().getRate("tunnel.buildExploratoryExpire");
             RateStat r = _context.statManager().getRate("tunnel.buildExploratoryReject");
