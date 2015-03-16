@@ -216,7 +216,8 @@ public class JobQueue {
         _context.statManager().addRateData("jobQueue.readyJobs", numReady);
         if (dropped) {
             _context.statManager().addRateData("jobQueue.droppedJobs", 1);
-            _log.logAlways(Log.WARN, "Dropping job due to overload!  # ready jobs: " 
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Dropping job due to overload!  # ready jobs: " 
                           + numReady + ": job = " + job);
             String key = job.getName();
             JobStats stats = _jobStats.get(key);
