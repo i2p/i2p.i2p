@@ -24,7 +24,10 @@ class RouterThrottleImpl implements RouterThrottle {
      * to a job, we're congested.
      *
      */
-    private static int JOB_LAG_LIMIT = 2*1000;
+    private static final long JOB_LAG_LIMIT_NETWORK = 2*1000;
+    private static final long JOB_LAG_LIMIT_NETDB = 2*1000;
+    // TODO reduce
+    private static final long JOB_LAG_LIMIT_TUNNEL = 500;
     private static final String PROP_MAX_TUNNELS = "router.maxParticipatingTunnels";
     private static final int DEFAULT_MAX_TUNNELS = 5000;
     private static final String PROP_MAX_PROCESSINGTIME = "router.defaultProcessingTimeThrottle";
@@ -50,7 +53,7 @@ class RouterThrottleImpl implements RouterThrottle {
         _context.simpleScheduler().addEvent(new ResetStatus(), 5*1000 + _context.getProperty(PROP_REJECT_STARTUP_TIME, DEFAULT_REJECT_STARTUP_TIME));
         _context.statManager().createRateStat("router.throttleNetworkCause", "How lagged the jobQueue was when an I2NP was throttled", "Throttle", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
         //_context.statManager().createRateStat("router.throttleNetDbCause", "How lagged the jobQueue was when a networkDb request was throttled", "Throttle", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
-        //_context.statManager().createRateStat("router.throttleTunnelCause", "How lagged the jobQueue was when a tunnel request was throttled", "Throttle", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
+        _context.statManager().createRateStat("router.throttleTunnelCause", "How lagged the jobQueue was when a tunnel request was throttled", "Throttle", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
         _context.statManager().createRateStat("tunnel.bytesAllocatedAtAccept", "How many bytes had been 'allocated' for participating tunnels when we accepted a request?", "Tunnels", new long[] { 10*60*1000, 60*60*1000, 24*60*60*1000 });
         _context.statManager().createRateStat("router.throttleTunnelProcessingTime1m", "How long it takes to process a message (1 minute average) when we throttle a tunnel?", "Throttle", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
         _context.statManager().createRateStat("router.throttleTunnelProcessingTime10m", "How long it takes to process a message (10 minute average) when we throttle a tunnel?", "Throttle", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
@@ -88,7 +91,7 @@ class RouterThrottleImpl implements RouterThrottle {
     public boolean acceptNetworkMessage() {
         //if (true) return true;
         long lag = _context.jobQueue().getMaxLag();
-        if ( (lag > JOB_LAG_LIMIT) && (_context.router().getUptime() > 60*1000) ) {
+        if ( (lag > JOB_LAG_LIMIT_NETWORK) && (_context.router().getUptime() > 60*1000) ) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Throttling network reader, as the job lag is " + lag);
             _context.statManager().addRateData("router.throttleNetworkCause", lag);
@@ -101,7 +104,7 @@ class RouterThrottleImpl implements RouterThrottle {
     /** @deprecated unused, function moved to netdb */
     public boolean acceptNetDbLookupRequest(Hash key) { 
         long lag = _context.jobQueue().getMaxLag();
-        if (lag > JOB_LAG_LIMIT) {
+        if (lag > JOB_LAG_LIMIT_NETDB) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Refusing netDb request, as the job lag is " + lag);
             _context.statManager().addRateData("router.throttleNetDbCause", lag);
@@ -129,8 +132,14 @@ class RouterThrottleImpl implements RouterThrottle {
             return TunnelHistory.TUNNEL_REJECT_BANDWIDTH;
         }
 
-        //long lag = _context.jobQueue().getMaxLag();
-        // reject here if lag too high???
+        long lag = _context.jobQueue().getMaxLag();
+        if (lag > JOB_LAG_LIMIT_TUNNEL) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Refusing tunnel request, as the job lag is " + lag);
+            _context.statManager().addRateData("router.throttleTunnelCause", lag);
+            setTunnelStatus(_x("Rejecting tunnels: High job lag"));
+            return TunnelHistory.TUNNEL_REJECT_BANDWIDTH;
+        } 
         
         RateAverages ra = RateAverages.getTemp();
         
