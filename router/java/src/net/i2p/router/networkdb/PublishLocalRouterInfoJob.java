@@ -81,39 +81,47 @@ public class PublishLocalRouterInfoJob extends JobImpl {
             List<RouterAddress> oldAddrs = new ArrayList<RouterAddress>(oldRI.getAddresses());
             List<RouterAddress> newAddrs = getContext().commSystem().createAddresses();
             int count = _runCount.incrementAndGet();
+            RouterInfo ri = new RouterInfo(oldRI);
+            // this will get overwritten by setOptions() below, must restore it below
+            getContext().router().addCapabilities(ri);
+            String caps = ri.getCapabilities();
             if (_notFirstTime && (count % 4) != 0 && oldAddrs.size() == newAddrs.size()) {
                 // 3 times out of 4, we don't republish if everything is the same...
                 // If something changed, including the cost, then publish,
                 // otherwise don't.
-                boolean different = false;
-                Comparator<RouterAddress> comp = new AddrComparator();
-                Collections.sort(oldAddrs, comp);
-                Collections.sort(newAddrs, comp);
-                for (int i = 0; i < oldAddrs.size(); i++) {
-                    // deepEquals() includes cost
-                    if (!oldAddrs.get(i).deepEquals(newAddrs.get(i))) {
-                        different = true;
-                        break;
+                boolean different = !oldRI.getCapabilities().equals(ri.getCapabilities());
+                if (!different) {
+                    Comparator<RouterAddress> comp = new AddrComparator();
+                    Collections.sort(oldAddrs, comp);
+                    Collections.sort(newAddrs, comp);
+                    for (int i = 0; i < oldAddrs.size(); i++) {
+                        // deepEquals() includes cost
+                        if (!oldAddrs.get(i).deepEquals(newAddrs.get(i))) {
+                            different = true;
+                            break;
+                        }
+                    }
+                    if (!different) {
+                        if (_log.shouldLog(Log.INFO))
+                            _log.info("Not republishing early because costs and caps and addresses are the same");
+                        requeue(getDelay());
+                        return;
                     }
                 }
-                if (!different) {
-                    if (_log.shouldLog(Log.INFO))
-                        _log.info("Not republishing early because costs are the same");
-                    requeue(getDelay());
-                    return;
-                }
                 if (_log.shouldLog(Log.INFO))
-                    _log.info("Republishing early because addresses or costs have changed - old:\n" +
+                    _log.info("Republishing early because addresses or costs or caps have changed -" +
+                              " oldCaps: " + oldRI.getCapabilities() + " newCaps: " + ri.getCapabilities() +
+                              " old:\n" +
                               oldAddrs + "\nnew:\n" + newAddrs);
             }
-            RouterInfo ri = new RouterInfo(oldRI);
             ri.setPublished(getContext().clock().now());
             Properties stats = getContext().statPublisher().publishStatistics();
-            stats.setProperty(RouterInfo.PROP_NETWORK_ID, ""+Router.NETWORK_ID);
+            stats.setProperty(RouterInfo.PROP_NETWORK_ID, String.valueOf(Router.NETWORK_ID));
+            // restore caps generated above
+            stats.setProperty(RouterInfo.PROP_CAPABILITIES, caps);
             ri.setOptions(stats);
             ri.setAddresses(newAddrs);
 
-            getContext().router().addCapabilities(ri);
             SigningPrivateKey key = getContext().keyManager().getSigningPrivateKey();
             if (key == null) {
                 _log.log(Log.CRIT, "Internal error - signing private key not known?  rescheduling publish for 30s");
