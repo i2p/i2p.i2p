@@ -57,7 +57,7 @@ abstract class LogWriterBase implements Runnable {
     }
 
     /**
-     *  @param ms
+     *  @param interval ms
      *  @since 0.9.18
      */
     public void setFlushInterval(long interval) {

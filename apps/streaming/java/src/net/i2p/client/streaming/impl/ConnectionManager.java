@@ -767,7 +767,6 @@ class ConnectionManager {
      *  blocking
      *
      *  @param timeoutMs greater than zero
-     *  @param notifier may be null
      *  @param payload non-null, include in packet, up to 32 bytes may be returned in pong
      *                 not copied, do not modify
      *  @return the payload received in the pong, zero-length if none, null on failure or timeout
