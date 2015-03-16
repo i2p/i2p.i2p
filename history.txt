@@ -1,5 +1,10 @@
 2015-03-16 zzz
  * Apache Tomcat 6.0.43
+ * NetDB: Send RI lookups directly to the floodfill if
+   we are already connected to him
+ * Router:
+   - Republish RI early if capabilities change
+   - Increase exploratory tunnel quantity if floodfill
  * Throttle: Reject tunnels based on job lag
 
 2015-03-15 zzz
