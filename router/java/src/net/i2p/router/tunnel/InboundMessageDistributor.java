@@ -63,75 +63,87 @@ class InboundMessageDistributor implements GarlicMessageReceiver.CloveReceiver {
         */
         
         int type = msg.getType();
-        // FVSJ or client lookups could also result in a DSRM.
-        // Since there's some code that replies directly to this to gather new ff RouterInfos,
-        // sanitize it
-        if ( (_client != null) && 
-             (type == DatabaseSearchReplyMessage.MESSAGE_TYPE)) {
-            // TODO: Strip in IterativeLookupJob etc. instead, depending on
-            // LS or RI and client or expl., so that we can safely follow references
-            // in a reply to a LS lookup over client tunnels.
-            // ILJ would also have to follow references via client tunnels
-          /****
-            DatabaseSearchReplyMessage orig = (DatabaseSearchReplyMessage) msg;
-            if (orig.getNumReplies() > 0) {
-                if (_log.shouldLog(Log.INFO))
-                    _log.info("Removing replies from a DSRM down a tunnel for " + _client + ": " + msg);
-                DatabaseSearchReplyMessage newMsg = new DatabaseSearchReplyMessage(_context);
-                newMsg.setFromHash(orig.getFromHash());
-                newMsg.setSearchKey(orig.getSearchKey());
-                msg = newMsg;
-            }
-          ****/
-        } else if ( (_client != null) && 
-                    (type == DatabaseStoreMessage.MESSAGE_TYPE)) {
-            DatabaseStoreMessage dsm = (DatabaseStoreMessage) msg;
-            if (dsm.getEntry().getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO) {
-                // FVSJ may result in an unsolicited RI store if the peer went non-ff.
-                // We handle this safely, so we don't ask him again.
-                // Todo: if peer was ff and RI is not ff, queue for exploration in netdb (but that isn't part of the facade now)
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Dropping DSM down a tunnel for " + _client + ": " + msg);
-                // Handle safely by just updating the caps table, after doing basic validation
-                Hash key = dsm.getKey();
-                if (_context.routerHash().equals(key))
+
+        // if the message came down a client tunnel:
+        if (_client != null) {
+            switch (type) {
+                 case DatabaseSearchReplyMessage.MESSAGE_TYPE:
+                     // FVSJ or client lookups could also result in a DSRM.
+                     // Since there's some code that replies directly to this to gather new ff RouterInfos,
+                     // sanitize it
+
+                     // TODO: Strip in IterativeLookupJob etc. instead, depending on
+                     // LS or RI and client or expl., so that we can safely follow references
+                     // in a reply to a LS lookup over client tunnels.
+                     // ILJ would also have to follow references via client tunnels
+                  /****
+                     DatabaseSearchReplyMessage orig = (DatabaseSearchReplyMessage) msg;
+                     if (orig.getNumReplies() > 0) {
+                         if (_log.shouldLog(Log.INFO))
+                             _log.info("Removing replies from a DSRM down a tunnel for " + _client + ": " + msg);
+                         DatabaseSearchReplyMessage newMsg = new DatabaseSearchReplyMessage(_context);
+                         newMsg.setFromHash(orig.getFromHash());
+                         newMsg.setSearchKey(orig.getSearchKey());
+                         msg = newMsg;
+                     }
+                   ****/
+                     break;
+
+                case DatabaseStoreMessage.MESSAGE_TYPE:
+                    DatabaseStoreMessage dsm = (DatabaseStoreMessage) msg;
+                    if (dsm.getEntry().getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO) {
+                        // FVSJ may result in an unsolicited RI store if the peer went non-ff.
+                        // We handle this safely, so we don't ask him again.
+                        // Todo: if peer was ff and RI is not ff, queue for exploration in netdb (but that isn't part of the facade now)
+                        if (_log.shouldLog(Log.WARN))
+                            _log.warn("Dropping DSM down a tunnel for " + _client + ": " + msg);
+                        // Handle safely by just updating the caps table, after doing basic validation
+                        Hash key = dsm.getKey();
+                        if (_context.routerHash().equals(key))
+                            return;
+                        RouterInfo ri = (RouterInfo) dsm.getEntry();
+                        if (!key.equals(ri.getIdentity().getHash()))
+                            return;
+                        if (!ri.isValid())
+                            return;
+                        RouterInfo oldri = _context.netDb().lookupRouterInfoLocally(key);
+                        // only update if RI is newer and non-ff
+                        if (oldri != null && oldri.getPublished() < ri.getPublished() &&
+                            !FloodfillNetworkDatabaseFacade.isFloodfill(ri)) {
+                            if (_log.shouldLog(Log.WARN))
+                                _log.warn("Updating caps for RI " + key + " from \"" +
+                                          oldri.getCapabilities() + "\" to \"" + ri.getCapabilities() + '"');
+                            _context.peerManager().setCapabilities(key, ri.getCapabilities());
+                        }
+                        return;
+                    } else if (dsm.getReplyToken() != 0) {
+                        if (_log.shouldLog(Log.WARN))
+                            _log.warn("Dropping LS DSM w/ reply token down a tunnel for " + _client + ": " + msg);
+                        return;
+                    } else {
+                        // allow DSM of our own key (used by FloodfillVerifyStoreJob)
+                        // or other keys (used by IterativeSearchJob)
+                        // as long as there's no reply token (we will never set a reply token but an attacker might)
+                        ((LeaseSet)dsm.getEntry()).setReceivedAsReply();
+                    }
+                    break;
+
+                case DeliveryStatusMessage.MESSAGE_TYPE:
+                case GarlicMessage.MESSAGE_TYPE:
+                case TunnelBuildReplyMessage.MESSAGE_TYPE:
+                case VariableTunnelBuildReplyMessage.MESSAGE_TYPE:
+                    // these are safe, handled below
+                    break;
+
+                default:
+                    // drop it, since we should only get the above message types down
+                    // client tunnels
+                    _context.statManager().addRateData("tunnel.dropDangerousClientTunnelMessage", 1, type);
+                    _log.error("Dropped dangerous message down a tunnel for " + _client + ": " + msg, new Exception("cause"));
                     return;
-                RouterInfo ri = (RouterInfo) dsm.getEntry();
-                if (!key.equals(ri.getIdentity().getHash()))
-                    return;
-                if (!ri.isValid())
-                    return;
-                RouterInfo oldri = _context.netDb().lookupRouterInfoLocally(key);
-                // only update if RI is newer and non-ff
-                if (oldri != null && oldri.getPublished() < ri.getPublished() &&
-                    !FloodfillNetworkDatabaseFacade.isFloodfill(ri)) {
-                    if (_log.shouldLog(Log.WARN))
-                        _log.warn("Updating caps for RI " + key + " from \"" +
-                                  oldri.getCapabilities() + "\" to \"" + ri.getCapabilities() + '"');
-                    _context.peerManager().setCapabilities(key, ri.getCapabilities());
-                }
-                return;
-            } else if (dsm.getReplyToken() != 0) {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Dropping LS DSM w/ reply token down a tunnel for " + _client + ": " + msg);
-                return;
-            } else {
-                // allow DSM of our own key (used by FloodfillVerifyStoreJob)
-                // or other keys (used by IterativeSearchJob)
-                // as long as there's no reply token (we will never set a reply token but an attacker might)
-                ((LeaseSet)dsm.getEntry()).setReceivedAsReply();
-            }
-        } else if ( (_client != null) && 
-             (type != DeliveryStatusMessage.MESSAGE_TYPE) &&
-             (type != GarlicMessage.MESSAGE_TYPE) &&
-             (type != TunnelBuildReplyMessage.MESSAGE_TYPE) &&
-             (type != VariableTunnelBuildReplyMessage.MESSAGE_TYPE)) {
-            // drop it, since we should only get tunnel test messages and garlic messages down
-            // client tunnels
-            _context.statManager().addRateData("tunnel.dropDangerousClientTunnelMessage", 1, type);
-            _log.error("Dropped dangerous message down a tunnel for " + _client + ": " + msg, new Exception("cause"));
-            return;
-        }
+
+            } // switch
+        } // client != null
 
         if ( (target == null) || ( (tunnel == null) && (_context.routerHash().equals(target) ) ) ) {
             // targetting us either implicitly (no target) or explicitly (no tunnel)
