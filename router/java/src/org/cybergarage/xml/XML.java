@@ -20,7 +20,8 @@ package org.cybergarage.xml;
 
 public class XML 
 {
-	public final static String CONTENT_TYPE = "text/xml; charset=\"utf-8\"";
+	public final static String DEFAULT_CONTENT_TYPE = "text/xml; charset=\"utf-8\"";
+	public final static String DEFAULT_CONTENT_LANGUAGE = "en";
 	public final static String CHARSET_UTF8 = "utf-8";
 
 	////////////////////////////////////////////////

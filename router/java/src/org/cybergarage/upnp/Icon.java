@@ -47,6 +47,10 @@ public class Icon
 		iconNode = node;
 	}
 
+	public Icon() {
+		this(new Node(ELEM_NAME));
+	}
+	
 	////////////////////////////////////////////////
 	//	isIconNode
 	////////////////////////////////////////////////
@@ -72,6 +76,14 @@ public class Icon
 		return getIconNode().getNodeValue(MIME_TYPE);
 	}
 
+	public boolean hasMimeType()
+	{
+		String iconMimeType = getMimeType();
+		if (iconMimeType == null)
+			return false;
+		return (0 < iconMimeType.length()) ? true : false;
+	}
+	
 	////////////////////////////////////////////////
 	//	width
 	////////////////////////////////////////////////
@@ -139,9 +151,21 @@ public class Icon
 		getIconNode().setNode(DEPTH, value);
 	}
 
-	public String getDepth()
+	public void setDepth(int value)
 	{
-		return getIconNode().getNodeValue(DEPTH);
+		try {
+			setDepth(Integer.toString(value));
+		}
+		catch (Exception e) {};
+	}
+	
+	public int getDepth()
+	{
+		try {
+			return Integer.parseInt(getIconNode().getNodeValue(DEPTH));
+		}
+		catch (Exception e) {};
+		return 0;
 	}
 
 	////////////////////////////////////////////////
@@ -159,6 +183,24 @@ public class Icon
 	{
 		return getIconNode().getNodeValue(URL);
 	}
+
+	public boolean hasURL()
+	{
+		String iconURL = getURL();
+		if (iconURL == null)
+			return false;
+		return (0 < iconURL.length()) ? true : false;
+	}
+	
+	public boolean isURL(String url)
+	{
+		if (url == null)
+			return false;
+		String iconURL = getURL();
+		if (iconURL == null)
+			return false;
+		return iconURL.equals(url);
+	}
 	
 	////////////////////////////////////////////////
 	//	userData
@@ -174,5 +216,26 @@ public class Icon
 	public Object getUserData() 
 	{
 		return userData;
+	}
+
+	////////////////////////////////////////////////
+	//	Bytes
+	////////////////////////////////////////////////
+
+	private byte bytes[] = null; 
+	
+	public void setBytes(byte data[]) 
+	{
+		bytes = data;
+	}
+
+	public boolean hasBytes() 
+	{
+		return (bytes != null) ? true : false;
+	}
+	
+	public byte[]getBytes() 
+	{
+		return bytes;
 	}
 }
