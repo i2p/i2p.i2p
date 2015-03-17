@@ -130,7 +130,7 @@ public class NotifyRequest extends SOAPRequest
 		setSID(sid);
 		setSEQ(notifyCnt);
 
-		setContentType(XML.CONTENT_TYPE);
+		setContentType(XML.DEFAULT_CONTENT_TYPE);
 		Node propSetNode = createPropertySetNode(varName, value);
 		setContent(propSetNode);		
 

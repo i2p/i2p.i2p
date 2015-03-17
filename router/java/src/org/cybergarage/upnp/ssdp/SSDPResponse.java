@@ -116,6 +116,20 @@ public class SSDPResponse extends HTTPResponse
 	}
 
 	////////////////////////////////////////////////
+	//	BootId
+	////////////////////////////////////////////////
+
+	public void setBootId(int bootId)
+	{
+		setHeader(HTTP.BOOTID_UPNP_ORG, bootId);
+	}
+
+	public int getBootId()
+	{
+		return getIntegerHeaderValue(HTTP.BOOTID_UPNP_ORG);
+	}
+	
+	////////////////////////////////////////////////
 	//	getHeader (Override)
 	////////////////////////////////////////////////
 	

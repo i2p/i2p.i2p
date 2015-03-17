@@ -45,7 +45,7 @@ public class UPnP
 	public final static String XML_CLASS_PROPERTTY="cyberlink.upnp.xml.parser";
 	
 	public final static String NAME = "CyberLinkJava";
-	public final static String VERSION = "1.8";
+	public final static String VERSION = "3.0";
 
 	public final static int SERVER_RETRY_COUNT = 100;
 	public final static int DEFAULT_EXPIRED_DEVICE_EXTRA_TIME = 60;
@@ -62,6 +62,8 @@ public class UPnP
 	public final static int INMPR03_DISCOVERY_OVER_WIRELESS_COUNT = 4;
 
 	public final static String XML_DECLARATION = "<?xml version=\"1.0\" encoding=\"utf-8\"?>"; 
+	
+	public final static int CONFIGID_UPNP_ORG_MAX = 16777215;
 	
 	////////////////////////////////////////////////
 	//	Enable / Disable
@@ -189,6 +191,34 @@ public class UPnP
 			toUUID((int)((time2 >> 32) | 0xE000) & 0xFFFF);
 	}
 
+	////////////////////////////////////////////////
+	//	BootId
+	////////////////////////////////////////////////
+
+	public static final int createBootId()
+	{
+		return (int)(System.currentTimeMillis() / 1000L);
+	}
+	
+	////////////////////////////////////////////////
+	//	ConfigId
+	////////////////////////////////////////////////
+
+	public static final int caluculateConfigId(String configXml)
+	{
+		if (configXml == null)
+			return 0;
+		int configId = 0;
+		int configLen = configXml.length();
+		for (int n=0; n<configLen; n++) {
+			configId += configXml.codePointAt(n);
+			if (configId < CONFIGID_UPNP_ORG_MAX)
+				continue;
+			configId = configId % CONFIGID_UPNP_ORG_MAX;
+		}
+		return configId;
+	}
+	
 	////////////////////////////////////////////////
 	// XML Parser
 	////////////////////////////////////////////////
