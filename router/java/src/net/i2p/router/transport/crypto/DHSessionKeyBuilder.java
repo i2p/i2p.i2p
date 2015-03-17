@@ -64,7 +64,7 @@ public class DHSessionKeyBuilder {
     private final static String PROP_DH_PRECALC_DELAY = "crypto.dh.precalc.delay";
     private final static int DEFAULT_DH_PRECALC_MIN = 20;
     private final static int DEFAULT_DH_PRECALC_MAX = 60;
-    private final static int DEFAULT_DH_PRECALC_DELAY = 50;
+    private final static int DEFAULT_DH_PRECALC_DELAY = 25;
 
     /**
      * Create a new public/private value pair for the DH exchange.
@@ -505,7 +505,7 @@ public class DHSessionKeyBuilder {
                         long curCalc = System.currentTimeMillis() - curStart;
                         // for some relief...
                         try {
-                            Thread.sleep(_calcDelay + (curCalc * 3));
+                            Thread.sleep(Math.min(200, Math.max(10, _calcDelay + (curCalc * 3))));
                         } catch (InterruptedException ie) { // nop
                         }
                     }
