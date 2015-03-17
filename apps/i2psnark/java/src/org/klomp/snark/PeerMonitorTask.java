@@ -21,13 +21,14 @@
 package org.klomp.snark;
 
 import java.util.Iterator;
-import java.util.TimerTask;
+
+import net.i2p.data.DataHelper;
 
 /**
  * TimerTask that monitors the peers and total up/download speeds.
  * Works together with the main Snark class to report periodical statistics.
  */
-class PeerMonitorTask extends TimerTask
+class PeerMonitorTask implements Runnable
 {
   final static long MONITOR_PERIOD = 10 * 1000; // Ten seconds.
   private static final long KILOPERSECOND = 1024 * (MONITOR_PERIOD / 1000);
@@ -83,21 +84,12 @@ class PeerMonitorTask extends TimerTask
 
     // Print some statistics
     long downloaded = coordinator.getDownloaded();
-    String totalDown;
-    if (downloaded >= 10 * 1024 * 1024)
-      totalDown = (downloaded / (1024 * 1024)) + "MB";
-    else
-      totalDown = (downloaded / 1024 )+ "KB";
+    String totalDown = DataHelper.formatSize(downloaded) + "B";
     long uploaded = coordinator.getUploaded();
-    String totalUp;
-    if (uploaded >= 10 * 1024 * 1024)
-      totalUp = (uploaded / (1024 * 1024)) + "MB";
-    else
-      totalUp = (uploaded / 1024) + "KB";
+    String totalUp = DataHelper.formatSize(uploaded) + "B";
     
     int needP = coordinator.storage.needed();
-    long needMB
-      = needP * coordinator.metainfo.getPieceLength(0) / (1024 * 1024);
+    long needMB = needP * coordinator.metainfo.getPieceLength(0) / (1024 * 1024);
     int totalP = coordinator.metainfo.getPieces();
     long totalMB = coordinator.metainfo.getTotalLength() / (1024 * 1024);
     

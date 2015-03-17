@@ -1,0 +1,299 @@
+/* I2P Console IE theme override for Classic */
+/* Comment: Welcome to the wonderful world of kludgey IE fixes (for best results use another browser) */
+/* Author: dr|z3d */
+
+.wideload {
+     overflow: auto;
+     width: 100%;
+}
+
+.formaction, form {
+     text-align: left !important;
+     margin: 0px 0 10px 0;
+}
+
+div.configure {
+     text-align: center;
+}
+
+div.configure hr {
+/*     display: none; */
+     margin-bottom: 10px !important;
+}
+
+div.configure p, div.configure table  {
+     text-align: justify;
+     margin: 10px 0;
+}
+
+div.main ul {
+     margin: 0 20px 0 40px;
+}
+
+div.configure textarea {
+     width: 450px !important;
+}
+
+div.configure input {
+     margin-left: 5px;
+}
+
+div.configure table {
+     width: auto !important;
+     text-align: left !important;
+}
+
+h1 {
+     padding: 24px 10px 23px 20px !important;
+     margin: 0 px 0 195px !important;
+     margin: 0 2px 0 200px !important;
+     color: #001;
+     border: 1px solid #89f !important;
+     border-left: 1px solid #89f !important;
+     text-align: left;
+}
+
+h2 {
+     padding: 12px !important;
+     text-align: left !important;
+     margin: 0 0 15px 0 !important;
+}
+
+h3 {
+     margin-top: 10px;
+     text-align: left !important
+}
+
+div.confignav {
+     padding: 15px 0 15px 0;
+     border-left: 0px;
+     margin-left: -15px;
+     border-top: 1px solid #89f;
+     margin-bottom: 10px !important;
+}
+
+div.messages {
+     border-left: 0;
+     border-right: 0;
+     margin: -10px -15px 0px -15px;
+}
+
+div.main {
+     margin: -5px 2px 10px 200px;
+     border: 1px solid #89f !important;
+}
+
+div.main hr, div.news hr {
+     margin: 0 10px !important;
+}
+
+div.news {
+     margin-left: 197px !important;
+     margin-right: 100px !important;
+     border-left: 1px solid #89f !important;
+}
+
+div.news hr {
+     height: 1px !important;
+     color: #ffffc0 !important; /* fixes immovable hr issue by making it invisible */
+}
+
+div.main {
+     border-top: 5px solid #bbf;
+}
+
+div.news {
+     border-left: 5px solid #bbf;
+     margin: 0px 5px 0 193px;
+     padding-bottom: 8px;
+}
+
+div.news hr {
+     color: #bbf;
+     background: #bbf;
+     height: 3px;
+     border: 0px;
+     margin: 0 -10px 0 -13px !important;
+}
+
+div.routersummaryouter {
+     left: 5px;
+     top: 5px;
+}
+
+div.routersummary {
+     color: #001;
+     padding-left: 0px;
+/*     border-left: 1px solid #bbf; */
+     text-align: center !important;
+     overflow: hidden; /* prevents IE from borking the sidepanel */
+     width: 195px !important;
+     padding-bottom: 20px !important;
+}
+
+div.routersummary submit {
+     padding: 0;
+     margin-bottom: 5px;
+}
+
+div.routersummary input[type=text] {
+     text-align: right !important;
+}
+
+div.routersummary hr {
+     color: #89f;
+     background: #89f;
+     height: 1px;
+     border-bottom: 1px solid #89f;
+     margin: 8px -2px 7px -1px;
+}
+
+div.routersummary h3 {
+     border: 0px solid #f00;
+     text-align: center !important;
+     font-size: 9pt;
+     letter-spacing: 0.05em;
+     margin: -14px 0px -15px 1px;
+     padding: 3px 0px !important;
+     background: #c5d5fb;
+     text-transform: uppercase;
+}
+
+div.routersummary h4 {
+     border: 0px solid #f00;
+     border-bottom: 0 !important;
+     font-size: 8.5pt;
+     letter-spacing: 0.05em;
+     margin: -14px 0px -15px 1px !important;
+     padding: 7px 3px 5px 3px;
+     background: #fff;
+     text-transform: capitalize;
+     text-decoration: none !important;
+     color: #2b2;
+     text-align: center !important;
+     line-height: 135%;
+}
+
+div.routersummary table {
+     border: 0;
+     text-align: center !important;
+     margin: -5px 5px !important;
+     width: 182px !important;
+     overflow: hidden;
+     font-size: 8pt;
+     padding: 0px -10px;
+     background-image: none !important;
+     background-color: transparent !important;
+}
+
+div.routersummary tr, div.routersummary td {
+     background-image: none !important;
+     background-color: transparent !important;
+     border: 0 !important;
+     line-height: 120% !important;
+     padding: 0 1px !important;
+}
+
+div.routersummary form {
+     margin-top: -25px !important;
+     margin-bottom: -25px !important;
+     text-align: center !important;
+}
+
+div.routersummary p {
+     padding: 0;
+}
+
+div.routersummary a:link, div.routersummary a:visited {
+     line-height: 120%;
+}
+
+div.routersummary a:hover {
+     color: #f60;
+}
+
+div.routersummary td {
+     padding: 2px 4px;
+     background-image: none !important;
+     border: 0 !important;
+}
+
+div.routersummary form {
+     margin: -20px 0 !important;
+}
+
+div.news li {
+     padding-top: 0px !important;
+     margin-bottom: -23px !important;
+}
+
+div.logo {
+}
+
+div.warning {
+     padding: 0px 20px 20px 80px;
+     margin-top: -20px;
+     margin-left: -10px !important;
+}
+
+.langbox {
+     margin: 7px -18px 0px 5px;
+}
+
+th {
+     text-align: left;
+     padding-left: 3px;
+     padding-right: 1px;
+}
+
+div.configure hr{
+     margin: 10px 0 15px 0;
+}
+
+input {
+     padding: 0;
+}
+
+div.graphspanel img {
+     border: 1px solid #99f;
+     margin: 6px 0 !important;
+     background: #ddf;
+     -moz-box-shadow: inset 0px 0px 1px 1px #99f;
+}
+
+div.graphspanel hr {
+     margin: 20px 0 10px !important;
+}
+
+table {
+     width: auto !important;
+}
+
+.links li {
+     list-style-image: url("images/link.png") !important;
+     list-style-image: none !important;
+     margin: 2px 15px 10px 0px !important;
+     padding-right: 5px;
+     list-style-position: outside;
+     display:list-item;
+}
+
+
+div.news {
+     margin: -1px 2px 0 200px !important;
+     padding: -10px 0px 8px 0px;
+     background: #ffffc0;
+     border: 1px solid #89f;
+     border-bottom: 1px solid #89f;
+     border-right: 1px solid #89f;
+     text-align: right;
+     color: #770;
+     min-width: 500px;
+     padding-bottom: 8px;
+     padding-left: 10px;
+     padding-right: 10px;
+     font-size: 7pt;
+}
+
+.routersummary h2, .routersummary h3 {
+     background: #fff url(images/tinytitle.png) center right tile-x !important;

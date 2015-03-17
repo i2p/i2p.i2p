@@ -12,83 +12,62 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
 import net.i2p.I2PAppContext;
+import net.i2p.data.DatabaseEntry;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
 import net.i2p.data.RouterInfo;
 import net.i2p.data.TunnelId;
-import net.i2p.util.Log;
 
 /**
  * Defines the message a router sends to another router to test the network
  * database reachability, as well as the reply message sent back.
  *
+ * TODO: Don't decompress and recompress RouterInfos at the OBEP and IBGW.
+ * Could this even change the message length or corrupt things?
+ *
  * @author jrandom
  */
-public class DatabaseStoreMessage extends I2NPMessageImpl {
-    private final static Log _log = new Log(DatabaseStoreMessage.class);
+public class DatabaseStoreMessage extends FastI2NPMessageImpl {
     public final static int MESSAGE_TYPE = 1;
     private Hash _key;
-    private int _type;
-    private LeaseSet _leaseSet;
-    private RouterInfo _info;
-    private byte[] _leaseSetCache;
-    private byte[] _routerInfoCache;
+    private DatabaseEntry _dbEntry;
+    private byte[] _byteCache;
     private long _replyToken;
     private TunnelId _replyTunnel;
     private Hash _replyGateway;
     
-    public final static int KEY_TYPE_ROUTERINFO = 0;
-    public final static int KEY_TYPE_LEASESET = 1;
-    
     public DatabaseStoreMessage(I2PAppContext context) {
         super(context);
-        setValueType(-1);
-        setKey(null);
-        setLeaseSet(null);
-        setRouterInfo(null);
-        setReplyToken(0);
-        setReplyTunnel(null);
-        setReplyGateway(null);
     }
     
     /**
      * Defines the key in the network database being stored
      *
      */
-    public Hash getKey() { return _key; }
-    public void setKey(Hash key) { _key = key; }
-    
-    /**
-     * Defines the router info value in the network database being stored
-     *
-     */
-    public RouterInfo getRouterInfo() { return _info; }
-    public void setRouterInfo(RouterInfo routerInfo) {
-        _info = routerInfo;
-        if (_info != null)
-            setValueType(KEY_TYPE_ROUTERINFO);
+    public Hash getKey() {
+        if (_key != null)
+            return _key;   // receive
+        if (_dbEntry != null)
+            return _dbEntry.getHash();   // create
+        return null;
     }
     
     /**
-     * Defines the lease set value in the network database being stored
-     *
+     * Defines the entry in the network database being stored
      */
-    public LeaseSet getLeaseSet() { return _leaseSet; }
-    public void setLeaseSet(LeaseSet leaseSet) {
-        _leaseSet = leaseSet;
-        if (_leaseSet != null)
-            setValueType(KEY_TYPE_LEASESET);
-    }
-    
+    public DatabaseEntry getEntry() { return _dbEntry; }
+
     /**
-     * Defines type of key being stored in the network database -
-     * either KEY_TYPE_ROUTERINFO or KEY_TYPE_LEASESET
-     *
+     * This also sets the key
+     * @throws IllegalStateException if data previously set, to protect saved checksum
      */
-    public int getValueType() { return _type; }
-    public void setValueType(int type) { _type = type; }
+    public void setEntry(DatabaseEntry entry) {
+        if (_dbEntry != null)
+            throw new IllegalStateException();
+        _dbEntry = entry;
+    }
     
     /**
      * If a reply is desired, this token specifies the message ID that should
@@ -98,6 +77,7 @@ public class DatabaseStoreMessage extends I2NPMessageImpl {
      * @return positive reply token ID, or 0 if no reply is necessary.
      */
     public long getReplyToken() { return _replyToken; }
+
     /**
      * Update the reply token.
      *
@@ -117,16 +97,14 @@ public class DatabaseStoreMessage extends I2NPMessageImpl {
     public Hash getReplyGateway() { return _replyGateway; }
     public void setReplyGateway(Hash peer) { _replyGateway = peer; }
     
-    public void readMessage(byte data[], int offset, int dataSize, int type) throws I2NPMessageException, IOException {
+    public void readMessage(byte data[], int offset, int dataSize, int type) throws I2NPMessageException {
         if (type != MESSAGE_TYPE) throw new I2NPMessageException("Message type is incorrect for this message");
         int curIndex = offset;
         
-        byte keyData[] = new byte[Hash.HASH_LENGTH];
-        System.arraycopy(data, curIndex, keyData, 0, Hash.HASH_LENGTH);
+        _key = Hash.create(data, curIndex);
         curIndex += Hash.HASH_LENGTH;
-        _key = new Hash(keyData);
         
-        _type = (int)DataHelper.fromLong(data, curIndex, 1);
+        type = (int)DataHelper.fromLong(data, curIndex, 1);
         curIndex++;
         
         _replyToken = DataHelper.fromLong(data, curIndex, 4);
@@ -138,68 +116,93 @@ public class DatabaseStoreMessage extends I2NPMessageImpl {
                 _replyTunnel = new TunnelId(tunnel);
             curIndex += 4;
             
-            byte gw[] = new byte[Hash.HASH_LENGTH];
-            System.arraycopy(data, curIndex, gw, 0, Hash.HASH_LENGTH);
+            _replyGateway = Hash.create(data, curIndex);
             curIndex += Hash.HASH_LENGTH;
-            _replyGateway = new Hash(gw);
         } else {
             _replyTunnel = null;
             _replyGateway = null;
         }
         
-        if (_type == KEY_TYPE_LEASESET) {
-            _leaseSet = new LeaseSet();
+        if (type == DatabaseEntry.KEY_TYPE_LEASESET) {
+            _dbEntry = new LeaseSet();
             try {
-                _leaseSet.readBytes(new ByteArrayInputStream(data, curIndex, data.length-curIndex));
+                _dbEntry.readBytes(new ByteArrayInputStream(data, curIndex, data.length-curIndex));
             } catch (DataFormatException dfe) {
                 throw new I2NPMessageException("Error reading the leaseSet", dfe);
+            } catch (IOException ioe) {
+                throw new I2NPMessageException("Error reading the leaseSet", ioe);
             }
-        } else if (_type == KEY_TYPE_ROUTERINFO) {
-            _info = new RouterInfo();
+        } else if (type == DatabaseEntry.KEY_TYPE_ROUTERINFO) {
+            _dbEntry = new RouterInfo();
             int compressedSize = (int)DataHelper.fromLong(data, curIndex, 2);
             curIndex += 2;
+            if (compressedSize <= 0 || curIndex + compressedSize > data.length || curIndex + compressedSize > dataSize + offset)
+                throw new I2NPMessageException("Compressed RI length: " + compressedSize +
+                                               " but remaining bytes: " + Math.min(data.length - curIndex, dataSize + offset -curIndex));
             
             try {
+                // TODO we could delay decompression, just copy to a new byte array and store in _byteCache
+                // May not be necessary since the IBGW now uses UnknownI2NPMessage.
+                // DSMs at the OBEP are generally garlic wrapped, so the OBEP won't see it.
+                // If we do delay it, getEntry() will have to check if _dbEntry is null and _byteCache
+                // is non-null, and then decompress.
                 byte decompressed[] = DataHelper.decompress(data, curIndex, compressedSize);
-                _info.readBytes(new ByteArrayInputStream(decompressed));
+                _dbEntry.readBytes(new ByteArrayInputStream(decompressed));
             } catch (DataFormatException dfe) {
                 throw new I2NPMessageException("Error reading the routerInfo", dfe);
             } catch (IOException ioe) {
-                throw new I2NPMessageException("Compressed routerInfo was corrupt", ioe);
+                throw new I2NPMessageException("Corrupt compressed routerInfo size = " + compressedSize, ioe);
             }
         } else {
-            throw new I2NPMessageException("Invalid type of key read from the structure - " + _type);
+            throw new I2NPMessageException("Invalid type of key read from the structure - " + type);
         }
+        //if (!key.equals(_dbEntry.getHash()))
+        //    throw new I2NPMessageException("Hash mismatch in DSM");
     }
     
     
-    /** calculate the message body's length (not including the header and footer */
+    /**
+     *  calculate the message body's length (not including the header and footer)
+     *
+     *  @throws IllegalStateException
+     */
     protected int calculateWrittenLength() { 
+        // TODO if _byteCache is non-null, don't check _dbEntry
+        if (_dbEntry == null)
+            throw new IllegalStateException("Missing entry");
         int len = Hash.HASH_LENGTH + 1 + 4; // key+type+replyToken
         if (_replyToken > 0) 
             len += 4 + Hash.HASH_LENGTH; // replyTunnel+replyGateway
-        if (_type == KEY_TYPE_LEASESET) {
-            _leaseSetCache = _leaseSet.toByteArray();
-            len += _leaseSetCache.length;
-        } else if (_type == KEY_TYPE_ROUTERINFO) {
-            byte uncompressed[] = _info.toByteArray();
-            byte compressed[] = DataHelper.compress(uncompressed);
-            _routerInfoCache = compressed;
-            len += compressed.length + 2;
+        int type = _dbEntry.getType();
+        if (type == DatabaseEntry.KEY_TYPE_LEASESET) {
+            if (_byteCache == null) {
+                _byteCache = _dbEntry.toByteArray();
+            }
+        } else if (type == DatabaseEntry.KEY_TYPE_ROUTERINFO) {
+            // only decompress once
+            if (_byteCache == null) {
+                byte uncompressed[] = _dbEntry.toByteArray();
+                _byteCache = DataHelper.compress(uncompressed);
+            }
+            len += 2;
+        } else {
+            throw new IllegalStateException("Invalid key type " + type);
         }
+        len += _byteCache.length;
         return len;
     }
+
     /** write the message body to the output array, starting at the given index */
     protected int writeMessageBody(byte out[], int curIndex) throws I2NPMessageException {
-        if (_key == null) throw new I2NPMessageException("Invalid key");
-        if ( (_type != KEY_TYPE_LEASESET) && (_type != KEY_TYPE_ROUTERINFO) ) throw new I2NPMessageException("Invalid key type");
-        if ( (_type == KEY_TYPE_LEASESET) && (_leaseSet == null) ) throw new I2NPMessageException("Missing lease set");
-        if ( (_type == KEY_TYPE_ROUTERINFO) && (_info == null) ) throw new I2NPMessageException("Missing router info");
+        if (_dbEntry == null) throw new I2NPMessageException("Missing entry");
+        int type = _dbEntry.getType();
+        if (type != DatabaseEntry.KEY_TYPE_LEASESET && type != DatabaseEntry.KEY_TYPE_ROUTERINFO)
+            throw new I2NPMessageException("Invalid key type " + type);
         
-        System.arraycopy(_key.getData(), 0, out, curIndex, Hash.HASH_LENGTH);
+        // Use the hash of the DatabaseEntry
+        System.arraycopy(getKey().getData(), 0, out, curIndex, Hash.HASH_LENGTH);
         curIndex += Hash.HASH_LENGTH;
-        byte type[] = DataHelper.toLong(1, _type);
-        out[curIndex++] = type[0];
+        out[curIndex++] = (byte) type;
         byte tok[] = DataHelper.toLong(4, _replyToken);
         System.arraycopy(tok, 0, out, curIndex, 4);
         curIndex += 4;
@@ -215,59 +218,53 @@ public class DatabaseStoreMessage extends I2NPMessageImpl {
             curIndex += Hash.HASH_LENGTH;
         }
         
-        if (_type == KEY_TYPE_LEASESET) {
-            // initialized in calculateWrittenLength
-            System.arraycopy(_leaseSetCache, 0, out, curIndex, _leaseSetCache.length);
-            curIndex += _leaseSetCache.length;
-        } else if (_type == KEY_TYPE_ROUTERINFO) {
-            byte len[] = DataHelper.toLong(2, _routerInfoCache.length);
+        // _byteCache initialized in calculateWrittenLength
+        if (type == DatabaseEntry.KEY_TYPE_ROUTERINFO) {
+            byte len[] = DataHelper.toLong(2, _byteCache.length);
             out[curIndex++] = len[0];
             out[curIndex++] = len[1];
-            System.arraycopy(_routerInfoCache, 0, out, curIndex, _routerInfoCache.length);
-            curIndex += _routerInfoCache.length;
         }
+        System.arraycopy(_byteCache, 0, out, curIndex, _byteCache.length);
+        curIndex += _byteCache.length;
         return curIndex;
     }
     
     public int getType() { return MESSAGE_TYPE; }
     
+    @Override
     public int hashCode() {
         return DataHelper.hashCode(getKey()) +
-               DataHelper.hashCode(getLeaseSet()) +
-               DataHelper.hashCode(getRouterInfo()) +
-               getValueType() +
-               (int)getReplyToken() +
-               DataHelper.hashCode(getReplyTunnel()) +
-               DataHelper.hashCode(getReplyGateway());
+               DataHelper.hashCode(_dbEntry) +
+               (int) _replyToken +
+               DataHelper.hashCode(_replyTunnel) +
+               DataHelper.hashCode(_replyGateway);
     }
     
+    @Override
     public boolean equals(Object object) {
         if ( (object != null) && (object instanceof DatabaseStoreMessage) ) {
             DatabaseStoreMessage msg = (DatabaseStoreMessage)object;
             return DataHelper.eq(getKey(),msg.getKey()) &&
-                   DataHelper.eq(getLeaseSet(),msg.getLeaseSet()) &&
-                   DataHelper.eq(getRouterInfo(),msg.getRouterInfo()) &&
-                   DataHelper.eq(getValueType(),msg.getValueType()) &&
-                   getReplyToken() == msg.getReplyToken() &&
-                   DataHelper.eq(getReplyTunnel(), msg.getReplyTunnel()) &&
-                   DataHelper.eq(getReplyGateway(), msg.getReplyGateway());
+                   DataHelper.eq(_dbEntry,msg.getEntry()) &&
+                   _replyToken == msg._replyToken &&
+                   DataHelper.eq(_replyTunnel, msg._replyTunnel) &&
+                   DataHelper.eq(_replyGateway, msg._replyGateway);
         } else {
             return false;
         }
     }
     
+    @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append("[DatabaseStoreMessage: ");
-        buf.append("\n\tExpiration: ").append(getMessageExpiration());
-        buf.append("\n\tUnique ID: ").append(getUniqueId());
+        buf.append("\n\tExpiration: ").append(_expiration);
+        buf.append("\n\tUnique ID: ").append(_uniqueId);
         buf.append("\n\tKey: ").append(getKey());
-        buf.append("\n\tValue Type: ").append(getValueType());
-        buf.append("\n\tRouter Info: ").append(getRouterInfo());
-        buf.append("\n\tLease Set: ").append(getLeaseSet());
-        buf.append("\n\tReply token: ").append(getReplyToken());
-        buf.append("\n\tReply tunnel: ").append(getReplyTunnel());
-        buf.append("\n\tReply gateway: ").append(getReplyGateway());
+        buf.append("\n\tEntry: ").append(_dbEntry);
+        buf.append("\n\tReply token: ").append(_replyToken);
+        buf.append("\n\tReply tunnel: ").append(_replyTunnel);
+        buf.append("\n\tReply gateway: ").append(_replyGateway);
         buf.append("]");
         return buf.toString();
     }

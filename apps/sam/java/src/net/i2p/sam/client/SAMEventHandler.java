@@ -12,17 +12,17 @@ import net.i2p.util.Log;
  *
  */
 public class SAMEventHandler extends SAMClientEventListenerImpl {
-    private I2PAppContext _context;
+    //private I2PAppContext _context;
     private Log _log;
     private Boolean _helloOk;
     private Object _helloLock = new Object();
     private Boolean _sessionCreateOk;
     private Object _sessionCreateLock = new Object();
     private Object _namingReplyLock = new Object();
-    private Map _namingReplies = new HashMap();
+    private Map<String,String> _namingReplies = new HashMap<String,String>();
 
     public SAMEventHandler(I2PAppContext ctx) {
-        _context = ctx;
+        //_context = ctx;
         _log = ctx.logManager().getLog(getClass());
     }
     
@@ -116,7 +116,7 @@ public class SAMEventHandler extends SAMClientEventListenerImpl {
         while (true) {
             try {
                 synchronized (_namingReplyLock) {
-                    String val = (String)_namingReplies.remove(name);
+                    String val = _namingReplies.remove(name);
                     if (val == null) {
                         _namingReplyLock.wait();
                     } else {

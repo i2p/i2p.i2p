@@ -1,0 +1,17 @@
+<%
+/*
+ * TODO - the bar would render more cleanly if we specified the img height and width here,
+ * but unfortunately the images in the different themes are different sizes.
+ * They range in height from 37 to 43 px. But there's a -2 bottom margin...
+ * So put it in a div.
+ */
+%>
+  <div style="height: 36px;">
+   <a href="/" target="_top">
+    <img src="<%=intl.getTheme(request.getHeader("User-Agent"))%>images/i2plogo.png" alt="<%=intl._("I2P Router Console")%>" title="<%=intl._("I2P Router Console")%>">
+   </a>
+  </div>
+  <div id="xhr">
+<!-- for non-script -->
+<%@include file="xhr1.jsi" %>
+  </div>

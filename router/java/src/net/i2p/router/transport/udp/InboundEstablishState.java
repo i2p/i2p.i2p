@@ -3,7 +3,6 @@ package net.i2p.router.transport.udp;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
-import net.i2p.crypto.DHSessionKeyBuilder;
 import net.i2p.data.Base64;
 import net.i2p.data.ByteArray;
 import net.i2p.data.DataFormatException;
@@ -12,6 +11,8 @@ import net.i2p.data.RouterIdentity;
 import net.i2p.data.SessionKey;
 import net.i2p.data.Signature;
 import net.i2p.router.RouterContext;
+import net.i2p.router.transport.crypto.DHSessionKeyBuilder;
+import net.i2p.util.Addresses;
 import net.i2p.util.Log;
 
 /**
@@ -19,67 +20,80 @@ import net.i2p.util.Log;
  * initiated the connection with us.  In other words, they are Alice and
  * we are Bob.
  *
+ * TODO do all these methods need to be synchronized?
  */
-public class InboundEstablishState {
-    private RouterContext _context;
-    private Log _log;
+class InboundEstablishState {
+    private final RouterContext _context;
+    private final Log _log;
     // SessionRequest message
     private byte _receivedX[];
     private byte _bobIP[];
-    private int _bobPort;
-    private DHSessionKeyBuilder _keyBuilder;
+    private final int _bobPort;
+    private final DHSessionKeyBuilder _keyBuilder;
     // SessionCreated message
     private byte _sentY[];
-    private byte _aliceIP[];
-    private int _alicePort;
+    private final byte _aliceIP[];
+    private final int _alicePort;
     private long _sentRelayTag;
     private long _sentSignedOnTime;
     private SessionKey _sessionKey;
     private SessionKey _macKey;
     private Signature _sentSignature;
-    // SessionConfirmed messages
+    // SessionConfirmed messages - fragmented in theory but not in practice - see below
     private byte _receivedIdentity[][];
     private long _receivedSignedOnTime;
     private byte _receivedSignature[];
     private boolean _verificationAttempted;
     private RouterIdentity _receivedConfirmedIdentity;
     // general status 
-    private long _establishBegin;
-    private long _lastReceive;
+    private final long _establishBegin;
+    //private long _lastReceive;
     private long _lastSend;
     private long _nextSend;
-    private RemoteHostId _remoteHostId;
-    private int _currentState;
+    private final RemoteHostId _remoteHostId;
+    private InboundState _currentState;
     private boolean _complete;
+    // count for backoff
+    private int _createdSentCount;
     
-    /** nothin known yet */
-    public static final int STATE_UNKNOWN = 0;
-    /** we have received an initial request */
-    public static final int STATE_REQUEST_RECEIVED = 1;
-    /** we have sent a signed creation packet */
-    public static final int STATE_CREATED_SENT = 2;
-    /** we have received one or more confirmation packets */
-    public static final int STATE_CONFIRMED_PARTIALLY = 3;
-    /** we have completely received all of the confirmation packets */
-    public static final int STATE_CONFIRMED_COMPLETELY = 4;
-    /** we are explicitly failing it */
-    public static final int STATE_FAILED = 5;
+    public enum InboundState {
+        /** nothin known yet */
+        IB_STATE_UNKNOWN,
+        /** we have received an initial request */
+        IB_STATE_REQUEST_RECEIVED,
+        /** we have sent a signed creation packet */
+        IB_STATE_CREATED_SENT,
+        /** we have received one but not all the confirmation packets
+          * This never happens in practice - see below. */
+        IB_STATE_CONFIRMED_PARTIALLY,
+        /** we have all the confirmation packets */
+        IB_STATE_CONFIRMED_COMPLETELY,
+        /** we are explicitly failing it */
+        IB_STATE_FAILED
+    }
     
-    public InboundEstablishState(RouterContext ctx, byte remoteIP[], int remotePort, int localPort) {
+    /** basic delay before backoff */
+    private static final long RETRANSMIT_DELAY = 1500;
+
+    /** max delay including backoff */
+    private static final long MAX_DELAY = 15*1000;
+
+    public InboundEstablishState(RouterContext ctx, byte remoteIP[], int remotePort, int localPort,
+                                 DHSessionKeyBuilder dh) {
         _context = ctx;
         _log = ctx.logManager().getLog(InboundEstablishState.class);
         _aliceIP = remoteIP;
         _alicePort = remotePort;
         _remoteHostId = new RemoteHostId(_aliceIP, _alicePort);
         _bobPort = localPort;
-        _keyBuilder = null;
-        _verificationAttempted = false;
-        _complete = false;
-        _currentState = STATE_UNKNOWN;
+        _currentState = InboundState.IB_STATE_UNKNOWN;
         _establishBegin = ctx.clock().now();
+        _keyBuilder = dh;
     }
     
-    public synchronized int getState() { return _currentState; }
+    public synchronized InboundState getState() { return _currentState; }
+
+    /** @return if previously complete */
     public synchronized boolean complete() { 
         boolean already = _complete; 
         _complete = true; 
@@ -94,9 +108,9 @@ public class InboundEstablishState {
             _bobIP = new byte[req.readIPSize()];
         req.readIP(_bobIP, 0);
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Receive sessionRequest, BobIP = " + Base64.encode(_bobIP));
-        if (_currentState == STATE_UNKNOWN)
-            _currentState = STATE_REQUEST_RECEIVED;
+            _log.debug("Receive sessionRequest, BobIP = " + Addresses.toString(_bobIP));
+        if (_currentState == InboundState.IB_STATE_UNKNOWN)
+            _currentState = InboundState.IB_STATE_REQUEST_RECEIVED;
         packetReceived();
     }
     
@@ -104,9 +118,11 @@ public class InboundEstablishState {
     public synchronized byte[] getReceivedX() { return _receivedX; }
     public synchronized byte[] getReceivedOurIP() { return _bobIP; }
     
+    /**
+     *  Generates session key and mac key.
+     */
     public synchronized void generateSessionKey() throws DHSessionKeyBuilder.InvalidPublicParameterException {
         if (_sessionKey != null) return;
-        _keyBuilder = new DHSessionKeyBuilder();
         _keyBuilder.setPeerPublicValue(_receivedX);
         _sessionKey = _keyBuilder.getSessionKey();
         ByteArray extra = _keyBuilder.getExtraBytes();
@@ -121,9 +137,10 @@ public class InboundEstablishState {
     public synchronized SessionKey getMACKey() { return _macKey; }
 
     /** what IP do they appear to be on? */
-    public synchronized byte[] getSentIP() { return _aliceIP; }
+    public byte[] getSentIP() { return _aliceIP; }
+
     /** what port number do they appear to be coming from? */
-    public synchronized int getSentPort() { return _alicePort; }
+    public int getSentPort() { return _alicePort; }
     
     public synchronized byte[] getBobIP() { return _bobIP; }
     
@@ -134,7 +151,7 @@ public class InboundEstablishState {
     }
     
     public synchronized void fail() {
-        _currentState = STATE_FAILED;
+        _currentState = InboundState.IB_STATE_FAILED;
     }
     
     public synchronized long getSentRelayTag() { return _sentRelayTag; }
@@ -181,14 +198,12 @@ public class InboundEstablishState {
         _sentSignature = _context.dsa().sign(signed, _context.keyManager().getSigningPrivateKey());
         
         if (_log.shouldLog(Log.DEBUG)) {
-            StringBuffer buf = new StringBuffer(128);
+            StringBuilder buf = new StringBuilder(128);
             buf.append("Signing sessionCreated:");
             buf.append(" ReceivedX: ").append(Base64.encode(_receivedX));
             buf.append(" SentY: ").append(Base64.encode(_sentY));
-            buf.append(" AliceIP: ").append(Base64.encode(_aliceIP));
-            buf.append(" AlicePort: ").append(_alicePort);
-            buf.append(" BobIP: ").append(Base64.encode(_bobIP));
-            buf.append(" BobPort: ").append(_bobPort);
+            buf.append(" Alice: ").append(Addresses.toString(_aliceIP, _alicePort));
+            buf.append(" Bob: ").append(Addresses.toString(_bobIP, _bobPort));
             buf.append(" RelayTag: ").append(_sentRelayTag);
             buf.append(" SignedOn: ").append(_sentSignedOnTime);
             buf.append(" signature: ").append(Base64.encode(_sentSignature.getData()));
@@ -199,23 +214,42 @@ public class InboundEstablishState {
     /** note that we just sent a SessionCreated packet */
     public synchronized void createdPacketSent() {
         _lastSend = _context.clock().now();
-        if ( (_currentState == STATE_UNKNOWN) || (_currentState == STATE_REQUEST_RECEIVED) )
-            _currentState = STATE_CREATED_SENT;
+        long delay;
+        if (_createdSentCount == 0) {
+            delay = RETRANSMIT_DELAY;
+        } else {
+            delay = Math.min(RETRANSMIT_DELAY << _createdSentCount, MAX_DELAY);
+        }
+        _createdSentCount++;
+        _nextSend = _lastSend + delay;
+        if ( (_currentState == InboundState.IB_STATE_UNKNOWN) || (_currentState == InboundState.IB_STATE_REQUEST_RECEIVED) )
+            _currentState = InboundState.IB_STATE_CREATED_SENT;
     }
-    
+
     /** how long have we been trying to establish this session? */
-    public synchronized long getLifetime() { return _context.clock().now() - _establishBegin; }
-    public synchronized long getEstablishBeginTime() { return _establishBegin; }
+    public long getLifetime() { return _context.clock().now() - _establishBegin; }
+    public long getEstablishBeginTime() { return _establishBegin; }
     public synchronized long getNextSendTime() { return _nextSend; }
-    public synchronized void setNextSendTime(long when) { _nextSend = when; }
 
     /** RemoteHostId, uniquely identifies an attempt */
-    public RemoteHostId getRemoteHostId() { return _remoteHostId; }
+    RemoteHostId getRemoteHostId() { return _remoteHostId; }
 
+    /**
+     *  Note that while a SessionConfirmed could in theory be fragmented,
+     *  in practice a RouterIdentity is 387 bytes and a single fragment is 512 bytes max,
+     *  so it will never be fragmented.
+     */
     public synchronized void receiveSessionConfirmed(UDPPacketReader.SessionConfirmedReader conf) {
         if (_receivedIdentity == null)
             _receivedIdentity = new byte[conf.readTotalFragmentNum()][];
         int cur = conf.readCurrentFragmentNum();
+        if (cur >= _receivedIdentity.length) {
+            // avoid AIOOBE
+            // should do more than this, but what? disconnect?
+            fail();
+            packetReceived();
+            return;
+        }
         if (_receivedIdentity[cur] == null) {
             byte fragment[] = new byte[conf.readCurrentFragmentSize()];
             conf.readFragmentData(fragment, 0);
@@ -229,20 +263,23 @@ public class InboundEstablishState {
             conf.readFinalSignature(_receivedSignature, 0);
         }
         
-        if ( (_currentState == STATE_UNKNOWN) || 
-             (_currentState == STATE_REQUEST_RECEIVED) ||
-             (_currentState == STATE_CREATED_SENT) ) {
+        if ( (_currentState == InboundState.IB_STATE_UNKNOWN) || 
+             (_currentState == InboundState.IB_STATE_REQUEST_RECEIVED) ||
+             (_currentState == InboundState.IB_STATE_CREATED_SENT) ) {
             if (confirmedFullyReceived())
-                _currentState = STATE_CONFIRMED_COMPLETELY;
+                _currentState = InboundState.IB_STATE_CONFIRMED_COMPLETELY;
             else
-                _currentState = STATE_CONFIRMED_PARTIALLY;
+                _currentState = InboundState.IB_STATE_CONFIRMED_PARTIALLY;
         }
         
         packetReceived();
     }
     
-    /** have we fully received the SessionConfirmed messages from Alice? */
-    public synchronized boolean confirmedFullyReceived() {
+    /**
+     *  Have we fully received the SessionConfirmed messages from Alice?
+     *  Caller must synch on this.
+     */
+    private boolean confirmedFullyReceived() {
         if (_receivedIdentity != null) {
             for (int i = 0; i < _receivedIdentity.length; i++)
                 if (_receivedIdentity[i] == null)
@@ -327,26 +364,22 @@ public class InboundEstablishState {
     }
     
     private void packetReceived() {
-        _lastReceive = _context.clock().now();
-        _nextSend = _lastReceive;
+        _nextSend = _context.clock().now();
     }
     
+    @Override
     public String toString() {            
-        StringBuffer buf = new StringBuffer(128);
-        buf.append(super.toString());
+        StringBuilder buf = new StringBuilder(128);
+        buf.append("IES ").append(super.toString());
         if (_receivedX != null)
             buf.append(" ReceivedX: ").append(Base64.encode(_receivedX, 0, 4));
         if (_sentY != null)
             buf.append(" SentY: ").append(Base64.encode(_sentY, 0, 4));
-        if (_aliceIP != null)
-            buf.append(" AliceIP: ").append(Base64.encode(_aliceIP));
-        buf.append(" AlicePort: ").append(_alicePort);
-        if (_bobIP != null)
-            buf.append(" BobIP: ").append(Base64.encode(_bobIP));
-        buf.append(" BobPort: ").append(_bobPort);
+        buf.append(" Alice: ").append(Addresses.toString(_aliceIP, _alicePort));
+        buf.append(" Bob: ").append(Addresses.toString(_bobIP, _bobPort));
         buf.append(" RelayTag: ").append(_sentRelayTag);
         buf.append(" SignedOn: ").append(_sentSignedOnTime);
-        buf.append(" state: ").append(_currentState);
+        buf.append(' ').append(_currentState);
         return buf.toString();
     }
 }

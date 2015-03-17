@@ -9,41 +9,53 @@ package net.i2p.router.networkdb.kademlia;
  */
 
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
-import net.i2p.router.RouterContext;
+import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.Log;
 import net.i2p.util.RandomSource;
 
 class KBucketImpl implements KBucket {
     private Log _log;
-    /** set of Hash objects for the peers in the kbucket */
-    private List _entries;
+    /**
+     *  set of Hash objects for the peers in the kbucketx
+     *
+     *  jrandom switched from a HashSet to an ArrayList with this change:
+     *  2005-08-27  jrandom
+     *    * Minor logging and optimization tweaks in the router and SDK
+     *
+     *  Now we switch back to a ConcurrentHashSet and remove all the
+     *  synchronization, which may or may not be faster than
+     *  a synchronized ArrayList, with checks for existence before
+     *  adding a Hash. But the other benefit is it removes one
+     *  cause of profileMangager/netDb deadlock.
+     */
+    private final Set<Hash> _entries;
     /** we center the kbucket set on the given hash, and derive distances from this */
-    private Hash _local;
+    private LocalHash _local;
     /** include if any bits equal or higher to this bit (in big endian order) */
     private int _begin;
     /** include if no bits higher than this bit (inclusive) are set */
     private int _end;
     /** when did we last shake things up */
     private long _lastShuffle;
-    private static final int SHUFFLE_DELAY = 10*60*1000;
     private I2PAppContext _context;
     
-    public KBucketImpl(I2PAppContext context, Hash local) {
+    public KBucketImpl(I2PAppContext context, LocalHash local) {
         _context = context;
         _log = context.logManager().getLog(KBucketImpl.class);
-        _entries = new ArrayList(0); //all but the last 1 or 2 buckets will be empty
+        _entries = new ConcurrentHashSet(2); //all but the last 1 or 2 buckets will be empty
         _lastShuffle = context.clock().now();
         setLocal(local);
+    }
+    
+    /** for testing - use above constructor for production to get common caching */
+    public KBucketImpl(I2PAppContext context, Hash local) {
+        this(context, new LocalHash(local));
     }
     
     public int getRangeBegin() { return _begin; }
@@ -53,13 +65,11 @@ class KBucketImpl implements KBucket {
         _end = highOrderBitLimit;
     }
     public int getKeyCount() {
-        synchronized (_entries) {
-            return _entries.size();
-        }
+        return _entries.size();
     }
     
-    public Hash getLocal() { return _local; }
-    private void setLocal(Hash local) {
+    public LocalHash getLocal() { return _local; }
+    private void setLocal(LocalHash local) {
         _local = local; 
         // we want to make sure we've got the cache in place before calling cachedXor
         _local.prepareCache();
@@ -198,46 +208,35 @@ class KBucketImpl implements KBucket {
         return true;
     }
     
-    public Set getEntries() {
-        Set entries = new HashSet(64);
-        synchronized (_entries) {
-            for (int i = 0; i < _entries.size(); i++) 
-                entries.add((Hash)_entries.get(i));
-        }
+    public Set<Hash> getEntries() {
+        Set<Hash> entries = new HashSet(_entries);
         return entries;
     }
-    public Set getEntries(Set toIgnoreHashes) {
-        Set entries = new HashSet(64);
-        synchronized (_entries) {
-            for (int i = 0; i < _entries.size(); i++) 
-                entries.add((Hash)_entries.get(i));
-            entries.removeAll(toIgnoreHashes);
-        }
+    public Set<Hash> getEntries(Set toIgnoreHashes) {
+        Set<Hash> entries = new HashSet(_entries);
+        entries.removeAll(toIgnoreHashes);
         return entries;
     }
     
     public void getEntries(SelectionCollector collector) {
-        synchronized (_entries) {
-            for (int i = 0; i < _entries.size(); i++) 
-                collector.add((Hash)_entries.get(i));
+        Set<Hash> entries = new HashSet(_entries);
+        for (Hash h : entries) {
+                collector.add(h);
         }
     }
     
-    public void setEntries(Set entries) {
-        synchronized (_entries) {
-            _entries.clear();
-            for (Iterator iter = entries.iterator(); iter.hasNext(); ) {
-                Hash entry = (Hash)iter.next();
-                if (!_entries.contains(entry))
-                    _entries.add(entry);
-            }
-        }
+    public void setEntries(Set<Hash> entries) {
+        _entries.clear();
+        _entries.addAll(entries);
     }
     
+    /**
+     *  Todo: shuffling here is a hack and doesn't work since
+     *  we switched back to a HashSet implementation
+     */
     public int add(Hash peer) {
-        synchronized (_entries) {
-            if (!_entries.contains(peer))
-                _entries.add(peer);
+            _entries.add(peer);
+/**********
             // Randomize the bucket every once in a while if we are floodfill, so that
             // exploration will return better results. See FloodfillPeerSelector.add(Hash).
             if (_lastShuffle + SHUFFLE_DELAY < _context.clock().now() &&
@@ -245,14 +244,12 @@ class KBucketImpl implements KBucket {
                 Collections.shuffle(_entries, _context.random());
                 _lastShuffle = _context.clock().now();
             }
-            return _entries.size();
-        }
+***********/
+        return _entries.size();
     }
     
     public boolean remove(Hash peer) {
-        synchronized (_entries) {
-            return _entries.remove(peer);
-        }
+        return _entries.remove(peer);
     }
     
     /**
@@ -328,12 +325,11 @@ class KBucketImpl implements KBucket {
             return BigInteger.ZERO.setBit(_begin);
     }
     
+    @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer(1024);
+        StringBuilder buf = new StringBuilder(1024);
         buf.append("KBucketImpl: ");
-        synchronized (_entries) {
-            buf.append(_entries.toString()).append("\n");
-        }
+        buf.append(_entries.toString()).append("\n");
         buf.append("Low bit: ").append(_begin).append(" high bit: ").append(_end).append('\n');
         buf.append("Local key: \n");
         if ( (_local != null) && (_local.getData() != null) )
@@ -379,23 +375,23 @@ class KBucketImpl implements KBucket {
     }
     
     private static void testRand() {
-        StringBuffer buf = new StringBuffer(2048);
+        //StringBuilder buf = new StringBuilder(2048);
         int low = 1;
         int high = 3;
         Log log = I2PAppContext.getGlobalContext().logManager().getLog(KBucketImpl.class);
-        Hash local = Hash.FAKE_HASH;
+        LocalHash local = new LocalHash(Hash.FAKE_HASH);
         local.prepareCache();
         KBucketImpl bucket = new KBucketImpl(I2PAppContext.getGlobalContext(), local);
         bucket.setRange(low, high);
-        Hash lowerBoundKey = bucket.getRangeBeginKey();
-        Hash upperBoundKey = bucket.getRangeEndKey();
+        //Hash lowerBoundKey = bucket.getRangeBeginKey();
+        //Hash upperBoundKey = bucket.getRangeEndKey();
         for (int i = 0; i < 100000; i++) {
             Hash rnd = bucket.generateRandomKey();
             //buf.append(toString(rnd.getData())).append('\n');
             boolean ok = bucket.shouldContain(rnd);
             if (!ok) {
-                byte diff[] = bucket.getLocal().cachedXor(rnd);
-                BigInteger dv = new BigInteger(1, diff);
+                //byte diff[] = bucket.getLocal().cachedXor(rnd);
+                //BigInteger dv = new BigInteger(1, diff);
                 //log.error("WTF! bucket doesn't want: \n" + toString(rnd.getData()) 
                 //          + "\nDelta: \n" + toString(diff) + "\nDelta val: \n" + dv.toString(2) 
                 //          + "\nBucket: \n"+bucket, new Exception("WTF"));
@@ -403,7 +399,7 @@ class KBucketImpl implements KBucket {
                 log.error("\nLow: " + DataHelper.toHexString(bucket.getRangeBeginKey().getData()) 
                            + "\nVal: " + DataHelper.toHexString(rnd.getData())
                            + "\nHigh:" + DataHelper.toHexString(bucket.getRangeEndKey().getData()));
-                try { Thread.sleep(1000); } catch (Exception e) {}
+                try { Thread.sleep(1000); } catch (InterruptedException e) {}
                 System.exit(0);
             } else {
                 //_log.debug("Ok, bucket wants: \n" + toString(rnd.getData()));
@@ -415,24 +411,23 @@ class KBucketImpl implements KBucket {
     
     private static void testRand2() {
         Log log = I2PAppContext.getGlobalContext().logManager().getLog(KBucketImpl.class);
-        StringBuffer buf = new StringBuffer(1024*1024*16);
         int low = 1;
         int high = 200;
         byte hash[] = new byte[Hash.HASH_LENGTH];
         RandomSource.getInstance().nextBytes(hash);
-        Hash local = new Hash(hash);
+        LocalHash local = new LocalHash(hash);
         local.prepareCache();
         KBucketImpl bucket = new KBucketImpl(I2PAppContext.getGlobalContext(), local);
         bucket.setRange(low, high);
-        Hash lowerBoundKey = bucket.getRangeBeginKey();
-        Hash upperBoundKey = bucket.getRangeEndKey();
+        //Hash lowerBoundKey = bucket.getRangeBeginKey();
+        //Hash upperBoundKey = bucket.getRangeEndKey();
         for (int i = 0; i < 100000; i++) {
             Hash rnd = bucket.generateRandomKey();
             //buf.append(toString(rnd.getData())).append('\n');
             boolean ok = bucket.shouldContain(rnd);
             if (!ok) {
-                byte diff[] = bucket.getLocal().cachedXor(rnd);
-                BigInteger dv = new BigInteger(1, diff);
+                //byte diff[] = bucket.getLocal().cachedXor(rnd);
+                //BigInteger dv = new BigInteger(1, diff);
                 //log.error("WTF! bucket doesn't want: \n" + toString(rnd.getData()) 
                 //          + "\nDelta: \n" + toString(diff) + "\nDelta val: \n" + dv.toString(2) 
                 //          + "\nBucket: \n"+bucket, new Exception("WTF"));
@@ -440,18 +435,18 @@ class KBucketImpl implements KBucket {
                 log.error("\nLow: " + DataHelper.toHexString(bucket.getRangeBeginKey().getData()) 
                            + "\nVal: " + DataHelper.toHexString(rnd.getData())
                            + "\nHigh:" + DataHelper.toHexString(bucket.getRangeEndKey().getData()));
-                try { Thread.sleep(1000); } catch (Exception e) {}
+                try { Thread.sleep(1000); } catch (InterruptedException e) {}
                 System.exit(0);
             } else {
                 //_log.debug("Ok, bucket wants: \n" + toString(rnd.getData()));
             }
         }
-        log.info("Passed 100,000 random key generations against a random hash\n" + buf.toString());
+        log.info("Passed 100,000 random key generations against a random hash");
     }
     
     private final static String toString(byte b[]) {
         if (true) return DataHelper.toHexString(b);
-        StringBuffer buf = new StringBuffer(b.length);
+        StringBuilder buf = new StringBuilder(b.length);
         for (int i = 0; i < b.length; i++) {
             buf.append(toString(b[i]));
             buf.append(" ");
@@ -460,7 +455,7 @@ class KBucketImpl implements KBucket {
     }
     
     private final static String toString(byte b) {
-        StringBuffer buf = new StringBuffer(8);
+        StringBuilder buf = new StringBuilder(8);
         for (int i = 7; i >= 0; i--) {
             boolean bb = (0 != (b & (1<<i)));
             if (bb)

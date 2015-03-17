@@ -9,11 +9,11 @@ import net.i2p.util.Log;
  * layers, and forward it on to the first hop.
  *
  */
-public class OutboundSender implements TunnelGateway.Sender {
-    private I2PAppContext _context;
-    private Log _log;
-    private TunnelCreatorConfig _config;
-    private OutboundGatewayProcessor _processor;
+class OutboundSender implements TunnelGateway.Sender {
+    private final I2PAppContext _context;
+    private final Log _log;
+    private final TunnelCreatorConfig _config;
+    private final OutboundGatewayProcessor _processor;
     
     static final boolean USE_ENCRYPTION = HopProcessor.USE_ENCRYPTION;
     

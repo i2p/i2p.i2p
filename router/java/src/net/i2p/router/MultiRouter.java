@@ -58,6 +58,7 @@ public class MultiRouter {
         _defaultContext.clock().setOffset(0);
         
         Runtime.getRuntime().addShutdownHook(new Thread() {
+            @Override
             public void run() {
                 Thread.currentThread().setName("Router* Shutdown");
                 try { Thread.sleep(120*1000); } catch (InterruptedException ie) {}
@@ -89,13 +90,17 @@ public class MultiRouter {
     
     private static Properties getEnv(String filename) {
         Properties props = new Properties();
+        FileInputStream in = null;
         try {
-            props.load(new FileInputStream(filename));
+            in = new FileInputStream(filename);
+            props.load(in);
             props.setProperty("time.disabled", "true");
             return props;
         } catch (IOException ioe) {
             ioe.printStackTrace();
             return null;
+        } finally {
+            if (in != null) try { in.close(); } catch (IOException ioe) {}
         }
     }
     

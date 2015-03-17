@@ -15,7 +15,6 @@ import java.io.InputStream;
 
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
-import net.i2p.util.Log;
 
 /**
  * Defines the message a client sends to a router when establishing a new 
@@ -24,16 +23,15 @@ import net.i2p.util.Log;
  * @author jrandom
  */
 public class CreateSessionMessage extends I2CPMessageImpl {
-    private final static Log _log = new Log(CreateSessionMessage.class);
     public final static int MESSAGE_TYPE = 1;
     private SessionConfig _sessionConfig;
 
     public CreateSessionMessage(SessionConfig config) {
-        setSessionConfig(config);
+        _sessionConfig = config;
     }
 
     public CreateSessionMessage() {
-        setSessionConfig(new SessionConfig());
+        _sessionConfig = new SessionConfig();
     }
 
     public SessionConfig getSessionConfig() {
@@ -72,11 +70,12 @@ public class CreateSessionMessage extends I2CPMessageImpl {
         return MESSAGE_TYPE;
     }
 
+    /* FIXME missing hashCode() method FIXME */
     @Override
     public boolean equals(Object object) {
         if ((object != null) && (object instanceof CreateSessionMessage)) {
             CreateSessionMessage msg = (CreateSessionMessage) object;
-            return DataHelper.eq(getSessionConfig(), msg.getSessionConfig());
+            return DataHelper.eq(_sessionConfig, msg.getSessionConfig());
         }
             
         return false;
@@ -84,9 +83,9 @@ public class CreateSessionMessage extends I2CPMessageImpl {
 
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append("[CreateSessionMessage: ");
-        buf.append("\n\tConfig: ").append(getSessionConfig());
+        buf.append("\n\tConfig: ").append(_sessionConfig);
         buf.append("]");
         return buf.toString();
     }

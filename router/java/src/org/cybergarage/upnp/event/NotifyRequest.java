@@ -188,6 +188,10 @@ public class NotifyRequest extends SOAPRequest
 	public PropertyList getPropertyList() {
 		PropertyList properties = new PropertyList();
 		Node varSetNode = getEnvelopeNode();
+		// I2P change: ParserException caught in getRootNode() causes
+		// getEnvelopeNode() to return null
+		if (varSetNode == null)
+			return properties;
 		for (int i = 0; i<varSetNode.getNNodes(); i++){
 			Node propNode = varSetNode.getNode(i);
 			if (propNode == null)

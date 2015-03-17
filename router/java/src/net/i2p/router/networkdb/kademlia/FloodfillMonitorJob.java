@@ -1,7 +1,6 @@
 package net.i2p.router.networkdb.kademlia;
 
 import java.util.List;
-import java.util.Properties;
 
 import net.i2p.data.Hash;
 import net.i2p.data.RouterAddress;
@@ -19,25 +18,25 @@ import net.i2p.util.Log;
  *
  */
 class FloodfillMonitorJob extends JobImpl {
-    private Log _log;
-    private FloodfillNetworkDatabaseFacade _facade;
+    private final Log _log;
+    private final FloodfillNetworkDatabaseFacade _facade;
     private long _lastChanged;
     
     private static final int REQUEUE_DELAY = 60*60*1000;
     private static final long MIN_UPTIME = 2*60*60*1000;
     private static final long MIN_CHANGE_DELAY = 6*60*60*1000;
-    private static final int MIN_FF = 4;
-    private static final int MAX_FF = 6;
+    private static final int MIN_FF = 250;
+    private static final int MAX_FF = 999999;
     private static final String PROP_FLOODFILL_PARTICIPANT = "router.floodfillParticipant";
     
     public FloodfillMonitorJob(RouterContext context, FloodfillNetworkDatabaseFacade facade) {
         super(context);
         _facade = facade;
         _log = context.logManager().getLog(FloodfillMonitorJob.class);
-        _lastChanged = 0;
     }
     
     public String getName() { return "Monitor the floodfill pool"; }
+
     public void runJob() {
         boolean wasFF = _facade.floodfillEnabled();
         boolean ff = shouldBeFloodfill();
@@ -46,7 +45,12 @@ class FloodfillMonitorJob extends JobImpl {
             getContext().router().rebuildRouterInfo();
         if (_log.shouldLog(Log.INFO))
             _log.info("Should we be floodfill? " + ff);
-        requeue((REQUEUE_DELAY / 2) + getContext().random().nextInt(REQUEUE_DELAY));
+        int delay = (REQUEUE_DELAY / 2) + getContext().random().nextInt(REQUEUE_DELAY);
+        // there's a lot of eligible non-floodfills, keep them from all jumping in at once
+        // To do: somehow assess the size of the network to make this adaptive?
+        if (!ff)
+            delay *= 7;
+        requeue(delay);
     }
 
     private boolean shouldBeFloodfill() {
@@ -75,10 +79,10 @@ class FloodfillMonitorJob extends JobImpl {
             return false;
 
         // This list will not include ourselves...
-        List floodfillPeers = _facade.getFloodfillPeers();
+        List<Hash> floodfillPeers = _facade.getFloodfillPeers();
         long now = getContext().clock().now();
         // We know none at all! Must be our turn...
-        if (floodfillPeers == null || floodfillPeers.size() <= 0) {
+        if (floodfillPeers == null || floodfillPeers.isEmpty()) {
             _lastChanged = now;
             return true;
         }
@@ -103,8 +107,7 @@ class FloodfillMonitorJob extends JobImpl {
         int ffcount = floodfillPeers.size();
         int failcount = 0;
         long before = now - 60*60*1000;
-        for (int i = 0; i < ffcount; i++) {
-            Hash peer = (Hash)floodfillPeers.get(i);
+        for (Hash peer : floodfillPeers) {
             PeerProfile profile = getContext().profileOrganizer().getProfile(peer);
             if (profile == null || profile.getLastHeardFrom() < before ||
                 profile.getIsFailing() || getContext().shitlist().isShitlisted(peer) ||
@@ -129,8 +132,7 @@ class FloodfillMonitorJob extends JobImpl {
             if (ra == null)
                 happy = false;
             else {
-                Properties props = ra.getOptions();
-                if (props == null || props.getProperty("ihost0") != null)
+                if (ra.getOption("ihost0") != null)
                    happy = false;
             }
         }
@@ -140,8 +142,7 @@ class FloodfillMonitorJob extends JobImpl {
         if (good < MIN_FF && happy) {
             if (!wasFF) {
                 _lastChanged = now;
-                if (_log.shouldLog(Log.ERROR))
-                    _log.error("Only " + good + " ff peers and we want " + MIN_FF + " so we are becoming floodfill");
+                _log.logAlways(Log.INFO, "Only " + good + " ff peers and we want " + MIN_FF + " so we are becoming floodfill");
             }
             return true;
         }
@@ -150,8 +151,7 @@ class FloodfillMonitorJob extends JobImpl {
         if (good > MAX_FF || (good > MIN_FF && !happy)) {
             if (wasFF) {
                 _lastChanged = now;
-                if (_log.shouldLog(Log.ERROR))
-                    _log.error("Have " + good + " ff peers and we need only " + MIN_FF + " to " + MAX_FF +
+                _log.logAlways(Log.INFO, "Have " + good + " ff peers and we need only " + MIN_FF + " to " + MAX_FF +
                                " so we are disabling floodfill; reachable? " + happy);
             }
             return false;

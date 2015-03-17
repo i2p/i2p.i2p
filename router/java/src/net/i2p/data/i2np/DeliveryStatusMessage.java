@@ -8,11 +8,8 @@ package net.i2p.data.i2np;
  *
  */
 
-import java.io.IOException;
-
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
-import net.i2p.util.Log;
 
 /**
  * Defines the message sent back in reply to a message when requested, containing
@@ -20,25 +17,47 @@ import net.i2p.util.Log;
  *
  * @author jrandom
  */
-public class DeliveryStatusMessage extends I2NPMessageImpl {
-    private final static Log _log = new Log(DeliveryStatusMessage.class);
+public class DeliveryStatusMessage extends FastI2NPMessageImpl {
     public final static int MESSAGE_TYPE = 10;
     private long _id;
     private long _arrival;
     
     public DeliveryStatusMessage(I2PAppContext context) {
         super(context);
-        setMessageId(-1);
-        setArrival(-1);
+        _id = -1;
+        _arrival = -1;
     }
     
     public long getMessageId() { return _id; }
-    public void setMessageId(long id) { _id = id; }
+
+    /**
+     *  @throws IllegalStateException if id previously set, to protect saved checksum
+     */
+    public void setMessageId(long id) {
+        if (_id >= 0)
+            throw new IllegalStateException();
+        _id = id;
+    }
     
+    /**
+     *  Misnamed, as it is generally (always?) set by the creator to the current time,
+     *  in some future usage it could be set on arrival
+     */
     public long getArrival() { return _arrival; }
-    public void setArrival(long arrival) { _arrival = arrival; }
+
+    /**
+     *  Misnamed, as it is generally (always?) set by the creator to the current time,
+     *  in some future usage it could be set on arrival
+     */
+    public void setArrival(long arrival) {
+        // To accomodate setting on arrival,
+        // invalidate the stored checksum instead of throwing ISE
+        if (_arrival >= 0)
+            _hasChecksum = false;
+        _arrival = arrival;
+    }
     
-    public void readMessage(byte data[], int offset, int dataSize, int type) throws I2NPMessageException, IOException {
+    public void readMessage(byte data[], int offset, int dataSize, int type) throws I2NPMessageException {
         if (type != MESSAGE_TYPE) throw new I2NPMessageException("Message type is incorrect for this message");
         int curIndex = offset;
         
@@ -64,22 +83,25 @@ public class DeliveryStatusMessage extends I2NPMessageImpl {
     
     public int getType() { return MESSAGE_TYPE; }
     
+    @Override
     public int hashCode() {
         return (int)getMessageId() + (int)getArrival();
     }
     
+    @Override
     public boolean equals(Object object) {
         if ( (object != null) && (object instanceof DeliveryStatusMessage) ) {
             DeliveryStatusMessage msg = (DeliveryStatusMessage)object;
-            return DataHelper.eq(getMessageId(),msg.getMessageId()) &&
-                   DataHelper.eq(getArrival(),msg.getArrival());
+            return _id == msg.getMessageId() &&
+                   _arrival == msg.getArrival();
         } else {
             return false;
         }
     }
     
+    @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append("[DeliveryStatusMessage: ");
         buf.append("\n\tMessage ID: ").append(getMessageId());
         buf.append("\n\tArrival: ").append(_context.clock().now() - _arrival);

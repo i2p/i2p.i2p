@@ -1,43 +1,68 @@
 package net.i2p.crypto;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
+import java.util.concurrent.LinkedBlockingQueue;
+
+// following are for main() tests
+//import java.security.InvalidKeyException;
+//import java.security.Key;
+//import java.security.NoSuchAlgorithmException;
+//import javax.crypto.spec.SecretKeySpec;
+//import net.i2p.data.Base64;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.SessionKey;
+import net.i2p.util.SimpleByteCache;
 
 import org.bouncycastle.crypto.digests.MD5Digest;
-import org.bouncycastle.crypto.macs.HMac;
+import org.bouncycastle.crypto.macs.I2PHMac;
 
 /**
- * Calculate the HMAC-MD5 of a key+message.  All the good stuff occurs
- * in {@link org.bouncycastle.crypto.macs.HMac} and 
+ * Calculate the HMAC-MD5-128 of a key+message.  All the good stuff occurs
+ * in {@link org.bouncycastle.crypto.macs.I2PHMac} and 
  * {@link org.bouncycastle.crypto.digests.MD5Digest}.
+ *
+ * Keys are always 32 bytes.
+ * This is used only by UDP.
+ * Use deprecated outside the router, this may move to router.jar.
+ *
+ * NOTE THIS IS NOT COMPATIBLE with javax.crypto.Mac.getInstance("HmacMD5")
+ * as we tell I2PHMac that the digest length is 32 bytes, so it generates
+ * a different result.
+ *
+ * Quote jrandom:
+ * "The HMAC is hardcoded to use SHA256 digest size
+ * for backwards compatability.  next time we have a backwards
+ * incompatible change, we should update this."
+ *
+ * Does this mean he intended it to be compatible with MD5?
+ * See also 2005-07-05 status notes.
  *
  */
 public class HMACGenerator {
-    private I2PAppContext _context;
     /** set of available HMAC instances for calculate */
-    protected List _available;
-    /** set of available byte[] buffers for verify */
-    private List _availableTmp;
+    protected final LinkedBlockingQueue<I2PHMac> _available;
     
+    /**
+     *  @param context unused
+     */
     public HMACGenerator(I2PAppContext context) {
-        _context = context;
-        _available = new ArrayList(32);
-        _availableTmp = new ArrayList(32);
+        _available = new LinkedBlockingQueue(32);
     }
     
     /**
      * Calculate the HMAC of the data with the given key
+     *
+     * @return the first 16 bytes contain the HMAC, the last 16 bytes are zero
+     * @deprecated unused
      */
     public Hash calculate(SessionKey key, byte data[]) {
         if ((key == null) || (key.getData() == null) || (data == null))
             throw new NullPointerException("Null arguments for HMAC");
-        byte rv[] = new byte[Hash.HASH_LENGTH];
+        byte rv[] = acquireTmp();
+        Arrays.fill(rv, (byte)0x0);
         calculate(key, data, 0, data.length, rv, 0);
         return new Hash(rv);
     }
@@ -49,13 +74,11 @@ public class HMACGenerator {
         if ((key == null) || (key.getData() == null) || (data == null))
             throw new NullPointerException("Null arguments for HMAC");
         
-        HMac mac = acquire();
+        I2PHMac mac = acquire();
         mac.init(key.getData());
         mac.update(data, offset, length);
-        //byte rv[] = new byte[Hash.HASH_LENGTH];
         mac.doFinal(target, targetOffset);
         release(mac);
-        //return new Hash(rv);
     }
     
     /**
@@ -73,11 +96,10 @@ public class HMACGenerator {
         if ((key == null) || (key.getData() == null) || (curData == null))
             throw new NullPointerException("Null arguments for HMAC");
         
-        HMac mac = acquire();
+        I2PHMac mac = acquire();
         mac.init(key.getData());
         mac.update(curData, curOffset, curLength);
         byte rv[] = acquireTmp();
-        //byte rv[] = new byte[Hash.HASH_LENGTH];
         mac.doFinal(rv, 0);
         release(mac);
         
@@ -86,40 +108,89 @@ public class HMACGenerator {
         return eq;
     }
     
-    protected HMac acquire() {
-        synchronized (_available) {
-            if (_available.size() > 0)
-                return (HMac)_available.remove(0);
-        }
+    protected I2PHMac acquire() {
+        I2PHMac rv = _available.poll();
+        if (rv != null)
+            return rv;
         // the HMAC is hardcoded to use SHA256 digest size
         // for backwards compatability.  next time we have a backwards
         // incompatible change, we should update this by removing ", 32"
-        return new HMac(new MD5Digest(), 32);
-    }
-    private void release(HMac mac) {
-        synchronized (_available) {
-            if (_available.size() < 64)
-                _available.add(mac);
-        }
+        // SEE NOTES ABOVE
+        return new I2PHMac(new MD5Digest(), 32);
     }
 
-    // temp buffers for verify(..)
+    private void release(I2PHMac mac) {
+        _available.offer(mac);
+    }
+
+    /**
+     * Not really tmp, just from the byte array cache.
+     * Does NOT zero.
+     */
     private byte[] acquireTmp() {
-        byte rv[] = null;
-        synchronized (_availableTmp) {
-            if (_availableTmp.size() > 0)
-                rv = (byte[])_availableTmp.remove(0);
-        }
-        if (rv != null)
-            Arrays.fill(rv, (byte)0x0);
-        else
-            rv = new byte[Hash.HASH_LENGTH];
+        byte rv[] = SimpleByteCache.acquire(Hash.HASH_LENGTH);
         return rv;
     }
+
     private void releaseTmp(byte tmp[]) {
-        synchronized (_availableTmp) {
-            if (_availableTmp.size() < 64)
-                _availableTmp.add((Object)tmp);
-        }
+        SimpleByteCache.release(tmp);
     }
+
+    //private static final int RUNS = 100000;
+
+    /**
+     *  Test the BC and the JVM's implementations for speed
+     */
+/****  All this did was prove that we aren't compatible with standard HmacMD5
+    public static void main(String args[]) {
+        if (args.length != 2) {
+            System.err.println("Usage: HMACGenerator keySeedString dataString");
+            return;
+        }
+
+        byte[] rand = SHA256Generator.getInstance().calculateHash(args[0].getBytes()).getData();
+        byte[] data = args[1].getBytes();
+        Key keyObj = new SecretKeySpec(rand, "HmacMD5");
+
+        byte[] keyBytes = keyObj.getEncoded();
+        System.out.println("key bytes (" + keyBytes.length + ") is [" + Base64.encode(keyBytes) + "]");
+        SessionKey key = new SessionKey(keyBytes);
+        System.out.println("session key is [" + key);
+        System.out.println("key object is [" + keyObj);
+
+        HMACGenerator gen = new HMACGenerator(I2PAppContext.getGlobalContext());
+        byte[] result = new byte[16];
+        long start = System.currentTimeMillis();
+        for (int i = 0; i < RUNS; i++) {
+            gen.calculate(key, data, 0, data.length, result, 0);
+            if (i == 0)
+                System.out.println("MAC [" + Base64.encode(result) + "]");
+        }
+        long time = System.currentTimeMillis() - start;
+        System.out.println("Time for " + RUNS + " HMAC-MD5 computations:");
+        System.out.println("BC time (ms): " + time);
+
+        start = System.currentTimeMillis();
+        javax.crypto.Mac mac;
+        try {
+            mac = javax.crypto.Mac.getInstance("HmacMD5");
+        } catch (NoSuchAlgorithmException e) {
+            System.err.println("Fatal: " + e);
+            return;
+        }
+        for (int i = 0; i < RUNS; i++) {
+            try {
+                mac.init(keyObj);
+            } catch (InvalidKeyException e) {
+                System.err.println("Fatal: " + e);
+            }
+            byte[] sha = mac.doFinal(data);
+            if (i == 0)
+                System.out.println("MAC [" + Base64.encode(sha) + "]");
+        }
+        time = System.currentTimeMillis() - start;
+
+        System.out.println("JVM time (ms): " + time);
+    }
+****/
 }

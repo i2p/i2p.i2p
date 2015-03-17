@@ -10,9 +10,9 @@ package net.i2p.util;
  */
 
 
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
  * In case its useful later...
@@ -20,73 +20,93 @@ import java.util.Set;
  *
  */
 public class I2PThread extends Thread {
-    private static volatile Log _log;
-    private static Set _listeners = new HashSet(4);
-    private String _name;
-    private Exception _createdBy;
+    /**
+     *  Non-static to avoid refs to old context in Android.
+     *  Probably should just remove all the logging though.
+     *  Logging removed, too much trouble with extra contexts
+     */
+    //private volatile Log _log;
+    private static final Set _listeners = new CopyOnWriteArraySet();
+    //private String _name;
+    //private Exception _createdBy;
 
     public I2PThread() {
         super();
-        if ( (_log == null) || (_log.shouldLog(Log.DEBUG)) )
-            _createdBy = new Exception("Created by");
+        //if ( (_log == null) || (_log.shouldLog(Log.DEBUG)) )
+        //    _createdBy = new Exception("Created by");
     }
 
     public I2PThread(String name) {
         super(name);
-        if ( (_log == null) || (_log.shouldLog(Log.DEBUG)) )
-            _createdBy = new Exception("Created by");
+        //if ( (_log == null) || (_log.shouldLog(Log.DEBUG)) )
+        //    _createdBy = new Exception("Created by");
     }
 
     public I2PThread(Runnable r) {
         super(r);
-        if ( (_log == null) || (_log.shouldLog(Log.DEBUG)) )
-            _createdBy = new Exception("Created by");
+        //if ( (_log == null) || (_log.shouldLog(Log.DEBUG)) )
+        //    _createdBy = new Exception("Created by");
     }
 
     public I2PThread(Runnable r, String name) {
         super(r, name);
-        if ( (_log == null) || (_log.shouldLog(Log.DEBUG)) )
-            _createdBy = new Exception("Created by");
+        //if ( (_log == null) || (_log.shouldLog(Log.DEBUG)) )
+        //    _createdBy = new Exception("Created by");
     }
     public I2PThread(Runnable r, String name, boolean isDaemon) {
         super(r, name);
 	setDaemon(isDaemon);
-        if ( (_log == null) || (_log.shouldLog(Log.DEBUG)) )
-            _createdBy = new Exception("Created by");
+        //if ( (_log == null) || (_log.shouldLog(Log.DEBUG)) )
+        //    _createdBy = new Exception("Created by");
     }
     
+    public I2PThread(ThreadGroup g, Runnable r) {
+        super(g, r);
+        //if ( (_log == null) || (_log.shouldLog(Log.DEBUG)) )
+        //    _createdBy = new Exception("Created by");
+    }
+
+/****
     private void log(int level, String msg) { log(level, msg, null); }
+
     private void log(int level, String msg, Throwable t) {
         // we cant assume log is created
         if (_log == null) _log = new Log(I2PThread.class);
         if (_log.shouldLog(level))
             _log.log(level, msg, t);
     }
+****/
     
     @Override
     public void run() {
-        _name = Thread.currentThread().getName();
-        log(Log.DEBUG, "New thread started: " + _name, _createdBy);
+        //_name = Thread.currentThread().getName();
+        //log(Log.INFO, "New thread started" + (isDaemon() ? " (daemon): " : ": ") + _name, _createdBy);
         try {
             super.run();
         } catch (Throwable t) {
+          /****
             try {
-                log(Log.CRIT, "Killing thread " + getName(), t);
+                log(Log.CRIT, "Thread terminated unexpectedly: " + getName(), t);
             } catch (Throwable woof) {
                 System.err.println("Died within the OOM itself");
                 t.printStackTrace();
             }
+          ****/
             if (t instanceof OutOfMemoryError)
                 fireOOM((OutOfMemoryError)t);
         }
-        log(Log.DEBUG, "Thread finished gracefully: " + _name);
+        // This creates a new I2PAppContext after it was deleted
+        // in Router.finalShutdown() via RouterContext.killGlobalContext()
+        //log(Log.INFO, "Thread finished normally: " + _name);
     }
     
+/****
     @Override
     protected void finalize() throws Throwable {
-        log(Log.DEBUG, "Thread finalized: " + _name);
+        //log(Log.DEBUG, "Thread finalized: " + _name);
         super.finalize();
     }
+****/
     
     protected void fireOOM(OutOfMemoryError oom) {
         for (Iterator iter = _listeners.iterator(); iter.hasNext(); ) {
@@ -109,6 +129,7 @@ public class I2PThread extends Thread {
         public void outOfMemory(OutOfMemoryError err);
     }
 
+/****
     public static void main(String args[]) {
         I2PThread t = new I2PThread(new Runnable() {
             public void run() {
@@ -121,4 +142,5 @@ public class I2PThread extends Thread {
         } catch (Throwable tt) { // nop
         }
     }
+****/
 }

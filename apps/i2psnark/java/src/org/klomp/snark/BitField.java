@@ -137,10 +137,11 @@ public class BitField
     return count >= size;
   }
 
+    @Override
   public String toString()
   {
     // Not very efficient
-    StringBuffer sb = new StringBuffer("BitField(");
+    StringBuilder sb = new StringBuilder("BitField(");
     sb.append(size).append(")[");
     for (int i = 0; i < size; i++)
       if (get(i))

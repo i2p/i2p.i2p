@@ -3,6 +3,7 @@ package net.i2p.router.tunnel.pool;
 import java.util.HashSet;
 import java.util.Set;
 
+import net.i2p.crypto.SessionKeyManager;
 import net.i2p.data.Certificate;
 import net.i2p.data.SessionKey;
 import net.i2p.data.SessionTag;
@@ -18,48 +19,46 @@ import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelInfo;
 import net.i2p.router.message.GarlicMessageBuilder;
 import net.i2p.router.message.PayloadGarlicConfig;
+import net.i2p.stat.Rate;
+import net.i2p.stat.RateStat;
 import net.i2p.util.Log;
 
+/**
+ *  Repeatedly test a single tunnel for its entire lifetime,
+ *  or until the pool is shut down or removed from the client manager.
+ */
 class TestJob extends JobImpl {
-    private Log _log;
-    private TunnelPool _pool;
-    private PooledTunnelCreatorConfig _cfg;
+    private final Log _log;
+    private final TunnelPool _pool;
+    private final PooledTunnelCreatorConfig _cfg;
     private boolean _found;
     private TunnelInfo _outTunnel;
     private TunnelInfo _replyTunnel;
     private PooledTunnelCreatorConfig _otherTunnel;
+    /** save this so we can tell the SKM to kill it if the test fails */
+    private SessionTag _encryptTag;
     
     /** base to randomize the test delay on */
-    private static final int TEST_DELAY = 30*1000;
+    private static final int TEST_DELAY = 40*1000;
     
     public TestJob(RouterContext ctx, PooledTunnelCreatorConfig cfg, TunnelPool pool) {
         super(ctx);
         _log = ctx.logManager().getLog(TestJob.class);
-        _pool = pool;
         _cfg = cfg;
-        if (_pool == null)
+        if (pool != null)
+            _pool = pool;
+        else
             _pool = cfg.getTunnelPool();
         if ( (_pool == null) && (_log.shouldLog(Log.ERROR)) )
             _log.error("Invalid tunnel test configuration: no pool for " + cfg, new Exception("origin"));
         getTiming().setStartAfter(getDelay() + ctx.clock().now());
-        ctx.statManager().createRateStat("tunnel.testFailedTime", "How long did the failure take (max of 60s for full timeout)?", "Tunnels", 
-                                         new long[] { 60*1000, 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
-        ctx.statManager().createRateStat("tunnel.testExploratoryFailedTime", "How long did the failure of an exploratory tunnel take (max of 60s for full timeout)?", "Tunnels", 
-                                         new long[] { 60*1000, 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
-        ctx.statManager().createRateStat("tunnel.testFailedCompletelyTime", "How long did the complete failure take (max of 60s for full timeout)?", "Tunnels", 
-                                         new long[] { 60*1000, 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
-        ctx.statManager().createRateStat("tunnel.testExploratoryFailedCompletelyTime", "How long did the complete failure of an exploratory tunnel take (max of 60s for full timeout)?", "Tunnels", 
-                                         new long[] { 60*1000, 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
-        ctx.statManager().createRateStat("tunnel.testSuccessLength", "How long were the tunnels that passed the test?", "Tunnels", 
-                                         new long[] { 60*1000, 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
-        ctx.statManager().createRateStat("tunnel.testSuccessTime", "How long did tunnel testing take?", "Tunnels", 
-                                         new long[] { 60*1000, 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
-        ctx.statManager().createRateStat("tunnel.testAborted", "Tunnel test could not occur, since there weren't any tunnels to test with", "Tunnels", 
-                                         new long[] { 60*1000, 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
+        // stats are created in TunnelPoolManager
     }
+
     public String getName() { return "Test tunnel"; }
+
     public void runJob() {
-        if (_pool == null)
+        if (_pool == null || !_pool.isAlive())
             return;
         long lag = getContext().jobQueue().getMaxLag();
         if (lag > 3000) {
@@ -69,6 +68,8 @@ class TestJob extends JobImpl {
             scheduleRetest();
             return;
         }
+        if (getContext().router().gracefulShutdownInProgress())
+            return;   // don't reschedule
         _found = false;
         // note: testing with exploratory tunnels always, even if the tested tunnel
         // is a client tunnel (per _cfg.getDestination())
@@ -78,9 +79,11 @@ class TestJob extends JobImpl {
         _outTunnel = null;
         if (_cfg.isInbound()) {
             _replyTunnel = _cfg;
+            // TODO if testing is re-enabled, pick closest to far end
             _outTunnel = getContext().tunnelManager().selectOutboundTunnel();
             _otherTunnel = (PooledTunnelCreatorConfig) _outTunnel;
         } else {
+            // TODO if testing is re-enabled, pick closest to far end
             _replyTunnel = getContext().tunnelManager().selectInboundTunnel();
             _outTunnel = _cfg;
             _otherTunnel = (PooledTunnelCreatorConfig) _replyTunnel;
@@ -116,16 +119,16 @@ class TestJob extends JobImpl {
         instructions.setDeliveryMode(DeliveryInstructions.DELIVERY_MODE_LOCAL);
 
         PayloadGarlicConfig payload = new PayloadGarlicConfig();
-        payload.setCertificate(new Certificate(Certificate.CERTIFICATE_TYPE_NULL, null));
+        payload.setCertificate(Certificate.NULL_CERT);
         payload.setId(getContext().random().nextLong(I2NPMessage.MAX_ID_VALUE));
         payload.setPayload(m);
         payload.setRecipient(getContext().router().getRouterInfo());
         payload.setDeliveryInstructions(instructions);
-        payload.setRequestAck(false);
         payload.setExpiration(m.getMessageExpiration());
 
         SessionKey encryptKey = getContext().keyGenerator().generateSessionKey();
         SessionTag encryptTag = new SessionTag(true);
+        _encryptTag = encryptTag;
         SessionKey sentKey = new SessionKey();
         Set sentTags = null;
         GarlicMessage msg = GarlicMessageBuilder.buildMessage(getContext(), payload, sentKey, sentTags, 
@@ -137,9 +140,17 @@ class TestJob extends JobImpl {
             scheduleRetest();
             return;
         }
+        // can't be a singleton, the SKM modifies it
         Set encryptTags = new HashSet(1);
         encryptTags.add(encryptTag);
-        getContext().sessionKeyManager().tagsReceived(encryptKey, encryptTags);
+        // Register the single tag with the appropriate SKM
+        if (_cfg.isInbound() && !_pool.getSettings().isExploratory()) {
+            SessionKeyManager skm = getContext().clientManager().getClientSessionKeyManager(_pool.getSettings().getDestination());
+            if (skm != null)
+                skm.tagsReceived(encryptKey, encryptTags);
+        } else {
+            getContext().sessionKeyManager().tagsReceived(encryptKey, encryptTags);
+        }
 
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Sending garlic test of " + _outTunnel + " / " + _replyTunnel);
@@ -149,6 +160,8 @@ class TestJob extends JobImpl {
     }
     
     public void testSuccessful(int ms) {
+        if (_pool == null || !_pool.isAlive())
+            return;
         getContext().statManager().addRateData("tunnel.testSuccessLength", _cfg.getLength(), 0);
         getContext().statManager().addRateData("tunnel.testSuccessTime", ms, 0);
     
@@ -176,6 +189,8 @@ class TestJob extends JobImpl {
     }
     
     private void testFailed(long timeToFail) {
+        if (_pool == null || !_pool.isAlive())
+            return;
         if (_found) {
             // ok, not really a /success/, but we did find it, even though slowly
             noteSuccess(timeToFail, _outTunnel);
@@ -202,7 +217,7 @@ class TestJob extends JobImpl {
     }
     
     /** randomized time we should wait before testing */
-    private int getDelay() { return TEST_DELAY + getContext().random().nextInt(TEST_DELAY); }
+    private int getDelay() { return TEST_DELAY + getContext().random().nextInt(TEST_DELAY / 3); }
 
     /** how long we allow tests to run for before failing them */
     private int getTestPeriod() {
@@ -215,14 +230,24 @@ class TestJob extends JobImpl {
         //
         // Try to prevent congestion collapse (failing all our tunnels and then clogging our outbound
         // with new tunnel build requests) by adding in three times the average outbound delay.
-        int delay = 3 * (int) getContext().statManager().getRate("transport.sendProcessingTime").getRate(60*1000).getAverageValue();
-        return delay + (2500 * (_outTunnel.getLength() + _replyTunnel.getLength()));
+        RateStat tspt = getContext().statManager().getRate("transport.sendProcessingTime");
+        if (tspt != null) {
+            Rate r = tspt.getRate(60*1000);
+            if (r != null) {
+                int delay = 3 * (int) r.getAverageValue();
+                return delay + (2500 * (_outTunnel.getLength() + _replyTunnel.getLength()));
+            }
+        }
+        return 15*1000;
     }
 
     private void scheduleRetest() { scheduleRetest(false); }
     private void scheduleRetest(boolean asap) {
+        if (_pool == null || !_pool.isAlive())
+            return;
         if (asap) {
-            requeue(getContext().random().nextInt(TEST_DELAY));
+            if (_cfg.getExpiration() > getContext().clock().now() + (60 * 1000))
+                requeue((TEST_DELAY / 4) + getContext().random().nextInt(TEST_DELAY / 4));
         } else {
             int delay = getDelay();
             if (_cfg.getExpiration() > getContext().clock().now() + delay + (3 * getTestPeriod()))
@@ -231,9 +256,10 @@ class TestJob extends JobImpl {
     }
     
     private class ReplySelector implements MessageSelector {
-        private RouterContext _context;
-        private long _id;
-        private long _expiration;
+        private final RouterContext _context;
+        private final long _id;
+        private final long _expiration;
+
         public ReplySelector(RouterContext ctx, long id, long expiration) {
             _context = ctx;
             _id = id;
@@ -242,7 +268,9 @@ class TestJob extends JobImpl {
         }
         
         public boolean continueMatching() { return !_found && _context.clock().now() < _expiration; }
+
         public long getExpiration() { return _expiration; }
+
         public boolean isMatch(I2NPMessage message) {
             if (message instanceof DeliveryStatusMessage) {
                 return ((DeliveryStatusMessage)message).getMessageId() == _id;
@@ -250,8 +278,9 @@ class TestJob extends JobImpl {
             return false;
         }
         
+        @Override
         public String toString() {
-            StringBuffer rv = new StringBuffer(64);
+            StringBuilder rv = new StringBuilder(64);
             rv.append("Testing tunnel ").append(_cfg.toString()).append(" waiting for ");
             rv.append(_id).append(" found? ").append(_found);
             return rv.toString();
@@ -264,9 +293,13 @@ class TestJob extends JobImpl {
     private class OnTestReply extends JobImpl implements ReplyJob {
         private long _successTime;
         private OutNetMessage _sentMessage;
+
         public OnTestReply(RouterContext ctx) { super(ctx); }
+
         public String getName() { return "Tunnel test success"; }
+
         public void setSentMessage(OutNetMessage m) { _sentMessage = m; }
+
         public void runJob() { 
             if (_sentMessage != null)
                 getContext().messageRegistry().unregisterPending(_sentMessage);
@@ -276,13 +309,15 @@ class TestJob extends JobImpl {
                 testFailed(_successTime);
             _found = true;
         }
+
         // who cares about the details...
         public void setMessage(I2NPMessage message) {
             _successTime = getContext().clock().now() - ((DeliveryStatusMessage)message).getArrival();
         }
         
+        @Override
         public String toString() {
-            StringBuffer rv = new StringBuffer(64);
+            StringBuilder rv = new StringBuilder(64);
             rv.append("Testing tunnel ").append(_cfg.toString());
             rv.append(" successful after ").append(_successTime);
             return rv.toString();
@@ -293,21 +328,34 @@ class TestJob extends JobImpl {
      * Test failed (boo, hiss)
      */
     private class OnTestTimeout extends JobImpl {
-        private long _started;
+        private final long _started;
+
         public OnTestTimeout(RouterContext ctx) { 
             super(ctx); 
             _started = ctx.clock().now();
         }
+
         public String getName() { return "Tunnel test timeout"; }
+
         public void runJob() {
             if (_log.shouldLog(Log.WARN))
-                _log.warn("Timeout: found? " + _found, getAddedBy());
-            if (!_found)
+                _log.warn("Timeout: found? " + _found);
+            if (!_found) {
+                // don't clog up the SKM with old one-tag tagsets
+                if (_cfg.isInbound() && !_pool.getSettings().isExploratory()) {
+                    SessionKeyManager skm = getContext().clientManager().getClientSessionKeyManager(_pool.getSettings().getDestination());
+                    if (skm != null)
+                        skm.consumeTag(_encryptTag);
+                } else {
+                    getContext().sessionKeyManager().consumeTag(_encryptTag);
+                }
                 testFailed(getContext().clock().now() - _started);
+            }
         }
         
+        @Override
         public String toString() {
-            StringBuffer rv = new StringBuffer(64);
+            StringBuilder rv = new StringBuilder(64);
             rv.append("Testing tunnel ").append(_cfg.toString());
             rv.append(" timed out");
             return rv.toString();

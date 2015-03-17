@@ -18,13 +18,11 @@ public class JobTiming implements Clock.ClockUpdateListener {
     private long _start;
     private long _actualStart;
     private long _actualEnd;
-    private RouterContext _context;
+    private final RouterContext _context;
     
     public JobTiming(RouterContext context) {
         _context = context;
         _start = context.clock().now();
-        _actualStart = 0;
-        _actualEnd = 0;
         //context.clock().addUpdateListener(this);
     }
     
@@ -33,6 +31,11 @@ public class JobTiming implements Clock.ClockUpdateListener {
      *
      */
     public long getStartAfter() { return _start; }
+
+    /**
+     * WARNING - this does not force a resort of the job queue any more...
+     * ALWAYS call JobImpl.requeue() instead if job is already queued.
+     */
     public void setStartAfter(long startTime) { 
         _start = startTime; 
         // sure, this current job object may not already be on the queue, so

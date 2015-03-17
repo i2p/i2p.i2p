@@ -1,0 +1,55 @@
+HIGH PRIORITY:
+- Allow desktopgui to start, stop and restart I2P. - DONE
+- Correct logging system - DONE
+- Internationalisation:
+    * Add strings - DONE
+    * Add Windows support - NEED TO CHECK
+    * Might need some kind of trigger to reload the menu (for live language switching) - DONE
+    * Language choice is not actually set as a parameter in I2P config?
+        As a result, desktopgui always starts with the default, unless you manually set the language.
+        DONE - uses routerconsole.lang -- this parameter is now updated in routerconsole as well
+- Check if we're inside I2P without using a command-line parameter - DONE
+- Modify installer to set I2P directory parameter; or use $I2P? - Is already there
+- Include in installer - TODO
+- Start desktopgui without adding to clients.config and without adding a dependency on routerconsole!
+  * One possibility:
+        Adding some kind of 'ApplicationManager' that allows starting applications.
+        Extra remark: ApplicationManager should also allow stopping certain applications from launching.
+        Suggestion:
+            * ApplicationManager reads/writes clients.config
+            * ApplicationManager itself: independent from clients.config?
+            * Upon reboot, ApplicationManager could add a new application to clients.config _if_ the 'application.manager.version' is not there, or is smaller than the current version.
+            * ApplicationManager can be the clients.config backend for routerconsole, so routerconsole is not the dependency.
+            * API:
+                - addConfig(args, name, ...)
+                - removeConfig(int)
+                - removeConfig(ConfigFilter)
+                    ConfigFilter() {
+                        boolean filterArgs(String args);
+                        boolean filterMain(String main);
+                        ...
+                    }
+                - editConfig(args, name, ..., ConfigFilter)
+                - editConfig(args, name, ..., int)
+                - editConfigArgs(args, ConfigFilter)
+                - editConfigArgs(args, int)
+                - ...
+ * For now: added in the routerconsole startup (like the old SysTray. - DONE
+    Possible migration path: startup ApplicationManager in routerconsole the first time.
+- Check bug: restart is happening instead of shutdown!
+- Check build order (for example: first desktopgui, only later routerconsole)
+- Fix tabs versus spaces ;-)
+- Add check for Java version 6 in RouterConsoleRunner!
+UNKNOWN:
+- API to allow applications to add themselves to the menu?
+    * registerApplication(); -- should return a positive number on success, -1 on failure
+    * unregisterApplication(int); -- should return nothing (or bool for success?), and the parameter should be the number given when registering the application
+- Fetch I2P localhost from the core I2P application? 
+- Use I2PAppContext::appDir (something like that) for desktopgui data.
+- Consider SWT as option
+    * Check core/java/src/net/i2p/util/FileUtil.java for dynamic jar loading
+    * Possible logic:
+        - First try to load SWT (has the most options and is not ugly)
+        - Then load AWT
+- Access router.jar from other JVM? Is this possible? -- no: use I2CP with auth (not ready yet)
+- Start desktopgui with another user than the user starting I2P (required for daemon usage).

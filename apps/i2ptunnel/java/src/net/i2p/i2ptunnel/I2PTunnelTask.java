@@ -3,8 +3,6 @@
  */
 package net.i2p.i2ptunnel;
 
-import java.util.Set;
-
 import net.i2p.client.I2PSession;
 import net.i2p.util.EventDispatcher;
 import net.i2p.util.EventDispatcherImpl;
@@ -13,9 +11,7 @@ import net.i2p.util.EventDispatcherImpl;
  * Either a Server or a Client.
  */
 
-public abstract class I2PTunnelTask implements EventDispatcher {
-
-    private final EventDispatcherImpl _event = new EventDispatcherImpl();
+public abstract class I2PTunnelTask extends EventDispatcherImpl {
 
     private int id;
     private String name;
@@ -62,6 +58,23 @@ public abstract class I2PTunnelTask implements EventDispatcher {
 
     public abstract boolean close(boolean forced);
 
+    /**
+     *  Notify the task that I2PTunnel's options have been updated.
+     *  Extending classes should override and call I2PTunnel.getClientOptions(),
+     *  then update the I2PSocketManager.
+     *
+     *  @since 0.9.1
+     */
+    public void optionsUpdated(I2PTunnel tunnel) {}
+
+    /**
+     *  For tasks that don't call I2PTunnel.addSession() directly
+     *  @since 0.8.13
+     */
+    public void connected(I2PSession session) {
+        getTunnel().addSession(session);
+    }
+
     public void disconnected(I2PSession session) {
         routerDisconnected();
         getTunnel().removeSession(session);
@@ -73,44 +86,8 @@ public abstract class I2PTunnelTask implements EventDispatcher {
     public void reportAbuse(I2PSession session, int severity) {
     }
 
+    @Override
     public String toString() {
         return name;
-    }
-
-    /* Required by the EventDispatcher interface */
-    public EventDispatcher getEventDispatcher() {
-        return _event;
-    }
-
-    public void attachEventDispatcher(EventDispatcher e) {
-        _event.attachEventDispatcher(e.getEventDispatcher());
-    }
-
-    public void detachEventDispatcher(EventDispatcher e) {
-        _event.detachEventDispatcher(e.getEventDispatcher());
-    }
-
-    public void notifyEvent(String e, Object a) {
-        _event.notifyEvent(e, a);
-    }
-
-    public Object getEventValue(String n) {
-        return _event.getEventValue(n);
-    }
-
-    public Set getEvents() {
-        return _event.getEvents();
-    }
-
-    public void ignoreEvents() {
-        _event.ignoreEvents();
-    }
-
-    public void unIgnoreEvents() {
-        _event.unIgnoreEvents();
-    }
-
-    public Object waitEventValue(String n) {
-        return _event.waitEventValue(n);
     }
 }

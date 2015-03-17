@@ -1,0 +1,35 @@
+<div lang="zh">
+
+<p>I2P 运行后的几分钟里控制台左侧的【活动节点】数量会逐渐增加，
+<b>在【本地目标】中出现【共享客户端】后，表示I2P已建立连接</b>(没有出现？见 <a href="#trouble">疑难解答</a>)。
+然后您可以：</p>
+<ul>
+ <li><B>浏览 I2P 匿名站点</B> -  I2P 网络内匿名运行的小站(EepSite) - 您要首先设置浏览器的 <b>HTTP 代理</b> 为 127.0.0.1:4444， 然后才能浏览 I2P 站点 - <ul class="links">
+         <li><a href="http://forum.i2p/">forum.i2p</a>:I2P官方论坛 <a href="http://forum.i2p2.de/">forum.i2p2.de</a>&nbsp;的匿名入口&nbsp;(个人的I2P站点会在论坛的EEPSITE讨论区发布)</li>
+         <li><a href="http://www.i2p2.i2p/index_zh.html">www.i2p2.i2p</a> 与镜像 <a href="http://i2p-projekt.i2p/index_zh.html">i2p-projekt.i2p</a>:&nbsp;可以安全匿名的访问I2P官网 <a href="http://www.i2p2.de/index_zh.html">www.i2p2.de</a></li>
+         <li><a href="http://eepsites.i2p/">eepsites.i2p</a>:&nbsp;I2P网络里的 “Google” 可以用来搜索各个匿名小站</li>
+         <li><a href="http://ugha.i2p/">ugha.i2p</a>:UGHA 的 I2P 小站，开放编辑的WIKI，有丰富的链接</li>
+         <li><a href="http://echelon.i2p/">echelon.i2p</a>:软件存档及有关I2P的相关文档&nbsp;(例如 I2P&nbsp;Messenger 基于I2P的匿名聊天工具等)&nbsp;</li>
+         <li><a href="http://pastethis.i2p/">pastethis.i2p</a>:安全匿名的公共剪贴板</li>
+     </ul> <br>
+      I2P网络中还有很多其他站点 - 访问上面的网站你会找到更多，别忘了收藏你喜爱的 I2P 网站方便访问。<br>
+ <li><b>浏览 Web 网页</b> - 目前 IP2 网络中的出口代理("Outproxy")只有一个，它的HTTP代理映射在本机的4444端口上。- 将浏览器的代理设置指向为上述地址(127.0.0.1:4444)后，访问任何普通链接即可 - 您的HTTP请求将在 I2P 网络内部传递。</li>
+ <li><b>文件交换</b> - I2P的其中一个本地&nbsp;<a href="/i2psnark">端口</a>&nbsp;用于内置的&nbsp;<a href="http://www.klomp.org/snark/">Snark</a> <a href="http://www.bittorrent.com/">BitTorrent</a> 客户端。</li>
+ <li><b>匿名电邮</b> - 由POSTMAN维护的邮件系统支持普通邮件客户端(POP3 / SMTP)，这个系统可以在 I2P 网络内部收发 Email 也可以收发来自外部 Internet 的邮件！建立I2P邮件帐户请到 <a href="http://hq.postman.i2p/">hq.postman.i2p</a> 申请。I2P中集成有Web界面的pop3/stmp邮件客户端 <a href="/webmail">SUSIMail</a>，并配置为使用POSTMAN 的邮件服务。</li>
+ <li><b>匿名聊天</b> - 打开你的 IRC 聊天程序，连接至 <b>127.0.0.1:6668&nbsp;</b>即可访问I2P的匿名聊天室，如果您的聊天客户端配置错误泄露IP(DDC,MSG)我们的匿名服务器会自动过滤掉这些数据不让对方发现你，如果您的IRC设置正确无论服务器还是其他聊天的人都不知道您在哪里。</li>
+ <li><b>匿名博客</b> - 参见 <a href="http://syndie.i2p2.de/">Syndie</a></li>
+ <li>以及其他服务。</li>
+</ul>
+
+<h2>想创建属于自己的 I2P 站点？</h2>
+
+<p>I2P 已经集成了Jetty服务器来帮助你运行自己的匿名站点 - &nbsp;<a href="http://jetty.mortbay.org/">Jetty</a> 实例运行于本机 <a href="http://127.0.0.1:7658/">http://127.0.0.1:7658/</a>上。只要将你的文件放在 I2P目录下的&nbsp;<code>eepsite/docroot/</code> 文件夹中 (或将任何标准的 JSP/Servlet <code>.war</code> 文件放置于 <code>eepsite/webapps</code> 中, 标准的 CGI 脚本请置于 <code>eepsite/cgi-bin</code> 目录内) ，通过上面的地址就可以浏览啦。然后&nbsp;<a href="/i2ptunnel/">在I2PTunnel中创建一个I2P站点隧道</a> 将其指向上面的本地端口, 您的匿名站点就可以供他人访问了。创建 I2P站点的具体操作参见 <a href="http://127.0.0.1:7658/">您的I2P站点临时页面</a>。</p>
+
+<h2><a name="trouble">疑难解答</a></h2>
+
+<p>保持耐心 - I2P 第一次启动时需要搜索节点，可能比较缓慢。如果30分钟后，您的活动节点计数仍在 10 个节点以下, 请在防火墙中打开 I2P端口(见【I2P内部设置】>【网络】中的IP与传输部分的设置)改善连接性能。如果您根本无法打开任何I2P匿名站点(甚至 <a href="http://www.i2p2.i2p/index_zh.html">www.i2p2.i2p</a>)，检查您的浏览器代理设置是否为本地的 127.0.0.1:4444。你也可以到&nbsp;<a href="http://www.i2p2.i2p/index_zh.html">I2P 网站</a>&nbsp;查找信息, 在 <a href="http://forum.i2p2.de/">I2P 论坛</a> 中发帖, 来 <a href="irc://irc.freenode.net/#i2p">irc.freenode.net</a> , irc.postman.i2p 或 irc.freshcoffee.i2p 上的
+ <a href="irc://127.0.0.1:6668/i2p-help">#i2p-help</a>, <a href="irc://127.0.0.1:6668/i2p">#i2p</a> 
+或 
+<a href="irc://127.0.0.1:6668/i2p-chat">#i2p-chat</a>
+这两个 IRC 频道上询问。 (这些服务器上的这两个频道是相通的)。</p>
+</div>

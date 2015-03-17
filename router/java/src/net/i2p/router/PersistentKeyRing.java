@@ -4,16 +4,12 @@ import java.io.IOException;
 import java.io.Writer;
 
 import java.util.Iterator;
-import java.util.Map;
-import java.util.TreeMap;
 
-import net.i2p.data.Base64;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
 import net.i2p.data.SessionKey;
-import net.i2p.router.TunnelPoolSettings;
 import net.i2p.util.KeyRing;
 
 /**
@@ -31,19 +27,18 @@ public class PersistentKeyRing extends KeyRing {
         addFromProperties();
     }
 
+    @Override
     public SessionKey put(Hash h, SessionKey sk) {
         SessionKey old = super.put(h, sk);
         if (!sk.equals(old)) {
-            _ctx.router().setConfigSetting(PROP_PFX + h.toBase64().replace("=", "$"),
+            _ctx.router().saveConfig(PROP_PFX + h.toBase64().replace("=", "$"),
                                            sk.toBase64());
-            _ctx.router().saveConfig();
         }
         return old;
     }
 
     public SessionKey remove(Hash h) {
-        _ctx.router().removeConfigSetting(PROP_PFX + h.toBase64().replace("=", "$"));
-        _ctx.router().saveConfig();
+        _ctx.router().saveConfig(PROP_PFX + h.toBase64().replace("=", "$"), null);
         return super.remove(h);
     }
 
@@ -56,7 +51,7 @@ public class PersistentKeyRing extends KeyRing {
             if (key == null || key.length() != 44)
                 continue;
             String hb = prop.substring(PROP_PFX.length());
-            hb.replace("$", "=");
+            hb = hb.replace("$", "=");
             Hash dest = new Hash();
             SessionKey sk = new SessionKey();
             try {
@@ -67,13 +62,14 @@ public class PersistentKeyRing extends KeyRing {
         }
     }
 
+    @Override
     public void renderStatusHTML(Writer out) throws IOException {
-        StringBuffer buf = new StringBuffer(1024);
-        buf.append("\n<table border=\"1\"><tr><th align=\"left\">Destination Hash<th align=\"left\">Name or Dest.<th align=\"left\">Session Key</tr>");
+        StringBuilder buf = new StringBuilder(1024);
+        buf.append("\n<table><tr><th align=\"left\">Destination Hash<th align=\"left\">Name or Dest.<th align=\"left\">Encryption Key</tr>");
         for (Entry<Hash, SessionKey> e : entrySet()) {
             buf.append("\n<tr><td>");
             Hash h = e.getKey();
-            buf.append(h.toBase64().substring(0, 6)).append("...");
+            buf.append(h.toBase64().substring(0, 6)).append("&hellip;");
             buf.append("<td>");
             LeaseSet ls = _ctx.netDb().lookupLeaseSetLocally(h);
             if (ls != null) {
@@ -83,13 +79,13 @@ public class PersistentKeyRing extends KeyRing {
                     if (in != null && in.getDestinationNickname() != null)
                         buf.append(in.getDestinationNickname());
                     else
-                        buf.append(dest.toBase64().substring(0, 6)).append("...");
+                        buf.append(dest.toBase64().substring(0, 6)).append("&hellip;");
                 } else {
                     String host = _ctx.namingService().reverseLookup(dest);
                     if (host != null)
                         buf.append(host);
                     else
-                        buf.append(dest.toBase64().substring(0, 6)).append("...");
+                        buf.append(dest.toBase64().substring(0, 6)).append("&hellip;");
                 }
             }
             buf.append("<td>");

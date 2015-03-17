@@ -8,49 +8,47 @@ package net.i2p.data.i2np;
  *
  */
 
-import java.io.IOException;
-
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
-import net.i2p.util.Log;
 
 /**
  * Defines a message containing arbitrary bytes of data
+ * This is what goes in a GarlicClove.
+ * It was also previously used for generating test messages.
  *
  * @author jrandom
  */
-public class DataMessage extends I2NPMessageImpl {
-    private final static Log _log = new Log(DataMessage.class);
+public class DataMessage extends FastI2NPMessageImpl {
     public final static int MESSAGE_TYPE = 20;
     private byte _data[];
     
-    private static final int MAX_SIZE = 64*1024;
-    
     public DataMessage(I2PAppContext context) {
         super(context);
-        _data = null;
     }
     
     public byte[] getData() { 
-        verifyUnwritten();
         return _data; 
     }
+
+    /**
+     *  @throws IllegalStateException if data previously set, to protect saved checksum
+     */
     public void setData(byte[] data) { 
-        verifyUnwritten();
+        if (_data != null)
+            throw new IllegalStateException();
         _data = data; 
     }
     
     public int getSize() { 
-        verifyUnwritten();
         return _data.length;
     }
     
-    public void readMessage(byte data[], int offset, int dataSize, int type) throws I2NPMessageException, IOException {
+    public void readMessage(byte data[], int offset, int dataSize, int type) throws I2NPMessageException {
         if (type != MESSAGE_TYPE) throw new I2NPMessageException("Message type is incorrect for this message");
         int curIndex = offset;
         long size = DataHelper.fromLong(data, curIndex, 4);
         curIndex += 4;
-        if (size > 64*1024)
+        if (size > MAX_SIZE)
             throw new I2NPMessageException("wtf, size=" + size);
         _data = new byte[(int)size];
         System.arraycopy(data, curIndex, _data, 0, (int)size);
@@ -63,9 +61,9 @@ public class DataMessage extends I2NPMessageImpl {
         else
             return 4 + _data.length;
     }
+
     /** write the message body to the output array, starting at the given index */
     protected int writeMessageBody(byte out[], int curIndex) {
-        verifyUnwritten();
         if (_data == null) {
             out[curIndex++] = 0x0;
             out[curIndex++] = 0x0;
@@ -81,30 +79,28 @@ public class DataMessage extends I2NPMessageImpl {
         return curIndex;
     }
     
-    protected void written() {
-        super.written();
-        _data = null;
-    }
-    
     public int getType() { return MESSAGE_TYPE; }
     
+    @Override
     public int hashCode() {
-        return DataHelper.hashCode(getData());
+        return DataHelper.hashCode(_data);
     }
     
+    @Override
     public boolean equals(Object object) {
         if ( (object != null) && (object instanceof DataMessage) ) {
             DataMessage msg = (DataMessage)object;
-            return DataHelper.eq(getData(),msg.getData());
+            return DataHelper.eq(_data, msg._data);
         } else {
             return false;
         }
     }
     
+    @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append("[DataMessage: ");
-        buf.append("\n\tData: ").append(DataHelper.toString(getData(), 64));
+        buf.append("\n\tData: ").append(DataHelper.toString(_data, 64));
         buf.append("]");
         return buf.toString();
     }

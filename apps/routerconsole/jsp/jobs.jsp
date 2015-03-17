@@ -1,21 +1,18 @@
 <%@page contentType="text/html"%>
+<%@page trimDirectiveWhitespaces="true"%>
 <%@page pageEncoding="UTF-8"%>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 
 <html><head>
-<title>I2P Router Console - job queue</title>
-<link rel="stylesheet" href="default.css" type="text/css" />
-</head><body>
-
-<%@include file="nav.jsp" %>
-<%@include file="summary.jsp" %>
-
+<%@include file="css.jsi" %>
+<%=intl.title("job queue")%>
+<script src="/js/ajax.js" type="text/javascript"></script>
+<%@include file="summaryajax.jsi" %>
+</head><body onload="initAjax()">
+<%@include file="summary.jsi" %><h1><%=intl._("I2P Router Job Queue")%></h1>
 <div class="main" id="main">
  <jsp:useBean class="net.i2p.router.web.JobQueueHelper" id="jobQueueHelper" scope="request" />
- <jsp:setProperty name="jobQueueHelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
- <jsp:setProperty name="jobQueueHelper" property="writer" value="<%=out%>" />
+ <jsp:setProperty name="jobQueueHelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
+ <% jobQueueHelper.storeWriter(out); %>
  <jsp:getProperty name="jobQueueHelper" property="jobQueueSummary" />
-</div>
-
-</body>
-</html>
+<hr></div></body></html>

@@ -1,0 +1,86 @@
+/* I2P Theme: I2P Classic Theme Override */
+/* I2P Description: Larger fontsize override for console to accomodate foreign charactersets */
+/* Author: Dr|Z3d */
+
+
+/* sidepanel */
+
+div.routersummary {
+     font: 9.5pt/125%;
+}
+
+div.routersummary h3 {
+     font-size: 12.5pt;
+}
+
+div.routersummary h4 {
+     font-size: 11.5pt;
+     letter-spacing: 0;
+}
+
+div.routersummary table {
+     font-size: 9pt;
+}
+
+div.routersummary table a:link, div.routersummary table a:visited {
+     font-size: 10.5pt;
+}
+
+div.routersummary a {
+     word-spacing: 0em !important;
+     letter-spacing: 0.2em !important;
+}
+
+div.tunnels a {
+     font-size: 9pt !important;
+}
+
+div.tunnels table {
+}
+
+div.tunnels td:first-child, div.tunnels td:last-child  {
+     width: 16px;
+}
+
+div.tunnels td:last-child {
+     text-align: left;
+}
+
+div.tunnels td {
+     padding: 0 2px;
+}
+/* global overrides */
+
+a, b, div.routersummary h3 a, div.routersummary h4 {
+    font-weight: normal !important;
+    font-size: 100%;
+}
+
+b, a, input, button, submit, i, th, thead, tfoot, h1, h2, h3, h4{
+     font-weight: normal !important;
+     font-style: normal !important;
+     -moz-text-shadow: 0 0 0;
+     -khtml-text-shadow: 0 0 0;
+     text-shadow: 0 0 0;
+}
+
+body {
+     font: 10pt Verdana, "Bitstream Vera Sans", Helvetica, Sans, sans-serif;
+}
+
+div.main, div.main p, div.news p {
+     line-height: 140%;
+}
+
+div.joblog li i {
+     font-weight: normaL;
+}
+
+b, div.joblog b {
+    color: #003;
+    font-size: 110%;
+}
+
+table code {
+     font-size: 120%;
+}

@@ -6,11 +6,17 @@
 <web-app>
 	<servlet>
 		<servlet-name>addressbook</servlet-name>
-		<servlet-class>addressbook.Servlet</servlet-class>
+		<servlet-class>net.i2p.addressbook.Servlet</servlet-class>
 		<init-param>
 		    <param-name>home</param-name>
 		    <param-value>./addressbook</param-value>
 		</init-param>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
+
+    <servlet-mapping> 
+      <servlet-name>addressbook</servlet-name>
+      <url-pattern>/*</url-pattern>
+    </servlet-mapping>
+
 </web-app>

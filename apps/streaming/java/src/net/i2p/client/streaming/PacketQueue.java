@@ -1,13 +1,9 @@
 package net.i2p.client.streaming;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import net.i2p.I2PAppContext;
 import net.i2p.client.I2PSession;
 import net.i2p.client.I2PSessionException;
 import net.i2p.data.ByteArray;
-import net.i2p.data.SessionKey;
 import net.i2p.util.ByteCache;
 import net.i2p.util.Log;
 
@@ -16,36 +12,40 @@ import net.i2p.util.Log;
  * Well, thats the theory at least... in practice we just
  * send them immediately with no blocking, since the 
  * mode=bestEffort doesnt block in the SDK.
- *
+ *<p>
+ * MessageOutputStream -> ConnectionDataReceiver -> Connection -> PacketQueue -> I2PSession
  */
 class PacketQueue {
-    private I2PAppContext _context;
-    private Log _log;
-    private I2PSession _session;
-    private ConnectionManager _connectionManager;
-    private ByteCache _cache = ByteCache.getInstance(64, 36*1024);
+    private final I2PAppContext _context;
+    private final Log _log;
+    private final I2PSession _session;
+    private final ConnectionManager _connectionManager;
+    private final ByteCache _cache = ByteCache.getInstance(64, 36*1024);
     
     public PacketQueue(I2PAppContext context, I2PSession session, ConnectionManager mgr) {
         _context = context;
         _session = session;
         _connectionManager = mgr;
         _log = context.logManager().getLog(PacketQueue.class);
-        _context.statManager().createRateStat("stream.con.sendMessageSize", "Size of a message sent on a connection", "Stream", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
-        _context.statManager().createRateStat("stream.con.sendDuplicateSize", "Size of a message resent on a connection", "Stream", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
+        // all createRateStats in ConnectionManager
     }
     
     /**
      * Add a new packet to be sent out ASAP
+     *
+     * keys and tags disabled since dropped in I2PSession
+     * @return true if sent
      */
-    public void enqueue(PacketLocal packet) {
+    public boolean enqueue(PacketLocal packet) {
+        // this updates the ack/nack field
         packet.prepare();
         
-        SessionKey keyUsed = packet.getKeyUsed();
-        if (keyUsed == null)
-            keyUsed = new SessionKey();
-        Set tagsSent = packet.getTagsSent();
-        if (tagsSent == null)
-            tagsSent = new HashSet(0);
+        //SessionKey keyUsed = packet.getKeyUsed();
+        //if (keyUsed == null)
+        //    keyUsed = new SessionKey();
+        //Set tagsSent = packet.getTagsSent();
+        //if (tagsSent == null)
+        //    tagsSent = new HashSet(0);
 
         // cache this from before sendMessage
         String conStr = null;
@@ -54,7 +54,7 @@ class PacketQueue {
         if (packet.getAckTime() > 0) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Not resending " + packet);
-            return;
+            return false;
         } else {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Sending... " + packet);
@@ -78,7 +78,7 @@ class PacketQueue {
                 _log.warn("took " + writeTime + "ms to write the packet: " + packet);
 
             // last chance to short circuit...
-            if (packet.getAckTime() > 0) return;
+            if (packet.getAckTime() > 0) return false;
             
             // this should not block!
             begin = _context.clock().now();
@@ -89,9 +89,23 @@ class PacketQueue {
                 // so if we retransmit it will use a new tunnel/lease combo
                 expires = rpe.getNextSendTime() - 500;
             if (expires > 0)
-                sent = _session.sendMessage(packet.getTo(), buf, 0, size, keyUsed, tagsSent, expires);
+                // I2PSessionImpl2
+                //sent = _session.sendMessage(packet.getTo(), buf, 0, size, keyUsed, tagsSent, expires);
+                // I2PSessionMuxedImpl
+                //sent = _session.sendMessage(packet.getTo(), buf, 0, size, keyUsed, tagsSent, expires,
+                //                 I2PSession.PROTO_STREAMING, I2PSession.PORT_UNSPECIFIED, I2PSession.PORT_UNSPECIFIED);
+                // I2PSessionMuxedImpl no tags
+                sent = _session.sendMessage(packet.getTo(), buf, 0, size, null, null, expires,
+                                 I2PSession.PROTO_STREAMING, packet.getLocalPort(), packet.getRemotePort());
             else
-                sent = _session.sendMessage(packet.getTo(), buf, 0, size, keyUsed, tagsSent);
+                // I2PSessionImpl2
+                //sent = _session.sendMessage(packet.getTo(), buf, 0, size, keyUsed, tagsSent, 0);
+                // I2PSessionMuxedImpl
+                //sent = _session.sendMessage(packet.getTo(), buf, 0, size, keyUsed, tagsSent,
+                //                 I2PSession.PROTO_STREAMING, I2PSession.PORT_UNSPECIFIED, I2PSession.PORT_UNSPECIFIED);
+                // I2PSessionMuxedImpl no tags
+                sent = _session.sendMessage(packet.getTo(), buf, 0, size, null, null,
+                                 I2PSession.PROTO_STREAMING, packet.getLocalPort(), packet.getRemotePort());
             end = _context.clock().now();
             
             if ( (end-begin > 1000) && (_log.shouldLog(Log.WARN)) ) 
@@ -121,13 +135,11 @@ class PacketQueue {
             if (c != null) // handle race on b0rk
                 c.disconnect(false);
         } else {
-            packet.setKeyUsed(keyUsed);
-            packet.setTagsSent(tagsSent);
+            //packet.setKeyUsed(keyUsed);
+            //packet.setTagsSent(tagsSent);
             packet.incrementSends();
             if (_log.shouldLog(Log.DEBUG)) {
-                String msg = "SEND " + packet + (tagsSent.size() > 0 
-                             ? " with " + tagsSent.size() + " tags"
-                             : "")
+                String msg = "SEND " + packet
                              + " send # " + packet.getNumSends()
                              + " sendTime: " + (end-begin)
                              + " con: " + conStr;
@@ -148,6 +160,7 @@ class PacketQueue {
             // reset
             packet.releasePayload();
         }
+        return sent;
     }
     
 }

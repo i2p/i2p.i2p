@@ -85,9 +85,9 @@ class HarvesterJob extends JobImpl {
                 long when = info.getPublished();
                 if (when + MIN_UPDATE_FREQUENCY > now)
                     continue;
-                while (routersByAge.containsKey(new Long(when)))
+                while (routersByAge.containsKey(Long.valueOf(when)))
                     when++;
-               routersByAge.put(new Long(when), info.getIdentity().getHash());
+               routersByAge.put(Long.valueOf(when), info.getIdentity().getHash());
             }
         }
         

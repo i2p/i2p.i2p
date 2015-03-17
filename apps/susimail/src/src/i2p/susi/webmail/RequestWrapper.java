@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -34,6 +35,19 @@ import javax.servlet.http.HttpSession;
 import org.mortbay.servlet.MultiPartRequest;
 
 /**
+ *  Required major changes for Jetty 6
+ *  to support change from MultiPartRequest to MultiPartFilter.
+ *  See http://docs.codehaus.org/display/JETTY/File+Upload+in+jetty6
+ *  Unfortunately, Content-type not available until Jetty 8
+ *  See https://bugs.eclipse.org/bugs/show_bug.cgi?id=349110
+ *
+ *  So we could either extend and fix MultiPartFilter, and rewrite everything here,
+ *  or copy MultiParRequest into our war and fix it so it compiles with Jetty 6.
+ *  We do the latter.
+ *
+ *  The filter would have been added in web.xml,
+ *  see that file, where it's commented out.
+ *
  * @author user
  */
 public class RequestWrapper {
@@ -55,7 +69,7 @@ public class RequestWrapper {
 		cache = new Hashtable();
 		this.httpRequest = httpRequest;
 		String contentType = httpRequest.getContentType();
-		if( contentType != null && contentType.toLowerCase().startsWith( "multipart/form-data" ) ) {
+		if( contentType != null && contentType.toLowerCase(Locale.US).startsWith( "multipart/form-data" ) ) {
 			try {
 				multiPartRequest = new MultiPartRequest( httpRequest );
 			} catch (IOException e) {
@@ -67,29 +81,25 @@ public class RequestWrapper {
 
 	/**
 	 * @param b
-	 * @return
 	 */
 	public HttpSession getSession(boolean b) {
 		return httpRequest.getSession( b );
 	}
 
 	/**
-	 * @param key
-	 * @return
+	 * @param name Specific parameter key
+	 * @return parameter value
 	 */
 	public String getParameter(String name ) {
 		return getParameter( name, null );
 	}
 
-	/**
-	 * @return
-	 */
 	public HttpSession getSession() {
 		return httpRequest.getSession();
 	}
 
 	/**
-	 * @return
+	 * @return List of request parameter names
 	 */
 	public Enumeration getParameterNames() {
 		if( multiPartRequest != null ) {
@@ -106,24 +116,19 @@ public class RequestWrapper {
 	}
 
 	/**
-	 * @return
+	 * @return The total length of the content.
 	 */
 	public int getContentLength() {
 		return httpRequest.getContentLength();
 	}
 
 	/**
-	 * @return
+	 * @return The content type of the request.
 	 */
 	public String getContentType() {
 		return httpRequest.getContentType();
 	}
 
-	/**
-	 * 
-	 * @param partName
-	 * @return
-	 */
 	public String getContentType( String partName )
 	{
 		String result = null;
@@ -131,7 +136,7 @@ public class RequestWrapper {
 			Hashtable params = multiPartRequest.getParams( partName );
 			for( Enumeration e = params.keys(); e.hasMoreElements(); ) {
 				String key = (String)e.nextElement();
-				if( key.toLowerCase().compareToIgnoreCase( "content-type") == 0 ) {
+				if( key.toLowerCase(Locale.US).compareToIgnoreCase( "content-type") == 0 ) {
 					String value = (String)params.get( key );
 					int i = value.indexOf( ";" );
 					if( i != -1 )
@@ -143,19 +148,11 @@ public class RequestWrapper {
 		}
 		return result;
 	}
-	/**
-	 * @param string
-	 * @return
-	 */
+
 	public Object getAttribute(String string) {
 		return httpRequest.getAttribute( string );
 	}
 
-	/**
-	 * @param new_subject
-	 * @param string
-	 * @return
-	 */
 	public String getParameter( String name, String defaultValue )
 	{
 		String result = defaultValue;
@@ -184,10 +181,7 @@ public class RequestWrapper {
 		}
 		return result;
 	}
-	/**
-	 * @param new_filename
-	 * @return
-	 */
+
 	public String getFilename(String partName )
 	{
 		String result = null;
@@ -198,10 +192,7 @@ public class RequestWrapper {
 		}
 		return result;
 	}
-	/**
-	 * @param new_filename
-	 * @return
-	 */
+
 	public InputStream getInputStream(String partName )
 	{
 		InputStream result = null;

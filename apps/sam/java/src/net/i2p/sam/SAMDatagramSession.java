@@ -30,10 +30,11 @@ public class SAMDatagramSession extends SAMMessageSession {
     private final static Log _log = new Log(SAMDatagramSession.class);
     public static int DGRAM_SIZE_MAX = 31*1024;
 
-    private SAMDatagramReceiver recv = null;
+    // FIXME make final after fixing SAMv3DatagramSession override
+    protected SAMDatagramReceiver recv;
 
-    private I2PDatagramMaker dgramMaker;
-    private I2PDatagramDissector dgramDissector = new I2PDatagramDissector();
+    private final I2PDatagramMaker dgramMaker;
+    private final I2PDatagramDissector dgramDissector = new I2PDatagramDissector();
     /**
      * Create a new SAM DATAGRAM session.
      *
@@ -84,9 +85,10 @@ public class SAMDatagramSession extends SAMMessageSession {
     public boolean sendBytes(String dest, byte[] data) throws DataFormatException {
         if (data.length > DGRAM_SIZE_MAX)
             throw new DataFormatException("Datagram size exceeded (" + data.length + ")");
-        
-        byte[] dgram = dgramMaker.makeI2PDatagram(data);
-
+        byte[] dgram ;
+        synchronized (dgramMaker) {
+        	dgram = dgramMaker.makeI2PDatagram(data);
+        }
         return sendBytesThroughMessageSession(dest, dgram);
     }
 

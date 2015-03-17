@@ -21,7 +21,7 @@ class MessageState {
     private long _nonce;
     private String _prefix;
     private MessageId _id;
-    private Set _receivedStatus;
+    private final Set _receivedStatus;
     private SessionKey _key;
     private SessionKey _newKey;
     private Set _tags;
@@ -37,13 +37,7 @@ class MessageState {
         _context = ctx;
         _nonce = nonce;
         _prefix = prefix + "[" + _stateId + "]: ";
-        _id = null;
         _receivedStatus = new HashSet();
-        _cancelled = false;
-        _key = null;
-        _newKey = null;
-        _tags = null;
-        _to = null;
         _created = ctx.clock().now();
         //ctx.statManager().createRateStat("i2cp.checkStatusTime", "how long it takes to go through the states", "i2cp", new long[] { 60*1000 });
     }
@@ -106,7 +100,7 @@ class MessageState {
     }
 
     public void waitFor(int status, long expiration) {
-        long checkTime = -1;
+        //long checkTime = -1;
         boolean found = false;
         while (!found) {
             if (_cancelled) return;
@@ -118,13 +112,13 @@ class MessageState {
             }
             found = false;
             synchronized (_receivedStatus) {
-                long beforeCheck = _context.clock().now();
+                //long beforeCheck = _context.clock().now();
                 if (locked_isSuccess(status) || locked_isFailure(status)) {
                     if (_log.shouldLog(Log.DEBUG)) 
                         _log.debug(_prefix + "Received a confirm (one way or the other)");
                     found = true;
                 }
-                checkTime = _context.clock().now() - beforeCheck;
+                //checkTime = _context.clock().now() - beforeCheck;
                 if (!found) {
                     if (timeToWait > 5000) {
                         timeToWait = 5000;

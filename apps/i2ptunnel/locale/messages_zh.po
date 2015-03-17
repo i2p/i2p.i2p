@@ -1,0 +1,848 @@
+# I2P
+# Copyright (C) 2009 The I2P Project
+# This file is distributed under the same license as the i2ptunnel package.
+# To contribute translations, see http://www.i2p2.de/newdevelopers
+# 
+# ducki2p <ducki2p@gmail.com>, 2011.
+#   <walking@i2pmail.org>, 2011.
+msgid ""
+msgstr ""
+"Project-Id-Version: I2P\n"
+"Report-Msgid-Bugs-To: https://trac.i2p2.de/\n"
+"POT-Creation-Date: 2011-06-11 08:23+0000\n"
+"PO-Revision-Date: 2011-08-20 06:00+0000\n"
+"Last-Translator: walking <walking@i2pmail.org>\n"
+"Language-Team: Chinese (China) (http://www.transifex.net/projects/p/I2P/team/zh_CN/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: zh_CN\n"
+"Plural-Forms: nplurals=1; plural=0\n"
+
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:514
+#, java-format
+msgid ""
+"To visit the destination in your host database, click <a "
+"href=\"{0}\">here</a>. To visit the conflicting addresshelper destination, "
+"click <a href=\"{1}\">here</a>."
+msgstr ""
+"域名冲突：要访问您本地【地址簿】中设置的目标主机(相当与IP)，请点击<a "
+"href=\"{0}\">这里</a>。要访问【地址助手】返回的目标主机请点<a href=\"{1}\">这里</a>。"
+
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:875
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:388
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:142
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:401
+msgid "Host"
+msgstr "主机"
+
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:876
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:370
+msgid "Destination"
+msgstr "目标"
+
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:881
+#, java-format
+msgid "Continue to {0} without saving"
+msgstr "继续{0}，而不保存"
+
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:886
+#, java-format
+msgid "Save {0} to router address book and continue to eepsite"
+msgstr "保存{0}至“路由器地址簿”并访问该eepsite。"
+
+#. only blockfile supports multiple books
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:889
+#, java-format
+msgid "Save {0} to master address book and continue to eepsite"
+msgstr "保存{0}至“主地址簿”并访问该eepsite。"
+
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:890
+#, java-format
+msgid "Save {0} to private address book and continue to eepsite"
+msgstr "保存{0}至“私有地址簿”并访问该eepsite。"
+
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1046
+msgid ""
+"Click a link below to look for an address helper by using a \"jump\" "
+"service:"
+msgstr "请点击下面的链接通过【跳转(Jump)】服务提供的【地址助手】链接跳转至域名对应的主机："
+
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1262
+msgid "Added via address helper"
+msgstr "已通过地址助手添加"
+
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1286
+#, java-format
+msgid "Redirecting to {0}"
+msgstr "正在重定向至{0}"
+
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1292
+msgid "Router Console"
+msgstr "路由控制台"
+
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1293
+msgid "Addressbook"
+msgstr "地址簿"
+
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1293
+msgid "Configuration"
+msgstr "配置"
+
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1293
+msgid "Help"
+msgstr "帮助"
+
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1298
+#, java-format
+msgid "Saved {0} to the {1} addressbook, redirecting now."
+msgstr "目标{0}已保存至{1}地址簿中，正在重定向至此目标。"
+
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1299
+#, java-format
+msgid "Failed to save {0} to the {1} addressbook, redirecting now."
+msgstr "目标{0}在{1}地址簿中保存失败，，正在重定向至此目标。"
+
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1301
+msgid "Click here if you are not redirected automatically."
+msgstr "如果未能自动重定向，请点击这里。"
+
+#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:326
+#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:336
+msgid "internal"
+msgstr "内部"
+
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:171
+msgid ""
+"Invalid form submission, probably because you used the 'back' or 'reload' "
+"button on your browser. Please resubmit."
+msgstr "网页提交无效，可能的原因是您使用了浏览器的“后退”和“刷新”按钮，导致表单过期，请重新提交。"
+
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:218
+msgid "Configuration reloaded for all tunnels"
+msgstr "所有隧道都已根据当前配置重启"
+
+#. and give them something to look at in any case
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:230
+msgid "Starting tunnel"
+msgstr "正在启动隧道"
+
+#. and give them something to look at in any case
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:243
+msgid "Stopping tunnel"
+msgstr "正在关闭隧道"
+
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:311
+msgid "Configuration changes saved"
+msgstr "配置修改成功"
+
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:314
+msgid "Failed to save configuration"
+msgstr "配置保存失败"
+
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:398
+msgid "New Tunnel"
+msgstr "新建隧道"
+
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:418
+msgid "Standard client"
+msgstr "标准客户端"
+
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:419
+msgid "HTTP client"
+msgstr "HTTP 客户端"
+
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:420
+msgid "IRC client"
+msgstr "IRC 客户端"
+
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:421
+msgid "Standard server"
+msgstr "标准服务器"
+
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:422
+msgid "HTTP server"
+msgstr "HTTP 服务器"
+
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:423
+msgid "SOCKS 4/4a/5 proxy"
+msgstr "SOCKS4/4A/5 代理"
+
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:424
+msgid "SOCKS IRC proxy"
+msgstr "SOCKS IRC 代理"
+
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:425
+msgid "CONNECT/SSL/HTTPS proxy"
+msgstr "CONNECT/SSL/HTTPS 代理"
+
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:426
+msgid "IRC server"
+msgstr "IRC 服务器"
+
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:427
+msgid "Streamr client"
+msgstr "Streamr 客户端"
+
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:428
+msgid "Streamr server"
+msgstr "Streamr 服务器"
+
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:429
+msgid "HTTP bidir"
+msgstr "双向http"
+
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:517
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:293
+msgid "Host not set"
+msgstr "主机未设置"
+
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:521
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:275
+msgid "Port not set"
+msgstr "端口未设置"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:73
+msgid "I2P Tunnel Manager - Edit Client Tunnel"
+msgstr "I2P 隧道管理器 - 编辑客户端隧道"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:93
+msgid "Edit proxy settings"
+msgstr "编辑代理设置"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:101
+msgid "New proxy settings"
+msgstr "新建代理设置"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:112
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:112
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:110
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:124
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:245
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:260
+msgid "Name"
+msgstr "名称"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:116
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:116
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:249
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:282
+msgid "Type"
+msgstr "类型"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:120
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:120
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:229
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:389
+msgid "Description"
+msgstr "描述"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:126
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:136
+msgid "Target"
+msgstr "目标"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:130
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:132
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:162
+msgid "Access Point"
+msgstr "接入点"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:137
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:150
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:192
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:153
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:167
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:213
+msgid "required"
+msgstr "必要"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:159
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:178
+msgid "Reachable by"
+msgstr "访问地址"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:180
+msgid "Outproxies"
+msgstr "出口代理"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:187
+msgid "Tunnel Destination"
+msgstr "隧道目标"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:199
+msgid "name or destination"
+msgstr "名称或描述"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:202
+msgid "b32 not recommended"
+msgstr "请避免使用b32地址。"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:208
+msgid "Shared Client"
+msgstr "共享客户端"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:212
+msgid ""
+"(Share tunnels with other clients and irc/httpclients? Change requires "
+"restart of client proxy)"
+msgstr "(与其他客户端例如IRC/HTTP共享隧道？修改需要重新启动)"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:216
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:124
+msgid "Auto Start"
+msgstr "自动启动"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:220
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:128
+msgid "(Check the Box for 'YES')"
+msgstr "(选中表示\"是\")"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:222
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:243
+msgid "Advanced networking options"
+msgstr "高级网络设置"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:224
+msgid ""
+"(NOTE: when this client proxy is configured to share tunnels, then these "
+"options are for all the shared proxy clients!)"
+msgstr "(注意:此客户代理被设置使用共享隧道时，这些设置将影响所有使用共享隧道的客户端!)"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:226
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:245
+msgid "Tunnel Options"
+msgstr "隧道选项"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:228
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:247
+msgid "Length"
+msgstr "长度"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:235
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:254
+msgid "0 hop tunnel (low anonymity, low latency)"
+msgstr "直连(匿名性无,延迟低)"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:239
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:258
+msgid "1 hop tunnel (medium anonymity, medium latency)"
+msgstr "隧道跳点x1(匿名性中,延迟中)"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:243
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:262
+msgid "2 hop tunnel (high anonymity, high latency)"
+msgstr "隧道跳点x2(匿名性高,延迟高)"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:247
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:266
+msgid "3 hop tunnel (very high anonymity, poor performance)"
+msgstr "隧道跳点x3(匿名性优,影响性能)"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:256
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:275
+msgid "hop tunnel (very poor performance)"
+msgstr "跳点隧道(严重影响性能)"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:261
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:280
+msgid "Variance"
+msgstr "随机变化"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:268
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:287
+msgid "0 hop variance (no randomisation, consistant performance)"
+msgstr "隧道长度恒定(随机性无,性能稳定)"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:272
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:291
+msgid ""
+"+ 0-1 hop variance (medium additive randomisation, subtractive performance)"
+msgstr "隧道长度+ 0-1(随机性中,影响性能)"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:276
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:295
+msgid ""
+"+ 0-2 hop variance (high additive randomisation, subtractive performance)"
+msgstr "隧道长度+ 0-2(随机性高,影响性能)"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:280
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:299
+msgid "+/- 0-1 hop variance (standard randomisation, standard performance)"
+msgstr "隧道长度+/- 0-1(随机性标准,正常性能)"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:284
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:303
+msgid "+/- 0-2 hop variance (not recommended)"
+msgstr "隧道程度+/- 0-2(不推荐)"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:296
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:315
+msgid "hop variance"
+msgstr "节点数量"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:301
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:320
+msgid "Count"
+msgstr "计数"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:308
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:327
+msgid "1 inbound, 1 outbound tunnel  (low bandwidth usage, less reliability)"
+msgstr "出/入站隧道x1(带宽低,低可靠性)"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:312
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:331
+msgid ""
+"2 inbound, 2 outbound tunnels (standard bandwidth usage, standard "
+"reliability)"
+msgstr "出/入站隧道x2(带宽标准,标准稳定性)"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:316
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:335
+msgid ""
+"3 inbound, 3 outbound tunnels (higher bandwidth usage, higher reliability)"
+msgstr "出/入站隧道x3(带宽高,高稳定性)"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:325
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:344
+msgid "tunnels"
+msgstr "隧道"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:330
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:349
+msgid "Backup Count"
+msgstr "备用数量"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:337
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:356
+msgid "0 backup tunnels (0 redundancy, no added resource usage)"
+msgstr "无备用隧道(无冗余,不增加资源占用)"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:341
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:360
+msgid "1 backup tunnel each direction (low redundancy, low resource usage)"
+msgstr "备用隧道对x1 (低冗余,低资源占用)"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:345
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:364
+msgid ""
+"2 backup tunnels each direction (medium redundancy, medium resource usage)"
+msgstr "备用隧道对x2 (中冗余,中资源占用)"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:349
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:368
+msgid "3 backup tunnels each direction (high redundancy, high resource usage)"
+msgstr "备用隧道对x3 (高冗余,高资源占用)"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:358
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:377
+msgid "backup tunnels"
+msgstr "备用隧道"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:365
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:384
+msgid "Profile"
+msgstr "连接类型"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:372
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:391
+msgid "interactive connection"
+msgstr "速度连接"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:376
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:395
+msgid "bulk connection (downloads/websites/BT)"
+msgstr "效率连接(下载/WEB/BT)"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:378
+msgid "Delay Connect"
+msgstr "连接延迟断开"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:382
+msgid "for request/response connections"
+msgstr "单请求/响应连接"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:386
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:399
+msgid "Router I2CP Address"
+msgstr "路由器I2CP地址"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:396
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:148
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:409
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:247
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:269
+msgid "Port"
+msgstr "端口"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:406
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:479
+msgid "Reduce tunnel quantity when idle"
+msgstr "空闲时缩减隧道数量"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:408
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:422
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:430
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:442
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:452
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:472
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:486
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:419
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:481
+msgid "Enable"
+msgstr "启用"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:412
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:485
+msgid "Reduced tunnel count"
+msgstr "削减后的隧道数量"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:416
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:436
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:489
+msgid "Idle minutes"
+msgstr "空闲时间(分钟)"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:420
+msgid "Close tunnels when idle"
+msgstr "空闲时关闭隧道"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:426
+msgid "New Keys on Reopen"
+msgstr "重新打开隧道时使用新密钥"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:434
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:435
+msgid "Disable"
+msgstr "禁用"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:440
+msgid "Delay tunnel open until required"
+msgstr "仅在请求时打开"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:450
+msgid "Persistent private key"
+msgstr "永久私有密钥"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:456
+msgid "File"
+msgstr "文件"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:460
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:220
+msgid "Local destination"
+msgstr "本地目标"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:464
+msgid "(if known)"
+msgstr "(如果已知)"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:470
+msgid "Local Authorization"
+msgstr "本地认证"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:476
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:490
+msgid "Username"
+msgstr "用户名"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:480
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:494
+msgid "Password"
+msgstr "密码"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:484
+msgid "Outproxy Authorization"
+msgstr "出口代理认证"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:502
+msgid "Jump URL List"
+msgstr "跳转服务列表"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:508
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:525
+msgid "Custom options"
+msgstr "自定义选项"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:512
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:529
+msgid ""
+"NOTE: If tunnel is currently running, most changes will not take effect "
+"until tunnel is stopped and restarted."
+msgstr "注意：如果当前隧道已经启动，设置需要【停止】并重新【启动】相应隧道后才能生效。"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:514
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:531
+msgid "Cancel"
+msgstr "取消"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:518
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:535
+msgid "Delete"
+msgstr "删除"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:520
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:537
+msgid "Save"
+msgstr "保存"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:73
+msgid "I2P Tunnel Manager - Edit Server Tunnel"
+msgstr "I2P隧道管理器 - 编辑服务器隧道"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:93
+msgid "Edit server settings"
+msgstr "服务器隧道设置"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:101
+msgid "New server settings"
+msgstr "新建服务器设置"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:199
+msgid "Website name"
+msgstr "网站名称"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:203
+msgid "(leave blank for outproxies)"
+msgstr "(出口代理这里请置空)"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:208
+msgid "Private key file"
+msgstr "私钥文件"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:230
+msgid "Add to local addressbook"
+msgstr "添加至本地地址簿"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:237
+msgid "Hostname Signature"
+msgstr "主机名签名"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:417
+msgid "Encrypt Leaseset"
+msgstr "加密赁集"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:423
+msgid "Encryption Key"
+msgstr "加密密钥"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:427
+msgid "Generate New Key"
+msgstr "生成新密钥"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:429
+msgid "Generate"
+msgstr "生成"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:431
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:523
+msgid "(Tunnel must be stopped first)"
+msgstr "(必须先停止隧道)"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:433
+msgid "Restricted Access List"
+msgstr "限制访问列表"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:439
+msgid "Whitelist"
+msgstr "白名单"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:443
+msgid "Blacklist"
+msgstr "黑名单"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:447
+msgid "Access List"
+msgstr "访问列表"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:451
+msgid "Inbound connection limits (0=unlimited)"
+msgstr "入站连接限制(0=无限制)"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:453
+msgid "Per client"
+msgstr "按客户端"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:455
+msgid "Per minute"
+msgstr "按分钟"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:459
+msgid "Per hour"
+msgstr "按小时"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:463
+msgid "Per day"
+msgstr "按天"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:467
+msgid "Total"
+msgstr "总数"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:475
+msgid "Max concurrent connections (0=unlimited)"
+msgstr "最大并发连接数(0=无限制)"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:493
+msgid "New Certificate type"
+msgstr "新建证书类型"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:495
+msgid "None"
+msgstr "无"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:499
+msgid "Hashcash (effort)"
+msgstr "Hashcash (强度)"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:505
+msgid "Hashcash Calc Time"
+msgstr "Hashcash 计算时间"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:507
+msgid "Estimate"
+msgstr "估算"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:509
+msgid "Hidden"
+msgstr "隐藏"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:513
+msgid "Signed (signed by)"
+msgstr "签名(签名者)"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:519
+msgid "Modify Certificate"
+msgstr "修改证书"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:521
+msgid "Modify"
+msgstr "修改"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:74
+msgid "I2P Tunnel Manager - List"
+msgstr "I2P隧道管理器 - 列表"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:86
+msgid "Status Messages"
+msgstr "状态信息"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:90
+msgid "Refresh"
+msgstr "刷新"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:94
+msgid "Stop All"
+msgstr "全部停止"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:98
+msgid "Start All"
+msgstr "全部启动"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:102
+msgid "Restart All"
+msgstr "全部重启"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:106
+msgid "Reload Config"
+msgstr "重新载入设置"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:108
+msgid "I2P Server Tunnels"
+msgstr "I2P服务端隧道"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:112
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:133
+msgid "Points at"
+msgstr "指向"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:114
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:156
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:160
+msgid "Preview"
+msgstr "预览"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:116
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:180
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:253
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:300
+msgid "Status"
+msgstr "状态"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:166
+msgid "Base32 Address"
+msgstr "Base32地址"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:174
+msgid "No Preview"
+msgstr "无预览"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:187
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:307
+msgid "Starting..."
+msgstr "正在启动..."
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:194
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:208
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:314
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:328
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:342
+msgid "Stop"
+msgstr "停止"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:201
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:335
+msgid "Running"
+msgstr "运行中"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:215
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:349
+msgid "Stopped"
+msgstr "已停止"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:222
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:356
+msgid "Start"
+msgstr "启动"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:237
+msgid "New server tunnel"
+msgstr "新建服务器隧道"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:239
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:399
+msgid "Standard"
+msgstr "标准"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:241
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:401
+msgid "Create"
+msgstr "创建"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:243
+msgid "I2P Client Tunnels"
+msgstr "I2P客户端隧道"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:251
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:286
+msgid "Interface"
+msgstr "网络接口"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:321
+msgid "Standby"
+msgstr "等待"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:366
+msgid "Outproxy"
+msgstr "出口代理"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:384
+msgid "none"
+msgstr "无"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:397
+msgid "New client tunnel"
+msgstr "新建客户隧道"
+
+

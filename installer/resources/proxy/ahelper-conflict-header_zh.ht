@@ -1,0 +1,29 @@
+HTTP/1.1 409 Conflict
+Content-Type: text/html; charset=UTF-8
+Cache-control: no-cache
+Connection: close
+Proxy-Connection: close
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+<title>I2P 警告: 目标密钥冲突</title>
+<link rel="shortcut icon" href="http://proxy.i2p/themes/console/images/favicon.ico">
+<link href="http://proxy.i2p/themes/console/default/console.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+<div class="logo">
+ <a href="http://127.0.0.1:7657/" title="Router Console"><img src="http://proxy.i2p/themes/console/images/i2plogo.png" alt="I2P Router Console" border="0"></a><hr>
+ <a href="http://127.0.0.1:7657/config.jsp">设置</a> <a href="http://127.0.0.1:7657/help.jsp">帮助</a> <a href="http://127.0.0.1:7657/susidns/">地址簿</a>
+</div>
+<div class="warning" id="warning">
+<h3>警告: 目标密钥冲突</h3>
+<p>
+您所打开的地址跳转链接中所指定的目标密钥
+与您I2P路由地址簿中对应匿名站点的密钥地址不同。
+可能有人在伪造匿名地址或有人为自己的匿名网站设定了相同的域名。
+</p>
+<p>
+您需要选择并信任一个目标密钥，才能解决这一冲突,
+您可以通过直接输入这个.i2p网址利用地址簿中的目标密钥访问
+或在地址簿删除对应的域名或为其改名来信任当前的跳转链接。
+</p>

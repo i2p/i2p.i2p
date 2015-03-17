@@ -1,44 +1,41 @@
 package net.i2p.router.web;
 
+import java.util.ArrayList;
+
+import net.i2p.data.DataHelper;
 import net.i2p.data.RouterAddress;
 import net.i2p.router.CommSystemFacade;
-import net.i2p.router.LoadTestManager;
 import net.i2p.router.Router;
-import net.i2p.router.RouterContext;
 import net.i2p.router.transport.TransportManager;
 import net.i2p.router.transport.udp.UDPAddress;
 import net.i2p.router.transport.udp.UDPTransport;
-import net.i2p.time.Timestamper;
+import net.i2p.util.Addresses;
 
 public class ConfigNetHelper extends HelperBase {
     public ConfigNetHelper() {}
     
     /** copied from various private components */
-    public final static String PROP_I2NP_UDP_PORT = "i2np.udp.port";
-    public final static String PROP_I2NP_INTERNAL_UDP_PORT = "i2np.udp.internalPort";
     public final static String PROP_I2NP_NTCP_HOSTNAME = "i2np.ntcp.hostname";
     public final static String PROP_I2NP_NTCP_PORT = "i2np.ntcp.port";
-    public final static String PROP_I2NP_NTCP_AUTO_PORT = "i2np.ntcp.autoip";
-    public final static String PROP_I2NP_NTCP_AUTO_IP = "i2np.ntcp.autoport";
-    public String getNtcphostname() {
-        if (!TransportManager.enableNTCP(_context))
-            return "\" disabled=\"true";
-        String hostname = _context.getProperty(PROP_I2NP_NTCP_HOSTNAME); 
-        if (hostname == null) return "";
-        return hostname;
+    public final static String PROP_I2NP_NTCP_AUTO_PORT = "i2np.ntcp.autoport";
+    public final static String PROP_I2NP_NTCP_AUTO_IP = "i2np.ntcp.autoip";
+    private final static String CHECKED = " checked=\"checked\" ";
+    public String getUdphostname() {
+        return _context.getProperty(UDPTransport.PROP_EXTERNAL_HOST, ""); 
     }
+
+    public String getNtcphostname() {
+        return _context.getProperty(PROP_I2NP_NTCP_HOSTNAME, "");
+    }
+
     public String getNtcpport() { 
-        if (!TransportManager.enableNTCP(_context))
-            return "\" disabled=\"true";
-        String port = _context.getProperty(PROP_I2NP_NTCP_PORT); 
-        if (port == null) return "";
-        return port;
+        return _context.getProperty(PROP_I2NP_NTCP_PORT, ""); 
     }
     
     public String getUdpAddress() {
         RouterAddress addr = _context.router().getRouterInfo().getTargetAddress("SSU");
         if (addr == null)
-            return "unknown";
+            return _("unknown");
         UDPAddress ua = new UDPAddress(addr);
         return ua.toString();
     }
@@ -46,91 +43,133 @@ public class ConfigNetHelper extends HelperBase {
     public String getUdpIP() {
         RouterAddress addr = _context.router().getRouterInfo().getTargetAddress("SSU");
         if (addr == null)
-            return "unknown";
+            return _("unknown");
         UDPAddress ua = new UDPAddress(addr);
         if (ua.getHost() == null)
-            return "unknown";
+            return _("unknown");
         return ua.getHost();
     }
 
     public String getUdpPort() {
         RouterAddress addr = _context.router().getRouterInfo().getTargetAddress("SSU");
         if (addr == null)
-            return "unknown";
+            return _("unknown");
         UDPAddress ua = new UDPAddress(addr);
         if (ua.getPort() <= 0)
-            return "unknown";
+            return _("unknown");
         return "" + ua.getPort();
     }
 
-    public String getEnableTimeSyncChecked() {
-        String disabled = _context.getProperty(Timestamper.PROP_DISABLED, "false");
-        if ( (disabled != null) && ("true".equalsIgnoreCase(disabled)) )
-            return "";
-        else
-            return " checked ";
+    public String getConfiguredUdpPort() {
+        return "" + _context.getProperty(UDPTransport.PROP_INTERNAL_PORT, UDPTransport.DEFAULT_INTERNAL_PORT);
     }
-    
-    public String getHiddenModeChecked() {
-        String enabled = _context.getProperty(Router.PROP_HIDDEN, "false");
-        if ( (enabled != null) && ("true".equalsIgnoreCase(enabled)) )
-            return " checked ";
-        else
-            return "";
+
+    /** @param prop must default to false */
+    public String getChecked(String prop) {
+        if (_context.getBooleanProperty(prop))
+            return CHECKED;
+        return "";
     }
 
     public String getDynamicKeysChecked() {
-        String enabled = _context.getProperty(Router.PROP_DYNAMIC_KEYS, "false");
-        if ( (enabled != null) && ("true".equalsIgnoreCase(enabled)) )
-            return " checked ";
-        else
-            return "";
+        return getChecked(Router.PROP_DYNAMIC_KEYS);
     }
 
-    public String getTcpAutoPortChecked() {
-        if (!TransportManager.enableNTCP(_context))
-            return " disabled=\"true\" ";
-        String enabled = _context.getProperty(PROP_I2NP_NTCP_AUTO_PORT, "false");
-        if ( (enabled != null) && ("true".equalsIgnoreCase(enabled)) )
-            return " checked ";
-        else
-            return "";
+    public String getLaptopChecked() {
+        return getChecked(UDPTransport.PROP_LAPTOP_MODE);
     }
 
-    public String getTcpAutoIPChecked() {
-        if (!TransportManager.enableNTCP(_context))
-            return " disabled=\"true\" ";
-        String enabled = _context.getProperty(PROP_I2NP_NTCP_AUTO_IP, "false");
-        if ( (enabled != null) && ("true".equalsIgnoreCase(enabled)) )
-            return " checked ";
-        else
-            return "";
+    public String getTcpAutoPortChecked(int mode) {
+        String port = _context.getProperty(PROP_I2NP_NTCP_PORT); 
+        boolean specified = port != null && port.length() > 0;
+        if ((mode == 1 && specified) ||
+            (mode == 2 && !specified))
+            return CHECKED;
+        return "";
+    }
+
+    public String getTcpAutoIPChecked(int mode) {
+        boolean enabled = TransportManager.isNTCPEnabled(_context);
+        String hostname = _context.getProperty(PROP_I2NP_NTCP_HOSTNAME); 
+        boolean specified = hostname != null && hostname.length() > 0;
+        String auto = _context.getProperty(PROP_I2NP_NTCP_AUTO_IP, "true");
+        if ((mode == 0 && (!specified) && auto.equals("false") && enabled) ||
+            (mode == 1 && specified && auto.equals("false") && enabled) ||
+            (mode == 2 && auto.equals("true") && enabled) ||
+            (mode == 3 && auto.equals("always") && enabled) ||
+            (mode == 4 && !enabled))
+            return CHECKED;
+        return "";
+    }
+
+    public String getUdpAutoIPChecked(int mode) {
+        String hostname = _context.getProperty(UDPTransport.PROP_EXTERNAL_HOST);
+        boolean specified = hostname != null && hostname.length() > 0;
+        boolean hidden = _context.router().isHidden();
+        String sources = _context.getProperty(UDPTransport.PROP_SOURCES, UDPTransport.DEFAULT_SOURCES);
+        if ((mode == 0 && sources.equals("ssu") && !hidden) ||
+            (mode == 1 && specified && !hidden) ||
+            (mode == 2 && hidden) ||
+            (mode == 3 && sources.equals("local,upnp,ssu") && !hidden) ||
+            (mode == 4 && sources.equals("local,ssu") && !hidden) ||
+            (mode == 5 && sources.equals("upnp,ssu") && !hidden))
+            return CHECKED;
+        return "";
+    }
+
+    /** default true */
+    public String getUpnpChecked() {
+        if (_context.getBooleanPropertyDefaultTrue(TransportManager.PROP_ENABLE_UPNP))
+            return CHECKED;
+        return "";
+    }
+
+    /**
+     * default false, inverse of default true property
+     * @since 0.8.13
+     */
+    public String getUdpDisabledChecked() {
+        if (!_context.getBooleanPropertyDefaultTrue(TransportManager.PROP_ENABLE_UDP))
+            return CHECKED;
+        return "";
     }
 
     public String getRequireIntroductionsChecked() {
         short status = _context.commSystem().getReachabilityStatus();
         switch (status) {
             case CommSystemFacade.STATUS_OK:
-                if ("true".equalsIgnoreCase(_context.getProperty(UDPTransport.PROP_FORCE_INTRODUCERS, "false")))
-                    return "checked=\"true\"";
-                return "";
+            case CommSystemFacade.STATUS_UNKNOWN:
+                return getChecked(UDPTransport.PROP_FORCE_INTRODUCERS);
             case CommSystemFacade.STATUS_DIFFERENT:
             case CommSystemFacade.STATUS_REJECT_UNSOLICITED:
-                return "checked=\"true\"";
-            case CommSystemFacade.STATUS_UNKNOWN:
-                if ("true".equalsIgnoreCase(_context.getProperty(UDPTransport.PROP_FORCE_INTRODUCERS, "false")))
-                    return "checked=\"true\"";
-                return "";
             default:
-                return "checked=\"true\"";
+                return CHECKED;
         }
     }
     
+    public String[] getAddresses() {
+        ArrayList<String> al = new ArrayList(Addresses.getAddresses());
+        return al.toArray(new String[al.size()]);
+    }
+
     public String getInboundRate() {
         return "" + _context.bandwidthLimiter().getInboundKBytesPerSecond();
     }
     public String getOutboundRate() {
         return "" + _context.bandwidthLimiter().getOutboundKBytesPerSecond();
+    }
+    public String getInboundRateBits() {
+        return kbytesToBits(_context.bandwidthLimiter().getInboundKBytesPerSecond());
+    }
+    public String getOutboundRateBits() {
+        return kbytesToBits(_context.bandwidthLimiter().getOutboundKBytesPerSecond());
+    }
+    public String getShareRateBits() {
+        return kbytesToBits(getShareBandwidth());
+    }
+    private String kbytesToBits(int kbytes) {
+        return DataHelper.formatSize(kbytes * 8 * 1024) + ' ' + _("bits per second") +
+               ' ' + _("or {0} bytes per month maximum", DataHelper.formatSize(kbytes * 1024l * 60 * 60 * 24 * 31));
     }
     public String getInboundBurstRate() {
         return "" + _context.bandwidthLimiter().getInboundBurstKBytesPerSecond();
@@ -157,7 +196,7 @@ public class ConfigNetHelper extends HelperBase {
     }
     
     private static String getBurstFactor(int numSeconds, String name) {
-        StringBuffer buf = new StringBuffer(256);
+        StringBuilder buf = new StringBuilder(256);
         buf.append("<select name=\"").append(name).append("\">\n");
         boolean found = false;
         for (int i = 10; i <= 70; i += 10) {
@@ -180,17 +219,15 @@ public class ConfigNetHelper extends HelperBase {
         return buf.toString();
     }
     
+    /** removed */
     public String getEnableLoadTesting() {
-        if (LoadTestManager.isEnabled(_context))
-            return " checked ";
-        else
-            return "";
+        return "";
     }
     
     public String getSharePercentageBox() {
         int pct = (int) (100 * _context.router().getSharePercentage());
-        StringBuffer buf = new StringBuffer(256);
-        buf.append("<select name=\"sharePercentage\">\n");
+        StringBuilder buf = new StringBuilder(256);
+        buf.append("<select style=\"text-align: right !important;\" name=\"sharePercentage\">\n");
         boolean found = false;
         for (int i = 30; i <= 110; i += 10) {
             int val = i;
@@ -200,12 +237,12 @@ public class ConfigNetHelper extends HelperBase {
                 else
                     val = pct;
             }
-            buf.append("<option value=\"").append(val).append("\" ");
+            buf.append("<option style=\"text-align: right;\" value=\"").append(val).append("\" ");
             if (pct == val) {
-                buf.append("selected=\"true\" ");
+                buf.append("selected=\"selected\" ");
                 found = true;
             }
-            buf.append(">Up to ").append(val).append("%</option>\n");
+            buf.append(">").append(val).append("%</option>\n");
         }
         buf.append("</select>\n");
         return buf.toString();

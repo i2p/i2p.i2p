@@ -23,7 +23,7 @@ import net.i2p.crypto.EntropyHarvester;
  *
  */
 public class FortunaRandomSource extends RandomSource implements EntropyHarvester {
-    private AsyncFortunaStandalone _fortuna;
+    private final AsyncFortunaStandalone _fortuna;
     private double _nextGaussian;
     private boolean _haveNextGaussian;
 
@@ -44,6 +44,14 @@ public class FortunaRandomSource extends RandomSource implements EntropyHarveste
         _haveNextGaussian = false;
     }
     
+    /**
+     *  Note - methods may hang or NPE or throw IllegalStateExceptions after this
+     *  @since 0.8.8
+     */
+    public void shutdown() {
+        _fortuna.shutdown();
+    }
+
     @Override
     public synchronized void setSeed(byte buf[]) {
       _fortuna.addRandomBytes(buf);
@@ -143,6 +151,16 @@ public class FortunaRandomSource extends RandomSource implements EntropyHarveste
     }
 
     /**
+     * Not part of java.util.SecureRandom, but added for efficiency, since Fortuna supports it.
+     *
+     * @since 0.8.12
+     */
+    @Override
+    public synchronized void nextBytes(byte buf[], int offset, int length) {
+        _fortuna.nextBytes(buf, offset, length);
+    }
+
+    /**
      * Implementation from sun's java.util.Random javadocs 
      */
     @Override
@@ -210,6 +228,7 @@ public class FortunaRandomSource extends RandomSource implements EntropyHarveste
         _fortuna.addRandomBytes(data, offset, len);
     }
     
+/*****
     public static void main(String args[]) {
         try {
             RandomSource rand = I2PAppContext.getGlobalContext().random();
@@ -231,4 +250,5 @@ public class FortunaRandomSource extends RandomSource implements EntropyHarveste
             System.out.println("Compressed size of 1MB: " + compressed.length);
         } catch (Exception e) { e.printStackTrace(); }
     }
+*****/
 }

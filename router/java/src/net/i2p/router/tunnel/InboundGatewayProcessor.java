@@ -6,7 +6,7 @@ import net.i2p.I2PAppContext;
  * Override the hop processor to seed the message with a random
  * IV.
  */
-public class InboundGatewayProcessor extends HopProcessor {
+class InboundGatewayProcessor extends HopProcessor {
     public InboundGatewayProcessor(I2PAppContext ctx, HopConfig config) {
         super(ctx, config, DummyValidator.getInstance());
     }

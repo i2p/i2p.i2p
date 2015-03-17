@@ -1,0 +1,22 @@
+<!--
+<i2p.news date="$Date: 2012-07-30 00:00:00 $">
+<i2p.release version="0.9.1" date="2012/07/30" minVersion="0.6" />
+-->
+<div lang="en">
+<h3>2012-07-30: <b>0.9.1 <a href="http://www.i2p2.i2p/release-0.9.1.html">Released</a></b></h3>
+
+<p>
+0.9.1 includes a large number of bug fixes and improvements in i2psnark, streaming, and elsewhere.
+There are also home page changes, new themes, and translation updates.
+Upgrading is recommended.
+</p><p>
+Say hello to the volunteers on the <a href="irc://127.0.0.1:6668/i2p-help">#i2p-help IRC channel</a>.
+<a href="http://www.i2p2.i2p/getinvolved.html">Get involved</a>,
+spread the word,
+and <a href="http://www.i2p2.i2p/donate.html">donate</a>!
+If you find a bug, please enter a report on <a href="http://trac.i2p2.i2p/report/1">trac</a>.
+To help on translations,
+volunteer on <a href="irc://127.0.0.1:6668/i2p">IRC #i2p-dev</a>
+or sign up on <a href="https://www.transifex.net/projects/p/I2P/">Transifex</a>.
+</p>
+</div>

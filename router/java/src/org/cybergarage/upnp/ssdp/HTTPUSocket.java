@@ -219,6 +219,7 @@ public class HTTPUSocket
 		try {
 	 		ssdpUniSock.receive(recvPacket.getDatagramPacket());
 			recvPacket.setTimeStamp(System.currentTimeMillis());
+			Debug.message("Received SSDP unicast packet on " + getLocalAddress() + " from " + recvPacket.getRemoteAddress());
 		}
 		catch (Exception e) {
 			//Debug.warning(e);

@@ -12,6 +12,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InterruptedIOException;
 import java.io.OutputStream;
+import java.nio.channels.Channels;
+import java.nio.ByteBuffer;
 import java.net.ConnectException;
 import java.net.NoRouteToHostException;
 import java.util.ArrayList;
@@ -140,9 +142,6 @@ public class SAMv2StreamSession extends SAMStreamSession
 		public class StreamConnector implements Runnable
 		{
 
-				private Object runningLock = new Object();
-				private boolean stillRunning = true;
-
 				private int id;
 				private Destination      dest ;
 				private I2PSocketOptions opts ;
@@ -245,19 +244,19 @@ public class SAMv2StreamSession extends SAMStreamSession
 		protected class v2StreamSender extends StreamSender
 
 		{
-				private List _data;
+				private final List<ByteArray> _data;
 				private int _dataSize;
-				private int _id;
-				private ByteCache _cache;
-				private OutputStream _out = null;
-				private boolean _stillRunning, _shuttingDownGracefully;
-				private Object runningLock = new Object();
-				private I2PSocket i2pSocket = null;
+				private final int _id;
+				private final ByteCache _cache;
+				private final OutputStream _out;
+				private volatile boolean _stillRunning, _shuttingDownGracefully;
+				private final Object runningLock = new Object();
+				private final I2PSocket i2pSocket;
 
 				public v2StreamSender ( I2PSocket s, int id ) throws IOException
 				{
 					super ( s, id );
-					_data = new ArrayList ( 1 );
+					_data = new ArrayList<ByteArray> ( 1 );
 					_dataSize = 0;
 					_id = id;
 					_cache = ByteCache.getInstance ( 10, 32 * 1024 );
@@ -372,10 +371,10 @@ public class SAMv2StreamSession extends SAMStreamSession
 						{
 							synchronized ( _data )
 							{
-								if ( _data.size() > 0 )
+								if ( !_data.isEmpty() )
 								{
 									int formerSize = _dataSize ;
-									data = ( ByteArray ) _data.remove ( 0 );
+									data = _data.remove ( 0 );
 									_dataSize -= data.getValid();
 
 									if ( ( formerSize >= SOCKET_HANDLER_BUF_SIZE ) && ( _dataSize < SOCKET_HANDLER_BUF_SIZE ) )
@@ -511,7 +510,7 @@ public class SAMv2StreamSession extends SAMStreamSession
 					_log.debug ( "run() called for socket reader " + id );
 
 					int read = -1;
-					byte[] data = new byte[SOCKET_HANDLER_BUF_SIZE];
+					ByteBuffer data = ByteBuffer.allocate(SOCKET_HANDLER_BUF_SIZE);
 
 					try
 					{
@@ -533,7 +532,8 @@ public class SAMv2StreamSession extends SAMStreamSession
 									break ;
 							}
 							
-							read = in.read ( data );
+							data.clear();
+							read = Channels.newChannel(in).read ( data );
 
 							if ( read == -1 )
 							{
@@ -542,8 +542,8 @@ public class SAMv2StreamSession extends SAMStreamSession
 							}
 
 							totalReceived += read ;
-							
-							recv.receiveStreamBytes ( id, data, read );
+							data.flip();
+							recv.receiveStreamBytes ( id, data );
 						}
 					}
 					catch ( IOException e )

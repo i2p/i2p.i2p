@@ -10,11 +10,12 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
 import net.i2p.client.streaming.I2PSocketManager;
 import net.i2p.data.Destination;
 import net.i2p.util.EventDispatcher;
-import net.i2p.util.I2PThread;
+import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 
 public class I2Ping extends I2PTunnelTask implements Runnable {
@@ -37,11 +38,11 @@ public class I2Ping extends I2PTunnelTask implements Runnable {
     private String command;
     private long timeout = PING_TIMEOUT;
 
-    private Object simulLock = new Object();
+    private final Object simulLock = new Object();
     private int simulPings = 0;
     private long lastPingTime = 0;
 
-    private Object lock = new Object(), slock = new Object();
+    private final Object lock = new Object(), slock = new Object();
 
     //public I2Ping(String cmd, Logging l,
     //		  boolean ownDest) {
@@ -59,7 +60,7 @@ public class I2Ping extends I2PTunnelTask implements Runnable {
                 sockMgr = I2PTunnelClient.getSocketManager(tunnel);
             }
         }
-        Thread t = new I2PThread(this);
+        Thread t = new I2PAppThread(this);
         t.setName("Client");
         t.start();
         open = true;
@@ -188,7 +189,7 @@ public class I2Ping extends I2PTunnelTask implements Runnable {
         }
     }
 
-    public class PingHandler extends I2PThread {
+    public class PingHandler extends I2PAppThread {
         private String destination;
 
         public PingHandler(String dest) {
@@ -197,9 +198,10 @@ public class I2Ping extends I2PTunnelTask implements Runnable {
             start();
         }
 
+        @Override
         public void run() {
             try {
-                Destination dest = I2PTunnel.destFromName(destination);
+                Destination dest = I2PAppContext.getGlobalContext().namingService().lookup(destination);
                 if (dest == null) {
                     synchronized (lock) { // Logger is not thread safe
                         l.log("Unresolvable: " + destination + "");
@@ -210,7 +212,7 @@ public class I2Ping extends I2PTunnelTask implements Runnable {
                 int fail = 0;
                 long totalTime = 0;
                 int cnt = countPing ? CPING_COUNT : PING_COUNT;
-                StringBuffer pingResults = new StringBuffer(2 * cnt + destination.length() + 3);
+                StringBuilder pingResults = new StringBuilder(2 * cnt + destination.length() + 3);
                 for (int i = 0; i < cnt; i++) {
                     boolean sent;
                     sent = ping(dest);

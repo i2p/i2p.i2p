@@ -1,0 +1,62 @@
+/* I2P Theme: Midnight Theme Override */
+/* Description: Larger fontsize & styling override to accomodate foreign charactersets */
+/* Author: Dr|Z3d */
+
+
+/* sidepanel */
+
+div.routersummary {
+     font: 9.5pt/125%;
+}
+
+div.routersummary h3 {
+     font-size: 12.5pt;
+}
+
+div.routersummary h4 {
+     font-size: 11.5pt;
+     letter-spacing: 0;
+}
+
+div.routersummary table {
+     font-size: 9pt;
+     margin: -5px 0px -5px 1px;
+     width: 188px !important;
+}
+
+div.routersummary table a:link, div.routersummary table a:visited {
+     font-size: 10.5pt;
+}
+
+div.tunnels a{
+     font-size: 9pt !important;
+}
+
+div.tunnels table{
+     margin: -2px -0px -4px 2px !important;
+     width: 185px;
+}
+
+/* global overrides */
+
+a, b, div.routersummary h3 a, div.routersummary h4 {
+    font-weight: normal !important;
+    font-size: 100%;
+}
+
+body {
+     font: 10pt Verdana, "Bitstream Vera Sans", Helvetica, Sans, sans-serif;
+}
+
+div.main, div.main p, div.news p {
+     line-height: 140%;
+}
+
+div.joblog li i {
+     font-weight: normaL;
+}
+
+b, div.joblog b {
+    color: #ee8;
+    font-size: 110%;
+}

@@ -1,102 +1,150 @@
 package net.i2p.router.web;
 
+import net.i2p.I2PAppContext;
 import net.i2p.crypto.TrustedUpdate;
 import net.i2p.data.DataHelper;
-import net.i2p.router.RouterContext;
+import net.i2p.util.PortMapper;
 
 public class ConfigUpdateHelper extends HelperBase {
+    private boolean _dontInstall;
+
     public ConfigUpdateHelper() {}
+    
+    /** hook this so we can call dontInstall() once after getting a context */
+    @Override
+    public void setContextId(String contextId) {
+        super.setContextId(contextId);
+        _dontInstall = NewsFetcher.getInstance(_context).dontInstall();
+    }
+
+    public boolean canInstall() {
+        return !_dontInstall;
+    }
     
     public boolean updateAvailable() {
         return true;
     }
     
     public String getNewsURL() {
-        String url = _context.getProperty(ConfigUpdateHandler.PROP_NEWS_URL);
-        if (url != null)
+        return getNewsURL(_context);
+    }
+
+    /** hack to replace the old news location with the new one, even if they have saved
+        the update page at some point */
+    public static String getNewsURL(I2PAppContext ctx) {
+        String url = ctx.getProperty(ConfigUpdateHandler.PROP_NEWS_URL);
+        if (url != null && !url.equals(ConfigUpdateHandler.OLD_DEFAULT_NEWS_URL))
             return url;
         else
             return ConfigUpdateHandler.DEFAULT_NEWS_URL;
     }
+
     public String getUpdateURL() {
         String url = _context.getProperty(ConfigUpdateHandler.PROP_UPDATE_URL);
         if (url != null)
-            return url.replaceAll(",", "\n");
+            return url.replace(",", "\n");
         else
             return ConfigUpdateHandler.DEFAULT_UPDATE_URL;
     }
+
     public String getProxyHost() {
-        String host = _context.getProperty(ConfigUpdateHandler.PROP_PROXY_HOST);
-        if (host != null)
-            return host;
-        else
-            return ConfigUpdateHandler.DEFAULT_PROXY_HOST;
+        if (isInternal())
+            return _("internal") + "\" readonly=\"readonly";
+        return _context.getProperty(ConfigUpdateHandler.PROP_PROXY_HOST, ConfigUpdateHandler.DEFAULT_PROXY_HOST);
     }
+
     public String getProxyPort() {
+        if (isInternal())
+            return _("internal") + "\" readonly=\"readonly";
+        return Integer.toString(ConfigUpdateHandler.proxyPort(_context));
+    }
+
+    /**
+     *  This should almost always be true.
+     *  @return true if settings are at defaults and proxy is registered
+     *  @since 0.8.13
+     */
+    private boolean isInternal() {
+        String host = _context.getProperty(ConfigUpdateHandler.PROP_PROXY_HOST);
         String port = _context.getProperty(ConfigUpdateHandler.PROP_PROXY_PORT);
-        if (port != null)
-            return port;
-        else
-            return ConfigUpdateHandler.DEFAULT_PROXY_PORT;
+        return (host == null || host.equals(ConfigUpdateHandler.DEFAULT_PROXY_HOST)) &&
+               (port == null || port.equals(ConfigUpdateHandler.DEFAULT_PROXY_PORT)) &&
+               _context.portMapper().getPort(PortMapper.SVC_HTTP_PROXY) == ConfigUpdateHandler.DEFAULT_PROXY_PORT_INT;
     }
     
     public String getUpdateThroughProxy() {
         String proxy = _context.getProperty(ConfigUpdateHandler.PROP_SHOULD_PROXY, ConfigUpdateHandler.DEFAULT_SHOULD_PROXY);
         if (Boolean.valueOf(proxy).booleanValue()) 
-            return "<input type=\"checkbox\" value=\"true\" name=\"updateThroughProxy\" checked=\"true\" >";
+            return "<input type=\"checkbox\" class=\"optbox\" value=\"true\" name=\"updateThroughProxy\" checked=\"checked\" >";
         else
-            
-            return "<input type=\"checkbox\" value=\"true\" name=\"updateThroughProxy\" >";
+            return "<input type=\"checkbox\" class=\"optbox\" value=\"true\" name=\"updateThroughProxy\" >";
     }
     
-    private static final long PERIODS[] = new long[] { 12*60*60*1000l, 24*60*60*1000l, 48*60*60*1000l, -1l };
+    public String getUpdateUnsigned() {
+        String foo = _context.getProperty(ConfigUpdateHandler.PROP_UPDATE_UNSIGNED);
+        if (Boolean.valueOf(foo).booleanValue()) 
+            return "<input type=\"checkbox\" class=\"optbox\" value=\"true\" name=\"updateUnsigned\" checked=\"checked\" >";
+        else
+            return "<input type=\"checkbox\" class=\"optbox\" value=\"true\" name=\"updateUnsigned\" >";
+    }
+    
+    private static final long PERIODS[] = new long[] { 12*60*60*1000l, 24*60*60*1000l,
+                                                       36*60*60*1000l, 48*60*60*1000l,
+                                                       3*24*60*60*1000l, 7*24*60*60*1000l,
+                                                       -1l };
     
     public String getRefreshFrequencySelectBox() {
-        String freq = _context.getProperty(ConfigUpdateHandler.PROP_REFRESH_FREQUENCY);
-        if (freq == null) freq = ConfigUpdateHandler.DEFAULT_REFRESH_FREQUENCY;
-        long ms = -1;
+        String freq = _context.getProperty(ConfigUpdateHandler.PROP_REFRESH_FREQUENCY,
+                                           ConfigUpdateHandler.DEFAULT_REFRESH_FREQUENCY);
+        long ms = ConfigUpdateHandler.DEFAULT_REFRESH_FREQ;
         try { 
             ms = Long.parseLong(freq);
         } catch (NumberFormatException nfe) {}
 
-        StringBuffer buf = new StringBuffer(256);
+        StringBuilder buf = new StringBuilder(256);
         buf.append("<select name=\"refreshFrequency\">");
         for (int i = 0; i < PERIODS.length; i++) {
             buf.append("<option value=\"").append(PERIODS[i]);
             if (PERIODS[i] == ms)
-                buf.append("\" selected=\"true\"");
+                buf.append("\" selected=\"selected");
             
             if (PERIODS[i] == -1)
-                buf.append("\">Never</option>\n");
+                buf.append("\">" + _("Never") + "</option>\n");
             else
-                buf.append("\">Every ").append(DataHelper.formatDuration(PERIODS[i])).append("</option>\n");
+                buf.append("\">" + _("Every") + " ").append(DataHelper.formatDuration2(PERIODS[i])).append("</option>\n");
         }
         buf.append("</select>\n");
         return buf.toString();
     }
     
+    /**
+     *  Right now the jsp hides the whole select box if _dontInstall is true but this could change
+     */
     public String getUpdatePolicySelectBox() {
-        String policy = _context.getProperty(ConfigUpdateHandler.PROP_UPDATE_POLICY);
-        if (policy == null) policy = ConfigUpdateHandler.DEFAULT_UPDATE_POLICY;
+        String policy = _context.getProperty(ConfigUpdateHandler.PROP_UPDATE_POLICY, ConfigUpdateHandler.DEFAULT_UPDATE_POLICY);
         
-        StringBuffer buf = new StringBuffer(256);
+        StringBuilder buf = new StringBuilder(256);
         buf.append("<select name=\"updatePolicy\">");
         
-        if ("notify".equals(policy))
-            buf.append("<option value=\"notify\" selected=\"true\">Notify only</option>");
-        else
-            buf.append("<option value=\"notify\">Notify only</option>");
+        buf.append("<option value=\"notify\"");
+        if ("notify".equals(policy) || _dontInstall)
+            buf.append(" selected=\"selected\"");
+        buf.append('>').append(_("Notify only")).append("</option>");
 
-        if ("download".equals(policy))
-            buf.append("<option value=\"download\" selected=\"true\">Download and verify only</option>");
-        else
-            buf.append("<option value=\"download\">Download and verify only</option>");
+        buf.append("<option value=\"download\"");
+        if (_dontInstall)
+            buf.append(" disabled=\"disabled\"");
+        else if ("download".equals(policy))
+            buf.append(" selected=\"selected\"");
+        buf.append('>').append(_("Download and verify only")).append("</option>");
         
-        if (System.getProperty("wrapper.version") != null) {
-            if ("install".equals(policy))
-                buf.append("<option value=\"install\" selected=\"true\">Download, verify, and restart</option>");
-            else
-                buf.append("<option value=\"install\">Download, verify, and restart</option>");
+        if (_context.hasWrapper()) {
+            buf.append("<option value=\"install\"");
+            if (_dontInstall)
+                buf.append(" disabled=\"disabled\"");
+            else if ("install".equals(policy))
+                buf.append(" selected=\"selected\"");
+            buf.append('>').append(_("Download, verify, and restart")).append("</option>");
         }
         
         buf.append("</select>\n");
@@ -107,11 +155,11 @@ public class ConfigUpdateHelper extends HelperBase {
         return new TrustedUpdate(_context).getTrustedKeysString();
     }
 
-    public String getNewsStatus() { 
-        return NewsFetcher.getInstance(_context).status();
+    public String getZipURL() {
+        return _context.getProperty(ConfigUpdateHandler.PROP_ZIP_URL, "");
     }
 
-    public String getUpdateVersion() { 
-        return NewsFetcher.getInstance(_context).updateVersion();
+    public String getNewsStatus() { 
+        return NewsFetcher.getInstance(_context).status();
     }
 }

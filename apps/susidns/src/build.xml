@@ -17,24 +17,32 @@
         <pathelement location="${lib}/jasper-compiler.jar" />
         <pathelement location="${lib}/jasper-runtime.jar" />
         <pathelement location="${lib}/javax.servlet.jar" />
+        <pathelement location="${lib}/jsp-api.jar" />
         <pathelement location="${lib}/commons-logging.jar" />
         <pathelement location="${lib}/commons-el.jar" />
-        <pathelement location="${lib}/ant.jar" />
+        <pathelement location="${ant.home}/lib/ant.jar" />
         <pathelement location="../../../core/java/build/i2p.jar" />
  	</path>
+	<property name="javac.compilerargs" value="" />
+	<property name="require.gettext" value="true" />
+
  	<target name="compile">
 		<mkdir dir="${bin}" />
 		<javac debug="true" deprecation="on" source="1.5" target="1.5"
- 			classpathref="cp" destdir="${bin}" srcdir="${src}" includes="**/*.java" />
+			includeAntRuntime="false"
+ 			classpathref="cp" destdir="${bin}" srcdir="${src}" includes="**/*.java" >
+			<compilerarg line="${javac.compilerargs}" />
+		</javac>
 	</target>
+
     <target name="precompilejsp" unless="precompilejsp.uptodate">
         <delete file="WEB-INF/web-fragment.xml" />
         <delete file="WEB-INF/web-out.xml" />
     	<mkdir dir="${tmp}" />
         <echo message="Ignore any warning about /WEB-INF/web.xml not found" />
-        <java classname="org.apache.jasper.JspC" fork="true" classpathref="cp">
+        <java classname="org.apache.jasper.JspC" fork="true" classpathref="cp" failonerror="true">
             <arg value="-d" />
-            <arg value="WEB-INF/classes" />
+            <arg value="${tmp}" />
             <arg value="-v" />
             <arg value="-p" />
             <arg value="i2p.susi.dns.jsp" />
@@ -44,7 +52,9 @@
             <arg value="./jsp" />
         </java>
         <javac debug="true" deprecation="on" source="1.5" target="1.5" 
-               destdir="${bin}" srcdir="./WEB-INF/classes" includes="**/*.java" classpathref="cp">
+               includeAntRuntime="false"
+               destdir="${bin}" srcdir="${tmp}" includes="**/*.java" classpathref="cp">
+		<compilerarg line="${javac.compilerargs}" />
          </javac>
         <copy file="WEB-INF/web-template.xml" tofile="WEB-INF/web-out.xml" />
         <loadfile property="jspc.web.fragment" srcfile="WEB-INF/web-fragment.xml" />
@@ -57,22 +67,91 @@
         <srcfiles dir= "." includes="jsp/*.jsp, WEB-INF/web-template.xml"/>
     </uptodate>
 
-    <target name="all" depends="compile,precompilejsp,war"/> 
-    <target name="war"> 
+    <target name="all" depends="war"/> 
+
+    <target name="listChangedFiles" depends="warUpToDate" if="shouldListChanges" >
+        <exec executable="mtn" outputproperty="workspace.changes" errorproperty="mtn.error2" failifexecutionfails="false" >
+            <arg value="list" />
+            <arg value="changed" />
+            <arg value="." />
+        </exec>
+        <!-- \n in an attribute value generates an invalid manifest -->
+        <exec executable="tr" inputstring="${workspace.changes}" outputproperty="workspace.changes.tr" errorproperty="mtn.error2" failifexecutionfails="false" >
+            <arg value="-s" />
+            <arg value="[:space:]" />
+            <arg value="," />
+        </exec>
+    </target>
+
+    <target name="war" depends="compile, precompilejsp, bundle, warUpToDate" unless="war.uptodate" > 
+        <!-- set if unset -->
+        <property name="workspace.changes.tr" value="" />
         <war destfile="${project}.war" webxml="WEB-INF/web-out.xml">
         	<fileset dir=".">
         		<include name="WEB-INF/**/*.class"/>
+                     <!-- pulled out of the jar in 0.7.12
         		<include name="WEB-INF/lib/*.jar"/>
-        		<include name="jsp/*.jsp"/>
+                      -->
         		<include name="images/*.png"/>
         		<include name="css.css"/>
         		<include name="index.html"/>
-        		<include name="WEB-INF/web-template.xml"/>
-        		<include name="WEB-INF/web-out.xml"/>
         		<include name="WEB-INF/classes/${project}.properties"/>
         	</fileset>
+            <manifest>
+                <attribute name="Implementation-Version" value="${full.version}" />
+                <attribute name="Built-By" value="${build.built-by}" />
+                <attribute name="Build-Date" value="${build.timestamp}" />
+                <attribute name="Base-Revision" value="${workspace.version}" />
+                <attribute name="Workspace-Changes" value="${workspace.changes.tr}" />
+            </manifest>
         </war>
     </target>
+
+    <target name="warUpToDate">
+        <uptodate property="war.uptodate" targetfile="${project}.war">
+            <srcfiles dir= "." includes="WEB-INF/web-out.xml WEB-INF/**/*.class images/*.png css.css index.html WEB-INF/classes/${project}.properties" />
+        </uptodate>
+        <condition property="shouldListChanges" >
+            <and>
+                <not>
+                    <isset property="war.uptodate" />
+                </not>
+                <isset property="mtn.available" />
+            </and>
+        </condition>
+    </target>
+
+    <target name="bundle" depends="compile, precompilejsp">
+        <!-- Update the messages_*.po files.
+             We need to supply the bat file for windows, and then change the fail property to true -->
+        <exec executable="sh" osfamily="unix" failifexecutionfails="true" failonerror="${require.gettext}" >
+            <arg value="./bundle-messages.sh" />
+        </exec>
+        <exec executable="sh" osfamily="mac" failifexecutionfails="true" failonerror="${require.gettext}" >
+            <arg value="./bundle-messages.sh" />
+        </exec>
+		<!-- multi-lang is optional -->
+        <exec executable="sh" osfamily="windows" failifexecutionfails="false" >
+            <arg value="./bundle-messages.sh" />
+        </exec>
+    </target>
+
+    <target name="poupdate" depends="compile, precompilejsp">
+        <!-- Update the messages_*.po files.  -->
+        <exec executable="sh" osfamily="unix" failifexecutionfails="true" failonerror="true" >
+            <arg value="./bundle-messages.sh" />
+            <arg value="-p" />
+        </exec>
+        <exec executable="sh" osfamily="mac" failifexecutionfails="true" failonerror="true" >
+            <arg value="./bundle-messages.sh" />
+            <arg value="-p" />
+        </exec>
+        <exec executable="sh" osfamily="windows" failifexecutionfails="true" failonerror="true" >
+            <arg value="./bundle-messages.sh" />
+            <arg value="-p" />
+        </exec>
+    </target>
+
     <target name="clean">
       <delete file="susidns.war" />
       <delete>
@@ -81,6 +160,7 @@
         <fileset dir="WEB-INF" includes="web-fragment.xml, web-out.xml" />
       </delete>
       <delete dir="${bin}" />
+      <delete dir="${tmp}" />
     </target>
     <target name="distclean" depends="clean" />
 </project>

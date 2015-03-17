@@ -9,9 +9,8 @@ package net.i2p.router.message;
  */
 
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 
+import net.i2p.crypto.SessionKeyManager;
 import net.i2p.data.Certificate;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
@@ -25,29 +24,31 @@ import net.i2p.util.Log;
  * Read a GarlicMessage, decrypt it, and return the resulting CloveSet
  *
  */
-public class GarlicMessageParser {
-    private Log _log;
-    private RouterContext _context;
+class GarlicMessageParser {
+    private final Log _log;
+    private final RouterContext _context;
     
     public GarlicMessageParser(RouterContext context) { 
         _context = context;
         _log = _context.logManager().getLog(GarlicMessageParser.class);
     }
     
-    public CloveSet getGarlicCloves(GarlicMessage message, PrivateKey encryptionKey) {
+    /** @param skm use tags from this session key manager */
+    public CloveSet getGarlicCloves(GarlicMessage message, PrivateKey encryptionKey, SessionKeyManager skm) {
         byte encData[] = message.getData();
         byte decrData[] = null;
         try {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Decrypting with private key " + encryptionKey);
-            decrData = _context.elGamalAESEngine().decrypt(encData, encryptionKey);
+            decrData = _context.elGamalAESEngine().decrypt(encData, encryptionKey, skm);
         } catch (DataFormatException dfe) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Error decrypting", dfe);
         }
         if (decrData == null) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Decryption of garlic message failed (data = " + encData + ")", new Exception("Decrypt fail"));
+            // This is the usual error path and it's logged at WARN level in GarlicMessageReceiver
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Decryption of garlic message failed", new Exception("Decrypt fail"));
             return null;
         } else {
             try {
@@ -70,20 +71,21 @@ public class GarlicMessageParser {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("# cloves to read: " + numCloves);
         for (int i = 0; i < numCloves; i++) {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Reading clove " + i);
+            //if (_log.shouldLog(Log.DEBUG))
+            //    _log.debug("Reading clove " + i);
                 GarlicClove clove = new GarlicClove(_context);
                 offset += clove.readBytes(data, offset);
                 set.addClove(clove);
-            if (_log.shouldLog(Log.WARN))
-                _log.debug("After reading clove " + i);
+            //if (_log.shouldLog(Log.DEBUG))
+            //    _log.debug("After reading clove " + i);
         }
-        Certificate cert = new Certificate();
-        offset += cert.readBytes(data, offset);
+        //Certificate cert = new Certificate();
+        //offset += cert.readBytes(data, offset);
+        Certificate cert = Certificate.create(data, offset);
+        offset += cert.size();
         long msgId = DataHelper.fromLong(data, offset, 4);
         offset += 4;
         Date expiration = DataHelper.fromDate(data, offset);
-        offset += DataHelper.DATE_LENGTH;
 
         set.setCertificate(cert);
         set.setMessageId(msgId);

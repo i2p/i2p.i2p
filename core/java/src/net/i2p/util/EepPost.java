@@ -8,7 +8,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.net.URL;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -17,9 +16,9 @@ import net.i2p.I2PAppContext;
 /**
  * Simple helper for uploading files and such via HTTP POST (rfc 1867)
  *
+ * @deprecated unused
  */
 public class EepPost {
-    private I2PAppContext _context;
     private Log _log;
     private static final String CRLF = "\r\n";
     
@@ -27,10 +26,10 @@ public class EepPost {
         this(I2PAppContext.getGlobalContext());
     }
     public EepPost(I2PAppContext ctx) {
-        _context = ctx;
         _log = ctx.logManager().getLog(EepPost.class);
     }
     
+/*****
     public static void main(String args[]) {
         EepPost e = new EepPost();
         Map fields = new HashMap();
@@ -47,6 +46,8 @@ public class EepPost {
         //e.postFiles("http://localhost/cgi-bin/read.pl", null, -1, fields, null);
         //e.postFiles("http://localhost:2001/import.jsp", null, -1, fields, null);
     }
+*****/
+
     /**
      * Submit an HTTP POST to the given URL (using the proxy if specified),
      * uploading the given fields.  If the field's value is a File object, then
@@ -117,7 +118,7 @@ public class EepPost {
                     }
                 }
                 out.close();
-            } catch (Exception e) {
+            } catch (IOException e) {
                 e.printStackTrace();
             } finally {
                 if (s != null) try { s.close(); } catch (IOException ioe) {}
@@ -184,7 +185,7 @@ public class EepPost {
     }
     
     private String getHeader(boolean isProxy, String path, String host, int port, String separator, long length) {
-        StringBuffer buf = new StringBuffer(512);
+        StringBuilder buf = new StringBuilder(512);
         buf.append("POST ");
         if (isProxy) {
             buf.append("http://").append(host);
@@ -206,15 +207,15 @@ public class EepPost {
     }
     
     private String getSeparator() {
-        if (false)
-            return "ABCDEFG"; 
-        if (false)
-            return "------------------------" + new java.util.Random().nextLong();
+        //if (false)
+        //    return "ABCDEFG"; 
+        //if (false)
+        //    return "------------------------" + new java.util.Random().nextLong();
         byte separator[] = new byte[32];  // 2^-128 chance of this being a problem
         I2PAppContext.getGlobalContext().random().nextBytes(separator);
-        StringBuffer sep = new StringBuffer(48);
+        StringBuilder sep = new StringBuilder(48);
         for (int i = 0; i < separator.length; i++)
-            sep.append((char)((int)'a' + (int)(separator[i]&0x0F))).append((char)((int)'a' + (int)((separator[i] >>> 4) & 0x0F)));
+            sep.append((char)('a' + (separator[i]&0x0F))).append((char)('a' + ((separator[i] >>> 4) & 0x0F)));
         return sep.toString();
     }
 }

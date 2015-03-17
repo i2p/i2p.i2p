@@ -28,44 +28,18 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Properties;
 
-public class SubscriptionsBean
+import net.i2p.I2PAppContext;
+import net.i2p.util.SecureFileOutputStream;
+
+public class SubscriptionsBean extends BaseBean
 {
 	private String action, fileName, content, serial, lastSerial;
 	
-	Properties properties;
-	
-	public SubscriptionsBean()
-	{
-		properties = new Properties();
-	}
-	private long configLastLoaded = 0;
-	private void loadConfig()
-	{
-		long currentTime = System.currentTimeMillis();
-		
-		if( properties.size() > 0 &&  currentTime - configLastLoaded < 10000 )
-			return;
-		
-		FileInputStream fis = null;
-		try {
-			properties.clear();
-			fis = new FileInputStream( ConfigBean.configFileName );
-			properties.load( fis );
-			configLastLoaded = currentTime;
-		}
-		catch (Exception e) {
-			Debug.debug( e.getClass().getName() + ": " + e.getMessage() );
-		} finally {
-			if (fis != null)
-				try { fis.close(); } catch (IOException ioe) {}
-		}	
-	}
 	public String getAction() {
 		return action;
 	}
@@ -86,7 +60,7 @@ public class SubscriptionsBean
 	{
 		File file = new File( getFileName() );
 		if( file != null && file.isFile() ) {
-			StringBuffer buf = new StringBuffer();
+			StringBuilder buf = new StringBuilder();
 			BufferedReader br = null;
 			try {
 				br = new BufferedReader( new FileReader( file ) );
@@ -113,7 +87,7 @@ public class SubscriptionsBean
 	{
 		File file = new File( getFileName() );
 		try {
-			PrintWriter out = new PrintWriter( new FileOutputStream( file ) );
+			PrintWriter out = new PrintWriter( new SecureFileOutputStream( file ) );
 			out.print( content );
 			out.flush();
 			out.close();
@@ -126,17 +100,32 @@ public class SubscriptionsBean
 		String message = "";
 		if( action != null ) {
 			if( lastSerial != null && serial != null && serial.compareTo( lastSerial ) == 0 ) {
-				if( action.compareToIgnoreCase( "save") == 0 ) {
+				if (action.equals(_("Save"))) {
 					save();
-					message = "Subscriptions saved.";
-				}
-				else if( action.compareToIgnoreCase( "reload") == 0 ) {
+				/*******
+					String nonce = System.getProperty("addressbook.nonce");
+					if (nonce != null) {	
+						// Yes this is a hack.
+						// No it doesn't work on a text-mode browser.
+						// Fetching from the addressbook servlet
+						// with the correct parameters will kick off a
+						// config reload and fetch.
+				*******/
+					if (content != null && content.length() > 2) {
+						message = _("Subscriptions saved, updating addressbook from subscription sources now.");
+						          // + "<img height=\"1\" width=\"1\" alt=\"\" " +
+						          // "src=\"/addressbook/?wakeup=1&nonce=" + nonce + "\">";
+						I2PAppContext.getGlobalContext().namingService().requestUpdate(null);
+					} else {
+						message = _("Subscriptions saved.");
+					}
+				} else if (action.equals(_("Reload"))) {
 					reload();
-					message = "Subscriptions reloaded.";
+					message = _("Subscriptions reloaded.");
 				}
 			}			
 			else {
-				message = "Invalid nonce. Are you being spoofed?";
+				message = _("Invalid form submission, probably because you used the \"back\" or \"reload\" button on your browser. Please resubmit.");
 			}
 		}
 		if( message.length() > 0 )
@@ -170,5 +159,10 @@ public class SubscriptionsBean
 		reload();
 		
 		return content;
+	}
+
+	/** translate */
+	private static String _(String s) {
+		return Messages.getString(s);
 	}
 }

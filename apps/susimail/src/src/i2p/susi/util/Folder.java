@@ -270,7 +270,7 @@ public class Folder {
 	/**
 	 * Returns the element on the current page on the given position.
 	 *
-	 * @param Position of the element on the current page.
+	 * @param x Position of the element on the current page.
 	 * @return Element on the current page on the given position.
 	 */
 	public Object getElementAtPosXonCurrentPage( int x )
@@ -331,7 +331,7 @@ public class Folder {
 	 * Gets index of an element in the array regardless of sorting direction.
 	 * 
 	 * @param element
-	 * @return
+	 * @return index
 	 */
 	private int getIndexOf( Object element )
 	{
@@ -348,7 +348,7 @@ public class Folder {
 	 * Sorting direction is taken into account.
 	 * 
 	 * @param element
-	 * @return
+	 * @return The next element
 	 */
 	public Object getNextElement( Object element )
 	{
@@ -369,7 +369,7 @@ public class Folder {
 	 * Sorting direction is taken into account.
 	 * 
 	 * @param element
-	 * @return
+	 * @return The previous element
 	 */
 	public Object getPreviousElement( Object element )
 	{
@@ -388,7 +388,7 @@ public class Folder {
 	 * Retrieves element at index i. Depends on sorting direction.
 	 * 
 	 * @param i
-	 * @return
+	 * @return Element at index i
 	 */
 	private Object getElement( int i )
 	{
@@ -404,8 +404,6 @@ public class Folder {
 	
 	/**
 	 * Returns true, if folder shows points to the last page.
-	 * 
-	 * @return
 	 */
 	public boolean isLastPage()
 	{
@@ -414,8 +412,6 @@ public class Folder {
 	
 	/**
 	 * Returns true, if folder shows points to the first page.
-	 * 
-	 * @return
 	 */
 	public boolean isFirstPage()
 	{
@@ -427,7 +423,6 @@ public class Folder {
 	 * The sorting direction influences which element is taken for comparison.
 	 * 
 	 * @param element
-	 * @return
 	 */
 	public boolean isLastElement( Object element )
 	{
@@ -441,7 +436,6 @@ public class Folder {
 	 * The sorting direction influences which element is taken for comparison.
 	 * 
 	 * @param element
-	 * @return
 	 */
 	public boolean isFirstElement( Object element )
 	{

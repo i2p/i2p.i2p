@@ -22,58 +22,73 @@
  *  
  * $Revision: 1.2 $
  */
+
+    // http://www.crazysquirrel.com/computing/general/form-encoding.jspx
+    if (request.getCharacterEncoding() == null)
+        request.setCharacterEncoding("UTF-8");
+
+    response.setHeader("X-Frame-Options", "SAMEORIGIN");
+
 %>
+<%@page pageEncoding="UTF-8"%>
+<%@page trimDirectiveWhitespaces="true"%>
 <%@ page contentType="text/html"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <jsp:useBean id="version" class="i2p.susi.dns.VersionBean" scope="application" />
 <jsp:useBean id="subs" class="i2p.susi.dns.SubscriptionsBean" scope="session" />
+<jsp:useBean id="intl" class="i2p.susi.dns.Messages" scope="application" />
 <jsp:setProperty name="subs" property="*" />
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
-<title>subscriptions - susidns v${version.version}</title>
-<link rel="stylesheet" type="text/css" href="css.css">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title><%=intl._("subscriptions")%> - susidns</title>
+<link rel="stylesheet" type="text/css" href="<%=subs.getTheme()%>susidns.css">
 </head>
 <body>
+<div class="page">
 <div id="logo">
-<img src="images/logo.png" alt="susidns logo" border="0"/>
-</div>
+<a href="index"><img src="<%=subs.getTheme()%>images/logo.png" alt="" title="<%=intl._("Overview")%>" border="0"/></a>
+</div><hr>
 <div id="navi">
-<p>addressbooks
-<a href="addressbook.jsp?book=master">master</a> |
-<a href="addressbook.jsp?book=router">router</a> |
-<a href="addressbook.jsp?book=published">published</a> |
-<a href="addressbook.jsp?book=private">private</a> *
-subscriptions *
-<a href="config.jsp">configuration</a> *
-<a href="index.jsp">overview</a>
+<p>
+<%=intl._("Address books")%>:
+<a href="addressbook?book=private"><%=intl._("private")%></a> |
+<a href="addressbook?book=master"><%=intl._("master")%></a> |
+<a href="addressbook?book=router"><%=intl._("router")%></a> |
+<a href="addressbook?book=published"><%=intl._("published")%></a> *
+<%=intl._("Subscriptions")%> *
+<a href="config"><%=intl._("Configuration")%></a> *
+<a href="index"><%=intl._("Overview")%></a>
 </p>
-</div>
+</div><hr>
 <div id="headline">
 <h3>${subs.fileName}</h3>
 </div>
 <div id="messages">${subs.messages}</div>
-<form method="POST" action="subscriptions.jsp">
+<form method="POST" action="subscriptions">
 <div id="content">
-<input type="hidden" name="serial" value="${subs.serial}" />
+<input type="hidden" name="serial" value="${subs.serial}" >
 <textarea name="content" rows="10" cols="80">${subs.content}</textarea>
 </div>
 <div id="buttons">
-<input type="image" src="images/save.png" name="action" value="save" alt="Save Subscriptions" />
-<input type="image" src="images/reload.png" name="action" value="reload" alt="Reload Subscriptions" />
+<input class="reload" type="submit" name="action" value="<%=intl._("Reload")%>" >
+<input class="accept" type="submit" name="action" value="<%=intl._("Save")%>" >
 </div>
 </form>
 <div id="help">
-<h3>Explanation</h3>
 <p class="help">
-The subscription file contains a list of (i2p) URLs. The addressbook application
-regularly (once per hour) checks this list for new eepsites. Those URLs simply contain the published hosts.txt
-file of other people. The default subscription is the hosts.txt from www.i2p2.i2p, which is updated infrequently.
-So it is a good idea to add additional subscriptions to sites that have the latest addresses.
+<%=intl._("The subscription file contains a list of i2p URLs.")%>
+<%=intl._("The addressbook application regularly checks this list for new eepsites.")%>
+<%=intl._("Those URLs refer to published hosts.txt files.")%>
+<%=intl._("The default subscription is the hosts.txt from www.i2p2.i2p, which is updated infrequently.")%>
+<%=intl._("So it is a good idea to add additional subscriptions to sites that have the latest addresses.")%>
+<a href="http://www.i2p2.i2p/faq.html#subscriptions"><%=intl._("See the FAQ for a list of subscription URLs.")%></a>
 </p>
-</div>
+</div><hr>
 <div id="footer">
 <p class="footer">susidns v${version.version} &copy; <a href="${version.url}">susi</a> 2005</p>
+</div>
 </div>
 </body>
 </html>

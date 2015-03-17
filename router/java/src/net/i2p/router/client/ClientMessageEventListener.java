@@ -10,11 +10,14 @@ package net.i2p.router.client;
 
 import java.util.Properties;
 
+import net.i2p.CoreVersion;
 import net.i2p.data.Payload;
+import net.i2p.data.i2cp.BandwidthLimitsMessage;
 import net.i2p.data.i2cp.CreateLeaseSetMessage;
 import net.i2p.data.i2cp.CreateSessionMessage;
 import net.i2p.data.i2cp.DestLookupMessage;
 import net.i2p.data.i2cp.DestroySessionMessage;
+import net.i2p.data.i2cp.GetBandwidthLimitsMessage;
 import net.i2p.data.i2cp.GetDateMessage;
 import net.i2p.data.i2cp.I2CPMessage;
 import net.i2p.data.i2cp.I2CPMessageException;
@@ -26,6 +29,7 @@ import net.i2p.data.i2cp.ReceiveMessageEndMessage;
 import net.i2p.data.i2cp.ReconfigureSessionMessage;
 import net.i2p.data.i2cp.SendMessageMessage;
 import net.i2p.data.i2cp.SendMessageExpiresMessage;
+import net.i2p.data.i2cp.SessionConfig;
 import net.i2p.data.i2cp.SessionId;
 import net.i2p.data.i2cp.SessionStatusMessage;
 import net.i2p.data.i2cp.SetDateMessage;
@@ -40,14 +44,19 @@ import net.i2p.util.RandomSource;
  *
  */
 class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventListener {
-    private Log _log;
-    private RouterContext _context;
-    private ClientConnectionRunner _runner;
+    private final Log _log;
+    private final RouterContext _context;
+    private final ClientConnectionRunner _runner;
+    private final boolean  _enforceAuth;
     
-    public ClientMessageEventListener(RouterContext context, ClientConnectionRunner runner) {
+    /**
+     *  @param enforceAuth set false for in-JVM, true for socket access
+     */
+    public ClientMessageEventListener(RouterContext context, ClientConnectionRunner runner, boolean enforceAuth) {
         _context = context;
         _log = _context.logManager().getLog(ClientMessageEventListener.class);
         _runner = runner;
+        _enforceAuth = enforceAuth;
         _context.statManager().createRateStat("client.distributeTime", "How long it took to inject the client message into the router", "ClientMessages", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
     }
     
@@ -93,6 +102,9 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
             case ReconfigureSessionMessage.MESSAGE_TYPE:
                 handleReconfigureSession(reader, (ReconfigureSessionMessage)message);
                 break;
+            case GetBandwidthLimitsMessage.MESSAGE_TYPE:
+                handleGetBWLimits(reader, (GetBandwidthLimitsMessage)message);
+                break;
             default:
                 if (_log.shouldLog(Log.ERROR))
                     _log.error("Unhandled I2CP type received: " + message.getType());
@@ -110,31 +122,43 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
         // Is this is a little drastic for an unknown message type?
         _runner.stopRunning();
     }
-    
+  
     public void disconnected(I2CPMessageReader reader) {
         if (_runner.isDead()) return;
         _runner.disconnected();
     }
     
     private void handleGetDate(I2CPMessageReader reader, GetDateMessage message) {
+        // sent by clients >= 0.8.7
+        String clientVersion = message.getVersion();
+        // TODO - save client's version string for future reference
         try {
-            _runner.doSend(new SetDateMessage());
+            // only send version if the client can handle it (0.8.7 or greater)
+            _runner.doSend(new SetDateMessage(clientVersion != null ? CoreVersion.VERSION : null));
         } catch (I2CPMessageException ime) {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Error writing out the setDate message", ime);
         }
     }
+
+    /**
+     *  As of 0.8.7, does nothing. Do not allow a client to set the router's clock.
+     */
     private void handleSetDate(I2CPMessageReader reader, SetDateMessage message) {
-        _context.clock().setNow(message.getDate().getTime());
+        //_context.clock().setNow(message.getDate().getTime());
     }
 	
     
     /** 
-     * Handle a CreateSessionMessage
-     *
+     * Handle a CreateSessionMessage.
+     * On errors, we could perhaps send a SessionStatusMessage with STATUS_INVALID before
+     * sending the DisconnectMessage... but right now the client will send _us_ a
+     * DisconnectMessage in return, and not wait around for our DisconnectMessage.
+     * So keep it simple.
      */
     private void handleCreateSession(I2CPMessageReader reader, CreateSessionMessage message) {
-        if (message.getSessionConfig().verifySignature()) {
+        SessionConfig in = message.getSessionConfig();
+        if (in.verifySignature()) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Signature verified correctly on create session message");
         } else {
@@ -143,12 +167,45 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
             _runner.disconnectClient("Invalid signature on CreateSessionMessage");
             return;
         }
-	
+
+        // Auth, since 0.8.2
+        if (_enforceAuth && Boolean.valueOf(_context.getProperty("i2cp.auth")).booleanValue()) {
+            String configUser = _context.getProperty("i2cp.username");
+            String configPW = _context.getProperty("i2cp.password");
+            if (configUser != null && configPW != null) {
+                Properties props = in.getOptions();
+                String user = props.getProperty("i2cp.username");
+                String pw = props.getProperty("i2cp.password");
+                if (user == null || pw == null) {
+                    _log.error("I2CP auth failed for client: " + props.getProperty("inbound.nickname"));
+                    _runner.disconnectClient("Authorization required to create session, specify i2cp.username and i2cp.password in session options");
+                    return;
+                }
+                if ((!user.equals(configUser)) || (!pw.equals(configPW))) {
+                    _log.error("I2CP auth failed for client: " + props.getProperty("inbound.nickname") + " user: " + user);
+                    _runner.disconnectClient("Authorization failed for Create Session, user = " + user);
+                    return;
+                }
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("I2CP auth success for client: " + props.getProperty("inbound.nickname") + " user: " + user);
+            }
+        }
+
         SessionId sessionId = new SessionId();
         sessionId.setSessionId(getNextSessionId()); 
         _runner.setSessionId(sessionId);
         sendStatusMessage(SessionStatusMessage.STATUS_CREATED);
-        _runner.sessionEstablished(message.getSessionConfig());
+
+        // Copy over the whole config structure so we don't later corrupt it on
+        // the client side if we change settings or later get a
+        // ReconfigureSessionMessage
+        SessionConfig cfg = new SessionConfig(in.getDestination());
+        cfg.setSignature(in.getSignature());
+        Properties props = new Properties();
+        props.putAll(in.getOptions());
+        cfg.setOptions(props);
+        _runner.sessionEstablished(cfg);
+
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("after sessionEstablished for " + message.getSessionConfig().getDestination().calculateHash().toBase64());
 
@@ -240,7 +297,10 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
     /**
      * Message's Session ID ignored. This doesn't support removing previously set options.
      * Nor do we bother with message.getSessionConfig().verifySignature() ... should we?
+     * Nor is the Date checked.
      *
+     * Note that this does NOT update the few options handled in
+     * ClientConnectionRunner.sessionEstablished(). Those can't be changed later.
      */
     private void handleReconfigureSession(I2CPMessageReader reader, ReconfigureSessionMessage message) {
         if (_log.shouldLog(Log.INFO))
@@ -267,6 +327,24 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
         SessionStatusMessage msg = new SessionStatusMessage();
         msg.setSessionId(_runner.getSessionId());
         msg.setStatus(status);
+        try {
+            _runner.doSend(msg);
+        } catch (I2CPMessageException ime) {
+            _log.error("Error writing out the session status message", ime);
+        }
+    }
+
+    /**
+     * Divide router limit by 1.75 for overhead.
+     * This could someday give a different answer to each client.
+     * But it's not enforced anywhere.
+     */
+    private void handleGetBWLimits(I2CPMessageReader reader, GetBandwidthLimitsMessage message) {
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Got BW Limits request");
+        int in = _context.bandwidthLimiter().getInboundKBytesPerSecond() * 4 / 7;
+        int out = _context.bandwidthLimiter().getOutboundKBytesPerSecond() * 4 / 7;
+        BandwidthLimitsMessage msg = new BandwidthLimitsMessage(in, out);
         try {
             _runner.doSend(msg);
         } catch (I2CPMessageException ime) {

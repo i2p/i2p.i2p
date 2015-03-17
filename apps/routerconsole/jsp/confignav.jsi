@@ -1,0 +1,15 @@
+<%
+    /*
+     *  Included ~10 times, keep whitespace to a minimum
+     */
+%>
+<jsp:useBean class="net.i2p.router.web.ConfigNavHelper" id="navHelper" scope="request" />
+<jsp:setProperty name="navHelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
+<% navHelper.storeWriter(out); %>
+<div class="confignav" id="confignav">
+<%
+    // moved to java for ease of translation and to avoid 10 copies
+    // allowIFrame variable from summary.jsi
+    navHelper.renderNavBar(request.getRequestURI(), allowIFrame);
+%>
+</div>

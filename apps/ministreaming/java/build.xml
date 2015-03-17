@@ -3,7 +3,7 @@
     <target name="all" depends="clean, build" />
     <target name="build" depends="builddep, jar" />
     <target name="builddep">
-        <ant dir="../../../core/java/" target="build" />
+        <!-- run from top level build.xml to get dependencies built -->
     </target>
     <condition property="depend.available">
         <typefound name="depend" />
@@ -19,14 +19,60 @@
             </classpath>
         </depend>
     </target>
+    <property name="javac.compilerargs" value="" />
     <target name="compile" depends="depend">
         <mkdir dir="./build" />
         <mkdir dir="./build/obj" />
-        <javac srcdir="./src" debug="true" deprecation="on" source="1.5" target="1.5" destdir="./build/obj" classpath="../../../core/java/build/i2p.jar" />
+        <!-- half of this is deprecated classes so turn deprecation off -->
+        <javac srcdir="./src" debug="true" deprecation="off" source="1.5" target="1.5"
+               includeAntRuntime="false"
+               destdir="./build/obj" classpath="../../../core/java/build/i2p.jar" >
+            <compilerarg line="${javac.compilerargs}" />
+        </javac>
     </target>
-    <target name="jar" depends="compile">
-        <jar destfile="./build/mstreaming.jar" basedir="./build/obj" includes="**/*.class" />
+
+    <target name="listChangedFiles" depends="jarUpToDate" if="shouldListChanges" >
+        <exec executable="mtn" outputproperty="workspace.changes" errorproperty="mtn.error2" failifexecutionfails="false" >
+            <arg value="list" />
+            <arg value="changed" />
+            <arg value="." />
+        </exec>
+        <!-- \n in an attribute value generates an invalid manifest -->
+        <exec executable="tr" inputstring="${workspace.changes}" outputproperty="workspace.changes.tr" errorproperty="mtn.error2" failifexecutionfails="false" >
+            <arg value="-s" />
+            <arg value="[:space:]" />
+            <arg value="," />
+        </exec>
     </target>
+
+    <target name="jar" depends="compile, jarUpToDate, listChangedFiles" unless="jar.uptodate" >
+        <!-- set if unset -->
+        <property name="workspace.changes.tr" value="" />
+        <jar destfile="./build/mstreaming.jar" basedir="./build/obj" includes="**/*.class" >
+            <manifest>
+                <attribute name="Implementation-Version" value="${full.version}" />
+                <attribute name="Built-By" value="${build.built-by}" />
+                <attribute name="Build-Date" value="${build.timestamp}" />
+                <attribute name="Base-Revision" value="${workspace.version}" />
+                <attribute name="Workspace-Changes" value="${workspace.changes.tr}" />
+            </manifest>
+        </jar>
+    </target>
+
+    <target name="jarUpToDate">
+        <uptodate property="jar.uptodate" targetfile="build/mstreaming.jar" >
+            <srcfiles dir= "." includes="build/obj/**/*.class" />
+        </uptodate>
+        <condition property="shouldListChanges" >
+            <and>
+                <not>
+                    <isset property="jar.uptodate" />
+                </not>
+                <isset property="mtn.available" />
+            </and>
+        </condition>
+    </target>
+
     <target name="javadoc">
         <mkdir dir="./build" />
         <mkdir dir="./build/javadoc" />
@@ -41,9 +87,7 @@
         <delete dir="./build" />
     </target>
     <target name="cleandep" depends="clean">
-        <ant dir="../../../core/java/" target="cleandep" />
     </target>
     <target name="distclean" depends="clean">
-        <ant dir="../../../core/java/" target="distclean" />
     </target>
 </project>

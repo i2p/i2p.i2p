@@ -17,6 +17,10 @@ import java.util.Properties;
 /**
  * Simple config file handler.
  * 
+ * Warning - browser needs double quotes and double backslashes on Windows
+ * e.g.
+ * browser="C:\\Program Files\\Mozilla Firefox\\firefox.exe"
+ *
  * @author hypercubus
  */
 public class ConfigFile {
@@ -60,11 +64,10 @@ public class ConfigFile {
             _properties.load(fileInputStream);
         } catch (Exception e) {
             rv = false;
-        }
-        try {
-            fileInputStream.close();
-        } catch (IOException e) {
-            // No worries.
+        } finally {
+            if (fileInputStream != null) {
+                try { fileInputStream.close(); } catch (IOException e) {}
+            }
         }
         return rv;
     }
@@ -78,11 +81,10 @@ public class ConfigFile {
             _properties.store(fileOutputStream, null);
         } catch (Exception e) {
             rv = false;
-        }
-        try {
-            fileOutputStream.close();
-        } catch (IOException e) {
-            // No worries.
+        } finally {
+            if (fileOutputStream != null) {
+                try { fileOutputStream.close(); } catch (IOException e) {}
+            }
         }
         return rv;
     }

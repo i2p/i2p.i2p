@@ -27,11 +27,11 @@ import net.i2p.util.Log;
 public class I2CPMessageReader {
     private final static Log _log = new Log(I2CPMessageReader.class);
     private InputStream _stream;
-    private I2CPMessageEventListener _listener;
-    private I2CPMessageReaderRunner _reader;
-    private Thread _readerThread;
+    protected I2CPMessageEventListener _listener;
+    protected I2CPMessageReaderRunner _reader;
+    protected Thread _readerThread;
     
-    private static volatile long __readerId = 0;
+    protected static volatile long __readerId = 0;
 
     public I2CPMessageReader(InputStream stream, I2CPMessageEventListener lsnr) {
         _stream = stream;
@@ -40,6 +40,14 @@ public class I2CPMessageReader {
         _readerThread = new I2PThread(_reader);
         _readerThread.setDaemon(true);
         _readerThread.setName("I2CP Reader " + (++__readerId));
+    }
+
+    /**
+     * For internal extension only. No stream.
+     * @since 0.8.3
+     */
+    protected I2CPMessageReader(I2CPMessageEventListener lsnr) {
+        setListener(lsnr);
     }
 
     public void setListener(I2CPMessageEventListener lsnr) {
@@ -60,7 +68,7 @@ public class I2CPMessageReader {
 
     /**
      * Have the already started reader pause its reading indefinitely
-     *
+     * @deprecated unused
      */
     public void pauseReading() {
         _reader.pauseRunner();
@@ -68,7 +76,7 @@ public class I2CPMessageReader {
 
     /**
      * Resume reading after a pause
-     *
+     * @deprecated unused
      */
     public void resumeReading() {
         _reader.resumeRunner();
@@ -114,19 +122,21 @@ public class I2CPMessageReader {
         public void disconnected(I2CPMessageReader reader);
     }
 
-    private class I2CPMessageReaderRunner implements Runnable {
-        private boolean _doRun;
-        private boolean _stayAlive;
+    protected class I2CPMessageReaderRunner implements Runnable {
+        protected volatile boolean _doRun;
+        protected volatile boolean _stayAlive;
 
         public I2CPMessageReaderRunner() {
             _doRun = true;
             _stayAlive = true;
         }
 
+        /** deprecated unused */
         public void pauseRunner() {
             _doRun = false;
         }
 
+        /** deprecated unused */
         public void resumeRunner() {
             _doRun = true;
         }
@@ -143,7 +153,6 @@ public class I2CPMessageReader {
                     _log.error("Error closing the stream", ioe);
                 }
             }
-            _stream = null;
         }
 
         public void run() {
@@ -174,15 +183,20 @@ public class I2CPMessageReader {
                         cancelRunner();
                     }
                 }
-                if (!_doRun) {
+                // ??? unused
+                if (_stayAlive && !_doRun) {
                     // pause .5 secs when we're paused
                     try {
                         Thread.sleep(500);
-                    } catch (InterruptedException ie) { // nop
+                    } catch (InterruptedException ie) {
+                        // we should break away here.
+                        _log.warn("Breaking away stream", ie);
+                        _listener.disconnected(I2CPMessageReader.this);
+                        cancelRunner();
                     }
                 }
             }
-            // boom bye bye bad bwoy
+            _stream = null;
         }
     }
 }

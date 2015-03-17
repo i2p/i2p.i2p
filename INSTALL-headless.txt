@@ -1,0 +1,45 @@
+Headless (console mode) I2P installation instructions
+
+1) java -jar i2pinstall.exe -console       (you've already done this)
+
+This will run the installer in text mode, including running the postinstall.sh
+script. After that, you may run 'sh i2prouter start'
+which will start the router and attempt to launch a browser.
+
+If you do not have an X server running, the browser launch may fail, and
+you may use:
+  lynx http://localhost:7657/
+to configure the router.
+
+If you're having trouble, swing by http://forum.i2p2.de/, check the
+website at http://www.i2p2.de/, or get on irc://irc.freenode.net/#i2p
+
+I2P will create and store files and configuration data in the user directory
+~/.i2p/ on Linux and %APPDATA%\I2P\ on Windows. This directory is created
+when I2P is run for the first time. It also creates files in the system
+temporary directory specified by the Java Virtual Machine.
+To change the location of these directories, or to configure I2P to
+put all files in this directory (the so-called "portable" configuration),
+edit the files i2prouter (Linux) and wrapper.config (Linux and Windows)
+where there are comments labeled "PORTABLE". Do this before you
+run I2P for the first time.
+
+To start I2P:
+   (*nix): sh i2prouter start
+   (win*): I2P.exe
+   (non-x86 platforms PPC, ARM, etc): sh runplain.sh
+
+To stop I2P (gracefully):
+   lynx http://localhost:7657/summaryframe (click "Shutdown")
+
+To stop I2P immediately:
+   sh i2prouter stop
+
+To uninstall I2P:
+   rm -rf $I2PInstallDir ~/.i2p
+
+Supported JVMs:
+  Windows: Latest available from http://java.com/download (1.5+ supported)
+  Linux:   Latest available from http://java.com/download (1.5+ supported)
+  FreeBSD: 1.5-compatible (NIO required)
+  Other operating systems and JVMs: See http://trac.i2p2.de/wiki/java

@@ -20,10 +20,12 @@
 
 package org.klomp.snark;
 
+import java.util.List;
+
 /**
  * Listener for Peer events.
  */
-public interface PeerListener
+interface PeerListener
 {
   /**
    * Called when the connection to the peer has started and the
@@ -93,12 +95,11 @@ public interface PeerListener
    * will be closed.
    *
    * @param peer the Peer that got the piece.
-   * @param piece the piece number received.
-   * @param bs the byte array containing the piece.
+   * @param piece the piece received.
    *
    * @return true when the bytes represent the piece, false otherwise.
    */
-  boolean gotPiece(Peer peer, int piece, byte[] bs);
+  boolean gotPiece(Peer peer, PartialPiece piece);
 
   /**
    * Called when the peer wants (part of) a piece from us. Only called
@@ -146,12 +147,26 @@ public interface PeerListener
   int wantPiece(Peer peer, BitField bitfield);
 
   /**
+   * Called when we are downloading from the peer and may need to ask for
+   * a new piece. Returns true if wantPiece() or getPartialPiece() would return a piece.
+   *
+   * @param peer the Peer that will be asked to provide the piece.
+   * @param bitfield a BitField containing the pieces that the other
+   * side has.
+   *
+   * @return if we want any of what the peer has
+   * @since 0.8.2
+   */
+  boolean needPiece(Peer peer, BitField bitfield);
+
+  /**
    * Called when the peer has disconnected and the peer task may have a partially
    * downloaded piece that the PeerCoordinator can save
    *
-   * @param state the PeerState for the peer
+   * @param peer the peer
+   * @since 0.8.2
    */
-  void savePeerPartial(PeerState state);
+  void savePartialPieces(Peer peer, List<Request> pcs);
 
   /**
    * Called when a peer has connected and there may be a partially
@@ -160,13 +175,36 @@ public interface PeerListener
    * @param havePieces the have-pieces bitmask for the peer
    *
    * @return request (contains the partial data and valid length)
+   * @since 0.8.2
    */
-  Request getPeerPartial(BitField havePieces);
+  PartialPiece getPartialPiece(Peer peer, BitField havePieces);
 
-  /** Mark a peer's requested pieces unrequested when it is disconnected
-   *  This prevents premature end game
+  /**
+   * Called when an extension message is received.
    *
-   * @param peer the peer that is disconnecting
+   * @param peer the Peer that got the message.
+   * @param id the message ID
+   * @param bs the message payload
+   * @since 0.8.4
    */
-  void markUnrequested(Peer peer);
+  void gotExtension(Peer peer, int id, byte[] bs);
+
+  /**
+   * Called when a DHT port message is received.
+   *
+   * @param peer the Peer that got the message.
+   * @param port the query port
+   * @param rport the response port
+   * @since 0.8.4
+   */
+  void gotPort(Peer peer, int port, int rport);
+
+  /**
+   * Called when peers are received via PEX
+   *
+   * @param peer the Peer that got the message.
+   * @param pIDList the peer IDs (dest hashes)
+   * @since 0.8.4
+   */
+  void gotPeers(Peer peer, List<PeerID> pIDList);
 }

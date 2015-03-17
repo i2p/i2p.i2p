@@ -17,7 +17,6 @@ import java.security.SecureRandom;
 
 import net.i2p.I2PAppContext;
 import net.i2p.crypto.EntropyHarvester;
-import net.i2p.data.Base64;
 
 /**
  * Singleton for whatever PRNG i2p uses.  
@@ -25,18 +24,29 @@ import net.i2p.data.Base64;
  * @author jrandom
  */
 public class RandomSource extends SecureRandom implements EntropyHarvester {
-    private Log _log;
-    private EntropyHarvester _entropyHarvester;
-    protected I2PAppContext _context;
+    private final EntropyHarvester _entropyHarvester;
+    protected final I2PAppContext _context;
 
+    /**
+     *  Deprecated - do not instantiate this directly, as you won't get the
+     *  good one (Fortuna). Use getInstance() or
+     *  I2PAppContext.getGlobalContext().random() to get the FortunaRandomSource
+     *  instance.
+     */
     public RandomSource(I2PAppContext context) {
         super();
         _context = context;
-        _log = context.logManager().getLog(RandomSource.class);
         // when we replace to have hooks for fortuna (etc), replace with
         // a factory (or just a factory method)
         _entropyHarvester = this;
     }
+
+    /**
+     * Singleton for whatever PRNG i2p uses.  
+     * Same as I2PAppContext.getGlobalContext().random();
+     * use context.random() if you have a context already.
+     * @return I2PAppContext.getGlobalContext().random()
+     */
     public static RandomSource getInstance() {
         return I2PAppContext.getGlobalContext().random();
     }
@@ -48,6 +58,7 @@ public class RandomSource extends SecureRandom implements EntropyHarvester {
      * WTF.  Ok, so we're going to have it return between 0 and n (including 0, excluding n), since 
      * thats what it has been used for.
      *
+     * This code unused, see FortunaRandomSource override
      */
     @Override
     public int nextInt(int n) {
@@ -61,6 +72,8 @@ public class RandomSource extends SecureRandom implements EntropyHarvester {
     /**
      * Like the modified nextInt, nextLong(n) returns a random number from 0 through n,
      * including 0, excluding n.
+     *
+     * This code unused, see FortunaRandomSource override
      */
     public long nextLong(long n) {
         long v = super.nextLong();
@@ -70,48 +83,50 @@ public class RandomSource extends SecureRandom implements EntropyHarvester {
     }
 
     /**
+     * Not part of java.util.SecureRandom, but added since Fortuna supports it.
+     *
+     * This code unused, see FortunaRandomSource override
+     *
+     * @since 0.8.12
+     */
+    public void nextBytes(byte buf[], int offset, int length) {
+        // inefficient, just in case anybody actually instantiates this
+        if (offset == 0 && buf.length == length) {
+            nextBytes(buf);
+        } else {
+            byte[] tmp = new byte[length];
+            nextBytes(tmp);
+            System.arraycopy(tmp, 0, buf, offset, length);
+        }
+    }
+
+    /**
      * override as synchronized, for those JVMs that don't always pull via
      * nextBytes (cough ibm)
-     */
+
     @Override
     public boolean nextBoolean() { return super.nextBoolean(); }
-    /**
-     * override as synchronized, for those JVMs that don't always pull via
-     * nextBytes (cough ibm)
-     */
+
     @Override
     public void nextBytes(byte buf[]) { super.nextBytes(buf); }
-    /**
-     * override as synchronized, for those JVMs that don't always pull via
-     * nextBytes (cough ibm)
-     */
+
     @Override
     public double nextDouble() { return super.nextDouble(); }
-    /**
-     * override as synchronized, for those JVMs that don't always pull via
-     * nextBytes (cough ibm)
-     */
+
     @Override
     public float nextFloat() { return super.nextFloat(); }
-    /**
-     * override as synchronized, for those JVMs that don't always pull via
-     * nextBytes (cough ibm)
-     */
+
     @Override
     public double nextGaussian() { return super.nextGaussian(); }
-    /**
-     * override as synchronized, for those JVMs that don't always pull via
-     * nextBytes (cough ibm)
-     */
+
     @Override
     public int nextInt() { return super.nextInt(); }
-    /**
-     * override as synchronized, for those JVMs that don't always pull via
-     * nextBytes (cough ibm)
-     */
+
     @Override
     public long nextLong() { return super.nextLong(); }
-    
+*****/
+   
+    /** */
     public EntropyHarvester harvester() { return _entropyHarvester; }
  
     public void feedEntropy(String source, long data, int bitoffset, int bits) {
@@ -142,10 +157,10 @@ public class RandomSource extends SecureRandom implements EntropyHarvester {
     private static final String SEEDFILE = "prngseed.rnd";
     
     public static final void writeSeed(byte buf[]) {
-        File f = new File(SEEDFILE);
+        File f = new File(I2PAppContext.getGlobalContext().getConfigDir(), SEEDFILE);
         FileOutputStream fos = null;
         try {
-            fos = new FileOutputStream(f);
+            fos = new SecureFileOutputStream(f);
             fos.write(buf);
         } catch (IOException ioe) {
             // ignore
@@ -157,14 +172,18 @@ public class RandomSource extends SecureRandom implements EntropyHarvester {
     public final boolean initSeed(byte buf[]) {
         // why urandom?  because /dev/random blocks, and there are arguments
         // suggesting such blockages are largely meaningless
-        boolean ok = seedFromFile("/dev/urandom", buf);
+        boolean ok = seedFromFile(new File("/dev/urandom"), buf);
         // we merge (XOR) in the data from /dev/urandom with our own seedfile
-        ok = seedFromFile("prngseed.rnd", buf) || ok;
+        File localFile = new File(_context.getConfigDir(), SEEDFILE);
+        ok = seedFromFile(localFile, buf) || ok;
         return ok;
     }
     
-    private static final boolean seedFromFile(String filename, byte buf[]) {
-        File f = new File(filename);
+    /**
+     *  @param f absolute path
+     *  @return success
+     */
+    private static final boolean seedFromFile(File f, byte buf[]) {
         if (f.exists()) {
             FileInputStream fis = null;
             try {
@@ -189,6 +208,7 @@ public class RandomSource extends SecureRandom implements EntropyHarvester {
         return false;
     }
 
+/****
     public static void main(String args[]) {
         for (int j = 0; j < 2; j++) {
         RandomSource rs = new RandomSource(I2PAppContext.getGlobalContext());
@@ -209,10 +229,5 @@ public class RandomSource extends SecureRandom implements EntropyHarvester {
         rs.saveSeed();
         }
     }
-    
-    // noop
-    private static class DummyEntropyHarvester implements EntropyHarvester {
-        public void feedEntropy(String source, long data, int bitoffset, int bits) {}
-        public void feedEntropy(String source, byte[] data, int offset, int len) {}
-    }
+****/
 }

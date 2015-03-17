@@ -3,8 +3,7 @@
     <target name="all" depends="clean, build" />
     <target name="build" depends="builddep, jar" />
     <target name="builddep">
-        <ant dir="../../ministreaming/java/" target="build" />
-	<!-- ministreaming will build core -->
+        <!-- run from top level build.xml to get dependencies built -->
     </target>
     <condition property="depend.available">
         <typefound name="depend" />
@@ -18,33 +17,99 @@
             <classpath>
                 <pathelement location="../../../core/java/build/obj" />
                 <pathelement location="../../ministreaming/java/build/obj" />
+                <pathelement location="../../streaming/java/build/obj" />
             </classpath>
         </depend>
     </target>
+
+    <property name="javac.compilerargs" value="" />
+
+    <!-- compile everything including client classes -->
     <target name="compile" depends="depend">
         <mkdir dir="./build" />
         <mkdir dir="./build/obj" />
         <javac 
             srcdir="./src" 
             debug="true" deprecation="on" source="1.5" target="1.5" 
+            includeAntRuntime="false"
             destdir="./build/obj" 
-            classpath="../../../core/java/build/i2p.jar:../../ministreaming/java/build/mstreaming.jar" />
+            classpath="../../../core/java/build/i2p.jar:../../ministreaming/java/build/mstreaming.jar:../../streaming/java/build/streaming.jar" >
+            <compilerarg line="${javac.compilerargs}" />
+        </javac>
     </target>
+
     <target name="compileTest" depends="compile">
         <javac 
             srcdir="./test" 
             debug="true" deprecation="on" source="1.5" target="1.5" 
+            includeAntRuntime="false"
             destdir="./build/obj" 
-            classpath="../../../core/java/build/i2p.jar:../../ministreaming/java/build/mstreaming.jar" />
+            classpath="../../../core/java/build/i2p.jar:../../ministreaming/java/build/mstreaming.jar:../../streaming/java/build/streaming.jar" >
+            <compilerarg line="${javac.compilerargs}" />
+        </javac>
     </target>
-    <target name="jar" depends="compile">
-        <jar destfile="./build/sam.jar" basedir="./build/obj" includes="**/*.class">
+
+    <target name="listChangedFiles" depends="jarUpToDate" if="shouldListChanges" >
+        <exec executable="mtn" outputproperty="workspace.changes" errorproperty="mtn.error2" failifexecutionfails="false" >
+            <arg value="list" />
+            <arg value="changed" />
+            <arg value="." />
+        </exec>
+        <!-- \n in an attribute value generates an invalid manifest -->
+        <exec executable="tr" inputstring="${workspace.changes}" outputproperty="workspace.changes.tr" errorproperty="mtn.error2" failifexecutionfails="false" >
+            <arg value="-s" />
+            <arg value="[:space:]" />
+            <arg value="," />
+        </exec>
+    </target>
+
+    <!-- does not include client classes, moved to samclient.jar -->
+    <target name="jar" depends="compile, jarUpToDate, listChangedFiles" unless="jar.uptodate" >
+        <!-- set if unset -->
+        <property name="workspace.changes.tr" value="" />
+        <jar destfile="./build/sam.jar" basedir="./build/obj" includes="**/*.class" excludes="net/i2p/sam/client/*">
             <manifest>
                 <attribute name="Main-Class" value="net.i2p.sam.SAMBridge" />
-                <attribute name="Class-Path" value="i2p.jar mstreaming.jar" />
+                <attribute name="Class-Path" value="i2p.jar mstreaming.jar streaming.jar" />
+                <attribute name="Implementation-Version" value="${full.version}" />
+                <attribute name="Built-By" value="${build.built-by}" />
+                <attribute name="Build-Date" value="${build.timestamp}" />
+                <attribute name="Base-Revision" value="${workspace.version}" />
+                <attribute name="Workspace-Changes" value="${workspace.changes.tr}" />
             </manifest>
         </jar>
     </target>
+
+    <target name="clientjar" depends="compile, listChangedFiles" >
+        <!-- set if unset -->
+        <property name="workspace.changes.tr" value="" />
+        <jar destfile="./build/samclient.jar" basedir="./build/obj" includes="net/i2p/sam/client/*.class">
+            <manifest>
+                <attribute name="Main-Class" value="net.i2p.sam.SAMBridge" />
+                <attribute name="Class-Path" value="i2p.jar mstreaming.jar streaming.jar" />
+                <attribute name="Implementation-Version" value="${full.version}" />
+                <attribute name="Built-By" value="${build.built-by}" />
+                <attribute name="Build-Date" value="${build.timestamp}" />
+                <attribute name="Base-Revision" value="${workspace.version}" />
+                <attribute name="Workspace-Changes" value="${workspace.changes.tr}" />
+            </manifest>
+        </jar>
+    </target>
+
+    <target name="jarUpToDate">
+        <uptodate property="jar.uptodate" targetfile="build/sam.jar" >
+            <srcfiles dir= "build/obj" includes="**/*.class" />
+        </uptodate>
+        <condition property="shouldListChanges" >
+            <and>
+                <not>
+                    <isset property="jar.uptodate" />
+                </not>
+                <isset property="mtn.available" />
+            </and>
+        </condition>
+    </target>
+
     <target name="jarTest" depends="jar, compileTest">
         <jar destfile="./build/sam.jar" basedir="./build/obj" includes="**/*Test*.class" update="true" />
     </target>
@@ -52,7 +117,7 @@
         <mkdir dir="./build" />
         <mkdir dir="./build/javadoc" />
         <javadoc 
-            sourcepath="./src:../../../core/java/src:../../ministreaming/java/src" destdir="./build/javadoc" 
+            sourcepath="./src:../../../core/java/src:../../ministreaming/java/src:../../streaming/java/src" destdir="./build/javadoc" 
             packagenames="*" 
             use="true" 
             splitindex="true" 
@@ -62,11 +127,7 @@
         <delete dir="./build" />
     </target>
     <target name="cleandep" depends="clean">
-	<!-- ministreaming will clean core -->
-        <ant dir="../../ministreaming/java/" target="distclean" />
     </target>
     <target name="distclean" depends="clean">
-	<!-- ministreaming will clean core -->
-        <ant dir="../../ministreaming/java/" target="distclean" />
     </target>
 </project>

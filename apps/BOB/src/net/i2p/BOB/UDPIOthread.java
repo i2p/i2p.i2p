@@ -78,26 +78,26 @@ public class UDPIOthread implements I2PSessionListener, Runnable {
 		try {
 			in = new DataInputStream(socket.getInputStream());
 			out = new DataOutputStream(socket.getOutputStream());
-			while(up) {
+			while (up) {
 				int c = in.read(data);
 				// Note: could do a loopback test here with a wrapper.
 				boolean ok = _session.sendMessage(_peerDestination, data, 0, c);
 
-				if(!ok) {
+				if (!ok) {
 					up = false; // Is this the right thing to do??
 				}
 			}
-		} catch(IOException ioe) {
+		} catch (IOException ioe) {
 			_log.error("Error running", ioe);
-		} catch(I2PSessionException ise) {
+		} catch (I2PSessionException ise) {
 			_log.error("Error communicating", ise);
 		//		} catch(DataFormatException dfe) {
 		//			_log.error("Peer destination file is not valid", dfe);
 		} finally {
-			if(_session != null) {
+			if (_session != null) {
 				try {
 					_session.destroySession();
-				} catch(I2PSessionException ise) {
+				} catch (I2PSessionException ise) {
 					// ignored
 				}
 			}
@@ -116,9 +116,9 @@ public class UDPIOthread implements I2PSessionListener, Runnable {
 			byte msg[] = session.receiveMessage(msgId);
 			out.write(msg);
 			out.flush();
-		} catch(I2PSessionException ise) {
+		} catch (I2PSessionException ise) {
 			up = false;
-		} catch(IOException ioe) {
+		} catch (IOException ioe) {
 			up = false;
 		}
 	}

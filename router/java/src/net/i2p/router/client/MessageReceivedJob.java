@@ -24,15 +24,11 @@ import net.i2p.util.Log;
 class MessageReceivedJob extends JobImpl {
     private Log _log;
     private ClientConnectionRunner _runner;
-    private Destination _to;
-    private Destination _from;
     private Payload _payload;
     public MessageReceivedJob(RouterContext ctx, ClientConnectionRunner runner, Destination toDest, Destination fromDest, Payload payload) {
         super(ctx);
         _log = ctx.logManager().getLog(MessageReceivedJob.class);
         _runner = runner;
-        _to = toDest;
-        _from = fromDest;
         _payload = payload;
     }
     
@@ -40,16 +36,13 @@ class MessageReceivedJob extends JobImpl {
     public void runJob() {
         if (_runner.isDead()) return;
         MessageId id = new MessageId();
-        id.setMessageId(ClientConnectionRunner.getNextMessageId());
+        id.setMessageId(_runner.getNextMessageId());
         _runner.setPayload(id, _payload);
         messageAvailable(id, _payload.getSize());
     }
     
     /**
      * Deliver notification to the client that the given message is available.
-     * This is synchronous and returns true if the notification was sent safely,
-     * otherwise it returns false
-     *
      */
     public void messageAvailable(MessageId id, long size) {
         if (_log.shouldLog(Log.DEBUG))
@@ -59,6 +52,7 @@ class MessageReceivedJob extends JobImpl {
         msg.setMessageId(id.getMessageId());
         msg.setSessionId(_runner.getSessionId().getSessionId());
         msg.setSize(size);
+        // has to be >= 0, it is initialized to -1
         msg.setNonce(1);
         msg.setStatus(MessageStatusMessage.STATUS_AVAILABLE);
         try {

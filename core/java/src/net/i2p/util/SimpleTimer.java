@@ -14,24 +14,43 @@ import net.i2p.I2PAppContext;
  * appropriate time.  The method that is fired however should NOT block (otherwise
  * they b0rk the timer).
  *
+ * WARNING - Deprecated.
+ * This is an inefficient mess. Use SimpleScheduler or SimpleTimer2 if possible.
  */
 public class SimpleTimer {
-    private static final SimpleTimer _instance = new SimpleTimer();
-    public static SimpleTimer getInstance() { return _instance; }
-    private I2PAppContext _context;
-    private Log _log;
-    /** event time (Long) to event (TimedEvent) mapping */
-    private TreeMap _events;
-    /** event (TimedEvent) to event time (Long) mapping */
-    private Map _eventTimes;
-    private List _readyEvents;
-    private SimpleStore runn;
 
-    protected SimpleTimer() { this("SimpleTimer"); }
-    protected SimpleTimer(String name) {
+    /**
+     *  If you have a context, use context.simpleTimer() instead
+     */
+    public static SimpleTimer getInstance() {
+        return I2PAppContext.getGlobalContext().simpleTimer();
+    }
+
+    private final Log _log;
+    /** event time (Long) to event (TimedEvent) mapping */
+    private final TreeMap<Long, TimedEvent> _events;
+    /** event (TimedEvent) to event time (Long) mapping */
+    private final Map<TimedEvent, Long> _eventTimes;
+    private final List<TimedEvent> _readyEvents;
+    private SimpleStore runn;
+    private static final int MIN_THREADS = 2;
+    private static final int MAX_THREADS = 4;
+
+    /**
+     *  To be instantiated by the context.
+     *  Others should use context.simpleTimer() instead
+     */
+    public SimpleTimer(I2PAppContext context) {
+        this(context, "SimpleTimer");
+    }
+
+    /**
+     *  To be instantiated by the context.
+     *  Others should use context.simpleTimer() instead
+     */
+    private SimpleTimer(I2PAppContext context, String name) {
         runn = new SimpleStore(true);
-        _context = I2PAppContext.getGlobalContext();
-        _log = _context.logManager().getLog(SimpleTimer.class);
+        _log = context.logManager().getLog(SimpleTimer.class);
         _events = new TreeMap();
         _eventTimes = new HashMap(256);
         _readyEvents = new ArrayList(4);
@@ -39,21 +58,41 @@ public class SimpleTimer {
         runner.setName(name);
         runner.setDaemon(true);
         runner.start();
-        for (int i = 0; i < 3; i++) {
-            I2PThread executor = new I2PThread(new Executor(_context, _log, _readyEvents, runn));
-            executor.setName(name + "Executor " + i);
+        long maxMemory = Runtime.getRuntime().maxMemory();
+        if (maxMemory == Long.MAX_VALUE)
+            maxMemory = 128*1024*1024l;
+        int threads = (int) Math.max(MIN_THREADS, Math.min(MAX_THREADS, 1 + (maxMemory / (32*1024*1024))));
+        for (int i = 1; i <= threads ; i++) {
+            I2PThread executor = new I2PThread(new Executor(context, _log, _readyEvents, runn));
+            executor.setName(name + "Executor " + i + '/' + threads);
             executor.setDaemon(true);
             executor.start();
         }
+        context.addShutdownTask(new Shutdown());
     }
     
+    /**
+     * @since 0.8.8
+     */
+    private class Shutdown implements Runnable {
+        public void run() {
+            removeSimpleTimer();
+        }
+    }
+
     /**
      * Removes the SimpleTimer.
      */
     public void removeSimpleTimer() {
         synchronized(_events) {
             runn.setAnswer(false);
+            _events.clear();
+            _eventTimes.clear();
             _events.notifyAll();
+        }
+        synchronized (_readyEvents) {
+            _readyEvents.clear();
+            _readyEvents.notifyAll();
         }
     }
 
@@ -86,10 +125,10 @@ public class SimpleTimer {
         int totalEvents = 0;
         long now = System.currentTimeMillis();
         long eventTime = now + timeoutMs;
-        Long time = new Long(eventTime);
+        Long time = Long.valueOf(eventTime);
         synchronized (_events) {
             // remove the old scheduled position, then reinsert it
-            Long oldTime = (Long)_eventTimes.get(event);
+            Long oldTime = _eventTimes.get(event);
             if (oldTime != null) {
                 if (useEarliestTime) {
                     if (oldTime.longValue() < eventTime) {
@@ -116,8 +155,8 @@ public class SimpleTimer {
                 _log.error("Skewed events: " + _events.size() + " for " + _eventTimes.size());
                 for (Iterator iter = _eventTimes.keySet().iterator(); iter.hasNext(); ) {
                     TimedEvent evt = (TimedEvent)iter.next();
-                    Long when = (Long)_eventTimes.get(evt);
-                    TimedEvent cur = (TimedEvent)_events.get(when);
+                    Long when = _eventTimes.get(evt);
+                    TimedEvent cur = _events.get(when);
                     if (cur != evt) {
                         _log.error("event " + evt + " @ " + when + ": " + cur);
                     }
@@ -143,7 +182,7 @@ public class SimpleTimer {
     public boolean removeEvent(TimedEvent evt) {
         if (evt == null) return false;
         synchronized (_events) {
-            Long when = (Long)_eventTimes.remove(evt);
+            Long when = _eventTimes.remove(evt);
             if (when != null)
                 _events.remove(when);
             return null != when;
@@ -168,7 +207,7 @@ public class SimpleTimer {
     //  private TimedEvent _recentEvents[] = new TimedEvent[5];
     private class SimpleTimerRunner implements Runnable {
         public void run() {
-            List eventsToFire = new ArrayList(1);
+            List<TimedEvent> eventsToFire = new ArrayList(1);
             while(runn.getAnswer()) {
                 try {
                     synchronized (_events) {
@@ -180,12 +219,12 @@ public class SimpleTimer {
                         long nextEventDelay = -1;
                         Object nextEvent = null;
                         while(runn.getAnswer()) {
-                            if(_events.size() <= 0) {
+                            if(_events.isEmpty()) {
                                 break;
                             }
-                            Long when = (Long)_events.firstKey();
+                            Long when = _events.firstKey();
                             if (when.longValue() <= now) {
-                                TimedEvent evt = (TimedEvent)_events.remove(when);
+                                TimedEvent evt = _events.remove(when);
                                 if (evt != null) {                            
                                     _eventTimes.remove(evt);
                                     eventsToFire.add(evt);
@@ -196,7 +235,7 @@ public class SimpleTimer {
                                 break;
                             }
                         }
-                        if (eventsToFire.size() <= 0) { 
+                        if (eventsToFire.isEmpty()) { 
                             if (nextEventDelay != -1) {
                                 if (_log.shouldLog(Log.DEBUG))
                                     _log.debug("Next event in " + nextEventDelay + ": " + nextEvent);
@@ -233,7 +272,7 @@ public class SimpleTimer {
                 } else {
                     _occurredTime = now;
                     if (_occurredEventCount > 2500) {
-                        StringBuffer buf = new StringBuffer(128);
+                        StringBuilder buf = new StringBuilder(128);
                         buf.append("Too many simpleTimerJobs (").append(_occurredEventCount);
                         buf.append(") in a second!");
                         _log.log(Log.WARN, buf.toString());

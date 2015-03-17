@@ -25,9 +25,12 @@ package i2p.susi.util;
 
 import i2p.susi.debug.Debug;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
+
+import net.i2p.I2PAppContext;
 
 /**
  * @author susi
@@ -39,7 +42,6 @@ public class Config {
 	/**
 	 * 
 	 * @param name
-	 * @return
 	 */
 	public static String getProperty( String name )
 	{
@@ -81,7 +83,8 @@ public class Config {
 		}
                 FileInputStream fis = null;
 		try {
-			fis = new FileInputStream( "susimail.config" );
+			File cfg = new File(I2PAppContext.getGlobalContext().getConfigDir(), "susimail.config");
+			fis = new FileInputStream(cfg);
 			config.load( fis );
 		} catch (Exception e) {
 			Debug.debug( Debug.DEBUG, "Could not open susimail.config, reason: " + e.getMessage() );
@@ -94,7 +97,6 @@ public class Config {
 	 * 
 	 * @param name
 	 * @param defaultValue
-	 * @return
 	 */
 	public static String getProperty( String name, String defaultValue )
 	{
@@ -105,7 +107,6 @@ public class Config {
 	 * 
 	 * @param name
 	 * @param defaultValue
-	 * @return
 	 */
 	public static int getProperty( String name, int defaultValue )
 	{

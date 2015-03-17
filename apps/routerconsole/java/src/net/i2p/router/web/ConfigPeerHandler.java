@@ -1,12 +1,8 @@
 package net.i2p.router.web;
 
-import net.i2p.I2PAppContext;
-import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.Base64;
-import net.i2p.router.Router;
 import net.i2p.router.peermanager.PeerProfile;
-import net.i2p.util.Log;
 
 /**
  *
@@ -16,30 +12,31 @@ public class ConfigPeerHandler extends FormHandler {
     private String _speed;
     private String _capacity;
     
+    @Override
     protected void processForm() {
         if ("Save Configuration".equals(_action)) {
             _context.router().saveConfig();
             addFormNotice("Settings saved - not really!!!!!");
-        } else if (_action.startsWith("Shitlist")) {
+        } else if (_action.equals(_("Ban peer until restart"))) {
             Hash h = getHash();
             if (h != null) {
-                _context.shitlist().shitlistRouterForever(h, "Manually shitlisted via <a href=\"configpeer.jsp\">configpeer.jsp</a>");
-                addFormNotice("Peer " + _peer + " shitlisted forever");
+                _context.shitlist().shitlistRouterForever(h, _("Manually banned via {0}"), "<a href=\"configpeer\">configpeer</a>");
+                addFormNotice(_("Peer") + " " + _peer + " " + _("banned until restart") );
                 return;
             }
-            addFormError("Invalid peer");
-        } else if (_action.startsWith("Unshitlist")) {
+            addFormError(_("Invalid peer"));
+        } else if (_action.equals(_("Unban peer"))) {
             Hash h = getHash();
             if (h != null) {
                 if (_context.shitlist().isShitlisted(h)) {
                     _context.shitlist().unshitlistRouter(h);
-                    addFormNotice("Peer " + _peer + " unshitlisted");
+                    addFormNotice(_("Peer") + " " + _peer + " " + _("unbanned") );
                 } else
-                    addFormNotice("Peer " + _peer + " is not currently shitlisted");
+                    addFormNotice(_("Peer") + " " + _peer + " " + _("is not currently banned") );
                 return;
             }
-            addFormError("Invalid peer");
-        } else if (_action.startsWith("Adjust")) {
+            addFormError(_("Invalid peer"));
+        } else if (_action.equals(_("Adjust peer bonuses"))) {
             Hash h = getHash();
             if (h != null) {
                 PeerProfile prof = _context.profileOrganizer().getProfile(h);
@@ -47,21 +44,23 @@ public class ConfigPeerHandler extends FormHandler {
                     try {
                         prof.setSpeedBonus(Long.parseLong(_speed));
                     } catch (NumberFormatException nfe) {
-                        addFormError("Bad speed value");
+                        addFormError(_("Bad speed value"));
                     }
                     try {
                         prof.setCapacityBonus(Long.parseLong(_capacity));
                     } catch (NumberFormatException nfe) {
-                        addFormError("Bad capacity value");
+                        addFormError(_("Bad capacity value"));
                     }
                     addFormNotice("Bonuses adjusted for " + _peer);
                 } else
                     addFormError("No profile exists for " + _peer);
                 return;
             }
-            addFormError("Invalid peer");
+            addFormError(_("Invalid peer"));
         } else if (_action.startsWith("Check")) {
-            addFormError("Unsupported");
+            addFormError(_("Unsupported"));
+        } else {
+            addFormError("Unknown action \"" + _action + '"');
         }
     }
     

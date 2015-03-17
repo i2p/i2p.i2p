@@ -1,0 +1,48 @@
+# history.txt is installed to /usr/share/i2p because
+# it's shown in the router console at http://127.0.0.1:7657
+# (this is also why I don't use dh_installchangelogs -k for it)
+history.txt usr/share/i2p
+
+pkg-temp/blocklist.txt usr/share/i2p
+pkg-temp/certificates usr/share/i2p
+pkg-temp/clients.config usr/share/i2p
+pkg-temp/docs usr/share/i2p/
+pkg-temp/eepget usr/bin
+pkg-temp/eepsite usr/share/i2p
+pkg-temp/geoip usr/share/i2p
+pkg-temp/hosts.txt usr/share/i2p
+pkg-temp/i2prouter-nowrapper usr/bin
+pkg-temp/i2psnark.config usr/share/i2p
+pkg-temp/i2ptunnel.config usr/share/i2p
+pkg-temp/router.config usr/share/i2p
+pkg-temp/systray.config usr/share/i2p
+pkg-temp/webapps usr/share/i2p
+
+pkg-temp/lib/BOB.jar usr/share/i2p/lib
+pkg-temp/lib/commons-el.jar usr/share/i2p/lib
+pkg-temp/lib/commons-logging.jar usr/share/i2p/lib
+pkg-temp/lib/desktopgui.jar usr/share/i2p/lib
+pkg-temp/lib/i2p.jar usr/share/i2p/lib
+pkg-temp/lib/i2psnark.jar usr/share/i2p/lib
+pkg-temp/lib/i2ptunnel.jar usr/share/i2p/lib
+pkg-temp/lib/jasper-compiler.jar usr/share/i2p/lib
+pkg-temp/lib/jasper-runtime.jar usr/share/i2p/lib
+pkg-temp/lib/javax.servlet.jar usr/share/i2p/lib
+pkg-temp/lib/jetty-i2p.jar usr/share/i2p/lib
+pkg-temp/lib/jetty-java5-threadpool.jar usr/share/i2p/lib
+pkg-temp/lib/jetty-rewrite-handler.jar usr/share/i2p/lib
+pkg-temp/lib/jetty-sslengine.jar usr/share/i2p/lib
+pkg-temp/lib/jetty-start.jar usr/share/i2p/lib
+pkg-temp/lib/jetty-util.jar usr/share/i2p/lib
+pkg-temp/lib/jrobin.jar usr/share/i2p/lib
+pkg-temp/lib/jstl.jar usr/share/i2p/lib
+pkg-temp/lib/mstreaming.jar usr/share/i2p/lib
+pkg-temp/lib/org.mortbay.jetty.jar usr/share/i2p/lib
+pkg-temp/lib/org.mortbay.jmx.jar usr/share/i2p/lib
+pkg-temp/lib/routerconsole.jar usr/share/i2p/lib
+pkg-temp/lib/router.jar usr/share/i2p/lib
+pkg-temp/lib/sam.jar usr/share/i2p/lib
+pkg-temp/lib/standard.jar usr/share/i2p/lib
+pkg-temp/lib/streaming.jar usr/share/i2p/lib
+pkg-temp/lib/systray4j.jar usr/share/i2p/lib
+pkg-temp/lib/systray.jar usr/share/i2p/lib

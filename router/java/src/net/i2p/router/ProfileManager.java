@@ -137,6 +137,13 @@ public interface ProfileManager {
     void dbStoreSent(Hash peer, long responseTimeMs);
     
     /**
+     * Note that we confirmed a successful send of db data to 
+     * the peer.
+     *
+     */
+    void dbStoreSuccessful(Hash peer);
+
+    /**
      * Note that we were unable to confirm a successful send of db data to 
      * the peer, at least not within our timeout period
      *
@@ -148,6 +155,7 @@ public interface ProfileManager {
      * through an explicit dbStore or in a dbLookupReply
      */
     void heardAbout(Hash peer);
+    void heardAbout(Hash peer, long when);
     
     /**
      * Note that the router received a message from the given peer on the specified

@@ -20,34 +20,50 @@
 
 package org.klomp.snark;
 
-import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
+import net.i2p.I2PAppContext;
 import net.i2p.client.streaming.I2PSocket;
+import net.i2p.data.DataHelper;
+import net.i2p.data.Destination;
 import net.i2p.util.Log;
+
+import org.klomp.snark.bencode.BEValue;
 
 public class Peer implements Comparable
 {
-  private Log _log = new Log(Peer.class);
+  private final Log _log = I2PAppContext.getGlobalContext().logManager().getLog(Peer.class);
   // Identifying property, the peer id of the other side.
   private final PeerID peerID;
 
   private final byte[] my_id;
-  final MetaInfo metainfo;
+  private final byte[] infohash;
+  /** will start out null in magnet mode */
+  private MetaInfo metainfo;
+  private Map<String, BEValue> handshakeMap;
 
   // The data in/output streams set during the handshake and used by
   // the actual connections.
   private DataInputStream din;
   private DataOutputStream dout;
 
+  /** running counters */
+  private long downloaded;
+  private long uploaded;
+
   // Keeps state for in/out connections.  Non-null when the handshake
   // was successful, the connection setup and runs
   PeerState state;
+
+  /** shared across all peers on this torrent */
+  MagnetState magnetState;
 
   private I2PSocket sock;
   
@@ -56,43 +72,60 @@ public class Peer implements Comparable
   private long _id;
   final static long CHECK_PERIOD = PeerCoordinator.CHECK_PERIOD; // 40 seconds
   final static int RATE_DEPTH = PeerCoordinator.RATE_DEPTH; // make following arrays RATE_DEPTH long
-  private long uploaded_old[] = {-1,-1,-1,-1,-1,-1};
-  private long downloaded_old[] = {-1,-1,-1,-1,-1,-1};
+  private long uploaded_old[] = {-1,-1,-1};
+  private long downloaded_old[] = {-1,-1,-1};
+
+  //  bytes per bt spec:                 0011223344556677
+  static final long OPTION_EXTENSION = 0x0000000000100000l;
+  static final long OPTION_FAST      = 0x0000000000000004l;
+  static final long OPTION_DHT       = 0x0000000000000001l;
+  /** we use a different bit since the compact format is different */
+/* no, let's use an extension message
+  static final long OPTION_I2P_DHT   = 0x0000000040000000l;
+*/
+  static final long OPTION_AZMP      = 0x1000000000000000l;
+  private long options;
 
   /**
+   * Outgoing connection.
    * Creates a disconnected peer given a PeerID, your own id and the
    * relevant MetaInfo.
+   * @param metainfo null if in magnet mode
    */
-  public Peer(PeerID peerID, byte[] my_id, MetaInfo metainfo)
-    throws IOException
+  public Peer(PeerID peerID, byte[] my_id, byte[] infohash, MetaInfo metainfo)
   {
     this.peerID = peerID;
     this.my_id = my_id;
+    this.infohash = infohash;
     this.metainfo = metainfo;
     _id = ++__id;
-    //_log.debug("Creating a new peer with " + peerID.getAddress().calculateHash().toBase64(), new Exception("creating"));
+    //_log.debug("Creating a new peer with " + peerID.toString(), new Exception("creating"));
   }
 
   /**
+   * Incoming connection.
    * Creates a unconnected peer from the input and output stream got
    * from the socket. Note that the complete handshake (which can take
    * some time or block indefinitely) is done in the calling Thread to
    * get the remote peer id. To completely start the connection call
    * the connect() method.
    *
+   * @param metainfo null if in magnet mode
    * @exception IOException when an error occurred during the handshake.
    */
-  public Peer(final I2PSocket sock, InputStream in, OutputStream out, byte[] my_id, MetaInfo metainfo)
+  public Peer(final I2PSocket sock, InputStream in, OutputStream out, byte[] my_id, byte[] infohash, MetaInfo metainfo)
     throws IOException
   {
     this.my_id = my_id;
+    this.infohash = infohash;
     this.metainfo = metainfo;
     this.sock = sock;
 
     byte[] id  = handshake(in, out);
     this.peerID = new PeerID(id, sock.getPeerDestination());
     _id = ++__id;
-    _log.debug("Creating a new peer with " + peerID.getAddress().calculateHash().toBase64(), new Exception("creating " + _id));
+    if (_log.shouldLog(Log.DEBUG))
+        _log.debug("Creating a new peer " + peerID.toString(), new Exception("creating " + _id));
   }
 
   /**
@@ -106,6 +139,7 @@ public class Peer implements Comparable
   /**
    * Returns the String representation of the peerID.
    */
+    @Override
   public String toString()
   {
     if (peerID != null)
@@ -115,25 +149,32 @@ public class Peer implements Comparable
   }
 
   /**
-   * Returns socket (for debug printing)
+   * @return socket debug string (for debug printing)
    */
   public String getSocket()
   {
+    if (state != null) {
+        String r = state.getRequests();
+        if (r != null)
+            return sock.toString() + "<br>Requests: " + r;
+    }
     return sock.toString();
   }
 
   /**
    * The hash code of a Peer is the hash code of the peerID.
    */
+    @Override
   public int hashCode()
   {
-    return peerID.hashCode() ^ (2 << _id);
+    return peerID.hashCode() ^ (7777 * (int)_id);
   }
 
   /**
    * Two Peers are equal when they have the same PeerID.
    * All other properties are ignored.
    */
+    @Override
   public boolean equals(Object o)
   {
     if (o instanceof Peer)
@@ -147,6 +188,7 @@ public class Peer implements Comparable
 
   /**
    * Compares the PeerIDs.
+   * @deprecated unused?
    */
   public int compareTo(Object o)
   {
@@ -173,60 +215,85 @@ public class Peer implements Comparable
    * If the given BitField is non-null it is send to the peer as first
    * message.
    */
-  public void runConnection(I2PSnarkUtil util, PeerListener listener, BitField bitfield)
+  public void runConnection(I2PSnarkUtil util, PeerListener listener, BitField bitfield, MagnetState mState)
   {
     if (state != null)
       throw new IllegalStateException("Peer already started");
 
-    _log.debug("Running connection to " + peerID.getAddress().calculateHash().toBase64(), new Exception("connecting"));    
+    if (_log.shouldLog(Log.DEBUG))
+        _log.debug("Running connection to " + peerID.toString(), new Exception("connecting"));    
     try
       {
         // Do we need to handshake?
         if (din == null)
           {
+            // Outgoing connection
             sock = util.connect(peerID);
-            _log.debug("Connected to " + peerID + ": " + sock);
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Connected to " + peerID + ": " + sock);
             if ((sock == null) || (sock.isClosed())) {
                 throw new IOException("Unable to reach " + peerID);
             }
             InputStream in = sock.getInputStream();
-            OutputStream out = sock.getOutputStream(); //new BufferedOutputStream(sock.getOutputStream());
-            if (true) {
-                // buffered output streams are internally synchronized, so we can't get through to the underlying
-                // I2PSocket's MessageOutputStream to close() it if we are blocking on a write(...).  Oh, and the
-                // buffer is unnecessary anyway, as unbuffered access lets the streaming lib do the 'right thing'.
-                //out = new BufferedOutputStream(out);
-                in = new BufferedInputStream(sock.getInputStream());
-            }
-            //BufferedInputStream bis
-            //  = new BufferedInputStream(sock.getInputStream());
-            //BufferedOutputStream bos
-            //  = new BufferedOutputStream(sock.getOutputStream());
-            byte [] id = handshake(in, out); //handshake(bis, bos);
+            OutputStream out = sock.getOutputStream();
+            byte [] id = handshake(in, out);
             byte [] expected_id = peerID.getID();
-            if (!Arrays.equals(expected_id, id))
-              throw new IOException("Unexpected peerID '"
+            if (expected_id == null) {
+                peerID.setID(id);
+            } else if (Arrays.equals(expected_id, id)) {
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Handshake got matching IDs with " + toString());
+            } else {
+                throw new IOException("Unexpected peerID '"
                                     + PeerID.idencode(id)
                                     + "' expected '"
                                     + PeerID.idencode(expected_id) + "'");
-            _log.debug("Handshake got matching IDs with " + toString());
+            }
           } else {
-            _log.debug("Already have din [" + sock + "] with " + toString());
+            // Incoming connection
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Already have din [" + sock + "] with " + toString());
           }
         
+        // bad idea?
+        if (metainfo == null && (options & OPTION_EXTENSION) == 0) {
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Peer does not support extensions and we need metainfo, dropping");
+            throw new IOException("Peer does not support extensions and we need metainfo, dropping");
+        }
+
         PeerConnectionIn in = new PeerConnectionIn(this, din);
         PeerConnectionOut out = new PeerConnectionOut(this, dout);
         PeerState s = new PeerState(this, listener, metainfo, in, out);
         
+        if ((options & OPTION_EXTENSION) != 0) {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Peer supports extensions, sending reply message");
+            int metasize = metainfo != null ? metainfo.getInfoBytes().length : -1;
+            boolean pexAndMetadata = metainfo == null || !metainfo.isPrivate();
+            boolean dht = util.getDHT() != null;
+            out.sendExtension(0, ExtensionHandler.getHandshake(metasize, pexAndMetadata, dht));
+        }
+
+        // Old DHT PORT message
+        //if ((options & OPTION_I2P_DHT) != 0 && util.getDHT() != null) {
+        //    if (_log.shouldLog(Log.DEBUG))
+        //        _log.debug("Peer supports DHT, sending PORT message");
+        //    int port = util.getDHT().getPort();
+        //    out.sendPort(port);
+        //}
+
         // Send our bitmap
         if (bitfield != null)
           s.out.sendBitfield(bitfield);
     
         // We are up and running!
         state = s;
+        magnetState = mState;
         listener.connected(this);
   
-        _log.debug("Start running the reader with " + toString());
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Start running the reader with " + toString());
         // Use this thread for running the incomming connection.
         // The outgoing connection creates its own Thread.
         out.startup();
@@ -257,7 +324,7 @@ public class Peer implements Comparable
    * Sets DataIn/OutputStreams, does the handshake and returns the id
    * reported by the other side.
    */
-  private byte[] handshake(InputStream in, OutputStream out) //BufferedInputStream bis, BufferedOutputStream bos)
+  private byte[] handshake(InputStream in, OutputStream out)
     throws IOException
   {
     din = new DataInputStream(in);
@@ -266,17 +333,20 @@ public class Peer implements Comparable
     // Handshake write - header
     dout.write(19);
     dout.write("BitTorrent protocol".getBytes("UTF-8"));
-    // Handshake write - zeros
-    byte[] zeros = new byte[8];
-    dout.write(zeros);
+    // Handshake write - options
+    long myOptions = OPTION_EXTENSION;
+    // FIXME get util here somehow
+    //if (util.getDHT() != null)
+    //    myOptions |= OPTION_I2P_DHT;
+    dout.writeLong(myOptions);
     // Handshake write - metainfo hash
-    byte[] shared_hash = metainfo.getInfoHash();
-    dout.write(shared_hash);
+    dout.write(infohash);
     // Handshake write - peer id
     dout.write(my_id);
     dout.flush();
     
-    _log.debug("Wrote my shared hash and ID to " + toString());
+    if (_log.shouldLog(Log.DEBUG))
+        _log.debug("Wrote my shared hash and ID to " + toString());
     
     // Handshake read - header
     byte b = din.readByte();
@@ -292,19 +362,79 @@ public class Peer implements Comparable
                             + "'Bittorrent protocol', got '"
                             + bittorrentProtocol + "'");
     
-    // Handshake read - zeros
-    din.readFully(zeros);
+    // Handshake read - options
+    options = din.readLong();
     
     // Handshake read - metainfo hash
     bs = new byte[20];
     din.readFully(bs);
-    if (!Arrays.equals(shared_hash, bs))
+    if (!Arrays.equals(infohash, bs))
       throw new IOException("Unexpected MetaInfo hash");
 
     // Handshake read - peer id
     din.readFully(bs);
-    _log.debug("Read the remote side's hash and peerID fully from " + toString());
+    if (_log.shouldLog(Log.DEBUG))
+        _log.debug("Read the remote side's hash and peerID fully from " + toString());
+
+    if (DataHelper.eq(my_id, bs))
+        throw new IOException("Connected to myself");
+
+    if (options != 0) {
+        // send them something in runConnection() above
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Peer supports options 0x" + Long.toString(options, 16) + ": " + toString());
+    }
+
     return bs;
+  }
+
+  /** @since 0.8.4 */
+  public long getOptions() {
+      return options;
+  }
+
+  /** @since 0.8.4 */
+  public Destination getDestination() {
+      if (sock == null)
+          return null;
+      return sock.getPeerDestination();
+  }
+
+  /**
+   *  Shared state across all peers, callers must sync on returned object
+   *  @return non-null
+   *  @since 0.8.4
+   */
+  public MagnetState getMagnetState() {
+      return magnetState;
+  }
+
+  /** @return could be null @since 0.8.4 */
+  public Map<String, BEValue> getHandshakeMap() {
+      return handshakeMap;
+  }
+
+  /** @since 0.8.4 */
+  public void setHandshakeMap(Map<String, BEValue> map) {
+      handshakeMap = map;
+  }
+
+  /** @since 0.8.4 */
+  public void sendExtension(int type, byte[] payload) {
+    PeerState s = state;
+    if (s != null)
+        s.out.sendExtension(type, payload);
+  }
+
+  /**
+   *  Switch from magnet mode to normal mode
+   *  @since 0.8.4
+   */
+  public void setMetaInfo(MetaInfo meta) {
+    metainfo = meta;
+    PeerState s = state;
+    if (s != null)
+        s.setMetaInfo(meta);
   }
 
   public boolean isConnected()
@@ -334,8 +464,11 @@ public class Peer implements Comparable
         if (this.deregister) {
           PeerListener p = s.listener;
           if (p != null) {
-            p.savePeerPartial(s);
-            p.markUnrequested(this);
+            List<Request> pcs = s.returnPartialPieces();
+            if (!pcs.isEmpty())
+                p.savePartialPieces(this, pcs);
+            // now covered by savePartialPieces
+            //p.markUnrequested(this);
           }
         }
         state = null;
@@ -372,6 +505,38 @@ public class Peer implements Comparable
   }
 
   /**
+   * Tell the other side that we are no longer interested in any of
+   * the outstanding requests (if any) for this piece.
+   * @since 0.8.1
+   */
+  void cancel(int piece) {
+    PeerState s = state;
+    if (s != null)
+      s.cancelPiece(piece);
+  }
+
+  /**
+   * Are we currently requesting the piece?
+   * @deprecated deadlocks
+   * @since 0.8.1
+   */
+  boolean isRequesting(int p) {
+    PeerState s = state;
+    return s != null && s.isRequesting(p);
+  }
+
+  /**
+   * Update the request queue.
+   * Call after adding wanted pieces.
+   * @since 0.8.1
+   */
+  void request() {
+    PeerState s = state;
+    if (s != null)
+      s.addRequest();
+  }
+
+  /**
    * Whether or not the peer is interested in pieces we have. Returns
    * false if not connected.
    */
@@ -385,6 +550,7 @@ public class Peer implements Comparable
    * Sets whether or not we are interested in pieces from this peer.
    * Defaults to false. When interest is true and this peer unchokes
    * us then we start downloading from it. Has no effect when not connected.
+   * @deprecated unused
    */
   public void setInteresting(boolean interest)
   {
@@ -434,13 +600,28 @@ public class Peer implements Comparable
   }
 
   /**
+   * Increment the counter.
+   * @since 0.8.4
+   */
+  public void downloaded(int size) {
+      downloaded += size;
+  }
+
+  /**
+   * Increment the counter.
+   * @since 0.8.4
+   */
+  public void uploaded(int size) {
+      uploaded += size;
+  }
+
+  /**
    * Returns the number of bytes that have been downloaded.
    * Can be reset to zero with <code>resetCounters()</code>/
    */
   public long getDownloaded()
   {
-    PeerState s = state;
-    return (s != null) ? s.downloaded : 0;
+      return downloaded;
   }
 
   /**
@@ -449,8 +630,7 @@ public class Peer implements Comparable
    */
   public long getUploaded()
   {
-    PeerState s = state;
-    return (s != null) ? s.uploaded : 0;
+      return uploaded;
   }
 
   /**
@@ -458,12 +638,8 @@ public class Peer implements Comparable
    */
   public void resetCounters()
   {
-    PeerState s = state;
-    if (s != null)
-      {
-        s.downloaded = 0;
-        s.uploaded = 0;
-      }
+      downloaded = 0;
+      uploaded = 0;
   }
   
   public long getInactiveTime() {
@@ -528,17 +704,8 @@ public class Peer implements Comparable
    */
   public void setRateHistory(long up, long down)
   {
-    setRate(up, uploaded_old);
-    setRate(down, downloaded_old);
-  }
-
-  private void setRate(long val, long array[])
-  {
-    synchronized(array) {
-      for (int i = RATE_DEPTH-1; i > 0; i--)
-        array[i] = array[i-1];
-      array[0] = val;
-    }
+    PeerCoordinator.setRate(up, uploaded_old);
+    PeerCoordinator.setRate(down, downloaded_old);
   }
 
   /**
@@ -546,28 +713,11 @@ public class Peer implements Comparable
    */
   public long getUploadRate()
   {
-    return getRate(uploaded_old);
+    return PeerCoordinator.getRate(uploaded_old);
   }
 
   public long getDownloadRate()
   {
-    return getRate(downloaded_old);
+    return PeerCoordinator.getRate(downloaded_old);
   }
-
-  private long getRate(long array[])
-  {
-    long rate = 0;
-    int i = 0;
-    synchronized(array) {
-      for ( ; i < RATE_DEPTH; i++){
-        if (array[i] < 0)
-            break;
-        rate += array[i];
-      }
-    }
-    if (i == 0)
-        return 0;
-    return rate / (i * CHECK_PERIOD / 1000);
-  }
-
 }

@@ -22,11 +22,9 @@ import net.i2p.util.Log;
  * </ul>
  */
 class SchedulerPreconnect extends SchedulerImpl {
-    private Log _log;
     
     public SchedulerPreconnect(I2PAppContext ctx) {
         super(ctx);
-        _log = ctx.logManager().getLog(SchedulerPreconnect.class);
     }
     
     public boolean accept(Connection con) {

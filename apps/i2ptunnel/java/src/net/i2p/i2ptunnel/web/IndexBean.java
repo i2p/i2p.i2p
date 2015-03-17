@@ -8,14 +8,18 @@ package net.i2p.i2ptunnel.web;
  *
  */
 
-import java.util.concurrent.ConcurrentHashMap;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.concurrent.ConcurrentHashMap;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.Base32;
@@ -23,25 +27,32 @@ import net.i2p.data.Certificate;
 import net.i2p.data.Destination;
 import net.i2p.data.PrivateKeyFile;
 import net.i2p.data.SessionKey;
+import net.i2p.i2ptunnel.I2PTunnelHTTPClient;
+import net.i2p.i2ptunnel.I2PTunnelHTTPClientBase;
+import net.i2p.i2ptunnel.I2PTunnelIRCClient;
 import net.i2p.i2ptunnel.TunnelController;
 import net.i2p.i2ptunnel.TunnelControllerGroup;
 import net.i2p.util.ConcurrentHashSet;
+import net.i2p.util.FileUtil;
 import net.i2p.util.Log;
 
 /**
  * Simple accessor for exposing tunnel info, but also an ugly form handler
  *
+ * Warning - This class is not part of the i2ptunnel API, and at some point
+ * it will be moved from the jar to the war.
+ * Usage by classes outside of i2ptunnel.war is deprecated.
  */
 public class IndexBean {
-    protected I2PAppContext _context;
-    protected Log _log;
-    protected TunnelControllerGroup _group;
+    protected final I2PAppContext _context;
+    protected final Log _log;
+    protected final TunnelControllerGroup _group;
     private String _action;
     private int _tunnel;
-    private long _prevNonce;
-    private long _curNonce;
-    private long _nextNonce;
-    private String _passphrase;
+    //private long _prevNonce;
+    //private long _prevNonce2;
+    private String _curNonce;
+    //private long _nextNonce;
 
     private String _type;
     private String _name;
@@ -57,7 +68,6 @@ public class IndexBean {
     private String _proxyList;
     private String _port;
     private String _reachableBy;
-    private String _reachableByOther;
     private String _targetDestination;
     private String _targetHost;
     private String _targetPort;
@@ -66,10 +76,9 @@ public class IndexBean {
     private String _profile;
     private boolean _startOnLoad;
     private boolean _sharedClient;
-    private boolean _privKeyGenerate;
     private boolean _removeConfirmed;
-    private Set<String> _booleanOptions;
-    private Map<String, String> _otherOptions;
+    private final Set<String> _booleanOptions;
+    private final Map<String, String> _otherOptions;
     private int _hashCashValue;
     private int _certType;
     private String _certSigner;
@@ -77,12 +86,21 @@ public class IndexBean {
     public static final int RUNNING = 1;
     public static final int STARTING = 2;
     public static final int NOT_RUNNING = 3;
+    public static final int STANDBY = 4;
     
-    public static final String PROP_TUNNEL_PASSPHRASE = "i2ptunnel.passphrase";
-    static final String PROP_NONCE = IndexBean.class.getName() + ".nonce";
+    /** deprecated unimplemented, now using routerconsole realm */
+    //public static final String PROP_TUNNEL_PASSPHRASE = "i2ptunnel.passphrase";
+    public static final String PROP_TUNNEL_PASSPHRASE = "consolePassword";
+    //static final String PROP_NONCE = IndexBean.class.getName() + ".nonce";
+    //static final String PROP_NONCE_OLD = PROP_NONCE + '2';
+    /** 3 wasn't enough for some browsers. They are reloading the page for some reason - maybe HEAD? @since 0.8.1 */
+    private static final int MAX_NONCES = 8;
+    /** store nonces in a static FIFO instead of in System Properties @since 0.8.1 */
+    private static final List<String> _nonces = new ArrayList(MAX_NONCES + 1);
+
     static final String CLIENT_NICKNAME = "shared clients";
-    
     public static final String PROP_THEME_NAME = "routerconsole.theme";
+    public static final String DEFAULT_THEME = "light";
     public static final String PROP_CSS_DISABLED = "routerconsole.css.disabled";
     public static final String PROP_JS_DISABLED = "routerconsole.javascript.disabled";
     
@@ -90,33 +108,44 @@ public class IndexBean {
         _context = I2PAppContext.getGlobalContext();
         _log = _context.logManager().getLog(IndexBean.class);
         _group = TunnelControllerGroup.getInstance();
-        _action = null;
         _tunnel = -1;
-        _curNonce = -1;
-        _prevNonce = -1;
-        try { 
-            String nonce = System.getProperty(PROP_NONCE);
-            if (nonce != null)
-                _prevNonce = Long.parseLong(nonce);
-        } catch (NumberFormatException nfe) {}
-        _nextNonce = _context.random().nextLong();
-        System.setProperty(PROP_NONCE, Long.toString(_nextNonce));
+        _curNonce = "-1";
+        addNonce();
         _booleanOptions = new ConcurrentHashSet(4);
         _otherOptions = new ConcurrentHashMap(4);
     }
     
-    public long getNextNonce() { return _nextNonce; }
-    public void setNonce(String nonce) {
-        if ( (nonce == null) || (nonce.trim().length() <= 0) ) return;
-        try {
-            _curNonce = Long.parseLong(nonce);
-        } catch (NumberFormatException nfe) {
-            _curNonce = -1;
+    public static String getNextNonce() {
+        synchronized (_nonces) {
+            return _nonces.get(0);
         }
     }
 
+    public void setNonce(String nonce) {
+        if ( (nonce == null) || (nonce.trim().length() <= 0) ) return;
+        _curNonce = nonce;
+    }
+
+    /** add a random nonce to the head of the queue @since 0.8.1 */
+    private void addNonce() {
+        String nextNonce = Long.toString(_context.random().nextLong());
+        synchronized (_nonces) {
+            _nonces.add(0, nextNonce);
+            int sz = _nonces.size();
+            if (sz > MAX_NONCES)
+                _nonces.remove(sz - 1);
+        }
+    }
+
+    /** do we know this nonce? @since 0.8.1 */
+    private static boolean haveNonce(String nonce) {
+        synchronized (_nonces) {
+            return _nonces.contains(nonce);
+        }
+    }
+
+    /** deprecated unimplemented, now using routerconsole realm */
     public void setPassphrase(String phrase) {
-        _passphrase = phrase;
     }
     
     public void setAction(String action) {
@@ -132,20 +161,17 @@ public class IndexBean {
         }
     }
     
-    private boolean validPassphrase(String proposed) {
-        if (proposed == null) return false;
+    /** just check if console password option is set, jetty will do auth */
+    private boolean validPassphrase() {
         String pass = _context.getProperty(PROP_TUNNEL_PASSPHRASE);
-        if ( (pass != null) && (pass.trim().length() > 0) ) 
-            return pass.trim().equals(proposed.trim());
-        else
-            return false;
+        return pass != null && pass.trim().length() > 0;
     }
     
     private String processAction() {
-        if ( (_action == null) || (_action.trim().length() <= 0) )
+        if ( (_action == null) || (_action.trim().length() <= 0) || ("Cancel".equals(_action)))
             return "";
-        if ( (_prevNonce != _curNonce) && (!validPassphrase(_passphrase)) )
-            return "Invalid nonce, are you being spoofed?";
+        if ( (!haveNonce(_curNonce)) && (!validPassphrase()) )
+            return _("Invalid form submission, probably because you used the 'back' or 'reload' button on your browser. Please resubmit.");
         if ("Stop all".equals(_action)) 
             return stopAll();
         else if ("Start all".equals(_action))
@@ -159,10 +185,10 @@ public class IndexBean {
         else if ("start".equals(_action))
             return start();
         else if ("Save changes".equals(_action) || // IE workaround:
-                (_action.toLowerCase().indexOf("s</span>ave") >= 0))
+                (_action.toLowerCase(Locale.US).indexOf("s</span>ave") >= 0))
             return saveChanges();
         else if ("Delete this proxy".equals(_action) || // IE workaround:
-                (_action.toLowerCase().indexOf("d</span>elete") >= 0))
+                (_action.toLowerCase(Locale.US).indexOf("d</span>elete") >= 0))
             return deleteTunnel();
         else if ("Estimate".equals(_action))
             return PrivateKeyFile.estimateHashCashTime(_hashCashValue);
@@ -175,24 +201,24 @@ public class IndexBean {
     }
     private String stopAll() {
         if (_group == null) return "";
-        List msgs = _group.stopAllControllers();
+        List<String> msgs = _group.stopAllControllers();
         return getMessages(msgs);
     }
     private String startAll() {
         if (_group == null) return "";
-        List msgs = _group.startAllControllers();
+        List<String> msgs = _group.startAllControllers();
         return getMessages(msgs);
     }
     private String restartAll() {
         if (_group == null) return "";
-        List msgs = _group.restartAllControllers();
+        List<String> msgs = _group.restartAllControllers();
         return getMessages(msgs);
     }
     private String reloadConfig() {
         if (_group == null) return "";
         
         _group.reloadControllers();
-        return "Config reloaded";
+        return _("Configuration reloaded for all tunnels");
     }
     private String start() {
         if (_tunnel < 0) return "Invalid tunnel";
@@ -201,7 +227,10 @@ public class IndexBean {
         if (_tunnel >= controllers.size()) return "Invalid tunnel";
         TunnelController controller = (TunnelController)controllers.get(_tunnel);
         controller.startTunnelBackground();
-        return "";
+        // give the messages a chance to make it to the window
+        try { Thread.sleep(1000); } catch (InterruptedException ie) {}
+        // and give them something to look at in any case
+        return _("Starting tunnel") + ' ' + getTunnelName(_tunnel) + "&hellip;";
     }
     
     private String stop() {
@@ -211,7 +240,10 @@ public class IndexBean {
         if (_tunnel >= controllers.size()) return "Invalid tunnel";
         TunnelController controller = (TunnelController)controllers.get(_tunnel);
         controller.stopTunnel();
-        return "";
+        // give the messages a chance to make it to the window
+        try { Thread.sleep(1000); } catch (InterruptedException ie) {}
+        // and give them something to look at in any case
+        return _("Stopping tunnel") + ' ' + getTunnelName(_tunnel) + "&hellip;";
     }
     
     private String saveChanges() {
@@ -233,7 +265,7 @@ public class IndexBean {
         }
         // Only modify other shared tunnels
         // if the current tunnel is shared, and of supported type
-        if ("true".equalsIgnoreCase(cur.getSharedClient()) && isClient(cur.getType())) {
+        if (Boolean.valueOf(cur.getSharedClient()).booleanValue() && isClient(cur.getType())) {
             // all clients use the same I2CP session, and as such, use the same I2CP options
             List controllers = _group.getControllers();
 
@@ -245,7 +277,7 @@ public class IndexBean {
 
                 // Only modify this non-current tunnel
                 // if it belongs to a shared destination, and is of supported type
-                if ("true".equalsIgnoreCase(c.getSharedClient()) && isClient(c.getType())) {
+                if (Boolean.valueOf(c.getSharedClient()).booleanValue() && isClient(c.getType())) {
                     Properties cOpt = c.getConfig("");
                     if (_tunnelQuantity != null) {
                         cOpt.setProperty("option.inbound.quantity", _tunnelQuantity);
@@ -271,14 +303,26 @@ public class IndexBean {
             }
         }
         
-        List msgs = doSave();
-        msgs.add(0, "Changes saved");
+        List<String> msgs = doSave();
         return getMessages(msgs);
     }
-    private List doSave() { 
-        _group.saveConfig();
-        return _group.clearAllMessages();
+
+    private List<String> doSave() { 
+        List<String> rv = _group.clearAllMessages();
+        try {
+            _group.saveConfig();
+            rv.add(0, _("Configuration changes saved"));
+        } catch (IOException ioe) {
+            _log.error("Failed to save config file", ioe);
+            rv.add(0, _("Failed to save configuration") + ": " + ioe.toString());
+        }
+        return rv;
     } 
+
+    /**
+     *  Stop the tunnel, delete from config,
+     *  rename the private key file if in the default directory
+     */
     private String deleteTunnel() {
         if (!_removeConfirmed)
             return "Please confirm removal";
@@ -287,8 +331,39 @@ public class IndexBean {
         if (cur == null)
             return "Invalid tunnel number";
         
-        List msgs = _group.removeController(cur);
+        List<String> msgs = _group.removeController(cur);
         msgs.addAll(doSave());
+
+        // Rename private key file if it was a default name in
+        // the default directory, so it doesn't get reused when a new
+        // tunnel is created.
+        // Use configured file name if available, not the one from the form.
+        String pk = cur.getPrivKeyFile();
+        if (pk == null)
+            pk = _privKeyFile;
+        if (pk != null && pk.startsWith("i2ptunnel") && pk.endsWith("-privKeys.dat") &&
+            ((!isClient(cur.getType())) || cur.getPersistentClientKey())) {
+            File pkf = new File(_context.getConfigDir(), pk);
+            if (pkf.exists()) {
+                String name = cur.getName();
+                if (name == null) {
+                    name = cur.getDescription();
+                    if (name == null) {
+                        name = cur.getType();
+                        if (name == null)
+                            name = Long.toString(_context.clock().now());
+                    }
+                }
+                name = "i2ptunnel-deleted-" + name.replace(' ', '_') + "-privkeys.dat";
+                File to = new File(_context.getConfigDir(), name);
+                if (to.exists())
+                    to = new File(_context.getConfigDir(), name + '-' + _context.clock().now());
+                boolean success = FileUtil.rename(pkf, to);
+                if (success)
+                    msgs.add("Private key file " + pkf.getAbsolutePath() +
+                             " renamed to " + to.getAbsolutePath());
+            }
+        }
         return getMessages(msgs);
     }
     
@@ -301,7 +376,7 @@ public class IndexBean {
         if (_group == null)
             return "";
         
-        StringBuffer buf = new StringBuffer(512);
+        StringBuilder buf = new StringBuilder(512);
         if (_action != null) {
             try {
                 buf.append(processAction()).append("\n");
@@ -318,11 +393,8 @@ public class IndexBean {
     ////
     
     public String getTheme() {
-    	String theme = _context.getProperty(PROP_THEME_NAME);
-    	if (theme != null)
-    		return "/themes/console/" + theme + "/";
-    	else
-    		return "/themes/console/";
+        String theme = _context.getProperty(PROP_THEME_NAME, DEFAULT_THEME);
+        return "/themes/console/" + theme + "/";
     }
 
     public boolean allowCSS() {
@@ -350,7 +422,9 @@ public class IndexBean {
         return ( ("client".equals(type)) || 
         		("httpclient".equals(type)) ||
         		("sockstunnel".equals(type)) ||
+        		("socksirctunnel".equals(type)) ||
         		("connectclient".equals(type)) ||
+        		("streamrclient".equals(type)) ||
         		("ircclient".equals(type)));
     }
     
@@ -359,7 +433,7 @@ public class IndexBean {
         if (tun != null && tun.getName() != null)
             return tun.getName();
         else
-            return "New Tunnel";
+            return _("New Tunnel");
     }
     
     public String getClientPort(int tunnel) {
@@ -379,13 +453,18 @@ public class IndexBean {
     }
     
     public String getTypeName(String internalType) {
-        if ("client".equals(internalType)) return "Standard client";
-        else if ("httpclient".equals(internalType)) return "HTTP client";
-        else if ("ircclient".equals(internalType)) return "IRC client";
-        else if ("server".equals(internalType)) return "Standard server";
-        else if ("httpserver".equals(internalType)) return "HTTP server";
-        else if ("sockstunnel".equals(internalType)) return "SOCKS 5 proxy";
-        else if ("connectclient".equals(internalType)) return "CONNECT/SSL/HTTPS proxy";
+        if ("client".equals(internalType)) return _("Standard client");
+        else if ("httpclient".equals(internalType)) return _("HTTP client");
+        else if ("ircclient".equals(internalType)) return _("IRC client");
+        else if ("server".equals(internalType)) return _("Standard server");
+        else if ("httpserver".equals(internalType)) return _("HTTP server");
+        else if ("sockstunnel".equals(internalType)) return _("SOCKS 4/4a/5 proxy");
+        else if ("socksirctunnel".equals(internalType)) return _("SOCKS IRC proxy");
+        else if ("connectclient".equals(internalType)) return _("CONNECT/SSL/HTTPS proxy");
+        else if ("ircserver".equals(internalType)) return _("IRC server");
+        else if ("streamrclient".equals(internalType)) return _("Streamr client");
+        else if ("streamrserver".equals(internalType)) return _("Streamr server");
+        else if ("httpbidirserver".equals(internalType)) return _("HTTP bidir");
         else return internalType;
     }
     
@@ -399,17 +478,24 @@ public class IndexBean {
     
     public String getClientInterface(int tunnel) {
         TunnelController tun = getController(tunnel);
-        if (tun != null)
-            return tun.getListenOnInterface();
-        else
-            return "";
+        if (tun != null) {
+            if ("streamrclient".equals(tun.getType()))
+                return tun.getTargetHost();
+            else
+                return tun.getListenOnInterface();
+        } else
+            return "127.0.0.1";
     }
     
     public int getTunnelStatus(int tunnel) {
         TunnelController tun = getController(tunnel);
         if (tun == null) return NOT_RUNNING;
-        if (tun.getIsRunning()) return RUNNING;
-        else if (tun.getIsStarting()) return STARTING;
+        if (tun.getIsRunning()) {
+            if (isClient(tunnel) && tun.getIsStandby())
+                return STANDBY;
+            else
+                return RUNNING;
+        } else if (tun.getIsStarting()) return STARTING;
         else return NOT_RUNNING;
     }
     
@@ -433,18 +519,46 @@ public class IndexBean {
         TunnelController tun = getController(tunnel);
         if (tun == null) return "";
         String rv;
-        if ("client".equals(tun.getType())||"ircclient".equals(tun.getType()))
+        if ("client".equals(tun.getType()) || "ircclient".equals(tun.getType()) ||
+            "streamrclient".equals(tun.getType()))
             rv = tun.getTargetDestination();
         else
             rv = tun.getProxyList();
         return rv != null ? rv : "";
     }
     
+    /**
+     * Call this to see if it is ok to linkify getServerTarget()
+     * @since 0.8.3
+     */
+    public boolean isServerTargetLinkValid(int tunnel) {
+        TunnelController tun = getController(tunnel);
+        return tun != null &&
+               "httpserver".equals(tun.getType()) &&
+               tun.getTargetHost() != null &&
+               tun.getTargetPort() != null;
+    }
+
+    /**
+     * @return valid host:port only if isServerTargetLinkValid() is true
+     */
     public String getServerTarget(int tunnel) {
         TunnelController tun = getController(tunnel);
-        if (tun != null)
-            return tun.getTargetHost() + ':' + tun.getTargetPort();
-        else
+        if (tun != null) {
+            String host;
+            if ("streamrserver".equals(tun.getType()))
+                host = tun.getListenOnInterface();
+            else
+                host = tun.getTargetHost();
+            String port = tun.getTargetPort();
+            if (host == null)
+                host = "<font color=\"red\">" + _("Host not set") + "</font>";
+            else if (host.indexOf(':') >= 0)
+                host = '[' + host + ']';
+            if (port == null)
+                port = "<font color=\"red\">" + _("Port not set") + "</font>";
+            return host + ':' + port;
+       }  else
             return "";
     }
     
@@ -500,11 +614,11 @@ public class IndexBean {
     public void setDescription(String description) { 
         _description = (description != null ? description.trim() : null);
     }
-    /** I2CP host the router is on */
+    /** I2CP host the router is on, ignored when in router context */
     public void setClientHost(String host) {
         _i2cpHost = (host != null ? host.trim() : null);
     }
-    /** I2CP port the router is on */
+    /** I2CP port the router is on, ignored when in router context */
     public void setClientport(String port) {
         _i2cpPort = (port != null ? port.trim() : null);
     }
@@ -537,18 +651,10 @@ public class IndexBean {
         _port = (port != null ? port.trim() : null);
     }
     /** 
-     * what interface should this client/httpclient/ircclient listen on (unless 
-     * overridden by the setReachableByOther() field)
+     * what interface should this client/httpclient/ircclient listen on
      */
     public void setReachableBy(String reachableBy) { 
         _reachableBy = (reachableBy != null ? reachableBy.trim() : null);
-    }
-    /**
-     * If specified, defines the exact IP interface to listen for requests
-     * on (in the case of client/httpclient/ircclient tunnels)
-     */
-    public void setReachableByOther(String reachableByOther) { 
-        _reachableByOther = (reachableByOther != null ? reachableByOther.trim() : null);
     }
     /** What peer does this client tunnel point at */
     public void setTargetDestination(String dest) { 
@@ -606,11 +712,30 @@ public class IndexBean {
     public void setEncrypt(String moo) {
         _booleanOptions.add("i2cp.encryptLeaseSet");
     }
-    public void setAccess(String moo) {
-        _booleanOptions.add("i2cp.enableAccessList");
+
+    /** @since 0.8.9 */
+    public void setDCC(String moo) {
+        _booleanOptions.add(I2PTunnelIRCClient.PROP_DCC);
     }
-    public void setNewDest(String moo) {
-        _booleanOptions.add("i2cp.newDestOnResume");
+
+    protected static final String PROP_ENABLE_ACCESS_LIST = "i2cp.enableAccessList";
+    protected static final String PROP_ENABLE_BLACKLIST = "i2cp.enableBlackList";
+
+    public void setAccessMode(String val) {
+        if ("1".equals(val))
+            _booleanOptions.add(PROP_ENABLE_ACCESS_LIST);
+        else if ("2".equals(val))
+            _booleanOptions.add(PROP_ENABLE_BLACKLIST);
+    }
+
+    public void setDelayOpen(String moo) {
+        _booleanOptions.add("i2cp.delayOpen");
+    }
+    public void setNewDest(String val) {
+        if ("1".equals(val))
+            _booleanOptions.add("i2cp.newDestOnResume");
+        else if ("2".equals(val))
+            _booleanOptions.add("persistentClientKey");
     }
 
     public void setReduceTime(String val) {
@@ -628,16 +753,96 @@ public class IndexBean {
         if (val != null)
             _otherOptions.put("i2cp.leaseSetKey", val.trim());
     }
+
     public void setAccessList(String val) {
         if (val != null)
-            _otherOptions.put("i2cp.accessList", val.trim().replaceAll("\r\n", ",").replaceAll("\n", ",").replaceAll(" ", ","));
+            _otherOptions.put("i2cp.accessList", val.trim().replace("\r\n", ",").replace("\n", ",").replace(" ", ","));
     }
+
+    public void setJumpList(String val) {
+        if (val != null)
+            _otherOptions.put(I2PTunnelHTTPClient.PROP_JUMP_SERVERS, val.trim().replace("\r\n", ",").replace("\n", ",").replace(" ", ","));
+    }
+
     public void setCloseTime(String val) {
         if (val != null) {
             try {
                 _otherOptions.put("i2cp.closeIdleTime", "" + (Integer.parseInt(val.trim()) * 60*1000));
             } catch (NumberFormatException nfe) {}
         }
+    }
+
+    /** all proxy auth @since 0.8.2 */
+    public void setProxyAuth(String s) {
+        _booleanOptions.add(I2PTunnelHTTPClientBase.PROP_AUTH);
+    }
+    
+    public void setProxyUsername(String s) {
+        if (s != null)
+            _otherOptions.put(I2PTunnelHTTPClientBase.PROP_USER, s.trim());
+    }
+    
+    public void setProxyPassword(String s) {
+        if (s != null)
+            _otherOptions.put(I2PTunnelHTTPClientBase.PROP_PW, s.trim());
+    }
+    
+    public void setOutproxyAuth(String s) {
+        _booleanOptions.add(I2PTunnelHTTPClientBase.PROP_OUTPROXY_AUTH);
+    }
+    
+    public void setOutproxyUsername(String s) {
+        if (s != null)
+            _otherOptions.put(I2PTunnelHTTPClientBase.PROP_OUTPROXY_USER, s.trim());
+    }
+    
+    public void setOutproxyPassword(String s) {
+        if (s != null)
+            _otherOptions.put(I2PTunnelHTTPClientBase.PROP_OUTPROXY_PW, s.trim());
+    }
+    
+    /** all of these are @since 0.8.3 */
+    protected static final String PROP_MAX_CONNS_MIN = "i2p.streaming.maxConnsPerMinute";
+    protected static final String PROP_MAX_CONNS_HOUR = "i2p.streaming.maxConnsPerHour";
+    protected static final String PROP_MAX_CONNS_DAY = "i2p.streaming.maxConnsPerDay";
+    protected static final String PROP_MAX_TOTAL_CONNS_MIN = "i2p.streaming.maxTotalConnsPerMinute";
+    protected static final String PROP_MAX_TOTAL_CONNS_HOUR = "i2p.streaming.maxTotalConnsPerHour";
+    protected static final String PROP_MAX_TOTAL_CONNS_DAY = "i2p.streaming.maxTotalConnsPerDay";
+    protected static final String PROP_MAX_STREAMS = "i2p.streaming.maxConcurrentStreams";
+
+    public void setLimitMinute(String s) {
+        if (s != null)
+            _otherOptions.put(PROP_MAX_CONNS_MIN, s.trim());
+    }
+
+    public void setLimitHour(String s) {
+        if (s != null)
+            _otherOptions.put(PROP_MAX_CONNS_HOUR, s.trim());
+    }
+
+    public void setLimitDay(String s) {
+        if (s != null)
+            _otherOptions.put(PROP_MAX_CONNS_DAY, s.trim());
+    }
+
+    public void setTotalMinute(String s) {
+        if (s != null)
+            _otherOptions.put(PROP_MAX_TOTAL_CONNS_MIN, s.trim());
+    }
+
+    public void setTotalHour(String s) {
+        if (s != null)
+            _otherOptions.put(PROP_MAX_TOTAL_CONNS_HOUR, s.trim());
+    }
+
+    public void setTotalDay(String s) {
+        if (s != null)
+            _otherOptions.put(PROP_MAX_TOTAL_CONNS_DAY, s.trim());
+    }
+
+    public void setMaxStreams(String s) {
+        if (s != null)
+            _otherOptions.put(PROP_MAX_STREAMS, s.trim());
     }
 
     /** params needed for hashcash and dest modification */
@@ -676,7 +881,11 @@ public class IndexBean {
         } else if (tun.getIsRunning() || tun.getIsStarting()) {
             return "Tunnel must be stopped before modifying destination";
         }
-        PrivateKeyFile pkf = new PrivateKeyFile(_privKeyFile);
+
+        File keyFile = new File(_privKeyFile);
+        if (!keyFile.isAbsolute())
+            keyFile = new File(_context.getConfigDir(), _privKeyFile);
+        PrivateKeyFile pkf = new PrivateKeyFile(keyFile);
         try {
             pkf.createIfAbsent();
         } catch (Exception e) {
@@ -759,20 +968,22 @@ public class IndexBean {
         Properties config = new Properties();
         updateConfigGeneric(config);
         
+        if ((isClient(_type) && !"streamrclient".equals(_type)) || "streamrserver".equals(_type)) {
+            // streamrserver uses interface
+            if (_reachableBy != null)
+                config.setProperty("interface", _reachableBy);
+            else
+                config.setProperty("interface", "");
+        } else {
+            // streamrclient uses targetHost
+            if (_targetHost != null)
+                config.setProperty("targetHost", _targetHost);
+        }
+
         if (isClient(_type)) {
             // generic client stuff
             if (_port != null)
                 config.setProperty("listenPort", _port);
-            if (_reachableByOther != null)
-                config.setProperty("interface", _reachableByOther);
-            else
-                config.setProperty("interface", _reachableBy);
-            config.setProperty("option.inbound.nickname", CLIENT_NICKNAME);
-            config.setProperty("option.outbound.nickname", CLIENT_NICKNAME);
-            if (_name != null && !_sharedClient) {
-                 config.setProperty("option.inbound.nickname", _name);
-                 config.setProperty("option.outbound.nickname", _name);
-            }
             config.setProperty("sharedClient", _sharedClient + "");
             for (String p : _booleanClientOpts)
                 config.setProperty("option." + p, "" + _booleanOptions.contains(p));
@@ -781,12 +992,8 @@ public class IndexBean {
                     config.setProperty("option." + p, _otherOptions.get(p));
         } else {
             // generic server stuff
-            if (_targetHost != null)
-                config.setProperty("targetHost", _targetHost);
             if (_targetPort != null)
                 config.setProperty("targetPort", _targetPort);
-            if (_privKeyFile != null)
-                config.setProperty("privKeyFile", _privKeyFile);
             for (String p : _booleanServerOpts)
                 config.setProperty("option." + p, "" + _booleanOptions.contains(p));
             for (String p : _otherServerOpts)
@@ -794,15 +1001,44 @@ public class IndexBean {
                     config.setProperty("option." + p, _otherOptions.get(p));
         }
 
-        if ("httpclient".equals(_type) || "connectclient".equals(_type)) {
+        // generic proxy stuff
+        if ("httpclient".equals(_type) || "connectclient".equals(_type) || 
+            "sockstunnel".equals(_type) ||"socksirctunnel".equals(_type)) {
+            for (String p : _booleanProxyOpts)
+                config.setProperty("option." + p, "" + _booleanOptions.contains(p));
             if (_proxyList != null)
                 config.setProperty("proxyList", _proxyList);
-        } else if ("ircclient".equals(_type) || "client".equals(_type)) {
+        }
+
+        if ("ircclient".equals(_type) || "client".equals(_type) || "streamrclient".equals(_type)) {
             if (_targetDestination != null)
                 config.setProperty("targetDestination", _targetDestination);
-        } else if ("httpserver".equals(_type)) {
+        } else if ("httpserver".equals(_type) || "httpbidirserver".equals(_type)) {
             if (_spoofedHost != null)
                 config.setProperty("spoofedHost", _spoofedHost);
+        }
+        if ("httpbidirserver".equals(_type)) {
+            if (_port != null)
+                config.setProperty("listenPort", _port);
+            if (_reachableBy != null)
+                config.setProperty("interface", _reachableBy);
+            else if (_targetHost != null)
+                config.setProperty("interface", _targetHost);
+            else
+                config.setProperty("interface", "");
+        }
+
+        if ("ircclient".equals(_type)) {
+            boolean dcc = _booleanOptions.contains(I2PTunnelIRCClient.PROP_DCC);
+            config.setProperty("option." + I2PTunnelIRCClient.PROP_DCC,
+                               "" + dcc);
+            // add some sane server options since they aren't in the GUI (yet)
+            if (dcc) {
+                config.setProperty("option." + PROP_MAX_CONNS_MIN, "3");
+                config.setProperty("option." + PROP_MAX_CONNS_HOUR, "10");
+                config.setProperty("option." + PROP_MAX_TOTAL_CONNS_MIN, "5");
+                config.setProperty("option." + PROP_MAX_TOTAL_CONNS_HOUR, "25");
+            }
         }
 
         return config;
@@ -811,24 +1047,35 @@ public class IndexBean {
     private static final String _noShowOpts[] = {
         "inbound.length", "outbound.length", "inbound.lengthVariance", "outbound.lengthVariance",
         "inbound.backupQuantity", "outbound.backupQuantity", "inbound.quantity", "outbound.quantity",
-        "inbound.nickname", "outbound.nickname", "i2p.streaming.connectDelay", "i2p.streaming.maxWindowSize"
+        "inbound.nickname", "outbound.nickname", "i2p.streaming.connectDelay", "i2p.streaming.maxWindowSize",
+        I2PTunnelIRCClient.PROP_DCC
         };
     private static final String _booleanClientOpts[] = {
-        "i2cp.reduceOnIdle", "i2cp.closeOnIdle", "i2cp.newDestOnResume"
+        "i2cp.reduceOnIdle", "i2cp.closeOnIdle", "i2cp.newDestOnResume", "persistentClientKey", "i2cp.delayOpen"
+        };
+    private static final String _booleanProxyOpts[] = {
+        I2PTunnelHTTPClientBase.PROP_AUTH, I2PTunnelHTTPClientBase.PROP_OUTPROXY_AUTH
         };
     private static final String _booleanServerOpts[] = {
-        "i2cp.reduceOnIdle", "i2cp.encryptLeaseSet", "i2cp.enableAccessList"
+        "i2cp.reduceOnIdle", "i2cp.encryptLeaseSet", PROP_ENABLE_ACCESS_LIST, PROP_ENABLE_BLACKLIST
         };
     private static final String _otherClientOpts[] = {
-        "i2cp.reduceIdleTime", "i2cp.reduceQuantity", "i2cp.closeIdleTime"
+        "i2cp.reduceIdleTime", "i2cp.reduceQuantity", "i2cp.closeIdleTime",
+        "proxyUsername", "proxyPassword", "outproxyUsername", "outproxyPassword",
+        I2PTunnelHTTPClient.PROP_JUMP_SERVERS
         };
     private static final String _otherServerOpts[] = {
-        "i2cp.reduceIdleTime", "i2cp.reduceQuantity", "i2cp.leaseSetKey", "i2cp.accessList"
+        "i2cp.reduceIdleTime", "i2cp.reduceQuantity", "i2cp.leaseSetKey", "i2cp.accessList",
+         PROP_MAX_CONNS_MIN, PROP_MAX_CONNS_HOUR, PROP_MAX_CONNS_DAY,
+         PROP_MAX_TOTAL_CONNS_MIN, PROP_MAX_TOTAL_CONNS_HOUR, PROP_MAX_TOTAL_CONNS_DAY,
+         PROP_MAX_STREAMS
         };
-    protected static final Set _noShowSet = new HashSet();
+
+    protected static final Set _noShowSet = new HashSet(64);
     static {
         _noShowSet.addAll(Arrays.asList(_noShowOpts));
         _noShowSet.addAll(Arrays.asList(_booleanClientOpts));
+        _noShowSet.addAll(Arrays.asList(_booleanProxyOpts));
         _noShowSet.addAll(Arrays.asList(_booleanServerOpts));
         _noShowSet.addAll(Arrays.asList(_otherClientOpts));
         _noShowSet.addAll(Arrays.asList(_otherServerOpts));
@@ -840,13 +1087,17 @@ public class IndexBean {
             config.setProperty("name", _name);
         if (_description != null)
             config.setProperty("description", _description);
-        if (_i2cpHost != null)
-            config.setProperty("i2cpHost", _i2cpHost);
-        if ( (_i2cpPort != null) && (_i2cpPort.trim().length() > 0) ) {
-            config.setProperty("i2cpPort", _i2cpPort);
-        } else {
-            config.setProperty("i2cpPort", "7654");
+        if (!_context.isRouterContext()) {
+            if (_i2cpHost != null)
+                config.setProperty("i2cpHost", _i2cpHost);
+            if ( (_i2cpPort != null) && (_i2cpPort.trim().length() > 0) ) {
+                config.setProperty("i2cpPort", _i2cpPort);
+            } else {
+                config.setProperty("i2cpPort", "7654");
+            }
         }
+        if (_privKeyFile != null)
+            config.setProperty("privKeyFile", _privKeyFile);
         
         if (_customOptions != null) {
             StringTokenizer tok = new StringTokenizer(_customOptions);
@@ -885,14 +1136,12 @@ public class IndexBean {
             config.setProperty("option.i2p.streaming.connectDelay", "1000");
         else
             config.setProperty("option.i2p.streaming.connectDelay", "0");
-        if (_name != null) {
-            if ( (!isClient(_type)) || (!_sharedClient) ) {
-                config.setProperty("option.inbound.nickname", _name);
-                config.setProperty("option.outbound.nickname", _name);
-            } else {
-                config.setProperty("option.inbound.nickname", CLIENT_NICKNAME);
-                config.setProperty("option.outbound.nickname", CLIENT_NICKNAME);
-            }
+        if (isClient(_type) && _sharedClient) {
+            config.setProperty("option.inbound.nickname", CLIENT_NICKNAME);
+            config.setProperty("option.outbound.nickname", CLIENT_NICKNAME);
+        } else if (_name != null) {
+            config.setProperty("option.inbound.nickname", _name);
+            config.setProperty("option.outbound.nickname", _name);
         }
         if ("interactive".equals(_profile))
             // This was 1 which doesn't make much sense
@@ -918,15 +1167,20 @@ public class IndexBean {
             return null;
     }
     
-    private String getMessages(List msgs) {
-        StringBuffer buf = new StringBuffer(128);
+    private static String getMessages(List<String> msgs) {
+        StringBuilder buf = new StringBuilder(128);
         getMessages(msgs, buf);
         return buf.toString();
     }
-    private void getMessages(List msgs, StringBuffer buf) {
+
+    private static void getMessages(List<String> msgs, StringBuilder buf) {
         if (msgs == null) return;
         for (int i = 0; i < msgs.size(); i++) {
-            buf.append((String)msgs.get(i)).append("\n");
+            buf.append(msgs.get(i)).append("\n");
         }
+    }
+
+    protected String _(String key) {
+        return Messages._(key, _context);
     }
 }

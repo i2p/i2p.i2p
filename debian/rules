@@ -1,20 +1,110 @@
 #!/usr/bin/make -f
 
+# Quoting Policy version 3.9.2.0, 2011-04-07 section 4.9:
+
+# /start quote
+# For some packages, notably ones where the same source tree is compiled in
+# different ways to produce two binary packages, the build target does not make
+# much sense. For these packages it is good enough to provide two (or more)
+# targets (build-a and build-b or whatever) for each of the ways of building the
+# package, and a build target that does nothing. The binary target will have to
+# build the package in each of the possible ways and make the binary package out
+# of each.
+# ...
+# When a package has a configuration and build routine which takes a long time,
+# or when the makefiles are poorly designed, or when build needs to run clean
+# first, it is a good idea to touch build when the build process is complete.
+# This will ensure that if debian/rules build is run again it will not rebuild
+# the whole program.
+# /end quote
+
+# Since that fits building I2P very well, we override the build target.
+#
+
 build:
-	ant preppkg && \
-	(cd pkg-temp; chmod +x postinstall.sh) && \
-	mkdir -p debian/tmp/var/lib && \
-	mkdir -p debian/tmp/etc/init.d && \
-	cp -a debian/scripts/init debian/tmp/etc/init.d/i2p && \
-	cp -a pkg-temp debian/tmp/var/lib/i2p && \
-	touch debian/build
-binary: build
-	mkdir -p debian/tmp/DEBIAN && \
-	dpkg-gencontrol && \
-	cp -a debian/scripts/postinst debian/scripts/postrm debian/scripts/prerm debian/tmp/DEBIAN && \
-	dpkg-deb -b debian/tmp ..
-clean:
-	rm -f debian/build
-	ant clean
-	rm -Rf pkg-temp
-	@exit 0
+	@echo 'The build target is disabled. Use the appropriate binary target.'
+
+JAVA_HOME=/usr/lib/jvm/default-java
+I2P=$(CURDIR)/pkg-temp
+ROUTERVERSION=$(CURDIR)/router/java/src/net/i2p/router/RouterVersion.java
+
+# I2P's version will be displayed in the router console as "$I2PVERSION-$EXTRAPREFIX$DEBIANVERSION", eg. 0.8.12-0-deb1
+export EXTRAPREFIX := deb
+export JAVA_HOME I2P
+export DEBIANVERSION := $(shell dpkg-parsechangelog |awk -F' ' '/^Version:/{print $$2}' |sed 's/.*-\([0-9A-Za-z~]\{1,\}\)$$/\1/')
+#export DEB_HOST_ARCH_CPU := $(shell dpkg-architecture -qDEB_HOST_ARCH_CPU)
+
+%:
+	dh $@ --with quilt
+
+clean: createcopyright
+
+override_dh_auto_clean:
+	-[ -r $(CURDIR)/debian/routerversion.java.bak ] && mv -f $(CURDIR)/debian/routerversion.java.bak $(ROUTERVERSION)
+	dh_auto_clean
+	ant distclean
+	find $(CURDIR)/core -name '*\.[s]o' -exec rm -f {} \;
+	rm -rf $(CURDIR)/core/c/jcpuid/lib/
+	#rm -f $(CURDIR)/installer/lib/wrapper/all/wrapper.jar
+	debconf-updatepo
+
+override_dh_auto_build:
+
+binary-indep: build-indep
+build-indep:
+	dh_prep
+	if [ ! -e $(CURDIR)/debian/routerversion.java.bak ]; then \
+		cp $(ROUTERVERSION) $(CURDIR)/debian/routerversion.java.bak; \
+	fi
+ifeq "$(findstring deb,$(shell grep 'deb' $(ROUTERVERSION)))" ""
+	sed -e "s/\(.*EXTRA\ =\ \)[^ ]*\"\(.*\)\"/\1\"\2-$$EXTRAPREFIX$$DEBIANVERSION\"/" < $(ROUTERVERSION) > $(ROUTERVERSION).tmp
+	mv -f $(ROUTERVERSION).tmp $(ROUTERVERSION)
+else
+	@echo "Already found deb in version, not doing anything"
+endif
+	TZ=UTC ant preppkg-unix javadoc
+	echo router.updateDisabled=true > $(I2P)/router.config
+	mv $(I2P)/runplain.sh $(I2P)/i2prouter-nowrapper
+	
+
+binary-arch: build-arch
+build-arch:
+	# build jbigi
+	cd $(CURDIR)/core/c/jbigi && ./build_jbigi.sh dynamic
+	# build jcpuid
+	cd $(CURDIR)/core/c/jcpuid && ./build.sh
+
+binary: binary-arch binary-indep
+
+createcopyright:
+	@echo " *** Creating debian/copyright*** "
+	@rm -f $(CURDIR)/debian/copyright
+	@/bin/echo -e "This package was Debianized by kytv <killyourtv@i2pmail.org>" >> $(CURDIR)/debian/copyright
+	@/bin/echo -e "Sun, 23 Jan 2011 20:26:51 +0000" >> $(CURDIR)/debian/copyright
+	@/bin/echo -e "\nIt was downloaded from http://www.i2p2.de" >> $(CURDIR)/debian/copyright
+	@/bin/echo -e "\nI2P is tracked upstream using the Monotone VCS" >> $(CURDIR)/debian/copyright
+	@/bin/echo -e "Complete information on fetching the source with monotone can be found" >> $(CURDIR)/debian/copyright
+	@/bin/echo -e "at http://www.i2p2.de/newdevelopers#getting-the-i2p-code\n\n\n" >> $(CURDIR)/debian/copyright
+	@/bin/cat $(CURDIR)/LICENSE.txt >> $(CURDIR)/debian/copyright
+
+override_dh_compress:
+	dh_compress -X.xsl -X.xml
+
+override_dh_installchangelogs:
+	dh_installchangelogs history.txt
+
+override_dh_installdocs:
+	dh_installdocs -pi2p -plibjbigi-jni --link-doc=i2p-router
+	dh_installdocs --remaining-packages
+
+override_dh_dhlibdeps:
+	dh_shlibdeps -llibjbigi-jni debian/libjbigi-jni/usr/lib/jni/*.so
+
+#override_dh_installinit:
+#	dh_installinit -r
+
+override_dh_builddeb:
+	dh_builddeb -- -Zbzip2
+
+get-orig-source:
+	uscan --verbose --rename --destdir $(CURDIR)/.. --watchfile debian/watch --force-download

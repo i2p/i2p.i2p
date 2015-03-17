@@ -1,16 +1,10 @@
 package net.i2p.util;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.zip.CRC32;
 import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
-
-import net.i2p.data.DataHelper;
 
 /**
  * GZIP implementation per 
@@ -26,14 +20,14 @@ public class ResettableGZIPOutputStream extends DeflaterOutputStream {
     private boolean _headerWritten;
     /** how much data is in the uncompressed stream? */
     private long _writtenSize;
-    private CRC32 _crc32;
+    private final CRC32 _crc32;
     private static final boolean DEBUG = false;
     
     public ResettableGZIPOutputStream(OutputStream o) {
         super(o, new Deflater(9, true));
-        _headerWritten = false;
         _crc32 = new CRC32();
     }
+
     /**
      * Reinitialze everything so we can write a brand new gzip output stream
      * again.
@@ -122,6 +116,7 @@ public class ResettableGZIPOutputStream extends DeflaterOutputStream {
         super.write(buf, off, len);
     }
     
+/******
     public static void main(String args[]) {
         for (int i = 0; i < 2; i++)
             test();
@@ -165,12 +160,13 @@ public class ResettableGZIPOutputStream extends DeflaterOutputStream {
         } catch (Exception e) { e.printStackTrace(); }
     }
     
-    /** just for testing/verification, expose the CRC32 values */
+    // just for testing/verification, expose the CRC32 values
     private static final class SnoopGZIPOutputStream extends GZIPOutputStream {
         public SnoopGZIPOutputStream(OutputStream o) throws IOException {
             super(o);
         }
         public CRC32 getCRC() { return crc; }
     }
+******/
 }
 

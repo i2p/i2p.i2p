@@ -10,9 +10,11 @@ package net.i2p.router.networkdb;
 
 import java.util.Date;
 
+import net.i2p.data.DatabaseEntry;
 import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
 import net.i2p.data.RouterIdentity;
+import net.i2p.data.RouterInfo;
 import net.i2p.data.i2np.DatabaseStoreMessage;
 import net.i2p.data.i2np.DeliveryStatusMessage;
 import net.i2p.router.JobImpl;
@@ -22,7 +24,7 @@ import net.i2p.util.Log;
 
 /**
  * Receive DatabaseStoreMessage data and store it in the local net db
- *
+ * Unused - see kademlia/ for replacement
  */
 public class HandleDatabaseStoreMessageJob extends JobImpl {
     private Log _log;
@@ -30,9 +32,6 @@ public class HandleDatabaseStoreMessageJob extends JobImpl {
     private RouterIdentity _from;
     private Hash _fromHash;
 
-    private static final int ACK_TIMEOUT = 15*1000;
-    private static final int ACK_PRIORITY = 100;
-    
     public HandleDatabaseStoreMessageJob(RouterContext ctx, DatabaseStoreMessage receivedMessage, RouterIdentity from, Hash fromHash) {
         super(ctx);
         _log = ctx.logManager().getLog(HandleDatabaseStoreMessageJob.class);
@@ -59,16 +58,17 @@ public class HandleDatabaseStoreMessageJob extends JobImpl {
 
         String invalidMessage = null;
         boolean wasNew = false;
-        if (_message.getValueType() == DatabaseStoreMessage.KEY_TYPE_LEASESET) {
+        DatabaseEntry entry = _message.getEntry();
+        if (entry.getType() == DatabaseEntry.KEY_TYPE_LEASESET) {
             getContext().statManager().addRateData("netDb.storeLeaseSetHandled", 1, 0);
    
             try {
-                LeaseSet ls = _message.getLeaseSet();
+                LeaseSet ls = (LeaseSet) entry;
                 // mark it as something we received, so we'll answer queries 
                 // for it.  this flag does NOT get set on entries that we 
                 // receive in response to our own lookups.
                 ls.setReceivedAsPublished(true);
-                LeaseSet match = getContext().netDb().store(_message.getKey(), _message.getLeaseSet());
+                LeaseSet match = getContext().netDb().store(_message.getKey(), ls);
                 if (match == null) {
                     wasNew = true;
                 } else {
@@ -78,13 +78,14 @@ public class HandleDatabaseStoreMessageJob extends JobImpl {
             } catch (IllegalArgumentException iae) {
                 invalidMessage = iae.getMessage();
             }
-        } else if (_message.getValueType() == DatabaseStoreMessage.KEY_TYPE_ROUTERINFO) {
+        } else if (entry.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO) {
+            RouterInfo ri = (RouterInfo) entry;
             getContext().statManager().addRateData("netDb.storeRouterInfoHandled", 1, 0);
             if (_log.shouldLog(Log.INFO))
                 _log.info("Handling dbStore of router " + _message.getKey() + " with publishDate of " 
-                          + new Date(_message.getRouterInfo().getPublished()));
+                          + new Date(ri.getPublished()));
             try {
-                Object match = getContext().netDb().store(_message.getKey(), _message.getRouterInfo());
+                Object match = getContext().netDb().store(_message.getKey(), ri);
                 wasNew = (null == match);
                 getContext().profileManager().heardAbout(_message.getKey());
             } catch (IllegalArgumentException iae) {
@@ -92,7 +93,7 @@ public class HandleDatabaseStoreMessageJob extends JobImpl {
             }
         } else {
             if (_log.shouldLog(Log.ERROR))
-                _log.error("Invalid DatabaseStoreMessage data type - " + _message.getValueType() 
+                _log.error("Invalid DatabaseStoreMessage data type - " + entry.getType() 
                            + ": " + _message);
         }
         
@@ -132,6 +133,7 @@ public class HandleDatabaseStoreMessageJob extends JobImpl {
  
     public String getName() { return "Handle Database Store Message"; }
     
+    @Override
     public void dropped() {
         getContext().messageHistory().messageProcessingError(_message.getUniqueId(), _message.getClass().getName(), "Dropped due to overload");
     }

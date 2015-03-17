@@ -31,10 +31,10 @@ public class SAMStreamSink {
     private OutputStream _samOut;
     private InputStream _samIn;
     private SAMReader _reader;
-    private boolean _dead;
+    //private boolean _dead;
     private SAMEventHandler _eventHandler;
     /** Connection id (Integer) to peer (Flooder) */
-    private Map _remotePeers;
+    private Map<Integer, Sink> _remotePeers;
     
     public static void main(String args[]) {
         if (args.length < 4) {
@@ -49,14 +49,14 @@ public class SAMStreamSink {
     public SAMStreamSink(I2PAppContext ctx, String samHost, String samPort, String destFile, String sinkDir) {
         _context = ctx;
         _log = ctx.logManager().getLog(SAMStreamSink.class);
-        _dead = false;
+        //_dead = false;
         _samHost = samHost;
         _samPort = samPort;
         _destFile = destFile;
         _sinkDir = sinkDir;
         _conOptions = "";
         _eventHandler = new SinkEventHandler(_context);
-        _remotePeers = new HashMap();
+        _remotePeers = new HashMap<Integer,Sink>();
     }
     
     public void startup() {
@@ -70,7 +70,8 @@ public class SAMStreamSink {
             String ourDest = handshake();
             _log.debug("Handshake complete.  we are " + ourDest);
             if (ourDest != null) {
-                boolean written = writeDest(ourDest);
+                //boolean written = 
+                	writeDest(ourDest);
                 _log.debug("Dest written");
             }
         }
@@ -82,7 +83,7 @@ public class SAMStreamSink {
         public void streamClosedReceived(String result, int id, String message) {
             Sink sink = null;
             synchronized (_remotePeers) {
-                sink = (Sink)_remotePeers.remove(new Integer(id));
+                sink = _remotePeers.remove(new Integer(id));
             }
             if (sink != null) {
                 sink.closed();
@@ -95,7 +96,7 @@ public class SAMStreamSink {
         public void streamDataReceived(int id, byte data[], int offset, int length) {
             Sink sink = null;
             synchronized (_remotePeers) {
-                sink = (Sink)_remotePeers.get(new Integer(id));
+                sink = _remotePeers.get(new Integer(id));
             }
             if (sink != null) {
                 sink.received(data, offset, length);
@@ -184,7 +185,6 @@ public class SAMStreamSink {
         private String _remoteDestination;
         private boolean _closed;
         private long _started;
-        private long _totalReceived;
         private long _lastReceivedOn;
         private OutputStream _out;
         
@@ -221,7 +221,6 @@ public class SAMStreamSink {
         }
         public void received(byte data[], int offset, int len) {
             if (_closed) return;
-            _totalReceived += len;
             try {
                 _out.write(data, offset, len);
             } catch (IOException ioe) {

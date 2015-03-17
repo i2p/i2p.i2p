@@ -6,8 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-
-import net.i2p.util.Log;
+import java.util.Locale;
 
 /**
  * Encodes and decodes to and from Base64 notation.
@@ -40,25 +39,50 @@ import net.i2p.util.Log;
  */
 public class Base64 {
 
-    private final static Log _log = new Log(Base64.class);
+    //private final static Log _log = new Log(Base64.class);
 
-    /** added by aum */
+    /**
+     *  @param source if null will return ""
+     */
     public static String encode(String source) {
         return (source != null ? encode(source.getBytes()) : "");
     }
+
+    /**
+     *  @param source if null will return ""
+     */
     public static String encode(byte[] source) {
         return (source != null ? encode(source, 0, source.length) : "");
     }
+
+    /**
+     *  @param source if null will return ""
+     */
     public static String encode(byte[] source, int off, int len) {
         return (source != null ? encode(source, off, len, false) : "");
     }
+
+    /**
+     *  @param source if null will return ""
+     *  @param useStandardAlphabet Warning, must be false for I2P compatibility
+     */
     public static String encode(byte[] source, boolean useStandardAlphabet) {
         return (source != null ? encode(source, 0, source.length, useStandardAlphabet) : "");
     }
+
+    /**
+     *  @param source if null will return ""
+     *  @param useStandardAlphabet Warning, must be false for I2P compatibility
+     */
     public static String encode(byte[] source, int off, int len, boolean useStandardAlphabet) {
         return (source != null ? safeEncode(source, off, len, useStandardAlphabet) : "");
     }
 
+    /**
+     *  Decodes data from Base64 notation.
+     *  @param s Base 64 encoded string using the I2P alphabet A-Z, a-z, 0-9, -, ~
+     *  @return the decoded data, null on error
+     */
     public static byte[] decode(String s) {
         return safeDecode(s, false);
     }
@@ -68,9 +92,6 @@ public class Base64 {
 
     /** The equals sign (=) as a byte. */
     private final static byte EQUALS_SIGN = (byte) '=';
-
-    /** The new line character (\n) as a byte. */
-    private final static byte NEW_LINE = (byte) '\n';
 
     /** The 64 valid Base64 values. */
     private final static byte[] ALPHABET = { (byte) 'A', (byte) 'B', (byte) 'C', (byte) 'D', (byte) 'E', (byte) 'F',
@@ -84,6 +105,8 @@ public class Base64 {
                                             (byte) 'w', (byte) 'x', (byte) 'y', (byte) 'z', (byte) '0', (byte) '1',
                                             (byte) '2', (byte) '3', (byte) '4', (byte) '5', (byte) '6', (byte) '7',
                                             (byte) '8', (byte) '9', (byte) '+', (byte) '/'};
+
+    /** The 64 valid Base64 values for I2P. */
     private final static byte[] ALPHABET_ALT = { (byte) 'A', (byte) 'B', (byte) 'C', (byte) 'D', (byte) 'E', (byte) 'F',
                                             (byte) 'G', (byte) 'H', (byte) 'I', (byte) 'J', (byte) 'K', (byte) 'L',
                                             (byte) 'M', (byte) 'N', (byte) 'O', (byte) 'P', (byte) 'Q', (byte) 'R',
@@ -133,7 +156,6 @@ public class Base64 {
      -9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9         // Decimal 244 - 255 */
     };
 
-    private final static byte BAD_ENCODING = -9; // Indicates error in encoding
     private final static byte WHITE_SPACE_ENC = -5; // Indicates white space in encoding
     private final static byte EQUALS_SIGN_ENC = -1; // Indicates equals sign in encoding
 
@@ -151,29 +173,46 @@ public class Base64 {
     }
 
     private static void runApp(String args[]) {
-        try {
-            if ("encodestring".equalsIgnoreCase(args[0])) {
-                System.out.println(encode(args[1].getBytes()));
-                return;
+        String cmd = args[0].toLowerCase(Locale.US);
+        if ("encodestring".equals(cmd)) {
+            System.out.println(encode(args[1].getBytes()));
+            return;
+        }
+        if ("decodestring".equals(cmd)) {
+            byte[] dec = decode(args[1]);
+            if (dec != null) {
+                try {
+                    System.out.write(dec);
+                } catch (IOException ioe) {
+                    System.err.println("output error " + ioe);
+                }
+            } else {
+                System.err.println("decode error");
             }
-            InputStream in = System.in;
-            OutputStream out = System.out;
+            return;
+        }
+        InputStream in = System.in;
+        OutputStream out = System.out;
+        try {
             if (args.length >= 3) {
                 out = new FileOutputStream(args[2]);
             }
             if (args.length >= 2) {
                 in = new FileInputStream(args[1]);
             }
-            if ("encode".equalsIgnoreCase(args[0])) {
+            if ("encode".equals(cmd)) {
                 encode(in, out);
                 return;
             }
-            if ("decode".equalsIgnoreCase(args[0])) {
+            if ("decode".equals(cmd)) {
                 decode(in, out);
                 return;
             }
         } catch (IOException ioe) {
             ioe.printStackTrace(System.err);
+        } finally {
+            try { in.close(); } catch (IOException e) {}
+            try { out.close(); } catch (IOException e) {}
         }
     }
 
@@ -206,9 +245,12 @@ public class Base64 {
         System.out.println("or    : Base64 decode <inFile> <outFile>");
         System.out.println("or    : Base64 decode <inFile>");
         System.out.println("or    : Base64 decode");
+        System.out.println("or    : Base64 encodestring 'string to encode'");
+        System.out.println("or    : Base64 decodestring 'string to decode'");
         System.out.println("or    : Base64 test");
     }
 
+/*******
     private static void test() {
         String orig = "you smell";
         String encoded = Base64.encode(orig.getBytes());
@@ -230,6 +272,7 @@ public class Base64 {
         else
             throw new RuntimeException("D(E([all bytes])) != [all bytes]!!!");
     }
+*******/
 
     /* ********  E N C O D I N G   M E T H O D S  ******** */
 
@@ -241,7 +284,7 @@ public class Base64 {
      * @return four byte array in Base64 notation.
      * @since 1.3
      */
-/***** unused
+/***** unused (standard alphabet)
     private static byte[] encode3to4(byte[] threeBytes) {
         return encode3to4(threeBytes, 3);
     } // end encodeToBytes
@@ -260,11 +303,13 @@ public class Base64 {
      * @return four byte array in Base64 notation.
      * @since 1.3
      */
+/***** unused (standard alphabet)
     private static byte[] encode3to4(byte[] threeBytes, int numSigBytes) {
         byte[] dest = new byte[4];
         encode3to4(threeBytes, 0, numSigBytes, dest, 0);
         return dest;
     }
+******/
 
     /**
      * Encodes up to three bytes of the array <var>source</var>
@@ -287,6 +332,7 @@ public class Base64 {
      * @return the <var>destination</var> array
      * @since 1.3
      */
+/***** unused (standard alphabet)
     private static byte[] encode3to4(byte[] source, int srcOffset, int numSigBytes, byte[] destination, int destOffset) {
         //           1         2         3  
         // 01234567890123456789012345678901 Bit position
@@ -329,8 +375,12 @@ public class Base64 {
             return destination;
         } // end switch
     } // end encode3to4
+******/
 
-    private static void encode3to4(byte[] source, int srcOffset, int numSigBytes, StringBuffer buf, byte alpha[]) {
+    /**
+     *  @param alpha alphabet
+     */
+    private static void encode3to4(byte[] source, int srcOffset, int numSigBytes, StringBuilder buf, byte alpha[]) {
         //           1         2         3  
         // 01234567890123456789012345678901 Bit position
         // --------000000001111111122222222 Array position from threeBytes
@@ -394,7 +444,7 @@ public class Base64 {
     private static String safeEncode(byte[] source, int off, int len, boolean useStandardAlphabet) {
         if (len + off > source.length)
             throw new ArrayIndexOutOfBoundsException("Trying to encode too much!  source.len=" + source.length + " off=" + off + " len=" + len);
-        StringBuffer buf = new StringBuffer(len * 4 / 3);
+        StringBuilder buf = new StringBuilder(len * 4 / 3);
         if (useStandardAlphabet)
             encodeBytes(source, off, len, false, buf, ALPHABET);
         else
@@ -446,7 +496,7 @@ public class Base64 {
 ******/
 
     private static String encodeBytes(byte[] source, int off, int len, boolean breakLines) {
-        StringBuffer buf = new StringBuffer( (len*4)/3 );
+        StringBuilder buf = new StringBuilder( (len*4)/3 );
         encodeBytes(source, off, len, breakLines, buf, ALPHABET);
         return buf.toString();
     }
@@ -460,16 +510,15 @@ public class Base64 {
      * @param breakLines Break lines at 80 characters or less.
      * @since 1.4
      */
-    private static void encodeBytes(byte[] source, int off, int len, boolean breakLines, StringBuffer out, byte alpha[]) {
+    private static void encodeBytes(byte[] source, int off, int len, boolean breakLines, StringBuilder out, byte alpha[]) {
         //int len43 = len * 4 / 3;
         //byte[] outBuff = new byte[(len43) // Main 4:3
         //                          + ((len % 3) > 0 ? 4 : 0) // Account for padding
         //                          + (breakLines ? (len43 / MAX_LINE_LENGTH) : 0)]; // New lines      
         int d = 0;
-        int e = 0;
         int len2 = len - 2;
         int lineLength = 0;
-        for (; d < len2; d += 3, e += 4) {
+        for (; d < len2; d += 3) {
             //encode3to4(source, d + off, 3, outBuff, e);
             encode3to4(source, d + off, 3, out, alpha);
 
@@ -477,7 +526,6 @@ public class Base64 {
             if (breakLines && lineLength == MAX_LINE_LENGTH) {
                 //outBuff[e + 4] = NEW_LINE;
                 out.append('\n');
-                e++;
                 lineLength = 0;
             } // end if: end of line
         } // en dfor: each piece of array
@@ -485,7 +533,6 @@ public class Base64 {
         if (d < len) {
             //encode3to4(source, d + off, len - d, outBuff, e);
             encode3to4(source, d + off, len - d, out, alpha);
-            e += 4;
         } // end if: some padding needed
 
         //out.append(new String(outBuff, 0, e));
@@ -506,21 +553,7 @@ public class Base64 {
     } // end encodeString
 ******/
 
-    /**
-     * Encodes a string in Base64 notation with line breaks
-     * after every 75 Base64 characters.
-     *
-     * @param s the string to encode
-     * @param breakLines Break lines at 80 characters or less.
-     * @return the encoded string
-     * @since 1.3
-     */
-    private static String encodeString(String s, boolean breakLines) {
-        byte src[] = new byte[s.length()];
-        for (int i = 0; i < src.length; i++)
-            src[i] = (byte)(s.charAt(i) & 0xFF);
-        return encodeBytes(src, breakLines);
-    } // end encodeString
+    
 
     /* ********  D E C O D I N G   M E T H O D S  ******** */
 
@@ -628,7 +661,7 @@ public class Base64 {
      * Decodes data from Base64 notation.
      *
      * @param s the string to decode
-     * @return the decoded data
+     * @return the decoded data, null on error
      * @since 1.4
      */
     private static byte[] standardDecode(String s) {
@@ -643,10 +676,12 @@ public class Base64 {
      * returns it as a string.
      * Equivlaent to calling
      * <code>new String( decode( s ) )</code>
+     * WARNING this uses the locale's encoding, it may not be what you want.
      *
      * @param s the strind to decode
      * @return The data as a string
      * @since 1.4
+     * @throws NPE on error?
      */
     public static String decodeToString(String s) {
         return new String(decode(s));
@@ -659,7 +694,7 @@ public class Base64 {
      * @param source The Base64 encoded data
      * @param off    The offset of where to begin decoding
      * @param len    The length of characters to decode
-     * @return decoded data
+     * @return decoded data, null on error
      * @since 1.3
      */
     private static byte[] decode(byte[] source, int off, int len) {
@@ -692,7 +727,7 @@ public class Base64 {
 
             } // end if: white space, equals sign or better
             else {
-                _log.warn("Bad Base64 input character at " + i + ": " + source[i] + "(decimal)");
+                //_log.warn("Bad Base64 input character at " + i + ": " + source[i] + "(decimal)");
                 return null;
             } // end else: 
         } // each input character

@@ -27,18 +27,22 @@ package i2p.susi.dns;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Serializable;
+
+import net.i2p.I2PAppContext;
+import net.i2p.util.SecureFileOutputStream;
 
 public class ConfigBean implements Serializable {
 	
 	/*
 	 * as this is not provided as constant in addressbook, we define it here
 	 */
-	public static final String addressbookPrefix = "addressbook/";
+ 	public static final String addressbookPrefix =
+ 		(new File(I2PAppContext.getGlobalContext().getRouterDir(), "addressbook")).getAbsolutePath()
+			+ File.separatorChar;
 	public static final String configFileName = addressbookPrefix + "config.txt";
 	
 	private String action, config;
@@ -79,7 +83,7 @@ public class ConfigBean implements Serializable {
 	{
 		File file = new File( configFileName );
 		if( file != null && file.isFile() ) {
-			StringBuffer buf = new StringBuffer();
+			StringBuilder buf = new StringBuilder();
 			BufferedReader br = null;
 			try {
 				br = new BufferedReader( new FileReader( file ) );
@@ -107,7 +111,7 @@ public class ConfigBean implements Serializable {
 	{
 		File file = new File( configFileName );
 		try {
-			PrintWriter out = new PrintWriter( new FileOutputStream( file ) );
+			PrintWriter out = new PrintWriter( new SecureFileOutputStream( file ) );
 			out.print( config );
 			out.flush();
 			out.close();
@@ -132,17 +136,16 @@ public class ConfigBean implements Serializable {
 		String message = "";
 		if( action != null ) {
 			if( lastSerial != null && serial != null && serial.compareTo( lastSerial ) == 0 ) {
-				if( action.compareToIgnoreCase( "save") == 0 ) {
+				if(action.equals(_("Save"))) {
 					save();
-					message = "Configuration saved.";
-				}
-				else if( action.compareToIgnoreCase( "reload") == 0 ) {
+					message = _("Configuration saved.");
+				} else if (action.equals(_("Reload"))) {
 					reload();
-					message = "Configuration reloaded.";
+					message = _("Configuration reloaded.");
 				}
 			}			
 			else {
-				message = "Invalid nonce. Are you being spoofed?";
+				message = _("Invalid form submission, probably because you used the \"back\" or \"reload\" button on your browser. Please resubmit.");
 			}
 		}
 		if( message.length() > 0 )
@@ -157,5 +160,10 @@ public class ConfigBean implements Serializable {
 	}
 	public void setSerial(String serial ) {
 		this.serial = serial;
+	}
+
+	/** translate */
+	private static String _(String s) {
+		return Messages.getString(s);
 	}
 }

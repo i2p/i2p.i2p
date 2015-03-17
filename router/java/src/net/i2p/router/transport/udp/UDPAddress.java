@@ -2,7 +2,6 @@ package net.i2p.router.transport.udp;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.Properties;
 
 import net.i2p.data.Base64;
 import net.i2p.data.RouterAddress;
@@ -10,6 +9,7 @@ import net.i2p.data.SessionKey;
 
 /**
  * basic helper to parse out peer info from a udp address
+ * FIXME public for ConfigNetHelper
  */
 public class UDPAddress {
     private String _host;
@@ -21,10 +21,12 @@ public class UDPAddress {
     private int _introPorts[];
     private byte[] _introKeys[];
     private long _introTags[];
+    private int _mtu;
     
     public static final String PROP_PORT = "port";
     public static final String PROP_HOST = "host";
     public static final String PROP_INTRO_KEY = "key";
+    public static final String PROP_MTU = "mtu";
     
     public static final String PROP_CAPACITY = "caps";
     public static final char CAPACITY_TESTING = 'B';
@@ -40,8 +42,9 @@ public class UDPAddress {
         parse(addr);
     }
     
+    @Override
     public String toString() {
-        StringBuffer rv = new StringBuffer(64);
+        StringBuilder rv = new StringBuilder(64);
         if (_introHosts != null) {
             for (int i = 0; i < _introHosts.length; i++) {
                 rv.append("ssu://");
@@ -62,36 +65,40 @@ public class UDPAddress {
     
     private void parse(RouterAddress addr) {
         if (addr == null) return;
-        Properties opts = addr.getOptions();
-        _host = opts.getProperty(PROP_HOST);
+        _host = addr.getOption(PROP_HOST);
         if (_host != null) _host = _host.trim();
         try { 
-            String port = opts.getProperty(PROP_PORT);
+            String port = addr.getOption(PROP_PORT);
             if (port != null)
                 _port = Integer.parseInt(port);
         } catch (NumberFormatException nfe) {
             _port = -1;
         }
-        String key = opts.getProperty(PROP_INTRO_KEY);
+        try { 
+            String mtu = addr.getOption(PROP_MTU);
+            if (mtu != null)
+                _mtu = MTU.rectify(Integer.parseInt(mtu));
+        } catch (NumberFormatException nfe) {}
+        String key = addr.getOption(PROP_INTRO_KEY);
         if (key != null)
             _introKey = Base64.decode(key.trim());
         
         for (int i = MAX_INTRODUCERS; i >= 0; i--) {
-            String host = opts.getProperty(PROP_INTRO_HOST_PREFIX + i);
+            String host = addr.getOption(PROP_INTRO_HOST_PREFIX + i);
             if (host == null) continue;
-            String port = opts.getProperty(PROP_INTRO_PORT_PREFIX + i);
+            String port = addr.getOption(PROP_INTRO_PORT_PREFIX + i);
             if (port == null) continue;
-            String k = opts.getProperty(PROP_INTRO_KEY_PREFIX + i);
+            String k = addr.getOption(PROP_INTRO_KEY_PREFIX + i);
             if (k == null) continue;
             byte ikey[] = Base64.decode(k);
             if ( (ikey == null) || (ikey.length != SessionKey.KEYSIZE_BYTES) )
                 continue;
-            String t = opts.getProperty(PROP_INTRO_TAG_PREFIX + i);
+            String t = addr.getOption(PROP_INTRO_TAG_PREFIX + i);
             if (t == null) continue;
             int p = -1;
             try { 
                 p = Integer.parseInt(port); 
-                if (p <= 0) continue;
+                if (p <= 0 || p > 65535) continue;
             } catch (NumberFormatException nfe) {
                 continue;
             }
@@ -151,7 +158,7 @@ public class UDPAddress {
     }
     
     public String getHost() { return _host; }
-    public InetAddress getHostAddress() {
+    InetAddress getHostAddress() {
         if (_hostAddress == null) {
             try {
                 _hostAddress = InetAddress.getByName(_host);
@@ -161,11 +168,16 @@ public class UDPAddress {
         }
         return _hostAddress;
     }
+
+    /**
+     *  @return 0 if unset; -1 if invalid
+     */
     public int getPort() { return _port; }
-    public byte[] getIntroKey() { return _introKey; }
+
+    byte[] getIntroKey() { return _introKey; }
     
-    public int getIntroducerCount() { return (_introAddresses == null ? 0 : _introAddresses.length); }
-    public InetAddress getIntroducerHost(int i) { 
+    int getIntroducerCount() { return (_introAddresses == null ? 0 : _introAddresses.length); }
+    InetAddress getIntroducerHost(int i) { 
         if (_introAddresses[i] == null) {
             try {
                 _introAddresses[i] = InetAddress.getByName(_introHosts[i]);
@@ -175,8 +187,15 @@ public class UDPAddress {
         }
         return _introAddresses[i];
     }
-    public int getIntroducerPort(int i) { return _introPorts[i]; }
-    public byte[] getIntroducerKey(int i) { return _introKeys[i]; }
-    public long getIntroducerTag(int i) { return _introTags[i]; }
+    int getIntroducerPort(int i) { return _introPorts[i]; }
+    byte[] getIntroducerKey(int i) { return _introKeys[i]; }
+    long getIntroducerTag(int i) { return _introTags[i]; }
         
+    /**
+     *  @return 0 if unset or invalid; recitified via MTU.rectify()
+     *  @since 0.9.2
+     */
+    int getMTU() {
+        return _mtu;
+    }
 }

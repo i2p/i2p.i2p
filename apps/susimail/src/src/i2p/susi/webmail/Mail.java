@@ -78,8 +78,8 @@ public class Mail {
 	}
 	/**
 	 * 
-	 * @param address
-	 * @return
+	 * @param address E-mail address to be validated
+	 * @return Is the e-mail address valid?
 	 */
 	public static boolean validateAddress( String address )
 	{
@@ -105,7 +105,6 @@ public class Mail {
 	}
 	/**
 	 * @param address
-	 * @return
 	 */
 	public static String getAddress(String address )
 	{
@@ -142,7 +141,7 @@ public class Mail {
 		}
 		return ok;
 	}
-	public static void appendRecipients( StringBuffer buf, ArrayList recipients, String prefix )
+	public static void appendRecipients( StringBuilder buf, ArrayList recipients, String prefix )
 	{
 		for( Iterator it = recipients.iterator(); it.hasNext(); ) {
 			buf.append( prefix );
@@ -214,7 +213,7 @@ public class Mail {
 								shortSubject = formattedSubject.substring( 0, 57 ).trim() + "...";
 							shortSubject = html.encode( shortSubject );
 						}
-						else if( line.toLowerCase().startsWith( "Reply-To:" ) ) {
+						else if( line.toLowerCase(Locale.US).startsWith( "reply-to:" ) ) {
 							reply = Mail.getAddress( line.substring( 9 ).trim() );
 						}
 						else if( line.startsWith( "To:" ) ) {

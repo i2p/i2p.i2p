@@ -20,12 +20,12 @@ import net.i2p.data.Destination;
  * just used to talk to the router.
  */
 public class I2PSimpleClient implements I2PClient {
-    /** Don't do this */
+    /** @deprecated Don't do this */
     public Destination createDestination(OutputStream destKeyStream) throws I2PException, IOException {
         return null;
     }
 
-    /** or this */
+    /** @deprecated or this */
     public Destination createDestination(OutputStream destKeyStream, Certificate cert) throws I2PException, IOException {
         return null;
     }

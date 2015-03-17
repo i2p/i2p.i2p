@@ -4,7 +4,9 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Constructor;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Properties;
 
 import net.i2p.I2PAppContext;
@@ -13,7 +15,6 @@ import net.i2p.client.I2PClient;
 import net.i2p.client.I2PClientFactory;
 import net.i2p.client.I2PSession;
 import net.i2p.client.I2PSessionException;
-import net.i2p.data.Destination;
 import net.i2p.util.Log;
 
 /**
@@ -36,7 +37,7 @@ public class I2PSocketManagerFactory {
      * @return the newly created socket manager, or null if there were errors
      */
     public static I2PSocketManager createManager() {
-        return createManager(getHost(), getPort(), System.getProperties());
+        return createManager(getHost(), getPort(), (Properties) System.getProperties().clone());
     }
     
     /**
@@ -59,7 +60,7 @@ public class I2PSocketManagerFactory {
      * @return the newly created socket manager, or null if there were errors
      */
     public static I2PSocketManager createManager(String host, int port) {
-        return createManager(host, port, System.getProperties());
+        return createManager(host, port, (Properties) System.getProperties().clone());
     }
 
     /**
@@ -91,18 +92,18 @@ public class I2PSocketManagerFactory {
      * Create a socket manager using the destination loaded from the given private key
      * stream and connected to the default I2CP host and port.
      *
-     * @param myPrivateKeyStream private key stream
+     * @param myPrivateKeyStream private key stream, format is specified in {@link net.i2p.data.PrivateKeyFile PrivateKeyFile}
      * @return the newly created socket manager, or null if there were errors
      */
     public static I2PSocketManager createManager(InputStream myPrivateKeyStream) {
-        return createManager(myPrivateKeyStream, getHost(), getPort(), System.getProperties());
+        return createManager(myPrivateKeyStream, getHost(), getPort(), (Properties) System.getProperties().clone());
     }
     
     /**
      * Create a socket manager using the destination loaded from the given private key
      * stream and connected to the default I2CP host and port.
      *
-     * @param myPrivateKeyStream private key stream
+     * @param myPrivateKeyStream private key stream, format is specified in {@link net.i2p.data.PrivateKeyFile PrivateKeyFile}
      * @param opts I2CP options
      * @return the newly created socket manager, or null if there were errors
      */
@@ -115,7 +116,7 @@ public class I2PSocketManagerFactory {
      * stream and connected to the I2CP router on the specified machine on the given
      * port
      *
-     * @param myPrivateKeyStream private key stream
+     * @param myPrivateKeyStream private key stream, format is specified in {@link net.i2p.data.PrivateKeyFile PrivateKeyFile}
      * @param i2cpHost I2CP host
      * @param i2cpPort I2CP port
      * @param opts I2CP options
@@ -126,21 +127,25 @@ public class I2PSocketManagerFactory {
         I2PClient client = I2PClientFactory.createClient();
         if (opts == null)
             opts = new Properties();
-        for (Iterator iter = System.getProperties().keySet().iterator(); iter.hasNext(); ) {
-            String name = (String)iter.next();
+        Properties syscopy = (Properties) System.getProperties().clone();
+        for (Map.Entry e : syscopy.entrySet()) {
+            String name = (String) e.getKey();
             if (!opts.containsKey(name))
-                opts.setProperty(name, System.getProperty(name));
+                opts.setProperty(name, (String) e.getValue());
         }
-        boolean oldLib = DEFAULT_MANAGER.equals(opts.getProperty(PROP_MANAGER, DEFAULT_MANAGER));
-        if (oldLib && false) {
+        //boolean oldLib = DEFAULT_MANAGER.equals(opts.getProperty(PROP_MANAGER, DEFAULT_MANAGER));
+        //if (oldLib && false) {
             // for the old streaming lib
-            opts.setProperty(I2PClient.PROP_RELIABILITY, I2PClient.PROP_RELIABILITY_GUARANTEED);
+        //    opts.setProperty(I2PClient.PROP_RELIABILITY, I2PClient.PROP_RELIABILITY_GUARANTEED);
             //opts.setProperty("tunnels.depthInbound", "0");
-        } else {
+        //} else {
             // for new streaming lib:
-            opts.setProperty(I2PClient.PROP_RELIABILITY, I2PClient.PROP_RELIABILITY_BEST_EFFORT);
+            //opts.setProperty(I2PClient.PROP_RELIABILITY, I2PClient.PROP_RELIABILITY_BEST_EFFORT);
+            // as of 0.8.1 (I2CP default is BestEffort)
+            if (!opts.containsKey(I2PClient.PROP_RELIABILITY))
+                opts.setProperty(I2PClient.PROP_RELIABILITY, I2PClient.PROP_RELIABILITY_NONE);
             //p.setProperty("tunnels.depthInbound", "0");
-        }
+        //}
 
         if (i2cpHost != null)
             opts.setProperty(I2PClient.PROP_TCP_HOST, i2cpHost);
@@ -159,44 +164,23 @@ public class I2PSocketManagerFactory {
     }
 
     private static I2PSocketManager createManager(I2PSession session, Properties opts, String name) {
-        if (false) {
-            I2PSocketManagerImpl mgr = new I2PSocketManagerImpl();
-            mgr.setSession(session);
-            //mgr.setDefaultOptions(new I2PSocketOptions());
+        I2PAppContext context = I2PAppContext.getGlobalContext();
+        String classname = opts.getProperty(PROP_MANAGER, DEFAULT_MANAGER);
+        try {
+            Class cls = Class.forName(classname);
+            Constructor<I2PSocketManager> con = (Constructor<I2PSocketManager>)
+                  cls.getConstructor(new Class[] {I2PAppContext.class, I2PSession.class, Properties.class, String.class});
+            I2PSocketManager mgr = con.newInstance(new Object[] {context, session, opts, name});
             return mgr;
-        } else {
-            String classname = opts.getProperty(PROP_MANAGER, DEFAULT_MANAGER);
-            if (classname != null) {
-                try {
-                    Class cls = Class.forName(classname);
-                    Object obj = cls.newInstance();
-                    if (obj instanceof I2PSocketManager) {
-                        I2PSocketManager mgr = (I2PSocketManager)obj;
-                        I2PAppContext context = I2PAppContext.getGlobalContext();
-                        mgr.init(context, session, opts, name);
-                        return mgr;
-                    } else {
-                        throw new IllegalStateException("Invalid manager class [" + classname + "]");
-                    }
-                } catch (ClassNotFoundException cnfe) {
-                    _log.error("Error loading " + classname, cnfe);
-                    throw new IllegalStateException("Invalid manager class [" + classname + "] - not found");
-                } catch (InstantiationException ie) {
-                    _log.error("Error loading " + classname, ie);
-                    throw new IllegalStateException("Invalid manager class [" + classname + "] - unable to instantiate");
-                } catch (IllegalAccessException iae) {
-                    _log.error("Error loading " + classname, iae);
-                    throw new IllegalStateException("Invalid manager class [" + classname + "] - illegal access");
-                }
-            } else {
-                throw new IllegalStateException("No manager class specified");
-            }
+        } catch (Throwable t) {
+            _log.log(Log.CRIT, "Error loading " + classname, t);
+            throw new IllegalStateException(t);
         }
-        
+
     }
 
     private static String getHost() {
-        return System.getProperty(I2PClient.PROP_TCP_HOST, "localhost");
+        return System.getProperty(I2PClient.PROP_TCP_HOST, "127.0.0.1");
     }
     private static int getPort() {
         int i2cpPort = 7654;

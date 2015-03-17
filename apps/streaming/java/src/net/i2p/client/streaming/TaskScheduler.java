@@ -5,7 +5,7 @@ package net.i2p.client.streaming;
  * selected based upon its current state.
  *
  */
-interface TaskScheduler {
+public interface TaskScheduler {
     /**
      * An event has occurred (timeout, message sent, or message received),
      * so schedule what to do next based on our current state.

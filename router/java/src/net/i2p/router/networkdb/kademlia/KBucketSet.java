@@ -9,6 +9,7 @@ package net.i2p.router.networkdb.kademlia;
  */
 
 import java.math.BigInteger;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -24,10 +25,10 @@ import net.i2p.util.Log;
  *
  */
 class KBucketSet {
-    private Log _log;
-    private I2PAppContext _context;
-    private Hash _us;
-    private KBucket _buckets[];
+    private final Log _log;
+    private final I2PAppContext _context;
+    private final LocalHash _us;
+    private final KBucket _buckets[];
     private volatile int _size;
     
     public final static int BASE = 8; // must go into KEYSIZE_BITS evenly
@@ -37,10 +38,11 @@ class KBucketSet {
     public final static int BUCKET_SIZE = 500; // # values at which we start periodic trimming (500 ~= 250Kb)
     
     public KBucketSet(I2PAppContext context, Hash us) {
-        _us = us;
+        _us = new LocalHash(us);
         _context = context;
         _log = context.logManager().getLog(KBucketSet.class);
-        createBuckets();
+        _buckets = createBuckets();
+        context.statManager().createRateStat("netDb.KBSGetAllTime", "Time to add all Hashes to the Collector", "NetworkDatabase", new long[] { 60*60*1000 });
     }
     
     /**
@@ -88,9 +90,18 @@ class KBucketSet {
         return removed;
     }
     
-    public Set getAll() { return getAll(new HashSet()); }
-    public Set getAll(Set toIgnore) {
-        HashSet all = new HashSet(1024);
+    /** @since 0.8.8 */
+    public void clear() {
+        for (int i = 0; i < _buckets.length; i++) {
+            _buckets[i].setEntries(Collections.EMPTY_SET);
+        }
+        _size = 0;
+        _us.clearXorCache();
+    }
+    
+    public Set<Hash> getAll() { return getAll(Collections.EMPTY_SET); };
+    public Set<Hash> getAll(Set<Hash> toIgnore) {
+        Set<Hash> all = new HashSet(1024);
         for (int i = 0; i < _buckets.length; i++) {
             all.addAll(_buckets[i].getEntries(toIgnore));
         }
@@ -98,8 +109,10 @@ class KBucketSet {
     }
     
     public void getAll(SelectionCollector collector) {
+        long start = _context.clock().now();
         for (int i = 0; i < _buckets.length; i++)
             _buckets[i].getEntries(collector);
+        _context.statManager().addRateData("netDb.KBSGetAllTime", _context.clock().now() - start, 0);
     }
     
     public int pickBucket(Hash key) {
@@ -119,12 +132,13 @@ class KBucketSet {
     
     public KBucket getBucket(int bucket) { return _buckets[bucket]; }
     
-    protected void createBuckets() {
-        _buckets = new KBucket[NUM_BUCKETS];
+    protected KBucket[] createBuckets() {
+        KBucket[] buckets = new KBucket[NUM_BUCKETS];
         for (int i = 0; i < NUM_BUCKETS-1; i++) {
-            _buckets[i] = createBucket(i*BASE, (i+1)*BASE);
+            buckets[i] = createBucket(i*BASE, (i+1)*BASE);
         }
-        _buckets[NUM_BUCKETS-1] = createBucket(BASE*(NUM_BUCKETS-1), BASE*(NUM_BUCKETS) + 1);
+        buckets[NUM_BUCKETS-1] = createBucket(BASE*(NUM_BUCKETS-1), BASE*(NUM_BUCKETS) + 1);
+        return buckets;
     }
     
     protected KBucket createBucket(int start, int end) {
@@ -138,9 +152,10 @@ class KBucketSet {
         _log.info(toString());
     }
     
+    @Override
     public String toString() {
         BigInteger us = new BigInteger(1, _us.getData());
-        StringBuffer buf = new StringBuffer(1024);
+        StringBuilder buf = new StringBuilder(1024);
         buf.append("Bucket set rooted on: ").append(us.toString()).append(" (aka ").append(us.toString(2)).append("): \n");
         for (int i = 0; i < NUM_BUCKETS; i++) {
             buf.append("* Bucket ").append(i).append("/").append(NUM_BUCKETS-1).append(": )\n");
@@ -158,7 +173,7 @@ class KBucketSet {
             System.arraycopy(b, 0, val, Hash.HASH_LENGTH-b.length-1, b.length);
         else
             System.arraycopy(b, Hash.HASH_LENGTH-b.length, val, 0, val.length);
-        StringBuffer buf = new StringBuffer(KEYSIZE_BITS);
+        StringBuilder buf = new StringBuilder(KEYSIZE_BITS);
         for (int i = 0; i < val.length; i++) {
             for (int j = 7; j >= 0; j--) {
                 boolean bb = (0 != (val[i] & (1<<j)));

@@ -10,7 +10,6 @@ package net.i2p.client;
  */
 
 import net.i2p.I2PException;
-import net.i2p.util.Log;
 
 /**
  * Thrown when there is a problem doing something on the session
@@ -18,7 +17,6 @@ import net.i2p.util.Log;
  * @author jrandom
  */
 public class I2PSessionException extends I2PException {
-    private final static Log _log = new Log(I2PSessionException.class);
 
     public I2PSessionException(String msg, Throwable t) {
         super(msg, t);

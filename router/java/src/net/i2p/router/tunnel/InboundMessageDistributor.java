@@ -1,41 +1,43 @@
 package net.i2p.router.tunnel;
 
+import net.i2p.data.DatabaseEntry;
 import net.i2p.data.Hash;
+import net.i2p.data.LeaseSet;
 import net.i2p.data.Payload;
+import net.i2p.data.RouterInfo;
 import net.i2p.data.TunnelId;
 import net.i2p.data.i2np.DataMessage;
+import net.i2p.data.i2np.DatabaseSearchReplyMessage;
 import net.i2p.data.i2np.DatabaseStoreMessage;
 import net.i2p.data.i2np.DeliveryInstructions;
 import net.i2p.data.i2np.DeliveryStatusMessage;
 import net.i2p.data.i2np.GarlicMessage;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.i2np.TunnelBuildReplyMessage;
-import net.i2p.data.i2np.TunnelGatewayMessage;
+import net.i2p.data.i2np.VariableTunnelBuildReplyMessage;
 import net.i2p.router.ClientMessage;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelInfo;
 import net.i2p.router.message.GarlicMessageReceiver;
+//import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import net.i2p.util.Log;
 
 /**
  * When a message arrives at the inbound tunnel endpoint, this distributor
  * honors the instructions (safely)
  */
-public class InboundMessageDistributor implements GarlicMessageReceiver.CloveReceiver {
-    private RouterContext _context;
-    private Log _log;
-    private Hash _client;
-    private GarlicMessageReceiver _receiver;
-    
-    private static final int MAX_DISTRIBUTE_TIME = 10*1000;
+class InboundMessageDistributor implements GarlicMessageReceiver.CloveReceiver {
+    private final RouterContext _context;
+    private final Log _log;
+    private final Hash _client;
+    private final GarlicMessageReceiver _receiver;
     
     public InboundMessageDistributor(RouterContext ctx, Hash client) {
         _context = ctx;
         _client = client;
         _log = ctx.logManager().getLog(InboundMessageDistributor.class);
         _receiver = new GarlicMessageReceiver(ctx, this, client);
-        _context.statManager().createRateStat("tunnel.dropDangerousClientTunnelMessage", "How many tunnel messages come down a client tunnel that we shouldn't expect (lifetime is the 'I2NP type')", "Tunnels", new long[] { 10*60*1000, 60*60*1000 });
-        _context.statManager().createRateStat("tunnel.handleLoadClove", "When do we receive load test cloves", "Tunnels", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
+        // all createRateStat in TunnelDispatcher
     }
     
     public void distribute(I2NPMessage msg, Hash target) {
@@ -53,17 +55,45 @@ public class InboundMessageDistributor implements GarlicMessageReceiver.CloveRec
         }
         */
         
+        // FVSJ could also result in a DSRM.
+        // Since there's some code that replies directly to this to gather new ff RouterInfos,
+        // sanitize it
         if ( (_client != null) && 
+             (msg.getType() == DatabaseSearchReplyMessage.MESSAGE_TYPE) &&
+             (_client.equals(((DatabaseSearchReplyMessage)msg).getSearchKey()))) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Removing replies from a DSRM down a tunnel for " + _client.toBase64() + ": " + msg);
+            DatabaseSearchReplyMessage orig = (DatabaseSearchReplyMessage) msg;
+            DatabaseSearchReplyMessage newMsg = new DatabaseSearchReplyMessage(_context);
+            newMsg.setFromHash(orig.getFromHash());
+            newMsg.setSearchKey(orig.getSearchKey());
+            msg = newMsg;
+        } else if ( (_client != null) && 
+             (msg.getType() == DatabaseStoreMessage.MESSAGE_TYPE) &&
+             (((DatabaseStoreMessage)msg).getEntry().getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO)) {
+            // FVSJ may result in an unsolicited RI store if the peer went non-ff.
+            // Maybe we can figure out a way to handle this safely, so we don't ask him again.
+            // For now, just hope we eventually find out through other means.
+            // Todo: if peer was ff and RI is not ff, queue for exploration in netdb (but that isn't part of the facade now)
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Dropping DSM down a tunnel for " + _client.toBase64() + ": " + msg);
+            return;
+        } else if ( (_client != null) && 
              (msg.getType() != DeliveryStatusMessage.MESSAGE_TYPE) &&
              (msg.getType() != GarlicMessage.MESSAGE_TYPE) &&
-             (msg.getType() != TunnelBuildReplyMessage.MESSAGE_TYPE)) {
+             // allow DSM of our own key (used by FloodfillVerifyStoreJob)
+             // as long as there's no reply token (FVSJ will never set a reply token but an attacker might)
+             ((msg.getType() != DatabaseStoreMessage.MESSAGE_TYPE)  || (!_client.equals(((DatabaseStoreMessage)msg).getKey())) ||
+              (((DatabaseStoreMessage)msg).getReplyToken() != 0)) &&
+             (msg.getType() != TunnelBuildReplyMessage.MESSAGE_TYPE) &&
+             (msg.getType() != VariableTunnelBuildReplyMessage.MESSAGE_TYPE)) {
             // drop it, since we should only get tunnel test messages and garlic messages down
             // client tunnels
             _context.statManager().addRateData("tunnel.dropDangerousClientTunnelMessage", 1, msg.getType());
             _log.error("Dropped dangerous message down a tunnel for " + _client.toBase64() + ": " + msg, new Exception("cause"));
             return;
         }
-        
+
         if ( (target == null) || ( (tunnel == null) && (_context.routerHash().equals(target) ) ) ) {
             // targetting us either implicitly (no target) or explicitly (no tunnel)
             // make sure we don't honor any remote requests directly (garlic instructions, etc)
@@ -134,12 +164,21 @@ public class InboundMessageDistributor implements GarlicMessageReceiver.CloveRec
                         // unnecessarily
                         DatabaseStoreMessage dsm = (DatabaseStoreMessage)data;
                         try {
-                            if (dsm.getValueType() == DatabaseStoreMessage.KEY_TYPE_LEASESET) {
-                                // dont tell anyone else about it if we got it through a client tunnel
-                                // (though this is the default, but it doesn't hurt to make it explicit)
-                                if (_client != null)
-                                    dsm.getLeaseSet().setReceivedAsPublished(false);
-                                _context.netDb().store(dsm.getKey(), dsm.getLeaseSet());
+                            if (dsm.getEntry().getType() == DatabaseEntry.KEY_TYPE_LEASESET) {
+                                // If it was stored to us before, don't undo the
+                                // receivedAsPublished flag so we will continue to respond to requests
+                                // for the leaseset. That is, we don't want this to change the
+                                // RAP flag of the leaseset.
+                                // When the keyspace rotates at midnight, and this leaseset moves out
+                                // of our keyspace, maybe we shouldn't do this?
+                                // Should we do this whether ff or not?
+                                LeaseSet ls = (LeaseSet) dsm.getEntry();
+                                LeaseSet old = _context.netDb().store(dsm.getKey(), ls);
+                                if (old != null && old.getReceivedAsPublished()
+                                    /** && ((FloodfillNetworkDatabaseFacade)_context.netDb()).floodfillEnabled() **/ )
+                                    ls.setReceivedAsPublished(true);
+                                if (_log.shouldLog(Log.INFO))
+                                    _log.info("Storing LS for: " + dsm.getKey() + " sent to: " + _client);
                             } else {                                        
                                 if (_client != null) {
                                     // drop it, since the data we receive shouldn't include router 
@@ -150,7 +189,7 @@ public class InboundMessageDistributor implements GarlicMessageReceiver.CloveRec
                                     _log.error("Dropped dangerous message down a tunnel for " + _client.toBase64() + ": " + dsm, new Exception("cause"));
                                     return;
                                 }
-                                _context.netDb().store(dsm.getKey(), dsm.getRouterInfo());
+                                _context.netDb().store(dsm.getKey(), (RouterInfo) dsm.getEntry());
                             }
                         } catch (IllegalArgumentException iae) {
                             if (_log.shouldLog(Log.WARN))
@@ -177,6 +216,7 @@ public class InboundMessageDistributor implements GarlicMessageReceiver.CloveRec
                     return;
                 }
             case DeliveryInstructions.DELIVERY_MODE_DESTINATION:
+                // Can we route UnknownI2NPMessages to a destination too?
                 if (!(data instanceof DataMessage)) {
                     if (_log.shouldLog(Log.ERROR))
                         _log.error("cant send a " + data.getClass().getName() + " to a destination");

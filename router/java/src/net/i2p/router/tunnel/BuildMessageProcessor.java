@@ -9,7 +9,8 @@ import net.i2p.data.PrivateKey;
 import net.i2p.data.SessionKey;
 import net.i2p.data.i2np.BuildRequestRecord;
 import net.i2p.data.i2np.TunnelBuildMessage;
-import net.i2p.util.DecayingBloomFilter;
+import net.i2p.router.util.DecayingBloomFilter;
+import net.i2p.router.util.DecayingHashSet;
 import net.i2p.util.Log;
 
 /**
@@ -19,11 +20,11 @@ import net.i2p.util.Log;
  * the next hop
  */
 public class BuildMessageProcessor {
-    private DecayingBloomFilter _filter;
+    private final DecayingBloomFilter _filter;
     
     public BuildMessageProcessor(I2PAppContext ctx) {
-        _filter = new DecayingBloomFilter(ctx, 60*1000, 32);
-        ctx.statManager().createRateStat("tunnel.buildRequestDup", "How frequently we get dup build request messages", "Tunnels", new long[] { 60*1000, 10*60*1000 });
+        _filter = new DecayingHashSet(ctx, 60*1000, 32, "TunnelBMP");
+        // all createRateStat in TunnelDispatcher
     }
     /**
      * Decrypt the record targetting us, encrypting all of the other records with the included 
@@ -42,7 +43,7 @@ public class BuildMessageProcessor {
         long totalEq = 0;
         long totalDup = 0;
         long beforeLoop = System.currentTimeMillis();
-        for (int i = 0; i < TunnelBuildMessage.RECORD_COUNT; i++) {
+        for (int i = 0; i < msg.getRecordCount(); i++) {
             ByteArray rec = msg.getRecord(i);
             int off = rec.getOffset();
             int len = BuildRequestRecord.PEER_SIZE;
@@ -86,7 +87,7 @@ public class BuildMessageProcessor {
         SessionKey replyKey = rv.readReplyKey();
         byte iv[] = rv.readReplyIV();
         int ivOff = 0;
-        for (int i = 0; i < TunnelBuildMessage.RECORD_COUNT; i++) {
+        for (int i = 0; i < msg.getRecordCount(); i++) {
             if (i != ourHop) {
                 ByteArray data = msg.getRecord(i);
                 if (log.shouldLog(Log.DEBUG))

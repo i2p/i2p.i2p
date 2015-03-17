@@ -1,0 +1,93 @@
+/* I2P Theme Override: Light */
+/* Comment: Larger text & other optimizations for Chinese & other doublebyte charactersets */
+/* Author: dr|z3d */
+
+div.routersummary table {
+    font-size: 8.5pt;
+}
+
+div.routersummary a {
+    font-size: 10pt;
+}
+
+div.routersummary h3, div.routersummary h4, div.routersummary p, div.routersummary h3 a, div.routersummary a {
+     text-shadow: 0 0 0 0 !important;
+}
+
+
+div.routersummary h4, div.routersummary h4 a {
+     font-size: 11pt !important;
+     letter-spacing: 0.1em;
+     -moz-box-shadow: inset 0px 0px 1px 15px #dfd;
+}
+div.routersummary b {
+     font-size: 9.5pt;
+     font-weight: normal !important;
+}
+
+div.routersummary a {
+     word-spacing: 0.1em !important;
+     letter-spacing: 0.05em !important;
+     font-size: 10.5pt;
+     line-height: 150%;
+}
+
+h1, h2,h3,h4 {
+     font-weight: normal !important;
+     text-shadow: 0 0 0;
+     word-spacing: 0.1em;
+}
+
+b, a, input, button, submit, i, th, thead, tfoot{
+     font-weight: normal !important;
+     font-style: normal !important;
+}
+
+button, button:visited {
+    font-size: 10.5pt;
+    font-family: Verdana, "Bitstream Vera Sans", Tahoma, Helvetica, sans-serif;
+}
+
+b {
+     color: #152 !important;
+}
+
+div.news {
+     font-size: 9pt;
+}
+
+input, input:visited {
+     font-size: 10pt !Important;
+}
+
+.smallhead {
+     font-size: 8.5pt
+}
+
+table {
+     font: 8.5pt/130% Verdana, "Bitstream Vera Sans", Tahoma, Helvetica, sans-serif;
+}
+
+td {
+     font-size: 9pt;
+}
+
+.statusnotes {
+     font-size: 10pt;
+     letter-spacing: 0.2em !important;
+     text-shadow: none !important;
+}
+
+.tablefooter tr, .tablefooter td {
+     font-size: 10pt !important;
+}
+
+div.tunnels a {
+     font-size: 9.5pt !important;
+     letter-spacing: 0 !important;
+     word-spacing: 0 !important;
+}
+
+code, tt {
+     font-size: 10pt !important;
+}

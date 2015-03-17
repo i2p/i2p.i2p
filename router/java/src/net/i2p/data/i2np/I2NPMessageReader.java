@@ -23,6 +23,15 @@ import net.i2p.util.Log;
  * thrown, or the connection being closed.  Routers should use this rather
  * than read from the stream themselves.
  *
+ * Deprecated - unused.
+ * This was used by the old TCP transport.
+ * Both the NTCP and SSU transports provide encapsulation
+ * of I2NP messages, so they use I2NPMessageHandlers directly.
+ * If we ever add a transport that does not provide encapsulation,
+ * this will be useful again.
+ *
+ * @deprecated unused
+ *
  * @author jrandom
  */
 public class I2NPMessageReader {
@@ -56,16 +65,19 @@ public class I2NPMessageReader {
      *
      */
     public void startReading() { _readerThread.start(); }
+
     /**
      * Have the already started reader pause its reading indefinitely
-     *
+     * @deprecated unused
      */
     public void pauseReading() { _reader.pauseRunner(); }
+
     /**
      * Resume reading after a pause
-     *
+     * @deprecated unused
      */
     public void resumeReading() { _reader.resumeRunner(); }
+
     /**
      * Cancel reading.
      *
@@ -106,8 +118,13 @@ public class I2NPMessageReader {
             _stayAlive = true;
             _handler = new I2NPMessageHandler(_context);
         }
+
+        /** deprecated unused */
         public void pauseRunner() { _doRun = false; }
+
+        /** deprecated unused */
         public void resumeRunner() { _doRun = true; }
+
         public void cancelRunner() {
             _doRun = false;
             _stayAlive = false;
@@ -153,7 +170,8 @@ public class I2NPMessageReader {
                         cancelRunner();
                     }
                 }
-                if (!_doRun) {
+                // ??? unused
+                if (_stayAlive && !_doRun) {
                     // pause .5 secs when we're paused
                     try { Thread.sleep(500); } catch (InterruptedException ie) {}
                 }

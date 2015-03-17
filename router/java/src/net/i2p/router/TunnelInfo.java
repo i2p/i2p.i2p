@@ -34,6 +34,27 @@ public interface TunnelInfo {
     /** retrieve the peer at the given hop.  the gateway is hop 0 */
     public Hash getPeer(int hop);
 
+    /**
+     *  For convenience
+     *  @return getPeer(0)
+     *  @since 0.8.9
+     */
+    public Hash getGateway();
+
+    /**
+     *  For convenience
+     *  @return getPeer(getLength() - 1)
+     *  @since 0.8.9
+     */
+    public Hash getEndpoint();
+
+    /**
+     *  For convenience
+     *  @return isInbound() ? getGateway() : getEndpoint()
+     *  @since 0.8.9
+     */
+    public Hash getFarEnd();
+
     /** is this an inbound tunnel? */
     public boolean isInbound();
 
@@ -47,10 +68,23 @@ public interface TunnelInfo {
      */
     public void testSuccessful(int responseTime);
     
-    public long getProcessedMessagesCount();
+    public int getProcessedMessagesCount();
     
     /** we know for sure that this many bytes travelled through the tunnel in its lifetime */
     public long getVerifiedBytesTransferred();
+
     /** we know for sure that the given number of bytes were sent down the tunnel fully */
     public void incrementVerifiedBytesTransferred(int numBytes);
+
+    /**
+     *  Did we reuse this tunnel?
+     *  @since 0.8.11
+     */
+    public boolean wasReused();
+
+    /**
+     *  Note that we reused this tunnel
+     *  @since 0.8.11
+     */
+    public void setReused();
 }

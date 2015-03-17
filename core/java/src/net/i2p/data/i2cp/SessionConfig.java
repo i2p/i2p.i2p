@@ -14,7 +14,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Date;
-import java.util.Iterator;
+import java.util.Map;
 import java.util.Properties;
 
 import net.i2p.crypto.DSAEngine;
@@ -26,6 +26,7 @@ import net.i2p.data.Signature;
 import net.i2p.data.SigningPrivateKey;
 import net.i2p.util.Clock;
 import net.i2p.util.Log;
+import net.i2p.util.OrderedProperties;
 
 /**
  * Defines the information a client must provide to create a session
@@ -51,9 +52,7 @@ public class SessionConfig extends DataStructureImpl {
     }
     public SessionConfig(Destination dest) {
         _destination = dest;
-        _signature = null;
         _creationDate = new Date(Clock.getInstance().now());
-        _options = null;
     }
 
     /**
@@ -170,10 +169,10 @@ public class SessionConfig extends DataStructureImpl {
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         try {
-            _log.debug("PubKey size for destination: " + _destination.getPublicKey().getData().length);
-            _log.debug("SigningKey size for destination: " + _destination.getSigningPublicKey().getData().length);
+            //_log.debug("PubKey size for destination: " + _destination.getPublicKey().getData().length);
+            //_log.debug("SigningKey size for destination: " + _destination.getSigningPublicKey().getData().length);
             _destination.writeBytes(out);
-            DataHelper.writeProperties(out, _options);
+            DataHelper.writeProperties(out, _options, true);  // UTF-8
             DataHelper.writeDate(out, _creationDate);
         } catch (IOException ioe) {
             _log.error("IOError signing", ioe);
@@ -198,11 +197,12 @@ public class SessionConfig extends DataStructureImpl {
         if ((_destination == null) || (_options == null) || (_signature == null) || (_creationDate == null))
             throw new DataFormatException("Not enough data to create the session config");
         _destination.writeBytes(out);
-        DataHelper.writeProperties(out, _options);
+        DataHelper.writeProperties(out, _options, true);  // UTF-8
         DataHelper.writeDate(out, _creationDate);
         _signature.writeBytes(out);
     }
 
+    /* FIXME missing hashCode() method FIXME */
     @Override
     public boolean equals(Object object) {
         if ((object != null) && (object instanceof SessionConfig)) {
@@ -218,14 +218,16 @@ public class SessionConfig extends DataStructureImpl {
 
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer("[SessionConfig: ");
+        StringBuilder buf = new StringBuilder("[SessionConfig: ");
         buf.append("\n\tDestination: ").append(getDestination());
         buf.append("\n\tSignature: ").append(getSignature());
         buf.append("\n\tCreation Date: ").append(getCreationDate());
-        buf.append("\n\tOptions: #: ").append(getOptions().size());
-        for (Iterator iter = getOptions().keySet().iterator(); iter.hasNext();) {
-            String key = (String) iter.next();
-            String val = getOptions().getProperty(key);
+        buf.append("\n\tOptions: #: ").append(_options.size());
+        Properties sorted = new OrderedProperties();
+        sorted.putAll(_options);
+        for (Map.Entry e : sorted.entrySet()) {
+            String key = (String) e.getKey();
+            String val = (String) e.getValue();
             buf.append("\n\t\t[").append(key).append("] = [").append(val).append("]");
         }
         buf.append("]");

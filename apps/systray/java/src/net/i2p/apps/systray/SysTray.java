@@ -10,9 +10,12 @@
 package net.i2p.apps.systray;
 
 import java.awt.Frame;
+import java.io.File;
 
+import net.i2p.I2PAppContext;
 import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
+
 import snoozesoft.systray4j.SysTrayMenu;
 import snoozesoft.systray4j.SysTrayMenuEvent;
 import snoozesoft.systray4j.SysTrayMenuIcon;
@@ -34,9 +37,12 @@ public class SysTray implements SysTrayMenuListener {
     private static String         _portString;
     private static boolean        _showIcon;
     private static UrlLauncher    _urlLauncher    = new UrlLauncher();
+    private static final boolean _is64 = "64".equals(System.getProperty("sun.arch.data.model")) ||
+                                         System.getProperty("os.arch").contains("64");
 
     static {
-        if (!_configFile.init("systray.config")) {
+        File config = new File(I2PAppContext.getGlobalContext().getConfigDir(), "systray.config");
+        if (!_configFile.init(config.getAbsolutePath())) {
             _configFile.setProperty("browser", "default");
             _configFile.setProperty("port", "7657");
         }
@@ -48,7 +54,7 @@ public class SysTray implements SysTrayMenuListener {
         //if (!(new File("router.config")).exists())
         //    openRouterConsole("http://localhost:" + _portString + "/index.jsp");
 
-        if ( (System.getProperty("os.name").startsWith("Windows")) && (!Boolean.getBoolean("systray.disable")) )
+        if ( (System.getProperty("os.name").startsWith("Windows")) && (!Boolean.getBoolean("systray.disable")) && (!_is64))
             _instance = new SysTray();
     }
 
@@ -132,7 +138,7 @@ public class SysTray implements SysTrayMenuListener {
     public void iconLeftClicked(SysTrayMenuEvent e) {}
 
     public void iconLeftDoubleClicked(SysTrayMenuEvent e) {
-        openRouterConsole("http://localhost:" + _portString + "/index.jsp");
+        openRouterConsole("http://127.0.0.1:" + _portString + "/index.jsp");
     }
 
     public void menuItemSelected(SysTrayMenuEvent e) {
@@ -153,7 +159,7 @@ public class SysTray implements SysTrayMenuListener {
             if (!(browser = promptForBrowser("Select browser")).equals("nullnull"))
                 setBrowser(browser);
         } else if (e.getActionCommand().equals("openconsole")) {
-            openRouterConsole("http://localhost:" + _portString + "/index.jsp");
+            openRouterConsole("http://127.0.0.1:" + _portString + "/index.jsp");
         }
     }
 
@@ -179,5 +185,21 @@ public class SysTray implements SysTrayMenuListener {
         //_sysTrayMenu.addItem(_itemSelectBrowser);
         _sysTrayMenu.addItem(_itemOpenConsole);
         refreshDisplay();
+    }
+
+    /**
+     *  Starts SysTray, even on linux (but requires kde3 libsystray4j.so to do anything)
+     *  @since 0.8.1
+     */
+    public static void main(String args[]) {
+        System.err.println("SysTray4j version " + SysTrayMenu.VERSION);
+        System.err.println("Hit ^C to exit");
+        new SysTray();
+        Thread t = Thread.currentThread();
+        synchronized(t) {
+            try {
+                t.wait();
+            } catch (InterruptedException ie) {}
+        }
     }
 }

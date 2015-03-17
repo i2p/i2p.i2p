@@ -21,7 +21,7 @@ import net.i2p.router.RouterContext;
  *
  */
 public class GarlicMessageHandler implements HandlerJobBuilder {
-    private RouterContext _context;
+    private final RouterContext _context;
     
     public GarlicMessageHandler(RouterContext context) {
         _context = context;

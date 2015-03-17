@@ -1,7 +1,6 @@
 package net.i2p.client.streaming;
 
 import net.i2p.I2PAppContext;
-import net.i2p.util.Log;
 
 /**
  * <p>Scheduler used for after both sides have had their close packets
@@ -25,10 +24,8 @@ import net.i2p.util.Log;
  *
  */
 class SchedulerClosed extends SchedulerImpl {
-    private Log _log;
     public SchedulerClosed(I2PAppContext ctx) {
         super(ctx);
-        _log = ctx.logManager().getLog(SchedulerClosed.class);
     }
     
     public boolean accept(Connection con) {

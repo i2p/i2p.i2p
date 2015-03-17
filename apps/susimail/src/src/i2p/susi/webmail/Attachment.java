@@ -56,16 +56,12 @@ public class Attachment {
 	public void setBuffer(ReadBuffer buffer) {
 		this.buffer = buffer;
 	}
-	/**
-	 * @return
-	 */
+
 	public String getTransferEncoding() {
 		// TODO Auto-generated method stub
 		return transferEncoding;
 	}
-	/**
-	 * @return
-	 */
+
 	public String getContentType() {
 		// TODO Auto-generated method stub
 		return contentType;
@@ -82,9 +78,7 @@ public class Attachment {
 	public void setTransferEncoding(String transferEncoding) {
 		this.transferEncoding = transferEncoding;
 	}
-	/**
-	 * @param string
-	 */
+
 	public void setData(String data ) {
 		this.data = data;
 	}

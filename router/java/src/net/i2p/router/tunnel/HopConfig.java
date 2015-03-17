@@ -1,7 +1,5 @@
 package net.i2p.router.tunnel;
 
-import java.util.Map;
-
 import net.i2p.data.ByteArray;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
@@ -25,29 +23,21 @@ public class HopConfig {
     private ByteArray _replyIV;
     private long _creation;
     private long _expiration;
-    private Map _options;
-    private long _messagesProcessed;
-    private long _oldMessagesProcessed;
-    private long _messagesSent;
-    private long _oldMessagesSent;
+    //private Map _options;
+
+    // these 4 were longs, let's save some space
+    // 2 billion * 1KB / 10 minutes = 3 GBps in a single tunnel
+    private int _messagesProcessed;
+    private int _oldMessagesProcessed;
+    //private int _messagesSent;
+    //private int _oldMessagesSent;
     
     /** IV length for {@link #getReplyIV} */
     public static final int REPLY_IV_LENGTH = 16;
     
     public HopConfig() {
-        _receiveTunnelId = null;
-        _receiveFrom = null;
-        _sendTunnelId = null;
-        _sendTo = null;
-        _layerKey = null;
-        _ivKey = null;
         _creation = -1;
         _expiration = -1;
-        _options = null;
-        _messagesProcessed = 0;
-        _oldMessagesProcessed = 0;
-        _messagesSent = 0;
-        _oldMessagesSent = 0;
     }
     
     /** what tunnel ID are we receiving on? */
@@ -57,6 +47,7 @@ public class HopConfig {
             _receiveTunnel = getTunnel(_receiveTunnelId); 
         return _receiveTunnel;
     }
+
     public void setReceiveTunnelId(byte id[]) { _receiveTunnelId = id; }
     public void setReceiveTunnelId(TunnelId id) { _receiveTunnelId = DataHelper.toLong(4, id.getTunnelId()); }
     
@@ -73,7 +64,7 @@ public class HopConfig {
     }
     public void setSendTunnelId(byte id[]) { _sendTunnelId = id; }
     
-    private TunnelId getTunnel(byte id[]) {
+    private static TunnelId getTunnel(byte id[]) {
         if (id == null)
             return null;
         else
@@ -115,32 +106,47 @@ public class HopConfig {
      * would be a Boolean, etc).
      *
      */
-    public Map getOptions() { return _options; }
-    public void setOptions(Map options) { _options = options; }
+    //public Map getOptions() { return _options; }
+    //public void setOptions(Map options) { _options = options; }
     
-    /** take note of a message being pumped through this tunnel */
-    /** "processed" is for incoming and "sent" is for outgoing (could be dropped in between) */
+    /**
+     *  Take note of a message being pumped through this tunnel.
+     *  "processed" is for incoming and "sent" is for outgoing (could be dropped in between)
+     */
     public void incrementProcessedMessages() { _messagesProcessed++; }
-    public long getProcessedMessagesCount() { return _messagesProcessed; }
-    public long getRecentMessagesCount() {
-        long rv = _messagesProcessed - _oldMessagesProcessed;
+
+    public int getProcessedMessagesCount() { return _messagesProcessed; }
+
+    public int getRecentMessagesCount() {
+        int rv = _messagesProcessed - _oldMessagesProcessed;
         _oldMessagesProcessed = _messagesProcessed;
         return rv;
     }
+
+    /**
+     *  Take note of a message being pumped through this tunnel.
+     *  "processed" is for incoming and "sent" is for outgoing (could be dropped in between)
+     */
+  /****
     public void incrementSentMessages() { _messagesSent++; }
-    public long getSentMessagesCount() { return _messagesSent; }
-    public long getRecentSentMessagesCount() {
-        long rv = _messagesSent - _oldMessagesSent;
+
+    public int getSentMessagesCount() { return _messagesSent; }
+
+    public int getRecentSentMessagesCount() {
+        int rv = _messagesSent - _oldMessagesSent;
         _oldMessagesSent = _messagesSent;
         return rv;
     }
+  ****/
     
+    /** */
+    @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer(64);
+        StringBuilder buf = new StringBuilder(64);
         if (_receiveTunnelId != null) {
             buf.append("recv on ");
             buf.append(DataHelper.fromLong(_receiveTunnelId, 0, 4));
-            buf.append(" ");
+            buf.append(' ');
         }
         
         if (_sendTo != null) {
@@ -149,8 +155,9 @@ public class HopConfig {
                 buf.append(DataHelper.fromLong(_sendTunnelId, 0, 4));
         }
         
-        buf.append(" expiring on ").append(TunnelCreatorConfig.format(_expiration));
-        buf.append(" having transferred ").append(_messagesProcessed).append("KB");
+        buf.append(" exp. ").append(TunnelCreatorConfig.format(_expiration));
+        if (_messagesProcessed > 0)
+            buf.append(" used ").append(_messagesProcessed).append("KB");
         return buf.toString();
     }
 }

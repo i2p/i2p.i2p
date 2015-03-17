@@ -10,26 +10,21 @@ package net.i2p.router.startup;
 
 import net.i2p.router.JobImpl;
 import net.i2p.router.RouterContext;
-import net.i2p.util.Log;
 
+/** start I2CP interface */
 public class StartAcceptingClientsJob extends JobImpl {
-    private Log _log;
     
     public StartAcceptingClientsJob(RouterContext context) {
         super(context);
-        _log = context.logManager().getLog(StartAcceptingClientsJob.class);
     }
     
     public String getName() { return "Start Accepting Clients"; }
     
     public void runJob() {
-        // start up the network database
 
         getContext().clientManager().startup();
 
-        getContext().jobQueue().addJob(new ReadConfigJob(getContext()));
         // pointless
         //getContext().jobQueue().addJob(new RebuildRouterInfoJob(getContext()));
-        getContext().jobQueue().allowParallelOperation();
     }
 }

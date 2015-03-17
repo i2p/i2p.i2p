@@ -1,0 +1,88 @@
+# Swedish debconf translation
+# Copyright (C) 2011 The I2P Project
+# This file is distributed under the same license as the i2p package.
+#
+# Translators:
+# Martin Svensson <digitalmannen@gmail.com>, 2011.
+msgid ""
+msgstr ""
+"Project-Id-Version: I2P\n"
+"Report-Msgid-Bugs-To: https://trac.i2p2.de/\n"
+"POT-Creation-Date: 2011-12-27 22:25+0000\n"
+"PO-Revision-Date: 2011-12-26 09:48+0000\n"
+"Last-Translator: Martin Svensson <digitalmannen@gmail.com>\n"
+"Language-Team: Swedish (Sweden) (http://www.transifex.net/projects/p/I2P/"
+"team/sv_SE/)\n"
+"Language: sv_SE\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+
+#. Type: boolean
+#. Description
+#: ../i2p.templates:2001
+msgid "Should the I2P router be started at boot?"
+msgstr "Skall I2P rutern startas vid uppstart?"
+
+#. Type: boolean
+#. Description
+#: ../i2p.templates:2001
+msgid ""
+"The I2P router can be run as a daemon that starts automatically when your "
+"computer boots up. This is the recommended configuration."
+msgstr ""
+"I2P routern kan köras som en tjänst (daemon) som automatiskt startas när "
+"datorn startas. Detta rekommenderas. "
+
+#. Type: string
+#. Description
+#: ../i2p.templates:3001
+msgid "I2P daemon user:"
+msgstr "Konto för I2P tjänsten:"
+
+#. Type: string
+#. Description
+#: ../i2p.templates:3001
+msgid ""
+"By default I2P is configured to run under the account i2psvc when running as "
+"a daemon. To use an **existing** I2P profile you may enter a different "
+"account name here. For example, if your previous I2P installation is at /"
+"home/user/i2p, you may enter 'user' here."
+msgstr ""
+"Som standard är I2P inställt för att köras under kontot i2psvc mär den körs "
+"som tjänst. För att använda ett **existerande** I2P profil, ange ett annat "
+"konto här. Exempelvis, om din tidigare I2P installation är /home/user/i2p så "
+"ange 'user' här."
+
+#. Type: string
+#. Description
+#: ../i2p.templates:3001
+msgid ""
+"Very important: If a user other than the default of 'i2psvc' is entered "
+"here, the chosen username *MUST* already exist."
+msgstr ""
+"OBS! Viktigt: Om en annan användare än standard 'i2psvc' skrivs in här. "
+"\"MÅSTE\" det användarnamnet redan existera."
+
+#. Type: string
+#. Description
+#: ../i2p.templates:4001
+msgid "Memory that can be allocated to I2P:"
+msgstr "Minne som kan tilldelas I2P"
+
+#. Type: string
+#. Description
+#: ../i2p.templates:4001
+msgid "By default, I2P will only be allowed to use up to 128MB of RAM."
+msgstr "Som standard kommer I2P bara att använda 128MB RAM "
+
+#. Type: string
+#. Description
+#: ../i2p.templates:4001
+msgid ""
+"High bandwidth routers, as well as routers with a lot of active torrents / "
+"plugins, may need to have this value increased."
+msgstr ""
+"För routrar med hög bandbredd eller routrar med hög aktivitet kan detta "
+"behöva ökas"

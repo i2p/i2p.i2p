@@ -14,24 +14,26 @@ import net.i2p.util.SimpleTimer2;
  * A stream that we can shove data into that fires off those bytes
  * on flush or when the buffer is full.  It also blocks according
  * to the data receiver's needs.
+ *<p>
+ * MessageOutputStream -> ConnectionDataReceiver -> Connection -> PacketQueue -> I2PSession
  */
-public class MessageOutputStream extends OutputStream {
-    private I2PAppContext _context;
-    private Log _log;
+class MessageOutputStream extends OutputStream {
+    private final I2PAppContext _context;
+    private final Log _log;
     private byte _buf[];
     private int _valid;
-    private Object _dataLock;
-    private DataReceiver _dataReceiver;
+    private final Object _dataLock;
+    private final DataReceiver _dataReceiver;
     private IOException _streamError;
-    private boolean _closed;
+    private volatile boolean _closed;
     private long _written;
     private int _writeTimeout;
     private ByteCache _dataCache;
-    private Flusher _flusher;
+    private final Flusher _flusher;
     private long _lastFlushed;
-    private long _lastBuffered;
+    private volatile long _lastBuffered;
     /** if we enqueue data but don't flush it in this period, flush it passively */
-    private int _passiveFlushDelay;
+    private final int _passiveFlushDelay;
     /** 
      * if we are changing the buffer size during operation, set this to the new 
      * buffer size, and next time we are flushing, update the _buf array to the new 
@@ -39,19 +41,30 @@ public class MessageOutputStream extends OutputStream {
      */
     private volatile int _nextBufferSize;
     // rate calc helpers
-    private long _sendPeriodBeginTime;
-    private long _sendPeriodBytes;
-    private int _sendBps;
+    //private long _sendPeriodBeginTime;
+    //private long _sendPeriodBytes;
+    //private int _sendBps;
     
+    /**
+     *  Since this is less than i2ptunnel's i2p.streaming.connectDelay default of 1000,
+     *  we only wait 250 at the start. Guess that's ok, 1000 is too long anyway.
+     */
     private static final int DEFAULT_PASSIVE_FLUSH_DELAY = 250;
 
+/****
     public MessageOutputStream(I2PAppContext ctx, DataReceiver receiver) {
         this(ctx, receiver, Packet.MAX_PAYLOAD_SIZE);
     }
-    public MessageOutputStream(I2PAppContext ctx, DataReceiver receiver, int bufSize) {
-        this(ctx, receiver, bufSize, DEFAULT_PASSIVE_FLUSH_DELAY);
+****/
+
+    /** */
+    public MessageOutputStream(I2PAppContext ctx, SimpleTimer2 timer,
+                               DataReceiver receiver, int bufSize) {
+        this(ctx, timer, receiver, bufSize, DEFAULT_PASSIVE_FLUSH_DELAY);
     }
-    public MessageOutputStream(I2PAppContext ctx, DataReceiver receiver, int bufSize, int passiveFlushDelay) {
+
+    public MessageOutputStream(I2PAppContext ctx, SimpleTimer2 timer,
+                               DataReceiver receiver, int bufSize, int passiveFlushDelay) {
         super();
         _dataCache = ByteCache.getInstance(128, bufSize);
         _context = ctx;
@@ -59,23 +72,19 @@ public class MessageOutputStream extends OutputStream {
         _buf = _dataCache.acquire().getData(); // new byte[bufSize];
         _dataReceiver = receiver;
         _dataLock = new Object();
-        _written = 0;
-        _closed = false;
         _writeTimeout = -1;
         _passiveFlushDelay = passiveFlushDelay;
         _nextBufferSize = -1;
-        _sendPeriodBeginTime = ctx.clock().now();
-        _sendPeriodBytes = 0;
-        _sendBps = 0;
-        _context.statManager().createRateStat("stream.sendBps", "How fast we pump data through the stream", "Stream", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
-        _flusher = new Flusher();
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("MessageOutputStream created");
+        //_sendPeriodBeginTime = ctx.clock().now();
+        //_context.statManager().createRateStat("stream.sendBps", "How fast we pump data through the stream", "Stream", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
+        _flusher = new Flusher(timer);
+        //if (_log.shouldLog(Log.DEBUG))
+        //    _log.debug("MessageOutputStream created");
     }
     
     public void setWriteTimeout(int ms) { 
-        if (_log.shouldLog(Log.INFO))
-            _log.info("Changing write timeout from " + _writeTimeout + " to " + ms);
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Changing write timeout from " + _writeTimeout + " to " + ms);
 
         _writeTimeout = ms; 
     }
@@ -124,10 +133,8 @@ public class MessageOutputStream extends OutputStream {
                     remaining -= toWrite;
                     cur += toWrite;
                     _valid = _buf.length;
-                    if (_dataReceiver == null) {
-                        throwAnyError();
-                        return;
-                    }
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("write() direct valid = " + _valid);
                     ws = _dataReceiver.writeData(_buf, 0, _valid);
                     _written += _valid;
                     _valid = 0;                       
@@ -138,17 +145,22 @@ public class MessageOutputStream extends OutputStream {
                 }
             }
             if (ws != null) {
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Waiting " + _writeTimeout + "ms for accept of " + ws);
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Waiting " + _writeTimeout + "ms for accept of " + ws);
                 // ok, we've actually added a new packet - lets wait until
                 // its accepted into the queue before moving on (so that we 
                 // dont fill our buffer instantly)
                 ws.waitForAccept(_writeTimeout);
                 if (!ws.writeAccepted()) {
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Write not accepted of " + ws);
                     if (_writeTimeout > 0)
                         throw new InterruptedIOException("Write not accepted within timeout: " + ws);
                     else
                         throw new IOException("Write not accepted into the queue: " + ws);
+                } else {
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("After waitForAccept of " + ws);
                 }
             } else {
                 if (_log.shouldLog(Log.DEBUG))
@@ -156,12 +168,13 @@ public class MessageOutputStream extends OutputStream {
             }
         }
         long elapsed = _context.clock().now() - begin;
-        if ( (elapsed > 10*1000) && (_log.shouldLog(Log.DEBUG)) )
-            _log.debug("wtf, took " + elapsed + "ms to write to the stream?", new Exception("foo"));
+        if ( (elapsed > 10*1000) && (_log.shouldLog(Log.INFO)) )
+            _log.info("wtf, took " + elapsed + "ms to write to the stream?", new Exception("foo"));
         throwAnyError();
-        updateBps(len);
+        //updateBps(len);
     }
     
+/****
     private void updateBps(int len) {
         long now = _context.clock().now();
         int periods = (int)Math.floor((now - _sendPeriodBeginTime) / 1000d);
@@ -175,7 +188,9 @@ public class MessageOutputStream extends OutputStream {
             _sendPeriodBytes += len;
         }
     }
+****/
     
+    /** */
     public void write(int b) throws IOException {
         write(new byte[] { (byte)b }, 0, 1);
         throwAnyError();
@@ -203,8 +218,8 @@ public class MessageOutputStream extends OutputStream {
      */
     private class Flusher extends SimpleTimer2.TimedEvent {
         private boolean _enqueued;
-        public Flusher() { 
-            super(RetransmissionTimer.getInstance());
+        public Flusher(SimpleTimer2 timer) { 
+            super(timer);
         }
         public void enqueue() {
             // no need to be overly worried about duplicates - it would just 
@@ -224,14 +239,15 @@ public class MessageOutputStream extends OutputStream {
             _enqueued = true;
         }
         public void timeReached() {
+            if (_closed)
+                return;
             _enqueued = false;
-            DataReceiver rec = _dataReceiver;
             long timeLeft = (_lastBuffered + _passiveFlushDelay - _context.clock().now());
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("flusher time reached: left = " + timeLeft);
             if (timeLeft > 0)
                 enqueue();
-            else if ( (rec != null) && (rec.writeInProcess()) )
+            else if (_dataReceiver.writeInProcess())
                 enqueue(); // don't passive flush if there is a write being done (unacked outbound)
             else
                 doFlush();
@@ -243,9 +259,9 @@ public class MessageOutputStream extends OutputStream {
             synchronized (_dataLock) {
                 long flushTime = _lastBuffered + _passiveFlushDelay;
                 if ( (_valid > 0) && (flushTime <= _context.clock().now()) ) {
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("doFlush() valid = " + _valid);
-                    if ( (_buf != null) && (_dataReceiver != null) ) {
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("doFlush() valid = " + _valid);
+                    if (_buf != null) {
                         ws = _dataReceiver.writeData(_buf, 0, _valid);
                         _written += _valid;
                         _valid = 0;
@@ -255,19 +271,29 @@ public class MessageOutputStream extends OutputStream {
                         sent = true;
                     }
                 } else {
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("doFlush() rejected... valid = " + _valid);
+                    if (_log.shouldLog(Log.INFO) && _valid > 0)
+                        _log.info("doFlush() rejected... valid = " + _valid);
                 }
             }
             // ignore the ws
-            if (sent && _log.shouldLog(Log.DEBUG)) 
-                _log.debug("Passive flush of " + ws);
+            if (sent && _log.shouldLog(Log.INFO)) 
+                _log.info("Passive flush of " + ws);
         }
     }
     
     /** 
-     * Flush the data already queued up, blocking until it has been
-     * delivered.
+     * Flush the data already queued up, blocking only if the outbound
+     * window is full.
+     *
+     * Prior to 0.8.1, this blocked until "delivered".
+     * "Delivered" meant "received an ACK from the far end",
+     * which is not the commom implementation of flush(), and really hurt the
+     * performance of i2psnark, which flush()ed frequently.
+     * Calling flush() would cause a complete window stall.
+     *
+     * As of 0.8.1, only wait for accept into the streaming output queue.
+     * This will speed up snark significantly, and allow us to flush()
+     * the initial data in I2PTunnelRunner, saving 250 ms.
      *
      * @throws IOException if the write fails
      */
@@ -276,26 +302,47 @@ public class MessageOutputStream extends OutputStream {
      /* @throws InterruptedIOException if the write times out
       * Documented here, but doesn't belong in the javadoc. 
       */
+        flush(true);
+    }
+
+    /**
+     *  @param wait_for_accept_only see discussion in close() code
+     *  @@since 0.8.1
+     */
+    private void flush(boolean wait_for_accept_only) throws IOException {
         long begin = _context.clock().now();
         WriteStatus ws = null;
+        if (_log.shouldLog(Log.INFO) && _valid > 0)
+            _log.info("flush() valid = " + _valid);
+
         synchronized (_dataLock) {
             if (_buf == null) {
                 _dataLock.notifyAll();
                 throw new IOException("closed (buffer went away)");
             }
-            if (_dataReceiver == null) {
+
+            // if valid == 0 return ??? - no, this could flush a CLOSE packet too.
+
+            // Yes, flush here, inside the data lock, and do all the waitForCompletion() stuff below
+            // (disabled)
+            if (!wait_for_accept_only) {
+                ws = _dataReceiver.writeData(_buf, 0, _valid);
+                _written += _valid;
+                _valid = 0;
+                locked_updateBufferSize();
+                _lastFlushed = _context.clock().now();
                 _dataLock.notifyAll();
-                throwAnyError();
-                return;
             }
-            ws = _dataReceiver.writeData(_buf, 0, _valid);
-            _written += _valid;
-            _valid = 0;
-            locked_updateBufferSize();
-            _lastFlushed = _context.clock().now();
-            _dataLock.notifyAll();
         }
         
+        // Skip all the waitForCompletion() stuff below, which is insanity, as of 0.8.1
+        // must do this outside the data lock
+        if (wait_for_accept_only) {
+            flushAvailable(_dataReceiver, true);
+            return;
+        }
+
+        // Wait a loooooong time, until we have the ACK
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("before waiting " + _writeTimeout + "ms for completion of " + ws);
         if (_closed && 
@@ -319,13 +366,29 @@ public class MessageOutputStream extends OutputStream {
         throwAnyError();
     }
     
+    /**
+     *  This does a flush, and BLOCKS until
+     *  the CLOSE packet is acked.
+     */
+    @Override
     public void close() throws IOException {
         if (_closed) {
             synchronized (_dataLock) { _dataLock.notifyAll(); }
             return;
         }
+        // setting _closed before flush() will force flush() to send a CLOSE packet
         _closed = true;
-        flush();
+        _flusher.cancel();
+
+        // In 0.8.1 we rewrote flush() to only wait for accept into the window,
+        // not "completion" (i.e. ack from the far end).
+        // Unfortunately, that broke close(), at least in i2ptunnel HTTPClient.
+        // Symptom was premature close, i.e. incomplete pages and images.
+        // Possible cause - I2PTunnelRunner code? or the code here that follows flush()?
+        // It seems like we shouldn't have to wait for the far-end ACK for a close packet,
+        // should we? To be researched further.
+        // false -> wait for completion, not just accept.
+        flush(false);
         _log.debug("Output stream closed after writing " + _written);
         ByteArray ba = null;
         synchronized (_dataLock) {
@@ -341,9 +404,14 @@ public class MessageOutputStream extends OutputStream {
             _dataCache.release(ba);
         }
     }
-    /** nonblocking close */
+
+    /**
+     *  nonblocking close -
+     *  Only for use inside package
+     */
     public void closeInternal() {
         _closed = true;
+        _flusher.cancel();
         if (_streamError == null)
             _streamError = new IOException("Closed internally");
         clearData(true);
@@ -351,9 +419,12 @@ public class MessageOutputStream extends OutputStream {
     
     private void clearData(boolean shouldFlush) {
         ByteArray ba = null;
+        if (_log.shouldLog(Log.INFO) && _valid > 0)
+            _log.info("clearData() valid = " + _valid);
+
         synchronized (_dataLock) {
             // flush any data, but don't wait for it
-            if ( (_dataReceiver != null) && (_valid > 0) && shouldFlush)
+            if (_valid > 0 && shouldFlush)
                 _dataReceiver.writeData(_buf, 0, _valid);
             _written += _valid;
             _valid = 0;
@@ -397,7 +468,11 @@ public class MessageOutputStream extends OutputStream {
     void flushAvailable(DataReceiver target, boolean blocking) throws IOException {
         WriteStatus ws = null;
         long before = System.currentTimeMillis();
+        if (_log.shouldLog(Log.INFO) && _valid > 0)
+            _log.info("flushAvailable() valid = " + _valid);
         synchronized (_dataLock) {
+            // if valid == 0 return ??? - no, this could flush a CLOSE packet too.
+
             // _buf may be null, but the data receiver can handle that just fine,
             // deciding whether or not to send a packet
             ws = target.writeData(_buf, 0, _valid);
@@ -416,18 +491,18 @@ public class MessageOutputStream extends OutputStream {
             if (ws.writeFailed())
                 throw new IOException("Flush available failed");
             else if (!ws.writeAccepted())
-                throw new InterruptedIOException("Flush available timed out");
+                throw new InterruptedIOException("Flush available timed out (" + _writeTimeout + "ms)");
         }
         long afterAccept = System.currentTimeMillis();
-        if ( (afterAccept - afterBuild > 1000) && (_log.shouldLog(Log.DEBUG)) )
-            _log.debug("Took " + (afterAccept-afterBuild) + "ms to accept a packet? " + ws);
+        if ( (afterAccept - afterBuild > 1000) && (_log.shouldLog(Log.INFO)) )
+            _log.info("Took " + (afterAccept-afterBuild) + "ms to accept a packet? " + ws);
         return;
     }
     
     void destroy() {
-        _dataReceiver = null;
+        _closed = true;
+        _flusher.cancel();
         synchronized (_dataLock) {
-            _closed = true;
             _dataLock.notifyAll();
         }
     }
@@ -443,13 +518,21 @@ public class MessageOutputStream extends OutputStream {
     
     /** Define a way to detect the status of a write */
     public interface WriteStatus {
-        /** wait until the data written either fails or succeeds */
+        /**
+         * Wait until the data written either fails or succeeds.
+         * Success means an ACK FROM THE FAR END.
+         * @param maxWaitMs -1 = forever
+         */
         public void waitForCompletion(int maxWaitMs);
+
         /** 
-         * wait until the data written is accepted into the outbound pool,
+         * Wait until the data written is accepted into the outbound pool,
+         * (i.e. the outbound window is not full)
          * which we throttle rather than accept arbitrary data and queue 
+         * @param maxWaitMs -1 = forever
          */
         public void waitForAccept(int maxWaitMs);
+
         /** the write was accepted.  aka did the socket not close? */
         public boolean writeAccepted();
         /** did the write fail?  */

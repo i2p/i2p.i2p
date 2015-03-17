@@ -2,13 +2,18 @@ package net.i2p.router.tunnel.pool;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 import net.i2p.data.Hash;
+import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.RouterInfo;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelManagerFacade;
-import net.i2p.router.tunnel.TunnelCreatorConfig;
+import net.i2p.stat.Rate;
+import net.i2p.stat.RateStat;
 import net.i2p.stat.StatManager;
 import net.i2p.util.Log;
 
@@ -19,38 +24,52 @@ import net.i2p.util.Log;
  * it waits for a short period before looping again (or until it is told that something
  * changed, such as a tunnel failed, new client started up, or tunnel creation was aborted).
  *
+ * Note that 10 minute tunnel expiration is hardcoded in here.
+ *
+ * As of 0.8.11, inbound request handling is done in a separate thread.
  */
 class BuildExecutor implements Runnable {
-    private RouterContext _context;
-    private Log _log;
-    private TunnelPoolManager _manager;
-    /** list of TunnelCreatorConfig elements of tunnels currently being built */
-    private List _currentlyBuilding;
-    private boolean _isRunning;
-    private BuildHandler _handler;
+    private final ArrayList<Long> _recentBuildIds = new ArrayList(100);
+    private final RouterContext _context;
+    private final Log _log;
+    private final TunnelPoolManager _manager;
+    /** Notify lock */
+    private final Object _currentlyBuilding;
+    /** indexed by ptcc.getReplyMessageId() */
+    private final ConcurrentHashMap<Long, PooledTunnelCreatorConfig> _currentlyBuildingMap;
+    /** indexed by ptcc.getReplyMessageId() */
+    private final ConcurrentHashMap<Long, PooledTunnelCreatorConfig> _recentlyBuildingMap;
+    private volatile boolean _isRunning;
     private boolean _repoll;
+    private static final int MAX_CONCURRENT_BUILDS = 10;
+    /** accept replies up to a minute after we gave up on them */
+    private static final long GRACE_PERIOD = 60*1000;
 
     public BuildExecutor(RouterContext ctx, TunnelPoolManager mgr) {
         _context = ctx;
         _log = ctx.logManager().getLog(getClass());
         _manager = mgr;
-        _currentlyBuilding = new ArrayList(10);
+        _currentlyBuilding = new Object();
+        _currentlyBuildingMap = new ConcurrentHashMap(MAX_CONCURRENT_BUILDS);
+        _recentlyBuildingMap = new ConcurrentHashMap(4 * MAX_CONCURRENT_BUILDS);
         _context.statManager().createRateStat("tunnel.concurrentBuilds", "How many builds are going at once", "Tunnels", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("tunnel.concurrentBuildsLagged", "How many builds are going at once when we reject further builds, due to job lag (period is lag)", "Tunnels", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
-        _context.statManager().createRateStat("tunnel.buildExploratoryExpire", "How often an exploratory tunnel times out during creation", "Tunnels", new long[] { 60*1000, 10*60*1000 });
-        _context.statManager().createRateStat("tunnel.buildClientExpire", "How often a client tunnel times out during creation", "Tunnels", new long[] { 60*1000, 10*60*1000 });
-        _context.statManager().createRateStat("tunnel.buildExploratorySuccess", "Response time for success", "Tunnels", new long[] { 60*1000, 10*60*1000 });
-        _context.statManager().createRateStat("tunnel.buildClientSuccess", "Response time for success", "Tunnels", new long[] { 60*1000, 10*60*1000 });
-        _context.statManager().createRateStat("tunnel.buildExploratoryReject", "Response time for rejection", "Tunnels", new long[] { 60*1000, 10*60*1000 });
-        _context.statManager().createRateStat("tunnel.buildClientReject", "Response time for rejection", "Tunnels", new long[] { 60*1000, 10*60*1000 });
-        _context.statManager().createRateStat("tunnel.buildRequestTime", "How long it takes to build a tunnel request", "Tunnels", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRequiredRateStat("tunnel.buildExploratoryExpire", "No response to our build request", "Tunnels", new long[] { 10*60*1000, 60*60*1000 });
+        _context.statManager().createRequiredRateStat("tunnel.buildClientExpire", "No response to our build request", "Tunnels", new long[] { 10*60*1000, 60*60*1000 });
+        _context.statManager().createRequiredRateStat("tunnel.buildExploratorySuccess", "Response time for success (ms)", "Tunnels", new long[] { 10*60*1000, 60*60*1000 });
+        _context.statManager().createRequiredRateStat("tunnel.buildClientSuccess", "Response time for success (ms)", "Tunnels", new long[] { 10*60*1000, 60*60*1000 });
+        _context.statManager().createRequiredRateStat("tunnel.buildExploratoryReject", "Response time for rejection (ms)", "Tunnels", new long[] { 10*60*1000, 60*60*1000 });
+        _context.statManager().createRequiredRateStat("tunnel.buildClientReject", "Response time for rejection (ms)", "Tunnels", new long[] { 10*60*1000, 60*60*1000 });
+        _context.statManager().createRequiredRateStat("tunnel.buildRequestTime", "Time to build a tunnel request (ms)", "Tunnels", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("tunnel.buildConfigTime", "Time to build a tunnel request (ms)", "Tunnels", new long[] { 60*1000, 10*60*1000 });
         _context.statManager().createRateStat("tunnel.buildRequestZeroHopTime", "How long it takes to build a zero hop tunnel", "Tunnels", new long[] { 60*1000, 10*60*1000 });
-        _context.statManager().createRateStat("tunnel.pendingRemaining", "How many inbound requests are pending after a pass (period is how long the pass takes)?", "Tunnels", new long[] { 60*1000, 10*60*1000 });
+        //_context.statManager().createRateStat("tunnel.pendingRemaining", "How many inbound requests are pending after a pass (period is how long the pass takes)?", "Tunnels", new long[] { 60*1000, 10*60*1000 });
         _context.statManager().createRateStat("tunnel.buildFailFirstHop", "How often we fail to build a OB tunnel because we can't contact the first hop", "Tunnels", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("tunnel.buildReplySlow", "Build reply late, but not too late", "Tunnels", new long[] { 10*60*1000 });
 
         // Get stat manager, get recognized bandwidth tiers
         StatManager statMgr = _context.statManager();
-        String bwTiers = _context.router().getRouterInfo().BW_CAPABILITY_CHARS;
+        String bwTiers = RouterInfo.BW_CAPABILITY_CHARS;
         // For each bandwidth tier, create tunnel build agree/reject/expire stats
         for (int i = 0; i < bwTiers.length(); i++) {
             String bwTier = String.valueOf(bwTiers.charAt(i));
@@ -62,40 +81,85 @@ class BuildExecutor implements Runnable {
         statMgr.createRateStat("tunnel.tierAgreeUnknown", "Agreed joins from unknown", "Tunnels", new long[] { 60*1000, 10*60*1000 });
         statMgr.createRateStat("tunnel.tierRejectUnknown", "Rejected joins from unknown", "Tunnels", new long[] { 60*1000, 10*60*1000 });
         statMgr.createRateStat("tunnel.tierExpireUnknown", "Expired joins from unknown", "Tunnels", new long[] { 60*1000, 10*60*1000 });
-
-        _repoll = false;
-        _handler = new BuildHandler(ctx, this);
     }
     
+    /**
+     *  @since 0.9
+     */
+    public void restart() {
+        synchronized (_recentBuildIds) { 
+            _recentBuildIds.clear();
+        }
+        _currentlyBuildingMap.clear();
+        _recentlyBuildingMap.clear();
+    }
+
+    /**
+     *  Cannot be restarted.
+     *  @since 0.9
+     */
+    public void shutdown() {
+        _isRunning = false;
+        restart();
+    }
+
     private int allowed() {
         int maxKBps = _context.bandwidthLimiter().getOutboundKBytesPerSecond();
         int allowed = maxKBps / 6; // Max. 1 concurrent build per 6 KB/s outbound
-        if (allowed < 2) allowed = 2; // Never choke below 2 builds (but congestion may)
-        if (allowed > 10) allowed = 10; // Never go beyond 10, that is uncharted territory (old limit was 5)
-        allowed = _context.getProperty("router.tunnelConcurrentBuilds", allowed);
-
-        List expired = null;
-        int concurrent = 0;
-        long expireBefore = _context.clock().now() + 10*60*1000 - BuildRequestor.REQUEST_TIMEOUT;
-        synchronized (_currentlyBuilding) {
-            // expire any old requests
-            for (int i = 0; i < _currentlyBuilding.size(); i++) {
-                TunnelCreatorConfig cfg = (TunnelCreatorConfig)_currentlyBuilding.get(i);
-                if (cfg.getExpiration() <= expireBefore) {
-                    _currentlyBuilding.remove(i);
-                    i--;
-                    if (expired == null)
-                        expired = new ArrayList();
-                    expired.add(cfg);
+        RateStat rs = _context.statManager().getRate("tunnel.buildRequestTime");
+        if (rs != null) {
+            Rate r = rs.getRate(60*1000);
+            double avg = 0;
+            if (r != null)
+                avg = r.getAverageValue();
+            if (avg <= 0)
+                avg = rs.getLifetimeAverageValue();
+            if (avg > 1) {
+                // If builds take more than 75 ms, start throttling
+                int throttle = (int) (75 * MAX_CONCURRENT_BUILDS / avg);
+                if (throttle < allowed) {
+                    allowed = throttle;
+                    if (allowed < MAX_CONCURRENT_BUILDS && _log.shouldLog(Log.INFO))
+                        _log.info("Throttling max builds to " + allowed +
+                                  " due to avg build time of " + ((int) avg) + " ms");
                 }
             }
-            concurrent = _currentlyBuilding.size();
-            allowed -= concurrent;
         }
+        if (allowed < 2) allowed = 2; // Never choke below 2 builds (but congestion may)
+        if (allowed > MAX_CONCURRENT_BUILDS) allowed = MAX_CONCURRENT_BUILDS; // Never go beyond 10, that is uncharted territory (old limit was 5)
+        allowed = _context.getProperty("router.tunnelConcurrentBuilds", allowed);
+
+        // expire any REALLY old requests
+        long expireBefore = _context.clock().now() + 10*60*1000 - BuildRequestor.REQUEST_TIMEOUT - GRACE_PERIOD;
+        for (Iterator<PooledTunnelCreatorConfig> iter = _recentlyBuildingMap.values().iterator(); iter.hasNext(); ) {
+            PooledTunnelCreatorConfig cfg = iter.next();
+            if (cfg.getExpiration() <= expireBefore) {
+                iter.remove();
+            }
+        }
+
+        // expire any old requests
+        List<PooledTunnelCreatorConfig> expired = null;
+        int concurrent = 0;
+        // Todo: Make expiration variable
+        expireBefore = _context.clock().now() + 10*60*1000 - BuildRequestor.REQUEST_TIMEOUT;
+        for (Iterator<PooledTunnelCreatorConfig> iter = _currentlyBuildingMap.values().iterator(); iter.hasNext(); ) {
+            PooledTunnelCreatorConfig cfg = iter.next();
+            if (cfg.getExpiration() <= expireBefore) {
+                // save them for another minute
+                _recentlyBuildingMap.putIfAbsent(Long.valueOf(cfg.getReplyMessageId()), cfg);
+                iter.remove();
+                if (expired == null)
+                    expired = new ArrayList();
+                expired.add(cfg);
+            }
+        }
+        concurrent = _currentlyBuildingMap.size();
+        allowed -= concurrent;
         
         if (expired != null) {
             for (int i = 0; i < expired.size(); i++) {
-                PooledTunnelCreatorConfig cfg = (PooledTunnelCreatorConfig)expired.get(i);
+                PooledTunnelCreatorConfig cfg = expired.get(i);
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Timed out waiting for reply asking for " + cfg);
 
@@ -106,7 +170,7 @@ class BuildExecutor implements Runnable {
                     // Look up peer
                     Hash peer = cfg.getPeer(iPeer);
                     // Avoid recording ourselves
-                    if (peer.toBase64().equals(_context.routerHash().toBase64()))
+                    if (peer.equals(_context.routerHash()))
                         continue;
                     // Look up routerInfo
                     RouterInfo ri = _context.netDb().lookupRouterInfoLocally(peer);
@@ -217,25 +281,16 @@ class BuildExecutor implements Runnable {
 
     public void run() {
         _isRunning = true;
-        List wanted = new ArrayList(8);
-        List pools = new ArrayList(8);
+        List<TunnelPool> wanted = new ArrayList(MAX_CONCURRENT_BUILDS);
+        List<TunnelPool> pools = new ArrayList(8);
         
-        int pendingRemaining = 0;
-        
-        //long loopBegin = 0;
-        //long beforeHandleInboundReplies = 0;
-        //long afterHandleInboundReplies = 0;
-        //long afterBuildZeroHop = 0;
-        long afterBuildReal = 0;
-        long afterHandleInbound = 0;
-                
-        while (!_manager.isShutdown()){
+        while (_isRunning && !_manager.isShutdown()){
             //loopBegin = System.currentTimeMillis();
             try {
-                _repoll = pendingRemaining > 0; // resets repoll to false unless there are inbound requeusts pending
+                _repoll = false; // resets repoll to false unless there are inbound requeusts pending
                 _manager.listPools(pools);
                 for (int i = 0; i < pools.size(); i++) {
-                    TunnelPool pool = (TunnelPool)pools.get(i);
+                    TunnelPool pool = pools.get(i);
                     if (!pool.isAlive())
                         continue;
                     int howMany = pool.countHowManyToBuild();
@@ -243,10 +298,6 @@ class BuildExecutor implements Runnable {
                         wanted.add(pool);
                 }
 
-                //beforeHandleInboundReplies = System.currentTimeMillis();
-                _handler.handleInboundReplies();
-                //afterHandleInboundReplies = System.currentTimeMillis();
-                
                 // allowed() also expires timed out requests (for new style requests)
                 int allowed = allowed();
                 
@@ -260,31 +311,35 @@ class BuildExecutor implements Runnable {
                 //if (_log.shouldLog(Log.DEBUG))
                 //    _log.debug("Zero hops built, Allowed: " + allowed + " wanted: " + wanted);
 
-                int realBuilt = 0;
+                //int realBuilt = 0;
                 TunnelManagerFacade mgr = _context.tunnelManager();
-                if ( (mgr == null) || (mgr.selectInboundTunnel() == null) || (mgr.selectOutboundTunnel() == null) ) {
+                if ( (mgr == null) || (mgr.getFreeTunnelCount() <= 0) || (mgr.getOutboundTunnelCount() <= 0) ) {
                     // we don't have either inbound or outbound tunnels, so don't bother trying to build
                     // non-zero-hop tunnels
                     synchronized (_currentlyBuilding) {
                         if (!_repoll) {
                             if (_log.shouldLog(Log.DEBUG))
-                                _log.debug("No tunnel to build with (allowed=" + allowed + ", wanted=" + wanted.size() + ", pending=" + pendingRemaining + "), wait for a while");
-                            _currentlyBuilding.wait(1*1000+_context.random().nextInt(1*1000));
+                                _log.debug("No tunnel to build with (allowed=" + allowed + ", wanted=" + wanted.size() + "), wait for a while");
+                            try {
+                                _currentlyBuilding.wait(1*1000+_context.random().nextInt(1*1000));
+                            } catch (InterruptedException ie) {}
                         }
                     }
                 } else {
-                    if ( (allowed > 0) && (wanted.size() > 0) ) {
+                    if ( (allowed > 0) && (!wanted.isEmpty()) ) {
                         Collections.shuffle(wanted, _context.random());
-                        
+                        Collections.sort(wanted, new TunnelPoolComparator());
+
                         // force the loops to be short, since 3 consecutive tunnel build requests can take
                         // a long, long time
                         if (allowed > 2)
                             allowed = 2;
                         
-                        for (int i = 0; (i < allowed) && (wanted.size() > 0); i++) {
-                            TunnelPool pool = (TunnelPool)wanted.remove(0);
+                        for (int i = 0; (i < allowed) && (!wanted.isEmpty()); i++) {
+                            TunnelPool pool = wanted.remove(0);
                             //if (pool.countWantedTunnels() <= 0)
                             //    continue;
+                            long bef = System.currentTimeMillis();
                             PooledTunnelCreatorConfig cfg = pool.configureNewTunnel();
                             if (cfg != null) {
                                 // 0hops are taken care of above, these are nonstandard 0hops
@@ -295,16 +350,12 @@ class BuildExecutor implements Runnable {
                                     pool.buildComplete(cfg);
                                     continue;
                                 }
+                                long pTime = System.currentTimeMillis() - bef;
+                                _context.statManager().addRateData("tunnel.buildConfigTime", pTime, 0);
                                 if (_log.shouldLog(Log.DEBUG))
                                     _log.debug("Configuring new tunnel " + i + " for " + pool + ": " + cfg);
-                                synchronized (_currentlyBuilding) {
-                                    _currentlyBuilding.add(cfg);
-                                }
                                 buildTunnel(pool, cfg);
-                                realBuilt++;
-                                
-                                // we want replies to go to the top of the queue
-                                _handler.handleInboundReplies();
+                                //realBuilt++;
                             } else {
                                 i--;
                             }
@@ -327,14 +378,7 @@ class BuildExecutor implements Runnable {
                         }
                 }
                 
-                afterBuildReal = System.currentTimeMillis();
                 
-                pendingRemaining = _handler.handleInboundRequests();
-                afterHandleInbound = System.currentTimeMillis();
-                
-                if (pendingRemaining > 0)
-                    _context.statManager().addRateData("tunnel.pendingRemaining", pendingRemaining, afterHandleInbound-afterBuildReal);
-
                 //if (_log.shouldLog(Log.DEBUG))
                 //    _log.debug("build loop complete, tot=" + (afterHandleInbound-loopBegin) + 
                 //              " inReply=" + (afterHandleInboundReplies-beforeHandleInboundReplies) +
@@ -346,8 +390,7 @@ class BuildExecutor implements Runnable {
                 
                 wanted.clear();
                 pools.clear();
-            } catch (Exception e) {
-                if (_log.shouldLog(Log.CRIT))
+            } catch (RuntimeException e) {
                     _log.log(Log.CRIT, "B0rked in the tunnel builder", e);
             }
         }
@@ -358,20 +401,40 @@ class BuildExecutor implements Runnable {
     }
     
     /**
+     *  Prioritize the pools for building
+     *  #1: Exploratory
+     *  #2: Pools without tunnels
+     *  #3: Everybody else
+     *
+     *  This prevents a large number of client pools from starving the exploratory pool.
+     *
+     */
+    private static class TunnelPoolComparator implements Comparator<TunnelPool> {
+        public int compare(TunnelPool tpl, TunnelPool tpr) {
+            if (tpl.getSettings().isExploratory() && !tpr.getSettings().isExploratory())
+                return -1;
+            if (tpr.getSettings().isExploratory() && !tpl.getSettings().isExploratory())
+                return 1;
+            if (tpl.getTunnelCount() <= 0 && tpr.getTunnelCount() > 0)
+                return -1;
+            if (tpr.getTunnelCount() <= 0 && tpl.getTunnelCount() > 0)
+                return 1;
+            return 0;
+        }
+    }
+
+    /**
      * iterate over the 0hop tunnels, running them all inline regardless of how many are allowed
      * @return number of tunnels allowed after processing these zero hop tunnels (almost always the same as before)
      */
-    private int buildZeroHopTunnels(List wanted, int allowed) {
+    private int buildZeroHopTunnels(List<TunnelPool> wanted, int allowed) {
         for (int i = 0; i < wanted.size(); i++) {
-            TunnelPool pool = (TunnelPool)wanted.get(0);
+            TunnelPool pool = wanted.get(0);
             if (pool.getSettings().getLength() == 0) {
                 PooledTunnelCreatorConfig cfg = pool.configureNewTunnel();
                 if (cfg != null) {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Configuring short tunnel " + i + " for " + pool + ": " + cfg);
-                    synchronized (_currentlyBuilding) {
-                        _currentlyBuilding.add(cfg);
-                    }
                     buildTunnel(pool, cfg);
                     if (cfg.getLength() > 1) {
                         allowed--; // oops... shouldn't have done that, but hey, its not that bad...
@@ -391,29 +454,55 @@ class BuildExecutor implements Runnable {
     
     void buildTunnel(TunnelPool pool, PooledTunnelCreatorConfig cfg) {
         long beforeBuild = System.currentTimeMillis();
+        if (cfg.getLength() > 1) {
+            // should we allow an ID of 0?
+            cfg.setReplyMessageId(_context.random().nextLong(I2NPMessage.MAX_ID_VALUE));
+            if (addToBuilding(cfg)) {
+                _log.error("Dup reply ID: " + cfg.getReplyMessageId());
+                // fail
+                return;
+            }
+        }
         BuildRequestor.request(_context, pool, cfg, this);
         long buildTime = System.currentTimeMillis() - beforeBuild;
         if (cfg.getLength() <= 1)
-            _context.statManager().addRateData("tunnel.buildRequestZeroHopTime", buildTime, buildTime);
+            _context.statManager().addRateData("tunnel.buildRequestZeroHopTime", buildTime, 0);
         else
-            _context.statManager().addRateData("tunnel.buildRequestTime", buildTime, buildTime);
+            _context.statManager().addRateData("tunnel.buildRequestTime", buildTime, 0);
         long id = cfg.getReplyMessageId();
         if (id > 0) {
             synchronized (_recentBuildIds) { 
-                while (_recentBuildIds.size() > 64)
-                    _recentBuildIds.remove(0);
-                _recentBuildIds.add(new Long(id));
+                // every so often, shrink the list semi-efficiently
+                if (_recentBuildIds.size() > 98) {
+                    for (int i = 0; i < 32; i++)
+                        _recentBuildIds.remove(0);
+                }
+                _recentBuildIds.add(Long.valueOf(id));
             }
         }
     }
     
+    /**
+     *  This wakes up the executor, so call this after TunnelPool.addTunnel()
+     *  so we don't build too many.
+     */
     public void buildComplete(PooledTunnelCreatorConfig cfg, TunnelPool pool) {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Build complete for " + cfg);
         pool.buildComplete(cfg);
-        synchronized (_currentlyBuilding) { 
-            _currentlyBuilding.remove(cfg);
-            _currentlyBuilding.notifyAll();
+        if (cfg.getLength() > 1)
+            removeFromBuilding(cfg.getReplyMessageId());
+        // Only wake up the build thread if it took a reasonable amount of time -
+        // this prevents high CPU usage when there is no network connection
+        // (via BuildRequestor.TunnelBuildFirstHopFailJob)
+        long buildTime = _context.clock().now() + 10*60*1000- cfg.getExpiration();
+        if (buildTime > 250) {
+            synchronized (_currentlyBuilding) { 
+                _currentlyBuilding.notifyAll();
+            }
+        } else {
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Build complete really fast (" + buildTime + " ms) for tunnel: " + cfg);
         }
         
         long expireBefore = _context.clock().now() + 10*60*1000 - BuildRequestor.REQUEST_TIMEOUT;
@@ -423,10 +512,9 @@ class BuildExecutor implements Runnable {
         }
     }
     
-    private List _recentBuildIds = new ArrayList(100);
     public boolean wasRecentlyBuilding(long replyId) {
         synchronized (_recentBuildIds) {
-            return _recentBuildIds.contains(new Long(replyId));
+            return _recentBuildIds.contains(Long.valueOf(replyId));
         }
     }
     
@@ -446,6 +534,41 @@ class BuildExecutor implements Runnable {
             _log.info(tunnel + ": Peer " + peer.toBase64() + " did not reply to the tunnel join request");
     }
     
-    List locked_getCurrentlyBuilding() { return _currentlyBuilding; }
-    public int getInboundBuildQueueSize() { return _handler.getInboundBuildQueueSize(); }
+    /**
+     *  Only do this for non-fallback tunnels.
+     *  @return true if refused because of a duplicate key
+     *  @since 0.7.12
+     */
+    private boolean addToBuilding(PooledTunnelCreatorConfig cfg) {
+        //_log.error("Adding ID: " + cfg.getReplyMessageId() + "; size was: " + _currentlyBuildingMap.size());
+        return _currentlyBuildingMap.putIfAbsent(Long.valueOf(cfg.getReplyMessageId()), cfg) != null;
+    }
+
+    /**
+     *  This returns the PTCC up to a minute after it 'expired', thus allowing us to
+     *  still use a tunnel if it was accepted, and to update peer stats.
+     *  This means that manager.buildComplete() could be called more than once, and
+     *  a build can be failed or successful after it was timed out,
+     *  which will affect the stats and profiles.
+     *  But that's ok. A peer that rejects slowly gets penalized twice, for example.
+     *
+     *  @return ptcc or null
+     *  @since 0.7.12
+     */
+    PooledTunnelCreatorConfig removeFromBuilding(long id) {
+        //_log.error("Removing ID: " + id + "; size was: " + _currentlyBuildingMap.size());
+        Long key = Long.valueOf(id);
+        PooledTunnelCreatorConfig rv = _currentlyBuildingMap.remove(key);
+        if (rv != null)
+            return rv;
+        rv = _recentlyBuildingMap.remove(key);
+        if (rv != null) {
+            long requestedOn = rv.getExpiration() - 10*60*1000;
+            long rtt = _context.clock().now() - requestedOn;
+            _context.statManager().addRateData("tunnel.buildReplySlow", rtt, 0);
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Got reply late (rtt = " + rtt + ") for: " + rv);
+        }
+        return rv;
+    }
 }

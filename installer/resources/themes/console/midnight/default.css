@@ -1,0 +1,254 @@
+/* I2P Theme: Midnight - I2P Tunnel Manager */
+/* Description: Minimalist Midnight Blue, based on Classic theme.*/
+/* Author: Dr|Z3d */
+
+body {
+     margin: 0px;
+     padding: 0px;
+     text-align: center;
+     font: 10pt/140% "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
+     background: #000;
+     color: #eef;
+     -moz-box-sizing: border-box;
+     box-sizing: border-box;
+}
+
+body.iframed {
+     background: transparent url('../dark/images/transparent.gif') !important;
+     padding: 15px 0 0;
+}
+
+div {
+     -moz-box-sizing: border-box;
+     box-sizing: border-box;
+}
+
+h4, label {
+     margin: 0px;
+     padding: 2px;
+     float: left;
+     width: 150px;
+     height: 24px;
+     font-weight: normal;
+     text-align: right;
+     font-size: 8.5pt;
+     -moz-box-sizing: border-box;
+     box-sizing: border-box;
+}
+
+h4 {
+     font-size: 10.5pt;
+     text-align: left !important;
+     font-weight: bold;
+     margin: -6px 0 5px -10px !important;
+     padding: 5px 10px 5px 10px;
+     background: #001;
+     text-shadow: 0px 0px 1px rgba(32, 32, 192, 0.3);
+     text-transform: uppercase;
+     white-space: nowrap;
+     width: 800px;
+     letter-spacing: 0.09em;
+     background: #001 url("/themes/console/midnight/images/tinytitles.png") repeat-x center center !important;
+}
+
+label {
+     font-style: italic;
+     margin: 0 3px 0 -3px;
+}
+
+a {
+     text-decoration: none;
+}
+
+form {
+     margin: 0px;
+}
+
+textarea, input, select, button, a {
+     -moz-box-sizing: border-box;
+     box-sizing: border-box;
+     font: 8pt "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
+     float: left;
+     margin: 2px 0 5px 0;
+     background: #001;
+     color: #eef;
+     border-radius: 3px;
+}
+
+button {
+     float: none;
+     height: 20px !important;
+}
+
+textarea {
+     border: 1px solid #99f;
+     background: #000;
+     color: #eef;
+}
+
+br {
+     clear: left;
+}
+
+div.statusNotRunning {
+     float: left;
+     width: 82px;
+     height: 24px;
+     color: #d00;
+}
+
+div.statusRunning {
+     float: left;
+     width: 82px;
+     height: 24px;
+     color: #0d0;
+}
+
+div.statusStarting {
+     float: left;
+     width: 82px;
+     height: 24px;
+     color: #393;
+}
+
+hr {
+     display: none;
+}
+
+.separator, .subdivider {
+     clear: both;
+     height: 1px;
+     margin: 5px -8px 5px -8px;
+     border-bottom: 1px solid #99f;
+}
+
+.subdivider {
+     border-bottom: 1px dotted #99f;
+     margin: 0 0 10px 0;
+}
+
+.freetext {
+     width: 150px;
+     height: 22px;
+     border: 1px solid #99f;
+}
+
+.control {
+     margin: 2px;
+     padding: 2px;
+     overflow: hidden;
+     height: 20px;
+     min-width: 60px;
+     font-weight: bold;
+     background: #ddd;
+     color: #001 !important;
+     border: 1px outset #ddddc0;
+     text-align: center;
+     vertical-align: middle;
+     white-space: nowrap;
+     text-decoration: none;
+     border-radius: 3px;
+}
+
+.control:hover {
+     background: #77f;
+     color: #fff !important;
+     text-decoration: none;
+}
+
+.control:active {
+     border: 2px inset;
+}
+
+.panel {
+     width: 790px;
+     margin: 16px auto 16px auto;
+     padding: 5px 10px;
+     overflow: hidden;
+     text-align: left;
+     font-size: 8pt;
+     background: #001;
+     border: 1px solid #99f;
+     -moz-box-shadow: inset 0px 0px 0px 1px #99f;
+     border-radius: 3px;
+}
+
+.iframed .panel {
+     margin: 16px auto -8px auto !important;
+}
+
+.iframed .panel.iframed {
+     margin: 0 auto -8px auto !important;
+}
+
+.panel .footer {
+
+     padding: 4px;
+}
+
+.toolbox {
+     width: 100%;
+}
+
+.rowItem {
+     width: 750px;
+     float: left;
+     margin: 0px;
+}
+
+.comment {
+     font-style: italic;
+     white-space: nowrap;
+}
+
+.text {
+     height: 24px;
+     width: 150px;
+     padding: 2px 0 0 2px;
+     float: left;
+     margin: 0;
+     font-weight: bold;
+}
+
+.accessKey {
+     text-decoration: underline;
+}
+
+#globalOperationsPanel {
+     background: #001;
+     border: 1px solid #99f;
+     -moz-box-shadow: inset 0px 0px 0px 1px #900;
+     padding: 5px 5px 10px 5px;
+     text-align: right;
+}
+
+#globalOperationsPanel .control {
+     min-width: 100px !important;
+     margin-top: 3px;
+     float: right;
+}
+
+a:link {
+     color: #bbf;
+     text-decoration: none;
+     font-weight: bold;
+     word-wrap: break-word;
+}
+
+a:visited {
+     color: #aaf;
+     text-decoration: none;
+     font-weight: bold;
+}
+
+a:hover {
+     color: #f60;
+     text-decoration: underline;
+     font-weight: bold;
+}
+
+a:active {
+     color: #f93;
+     text-decoration: underline;
+     font-weight: bold;
+}

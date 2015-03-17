@@ -49,6 +49,10 @@ package gnu.crypto.hash;
  * <p>A hash (or message digest) algorithm produces its output by iterating a
  * basic compression function on blocks of data.</p>
  *
+ * WARNING - DEPRECATED - Use SHA256Generator.getDigestInstance() to get a
+ * MessageDigest that will be faster in almost all cases.
+ * See SHA256Generator for more information.
+ *
  * @version $Revision: 1.1 $
  */
 public interface IMessageDigestStandalone extends Cloneable {

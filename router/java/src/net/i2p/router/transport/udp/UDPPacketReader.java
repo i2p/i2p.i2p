@@ -1,7 +1,5 @@
 package net.i2p.router.transport.udp;
 
-import java.net.InetAddress;
-
 import net.i2p.I2PAppContext;
 import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
@@ -15,20 +13,20 @@ import net.i2p.util.Log;
  * elements, grab the appropriate subreader.
  *
  */
-public class UDPPacketReader {
-    private I2PAppContext _context;
-    private Log _log;
+class UDPPacketReader {
+    private final I2PAppContext _context;
+    private final Log _log;
     private byte _message[];
     private int _payloadBeginOffset;
     private int _payloadLength;
-    private SessionRequestReader _sessionRequestReader;
-    private SessionCreatedReader _sessionCreatedReader;
-    private SessionConfirmedReader _sessionConfirmedReader;
-    private DataReader _dataReader;
-    private PeerTestReader _peerTestReader;
-    private RelayRequestReader _relayRequestReader;
-    private RelayIntroReader _relayIntroReader;
-    private RelayResponseReader _relayResponseReader;
+    private final SessionRequestReader _sessionRequestReader;
+    private final SessionCreatedReader _sessionCreatedReader;
+    private final SessionConfirmedReader _sessionConfirmedReader;
+    private final DataReader _dataReader;
+    private final PeerTestReader _peerTestReader;
+    private final RelayRequestReader _relayRequestReader;
+    private final RelayIntroReader _relayIntroReader;
+    private final RelayResponseReader _relayResponseReader;
     
     private static final int KEYING_MATERIAL_LENGTH = 64;
     
@@ -74,6 +72,7 @@ public class UDPPacketReader {
         return (_message[_payloadBeginOffset] & (1 << 2)) != 0;
     }
     
+    /** @return seconds */
     public long readTimestamp() {
         return DataHelper.fromLong(_message, _payloadBeginOffset + 1, 4);
     }
@@ -105,6 +104,7 @@ public class UDPPacketReader {
     public RelayIntroReader getRelayIntroReader() { return _relayIntroReader; }
     public RelayResponseReader getRelayResponseReader() { return _relayResponseReader; }
     
+    @Override
     public String toString() {
         switch (readPayloadType()) {
             case UDPPacket.PAYLOAD_TYPE_DATA:
@@ -123,16 +123,20 @@ public class UDPPacketReader {
                 return "Relay request packet";
             case UDPPacket.PAYLOAD_TYPE_RELAY_RESPONSE:
                 return "Relay response packet";
+            case UDPPacket.PAYLOAD_TYPE_SESSION_DESTROY:
+                return "Session destroyed packet";
             default:
                 return "Other packet type...";
         }
     }
     
-    public void toRawString(StringBuffer buf) {
+    public void toRawString(StringBuilder buf) {
         if (_message != null)
             buf.append(Base64.encode(_message, _payloadBeginOffset, _payloadLength));
     }
     
+    /* ------- Begin Reader Classes ------- */
+
     /** Help read the SessionRequest payload */
     public class SessionRequestReader {
         public static final int X_LENGTH = 256;
@@ -183,7 +187,7 @@ public class UDPPacketReader {
             return (int)DataHelper.fromLong(_message, offset, 2);
         }
         
-        /** write out the 4 byte relayAs tag */
+        /** read in the 4 byte relayAs tag */
         public long readRelayTag() {
             int offset = readBodyOffset() + Y_LENGTH + 1 + readIPSize() + 2;
             return DataHelper.fromLong(_message, offset, 4);
@@ -253,7 +257,12 @@ public class UDPPacketReader {
     
     /** parse out the data message */
     public class DataReader {
+
+        /**
+         *  @return the data size, NOT including IP header, UDP header, IV, or MAC
+         */
         public int getPacketSize() { return _payloadLength; }
+
         public boolean readACKsIncluded() {
             return flagSet(UDPPacket.DATA_FLAG_EXPLICIT_ACK);
         }
@@ -325,7 +334,7 @@ public class UDPPacketReader {
                 off++;
                 off += size;
             }
-            return (int)_message[off];
+            return _message[off];
         }
         
         public long readMessageId(int fragmentNum) {
@@ -348,7 +357,9 @@ public class UDPPacketReader {
             off++; // fragment info
             return ((int)DataHelper.fromLong(_message, off, 2)) & 0x3FFF;
         }
-        public void readMessageFragment(int fragmentNum, byte target[], int targetOffset) {
+
+        public void readMessageFragment(int fragmentNum, byte target[], int targetOffset)
+                                                      throws ArrayIndexOutOfBoundsException {
             int off = getFragmentBegin(fragmentNum);
             off += 4; // messageId
             off++; // fragment info
@@ -398,8 +409,9 @@ public class UDPPacketReader {
             return ((_message[flagOffset] & flag) != 0);
         }
         
+        @Override
         public String toString() {
-            StringBuffer buf = new StringBuffer(256);
+            StringBuilder buf = new StringBuilder(512);
             long msAgo = _context.clock().now() - readTimestamp()*1000;
             buf.append("Data packet sent ").append(msAgo).append("ms ago ");
             buf.append("IV ");
@@ -450,7 +462,7 @@ public class UDPPacketReader {
                 off++;
                 buf.append(" frag# ").append(fragNum);
                 buf.append(" isLast? ").append(isLast);
-                buf.append(" info ").append((int)_message[off-1]);
+                buf.append(" info ").append(_message[off-1]);
                 int size = ((int)DataHelper.fromLong(_message, off, 2)) & 0x3FFF;
                 buf.append(" with ").append(size).append(" bytes");
                 buf.append(' ');
@@ -461,7 +473,7 @@ public class UDPPacketReader {
             return buf.toString();
         }
         
-        public void toRawString(StringBuffer buf) { 
+        public void toRawString(StringBuilder buf) { 
             UDPPacketReader.this.toRawString(buf); 
             buf.append(" payload: ");
                   
@@ -502,8 +514,9 @@ public class UDPPacketReader {
             int flagNum = fragmentNum % 7;
             return (_message[byteNum] & (1 << flagNum)) != 0x0;
         }
+        @Override
         public String toString() { 
-            StringBuffer buf = new StringBuffer(64);
+            StringBuilder buf = new StringBuilder(64);
             buf.append("Read partial ACK of ");
             buf.append(getMessageId());
             buf.append(" with ACKs for: ");
@@ -594,6 +607,8 @@ public class UDPPacketReader {
                 _log.debug("read alice port: " + rv);
             return rv;
         }
+
+        /** unused */
         public int readChallengeSize() {
             int offset = readBodyOffset() + 4;
             offset += DataHelper.fromLong(_message, offset, 1);
@@ -604,6 +619,8 @@ public class UDPPacketReader {
                 _log.debug("read challenge size: " + rv);
             return rv;
         }
+
+        /** unused */
         public void readChallengeSize(byte target[], int targetOffset) {
             int offset = readBodyOffset() + 4;
             offset += DataHelper.fromLong(_message, offset, 1);
@@ -664,6 +681,8 @@ public class UDPPacketReader {
             offset++;
             return (int)DataHelper.fromLong(_message, offset, 2);
         }
+
+        /** unused */
         public int readChallengeSize() {
             int offset = readBodyOffset();
             offset += DataHelper.fromLong(_message, offset, 1);
@@ -671,6 +690,8 @@ public class UDPPacketReader {
             offset += 2;
             return (int)DataHelper.fromLong(_message, offset, 1);
         }
+
+        /** unused */
         public void readChallengeSize(byte target[], int targetOffset) {
             int offset = readBodyOffset();
             offset += DataHelper.fromLong(_message, offset, 1);
@@ -743,7 +764,9 @@ public class UDPPacketReader {
         }
     }
     
+    /* ------- End Reader Classes ------- */
     
+/******
     public static void main(String args[]) {
         I2PAppContext ctx = I2PAppContext.getGlobalContext();
         try {
@@ -769,4 +792,5 @@ public class UDPPacketReader {
         }
         
     }
+*******/
 }

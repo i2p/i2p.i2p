@@ -6,6 +6,7 @@
 	<property name="dist"  location="dist"/>
 	<property name="jar" value="addressbook.jar"/>
 	<property name="war" value="addressbook.war"/>
+	<property name="javac.compilerargs" value="" />
 	
 	<target name="init">
 		<mkdir dir="${build}"/>
@@ -37,7 +38,9 @@
 
 	<target name="compile" depends="init, depend">
 		<javac debug="true" deprecation="on" source="1.5" target="1.5" 
+                       includeAntRuntime="false"
                        srcdir="${src}" destdir="${build}">
+            <compilerarg line="${javac.compilerargs}" />
             <classpath>
                 <pathelement location="../../core/java/build/i2p.jar" />
                 <pathelement location="../jetty/jettylib/javax.servlet.jar" />
@@ -45,27 +48,68 @@
 		</javac>
 	</target>
 
-	<target name="jar" depends="compile">
+        <!-- unused for now, as we oddly ship addressbook as a .war -->
+	<target name="jar" depends="compile, changes">
 		<jar basedir="${build}" destfile="${dist}/${jar}">
+		<!-- set if unset -->
+		<property name="workspace.changes" value="" />
 			<manifest>
 				<attribute name="Main-Class" value="addressbook.Daemon"/>
+				<attribute name="Implementation-Version" value="${full.version}" />
+				<attribute name="Built-By" value="${build.built-by}" />
+		                <attribute name="Build-Date" value="${build.timestamp}" />
+		                <attribute name="Base-Revision" value="${workspace.version}" />
+		                <attribute name="Workspace-Changes" value="${workspace.changes}" />
 			</manifest>
 		</jar>
 	</target>
 	
-	<target name="war" depends="compile" unless="war.uptodate">
+	<target name="war" depends="compile, changes, warUpToDate" unless="war.uptodate">
 		<mkdir dir="${dist}/tmp"/>
 		<mkdir dir="${dist}/tmp/WEB-INF"/>
 		<mkdir dir="${dist}/tmp/WEB-INF/classes"/>
 		<copy todir="${dist}/tmp/WEB-INF/classes">
 			<fileset dir="${build}"/>
 		</copy>
-		<war basedir="${dist}/tmp" webxml="web.xml" destfile="${dist}/${war}"/>
+		<!-- set if unset -->
+		<property name="workspace.changes.tr" value="" />
+		<war basedir="${dist}/tmp" webxml="web.xml" destfile="${dist}/${war}">
+			<manifest>
+				<attribute name="Implementation-Version" value="${full.version}" />
+				<attribute name="Built-By" value="${build.built-by}" />
+		                <attribute name="Build-Date" value="${build.timestamp}" />
+		                <attribute name="Base-Revision" value="${workspace.version}" />
+		                <attribute name="Workspace-Changes" value="${workspace.changes.tr}" />
+			</manifest>
+		</war>
 		<delete dir="${dist}/tmp"/>
 	</target>
 	
-        <uptodate property="war.uptodate" targetfile="${dist}/${war}">
-            <srcfiles dir= "." includes="${build}/**/*.class, web.xml"/>
-        </uptodate>
+	<target name="warUpToDate">
+	        <uptodate property="war.uptodate" targetfile="${dist}/${war}">
+		            <srcfiles dir= "." includes="${build}/**/*.class, web.xml"/>
+	        </uptodate>
+                <condition property="shouldListChanges" >
+                    <and>
+                        <not>
+                            <isset property="war.uptodate" />
+                        </not>
+                        <isset property="mtn.available" />
+                    </and>
+                </condition>
+	</target>
 
+	<target name="changes" depends="warUpToDate" if="shouldListChanges" >
+	        <exec executable="mtn" outputproperty="workspace.changes" errorproperty="mtn.error2" failifexecutionfails="false" >
+	            <arg value="list" />
+	            <arg value="changed" />
+	            <arg value="." />
+	        </exec>
+		<!-- \n in an attribute value generates an invalid manifest -->
+		<exec executable="tr" inputstring="${workspace.changes}" outputproperty="workspace.changes.tr" errorproperty="mtn.error2" failifexecutionfails="false" >
+			<arg value="-s" />
+			<arg value="[:space:]" />
+			<arg value="," />
+		</exec>
+	</target>
 </project>

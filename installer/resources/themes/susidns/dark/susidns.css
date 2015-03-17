@@ -1,0 +1,317 @@
+/* Susidns Dark theme by dr|z3d */
+
+body {
+     font-family:"Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
+     background-color: #000;
+     color:#ee9;
+}
+
+body.iframed {
+     background: transparent !important;
+     margin: 0;
+}
+
+#logo {
+     display: none;
+}
+
+#navi p {
+     text-align: center;
+     font-weight: bold;
+}
+
+#navi a:link {
+     text-transform: capitalize;     
+}
+
+hr {
+     color: #494;
+     background: #494;
+     height: 1px;
+     border: 0px solid #494;
+     width: 100%;
+     margin: 5px 0;
+     text-align: center;
+}
+
+p {
+     color:#ee9;
+     margin: 0;
+     font-size: 8pt;
+     text-align: justify;
+}
+
+span.addrhlpr {
+     font-size:8pt;
+}
+
+h3 {
+     color:#ee9;
+     font-size:10pt;
+     font-weight:bold;
+     border: 1px solid #494;
+     padding: 5px;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+     background: #000 url('../../console/dark/images/header.png') repeat-x scroll center center !important;
+     letter-spacing: 0.08em;
+     padding: 6px;
+     text-shadow: 0 0 2px #001100;
+     text-transform: uppercase;
+}
+
+a {
+     color:#f60;
+     text-decoration:none;
+     font-weight: bold;
+}
+
+a:hover {
+     text-decoration:underline;
+     font-weight: bold;
+}
+
+th {
+
+     color:#ee9;
+     font-size: 9pt;
+     padding:5px 10px;
+     font-size:10pt;
+}
+
+td {
+
+     color:#ee9;
+     line-height:12pt;
+     padding:5px 10px;
+     font-size:8pt;
+     vertical-align:center;
+}
+
+ol, ul {
+     margin: 0 20px 0 10px;
+}
+
+li {
+     color:#ee9;
+     line-height:12pt;
+     margin: 0;
+     font-size:8pt;
+     list-style: square;
+}
+
+tr.list1 {
+     background-color:#010;
+}
+
+tr.list0 {
+     background-color:#000;
+}
+
+p.messages {
+     background-color:#000;
+     color:#ee9;
+     border: 1px solid #494;
+     padding: 5px;
+     margin: 5px 0 10px;
+     border-radius: 4px;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+}
+
+#help {
+     border: 1px solid #494;
+     padding: 10px 20px;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+     margin: 0 0 15px;
+     background: #000;
+}
+
+p.footer {
+     font-size:7pt;
+     text-align: center;
+     display: none;
+}
+
+p.buttons, #buttons {
+     text-align: right;
+     margin: 5px 0 -5px;
+}
+
+.illustrate {
+     margin: 20px 0 15px;
+     padding: 10px;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+     border: 1px solid #001;
+     font-size: 10pt;
+     -moz-box-shadow: inset 0px 0px 1px 0px #002;
+     background: #fff;
+}
+
+#book table {
+     width: 100%;
+}
+
+.destinations textarea {
+     width: 100%;
+     padding: 2px;
+}
+
+.page {
+     color:#ee9;
+     margin: 10px 0;
+     padding: 0;
+     font-size: 8pt !important;
+     -moz-box-shadow: inset 0px 0px 1px 0px #002;
+}
+
+.iframed .page {
+     margin: 0;
+}
+
+input[type=submit], input[type=reset] {
+     border: 1px outset #999;
+     background: #ddf;
+     color: #001;
+     margin: 5px;
+     font: bold 8pt "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
+     padding: 1px 2px;
+     text-decoration: none;
+     min-width: 110px;
+     border-radius: 4px;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     -moz-box-shadow: inset 0px 2px 8px 0px #fff;
+     color: #006;
+}
+
+input[type=submit]:hover, input[type=reset]:hover {
+     background: #000;
+     color: #f60;
+     border: 1px solid #f60;
+     -moz-box-shadow: inset 0 1px 1px 0 #ee9;
+     box-shadow: inset 0 1px 1px 0 #ee9;
+}
+
+/*
+input[type=reset] {
+     border: 1px outset #999;
+     background: #ddf;
+     color: #001;
+     margin: 5px;
+     font: bold 8pt "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
+     padding: 1px 2px;
+     text-decoration: none;
+     min-width: 110px;
+     border-radius: 4px;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     -moz-box-shadow: inset 0px 2px 8px 0px #fff;
+     color: #006;
+     opacity: 0.9;
+}
+
+input[type=reset]:hover {
+     background: #22a;
+     color: #fff;
+     border: 1px solid #f60;
+     opacity: 1.0;
+     -moz-box-shadow: inset 0px 0px 0px 1px #fff;
+}
+*/
+
+input.accept {
+     background: #ddf url('/themes/console/images/accept.png') no-repeat 2px center;
+     padding: 2px 3px 2px 20px;
+     min-height: 22px;
+}
+
+input.add {
+     background: #ddf url('/themes/console/images/add.png') no-repeat 2px center;
+     padding: 2px 3px 2px 20px;
+     min-height: 22px;
+}
+
+input.cancel {
+     background: #ddf url('/themes/console/images/cancel.png') no-repeat 2px center;
+     padding: 2px 3px 2px 20px;
+     min-height: 22px;
+}
+
+input.delete {
+     background: #ddf url('/themes/console/images/delete.png') no-repeat 2px center;
+     padding: 2px 3px 2px 20px;
+     min-height: 22px;
+}
+
+input.reload {
+     background: #ddf url('/themes/console/images/arrow_refresh.png') no-repeat 2px center;
+     padding: 2px 3px 2px 20px;
+     min-height: 22px;
+}
+
+input.search {
+     background: #ddf url('/themes/console/images/magnifier.png') no-repeat 2px center;
+     padding: 2px 3px 2px 24px;
+     min-height: 22px;
+}
+
+input.search[type="text"] {
+     background: #eef url('/themes/console/images/magnifier.png') no-repeat 2px center;
+}
+
+input {
+     font-size: 9pt;
+     font-weight: bold;
+     text-align: left;
+     padding: 3px 4px !important;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+     border: 1px solid #494;
+     background: #000 none !important;      
+     color: #494;
+     margin: 2px 4px 2px 0;
+     font: bold 8pt "Lucida Sans Unicode","Bitstream Vera Sans",Verdana,Tahoma,Helvetica,sans-serif;
+     min-width: 64px !important;
+}
+
+input[type=submit], input[type=reset] {
+     color: #494;
+     background: #000;
+     border: 1px outset #191;
+     padding: 2px !important;
+     box-shadow: 0 1px 1px 0 #119911 inset;
+     font: bold 8pt "Lucida Sans Unicode","Bitstream Vera Sans",Verdana,Tahoma,Helvetica,sans-serif;
+     text-align: center;
+     min-height: 22px !important;
+}
+
+input[type=submit]:active, input[type=reset]:active {
+     background: #f60 !important;
+     color: #ee9 !important;
+     border: 1px solid #f60;
+}
+
+textarea {
+     color: #494;
+     background: #000;
+     border: 1px solid #494;
+     padding: 2px !important;
+     font: bold 8pt "Lucida Sans Unicode","Bitstream Vera Sans",Verdana,Tahoma,Helvetica,sans-serif;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+     width: 100%;
+     height: 100px;
+     spell-check: false;
+}
+
+input:focus, textarea:focus {
+     color: #ee9;     
+}

@@ -13,9 +13,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import net.i2p.data.DataStructure;
+import net.i2p.data.DatabaseEntry;
 import net.i2p.data.Hash;
-import net.i2p.data.LeaseSet;
 import net.i2p.data.RouterInfo;
 import net.i2p.data.TunnelId;
 import net.i2p.data.i2np.DatabaseStoreMessage;
@@ -26,41 +25,32 @@ import net.i2p.router.OutNetMessage;
 import net.i2p.router.ReplyJob;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelInfo;
-import net.i2p.router.peermanager.PeerProfile;
-import net.i2p.stat.Rate;
-import net.i2p.stat.RateStat;
 import net.i2p.util.Log;
+import net.i2p.util.VersionComparator;
 
+/**
+ *  Unused directly - see FloodfillStoreJob
+ */
 class StoreJob extends JobImpl {
-    private Log _log;
+    protected final Log _log;
     private KademliaNetworkDatabaseFacade _facade;
-    protected StoreState _state;
-    private Job _onSuccess;
-    private Job _onFailure;
+    protected final StoreState _state;
+    private final Job _onSuccess;
+    private final Job _onFailure;
     private long _timeoutMs;
-    private long _expiration;
-    private PeerSelector _peerSelector;
+    private final long _expiration;
+    private final PeerSelector _peerSelector;
 
     private final static int PARALLELIZATION = 4; // how many sent at a time
     private final static int REDUNDANCY = 4; // we want the data sent to 6 peers
-    /**
-     * additionally send to 1 outlier(s), in case all of the routers chosen in our
-     * REDUNDANCY set are attacking us by accepting DbStore messages but dropping
-     * the data.  
-     *
-     * TODO: um, honor this.  make sure we send to this many peers that aren't 
-     * closest to the key.
-     *
-     */
-    private final static int EXPLORATORY_REDUNDANCY = 1; 
     private final static int STORE_PRIORITY = 100;
     
     /**
-     * Create a new search for the routingKey specified
+     * Send a data structure to the floodfills
      * 
      */
     public StoreJob(RouterContext context, KademliaNetworkDatabaseFacade facade, Hash key, 
-                    DataStructure data, Job onSuccess, Job onFailure, long timeoutMs) {
+                    DatabaseEntry data, Job onSuccess, Job onFailure, long timeoutMs) {
         this(context, facade, key, data, onSuccess, onFailure, timeoutMs, null);
     }
     
@@ -69,15 +59,9 @@ class StoreJob extends JobImpl {
      *               already know they have it).  This can be null.
      */
     public StoreJob(RouterContext context, KademliaNetworkDatabaseFacade facade, Hash key, 
-                    DataStructure data, Job onSuccess, Job onFailure, long timeoutMs, Set toSkip) {
+                    DatabaseEntry data, Job onSuccess, Job onFailure, long timeoutMs, Set<Hash> toSkip) {
         super(context);
         _log = context.logManager().getLog(StoreJob.class);
-        getContext().statManager().createRateStat("netDb.storeRouterInfoSent", "How many routerInfo store messages have we sent?", "NetworkDatabase", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
-        getContext().statManager().createRateStat("netDb.storeLeaseSetSent", "How many leaseSet store messages have we sent?", "NetworkDatabase", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
-        getContext().statManager().createRateStat("netDb.storePeers", "How many peers each netDb must be sent to before success?", "NetworkDatabase", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
-        getContext().statManager().createRateStat("netDb.storeFailedPeers", "How many peers each netDb must be sent to before failing completely?", "NetworkDatabase", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
-        getContext().statManager().createRateStat("netDb.ackTime", "How long does it take for a peer to ack a netDb store?", "NetworkDatabase", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
-        getContext().statManager().createRateStat("netDb.replyTimeout", "How long after a netDb send does the timeout expire (when the peer doesn't reply in time)?", "NetworkDatabase", new long[] { 60*1000, 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
         _facade = facade;
         _state = new StoreState(getContext(), key, data, toSkip);
         _onSuccess = onSuccess;
@@ -100,6 +84,8 @@ class StoreJob extends JobImpl {
 
     /**
      * send the key to the next batch of peers
+     *
+     * Synchronized to enforce parallelization limits and prevent dups
      */
     private void sendNext() {
         if (_state.completed()) {
@@ -109,9 +95,13 @@ class StoreJob extends JobImpl {
         }
         if (isExpired()) {
             _state.complete(true);
+            if (_log.shouldLog(Log.INFO))
+                _log.info(getJobId() + ": Expired: " + _timeoutMs);
             fail();
         } else if (_state.getAttempted().size() > MAX_PEERS_SENT) {
             _state.complete(true);
+            if (_log.shouldLog(Log.INFO))
+                _log.info(getJobId() + ": Max sent");
             fail();
         } else {
             //if (_log.shouldLog(Log.INFO))
@@ -128,8 +118,9 @@ class StoreJob extends JobImpl {
      * the routing table, but making sure no more than PARALLELIZATION are outstanding
      * at any time
      *
+     * Caller should synchronize to enforce parallelization limits and prevent dups
      */
-    private void continueSending() { 
+    private synchronized void continueSending() { 
         if (_state.completed()) return;
         int toCheck = getParallelization() - _state.getPending().size();
         if (toCheck <= 0) {
@@ -146,13 +137,14 @@ class StoreJob extends JobImpl {
         // This will help minimize active connections for floodfill peers and allow
         // the network to scale.
         // Perhaps the ultimate solution is to send RouterInfos through a lease also.
-        List closestHashes;
-        if (_state.getData() instanceof RouterInfo) 
-            closestHashes = getMostReliableRouters(_state.getTarget(), toCheck, _state.getAttempted());
-        else
-            closestHashes = getClosestRouters(_state.getTarget(), toCheck, _state.getAttempted());
-        if ( (closestHashes == null) || (closestHashes.size() <= 0) ) {
-            if (_state.getPending().size() <= 0) {
+        List<Hash> closestHashes;
+        //if (_state.getData() instanceof RouterInfo) 
+        //    closestHashes = getMostReliableRouters(_state.getTarget(), toCheck, _state.getAttempted());
+        //else
+        //    closestHashes = getClosestRouters(_state.getTarget(), toCheck, _state.getAttempted());
+        closestHashes = getClosestFloodfillRouters(_state.getTarget(), toCheck, _state.getAttempted());
+        if ( (closestHashes == null) || (closestHashes.isEmpty()) ) {
+            if (_state.getPending().isEmpty()) {
                 if (_log.shouldLog(Log.INFO))
                     _log.info(getJobId() + ": No more peers left and none pending");
                 fail();
@@ -165,20 +157,22 @@ class StoreJob extends JobImpl {
             //_state.addPending(closestHashes);
             if (_log.shouldLog(Log.INFO))
                 _log.info(getJobId() + ": Continue sending key " + _state.getTarget() + " after " + _state.getAttempted().size() + " tries to " + closestHashes);
-            for (Iterator iter = closestHashes.iterator(); iter.hasNext(); ) {
-                Hash peer = (Hash)iter.next();
-                DataStructure ds = _facade.getDataStore().get(peer);
-                if ( (ds == null) || !(ds instanceof RouterInfo) ) {
+            for (Iterator<Hash> iter = closestHashes.iterator(); iter.hasNext(); ) {
+                Hash peer = iter.next();
+                DatabaseEntry ds = _facade.getDataStore().get(peer);
+                if ( (ds == null) || !(ds.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO) ) {
                     if (_log.shouldLog(Log.INFO))
                         _log.info(getJobId() + ": Error selecting closest hash that wasnt a router! " + peer + " : " + ds);
                     _state.addSkipped(peer);
                 } else {
                     int peerTimeout = _facade.getPeerTimeout(peer);
-                    PeerProfile prof = getContext().profileOrganizer().getProfile(peer);
-                    if (prof != null) {
-                        RateStat failing = prof.getDBHistory().getFailedLookupRate();
-                        Rate failed = failing.getRate(60*60*1000);
-                    }
+
+                    //PeerProfile prof = getContext().profileOrganizer().getProfile(peer);
+                    //if (prof != null && prof.getIsExpandedDB()) {
+                    //    RateStat failing = prof.getDBHistory().getFailedLookupRate();
+                    //    Rate failed = failing.getRate(60*60*1000);
+                    //}
+
                     //long failedCount = failed.getCurrentEventCount()+failed.getLastEventCount();
                     //if (failedCount > 10) {
                     //    _state.addSkipped(peer);
@@ -215,7 +209,8 @@ class StoreJob extends JobImpl {
      *
      * @return ordered list of Hash objects
      */
-    private List getClosestRouters(Hash key, int numClosest, Set alreadyChecked) {
+/*****
+    private List<Hash> getClosestRouters(Hash key, int numClosest, Set<Hash> alreadyChecked) {
         Hash rkey = getContext().routingKeyGenerator().getRoutingKey(key);
         //if (_log.shouldLog(Log.DEBUG))
         //    _log.debug(getJobId() + ": Current routing key for " + key + ": " + rkey);
@@ -224,28 +219,47 @@ class StoreJob extends JobImpl {
         if (ks == null) return new ArrayList();
         return _peerSelector.selectNearestExplicit(rkey, numClosest, alreadyChecked, ks);
     }
+*****/
 
-    private List getMostReliableRouters(Hash key, int numClosest, Set alreadyChecked) {
+    /** used for routerinfo stores, prefers those already connected */
+/*****
+    private List<Hash> getMostReliableRouters(Hash key, int numClosest, Set<Hash> alreadyChecked) {
         Hash rkey = getContext().routingKeyGenerator().getRoutingKey(key);
         KBucketSet ks = _facade.getKBuckets();
         if (ks == null) return new ArrayList();
         return _peerSelector.selectMostReliablePeers(rkey, numClosest, alreadyChecked, ks);
     }
+*****/
+
+    private List<Hash> getClosestFloodfillRouters(Hash key, int numClosest, Set<Hash> alreadyChecked) {
+        Hash rkey = getContext().routingKeyGenerator().getRoutingKey(key);
+        KBucketSet ks = _facade.getKBuckets();
+        if (ks == null) return new ArrayList();
+        return ((FloodfillPeerSelector)_peerSelector).selectFloodfillParticipants(rkey, numClosest, alreadyChecked, ks);
+    }
+
+    /** limit expiration for direct sends */
+    private static final int MAX_DIRECT_EXPIRATION = 15*1000;
 
     /**
-     * Send a store to the given peer through a garlic route, including a reply 
+     * Send a store to the given peer, including a reply 
      * DeliveryStatusMessage so we know it got there
      *
      */
     private void sendStore(RouterInfo router, int responseTime) {
+        if (!_state.getTarget().equals(_state.getData().getHash())) {
+            _log.error("Hash mismatch StoreJob");
+            return;
+        }
         DatabaseStoreMessage msg = new DatabaseStoreMessage(getContext());
-        msg.setKey(_state.getTarget());
-        if (_state.getData() instanceof RouterInfo) 
-            msg.setRouterInfo((RouterInfo)_state.getData());
-        else if (_state.getData() instanceof LeaseSet) 
-            msg.setLeaseSet((LeaseSet)_state.getData());
-        else
+        if (_state.getData().getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO) {
+            if (responseTime > MAX_DIRECT_EXPIRATION)
+                responseTime = MAX_DIRECT_EXPIRATION;
+        } else if (_state.getData().getType() == DatabaseEntry.KEY_TYPE_LEASESET) {
+        } else {
             throw new IllegalArgumentException("Storing an unknown data type! " + _state.getData());
+        }
+        msg.setEntry(_state.getData());
         msg.setMessageExpiration(getContext().clock().now() + _timeoutMs);
 
         if (router.getIdentity().equals(getContext().router().getRouterInfo().getIdentity())) {
@@ -253,26 +267,40 @@ class StoreJob extends JobImpl {
             if (_log.shouldLog(Log.ERROR))
                 _log.error(getJobId() + ": Dont send store to ourselves - why did we try?");
             return;
-        } else {
-            //if (_log.shouldLog(Log.DEBUG))
-            //    _log.debug(getJobId() + ": Send store to " + router.getIdentity().getHash().toBase64());
         }
+
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug(getJobId() + ": Send store timeout is " + responseTime);
 
         sendStore(msg, router, getContext().clock().now() + responseTime);
     }
     
+    /**
+     * Send a store to the given peer, including a reply 
+     * DeliveryStatusMessage so we know it got there
+     *
+     */
     private void sendStore(DatabaseStoreMessage msg, RouterInfo peer, long expiration) {
-        if (msg.getValueType() == DatabaseStoreMessage.KEY_TYPE_LEASESET) {
+        if (msg.getEntry().getType() == DatabaseEntry.KEY_TYPE_LEASESET) {
             getContext().statManager().addRateData("netDb.storeLeaseSetSent", 1, 0);
-            sendStoreThroughGarlic(msg, peer, expiration);
+            // if it is an encrypted leaseset...
+            if (getContext().keyRing().get(msg.getKey()) != null)
+                sendStoreThroughGarlic(msg, peer, expiration);
+            else
+                sendStoreThroughClient(msg, peer, expiration);
         } else {
             getContext().statManager().addRateData("netDb.storeRouterInfoSent", 1, 0);
             sendDirect(msg, peer, expiration);
         }
     }
 
+    /**
+     * Send directly,
+     * with the reply to come back directly.
+     *
+     */
     private void sendDirect(DatabaseStoreMessage msg, RouterInfo peer, long expiration) {
-        long token = getContext().random().nextLong(I2NPMessage.MAX_ID_VALUE);
+        long token = 1 + getContext().random().nextLong(I2NPMessage.MAX_ID_VALUE);
         msg.setReplyToken(token);
         msg.setReplyGateway(getContext().routerHash());
 
@@ -296,13 +324,21 @@ class StoreJob extends JobImpl {
         m.setPriority(STORE_PRIORITY);
         m.setReplySelector(selector);
         m.setTarget(peer);
+        getContext().messageRegistry().registerPending(m);
         getContext().commSystem().processMessage(m);
     }
     
+    /**
+     * This is misnamed, it means sending it out through an exploratory tunnel,
+     * with the reply to come back through an exploratory tunnel.
+     * There is no garlic encryption added.
+     *
+     */
     private void sendStoreThroughGarlic(DatabaseStoreMessage msg, RouterInfo peer, long expiration) {
-        long token = getContext().random().nextLong(I2NPMessage.MAX_ID_VALUE);
+        long token = 1 + getContext().random().nextLong(I2NPMessage.MAX_ID_VALUE);
         
-        TunnelInfo replyTunnel = selectInboundTunnel();
+        Hash to = peer.getIdentity().getHash();
+        TunnelInfo replyTunnel = getContext().tunnelManager().selectInboundExploratoryTunnel(to);
         if (replyTunnel == null) {
             _log.warn("No reply inbound tunnels available!");
             return;
@@ -315,15 +351,15 @@ class StoreJob extends JobImpl {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug(getJobId() + ": send(dbStore) w/ token expected " + token);
         
-        _state.addPending(peer.getIdentity().getHash());
+        _state.addPending(to);
         
-        TunnelInfo outTunnel = selectOutboundTunnel();
+        TunnelInfo outTunnel = getContext().tunnelManager().selectOutboundExploratoryTunnel(to);
         if (outTunnel != null) {
             //if (_log.shouldLog(Log.DEBUG))
             //    _log.debug(getJobId() + ": Sending tunnel message out " + outTunnelId + " to " 
             //               + peer.getIdentity().getHash().toBase64());
-            TunnelId targetTunnelId = null; // not needed
-            Job onSend = null; // not wanted
+            //TunnelId targetTunnelId = null; // not needed
+            //Job onSend = null; // not wanted
         
             SendSuccessJob onReply = new SendSuccessJob(getContext(), peer, outTunnel, msg.getMessageSize());
             FailedJob onFail = new FailedJob(getContext(), peer, getContext().clock().now());
@@ -332,7 +368,7 @@ class StoreJob extends JobImpl {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("sending store to " + peer.getIdentity().getHash() + " through " + outTunnel + ": " + msg);
             getContext().messageRegistry().registerPending(selector, onReply, onFail, (int)(expiration - getContext().clock().now()));
-            getContext().tunnelDispatcher().dispatchOutbound(msg, outTunnel.getSendTunnelId(0), null, peer.getIdentity().getHash());
+            getContext().tunnelDispatcher().dispatchOutbound(msg, outTunnel.getSendTunnelId(0), null, to);
         } else {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("No outbound tunnels to send a dbStore out!");
@@ -340,14 +376,122 @@ class StoreJob extends JobImpl {
         }
     }
     
-    private TunnelInfo selectOutboundTunnel() {
-        return getContext().tunnelManager().selectOutboundTunnel();
+    /**
+     * Send a leaseset store message out the client tunnel,
+     * with the reply to come back through a client tunnel.
+     * Stores are garlic encrypted to hide the identity from the OBEP.
+     *
+     * This makes it harder for an exploratory OBEP or IBGW to correlate it
+     * with one or more destinations. Since we are publishing the leaseset,
+     * it's easy to find out that an IB tunnel belongs to this dest, and
+     * it isn't much harder to do the same for an OB tunnel.
+     *
+     * As a side benefit, client tunnels should be faster and more reliable than
+     * exploratory tunnels.
+     *
+     * @param msg must contain a leaseset
+     * @since 0.7.10
+     */
+    private void sendStoreThroughClient(DatabaseStoreMessage msg, RouterInfo peer, long expiration) {
+        long token = 1 + getContext().random().nextLong(I2NPMessage.MAX_ID_VALUE);
+        Hash client = msg.getKey();
+
+        Hash to = peer.getIdentity().getHash();
+        TunnelInfo replyTunnel = getContext().tunnelManager().selectInboundTunnel(client, to);
+        if (replyTunnel == null) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("No reply inbound tunnels available!");
+            fail();
+            return;
+        }
+        TunnelId replyTunnelId = replyTunnel.getReceiveTunnelId(0);
+        msg.setReplyToken(token);
+        msg.setReplyTunnel(replyTunnelId);
+        msg.setReplyGateway(replyTunnel.getPeer(0));
+
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug(getJobId() + ": send(dbStore) w/ token expected " + token);
+
+        TunnelInfo outTunnel = getContext().tunnelManager().selectOutboundTunnel(client, to);
+        if (outTunnel != null) {
+            I2NPMessage sent;
+            boolean shouldEncrypt = supportsEncryption(peer);
+            if (shouldEncrypt) {
+                // garlic encrypt
+                MessageWrapper.WrappedMessage wm = MessageWrapper.wrap(getContext(), msg, client, peer);
+                if (wm == null) {
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Fail garlic encrypting from: " + client);
+                    fail();
+                    return;
+                }
+                sent = wm.getMessage();
+                _state.addPending(to, wm);
+            } else {
+                _state.addPending(to);
+                // now that almost all floodfills are at 0.7.10,
+                // just refuse to store unencrypted to older ones.
+                _state.replyTimeout(to);
+                getContext().jobQueue().addJob(new WaitJob(getContext()));
+                return;
+            }
+
+            SendSuccessJob onReply = new SendSuccessJob(getContext(), peer, outTunnel, sent.getMessageSize());
+            FailedJob onFail = new FailedJob(getContext(), peer, getContext().clock().now());
+            StoreMessageSelector selector = new StoreMessageSelector(getContext(), getJobId(), peer, token, expiration);
+    
+            if (_log.shouldLog(Log.DEBUG)) {
+                if (shouldEncrypt)
+                    _log.debug("sending encrypted store to " + peer.getIdentity().getHash() + " through " + outTunnel + ": " + sent);
+                else
+                    _log.debug("sending store to " + peer.getIdentity().getHash() + " through " + outTunnel + ": " + sent);
+                //_log.debug("Expiration is " + new Date(sent.getMessageExpiration()));
+            }
+            getContext().messageRegistry().registerPending(selector, onReply, onFail, (int)(expiration - getContext().clock().now()));
+            getContext().tunnelDispatcher().dispatchOutbound(sent, outTunnel.getSendTunnelId(0), null, to);
+        } else {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("No outbound tunnels to send a dbStore out - delaying...");
+            // continueSending() above did an addPending() so remove it here.
+            // This means we will skip the peer next time, can't be helped for now
+            // without modding StoreState
+            _state.replyTimeout(to);
+            Job waiter = new WaitJob(getContext());
+            waiter.getTiming().setStartAfter(getContext().clock().now() + 3*1000);
+            getContext().jobQueue().addJob(waiter);
+            //fail();
+        }
     }
- 
-    private TunnelInfo selectInboundTunnel() {
-        return getContext().tunnelManager().selectInboundTunnel();
+    
+    /**
+     * Called to wait a little while
+     * @since 0.7.10
+     */
+    private class WaitJob extends JobImpl {
+        public WaitJob(RouterContext enclosingContext) {
+            super(enclosingContext);
+        }
+        public void runJob() {
+            sendNext();
+        }
+        public String getName() { return "Kademlia Store Send Delay"; }
     }
- 
+
+    private static final String MIN_ENCRYPTION_VERSION = "0.7.10";
+
+    /**
+     * *sigh*
+     * sadly due to a bug in HandleFloodfillDatabaseStoreMessageJob, where
+     * a floodfill would not flood anything that arrived garlic-wrapped
+     * @since 0.7.10
+     */
+    private static boolean supportsEncryption(RouterInfo ri) {
+        String v = ri.getOption("router.version");
+        if (v == null)
+            return false;
+        return (new VersionComparator()).compare(v, MIN_ENCRYPTION_VERSION) >= 0;
+    }
+
     /**
      * Called after sending a dbStore to a peer successfully, 
      * marking the store as successful
@@ -373,11 +517,16 @@ class StoreJob extends JobImpl {
 
         public String getName() { return "Kademlia Store Send Success"; }
         public void runJob() {
-            long howLong = _state.confirmed(_peer.getIdentity().getHash());
+            Hash hash = _peer.getIdentity().getHash();
+            MessageWrapper.WrappedMessage wm = _state.getPendingMessage(hash);
+            if (wm != null)
+                wm.acked();
+            long howLong = _state.confirmed(hash);
+
             if (_log.shouldLog(Log.INFO))
                 _log.info(StoreJob.this.getJobId() + ": Marking store of " + _state.getTarget() 
-                          + " to " + _peer.getIdentity().getHash().toBase64() + " successful after " + howLong);
-            getContext().profileManager().dbStoreSent(_peer.getIdentity().getHash(), howLong);
+                          + " to " + hash.toBase64() + " successful after " + howLong);
+            getContext().profileManager().dbStoreSent(hash, howLong);
             getContext().statManager().addRateData("netDb.ackTime", howLong, howLong);
 
             if ( (_sendThrough != null) && (_msgSize > 0) ) {
@@ -415,16 +564,22 @@ class StoreJob extends JobImpl {
             _sendOn = sendOn;
         }
         public void runJob() {
+            Hash hash = _peer.getIdentity().getHash();
             if (_log.shouldLog(Log.INFO))
-                _log.info(StoreJob.this.getJobId() + ": Peer " + _peer.getIdentity().getHash().toBase64() 
+                _log.info(StoreJob.this.getJobId() + ": Peer " + hash.toBase64() 
                           + " timed out sending " + _state.getTarget());
-            _state.replyTimeout(_peer.getIdentity().getHash());
-            getContext().profileManager().dbStoreFailed(_peer.getIdentity().getHash());
+
+            MessageWrapper.WrappedMessage wm = _state.getPendingMessage(hash);
+            if (wm != null)
+                wm.fail();
+            _state.replyTimeout(hash);
+
+            getContext().profileManager().dbStoreFailed(hash);
             getContext().statManager().addRateData("netDb.replyTimeout", getContext().clock().now() - _sendOn, 0);
             
             sendNext();
         }
-        public String getName() { return "Kademlia Store Peer Failed"; }
+        public String getName() { return "Kademlia Store Send Failed"; }
     }
 
     /**

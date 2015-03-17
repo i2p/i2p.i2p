@@ -15,7 +15,6 @@ import java.io.InputStream;
 
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
-import net.i2p.util.Log;
 
 /**
  * Defines the message a client sends to a router when destroying
@@ -24,7 +23,6 @@ import net.i2p.util.Log;
  * @author jrandom
  */
 public class SessionStatusMessage extends I2CPMessageImpl {
-    private final static Log _log = new Log(SessionStatusMessage.class);
     public final static int MESSAGE_TYPE = 20;
     private SessionId _sessionId;
     private int _status;
@@ -35,7 +33,6 @@ public class SessionStatusMessage extends I2CPMessageImpl {
     public final static int STATUS_INVALID = 3;
 
     public SessionStatusMessage() {
-        setSessionId(null);
         setStatus(STATUS_INVALID);
     }
 
@@ -84,11 +81,12 @@ public class SessionStatusMessage extends I2CPMessageImpl {
         return MESSAGE_TYPE;
     }
 
+    /* FIXME missing hashCode method FIXME */
     @Override
     public boolean equals(Object object) {
         if ((object != null) && (object instanceof SessionStatusMessage)) {
             SessionStatusMessage msg = (SessionStatusMessage) object;
-            return DataHelper.eq(getSessionId(), msg.getSessionId()) && DataHelper.eq(getStatus(), msg.getStatus());
+            return DataHelper.eq(getSessionId(), msg.getSessionId()) && _status == msg.getStatus();
         }
          
         return false;
@@ -96,7 +94,7 @@ public class SessionStatusMessage extends I2CPMessageImpl {
 
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append("[SessionStatusMessage: ");
         buf.append("\n\tSessionId: ").append(getSessionId());
         buf.append("\n\tStatus: ").append(getStatus());

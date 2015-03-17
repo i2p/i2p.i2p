@@ -125,6 +125,8 @@ public abstract class BasePRNGStandalone implements IRandomStandalone {
          throw new ArrayIndexOutOfBoundsException("offset=" + offset + " length="
                                                   + length + " limit=" + out.length);
 
+      if (buffer == null)
+          throw new IllegalStateException("Random is shut down - do you have a static ref?");
       if (ndx >= buffer.length) {
          fillBlock();
          ndx = 0;
@@ -162,6 +164,8 @@ public abstract class BasePRNGStandalone implements IRandomStandalone {
    }
 
    private byte nextByteInternal() {//throws LimitReachedException {
+      if (buffer == null)
+          throw new IllegalStateException("Random is shut down - do you have a static ref?");
       if (ndx >= buffer.length) {
          this.fillBlock();
          ndx = 0;
@@ -172,6 +176,7 @@ public abstract class BasePRNGStandalone implements IRandomStandalone {
 
    // abstract methods to implement by subclasses -----------------------------
 
+  @Override
   public Object clone() throws CloneNotSupportedException
   {
     return super.clone();

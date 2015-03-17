@@ -1,7 +1,7 @@
 package net.i2p.router.tunnel.pool;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import net.i2p.data.Base64;
 import net.i2p.data.ByteArray;
@@ -16,6 +16,8 @@ import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.i2np.TunnelBuildMessage;
 import net.i2p.data.i2np.TunnelBuildReplyMessage;
 import net.i2p.data.i2np.TunnelGatewayMessage;
+import net.i2p.data.i2np.VariableTunnelBuildMessage;
+import net.i2p.data.i2np.VariableTunnelBuildReplyMessage;
 import net.i2p.router.HandlerJobBuilder;
 import net.i2p.router.Job;
 import net.i2p.router.JobImpl;
@@ -25,227 +27,213 @@ import net.i2p.router.peermanager.TunnelHistory;
 import net.i2p.router.tunnel.BuildMessageProcessor;
 import net.i2p.router.tunnel.BuildReplyHandler;
 import net.i2p.router.tunnel.HopConfig;
+import net.i2p.router.tunnel.TunnelDispatcher;
 import net.i2p.stat.Rate;
 import net.i2p.stat.RateStat;
 import net.i2p.util.Log;
 
 /**
+ * Handle the received tunnel build message requests and replies,
+ * including sending responsses to requests, updating the
+ * lists of our tunnels and participating tunnels,
+ * and updating stats.
  *
+ * Replies are handled immediately on reception; requests are queued.
+ * As of 0.8.11 the request queue is handled in a separate thread,
+ * it used to be called from the BuildExecutor thread loop.
+ *
+ * Note that 10 minute tunnel expiration is hardcoded in here.
  */
-class BuildHandler {
-    private RouterContext _context;
-    private Log _log;
-    private BuildExecutor _exec;
-    private Job _buildMessageHandlerJob;
-    private Job _buildReplyMessageHandlerJob;
-    /** list of BuildMessageState, oldest first */
-    private List _inboundBuildMessages;
-    /** list of BuildReplyMessageState, oldest first */
-    private List _inboundBuildReplyMessages;
-    /** list of BuildEndMessageState, oldest first */
-    private List _inboundBuildEndMessages;
-    private BuildMessageProcessor _processor;
+class BuildHandler implements Runnable {
+    private final RouterContext _context;
+    private final Log _log;
+    private final TunnelPoolManager _manager;
+    private final BuildExecutor _exec;
+    private final Job _buildMessageHandlerJob;
+    private final Job _buildReplyMessageHandlerJob;
+    private final LinkedBlockingQueue<BuildMessageState> _inboundBuildMessages;
+    private final BuildMessageProcessor _processor;
+    private final ParticipatingThrottler _throttler;
+    private volatile boolean _isRunning;
+
+    /** TODO these may be too high, review and adjust */
+    private static final int MIN_QUEUE = 18;
+    private static final int MAX_QUEUE = 192;
+
+    private static final int NEXT_HOP_LOOKUP_TIMEOUT = 15*1000;
     
-    public BuildHandler(RouterContext ctx, BuildExecutor exec) {
+    /**
+     *  This must be high, as if we timeout the send we remove the tunnel from
+     *  participating via OnFailedSendJob.
+     *  If them msg actually got through then we will be dropping
+     *  all the traffic in TunnelDispatcher.dispatch(TunnelDataMessage msg, Hash recvFrom).
+     *  10s was not enough.
+     */
+    private static final int NEXT_HOP_SEND_TIMEOUT = 25*1000;
+
+    public BuildHandler(RouterContext ctx, TunnelPoolManager manager, BuildExecutor exec) {
         _context = ctx;
         _log = ctx.logManager().getLog(getClass());
+        _manager = manager;
         _exec = exec;
-        _inboundBuildMessages = new ArrayList(16);
-        _inboundBuildReplyMessages = new ArrayList(16);
-        _inboundBuildEndMessages = new ArrayList(16);
+        // Queue size = 12 * share BW / 48K
+        int sz = Math.min(MAX_QUEUE, Math.max(MIN_QUEUE, TunnelDispatcher.getShareBandwidth(ctx) * MIN_QUEUE / 48));
+        _inboundBuildMessages = new LinkedBlockingQueue(sz);
     
         _context.statManager().createRateStat("tunnel.reject.10", "How often we reject a tunnel probabalistically", "Tunnels", new long[] { 60*1000, 10*60*1000 });
         _context.statManager().createRateStat("tunnel.reject.20", "How often we reject a tunnel because of transient overload", "Tunnels", new long[] { 60*1000, 10*60*1000 });
         _context.statManager().createRateStat("tunnel.reject.30", "How often we reject a tunnel because of bandwidth overload", "Tunnels", new long[] { 60*1000, 10*60*1000 });
         _context.statManager().createRateStat("tunnel.reject.50", "How often we reject a tunnel because of a critical issue (shutdown, etc)", "Tunnels", new long[] { 60*1000, 10*60*1000 });
 
-        _context.statManager().createRateStat("tunnel.decryptRequestTime", "How long it takes to decrypt a new tunnel build request", "Tunnels", new long[] { 60*1000, 10*60*1000 });
-        _context.statManager().createRateStat("tunnel.rejectTimeout", "How often we reject a tunnel because we can't find the next hop", "Tunnels", new long[] { 60*1000, 10*60*1000 });
-        _context.statManager().createRateStat("tunnel.rejectTimeout2", "How often we fail a tunnel because we can't contact the next hop", "Tunnels", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRequiredRateStat("tunnel.decryptRequestTime", "Time to decrypt a build request (ms)", "Tunnels", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRequiredRateStat("tunnel.rejectTimeout", "Reject tunnel count (unknown next hop)", "Tunnels", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRequiredRateStat("tunnel.rejectTimeout2", "Reject tunnel count (can't contact next hop)", "Tunnels", new long[] { 60*1000, 10*60*1000 });
 
-        _context.statManager().createRateStat("tunnel.rejectOverloaded", "How long we had to wait before processing the request (when it was rejected)", "Tunnels", new long[] { 60*1000, 10*60*1000 });
-        _context.statManager().createRateStat("tunnel.acceptLoad", "Delay before processing the accepted request", "Tunnels", new long[] { 60*1000, 10*60*1000 });
-        _context.statManager().createRateStat("tunnel.dropLoad", "How long we had to wait before finally giving up on an inbound request (period is queue count)?", "Tunnels", new long[] { 60*1000, 10*60*1000 });
-        _context.statManager().createRateStat("tunnel.dropLoadDelay", "How long we had to wait before finally giving up on an inbound request?", "Tunnels", new long[] { 60*1000, 10*60*1000 });
-        _context.statManager().createRateStat("tunnel.dropLoadBacklog", "How many requests were pending when they were so lagged that we had to drop a new inbound request??", "Tunnels", new long[] { 60*1000, 10*60*1000 });
-        _context.statManager().createRateStat("tunnel.dropLoadProactive", "What the estimated queue time was when we dropped an inbound request (period is num pending)", "Tunnels", new long[] { 60*1000, 10*60*1000 });
-        _context.statManager().createRateStat("tunnel.dropLoadProactiveAbort", "How often we would have proactively dropped a request, but allowed it through?", "Tunnels", new long[] { 60*1000, 10*60*1000 });
-        _context.statManager().createRateStat("tunnel.handleRemaining", "How many pending inbound requests were left on the queue after one pass?", "Tunnels", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRequiredRateStat("tunnel.rejectOverloaded", "Delay to process rejected request (ms)", "Tunnels", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRequiredRateStat("tunnel.acceptLoad", "Delay to process accepted request (ms)", "Tunnels", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("tunnel.dropConnLimits", "Drop instead of reject due to conn limits", "Tunnels", new long[] { 10*60*1000 });
+        _context.statManager().createRateStat("tunnel.rejectConnLimits", "Reject due to conn limits", "Tunnels", new long[] { 10*60*1000 });
+        _context.statManager().createRequiredRateStat("tunnel.dropLoad", "Delay before dropping request (ms)?", "Tunnels", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRequiredRateStat("tunnel.dropLoadDelay", "Delay before abandoning request (ms)", "Tunnels", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRequiredRateStat("tunnel.dropLoadBacklog", "Pending request count when dropped", "Tunnels", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRequiredRateStat("tunnel.dropLoadProactive", "Delay estimate when dropped (ms)", "Tunnels", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRequiredRateStat("tunnel.dropLoadProactiveAbort", "Allowed requests during load", "Tunnels", new long[] { 60*1000, 10*60*1000 });
+        //_context.statManager().createRateStat("tunnel.handleRemaining", "How many pending inbound requests were left on the queue after one pass?", "Tunnels", new long[] { 60*1000, 10*60*1000 });
         _context.statManager().createRateStat("tunnel.buildReplyTooSlow", "How often a tunnel build reply came back after we had given up waiting for it?", "Tunnels", new long[] { 60*1000, 10*60*1000 });
         
         _context.statManager().createRateStat("tunnel.receiveRejectionProbabalistic", "How often we are rejected probabalistically?", "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
         _context.statManager().createRateStat("tunnel.receiveRejectionTransient", "How often we are rejected due to transient overload?", "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
         _context.statManager().createRateStat("tunnel.receiveRejectionBandwidth", "How often we are rejected due to bandwidth overload?", "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
         _context.statManager().createRateStat("tunnel.receiveRejectionCritical", "How often we are rejected due to critical failure?", "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
+
+        _context.statManager().createRateStat("tunnel.corruptBuildReply", "", "Tunnels", new long[] { 24*60*60*1000l });
+        ctx.statManager().createRateStat("tunnel.buildLookupSuccess", "Was a deferred lookup successful?", "Tunnels", new long[] { 60*60*1000 });
         
         _processor = new BuildMessageProcessor(ctx);
+        _throttler = new ParticipatingThrottler(ctx);
         _buildMessageHandlerJob = new TunnelBuildMessageHandlerJob(ctx);
         _buildReplyMessageHandlerJob = new TunnelBuildReplyMessageHandlerJob(ctx);
-        ctx.inNetMessagePool().registerHandlerJobBuilder(TunnelBuildMessage.MESSAGE_TYPE, new TunnelBuildMessageHandlerJobBuilder());
-        ctx.inNetMessagePool().registerHandlerJobBuilder(TunnelBuildReplyMessage.MESSAGE_TYPE, new TunnelBuildReplyMessageHandlerJobBuilder());
+        TunnelBuildMessageHandlerJobBuilder tbmhjb = new TunnelBuildMessageHandlerJobBuilder();
+        TunnelBuildReplyMessageHandlerJobBuilder tbrmhjb = new TunnelBuildReplyMessageHandlerJobBuilder();
+        ctx.inNetMessagePool().registerHandlerJobBuilder(TunnelBuildMessage.MESSAGE_TYPE, tbmhjb);
+        ctx.inNetMessagePool().registerHandlerJobBuilder(TunnelBuildReplyMessage.MESSAGE_TYPE, tbrmhjb);
+        ctx.inNetMessagePool().registerHandlerJobBuilder(VariableTunnelBuildMessage.MESSAGE_TYPE, tbmhjb);
+        ctx.inNetMessagePool().registerHandlerJobBuilder(VariableTunnelBuildReplyMessage.MESSAGE_TYPE, tbrmhjb);
     }
-    
-    private static final int MAX_HANDLE_AT_ONCE = 2;
-    private static final int NEXT_HOP_LOOKUP_TIMEOUT = 5*1000;
     
     /**
-     * Blocking call to handle a few of the pending inbound requests, returning how many
-     * requests remain after this pass
+     *  @since 0.9
      */
-    int handleInboundRequests() {
-        int dropExpired = 0;
-        int remaining = 0;
-        List handled = null;
-        long beforeFindHandled = System.currentTimeMillis();
-        synchronized (_inboundBuildMessages) {
-            int toHandle = _inboundBuildMessages.size();
-            if (toHandle > 0) {
-                if (toHandle > MAX_HANDLE_AT_ONCE)
-                    toHandle = MAX_HANDLE_AT_ONCE;
-                handled = new ArrayList(toHandle);
-                if (false) {
-                    for (int i = 0; i < toHandle; i++) // LIFO for lower response time (should we RED it for DoS?)
-                        handled.add(_inboundBuildMessages.remove(_inboundBuildMessages.size()-1));
-                } else {
-                    // drop any expired messages
-                    long dropBefore = System.currentTimeMillis() - (BuildRequestor.REQUEST_TIMEOUT/4);
-                    do {
-                        BuildMessageState state = (BuildMessageState)_inboundBuildMessages.get(0);
-                        if (state.recvTime <= dropBefore) {
-                            _inboundBuildMessages.remove(0);
-                            dropExpired++;
-                            if (_log.shouldLog(Log.WARN))
-                                _log.warn("Not even trying to handle/decrypt the request " + state.msg.getUniqueId() 
-                                           + ", since we received it a long time ago: " + (System.currentTimeMillis() - state.recvTime));
-                            _context.statManager().addRateData("tunnel.dropLoadDelay", System.currentTimeMillis() - state.recvTime, 0);
-                        } else {
-                            break;
-                        }
-                    } while (_inboundBuildMessages.size() > 0);
-                    
-                    if (dropExpired > 0)
-                        _context.throttle().setTunnelStatus("Dropping tunnel requests: Too slow");
+    public void restart() {
+        _inboundBuildMessages.clear();
+    }
 
-                    // now pull off the oldest requests first (we're doing a tail-drop
-                    // when adding)
-                    for (int i = 0; i < toHandle && _inboundBuildMessages.size() > 0; i++)
-                        handled.add(_inboundBuildMessages.remove(0));
-                }
-            }
-            remaining = _inboundBuildMessages.size();
-        }
-        if (handled != null) {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Handling " + handled.size() + " requests (took " + (System.currentTimeMillis()-beforeFindHandled) + "ms to find them)");
-            
-            for (int i = 0; i < handled.size(); i++) {
-                BuildMessageState state = (BuildMessageState)handled.get(i);
-                long beforeHandle = System.currentTimeMillis();
-                long actualTime = handleRequest(state);
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Handle took " + (System.currentTimeMillis()-beforeHandle) + "/" + actualTime + " (" + i + " out of " + handled.size() + " with " + remaining + " remaining)");
-            }
-            handled.clear();
-        }
-        synchronized (_inboundBuildEndMessages) {
-            int toHandle = _inboundBuildEndMessages.size();
-            if (toHandle > 0) {
-                if (handled == null)
-                    handled = new ArrayList(_inboundBuildEndMessages);
-                else
-                    handled.addAll(_inboundBuildEndMessages);
-                _inboundBuildEndMessages.clear();
-            }
-        }
-        if (handled != null) {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Handling " + handled.size() + " requests that are actually replies");
-            // these are inbound build messages that actually contain the full replies, since
-            // they are for inbound tunnels we have created
-            for (int i = 0; i < handled.size(); i++) {
-                BuildEndMessageState state = (BuildEndMessageState)handled.get(i);
-                handleRequestAsInboundEndpoint(state);
-            }
-        }
-        
-        // anything else?
-        /*
-        synchronized (_inboundBuildMessages) {
-            int remaining = _inboundBuildMessages.size();
-            return remaining;
-        }
-         */
-        if (remaining > 0)
-            _context.statManager().addRateData("tunnel.handleRemaining", remaining, 0);
-        return remaining;
-    }
-    
-    void handleInboundReplies() {
-        List handled = null;
-        synchronized (_inboundBuildReplyMessages) {
-            int toHandle = _inboundBuildReplyMessages.size();
-            if (toHandle > 0) {
-                // always handle all of them - they're replies that we were waiting for!
-                handled = new ArrayList(_inboundBuildReplyMessages);
-                _inboundBuildReplyMessages.clear();
-            }
-        }
-        if (handled != null) {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Handling " + handled.size() + " replies");
-            
-            for (int i = 0; i < handled.size(); i++) {
-                BuildReplyMessageState state = (BuildReplyMessageState)handled.get(i);
-                handleReply(state);
-            }
+    /**
+     *  Cannot be restarted.
+     *  @param numThreads the number of threads to be shut down
+     *  @since 0.9
+     */
+    public void shutdown(int numThreads) {
+        _isRunning = false;
+        _inboundBuildMessages.clear();
+        BuildMessageState poison = new BuildMessageState(null, null, null);
+        for (int i = 0; i < numThreads; i++) {
+            _inboundBuildMessages.offer(poison);
         }
     }
+
+    /**
+     * Thread to handle inbound requests
+     * @since 0.8.11
+     */
+    public void run() {
+        _isRunning = true;
+        while (_isRunning && !_manager.isShutdown()) {
+            try {
+                handleInboundRequest();
+            } catch (Exception e) {
+                _log.log(Log.CRIT, "B0rked in the tunnel handler", e);
+            }
+        }
+        if (_log.shouldLog(Log.WARN))
+            _log.warn("Done handling");
+        _isRunning = false;
+    }
+
+    /**
+     * Blocking call to handle a single inbound request
+     */
+    private void handleInboundRequest() {
+        BuildMessageState state = null;
+
+            try {
+                state = _inboundBuildMessages.take();
+            } catch (InterruptedException ie) {
+                return;
+            }
+
+            // check for poison
+            if (state.msg == null) {
+                _isRunning = false;
+                return;
+            }
+
+            long dropBefore = System.currentTimeMillis() - (BuildRequestor.REQUEST_TIMEOUT/4);
+            if (state.recvTime <= dropBefore) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Not even trying to handle/decrypt the request " + state.msg.getUniqueId() 
+                              + ", since we received it a long time ago: " + (System.currentTimeMillis() - state.recvTime));
+                _context.statManager().addRateData("tunnel.dropLoadDelay", System.currentTimeMillis() - state.recvTime, 0);
+                _context.throttle().setTunnelStatus(_x("Dropping tunnel requests: Too slow"));
+                return;
+            }       
+            handleRequest(state);
+
+        //int remaining = _inboundBuildMessages.size();
+        //if (remaining > 0)
+        //    _context.statManager().addRateData("tunnel.handleRemaining", remaining, 0);
+        //return remaining;
+    }
     
+    /**
+     * Blocking call to handle a single inbound reply
+     */
     private void handleReply(BuildReplyMessageState state) {
         // search through the tunnels for a reply
         long replyMessageId = state.msg.getUniqueId();
-        PooledTunnelCreatorConfig cfg = null;
-        List building = _exec.locked_getCurrentlyBuilding();
-        StringBuffer buf = null;
-        synchronized (building) {
-            for (int i = 0; i < building.size(); i++) {
-                PooledTunnelCreatorConfig cur = (PooledTunnelCreatorConfig)building.get(i);
-                if (cur.getReplyMessageId() == replyMessageId) {
-                    building.remove(i);
-                    cfg = cur;
-                    break;
-                }
-            }
-            if ( (cfg == null) && (_log.shouldLog(Log.DEBUG)) )
-                buf = new StringBuffer(building.toString());
-        }
-        
+        PooledTunnelCreatorConfig cfg = _exec.removeFromBuilding(replyMessageId);
         if (cfg == null) {
             // cannot handle - not pending... took too long?
             if (_log.shouldLog(Log.WARN))
                 _log.warn("The reply " + replyMessageId + " did not match any pending tunnels");
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Pending tunnels: " + buf.toString());
             _context.statManager().addRateData("tunnel.buildReplyTooSlow", 1, 0);
         } else {
             handleReply(state.msg, cfg, System.currentTimeMillis()-state.recvTime);
         }
     }
     
+    /**
+     * Blocking call to handle a single inbound reply
+     */
     private void handleReply(TunnelBuildReplyMessage msg, PooledTunnelCreatorConfig cfg, long delay) {
         long requestedOn = cfg.getExpiration() - 10*60*1000;
         long rtt = _context.clock().now() - requestedOn;
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug(msg.getUniqueId() + ": Handling the reply after " + rtt + ", delayed " + delay + " waiting for " + cfg);
+        if (_log.shouldLog(Log.INFO))
+            _log.info(msg.getUniqueId() + ": Handling the reply after " + rtt + ", delayed " + delay + " waiting for " + cfg);
         
-        BuildReplyHandler handler = new BuildReplyHandler();
-        List order = cfg.getReplyOrder();
-        int statuses[] = handler.decrypt(_context, msg, cfg, order);
+        List<Integer> order = cfg.getReplyOrder();
+        int statuses[] = BuildReplyHandler.decrypt(_context, msg, cfg, order);
         if (statuses != null) {
             boolean allAgree = true;
             // For each peer in the tunnel
             for (int i = 0; i < cfg.getLength(); i++) {
                 Hash peer = cfg.getPeer(i);
+                // If this tunnel member is us, skip this record, don't update profile or stats
+                // for ourselves, we always agree
+                // Why must we save a slot for ourselves anyway?
+                if (peer.equals(_context.routerHash()))
+                    continue;
+
                 int record = order.indexOf(Integer.valueOf(i));
                 if (record < 0) {
                     _log.error("Bad status index " + i);
@@ -253,9 +241,9 @@ class BuildHandler {
                     _exec.buildComplete(cfg, cfg.getTunnelPool());
                     return;
                 }
+
                 int howBad = statuses[record];
-                // If this tunnel member isn't ourselves
-                if (!peer.toBase64().equals(_context.routerHash().toBase64())) {
+
                     // Look up routerInfo
                     RouterInfo ri = _context.netDb().lookupRouterInfoLocally(peer);
                     // Default and detect bandwidth tier
@@ -269,8 +257,7 @@ class BuildHandler {
                         _context.statManager().addRateData("tunnel.tierReject" + bwTier, 1, 0);
                     }
                     if (_log.shouldLog(Log.INFO))
-                        _log.info(msg.getUniqueId() + ": Peer " + peer.toBase64() + " replied with status " + howBad);
-                }
+                        _log.info(msg.getUniqueId() + ": Peer " + peer + " replied with status " + howBad);
 
                 if (howBad == 0) {
                     // w3wt
@@ -296,7 +283,7 @@ class BuildHandler {
                     _context.messageHistory().tunnelParticipantRejected(peer, "peer rejected after " + rtt + " with " + howBad + ": " + cfg.toString());
                 }
             }
-            _exec.buildComplete(cfg, cfg.getTunnelPool());
+
             if (allAgree) {
                 // wikked, completely build
                 if (cfg.isInbound())
@@ -304,6 +291,8 @@ class BuildHandler {
                 else
                     _context.tunnelDispatcher().joinOutbound(cfg);
                 cfg.getTunnelPool().addTunnel(cfg); // self.self.self.foo!
+                // call buildComplete() after addTunnel() so we don't try another build.
+                _exec.buildComplete(cfg, cfg.getTunnelPool());
                 _exec.buildSuccessful(cfg);
                 
                 ExpireJob expireJob = new ExpireJob(_context, cfg, cfg.getTunnelPool());
@@ -315,6 +304,7 @@ class BuildHandler {
                     _context.statManager().addRateData("tunnel.buildClientSuccess", rtt, rtt);
             } else {
                 // someone is no fun
+                _exec.buildComplete(cfg, cfg.getTunnelPool());
                 if (cfg.getDestination() == null)
                     _context.statManager().addRateData("tunnel.buildExploratoryReject", rtt, rtt);
                 else
@@ -323,11 +313,13 @@ class BuildHandler {
         } else {
             if (_log.shouldLog(Log.WARN))
                 _log.warn(msg.getUniqueId() + ": Tunnel reply could not be decrypted for tunnel " + cfg);
+            _context.statManager().addRateData("tunnel.corruptBuildReply", 1, 0);
             // don't leak
             _exec.buildComplete(cfg, cfg.getTunnelPool());
         }
     }
     
+    /** @return handle time or -1 if it wasn't completely handled */
     private long handleRequest(BuildMessageState state) {
         long timeSinceReceived = System.currentTimeMillis()-state.recvTime;
         if (_log.shouldLog(Log.DEBUG))
@@ -335,7 +327,7 @@ class BuildHandler {
         
         if (timeSinceReceived > (BuildRequestor.REQUEST_TIMEOUT*3)) {
             // don't even bother, since we are so overloaded locally
-            _context.throttle().setTunnelStatus("Dropping tunnel requests: Overloaded");
+            _context.throttle().setTunnelStatus(_x("Dropping tunnel requests: Overloaded"));
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Not even trying to handle/decrypt the request " + state.msg.getUniqueId() 
                            + ", since we received it a long time ago: " + timeSinceReceived);
@@ -349,7 +341,7 @@ class BuildHandler {
         BuildRequestRecord req = _processor.decrypt(_context, state.msg, _context.routerHash(), _context.keyManager().getPrivateKey());
         long decryptTime = System.currentTimeMillis() - beforeDecrypt;
         _context.statManager().addRateData("tunnel.decryptRequestTime", decryptTime, decryptTime);
-        if (decryptTime > 500)
+        if (decryptTime > 500 && _log.shouldLog(Log.WARN))
             _log.warn("Took too long to decrypt the request: " + decryptTime + " for message " + state.msg.getUniqueId() + " received " + (timeSinceReceived+decryptTime) + " ago");
         if (req == null) {
             // no records matched, or the decryption failed.  bah
@@ -363,13 +355,14 @@ class BuildHandler {
         long readPeerTime = System.currentTimeMillis()-beforeLookup;
         RouterInfo nextPeerInfo = _context.netDb().lookupRouterInfoLocally(nextPeer);
         long lookupTime = System.currentTimeMillis()-beforeLookup;
-        if (lookupTime > 500)
+        if (lookupTime > 500 && _log.shouldLog(Log.WARN))
             _log.warn("Took too long to lookup the request: " + lookupTime + "/" + readPeerTime + " for message " + state.msg.getUniqueId() + " received " + (timeSinceReceived+decryptTime) + " ago");
         if (nextPeerInfo == null) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Request " + state.msg.getUniqueId() + "/" + req.readReceiveTunnelId() + "/" + req.readNextTunnelId() 
-                           + " handled, looking for the next peer " + nextPeer.toBase64());
-            _context.netDb().lookupRouterInfo(nextPeer, new HandleReq(_context, state, req, nextPeer), new TimeoutReq(_context, state, req, nextPeer), NEXT_HOP_LOOKUP_TIMEOUT);
+                           + " handled, looking for the next peer " + nextPeer);
+            _context.netDb().lookupRouterInfo(nextPeer, new HandleReq(_context, state, req, nextPeer),
+                                              new TimeoutReq(_context, state, req, nextPeer), NEXT_HOP_LOOKUP_TIMEOUT);
             return -1;
         } else {
             long beforeHandle = System.currentTimeMillis();
@@ -377,7 +370,7 @@ class BuildHandler {
             long handleTime = System.currentTimeMillis() - beforeHandle;
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Request " + state.msg.getUniqueId() + " handled and we know the next peer " 
-                           + nextPeer.toBase64() + " after " + handleTime
+                           + nextPeer + " after " + handleTime
                            + "/" + decryptTime + "/" + lookupTime + "/" + timeSinceReceived);
             return handleTime;
         }
@@ -387,17 +380,22 @@ class BuildHandler {
      * This request is actually a reply, process it as such
      */
     private void handleRequestAsInboundEndpoint(BuildEndMessageState state) {
-        TunnelBuildReplyMessage msg = new TunnelBuildReplyMessage(_context);
-        for (int i = 0; i < TunnelBuildMessage.RECORD_COUNT; i++)
+        int records = state.msg.getRecordCount();
+        TunnelBuildReplyMessage msg;
+        if (records == TunnelBuildMessage.MAX_RECORD_COUNT)
+            msg = new TunnelBuildReplyMessage(_context);
+        else
+            msg = new VariableTunnelBuildReplyMessage(_context, records);
+        for (int i = 0; i < records; i++)
             msg.setRecord(i, state.msg.getRecord(i));
         msg.setUniqueId(state.msg.getUniqueId());
         handleReply(msg, state.cfg, System.currentTimeMillis() - state.recvTime);
     }
     
     private class HandleReq extends JobImpl {
-        private BuildMessageState _state;
-        private BuildRequestRecord _req;
-        private Hash _nextPeer;
+        private final BuildMessageState _state;
+        private final BuildRequestRecord _req;
+        private final Hash _nextPeer;
         HandleReq(RouterContext ctx, BuildMessageState state, BuildRequestRecord req, Hash nextPeer) {
             super(ctx);
             _state = state;
@@ -407,20 +405,24 @@ class BuildHandler {
         public String getName() { return "Deferred tunnel join processing"; }
         public void runJob() {
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Request " + _state.msg.getUniqueId() + " handled with a successful deferred lookup for the next peer " + _nextPeer.toBase64());
+                _log.debug("Request " + _state.msg.getUniqueId() + " handled with a successful deferred lookup for the next peer " + _nextPeer);
 
             RouterInfo ri = getContext().netDb().lookupRouterInfoLocally(_nextPeer);
-            if (ri != null)
+            if (ri != null) {
                 handleReq(ri, _state, _req, _nextPeer);
-            else
-                _log.error("Deferred successfully, but we couldnt find " + _nextPeer.toBase64() + "?");
+                getContext().statManager().addRateData("tunnel.buildLookupSuccess", 1, 0);
+            } else {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Deferred successfully, but we couldnt find " + _nextPeer);
+                getContext().statManager().addRateData("tunnel.buildLookupSuccess", 0, 0);
+            }
         }
     }
 
     private static class TimeoutReq extends JobImpl {
-        private BuildMessageState _state;
-        private BuildRequestRecord _req;
-        private Hash _nextPeer;
+        private final BuildMessageState _state;
+        private final BuildRequestRecord _req;
+        private final Hash _nextPeer;
         TimeoutReq(RouterContext ctx, BuildMessageState state, BuildRequestRecord req, Hash nextPeer) {
             super(ctx);
             _state = state;
@@ -430,6 +432,7 @@ class BuildHandler {
         public String getName() { return "Timeout looking for next peer for tunnel join"; }
         public void runJob() {
             getContext().statManager().addRateData("tunnel.rejectTimeout", 1, 0);
+            getContext().statManager().addRateData("tunnel.buildLookupSuccess", 0, 0);
             // logging commented out so class can be static
             //if (_log.shouldLog(Log.WARN))
             //    _log.warn("Request " + _state.msg.getUniqueId() 
@@ -437,7 +440,7 @@ class BuildHandler {
 
             // ???  should we blame the peer here?   getContext().profileManager().tunnelTimedOut(_nextPeer);
             getContext().messageHistory().tunnelRejected(_state.fromHash, new TunnelId(_req.readReceiveTunnelId()), _nextPeer, 
-                                                         "rejected because we couldn't find " + _nextPeer.toBase64() + ": " +
+                                                         "rejected because we couldn't find " + _nextPeer + ": " +
                                                          _state.msg.getUniqueId() + "/" + _req.readNextTunnelId());
         }
     }
@@ -466,12 +469,51 @@ class BuildHandler {
         return 0;
     }
     
-    private static final String PROP_REJECT_NONPARTICIPANT = "router.participantOnly";
+    /**
+     *  Actually process the request and send the reply.
+     *
+     *  Todo: Replies are not subject to RED for bandwidth reasons,
+     *  and the bandwidth is not credited to any tunnel.
+     *  If we did credit the reply to the tunnel, it would
+     *  prevent the classification of the tunnel as 'inactive' on tunnels.jsp.
+     */
     private void handleReq(RouterInfo nextPeerInfo, BuildMessageState state, BuildRequestRecord req, Hash nextPeer) {
         long ourId = req.readReceiveTunnelId();
         long nextId = req.readNextTunnelId();
         boolean isInGW = req.readIsInboundGateway();
         boolean isOutEnd = req.readIsOutboundEndpoint();
+
+        // Loop checks
+        if ((!isOutEnd) && _context.routerHash().equals(nextPeer)) {
+            // We are 2 hops in a row? Drop it without a reply.
+            // No way to recognize if we are every other hop, but see below
+            _log.error("Dropping build request, we the next hop");
+            return;
+        }
+        // previous test should be sufficient to keep it from getting here but maybe not?
+        if (!isInGW) {
+            Hash from = state.fromHash;
+            if (from == null)
+                from = state.from.calculateHash();
+            if (_context.routerHash().equals(from)) {
+                _log.error("Dropping build request, we are the previous hop");
+                return;
+            }
+        }
+        if ((!isOutEnd) && (!isInGW)) {
+            Hash from = state.fromHash;
+            if (from == null)
+                from = state.from.calculateHash();
+            // Previous and next hop the same? Don't help somebody be evil. Drop it without a reply.
+            // A-B-C-A is not preventable
+            if (nextPeer.equals(from)) {
+                _log.error("Dropping build request with the same previous and next hop");
+                return;
+            }
+        }
+
+        // time is in hours, and only for log below - what's the point?
+        // tunnel-alt-creation.html specifies that this is enforced +/- 1 hour but it is not.
         long time = req.readRequestTime();
         long now = (_context.clock().now() / (60l*60l*1000l)) * (60*60*1000);
         int ourSlot = -1;
@@ -494,7 +536,7 @@ class BuildHandler {
             pDrop = (float)Math.pow(pDrop, 16);
             if (_context.random().nextFloat() < pDrop) { // || (proactiveDrops > MAX_PROACTIVE_DROPS) ) ) {
                 _context.statManager().addRateData("tunnel.rejectOverloaded", recvDelay, proactiveDrops);
-                _context.throttle().setTunnelStatus("Rejecting tunnels: Request overload");
+                _context.throttle().setTunnelStatus(_x("Rejecting tunnels: Request overload"));
                 if (true || (proactiveDrops < MAX_PROACTIVE_DROPS*2))
                     response = TunnelHistory.TUNNEL_REJECT_TRANSIENT_OVERLOAD;
                 else
@@ -503,24 +545,61 @@ class BuildHandler {
                 _context.statManager().addRateData("tunnel.acceptLoad", recvDelay, recvDelay);
             }
         }
-        
+
         /*
          * Being a IBGW or OBEP generally leads to more connections, so if we are
          * approaching our connection limit (i.e. !haveCapacity()),
          * reject this request.
+         *
+         * Don't do this for class N or O, under the assumption that they are already talking
+         * to most of the routers, so there's no reason to reject. This may drive them
+         * to their conn. limits, but it's hopefully a temporary solution to the
+         * tunnel build congestion. As the net grows this will have to be revisited.
          */
-        if (response == 0 && (isInGW || isOutEnd) &&
-            (Boolean.valueOf(_context.getProperty(PROP_REJECT_NONPARTICIPANT)).booleanValue() ||
-             ! _context.commSystem().haveCapacity())) {
-                _context.throttle().setTunnelStatus("Rejecting tunnels: Connection limit");
+        RouterInfo ri = _context.router().getRouterInfo();
+        if (response == 0) {
+            if (ri == null) {
+                // ?? We should always have a RI
                 response = TunnelHistory.TUNNEL_REJECT_BANDWIDTH;
+            } else {
+                char bw = ri.getBandwidthTier().charAt(0);
+                if (bw != 'O' && bw != 'N' &&
+                    ((isInGW && ! _context.commSystem().haveInboundCapacity(87)) ||
+                     (isOutEnd && ! _context.commSystem().haveOutboundCapacity(87)))) {
+                        _context.statManager().addRateData("tunnel.rejectConnLimits", 1);
+                        _context.throttle().setTunnelStatus(_x("Rejecting tunnels: Connection limit"));
+                        response = TunnelHistory.TUNNEL_REJECT_BANDWIDTH;
+                }
+            }
+        }
+        
+        // Check participating throttle counters for previous and next hops
+        // This is at the end as it compares to a percentage of created tunnels.
+        // We may need another counter above for requests.
+        if (response == 0 && !isInGW) {
+            Hash from = state.fromHash;
+            if (from == null)
+                from = state.from.calculateHash();
+            if (from != null && _throttler.shouldThrottle(from)) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Rejecting tunnel (hop throttle), previous hop: " + from);
+                // no setTunnelStatus() indication
+                response = TunnelHistory.TUNNEL_REJECT_BANDWIDTH;
+            }
+        }
+        if (response == 0 && (!isOutEnd) &&
+            _throttler.shouldThrottle(nextPeer)) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Rejecting tunnel (hop throttle), next hop: " + nextPeer);
+            // no setTunnelStatus() indication
+            response = TunnelHistory.TUNNEL_REJECT_BANDWIDTH;
         }
 
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Responding to " + state.msg.getUniqueId() + "/" + ourId
                        + " after " + recvDelay + "/" + proactiveDrops + " with " + response 
-                       + " from " + (state.fromHash != null ? state.fromHash.toBase64() : 
-                                     state.from != null ? state.from.calculateHash().toBase64() : "tunnel"));
+                       + " from " + (state.fromHash != null ? state.fromHash : 
+                                     state.from != null ? state.from.calculateHash() : "tunnel"));
 
         HopConfig cfg = null;
         if (response == 0) {
@@ -546,7 +625,7 @@ class BuildHandler {
                 cfg.setSendTo(null);
                 cfg.setSendTunnelId(null);
             } else {
-                cfg.setSendTo(req.readNextIdentity());
+                cfg.setSendTo(nextPeer);
                 cfg.setSendTunnelId(DataHelper.toLong(4, nextId));
             }
 
@@ -562,16 +641,28 @@ class BuildHandler {
                 _context.tunnelDispatcher().joinParticipant(cfg);
         } else {
             _context.statManager().addRateData("tunnel.reject." + response, 1, 1);
-            _context.messageHistory().tunnelRejected(state.fromHash, new TunnelId(ourId), req.readNextIdentity(), 
+            _context.messageHistory().tunnelRejected(state.fromHash, new TunnelId(ourId), nextPeer, 
                                                      "rejecting for " + response + ": " +
                                                      state.msg.getUniqueId() + "/" + ourId + "/" + req.readNextTunnelId() + " delay " +
                                                      recvDelay + " as " +
                                                      (isOutEnd ? "outbound endpoint" : isInGW ? "inbound gw" : "participant"));
         }
 
-        BuildResponseRecord resp = new BuildResponseRecord();
-        byte reply[] = resp.create(_context, response, req.readReplyKey(), req.readReplyIV(), state.msg.getUniqueId());
-        for (int j = 0; j < TunnelBuildMessage.RECORD_COUNT; j++) {
+        // Connection congestion control:
+        // If we rejected the request, are near our conn limits, and aren't connected to the next hop,
+        // just drop it.
+        // 81% = between 75% control measures in Transports and 87% rejection above
+        if (response != 0 &&
+            (! _context.routerHash().equals(nextPeer)) &&
+            (! _context.commSystem().haveOutboundCapacity(81)) &&
+            (! _context.commSystem().isEstablished(nextPeer))) {
+            _context.statManager().addRateData("tunnel.dropConnLimits", 1, 0);
+            return;
+        }
+
+        byte reply[] = BuildResponseRecord.create(_context, response, req.readReplyKey(), req.readReplyIV(), state.msg.getUniqueId());
+        int records = state.msg.getRecordCount();
+        for (int j = 0; j < records; j++) {
             if (state.msg.getRecord(j) == null) {
                 ourSlot = j;
                 state.msg.setRecord(j, new ByteArray(reply));
@@ -583,18 +674,18 @@ class BuildHandler {
         }
 
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Read slot " + ourSlot + " containing our hop @ " + _context.routerHash().toBase64()
+            _log.debug("Read slot " + ourSlot + " containing our hop @ " + _context.routerHash()
                       + " accepted? " + response + " receiving on " + ourId 
                       + " sending to " + nextId
-                      + " on " + nextPeer.toBase64()
+                      + " on " + nextPeer
                       + " inGW? " + isInGW + " outEnd? " + isOutEnd + " time difference " + (now-time)
                       + " recvDelay " + recvDelay + " replyMessage " + req.readReplyMessageId()
-                      + " replyKey " + req.readReplyKey().toBase64() + " replyIV " + Base64.encode(req.readReplyIV()));
+                      + " replyKey " + req.readReplyKey() + " replyIV " + Base64.encode(req.readReplyIV()));
 
         // now actually send the response
         if (!isOutEnd) {
             state.msg.setUniqueId(req.readReplyMessageId());
-            state.msg.setMessageExpiration(_context.clock().now() + 10*1000);
+            state.msg.setMessageExpiration(_context.clock().now() + NEXT_HOP_SEND_TIMEOUT);
             OutNetMessage msg = new OutNetMessage(_context);
             msg.setMessage(state.msg);
             msg.setExpiration(state.msg.getMessageExpiration());
@@ -604,13 +695,18 @@ class BuildHandler {
                 msg.setOnFailedSendJob(new TunnelBuildNextHopFailJob(_context, cfg));
             _context.outNetMessagePool().add(msg);
         } else {
+            // We are the OBEP.
             // send it to the reply tunnel on the reply peer within a new TunnelBuildReplyMessage
             // (enough layers jrandom?)
-            TunnelBuildReplyMessage replyMsg = new TunnelBuildReplyMessage(_context);
-            for (int i = 0; i < state.msg.RECORD_COUNT; i++)
+            TunnelBuildReplyMessage replyMsg;
+            if (records == TunnelBuildMessage.MAX_RECORD_COUNT)
+                replyMsg = new TunnelBuildReplyMessage(_context);
+            else
+                replyMsg = new VariableTunnelBuildReplyMessage(_context, records);
+            for (int i = 0; i < records; i++)
                 replyMsg.setRecord(i, state.msg.getRecord(i));
             replyMsg.setUniqueId(req.readReplyMessageId());
-            replyMsg.setMessageExpiration(_context.clock().now() + 10*1000);
+            replyMsg.setMessageExpiration(_context.clock().now() + NEXT_HOP_SEND_TIMEOUT);
             TunnelGatewayMessage m = new TunnelGatewayMessage(_context);
             m.setMessage(replyMsg);
             m.setMessageExpiration(replyMsg.getMessageExpiration());
@@ -636,102 +732,84 @@ class BuildHandler {
     }
     
     public int getInboundBuildQueueSize() {
-        synchronized (_inboundBuildMessages) {
             return _inboundBuildMessages.size();
-        }
     }
     
-    /** um, this is bad.  don't set this. */
-    private static final boolean DROP_ALL_REQUESTS = false;
-    private static final boolean HANDLE_REPLIES_INLINE = true;
-
+    /**
+     *  Handle incoming Tunnel Build Messages, which are generally requests to us,
+     *  but could also be the reply where we are the IBEP.
+     */
     private class TunnelBuildMessageHandlerJobBuilder implements HandlerJobBuilder {
         public Job createJob(I2NPMessage receivedMessage, RouterIdentity from, Hash fromHash) {
             // need to figure out if this is a reply to an inbound tunnel request (where we are the
             // endpoint, receiving the request at the last hop)
             long reqId = receivedMessage.getUniqueId();
-            PooledTunnelCreatorConfig cfg = null;
-            List building = _exec.locked_getCurrentlyBuilding();
-            List ids = new ArrayList();
-            synchronized (building) {
-                for (int i = 0; i < building.size(); i++) {
-                    PooledTunnelCreatorConfig cur = (PooledTunnelCreatorConfig)building.get(i);
-                    ids.add(new Long(cur.getReplyMessageId()));
-                    if ( (cur.isInbound()) && (cur.getReplyMessageId() == reqId) ) {
-                        building.remove(i);
-                        cfg = cur;
-                        break;
-                    } else if (cur.getReplyMessageId() == reqId) {
-                        _log.error("received it, but its not inbound? " + cur);
-                    }
-                }
-            }
+            PooledTunnelCreatorConfig cfg = _exec.removeFromBuilding(reqId);
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Receive tunnel build message " + reqId + " from " 
-                           + (from != null ? from.calculateHash().toBase64() : fromHash != null ? fromHash.toBase64() : "tunnels") 
-                           + ", waiting ids: " + ids + ", found matching tunnel? " + (cfg != null), 
-                           null);//new Exception("source"));
+                           + (from != null ? from.calculateHash() : fromHash != null ? fromHash : "tunnels") 
+                           + ", found matching tunnel? " + (cfg != null));
             if (cfg != null) {
-                BuildEndMessageState state = new BuildEndMessageState(cfg, receivedMessage);
-                if (HANDLE_REPLIES_INLINE) {
-                    handleRequestAsInboundEndpoint(state);
-                } else {
-                    synchronized (_inboundBuildEndMessages) {
-                        _inboundBuildEndMessages.add(state);
-                    }
-                    _exec.repoll();
+                if (!cfg.isInbound()) {
+                    // shouldnt happen - should we put it back?
+                    _log.error("received it, but its not inbound? " + cfg);
                 }
+                BuildEndMessageState state = new BuildEndMessageState(cfg, receivedMessage);
+                handleRequestAsInboundEndpoint(state);
             } else {
-                if (DROP_ALL_REQUESTS || _exec.wasRecentlyBuilding(reqId)) {
+                if (_exec.wasRecentlyBuilding(reqId)) {
+                    // we are the IBEP but we already gave up?
                     if (_log.shouldLog(Log.WARN))
                         _log.warn("Dropping the reply " + reqId + ", as we used to be building that");
+                    _context.statManager().addRateData("tunnel.buildReplyTooSlow", 1, 0);
                 } else {
-                    synchronized (_inboundBuildMessages) {
-                        boolean removed = false;
-                        int dropped = 0;
-                        for (int i = 0; i < _inboundBuildMessages.size(); i++) {
-                            BuildMessageState cur = (BuildMessageState)_inboundBuildMessages.get(i);
-                            long age = System.currentTimeMillis() - cur.recvTime;
-                            if (age >= BuildRequestor.REQUEST_TIMEOUT/4) {
-                                _inboundBuildMessages.remove(i);
-                                i--;
-                                dropped++;
-                                _context.statManager().addRateData("tunnel.dropLoad", age, _inboundBuildMessages.size());
-                            }
-                        }
-                        if (dropped > 0) {
-                            _context.throttle().setTunnelStatus("Dropping tunnel requests: High load");
+                    int sz = _inboundBuildMessages.size();
+                    BuildMessageState cur = _inboundBuildMessages.peek();
+                    boolean accept = true;
+                    if (cur != null) {
+                        long age = System.currentTimeMillis() - cur.recvTime;
+                        if (age >= BuildRequestor.REQUEST_TIMEOUT/4) {
+                            _context.statManager().addRateData("tunnel.dropLoad", age, sz);
+                            _context.throttle().setTunnelStatus(_x("Dropping tunnel requests: High load"));
                             // if the queue is backlogged, stop adding new messages
-                            _context.statManager().addRateData("tunnel.dropLoadBacklog", _inboundBuildMessages.size(), _inboundBuildMessages.size());
+                            _context.statManager().addRateData("tunnel.dropLoadBacklog", sz, sz);
+                            accept = false;
+                        }
+                    }
+                    if (accept) {
+                        int queueTime = estimateQueueTime(sz);
+                        float pDrop = queueTime/((float)BuildRequestor.REQUEST_TIMEOUT*3);
+                        pDrop = (float)Math.pow(pDrop, 16); // steeeep
+                        float f = _context.random().nextFloat();
+                        //if ( (pDrop > f) && (allowProactiveDrop()) ) {
+                        if (pDrop > f) {
+                            _context.throttle().setTunnelStatus(_x("Dropping tunnel requests: Queue time"));
+                            _context.statManager().addRateData("tunnel.dropLoadProactive", queueTime, sz);
                         } else {
-                            int queueTime = estimateQueueTime(_inboundBuildMessages.size());
-                            float pDrop = queueTime/((float)BuildRequestor.REQUEST_TIMEOUT*3);
-                            pDrop = (float)Math.pow(pDrop, 16); // steeeep
-                            float f = _context.random().nextFloat();
-                            if ( (pDrop > f) && (allowProactiveDrop()) ) {
-                                _context.throttle().setTunnelStatus("Dropping tunnel requests: Queue time");
-                                _context.statManager().addRateData("tunnel.dropLoadProactive", queueTime, _inboundBuildMessages.size());
+                            accept = _inboundBuildMessages.offer(new BuildMessageState(receivedMessage, from, fromHash));
+                            if (accept) {
+                                // wake up the Executor to call handleInboundRequests()
+                                _exec.repoll();
                             } else {
-                                _inboundBuildMessages.add(new BuildMessageState(receivedMessage, from, fromHash));
+                                _context.throttle().setTunnelStatus(_x("Dropping tunnel requests: High load"));
+                                _context.statManager().addRateData("tunnel.dropLoadBacklog", sz, sz);
                             }
                         }
                     }
-                    _exec.repoll();
                 }
             }
             return _buildMessageHandlerJob;
         }
     }
     
+/****
     private boolean allowProactiveDrop() {
-        String allow = _context.getProperty("router.allowProactiveDrop", "true");
-        boolean rv = false;
-        if ( (allow == null) || (Boolean.valueOf(allow).booleanValue()) )
-            rv = true;
+        boolean rv = _context.getBooleanPropertyDefaultTrue("router.allowProactiveDrop");
         if (!rv)
             _context.statManager().addRateData("tunnel.dropLoadProactiveAbort", 1, 0);
         return rv;
     }
+****/
     
     private int estimateQueueTime(int numPendingMessages) {
         int decryptTime = 200;
@@ -759,25 +837,18 @@ class BuildHandler {
         public Job createJob(I2NPMessage receivedMessage, RouterIdentity from, Hash fromHash) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Receive tunnel build reply message " + receivedMessage.getUniqueId() + " from "
-                           + (fromHash != null ? fromHash.toBase64() : from != null ? from.calculateHash().toBase64() : "a tunnel"));
-            if (HANDLE_REPLIES_INLINE) {
-                handleReply(new BuildReplyMessageState(receivedMessage));
-            } else {
-                synchronized (_inboundBuildReplyMessages) {
-                    _inboundBuildReplyMessages.add(new BuildReplyMessageState(receivedMessage));
-                }
-                _exec.repoll();
-            }
+                           + (fromHash != null ? fromHash : from != null ? from.calculateHash() : "a tunnel"));
+            handleReply(new BuildReplyMessageState(receivedMessage));
             return _buildReplyMessageHandlerJob;
         }
     }
     
     /** normal inbound requests from other people */
     private static class BuildMessageState {
-        TunnelBuildMessage msg;
-        RouterIdentity from;
-        Hash fromHash;
-        long recvTime;
+        final TunnelBuildMessage msg;
+        final RouterIdentity from;
+        final Hash fromHash;
+        final long recvTime;
         public BuildMessageState(I2NPMessage m, RouterIdentity f, Hash h) {
             msg = (TunnelBuildMessage)m;
             from = f;
@@ -785,20 +856,22 @@ class BuildHandler {
             recvTime = System.currentTimeMillis();
         }
     }
+
     /** replies for outbound tunnels that we have created */
     private static class BuildReplyMessageState {
-        TunnelBuildReplyMessage msg;
-        long recvTime;
+        final TunnelBuildReplyMessage msg;
+        final long recvTime;
         public BuildReplyMessageState(I2NPMessage m) {
             msg = (TunnelBuildReplyMessage)m;
             recvTime = System.currentTimeMillis();
         }
     }
+
     /** replies for inbound tunnels we have created */
     private static class BuildEndMessageState {
-        TunnelBuildMessage msg;
-        PooledTunnelCreatorConfig cfg;
-        long recvTime;
+        final TunnelBuildMessage msg;
+        final PooledTunnelCreatorConfig cfg;
+        final long recvTime;
         public BuildEndMessageState(PooledTunnelCreatorConfig c, I2NPMessage m) {
             cfg = c;
             msg = (TunnelBuildMessage)m;
@@ -806,13 +879,14 @@ class BuildHandler {
         }
     }
 
-    // noop
+    /** noop */
     private static class TunnelBuildMessageHandlerJob extends JobImpl {
         private TunnelBuildMessageHandlerJob(RouterContext ctx) { super(ctx); }
         public void runJob() {}
         public String getName() { return "Receive tunnel build message"; }
     }
-    // noop
+
+    /** noop */
     private static class TunnelBuildReplyMessageHandlerJob extends JobImpl {
         private TunnelBuildReplyMessageHandlerJob(RouterContext ctx) { super(ctx); }
         public void runJob() {}
@@ -825,17 +899,31 @@ class BuildHandler {
      *  but it affects capacity calculations
      */
     private static class TunnelBuildNextHopFailJob extends JobImpl {
-        HopConfig _cfg;
+        private final HopConfig _cfg;
+
         private TunnelBuildNextHopFailJob(RouterContext ctx, HopConfig cfg) {
             super(ctx);
             _cfg = cfg;
         }
+
         public String getName() { return "Timeout contacting next peer for tunnel join"; }
+
         public void runJob() {
             getContext().tunnelDispatcher().remove(_cfg);
             getContext().statManager().addRateData("tunnel.rejectTimeout2", 1, 0);
-            // static, no _log
-            //_log.error("Cant contact next hop for " + _cfg);
+            Log log = getContext().logManager().getLog(BuildHandler.class);
+            if (log.shouldLog(Log.WARN))
+                log.warn("Timeout contacting next hop for " + _cfg);
         }
+    }
+
+    /**
+     *  Mark a string for extraction by xgettext and translation.
+     *  Use this only in static initializers.
+     *  It does not translate!
+     *  @return s
+     */
+    private static final String _x(String s) {
+        return s;
     }
 }

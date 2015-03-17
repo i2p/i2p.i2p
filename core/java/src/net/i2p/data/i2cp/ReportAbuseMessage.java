@@ -15,7 +15,6 @@ import java.io.InputStream;
 
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
-import net.i2p.util.Log;
 
 /**
  * Defines the message a client sends to a router when asking the 
@@ -24,7 +23,6 @@ import net.i2p.util.Log;
  * @author jrandom
  */
 public class ReportAbuseMessage extends I2CPMessageImpl {
-    private final static Log _log = new Log(ReportAbuseMessage.class);
     public final static int MESSAGE_TYPE = 29;
     private SessionId _sessionId;
     private AbuseSeverity _severity;
@@ -32,10 +30,6 @@ public class ReportAbuseMessage extends I2CPMessageImpl {
     private MessageId _messageId;
 
     public ReportAbuseMessage() {
-        setSessionId(null);
-        setSeverity(null);
-        setReason(null);
-        setMessageId(null);
     }
 
     public SessionId getSessionId() {
@@ -110,6 +104,7 @@ public class ReportAbuseMessage extends I2CPMessageImpl {
         return MESSAGE_TYPE;
     }
 
+    /* FIXME missing hashCode() method FIXME */
     @Override
     public boolean equals(Object object) {
         if ((object != null) && (object instanceof ReportAbuseMessage)) {
@@ -123,7 +118,7 @@ public class ReportAbuseMessage extends I2CPMessageImpl {
 
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append("[ReportAbuseMessage: ");
         buf.append("\n\tSessionID: ").append(getSessionId());
         buf.append("\n\tSeverity: ").append(getSeverity());

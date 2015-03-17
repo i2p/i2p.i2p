@@ -14,12 +14,16 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.Set;
 
+import net.i2p.client.I2PSessionException;
+import net.i2p.crypto.SessionKeyManager;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
 import net.i2p.data.i2cp.MessageId;
 import net.i2p.data.i2cp.SessionConfig;
+import net.i2p.internal.I2CPMessageQueue;
+import net.i2p.internal.InternalClientManager;
 import net.i2p.router.ClientManagerFacade;
 import net.i2p.router.ClientMessage;
 import net.i2p.router.Job;
@@ -31,40 +35,40 @@ import net.i2p.util.Log;
  *
  * @author jrandom
  */
-public class ClientManagerFacadeImpl extends ClientManagerFacade {
-    private final static Log _log = new Log(ClientManagerFacadeImpl.class);
+public class ClientManagerFacadeImpl extends ClientManagerFacade implements InternalClientManager {
+    private final Log _log;
     private ClientManager _manager; 
     private RouterContext _context;
+    /** note that this is different than the property the client side uses, i2cp.tcp.port */
     public final static String PROP_CLIENT_PORT = "i2cp.port";
     public final static int DEFAULT_PORT = 7654;
+    /** note that this is different than the property the client side uses, i2cp.tcp.host */
     public final static String PROP_CLIENT_HOST = "i2cp.hostname";
     public final static String DEFAULT_HOST = "127.0.0.1";
     
     public ClientManagerFacadeImpl(RouterContext context) {
         _context = context;
-        _manager = null;
-        _log.debug("Client manager facade created");
+        _log = _context.logManager().getLog(ClientManagerFacadeImpl.class);
+        //_log.debug("Client manager facade created");
     }
     
     public void startup() {
         _log.info("Starting up the client subsystem");
-        String portStr = _context.router().getConfigSetting(PROP_CLIENT_PORT);
-        if (portStr != null) {
-            try {
-                int port = Integer.parseInt(portStr);
-                _manager = new ClientManager(_context, port);
-            } catch (NumberFormatException nfe) {
-                _log.error("Error setting the port: " + portStr + " is not valid", nfe);
-                _manager = new ClientManager(_context, DEFAULT_PORT);
-            }
-        } else {
-            _manager = new ClientManager(_context, DEFAULT_PORT);
-        }
+        int port = _context.getProperty(PROP_CLIENT_PORT, DEFAULT_PORT);
+        _manager = new ClientManager(_context, port);
     }    
     
     public void shutdown() {
+        shutdown("Router shutdown");
+    }
+
+    /**
+     *  @param msg message to send to the clients
+     *  @since 0.8.8
+     */
+    public void shutdown(String msg) {
         if (_manager != null)
-            _manager.shutdown();
+            _manager.shutdown(msg);
     }
     
     public void restart() {
@@ -74,7 +78,11 @@ public class ClientManagerFacadeImpl extends ClientManagerFacade {
             startup();
     }
     
+    @Override
+    public boolean isAlive() { return _manager != null && _manager.isAlive(); }
+
     private static final long MAX_TIME_TO_REBUILD = 10*60*1000;
+    @Override
     public boolean verifyClientLiveliness() {
         if (_manager == null) return true;
         boolean lively = true;
@@ -165,6 +173,7 @@ public class ClientManagerFacadeImpl extends ClientManagerFacade {
         }
     }
 
+    @Override
     public boolean shouldPublishLeaseSet(Hash destinationHash) { return _manager.shouldPublishLeaseSet(destinationHash); }
     
     public void messageDeliveryStatusUpdate(Destination fromDest, MessageId id, boolean delivered) {
@@ -194,6 +203,21 @@ public class ClientManagerFacadeImpl extends ClientManagerFacade {
         }
     }
     
+    /**
+     * Return the client's current manager or null if not connected
+     *
+     */
+    public SessionKeyManager getClientSessionKeyManager(Hash dest) {
+        if (_manager != null)
+            return _manager.getClientSessionKeyManager(dest);
+        else {
+            _log.error("Null manager on getClientSessionKeyManager!");
+            return null;
+        }
+    }
+    
+    /** @deprecated unused */
+    @Override
     public void renderStatusHTML(Writer out) throws IOException { 
         if (_manager != null)
             _manager.renderStatusHTML(out); 
@@ -204,10 +228,23 @@ public class ClientManagerFacadeImpl extends ClientManagerFacade {
      *
      * @return set of Destination objects
      */
-    public Set listClients() {
+    @Override
+    public Set<Destination> listClients() {
         if (_manager != null)
             return _manager.listClients();
         else
             return Collections.EMPTY_SET;
+    }
+
+    /**
+     *  The InternalClientManager interface.
+     *  Connect to the router, receiving a message queue to talk to the router with.
+     *  @throws I2PSessionException if the router isn't ready
+     *  @since 0.8.3
+     */
+    public I2CPMessageQueue connect() throws I2PSessionException {
+        if (_manager != null)
+            return _manager.internalConnect();
+        throw new I2PSessionException("No manager yet");
     }
 }

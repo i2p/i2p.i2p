@@ -7,12 +7,13 @@ package net.i2p.client.naming;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.Properties;
 import java.util.StringTokenizer;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.Destination;
 import net.i2p.util.EepGet;
-import net.i2p.util.Log;
 
 /**
  * A network-based naming service using HTTP, with in-memory caching.
@@ -25,6 +26,7 @@ import net.i2p.util.Log;
  * Should be used from MetaNamingService, after HostsTxtNamingService.
  * Cannot be used as the only NamingService! Be sure any naming service hosts
  * are in hosts.txt.
+ * Supports caching, b32, and b64.
  *
  * Sample config to put in configadvanced.jsp (restart required):
  *
@@ -33,11 +35,10 @@ import net.i2p.util.Log;
  * i2p.naming.eepget.list=http://namingservice.i2p/cgi-bin/lkup.cgi?host=,http://i2host.i2p/cgi-bin/i2hostquery?
  *
  */
-public class EepGetNamingService extends NamingService {
+public class EepGetNamingService extends DummyNamingService {
 
     private final static String PROP_EEPGET_LIST = "i2p.naming.eepget.list";
     private final static String DEFAULT_EEPGET_LIST = "http://i2host.i2p/cgi-bin/i2hostquery?";
-    private final static Log _log = new Log(EepGetNamingService.class);
 
     /** 
      * The naming service should only be constructed and accessed through the 
@@ -59,20 +60,18 @@ public class EepGetNamingService extends NamingService {
     }
     
     @Override
-    public Destination lookup(String hostname) {
-        // If it's long, assume it's a key.
-        if (hostname.length() >= DEST_SIZE)
-            return lookupBase64(hostname);
-
-        hostname = hostname.toLowerCase();
-
-        // check the cache
-        Destination d = getCache(hostname);
+    public Destination lookup(String hostname, Properties lookupOptions, Properties storedOptions) {
+        Destination d = super.lookup(hostname, null, null);
         if (d != null)
             return d;
 
+        hostname = hostname.toLowerCase(Locale.US);
+        // Base32 failed?
+        if (hostname.length() == BASE32_HASH_LENGTH + 8 && hostname.endsWith(".b32.i2p"))
+            return null;
+
         List URLs = getURLs();
-        if (URLs.size() == 0)
+        if (URLs.isEmpty())
             return null;
 
         // prevent lookup loops - this cannot be the only lookup service
@@ -99,7 +98,6 @@ public class EepGetNamingService extends NamingService {
     }
 
     // FIXME allow larger Dests for non-null Certs
-    private static final int DEST_SIZE = 516;                    // Std. Base64 length (no certificate)
     private static final int MAX_RESPONSE = DEST_SIZE + 68 + 10; // allow for hostname= and some trailing stuff
     private String fetchAddr(String url, String hostname) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream(MAX_RESPONSE);
@@ -118,7 +116,7 @@ public class EepGetNamingService extends NamingService {
                 if (key.startsWith(hostname + "="))  // strip hostname=
                     key = key.substring(hostname.length() + 1); 
                 key = key.substring(0, DEST_SIZE);   // catch IndexOutOfBounds exception below
-                if (!key.endsWith("AAAA")) {
+                if (!key.endsWith("AA")) {
                     _log.error("Invalid key: " + url + hostname);
                     return null;
                 }
@@ -134,11 +132,6 @@ public class EepGetNamingService extends NamingService {
             _log.error("Error fetching the addr", t);
         }
         _log.error("Caught from: " + url + hostname);
-        return null;
-    }
-    
-    @Override
-    public String reverseLookup(Destination dest) {
         return null;
     }
 }

@@ -1,0 +1,692 @@
+# I2P
+# Copyright (C) 2009 The I2P Project
+# This file is distributed under the same license as the susidns package.
+# To contribute translations, see http://www.i2p2.de/newdevelopers
+# 
+# ducki2p <ducki2p@gmail.com>, 2011.
+#   <walking@i2pmail.org>, 2011.
+msgid ""
+msgstr ""
+"Project-Id-Version: I2P\n"
+"Report-Msgid-Bugs-To: https://trac.i2p2.de/\n"
+"POT-Creation-Date: 2011-06-11 08:23+0000\n"
+"PO-Revision-Date: 2011-08-20 05:50+0000\n"
+"Last-Translator: walking <walking@i2pmail.org>\n"
+"Language-Team: Chinese (China) (http://www.transifex.net/projects/p/I2P/team/zh_CN/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: zh_CN\n"
+"Plural-Forms: nplurals=1; plural=0\n"
+
+#: ../src/java/src/i2p/susi/dns/AddressBean.java:130
+#, java-format
+msgid "Host name \"{0}\" contains illegal character {1}"
+msgstr "主机名\"{0}\"中包含非法字符{1}"
+
+#: ../src/java/src/i2p/susi/dns/AddressBean.java:143
+#: ../src/java/src/i2p/susi/dns/AddressBean.java:145
+#: ../src/java/src/i2p/susi/dns/AddressBean.java:152
+#, java-format
+msgid "Host name cannot start with \"{0}\""
+msgstr "主机名称不能以\"{0}\"开头。"
+
+#: ../src/java/src/i2p/susi/dns/AddressBean.java:147
+#: ../src/java/src/i2p/susi/dns/AddressBean.java:149
+#, java-format
+msgid "Host name cannot end with \"{0}\""
+msgstr "主机名不能以\"{0}\"结尾。"
+
+#: ../src/java/src/i2p/susi/dns/AddressBean.java:154
+#, java-format
+msgid "Host name cannot contain \"{0}\""
+msgstr "主机名称不能包含“{0}”"
+
+#: ../src/java/src/i2p/susi/dns/AddressBean.java:157
+#, java-format
+msgid ""
+"Host name \"{0}\" requires conversion to ASCII but the conversion library is"
+" unavailable in this JVM"
+msgstr "主机名称“{0}”需要转化为ASCIIb编码，但您的JavaJVM缺少转换需要的库。"
+
+#: ../src/java/src/i2p/susi/dns/AddressBean.java:209
+msgid "None"
+msgstr "无"
+
+#: ../src/java/src/i2p/susi/dns/AddressBean.java:217
+msgid "Hashcash"
+msgstr "Hashcash"
+
+#: ../src/java/src/i2p/susi/dns/AddressBean.java:219
+msgid "Hidden"
+msgstr "隐藏"
+
+#: ../src/java/src/i2p/susi/dns/AddressBean.java:221
+msgid "Signed"
+msgstr "已数字签名"
+
+#: ../src/java/src/i2p/susi/dns/AddressBean.java:223
+#, java-format
+msgid "Type {0}"
+msgstr "类型{0}"
+
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:232
+#, java-format
+msgid "One result for search within filtered list."
+msgid_plural "{0} results for search within filtered list."
+msgstr[0] "列表中有{0}个与筛选条件匹配的结果。"
+
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:236
+#, java-format
+msgid "Filtered list contains 1 entry."
+msgid_plural "Fltered list contains {0} entries."
+msgstr[0] "筛选列表中包含{0}条记录。"
+
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:241
+#, java-format
+msgid "One result for search."
+msgid_plural "{0} results for search."
+msgstr[0] "{0}个搜索结果。"
+
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:250
+#, java-format
+msgid "Address book contains 1 entry."
+msgid_plural "Address book contains {0} entries."
+msgstr[0] "地址簿中有{0}条记录。"
+
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:266
+#, java-format
+msgid "Showing {0} of {1}"
+msgstr "显示 {0} 个项目共 {1}"
+
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:287
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:231
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:392
+msgid "Add"
+msgstr "添加"
+
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:287
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:298
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:231
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:243
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:390
+msgid "Replace"
+msgstr "替换"
+
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:297
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:242
+#, java-format
+msgid "Host name {0} is already in address book, unchanged."
+msgstr "主机名{0}已存在于地址簿中，操作取消。"
+
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:299
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:244
+#, java-format
+msgid ""
+"Host name {0} is already in address book with a different destination. Click"
+" \"Replace\" to overwrite."
+msgstr "主机名{0}已存在于地址簿中，但对应不同的目标密钥，点击“替换”覆盖此记录。"
+
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:311
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:257
+#, java-format
+msgid "Destination added for {0}."
+msgstr "目标密钥已添加为{0}。"
+
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:313
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:259
+#, java-format
+msgid "Destination changed for {0}."
+msgstr "目标已更新为{0}。"
+
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:315
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:261
+msgid "Warning - host name does not end with \".i2p\""
+msgstr "警告 - 主机名未以\".i2p\"结尾。"
+
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:320
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:269
+msgid "Invalid Base 64 destination."
+msgstr "无效的Base64目标密钥"
+
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:326
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:275
+#, java-format
+msgid "Invalid host name \"{0}\"."
+msgstr "无效的主机名“{0}”。"
+
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:329
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:278
+msgid "Please enter a host name and destination"
+msgstr "请输入主机名称与目标"
+
+#. clear search when deleting
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:333
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:354
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:282
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:307
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:261
+msgid "Delete Entry"
+msgstr "删除记录"
+
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:333
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:282
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:334
+msgid "Delete Selected"
+msgstr "删除选中项"
+
+#. parameter is a host name
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:347
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:299
+#, java-format
+msgid "Destination {0} deleted."
+msgstr "目标 {0} 已删除"
+
+#. parameter will always be >= 2
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:350
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:302
+#, java-format
+msgid "1 destination deleted."
+msgid_plural "{0} destinations deleted."
+msgstr[0] "{0} 个目标已删除。"
+
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:352
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:304
+msgid "No entries selected to delete."
+msgstr "未选择要删除的记录。"
+
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:360
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:311
+msgid "Address book saved."
+msgstr "地址簿已保存。"
+
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:363
+msgid "ERROR: Could not write addressbook file."
+msgstr "错误:无法写入地址簿文件"
+
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:368
+#: ../src/java/src/i2p/susi/dns/ConfigBean.java:148
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:315
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:156
+msgid ""
+"Invalid form submission, probably because you used the \"back\" or "
+"\"reload\" button on your browser. Please resubmit."
+msgstr "提交数据无效，可能的原因是您使用了浏览器中的“前进”或“后退”按钮造成会话过期，请重新提交。"
+
+#: ../src/java/src/i2p/susi/dns/ConfigBean.java:139
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:131
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:132
+#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:132
+msgid "Save"
+msgstr "保存"
+
+#: ../src/java/src/i2p/susi/dns/ConfigBean.java:141
+msgid "Configuration saved."
+msgstr "配置已保存"
+
+#: ../src/java/src/i2p/susi/dns/ConfigBean.java:142
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:150
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:130
+#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:130
+msgid "Reload"
+msgstr "刷新"
+
+#: ../src/java/src/i2p/susi/dns/ConfigBean.java:144
+msgid "Configuration reloaded."
+msgstr "配置已重新载入"
+
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:105
+#, java-format
+msgid "{0} address book in {1} database"
+msgstr "{1}数据库中{0}地址簿"
+
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:252
+msgid "Manually added via SusiDNS"
+msgstr "通过 SusiDNS 手工添加。"
+
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:266
+#, java-format
+msgid "Failed to add Destination for {0} to naming service {1}"
+msgstr "域名服务{1}中的目标{0}添加失败。"
+
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:290
+#, java-format
+msgid "Failed to delete Destination for {0} from naming service {1}"
+msgstr "域名服务{1}中的目标{0}删除失败。"
+
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:143
+msgid ""
+"Subscriptions saved, updating addressbook from subscription sources now."
+msgstr "订阅已保存，正在通过订阅地址更新地址簿。"
+
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:148
+msgid "Subscriptions saved."
+msgstr "订阅已保存。"
+
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:152
+msgid "Subscriptions reloaded."
+msgstr "订阅设置已重新载入。"
+
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:125
+msgid "address book"
+msgstr "地址簿"
+
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:127
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:143
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:104
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:120
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:108
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:124
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:107
+#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:104
+#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:120
+msgid "Overview"
+msgstr "概述"
+
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:129
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:106
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:110
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:93
+#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:106
+msgid "Address books"
+msgstr "地址簿"
+
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:131
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:108
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:112
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:95
+#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:108
+msgid "private"
+msgstr "私人"
+
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:133
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:110
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:114
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:97
+#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:110
+msgid "master"
+msgstr "主要"
+
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:135
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:112
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:116
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:99
+#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:112
+msgid "router"
+msgstr "路由"
+
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:137
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:114
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:118
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:101
+#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:114
+msgid "published"
+msgstr "发布"
+
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:139
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:116
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:120
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:103
+#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:116
+msgid "Subscriptions"
+msgstr "订阅"
+
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:141
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:118
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:122
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:105
+#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:118
+msgid "Configuration"
+msgstr "配置"
+
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:145
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:126
+msgid "Address book"
+msgstr "地址簿"
+
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:150
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:131
+msgid "Storage"
+msgstr "储存"
+
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:169
+msgid "Filter"
+msgstr "过滤器"
+
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:172
+msgid "other"
+msgstr "其他"
+
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:174
+msgid "all"
+msgstr "全部"
+
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:185
+msgid "Current filter"
+msgstr "当前过滤器"
+
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:190
+msgid "clear filter"
+msgstr "清除过滤器"
+
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:201
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:205
+msgid "Search"
+msgstr "搜索"
+
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:238
+msgid "Name"
+msgstr "名称"
+
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:240
+msgid "Links"
+msgstr "链接"
+
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:242
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:384
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:253
+msgid "Destination"
+msgstr "目标"
+
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:273
+msgid "Mark for deletion"
+msgstr "标记为删除"
+
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:292
+msgid "Base 32 address"
+msgstr "Base32 地址"
+
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:296
+msgid "More information on this entry"
+msgstr "此记录的更多信息"
+
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:299
+msgid "details"
+msgstr "详情"
+
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:332
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:388
+msgid "Cancel"
+msgstr "取消"
+
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:365
+msgid "This address book is empty."
+msgstr "此地址簿为空。"
+
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:378
+msgid "Add new destination"
+msgstr "添加新目标"
+
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:380
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:158
+msgid "Host Name"
+msgstr "主机名称"
+
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:102
+msgid "configuration"
+msgstr "配置"
+
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:134
+msgid "Hints"
+msgstr "提示"
+
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:136
+msgid ""
+"File and directory paths here are relative to the addressbook's working "
+"directory, which is normally ~/.i2p/addressbook/ (Linux) or "
+"%APPDATA%\\I2P\\addressbook\\ (Windows)."
+msgstr ""
+"此处使用的路径是以地址簿工作目录为参照的相对路径，通常为 ~/.i2p/addressbook/ (Linux) 或 "
+"%APPDATA%\\I2P\\addressbook\\ (Windows)."
+
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:138
+msgid ""
+"If you want to manually add lines to an addressbook, add them to the private"
+" or master addressbooks."
+msgstr "如果您希望想地址簿手动添加地址条目，请将其加入私有地址簿或主地址簿。"
+
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:140
+msgid ""
+"The router addressbook and the published addressbook are updated by the "
+"addressbook application."
+msgstr "路由地址簿与已发布地址簿会由地址簿程序负责更新。"
+
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:142
+msgid ""
+"When you publish your addressbook, ALL destinations from the master and "
+"router addressbooks appear there."
+msgstr "当您发布地址簿时，主地址簿与路由地址簿中的所有地址条目都会显示于已发布地址簿中。"
+
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:144
+msgid ""
+"Use the private addressbook for private destinations, these are not "
+"published."
+msgstr "私有地址簿用来记录需要保密的私人目标，其中的条目不会被发布。"
+
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:146
+msgid "Options"
+msgstr "选项"
+
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:148
+msgid "File containing the list of subscriptions URLs (no need to change)"
+msgstr "含有订阅URL列表的文件(无需修改)"
+
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:150
+msgid "Update interval in hours"
+msgstr "更新周期(小时)"
+
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:152
+msgid ""
+"Your public hosts.txt file (choose a path within your webserver document "
+"root)"
+msgstr "您发布的公开地址簿 hosts.txt (请指定为您Web服务器目录中的某个路径以便发布。)"
+
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:154
+msgid "Your hosts.txt (don't change)"
+msgstr "您的 host.txt (无需修改)"
+
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:156
+msgid "Your personal addressbook, these hosts will be published"
+msgstr "您的个人地址簿，其中的地址会参与发布。"
+
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:158
+msgid "Your private addressbook, it is never published"
+msgstr "您的私有地址簿，其中的地址不会被发布。"
+
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:160
+msgid "Port for your eepProxy (no need to change)"
+msgstr "您的I2P代理端口(无需修改)"
+
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:162
+msgid "Hostname for your eepProxy (no need to change)"
+msgstr "您的I2P代理主机名(无需修改)"
+
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:164
+msgid "Whether to update the published addressbook"
+msgstr "是否更新发布地址簿"
+
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:166
+msgid ""
+"File containing the etags header from the fetched subscription URLs (no need"
+" to change)"
+msgstr "此文件含有订阅URL返回的etag头(无需修改)"
+
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:168
+msgid ""
+"File containing the modification timestamp for each fetched subscription URL"
+" (no need to change)"
+msgstr "此文件含有每个地址簿订阅URL上次获取时的修改时间(无需修改)"
+
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:170
+msgid "File to log activity to (change to /dev/null if you like)"
+msgstr "活动日志文件(关闭可设为/dev/null [Linux])"
+
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:106
+msgid "addressbook"
+msgstr "地址簿"
+
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:174
+msgid "Encoded Name"
+msgstr "编码后名称"
+
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:190
+msgid "Base 32 Address"
+msgstr "b32(Base32)地址"
+
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:200
+msgid "Address Helper"
+msgstr "地址助手"
+
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:207
+msgid "link"
+msgstr "链接"
+
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:211
+msgid "Public Key"
+msgstr "公钥"
+
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:213
+msgid "ElGamal 2048 bit"
+msgstr "ElGamal 2048位"
+
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:217
+msgid "Signing Key"
+msgstr "签名钥匙"
+
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:219
+msgid "DSA 1024 bit"
+msgstr "DSA 1024位"
+
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:223
+msgid "Certificate"
+msgstr "证书"
+
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:229
+msgid "Added Date"
+msgstr "加入日期"
+
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:235
+msgid "Source"
+msgstr "来源"
+
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:241
+msgid "Last Modified"
+msgstr "上次修改"
+
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:247
+msgid "Notes"
+msgstr "注释"
+
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:91
+msgid "Introduction"
+msgstr "介绍"
+
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:109
+msgid "What is the addressbook?"
+msgstr "什么是地址簿"
+
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:111
+msgid "The addressbook application is part of your I2P installation."
+msgstr "地址簿程序是I2P软件的一部分。"
+
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:113
+msgid ""
+"It regularly updates your hosts.txt file from distributed sources or "
+"\"subscriptions\"."
+msgstr "他通过分散的来源或称地址簿“订阅”(概念类似RSS)更新您的地址簿文件 host.txt。"
+
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:115
+msgid ""
+"In the default configuration, the address book is only subscribed to "
+"www.i2p2.i2p."
+msgstr "默认安装中，地址簿程序只订阅了 www.i2p2.i2p 的地址簿。"
+
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:117
+msgid ""
+"Subscribing to additional sites is easy, just add them to your <a "
+"href=\"subscriptions.jsp\">subscriptions</a> file."
+msgstr "订阅其他网站的地址簿也很简单，只需将它们加入 <a href=\"subscriptions.jsp\">订阅</a> 文件即可。"
+
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:119
+msgid ""
+"For more information on naming in I2P, see <a "
+"href=\"http://www.i2p2.i2p/naming.html\">the overview on www.i2p2.i2p</a>."
+msgstr ""
+"关于I2P域名解析的详情，参见 <a href=\"http://www.i2p2.i2p/naming.html\">www.i2p2.i2p "
+"上的概述</a>."
+
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:121
+msgid "How does the addressbook application work?"
+msgstr "地址簿程序如何工作?"
+
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:123
+msgid ""
+"The addressbook application regularly polls your subscriptions and merges "
+"their content into your \"router\" address book."
+msgstr "地址簿程序会定期下载订阅的地址簿并将他们的内容合并至“路由器地址簿\"。"
+
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:125
+msgid ""
+"Then it merges your \"master\" address book into the router address book as "
+"well."
+msgstr "然后您的“主地址簿\"中的内容也会并入\"路由器地址簿\"中。"
+
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:127
+msgid ""
+"If configured, the router address book is now written to the \"published\" "
+"address book, which will be publicly available if you are running an "
+"eepsite."
+msgstr "如果配置中指定，“路由器地址簿”还会被写入“已发布地址簿”中，如果您运行有eepsite，此地址簿可以被公开订阅。"
+
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:129
+msgid ""
+"The router also uses a private address book (not shown in the picture), "
+"which is not merged or published."
+msgstr "路由器同时还使用“私人地址簿”(图中未显示)，该地址簿不会被合并或发布。"
+
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:131
+msgid ""
+"Hosts in the private address book can be accessed by you but their addresses"
+" are never distributed to others."
+msgstr "您可以访问“私有地址簿”中的主机名，但他们的实际地址不会发布给其他人。"
+
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:133
+msgid ""
+"The private address book can also be used for aliases of hosts in your other"
+" address books."
+msgstr "“私有地址簿”也可以用于为其他地址簿中的主机名添加别名。"
+
+#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:102
+msgid "subscriptions"
+msgstr "订阅"
+
+#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:134
+msgid "The subscription file contains a list of i2p URLs."
+msgstr "订阅文件是一个I2P链接列表。"
+
+#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:136
+msgid ""
+"The addressbook application regularly checks this list for new eepsites."
+msgstr "地址簿程序定期通过这些链接检查是否有新的I2P匿名网站。"
+
+#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:138
+msgid "Those URLs refer to published hosts.txt files."
+msgstr "这些URL指向公开发布的hosts.txt文件。"
+
+#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:140
+msgid ""
+"The default subscription is the hosts.txt from www.i2p2.i2p, which is "
+"updated infrequently."
+msgstr "默认订阅是 www.i2p2.i2p 提供的 hosts.txt,此文件很少更新。"
+
+#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:142
+msgid ""
+"So it is a good idea to add additional subscriptions to sites that have the "
+"latest addresses."
+msgstr "所以订阅一些网站的最新地址簿是个不错的主意。"
+
+#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:144
+msgid "See the FAQ for a list of subscription URLs."
+msgstr "其他来源的订阅链接参见I2P站点的 <a href=\"http://www.i2p2.i2p/faq_zh.html\">FAQ</a>"
+
+

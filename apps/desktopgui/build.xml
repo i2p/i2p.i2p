@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="all" name="desktopgui">
+
+	<property name="src" value="src"/>
+	<property name="build" value="build"/>
+	<property name="dist"  location="dist"/>
+	<property name="jar" value="desktopgui.jar"/>
+	<property name="resources" value="resources"/>
+    <property name="javadoc" value="javadoc"/>
+
+	<property name="javac.compilerargs" value=""/>
+	<property name="require.gettext" value="true" />
+
+	<target name="init">
+		<mkdir dir="${build}"/>
+        <mkdir dir="${build}/${resources}"/>
+        <mkdir dir="${build}/${javadoc}"/>
+		<mkdir dir="${dist}"/>
+	</target>
+
+	<target name="clean">
+		<delete dir="${build}"/>
+		<delete dir="${dist}"/>
+	</target>
+
+	<target name="compile" depends="init">
+		<javac debug="true" deprecation="on" source="1.5" target="1.5" 
+                       includeAntRuntime="false"
+                       srcdir="${src}" destdir="${build}">
+            <compilerarg line="${javac.compilerargs}" />
+            <classpath>
+                <pathelement location="../../core/java/build/i2p.jar" />
+                <pathelement location="../../installer/lib/wrapper/all/wrapper.jar" />
+            	<pathelement location="../../router/java/build/router.jar" />
+            </classpath>
+		</javac>
+        <copy todir="${build}/desktopgui/${resources}">
+            <fileset dir="${resources}" />
+        </copy>
+	</target>
+
+	<target name="bundle" >
+        <exec executable="sh" osfamily="unix" failifexecutionfails="true" failonerror="${require.gettext}" >
+            <arg value="./bundle-messages.sh" />
+        </exec>
+        <exec executable="sh" osfamily="mac" failifexecutionfails="true" failonerror="${require.gettext}" >
+            <arg value="./bundle-messages.sh" />
+        </exec>
+		<!-- multi-lang is optional -->
+        <exec executable="sh" osfamily="windows" failifexecutionfails="false" >
+            <arg value="./bundle-messages.sh" />
+        </exec>
+	</target>
+
+        <target name="listChangedFiles" depends="jarUpToDate" if="shouldListChanges" >
+        <exec executable="mtn" outputproperty="workspace.changes" errorproperty="mtn.error2" failifexecutionfails="false" >
+            <arg value="list" />
+            <arg value="changed" />
+            <arg value="." />
+        </exec>
+        <!-- \n in an attribute value generates an invalid manifest -->
+        <exec executable="tr" inputstring="${workspace.changes}" outputproperty="workspace.changes.tr" errorproperty="mtn.error2" failifexecutionfails="false" >
+            <arg value="-s" />
+            <arg value="[:space:]" />
+            <arg value="," />
+        </exec>
+	</target>
+
+	<target name="jar" depends="compile, bundle, listChangedFiles" unless="jar.uptodate" >
+		<!-- set if unset -->
+		<property name="workspace.changes.tr" value="" />
+		<jar basedir="${build}" destfile="${dist}/${jar}">
+			<manifest>
+				<attribute name="Main-Class" value="net.i2p.desktopgui.Main"/>
+				<attribute name="Build-Date" value="${build.timestamp}" />
+				<attribute name="Base-Revision" value="${workspace.version}" />
+				<attribute name="Workspace-Changes" value="${workspace.changes.tr}" />
+			</manifest>
+		</jar>
+	</target>
+
+    <target name="jarUpToDate">
+        <uptodate property="jar.uptodate" targetfile="${dist}/${jar}" >
+            <srcfiles dir= "." includes="build/**/*.class" />
+        </uptodate>
+        <condition property="shouldListChanges" >
+            <and>
+                <not>
+                    <isset property="jar.uptodate" />
+                </not>
+                <isset property="mtn.available" />
+            </and>
+        </condition>
+    </target>
+
+    <target name="javadoc">
+        <mkdir dir="${build}" />
+        <mkdir dir="${build}/${javadoc}" />
+        <javadoc 
+            sourcepath="${src}" destdir="${build}/${javadoc}" 
+            packagenames="*" 
+            use="true" 
+            splitindex="true" 
+            windowtitle="Desktopgui">
+            <classpath>
+                <pathelement location="../../router/java/build/router.jar" />
+                <pathelement location="../../core/java/build/i2p.jar" />
+            </classpath>
+        </javadoc>
+    </target>
+
+    <target name="poupdate">
+        <exec executable="sh" osfamily="unix" failifexecutionfails="true" failonerror="true" >
+            <arg value="./bundle-messages.sh" />
+            <arg value="-p" />
+        </exec>
+        <exec executable="sh" osfamily="mac" failifexecutionfails="true" failonerror="true" >
+            <arg value="./bundle-messages.sh" />
+            <arg value="-p" />
+        </exec>
+        <exec executable="sh" osfamily="windows" failifexecutionfails="true" failonerror="true" >
+            <arg value="./bundle-messages.sh" />
+            <arg value="-p" />
+        </exec>
+    </target>
+
+	<target name="dist" depends="jar" />	
+	<target name="all" depends="jar" />
+</project>
+

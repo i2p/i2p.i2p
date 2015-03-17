@@ -1,0 +1,15 @@
+#!/bin/sh -e
+exit 0
+
+if [ ! -z $2 ]; then
+        if dpkg --compare-versions $2 lt 0.8.6-5; then
+                test -d /usr/share/doc/i2p-doc \
+                        && rm -rf /usr/share/doc/i2p-doc
+        fi
+	if dpkg --compare-versions $2 lt 0.8.7-3; then
+                test -d /usr/share/doc/i2p-doc/api \
+                        && rm -rf /usr/share/doc/i2p-doc/api
+        fi
+fi
+
+#DEBHELPER# 

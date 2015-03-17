@@ -1,0 +1,432 @@
+/* I2P Tunnel Manager Theme: Light */
+/* Description: Light blue highlights. */
+/* Author: dr|z3d */
+
+body {
+     margin: 0px;
+     padding: 0px;
+     text-align: center;
+     font-family: "Lucida Sans Unicode", Verdana, Helvetica, sans-serif;
+     color: #001;
+     font-size: 10pt;
+/* we've avoided Tantek Hacks so far,
+    ** but we can't avoid using the non-w3c method of
+    ** box rendering. (and therefore one of mozilla's
+    ** proprietry -moz properties (which hopefully they'll
+    ** drop soon).
+ */
+     -moz-box-sizing: border-box;
+     -webkit-box-sizing: border-box;
+    background: #99f url(images/snowcamo.png);
+}
+
+body.iframed {
+     background: transparent url('../dark/images/transparent.gif') !important;
+     padding-top: 5px;
+}
+
+div {
+     -moz-box-sizing: border-box;
+     -webkit-box-sizing: border-box;
+}
+
+label {
+     margin: 0px 4px;
+     padding: 1px 10px 2px 0px;
+     float: left;
+     width: 120px;
+     height: 24px;
+     font-weight: normal;
+     text-align: right;
+     font-size: 8pt;
+     font-style: italic;
+     -moz-box-sizing: border-box;
+     -webkit-box-sizing: border-box;
+     line-height: 120%;
+     color: #101;
+}
+
+h4 {
+     font-size: 11pt;
+     font-weight: bold !important;
+     color: #115;
+     text-align: left;
+     border: 1px solid #115;
+     margin: 5px 0 15px 0;
+     padding: 5px 10px;
+     background: url(images/header.png) repeat-x center center;
+     letter-spacing: 0.07em;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+     -moz-box-shadow: 0 2px 1px 1px rgba(176, 176, 216, 0.4);
+     -khtml-box-shadow: 0 2px 1px 1px rgba(176, 176, 216, 0.4);
+     box-shadow: 0 2px 1px 1px rgba(176, 176, 216, 0.4);
+}
+
+a {
+     text-decoration: none;
+}
+
+form {
+     margin: 0px;
+}
+
+textarea, input, select, button, a {
+     -moz-box-sizing: border-box;
+     -webkit-box-sizing: border-box;
+     font-size: 8.5pt;
+     float: left;
+     vertical-align: middle;
+}
+
+button {
+     float: none;
+     text-decoration: none;
+}
+
+textarea {
+     color: #003;
+     background: #fff;
+     border: 1px solid #447;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+}
+
+textarea:active {
+     -moz-box-shadow: inset 0px 0px 0px 1px #f60;
+     -khtml-box-shadow: inset 0px 0px 0px 1px #f60;
+     box-shadow: inset 0px 0px 0px 1px #f60;
+}
+
+br {
+     clear: left;
+}
+
+div.statusNotRunning {
+     float: left;
+     width: 68px;
+     height: 24px;
+     overflow: hidden;
+     color: #d00;
+     background: url('images/console_status_stopped.png') 0 0 no-repeat;
+     padding-top: 24px;
+     margin-top: 4px;
+}
+
+div.statusRunning {
+   float: left;
+     width: 68px;
+     height: 24px;
+     overflow: hidden;
+     color: #0b0;
+     background: url('images/console_status_running.png') 0 0 no-repeat;
+     padding-top: 24px;
+     margin-top: 4px;
+}
+
+div.statusStarting {
+     float: left;
+     width: 68px;
+     height: 24px;
+     overflow: hidden;
+     color: #339933;
+     background: url('images/console_status_starting.png') 0 0 no-repeat;
+     padding-top: 24px;
+     margin-top: 4px;
+}
+
+hr {
+     display: none;
+}
+
+.separator, .subdivider {
+     clear: both;
+     height: 1px;
+     margin: 10px 0px 10px 0px;
+     border-bottom: 1px dotted #447;
+/*
+     display: none;
+*/
+}
+
+.subdivider {
+     border-bottom: 1px dotted #447;
+     padding: 5px 0;
+}
+
+.freetext {
+     width: 150px;
+     height: 24px;
+     border: 1px solid #447;
+     padding: 2px;
+     margin: 4px 0 2px 0px;
+     font: 9pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
+     font-weight: bold;
+     background: #fff;
+     color: #003;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+/*
+     -moz-box-shadow: inset 0px -1px 1px 0px #fff;
+*/
+}
+
+.freetext:active {
+     -moz-box-shadow: inset 0px 0px 0px 1px #f60;
+     -khtml-box-shadow: inset 0px 0px 0px 1px #f60;
+     box-shadow: inset 0px 0px 0px 1px #f60;
+}
+
+.control, control:link, control:visited {
+     margin: 4px 0 0 4px !important;
+     padding: 2px;
+     overflow: hidden;
+     min-width: 60px;
+     font-weight: bold;
+     background: #ffe;
+     color: #001;
+     border: 1px outset #66a;
+     text-align: center;
+     white-space: nowrap;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+     margin-top: 8px;
+     text-decoration: none;
+}
+
+/*
+.control:active {
+     border: 1px inset;
+     background-color: #003;
+     color: #f60;
+     text-decoration: none;
+}
+*/
+
+.control:hover, control:visited:hover {
+     background-color: #f60;
+     color: #fff !important;
+     text-decoration: none;
+     border: 1px solid #f60 !important;
+     background: #f60 !important;
+     color: #fff;
+     -moz-box-shadow: inset 0px 0px 0px 1px #fff !important;
+     -khtml-box-shadow: inset 0px 0px 0px 1px #fff !important;
+     box-shadow: inset 0px 0px 0px 1px #fff !important;
+}
+
+.control:link, control:visited {
+     margin: 4px 0 0 4px !important;
+     padding: 2px;
+     overflow: hidden;
+     min-width: 60px;
+     font-weight: bold;
+     color: #001;
+     border: 1px outset #66a;
+     text-align: center;
+     white-space: nowrap;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+     margin-top: 8px;
+     background: #ffe url(images/header.png) center center repeat-x;
+     text-decoration: none;
+}
+
+.panel {
+     width: 800px;
+     margin: 16px auto 16px auto;
+     overflow: hidden;
+     text-align: left !important;
+     font-size: 7pt;
+     background-color: #fff;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+     border: 1px solid #002;
+     padding: 10px 20px;
+     -moz-box-shadow: inset 0px 0px 1px 1px #bbf;
+     -khtml-box-shadow: inset 0px 0px 1px 1px #bbf;
+     box-shadow: inset 0px 0px 1px 1px #bbf;
+    background: none repeat scroll 0 0 #EEEEFF;
+    background: #fff url(images/magic.png);
+    border: 1px solid #444477;
+    color: #000011;
+}
+
+.iframed .panel {
+     margin: 16px auto -8px auto !important;
+}
+
+.iframed .panel.iframed {
+     margin: 0 auto -8px auto !important;
+}
+
+.panel .footer {
+     float: right;
+     padding: 4px;
+}
+
+.toolbox {
+     float: right;
+}
+
+.rowItem {
+     width: 750px;
+     float: left;
+     margin: 2px 0;
+}
+
+.comment {
+     font-weight: bold;
+     display: block;
+     padding: 2px 10px 0 20px;
+     text-align: left;
+}
+
+.text {
+     height: 24px;
+     width: 150px;
+     padding: 0 0 0 2px;
+     float: left;
+     margin: 0;
+     font-size: 8.5pt !important;
+     font-weight: bold;
+}
+
+.accessKey {
+     text-decoration: underline;
+}
+
+#globalOperationsPanel {
+     background-color: #fff;
+     border: 1px solid #003;
+     padding: 5px 20px 11px 10px;
+     -moz-box-shadow: inset 0px 0px 0px 1px #f00;
+     -moz-box-shadow: inset 0px 0px 1px 0px #f60;
+     background: #fff url(images/magic.png);
+     border: 1px solid #444477;
+     color: #613;
+}
+
+#globalOperationsPanel .control {
+     min-width: 120px;
+     font-family: "Lucida Sans Unicode", Verdana, Tahoma, Helvetica, sans-serif;
+     font-weight: bold;
+}
+
+#globalOperationsPanel .control:link {
+     min-width: 120px;
+}
+
+
+globalOperationsPanel .control:link {
+     min-width: 120px;
+     margin: 4px 0 0 4px !important;
+     padding: 2px;
+     overflow: hidden;
+     font-weight: bold;
+     background-color: #bbbbff;
+     color: black;
+     border: 1px outset #ddddc0;
+     text-align: center;
+     white-space: nowrap;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+     margin-top: 8px;
+     background: #ffe url(images/header.png) 0 0 repeat-x !important;
+}
+
+
+globalOperationsPanel .control:visited {
+     min-width: 120px;
+     margin: 4px 0 0 4px !important;
+     padding: 2px;
+     overflow: hidden;
+     font-weight: bold;
+     background-color: #ffe;
+     color: black;
+     border: 1px outset #ddddc0;
+     text-align: center;
+     white-space: nowrap;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+     margin-top: 8px;
+     background: url(images/header.png) 0 0 repeat-x !important;
+}
+
+globalOperationsPanel .control:hover {
+     min-width: 120px;
+     margin: 4px 0 0 4px !important;
+     padding: 2px;
+     overflow: hidden;
+     font-weight: bold;
+     background-color: #003;
+     color: #f60;
+     border: 1px outset #fff;
+     text-align: center;
+     white-space: nowrap;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+     margin-top: 8px;
+     background: url(images/header_on.png) 0 0 repeat-x !important;
+}
+.header {
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+}
+
+select {
+     background-color: #fff;
+     color: #003;
+     margin: 4px;
+     font-family: "Lucida Sans Unicode", Verdana, Tahoma, Helvetica, sans-serif;
+     font-weight: bold;
+     border: 1px solid #447;
+     padding: 3px 3px 3px 0;
+     min-width: 270px;
+     font-size: 8pt;
+     max-height: 24px;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+}
+
+select:active {
+     -moz-box-shadow: inset 0px 0px 0px 1px #f60;
+     -khtml-box-shadow: inset 0px 0px 0px 1px #f60;
+     box-shadow: inset 0px 0px 0px 1px #f60;
+}
+
+a:link {
+     color: #359;
+     text-decoration: none;
+     font-weight: bold;
+     word-wrap: break-word;
+}
+
+a:visited {
+     color: #218;
+     text-decoration: none;
+     font-weight: bold;
+}
+
+a:hover {
+     color: #f60;
+     text-decoration: underline;
+     font-weight: bold;
+}
+
+a:active {
+     color: #f93;
+     text-decoration: underline;
+     font-weight: bold;
+}

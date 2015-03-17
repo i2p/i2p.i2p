@@ -17,7 +17,10 @@ public class ConfigLoggingHandler extends FormHandler {
     private String _recordFormat;
     private String _dateFormat;
     private String _fileSize;
+    private String _newLogClass;
+    private String _newLogLevel = "WARN";
     
+    @Override
     protected void processForm() {
         if (_shouldSave) {
             saveChanges();
@@ -25,7 +28,7 @@ public class ConfigLoggingHandler extends FormHandler {
             // noop
         }
     }
-    
+
     public void setShouldsave(String moo) { _shouldSave = true; }
     
     public void setLevels(String levels) {
@@ -46,6 +49,18 @@ public class ConfigLoggingHandler extends FormHandler {
     public void setLogfilesize(String size) {
         _fileSize = (size != null ? size.trim() : null);
     }
+
+    /** @since 0.8.1 */
+    public void setNewlogclass(String s) {
+        if (s != null && s.length() > 0)
+            _newLogClass = s;
+    }
+    
+    /** @since 0.8.1 */
+    public void setNewloglevel(String s) {
+        if (s != null)
+            _newLogLevel = s;
+    }
     
     /**
      * The user made changes to the config and wants to save them, so
@@ -55,19 +70,24 @@ public class ConfigLoggingHandler extends FormHandler {
     private void saveChanges() {
         boolean shouldSave = false;
         
-        if (_levels != null) {
+        if ((_levels != null && _levels.length() > 0) || _newLogClass != null) {
             try {
                 Properties props = new Properties();
-                props.load(new ByteArrayInputStream(_levels.getBytes()));
+                if (_levels != null)
+                    props.load(new ByteArrayInputStream(_levels.getBytes()));
+                if (_newLogClass != null)
+                    props.setProperty(_newLogClass, _newLogLevel);
                 _context.logManager().setLimits(props);
                 shouldSave = true;
-                addFormNotice("Log limits updated");
+                addFormNotice(_("Log overrides updated"));
             } catch (IOException ioe) {
+                // shouldn't ever happen (BAIS shouldnt cause an IOE)
                 _context.logManager().getLog(ConfigLoggingHandler.class).error("Error reading from the props?", ioe);
                 addFormError("Error updating the log limits - levels not valid");
             }
-        } else {
+        } else if (!_context.logManager().getLimits().isEmpty()) {
             _context.logManager().setLimits(null);
+            shouldSave = true;
             addFormNotice("Log limits cleared");
         }
           
@@ -82,7 +102,7 @@ public class ConfigLoggingHandler extends FormHandler {
             }
         }
         
-        if (_dateFormat != null) {
+        if (_dateFormat != null && !_dateFormat.equals(_context.logManager().getDateFormatPattern())) {
             boolean valid = _context.logManager().setDateFormat(_dateFormat);
             if (valid) {
                 shouldSave = true;
@@ -138,9 +158,9 @@ public class ConfigLoggingHandler extends FormHandler {
             boolean saved = _context.logManager().saveConfig();
 
             if (saved) 
-                addFormNotice("Log configuration saved and applied successfully");
+                addFormNotice(_("Log configuration saved"));
             else
-                addFormNotice("Error saving the configuration (applied but not saved) - please see the error logs");
+                addFormError("Error saving the configuration (applied but not saved) - please see the error logs");
         }
     }
 }

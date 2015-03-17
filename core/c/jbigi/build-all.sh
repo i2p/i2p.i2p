@@ -3,6 +3,8 @@
 case `uname -sr` in
 MINGW*)
 	echo "Building windows .dlls for all architectures";;
+SunOS*) 
+	echo "Building solaris .sos for all architectures";;
 Linux*)
 	echo "Building linux .sos for all architectures";;
 FreeBSD*)
@@ -12,7 +14,7 @@ FreeBSD*)
 	exit;;
 esac
 
-VER=4.2.2
+VER=4.2.4
 echo "Extracting GMP Version $VER ..."
 tar -xjf gmp-$VER.tar.bz2
 echo "Building..."
@@ -21,7 +23,8 @@ mkdir lib
 mkdir lib/net
 mkdir lib/net/i2p
 mkdir lib/net/i2p/util
-for x in none pentium pentiummmx pentium2 pentium3 pentium4 k6 k62 k63 athlon
+
+for x in none pentium pentiummmx pentium2 pentium3 pentium4 k6 k62 k63 athlon geode pentiumm core2
 do
 	mkdir bin/$x
 	cd bin/$x
@@ -31,6 +34,8 @@ do
 	case `uname -sr` in
 	MINGW*)
 		cp jbigi.dll ../../lib/net/i2p/util/jbigi-windows-$x.dll;;
+	SunOS*)
+		cp libjbigi.so ../../lib/net/i2p/util/libjbigi-solaris-$x.so;;
 	Linux*)
 		cp libjbigi.so ../../lib/net/i2p/util/libjbigi-linux-$x.so;;
 	FreeBSD*)

@@ -9,7 +9,9 @@ import net.i2p.data.PublicKey;
 import net.i2p.data.SessionKey;
 
 /**
- * Hold the tunnel request record, managing its encryption and decryption.
+ * Hold the tunnel request record, managing its ElGamal encryption and decryption.
+ * Iterative AES encryption/decryption is done elsewhere.
+ *
  * Cleartext:
  * <pre>
  *   bytes     0-3: tunnel ID to receive messages as
@@ -23,7 +25,13 @@ import net.i2p.data.SessionKey;
  *   byte      184: flags
  *   bytes 185-188: request time (in hours since the epoch)
  *   bytes 189-192: next message ID
- *   bytes 193-222: uninterpreted / random padding
+ *   bytes 193-221: uninterpreted / random padding
+ * </pre>
+ *
+ * Encrypted:
+ * <pre>
+ *   bytes    0-15: First 16 bytes of router hash
+ *   bytes  16-527: ElGamal encrypted block (discarding zero bytes at elg[0] and elg[257])
  * </pre>
  *
  */
@@ -85,9 +93,10 @@ public class BuildRequestRecord {
      * the gateway to which the reply should be sent.
      */
     public Hash readNextIdentity() {
-        byte rv[] = new byte[Hash.HASH_LENGTH];
-        System.arraycopy(_data.getData(), _data.getOffset() + OFF_SEND_IDENT, rv, 0, Hash.HASH_LENGTH);
-        return new Hash(rv);
+        //byte rv[] = new byte[Hash.HASH_LENGTH];
+        //System.arraycopy(_data.getData(), _data.getOffset() + OFF_SEND_IDENT, rv, 0, Hash.HASH_LENGTH);
+        //return new Hash(rv);
+        return Hash.create(_data.getData(), _data.getOffset() + OFF_SEND_IDENT);
     }
     /**
      * Tunnel layer encryption key that the current hop should use
@@ -152,7 +161,7 @@ public class BuildRequestRecord {
     
     /**
      * Encrypt the record to the specified peer.  The result is formatted as: <pre>
-     *   bytes 0-15: SHA-256-128 of the current hop's identity (the toPeer parameter)
+     *   bytes 0-15: truncated SHA-256 of the current hop's identity (the toPeer parameter)
      * bytes 15-527: ElGamal-2048 encrypted block
      * </pre>
      */
@@ -226,7 +235,7 @@ public class BuildRequestRecord {
         *   byte      184: flags
         *   bytes 185-188: request time (in hours since the epoch)
         *   bytes 189-192: next message ID
-        *   bytes 193-222: uninterpreted / random padding
+        *   bytes 193-221: uninterpreted / random padding
         */
         DataHelper.toLong(buf, OFF_RECV_TUNNEL, 4, receiveTunnelId);
         System.arraycopy(peer.getData(), 0, buf, OFF_OUR_IDENT, Hash.HASH_LENGTH);
@@ -244,9 +253,7 @@ public class BuildRequestRecord {
         truncatedHour /= (60l*60l*1000l);
         DataHelper.toLong(buf, OFF_REQ_TIME, 4, truncatedHour);
         DataHelper.toLong(buf, OFF_SEND_MSG_ID, 4, nextMsgId);
-        byte rnd[] = new byte[PADDING_SIZE];
-        ctx.random().nextBytes(rnd);
-        System.arraycopy(rnd, 0, buf, OFF_SEND_MSG_ID+4, rnd.length);
+        ctx.random().nextBytes(buf, OFF_SEND_MSG_ID+4, PADDING_SIZE);
         
         byte wroteIV[] = readReplyIV();
         if (!DataHelper.eq(iv, wroteIV))

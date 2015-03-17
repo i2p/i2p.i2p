@@ -27,6 +27,7 @@ import i2p.susi.util.ReadBuffer;
 import i2p.susi.webmail.encoding.EncodingFactory;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 /**
  * @author susi23
@@ -82,18 +83,18 @@ public class MailPart {
 
 		for( int i = 0; i < headerLines.length; i++ )
 		{
-			if( headerLines[i].toLowerCase().startsWith( "content-transfer-encoding: " ) ) {
-				encoding = getFirstAttribute( headerLines[i] ).toLowerCase();
+			if( headerLines[i].toLowerCase(Locale.US).startsWith( "content-transfer-encoding: " ) ) {
+				encoding = getFirstAttribute( headerLines[i] ).toLowerCase(Locale.US);
 			}
-			else if( headerLines[i].toLowerCase().startsWith( "content-disposition: " ) ) {
-				disposition = getFirstAttribute( headerLines[i] ).toLowerCase();
+			else if( headerLines[i].toLowerCase(Locale.US).startsWith( "content-disposition: " ) ) {
+				disposition = getFirstAttribute( headerLines[i] ).toLowerCase(Locale.US);
 				String str;
 				str = getHeaderLineAttribute( headerLines[i], "filename" );
 				if( str != null )
 					name = str;
 			}
-			else if( headerLines[i].toLowerCase().startsWith( "content-type: " ) ) {
-				type = getFirstAttribute( headerLines[i] ).toLowerCase();
+			else if( headerLines[i].toLowerCase(Locale.US).startsWith( "content-type: " ) ) {
+				type = getFirstAttribute( headerLines[i] ).toLowerCase(Locale.US);
 				/*
 				 * extract boundary, name and charset from content type
 				 */
@@ -110,12 +111,12 @@ public class MailPart {
 					name = str;
 				str = getHeaderLineAttribute( headerLines[i], "charset" );
 				if( str != null )
-					charset = str.toUpperCase();
+					charset = str.toUpperCase(Locale.US);
 			}
-			else if( headerLines[i].toLowerCase().startsWith( "content-description: " ) ) {
+			else if( headerLines[i].toLowerCase(Locale.US).startsWith( "content-description: " ) ) {
 				description = getFirstAttribute( headerLines[i] );
 			}
-			else if( headerLines[i].toLowerCase().startsWith( "mime-version: " ) ) {
+			else if( headerLines[i].toLowerCase(Locale.US).startsWith( "mime-version: " ) ) {
 				version = getFirstAttribute( headerLines[i] );
 			}
 		}

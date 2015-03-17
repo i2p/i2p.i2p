@@ -24,6 +24,8 @@ import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Map;
 
+import net.i2p.data.Base64;
+
 /**
  * Holds different types that a bencoded byte array can represent.
  * You need to call the correct get method to get the correct java
@@ -140,7 +142,7 @@ public class BEValue
    * succeeds when the BEValue is actually a List, otherwise it will
    * throw a InvalidBEncodingException.
    */
-  public List getList() throws InvalidBEncodingException
+  public List<BEValue> getList() throws InvalidBEncodingException
   {
     try
       {
@@ -157,7 +159,7 @@ public class BEValue
    * values. This operation only succeeds when the BEValue is actually
    * a Map, otherwise it will throw a InvalidBEncodingException.
    */
-  public Map getMap() throws InvalidBEncodingException
+  public Map<String, BEValue> getMap() throws InvalidBEncodingException
   {
     try
       {
@@ -172,17 +174,43 @@ public class BEValue
   /** return the untyped value */
   public Object getValue() { return value; }
   
+    @Override
   public String toString()
   {
     String valueString;
     if (value instanceof byte[])
       {
+        // try to do a nice job for debugging
         byte[] bs = (byte[])value;
-        // XXX - Stupid heuristic...
-        if (bs.length <= 12)
-          valueString = new String(bs);
-        else
-          valueString = "bytes:" + bs.length;
+        if (bs.length == 0)
+          valueString =  "0 bytes";
+        else if (bs.length <= 32) {
+          StringBuilder buf = new StringBuilder(32);
+          boolean bin = false;
+          for (int i = 0; i < bs.length; i++) {
+              int b = bs[i] & 0xff;
+              // no UTF-8
+              if (b < ' ' || b > 0x7e) {
+                  bin = true;
+                  break;
+              }
+          }
+          if (bin && bs.length <= 8) {
+              buf.append(bs.length).append(" bytes: 0x");
+              for (int i = 0; i < bs.length; i++) {
+                  int b = bs[i] & 0xff;
+                  if (b < 16)
+                      buf.append('0');
+                  buf.append(Integer.toHexString(b));
+              }
+          } else if (bin) {
+              buf.append(bs.length).append(" bytes: ").append(Base64.encode(bs));
+          } else {
+              buf.append('"').append(new String(bs)).append('"');
+          }
+          valueString = buf.toString();
+        } else
+          valueString =  bs.length + " bytes";
       }
     else
       valueString = value.toString();

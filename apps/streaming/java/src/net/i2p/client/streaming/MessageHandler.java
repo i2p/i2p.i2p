@@ -1,40 +1,54 @@
 package net.i2p.client.streaming;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Iterator;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 import net.i2p.I2PAppContext;
 import net.i2p.client.I2PSession;
 import net.i2p.client.I2PSessionException;
-import net.i2p.client.I2PSessionListener;
+import net.i2p.client.I2PSessionMuxedListener;
 import net.i2p.util.Log;
 
 /**
  * Receive raw information from the I2PSession and turn it into
  * Packets, if we can.
- *
+ *<p>
+ * I2PSession -> MessageHandler -> PacketHandler -> ConnectionPacketHandler -> MessageInputStream
  */
-public class MessageHandler implements I2PSessionListener {
-    private ConnectionManager _manager;
-    private I2PAppContext _context;
-    private Log _log;
-    private List _listeners;
+class MessageHandler implements I2PSessionMuxedListener {
+    private final ConnectionManager _manager;
+    private final I2PAppContext _context;
+    private final Log _log;
+    private final Set<I2PSocketManager.DisconnectListener> _listeners;
     
     public MessageHandler(I2PAppContext ctx, ConnectionManager mgr) {
         _manager = mgr;
         _context = ctx;
-        _listeners = new ArrayList(1);
+        _listeners = new CopyOnWriteArraySet();
         _log = ctx.logManager().getLog(MessageHandler.class);
         _context.statManager().createRateStat("stream.packetReceiveFailure", "When do we fail to decrypt or otherwise receive a packet sent to us?", "Stream", new long[] { 60*60*1000, 24*60*60*1000 });
     }
         
     /** Instruct the client that the given session has received a message with
      * size # of bytes.
+     * This shouldn't be called anymore since we are registering as a muxed listener.
      * @param session session to notify
      * @param msgId message number available
      * @param size size of the message
      */
     public void messageAvailable(I2PSession session, int msgId, long size) {
+        messageAvailable(session, msgId, size, I2PSession.PROTO_UNSPECIFIED,
+                         I2PSession.PORT_UNSPECIFIED, I2PSession.PORT_UNSPECIFIED);
+    }
+
+    /** Instruct the client that the given session has received a message with
+     * size # of bytes.
+     * @param session session to notify
+     * @param msgId message number available
+     * @param size size of the message
+     */
+    public void messageAvailable(I2PSession session, int msgId, long size, int proto, int fromPort, int toPort) {
         byte data[] = null;
         try {
             data = session.receiveMessage(msgId);
@@ -48,6 +62,8 @@ public class MessageHandler implements I2PSessionListener {
         Packet packet = new Packet();
         try {
             packet.readPacket(data, 0, data.length);
+            packet.setRemotePort(fromPort);
+            packet.setLocalPort(toPort);
             _manager.getPacketHandler().receivePacket(packet);
         } catch (IllegalArgumentException iae) {
             _context.statManager().addRateData("stream.packetReceiveFailure", 1, 0);
@@ -73,19 +89,15 @@ public class MessageHandler implements I2PSessionListener {
      * @param session that has been terminated
      */
     public void disconnected(I2PSession session) {
-        if (_log.shouldLog(Log.ERROR))
-            _log.error("I2PSession disconnected");
+        if (_log.shouldLog(Log.WARN))
+            _log.warn("I2PSession disconnected");
         _manager.disconnectAllHard();
         
-        List listeners = null;
-        synchronized (_listeners) {
-            listeners = new ArrayList(_listeners);
-            _listeners.clear();
-        }
-        for (int i = 0; i < listeners.size(); i++) {
-            I2PSocketManager.DisconnectListener lsnr = (I2PSocketManager.DisconnectListener)listeners.get(i);
+        for (Iterator<I2PSocketManager.DisconnectListener> iter = _listeners.iterator(); iter.hasNext(); ) {
+            I2PSocketManager.DisconnectListener lsnr = iter.next();
             lsnr.sessionDisconnected();
         }
+        _listeners.clear();
     }
 
     /**
@@ -104,13 +116,9 @@ public class MessageHandler implements I2PSessionListener {
     }
     
     public void addDisconnectListener(I2PSocketManager.DisconnectListener lsnr) { 
-        synchronized (_listeners) {
             _listeners.add(lsnr);
-        }
     }
     public void removeDisconnectListener(I2PSocketManager.DisconnectListener lsnr) {
-        synchronized (_listeners) {
             _listeners.remove(lsnr);
-        }
     }
 }

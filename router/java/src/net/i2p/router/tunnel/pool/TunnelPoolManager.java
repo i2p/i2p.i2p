@@ -3,46 +3,51 @@ package net.i2p.router.tunnel.pool;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
-import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
-import net.i2p.data.RouterInfo;
 import net.i2p.data.TunnelId;
 import net.i2p.router.ClientTunnelSettings;
 import net.i2p.router.JobImpl;
-import net.i2p.router.LoadTestManager;
-import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelInfo;
 import net.i2p.router.TunnelManagerFacade;
 import net.i2p.router.TunnelPoolSettings;
-import net.i2p.router.tunnel.HopConfig;
-import net.i2p.stat.RateStat;
+import net.i2p.router.tunnel.TunnelDispatcher;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
+import net.i2p.util.ObjectCounter;
+import net.i2p.util.SimpleScheduler;
+import net.i2p.util.SimpleTimer;
 
 /**
- * 
+ * Manage all the exploratory and client tunnel pools.
+ * Run the tunnel builder and handler threads.
  */
 public class TunnelPoolManager implements TunnelManagerFacade {
-    private RouterContext _context;
-    private Log _log;
+    private final RouterContext _context;
+    private final Log _log;
     /** Hash (destination) to TunnelPool */
-    private Map _clientInboundPools;
+    private final Map<Hash, TunnelPool> _clientInboundPools;
     /** Hash (destination) to TunnelPool */
-    private Map _clientOutboundPools;
+    private final Map<Hash, TunnelPool> _clientOutboundPools;
     private TunnelPool _inboundExploratory;
     private TunnelPool _outboundExploratory;
-    private LoadTestManager _loadTestManager;
-    private BuildExecutor _executor;
+    private final BuildExecutor _executor;
+    private final BuildHandler _handler;
+    private final TunnelPeerSelector _clientPeerSelector;
     private boolean _isShutdown;
+    private final int _numHandlerThreads;
+    private static final long[] RATES = { 60*1000, 10*60*1000l, 60*60*1000l };
+
+    private static final int MIN_KBPS_TWO_HANDLERS = 512;
+    private static final int MIN_KBPS_THREE_HANDLERS = 1024;
     
     public TunnelPoolManager(RouterContext ctx) {
         _context = ctx;
@@ -54,26 +59,50 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         //ctx.inNetMessagePool().registerHandlerJobBuilder(TunnelGatewayMessage.MESSAGE_TYPE, b);
         //ctx.inNetMessagePool().registerHandlerJobBuilder(TunnelDataMessage.MESSAGE_TYPE, b);
 
-        _clientInboundPools = new HashMap(4);
-        _clientOutboundPools = new HashMap(4);
-        if (! LoadTestManager.FORCE_DISABLE)
-            _loadTestManager = new LoadTestManager(_context);
+        _clientInboundPools = new ConcurrentHashMap(4);
+        _clientOutboundPools = new ConcurrentHashMap(4);
+        _clientPeerSelector = new ClientPeerSelector(ctx);
         
-        _isShutdown = false;
         _executor = new BuildExecutor(ctx, this);
-        I2PThread execThread = new I2PThread(_executor, "BuildExecutor");
-        execThread.setDaemon(true);
+        I2PThread execThread = new I2PThread(_executor, "BuildExecutor", true);
         execThread.start();
+        _handler = new BuildHandler(ctx, this, _executor);
+        int numHandlerThreads;
+        int share = TunnelDispatcher.getShareBandwidth(ctx);
+        if (share >= MIN_KBPS_THREE_HANDLERS)
+            numHandlerThreads = 3;
+        else if (share >= MIN_KBPS_TWO_HANDLERS)
+            numHandlerThreads = 2;
+        else
+            numHandlerThreads = 1;
+        _numHandlerThreads = ctx.getProperty("router.buildHandlerThreads", numHandlerThreads);
+        for (int i = 1; i <= _numHandlerThreads; i++) {
+            I2PThread hThread = new I2PThread(_handler, "BuildHandler " + i + '/' + numHandlerThreads, true);
+            hThread.start();
+        }
         
-        ctx.statManager().createRateStat("tunnel.testSuccessTime", 
-                                         "How long do successful tunnel tests take?", "Tunnels", 
-                                         new long[] { 60*1000, 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
-        ctx.statManager().createRateStat("tunnel.participatingTunnels", 
-                                         "How many tunnels are we participating in?", "Tunnels", 
-                                         new long[] { 60*1000, 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
+        // The following are for TestJob
+        ctx.statManager().createRequiredRateStat("tunnel.testFailedTime", "Time for tunnel test failure (ms)", "Tunnels", 
+                                         RATES);
+        ctx.statManager().createRateStat("tunnel.testExploratoryFailedTime", "How long did the failure of an exploratory tunnel take (max of 60s for full timeout)?", "Tunnels", 
+                                         RATES);
+        ctx.statManager().createRateStat("tunnel.testFailedCompletelyTime", "How long did the complete failure take (max of 60s for full timeout)?", "Tunnels", 
+                                         RATES);
+        ctx.statManager().createRateStat("tunnel.testExploratoryFailedCompletelyTime", "How long did the complete failure of an exploratory tunnel take (max of 60s for full timeout)?", "Tunnels", 
+                                         RATES);
+        ctx.statManager().createRateStat("tunnel.testSuccessLength", "How long were the tunnels that passed the test?", "Tunnels", 
+                                         RATES);
+        ctx.statManager().createRequiredRateStat("tunnel.testSuccessTime", "Time for tunnel test success (ms)", "Tunnels", 
+                                         RATES);
+        ctx.statManager().createRateStat("tunnel.testAborted", "Tunnel test could not occur, since there weren't any tunnels to test with", "Tunnels", 
+                                         RATES);
     }
     
-    /** pick an inbound tunnel not bound to a particular destination */
+    /**
+     * Pick a random inbound exploratory tunnel
+     *
+     * @return null if none
+     */
     public TunnelInfo selectInboundTunnel() { 
         TunnelPool pool = _inboundExploratory;
         if (pool == null) return null;
@@ -86,23 +115,29 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         return info;
     }
     
-    /** pick an inbound tunnel bound to the given destination */
+    /**
+     * Pick a random inbound tunnel from the given destination's pool
+     *
+     * @param destination if null, returns inbound exploratory tunnel
+     * @return null if none
+     */
     public TunnelInfo selectInboundTunnel(Hash destination) { 
         if (destination == null) return selectInboundTunnel();
-        TunnelPool pool = null;
-        synchronized (_clientInboundPools) {
-            pool = (TunnelPool)_clientInboundPools.get(destination);
-        }
+        TunnelPool pool = _clientInboundPools.get(destination);
         if (pool != null) {
             return pool.selectTunnel();
         }
-        if (_log.shouldLog(Log.CRIT))
-            _log.log(Log.CRIT, "wtf, want the inbound tunnel for " + destination.calculateHash().toBase64() +
+        if (_log.shouldLog(Log.ERROR))
+            _log.error("Want the inbound tunnel for " + destination.calculateHash() +
                      " but there isn't a pool?");
         return null;
     }
     
-    /** pick an outbound tunnel not bound to a particular destination */
+    /**
+     * Pick a random outbound exploratory tunnel
+     *
+     * @return null if none
+     */
     public TunnelInfo selectOutboundTunnel() { 
         TunnelPool pool = _outboundExploratory;
         if (pool == null) return null;
@@ -115,98 +150,205 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         return info;
     }
     
-    /** pick an outbound tunnel bound to the given destination */
+    /**
+     * Pick a random outbound tunnel from the given destination's pool
+     *
+     * @param destination if null, returns outbound exploratory tunnel
+     * @return null if none
+     */
     public TunnelInfo selectOutboundTunnel(Hash destination)  {
         if (destination == null) return selectOutboundTunnel();
-        TunnelPool pool = null;
-        synchronized (_clientOutboundPools) {
-            pool = (TunnelPool)_clientOutboundPools.get(destination);
-        }
+        TunnelPool pool = _clientOutboundPools.get(destination);
         if (pool != null) {
             return pool.selectTunnel();
         }
         return null;
     }
     
-    public TunnelInfo getTunnelInfo(TunnelId id) {
-        TunnelInfo info = null;
-        synchronized (_clientInboundPools) {
-            for (Iterator iter = _clientInboundPools.values().iterator(); iter.hasNext(); ) {
-                TunnelPool pool = (TunnelPool)iter.next();
-                info = pool.getTunnel(id);
-                if (info != null)
-                    return info;
-            }
+    /**
+     * Pick the inbound exploratory tunnel with the gateway closest to the given hash.
+     * By using this instead of the random selectTunnel(),
+     * we force some locality in OBEP-IBGW connections to minimize
+     * those connections network-wide.
+     *
+     * @param closestTo non-null
+     * @return null if none
+     * @since 0.8.10
+     */
+    public TunnelInfo selectInboundExploratoryTunnel(Hash closestTo) { 
+        TunnelPool pool = _inboundExploratory;
+        if (pool == null) return null;
+        TunnelInfo info = pool.selectTunnel(); 
+        if (info == null) {
+            _inboundExploratory.buildFallback();
+            // still can be null, but probably not
+            info = _inboundExploratory.selectTunnel(closestTo);
         }
-        info = _inboundExploratory.getTunnel(id);
-        if (info != null) return info;
-        info = _outboundExploratory.getTunnel(id);
-        if (info != null) return info;
+        return info;
+    }
+    
+    /**
+     * Pick the inbound tunnel with the gateway closest to the given hash
+     * from the given destination's pool.
+     * By using this instead of the random selectTunnel(),
+     * we force some locality in OBEP-IBGW connections to minimize
+     * those connections network-wide.
+     *
+     * @param destination if null, returns inbound exploratory tunnel
+     * @param closestTo non-null
+     * @return null if none
+     * @since 0.8.10
+     */
+    public TunnelInfo selectInboundTunnel(Hash destination, Hash closestTo) { 
+        if (destination == null) return selectInboundExploratoryTunnel(closestTo);
+        TunnelPool pool = _clientInboundPools.get(destination);
+        if (pool != null) {
+            return pool.selectTunnel(closestTo);
+        }
+        if (_log.shouldLog(Log.ERROR))
+            _log.error("Want the inbound tunnel for " + destination.calculateHash() +
+                     " but there isn't a pool?");
         return null;
     }
     
+    /**
+     * Pick the outbound exploratory tunnel with the endpoint closest to the given hash.
+     * By using this instead of the random selectTunnel(),
+     * we force some locality in OBEP-IBGW connections to minimize
+     * those connections network-wide.
+     *
+     * @param closestTo non-null
+     * @return null if none
+     * @since 0.8.10
+     */
+    public TunnelInfo selectOutboundExploratoryTunnel(Hash closestTo) { 
+        TunnelPool pool = _outboundExploratory;
+        if (pool == null) return null;
+        TunnelInfo info = pool.selectTunnel();
+        if (info == null) {
+            pool.buildFallback();
+            // still can be null, but probably not
+            info = pool.selectTunnel(closestTo);
+        }
+        return info;
+    }
+    
+    /**
+     * Pick the outbound tunnel with the endpoint closest to the given hash
+     * from the given destination's pool.
+     * By using this instead of the random selectTunnel(),
+     * we force some locality in OBEP-IBGW connections to minimize
+     * those connections network-wide.
+     *
+     * @param destination if null, returns outbound exploratory tunnel
+     * @param closestTo non-null
+     * @return null if none
+     * @since 0.8.10
+     */
+    public TunnelInfo selectOutboundTunnel(Hash destination, Hash closestTo) {
+        if (destination == null) return selectOutboundExploratoryTunnel(closestTo);
+        TunnelPool pool = _clientOutboundPools.get(destination);
+        if (pool != null) {
+            return pool.selectTunnel(closestTo);
+        }
+        return null;
+    }
+    
+    public TunnelInfo getTunnelInfo(TunnelId id) {
+        TunnelInfo info = null;
+        for (TunnelPool pool : _clientInboundPools.values()) {
+                info = pool.getTunnel(id);
+                if (info != null)
+                    return info;
+        }
+        if (_inboundExploratory != null) {
+            info = _inboundExploratory.getTunnel(id);
+            if (info != null) return info;
+        }
+        if (_outboundExploratory != null) {
+            info = _outboundExploratory.getTunnel(id);
+            if (info != null) return info;
+        }
+        return null;
+    }
+    
+    /** @return number of inbound exploratory tunnels */
     public int getFreeTunnelCount() { 
         if (_inboundExploratory == null)
             return 0;
         else
             return _inboundExploratory.size(); 
     }
+
+    /** @return number of outbound exploratory tunnels */
     public int getOutboundTunnelCount() { 
         if (_outboundExploratory == null)
             return 0;
         else
             return _outboundExploratory.size(); 
     }
+
     public int getInboundClientTunnelCount() { 
         int count = 0;
-        List destinations = null;
-        synchronized (_clientInboundPools) {
-            destinations = new ArrayList(_clientInboundPools.keySet());
-        }
-        for (int i = 0; i < destinations.size(); i++) {
-            Hash client = (Hash)destinations.get(i);
-            TunnelPool pool = null;
-            synchronized (_clientInboundPools) {
-                pool = (TunnelPool)_clientInboundPools.get(client);
-            }
+        for (TunnelPool pool : _clientInboundPools.values()) {
             count += pool.listTunnels().size();
         }
         return count;
     }
+
     public int getOutboundClientTunnelCount() { 
         int count = 0;
-        List destinations = null;
-        synchronized (_clientInboundPools) {
-            destinations = new ArrayList(_clientOutboundPools.keySet());
-        }
-        for (int i = 0; i < destinations.size(); i++) {
-            Hash client = (Hash)destinations.get(i);
-            TunnelPool pool = null;
-            synchronized (_clientOutboundPools) {
-                pool = (TunnelPool)_clientOutboundPools.get(client);
-            }
+        for (TunnelPool pool : _clientOutboundPools.values()) {
             count += pool.listTunnels().size();
         }
         return count;
     }
+
+    /**
+     *  Use to verify a tunnel pool is alive
+     *  @since 0.7.11
+     */
+    public int getOutboundClientTunnelCount(Hash destination)  {
+        TunnelPool pool = _clientOutboundPools.get(destination);
+        if (pool != null)
+            return pool.getTunnelCount();
+        return 0;
+    }
+    
     public int getParticipatingCount() { return _context.tunnelDispatcher().getParticipatingCount(); }
     public long getLastParticipatingExpiration() { return _context.tunnelDispatcher().getLastParticipatingExpiration(); }
     
-    public boolean isInUse(Hash peer) { 
-        // this lets peers that are in our tunnels expire (forcing us to refetch them) 
-        // if the info is old
-        //!! no, dont.  bad.
-        return true; 
+    /**
+     *  @return (number of part. tunnels) / (estimated total number of hops in our expl.+client tunnels)
+     *  100 max.
+     *  We just use length setting, not variance, for speed
+     *  @since 0.7.10
+     */
+    public double getShareRatio() {
+        int part = getParticipatingCount();
+        if (part <= 0)
+            return 0d;
+        List<TunnelPool> pools = new ArrayList();
+        listPools(pools);
+        int count = 0;
+        for (int i = 0; i < pools.size(); i++) {
+            TunnelPool pool = pools.get(i);
+            count += pool.size() * pool.getSettings().getLength();
+        }
+        if (count <= 0)
+            return 100d;
+        return Math.min(part / (double) count, 100d);
     }
-    
+
+
     public boolean isValidTunnel(Hash client, TunnelInfo tunnel) {
         if (tunnel.getExpiration() < _context.clock().now())
             return false;
         TunnelPool pool;
         if (tunnel.isInbound())
-            pool = (TunnelPool)_clientInboundPools.get(client); 
+            pool = _clientInboundPools.get(client); 
         else
-            pool = (TunnelPool)_clientOutboundPools.get(client); 
+            pool = _clientOutboundPools.get(client); 
         if (pool == null)
             return false;
         return pool.listTunnels().contains(tunnel);
@@ -216,37 +358,32 @@ public class TunnelPoolManager implements TunnelManagerFacade {
     public TunnelPoolSettings getOutboundSettings() { return _outboundExploratory.getSettings(); }
     public void setInboundSettings(TunnelPoolSettings settings) { _inboundExploratory.setSettings(settings); }
     public void setOutboundSettings(TunnelPoolSettings settings) { _outboundExploratory.setSettings(settings); }
+
     public TunnelPoolSettings getInboundSettings(Hash client) { 
-        TunnelPool pool = null;
-        synchronized (_clientInboundPools) { 
-            pool = (TunnelPool)_clientInboundPools.get(client); 
-        }
+        TunnelPool pool = _clientInboundPools.get(client); 
         if (pool != null)
             return pool.getSettings();
         else
             return null;
     }
+
     public TunnelPoolSettings getOutboundSettings(Hash client) { 
-        TunnelPool pool = null;
-        synchronized (_clientOutboundPools) { 
-            pool = (TunnelPool)_clientOutboundPools.get(client); 
-        }
+        TunnelPool pool = _clientOutboundPools.get(client); 
         if (pool != null)
             return pool.getSettings();
         else
             return null;
     }
+
     public void setInboundSettings(Hash client, TunnelPoolSettings settings) {
         setSettings(_clientInboundPools, client, settings);
     }
     public void setOutboundSettings(Hash client, TunnelPoolSettings settings) {
         setSettings(_clientOutboundPools, client, settings);
     }
-    private void setSettings(Map pools, Hash client, TunnelPoolSettings settings) {
-        TunnelPool pool = null;
-        synchronized (pools) { 
-            pool = (TunnelPool)pools.get(client); 
-        }
+
+    private static void setSettings(Map<Hash, TunnelPool> pools, Hash client, TunnelPoolSettings settings) {
+        TunnelPool pool = pools.get(client); 
         if (pool != null) {
             settings.setDestination(client); // prevent spoofing or unset dest
             pool.setSettings(settings);
@@ -254,82 +391,105 @@ public class TunnelPoolManager implements TunnelManagerFacade {
     }
     
     public void restart() { 
-        shutdown();
+        _handler.restart();
+        _executor.restart();
+        shutdownExploratory();
         startup();
     }
         
+    /**
+     *  Used only at session startup.
+     *  Do not use to change settings.
+     */
     public void buildTunnels(Destination client, ClientTunnelSettings settings) {
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Building tunnels for the client " + client.calculateHash().toBase64() + ": " + settings);
         Hash dest = client.calculateHash();
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Building tunnels for the client " + dest + ": " + settings);
         settings.getInboundSettings().setDestination(dest);
         settings.getOutboundSettings().setDestination(dest);
         TunnelPool inbound = null;
         TunnelPool outbound = null;
-        // should we share the clientPeerSelector across both inbound and outbound?
-        synchronized (_clientInboundPools) {
-            inbound = (TunnelPool)_clientInboundPools.get(dest);
+
+        boolean delayOutbound = false;
+        // synch with removeTunnels() below
+        synchronized (this) {
+            inbound = _clientInboundPools.get(dest);
             if (inbound == null) {
                 inbound = new TunnelPool(_context, this, settings.getInboundSettings(), 
-                                         new ClientPeerSelector());
+                                         _clientPeerSelector);
                 _clientInboundPools.put(dest, inbound);
             } else {
                 inbound.setSettings(settings.getInboundSettings());
             }
-        }
-        synchronized (_clientOutboundPools) {
-            outbound = (TunnelPool)_clientOutboundPools.get(dest);
+            outbound = _clientOutboundPools.get(dest);
             if (outbound == null) {
                 outbound = new TunnelPool(_context, this, settings.getOutboundSettings(), 
-                                          new ClientPeerSelector());
+                                          _clientPeerSelector);
                 _clientOutboundPools.put(dest, outbound);
+                delayOutbound = true;
             } else {
                 outbound.setSettings(settings.getOutboundSettings());
             }
         }
         inbound.startup();
-        try { Thread.sleep(3*1000); } catch (InterruptedException ie) {}
-        outbound.startup();
+        // don't delay the outbound if it already exists, as this opens up a large
+        // race window with removeTunnels() below
+        if (delayOutbound)
+            _context.simpleScheduler().addEvent(new DelayedStartup(outbound), 1000);
+        else
+            outbound.startup();
     }
     
     
-    public void removeTunnels(Hash destination) {
+    private static class DelayedStartup implements SimpleTimer.TimedEvent {
+        private final TunnelPool pool;
+
+        public DelayedStartup(TunnelPool p) {
+            this.pool = p;
+        }
+
+        public void timeReached() {
+            this.pool.startup();
+        }
+    }
+
+    /**
+     *  This will be called twice, once by the inbound and once by the outbound pool.
+     *  Synched with buildTunnels() above.
+     */
+    public synchronized void removeTunnels(Hash destination) {
         if (destination == null) return;
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Removing tunnels for the client " + destination);
         if (_context.clientManager().isLocal(destination)) {
-            if (_log.shouldLog(Log.CRIT))
-                _log.log(Log.CRIT, "wtf, why are you removing the pool for " + destination.toBase64(), new Exception("i did it"));
+            // race with buildTunnels() on restart of a client
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("Not removing pool still registered with client manager: " + destination.toBase64(), new Exception("i did it"));
+            return;
         }
-        TunnelPool inbound = null;
-        TunnelPool outbound = null;
-        synchronized (_clientInboundPools) {
-            inbound = (TunnelPool)_clientInboundPools.remove(destination);
-        }
-        synchronized (_clientOutboundPools) {
-            outbound = (TunnelPool)_clientOutboundPools.remove(destination);
-        }
+        TunnelPool inbound = _clientInboundPools.remove(destination);
+        TunnelPool outbound = _clientOutboundPools.remove(destination);
         if (inbound != null)
             inbound.shutdown();
         if (outbound != null)
             outbound.shutdown();
     }
     
+    /** queue a recurring test job if appropriate */
     void buildComplete(PooledTunnelCreatorConfig cfg) {
-        buildComplete();
-        if (_loadTestManager != null)
-            _loadTestManager.addTunnelTestCandidate(cfg);
-        if (cfg.getLength() > 1) {
+        if (cfg.getLength() > 1 &&
+            (!_context.router().gracefulShutdownInProgress()) &&
+            !_context.getBooleanPropertyDefaultTrue("router.disableTunnelTesting")) {
             TunnelPool pool = cfg.getTunnelPool();
             if (pool == null) {
+                // never seen this before, do we reallly need to bother
+                // trying so hard to find his pool?
                 _log.error("How does this not have a pool?  " + cfg, new Exception("baf"));
                 if (cfg.getDestination() != null) {
                     if (cfg.isInbound()) {
-                        synchronized (_clientInboundPools) {
-                            pool = (TunnelPool)_clientInboundPools.get(cfg.getDestination());
-                        }
+                            pool = _clientInboundPools.get(cfg.getDestination());
                     } else {
-                        synchronized (_clientOutboundPools) {
-                            pool = (TunnelPool)_clientOutboundPools.get(cfg.getDestination());
-                        }
+                            pool = _clientOutboundPools.get(cfg.getDestination());
                     }
                 } else {
                     if (cfg.isInbound()) {
@@ -343,10 +503,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
             _context.jobQueue().addJob(new TestJob(_context, cfg, pool));
         }
     }
-    void buildComplete() {}
-    
-    private static final String PROP_LOAD_TEST = "router.loadTest";
-    
+
     public void startup() { 
         _isShutdown = false;
         if (!_executor.isRunning()) {
@@ -354,7 +511,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
             t.setDaemon(true);
             t.start();
         }
-        ExploratoryPeerSelector selector = new ExploratoryPeerSelector();
+        ExploratoryPeerSelector selector = new ExploratoryPeerSelector(_context);
         
         TunnelPoolSettings inboundSettings = new TunnelPoolSettings();
         inboundSettings.setIsExploratory(true);
@@ -362,12 +519,11 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         _inboundExploratory = new TunnelPool(_context, this, inboundSettings, selector);
         _inboundExploratory.startup();
         
-        try { Thread.sleep(3*1000); } catch (InterruptedException ie) {}
         TunnelPoolSettings outboundSettings = new TunnelPoolSettings();
         outboundSettings.setIsExploratory(true);
         outboundSettings.setIsInbound(false);
         _outboundExploratory = new TunnelPool(_context, this, outboundSettings, selector);
-        _outboundExploratory.startup();
+        _context.simpleScheduler().addEvent(new DelayedStartup(_outboundExploratory), 3*1000);
         
         // try to build up longer tunnels
         _context.jobQueue().addJob(new BootstrapPool(_context, _inboundExploratory));
@@ -387,22 +543,27 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         }
     }
     
+    /**
+     *  Cannot be restarted
+     */
     public void shutdown() { 
+        _handler.shutdown(_numHandlerThreads);
+        _executor.shutdown();
+        shutdownExploratory();
+        _isShutdown = true;
+    }
+
+    private void shutdownExploratory() {
         if (_inboundExploratory != null)
             _inboundExploratory.shutdown();
         if (_outboundExploratory != null)
             _outboundExploratory.shutdown();
-        _isShutdown = true;
     }
     
     /** list of TunnelPool instances currently in play */
-    void listPools(List out) {
-        synchronized (_clientInboundPools) {
-            out.addAll(_clientInboundPools.values());
-        }
-        synchronized (_clientOutboundPools) {
-            out.addAll(_clientOutboundPools.values());
-        }
+    public void listPools(List<TunnelPool> out) {
+        out.addAll(_clientInboundPools.values());
+        out.addAll(_clientOutboundPools.values());
         if (_inboundExploratory != null)
             out.add(_inboundExploratory);
         if (_outboundExploratory != null)
@@ -412,197 +573,132 @@ public class TunnelPoolManager implements TunnelManagerFacade {
     BuildExecutor getExecutor() { return _executor; }
     boolean isShutdown() { return _isShutdown; }
 
-    public int getInboundBuildQueueSize() { return _executor.getInboundBuildQueueSize(); }
+    public int getInboundBuildQueueSize() { return _handler.getInboundBuildQueueSize(); }
     
-    
+    /** @deprecated moved to routerconsole */
     public void renderStatusHTML(Writer out) throws IOException {
-        out.write("<h2><a name=\"exploratory\">Exploratory tunnels</a> (<a href=\"/configtunnels.jsp#exploratory\">config</a>):</h2>\n");
-        renderPool(out, _inboundExploratory, _outboundExploratory);
-        
-        List destinations = null;
-        synchronized (_clientInboundPools) {
-            destinations = new ArrayList(_clientInboundPools.keySet());
-        }
-        for (int i = 0; i < destinations.size(); i++) {
-            Hash client = (Hash)destinations.get(i);
-            TunnelPool in = null;
-            TunnelPool outPool = null;
-            synchronized (_clientInboundPools) {
-                in = (TunnelPool)_clientInboundPools.get(client);
-            }
-            synchronized (_clientOutboundPools) {
-                outPool = (TunnelPool)_clientOutboundPools.get(client);
-            }
-            String name = (in != null ? in.getSettings().getDestinationNickname() : null);
-            if ( (name == null) && (outPool != null) )
-                name = outPool.getSettings().getDestinationNickname();
-            if (name == null)
-                name = client.toBase64().substring(0,4);
-            out.write("<h2><a name=\"" + client.toBase64().substring(0,4)
-                      + "\">Client tunnels</a> for " + name);
-            if (_context.clientManager().isLocal(client))
-                out.write(" (<a href=\"/configtunnels.jsp#" + client.toBase64().substring(0,4) +"\">config</a>):</h2>\n");
-            else
-                out.write(" (dead):</h2>\n");
-            renderPool(out, in, outPool);
-        }
-        
-        List participating = _context.tunnelDispatcher().listParticipatingTunnels();
-        Collections.sort(participating, new TunnelComparator());
-        out.write("<h2><a name=\"participating\">Participating tunnels</a>:</h2><table border=\"1\">\n");
-        out.write("<tr><td><b>Receive on</b></td><td><b>From</b></td><td>"
-                  + "<b>Send on</b></td><td><b>To</b></td><td><b>Expiration</b></td>"
-                  + "<td><b>Usage</b></td><td><b>Rate</b></td><td><b>Role</b></td></tr>\n");
-        long processed = 0;
-        RateStat rs = _context.statManager().getRate("tunnel.participatingMessageCount");
-        if (rs != null)
-            processed = (long)rs.getRate(10*60*1000).getLifetimeTotalValue();
-        int inactive = 0;
-        for (int i = 0; i < participating.size(); i++) {
-            HopConfig cfg = (HopConfig)participating.get(i);
-            if (cfg.getProcessedMessagesCount() <= 0) {
-                inactive++;
-                continue;
-            }
-            out.write("<tr>");
-            if (cfg.getReceiveTunnel() != null)
-                out.write("<td>" + cfg.getReceiveTunnel().getTunnelId() +"</td>");
-            else
-                out.write("<td>n/a</td>");
-            if (cfg.getReceiveFrom() != null)
-                out.write("<td>" + netDbLink(cfg.getReceiveFrom()) +"</td>");
-            else
-                out.write("<td>&nbsp;</td>");
-            if (cfg.getSendTunnel() != null)
-                out.write("<td>" + cfg.getSendTunnel().getTunnelId() +"</td>");
-            else
-                out.write("<td>&nbsp;</td>");
-            if (cfg.getSendTo() != null)
-                out.write("<td>" + netDbLink(cfg.getSendTo()) +"</td>");
-            else
-                out.write("<td>&nbsp;</td>");
-            long timeLeft = cfg.getExpiration()-_context.clock().now();
-            if (timeLeft > 0)
-                out.write("<td align=right>" + DataHelper.formatDuration(timeLeft) + "</td>");
-            else
-                out.write("<td align=right>(grace period)</td>");
-            out.write("<td align=right>" + cfg.getProcessedMessagesCount() + "KB</td>");
-            int lifetime = (int) ((_context.clock().now() - cfg.getCreation()) / 1000);
-            if (lifetime <= 0)
-                lifetime = 1;
-            if (lifetime > 10*60)
-                lifetime = 10*60;
-            int bps = 1024 * (int) cfg.getProcessedMessagesCount() / lifetime;
-            out.write("<td align=right>" + bps + "Bps</td>");
-            if (cfg.getSendTo() == null)
-                out.write("<td>Outbound Endpoint</td>");
-            else if (cfg.getReceiveFrom() == null)
-                out.write("<td>Inbound Gateway</td>");
-            else
-                out.write("<td>Participant</td>");
-            out.write("</tr>\n");
-            processed += cfg.getProcessedMessagesCount();
-        }
-        out.write("</table>\n");
-        out.write("Inactive participating tunnels: " + inactive + "<br />\n");
-        out.write("Lifetime bandwidth usage: " + DataHelper.formatSize(processed*1024) + "B<br />\n");
     }
-    
-    class TunnelComparator implements Comparator {
-         public int compare(Object l, Object r) {
-             return (int) (((HopConfig)r).getProcessedMessagesCount() - ((HopConfig)l).getProcessedMessagesCount());
+
+    /** @return total number of non-fallback expl. + client tunnels */
+    private int countTunnelsPerPeer(ObjectCounter<Hash> lc) {
+        List<TunnelPool> pools = new ArrayList();
+        listPools(pools);
+        int tunnelCount = 0;
+        for (TunnelPool tp : pools) {
+            for (TunnelInfo info : tp.listTunnels()) {
+                if (info.getLength() > 1) {
+                    tunnelCount++;
+                    for (int j = 0; j < info.getLength(); j++) {
+                        Hash peer = info.getPeer(j);
+                        if (!_context.routerHash().equals(peer))
+                            lc.increment(peer);
+                    }
+                }
+            }
+        }
+        return tunnelCount;
+    }
+
+    private static final int DEFAULT_MAX_PCT_TUNNELS = 33;
+    /**
+     *  For reliability reasons, don't allow a peer in more than x% of
+     *  client and exploratory tunnels.
+     *
+     *  This also will prevent a single huge-capacity (or malicious) peer from
+     *  taking all the tunnels in the network (although it would be nice to limit
+     *  the % of total network tunnels to 10% or so, but that appears to be
+     *  too low to set as a default here... much lower than 33% will push client
+     *  tunnels out of the fast tier into high cap or beyond...)
+     *
+     *  Possible improvement - restrict based on count per IP, or IP block,
+     *  to slightly increase costs of collusion
+     *
+     *  @return Set of peers that should not be allowed in another tunnel
+     */
+    public Set<Hash> selectPeersInTooManyTunnels() {
+        ObjectCounter<Hash> lc = new ObjectCounter();
+        int tunnelCount = countTunnelsPerPeer(lc);
+        Set<Hash> rv = new HashSet();
+        if (tunnelCount >= 4 && _context.router().getUptime() > 10*60*1000) {
+            int max = _context.getProperty("router.maxTunnelPercentage", DEFAULT_MAX_PCT_TUNNELS);
+            for (Hash h : lc.objects()) {
+                 if (lc.count(h) > 0 && (lc.count(h) + 1) * 100 / (tunnelCount + 1) > max)
+                     rv.add(h);
+            }
+        }
+        return rv;
+    }
+
+    /** for TunnelRenderer in router console */
+    public Map<Hash, TunnelPool> getInboundClientPools() {
+            return new HashMap(_clientInboundPools);
+    }
+
+    /** for TunnelRenderer in router console */
+    public Map<Hash, TunnelPool> getOutboundClientPools() {
+            return new HashMap(_clientOutboundPools);
+    }
+
+    /** for TunnelRenderer in router console */
+    public TunnelPool getInboundExploratoryPool() {
+        return _inboundExploratory;
+    }
+
+    /** for TunnelRenderer in router console */
+    public TunnelPool getOutboundExploratoryPool() {
+        return _outboundExploratory;
+    }
+
+    /**
+     *  Fail all outbound tunnels with this peer as first hop,
+     *  and all inbound tunnels with this peer as the last hop,
+     *  baecause we can't contact it any more.
+     *  This is most likely to be triggered by an outbound tunnel.
+     *
+     *  @since 0.8.13
+     */
+    public void fail(Hash peer) {
+        if (_outboundExploratory != null)
+            failTunnelsWithFirstHop(_outboundExploratory, peer);
+        for (TunnelPool pool : _clientOutboundPools.values()) {
+            failTunnelsWithFirstHop(pool, peer);
+        }
+        if (_inboundExploratory != null)
+            failTunnelsWithLastHop(_inboundExploratory, peer);
+        for (TunnelPool pool : _clientInboundPools.values()) {
+            failTunnelsWithLastHop(pool, peer);
         }
     }
 
-    private void renderPool(Writer out, TunnelPool in, TunnelPool outPool) throws IOException {
-        List tunnels = null;
-        if (in == null)
-            tunnels = new ArrayList();
-        else
-            tunnels = in.listTunnels();
-        if (outPool != null)
-            tunnels.addAll(outPool.listTunnels());
-        
-        long processedIn = (in != null ? in.getLifetimeProcessed() : 0);
-        long processedOut = (outPool != null ? outPool.getLifetimeProcessed() : 0);
-        
-        out.write("<table border=\"1\"><tr><td><b>Direction</b></td><td><b>Expiration</b></td><td><b>Usage</b></td><td align=\"left\">Hops (gateway first)</td></tr>\n");
-        int live = 0;
-        for (int i = 0; i < tunnels.size(); i++) {
-            TunnelInfo info = (TunnelInfo)tunnels.get(i);
-            long timeLeft = info.getExpiration()-_context.clock().now();
-            if (timeLeft <= 0)
-                continue; // don't display tunnels in their grace period
-            live++;
-            if (info.isInbound())
-                out.write("<tr><td><b>inbound</b></td>");
-            else
-                out.write("<tr><td><b>outbound</b></td>");
-            out.write("<td align=right>" + DataHelper.formatDuration(timeLeft) + "</td>\n");
-            out.write("<td align=right>" + info.getProcessedMessagesCount() + "KB</td>\n");
-            for (int j = 0; j < info.getLength(); j++) {
-                Hash peer = info.getPeer(j);
-                String cap = getCapacity(peer);
-                TunnelId id = (info.isInbound() ? info.getReceiveTunnelId(j) : info.getSendTunnelId(j));
-                if (_context.routerHash().equals(peer))
-                    out.write("<td>" + (id == null ? "" : "" + id) + "</td>");
-                else
-                    out.write("<td>" + netDbLink(peer) + (id == null ? "" : ":" + id) + cap + "</td>");                
+    /**
+     *  Fail all (outbound) tunnels with this peer as first hop (not counting us)
+     *
+     *  @since 0.8.13
+     */
+    private void failTunnelsWithFirstHop(TunnelPool pool, Hash peer) {
+        for (TunnelInfo tun : pool.listTunnels()) {
+            int len = tun.getLength();
+            if (len > 1 && tun.getPeer(1).equals(peer)) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Removing OB tunnel, first hop shitlisted: " + tun);
+                pool.tunnelFailed(tun, peer);
             }
-            out.write("</tr>\n");
-            
-            if (info.isInbound()) 
-                processedIn += info.getProcessedMessagesCount();
-            else
-                processedOut += info.getProcessedMessagesCount();
-        }
-        out.write("</table>\n");
-        if (in != null) {
-            List pending = in.listPending();
-            for (int i = 0; i < pending.size(); i++) {
-                TunnelInfo info = (TunnelInfo)pending.get(i);
-                out.write("In progress: <code>" + info.toString() + "</code><br />\n");
-            }
-            live += pending.size();
-        }
-        if (outPool != null) {
-            List pending = outPool.listPending();
-            for (int i = 0; i < pending.size(); i++) {
-                TunnelInfo info = (TunnelInfo)pending.get(i);
-                out.write("In progress: <code>" + info.toString() + "</code><br />\n");
-            }
-            live += pending.size();
-        }
-        if (live <= 0)
-            out.write("<b>No tunnels, waiting for the grace period to end</b><br />\n");
-        out.write("Lifetime bandwidth usage: " + DataHelper.formatSize(processedIn*1024) + "B in, " +
-                  DataHelper.formatSize(processedOut*1024) + "B out<br />");
-    }
-    
-    private String getCapacity(Hash peer) {
-        RouterInfo info = _context.netDb().lookupRouterInfoLocally(peer);
-        if (info != null) {
-            String caps = info.getCapabilities();
-            if (caps.indexOf(Router.CAPABILITY_BW12) >= 0) {
-                return "[&lt;12&nbsp;]";
-            } else if (caps.indexOf(Router.CAPABILITY_BW32) >= 0) {
-                return "[&lt;=32&nbsp;]";
-            } else if (caps.indexOf(Router.CAPABILITY_BW64) >= 0) {
-                return "[&lt;=64&nbsp;]";
-            } else if (caps.indexOf(Router.CAPABILITY_BW128) >= 0) {
-                return "<b>[&lt;=128]</b>";
-            } else if (caps.indexOf(Router.CAPABILITY_BW256) >= 0) {
-                return "<b>[&gt;128]</b>";
-            } else {
-                return "[old&nbsp;]";
-            }
-        } else {
-            return "[unkn]";
         }
     }
 
-    private static String netDbLink(Hash peer) {
-        String h = peer.toBase64().substring(0, 4);
-        return "<a href=\"netdb.jsp?r=" + h + "\">" + h + "</a>";
+    /**
+     *  Fail all (inbound) tunnels with this peer as last hop (not counting us)
+     *
+     *  @since 0.8.13
+     */
+    private void failTunnelsWithLastHop(TunnelPool pool, Hash peer) {
+        for (TunnelInfo tun : pool.listTunnels()) {
+            int len = tun.getLength();
+            if (len > 1 && tun.getPeer(len - 2).equals(peer)) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Removing IB tunnel, prev. hop shitlisted: " + tun);
+                pool.tunnelFailed(tun, peer);
+            }
+        }
     }
 }

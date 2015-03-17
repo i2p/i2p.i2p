@@ -89,8 +89,6 @@ public final class CryptixRijndael_Algorithm // implicit no-argument constructor
     //...........................................................................
 
     static {
-        long time = Clock.getInstance().now();
-
         if (_RDEBUG && _debuglevel > 6) {
             System.out.println("Algorithm Name: Rijndael ver 0.1");
             System.out.println("Electronic Codebook (ECB) Mode");
@@ -214,6 +212,7 @@ public final class CryptixRijndael_Algorithm // implicit no-argument constructor
         for (t = 1; t < 30;)
             _rcon[t++] = (byte) (r = mul(2, r));
 
+/****
         time = Clock.getInstance().now() - time;
 
         if (_RDEBUG && _debuglevel > 8) {
@@ -341,6 +340,7 @@ public final class CryptixRijndael_Algorithm // implicit no-argument constructor
             System.out.println("Total initialization time: " + time + " ms.");
             System.out.println();
         }
+****/
     }
 
     // multiply two elements of GF(2^m)
@@ -453,8 +453,8 @@ public final class CryptixRijndael_Algorithm // implicit no-argument constructor
      * @param  sessionKey The session key to use for decryption.
      */
     public static final void blockDecrypt(byte[] in, byte[] result, int inOffset, int outOffset, Object sessionKey) {
-        if (in.length - inOffset > result.length - outOffset)
-            throw new IllegalArgumentException("result too small: in.len=" + in.length + " in.offset=" + inOffset
+        if (result.length - outOffset <= 15)
+            throw new IllegalArgumentException("result too small:"
                                                + " result.len=" + result.length + " result.offset=" + outOffset);
         if (in.length - inOffset <= 15)
             throw new IllegalArgumentException("data too small: " + in.length + " inOffset: " + inOffset);
@@ -519,9 +519,11 @@ public final class CryptixRijndael_Algorithm // implicit no-argument constructor
     }
 
     /** A basic symmetric encryption/decryption test. */
+/****
     public static boolean self_test() {
         return self_test(_BLOCK_SIZE);
     }
+****/
 
     // Rijndael own methods
     //...........................................................................
@@ -745,6 +747,7 @@ public final class CryptixRijndael_Algorithm // implicit no-argument constructor
     }
 
     /** A basic symmetric encryption/decryption test for a given key size. */
+/****
     private static boolean self_test(int keysize) {
         if (_RDEBUG) trace(_IN, "self_test(" + keysize + ")");
         boolean ok = false;
@@ -795,6 +798,7 @@ public final class CryptixRijndael_Algorithm // implicit no-argument constructor
         if (_RDEBUG) trace(_OUT, "self_test()");
         return ok;
     }
+****/
 
     /**
      * Return The number of rounds for a given Rijndael's key and block sizes.
@@ -824,6 +828,7 @@ public final class CryptixRijndael_Algorithm // implicit no-argument constructor
      *
      * @return true if the arrays have identical contents
      */
+  /****
     private static final boolean areEqual(byte[] a, byte[] b) {
         int aLength = a.length;
         if (aLength != b.length) return false;
@@ -831,15 +836,18 @@ public final class CryptixRijndael_Algorithm // implicit no-argument constructor
             if (a[i] != b[i]) return false;
         return true;
     }
+  ****/
 
     /**
      * Returns a string of 2 hexadecimal digits (most significant
      * digit first) corresponding to the lowest 8 bits of <i>n</i>.
      */
+  /****
     private static final String byteToString(int n) {
         char[] buf = { _HEX_DIGITS[(n >>> 4) & 0x0F], _HEX_DIGITS[n & 0x0F]};
         return new String(buf);
     }
+  ****/
 
     /**
      * Returns a string of 8 hexadecimal digits (most significant
@@ -894,9 +902,11 @@ public final class CryptixRijndael_Algorithm // implicit no-argument constructor
     // main(): use to generate the Intermediate Values KAT
     //...........................................................................
 
+/****
     public static void main(String[] args) {
         self_test(16);
         self_test(24);
         self_test(32);
     }
+****/
 }

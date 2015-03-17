@@ -7,29 +7,40 @@ import net.i2p.I2PException;
  * Bridge to allow accepting new connections
  *
  */
-public class I2PServerSocketFull implements I2PServerSocket {
-    private I2PSocketManagerFull _socketManager;
+class I2PServerSocketFull implements I2PServerSocket {
+    private final I2PSocketManagerFull _socketManager;
+    private volatile AcceptingChannel _channel;
     
     public I2PServerSocketFull(I2PSocketManagerFull mgr) {
         _socketManager = mgr;
     }
     
     /**
+     * Warning, unlike regular ServerSocket, may return null
      * 
-     * @return I2PSocket
+     * @return I2PSocket OR NULL
      * @throws net.i2p.I2PException
      * @throws SocketTimeoutException 
      */
     public I2PSocket accept() throws I2PException, SocketTimeoutException {
         return _socketManager.receiveSocket();
     }
+
+    /**
+     *  @since 0.8.11
+     */
+    public synchronized AcceptingChannel getChannel() {
+        if (_channel == null)
+            _channel = new AcceptingChannelImpl(_socketManager);
+        return _channel;
+    }
     
     public long getSoTimeout() {
-        return _socketManager.getConnectionManager().MgetSoTimeout();
+        return _socketManager.getConnectionManager().getSoTimeout();
     }
     
     public void setSoTimeout(long x) {
-        _socketManager.getConnectionManager().MsetSoTimeout(x);
+        _socketManager.getConnectionManager().setSoTimeout(x);
     }
     /**
      * Close the connection.

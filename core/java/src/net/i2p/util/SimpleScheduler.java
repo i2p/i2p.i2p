@@ -1,8 +1,8 @@
 package net.i2p.util;
 
 import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.ThreadFactory;
 
@@ -27,28 +27,62 @@ import net.i2p.I2PAppContext;
  * @author zzz
  */
 public class SimpleScheduler {
-    private static final SimpleScheduler _instance = new SimpleScheduler();
-    public static SimpleScheduler getInstance() { return _instance; }
-    private static final int THREADS = 4;
-    private I2PAppContext _context;
-    private Log _log;
-    private ScheduledThreadPoolExecutor _executor;
-    private String _name;
-    private int _count;
 
-    protected SimpleScheduler() { this("SimpleScheduler"); }
-    protected SimpleScheduler(String name) {
-        _context = I2PAppContext.getGlobalContext();
-        _log = _context.logManager().getLog(SimpleScheduler.class);
+    /**
+     *  If you have a context, use context.simpleScheduler() instead
+     */
+    public static SimpleScheduler getInstance() {
+        return I2PAppContext.getGlobalContext().simpleScheduler();
+    }
+
+    private static final int MIN_THREADS = 2;
+    private static final int MAX_THREADS = 4;
+    private final Log _log;
+    private final ScheduledThreadPoolExecutor _executor;
+    private final String _name;
+    private int _count;
+    private final int _threads;
+
+    /**
+     *  To be instantiated by the context.
+     *  Others should use context.simpleTimer() instead
+     */
+    public SimpleScheduler(I2PAppContext context) {
+        this(context, "SimpleScheduler");
+    }
+
+    /**
+     *  To be instantiated by the context.
+     *  Others should use context.simpleTimer() instead
+     */
+    private SimpleScheduler(I2PAppContext context, String name) {
+        _log = context.logManager().getLog(SimpleScheduler.class);
         _name = name;
-        _count = 0;
-        _executor = new ScheduledThreadPoolExecutor(THREADS, new CustomThreadFactory());
+        long maxMemory = Runtime.getRuntime().maxMemory();
+        if (maxMemory == Long.MAX_VALUE)
+            maxMemory = 96*1024*1024l;
+        _threads = (int) Math.max(MIN_THREADS, Math.min(MAX_THREADS, 1 + (maxMemory / (32*1024*1024))));
+        _executor = new ScheduledThreadPoolExecutor(_threads, new CustomThreadFactory());
+        _executor.prestartAllCoreThreads();
+        // don't bother saving ref to remove hook if somebody else calls stop
+        context.addShutdownTask(new Shutdown());
     }
     
     /**
-     * Removes the SimpleScheduler.
+     * @since 0.8.8
+     */
+    private class Shutdown implements Runnable {
+        public void run() {
+            stop();
+        }
+    }
+
+    /**
+     * Stops the SimpleScheduler.
+     * Subsequent executions should not throw a RejectedExecutionException.
      */
     public void stop() {
+        _executor.setRejectedExecutionHandler(new ThreadPoolExecutor.DiscardPolicy());
         _executor.shutdownNow();
     }
 
@@ -65,6 +99,13 @@ public class SimpleScheduler {
         re.schedule();
     }
     
+    /**
+     * Queue up the given event to be fired after timeoutMs and every
+     * timeoutMs thereafter. The TimedEvent must not do its own rescheduling.
+     * As all Exceptions are caught in run(), these will not prevent
+     * subsequent executions (unlike SimpleTimer, where the TimedEvent does
+     * its own rescheduling).
+     */
     public void addPeriodicEvent(SimpleTimer.TimedEvent event, long timeoutMs) {
         addPeriodicEvent(event, timeoutMs, timeoutMs);
     }
@@ -90,7 +131,12 @@ public class SimpleScheduler {
     private class CustomThreadFactory implements ThreadFactory {
         public Thread newThread(Runnable r) {
             Thread rv = Executors.defaultThreadFactory().newThread(r);
-            rv.setName(_name +  ' ' + (++_count) + '/' + THREADS);
+            rv.setName(_name +  ' ' + (++_count) + '/' + _threads);
+// Uncomment this to test threadgrouping, but we should be all safe now that the constructor preallocates!
+//            String name = rv.getThreadGroup().getName();
+//            if(!name.equals("main")) {
+//                (new Exception("OWCH! DAMN! Wrong ThreadGroup `" + name +"', `" + rv.getName() + "'")).printStackTrace();
+//            }
             rv.setDaemon(true);
             return rv;
         }
@@ -100,7 +146,7 @@ public class SimpleScheduler {
      * Same as SimpleTimer.TimedEvent but use run() instead of timeReached(), and remembers the time
      */
     private class RunnableEvent implements Runnable {
-        protected SimpleTimer.TimedEvent _timedEvent;
+        protected final SimpleTimer.TimedEvent _timedEvent;
         protected long _scheduled;
 
         public RunnableEvent(SimpleTimer.TimedEvent t, long timeoutMs) {
@@ -123,7 +169,7 @@ public class SimpleScheduler {
             try {
                 _timedEvent.timeReached();
             } catch (Throwable t) {
-                _log.log(Log.CRIT, _name + " wtf, event borked: " + _timedEvent, t);
+                _log.log(Log.CRIT, _name + ": Scheduled task " + _timedEvent + " exited unexpectedly, please report", t);
             }
             long time = System.currentTimeMillis() - before;
             if (time > 1000 && _log.shouldLog(Log.WARN))
@@ -144,9 +190,11 @@ public class SimpleScheduler {
             _timeoutMs = timeoutMs;
             _scheduled = initialDelay + System.currentTimeMillis();
         }
+        @Override
         public void schedule() {
             _executor.scheduleWithFixedDelay(this, _initialDelay, _timeoutMs, TimeUnit.MILLISECONDS);
         }
+        @Override
         public void run() {
             super.run();
             _scheduled = _timeoutMs + System.currentTimeMillis();

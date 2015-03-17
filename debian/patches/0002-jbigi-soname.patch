@@ -1,0 +1,32 @@
+From: Kill Your TV <killyourtv@i2pmail.org>
+Date: Wed, 11 May 2011 00:12:04 +0000
+Subject: jbigi soname
+
+The purpose of this patch is to change the path that build_jbigi.sh
+expects to find the source files at. At the same time I'm specifying
+a soname to shut lintian up.
+
+---
+ core/c/jbigi/build_jbigi.sh |    4 +++---
+ 1 files changed, 2 insertions(+), 2 deletions(-)
+
+--- a/core/c/jbigi/build_jbigi.sh
++++ b/core/c/jbigi/build_jbigi.sh
+@@ -37,7 +37,7 @@
+             UNIXTYPE="solaris"
+         fi
+         COMPILEFLAGS="-fPIC -Wall"
+-        INCLUDES="-I. -I../../jbigi/include -I$JAVA_HOME/include -I$JAVA_HOME/include/${UNIXTYPE}"
++        INCLUDES="-I. -I./jbigi/include -I$JAVA_HOME/include -I$JAVA_HOME/include/${UNIXTYPE}"
+         LINKFLAGS="-shared -Wl,-soname,libjbigi.so"
+         LIBFILE="libjbigi.so";;
+ *)
+@@ -56,7 +56,7 @@
+ 
+ echo "Compiling C code..."
+ rm -f jbigi.o $LIBFILE
+-$CC -c $COMPILEFLAGS $INCLUDES ../../jbigi/src/jbigi.c || exit 1
++$CC -c $COMPILEFLAGS $INCLUDES ./jbigi/src/jbigi.c || exit 1
+ $CC $LINKFLAGS $INCLUDES -o $LIBFILE jbigi.o $INCLUDELIBS $STATICLIBS || exit 1
+ 
+ exit 0

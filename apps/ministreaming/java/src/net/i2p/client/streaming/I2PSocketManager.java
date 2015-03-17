@@ -4,9 +4,12 @@
  */
 package net.i2p.client.streaming;
 
+import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.net.ConnectException;
 import java.net.NoRouteToHostException;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.Properties;
 import java.util.Set;
 
@@ -35,11 +38,32 @@ public interface I2PSocketManager {
      */
     public void setAcceptTimeout(long ms);
     public long getAcceptTimeout();
+
+    /**
+     *  Update the options on a running socket manager.
+     *  Parameters in the I2PSocketOptions interface may be changed directly
+     *  with the setters; no need to use this method for those.
+     *  This does NOT update the underlying I2CP or tunnel options; use getSession().updateOptions() for that.
+     *  @param options as created from a call to buildOptions(properties), non-null
+     */
     public void setDefaultOptions(I2PSocketOptions options);
+
+    /**
+     *  Current options, not a copy, setters may be used to make changes.
+     */
     public I2PSocketOptions getDefaultOptions();
+
     public I2PServerSocket getServerSocket();
     
+    /**
+     *  Create a copy of the current options, to be used in a setDefaultOptions() call.
+     */
     public I2PSocketOptions buildOptions();
+
+    /**
+     *  Create a modified copy of the current options, to be used in a setDefaultOptions() call.
+     *  @param opts The new options, may be null
+     */
     public I2PSocketOptions buildOptions(Properties opts);
 
     /**
@@ -84,7 +108,7 @@ public interface I2PSocketManager {
      *
      * @return a set of currently connected I2PSockets
      */
-    public Set listSockets();
+    public Set<I2PSocket> listSockets();
 
     /**
      * Ping the specified peer, returning true if they replied to the ping within 
@@ -99,6 +123,10 @@ public interface I2PSocketManager {
     public String getName();
     public void setName(String name);
 
+    /**
+     * Deprecated - Factory will initialize.
+     * @throws UnsupportedOperationException always
+     */
     public void init(I2PAppContext context, I2PSession session, Properties opts, String name);
     
     public void addDisconnectListener(DisconnectListener lsnr);
@@ -107,4 +135,25 @@ public interface I2PSocketManager {
     public static interface DisconnectListener {
         public void sessionDisconnected();
     }
+
+    /**
+     *  Like getServerSocket but returns a real ServerSocket for easier porting of apps.
+     *  @since 0.8.4
+     */
+    public ServerSocket getStandardServerSocket() throws IOException;
+
+    /**
+     *  Like connect() but returns a real Socket, and throws only IOE,
+     *  for easier porting of apps.
+     *  @since 0.8.4
+     */
+    public Socket connectToSocket(Destination peer) throws IOException;
+
+    /**
+     *  Like connect() but returns a real Socket, and throws only IOE,
+     *  for easier porting of apps.
+     *  @param timeout ms if > 0, forces blocking (disables connectDelay)
+     *  @since 0.8.4
+     */
+    public Socket connectToSocket(Destination peer, int timeout) throws IOException;
 }

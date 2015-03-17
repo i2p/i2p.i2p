@@ -1,0 +1,20 @@
+<div lang="en">
+<h3>Congratulations on getting I2P installed!</h3>
+<p>
+<b>Welcome to I2P!</b>
+Please <b>have patience</b> as I2P boots up and finds peers.
+</p>
+<p>
+While you are waiting, please <b>adjust your bandwidth settings</b> on the
+<a href="config.jsp">configuration page</a>.
+</p>
+<p>
+Once you have a "shared clients" destination listed on the left,
+please <b>check out</b> our
+<a href="http://www.i2p2.i2p/faq.html">FAQ</a>.
+</p>
+<p>
+Point your IRC client to <b>localhost:6668</b> and say hi to us on 
+<a href="irc://127.0.0.1:6668/i2p-help">#i2p-help</a> or <a href="irc://127.0.0.1:6668/i2p">#i2p</a>.
+</p>
+</div>

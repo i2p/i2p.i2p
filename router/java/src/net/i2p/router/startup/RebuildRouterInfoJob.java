@@ -26,6 +26,7 @@ import net.i2p.router.JobImpl;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
+import net.i2p.util.SecureFileOutputStream;
 
 /**
  * This used be called from StartAcceptingClientsJob but is now disabled.
@@ -44,7 +45,7 @@ import net.i2p.util.Log;
  *
  */
 public class RebuildRouterInfoJob extends JobImpl {
-    private Log _log;
+    private final Log _log;
     
     private final static long REBUILD_DELAY = 45*1000; // every 30 seconds
     
@@ -57,18 +58,11 @@ public class RebuildRouterInfoJob extends JobImpl {
     
     public void runJob() {
         _log.debug("Testing to rebuild router info");
-        String infoFile = getContext().router().getConfigSetting(Router.PROP_INFO_FILENAME);
-        if (infoFile == null) {
-            _log.debug("Info filename not configured, defaulting to " + Router.PROP_INFO_FILENAME_DEFAULT);
-            infoFile = Router.PROP_INFO_FILENAME_DEFAULT;
-        }
+        String infoFile = getContext().getProperty(Router.PROP_INFO_FILENAME, Router.PROP_INFO_FILENAME_DEFAULT);
+        File info = new File(getContext().getRouterDir(), infoFile);
+        String keyFilename = getContext().getProperty(Router.PROP_KEYS_FILENAME, Router.PROP_KEYS_FILENAME_DEFAULT);
+        File keyFile = new File(getContext().getRouterDir(), keyFilename);
         
-        String keyFilename = getContext().router().getConfigSetting(Router.PROP_KEYS_FILENAME);
-        if (keyFilename == null)
-            keyFilename = Router.PROP_KEYS_FILENAME_DEFAULT;
-        File keyFile = new File(keyFilename);
-        
-        File info = new File(infoFile);
         if (!info.exists() || !keyFile.exists()) {
             _log.info("Router info file [" + info.getAbsolutePath() + "] or private key file [" + keyFile.getAbsolutePath() + "] deleted, rebuilding");
             rebuildRouterInfo();
@@ -84,16 +78,11 @@ public class RebuildRouterInfoJob extends JobImpl {
     }
     void rebuildRouterInfo(boolean alreadyRunning) {
         _log.debug("Rebuilding the new router info");
-        boolean fullRebuild = false;
         RouterInfo info = null;
-        String infoFilename = getContext().router().getConfigSetting(Router.PROP_INFO_FILENAME);
-        if (infoFilename == null)
-            infoFilename = Router.PROP_INFO_FILENAME_DEFAULT;
-        
-        String keyFilename = getContext().router().getConfigSetting(Router.PROP_KEYS_FILENAME);
-        if (keyFilename == null)
-            keyFilename = Router.PROP_KEYS_FILENAME_DEFAULT;
-        File keyFile = new File(keyFilename);
+        String infoFilename = getContext().getProperty(Router.PROP_INFO_FILENAME, Router.PROP_INFO_FILENAME_DEFAULT);
+        File infoFile = new File(getContext().getRouterDir(), infoFilename);
+        String keyFilename = getContext().getProperty(Router.PROP_KEYS_FILENAME, Router.PROP_KEYS_FILENAME_DEFAULT);
+        File keyFile = new File(getContext().getRouterDir(), keyFilename);
         
         if (keyFile.exists()) {
             // ok, no need to rebuild a brand new identity, just update what we can
@@ -118,7 +107,7 @@ public class RebuildRouterInfoJob extends JobImpl {
                     ident.setSigningPublicKey(signingPubKey);
                     info.setIdentity(ident);
                 } catch (Exception e) {
-                    _log.error("Error reading in the key data from " + keyFile.getAbsolutePath(), e);
+                    _log.log(Log.CRIT, "Error reading in the key data from " + keyFile.getAbsolutePath(), e);
                     if (fis != null) try { fis.close(); } catch (IOException ioe) {}
                     fis = null;
                     keyFile.delete();
@@ -140,20 +129,27 @@ public class RebuildRouterInfoJob extends JobImpl {
                 
                 info.sign(getContext().keyManager().getSigningPrivateKey());
             } catch (DataFormatException dfe) {
-                _log.error("Error rebuilding the new router info", dfe);
+                _log.log(Log.CRIT, "Error rebuilding the new router info", dfe);
                 return;
             }
-            
+
+            if (!info.isValid()) {
+                _log.log(Log.CRIT, "RouterInfo we just built is invalid: " + info, new Exception());
+                return;
+            }
+
             FileOutputStream fos = null;
-            try {
-                fos = new FileOutputStream(infoFilename);
-                info.writeBytes(fos);
-            } catch (DataFormatException dfe) {
-                _log.error("Error rebuilding the router information", dfe);
-            } catch (IOException ioe) {
-                _log.error("Error writing out the rebuilt router information", ioe);
-            } finally {
-                if (fos != null) try { fos.close(); } catch (IOException ioe) {}
+            synchronized (getContext().router().routerInfoFileLock) {
+                try {
+                    fos = new SecureFileOutputStream(infoFile);
+                    info.writeBytes(fos);
+                } catch (DataFormatException dfe) {
+                    _log.log(Log.CRIT, "Error rebuilding the router information", dfe);
+                } catch (IOException ioe) {
+                    _log.log(Log.CRIT, "Error writing out the rebuilt router information", ioe);
+                } finally {
+                    if (fos != null) try { fos.close(); } catch (IOException ioe) {}
+                }
             }
             
         } else {
@@ -161,7 +157,6 @@ public class RebuildRouterInfoJob extends JobImpl {
             // this proc writes the keys and info to the file as well as builds the latest and greatest info
             CreateRouterInfoJob j = new CreateRouterInfoJob(getContext(), null);
             info = j.createRouterInfo();
-            fullRebuild = true;
         }
         
         //MessageHistory.initialize();

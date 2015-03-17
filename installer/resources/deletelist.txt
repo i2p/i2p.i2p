@@ -1,0 +1,3 @@
+# Files listed here will be deleted after the update is extracted
+# expired cert
+certificates/r31453.ovh.net

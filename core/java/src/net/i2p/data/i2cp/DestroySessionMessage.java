@@ -15,7 +15,6 @@ import java.io.InputStream;
 
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
-import net.i2p.util.Log;
 
 /**
  * Defines the message a client sends to a router when destroying
@@ -24,12 +23,10 @@ import net.i2p.util.Log;
  * @author jrandom
  */
 public class DestroySessionMessage extends I2CPMessageImpl {
-    private final static Log _log = new Log(DestroySessionMessage.class);
     public final static int MESSAGE_TYPE = 3;
     private SessionId _sessionId;
 
     public DestroySessionMessage() {
-        setSessionId(null);
     }
 
     public SessionId getSessionId() {
@@ -72,17 +69,24 @@ public class DestroySessionMessage extends I2CPMessageImpl {
     public boolean equals(Object object) {
         if ((object != null) && (object instanceof DestroySessionMessage)) {
             DestroySessionMessage msg = (DestroySessionMessage) object;
-            return DataHelper.eq(getSessionId(), msg.getSessionId());
+            return DataHelper.eq(_sessionId, msg.getSessionId());
         }
             
         return false;
     }
 
     @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 11 * hash + (this._sessionId != null ? this._sessionId.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append("[DestroySessionMessage: ");
-        buf.append("\n\tSessionId: ").append(getSessionId());
+        buf.append("\n\tSessionId: ").append(_sessionId);
         buf.append("]");
         return buf.toString();
     }

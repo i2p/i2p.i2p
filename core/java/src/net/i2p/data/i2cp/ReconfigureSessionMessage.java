@@ -15,7 +15,6 @@ import java.io.InputStream;
 
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
-import net.i2p.util.Log;
 
 /**
  * Defines the message a client sends to a router when
@@ -24,14 +23,11 @@ import net.i2p.util.Log;
  * @author zzz
  */
 public class ReconfigureSessionMessage extends I2CPMessageImpl {
-    private final static Log _log = new Log(ReconfigureSessionMessage.class);
     public final static int MESSAGE_TYPE = 2;
     private SessionId _sessionId;
     private SessionConfig _sessionConfig;
 
     public ReconfigureSessionMessage() {
-        _sessionId = null;
-        _sessionConfig = null;
     }
 
     public SessionId getSessionId() {
@@ -80,12 +76,13 @@ public class ReconfigureSessionMessage extends I2CPMessageImpl {
         return MESSAGE_TYPE;
     }
 
+    /* FIXME missing hashCode() method FIXME */
     @Override
     public boolean equals(Object object) {
         if ((object != null) && (object instanceof ReconfigureSessionMessage)) {
             ReconfigureSessionMessage msg = (ReconfigureSessionMessage) object;
-            return DataHelper.eq(getSessionId(), msg.getSessionId())
-                   && DataHelper.eq(getSessionConfig(), msg.getSessionConfig());
+            return DataHelper.eq(_sessionId, msg.getSessionId())
+                   && DataHelper.eq(_sessionConfig, msg.getSessionConfig());
         }
             
         return false;
@@ -93,10 +90,10 @@ public class ReconfigureSessionMessage extends I2CPMessageImpl {
 
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append("[ReconfigureSessionMessage: ");
-        buf.append("\n\tSessionId: ").append(getSessionId());
-        buf.append("\n\tSessionConfig: ").append(getSessionConfig());
+        buf.append("\n\tSessionId: ").append(_sessionId);
+        buf.append("\n\tSessionConfig: ").append(_sessionConfig);
         buf.append("]");
         return buf.toString();
     }

@@ -4,17 +4,18 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
+import java.util.Queue;
 import java.util.TimeZone;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import net.i2p.data.Hash;
 import net.i2p.data.TunnelId;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.router.tunnel.HopConfig;
 import net.i2p.util.Log;
+import net.i2p.util.SecureFileOutputStream;
 
 /**
  * Simply act as a pen register of messages sent in and out of the router.
@@ -22,26 +23,28 @@ import net.i2p.util.Log;
  * (with clock synchronization, this will generate a log that can be used to
  * analyze the entire network, if everyone provides their logs honestly)
  *
+ * This is always instantiated in the context and the WriteJob runs every minute,
+ * but unless router.keepHistory=true it does nothing.
+ * It generates a LARGE log file.
  */
 public class MessageHistory {
-    private Log _log;
-    private RouterContext _context;
-    private List _unwrittenEntries; // list of raw entries (strings) yet to be written
+    private final Log _log;
+    private final RouterContext _context;
+    private final Queue<String> _unwrittenEntries; // list of raw entries (strings) yet to be written
     private String _historyFile; // where to write 
     private String _localIdent; // placed in each entry to uniquely identify the local router
     private boolean _doLog; // true == we want to log
     private boolean _doPause; // true == briefly stop writing data to the log (used while submitting it)
-    private ReinitializeJob _reinitializeJob;
-    private WriteJob _writeJob;
-    private SubmitMessageHistoryJob _submitMessageHistoryJob;
+    private final ReinitializeJob _reinitializeJob;
+    private final WriteJob _writeJob;
+    //private SubmitMessageHistoryJob _submitMessageHistoryJob;
     private volatile boolean _firstPass;
     
     private final static byte[] NL = System.getProperty("line.separator").getBytes();
     private final static int FLUSH_SIZE = 1000; // write out at least once every 1000 entries
         
-    /** config property determining whether we want to debug with the message history */
+    /** config property determining whether we want to debug with the message history - default false */
     public final static String PROP_KEEP_MESSAGE_HISTORY = "router.keepHistory";
-    public final static boolean DEFAULT_KEEP_MESSAGE_HISTORY = false;
     /** config property determining where we want to log the message history, if we're keeping one */
     public final static String PROP_MESSAGE_HISTORY_FILENAME = "router.historyFilename";
     public final static String DEFAULT_MESSAGE_HISTORY_FILENAME = "messageHistory.txt";
@@ -53,6 +56,7 @@ public class MessageHistory {
         _log = context.logManager().getLog(getClass());
          _fmt = new SimpleDateFormat("yy/MM/dd.HH:mm:ss.SSS");
         _fmt.setTimeZone(TimeZone.getTimeZone("GMT"));
+        _unwrittenEntries = new LinkedBlockingQueue();
         _reinitializeJob = new ReinitializeJob();
         _writeJob = new WriteJob();
         _firstPass = true;
@@ -60,26 +64,24 @@ public class MessageHistory {
         initialize(true);
     }
     
-    void setDoLog(boolean log) { _doLog = log; }
-    boolean getDoLog() { return _doLog; }
+    /** @since 0.8.12 */
+    public void shutdown() {
+        if (_doLog)
+            addEntry(getPrefix() + "** Router shutdown");
+        _doPause = false;
+        flushEntries();
+        _doLog = false;
+    }
+
+    public boolean getDoLog() { return _doLog; }
     
+    /** @deprecated unused */
     void setPauseFlushes(boolean doPause) { _doPause = doPause; }
     String getFilename() { return _historyFile; }
     
     private void updateSettings() {
-        String keepHistory = _context.router().getConfigSetting(PROP_KEEP_MESSAGE_HISTORY);
-        if (keepHistory != null) {
-            _doLog = Boolean.TRUE.toString().equalsIgnoreCase(keepHistory);
-        } else {
-            _doLog = DEFAULT_KEEP_MESSAGE_HISTORY;
-        }
-
-        String filename = null;
-        if (_doLog) {
-            filename = _context.router().getConfigSetting(PROP_MESSAGE_HISTORY_FILENAME);
-            if ( (filename == null) || (filename.trim().length() <= 0) )
-                filename = DEFAULT_MESSAGE_HISTORY_FILENAME;
-        }
+        _doLog = Boolean.valueOf(_context.getProperty(PROP_KEEP_MESSAGE_HISTORY)).booleanValue();
+        _historyFile = _context.getProperty(PROP_MESSAGE_HISTORY_FILENAME, DEFAULT_MESSAGE_HISTORY_FILENAME);
     }
     
     /**
@@ -90,30 +92,25 @@ public class MessageHistory {
     public void initialize(boolean forceReinitialize) {
         if (!forceReinitialize) return;
 
-        if (_context.router() == null) return;
-        
         if (_context.router().getRouterInfo() == null) {
-            _reinitializeJob.getTiming().setStartAfter(_context.clock().now()+5000);
+            _reinitializeJob.getTiming().setStartAfter(_context.clock().now() + 15*1000);
             _context.jobQueue().addJob(_reinitializeJob);
         } else {
-            String filename = null;
-            filename = _context.router().getConfigSetting(PROP_MESSAGE_HISTORY_FILENAME);
-            if ( (filename == null) || (filename.trim().length() <= 0) )
-                filename = DEFAULT_MESSAGE_HISTORY_FILENAME;
-
-            _doLog = DEFAULT_KEEP_MESSAGE_HISTORY;
-            _historyFile = filename;
             _localIdent = getName(_context.routerHash());
-            _unwrittenEntries = new ArrayList(64);
+            // _unwrittenEntries = new ArrayList(64);
             updateSettings();
             // clear the history file on startup
             if (_firstPass) {
                 File f = new File(_historyFile);
+                if (!f.isAbsolute())
+                    f = new File(_context.getLogDir(), _historyFile);
                 f.delete();
+                _writeJob.getTiming().setStartAfter(_context.clock().now() + WRITE_DELAY);
+                _context.jobQueue().addJob(_writeJob);
+                _firstPass = false;
             }
-            _firstPass = false;
-            addEntry(getPrefix() + "** Router initialized (started up or changed identities)");
-            _context.jobQueue().addJob(_writeJob);
+            if (_doLog)
+                addEntry(getPrefix() + "** Router initialized (started up or changed identities)");
             //_submitMessageHistoryJob.getTiming().setStartAfter(_context.clock().now() + 2*60*1000);
             //_context.jobQueue().addJob(_submitMessageHistoryJob);
         }
@@ -142,9 +139,10 @@ public class MessageHistory {
      * @param replyTunnel the tunnel sourceRoutePeer should forward the source routed message to
      * @param replyThrough the gateway of the tunnel that the sourceRoutePeer will be sending to
      */
+/********
     public void requestTunnelCreate(TunnelId createTunnel, TunnelId outTunnel, Hash peerRequested, Hash nextPeer, TunnelId replyTunnel, Hash replyThrough) {
         if (!_doLog) return;
-        StringBuffer buf = new StringBuffer(128);
+        StringBuilder buf = new StringBuilder(128);
         buf.append(getPrefix());
         buf.append("request [").append(getName(peerRequested)).append("] to create tunnel [");
         buf.append(createTunnel.getTunnelId()).append("] ");
@@ -156,6 +154,7 @@ public class MessageHistory {
             buf.append("who forwards it through [").append(replyTunnel.getTunnelId()).append("] on [").append(getName(replyThrough)).append("]");
         addEntry(buf.toString());
     }
+*********/
     
     /**
      * The local router has received a request to join the createTunnel with the next hop being nextPeer,
@@ -167,9 +166,10 @@ public class MessageHistory {
      * @param ok whether we will join the tunnel
      * @param sourceRoutePeer peer through whom we should send our garlic routed ok through
      */
+/*********
     public void receiveTunnelCreate(TunnelId createTunnel, Hash nextPeer, Date expire, boolean ok, Hash sourceRoutePeer) {
         if (!_doLog) return;
-        StringBuffer buf = new StringBuffer(128);
+        StringBuilder buf = new StringBuilder(128);
         buf.append(getPrefix());
         buf.append("receive tunnel create [").append(createTunnel.getTunnelId()).append("] ");
         if (nextPeer != null)
@@ -177,6 +177,7 @@ public class MessageHistory {
         buf.append("ok? ").append(ok).append(" expiring on [").append(getTime(expire.getTime())).append("]");
         addEntry(buf.toString());
     }
+*********/
     
     /**
      * The local router has joined the given tunnel operating in the given state.
@@ -187,7 +188,7 @@ public class MessageHistory {
     public void tunnelJoined(String state, TunnelInfo tunnel) {
         if (!_doLog) return;
         if (tunnel == null) return;
-        StringBuffer buf = new StringBuffer(128);
+        StringBuilder buf = new StringBuilder(128);
         buf.append(getPrefix());
         buf.append("joining as [").append(state);
         buf.append("] to tunnel: ").append(tunnel.toString());
@@ -203,7 +204,7 @@ public class MessageHistory {
     public void tunnelJoined(String state, HopConfig tunnel) {
         if (!_doLog) return;
         if (tunnel == null) return;
-        StringBuffer buf = new StringBuffer(128);
+        StringBuilder buf = new StringBuilder(128);
         buf.append(getPrefix());
         buf.append("joining as [").append(state);
         buf.append("] to tunnel: ").append(tunnel.toString());
@@ -242,7 +243,7 @@ public class MessageHistory {
     public void tunnelFailed(TunnelId tunnel) {
         if (!_doLog) return;
         if (tunnel == null) return;
-        StringBuffer buf = new StringBuffer(128);
+        StringBuilder buf = new StringBuilder(128);
         buf.append(getPrefix());
         buf.append("failing tunnel [").append(tunnel.getTunnelId()).append("]");
         addEntry(buf.toString());
@@ -258,7 +259,7 @@ public class MessageHistory {
     public void tunnelValid(TunnelInfo tunnel, long timeToTest) {
         if (!_doLog) return;
         if (tunnel == null) return;
-        StringBuffer buf = new StringBuffer(128);
+        StringBuilder buf = new StringBuilder(128);
         buf.append(getPrefix());
         buf.append("tunnel ").append(tunnel).append(" tested ok after ").append(timeToTest).append("ms");
         addEntry(buf.toString());
@@ -271,7 +272,7 @@ public class MessageHistory {
     public void tunnelRejected(Hash peer, TunnelId tunnel, Hash replyThrough, String reason) {
         if (!_doLog) return;
         if ( (tunnel == null) || (peer == null) ) return;
-        StringBuffer buf = new StringBuffer(128);
+        StringBuilder buf = new StringBuilder(128);
         buf.append(getPrefix());
         buf.append("tunnel [").append(tunnel.getTunnelId()).append("] was rejected by [");
         buf.append(getName(peer)).append("] for [").append(reason).append("]");
@@ -283,7 +284,7 @@ public class MessageHistory {
     public void tunnelParticipantRejected(Hash peer, String msg) {
         if (!_doLog) return;
         if (peer == null) return;
-        StringBuffer buf = new StringBuffer(128);
+        StringBuilder buf = new StringBuilder(128);
         buf.append(getPrefix());
         buf.append("tunnel participation rejected by [");
         buf.append(getName(peer)).append("]: ").append(msg);
@@ -298,7 +299,7 @@ public class MessageHistory {
     public void tunnelRequestTimedOut(Hash peer, TunnelId tunnel) {
         if (!_doLog) return;
         if ( (tunnel == null) || (peer == null) ) return;
-        StringBuffer buf = new StringBuffer(128);
+        StringBuilder buf = new StringBuilder(128);
         buf.append(getPrefix());
         buf.append("tunnel [").append(tunnel.getTunnelId()).append("] timed out on [");
         buf.append(getName(peer)).append("]");
@@ -314,7 +315,7 @@ public class MessageHistory {
      */
     public void droppedTunnelMessage(TunnelId id, long msgId, Date expiration, Hash from) {
         if (!_doLog) return;
-        StringBuffer buf = new StringBuffer(128);
+        StringBuilder buf = new StringBuilder(128);
         buf.append(getPrefix());
         buf.append("dropped message ").append(msgId).append(" for unknown tunnel [").append(id.getTunnelId());
         buf.append("] from [").append(getName(from)).append("]").append(" expiring on ");
@@ -328,7 +329,7 @@ public class MessageHistory {
     public void droppedOtherMessage(I2NPMessage message, Hash from) {
         if (!_doLog) return;
         if (message == null) return;
-        StringBuffer buf = new StringBuffer(512);
+        StringBuilder buf = new StringBuilder(512);
         buf.append(getPrefix());
         buf.append("dropped [").append(message.getClass().getName()).append("] ").append(message.getUniqueId());
         buf.append(" [").append(message.toString()).append("] from [");
@@ -342,7 +343,7 @@ public class MessageHistory {
     
     public void droppedInboundMessage(long messageId, Hash from, String info) {
         if (!_doLog) return;
-        StringBuffer buf = new StringBuffer(512);
+        StringBuilder buf = new StringBuilder(512);
         buf.append(getPrefix());
         buf.append("dropped inbound message ").append(messageId);
         buf.append(" from ");
@@ -364,7 +365,7 @@ public class MessageHistory {
     public void replyTimedOut(OutNetMessage sentMessage) {
         if (!_doLog) return;
         if (sentMessage == null) return;
-        StringBuffer buf = new StringBuffer(512);
+        StringBuilder buf = new StringBuilder(512);
         buf.append(getPrefix());
         buf.append("timed out waiting for a reply to [").append(sentMessage.getMessageType());
         buf.append("] [").append(sentMessage.getMessageId()).append("] expiring on [");
@@ -383,7 +384,7 @@ public class MessageHistory {
      */
     public void messageProcessingError(long messageId, String messageType, String error) {
         if (!_doLog) return;
-        StringBuffer buf = new StringBuffer(128);
+        StringBuilder buf = new StringBuilder(128);
         buf.append(getPrefix());
         buf.append("Error processing [").append(messageType).append("] [").append(messageId).append("] failed with [").append(error).append("]");
         addEntry(buf.toString());
@@ -420,7 +421,7 @@ public class MessageHistory {
     public void sendMessage(String messageType, long messageId, long expiration, Hash peer, boolean sentOk, String info) {
         if (!_doLog) return;
         if (false) return;
-        StringBuffer buf = new StringBuffer(256);
+        StringBuilder buf = new StringBuilder(256);
         buf.append(getPrefix());
         buf.append("send [").append(messageType).append("] message [").append(messageId).append("] ");
         buf.append("to [").append(getName(peer)).append("] ");
@@ -448,7 +449,7 @@ public class MessageHistory {
     public void receiveMessage(String messageType, long messageId, long expiration, Hash from, boolean isValid) {
         if (!_doLog) return;
         if (false) return;
-        StringBuffer buf = new StringBuffer(256);
+        StringBuilder buf = new StringBuilder(256);
         buf.append(getPrefix());
         buf.append("receive [").append(messageType).append("] with id [").append(messageId).append("] ");
         if (from != null)
@@ -470,7 +471,7 @@ public class MessageHistory {
      */
     public void wrap(String bodyMessageType, long bodyMessageId, String containerMessageType, long containerMessageId) {
         if (!_doLog) return;
-        StringBuffer buf = new StringBuffer(128);
+        StringBuilder buf = new StringBuilder(128);
         buf.append(getPrefix());
         buf.append("Wrap message [").append(bodyMessageType).append("] id [").append(bodyMessageId).append("] ");
         buf.append("in [").append(containerMessageType).append("] id [").append(containerMessageId).append("]");
@@ -483,7 +484,7 @@ public class MessageHistory {
      */
     public void receivePayloadMessage(long messageId) {
         if (!_doLog) return;
-        StringBuffer buf = new StringBuffer(64);
+        StringBuilder buf = new StringBuilder(64);
         buf.append(getPrefix());
         buf.append("Receive payload message [").append(messageId).append("]");
         addEntry(buf.toString());
@@ -498,7 +499,7 @@ public class MessageHistory {
      */
     public void sendPayloadMessage(long messageId, boolean successfullySent, long timeToSend) {
         if (!_doLog) return;
-        StringBuffer buf = new StringBuffer(128);
+        StringBuilder buf = new StringBuilder(128);
         buf.append(getPrefix());
         buf.append("Send payload message in [").append(messageId).append("] in [").append(timeToSend).append("] successfully? ").append(successfullySent);
         addEntry(buf.toString());
@@ -507,7 +508,7 @@ public class MessageHistory {
     public void receiveTunnelFragment(long messageId, int fragmentId, Object status) {
         if (!_doLog) return;
         if (messageId == -1) throw new IllegalArgumentException("why are you -1?");
-        StringBuffer buf = new StringBuffer(48);
+        StringBuilder buf = new StringBuilder(48);
         buf.append(getPrefix());
         buf.append("Receive fragment ").append(fragmentId).append(" in ").append(messageId);
         buf.append(" status: ").append(status.toString());
@@ -516,7 +517,7 @@ public class MessageHistory {
     public void receiveTunnelFragmentComplete(long messageId) {
         if (!_doLog) return;
         if (messageId == -1) throw new IllegalArgumentException("why are you -1?");
-        StringBuffer buf = new StringBuffer(48);
+        StringBuilder buf = new StringBuilder(48);
         buf.append(getPrefix());
         buf.append("Receive fragmented message completely: ").append(messageId);
         addEntry(buf.toString());
@@ -524,7 +525,7 @@ public class MessageHistory {
     public void droppedFragmentedMessage(long messageId, String status) {
         if (!_doLog) return;
         if (messageId == -1) throw new IllegalArgumentException("why are you -1?");
-        StringBuffer buf = new StringBuffer(48);
+        StringBuilder buf = new StringBuilder(48);
         buf.append(getPrefix());
         buf.append("Fragmented message dropped: ").append(messageId);
         buf.append(" ").append(status);
@@ -533,7 +534,7 @@ public class MessageHistory {
     public void fragmentMessage(long messageId, int numFragments, int totalLength, List messageIds, String msg) {
         if (!_doLog) return;
         //if (messageId == -1) throw new IllegalArgumentException("why are you -1?");
-        StringBuffer buf = new StringBuffer(48);
+        StringBuilder buf = new StringBuilder(48);
         buf.append(getPrefix());
         buf.append("Break message ").append(messageId).append(" into fragments: ").append(numFragments);
         buf.append(" total size ").append(totalLength);
@@ -545,7 +546,7 @@ public class MessageHistory {
     public void fragmentMessage(long messageId, int numFragments, int totalLength, List messageIds, Object tunnel, String msg) {
         if (!_doLog) return;
         //if (messageId == -1) throw new IllegalArgumentException("why are you -1?");
-        StringBuffer buf = new StringBuffer(48);
+        StringBuilder buf = new StringBuilder(48);
         buf.append(getPrefix());
         buf.append("Break message ").append(messageId).append(" into fragments: ").append(numFragments);
         buf.append(" total size ").append(totalLength);
@@ -559,7 +560,7 @@ public class MessageHistory {
     public void droppedTunnelDataMessageUnknown(long msgId, long tunnelId) {
         if (!_doLog) return;
         if (msgId == -1) throw new IllegalArgumentException("why are you -1?");
-        StringBuffer buf = new StringBuffer(48);
+        StringBuilder buf = new StringBuilder(48);
         buf.append(getPrefix());
         buf.append("Dropped data message ").append(msgId).append(" for unknown tunnel ").append(tunnelId);
         addEntry(buf.toString());
@@ -567,7 +568,7 @@ public class MessageHistory {
     public void droppedTunnelGatewayMessageUnknown(long msgId, long tunnelId) {
         if (!_doLog) return;
         if (msgId == -1) throw new IllegalArgumentException("why are you -1?");
-        StringBuffer buf = new StringBuffer(48);
+        StringBuilder buf = new StringBuilder(48);
         buf.append(getPrefix());
         buf.append("Dropped gateway message ").append(msgId).append(" for unknown tunnel ").append(tunnelId);
         addEntry(buf.toString());
@@ -585,7 +586,7 @@ public class MessageHistory {
     }
     
     private final String getPrefix() {
-        StringBuffer buf = new StringBuffer(48);
+        StringBuilder buf = new StringBuilder(48);
         buf.append(getTime(_context.clock().now()));
         buf.append(' ').append(_localIdent).append(": ");
         return buf.toString();
@@ -604,11 +605,8 @@ public class MessageHistory {
      */
     private void addEntry(String entry) {
         if (entry == null) return;
-        int sz = 0;
-        synchronized (_unwrittenEntries) {
-            _unwrittenEntries.add(entry);
-            sz = _unwrittenEntries.size();
-        }
+        _unwrittenEntries.offer(entry);
+        int sz = _unwrittenEntries.size();
         if (sz > FLUSH_SIZE)
             flushEntries();
     }
@@ -617,26 +615,25 @@ public class MessageHistory {
      * Write out any unwritten entries, and clear the pending list
      */
     private void flushEntries() {
-        if (_doPause) return;
-        List entries = null;
-        synchronized (_unwrittenEntries) {
-            entries = new ArrayList(_unwrittenEntries);
+        if (!_doLog)
             _unwrittenEntries.clear();
-        }
-        writeEntries(entries);
+        else if ((!_unwrittenEntries.isEmpty()) && !_doPause)
+            writeEntries();
     }
     
     /**
      * Actually write the specified entries
      *
      */
-    private void writeEntries(List entries) {
-        if (!_doLog) return;
+    private synchronized void writeEntries() {
+        File f = new File(_historyFile);
+        if (!f.isAbsolute())
+            f = new File(_context.getLogDir(), _historyFile);
         FileOutputStream fos = null;
         try {
-            fos = new FileOutputStream(_historyFile, true);
-            for (Iterator iter = entries.iterator(); iter.hasNext(); ) {
-                String entry = (String)iter.next();
+            fos = new SecureFileOutputStream(f, true);
+            String entry;
+            while ((entry = _unwrittenEntries.poll()) != null) {
                 fos.write(entry.getBytes());
                 fos.write(NL);
             }
@@ -653,7 +650,7 @@ public class MessageHistory {
         public WriteJob() {
             super(MessageHistory.this._context);
         }
-        public String getName() { return "Write History Entries"; }
+        public String getName() { return _doLog ? "Message debug log" : "Message debug log (disabled)"; }
         public void runJob() {
             flushEntries();
             updateSettings();
@@ -661,6 +658,7 @@ public class MessageHistory {
         }
     }
     
+/****
     public static void main(String args[]) {
         RouterContext ctx = new RouterContext(null);
         MessageHistory hist = new MessageHistory(ctx);
@@ -673,4 +671,5 @@ public class MessageHistory {
         hist.addEntry("you smell finished");
         hist.flushEntries();
     }
+****/
 }

@@ -21,32 +21,33 @@
 package org.klomp.snark;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
+import net.i2p.I2PAppContext;
 import net.i2p.util.Log;
 
-class PeerState
+class PeerState implements DataLoader
 {
-  private Log _log = new Log(PeerState.class);
-  final Peer peer;
+  private final Log _log = I2PAppContext.getGlobalContext().logManager().getLog(PeerState.class);
+  private final Peer peer;
+  /** Fixme, used by Peer.disconnect() to get to the coordinator */
   final PeerListener listener;
-  final MetaInfo metainfo;
+  private MetaInfo metainfo;
 
   // Interesting and choking describes whether we are interested in or
   // are choking the other side.
-  boolean interesting = false;
-  boolean choking = true;
+  volatile boolean interesting;
+  volatile boolean choking = true;
 
   // Interested and choked describes whether the other side is
   // interested in us or choked us.
-  boolean interested = false;
-  boolean choked = true;
+  volatile boolean interested;
+  volatile boolean choked = true;
 
-  // Package local for use by Peer.
-  long downloaded;
-  long uploaded;
-
+  /** the pieces the peer has */
   BitField bitfield;
 
   // Package local for use by Peer.
@@ -54,17 +55,19 @@ class PeerState
   final PeerConnectionOut out;
 
   // Outstanding request
-  private final List outstandingRequests = new ArrayList();
+  private final List<Request> outstandingRequests = new ArrayList();
+  /** the tail (NOT the head) of the request queue */
   private Request lastRequest = null;
 
-  // If we have te resend outstanding requests (true after we got choked).
-  private boolean resend = false;
-
-  private final static int MAX_PIPELINE = 3;               // this is for outbound requests
+  // FIXME if piece size < PARTSIZE, pipeline could be bigger
+  private final static int MAX_PIPELINE = 5;               // this is for outbound requests
   private final static int MAX_PIPELINE_BYTES = 128*1024;  // this is for inbound requests
-  public final static int PARTSIZE = 32*1024; // Snark was 16K, i2p-bt uses 64KB
+  public final static int PARTSIZE = 16*1024; // outbound request
   private final static int MAX_PARTSIZE = 64*1024; // Don't let anybody request more than this
 
+  /**
+   * @param metainfo null if in magnet mode
+   */
   PeerState(Peer peer, PeerListener listener, MetaInfo metainfo,
             PeerConnectionIn in, PeerConnectionOut out)
   {
@@ -90,14 +93,27 @@ class PeerState
     if (_log.shouldLog(Log.DEBUG))
         _log.debug(peer + " rcv " + (choke ? "" : "un") + "choked");
 
+    boolean resend = choked && !choke;
     choked = choke;
-    if (choked)
-      resend = true;
 
     listener.gotChoke(peer, choke);
 
-    if (!choked && interesting)
-      request();
+    if (interesting && !choked)
+      request(resend);
+
+    if (choked) {
+        out.cancelRequestMessages();
+        // old Roberts thrash us here, choke+unchoke right together
+        // The only problem with returning the partials to the coordinator
+        // is that chunks above a missing request are lost.
+        // Future enhancements to PartialPiece could keep track of the holes.
+        List<Request> pcs = returnPartialPieces();
+        if (!pcs.isEmpty()) {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug(peer + " got choked, returning partial pieces to the PeerCoordinator: " + pcs);
+            listener.savePartialPieces(this.peer, pcs);
+        }
+    }
   }
 
   void interestedMessage(boolean interest)
@@ -113,6 +129,9 @@ class PeerState
   {
     if (_log.shouldLog(Log.DEBUG))
       _log.debug(peer + " rcv have(" + piece + ")");
+    // FIXME we will lose these until we get the metainfo
+    if (metainfo == null)
+        return;
     // Sanity check
     if (piece < 0 || piece >= metainfo.getPieces())
       {
@@ -150,9 +169,25 @@ class PeerState
           }
         
         // XXX - Check for weird bitfield and disconnect?
-        bitfield = new BitField(bitmap, metainfo.getPieces());
+        // FIXME will have to regenerate the bitfield after we know exactly
+        // how many pieces there are, as we don't know how many spare bits there are.
+        if (metainfo == null)
+            bitfield = new BitField(bitmap, bitmap.length * 8);
+        else
+            bitfield = new BitField(bitmap, metainfo.getPieces());
       }
-    setInteresting(listener.gotBitField(peer, bitfield));
+    if (metainfo == null)
+        return;
+    boolean interest = listener.gotBitField(peer, bitfield);
+    setInteresting(interest);
+    if (bitfield.complete() && !interest) {
+        // They are seeding and we are seeding,
+        // why did they contact us? (robert)
+        // Dump them quick before we send our whole bitmap
+        if (_log.shouldLog(Log.WARN))
+            _log.warn("Disconnecting seed that connects to seeds: " + peer);
+        peer.disconnect(true);
+    }
   }
 
   void requestMessage(int piece, int begin, int length)
@@ -160,6 +195,8 @@ class PeerState
     if (_log.shouldLog(Log.DEBUG))
       _log.debug(peer + " rcv request("
                   + piece + ", " + begin + ", " + length + ") ");
+    if (metainfo == null)
+        return;
     if (choking)
       {
         if (_log.shouldLog(Log.INFO))
@@ -186,6 +223,7 @@ class PeerState
 
     // Limit total pipelined requests to MAX_PIPELINE bytes
     // to conserve memory and prevent DOS
+    // Todo: limit number of requests also? (robert 64 x 4KB)
     if (out.queuedBytes() + length > MAX_PIPELINE_BYTES)
       {
         if (_log.shouldLog(Log.WARN))
@@ -193,13 +231,28 @@ class PeerState
         return;
       }
 
+    if (_log.shouldLog(Log.DEBUG))
+        _log.debug("Queueing (" + piece + ", " + begin + ", "
+                + length + ")" + " to " + peer);
+
+    // don't load the data into mem now, let PeerConnectionOut do it
+    out.sendPiece(piece, begin, length, this);
+  }
+
+  /**
+   *  This is the callback that PeerConnectionOut calls
+   *
+   *  @return bytes or null for errors
+   *  @since 0.8.2
+   */
+  public byte[] loadData(int piece, int begin, int length) {
     byte[] pieceBytes = listener.gotRequest(peer, piece, begin, length);
     if (pieceBytes == null)
       {
         // XXX - Protocol error-> diconnect?
         if (_log.shouldLog(Log.WARN))
           _log.warn("Got request for unknown piece: " + piece);
-        return;
+        return null;
       }
 
     // More sanity checks
@@ -211,13 +264,13 @@ class PeerState
                       + ", " + begin
                       + ", " + length
                       + "' message from " + peer);
-        return;
+        return null;
       }
 
-    if (_log.shouldLog(Log.INFO))
-      _log.info("Sending (" + piece + ", " + begin + ", "
+    if (_log.shouldLog(Log.DEBUG))
+        _log.debug("Sending (" + piece + ", " + begin + ", "
                 + length + ")" + " to " + peer);
-    out.sendPiece(piece, begin, length, pieceBytes);
+    return pieceBytes;
   }
 
   /**
@@ -226,63 +279,80 @@ class PeerState
    */
   void uploaded(int size)
   {
-    uploaded += size;
+    peer.uploaded(size);
     listener.uploaded(peer, size);
   }
 
   // This is used to flag that we have to back up from the firstOutstandingRequest
   // when calculating how far we've gotten
-  Request pendingRequest = null;
+  private Request pendingRequest;
 
   /**
-   * Called when a partial piece request has been handled by
+   * Called when a full chunk (i.e. a piece message) has been received by
    * PeerConnectionIn.
+   *
+   * This may block quite a while if it is the last chunk for a piece,
+   * as it calls the listener, who stores the piece and then calls
+   * havePiece for every peer on the torrent (including us).
+   *
    */
   void pieceMessage(Request req)
   {
     int size = req.len;
-    downloaded += size;
+    peer.downloaded(size);
     listener.downloaded(peer, size);
 
-    pendingRequest = null;
+    if (_log.shouldLog(Log.DEBUG))
+      _log.debug("got end of Chunk("
+                  + req.getPiece() + "," + req.off + "," + req.len + ") from "
+                  + peer);
 
     // Last chunk needed for this piece?
-    if (getFirstOutstandingRequest(req.piece) == -1)
+    // FIXME if priority changed to skip, we will think we're done when we aren't
+    if (getFirstOutstandingRequest(req.getPiece()) == -1)
       {
-        if (listener.gotPiece(peer, req.piece, req.bs))
+        // warning - may block here for a while
+        if (listener.gotPiece(peer, req.getPartialPiece()))
           {
             if (_log.shouldLog(Log.DEBUG))
-              _log.debug("Got " + req.piece + ": " + peer);
+              _log.debug("Got " + req.getPiece() + ": " + peer);
           }
         else
           {
             if (_log.shouldLog(Log.WARN))
-              _log.warn("Got BAD " + req.piece + " from " + peer);
-            // XXX ARGH What now !?!
-            downloaded = 0;
+              _log.warn("Got BAD " + req.getPiece() + " from " + peer);
           }
+      }
+
+      // ok done with this one
+      synchronized(this) {
+          pendingRequest = null;
       }
   }
 
+  /**
+   *  @return index in outstandingRequests or -1
+   */
   synchronized private int getFirstOutstandingRequest(int piece)
-  {
+   {
     for (int i = 0; i < outstandingRequests.size(); i++)
-      if (((Request)outstandingRequests.get(i)).piece == piece)
+      if (outstandingRequests.get(i).getPiece() == piece)
         return i;
     return -1;
   }
 
   /**
    * Called when a piece message is being processed by the incoming
-   * connection. Returns null when there was no such request. It also
+   * connection. That is, when the header of the piece message was received.
+   * Returns null when there was no such request. It also
    * requeues/sends requests when it thinks that they must have been
    * lost.
    */
   Request getOutstandingRequest(int piece, int begin, int length)
   {
     if (_log.shouldLog(Log.DEBUG))
-      _log.debug("getChunk("
-                  + piece + "," + begin + "," + length + ") "
+      _log.debug("got start of Chunk("
+                  + piece + "," + begin + "," + length + ") from "
                   + peer);
 
     int r = getFirstOutstandingRequest(piece);
@@ -294,7 +364,6 @@ class PeerState
           _log.info("Unrequested 'piece: " + piece + ", "
                       + begin + ", " + length + "' received from "
                       + peer);
-        downloaded = 0; // XXX - punishment?
         return null;
       }
 
@@ -302,16 +371,16 @@ class PeerState
     Request req;
     synchronized(this)
       {
-        req = (Request)outstandingRequests.get(r);
-        while (req.piece == piece && req.off != begin
+        req = outstandingRequests.get(r);
+        while (req.getPiece() == piece && req.off != begin
                && r < outstandingRequests.size() - 1)
           {
             r++;
-            req = (Request)outstandingRequests.get(r);
+            req = outstandingRequests.get(r);
           }
         
         // Something wrong?
-        if (req.piece != piece || req.off != begin || req.len != length)
+        if (req.getPiece() != piece || req.off != begin || req.len != length)
           {
             if (_log.shouldLog(Log.INFO))
               _log.info("Unrequested or unneeded 'piece: "
@@ -319,9 +388,11 @@ class PeerState
                           + begin + ", "
                           + length + "' received from "
                           + peer);
-            downloaded = 0; // XXX - punishment?
             return null;
           }
+
+        // note that this request is being read
+        pendingRequest = req;
         
         // Report missing requests.
         if (r != 0)
@@ -331,7 +402,7 @@ class PeerState
                                + ", wanted for peer: " + peer);
             for (int i = 0; i < r; i++)
               {
-                Request dropReq = (Request)outstandingRequests.remove(0);
+                Request dropReq = outstandingRequests.remove(0);
                 outstandingRequests.add(dropReq);
                 if (!choked)
                   out.sendRequest(dropReq);
@@ -345,56 +416,66 @@ class PeerState
     // Request more if necessary to keep the pipeline filled.
     addRequest();
 
-    pendingRequest = req;
     return req;
 
   }
 
-  // get longest partial piece
-  Request getPartialRequest()
-  {
-    Request req = null;
-    for (int i = 0; i < outstandingRequests.size(); i++) {
-      Request r1 = (Request)outstandingRequests.get(i);
-      int j = getFirstOutstandingRequest(r1.piece);
-      if (j == -1)
-        continue;
-      Request r2 = (Request)outstandingRequests.get(j);
-      if (r2.off > 0 && ((req == null) || (r2.off > req.off)))
-        req = r2;
-    }
-    if (pendingRequest != null && req != null && pendingRequest.off < req.off) {
-      if (pendingRequest.off != 0)
-        req = pendingRequest;
-      else
-        req = null;
-    }
-    return req;
-  }
-
-  // return array of pieces terminated by -1
-  // remove most duplicates
-  // but still could be some duplicates, not guaranteed
-  int[] getRequestedPieces()
-  {
-    int size = outstandingRequests.size();
-    int[] arr = new int[size+2];
-    int pc = -1;
-    int pos = 0;
-    if (pendingRequest != null) {
-      pc = pendingRequest.piece;
-      arr[pos++] = pc;
-    }
-    Request req = null;
-    for (int i = 0; i < size; i++) {
-      Request r1 = (Request)outstandingRequests.get(i);
-      if (pc != r1.piece) {
-        pc = r1.piece;
-        arr[pos++] = pc;
+  /**
+   *  @return lowest offset of any request for the piece
+   *  @since 0.8.2
+   */
+  synchronized private Request getLowestOutstandingRequest(int piece) {
+      Request rv = null;
+      int lowest = Integer.MAX_VALUE;
+      for (Request r :  outstandingRequests) {
+          if (r.getPiece() == piece && r.off < lowest) {
+              lowest = r.off;
+              rv = r;
+          }
       }
-    }
-    arr[pos] = -1;
-    return(arr);
+      if (pendingRequest != null &&
+          pendingRequest.getPiece() == piece && pendingRequest.off < lowest)
+          rv = pendingRequest;
+
+      if (_log.shouldLog(Log.DEBUG))
+          _log.debug(peer + " lowest for " + piece + " is " + rv + " out of " + pendingRequest + " and " + outstandingRequests);
+      return rv;
+  }
+
+  /**
+   *  Get partial pieces, give them back to PeerCoordinator.
+   *  Clears the request queue.
+   *  @return List of PartialPieces, even those with an offset == 0, or empty list
+   *  @since 0.8.2
+   */
+  synchronized List<Request> returnPartialPieces()
+  {
+      Set<Integer> pcs = getRequestedPieces();
+      List<Request> rv = new ArrayList(pcs.size());
+      for (Integer p : pcs) {
+          Request req = getLowestOutstandingRequest(p.intValue());
+          if (req != null) {
+              req.getPartialPiece().setDownloaded(req.off);
+              rv.add(req);
+          }
+      }
+      outstandingRequests.clear();
+      pendingRequest = null;
+      lastRequest = null;
+      return rv;
+  }
+
+  /**
+   * @return all pieces we are currently requesting, or empty Set
+   */
+  synchronized private Set<Integer> getRequestedPieces() {
+      Set<Integer> rv = new HashSet(outstandingRequests.size() + 1);
+      for (Request req : outstandingRequests) {
+          rv.add(Integer.valueOf(req.getPiece()));
+      if (pendingRequest != null)
+          rv.add(Integer.valueOf(pendingRequest.getPiece()));
+      }
+      return rv;
   }
 
   void cancelMessage(int piece, int begin, int length)
@@ -405,6 +486,56 @@ class PeerState
     out.cancelRequest(piece, begin, length);
   }
 
+  /** @since 0.8.2 */
+  void extensionMessage(int id, byte[] bs)
+  {
+      if (metainfo != null && metainfo.isPrivate() &&
+          (id == ExtensionHandler.ID_METADATA || id == ExtensionHandler.ID_PEX)) {
+          // shouldn't get this since we didn't advertise it but they could send it anyway
+          if (_log.shouldLog(Log.WARN))
+              _log.warn("Private torrent, ignoring ext msg " + id);
+          return;
+      }
+      ExtensionHandler.handleMessage(peer, listener, id, bs);
+      // Peer coord will get metadata from MagnetState,
+      // verify, and then call gotMetaInfo()
+      listener.gotExtension(peer, id, bs);
+  }
+
+  /**
+   *  Switch from magnet mode to normal mode.
+   *  If we already have the metainfo, this does nothing.
+   *  @param meta non-null
+   *  @since 0.8.4
+   */
+  public void setMetaInfo(MetaInfo meta) {
+      if (metainfo != null)
+          return;
+      BitField oldBF = bitfield;
+      if (oldBF != null) {
+          if (oldBF.size() != meta.getPieces())
+              // fix bitfield, it was too big by 1-7 bits
+              bitfield = new BitField(oldBF.getFieldBytes(), meta.getPieces());
+          // else no extra
+      } else {
+          // it will be initialized later
+          //bitfield = new BitField(meta.getPieces());
+      }
+      metainfo = meta;
+      if (bitfield != null && bitfield.count() > 0)
+          setInteresting(true);
+  }
+
+  /**
+   *  Unused
+   *  @since 0.8.4
+   */
+  void portMessage(int port)
+  {
+      // for compatibility with old DHT PORT message
+      listener.gotPort(peer, port, port + 1);
+  }
+
   void unknownMessage(int type, byte[] bs)
   {
     if (_log.shouldLog(Log.WARN))
@@ -412,23 +543,49 @@ class PeerState
                   + " length: " + bs.length);
   }
 
+  /**
+   *  We now have this piece.
+   *  Tell the peer and cancel any requests for the piece.
+   */
   void havePiece(int piece)
   {
     if (_log.shouldLog(Log.DEBUG))
       _log.debug("Tell " + peer + " havePiece(" + piece + ")");
 
-    synchronized(this)
-      {
         // Tell the other side that we are no longer interested in any of
         // the outstanding requests for this piece.
-        if (lastRequest != null && lastRequest.piece == piece)
+    cancelPiece(piece);
+
+    // Tell the other side that we really have this piece.
+    out.sendHave(piece);
+    
+    // Request something else if necessary.
+    addRequest();
+    
+   /**** taken care of in addRequest()
+    synchronized(this)
+      {
+        // Is the peer still interesting?
+        if (lastRequest == null)
+          setInteresting(false);
+      }
+    ****/
+  }
+
+  /**
+   * Tell the other side that we are no longer interested in any of
+   * the outstanding requests (if any) for this piece.
+   * @since 0.8.1
+   */
+  synchronized void cancelPiece(int piece) {
+        if (lastRequest != null && lastRequest.getPiece() == piece)
           lastRequest = null;
         
-        Iterator it = outstandingRequests.iterator();
+        Iterator<Request> it = outstandingRequests.iterator();
         while (it.hasNext())
           {
-            Request req = (Request)it.next();
-            if (req.piece == piece)
+            Request req = it.next();
+            if (req.getPiece() == piece)
               {
                 it.remove();
                 // Send cancel even when we are choked to make sure that it is
@@ -436,32 +593,39 @@ class PeerState
                 out.sendCancel(req);
               }
           }
-      }
-    
-    // Tell the other side that we really have this piece.
-    out.sendHave(piece);
-    
-    // Request something else if necessary.
-    addRequest();
-    
-    synchronized(this)
-      {
-        // Is the peer still interesting?
-        if (lastRequest == null)
-          setInteresting(false);
-      }
   }
 
-  // Starts or resumes requesting pieces.
-  private void request()
+  /**
+   * Are we currently requesting the piece?
+   * @deprecated deadlocks
+   * @since 0.8.1
+   */
+  synchronized boolean isRequesting(int piece) {
+      if (pendingRequest != null && pendingRequest.getPiece() == piece)
+          return true;
+      for (Request req : outstandingRequests) {
+          if (req.getPiece() == piece)
+              return true;
+      }
+      return false;
+  }
+
+  /**
+   * Starts or resumes requesting pieces.
+   * @param resend should we resend outstanding requests?
+   */
+  private void request(boolean resend)
   {
     // Are there outstanding requests that have to be resend?
     if (resend)
       {
         synchronized (this) {
-            out.sendRequests(outstandingRequests);
+            if (!outstandingRequests.isEmpty()) {
+                out.sendRequests(outstandingRequests);
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Resending requests to " + peer + outstandingRequests);
+            }
         }
-        resend = false;
       }
 
     // Add/Send some more requests if necessary.
@@ -470,21 +634,59 @@ class PeerState
 
   /**
    * Adds a new request to the outstanding requests list.
+   * Then send interested if we weren't.
+   * Then send new requests if not choked.
+   * If nothing to request, send not interested if we were.
+   *
+   * This is called from several places:
+   *<pre>
+   *   By getOustandingRequest() when the first part of a chunk comes in
+   *   By havePiece() when somebody got a new piece completed
+   *   By chokeMessage() when we receive an unchoke
+   *   By setInteresting() when we are now interested
+   *   By PeerCoordinator.updatePiecePriorities()
+   *</pre>
    */
-  synchronized private void addRequest()
+  synchronized void addRequest()
   {
+    // no bitfield yet? nothing to request then.
+    if (bitfield == null)
+        return;
+    if (metainfo == null)
+        return;
     boolean more_pieces = true;
     while (more_pieces)
       {
         more_pieces = outstandingRequests.size() < MAX_PIPELINE;
         // We want something and we don't have outstanding requests?
-        if (more_pieces && lastRequest == null)
+        if (more_pieces && lastRequest == null) {
+          // we have nothing in the queue right now
+          if (!interesting) {
+              // If we need something, set interesting but delay pulling
+              // a request from the PeerCoordinator until unchoked.
+              if (listener.needPiece(this.peer, bitfield)) {
+                  setInteresting(true);
+                  if (_log.shouldLog(Log.DEBUG))
+                      _log.debug(peer + " addRequest() we need something, setting interesting, delaying requestNextPiece()");
+              } else {
+                  if (_log.shouldLog(Log.DEBUG))
+                      _log.debug(peer + " addRequest() needs nothing");
+              }
+              return;
+          }
+          if (choked) {
+              // If choked, delay pulling
+              // a request from the PeerCoordinator until unchoked.
+              if (_log.shouldLog(Log.DEBUG))
+                  _log.debug(peer + " addRequest() we are choked, delaying requestNextPiece()");
+              return;
+          }
           more_pieces = requestNextPiece();
-        else if (more_pieces) // We want something
+        } else if (more_pieces) // We want something
           {
             int pieceLength;
             boolean isLastChunk;
-            pieceLength = metainfo.getPieceLength(lastRequest.piece);
+            pieceLength = metainfo.getPieceLength(lastRequest.getPiece());
             isLastChunk = lastRequest.off + lastRequest.len == pieceLength;
 
             // Last part of a piece?
@@ -492,14 +694,13 @@ class PeerState
               more_pieces = requestNextPiece();
             else
               {
-                    int nextPiece = lastRequest.piece;
+                    PartialPiece nextPiece = lastRequest.getPartialPiece();
                     int nextBegin = lastRequest.off + PARTSIZE;
-                    byte[] bs = lastRequest.bs;
                     int maxLength = pieceLength - nextBegin;
                     int nextLength = maxLength > PARTSIZE ? PARTSIZE
                                                           : maxLength;
                     Request req
-                      = new Request(nextPiece, bs, nextBegin, nextLength);
+                      = new Request(nextPiece,nextBegin, nextLength);
                     outstandingRequests.add(req);
                     if (!choked)
                       out.sendRequest(req);
@@ -508,43 +709,55 @@ class PeerState
           }
       }
 
+    // failsafe
+    if (interesting && lastRequest == null && outstandingRequests.isEmpty())
+        setInteresting(false);
+
     if (_log.shouldLog(Log.DEBUG))
       _log.debug(peer + " requests " + outstandingRequests);
   }
 
-  // Starts requesting first chunk of next piece. Returns true if
-  // something has been added to the requests, false otherwise.
+  /**
+   * Starts requesting first chunk of next piece. Returns true if
+   * something has been added to the requests, false otherwise.
+   * Caller should synchronize.
+   */
   private boolean requestNextPiece()
   {
     // Check that we already know what the other side has.
-    if (bitfield != null)
-      {
+    if (bitfield != null) {
         // Check for adopting an orphaned partial piece
-        Request r = listener.getPeerPartial(bitfield);
-        if (r != null) {
-              // Check that r not already in outstandingRequests
-              int[] arr = getRequestedPieces();
-              boolean found = false;
-              for (int i = 0; arr[i] >= 0; i++) {
-                if (arr[i] == r.piece) {
-                  found = true;
-                  break;
-                }
-              }
-              if (!found) {
+        PartialPiece pp = listener.getPartialPiece(peer, bitfield);
+        if (pp != null) {
+            // Double-check that r not already in outstandingRequests
+            if (!getRequestedPieces().contains(Integer.valueOf(pp.getPiece()))) {
+                Request r = pp.getRequest();
                 outstandingRequests.add(r);
                 if (!choked)
                   out.sendRequest(r);
                 lastRequest = r;
                 return true;
-              }
+            }
         }
+
+      /******* getPartialPiece() does it all now
+        // Note that in addition to the bitfield, PeerCoordinator uses
+        // its request tracking and isRequesting() to determine
+        // what piece to give us next.
         int nextPiece = listener.wantPiece(peer, bitfield);
-        if (_log.shouldLog(Log.DEBUG))
-          _log.debug(peer + " want piece " + nextPiece);
-            if (nextPiece != -1
-                && (lastRequest == null || lastRequest.piece != nextPiece))
-              {
+        if (nextPiece != -1
+            && (lastRequest == null || lastRequest.getPiece() != nextPiece)) {
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug(peer + " want piece " + nextPiece);
+                // Fail safe to make sure we are interested
+                // When we transition into the end game we may not be interested...
+                if (!interesting) {
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug(peer + " transition to end game, setting interesting");
+                    interesting = true;
+                    out.sendInterest(true);
+                }
+
                 int piece_length = metainfo.getPieceLength(nextPiece);
                 //Catch a common place for OOMs esp. on 1MB pieces
                 byte[] bs;
@@ -562,34 +775,49 @@ class PeerState
                   out.sendRequest(req);
                 lastRequest = req;
                 return true;
-              }
-      }
+        } else {
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug(peer + " no more pieces to request");
+        }
+     *******/
+    }
 
+    // failsafe
+    if (outstandingRequests.isEmpty())
+        lastRequest = null;
+
+    // If we are not in the end game, we may run out of things to request
+    // because we are asking other peers. Set not-interesting now rather than
+    // wait for those other requests to be satisfied via havePiece()
+    if (interesting && lastRequest == null) {
+        interesting = false;
+        out.sendInterest(false);
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug(peer + " nothing more to request, now uninteresting");
+    }
     return false;
   }
 
   synchronized void setInteresting(boolean interest)
   {
-    if (_log.shouldLog(Log.DEBUG))
-      _log.debug(peer + " setInteresting(" + interest + ")");
-
     if (interest != interesting)
       {
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug(peer + " setInteresting(" + interest + ")");
         interesting = interest;
         out.sendInterest(interest);
 
         if (interesting && !choked)
-          request();
+          request(true);  // we shouldnt have any pending requests, but if we do, resend them
       }
   }
 
   synchronized void setChoking(boolean choke)
   {
-    if (_log.shouldLog(Log.DEBUG))
-      _log.debug(peer + " setChoking(" + choke + ")");
-
     if (choking != choke)
       {
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug(peer + " setChoking(" + choke + ")");
         choking = choke;
         out.sendChoke(choke);
       }
@@ -604,5 +832,17 @@ class PeerState
   {
       if (interesting && !choked)
         out.retransmitRequests(outstandingRequests);
+  }
+
+  /**
+   *  debug
+   *  @return string or null
+   *  @since 0.8.1
+   */
+  synchronized String getRequests() {
+      if (outstandingRequests.isEmpty())
+          return null;
+      else
+          return outstandingRequests.toString();
   }
 }

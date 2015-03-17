@@ -9,28 +9,29 @@ import net.i2p.util.Log;
  * Blocking thread to grab new messages off the outbound queue and
  * plopping them into our active pool.  
  *
+ * WARNING - UNUSED since 0.6.1.11
+ *
  */
-public class OutboundRefiller implements Runnable {
+class OutboundRefiller implements Runnable {
     private RouterContext _context;
     private Log _log;
     private OutboundMessageFragments _fragments;
     private MessageQueue _messages;
     private boolean _alive;
-    private Object _refillLock;
+    // private Object _refillLock;
     
     public OutboundRefiller(RouterContext ctx, OutboundMessageFragments fragments, MessageQueue messages) {
         _context = ctx;
         _log = ctx.logManager().getLog(OutboundRefiller.class);
         _fragments = fragments;
         _messages = messages;
-        _refillLock = this;
-        _context.statManager().createRateStat("udp.timeToActive", "Message lifetime until it reaches the outbound fragment queue", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
+        // _refillLock = this;
+        _context.statManager().createRateStat("udp.timeToActive", "Message lifetime until it reaches the outbound fragment queue", "udp", UDPTransport.RATES);
     }
     
     public void startup() {
         _alive = true;
-        I2PThread t = new I2PThread(this, "UDP outbound refiller");
-        t.setDaemon(true);
+        I2PThread t = new I2PThread(this, "UDP outbound refiller", true);
         t.start();
     }
     public void shutdown() { _alive = false; }

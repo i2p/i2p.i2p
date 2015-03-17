@@ -5,7 +5,7 @@ import net.i2p.router.OutNetMessage;
 /**
  * Base queue for messages not yet packetized
  */
-public interface MessageQueue {
+interface MessageQueue {
     /**
      * Get the next message, blocking until one is found or the expiration
      * reached.

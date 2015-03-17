@@ -13,6 +13,13 @@ import net.i2p.data.SigningPrivateKey;
 import net.i2p.util.Log;
 
 /**
+ * This contains solely the data that goes out on the wire,
+ * including the local and remote port which is embedded in
+ * the I2CP overhead, not in the packet itself.
+ * For local state saved for outbound packets, see PacketLocal.
+ *
+ * <p>
+ *
  * Contain a single packet transferred as part of a streaming connection.  
  * The data format is as follows:<ul>
  * <li>{@link #getSendStreamId sendStreamId} [4 byte value]</li>
@@ -42,7 +49,7 @@ import net.i2p.util.Log;
  * <li>{@link #FLAG_MAX_PACKET_SIZE_INCLUDED}: 2 byte integer</li>
  * <li>{@link #FLAG_PROFILE_INTERACTIVE}: no option data</li>
  * <li>{@link #FLAG_ECHO}: no option data</li>
- * <li>{@link #FLAG_NO_ACK}: no option data</li>
+ * <li>{@link #FLAG_NO_ACK}: no option data - this appears to be unused, we always ack, even for the first packet</li>
  * </ol>
  *
  * <p>If the signature is included, it uses the Destination's DSA key 
@@ -53,7 +60,7 @@ import net.i2p.util.Log;
  * packet that should not be ACKed</p>
  *
  */
-public class Packet {
+class Packet {
     private long _sendStreamId;
     private long _receiveStreamId;
     private long _sequenceNum;
@@ -67,6 +74,8 @@ public class Packet {
     private Destination _optionFrom;
     private int _optionDelay;
     private int _optionMaxSize;
+    private int _localPort;
+    private int _remotePort;
     
     /** 
      * The receiveStreamId will be set to this when the packet doesn't know 
@@ -148,29 +157,39 @@ public class Packet {
     public static final int DEFAULT_MAX_SIZE = 32*1024;
     protected static final int MAX_DELAY_REQUEST = 65535;
 
+    /**
+     *  Does no initialization.
+     *  See readPacket() for inbound packets, and the setters for outbound packets.
+     */
     public Packet() { }
     
     private boolean _sendStreamIdSet = false;
+
     /** what stream do we send data to the peer on?
      * @return stream ID we use to send data
      */
     public long getSendStreamId() { return _sendStreamId; }
+
     public void setSendStreamId(long id) { 
-        if ( (_sendStreamIdSet) && (_sendStreamId > 0) )
+        // allow resetting to the same id (race)
+        if ( (_sendStreamIdSet) && (_sendStreamId > 0) && _sendStreamId != id)
             throw new RuntimeException("Send stream ID already set [" + _sendStreamId + ", " + id + "]");
         _sendStreamIdSet = true;
         _sendStreamId = id; 
     }
     
     private boolean _receiveStreamIdSet = false;
+
     /** 
      * stream the replies should be sent on.  this should be 0 if the
      * connection is still being built.
      * @return stream ID we use to get data, zero if the connection is still being built.
      */
     public long getReceiveStreamId() { return _receiveStreamId; }
+
     public void setReceiveStreamId(long id) { 
-        if ( (_receiveStreamIdSet) && (_receiveStreamId > 0) ) 
+        // allow resetting to the same id (race)
+        if ( (_receiveStreamIdSet) && (_receiveStreamId > 0) && _receiveStreamId != id) 
             throw new RuntimeException("Receive stream ID already set [" + _receiveStreamId + ", " + id + "]");
         _receiveStreamIdSet = true;
         _receiveStreamId = id; 
@@ -216,9 +235,21 @@ public class Packet {
      * resending this packet (if it hasn't yet been ACKed).  The 
      * value is seconds since the packet was created.
      *
+     * Unused.
+     * Broken before release 0.7.8
+     * Not to be used without sanitizing for huge values.
+     * Setters from options did not divide by 1000, and the options default
+     * is 1000, so the value sent in the 1-byte field was always
+     * 1000 & 0xff = 0xe8 = 232
+     *
      * @return Delay before resending a packet in seconds.
      */
     public int getResendDelay() { return _resendDelay; }
+    /**
+     *  Unused.
+     *  Broken before release 0.7.8
+     *  See above
+     */
     public void setResendDelay(int numSeconds) { _resendDelay = numSeconds; }
     
     public static final int MAX_PAYLOAD_SIZE = 32*1024;
@@ -239,7 +270,6 @@ public class Packet {
         //_payload = null;
     }
     public ByteArray acquirePayload() {
-        ByteArray old = _payload;
         _payload = new ByteArray(new byte[Packet.MAX_PAYLOAD_SIZE]);
         return _payload;
     }
@@ -305,6 +335,40 @@ public class Packet {
     }
     
     /**
+     *  @return Default I2PSession.PORT_UNSPECIFIED (0) or PORT_ANY (0)
+     *  @since 0.8.9
+     */
+    public int getLocalPort() {
+        return _localPort;
+    }
+
+    /**
+     *  Must be called to change the port, not set by readPacket()
+     *  as the port is out-of-band in the I2CP header.
+     *  @since 0.8.9
+     */
+    public void setLocalPort(int port) {
+        _localPort = port;
+    }
+    
+    /**
+     *  @return Default I2PSession.PORT_UNSPECIFIED (0) or PORT_ANY (0)
+     *  @since 0.8.9
+     */
+    public int getRemotePort() {
+        return _remotePort;
+    }
+
+    /**
+     *  Must be called to change the port, not set by readPacket()
+     *  as the port is out-of-band in the I2CP header.
+     *  @since 0.8.9
+     */
+    public void setRemotePort(int port) {
+        _remotePort = port;
+    }
+
+    /**
      * Write the packet to the buffer (starting at the offset) and return
      * the number of bytes written.
      *
@@ -331,6 +395,7 @@ public class Packet {
         DataHelper.toLong(buffer, cur, 4, _ackThrough > 0 ? _ackThrough : 0);
         cur += 4;
         if (_nacks != null) {
+            // if max win is ever > 255, limit to 255
             DataHelper.toLong(buffer, cur, 1, _nacks.length);
             cur++;
             for (int i = 0; i < _nacks.length; i++) {
@@ -397,7 +462,7 @@ public class Packet {
      * @return How large the current packet would be
      * @throws IllegalStateException 
      */
-    public int writtenSize() throws IllegalStateException {
+    private int writtenSize() {
         int size = 0;
         size += 4; // _sendStreamId.length;
         size += 4; // _receiveStreamId.length;
@@ -405,6 +470,7 @@ public class Packet {
         size += 4; // ackThrough
         if (_nacks != null) {
             size++; // nacks length
+            // if max win is ever > 255, limit to 255
             size += 4 * _nacks.length;
         } else {
             size++; // nacks length
@@ -598,19 +664,20 @@ public class Packet {
     
 	@Override
     public String toString() {
-        StringBuffer str = formatAsString();
+        StringBuilder str = formatAsString();
         return str.toString();
     }
     
-    protected StringBuffer formatAsString() {
-        StringBuffer buf = new StringBuffer(64);
+    protected StringBuilder formatAsString() {
+        StringBuilder buf = new StringBuilder(64);
         buf.append(toId(_sendStreamId));
         //buf.append("<-->");
         buf.append(toId(_receiveStreamId)).append(": #").append(_sequenceNum);
-        if (_sequenceNum < 10) 
-            buf.append(" \t"); // so the tab lines up right
-        else
-            buf.append('\t');
+        //if (_sequenceNum < 10) 
+        //    buf.append(" \t"); // so the tab lines up right
+        //else
+        //    buf.append('\t');
+        buf.append(' ');
         buf.append(toFlagString());
         buf.append(" ACK ").append(getAckThrough());
         if (_nacks != null) {
@@ -629,7 +696,7 @@ public class Packet {
     }
     
     private final String toFlagString() {
-        StringBuffer buf = new StringBuffer(32);
+        StringBuilder buf = new StringBuilder(32);
         if (isFlagSet(FLAG_CLOSE)) buf.append(" CLOSE");
         if (isFlagSet(FLAG_DELAY_REQUESTED)) buf.append(" DELAY ").append(_optionDelay);
         if (isFlagSet(FLAG_ECHO)) buf.append(" ECHO");

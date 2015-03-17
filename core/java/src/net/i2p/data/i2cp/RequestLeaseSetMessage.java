@@ -20,7 +20,6 @@ import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.TunnelId;
-import net.i2p.util.Log;
 
 /**
  * Defines the message a client sends to a router when destroying
@@ -29,16 +28,13 @@ import net.i2p.util.Log;
  * @author jrandom
  */
 public class RequestLeaseSetMessage extends I2CPMessageImpl {
-    private final static Log _log = new Log(RequestLeaseSetMessage.class);
     public final static int MESSAGE_TYPE = 21;
     private SessionId _sessionId;
-    private List _endpoints;
+    private List<TunnelEndpoint> _endpoints;
     private Date _end;
 
     public RequestLeaseSetMessage() {
-        setSessionId(null);
         _endpoints = new ArrayList();
-        setEndDate(null);
     }
 
     public SessionId getSessionId() {
@@ -55,14 +51,15 @@ public class RequestLeaseSetMessage extends I2CPMessageImpl {
 
     public Hash getRouter(int endpoint) {
         if ((endpoint < 0) || (_endpoints.size() < endpoint)) return null;
-        return ((TunnelEndpoint) _endpoints.get(endpoint)).getRouter();
+        return _endpoints.get(endpoint).getRouter();
     }
 
     public TunnelId getTunnelId(int endpoint) {
         if ((endpoint < 0) || (_endpoints.size() < endpoint)) return null;
-        return ((TunnelEndpoint) _endpoints.get(endpoint)).getTunnelId();
+        return _endpoints.get(endpoint).getTunnelId();
     }
 
+    /** @deprecated unused - presumably he meant remove? */
     public void remoteEndpoint(int endpoint) {
         if ((endpoint >= 0) && (endpoint < _endpoints.size())) _endpoints.remove(endpoint);
     }
@@ -89,8 +86,9 @@ public class RequestLeaseSetMessage extends I2CPMessageImpl {
             int numTunnels = (int) DataHelper.readLong(in, 1);
             _endpoints.clear();
             for (int i = 0; i < numTunnels; i++) {
-                Hash router = new Hash();
-                router.readBytes(in);
+                //Hash router = new Hash();
+                //router.readBytes(in);
+                Hash router = Hash.create(in);
                 TunnelId tunnel = new TunnelId();
                 tunnel.readBytes(in);
                 _endpoints.add(new TunnelEndpoint(router, tunnel));
@@ -126,6 +124,7 @@ public class RequestLeaseSetMessage extends I2CPMessageImpl {
         return MESSAGE_TYPE;
     }
 
+    /* FIXME missing hashCode() method FIXME */
     @Override
     public boolean equals(Object object) {
         if ((object != null) && (object instanceof RequestLeaseSetMessage)) {
@@ -143,7 +142,7 @@ public class RequestLeaseSetMessage extends I2CPMessageImpl {
 
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append("[RequestLeaseMessage: ");
         buf.append("\n\tSessionId: ").append(getSessionId());
         buf.append("\n\tTunnels:");
@@ -160,11 +159,6 @@ public class RequestLeaseSetMessage extends I2CPMessageImpl {
         private Hash _router;
         private TunnelId _tunnelId;
 
-        public TunnelEndpoint() {
-            _router = null;
-            _tunnelId = null;
-        }
-
         public TunnelEndpoint(Hash router, TunnelId id) {
             _router = router;
             _tunnelId = id;
@@ -174,16 +168,8 @@ public class RequestLeaseSetMessage extends I2CPMessageImpl {
             return _router;
         }
 
-        public void setRouter(Hash router) {
-            _router = router;
-        }
-
         public TunnelId getTunnelId() {
             return _tunnelId;
-        }
-
-        public void setTunnelId(TunnelId tunnelId) {
-            _tunnelId = tunnelId;
         }
     }
 }

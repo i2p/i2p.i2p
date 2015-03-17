@@ -4,21 +4,22 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
 
+import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
 import net.i2p.util.Log;
 
 /** coordinate a moving rate over various periods */
 public class RateStat {
-    private final static Log _log = new Log(RateStat.class);
     /** unique name of the statistic */
-    private String _statName;
+    private final String _statName;
     /** grouping under which the stat is kept */
-    private String _groupName;
+    private final String _groupName;
     /** describe the stat */
-    private String _description;
+    private final String _description;
     /** actual rate objects for this statistic */
-    private Rate _rates[];
+    protected final ConcurrentHashMap<Long, Rate> _rates;
     /** component we tell about events as they occur */
     private StatLog _statLog;
 
@@ -26,10 +27,11 @@ public class RateStat {
         _statName = name;
         _description = description;
         _groupName = group;
-        _rates = new Rate[periods.length];
+        _rates = new ConcurrentHashMap<Long, Rate>(4);
         for (int i = 0; i < periods.length; i++) {
-            _rates[i] = new Rate(periods[i]);
-            _rates[i].setRateStat(this);
+            Rate rate = new Rate(periods[i]);
+            rate.setRateStat(this);
+            _rates.put(rate.getPeriod(),rate);
         }
     }
     public void setStatLog(StatLog sl) { _statLog = sl; }
@@ -39,14 +41,26 @@ public class RateStat {
      */
     public void addData(long value, long eventDuration) {
         if (_statLog != null) _statLog.addData(_groupName, _statName, value, eventDuration);
-        for (int i = 0; i < _rates.length; i++)
-            _rates[i].addData(value, eventDuration);
+        for (Rate r: _rates.values())
+            r.addData(value, eventDuration);
+    }
+
+    /** 
+     * Update all of the rates for the various periods with the given value.  
+     * Zero duration.
+     * @since 0.8.10
+     */
+    public void addData(long value) {
+        if (_statLog != null) _statLog.addData(_groupName, _statName, value, 0);
+        for (Rate r: _rates.values())
+            r.addData(value);
     }
 
     /** coalesce all the stats */
     public void coalesceStats() {
-        for (int i = 0; i < _rates.length; i++)
-            _rates[i].coalesce();
+        for (Rate r: _rates.values()){
+            r.coalesce();
+        }
     }
 
     public String getName() {
@@ -62,26 +76,71 @@ public class RateStat {
     }
 
     public long[] getPeriods() {
-        long rv[] = new long[_rates.length];
-        for (int i = 0; i < _rates.length; i++)
-            rv[i] = _rates[i].getPeriod();
+        long rv[] = new long[_rates.size()];
+        int counter = 0;
+        for (Rate r: _rates.values())
+            rv[counter++] = r.getPeriod();
+        Arrays.sort(rv);
         return rv;
     }
 
     public double getLifetimeAverageValue() {
-        if ( (_rates == null) || (_rates.length <= 0) ) return 0;
-        return _rates[0].getLifetimeAverageValue();
+        if (_rates.isEmpty()) return 0;
+        return _rates.values().iterator().next().getLifetimeAverageValue();
     }
     public long getLifetimeEventCount() {
-        if ( (_rates == null) || (_rates.length <= 0) ) return 0;
-        return _rates[0].getLifetimeEventCount();
+        if (_rates.isEmpty()) return 0;
+        return _rates.values().iterator().next().getLifetimeEventCount();
     }
 
+    /**
+     * Returns rate with requested period if it exists, 
+     * otherwise null
+     * @param period ms
+     * @return the Rate
+     */
     public Rate getRate(long period) {
-        for (int i = 0; i < _rates.length; i++) {
-            if (_rates[i].getPeriod() == period) return _rates[i];
-        }
-        return null;
+        //if (_rates.containsKey(period)){
+        	return _rates.get(Long.valueOf(period));
+        //} else {
+        //	Rate rate = new Rate(period);
+        //	rate.setRateStat(this);
+        //	_rates.put(period, rate);
+        //	return rate;
+        //}
+    }
+    
+    /**
+     * Adds a new rate with the requested period, provided that 
+     * a rate with that period does not already exist.
+     * @param period ms
+     * @since 0.8.8
+     */
+    public void addRate(long period) {
+    	if (!_rates.containsKey(period)){
+	    	Rate rate = new Rate(period);
+	    	rate.setRateStat(this);
+	    	_rates.put(period, rate);
+    	}
+    }
+    
+    /**
+     * If a rate with the provided period exists, remove it.
+     * @param period ms
+     * @since 0.8.8
+     */
+    public void removeRate(long period) {
+    	_rates.remove(period);
+    }
+    
+    /**
+     * Tests if a rate with the provided period exists within this RateStat.
+     * @param period ms
+     * @return true if exists
+     * @since 0.8.8
+     */
+    public boolean containsRate(long period) {
+    	return _rates.containsKey(period);
     }
 
     @Override
@@ -93,7 +152,7 @@ public class RateStat {
 
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer(4096);
+        StringBuilder buf = new StringBuilder(4096);
         buf.append(getGroupName()).append('.').append(getName()).append(": ").append(getDescription()).append('\n');
         long periods[] = getPeriods();
         Arrays.sort(periods);
@@ -108,20 +167,18 @@ public class RateStat {
 
     @Override
     public boolean equals(Object obj) {
-        if ((obj == null) || (obj.getClass() != RateStat.class)) return false;
+        if ((obj == null) || !(obj instanceof RateStat)) return false;
         RateStat rs = (RateStat) obj;
         if (DataHelper.eq(getGroupName(), rs.getGroupName()) && DataHelper.eq(getDescription(), rs.getDescription())
             && DataHelper.eq(getName(), rs.getName())) {
-            for (int i = 0; i < _rates.length; i++)
-                if (!_rates[i].equals(rs.getRate(_rates[i].getPeriod()))) return false;
-            return true;
+            return this._rates.equals(rs._rates);
         } 
         
         return false;
     }
 
     public void store(OutputStream out, String prefix) throws IOException {
-        StringBuffer buf = new StringBuffer(1024);
+        StringBuilder buf = new StringBuilder(1024);
         buf.append(NL);
         buf.append("################################################################################").append(NL);
         buf.append("# Rate: ").append(_groupName).append(": ").append(_statName).append(NL);
@@ -129,14 +186,13 @@ public class RateStat {
         buf.append("# ").append(NL).append(NL);
         out.write(buf.toString().getBytes());
         buf.setLength(0);
-        for (int i = 0; i < _rates.length; i++) {
+        for (Rate r: _rates.values()){
             buf.append("#######").append(NL);
-            buf.append("# Period : ").append(DataHelper.formatDuration(_rates[i].getPeriod())).append(" for rate ")
+            buf.append("# Period : ").append(DataHelper.formatDuration(r.getPeriod())).append(" for rate ")
                 .append(_groupName).append(" - ").append(_statName).append(NL);
             buf.append(NL);
-            out.write(buf.toString().getBytes());
-            String curPrefix = prefix + "." + DataHelper.formatDuration(_rates[i].getPeriod());
-            _rates[i].store(curPrefix, buf);
+            String curPrefix = prefix + "." + DataHelper.formatDuration(r.getPeriod());
+            r.store(curPrefix, buf);
             out.write(buf.toString().getBytes());
             buf.setLength(0);
         }
@@ -157,31 +213,37 @@ public class RateStat {
      * @throws IllegalArgumentException if the data was formatted incorrectly
      */
     public void load(Properties props, String prefix, boolean treatAsCurrent) throws IllegalArgumentException {
-        for (int i = 0; i < _rates.length; i++) {
-            long period = _rates[i].getPeriod();
+        for (Rate r : _rates.values()) {
+            long period = r.getPeriod();
             String curPrefix = prefix + "." + DataHelper.formatDuration(period);
             try {
-                _rates[i].load(props, curPrefix, treatAsCurrent);
+                r.load(props, curPrefix, treatAsCurrent);
             } catch (IllegalArgumentException iae) {
-                _rates[i] = new Rate(period);
-                _rates[i].setRateStat(this);
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Rate for " + prefix + " is corrupt, reinitializing that period");
+                Rate rate = new Rate(period);
+                rate.setRateStat(this);
+                _rates.put(rate.getPeriod(), rate);
+                Log log = I2PAppContext.getGlobalContext().logManager().getLog(RateStat.class);
+                if (log.shouldLog(Log.WARN))
+                    log.warn("Rate for " + prefix + " is corrupt, reinitializing that period");
             }
         }
     }
 
+/*********
     public static void main(String args[]) {
         RateStat rs = new RateStat("moo", "moo moo moo", "cow trueisms", new long[] { 60 * 1000, 60 * 60 * 1000,
                                                                                      24 * 60 * 60 * 1000});
-        for (int i = 0; i < 50; i++) {
+
+        for (int i = 0; i < 500; i++) {
             try {
                 Thread.sleep(20);
             } catch (InterruptedException ie) { // nop
             }
             rs.addData(i * 100, 20);
         }
+        
         rs.coalesceStats();
+
         java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream(2048);
         try {
             rs.store(baos, "rateStat.test");
@@ -207,4 +269,5 @@ public class RateStat {
         } catch (InterruptedException ie) { // nop
         }
     }
+*********/
 }

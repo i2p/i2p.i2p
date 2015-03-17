@@ -1,16 +1,19 @@
 package net.i2p.router.tunnel;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
-import net.i2p.I2PAppContext;
 import net.i2p.data.Hash;
 import net.i2p.data.TunnelId;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.router.Router;
+import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
 
 /**
+ * This is used for all gateways with more than zero hops.
+ *
  * Serve as the gatekeeper for a tunnel, accepting messages, coallescing and/or
  * fragmenting them before wrapping them up for tunnel delivery. The flow here
  * is: <ol>
@@ -31,9 +34,9 @@ import net.i2p.util.Log;
  * </ol>
  *
  */
-public class PumpedTunnelGateway extends TunnelGateway {
-    private List _prequeue;
-    private TunnelGatewayPumper _pumper;
+class PumpedTunnelGateway extends TunnelGateway {
+    private final BlockingQueue<Pending> _prequeue;
+    private final TunnelGatewayPumper _pumper;
     
     /**
      * @param preprocessor this pulls Pending messages off a list, builds some
@@ -43,9 +46,9 @@ public class PumpedTunnelGateway extends TunnelGateway {
      * @param receiver this receives the encrypted message and forwards it off 
      *                 to the first hop
      */
-    public PumpedTunnelGateway(I2PAppContext context, QueuePreprocessor preprocessor, Sender sender, Receiver receiver, TunnelGatewayPumper pumper) {
+    public PumpedTunnelGateway(RouterContext context, QueuePreprocessor preprocessor, Sender sender, Receiver receiver, TunnelGatewayPumper pumper) {
         super(context, preprocessor, sender, receiver);
-        _prequeue = new ArrayList(4);
+        _prequeue = new LinkedBlockingQueue();
         _pumper = pumper;
     }
     
@@ -58,16 +61,12 @@ public class PumpedTunnelGateway extends TunnelGateway {
      * @param toRouter router to send to after the endpoint (or null for endpoint processing)
      * @param toTunnel tunnel to send to after the endpoint (or null for endpoint or router processing)
      */
+    @Override
     public void add(I2NPMessage msg, Hash toRouter, TunnelId toTunnel) {
         _messagesSent++;
         Pending cur = new PendingImpl(msg, toRouter, toTunnel);
-        long beforeLock = System.currentTimeMillis();
-        synchronized (_prequeue) {
-            _prequeue.add(cur);
-        }
+        _prequeue.offer(cur);
         _pumper.wantsPumping(this);
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("GW prequeue time: " + (System.currentTimeMillis()-beforeLock) + " for " + msg.getUniqueId() + " on " + toString());
     }
 
     /**
@@ -76,18 +75,17 @@ public class PumpedTunnelGateway extends TunnelGateway {
      * scheduling a later delayed flush as necessary.  this allows the gw.add call to
      * go quickly, rather than blocking its callers on potentially substantial
      * processing.
+     *
+     * @param queueBuf Empty list for convenience, to use as a temporary buffer.
+     *                 Must be empty when called; will always be emptied before return.
      */
-    void pump(List queueBuf) {
-        synchronized (_prequeue) {
-            if (_prequeue.size() > 0) {
-                queueBuf.addAll(_prequeue);
-                _prequeue.clear();
-            } else {
-                return;
-            }
-        }
+    void pump(List<Pending> queueBuf) {
+        _prequeue.drainTo(queueBuf);
+        if (queueBuf.isEmpty())
+            return;
+
         long startAdd = System.currentTimeMillis();
-        long beforeLock = System.currentTimeMillis();
+        long beforeLock = startAdd;
         long afterAdded = -1;
         boolean delayedFlush = false;
         long delayAmount = -1;
@@ -107,7 +105,7 @@ public class PumpedTunnelGateway extends TunnelGateway {
             
             // expire any as necessary, even if its framented
             for (int i = 0; i < _queue.size(); i++) {
-                Pending m = (Pending)_queue.get(i);
+                Pending m = _queue.get(i);
                 if (m.getExpiration() + Router.CLOCK_FUDGE_FACTOR < _lastFlush) {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Expire on the queue (size=" + _queue.size() + "): " + m);
@@ -122,14 +120,13 @@ public class PumpedTunnelGateway extends TunnelGateway {
         }
         
         if (delayedFlush) {
-            FlushTimer.getInstance().addEvent(_delayedFlush, delayAmount);
+            _context.simpleTimer().addEvent(_delayedFlush, delayAmount);
         }
         _context.statManager().addRateData("tunnel.lockedGatewayAdd", afterAdded-beforeLock, remaining);
         long complete = System.currentTimeMillis();
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Time to add " + queueBuf.size() + " messages to " + toString() + ": " + (complete-startAdd)
                        + " delayed? " + delayedFlush + " remaining: " + remaining
-                       + " prepare: " + (beforeLock-startAdd)
                        + " add: " + (afterAdded-beforeLock)
                        + " preprocess: " + (afterPreprocess-afterAdded)
                        + " expire: " + (afterExpire-afterPreprocess)

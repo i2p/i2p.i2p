@@ -3,12 +3,12 @@ package net.i2p.router.tunnel;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.i2p.I2PAppContext;
 import net.i2p.data.Hash;
 import net.i2p.data.TunnelId;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.i2np.TunnelGatewayMessage;
 import net.i2p.router.Router;
+import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleTimer;
 
@@ -33,16 +33,16 @@ import net.i2p.util.SimpleTimer;
  * </ol>
  *
  */
-public class TunnelGateway {
-    protected I2PAppContext _context;
-    protected Log _log;
-    protected List _queue;
-    protected QueuePreprocessor _preprocessor;
-    protected Sender _sender;
-    protected Receiver _receiver;
+class TunnelGateway {
+    protected final RouterContext _context;
+    protected final Log _log;
+    protected final List<Pending> _queue;
+    protected final QueuePreprocessor _preprocessor;
+    protected final Sender _sender;
+    protected final Receiver _receiver;
     protected long _lastFlush;
-    protected int _flushFrequency;
-    protected DelayedFlush _delayedFlush;
+    //protected int _flushFrequency;
+    protected final DelayedFlush _delayedFlush;// FIXME Exporting non-public type through public API FIXME
     protected int _messagesSent;
     
     /**
@@ -53,15 +53,14 @@ public class TunnelGateway {
      * @param receiver this receives the encrypted message and forwards it off 
      *                 to the first hop
      */
-    public TunnelGateway(I2PAppContext context, QueuePreprocessor preprocessor, Sender sender, Receiver receiver) {
+    public TunnelGateway(RouterContext context, QueuePreprocessor preprocessor, Sender sender, Receiver receiver) {
         _context = context;
         _log = context.logManager().getLog(getClass());
         _queue = new ArrayList(4);
         _preprocessor = preprocessor;
         _sender = sender;
         _receiver = receiver;
-        _messagesSent = 0;
-        _flushFrequency = 500;
+        //_flushFrequency = 500;
         _delayedFlush = new DelayedFlush();
         _lastFlush = _context.clock().now();
         _context.statManager().createRateStat("tunnel.lockedGatewayAdd", "How long do we block when adding a message to a tunnel gateway's queue", "Tunnels", new long[] { 60*1000, 10*60*1000 });
@@ -110,7 +109,7 @@ public class TunnelGateway {
             
             // expire any as necessary, even if its framented
             for (int i = 0; i < _queue.size(); i++) {
-                Pending m = (Pending)_queue.get(i);
+                Pending m = _queue.get(i);
                 if (m.getExpiration() + Router.CLOCK_FUDGE_FACTOR < _lastFlush) {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Expire on the queue (size=" + _queue.size() + "): " + m);
@@ -125,11 +124,11 @@ public class TunnelGateway {
         }
         
         if (delayedFlush) {
-            FlushTimer.getInstance().addEvent(_delayedFlush, delayAmount);
+            _context.simpleTimer().addEvent(_delayedFlush, delayAmount);
         }
         _context.statManager().addRateData("tunnel.lockedGatewayAdd", afterAdded-beforeLock, remaining);
-        long complete = System.currentTimeMillis();
-        if (_log.shouldLog(Log.DEBUG))
+        if (_log.shouldLog(Log.DEBUG)) {
+            long complete = System.currentTimeMillis();
             _log.debug("Time to add the message " + msg.getUniqueId() + ": " + (complete-startAdd)
                        + " delayed? " + delayedFlush + " remaining: " + remaining
                        + " prepare: " + (beforeLock-startAdd)
@@ -137,6 +136,7 @@ public class TunnelGateway {
                        + " preprocess: " + (afterPreprocess-afterAdded)
                        + " expire: " + (afterExpire-afterPreprocess)
                        + " queue flush: " + (complete-afterExpire));
+        }
     }
     
     public int getMessagesSent() { return _messagesSent; }
@@ -154,12 +154,18 @@ public class TunnelGateway {
         
     public interface QueuePreprocessor {
         /** 
+         * Caller must synchronize on the list!
+         *
          * @param pending list of Pending objects for messages either unsent
          *                or partly sent.  This list should be update with any
          *                values removed (the preprocessor owns the lock)
+         *                Messages are not removed from the list until actually sent.
+         *                The status of unsent and partially-sent messages is stored in
+         *                the Pending structure.
+         *
          * @return true if we should delay before preprocessing again 
          */
-        public boolean preprocessQueue(List pending, Sender sender, Receiver receiver);
+        public boolean preprocessQueue(List<Pending> pending, Sender sender, Receiver receiver);
         
         /** how long do we want to wait before flushing */
         public long getDelayAmount();
@@ -173,16 +179,19 @@ public class TunnelGateway {
         public long receiveEncrypted(byte encrypted[]);
     }
     
+    /**
+     *  Stores all the state for an unsent or partially-sent message
+     */
     public static class Pending {
-        protected Hash _toRouter;
-        protected TunnelId _toTunnel;
-        protected long _messageId;
-        protected long _expiration;
-        protected byte _remaining[];
+        protected final Hash _toRouter;
+        protected final TunnelId _toTunnel;
+        protected final long _messageId;
+        protected final long _expiration;
+        protected final byte _remaining[];
         protected int _offset;
         protected int _fragmentNumber;
-        protected long _created;
-        private List _messageIds;
+        protected final long _created;
+        private List<Long> _messageIds;
         
         public Pending(I2NPMessage message, Hash toRouter, TunnelId toTunnel) { 
             this(message, toRouter, toTunnel, System.currentTimeMillis()); 
@@ -193,10 +202,7 @@ public class TunnelGateway {
             _messageId = message.getUniqueId();
             _expiration = message.getMessageExpiration();
             _remaining = message.toByteArray();
-            _offset = 0;
-            _fragmentNumber = 0;
             _created = now;
-            _messageIds = null;
         }
         /** may be null */
         public Hash getToRouter() { return _toRouter; }
@@ -215,14 +221,22 @@ public class TunnelGateway {
         public int getFragmentNumber() { return _fragmentNumber; }
         /** ok, fragment sent, increment what the next will be */
         public void incrementFragmentNumber() { _fragmentNumber++; }
+        /**
+         *  Add an ID to the list of the TunnelDataMssages this message was fragmented into.
+         *  Unused except in notePreprocessing() calls for debugging
+         */
         public void addMessageId(long id) { 
             synchronized (Pending.this) {
                 if (_messageIds == null)
                     _messageIds = new ArrayList();
-                _messageIds.add(new Long(id));
+                _messageIds.add(Long.valueOf(id));
             }
         }
-        public List getMessageIds() { 
+        /**
+         *  The IDs of the TunnelDataMssages this message was fragmented into.
+         *  Unused except in notePreprocessing() calls for debugging
+         */
+        public List<Long> getMessageIds() { 
             synchronized (Pending.this) { 
                 if (_messageIds != null)
                     return new ArrayList(_messageIds); 
@@ -231,13 +245,16 @@ public class TunnelGateway {
             } 
         }
     }
+
+    /** Extend for debugging */
     class PendingImpl extends Pending {
         public PendingImpl(I2NPMessage message, Hash toRouter, TunnelId toTunnel) {
             super(message, toRouter, toTunnel, _context.clock().now());
         }        
         
+        @Override
         public String toString() {
-            StringBuffer buf = new StringBuffer(64);
+            StringBuilder buf = new StringBuilder(64);
             buf.append("Message ").append(_messageId).append(" on ");
             buf.append(TunnelGateway.this.toString());
             if (_toRouter != null) {
@@ -257,6 +274,7 @@ public class TunnelGateway {
             return buf.toString();
         }
 
+        @Override
         public long getLifetime() { return _context.clock().now()-_created; }
     }
     
@@ -267,13 +285,13 @@ public class TunnelGateway {
             long beforeLock = _context.clock().now();
             long afterChecked = -1;
             long delayAmount = -1;
-            if (_queue.size() > 10000) // stay out of the synchronized block
-                System.out.println("foo!");
+            //if (_queue.size() > 10000) // stay out of the synchronized block
+            //    System.out.println("foo!");
             synchronized (_queue) {
-                if (_queue.size() > 10000) // stay in the synchronized block
-                    System.out.println("foo!");
+                //if (_queue.size() > 10000) // stay in the synchronized block
+                //    System.out.println("foo!");
                 afterChecked = _context.clock().now();
-                if (_queue.size() > 0) {
+                if (!_queue.isEmpty()) {
                     if ( (remaining > 0) && (_log.shouldLog(Log.DEBUG)) )
                         _log.debug("Remaining before delayed flush preprocessing: " + _queue);
                     wantRequeue = _preprocessor.preprocessQueue(_queue, _sender, _receiver);
@@ -286,7 +304,7 @@ public class TunnelGateway {
             }
             
             if (wantRequeue)
-                FlushTimer.getInstance().addEvent(_delayedFlush, delayAmount);
+                _context.simpleTimer().addEvent(_delayedFlush, delayAmount);
             else
                 _lastFlush = _context.clock().now();
             

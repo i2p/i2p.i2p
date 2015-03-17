@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import net.i2p.data.Hash;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelPoolSettings;
 import net.i2p.stat.Rate;
@@ -17,9 +18,14 @@ import net.i2p.util.Log;
  *
  */
 class ExploratoryPeerSelector extends TunnelPeerSelector {
-    public List selectPeers(RouterContext ctx, TunnelPoolSettings settings) {
+
+    public ExploratoryPeerSelector(RouterContext context) {
+        super(context);
+    }
+
+    public List<Hash> selectPeers(TunnelPoolSettings settings) {
         Log l = ctx.logManager().getLog(getClass());
-        int length = getLength(ctx, settings);
+        int length = getLength(settings);
         if (length < 0) { 
             if (l.shouldLog(Log.DEBUG))
                 l.debug("Length requested is zero: " + settings);
@@ -27,13 +33,13 @@ class ExploratoryPeerSelector extends TunnelPeerSelector {
         }
         
         if (false && shouldSelectExplicit(settings)) {
-            List rv = selectExplicit(ctx, settings, length);
+            List rv = selectExplicit(settings, length);
             if (l.shouldLog(Log.DEBUG))
                 l.debug("Explicit peers selected: " + rv);
             return rv;
         }
         
-        Set exclude = getExclude(ctx, settings.isInbound(), settings.isExploratory());
+        Set<Hash> exclude = getExclude(settings.isInbound(), true);
         exclude.add(ctx.routerHash());
         // Don't use ff peers for exploratory tunnels to lessen exposure to netDb searches and stores
         // Hmm if they don't get explored they don't get a speed/capacity rating
@@ -41,17 +47,29 @@ class ExploratoryPeerSelector extends TunnelPeerSelector {
         // FloodfillNetworkDatabaseFacade fac = (FloodfillNetworkDatabaseFacade)ctx.netDb();
         // exclude.addAll(fac.getFloodfillPeers());
         HashSet matches = new HashSet(length);
-        boolean exploreHighCap = shouldPickHighCap(ctx);
-        if (exploreHighCap) 
+        boolean exploreHighCap = shouldPickHighCap();
+
+        //
+        // We don't honor IP Restriction here, to be fixed
+        //
+
+        // If hidden and inbound, use fast peers - that we probably have recently
+        // connected to and so they have our real RI - to maximize the chance
+        // that the adjacent hop can connect to us.
+        if (settings.isInbound() && ctx.router().isHidden())
+            ctx.profileOrganizer().selectFastPeers(length, exclude, matches);
+        else if (exploreHighCap) 
             ctx.profileOrganizer().selectHighCapacityPeers(length, exclude, matches);
-        else
+        else if (ctx.commSystem().haveHighOutboundCapacity())
             ctx.profileOrganizer().selectNotFailingPeers(length, exclude, matches, false);
+        else // use only connected peers so we don't make more connections
+            ctx.profileOrganizer().selectActiveNotFailingPeers(length, exclude, matches);
         
         if (l.shouldLog(Log.DEBUG))
             l.debug("profileOrganizer.selectNotFailing(" + length + ") found " + matches);
         
         matches.remove(ctx.routerHash());
-        ArrayList rv = new ArrayList(matches);
+        ArrayList<Hash> rv = new ArrayList(matches);
         if (rv.size() > 1)
             orderPeers(rv, settings.getRandomKey());
         if (settings.isInbound())
@@ -61,13 +79,41 @@ class ExploratoryPeerSelector extends TunnelPeerSelector {
         return rv;
     }
     
-    private static final int MIN_NONFAILING_PCT = 25;
-    private boolean shouldPickHighCap(RouterContext ctx) {
-        if (Boolean.valueOf(ctx.getProperty("router.exploreHighCapacity", "false")).booleanValue())
+    private static final int MIN_NONFAILING_PCT = 15;
+    private static final int MIN_ACTIVE_PEERS_STARTUP = 6;
+    private static final int MIN_ACTIVE_PEERS = 12;
+
+    /**
+     *  Should we pick from the high cap pool instead of the larger not failing pool?
+     *  This should return false most of the time, but if the not-failing pool's
+     *  build success rate is much worse, return true so that reliability
+     *  is maintained.
+     */
+    private boolean shouldPickHighCap() {
+        if (ctx.getBooleanProperty("router.exploreHighCapacity"))
             return true;
-        // no need to explore too wildly at first
+
+        // If we don't have enough connected peers, use exploratory
+        // tunnel building to get us better-connected.
+        // This is a tradeoff, we could easily lose our exploratory tunnels,
+        // but with so few connected peers, anonymity suffers and reliability
+        // will decline also, as we repeatedly try to build tunnels
+        // through the same few peers.
+        int active = ctx.commSystem().countActivePeers();
+        if (active < MIN_ACTIVE_PEERS_STARTUP)
+            return false;
+
+        // no need to explore too wildly at first (if we have enough connected peers)
         if (ctx.router().getUptime() <= 5*60*1000)
             return true;
+        // or at the end
+        if (ctx.router().gracefulShutdownInProgress())
+            return true;
+
+        // see above
+        if (active < MIN_ACTIVE_PEERS)
+            return false;
+
         // ok, if we aren't explicitly asking for it, we should try to pick peers
         // randomly from the 'not failing' pool.  However, if we are having a
         // hard time building exploratory tunnels, lets fall back again on the
@@ -77,10 +123,10 @@ class ExploratoryPeerSelector extends TunnelPeerSelector {
         if (ctx.router().getUptime() <= 11*60*1000) {
             failPct = 100 - MIN_NONFAILING_PCT;
         } else {
-            failPct = getExploratoryFailPercentage(ctx);
-            Log l = ctx.logManager().getLog(getClass());
-            if (l.shouldLog(Log.DEBUG))
-                l.debug("Normalized Fail pct: " + failPct);
+            failPct = getExploratoryFailPercentage();
+            //Log l = ctx.logManager().getLog(getClass());
+            //if (l.shouldLog(Log.DEBUG))
+            //    l.debug("Normalized Fail pct: " + failPct);
             // always try a little, this helps keep the failPct stat accurate too
             if (failPct > 100 - MIN_NONFAILING_PCT)
                 failPct = 100 - MIN_NONFAILING_PCT;
@@ -88,41 +134,44 @@ class ExploratoryPeerSelector extends TunnelPeerSelector {
         return (failPct >= ctx.random().nextInt(100));
     }
     
-    // We should really use the difference between the exploratory fail rate
-    // and the high capacity fail rate - but we don't have a stat for high cap,
-    // so use the fast (== client) fail rate, it should be close
-    // if the expl. and client tunnel lengths aren't too different.
-    // So calculate the difference between the exploratory fail rate
-    // and the client fail rate, normalized to 100:
-    //    100 * ((Efail - Cfail) / (100 - Cfail))
-    // Even this isn't the "true" rate for the NonFailingPeers pool, since we
-    // are often building exploratory tunnels using the HighCapacity pool.
-    private int getExploratoryFailPercentage(RouterContext ctx) {
-        int c = getFailPercentage(ctx, "Client");
-        int e = getFailPercentage(ctx, "Exploratory");
-        Log l = ctx.logManager().getLog(getClass());
-        if (l.shouldLog(Log.DEBUG))
-            l.debug("Client, Expl. Fail pct: " + c + ", " + e);
+    /**
+     * We should really use the difference between the exploratory fail rate
+     * and the high capacity fail rate - but we don't have a stat for high cap,
+     * so use the fast (== client) fail rate, it should be close
+     * if the expl. and client tunnel lengths aren't too different.
+     * So calculate the difference between the exploratory fail rate
+     * and the client fail rate, normalized to 100:
+     *    100 * ((Efail - Cfail) / (100 - Cfail))
+     * Even this isn't the "true" rate for the NonFailingPeers pool, since we
+     * are often building exploratory tunnels using the HighCapacity pool.
+     */
+    private int getExploratoryFailPercentage() {
+        int c = getFailPercentage("Client");
+        int e = getFailPercentage("Exploratory");
+        //Log l = ctx.logManager().getLog(getClass());
+        //if (l.shouldLog(Log.DEBUG))
+        //    l.debug("Client, Expl. Fail pct: " + c + ", " + e);
         if (e <= c || e <= 25) // doing very well (unlikely)
             return 0;
-        if (c >= 90) // doing very badly
+        // Doing very badly? This is important to prevent network congestion collapse
+        if (c >= 70 || e >= 75)
             return 100 - MIN_NONFAILING_PCT;
         return (100 * (e-c)) / (100-c);
     }
 
-    private int getFailPercentage(RouterContext ctx, String t) {
+    private int getFailPercentage(String t) {
         String pfx = "tunnel.build" + t;
-        int timeout = getEvents(ctx, pfx + "Expire", 10*60*1000);
-        int reject = getEvents(ctx, pfx + "Reject", 10*60*1000);
-        int accept = getEvents(ctx, pfx + "Success", 10*60*1000);
+        int timeout = getEvents(pfx + "Expire", 10*60*1000);
+        int reject = getEvents(pfx + "Reject", 10*60*1000);
+        int accept = getEvents(pfx + "Success", 10*60*1000);
         if (accept + reject + timeout <= 0)
             return 0;
         double pct = (double)(reject + timeout) / (accept + reject + timeout);
         return (int)(100 * pct);
     }
     
-    // Use current + last to get more recent and smoother data
-    private int getEvents(RouterContext ctx, String stat, long period) {
+    /** Use current + last to get more recent and smoother data */
+    private int getEvents(String stat, long period) {
         RateStat rs = ctx.statManager().getRate(stat);
         if (rs == null) 
             return 0;

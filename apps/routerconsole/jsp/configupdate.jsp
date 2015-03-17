@@ -1,56 +1,76 @@
 <%@page contentType="text/html"%>
+<%@page trimDirectiveWhitespaces="true"%>
 <%@page pageEncoding="UTF-8"%>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 
 <html><head>
-<title>I2P Router Console - config update</title>
-<link rel="stylesheet" href="default.css" type="text/css" />
-</head><body>
+<%@include file="css.jsi" %>
+<%=intl.title("config update")%>
+<script src="/js/ajax.js" type="text/javascript"></script>
+<%@include file="summaryajax.jsi" %>
+</head><body onload="initAjax()">
 
-<%@include file="nav.jsp" %>
-<%@include file="summary.jsp" %>
-
+<%@include file="summary.jsi" %>
+<h1><%=intl._("I2P Update Configuration")%></h1>
 <div class="main" id="main">
- <%@include file="confignav.jsp" %>
-  
- <jsp:useBean class="net.i2p.router.web.ConfigUpdateHandler" id="formhandler" scope="request" />
- <jsp:setProperty name="formhandler" property="*" />
- <jsp:setProperty name="formhandler" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
- <font color="red"><jsp:getProperty name="formhandler" property="errors" /></font>
- <i><jsp:getProperty name="formhandler" property="notices" /></i>
- 
- <jsp:useBean class="net.i2p.router.web.ConfigUpdateHelper" id="updatehelper" scope="request" />
- <jsp:setProperty name="updatehelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
- 
- <br /><i><jsp:getProperty name="updatehelper" property="newsStatus" /></i><br />&nbsp;<br />
- <form action="configupdate.jsp" method="POST">
- <% String prev = System.getProperty("net.i2p.router.web.ConfigUpdateHandler.nonce");
-    if (prev != null) System.setProperty("net.i2p.router.web.ConfigUpdateHandler.noncePrev", prev);
-    System.setProperty("net.i2p.router.web.ConfigUpdateHandler.nonce", new java.util.Random().nextLong()+""); %>
- <input type="hidden" name="nonce" value="<%=System.getProperty("net.i2p.router.web.ConfigUpdateHandler.nonce")%>" />
- <% if ("true".equals(System.getProperty("net.i2p.router.web.UpdateHandler.updateInProgress", "false"))) { %>
- <i>Update In Progress</i><br /><br />
- <% } else { %>
- <input type="submit" name="action" value="Check for update now" /><br /><br />
- <% } %>
- News URL:
- <input type="text" size="60" name="newsURL" value="<jsp:getProperty name="updatehelper" property="newsURL" />"><br />
- Refresh frequency:
- <jsp:getProperty name="updatehelper" property="refreshFrequencySelectBox" /><br />
- Update policy:
- <jsp:getProperty name="updatehelper" property="updatePolicySelectBox" /><br />
- <p>Update through the eepProxy?
- <jsp:getProperty name="updatehelper" property="updateThroughProxy" /><br />
- eepProxy host: <input type="text" size="10" name="proxyHost" value="<jsp:getProperty name="updatehelper" property="proxyHost" />" /><br />
- eepProxy port: <input type="text" size="4" name="proxyPort" value="<jsp:getProperty name="updatehelper" property="proxyPort" />" /></p>
- <p>Update URLs:<br />
- <textarea name="updateURL" cols="90" rows="4" wrap="off"><jsp:getProperty name="updatehelper" property="updateURL" /></textarea></p>
- <p>Trusted keys:</br />
- <textarea name="trustedKeys" cols="90" rows="4" wrap="off"><jsp:getProperty name="updatehelper" property="trustedKeys" /></textarea></p>
- <br />
- <input type="submit" name="action" value="Save" />
- </form>
-</div>
+ <%@include file="confignav.jsi" %>
 
-</body>
-</html>
+ <jsp:useBean class="net.i2p.router.web.ConfigUpdateHandler" id="formhandler" scope="request" />
+ <% formhandler.storeMethod(request.getMethod()); %>
+ <jsp:setProperty name="formhandler" property="*" />
+ <jsp:setProperty name="formhandler" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
+ <jsp:getProperty name="formhandler" property="allMessages" />
+ <jsp:useBean class="net.i2p.router.web.ConfigUpdateHelper" id="updatehelper" scope="request" />
+ <jsp:setProperty name="updatehelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
+<div class="messages">
+ <jsp:getProperty name="updatehelper" property="newsStatus" /></div>
+<div class="configure">
+ <form action="" method="POST">
+ <input type="hidden" name="nonce" value="<jsp:getProperty name="formhandler" property="newNonce" />" >
+ <% /* set hidden default */ %>
+ <input type="submit" name="action" value="" style="display:none" >
+    <% if (updatehelper.canInstall()) { %>
+      <h3><%=intl._("Check for I2P and news updates")%></h3>
+      <div class="wideload"><table border="0" cellspacing="5">
+        <tr><td colspan="2"></tr>
+        <tr><td class="mediumtags" align="right"><b><%=intl._("News &amp; I2P Updates")%>:</b></td>
+     <% } else { %>
+      <h3><%=intl._("Check for news updates")%></h3>
+      <div class="wideload"><table border="0" cellspacing="5">
+        <tr><td colspan="2"></tr>
+        <tr><td class="mediumtags" align="right"><b><%=intl._("News Updates")%>:</b></td>
+     <% }   // if canInstall %>
+          <td> <% if ("true".equals(System.getProperty("net.i2p.router.web.UpdateHandler.updateInProgress", "false"))) { %> <i><%=intl._("Update In Progress")%></i><br> <% } else { %> <input type="submit" name="action" class="check" value="<%=intl._("Check for updates")%>" />
+            <% } %></td></tr>
+        <tr><td colspan="2"><br></td></tr>
+        <tr><td class="mediumtags" align="right"><b><%=intl._("News URL")%>:</b></td>
+          <td><input type="text" size="60" name="newsURL" value="<jsp:getProperty name="updatehelper" property="newsURL" />"></td>
+        </tr><tr><td class="mediumtags" align="right"><b><%=intl._("Refresh frequency")%>:</b>
+          <td><jsp:getProperty name="updatehelper" property="refreshFrequencySelectBox" /></td></tr>
+    <% if (updatehelper.canInstall()) { %>
+        <tr><td class="mediumtags" align="right"><b><%=formhandler._("Update policy")%>:</b></td>
+          <td><jsp:getProperty name="updatehelper" property="updatePolicySelectBox" /></td></tr>
+    <% }   // if canInstall %>
+        <tr><td class="mediumtags" align="right"><b><%=intl._("Update through the eepProxy?")%></b></td>
+          <td><jsp:getProperty name="updatehelper" property="updateThroughProxy" /></td>
+        </tr><tr><td class="mediumtags" align="right"><b><%=intl._("eepProxy host")%>:</b></td>
+          <td><input type="text" size="10" name="proxyHost" value="<jsp:getProperty name="updatehelper" property="proxyHost" />" /></td>
+        </tr><tr><td class="mediumtags" align="right"><b><%=intl._("eepProxy port")%>:</b></td>
+          <td><input type="text" size="10" name="proxyPort" value="<jsp:getProperty name="updatehelper" property="proxyPort" />" /></td></tr>
+    <% if (updatehelper.canInstall()) { %>
+        <tr><td class="mediumtags" align="right"><b><%=intl._("Update URLs")%>:</b></td>
+          <td><textarea cols="60" rows="6" name="updateURL" wrap="off" spellcheck="false"><jsp:getProperty name="updatehelper" property="updateURL" /></textarea></td>
+        </tr><tr><td class="mediumtags" align="right"><b><%=intl._("Trusted keys")%>:</b></td>
+          <td><textarea cols="60" rows="6" name="trustedKeys" wrap="off" spellcheck="false"><jsp:getProperty name="updatehelper" property="trustedKeys" /></textarea></td>
+        </tr><tr><td id="unsignedbuild" class="mediumtags" align="right"><b><%=intl._("Update with unsigned development builds?")%></b></td>
+          <td><jsp:getProperty name="updatehelper" property="updateUnsigned" /></td>
+        </tr><tr><td class="mediumtags" align="right"><b><%=intl._("Unsigned Build URL")%>:</b></td>
+          <td><input type="text" size="60" name="zipURL" value="<jsp:getProperty name="updatehelper" property="zipURL" />"></td></tr>
+    <% } else { %>
+        <tr><td class="mediumtags" align="center" colspan="2"><b><%=intl._("Updates will be dispatched via your package manager.")%></b></td></tr>
+    <% }   // if canInstall %>
+        <tr class="tablefooter"><td colspan="2">
+        <div class="formaction">
+            <input type="reset" class="cancel" value="<%=intl._("Cancel")%>" >
+            <input type="submit" name="action" class="accept" value="<%=intl._("Save")%>" >
+        </div></td></tr></table></div></form></div></div></body></html>

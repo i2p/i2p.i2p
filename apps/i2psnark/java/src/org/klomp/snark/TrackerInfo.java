@@ -23,7 +23,7 @@ package org.klomp.snark;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashSet;
-import java.util.Iterator;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -32,25 +32,34 @@ import org.klomp.snark.bencode.BDecoder;
 import org.klomp.snark.bencode.BEValue;
 import org.klomp.snark.bencode.InvalidBEncodingException;
 
+/**
+ *  The data structure for the tracker response.
+ *  Handles both traditional and compact formats.
+ *  Compact format 1 - a list of hashes - early format for testing
+ *  Compact format 2 - One big string of concatenated hashes - official format
+ */
 public class TrackerInfo
 {
   private final String failure_reason;
   private final int interval;
-  private final Set peers;
+  private final Set<Peer> peers;
+  private int complete;
+  private int incomplete;
 
-  public TrackerInfo(InputStream in, byte[] my_id, MetaInfo metainfo)
+  /** @param metainfo may be null */
+  public TrackerInfo(InputStream in, byte[] my_id, byte[] infohash, MetaInfo metainfo)
     throws IOException
   {
-    this(new BDecoder(in), my_id, metainfo);
+    this(new BDecoder(in), my_id, infohash, metainfo);
   }
 
-  public TrackerInfo(BDecoder be, byte[] my_id, MetaInfo metainfo)
+  private TrackerInfo(BDecoder be, byte[] my_id, byte[] infohash, MetaInfo metainfo)
     throws IOException
   {
-    this(be.bdecodeMap().getMap(), my_id, metainfo);
+    this(be.bdecodeMap().getMap(), my_id, infohash, metainfo);
   }
 
-  public TrackerInfo(Map m, byte[] my_id, MetaInfo metainfo)
+  private TrackerInfo(Map m, byte[] my_id, byte[] infohash, MetaInfo metainfo)
     throws IOException
   {
     BEValue reason = (BEValue)m.get("failure reason");
@@ -68,51 +77,117 @@ public class TrackerInfo
           throw new InvalidBEncodingException("No interval given");
         else
           interval = beInterval.getInt();
+
         BEValue bePeers = (BEValue)m.get("peers");
-        if (bePeers == null)
-          throw new InvalidBEncodingException("No peer list");
-        else
-          peers = getPeers(bePeers.getList(), my_id, metainfo);
+        if (bePeers == null) {
+          peers = Collections.EMPTY_SET;
+        } else {
+            Set<Peer> p;
+            try {
+              // One big string (the official compact format)
+              p = getPeers(bePeers.getBytes(), my_id, infohash, metainfo);
+            } catch (InvalidBEncodingException ibe) {
+              // List of Dictionaries or List of Strings
+              p = getPeers(bePeers.getList(), my_id, infohash, metainfo);
+            }
+            peers = p;
+        }
+
+        BEValue bev = (BEValue)m.get("complete");
+        if (bev != null) try {
+          complete = bev.getInt();
+          if (complete < 0)
+              complete = 0;
+        } catch (InvalidBEncodingException ibe) {}
+
+        bev = (BEValue)m.get("incomplete");
+        if (bev != null) try {
+          incomplete = bev.getInt();
+          if (incomplete < 0)
+              incomplete = 0;
+        } catch (InvalidBEncodingException ibe) {}
       }
   }
 
-  public static Set getPeers(InputStream in, byte[] my_id, MetaInfo metainfo)
+/******
+  public static Set<Peer> getPeers(InputStream in, byte[] my_id, MetaInfo metainfo)
     throws IOException
   {
     return getPeers(new BDecoder(in), my_id, metainfo);
   }
 
-  public static Set getPeers(BDecoder be, byte[] my_id, MetaInfo metainfo)
+  public static Set<Peer> getPeers(BDecoder be, byte[] my_id, MetaInfo metainfo)
     throws IOException
   {
     return getPeers(be.bdecodeList().getList(), my_id, metainfo);
   }
+******/
 
-  public static Set getPeers(List l, byte[] my_id, MetaInfo metainfo)
+  /** List of Dictionaries or List of Strings */
+  private static Set<Peer> getPeers(List<BEValue> l, byte[] my_id, byte[] infohash, MetaInfo metainfo)
     throws IOException
   {
-    Set peers = new HashSet(l.size());
+    Set<Peer> peers = new HashSet(l.size());
 
-    Iterator it = l.iterator();
-    while (it.hasNext())
-      {
+    for (BEValue bev : l) {
         PeerID peerID;
         try {
-            peerID = new PeerID(((BEValue)it.next()).getMap());
+            // Case 1 - non-compact - A list of dictionaries (maps)
+            peerID = new PeerID(bev.getMap());
         } catch (InvalidBEncodingException ibe) {
-            // don't let one bad entry spoil the whole list
-            //Snark.debug("Discarding peer from list: " + ibe, Snark.ERROR);
-            continue;
+            try {
+                // Case 2 - compact - A list of 32-byte binary strings (hashes)
+                // This was just for testing and is not the official format
+                peerID = new PeerID(bev.getBytes());
+            } catch (InvalidBEncodingException ibe2) {
+                // don't let one bad entry spoil the whole list
+                //Snark.debug("Discarding peer from list: " + ibe, Snark.ERROR);
+                continue;
+            }
         }
-        peers.add(new Peer(peerID, my_id, metainfo));
+        peers.add(new Peer(peerID, my_id, infohash, metainfo));
       }
 
     return peers;
   }
 
-  public Set getPeers()
+  private static final int HASH_LENGTH = 32;
+
+  /**
+   *  One big string of concatenated 32-byte hashes
+   *  @since 0.8.1
+   */
+  private static Set<Peer> getPeers(byte[] l, byte[] my_id, byte[] infohash, MetaInfo metainfo)
+    throws IOException
+  {
+    int count = l.length / HASH_LENGTH;
+    Set<Peer> peers = new HashSet(count);
+
+    for (int i = 0; i < count; i++) {
+        PeerID peerID;
+        byte[] hash = new byte[HASH_LENGTH];
+        System.arraycopy(l, i * HASH_LENGTH, hash, 0, HASH_LENGTH);
+        try {
+            peerID = new PeerID(hash);
+        } catch (InvalidBEncodingException ibe) {
+            // won't happen
+            continue;
+        }
+        peers.add(new Peer(peerID, my_id, infohash, metainfo));
+      }
+
+    return peers;
+  }
+
+  public Set<Peer> getPeers()
   {
     return peers;
+  }
+
+  public int getPeerCount()
+  {
+    int pc = peers == null ? 0 : peers.size();
+    return Math.max(pc, complete + incomplete - 1);
   }
 
   public String getFailureReason()
@@ -125,12 +200,15 @@ public class TrackerInfo
     return interval;
   }
 
+    @Override
   public String toString()
   {
     if (failure_reason != null)
       return "TrackerInfo[FAILED: " + failure_reason + "]";
     else
       return "TrackerInfo[interval=" + interval
+        + (complete > 0 ? (", complete=" + complete) : "" )
+        + (incomplete > 0 ? (", incomplete=" + incomplete) : "" )
         + ", peers=" + peers + "]";
   }
 }

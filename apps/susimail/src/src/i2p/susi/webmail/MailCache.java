@@ -47,9 +47,9 @@ public class MailCache {
 	/**
 	 * Fetch any needed data from pop3 server.
 	 * 
-	 * @param id message id to get
+	 * @param uidl message id to get
 	 * @param headerOnly fetch only header lines?
-	 * @return
+	 * @return An e-mail
 	 */
 	public Mail getMail( String uidl, boolean headerOnly ) {
 		

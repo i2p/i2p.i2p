@@ -1,0 +1,180 @@
+/* I2P Tunnel Edit Page
+*/
+
+#tunnelEditPage input {
+    width: 458px;
+}
+
+#tunnelEditPage select {
+    width: 308px;
+}
+
+#tunnelEditPage option[selected] {
+    color: green;
+}
+
+#tunnelEditPage #targetField,
+#tunnelEditPage #accessField,
+#tunnelEditPage #optionsField {
+    height: 48px;
+    width: 150px;
+}
+#tunnelEditPage #tunnelOptionsField {
+    height: 96px;
+    width: 150px;
+}
+
+#tunnelEditPage #targetField label,
+#tunnelEditPage #accessField label,
+#tunnelEditPage #tunnelOptionsField label,
+#tunnelEditPage #optionsField label{
+    height: 48px;
+    width: 150px;
+}
+
+#tunnelEditPage #reachField,
+#tunnelEditPage #hostField,
+#tunnelEditPage #depthField,
+#tunnelEditPage #countField,
+#tunnelEditPage #optionsHostField {
+    width: 304px;
+    margin-right: 4px;
+}
+
+#tunnelEditPage #portField,
+#tunnelEditPage #optionsPortField,
+#tunnelEditPage #backupField,
+#tunnelEditPage #varianceField {
+    width: 150px;
+
+}
+
+#tunnelEditPage #reachField label,
+#tunnelEditPage #hostField label,
+#tunnelEditPage #portField label,
+#tunnelEditPage #optionsHostField label,
+#tunnelEditPage #optionsPortField label,
+#tunnelEditPage #depthField label,
+#tunnelEditPage #countField label,
+#tunnelEditPage #backupField label,
+#tunnelEditPage #varianceField label {
+    text-align: left;
+
+}
+
+#tunnelEditPage #otherField label {
+    width: 300px;
+}
+
+#tunnelEditPage #reachableByOther,
+#tunnelEditPage #tunnelDepth,
+#tunnelEditPage #tunnelQuantity,
+#tunnelEditPage #targetHost,
+#tunnelEditPage #clientHost {
+    width: 306px;
+}
+
+#tunnelEditPage #port {
+    width: 80px;
+}
+
+#tunnelEditPage #targetPort,
+#tunnelEditPage #clientPort,
+#tunnelEditPage #tunnelBackupQuantity,
+#tunnelEditPage #tunnelVariance {
+    width: 150px;
+}
+
+#tunnelEditPage #shared,
+#tunnelEditPage #connectDelay,
+#tunnelEditPage #startOnLoad {
+    width: 16px;
+}
+
+#tunnelEditPage label {
+    width: 150px;
+    font-weight: bold;
+    text-align: right;
+    float: left;
+}
+
+/* I2P Tunnel List Page
+*/
+
+#tunnelListPage .rowItem {
+    width: 150px;
+}
+
+#tunnelListPage select {
+    width: 150px;
+}
+
+#tunnelListPage textarea {
+    width: 100%;
+    height: 88px;
+    padding: 0 0 0 4px;
+    color: green;
+    margin-bottom: 7px;
+}
+
+#tunnelListPage .footer .control {
+    margin-left: 2px;
+}
+
+#tunnelListPage .footer label {
+    text-align: right;
+    height: 24px;
+    width: 360px;
+    float: left;
+
+}
+
+/* Use Leary and Langridge content replacement methods (LIR)
+** to embed accessibility information into the document.
+** Should allow the lists to be rendered nicely by
+** screen readers. (and lynx!)
+*/
+
+#tunnelListPage label {
+    height: 0;
+    width: 0;
+    overflow: hidden;
+}
+
+#tunnelListPage .nameHeaderField label,
+#tunnelListPage .portHeaderField label,
+#tunnelListPage .typeHeaderField label,
+#tunnelListPage .interfaceHeaderField label,
+#tunnelListPage .targetHeaderField label,
+#tunnelListPage .previewHeaderField label,
+#tunnelListPage .statusHeaderField label {
+    text-align: left;
+    width: 150px;
+    height: 24px;
+    float: left;
+}
+
+#tunnelListPage .targetField,
+#tunnelListPage .targetField .text,
+#tunnelListPage .targetHeaderField,
+#tunnelListPage .targetHeaderField label {
+    width: 300px;
+}
+
+#tunnelListPage .descriptionField,
+#tunnelListPage .destinationField {
+    width: 750px;
+}
+
+#tunnelListPage .descriptionField .text,
+#tunnelListPage .destinationField .text {
+    width: 450px;
+}
+
+#tunnelListPage .descriptionField label,
+#tunnelListPage .destinationField label {
+    text-align: right;
+    width: 150px;
+    height: 24px;
+    float: left;
+}

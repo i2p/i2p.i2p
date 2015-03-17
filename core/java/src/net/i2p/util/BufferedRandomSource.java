@@ -10,12 +10,13 @@ package net.i2p.util;
  */
 
 import net.i2p.I2PAppContext;
-import net.i2p.data.DataHelper;
 
 /**
  * Allocate data out of a large buffer of data, rather than the PRNG's 
  * (likely) small buffer to reduce the frequency of prng recalcs (though
  * the recalcs are now more time consuming).
+ *
+ * @deprecated Unused! See FortunaRandomSource
  *
  */
 public class BufferedRandomSource extends RandomSource {
@@ -182,14 +183,14 @@ public class BufferedRandomSource extends RandomSource {
         return nextBits(1) != 0;
     }
     
-    private static final double DOUBLE_DENOMENATOR = (double)(1L << 53);
+    private static final double DOUBLE_DENOMENATOR = (1L << 53);
     /** defined per javadoc ( ((nextBits(26)<<27) + nextBits(27)) / (1 << 53)) */
     @Override
     public final double nextDouble() { 
-        long top = (((long)nextBits(26) << 27) + nextBits(27));
+        long top = ((nextBits(26) << 27) + nextBits(27));
         return top / DOUBLE_DENOMENATOR;
     }
-    private static final float FLOAT_DENOMENATOR = (float)(1 << 24);
+    private static final float FLOAT_DENOMENATOR = (1 << 24);
     /** defined per javadoc (nextBits(24) / ((float)(1 << 24)) ) */
     @Override
     public float nextFloat() { 
@@ -202,6 +203,7 @@ public class BufferedRandomSource extends RandomSource {
         return super.nextGaussian(); 
     }
     
+/*****
     public static void main(String args[]) {
         for (int i = 0; i < 16; i++)
             test();
@@ -218,7 +220,7 @@ public class BufferedRandomSource extends RandomSource {
         System.out.println("Data: " + data.length + "/" + compressed.length + ": " + toString(data));
     }
     private static final String toString(byte data[]) {
-        StringBuffer buf = new StringBuffer(data.length * 9);
+        StringBuilder buf = new StringBuilder(data.length * 9);
         for (int i = 0; i < data.length; i++) {
             for (int j = 0; j < 8; j++) {
                 if ((data[i] & (1 << j)) != 0)
@@ -230,4 +232,5 @@ public class BufferedRandomSource extends RandomSource {
         }
         return buf.toString();
     }
+*****/
 }

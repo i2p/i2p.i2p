@@ -2,6 +2,7 @@ package net.i2p.router.transport.ntcp;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.ThreadFactory;
@@ -22,43 +23,58 @@ import net.i2p.util.Log;
  *
  * @author zzz
  */
-public class NTCPSendFinisher {
-    private static final int THREADS = 4;
-    private I2PAppContext _context;
-    private NTCPTransport _transport;
-    private Log _log;
-    private int _count;
+class NTCPSendFinisher {
+    private static final int MIN_THREADS = 1;
+    private static final int MAX_THREADS = 4;
+    private final I2PAppContext _context;
+    private final NTCPTransport _transport;
+    private final Log _log;
+    private static int _count;
     private ThreadPoolExecutor _executor;
+    private static final int THREADS;
+    static {
+        long maxMemory = Runtime.getRuntime().maxMemory();
+        if (maxMemory == Long.MAX_VALUE)
+            maxMemory = 96*1024*1024l;
+        THREADS = (int) Math.max(MIN_THREADS, Math.min(MAX_THREADS, 1 + (maxMemory / (32*1024*1024))));
+    }
 
     public NTCPSendFinisher(I2PAppContext context, NTCPTransport transport) {
         _context = context;
         _log = _context.logManager().getLog(NTCPSendFinisher.class);
         _transport = transport;
+        //_context.statManager().createRateStat("ntcp.sendFinishTime", "How long to queue and excecute msg.afterSend()", "ntcp", new long[] {5*1000});
     }
     
     public void start() {
         _count = 0;
-        _executor = new CustomThreadPoolExecutor();
+        _executor = new CustomThreadPoolExecutor(THREADS);
     }
 
     public void stop() {
-        _executor.shutdownNow();
+        if (_executor != null)
+            _executor.shutdownNow();
     }
 
     public void add(OutNetMessage msg) {
-        _executor.execute(new RunnableEvent(msg));
+        try {
+            _executor.execute(new RunnableEvent(msg));
+        } catch (RejectedExecutionException ree) {
+            // race with stop()
+            _log.warn("NTCP send finisher stopped, discarding msg.afterSend()");
+        }
     }
     
     // not really needed for now but in case we want to add some hooks like afterExecute()
-    private class CustomThreadPoolExecutor extends ThreadPoolExecutor {
-        public CustomThreadPoolExecutor() {
+    private static class CustomThreadPoolExecutor extends ThreadPoolExecutor {
+        public CustomThreadPoolExecutor(int num) {
              // use unbounded queue, so maximumPoolSize and keepAliveTime have no effect
-             super(THREADS, THREADS, 1000, TimeUnit.MILLISECONDS,
+             super(num, num, 1000, TimeUnit.MILLISECONDS,
                    new LinkedBlockingQueue(), new CustomThreadFactory());
         }
     }
 
-    private class CustomThreadFactory implements ThreadFactory {
+    private static class CustomThreadFactory implements ThreadFactory {
         public Thread newThread(Runnable r) {
             Thread rv = Executors.defaultThreadFactory().newThread(r);
             rv.setName("NTCPSendFinisher " + (++_count) + '/' + THREADS);
@@ -71,15 +87,19 @@ public class NTCPSendFinisher {
      * Call afterSend() for the message
      */
     private class RunnableEvent implements Runnable {
-        private OutNetMessage _msg;
+        private final OutNetMessage _msg;
+        //private final long _queued;
 
         public RunnableEvent(OutNetMessage msg) {
             _msg = msg;
+            //_queued = _context.clock().now();
         }
 
         public void run() {
             try {
                 _transport.afterSend(_msg, true, false, _msg.getSendTime());
+                // appx 0.1 ms
+                //_context.statManager().addRateData("ntcp.sendFinishTime", _context.clock().now() - _queued, 0);
             } catch (Throwable t) {
                 _log.log(Log.CRIT, " wtf, afterSend borked", t);
             }

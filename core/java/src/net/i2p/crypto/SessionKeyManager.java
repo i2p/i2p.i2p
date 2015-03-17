@@ -9,6 +9,8 @@ package net.i2p.crypto;
  *
  */
 
+import java.io.IOException;
+import java.io.Writer;
 import java.util.Set;
 
 import net.i2p.I2PAppContext;
@@ -22,22 +24,34 @@ import net.i2p.data.SessionTag;
  * unknown (and hence always forces a full ElGamal encryption for each message).
  * A more intelligent subclass should manage and persist keys and tags.
  *
+ * TODO if we aren't going to use this for testing, make it abstract.
  */
 public class SessionKeyManager {
-    /** session key managers must be created through an app context */
-    protected SessionKeyManager(I2PAppContext context) { // nop
-    }
 
-    /** see above */
-    private SessionKeyManager() { // nop
+    /**
+     *  Make this public if you need a dummy SessionKeyManager for testing
+     */
+    protected SessionKeyManager(I2PAppContext context) { // nop
     }
     
     /**
      * Retrieve the session key currently associated with encryption to the target,
      * or null if a new session key should be generated.
      *
+     * Warning - don't generate a new session if this returns null, it's racy, use getCurrentOrNewKey()
      */
     public SessionKey getCurrentKey(PublicKey target) {
+        return null;
+    }
+
+    /**
+     * Retrieve the session key currently associated with encryption to the target.
+     * Generates a new session and session key if not previously exising.
+     *
+     * @return non-null
+     * @since 0.9
+     */
+    public SessionKey getCurrentOrNewKey(PublicKey target) {
         return null;
     }
 
@@ -45,6 +59,8 @@ public class SessionKeyManager {
      * Associate a new session key with the specified target.  Metrics to determine
      * when to expire that key begin with this call.
      *
+     * Racy if called after getCurrentKey() to check for a current session;
+     * use getCurrentOrNewKey() in that case.
      */
     public void createSession(PublicKey target, SessionKey key) { // nop
     }
@@ -52,6 +68,8 @@ public class SessionKeyManager {
     /**
      * Generate a new session key and associate it with the specified target.  
      *
+     * Racy if called after getCurrentKey() to check for a current session;
+     * use getCurrentOrNewKey() in that case.
      */
     public SessionKey createSession(PublicKey target) {
         SessionKey key = KeyGenerator.getInstance().generateSessionKey();
@@ -69,6 +87,31 @@ public class SessionKeyManager {
     public SessionTag consumeNextAvailableTag(PublicKey target, SessionKey key) {
         return null;
     }
+
+    /**
+     *  How many to send, IF we need to.
+     *  @since 0.9.2
+     */
+    public int getTagsToSend() { return 0; };
+
+    /**
+     *  @since 0.9.2
+     */
+    public int getLowThreshold() { return 0; };
+
+    /**
+     *  @return true if we have less than the threshold or what we have is about to expire
+     *  @since 0.9.2
+     */
+    public boolean shouldSendTags(PublicKey target, SessionKey key) {
+        return shouldSendTags(target, key, getLowThreshold());
+    }
+
+    /**
+     *  @return true if we have less than the threshold or what we have is about to expire
+     *  @since 0.9.2
+     */
+    public boolean shouldSendTags(PublicKey target, SessionKey key, int lowThreshold) { return false; }
 
     /**
      * Determine (approximately) how many available session tags for the current target
@@ -93,7 +136,8 @@ public class SessionKeyManager {
      * method after receiving an ack to a message delivering them)
      *
      */
-    public void tagsDelivered(PublicKey target, SessionKey key, Set sessionTags) { // nop
+    public TagSetHandle tagsDelivered(PublicKey target, SessionKey key, Set<SessionTag> sessionTags) { // nop
+         return null;
     }
 
     /**
@@ -109,7 +153,7 @@ public class SessionKeyManager {
      * Accept the given tags and associate them with the given key for decryption
      *
      */
-    public void tagsReceived(SessionKey key, Set sessionTags) { // nop
+    public void tagsReceived(SessionKey key, Set<SessionTag> sessionTags) { // nop
     }
 
     /**
@@ -130,4 +174,8 @@ public class SessionKeyManager {
      */
     public void shutdown() { // nop
     }
+
+    public void renderStatusHTML(Writer out) throws IOException {}
+    public void failTags(PublicKey target, SessionKey key, TagSetHandle ts) {}
+    public void tagsAcked(PublicKey target, SessionKey key, TagSetHandle ts) {}
 }

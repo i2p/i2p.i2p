@@ -27,11 +27,9 @@ import net.i2p.util.Log;
  *
  */
 class SchedulerConnecting extends SchedulerImpl {
-    private Log _log;
     
     public SchedulerConnecting(I2PAppContext ctx) {
         super(ctx);
-        _log = ctx.logManager().getLog(SchedulerConnecting.class);
     }
     
     public boolean accept(Connection con) {

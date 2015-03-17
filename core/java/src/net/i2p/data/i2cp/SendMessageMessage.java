@@ -17,7 +17,6 @@ import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.Payload;
-import net.i2p.util.Log;
 
 /**
  * Defines the message a client sends to a router to ask it to deliver
@@ -26,7 +25,6 @@ import net.i2p.util.Log;
  * @author jrandom
  */
 public class SendMessageMessage extends I2CPMessageImpl {
-    private final static Log _log = new Log(SendMessageMessage.class);
     public final static int MESSAGE_TYPE = 5;
     private SessionId _sessionId;
     private Destination _destination;
@@ -34,10 +32,6 @@ public class SendMessageMessage extends I2CPMessageImpl {
     private long _nonce;
 
     public SendMessageMessage() {
-        setSessionId(null);
-        setDestination(null);
-        setPayload(null);
-        setNonce(0);
     }
 
     public SessionId getSessionId() {
@@ -135,6 +129,7 @@ public class SendMessageMessage extends I2CPMessageImpl {
         return MESSAGE_TYPE;
     }
 
+    /* FIXME missing hashCode() method FIXME */
     @Override
     public boolean equals(Object object) {
         if ((object != null) && (object instanceof SendMessageMessage)) {
@@ -149,7 +144,7 @@ public class SendMessageMessage extends I2CPMessageImpl {
 
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append("[SendMessageMessage: ");
         buf.append("\n\tSessionId: ").append(getSessionId());
         buf.append("\n\tNonce: ").append(getNonce());

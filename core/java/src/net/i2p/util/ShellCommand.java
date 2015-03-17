@@ -34,6 +34,7 @@ public class ShellCommand {
     private static final boolean NO_WAIT_FOR_EXIT_STATUS = false;
 
     private boolean       _commandSuccessful;
+    private boolean       _commandCompleted;
     private CommandThread _commandThread;
     private InputStream   _errorStream;
     private InputStream   _inputStream;
@@ -43,16 +44,21 @@ public class ShellCommand {
 
     /**
      * Executes a shell command in its own thread.
+     * Use caution when repeatedly calling execute methods with the same object
+     * as there are some globals here...
      * 
      * @author hypercubus
      */
     private class CommandThread extends Thread {
 
-        Object  caller;
-        boolean consumeOutput;
-        String  shellCommand;
+        private final Object  caller;
+        private final boolean consumeOutput;
+        private final Object shellCommand;
 
-        CommandThread(Object caller, String shellCommand, boolean consumeOutput) {
+        /**
+         *  @param shellCommand either a String or a String[] (since 0.8.3)
+         */
+        CommandThread(Object caller, Object shellCommand, boolean consumeOutput) {
             super("CommandThread");
             this.caller = caller;
             this.shellCommand = shellCommand;
@@ -61,7 +67,10 @@ public class ShellCommand {
 
         @Override
         public void run() {
+            // FIXME these will corrupt the globals if the command times out and the caller
+            // makes another request with the same object.
             _commandSuccessful = execute(shellCommand, consumeOutput, WAIT_FOR_EXIT_STATUS);
+            _commandCompleted = true;
             if (_isTimerRunning) {
                 synchronized(caller) {
                     caller.notifyAll();  // In case the caller is still in the wait() state.
@@ -80,7 +89,7 @@ public class ShellCommand {
      * 
      * @author hypercubus
      */
-    private class StreamConsumer extends Thread {
+    private static class StreamConsumer extends Thread {
 
         private BufferedReader    bufferedReader;
         private InputStreamReader inputStreamReader;
@@ -94,10 +103,8 @@ public class ShellCommand {
         @Override
         public void run() {
 
-            String streamData;
-
             try {
-                while ((streamData = bufferedReader.readLine()) != null) {
+                while ((bufferedReader.readLine()) != null) {
                     // Just like a Hoover.
                 }
             } catch (IOException e) {
@@ -114,7 +121,7 @@ public class ShellCommand {
      * 
      * @author hypercubus
      */
-    private class StreamReader extends Thread {
+    private static class StreamReader extends Thread {
 
         private BufferedReader    bufferedReader;
         private InputStreamReader inputStreamReader;
@@ -150,7 +157,7 @@ public class ShellCommand {
      * 
      * @author hypercubus
      */
-    private class StreamWriter extends Thread {
+    private static class StreamWriter extends Thread {
 
         private BufferedWriter     bufferedWriter;
         private BufferedReader     in;
@@ -174,7 +181,7 @@ public class ShellCommand {
                     bufferedWriter.write(input, 0, input.length());
                     bufferedWriter.flush();
                 }
-            } catch (Exception e) {
+            } catch (IOException e) {
                 try {
                     bufferedWriter.flush();
                 } catch (IOException e1) {
@@ -192,6 +199,9 @@ public class ShellCommand {
      * {@link #getErrorStream()}, respectively. Input can be passed to the
      * <code>STDIN</code> of the shell process via {@link #getInputStream()}.
      * 
+     * Warning, no good way to quote or escape spaces in arguments with this method.
+     * @deprecated unused
+     * 
      * @param shellCommand The command for the shell to execute.
      */
     public void execute(String shellCommand) {
@@ -206,6 +216,9 @@ public class ShellCommand {
      * {@link #getOutputStream()} and {@link #getErrorStream()}, respectively.
      * Input can be passed to the <code>STDIN</code> of the shell process via
      * {@link #getInputStream()}.
+     * 
+     * Warning, no good way to quote or escape spaces in arguments with this method.
+     * @deprecated unused
      * 
      * @param  shellCommand The command for the shell to execute.
      * @return              <code>true</code> if the spawned shell process
@@ -229,6 +242,9 @@ public class ShellCommand {
      * {@link #getErrorStream()}, respectively. Input can be passed to the
      * <code>STDIN</code> of the shell process via {@link #getInputStream()}.
      * 
+     * Warning, no good way to quote or escape spaces in arguments with this method.
+     * @deprecated unused
+     * 
      * @param  shellCommand The command for the shell to execute.
      * @param  seconds      The method will return <code>true</code> if this
      *                      number of seconds elapses without the process
@@ -248,7 +264,8 @@ public class ShellCommand {
                 _isTimerRunning = true;
                 wait(seconds * 1000);
                 _isTimerRunning = false;
-                return true;
+                if (!_commandCompleted)
+                    return true;
             }
 
         } catch (InterruptedException e) {
@@ -267,6 +284,9 @@ public class ShellCommand {
      * without waiting for an exit status. Any output produced by the executed
      * command will not be displayed.
      * 
+     * Warning, no good way to quote or escape spaces in arguments with this method.
+     * @deprecated unused
+     * 
      * @param  shellCommand The command for the shell to execute.
      * @throws IOException
      */
@@ -278,6 +298,8 @@ public class ShellCommand {
      * Passes a command to the shell for execution. This method blocks until
      * all of the command's resulting shell processes have completed. Any output
      * produced by the executed command will not be displayed.
+     * 
+     * Warning, no good way to quote or escape spaces in arguments with this method.
      * 
      * @param  shellCommand The command for the shell to execute.
      * @return              <code>true</code> if the spawned shell process
@@ -298,7 +320,12 @@ public class ShellCommand {
      * specified number of seconds has elapsed first. Any output produced by the
      * executed command will not be displayed.
      * 
-     * @param  shellCommand The command for the shell to execute.
+     * Warning, no good way to quote or escape spaces in arguments when shellCommand is a String.
+     * Use a String array for best results, especially on Windows.
+     * 
+     * @param  shellCommand The command for the shell to execute, as a String.
+     *                      You can't quote arguments successfully.
+     *                      See Runtime.exec(String) for more info.
      * @param  seconds      The method will return <code>true</code> if this
      *                      number of seconds elapses without the process
      *                      returning an exit status. A value of <code>0</code>
@@ -308,7 +335,33 @@ public class ShellCommand {
      *                      else <code>false</code>.
      */
     public synchronized boolean executeSilentAndWaitTimed(String shellCommand, int seconds) {
+        return executeSAWT(shellCommand, seconds);
+    }
 
+    /**
+     * Passes a command to the shell for execution. This method blocks until
+     * all of the command's resulting shell processes have completed unless a
+     * specified number of seconds has elapsed first. Any output produced by the
+     * executed command will not be displayed.
+     * 
+     * @param  commandArray The command for the shell to execute,
+     *                      as a String[].
+     *                      See Runtime.exec(String[]) for more info.
+     * @param  seconds      The method will return <code>true</code> if this
+     *                      number of seconds elapses without the process
+     *                      returning an exit status. A value of <code>0</code>
+     *                      here disables waiting.
+     * @return              <code>true</code> if the spawned shell process
+     *                      returns an exit status of 0 (indicating success),
+     *                      else <code>false</code>.
+     * @since 0.8.3
+     */
+    public synchronized boolean executeSilentAndWaitTimed(String[] commandArray, int seconds) {
+        return executeSAWT(commandArray, seconds);
+    }
+
+    /** @since 0.8.3 */
+    private boolean executeSAWT(Object shellCommand, int seconds) {
         _commandThread = new CommandThread(this, shellCommand, CONSUME_OUTPUT);
         _commandThread.start();
         try {
@@ -317,7 +370,8 @@ public class ShellCommand {
                 _isTimerRunning = true;
                 wait(seconds * 1000);
                 _isTimerRunning = false;
-                return true;
+                if (!_commandCompleted)
+                    return true;
             }
 
         } catch (InterruptedException e) {
@@ -354,7 +408,10 @@ public class ShellCommand {
         return;
     }
     
-    private boolean execute(String shellCommand, boolean consumeOutput, boolean waitForExitStatus) {
+    /**
+     *  @param shellCommand either a String or a String[] (since 0.8.3) - quick hack
+     */
+    private boolean execute(Object shellCommand, boolean consumeOutput, boolean waitForExitStatus) {
 
         StreamConsumer processStderrConsumer;
         StreamConsumer processStdoutConsumer;
@@ -364,7 +421,13 @@ public class ShellCommand {
         StreamReader   processStdoutReader;
 
         try {
-            _process = Runtime.getRuntime().exec(shellCommand, null);
+            // easy way so we don't have to copy this whole method
+            if (shellCommand instanceof String)
+                _process = Runtime.getRuntime().exec((String)shellCommand);
+            else if (shellCommand instanceof String[])
+                _process = Runtime.getRuntime().exec((String[])shellCommand);
+            else
+               throw new ClassCastException("shell command must be a String or a String[]");
             if (consumeOutput) {
                 processStderrConsumer = new StreamConsumer(_process.getErrorStream());
                 processStderrConsumer.start();

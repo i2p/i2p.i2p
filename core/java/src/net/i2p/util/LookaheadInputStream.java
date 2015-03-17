@@ -14,28 +14,40 @@ import java.util.Arrays;
  */
 public class LookaheadInputStream extends FilterInputStream {
     private boolean _eofReached;
-    private byte[] _footerLookahead;
+    private final byte[] _footerLookahead;
     private static final InputStream _fakeInputStream = new ByteArrayInputStream(new byte[0]);
     
+    /**
+     *  Configure a stream that hides a number of bytes from the reader.
+     *  The last n bytes will never be available from read(),
+     *  they can only be obtained from getFooter().
+     *
+     *  initialize() MUST be called before doing any read() calls.
+     *
+     *  @param lookaheadSize how many bytes to hide
+     */
     public LookaheadInputStream(int lookaheadSize) {
         super(_fakeInputStream);
-        _eofReached = false;
         _footerLookahead = new byte[lookaheadSize];
     }
     
     public boolean getEOFReached() { return _eofReached; }
         
+    /**
+     *  Start the LookaheadInputStream with the given input stream.
+     *  Resets everything if the LookaheadInputStream was previously used.
+     *  WARNING - blocking until lookaheadSize bytes are read!
+     */
     public void initialize(InputStream src) throws IOException {
         in = src;
         _eofReached = false;
         Arrays.fill(_footerLookahead, (byte)0x00);
         int footerRead = 0;
         while (footerRead < _footerLookahead.length) {
-            int read = in.read(_footerLookahead);
+            int read = in.read(_footerLookahead, footerRead, _footerLookahead.length - footerRead);
             if (read == -1) throw new IOException("EOF reading the footer lookahead");
             footerRead += read;
         }
-        boolean f = true;
     }
     
     @Override
@@ -48,15 +60,18 @@ public class LookaheadInputStream extends FilterInputStream {
             return -1;
         }
         int rv = _footerLookahead[0];
+        // FIXME use an index!!!!!!!!!!!!
         System.arraycopy(_footerLookahead, 1, _footerLookahead, 0, _footerLookahead.length-1);
         _footerLookahead[_footerLookahead.length-1] = (byte)c;
         if (rv < 0) rv += 256;
         return rv;
     }
+
     @Override
     public int read(byte buf[]) throws IOException {
         return read(buf, 0, buf.length);
     }
+
     @Override
     public int read(byte buf[], int off, int len) throws IOException {
         if (_eofReached) 
@@ -78,6 +93,7 @@ public class LookaheadInputStream extends FilterInputStream {
     /** grab the lookahead footer */
     public byte[] getFooter() { return _footerLookahead; }
     
+/*******
     public static void main(String args[]) {
         byte buf[] = new byte[32];
         for (int i = 0; i < 32; i++)
@@ -128,4 +144,5 @@ public class LookaheadInputStream extends FilterInputStream {
             return false;
         }
     }
+******/
 }

@@ -14,7 +14,6 @@ import net.i2p.util.Log;
  *
  */
 public class ConfigTunnelsHandler extends FormHandler {
-    private Log _log;
     private Map _settings;
     private boolean _shouldSave;
     
@@ -22,6 +21,7 @@ public class ConfigTunnelsHandler extends FormHandler {
         _shouldSave = false;
     }
     
+    @Override
     protected void processForm() {
         if (_shouldSave) {
             saveChanges();
@@ -31,7 +31,7 @@ public class ConfigTunnelsHandler extends FormHandler {
     }
     
     public void setShouldsave(String moo) { 
-        if ( (moo != null) && (moo.equals("Save changes")) )
+        if ( (moo != null) && (moo.equals(_("Save changes"))) )
             _shouldSave = true; 
     }
     
@@ -43,11 +43,11 @@ public class ConfigTunnelsHandler extends FormHandler {
      *
      */
     private void saveChanges() {
-        _log = _context.logManager().getLog(ConfigTunnelsHandler.class);
         boolean saveRequired = false;
+        Map<String, String> changes = new HashMap();
         
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Saving changes, with props = " + _settings);
+            _log.debug("Saving changes, with props = " + _settings + ".");
         
         int updated = 0;
         int index = 0;
@@ -67,7 +67,7 @@ public class ConfigTunnelsHandler extends FormHandler {
                 try {
                     client.fromBase64(poolName);
                 } catch (DataFormatException dfe) {
-                    addFormError("Internal error (pool name could not resolve - " + poolName + ")");
+                    addFormError("Internal error (pool name could not resolve - " + poolName + ").");
                     index++;
                     continue;
                 }
@@ -76,7 +76,7 @@ public class ConfigTunnelsHandler extends FormHandler {
             }
             
             if ( (in == null) || (out == null) ) {
-                addFormError("Internal error (pool settings cound not be found for " + poolName + ")");
+                addFormError("Internal error (pool settings cound not be found for " + poolName + ").");
                 index++;
                 continue;
             }
@@ -91,21 +91,21 @@ public class ConfigTunnelsHandler extends FormHandler {
             out.setBackupQuantity(getInt(_settings.get(index + ".backupOutbound")));
             
             if ("exploratory".equals(poolName)) {
-                _context.router().setConfigSetting(TunnelPoolSettings.PREFIX_INBOUND_EXPLORATORY + 
+                changes.put(TunnelPoolSettings.PREFIX_INBOUND_EXPLORATORY + 
                                                    TunnelPoolSettings.PROP_LENGTH, in.getLength()+"");
-                _context.router().setConfigSetting(TunnelPoolSettings.PREFIX_OUTBOUND_EXPLORATORY + 
+                changes.put(TunnelPoolSettings.PREFIX_OUTBOUND_EXPLORATORY + 
                                                    TunnelPoolSettings.PROP_LENGTH, out.getLength()+"");
-                _context.router().setConfigSetting(TunnelPoolSettings.PREFIX_INBOUND_EXPLORATORY + 
+                changes.put(TunnelPoolSettings.PREFIX_INBOUND_EXPLORATORY + 
                                                    TunnelPoolSettings.PROP_LENGTH_VARIANCE, in.getLengthVariance()+"");
-                _context.router().setConfigSetting(TunnelPoolSettings.PREFIX_OUTBOUND_EXPLORATORY + 
+                changes.put(TunnelPoolSettings.PREFIX_OUTBOUND_EXPLORATORY + 
                                                    TunnelPoolSettings.PROP_LENGTH_VARIANCE, out.getLengthVariance()+"");
-                _context.router().setConfigSetting(TunnelPoolSettings.PREFIX_INBOUND_EXPLORATORY + 
+                changes.put(TunnelPoolSettings.PREFIX_INBOUND_EXPLORATORY + 
                                                    TunnelPoolSettings.PROP_QUANTITY, in.getQuantity()+"");
-                _context.router().setConfigSetting(TunnelPoolSettings.PREFIX_OUTBOUND_EXPLORATORY + 
+                changes.put(TunnelPoolSettings.PREFIX_OUTBOUND_EXPLORATORY + 
                                                    TunnelPoolSettings.PROP_QUANTITY, out.getQuantity()+"");
-                _context.router().setConfigSetting(TunnelPoolSettings.PREFIX_INBOUND_EXPLORATORY + 
+                changes.put(TunnelPoolSettings.PREFIX_INBOUND_EXPLORATORY + 
                                                    TunnelPoolSettings.PROP_BACKUP_QUANTITY, in.getBackupQuantity()+"");
-                _context.router().setConfigSetting(TunnelPoolSettings.PREFIX_OUTBOUND_EXPLORATORY + 
+                changes.put(TunnelPoolSettings.PREFIX_OUTBOUND_EXPLORATORY + 
                                                    TunnelPoolSettings.PROP_BACKUP_QUANTITY, out.getBackupQuantity()+"");
             }
             
@@ -131,14 +131,16 @@ public class ConfigTunnelsHandler extends FormHandler {
         }
         
         if (updated > 0)
-            addFormNotice("Updated settings for " + updated + " pools");
+            // the count isn't really correct anyway, since we don't check for actual changes
+            //addFormNotice("Updated settings for " + updated + " pools.");
+            addFormNotice(_("Updated settings for all pools."));
         
         if (saveRequired) {
-            boolean saved = _context.router().saveConfig();
+            boolean saved = _context.router().saveConfig(changes, null);
             if (saved) 
-                addFormNotice("Exploratory tunnel configuration saved successfully");
+                addFormNotice(_("Exploratory tunnel configuration saved successfully."));
             else
-                addFormNotice("Error saving the configuration (applied but not saved) - please see the error logs");
+                addFormError(_("Error saving the configuration (applied but not saved) - please see the error logs."));
         }
     }
     private static final int getInt(Object val) { 

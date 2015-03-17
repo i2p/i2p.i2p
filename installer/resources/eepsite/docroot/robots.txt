@@ -1,0 +1,78 @@
+#
+# robots.txt for your eepsite
+#
+# You can use this file to control how web crawling robots (for example search
+# engine robots like the Googlebot) index your site. Only well-behaving robots
+# will abide the rules you set in this file, thankfully those are a majority.
+
+# Robots that do not abide the robots.txt rules will be able to index anything
+# they find. So be aware that this file does not allow you to actually lock
+# anyone out. It is voluntary.
+
+# Keep this file in the root of your site, ie: myeepsite.i2p/robots.txt
+
+# Remove the # in front of lines you want to use (uncomment). By default robots
+# are allowed to index your whole site.
+
+##### Syntax:
+
+# User-agent: Botname
+# Disallow: /directory/to/disallow/
+
+# You can use a * in the User-agent field to select all robots:
+# User-agent: *
+
+# You can not use * as a wildcard in the Disallow string.
+
+# To allow indexing your whole site you leave the Disallow field empty:
+# Disallow:
+
+##### Examples:
+
+# At the time of writing there are only two active search engines in the
+# I2P network: http://eepsites.i2p and http://yacysearch.i2p
+# Because eepsites.i2p does abide robots.txt but not the User-agent string, the
+# Yacybot is used in these examples.
+
+# To control the eepsites.i2p robot you can use the HTML <meta> tag instead.
+# Example: <META name="ROBOTS" content="NOINDEX, NOFOLLOW">
+# If the robot sees above line it will neither index that url not will it
+# follow links on it to further pages. 
+# Options for the content attribut are: INDEX or NOINDEX and FOLLOW or NOFOLLOW.
+# You can also use <meta name="robots" content="noarchive"> to disable caching.
+
+# To allow Yacy to access anything but disallow all other robots:
+# User-agent: yacybot
+# Disallow:
+# User-agent: *
+# Disallow: /
+
+# To disallow Yacy from accessing anything:
+# User-agent: yacybot
+# Disallow: /
+
+# To disallow Yacy from accessing the /stuff/ directory, eg me.i2p/stuff/ :
+# User-agent: yacybot
+# Disallow: /stuff/
+
+# If Google was crawling I2P and you would not want them to index your site
+# User-agent: Googlebot
+# Disallow: /
+
+# To disallow any well-behaving robots from accessing your /secret/ and
+# /private/ directories:
+# Keep in mind that this is NOT blocking anyone else. Use proper authentication
+# if you want your private and secret things to stay private and secret. Also 
+# everyone can read the robots.txt file and see what things you want to hide.
+# User-agent: *
+# Disallow: /secret/
+# Disallow: /private/
+
+# Disallow robots to index a specific file:
+# User-agent: *
+# Disallow: /not/thisfile.html
+
+# Allow everyone to access everything. This rule is active by default.
+# Comment it with # at the start of the line to disable it.
+User-agent: *
+Disallow:

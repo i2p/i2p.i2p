@@ -11,7 +11,6 @@ package net.i2p.router;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -30,11 +29,13 @@ public abstract class CommSystemFacade implements Service {
     public void renderStatusHTML(Writer out) throws IOException { renderStatusHTML(out, null, 0); }
     
     /** Create the set of RouterAddress structures based on the router's config */
-    public Set createAddresses() { return new HashSet(); }
+    public Set<RouterAddress> createAddresses() { return Collections.EMPTY_SET; }
     
     public int countActivePeers() { return 0; }
     public int countActiveSendPeers() { return 0; }
-    public boolean haveCapacity() { return true; }
+    public boolean haveInboundCapacity(int pct) { return true; }
+    public boolean haveOutboundCapacity(int pct) { return true; }
+    public boolean haveHighOutboundCapacity() { return true; }
     public List getMostRecentErrorMessages() { return Collections.EMPTY_LIST; }
     
     /**
@@ -47,7 +48,7 @@ public abstract class CommSystemFacade implements Service {
      * Return framed average clock skew of connected peers in seconds, or null if we cannot answer.
      * CommSystemFacadeImpl overrides this.
      */
-    public Long getFramedAveragePeerClockSkew(int percentToInclude) { return null; }
+    public long getFramedAveragePeerClockSkew(int percentToInclude) { return 0; }
     
     /**
      * Determine under what conditions we are remotely reachable.
@@ -58,7 +59,24 @@ public abstract class CommSystemFacade implements Service {
     public boolean isBacklogged(Hash dest) { return false; }
     public boolean wasUnreachable(Hash dest) { return false; }
     public boolean isEstablished(Hash dest) { return false; }
+    public byte[] getIP(Hash dest) { return null; }
+    public void queueLookup(byte[] ip) {}
+
+    /** @since 0.8.11 */
+    public String getOurCountry() { return null; }
+
+    /** @since 0.8.13 */
+    public boolean isInBadCountry() { return false; }
+
+    public String getCountry(Hash peer) { return null; }
+    public String getCountryName(String code) { return code; }
+    public String renderPeerHTML(Hash peer) {
+        return peer.toBase64().substring(0, 4);
+    }
     
+    /** @since 0.8.13 */
+    public boolean isDummy() { return true; }
+
     /** 
      * Tell other transports our address changed
      */

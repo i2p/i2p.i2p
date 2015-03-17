@@ -1,0 +1,1372 @@
+/* I2P Theme: Camo aka Dark */
+/* Description: Military Grade. */
+/* Comment: Thanks to Florian Kuhlmann for the hatface images. [http://www.flickr.com/photos/floriankuhlmann/] */
+/* Author: dr|z3d */
+
+body {
+     margin: 5px 0 0 0;
+     padding: 0;
+     text-align: center;
+     background: #010 url('images/camotile.png') center bottom;
+     color: #EE9;
+     font: 8.5pt/130% "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
+}
+
+.hide {
+     display: none;
+}
+
+div.clearer {
+     clear: left;
+     height: 0;
+     line-height: 0;
+     margin-bottom: -16px;
+}
+
+img {
+     border: none;
+}
+
+pre {
+     width: 98%;
+     overflow-x: scroll;
+     text-align: left;
+     font: 8.5pt "Lucida Console", "Droid Sans Mono", "DejaVu Sans Mono", Courier, mono;
+     color: #EE9;
+}
+
+div.logo {
+     float: left;
+     padding: 10px;
+     text-align: center;
+     color: #EE9;
+     margin: 0 20px 0 20px;
+     border: 1px solid #494;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+     background: #000; /*url("images/camotile2.png");*/
+     width: 185px;
+     -moz-box-shadow: inset 0 0 1px 0 #009;
+     -khtml-box-shadow: inset 0 0 1px 0 #009;
+     box-shadow: inset 0 0 1px 0 #009;
+}
+
+div.logo hr {
+     color: #494;
+     background: #494;
+     height: 1px;
+     border: 0 solid #494;
+     margin: 10px 0 5px;
+}
+
+div.toolbar {
+     margin: 0;
+     padding: 10px;
+     font-weight: bold;
+     background: #000;
+     border: 1px solid #000;
+     display: none;
+}
+
+div.toolbar a:link {
+     border: 1px outset #ddddc0;
+     padding: 0 5px 1px 5px;
+     background: #bbf;
+     text-decoration: none;
+     border-radius: 4px;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     color: #000;
+}
+
+div.toolbar a:visited {
+     background: #ddf;
+}
+
+div.toolbar a:hover, button:hover {
+     border: 1px solid #f60;
+     background: #030;
+     color: #f60;
+}
+
+a:active {
+     color: #900;
+}
+
+div.routersummaryouter {
+     float: left;
+     width: 200px;
+     margin: 0 0 10px 5px;
+     padding: 0;
+     border: 0;
+     clear: left;/* fixes a bug in Opera */
+     text-align: center;
+     display: block;
+     position: absolute;/* so no interference with /home app icons */
+}
+
+div.routersummary {
+     width: 173px;
+     padding: 8px 10px 8px;
+     text-align: center;
+     border: 1px solid #494;
+     background: #000 url(images/camotile2.png);
+     color: #EE9;
+     font-size: 8pt;
+     clear: left;/* fixes a bug in Opera */
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+     float: left;
+     -moz-box-shadow: 0 1px 5px #000;
+     -khtml-box-shadow: 0 1px 5px #000;
+     box-shadow: 0 1px 5px #000;
+     margin-bottom: 7px !important;
+}
+
+div.routersummary input[type=text] {
+     text-align: right !important;
+     -moz-box-shadow: inset 1px 1px 1px 0 #000;
+     -khtml-box-shadow: inset 1px 1px 1px 0 #000;
+     box-shadow: inset 1px 1px 1px 0 #000;
+}
+
+div.routersummary hr {
+     color: #494;
+     background: #494;
+     height: 2px;
+     border-bottom: 1px solid #494;
+     margin: 8px -10px 7px -10px;
+     -moz-box-shadow: inset 0 1px 1px 1px #000;
+     -khtml-box-shadow: inset 0 1px 1px 1px #000;
+     box-shadow: inset 0 1px 1px 1px #000;
+}
+
+div.routersummary h3 {
+     border: 0;
+     font-size: 9.5pt;
+     letter-spacing: 0.04em;
+     margin: -7px -10px -8px -10px;
+     padding: 3px 0 4px 0 !important;
+     text-transform: uppercase;
+     -moz-border-radius: 0;
+     -khtml-border-radius: 0;
+     border-radius: 0;
+     background: #000 url('images/header.png') center center ;
+}
+
+div.routersummary h4 {
+     border: 0;
+     border-bottom: 0 !important;
+     font-size: 8pt;
+     letter-spacing: 0.02em;
+     margin: -7px -9px -10px -9px !important;
+     padding: 6px 3px 8px 3px;
+     background: #000;
+     text-transform: capitalize;
+     text-decoration: none !important;
+     color: #2b2;
+     line-height: 100%;
+}
+
+div.routersummary ul {
+     text-align: left !important;
+}
+
+div.routersummary table {
+     border: 0;
+     text-align: center !important;
+     margin: -5px -7px -5px -8px !important;
+     width: 188px !important;
+     overflow: hidden;
+     font-size: 8pt;
+/*     padding: 0 -10px; */
+     background-image: none !important;
+     background-color: transparent !important;
+}
+
+div.routersummary tr {
+     background-image: none !important;
+     background-color: transparent !important;
+     border: 0 !important;
+}
+
+div.routersummary form {
+     margin: -4px 0 -6px;
+}
+
+div.routersummary form:first-child {
+     margin: 6px 0 -5px 0 !important;
+}
+
+div.routersummary p {
+     padding: 0;
+}
+
+div.refresh {
+     margin-top: -10px !important;
+     margin-bottom: -4px !important;
+     padding: 2px 0 0 0 !important;
+}
+
+div.routersummary a:link, div.routersummary a:visited {
+     text-shadow: 1px 1px 1px rgba(0, 16, 0, 0.8);
+     text-shadow: 0 0 2px #101 !important;
+     padding: 0 1px;
+}
+
+div.routersummary a:hover {
+     text-shadow: 0 0 1px rgba(255, 96, 0, 0.7);
+     color: #f60;
+}
+
+div.routersummary td {
+     padding: 0 2px 0 2px;
+     background-image: none !important;
+     border: 0 !important;
+     word-spacing: -0.1em;
+}
+
+div routersummary hr:last-child {
+     margin-top: 5px;
+     margin-bottom: -5px !important;
+}
+
+div.newsheadings {
+     text-align: center;
+     margin: -3px 0 -5px 10px;
+     word-spacing: 0;
+}
+
+div.newsheadings li {
+     list-style: none outside url('images/newsbullet_mini.png');
+     margin: 0 -4px 2px 8px;
+     line-height: 110%;
+     text-transform: capitalize;
+}
+
+div.newsheadings li b {
+     font-weight: normal !important;
+}
+
+
+div.newsheadings button {
+     margin: 4px 0 2px;
+}
+
+div.tunnels {
+     padding-top: 3px !important;
+     margin-left: -4px;
+     text-align: center;
+}
+
+div.tunnels table {
+     margin: -5px 0 -5px -3px !important;
+}
+
+div.tunnels td {
+     padding: 1px 0 1px 0;
+}
+
+div.tunnels td:first-child {
+     width: 16px;
+     text-align: left;
+     padding-right: 2px;
+}
+
+div.tunnels td:last-child {
+     text-align: right;
+     padding-right: 1px;
+}
+
+div.tunnels tr {
+/*     border: 1px solid #494 !important;*/
+}
+
+div.warning {
+     margin: 20px 20px 20px 245px;
+     padding: 5px 25px 20px 75px;
+     background: #000;
+     border: 1px solid #494;
+     text-align: left;
+     color: #EE9;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+     text-align: justify;
+     background-image:url("../images/itoopie_sm.png");
+     background-position:10px center;
+     background-repeat:no-repeat;
+     -moz-box-shadow: inset 0 0 0 1px #f00;
+     -khtml-box-shadow: inset 0 0 0 1px #f00;
+     box-shadow: inset 0 0 0 1px #f00;
+     word-wrap: break-word;
+}
+
+/* console error messages */
+
+div.sorry {
+     margin: -1px 5px 10px 205px;
+     padding: 20px 20px 20px 75px;
+     background: #020;
+     border: 1px solid #494;
+     -moz-border-radius: 0 0 4px 4px;
+     -khtml-border-radius: 0 0 4px 4px;
+     border-radius: 0 0 4px 4px;
+     text-align: justify;
+     background-image:url("images/errortriangle.png");
+     background-position:15px center;
+     background-repeat:no-repeat;
+     -moz-box-shadow: inset 0 0 0 1px #d00;
+     word-wrap: break-word;
+     font-weight: bold;
+     color: #EE9;
+}
+
+div.sorry hr {
+     color: #EE9;
+     background: #EE9;
+     height: 1px;
+     border: 1px solid #EE9;
+     margin: 10px 0;
+}
+
+div.main {
+     margin: -1px 5px 5px 205px;
+     padding: 0 15px 15px 15px;
+     text-align: left;
+     color: #EE9;
+     width: auto;
+/*  overflow-x: scroll; */
+     border: 1px solid #494;
+     -moz-border-radius: 0 0 4px 4px;
+     -khtml-border-radius: 0 0 4px 4px;
+     border-radius: 0 0 4px 4px;
+     background: #000 url(images/scarface.jpg) right bottom no-repeat !important;
+     min-width: 620px;
+     -moz-box-shadow: 0 1px 5px #000;
+}
+
+div.main textarea {
+     background: #000;
+     color: #EE9;
+     font: 8pt "Lucida Console", "Droid Sans Mono", "DejaVu Sans Mono", Courier, mono;
+}
+
+div.news {
+     margin: -1px 5px 0 205px;
+     padding: 4px 30px 4px 30px;
+     border: 1px solid #494;
+     background: #000;
+     background: #000 url("images/news.png")no-repeat scroll bottom right;
+     color: #7b7;
+/*     border-radius: 4px 4px 0 0;
+     -moz-border-radius: 4px 4px 0 0;
+     -khtml-border-radius: 4px 4px 0 0;*/
+     font-size: 7.5pt;
+     text-align: right;
+     -moz-box-shadow: 0 1px 5px #000;
+     -khtml-box-shadow: 0 1px 5px #000;
+     box-shadow: 0 1px 5px #000;
+     min-width: 580px;
+/*     height: 164px;
+     overflow-y: auto;*/
+}
+
+div.news li {
+     text-align: justify;
+     list-style: url('images/info_dark.png');
+     list-style: none;
+     margin: 0;
+     padding: 5px 5px 5px 0;
+     vertical-align: middle;
+     word-wrap: break-word;
+     color: #494;
+     font-weight: bold;
+     font-size: 9.5pt;
+     border-bottom: 1px dotted #494;
+     margin-bottom: 5px;
+     text-transform: capitalize;
+}
+
+div.news h3 {
+     text-align: left !important;
+     font-size: 9.5pt;
+     letter-spacing: 0.03em;
+}
+
+div.news h4 {
+     border-bottom: 1px;
+     border-bottom-style: dotted;
+     border-bottom-color: #494;
+     padding: 0 0 0 0;
+     margin: 5px 0 10px 0;
+     font-size: 10pt;
+     opacity: 1;
+     text-transform: capitalize;
+}
+
+div.news h4:first-child {
+     background: url('../images/itoopbullet.png');
+     background-repeat: no-repeat;
+     background-position: right;
+}
+
+div.news p {
+     margin-top: -5px;
+     font-size: 8.5pt;
+     color: #EE9;
+     margin-bottom: 0;
+}
+
+div.news p:nth-child(n+1) {
+     margin-top: 5px;
+}
+
+div.news hr {
+     margin: 8px 0 3px 0;
+}
+
+div.confignav {
+     background: url('images/header.png') repeat-x scroll center center #000;
+     padding:5px 5px 6px !important;
+     margin: -1px 0 15px;
+     -moz-border-radius: 0 0 4px 4px;
+     -khtml-border-radius: 0 0 4px 4px;
+     border-radius: 0 0 4px 4px;
+     border: 1px solid #494;
+     font-size: 8.5pt !important;
+     font-weight: bold !important;
+     line-height: 160% !important;
+
+}
+
+div.configure {
+/*     padding: 5px 15px 0 15px;
+     margin: 10px 0;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+     border: 1px solid #494; */
+     background: none;/* url(images/camotile2.png);*/
+}
+
+.sidebarconf input[type="image"] {
+     margin: 2px;
+     padding: 1px;     
+}
+
+.sidebarconf th:nth-child(1) {
+     text-align: center;     
+}
+
+.sidebarconf th:nth-child(2) {
+     text-align: left;     
+}
+
+.sidebarconf td:first-child {
+     width: 60px;
+     text-align: right;
+     padding-right: 50px;
+}
+
+.sidebarconf td:nth-child(2) {
+     font-weight: bold;     
+}
+
+.sidebarconf td:nth-child(3), .sidebarconf td:nth-child(4) {
+     width: 70px;
+     padding: 0;  
+}
+
+.sidebarconf td:nth-child(3) {
+     text-align: right;
+     padding-left: 50px;
+}
+
+.sidebarconf td:nth-child(4) {
+     text-align: left;
+     padding-right: 50px;
+}
+
+div.messages {
+     padding: 10px;
+     margin: 10px 0 15px 0;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+     border: 1px solid #494;
+     background: #000;  /*url('images/infotile.png') center left no-repeat;*/
+     font-weight: bold;
+     font-size: 9pt;
+     color: #4f4;
+}
+
+div.messages span.error {
+     color: #d90;
+}
+
+div.messages span.notice {
+     font-style: italic;
+}
+
+div.messages li {
+     text-align: justify !important;
+     font-weight: bold;
+     list-style: url(images/warning_dark.png) !important;
+     margin: 0 5px 0 50px !important;
+     padding: 0 10px 0 0 !important;
+     border: 0 !important;
+}
+
+div.graphspanel {
+     padding: 0;
+     margin: 15px 0 -15px 0;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+/*     border: 1px solid #494;*/
+     background: none;/* url(images/camotile.png);*/
+     text-align: center;
+}
+
+div.widepanel h3 {
+     text-align: left !important;
+}
+
+div.graphspanel form {
+     text-align: left;
+     padding: 0 15px 0 15px;
+}
+
+div.graphspanel hr {
+     margin: 10px -15px 10px -15px;
+}
+
+div.graphspanel img {
+     border: 1px solid #494;
+     padding: 3px;
+     margin: 5px;
+     text-align: center !important;
+     background: #000;
+     opacity: 0.8;
+}
+
+div.graphspanel img:hover {
+     border: 1px solid #000;
+     padding: 3px;
+     margin: 5px;
+     text-align: center !important;
+     background: #000;
+     -moz-box-shadow: inset 0 0 1px 1px #f60;
+     -khtml-box-shadow: inset 0 0 1px 1px #f60;
+     box-shadow: inset 0 0 1px 1px #f60;
+     opacity: 1;
+}
+
+table {
+     border-collapse: collapse;
+     width: 100%;
+     border: 1px solid #494;
+     padding: 1px;
+     font-size: 8pt;
+     background: #030;
+     margin: 1px 0;
+}
+
+table hr {
+     padding: 0 0;
+     color: #494;
+     background: #494;
+     border: 0 solid #494;
+     margin: 0 0;
+     height: 1px;
+     display: none;
+}
+
+th {
+     padding: 6px 2px;
+     color: #EE9;
+     text-align: center;
+     font-size: 9pt;
+     background: #000 url('images/header.png') center center repeat-x ;
+     border-top: 1px solid #494;
+     border-bottom: 1px solid #494 !important;
+     line-height: 110%;
+}
+
+tr {
+     vertical-align: middle;
+}
+
+tr:nth-child(even) {
+     background: #010;
+     vertical-align: middle;
+}
+
+tr:nth-child(odd) {
+     background: #000800;
+     vertical-align: middle;
+}
+
+/*
+tr:last-child {
+     background: #004 url('images/lightbluetile.png') !important;
+     font-weight: bold;
+     border: 1px solid #494 !important;
+}
+*/
+
+td {
+     padding: 4px 6px;
+     color: #EE9;
+     vertical-align: middle;
+     border-top: 1px inset #494;
+     border-bottom: 1px outset #494;
+}
+
+td img {
+     padding: 0 1px 0 2px;
+}
+
+tt {
+     font: bold 8pt "Lucida Console", "Droid Sans Mono", "DejaVu Sans Mono", Courier, mono;
+     color: #FF0;
+     padding: 0 5px 2px 0;
+}
+
+div.main li {
+     text-align: left;
+     list-style: square;
+     margin: 2px 0 2px 30px;
+     padding: 2px 20px 2px 0;
+/*     line-height: 150%;*/
+     word-wrap: break-word;
+}
+
+
+div.main li b {
+     color: #b70 !important;
+     letter-spacing: 0.07em;
+     font-size: 8.5pt;
+     text-shadow: 0 1px 1px #700;
+}
+
+.tidylist {
+     text-align: justify !important;
+     line-height: 150%;
+}
+
+.tidylist:first-child {
+/*     padding-top: 5px;*/
+}
+
+.tidylist:last-child {
+     padding-bottom: 10px;
+}
+
+.tidylist code {
+     text-align: left;
+     font: 8.5pt "Lucida Console", "Droid Sans Mono", "DejaVu Sans Mono", Courier, mono;
+     color: #dd0;
+     padding: 1px 2px;
+     background: #030;
+     margin: 0 2px;
+}
+
+ol {
+     display: inline;
+     margin: 1px 0 0 0;
+     padding: 1px 0 0 20px;
+}
+
+ul {
+/*     display: inline; */
+     margin: 0;
+     padding: 0;
+}
+
+code {
+     text-align: left;
+     font: 8.5pt "Lucida Console", "Droid Sans Mono", "DejaVu Sans Mono", Courier, mono;
+     color: #dd0;
+     padding: 1px 2px;
+}
+
+a:link, h2 a:link {
+     color: #494;
+     text-decoration: none;
+     font-weight: bold;
+     word-wrap: break-word;
+}
+
+a:visited {
+     color: #7b7;
+     text-decoration: none;
+     font-weight: bold;
+     word-wrap: break-word;
+}
+
+a:hover {
+     color: #f60;
+     text-decoration: underline;
+     font-weight: bold;
+     word-wrap: break-word;
+}
+
+.links {
+/*     padding-bottom: -2px; */
+     text-align: justify;
+     margin-top: 10px;
+     margin-bottom: -10px;
+}
+
+.links li {
+     list-style-image: url("images/link.png") !important;
+}
+
+.links b {
+     color: #b70 !important;
+     letter-spacing: 0.07em;
+     font-size: 8.5pt;
+     line-height: 165%;
+     text-shadow: 0 1px 1px #700;
+}
+
+p {
+     text-align: justify;
+     line-height: 160%;
+}
+
+p img:first-child {
+     display: none !important;
+}
+
+h1 {
+     text-align: left;
+     color: #EE9;
+     padding: 13px 15px;
+     margin: 0 5px 0 205px !important;
+     font-size: 17pt;
+     font-weight: bold;
+     font-style: normal;
+     text-transform: uppercase;
+     letter-spacing: 0.15em;
+     text-shadow: 0 0 2px #010;
+     white-space: normal;
+     background: #000 url('images/header.png') center center;
+     border: 1px solid #494;
+     border-radius: 4px 4px 0 0;
+     -moz-border-radius: 4px 4px 0 0;
+     -khtml-border-radius: 4px 4px 0 0;
+     line-height: 120%;
+     min-width: 620px;
+     -moz-box-shadow: 0 1px 5px #000;
+     -khtml-box-shadow: 0 1px 5px #000;
+     box-shadow: 0 1px 5px #000;
+}
+
+span.newtab {
+     text-align: right;
+     font-size: 8pt;
+     float: right;
+     letter-spacing: 0;
+}
+
+/* opera targetted hack */
+x:-o-prefocus, span.newtab {
+     margin-top: -25px;
+}
+
+h2 {
+     font-size: 12pt;
+     color: #EE9;
+     text-shadow: 0 0 2px #010;
+     letter-spacing: 0.05em;
+     background: #000 url(images/camotile2.png);
+     background: #000 url('images/header.png') center center ;
+     padding: 10px;
+     border: 1px solid #494;
+     border-radius: 4px;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     vertical-align: middle;
+     margin: 15px 0 12px 0 !important;
+     text-transform: uppercase;
+     word-wrap: break-word;
+}
+
+h2 a:visited {
+     color: #191;
+}
+
+h2 a:hover {
+     color: #f60;
+     text-shadow: 0 0 1px rgba(255, 64, 0, 0.7);
+}
+
+h3 {
+     border: 1px solid #494;
+     border-left: 5px solid #494;
+     padding: 6px;
+     margin: 12px 0 10px 0;
+     border-radius: 0 4px 4px 0;
+     -moz-border-radius: 0 4px 4px 0;
+     -khtml-border-radius: 0 4px 4px 0;
+     background: #000 url(images/camotile.png);
+     background: #000 url('images/header.png') center center ;
+     text-transform: uppercase;
+     text-shadow: 0 0 2px #010;
+     letter-spacing: 0.08em;
+}
+
+h4 {
+     border-bottom: 1px;
+     border-bottom-style: solid;
+     border-bottom-color: #494;
+     padding: 0 0 10px 0;
+     margin: 5px 0 10px 0;
+     font-size: 11pt;
+}
+
+button, button:visited {
+     font: bold 9pt "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
+     border: 1px outset #191;
+     padding: 1px 3px;
+     text-decoration: none;
+     border-radius: 4px;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     font-size: 8pt;
+     font-weight: bold;
+     margin: 2px 3px;
+     text-align: center;
+     vertical-align: middle;
+     min-width: 70px;
+     -moz-box-shadow: inset 0 1px 1px 0 #494;
+     -khtml-box-shadow: inset 0 1px 1px 0 #191;
+     box-shadow: inset 0 1px 1px 0 #191;
+     background: #000;
+     color: #494;
+}
+
+button:hover {
+     border: 1px solid #f60;
+     -moz-box-shadow: inset 0 1px 1px 0 #EE9;
+     -khtml-box-shadow: inset 0 1px 1px 0 #EE9;
+     box-shadow: inset 0 1px 1px 0 #EE9;
+     background: #000;
+     color: #f60;
+}
+
+button:active {
+     border: 1px inset #f60;
+     background: #f60;
+     color: #EE9;
+     -moz-box-shadow: inset 0 0 0 0 #f60;
+     -khtml-box-shadow: inset 0 0 0 0 #f60;
+     box-shadow: inset 0 0 0 0 #f60;
+}
+
+.underline {
+     border-bottom: 1px solid #eeeeff;
+     padding: 5px 0 5px 0;
+     margin: 0 0 10px 0;
+}
+
+.langbox {
+     margin: 4px 4px 2px 5px;
+     padding: 0;
+     color: #EE9;
+     font-size: 7pt;
+     width: 260px;
+     text-align: right;
+     float: right;
+     vertical-align: middle;
+}
+
+.langbox img {
+     opacity: 0.5;
+     -moz-box-shadow: 0 0 1px #000;
+     padding: 1px !important;
+}
+
+.langbox img:hover {
+     opacity: 1;
+     -moz-box-shadow: 0 0 1px #f60;
+}
+
+hr {
+     color: #494;
+     background: #494;
+     height: 1px;
+     border: 0 solid #494;
+     margin: 20px 0 10px;
+}
+
+hr:last-child {
+     margin-top: 20px;
+     margin-bottom: 20px;
+}
+
+.sidebarlogo {
+     text-align: center;
+}
+
+input {
+     border: 1px outset #5f5;
+     -moz-box-shadow: inset 0 1px 1px 0 #373;
+     -khtml-box-shadow: inset 0 1px 1px 0 #373;
+     box-shadow: inset 0 1px 1px 0 #373;
+     background: #000;
+     color: #494;
+     margin: 5px;
+     font: bold 8pt "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
+     padding: 1px 2px;
+     text-decoration: none;
+     min-width: 110px;
+     border-radius: 4px;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+}
+
+input:hover {
+     background: #000;
+     color: #f60;
+     border: 1px solid #f60;
+     -moz-box-shadow: inset 0 1px 1px 0 #9e9;
+     -khtml-box-shadow: inset 0 1px 1px 0 #9e9;
+     box-shadow: inset 0 1px 1px 0 #9e9;
+}
+
+input:active {
+     background: #000;
+     color: #f30;
+     border: 1px solid #f30;
+}
+
+input:active {
+     border: 1px inset #f60;
+     background: #f60;
+     color: #EE9;
+}
+
+input[type=text], input[type=password] {
+     background: #000;
+     color: #EE9;
+     margin: 5px 10px;
+     padding: 4px 2px;
+     font: bold 8pt "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
+     border: 1px solid #494 !important;
+     text-decoration: none;
+     border-radius: 4px;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     -moz-box-shadow: inset 1px 1px 1px 0 #000;
+     -khtml-box-shadow: inset 1px 1px 1px 0 #000;
+     box-shadow: inset 1px 1px 1px 0 #000;
+}
+
+input[type=text]:active, input[type=text]:hover {
+     background: #000;
+}
+
+input[type=image] {
+     min-width: 0;
+}
+
+fieldset {
+overflow: hidden;
+position: relative;
+}
+
+select {
+     background: #000;
+     color: #EE9;
+     margin: 5px 10px;
+     border: 1px solid #494;
+     border-radius: 4px;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     min-width: 110px;
+     font: 9pt "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
+     padding: 2px;
+}
+
+textarea {
+     background: #000;
+     color: #EE9;
+     padding: 5px;
+     margin: 10px;
+     border-radius: 4px;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     font: 8.5pt "Lucida Console", "Droid Sans Mono", "DejaVu Sans Mono", Courier, mono;
+     min-height: 100px;
+     min-width: 97%;
+     text-align: left;
+     border: 1px solid #494;
+}
+
+form {}
+
+.proxyfooter {
+     margin: 0 20px 10px 240px;
+     padding: 20px 25px 20px 75px;
+     color: #f00;
+     font-size: 7pt;
+     text-align: right !important;
+     border-radius: 4px;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border: 1px solid #000;
+     display: none;
+}
+
+.statusnotes {
+     font-style: italic;
+     font-size: 8pt;
+     color: #EE9;
+     text-align: center;
+     border: 1px solid #494 !important;
+/*     border-top: 0 !important;*/
+     margin: -3px 0 5px 0;
+     padding: 7px;
+     background: #010;
+     -moz-box-shadow: inset 0 0 0 1px #090;
+     -khtml-box-shadow: inset 0 0 0 1px #090;
+     box-shadow: inset 0 0 0 1px #090;
+/*     background: #000 url('images/header.png') repeat-x center center !important;*/
+}
+
+div.joblog {
+/*     margin: 	15px 0 15px 0;
+     padding: 5px 20px 10px 20px !important;
+     border: 1px solid #494;
+     background-color: #000;
+     background: #000; url("images/camotile.png");*/
+/*     color: #dfd;*/
+     border-radius: 4px 4px 0 0;
+     -moz-border-radius: 4px 4px 0 0;
+     -khtml-border-radius: 4px 4px 0 0;
+     text-align: justify !important;
+     overflow-x: auto; /* Opera fix */
+ }
+
+div.joblog h3 {
+     margin-top: 10px;
+}
+
+div.main li {
+     text-align: left;
+     list-style: square;
+     margin: 2px 0 2px 30px;
+     padding: 2px 20px 2px 0;
+/*     line-height: 150%;*/
+     word-wrap: break-word;
+}
+
+div.joblog li {
+     word-wrap: break-word !important;
+     text-align: justify !important;
+     line-height: 120% !important;
+     margin: 2px 0 2px 30px;
+     padding: 2px 20px 2px 0;
+}
+
+div.joblog ul {
+     word-wrap: break-word !important;
+     text-align: justify;
+     margin: 0;
+}
+
+div.joblog li:first-child {
+     margin-top: 0;
+}
+
+div.joblog li:last-child {
+     margin-bottom: -10px;
+}
+
+div.joblog form:first-child {
+     margin-top: 10px;
+}
+
+div.joblog table {
+     margin-top: 15px;
+}
+
+div.joblog p {
+     line-height: 140%;
+}
+
+.smallhead {
+     font-size: 7pt
+}
+
+.mediumtags {
+     font-size: 8.5pt;
+}
+
+.optbox {
+     min-width: 16px !important;
+     max-width: 16px !important;
+     width: 16px !important;
+     min-height: 16px;
+     max-height: 16px;
+     height: 16px;
+     opacity: 1.0;
+     border: 0;
+     margin: 5px 5px 5px 10px;
+     padding: 2px;
+     overflow: hidden;
+     position: relative;
+}
+
+.optbox:hover {
+     min-width: 16px !important;
+     max-width: 16px !important;
+     width: 16px !important;
+     min-height: 16px;
+     max-height: 16px;
+     height: 16px;
+     opacity: 1.0;
+     border: 0;
+     margin: 5px 5px 5px 10px;
+     padding: 2px;
+}
+
+.cells {
+     border: 1px inset #494;
+     border-left: 1px outset #494;
+}
+
+.tablefooter tr, .tablefooter td {
+     background: #000 url('images/header.png') repeat-x center center !important;
+     border-top: 1px solid #494;
+     border-bottom: 1px solid #494 !important;
+     font-size: 7pt;
+     line-height: 110%;
+     padding: 5px 5px 10px;
+}
+
+.formaction {
+     text-align: right;
+     margin-bottom: -5px;
+}
+
+div.footnote {
+     text-align: right;
+     color: #494;
+     font-size: 7pt;
+     margin-bottom: -8px !important;
+}
+
+div.footnote hr{
+     margin: 10px 0 5px 0 !important;
+     color: #494;
+     background: #494;
+     height: 1px;
+     border: 0 solid #494;
+}
+
+.topness {
+     font-size: 7.5pt;
+     text-align: right;
+     margin-top: -5px;
+     margin-bottom: -5px;
+     margin-right: 5px;
+}
+
+/* begin home page */
+
+/*
+#appsummary {
+     clear: none;
+     float: none;
+     left: 10px;
+     margin: 0;
+     position: absolute;
+     top: 10px;
+}
+
+#homemain {
+     left: 217px;
+     margin: 0 10px 10px 0;
+     position: absolute;
+     top: 10px;
+}
+
+#homenews {
+     margin: 0 10px 5px 0;
+}
+
+h2.app {
+     border-radius: 8px;
+     margin: 1px 10px 15px 0 !important;
+}
+*/
+
+h4.app, h4.app2 {
+    background: url('images/header.png') center center repeat-x;
+    border: 1px solid #449944;
+    font-size: 10pt;
+    font-variant: small-caps;
+    letter-spacing: 2px;
+    margin: 12px 0 -9px 0;
+    padding: 7px 8px 7px;
+    text-transform: uppercase;
+    border-radius: 4px;
+    text-align: left;
+}
+
+h4.app2 {
+     clear: left;
+     margin-top: 5px !important;
+}
+
+div.ag2 {
+     margin: 0;
+     padding: 0;
+}
+
+div.app {
+     float: left;
+     padding: 2px 0 0 !important;
+/*     width: 137px; */
+     min-width: 70px;
+     border: 1px solid #494;
+     background: #000;
+     background-image: -moz-linear-gradient(center top , #000B00, #000);
+     border-radius: 3px;
+     -moz-border-radius: 3px;
+     -khtml-border-radius: 3px;
+     margin: 3px;
+     height: 53px;
+     text-align: center !important;
+     padding-top: 3px;
+     opacity: 0.9;
+     box-shadow: 0 1px 5px #000000;
+}
+
+div.app:hover {
+    opacity: 1;
+    border: 1px solid #f60;
+    background: #000;
+    box-shadow: none;
+}
+
+div.app:last-child {
+     margin-bottom: 12px;
+}
+
+div.appgroup {
+     margin: 0;
+     padding: 16px 3px;
+     width: auto;
+}
+
+div.search {
+     margin: 10px 10px 0 0;
+     padding: 8px 8px 0 8px;
+     width: auto;
+}
+
+table.search {
+     background: none;
+     padding: 8px;
+     width: auto;
+     margin-left:auto;
+     margin-right:auto;
+}
+
+.appimg {
+     height: 35px;
+}
+
+img.app {
+     height: 32px;
+     width: 32px;
+     padding: 2px 0 0;
+     margin-bottom: 2px;
+}
+
+img.app2p {
+     height: 40px;
+     padding: 5px 6px 0 6px;
+     margin-bottom: 3px;
+}
+
+table.app {
+     background: none;
+     border: 0;
+     margin: auto;
+     width: auto;
+}
+
+tr.app {
+     background: none;
+     border: 0;
+     margin: 0;
+}
+
+td.app {
+     background: none;
+     border: 0;
+     margin: 0;
+     padding: 3px 0 0;
+}
+
+div.applabel {
+     font-size: 7.5pt;
+     margin: 0;
+     padding: 2px;
+     text-align: center;
+     vertical-align: bottom;
+     line-height: 95%;
+     text-transform: lowercase;
+     border: none;
+/*     width: 131px; */
+     min-width: 72px;
+     background: #010;
+     border-radius: 0 0 2px 2px;
+     border-top: 1px solid #494;
+}
+
+div.applabel:hover {
+     background: #000;
+     border-top: 1px solid #f60;
+}
+
+div.applabel a, div.applabel a:hover {
+     text-decoration: none !important;
+     outline: none;
+}
+
+
+/* end home page */
+
+iframe.iframed {
+     margin: 10px 0 0;
+}
+
+/* Fixes for when app is not started and console error loads inside iframe */
+
+body.iframed {
+     background: transparent url('images/transparent.gif') !important;
+}
+
+.iframed div.routersummaryouter {
+     display: none !important;
+}
+
+.iframed h1 {
+     margin: 0 5px 0 5px !important;
+}
+
+.iframed div.sorry {
+     margin: -1px 5px 10px 5px !important;
+}
+
+/* end iframed console fixes */

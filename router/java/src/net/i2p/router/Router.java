@@ -8,25 +8,25 @@ package net.i2p.router;
  *
  */
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.InputStreamReader;
 import java.io.IOException;
-import java.io.Writer;
-import java.text.DecimalFormat;
-import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.TreeSet;
+import java.util.concurrent.ConcurrentHashMap;
 
-import net.i2p.CoreVersion;
-import net.i2p.crypto.DHSessionKeyBuilder;
 import net.i2p.data.Certificate;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
@@ -36,36 +36,47 @@ import net.i2p.data.i2np.GarlicMessage;
 import net.i2p.router.message.GarlicMessageHandler;
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import net.i2p.router.startup.StartupJob;
+import net.i2p.router.startup.WorkingDir;
+import net.i2p.router.tasks.*;
 import net.i2p.router.transport.FIFOBandwidthLimiter;
-import net.i2p.stat.Rate;
+import net.i2p.router.transport.udp.UDPTransport;
 import net.i2p.stat.RateStat;
 import net.i2p.stat.StatManager;
+import net.i2p.util.ByteCache;
 import net.i2p.util.FileUtil;
+import net.i2p.util.FortunaRandomSource;
+import net.i2p.util.I2PAppThread;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
+import net.i2p.util.SecureFileOutputStream;
+import net.i2p.util.SimpleByteCache;
 import net.i2p.util.SimpleScheduler;
-import net.i2p.util.SimpleTimer;
 
 /**
  * Main driver for the router.
  *
  */
-public class Router {
+public class Router implements RouterClock.ClockShiftListener {
     private Log _log;
-    private RouterContext _context;
-    private Properties _config;
+    private final RouterContext _context;
+    private final Map<String, String> _config;
+    /** full path */
     private String _configFilename;
     private RouterInfo _routerInfo;
+    public final Object routerInfoFileLock = new Object();
     private long _started;
     private boolean _higherVersionSeen;
-    private SessionKeyPersistenceHelper _sessionKeyPersistenceHelper;
+    //private SessionKeyPersistenceHelper _sessionKeyPersistenceHelper;
     private boolean _killVMOnEnd;
-    private boolean _isAlive;
+    private volatile boolean _isAlive;
     private int _gracefulExitCode;
     private I2PThread.OOMEventListener _oomListener;
     private ShutdownHook _shutdownHook;
+    /** non-cancellable shutdown has begun */
+    private volatile boolean _shutdownInProgress;
     private I2PThread _gracefulShutdownDetector;
-    private Set _shutdownTasks;
+    private RouterWatchdog _watchdog;
+    private Thread _watchdogThread;
     
     public final static String PROP_CONFIG_FILE = "router.configLocation";
     
@@ -75,7 +86,13 @@ public class Router {
     /** used to differentiate routerInfo files on different networks */
     public static final int NETWORK_ID = 2;
     
+    /** coalesce stats this often - should be a little less than one minute, so the graphs get updated */
+    public static final int COALESCE_TIME = 50*1000;
+
+    /** this puts an 'H' in your routerInfo **/
     public final static String PROP_HIDDEN = "router.hiddenMode";
+    /** this does not put an 'H' in your routerInfo **/
+    public final static String PROP_HIDDEN_HIDDEN = "router.isHidden";
     public final static String PROP_DYNAMIC_KEYS = "router.dynamicKeys";
     public final static String PROP_INFO_FILENAME = "router.info.location";
     public final static String PROP_INFO_FILENAME_DEFAULT = "router.info";
@@ -84,6 +101,7 @@ public class Router {
     public final static String PROP_SHUTDOWN_IN_PROGRESS = "__shutdownInProgress";
     public final static String DNS_CACHE_TIME = "" + (5*60);
         
+    private static final String originalTimeZoneID;
     static {
         // grumble about sun's java caching DNS entries *forever* by default
         // so lets just keep 'em for a short time
@@ -91,30 +109,36 @@ public class Router {
         System.setProperty("sun.net.inetaddr.negative.ttl", DNS_CACHE_TIME);
         System.setProperty("networkaddress.cache.ttl", DNS_CACHE_TIME);
         System.setProperty("networkaddress.cache.negative.ttl", DNS_CACHE_TIME);
-        // until we handle restricted routes and/or all peers support v6, try v4 first
-        System.setProperty("java.net.preferIPv4Stack", "true");
         System.setProperty("http.agent", "I2P");
         // (no need for keepalive)
         System.setProperty("http.keepAlive", "false");
+        // Save it for LogManager
+        originalTimeZoneID = TimeZone.getDefault().getID();
         System.setProperty("user.timezone", "GMT");
         // just in case, lets make it explicit...
         TimeZone.setDefault(TimeZone.getTimeZone("GMT"));
+        // https://www.kb.cert.org/vuls/id/402580
+        // http://docs.codehaus.org/display/JETTY/SystemProperties
+        // Fixed in Jetty 5.1.15 but we are running 5.1.12
+        // The default is true, unfortunately it was previously
+        // set to false in wrapper.config thru 0.7.10 so we must set it back here.
+        System.setProperty("org.mortbay.util.FileResource.checkAliases", "true");
     }
     
+    /**
+     *  Instantiation only. Starts no threads. Does not install updates.
+     *  RouterContext is created but not initialized.
+     *  You must call runRouter() after any constructor to start things up.
+     */
     public Router() { this(null, null); }
-    public Router(Properties envProps) { this(null, envProps); }
-    public Router(String configFilename) { this(configFilename, null); }
-    public Router(String configFilename, Properties envProps) {
-        if (!beginMarkingLiveliness(envProps)) {
-            System.err.println("ERROR: There appears to be another router already running!");
-            System.err.println("       Please make sure to shut down old instances before starting up");
-            System.err.println("       a new one.  If you are positive that no other instance is running,");
-            System.err.println("       please delete the file " + getPingFile(envProps));
-            System.exit(-1);
-        }
 
+    public Router(Properties envProps) { this(null, envProps); }
+
+    public Router(String configFilename) { this(configFilename, null); }
+
+    public Router(String configFilename, Properties envProps) {
         _gracefulExitCode = -1;
-        _config = new Properties();
+        _config = new ConcurrentHashMap();
 
         if (configFilename == null) {
             if (envProps != null) {
@@ -126,96 +150,229 @@ public class Router {
             _configFilename = configFilename;
         }
                     
-        readConfig();
-        if (envProps == null) {
-            envProps = _config;
-        } else {
-            for (Iterator iter = _config.keySet().iterator(); iter.hasNext(); ) {
-                String k = (String)iter.next();
-                String v = _config.getProperty(k);
-                envProps.setProperty(k, v);
-            }
-        }
-            
+        // we need the user directory figured out by now, so figure it out here rather than
+        // in the RouterContext() constructor.
+        //
+        // We have not read the config file yet. Therefore the base and config locations
+        // are determined solely by properties (first envProps then System), for the purposes
+        // of initializing the user's config directory if it did not exist.
+        // If the base dir and/or config dir are set in the config file,
+        // they wil be used after the initialization of the (possibly different) dirs
+        // determined by WorkingDir.
+        // So for now, it doesn't make much sense to set the base or config dirs in the config file -
+        // use properties instead. If for some reason, distros need this, we can revisit it.
+        //
+        // Then add it to envProps (but not _config, we don't want it in the router.config file)
+        // where it will then be available to all via _context.dir()
+        //
+        // This call also migrates all files to the new working directory,
+        // including router.config
+        //
 
+        // Do we copy all the data files to the new directory? default false
+        String migrate = System.getProperty("i2p.dir.migrate");
+        boolean migrateFiles = Boolean.valueOf(migrate).booleanValue();
+        String userDir = WorkingDir.getWorkingDir(envProps, migrateFiles);
+
+        // Use the router.config file specified in the router.configLocation property
+        // (default "router.config"),
+        // if it is an abolute path, otherwise look in the userDir returned by getWorkingDir
+        // replace relative path with absolute
+        File cf = new File(_configFilename);
+        if (!cf.isAbsolute()) {
+            cf = new File(userDir, _configFilename);
+            _configFilename = cf.getAbsolutePath();
+        }
+
+        readConfig();
+
+        if (envProps == null)
+            envProps = new Properties();
+        envProps.putAll(_config);
+
+        // This doesn't work, guess it has to be in the static block above?
+        // if (Boolean.valueOf(envProps.getProperty("router.disableIPv6")).booleanValue())
+        //    System.setProperty("java.net.preferIPv4Stack", "true");
+
+        if (envProps.getProperty("i2p.dir.config") == null)
+            envProps.setProperty("i2p.dir.config", userDir);
+        // Save this in the context for the logger and apps that need it
+        envProps.setProperty("i2p.systemTimeZone", originalTimeZoneID);
+
+        // Make darn sure we don't have a leftover I2PAppContext in the same JVM
+        // e.g. on Android - see finalShutdown() also
+        List<RouterContext> contexts = RouterContext.getContexts();
+        if (contexts.isEmpty()) {
+            RouterContext.killGlobalContext();
+        } else if (System.getProperty("java.vendor").contains("Android")) {
+            System.err.println("Warning: Killing " + contexts.size() + " other routers in this JVM");
+            contexts.clear();
+            RouterContext.killGlobalContext();
+        } else {
+            System.err.println("Warning: " + contexts.size() + " other routers in this JVM");
+        }
+
+        // The important thing that happens here is the directory paths are set and created
+        // i2p.dir.router defaults to i2p.dir.config
+        // i2p.dir.app defaults to i2p.dir.router
+        // i2p.dir.log defaults to i2p.dir.router
+        // i2p.dir.pid defaults to i2p.dir.router
+        // i2p.dir.base defaults to user.dir == $CWD
         _context = new RouterContext(this, envProps);
+
+        // This is here so that we can get the directory location from the context
+        // for the ping file
+        // Check for other router but do not start a thread yet so the update doesn't cause
+        // a NCDFE
+        if (!isOnlyRouterRunning()) {
+            System.err.println("ERROR: There appears to be another router already running!");
+            System.err.println("       Please make sure to shut down old instances before starting up");
+            System.err.println("       a new one.  If you are positive that no other instance is running,");
+            System.err.println("       please delete the file " + getPingFile().getAbsolutePath());
+            System.exit(-1);
+        }
+
+        if (_config.get("router.firstVersion") == null) {
+            // These may be useful someday. First added in 0.8.2
+            _config.put("router.firstVersion", RouterVersion.VERSION);
+            String now = Long.toString(System.currentTimeMillis());
+            _config.put("router.firstInstalled", now);
+            _config.put("router.updateLastInstalled", now);
+            // First added in 0.8.13
+            _config.put("router.previousVersion", RouterVersion.VERSION);
+            saveConfig();
+        }
+        // *********  Start no threads before here ********* //
+    }
+
+    /**
+     *  Initializes the RouterContext.
+     *  Starts some threads. Does not install updates.
+     *  All this was in the constructor.
+     *  @since 0.8.12
+     */
+    private void startupStuff() {
+        // *********  Start no threads before here ********* //
+        //
+        // NOW we can start the ping file thread.
+        if (!System.getProperty("java.vendor").contains("Android"))
+            beginMarkingLiveliness();
+
+        // Apps may use this as an easy way to determine if they are in the router JVM
+        // But context.isRouterContext() is even easier...
+        // Both of these as of 0.7.9
+        System.setProperty("router.version", RouterVersion.VERSION);
+
+        // NOW we start all the activity
+        _context.initAll();
+
+        // Set wrapper.log permissions.
+        // Just hope this is the right location, we don't know for sure,
+        // but this is the same method used in LogsHelper and we have no complaints.
+        // (we could look for the wrapper.config file and parse it I guess...)
+        // If we don't have a wrapper, RouterLaunch does this for us.
+        if (_context.hasWrapper()) {
+            File f = new File(System.getProperty("java.io.tmpdir"), "wrapper.log");
+            if (!f.exists())
+                f = new File(_context.getBaseDir(), "wrapper.log");
+            if (f.exists())
+                SecureFileOutputStream.setPerms(f);
+        }
+
         _routerInfo = null;
         _higherVersionSeen = false;
         _log = _context.logManager().getLog(Router.class);
         _log.info("New router created with config file " + _configFilename);
-        _sessionKeyPersistenceHelper = new SessionKeyPersistenceHelper(_context);
+        //_sessionKeyPersistenceHelper = new SessionKeyPersistenceHelper(_context);
         _killVMOnEnd = true;
-        _oomListener = new I2PThread.OOMEventListener() { 
-            public void outOfMemory(OutOfMemoryError oom) { 
-                _log.log(Log.CRIT, "Thread ran out of memory", oom);
-                for (int i = 0; i < 5; i++) { // try this 5 times, in case it OOMs
-                    try { 
-                        _log.log(Log.CRIT, "free mem: " + Runtime.getRuntime().freeMemory() + 
-                                           " total mem: " + Runtime.getRuntime().totalMemory());
-                        break; // w00t
-                    } catch (OutOfMemoryError oome) {
-                        // gobble
-                    }
-                }
-                shutdown(EXIT_OOM); 
-            }
-        };
+        _oomListener = new OOMListener(_context);
+
         _shutdownHook = new ShutdownHook(_context);
-        _gracefulShutdownDetector = new I2PThread(new GracefulShutdown());
-        _gracefulShutdownDetector.setDaemon(true);
-        _gracefulShutdownDetector.setName("Graceful shutdown hook");
+        _gracefulShutdownDetector = new I2PAppThread(new GracefulShutdown(_context), "Graceful shutdown hook", true);
+        _gracefulShutdownDetector.setPriority(Thread.NORM_PRIORITY + 1);
         _gracefulShutdownDetector.start();
         
-        I2PThread watchdog = new I2PThread(new RouterWatchdog(_context));
-        watchdog.setName("RouterWatchdog");
-        watchdog.setDaemon(true);
-        watchdog.start();
+        _watchdog = new RouterWatchdog(_context);
+        _watchdogThread = new I2PAppThread(_watchdog, "RouterWatchdog", true);
+        _watchdogThread.setPriority(Thread.NORM_PRIORITY + 1);
+        _watchdogThread.start();
         
-        _shutdownTasks = new HashSet(0);
     }
     
+    /** @since 0.8.8 */
+    public static final void clearCaches() {
+        ByteCache.clearAll();
+        SimpleByteCache.clearAll();
+    }
+
     /**
      * Configure the router to kill the JVM when the router shuts down, as well
      * as whether to explicitly halt the JVM during the hard fail process.
      *
      */
     public void setKillVMOnEnd(boolean shouldDie) { _killVMOnEnd = shouldDie; }
+
+    /** @deprecated unused */
     public boolean getKillVMOnEnd() { return _killVMOnEnd; }
     
+    /** @return absolute path */
     public String getConfigFilename() { return _configFilename; }
+
+    /** @deprecated unused */
     public void setConfigFilename(String filename) { _configFilename = filename; }
     
     public String getConfigSetting(String name) { 
-        synchronized (_config) {
-            return _config.getProperty(name); 
-        }
+            return _config.get(name); 
     }
+
+    /**
+     *  Warning, race between here and saveConfig(),
+     *  saveConfig(String name, String value) or saveConfig(Map toAdd, Set toRemove) is recommended.
+     *
+     *  @since 0.8.13
+     */
     public void setConfigSetting(String name, String value) { 
-        synchronized (_config) {
-            _config.setProperty(name, value); 
-        }
+            _config.put(name, value); 
     }
+
+    /**
+     *  Warning, race between here and saveConfig(),
+     *  saveConfig(String name, String value) or saveConfig(Map toAdd, Set toRemove) is recommended.
+     *
+     *  @since 0.8.13
+     */
     public void removeConfigSetting(String name) { 
-        synchronized (_config) {
             _config.remove(name); 
-        }
+            // remove the backing default also
+            _context.removeProperty(name);
     }
-    public Set getConfigSettings() { 
-        synchronized (_config) {
-            return new HashSet(_config.keySet()); 
-        }
+
+    /**
+     *  @return unmodifiable Set, unsorted
+     */
+    public Set<String> getConfigSettings() { 
+        return Collections.unmodifiableSet(_config.keySet()); 
     }
-    public Properties getConfigMap() { 
-        Properties rv = new Properties();
-        synchronized (_config) {
-            rv.putAll(_config); 
-        }
-        return rv;
+
+    /**
+     *  @return unmodifiable Map, unsorted
+     */
+    public Map<String, String> getConfigMap() { 
+        return Collections.unmodifiableMap(_config); 
     }
     
+    /**
+     *  Warning, may be null if called very early
+     */
     public RouterInfo getRouterInfo() { return _routerInfo; }
+
+    /**
+     *  Caller must ensure info is valid - no validation done here
+     */
     public void setRouterInfo(RouterInfo info) { 
         _routerInfo = info; 
+        if (_log.shouldLog(Log.INFO))
+            _log.info("setRouterInfo() : " + info, new Exception("I did it"));
         if (info != null)
             _context.jobQueue().addJob(new PersistRouterInfoJob(_context));
     }
@@ -223,68 +380,95 @@ public class Router {
     /**
      * True if the router has tried to communicate with another router who is running a higher
      * incompatible protocol version.  
-     *
+     * @deprecated unused
      */
     public boolean getHigherVersionSeen() { return _higherVersionSeen; }
+
+    /**
+     * True if the router has tried to communicate with another router who is running a higher
+     * incompatible protocol version.  
+     * @deprecated unused
+     */
     public void setHigherVersionSeen(boolean seen) { _higherVersionSeen = seen; }
     
     public long getWhenStarted() { return _started; }
+
     /** wall clock uptime */
     public long getUptime() { 
         if ( (_context == null) || (_context.clock() == null) ) return 1; // racing on startup
-        return _context.clock().now() - _context.clock().getOffset() - _started;
+        return Math.max(1, _context.clock().now() - _context.clock().getOffset() - _started);
     }
     
     public RouterContext getContext() { return _context; }
     
-    void runRouter() {
+    /**
+     *  This must be called after instantiation.
+     *  Starts the threads. Does not install updates.
+     *  Most users will just call main() instead.
+     *  @since public as of 0.9 for Android and other embedded uses
+     */
+    public void runRouter() {
+        if (_isAlive)
+            throw new IllegalStateException();
+        startupStuff();
         _isAlive = true;
         _started = _context.clock().now();
-        Runtime.getRuntime().addShutdownHook(_shutdownHook);
+        try {
+            Runtime.getRuntime().addShutdownHook(_shutdownHook);
+        } catch (IllegalStateException ise) {}
         I2PThread.addOOMEventListener(_oomListener);
         
         _context.keyManager().startup();
         
-        readConfig();
-        
         setupHandlers();
-        if (ALLOW_DYNAMIC_KEYS) {
-            if ("true".equalsIgnoreCase(_context.getProperty(Router.PROP_HIDDEN, "false")))
-                killKeys();
-        }
+        //if (ALLOW_DYNAMIC_KEYS) {
+        //    if ("true".equalsIgnoreCase(_context.getProperty(Router.PROP_HIDDEN, "false")))
+        //        killKeys();
+        //}
 
         _context.messageValidator().startup();
         _context.tunnelDispatcher().startup();
         _context.inNetMessagePool().startup();
         startupQueue();
         //_context.jobQueue().addJob(new CoalesceStatsJob(_context));
-        SimpleScheduler.getInstance().addPeriodicEvent(new CoalesceStatsEvent(_context), 20*1000);
+        _context.simpleScheduler().addPeriodicEvent(new CoalesceStatsEvent(_context), COALESCE_TIME);
         _context.jobQueue().addJob(new UpdateRoutingKeyModifierJob(_context));
         warmupCrypto();
-        _sessionKeyPersistenceHelper.startup();
+        //_sessionKeyPersistenceHelper.startup();
         //_context.adminManager().startup();
         _context.blocklist().startup();
         
         // let the timestamper get us sync'ed
+        // this will block for quite a while on a disconnected machine
         long before = System.currentTimeMillis();
         _context.clock().getTimestamper().waitForInitialization();
         long waited = System.currentTimeMillis() - before;
         if (_log.shouldLog(Log.INFO))
             _log.info("Waited " + waited + "ms to initialize");
-        
+
         _context.jobQueue().addJob(new StartupJob(_context));
     }
     
-    public void readConfig() {
+    /**
+     * This updates the config with all settings found in the file.
+     * It does not clear the config first, so settings not found in
+     * the file will remain in the config.
+     *
+     * This is synchronized with saveConfig()
+     */
+    public synchronized void readConfig() {
         String f = getConfigFilename();
         Properties config = getConfig(_context, f);
-        for (Iterator iter = config.keySet().iterator(); iter.hasNext(); ) {
-            String name = (String)iter.next();
-            String val = config.getProperty(name);
-            setConfigSetting(name, val);
-        }
+        // to avoid compiler errror
+        Map foo = _config;
+        foo.putAll(config);
     }
     
+    /**
+     *  this does not use ctx.getConfigDir(), must provide a full path in filename
+     *
+     *  @param ctx will be null at startup when called from constructor
+     */
     private static Properties getConfig(RouterContext ctx, String filename) {
         Log log = null;
         if (ctx != null) {
@@ -302,10 +486,15 @@ public class Router {
             } else {
                 if (log != null)
                     log.warn("Configuration file " + filename + " does not exist");
+                // normal not to exist at first install
+                //else
+                //    System.err.println("WARNING: Configuration file " + filename + " does not exist");
             }
         } catch (Exception ioe) {
             if (log != null)
                 log.error("Error loading the router configuration from " + filename, ioe);
+            else
+                System.err.println("Error loading the router configuration from " + filename + ": " + ioe);
         }
         return props;
     }
@@ -343,49 +532,44 @@ public class Router {
             }
             ri.sign(key);
             setRouterInfo(ri);
-            Republish r = new Republish();
+            if (!ri.isValid())
+                throw new DataFormatException("Our RouterInfo has a bad signature");
+            Republish r = new Republish(_context);
             if (blockingRebuild)
                 r.timeReached();
             else
-                SimpleScheduler.getInstance().addEvent(r, 0);
+                _context.simpleScheduler().addEvent(r, 0);
         } catch (DataFormatException dfe) {
             _log.log(Log.CRIT, "Internal error - unable to sign our own address?!", dfe);
         }
     }
-    
-    private class Republish implements SimpleTimer.TimedEvent {
-        public void timeReached() {
-            try {
-                _context.netDb().publish(getRouterInfo());
-            } catch (IllegalArgumentException iae) {
-                _log.log(Log.CRIT, "Local router info is invalid?  rebuilding a new identity", iae);
-                rebuildNewIdentity();
-            }
-        }
-    }
-    
-    // publicize our ballpark capacity - this does not affect anything at
-    // the moment
+
+    // publicize our ballpark capacity
     public static final char CAPABILITY_BW12 = 'K';
     public static final char CAPABILITY_BW32 = 'L';
     public static final char CAPABILITY_BW64 = 'M';
     public static final char CAPABILITY_BW128 = 'N';
     public static final char CAPABILITY_BW256 = 'O';
+    public static final String PROP_FORCE_BWCLASS = "router.forceBandwidthClass";
     
     public static final char CAPABILITY_REACHABLE = 'R';
     public static final char CAPABILITY_UNREACHABLE = 'U';
     public static final String PROP_FORCE_UNREACHABLE = "router.forceUnreachable";
 
+    /** @deprecated unused */
     public static final char CAPABILITY_NEW_TUNNEL = 'T';
     
     public void addCapabilities(RouterInfo ri) {
         int bwLim = Math.min(_context.bandwidthLimiter().getInboundKBytesPerSecond(),
                              _context.bandwidthLimiter().getOutboundKBytesPerSecond());
-        bwLim = (int)(((float)bwLim) * getSharePercentage());
+        bwLim = (int)(bwLim * getSharePercentage());
         if (_log.shouldLog(Log.INFO))
             _log.info("Adding capabilities w/ bw limit @ " + bwLim, new Exception("caps"));
         
-        if (bwLim < 12) {
+        String force = _context.getProperty(PROP_FORCE_BWCLASS);
+        if (force != null && force.length() > 0) {
+            ri.addCapability(force.charAt(0));
+        } else if (bwLim < 12) {
             ri.addCapability(CAPABILITY_BW12);
         } else if (bwLim <= 32) {
             ri.addCapability(CAPABILITY_BW32);
@@ -397,14 +581,15 @@ public class Router {
             ri.addCapability(CAPABILITY_BW256);
         }
         
-        if (FloodfillNetworkDatabaseFacade.floodfillEnabled(_context))
-            ri.addCapability(FloodfillNetworkDatabaseFacade.CAPACITY_FLOODFILL);
+        // if prop set to true, don't tell people we are ff even if we are
+        if (FloodfillNetworkDatabaseFacade.floodfillEnabled(_context) &&
+            !_context.getBooleanProperty("router.hideFloodfillParticipant"))
+            ri.addCapability(FloodfillNetworkDatabaseFacade.CAPABILITY_FLOODFILL);
         
-        if("true".equalsIgnoreCase(_context.getProperty(Router.PROP_HIDDEN, "false")))
+        if(_context.getBooleanProperty(PROP_HIDDEN))
             ri.addCapability(RouterInfo.CAPABILITY_HIDDEN);
         
-        String forceUnreachable = _context.getProperty(PROP_FORCE_UNREACHABLE);
-        if ( (forceUnreachable != null) && ("true".equalsIgnoreCase(forceUnreachable)) ) {
+        if (_context.getBooleanProperty(PROP_FORCE_UNREACHABLE)) {
             ri.addCapability(CAPABILITY_UNREACHABLE);
             return;
         }
@@ -426,18 +611,24 @@ public class Router {
         RouterInfo ri = _routerInfo;
         if ( (ri != null) && (ri.isHidden()) )
             return true;
-        return Boolean.valueOf(_context.getProperty("router.isHidden", "false")).booleanValue();
+        String h = _context.getProperty(PROP_HIDDEN_HIDDEN);
+        if (h != null)
+            return Boolean.valueOf(h).booleanValue();
+        return _context.commSystem().isInBadCountry();
     }
+
+    /**
+     *  Only called at startup via LoadRouterInfoJob and RebuildRouterInfoJob.
+     *  Not called by periodic RepublishLocalRouterInfoJob.
+     *  We don't want to change the cert on the fly as it changes the router hash.
+     *  RouterInfo.isHidden() checks the capability, but RouterIdentity.isHidden() checks the cert.
+     *  There's no reason to ever add a hidden cert?
+     *  @return the certificate for a new RouterInfo - probably a null cert.
+     */
     public Certificate createCertificate() {
-        Certificate cert = new Certificate();
-        if (isHidden()) {
-            cert.setCertificateType(Certificate.CERTIFICATE_TYPE_HIDDEN);
-            cert.setPayload(null);
-        } else {
-            cert.setCertificateType(Certificate.CERTIFICATE_TYPE_NULL);
-            cert.setPayload(null);
-        }
-        return cert;
+        if (_context.getBooleanProperty(PROP_HIDDEN))
+            return new Certificate(Certificate.CERTIFICATE_TYPE_HIDDEN, null);
+        return Certificate.NULL_CERT;
     }
     
     /**
@@ -446,20 +637,21 @@ public class Router {
      */
     private static final String _rebuildFiles[] = new String[] { "router.info", 
                                                                  "router.keys",
-                                                                 "netDb/my.info",
-                                                                 "connectionTag.keys",
+                                                                 "netDb/my.info",      // no longer used
+                                                                 "connectionTag.keys", // never used?
                                                                  "keyBackup/privateEncryption.key",
                                                                  "keyBackup/privateSigning.key",
                                                                  "keyBackup/publicEncryption.key",
                                                                  "keyBackup/publicSigning.key",
-                                                                 "sessionKeys.dat" };
+                                                                 "sessionKeys.dat"     // no longer used
+                                                               };
 
     static final String IDENTLOG = "identlog.txt";
-    public static void killKeys() {
-        new Exception("Clearing identity files").printStackTrace();
+    public void killKeys() {
+        //new Exception("Clearing identity files").printStackTrace();
         int remCount = 0;
         for (int i = 0; i < _rebuildFiles.length; i++) {
-            File f = new File(_rebuildFiles[i]);
+            File f = new File(_context.getRouterDir(),_rebuildFiles[i]);
             if (f.exists()) {
                 boolean removed = f.delete();
                 if (removed) {
@@ -470,10 +662,18 @@ public class Router {
                 }
             }
         }
+
+        // now that we have random ports, keeping the same port would be bad
+        synchronized(this) {
+            removeConfigSetting(UDPTransport.PROP_INTERNAL_PORT);
+            removeConfigSetting(UDPTransport.PROP_EXTERNAL_PORT);
+            saveConfig();
+        }
+
         if (remCount > 0) {
             FileOutputStream log = null;
             try {
-                log = new FileOutputStream(IDENTLOG, true);
+                log = new FileOutputStream(new File(_context.getRouterDir(), IDENTLOG), true);
                 log.write((new Date() + ": Old router identity keys cleared\n").getBytes());
             } catch (IOException ioe) {
                 // ignore
@@ -489,22 +689,34 @@ public class Router {
      *
      */
     public void rebuildNewIdentity() {
-        killKeys();
-        try {
-            for (Iterator iter = _shutdownTasks.iterator(); iter.hasNext(); ) {
-                Runnable task = (Runnable)iter.next();
-                task.run();
-            }
-        } catch (Throwable t) {
-            _log.log(Log.CRIT, "Error running shutdown task", t);
+        if (_shutdownHook != null) {
+            try {
+                Runtime.getRuntime().removeShutdownHook(_shutdownHook);
+            } catch (IllegalStateException ise) {}
         }
+        killKeys();
+        for (Runnable task : _context.getShutdownTasks()) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Running shutdown task " + task.getClass());
+            try {
+                task.run();
+            } catch (Throwable t) {
+                _log.log(Log.CRIT, "Error running shutdown task", t);
+            }
+        }
+        _context.removeShutdownTasks();
         // hard and ugly
+        if (_context.hasWrapper())
+            _log.log(Log.CRIT, "Restarting with new router identity");
+        else
+            _log.log(Log.CRIT, "Shutting down because old router identity was invalid - restart I2P");
         finalShutdown(EXIT_HARD_RESTART);
     }
     
     private void warmupCrypto() {
         _context.random().nextBoolean();
-        new DHSessionKeyBuilder(); // load the class so it starts the precalc process
+        // Instantiate to fire up the YK refiller thread
+        _context.elGamalEngine();
     }
     
     private void startupQueue() {
@@ -516,312 +728,114 @@ public class Router {
         //_context.inNetMessagePool().registerHandlerJobBuilder(TunnelMessage.MESSAGE_TYPE, new TunnelMessageHandler(_context));
     }
     
-    public void renderStatusHTML(Writer out) throws IOException {
-        out.write("<h1>Router console</h1>\n" +
-                   "<i><a href=\"/oldconsole.jsp\">console</a> | <a href=\"/oldstats.jsp\">stats</a></i><br>\n" +
-                   "<form action=\"/oldconsole.jsp\">" +
-                   "<select name=\"go\" onChange='location.href=this.value'>" +
-                   "<option value=\"/oldconsole.jsp#bandwidth\">Bandwidth</option>\n" +
-                   "<option value=\"/oldconsole.jsp#clients\">Clients</option>\n" +
-                   "<option value=\"/oldconsole.jsp#transports\">Transports</option>\n" +
-                   "<option value=\"/oldconsole.jsp#profiles\">Peer Profiles</option>\n" +
-                   "<option value=\"/oldconsole.jsp#tunnels\">Tunnels</option>\n" +
-                   "<option value=\"/oldconsole.jsp#jobs\">Jobs</option>\n" +
-                   "<option value=\"/oldconsole.jsp#shitlist\">Shitlist</option>\n" +
-                   "<option value=\"/oldconsole.jsp#pending\">Pending messages</option>\n" +
-                   "<option value=\"/oldconsole.jsp#netdb\">Network Database</option>\n" +
-                   "<option value=\"/oldconsole.jsp#logs\">Log messages</option>\n" +
-                   "</select> <input type=\"submit\" value=\"GO\" /> </form>" +
-                   "<hr />\n");
-
-        StringBuffer buf = new StringBuffer(32*1024);
-        
-        if ( (_routerInfo != null) && (_routerInfo.getIdentity() != null) )
-            buf.append("<b>Router: </b> ").append(_routerInfo.getIdentity().getHash().toBase64()).append("<br />\n");
-        buf.append("<b>As of: </b> ").append(new Date(_context.clock().now())).append(" (uptime: ").append(DataHelper.formatDuration(getUptime())).append(") <br />\n");
-        buf.append("<b>Started on: </b> ").append(new Date(getWhenStarted())).append("<br />\n");
-        buf.append("<b>Clock offset: </b> ").append(_context.clock().getOffset()).append("ms (OS time: ").append(new Date(_context.clock().now() - _context.clock().getOffset())).append(")<br />\n");
-        long tot = Runtime.getRuntime().totalMemory()/1024;
-        long free = Runtime.getRuntime().freeMemory()/1024;
-        buf.append("<b>Memory:</b> In use: ").append((tot-free)).append("KB Free: ").append(free).append("KB <br />\n"); 
-        buf.append("<b>Version:</b> Router: ").append(RouterVersion.VERSION).append(" / SDK: ").append(CoreVersion.VERSION).append("<br />\n"); 
-        if (_higherVersionSeen) 
-            buf.append("<b><font color=\"red\">HIGHER VERSION SEEN</font><b> - please <a href=\"http://www.i2p.net/\">check</a> to see if there is a new release out<br />\n");
-
-        buf.append("<hr /><a name=\"bandwidth\"> </a><h2>Bandwidth</h2>\n");
-        long sent = _context.bandwidthLimiter().getTotalAllocatedOutboundBytes();
-        long received = _context.bandwidthLimiter().getTotalAllocatedInboundBytes();
-        buf.append("<ul>");
-
-        buf.append("<li> ").append(sent).append(" bytes sent, ");
-        buf.append(received).append(" bytes received</li>");
-
-        long notSent = _context.bandwidthLimiter().getTotalWastedOutboundBytes();
-        long notReceived = _context.bandwidthLimiter().getTotalWastedInboundBytes();
-
-        buf.append("<li> ").append(notSent).append(" bytes outbound bytes unused, ");
-        buf.append(notReceived).append(" bytes inbound bytes unused</li>");
-
-        DecimalFormat fmt = new DecimalFormat("##0.00");
-
-        // we use the unadjusted time, since thats what getWhenStarted is based off
-        long lifetime = _context.clock().now()-_context.clock().getOffset() - getWhenStarted();
-        lifetime /= 1000;
-        if ( (sent > 0) && (received > 0) ) {
-            double sendKBps = sent / (lifetime*1024.0);
-            double receivedKBps = received / (lifetime*1024.0);
-            buf.append("<li>Lifetime rate: ");
-            buf.append(fmt.format(sendKBps)).append("KBps sent ");
-            buf.append(fmt.format(receivedKBps)).append("KBps received");
-            buf.append("</li>");
-        }
-        if ( (notSent > 0) && (notReceived > 0) ) {
-            double notSendKBps = notSent / (lifetime*1024.0);
-            double notReceivedKBps = notReceived / (lifetime*1024.0);
-            buf.append("<li>Lifetime unused rate: ");
-            buf.append(fmt.format(notSendKBps)).append("KBps outbound unused  ");
-            buf.append(fmt.format(notReceivedKBps)).append("KBps inbound unused");
-            buf.append("</li>");
-        } 
-        
-        RateStat sendRate = _context.statManager().getRate("transport.sendMessageSize");
-        for (int i = 0; i < sendRate.getPeriods().length; i++) {
-            Rate rate = sendRate.getRate(sendRate.getPeriods()[i]);
-            double bytes = rate.getLastTotalValue();
-            long ms = rate.getLastTotalEventTime() + rate.getLastTotalEventTime();
-            if (ms <= 0) {
-                bytes = 0;
-                ms = 1;
-            }
-            buf.append("<li>");
-            buf.append(DataHelper.formatDuration(rate.getPeriod())).append(" instantaneous send avg: ");
-            double bps = bytes*1000.0d/ms;
-            if (bps > 2048) {
-                bps /= 1024.0d;
-                buf.append(fmt.format(bps)).append(" KBps");
-            } else {
-                buf.append(fmt.format(bps)).append(" Bps");
-            }
-            buf.append(" over ").append((long)bytes).append(" bytes");
-            buf.append("</li><li>");
-            buf.append(DataHelper.formatDuration(rate.getPeriod())).append(" period send avg: ");
-            bps = bytes*1000.0d/(rate.getPeriod()); 
-            if (bps > 2048) {
-                bps /= 1024.0d;
-                buf.append(fmt.format(bps)).append(" KBps");
-            } else {
-                buf.append(fmt.format(bps)).append(" Bps");
-            }
-            buf.append(" over ").append((long)bytes).append(" bytes");
-            buf.append("</li>");
-        }
-
-        RateStat receiveRate = _context.statManager().getRate("transport.receiveMessageSize");
-        for (int i = 0; i < receiveRate.getPeriods().length; i++) {
-            Rate rate = receiveRate.getRate(receiveRate.getPeriods()[i]);
-            double bytes = rate.getLastTotalValue();
-            long ms = rate.getLastTotalEventTime();
-            if (ms <= 0) {
-                bytes = 0;
-                ms = 1;
-            }
-            buf.append("<li>");
-            buf.append(DataHelper.formatDuration(rate.getPeriod())).append(" instantaneous receive avg: ");
-            double bps = bytes*1000.0d/ms;
-            if (bps > 2048) {
-                bps /= 1024.0d;
-                buf.append(fmt.format(bps)).append(" KBps ");
-            } else {
-                buf.append(fmt.format(bps)).append(" Bps ");
-            }
-            buf.append(" over ").append((long)bytes).append(" bytes");
-            buf.append("</li><li>");
-            buf.append(DataHelper.formatDuration(rate.getPeriod())).append(" period receive avg: ");
-            bps = bytes*1000.0d/(rate.getPeriod());
-            if (bps > 2048) {
-                bps /= 1024.0d;
-                buf.append(fmt.format(bps)).append(" KBps");
-            } else {
-                buf.append(fmt.format(bps)).append(" Bps");
-            }
-            buf.append(" over ").append((long)bytes).append(" bytes");
-            buf.append("</li>");
-        }
-
-        buf.append("</ul>\n");
-        buf.append("<i>Instantaneous averages count how fast the transfers go when we're trying to transfer data, ");
-        buf.append("while period averages count how fast the transfers go across the entire period, even when we're not ");
-        buf.append("trying to transfer data.  Lifetime averages count how many elephants there are on the moon [like anyone reads this text]</i>");
-        buf.append("\n");
-        
-        out.write(buf.toString());
-        
-        _context.bandwidthLimiter().renderStatusHTML(out);
-
-        out.write("<hr /><a name=\"clients\"> </a>\n");
-        
-        _context.clientManager().renderStatusHTML(out);
-        
-        out.write("\n<hr /><a name=\"transports\"> </a>\n");
-        
-        _context.commSystem().renderStatusHTML(out);
-        
-        out.write("\n<hr /><a name=\"profiles\"> </a>\n");
-        
-        _context.peerManager().renderStatusHTML(out);
-        
-        out.write("\n<hr /><a name=\"tunnels\"> </a>\n");
-        
-        _context.tunnelManager().renderStatusHTML(out);
-        
-        out.write("\n<hr /><a name=\"jobs\"> </a>\n");
-        
-        _context.jobQueue().renderStatusHTML(out);
-        
-        out.write("\n<hr /><a name=\"shitlist\"> </a>\n");
-        
-        _context.shitlist().renderStatusHTML(out);
-        
-        out.write("\n<hr /><a name=\"pending\"> </a>\n");
-        
-        _context.messageRegistry().renderStatusHTML(out);
-        
-        out.write("\n<hr /><a name=\"netdb\"> </a>\n");
-        
-        _context.netDb().renderStatusHTML(out);
-        
-        buf.setLength(0);
-        buf.append("\n<hr /><a name=\"logs\"> </a>\n");	
-        List msgs = _context.logManager().getBuffer().getMostRecentMessages();
-        buf.append("\n<h2>Most recent console messages:</h2><table border=\"1\">\n");
-        for (Iterator iter = msgs.iterator(); iter.hasNext(); ) {
-            String msg = (String)iter.next();
-            buf.append("<tr><td valign=\"top\" align=\"left\"><pre>");
-            appendLogMessage(buf, msg);
-            buf.append("</pre></td></tr>\n");
-        }
-        buf.append("</table>\n");
-        out.write(buf.toString());
-        out.flush();
-    }
-    
-    private static int MAX_MSG_LENGTH = 120;
-    private static final void appendLogMessage(StringBuffer buf, String msg) {
-        // disable this code for the moment because i think it
-        // looks ugly (on the router console)
-        if (true) {
-            buf.append(msg);
-            return;
-        }
-        if (msg.length() < MAX_MSG_LENGTH) {
-            buf.append(msg);
-            return;
-        }
-        int newline = msg.indexOf('\n');
-        int len = msg.length();
-        while ( (msg != null) && (len > 0) ) {
-            if (newline < 0) {
-                // last line, trim if necessary
-                if (len > MAX_MSG_LENGTH)
-                    msg = msg.substring(len-MAX_MSG_LENGTH);
-                buf.append(msg);
-                return;
-            } else if (newline >= MAX_MSG_LENGTH) {
-                // not the last line, but too long.  
-                // trim the first few chars 
-                String cur = msg.substring(newline-MAX_MSG_LENGTH, newline).trim();
-                msg = msg.substring(newline+1);
-                if (cur.length() > 0)
-                    buf.append(cur).append('\n');
-            } else {
-                // newline <= max_msg_length, so its not the last,
-                // and not too long
-                String cur = msg.substring(0, newline).trim();
-                msg = msg.substring(newline+1);
-                if (cur.length() > 0)
-                    buf.append(cur).append('\n');
-            }
-            newline = msg.indexOf('\n');
-            len = msg.length();
-        }
-    }
-    
-    /** main-ish method for testing appendLogMessage */
-    private static final void testAppendLog() {
-        StringBuffer buf = new StringBuffer(1024);
-        Router.appendLogMessage(buf, "hi\nhow are you\nh0h0h0");
-        System.out.println("line: [" + buf.toString() + "]");
-        buf.setLength(0);
-        Router.appendLogMessage(buf, "\nfine thanks\nh0h0h0");
-        System.out.println("line: [" + buf.toString() + "]");
-        buf.setLength(0);
-        Router.appendLogMessage(buf, "liar\nblah blah\n");
-        System.out.println("line: [" + buf.toString() + "]");
-        buf.setLength(0);
-        Router.appendLogMessage(buf, "\n");
-        System.out.println("line: [" + buf.toString() + "]");
-        buf.setLength(0);
-        Router.appendLogMessage(buf, "");
-        System.out.println("line: [" + buf.toString() + "]");
-        buf.setLength(0);
-        Router.appendLogMessage(buf, ".........10........20........30........40........50........6");
-        System.out.println("line: [" + buf.toString() + "]");
-        buf.setLength(0);
-        Router.appendLogMessage(buf, ".........10........\n20........30........40........50........6");
-        System.out.println("line: [" + buf.toString() + "]");
-        buf.setLength(0);
-        Router.appendLogMessage(buf, ".........10........20\n........30........40........50........6");
-        System.out.println("line: [" + buf.toString() + "]");
-        buf.setLength(0);
-        Router.appendLogMessage(buf, ".........10.......\n.20........30........40........50........6");
-        System.out.println("line: [" + buf.toString() + "]");
-        buf.setLength(0);
-        Router.appendLogMessage(buf, "\n.........10........20........30........40........50........6");
-        System.out.println("line: [" + buf.toString() + "]");
-        buf.setLength(0);
-    }
-    
-    public void addShutdownTask(Runnable task) {
-        synchronized (_shutdownTasks) {
-            _shutdownTasks.add(task);
-        }
-    }
-    
     public static final int EXIT_GRACEFUL = 2;
     public static final int EXIT_HARD = 3;
     public static final int EXIT_OOM = 10;
     public static final int EXIT_HARD_RESTART = 4;
     public static final int EXIT_GRACEFUL_RESTART = 5;
     
+    /**
+     *  Shutdown with no chance of cancellation
+     */
     public void shutdown(int exitCode) {
+        if (_shutdownInProgress)
+            return;
+        _shutdownInProgress = true;
+        _context.throttle().setShutdownStatus();
+        if (_shutdownHook != null) {
+            try {
+                Runtime.getRuntime().removeShutdownHook(_shutdownHook);
+            } catch (IllegalStateException ise) {}
+        }
+        shutdown2(exitCode);
+    }
+
+    /**
+     *  Cancel the JVM runtime hook before calling this.
+     *  Called by the ShutdownHook.
+     *  NOT to be called by others, use shutdown().
+     */
+    public void shutdown2(int exitCode) {
+        _shutdownInProgress = true;
+        _log.log(Log.CRIT, "Starting final shutdown(" + exitCode + ')');
+        // So we can get all the way to the end
+        // No, you can't do Thread.currentThread.setDaemon(false)
+        if (_killVMOnEnd) {
+            try {
+                (new Spinner()).start();
+            } catch (Throwable t) {}
+        }
+        ((RouterClock) _context.clock()).removeShiftListener(this);
         _isAlive = false;
         _context.random().saveSeed();
         I2PThread.removeOOMEventListener(_oomListener);
         // Run the shutdown hooks first in case they want to send some goodbye messages
         // Maybe we need a delay after this too?
-        try {
-            for (Iterator iter = _shutdownTasks.iterator(); iter.hasNext(); ) {
-                Runnable task = (Runnable)iter.next();
-                task.run();
+        for (Runnable task : _context.getShutdownTasks()) {
+            //System.err.println("Running shutdown task " + task.getClass());
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Running shutdown task " + task.getClass());
+            try {
+                //task.run();
+                Thread t = new Thread(task, "Shutdown task " + task.getClass().getName());
+                t.setDaemon(true);
+                t.start();
+                try {
+                    t.join(10*1000);
+                } catch (InterruptedException ie) {}
+                if (t.isAlive())
+                    _log.logAlways(Log.WARN, "Shutdown task took more than 10 seconds to run: " + task.getClass());
+            } catch (Throwable t) {
+                _log.log(Log.CRIT, "Error running shutdown task", t);
             }
-        } catch (Throwable t) {
-            _log.log(Log.CRIT, "Error running shutdown task", t);
         }
-        try { _context.clientManager().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the client manager", t); }
-        try { _context.jobQueue().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the job queue", t); }
-        //try { _context.adminManager().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the admin manager", t); }        
-        try { _context.statPublisher().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the stats manager", t); }
-        try { _context.tunnelManager().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the tunnel manager", t); }
-        try { _context.tunnelDispatcher().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the tunnel dispatcher", t); }
-        try { _context.netDb().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the networkDb", t); }
-        try { _context.commSystem().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the comm system", t); }
-        try { _context.peerManager().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the peer manager", t); }
-        try { _context.messageRegistry().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the message registry", t); }
-        try { _context.messageValidator().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the message validator", t); }
-        try { _context.inNetMessagePool().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the inbound net pool", t); }
-        try { _sessionKeyPersistenceHelper.shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the session key manager", t); }
-        RouterContext.listContexts().remove(_context);
-        dumpStats();
+
+        // Set the last version to the current version, since 0.8.13
+        if (!RouterVersion.VERSION.equals(_config.get("router.previousVersion"))) {
+            saveConfig("router.previousVersion", RouterVersion.VERSION);
+        }
+
+        _context.removeShutdownTasks();
+        try { _context.clientManager().shutdown(); } catch (Throwable t) { _log.error("Error shutting down the client manager", t); }
+        try { _context.namingService().shutdown(); } catch (Throwable t) { _log.error("Error shutting down the naming service", t); }
+        try { _context.jobQueue().shutdown(); } catch (Throwable t) { _log.error("Error shutting down the job queue", t); }
+        try { _context.statPublisher().shutdown(); } catch (Throwable t) { _log.error("Error shutting down the stats publisher", t); }
+        try { _context.tunnelManager().shutdown(); } catch (Throwable t) { _log.error("Error shutting down the tunnel manager", t); }
+        try { _context.tunnelDispatcher().shutdown(); } catch (Throwable t) { _log.error("Error shutting down the tunnel dispatcher", t); }
+        try { _context.netDb().shutdown(); } catch (Throwable t) { _log.error("Error shutting down the networkDb", t); }
+        try { _context.commSystem().shutdown(); } catch (Throwable t) { _log.error("Error shutting down the comm system", t); }
+        try { _context.bandwidthLimiter().shutdown(); } catch (Throwable t) { _log.error("Error shutting down the comm system", t); }
+        try { _context.peerManager().shutdown(); } catch (Throwable t) { _log.error("Error shutting down the peer manager", t); }
+        try { _context.messageRegistry().shutdown(); } catch (Throwable t) { _log.error("Error shutting down the message registry", t); }
+        try { _context.messageValidator().shutdown(); } catch (Throwable t) { _log.error("Error shutting down the message validator", t); }
+        try { _context.inNetMessagePool().shutdown(); } catch (Throwable t) { _log.error("Error shutting down the inbound net pool", t); }
+        try { _context.clientMessagePool().shutdown(); } catch (Throwable t) { _log.error("Error shutting down the client msg pool", t); }
+        try { _context.sessionKeyManager().shutdown(); } catch (Throwable t) { _log.error("Error shutting down the session key manager", t); }
+        try { _context.messageHistory().shutdown(); } catch (Throwable t) { _log.error("Error shutting down the message history logger", t); }
+        // do stat manager last to reduce chance of NPEs in other threads
+        try { _context.statManager().shutdown(); } catch (Throwable t) { _log.error("Error shutting down the stats manager", t); }
+        _context.deleteTempDir();
+        List<RouterContext> contexts = RouterContext.getContexts();
+        contexts.remove(_context);
+
+        // shut down I2PAppContext tasks here
+
+        try {
+            _context.elGamalEngine().shutdown();
+        } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting elGamal", t); }
+
+        if (contexts.isEmpty()) {
+            // any thing else to shut down?
+        } else {
+            _log.logAlways(Log.WARN, "Warning - " + contexts.size() + " routers remaining in this JVM, not releasing all resources");
+        }
+        try {
+            ((FortunaRandomSource)_context.random()).shutdown();
+        } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting random()", t); }
+
+        // logManager shut down in finalShutdown()
+        _watchdog.shutdown();
+        _watchdogThread.interrupt();
         finalShutdown(exitCode);
     }
 
@@ -831,19 +845,41 @@ public class Router {
      */
     private static final boolean ALLOW_DYNAMIC_KEYS = false;
 
-    public void finalShutdown(int exitCode) {
-        _log.log(Log.CRIT, "Shutdown(" + exitCode + ") complete", new Exception("Shutdown"));
+    /**
+     *  Cancel the JVM runtime hook before calling this.
+     */
+    private void finalShutdown(int exitCode) {
+        clearCaches();
+        _log.log(Log.CRIT, "Shutdown(" + exitCode + ") complete"  /* , new Exception("Shutdown") */ );
         try { _context.logManager().shutdown(); } catch (Throwable t) { }
         if (ALLOW_DYNAMIC_KEYS) {
-            if ("true".equalsIgnoreCase(_context.getProperty(PROP_DYNAMIC_KEYS, "false")))
+            if (_context.getBooleanProperty(PROP_DYNAMIC_KEYS))
                 killKeys();
         }
 
-        File f = new File(getPingFile());
+        File f = getPingFile();
         f.delete();
+        if (RouterContext.getContexts().isEmpty())
+            RouterContext.killGlobalContext();
+
+        // Since 0.8.8, for Android and the wrapper
+        for (Runnable task : _context.getFinalShutdownTasks()) {
+            //System.err.println("Running final shutdown task " + task.getClass());
+            try {
+                task.run();
+            } catch (Throwable t) {
+                System.err.println("Running final shutdown task " + t);
+            }
+        }
+        _context.getFinalShutdownTasks().clear();
+
         if (_killVMOnEnd) {
             try { Thread.sleep(1000); } catch (InterruptedException ie) {}
-            Runtime.getRuntime().halt(exitCode);
+            //Runtime.getRuntime().halt(exitCode);
+            // allow the Runtime shutdown hooks to execute
+            Runtime.getRuntime().exit(exitCode);
+        } else if (System.getProperty("java.vendor").contains("Android")) {
+            Runtime.getRuntime().gc();
         }
     }
     
@@ -859,9 +895,14 @@ public class Router {
     public void shutdownGracefully() {
         shutdownGracefully(EXIT_GRACEFUL);
     }
+    /**
+     * Call this with EXIT_HARD or EXIT_HARD_RESTART for a non-blocking,
+     * hard, non-graceful shutdown with a brief delay to allow a UI response
+     */
     public void shutdownGracefully(int exitCode) {
         _gracefulExitCode = exitCode;
-        _config.setProperty(PROP_SHUTDOWN_IN_PROGRESS, "true");
+        _config.put(PROP_SHUTDOWN_IN_PROGRESS, "true");
+        _context.throttle().setShutdownStatus();
         synchronized (_gracefulShutdownDetector) {
             _gracefulShutdownDetector.notifyAll();
         }
@@ -874,20 +915,37 @@ public class Router {
     public void cancelGracefulShutdown() {
         _gracefulExitCode = -1;
         _config.remove(PROP_SHUTDOWN_IN_PROGRESS);
+        _context.throttle().cancelShutdownStatus();
         synchronized (_gracefulShutdownDetector) {
             _gracefulShutdownDetector.notifyAll();
         }        
     }
+
     /**
      * What exit code do we plan on using when we shut down (or -1, if there isn't a graceful shutdown planned)
      */
     public int scheduledGracefulExitCode() { return _gracefulExitCode; }
+
+    /**
+     * Is a graceful shutdown in progress? This may be cancelled.
+     */
     public boolean gracefulShutdownInProgress() {
-        return (null != _config.getProperty(PROP_SHUTDOWN_IN_PROGRESS));
+        return (null != _config.get(PROP_SHUTDOWN_IN_PROGRESS));
     }
+
+    /**
+     * Is a final shutdown in progress? This may not be cancelled.
+     * @since 0.8.12
+     */
+    public boolean isFinalShutdownInProgress() {
+        return _shutdownInProgress;
+    }
+
     /** How long until the graceful shutdown will kill us?  */
     public long getShutdownTimeRemaining() {
-        if (_gracefulExitCode <= 0) return -1;
+        if (_gracefulExitCode <= 0) return -1; // maybe Long.MAX_VALUE would be better?
+        if (_gracefulExitCode == EXIT_HARD || _gracefulExitCode == EXIT_HARD_RESTART)
+            return 0;
         long exp = _context.tunnelManager().getLastParticipatingExpiration();
         if (exp < 0)
             return -1;
@@ -896,65 +954,39 @@ public class Router {
     }
     
     /**
-     * Simple thread that sits and waits forever, managing the
-     * graceful shutdown "process" (describing it would take more text
-     * than just reading the code...)
-     *
-     */
-    private class GracefulShutdown implements Runnable {
-        public void run() {
-            while (true) {
-                boolean shutdown = (null != _config.getProperty(PROP_SHUTDOWN_IN_PROGRESS));
-                if (shutdown) {
-                    if (_context.tunnelManager().getParticipatingCount() <= 0) {
-                        if (_log.shouldLog(Log.CRIT))
-                            _log.log(Log.CRIT, "Graceful shutdown progress - no more tunnels, safe to die");
-                        shutdown(_gracefulExitCode);
-                        return;
-                    } else {
-                        try {
-                            synchronized (Thread.currentThread()) {
-                                Thread.currentThread().wait(10*1000);
-                            }
-                        } catch (InterruptedException ie) {}
-                    }
-                } else {
-                    try {
-                        synchronized (Thread.currentThread()) {
-                            Thread.currentThread().wait();
-                        }
-                    } catch (InterruptedException ie) {}
-                }
-            }
-        }
-    }
-    
-    /**
      * Save the current config options (returning true if save was 
      * successful, false otherwise)
      *
+     * Note that unlike DataHelper.storeProps(),
+     * this does escape the \r or \n that are unescaped in DataHelper.loadProps().
+     * Note that the escaping of \r or \n was probably a mistake and should be taken out.
+     *
+     * Synchronized with file read in getConfig()
      */
-    public boolean saveConfig() {
+    public synchronized boolean saveConfig() {
         FileOutputStream fos = null;
         try {
-            fos = new FileOutputStream(_configFilename);
-            StringBuffer buf = new StringBuffer(8*1024);
-            synchronized (_config) {
-                TreeSet ordered = new TreeSet(_config.keySet());
-                for (Iterator iter = ordered.iterator() ; iter.hasNext(); ) {
-                    String key = (String)iter.next();
-                    String val = _config.getProperty(key);
+            fos = new SecureFileOutputStream(_configFilename);
+            StringBuilder buf = new StringBuilder(8*1024);
+            buf.append("# NOTE: This I2P config file must use UTF-8 encoding\n");
+            TreeSet ordered = new TreeSet(_config.keySet());
+            for (Iterator iter = ordered.iterator() ; iter.hasNext(); ) {
+                String key = (String)iter.next();
+                String val = _config.get(key);
                     // Escape line breaks before saving.
                     // Remember: "\" needs escaping both for regex and string.
-                    val = val.replaceAll("\\r","\\\\r");
-                    val = val.replaceAll("\\n","\\\\n");
-                    buf.append(key).append('=').append(val).append('\n');
-                }
+                    // NOOO - see comments in DataHelper
+                    //val = val.replaceAll("\\r","\\\\r");
+                    //val = val.replaceAll("\\n","\\\\n");
+                buf.append(key).append('=').append(val).append('\n');
             }
-            fos.write(buf.toString().getBytes());
+            fos.write(buf.toString().getBytes("UTF-8"));
         } catch (IOException ioe) {
-            if (_log.shouldLog(Log.ERROR))
+            // warning, _log will be null when called from constructor
+            if (_log != null)
                 _log.error("Error saving the config to " + _configFilename, ioe);
+            else
+                System.err.println("Error saving the config to " + _configFilename + ": " + ioe);
             return false;
         } finally {
             if (fos != null) try { fos.close(); } catch (IOException ioe) {}
@@ -963,67 +995,302 @@ public class Router {
         return true;
     }
     
-    public void restart() {
+    /**
+     * Updates the current config and then saves it.
+     * Prevents a race in the interval between setConfigSetting() / removeConfigSetting() and saveConfig(),
+     * Synchronized with getConfig() / saveConfig()
+     *
+     * @param name setting to add/change/remove before saving
+     * @param value if non-null, updated value; if null, setting will be removed
+     * @return success
+     * @since 0.8.13
+     */
+    public synchronized boolean saveConfig(String name, String value) {
+        if (value != null)
+            _config.put(name, value);
+        else
+            removeConfigSetting(name);
+        return saveConfig();
+    }
+
+    /**
+     * Updates the current config and then saves it.
+     * Prevents a race in the interval between setConfigSetting() / removeConfigSetting() and saveConfig(),
+     * Synchronized with getConfig() / saveConfig()
+     *
+     * @param toAdd settings to add/change before saving, may be null or empty
+     * @param toRemove settings to remove before saving, may be null or empty
+     * @return success
+     * @since 0.8.13
+     */
+    public synchronized boolean saveConfig(Map toAdd, Collection<String> toRemove) {
+        if (toAdd != null)
+            _config.putAll(toAdd);
+        if (toRemove != null) {
+            for (String s : toRemove) {
+                removeConfigSetting(s);
+            }
+        }
+        return saveConfig();
+    }
+
+    /**
+     *  The clock shift listener.
+     *  Restart the router if we should.
+     *
+     *  @since 0.8.8
+     */
+    public void clockShift(long delta) {
+        if (gracefulShutdownInProgress() || !_isAlive)
+            return;
+        if (delta > -60*1000 && delta < 60*1000)
+            return;
+        // update the routing key modifier
+        _context.routingKeyGenerator().generateDateBasedModData();
+        if (_context.commSystem().countActivePeers() <= 0)
+            return;
+        if (delta > 0)
+            _log.error("Restarting after large clock shift forward by " + DataHelper.formatDuration(delta));
+        else
+            _log.error("Restarting after large clock shift backward by " + DataHelper.formatDuration(0 - delta));
+        restart();
+    }
+
+    /**
+     *  A "soft" restart, primarily of the comm system, after
+     *  a port change or large step-change in system time.
+     *  Does not stop the whole JVM, so it is safe even in the absence
+     *  of the wrapper.
+     *  This is not a graceful restart - all peer connections are dropped immediately.
+     *
+     *  As of 0.8.8, this returns immediately and does the actual restart in a separate thread.
+     *  Poll isAlive() if you need to know when the restart is complete.
+     */
+    public synchronized void restart() {
+        if (gracefulShutdownInProgress() || !_isAlive)
+            return;
+        ((RouterClock) _context.clock()).removeShiftListener(this);
         _isAlive = false;
-        
-        try { _context.commSystem().restart(); } catch (Throwable t) { _log.log(Log.CRIT, "Error restarting the comm system", t); }
-        //try { _context.adminManager().restart(); } catch (Throwable t) { _log.log(Log.CRIT, "Error restarting the client manager", t); }
-        try { _context.clientManager().restart(); } catch (Throwable t) { _log.log(Log.CRIT, "Error restarting the client manager", t); }
-        try { _context.tunnelManager().restart(); } catch (Throwable t) { _log.log(Log.CRIT, "Error restarting the tunnel manager", t); }
-        try { _context.peerManager().restart(); } catch (Throwable t) { _log.log(Log.CRIT, "Error restarting the peer manager", t); }
-        try { _context.netDb().restart(); } catch (Throwable t) { _log.log(Log.CRIT, "Error restarting the networkDb", t); }
-        
-        //try { _context.jobQueue().restart(); } catch (Throwable t) { _log.log(Log.CRIT, "Error restarting the job queue", t); }
-        
-        _log.log(Log.CRIT, "Restart teardown complete... ");
-        try { Thread.sleep(10*1000); } catch (InterruptedException ie) {}
-        
-        _log.log(Log.CRIT, "Restarting...");
-        
-        _isAlive = true;
         _started = _context.clock().now();
-        
-        _log.log(Log.CRIT, "Restart complete");
+        Thread t = new Thread(new Restarter(_context), "Router Restart");
+        t.setPriority(Thread.NORM_PRIORITY + 1);
+        t.start();
+    }    
+
+    /**
+     *  Only for Restarter
+     *  @since 0.8.12
+     */
+    public void setIsAlive() {
+        _isAlive = true;
     }
-    
-    private void dumpStats() {
-        //_log.log(Log.CRIT, "Lifetime stats:\n\n" + StatsGenerator.generateStatsPage());
-    }
-    
+
     public static void main(String args[]) {
-        System.out.println("Starting I2P " + RouterVersion.VERSION + "-" + RouterVersion.BUILD);
-        System.out.println(RouterVersion.ID);
-        installUpdates();
-        verifyWrapperConfig();
+        System.out.println("Starting I2P " + RouterVersion.FULL_VERSION);
+        //verifyWrapperConfig();
         Router r = new Router();
         if ( (args != null) && (args.length == 1) && ("rebuild".equals(args[0])) ) {
             r.rebuildNewIdentity();
         } else {
+            // This is here so that we can get the directory location from the context
+            // for the zip file and the base location to unzip to.
+            // If it does an update, it never returns.
+            // I guess it's better to have the other-router check above this, we don't want to
+            // overwrite an existing running router's jar files. Other than ours.
+            r.installUpdates();
+            // *********  Start no threads before here ********* //
             r.runRouter();
         }
     }
     
     public static final String UPDATE_FILE = "i2pupdate.zip";
+    private static final String DELETE_FILE = "deletelist.txt";
     
-    private static void installUpdates() {
-        File updateFile = new File(UPDATE_FILE);
-        if (updateFile.exists()) {
-            System.out.println("INFO: Update file exists [" + UPDATE_FILE + "] - installing");
-            boolean ok = FileUtil.extractZip(updateFile, new File("."));
-            if (ok)
-                System.out.println("INFO: Update installed");
-            else
-                System.out.println("ERROR: Update failed!");
-            boolean deleted = updateFile.delete();
-            if (!deleted) {
-                System.out.println("ERROR: Unable to delete the update file!");
-                updateFile.deleteOnExit();
+    /**
+     * Context must be available.
+     * Unzip update file found in the router dir OR base dir, to the base dir
+     *
+     * If we can't write to the base dir, complain.
+     * Note: _log not available here.
+     */
+    private void installUpdates() {
+        File updateFile = new File(_context.getRouterDir(), UPDATE_FILE);
+        boolean exists = updateFile.exists();
+        if (!exists) {
+            updateFile = new File(_context.getBaseDir(), UPDATE_FILE);
+            exists = updateFile.exists();
+        }
+        if (exists) {
+            // do a simple permissions test, if it fails leave the file in place and don't restart
+            File test = new File(_context.getBaseDir(), "history.txt");
+            if ((test.exists() && !test.canWrite()) || (!_context.getBaseDir().canWrite())) {
+                System.out.println("ERROR: No write permissions on " + _context.getBaseDir() +
+                                   " to extract software update file");
+                // carry on
+                return;
             }
-            System.out.println("INFO: Restarting after update");
+            System.out.println("INFO: Update file exists [" + UPDATE_FILE + "] - installing");
+            // verify the whole thing first
+            // we could remember this fails, and not bother restarting, but who cares...
+            boolean ok = FileUtil.verifyZip(updateFile);
+            if (ok) {
+                // This may be useful someday. First added in 0.8.2
+                // Moved above the extract so we don't NCDFE
+                _config.put("router.updateLastInstalled", "" + System.currentTimeMillis());
+                // Set the last version to the current version, since 0.8.13
+                _config.put("router.previousVersion", RouterVersion.VERSION);
+                saveConfig();
+                ok = FileUtil.extractZip(updateFile, _context.getBaseDir());
+            }
+
+            // Very important - we have now trashed our jars.
+            // After this point, do not use any new I2P classes, or they will fail to load
+            // and we will die with NCDFE.
+            // Ideally, do not use I2P classes at all, new or not.
+            try {
+                if (ok) {
+                    // We do this here so we may delete old jars before we restart
+                    deleteListedFiles();
+                    System.out.println("INFO: Update installed");
+                } else {
+                    System.out.println("ERROR: Update failed!");
+                }
+                if (!ok) {
+                    // we can't leave the file in place or we'll continually restart, so rename it
+                    File bad = new File(_context.getRouterDir(), "BAD-" + UPDATE_FILE);
+                    boolean renamed = updateFile.renameTo(bad);
+                    if (renamed) {
+                        System.out.println("Moved update file to " + bad.getAbsolutePath());
+                    } else {
+                        System.out.println("Deleting file " + updateFile.getAbsolutePath());
+                        ok = true;  // so it will be deleted
+                    }
+                }
+                if (ok) {
+                    boolean deleted = updateFile.delete();
+                    if (!deleted) {
+                        System.out.println("ERROR: Unable to delete the update file!");
+                        updateFile.deleteOnExit();
+                    }
+                }
+                // exit whether ok or not
+                if (_context.hasWrapper())
+                    System.out.println("INFO: Restarting after update");
+                else
+                    System.out.println("WARNING: Exiting after update, restart I2P");
+            } catch (Throwable t) {
+                // hide the NCDFE
+                // hopefully the update file got deleted or we will loop
+            }
             System.exit(EXIT_HARD_RESTART);
+        } else {
+            deleteJbigiFiles();
+            // It was here starting in 0.8.12 so it could be used the very first time
+            // Now moved up so it is usually run only after an update
+            // But the first time before jetty 6 it will run here...
+            // Here we can't remove jars
+            deleteListedFiles();
         }
     }
+
+    /**
+     *  Remove extracted libjbigi.so and libjcpuid.so files if we have a newer jbigi.jar,
+     *  so the new ones will be extracted.
+     *  We do this after the restart, not after the extract, because it's safer, and
+     *  because people may upgrade their jbigi.jar file manually.
+     *
+     *  Copied from NativeBigInteger, which we can't access here or the
+     *  libs will get loaded.
+     */
+    private void deleteJbigiFiles() {
+            String osArch = System.getProperty("os.arch");
+            boolean isX86 = osArch.contains("86") || osArch.equals("amd64");
+            String osName = System.getProperty("os.name").toLowerCase(Locale.US);
+            boolean isWin = osName.startsWith("win");
+            boolean isMac = osName.startsWith("mac");
+            // only do this on these OSes
+            boolean goodOS = isWin || isMac ||
+                             osName.contains("linux") || osName.contains("freebsd");
+
+            // only do this on these x86
+            File jbigiJar = new File(_context.getBaseDir(), "lib/jbigi.jar");
+            if (isX86 && goodOS && jbigiJar.exists()) {
+                String libPrefix = (isWin ? "" : "lib");
+                String libSuffix = (isWin ? ".dll" : isMac ? ".jnilib" : ".so");
+
+                File jcpuidLib = new File(_context.getBaseDir(), libPrefix + "jcpuid" + libSuffix);
+                if (jcpuidLib.canWrite() && jbigiJar.lastModified() > jcpuidLib.lastModified()) {
+                    String path = jcpuidLib.getAbsolutePath();
+                    boolean success = FileUtil.copy(path, path + ".bak", true, true);
+                    if (success) {
+                        boolean success2 = jcpuidLib.delete();
+                        if (success2) {
+                            System.out.println("New jbigi.jar detected, moved jcpuid library to " +
+                                               path + ".bak");
+                            System.out.println("Check logs for successful installation of new library");
+                        }
+                    }
+                }
+
+                File jbigiLib = new File(_context.getBaseDir(), libPrefix + "jbigi" + libSuffix);
+                if (jbigiLib.canWrite() && jbigiJar.lastModified() > jbigiLib.lastModified()) {
+                    String path = jbigiLib.getAbsolutePath();
+                    boolean success = FileUtil.copy(path, path + ".bak", true, true);
+                    if (success) {
+                        boolean success2 = jbigiLib.delete();
+                        if (success2) {
+                            System.out.println("New jbigi.jar detected, moved jbigi library to " +
+                                               path + ".bak");
+                            System.out.println("Check logs for successful installation of new library");
+                        }
+                    }
+                }
+            }
+    }
     
+    /**
+     *  Delete all files listed in the delete file.
+     *  Format: One file name per line, comment lines start with '#'.
+     *  All file names must be relative to $I2P, absolute file names not allowed.
+     *  We probably can't remove old jars this way.
+     *  Fails silently.
+     *  Use no new I2P classes here so it may be called after zip extraction.
+     *  @since 0.8.12
+     */
+    private void deleteListedFiles() {
+        File deleteFile = new File(_context.getBaseDir(), DELETE_FILE);
+        if (!deleteFile.exists())
+            return;
+        // this is similar to FileUtil.readTextFile() but we can't use any I2P classes here
+        FileInputStream fis = null;
+        try {
+            fis = new FileInputStream(deleteFile);
+            BufferedReader in = new BufferedReader(new InputStreamReader(fis, "UTF-8"));
+            String line;
+            while ( (line = in.readLine()) != null) {
+                String fl = line.trim();
+                if (fl.startsWith("..") || fl.startsWith("#") || fl.length() == 0)
+                    continue;
+                File df = new File(fl);
+                if (df.isAbsolute())
+                    continue;
+                df = new File(_context.getBaseDir(), fl);
+                if (df.exists() && !df.isDirectory()) {
+                    if (df.delete())
+                        System.out.println("INFO: File [" + fl + "] deleted");
+                }
+            }
+            fis.close();
+            fis = null;
+            if (deleteFile.delete())
+                System.out.println("INFO: File [" + DELETE_FILE + "] deleted");
+        } catch (IOException ioe) {
+        } finally {
+            if (fis != null) try { fis.close(); } catch (IOException ioe) {}
+        }
+    }
+
+/*******
     private static void verifyWrapperConfig() {
         File cfgUpdated = new File("wrapper.config.updated");
         if (cfgUpdated.exists()) {
@@ -1033,29 +1300,36 @@ public class Router {
             System.exit(EXIT_HARD);
         }
     }
+*******/
     
+/*
     private static String getPingFile(Properties envProps) {
         if (envProps != null) 
             return envProps.getProperty("router.pingFile", "router.ping");
         else
             return "router.ping";
     }
-    private String getPingFile() {
-        return _context.getProperty("router.pingFile", "router.ping");
+*/
+    private File getPingFile() {
+        String s = _context.getProperty("router.pingFile", "router.ping");
+        File f = new File(s);
+        if (!f.isAbsolute())
+            f = new File(_context.getPIDDir(), s);
+        return f;
     }
     
     static final long LIVELINESS_DELAY = 60*1000;
     
     /** 
-     * Start a thread that will periodically update the file "router.ping", but if 
+     * Check the file "router.ping", but if 
      * that file already exists and was recently written to, return false as there is
-     * another instance running
+     * another instance running.
      * 
      * @return true if the router is the only one running 
+     * @since 0.8.2
      */
-    private boolean beginMarkingLiveliness(Properties envProps) {
-        String filename = getPingFile(envProps);
-        File f = new File(filename);
+    private boolean isOnlyRouterRunning() {
+        File f = getPingFile();
         if (f.exists()) {
             long lastWritten = f.lastModified();
             if (System.currentTimeMillis()-lastWritten > LIVELINESS_DELAY) {
@@ -1065,12 +1339,16 @@ public class Router {
                 return false;
             }
         }
-        // not an I2PThread for context creation issues
-        Thread t = new Thread(new MarkLiveliness(_context, this, f));
-        t.setName("Mark router liveliness");
-        t.setDaemon(true);
-        t.start();
         return true;
+    }
+
+    /** 
+     * Start a thread that will periodically update the file "router.ping".
+     * isOnlyRouterRunning() MUST have been called previously.
+     */
+    private void beginMarkingLiveliness() {
+        File f = getPingFile();
+        _context.simpleScheduler().addPeriodicEvent(new MarkLiveliness(this, f), 0, LIVELINESS_DELAY - (5*1000));
     }
     
     public static final String PROP_BANDWIDTH_SHARE_PERCENTAGE = "router.sharePercentage";
@@ -1083,9 +1361,7 @@ public class Router {
      *
      */
     public double getSharePercentage() {
-        RouterContext ctx = _context;
-        if (ctx == null) return 0;
-        String pct = ctx.getProperty(PROP_BANDWIDTH_SHARE_PERCENTAGE);
+        String pct = _context.getProperty(PROP_BANDWIDTH_SHARE_PERCENTAGE);
         if (pct != null) {
             try {
                 double d = Double.parseDouble(pct);
@@ -1102,62 +1378,40 @@ public class Router {
     }
 
     public int get1sRate() { return get1sRate(false); }
+
     public int get1sRate(boolean outboundOnly) {
-        RouterContext ctx = _context;
-        if (ctx != null) {
-            FIFOBandwidthLimiter bw = ctx.bandwidthLimiter();
-            if (bw != null) {
+            FIFOBandwidthLimiter bw = _context.bandwidthLimiter();
                 int out = (int)bw.getSendBps();
                 if (outboundOnly)
                     return out;
                 return (int)Math.max(out, bw.getReceiveBps());
-            }
-        }
-        return 0;
     }
+
     public int get1sRateIn() {
-        RouterContext ctx = _context;
-        if (ctx != null) {
-            FIFOBandwidthLimiter bw = ctx.bandwidthLimiter();
-            if (bw != null)
+            FIFOBandwidthLimiter bw = _context.bandwidthLimiter();
                 return (int) bw.getReceiveBps();
-        }
-        return 0;
     }
 
     public int get15sRate() { return get15sRate(false); }
+
     public int get15sRate(boolean outboundOnly) {
-        RouterContext ctx = _context;
-        if (ctx != null) {
-            FIFOBandwidthLimiter bw = ctx.bandwidthLimiter();
-            if (bw != null) {
+            FIFOBandwidthLimiter bw = _context.bandwidthLimiter();
                 int out = (int)bw.getSendBps15s();
                 if (outboundOnly)
                     return out;
                 return (int)Math.max(out, bw.getReceiveBps15s());
-            }
-        }
-        return 0;
     }
+
     public int get15sRateIn() {
-        RouterContext ctx = _context;
-        if (ctx != null) {
-            FIFOBandwidthLimiter bw = ctx.bandwidthLimiter();
-            if (bw != null)
+            FIFOBandwidthLimiter bw = _context.bandwidthLimiter();
                 return (int) bw.getReceiveBps15s();
-        }
-        return 0;
     }
 
     public int get1mRate() { return get1mRate(false); }
+
     public int get1mRate(boolean outboundOnly) {
         int send = 0;
-        RouterContext ctx = _context;
-        if (ctx == null)
-            return 0;
-        StatManager mgr = ctx.statManager();
-        if (mgr == null)
-            return 0;
+        StatManager mgr = _context.statManager();
         RateStat rs = mgr.getRate("bw.sendRate");
         if (rs != null)
             send = (int)rs.getRate(1*60*1000).getAverageValue();
@@ -1169,13 +1423,9 @@ public class Router {
             recv = (int)rs.getRate(1*60*1000).getAverageValue();
         return Math.max(send, recv);
     }
+
     public int get1mRateIn() {
-        RouterContext ctx = _context;
-        if (ctx == null)
-            return 0;
-        StatManager mgr = ctx.statManager();
-        if (mgr == null)
-            return 0;
+        StatManager mgr = _context.statManager();
         RateStat rs = mgr.getRate("bw.recvRate");
         int recv = 0;
         if (rs != null)
@@ -1184,6 +1434,7 @@ public class Router {
     }
 
     public int get5mRate() { return get5mRate(false); }
+
     public int get5mRate(boolean outboundOnly) {
         int send = 0;
         RateStat rs = _context.statManager().getRate("bw.sendRate");
@@ -1196,188 +1447,5 @@ public class Router {
         if (rs != null)
             recv = (int)rs.getRate(5*60*1000).getAverageValue();
         return Math.max(send, recv);
-    }
-    
-}
-
-/**
- * coalesce the stats framework every minute
- *
- */
-class CoalesceStatsEvent implements SimpleTimer.TimedEvent {
-    private RouterContext _ctx;
-    public CoalesceStatsEvent(RouterContext ctx) { 
-        _ctx = ctx; 
-        ctx.statManager().createRateStat("bw.receiveBps", "How fast we receive data (in KBps)", "Bandwidth", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
-        ctx.statManager().createRateStat("bw.sendBps", "How fast we send data (in KBps)", "Bandwidth", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
-        ctx.statManager().createRateStat("bw.sendRate", "Low level bandwidth send rate", "Bandwidth", new long[] { 60*1000l, 5*60*1000l, 10*60*1000l, 60*60*1000l });
-        ctx.statManager().createRateStat("bw.recvRate", "Low level bandwidth receive rate", "Bandwidth", new long[] { 60*1000l, 5*60*1000l, 10*60*1000l, 60*60*1000l });
-        ctx.statManager().createRateStat("router.activePeers", "How many peers we are actively talking with", "Throttle", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
-        ctx.statManager().createRateStat("router.activeSendPeers", "How many peers we've sent to this minute", "Throttle", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
-        ctx.statManager().createRateStat("router.highCapacityPeers", "How many high capacity peers we know", "Throttle", new long[] { 5*60*1000, 60*60*1000 });
-        ctx.statManager().createRateStat("router.fastPeers", "How many fast peers we know", "Throttle", new long[] { 5*60*1000, 60*60*1000 });
-        long max = Runtime.getRuntime().maxMemory() / (1024*1024);
-        ctx.statManager().createRateStat("router.memoryUsed", "(Bytes) Max is " + max + "MB", "Router", new long[] { 60*1000 });
-    }
-    private RouterContext getContext() { return _ctx; }
-    public void timeReached() {
-        int active = getContext().commSystem().countActivePeers();
-        getContext().statManager().addRateData("router.activePeers", active, 60*1000);
-
-        int activeSend = getContext().commSystem().countActiveSendPeers();
-        getContext().statManager().addRateData("router.activeSendPeers", activeSend, 60*1000);
-
-        int fast = getContext().profileOrganizer().countFastPeers();
-        getContext().statManager().addRateData("router.fastPeers", fast, 60*1000);
-
-        int highCap = getContext().profileOrganizer().countHighCapacityPeers();
-        getContext().statManager().addRateData("router.highCapacityPeers", highCap, 60*1000);
-
-        getContext().statManager().addRateData("bw.sendRate", (long)getContext().bandwidthLimiter().getSendBps(), 0);
-        getContext().statManager().addRateData("bw.recvRate", (long)getContext().bandwidthLimiter().getReceiveBps(), 0);
-        
-        long used = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
-        getContext().statManager().addRateData("router.memoryUsed", used, 0);
-
-        getContext().tunnelDispatcher().updateParticipatingStats();
-
-        getContext().statManager().coalesceStats();
-
-        RateStat receiveRate = getContext().statManager().getRate("transport.receiveMessageSize");
-        if (receiveRate != null) {
-            Rate rate = receiveRate.getRate(60*1000);
-            if (rate != null) { 
-                double bytes = rate.getLastTotalValue();
-                double KBps = (bytes*1000.0d)/(rate.getPeriod()*1024.0d); 
-                getContext().statManager().addRateData("bw.receiveBps", (long)KBps, 60*1000);
-            }
-        }
-
-        RateStat sendRate = getContext().statManager().getRate("transport.sendMessageSize");
-        if (sendRate != null) {
-            Rate rate = sendRate.getRate(60*1000);
-            if (rate != null) {
-                double bytes = rate.getLastTotalValue();
-                double KBps = (bytes*1000.0d)/(rate.getPeriod()*1024.0d); 
-                getContext().statManager().addRateData("bw.sendBps", (long)KBps, 60*1000);
-            }
-        }
-    }
-}
-
-/**
- * Update the routing Key modifier every day at midnight (plus on startup).
- * This is done here because we want to make sure the key is updated before anyone
- * uses it.
- */
-class UpdateRoutingKeyModifierJob extends JobImpl {
-    private Log _log;
-    private Calendar _cal = new GregorianCalendar(TimeZone.getTimeZone("GMT"));
-    public UpdateRoutingKeyModifierJob(RouterContext ctx) { 
-        super(ctx);
-    }
-    public String getName() { return "Update Routing Key Modifier"; }
-    public void runJob() {
-        _log = getContext().logManager().getLog(getClass());
-        getContext().routingKeyGenerator().generateDateBasedModData();
-        requeue(getTimeTillMidnight());
-    }
-    private long getTimeTillMidnight() {
-        long now = getContext().clock().now();
-        _cal.setTime(new Date(now));
-        _cal.set(Calendar.YEAR, _cal.get(Calendar.YEAR));               // gcj <= 4.0 workaround
-        _cal.set(Calendar.DAY_OF_YEAR, _cal.get(Calendar.DAY_OF_YEAR)); // gcj <= 4.0 workaround
-        _cal.add(Calendar.DATE, 1);
-        _cal.set(Calendar.HOUR_OF_DAY, 0);
-        _cal.set(Calendar.MINUTE, 0);
-        _cal.set(Calendar.SECOND, 0);
-        _cal.set(Calendar.MILLISECOND, 0);
-        long then = _cal.getTime().getTime();
-        long howLong = then - now;
-        if (howLong < 0) // hi kaffe
-            howLong = 24*60*60*1000l + howLong;
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Time till midnight: " + howLong + "ms");
-        return howLong;
-    }
-}
-
-class MarkLiveliness implements Runnable {
-    private RouterContext _context;
-    private Router _router;
-    private File _pingFile;
-    public MarkLiveliness(RouterContext ctx, Router router, File pingFile) {
-        _context = ctx;
-        _router = router;
-        _pingFile = pingFile;
-    }
-    public void run() {
-        _pingFile.deleteOnExit();
-        do {
-            ping();
-            try { Thread.sleep(Router.LIVELINESS_DELAY); } catch (InterruptedException ie) {}
-        } while (_router.isAlive());
-        _pingFile.delete();
-    }
-
-    private void ping() {
-        FileOutputStream fos = null;
-        try { 
-            fos = new FileOutputStream(_pingFile);
-            fos.write(("" + System.currentTimeMillis()).getBytes());
-        } catch (IOException ioe) {
-            System.err.println("Error writing to ping file");
-            ioe.printStackTrace();
-        } finally {
-            if (fos != null) try { fos.close(); } catch (IOException ioe) {}
-        }
-    }
-}
-
-class ShutdownHook extends Thread {
-    private RouterContext _context;
-    private static int __id = 0;
-    private int _id;
-    public ShutdownHook(RouterContext ctx) {
-        _context = ctx;
-        _id = ++__id;
-    }
-    public void run() {
-        setName("Router " + _id + " shutdown");
-        Log l = _context.logManager().getLog(Router.class);
-        l.log(Log.CRIT, "Shutting down the router...");
-        _context.router().shutdown(Router.EXIT_HARD);
-    }
-}
-
-/** update the router.info file whenever its, er, updated */
-class PersistRouterInfoJob extends JobImpl {
-    private Log _log;
-    public PersistRouterInfoJob(RouterContext ctx) { 
-        super(ctx); 
-    }
-    public String getName() { return "Persist Updated Router Information"; }
-    public void runJob() {
-        _log = getContext().logManager().getLog(PersistRouterInfoJob.class);
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Persisting updated router info");
-
-        String infoFilename = getContext().getProperty(Router.PROP_INFO_FILENAME);
-        if (infoFilename == null)
-            infoFilename = Router.PROP_INFO_FILENAME_DEFAULT;
-
-        RouterInfo info = getContext().router().getRouterInfo();
-
-        FileOutputStream fos = null;
-        try {
-            fos = new FileOutputStream(infoFilename);
-            info.writeBytes(fos);
-        } catch (DataFormatException dfe) {
-            _log.error("Error rebuilding the router information", dfe);
-        } catch (IOException ioe) {
-            _log.error("Error writing out the rebuilt router information", ioe);
-        } finally {
-            if (fos != null) try { fos.close(); } catch (IOException ioe) {}
-        }
     }
 }

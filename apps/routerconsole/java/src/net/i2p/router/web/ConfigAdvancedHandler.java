@@ -1,11 +1,12 @@
 package net.i2p.router.web;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.HashSet;
-import java.util.Iterator;
+import java.util.Properties;
+import java.util.Set;
+
+import net.i2p.data.DataHelper;
 
 /**
  * Handler to deal with form submissions from the advanced config form and act
@@ -13,10 +14,11 @@ import java.util.Iterator;
  *
  */
 public class ConfigAdvancedHandler extends FormHandler {
-    private boolean _forceRestart;
+    //private boolean _forceRestart;
     private boolean _shouldSave;
     private String _config;
     
+    @Override
     protected void processForm() {
         if (_shouldSave) {
             saveChanges();
@@ -26,7 +28,7 @@ public class ConfigAdvancedHandler extends FormHandler {
     }
     
     public void setShouldsave(String moo) { _shouldSave = true; }
-    public void setRestart(String moo) { _forceRestart = true; }
+    //public void setRestart(String moo) { _forceRestart = true; }
     
     public void setConfig(String val) {
         _config = val;
@@ -38,42 +40,33 @@ public class ConfigAdvancedHandler extends FormHandler {
      *
      */
     private void saveChanges() {
-        HashSet unsetKeys = new HashSet(_context.router().getConfigMap().keySet());
+        Set<String> unsetKeys = new HashSet(_context.router().getConfigSettings());
         if (_config != null) {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(_config.getBytes())));
-            String line = null;
+            Properties props = new Properties();
             try {
-                while ( (line = reader.readLine()) != null) {
-                    int eq = line.indexOf('=');
-                    if (eq == -1) continue;
-                    if (eq >= line.length() - 1) continue;
-                    String key = line.substring(0, eq).trim();
-                    String val = line.substring(eq + 1).trim();
-                    _context.router().setConfigSetting(key, val);
-                    unsetKeys.remove(key);
-                }
+                DataHelper.loadProps(props, new ByteArrayInputStream(_config.getBytes()));
             } catch (IOException ioe) {
-                addFormError("Error updating the configuration (IOERROR) - please see the error logs");
+                _log.error("Config error", ioe);
+                addFormError(ioe.toString());
+                addFormError(_("Error updating the configuration - please see the error logs"));
                 return;
             }
 
-            Iterator cleaner = unsetKeys.iterator();
-            while (cleaner.hasNext()) {
-                String unsetKey = (String)cleaner.next();
-                _context.router().removeConfigSetting(unsetKey);
+            for (Object key : props.keySet()) {
+                unsetKeys.remove(key);
             }
 
-            boolean saved = _context.router().saveConfig();
+            boolean saved = _context.router().saveConfig(props, unsetKeys);
             if (saved) 
-                addFormNotice("Configuration saved successfully");
+                addFormNotice(_("Configuration saved successfully"));
             else
-                addFormNotice("Error saving the configuration (applied but not saved) - please see the error logs");
+                addFormError(_("Error saving the configuration (applied but not saved) - please see the error logs"));
             
-            if (_forceRestart) {
-                addFormNotice("Performing a soft restart");
-                _context.router().restart();
-                addFormNotice("Soft restart complete");
-            }
+            //if (_forceRestart) {
+            //    addFormNotice("Performing a soft restart");
+            //    _context.router().restart();
+            //    addFormNotice("Soft restart complete");
+            //}
         }
     }
 }

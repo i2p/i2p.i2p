@@ -16,8 +16,11 @@ import net.i2p.util.Log;
  * Weighted priority queue implementation for the outbound messages, coupled
  * with code to fail messages that expire.  
  *
+ * WARNING - UNUSED since 0.6.1.11
+ * See comments in DummyThrottle.java and mtn history ca. 2006-02-19
+ *
  */
-public class TimedWeightedPriorityMessageQueue implements MessageQueue, OutboundMessageFragments.ActiveThrottle {
+class TimedWeightedPriorityMessageQueue implements MessageQueue, OutboundMessageFragments.ActiveThrottle {
     private RouterContext _context;
     private Log _log;
     /** FIFO queue of messages in a particular priority */
@@ -33,7 +36,7 @@ public class TimedWeightedPriorityMessageQueue implements MessageQueue, Outbound
     /** how many bytes total have been pulled off the given queue */
     private long _bytesTransferred[];
     /** lock to notify message enqueue/removal (and block for getNext()) */
-    private Object _nextLock;
+    private final Object _nextLock;
     /** have we shut down or are we still alive? */
     private boolean _alive;
     /** which queue should we pull out of next */
@@ -73,11 +76,10 @@ public class TimedWeightedPriorityMessageQueue implements MessageQueue, Outbound
         }
         _alive = true;
         _nextLock = this;
-        _nextQueue = 0;
         _chokedPeers = Collections.synchronizedSet(new HashSet(16));
         _listener = lsnr;
-        _context.statManager().createRateStat("udp.timeToEntrance", "Message lifetime until it reaches the UDP system", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
-        _context.statManager().createRateStat("udp.messageQueueSize", "How many messages are on the current class queue at removal", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
+        _context.statManager().createRateStat("udp.timeToEntrance", "Message lifetime until it reaches the UDP system", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.messageQueueSize", "How many messages are on the current class queue at removal", "udp", UDPTransport.RATES);
         _expirer = new Expirer();
         I2PThread t = new I2PThread(_expirer, "UDP outbound expirer");
         t.setDaemon(true);

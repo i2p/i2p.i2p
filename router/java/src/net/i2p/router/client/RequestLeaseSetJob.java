@@ -27,26 +27,18 @@ import net.i2p.util.Log;
  *
  */
 class RequestLeaseSetJob extends JobImpl {
-    private Log _log;
-    private ClientConnectionRunner _runner;
-    private LeaseSet _ls;
-    private long _expiration;
-    private Job _onCreate;
-    private Job _onFail;
-    private LeaseRequestState _requestState;
+    private final Log _log;
+    private final ClientConnectionRunner _runner;
+    private final LeaseRequestState _requestState;
     
     public RequestLeaseSetJob(RouterContext ctx, ClientConnectionRunner runner, LeaseSet set, long expiration, Job onCreate, Job onFail, LeaseRequestState state) {
         super(ctx);
         _log = ctx.logManager().getLog(RequestLeaseSetJob.class);
         _runner = runner;
-        _ls = set;
-        _expiration = expiration;
-        _onCreate = onCreate;
-        _onFail = onFail;
         _requestState = state;
-        ctx.statManager().createRateStat("client.requestLeaseSetSuccess", "How frequently the router requests successfully a new leaseSet?", "ClientMessages", new long[] { 10*60*1000, 60*60*1000, 24*60*60*1000 });
-        ctx.statManager().createRateStat("client.requestLeaseSetTimeout", "How frequently the router requests a new leaseSet but gets no reply?", "ClientMessages", new long[] { 10*60*1000, 60*60*1000, 24*60*60*1000 });
-        ctx.statManager().createRateStat("client.requestLeaseSetDropped", "How frequently the router requests a new leaseSet but the client drops?", "ClientMessages", new long[] { 10*60*1000, 60*60*1000, 24*60*60*1000 });
+        ctx.statManager().createRateStat("client.requestLeaseSetSuccess", "How frequently the router requests successfully a new leaseSet?", "ClientMessages", new long[] { 60*60*1000 });
+        ctx.statManager().createRateStat("client.requestLeaseSetTimeout", "How frequently the router requests a new leaseSet but gets no reply?", "ClientMessages", new long[] { 60*60*1000 });
+        ctx.statManager().createRateStat("client.requestLeaseSetDropped", "How frequently the router requests a new leaseSet but the client drops?", "ClientMessages", new long[] { 60*60*1000 });
     }
     
     public String getName() { return "Request Lease Set"; }
@@ -54,13 +46,15 @@ class RequestLeaseSetJob extends JobImpl {
         if (_runner.isDead()) return;
         
         RequestLeaseSetMessage msg = new RequestLeaseSetMessage();
-        Date end = null;
-        // get the earliest end date
-        for (int i = 0; i < _requestState.getRequested().getLeaseCount(); i++) {
-            if ( (end == null) || (end.getTime() > _requestState.getRequested().getLease(i).getEndDate().getTime()) )
-                end = _requestState.getRequested().getLease(i).getEndDate();
-        }
-        
+        long endTime = _requestState.getRequested().getEarliestLeaseDate();
+        // Add a small number of ms (0-300) that increases as we approach the expire time.
+        // Since the earliest date functions as a version number,
+        // this will force the floodfill to flood each new version;
+        // otherwise it won't if the earliest time hasn't changed.
+        long fudge = 300 - ((endTime - getContext().clock().now()) / 2000);
+        endTime += fudge;
+        Date end = new Date(endTime);
+
         msg.setEndDate(end);
         msg.setSessionId(_runner.getSessionId());
         
@@ -90,8 +84,8 @@ class RequestLeaseSetJob extends JobImpl {
      *
      */
     private class CheckLeaseRequestStatus extends JobImpl {
-        private LeaseRequestState _req;
-        private long _start;
+        private final LeaseRequestState _req;
+        private final long _start;
         
         public CheckLeaseRequestStatus(RouterContext enclosingContext, LeaseRequestState state) {
             super(enclosingContext);
@@ -112,9 +106,9 @@ class RequestLeaseSetJob extends JobImpl {
                 return;
             } else {
                 RequestLeaseSetJob.CheckLeaseRequestStatus.this.getContext().statManager().addRateData("client.requestLeaseSetTimeout", 1, 0);
-                if (_log.shouldLog(Log.CRIT)) {
+                if (_log.shouldLog(Log.ERROR)) {
                     long waited = System.currentTimeMillis() - _start;
-                    _log.log(Log.CRIT, "Failed to receive a leaseSet in the time allotted (" + waited + "): " + _req + " for " 
+                    _log.error("Failed to receive a leaseSet in the time allotted (" + waited + "): " + _req + " for " 
                              + _runner.getConfig().getDestination().calculateHash().toBase64());
                 }
                 _runner.disconnectClient("Took too long to request leaseSet");

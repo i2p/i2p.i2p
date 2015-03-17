@@ -15,6 +15,9 @@ import net.i2p.data.Base64;
 
 /**
  * Maintain a set of PRNGs to feed the apps
+ *
+ * @deprecated Unused! See FortunaRandomSource
+ *
  */
 public class PooledRandomSource extends RandomSource {
     private Log _log;
@@ -193,6 +196,7 @@ public class PooledRandomSource extends RandomSource {
         return prng.harvester();
     }
     
+/*****
     public static void main(String args[]) {
         //PooledRandomSource prng = new PooledRandomSource(I2PAppContext.getGlobalContext());
         long start = System.currentTimeMillis();
@@ -211,4 +215,5 @@ public class PooledRandomSource extends RandomSource {
         System.out.println("Written to random.file: create took " + (created-start) + ", generate took " + (done-created));
 	prng.saveSeed();
     }    
+*****/
 }

@@ -10,15 +10,11 @@ import net.i2p.router.tunnel.TunnelCreatorConfig;
 import net.i2p.util.Log;
 
 /**
- *
+ *  Data about a tunnel we created
  */
-public class PooledTunnelCreatorConfig extends TunnelCreatorConfig {
+class PooledTunnelCreatorConfig extends TunnelCreatorConfig {
     private TunnelPool _pool;
     private TestJob _testJob;
-    // private Job _expireJob;
-    // private TunnelInfo _pairedTunnel;
-    private boolean _live;
-    
     /** Creates a new instance of PooledTunnelCreatorConfig */
     
     public PooledTunnelCreatorConfig(RouterContext ctx, int length, boolean isInbound) {
@@ -26,33 +22,34 @@ public class PooledTunnelCreatorConfig extends TunnelCreatorConfig {
     }
     public PooledTunnelCreatorConfig(RouterContext ctx, int length, boolean isInbound, Hash destination) {
         super(ctx, length, isInbound, destination);
-        _pool = null;
-        _live = false;
     }
     
-    // calls TestJob
+    /** calls TestJob */
+    @Override
     public void testSuccessful(int ms) {
         if (_testJob != null)
             _testJob.testSuccessful(ms);
         super.testSuccessful(ms);
-        _live = true;
     }
     
-    // called from TestJob
+    /** called from TestJob */
     public void testJobSuccessful(int ms) {
         super.testSuccessful(ms);
-        _live = true;
     }
     
     /**
      * The tunnel failed a test, so (maybe) stop using it
      */
+    @Override
     public boolean tunnelFailed() {
         boolean rv = super.tunnelFailed();
         if (!rv) {
             // remove us from the pool (but not the dispatcher) so that we aren't 
             // selected again.  _expireJob is left to do its thing, in case there
             // are any straggling messages coming down the tunnel
+            //
+            // Todo: Maybe delay or prevent failing if we are near tunnel build capacity,
+            // to prevent collapse (loss of all tunnels)
             _pool.tunnelFailed(this);
             if (_testJob != null) // just in case...
                 _context.jobQueue().removeJob(_testJob);
@@ -60,6 +57,7 @@ public class PooledTunnelCreatorConfig extends TunnelCreatorConfig {
         return rv;
     }
     
+    @Override
     public Properties getOptions() {
         if (_pool == null) return null;
         return _pool.getSettings().getUnknownOptions();
@@ -75,10 +73,15 @@ public class PooledTunnelCreatorConfig extends TunnelCreatorConfig {
     }
     public TunnelPool getTunnelPool() { return _pool; }
     
-    public void setTestJob(TestJob job) { _testJob = job; }
+
+    /** @deprecated unused, which makes _testJob unused - why is it here */
+    void setTestJob(TestJob job) { _testJob = job; }
+    /** does nothing, to be deprecated */
     public void setExpireJob(Job job) { /* _expireJob = job; */ }
     
-    // Fix memory leaks caused by references if you need to use pairedTunnel
+    /**
+     * @deprecated Fix memory leaks caused by references if you need to use pairedTunnel
+     */
     public void setPairedTunnel(TunnelInfo tunnel) { /* _pairedTunnel = tunnel; */}
     // public TunnelInfo getPairedTunnel() { return _pairedTunnel; }
 }

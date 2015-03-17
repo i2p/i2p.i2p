@@ -12,35 +12,30 @@ package net.i2p.crypto;
 import java.math.BigInteger;
 
 import net.i2p.I2PAppContext;
-import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.PrivateKey;
 import net.i2p.data.PublicKey;
 import net.i2p.data.SessionKey;
-import net.i2p.data.Signature;
 import net.i2p.data.SigningPrivateKey;
 import net.i2p.data.SigningPublicKey;
-import net.i2p.util.Clock;
-import net.i2p.util.Log;
+import net.i2p.data.SimpleDataStructure;
 import net.i2p.util.NativeBigInteger;
-import net.i2p.util.RandomSource;
 
-/** Define a way of generating asymetrical key pairs as well as symetrical keys
+/** Define a way of generating asymmetrical key pairs as well as symmetrical keys
  * @author jrandom
  */
 public class KeyGenerator {
-    private Log _log;
-    private I2PAppContext _context;
+    //private final Log _log;
+    private final I2PAppContext _context;
 
     public KeyGenerator(I2PAppContext context) {
-        _log = context.logManager().getLog(KeyGenerator.class);
+        //_log = context.logManager().getLog(KeyGenerator.class);
         _context = context;
     }
+
     public static KeyGenerator getInstance() {
         return I2PAppContext.getGlobalContext().keyGenerator();
     }
-    
-
 
     /** Generate a private 256 bit session key
      * @return session key
@@ -55,7 +50,12 @@ public class KeyGenerator {
     }
     
     private static final int PBE_ROUNDS = 1000;
-    /** PBE the passphrase with the salt */
+
+    /**
+     *  PBE the passphrase with the salt.
+     *  Warning - SLOW
+     *  Deprecated - Used by Syndie only.
+     */
     public SessionKey generateSessionKey(byte salt[], byte passphrase[]) {
         byte salted[] = new byte[16+passphrase.length];
         System.arraycopy(salt, 0, salted, 0, Math.min(salt.length, 16));
@@ -68,6 +68,7 @@ public class KeyGenerator {
     
     /** standard exponent size */
     private static final int PUBKEY_EXPONENT_SIZE_FULL = 2048;
+
     /** 
      * short exponent size, which should be safe for use with the Oakley primes,
      * per "On Diffie-Hellman Key Agreement with Short Exponents" - van Oorschot, Weiner
@@ -85,10 +86,18 @@ public class KeyGenerator {
      * @return pair of keys
      */
     public Object[] generatePKIKeypair() {
+        return generatePKIKeys();
+    }
+
+    /**
+     *  Same as above but different return type
+     *  @since 0.8.7
+     */
+    public SimpleDataStructure[] generatePKIKeys() {
         BigInteger a = new NativeBigInteger(PUBKEY_EXPONENT_SIZE, _context.random());
         BigInteger aalpha = CryptoConstants.elgg.modPow(a, CryptoConstants.elgp);
 
-        Object[] keys = new Object[2];
+        SimpleDataStructure[] keys = new SimpleDataStructure[2];
         keys[0] = new PublicKey();
         keys[1] = new PrivateKey();
         byte[] k0 = aalpha.toByteArray();
@@ -97,8 +106,8 @@ public class KeyGenerator {
         // bigInteger.toByteArray returns SIGNED integers, but since they'return positive,
         // signed two's complement is the same as unsigned
 
-        ((PublicKey) keys[0]).setData(padBuffer(k0, PublicKey.KEYSIZE_BYTES));
-        ((PrivateKey) keys[1]).setData(padBuffer(k1, PrivateKey.KEYSIZE_BYTES));
+        keys[0].setData(padBuffer(k0, PublicKey.KEYSIZE_BYTES));
+        keys[1].setData(padBuffer(k1, PrivateKey.KEYSIZE_BYTES));
 
         return keys;
     }
@@ -121,7 +130,15 @@ public class KeyGenerator {
      * @return pair of keys
      */
     public Object[] generateSigningKeypair() {
-        Object[] keys = new Object[2];
+        return generateSigningKeys();
+    }
+
+    /**
+     *  Same as above but different return type
+     *  @since 0.8.7
+     */
+    public SimpleDataStructure[] generateSigningKeys() {
+        SimpleDataStructure[] keys = new SimpleDataStructure[2];
         BigInteger x = null;
 
         // make sure the random key is less than the DSA q
@@ -135,8 +152,8 @@ public class KeyGenerator {
         byte k0[] = padBuffer(y.toByteArray(), SigningPublicKey.KEYSIZE_BYTES);
         byte k1[] = padBuffer(x.toByteArray(), SigningPrivateKey.KEYSIZE_BYTES);
 
-        ((SigningPublicKey) keys[0]).setData(k0);
-        ((SigningPrivateKey) keys[1]).setData(k1);
+        keys[0].setData(k0);
+        keys[1].setData(k1);
         return keys;
     }
 
@@ -157,7 +174,7 @@ public class KeyGenerator {
      * Pad the buffer w/ leading 0s or trim off leading bits so the result is the
      * given length.  
      */
-    final static byte[] padBuffer(byte src[], int length) {
+    private final static byte[] padBuffer(byte src[], int length) {
         byte buf[] = new byte[length];
 
         if (src.length > buf.length) // extra bits, chop leading bits
@@ -171,6 +188,7 @@ public class KeyGenerator {
         return buf;
     }
 
+/******
     public static void main(String args[]) {
         Log log = new Log("keygenTest");
         RandomSource.getInstance().nextBoolean();
@@ -222,4 +240,5 @@ public class KeyGenerator {
         } catch (InterruptedException ie) { // nop
         }
     }
+******/
 }

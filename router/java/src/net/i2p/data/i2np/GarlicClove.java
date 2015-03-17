@@ -24,27 +24,25 @@ import net.i2p.util.Log;
  * Contains one deliverable message encrypted to a router along with instructions
  * and a certificate 'paying for' the delivery.
  *
+ * Note that certificates are always the null certificate at this time, others are unimplemented.
+ *
  * @author jrandom
  */
 public class GarlicClove extends DataStructureImpl {
-    private Log _log;
-    private RouterContext _context;
+    private final Log _log;
+    //private final RouterContext _context;
     private DeliveryInstructions _instructions;
     private I2NPMessage _msg;
     private long _cloveId;
     private Date _expiration;
     private Certificate _certificate;
-    private I2NPMessageHandler _handler;
+    private final I2NPMessageHandler _handler;
     
     public GarlicClove(RouterContext context) {
-        _context = context;
+        //_context = context;
         _log = context.logManager().getLog(GarlicClove.class);
         _handler = new I2NPMessageHandler(context);
-        setInstructions(null);
-        setData(null);
-        setCloveId(-1);
-        setExpiration(null);
-        setCertificate(null);
+        _cloveId = -1;
     }
     
     public DeliveryInstructions getInstructions() { return _instructions; }
@@ -58,6 +56,9 @@ public class GarlicClove extends DataStructureImpl {
     public Certificate getCertificate() { return _certificate; }
     public void setCertificate(Certificate cert) { _certificate = cert; }
     
+    /**
+     *  @deprecated unused, use byte array method to avoid copying
+     */
     public void readBytes(InputStream in) throws DataFormatException, IOException {
         _instructions = new DeliveryInstructions();
         _instructions.readBytes(in);
@@ -72,8 +73,9 @@ public class GarlicClove extends DataStructureImpl {
         _expiration = DataHelper.readDate(in);
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("CloveID read: " + _cloveId + " expiration read: " + _expiration);
-        _certificate = new Certificate();
-        _certificate.readBytes(in);
+        //_certificate = new Certificate();
+        //_certificate.readBytes(in);
+        _certificate = Certificate.create(in);
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Read cert: " + _certificate);
     }
@@ -89,8 +91,6 @@ public class GarlicClove extends DataStructureImpl {
             _msg = _handler.lastRead();
         } catch (I2NPMessageException ime) {
             throw new DataFormatException("Unable to read the message from a garlic clove", ime);
-        } catch (IOException ioe) {
-            throw new DataFormatException("Not enough data to read the clove", ioe);
         }
         _cloveId = DataHelper.fromLong(source, cur, 4);
         cur += 4;
@@ -98,34 +98,38 @@ public class GarlicClove extends DataStructureImpl {
         cur += DataHelper.DATE_LENGTH;
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("CloveID read: " + _cloveId + " expiration read: " + _expiration);
-        _certificate = new Certificate();
-        cur += _certificate.readBytes(source, cur);
+        //_certificate = new Certificate();
+        //cur += _certificate.readBytes(source, cur);
+        _certificate = Certificate.create(source, cur);
+        cur += _certificate.size();
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Read cert: " + _certificate);
         return cur - offset;
     }
 
-    
+    /**
+     *  @deprecated unused, use byte array method to avoid copying
+     */
     public void writeBytes(OutputStream out) throws DataFormatException, IOException {
-        StringBuffer error = null; 
+        StringBuilder error = null; 
         if (_instructions == null) {
-            if (error == null) error = new StringBuffer();
+            if (error == null) error = new StringBuilder();
             error.append("No instructions ");
         }
         if (_msg == null) {
-            if (error == null) error = new StringBuffer();
+            if (error == null) error = new StringBuilder();
             error.append("No message ");
         }
         if (_cloveId < 0) {
-            if (error == null) error = new StringBuffer();
+            if (error == null) error = new StringBuilder();
             error.append("CloveID < 0 [").append(_cloveId).append("] ");
         }
         if (_expiration == null) {
-            if (error == null) error = new StringBuffer();
+            if (error == null) error = new StringBuilder();
             error.append("Expiration is null ");
         }
         if (_certificate == null) {
-            if (error == null) error = new StringBuffer();
+            if (error == null) error = new StringBuilder();
             error.append("Certificate is null ");
         }
         
@@ -156,6 +160,7 @@ public class GarlicClove extends DataStructureImpl {
             _log.debug("Written cert: " + _certificate);
     }
 
+    @Override
     public byte[] toByteArray() {
         byte rv[] = new byte[estimateSize()];
         int offset = 0;
@@ -186,17 +191,19 @@ public class GarlicClove extends DataStructureImpl {
                + _certificate.size(); // certificate
     }
     
+    @Override
     public boolean equals(Object obj) {
         if ( (obj == null) || !(obj instanceof GarlicClove))
             return false;
         GarlicClove clove = (GarlicClove)obj;
         return DataHelper.eq(getCertificate(), clove.getCertificate()) &&
-               DataHelper.eq(getCloveId(), clove.getCloveId()) &&
+               _cloveId == clove.getCloveId() &&
                DataHelper.eq(getData(), clove.getData()) &&
                DataHelper.eq(getExpiration(), clove.getExpiration()) &&
                DataHelper.eq(getInstructions(),  clove.getInstructions());
     }
     
+    @Override
     public int hashCode() {
         return DataHelper.hashCode(getCertificate()) +
                (int)getCloveId() +
@@ -205,8 +212,9 @@ public class GarlicClove extends DataStructureImpl {
                DataHelper.hashCode(getInstructions());
     }
     
+    @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer(128);
+        StringBuilder buf = new StringBuilder(128);
         buf.append("[GarlicClove: ");
         buf.append("\n\tInstructions: ").append(getInstructions());
         buf.append("\n\tCertificate: ").append(getCertificate());

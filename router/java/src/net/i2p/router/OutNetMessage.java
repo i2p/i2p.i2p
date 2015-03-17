@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import net.i2p.data.DataHelper;
 import net.i2p.data.RouterInfo;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.util.Log;
@@ -29,8 +28,8 @@ import net.i2p.util.Log;
  *
  */
 public class OutNetMessage {
-    private Log _log;
-    private RouterContext _context;
+    private final Log _log;
+    private final RouterContext _context;
     private RouterInfo _target;
     private I2NPMessage _message;
     /** cached message class name, for use after we discard the message */
@@ -46,41 +45,28 @@ public class OutNetMessage {
     private ReplyJob _onReply;
     private Job _onFailedReply;
     private MessageSelector _replySelector;
-    private Set _failedTransports;
+    private Set<String> _failedTransports;
     private long _sendBegin;
-    private long _transmitBegin;
-    private Exception _createdBy;
-    private long _created;
+    //private Exception _createdBy;
+    private final long _created;
     /** for debugging, contains a mapping of even name to Long (e.g. "begin sending", "handleOutbound", etc) */
-    private HashMap _timestamps;
+    private HashMap<String, Long> _timestamps;
     /**
      * contains a list of timestamp event names in the order they were fired
      * (some JVMs have less than 10ms resolution, so the Long above doesn't guarantee order)
      */
-    private List _timestampOrder;
-    private int _queueSize;
-    private long _prepareBegin;
-    private long _prepareEnd;
+    private List<String> _timestampOrder;
     private Object _preparationBuf;
     
     public OutNetMessage(RouterContext context) {
         _context = context;
         _log = context.logManager().getLog(OutNetMessage.class);
-        setTarget(null);
-        _message = null;
-        _messageSize = 0;
-        setPriority(-1);
-        setExpiration(-1);
-        setOnSendJob(null);
-        setOnFailedSendJob(null);
-        setOnReplyJob(null);
-        setOnFailedReplyJob(null);
-        setReplySelector(null);
-        _failedTransports = null;
-        _sendBegin = 0;
+        _priority = -1;
+        _expiration = -1;
         //_createdBy = new Exception("Created by");
         _created = context.clock().now();
-        timestamp("Created");
+        if (_log.shouldLog(Log.INFO))
+            timestamp("Created");
         //_context.messageStateMonitor().outboundMessageAdded();
         //_context.statManager().createRateStat("outNetMessage.timeToDiscard", 
         //                                      "How long until we discard an outbound msg?",
@@ -88,7 +74,8 @@ public class OutNetMessage {
     }
     
     /**
-     * Stamp the message's progress
+     * Stamp the message's progress.
+     * Only useful if log level is INFO or DEBUG
      *
      * @param eventName what occurred 
      * @return how long this message has been 'in flight'
@@ -99,34 +86,39 @@ public class OutNetMessage {
             // only timestamp if we are debugging
             synchronized (this) {
                 locked_initTimestamps();
-                while (_timestamps.containsKey(eventName)) {
-                    eventName = eventName + '.';
-                }
-                _timestamps.put(eventName, new Long(now));
+                // ???
+                //while (_timestamps.containsKey(eventName)) {
+                //    eventName = eventName + '.';
+                //}
+                _timestamps.put(eventName, Long.valueOf(now));
                 _timestampOrder.add(eventName);
             }
         }
         return now - _created;
     }
-    public Map getTimestamps() {
+
+    /** @deprecated unused */
+    public Map<String, Long> getTimestamps() {
         if (_log.shouldLog(Log.INFO)) {
             synchronized (this) {
                 locked_initTimestamps();
-                return (Map)_timestamps.clone();
+                return (Map<String, Long>)_timestamps.clone();
             }
         }
         return Collections.EMPTY_MAP;
     }
+
+    /** @deprecated unused */
     public Long getTimestamp(String eventName) {
         if (_log.shouldLog(Log.INFO)) {
             synchronized (this) {
                 locked_initTimestamps();
-                return (Long)_timestamps.get(eventName);
+                return _timestamps.get(eventName);
             }
         }
-        return ZERO;
+        return Long.valueOf(0);
     }
-    private static final Long ZERO = new Long(0);
+
     private void locked_initTimestamps() {
         if (_timestamps == null) {
             _timestamps = new HashMap(8);
@@ -134,7 +126,11 @@ public class OutNetMessage {
         }
     }
     
-    public Exception getCreatedBy() { return _createdBy; }
+    /**
+     * @deprecated
+     * @return null always
+     */
+    public Exception getCreatedBy() { return null; }
     
     /**
      * Specifies the router to which the message should be delivered.
@@ -142,22 +138,28 @@ public class OutNetMessage {
      */
     public RouterInfo getTarget() { return _target; }
     public void setTarget(RouterInfo target) { _target = target; }
+
     /**
      * Specifies the message to be sent
      *
      */
     public I2NPMessage getMessage() { return _message; }
+
     public void setMessage(I2NPMessage msg) {
         _message = msg;
         if (msg != null) {
-            _messageType = msg.getClass().getName();
+            _messageType = msg.getClass().getSimpleName();
             _messageTypeId = msg.getType();
             _messageId = msg.getUniqueId();
             _messageSize = _message.getMessageSize();
         }
     }
     
+    /**
+     *  @return the simple class name
+     */
     public String getMessageType() { return _messageType; }
+
     public int getMessageTypeId() { return _messageTypeId; }
     public long getMessageId() { return _messageId; }
     
@@ -230,7 +232,7 @@ public class OutNetMessage {
     
     public void transportFailed(String transportStyle) { 
         if (_failedTransports == null)
-            _failedTransports = new HashSet(1);
+            _failedTransports = new HashSet(2);
         _failedTransports.add(transportStyle); 
     }
     /** not thread safe - dont fail transports and iterate over this at the same time */
@@ -240,14 +242,13 @@ public class OutNetMessage {
     
     /** when did the sending process begin */
     public long getSendBegin() { return _sendBegin; }
+
     public void beginSend() { _sendBegin = _context.clock().now(); }
-    public void beginTransmission() { _transmitBegin = _context.clock().now(); }
-    public void beginPrepare() { _prepareBegin = _context.clock().now(); }
-    public void prepared() { prepared(null); }
+
     public void prepared(Object buf) { 
-        _prepareEnd = _context.clock().now();
         _preparationBuf = buf;
     }
+
     public Object releasePreparationBuffer() { 
         Object rv = _preparationBuf;
         _preparationBuf = null;
@@ -255,29 +256,25 @@ public class OutNetMessage {
     }
     
     public long getCreated() { return _created; }
+
     /** time since the message was created */
     public long getLifetime() { return _context.clock().now() - _created; }
+
     /** time the transport tries to send the message (including any queueing) */
     public long getSendTime() { return _context.clock().now() - _sendBegin; }
-    /** time during which the i2np message is actually in flight */
-    public long getTransmissionTime() { return _context.clock().now() - _transmitBegin; }
-    /** how long it took to prepare the i2np message for transmission (including serialization and transport layer encryption) */
-    public long getPreparationTime() { return _prepareEnd - _prepareBegin; }
-    /** number of messages ahead of this one going to the targetted peer when it is first enqueued */
-    public int getQueueSize() { return _queueSize; }
-    public void setQueueSize(int size) { _queueSize = size; }
-    
+
     /** 
      * We've done what we need to do with the data from this message, though
      * we may keep the object around for a while to use its ID, jobs, etc.
      */
     public void discardData() {
-        long timeToDiscard = _context.clock().now() - _created;
         if ( (_message != null) && (_messageSize <= 0) )
             _messageSize = _message.getMessageSize();
-        if (_log.shouldLog(Log.DEBUG))
+        if (_log.shouldLog(Log.DEBUG)) {
+            long timeToDiscard = _context.clock().now() - _created;
             _log.debug("Discard " + _messageSize + "byte " + _messageType + " message after " 
                        + timeToDiscard);
+        }
         _message = null;
         //_context.statManager().addRateData("outNetMessage.timeToDiscard", timeToDiscard, timeToDiscard);
         //_context.messageStateMonitor().outboundMessageDiscarded();
@@ -287,7 +284,7 @@ public class OutNetMessage {
     public void finalize() throws Throwable {
         if (_message != null) {
             if (_log.shouldLog(Log.WARN)) {
-                StringBuffer buf = new StringBuffer(1024);
+                StringBuilder buf = new StringBuilder(1024);
                 buf.append("Undiscarded ").append(_messageSize).append("byte ");
                 buf.append(_messageType).append(" message created ");
                 buf.append((_context.clock().now() - _created)).append("ms ago: ");
@@ -302,14 +299,16 @@ public class OutNetMessage {
         super.finalize();
     }
     */
+
+    @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer(128);
-        buf.append("[OutNetMessage contains ");
+        StringBuilder buf = new StringBuilder(256);
+        buf.append("[OutNetMessage containing ");
         if (_message == null) {
             buf.append("*no message*");
         } else {
             buf.append("a ").append(_messageSize).append(" byte ");
-            buf.append(_message.getClass().getName());
+            buf.append(_messageType);
         }
         buf.append(" expiring on ").append(new Date(_expiration));
         if (_failedTransports != null)
@@ -326,20 +325,25 @@ public class OutNetMessage {
             buf.append(" with onFailedReply job: ").append(_onFailedReply);
         if (_onFailedSend != null)
             buf.append(" with onFailedSend job: ").append(_onFailedSend);
-        buf.append(" {timestamps: \n");
-        renderTimestamps(buf);
-        buf.append("}");
+        if (_timestamps != null && _timestampOrder != null && _log.shouldLog(Log.INFO)) {
+            buf.append(" {timestamps: \n");
+            renderTimestamps(buf);
+            buf.append("}");
+        }
         buf.append("]");
         return buf.toString();
     }
     
-    private void renderTimestamps(StringBuffer buf) {
-        if (_log.shouldLog(Log.INFO)) {
+    /**
+     *  Only useful if log level is INFO or DEBUG;
+     *  locked_initTimestamps() must have been called previously
+     */
+    private void renderTimestamps(StringBuilder buf) {
             synchronized (this) {
                 long lastWhen = -1;
                 for (int i = 0; i < _timestampOrder.size(); i++) {
-                    String name = (String)_timestampOrder.get(i);
-                    Long when = (Long)_timestamps.get(name);
+                    String name = _timestampOrder.get(i);
+                    Long when = _timestamps.get(name);
                     buf.append("\t[");
                     long diff = when.longValue() - lastWhen;
                     if ( (lastWhen > 0) && (diff > 500) )
@@ -354,7 +358,6 @@ public class OutNetMessage {
                     lastWhen = when.longValue();
                 }
             }
-        } 
     }
     
     private final static SimpleDateFormat _fmt = new SimpleDateFormat("HH:mm:ss.SSS");
@@ -365,15 +368,21 @@ public class OutNetMessage {
         }
     }
     
+/****
+
+    @Override
     public int hashCode() {
-        int rv = 0;
-        rv += DataHelper.hashCode(_message);
-        rv += DataHelper.hashCode(_target);
+        int rv = DataHelper.hashCode(_message);
+        rv ^= DataHelper.hashCode(_target);
         // the others are pretty much inconsequential
         return rv;
     }
     
+    @Override
     public boolean equals(Object obj) {
+        //if(obj == null) return false;
+        //if(!(obj instanceof OutNetMessage)) return false;
         return obj == this; // two OutNetMessages are different even if they contain the same message
     }
+****/
 }

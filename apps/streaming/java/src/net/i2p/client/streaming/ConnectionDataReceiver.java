@@ -2,7 +2,6 @@ package net.i2p.client.streaming;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.ByteArray;
-import net.i2p.data.DataHelper;
 import net.i2p.util.Log;
 
 /**
@@ -11,14 +10,22 @@ import net.i2p.util.Log;
  * do NOT block, but they also do not necessary imply immediate
  * delivery, or even the generation of a new packet.  This class
  * is the only one that builds useful outbound Packet objects.
- *
+ *<p>
+ * MessageOutputStream -> ConnectionDataReceiver -> Connection -> PacketQueue -> I2PSession
+ *<p>
+ * There's one of these per MessageOutputStream.
+ * It stores no state. It sends everything to the Connection unless
+ * the Connection is closed,
  */
 class ConnectionDataReceiver implements MessageOutputStream.DataReceiver {
-    private I2PAppContext _context;
-    private Log _log;
-    private Connection _connection;
+    private final I2PAppContext _context;
+    private final Log _log;
+    private final Connection _connection;
     private static final MessageOutputStream.WriteStatus _dummyStatus = new DummyStatus();
     
+    /**
+     *  @param con non-null
+     */
     public ConnectionDataReceiver(I2PAppContext ctx, Connection con) {
         _context = ctx;
         _log = ctx.logManager().getLog(ConnectionDataReceiver.class);
@@ -42,10 +49,7 @@ class ConnectionDataReceiver implements MessageOutputStream.DataReceiver {
      * @return !flush
      */
     public boolean writeInProcess() {
-        Connection con = _connection;
-        if (con != null)
-            return con.getUnackedPacketsSent() >= con.getOptions().getWindowSize();
-        return false;
+        return _connection.getUnackedPacketsSent() >= _connection.getOptions().getWindowSize();
     }
     
     /**
@@ -61,7 +65,7 @@ class ConnectionDataReceiver implements MessageOutputStream.DataReceiver {
      */
     public MessageOutputStream.WriteStatus writeData(byte[] buf, int off, int size) {
         Connection con = _connection;
-        if (con == null) return _dummyStatus;
+        //if (con == null) return _dummyStatus;
         boolean doSend = true;
         if ( (size <= 0) && (con.getLastSendId() >= 0) ) {
             if (con.getOutputStream().getClosed()) {
@@ -83,7 +87,7 @@ class ConnectionDataReceiver implements MessageOutputStream.DataReceiver {
         if (_log.shouldLog(Log.INFO) && !doSend)
             _log.info("writeData called: size="+size + " doSend=" + doSend 
                        + " unackedReceived: " + con.getUnackedPacketsReceived()
-                       + " con: " + con, new Exception("write called by"));
+                       + " con: " + con  /* , new Exception("write called by") */ );
 
         if (doSend) {
             PacketLocal packet = send(buf, off, size);
@@ -112,6 +116,7 @@ class ConnectionDataReceiver implements MessageOutputStream.DataReceiver {
     public PacketLocal send(byte buf[], int off, int size) {
         return send(buf, off, size, false);
     }
+
     /** 
      * @param buf data to be sent - may be null
      * @param off offset into the buffer to start writing from
@@ -121,22 +126,20 @@ class ConnectionDataReceiver implements MessageOutputStream.DataReceiver {
      * @return the packet sent
      */
     public PacketLocal send(byte buf[], int off, int size, boolean forceIncrement) {
-        Connection con = _connection;
-        if (con == null) return null;
-        long before = System.currentTimeMillis();
-        PacketLocal packet = buildPacket(con, buf, off, size, forceIncrement);
-        long built = System.currentTimeMillis();
-        con.sendPacket(packet);
-        long sent = System.currentTimeMillis();
+        //long before = System.currentTimeMillis();
+        PacketLocal packet = buildPacket(buf, off, size, forceIncrement);
+        //long built = System.currentTimeMillis();
+        _connection.sendPacket(packet);
+        //long sent = System.currentTimeMillis();
         
-        if ( (built-before > 5*1000) && (_log.shouldLog(Log.WARN)) )
-            _log.warn("wtf, took " + (built-before) + "ms to build a packet: " + packet);
-        if ( (sent-built> 5*1000) && (_log.shouldLog(Log.WARN)) )
-            _log.warn("wtf, took " + (sent-built) + "ms to send a packet: " + packet);
+        //if ( (built-before > 5*1000) && (_log.shouldLog(Log.WARN)) )
+        //    _log.warn("wtf, took " + (built-before) + "ms to build a packet: " + packet);
+        //if ( (sent-built> 5*1000) && (_log.shouldLog(Log.WARN)) )
+        //    _log.warn("wtf, took " + (sent-built) + "ms to send a packet: " + packet);
         return packet;
     }
     
-    private boolean isAckOnly(Connection con, int size) {
+    private static boolean isAckOnly(Connection con, int size) {
         boolean ackOnly = ( (size <= 0) && // no data
                             (con.getLastSendId() >= 0) && // not a SYN
                             ( (!con.getOutputStream().getClosed()) || // not a CLOSE
@@ -145,7 +148,16 @@ class ConnectionDataReceiver implements MessageOutputStream.DataReceiver {
         return ackOnly;
     }
     
-    private PacketLocal buildPacket(Connection con, byte buf[], int off, int size, boolean forceIncrement) {
+    /** 
+     * @param buf data to be sent - may be null
+     * @param off offset into the buffer to start writing from
+     * @param size how many bytes of the buffer to write (may be 0)
+     * @param forceIncrement even if the buffer is empty, increment the packetId
+     *                       so we get an ACK back
+     * @return the packet to be sent
+     */
+    private PacketLocal buildPacket(byte buf[], int off, int size, boolean forceIncrement) {
+        Connection con = _connection;
         if (size > Packet.MAX_PAYLOAD_SIZE) throw new IllegalArgumentException("size is too large (" + size + ")");
         boolean ackOnly = isAckOnly(con, size);
         boolean isFirst = (con.getAckedPackets() <= 0) && (con.getUnackedPacketsSent() <= 0);
@@ -165,12 +177,15 @@ class ConnectionDataReceiver implements MessageOutputStream.DataReceiver {
         packet.setSendStreamId(con.getSendStreamId());
         packet.setReceiveStreamId(con.getReceiveStreamId());
         
-        con.getInputStream().updateAcks(packet);
+        // not needed here, handled in PacketQueue.enqueue()
+        //con.getInputStream().updateAcks(packet);
+        // note that the optional delay is usually rewritten in Connection.sendPacket()
         int choke = con.getOptions().getChoke();
         packet.setOptionalDelay(choke);
         if (choke > 0)
             packet.setFlag(Packet.FLAG_DELAY_REQUESTED);
-        packet.setResendDelay(con.getOptions().getResendDelay());
+        // bugfix release 0.7.8, we weren't dividing by 1000
+        packet.setResendDelay(con.getOptions().getResendDelay() / 1000);
         
         if (con.getOptions().getProfile() == ConnectionOptions.PROFILE_INTERACTIVE)
             packet.setFlag(Packet.FLAG_PROFILE_INTERACTIVE, true);
@@ -184,24 +199,24 @@ class ConnectionDataReceiver implements MessageOutputStream.DataReceiver {
             packet.setFlag(Packet.FLAG_SYNCHRONIZE);
             packet.setOptionalFrom(con.getSession().getMyDestination());
             packet.setOptionalMaxSize(con.getOptions().getMaxMessageSize());
+            packet.setLocalPort(con.getLocalPort());
+            packet.setRemotePort(con.getPort());
         }
-        if (DataHelper.eq(con.getSendStreamId(), Packet.STREAM_ID_UNKNOWN)) {
+        if (con.getSendStreamId() == Packet.STREAM_ID_UNKNOWN) {
             packet.setFlag(Packet.FLAG_NO_ACK);
         }
         
         // don't set the closed flag if this is a plain ACK and there are outstanding
         // packets sent, otherwise the other side could receive the CLOSE prematurely,
         // since this ACK could arrive before the unacked payload message.
+        // TODO if the only unacked packet is the CLOSE packet and it didn't have any data...
         if (con.getOutputStream().getClosed() && 
             ( (size > 0) || (con.getUnackedPacketsSent() <= 0) || (packet.getSequenceNum() > 0) ) ) {
             packet.setFlag(Packet.FLAG_CLOSE);
             con.setCloseSentOn(_context.clock().now());
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Closed is set for a new packet on " + con + ": " + packet);
-        } else {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Closed is not set for a new packet on " + _connection + ": " + packet);
         }
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("New outbound packet on " + _connection + ": " + packet);
         return packet;
     }
 

@@ -11,8 +11,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-
-import net.i2p.util.Log;
+import java.util.Locale;
 
 /**
  * Encodes and decodes to and from Base32 notation.
@@ -23,12 +22,14 @@ import net.i2p.util.Log;
  * No whitespace allowed.
  *
  * Decode accepts upper or lower case.
+ * @author zzz
+ * @since 0.7
  */
 public class Base32 {
 
-    private final static Log _log = new Log(Base32.class);
+    //private final static Log _log = new Log(Base32.class);
 
-    /** The 64 valid Base32 values. */
+    /** The 32 valid Base32 values. */
     private final static char[] ALPHABET = {'a', 'b', 'c', 'd',
                                             'e', 'f', 'g', 'h', 'i', 'j',
                                             'k', 'l', 'm', 'n', 'o', 'p',
@@ -55,8 +56,6 @@ public class Base32 {
     };
 
     private final static byte BAD_ENCODING = -9; // Indicates error in encoding
-    private final static byte EQUALS_SIGN_ENC = -1; // Indicates equals sign in encoding
-
     /** Defeats instantiation. */
     private Base32() { // nop
     }
@@ -70,29 +69,33 @@ public class Base32 {
     }
 
     private static void runApp(String args[]) {
+        String cmd = args[0].toLowerCase(Locale.US);
+        if ("encodestring".equals(cmd)) {
+            System.out.println(encode(args[1].getBytes()));
+            return;
+        }
+        InputStream in = System.in;
+        OutputStream out = System.out;
         try {
-            if ("encodestring".equalsIgnoreCase(args[0])) {
-                System.out.println(encode(args[1].getBytes()));
-                return;
-            }
-            InputStream in = System.in;
-            OutputStream out = System.out;
             if (args.length >= 3) {
                 out = new FileOutputStream(args[2]);
             }
             if (args.length >= 2) {
                 in = new FileInputStream(args[1]);
             }
-            if ("encode".equalsIgnoreCase(args[0])) {
+            if ("encode".equals(cmd)) {
                 encode(in, out);
                 return;
             }
-            if ("decode".equalsIgnoreCase(args[0])) {
+            if ("decode".equals(cmd)) {
                 decode(in, out);
                 return;
             }
         } catch (IOException ioe) {
             ioe.printStackTrace(System.err);
+        } finally {
+            try { in.close(); } catch (IOException e) {}
+            try { out.close(); } catch (IOException e) {}
         }
     }
 
@@ -132,12 +135,18 @@ public class Base32 {
         System.out.println("or    : Base32 decode");
     }
 
+    /**
+     *  @param source if null will return ""
+     */
     public static String encode(String source) {
         return (source != null ? encode(source.getBytes()) : "");
     }
 
+    /**
+     * @param source The data to convert non-null
+     */
     public static String encode(byte[] source) {
-        StringBuffer buf = new StringBuffer((source.length + 7) * 8 / 5);
+        StringBuilder buf = new StringBuilder((source.length + 7) * 8 / 5);
         encodeBytes(source, buf);
         return buf.toString();
     }
@@ -147,9 +156,9 @@ public class Base32 {
     /**
      * Encodes a byte array into Base32 notation.
      *
-     * @param source The data to convert
+     * @param source The data to convert non-null
      */
-    private static void encodeBytes(byte[] source, StringBuffer out) {
+    private static void encodeBytes(byte[] source, StringBuilder out) {
         int usedbits = 0;
         for (int i = 0; i < source.length; ) {
              int fivebits;
@@ -174,7 +183,7 @@ public class Base32 {
      * Decodes data from Base32 notation and
      * returns it as a string.
      *
-     * @param s the string to decode
+     * @param s the string to decode, if null returns null
      * @return The data as a string or null on failure
      */
     public static String decodeToString(String s) {
@@ -184,6 +193,10 @@ public class Base32 {
         return new String(b);
     }
 
+    /**
+     * @param s non-null
+     * @return decoded data, null on error
+     */
     public static byte[] decode(String s) {
         return decode(s.getBytes());
     }
@@ -194,8 +207,8 @@ public class Base32 {
      * Decodes Base32 content in byte array format and returns
      * the decoded byte array.
      *
-     * @param source The Base32 encoded data
-     * @return decoded data
+     * @param source The Base32 encoded data non-null
+     * @return decoded data, null on error
      */
     private static byte[] decode(byte[] source) {
         int len58;
@@ -231,12 +244,12 @@ public class Base32 {
                          outBuff[outBuffPosn] = next;
                          usedbits -= 3;
                      } else if (next != 0) {
-                       _log.warn("Extra data at the end: " + next + "(decimal)");
+                       //_log.warn("Extra data at the end: " + next + "(decimal)");
                        return null;
                      }
                  }
             } else {
-                _log.warn("Bad Base32 input character at " + i + ": " + source[i] + "(decimal)");
+                //_log.warn("Bad Base32 input character at " + i + ": " + source[i] + "(decimal)");
                 return null;
             }
         }

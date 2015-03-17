@@ -1,7 +1,6 @@
 package net.i2p.router.tunnel;
 
 import net.i2p.I2PAppContext;
-import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.util.ByteCache;
 import net.i2p.util.Log;
@@ -12,14 +11,14 @@ import net.i2p.util.Log;
  * want.  The hop processor works the same on all peers -
  * inbound and outbound participants, outbound endpoints,
  * and inbound gateways (with a small modification per 
- * InbuondGatewayProcessor).  
+ * InboundGatewayProcessor).  
  *
  */
-public class HopProcessor {
-    protected I2PAppContext _context;
-    private Log _log;
-    protected HopConfig _config;
-    private IVValidator _validator;
+class HopProcessor {
+    protected final I2PAppContext _context;
+    private final Log _log;
+    protected final HopConfig _config;
+    private final IVValidator _validator;
         
     /** helpful flag for debugging */
     static final boolean USE_ENCRYPTION = true;
@@ -32,9 +31,11 @@ public class HopProcessor {
     static final int IV_LENGTH = 16;
     private static final ByteCache _cache = ByteCache.getInstance(128, IV_LENGTH);
     
+    /** @deprecated unused */
     public HopProcessor(I2PAppContext ctx, HopConfig config) {
         this(ctx, config, createValidator());
     }
+
     public HopProcessor(I2PAppContext ctx, HopConfig config, IVValidator validator) {
         _context = ctx;
         _log = ctx.logManager().getLog(HopProcessor.class);
@@ -42,6 +43,7 @@ public class HopProcessor {
         _validator = validator;
     }
     
+    /** @deprecated unused */
     protected static IVValidator createValidator() { 
         // yeah, we'll use an O(1) validator later (e.g. bloom filter)
         return new HashSetIVValidator();
@@ -74,7 +76,7 @@ public class HopProcessor {
         boolean okIV = _validator.receiveIV(orig, offset, orig, offset + IV_LENGTH);
         if (!okIV) {
             if (_log.shouldLog(Log.WARN)) 
-                _log.warn("Invalid IV received on tunnel " + _config.getReceiveTunnelId());
+                _log.warn("Invalid IV, dropping at hop " + _config);
             return false;
         }
         
@@ -88,21 +90,32 @@ public class HopProcessor {
             encrypt(orig, offset, length);
             updateIV(orig, offset);
         }
-        if (_log.shouldLog(Log.DEBUG)) {
+        //if (_log.shouldLog(Log.DEBUG)) {
             //_log.debug("Data after processing: " + Base64.encode(orig, IV_LENGTH, orig.length - IV_LENGTH));
             //_log.debug("IV sent: " + Base64.encode(orig, 0, IV_LENGTH));
-        }
+        //}
         return true;
     }
     
     private final void encrypt(byte data[], int offset, int length) {
         for (int off = offset + IV_LENGTH; off < length; off += IV_LENGTH) {
-            DataHelper.xor(data, off - IV_LENGTH, data, off, data, off, IV_LENGTH);
+            //DataHelper.xor(data, off - IV_LENGTH, data, off, data, off, IV_LENGTH);
+            for (int j = 0; j < IV_LENGTH; j++) {
+                data[off + j] ^= data[(off - IV_LENGTH) + j];
+            }
             _context.aes().encryptBlock(data, off, _config.getLayerKey(), data, off);
         }
     }
     
     private final void updateIV(byte orig[], int offset) {
         _context.aes().encryptBlock(orig, offset, _config.getIVKey(), orig, offset);
+    }
+
+    /**
+     *  @since 0.8.12
+     */
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + " for " + _config;
     }
 }

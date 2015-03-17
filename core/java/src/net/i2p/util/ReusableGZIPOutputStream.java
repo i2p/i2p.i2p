@@ -1,29 +1,42 @@
 package net.i2p.util;
 
-import java.io.ByteArrayInputStream;
+//import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.util.ArrayList;
 import java.util.zip.Deflater;
-import java.util.zip.GZIPInputStream;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import net.i2p.data.DataHelper;
 
 /**
- * Provide a cache of reusable GZIP streams, each handling up to 32KB without
+ * Provide a cache of reusable GZIP streams, each handling up to 40 KB output without
  * expansion.
  *
+ * This compresses to memory only. Retrieve the compressed data with getData().
+ * There is no facility to compress to an output stream.
+ *
+ * Do NOT use this for compression of unlimited-size data, as it will
+ * expand, but never release, the BAOS memory buffer.
  */
 public class ReusableGZIPOutputStream extends ResettableGZIPOutputStream {
-    private static ArrayList _available = new ArrayList(16);
+    // Apache Harmony 5.0M13 Deflater doesn't work after reset()
+    // Neither does Android
+    private static final boolean ENABLE_CACHING = !(System.getProperty("java.vendor").startsWith("Apache") ||
+                                                    System.getProperty("java.vendor").contains("Android"));
+    private static final LinkedBlockingQueue<ReusableGZIPOutputStream> _available;
+    static {
+        if (ENABLE_CACHING)
+            _available = new LinkedBlockingQueue(16);
+        else
+            _available = null;
+    }
+
     /**
      * Pull a cached instance
      */
     public static ReusableGZIPOutputStream acquire() {
         ReusableGZIPOutputStream rv = null;
-        synchronized (_available) {
-            if (_available.size() > 0)
-                rv = (ReusableGZIPOutputStream)_available.remove(0);
-        }
+        if (ENABLE_CACHING)
+            rv = _available.poll();
         if (rv == null) {
             rv = new ReusableGZIPOutputStream();
         } 
@@ -36,17 +49,17 @@ public class ReusableGZIPOutputStream extends ResettableGZIPOutputStream {
      */
     public static void release(ReusableGZIPOutputStream out) {
         out.reset();
-        synchronized (_available) {
-            if (_available.size() < 16)
-                _available.add(out);
-        }
+        if (ENABLE_CACHING)
+            _available.offer(out);
     }
     
-    private ByteArrayOutputStream _buffer = null;
+    private final ByteArrayOutputStream _buffer;
+
     private ReusableGZIPOutputStream() {
-        super(new ByteArrayOutputStream(40*1024));
+        super(new ByteArrayOutputStream(DataHelper.MAX_UNCOMPRESSED));
         _buffer = (ByteArrayOutputStream)out;
     }
+
     /** clear the data so we can start again afresh */
     @Override
     public void reset() { 
@@ -54,12 +67,15 @@ public class ReusableGZIPOutputStream extends ResettableGZIPOutputStream {
         _buffer.reset();
         def.setLevel(Deflater.BEST_COMPRESSION);
     }
+
     public void setLevel(int level) { 
         def.setLevel(level);
     }
+
     /** pull the contents of the stream written */
     public byte[] getData() { return _buffer.toByteArray(); }
     
+/******
     public static void main(String args[]) {
         try {
             for (int i = 0; i < 2; i++)
@@ -124,5 +140,6 @@ public class ReusableGZIPOutputStream extends ResettableGZIPOutputStream {
             return false;
         }
     }
+*****/
 }
 

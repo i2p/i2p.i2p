@@ -2,9 +2,12 @@ package net.i2p.router;
 
 import net.i2p.data.DataHelper;
 
-/** glorified struct to contain basic job stats */
-class JobStats {
-    private String _job;
+/**
+ *  Glorified struct to contain basic job stats.
+ *  Public for router console only.
+ */
+public class JobStats {
+    private final String _job;
     private volatile long _numRuns;
     private volatile long _totalTime;
     private volatile long _maxTime;
@@ -15,11 +18,8 @@ class JobStats {
     
     public JobStats(String name) {
         _job = name;
-        _numRuns = 0;
-        _totalTime = 0;
         _maxTime = -1;
         _minTime = -1;
-        _totalPendingTime = 0;
         _maxPendingTime = -1;
         _minPendingTime = -1;
     }
@@ -59,7 +59,9 @@ class JobStats {
             return 0; 
     }
     
+    @Override
     public int hashCode() { return _job.hashCode(); }
+    @Override
     public boolean equals(Object obj) {
         if ( (obj != null) && (obj instanceof JobStats) ) {
             JobStats stats = (JobStats)obj;
@@ -73,8 +75,9 @@ class JobStats {
         }
     }
     
+    @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append("Over ").append(getRuns()).append(" runs, job <b>").append(getName()).append("</b> took ");
         buf.append(getTotalTime()).append("ms (").append(getAvgTime()).append("ms/").append(getMaxTime()).append("ms/");
         buf.append(getMinTime()).append("ms avg/max/min) after a total lag of ");

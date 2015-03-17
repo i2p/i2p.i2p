@@ -1,0 +1,447 @@
+# I2P
+# Copyright (C) 2009 The I2P Project
+# This file is distributed under the same license as the susimail package.
+# To contribute translations, see http://www.i2p2.de/newdevelopers
+#
+# Translators:
+# Denis  <gribua@gmail.com>, 2011.
+#   <gribua@gmail.com>, 2011.
+msgid ""
+msgstr ""
+"Project-Id-Version: I2P\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2011-11-01 00:11+0000\n"
+"PO-Revision-Date: 2011-10-29 20:17+0000\n"
+"Last-Translator: Pharmasolin <gribua@gmail.com>\n"
+"Language-Team: Ukrainian (Ukraine) (http://www.transifex.net/projects/p/I2P/"
+"team/uk_UA/)\n"
+"Language: uk_UA\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
+
+#: src/src/i2p/susi/webmail/WebMail.java:454
+msgid "unknown"
+msgstr "Невідомий"
+
+#: src/src/i2p/susi/webmail/WebMail.java:473
+msgid "Warning: no transfer encoding found, fallback to 7bit."
+msgstr "Попередження: не знайдено кодування передачі, повертаємось до 7bit."
+
+#: src/src/i2p/susi/webmail/WebMail.java:478
+#, java-format
+msgid "No encoder found for encoding \\''{0}\\''."
+msgstr "Не знайдено кодировщик для кодування \\''{0}\\''."
+
+#: src/src/i2p/susi/webmail/WebMail.java:484
+msgid "Warning: no charset found, fallback to US-ASCII."
+msgstr "Попередження: незрозуміле кодування, повертаємось до US-ASCII."
+
+#: src/src/i2p/susi/webmail/WebMail.java:498
+#, java-format
+msgid "Charset \\''{0}\\'' not supported."
+msgstr "Кодування \\''{0}\\'' не підтримується."
+
+#: src/src/i2p/susi/webmail/WebMail.java:502
+#, java-format
+msgid "Part ({0}) not shown, because of {1}"
+msgstr "Частина ({0}) не показана, тому що {1}"
+
+#: src/src/i2p/susi/webmail/WebMail.java:525
+msgid "Download"
+msgstr "Завантажити"
+
+#: src/src/i2p/susi/webmail/WebMail.java:525
+msgid "File is packed into a zipfile for security reasons."
+msgstr "Файл запакований в zipfile з міркувань безпеки"
+
+#: src/src/i2p/susi/webmail/WebMail.java:525
+#, java-format
+msgid "attachment ({0})."
+msgstr "прикріплення ({0})."
+
+#: src/src/i2p/susi/webmail/WebMail.java:529
+#, java-format
+msgid "Attachment ({0})."
+msgstr "Прикріплення Attachment ({0})"
+
+#: src/src/i2p/susi/webmail/WebMail.java:579
+msgid "Need username for authentication."
+msgstr "Необхідне ім'я користувача для авторизації."
+
+#: src/src/i2p/susi/webmail/WebMail.java:583
+msgid "Need password for authentication."
+msgstr "Необхідний пароль для авторизації."
+
+#: src/src/i2p/susi/webmail/WebMail.java:587
+msgid "Need hostname for connect."
+msgstr "Необхідне ім'я хоста для з'єднання."
+
+#: src/src/i2p/susi/webmail/WebMail.java:592
+msgid "Need port number for pop3 connect."
+msgstr "Необхідний вказати порт для pop3 з'єднання."
+
+#: src/src/i2p/susi/webmail/WebMail.java:599
+msgid "POP3 port number is not in range 0..65535."
+msgstr "POP3 порт може бути лише в числовому проміжку 0..65535."
+
+#: src/src/i2p/susi/webmail/WebMail.java:605
+msgid "POP3 port number is invalid."
+msgstr "POP3 порт вказаний не вірно."
+
+#: src/src/i2p/susi/webmail/WebMail.java:611
+msgid "Need port number for smtp connect."
+msgstr "Необхідно вказати порт для smtp з'єднання."
+
+#: src/src/i2p/susi/webmail/WebMail.java:618
+msgid "SMTP port number is not in range 0..65535."
+msgstr "SMTP порт може бути лише в числовому проміжку 0..65535."
+
+#: src/src/i2p/susi/webmail/WebMail.java:624
+msgid "SMTP port number is invalid."
+msgstr "SMTP порт вказаний не вірно."
+
+#: src/src/i2p/susi/webmail/WebMail.java:671
+msgid "User logged out."
+msgstr "Користувач вийшов."
+
+#: src/src/i2p/susi/webmail/WebMail.java:675
+msgid "Internal error, lost connection."
+msgstr "Внутрішня помилка, з'єднання закрито."
+
+#: src/src/i2p/susi/webmail/WebMail.java:771
+#, java-format
+msgid "On {0} {1} wrote:"
+msgstr "В повідомленні від {0}{1} написав(-ла):"
+
+#: src/src/i2p/susi/webmail/WebMail.java:818
+msgid "begin forwarded mail"
+msgstr "початок пересланого листа"
+
+#: src/src/i2p/susi/webmail/WebMail.java:840
+msgid "end forwarded mail"
+msgstr "кінець пересланого листа"
+
+#: src/src/i2p/susi/webmail/WebMail.java:847
+#: src/src/i2p/susi/webmail/WebMail.java:1708
+msgid "Could not fetch mail body."
+msgstr "Не вдалося отримати текст листа."
+
+#: src/src/i2p/susi/webmail/WebMail.java:875
+msgid "Message id not valid."
+msgstr "id повідомлення не дійсний."
+
+#: src/src/i2p/susi/webmail/WebMail.java:958
+#, java-format
+msgid "No Encoding found for {0}"
+msgstr "Не знайдено кодировщика для {0}"
+
+#: src/src/i2p/susi/webmail/WebMail.java:962
+#, java-format
+msgid "Could not encode data: {0}"
+msgstr "Не можливо кодувати данні: {0}"
+
+#: src/src/i2p/susi/webmail/WebMail.java:967
+#, java-format
+msgid "Error reading uploaded file: {0}"
+msgstr "Помилка читання завантаженого файла: {0}"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1045
+msgid "Error parsing download parameter."
+msgstr "Помилка розбору завантаженого параметру."
+
+#: src/src/i2p/susi/webmail/WebMail.java:1089
+msgid "Invalid pagesize number, resetting to default value."
+msgstr "Не дійсний розмір сторінки, скудую до параметру за замовчуванням"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1113
+msgid "No messages marked for deletion."
+msgstr "Не позначені повідомлення для видалення."
+
+#: src/src/i2p/susi/webmail/WebMail.java:1133
+#, java-format
+msgid "Error deleting message: {0}"
+msgstr "Помилка видалення повідомлення: {0}"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1144
+#, java-format
+msgid "1 message deleted."
+msgid_plural "{0} messages deleted."
+msgstr[0] "{0} повідомлення видалено."
+msgstr[1] "{0} повідомлення видалено.{0}"
+msgstr[2] "{0} повідомлень видалено."
+
+#: src/src/i2p/susi/webmail/WebMail.java:1266
+#: src/src/i2p/susi/webmail/WebMail.java:1594
+msgid "Login"
+msgstr "Логін"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1268
+#, java-format
+msgid "1 Message"
+msgid_plural "{0} Messages"
+msgstr[0] "{0} Повідомлення"
+msgstr[1] "{0} Повідомлення"
+msgstr[2] "{0} Повідомлень"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1270
+msgid "Show Message"
+msgstr "Показати повідомлення"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1332
+#, java-format
+msgid "Error decoding content: {0}"
+msgstr "Помилка декодування вмісту: {0}"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1337
+msgid "Error decoding content: No encoder found."
+msgstr "Помилка декодування вмісту: Не знайдено кодировщика."
+
+#: src/src/i2p/susi/webmail/WebMail.java:1384
+msgid "no subject"
+msgstr "без теми"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1401
+msgid "Found no valid sender address."
+msgstr "Адреса відправника не дійсна."
+
+#: src/src/i2p/susi/webmail/WebMail.java:1407
+#, java-format
+msgid "Found no valid address in \\''{0}\\''."
+msgstr "Знайдена не дійсна адреса в  \\''{0}\\''."
+
+#: src/src/i2p/susi/webmail/WebMail.java:1426
+msgid "No recipients found."
+msgstr "Одержувачів не знайдено."
+
+#: src/src/i2p/susi/webmail/WebMail.java:1433
+msgid "Quoted printable encoder not available."
+msgstr "Кодек quoted printable недоступний."
+
+#: src/src/i2p/susi/webmail/WebMail.java:1438
+msgid "Header line encoder not available."
+msgstr "Кодек для заголовку недоступний."
+
+#: src/src/i2p/susi/webmail/WebMail.java:1489
+msgid "Mail sent."
+msgstr "Лист надісланий."
+
+#: src/src/i2p/susi/webmail/WebMail.java:1526
+msgid "Send"
+msgstr "Відправити"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1527
+msgid "Cancel"
+msgstr "Відмінити"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1528
+msgid "Delete Attachment"
+msgstr "Видалити Прикріплення"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1529
+#: src/src/i2p/susi/webmail/WebMail.java:1614
+#: src/src/i2p/susi/webmail/WebMail.java:1695
+msgid "Reload Config"
+msgstr "Перезавантажити настройки"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1530
+#: src/src/i2p/susi/webmail/WebMail.java:1615
+#: src/src/i2p/susi/webmail/WebMail.java:1696
+msgid "Logout"
+msgstr "Вийти"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1553
+#: src/src/i2p/susi/webmail/WebMail.java:1700
+msgid "From:"
+msgstr "Від:"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1554
+msgid "To:"
+msgstr "Кому:"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1555
+msgid "Cc:"
+msgstr "Cc:"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1556
+msgid "Bcc:"
+msgstr "Bcc:"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1557
+#: src/src/i2p/susi/webmail/WebMail.java:1702
+msgid "Subject:"
+msgstr "Тема:"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1558
+msgid "Bcc to self"
+msgstr "Відправляти приховану копію самому собі"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1561
+msgid "New Attachment:"
+msgstr "Нове прикріплення:"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1561
+msgid "Upload File"
+msgstr "Завантажити файл"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1567
+msgid "Attachments:"
+msgstr "Прикріплення:"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1589
+msgid "User"
+msgstr "Користувач"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1590
+msgid "Password"
+msgstr "Пароль"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1591
+msgid "Host"
+msgstr "Хост"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1592
+msgid "POP3-Port"
+msgstr "POP3-Порт"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1593
+msgid "SMTP-Port"
+msgstr "SMTP-Порт"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1594
+msgid "Create Account"
+msgstr "Створити обліковий запис"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1594
+msgid "Reset"
+msgstr "Скинути"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1606
+msgid "Really delete the marked messages?"
+msgstr "Ви дійсно хочете видалити позначені повідомлення?"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1606
+msgid "Yes, really delete them!"
+msgstr "Так, дійсно видалити їх!"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1608
+#: src/src/i2p/susi/webmail/WebMail.java:1687
+msgid "New"
+msgstr "Новий"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1609
+#: src/src/i2p/susi/webmail/WebMail.java:1688
+msgid "Reply"
+msgstr "Відповісти"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1610
+#: src/src/i2p/susi/webmail/WebMail.java:1689
+msgid "Reply All"
+msgstr "Відповісти всім"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1611
+#: src/src/i2p/susi/webmail/WebMail.java:1690
+msgid "Forward"
+msgstr "Переслати"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1612
+#: src/src/i2p/susi/webmail/WebMail.java:1691
+msgid "Delete"
+msgstr "Видалити"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1613
+msgid "Check Mail"
+msgstr "Перевірити пошту"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1617
+msgid "Sender"
+msgstr "Відправник"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1618
+msgid "Subject"
+msgstr "Тема"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1619
+msgid "Date"
+msgstr "Дата"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1620
+msgid "Size"
+msgstr "Розмір"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1646
+#, java-format
+msgid "1 Byte"
+msgid_plural "{0} Bytes"
+msgstr[0] "{0} Байт"
+msgstr[1] "{0} Байти"
+msgstr[2] "{0} Байт"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1651
+msgid "Mark All"
+msgstr "Позначити всі"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1652
+msgid "Invert Selection"
+msgstr "Інвертувати виділене"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1653
+msgid "Clear"
+msgstr "Очистити"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1656
+#: src/src/i2p/susi/webmail/WebMail.java:1657
+msgid "First"
+msgstr "Перше"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1656
+#: src/src/i2p/susi/webmail/WebMail.java:1657
+#: src/src/i2p/susi/webmail/WebMail.java:1692
+msgid "Previous"
+msgstr "Попереднє"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1658
+#, java-format
+msgid "Page {0} of {1}"
+msgstr "Сторінка {0} з {1}"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1660
+#: src/src/i2p/susi/webmail/WebMail.java:1661
+msgid "Last"
+msgstr "Останнє"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1660
+#: src/src/i2p/susi/webmail/WebMail.java:1661
+#: src/src/i2p/susi/webmail/WebMail.java:1693
+msgid "Next"
+msgstr "Наступне"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1664
+msgid "Pagesize:"
+msgstr "Розмір сторінки:"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1665
+msgid "Set"
+msgstr "Встановити"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1675
+msgid "Really delete this message?"
+msgstr "Ви дійсно хочете видалити ці повідомлення?"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1675
+msgid "Yes, really delete it!"
+msgstr "Так, дійсно видалити це!"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1694
+msgid "Back to Folder"
+msgstr "Назад в Папку"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1701
+msgid "Date:"
+msgstr "Дата:"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1712
+msgid "Could not fetch mail."
+msgstr "Не змогли отримати пошту."

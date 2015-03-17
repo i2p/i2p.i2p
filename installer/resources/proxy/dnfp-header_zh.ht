@@ -1,0 +1,32 @@
+HTTP/1.1 504 Gateway Timeout
+Content-Type: text/html; charset=UTF-8
+Cache-control: no-cache
+Connection: close
+Proxy-Connection: close
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+<title>I2P 警告: 未找到出口代理</title>
+<link rel="shortcut icon" href="http://proxy.i2p/themes/console/images/favicon.ico">
+<link href="http://proxy.i2p/themes/console/default/console.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+<div class="logo">
+ <a href="http://127.0.0.1:7657/" title="Router Console"><img src="http://proxy.i2p/themes/console/images/i2plogo.png" alt="I2P Router Console" border="0"></a><hr>
+ <a href="http://127.0.0.1:7657/config.jsp">设置</a> <a href="http://127.0.0.1:7657/help.jsp">帮助</a> <a href="http://127.0.0.1:7657/susidns/">地址簿</a>
+</div>
+<div class="warning" id="warning">
+<h3>警告: I2P 未找到代理</h3>
+<p>
+未找到 WWW 出口代理.
+它可能以下线, 或网络拥堵，或你的路由器与网络
+尚未良好整合。您可以
+<a href="javascript: parent.window.location.reload()">重试</a>
+这将从所设置的所有出口代理中随机选择一个代理做出口。
+<a href="http://127.0.0.1:7657/i2ptunnel/index.jsp">点此</a>
+(如果您设置了超过1个的出口代理地址)。
+如果您总是遇到此错误，你也许需要修改出口代理列表了
+<a href="http://127.0.0.1:7657/i2ptunnel/edit.jsp?tunnel=0">点此</a>.
+</p>
+<hr>
+<p><b>找不到以下目标:</b></p>

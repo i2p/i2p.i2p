@@ -9,7 +9,6 @@ package net.i2p.i2ptunnel.socks;
 import java.net.Socket;
 
 import net.i2p.client.streaming.I2PSocket;
-import net.i2p.i2ptunnel.I2PTunnel;
 import net.i2p.util.Log;
 
 /**
@@ -21,8 +20,9 @@ public abstract class SOCKSServer {
     private static final Log _log = new Log(SOCKSServer.class);
 
     /* Details about the connection requested by client */
-    protected String connHostName = null;
-    protected int connPort = 0;
+    protected String connHostName;
+    protected int connPort;
+    protected int addressType;
 
     /**
      * Perform server initialization (expecially regarding protected

@@ -7,31 +7,30 @@ communicate with the network routers. In addition, various transport protocols d
 the specifics of how data is passed from one router to another over the network. I2NP
 does not specify or require any particular transport layer, allowing transport protocols
 to work over TCP, Polling HTTP, SMTP+POP3/IMAP, UDP, among anything else
-that can pass data. I2NP merely requires that they:
+that can pass data. I2NP merely requires that they:</p>
 <ul>
 <li>
 Register a unique identifier for use in RouterAddress structures consisting of no
-more than 32 UTF-8 characters.
+more than 32 UTF-8 characters.</li>
 <li>
 Define standard text based options that uniquely define a contact method (for
 example .hostname. and .port. or .email address.) as usable in the
-RouterAddress structure's set of options.
+RouterAddress structure's set of options.</li>
 <li>
 Provide a means to reliably deliver a chunk of data, where the contents of any
 particular chunk is delivered in order. However, different chunks of data do not
-need to be delivered in order.
+need to be delivered in order.</li>
 <li>
 Secure the chunks of data from alteration or disclosure (e.g. encrypt them and use
-checksums).
+checksums).</li>
 <li>
-Enable the router to control the transport's bandwidth usage.
+Enable the router to control the transport's bandwidth usage.</li>
 <li>
 Provide estimates for the latency and bandwidth associated with passing a chunk of
-data.
+data.</li>
 <li>
-Provide a programmable interface suitable for integration with various routers.
+Provide a programmable interface suitable for integration with various routers.</li>
 </ul>
-</p>
 <p>
 Transports themselves can implement advanced features, such as steganography,
 constant rate delivery, dummy message delivery, and may even run on top of existing
@@ -56,12 +55,12 @@ message to be sent. The router then determines where to send it, delivers it thr
 outbound tunnels, instructing the end point to pass it along to the appropriate inbound
 tunnel, where it is passed along again to that tunnel's end point and made available to
 the target for reception. To understand fully, each step in the process must be
-explained in detail.
+explained in detail.</p>
 <ul>
 <li>
 First, once the originating router receives the message and the Destination, it
 attempts to find the LeaseSet associated with it as stored in the Network Database
-under the key calculated by SHA256 of the Destination.
+under the key calculated by SHA256 of the Destination.</li>
 <li>
 The router then builds a GarlicMessage addressed to the SHA256 of the
 PublicKey from the LeaseSet with the real data to be delivered. This
@@ -71,48 +70,48 @@ and in fact, if the source router desires guaranteed delivery, it will include a
 requesting source route delivery of a DeliveryStatusMessage back to itself. The
 body of the GarlicMessage with all enclosed GarlicCloves is encrypted to the key
 specified on the LeaseSet using the ElGamal+AES256 algorithm described in the
-data structure spec.
+data structure spec.</li>
 <li>
 The router then selects one or more outbound tunnels through which the
-GarlicMessage will be delivered.
+GarlicMessage will be delivered.</li>
 <li>
 Then the router selects one or more of those Lease structures from the LeaseSet
 and constructs a TunnelMessage along with DeliveryInstructions for the
 outbound tunnel's end point to deliver the GarlicMessage to the inbound tunnel's
-gateway router.
+gateway router.</li>
 <li>
 The source router then passes the various TunnelMessages down the outbound
 tunnel to that tunnel's end point, where the instructions are decrypted, specifying
-where the message should be delivered.
+where the message should be delivered.</li>
 <li>
 At this point, the end point must determine how to contact the router specified in
 the decrypted DeliveryInstructions, perhaps looking up RouterInfo or
 LeaseSet structures in the Network Database, and maybe even delaying a
-requested period of time before passing on the message.
+requested period of time before passing on the message.</li>
 <li>
 Once the tunnel end point has the data it needs to contact the inbound tunnel's
 gateway router, it then attempts to contact it either directly through one of its public
 RouterAddress or source routed through one of its published trusted peers. Over
 this medium the tunnel end point delivers the GarlicMessage as it was wrapped by
-the source router, along with the TunnelId.
+the source router, along with the TunnelId.</li>
 <li>
 Once delivered to the inbound tunnel's gateway, the gateway builds a
 TunnelMessage wrapping the GarlicMessage, encrypting a
 DeliveryInstructions to specify local delivery upon arrival at the tunnel's end
-point.
+point.</li>
 <li>
 Once the TunnelMessage is passed down to the end point in inbound tunnel, the
 router opens the DeliveryInstructions, notes the request to deliver it locally,
 and then proceeds to review the contents of the TunnelMessage's payload, which in
 this case is a GarlicMessage addressed to the SHA256 of a LeaseSet that it has
-published. It then decrypts the payload of the message with ElGamal + AES256.
+published. It then decrypts the payload of the message with ElGamal + AES256.</li>
 <li>
 After opening up the GarlicMessage, it reviews each of the GarlicCloves and
 processes them each. Cloves with DeliveryInstructions addressed to a local
 Destination are delivered to the associated client application, other cloves asking
 for local processing (e.g. Network Database messages or DeliveryStatusMessages)
 are processed, and cloves asking for forwarding to other routers are passed off for
-delivery.
+delivery.</li>
 </ul>
 <p>
 There are several important points of note in this scenario. First, the source router

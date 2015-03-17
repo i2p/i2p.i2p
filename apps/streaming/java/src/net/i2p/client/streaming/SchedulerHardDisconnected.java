@@ -1,7 +1,6 @@
 package net.i2p.client.streaming;
 
 import net.i2p.I2PAppContext;
-import net.i2p.util.Log;
 
 /**
  * <p>Scheduler used after we've locally done a hard disconnect, 
@@ -25,10 +24,9 @@ import net.i2p.util.Log;
  *
  */
 class SchedulerHardDisconnected extends SchedulerImpl {
-    private Log _log;
+
     public SchedulerHardDisconnected(I2PAppContext ctx) {
         super(ctx);
-        _log = ctx.logManager().getLog(SchedulerHardDisconnected.class);
     }
     
     public boolean accept(Connection con) {

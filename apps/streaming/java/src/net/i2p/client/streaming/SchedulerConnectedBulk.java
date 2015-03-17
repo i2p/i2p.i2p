@@ -1,7 +1,6 @@
 package net.i2p.client.streaming;
 
 import net.i2p.I2PAppContext;
-import net.i2p.util.Log;
 
 /**
  * <p>Scheduler used for after our SYN has been sent and ACKed but one
@@ -30,10 +29,9 @@ import net.i2p.util.Log;
  *
  */
 class SchedulerConnectedBulk extends SchedulerImpl {
-    private Log _log;
+
     public SchedulerConnectedBulk(I2PAppContext ctx) {
         super(ctx);
-        _log = ctx.logManager().getLog(SchedulerConnectedBulk.class);
     }
     
     public boolean accept(Connection con) {

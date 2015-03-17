@@ -22,11 +22,10 @@ public class ByteArray implements Serializable, Comparable {
     private int _offset;
 
     public ByteArray() {
-        this(null);
     }
 
+    /** Sets valid */
     public ByteArray(byte[] data) {
-        _offset = 0;
         _data = data;
         _valid = (data != null ? data.length : 0);
     }
@@ -40,6 +39,7 @@ public class ByteArray implements Serializable, Comparable {
         return _data;
     }
 
+    /** Warning, does not set valid */
     public void setData(byte[] data) {
         _data = data;
     }

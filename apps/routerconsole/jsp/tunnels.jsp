@@ -1,21 +1,18 @@
 <%@page contentType="text/html"%>
+<%@page trimDirectiveWhitespaces="true"%>
 <%@page pageEncoding="UTF-8"%>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 
 <html><head>
-<title>I2P Router Console - tunnel summary</title>
-<link rel="stylesheet" href="default.css" type="text/css" />
-</head><body>
-
-<%@include file="nav.jsp" %>
-<%@include file="summary.jsp" %>
-
+<%@include file="css.jsi" %>
+<%=intl.title("tunnel summary")%>
+<script src="/js/ajax.js" type="text/javascript"></script>
+<%@include file="summaryajax.jsi" %>
+</head><body onload="initAjax()">
+<%@include file="summary.jsi" %><h1><%=intl._("I2P Tunnel Summary")%></h1>
 <div class="main" id="main">
  <jsp:useBean class="net.i2p.router.web.TunnelHelper" id="tunnelHelper" scope="request" />
- <jsp:setProperty name="tunnelHelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
- <jsp:setProperty name="tunnelHelper" property="writer" value="<%=out%>" />
+ <jsp:setProperty name="tunnelHelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
+ <% tunnelHelper.storeWriter(out); %>
  <jsp:getProperty name="tunnelHelper" property="tunnelSummary" />
-</div>
-
-</body>
-</html>
+</div></body></html>

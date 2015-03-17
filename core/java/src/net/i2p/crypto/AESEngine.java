@@ -14,20 +14,23 @@ import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.SessionKey;
 import net.i2p.util.Log;
-import net.i2p.util.RandomSource;
+import net.i2p.util.SimpleByteCache;
 
 /** 
  * Dummy wrapper for AES cipher operation.
- *
+ * Warning - 
+ * most methods UNUSED unless i2p.encryption = off
+ * See CryptixAESEngine overrides for the real thing.
  */
 public class AESEngine {
-    private Log _log;
-    private I2PAppContext _context;
+    protected final Log _log;
+    protected final I2PAppContext _context;
+
     public AESEngine(I2PAppContext ctx) {
         _context = ctx;
-        _log = _context.logManager().getLog(AESEngine.class);
-        if (getClass() == AESEngine.class)
-            _log.warn("Warning: AES is disabled");
+        _log = _context.logManager().getLog(getClass());
+        if (getClass().equals(AESEngine.class))
+            _log.logAlways(Log.WARN, "AES is disabled");
     }
     
     /** Encrypt the payload with the session key
@@ -36,14 +39,17 @@ public class AESEngine {
      * @param out where to store the result
      * @param outIndex where in out to start writing
      * @param sessionKey private esession key to encrypt to
-     * @param iv IV for CBC
+     * @param iv IV for CBC, must be 16 bytes
      * @param length how much data to encrypt
      */
     public void encrypt(byte payload[], int payloadIndex, byte out[], int outIndex, SessionKey sessionKey, byte iv[], int length) {
         encrypt(payload, payloadIndex, out, outIndex, sessionKey, iv, 0, length);
     }
     
-    /** Encrypt the payload with the session key
+    /**
+     * Encrypt the payload with the session key.
+     * This just copies payload to out, see extension for the real thing.
+     *
      * @param payload data to be encrypted
      * @param payloadIndex index into the payload to start encrypting
      * @param out where to store the result
@@ -54,9 +60,18 @@ public class AESEngine {
      */
     public void encrypt(byte payload[], int payloadIndex, byte out[], int outIndex, SessionKey sessionKey, byte iv[], int ivOffset, int length) {
         System.arraycopy(payload, payloadIndex, out, outIndex, length);
-        _log.warn("Warning: AES is disabled");
+        _log.logAlways(Log.WARN, "AES is disabled");
     }
 
+    /**
+     * Encrypt the SHA-256 Hash of the IV, the 4 byte length, and the payload,
+     * with random padding up to the paddedSize, rounded up to the next multiple of 16.
+     *
+     * @param paddedSize minimum size of the output
+     * @param iv IV for CBC, must be 16 bytes
+     * @return null on error
+     * @deprecated unused
+     */
     public byte[] safeEncrypt(byte payload[], SessionKey sessionKey, byte iv[], int paddedSize) {
         if ((iv == null) || (payload == null) || (sessionKey == null) || (iv.length != 16)) return null;
 
@@ -66,11 +81,8 @@ public class AESEngine {
         int padding = ElGamalAESEngine.getPaddingSize(size, paddedSize);
         
         byte data[] = new byte[size + padding];
-        Hash h = _context.sha().calculateHash(iv);
-        
-        int cur = 0;
-        System.arraycopy(h.getData(), 0, data, cur, Hash.HASH_LENGTH);
-        cur += Hash.HASH_LENGTH;
+        _context.sha().calculateHash(iv, 0, 16, data, 0);
+        int cur = Hash.HASH_LENGTH;
         
         DataHelper.toLong(data, cur, 4, payload.length);
         cur += 4;
@@ -83,6 +95,14 @@ public class AESEngine {
         return data;
     }
 
+    /**
+     * See safeEncrypt() for description.
+     * WARNING - no check for maximum length here, OOM DOS possible, fix it if you're going to use this.
+     *
+     * @param iv IV for CBC, must be 16 bytes
+     * @return null on error
+     * @deprecated unused
+     */
     public byte[] safeDecrypt(byte payload[], SessionKey sessionKey, byte iv[]) {
         if ((iv == null) || (payload == null) || (sessionKey == null) || (iv.length != 16)) return null;
 
@@ -93,16 +113,16 @@ public class AESEngine {
             return null;
         }
 
-        int cur = 0;
-        byte h[] = _context.sha().calculateHash(iv).getData();
-        for (int i = 0; i < Hash.HASH_LENGTH; i++) {
-            if (decr[i] != h[i]) {
+        byte h[] = SimpleByteCache.acquire(Hash.HASH_LENGTH);
+        _context.sha().calculateHash(iv, 0, 16, h, 0);
+        boolean eq = DataHelper.eq(decr, 0, h, 0, Hash.HASH_LENGTH);
+        SimpleByteCache.release(h);
+        if (!eq) {
                 _log.error("Hash does not match [key=" + sessionKey + " / iv =" + DataHelper.toString(iv, iv.length)
                            + "]", new Exception("Hash error"));
                 return null;
-            }
         }
-        cur += Hash.HASH_LENGTH;
+        int cur = Hash.HASH_LENGTH;
         
         long len = DataHelper.fromLong(decr, cur, 4);
         cur += 4;
@@ -117,7 +137,6 @@ public class AESEngine {
         return data;
     }
 
-
     /** Decrypt the data with the session key
      * @param payload data to be decrypted
      * @param payloadIndex index into the payload to start decrypting
@@ -131,7 +150,10 @@ public class AESEngine {
         decrypt(payload, payloadIndex, out, outIndex, sessionKey, iv, 0, length);
     }
     
-    /** Decrypt the data with the session key
+    /**
+     * Decrypt the data with the session key.
+     * This just copies payload to out, see extension for the real thing.
+     *
      * @param payload data to be decrypted
      * @param payloadIndex index into the payload to start decrypting
      * @param out where to store the cleartext
@@ -142,15 +164,20 @@ public class AESEngine {
      */
     public void decrypt(byte payload[], int payloadIndex, byte out[], int outIndex, SessionKey sessionKey, byte iv[], int ivOffset, int length) {
         System.arraycopy(payload, payloadIndex, out, outIndex, length);
-        _log.warn("Warning: AES is disabled");
+        _log.logAlways(Log.WARN, "AES is disabled");
     }
 
-    
+    /**
+     * This just copies payload to out, see extension for the real thing.
+     *   @param sessionKey unused
+     */
     public void encryptBlock(byte payload[], int inIndex, SessionKey sessionKey, byte out[], int outIndex) {
         System.arraycopy(payload, inIndex, out, outIndex, out.length - outIndex);
     }
 
-    /** decrypt the data with the session key provided
+    /**
+     * This just copies payload to rv, see extension for the real thing.
+     *
      * @param payload encrypted data
      * @param sessionKey private session key
      */
@@ -158,6 +185,7 @@ public class AESEngine {
         System.arraycopy(payload, inIndex, rv, outIndex, rv.length - outIndex);
     }
     
+/******
     public static void main(String args[]) {
         I2PAppContext ctx = new I2PAppContext();
         SessionKey key = ctx.keyGenerator().generateSessionKey();
@@ -178,4 +206,5 @@ public class AESEngine {
         byte ld[] = ctx.aes().safeDecrypt(le, key, iv);
         ctx.logManager().getLog(AESEngine.class).debug("Long test: " + DataHelper.eq(ld, lbuf));
     }
+******/
 }

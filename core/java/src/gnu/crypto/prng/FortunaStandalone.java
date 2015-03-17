@@ -41,19 +41,19 @@ exception statement from your version.  */
 
 package gnu.crypto.prng;
 
-import gnu.crypto.hash.Sha256Standalone;
-
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.security.InvalidKeyException;
+import java.security.MessageDigest;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 import net.i2p.crypto.CryptixAESKeyCache;
 import net.i2p.crypto.CryptixRijndael_Algorithm;
+import net.i2p.crypto.SHA256Generator;
 
 /**
  * The Fortuna continuously-seeded pseudo-random number generator. This
@@ -93,6 +93,7 @@ import net.i2p.crypto.CryptixRijndael_Algorithm;
  * Renamed from Fortuna to FortunaStandalone so it doesn't conflict with the
  * gnu-crypto implementation, which has been imported into GNU/classpath
  *
+ * NOTE: As of 0.8.8, uses the java.security.MessageDigest instead of GNU Sha256Standalone
  */
 public class FortunaStandalone extends BasePRNGStandalone implements Serializable, RandomEventListenerStandalone
 {
@@ -103,7 +104,7 @@ public class FortunaStandalone extends BasePRNGStandalone implements Serializabl
   static final int NUM_POOLS = 32;
   static final int MIN_POOL_SIZE = 64;
   final Generator generator;
-  final Sha256Standalone[] pools;
+  final MessageDigest[] pools;
   long lastReseed;
   int pool;
   int pool0Count;
@@ -117,9 +118,9 @@ public class FortunaStandalone extends BasePRNGStandalone implements Serializabl
   {
     super("Fortuna i2p");
     generator = new Generator();
-    pools = new Sha256Standalone[NUM_POOLS];
+    pools = new MessageDigest[NUM_POOLS];
     for (int i = 0; i < NUM_POOLS; i++)
-      pools[i] = new Sha256Standalone();
+      pools[i] = SHA256Generator.getDigestInstance();
     lastReseed = 0;
     pool = 0;
     pool0Count = 0;
@@ -131,7 +132,7 @@ public class FortunaStandalone extends BasePRNGStandalone implements Serializabl
 
   public void seed(byte val[]) {
       Map props = new HashMap(1);
-      props.put(SEED, (Object)val);
+      props.put(SEED, val);
       init(props);
       fillBlock();
   }
@@ -169,6 +170,7 @@ public class FortunaStandalone extends BasePRNGStandalone implements Serializabl
     System.out.println("Refilling " + (++refillCount) + " after " + diff + " for the PRNG took " + refillTime);
   }
 
+    @Override
   public void addRandomByte(byte b)
   {
     pools[pool].update(b);
@@ -177,6 +179,7 @@ public class FortunaStandalone extends BasePRNGStandalone implements Serializabl
     pool = (pool + 1) % NUM_POOLS;
   }
 
+    @Override
   public void addRandomBytes(byte[] buf, int offset, int length)
   {
     pools[pool].update(buf, offset, length);
@@ -225,7 +228,7 @@ public class FortunaStandalone extends BasePRNGStandalone implements Serializabl
 
     private static final int LIMIT = 1 << 20;
 
-    private final Sha256Standalone hash;
+    private final MessageDigest hash;
     private final byte[] counter;
     private final byte[] key;
     /** current encryption key built from the keying material */
@@ -236,7 +239,7 @@ public class FortunaStandalone extends BasePRNGStandalone implements Serializabl
     public Generator ()
     {
       super("Fortuna.generator.i2p");
-      this.hash = new Sha256Standalone();
+      this.hash = SHA256Generator.getDigestInstance();
       counter = new byte[16]; //cipher.defaultBlockSize()];
       buffer = new byte[16]; //cipher.defaultBlockSize()];
       int keysize = 32;
@@ -244,6 +247,7 @@ public class FortunaStandalone extends BasePRNGStandalone implements Serializabl
       cryptixKeyBuf = CryptixAESKeyCache.createNew();
     }
 
+        @Override
     public final byte nextByte()
     {
       byte[] b = new byte[1];
@@ -251,6 +255,7 @@ public class FortunaStandalone extends BasePRNGStandalone implements Serializabl
       return b[0];
     }
 
+        @Override
     public final void nextBytes(byte[] out, int offset, int length)
     {
       if (!seeded)
@@ -280,11 +285,13 @@ public class FortunaStandalone extends BasePRNGStandalone implements Serializabl
       ndx = 0;
     }
 
+        @Override
     public final void addRandomByte(byte b)
     {
       addRandomBytes(new byte[] { b });
     }
 
+        @Override
     public final void addRandomBytes(byte[] seed, int offset, int length)
     {
       hash.update(key, 0, key.length);
@@ -345,6 +352,7 @@ public class FortunaStandalone extends BasePRNGStandalone implements Serializabl
     }
   }
   
+/*****
   public static void main(String args[]) {
       byte in[] = new byte[16];
       byte out[] = new byte[16];
@@ -373,7 +381,7 @@ public class FortunaStandalone extends BasePRNGStandalone implements Serializabl
           long after = System.currentTimeMillis();
           System.out.println("encrypting 4MB took " + (after-beforeAll));
       } catch (Exception e) { e.printStackTrace(); }
-      /*
+****/ /*
       FortunaStandalone f = new FortunaStandalone();
       java.util.HashMap props = new java.util.HashMap();
       byte initSeed[] = new byte[1234];
@@ -388,5 +396,7 @@ public class FortunaStandalone extends BasePRNGStandalone implements Serializabl
       long time = System.currentTimeMillis() - before;
       System.out.println("512MB took " + time + ", or " + (8*64d)/((double)time/1000d) +"MBps");
        */
+/*****
   }
+*****/
 }

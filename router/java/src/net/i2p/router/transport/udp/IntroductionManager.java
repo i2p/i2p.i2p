@@ -1,42 +1,55 @@
 package net.i2p.router.transport.udp;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import net.i2p.data.Base64;
 import net.i2p.data.RouterAddress;
 import net.i2p.data.RouterInfo;
 import net.i2p.data.SessionKey;
 import net.i2p.router.RouterContext;
+import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.Log;
 
 /**
  *
  */
-public class IntroductionManager {
-    private RouterContext _context;
-    private Log _log;
-    private UDPTransport _transport;
-    private PacketBuilder _builder;
+class IntroductionManager {
+    private final RouterContext _context;
+    private final Log _log;
+    private final UDPTransport _transport;
+    private final PacketBuilder _builder;
     /** map of relay tag to PeerState that should receive the introduction */
-    private Map _outbound;
+    private final Map<Long, PeerState> _outbound;
     /** list of peers (PeerState) who have given us introduction tags */
-    private List _inbound;
+    private final Set<PeerState> _inbound;
+
+    /**
+     * Limit since we ping to keep the conn open
+     * @since 0.8.11
+     */
+    private static final int MAX_INBOUND = 20;
+
+    /**
+     * TODO this should be enforced in EstablishmentManager, it isn't now.
+     * @since 0.8.11
+     */
+    private static final int MAX_OUTBOUND = 100;
 
     public IntroductionManager(RouterContext ctx, UDPTransport transport) {
         _context = ctx;
         _log = ctx.logManager().getLog(IntroductionManager.class);
         _transport = transport;
         _builder = new PacketBuilder(ctx, transport);
-        _outbound = Collections.synchronizedMap(new HashMap(128));
-        _inbound = new ArrayList(128);
-        ctx.statManager().createRateStat("udp.receiveRelayIntro", "How often we get a relayed request for us to talk to someone?", "udp", new long[] { 10*60*1000 });
-        ctx.statManager().createRateStat("udp.receiveRelayRequest", "How often we receive a good request to relay to someone else?", "udp", new long[] { 10*60*1000 });
-        ctx.statManager().createRateStat("udp.receiveRelayRequestBadTag", "Received relay requests with bad/expired tag", "udp", new long[] { 10*60*1000 });
+        _outbound = new ConcurrentHashMap(MAX_OUTBOUND);
+        _inbound = new ConcurrentHashSet(MAX_INBOUND);
+        ctx.statManager().createRateStat("udp.receiveRelayIntro", "How often we get a relayed request for us to talk to someone?", "udp", UDPTransport.RATES);
+        ctx.statManager().createRateStat("udp.receiveRelayRequest", "How often we receive a good request to relay to someone else?", "udp", UDPTransport.RATES);
+        ctx.statManager().createRateStat("udp.receiveRelayRequestBadTag", "Received relay requests with bad/expired tag", "udp", UDPTransport.RATES);
     }
     
     public void reset() {
@@ -50,12 +63,9 @@ public class IntroductionManager {
             _log.debug("Adding peer " + peer.getRemoteHostId() + ", weRelayToThemAs " 
                        + peer.getWeRelayToThemAs() + ", theyRelayToUsAs " + peer.getTheyRelayToUsAs());
         if (peer.getWeRelayToThemAs() > 0) 
-            _outbound.put(new Long(peer.getWeRelayToThemAs()), peer);
-        if (peer.getTheyRelayToUsAs() > 0) {
-            synchronized (_inbound) {
-                if (!_inbound.contains(peer))
-                    _inbound.add(peer);
-            }
+            _outbound.put(Long.valueOf(peer.getWeRelayToThemAs()), peer);
+        if (peer.getTheyRelayToUsAs() > 0 && _inbound.size() < MAX_INBOUND) {
+            _inbound.add(peer);
         }
     }
     
@@ -65,16 +75,14 @@ public class IntroductionManager {
             _log.debug("removing peer " + peer.getRemoteHostId() + ", weRelayToThemAs " 
                        + peer.getWeRelayToThemAs() + ", theyRelayToUsAs " + peer.getTheyRelayToUsAs());
         if (peer.getWeRelayToThemAs() > 0) 
-            _outbound.remove(new Long(peer.getWeRelayToThemAs()));
+            _outbound.remove(Long.valueOf(peer.getWeRelayToThemAs()));
         if (peer.getTheyRelayToUsAs() > 0) {
-            synchronized (_inbound) {
-                _inbound.remove(peer);
-            }
+            _inbound.remove(peer);
         }
     }
     
     public PeerState get(long id) {
-        return (PeerState)_outbound.get(new Long(id));
+        return _outbound.get(Long.valueOf(id));
     }
     
     /**
@@ -90,20 +98,20 @@ public class IntroductionManager {
      * and we want to keep our introducers valid.
      */
     public int pickInbound(Properties ssuOptions, int howMany) {
-        List peers = null;
         int start = _context.random().nextInt(Integer.MAX_VALUE);
-        synchronized (_inbound) {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Picking inbound out of " + _inbound.size());
-            if (_inbound.size() <= 0) return 0;
-            peers = new ArrayList(_inbound);
-        }
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Picking inbound out of " + _inbound.size());
+        if (_inbound.isEmpty()) return 0;
+        List<PeerState> peers = new ArrayList(_inbound);
         int sz = peers.size();
         start = start % sz;
         int found = 0;
-        long inactivityCutoff = _context.clock().now() - (UDPTransport.EXPIRE_TIMEOUT / 2);
+        long inactivityCutoff = _context.clock().now() - (UDPTransport.EXPIRE_TIMEOUT / 2);    // 15 min
+        // if not too many to choose from, be less picky
+        if (sz <= howMany + 2)
+            inactivityCutoff -= UDPTransport.EXPIRE_TIMEOUT / 4;
         for (int i = 0; i < sz && found < howMany; i++) {
-            PeerState cur = (PeerState)peers.get((start + i) % sz);
+            PeerState cur = peers.get((start + i) % sz);
             RouterInfo ri = _context.netDb().lookupRouterInfoLocally(cur.getRemotePeer());
             if (ri == null) {
                 if (_log.shouldLog(Log.INFO))
@@ -116,7 +124,7 @@ public class IntroductionManager {
                     _log.info("Picked peer has no SSU address: " + ri);
                 continue;
             }
-            if (_context.profileOrganizer().isFailing(cur.getRemotePeer()) ||
+            if ( /* _context.profileOrganizer().isFailing(cur.getRemotePeer()) || */
                 _context.shitlist().isShitlisted(cur.getRemotePeer()) ||
                 _transport.wasUnreachable(cur.getRemotePeer())) {
                 if (_log.shouldLog(Log.INFO))
@@ -124,7 +132,11 @@ public class IntroductionManager {
                 continue;
             }
             // Try to pick active peers...
-            if (cur.getLastReceiveTime() < inactivityCutoff || cur.getLastSendTime() < inactivityCutoff) {
+            // FIXME this is really strict and causes us to run out of introducers
+            // We have much less introducers than we used to have because routers don't offer
+            // if they are approaching max connections (see EstablishmentManager)
+            // FIXED, was ||, is this OK now?
+            if (cur.getLastReceiveTime() < inactivityCutoff && cur.getLastSendTime() < inactivityCutoff) {
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Peer is idle too long: " + cur);
                 continue;
@@ -140,11 +152,21 @@ public class IntroductionManager {
             found++;
         }
 
+        // FIXME failsafe if found == 0, relax inactivityCutoff and try again?
+
+        pingIntroducers();
+        return found;
+    }
+
+    /**
+     *  Was part of pickInbound(), moved out so we can call it more often
+     *  @since 0.8.11
+     */
+    public void pingIntroducers() {
         // Try to keep the connection up for two hours after we made anybody an introducer
-        long pingCutoff = _context.clock().now() - (2 * 60 * 60 * 1000);
-        inactivityCutoff = _context.clock().now() - (UDPTransport.EXPIRE_TIMEOUT / 4);
-        for (int i = 0; i < sz; i++) {
-            PeerState cur = (PeerState)peers.get(i);
+        long pingCutoff = _context.clock().now() - (105 * 60 * 1000);
+        long inactivityCutoff = _context.clock().now() - UDPTransport.MIN_EXPIRE_TIMEOUT;
+        for (PeerState cur : _inbound) {
             if (cur.getIntroducerTime() > pingCutoff &&
                 cur.getLastSendTime() < inactivityCutoff) {
                 if (_log.shouldLog(Log.INFO))
@@ -153,11 +175,19 @@ public class IntroductionManager {
                 _transport.send(_builder.buildPing(cur));
             }
         }
-
-        return found;
     }
     
-    public void receiveRelayIntro(RemoteHostId bob, UDPPacketReader reader) {
+    /**
+     * Not as elaborate as pickInbound() above.
+     * Just a quick check to see how many volunteers we know,
+     * which the Transport uses to see if we need more.
+     * @return number of peers that have volunteered to introduce us
+     */
+    int introducerCount() {
+            return _inbound.size();
+    }
+
+    void receiveRelayIntro(RemoteHostId bob, UDPPacketReader reader) {
         if (_context.router().isHidden())
             return;
         if (_log.shouldLog(Log.INFO))
@@ -166,7 +196,7 @@ public class IntroductionManager {
         _transport.send(_builder.buildHolePunch(reader));
     }
     
-    public void receiveRelayRequest(RemoteHostId alice, UDPPacketReader reader) {
+    void receiveRelayRequest(RemoteHostId alice, UDPPacketReader reader) {
         if (_context.router().isHidden())
             return;
         long tag = reader.getRelayRequestReader().readTag();

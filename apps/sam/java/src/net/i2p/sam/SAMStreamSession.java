@@ -13,6 +13,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InterruptedIOException;
 import java.io.OutputStream;
+import java.nio.ByteBuffer;
+import java.nio.channels.Channels;
 import java.net.ConnectException;
 import java.net.NoRouteToHostException;
 import java.util.ArrayList;
@@ -49,19 +51,19 @@ public class SAMStreamSession {
 
     protected final static int SOCKET_HANDLER_BUF_SIZE = 32768;
 
-    protected SAMStreamReceiver recv = null;
+    protected final SAMStreamReceiver recv;
 
-    private SAMStreamSessionServer server = null;
+    protected final SAMStreamSessionServer server;
 
-    protected I2PSocketManager socketMgr = null;
+    protected final I2PSocketManager socketMgr;
 
-    private Object handlersMapLock = new Object();
+    private final Object handlersMapLock = new Object();
     /** stream id (Long) to SAMStreamSessionSocketReader */
-    private HashMap handlersMap = new HashMap();
+    private final HashMap<Integer,SAMStreamSessionSocketReader> handlersMap = new HashMap<Integer,SAMStreamSessionSocketReader>();
     /** stream id (Long) to StreamSender */
-    private HashMap sendersMap = new HashMap();
+    private final HashMap<Integer,StreamSender> sendersMap = new HashMap<Integer,StreamSender>();
 
-    private Object idLock = new Object();
+    private final Object idLock = new Object();
     private int lastNegativeId = 0;
 
     // Can we create outgoing connections?
@@ -71,7 +73,7 @@ public class SAMStreamSession {
      * should we flush every time we get a STREAM SEND, or leave that up to
      * the streaming lib to decide? 
      */
-    protected boolean forceFlush = false;
+    protected final boolean forceFlush;
 
     public static String PROP_FORCE_FLUSH = "sam.forceFlush";
     public static String DEFAULT_FORCE_FLUSH = "false";
@@ -89,11 +91,7 @@ public class SAMStreamSession {
      */
     public SAMStreamSession(String dest, String dir, Properties props,
                             SAMStreamReceiver recv) throws IOException, DataFormatException, SAMException {
-        ByteArrayInputStream bais;
-
-        bais = new ByteArrayInputStream(Base64.decode(dest));
-
-        initSAMStreamSession(bais, dir, props, recv);
+        this(new ByteArrayInputStream(Base64.decode(dest)), dir, props, recv);
     }
 
     /**
@@ -109,17 +107,11 @@ public class SAMStreamSession {
      */
     public SAMStreamSession(InputStream destStream, String dir,
                             Properties props,  SAMStreamReceiver recv) throws IOException, DataFormatException, SAMException {
-        initSAMStreamSession(destStream, dir, props, recv);
-    }
-
-    private void initSAMStreamSession(InputStream destStream, String dir,
-                                      Properties props, SAMStreamReceiver recv) throws IOException, DataFormatException, SAMException{
         this.recv = recv;
 
         _log.debug("SAM STREAM session instantiated");
 
-        Properties allprops = new Properties();
-        allprops.putAll(System.getProperties());
+        Properties allprops = (Properties) System.getProperties().clone();
         allprops.putAll(props);
 
         String i2cpHost = allprops.getProperty(I2PClient.PROP_TCP_HOST, "127.0.0.1");
@@ -163,10 +155,12 @@ public class SAMStreamSession {
             Thread t = new I2PAppThread(server, "SAMStreamSessionServer");
 
             t.start();
+        } else {
+            server = null;
         }
     }
     
-    private class DisconnectListener implements I2PSocketManager.DisconnectListener {
+    protected class DisconnectListener implements I2PSocketManager.DisconnectListener {
         public void sessionDisconnected() {
             close();
         }
@@ -338,12 +332,12 @@ public class SAMStreamSession {
      */
     protected SAMStreamSessionSocketReader getSocketReader ( int id ) {
         synchronized (handlersMapLock) {
-            return (SAMStreamSessionSocketReader)handlersMap.get(new Integer(id));
+            return handlersMap.get(new Integer(id));
         }
     }
     private StreamSender getSender(int id) {
         synchronized (handlersMapLock) {
-            return (StreamSender)sendersMap.get(new Integer(id));
+            return sendersMap.get(new Integer(id));
         }
     }
 
@@ -369,8 +363,8 @@ public class SAMStreamSession {
         StreamSender sender = null;
 
         synchronized (handlersMapLock) {
-            reader = (SAMStreamSessionSocketReader)handlersMap.remove(new Integer(id));
-            sender = (StreamSender)sendersMap.remove(new Integer(id));
+            reader = handlersMap.remove(new Integer(id));
+            sender = sendersMap.remove(new Integer(id));
         }
 
         if (reader != null)
@@ -396,8 +390,8 @@ public class SAMStreamSession {
             
             while (iter.hasNext()) {
                  id = (Integer)iter.next();
-                 ((SAMStreamSessionSocketReader)handlersMap.get(id)).stopRunning();
-                 ((StreamSender)sendersMap.get(id)).shutDownGracefully();
+                 handlersMap.get(id).stopRunning();
+                 sendersMap.get(id).shutDownGracefully();
             }
             handlersMap.clear();
             sendersMap.clear();
@@ -412,10 +406,10 @@ public class SAMStreamSession {
      */
     public class SAMStreamSessionServer implements Runnable {
 
-        private Object runningLock = new Object();
-        private boolean stillRunning = true;
+        private final Object runningLock = new Object();
+        private volatile boolean stillRunning = true;
 
-        private I2PServerSocket serverSocket = null;
+        private final I2PServerSocket serverSocket;
 
         /**
          * Create a new SAM STREAM session server
@@ -506,9 +500,9 @@ public class SAMStreamSession {
         
         protected I2PSocket i2pSocket = null;
 
-        protected Object runningLock = new Object();
+        protected final Object runningLock = new Object();
 
-        protected boolean stillRunning = true;
+        protected volatile boolean stillRunning = true;
 
         protected int id;
 
@@ -572,19 +566,20 @@ public class SAMStreamSession {
             _log.debug("run() called for socket reader " + id);
 
             int read = -1;
-            byte[] data = new byte[SOCKET_HANDLER_BUF_SIZE];
+            ByteBuffer data = ByteBuffer.allocate(SOCKET_HANDLER_BUF_SIZE);
 
             try {
                 InputStream in = i2pSocket.getInputStream();
 
                 while (stillRunning) {
-                    read = in.read(data);
+                	data.clear();
+                    read = Channels.newChannel(in).read(data);
                     if (read == -1) {
                         _log.debug("Handler " + id + ": connection closed");
                         break;
                     }
-                    
-                    recv.receiveStreamBytes(id, data, read);
+                    data.flip();
+                    recv.receiveStreamBytes(id, data);
                 }
             } catch (IOException e) {
                 _log.debug("Caught IOException", e);
@@ -650,17 +645,17 @@ public class SAMStreamSession {
 
     protected class v1StreamSender extends StreamSender
       {
-        private List _data;
+        private List<ByteArray> _data;
         private int _id;
         private ByteCache _cache;
         private OutputStream _out = null;
-        private boolean _stillRunning, _shuttingDownGracefully;
-        private Object runningLock = new Object();
+        private volatile boolean _stillRunning, _shuttingDownGracefully;
+        private final Object runningLock = new Object();
         private I2PSocket i2pSocket = null;
         
 	public v1StreamSender ( I2PSocket s, int id ) throws IOException {
 	    super ( s, id );
-            _data = new ArrayList(1);
+            _data = new ArrayList<ByteArray>(1);
             _id = id;
             _cache = ByteCache.getInstance(4, 32*1024);
             _out = s.getOutputStream();
@@ -732,8 +727,8 @@ public class SAMStreamSession {
                 data = null;
                 try {
                     synchronized (_data) {
-                        if (_data.size() > 0) {
-                            data = (ByteArray)_data.remove(0);
+                        if (!_data.isEmpty()) {
+                            data = _data.remove(0);
                         } else if (_shuttingDownGracefully) {
                             /* No data left and shutting down gracefully?
                                If so, stop the sender. */

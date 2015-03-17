@@ -1,0 +1,16 @@
+@echo off
+IF NOT "%1" == "%2" GOTO EEPGET
+ECHO ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ECHO ~ EepGet provide resumable download from EepSite n' auto retry ~
+ECHO ~ Syntax: Eepget URL -o PathOfDownloadedFile                   ~
+ECHO ~ e.g.: Eepget http://www.i2p2.i2p/index.html -o e:\index.html ~
+ECHO ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ECHO Please input URL and target Path
+SET /P eepURL=URL to download:
+SET /P eepLOC=Target Path for the downlaoded file:
+java -cp lib/i2p.jar net.i2p.util.EepGet %eepURL% -o %eepLOC%
+GOTO END
+:EEPGET
+java -cp lib/i2p.jar net.i2p.util.EepGet %1 %2 %3 %4 %5
+:END
+pause

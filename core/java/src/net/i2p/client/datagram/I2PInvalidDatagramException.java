@@ -16,10 +16,10 @@ package net.i2p.client.datagram;
 public class I2PInvalidDatagramException extends Exception {
 
     public I2PInvalidDatagramException() {
-	super();
+        super();
     }
     
     public I2PInvalidDatagramException(String s) {
-	super(s);
+        super(s);
     }
 }

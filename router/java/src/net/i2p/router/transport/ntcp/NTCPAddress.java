@@ -11,6 +11,7 @@ package net.i2p.router.transport.ntcp;
 import java.net.InetAddress;
 import java.util.Properties;
 
+import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
 import net.i2p.data.RouterAddress;
 import net.i2p.router.transport.TransportImpl;
@@ -20,7 +21,6 @@ import net.i2p.util.Log;
  * Wrap up an address 
  */
 public class NTCPAddress {
-    private final static Log _log = new Log(NTCPAddress.class);
     private int _port;
     private String _host;
     //private InetAddress _addr;
@@ -28,6 +28,7 @@ public class NTCPAddress {
     public final static String PROP_PORT = "port";
     /** Host name used in RouterAddress definitions */
     public final static String PROP_HOST = "host";
+    public static final int DEFAULT_COST = 10;
     
     public NTCPAddress(String host, int port) {
         if (host != null)
@@ -56,18 +57,19 @@ public class NTCPAddress {
             _port = -1;
             return;
         }
-        String host = addr.getOptions().getProperty(PROP_HOST);
+        String host = addr.getOption(PROP_HOST);
         if (host == null) {
             _host = null;
             _port = -1;
         } else { 
             _host = host.trim();
-            String port = addr.getOptions().getProperty(PROP_PORT);
+            String port = addr.getOption(PROP_PORT);
             if ( (port != null) && (port.trim().length() > 0) && !("null".equals(port)) ) {
                 try {
                     _port = Integer.parseInt(port.trim());
                 } catch (NumberFormatException nfe) {
-                    _log.error("Invalid port [" + port + "]", nfe);
+                    Log log = I2PAppContext.getGlobalContext().logManager().getLog(NTCPAddress.class);
+                    log.error("Invalid port [" + port + "]", nfe);
                     _port = -1;
                 }
             } else {
@@ -82,7 +84,7 @@ public class NTCPAddress {
         
         RouterAddress addr = new RouterAddress();
         
-        addr.setCost(10);
+        addr.setCost(DEFAULT_COST);
         addr.setExpiration(null);
         
         Properties props = new Properties();
@@ -118,14 +120,16 @@ public class NTCPAddress {
             //}
             return TransportImpl.isPubliclyRoutable(quad);
         } catch (Throwable t) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Error checking routability", t);
+            //if (_log.shouldLog(Log.WARN))
+            //    _log.warn("Error checking routability", t);
             return false;
         }
     }
     
+    @Override
     public String toString() { return _host + ":" + _port; }
     
+    @Override
     public int hashCode() {
         int rv = 0;
         rv += _port;
@@ -136,6 +140,7 @@ public class NTCPAddress {
         return rv;
     }
     
+    @Override
     public boolean equals(Object val) {
         if ( (val != null) && (val instanceof NTCPAddress) ) {
             NTCPAddress addr = (NTCPAddress)val;
@@ -152,9 +157,7 @@ public class NTCPAddress {
     
     public boolean equals(RouterAddress addr) {
         if (addr == null) return false;
-        Properties opts = addr.getOptions();
-        if (opts == null) return false;
-        return ( (_host.equals(opts.getProperty(PROP_HOST))) &&
-                 (Integer.toString(_port).equals(opts.getProperty(PROP_PORT))) );
+        return ( (_host.equals(addr.getOption(PROP_HOST))) &&
+                 (Integer.toString(_port).equals(addr.getOption(PROP_PORT))) );
     }
 }

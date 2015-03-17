@@ -77,7 +77,7 @@ public class MultiRouterBuilder {
         buildStartupScriptNix(args);
     }
     private static void buildStartupScriptNix(String args[]) {
-        StringBuffer buf = new StringBuffer(4096);
+        StringBuilder buf = new StringBuilder(4096);
         buf.append("#!/bin/sh\n");
         buf.append("export CP=.; for LIB in lib/* ; do export CP=$CP:$LIB ; done\n"); 
         buf.append("nohup java -cp $CP ");
@@ -106,7 +106,7 @@ public class MultiRouterBuilder {
         File baseDir = new File(dir);
         baseDir.mkdirs();
         File cfgFile = new File(baseDir, "router.config");
-        StringBuffer buf = new StringBuffer(8*1024);
+        StringBuilder buf = new StringBuilder(8*1024);
         buf.append("router.profileDir=").append(baseDir.getPath()).append("/peerProfiles\n");
         buf.append("router.historyFilename=").append(baseDir.getPath()).append("/messageHistory.txt\n");
         buf.append("router.sessionKeys.location=").append(baseDir.getPath()).append("/sessionKeys.dat\n");

@@ -1,0 +1,56 @@
+<%
+   /*
+    * This should be included inside <head>...</head>,
+    * as it sets the stylesheet.
+    *
+    * This is included almost 30 times, so keep whitespace etc. to a minimum.
+    */
+
+   // http://www.crazysquirrel.com/computing/general/form-encoding.jspx
+   if (request.getCharacterEncoding() == null)
+       request.setCharacterEncoding("UTF-8");
+
+   // Now that we use POST for most forms, these prevent the back button from working after a form submit
+   // Just let the browser do its thing
+   //response.setHeader("Pragma", "no-cache");
+   //response.setHeader("Cache-Control","no-cache");
+   //response.setDateHeader("Expires", 0);
+
+   // the above will b0rk if the servlet engine has already flushed
+   // the response prior to including this file, so it should be
+   // near the top
+
+   if (request.getParameter("i2p.contextId") != null) {
+       session.setAttribute("i2p.contextId", request.getParameter("i2p.contextId"));
+   }
+%>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<jsp:useBean class="net.i2p.router.web.CSSHelper" id="intl" scope="request" />
+<jsp:setProperty name="intl" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
+<link rel="icon" href="<%=intl.getTheme(request.getHeader("User-Agent"))%>images/favicon.ico">
+<%
+   // clickjacking
+   if (intl.shouldSendXFrame())
+      response.setHeader("X-Frame-Options", "SAMEORIGIN");
+
+   String conNonceParam = request.getParameter("consoleNonce");
+   if (conNonceParam != null && conNonceParam.equals(System.getProperty("router.consoleNonce"))) {
+       intl.setLang(request.getParameter("lang"));
+       intl.setNews(request.getParameter("news"));
+   }
+%>
+<link href="<%=intl.getTheme(request.getHeader("User-Agent"))%>console.css" rel="stylesheet" type="text/css">
+<%
+   if (intl.getLang().equals("zh")) {
+       // make the fonts bigger for chinese
+%>
+<link href="<%=intl.getTheme(request.getHeader("User-Agent"))%>console_big.css" rel="stylesheet" type="text/css">
+<%
+   } else if (intl.getLang().equals("ar")) {
+       // Use RTL theme for Arabic
+%>
+<link href="<%=intl.getTheme(request.getHeader("User-Agent"))%>console_ar.css" rel="stylesheet" type="text/css">
+<%
+   }
+%>
+<!--[if IE]><link href="/themes/console/classic/ieshim.css" rel="stylesheet" type="text/css" /><![endif]-->

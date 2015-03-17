@@ -31,6 +31,8 @@ import java.util.Set;
  * public Object waitEventValue(String n) { return _event.waitEventValue(n); }
  * </code>
  *
+ * Deprecated - Used only by I2PTunnel
+ *
  * @author human
  */
 public interface EventDispatcher {

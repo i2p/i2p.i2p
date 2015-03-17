@@ -1,0 +1,64 @@
+<jsp:useBean class="net.i2p.router.web.NewsHelper" id="newshelper" scope="request" />
+<jsp:setProperty name="newshelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
+<%
+    java.io.File newspath = new java.io.File(net.i2p.I2PAppContext.getGlobalContext().getRouterDir(), "docs/news.xml");
+%>
+<jsp:setProperty name="newshelper" property="page" value="<%=newspath.getAbsolutePath()%>" />
+<jsp:setProperty name="newshelper" property="maxLines" value="300" />
+<div class="routersummaryouter">
+<%
+    // The refresh delay, 0 to disable
+    String d = "0";
+    boolean allowIFrame = intl.allowIFrame(request.getHeader("User-Agent"));
+    if (allowIFrame) {
+        // skip the iframe if refresh disabled
+        d = request.getParameter("refresh");
+        String newDelay = "";
+        if (d == null || "".equals(d))
+            d = intl.getRefresh();
+        else {
+            d = net.i2p.data.DataHelper.stripHTML(d);  // XSS
+            // pass the new delay parameter to the iframe
+            newDelay = "?refresh=" + d;
+            // update disable boolean
+            intl.setDisableRefresh(d);
+        }
+        if (false && !intl.getDisableRefresh())
+            out.print("<noscript><iframe src=\"/summaryframe.jsp" + newDelay + "\" height=\"1500\" width=\"200\" scrolling=\"auto\" frameborder=\"0\" title=\"sidepanel\"></noscript>\n");
+    }
+%>
+<div class="routersummary">
+<%
+    if (allowIFrame) {
+        // Display the whole summary bar
+%>
+<%@include file="summarynoframe.jsi" %>
+<%
+    } else {
+        // Text browsers don't render the two divs side-by-side, so just provide a link
+        out.print("<a href=\"/summaryframe\">");
+        out.print(intl._("Summary Bar"));
+        out.print("</a>");
+    }
+
+    // d and allowIFrame defined above
+    if (false && !intl.getDisableRefresh()) {
+        out.print("</div><noscript></iframe></noscript>\n");
+    } else if (false && allowIFrame) {
+        // since we don't have an iframe this will reload the base page, and
+        // the new delay will be passed to the iframe above
+        out.print("<noscript><div class=\"refresh\"><form action=\"" + request.getRequestURI() + "\" method=\"POST\">\n" +
+                  "<b>");
+        // We have intl defined when this is included, but not when compiled standalone.
+        out.print(intl._("Refresh (s)"));
+        out.print(":</b> <input size=\"3\" type=\"text\" name=\"refresh\" value=\"60\" >\n" +
+                  "<button type=\"submit\" value=\"Enable\" >");
+        // ditto
+        out.print(intl._("Enable"));
+        out.print("</button>\n" +
+                  "</form></div></noscript></div>\n");
+    } else {
+        out.print("</div>\n");
+    }
+%>
+</div>

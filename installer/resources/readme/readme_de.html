@@ -1,0 +1,78 @@
+<div lang="de">
+
+<p>Wenn Du I2P gerade gestartet hast, sollten die "Aktiv:"-Zahlen links in den n&auml;chsten Minuten anwachsen. Du siehst dann dort ein als "versch. Klienten" bezeichnetes lokales Ziel gelistet (falls nicht, <a href="#trouble">siehe unten</a>). Sobald dieses erscheint, kannst Du:</p>
+<ul>
+ <li><b>"Eepseiten" besuchen</b> - In I2P gibt es anonym gehostete Websites: 
+     Konfiguriere Deinen Browser, &uuml;ber den <b>HTTP-Proxy: 127.0.0.1 Port 4444</b> zu surfen, dann besuche eine Eepseite:<br>
+     <ul class="links">
+         <li><a href="http://forum.i2p/">forum.i2p</a>: sichere und anonyme Verbindung zu <a href="http://forum.i2p2.de/">forum.i2p2.de</a></li>
+         <li><a href="http://www.i2p2.i2p/index_de.html">www.i2p2.i2p</a> und der Spiegel <a href="http://i2p-projekt.i2p/index_de.html">i2p-projekt.i2p</a>:
+              sichere und anonyme Verbindungen zu <a href="http://www.i2p2.de/index_de.html">www.i2p2.de</a></li>
+         <li><a href="http://eepsites.i2p/">eepsites.i2p</a>: anonym gehostete Suchseite f&uuml;r Eepseiten</li>
+         <li><a href="http://ugha.i2p/">ugha.i2p</a>: Ugha's Eepseite, ein &ouml;ffentliches Wiki mit vielen Links</li>
+	 <li><a href="http://echelon.i2p">echelon.i2p</a>: Softwarearchiv und Informationen zu I2P (mit BitTorrent-Klienten, iMule, I2PFox, I2P-Messenger,&nbsp;&hellip;)</li>
+         <li><a href="http://pastethis.i2p">pastethis.i2p</a>: anonymer Pastebin</li>
+	</ul><br />
+     Es gibt viele andere Eepseiten - folge einfach den Links, die du findest,
+     setze Lesezeichen f&uuml;r Deine Favoriten, und besuche sie oft!</li>
+ <li class="tidylist"><b>Im Internet surfen</b> - Es gibt in I2P einen HTTP-"Outproxy". Um ihn zu nutzen, kannst du ebenfalls den
+     HTTP-Proxy auf Port 4444 verwenden - Konfiguriere Deines Browsers Proxy-Einstellungen 
+     darauf (siehe oben) und besuche jede normale URL - Deine Anfrage wird dann anonym 
+     durch das I2P Netzwerk geroutet.</li>
+ <li class="tidylist"><b>Daten austauschen</b> - Es gibt eine <a href="i2psnark/">Portierung</a> des
+     <a href="http://www.klomp.org/snark/">Snark</a> <a href="http://www.bittorrent.com/">BitTorrent</a>-Klienten.</li>
+ <li class="tidylist"><b>Anonyme Email</b> - Postman hat ein Email-System aufgebaut, das 
+     kompatibel zu normalen  Email-Klienten (POP3/SMTP) ist, und welches es erlaubt, 
+     Emails innerhalb von I2P sowie Emails von und ins normale Internet zu 
+     schicken.  Hole Dir Dein Emailkonto auf <a href="http://hq.postman.i2p/">hq.postman.i2p</a>.
+     Im Verbund damit gibt es <a href="/webmail">susimail</a>, einen 
+     browserbasierten anonymen POP3/SMTP-Klienten, fertig eingerichtet 
+     f&uuml;r Postmans Email-Service. 
+     <br>Oder probier unser neues serverloses und Ende-zu-Ende-verschl&uuml;sseltes Emailsystem <a href="http://tjgidoycrw6s3guetge3kvrvynppqjmvqsosmtbmgqasa6vmsf6a.b32.i2p/">I2P-Bote</a> (mit Webinterface) aus, welches als Plugin erh&auml;ltlich ist!</li>
+ <li class="tidylist"><b>Anonymer Chat</b> - Starte Deinen Lieblings-IRC-Klienten und verbinde ihn 
+     mit dem Server unter <b>127.0.0.1 auf Port 6668</b>.  Das bringt Dich auf auf einen 
+     von zwei anonym gehosteten IRC-Servern - und weder Du noch die anderen Benutzer wissen, wer 
+     der jeweils andere ist, nicht einmal der Server-Administrator.</li>
+ <li class="tidylist"><b>Anonymer Blog</b> - Probiere <a href="http://syndie.i2p2.de/">Syndie</a> aus!</li>
+ <li class="tidylist">und vieles mehr</li>
+</ul>
+
+<h2>Willst Du Deine eigene Eepseite?</h2>
+
+<p>Das I2P-Paket beinhaltet Software, die es Dir  erm&ouml;glicht, Deine eigene Eepseite zu betreiben
+   : Eine 
+<a href="http://jetty.mortbay.org/">Jetty</a>-Instanz horcht auf 
+<a href="http://127.0.0.1:7658/">http://127.0.0.1:7658/</a>. Platziere einfach 
+   Deine Dateien im Verzeichnis <code>eepsite/docroot/</code> (oder jedes 
+   Standard-JSP/Servlet <code>.war</code> unter <code>eepsite/webapps</code>, 
+   CGI Scripte unter <code>eepsite/cgi-bin</code>) und schon sind sie 
+   verf&uuml;gbar. Nach dem Starten des <a href="/i2ptunnel/">Eepseiten-Tunnels</a>,
+   der darauf zeigt, ist Deine Eepseite f&uuml;r andere verf&uuml;gbar. 
+   Detailierte Instruktionen zum Start Deiner eigenen Eepseite findest Du auf
+   <a href="http://127.0.0.1:7658/">Deiner tempor&auml;ren Eepseite</a>.
+</p>
+
+<h2><a name="trouble">Problembehebung</a></h2>
+
+<p>Hab Geduld, denn nach dem ersten Start kann I2P noch etwas langsam sein. 
+  Dein Router braucht etwas Zeit, um Verbindungen zu suchen und das Netzwerk kennenzulernen. 
+  Falls nach 30 Minuten die Zahl Deiner aktiven Verbindungen (im Seitenpanel unter 
+  "Teilnehmer", die Zahl hinter "Aktiv:") noch immer geringer als 10 ist,  
+  solltest Du den I2P-Port auf Deiner Firewall &ouml;ffnen, um 
+  f&uuml;r eine bessere Verbindung zu sorgen. Den von I2P bei Dir benutzten Port 
+  (bei jeder Installation setzt I2P einen anderen) siehst Du auf der 
+  <a href="config.jsp">Konfigurationsseite</a>.
+  Wenn Du gar keine Eepseiten erreichen kannst (auch nicht 
+  <a href="http://www.i2p2.i2p/index_de.html">www.i2p2.i2p</a>), dann stell sicher, dass Dein 
+  Internet-Browser auf den Proxy 127.0.0.1 Port 4444 eingestellt ist!
+  Vielleicht m&ouml;chtest Du auch die Informationen lesen, die auf der 
+  <a href="http://www.i2p2.i2p/index_de.html">I2P-Website</a> stehen, Nachrichten lesen und 
+  im <a href="http://forum.i2p2.de/">I2P-Forum</a> posten, oder 
+  im offiziellen deutschsprachigen Support-Channel
+  <a href="irc://127.0.0.1:6668/i2p-de">#i2p-de</a>, dem offiziellen internationalen Support-Channel 
+  <a href="irc://127.0.0.1:6668/i2p-help">#i2p-help</a>, 
+  in <a href="irc://127.0.0.1:6668/i2p">#i2p</a> oder in <a href="irc://127.0.0.1:6668/i2p-chat">#i2p-chat</a>
+  auf
+  irc.postman.i2p 
+  bzw. irc.freshcoffee.i2p chatten. (Beide unter <a href="irc://localhost:6668">irc://localhost:6668</a> erreichbar; die Server sind verbunden.) Wenn Du keinen Zugriff auf I2P hast, kannst du #i2p, #i2p-help und #i2p-de auch auf <a href="irc://irc.freenode.net/#i2p">irc.freenode.net</a> erreichen, dann allerdings nicht anonym.</p>
+</div>

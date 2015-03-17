@@ -26,14 +26,15 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import net.i2p.I2PAppContext;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
-import net.i2p.util.SimpleScheduler;
-import net.i2p.util.SimpleTimer;
+//import net.i2p.util.SimpleScheduler;
+//import net.i2p.util.SimpleTimer;
 
 class PeerConnectionOut implements Runnable
 {
-  private Log _log = new Log(PeerConnectionOut.class);
+  private final Log _log = I2PAppContext.getGlobalContext().logManager().getLog(PeerConnectionOut.class);
   private final Peer peer;
   private final DataOutputStream dout;
 
@@ -41,7 +42,7 @@ class PeerConnectionOut implements Runnable
   private boolean quit;
 
   // Contains Messages.
-  private List sendQueue = new ArrayList();
+  private final List<Message> sendQueue = new ArrayList();
   
   private static long __id = 0;
   private long _id;
@@ -123,35 +124,39 @@ class PeerConnectionOut implements Runnable
                           {
                             if (state.choking) {
                               it.remove();
-                              SimpleTimer.getInstance().removeEvent(nm.expireEvent);
+                              //SimpleTimer.getInstance().removeEvent(nm.expireEvent);
                             }
                             nm = null;
                           }
                         else if (nm.type == Message.REQUEST && state.choked)
                           {
                             it.remove();
-                            SimpleTimer.getInstance().removeEvent(nm.expireEvent);
+                            //SimpleTimer.getInstance().removeEvent(nm.expireEvent);
                             nm = null;
                           }
                           
                         if (m == null && nm != null)
                           {
                             m = nm;
-                            SimpleTimer.getInstance().removeEvent(nm.expireEvent);
+                            //SimpleTimer.getInstance().removeEvent(nm.expireEvent);
                             it.remove();
                           }
                       }
-                    if (m == null && sendQueue.size() > 0) {
-                      m = (Message)sendQueue.remove(0);
-                      SimpleTimer.getInstance().removeEvent(m.expireEvent);
+                    if (m == null && !sendQueue.isEmpty()) {
+                      m = sendQueue.remove(0);
+                      //SimpleTimer.getInstance().removeEvent(m.expireEvent);
                     }
                   }
               }
             if (m != null)
               {
                 if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Send " + peer + ": " + m + " on " + peer.metainfo.getName());
-                m.sendMessage(dout);
+                    _log.debug("Send " + peer + ": " + m);
+
+                // This can block for quite a while.
+                // To help get slow peers going, and track the bandwidth better,
+                // move this _after_ state.uploaded() and see how it works.
+                //m.sendMessage(dout);
                 lastSent = System.currentTimeMillis();
 
                 // Remove all piece messages after sending a choke message.
@@ -159,9 +164,22 @@ class PeerConnectionOut implements Runnable
                   removeMessage(Message.PIECE);
 
                 // XXX - Should also register overhead...
-                if (m.type == Message.PIECE)
-                  state.uploaded(m.len);
+                // Don't let other clients requesting big chunks get an advantage
+                // when we are seeding;
+                // only count the rest of the upload after sendMessage().
+                int remainder = 0;
+                if (m.type == Message.PIECE) {
+                  if (m.len <= PeerState.PARTSIZE) {
+                     state.uploaded(m.len);
+                  } else {
+                     state.uploaded(PeerState.PARTSIZE);
+                     remainder = m.len - PeerState.PARTSIZE;
+                  }
+                }
 
+                m.sendMessage(dout);
+                if (remainder > 0)
+                  state.uploaded(remainder);
                 m = null;
               }
           }
@@ -211,12 +229,9 @@ class PeerConnectionOut implements Runnable
   /**
    * Adds a message to the sendQueue and notifies the method waiting
    * on the sendQueue to change.
-   * If a PIECE message only, add a timeout.
    */
   private void addMessage(Message m)
   {
-    if (m.type == Message.PIECE)
-      SimpleScheduler.getInstance().addEvent(new RemoveTooSlow(m), SEND_TIMEOUT);
     synchronized(sendQueue)
       {
         sendQueue.add(m);
@@ -226,6 +241,8 @@ class PeerConnectionOut implements Runnable
   
   /** remove messages not sent in 3m */
   private static final int SEND_TIMEOUT = 3*60*1000;
+
+/*****
   private class RemoveTooSlow implements SimpleTimer.TimedEvent {
       private Message _m;
       public RemoveTooSlow(Message m) {
@@ -243,6 +260,7 @@ class PeerConnectionOut implements Runnable
               _log.info("Took too long to send " + _m + " to " + peer);
       }
   }
+*****/
 
   /**
    * Removes a particular message type from the queue.
@@ -377,7 +395,7 @@ class PeerConnectionOut implements Runnable
         while (it.hasNext())
           {
             Message m = (Message)it.next();
-            if (m.type == Message.REQUEST && m.piece == req.piece &&
+            if (m.type == Message.REQUEST && m.piece == req.getPiece() &&
                 m.begin == req.off && m.length == req.len)
               {
                 if (_log.shouldLog(Log.DEBUG))
@@ -388,7 +406,7 @@ class PeerConnectionOut implements Runnable
       }
     Message m = new Message();
     m.type = Message.REQUEST;
-    m.piece = req.piece;
+    m.piece = req.getPiece();
     m.begin = req.off;
     m.length = req.len;
     addMessage(m);
@@ -412,6 +430,42 @@ class PeerConnectionOut implements Runnable
     return total;
   }
 
+  /**
+   *  Queue a piece message with a callback to load the data
+   *  from disk when required.
+   *  @since 0.8.2
+   */
+  void sendPiece(int piece, int begin, int length, DataLoader loader)
+  {
+      boolean sendNow = false;
+      // are there any cases where we should?
+
+      if (sendNow) {
+        // queue the real thing
+        byte[] bytes = loader.loadData(piece, begin, length);
+        if (bytes != null)
+            sendPiece(piece, begin, length, bytes);
+        return;
+      }
+
+      // queue a fake message... set everything up,
+      // except save the PeerState instead of the bytes.
+      Message m = new Message();
+      m.type = Message.PIECE;
+      m.piece = piece;
+      m.begin = begin;
+      m.length = length;
+      m.dataLoader = loader;
+      m.off = 0;
+      m.len = length;
+      addMessage(m);
+  }
+
+  /**
+   *  Queue a piece message with the data already loaded from disk
+   *  Also add a timeout.
+   *  We don't use this anymore.
+   */
   void sendPiece(int piece, int begin, int length, byte[] bytes)
   {
     Message m = new Message();
@@ -422,6 +476,9 @@ class PeerConnectionOut implements Runnable
     m.data = bytes;
     m.off = 0;
     m.len = length;
+    // since we have the data already loaded, queue a timeout to remove it
+    // no longer prefetched
+    //SimpleScheduler.getInstance().addEvent(new RemoveTooSlow(m), SEND_TIMEOUT);
     addMessage(m);
   }
 
@@ -435,7 +492,7 @@ class PeerConnectionOut implements Runnable
           {
             Message m = (Message)it.next();
             if (m.type == Message.REQUEST
-                && m.piece == req.piece
+                && m.piece == req.getPiece()
                 && m.begin == req.off
                 && m.length == req.len)
               it.remove();
@@ -445,10 +502,23 @@ class PeerConnectionOut implements Runnable
     // Always send, just to be sure it it is really canceled.
     Message m = new Message();
     m.type = Message.CANCEL;
-    m.piece = req.piece;
+    m.piece = req.getPiece();
     m.begin = req.off;
     m.length = req.len;
     addMessage(m);
+  }
+
+  /**
+   *  Remove all Request messages from the queue
+   *  @since 0.8.2
+   */
+  void cancelRequestMessages() {
+      synchronized(sendQueue) {
+          for (Iterator<Message> it = sendQueue.iterator(); it.hasNext(); ) {
+              if (it.next().type == Message.REQUEST)
+                it.remove();
+          }
+      }
   }
 
   // Called by the PeerState when the other side doesn't want this
@@ -469,5 +539,24 @@ class PeerConnectionOut implements Runnable
               it.remove();
           }
       }
+  }
+
+  /** @since 0.8.2 */
+  void sendExtension(int id, byte[] bytes) {
+    Message m = new Message();
+    m.type = Message.EXTENSION;
+    m.piece = id;
+    m.data = bytes;
+    m.off = 0;
+    m.len = bytes.length;
+    addMessage(m);
+  }
+
+  /** @since 0.8.4 */
+  void sendPort(int port) {
+    Message m = new Message();
+    m.type = Message.PORT;
+    m.piece = port;
+    addMessage(m);
   }
 }

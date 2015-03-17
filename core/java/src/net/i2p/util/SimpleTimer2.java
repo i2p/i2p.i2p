@@ -3,9 +3,9 @@ package net.i2p.util;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.ThreadFactory;
-import java.util.Map;
 
 import net.i2p.I2PAppContext;
 
@@ -26,47 +26,98 @@ import net.i2p.I2PAppContext;
  * @author zzz
  */
 public class SimpleTimer2 {
-    private static final SimpleTimer2 _instance = new SimpleTimer2();
-    public static SimpleTimer2 getInstance() { return _instance; }
-    private static final int THREADS = 4;
-    private I2PAppContext _context;
-    private static Log _log; // static so TimedEvent can use it
-    private ScheduledThreadPoolExecutor _executor;
-    private String _name;
-    private int _count;
 
-    protected SimpleTimer2() { this("SimpleTimer2"); }
-    protected SimpleTimer2(String name) {
-        _context = I2PAppContext.getGlobalContext();
-        _log = _context.logManager().getLog(SimpleTimer2.class);
+    /**
+     *  If you have a context, use context.simpleTimer2() instead
+     */
+    public static SimpleTimer2 getInstance() {
+        return I2PAppContext.getGlobalContext().simpleTimer2();
+    }
+
+    private static final int MIN_THREADS = 2;
+    private static final int MAX_THREADS = 4;
+    private final ScheduledThreadPoolExecutor _executor;
+    private final String _name;
+    private int _count;
+    private final int _threads;
+
+    /**
+     *  To be instantiated by the context.
+     *  Others should use context.simpleTimer2() instead
+     */
+    public SimpleTimer2(I2PAppContext context) {
+        this(context, "SimpleTimer2");
+    }
+
+    /**
+     *  To be instantiated by the context.
+     *  Others should use context.simpleTimer2() instead
+     */
+    protected SimpleTimer2(I2PAppContext context, String name) {
+        this(context, name, true);
+    }
+
+    /**
+     *  To be instantiated by the context.
+     *  Others should use context.simpleTimer2() instead
+     *  @since 0.9
+     */
+    protected SimpleTimer2(I2PAppContext context, String name, boolean prestartAllThreads) {
         _name = name;
         _count = 0;
-        _executor = new CustomScheduledThreadPoolExecutor(THREADS, new CustomThreadFactory());
+        long maxMemory = Runtime.getRuntime().maxMemory();
+        if (maxMemory == Long.MAX_VALUE)
+            maxMemory = 96*1024*1024l;
+        _threads = (int) Math.max(MIN_THREADS, Math.min(MAX_THREADS, 1 + (maxMemory / (32*1024*1024))));
+        _executor = new CustomScheduledThreadPoolExecutor(_threads, new CustomThreadFactory());
+        if (prestartAllThreads)
+            _executor.prestartAllCoreThreads();
+        // don't bother saving ref to remove hook if somebody else calls stop
+        context.addShutdownTask(new Shutdown());
     }
     
     /**
-     * Removes the SimpleTimer.
+     * @since 0.8.8
+     */
+    private class Shutdown implements Runnable {
+        public void run() {
+            stop();
+        }
+    }
+
+    /**
+     * Stops the SimpleTimer.
+     * Subsequent executions should not throw a RejectedExecutionException.
      */
     public void stop() {
+        _executor.setRejectedExecutionHandler(new ThreadPoolExecutor.DiscardPolicy());
         _executor.shutdownNow();
     }
 
-    private class CustomScheduledThreadPoolExecutor extends ScheduledThreadPoolExecutor {
+    private static class CustomScheduledThreadPoolExecutor extends ScheduledThreadPoolExecutor {
         public CustomScheduledThreadPoolExecutor(int threads, ThreadFactory factory) {
              super(threads, factory);
         }
 
+        @Override
         protected void afterExecute(Runnable r, Throwable t) {
             super.afterExecute(r, t);
-            if (t != null) // shoudn't happen, caught in RunnableEvent.run()
-                _log.log(Log.CRIT, "wtf, event borked: " + r, t);
+            if (t != null) { // shoudn't happen, caught in RunnableEvent.run()
+                Log log = I2PAppContext.getGlobalContext().logManager().getLog(SimpleTimer2.class);
+                log.log(Log.CRIT, "wtf, event borked: " + r, t);
+            }
         }
     }
 
     private class CustomThreadFactory implements ThreadFactory {
         public Thread newThread(Runnable r) {
             Thread rv = Executors.defaultThreadFactory().newThread(r);
-            rv.setName(_name + ' ' + (++_count) + '/' + THREADS);
+            rv.setName(_name + ' ' + (++_count) + '/' + _threads);
+// Uncomment this to test threadgrouping, but we should be all safe now that the constructor preallocates!
+//            String name = rv.getThreadGroup().getName();
+//            if(!name.equals("main")) {
+//                (new Exception("OWCH! DAMN! Wrong ThreadGroup `" + name +"', `" + rv.getName() + "'")).printStackTrace();
+//           }
             rv.setDaemon(true);
             return rv;
         }
@@ -100,6 +151,7 @@ public class SimpleTimer2 {
      *
      */
     public static abstract class TimedEvent implements Runnable {
+        private final Log _log;
         private SimpleTimer2 _pool;
         private int _fuzz;
         protected static final int DEFAULT_FUZZ = 3;
@@ -110,7 +162,9 @@ public class SimpleTimer2 {
         public TimedEvent(SimpleTimer2 pool) {
             _pool = pool;
             _fuzz = DEFAULT_FUZZ;
+            _log = I2PAppContext.getGlobalContext().logManager().getLog(SimpleTimer2.class);
         }
+
         /** automatically schedules, don't use this one if you have other things to do first */
         public TimedEvent(SimpleTimer2 pool, long timeoutMs) {
             this(pool);
@@ -209,11 +263,11 @@ public class SimpleTimer2 {
             if (_log.shouldLog(Log.WARN) && delay > 100)
                 _log.warn(_pool + " wtf, early execution " + delay + ": " + this);
             else if (_log.shouldLog(Log.WARN) && delay < -1000)
-                _log.warn(" wtf, late execution " + delay + ": " + this + _pool.debug());
+                _log.warn(" wtf, late execution " + (0 - delay) + ": " + this + _pool.debug());
             try {
                 timeReached();
             } catch (Throwable t) {
-                _log.log(Log.CRIT, _pool + " wtf, event borked: " + this, t);
+                _log.log(Log.CRIT, _pool + ": Timed task " + this + " exited unexpectedly, please report", t);
             }
             long time = System.currentTimeMillis() - before;
             if (time > 500 && _log.shouldLog(Log.WARN))
@@ -232,6 +286,7 @@ public class SimpleTimer2 {
         public abstract void timeReached();
     }
 
+    @Override
     public String toString() {
         return _name;
     }

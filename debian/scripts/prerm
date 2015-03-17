@@ -1,2 +1,0 @@
-#!/bin/sh
-exec /etc/init.d/i2p stop

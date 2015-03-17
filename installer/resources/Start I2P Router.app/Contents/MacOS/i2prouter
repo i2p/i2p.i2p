@@ -1,0 +1,4 @@
+#!/bin/sh
+
+
+%INSTALL_PATH/i2prouter start

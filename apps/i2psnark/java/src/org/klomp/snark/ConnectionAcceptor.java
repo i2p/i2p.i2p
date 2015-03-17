@@ -25,25 +25,34 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
 import net.i2p.client.streaming.I2PServerSocket;
 import net.i2p.client.streaming.I2PSocket;
+import net.i2p.data.Hash;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
+import net.i2p.util.ObjectCounter;
+import net.i2p.util.SimpleScheduler;
+import net.i2p.util.SimpleTimer;
 
 /**
  * Accepts connections on a TCP port and routes them to sub-acceptors.
  */
 public class ConnectionAcceptor implements Runnable
 {
-  private Log _log = new Log(ConnectionAcceptor.class);
+  private final Log _log = I2PAppContext.getGlobalContext().logManager().getLog(ConnectionAcceptor.class);
   private I2PServerSocket serverSocket;
   private PeerAcceptor peeracceptor;
   private Thread thread;
-  private I2PSnarkUtil _util;
+  private final I2PSnarkUtil _util;
+  private final ObjectCounter<Hash> _badCounter = new ObjectCounter();
 
   private boolean stop;
   private boolean socketChanged;
+
+  private static final int MAX_BAD = 2;
+  private static final long BAD_CLEAN_INTERVAL = 30*60*1000;
 
   public ConnectionAcceptor(I2PSnarkUtil util) { _util = util; }
   
@@ -58,6 +67,7 @@ public class ConnectionAcceptor implements Runnable
           thread = new I2PAppThread(this, "I2PSnark acceptor");
           thread.setDaemon(true);
           thread.start();
+          _util.getContext().simpleScheduler().addPeriodicEvent(new Cleaner(), BAD_CLEAN_INTERVAL);
       }
     }
   }
@@ -69,11 +79,10 @@ public class ConnectionAcceptor implements Runnable
     this.peeracceptor = peeracceptor;
     _util = util;
     
-    socketChanged = false;
-    stop = false;
     thread = new I2PAppThread(this, "I2PSnark acceptor");
     thread.setDaemon(true);
     thread.start();
+    _util.getContext().simpleScheduler().addPeriodicEvent(new Cleaner(), BAD_CLEAN_INTERVAL);
   }
 
   public void halt()
@@ -136,22 +145,34 @@ public class ConnectionAcceptor implements Runnable
                     }
                 }
             } else {
-                Thread t = new I2PAppThread(new Handler(socket), "Connection-" + socket);
+                if (socket.getPeerDestination().equals(_util.getMyDestination())) {
+                    _log.error("Incoming connection from myself");
+                    try { socket.close(); } catch (IOException ioe) {}
+                    continue;
+                }
+                if (_badCounter.count(socket.getPeerDestination().calculateHash()) >= MAX_BAD) {
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Rejecting connection from " + socket.getPeerDestination().calculateHash() + " after " + MAX_BAD + " failures");
+                    try { socket.close(); } catch (IOException ioe) {}
+                    continue;
+                }
+                Thread t = new I2PAppThread(new Handler(socket), "I2PSnark incoming connection");
                 t.start();
             }
           }
         catch (I2PException ioe)
           {
             if (!socketChanged) {
-                _util.debug("Error while accepting: " + ioe, Snark.ERROR);
+                _log.error("Error while accepting", ioe);
                 stop = true;
             }
           }
         catch (IOException ioe)
           {
-            _util.debug("Error while accepting: " + ioe, Snark.ERROR);
+            _log.error("Error while accepting", ioe);
             stop = true;
           }
+        // catch oom?
       }
 
     try
@@ -164,27 +185,36 @@ public class ConnectionAcceptor implements Runnable
   }
   
   private class Handler implements Runnable {
-      private I2PSocket _socket;
+      private final I2PSocket _socket;
+
       public Handler(I2PSocket socket) {
           _socket = socket;
       }
+
       public void run() {
           try {
               InputStream in = _socket.getInputStream();
               OutputStream out = _socket.getOutputStream();
-
-              if (true) {
-                  in = new BufferedInputStream(in);
-                  //out = new BufferedOutputStream(out);
-              }
+              // this is for the readahead in PeerAcceptor.connection()
+              in = new BufferedInputStream(in);
               if (_log.shouldLog(Log.DEBUG))
-                  _log.debug("Handling socket from " + _socket.getPeerDestination().calculateHash().toBase64());
+                  _log.debug("Handling socket from " + _socket.getPeerDestination().calculateHash());
               peeracceptor.connection(_socket, in, out);
+          } catch (PeerAcceptor.ProtocolException ihe) {
+              _badCounter.increment(_socket.getPeerDestination().calculateHash());
+              if (_log.shouldLog(Log.INFO))
+                  _log.info("Protocol error from " + _socket.getPeerDestination().calculateHash(), ihe);
+              try { _socket.close(); } catch (IOException ignored) { }
           } catch (IOException ioe) {
               if (_log.shouldLog(Log.DEBUG))
-                  _log.debug("Error handling connection from " + _socket.getPeerDestination().calculateHash().toBase64(), ioe);
+                  _log.debug("Error handling connection from " + _socket.getPeerDestination().calculateHash(), ioe);
               try { _socket.close(); } catch (IOException ignored) { }
           }
       }
   }
+
+    /** @since 0.9.1 */    
+    private class Cleaner implements SimpleTimer.TimedEvent {
+        public void timeReached() { _badCounter.clear(); }
+    }
 }

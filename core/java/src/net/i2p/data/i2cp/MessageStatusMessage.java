@@ -15,7 +15,6 @@ import java.io.OutputStream;
 
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
-import net.i2p.util.Log;
 
 /**
  * Defines the message a client sends to a router when destroying
@@ -24,7 +23,6 @@ import net.i2p.util.Log;
  * @author jrandom
  */
 public class MessageStatusMessage extends I2CPMessageImpl {
-    private final static Log _log = new Log(SessionStatusMessage.class);
     public final static int MESSAGE_TYPE = 22;
     private long _sessionId;
     private long _messageId;
@@ -34,17 +32,19 @@ public class MessageStatusMessage extends I2CPMessageImpl {
 
     public final static int STATUS_AVAILABLE = 0;
     public final static int STATUS_SEND_ACCEPTED = 1;
+    /** unused */
     public final static int STATUS_SEND_BEST_EFFORT_SUCCESS = 2;
+    /** unused */
     public final static int STATUS_SEND_BEST_EFFORT_FAILURE = 3;
     public final static int STATUS_SEND_GUARANTEED_SUCCESS = 4;
     public final static int STATUS_SEND_GUARANTEED_FAILURE = 5;
 
     public MessageStatusMessage() {
-        setSessionId(-1);
-        setStatus(-1);
-        setMessageId(-1);
-        setSize(-1);
-        setNonce(-1);
+        _sessionId = -1;
+        _status = -1;
+        _messageId = -1;
+        _size = -1;
+        _nonce = -1;
     }
 
     public long getSessionId() {
@@ -154,13 +154,14 @@ public class MessageStatusMessage extends I2CPMessageImpl {
         return MESSAGE_TYPE;
     }
 
+    /* FIXME missing hashCode() method FIXME */
     @Override
     public boolean equals(Object object) {
         if ((object != null) && (object instanceof MessageStatusMessage)) {
             MessageStatusMessage msg = (MessageStatusMessage) object;
-            return DataHelper.eq(getSessionId(), msg.getSessionId())
-                   && DataHelper.eq(getMessageId(), msg.getMessageId()) && (getNonce() == msg.getNonce())
-                   && DataHelper.eq(getSize(), msg.getSize()) && DataHelper.eq(getStatus(), msg.getStatus());
+            return _sessionId == msg.getSessionId()
+                   && _messageId == msg.getMessageId() && _nonce == msg.getNonce()
+                   && _size == msg.getSize() && _status == msg.getStatus();
         }
             
         return false;
@@ -168,13 +169,13 @@ public class MessageStatusMessage extends I2CPMessageImpl {
 
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append("[MessageStatusMessage: ");
-        buf.append("\n\tSessionId: ").append(getSessionId());
-        buf.append("\n\tNonce: ").append(getNonce());
-        buf.append("\n\tMessageId: ").append(getMessageId());
-        buf.append("\n\tStatus: ").append(getStatusString(getStatus()));
-        buf.append("\n\tSize: ").append(getSize());
+        buf.append("\n\tSessionId: ").append(_sessionId);
+        buf.append("\n\tNonce: ").append(_nonce);
+        buf.append("\n\tMessageId: ").append(_messageId);
+        buf.append("\n\tStatus: ").append(getStatusString(_status));
+        buf.append("\n\tSize: ").append(_size);
         buf.append("]");
         return buf.toString();
     }

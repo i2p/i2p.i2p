@@ -9,11 +9,8 @@ package net.i2p.data;
  *
  */
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-
-import net.i2p.util.Log;
+import java.io.IOException;
 
 /**
  * Defines the PublicKey as defined by the I2P data structure spec.
@@ -22,19 +19,39 @@ import net.i2p.util.Log;
  *
  * @author jrandom
  */
-public class PublicKey extends DataStructureImpl {
-    private final static Log _log = new Log(PublicKey.class);
-    private byte[] _data;
-
+public class PublicKey extends SimpleDataStructure {
     public final static int KEYSIZE_BYTES = 256;
+    private static final int CACHE_SIZE = 1024;
+
+    private static final SDSCache<PublicKey> _cache = new SDSCache(PublicKey.class, KEYSIZE_BYTES, CACHE_SIZE);
+
+    /**
+     * Pull from cache or return new
+     * @throws AIOOBE if not enough bytes
+     * @since 0.8.3
+     */
+    public static PublicKey create(byte[] data, int off) {
+        return _cache.get(data, off);
+    }
+
+    /**
+     * Pull from cache or return new
+     * @since 0.8.3
+     */
+    public static PublicKey create(InputStream in) throws IOException {
+        return _cache.get(in);
+    }
 
     public PublicKey() {
-        setData(null);
+        super();
     }
+
+    /** @param data must be non-null */
     public PublicKey(byte data[]) {
-        if ( (data == null) || (data.length != KEYSIZE_BYTES) )
-            throw new IllegalArgumentException("Data must be specified, and the correct size");
-        setData(data);
+        super();
+        if (data == null)
+            throw new IllegalArgumentException("Data must be specified");
+        _data = data;
     }
 
     /** constructs from base64
@@ -42,56 +59,11 @@ public class PublicKey extends DataStructureImpl {
      * on a prior instance of PublicKey
      */
     public PublicKey(String base64Data)  throws DataFormatException {
-        this();
+        super();
         fromBase64(base64Data);
     }
-
-    public byte[] getData() {
-        return _data;
-    }
-
-    public void setData(byte[] data) {
-        _data = data;
-    }
     
-    public void readBytes(InputStream in) throws DataFormatException, IOException {
-        _data = new byte[KEYSIZE_BYTES];
-        int read = read(in, _data);
-        if (read != KEYSIZE_BYTES) throw new DataFormatException("Not enough bytes to read the public key");
+    public int length() {
+        return KEYSIZE_BYTES;
     }
-    
-    public void writeBytes(OutputStream out) throws DataFormatException, IOException {
-        if (_data == null) throw new DataFormatException("No data in the public key to write out");
-        if (_data.length != KEYSIZE_BYTES) throw new DataFormatException("Invalid size of data in the public key");
-        out.write(_data);
-    }
-    
-    @Override
-    public boolean equals(Object obj) {
-        if ((obj == null) || !(obj instanceof PublicKey)) return false;
-        return DataHelper.eq(_data, ((PublicKey) obj)._data);
-    }
-    
-    @Override
-    public int hashCode() {
-        return DataHelper.hashCode(_data);
-    }
-    
-    @Override
-    public String toString() {
-        StringBuffer buf = new StringBuffer(64);
-        buf.append("[PublicKey: ");
-        if (_data == null) {
-            buf.append("null key");
-        } else {
-            buf.append("size: ").append(_data.length);
-            //int len = 32;
-            //if (len > _data.length) len = _data.length;
-            //buf.append(" first ").append(len).append(" bytes: ");
-            //buf.append(DataHelper.toString(_data, len));
-        }
-        buf.append("]");
-        return buf.toString();
-    }
-
 }

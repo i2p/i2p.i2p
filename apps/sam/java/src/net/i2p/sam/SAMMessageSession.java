@@ -109,8 +109,7 @@ public abstract class SAMMessageSession {
      * @throws DataFormatException 
      */
     protected boolean sendBytesThroughMessageSession(String dest, byte[] data) throws DataFormatException {
-	Destination d = new Destination();
-	d.fromBase64(dest);
+	Destination d = SAMUtils.getDest(dest);
 
 	if (_log.shouldLog(Log.DEBUG)) {
 	    _log.debug("Sending " + data.length + " bytes to " + dest);
@@ -160,8 +159,8 @@ public abstract class SAMMessageSession {
      */
     public class SAMMessageSessionHandler implements Runnable, I2PSessionListener {
 
-        private Object runningLock = new Object();
-        private boolean stillRunning = true;
+        private final Object runningLock = new Object();
+        private volatile boolean stillRunning = true;
                 
         /**
          * Create a new SAM message-based session handler

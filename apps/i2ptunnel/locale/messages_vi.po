@@ -1,0 +1,860 @@
+# I2P
+# Copyright (C) 2009 The I2P Project
+# This file is distributed under the same license as the i2ptunnel package.
+# To contribute translations, see http://www.i2p2.de/newdevelopers
+# 
+#   <tran.nathan@gmail.com>, 2011.
+# dich_tran <tran.nathan@gmail.com>, 2011.
+msgid ""
+msgstr ""
+"Project-Id-Version: I2P\n"
+"Report-Msgid-Bugs-To: https://trac.i2p2.de/\n"
+"POT-Creation-Date: 2011-06-11 08:23+0000\n"
+"PO-Revision-Date: 2011-06-11 08:42+0000\n"
+"Last-Translator: ducki2p <ducki2p@gmail.com>\n"
+"Language-Team: Vietnamese (http://www.transifex.net/projects/p/I2P/team/vi/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: vi\n"
+"Plural-Forms: nplurals=1; plural=0\n"
+
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:514
+#, java-format
+msgid ""
+"To visit the destination in your host database, click <a "
+"href=\"{0}\">here</a>. To visit the conflicting addresshelper destination, "
+"click <a href=\"{1}\">here</a>."
+msgstr ""
+"Để truy cập vào điểm đến trong cơ sở dữ liệu máy chủ, bấm <a "
+"href=\"{0}\">vào đây</a>. Để truy cập vào địa chỉ giúp đỡ xung đột, bấm <a "
+"href=\"{1}\">vào đây</a>."
+
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:875
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:388
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:142
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:401
+msgid "Host"
+msgstr "Máy chủ"
+
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:876
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:370
+msgid "Destination"
+msgstr "Đích đến"
+
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:881
+#, java-format
+msgid "Continue to {0} without saving"
+msgstr ""
+
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:886
+#, java-format
+msgid "Save {0} to router address book and continue to eepsite"
+msgstr ""
+
+#. only blockfile supports multiple books
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:889
+#, java-format
+msgid "Save {0} to master address book and continue to eepsite"
+msgstr ""
+
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:890
+#, java-format
+msgid "Save {0} to private address book and continue to eepsite"
+msgstr ""
+
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1046
+msgid ""
+"Click a link below to look for an address helper by using a \"jump\" "
+"service:"
+msgstr "Bấm vào đường dẫn dưới đây để tìm địa chỉ giúp đỡ bằng dịch vụ \"nhảy\":"
+
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1262
+msgid "Added via address helper"
+msgstr ""
+
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1286
+#, java-format
+msgid "Redirecting to {0}"
+msgstr ""
+
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1292
+msgid "Router Console"
+msgstr ""
+
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1293
+msgid "Addressbook"
+msgstr ""
+
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1293
+msgid "Configuration"
+msgstr ""
+
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1293
+msgid "Help"
+msgstr ""
+
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1298
+#, java-format
+msgid "Saved {0} to the {1} addressbook, redirecting now."
+msgstr ""
+
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1299
+#, java-format
+msgid "Failed to save {0} to the {1} addressbook, redirecting now."
+msgstr ""
+
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1301
+msgid "Click here if you are not redirected automatically."
+msgstr ""
+
+#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:326
+#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:336
+msgid "internal"
+msgstr "nội bộ"
+
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:171
+msgid ""
+"Invalid form submission, probably because you used the 'back' or 'reload' "
+"button on your browser. Please resubmit."
+msgstr ""
+"Mẫu đơn đệ nạp không đúng, có lẻ vì bạn dùng nút 'back' hay 'reload\" của "
+"trình duyệt. Xin vui lòng đệ nạp lại."
+
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:218
+msgid "Configuration reloaded for all tunnels"
+msgstr "Nạp lại cấu hình cho mọi đường hầm"
+
+#. and give them something to look at in any case
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:230
+msgid "Starting tunnel"
+msgstr "Bắt đầu đường hầm"
+
+#. and give them something to look at in any case
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:243
+msgid "Stopping tunnel"
+msgstr "Ngưng đường hầm"
+
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:311
+msgid "Configuration changes saved"
+msgstr "Lưu giữ thay đổi cấu hình"
+
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:314
+msgid "Failed to save configuration"
+msgstr "Không lưu cấu hình được"
+
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:398
+msgid "New Tunnel"
+msgstr "Đường Hầm Mới"
+
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:418
+msgid "Standard client"
+msgstr "Khách thường"
+
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:419
+msgid "HTTP client"
+msgstr "Khách HTTP"
+
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:420
+msgid "IRC client"
+msgstr "Khách IRC"
+
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:421
+msgid "Standard server"
+msgstr "Máy chủ thường"
+
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:422
+msgid "HTTP server"
+msgstr "Máy chủ HTTP"
+
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:423
+msgid "SOCKS 4/4a/5 proxy"
+msgstr "Proxy SOCKS 4/4a/5"
+
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:424
+msgid "SOCKS IRC proxy"
+msgstr "Proxy SOCKS IRC"
+
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:425
+msgid "CONNECT/SSL/HTTPS proxy"
+msgstr "Proxy nối kết/SSL/HTTPS"
+
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:426
+msgid "IRC server"
+msgstr "Máy chủ IRC"
+
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:427
+msgid "Streamr client"
+msgstr "Khách Streamr"
+
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:428
+msgid "Streamr server"
+msgstr "Máy chủ Streamr"
+
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:429
+msgid "HTTP bidir"
+msgstr "HTTP hai chiều"
+
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:517
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:293
+msgid "Host not set"
+msgstr "Máy chủ chưa cấu hình"
+
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:521
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:275
+msgid "Port not set"
+msgstr "Cổng chưa cấu hình"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:73
+msgid "I2P Tunnel Manager - Edit Client Tunnel"
+msgstr "Quảng Lý Hầm I2P - Chỉnh đổi hầm khách"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:93
+msgid "Edit proxy settings"
+msgstr "Chỉnh đổi cấu hình proxy"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:101
+msgid "New proxy settings"
+msgstr "Cấu hình mới cho proxy"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:112
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:112
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:110
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:124
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:245
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:260
+msgid "Name"
+msgstr "Tên"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:116
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:116
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:249
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:282
+msgid "Type"
+msgstr "Loại"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:120
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:120
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:229
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:389
+msgid "Description"
+msgstr "Mô tả"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:126
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:136
+msgid "Target"
+msgstr "Điểm đến"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:130
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:132
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:162
+msgid "Access Point"
+msgstr "Điểm Truy Cập"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:137
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:150
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:192
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:153
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:167
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:213
+msgid "required"
+msgstr "cần có"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:159
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:178
+msgid "Reachable by"
+msgstr "Với được qua"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:180
+msgid "Outproxies"
+msgstr "Proxy ra"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:187
+msgid "Tunnel Destination"
+msgstr "Địa điểm Hầm đến"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:199
+msgid "name or destination"
+msgstr "tên hay điểm đến"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:202
+msgid "b32 not recommended"
+msgstr "không nên dùng b32"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:208
+msgid "Shared Client"
+msgstr "Chia khách"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:212
+msgid ""
+"(Share tunnels with other clients and irc/httpclients? Change requires "
+"restart of client proxy)"
+msgstr ""
+"(Chia sẻ hầm với những khách khác hay khách irc/http? Chỉnh đổi yêu cầu khởi"
+" động lại proxy khách)"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:216
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:124
+msgid "Auto Start"
+msgstr "Tự động khởi động"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:220
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:128
+msgid "(Check the Box for 'YES')"
+msgstr "Chọn YES trong ô"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:222
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:243
+msgid "Advanced networking options"
+msgstr "Tùy chọn mạng cao cấp "
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:224
+msgid ""
+"(NOTE: when this client proxy is configured to share tunnels, then these "
+"options are for all the shared proxy clients!)"
+msgstr ""
+"(GHI CHÚ: khi proxy khách được cấu hình để chia sẻ hầm, thì những tùy chọn "
+"này cho tất cả khách proxy chia sẻ)"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:226
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:245
+msgid "Tunnel Options"
+msgstr "Tùy chọn hầm"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:228
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:247
+msgid "Length"
+msgstr "Độ dài"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:235
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:254
+msgid "0 hop tunnel (low anonymity, low latency)"
+msgstr "hầm 0 bước nhảy (độ ẩn danh thấp, độ trễ thấp)"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:239
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:258
+msgid "1 hop tunnel (medium anonymity, medium latency)"
+msgstr "hầm 1 bước nhảy (độ ẩn danh vừa, độ trễ vừa)"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:243
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:262
+msgid "2 hop tunnel (high anonymity, high latency)"
+msgstr "hầm 2 bước nhảy (độ ẩn danh cao, độ trễ cao"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:247
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:266
+msgid "3 hop tunnel (very high anonymity, poor performance)"
+msgstr "hầm 3 bước nhảy (độ ẩn danh rất cao, hiệu suất tệ)"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:256
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:275
+msgid "hop tunnel (very poor performance)"
+msgstr "hầm bước nhảy (hiệu xuất rất tệ)"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:261
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:280
+msgid "Variance"
+msgstr "Độ khác biệt"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:268
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:287
+msgid "0 hop variance (no randomisation, consistant performance)"
+msgstr "Khác biệt 0 bước (không ngẫu nhiên, hiệu xuất vững)"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:272
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:291
+msgid ""
+"+ 0-1 hop variance (medium additive randomisation, subtractive performance)"
+msgstr ""
+"Khác biệt + 0-1 bước (độ ngẫu nhiên bổ xung trung bình, hiệu xuất trừ)"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:276
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:295
+msgid ""
+"+ 0-2 hop variance (high additive randomisation, subtractive performance)"
+msgstr "Khác biệt + 0-2 bước (độ ngẫu nhiên bổ xung cao, hiệu xuất trừ)"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:280
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:299
+msgid "+/- 0-1 hop variance (standard randomisation, standard performance)"
+msgstr "Khác biệt +/- 0-1 bước (độ ngẫu nhiên chuẩn, hiệu xuất chuẩn)"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:284
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:303
+msgid "+/- 0-2 hop variance (not recommended)"
+msgstr "Khác biệt +/- 0-2 bước (không nên)"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:296
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:315
+msgid "hop variance"
+msgstr "khác biệt bước"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:301
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:320
+msgid "Count"
+msgstr "Số lượng"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:308
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:327
+msgid "1 inbound, 1 outbound tunnel  (low bandwidth usage, less reliability)"
+msgstr "1 đường vô, 1 đường hầm ra  (dùng băng thông thấp, độ bền vững thấp)"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:312
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:331
+msgid ""
+"2 inbound, 2 outbound tunnels (standard bandwidth usage, standard "
+"reliability)"
+msgstr ""
+"2 đường vô, 2 đường hầm ra  (dùng băng thông trung bình, độ bền vững trung "
+"bình)"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:316
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:335
+msgid ""
+"3 inbound, 3 outbound tunnels (higher bandwidth usage, higher reliability)"
+msgstr "3 đường vô, 3 đường hầm ra  (dùng băng thông cao, độ bền vững cao)"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:325
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:344
+msgid "tunnels"
+msgstr "đường hầm"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:330
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:349
+msgid "Backup Count"
+msgstr "Số lượng trừ bị"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:337
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:356
+msgid "0 backup tunnels (0 redundancy, no added resource usage)"
+msgstr "0 hầm trừ bị (độ dư 0, không thêm tài nguyên)"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:341
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:360
+msgid "1 backup tunnel each direction (low redundancy, low resource usage)"
+msgstr "1 hầm trừ bị mỗi hướng (độ dư thấp, dùng tài nguyên thấp)"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:345
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:364
+msgid ""
+"2 backup tunnels each direction (medium redundancy, medium resource usage)"
+msgstr "2 hầm trừ bị mỗi hướng (độ dư trung bình, dùng tài nguyên trung bình)"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:349
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:368
+msgid "3 backup tunnels each direction (high redundancy, high resource usage)"
+msgstr "3 hầm trừ bị mỗi hướng (độ dư cao, dùng tài nguyên cao)"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:358
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:377
+msgid "backup tunnels"
+msgstr "hầm trừ bị"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:365
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:384
+msgid "Profile"
+msgstr "Hồ sơ"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:372
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:391
+msgid "interactive connection"
+msgstr "đường nối tương tác"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:376
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:395
+msgid "bulk connection (downloads/websites/BT)"
+msgstr "đường nối khổ to"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:378
+msgid "Delay Connect"
+msgstr "Chờ nối kết"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:382
+msgid "for request/response connections"
+msgstr "cho nối kết yêu cầu/phản hồi"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:386
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:399
+msgid "Router I2CP Address"
+msgstr "Địa chỉ Định Tuyến I2CP"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:396
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:148
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:409
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:247
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:269
+msgid "Port"
+msgstr "Cổng"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:406
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:479
+msgid "Reduce tunnel quantity when idle"
+msgstr "Giảm số lượng hầm khi rổi"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:408
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:422
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:430
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:442
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:452
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:472
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:486
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:419
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:481
+msgid "Enable"
+msgstr "Mở"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:412
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:485
+msgid "Reduced tunnel count"
+msgstr "Số lượng đường hầm giảm"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:416
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:436
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:489
+msgid "Idle minutes"
+msgstr "Số phút rảnh rổi"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:420
+msgid "Close tunnels when idle"
+msgstr "Đóng đường hầm khi rảnh rổi"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:426
+msgid "New Keys on Reopen"
+msgstr "Chìa khóa mới khi mở lại"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:434
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:435
+msgid "Disable"
+msgstr "Tắt"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:440
+msgid "Delay tunnel open until required"
+msgstr "Đợi mở đường hầm cho đến khi yêu cầu"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:450
+msgid "Persistent private key"
+msgstr "Chìa khóa riêng bền dai"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:456
+msgid "File"
+msgstr "Tập tin"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:460
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:220
+msgid "Local destination"
+msgstr "Điểm đến nội bộ"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:464
+msgid "(if known)"
+msgstr "(nếu biết)"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:470
+msgid "Local Authorization"
+msgstr "Cho phép nội bộ"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:476
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:490
+msgid "Username"
+msgstr "Tên đăng nhập"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:480
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:494
+msgid "Password"
+msgstr "Mật khẩu"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:484
+msgid "Outproxy Authorization"
+msgstr "Cho phép Outproxy"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:502
+msgid "Jump URL List"
+msgstr "Danh sách đường dẫn nhảy"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:508
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:525
+msgid "Custom options"
+msgstr "Tùy chọn tùy ý"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:512
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:529
+msgid ""
+"NOTE: If tunnel is currently running, most changes will not take effect "
+"until tunnel is stopped and restarted."
+msgstr ""
+"GHI CHÚ: nếu đường hầm đang chạy thì những sửa đổi sẽ không có tác động cho "
+"đến khi đường hầm ngừng và khởi động lại."
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:514
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:531
+msgid "Cancel"
+msgstr "Hủy"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:518
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:535
+msgid "Delete"
+msgstr "Xóa"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:520
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:537
+msgid "Save"
+msgstr "Giữ"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:73
+msgid "I2P Tunnel Manager - Edit Server Tunnel"
+msgstr "Quản Lý Hầm I2P - Điều chỉnh Hầm Máy Chủ"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:93
+msgid "Edit server settings"
+msgstr "Chỉnh sửa cấu hình máy chủ"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:101
+msgid "New server settings"
+msgstr "Cấu hình mới cho máy chủ"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:199
+msgid "Website name"
+msgstr "Tên trang web"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:203
+msgid "(leave blank for outproxies)"
+msgstr "(để trống cho outproxies)"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:208
+msgid "Private key file"
+msgstr "Tập tin khóa riêng"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:230
+msgid "Add to local addressbook"
+msgstr "Thêm vô sổ địa chỉ địa phương"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:237
+msgid "Hostname Signature"
+msgstr "Chữ ký tên máy chủ"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:417
+msgid "Encrypt Leaseset"
+msgstr "Leaseset mã hóa"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:423
+msgid "Encryption Key"
+msgstr "Khóa mã hóa"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:427
+msgid "Generate New Key"
+msgstr "Tạo khóa mới"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:429
+msgid "Generate"
+msgstr "Kiến tạo"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:431
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:523
+msgid "(Tunnel must be stopped first)"
+msgstr "(Hầm phải ngưng trước)"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:433
+msgid "Restricted Access List"
+msgstr "Sổ truy cập giới hạn"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:439
+msgid "Whitelist"
+msgstr "Sổ trắng"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:443
+msgid "Blacklist"
+msgstr "Sổ đen"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:447
+msgid "Access List"
+msgstr "Sổ truy cập"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:451
+msgid "Inbound connection limits (0=unlimited)"
+msgstr "Giới hạn đường nối vào (0=không giới hạn)"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:453
+msgid "Per client"
+msgstr "Mỗi khách"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:455
+msgid "Per minute"
+msgstr "Mỗi phút"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:459
+msgid "Per hour"
+msgstr "Mỗi giờ"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:463
+msgid "Per day"
+msgstr "Mỗi ngày"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:467
+msgid "Total"
+msgstr "Tổng cộng"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:475
+msgid "Max concurrent connections (0=unlimited)"
+msgstr "Số đường nối tối đa cùng lúc (0=không giới hạn)"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:493
+msgid "New Certificate type"
+msgstr "Loại Chứng chỉ mới"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:495
+msgid "None"
+msgstr "Không có"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:499
+msgid "Hashcash (effort)"
+msgstr "Hashcash (nỗ lực)"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:505
+msgid "Hashcash Calc Time"
+msgstr "Hashcash (giờ tính toán)"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:507
+msgid "Estimate"
+msgstr "Ước lượng"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:509
+msgid "Hidden"
+msgstr "Dấu"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:513
+msgid "Signed (signed by)"
+msgstr "Ký (ký bởi)"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:519
+msgid "Modify Certificate"
+msgstr "Chứng chỉ Điều chỉnh"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:521
+msgid "Modify"
+msgstr "Điều chỉnh"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:74
+msgid "I2P Tunnel Manager - List"
+msgstr "Quản Lý Hầm I2P - Danh sách"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:86
+msgid "Status Messages"
+msgstr "Thông báo hiện trạng"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:90
+msgid "Refresh"
+msgstr "Nạp lại"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:94
+msgid "Stop All"
+msgstr "Ngưng tất cả"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:98
+msgid "Start All"
+msgstr "Bắt đầu tất cả"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:102
+msgid "Restart All"
+msgstr "Khởi động lại tất cả"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:106
+msgid "Reload Config"
+msgstr "Nạp lại cấu hình"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:108
+msgid "I2P Server Tunnels"
+msgstr "Đường hầm máy chủ I2P"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:112
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:133
+msgid "Points at"
+msgstr "Điểm ở"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:114
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:156
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:160
+msgid "Preview"
+msgstr "Xem trước"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:116
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:180
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:253
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:300
+msgid "Status"
+msgstr "Hiện trạng"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:166
+msgid "Base32 Address"
+msgstr "Địa chỉ Base32"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:174
+msgid "No Preview"
+msgstr "Không xem trước"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:187
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:307
+msgid "Starting..."
+msgstr "Bắt đầu..."
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:194
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:208
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:314
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:328
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:342
+msgid "Stop"
+msgstr "Ngưng"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:201
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:335
+msgid "Running"
+msgstr "Đang chạy"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:215
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:349
+msgid "Stopped"
+msgstr "Đã ngưng"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:222
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:356
+msgid "Start"
+msgstr "Bắt đầu"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:237
+msgid "New server tunnel"
+msgstr "Hầm chủ mới"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:239
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:399
+msgid "Standard"
+msgstr "Chuẩn"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:241
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:401
+msgid "Create"
+msgstr "Kiến tạo"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:243
+msgid "I2P Client Tunnels"
+msgstr "Hầm khách I2P"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:251
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:286
+msgid "Interface"
+msgstr "Giao diện"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:321
+msgid "Standby"
+msgstr "Chờ"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:366
+msgid "Outproxy"
+msgstr "Outproxy"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:384
+msgid "none"
+msgstr "không có"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:397
+msgid "New client tunnel"
+msgstr "Đường hầm mới"
+
+

@@ -8,9 +8,6 @@ package net.i2p.router.message;
  *
  */
 
-import java.util.HashMap;
-import java.util.Map;
-
 import net.i2p.data.Hash;
 import net.i2p.data.RouterIdentity;
 import net.i2p.data.i2np.DeliveryInstructions;
@@ -28,17 +25,19 @@ import net.i2p.util.Log;
  * need to be. soon)
  *
  */
-public class HandleGarlicMessageJob extends JobImpl implements GarlicMessageReceiver.CloveReceiver {
-    private Log _log;
-    private GarlicMessage _message;
-    private RouterIdentity _from;
-    private Hash _fromHash;
-    private Map _cloves; // map of clove Id --> Expiration of cloves we've already seen
+class HandleGarlicMessageJob extends JobImpl implements GarlicMessageReceiver.CloveReceiver {
+    private final Log _log;
+    private final GarlicMessage _message;
+    //private RouterIdentity _from;
+    //private Hash _fromHash;
+    //private Map _cloves; // map of clove Id --> Expiration of cloves we've already seen
     //private MessageHandler _handler;
-    private GarlicMessageParser _parser;
+    //private GarlicMessageParser _parser;
    
-    private final static int FORWARD_PRIORITY = 50;
-    
+    /**
+     *  @param from ignored
+     *  @param fromHash ignored
+     */
     public HandleGarlicMessageJob(RouterContext context, GarlicMessage msg, RouterIdentity from, Hash fromHash) {
         super(context);
         _log = context.logManager().getLog(HandleGarlicMessageJob.class);
@@ -46,11 +45,11 @@ public class HandleGarlicMessageJob extends JobImpl implements GarlicMessageRece
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("New handle garlicMessageJob called w/ message from [" + from + "]", new Exception("Debug"));
         _message = msg;
-        _from = from;
-        _fromHash = fromHash;
-        _cloves = new HashMap();
+        //_from = from;
+        //_fromHash = fromHash;
+        //_cloves = new HashMap();
         //_handler = new MessageHandler(context);
-        _parser = new GarlicMessageParser(context);
+        //_parser = new GarlicMessageParser(context);
     }
     
     public String getName() { return "Handle Inbound Garlic Message"; }
@@ -106,6 +105,7 @@ public class HandleGarlicMessageJob extends JobImpl implements GarlicMessageRece
         }
     }
     
+    @Override
     public void dropped() {
         getContext().messageHistory().messageProcessingError(_message.getUniqueId(), 
                                                          _message.getClass().getName(), 

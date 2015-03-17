@@ -46,42 +46,63 @@ import net.i2p.util.RandomSource;
  * writeBytes() will output the original encrypted
  * leases and the original leaseset signature.
  *
+ * Revocation (zero leases) isn't used anywhere. In addition:
+ *  - A revoked leaseset has an EarliestLeaseDate of -1, so it will
+ *    never be stored successfully.
+ *  - Revocation of an encrypted leaseset will explode.
+ *  - So having an included signature at all is pointless?
+ *
+ *
  * @author jrandom
  */
-public class LeaseSet extends DataStructureImpl {
-    private final static Log _log = new Log(LeaseSet.class);
+public class LeaseSet extends DatabaseEntry {
     private Destination _destination;
     private PublicKey _encryptionKey;
     private SigningPublicKey _signingKey;
     // Keep leases in the order received, or else signature verification will fail!
-    private List _leases;
-    private Signature _signature;
-    private volatile Hash _currentRoutingKey;
-    private volatile byte[] _routingKeyGenMod;
+    private final List<Lease> _leases;
     private boolean _receivedAsPublished;
+    private boolean _receivedAsReply;
     // Store these since isCurrent() and getEarliestLeaseDate() are called frequently
     private long _firstExpiration;
     private long _lastExpiration;
-    private List _decryptedLeases;
+    private List<Lease> _decryptedLeases;
     private boolean _decrypted;
     private boolean _checked;
 
-    /** This seems like plenty  */
-    private final static int MAX_LEASES = 6;
+    /**
+     *  Unlimited before 0.6.3;
+     *  6 as of 0.6.3;
+     *  Increased in version 0.9.
+     *
+     *  Leasesets larger than 6 should be used with caution,
+     *  as each lease adds 44 bytes, and routers older than version 0.9
+     *  will not be able to connect as they will throw an exception in
+     *  readBytes(). Also, the churn will be quite rapid, leading to
+     *  frequent netdb stores and transmission on existing connections.
+     *
+     *  However we increase it now in case some hugely popular eepsite arrives.
+     *  Strategies elsewhere in the router to efficiently handle
+     *  large leasesets are TBD.
+     */
+    public static final int MAX_LEASES = 16;
+    private static final int OLD_MAX_LEASES = 6;
 
     public LeaseSet() {
-        setDestination(null);
-        setEncryptionKey(null);
-        setSigningKey(null);
-        setSignature(null);
-        setRoutingKey(null);
-        _leases = new ArrayList();
-        _routingKeyGenMod = null;
-        _receivedAsPublished = false;
+        _leases = new ArrayList(OLD_MAX_LEASES);
         _firstExpiration = Long.MAX_VALUE;
-        _lastExpiration = 0;
-        _decrypted = false;
-        _checked = false;
+    }
+
+    public long getDate() {
+        return getEarliestLeaseDate();
+    }
+
+    protected KeysAndCert getKeysAndCert() {
+        return _destination;
+    }
+
+    public int getType() {
+        return KEY_TYPE_LEASESET;
     }
 
     public Destination getDestination() {
@@ -100,6 +121,7 @@ public class LeaseSet extends DataStructureImpl {
         _encryptionKey = encryptionKey;
     }
 
+    /** @deprecated unused */
     public SigningPublicKey getSigningKey() {
         return _signingKey;
     }
@@ -111,10 +133,20 @@ public class LeaseSet extends DataStructureImpl {
     /**
      * If true, we received this LeaseSet by a remote peer publishing it to
      * us, rather than by searching for it ourselves or locally creating it.
-     *
+     * Default false.
      */
     public boolean getReceivedAsPublished() { return _receivedAsPublished; }
+    /** Default false */
     public void setReceivedAsPublished(boolean received) { _receivedAsPublished = received; }
+
+    /**
+     * If true, we received this LeaseSet by searching for it
+     * Default false.
+     * @since 0.7.14
+     */
+    public boolean getReceivedAsReply() { return _receivedAsReply; }
+    /** set to true @since 0.7.14 */
+    public void setReceivedAsReply() { _receivedAsReply = true; }
 
     public void addLease(Lease lease) {
         if (lease == null) throw new IllegalArgumentException("erm, null lease");
@@ -130,6 +162,10 @@ public class LeaseSet extends DataStructureImpl {
             _lastExpiration = expire;
     }
 
+    /**
+     *  @return 0-6
+     *  A LeaseSet with no leases is revoked.
+     */
     public int getLeaseCount() {
         if (isEncrypted())
             return _leases.size() - 1;
@@ -139,45 +175,9 @@ public class LeaseSet extends DataStructureImpl {
 
     public Lease getLease(int index) {
         if (isEncrypted())
-            return (Lease) _decryptedLeases.get(index);
+            return _decryptedLeases.get(index);
         else
-            return (Lease) _leases.get(index);
-    }
-
-    public Signature getSignature() {
-        return _signature;
-    }
-
-    public void setSignature(Signature sig) {
-        _signature = sig;
-    }
-
-    /**
-     * Get the routing key for the structure using the current modifier in the RoutingKeyGenerator.
-     * This only calculates a new one when necessary though (if the generator's key modifier changes)
-     *
-     */
-    public Hash getRoutingKey() {
-        RoutingKeyGenerator gen = RoutingKeyGenerator.getInstance();
-        if ((gen.getModData() == null) || (_routingKeyGenMod == null)
-            || (!DataHelper.eq(gen.getModData(), _routingKeyGenMod))) {
-            setRoutingKey(gen.getRoutingKey(getDestination().calculateHash()));
-            _routingKeyGenMod = gen.getModData();
-        }
-        return _currentRoutingKey;
-    }
-
-    public void setRoutingKey(Hash key) {
-        _currentRoutingKey = key;
-    }
-
-    public boolean validateRoutingKey() {
-        Hash destKey = getDestination().calculateHash();
-        Hash rk = RoutingKeyGenerator.getInstance().getRoutingKey(destKey);
-        if (rk.equals(getRoutingKey()))
-            return true;
-
-        return false;
+            return _leases.get(index);
     }
 
     /**
@@ -189,59 +189,41 @@ public class LeaseSet extends DataStructureImpl {
      * @return earliest end date of any lease in the set, or -1 if there are no leases
      */
     public long getEarliestLeaseDate() {
-        if (_leases.size() <= 0)
+        if (_leases.isEmpty())
             return -1;
         return _firstExpiration;
     }
 
     /**
-     * Sign the structure using the supplied signing key
-     *
-     */
-    public void sign(SigningPrivateKey key) throws DataFormatException {
-        byte[] bytes = getBytes();
-        if (bytes == null) throw new DataFormatException("Not enough data to sign");
-        // now sign with the key 
-        Signature sig = DSAEngine.getInstance().sign(bytes, key);
-        setSignature(sig);
-    }
-
-    /**
      * Verify that the signature matches the lease set's destination's signing public key.
+     * OR the included revocation key.
      *
      * @return true only if the signature matches
      */
+    @Override
     public boolean verifySignature() {
-        if (getSignature() == null) return false;
-        if (getDestination() == null) return false;
-        byte data[] = getBytes();
-        if (data == null) return false;
-        boolean signedByDest = DSAEngine.getInstance().verifySignature(getSignature(), data,
-                                                                       getDestination().getSigningPublicKey());
-        boolean signedByRevoker = false;
-        if (!signedByDest) {
-            signedByRevoker = DSAEngine.getInstance().verifySignature(getSignature(), data, _signingKey);
-        }
-        return signedByDest || signedByRevoker;
+        if (super.verifySignature())
+            return true;
+
+        // Revocation unused (see above)
+        boolean signedByRevoker = DSAEngine.getInstance().verifySignature(_signature, getBytes(), _signingKey);
+        return signedByRevoker;
     }
 
     /**
      * Verify that the signature matches the lease set's destination's signing public key.
+     * OR the specified revocation key.
      *
+     * @deprecated revocation unused
      * @return true only if the signature matches
      */
     public boolean verifySignature(SigningPublicKey signingKey) {
-        if (getSignature() == null) return false;
-        if (getDestination() == null) return false;
-        byte data[] = getBytes();
-        if (data == null) return false;
-        boolean signedByDest = DSAEngine.getInstance().verifySignature(getSignature(), data,
-                                                                       getDestination().getSigningPublicKey());
-        boolean signedByRevoker = false;
-        if (!signedByDest) {
-            signedByRevoker = DSAEngine.getInstance().verifySignature(getSignature(), data, signingKey);
-        }
-        return signedByDest || signedByRevoker;
+        if (super.verifySignature())
+            return true;
+
+        // Revocation unused (see above)
+        boolean signedByRevoker = DSAEngine.getInstance().verifySignature(_signature, getBytes(), signingKey);
+        return signedByRevoker;
     }
 
     /**
@@ -256,12 +238,12 @@ public class LeaseSet extends DataStructureImpl {
         return _lastExpiration > now - fudge;
     }
 
-    private byte[] getBytes() {
-        if ((_destination == null) || (_encryptionKey == null) || (_signingKey == null) || (_leases == null))
+    protected byte[] getBytes() {
+        if ((_destination == null) || (_encryptionKey == null) || (_signingKey == null))
             return null;
         int len = PublicKey.KEYSIZE_BYTES  // dest
                 + SigningPublicKey.KEYSIZE_BYTES // dest
-                + 4 // cert
+                + 3 // cert minimum, could be more, only used to size the BAOS
                 + PublicKey.KEYSIZE_BYTES // encryptionKey
                 + SigningPublicKey.KEYSIZE_BYTES // signingKey
                 + 1
@@ -286,13 +268,14 @@ public class LeaseSet extends DataStructureImpl {
         return rv;
     }
     
+    /**
+     *  This does NOT validate the signature
+     */
     public void readBytes(InputStream in) throws DataFormatException, IOException {
         _destination = new Destination();
         _destination.readBytes(in);
-        _encryptionKey = new PublicKey();
-        _encryptionKey.readBytes(in);
-        _signingKey = new SigningPublicKey();
-        _signingKey.readBytes(in);
+        _encryptionKey = PublicKey.create(in);
+        _signingKey = SigningPublicKey.create(in);
         int numLeases = (int) DataHelper.readLong(in, 1);
         if (numLeases > MAX_LEASES)
             throw new DataFormatException("Too many leases - max is " + MAX_LEASES);
@@ -307,8 +290,11 @@ public class LeaseSet extends DataStructureImpl {
         _signature.readBytes(in);
     }
     
+    /**
+     *  This does NOT validate the signature
+     */
     public void writeBytes(OutputStream out) throws DataFormatException, IOException {
-        if ((_destination == null) || (_encryptionKey == null) || (_signingKey == null) || (_leases == null)
+        if ((_destination == null) || (_encryptionKey == null) || (_signingKey == null)
             || (_signature == null)) throw new DataFormatException("Not enough data to write out a LeaseSet");
 
         _destination.writeBytes(out);
@@ -323,13 +309,16 @@ public class LeaseSet extends DataStructureImpl {
         _signature.writeBytes(out);
     }
     
+    /**
+     *  Number of bytes, NOT including signature
+     */
     public int size() {
         return PublicKey.KEYSIZE_BYTES //destination.pubKey
              + SigningPublicKey.KEYSIZE_BYTES // destination.signPubKey
-             + 2 // destination.certificate
+             + _destination.getCertificate().size() // destination.certificate, usually 3
              + PublicKey.KEYSIZE_BYTES // encryptionKey
              + SigningPublicKey.KEYSIZE_BYTES // signingKey
-             + 1
+             + 1 // number of leases
              + _leases.size() * (Hash.HASH_LENGTH + 4 + 8);
     }
     
@@ -339,29 +328,29 @@ public class LeaseSet extends DataStructureImpl {
         LeaseSet ls = (LeaseSet) object;
         return DataHelper.eq(getEncryptionKey(), ls.getEncryptionKey()) &&
         //DataHelper.eq(getVersion(), ls.getVersion()) &&
-               DataHelper.eq(_leases, ls._leases) && DataHelper.eq(getSignature(), ls.getSignature())
-               && DataHelper.eq(getSigningKey(), ls.getSigningKey())
-               && DataHelper.eq(getDestination(), ls.getDestination());
+               DataHelper.eq(_leases, ls._leases) && DataHelper.eq(_signature, ls.getSignature())
+               && DataHelper.eq(_signingKey, ls.getSigningKey())
+               && DataHelper.eq(_destination, ls.getDestination());
 
     }
     
+    /** the destination has enough randomness in it to use it by itself for speed */
     @Override
     public int hashCode() {
-        return DataHelper.hashCode(getEncryptionKey()) +
-        //(int)_version +
-               DataHelper.hashCode(_leases) + DataHelper.hashCode(getSignature())
-               + DataHelper.hashCode(getSigningKey()) + DataHelper.hashCode(getDestination());
+        if (_destination == null)
+            return 0;
+        return _destination.hashCode();
     }
     
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer(128);
+        StringBuilder buf = new StringBuilder(128);
         buf.append("[LeaseSet: ");
-        buf.append("\n\tDestination: ").append(getDestination());
-        buf.append("\n\tEncryptionKey: ").append(getEncryptionKey());
-        buf.append("\n\tSigningKey: ").append(getSigningKey());
+        buf.append("\n\tDestination: ").append(_destination);
+        buf.append("\n\tEncryptionKey: ").append(_encryptionKey);
+        buf.append("\n\tSigningKey: ").append(_signingKey);
         //buf.append("\n\tVersion: ").append(getVersion());
-        buf.append("\n\tSignature: ").append(getSignature());
+        buf.append("\n\tSignature: ").append(_signature);
         buf.append("\n\tLeases: #").append(getLeaseCount());
         for (int i = 0; i < getLeaseCount(); i++)
             buf.append("\n\t\tLease (").append(i).append("): ").append(getLease(i));
@@ -379,14 +368,16 @@ public class LeaseSet extends DataStructureImpl {
      *  Must be called after all the leases are in place, but before sign().
      */
     public void encrypt(SessionKey key) {
-        if (_log.shouldLog(Log.WARN))
-            _log.warn("encrypting lease: " + _destination.calculateHash());
+        //if (_log.shouldLog(Log.WARN))
+        //    _log.warn("encrypting lease: " + _destination.calculateHash());
         try {
             encryp(key);
         } catch (DataFormatException dfe) {
-            _log.error("Error encrypting lease: " + _destination.calculateHash());
+            Log log = I2PAppContext.getGlobalContext().logManager().getLog(LeaseSet.class);
+            log.error("Error encrypting lease: " + _destination.calculateHash());
         } catch (IOException ioe) {
-            _log.error("Error encrypting lease: " + _destination.calculateHash());
+            Log log = I2PAppContext.getGlobalContext().logManager().getLog(LeaseSet.class);
+            log.error("Error encrypting lease: " + _destination.calculateHash());
         }
     }
 
@@ -406,8 +397,8 @@ public class LeaseSet extends DataStructureImpl {
         int datalen = ((DATA_LEN * size / 16) + 1) * 16;
         ByteArrayOutputStream baos = new ByteArrayOutputStream(datalen);
         for (int i = 0; i < size; i++) {
-            ((Lease)_leases.get(i)).getGateway().writeBytes(baos);
-            ((Lease)_leases.get(i)).getTunnelId().writeBytes(baos);
+            _leases.get(i).getGateway().writeBytes(baos);
+            _leases.get(i).getTunnelId().writeBytes(baos);
         }
         // pad out to multiple of 16 with random data before encryption
         int padlen = datalen - (DATA_LEN * size);
@@ -421,22 +412,20 @@ public class LeaseSet extends DataStructureImpl {
         // pad out to multiple of 36 with random data after encryption
         // (even for 4 leases, where 36*4 is a multiple of 16, we add another, just to be consistent)
         padlen = enc.length - datalen;
-        pad = new byte[padlen];
-        RandomSource.getInstance().nextBytes(pad);
-        System.arraycopy(pad, 0, enc, datalen, padlen);
+        RandomSource.getInstance().nextBytes(enc, datalen, padlen);
         // add the padded lease...
         Lease padLease = new Lease();
-        padLease.setEndDate(((Lease)_leases.get(0)).getEndDate());
+        padLease.setEndDate(_leases.get(0).getEndDate());
         _leases.add(padLease);
         // ...and replace all the gateways and tunnel ids
         ByteArrayInputStream bais = new ByteArrayInputStream(enc);
         for (int i = 0; i < size+1; i++) {
             Hash h = new Hash();
             h.readBytes(bais);
-            ((Lease)_leases.get(i)).setGateway(h);
+            _leases.get(i).setGateway(h);
             TunnelId t = new TunnelId();
             t.readBytes(bais);
-            ((Lease)_leases.get(i)).setTunnelId(t);
+            _leases.get(i).setTunnelId(t);
         }
     }
 
@@ -447,16 +436,16 @@ public class LeaseSet extends DataStructureImpl {
      *  encrypted leaseset can be sent on to others (via writeBytes())
      */
     private void decrypt(SessionKey key) throws DataFormatException, IOException {
-        if (_log.shouldLog(Log.WARN))
-            _log.warn("decrypting lease: " + _destination.calculateHash());
+        //if (_log.shouldLog(Log.WARN))
+        //    _log.warn("decrypting lease: " + _destination.calculateHash());
         int size = _leases.size();
         if (size < 2)
             throw new DataFormatException("Bad number of leases for decryption");
         int datalen = DATA_LEN * size;
         ByteArrayOutputStream baos = new ByteArrayOutputStream(datalen);
         for (int i = 0; i < size; i++) {
-            ((Lease)_leases.get(i)).getGateway().writeBytes(baos);
-            ((Lease)_leases.get(i)).getTunnelId().writeBytes(baos);
+            _leases.get(i).getGateway().writeBytes(baos);
+            _leases.get(i).getTunnelId().writeBytes(baos);
         }
         byte[] iv = new byte[IV_LEN];
         System.arraycopy(_destination.getPublicKey().getData(), 0, iv, 0, IV_LEN);
@@ -475,7 +464,7 @@ public class LeaseSet extends DataStructureImpl {
             TunnelId t = new TunnelId();
             t.readBytes(bais);
             l.setTunnelId(t);
-            l.setEndDate(((Lease)_leases.get(i)).getEndDate());
+            l.setEndDate(_leases.get(i).getEndDate());
             _decryptedLeases.add(l);
         }
     }
@@ -495,9 +484,11 @@ public class LeaseSet extends DataStructureImpl {
                 decrypt(key);
                 _decrypted = true;
             } catch (DataFormatException dfe) {
-                _log.error("Error decrypting lease: " + _destination.calculateHash() + dfe);
+                Log log = I2PAppContext.getGlobalContext().logManager().getLog(LeaseSet.class);
+                log.error("Error decrypting lease: " + _destination.calculateHash() + dfe);
             } catch (IOException ioe) {
-                _log.error("Error decrypting lease: " + _destination.calculateHash() + ioe);
+                Log log = I2PAppContext.getGlobalContext().logManager().getLog(LeaseSet.class);
+                log.error("Error decrypting lease: " + _destination.calculateHash() + ioe);
             }
         }
         _checked = true;

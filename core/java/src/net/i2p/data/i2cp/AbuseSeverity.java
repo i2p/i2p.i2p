@@ -16,7 +16,6 @@ import java.io.OutputStream;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.DataStructureImpl;
-import net.i2p.util.Log;
 
 /**
  * Provides a severity level (larger numbers are more severe) in association with
@@ -26,11 +25,10 @@ import net.i2p.util.Log;
  * @author jrandom
  */
 public class AbuseSeverity extends DataStructureImpl {
-    private final static Log _log = new Log(AbuseSeverity.class);
     private int _severityId;
 
     public AbuseSeverity() {
-        setSeverity(-1);
+        _severityId = -1;
     }
 
     public int getSeverity() {
@@ -53,16 +51,16 @@ public class AbuseSeverity extends DataStructureImpl {
     @Override
     public boolean equals(Object object) {
         if ((object == null) || !(object instanceof AbuseSeverity)) return false;
-        return DataHelper.eq(getSeverity(), ((AbuseSeverity) object).getSeverity());
+        return _severityId == ((AbuseSeverity) object).getSeverity();
     }
 
     @Override
     public int hashCode() {
-        return getSeverity();
+        return _severityId;
     }
 
     @Override
     public String toString() {
-        return "[AbuseSeverity: " + getSeverity() + "]";
+        return "[AbuseSeverity: " + _severityId + "]";
     }
 }

@@ -12,6 +12,7 @@ package net.i2p.router;
  * Defines the criteria for selecting a set of peers for use when searching the
  * PeerManager
  *
+ * Only used by PeerTestJob, which may not have a point.
  */
 public class PeerSelectionCriteria {
     /** The peers will be used in a tunnel */

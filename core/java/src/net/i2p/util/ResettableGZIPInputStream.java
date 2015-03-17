@@ -1,11 +1,13 @@
 package net.i2p.util;
 
-import java.io.ByteArrayInputStream;
+import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.zip.CRC32;
 import java.util.zip.Inflater;
 import java.util.zip.InflaterInputStream;
+
+import net.i2p.data.DataHelper;
 
 /**
  * GZIP implementation per 
@@ -18,11 +20,12 @@ import java.util.zip.InflaterInputStream;
  */
 public class ResettableGZIPInputStream extends InflaterInputStream {
     private static final int FOOTER_SIZE = 8; // CRC32 + ISIZE
-    private static final boolean DEBUG = false;
-    /** keep a typesafe copy of (LookaheadInputStream)in */
-    private LookaheadInputStream _lookaheadStream;
-    private CRC32 _crc32;
-    private byte _buf1[] = new byte[1];
+    /** See below for why this is necessary */
+    private final ExtraByteInputStream _extraByteInputStream;
+    /** keep a typesafe copy of this */
+    private final LookaheadInputStream _lookaheadStream;
+    private final CRC32 _crc32;
+    private final byte _buf1[] = new byte[1];
     private boolean _complete;
     
     /**
@@ -31,11 +34,21 @@ public class ResettableGZIPInputStream extends InflaterInputStream {
      * decompress a stream.
      */
     public ResettableGZIPInputStream() {
-        super(new LookaheadInputStream(FOOTER_SIZE), new Inflater(true));
-        _lookaheadStream = (LookaheadInputStream)in;
+        // compressedStream -> 
+        //   LookaheadInputStream that removes last 8 bytes ->
+        //     ExtraByteInputStream that adds 1 byte ->
+        //       InflaterInputStream
+        // See below for why this is necessary
+        super(new ExtraByteInputStream(new LookaheadInputStream(FOOTER_SIZE)),
+              new Inflater(true));
+        _extraByteInputStream = (ExtraByteInputStream)in;
+        _lookaheadStream = (LookaheadInputStream)_extraByteInputStream.getInputStream();
         _crc32 = new CRC32();
-        _complete = false;
     }
+
+    /**
+     * Warning - blocking!
+     */
     public ResettableGZIPInputStream(InputStream compressedStream) throws IOException {
         this();
         initialize(compressedStream);
@@ -52,6 +65,7 @@ public class ResettableGZIPInputStream extends InflaterInputStream {
         _complete = false;
         _crc32.reset();
         _buf1[0] = 0x0;
+        _extraByteInputStream.reset();
         // blocking call to read the footer/lookahead, and use the compressed
         // stream as the source for further lookahead bytes
         _lookaheadStream.initialize(compressedStream);
@@ -62,22 +76,20 @@ public class ResettableGZIPInputStream extends InflaterInputStream {
     
     @Override
     public int read() throws IOException {
-        if (_complete) {
-            // shortcircuit so the inflater doesn't try to refill 
-            // with the footer's data (which would fail, causing ZLIB err)
-            return -1;
-        }
         int read = read(_buf1, 0, 1);
         if (read == -1)
             return -1;
-        else
-            return _buf1[0];
+        return _buf1[0] & 0xff;
     }
     
     @Override
     public int read(byte buf[]) throws IOException {
         return read(buf, 0, buf.length);
     }
+
+    /**
+     *
+     */
     @Override
     public int read(byte buf[], int off, int len) throws IOException {
         if (_complete) {
@@ -91,7 +103,12 @@ public class ResettableGZIPInputStream extends InflaterInputStream {
             return -1;
         } else {
             _crc32.update(buf, off, read);
-            if (_lookaheadStream.getEOFReached()) {
+            // NO, we can't do use getEOFReached here
+            // 1) Just because the lookahead stream has hit EOF doesn't mean
+            //    that the inflater has given us all the data yet,
+            //    this would cause data loss at the end
+            //if (_lookaheadStream.getEOFReached()) {
+            if (inf.finished()) {
                 verifyFooter();
                 inf.reset(); // so it doesn't bitch about missing data...
                 _complete = true;
@@ -100,41 +117,79 @@ public class ResettableGZIPInputStream extends InflaterInputStream {
         }
     }
     
-    long getCurrentCRCVal() { return _crc32.getValue(); }
-    
-    void verifyFooter() throws IOException {
+    /**
+     *  Moved from i2ptunnel HTTPResponseOutputStream.InternalGZIPInputStream
+     *  @since 0.8.9
+     */
+    public long getTotalRead() {
+        try {
+            return inf.getBytesRead(); 
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
+    /**
+     *  Moved from i2ptunnel HTTPResponseOutputStream.InternalGZIPInputStream
+     *  @since 0.8.9
+     */
+    public long getTotalExpanded() { 
+        try {
+            return inf.getBytesWritten(); 
+        } catch (Exception e) {
+            // possible NPE in some implementations
+            return 0;
+        }
+    }
+
+    /**
+     *  Moved from i2ptunnel HTTPResponseOutputStream.InternalGZIPInputStream
+     *  @since 0.8.9
+     */
+    public long getRemaining() { 
+        try {
+            return inf.getRemaining(); 
+        } catch (Exception e) {
+            // possible NPE in some implementations
+            return 0;
+        }
+    }
+
+    /**
+     *  Moved from i2ptunnel HTTPResponseOutputStream.InternalGZIPInputStream
+     *  @since 0.8.9
+     */
+    public boolean getFinished() { 
+        try {
+            return inf.finished(); 
+        } catch (Exception e) {
+            // possible NPE in some implementations
+            return true;
+        }
+    }
+
+    /**
+     *  Moved from i2ptunnel HTTPResponseOutputStream.InternalGZIPInputStream
+     *  @since 0.8.9
+     */
+    @Override
+    public String toString() { 
+        return "Read: " + getTotalRead() + " expanded: " + getTotalExpanded() + " remaining: " + getRemaining() + " finished: " + getFinished();
+    }
+
+    private void verifyFooter() throws IOException {
         byte footer[] = _lookaheadStream.getFooter();
         
-        long expectedCRCVal = _crc32.getValue();
+        long actualSize = inf.getTotalOut();
+        long expectedSize = DataHelper.fromLongLE(footer, 4, 4);
+        if (expectedSize != actualSize)
+            throw new IOException("gunzip expected " + expectedSize + " bytes, got " + actualSize);
         
-        // damn RFC writing their bytes backwards...
-        if (!(footer[0] == (byte)(expectedCRCVal & 0xFF)))
-            throw new IOException("footer[0]=" + footer[0] + " expectedCRC[0]="
-                                  + (expectedCRCVal & 0xFF));
-        if (!(footer[1] == (byte)(expectedCRCVal >>> 8)))
-            throw new IOException("footer[1]=" + footer[1] + " expectedCRC[1]="
-                                  + ((expectedCRCVal >>> 8) & 0xFF));
-        if (!(footer[2] == (byte)(expectedCRCVal >>> 16)))
-            throw new IOException("footer[2]=" + footer[2] + " expectedCRC[2]="
-                                  + ((expectedCRCVal >>> 16) & 0xFF));
-        if (!(footer[3] == (byte)(expectedCRCVal >>> 24)))
-            throw new IOException("footer[3]=" + footer[3] + " expectedCRC[3]="
-                                  + ((expectedCRCVal >>> 24) & 0xFF));
-        
-        int expectedSizeVal = inf.getTotalOut();
-        
-        if (!(footer[4] == (byte)expectedSizeVal))
-            throw new IOException("footer[4]=" + footer[4] + " expectedSize[0]="
-                                  + (expectedSizeVal & 0xFF));
-        if (!(footer[5] == (byte)(expectedSizeVal >>> 8)))
-            throw new IOException("footer[5]=" + footer[5] + " expectedSize[1]="
-                                  + ((expectedSizeVal >>> 8) & 0xFF));
-        if (!(footer[6] == (byte)(expectedSizeVal >>> 16)))
-            throw new IOException("footer[6]=" + footer[6] + " expectedSize[2]="
-                                  + ((expectedSizeVal >>> 16) & 0xFF));
-        if (!(footer[7] == (byte)(expectedSizeVal >>> 24)))
-            throw new IOException("footer[7]=" + footer[7] + " expectedSize[3]="
-                                  + ((expectedSizeVal >>> 24) & 0xFF));
+        long actualCRC = _crc32.getValue();
+        long expectedCRC = DataHelper.fromLongLE(footer, 0, 4);
+        if (expectedCRC != actualCRC)
+            throw new IOException("gunzip CRC fail expected 0x" + Long.toHexString(expectedCRC) +
+                                  " bytes, got 0x" + Long.toHexString(actualCRC));
     }
     
     /**
@@ -169,16 +224,16 @@ public class ResettableGZIPInputStream extends InflaterInputStream {
         // handle flags...
         if (0 != (flags & (1<<5))) {
             // extra header, read and ignore
-            int len = 0;
+            int _len = 0;
             c = in.read();
             if (c == -1) throw new IOException("EOF reading the extra header");
-            len = c;
+            _len = c;
             c = in.read();
             if (c == -1) throw new IOException("EOF reading the extra header");
-            len += (c << 8);
+            _len += (c << 8);
             
             // now skip that data
-            for (int i = 0; i < len; i++) {
+            for (int i = 0; i < _len; i++) {
                 c = in.read();
                 if (c == -1) throw new IOException("EOF reading the extra header's body");
             }
@@ -211,6 +266,99 @@ public class ResettableGZIPInputStream extends InflaterInputStream {
         }
     }
     
+    /**
+     *  Essentially a SequenceInputStream(in, new ByteArrayInputStream(new byte[1])),
+     *  except that this is resettable.
+     *
+     *  Unsupported:
+     *    - available() doesn't include the extra byte
+     *    - skip() doesn't skip the extra byte
+     *
+     *  Why? otherwise the inflater finished() is wrong when the compressed payload
+     *  (in between the 10 byte header and the 8 byte footer) is a multiple of 512 bytes,
+     *  which caused read(buf, off, len) above to fail.
+     *  Happened every time with 1042 byte compressed router infos, for example.
+     *
+     *  Details:
+     *
+     *  Warning with Inflater nowrap = true:
+     *
+     *     "Note: When using the 'nowrap' option it is also necessary to provide an extra "dummy" byte as input.
+     *      This is required by the ZLIB native library in order to support certain optimizations."
+     *
+     *     http://docs.oracle.com/javase/1.5.0/docs/api/java/util/zip/Inflater.html
+     *
+     *  This is for sure:
+     *
+     *     "This is not nearly specific enough to be useful.  Where in the compressed byte array is the
+     *      extra 'dummy' byte" expected?  What is it to contain? When calling setInput() is the 'len'
+     *      argument incremented to include the dummy byte or not?"
+     *
+     *     http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4795299
+     *
+     *  This is useless:
+     *
+     *     http://www.java-forums.org/new-java/38604-decompress-un-gzip-byte.html
+     *
+     *  This seems to be the definitive answer:
+     *
+     *     "The fix simply involves copying the byte array and tacking a single null byte on to the end."
+     *
+     *     http://code.google.com/p/google-apps-sso-sample/issues/detail?id=8
+     *
+     *  @since 0.8.12
+     */
+    private static class ExtraByteInputStream extends FilterInputStream {
+        private static final byte DUMMY = 0;
+        private boolean _extraSent;
+
+        public ExtraByteInputStream(InputStream in) {
+            super(in);
+        }
+
+        @Override
+        public int read() throws IOException {
+            if (_extraSent)
+                return -1;
+            int rv = in.read();
+            if (rv >= 0)
+                return rv;
+            _extraSent = true;
+            return DUMMY;
+        }
+
+        @Override
+        public int read(byte buf[], int off, int len) throws IOException {
+            if (len == 0)
+                return 0;
+            if (_extraSent)
+                return -1;
+            int rv = in.read(buf, off, len);
+            if (rv >= 0)
+                return rv;
+            _extraSent = true;
+            buf[off] = DUMMY;
+            return 1;
+        }
+
+        @Override
+        public void close() throws IOException {
+            _extraSent = false;
+            in.close();
+        }
+
+        /** does NOT call in.reset() */
+        @Override
+        public void reset() {
+            _extraSent = false;
+        }
+
+        public InputStream getInputStream() {
+            return in;
+        }
+    }
+    
+/******
     public static void main(String args[]) {
         for (int i = 129; i < 64*1024; i++) {
             if (!test(i)) return;
@@ -279,4 +427,5 @@ public class ResettableGZIPInputStream extends InflaterInputStream {
             return false;
         }
     }
+******/
 }

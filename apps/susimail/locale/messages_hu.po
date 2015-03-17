@@ -1,0 +1,447 @@
+# I2P
+# Copyright (C) 2009 The I2P Project
+# This file is distributed under the same license as the susimail package.
+# To contribute translations, see http://www.i2p2.de/newdevelopers
+#
+# Translators:
+msgid ""
+msgstr ""
+"Project-Id-Version: I2P\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-06-03 13:26+0000\n"
+"PO-Revision-Date: 2012-06-01 16:16+0000\n"
+"Last-Translator: AdminLMH <lehetmashogy@i2pmail.org>\n"
+"Language-Team: Hungarian (http://www.transifex.net/projects/p/I2P/language/"
+"hu/)\n"
+"Language: hu\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+
+#: src/src/i2p/susi/webmail/WebMail.java:435
+msgid "unknown"
+msgstr "ismeretlen"
+
+#: src/src/i2p/susi/webmail/WebMail.java:454
+msgid "Warning: no transfer encoding found, fallback to 7bit."
+msgstr "Figyelmeztetés: Nem található átviteli kódolás, visszatérés 7bitre."
+
+#: src/src/i2p/susi/webmail/WebMail.java:459
+#, java-format
+msgid "No encoder found for encoding \\''{0}\\''."
+msgstr "Nincs kódoló a következőhöz: \\''{0}\\''."
+
+#: src/src/i2p/susi/webmail/WebMail.java:465
+msgid "Warning: no charset found, fallback to US-ASCII."
+msgstr ""
+"Figyelmeztetés: Karakterkészlet nem található, visszatérés US-ASCII-hez."
+
+#: src/src/i2p/susi/webmail/WebMail.java:479
+#, java-format
+msgid "Charset \\''{0}\\'' not supported."
+msgstr "A \\''{0}\\'' not supported. karakterkészlet nem támogatott."
+
+#: src/src/i2p/susi/webmail/WebMail.java:483
+#, java-format
+msgid "Part ({0}) not shown, because of {1}"
+msgstr "Nincs mutatva ({0}) rész, mert {1}"
+
+#: src/src/i2p/susi/webmail/WebMail.java:506
+msgid "Download"
+msgstr "Letöltés"
+
+#: src/src/i2p/susi/webmail/WebMail.java:506
+msgid "File is packed into a zipfile for security reasons."
+msgstr "A fájl zippel tömörített, biztonsági okokból."
+
+#: src/src/i2p/susi/webmail/WebMail.java:506
+#, java-format
+msgid "attachment ({0})."
+msgstr "melléklet ({0})."
+
+#: src/src/i2p/susi/webmail/WebMail.java:510
+#, java-format
+msgid "Attachment ({0})."
+msgstr "Melléklet ({0})."
+
+#: src/src/i2p/susi/webmail/WebMail.java:560
+msgid "Need username for authentication."
+msgstr "Hitelesítéshez felhasználónév szükséges."
+
+#: src/src/i2p/susi/webmail/WebMail.java:564
+msgid "Need password for authentication."
+msgstr "Hitelesítéshez jelszó szükséges."
+
+#: src/src/i2p/susi/webmail/WebMail.java:568
+msgid "Need hostname for connect."
+msgstr "A csatlakozáshoz hosztnév szükséges."
+
+#: src/src/i2p/susi/webmail/WebMail.java:573
+msgid "Need port number for pop3 connect."
+msgstr "A pop3 csatlakozáshoz port szám szükséges."
+
+#: src/src/i2p/susi/webmail/WebMail.java:580
+msgid "POP3 port number is not in range 0..65535."
+msgstr "POP3 port szám nincs a 0-65535 tartományban."
+
+#: src/src/i2p/susi/webmail/WebMail.java:586
+msgid "POP3 port number is invalid."
+msgstr "Érvénytelen POP3 port szám."
+
+#: src/src/i2p/susi/webmail/WebMail.java:592
+msgid "Need port number for smtp connect."
+msgstr "smtp kapcsolathoz szükség van port számra."
+
+#: src/src/i2p/susi/webmail/WebMail.java:599
+msgid "SMTP port number is not in range 0..65535."
+msgstr "SMTP port szám nincs a 0-65535 tartományban."
+
+#: src/src/i2p/susi/webmail/WebMail.java:605
+msgid "SMTP port number is invalid."
+msgstr "Érvénytelen SMTP port szám."
+
+#: src/src/i2p/susi/webmail/WebMail.java:652
+msgid "User logged out."
+msgstr "Felhasználó kijelentkezett."
+
+#: src/src/i2p/susi/webmail/WebMail.java:656
+msgid "Internal error, lost connection."
+msgstr "Belső hiba, a kapcsolat megszakadt."
+
+#: src/src/i2p/susi/webmail/WebMail.java:752
+#, java-format
+msgid "On {0} {1} wrote:"
+msgstr "{0}, {1} írta:"
+
+#: src/src/i2p/susi/webmail/WebMail.java:799
+msgid "begin forwarded mail"
+msgstr "Továbbított levél kezdete"
+
+#: src/src/i2p/susi/webmail/WebMail.java:821
+msgid "end forwarded mail"
+msgstr "továbbított levél vége"
+
+#: src/src/i2p/susi/webmail/WebMail.java:828
+#: src/src/i2p/susi/webmail/WebMail.java:1701
+msgid "Could not fetch mail body."
+msgstr "Levéltörzs letöltése sikertelen."
+
+#: src/src/i2p/susi/webmail/WebMail.java:856
+msgid "Message id not valid."
+msgstr "Érvénytelen üzenet azonosító (ID)."
+
+#: src/src/i2p/susi/webmail/WebMail.java:939
+#, java-format
+msgid "No Encoding found for {0}"
+msgstr "Nem található kódoló a következőhöz: {0}"
+
+#: src/src/i2p/susi/webmail/WebMail.java:943
+#, java-format
+msgid "Could not encode data: {0}"
+msgstr "Adat kódolása sikertelen: {0}"
+
+#: src/src/i2p/susi/webmail/WebMail.java:948
+#, java-format
+msgid "Error reading uploaded file: {0}"
+msgstr "Hiba a feltöltött fájl olvasásakor: {0}"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1026
+msgid "Error parsing download parameter."
+msgstr "Hiba a letöltési paraméter elemzésekor."
+
+#: src/src/i2p/susi/webmail/WebMail.java:1070
+msgid "Invalid pagesize number, resetting to default value."
+msgstr "Érvénytelen oldalméret, visszatérés az alapértelmezett értékhez."
+
+#: src/src/i2p/susi/webmail/WebMail.java:1094
+msgid "No messages marked for deletion."
+msgstr "Nincs kijelölve üzenet törlésre."
+
+#: src/src/i2p/susi/webmail/WebMail.java:1114
+#, java-format
+msgid "Error deleting message: {0}"
+msgstr "Hiba az üzenet törlésekor: {0}"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1125
+#, java-format
+msgid "1 message deleted."
+msgid_plural "{0} messages deleted."
+msgstr[0] "1 üzenet lett törölve."
+msgstr[1] "{0} üzenet lett törölve."
+
+#: src/src/i2p/susi/webmail/WebMail.java:1248
+#: src/src/i2p/susi/webmail/WebMail.java:1585
+msgid "Login"
+msgstr "Bejelentkezés"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1250
+#, java-format
+msgid "1 Message"
+msgid_plural "{0} Messages"
+msgstr[0] "1 Üzenet"
+msgstr[1] "{0} Üzenet"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1252
+msgid "Show Message"
+msgstr "Üzenet Megjelenítése"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1314
+#, java-format
+msgid "Error decoding content: {0}"
+msgstr "Hiba a dekódoláskor: {0}"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1319
+msgid "Error decoding content: No encoder found."
+msgstr "Hiba a dekódoláskor: Dekódoló nem található."
+
+#: src/src/i2p/susi/webmail/WebMail.java:1366
+msgid "no subject"
+msgstr "nincs tárgy"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1383
+msgid "Found no valid sender address."
+msgstr "Érvényes feladó cím nem található."
+
+#: src/src/i2p/susi/webmail/WebMail.java:1389
+#, java-format
+msgid "Found no valid address in \\''{0}\\''."
+msgstr "Nem található érvényes cím a következőben: \\''{0}\\''."
+
+#: src/src/i2p/susi/webmail/WebMail.java:1408
+msgid "No recipients found."
+msgstr "Címzett nem található."
+
+#: src/src/i2p/susi/webmail/WebMail.java:1415
+msgid "Quoted printable encoder not available."
+msgstr "Nem található a megjelölt nyomtatható kódoló."
+
+#: src/src/i2p/susi/webmail/WebMail.java:1420
+msgid "Header line encoder not available."
+msgstr "Fejléc kódoló nem elérhető."
+
+#: src/src/i2p/susi/webmail/WebMail.java:1471
+msgid "Mail sent."
+msgstr "Levél elküldve."
+
+#: src/src/i2p/susi/webmail/WebMail.java:1510
+msgid "Send"
+msgstr "Küldés"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1511
+msgid "Cancel"
+msgstr "Mégse"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1512
+msgid "Delete Attachment"
+msgstr "Melléklet Törlése"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1513
+#: src/src/i2p/susi/webmail/WebMail.java:1607
+#: src/src/i2p/susi/webmail/WebMail.java:1688
+msgid "Reload Config"
+msgstr "Beállítások Újratöltése"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1514
+#: src/src/i2p/susi/webmail/WebMail.java:1608
+#: src/src/i2p/susi/webmail/WebMail.java:1689
+msgid "Logout"
+msgstr "Kijelentkezés"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1537
+#: src/src/i2p/susi/webmail/WebMail.java:1693
+msgid "From:"
+msgstr "Feladó:"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1538
+msgid "To:"
+msgstr "Címzett:"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1539
+msgid "Cc:"
+msgstr "Másolat:"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1540
+msgid "Bcc:"
+msgstr "Bcc:"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1541
+#: src/src/i2p/susi/webmail/WebMail.java:1695
+msgid "Subject:"
+msgstr "Tárgy:"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1542
+msgid "Bcc to self"
+msgstr "Bcc saját részre"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1545
+msgid "New Attachment:"
+msgstr "Új Melléklet:"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1545
+msgid "Upload File"
+msgstr "Fájl Feltöltése"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1551
+msgid "Attachments:"
+msgstr "Mellékletek:"
+
+#. current postman hq length limits 16/12, new postman version 32/32
+#: src/src/i2p/susi/webmail/WebMail.java:1574
+msgid "User"
+msgstr "Felhasználó"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1575
+msgid "Password"
+msgstr "Jelszó"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1580
+msgid "Host"
+msgstr "Hoszt"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1581
+msgid "POP3-Port"
+msgstr "POP3 Port"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1582
+msgid "SMTP-Port"
+msgstr "SMTP Port"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1585
+msgid "Reset"
+msgstr "Visszaállít"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1586
+msgid "Learn about I2P mail"
+msgstr "Ismerd meg az I2P mailt"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1587
+msgid "Create Account"
+msgstr "Levélfiók Hozzáadása"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1599
+msgid "Really delete the marked messages?"
+msgstr "A kijelölt üzenetek tényleg törlésre kerüljenek?"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1599
+msgid "Yes, really delete them!"
+msgstr "Igen, tényleg töröld őket!"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1601
+#: src/src/i2p/susi/webmail/WebMail.java:1680
+msgid "New"
+msgstr "Új"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1602
+#: src/src/i2p/susi/webmail/WebMail.java:1681
+msgid "Reply"
+msgstr "Válasz"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1603
+#: src/src/i2p/susi/webmail/WebMail.java:1682
+msgid "Reply All"
+msgstr "Válasz Mindenkinek"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1604
+#: src/src/i2p/susi/webmail/WebMail.java:1683
+msgid "Forward"
+msgstr "Továbbítás"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1605
+#: src/src/i2p/susi/webmail/WebMail.java:1684
+msgid "Delete"
+msgstr "Törlés"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1606
+msgid "Check Mail"
+msgstr "Új Levelek Ellenőrzése"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1610
+msgid "Sender"
+msgstr "Feladó"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1611
+msgid "Subject"
+msgstr "Tárgy"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1612
+msgid "Date"
+msgstr "Dátum"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1613
+msgid "Size"
+msgstr "Méret"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1639
+#, java-format
+msgid "1 Byte"
+msgid_plural "{0} Bytes"
+msgstr[0] "1 bájt"
+msgstr[1] "{0} bájt"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1644
+msgid "Mark All"
+msgstr "Mindet Kijelöli"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1645
+msgid "Invert Selection"
+msgstr "Kijelölés Megfordítása"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1646
+msgid "Clear"
+msgstr "Töröl"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1649
+#: src/src/i2p/susi/webmail/WebMail.java:1650
+msgid "First"
+msgstr "Első"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1649
+#: src/src/i2p/susi/webmail/WebMail.java:1650
+#: src/src/i2p/susi/webmail/WebMail.java:1685
+msgid "Previous"
+msgstr "Előző"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1651
+#, java-format
+msgid "Page {0} of {1}"
+msgstr "{0}. oldal, összesen {1}"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1653
+#: src/src/i2p/susi/webmail/WebMail.java:1654
+msgid "Last"
+msgstr "Utolsó"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1653
+#: src/src/i2p/susi/webmail/WebMail.java:1654
+#: src/src/i2p/susi/webmail/WebMail.java:1686
+msgid "Next"
+msgstr "Következő"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1657
+msgid "Pagesize:"
+msgstr "Oldalméret:"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1658
+msgid "Set"
+msgstr "Beállít"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1668
+msgid "Really delete this message?"
+msgstr "Tényleg törlődjön ez az üzenet?"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1668
+msgid "Yes, really delete it!"
+msgstr "Igen, tényleg töröld!"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1687
+msgid "Back to Folder"
+msgstr "Visszatérés Mappához"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1694
+msgid "Date:"
+msgstr "Dátum:"
+
+#: src/src/i2p/susi/webmail/WebMail.java:1705
+msgid "Could not fetch mail."
+msgstr "Nem sikerül a levél letöltése."

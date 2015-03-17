@@ -2,7 +2,9 @@ package net.i2p.router.transport.ntcp;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import net.i2p.router.RouterContext;
 import net.i2p.util.I2PThread;
@@ -15,33 +17,35 @@ import net.i2p.util.Log;
  *
  */
 class Reader {
-    private RouterContext _context;
-    private Log _log;
-    private List _pendingConnections;
-    private List _liveReads;
-    private List _readAfterLive;
-    private List _runners;
+    private final RouterContext _context;
+    private final Log _log;
+    // TODO change to LBQ ??
+    private final List<NTCPConnection> _pendingConnections;
+    private final Set<NTCPConnection> _liveReads;
+    private final Set<NTCPConnection> _readAfterLive;
+    private final List<Runner> _runners;
     
     public Reader(RouterContext ctx) {
         _context = ctx;
         _log = ctx.logManager().getLog(getClass());
         _pendingConnections = new ArrayList(16);
-        _runners = new ArrayList(5);
-        _liveReads = new ArrayList(5);
-        _readAfterLive = new ArrayList();
+        _runners = new ArrayList(8);
+        _liveReads = new HashSet(8);
+        _readAfterLive = new HashSet(8);
     }
     
     public void startReading(int numReaders) {
-        for (int i = 0; i < numReaders; i++) {
+        for (int i = 1; i <= numReaders; i++) {
             Runner r = new Runner();
-            I2PThread t = new I2PThread(r, "NTCP read " + i, true);
+            I2PThread t = new I2PThread(r, "NTCP reader " + i + '/' + numReaders, true);
             _runners.add(r);
             t.start();
         }
     }
+
     public void stopReading() {
-        while (_runners.size() > 0) {
-            Runner r = (Runner)_runners.remove(0);
+        while (!_runners.isEmpty()) {
+            Runner r = _runners.remove(0);
             r.stop();
         }
         synchronized (_pendingConnections) {
@@ -54,9 +58,7 @@ class Reader {
         boolean already = false;
         synchronized (_pendingConnections) {
             if (_liveReads.contains(con)) {
-                if (!_readAfterLive.contains(con)) {
-                    _readAfterLive.add(con);
-                }
+                _readAfterLive.add(con);
                 already = true;
             } else if (!_pendingConnections.contains(con)) {
                 _pendingConnections.add(con);
@@ -66,6 +68,7 @@ class Reader {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("wantsRead: " + con + " already live? " + already);
     }
+
     public void connectionClosed(NTCPConnection con) {
         synchronized (_pendingConnections) {
             _readAfterLive.remove(con);
@@ -76,8 +79,11 @@ class Reader {
     
     private class Runner implements Runnable {
         private boolean _stop;
-        public Runner() { _stop = false; }
+
+        public Runner() {}
+
         public void stop() { _stop = true; }
+
         public void run() {
             if (_log.shouldLog(Log.INFO)) _log.info("Starting reader");
             NTCPConnection con = null;
@@ -90,10 +96,10 @@ class Reader {
                         } else {
                             _liveReads.remove(con);
                             con = null;
-                            if (_pendingConnections.size() <= 0) {
+                            if (_pendingConnections.isEmpty()) {
                                 _pendingConnections.wait();
                             } else {
-                                con = (NTCPConnection)_pendingConnections.remove(0);
+                                con = _pendingConnections.remove(0);
                                 _liveReads.add(con);
                             }
                         }
@@ -116,7 +122,8 @@ class Reader {
     }
     
     /**
-     * process everything read
+     * Process everything read.
+     * Return read buffers back to the pool as we process them.
      */
     private void processRead(NTCPConnection con) {
         if (con.isClosed())
@@ -127,6 +134,7 @@ class Reader {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Processing read buffer as an establishment for " + con + " with [" + est + "]");
             if (est == null) {
+                EventPumper.releaseBuf(buf);
                 if (!con.isEstablished()) {
                     // establish state is only removed when the connection is fully established,
                     // yet if that happens, con.isEstablished() should return true...
@@ -134,38 +142,39 @@ class Reader {
                 } else {
                     // hmm, there shouldn't be a race here - only one reader should 
                     // be running on a con at a time...
-                    if (_log.shouldLog(Log.ERROR))
-                        _log.error("no establishment state but " + con + " is established... race?");
+                    _log.error("no establishment state but " + con + " is established... race?");
                     break;
                 }
             }
             if (est.isComplete()) {
                 // why is it complete yet !con.isEstablished?
-                if (_log.shouldLog(Log.ERROR))
                     _log.error("establishment state [" + est + "] is complete, yet the connection isn't established? " 
                                + con.isEstablished() + " (inbound? " + con.isInbound() + " " + con + ")");
+                EventPumper.releaseBuf(buf);
                 break;
             }
             est.receive(buf);
+            EventPumper.releaseBuf(buf);
             if (est.isCorrupt()) {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("closing connection on establishment because: " +est.getError(), est.getException());
                 if (!est.getFailedBySkew())
-                    _context.statManager().addRateData("ntcp.receiveCorruptEstablishment", 1, 0);
+                    _context.statManager().addRateData("ntcp.receiveCorruptEstablishment", 1);
                 con.close();
                 return;
-            } else if (buf.remaining() <= 0) {
-                con.removeReadBuf(buf);
             }
             if (est.isComplete() && est.getExtraBytes() != null)
                 con.recvEncryptedI2NP(ByteBuffer.wrap(est.getExtraBytes()));
         }
+        // catch race?
+        if (!con.isEstablished())
+            return;
         while (!con.isClosed() && (buf = con.getNextReadBuf()) != null) {
             // decrypt the data and push it into an i2np message
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Processing read buffer as part of an i2np message (" + buf.remaining() + " bytes)");
             con.recvEncryptedI2NP(buf);
-            con.removeReadBuf(buf);
+            EventPumper.releaseBuf(buf);
         }
     }
 }

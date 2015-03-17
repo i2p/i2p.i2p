@@ -11,15 +11,15 @@ package net.i2p.router.startup;
 import net.i2p.router.Job;
 import net.i2p.router.JobImpl;
 import net.i2p.router.RouterContext;
-import net.i2p.util.Log;
 
+/**
+ *  For future restricted routes. Does nothing now.
+ */
 public class BuildTrustedLinksJob extends JobImpl {
-    private Log _log;
-    private Job _next;
+    private final Job _next;
     
     public BuildTrustedLinksJob(RouterContext context, Job next) {
         super(context);
-        _log = getContext().logManager().getLog(BuildTrustedLinksJob.class);
         _next = next;
     }
     

@@ -36,6 +36,7 @@ import org.cybergarage.net.*;
 import org.cybergarage.util.*;
 import org.cybergarage.http.*;
 import org.cybergarage.upnp.*;
+import org.cybergarage.util.Debug;
 
 /**
  * 
@@ -63,6 +64,7 @@ public class SSDPNotifySocket extends HTTPMUSocket implements Runnable
 			useIPv6Address = true;
 		}
 		open(addr, SSDP.PORT, bindAddr);
+		Debug.message("Opened SSDP notify socket at " + bindAddr + ':' + SSDP.PORT);
 		setControlPoint(null);
 	}
 
@@ -130,7 +132,8 @@ public class SSDPNotifySocket extends HTTPMUSocket implements Runnable
 			InetAddress maddr = getMulticastInetAddress();
 			InetAddress pmaddr = packet.getHostInetAddress();
 			if (maddr.equals(pmaddr) == false) {
-				Debug.warning("Invalidate Multicast Recieved from IP " + maddr + " on " + pmaddr);
+				// I2P
+				//Debug.warning("Invalidate Multicast Recieved : " + maddr + "," + pmaddr);
 				continue;
 			}
 			//TODO Must be performed on a different Thread in order to prevent UDP packet losses.
@@ -144,8 +147,9 @@ public class SSDPNotifySocket extends HTTPMUSocket implements Runnable
 		String localAddr = this.getLocalAddress();
 		// localAddr is null on Android m3-rc37a (01/30/08)
 		if (localAddr != null && 0 < localAddr.length()) {
-			name.append(this.getLocalAddress()).append(':');
-			name.append(this.getLocalPort()).append(" -> ");
+			// I2P hide address from thread dumps
+			//name.append(this.getLocalAddress()).append(':');
+			//name.append(this.getLocalPort()).append(" -> ");
 			name.append(this.getMulticastAddress()).append(':');
 			name.append(this.getMulticastPort());
 		}

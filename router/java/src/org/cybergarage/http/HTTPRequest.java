@@ -59,6 +59,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.net.Socket;
+import java.net.SocketAddress;
 import java.net.SocketException;
 import java.net.InetSocketAddress;
 import java.util.StringTokenizer;
@@ -401,11 +402,21 @@ public class HTTPRequest extends HTTPPacket
 		InputStream in = null;
 		
  		try {
- 			if (postSocket == null){
- 				// Thanks for Hao Hu 
+ 			if (postSocket == null) {
+				// Mod for I2P
+				// We can't handle the default system soTimeout of 3 minutes or so
+				// as when the device goes away, this hangs the display of peers.jsp
+				// and who knows what else.
+				// Set the timeout to be nice and short, the device should be local and fast.
+				// Yeah, the UPnP standard is a minute or something, too bad.
+				// If he can't get back to us in a few seconds, forget it.
+				// And set the soTimeout to 2 second (for reads).
+				//postSocket = new Socket(host, port);
 				postSocket = new Socket();
-				postSocket.connect(new InetSocketAddress(host, port), HTTPServer.DEFAULT_TIMEOUT);
- 			}
+				postSocket.setSoTimeout(2000);
+				SocketAddress sa = new InetSocketAddress(host, port);
+				postSocket.connect(sa, 3000);
+			}
 
 			out = postSocket.getOutputStream();
 			PrintStream pout = new PrintStream(out);
@@ -522,6 +533,6 @@ public class HTTPRequest extends HTTPPacket
 
 	public void print()
 	{
-		System.out.println(toString());
+		Debug.message(toString());
 	}
 }

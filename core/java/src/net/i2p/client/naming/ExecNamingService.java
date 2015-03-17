@@ -5,10 +5,11 @@
 package net.i2p.client.naming;
 
 import java.io.InputStream;
+import java.util.Locale;
+import java.util.Properties;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.Destination;
-import net.i2p.util.Log;
 
 /**
  * An interface to an external naming service program, with in-memory caching.
@@ -27,6 +28,7 @@ import net.i2p.util.Log;
  *
  * Can be used from MetaNamingService, (e.g. after HostsTxtNamingService),
  * or as the sole naming service.
+ * Supports caching, b32, and b64.
  *
  * Sample chained config to put in configadvanced.jsp (restart required):
  *
@@ -40,13 +42,12 @@ import net.i2p.util.Log;
  * i2p.naming.exec.command=/usr/local/bin/i2presolve
  *
  */
-public class ExecNamingService extends NamingService {
+public class ExecNamingService extends DummyNamingService {
 
     private final static String PROP_EXEC_CMD = "i2p.naming.exec.command";
     private final static String DEFAULT_EXEC_CMD = "/usr/local/bin/i2presolve";
     private final static String PROP_SHELL_CMD = "i2p.naming.exec.shell";
     private final static String DEFAULT_SHELL_CMD = "/bin/bash";
-    private final static Log _log = new Log(ExecNamingService.class);
 
     /** 
      * The naming service should only be constructed and accessed through the 
@@ -59,17 +60,15 @@ public class ExecNamingService extends NamingService {
     }
     
     @Override
-    public Destination lookup(String hostname) {
-        // If it's long, assume it's a key.
-        if (hostname.length() >= DEST_SIZE)
-            return lookupBase64(hostname);
-
-        hostname = hostname.toLowerCase();
-
-        // check the cache
-        Destination d = getCache(hostname);
+    public Destination lookup(String hostname, Properties lookupOptions, Properties storedOptions) {
+        Destination d = super.lookup(hostname, null, null);
         if (d != null)
             return d;
+        // Base32 failed?
+        if (hostname.length() == BASE32_HASH_LENGTH + 8 && hostname.toLowerCase(Locale.US).endsWith(".b32.i2p"))
+            return null;
+
+        hostname = hostname.toLowerCase(Locale.US);
 
         // lookup
         String key = fetchAddr(hostname);	  	
@@ -83,7 +82,6 @@ public class ExecNamingService extends NamingService {
     }
 
     // FIXME allow larger Dests for non-null Certs
-    private static final int DEST_SIZE = 516;                    // Std. Base64 length (no certificate)
     private static final int MAX_RESPONSE = DEST_SIZE + 68 + 10; // allow for hostname= and some trailing stuff
     private String fetchAddr(String hostname) {
         String[] commandArr = new String[3];
@@ -112,7 +110,7 @@ public class ExecNamingService extends NamingService {
             if (key.startsWith(hostname + "="))   // strip hostname=
                 key = key.substring(hostname.length() + 1); 
             key = key.substring(0, DEST_SIZE);    // catch IndexOutOfBounds exception below
-            if (!key.endsWith("AAAA")) {
+            if (!key.endsWith("AA")) {
                 _log.error("Invalid key: " + command);
                 return null;
             }
@@ -124,11 +122,6 @@ public class ExecNamingService extends NamingService {
         } catch (Throwable t) {
             _log.error("Error fetching the addr", t);
         }
-        return null;
-    }
-    
-    @Override
-    public String reverseLookup(Destination dest) {
         return null;
     }
 }

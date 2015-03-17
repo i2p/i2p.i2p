@@ -9,11 +9,12 @@ package net.i2p.util;
  *
  */
 
+import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.util.List;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.util.Queue;
 
 /**
  * Log writer thread that pulls log records from the LogManager, writes them to
@@ -22,22 +23,24 @@ import java.util.List;
  *
  */
 class LogWriter implements Runnable {
-    private final static long CONFIG_READ_ITERVAL = 10 * 1000;
+    /** every 10 seconds? why? Just have the gui force a reread after a change?? */
+    private final static long CONFIG_READ_INTERVAL = 50 * 1000;
+    private final static long FLUSH_INTERVAL = 9 * 1000;
     private long _lastReadConfig = 0;
     private long _numBytesInCurrentFile = 0;
-    private OutputStream _currentOut; // = System.out
+    // volatile as it changes on log file rotation
+    private volatile Writer _currentOut;
     private int _rotationNum = -1;
-    private String _logFilenamePattern;
     private File _currentFile;
-    private LogManager _manager;
+    private final LogManager _manager;
 
-    private boolean _write;
+    private volatile boolean _write;
+    private static final int MAX_DISKFULL_MESSAGES = 8;
+    private int _diskFullMessageCount;
     
-    private LogWriter() { // nop
-    }
-
     public LogWriter(LogManager manager) {
         _manager = manager;
+        _lastReadConfig = Clock.getInstance().now();
     }
 
     public void stopWriting() {
@@ -47,32 +50,38 @@ class LogWriter implements Runnable {
     public void run() {
         _write = true;
         try {
-            rotateFile();
+            // Don't rotate and open until needed
+            //rotateFile();
             while (_write) {
                 flushRecords();
-                rereadConfig();
+                if (_write)
+                    rereadConfig();
             }
-            System.err.println("Done writing");
+            //System.err.println("Done writing");
         } catch (Exception e) {
-            System.err.println("Error writing the logs: " + e.getMessage());
+            System.err.println("Error writing the log: " + e);
             e.printStackTrace();
         }
+        closeFile();
     }
 
     public void flushRecords() { flushRecords(true); }
     public void flushRecords(boolean shouldWait) {
         try {
-            List records = _manager._removeAll();
+            // zero copy, drain the manager queue directly
+            Queue<LogRecord> records = _manager.getQueue();
             if (records == null) return;
-            for (int i = 0; i < records.size(); i++) {
-                LogRecord rec = (LogRecord) records.get(i);
-                writeRecord(rec);
-            }
-            if (records.size() > 0) {
+            if (!records.isEmpty()) {
+                LogRecord rec;
+                while ((rec = records.poll()) != null) {
+                    writeRecord(rec);
+                }
                 try {
-                    _currentOut.flush();
+                    if (_currentOut != null)
+                        _currentOut.flush();
                 } catch (IOException ioe) {
-                    System.err.println("Error flushing the records");
+                    if (_write && ++_diskFullMessageCount < MAX_DISKFULL_MESSAGES)
+                        System.err.println("Error writing the router log - disk full? " + ioe);
                 }
             }
         } catch (Throwable t) {
@@ -81,7 +90,7 @@ class LogWriter implements Runnable {
             if (shouldWait) {
                 try { 
                     synchronized (this) {
-                        this.wait(10*1000); 
+                        this.wait(FLUSH_INTERVAL); 
                     }
                 } catch (InterruptedException ie) { // nop
                 }
@@ -89,17 +98,20 @@ class LogWriter implements Runnable {
         }
     }
     
-    
+    public String currentFile() {
+        return _currentFile != null ? _currentFile.getAbsolutePath() : "uninitialized";
+    }
+
     private void rereadConfig() {
         long now = Clock.getInstance().now();
-        if (now - _lastReadConfig > CONFIG_READ_ITERVAL) {
+        if (now - _lastReadConfig > CONFIG_READ_INTERVAL) {
             _manager.rereadConfig();
             _lastReadConfig = now;
         }
     }
 
     private void writeRecord(LogRecord rec) {
-        String val = LogRecordFormatter.formatRecord(_manager, rec);
+        String val = LogRecordFormatter.formatRecord(_manager, rec, true);
         writeRecord(val);
 
         // we always add to the console buffer, but only sometimes write to stdout
@@ -108,24 +120,33 @@ class LogWriter implements Runnable {
             _manager.getBuffer().addCritical(val);
         if (_manager.getDisplayOnScreenLevel() <= rec.getPriority()) {
             if (_manager.displayOnScreen()) {
-                System.out.print(val);
+                // wrapper log already does time stamps, so reformat without the date
+                if (_manager.getContext().hasWrapper())
+                    System.out.print(LogRecordFormatter.formatRecord(_manager, rec, false));
+                else
+                    System.out.print(val);
             }
         }
     }
 
     private void writeRecord(String val) {
         if (val == null) return;
-        if (_currentOut == null) rotateFile();
+        if (_currentOut == null) {
+            rotateFile();
+            if (_currentOut == null)
+                return; // hosed
+        }
 
-        byte b[] = new byte[val.length()];
-        for (int i = 0; i < b.length; i++)
-            b[i] = (byte)val.charAt(i);
         try {
-            _currentOut.write(b);
-            _numBytesInCurrentFile += b.length;
+            _currentOut.write(val);
+            // may be a little off if a lot of multi-byte chars, but unlikely
+            _numBytesInCurrentFile += val.length();
         } catch (Throwable t) {
-            System.err.println("Error writing record, disk full?");
-            t.printStackTrace();
+            if (!_write)
+                return;
+            if (++_diskFullMessageCount < MAX_DISKFULL_MESSAGES)
+                System.err.println("Error writing log, disk full? " + t);
+            //t.printStackTrace();
         }
         if (_numBytesInCurrentFile >= _manager.getFileSize()) {
             rotateFile();
@@ -144,22 +165,33 @@ class LogWriter implements Runnable {
         File parent = f.getParentFile();
         if (parent != null) {
             if (!parent.exists()) {
-                boolean ok = parent.mkdirs();
+                File sd = new SecureDirectory(parent.getAbsolutePath());
+                boolean ok = sd.mkdirs();
                 if (!ok) {
-                    System.err.println("Unable to create the parent directy: " + parent.getAbsolutePath());
-                    System.exit(0);
+                    System.err.println("Unable to create the parent directory: " + parent.getAbsolutePath());
+                    //System.exit(0);
                 }
             }
             if (!parent.isDirectory()) {
-                System.err.println("wtf, we cannot put the logs in a subdirectory of a plain file!  we want to stre the log as " + f.getAbsolutePath());
-                System.exit(0);
+                System.err.println("Cannot put the logs in a subdirectory of a plain file: " + f.getAbsolutePath());
+                //System.exit(0);
             }
         }
+        closeFile();
         try {
-            _currentOut = new FileOutputStream(f);
+            _currentOut = new BufferedWriter(new OutputStreamWriter(new SecureFileOutputStream(f), "UTF-8"));
         } catch (IOException ioe) {
-            System.err.println("Error rotating into [" + f.getAbsolutePath() + "]");
-            ioe.printStackTrace();
+            if (++_diskFullMessageCount < MAX_DISKFULL_MESSAGES)
+                System.err.println("Error creating log file [" + f.getAbsolutePath() + "]" + ioe);
+        }
+    }
+
+    private void closeFile() {
+        Writer out = _currentOut;
+        if (out != null) {
+            try {
+                out.close();
+            } catch (IOException ioe) {}
         }
     }
 
@@ -168,31 +200,44 @@ class LogWriter implements Runnable {
      *
      */
     private File getNextFile(String pattern) {
-        File f = null;
+        File f = new File(pattern);
+        File base = null;
+        if (!f.isAbsolute())
+            base = _manager.getContext().getLogDir();
 
         if ( (pattern.indexOf('#') < 0) && (pattern.indexOf('@') <= 0) ) {
-            return new File(pattern);
+            if (base != null)
+                return new File(base, pattern);
+            else
+                return f;
         }
         
         int max = _manager.getRotationLimit();
         if (_rotationNum == -1) {
-            return getFirstFile(pattern, max);
+            return getFirstFile(base, pattern, max);
         }
              
         // we're in rotation, just go to the next  
         _rotationNum++;
         if (_rotationNum > max) _rotationNum = 0;
 
-        return new File(replace(pattern, _rotationNum));
+        String newf = replace(pattern, _rotationNum);
+        if (base != null)
+            return new File(base, newf);
+        return new File(newf);
     }
 
     /**
      * Retrieve the first file, updating the rotation number accordingly
      *
      */
-    private File getFirstFile(String pattern, int max) {
+    private File getFirstFile(File base, String pattern, int max) {
         for (int i = 0; i < max; i++) {
-            File f = new File(replace(pattern, i));
+            File f;
+            if (base != null)
+                f = new File(base, replace(pattern, i));
+            else
+                f = new File(replace(pattern, i));
             if (!f.exists()) {
                 _rotationNum = i;
                 return f;
@@ -202,7 +247,11 @@ class LogWriter implements Runnable {
         // all exist, pick the oldest to replace
         File oldest = null;
         for (int i = 0; i < max; i++) {
-            File f = new File(replace(pattern, i));
+            File f;
+            if (base != null)
+                f = new File(base, replace(pattern, i));
+            else
+                f = new File(replace(pattern, i));
             if (oldest == null) {
                 oldest = f;
             } else {
@@ -217,7 +266,7 @@ class LogWriter implements Runnable {
 
     private static final String replace(String pattern, int num) {
         char c[] = pattern.toCharArray();
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         for (int i = 0; i < c.length; i++) {
             if ( (c[i] != '#') && (c[i] != '@') )
                 buf.append(c[i]);

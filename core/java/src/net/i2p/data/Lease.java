@@ -15,7 +15,6 @@ import java.io.OutputStream;
 import java.util.Date;
 
 import net.i2p.util.Clock;
-import net.i2p.util.Log;
 
 /**
  * Defines the proof that a particular router / tunnel is allowed to receive
@@ -24,19 +23,13 @@ import net.i2p.util.Log;
  * @author jrandom
  */
 public class Lease extends DataStructureImpl {
-    private final static Log _log = new Log(Lease.class);
     private Hash _gateway;
     private TunnelId _tunnelId;
     private Date _end;
-    private int _numSuccess;
-    private int _numFailure;
+    //private int _numSuccess;
+    //private int _numFailure;
 
     public Lease() {
-        setGateway(null);
-        setTunnelId(null);
-        setEndDate(null);
-        setNumSuccess(0);
-        setNumFailure(0);
     }
 
     /** Retrieve the router at which the destination can be contacted
@@ -79,27 +72,39 @@ public class Lease extends DataStructureImpl {
      * Transient attribute of the lease, used to note how many times messages sent
      * to the destination through the current lease were successful.
      *
+     * @deprecated unused
      */
+/****
     public int getNumSuccess() {
         return _numSuccess;
     }
+****/
 
+    /** @deprecated unused */
+/****
     public void setNumSuccess(int num) {
         _numSuccess = num;
     }
+****/
 
     /**
      * Transient attribute of the lease, used to note how many times messages sent
      * to the destination through the current lease failed.
      *
+     * @deprecated unused
      */
+/****
     public int getNumFailure() {
         return _numFailure;
     }
+****/
 
+    /** @deprecated unused */
+/****
     public void setNumFailure(int num) {
         _numFailure = num;
     }
+****/
 
     /** has this lease already expired? */
     public boolean isExpired() {
@@ -113,8 +118,9 @@ public class Lease extends DataStructureImpl {
     }
     
     public void readBytes(InputStream in) throws DataFormatException, IOException {
-        _gateway = new Hash();
-        _gateway.readBytes(in);
+        //_gateway = new Hash();
+        //_gateway.readBytes(in);
+        _gateway = Hash.create(in);
         _tunnelId = new TunnelId();
         _tunnelId.readBytes(in);
         _end = DataHelper.readDate(in);
@@ -133,25 +139,25 @@ public class Lease extends DataStructureImpl {
     public boolean equals(Object object) {
         if ((object == null) || !(object instanceof Lease)) return false;
         Lease lse = (Lease) object;
-        return DataHelper.eq(getEndDate(), lse.getEndDate())
-               && DataHelper.eq(getTunnelId(), lse.getTunnelId())
-               && DataHelper.eq(getGateway(), lse.getGateway());
+        return DataHelper.eq(_end, lse.getEndDate())
+               && DataHelper.eq(_tunnelId, lse.getTunnelId())
+               && DataHelper.eq(_gateway, lse.getGateway());
 
     }
     
     @Override
     public int hashCode() {
-        return DataHelper.hashCode(getEndDate()) + DataHelper.hashCode(getGateway())
-               + DataHelper.hashCode(getTunnelId());
+        return DataHelper.hashCode(_end) + DataHelper.hashCode(_gateway)
+               + DataHelper.hashCode(_tunnelId);
     }
     
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer(128);
+        StringBuilder buf = new StringBuilder(128);
         buf.append("[Lease: ");
-        buf.append("\n\tEnd Date: ").append(getEndDate());
-        buf.append("\n\tGateway: ").append(getGateway());
-        buf.append("\n\tTunnelId: ").append(getTunnelId());
+        buf.append("\n\tEnd Date: ").append(_end);
+        buf.append("\n\tGateway: ").append(_gateway);
+        buf.append("\n\tTunnelId: ").append(_tunnelId);
         buf.append("]");
         return buf.toString();
     }

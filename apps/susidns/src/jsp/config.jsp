@@ -22,77 +22,122 @@
  *  
  * $Revision: 1.1 $
  */
+
+    // http://www.crazysquirrel.com/computing/general/form-encoding.jspx
+    if (request.getCharacterEncoding() == null)
+        request.setCharacterEncoding("UTF-8");
+
+    response.setHeader("X-Frame-Options", "SAMEORIGIN");
+
 %>
+<%@page pageEncoding="UTF-8"%>
+<%@page trimDirectiveWhitespaces="true"%>
 <%@ page contentType="text/html" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <jsp:useBean id="version" class="i2p.susi.dns.VersionBean" scope="application"/>
 <jsp:useBean id="cfg" class="i2p.susi.dns.ConfigBean" scope="session"/>
+<jsp:useBean id="base" class="i2p.susi.dns.BaseBean" scope="session" />
+<jsp:useBean id="intl" class="i2p.susi.dns.Messages" scope="application" />
 <jsp:setProperty name="cfg" property="*" />
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
-<title>configuration - susidns v${version.version}</title>
-<link rel="stylesheet" type="text/css" href="css.css">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title><%=intl._("configuration")%> - susidns</title>
+<link rel="stylesheet" type="text/css" href="<%=base.getTheme()%>susidns.css">
 </head>
 <body>
+<div class="page">
 <div id="logo">
-<img src="images/logo.png" alt="susidns logo" border="0"/>
-</div>
+<a href="index"><img src="<%=base.getTheme()%>images/logo.png" alt="" title="<%=intl._("Overview")%>" border="0"/></a>
+</div><hr>
 <div id="navi">
 <p>
-addressbooks
-<a href="addressbook.jsp?book=master">master</a> |
-<a href="addressbook.jsp?book=router">router</a> |
-<a href="addressbook.jsp?book=published">published</a> |
-<a href="addressbook.jsp?book=private">private</a> *
-<a href="subscriptions.jsp">subscriptions</a> *
-configuration *
-<a href="index.jsp">overview</a>
+<%=intl._("Address books")%>:
+<a href="addressbook?book=private"><%=intl._("private")%></a> |
+<a href="addressbook?book=master"><%=intl._("master")%></a> |
+<a href="addressbook?book=router"><%=intl._("router")%></a> |
+<a href="addressbook?book=published"><%=intl._("published")%></a> *
+<a href="subscriptions"><%=intl._("Subscriptions")%></a> *
+<%=intl._("Configuration")%> *
+<a href="index"><%=intl._("Overview")%></a>
 </p>
-</div>
+</div><hr>
 <div id="headline">
 <h3>${cfg.fileName}</h3>
 </div>
 <div id="messages">${cfg.messages}</div>
-<form method="POST" action="config.jsp">
+<form method="POST" action="config">
 <div id="config">
-<input type="hidden" name="serial" value="${cfg.serial}" />
+<input type="hidden" name="serial" value="${cfg.serial}" >
 <textarea name="config" rows="10" cols="80">${cfg.config}</textarea>
 </div>
 <div id="buttons">
-<input type="image" src="images/save.png" name="action" value="save" alt="Save Config"/>
-<input type="image" src="images/reload.png" name="action" value="reload" alt="Reload Config"/>
+<input class="reload" type="submit" name="action" value="<%=intl._("Reload")%>" >
+<input class="accept" type="submit" name="action" value="<%=intl._("Save")%>" >
 </div>
 </form>
 <div id="help">
-<h3>Hints</h3>
+<h3><%=intl._("Hints")%></h3>
 <ol>
-<li>All file or directory paths here are relative to the addressbook's working directory, which normally
-is located at $I2P/addressbook/.</li>
-<li>If you want to manually add lines to an addressbook, add them to the private or master addressbooks. The router
-addressbook and the published addressbook are overwritten by the addressbook application.</li>
-<li><b>Important:</b>When you publish your addressbook, <b>ALL</b> destinations from the master and router addressbooks appear there.
-Use the private addressbook for private destinations, these are not published.
+<li>
+<%=intl._("File and directory paths here are relative to the addressbook's working directory, which is normally ~/.i2p/addressbook/ (Linux) or %APPDATA%\\I2P\\addressbook\\ (Windows).")%>
+</li>
+<li>
+<%=intl._("If you want to manually add lines to an addressbook, add them to the private or master addressbooks.")%>
+<%=intl._("The router addressbook and the published addressbook are updated by the addressbook application.")%>
+</li>
+<li>
+<%=intl._("When you publish your addressbook, ALL destinations from the master and router addressbooks appear there.")%>
+<%=intl._("Use the private addressbook for private destinations, these are not published.")%>
 </li>
 </ol>
-<h3>Options</h3>
+<h3><%=intl._("Options")%></h3>
 <ul>
-<li><b>subscriptions</b> - file containing the list of subscriptions URLs (no need to change)</li>
-<li><b>update_delay</b> - update interval in hours (no need to change)</li>
-<li><b>published_addressbook</b> - your public hosts.txt file (choose a path within your webserver document root)</li>
-<li><b>router_addressbook</b> - your hosts.txt (don't change)</li>
-<li><b>master_addressbook</b> - your personal addressbook, it never gets overwritten by the addressbook (don't change)</li>
-<li><b>private_addressbook</b> - your private addressbook, it is never published (defaults to ../privatehosts.txt, don't change)</li>
-<li><b>proxy_port</b> - http port for your eepProxy (no need to change)</li>
-<li><b>proxy_host</b> - hostname for your eepProxy (no need to change)</li>
-<li><b>should_publish</b> - true/false whether to write the published addressbook</li>
-<li><b>etags</b> - file containing the etags header from the fetched subscription URLs (no need to change)</li>
-<li><b>last_modified</b> - file containing the modification timestamp for each fetched subscription URL (no need to change)</li>
-<li><b>log</b> - file to log activity to (change to /dev/null if you like)</li>
+<li><b>subscriptions</b> -
+<%=intl._("File containing the list of subscriptions URLs (no need to change)")%>
+</li>
+<li><b>update_delay</b> -
+<%=intl._("Update interval in hours")%>
+</li>
+<li><b>published_addressbook</b> -
+<%=intl._("Your public hosts.txt file (choose a path within your webserver document root)")%>
+</li>
+<li><b>router_addressbook</b> -
+<%=intl._("Your hosts.txt (don't change)")%>
+</li>
+<li><b>master_addressbook</b> -
+<%=intl._("Your personal addressbook, these hosts will be published")%>
+</li>
+<li><b>private_addressbook</b> -
+<%=intl._("Your private addressbook, it is never published")%>
+</li>
+<li><b>proxy_port</b> -
+<%=intl._("Port for your eepProxy (no need to change)")%>
+</li>
+<li><b>proxy_host</b> -
+<%=intl._("Hostname for your eepProxy (no need to change)")%>
+</li>
+<li><b>should_publish</b> -
+<%=intl._("Whether to update the published addressbook")%>
+</li>
+<li><b>etags</b> -
+<%=intl._("File containing the etags header from the fetched subscription URLs (no need to change)")%>
+</li>
+<li><b>last_modified</b> -
+<%=intl._("File containing the modification timestamp for each fetched subscription URL (no need to change)")%>
+</li>
+<li><b>log</b> -
+<%=intl._("File to log activity to (change to /dev/null if you like)")%>
+</li>
+<li><b>theme</b> -
+<%=intl._("Name of the theme to use (defaults to 'light')")%>
+</li>
 </ul>
-</div>
+</div><hr>
 <div id="footer">
 <p class="footer">susidns v${version.version} &copy; <a href="${version.url}">susi</a> 2005 </p>
+</div>
 </div>
 </body>
 </html>

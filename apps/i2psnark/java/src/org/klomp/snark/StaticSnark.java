@@ -38,6 +38,7 @@ public class StaticSnark
     //Security.addProvider(gnu);
 
     // And finally call the normal starting point.
-    Snark.main(args);
+    //Snark.main(args);
+    System.err.println("unsupported");
   }
 }

@@ -11,6 +11,7 @@ package net.i2p.client.datagram;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
+import net.i2p.I2PAppContext;
 import net.i2p.client.I2PSession;
 import net.i2p.crypto.DSAEngine;
 import net.i2p.crypto.SHA256Generator;
@@ -26,17 +27,15 @@ import net.i2p.util.Log;
  */
 public final class I2PDatagramMaker {
 
-    private static Log _log = new Log(I2PDatagramMaker.class);
+    private static final int DGRAM_BUFSIZE = 32768;
 
-    private static int DGRAM_BUFSIZE = 32768;
+    private final SHA256Generator hashGen = SHA256Generator.getInstance();
+    private final DSAEngine dsaEng = DSAEngine.getInstance();
 
-    private SHA256Generator hashGen = SHA256Generator.getInstance();
-    private DSAEngine dsaEng = DSAEngine.getInstance();
+    private SigningPrivateKey sxPrivKey;
+    private byte[] sxDestBytes;
 
-    private SigningPrivateKey sxPrivKey = null;
-    private byte[] sxDestBytes = null;
-
-    private ByteArrayOutputStream sxDGram = new ByteArrayOutputStream(DGRAM_BUFSIZE);
+    private final ByteArrayOutputStream sxDGram = new ByteArrayOutputStream(DGRAM_BUFSIZE);
 
     /**
      * Construct a new I2PDatagramMaker that will be able to create I2P
@@ -45,10 +44,21 @@ public final class I2PDatagramMaker {
      * @param session I2PSession used to send I2PDatagrams through
      */
     public I2PDatagramMaker(I2PSession session) {
+        this();
+        this.setI2PDatagramMaker(session);
+    }
+    /**
+     * Construct a new I2PDatagramMaker that is null.
+     * Use setI2PDatagramMaker to set the parameters.
+     */
+    public I2PDatagramMaker() {
+        // nop
+    }
+
+    public void setI2PDatagramMaker(I2PSession session) {
         sxPrivKey = session.getPrivateKey();
         sxDestBytes = session.getMyDestination().toByteArray();
     }
-
     /**
      * Make a repliable I2P datagram containing the specified payload.
      *
@@ -59,18 +69,20 @@ public final class I2PDatagramMaker {
         
         try {
             sxDGram.write(sxDestBytes);
-        
+            
             dsaEng.sign(hashGen.calculateHash(payload).toByteArray(),
                         sxPrivKey).writeBytes(sxDGram);
-
+            
             sxDGram.write(payload);
-
+            
             return sxDGram.toByteArray();
         } catch (IOException e) {
-            _log.error("Caught IOException", e);
+            Log log = I2PAppContext.getGlobalContext().logManager().getLog(I2PDatagramMaker.class);
+            log.error("Caught IOException", e);
             return null;
         } catch (DataFormatException e) {
-            _log.error("Caught DataFormatException", e);
+            Log log = I2PAppContext.getGlobalContext().logManager().getLog(I2PDatagramMaker.class);
+            log.error("Caught DataFormatException", e);
             return null;
         }
     }

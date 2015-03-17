@@ -1,8 +1,7 @@
 package net.i2p.util;
 
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 import net.i2p.I2PAppContext;
 import net.i2p.time.Timestamper;
@@ -19,48 +18,54 @@ import net.i2p.time.Timestamper;
  *
  */
 public class Clock implements Timestamper.UpdateListener {
-    protected I2PAppContext _context;
-    private Timestamper _timestamper;
+    protected final I2PAppContext _context;
     protected long _startedOn;
     protected boolean _statCreated;
+    protected volatile long _offset;
+    protected boolean _alreadyChanged;
+    private final Set<ClockUpdateListener> _listeners;
     
     public Clock(I2PAppContext context) {
         _context = context;
-        _offset = 0;
-        _alreadyChanged = false;
-        _listeners = new HashSet(1);
-        _timestamper = new Timestamper(context, this);
+        _listeners = new CopyOnWriteArraySet();
         _startedOn = System.currentTimeMillis();
-        _statCreated = false;
     }
+
     public static Clock getInstance() {
         return I2PAppContext.getGlobalContext().clock();
     }
     
-    public Timestamper getTimestamper() { return _timestamper; }
+    /**
+     *  This is a dummy, see RouterClock and RouterTimestamper for the real thing
+     */
+    public Timestamper getTimestamper() { return new Timestamper(); }
     
     /** we fetch it on demand to avoid circular dependencies (logging uses the clock) */
     protected Log getLog() { return _context.logManager().getLog(Clock.class); }
-    
-    protected volatile long _offset;
-    protected boolean _alreadyChanged;
-    private Set _listeners;
 
     /** if the clock is skewed by 3+ days, fuck 'em */
     public final static long MAX_OFFSET = 3 * 24 * 60 * 60 * 1000;
     /** after we've started up and shifted the clock, don't allow shifts of more than 10 minutes */
     public final static long MAX_LIVE_OFFSET = 10 * 60 * 1000;
-    /** if the clock skewed changes by less than 1s, ignore the update (so we don't slide all over the place) */
-    public final static long MIN_OFFSET_CHANGE = 10 * 1000;
+    /** if the clock skewed changes by less than this, ignore the update (so we don't slide all over the place) */
+    public final static long MIN_OFFSET_CHANGE = 5 * 1000;
 
+    /**
+     * Specify how far away from the "correct" time the computer is - a positive
+     * value means that the system time is slow, while a negative value means the system time is fast.
+     *
+     * @param offsetMs the delta from System.currentTimeMillis() (NOT the delta from now())
+     */
     public void setOffset(long offsetMs) {
         setOffset(offsetMs, false);        
     }
     
     /**
      * Specify how far away from the "correct" time the computer is - a positive
-     * value means that we are slow, while a negative value means we are fast.
+     * value means that the system time is slow, while a negative value means the system time is fast.
+     * Warning - overridden in RouterClock
      *
+     * @param offsetMs the delta from System.currentTimeMillis() (NOT the delta from now())
      */
     public void setOffset(long offsetMs, boolean force) {
         if (false) return;
@@ -92,9 +97,10 @@ public class Clock implements Timestamper.UpdateListener {
             else if (getLog().shouldLog(Log.INFO))
                 getLog().info("Updating clock offset to " + offsetMs + "ms from " + _offset + "ms");
             
-            if (!_statCreated)
-                _context.statManager().createRateStat("clock.skew", "How far is the already adjusted clock being skewed?", "Clock", new long[] { 10*60*1000, 3*60*60*1000, 24*60*60*60 });
+            if (!_statCreated) {
+                _context.statManager().createRequiredRateStat("clock.skew", "Clock step adjustment (ms)", "Clock", new long[] { 10*60*1000, 3*60*60*1000, 24*60*60*60 });
                 _statCreated = true;
+            }
             _context.statManager().addRateData("clock.skew", delta, 0);
         } else {
             getLog().log(Log.INFO, "Initializing clock offset to " + offsetMs + "ms from " + _offset + "ms");
@@ -104,6 +110,9 @@ public class Clock implements Timestamper.UpdateListener {
         fireOffsetChanged(delta);
     }
 
+    /*
+     * @return the current delta from System.currentTimeMillis() in milliseconds
+     */
     public long getOffset() {
         return _offset;
     }
@@ -112,6 +121,15 @@ public class Clock implements Timestamper.UpdateListener {
     
     
     public void setNow(long realTime) {
+        long diff = realTime - System.currentTimeMillis();
+        setOffset(diff);
+    }
+
+    /**
+     *  @param stratum ignored
+     *  @since 0.7.12
+     */
+    public void setNow(long realTime, int stratum) {
         long diff = realTime - System.currentTimeMillis();
         setOffset(diff);
     }
@@ -126,27 +144,25 @@ public class Clock implements Timestamper.UpdateListener {
     }
 
     public void addUpdateListener(ClockUpdateListener lsnr) {
-        synchronized (_listeners) {
             _listeners.add(lsnr);
-        }
     }
 
     public void removeUpdateListener(ClockUpdateListener lsnr) {
-        synchronized (_listeners) {
             _listeners.remove(lsnr);
-        }
     }
 
     protected void fireOffsetChanged(long delta) {
-        synchronized (_listeners) {
-            for (Iterator iter = _listeners.iterator(); iter.hasNext();) {
-                ClockUpdateListener lsnr = (ClockUpdateListener) iter.next();
+            for (ClockUpdateListener lsnr : _listeners) {
                 lsnr.offsetChanged(delta);
             }
-        }
     }
 
-    public static interface ClockUpdateListener {
+    public interface ClockUpdateListener {
+
+        /**
+         *  @param delta = (new offset - old offset),
+         *         where each offset = (now() - System.currentTimeMillis())
+         */
         public void offsetChanged(long delta);
     }
 }

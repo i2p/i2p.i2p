@@ -6,20 +6,23 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.TunnelId;
 import net.i2p.data.i2np.I2NPMessage;
+import net.i2p.data.i2np.TunnelBuildMessage;
+import net.i2p.data.i2np.TunnelBuildReplyMessage;
 import net.i2p.data.i2np.TunnelDataMessage;
 import net.i2p.data.i2np.TunnelGatewayMessage;
+import net.i2p.data.i2np.VariableTunnelBuildMessage;
+import net.i2p.data.i2np.VariableTunnelBuildReplyMessage;
 import net.i2p.router.JobImpl;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.router.Service;
 import net.i2p.router.peermanager.PeerProfile;
-import net.i2p.stat.Rate;
-import net.i2p.stat.RateStat;
 import net.i2p.util.Log;
 
 /**
@@ -28,20 +31,28 @@ import net.i2p.util.Log;
  *
  */
 public class TunnelDispatcher implements Service {
-    private RouterContext _context;
-    private Log _log;
-    private Map<TunnelId, TunnelGateway> _outboundGateways;
-    private Map<TunnelId, OutboundTunnelEndpoint> _outboundEndpoints;
-    private Map<TunnelId, TunnelParticipant> _participants;
-    private Map<TunnelId, TunnelGateway> _inboundGateways;
-    private Map<TunnelId, HopConfig> _participatingConfig;
+    private final RouterContext _context;
+    private final Log _log;
+    /** us */
+    private final Map<TunnelId, TunnelGateway> _outboundGateways;
+    private final Map<TunnelId, OutboundTunnelEndpoint> _outboundEndpoints;
+    /** regular participant or IBEP of our own tunnel */
+    private final Map<TunnelId, TunnelParticipant> _participants;
+    /** regular IBGW or our own zero-hop inbound */
+    private final Map<TunnelId, TunnelGateway> _inboundGateways;
+    private final Map<TunnelId, HopConfig> _participatingConfig;
     /** what is the date/time on which the last non-locally-created tunnel expires? */
     private long _lastParticipatingExpiration;
     private BloomFilterIVValidator _validator;
-    private LeaveTunnel _leaveJob;
+    private final LeaveTunnel _leaveJob;
     /** what is the date/time we last deliberately dropped a tunnel? **/
-    private long _lastDropTime;
-    private TunnelGatewayPumper _pumper;
+    //private long _lastDropTime;
+    private final TunnelGatewayPumper _pumper;
+
+    /** for shouldDropParticipatingMessage() */
+    enum Location {OBEP, PARTICIPANT, IBGW}
+
+    private static final long[] RATES = { 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000 };
     
     /** Creates a new instance of TunnelDispatcher */
     public TunnelDispatcher(RouterContext ctx) {
@@ -52,14 +63,11 @@ public class TunnelDispatcher implements Service {
         _participants = new ConcurrentHashMap();
         _inboundGateways = new ConcurrentHashMap();
         _participatingConfig = new ConcurrentHashMap();
-        _lastParticipatingExpiration = 0;
-        _lastDropTime = 0;
-        _validator = null;
         _pumper = new TunnelGatewayPumper(ctx);
         _leaveJob = new LeaveTunnel(ctx);
-        ctx.statManager().createRateStat("tunnel.participatingTunnels", 
-                                         "How many tunnels are we participating in?", "Tunnels", 
-                                         new long[] { 60*1000, 10*60*1000l, 60*60*1000l });
+        ctx.statManager().createRequiredRateStat("tunnel.participatingTunnels", 
+                                         "Tunnels routed for others", "Tunnels", 
+                                         new long[] { 60*1000, 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
         ctx.statManager().createRateStat("tunnel.dispatchOutboundPeer", 
                                          "How many messages we send out a tunnel targetting a peer?", "Tunnels", 
                                          new long[] { 10*60*1000l, 60*60*1000l });
@@ -96,29 +104,29 @@ public class TunnelDispatcher implements Service {
         ctx.statManager().createRateStat("tunnel.joinInboundGateway", 
                                          "How many tunnels we join as the inbound gateway?", "Tunnels", 
                                          new long[] { 10*60*1000l, 60*60*1000l });
-        ctx.statManager().createRateStat("tunnel.dispatchGatewayTime", 
-                                         "How long it takes to dispatch a TunnelGatewayMessage", "Tunnels", 
-                                         new long[] { 60*1000l, 60*60*1000l });
-        ctx.statManager().createRateStat("tunnel.dispatchDataTime", 
-                                         "How long it takes to dispatch a TunnelDataMessage", "Tunnels", 
-                                         new long[] { 60*1000l, 60*60*1000l });
-        ctx.statManager().createRateStat("tunnel.dispatchOutboundTime", 
-                                         "How long it takes to dispatch an outbound message", "Tunnels", 
-                                         new long[] { 60*1000l, 60*60*1000l });
-        ctx.statManager().createRateStat("tunnel.dispatchOutboundZeroHopTime", 
-                                         "How long it takes to dispatch an outbound message through a zero hop tunnel", "Tunnels", 
-                                         new long[] { 60*1000l, 60*60*1000l });
-        ctx.statManager().createRateStat("tunnel.participatingBandwidth", 
-                                         "Participating traffic", "Tunnels", 
+        //ctx.statManager().createRateStat("tunnel.dispatchGatewayTime", 
+        //                                 "How long it takes to dispatch a TunnelGatewayMessage", "Tunnels", 
+        //                                 new long[] { 60*1000l, 60*60*1000l });
+        //ctx.statManager().createRateStat("tunnel.dispatchDataTime", 
+        //                                 "How long it takes to dispatch a TunnelDataMessage", "Tunnels", 
+        //                                 new long[] { 60*1000l, 60*60*1000l });
+        //ctx.statManager().createRateStat("tunnel.dispatchOutboundTime", 
+        //                                 "How long it takes to dispatch an outbound message", "Tunnels", 
+        //                                 new long[] { 60*1000l, 60*60*1000l });
+        //ctx.statManager().createRateStat("tunnel.dispatchOutboundZeroHopTime", 
+        //                                 "How long it takes to dispatch an outbound message through a zero hop tunnel", "Tunnels", 
+        //                                 new long[] { 60*60*1000l });
+        ctx.statManager().createRequiredRateStat("tunnel.participatingBandwidth", 
+                                         "Participating traffic received (Bytes/sec)", "Tunnels", 
                                          new long[] { 60*1000l, 60*10*1000l });
-        ctx.statManager().createRateStat("tunnel.participatingBandwidthOut", 
-                                         "Participating traffic", "Tunnels", 
+        ctx.statManager().createRequiredRateStat("tunnel.participatingBandwidthOut", 
+                                         "Participating traffic sent (Bytes/sec)", "Tunnels", 
                                          new long[] { 60*1000l, 60*10*1000l });
         ctx.statManager().createRateStat("tunnel.participatingMessageDropped", 
                                          "Dropped for exceeding share limit", "Tunnels", 
                                          new long[] { 60*1000l, 60*10*1000l });
-        ctx.statManager().createRateStat("tunnel.participatingMessageCount", 
-                                         "How many messages are sent through a participating tunnel?", "Tunnels", 
+        ctx.statManager().createRequiredRateStat("tunnel.participatingMessageCount", 
+                                         "Number of 1KB participating messages", "Tunnels", 
                                          new long[] { 60*1000l, 60*10*1000l, 60*60*1000l });
         ctx.statManager().createRateStat("tunnel.ownedMessageCount", 
                                          "How many messages are sent through a tunnel we created (period == failures)?", "Tunnels", 
@@ -129,19 +137,59 @@ public class TunnelDispatcher implements Service {
         ctx.statManager().createRateStat("tunnel.failedPartially", 
                                          "How many messages are sent through a tunnel that only failed partially (period == failures)?", "Tunnels", 
                                          new long[] { 60*1000l, 10*60*1000l, 60*60*1000l });
+        // following are for BatchedPreprocessor
+        ctx.statManager().createRateStat("tunnel.batchMultipleCount", "How many messages are batched into a tunnel message", "Tunnels", new long[] { 10*60*1000, 60*60*1000 });
+        ctx.statManager().createRateStat("tunnel.batchDelay", "How many messages were pending when the batching waited", "Tunnels", new long[] { 10*60*1000, 60*60*1000 });
+        ctx.statManager().createRateStat("tunnel.batchDelaySent", "How many messages were flushed when the batching delay completed", "Tunnels", new long[] { 10*60*1000, 60*60*1000 });
+        ctx.statManager().createRateStat("tunnel.batchCount", "How many groups of messages were flushed together", "Tunnels", new long[] { 10*60*1000, 60*60*1000 });
+        ctx.statManager().createRateStat("tunnel.batchDelayAmount", "How long we should wait before flushing the batch", "Tunnels", new long[] { 10*60*1000, 60*60*1000 });
+        ctx.statManager().createRateStat("tunnel.batchFlushRemaining", "How many messages remain after flushing", "Tunnels", new long[] { 10*60*1000, 60*60*1000 });
+        ctx.statManager().createRateStat("tunnel.writeDelay", "How long after a message reaches the gateway is it processed (lifetime is size)", "Tunnels", new long[] { 10*60*1000, 60*60*1000 });
+        ctx.statManager().createRateStat("tunnel.batchSmallFragments", "How many outgoing pad bytes are in small fragments?", 
+                                         "Tunnels", new long[] { 10*60*1000l, 60*60*1000l });
+        ctx.statManager().createRateStat("tunnel.batchFullFragments", "How many outgoing tunnel messages use the full data area?", 
+                                         "Tunnels", new long[] { 10*60*1000l, 60*60*1000l });
+        ctx.statManager().createRateStat("tunnel.batchFragmentation", "Avg. number of fragments per msg", "Tunnels", new long[] { 10*60*1000, 60*60*1000 });
+        // following is for OutboundMessageDistributor
+        ctx.statManager().createRateStat("tunnel.distributeLookupSuccess", "Was a deferred lookup successful?", "Tunnels", new long[] { 60*60*1000 });
+        // following is for OutboundReceiver
+        ctx.statManager().createRateStat("tunnel.outboundLookupSuccess", "Was a deferred lookup successful?", "Tunnels", new long[] { 60*60*1000 });
+        // following is for InboundGatewayReceiver
+        ctx.statManager().createRateStat("tunnel.inboundLookupSuccess", "Was a deferred lookup successful?", "Tunnels", new long[] { 60*60*1000 });
+        // following is for TunnelParticipant
+        ctx.statManager().createRateStat("tunnel.participantLookupSuccess", "Was a deferred lookup successful?", "Tunnels", new long[] { 60*60*1000 });
+        // following is for BuildMessageProcessor
+        ctx.statManager().createRateStat("tunnel.buildRequestDup", "How frequently we get dup build request messages", "Tunnels", new long[] { 60*60*1000 });
+        // following are for FragmentHandler
+        ctx.statManager().createRateStat("tunnel.smallFragments", "How many pad bytes are in small fragments?", 
+                                              "Tunnels", RATES);
+        ctx.statManager().createRateStat("tunnel.fullFragments", "How many tunnel messages use the full data area?", 
+                                              "Tunnels", RATES);
+        ctx.statManager().createRateStat("tunnel.fragmentedComplete", "How many fragments were in a completely received message?", 
+                                              "Tunnels", RATES);
+        ctx.statManager().createRequiredRateStat("tunnel.fragmentedDropped", "Number of dropped fragments", 
+                                              "Tunnels", RATES);
+        ctx.statManager().createRequiredRateStat("tunnel.corruptMessage", "Corrupt messages received", 
+                                              "Tunnels", RATES);
+        // following are for InboundMessageDistributor
+        ctx.statManager().createRateStat("tunnel.dropDangerousClientTunnelMessage", "How many tunnel messages come down a client tunnel that we shouldn't expect (lifetime is the 'I2NP type')", "Tunnels", new long[] { 60*60*1000 });
+        ctx.statManager().createRateStat("tunnel.handleLoadClove", "When do we receive load test cloves", "Tunnels", new long[] { 60*60*1000 });
     }
 
+    /** for IBGW */
     private TunnelGateway.QueuePreprocessor createPreprocessor(HopConfig cfg) {
-        if (true)
+        //if (true)
             return new BatchedRouterPreprocessor(_context, cfg); 
-        else
-            return new TrivialRouterPreprocessor(_context); 
+        //else
+        //    return new TrivialRouterPreprocessor(_context); 
     }
+
+    /** for OBGW */
     private TunnelGateway.QueuePreprocessor createPreprocessor(TunnelCreatorConfig cfg) {
-        if (true)
+        //if (true)
             return new BatchedRouterPreprocessor(_context, cfg); 
-        else
-            return new TrivialRouterPreprocessor(_context); 
+        //else
+        //    return new TrivialRouterPreprocessor(_context); 
     }
     
     /**
@@ -158,16 +206,17 @@ public class TunnelDispatcher implements Service {
             TunnelGateway gw = new PumpedTunnelGateway(_context, preproc, sender, receiver, _pumper);
             TunnelId outId = cfg.getConfig(0).getSendTunnel();
             _outboundGateways.put(outId, gw);
-            _context.statManager().addRateData("tunnel.joinOutboundGateway", 1, 0);
+            _context.statManager().addRateData("tunnel.joinOutboundGateway", 1);
             _context.messageHistory().tunnelJoined("outbound", cfg);
         } else {
             TunnelGatewayZeroHop gw = new TunnelGatewayZeroHop(_context, cfg);
             TunnelId outId = cfg.getConfig(0).getSendTunnel();
             _outboundGateways.put(outId, gw);
-            _context.statManager().addRateData("tunnel.joinOutboundGatewayZeroHop", 1, 0);
+            _context.statManager().addRateData("tunnel.joinOutboundGatewayZeroHop", 1);
             _context.messageHistory().tunnelJoined("outboundZeroHop", cfg);
         }
     }
+
     /** 
      * We are the inbound endpoint - we created this tunnel
      */
@@ -179,13 +228,13 @@ public class TunnelDispatcher implements Service {
             TunnelParticipant participant = new TunnelParticipant(_context, new InboundEndpointProcessor(_context, cfg, _validator));
             TunnelId recvId = cfg.getConfig(cfg.getLength()-1).getReceiveTunnel();
             _participants.put(recvId, participant);
-            _context.statManager().addRateData("tunnel.joinInboundEndpoint", 1, 0);
+            _context.statManager().addRateData("tunnel.joinInboundEndpoint", 1);
             _context.messageHistory().tunnelJoined("inboundEndpoint", cfg);
         } else {
             TunnelGatewayZeroHop gw = new TunnelGatewayZeroHop(_context, cfg);
             TunnelId recvId = cfg.getConfig(0).getReceiveTunnel();
             _inboundGateways.put(recvId, gw);
-            _context.statManager().addRateData("tunnel.joinInboundEndpointZeroHop", 1, 0);
+            _context.statManager().addRateData("tunnel.joinInboundEndpointZeroHop", 1);
             _context.messageHistory().tunnelJoined("inboundEndpointZeroHop", cfg);
         }
     }
@@ -202,24 +251,25 @@ public class TunnelDispatcher implements Service {
         _participants.put(recvId, participant);
         _participatingConfig.put(recvId, cfg);
         _context.messageHistory().tunnelJoined("participant", cfg);
-        _context.statManager().addRateData("tunnel.joinParticipant", 1, 0);
+        _context.statManager().addRateData("tunnel.joinParticipant", 1);
         if (cfg.getExpiration() > _lastParticipatingExpiration)
             _lastParticipatingExpiration = cfg.getExpiration();
         _leaveJob.add(cfg);
     }
+
     /**
      * We are the outbound endpoint in this tunnel, and did not create it
      *
      */
     public void joinOutboundEndpoint(HopConfig cfg) {
         if (_log.shouldLog(Log.INFO))
-            _log.info("Joining as outbound endpoint: " + cfg);
+            _log.info("Joining as OBEP: " + cfg);
         TunnelId recvId = cfg.getReceiveTunnel();
         OutboundTunnelEndpoint endpoint = new OutboundTunnelEndpoint(_context, cfg, new HopProcessor(_context, cfg, _validator));
         _outboundEndpoints.put(recvId, endpoint);
         _participatingConfig.put(recvId, cfg);
         _context.messageHistory().tunnelJoined("outboundEndpoint", cfg);
-        _context.statManager().addRateData("tunnel.joinOutboundEndpoint", 1, 0);
+        _context.statManager().addRateData("tunnel.joinOutboundEndpoint", 1);
 
         if (cfg.getExpiration() > _lastParticipatingExpiration)
             _lastParticipatingExpiration = cfg.getExpiration();
@@ -232,17 +282,17 @@ public class TunnelDispatcher implements Service {
      */
     public void joinInboundGateway(HopConfig cfg) {
         if (_log.shouldLog(Log.INFO))
-            _log.info("Joining as inbound gateway: " + cfg);
+            _log.info("Joining as IBGW: " + cfg);
         TunnelGateway.QueuePreprocessor preproc = createPreprocessor(cfg);
         TunnelGateway.Sender sender = new InboundSender(_context, cfg);
         TunnelGateway.Receiver receiver = new InboundGatewayReceiver(_context, cfg);
         //TunnelGateway gw = new TunnelGateway(_context, preproc, sender, receiver);
-        TunnelGateway gw = new PumpedTunnelGateway(_context, preproc, sender, receiver, _pumper);
+        TunnelGateway gw = new ThrottledPumpedTunnelGateway(_context, preproc, sender, receiver, _pumper, cfg);
         TunnelId recvId = cfg.getReceiveTunnel();
         _inboundGateways.put(recvId, gw);
         _participatingConfig.put(recvId, cfg);
         _context.messageHistory().tunnelJoined("inboundGateway", cfg);
-        _context.statManager().addRateData("tunnel.joinInboundGateway", 1, 0);
+        _context.statManager().addRateData("tunnel.joinInboundGateway", 1);
 
         if (cfg.getExpiration() > _lastParticipatingExpiration)
             _lastParticipatingExpiration = cfg.getExpiration();
@@ -252,6 +302,12 @@ public class TunnelDispatcher implements Service {
     public int getParticipatingCount() {
         return _participatingConfig.size();
     }
+    
+    /*******  may be used for congestion control later...
+    public int getParticipatingInboundGatewayCount() {
+        return _inboundGateways.size();
+    }
+    *******/
     
     /** what is the date/time on which the last non-locally-created tunnel expires? */
     public long getLastParticipatingExpiration() { return _lastParticipatingExpiration; }
@@ -305,13 +361,15 @@ public class TunnelDispatcher implements Service {
      */
     public void remove(HopConfig cfg) {
         TunnelId recvId = cfg.getReceiveTunnel();
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("removing " + cfg);
         
         boolean removed = (null != _participatingConfig.remove(recvId));
-        if (!removed) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Participating tunnel, but no longer listed in participatingConfig? " + cfg);
+        if (removed) {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("removing " + cfg, new Exception());
+        } else {
+            // this is normal, this can get called twice
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Participating tunnel, but no longer listed in participatingConfig? " + cfg, new Exception());
         }
         
         removed = (null != _participants.remove(recvId));
@@ -331,7 +389,7 @@ public class TunnelDispatcher implements Service {
      *
      */
     public void dispatch(TunnelDataMessage msg, Hash recvFrom) {
-        long before = System.currentTimeMillis();
+        //long before = System.currentTimeMillis();
         TunnelParticipant participant = _participants.get(msg.getTunnelIdObj());
         if (participant != null) {
             // we are either just a random participant or the inbound endpoint 
@@ -340,7 +398,7 @@ public class TunnelDispatcher implements Service {
                            + recvFrom.toBase64().substring(0,4));
             _context.messageHistory().tunnelDispatched(msg.getUniqueId(), msg.getTunnelId(), "participant");
             participant.dispatch(msg, recvFrom);
-            _context.statManager().addRateData("tunnel.dispatchParticipant", 1, 0);
+            _context.statManager().addRateData("tunnel.dispatchParticipant", 1);
         } else {
             OutboundTunnelEndpoint endpoint = _outboundEndpoints.get(msg.getTunnelIdObj());
             if (endpoint != null) {
@@ -351,8 +409,9 @@ public class TunnelDispatcher implements Service {
                 _context.messageHistory().tunnelDispatched(msg.getUniqueId(), msg.getTunnelId(), "outbound endpoint");
                 endpoint.dispatch(msg, recvFrom);
                 
-                _context.statManager().addRateData("tunnel.dispatchEndpoint", 1, 0);
+                _context.statManager().addRateData("tunnel.dispatchEndpoint", 1);
             } else {
+                // Somewhat common, probably due to somebody with large clock skew?
                 _context.messageHistory().droppedTunnelDataMessageUnknown(msg.getUniqueId(), msg.getTunnelId());
                 int level = (_context.router().getUptime() > 10*60*1000 ? Log.WARN : Log.DEBUG);
                 if (_log.shouldLog(level))
@@ -362,11 +421,14 @@ public class TunnelDispatcher implements Service {
             }
         }
         
-        long dispatchTime = System.currentTimeMillis() - before;
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Dispatch data time: " + dispatchTime + " participant? " + participant);
-        _context.statManager().addRateData("tunnel.dispatchDataTime", dispatchTime, dispatchTime);
+        //long dispatchTime = System.currentTimeMillis() - before;
+        //if (_log.shouldLog(Log.DEBUG))
+        //    _log.debug("Dispatch data time: " + dispatchTime + " participant? " + participant);
+        //_context.statManager().addRateData("tunnel.dispatchDataTime", dispatchTime, dispatchTime);
     }
+
+    /** High for now, just to prevent long-lived-message attacks */
+    private static final long MAX_FUTURE_EXPIRATION = 3*60*1000 + Router.CLOCK_FUDGE_FACTOR;
 
     /**
      * We are the inbound tunnel gateway, so encrypt it as necessary and forward
@@ -374,25 +436,28 @@ public class TunnelDispatcher implements Service {
      *
      */
     public void dispatch(TunnelGatewayMessage msg) {
-        long before = System.currentTimeMillis();
+        long before = _context.clock().now();
         TunnelGateway gw = _inboundGateways.get(msg.getTunnelId());
         if (gw != null) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("dispatch where we are the inbound gateway: " + gw + ": " + msg);
-            if ( (msg.getMessageExpiration() < before - Router.CLOCK_FUDGE_FACTOR) || (msg.getMessage().getMessageExpiration() < before - Router.CLOCK_FUDGE_FACTOR) ) {
+            long minTime = before - Router.CLOCK_FUDGE_FACTOR;
+            long maxTime = before + MAX_FUTURE_EXPIRATION;
+            if ( (msg.getMessageExpiration() < minTime) || (msg.getMessage().getMessageExpiration() < minTime) ||
+                 (msg.getMessageExpiration() > maxTime) || (msg.getMessage().getMessageExpiration() > maxTime) ) {
                 if (_log.shouldLog(Log.ERROR))
                     _log.error("Not dispatching a gateway message for tunnel " + msg.getTunnelId().getTunnelId()
                                + " as the wrapper's expiration is in " + DataHelper.formatDuration(msg.getMessageExpiration()-before)
                                + " and/or the content's expiration is in " + DataHelper.formatDuration(msg.getMessage().getMessageExpiration()-before)
                                + " with messageId " + msg.getUniqueId() + "/" + msg.getMessage().getUniqueId() + " and message type "
-                               + msg.getMessage().getClass().getName());
+                               + msg.getMessage().getClass().getSimpleName());
                 return;
             }
             //_context.messageHistory().tunnelDispatched("message " + msg.getUniqueId() + "/" + msg.getMessage().getUniqueId() + " on tunnel " 
             //                                               + msg.getTunnelId().getTunnelId() + " as inbound gateway");
             _context.messageHistory().tunnelDispatched(msg.getUniqueId(), msg.getMessage().getUniqueId(), msg.getTunnelId().getTunnelId(), "inbound gateway");
             gw.add(msg);
-            _context.statManager().addRateData("tunnel.dispatchInbound", 1, 0);
+            _context.statManager().addRateData("tunnel.dispatchInbound", 1);
         } else {
             _context.messageHistory().droppedTunnelGatewayMessageUnknown(msg.getUniqueId(), msg.getTunnelId().getTunnelId());
             int level = (_context.router().getUptime() > 10*60*1000 ? Log.WARN : Log.INFO);
@@ -404,15 +469,15 @@ public class TunnelDispatcher implements Service {
                            + DataHelper.formatDuration(msg.getMessage().getMessageExpiration()-_context.clock().now())
                            + " messageId " + msg.getUniqueId()
                            + "/" + msg.getMessage().getUniqueId()
-                           + " messageType: " + msg.getMessage().getClass().getName()
+                           + " messageType: " + msg.getMessage().getClass().getSimpleName()
                            + " existing = " + _inboundGateways.size(), new Exception("source"));
         }
         
-        long dispatchTime = System.currentTimeMillis() - before;
+        //long dispatchTime = _context.clock().now() - before;
         
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Dispatch in gw time: " + dispatchTime + " gateway? " + gw);
-        _context.statManager().addRateData("tunnel.dispatchGatewayTime", dispatchTime, dispatchTime);
+        //if (_log.shouldLog(Log.DEBUG))
+        //    _log.debug("Dispatch in gw time: " + dispatchTime + " gateway? " + gw);
+        //_context.statManager().addRateData("tunnel.dispatchGatewayTime", dispatchTime, dispatchTime);
     }
     
     /**
@@ -427,6 +492,7 @@ public class TunnelDispatcher implements Service {
     public void dispatchOutbound(I2NPMessage msg, TunnelId outboundTunnel, Hash targetPeer) {
         dispatchOutbound(msg, outboundTunnel, null, targetPeer);
     }
+
     /**
      * We are the outbound tunnel gateway (we created it), so wrap up this message
      * with instructions to be forwarded to the targetTunnel on the targetPeer when
@@ -457,33 +523,40 @@ public class TunnelDispatcher implements Service {
                     _log.warn("why are you sending a tunnel message that expired " 
                                + (before-msg.getMessageExpiration()) + "ms ago? " 
                                + msg, new Exception("cause"));
+            } else if (msg.getMessageExpiration() > before + MAX_FUTURE_EXPIRATION) {
+                if (_log.shouldLog(Log.ERROR))
+                    _log.error("why are you sending a tunnel message that expires " 
+                               + (msg.getMessageExpiration() - before) + "ms from now? "
+                               + msg, new Exception("cause"));
+                return;
             }
             long tid1 = outboundTunnel.getTunnelId();
             long tid2 = (targetTunnel != null ? targetTunnel.getTunnelId() : -1);
             _context.messageHistory().tunnelDispatched(msg.getUniqueId(), tid1, tid2, targetPeer, "outbound gateway");
             gw.add(msg, targetPeer, targetTunnel);
             if (targetTunnel == null)
-                _context.statManager().addRateData("tunnel.dispatchOutboundPeer", 1, 0);
+                _context.statManager().addRateData("tunnel.dispatchOutboundPeer", 1);
             else
-                _context.statManager().addRateData("tunnel.dispatchOutboundTunnel", 1, 0);
+                _context.statManager().addRateData("tunnel.dispatchOutboundTunnel", 1);
         } else {
             _context.messageHistory().droppedTunnelGatewayMessageUnknown(msg.getUniqueId(), outboundTunnel.getTunnelId());
 
-            int level = (_context.router().getUptime() > 10*60*1000 ? Log.ERROR : Log.WARN);
+            //int level = (_context.router().getUptime() > 10*60*1000 ? Log.ERROR : Log.WARN);
+            int level = Log.WARN;
             if (_log.shouldLog(level))
                 _log.log(level, "no matching outbound tunnel for id=" + outboundTunnel
                            + ": existing = " + _outboundGateways.size(), new Exception("src"));
         }
         
-        long dispatchTime = _context.clock().now() - before;
-        if (dispatchTime > 1000) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("wtf, took " + dispatchTime + " to dispatch " + msg + " out " + outboundTunnel + " in " + gw);
-        }
-        if (gw instanceof TunnelGatewayZeroHop)
-            _context.statManager().addRateData("tunnel.dispatchOutboundZeroHopTime", dispatchTime, dispatchTime);
-        else
-            _context.statManager().addRateData("tunnel.dispatchOutboundTime", dispatchTime, dispatchTime);
+        //long dispatchTime = _context.clock().now() - before;
+        //if (dispatchTime > 1000) {
+        //    if (_log.shouldLog(Log.WARN))
+        //        _log.warn("wtf, took " + dispatchTime + " to dispatch " + msg + " out " + outboundTunnel + " in " + gw);
+        //}
+        //if (gw instanceof TunnelGatewayZeroHop)
+        //    _context.statManager().addRateData("tunnel.dispatchOutboundZeroHopTime", dispatchTime, dispatchTime);
+        //else
+        //    _context.statManager().addRateData("tunnel.dispatchOutboundTime", dispatchTime, dispatchTime);
     }
     
     public List<HopConfig> listParticipatingTunnels() {
@@ -492,27 +565,24 @@ public class TunnelDispatcher implements Service {
 
     /**
      * Generate a current estimate of usage per-participating-tunnel lifetime.
-     * The router code calls this every 20s.
+     * The router code calls this every 'ms' millisecs.
      * This is better than waiting until the tunnel expires to update the rate,
      * as we want this to be current because it's an important part of
      * the throttle code.
      * Stay a little conservative by taking the counts only for tunnels 1-10m old
      * and computing the average from that.
      */
-    public void updateParticipatingStats() {
-        List<HopConfig> participating = listParticipatingTunnels();
-        int size = participating.size();
+    public void updateParticipatingStats(int ms) {
         long count = 0;
         long bw = 0;
-        long bwOut = 0;
+        //long bwOut = 0;
         long tcount = 0;
         long tooYoung = _context.clock().now() - 60*1000;
         long tooOld = tooYoung - 9*60*1000;
-        for (int i = 0; i < size; i++) {
-            HopConfig cfg = participating.get(i);
+        for (HopConfig cfg : _participatingConfig.values()) {
             long c = cfg.getRecentMessagesCount();
             bw += c;
-            bwOut += cfg.getRecentSentMessagesCount();
+            //bwOut += cfg.getRecentSentMessagesCount();
             long created = cfg.getCreation();
             if (created > tooYoung || created < tooOld)
                 continue;
@@ -521,10 +591,11 @@ public class TunnelDispatcher implements Service {
         }
         if (tcount > 0)
             count = count * 30 / tcount;
-        _context.statManager().addRateData("tunnel.participatingMessageCount", count, 20*1000);
-        _context.statManager().addRateData("tunnel.participatingBandwidth", bw*1024/20, 20*1000);
-        _context.statManager().addRateData("tunnel.participatingBandwidthOut", bwOut*1024/20, 20*1000);
-        _context.statManager().addRateData("tunnel.participatingTunnels", size, 0);
+        _context.statManager().addRateData("tunnel.participatingMessageCount", count, ms);
+        _context.statManager().addRateData("tunnel.participatingBandwidth", bw*1024/(ms/1000), ms);
+        // moved to FIFOBandwidthRefiller
+        //_context.statManager().addRateData("tunnel.participatingBandwidthOut", bwOut*1024/(ms/1000), ms);
+        _context.statManager().addRateData("tunnel.participatingTunnels", tcount);
     }
 
     /**
@@ -534,8 +605,33 @@ public class TunnelDispatcher implements Service {
      * This is similar to the code in ../RouterThrottleImpl.java
      * We drop in proportion to how far over the limit we are.
      * Perhaps an exponential function would be better?
+     *
+     * The drop probability is adjusted for the size of the message.
+     * At this stage, participants and IBGWs see a standard 1024 byte message.
+     * OBEPs however may see a wide variety of sizes.
+     *
+     * Network-wise, it's most efficient to drop OBEP messages, because they
+     * are unfragmented and we know their size. Therefore we drop the big ones
+     * and we drop a single wrapped I2CP message, not a fragment of one or more messages.
+     * Also, the OBEP is the earliest identifiable hop in the message's path
+     * (a plain participant could be earlier or later, but on average is later)
+     *
+     * @param loc message hop location
+     * @param type I2NP message type
+     * @param length the length of the message
      */
-    public boolean shouldDropParticipatingMessage() {
+    public boolean shouldDropParticipatingMessage(Location loc, int type, int length) {
+        if (length <= 0)
+            return false;
+     /****
+        Don't use the tunnel.participatingBandwidth stat any more. It could be up to 3 minutes old.
+        Also, it counts inbound bandwidth, i.e. before dropping, which resulted in too many drops
+        during a burst.
+        We now use the bandwidth limiter to track outbound participating bandwidth
+        over the last few seconds.
+     ****/
+
+     /****
         RateStat rs = _context.statManager().getRate("tunnel.participatingBandwidth");
         if (rs == null)
             return false;
@@ -551,48 +647,77 @@ public class TunnelDispatcher implements Service {
             bw = (int) r.getLifetimeAverageValue();
 
         int usedIn = Math.min(_context.router().get1sRateIn(), _context.router().get15sRateIn());
-        usedIn = Math.min(usedIn, bw);
+        if (bw < usedIn)
+            usedIn = bw;
         if (usedIn <= 0)
             return false;
         int usedOut = Math.min(_context.router().get1sRate(true), _context.router().get15sRate(true));
-        usedOut = Math.min(usedOut, bw);
+        if (bw < usedOut)
+            usedOut = bw;
         if (usedOut <= 0)
             return false;
         int used = Math.min(usedIn, usedOut);
+     ****/
+        int used = _context.bandwidthLimiter().getCurrentParticipatingBandwidth();
+
         int maxKBps = Math.min(_context.bandwidthLimiter().getInboundKBytesPerSecond(),
                                _context.bandwidthLimiter().getOutboundKBytesPerSecond());
         float share = (float) _context.router().getSharePercentage();
 
-        // start dropping at 95% of the limit
-        float maxBps = maxKBps * share * 1024f * 0.95f;
+        // start dropping at 120% of the limit,
+        // as we rely on Throttle for long-term bandwidth control by rejecting tunnels
+        float maxBps = maxKBps * share * (1024f * 1.20f);
         float pctDrop = (used - maxBps) / used;
         if (pctDrop <= 0)
             return false;
+        // increase the drop probability for OBEP,
+        // (except lower it for tunnel build messages type 21/22/23/24),
+        // and lower it for IBGW, for network efficiency
+        double len = length;
+        if (loc == Location.OBEP) {
+            // we don't need to check for VTBRM/TBRM as that happens at tunnel creation
+            if (type == VariableTunnelBuildMessage.MESSAGE_TYPE || type == TunnelBuildMessage.MESSAGE_TYPE)
+                len /= 1.5;
+            else
+                len *= 1.5;
+        } else if (loc == Location.IBGW) {
+            // we don't need to check for VTBM/TBM as that happens at tunnel creation
+            if (type == VariableTunnelBuildReplyMessage.MESSAGE_TYPE || type == TunnelBuildReplyMessage.MESSAGE_TYPE)
+                len /= 1.5 * 1.5 * 1.5;
+            else
+                len /= 1.5;
+        }
+        // drop in proportion to size w.r.t. a standard 1024-byte message
+        // this is a little expensive but we want to adjust the curve between 0 and 1
+        // Most messages are 1024, only at the OBEP do we see other sizes
+        if ((int)len != 1024)
+            pctDrop = (float) Math.pow(pctDrop, 1024d / len);
         float rand = _context.random().nextFloat();
         boolean reject = rand <= pctDrop;
         if (reject) {
             if (_log.shouldLog(Log.WARN)) {
                 int availBps = (int) (((maxKBps*1024)*share) - used);
                 _log.warn("Drop part. msg. avail/max/used " + availBps + "/" + (int) maxBps + "/" 
-                          + used + " %Drop = " + pctDrop);
+                          + used + " %Drop = " + pctDrop
+                          + ' ' + loc + ' ' + type + ' ' + length);
             }
-            _context.statManager().addRateData("tunnel.participatingMessageDropped", 1, 0);
+            _context.statManager().addRateData("tunnel.participatingMessageDropped", 1);
         }
         return reject;
     }
 
-    private static final int DROP_BASE_INTERVAL = 40 * 1000;
-    private static final int DROP_RANDOM_BOOST = 10 * 1000;
+    //private static final int DROP_BASE_INTERVAL = 40 * 1000;
+    //private static final int DROP_RANDOM_BOOST = 10 * 1000;
 
     /**
      * If a router is too overloaded to build its own tunnels,
      * the build executor may call this.
      */
-
+/*******
     public void dropBiggestParticipating() {
 
        List<HopConfig> partTunnels = listParticipatingTunnels();
-       if ((partTunnels == null) || (partTunnels.size() == 0)) {
+       if ((partTunnels == null) || (partTunnels.isEmpty())) {
            if (_log.shouldLog(Log.ERROR))
                _log.error("Not dropping tunnel, since partTunnels was null or had 0 items!");
            return;
@@ -643,99 +768,86 @@ public class TunnelDispatcher implements Service {
        remove(biggest);
        _lastDropTime = _context.clock().now() + _context.random().nextInt(DROP_RANDOM_BOOST);
     }
-    
+******/
+
     public void startup() {
-        // NB: 256 == assume max rate (size adjusted to handle 256 messages per second)
-        _validator = new BloomFilterIVValidator(_context, 256);
+        // Note that we only use the validator for participants and OBEPs, not IBGWs, so
+        // this BW estimate will be high by about 33% assuming 2-hop tunnels average
+        _validator = new BloomFilterIVValidator(_context, getShareBandwidth(_context));
     }
+
+    /** @return in KBps */
+    public static int getShareBandwidth(RouterContext ctx) {
+        int irateKBps = ctx.bandwidthLimiter().getInboundKBytesPerSecond();
+        int orateKBps = ctx.bandwidthLimiter().getOutboundKBytesPerSecond();
+        double pct = ctx.router().getSharePercentage();
+        return (int) (pct * Math.min(irateKBps, orateKBps));
+    }
+
     public void shutdown() {
         if (_validator != null)
             _validator.destroy();
         _validator = null;
         _pumper.stopPumping();
+        _outboundGateways.clear();
+        _outboundEndpoints.clear();
+        _participants.clear();
+        _inboundGateways.clear();
+        _participatingConfig.clear();
     }
+
     public void restart() { 
         shutdown(); 
         startup(); 
     }
     
+    /** @deprecated moved to router console */
     public void renderStatusHTML(Writer out) throws IOException {}    
     
+    /**
+     *  Expire participants.
+     *  For efficiency, we keep the HopConfigs in a FIFO, and assume that
+     *  tunnels expire (roughly) in the same order as they are added.
+     *  As tunnels have a fixed expiration from now, that's a good assumption -
+     *  see BuildHandler.handleReq().
+     */
     private class LeaveTunnel extends JobImpl {
-        private List<HopConfig> _configs;
-        private List<Long> _times;
+        private final LinkedBlockingQueue<HopConfig> _configs;
         
         public LeaveTunnel(RouterContext ctx) {
             super(ctx);
-            getTiming().setStartAfter(ctx.clock().now());
-            _configs = new ArrayList(128);
-            _times = new ArrayList(128);
+            _configs = new LinkedBlockingQueue();
+            // 20 min no tunnels accepted + 10 min tunnel expiration
+            getTiming().setStartAfter(ctx.clock().now() + 30*60*1000);
+            getContext().jobQueue().addJob(LeaveTunnel.this);
         }
         
         private static final int LEAVE_BATCH_TIME = 10*1000;
-        public void add(HopConfig cfg) {
-            Long dropTime = new Long(cfg.getExpiration() + 2*Router.CLOCK_FUDGE_FACTOR + LEAVE_BATCH_TIME);
-            boolean noTunnels;
-            synchronized (LeaveTunnel.this) {
-                noTunnels = _configs.size() <= 0;
-                _configs.add(cfg);
-                _times.add(dropTime);
-            
-                // Make really sure we queue or requeue the job only when we have to, or else bad things happen.
-                // Locking around this part may not be sufficient but there was nothing before.
-                // Symptom is the Leave Participant job not running for 12m, leading to seesaw participating tunnel count
 
-                long oldAfter = getTiming().getStartAfter();
-                long oldStart = getTiming().getActualStart();
-                if ( noTunnels || (oldAfter <= 0) ||
-                     (oldAfter < getContext().clock().now() && oldAfter <= oldStart) || // if oldAfter > oldStart, it's late but it will run, so don't do this (race)
-                     (oldAfter >= dropTime.longValue()) ) {
-                    getTiming().setStartAfter(dropTime.longValue());
-                    getContext().jobQueue().addJob(LeaveTunnel.this);
-                } else {
-                    // already scheduled for the future, and before this expiration
-                }
-            }
-            if (_log.shouldLog(Log.DEBUG)) {
-                long now = getContext().clock().now();
-                _log.debug("Scheduling leave in " + DataHelper.formatDuration(dropTime.longValue()-now) +": " + cfg);
-            }
+        public void add(HopConfig cfg) {
+            _configs.offer(cfg);
         }
         
-        public String getName() { return "Leave participant"; }
+        public String getName() { return "Expire participating tunnels"; }
         public void runJob() {
             HopConfig cur = null;
-            Long nextTime = null;
             long now = getContext().clock().now() + LEAVE_BATCH_TIME; // leave all expiring in next 10 sec
-            while (true) {
-                synchronized (LeaveTunnel.this) {
-                    if (_configs.size() <= 0)
-                        return;
-                    nextTime = _times.get(0);
-                    if (nextTime.longValue() <= now) {
-                        cur = _configs.remove(0);
-                        _times.remove(0);
-                        if (_times.size() > 0)
-                            nextTime = _times.get(0);
-                        else
-                            nextTime = null;
-                    } else {
-                        cur = null;
-                    }
-                }
-
-                if (cur != null) 
+            long nextTime = now + 10*60*1000;
+            while ((cur = _configs.peek()) != null) {
+                long exp = cur.getExpiration() + (2 * Router.CLOCK_FUDGE_FACTOR) + LEAVE_BATCH_TIME;
+                if (exp < now) {
+                    _configs.poll();
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("Expiring " + cur);
                     remove(cur);
-                else
+                } else {
+                    if (exp < nextTime)
+                        nextTime = exp;
                     break;
-            }
-            
-            if (nextTime != null) {
-                synchronized (LeaveTunnel.this) {
-                    getTiming().setStartAfter(nextTime.longValue());
-                    getContext().jobQueue().addJob(LeaveTunnel.this);
                 }
             }
+            getTiming().setStartAfter(nextTime);
+            getContext().jobQueue().addJob(LeaveTunnel.this);
         }
     }
 }

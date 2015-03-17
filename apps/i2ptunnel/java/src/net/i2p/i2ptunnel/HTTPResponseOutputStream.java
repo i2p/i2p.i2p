@@ -8,22 +8,26 @@ package net.i2p.i2ptunnel;
  *
  */
 
-import java.io.ByteArrayOutputStream;
 import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
-import java.util.zip.GZIPInputStream;
+import java.util.Locale;
+import java.util.concurrent.RejectedExecutionException;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.ByteArray;
+import net.i2p.util.BigPipedInputStream;
 import net.i2p.util.ByteCache;
-import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
+import net.i2p.util.ReusableGZIPInputStream;
 
 /**
+ * This does the transparent gzip decompression on the client side.
+ * Extended in I2PTunnelHTTPServer to do the compression on the server side.
+ *
  * Simple stream for delivering an HTTP response to
  * the client, trivially filtered to make sure "Connection: close"
  * is always in the response.  Perhaps add transparent handling of the
@@ -33,43 +37,44 @@ import net.i2p.util.Log;
  *
  */
 class HTTPResponseOutputStream extends FilterOutputStream {
-    private I2PAppContext _context;
-    private Log _log;
-    private ByteCache _cache;
+    private final I2PAppContext _context;
+    private final Log _log;
     protected ByteArray _headerBuffer;
     private boolean _headerWritten;
-    private byte _buf1[];
+    private final byte _buf1[];
     protected boolean _gzip;
-    private long _dataWritten;
-    private InternalGZIPInputStream _in;
+    protected long _dataExpected;
+    protected String _contentType;
+
     private static final int CACHE_SIZE = 8*1024;
+    private static final ByteCache _cache = ByteCache.getInstance(8, CACHE_SIZE);
+    // OOM DOS prevention
+    private static final int MAX_HEADER_SIZE = 64*1024;
     
     public HTTPResponseOutputStream(OutputStream raw) {
         super(raw);
         _context = I2PAppContext.getGlobalContext();
-        _context.statManager().createRateStat("i2ptunnel.httpCompressionRatio", "ratio of compressed size to decompressed size after transfer", "I2PTunnel", new long[] { 60*1000, 30*60*1000 });
-        _context.statManager().createRateStat("i2ptunnel.httpCompressed", "compressed size transferred", "I2PTunnel", new long[] { 60*1000, 30*60*1000 });
-        _context.statManager().createRateStat("i2ptunnel.httpExpanded", "size transferred after expansion", "I2PTunnel", new long[] { 60*1000, 30*60*1000 });
+        _context.statManager().createRateStat("i2ptunnel.httpCompressionRatio", "ratio of compressed size to decompressed size after transfer", "I2PTunnel", new long[] { 60*60*1000 });
+        _context.statManager().createRateStat("i2ptunnel.httpCompressed", "compressed size transferred", "I2PTunnel", new long[] { 60*60*1000 });
+        _context.statManager().createRateStat("i2ptunnel.httpExpanded", "size transferred after expansion", "I2PTunnel", new long[] { 60*60*1000 });
         _log = _context.logManager().getLog(getClass());
-        _cache = ByteCache.getInstance(8, CACHE_SIZE);
         _headerBuffer = _cache.acquire();
-        _headerWritten = false;
-        _gzip = false;
-        _dataWritten = 0;
         _buf1 = new byte[1];
     }
 
+    @Override
     public void write(int c) throws IOException {
         _buf1[0] = (byte)c;
         write(_buf1, 0, 1);
     }
+    @Override
     public void write(byte buf[]) throws IOException { 
         write(buf, 0, buf.length); 
     }
+    @Override
     public void write(byte buf[], int off, int len) throws IOException {
         if (_headerWritten) {
             out.write(buf, off, len);
-            _dataWritten += len;
             //out.flush();
             return;
         }
@@ -85,7 +90,6 @@ class HTTPResponseOutputStream extends FilterOutputStream {
                 if (i + 1 < len) {
                     // write out the remaining
                     out.write(buf, off+i+1, len-i-1);
-                    _dataWritten += len-i-1;
                     //out.flush();
                 }
                 return;
@@ -93,14 +97,20 @@ class HTTPResponseOutputStream extends FilterOutputStream {
         }
     }
     
-    /** grow (and free) the buffer as necessary */
-    private void ensureCapacity() {
+    /**
+     *  grow (and free) the buffer as necessary
+     *  @throws IOException if the headers are too big
+     */
+    private void ensureCapacity() throws IOException {
+        if (_headerBuffer.getValid() >= MAX_HEADER_SIZE)
+            throw new IOException("Max header size exceeded: " + MAX_HEADER_SIZE);
         if (_headerBuffer.getValid() + 1 >= _headerBuffer.getData().length) {
             int newSize = (int)(_headerBuffer.getData().length * 1.5);
             ByteArray newBuf = new ByteArray(new byte[newSize]);
             System.arraycopy(_headerBuffer.getData(), 0, newBuf.getData(), 0, _headerBuffer.getValid());
             newBuf.setValid(_headerBuffer.getValid());
             newBuf.setOffset(0);
+            // if we changed the ByteArray size, don't put it back in the cache
             if (_headerBuffer.getData().length == CACHE_SIZE)
                 _cache.release(_headerBuffer);
             _headerBuffer = newBuf;
@@ -118,7 +128,8 @@ class HTTPResponseOutputStream extends FilterOutputStream {
     }
     
     /**
-     * Tweak that first HTTP response line (HTTP 200 OK, etc)
+     * Possibly tweak that first HTTP response line (HTTP/1.0 200 OK, etc).
+     * Overridden on server side.
      *
      */
     protected String filterResponseLine(String line) {
@@ -127,7 +138,7 @@ class HTTPResponseOutputStream extends FilterOutputStream {
     
     /** we ignore any potential \r, since we trim it on write anyway */
     private static final byte NL = '\n';
-    private boolean isNL(byte b) { return (b == NL); }
+    private static boolean isNL(byte b) { return (b == NL); }
     
     /** ok, received, now munge & write it */
     private void writeHeader() throws IOException {
@@ -161,15 +172,27 @@ class HTTPResponseOutputStream extends FilterOutputStream {
                             if (_log.shouldLog(Log.INFO))
                                 _log.info("Response header [" + key + "] = [" + val + "]");
                             
-                            if ("Connection".equalsIgnoreCase(key)) {
+                            String lcKey = key.toLowerCase(Locale.US);
+                            if ("connection".equals(lcKey)) {
                                 out.write("Connection: close\r\n".getBytes());
                                 connectionSent = true;
-                            } else if ("Proxy-Connection".equalsIgnoreCase(key)) {
+                            } else if ("proxy-connection".equals(lcKey)) {
                                 out.write("Proxy-Connection: close\r\n".getBytes());
                                 proxyConnectionSent = true;
-                            } else if ( ("Content-encoding".equalsIgnoreCase(key)) && ("x-i2p-gzip".equalsIgnoreCase(val)) ) {
+                            } else if ("content-encoding".equals(lcKey) && "x-i2p-gzip".equals(val.toLowerCase(Locale.US))) {
                                 _gzip = true;
+                            } else if ("proxy-authenticate".equals(lcKey)) {
+                                // filter this hop-by-hop header; outproxy authentication must be configured in I2PTunnelHTTPClient
                             } else {
+                                if ("content-length".equals(lcKey)) {
+                                    // save for compress decision on server side
+                                    try {
+                                        _dataExpected = Long.parseLong(val);
+                                    } catch (NumberFormatException nfe) {}
+                                } else if ("content-type".equals(lcKey)) {
+                                    // save for compress decision on server side
+                                    _contentType = val;
+                                }
                                 out.write((key.trim() + ": " + val.trim() + "\r\n").getBytes());
                             }
                             break;
@@ -207,38 +230,51 @@ class HTTPResponseOutputStream extends FilterOutputStream {
         out.write("\r\n".getBytes()); // end of the headers
     }
     
+    @Override
     public void close() throws IOException {
         out.close();
     }
     
     protected void beginProcessing() throws IOException {
         //out.flush();
-        PipedInputStream pi = new PipedInputStream();
+        PipedInputStream pi = BigPipedInputStream.getInstance();
         PipedOutputStream po = new PipedOutputStream(pi);
-        new I2PThread(new Pusher(pi, out), "HTTP decompresser").start();
+        // Run in the client thread pool, as there should be an unused thread
+        // there after the accept().
+        // Overridden in I2PTunnelHTTPServer, where it does not use the client pool.
+        try {
+            I2PTunnelClientBase.getClientExecutor().execute(new Pusher(pi, out));
+        } catch (RejectedExecutionException ree) {
+            // shouldn't happen
+            throw ree;
+        }
         out = po;
     }
     
     private class Pusher implements Runnable {
-        private InputStream _inRaw;
-        private OutputStream _out;
+        private final InputStream _inRaw;
+        private final OutputStream _out;
+
         public Pusher(InputStream in, OutputStream out) {
             _inRaw = in;
             _out = out;
         }
+
         public void run() {
-            OutputStream to = null;
-            _in = null;
-            long start = System.currentTimeMillis();
+            ReusableGZIPInputStream _in = null;
             long written = 0;
+            ByteArray ba = null;
             try {
-                _in = new InternalGZIPInputStream(_inRaw);
-                byte buf[] = new byte[8192];
+                _in = ReusableGZIPInputStream.acquire();
+                // blocking
+                _in.initialize(_inRaw);
+                ba = _cache.acquire();
+                byte buf[] = ba.getData();
                 int read = -1;
                 while ( (read = _in.read(buf)) != -1) {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Read " + read + " and writing it to the browser/streams");
-                    _out.write(buf, 0, read);
+;                   _out.write(buf, 0, read);
                     _out.flush();
                     written += read;
                 }
@@ -247,71 +283,37 @@ class HTTPResponseOutputStream extends FilterOutputStream {
             } catch (IOException ioe) {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Error decompressing: " + written + ", " + (_in != null ? _in.getTotalRead() + "/" + _in.getTotalExpanded() : ""), ioe);
+            } catch (OutOfMemoryError oom) {
+                _log.error("OOM in HTTP Decompressor", oom);
             } finally {
-                if (_log.shouldLog(Log.WARN) && (_in != null))
-                    _log.warn("After decompression, written=" + written + 
-                              (_in != null ?
+                if (_log.shouldLog(Log.INFO) && (_in != null))
+                    _log.info("After decompression, written=" + written + 
                                 " read=" + _in.getTotalRead() 
                                 + ", expanded=" + _in.getTotalExpanded() + ", remaining=" + _in.getRemaining() 
-                                + ", finished=" + _in.getFinished()
-                               : ""));
+                                + ", finished=" + _in.getFinished());
+                if (ba != null)
+                    _cache.release(ba);
                 if (_out != null) try { 
                     _out.close(); 
                 } catch (IOException ioe) {}
             }
-            long end = System.currentTimeMillis();
-            double compressed = (_in != null ? _in.getTotalRead() : 0);
-            double expanded = (_in != null ? _in.getTotalExpanded() : 0);
-            double ratio = 0;
-            if (expanded > 0)
-                ratio = compressed/expanded;
 
-            _context.statManager().addRateData("i2ptunnel.httpCompressionRatio", (int)(100d*ratio), end-start);
-            _context.statManager().addRateData("i2ptunnel.httpCompressed", (long)compressed, end-start);
-            _context.statManager().addRateData("i2ptunnel.httpExpanded", (long)expanded, end-start);
+            if (_in != null) {
+                double compressed = _in.getTotalRead();
+                double expanded = _in.getTotalExpanded();
+                ReusableGZIPInputStream.release(_in);
+                if (compressed > 0 && expanded > 0) {
+                    // only update the stats if we did something
+                    double ratio = compressed/expanded;
+                    _context.statManager().addRateData("i2ptunnel.httpCompressionRatio", (int)(100d*ratio), 0);
+                    _context.statManager().addRateData("i2ptunnel.httpCompressed", (long)compressed, 0);
+                    _context.statManager().addRateData("i2ptunnel.httpExpanded", (long)expanded, 0);
+                }
+            }
         }
     }
-    private class InternalGZIPInputStream extends GZIPInputStream {
-        public InternalGZIPInputStream(InputStream in) throws IOException {
-            super(in);
-        }
-        public long getTotalRead() { 
-            try {
-                return super.inf.getTotalIn(); 
-            } catch (Exception e) { 
-                return 0; 
-            }
-        }
-        public long getTotalExpanded() { 
-            try {
-                return super.inf.getTotalOut(); 
-            } catch (Exception e) {
-                return 0;
-            }
-        }
-        public long getRemaining() { 
-            try {
-                return super.inf.getRemaining(); 
-            } catch (Exception e) {
-                return 0;
-            }
-        }
-        public boolean getFinished() { 
-            try {
-                return super.inf.finished(); 
-            } catch (Exception e) {
-                return true;
-            }
-        }
-        public String toString() { 
-            return "Read: " + getTotalRead() + " expanded: " + getTotalExpanded() + " remaining: " + getRemaining() + " finished: " + getFinished();
-        }
-    }
-    
-    public String toString() {
-        return super.toString() + ": " + _in;
-    }
-    
+
+/*******
     public static void main(String args[]) {
         String simple   = "HTTP/1.1 200 OK\n" +
                           "foo: bar\n" +
@@ -361,7 +363,6 @@ class HTTPResponseOutputStream extends FilterOutputStream {
                           "A:\n" +
                           "\n";
         
-        /* */
         test("Simple", simple, true);
         test("Filtered", filtered, true);
         test("Filtered windows", winfilter, true);
@@ -376,7 +377,6 @@ class HTTPResponseOutputStream extends FilterOutputStream {
         test("Invalid (bad headers)", invalid5, true);
         test("Invalid (bad headers2)", invalid6, false);
         test("Invalid (bad headers3)", invalid7, false);
-        /* */
     }
     
     private static void test(String name, String orig, boolean shouldPass) {
@@ -395,4 +395,5 @@ class HTTPResponseOutputStream extends FilterOutputStream {
                 System.out.println("Properly fails with " + e.getMessage());
         }
     }
+******/
 }

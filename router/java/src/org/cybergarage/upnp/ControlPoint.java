@@ -257,6 +257,7 @@ public class ControlPoint implements HTTPRequestListener
 			if (rootDev == null)
 				return;
 			rootDev.setSSDPPacket(ssdpPacket);
+			Debug.warning("Add root device", new Exception("received on " + ssdpPacket.getLocalAddress()));
 			addDevice(rootNode);
 
 			// Thanks for Oliver Newell (2004/10/16)
@@ -304,7 +305,14 @@ public class ControlPoint implements HTTPRequestListener
 	{
 		int nRoots = devNodeList.size();
 		for (int n=0; n<nRoots; n++) {
-			Node rootNode = devNodeList.getNode(n);
+			// AIOOB was thrown from here, maybe would be better to
+			// copy the list before traversal?
+			Node rootNode;
+			try {
+				rootNode = devNodeList.getNode(n);
+			} catch (ArrayIndexOutOfBoundsException aioob) {
+				break;
+			}
 			Device dev = getDevice(rootNode);
 			if (dev == null)
 				continue;
@@ -825,9 +833,13 @@ public class ControlPoint implements HTTPRequestListener
 		HTTPServerList httpServerList = getHTTPServerList();
 		while (httpServerList.open(bindPort) == false) {
 			retryCnt++;
-			if (UPnP.SERVER_RETRY_COUNT < retryCnt)
+			if (UPnP.SERVER_RETRY_COUNT < retryCnt) {
+				Debug.warning("Failed to open HTTP event listener port " + bindPort);
+				// I2P do we really need this, or can we just break ?
 				return false;
-			setHTTPPort(bindPort + 1);
+			}
+			// I2P go down not up so we don't run into other I2P things
+			setHTTPPort(bindPort - 1);
 			bindPort = getHTTPPort();
 		}
 		httpServerList.addRequestListener(this);
@@ -838,8 +850,10 @@ public class ControlPoint implements HTTPRequestListener
 		////////////////////////////////////////
 		
 		SSDPNotifySocketList ssdpNotifySocketList = getSSDPNotifySocketList();
-		if (ssdpNotifySocketList.open() == false)
+		if (ssdpNotifySocketList.open() == false) {
+			Debug.warning("Failed to open SSDP notify port 1900");
 			return false;
+		}
 		ssdpNotifySocketList.setControlPoint(this);			
 		ssdpNotifySocketList.start();
 		
@@ -852,9 +866,12 @@ public class ControlPoint implements HTTPRequestListener
 		SSDPSearchResponseSocketList ssdpSearchResponseSocketList = getSSDPSearchResponseSocketList();
 		while (ssdpSearchResponseSocketList.open(ssdpPort) == false) {
 			retryCnt++;
-			if (UPnP.SERVER_RETRY_COUNT < retryCnt)
+			if (UPnP.SERVER_RETRY_COUNT < retryCnt) {
+				Debug.warning("Failed to open SSDP search response port " + ssdpPort);
 				return false;
-			setSSDPPort(ssdpPort + 1);
+			}
+			// I2P go down not up so we don't run into other I2P things
+			setSSDPPort(ssdpPort - 1);
 			ssdpPort = getSSDPPort();
 		}
 		ssdpSearchResponseSocketList.setControlPoint(this);
@@ -936,6 +953,12 @@ public class ControlPoint implements HTTPRequestListener
 			setRenewSubscriber(null);
 		}
 		
+		// I2P so we will re-notify on restart
+		DeviceList dl = getDeviceList();
+		for (int i = 0; i < dl.size(); i++) {
+			removeDevice(dl.getDevice(i));
+		}
+
 		return true;
 	}
 

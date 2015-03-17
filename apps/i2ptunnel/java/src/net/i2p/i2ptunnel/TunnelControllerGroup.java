@@ -1,37 +1,36 @@
 package net.i2p.i2ptunnel;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import java.util.TreeMap;
 
 import net.i2p.I2PAppContext;
 import net.i2p.client.I2PSession;
 import net.i2p.client.I2PSessionException;
 import net.i2p.data.DataHelper;
-import net.i2p.util.I2PThread;
+import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
+import net.i2p.util.OrderedProperties;
 
 /**
  * Coordinate a set of tunnels within the JVM, loading and storing their config
  * to disk, and building new ones as requested.
  *
+ * Warning - this is a singleton. Todo: fix
  */
 public class TunnelControllerGroup {
     private Log _log;
     private static TunnelControllerGroup _instance;
     static final String DEFAULT_CONFIG_FILE = "i2ptunnel.config";
     
-    private List _controllers;
+    private final List<TunnelController> _controllers;
     private String _configFile = DEFAULT_CONFIG_FILE;
     
     /** 
@@ -40,7 +39,7 @@ public class TunnelControllerGroup {
      * no more tunnels are using it)
      *
      */
-    private Map _sessions;
+    private final Map<I2PSession, Set<TunnelController>> _sessions;
     
     public static TunnelControllerGroup getInstance() { 
         synchronized (TunnelControllerGroup.class) {
@@ -56,6 +55,7 @@ public class TunnelControllerGroup {
         _configFile = configFile;
         _sessions = new HashMap(4);
         loadControllers(_configFile);
+        I2PAppContext.getGlobalContext().addShutdownTask(new Shutdown());
     }
 
     public static void main(String args[]) {
@@ -71,6 +71,34 @@ public class TunnelControllerGroup {
                 return;
             }
         }
+    }
+
+    /**
+     *  Warning - destroys the singleton!
+     *  @since 0.8.8
+     */
+    private static class Shutdown implements Runnable {
+        public void run() {
+            shutdown();
+        }
+    }
+
+    /**
+     *  Warning - destroys the singleton!
+     *  Caller must root a new context before calling instance() or main() again.
+     *  Agressively kill and null everything to reduce memory usage in the JVM
+     *  after stopping, and to recognize what must be reinitialized on restart (Android)
+     *
+     *  @since 0.8.8
+     */
+    public static void shutdown() {
+        synchronized (TunnelControllerGroup.class) {
+            if (_instance == null) return;
+            _instance.unloadControllers();
+            _instance._log = null;
+            _instance = null;
+        }
+        I2PTunnelClientBase.killClientExecutor();
     }
     
     /**
@@ -94,7 +122,7 @@ public class TunnelControllerGroup {
             _controllers.add(controller);
             i++;
         }
-        I2PThread startupThread = new I2PThread(new StartControllers(), "Startup tunnels");
+        I2PAppThread startupThread = new I2PAppThread(new StartControllers(), "Startup tunnels");
         startupThread.start();
         
         if (_log.shouldLog(Log.INFO))
@@ -104,7 +132,7 @@ public class TunnelControllerGroup {
     private class StartControllers implements Runnable {
         public void run() {
             for (int i = 0; i < _controllers.size(); i++) {
-                TunnelController controller = (TunnelController)_controllers.get(i);
+                TunnelController controller = _controllers.get(i);
                 if (controller.getStartOnLoad())
                     controller.startTunnel();
             }
@@ -141,10 +169,10 @@ public class TunnelControllerGroup {
      *
      * @return list of messages from the controller as it is stopped
      */
-    public List removeController(TunnelController controller) {
+    public List<String> removeController(TunnelController controller) {
         if (controller == null) return new ArrayList();
         controller.stopTunnel();
-        List msgs = controller.clearMessages();
+        List<String> msgs = controller.clearMessages();
         _controllers.remove(controller);
         msgs.add("Tunnel " + controller.getName() + " removed");
         return msgs;
@@ -155,10 +183,10 @@ public class TunnelControllerGroup {
      *
      * @return list of messages the tunnels generate when stopped
      */
-    public List stopAllControllers() {
-        List msgs = new ArrayList();
+    public List<String> stopAllControllers() {
+        List<String> msgs = new ArrayList();
         for (int i = 0; i < _controllers.size(); i++) {
-            TunnelController controller = (TunnelController)_controllers.get(i);
+            TunnelController controller = _controllers.get(i);
             controller.stopTunnel();
             msgs.addAll(controller.clearMessages());
         }
@@ -172,10 +200,10 @@ public class TunnelControllerGroup {
      *
      * @return list of messages the tunnels generate when started
      */
-    public List startAllControllers() {
-        List msgs = new ArrayList();
+    public List<String> startAllControllers() {
+        List<String> msgs = new ArrayList();
         for (int i = 0; i < _controllers.size(); i++) {
-            TunnelController controller = (TunnelController)_controllers.get(i);
+            TunnelController controller = _controllers.get(i);
             controller.startTunnelBackground();
             msgs.addAll(controller.clearMessages());
         }
@@ -190,10 +218,10 @@ public class TunnelControllerGroup {
      *
      * @return list of messages the tunnels generate when restarted
      */
-    public List restartAllControllers() {
-        List msgs = new ArrayList();
+    public List<String> restartAllControllers() {
+        List<String> msgs = new ArrayList();
         for (int i = 0; i < _controllers.size(); i++) {
-            TunnelController controller = (TunnelController)_controllers.get(i);
+            TunnelController controller = _controllers.get(i);
             controller.restartTunnel();
             msgs.addAll(controller.clearMessages());
         }
@@ -207,10 +235,10 @@ public class TunnelControllerGroup {
      *
      * @return list of messages the tunnels have generated
      */
-    public List clearAllMessages() {
-        List msgs = new ArrayList();
+    public List<String> clearAllMessages() {
+        List<String> msgs = new ArrayList();
         for (int i = 0; i < _controllers.size(); i++) {
-            TunnelController controller = (TunnelController)_controllers.get(i);
+            TunnelController controller = _controllers.get(i);
             msgs.addAll(controller.clearMessages());
         }
         return msgs;
@@ -221,46 +249,31 @@ public class TunnelControllerGroup {
      * file
      *
      */
-    public void saveConfig() {
+    public void saveConfig() throws IOException {
         saveConfig(_configFile);
     }
+
     /**
      * Save the configuration of all known tunnels to the given file
      *
      */
-    public void saveConfig(String configFile) {
+    public void saveConfig(String configFile) throws IOException {
         _configFile = configFile;
         File cfgFile = new File(configFile);
+        if (!cfgFile.isAbsolute())
+            cfgFile = new File(I2PAppContext.getGlobalContext().getConfigDir(), configFile);
         File parent = cfgFile.getParentFile();
         if ( (parent != null) && (!parent.exists()) )
             parent.mkdirs();
         
-        
-        TreeMap map = new TreeMap();
+        Properties map = new OrderedProperties();
         for (int i = 0; i < _controllers.size(); i++) {
-            TunnelController controller = (TunnelController)_controllers.get(i);
+            TunnelController controller = _controllers.get(i);
             Properties cur = controller.getConfig("tunnel." + i + ".");
             map.putAll(cur);
         }
         
-        StringBuffer buf = new StringBuffer(1024);
-        for (Iterator iter = map.keySet().iterator(); iter.hasNext(); ) {
-            String key = (String)iter.next();
-            String val = (String)map.get(key);
-            buf.append(key).append('=').append(val).append('\n');
-        }
-        
-        FileOutputStream fos = null;
-        try {
-            fos = new FileOutputStream(cfgFile);
-            fos.write(buf.toString().getBytes());
-            if (_log.shouldLog(Log.INFO))
-                _log.info("Config written to " + cfgFile.getPath());
-        } catch (IOException ioe) {
-            _log.error("Error writing out the config");
-        } finally {
-            if (fos != null) try { fos.close(); } catch (IOException ioe) {}
-        }
+        DataHelper.storeProps(map, cfgFile);
     }
     
     /**
@@ -270,9 +283,11 @@ public class TunnelControllerGroup {
      */
     private Properties loadConfig(String configFile) {
         File cfgFile = new File(configFile);
+        if (!cfgFile.isAbsolute())
+            cfgFile = new File(I2PAppContext.getGlobalContext().getConfigDir(), configFile);
         if (!cfgFile.exists()) {
             if (_log.shouldLog(Log.ERROR))
-                _log.error("Unable to load the controllers from " + configFile);
+                _log.error("Unable to load the controllers from " + cfgFile.getAbsolutePath());
             return null;
         }
         
@@ -282,7 +297,7 @@ public class TunnelControllerGroup {
             return props;
         } catch (IOException ioe) {
             if (_log.shouldLog(Log.ERROR))
-                _log.error("Error reading the controllers from " + configFile, ioe);
+                _log.error("Error reading the controllers from " + cfgFile.getAbsolutePath(), ioe);
             return null;
         }
     }
@@ -292,7 +307,7 @@ public class TunnelControllerGroup {
      *
      * @return list of TunnelController objects
      */
-    public List getControllers() { return _controllers; }
+    public List<TunnelController> getControllers() { return _controllers; }
     
     
     /** 
@@ -302,9 +317,9 @@ public class TunnelControllerGroup {
      */
     void acquire(TunnelController controller, I2PSession session) {
         synchronized (_sessions) {
-            Set owners = (Set)_sessions.get(session);
+            Set<TunnelController> owners = _sessions.get(session);
             if (owners == null) {
-                owners = new HashSet(1);
+                owners = new HashSet(2);
                 _sessions.put(session, owners);
             }
             owners.add(controller);
@@ -322,10 +337,10 @@ public class TunnelControllerGroup {
     void release(TunnelController controller, I2PSession session) {
         boolean shouldClose = false;
         synchronized (_sessions) {
-            Set owners = (Set)_sessions.get(session);
+            Set<TunnelController> owners = _sessions.get(session);
             if (owners != null) {
                 owners.remove(controller);
-                if (owners.size() <= 0) {
+                if (owners.isEmpty()) {
                     if (_log.shouldLog(Log.INFO))
                         _log.info("After releasing session " + session + " by " + controller + ", no more owners remain");
                     shouldClose = true;

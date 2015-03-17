@@ -1,0 +1,108 @@
+/* I2P Theme: Light */
+/* Description: RTL Light blue highlights for Arabic locale. */
+/* Author: dr|z3d */
+
+body {
+     direction: rtl;
+}
+
+pre {
+     text-align: right;
+}
+
+table {
+     direction: rtl;
+}
+
+td {
+     text-align: right;
+}
+
+h1,h2,h3,h4 {
+     direction: rtl;
+     text-align: right;
+}
+
+h1 {
+     margin: 10px 210px 0px 10px;
+     padding: 7px 0px 30px 20px;
+}
+
+form {
+    text-align: right;
+}
+
+div.routersummary form {
+    text-align: center;
+}
+
+div.routersummary h3 {
+     text-align: center;
+}
+
+div.routersummary td:last-child {
+     text-align: left;
+     margin-left: 3px;
+}
+
+div.logo {
+     float:right;
+}
+
+div.tunnels td:first-child {
+     text-align: right;
+}
+
+/* proxy error messages */
+
+div.warning {
+     text-align: right;
+}
+
+div.main {
+     margin: 10px 210px 0px 10px;
+     padding: 7px 0px 30px 20px;
+}
+
+div.main li {
+     text-align: right;
+}
+
+div.news {
+     margin: 10px 210px 0px 10px;
+     padding: 7px 0px 30px 20px;
+     direction: ltr;
+}
+
+div.graphspanel form {
+     text-align: right;
+}
+
+.langbox {
+     float: left;
+     text-align: left;
+}
+
+.formaction {
+     text-align: left;
+}
+
+.tidylist code {
+     text-align: right;
+}
+
+code {
+     text-align: right;
+}
+
+div.joblog li, div.newsheadings li {
+    text-align: left;
+    direction: ltr;
+}
+
+span.newtab {
+     text-align: left;
+     font-size: 8pt;
+     float: left;
+     letter-spacing: 0;
+}

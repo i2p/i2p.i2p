@@ -13,8 +13,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import net.i2p.util.Log;
-
 /**
  * Defines a certificate that can be attached to various I2P structures, such
  * as RouterIdentity and Destination, allowing routers and clients to help
@@ -23,12 +21,15 @@ import net.i2p.util.Log;
  * certificate authority, though that use probably isn't appropriate for an
  * anonymous network ;)
  *
+ * Todo: Properly support multiple certificates
+ *
  * @author jrandom
  */
 public class Certificate extends DataStructureImpl {
-    private final static Log _log = new Log(Certificate.class);
-    private int _type;
-    private byte[] _payload;
+    public final static Certificate NULL_CERT = new NullCert();
+
+    protected int _type;
+    protected byte[] _payload;
 
     /** Specifies a null certificate type with no payload */
     public final static int CERTIFICATE_TYPE_NULL = 0;
@@ -42,9 +43,44 @@ public class Certificate extends DataStructureImpl {
     /** Contains multiple certs */
     public final static int CERTIFICATE_TYPE_MULTIPLE = 4;
 
+    /**
+     * If null cert, return immutable static instance, else create new
+     * @throws AIOOBE if not enough bytes
+     * @since 0.8.3
+     */
+    public static Certificate create(byte[] data, int off) {
+        int type = data[off] & 0xff;
+        int length = (int) DataHelper.fromLong(data, off + 1, 2);
+        if (type == 0 && length == 0)
+            return NULL_CERT;
+        // from here down roughly the same as readBytes() below
+        if (length == 0)
+            return new Certificate(type, null);
+        byte[] payload = new byte[length];
+        System.arraycopy(data, off + 3, payload, 0, length);
+        return new Certificate(type, payload);
+    }
+
+    /**
+     * If null cert, return immutable static instance, else create new
+     * @since 0.8.3
+     */
+    public static Certificate create(InputStream in) throws DataFormatException, IOException {
+        int type = (int) DataHelper.readLong(in, 1);
+        int length = (int) DataHelper.readLong(in, 2);
+        if (type == 0 && length == 0)
+            return NULL_CERT;
+        // from here down roughly the same as readBytes() below
+        if (length == 0)
+            return new Certificate(type, null);
+        byte[] payload = new byte[length];
+        int read = DataHelper.read(in, payload);
+        if (read != length)
+            throw new DataFormatException("Not enough bytes for the payload (read: " + read + " length: " + length + ')');
+        return new Certificate(type, payload);
+    }
+
     public Certificate() {
-        _type = 0;
-        _payload = null;
     }
 
     public Certificate(int type, byte[] payload) {
@@ -93,8 +129,10 @@ public class Certificate extends DataStructureImpl {
             DataHelper.writeLong(out, 2, 0L);
         }
     }
-    
-    
+
+    /**
+     *  @return the written length (NOT the new offset)    
+     */    
     public int writeBytes(byte target[], int offset) {
         int cur = offset;
         DataHelper.toLong(target, cur, 1, _type);
@@ -113,7 +151,7 @@ public class Certificate extends DataStructureImpl {
     
     public int readBytes(byte source[], int offset) throws DataFormatException {
         if (source == null) throw new DataFormatException("Cert is null");
-        if (source.length <= offset + 3)
+        if (source.length < offset + 3)
             throw new DataFormatException("Cert is too small [" + source.length + " off=" + offset + "]");
 
         int cur = offset;
@@ -141,15 +179,17 @@ public class Certificate extends DataStructureImpl {
     public boolean equals(Object object) {
         if ((object == null) || !(object instanceof Certificate)) return false;
         Certificate cert = (Certificate) object;
-        return getCertificateType() == cert.getCertificateType() && DataHelper.eq(getPayload(), cert.getPayload());
+        return _type == cert.getCertificateType() && DataHelper.eq(_payload, cert.getPayload());
     }
+
     @Override
     public int hashCode() {
-        return getCertificateType() + DataHelper.hashCode(getPayload());
+        return _type + DataHelper.hashCode(_payload);
     }
+
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer(64);
+        StringBuilder buf = new StringBuilder(64);
         buf.append("[Certificate: type: ");
         if (getCertificateType() == CERTIFICATE_TYPE_NULL)
             buf.append("Null certificate");
@@ -179,5 +219,68 @@ public class Certificate extends DataStructureImpl {
         }
         buf.append("]");
         return buf.toString();
+    }
+
+    /**
+     *  An immutable null certificate.
+     *  @since 0.8.3
+     */
+    private static final class NullCert extends Certificate {
+        private static final int NULL_LENGTH = 1 + 2;
+        private static final byte[] NULL_DATA = new byte[NULL_LENGTH];
+
+        public NullCert() {
+            // zero already
+            //_type = CERTIFICATE_TYPE_NULL;
+        }
+
+        /** @throws RuntimeException always */
+        @Override
+        public void setCertificateType(int type) {
+            throw new RuntimeException("Data already set");
+        }
+
+        /** @throws RuntimeException always */
+        @Override
+        public void setPayload(byte[] payload) {
+            throw new RuntimeException("Data already set");
+        }
+    
+        /** @throws RuntimeException always */
+        @Override
+        public void readBytes(InputStream in) throws DataFormatException, IOException {
+            throw new RuntimeException("Data already set");
+        }
+    
+        /** Overridden for efficiency */
+        @Override
+        public void writeBytes(OutputStream out) throws IOException {
+            out.write(NULL_DATA);
+        }
+    
+        /** Overridden for efficiency */
+        @Override
+        public int writeBytes(byte target[], int offset) {
+            System.arraycopy(NULL_DATA, 0, target, offset, NULL_LENGTH);
+            return NULL_LENGTH;
+        }
+    
+        /** @throws RuntimeException always */
+        @Override
+        public int readBytes(byte source[], int offset) throws DataFormatException {
+            throw new RuntimeException("Data already set");
+        }
+    
+        /** Overridden for efficiency */
+        @Override
+        public int size() {
+            return NULL_LENGTH;
+        }
+    
+        /** Overridden for efficiency */
+        @Override
+        public int hashCode() {
+            return 99999;
+        }
     }
 }

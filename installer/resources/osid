@@ -21,6 +21,8 @@
 #     redhat   = Red Hat
 #     solaris  = Solaris
 #     suse     = SuSE
+#     openbsd  = OpenBSD
+#     netbsd   = NetBSD
 #     unknown  = OS could not be determined
 
 HOST_OS=`uname -a`
@@ -36,6 +38,8 @@ FREEBSD=`echo "$HOST_OS" | grep FreeBSD`
 LINUX=`echo "$HOST_OS" | grep Linux`
 SOLARIS=`echo "$HOST_OS" | grep Solaris`
 SUNOS=`echo "$HOST_OS" | grep SunOS`
+NETBSD=`echo "$HOST_OS" |grep NetBSD`
+OPENBSD=`echo "$HOST_OS" |grep OpenBSD`
 
 if [ ! "X$DARWIN" = "X" -o ! "X$MAC" = "X" ]; then
     echo osx
@@ -44,6 +48,16 @@ fi
 
 if [ ! "X$FREEBSD" = "X" ]; then
     echo freebsd
+    exit 0
+fi
+
+if [ ! "X$NETBSD" = "X" ]; then
+    echo netbsd
+    exit 0
+fi
+
+if [ ! "X$OPENBSD" = "X" ]; then
+    echo openbsd
     exit 0
 fi
 

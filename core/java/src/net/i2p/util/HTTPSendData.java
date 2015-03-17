@@ -1,6 +1,5 @@
 package net.i2p.util;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -12,6 +11,7 @@ import java.util.zip.GZIPOutputStream;
 /**
  * Simple helper class to submit data via HTTP Post
  *
+ * @deprecated unused
  */
 public class HTTPSendData {
     private final static Log _log = new Log(HTTPSendData.class);
@@ -74,6 +74,7 @@ public class HTTPSendData {
         }
     }
 
+/****
     public static void main(String args[]) {
         byte data[] = new byte[4096];
         for (int i = 0; i < data.length; i++)
@@ -87,4 +88,5 @@ public class HTTPSendData {
         } catch (InterruptedException ie) { // nop
         }
     }
+****/
 }

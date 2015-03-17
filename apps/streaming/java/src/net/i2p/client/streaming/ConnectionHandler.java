@@ -2,10 +2,9 @@ package net.i2p.client.streaming;
 
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
-import java.util.ArrayList;
-import java.util.List;
 
 import net.i2p.I2PAppContext;
+import net.i2p.data.Destination;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
@@ -19,10 +18,10 @@ import net.i2p.util.SimpleTimer;
  * @author zzz modded to use concurrent and bound queue size
  */
 class ConnectionHandler {
-    private I2PAppContext _context;
-    private Log _log;
-    private ConnectionManager _manager;
-    private LinkedBlockingQueue<Packet> _synQueue;
+    private final I2PAppContext _context;
+    private final Log _log;
+    private final ConnectionManager _manager;
+    private final LinkedBlockingQueue<Packet> _synQueue;
     private boolean _active;
     private int _acceptTimeout;
     
@@ -41,8 +40,7 @@ class ConnectionHandler {
         _context = context;
         _log = context.logManager().getLog(ConnectionHandler.class);
         _manager = mgr;
-        _synQueue = new LinkedBlockingQueue(MAX_QUEUE_SIZE);
-        _active = false;
+        _synQueue = new LinkedBlockingQueue<Packet>(MAX_QUEUE_SIZE);
         _acceptTimeout = DEFAULT_ACCEPT_TIMEOUT;
     }
     
@@ -75,12 +73,12 @@ class ConnectionHandler {
                 sendReset(packet);
             return;
         }
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Receive new SYN: " + packet + ": timeout in " + _acceptTimeout);
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Receive new SYN: " + packet + ": timeout in " + _acceptTimeout);
         // also check if expiration of the head is long past for overload detection with peek() ?
         boolean success = _synQueue.offer(packet); // fail immediately if full
         if (success) {
-            SimpleScheduler.getInstance().addEvent(new TimeoutSyn(packet), _acceptTimeout);
+            _context.simpleScheduler().addEvent(new TimeoutSyn(packet), _acceptTimeout);
         } else {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Dropping new SYN request, as the queue is full");
@@ -111,7 +109,7 @@ class ConnectionHandler {
                 // fail all the ones we had queued up
                 while(true) {
                     Packet packet = _synQueue.poll(); // fails immediately if empty
-                    if (packet == null || packet.getOptionalDelay() == PoisonPacket.MAX_DELAY_REQUEST)
+                    if (packet == null || packet.getOptionalDelay() == PoisonPacket.POISON_MAX_DELAY_REQUEST)
                         break;
                     sendReset(packet);
                 }
@@ -126,7 +124,7 @@ class ConnectionHandler {
                 if (timeoutMs <= 0) {
                     try {
                        syn = _synQueue.take(); // waits forever
-                    } catch (InterruptedException ie) {}
+                    } catch (InterruptedException ie) { } // { break;}
                 } else {
                     long remaining = expiration - _context.clock().now();
                     // (dont think this applies anymore for LinkedBlockingQueue)
@@ -138,19 +136,38 @@ class ConnectionHandler {
                         break;
                     try {
                         syn = _synQueue.poll(remaining, TimeUnit.MILLISECONDS); // waits the specified time max
-                    } catch (InterruptedException ie) {}
+                    } catch (InterruptedException ie) { }
                     break;
                 }
             }
 
             if (syn != null) {
-                if (syn.getOptionalDelay() == PoisonPacket.MAX_DELAY_REQUEST)
+                if (syn.getOptionalDelay() == PoisonPacket.POISON_MAX_DELAY_REQUEST)
                     return null;
 
-                // deal with forged / invalid syn packets
+                // deal with forged / invalid syn packets in _manager.receiveConnection()
 
                 // Handle both SYN and non-SYN packets in the queue
                 if (syn.isFlagSet(Packet.FLAG_SYNCHRONIZE)) {
+                    // We are single-threaded here, so this is
+                    // a good place to check for dup SYNs and drop them
+                    Destination from = syn.getOptionalFrom();
+                    if (from == null) {
+                        if (_log.shouldLog(Log.WARN))
+                            _log.warn("Dropping SYN packet with no FROM: " + syn);
+                        // drop it
+                        continue;
+                    }
+                    Connection oldcon = _manager.getConnectionByOutboundId(syn.getReceiveStreamId());
+                    if (oldcon != null) {
+                        // His ID not guaranteed to be unique to us, but probably is...
+                        // only drop it on a destination match too
+                        if (from.equals(oldcon.getRemotePeer())) {
+                            if (_log.shouldLog(Log.WARN))
+                                _log.warn("Dropping dup SYN: " + syn);
+                            continue;
+                        }
+                    }
                     Connection con = _manager.receiveConnection(syn);
                     if (con != null)
                         return con;
@@ -173,7 +190,9 @@ class ConnectionHandler {
             // Send it through the packet handler again
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Found con for queued non-syn packet: " + packet);
-            _manager.getPacketHandler().receivePacket(packet);
+            // false -> don't requeue, fixes a race where a SYN gets dropped
+            // between here and PacketHandler, causing the packet to loop forever....
+            _manager.getPacketHandler().receivePacketDirect(packet, false);
         } else {
             // goodbye
             if (_log.shouldLog(Log.WARN))
@@ -226,14 +245,14 @@ class ConnectionHandler {
 
     /**
      * Simple end-of-queue marker.
-     * The standard class limits the delay to MAX_DELAY_REQUEST so
+     * The standard class limits the delay to POISON_MAX_DELAY_REQUEST so
      * an evil user can't use this to shut us down
      */
     private static class PoisonPacket extends Packet {
-        public static final int MAX_DELAY_REQUEST = Packet.MAX_DELAY_REQUEST + 1;
+        public static final int POISON_MAX_DELAY_REQUEST = Packet.MAX_DELAY_REQUEST + 1;
 
         public PoisonPacket() {
-            setOptionalDelay(MAX_DELAY_REQUEST);
+            setOptionalDelay(POISON_MAX_DELAY_REQUEST);
         }
     }
 }

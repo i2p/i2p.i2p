@@ -62,7 +62,7 @@ public class RandomEventStandalone extends EventObject
     this.poolNumber = poolNumber;
     if (data.length == 0 || data.length > 32)
       throw new IllegalArgumentException("random events take between 1 and 32 bytes of data");
-    this.data = (byte[]) data.clone();
+    this.data = data.clone();
   }
 
   public byte getSourceNumber()

@@ -1,0 +1,1447 @@
+/* I2P Theme: Light */
+/* Description: Light blue highlights. */
+/* Author: dr|z3d */
+
+body {
+     margin: 10px 0px -10px 10px;
+     text-align: center;
+     color: #000;
+     font: 10pt/130% "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
+     background: #9696ff url('images/snowcamo.png');
+}
+
+.hide {
+     display: none;
+}
+
+div.clearer {
+     clear: left;
+     height: 0;
+     line-height: 0;
+}
+
+img {
+     border: none;
+}
+
+pre {
+     width: 98%;
+     overflow: auto;
+     text-align: left;
+     font: 8pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
+     color: #333;
+     margin: 10px;
+}
+
+div.logo {
+     float: left;
+     padding: 10px;
+     text-align: center;
+     color: #fff;
+     margin: 0 10px;
+     border: 1px solid #447;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+     background: #ffe;
+     width: 185px;
+     -moz-box-shadow: inset 0px 0px 1px 1px #bbf;
+}
+
+div.toolbar {
+     margin: 0;
+     padding: 10px;
+     font-weight: bold;
+     background: #ffe;
+     border: 1px solid #447;
+     display: none !important;
+}
+
+div.toolbar a:link {
+     border: 1px outset #ddddc0;
+     padding: 0px 5px 1px 5px;
+     line-height: 250%;
+     background: #bbf;
+     text-decoration: none;
+     border-radius: 4px;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     display: none !important;
+}
+
+div.toolbar a:visited {
+     background: #ffe;
+}
+
+div.toolbar a:hover {
+     border: 1px solid #eeffef;
+     background: #003;
+     color: #f60;
+}
+
+a:active {
+     color: #900;
+}
+
+div.routersummaryouter {
+     float: left;
+     width: 200px;
+     margin: 0 0 10px 0px;
+     padding: 0;
+     border: 0;
+     clear: left;/* fixes a bug in Opera */
+     text-align: center !important;
+     display: block;
+     position: absolute;/* so no interference with /home app icons */
+}
+
+div.routersummary {
+     width: 180px;
+     padding: 8px 8px 10px 8px;
+     text-align: center !important;
+     border: 1px solid #447;
+     color: #000;
+     font-size: 8pt;
+     clear: left;/* fixes a bug in Opera */
+     -moz-border-radius: 8px;
+     -khtml-border-radius: 8px;
+     border-radius: 8px;
+     background: #f0f0f0;
+     -moz-box-shadow: inset 0px 0px 1px 1px #bbf;
+     -khtml-box-shadow: inset 0px 0px 1px 1px #bbf;
+     box-shadow: inset 0px 0px 1px 1px #bbf;
+}
+
+div.routersummary input[type=text] {
+     text-align: right !important;
+}
+
+div.routersummary hr {
+     color: #99f;
+     background: #99f;
+     height: 1px;
+     border-bottom: 1px solid #99f;
+     margin: 8px -7px 8px -7px;
+     -moz-box-shadow: inset 0px 1px 1px 1px #fff;
+    -khtml-box-shadow: inset 0px 1px 0px #fff;
+     box-shadow: inset 0px 1px 1px 1px #fff;
+}
+
+div.routersummary hr.b {
+     color: #f0f0f0;
+     background: #f0f0f0;
+     border-bottom: 1px solid #f0f0f0;
+}
+
+div routersummary hr:last-child {
+}
+
+div.routersummary h3 {
+     border: 0;
+     font-size: 9.5pt;
+     letter-spacing: 0.04em;
+     margin: -4px -3px;
+     padding: 2px 0;
+     background: #ffe;
+     text-transform: uppercase;
+     background: #ffe url('images/header.png') center center repeat-x;
+     border: 1px solid #99f !important;
+     -moz-border-radius: 3px;
+     -khtml-border-radius: 3px;
+     border-radius: 3px;
+     -moz-box-shadow: 0px 1px 5px #bbf;
+     -khtml-box-shadow: outset 0px 0px 2px 1px #bbf;
+}
+
+div.routersummary h3 a {
+     text-decoration: none;
+}
+
+div.routersummary h3:hover {
+     background: #ffa url('images/header.png') center center repeat-x !important;
+     text-shadow: 0 0 0;
+     -moz-box-shadow: inset 0px 0px 2px 1px #ffa;
+     -khtml-box-shadow: inset 0px 0px 2px 1px #ffa;
+     box-shadow: inset 0px 0px 2px 1px #ffa;
+}
+
+div.routersummary h4 {
+     border: 0px solid #fff;
+     border-bottom: 0 !important;
+     font-size: 8.5pt;
+     letter-spacing: 0.02em;
+     margin: -6px -6px -7px !important;
+     padding: 6px 3px 6px 27px;
+     background: #e0e0f5 url('../images/itoopie_xsm.png') no-repeat 1px center;
+     min-height: 16px;
+     text-decoration: none !important;
+     color: #359;
+     line-height: 105%;
+     -moz-box-shadow: inset 0px 0px 1px 30px #bdf;
+     -khtml-box-shadow: 0px 0px 1px 1px #bdf;
+     box-shadow: 0px 0px 1px 1px #bdf;
+}
+
+div.routersummary ul {
+     text-align: left !important;
+}
+
+div.routersummary table {
+     border: 0;
+     text-align: center !important;
+     margin: -6px -5px -4px -5px;
+     width: 190px !important;
+     overflow: hidden;
+     font-size: 8pt;
+     background-image: none !important;
+     background-color: transparent !important;
+}
+
+div.routersummary tr {
+     background-image: none !important;
+     background-color: transparent !important;
+     border: 0 !important;
+}
+
+div.routersummary td:first-child {
+     max-width: 90px;
+     overflow: hidden;
+}
+
+div.routersummary a:hover {
+     color: #f60;
+}
+
+div.routersummary td {
+     padding: 1px 3px;
+     background-image: none !important;
+     border: 0 !important;
+}
+
+div.tunnels td:first-child {
+     width: 16px;
+     text-align: left;
+     padding-right: 1px;
+}
+
+div.tunnels td:last-child {
+     text-align: right;
+     padding-right: 1px;
+}
+
+div.tunnels img, div.tunnels img:hover {
+     opacity: 1 !important;
+}
+
+div.routersummary img:first-child  {
+     margin-bottom: -2px !important;
+     opacity: 0.7;
+}
+
+div.routersummary img:hover:first-child {
+     margin-bottom: -2px !important;
+     opacity: 1;
+}
+
+div.newsheadings {
+     text-align: right;
+     margin: 0 0 0 10px;
+}
+
+div.newsheadings li {
+     list-style: none outside url('images/newsbullet_mini.png');
+     margin: 0 -4px 2px 8px;
+}
+
+div.tunnels {
+     margin-top: 6px !important;
+     margin-left: -2px !important;
+     margin-bottom: 3px !important;
+     padding-top: 3px !important;
+}
+
+div.tunnels table {
+     margin: -7px 0 -5px -4px !important;
+}
+
+div.tunnels td, div.tunnels img:first-child {
+     margin: 0 !important;
+    text-transform: capitalize;
+}
+
+.tunnels tr {
+     padding: 4px 0 !important;
+}
+
+div.routersummary p {
+     padding: 0;
+}
+
+div.refresh {
+     margin-top: 10px !important;
+     margin-bottom: 10px !important;
+     padding: 2px 0 0px 0 !important;
+}
+
+/* proxy error messages */
+
+div.warning {
+     margin: 20px 20px 30px 240px;
+     padding: 5px 25px 20px 75px;
+     background: #fff;
+     border: 1px solid #447;
+     text-align: left;
+     color: inherit;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+     text-align: justify;
+     background-image:url("../images/itoopie_sm.png");
+     background-position:10px center;
+     background-repeat:no-repeat;
+     -moz-box-shadow: inset 0px 0px 1px 0px #d00;
+     word-wrap: break-word;
+     min-width: 400px;
+}
+
+/* console error messages */
+
+div.sorry {
+     margin: 5px 10px 10px 207px;
+     padding: 20px 20px 20px 75px;
+     background: #ffe;
+     border: 1px solid #447;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+     text-align: justify;
+     background-image: url("images/errortriangle.png");
+     background-position: 15px center;
+     background-repeat: no-repeat;
+     -moz-box-shadow: inset 0px 0px 0px 1px #d00;
+     word-wrap: break-word;
+     font-weight: bold;
+     color: #531;
+}
+
+div.sorry hr {
+     color: #531;
+     background: #531;
+     height: 1px;
+     border: 1px solid #531;
+     margin: 10px 0 15px 0;
+}
+
+div.main {
+     margin: 10px 10px 20px 207px;
+     padding: 0 15px 15px 15px;
+     text-align: left;
+     color: #001;
+     width: auto;
+     min-width: 500px;
+     border: 1px solid #447;
+     -moz-border-radius: 8px;
+     -khtml-border-radius: 8px;
+     border-radius: 8px;
+     -moz-box-shadow: inset 0px 0px 1px 1px #bbf;
+     -khtml-box-shadow: inset 0px 0px 1px 1px #bbf;
+     box-shadow: inset 0px 0px 1px 1px #bbf;
+     background: #f0f0f0;
+}
+
+div.main hr, hr {
+     color: #113;
+     background: #113;
+     height: 1px;
+     border: 0px solid #113;
+     margin: 10px 0;
+}
+
+hr:last-child {
+     margin-top: 20px !important;
+}
+
+div.main textarea {
+     background: #ffe;
+     color: #001;
+     font: 8pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
+}
+
+div.news {
+     margin: 0px 10px 5px 207px;
+     padding: 7px 20px 7px 20px;
+     border: 1px solid #447;
+     color: #224;
+     border-radius: 8px;
+     -moz-border-radius: 8px;
+     -khtml-border-radius: 8px;
+     text-align: right !important;
+     font-size: 7.5pt;
+     line-height: 140%;
+     -moz-box-shadow: inset 0px 0px 1px 1px #bbf;
+     -khtml-box-shadow: inset 0px 0px 1px 1px #bbf;
+     box-shadow: inset 0px 0px 1px 1px #bbf;
+     background: #f0f0f0 url("/themes/snark/ubergine/images/hat.png") no-repeat scroll right bottom;
+     min-width: 490px;
+}
+
+div.news p {
+     font-size: 9pt;
+     text-align: justify !important;
+     line-height: 120%;
+     margin-top: -7px;
+     padding: 0 15px;
+}
+
+div.news hr {
+     color: #225;
+     background: #225;
+     height: 1px;
+     border: 0px dotted #225;
+     margin: 10px 0 5px;
+     opacity: 0.6;
+}
+
+div.news li {
+     text-align: justify;
+     list-style: none;
+     margin: 5px 0 16px 0 !important;
+     vertical-align: bottom;
+     border: 1px solid #113;
+     border-left: 5px solid #113;
+     padding: 5px 5px;
+     border-radius: 0 4px 4px 0;
+     -moz-border-radius: 0 4px 4px 0;
+     -khtml-border-radius: 0 4px 4px 0;
+     font-size: 10pt;
+     opacity: 1;
+     background: #ffe url('images/header.png') center center repeat-x;
+     -moz-box-shadow: 0 1px 1px 1px rgba(176, 176, 216, 0.4);
+     -moz-box-shadow: 0 1px 1px 1px rgba(176, 176, 216, 0.4);
+     font-weight: bold;
+     text-transform: capitalize;
+}
+
+div.news li:first-child {
+     margin-top: 10px !important;
+}
+
+div.news h3 {
+     background: none !important;
+     text-align: left;
+     border: none !important;
+     padding-left: 0;
+     padding-top: 0px;
+     border-bottom: 1px dotted #225 !important;
+     -moz-box-shadow: none;
+     -khtml-box-shadow: none;
+     box-shadow: none;
+     font-size: 10pt !important;
+     letter-spacing: 0.05em;
+     text-transform: capitalize !important;
+     text-shadow: 0px 0px 0px #77f;
+}
+
+div.news h4 {
+     border-bottom: 0px;
+     padding: 0;
+     margin: 0 0 -10px 0;
+     font-size: 11pt;
+}
+
+div.confignav {
+     padding: 16px 10px !important;
+     margin: 10px 0 0 -10px;
+     font-size: 9.5pt !important;
+     font-weight: bold !important;
+     line-height: 160% !important;
+     opacity: 1;
+     min-width: 400px;
+}
+
+span.tab {
+     padding: 2px 18px 4px 6px;
+     margin: -5px -7px 0 0;
+     background: #d8d8ff;
+     -moz-border-radius: 6px 32px 2px 0;
+     -khtml-border-radius: 6px 32px 2px 0;
+     border-radius: 6px 32px 2px 0;
+     border: 1px outset #00f;
+     border-width: 2px 1px 1px 2px;
+     border-bottom-style: dashed;
+     min-width: 40px;
+     display: inline-block;
+     word-wrap: break-word;
+     vertical-align: bottom;
+}
+
+span.tab2 {
+     color: #008;
+     padding: 7px 18px 6px 6px;
+     margin: -11px -3px 0 0;
+     background: #e8e8ff;
+     -moz-border-radius: 6px 32px 2px 0;
+     -khtml-border-radius: 6px 32px 2px 0;
+     border-radius: 6px 32px 2px 0;
+     border: outset #00f;
+     border-width: 3px 1px 0 4px;
+     border-bottom-style: none;
+     min-width: 40px;
+     display: inline-block;
+     word-wrap: break-word;
+     vertical-align: bottom;
+}
+
+div.configure {
+     min-width: 400px;
+     margin-bottom: 0px;
+}
+
+div.configure h3, div.graphspanel h3 {
+     border: 1px solid #115;
+     border-left: 5px solid #115;
+     padding: 5px;
+     margin: 15px 0 15px 0;
+     border-radius: 0 4px 4px 0;
+     -moz-border-radius: 0 4px 4px 0;
+     -khtml-border-radius: 0 4px 4px 0;
+     background: #ffe;
+     text-align: left;
+}
+
+.sidebarconf input[type="image"] {
+     margin: 2px;
+     padding: 1px;     
+}
+
+.sidebarconf th:nth-child(1) {
+     text-align: center;     
+}
+
+.sidebarconf th:nth-child(2) {
+     text-align: left;     
+}
+
+.sidebarconf td:first-child {
+     width: 60px;
+     text-align: right;
+     padding-right: 50px;
+}
+
+.sidebarconf td {
+     font-weight: bold;
+     font-size: 9pt;  
+}
+
+.sidebarconf td:nth-child(3), .sidebarconf td:nth-child(4) {
+     width: 70px;
+     padding: 0;  
+}
+
+.sidebarconf td:nth-child(3) {
+     text-align: right;
+     padding-left: 50px;
+}
+
+.sidebarconf td:nth-child(4) {
+     text-align: left;
+     padding-right: 50px;
+}
+
+div.graphspanel {
+     text-align: center !important;
+     margin: 15px 0px -15px;
+}
+
+div.graphspanel img {
+     border: 1px solid #447;
+     padding: 2px;
+     margin: 6px;
+     text-align: center !important;
+     background: #001;
+     -moz-box-shadow: inset 0px 0px 1px 1px #99f;
+}
+
+div.graphspanel img:hover {
+     -moz-box-shadow: inset 0px 0px 2px 1px #f60;
+}
+
+div.graphspanel form {
+     text-align: left;
+}
+
+div.messages {
+     padding: 10px;
+     margin: 10px 0 15px 0;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+     border: 1px solid #447;
+     background: #fff url('images/magic.png');
+     font-weight: bold;
+     -moz-box-shadow: 0 2px 1px 1px rgba(176, 176, 216, 0.4);
+     -khtml-box-shadow: 0 2px 1px 1px rgba(176, 176, 216, 0.4);
+     box-shadow: 0 2px 1px 1px rgba(176, 176, 216, 0.4);
+}
+
+div.error {
+     color: #d00000;
+}
+
+div.notice {
+     font-style: italic;
+}
+
+div.messages li {
+     text-align: justify !important;
+     font-weight: bold;
+     list-style: url(images/warning.png) !important;
+     margin: 0 10px 0 35px !important;
+     padding: 5px 10px !important;
+     border: 0px !important;
+}
+
+table {
+     border-collapse: collapse;
+     width: 100%;
+     border: 1px solid #447;
+     margin: 1px -15px 5px 0px;
+     font-size: 7pt;
+     background: #b4c8ff url('images/tabletitlelight.png') repeat-x;
+     font: 7pt/130% "Lucida Sans Unicode", Verdana, "Bitstream Vera Sans", Tahoma, Helvetica, sans-serif;
+}
+
+table hr {
+     padding: 0px 0;
+     color: #99f;
+     background: #99f;
+     border: 0px solid #99f;
+     margin: 0px 0px;
+     height: 1px;
+     display: none;
+}
+
+th {
+     padding: 6px 2px;
+     color: #000;
+     background: #ffe url('images/header.png') center center repeat-x;
+     text-align: center;
+     font-size: 9pt;
+     line-height: 110%;
+     border-bottom: 1px solid #447 !important;
+     border-top: 1px solid #447 !important;
+}
+
+tr {
+     vertical-align: middle !important;
+}
+
+tr:nth-child(even) {
+     background: #f7f7ff url(images/magic.png);
+}
+
+tr:nth-child(odd) {
+     background: #fff url(images/magic.png);
+}
+
+td {
+     padding: 5px 3px;
+     color: #000;
+     vertical-align: middle;
+     border-top: 1px inset #447;
+     border-bottom: 1px outset #99f;
+}
+
+/* begin home page */
+
+/*
+#appsummary {
+     clear: none;
+     float: none;
+     left: 10px;
+     margin: 0;
+     position: absolute;
+     top: 10px;
+}
+
+#homemain {
+     left: 217px;
+     margin: 0 10px 10px 0;
+     position: absolute;
+     top: 10px;
+}
+
+#homenews {
+     margin: 0 10px 5px 0;
+}
+
+h2.app {
+     border-radius: 8px;
+     margin: 1px 10px 15px 0 !important;
+}
+*/
+
+h4.app, h4.app2 {
+     margin: 0 10px 2px 10px;
+     padding: 10px 0 8px 0;
+}
+
+h4.app2 {
+     clear: left;
+     margin-top: 5px !important;
+}
+
+div.ag2 {
+     margin: 0;
+}
+
+div.app {
+     float: left;
+     padding: 2px;
+     height: 84px;
+     width: 112px;
+     text-align: center !important;
+}
+
+div.appgroup {
+     margin: 0;
+     padding: 16px 8px;
+     width: auto;
+}
+
+div.search {
+     margin: 10px 10px 0 0;
+     padding: 8px 8px 0 8px;
+     width: auto;
+}
+
+table.search {
+     background: none;
+     padding: 8px;
+     width: auto;
+     margin-left:auto;
+     margin-right:auto;
+}
+
+img.app {
+     height: 32px;
+     width: 32px;
+     padding: 6px;
+}
+
+img.app2p {
+     height: 40px;
+     padding: 3px 6px 0 6px;
+}
+
+table.app {
+     background: none;
+     border: 0;
+     margin: auto;
+     width: auto;
+}
+
+tr.app {
+     background: none;
+     border: 0;
+     margin: 0;
+}
+
+td.app {
+     background: none;
+     border: 0;
+     margin: 0;
+}
+
+div.applabel {
+     background: url('images/header.png') center center repeat-x;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border: 2px #00f;
+     border-radius: 4px;
+     border-width: 1px;
+     font-size: 9pt;
+     margin: 0;
+     padding: 3px 6px 4px 6px;
+     text-align: center;
+}
+
+/* end home page */
+
+tt {
+     font: bold 8pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
+     color: #008000;
+     padding: 1px 5px;
+}
+
+div.main li {
+     text-align: left;
+     list-style: square;
+     margin: 2px 20px 0px 40px;
+     padding: 1px 10px 1px 10px;
+     line-height: 150%;
+     word-wrap: break-word;
+}
+
+div.main li b {
+     color: #514 !important;
+     color: #003 !important;
+     letter-spacing: 0.01em;
+     font-size: 9.5pt;
+     line-height: 170%;
+}
+
+div.main li:first-child {
+     margin-top: 10px !important;
+}
+.tidylist {
+     text-align: justify !important;
+}
+
+.tidylist li:first-child {
+     margin-top: -10px !important;
+}
+
+.tidylist:last-child {
+     padding-bottom: 5px;
+}
+
+.tidylist code {
+     text-align: left;
+     font: 9pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
+     color: #910;
+     padding: 2px 3px;
+     font-weight: bold;
+}
+
+ol {
+
+     margin: 1px 0 0 5px;
+     padding: 1px 0 0 20px;
+}
+
+ul {
+     display: inline;
+     margin: 0;
+     padding: 0;
+}
+
+code {
+     text-align: left;
+     font: 9pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
+     color: #390;
+     font-weight: bold;
+}
+
+a:link {
+     color: #359;
+     text-decoration: none;
+     font-weight: bold;
+     word-wrap: break-word;
+}
+
+a:visited {
+     color: #218;
+     text-decoration: none;
+     font-weight: bold;
+}
+
+a:hover {
+     color: #f60;
+     text-decoration: underline;
+     font-weight: bold;
+}
+
+a:active {
+     color: #f93;
+     text-decoration: underline;
+     font-weight: bold;
+}
+
+.links li {
+     list-style: url(images/link.png) !important;
+     text-align: justify;
+     line-height: 120% !important;
+}
+
+.links li:first-child {
+     padding-top: 0 !important;
+}
+
+.links ul {
+     margin-top: -5px !important;
+}
+
+p {
+     text-align: justify;
+     line-height: 160%;
+}
+
+h1 {
+     text-align: left;
+     color: #115;
+     padding: 10px 15px;
+     margin: 0 10px 10px 207px;
+     font: normal bold 16pt/120% "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
+     letter-spacing: 0.15em;
+     text-transform: uppercase;
+     -moz-box-shadow: inset 0px 0px 1px 1px #bbf;
+     -khtml-box-shadow: inset 0px 0px 1px 1px #bbf;
+     box-shadow: inset 0px 0px 1px 1px #bbf;
+     white-space: normal;
+     background: #f0f0f0;
+     border: 1px solid #447;
+     border-radius: 8px;
+     -moz-border-radius: 8px;
+     -khtml-border-radius: 8px;
+     min-width: 500px;
+}
+
+span.newtab {
+     text-align: right;
+     font-size: 8pt;
+     float: right;
+     letter-spacing: 0;
+}
+
+/* opera targetted hack */
+x:-o-prefocus, span.newtab {
+     margin-top: -25px;
+}
+
+h2 {
+     font-size: 13pt;
+     color: #115;
+     letter-spacing: 0.07em;
+     background: url('images/header.png') center center repeat-x;
+     padding: 10px;
+     border: 1px solid #115;
+     border-radius: 4px;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     margin: 15px 0px 15px 0 !important;
+     -moz-box-shadow: 0 2px 1px 1px rgba(176, 176, 216, 0.4);
+     -khtml-box-shadow: 0 2px 1px 1px rgba(176, 176, 216, 0.4);
+     box-shadow: 0 2px 1px 1px rgba(176, 176, 216, 0.4);
+     word-wrap: break-word;
+     opacity: 1;
+}
+
+h2 a, h3 a {
+    text-transform: capitalize;
+    letter-spacing: 0.03em;
+}
+
+h2 a:hover, h3 a:hover {
+     text-shadow: none;
+}
+
+.routersummary h3 a{
+    text-transform: uppercase;
+}
+
+h2 a:hover {
+     text-shadow: 0px 0px 1px rgba(255, 255, 72, 0.9);
+     border-bottom: 1px #ff6600;
+     padding-bottom: 5px;
+}
+
+h2 img {
+     opacity: 0.9 !important;
+}
+
+h3 {
+     border: 1px solid #115;
+     border-left: 5px solid #115;
+     padding: 5px 5px 5px 8px;
+     margin: 12px 0 15px 0;
+     border-radius: 0 4px 4px 0;
+     -moz-border-radius: 0 4px 4px 0;
+     -khtml-border-radius: 0 4px 4px 0;
+     background: url('images/header.png') center center repeat-x !important;
+     font-size: 11pt;
+     color: #115;
+     -moz-box-shadow: 0 2px 1px 1px rgba(176, 176, 216, 0.4);
+     -khtml-box-shadow: 0 2px 1px 1px rgba(176, 176, 216, 0.4);
+     box-shadow: 0 2px 1px 1px rgba(176, 176, 216, 0.4);
+     opacity: 1;
+     letter-spacing: 0.07em;
+}
+
+h4 {
+     border-bottom: 1px;
+     border-bottom-style: solid;
+     border-bottom-color: #447;
+     padding: 0 0 10px 0;
+     margin: 5px 0 10px 0;
+     font-size: 11pt;
+}
+
+button, button:visited {
+     font: bold 9pt "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
+     border: 1px outset #66a;
+     padding: 1px 3px;
+     background: #ffe;
+     text-decoration: none;
+     border-radius: 4px;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     font-size: 8pt;
+     font-weight: bold;
+     margin: 2px;
+     text-align: center;
+     min-width: 60px;
+     -moz-box-shadow: inset 0px 0px 2px 1px #fff;
+     -khtml-box-shadow: inset 0px 2px 8px 0px #fff;
+     box-shadow: inset 0px 2px 8px 0px #fff;
+     color: #316;
+}
+
+button.accept {
+     background: #ffe url('../images/accept.png') no-repeat 2px center;
+     padding: 2px 3px 2px 20px;
+     min-height: 22px;
+}
+
+button.add {
+     background: #ffe url('../images/add.png') no-repeat 2px center;
+     padding: 2px 3px 2px 20px;
+     min-height: 22px;
+}
+
+button.cancel {
+     background: #ffe url('../images/cancel.png') no-repeat 2px center;
+     padding: 2px 3px 2px 20px;
+     min-height: 22px;
+}
+
+button.check {
+     background: #ffe url('../images/tick.png') no-repeat 2px center;
+     padding: 2px 3px 2px 20px;
+     min-height: 22px;
+}
+
+button.delete {
+     background: #ffe url('../images/delete.png') no-repeat 2px center;
+     padding: 2px 3px 2px 20px;
+     min-height: 22px;
+}
+
+button.download {
+     background: #ffe url('../images/arrow_down.png') no-repeat 2px center;
+     padding: 2px 3px 2px 20px;
+     min-height: 22px;
+}
+
+button.go {
+     background: #ffe url('../images/arrow_right.png') no-repeat 2px center;
+     padding: 2px 3px 2px 20px;
+     min-height: 22px;
+}
+
+button.reload {
+     background: #ffe url('../images/arrow_refresh.png') no-repeat 2px center;
+     padding: 2px 3px 2px 20px;
+     min-height: 22px;
+}
+
+button.search {
+     background: #ffe url('../images/magnifier.png') no-repeat 2px center;
+     padding: 2px 3px 2px 20px;
+     min-height: 22px;
+}
+
+button.stop {
+     background: #ffe url('../images/stop.png') no-repeat 2px center;
+     padding: 2px 3px 2px 20px;
+     min-height: 22px;
+}
+
+button:hover {
+     border: 1px solid #f60;
+     background-color: #f60 !important;
+     color: #fff;
+     -moz-box-shadow: inset 0px 0px 0px 1px #fff;
+     -khtml-box-shadow: inset 0px 0px 0px 1px #fff;
+     box-shadow: inset 0px 0px 0px 1px #fff;
+}
+
+button:active {
+     border: 1px solid #f60;
+     background: #202 !important;
+     color: #f60;
+     -moz-box-shadow: inset 0px 0px 0px 1px #f60;
+     box-shadow: inset 0px 0px 0px 1px #f60;
+     -khtml-box-shadow: inset 0px 0px 0px 1px #f60;
+}
+
+.underline {
+     border-bottom: 1px solid #000022;
+     padding: 5px 0px 5px 0px;
+     margin: 0px 0px 10px 0px;
+}
+
+.langbox {
+     margin: 3px 10px 4px 5px;
+     padding: 2px 5px;
+     color: #001;
+     font-size: 7pt;
+     width: 260px;
+     text-align: right;
+     float: right;
+     vertical-align: middle;
+     opacity: 1 !important;
+}
+
+.langbox img {
+     opacity: 0.8 !important;
+}
+
+.langbox img:hover {
+     opacity: 1 !important;
+}
+
+input, input:visited {
+     border: 1px outset #999;
+     background: #ffe;
+     color: #316;
+     margin: 5px;
+     font: bold 8pt "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
+     padding: 1px 3px;
+     text-decoration: none;
+     border-radius: 4px;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     -moz-box-shadow: inset 0px 2px 8px 0px #fff;
+     color: #813;
+     opacity: 1;
+}
+
+input.accept {
+     background: #ffe url('../images/accept.png') no-repeat 2px center;
+     padding: 2px 3px 2px 20px;
+     min-height: 22px;
+}
+
+input.add {
+     background: #ffe url('../images/add.png') no-repeat 2px center;
+     padding: 2px 3px 2px 20px;
+     min-height: 22px;
+}
+
+input.cancel {
+     background: #ffe url('../images/cancel.png') no-repeat 2px center;
+     padding: 2px 3px 2px 20px;
+     min-height: 22px;
+}
+
+input.check {
+     background: #ffe url('../images/tick.png') no-repeat 2px center;
+     padding: 2px 3px 2px 20px;
+     min-height: 22px;
+}
+
+input.delete {
+     background: #ffe url('../images/delete.png') no-repeat 2px center;
+     padding: 2px 3px 2px 20px;
+     min-height: 22px;
+}
+
+input.download {
+     background: #ffe url('../images/arrow_down.png') no-repeat 2px center;
+     padding: 2px 3px 2px 20px;
+     min-height: 22px;
+}
+
+input.go {
+     background: #ffe url('../images/arrow_right.png') no-repeat 2px center;
+     padding: 2px 3px 2px 20px;
+     min-height: 22px;
+}
+
+input.reload {
+     background: #ffe url('../images/arrow_refresh.png') no-repeat 2px center;
+     padding: 2px 3px 2px 20px;
+     min-height: 22px;
+}
+
+input.search[type="text"] {
+     background: #ffe url('../images/magnifier.png') no-repeat 2px center;
+     padding: 2px 3px 2px 24px;
+     min-height: 22px;
+}
+
+input.stop {
+     background: #ffe url('../images/stop.png') no-repeat 2px center;
+     padding: 2px 3px 2px 20px;
+     min-height: 22px;
+}
+
+input:hover {
+     background-color: #f60;
+     color: #fff;
+     border: 1px solid #f60;
+     opacity: 1.0;
+     -moz-box-shadow: inset 0px 0px 0px 1px #fff;
+
+}
+
+input:active {
+     background: #002;
+     color: #f60;
+     border: 1px solid #f60;
+     opacity: 1.0;
+     -moz-box-shadow: inset 0px 0px 0px 1px #f60;
+     -khtml-box-shadow: inset 0px 0px 0px 1px #f60;
+     box-shadow: inset 0px 0px 0px 1px #f60;
+}
+
+input[type=text], input[type=password] {
+     background: #ffe;
+     color: #001;
+     margin: 5px 10px 5px 10px;
+     padding: 4px;
+     font: bold 8pt "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
+     border: 1px solid #447;
+     text-decoration: none;
+}
+
+submit {
+     background: #f00;
+     color: #ffe;
+     margin: 10px 2px 10px 0;
+     padding: 2px;
+     font-family: "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
+     font-weight: bold;
+     border: 1px solid #447;
+     text-decoration: none;
+}
+
+input checkbox {
+     border: 0 !important;
+}
+
+select {
+     background: #ffe;
+     color: #003;
+     margin: 5px 10px 5px 10px;
+     padding: 4px;
+     border: 1px solid #447;
+     min-width: 80px;
+     font: 9pt "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
+     border-radius: 4px;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     text-align: left !important;
+}
+
+select:active {
+     -moz-box-shadow: inset 0px 0px 0px 1px #f60;
+     -khtml-box-shadow: inset 0px 0px 0px 1px #f60;
+     box-shadow: inset 0px 0px 0px 1px #f60;
+}
+
+textarea {
+     padding: 5px;
+     margin: 5px 15px 5px 10px;
+     background: #ffe;
+     color: #003;
+     border-radius: 4px;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     font: 8pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
+     min-height: 100px;
+     min-width: 97%;
+     border: 1px solid #447;
+}
+
+textarea:active {
+     -moz-box-shadow: inset 0px 0px 0px 1px #f60;
+     -khtml-box-shadow: inset 0px 0px 0px 1px #f60;
+     box-shadow: inset 0px 0px 0px 1px #f60;
+}
+
+.proxyfooter {
+     margin: 0 20px 10px 240px;
+     padding: 20px 25px 20px 75px;
+     color: #f00;
+     font-size: 7pt;
+     text-align: right !important;
+     border-radius: 4px;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border: 1px solid #447;
+     display: none;
+}
+
+.statusnotes {
+     font-style: normal;
+     font-size: 8pt;
+     color: #225 !important;
+     text-align: center;
+     border: 1px solid #447 !important;
+     border-top: 0 !important;
+     margin: -5px 0 5px 0;
+     padding: 7px;
+     background: url("images/header.png") repeat scroll center center #eef;
+     letter-spacing: 0em !important;
+}
+
+div.joblog {
+     overflow: auto;
+     border: 0;
+     margin-top: 5px;
+ }
+
+div.joblog i {
+     color: #050;
+     font-weight: bold;
+}
+
+div.joblog ul {
+     word-wrap: break-word !important;
+     text-align: justify;
+     line-height: 100% !important;
+     margin-top: -5px !important;
+}
+
+div.joblog li {
+     word-wrap: break-word !important;
+     line-height: 115% !important;
+     padding: 0;
+     font-size: 9pt !important;
+}
+
+div.joblog li:last-child {
+     margin-bottom: -5px;
+}
+
+div.joblog li:first-child {
+     margin-top: 10px !important;
+}
+
+div.joblog form:first-child {
+     margin-top: 10px;
+}
+
+div.joblog table {
+     margin-top: 15px;
+}
+
+div.joblog p {
+     line-height: 130%;
+}
+
+div.joblog hr {
+     margin: 15px 0;
+}
+
+div.joblog h3 {
+     margin-bottom: 5px;
+}
+
+.smallhead {
+     font-size: 7pt
+}
+
+.mediumtags {
+     font-size: 8pt;
+     font-style: italic;
+     font-weight: bold;
+}
+
+.optbox {
+     min-width: 16px !important;
+     max-width: 16px !important;
+     width: 16px !important;
+     min-height: 16px;
+     max-height: 16px;
+     height: 16px;
+     opacity: 1.0;
+     border: 0;
+     margin: 5px 5px 5px 10px;
+     padding: 2px;
+}
+
+.optbox:hover {
+     min-width: 16px !important;
+     max-width: 16px !important;
+     width: 16px !important;
+     min-height: 16px;
+     max-height: 16px;
+     height: 16px;
+     opacity: 1.0;
+     border: 0;
+     margin: 5px 5px 5px 10px;
+     padding: 2px;
+}
+
+.cells {
+     border-left: 1px outset #bbf;
+     border-top: 1px inset #99f !important;
+     border-bottom: 1px inset #99f !important;
+}
+
+.tablefooter {
+     background: #b4c8ff url('images/tabletitlelight.png') repeat-x;
+}
+
+.tablefooter tr, .tablefooter td {
+     background: #ffe url('images/header.png') center center repeat-x;
+     border-top: 1px solid #447;
+     border-bottom: 1px solid #447 !important;
+     padding: 8px 2px !important;
+     font-size: 7pt;
+     line-height: 110%;
+}
+
+.formaction {
+     text-align: right;
+}
+
+div.footnote {
+     text-align: right;
+     color: #447;
+     font-size: 7pt;
+     margin-bottom: -5px !important;
+}
+
+div.footnote hr{
+     margin: 20px 0 5px 0 !important;
+     color: #447;
+     background: #447;
+     height: 1px;
+     border: 0px solid #447;
+}
+
+.topness {
+     font-size: 7.5pt;
+     text-align: right;
+     margin-top: 0px;
+     margin-bottom: -18px;
+     margin-right: 5px;
+}
+
+iframe.iframed {
+     margin: 10px 0 0;
+}
+
+/* Fixes for when app is not started and console error loads inside iframe */
+
+body.iframed {
+     background: transparent url('../dark/images/transparent.gif') !important;
+}
+
+.iframed div.routersummaryouter {
+     display: none !important;
+}
+
+.iframed h1 {
+     margin: 0 10px 10px 7px !important;
+}
+
+.iframed div.sorry {
+     margin: 5px 10px 10px 7px !important;
+}
+
+/* end iframed console fixes */

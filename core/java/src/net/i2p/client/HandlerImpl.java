@@ -18,14 +18,14 @@ import net.i2p.util.Log;
  * @author jrandom
  */
 abstract class HandlerImpl implements I2CPMessageHandler {
-    protected Log _log;
-    private int _type;
-    protected I2PAppContext _context;
+    protected final Log _log;
+    private final int _type;
+    protected final I2PAppContext _context;
 
     public HandlerImpl(I2PAppContext context, int type) {
         _context = context;
         _type = type;
-        _log = new Log(getClass());
+        _log = context.logManager().getLog(getClass());
     }
     
     public int getType() {

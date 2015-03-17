@@ -1,0 +1,205 @@
+#!/bin/sh
+
+### BEGIN INIT INFO
+# Provides: i2p i2p-router
+# Required-Start: $remote_fs $syslog $named $network $time
+# Required-Stop: $remote_fs $syslog $named $network
+# Default-Start: 2 3 4 5
+# Default-Stop: 0 1 6
+# Short-Description: start and stop the i2p router
+# Description: i2p is a load-balanced unspoofable packet switching network
+### END INIT INFO
+
+# Check permissions
+if [ "`id -ur`" != '0' ]; then
+   echo 'ERROR: You must be root to start this service.' >&2
+   echo
+   exit 1
+fi
+
+PATH=/sbin:/usr/sbin:/bin:/usr/bin
+DESC="I2P Router"
+NAME="i2p"
+RUN="/var/run/$NAME"
+DAEMON="/usr/sbin/wrapper"
+PIDFILE="$RUN/$NAME.pid"
+JVMPIDFILE="$RUN/routerjvm.pid"
+I2P="/usr/share/i2p"
+I2PTEMP="/tmp/${NAME}-daemon"
+WRAPPERLOG="/var/log/i2p/wrapper.log"
+
+# Don't touch these, edit /etc/default/i2p
+RUN_DAEMON="False"
+NICE=0
+I2PUSER="i2psvc"
+
+I2P_ARGS="/etc/i2p/wrapper.config \
+ wrapper.java.additional.1=-DloggerFilenameOverride=/var/log/i2p/log-router-@.txt \
+ wrapper.java.additional.10=-Dwrapper.logfile=$WRAPPERLOG \
+ wrapper.java.additional.11=-Di2p.dir.pid=$RUN \
+ wrapper.java.additional.12=-Di2p.dir.temp=$I2PTEMP \
+ wrapper.logfile=$WRAPPERLOG \
+ wrapper.pidfile=$PIDFILE \
+ wrapper.java.pidfile=$JVMPIDFILE \
+ wrapper.daemonize=TRUE"
+
+[ -r /lib/lsb/init-functions ] && . /lib/lsb/init-functions
+[ -r /lib/init/vars.sh ] && . /lib/init/vars.sh
+
+
+for ENV_FILE in /etc/environment /etc/default/locale; do
+[ -r "$ENV_FILE" ] || continue
+[ -s "$ENV_FILE" ] || continue
+
+ for var in LANG LANGUAGE LC_ALL LC_CTYPE; do
+     value=`egrep "^${var}=" "$ENV_FILE" | tail -n1 | cut -d= -f2`
+     [ -n "$value" ] && eval export $var=$value
+
+# This is commented out for Ubuntu: Ubuntu still creates
+# /etc/environment in the most recent release
+# (currently 'Precise').
+#
+# TODO Add logic to automatically handle this
+#
+# Commented for Ubuntu since PPA packages 0.9-1$DISTRO1.
+# Packages for Debian systems will have this stanza uncommented.
+#
+#     if [ -n "$value" ] && [ "$ENV_FILE" = /etc/environment ]; then
+#         log_warning_msg "/etc/environment has been deprecated for locale information; use /etc/default/locale for $var=$value instead"
+#     fi
+
+ done
+done
+
+# read config file
+[ -r /etc/default/$NAME ] && . /etc/default/$NAME
+
+if [ -z "$RUN_DAEMON" ]; then
+    echo "/etc/default/$NAME is not properly configured. Aborting." >&2
+    exit 1
+fi
+
+case "$RUN_DAEMON" in
+        [NnFf]*)
+                log_action_msg "$DESC daemon disabled in /etc/default/$NAME".
+                exit 0
+                ;;
+esac
+
+# We need the wrapper. If it's not found, abort.
+[ -x $DAEMON ] || exit 1
+
+# Even though this script doesn't call it, check for i2prouter.  If it's not
+# found, it probably means that the package isn't installed anymore.
+[ -x /usr/bin/i2prouter ] || exit 1
+
+do_start()
+{
+    start-stop-daemon --start --quiet --pidfile $PIDFILE --exec $DAEMON --test > /dev/null 2>&1 \
+        || return 1
+    [ -d $RUN ] || mkdir $RUN > /dev/null 2>&1
+    [ -d $I2PTEMP ] || mkdir $I2PTEMP > /dev/null 2>&1
+    if [ -r $PIDFILE ]; then
+        PID="$(cat ${PIDFILE})"
+        if ! kill -0 $PID > /dev/null 2>&1; then
+                rm "$PIDFILE" "$JVMPIDFILE"
+        else
+                # we shouldn't get here, but...
+                echo "ERROR: Another instance of $DESC is already running." >&2
+                return 1
+        fi
+    fi
+    chown -Rf $I2PUSER:$I2PUSER  $I2PTEMP $RUN > /dev/null 2>&1
+    chown -f -R $I2PUSER:i2psvc /var/log/$NAME > /dev/null 2>&1
+    TZ=UTC start-stop-daemon --start --quiet -c $I2PUSER --pidfile $PIDFILE --exec $DAEMON -n $NICE -- \
+        $I2P_ARGS || return 2
+}
+
+do_stop()
+{
+    start-stop-daemon --stop --quiet --retry=TERM/60/KILL/20 --pidfile $PIDFILE -u $I2PUSER
+    RETVAL="$?"
+    [ "$RETVAL" = 2 ] && return 2
+
+    start-stop-daemon --stop --quiet --oknodo --retry=0/60/KILL/20 --exec $DAEMON
+
+    rm -rf "$I2PTEMP" > /dev/null 2>&1
+    [ -d "$RUN" ] && rmdir "$RUN" 2>&1
+}
+
+do_dump()
+{
+    start-stop-daemon --stop --quiet -s 3 --pidfile $PIDFILE -u $I2PUSER
+    RETVAL="$?"
+    [ "$RETVAL" = 2 ] && return 2
+}
+
+do_graceful()
+{
+    start-stop-daemon --stop --quiet -s HUP --pidfile $PIDFILE -u $I2PUSER
+    [ "$RETVAL" = 2 ] && return 2
+}
+
+case "$1" in
+  start)
+        log_daemon_msg "Starting $DESC" "$NAME"
+        do_start
+        case "$?" in
+                0|1) log_end_msg 0 ;;
+                2) log_end_msg 1 ;;
+        esac
+        ;;
+  dump)
+        log_daemon_msg "Dumping $DESC" "$NAME"
+        do_dump
+        case "$?" in
+                0|1) log_end_msg 0 ;;
+                2) log_end_msg 1 ;;
+        esac
+        ;;
+  graceful)
+        log_daemon_msg "Attempting graceful shutdown of $DESC" "$NAME"
+        log_daemon_msg "(could take up to 11 minutes)"
+        do_graceful
+        case "$?" in
+                0|1) log_end_msg 0 ;;
+                2) log_end_msg 1 ;;
+        esac
+        ;;
+  stop)
+    log_daemon_msg "Stopping $DESC" "$NAME"
+        do_stop
+        case "$?" in
+                0|1) log_end_msg 0 ;;
+                2) log_end_msg 1 ;;
+        esac
+        ;;
+  status)
+       status_of_proc -p $PIDFILE "$DAEMON" "$NAME" && exit 0 || exit $?
+    ;;
+ restart|force-reload)
+        log_daemon_msg "Restarting $DESC" "$NAME"
+        do_stop
+        case "$?" in
+          0|1)
+                do_start
+                case "$?" in
+                        0) log_end_msg 0 ;;
+                        1) log_end_msg 1 ;; # Old process is still running
+                        *) log_end_msg 1 ;; # Failed to start
+                esac
+                ;;
+          *)
+                # Failed to stop
+                log_end_msg 1
+                ;;
+        esac
+        ;;
+*)
+    N=/etc/init.d/$NAME
+    echo "Usage: $N {start|stop|dump|graceful|status|restart|force-reload}" >&2
+    exit 3
+    ;;
+
+
+esac

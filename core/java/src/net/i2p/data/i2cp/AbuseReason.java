@@ -16,7 +16,6 @@ import java.io.OutputStream;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.DataStructureImpl;
-import net.i2p.util.Log;
 
 /**
  * Defines the structure for why abuse was reported either by the client to
@@ -25,11 +24,9 @@ import net.i2p.util.Log;
  * @author jrandom
  */
 public class AbuseReason extends DataStructureImpl {
-    private final static Log _log = new Log(AbuseReason.class);
     private String _reason;
 
     public AbuseReason() {
-        setReason(null);
     }
 
     public String getReason() {
@@ -52,16 +49,16 @@ public class AbuseReason extends DataStructureImpl {
     @Override
     public boolean equals(Object object) {
         if ((object == null) || !(object instanceof AbuseReason)) return false;
-        return DataHelper.eq(getReason(), ((AbuseReason) object).getReason());
+        return DataHelper.eq(_reason, ((AbuseReason) object).getReason());
     }
 
     @Override
     public int hashCode() {
-        return DataHelper.hashCode(getReason());
+        return DataHelper.hashCode(_reason);
     }
 
     @Override
     public String toString() {
-        return "[AbuseReason: " + getReason() + "]";
+        return "[AbuseReason: " + _reason + "]";
     }
 }

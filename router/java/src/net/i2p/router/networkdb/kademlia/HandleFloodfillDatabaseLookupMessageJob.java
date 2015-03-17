@@ -30,6 +30,13 @@ public class HandleFloodfillDatabaseLookupMessageJob extends HandleDatabaseLooku
         super(ctx, receivedMessage, from, fromHash);    
     }
     
+    /**
+     * @return are we floodfill
+     * We don't really answer all queries if this is true,
+     * since floodfills don't have the whole keyspace any more,
+     * see ../HTLMJ for discussion
+     */
+    @Override
     protected boolean answerAllQueries() {
         if (!FloodfillNetworkDatabaseFacade.floodfillEnabled(getContext())) return false;
         return FloodfillNetworkDatabaseFacade.isFloodfill(getContext().router().getRouterInfo());
@@ -40,7 +47,8 @@ public class HandleFloodfillDatabaseLookupMessageJob extends HandleDatabaseLooku
      * This gets the word out to routers that we are no longer floodfill, so they
      * will stop bugging us.
      */
-    protected void sendClosest(Hash key, Set routerInfoSet, Hash toPeer, TunnelId replyTunnel) {
+    @Override
+    protected void sendClosest(Hash key, Set<Hash> routerInfoSet, Hash toPeer, TunnelId replyTunnel) {
         super.sendClosest(key, routerInfoSet, toPeer, replyTunnel);
 
         // go away, you got the wrong guy, send our RI back unsolicited
@@ -49,9 +57,7 @@ public class HandleFloodfillDatabaseLookupMessageJob extends HandleDatabaseLooku
             // that would increment the netDb.lookupsHandled and netDb.lookupsMatched stats
             DatabaseStoreMessage msg = new DatabaseStoreMessage(getContext());
             RouterInfo me = getContext().router().getRouterInfo();
-            msg.setKey(me.getIdentity().getHash());
-            msg.setRouterInfo(me);
-            msg.setValueType(DatabaseStoreMessage.KEY_TYPE_ROUTERINFO);
+            msg.setEntry(me);
             sendMessage(msg, toPeer, replyTunnel);
         }
     }

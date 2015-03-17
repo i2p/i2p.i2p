@@ -10,10 +10,9 @@ package net.i2p.router.startup;
 
 import net.i2p.router.JobImpl;
 import net.i2p.router.RouterContext;
-import net.i2p.util.Log;
 
+/** start up the network database */
 public class BootNetworkDbJob extends JobImpl {
-    private static Log _log = new Log(BootNetworkDbJob.class);
     
     public BootNetworkDbJob(RouterContext ctx) {
         super(ctx);
@@ -22,10 +21,6 @@ public class BootNetworkDbJob extends JobImpl {
     public String getName() { return "Boot Network Database"; }
     
     public void runJob() {
-        // start up the network database
-        
         getContext().netDb().startup();
-        
-        getContext().jobQueue().addJob(new StartAcceptingClientsJob(getContext()));
     }
 }

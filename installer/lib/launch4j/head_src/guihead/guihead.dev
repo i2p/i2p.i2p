@@ -12,22 +12,22 @@ ResourceIncludes=
 MakeIncludes=
 Compiler=
 CppCompiler=
-Linker=_@@_
+Linker=-n_@@_
 IsCpp=0
 Icon=
 ExeOutput=
-ObjectOutput=
+ObjectOutput=..\..\head
 OverrideOutput=0
 OverrideOutputName=guihead.exe
 HostApplication=
 Folders=
 CommandLine=
-UseCustomMakefile=0
-CustomMakefile=
+UseCustomMakefile=1
+CustomMakefile=Makefile.win
 IncludeVersionInfo=0
 SupportXPThemes=0
 CompilerSet=0
-CompilerSettings=0000000001001000000000
+CompilerSettings=0000000001001000000100
 
 [Unit1]
 FileName=guihead.c
@@ -37,7 +37,7 @@ Compile=1
 Link=1
 Priority=1000
 OverrideBuildCmd=0
-BuildCmd=
+BuildCmd=$(CC) -c guihead.c -o ../../head/guihead.o $(CFLAGS)
 
 [Unit2]
 FileName=guihead.h
@@ -78,16 +78,6 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit6]
-FileName=..\resource.h
-Folder=guihead
-Compile=1
-Link=1
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
-CompileCpp=0
-
-[Unit7]
 FileName=..\resid.h
 CompileCpp=0
 Folder=guihead

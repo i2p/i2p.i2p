@@ -1,36 +1,37 @@
 package net.i2p.crypto;
 
 import gnu.crypto.hash.Sha256Standalone;
+
 import net.i2p.I2PAppContext;
-import net.i2p.data.Base64;
-import net.i2p.data.Hash;
-import net.i2p.data.SessionKey;
 
 import org.bouncycastle.crypto.Digest;
-import org.bouncycastle.crypto.macs.HMac;
+import org.bouncycastle.crypto.macs.I2PHMac;
 
 /**
  * Calculate the HMAC-SHA256 of a key+message.  All the good stuff occurs
- * in {@link org.bouncycastle.crypto.macs.HMac} and 
- * {@link org.bouncycastle.crypto.digests.MD5Digest}.
+ * in {@link org.bouncycastle.crypto.macs.I2PHMac} and 
+ * {@link gnu.crypto.hash.Sha256Standalone}.
  *
+ * This should be compatible with javax.crypto.Mac.getInstance("HmacSHA256")
+ * but that is untested.
+ *
+ * deprecated used only by syndie
  */
 public class HMAC256Generator extends HMACGenerator {
     public HMAC256Generator(I2PAppContext context) { super(context); }
     
     @Override
-    protected HMac acquire() {
-        synchronized (_available) {
-            if (_available.size() > 0)
-                return (HMac)_available.remove(0);
-        }
+    protected I2PHMac acquire() {
+        I2PHMac rv = _available.poll();
+        if (rv != null)
+            return rv;
         // the HMAC is hardcoded to use SHA256 digest size
         // for backwards compatability.  next time we have a backwards
         // incompatible change, we should update this by removing ", 32"
-        return new HMac(new Sha256ForMAC());
+        return new I2PHMac(new Sha256ForMAC());
     }
     
-    private class Sha256ForMAC extends Sha256Standalone implements Digest {
+    private static class Sha256ForMAC extends Sha256Standalone implements Digest {
         public String getAlgorithmName() { return "sha256 for hmac"; }
         public int getDigestSize() { return 32; }
         public int doFinal(byte[] out, int outOff) {
@@ -42,6 +43,7 @@ public class HMAC256Generator extends HMACGenerator {
         
     }
     
+/******
     public static void main(String args[]) {
         I2PAppContext ctx = I2PAppContext.getGlobalContext();
         byte data[] = new byte[64];
@@ -50,4 +52,5 @@ public class HMAC256Generator extends HMACGenerator {
         Hash mac = ctx.hmac256().calculate(key, data);
         System.out.println(Base64.encode(mac.getData()));
     }
+******/
 }

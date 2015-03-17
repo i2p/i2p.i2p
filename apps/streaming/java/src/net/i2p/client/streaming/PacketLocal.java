@@ -12,15 +12,15 @@ import net.i2p.util.SimpleTimer2;
  * coordinate local attributes about a packet - send time, ack time, number of
  * retries, etc.
  */
-public class PacketLocal extends Packet implements MessageOutputStream.WriteStatus {
-    private I2PAppContext _context;
-    private Log _log;
-    private Connection _connection;
-    private Destination _to;
+class PacketLocal extends Packet implements MessageOutputStream.WriteStatus {
+    private final I2PAppContext _context;
+    private final Log _log;
+    private final Connection _connection;
+    private final Destination _to;
     private SessionKey _keyUsed;
     private Set _tagsSent;
-    private long _createdOn;
-    private int _numSends;
+    private final long _createdOn;
+    private volatile int _numSends;
     private long _lastSend;
     private long _acceptedOn;
     private long _ackOn;
@@ -29,9 +29,11 @@ public class PacketLocal extends Packet implements MessageOutputStream.WriteStat
     private volatile boolean _retransmitted;
     private SimpleTimer2.TimedEvent _resendEvent;
     
+    /** not bound to a connection */
     public PacketLocal(I2PAppContext ctx, Destination to) {
         this(ctx, to, null);
     }
+
     public PacketLocal(I2PAppContext ctx, Destination to, Connection con) {
         _context = ctx;
         _createdOn = ctx.clock().now();
@@ -40,19 +42,37 @@ public class PacketLocal extends Packet implements MessageOutputStream.WriteStat
         _connection = con;
         _lastSend = -1;
         _cancelledOn = -1;
-        _nackCount = 0;
-        _retransmitted = false;
     }
     
     public Destination getTo() { return _to; }
-    public void setTo(Destination to) { _to = to; }
     
+    /**
+     * @deprecated should always return null
+     */
     public SessionKey getKeyUsed() { return _keyUsed; }
-    public void setKeyUsed(SessionKey key) { _keyUsed = key; }
+
+    /**
+     * @deprecated I2PSession throws out the tags
+     */
+    public void setKeyUsed(SessionKey key) {
+        if (key != null)
+            _log.error("Who is sending tags thru the streaming lib?");
+        _keyUsed = key;
+    }
     
+    /**
+     * @deprecated should always return null or an empty set
+     */
     public Set getTagsSent() { return _tagsSent; }
+
+    /**
+     * @deprecated I2PSession throws out the tags
+     */
     public void setTagsSent(Set tags) { 
-        if ( (_tagsSent != null) && (_tagsSent.size() > 0) && (tags.size() > 0) ) {
+        if (tags != null && !tags.isEmpty())
+            _log.error("Who is sending tags thru the streaming lib? " + tags.size());
+      /****
+        if ( (_tagsSent != null) && (!_tagsSent.isEmpty()) && (!tags.isEmpty()) ) {
             //int old = _tagsSent.size();
             //_tagsSent.addAll(tags);
             if (!_tagsSent.equals(tags))
@@ -60,6 +80,7 @@ public class PacketLocal extends Packet implements MessageOutputStream.WriteStat
         } else {
             _tagsSent = tags;
         }
+      ****/
     }
     
     public boolean shouldSign() { 
@@ -118,12 +139,19 @@ public class PacketLocal extends Packet implements MessageOutputStream.WriteStat
     }
     public int getNumSends() { return _numSends; }
     public long getLastSend() { return _lastSend; }
+
+    /** @return null if not bound */
     public Connection getConnection() { return _connection; }
 
+    /**
+     *  Will force a fast restransmit on the 3rd call (FAST_RETRANSMIT_THRESHOLD)
+     *  but only if it's the lowest unacked (see Connection.ResendPacketEvent)
+     */
     public void incrementNACKs() { 
         int cnt = ++_nackCount;
         SimpleTimer2.TimedEvent evt = _resendEvent;
-        if ( (cnt >= Connection.FAST_RETRANSMIT_THRESHOLD) && (evt != null) && (!_retransmitted)) {
+        if (cnt >= Connection.FAST_RETRANSMIT_THRESHOLD && evt != null && (!_retransmitted) &&
+            (_numSends == 1 || _lastSend < _context.clock().now() + 4*1000)) {  // Don't fast retx if we recently resent it
             _retransmitted = true;
             evt.reschedule(0);
         }
@@ -133,15 +161,18 @@ public class PacketLocal extends Packet implements MessageOutputStream.WriteStat
     public void setResendPacketEvent(SimpleTimer2.TimedEvent evt) { _resendEvent = evt; }
     
 	@Override
-    public StringBuffer formatAsString() {
-        StringBuffer buf = super.formatAsString();
+    public StringBuilder formatAsString() {
+        StringBuilder buf = super.formatAsString();
         
         Connection con = _connection;
         if (con != null)
             buf.append(" rtt ").append(con.getOptions().getRTT());
         
-        if ( (_tagsSent != null) && (_tagsSent.size() > 0) ) 
-            buf.append(" with tags");
+        //if ( (_tagsSent != null) && (!_tagsSent.isEmpty()) ) 
+        //    buf.append(" with tags");
+
+        if (_nackCount > 0)
+            buf.append(" nacked ").append(_nackCount).append(" times");
 
         if (_ackOn > 0)
             buf.append(" ack after ").append(getAckTime());
@@ -173,9 +204,11 @@ public class PacketLocal extends Packet implements MessageOutputStream.WriteStat
         return buf;
     }
     
+    /**
+     * Blocks until outbound window is not full. See Connection.packetSendChoke().
+     * @param maxWaitMs MessageOutputStream is the only caller, generally with -1
+     */
     public void waitForAccept(int maxWaitMs) {
-        if (_connection == null) 
-            throw new IllegalStateException("Cannot wait for accept with no connection");
         long before = _context.clock().now();
         int queued = _connection.getUnackedPacketsSent();
         int window = _connection.getOptions().getWindowSize();
@@ -190,13 +223,14 @@ public class PacketLocal extends Packet implements MessageOutputStream.WriteStat
         int afterQueued = _connection.getUnackedPacketsSent();
         if ( (after - before > 1000) && (_log.shouldLog(Log.DEBUG)) )
             _log.debug("Took " + (after-before) + "ms to get " 
-                       + (accepted ? " accepted" : " rejected")
+                       + (accepted ? "accepted" : "rejected")
                        + (_cancelledOn > 0 ? " and CANCELLED" : "")
                        + ", queued behind " + queued +" with a window size of " + window 
                        + ", finally accepted with " + afterQueued + " queued: " 
                        + toString());
     }
     
+    /** block until the packet is acked from the far end */
     public void waitForCompletion(int maxWaitMs) {
         long expiration = _context.clock().now()+maxWaitMs;
         while (true) {
@@ -213,7 +247,7 @@ public class PacketLocal extends Packet implements MessageOutputStream.WriteStat
                         timeRemaining = 10*1000;
                     wait(timeRemaining);
                 }
-            } catch (InterruptedException ie) {}
+            } catch (InterruptedException ie) { }//{ break; }
         }
         if (!writeSuccessful())
             releasePayload();

@@ -25,14 +25,13 @@ import net.i2p.util.Log;
  * selection to the peer manager and tests the peer by sending it a useless
  * database store message
  *
+ * TODO - What's the point? Disable this? See also notes in PeerManager.selectPeers()
  */
 public class PeerTestJob extends JobImpl {
-    private Log _log;
+    private final Log _log;
     private PeerManager _manager;
     private boolean _keepTesting;
     private static final long DEFAULT_PEER_TEST_DELAY = 5*60*1000;
-    private static final int TEST_PRIORITY = 100;
-    
     /** Creates a new instance of PeerTestJob */
     public PeerTestJob(RouterContext context) {
         super(context);
@@ -50,9 +49,11 @@ public class PeerTestJob extends JobImpl {
     /** number of peers to test each round */
     private int getTestConcurrency() { return 1; }
     
-    public void startTesting(PeerManager manager) { 
+    // FIXME Exporting non-public type through public API FIXME
+    public void startTesting(PeerManager manager) {
         _manager = manager;
         _keepTesting = true;
+        this.getTiming().setStartAfter(getContext().clock().now() + DEFAULT_PEER_TEST_DELAY);
         getContext().jobQueue().addJob(this); 
         if (_log.shouldLog(Log.INFO))
             _log.info("Start testing peers");
@@ -63,7 +64,8 @@ public class PeerTestJob extends JobImpl {
             _log.info("Stop testing peers");
     }
     
-    public String getName() { return "Initiate some peer tests"; }
+    public String getName() { return "Peer test start"; }
+
     public void runJob() {
         if (!_keepTesting) return;
         Set peers = selectPeersToTest();
@@ -176,8 +178,7 @@ public class PeerTestJob extends JobImpl {
      */
     private DatabaseStoreMessage buildMessage(RouterInfo peer, TunnelId replyTunnel, Hash replyGateway, long nonce, long expiration) {
         DatabaseStoreMessage msg = new DatabaseStoreMessage(getContext());
-        msg.setKey(peer.getIdentity().getHash());
-        msg.setRouterInfo(peer);
+        msg.setEntry(peer);
         msg.setReplyGateway(replyGateway);
         msg.setReplyTunnel(replyTunnel);
         msg.setReplyToken(nonce);
@@ -222,8 +223,9 @@ public class PeerTestJob extends JobImpl {
             return false;
         }
         public boolean matchFound() { return _matchFound; }
+        @Override
         public String toString() {
-            StringBuffer buf = new StringBuffer(64);
+            StringBuilder buf = new StringBuilder(64);
             buf.append("Test peer ").append(_peer.toBase64().substring(0,4));
             buf.append(" with nonce ").append(_nonce);
             return buf.toString();

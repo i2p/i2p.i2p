@@ -1,0 +1,68 @@
+I2P source installation instructions
+
+Prerequisites to build from source:
+	Java SDK (preferably Oracle/Sun or OpenJDK) 1.6.0 or higher
+          Non-linux operating systems and JVMs: See http://trac.i2p2.de/wiki/java
+	Apache Ant 1.7.0 or higher
+	The xgettext, msgfmt, and msgmerge tools installed
+	from the GNU gettext package http://www.gnu.org/software/gettext/
+
+To build and install I2P from source, you must first build
+and package up the appropriate installer by running:
+
+  	ant pkg
+
+On non-x86, use one of the following instead:
+	ant installer-linux
+	ant installer-freebsd
+	ant installer-osx
+
+
+
+This will produce a few key files:
+* install.jar:    the GUI and console installer
+* i2pinstall.exe: the GUI and console installer wrapped for cross-platform execution
+                  (only created with ant pkg)
+* i2pupdate.zip:  the update package
+                  (only created with ant pkg)
+
+From there, you can run the headless (console mode) installer:
+  java -jar i2pinstall.exe -console
+or
+  java -jar i2pinstall.jar -console
+
+Or run the GUI installer:
+  java -jar i2pinstall.exe
+or
+  java -jar i2pinstall.jar
+or on Windows, just double-click on i2pinstall.exe.
+
+Or move the i2pupdate.zip file into an existing installation directory and restart.
+
+To start I2P:
+   (*nix): sh i2prouter start
+   (win*): I2P.exe or i2prouter.bat
+   (non-x86 platforms PPC, ARM, etc): sh runplain.sh
+
+To install I2P as a system service:
+   (*nix) sh i2prouter install
+   (win*) install_i2p_service_winnt.bat
+
+To uninstall I2P as a system service:
+   (*nix) sh i2prouter remove
+   (win*) uninstall_i2p-service_winnt.bat
+
+To stop I2P (gracefully):
+   lynx http://localhost:7657/summaryframe (click "Shutdown")
+
+To stop I2P immediately:
+   sh i2prouter stop
+
+To uninstall I2P:
+   rm -rf $I2PInstallDir ~/.i2p
+
+Supported JVMs:
+  Windows: Latest available from http://java.com/download (1.5+ supported)
+  Linux:   Latest available from http://java.com/download (1.5+ supported)
+  FreeBSD: 1.5-compatible (NIO required)
+  Other operating systems and JVMs: See http://trac.i2p2.de/wiki/java

@@ -1,32 +1,30 @@
 package net.i2p.router;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.Hash;
-import net.i2p.router.admin.AdminManager;
+import net.i2p.data.RouterInfo;
+import net.i2p.internal.InternalClientManager;
 import net.i2p.router.client.ClientManagerFacadeImpl;
+import net.i2p.router.dummy.*;
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
-import net.i2p.router.peermanager.Calculator;
-import net.i2p.router.peermanager.CapacityCalculator;
-import net.i2p.router.peermanager.IntegrationCalculator;
-import net.i2p.router.peermanager.IsFailingCalculator;
 import net.i2p.router.peermanager.PeerManagerFacadeImpl;
 import net.i2p.router.peermanager.ProfileManagerImpl;
 import net.i2p.router.peermanager.ProfileOrganizer;
-import net.i2p.router.peermanager.ReliabilityCalculator;
-import net.i2p.router.peermanager.SpeedCalculator;
-import net.i2p.router.peermanager.StrictSpeedCalculator;
 import net.i2p.router.transport.CommSystemFacadeImpl;
 import net.i2p.router.transport.FIFOBandwidthLimiter;
 import net.i2p.router.transport.OutboundMessageRegistry;
-import net.i2p.router.transport.VMCommSystem;
 import net.i2p.router.tunnel.TunnelDispatcher;
 import net.i2p.router.tunnel.pool.TunnelPoolManager;
-import net.i2p.util.Clock;
 import net.i2p.util.KeyRing;
+import net.i2p.util.I2PProperties.I2PPropertyCallback;
 
 /**
  * Build off the core I2P context to provide a root for a router instance to
@@ -37,9 +35,8 @@ import net.i2p.util.KeyRing;
  *
  */
 public class RouterContext extends I2PAppContext {
-    private Router _router;
-    private AdminManager _adminManager;
-    private ClientManagerFacade _clientManagerFacade;
+    private final Router _router;
+    private ClientManagerFacadeImpl _clientManagerFacade;
     private ClientMessagePool _clientMessagePool;
     private JobQueue _jobQueue;
     private InNetMessagePool _inNetMessagePool;
@@ -59,52 +56,105 @@ public class RouterContext extends I2PAppContext {
     private Shitlist _shitlist;
     private Blocklist _blocklist;
     private MessageValidator _messageValidator;
-    private MessageStateMonitor _messageStateMonitor;
+    //private MessageStateMonitor _messageStateMonitor;
     private RouterThrottle _throttle;
-    private RouterClock _clock;
-    private Calculator _isFailingCalc;
-    private Calculator _integrationCalc;
-    private Calculator _speedCalc;
-    private Calculator _reliabilityCalc;
-    private Calculator _capacityCalc;
-    private Calculator _oldSpeedCalc;
+    private final Set<Runnable> _finalShutdownTasks;
+    // split up big lock on this to avoid deadlocks
+    private final Object _lock1 = new Object(), _lock2 = new Object();
 
-
-    private static List _contexts = new ArrayList(1);
+    private static final List<RouterContext> _contexts = new CopyOnWriteArrayList();
     
     public RouterContext(Router router) { this(router, null); }
+
     public RouterContext(Router router, Properties envProps) { 
         super(filterProps(envProps));
         _router = router;
-        initAll();
+        // Disabled here so that the router can get a context and get the
+        // directory locations from it, to do an update, without having
+        // to init everything. Caller MUST call initAll() afterwards.
+        // Sorry, this breaks some main() unit tests out there.
+        //initAll();
+        if (!_contexts.isEmpty())
+            System.err.println("Warning - More than one router in this JVM");
+        _finalShutdownTasks = new CopyOnWriteArraySet();
         _contexts.add(this);
     }
+
     /**
+     * Set properties where the defaults must be different from those
+     * in I2PAppContext.
+     *
      * Unless we are explicitly disabling the timestamper, we want to use it.
      * We need this now as the new timestamper default is disabled (so we don't
      * have each I2PAppContext creating their own SNTP queries all the time)
      *
+     * Set more PRNG buffers, as the default is now small for the I2PAppContext.
+     *
      */
-    static final Properties filterProps(Properties envProps) {
+    private static final Properties filterProps(Properties envProps) {
         if (envProps == null)
             envProps = new Properties();
         if (envProps.getProperty("time.disabled") == null)
             envProps.setProperty("time.disabled", "false");
+        if (envProps.getProperty("prng.buffers") == null) {
+            // How many of these 256 KB buffers do we need?
+            // One clue: prng.bufferFillTime is ~10ms on my system,
+            // and prng.bufferFillTime event count is ~30 per minute,
+            // or about 2 seconds per buffer - so about 200x faster
+            // to fill than to drain - so we don't need too many
+            long maxMemory = Runtime.getRuntime().maxMemory();
+            if (maxMemory == Long.MAX_VALUE)
+                maxMemory = 96*1024*1024l;
+            long buffs = Math.min(16, Math.max(2, maxMemory / (14 * 1024 * 1024)));
+            envProps.setProperty("prng.buffers", "" + buffs);
+        }
         return envProps;
     }
-    private void initAll() {
-        _adminManager = new AdminManager(this);
-        if ("false".equals(getProperty("i2p.dummyClientFacade", "false")))
-            _clientManagerFacade = new ClientManagerFacadeImpl(this);
-        else
-            _clientManagerFacade = new DummyClientManagerFacade(this);
+    
+    /**
+     * Modify the configuration attributes of this context, changing
+     * one of the properties provided during the context construction.
+     *
+     * @param propName The name of the property.
+     * @param value The new value for the property.
+     * @since 0.8.4
+     * @deprecated Use Router.saveConfig()
+     */
+    public void setProperty(String propName, String value) {
+    		_overrideProps.setProperty(propName, value);
+    }
+    
+    /**
+     * Remove a property provided during the context construction.
+     * Only for use by the router. Others use Router.saveConfig()
+     *
+     * @param propName The name of the property.
+     * @since 0.9
+     */
+    void removeProperty(String propName) {
+        _overrideProps.remove(propName);
+    }
+
+    
+    public void addPropertyCallback(I2PPropertyCallback callback) {
+    	_overrideProps.addCallBack(callback);
+    }
+
+
+    public void initAll() {
+        if (getBooleanProperty("i2p.dummyClientFacade"))
+            System.err.println("i2p.dummyClientFacade currently unsupported");
+        _clientManagerFacade = new ClientManagerFacadeImpl(this);
+        // removed since it doesn't implement InternalClientManager for now
+        //else
+        //    _clientManagerFacade = new DummyClientManagerFacade(this);
         _clientMessagePool = new ClientMessagePool(this);
         _jobQueue = new JobQueue(this);
         _inNetMessagePool = new InNetMessagePool(this);
         _outNetMessagePool = new OutNetMessagePool(this);
         _messageHistory = new MessageHistory(this);
         _messageRegistry = new OutboundMessageRegistry(this);
-        _messageStateMonitor = new MessageStateMonitor(this);
+        //_messageStateMonitor = new MessageStateMonitor(this);
         if ("false".equals(getProperty("i2p.dummyNetDb", "false")))
             _netDb = new FloodfillNetworkDatabaseFacade(this); // new KademliaNetworkDatabaseFacade(this);
         else
@@ -130,35 +180,62 @@ public class RouterContext extends I2PAppContext {
         _shitlist = new Shitlist(this);
         _blocklist = new Blocklist(this);
         _messageValidator = new MessageValidator(this);
-        //_throttle = new RouterThrottleImpl(this);
-        _throttle = new RouterDoSThrottle(this);
-        _isFailingCalc = new IsFailingCalculator(this);
-        _integrationCalc = new IntegrationCalculator(this);
-        _speedCalc = new SpeedCalculator(this);
-        _oldSpeedCalc = new StrictSpeedCalculator(this);
-        _reliabilityCalc = new ReliabilityCalculator(this);
-        _capacityCalc = new CapacityCalculator(this);
+        _throttle = new RouterThrottleImpl(this);
+        //_throttle = new RouterDoSThrottle(this);
     }
     
     /**
      * Retrieve the list of router contexts currently instantiated in this JVM.  
      * This will always contain only one item (except when a simulation per the
-     * MultiRouter is going on), and the list should only be modified when a new
+     * MultiRouter is going on).
+     *
+     * @return an unmodifiable list (as of 0.8.8). May be empty.
+     */
+    public static List<RouterContext> listContexts() {
+        return Collections.unmodifiableList(_contexts);
+    }
+    
+    /**
+     * Same as listContexts() but package private and modifiable.
+     * The list should only be modified when a new
      * context is created or a router is shut down.
      *
+     * @since 0.8.8
      */
-    public static List listContexts() { return _contexts; }
+    static List<RouterContext> getContexts() {
+        return _contexts;
+    }
+    
+    /**
+     * Kill the global I2PAppContext, so it isn't still around
+     * when we restart in the same JVM (Android).
+     * Only do this if there are no other routers in the JVM.
+     *
+     * @since 0.8.8
+     */
+    static void killGlobalContext() {
+        synchronized (I2PAppContext.class) {
+            _globalAppContext = null;
+        }
+    }
     
     /** what router is this context working for? */
     public Router router() { return _router; }
-    /** convenience method for querying the router's ident */
-    public Hash routerHash() { return _router.getRouterInfo().getIdentity().getHash(); }
 
     /**
-     * Controls a basic admin interface
-     *
+     *  Convenience method for getting the router hash.
+     *  Equivalent to context.router().getRouterInfo().getIdentity().getHash()
+     *  @return may be null if called very early
      */
-    public AdminManager adminManager() { return _adminManager; }
+    public Hash routerHash() {
+        if (_router == null)
+            return null;
+        RouterInfo ri = _router.getRouterInfo();
+        if (ri == null)
+            return null;
+        return ri.getIdentity().getHash();
+    }
+
     /**
      * How are we coordinating clients for the router?
      */
@@ -189,13 +266,15 @@ public class RouterContext extends I2PAppContext {
      * The registry is used by outbound messages to wait for replies.
      */
     public OutboundMessageRegistry messageRegistry() { return _messageRegistry; }
+
     /**
      * The monitor keeps track of inbound and outbound messages currently held in
      * memory / queued for processing.  We'll use this to throttle the router so
      * we don't overflow.
      *
      */
-    public MessageStateMonitor messageStateMonitor() { return _messageStateMonitor; }
+    //public MessageStateMonitor messageStateMonitor() { return _messageStateMonitor; }
+
     /**
      * Our db cache
      */
@@ -264,20 +343,9 @@ public class RouterContext extends I2PAppContext {
      */
     public RouterThrottle throttle() { return _throttle; }
     
-    /** how do we rank the failure of profiles? */
-    public Calculator isFailingCalculator() { return _isFailingCalc; }
-    /** how do we rank the integration of profiles? */
-    public Calculator integrationCalculator() { return _integrationCalc; }
-    /** how do we rank the speed of profiles? */
-    public Calculator speedCalculator() { return _speedCalc; } 
-    public Calculator oldSpeedCalculator() { return _oldSpeedCalc; }
-    /** how do we rank the reliability of profiles? */
-    public Calculator reliabilityCalculator() { return _reliabilityCalc; }
-    /** how do we rank the capacity of profiles? */
-    public Calculator capacityCalculator() { return _capacityCalc; }
-    
+    @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer(512);
+        StringBuilder buf = new StringBuilder(512);
         buf.append("RouterContext: ").append(super.toString()).append('\n');
         buf.append(_router).append('\n');
         buf.append(_clientManagerFacade).append('\n');
@@ -298,10 +366,6 @@ public class RouterContext extends I2PAppContext {
         buf.append(_statPublisher).append('\n');
         buf.append(_shitlist).append('\n');
         buf.append(_messageValidator).append('\n');
-        buf.append(_isFailingCalc).append('\n');
-        buf.append(_integrationCalc).append('\n');
-        buf.append(_speedCalc).append('\n');
-        buf.append(_reliabilityCalc).append('\n');
         return buf.toString();
     }
     
@@ -310,6 +374,7 @@ public class RouterContext extends I2PAppContext {
      * I2PAppContext says.
      *
      */
+    @Override
     public String getProperty(String propName) {
         if (_router != null) {
             String val = _router.getConfigSetting(propName);
@@ -322,6 +387,7 @@ public class RouterContext extends I2PAppContext {
      * I2PAppContext says.
      *
      */
+    @Override
     public String getProperty(String propName, String defaultVal) {
         if (_router != null) {
             String val = _router.getConfigSetting(propName);
@@ -333,6 +399,7 @@ public class RouterContext extends I2PAppContext {
     /**
      * Return an int with an int default
      */
+    @Override
     public int getProperty(String propName, int defaultVal) {
         if (_router != null) {
             String val = _router.getConfigSetting(propName);
@@ -348,19 +415,20 @@ public class RouterContext extends I2PAppContext {
     }
 
     /**
-     * The context's synchronized clock, which is kept context specific only to
-     * enable simulators to play with clock skew among different instances.
-     *
-     * It wouldn't be necessary to override clock(), except for the reason
-     * that it triggers initializeClock() of which we definitely
-     * need the local version to run.
+     * @return new Properties with system and context properties
+     * @since 0.8.4
      */
-    public Clock clock() {
-        if (!_clockInitialized) initializeClock();
-        return _clock;
+    @Override
+    public Properties getProperties() { 
+        Properties rv = super.getProperties();
+        if (_router != null)
+            rv.putAll(_router.getConfigMap());
+        return rv;
     }
+    
+    @Override
     protected void initializeClock() {
-        synchronized (this) {
+        synchronized (_lock1) {
             if (_clock == null)
                 _clock = new RouterClock(this);
             _clockInitialized = true;
@@ -377,11 +445,54 @@ public class RouterContext extends I2PAppContext {
 
     @Override
     protected void initializeKeyRing() {
-        synchronized (this) {
+        synchronized (_lock2) {
             if (_keyRing == null)
                 _keyRing = new PersistentKeyRing(this);
             _keyRingInitialized = true;
         }
     }
     
+    /**
+     *  @since 0.8.8
+     */
+    void removeShutdownTasks() {
+        _shutdownTasks.clear();
+    }
+    
+    /**
+     *  The last thing to be called before router shutdown.
+     *  No context resources, including logging, will be available.
+     *  Only for external threads in the same JVM needing to know when
+     *  the shutdown is complete, like Android.
+     *  @since 0.8.8
+     */
+    public void addFinalShutdownTask(Runnable task) {
+        _finalShutdownTasks.add(task);
+    }
+    
+    /**
+     *  @return the Set
+     *  @since 0.8.8
+     */
+    Set<Runnable> getFinalShutdownTasks() {
+        return _finalShutdownTasks;
+    }
+    
+    /**
+     *  Use this instead of context instanceof RouterContext
+     *  @return true
+     *  @since 0.7.9
+     */
+    public boolean isRouterContext() {
+        return true;
+    }
+
+    /**
+     *  Use this to connect to the router in the same JVM.
+     *  @return the client manager
+     *  @since 0.8.3
+     */
+    public InternalClientManager internalClientManager() {
+        return _clientManagerFacade;
+    }
 }

@@ -1,0 +1,365 @@
+/* I2P Console theme: "Camo" by dr|z3d. Aka "dark". As in ops. */
+
+body {
+     margin: 0px;
+     padding: 0px;
+     text-align: center;
+     font-family: "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
+     background: #010 url('images/camotile.png') center bottom;
+     color: #000000;
+     font-size: 8.5pt;
+    /* we've avoided Tantek Hacks so far,
+    ** but we can't avoid using the non-w3c method of 
+    ** box rendering. (and therefore one of mozilla's
+    ** proprietry -moz properties (which hopefully they'll
+    ** drop soon).
+    */
+     -moz-box-sizing: border-box;
+     box-sizing: border-box;
+}
+
+body.iframed {
+     background: transparent url('images/transparent.gif') !important;
+     padding-top: 5px;
+}
+
+div {
+     -moz-box-sizing: border-box;
+     box-sizing: border-box;
+}
+
+label {
+     margin: 0;
+     padding: 5px 4px 4px 4px;
+     float: left;
+     width: 120px;
+/*    height:  24px; */
+     font-weight: normal;
+     text-align: right;
+     font-size: 8pt;
+     font-style: italic;
+     -moz-box-sizing: border-box;
+     box-sizing: border-box;
+}
+
+h4 {
+     font-size: 14px;
+     font-weight: bold !important;
+     text-align: left;
+     border: 1px solid #494;
+     margin: 5px 0 15px 0;
+     padding: 5px 10px;
+     background: #000 url('images/header.png') center center repeat-x ;
+     text-transform: uppercase;
+     text-shadow: 0px 0px 2px rgba(0, 0, 0, 0.9);
+     letter-spacing: 0.08em;
+     -moz-box-shadow: inset 0px 0px 4px 0px #090;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+}
+
+a {
+     text-decoration: none;
+}
+
+form {
+     margin: 0px;
+}
+
+textarea, input, select, button, a {
+     font-family: "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
+     -moz-box-sizing: border-box;
+     box-sizing: border-box;
+     font-size: 8.5pt;
+     float: left;
+     background: #020;
+     border-radius: 4px;
+     color: #EEEE99;
+}
+
+button {
+     float: none;
+}
+
+textarea {
+     border: 1px solid #494;
+     background: #000;
+     margin-left: 4px;
+     width: 458px;
+}
+
+br {
+     clear: left;
+}
+
+div.statusNotRunning {
+     float: left;
+     width: 78px;
+     height: 24px;
+     overflow: hidden;
+     color: #dd0000;
+     padding-top: 24px;
+     margin-top: 6px;
+     background: url('images/console_status_stopped.png') 0 0 no-repeat;
+}
+
+div.statusRunning {
+     float: left;
+     width: 78px;
+     height: 24px;
+     overflow: hidden;
+     color: #00dd00;
+     padding-top: 24px;
+     margin-top: 6px;
+     background: url('images/console_status_running.png') 0 0 no-repeat;
+}
+
+div.statusStarting {
+     float: left;
+     width: 78px;
+     height: 24px;
+     overflow: hidden;
+     color: #339933;
+     padding-top: 24px;
+     margin-top: 6px;
+     background: url('images/console_status_starting.png') 0 0 no-repeat;
+}
+
+hr {
+     display: none;
+}
+
+.separator, .subdivider {
+     clear: both;
+     height: 1px;
+     margin: 3px 0px 3px 0px;
+     border-bottom: 1px solid #494;
+}
+
+.subdivider {
+     border-bottom: 1px solid #494;
+     padding: 5px 0px 0px 0px;
+}
+
+.freetext {
+     width: 150px;
+     height : 22px; 
+     border: 1px solid #494;
+     padding: 2px;
+     margin: 4px 0 2px 4px;
+     background-color: #000;
+     font-size: 8.5pt;
+}
+
+.control {
+     margin: 6px 0 0 2px !important;
+     padding: 2px 0;
+     overflow: hidden;
+     min-width: 60px;
+     max-height: 24px;
+     font-size: 8pt;
+     font-weight: bold;
+     background-color: #000;
+     color: #494 !important;
+     border: 1px outset #ddddc0;
+     text-align: center;
+     white-space: nowrap;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+     margin-top: 8px;
+     background: url(images/tabletitlelight.png) repeat: x;
+     vertical-align: middle;
+     text-decoration: none;
+     border: 1px outset #5f5;
+     -moz-box-shadow: inset 0px 1px 1px 0px #373;
+     -khtml-box-shadow: inset 0px 1px 1px 0px #373;
+     box-shadow: inset 0px 1px 1px 0px #373;
+}
+
+.control:link {
+     color: #494 !important;
+     text-decoration: none;
+     background: #000 !important;
+}
+
+.control:hover {
+     border: 1px solid #f60;
+     background-color: #000;
+     color: #f60 !important;
+     text-decoration: none;
+     -moz-box-shadow: inset 0px 1px 1px 0px #fff;
+     -khtml-box-shadow: inset 0px 1px 1px 0px #fff;
+     box-shadow: inset 0px 1px 1px 0px #fff;
+}
+
+.control:active {
+     border: 1px inset;
+     background-color: #f60 !important;
+     color: #EE9 !important;
+     text-decoration: none;
+}
+
+.control:visited {
+     color: #494 !important;
+     text-decoration: none;
+}
+
+.panel {
+     width: 800px;
+     margin: 16px auto 16px auto;
+     overflow: hidden;
+     text-align: left;
+     font-size: 8.5pt;
+     color: #EEEE99;
+     background-color: #020;
+     background: #000 url(images/camotile2.png);
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+     border: 1px solid #494;
+     padding: 10px 20px;
+}
+
+.iframed .panel {
+     margin: 16px auto -8px auto !important;
+}
+
+.iframed .panel.iframed {
+     margin: 0 auto -8px auto !important;
+}
+
+.panel td:first-child {
+     font-weight: bold;	
+}
+
+.panel td {
+	  padding: 6px 0 8px;
+}
+
+.panel td:last-child {
+     border-bottom: 1px dotted #494;	
+}
+
+.panel .footer {
+     float: right;
+     padding: 4px;
+}
+
+.toolbox {
+     float: right;
+}
+
+.rowItem {
+     width: 750px;
+     float: left;
+     margin: 0px;
+}
+
+.comment {
+     font-style: italic;
+}
+
+.text {
+/*     height: 24px;*/
+     width: 150px;
+     padding: 4px 0 0 2px;
+     float: left;
+     margin: 0;
+     font-size: 8pt !important;
+     font-weight: bold;
+}
+
+.accessKey {
+     text-decoration: underline;
+}
+
+#globalOperationsPanel {
+     background-color: #000;
+     border: 1px solid #494;
+     -moz-box-shadow: inset 0px 0px 0px 1px #932;
+     padding: 5px 20px 11px 10px !important;
+/*     background: #000 url(images/scarface.jpg) right center no-repeat !important;*/
+}
+
+#globalOperationsPanel .control {
+     width: 120px;
+     color: #494 !important;
+}
+
+#globalOperationsPanel .control:hover {
+     color: #F60 !important;
+}
+
+#globalOperationsPanel .control:active {
+     color: #EE9 !important;
+}
+
+.header {
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+     border: 0;
+}
+
+a:link{
+     color: #494;
+     text-decoration: none;
+     background: none;
+}
+
+a:visited{
+     color: #7b7;
+     text-decoration: none;
+     background: none;
+}
+
+a:hover{
+     color: #ff6600;
+     text-decoration: underline;
+     background: none;
+}
+
+a:active{
+     color: #900;
+     text-decoration: underline;
+     background: none;
+}
+
+input {
+     background-color: #020;
+     color: #EEEE99;
+     margin: 0 2px 0 2px;
+     font-family: "Lucida Sans Unicode", Verdana, Tahoma, Helvetica, sans-serif;
+     border: 1px solid #494;
+/*
+     padding: 0px 2px 1px 2px;
+*/
+     text-decoration: none;
+}
+
+input hover {
+     background-color: #f00;
+     color: #EEEE99;
+     margin: 0 2px 0 2px;
+     font-family: "Lucida Sans Unicode", Verdana, Tahoma, Helvetica, sans-serif;
+     font-weight: bold;
+     border: 1px solid #494;
+     padding: 2px;
+     text-decoration: none;
+}
+
+select {
+     background-color: #020;
+     color: #EEEE99;
+     margin: 6px 2px 0 2px;
+     font-family: "Lucida Sans Unicode", Verdana, Tahoma, Helvetica, sans-serif;
+     border: 1px solid #494;
+     padding: 2px 2px 2px 4px;
+     max-height: 24px;
+     background: #000;
+     border-radius: 4px;
+}
+
+form {}

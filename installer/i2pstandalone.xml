@@ -1,7 +1,7 @@
 <launch4jConfig>
   <headerType>0</headerType>
   <jar>../build/launchi2p.jar</jar>
-  <outfile>../i2p.exe</outfile>
+  <outfile>../build/i2p.exe</outfile>
   <errTitle>I2P</errTitle>
   <chdir>.</chdir>
   <customProcName>false</customProcName>

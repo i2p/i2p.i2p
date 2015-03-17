@@ -16,7 +16,6 @@ import java.io.OutputStream;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Payload;
-import net.i2p.util.Log;
 
 /**
  * Defines the payload message a router sends to the client
@@ -24,16 +23,14 @@ import net.i2p.util.Log;
  * @author jrandom
  */
 public class MessagePayloadMessage extends I2CPMessageImpl {
-    private final static Log _log = new Log(MessagePayloadMessage.class);
     public final static int MESSAGE_TYPE = 31;
     private long _sessionId;
     private long _messageId;
     private Payload _payload;
 
     public MessagePayloadMessage() {
-        setSessionId(-1);
-        setMessageId(-1);
-        setPayload(null);
+        _sessionId = -1;
+        _messageId = -1;
     }
 
     public long getSessionId() {
@@ -109,13 +106,14 @@ public class MessagePayloadMessage extends I2CPMessageImpl {
         return MESSAGE_TYPE;
     }
 
+    /* FIXME missing hashCode() method FIXME */
     @Override
     public boolean equals(Object object) {
         if ((object != null) && (object instanceof MessagePayloadMessage)) {
             MessagePayloadMessage msg = (MessagePayloadMessage) object;
-            return DataHelper.eq(getSessionId(), msg.getSessionId())
-                   && DataHelper.eq(getMessageId(), msg.getMessageId())
-                   && DataHelper.eq(getPayload(), msg.getPayload());
+            return _sessionId == msg.getSessionId()
+                   && _messageId == msg.getMessageId()
+                   && DataHelper.eq(_payload, msg.getPayload());
         }
             
         return false;
@@ -123,11 +121,11 @@ public class MessagePayloadMessage extends I2CPMessageImpl {
 
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append("[MessagePayloadMessage: ");
-        buf.append("\n\tSessionId: ").append(getSessionId());
-        buf.append("\n\tMessageId: ").append(getMessageId());
-        buf.append("\n\tPayload: ").append(getPayload());
+        buf.append("\n\tSessionId: ").append(_sessionId);
+        buf.append("\n\tMessageId: ").append(_messageId);
+        buf.append("\n\tPayload: ").append(_payload);
         buf.append("]");
         return buf.toString();
     }

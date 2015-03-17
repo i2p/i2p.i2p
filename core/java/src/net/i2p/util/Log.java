@@ -9,12 +9,14 @@ package net.i2p.util;
  *
  */
 
+import java.util.Locale;
+
 import net.i2p.I2PAppContext;
 
 /**
  * Wrapper class for whatever logging system I2P uses.  This class should be 
  * instantiated and kept as a variable for each class it is used by, ala:
- *  <code>private final static Log _log = new Log(MyClassName.class);</code>
+ *  <code>private final Log _log = context.logManager().getLog(MyClassName.class);</code>
  *
  * If there is anything in here that doesn't make sense, turn off your computer
  * and go fly a kite.
@@ -23,12 +25,12 @@ import net.i2p.I2PAppContext;
  * @author jrandom
  */
 public class Log {
-    private Class _class;
-    private String _className;
-    private String _name;
+    private final Class _class;
+    private final String _className;
+    private final String _name;
     private int _minPriority;
-    private LogScope _scope;
-    private LogManager _manager;
+    private final LogScope _scope;
+    private final LogManager _manager;
 
     public final static int DEBUG = 10;
     public final static int INFO = 20;
@@ -44,7 +46,7 @@ public class Log {
 
     public static int getLevel(String level) {
         if (level == null) return Log.CRIT;
-        level = level.toUpperCase();
+        level = level.toUpperCase(Locale.US);
         if (STR_DEBUG.startsWith(level)) return DEBUG;
         if (STR_INFO.startsWith(level)) return INFO;
         if (STR_WARN.startsWith(level)) return WARN;
@@ -69,11 +71,19 @@ public class Log {
         return (level > CRIT ? STR_CRIT : STR_DEBUG);
     }
 
+    /**
+     *  Warning - not recommended.
+     *  Use I2PAppContext.getGlobalContext().logManager().getLog(cls)
+     */
     public Log(Class cls) {
         this(I2PAppContext.getGlobalContext().logManager(), cls, null);
         _manager.addLog(this);
     }
 
+    /**
+     *  Warning - not recommended.
+     *  Use I2PAppContext.getGlobalContext().logManager().getLog(name)
+     */
     public Log(String name) {
         this(I2PAppContext.getGlobalContext().logManager(), null, name);
         _manager.addLog(this);
@@ -107,11 +117,25 @@ public class Log {
     }
 
     public void log(int priority, String msg, Throwable t) {
+        // Boost the priority of NPE and friends so they get seen and reported
+        //if (t != null && t instanceof RuntimeException && !(t instanceof IllegalArgumentException))
+        //    priority = CRIT;
         if (priority >= _minPriority) {
             _manager.addRecord(new LogRecord(_class, _name, 
                                              Thread.currentThread().getName(), priority,
                                              msg, t));
         }
+    }
+
+    /**
+     *  Always log this messge with the given priority, ignoring current minimum priority level.
+     *  This allows an INFO message about changing port numbers, for example, to always be logged.
+     *  @since 0.8.2
+     */
+    public void logAlways(int priority, String msg) {
+            _manager.addRecord(new LogRecord(_class, _name, 
+                                             Thread.currentThread().getName(), priority,
+                                             msg, null));
     }
 
     public void debug(String msg) {
@@ -167,29 +191,32 @@ public class Log {
         return _name;
     }
     
+    /** @return the LogScope (private class) */
     public Object getScope() { return _scope; }
+
     static String getScope(String name, Class cls) { 
         if ( (name == null) && (cls == null) ) return "f00";
         if (cls == null) return name;
         if (name == null) return cls.getName();
         return name + "" + cls.getName();
     }
+
     private static final class LogScope {
-        private String _scopeName;
-        private Class _scopeClass;
-        private String _scopeCache;
+        private final String _scopeCache;
+
         public LogScope(String name, Class cls) {
-            _scopeName = name;
-            _scopeClass = cls;
             _scopeCache = getScope(name, cls);
         }
+
         @Override
         public int hashCode() {
             return _scopeCache.hashCode();
         }
+
         @Override
         public boolean equals(Object obj) {
-            if (obj == null) throw new NullPointerException("Null object scope?");
+            if (obj == null)
+                return false;
             if (obj instanceof LogScope) {
                 LogScope s = (LogScope)obj;
                 return s._scopeCache.equals(_scopeCache);

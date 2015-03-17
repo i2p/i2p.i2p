@@ -1,0 +1,60 @@
+.TH EEEPGET 1 "April 19, 2012" "" "Eepget - I2P Downloader"
+
+.SH NAME
+Eepget \- I2P downloader
+
+.SH SYNOPSIS
+.B eepget
+.RI [ options ] URL
+.br
+
+.SH DESCRIPTION
+.P
+Download a file non-interactively via HTTP. Transfers through both I2P and the
+regular Internet are supported.
+.P
+Eepget is able to cope with slow or unstable network connections; if a download
+is not successful because of a network problem, it will keep retrying until the
+whole file has been retrieved (by default up to three times).  If supported by
+the remote server, eepget will instruct the server to continue the download
+from the point of interruption.
+
+.SH OPTIONS
+.B
+\fB\-p\fR proxy_host:port
+.TP
+Specify an I2P proxy server (eeproxy) to use. If this option is not specified, eepget will use 127.0.0.1:4444. Specify \fB\-p\fR :0 to disable the eeproxy.
+.TP
+
+.B
+\fB\-n\fR retries
+.TP
+Specify the number of times to retry downloading if the download isn't successful. If this option is not specified, eepget will retry downloading the file 3 times.
+.TP
+
+.B
+\fB\-o\fR file
+.TP
+Sets the output file to write to. If this option is not given, the output filename will be determined by the URL.
+.TP
+
+.B
+\fB\-m\fR markSize lineLen
+.TP
+Controls the progress display. \fB\ markSize \fP is the number of bytes one '#' character represents. \fB\ lineLen \fP is the length of one progress line in characters. The defaults are 1024 and 40.
+.TP
+
+.B
+\fB\-t\fR seconds
+.TP
+Sets the inactivity timeout. The default is 60 seconds.
+
+.SH EXIT STATUS
+
+.B eepget
+exits with status zero upon successful transfer and non-zero if there were  problems with the download.
+
+.SH "SEE ALSO"
+
+wget(1)
+

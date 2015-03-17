@@ -20,11 +20,11 @@ import net.i2p.util.SimpleTimer2;
  *  same router.
  *
  */
-public class TCBShare {
-    private I2PAppContext _context;
-    private Log _log;
-    private Map<Destination, Entry> _cache;
-    private CleanEvent _cleaner;
+class TCBShare {
+    private final I2PAppContext _context;
+    private final Log _log;
+    private final Map<Destination, Entry> _cache;
+    private final CleanEvent _cleaner;
 
     private static final long EXPIRE_TIME = 30*60*1000;
     private static final long CLEAN_TIME = 10*60*1000;
@@ -33,11 +33,11 @@ public class TCBShare {
     private static final int MAX_RTT = ((int) Connection.MAX_RESEND_DELAY) / 2;
     private static final int MAX_WINDOW_SIZE = Connection.MAX_WINDOW_SIZE / 4;
     
-    public TCBShare(I2PAppContext ctx) {
+    public TCBShare(I2PAppContext ctx, SimpleTimer2 timer) {
         _context = ctx;
         _log = ctx.logManager().getLog(TCBShare.class);
         _cache = new ConcurrentHashMap(4);
-        _cleaner = new CleanEvent();
+        _cleaner = new CleanEvent(timer);
         _cleaner.schedule(CLEAN_TIME);
     }
 
@@ -125,12 +125,13 @@ public class TCBShare {
     }
 
     private class CleanEvent extends SimpleTimer2.TimedEvent {
-        public CleanEvent() {
-            super(RetransmissionTimer.getInstance());
+        public CleanEvent(SimpleTimer2 timer) {
+            // Use router's SimpleTimer2
+            super(timer);
         }
         public void timeReached() {
-            for (Iterator iter = _cache.keySet().iterator(); iter.hasNext(); ) {
-                if (_cache.get(iter.next()).isExpired())
+            for (Iterator<Entry> iter = _cache.values().iterator(); iter.hasNext(); ) {
+                if (iter.next().isExpired())
                     iter.remove();
             }
             schedule(CLEAN_TIME);

@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-import net.i2p.router.RouterContext;
 import net.i2p.stat.FrequencyStat;
 import net.i2p.stat.Rate;
 import net.i2p.stat.RateStat;
@@ -35,16 +34,13 @@ public class ConfigStatsHelper extends HelperBase {
     /**
      * Configure this bean to query a particular router context
      *
-     * @param contextId begging few characters of the routerHash, or null to pick
+     * @param contextId beginning few characters of the routerHash, or null to pick
      *                  the first one we come across.
      */
+    @Override
     public void setContextId(String contextId) {
-        try {
-            _context = ContextHelper.getContext(contextId);
-            _log = _context.logManager().getLog(ConfigStatsHelper.class);
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
+        super.setContextId(contextId);
+        _log = _context.logManager().getLog(ConfigStatsHelper.class);
         
         _stats = new ArrayList();
         Map groups = _context.statManager().getStatsByGroup();
@@ -63,8 +59,16 @@ public class ConfigStatsHelper extends HelperBase {
             _filters.add(tok.nextToken().trim());
     }
 
-    public ConfigStatsHelper() {}
-    
+    /**
+     *  Just hide for everybody unless already set.
+     *  To enable set advanced config stat.logFilters=foo before starting...
+     *  it has to be set at startup anyway for logging to be enabled at all
+     *  @since 0.9
+     */
+    public boolean shouldShowLog() {
+        return !_filters.isEmpty();
+    }
+
     public String getFilename() { return _context.statManager().getStatFile(); }
     
     /** 
@@ -74,7 +78,7 @@ public class ConfigStatsHelper extends HelperBase {
      * @return true if a valid stat is available, otherwise false
      */
     public boolean hasMoreStats() {
-        if (_stats.size() <= 0)
+        if (_stats.isEmpty())
             return false;
         _currentIsGraphed = false;
         _currentStatName = (String)_stats.remove(0);
@@ -143,9 +147,6 @@ public class ConfigStatsHelper extends HelperBase {
     public boolean getCurrentCanBeGraphed() { return _currentCanBeGraphed; }
     public String getExplicitFilter() { return _filter; }
     public boolean getIsFull() {
-        String f = _context.getProperty(StatManager.PROP_STAT_FULL);
-        if (f != null && f.equals("true"))
-            return true;
-        return false;
+        return _context.getBooleanProperty(StatManager.PROP_STAT_FULL);
     }
 }

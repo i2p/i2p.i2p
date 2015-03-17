@@ -2,9 +2,9 @@ package net.i2p.router.transport.udp;
 
 import java.net.DatagramPacket;
 import java.net.InetAddress;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
@@ -16,16 +16,15 @@ import net.i2p.util.Log;
  * of object instances to allow rapid reuse.
  *
  */
-public class UDPPacket {
+class UDPPacket {
     private I2PAppContext _context;
-    private static Log _log;
-    private volatile DatagramPacket _packet;
+    private final DatagramPacket _packet;
     private volatile short _priority;
     private volatile long _initializeTime;
     private volatile long _expiration;
-    private byte[] _data;
-    private byte[] _validateBuf;
-    private byte[] _ivBuf;
+    private final byte[] _data;
+    private final byte[] _validateBuf;
+    private final byte[] _ivBuf;
     private volatile int _markedType;
     private volatile RemoteHostId _remoteHost;
     private volatile boolean _released;
@@ -33,26 +32,47 @@ public class UDPPacket {
     private volatile Exception _acquiredBy;
     private long _enqueueTime;
     private long _receivedTime;
-    private long _beforeValidate;
-    private long _afterValidate;
-    private long _beforeReceiveFragments;
-    private long _afterHandlingTime;
+    //private long _beforeValidate;
+    //private long _afterValidate;
+    //private long _beforeReceiveFragments;
+    //private long _afterHandlingTime;
     private int _validateCount;
-    private boolean _isInbound;
+    // private boolean _isInbound;
   
-    private static final List _packetCache;
+    //  Warning - this mixes contexts in a multi-router JVM
+    private static final Queue<UDPPacket> _packetCache;
+    private static final boolean CACHE = true;
+    private static final int MIN_CACHE_SIZE = 64;
+    private static final int MAX_CACHE_SIZE = 256;
     static {
-        _packetCache = new ArrayList(256);
-        _log = I2PAppContext.getGlobalContext().logManager().getLog(UDPPacket.class);
+        if (CACHE) {
+            long maxMemory = Runtime.getRuntime().maxMemory();
+            if (maxMemory == Long.MAX_VALUE)
+                maxMemory = 96*1024*1024l;
+            int csize = (int) Math.max(MIN_CACHE_SIZE, Math.min(MAX_CACHE_SIZE, maxMemory / (1024*1024)));
+            _packetCache = new LinkedBlockingQueue(csize);
+        } else {
+            _packetCache = null;
+        }
     }
     
-    private static final boolean CACHE = true; // TODO: support caching to cut churn down a /lot/
-    private static final int CACHE_SIZE = 64;
-      
-    static final int MAX_PACKET_SIZE = 2048;
+    /**
+     *  Actually it is one less than this, we assume
+     *  if a received packet is this big it is truncated.
+     *  This is bigger than PeerState.LARGE_MTU, as the far-end's
+     *  LARGE_MTU may be larger than ours.
+     *
+     *  Due to longstanding bugs, a packet may be larger than LARGE_MTU
+     *  (acks and padding). Together with an increase in the LARGE_MTU to
+     *  1492 in release 0.8.9, routers from 0.8.9 - 0.8.11 can generate
+     *  packets up to 1536. Data packets are always a multiple of 16,
+     *  so make this 4 + a multiple of 16.
+     */
+    static final int MAX_PACKET_SIZE = 1572;
     public static final int IV_SIZE = 16;
     public static final int MAC_SIZE = 16;
     
+    /** Message types, 4 bits max */
     public static final int PAYLOAD_TYPE_SESSION_REQUEST = 0;
     public static final int PAYLOAD_TYPE_SESSION_CREATED = 1;
     public static final int PAYLOAD_TYPE_SESSION_CONFIRMED = 2;
@@ -61,57 +81,72 @@ public class UDPPacket {
     public static final int PAYLOAD_TYPE_RELAY_INTRO = 5;
     public static final int PAYLOAD_TYPE_DATA = 6;
     public static final int PAYLOAD_TYPE_TEST = 7;
+    /** @since 0.8.1 */
+    public static final int PAYLOAD_TYPE_SESSION_DESTROY = 8;
     
     // various flag fields for use in the data packets
     public static final byte DATA_FLAG_EXPLICIT_ACK = (byte)(1 << 7);
     public static final byte DATA_FLAG_ACK_BITFIELDS = (1 << 6);
+    // unused
     public static final byte DATA_FLAG_ECN = (1 << 4);
     public static final byte DATA_FLAG_WANT_ACKS = (1 << 3);
     public static final byte DATA_FLAG_WANT_REPLY = (1 << 2);
+    // unused
     public static final byte DATA_FLAG_EXTENDED = (1 << 1);
     
     public static final byte BITFIELD_CONTINUATION = (byte)(1 << 7);
     
     private static final int MAX_VALIDATE_SIZE = MAX_PACKET_SIZE;
 
-    private UDPPacket(I2PAppContext ctx, boolean inbound) {
-        ctx.statManager().createRateStat("udp.packetsLiveInbound", "Number of live inbound packets in memory", "udp", new long[] { 60*1000, 5*60*1000 });
-        ctx.statManager().createRateStat("udp.packetsLiveOutbound", "Number of live outbound packets in memory", "udp", new long[] { 60*1000, 5*60*1000 });
-        ctx.statManager().createRateStat("udp.packetsLivePendingRecvInbound", "Number of live inbound packets not yet handled by the PacketHandler", "udp", new long[] { 60*1000, 5*60*1000 });
-        ctx.statManager().createRateStat("udp.packetsLivePendingHandleInbound", "Number of live inbound packets not yet handled fully by the PacketHandler", "udp", new long[] { 60*1000, 5*60*1000 });
-        ctx.statManager().createRateStat("udp.fetchRemoteSlow", "How long it takes to grab the remote ip info", "udp", new long[] { 60*1000 });
+    private UDPPacket(I2PAppContext ctx) {
+        //ctx.statManager().createRateStat("udp.fetchRemoteSlow", "How long it takes to grab the remote ip info", "udp", UDPTransport.RATES);
         // the data buffer is clobbered on init(..), but we need it to bootstrap
         _data = new byte[MAX_PACKET_SIZE];
         _packet = new DatagramPacket(_data, MAX_PACKET_SIZE);
         _validateBuf = new byte[MAX_VALIDATE_SIZE];
         _ivBuf = new byte[IV_SIZE];
-        init(ctx, inbound);
+        init(ctx);
     }
-    private void init(I2PAppContext ctx, boolean inbound) {
+
+    private void init(I2PAppContext ctx) {
         _context = ctx;
         //_dataBuf = _dataCache.acquire();
         Arrays.fill(_data, (byte)0);
         //_packet = new DatagramPacket(_data, MAX_PACKET_SIZE);
+        //
+        // WARNING -
+        // Doesn't seem like we should have to do this every time,
+        // from reading the DatagramPacket javadocs,
+        // but we get massive corruption without it.
         _packet.setData(_data);
-        _isInbound = inbound;
+        // _isInbound = inbound;
         _initializeTime = _context.clock().now();
         _markedType = -1;
         _validateCount = 0;
         _remoteHost = null;
         _released = false;
+        // clear out some values to make debugging easier via toString()
+        _messageType = -1;
+        _enqueueTime = 0;
+        _receivedTime = 0;
+        _fragmentCount = 0;
     }
     
+  /****
     public void writeData(byte src[], int offset, int len) { 
         verifyNotReleased();
         System.arraycopy(src, offset, _data, 0, len);
         _packet.setLength(len);
         resetBegin();
     }
+  ****/
+
+    /** */
     public DatagramPacket getPacket() { verifyNotReleased(); return _packet; }
     public short getPriority() { verifyNotReleased(); return _priority; }
     public long getExpiration() { verifyNotReleased(); return _expiration; }
     public long getBegin() { verifyNotReleased(); return _initializeTime; }
-    public long getLifetime() { verifyNotReleased(); return _context.clock().now() - _initializeTime; }
+    public long getLifetime() { /** verifyNotReleased(); */ return _context.clock().now() - _initializeTime; }
     public void resetBegin() { _initializeTime = _context.clock().now(); }
     /** flag this packet as a particular type for accounting purposes */
     public void markType(int type) { verifyNotReleased(); _markedType = type; }
@@ -124,21 +159,23 @@ public class UDPPacket {
     
     private int _messageType;
     private int _fragmentCount;
+    /** only for debugging and stats, does not go on the wire */
     int getMessageType() { return _messageType; }
+    /** only for debugging and stats, does not go on the wire */
     void setMessageType(int type) { _messageType = type; }
     int getFragmentCount() { return _fragmentCount; }
     void setFragmentCount(int count) { _fragmentCount = count; }
-    
-    public RemoteHostId getRemoteHost() {
+
+    RemoteHostId getRemoteHost() {
         if (_remoteHost == null) {
-            long before = System.currentTimeMillis();
+            //long before = System.currentTimeMillis();
             InetAddress addr = _packet.getAddress();
             byte ip[] = addr.getAddress();
             int port = _packet.getPort();
             _remoteHost = new RemoteHostId(ip, port);
-            long timeToFetch = System.currentTimeMillis() - before;
-            if (timeToFetch > 50)
-                _context.statManager().addRateData("udp.fetchRemoteSlow", timeToFetch, getLifetime());
+            //long timeToFetch = System.currentTimeMillis() - before;
+            //if (timeToFetch > 50)
+            //    _context.statManager().addRateData("udp.fetchRemoteSlow", timeToFetch, getLifetime());
         }
         return _remoteHost;
     }
@@ -150,7 +187,7 @@ public class UDPPacket {
      */
     public boolean validate(SessionKey macKey) {
         verifyNotReleased(); 
-        _beforeValidate = _context.clock().now();
+        //_beforeValidate = _context.clock().now();
         boolean eq = false;
         Arrays.fill(_validateBuf, (byte)0);
         
@@ -172,7 +209,7 @@ public class UDPPacket {
             Hash hmac = _context.hmac().calculate(macKey, buf.getData(), 0, off);
 
             if (_log.shouldLog(Log.DEBUG)) {
-                StringBuffer str = new StringBuffer(128);
+                StringBuilder str = new StringBuilder(128);
                 str.append(_packet.getLength()).append(" byte packet received, payload length ");
                 str.append(payloadLength);
                 str.append("\nIV: ").append(Base64.encode(buf.getData(), payloadLength, IV_SIZE));
@@ -187,11 +224,11 @@ public class UDPPacket {
             eq = DataHelper.eq(hmac.getData(), 0, _data, _packet.getOffset(), MAC_SIZE);
              */
         } else {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Payload length is " + payloadLength);
+            //if (_log.shouldLog(Log.WARN))
+            //    _log.warn("Payload length is " + payloadLength);
         }
         
-        _afterValidate = _context.clock().now();
+        //_afterValidate = _context.clock().now();
         _validateCount++;
         return eq;
     }
@@ -213,62 +250,74 @@ public class UDPPacket {
     void enqueue() { _enqueueTime = _context.clock().now(); }
     /** a packet handler has pulled it off the inbound queue */
     void received() { _receivedTime = _context.clock().now(); }
+
     /** a packet handler has decrypted and verified the packet and is about to parse out the good bits */
-    void beforeReceiveFragments() { _beforeReceiveFragments = _context.clock().now(); }
+    //void beforeReceiveFragments() { _beforeReceiveFragments = _context.clock().now(); }
     /** a packet handler has finished parsing out the good bits */
-    void afterHandling() { _afterHandlingTime = _context.clock().now(); } 
+    //void afterHandling() { _afterHandlingTime = _context.clock().now(); } 
       
     /** the UDPReceiver has tossed it onto the inbound queue */
-    long getTimeSinceEnqueue() { return (_enqueueTime > 0 ? _context.clock().now() - _enqueueTime : 0); }
+    //long getTimeSinceEnqueue() { return (_enqueueTime > 0 ? _context.clock().now() - _enqueueTime : 0); }
+
     /** a packet handler has pulled it off the inbound queue */
     long getTimeSinceReceived() { return (_receivedTime > 0 ? _context.clock().now() - _receivedTime : 0); }
+
     /** a packet handler has decrypted and verified the packet and is about to parse out the good bits */
-    long getTimeSinceReceiveFragments() { return (_beforeReceiveFragments > 0 ? _context.clock().now() - _beforeReceiveFragments : 0); }
+    //long getTimeSinceReceiveFragments() { return (_beforeReceiveFragments > 0 ? _context.clock().now() - _beforeReceiveFragments : 0); }
     /** a packet handler has finished parsing out the good bits */
-    long getTimeSinceHandling() { return (_afterHandlingTime > 0 ? _context.clock().now() - _afterHandlingTime : 0); }
+    //long getTimeSinceHandling() { return (_afterHandlingTime > 0 ? _context.clock().now() - _afterHandlingTime : 0); }
     
+    // Following 5: All used only for stats in PacketHandler, commented out
+
     /** when it was added to the endpoint's receive queue */
-    long getEnqueueTime() { return _enqueueTime; }
+    //long getEnqueueTime() { return _enqueueTime; }
     /** when it was pulled off the endpoint receive queue */
-    long getReceivedTime() { return _receivedTime; }
+    //long getReceivedTime() { return _receivedTime; }
     /** when we began validate() */
-    long getBeforeValidate() { return _beforeValidate; }
+    //long getBeforeValidate() { return _beforeValidate; }
     /** when we finished validate() */
-    long getAfterValidate() { return _afterValidate; }
+    //long getAfterValidate() { return _afterValidate; }
     /** how many times we tried to validate the packet */
-    int getValidateCount() { return _validateCount; }
+    //int getValidateCount() { return _validateCount; }
     
+    @Override
     public String toString() {
         verifyNotReleased(); 
-        StringBuffer buf = new StringBuffer(64);
+        StringBuilder buf = new StringBuilder(256);
         buf.append(_packet.getLength());
-        buf.append(" byte packet with ");
+        buf.append(" byte pkt with ");
         buf.append(_packet.getAddress().getHostAddress()).append(":");
         buf.append(_packet.getPort());
-        buf.append(" id=").append(System.identityHashCode(this));
+        //buf.append(" id=").append(System.identityHashCode(this));
+        if (_messageType >= 0)
+            buf.append(" msgType=").append(_messageType);
+        if (_markedType >= 0)
+            buf.append(" markType=").append(_markedType);
+        if (_fragmentCount > 0)
+            buf.append(" fragCount=").append(_fragmentCount);
 
-        buf.append(" sinceEnqueued=").append((_enqueueTime > 0 ? _context.clock().now()-_enqueueTime : -1));
-        buf.append(" sinceReceived=").append((_receivedTime > 0 ? _context.clock().now()-_receivedTime : -1));
-        buf.append(" beforeReceiveFragments=").append((_beforeReceiveFragments > 0 ? _context.clock().now()-_beforeReceiveFragments : -1));
-        buf.append(" sinceHandled=").append((_afterHandlingTime > 0 ? _context.clock().now()-_afterHandlingTime : -1));
+        if (_enqueueTime >= 0)
+            buf.append(" sinceEnqueued=").append(_context.clock().now() - _enqueueTime);
+        if (_receivedTime >= 0)
+            buf.append(" sinceReceived=").append(_context.clock().now() - _receivedTime);
+        //buf.append(" beforeReceiveFragments=").append((_beforeReceiveFragments > 0 ? _context.clock().now()-_beforeReceiveFragments : -1));
+        //buf.append(" sinceHandled=").append((_afterHandlingTime > 0 ? _context.clock().now()-_afterHandlingTime : -1));
         //buf.append("\ndata=").append(Base64.encode(_packet.getData(), _packet.getOffset(), _packet.getLength()));
         return buf.toString();
     }
     
+    /**
+     *  @param inbound unused
+     */
     public static UDPPacket acquire(I2PAppContext ctx, boolean inbound) {
         UDPPacket rv = null;
         if (CACHE) {
-            synchronized (_packetCache) {
-                if (_packetCache.size() > 0) {
-                    rv = (UDPPacket)_packetCache.remove(0);
-                }
-            }
-            
+            rv = _packetCache.poll();
             if (rv != null)
-                rv.init(ctx, inbound);
+                rv.init(ctx);
         }
         if (rv == null)
-            rv = new UDPPacket(ctx, inbound);
+            rv = new UDPPacket(ctx);
         //if (rv._acquiredBy != null) {
         //    _log.log(Log.CRIT, "Already acquired!  current stack trace is:", new Exception());
         //    _log.log(Log.CRIT, "Earlier acquired:", rv._acquiredBy);
@@ -286,19 +335,25 @@ public class UDPPacket {
         //_dataCache.release(_dataBuf);
         if (!CACHE)
             return;
-        synchronized (_packetCache) {
-            if (_packetCache.size() <= CACHE_SIZE) {
-                _packetCache.add(this);
-            }
-        }
+        _packetCache.offer(this);
     }
     
+    /**
+     *  Call at shutdown/startup to not hold ctx refs
+     *  @since 0.9.2
+     */
+    public static void clearCache() {
+        if (CACHE)
+            _packetCache.clear();
+    }
+
     private void verifyNotReleased() {
-        if (CACHE) return;
+        if (!CACHE) return;
         if (_released) {
-            _log.log(Log.CRIT, "Already released.  current stack trace is:", new Exception());
-            _log.log(Log.CRIT, "Released by: ", _releasedBy);
-            _log.log(Log.CRIT, "Acquired by: ", _acquiredBy);
+            Log log = _context.logManager().getLog(UDPPacket.class);
+            log.error("Already released", new Exception());
+            //log.log(Log.CRIT, "Released by: ", _releasedBy);
+            //log.log(Log.CRIT, "Acquired by: ", _acquiredBy);
         }
     }
 }

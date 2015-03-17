@@ -10,19 +10,24 @@ package net.i2p.util;
  */
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
+import java.util.Locale;
 import java.util.Properties;
-import java.util.TreeMap;
+import java.util.Queue;
+import java.util.Set;
+import java.util.TimeZone;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicLong;
 
 import net.i2p.I2PAppContext;
+import net.i2p.data.DataHelper;
 
 /**
  * Manages the logging system, loading (and reloading) the configuration file,
@@ -49,10 +54,16 @@ public class LogManager {
     public final static String PROP_CONSOLEBUFFERSIZE = "logger.consoleBufferSize";
     public final static String PROP_DISPLAYONSCREENLEVEL = "logger.minimumOnScreenLevel";
     public final static String PROP_DEFAULTLEVEL = "logger.defaultLevel";
+    /** @since 0.9.2 */
+    private static final String PROP_LOG_BUFFER_SIZE = "logger.logBufferSize";
+    /** @since 0.9.2 */
+    private static final String PROP_DROP = "logger.dropOnOverflow";
     public final static String PROP_RECORD_PREFIX = "logger.record.";
 
     public final static String DEFAULT_FORMAT = DATE + " " + PRIORITY + " [" + THREAD + "] " + CLASS + ": " + MESSAGE;
-    public final static String DEFAULT_DATEFORMAT = "HH:mm:ss.SSS";
+    //public final static String DEFAULT_DATEFORMAT = "HH:mm:ss.SSS";
+    /** blank means default short date and medium time for the locale - see DateFormat */
+    public final static String DEFAULT_DATEFORMAT = "";
     public final static String DEFAULT_FILENAME = "logs/log-#.txt";
     public final static String DEFAULT_FILESIZE = "10m";
     public final static boolean DEFAULT_DISPLAYONSCREEN = true;
@@ -61,20 +72,23 @@ public class LogManager {
     public final static String DEFAULT_DEFAULTLEVEL = Log.STR_ERROR;
     public final static String DEFAULT_ONSCREENLEVEL = Log.STR_CRIT;
 
-    private I2PAppContext _context;
-    private Log _log;
+    private final I2PAppContext _context;
+    private final Log _log;
     
     /** when was the config file last read (or -1 if never) */
     private long _configLastRead;
 
-    /** filename of the config file */
-    private String _location;
+    /** the config file */
+    private File _locationFile;
+
+    /** max to LogRecords to buffer in memory before we start blocking */
+    private static final int MAX_BUFFER = 1024;
     /** Ordered list of LogRecord elements that have not been written out yet */
-    private List _records;
+    private final LinkedBlockingQueue<LogRecord> _records;
     /** List of explicit overrides of log levels (LogLimit objects) */
-    private List _limits;
-    /** String (scope) to Log object */
-    private Map _logs;
+    private final Set<LogLimit> _limits;
+    /** String (scope) or Log.LogScope to Log object */
+    private final ConcurrentHashMap<Object, Log> _logs;
     /** who clears and writes our records */
     private LogWriter _writer;
 
@@ -101,30 +115,33 @@ public class LogManager {
     /** whether or not we even want to display anything on stdout */
     private boolean _displayOnScreen;
     /** how many records we want to buffer in the "recent logs" list */
-    private int _consoleBufferSize;
+    private int _consoleBufferSize = DEFAULT_CONSOLEBUFFERSIZE;
     /** the actual "recent logs" list */
-    private LogConsoleBuffer _consoleBuffer;
+    private final LogConsoleBuffer _consoleBuffer;
+    private int _logBufferSize = MAX_BUFFER;
+    private boolean _dropOnOverflow;
+    private final AtomicLong _droppedRecords = new AtomicLong();
     
     private boolean _alreadyNoticedMissingConfig;
 
     public LogManager(I2PAppContext context) {
         _displayOnScreen = true;
         _alreadyNoticedMissingConfig = false;
-        _records = new ArrayList();
-        _limits = new ArrayList(128);
-        _logs = new HashMap(128);
+        _limits = new ConcurrentHashSet();
+        _logs = new ConcurrentHashMap(128);
         _defaultLimit = Log.ERROR;
-        _configLastRead = 0;
-        _location = context.getProperty(CONFIG_LOCATION_PROP, CONFIG_LOCATION_DEFAULT);
         _context = context;
         _log = getLog(LogManager.class);
-        _consoleBuffer = new LogConsoleBuffer(context);
-        loadConfig();
-        _writer = new LogWriter(this);
-        Thread t = new I2PThread(_writer);
-        t.setName("LogWriter");
-        t.setDaemon(true);
-        t.start();
+        String location = context.getProperty(CONFIG_LOCATION_PROP, CONFIG_LOCATION_DEFAULT);
+        setConfig(location);
+        _records = new LinkedBlockingQueue(_logBufferSize);
+        _consoleBuffer = new LogConsoleBuffer(_consoleBufferSize);
+        // If we aren't in the router context, delay creating the LogWriter until required,
+        // so it doesn't create a log directory and log files unless there is output.
+        // In the router context, we have to rotate to a new log file at startup or the logs.jsp
+        // page will display the old log.
+        if (context.isRouterContext())
+            startLogWriter();
         try {
             Runtime.getRuntime().addShutdownHook(new ShutdownHook());
         } catch (IllegalStateException ise) {
@@ -133,44 +150,57 @@ public class LogManager {
         //System.out.println("Created logManager " + this + " with context: " + context);
     }
 
-    private LogManager() { // nop
+    /** @since 0.8.2 */
+    private synchronized void startLogWriter() {
+        // yeah, this doesn't always work, _writer should be volatile
+        if (_writer != null)
+            return;
+        _writer = new LogWriter(this);
+        // NOT an I2PThread, as it contains logging and we end up with problems
+        Thread t = new Thread(_writer, "LogWriter");
+        t.setDaemon(true);
+        t.start();
     }
-    
+
     public Log getLog(Class cls) { return getLog(cls, null); }
     public Log getLog(String name) { return getLog(null, name); }
     public Log getLog(Class cls, String name) {
-        Log rv = null;
         String scope = Log.getScope(name, cls);
         boolean isNew = false;
-        synchronized (_logs) {
-            rv = (Log)_logs.get(scope);
-            if (rv == null) {
-                rv = new Log(this, cls, name);
-                _logs.put(scope, rv);
-                isNew = true;
-            }
+        Log rv = _logs.get(scope);
+        if (rv == null) {
+            rv = new Log(this, cls, name);
+            Log old = _logs.putIfAbsent(scope, rv);
+            isNew = old == null;
+            if (!isNew)
+                rv = old;
         }
         if (isNew)
             updateLimit(rv);
         return rv;
     }
-    public List getLogs() {
-        List rv = null;
-        synchronized (_logs) {
-            rv = new ArrayList(_logs.values());
-        }
-        return rv;
+
+    /** now used by ConfigLogingHelper */
+    public List<Log> getLogs() {
+        return new ArrayList(_logs.values());
     }
+
+    /**
+     *  If the log already exists, its priority is set here but cannot
+     *  be changed later, as it becomes an "orphan" not tracked by the manager.
+     */
     void addLog(Log log) {
-        synchronized (_logs) {
-            if (!_logs.containsKey(log.getScope()))
-                _logs.put(log.getScope(), log);
-        }
+        Log old = _logs.putIfAbsent(log.getScope(), log);
         updateLimit(log);
+        if (old != null) {
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Duplicate log for " + log.getName());
+        }
     }
     
     public LogConsoleBuffer getBuffer() { return _consoleBuffer; }
         
+    /** @deprecated unused */
     public void setDisplayOnScreen(boolean yes) {
         _displayOnScreen = yes;
     }
@@ -183,6 +213,7 @@ public class LogManager {
         return _onScreenLimit;
     }
 
+    /** @deprecated unused */
     public void setDisplayOnScreenLevel(int level) {
         _onScreenLimit = level;
     }
@@ -191,61 +222,72 @@ public class LogManager {
         return _consoleBufferSize;
     }
 
+    /** @deprecated unused */
     public void setConsoleBufferSize(int numRecords) {
         _consoleBufferSize = numRecords;
     }
 
     public void setConfig(String filename) {
-        _log.debug("Config filename set to " + filename);
-        _location = filename;
+        _locationFile = new File(filename);
+        if (!_locationFile.isAbsolute())
+            _locationFile = new File(_context.getConfigDir(), filename);
         loadConfig();
     }
 
+    public String currentFile() {
+        if (_writer == null)
+            return ("No log file created yet");
+        return _writer.currentFile();
+    }
+
     /**
-     * Used by Log to add records to the queue
-     *
+     * Used by Log to add records to the queue.
+     * This is generally nonblocking and unsyncrhonized but may block when under
+     * massive logging load as a way of throttling logging threads.
      */
     void addRecord(LogRecord record) {
-        int numRecords = 0;
-        synchronized (_records) {
-            _records.add(record);
-            numRecords = _records.size();
-        }
-        
-        if (numRecords > 100) {
+        if ((!_context.isRouterContext()) && _writer == null)
+            startLogWriter();
+
+        boolean success = _records.offer(record);
+        if (!success) {
+            if (_dropOnOverflow) {
+                // TODO use the counter in a periodic drop msg
+                _droppedRecords.incrementAndGet();
+                return;
+            }
             // the writer waits 10 seconds *or* until we tell them to wake up
             // before rereading the config and writing out any log messages
             synchronized (_writer) {
                 _writer.notifyAll();
             }
+            // block as a way of slowing down out-of-control loggers (a little)
+            try {
+                _records.put(record);
+            } catch (InterruptedException ie) {}
         }
     }
     
     /**
      * Called periodically by the log writer's thread
-     *
+     * Do not log here, deadlock of LogWriter
      */
     void rereadConfig() {
         // perhaps check modification time
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Rereading configuration file");
+        //if (_log.shouldLog(Log.DEBUG))
+        //    _log.debug("Rereading configuration file");
         loadConfig();
     }
 
-    ///
-    ///
-
-    //
-    //
-    //
-
+    /**
+     * Do not log here, deadlock of LogWriter via rereadConfig().
+     */
     private void loadConfig() {
-        File cfgFile = new File(_location);
+        File cfgFile = _locationFile;
         if (!cfgFile.exists()) {
             if (!_alreadyNoticedMissingConfig) {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Log file " + _location + " does not exist");
-                //System.err.println("Log file " + _location + " does not exist");
+                //if (_log.shouldLog(Log.WARN))
+                //    _log.warn("Log file " + _locationFile.getAbsolutePath() + " does not exist");
                 _alreadyNoticedMissingConfig = true;
             }
             parseConfig(new Properties());
@@ -255,49 +297,41 @@ public class LogManager {
         _alreadyNoticedMissingConfig = false;
         
         if ((_configLastRead > 0) && (_configLastRead >= cfgFile.lastModified())) {
-            if (_log.shouldLog(Log.INFO))
-                _log.info("Short circuiting config read (last read: " 
-                           + (_context.clock().now() - _configLastRead) + "ms ago, config file modified "
-                           + (_context.clock().now() - cfgFile.lastModified()) + "ms ago");
+            //if (_log.shouldLog(Log.INFO))
+            //    _log.info("Short circuiting config read (last read: " 
+            //               + (_context.clock().now() - _configLastRead) + "ms ago, config file modified "
+            //               + (_context.clock().now() - cfgFile.lastModified()) + "ms ago");
             return;
         }
 
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Loading config from " + _location);
-
         Properties p = new Properties();
-        FileInputStream fis = null;
         try {
-            fis = new FileInputStream(cfgFile);
-            p.load(fis);
+            DataHelper.loadProps(p, cfgFile);
             _configLastRead = _context.clock().now();
         } catch (IOException ioe) {
-            System.err.println("Error loading logger config from " + new File(_location).getAbsolutePath());
-        } finally {
-            if (fis != null) try {
-                fis.close();
-            } catch (IOException ioe) { // nop
-            }
+            System.err.println("Error loading logger config from " + cfgFile.getAbsolutePath());
         }
         parseConfig(p);
         updateLimits();
     }
 
+    /**
+     * Do not log here, deadlock of LogWriter via rereadConfig().
+     */
     private void parseConfig(Properties config) {
         String fmt = config.getProperty(PROP_FORMAT, DEFAULT_FORMAT);
         _format = fmt.toCharArray();
         
         String df = config.getProperty(PROP_DATEFORMAT, DEFAULT_DATEFORMAT);
-        _dateFormatPattern = df;
-        _dateFormat = new SimpleDateFormat(df);
+        setDateFormat(df);
 
         String disp = config.getProperty(PROP_DISPLAYONSCREEN);
         if (disp == null)
             _displayOnScreen = DEFAULT_DISPLAYONSCREEN;
         else {
-            if ("TRUE".equals(disp.toUpperCase().trim()))
+            if ("TRUE".equals(disp.toUpperCase(Locale.US).trim()))
                 _displayOnScreen = true;
-            else if ("YES".equals(disp.toUpperCase().trim()))
+            else if ("YES".equals(disp.toUpperCase(Locale.US).trim()))
                 _displayOnScreen = true;
             else
                 _displayOnScreen = false;
@@ -312,7 +346,6 @@ public class LogManager {
         _fileSize = getFileSize(config.getProperty(PROP_FILESIZE, DEFAULT_FILESIZE));
         _rotationLimit = -1;
         try {
-            String str = config.getProperty(PROP_ROTATIONLIMIT);
             _rotationLimit = Integer.parseInt(config.getProperty(PROP_ROTATIONLIMIT, DEFAULT_ROTATIONLIMIT));
         } catch (NumberFormatException nfe) {
             System.err.println("Invalid rotation limit");
@@ -325,29 +358,36 @@ public class LogManager {
 
         try {
             String str = config.getProperty(PROP_CONSOLEBUFFERSIZE);
-            if (str == null)
-                _consoleBufferSize = DEFAULT_CONSOLEBUFFERSIZE;
-            else
+            if (str != null)
                 _consoleBufferSize = Integer.parseInt(str);
-        } catch (NumberFormatException nfe) {
-            System.err.println("Invalid console buffer size");
-            nfe.printStackTrace();
-            _consoleBufferSize = DEFAULT_CONSOLEBUFFERSIZE;
-        }
+        } catch (NumberFormatException nfe) {}
 
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Log set to use the base log file as " + _baseLogfilename);
+        try {
+            String str = config.getProperty(PROP_LOG_BUFFER_SIZE);
+            if (str != null)
+                _logBufferSize = Integer.parseInt(str);
+        } catch (NumberFormatException nfe) {}
+
+        _dropOnOverflow = Boolean.valueOf(config.getProperty(PROP_DROP)).booleanValue();
+
+        //if (_log.shouldLog(Log.DEBUG))
+        //    _log.debug("Log set to use the base log file as " + _baseLogfilename);
         
         parseLimits(config);
     }
 
+    /**
+     * Do not log here, deadlock of LogWriter via rereadConfig().
+     */
     private void parseLimits(Properties config) {
         parseLimits(config, PROP_RECORD_PREFIX);
     }
+
+    /**
+     * Do not log here, deadlock of LogWriter via rereadConfig().
+     */
     private void parseLimits(Properties config, String recordPrefix) {
-        synchronized (_limits) {
-            _limits.clear();
-        }
+        _limits.clear();
         if (config != null) {
             for (Iterator iter = config.keySet().iterator(); iter.hasNext();) {
                 String key = (String) iter.next();
@@ -365,10 +405,8 @@ public class LogManager {
 
                 LogLimit lim = new LogLimit(key, Log.getLevel(val));
                 //_log.debug("Limit found for " + name + " as " + val);
-                synchronized (_limits) {
-                    if (!_limits.contains(lim))
-                        _limits.add(lim);
-                }
+                if (!_limits.contains(lim))
+                    _limits.add(lim);
             }
         }
         updateLimits();
@@ -385,19 +423,31 @@ public class LogManager {
     
     /**
      * Update the date format
+     * Do not log here, deadlock of LogWriter via rereadConfig().
      *
+     * @param format null or empty string means use default format for the locale
+     *               (with a SHORT date and a MEDIUM time - see DateFormat)
      * @return true if the format was updated, false if it was invalid
      */
     public boolean setDateFormat(String format) {
-        if (format == null) return false;
+        if (format == null)
+            format = "";
+        if (format.equals(_dateFormatPattern) && _dateFormat != null)
+            return true;
         
         try {
-            SimpleDateFormat fmt = new SimpleDateFormat(format);
+            SimpleDateFormat fmt = (SimpleDateFormat) DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.MEDIUM);
+            if (!format.equals(""))
+                fmt.applyPattern(format);
+            // the router sets the JVM time zone to UTC but saves the original here so we can get it
+            String systemTimeZone = _context.getProperty("i2p.systemTimeZone");
+            if (systemTimeZone != null)
+                fmt.setTimeZone(TimeZone.getTimeZone(systemTimeZone));
             _dateFormatPattern = format;
             _dateFormat = fmt;
             return true;
         } catch (IllegalArgumentException iae) {
-            getLog(LogManager.class).error("Date format is invalid [" + format + "]", iae);
+            //getLog(LogManager.class).error("Date format is invalid [" + format + "]", iae);
             return false;
         }
     }
@@ -423,26 +473,30 @@ public class LogManager {
      */
     public Properties getLimits() {
         Properties rv = new Properties();
-        synchronized (_limits) {
-            for (int i = 0; i < _limits.size(); i++) {
-                LogLimit lim = (LogLimit)_limits.get(i);
-                rv.setProperty(lim.getRootName(), Log.toLevelString(lim.getLimit()));
-            }
+        for (LogLimit lim : _limits) {
+            rv.setProperty(lim.getRootName(), Log.toLevelString(lim.getLimit()));
         }
         return rv;
     }
 
     /** 
      * Determine how many bytes are in the given formatted string (5m, 60g, 100k, etc)
-     *
+     * Size may be k, m, or g; a trailing b is ignored. Upper-case is allowed.
+     * Spaces between the number and letter is are allowed.
+     * The number may be in floating point.
+     * 4096 min, 2 GB max (returns int)
      */
-    public int getFileSize(String size) {
-        int sz = -1;
+    public static int getFileSize(String size) {
         try {
-            String v = size;
-            char mod = size.toUpperCase().charAt(size.length() - 1);
-            if (!Character.isDigit(mod)) v = size.substring(0, size.length() - 1);
-            int val = Integer.parseInt(v);
+            String v = size.trim().toUpperCase(Locale.US);
+            if (v.length() < 2)
+                return -1;
+            if (v.endsWith("B"))
+                v = v.substring(0, v.length() - 1);
+            char mod = v.charAt(v.length() - 1);
+            if (!Character.isDigit(mod)) v = v.substring(0, v.length() - 1);
+            // output to form was in current locale, so have to parse it back that way
+            double val = (new DecimalFormat()).parse(v.trim()).doubleValue();
             switch (mod) {
                 case 'K':
                     val *= 1024;
@@ -457,37 +511,36 @@ public class LogManager {
                     // blah, noop
                     break;
             }
-            return val;
+            if (val < 4096 || val > Integer.MAX_VALUE)
+                return -1;
+            return (int) val;
         } catch (Throwable t) {
             System.err.println("Error parsing config for filesize: [" + size + "]");
-            t.printStackTrace();
             return -1;
         }
     }
 
+    /**
+     * Do not log here, deadlock of LogWriter via rereadConfig().
+     */
     private void updateLimits() {
-        Map logs = null;
-        synchronized (_logs) {
-            logs = new HashMap(_logs);
-        }
-        for (Iterator iter = logs.values().iterator(); iter.hasNext();) {
-            Log log = (Log) iter.next();
+        for (Log log : _logs.values()) {
             updateLimit(log);
         }
     }
 
+    /**
+     * Do not log here, deadlock of LogWriter via rereadConfig().
+     */
     private void updateLimit(Log log) {
-        List limits = getLimits(log);
+        List<LogLimit> limits = getLimits(log);
         LogLimit max = null;
-        LogLimit notMax = null;
         if (limits != null) {
-            for (int i = 0; i < limits.size(); i++) {
-                LogLimit cur = (LogLimit) limits.get(i);
+            for (LogLimit cur : limits) {
                 if (max == null)
                     max = cur;
                 else {
                     if (cur.getRootName().length() > max.getRootName().length()) {
-                        notMax = max;
                         max = cur;
                     }
                 }
@@ -502,16 +555,17 @@ public class LogManager {
         }
     }
 
-    private List getLimits(Log log) {
-        ArrayList limits = null; // new ArrayList(4);
-        synchronized (_limits) {
-            for (int i = 0; i < _limits.size(); i++) {
-                LogLimit limit = (LogLimit)_limits.get(i);
-                if (limit.matches(log)) { 
-                    if (limits == null)
-                        limits = new ArrayList(4);
-                    limits.add(limit);
-                }
+    /**
+     * Do not log here, deadlock of LogWriter via rereadConfig().
+     * @return null if no matches
+     */
+    private List<LogLimit> getLimits(Log log) {
+        ArrayList<LogLimit> limits = null; // new ArrayList(4);
+        for (LogLimit limit : _limits) {
+            if (limit.matches(log)) { 
+                if (limits == null)
+                    limits = new ArrayList(4);
+                limits.add(limit);
             }
         }
         return limits;
@@ -536,76 +590,56 @@ public class LogManager {
         return _rotationLimit;
     }
 
+    /** @return success */
     public boolean saveConfig() {
-        String config = createConfig();
-        FileOutputStream fos = null;
+        Properties props = createConfig();
         try {
-            fos = new FileOutputStream(_location);
-            fos.write(config.getBytes());
+            DataHelper.storeProps(props, _locationFile);
             return true;
         } catch (IOException ioe) {
             getLog(LogManager.class).error("Error saving the config", ioe);
             return false;
-        } finally {
-            if (fos != null) try { fos.close(); } catch (IOException ioe) {}
         }
     }
     
-    private String createConfig() {
-        StringBuffer buf = new StringBuffer(8*1024);
-        buf.append(PROP_FORMAT).append('=').append(new String(_format)).append('\n');
-        buf.append(PROP_DATEFORMAT).append('=').append(_dateFormatPattern).append('\n');
-        buf.append(PROP_DISPLAYONSCREEN).append('=').append((_displayOnScreen ? "TRUE" : "FALSE")).append('\n');
+    private Properties createConfig() {
+        Properties rv = new OrderedProperties();
+        rv.setProperty(PROP_FORMAT, new String(_format));
+        rv.setProperty(PROP_DATEFORMAT, _dateFormatPattern);
+        rv.setProperty(PROP_DISPLAYONSCREEN, Boolean.toString(_displayOnScreen));
         String filenameOverride = _context.getProperty(FILENAME_OVERRIDE_PROP);
         if (filenameOverride == null)
-            buf.append(PROP_FILENAME).append('=').append(_baseLogfilename).append('\n');
+            rv.setProperty(PROP_FILENAME, _baseLogfilename);
         else // this isn't technically correct - this could mess with some funky scenarios
-            buf.append(PROP_FILENAME).append('=').append(DEFAULT_FILENAME).append('\n');
+            rv.setProperty(PROP_FILENAME, DEFAULT_FILENAME);
         
         if (_fileSize >= 1024*1024)
-            buf.append(PROP_FILESIZE).append('=').append( (_fileSize / (1024*1024))).append("m\n");
+            rv.setProperty(PROP_FILESIZE,  (_fileSize / (1024*1024)) + "m");
         else if (_fileSize >= 1024)
-            buf.append(PROP_FILESIZE).append('=').append( (_fileSize / (1024))).append("k\n");
+            rv.setProperty(PROP_FILESIZE,  (_fileSize / (1024))+ "k");
         else if (_fileSize > 0)
-            buf.append(PROP_FILESIZE).append('=').append(_fileSize).append('\n');
+            rv.setProperty(PROP_FILESIZE, Integer.toString(_fileSize));
         // if <= 0, dont specify
         
-        buf.append(PROP_ROTATIONLIMIT).append('=').append(_rotationLimit).append('\n');
-        buf.append(PROP_DEFAULTLEVEL).append('=').append(Log.toLevelString(_defaultLimit)).append('\n');
-        buf.append(PROP_DISPLAYONSCREENLEVEL).append('=').append(Log.toLevelString(_onScreenLimit)).append('\n');
-        buf.append(PROP_CONSOLEBUFFERSIZE).append('=').append(_consoleBufferSize).append('\n');
+        rv.setProperty(PROP_ROTATIONLIMIT, Integer.toString(_rotationLimit));
+        rv.setProperty(PROP_DEFAULTLEVEL, Log.toLevelString(_defaultLimit));
+        rv.setProperty(PROP_DISPLAYONSCREENLEVEL, Log.toLevelString(_onScreenLimit));
+        rv.setProperty(PROP_CONSOLEBUFFERSIZE, Integer.toString(_consoleBufferSize));
 
-        buf.append("# log limit overrides:\n");
-        
-        TreeMap limits = new TreeMap();
-        synchronized (_limits) {
-            for (int i = 0; i < _limits.size(); i++) {
-                LogLimit lim = (LogLimit)_limits.get(i);
-                limits.put(lim.getRootName(), Log.toLevelString(lim.getLimit()));
-            }
-        }
-        for (Iterator iter = limits.entrySet().iterator(); iter.hasNext(); ) {
-            Map.Entry entry = (Map.Entry)iter.next();
-            String path = (String)entry.getKey();
-            String lim = (String)entry.getValue();
-            buf.append(PROP_RECORD_PREFIX).append(path);
-            buf.append('=').append(lim).append('\n');
+        for (LogLimit lim : _limits) {
+            rv.setProperty(PROP_RECORD_PREFIX + lim.getRootName(), Log.toLevelString(lim.getLimit()));
         }
         
-        return buf.toString();
+        return rv;
     }
 
-    
-    //List _getRecords() { return _records; }
-    List _removeAll() {
-        List vals = null;
-        synchronized (_records) {
-            if (_records.size() <= 0) 
-                return null;
-            vals = new ArrayList(_records);
-            _records.clear();
-        }
-        return vals;
+    /**
+     *  Zero-copy.
+     *  For the LogWriter
+     *  @since 0.8.2
+     */
+    Queue<LogRecord> getQueue() {
+        return _records;
     }
 
     public char[] getFormat() {
@@ -623,6 +657,7 @@ public class LogManager {
         return _dateFormatPattern;
     }
 
+/*****
     public static void main(String args[]) {
         I2PAppContext ctx = new I2PAppContext();
         Log l1 = ctx.logManager().getLog("test.1");
@@ -643,10 +678,31 @@ public class LogManager {
         }
         System.exit(0);
     }
+*****/
 
     public void shutdown() {
-        _log.log(Log.WARN, "Shutting down logger");
-        _writer.flushRecords(false);
+        if (_writer != null) {
+            //_log.log(Log.WARN, "Shutting down logger");
+            // try to prevent out-of-order logging at shutdown
+            synchronized (_writer) {
+                _writer.notifyAll();
+            }
+            if (!_records.isEmpty()) {
+                try {
+                    Thread.sleep(250);
+                } catch (InterruptedException ie) {}
+            }
+            // this could generate out-of-order messages
+            _writer.flushRecords(false);
+            _writer.stopWriting();
+            synchronized (_writer) {
+                _writer.notifyAll();
+            }
+        }
+        _records.clear();
+        _limits.clear();
+        _logs.clear();
+        _consoleBuffer.clear();
     }
 
     private static int __id = 0;
@@ -660,5 +716,13 @@ public class LogManager {
             setName("Log " + _id + " shutdown ");
             shutdown();
         }
+    }
+
+    /**
+     *  Convenience method for LogRecordFormatter
+     *  @since 0.7.14
+     */
+    I2PAppContext getContext() {
+        return _context;
     }
 }

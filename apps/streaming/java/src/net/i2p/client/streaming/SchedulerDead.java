@@ -1,14 +1,13 @@
 package net.i2p.client.streaming;
 
 import net.i2p.I2PAppContext;
-import net.i2p.util.Log;
 
 /**
  * <p>Scheduler used for after the final timeout has passed or the
  * connection was reset.</p>
  *
  * <h2>Entry conditions:</h2><ul>
- * <li>Both sides have closed and ACKed and the timeout has passed. <br />
+ * <li>Both sides have closed and ACKed and the timeout has passed. <br>
  *     <b>or</b></li>
  * <li>A RESET was received</li>
  * </ul>
@@ -24,10 +23,9 @@ import net.i2p.util.Log;
  *
  */
 class SchedulerDead extends SchedulerImpl {
-    private Log _log;
+
     public SchedulerDead(I2PAppContext ctx) {
         super(ctx);
-        _log = ctx.logManager().getLog(SchedulerDead.class);
     }
     
     public boolean accept(Connection con) {

@@ -16,7 +16,6 @@ import java.io.OutputStream;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.DataStructureImpl;
-import net.i2p.util.Log;
 
 /**
  * Defines the message ID of a message delivered between a router and a client
@@ -25,14 +24,13 @@ import net.i2p.util.Log;
  * @author jrandom
  */
 public class MessageId extends DataStructureImpl {
-    private final static Log _log = new Log(MessageId.class);
     private long _messageId;
 
     public MessageId() {
-        setMessageId(-1);
+        _messageId = -1;
     }
     public MessageId(long id) {
-        setMessageId(id);
+        _messageId = id;
     }
 
     public long getMessageId() {
@@ -55,16 +53,16 @@ public class MessageId extends DataStructureImpl {
     @Override
     public boolean equals(Object object) {
         if ((object == null) || !(object instanceof MessageId)) return false;
-        return DataHelper.eq(getMessageId(), ((MessageId) object).getMessageId());
+        return _messageId == ((MessageId) object).getMessageId();
     }
 
     @Override
     public int hashCode() {
-        return (int)getMessageId();
+        return (int)_messageId;
     }
 
     @Override
     public String toString() {
-        return "[MessageId: " + getMessageId() + "]";
+        return "[MessageId: " + _messageId + "]";
     }
 }

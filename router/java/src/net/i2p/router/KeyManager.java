@@ -12,10 +12,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataStructure;
@@ -27,6 +25,8 @@ import net.i2p.data.SigningPrivateKey;
 import net.i2p.data.SigningPublicKey;
 import net.i2p.util.Clock;
 import net.i2p.util.Log;
+import net.i2p.util.SecureDirectory;
+import net.i2p.util.SecureFileOutputStream;
 
 /**
  * Maintain all of the key pairs for the router.
@@ -35,14 +35,14 @@ import net.i2p.util.Log;
  *
  */
 public class KeyManager {
-    private Log _log;
-    private RouterContext _context;
+    private final Log _log;
+    private final RouterContext _context;
     private PrivateKey _privateKey;
     private PublicKey _publicKey;
     private SigningPrivateKey _signingPrivateKey;
     private SigningPublicKey _signingPublicKey;
-    private Map _leaseSetKeys; // Destination --> LeaseSetKeys
-    private SynchronizeKeysJob _synchronizeJob;
+    private final Map<Hash, LeaseSetKeys> _leaseSetKeys; // Destination --> LeaseSetKeys
+    private final SynchronizeKeysJob _synchronizeJob;
     
     public final static String PROP_KEYDIR = "router.keyBackupDir";
     public final static String DEFAULT_KEYDIR = "keyBackup";
@@ -59,11 +59,7 @@ public class KeyManager {
         _context = context;
         _log = _context.logManager().getLog(KeyManager.class);	
         _synchronizeJob = new SynchronizeKeysJob();
-        setPrivateKey(null);
-        setPublicKey(null);
-        setSigningPrivateKey(null);
-        setSigningPublicKey(null);
-        _leaseSetKeys = new HashMap();
+        _leaseSetKeys = new ConcurrentHashMap();
     }
     
     public void startup() {
@@ -102,44 +98,32 @@ public class KeyManager {
     public void registerKeys(Destination dest, SigningPrivateKey leaseRevocationPrivateKey, PrivateKey endpointDecryptionKey) {
         _log.info("Registering keys for destination " + dest.calculateHash().toBase64());
         LeaseSetKeys keys = new LeaseSetKeys(dest, leaseRevocationPrivateKey, endpointDecryptionKey);
-        synchronized (_leaseSetKeys) {
-            _leaseSetKeys.put(dest.calculateHash(), keys);
-        }
+        _leaseSetKeys.put(dest.calculateHash(), keys);
     }
    
+    /**
+     *  Wait one second, as this will get called 4 times in quick succession
+     *  There is still a race here though, if a key is set while the sync job is running
+     */
     private void queueWrite() {
         Clock cl = _context.clock();
         JobQueue q = _context.jobQueue();
         if ( (cl == null) || (q == null) ) return;
-        _synchronizeJob.getTiming().setStartAfter(cl.now());
+        _synchronizeJob.getTiming().setStartAfter(cl.now() + 1000);
         q.addJob(_synchronizeJob);
     }
 
     public LeaseSetKeys unregisterKeys(Destination dest) {
         if (_log.shouldLog(Log.INFO))
             _log.info("Unregistering keys for destination " + dest.calculateHash().toBase64());
-        LeaseSetKeys rv = null;
-        synchronized (_leaseSetKeys) {
-            rv = (LeaseSetKeys)_leaseSetKeys.remove(dest.calculateHash());
-        }
-        return rv;
+        return _leaseSetKeys.remove(dest.calculateHash());
     }
     
     public LeaseSetKeys getKeys(Destination dest) {
         return getKeys(dest.calculateHash());
     }
     public LeaseSetKeys getKeys(Hash dest) {
-        synchronized (_leaseSetKeys) {
-            return (LeaseSetKeys)_leaseSetKeys.get(dest);
-        }
-    }
-    
-    public Set getAllKeys() {
-        HashSet keys = new HashSet();
-        synchronized (_leaseSetKeys) {
-            keys.addAll(_leaseSetKeys.values());
-        }
-        return keys;
+            return _leaseSetKeys.get(dest);
     }
     
     private class SynchronizeKeysJob extends JobImpl {
@@ -147,10 +131,8 @@ public class KeyManager {
             super(KeyManager.this._context);
         }
         public void runJob() {
-            String keyDir = getContext().getProperty(PROP_KEYDIR);
-            if (keyDir == null) 
-                keyDir = DEFAULT_KEYDIR;
-            File dir = new File(keyDir);
+            String keyDir = getContext().getProperty(PROP_KEYDIR, DEFAULT_KEYDIR);
+            File dir = new SecureDirectory(getContext().getRouterDir(), keyDir);
             if (!dir.exists())
                 dir.mkdirs();
             if (dir.exists() && dir.isDirectory() && dir.canRead() && dir.canWrite()) {
@@ -171,33 +153,55 @@ public class KeyManager {
         }
 
         private synchronized void syncPrivateKey(File keyDir) {
-            File keyFile = new File(keyDir, KeyManager.KEYFILE_PRIVATE_ENC);
+            DataStructure ds;
+            File keyFile = new File(keyDir, KEYFILE_PRIVATE_ENC);
             boolean exists = (_privateKey != null);
-            if (!exists)
-                _privateKey = new PrivateKey();
-            _privateKey = (PrivateKey)syncKey(keyFile, _privateKey, exists);
+            if (exists)
+                ds = _privateKey;
+            else
+                ds = new PrivateKey();
+            DataStructure readin = syncKey(keyFile, ds, exists);
+            if (readin != null && !exists)
+                _privateKey = (PrivateKey) readin;
         }
+
         private synchronized void syncPublicKey(File keyDir) {
-            File keyFile = new File(keyDir, KeyManager.KEYFILE_PUBLIC_ENC);
+            DataStructure ds;
+            File keyFile = new File(keyDir, KEYFILE_PUBLIC_ENC);
             boolean exists = (_publicKey != null);
-            if (!exists)
-                _publicKey = new PublicKey();
-            _publicKey = (PublicKey)syncKey(keyFile, _publicKey, exists);
+            if (exists)
+                ds = _publicKey;
+            else
+                ds = new PublicKey();
+            DataStructure readin = syncKey(keyFile, ds, exists);
+            if (readin != null && !exists)
+                _publicKey = (PublicKey) readin;
         }
 
         private synchronized void syncSigningKey(File keyDir) {
-            File keyFile = new File(keyDir, KeyManager.KEYFILE_PRIVATE_SIGNING);
+            DataStructure ds;
+            File keyFile = new File(keyDir, KEYFILE_PRIVATE_SIGNING);
             boolean exists = (_signingPrivateKey != null);
-            if (!exists)
-                _signingPrivateKey = new SigningPrivateKey();
-            _signingPrivateKey = (SigningPrivateKey)syncKey(keyFile, _signingPrivateKey, exists);
+            if (exists)
+                ds = _signingPrivateKey;
+            else
+                ds = new SigningPrivateKey();
+            DataStructure readin = syncKey(keyFile, ds, exists);
+            if (readin != null && !exists)
+                _signingPrivateKey = (SigningPrivateKey) readin;
         }
+
         private synchronized void syncVerificationKey(File keyDir) {
-            File keyFile = new File(keyDir, KeyManager.KEYFILE_PUBLIC_SIGNING);
+            DataStructure ds;
+            File keyFile = new File(keyDir, KEYFILE_PUBLIC_SIGNING);
             boolean exists = (_signingPublicKey != null);
-            if (!exists)
-                _signingPublicKey  = new SigningPublicKey();
-            _signingPublicKey  = (SigningPublicKey)syncKey(keyFile, _signingPublicKey, exists);
+            if (exists)
+                ds = _signingPublicKey;
+            else
+                ds = new SigningPublicKey();
+            DataStructure readin = syncKey(keyFile, ds, exists);
+            if (readin != null && !exists)
+                _signingPublicKey  = (SigningPublicKey) readin;
         }
 
         private DataStructure syncKey(File keyFile, DataStructure structure, boolean exists) {
@@ -205,7 +209,7 @@ public class KeyManager {
             FileInputStream in = null;
             try {
                 if (exists) {
-                    out = new FileOutputStream(keyFile);
+                    out = new SecureFileOutputStream(keyFile);
                     structure.writeBytes(out);
                     return structure;
                 } else {

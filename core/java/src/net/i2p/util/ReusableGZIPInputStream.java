@@ -1,29 +1,32 @@
 package net.i2p.util;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.zip.GZIPOutputStream;
-
-import net.i2p.data.DataHelper;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
- * Provide a cache of reusable GZIP streams, each handling up to 32KB without
- * expansion.
- *
+ * Provide a cache of reusable GZIP unzipper streams.
+ * This provides stream output only, and therefore can handle unlimited size.
  */
 public class ReusableGZIPInputStream extends ResettableGZIPInputStream {
-    private static ArrayList _available = new ArrayList(8);
+    // Apache Harmony 5.0M13 Deflater doesn't work after reset()
+    // Neither does Android
+    private static final boolean ENABLE_CACHING = !(System.getProperty("java.vendor").startsWith("Apache") ||
+                                                    System.getProperty("java.vendor").contains("Android"));
+    private static final LinkedBlockingQueue<ReusableGZIPInputStream> _available;
+    static {
+        if (ENABLE_CACHING)
+            _available = new LinkedBlockingQueue(8);
+        else
+            _available = null;
+    }
+
     /**
      * Pull a cached instance
      */
     public static ReusableGZIPInputStream acquire() {
         ReusableGZIPInputStream rv = null;
-        synchronized (_available) {
-            if (_available.size() > 0)
-                rv = (ReusableGZIPInputStream)_available.remove(0);
-        }
+        // Apache Harmony 5.0M13 Deflater doesn't work after reset()
+        if (ENABLE_CACHING)
+            rv = _available.poll();
         if (rv == null) {
             rv = new ReusableGZIPInputStream();
         } 
@@ -34,14 +37,13 @@ public class ReusableGZIPInputStream extends ResettableGZIPInputStream {
      * state)
      */
     public static void release(ReusableGZIPInputStream released) {
-        synchronized (_available) {
-            if (_available.size() < 8)
-                _available.add(released);
-        }
+        if (ENABLE_CACHING)
+            _available.offer(released);
     }
     
     private ReusableGZIPInputStream() { super(); }
     
+/*******
     public static void main(String args[]) {
         for (int i = 0; i < 2; i++)
             test();
@@ -121,5 +123,6 @@ public class ReusableGZIPInputStream extends ResettableGZIPInputStream {
             return false;
         }
     }
+******/
 }
 

@@ -8,48 +8,62 @@ package net.i2p.router;
  *
  */
 
-import net.i2p.util.Log;
+import java.util.concurrent.atomic.AtomicLong;
+
 /**
  * Base implementation of a Job
  */
 public abstract class JobImpl implements Job {
-    private RouterContext _context;
-    private JobTiming _timing;
-    private static int _idSrc = 0;
-    private int _id;
-    private Exception _addedBy;
+    private final RouterContext _context;
+    private final JobTiming _timing;
+    private static AtomicLong _idSrc = new AtomicLong();
+    private final long _id;
+    //private Exception _addedBy;
     private long _madeReadyOn;
     
     public JobImpl(RouterContext context) {
         _context = context;
         _timing = new JobTiming(context);
-        _id = ++_idSrc;
-        _addedBy = null;
-        _madeReadyOn = 0;
+        _id = _idSrc.incrementAndGet();
     }
     
-    public int getJobId() { return _id; }
+    public long getJobId() { return _id; }
     public JobTiming getTiming() { return _timing; }
     
     public final RouterContext getContext() { return _context; }
     
+    @Override
     public String toString() { 
-        StringBuffer buf = new StringBuffer(128);
-        buf.append(super.toString());
+        StringBuilder buf = new StringBuilder(128);
+        buf.append(getClass().getSimpleName());
         buf.append(": Job ").append(_id).append(": ").append(getName());
         return buf.toString();
     }
     
+    /**
+     *  @deprecated
+     *  As of 0.8.1, this is a noop, as it just adds classes to the log manager
+     *  class list for no good reason. Logging in jobs is almost always
+     *  set explicitly rather than by class name.
+     */
     void addedToQueue() {
-        if (_context.logManager().getLog(getClass()).shouldLog(Log.DEBUG))
-            _addedBy = new Exception();
+        //if (_context.logManager().getLog(getClass()).shouldLog(Log.DEBUG))
+        //    _addedBy = new Exception();
     }
     
-    public Exception getAddedBy() { return _addedBy; }
+    /**
+     *  @deprecated
+     *  @return null always
+     */
+    public Exception getAddedBy() { return null; }
     public long getMadeReadyOn() { return _madeReadyOn; }
     public void madeReady() { _madeReadyOn = _context.clock().now(); }
     public void dropped() {}
     
+    /**
+     *  Warning - only call this from runJob() or if Job is not already queued,
+     *  or else it gets the job queue out of order.
+     */
     protected void requeue(long delayMs) { 
         getTiming().setStartAfter(_context.clock().now() + delayMs);
         _context.jobQueue().addJob(this);

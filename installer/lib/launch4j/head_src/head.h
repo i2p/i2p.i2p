@@ -1,24 +1,31 @@
 /*
+	Launch4j (http://launch4j.sourceforge.net/)
+	Cross-platform Java application wrapper for creating Windows native executables.
 
- 	launch4j :: Cross-platform Java application wrapper for creating Windows native executables
-	Copyright (C) 2004-2005 Grzegorz Kowal
+	Copyright (c) 2004, 2008 Grzegorz Kowal,
+							 Ian Roberts (jdk preference patch)
 
-	Compiled with Mingw port of GCC, Bloodshed Dev-C++ IDE (http://www.bloodshed.net/devcpp.html)
+	Permission is hereby granted, free of charge, to any person obtaining a copy
+	of this software and associated documentation files (the "Software"), to deal
+	in the Software without restriction, including without limitation the rights
+	to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+	copies of the Software, and to permit persons to whom the Software is
+	furnished to do so, subject to the following conditions:
 
-	This library is free software; you can redistribute it and/or
-	modify it under the terms of the GNU Lesser General Public
-	License as published by the Free Software Foundation; either
-	version 2.1 of the License, or (at your option) any later version.
+	The above copyright notice and this permission notice shall be included in
+	all copies or substantial portions of the Software.
 
-	This library is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-	Lesser General Public License for more details.
+	Except as contained in this notice, the name(s) of the above copyright holders
+	shall not be used in advertising or otherwise to promote the sale, use or other
+	dealings in this Software without prior written authorization.
 
-	You should have received a copy of the GNU Lesser General Public
-	License along with this library; if not, write to the Free Software
-	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
+	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+	THE SOFTWARE.
 */
 
 #ifndef _LAUNCH4J_HEAD__INCLUDED_
@@ -36,6 +43,7 @@
 #include <tchar.h>
 #include <shellapi.h>
 #include <direct.h>
+#include <fcntl.h>
 #include <stdio.h>
 #include <sys/stat.h>
 #include <io.h>
@@ -45,25 +53,61 @@
 #define FOUND_JRE 1
 #define FOUND_SDK 2
 
+#define JRE_ONLY 0
+#define PREFER_JRE 1
+#define PREFER_JDK 2
+#define JDK_ONLY 3
+
 #define LAUNCH4J_TMP_DIR "\\launch4j-tmp\\"
+#define MANIFEST ".manifest"
+
+#define KEY_WOW64_64KEY 0x0100
+
+#define HKEY_STR "HKEY"
+#define HKEY_CLASSES_ROOT_STR "HKEY_CLASSES_ROOT"
+#define HKEY_CURRENT_USER_STR "HKEY_CURRENT_USER"
+#define HKEY_LOCAL_MACHINE_STR "HKEY_LOCAL_MACHINE"
+#define HKEY_USERS_STR "HKEY_USERS"
+#define HKEY_CURRENT_CONFIG_STR "HKEY_CURRENT_CONFIG"
 
 #define STR 128
 #define BIG_STR 1024
+#define MAX_VAR_SIZE 32767
+#define MAX_ARGS 32768
 
 #define TRUE_STR "true"
 #define FALSE_STR "false"
 
+#define debug(args...) if (hLog != NULL) fprintf(hLog, ## args); 
+
+typedef void (WINAPI *LPFN_ISWOW64PROCESS) (HANDLE, PBOOL);
+
+FILE* openLogFile(const char* exePath, const int pathLen);
+void closeLogFile();
 void msgBox(const char* text);
-void showJavaWebPage();
-BOOL loadString(HMODULE hLibrary, int resID, char* buffer);
-BOOL loadBoolString(HMODULE hLibrary, int resID);
-void regSearch(HKEY hKey, char* keyName, int searchType);
-BOOL findJavaHome(char* path);
+void signalError();
+BOOL loadString(const int resID, char* buffer);
+BOOL loadBool(const int resID);
+int loadInt(const int resID);
+BOOL regQueryValue(const char* regPath, unsigned char* buffer,
+		unsigned long bufferLength);
+void regSearch(const HKEY hKey, const char* keyName, const int searchType);
+void regSearchWow(const char* keyName, const int searchType);
+void regSearchJreSdk(const char* jreKeyName, const char* sdkKeyName,
+		const int jdkPreference);
+BOOL findJavaHome(char* path, const int jdkPreference);
 int getExePath(char* exePath);
-void catJavaw(char* jrePath);
-BOOL isJrePathOk(char* path);
-BOOL prepare(HMODULE hLibrary, char *lpCmdLine);
+void appendPath(char* basepath, const char* path);
+void appendJavaw(char* jrePath);
+void appendAppClasspath(char* dst, const char* src, const char* classpath);
+BOOL isJrePathOk(const char* path);
+BOOL expandVars(char *dst, const char *src, const char *exePath, const int pathLen);
+void appendHeapSizes(char *dst);
+void appendHeapSize(char *dst, const int absID, const int percentID,
+		const DWORD freeMemory, const char *option);
+int prepare(const char *lpCmdLine);
 void closeHandles();
-DWORD execute(BOOL wait);
+BOOL appendToPathVar(const char* path);
+DWORD execute(const BOOL wait);
 
 #endif // _LAUNCH4J_HEAD__INCLUDED_

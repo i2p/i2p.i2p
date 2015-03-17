@@ -20,28 +20,22 @@
 
 package org.klomp.snark;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 import java.util.Random;
 import java.util.StringTokenizer;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import net.i2p.I2PAppContext;
-import net.i2p.router.client.ClientManagerFacadeImpl;
 import net.i2p.client.streaming.I2PServerSocket;
 import net.i2p.data.Destination;
 import net.i2p.util.I2PThread;
-
-import org.klomp.snark.bencode.BDecoder;
+import net.i2p.util.Log;
 
 /**
  * Main Snark program startup class.
@@ -54,34 +48,12 @@ public class Snark
   private final static int MIN_PORT = 6881;
   private final static int MAX_PORT = 6889;
 
-  // Error messages (non-fatal)
-  public final static int ERROR   = 1;
-
-  // Warning messages
-  public final static int WARNING = 2;
-
-  // Notices (peer level)
-  public final static int NOTICE  = 3;
-
-  // Info messages (protocol policy level)
-  public final static int INFO    = 4;
-
-  // Debug info (protocol level)
-  public final static int DEBUG   = 5;
-
-  // Very low level stuff (network level)
-  public final static int ALL     = 6;
-
-  /**
-   * What level of debug info to show.
-   */
-  //public static int debug = NOTICE;
-
   // Whether or not to ask the user for commands while sharing
-  private static boolean command_interpreter = true;
+  //private static boolean command_interpreter = true;
 
   private static final String newline = System.getProperty("line.separator");
 
+/****
   private static final String copyright =
   "The Hunting of the Snark Project - Copyright (C) 2003 Mark J. Wielaard"
   + newline + newline
@@ -97,10 +69,12 @@ public class Snark
   "Press return for help. Type \"quit\" and return to stop.";
   private static final String help =
   "Commands: 'info', 'list', 'quit'.";
+****/
 
   // String indicating main activity
   String activity = "Not started";
   
+/****
   private static class OOMListener implements I2PThread.OOMEventListener {
       public void outOfMemory(OutOfMemoryError err) {
           try {
@@ -109,11 +83,14 @@ public class Snark
           } catch (Throwable t) {
               System.out.println("OOM in the OOM");
           }
-          System.exit(0);
+          //System.exit(0);
       }
       
   }
+****/
   
+/******** No, not maintaining a command-line client
+
   public static void main(String[] args)
   {
     System.out.println(copyright);
@@ -232,24 +209,35 @@ public class Snark
           }
         
         // Explicit shutdown.
-        Runtime.getRuntime().removeShutdownHook(snarkhook);
+        //Runtime.getRuntime().removeShutdownHook(snarkhook);
         snarkhook.start();
       }
   }
 
+***********/
+
   public static final String PROP_MAX_CONNECTIONS = "i2psnark.maxConnections";
-  public String torrent;
-  public MetaInfo meta;
-  public Storage storage;
-  public PeerCoordinator coordinator;
-  public ConnectionAcceptor acceptor;
-  public TrackerClient trackerclient;
-  public String rootDataDir = ".";
-  public CompleteListener completeListener;
-  public boolean stopped;
-  byte[] id;
-  public I2PSnarkUtil _util;
-  private PeerCoordinatorSet _peerCoordinatorSet;
+
+  /** most of these used to be public, use accessors below instead */
+  private String torrent;
+  private MetaInfo meta;
+  private Storage storage;
+  private PeerCoordinator coordinator;
+  private ConnectionAcceptor acceptor;
+  private TrackerClient trackerclient;
+  private String rootDataDir = ".";
+  private final CompleteListener completeListener;
+  private volatile boolean stopped;
+  private volatile boolean starting;
+  private byte[] id;
+  private final byte[] infoHash;
+  private String additionalTrackerURL;
+  private final I2PSnarkUtil _util;
+  private final Log _log;
+  private final PeerCoordinatorSet _peerCoordinatorSet;
+  private String trackerProblems;
+  private int trackerSeenPeers;
+
 
   /** from main() via parseArguments() single torrent */
   Snark(I2PSnarkUtil util, String torrent, String ip, int user_port,
@@ -261,9 +249,9 @@ public class Snark
   public Snark(I2PAppContext ctx, Properties opts, String torrent,
                StorageListener slistener, boolean start, String rootDir) { 
     this(new I2PSnarkUtil(ctx), torrent, null, -1, slistener, null, null, null, null, false, rootDir);
-    String host = opts.getProperty(ClientManagerFacadeImpl.PROP_CLIENT_HOST);
+    String host = opts.getProperty("i2cp.hostname");
     int port = 0;
-    String s = opts.getProperty(ClientManagerFacadeImpl.PROP_CLIENT_PORT);
+    String s = opts.getProperty("i2cp.port");
     if (s != null) {
         try {
              port = Integer.parseInt(s);
@@ -299,6 +287,7 @@ public class Snark
 
     completeListener = complistener;
     _util = util;
+    _log = util.getContext().logManager().getLog(Snark.class);
     _peerCoordinatorSet = peerCoordinatorSet;
     acceptor = connectionAcceptor;
 
@@ -308,35 +297,10 @@ public class Snark
     stopped = true;
     activity = "Network setup";
 
-    // "Taking Three as the subject to reason about--
-    // A convenient number to state--
-    // We add Seven, and Ten, and then multiply out
-    // By One Thousand diminished by Eight.
-    //
-    // "The result we proceed to divide, as you see,
-    // By Nine Hundred and Ninety Two:
-    // Then subtract Seventeen, and the answer must be
-    // Exactly and perfectly true.
+    id = generateID();
+    if (_log.shouldLog(Log.INFO))
+        _log.info("My peer id: " + PeerID.idencode(id));
 
-    // Create a new ID and fill it with something random.  First nine
-    // zeros bytes, then three bytes filled with snark and then
-    // sixteen random bytes.
-    byte snark = (((3 + 7 + 10) * (1000 - 8)) / 992) - 17;
-    id = new byte[20];
-    Random random = new Random();
-    int i;
-    for (i = 0; i < 9; i++)
-      id[i] = 0;
-    id[i++] = snark;
-    id[i++] = snark;
-    id[i++] = snark;
-    while (i < 20)
-      id[i++] = (byte)random.nextInt(256);
-
-    debug("My peer id: " + PeerID.idencode(id), Snark.INFO);
-
-    int port;
-    IOException lastException = null;
 /*
  * Don't start a tunnel if the torrent isn't going to be started.
  * If we are starting,
@@ -357,6 +321,7 @@ public class Snark
     meta = null;
     File f = null;
     InputStream in = null;
+    byte[] x_infoHash = null;
     try
       {
         f = new File(torrent);
@@ -364,6 +329,8 @@ public class Snark
           in = new FileInputStream(f);
         else
           {
+         /**** No, we don't ever fetch a torrent file this way
+               and we don't want to block in the constructor
             activity = "Getting torrent";
             File torrentFile = _util.get(torrent, 3);
             if (torrentFile == null) {
@@ -373,8 +340,11 @@ public class Snark
                 torrentFile.deleteOnExit();
                 in = new FileInputStream(torrentFile);
             }
+         *****/
+             throw new IOException("not found");
           }
-        meta = new MetaInfo(new BDecoder(in));
+        meta = new MetaInfo(in);
+        x_infoHash = meta.getInfoHash();
       }
     catch(IOException ioe)
       {
@@ -408,12 +378,16 @@ public class Snark
          */
         else
           fatal("Cannot open '" + torrent + "'", ioe);
+      } catch (OutOfMemoryError oom) {
+          fatal("ERROR - Out of memory, cannot create torrent " + torrent + ": " + oom.getMessage());
       } finally {
           if (in != null)
               try { in.close(); } catch (IOException ioe) {}
       }    
 
-    debug(meta.toString(), INFO);
+    infoHash = x_infoHash;  // final
+    if (_log.shouldLog(Log.INFO))
+        _log.info(meta.toString());
     
     // When the metainfo torrent was created from an existing file/dir
     // it already exists.
@@ -439,7 +413,7 @@ public class Snark
             try { storage.close(); } catch (IOException ioee) {
                 ioee.printStackTrace();
             }
-            fatal("Could not create storage", ioe);
+            fatal("Could not check or create storage", ioe);
           }
       }
 
@@ -459,10 +433,81 @@ public class Snark
     if (start)
         startTorrent();
   }
+
   /**
-   * Start up contacting peers and querying the tracker
+   *  multitorrent, magnet
+   *
+   *  @param torrent a fake name for now (not a file name)
+   *  @param ih 20-byte info hash
+   *  @param trackerURL may be null
+   *  @since 0.8.4
    */
-  public void startTorrent() {
+  public Snark(I2PSnarkUtil util, String torrent, byte[] ih, String trackerURL,
+        CompleteListener complistener, PeerCoordinatorSet peerCoordinatorSet,
+        ConnectionAcceptor connectionAcceptor, boolean start, String rootDir)
+  {
+    completeListener = complistener;
+    _util = util;
+    _log = util.getContext().logManager().getLog(Snark.class);
+    _peerCoordinatorSet = peerCoordinatorSet;
+    acceptor = connectionAcceptor;
+    this.torrent = torrent;
+    this.infoHash = ih;
+    this.additionalTrackerURL = trackerURL;
+    this.rootDataDir = rootDir;
+    stopped = true;
+    id = generateID();
+
+    // All we have is an infoHash
+    // meta remains null
+    // storage remains null
+
+    if (start)
+        startTorrent();
+  }
+
+  private static byte[] generateID() {
+    // "Taking Three as the subject to reason about--
+    // A convenient number to state--
+    // We add Seven, and Ten, and then multiply out
+    // By One Thousand diminished by Eight.
+    //
+    // "The result we proceed to divide, as you see,
+    // By Nine Hundred and Ninety Two:
+    // Then subtract Seventeen, and the answer must be
+    // Exactly and perfectly true.
+
+    // Create a new ID and fill it with something random.  First nine
+    // zeros bytes, then three bytes filled with snark and then
+    // sixteen random bytes.
+    byte snark = (((3 + 7 + 10) * (1000 - 8)) / 992) - 17;
+    byte[] rv = new byte[20];
+    Random random = I2PAppContext.getGlobalContext().random();
+    int i;
+    for (i = 0; i < 9; i++)
+      rv[i] = 0;
+    rv[i++] = snark;
+    rv[i++] = snark;
+    rv[i++] = snark;
+    while (i < 20)
+      rv[i++] = (byte)random.nextInt(256);
+    return rv;
+  }
+
+  /**
+   * Start up contacting peers and querying the tracker.
+   * Blocks if tunnel is not yet open.
+   */
+  public synchronized void startTorrent() {
+      starting = true;
+      try {
+          x_startTorrent();
+      } finally {
+          starting = false;
+      }
+  }
+
+  private void x_startTorrent() {
     boolean ok = _util.connect();
     if (!ok) fatal("Unable to connect to I2P");
     if (coordinator == null) {
@@ -471,11 +516,13 @@ public class Snark
             fatal("Unable to listen for I2P connections");
         else {
             Destination d = serversocket.getManager().getSession().getMyDestination();
-            debug("Listening on I2P destination " + d.toBase64() + " / " + d.calculateHash().toBase64(), NOTICE);
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Listening on I2P destination " + d.toBase64() + " / " + d.calculateHash().toBase64());
         }
-        debug("Starting PeerCoordinator, ConnectionAcceptor, and TrackerClient", NOTICE);
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Starting PeerCoordinator, ConnectionAcceptor, and TrackerClient");
         activity = "Collecting pieces";
-        coordinator = new PeerCoordinator(_util, id, meta, storage, this, this);
+        coordinator = new PeerCoordinator(_util, id, infoHash, meta, storage, this, this);
         if (_peerCoordinatorSet != null) {
             // multitorrent
             _peerCoordinatorSet.add(coordinator);
@@ -488,58 +535,59 @@ public class Snark
             // single torrent
             acceptor = new ConnectionAcceptor(_util, serversocket, new PeerAcceptor(coordinator));
         }
-        trackerclient = new TrackerClient(_util, meta, coordinator);
+        // TODO pass saved closest DHT nodes to the tracker? or direct to the coordinator?
+        trackerclient = new TrackerClient(_util, meta, additionalTrackerURL, coordinator, this);
     }
 
     stopped = false;
-    boolean coordinatorChanged = false;
     if (coordinator.halted()) {
-        // ok, we have already started and stopped, but the coordinator seems a bit annoying to
-        // restart safely, so lets build a new one to replace the old
+        coordinator.restart();
         if (_peerCoordinatorSet != null)
-            _peerCoordinatorSet.remove(coordinator);
-        PeerCoordinator newCoord = new PeerCoordinator(_util, coordinator.getID(), coordinator.getMetaInfo(), 
-                                                       coordinator.getStorage(), coordinator.getListener(), this);
-        if (_peerCoordinatorSet != null)
-            _peerCoordinatorSet.add(newCoord);
-        coordinator = newCoord;
-        coordinatorChanged = true;
+            _peerCoordinatorSet.add(coordinator);
     }
-    if (!trackerclient.started() && !coordinatorChanged) {
+    if (!trackerclient.started()) {
         trackerclient.start();
-    } else if (trackerclient.halted() || coordinatorChanged) {
-        try
-          {
-            storage.reopen(rootDataDir);
-          }
-        catch (IOException ioe)
-          {
-            try { storage.close(); } catch (IOException ioee) {
-                ioee.printStackTrace();
-            }
-            fatal("Could not reopen storage", ioe);
-          }
-        TrackerClient newClient = new TrackerClient(_util, coordinator.getMetaInfo(), coordinator);
-        if (!trackerclient.halted())
-            trackerclient.halt();
-        trackerclient = newClient;
+    } else if (trackerclient.halted()) {
+        if (storage != null) {
+            try {
+                 storage.reopen(rootDataDir);
+             }   catch (IOException ioe) {
+                 try { storage.close(); } catch (IOException ioee) {
+                     ioee.printStackTrace();
+                 }
+                 fatal("Could not reopen storage", ioe);
+             }
+        }
         trackerclient.start();
+    } else {
+        if (_log.shouldLog(Log.INFO))
+            _log.info("NOT starting TrackerClient???");
     }
   }
+
   /**
    * Stop contacting the tracker and talking with peers
    */
   public void stopTorrent() {
+      stopTorrent(false);
+  }
+
+  /**
+   * Stop contacting the tracker and talking with peers
+   * @param fast if true, limit the life of the unannounce threads
+   * @since 0.9.1
+   */
+  public synchronized void stopTorrent(boolean fast) {
     stopped = true;
     TrackerClient tc = trackerclient;
     if (tc != null)
-        tc.halt();
+        tc.halt(fast);
     PeerCoordinator pc = coordinator;
     if (pc != null)
         pc.halt();
     Storage st = storage;
     if (st != null) {
-        boolean changed = storage.changed;
+        boolean changed = storage.isChanged();
         try { 
             storage.close(); 
         } catch (IOException ioe) {
@@ -555,10 +603,291 @@ public class Snark
         _util.disconnect();
   }
 
-  static Snark parseArguments(String[] args)
+/****
+  private static Snark parseArguments(String[] args)
   {
     return parseArguments(args, null, null);
   }
+****/
+
+    // Accessors
+
+    /**
+     *  @return file name of .torrent file (should be full absolute path), or a fake name if in magnet mode.
+     *  @since 0.8.4
+     */
+    public String getName() {
+        return torrent;
+    }
+
+    /**
+     *  @return base name of torrent [filtered version of getMetaInfo.getName()], or a fake name if in magnet mode
+     *  @since 0.8.4
+     */
+    public String getBaseName() {
+        if (storage != null)
+            return storage.getBaseName();
+        return torrent;
+    }
+
+    /**
+     *  @return always will be valid even in magnet mode
+     *  @since 0.8.4
+     */
+    public byte[] getID() {
+        return id;
+    }
+
+    /**
+     *  @return always will be valid even in magnet mode
+     *  @since 0.8.4
+     */
+    public byte[] getInfoHash() {
+        // should always be the same
+        if (meta != null)
+            return meta.getInfoHash();
+        return infoHash;
+    }
+
+    /**
+     *  @return may be null if in magnet mode
+     *  @since 0.8.4
+     */
+    public MetaInfo getMetaInfo() {
+        return meta;
+    }
+
+    /**
+     *  @return may be null if in magnet mode
+     *  @since 0.8.4
+     */
+    public Storage getStorage() {
+        return storage;
+    }
+
+    /**
+     *  @since 0.8.4
+     */
+    public boolean isStopped() {
+        return stopped;
+    }
+
+    /**
+     *  Startup in progress.
+     *  @since 0.9.1
+     */
+    public boolean isStarting() {
+        return starting && stopped;
+    }
+
+    /**
+     *  Set startup in progress.
+     *  @since 0.9.1
+     */
+    public void setStarting() {
+        starting = true;
+    }
+
+    /**
+     *  @since 0.8.4
+     */
+    public long getDownloadRate() {
+        PeerCoordinator coord = coordinator;
+        if (coord != null)
+            return coord.getDownloadRate();
+        return 0;
+    }
+
+    /**
+     *  @since 0.8.4
+     */
+    public long getUploadRate() {
+        PeerCoordinator coord = coordinator;
+        if (coord != null)
+            return coord.getUploadRate();
+        return 0;
+    }
+
+    /**
+     *  @since 0.8.4
+     */
+    public long getDownloaded() {
+        PeerCoordinator coord = coordinator;
+        if (coord != null)
+            return coord.getDownloaded();
+        return 0;
+    }
+
+    /**
+     *  @since 0.8.4
+     */
+    public long getUploaded() {
+        PeerCoordinator coord = coordinator;
+        if (coord != null)
+            return coord.getUploaded();
+        return 0;
+    }
+
+    /**
+     *  @since 0.8.4
+     */
+    public int getPeerCount() {
+        PeerCoordinator coord = coordinator;
+        if (coord != null)
+            return coord.getPeerCount();
+        return 0;
+    }
+
+    /**
+     *  @since 0.8.4
+     */
+    public List<Peer> getPeerList() {
+        PeerCoordinator coord = coordinator;
+        if (coord != null)
+            return coord.peerList();
+        return Collections.EMPTY_LIST;
+    }
+
+    /**
+     *  @return String returned from tracker, or null if no error
+     *  @since 0.8.4
+     */
+    public String getTrackerProblems() {
+        return trackerProblems;
+    }
+
+    /**
+     *  @param p tracker error string or null
+     *  @since 0.8.4
+     */
+    public void setTrackerProblems(String p) {
+        trackerProblems = p;
+    }
+
+    /**
+     *  @return count returned from tracker
+     *  @since 0.8.4
+     */
+    public int getTrackerSeenPeers() {
+        return trackerSeenPeers;
+    }
+
+    /**
+     *  @since 0.8.4
+     */
+    public void setTrackerSeenPeers(int p) {
+        trackerSeenPeers = p;
+    }
+
+    /**
+     *  @since 0.8.4
+     */
+    public void updatePiecePriorities() {
+        PeerCoordinator coord = coordinator;
+        if (coord != null)
+            coord.updatePiecePriorities();
+    }
+
+    /**
+     *  @return total of all torrent files, or total of metainfo file if fetching magnet, or -1
+     *  @since 0.8.4
+     */
+    public long getTotalLength() {
+        if (meta != null)
+            return meta.getTotalLength();
+        // FIXME else return metainfo length if available
+        return -1;
+    }
+
+    /**
+     *  Bytes not yet in storage. Does NOT account for skipped files.
+     *  @return exact value. or -1 if no storage yet.
+     *          getNeeded() * pieceLength(0) isn't accurate if last piece
+     *          is still needed.
+     *  @since 0.8.9
+     */
+    public long getRemainingLength() {
+        if (meta != null && storage != null) {
+            long needed = storage.needed();
+            long length0 = meta.getPieceLength(0);
+            long remaining = needed * length0;
+            // fixup if last piece is needed
+            int last = meta.getPieces() - 1;
+            if (last != 0 && !storage.getBitField().get(last))
+                remaining -= length0 - meta.getPieceLength(last);
+            return remaining;
+        }
+        return -1;
+    }
+
+    /**
+     *  Bytes still wanted. DOES account for skipped files.
+     *  FIXME -1 when not running.
+     *  @return exact value. or -1 if no storage yet or when not running.
+     *  @since 0.9.1
+     */
+    public long getNeededLength() {
+        PeerCoordinator coord = coordinator;
+        if (coord != null)
+            return coord.getNeededLength();
+        return -1;
+    }
+
+    /**
+     *  Does not account for skipped files.
+     *  @return number of pieces still needed (magnet mode or not), or -1 if unknown
+     *  @since 0.8.4
+     */
+    public long getNeeded() {
+        if (storage != null)
+            return storage.needed();
+        if (meta != null)
+            // FIXME subtract chunks we have
+            return meta.getTotalLength();
+        // FIXME fake
+        return -1;
+    }
+
+    /**
+     *  @param p the piece number
+     *  @return metainfo piece length or 16K if fetching magnet
+     *  @since 0.8.4
+     */
+    public int getPieceLength(int p) {
+        if (meta != null)
+            return meta.getPieceLength(p);
+        return 16*1024;
+    }
+
+    /**
+     *  @return number of pieces
+     *  @since 0.8.4
+     */
+    public int getPieces() {
+        if (meta != null)
+            return meta.getPieces();
+        // FIXME else return metainfo pieces if available
+        return -1;
+    }
+
+    /**
+     *  @return true if restarted
+     *  @since 0.8.4
+     */
+    public boolean restartAcceptor() {
+        if (acceptor == null)
+            return false;
+        acceptor.restart();
+        return true;
+    }
+
+    /**
+     *  @return trackerURL string from magnet-mode constructor, may be null
+     *  @since 0.8.4
+     */
+    public String getTrackerURL() {
+        return additionalTrackerURL;
+    }
 
   /**
    * Sets debug, ip and torrent variables then creates a Snark
@@ -566,7 +895,7 @@ public class Snark
    * non-valid argument list.  The given listeners will be
    * passed to all components that take one.
    */
-  static Snark parseArguments(String[] args,
+  private static Snark parseArguments(String[] args,
                               StorageListener slistener,
                               CoordinatorListener clistener)
   {
@@ -617,17 +946,17 @@ public class Snark
           }
         else if (args[i].equals("--no-commands"))
           {
-            command_interpreter = false;
+            //command_interpreter = false;
             i++;
           }
-        else if (args[i].equals("--eepproxy"))
-          {
-            String proxyHost = args[i+1];
-            String proxyPort = args[i+2];
-            if (!configured)
-                util.setProxy(proxyHost, Integer.parseInt(proxyPort));
-            i += 3;
-          }
+        //else if (args[i].equals("--eepproxy"))
+        //  {
+        //    String proxyHost = args[i+1];
+        //    String proxyPort = args[i+2];
+        //    if (!configured)
+        //        util.setProxy(proxyHost, Integer.parseInt(proxyPort));
+        //    i += 3;
+        //  }
         else if (args[i].equals("--i2cp"))
           {
             String i2cpHost = args[i+1];
@@ -676,22 +1005,13 @@ public class Snark
   private static void usage()
   {
     System.out.println
-      ("Usage: snark [--debug [level]] [--no-commands] [--port <port>]");
+      ("Usage: snark [--no-commands] [--port <port>]");
     System.out.println
       ("             [--eepproxy hostname portnum]");
     System.out.println
       ("             [--i2cp routerHost routerPort ['name=val name=val name=val']]");
     System.out.println
       ("             (<url>|<file>)");
-    System.out.println
-      ("  --debug\tShows some extra info and stacktraces");
-    System.out.println
-      ("    level\tHow much debug details to show");
-    System.out.println
-      ("         \t(defaults to "
-       + NOTICE + ", with --debug to "
-       + INFO + ", highest level is "
-       + ALL + ").");
     System.out.println
       ("  --no-commands\tDon't read interactive commands or show usage info.");
     System.out.println
@@ -715,13 +1035,12 @@ public class Snark
       ("  <file> \tEither a local .torrent metainfo file to download");
     System.out.println
       ("         \tor (with --share) a file to share.");
-    System.exit(-1);
   }
 
   /**
    * Aborts program abnormally.
    */
-  public void fatal(String s)
+  private void fatal(String s)
   {
     fatal(s, null);
   }
@@ -729,31 +1048,58 @@ public class Snark
   /**
    * Aborts program abnormally.
    */
-  public void fatal(String s, Throwable t)
+  private void fatal(String s, Throwable t)
   {
-    _util.debug(s, ERROR, t);
+    _log.error(s, t);
     //System.err.println("snark: " + s + ((t == null) ? "" : (": " + t)));
     //if (debug >= INFO && t != null)
     //  t.printStackTrace();
     stopTorrent();
-    throw new RuntimeException("die bart die");
+    if (t != null)
+        s += ": " + t;
+    if (completeListener != null)
+        completeListener.fatal(this, s);
+    throw new RuntimeException(s, t);
   }
 
-  /**
-   * Show debug info if debug is true.
-   */
-  private void debug(String s, int level)
-  {
-    _util.debug(s, level, null);
-  }
-
-  /** coordinatorListener */
+  /** CoordinatorListener - this does nothing */
   public void peerChange(PeerCoordinator coordinator, Peer peer)
   {
     // System.out.println(peer.toString());
   }
   
-  boolean allocating = false;
+  /**
+   * Called when the PeerCoordinator got the MetaInfo via magnet.
+   * CoordinatorListener.
+   * Create the storage, tell SnarkManager, and give the storage
+   * back to the coordinator.
+   *
+   * @throws RuntimeException via fatal()
+   * @since 0.8.4
+   */
+  public void gotMetaInfo(PeerCoordinator coordinator, MetaInfo metainfo) {
+      try {
+          // The following two may throw IOE...
+          storage = new Storage(_util, metainfo, this);
+          storage.check(rootDataDir);
+          // ... so don't set meta until here
+          meta = metainfo;
+          if (completeListener != null) {
+              String newName = completeListener.gotMetaInfo(this);
+              if (newName != null)
+                  torrent = newName;
+              // else some horrible problem
+          }
+          coordinator.setStorage(storage);
+      } catch (IOException ioe) {
+          if (storage != null) {
+              try { storage.close(); } catch (IOException ioee) {}
+          }
+          fatal("Could not check or create storage", ioe);
+      }
+  }
+
+  //private boolean allocating = false;
   public void storageCreateFile(Storage storage, String name, long length)
   {
     //if (allocating)
@@ -761,7 +1107,7 @@ public class Snark
 
     //System.out.print("Creating file '" + name
     //                 + "' of length " + length + ": ");
-    allocating = true;
+    //allocating = true;
   }
 
   // How much storage space has been allocated
@@ -769,19 +1115,19 @@ public class Snark
 
   public void storageAllocated(Storage storage, long length)
   {
-    allocating = true;
+    //allocating = true;
     //System.out.print(".");
-    allocated += length;
+    //allocated += length;
     //if (allocated == meta.getTotalLength())
     //  System.out.println(); // We have all the disk space we need.
   }
 
-  boolean allChecked = false;
-  boolean checking = false;
-  boolean prechecking = true;
+  private boolean allChecked = false;
+  private boolean checking = false;
+  private boolean prechecking = true;
   public void storageChecked(Storage storage, int num, boolean checked)
   {
-    allocating = false;
+    //allocating = false;
     if (!allChecked && !checking)
       {
         // Use the MetaInfo from the storage since our own might not
@@ -793,9 +1139,10 @@ public class Snark
         //                   + " pieces: ");
         checking = true;
       }
-    if (!checking)
-      debug("Got " + (checked ? "" : "BAD ") + "piece: " + num,
-                  Snark.INFO);
+    if (!checking) {
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Got " + (checked ? "" : "BAD ") + "piece: " + num);
+    }
   }
 
   public void storageAllChecked(Storage storage)
@@ -805,13 +1152,14 @@ public class Snark
 
     allChecked = true;
     checking = false;
-    if (storage.changed && completeListener != null)
+    if (storage.isChanged() && completeListener != null)
         completeListener.updateStatus(this);
   }
   
   public void storageCompleted(Storage storage)
   {
-    debug("Completely received " + torrent, Snark.INFO);
+    if (_log.shouldLog(Log.INFO))
+        _log.info("Completely received " + torrent);
     //storage.close();
     //System.out.println("Completely received: " + torrent);
     if (completeListener != null)
@@ -823,16 +1171,47 @@ public class Snark
     coordinator.setWantedPieces();
   }
 
+  /** SnarkSnutdown callback unused */
   public void shutdown()
   {
     // Should not be necessary since all non-deamon threads should
     // have died. But in reality this does not always happen.
-    System.exit(0);
+    //System.exit(0);
   }
   
+  /**
+   * StorageListener and CoordinatorListener callback
+   * @since 0.9.2
+   */
+  public void addMessage(String message) {
+      if (completeListener != null)
+          completeListener.addMessage(this, message);
+  }
+
   public interface CompleteListener {
     public void torrentComplete(Snark snark);
     public void updateStatus(Snark snark);
+
+    /**
+     * We transitioned from magnet mode, we have now initialized our
+     * metainfo and storage. The listener should now call getMetaInfo()
+     * and save the data to disk.
+     *
+     * @return the new name for the torrent or null on error
+     * @since 0.8.4
+     */
+    public String gotMetaInfo(Snark snark);
+
+    /**
+     * @since 0.9
+     */
+    public void fatal(Snark snark, String error);
+
+    /**
+     * @since 0.9.2
+     */
+    public void addMessage(Snark snark, String message);
+
     // not really listeners but the easiest way to get back to an optional SnarkManager
     public long getSavedTorrentTime(Snark snark);
     public BitField getSavedTorrentBitField(Snark snark);
@@ -847,8 +1226,8 @@ public class Snark
     if (_peerCoordinatorSet == null || uploaders <= 0)
       return false;
     int totalUploaders = 0;
-    for (Iterator iter = _peerCoordinatorSet.iterator(); iter.hasNext(); ) {
-      PeerCoordinator c = (PeerCoordinator)iter.next();
+    for (Iterator<PeerCoordinator> iter = _peerCoordinatorSet.iterator(); iter.hasNext(); ) {
+      PeerCoordinator c = iter.next();
       if (!c.halted())
         totalUploaders += c.uploaders;
     }
@@ -861,13 +1240,14 @@ public class Snark
     if (_peerCoordinatorSet == null)
       return false;
     long total = 0;
-    for (Iterator iter = _peerCoordinatorSet.iterator(); iter.hasNext(); ) {
-      PeerCoordinator c = (PeerCoordinator)iter.next();
+    for (Iterator<PeerCoordinator> iter = _peerCoordinatorSet.iterator(); iter.hasNext(); ) {
+      PeerCoordinator c = iter.next();
       if (!c.halted())
         total += c.getCurrentUploadRate();
     }
     long limit = 1024l * _util.getMaxUpBW();
-    debug("Total up bw: " + total + " Limit: " + limit, Snark.WARNING);
+    if (_log.shouldLog(Log.INFO))
+        _log.info("Total up bw: " + total + " Limit: " + limit);
     return total > limit;
   }
 

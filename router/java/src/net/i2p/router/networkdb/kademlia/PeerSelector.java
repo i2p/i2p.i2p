@@ -10,26 +10,22 @@ package net.i2p.router.networkdb.kademlia;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.RouterInfo;
 import net.i2p.router.RouterContext;
-import net.i2p.router.peermanager.PeerProfile;
-import net.i2p.stat.Rate;
-import net.i2p.stat.RateStat;
 import net.i2p.util.Log;
 
-public class PeerSelector {
-    protected Log _log;
-    protected RouterContext _context;
+/**
+ *  Mostly unused, see overrides in FloodfillPeerSelector
+ */
+class PeerSelector {
+    protected final Log _log;
+    protected final RouterContext _context;
     
     public PeerSelector(RouterContext ctx) {
         _context = ctx;
@@ -37,31 +33,34 @@ public class PeerSelector {
     }
     
     /**
+     * UNUSED - See FloodfillPeerSelector override
      * Search through the kbucket set to find the most reliable peers close to the
      * given key, skipping all of the ones already checked
+     * List will not include our own hash.
      *
      * @return ordered list of Hash objects
      */
-    public List selectMostReliablePeers(Hash key, int numClosest, Set alreadyChecked, KBucketSet kbuckets) {
+    List<Hash> selectMostReliablePeers(Hash key, int numClosest, Set<Hash> alreadyChecked, KBucketSet kbuckets) {
         // get the peers closest to the key
-        List nearest = selectNearestExplicit(key, numClosest, alreadyChecked, kbuckets);
-        return nearest;
+        return selectNearestExplicit(key, numClosest, alreadyChecked, kbuckets);
     }
     
     /**
      * Ignore KBucket ordering and do the XOR explicitly per key.  Runs in O(n*log(n))
      * time (n=routing table size with c ~ 32 xor ops).  This gets strict ordering 
      * on closest
+     * List will not include our own hash.
      *
      * @return List of Hash for the peers selected, ordered by bucket (but intra bucket order is not defined)
      */
-    public List selectNearestExplicit(Hash key, int maxNumRouters, Set peersToIgnore, KBucketSet kbuckets) { 
-        if (true)
+    List<Hash> selectNearestExplicit(Hash key, int maxNumRouters, Set<Hash> peersToIgnore, KBucketSet kbuckets) {
+        //if (true)
             return selectNearestExplicitThin(key, maxNumRouters, peersToIgnore, kbuckets);
         
+/******
         if (peersToIgnore == null)
             peersToIgnore = new HashSet(1);
-        peersToIgnore.add(_context.router().getRouterInfo().getIdentity().getHash());
+        peersToIgnore.add(_context.routerHash());
         Set allHashes = kbuckets.getAll(peersToIgnore);
         removeFailingPeers(allHashes);
         Map diffMap = new HashMap(allHashes.size());
@@ -82,19 +81,22 @@ public class PeerSelector {
                        + peerHashes + " (not including " + peersToIgnore + ") [allHashes.size = " 
                        + allHashes.size() + "]");
         return peerHashes;
+******/
     }
     
     /**
+     * UNUSED - See FloodfillPeerSelector override
      * Ignore KBucket ordering and do the XOR explicitly per key.  Runs in O(n*log(n))
      * time (n=routing table size with c ~ 32 xor ops).  This gets strict ordering 
      * on closest
+     * List will not include our own hash.
      *
      * @return List of Hash for the peers selected, ordered by bucket (but intra bucket order is not defined)
      */
-    public List selectNearestExplicitThin(Hash key, int maxNumRouters, Set peersToIgnore, KBucketSet kbuckets) { 
+    List<Hash> selectNearestExplicitThin(Hash key, int maxNumRouters, Set<Hash> peersToIgnore, KBucketSet kbuckets) {
         if (peersToIgnore == null)
             peersToIgnore = new HashSet(1);
-        peersToIgnore.add(_context.router().getRouterInfo().getIdentity().getHash());
+        peersToIgnore.add(_context.routerHash());
         MatchSelectionCollector matches = new MatchSelectionCollector(key, peersToIgnore);
         kbuckets.getAll(matches);
         List rv = matches.get(maxNumRouters);
@@ -105,20 +107,22 @@ public class PeerSelector {
         return rv;
     }
     
+    /** UNUSED */
     private class MatchSelectionCollector implements SelectionCollector {
-        private TreeMap _sorted;
+        private TreeMap<BigInteger, Hash> _sorted;
         private Hash _key;
-        private Set _toIgnore;
+        private Set<Hash> _toIgnore;
         private int _matches;
-        public MatchSelectionCollector(Hash key, Set toIgnore) {
+        public MatchSelectionCollector(Hash key, Set<Hash> toIgnore) {
             _key = key;
             _sorted = new TreeMap();
             _toIgnore = toIgnore;
             _matches = 0;
         }
         public void add(Hash entry) {
-            if (_context.profileOrganizer().isFailing(entry))
-                return;
+            // deadlock seen here, and we don't mark profiles failing anymore
+            //if (_context.profileOrganizer().isFailing(entry))
+            //    return;
             if (_toIgnore.contains(entry))
                 return;
             RouterInfo info = _context.netDb().lookupRouterInfoLocally(entry);
@@ -127,15 +131,15 @@ public class PeerSelector {
             if (info.getIdentity().isHidden())
                 return;
             
-            BigInteger diff = getDistance(_key, entry);
+            BigInteger diff = HashDistance.getDistance(_key, entry);
             _sorted.put(diff, entry);
             _matches++;
         }
         /** get the first $howMany entries matching */
-        public List get(int howMany) {
-            List rv = new ArrayList(howMany);
+        public List<Hash> get(int howMany) {
+            List<Hash> rv = new ArrayList(howMany);
             for (int i = 0; i < howMany; i++) {
-                if (_sorted.size() <= 0)
+                if (_sorted.isEmpty())
                     break;
                 rv.add(_sorted.remove(_sorted.firstKey()));
             }
@@ -148,6 +152,7 @@ public class PeerSelector {
      * strip out all of the peers that are failing
      *
      */
+/********
     private void removeFailingPeers(Set peerHashes) {
         List failing = null;
         for (Iterator iter = peerHashes.iterator(); iter.hasNext(); ) {
@@ -181,21 +186,20 @@ public class PeerSelector {
         if (failing != null)
             peerHashes.removeAll(failing);
     }
-    
-    public static BigInteger getDistance(Hash targetKey, Hash routerInQuestion) {
-        // plain XOR of the key and router
-        byte diff[] = DataHelper.xor(routerInQuestion.getData(), targetKey.getData());
-        return new BigInteger(1, diff);
-    }
+**********/
     
     /**
+     * UNUSED - See FloodfillPeerSelector override
      * Generic KBucket filtering to find the hashes close to a key, regardless of other considerations.
      * This goes through the kbuckets, starting with the key's location, moving towards us, and then away from the
      * key's location's bucket, selecting peers until we have numClosest.  
+     * List MAY INCLUDE our own router - add to peersToIgnore if you don't want
      *
+     * @param key the original key (NOT the routing key)
+     * @param peersToIgnore can be null
      * @return List of Hash for the peers selected, ordered by bucket (but intra bucket order is not defined)
      */
-    public List selectNearest(Hash key, int maxNumRouters, Set peersToIgnore, KBucketSet kbuckets) { 
+    List<Hash> selectNearest(Hash key, int maxNumRouters, Set<Hash> peersToIgnore, KBucketSet kbuckets) {
         // sure, this may not be exactly correct per kademlia (peers on the border of a kbucket in strict kademlia
         // would behave differently) but I can see no reason to keep around an /additional/ more complicated algorithm.
         // later if/when selectNearestExplicit gets costly, we may revisit this (since kbuckets let us cache the distance()

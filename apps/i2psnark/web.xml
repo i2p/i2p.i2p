@@ -22,4 +22,68 @@
             30
         </session-timeout>
     </session-config>
+
+
+    <!-- mime types not in mime.properties in the jetty 5.1.15 source -->
+
+    <mime-mapping>
+        <extension>mkv</extension>
+        <mime-type>video/x-matroska</mime-type>
+    </mime-mapping>
+
+    <mime-mapping>
+        <extension>wmv</extension>
+        <mime-type>video/x-ms-wmv</mime-type>
+    </mime-mapping>
+
+    <mime-mapping>
+        <extension>flv</extension>
+        <mime-type>video/x-flv</mime-type>
+    </mime-mapping>
+
+    <mime-mapping>
+        <extension>mp4</extension>
+        <mime-type>video/mp4</mime-type>
+    </mime-mapping>
+
+    <mime-mapping>
+        <extension>rar</extension>
+        <mime-type>application/rar</mime-type>
+    </mime-mapping>
+
+    <mime-mapping>
+        <extension>7z</extension>
+        <mime-type>application/x-7z-compressed</mime-type>
+    </mime-mapping>
+
+    <mime-mapping>
+        <extension>iso</extension>
+        <mime-type>application/x-iso9660-image</mime-type>
+    </mime-mapping>
+
+    <mime-mapping>
+        <extension>ico</extension>
+        <mime-type>image/x-icon</mime-type>
+    </mime-mapping>
+
+    <mime-mapping>
+        <extension>exe</extension>
+        <mime-type>application/x-msdos-program</mime-type>
+    </mime-mapping>
+
+    <mime-mapping>
+        <extension>flac</extension>
+        <mime-type>audio/flac</mime-type>
+    </mime-mapping>
+
+    <mime-mapping>
+        <extension>m4a</extension>
+        <mime-type>audio/mpeg</mime-type>
+    </mime-mapping>
+
+    <mime-mapping>
+        <extension>wma</extension>
+        <mime-type>audio/x-ms-wma</mime-type>
+    </mime-mapping>
+
 </web-app>

@@ -20,13 +20,16 @@
 
 package org.klomp.snark;
 
+import java.io.DataInputStream;
+import java.io.IOException;
+
 /**
  * Holds all information needed for a partial piece request.
+ * This class should be used only by PeerState, PeerConnectionIn, and PeerConnectionOut.
  */
 class Request
 {
-  final int piece;
-  final byte[] bs;
+  private final PartialPiece piece;
   final int off;
   final int len;
   long sendTime;
@@ -35,40 +38,66 @@ class Request
    * Creates a new Request.
    *
    * @param piece Piece number requested.
-   * @param bs byte array where response should be stored.
    * @param off the offset in the array.
    * @param len the number of bytes requested.
    */
-  Request(int piece, byte[] bs, int off, int len)
+  Request(PartialPiece piece, int off, int len)
   {
+    // Sanity check
+    if (off < 0 || len <= 0 || off + len > piece.getLength())
+      throw new IndexOutOfBoundsException("Illegal Request " + toString());
+
     this.piece = piece;
-    this.bs = bs;
     this.off = off;
     this.len = len;
-
-    // Sanity check
-    if (piece < 0 || off < 0 || len <= 0 || off + len > bs.length)
-      throw new IndexOutOfBoundsException("Illegal Request " + toString());
   }
 
+  /**
+   *  @since 0.9.1
+   */
+  public void read(DataInputStream din) throws IOException {
+      piece.read(din, off, len);
+  }
+
+  /**
+   *  The piece number this Request is for
+   *
+   *  @since 0.9.1
+   */
+  public int getPiece() {
+      return piece.getPiece();
+  }
+
+  /**
+   *  The PartialPiece this Request is for
+   *
+   *  @since 0.9.1
+   */
+  public PartialPiece getPartialPiece() {
+      return piece;
+  }
+
+    @Override
   public int hashCode()
   {
-    return piece ^ off ^ len;
+    return piece.getPiece() ^ off ^ len;
   }
 
+    @Override
   public boolean equals(Object o)
   {
     if (o instanceof Request)
       {
         Request req = (Request)o;
-        return req.piece == piece && req.off == off && req.len == len;
+        return req.piece.equals(piece) && req.off == off && req.len == len;
       }
 
     return false;
   }
 
+    @Override
   public String toString()
   {
-    return "(" + piece + "," + off + "," + len + ")";
+    return "(" + piece.getPiece() + "," + off + "," + len + ")";
   }
 }

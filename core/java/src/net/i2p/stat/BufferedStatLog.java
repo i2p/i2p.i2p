@@ -1,6 +1,7 @@
 package net.i2p.stat;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -14,17 +15,18 @@ import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 
 /**
- * 
+ * Note - if no filter is defined in stat.logFilters at startup, this class will not
+ * be instantiated - see StatManager.
  */
 public class BufferedStatLog implements StatLog {
-    private I2PAppContext _context;
-    private Log _log;
-    private StatEvent _events[];
+    private final I2PAppContext _context;
+    private final Log _log;
+    private final StatEvent _events[];
     private int _eventNext;
     private int _lastWrite;
     /** flush stat events to disk after this many events (or 30s)*/
     private int _flushFrequency;
-    private List _statFilters;
+    private final List _statFilters;
     private String _lastFilters;
     private BufferedWriter _out;
     private String _outFile;
@@ -45,7 +47,7 @@ public class BufferedStatLog implements StatLog {
         _lastWrite = _events.length-1;
         _statFilters = new ArrayList(10);
         _flushFrequency = 500;
-        _filtersSpecified = false;
+        updateFilters();
         I2PThread writer = new I2PThread(new StatLogWriter(), "StatLogWriter");
         writer.setDaemon(true);
         writer.start();
@@ -92,10 +94,7 @@ public class BufferedStatLog implements StatLog {
                     _statFilters.clear();
                     while (tok.hasMoreTokens())
                         _statFilters.add(tok.nextToken().trim());
-                    if (_statFilters.size() > 0)
-                        _filtersSpecified = true;
-                    else
-                        _filtersSpecified = false;
+                    _filtersSpecified = !_statFilters.isEmpty();
                 }
             }
             _lastFilters = val;
@@ -106,9 +105,10 @@ public class BufferedStatLog implements StatLog {
             }
         }
         
-        String filename = _context.getProperty(StatManager.PROP_STAT_FILE);
-        if (filename == null)
-            filename = StatManager.DEFAULT_STAT_FILE;
+        String filename = _context.getProperty(StatManager.PROP_STAT_FILE, StatManager.DEFAULT_STAT_FILE);
+        File foo = new File(filename);
+        if (!foo.isAbsolute())
+            filename = (new File(_context.getRouterDir(), filename)).getAbsolutePath();
         if ( (_outFile != null) && (_outFile.equals(filename)) ) {
             // noop
         } else {
@@ -121,7 +121,7 @@ public class BufferedStatLog implements StatLog {
     }
     
     private class StatLogWriter implements Runnable {
-        private SimpleDateFormat _fmt = new SimpleDateFormat("yyyyMMdd HH:mm:ss.SSS");
+        private final SimpleDateFormat _fmt = new SimpleDateFormat("yyyyMMdd HH:mm:ss.SSS");
         public void run() {
             int writeStart = -1;
             int writeEnd = -1;

@@ -1,20 +1,34 @@
 /*
- 	launch4j :: Cross-platform Java application wrapper for creating Windows native executables
- 	Copyright (C) 2005 Grzegorz Kowal
+	Launch4j (http://launch4j.sourceforge.net/)
+	Cross-platform Java application wrapper for creating Windows native executables.
 
-	This program is free software; you can redistribute it and/or modify
-	it under the terms of the GNU General Public License as published by
-	the Free Software Foundation; either version 2 of the License, or
-	(at your option) any later version.
+	Copyright (c) 2004, 2007 Grzegorz Kowal
 
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
+	All rights reserved.
 
-	You should have received a copy of the GNU General Public License
-	along with this program; if not, write to the Free Software
-	Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+	Redistribution and use in source and binary forms, with or without modification,
+	are permitted provided that the following conditions are met:
+
+	    * Redistributions of source code must retain the above copyright notice,
+	      this list of conditions and the following disclaimer.
+	    * Redistributions in binary form must reproduce the above copyright notice,
+	      this list of conditions and the following disclaimer in the documentation
+	      and/or other materials provided with the distribution.
+	    * Neither the name of the Launch4j nor the names of its contributors
+	      may be used to endorse or promote products derived from this software without
+	      specific prior written permission.
+
+	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+	"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+	LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+	A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+	CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+	EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+	PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+	PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+	LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+	NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+	SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 /*
@@ -22,13 +36,14 @@
  */
 package net.sf.launch4j.config;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import net.sf.launch4j.Util;
@@ -50,9 +65,17 @@ public class ConfigPersister {
 	private ConfigPersister() {
 		_xstream = new XStream(new DomDriver());
     	_xstream.alias("launch4jConfig", Config.class);
+    	_xstream.alias("classPath", ClassPath.class);
     	_xstream.alias("jre", Jre.class);
     	_xstream.alias("splash", Splash.class);
     	_xstream.alias("versionInfo", VersionInfo.class);
+
+    	_xstream.addImplicitCollection(Config.class, "headerObjects", "obj",
+    			String.class);
+    	_xstream.addImplicitCollection(Config.class, "libs", "lib", String.class);
+    	_xstream.addImplicitCollection(Config.class, "variables", "var", String.class);
+    	_xstream.addImplicitCollection(ClassPath.class, "paths", "cp", String.class);
+    	_xstream.addImplicitCollection(Jre.class, "options", "opt", String.class);
 	}
 
 	public static ConfigPersister getInstance() {
@@ -94,9 +117,25 @@ public class ConfigPersister {
 
 	public void load(File f) throws ConfigPersisterException {
 		try {
-			BufferedReader r = new BufferedReader(new FileReader(f));
-	    	_config = (Config) _xstream.fromXML(r);
+			FileReader r = new FileReader(f);
+			char[] buf = new char[(int) f.length()];
+			r.read(buf);
 	    	r.close();
+	    	// Convert 2.x config to 3.x
+	    	String s = String.valueOf(buf)
+	    			.replaceAll("<headerType>0<", "<headerType>gui<")
+	    			.replaceAll("<headerType>1<", "<headerType>console<")
+	    			.replaceAll("jarArgs>", "cmdLine>")
+	    			.replaceAll("<jarArgs[ ]*/>", "<cmdLine/>")
+	    			.replaceAll("args>", "opt>")
+	    			.replaceAll("<args[ ]*/>", "<opt/>")
+	    			.replaceAll("<dontUsePrivateJres>false</dontUsePrivateJres>",
+	    					"<jdkPreference>" + Jre.JDK_PREFERENCE_PREFER_JRE + "</jdkPreference>")
+	    			.replaceAll("<dontUsePrivateJres>true</dontUsePrivateJres>",
+	    					"<jdkPreference>" + Jre.JDK_PREFERENCE_JRE_ONLY + "</jdkPreference>")
+	    			.replaceAll("<initialHeapSize>0</initialHeapSize>", "")
+	    			.replaceAll("<maxHeapSize>0</maxHeapSize>", "");
+	    	_config = (Config) _xstream.fromXML(s);
 	    	setConfigPath(f);
 		} catch (Exception e) {
 			throw new ConfigPersisterException(e);
@@ -112,16 +151,23 @@ public class ConfigPersister {
 			_config = new Config();
 			String header = props.getProperty(Config.HEADER);
 			_config.setHeaderType(header == null
-					|| header.toLowerCase().equals("guihead.bin") ? 0 : 1);
+					|| header.toLowerCase().equals("guihead.bin") ? Config.GUI_HEADER
+															: Config.CONSOLE_HEADER);
 			_config.setJar(props.getFile(Config.JAR));
 			_config.setOutfile(props.getFile(Config.OUTFILE));
 			_config.setJre(new Jre());
 			_config.getJre().setPath(props.getProperty(Jre.PATH));
 			_config.getJre().setMinVersion(props.getProperty(Jre.MIN_VERSION));
 			_config.getJre().setMaxVersion(props.getProperty(Jre.MAX_VERSION));
-			_config.getJre().setArgs(props.getProperty(Jre.ARGS));
-			_config.setJarArgs(props.getProperty(Config.JAR_ARGS));
-			_config.setChdir("true".equals(props.getProperty(Config.CHDIR)) ? "." : null);
+			String args = props.getProperty(Jre.ARGS);
+			if (args != null) {
+				List jreOptions = new ArrayList();
+				jreOptions.add(args);
+				_config.getJre().setOptions(jreOptions);
+			}
+			_config.setCmdLine(props.getProperty(Config.JAR_ARGS));
+			_config.setChdir("true".equals(props.getProperty(Config.CHDIR))
+					? "." : null);
 			_config.setCustomProcName("true".equals(
 					props.getProperty("setProcName")));				// 1.x
 			_config.setStayAlive("true".equals(props.getProperty(Config.STAY_ALIVE)));
@@ -132,7 +178,8 @@ public class ConfigPersister {
 				_config.setSplash(new Splash());
 				_config.getSplash().setFile(splashFile);
 				String waitfor = props.getProperty("waitfor");		// 1.x
-				_config.getSplash().setWaitForWindow(waitfor != null && !waitfor.equals(""));
+				_config.getSplash().setWaitForWindow(waitfor != null
+													&& !waitfor.equals(""));
 				String splashTimeout = props.getProperty(Splash.TIMEOUT);
 				if (splashTimeout != null) {
 					_config.getSplash().setTimeout(Integer.parseInt(splashTimeout));	

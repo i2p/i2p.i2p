@@ -8,9 +8,9 @@ package net.i2p.router.startup;
  *
  */
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.Properties;
 
 import net.i2p.data.Certificate;
@@ -26,14 +26,16 @@ import net.i2p.router.JobImpl;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
+import net.i2p.util.SecureFileOutputStream;
 
 public class CreateRouterInfoJob extends JobImpl {
-    private static Log _log = new Log(CreateRouterInfoJob.class);
-    private Job _next;
+    private final Log _log;
+    private final Job _next;
     
     public CreateRouterInfoJob(RouterContext ctx, Job next) {
         super(ctx);
         _next = next;
+        _log = ctx.logManager().getLog(CreateRouterInfoJob.class);
     }
     
     public String getName() { return "Create New Router Info"; }
@@ -41,10 +43,15 @@ public class CreateRouterInfoJob extends JobImpl {
     public void runJob() {
         _log.debug("Creating the new router info");
         // create a new router info and store it where LoadRouterInfoJob looks
-        createRouterInfo();
+        synchronized (getContext().router().routerInfoFileLock) {
+            createRouterInfo();
+        }
         getContext().jobQueue().addJob(_next);
     }
     
+    /**
+     *  Caller must hold Router.routerInfoFileLock
+     */
     RouterInfo createRouterInfo() {
         RouterInfo info = new RouterInfo();
         FileOutputStream fos1 = null;
@@ -55,7 +62,8 @@ public class CreateRouterInfoJob extends JobImpl {
             stats.setProperty(RouterInfo.PROP_NETWORK_ID, Router.NETWORK_ID+"");
             getContext().router().addCapabilities(info);
             info.setOptions(stats);
-            info.setPeers(new HashSet());
+            // not necessary, in constructor
+            //info.setPeers(new HashSet());
             info.setPublished(getCurrentPublishDate(getContext()));
             RouterIdentity ident = new RouterIdentity();
             Certificate cert = getContext().router().createCertificate();
@@ -75,17 +83,18 @@ public class CreateRouterInfoJob extends JobImpl {
             info.setIdentity(ident);
             
             info.sign(signingPrivKey);
+
+            if (!info.isValid())
+                throw new DataFormatException("RouterInfo we just built is invalid: " + info);
             
-            String infoFilename = getContext().router().getConfigSetting(Router.PROP_INFO_FILENAME);
-            if (infoFilename == null)
-                infoFilename = Router.PROP_INFO_FILENAME_DEFAULT;
-            fos1 = new FileOutputStream(infoFilename);
+            String infoFilename = getContext().getProperty(Router.PROP_INFO_FILENAME, Router.PROP_INFO_FILENAME_DEFAULT);
+            File ifile = new File(getContext().getRouterDir(), infoFilename);
+            fos1 = new SecureFileOutputStream(ifile);
             info.writeBytes(fos1);
             
-            String keyFilename = getContext().router().getConfigSetting(Router.PROP_KEYS_FILENAME);
-            if (keyFilename == null)
-                keyFilename = Router.PROP_KEYS_FILENAME_DEFAULT;
-            fos2 = new FileOutputStream(keyFilename);
+            String keyFilename = getContext().getProperty(Router.PROP_KEYS_FILENAME, Router.PROP_KEYS_FILENAME_DEFAULT);
+            File kfile = new File(getContext().getRouterDir(), keyFilename);
+            fos2 = new SecureFileOutputStream(kfile);
             privkey.writeBytes(fos2);
             signingPrivKey.writeBytes(fos2);
             pubkey.writeBytes(fos2);
@@ -96,11 +105,11 @@ public class CreateRouterInfoJob extends JobImpl {
             getContext().keyManager().setPrivateKey(privkey);
             getContext().keyManager().setPublicKey(pubkey);
             
-            _log.info("Router info created and stored at " + infoFilename + " with private keys stored at " + keyFilename + " [" + info + "]");
+            _log.info("Router info created and stored at " + ifile.getAbsolutePath() + " with private keys stored at " + kfile.getAbsolutePath() + " [" + info + "]");
         } catch (DataFormatException dfe) {
-            _log.error("Error building the new router information", dfe);
+            _log.log(Log.CRIT, "Error building the new router information", dfe);
         } catch (IOException ioe) {
-            _log.error("Error writing out the new router information", ioe);
+            _log.log(Log.CRIT, "Error writing out the new router information", ioe);
         } finally {
             if (fos1 != null) try { fos1.close(); } catch (IOException ioe) {}
             if (fos2 != null) try { fos2.close(); } catch (IOException ioe) {}
@@ -115,7 +124,7 @@ public class CreateRouterInfoJob extends JobImpl {
      *
      */
     static long getCurrentPublishDate(RouterContext context) {
-        _log.info("Setting published date to /now/");
+        //_log.info("Setting published date to /now/");
         return context.clock().now();
     }
 }

@@ -14,15 +14,13 @@ import net.i2p.util.Log;
  *
  */
 class Writer {
-    private RouterContext _context;
-    private Log _log;
-    private List _pendingConnections;
-    private List _liveWrites;
-    private List _writeAfterLive;
-    private List _runners;
+    private final Log _log;
+    private final List<NTCPConnection> _pendingConnections;
+    private final List<NTCPConnection> _liveWrites;
+    private final List<NTCPConnection> _writeAfterLive;
+    private final List<Runner> _runners;
     
     public Writer(RouterContext ctx) {
-        _context = ctx;
         _log = ctx.logManager().getLog(getClass());
         _pendingConnections = new ArrayList(16);
         _runners = new ArrayList(5);
@@ -31,16 +29,16 @@ class Writer {
     }
     
     public void startWriting(int numWriters) {
-        for (int i = 0; i < numWriters; i++) {
+        for (int i = 1; i <=numWriters; i++) {
             Runner r = new Runner();
-            I2PThread t = new I2PThread(r, "NTCP write " + i, true);
+            I2PThread t = new I2PThread(r, "NTCP writer " + i + '/' + numWriters, true);
             _runners.add(r);
             t.start();
         }
     }
     public void stopWriting() {
-        while (_runners.size() > 0) {
-            Runner r = (Runner)_runners.remove(0);
+        while (!_runners.isEmpty()) {
+            Runner r = _runners.remove(0);
             r.stop();
         }
         synchronized (_pendingConnections) {
@@ -95,12 +93,12 @@ class Writer {
                         } else {
                             _liveWrites.remove(con);
                             con = null;
-                            if (_pendingConnections.size() <= 0) {
+                            if (_pendingConnections.isEmpty()) {
                                 if (_log.shouldLog(Log.DEBUG))
                                     _log.debug("Done writing, but nothing pending, so wait");
                                 _pendingConnections.wait();
                             } else {
-                                con = (NTCPConnection)_pendingConnections.remove(0);
+                                con = _pendingConnections.remove(0);
                                 _liveWrites.add(con);
                                 if (_log.shouldLog(Log.DEBUG))
                                     _log.debug("Switch to writing on: " + con);

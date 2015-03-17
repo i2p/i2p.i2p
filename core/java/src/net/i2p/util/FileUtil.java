@@ -9,14 +9,31 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.jar.JarOutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+// Pack200 now loaded dynamically in unpack() below
+//
+// For Sun, OpenJDK, IcedTea, etc, use this
+//import java.util.jar.Pack200;
+//
+// For Apache Harmony or if you put its pack200.jar in your library directory use this
+//import org.apache.harmony.unpack200.Archive;
+
 /**
  * General helper methods for messing with files
+ *
+ * These are static methods that do NOT convert arguments
+ * to absolute paths for a particular context and directory.
+ *
+ * Callers should ALWAYS provide absolute paths as arguments,
+ * and should NEVER assume files are in the current working directory.
  *
  */
 public class FileUtil {
@@ -69,10 +86,15 @@ public class FileUtil {
         }
     }
     
+    /**
+     *  As of release 0.7.12, any files inside the zip that have a .jar.pack or .war.pack suffix
+     *  are transparently unpacked to a .jar or .war file using unpack200.
+     */
     public static boolean extractZip(File zipfile, File targetDir) {
+        ZipFile zip = null;
         try {
             byte buf[] = new byte[16*1024];
-            ZipFile zip = new ZipFile(zipfile);
+            zip = new ZipFile(zipfile);
             Enumeration entries = zip.entries();
             while (entries.hasMoreElements()) {
                 ZipEntry entry = (ZipEntry)entries.nextElement();
@@ -100,40 +122,209 @@ public class FileUtil {
                         }
                     }
                 } else {
+                    InputStream in = null;
+                    FileOutputStream fos = null;
+                    JarOutputStream jos = null;
                     try {
-                        InputStream in = zip.getInputStream(entry);
-                        FileOutputStream fos = new FileOutputStream(target);
-                        int read = 0;
-                        while ( (read = in.read(buf)) != -1) {
-                            fos.write(buf, 0, read);
+                        in = zip.getInputStream(entry);
+                        if (entry.getName().endsWith(".jar.pack") || entry.getName().endsWith(".war.pack")) {
+                            target = new File(targetDir, entry.getName().substring(0, entry.getName().length() - ".pack".length()));
+                            jos = new JarOutputStream(new FileOutputStream(target));
+                            unpack(in, jos);
+                            System.err.println("INFO: File [" + entry.getName() + "] extracted and unpacked");
+                        } else {
+                            fos = new FileOutputStream(target);
+                            int read = 0;
+                            while ( (read = in.read(buf)) != -1) {
+                                fos.write(buf, 0, read);
+                            }
+                            System.err.println("INFO: File [" + entry.getName() + "] extracted");
                         }
-                        fos.close();
-                        in.close();
-                        
-                        System.err.println("INFO: File [" + entry.getName() + "] extracted");
                     } catch (IOException ioe) {
-                        System.err.println("ERROR: Error extracting the zip entry (" + entry.getName() + "]");
+                        System.err.println("ERROR: Error extracting the zip entry (" + entry.getName() + ')');
+                        if (ioe.getMessage() != null && ioe.getMessage().indexOf("CAFED00D") >= 0)
+                            System.err.println("This may be caused by a packed library that requires Java 1.6, your Java version is: " +
+                                               System.getProperty("java.version"));
                         ioe.printStackTrace();
                         return false;
+                    } catch (Exception e) {
+                        // Oracle unpack() should throw an IOE but other problems can happen, e.g:
+                        // java.lang.reflect.InvocationTargetException
+                        // Caused by: java.util.zip.ZipException: duplicate entry: xxxxx
+                        System.err.println("ERROR: Error extracting the zip entry (" + entry.getName() + ')');
+                        e.printStackTrace();
+                        return false;
+                    } finally {
+                        try { if (in != null) in.close(); } catch (IOException ioe) {}
+                        try { if (fos != null) fos.close(); } catch (IOException ioe) {}
+                        try { if (jos != null) jos.close(); } catch (IOException ioe) {}
                     }
                 }
             }
-            zip.close();
             return true;
         } catch (IOException ioe) {
             System.err.println("ERROR: Unable to extract the zip file");
             ioe.printStackTrace();
             return false;
-        } 
+        } finally {
+            if (zip != null) {
+                try { zip.close(); } catch (IOException ioe) {}
+            }
+        }
     }
     
+    /**
+     * Verify the integrity of a zipfile.
+     * There doesn't seem to be any library function to do this,
+     * so we basically go through all the motions of extractZip() above,
+     * unzipping everything but throwing away the data.
+     *
+     * Todo: verify zip header? Although this would break the undocumented
+     * practice of renaming the i2pupdate.sud file to i2pupdate.zip and
+     * letting the unzip method skip over the leading 56 bytes of
+     * "junk" (sig and version)
+     *
+     * @return true if ok
+     */
+    public static boolean verifyZip(File zipfile) {
+        ZipFile zip = null;
+        try {
+            byte buf[] = new byte[16*1024];
+            zip = new ZipFile(zipfile);
+            Enumeration entries = zip.entries();
+            boolean p200TestRequired = true;
+            while (entries.hasMoreElements()) {
+                ZipEntry entry = (ZipEntry)entries.nextElement();
+                if (entry.getName().indexOf("..") != -1) {
+                    //System.err.println("ERROR: Refusing to extract a zip entry with '..' in it [" + entry.getName() + "]");
+                    return false;
+                }
+                if (entry.isDirectory()) {
+                    // noop
+                } else {
+                    if (p200TestRequired &&
+                        (entry.getName().endsWith(".jar.pack") || entry.getName().endsWith(".war.pack"))) {
+                        if (!isPack200Supported()) {
+                            System.err.println("ERROR: Zip verify failed, your JVM does not support unpack200");
+                            return false;
+                        }
+                        p200TestRequired = false;
+                    }
+                    try {
+                        InputStream in = zip.getInputStream(entry);
+                        while ( (in.read(buf)) != -1) {
+                            // throw the data away
+                        }
+                        //System.err.println("INFO: File [" + entry.getName() + "] extracted");
+                        in.close();
+                    } catch (IOException ioe) {
+                        //System.err.println("ERROR: Error extracting the zip entry (" + entry.getName() + "]");
+                        //ioe.printStackTrace();
+                        return false;
+                    }
+                }
+            }
+            return true;
+        } catch (IOException ioe) {
+            //System.err.println("ERROR: Unable to extract the zip file");
+            //ioe.printStackTrace();
+            return false;
+        } finally {
+            if (zip != null) {
+                try { zip.close(); } catch (IOException ioe) {}
+            }
+        }
+    }
+    
+    /**
+     * Public since 0.8.3
+     * @since 0.8.1
+     */
+    public static boolean isPack200Supported() {
+        try {
+            Class.forName("java.util.jar.Pack200", false, ClassLoader.getSystemClassLoader());
+            return true;
+        } catch (Exception e) {}
+        try {
+            Class.forName("org.apache.harmony.unpack200.Archive", false, ClassLoader.getSystemClassLoader());
+            return true;
+        } catch (Exception e) {}
+        return false;
+    }
+
+    private static boolean _failedOracle;
+    private static boolean _failedApache;
+
+    /**
+     * Unpack using either Oracle or Apache's unpack200 library,
+     * with the classes discovered at runtime so neither is required at compile time.
+     *
+     * Caller must close streams
+     * @throws IOException on unpack error or if neither library is available.
+     *         Will not throw ClassNotFoundException.
+     * @throws org.apache.harmony.pack200.Pack200Exception which is not an IOException
+     * @throws java.lang.reflect.InvocationTargetException on duplicate zip entries in the packed jar
+     * @since 0.8.1
+     */
+    private static void unpack(InputStream in, JarOutputStream out) throws Exception {
+        // For Sun, OpenJDK, IcedTea, etc, use this
+        //Pack200.newUnpacker().unpack(in, out);
+        if (!_failedOracle) {
+            try {
+                Class p200 = Class.forName("java.util.jar.Pack200", true, ClassLoader.getSystemClassLoader());
+                Method newUnpacker = p200.getMethod("newUnpacker", (Class[]) null);
+                Object unpacker = newUnpacker.invoke(null,(Object[])  null);
+                Method unpack = unpacker.getClass().getMethod("unpack", new Class[] {InputStream.class, JarOutputStream.class});
+                // throws IOException
+                unpack.invoke(unpacker, new Object[] {in, out});
+                return;
+            } catch (ClassNotFoundException e) {
+                _failedOracle = true;
+                //e.printStackTrace();
+            } catch (NoSuchMethodException e) {
+                _failedOracle = true;
+                //e.printStackTrace();
+            }
+        }
+
+        // ------------------
+        // For Apache Harmony or if you put its pack200.jar in your library directory use this
+        //(new Archive(in, out)).unpack();
+        if (!_failedApache) {
+            try {
+                Class p200 = Class.forName("org.apache.harmony.unpack200.Archive", true, ClassLoader.getSystemClassLoader());
+                Constructor newUnpacker = p200.getConstructor(new Class[] {InputStream.class, JarOutputStream.class});
+                Object unpacker = newUnpacker.newInstance(new Object[] {in, out});
+                Method unpack = unpacker.getClass().getMethod("unpack", (Class[]) null);
+                // throws IOException or Pack200Exception
+                unpack.invoke(unpacker, (Object[]) null);
+                return;
+            } catch (ClassNotFoundException e) {
+                _failedApache = true;
+                //e.printStackTrace();
+            } catch (NoSuchMethodException e) {
+                _failedApache = true;
+                //e.printStackTrace();
+            }
+        }
+
+        // ------------------
+        // For gcj, gij, etc., use this
+        throw new IOException("Unpack200 not supported");
+    }
+
     /**
      * Read in the last few lines of a (newline delimited) textfile, or null if
      * the file doesn't exist.  
      *
+     * Warning - this inefficiently allocates a StringBuilder of size maxNumLines*80,
+     *           so don't make it too big.
+     * Warning - converts \r\n to \n
+     *
      * @param startAtBeginning if true, read the first maxNumLines, otherwise read
      *                         the last maxNumLines
      * @param maxNumLines max number of lines (or -1 for unlimited)
+     * @return string or null; does not throw IOException.
      *
      */
     public static String readTextFile(String filename, int maxNumLines, boolean startAtBeginning) {
@@ -142,7 +333,7 @@ public class FileUtil {
         FileInputStream fis = null;
         try {
             fis = new FileInputStream(f);
-            BufferedReader in = new BufferedReader(new InputStreamReader(fis));
+            BufferedReader in = new BufferedReader(new InputStreamReader(fis, "UTF-8"));
             List lines = new ArrayList(maxNumLines > 0 ? maxNumLines : 64);
             String line = null;
             while ( (line = in.readLine()) != null) {
@@ -154,7 +345,7 @@ public class FileUtil {
                         lines.remove(0);
                 }
             }
-            StringBuffer buf = new StringBuffer(lines.size() * 80);
+            StringBuilder buf = new StringBuilder(lines.size() * 80);
             for (int i = 0; i < lines.size(); i++)
                 buf.append((String)lines.get(i)).append('\n');
             return buf.toString();
@@ -169,6 +360,9 @@ public class FileUtil {
      * Dump the contents of the given path (relative to the root) to the output 
      * stream.  The path must not go above the root, either - if it does, it will
      * throw a FileNotFoundException
+     *
+     * Closes the OutputStream out on successful completion
+     * but leaves it open when throwing IOE.
      */
     public static void readFile(String path, String root, OutputStream out) throws IOException {
         File rootDir = new File(root);
@@ -181,26 +375,43 @@ public class FileUtil {
         String rootDirStr = rootDir.getCanonicalPath();
         if (!targetStr.startsWith(rootDirStr)) throw new FileNotFoundException("Requested file is outside the root dir: " + path);
 
-        byte buf[] = new byte[1024];
+        byte buf[] = new byte[4*1024];
         FileInputStream in = null;
         try {
             in = new FileInputStream(target);
             int read = 0;
             while ( (read = in.read(buf)) != -1) 
                 out.write(buf, 0, read);
-            out.close();
+            try { out.close(); } catch (IOException ioe) {}
         } finally {
             if (in != null) 
-                in.close();
+                try { in.close(); } catch (IOException ioe) {}
         }
     }
 
-    
-    /** return true if it was copied successfully */
+    /**
+      * @return true if it was copied successfully
+      */
     public static boolean copy(String source, String dest, boolean overwriteExisting) {
+        return copy(source, dest, overwriteExisting, false);
+    }
+
+    /**
+      * @param quiet don't log fails to wrapper log if true
+      * @return true if it was copied successfully
+      */
+    public static boolean copy(String source, String dest, boolean overwriteExisting, boolean quiet) {
         File src = new File(source);
         File dst = new File(dest);
+        return copy(src, dst, overwriteExisting, quiet);
+    }
 
+    /**
+      * @param quiet don't log fails to wrapper log if true
+      * @return true if it was copied successfully
+      * @since 0.8.8
+      */
+    public static boolean copy(File src, File dst, boolean overwriteExisting, boolean quiet) {
 	if (dst.exists() && dst.isDirectory())
             dst = new File(dst, src.getName());
         
@@ -208,30 +419,64 @@ public class FileUtil {
         if (dst.exists() && !overwriteExisting) return false;
         
         byte buf[] = new byte[4096];
+        InputStream in = null;
+        OutputStream out = null;
         try {
-            FileInputStream in = new FileInputStream(src);
-            FileOutputStream out = new FileOutputStream(dst);
+            in = new FileInputStream(src);
+            out = new FileOutputStream(dst);
             
             int read = 0;
             while ( (read = in.read(buf)) != -1)
                 out.write(buf, 0, read);
             
-            in.close();
-            out.close();
             return true;
         } catch (IOException ioe) {
-            ioe.printStackTrace();
+            if (!quiet)
+                ioe.printStackTrace();
             return false;
+        } finally {
+            try { if (in != null) in.close(); } catch (IOException ioe) {}
+            try { if (out != null) out.close(); } catch (IOException ioe) {}
         }
     }
     
     /**
-     * Usage: FileUtil (delete path | copy source dest)
+     * Try to rename, if it doesn't work then copy and delete the old.
+     * Always overwrites any existing "to" file.
+     * Method moved from SingleFileNamingService.
+     *
+     * @return true if it was renamed / copied successfully
+     * @since 0.8.8
+     */
+    public static boolean rename(File from, File to) {
+        if (!from.exists())
+            return false;
+        boolean success = false;
+        boolean isWindows = System.getProperty("os.name").startsWith("Win");
+        // overwrite fails on windows
+        if (!isWindows)
+            success = from.renameTo(to);
+        if (!success) {
+            to.delete();
+            success = from.renameTo(to);
+            if (!success) {
+                // hard way
+                success = copy(from, to, true, true);
+                if (success)
+                    from.delete();
+            }
+        }
+        return success;
+    }
+
+    /**
+     * Usage: FileUtil (delete path | copy source dest | unzip path.zip)
      *
      */
     public static void main(String args[]) {
         if ( (args == null) || (args.length < 2) ) {
-            testRmdir();
+            System.err.println("Usage: delete path | copy source dest | unzip path.zip");
+            //testRmdir();
         } else if ("delete".equals(args[0])) {
             boolean deleted = FileUtil.rmdir(args[1], false);
             if (!deleted)
@@ -240,9 +485,22 @@ public class FileUtil {
             boolean copied = FileUtil.copy(args[1], args[2], false);
             if (!copied) 
                 System.err.println("Error copying [" + args[1] + "] to [" + args[2] + "]");
+        } else if ("unzip".equals(args[0])) {
+            File f = new File(args[1]);
+            File to = new File("tmp");
+            to.mkdir();
+            boolean copied = verifyZip(f);
+            if (!copied) 
+                System.err.println("Error verifying " + args[1]);
+            copied = extractZip(f,  to);
+            if (copied) 
+                System.err.println("Unzipped [" + args[1] + "] to [" + to + "]");
+            else
+                System.err.println("Error unzipping [" + args[1] + "] to [" + to + "]");
         }
     }
     
+  /*****
     private static void testRmdir() {
         File t = new File("rmdirTest/test/subdir/blah");
         boolean created = t.mkdirs();
@@ -253,4 +511,5 @@ public class FileUtil {
         else
             System.out.println("PASS: rmdirTest deleted");
     }
+   *****/
 }

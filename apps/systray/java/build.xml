@@ -3,8 +3,9 @@
     <target name="all" depends="clean, build" />
     <target name="build" depends="builddep, jar" />
     <target name="builddep">
-        <ant dir="../../../core/java/" target="build" />
+        <!-- run from top level build.xml to get dependencies built -->
     </target>
+    <property name="javac.compilerargs" value="" />
     <target name="compile">
         <mkdir dir="./build" />
         <mkdir dir="./build/obj" />
@@ -15,26 +16,56 @@
             source="1.5"
             target="1.5"
             destdir="./build/obj"
+            includeAntRuntime="false"
             includes="**/*.java"
-            classpath="./lib/systray4j.jar:../../../core/java/build/i2p.jar" />
+            classpath="./lib/systray4j.jar:../../../core/java/build/i2p.jar" >
+            <compilerarg line="${javac.compilerargs}" />
+        </javac>
     </target>
-    <target name="jar" depends="compile" unless="jar.uptodate">
-        <mkdir dir="./build/jar_temp" />
-        <copy todir="./build/jar_temp">
-            <fileset dir="./build/obj" includes="**/*.class" />
-        </copy>
-        <jar destfile="./build/systray.jar" basedir="./build/jar_temp" includes="**/*">
+
+    <target name="listChangedFiles" depends="jarUpToDate" if="shouldListChanges" >
+        <exec executable="mtn" outputproperty="workspace.changes" errorproperty="mtn.error2" failifexecutionfails="false" >
+            <arg value="list" />
+            <arg value="changed" />
+            <arg value="." />
+        </exec>
+        <!-- \n in an attribute value generates an invalid manifest -->
+        <exec executable="tr" inputstring="${workspace.changes}" outputproperty="workspace.changes.tr" errorproperty="mtn.error2" failifexecutionfails="false" >
+            <arg value="-s" />
+            <arg value="[:space:]" />
+            <arg value="," />
+        </exec>
+    </target>
+
+    <target name="jar" depends="compile, jarUpToDate, listChangedFiles" unless="jar.uptodate">
+        <!-- set if unset -->
+        <property name="workspace.changes.tr" value="" />
+        <jar destfile="./build/systray.jar" basedir="./build/obj" includes="**/*.class">
             <manifest>
                 <attribute name="Main-Class" value="net.i2p.apps.systray.SysTray" />
                 <attribute name="Class-Path" value="systray4j.jar" />
+                <attribute name="Implementation-Version" value="${full.version}" />
+                <attribute name="Built-By" value="${build.built-by}" />
+                <attribute name="Build-Date" value="${build.timestamp}" />
+                <attribute name="Base-Revision" value="${workspace.version}" />
+                <attribute name="Workspace-Changes" value="${workspace.changes.tr}" />
             </manifest>
         </jar>
-        <delete dir="./build/jar_temp" />
     </target>
 
-    <uptodate property="jar.uptodate" targetfile="./build/systray.jar">
-        <srcfiles dir= "src" includes="**/*.java" />
-    </uptodate>
+    <target name="jarUpToDate">
+        <uptodate property="jar.uptodate" targetfile="./build/systray.jar">
+            <srcfiles dir= "build/obj" includes="**/*.class" />
+        </uptodate>
+        <condition property="shouldListChanges" >
+            <and>
+                <not>
+                    <isset property="jar.uptodate" />
+                </not>
+                <isset property="mtn.available" />
+            </and>
+        </condition>
+    </target>
 
     <target name="javadoc">
         <mkdir dir="./build" />
@@ -52,10 +83,7 @@
         <delete dir="./build" />
     </target>
     <target name="cleandep" depends="clean">
-	<!-- router will clean core -->
-        <ant dir="../../../core/java/" target="cleandep" />
     </target>
     <target name="distclean" depends="clean">
-        <ant dir="../../../core/java/" target="distclean" />
     </target>
 </project>

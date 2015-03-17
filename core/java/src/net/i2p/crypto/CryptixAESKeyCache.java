@@ -1,7 +1,6 @@
 package net.i2p.crypto;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * Cache the objects used in CryptixRijndael_Algorithm.makeKey to reduce
@@ -9,9 +8,11 @@ import java.util.List;
  * data referenced in it is needed (which often is only one or two lines
  * of code)
  *
+ * Unused as a class, as the keys are cached in the SessionKey objects,
+ * but the static methods are used in FortunaStandalone.
  */
 public final class CryptixAESKeyCache {
-    private List _availableKeys;
+    private final LinkedBlockingQueue<KeyCacheEntry> _availableKeys;
     
     private static final int KEYSIZE = 32; // 256bit AES
     private static final int BLOCKSIZE = 16;
@@ -21,31 +22,32 @@ public final class CryptixAESKeyCache {
     
     private static final int MAX_KEYS = 64;
     
+    /*
+     * @deprecated unused, keys are now cached in the SessionKey objects
+     */
     public CryptixAESKeyCache() {
-        _availableKeys = new ArrayList(MAX_KEYS);
+        _availableKeys = new LinkedBlockingQueue(MAX_KEYS);
     }
     
     /**
      * Get the next available structure, either from the cache or a brand new one
      *
+     * @deprecated unused, keys are now cached in the SessionKey objects
      */
     public final KeyCacheEntry acquireKey() {
-        synchronized (_availableKeys) {
-            if (_availableKeys.size() > 0)
-                return (KeyCacheEntry)_availableKeys.remove(0);
-        }
+        KeyCacheEntry rv = _availableKeys.poll();
+        if (rv != null)
+            return rv;
         return createNew();
     }
     
     /**
      * Put this structure back onto the available cache for reuse
      *
+     * @deprecated unused, keys are now cached in the SessionKey objects
      */
     public final void releaseKey(KeyCacheEntry key) {
-        synchronized (_availableKeys) {
-            if (_availableKeys.size() < MAX_KEYS)
-                _availableKeys.add(key);
-        }
+        _availableKeys.offer(key);
     }
     
     public static final KeyCacheEntry createNew() {

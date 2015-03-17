@@ -1,11 +1,12 @@
 package net.i2p.router.web;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 import net.i2p.stat.StatManager;
-import net.i2p.util.Log;
 
 /**
  * Handler to deal with form submissions from the stats config form and act
@@ -28,6 +29,7 @@ public class ConfigStatsHandler extends FormHandler {
         _isFull = false;
     }
     
+    @Override
     protected void processForm() {
         saveChanges();
     }
@@ -40,14 +42,10 @@ public class ConfigStatsHandler extends FormHandler {
         if (stats != null) {
             for (int i = 0; i < stats.length; i++) {
                 String cur = stats[i].trim();
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Stat: [" + cur + "]");
                 if ( (cur.length() > 0) && (!_stats.contains(cur)) )
                     _stats.add(cur);
             }
         }
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Updated stats: " + _stats);
     }
 
     public void setGraphList(String stats[]) {
@@ -65,8 +63,6 @@ public class ConfigStatsHandler extends FormHandler {
         } else {
             _graphs = "";
         }
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Updated graphs: " + _graphs);
     }
 
     public void setExplicitFilter(String foo) { _explicitFilter = true; }
@@ -79,9 +75,10 @@ public class ConfigStatsHandler extends FormHandler {
      *
      */
     private void saveChanges() {
+        Map<String, String> changes = new HashMap();
         if (_filename == null)
             _filename = StatManager.DEFAULT_STAT_FILE;
-        _context.router().setConfigSetting(StatManager.PROP_STAT_FILE, _filename);
+        changes.put(StatManager.PROP_STAT_FILE, _filename);
         
         if (_explicitFilter) {
             _stats.clear();
@@ -102,22 +99,29 @@ public class ConfigStatsHandler extends FormHandler {
             }
         }
         
-        StringBuffer stats = new StringBuffer();
+        StringBuilder stats = new StringBuilder();
         for (int i = 0; i < _stats.size(); i++) {
             stats.append((String)_stats.get(i));
             if (i + 1 < _stats.size())
                 stats.append(',');
         }
             
-        _context.router().setConfigSetting(StatManager.PROP_STAT_FILTER, stats.toString());
-        _context.router().setConfigSetting("stat.summaries", _graphs);
-        _context.router().setConfigSetting(StatManager.PROP_STAT_FULL, "" + _isFull);
-        boolean ok = _context.router().saveConfig();
-        if (ok) 
-            addFormNotice("Stat filter and location updated successfully to: " + stats.toString());
-        else
-            addFormError("Failed to update the stat filter and location");
-        addFormNotice("Graph list updated, may take up to 60s to be reflected here and on the <a href=\"graphs.jsp\">Graphs Page</a>");
+        changes.put(StatManager.PROP_STAT_FILTER, stats.toString());
+        boolean graphsChanged = !_graphs.equals(_context.getProperty("stat.summaries"));
+        changes.put("stat.summaries", _graphs);
+        boolean fullChanged = _context.getBooleanProperty(StatManager.PROP_STAT_FULL) != _isFull;
+        changes.put(StatManager.PROP_STAT_FULL, "" + _isFull);
+        _context.router().saveConfig(changes, null);
+        if (!_stats.isEmpty())
+            addFormNotice(_("Stat filter and location updated successfully to") + ": " + stats.toString());
+        if (fullChanged) {
+            if (_isFull)
+                addFormNotice(_("Full statistics enabled - restart required to take effect"));
+            else
+                addFormNotice(_("Full statistics disabled - restart required to take effect"));
+        }
+        if (graphsChanged)
+            addFormNotice(_("Graph list updated, may take up to 60s to be reflected here and on the <a href=\"graphs.jsp\">Graphs Page</a>"));
     }
     
 }

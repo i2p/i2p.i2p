@@ -1,0 +1,284 @@
+/* Susimail dark theme by dr|z3d */
+
+body {
+     background-color: #000;
+     color:#ee9;
+     font-family:"Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
+     font-size: 8pt;
+}
+
+body.iframed {
+     background: transparent !important;
+     margin: 0;
+}
+
+hr {
+     color: #494;
+     background: #494;
+     height: 1px;
+     border: 0px solid #494;
+     width: 100%;
+     margin: 5px 0;
+     text-align: center;
+}
+
+li {
+     color:#ee9;
+     line-height:12pt;
+     font-size:10pt;
+     margin-left:5mm;
+     margin-right:5mm;
+}
+
+p {
+     color:#ee9;
+     line-height:12pt;
+     margin-left:5mm;
+     margin-right:5mm;
+     font-size:9pt;
+}
+
+p.hl {
+     font-size:12pt;
+     letter-spacing:2pt;
+     line-height:18pt;
+     font-weight:bold;
+}
+
+p.text {
+     margin-left:10mm;
+     margin-right:10mm;
+}
+
+p.error {
+     color: #f00;
+     background: url("../../console/images/errortriangle.png") no-repeat scroll 20px center #000;
+     border: 1px solid #f00;
+     border-radius: 4px;
+     font-weight: bold;
+     text-align: justify;
+     word-wrap: break-word;
+     padding: 15px 5px 15px 70px !important;
+     margin: 10px 10px 15px;
+     min-height: 30px;
+}
+
+p.info {
+     color:#327BBF;
+}
+
+span.coloured {
+     color:#327BBF;
+}
+
+p.footer {
+     margin-left:10mm;
+     margin-right:10mm;
+     font-size:8pt;
+     line-height:10pt;
+     display: none;
+}
+
+p.mailbody {
+     font: 9pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
+     margin: 0 5px;
+     text-align: left;
+}
+
+.mailbody {
+     display: block !important;
+}
+
+.mailbody td {
+}
+
+p img {
+/*     display: none; */
+     height: 0;
+     width: 0;
+     margin: -20px 0;
+}
+
+p:first-child {
+     display: none;
+}
+
+p.error {
+     display: block !important;
+}
+
+a {
+     color: #f60;
+     text-decoration: none;
+     font-weight: bold;
+}
+
+a:hover {
+     text-decoration: underline;
+}
+
+td {
+     color: #ee9;
+     margin: 0 5px;
+     font-size: 8pt;
+     padding: 2px;
+}
+
+tr.list0 {
+     background-color: #000;
+}
+
+tr.list1 {
+     background-color: #010;
+}
+
+table.noborder {
+     margin-left: 0;
+     margin-top: 0;
+     margin-right: 0;
+}
+
+pre {
+     font: 9pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
+     margin-left: 1cm;
+     margin-right: 1cm;
+}
+
+.page {
+     color: #ee9;
+     margin: 0;
+     padding: 0;
+     font-size: 9pt !important;
+     text-align: center;
+}
+
+table {
+     text-align: justify;
+     width: 100%;
+}
+
+th {
+     font-size: 9pt;
+     font-weight: bold;
+     background: url("../../console/dark/images/header.png") repeat scroll center center #000000;
+     padding: 7px;
+     border-bottom: 1px solid #494;
+     border-top: 1px solid #494;
+}
+
+form {
+     line-height: 160%
+}
+
+.mailhead {
+     font-size: 9pt;
+     font-weight: bold;
+}
+
+input.cancel, input.clearselection, input.logout {
+     background: #000 url('/themes/console/images/cancel.png') no-repeat 2px center;
+     min-height: 22px;
+}
+
+input.delete, input.delete_attachment, input.really_delete {
+     background: #000 url('/themes/console/images/delete.png') no-repeat 2px center;
+     min-height: 22px;
+}
+
+input.download, input.lastpage {
+     background: #000 url('/themes/console/images/arrow_down.png') no-repeat 2px center;
+     min-height: 22px;
+}
+
+input.firstpage {
+     background: #000 url('/themes/console/images/arrow_up.png') no-repeat 2px center;
+     min-height: 22px;
+}
+
+input.forward, input.login, input.nextpage, input.send {
+     background: #000 url('/themes/console/images/arrow_right.png') no-repeat 2px center;
+     min-height: 22px;
+}
+
+input.invertselection, input.reload, input.refresh {
+     background: #000 url('/themes/console/images/arrow_refresh.png') no-repeat 2px center;
+     min-height: 22px;
+}
+
+input.markall, input.show {
+     background: #000 url('/themes/console/images/tick.png') no-repeat 2px center;
+     min-height: 22px;
+}
+
+input.new, input.reply, input.replyall {
+     background: #000 url('/themes/console/images/email.png') no-repeat 2px center;
+     min-height: 22px;
+}
+
+input.prevpage {
+     background: #000 url('/themes/console/images/arrow_left.png') no-repeat 2px center;
+     min-height: 22px;
+}
+
+input.send, input.setpagesize {
+     background: #000 url('/themes/console/images/accept.png') no-repeat 2px center;
+     min-height: 22px;
+}
+
+input {
+     font-size: 9pt;
+     font-weight: bold;
+     text-align: left;
+     padding: 2px 2px 3px !important;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+     border: 1px solid #494;
+     background: #000 none !important;      
+     color: #494;
+     margin: 2px 4px 2px 0;
+     font: bold 8pt "Lucida Sans Unicode","Bitstream Vera Sans",Verdana,Tahoma,Helvetica,sans-serif;
+     min-width: 64px !important;
+}
+
+input[type=submit], input.cancel {
+     color: #494;
+     background: #000;
+     border: 1px outset #191;
+     box-shadow: 0 1px 1px 0 #119911 inset;
+     font: bold 8pt "Lucida Sans Unicode","Bitstream Vera Sans",Verdana,Tahoma,Helvetica,sans-serif;
+     text-align: center;
+     min-height: 22px !important;
+}
+
+input[type=submit]:hover, input.cancel:hover {
+     color: #f60;
+     background: #000;
+     border: 1px solid #f60;
+     box-shadow: 0 1px 1px 0 #ee9 inset;
+     -moz-box-shadow: 0 1px 1px 0 #ee9 inset;
+     -khtml-box-shadow: 0 1px 1px 0 #ee9 inset;
+}
+
+input[type=submit]:active, input.cancel:active {
+     border: 1px inset #f60;
+     background: #f60 !important;
+     color: #EE9 !important;
+     -moz-box-shadow: inset 0px 0px 0px 0px #f60;
+     -khtml-box-shadow: inset 0px 0px 0px 0px #f60;
+     box-shadow: inset 0px 0px 0px 0px #f60;
+}
+
+input[type=text] {
+     color: #ee9;     
+}
+
+input:disabled, input:disabled:hover, input:disabled:active {
+     border: none;
+     color: #ee9;
+     margin-left: -2px;
+     box-shadow: none;
+     -moz-box-shadow: none;
+     -khtml-box-shadow: none;
+     background: #000 !important;
+}

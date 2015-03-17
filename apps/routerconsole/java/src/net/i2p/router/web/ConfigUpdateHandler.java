@@ -1,8 +1,13 @@
 package net.i2p.router.web;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import net.i2p.I2PAppContext;
 import net.i2p.crypto.TrustedUpdate;
 import net.i2p.data.DataHelper;
+import net.i2p.util.FileUtil;
+import net.i2p.util.PortMapper;
 
 /**
  *
@@ -16,111 +21,173 @@ public class ConfigUpdateHandler extends FormHandler {
     private String _proxyPort;
     private boolean _updateThroughProxy;
     private String _trustedKeys;
+    private boolean _updateUnsigned;
+    private String _zipURL;
 
     public static final String PROP_NEWS_URL = "router.newsURL";
 //  public static final String DEFAULT_NEWS_URL = "http://dev.i2p.net/cgi-bin/cvsweb.cgi/i2p/news.xml?rev=HEAD";
-    public static final String DEFAULT_NEWS_URL = "http://complication.i2p/news.xml";
+    public static final String OLD_DEFAULT_NEWS_URL = "http://complication.i2p/news.xml";
+    public static final String DEFAULT_NEWS_URL = "http://echelon.i2p/i2p/news.xml";
     public static final String PROP_REFRESH_FREQUENCY = "router.newsRefreshFrequency";
-    public static final String DEFAULT_REFRESH_FREQUENCY = 12*60*60*1000 + "";
+    public static final long DEFAULT_REFRESH_FREQ = 36*60*60*1000l;
+    public static final String DEFAULT_REFRESH_FREQUENCY = Long.toString(DEFAULT_REFRESH_FREQ);
     public static final String PROP_UPDATE_POLICY = "router.updatePolicy";
-    public static final String DEFAULT_UPDATE_POLICY = "notify";
+    public static final String DEFAULT_UPDATE_POLICY = "download";
     public static final String PROP_SHOULD_PROXY = "router.updateThroughProxy";
     public static final String DEFAULT_SHOULD_PROXY = Boolean.TRUE.toString();
     public static final String PROP_PROXY_HOST = "router.updateProxyHost";
-    public static final String DEFAULT_PROXY_HOST = "localhost";
+    public static final String DEFAULT_PROXY_HOST = "127.0.0.1";
     public static final String PROP_PROXY_PORT = "router.updateProxyPort";
-    public static final String DEFAULT_PROXY_PORT = "4444";
+    public static final int DEFAULT_PROXY_PORT_INT = 4444;
+    public static final String DEFAULT_PROXY_PORT = "" + DEFAULT_PROXY_PORT_INT;
+    /** default false */
+    public static final String PROP_UPDATE_UNSIGNED = "router.updateUnsigned";
+    /** default false - use for distros */
+    public static final String PROP_UPDATE_DISABLED = "router.updateDisabled";
+    /** no default */
+    public static final String PROP_ZIP_URL = "router.updateUnsignedURL";
     
     public static final String PROP_UPDATE_URL = "router.updateURL";
-//  public static final String DEFAULT_UPDATE_URL = "http://dev.i2p.net/i2p/i2pupdate.sud";
-    public static final String DEFAULT_UPDATE_URL =
+    /**
+     *  Changed as of release 0.8 to support both .sud and .su2
+     *  Some JVMs (IcedTea) don't have pack200
+     *  Update hosts must maintain both
+     */
+    private static final String PACK200_URLS =
+    "http://echelon.i2p/i2p/i2pupdate.su2\r\n" +
+    "http://inr.i2p/i2p/i2pupdate.su2\r\n" +
+    "http://stats.i2p/i2p/i2pupdate.su2\r\n" +
+    "http://www.i2p2.i2p/_static/i2pupdate.su2\r\n" +
+    "http://update.killyourtv.i2p/i2pupdate.su2\r\n" +
+    "http://update.postman.i2p/i2pupdate.su2" ;
+
+    private static final String NO_PACK200_URLS =
     "http://echelon.i2p/i2p/i2pupdate.sud\r\n" +
+    "http://inr.i2p/i2p/i2pupdate.sud\r\n" +
     "http://stats.i2p/i2p/i2pupdate.sud\r\n" +
-    "http://complication.i2p/i2p/i2pupdate.sud\r\n" +
     "http://www.i2p2.i2p/_static/i2pupdate.sud\r\n" +
+    "http://update.killyourtv.i2p/i2pupdate.sud\r\n" +
     "http://update.postman.i2p/i2pupdate.sud" ;
-    
+
+    public static final String DEFAULT_UPDATE_URL;
+    static {
+        if (FileUtil.isPack200Supported())
+            DEFAULT_UPDATE_URL = PACK200_URLS;
+        else
+            DEFAULT_UPDATE_URL = NO_PACK200_URLS;
+    }
+
     public static final String PROP_TRUSTED_KEYS = "router.trustedUpdateKeys";
     
-    
+    /**
+     *  Convenience method for updaters
+     *  @return the configured value, else the registered HTTP proxy, else the default
+     *  @since 0.8.13
+     */
+    static int proxyPort(I2PAppContext ctx) {
+        return ctx.getProperty(PROP_PROXY_PORT,
+                               ctx.portMapper().getPort(PortMapper.SVC_HTTP_PROXY, DEFAULT_PROXY_PORT_INT));
+    }
+
+    @Override
     protected void processForm() {
-        if ("Check for update now".equals(_action)) {
-            NewsFetcher fetcher = NewsFetcher.getInstance(I2PAppContext.getGlobalContext());
+        if (_action == null)
+            return;
+        if (_action.equals(_("Check for updates"))) {
+            NewsFetcher fetcher = NewsFetcher.getInstance(_context);
             fetcher.fetchNews();
-            if (fetcher.updateAvailable()) {
+            if (fetcher.shouldFetchUnsigned())
+                fetcher.fetchUnsignedHead();
+            if (fetcher.updateAvailable() || fetcher.unsignedUpdateAvailable()) {
                 if ( (_updatePolicy == null) || (!_updatePolicy.equals("notify")) )
-                    addFormNotice("Update available, attempting to download now");
+                    addFormNotice(_("Update available, attempting to download now"));
                 else
-                    addFormNotice("Update available, click button on left to download");
+                    addFormNotice(_("Update available, click button on left to download"));
+                // So that update() will post a status to the summary bar before we reload
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException ie) {}
             } else
-                addFormNotice("No update available");
+                addFormNotice(_("No update available"));
+            return;
         }
 
+        Map<String, String> changes = new HashMap();
+
         if ( (_newsURL != null) && (_newsURL.length() > 0) ) {
-            String oldURL = _context.router().getConfigSetting(PROP_NEWS_URL);
+            String oldURL = ConfigUpdateHelper.getNewsURL(_context);
             if ( (oldURL == null) || (!_newsURL.equals(oldURL)) ) {
-                _context.router().setConfigSetting(PROP_NEWS_URL, _newsURL);
-                addFormNotice("Updating news URL to " + _newsURL);
+                changes.put(PROP_NEWS_URL, _newsURL);
+                NewsFetcher.getInstance(_context).invalidateNews();
+                addFormNotice(_("Updating news URL to {0}", _newsURL));
             }
         }
         
-        if ( (_proxyHost != null) && (_proxyHost.length() > 0) ) {
+        if (_proxyHost != null && _proxyHost.length() > 0 && !_proxyHost.equals(_("internal"))) {
             String oldHost = _context.router().getConfigSetting(PROP_PROXY_HOST);
             if ( (oldHost == null) || (!_proxyHost.equals(oldHost)) ) {
-                _context.router().setConfigSetting(PROP_PROXY_HOST, _proxyHost);
-                addFormNotice("Updating proxy host to " + _proxyHost);
+                changes.put(PROP_PROXY_HOST, _proxyHost);
+                addFormNotice(_("Updating proxy host to {0}", _proxyHost));
             }
         }
         
-        if ( (_proxyPort != null) && (_proxyPort.length() > 0) ) {
+        if (_proxyPort != null && _proxyPort.length() > 0 && !_proxyPort.equals(_("internal"))) {
             String oldPort = _context.router().getConfigSetting(PROP_PROXY_PORT);
             if ( (oldPort == null) || (!_proxyPort.equals(oldPort)) ) {
-                _context.router().setConfigSetting(PROP_PROXY_PORT, _proxyPort);
-                addFormNotice("Updating proxy port to " + _proxyPort);
+                changes.put(PROP_PROXY_PORT, _proxyPort);
+                addFormNotice(_("Updating proxy port to {0}", _proxyPort));
             }
         }
         
-        if (_updateThroughProxy) {
-            _context.router().setConfigSetting(PROP_SHOULD_PROXY, Boolean.TRUE.toString());
-        } else {
-            _context.router().setConfigSetting(PROP_SHOULD_PROXY, Boolean.FALSE.toString());
-        }
+        changes.put(PROP_SHOULD_PROXY, "" + _updateThroughProxy);
+        changes.put(PROP_UPDATE_UNSIGNED, "" + _updateUnsigned);
         
-        String oldFreqStr = _context.router().getConfigSetting(PROP_REFRESH_FREQUENCY);
-        long oldFreq = -1;
-        if (oldFreqStr != null) 
-            try { oldFreq = Long.parseLong(oldFreqStr); } catch (NumberFormatException nfe) {}
+        String oldFreqStr = _context.getProperty(PROP_REFRESH_FREQUENCY, DEFAULT_REFRESH_FREQUENCY);
+        long oldFreq = DEFAULT_REFRESH_FREQ;
+        try { oldFreq = Long.parseLong(oldFreqStr); } catch (NumberFormatException nfe) {}
         if (_refreshFrequency != oldFreq) {
-            _context.router().setConfigSetting(PROP_REFRESH_FREQUENCY, ""+_refreshFrequency);
-            addFormNotice("Updating refresh frequency to " + DataHelper.formatDuration(_refreshFrequency));
+            changes.put(PROP_REFRESH_FREQUENCY, ""+_refreshFrequency);
+            addFormNotice(_("Updating refresh frequency to {0}",
+                            _refreshFrequency <= 0 ? _("Never") : DataHelper.formatDuration2(_refreshFrequency)));
         }
 
         if ( (_updatePolicy != null) && (_updatePolicy.length() > 0) ) {
             String oldPolicy = _context.router().getConfigSetting(PROP_UPDATE_POLICY);
             if ( (oldPolicy == null) || (!_updatePolicy.equals(oldPolicy)) ) {
-                _context.router().setConfigSetting(PROP_UPDATE_POLICY, _updatePolicy);
-                addFormNotice("Updating update policy to " + _updatePolicy);
+                changes.put(PROP_UPDATE_POLICY, _updatePolicy);
+                addFormNotice(_("Updating update policy to {0}", _updatePolicy));
             }
         }
 
         if ( (_updateURL != null) && (_updateURL.length() > 0) ) {
-            _updateURL = _updateURL.replaceAll("\r\n", ",").replaceAll("\n", ",");
+            _updateURL = _updateURL.replace("\r\n", ",").replace("\n", ",");
             String oldURL = _context.router().getConfigSetting(PROP_UPDATE_URL);
             if ( (oldURL == null) || (!_updateURL.equals(oldURL)) ) {
-                _context.router().setConfigSetting(PROP_UPDATE_URL, _updateURL);
-                addFormNotice("Updating update URLs.");
+                changes.put(PROP_UPDATE_URL, _updateURL);
+                addFormNotice(_("Updating update URLs."));
             }
         }
 
         if ( (_trustedKeys != null) && (_trustedKeys.length() > 0) ) {
+            _trustedKeys = _trustedKeys.replace("\r\n", ",").replace("\n", ",");
             String oldKeys = new TrustedUpdate(_context).getTrustedKeysString();
-            if ( (oldKeys == null) || (!_trustedKeys.equals(oldKeys)) ) {
-                _context.router().setConfigSetting(PROP_TRUSTED_KEYS, _trustedKeys);
-                addFormNotice("Updating trusted keys.");
+            oldKeys = oldKeys.replace("\r\n", ",");
+            if (!_trustedKeys.equals(oldKeys)) {
+                // note that keys are not validated here and no console error message will be generated
+                changes.put(PROP_TRUSTED_KEYS, _trustedKeys);
+                addFormNotice(_("Updating trusted keys."));
             }
         }
         
-        _context.router().saveConfig();
+        if ( (_zipURL != null) && (_zipURL.length() > 0) ) {
+            String oldURL = _context.router().getConfigSetting(PROP_ZIP_URL);
+            if ( (oldURL == null) || (!_zipURL.equals(oldURL)) ) {
+                changes.put(PROP_ZIP_URL, _zipURL);
+                addFormNotice(_("Updating unsigned update URL to {0}", _zipURL));
+            }
+        }
+        
+        _context.router().saveConfig(changes, null);
     }
     
     public void setNewsURL(String url) { _newsURL = url; }
@@ -133,4 +200,6 @@ public class ConfigUpdateHandler extends FormHandler {
     public void setUpdateThroughProxy(String foo) { _updateThroughProxy = true; }
     public void setProxyHost(String host) { _proxyHost = host; }
     public void setProxyPort(String port) { _proxyPort = port; }
+    public void setUpdateUnsigned(String foo) { _updateUnsigned = true; }
+    public void setZipURL(String url) { _zipURL = url; }
 }

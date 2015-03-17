@@ -1,0 +1,8 @@
+#!/bin/sh
+#
+# This launches i2psnark and jetty in a separate jvm.
+# The file jetty-i2psnark.xml must be present in the current directory.
+# i2psnark will be accessed at http://127.0.0.1:8002/
+#
+I2P="."
+java -cp "$I2P/lib/i2psnark.jar:$I2P/lib/i2p.jar:$I2P/lib/mstreaming.jar:$I2P/lib/streaming.jar:$I2P/lib/commons-el.jar:$I2P/lib/commons-logging.jar:$I2P/lib/jasper-compiler.jar:$I2P/lib/jasper-runtime.jar:$I2P/lib/javax.servlet.jar:$I2P/lib/org.mortbay.jetty.jar" org.klomp.snark.web.RunStandalone "$@"

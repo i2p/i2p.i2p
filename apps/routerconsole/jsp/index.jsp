@@ -1,40 +1,27 @@
-<%@page contentType="text/html"%>
+<%@page contentType="text/plain"%>
 <%@page pageEncoding="UTF-8"%>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-
-<html><head>
-<title>I2P Router Console - home</title>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<link rel="stylesheet" href="default.css" type="text/css" />
-<link rel="shortcut icon" href="favicon.ico" />
-</head><body>
 <%
-if (System.getProperty("router.consoleNonce") == null) {
-    System.setProperty("router.consoleNonce", new java.util.Random().nextLong() + "");
-}
+    //
+    //  Redirect to either /home or /console, depending on configuration,
+    //  while preserving any query parameters
+    //
+    response.setStatus(302, "Moved");
+    String req = request.getRequestURL().toString();
+    StringBuilder buf = new StringBuilder(128);
+    if (req.endsWith("index"))
+        req = req.substring(0, req.length() - 5);
+    else if (req.endsWith("index.jsp"))
+        req = req.substring(0, req.length() - 9);
+    buf.append(req);
+    if (!req.endsWith("/"))
+        buf.append('/');
+    boolean oldHome = net.i2p.I2PAppContext.getGlobalContext().getBooleanProperty("routerconsole.oldHomePage");
+    if (oldHome)
+        buf.append("console");
+    else
+        buf.append("home");
+    String query = request.getQueryString();
+    if (query != null)
+        buf.append('?').append(query);
+    response.setHeader("Location", buf.toString());
 %>
-
-<%@include file="nav.jsp" %>
-<%@include file="summary.jsp" %>
-
-<div class="news" id="news">
- <jsp:useBean class="net.i2p.router.web.ContentHelper" id="newshelper" scope="request" />
- <jsp:setProperty name="newshelper" property="page" value="docs/news.xml" />
- <jsp:setProperty name="newshelper" property="maxLines" value="300" />
- <jsp:getProperty name="newshelper" property="content" />
-
- <jsp:useBean class="net.i2p.router.web.ConfigUpdateHelper" id="updatehelper" scope="request" />
- <jsp:setProperty name="updatehelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
- <br /><i><font size="-1"><jsp:getProperty name="updatehelper" property="newsStatus" /></font></i><br />
-</div>
-
-<div class="main" id="main">
- <jsp:useBean class="net.i2p.router.web.ContentHelper" id="contenthelper" scope="request" />
- <jsp:setProperty name="contenthelper" property="page" value="docs/readme.html" />
- <jsp:setProperty name="contenthelper" property="maxLines" value="300" />
- <jsp:setProperty name="contenthelper" property="lang" value="<%=request.getParameter("lang")%>" />
- <jsp:getProperty name="contenthelper" property="content" />
-</div>
-
-</body>
-</html>

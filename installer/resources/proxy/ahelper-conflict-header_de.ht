@@ -1,0 +1,30 @@
+HTTP/1.1 409 Conflict
+Content-Type: text/html; charset=UTF-8
+Cache-control: no-cache
+Connection: close
+Proxy-Connection: close
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+<title>I2P-Warnung: kollidierende Ziele</title>
+<link rel="shortcut icon" href="http://proxy.i2p/themes/console/images/favicon.ico">
+<link href="http://proxy.i2p/themes/console/default/console.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+<div class="logo">
+ <a href="http://127.0.0.1:7657/" title="Routerkonsole"><img src="http://proxy.i2p/themes/console/images/i2plogo.png" alt="I2P Router Console" border="0"></a><hr>
+ <a href="http://127.0.0.1:7657/config.jsp">Einstellungen</a> <a href="http://127.0.0.1:7657/help.jsp">Hilfe</a> <a href="http://127.0.0.1:7657/susidns/">Adressbuch</a>
+</div>
+<div class="warning" id="warning">
+<h3>Warnung: Zielkonflikt</h3>
+<p>
+Der Adresshelferverweis, dem Sie folgen wollen, verwendet für diesen Hostnamen ein anderes kryptographisches Ziel
+als im zugehörigen Eintrag in Ihrem Routeradressbuch angegeben.
+Jemand könnte versuchen, fälschlicherweise eine andere als die gesuchte Eepseite auszugeben.
+Möglicherweise haben aber die betreiber beider Eepseiten nur zufällig denselben Namen ausgewählt.
+</p>
+<p>
+Diesen Konflikt können Sie lösen, indem Sie entscheiden, welchem Ziel Sie trauen, das gesuchte zu sein,
+und dann entweder den Verweis des Adresshelfers verwerfen, den Eintrag in Ihrem Routeradressbuch löschen,
+oder beiden Zielen unterschiedliche Namen zuweisen.
+</p>

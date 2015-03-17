@@ -11,6 +11,7 @@ import net.i2p.data.ByteArray;
  * needs to be done (e.g. write(foo); toByteArray();), call releaseBuffer
  * to put the buffer back into the cache.
  * 
+ * @deprecated unused
  */
 public class CachingByteArrayOutputStream extends ByteArrayOutputStream {
     private ByteCache _cache;

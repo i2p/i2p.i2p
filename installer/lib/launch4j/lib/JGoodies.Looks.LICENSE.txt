@@ -1,7 +1,8 @@
-           The BSD License for the JGoodies Looks
-           ======================================
 
-Copyright (c) 2003 JGoodies Karsten Lentzsch. All rights reserved.
+              The BSD License for the JGoodies Looks
+              ======================================
+
+Copyright (c) 2001-2007 JGoodies Karsten Lentzsch. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without 
 modification, are permitted provided that the following conditions are met:

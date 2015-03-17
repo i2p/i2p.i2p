@@ -1,6 +1,5 @@
 package net.i2p.router.tunnel;
 
-import net.i2p.I2PAppContext;
 import net.i2p.data.ByteArray;
 import net.i2p.data.Hash;
 import net.i2p.router.RouterContext;
@@ -15,19 +14,21 @@ import net.i2p.util.Log;
  * same thing in both instances.
  *
  */
-public class InboundEndpointProcessor {
-    private I2PAppContext _context;
-    private Log _log;
-    private TunnelCreatorConfig _config;
-    private IVValidator _validator;    
+class InboundEndpointProcessor {
+    private final RouterContext _context;
+    private final Log _log;
+    private final TunnelCreatorConfig _config;
+    private final IVValidator _validator;    
     
     static final boolean USE_ENCRYPTION = HopProcessor.USE_ENCRYPTION;
     private static final ByteCache _cache = ByteCache.getInstance(128, HopProcessor.IV_LENGTH);
     
-    public InboundEndpointProcessor(I2PAppContext ctx, TunnelCreatorConfig cfg) {
+    /** @deprecated unused */
+    public InboundEndpointProcessor(RouterContext ctx, TunnelCreatorConfig cfg) {
         this(ctx, cfg, DummyValidator.getInstance());
     }
-    public InboundEndpointProcessor(I2PAppContext ctx, TunnelCreatorConfig cfg, IVValidator validator) {
+
+    public InboundEndpointProcessor(RouterContext ctx, TunnelCreatorConfig cfg, IVValidator validator) {
         _context = ctx;
         _log = ctx.logManager().getLog(InboundEndpointProcessor.class);
         _config = cfg;
@@ -62,7 +63,7 @@ public class InboundEndpointProcessor {
         boolean ok = _validator.receiveIV(iv, 0, orig, offset + HopProcessor.IV_LENGTH);
         if (!ok) {
             if (_log.shouldLog(Log.WARN)) 
-                _log.warn("Invalid IV received");
+                _log.warn("Invalid IV, dropping at IBEP " + _config);
             _cache.release(ba);
             return false;
         }
@@ -73,32 +74,31 @@ public class InboundEndpointProcessor {
         
         _cache.release(ba);
         
-        // now for a little bookkeeping
-        RouterContext ctx = null;
-        if (_context instanceof RouterContext)
-            ctx = (RouterContext)_context;
-        if ( (ctx != null) && (_config.getLength() > 0) ) {
+        if (_config.getLength() > 0) {
             int rtt = 0; // dunno... may not be related to an rtt
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Received a " + length + "byte message through tunnel " + _config);
             for (int i = 0; i < _config.getLength(); i++)
-                ctx.profileManager().tunnelDataPushed(_config.getPeer(i), rtt, length);
+                _context.profileManager().tunnelDataPushed(_config.getPeer(i), rtt, length);
             _config.incrementVerifiedBytesTransferred(length);
         }
         
         return true;
     }
     
-    private void decrypt(I2PAppContext ctx, TunnelCreatorConfig cfg, byte iv[], byte orig[], int offset, int length) {
-        Log log = ctx.logManager().getLog(OutboundGatewayProcessor.class);
+    /**
+     * Iteratively undo the crypto that the various layers in the tunnel added.
+     */
+    private void decrypt(RouterContext ctx, TunnelCreatorConfig cfg, byte iv[], byte orig[], int offset, int length) {
+        //Log log = ctx.logManager().getLog(OutboundGatewayProcessor.class);
         ByteArray ba = _cache.acquire();
         byte cur[] = ba.getData(); // new byte[HopProcessor.IV_LENGTH]; // so we dont malloc
         for (int i = cfg.getLength()-2; i >= 0; i--) { // dont include the endpoint, since that is the creator
             OutboundGatewayProcessor.decrypt(ctx, iv, orig, offset, length, cur, cfg.getConfig(i));
-            if (log.shouldLog(Log.DEBUG)) {
+            //if (log.shouldLog(Log.DEBUG)) {
                 //log.debug("IV at hop " + i + ": " + Base64.encode(orig, offset, HopProcessor.IV_LENGTH));
                 //log.debug("hop " + i + ": " + Base64.encode(orig, offset + HopProcessor.IV_LENGTH, length - HopProcessor.IV_LENGTH));
-            }
+            //}
         }
         _cache.release(ba);
     }
