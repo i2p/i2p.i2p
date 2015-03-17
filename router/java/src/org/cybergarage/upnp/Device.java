@@ -489,7 +489,6 @@ public class Device implements org.cybergarage.http.HTTPRequestListener,
 	 * 
 	 * @return A Device that contain this object.<br>
 	 *         Return <code>null</code> if this is a root device.
-	 * @author Stefano "Kismet" Lenzi
 	 */
 	public Device getParentDevice() {
 		if (isRootDevice())
@@ -522,12 +521,6 @@ public class Device implements org.cybergarage.http.HTTPRequestListener,
 	 * <br>
 	 * Note: This method should be used to create a dynamic<br>
 	 * Device withtout writing any XML that describe the device<br>
-	 * .
-	 * 
-	 * @param d
-	 *            Add Device d to the Device
-	 * 
-	 * @author Stefano "Kismet" Lenzi - kismet-sl@users.sourceforge.net - 2005
 	 * 
 	 * @param d Add Device d to the Device
 	 */

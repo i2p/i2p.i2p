@@ -180,9 +180,9 @@ public class DeviceData extends NodeData
 	 * 
 	 * @param inets The <tt>InetAddress</tt> that will be binded for listing this service. 
 	 * 		Use <code>null</code> for the default behaviur. 
-	 * @see {@link UPnP}
-	 * @see {@link USSDP}
-	 * @see {@link HostInterface} 
+	 * @see org.cybergarage.upnp.ssdp
+	 * @see org.cybergarage.upnp
+	 * @see org.cybergarage.net.HostInterface
 	 * @since 1.8 
 	 */
 	public void setSSDPBindAddress(InetAddress[] inets){
