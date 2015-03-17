@@ -500,7 +500,7 @@ public class Router implements RouterClock.ClockShiftListener {
     public void setHigherVersionSeen(boolean seen) { _higherVersionSeen = seen; }
     
     /**
-     * @deprecated unused
+     *  Used only by routerconsole.. to be deprecated?
      */
     public long getWhenStarted() { return _started; }
 
@@ -856,6 +856,12 @@ public class Router implements RouterClock.ClockShiftListener {
     
     /**
      *  For building our RI. Not for external use.
+     *  This does not publish the ri.
+     *  This does not use anything in the ri (i.e. it can be freshly constructed)
+     *
+     *  TODO just return a string instead of passing in the RI? See PublishLocalRouterInfoJob.
+     *
+     *  @param an unpublished ri we are generating.
      */
     public void addCapabilities(RouterInfo ri) {
         int bwLim = Math.min(_context.bandwidthLimiter().getInboundKBytesPerSecond(),
@@ -877,11 +883,17 @@ public class Router implements RouterClock.ClockShiftListener {
             ri.addCapability(CAPABILITY_BW128);
         } else if (bwLim <= 256) {
             ri.addCapability(CAPABILITY_BW256);
-        } else {
+        } else if (bwLim <= 2000) {    // TODO adjust threshold
             // 512 supported as of 0.9.18;
             // Add 256 as well for compatibility
             // TODO uncomment
             //ri.addCapability(CAPABILITY_BW512);
+            ri.addCapability(CAPABILITY_BW256);
+        } else {
+            // Unlimited supported as of 0.9.18;
+            // Add 256 as well for compatibility
+            // TODO uncomment
+            //ri.addCapability(CAPABILITY_BW_UNLIMITED);
             ri.addCapability(CAPABILITY_BW256);
         }
         
