@@ -436,6 +436,9 @@ public class Service
 		
 		String scpdURLStr = getSCPDURL();
 
+/****
+ * I2P - no, dont attempt to load local file
+ *
 		// Thanks for Robin V. (Sep 18, 2010)
 		String rootDevPath = rootDev.getDescriptionFilePath();
 		if(rootDevPath!=null) {
@@ -455,6 +458,7 @@ public class Service
 				}
 			}
 		}
+****/
 
 		try {
 			URL scpdUrl = new URL(rootDev.getAbsoluteURL(scpdURLStr));
@@ -464,8 +468,14 @@ public class Service
 				return scpdNode;
 			}
 		}
-		catch (Exception e) {}
+		catch (Exception e) {
+			// I2P
+			Debug.warning(e);
+		}
 		
+/****
+ * I2P - no, dont attempt to load local file
+ *
 		String newScpdURLStr = rootDev.getDescriptionFilePath() + HTTP.toRelativeURL(scpdURLStr);
 		try {
 			scpdNode = getSCPDNode(new File(newScpdURLStr));
@@ -474,6 +484,7 @@ public class Service
 		catch (Exception e) {
 			Debug.warning(e);
 		}
+****/
 		
 		return null;
 	}

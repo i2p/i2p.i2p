@@ -255,11 +255,13 @@ public class Device implements org.cybergarage.http.HTTPRequestListener,
 
 	public String getAbsoluteURL(String urlString, String baseURLStr,
 			String locationURLStr) {
+		//Debug.warning("GAURL \"" + urlString + "\" \"" + baseURLStr + "\" \"" + locationURLStr + '"');
 		if ((urlString == null) || (urlString.length() <= 0))
 			return "";
 
 		try {
 			URL url = new URL(urlString);
+			//Debug.warning("Return 0: " + url);
 			return url.toString();
 		} catch (Exception e) {
 		}
@@ -267,9 +269,21 @@ public class Device implements org.cybergarage.http.HTTPRequestListener,
 		if ((baseURLStr == null) || (baseURLStr.length() <= 0)) {
 			if ((locationURLStr != null) && (0 < locationURLStr.length())) {
 				if (!locationURLStr.endsWith("/") || !urlString.startsWith("/")) {
-					String absUrl = locationURLStr + urlString;
+					String absUrl;
+					// I2P - getAbsoluteURL("/WANIPCn.xml", "", "http://192.168.1.1:5555/rootDesc.xml")
+					// returns here as  "http://192.168.1.1:5555/rootDesc.xml/WANIPCn.xml" which is horribly wrong
+					// So back up to last slash
+					if (!locationURLStr.endsWith("/")) {
+						if (urlString.startsWith("/"))
+						      absUrl = locationURLStr.substring(0, locationURLStr.lastIndexOf('/')) + urlString;
+						else
+						      absUrl = locationURLStr.substring(0, locationURLStr.lastIndexOf('/') + 1) + urlString;
+					} else {
+						absUrl = locationURLStr + urlString;
+					}
 					try {
 						URL url = new URL(absUrl);
+						//Debug.warning("Return 1: " + url);
 						return url.toString();
 					} catch (Exception e) {
 					}
@@ -277,6 +291,7 @@ public class Device implements org.cybergarage.http.HTTPRequestListener,
 					String absUrl = locationURLStr + urlString.substring(1);
 					try {
 						URL url = new URL(absUrl);
+						//Debug.warning("Return 2: " + url);
 						return url.toString();
 					} catch (Exception e) {
 					}
@@ -285,6 +300,7 @@ public class Device implements org.cybergarage.http.HTTPRequestListener,
 				String absUrl = HTTP.getAbsoluteURL(locationURLStr, urlString);
 				try {
 					URL url = new URL(absUrl);
+					//Debug.warning("Return 3: " + url);
 					return url.toString();
 				} catch (Exception e) {
 				}
@@ -306,6 +322,7 @@ public class Device implements org.cybergarage.http.HTTPRequestListener,
 				String absUrl = baseURLStr + urlString;
 				try {
 					URL url = new URL(absUrl);
+					//Debug.warning("Return 4: " + url);
 					return url.toString();
 				} catch (Exception e) {
 				}
@@ -313,6 +330,7 @@ public class Device implements org.cybergarage.http.HTTPRequestListener,
 				String absUrl = baseURLStr + urlString.substring(1);
 				try {
 					URL url = new URL(absUrl);
+					//Debug.warning("Return 5: " + url);
 					return url.toString();
 				} catch (Exception e) {
 				}
@@ -321,11 +339,13 @@ public class Device implements org.cybergarage.http.HTTPRequestListener,
 			String absUrl = HTTP.getAbsoluteURL(baseURLStr, urlString);
 			try {
 				URL url = new URL(absUrl);
+				//Debug.warning("Return 6: " + url);
 				return url.toString();
 			} catch (Exception e) {
 			}
 		}
 
+		//Debug.warning("Return 7: " + urlString);
 		return urlString;
 	}
 
