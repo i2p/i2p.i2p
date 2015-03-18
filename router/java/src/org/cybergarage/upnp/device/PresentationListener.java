@@ -4,7 +4,7 @@
 *
 *	Copyright (C) Satoshi Konno 2002
 *
-*	File: SearchResponseListener.java
+*	File: DeviceNotifyListener.java
 *
 *	Revision;
 *
@@ -15,9 +15,9 @@
 
 package org.cybergarage.upnp.device;
 
-import org.cybergarage.upnp.ssdp.*;
+import org.cybergarage.http.HTTPRequest;
 
-public interface SearchResponseListener
+public interface PresentationListener
 {
-	public void deviceSearchResponseReceived(SSDPPacket ssdpPacket);
+	public void httpRequestRecieved(HTTPRequest httpReq);
 }

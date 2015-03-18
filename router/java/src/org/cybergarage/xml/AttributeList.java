@@ -17,7 +17,7 @@ package org.cybergarage.xml;
 
 import java.util.Vector;
 
-public class AttributeList extends Vector<Attribute> 
+public class AttributeList extends Vector<Attribute>
 {
 	public AttributeList() 
 	{
