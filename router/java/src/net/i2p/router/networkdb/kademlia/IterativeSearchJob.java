@@ -347,7 +347,9 @@ class IterativeSearchJob extends FloodSearchJob {
             I2NPMessage outMsg = null;
             if (isDirect) {
                 // never wrap
-            } else if (_isLease || getContext().getProperty(PROP_ENCRYPT_RI, DEFAULT_ENCRYPT_RI)) {
+            } else if (_isLease ||
+                       (getContext().getProperty(PROP_ENCRYPT_RI, DEFAULT_ENCRYPT_RI) &&
+                        getContext().jobQueue().getMaxLag() < 300)) {
                 // Full ElG is fairly expensive so only do it for LS lookups
                 // and for RI lookups on fast boxes.
                 // if we have the ff RI, garlic encrypt it

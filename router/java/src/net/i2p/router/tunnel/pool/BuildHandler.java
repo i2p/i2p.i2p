@@ -93,6 +93,8 @@ class BuildHandler implements Runnable {
     /** must be > 1 hour due to rouding down */
     private static final long MAX_REQUEST_AGE = 65*60*1000;
 
+    private static final long JOB_LAG_LIMIT_TUNNEL = 350;
+
 
     public BuildHandler(RouterContext ctx, TunnelPoolManager manager, BuildExecutor exec) {
         _context = ctx;
@@ -248,6 +250,17 @@ class BuildHandler implements Runnable {
                 _context.throttle().setTunnelStatus(_x("Dropping tunnel requests: Too slow"));
                 return;
             }       
+
+            long lag = _context.jobQueue().getMaxLag();
+            // TODO reject instead of drop also for a lower limit? see throttle
+            if (lag > JOB_LAG_LIMIT_TUNNEL) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Dropping tunnel request, as the job lag is " + lag);
+                _context.statManager().addRateData("router.throttleTunnelCause", lag);
+                _context.throttle().setTunnelStatus(_x("Dropping tunnel requests: High job lag"));
+                return;
+            }       
+
             handleRequest(state);
 
         //int remaining = _inboundBuildMessages.size();

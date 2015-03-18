@@ -115,6 +115,10 @@ class RouterThrottleImpl implements RouterThrottle {
     }
     
     /**
+     *  If we should send a reject, return a nonzero reject code.
+     *  Anything that causes us to drop a request instead of rejecting it
+     *  must go in BuildHandler.handleInboundRequest(), not here.
+     *
      *  @return 0 for accept or nonzero reject code
      */
     public int acceptTunnelRequest() { 
@@ -132,6 +136,7 @@ class RouterThrottleImpl implements RouterThrottle {
             return TunnelHistory.TUNNEL_REJECT_BANDWIDTH;
         }
 
+    /**** Moved to BuildHandler
         long lag = _context.jobQueue().getMaxLag();
         if (lag > JOB_LAG_LIMIT_TUNNEL) {
             if (_log.shouldLog(Log.WARN))
@@ -140,6 +145,7 @@ class RouterThrottleImpl implements RouterThrottle {
             setTunnelStatus(_x("Rejecting tunnels: High job lag"));
             return TunnelHistory.TUNNEL_REJECT_BANDWIDTH;
         } 
+     ****/
         
         RateAverages ra = RateAverages.getTemp();
         
