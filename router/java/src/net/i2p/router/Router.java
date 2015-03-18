@@ -116,20 +116,32 @@ public class Router implements RouterClock.ClockShiftListener {
         
     private static final String originalTimeZoneID;
     static {
-        // grumble about sun's java caching DNS entries *forever* by default
-        // so lets just keep 'em for a short time
-        System.setProperty("sun.net.inetaddr.ttl", DNS_CACHE_TIME);
-        System.setProperty("sun.net.inetaddr.negative.ttl", DNS_CACHE_TIME);
-        System.setProperty("networkaddress.cache.ttl", DNS_CACHE_TIME);
-        System.setProperty("networkaddress.cache.negative.ttl", DNS_CACHE_TIME);
-        System.setProperty("http.agent", "I2P");
-        // (no need for keepalive)
-        System.setProperty("http.keepAlive", "false");
+        //
+        // If embedding I2P you may wish to disable one or more of the following
+        // via the associated System property. Since 0.9.19.
+        //
+        if (System.getProperty("I2P_DISABLE_DNS_CACHE_OVERRIDE") == null) {
+            // grumble about sun's java caching DNS entries *forever* by default
+            // so lets just keep 'em for a short time
+            System.setProperty("sun.net.inetaddr.ttl", DNS_CACHE_TIME);
+            System.setProperty("sun.net.inetaddr.negative.ttl", DNS_CACHE_TIME);
+            System.setProperty("networkaddress.cache.ttl", DNS_CACHE_TIME);
+            System.setProperty("networkaddress.cache.negative.ttl", DNS_CACHE_TIME);
+        }
+        if (System.getProperty("I2P_DISABLE_HTTP_AGENT_OVERRIDE") == null) {
+            System.setProperty("http.agent", "I2P");
+        }
+        if (System.getProperty("I2P_DISABLE_HTTP_KEEPALIVE_OVERRIDE") == null) {
+            // (no need for keepalive)
+            System.setProperty("http.keepAlive", "false");
+        }
         // Save it for LogManager
         originalTimeZoneID = TimeZone.getDefault().getID();
-        System.setProperty("user.timezone", "GMT");
-        // just in case, lets make it explicit...
-        TimeZone.setDefault(TimeZone.getTimeZone("GMT"));
+        if (System.getProperty("I2P_DISABLE_TIMEZONE_OVERRIDE") == null) {
+            System.setProperty("user.timezone", "GMT");
+            // just in case, lets make it explicit...
+            TimeZone.setDefault(TimeZone.getTimeZone("GMT"));
+        }
         // https://www.kb.cert.org/vuls/id/402580
         // http://docs.codehaus.org/display/JETTY/SystemProperties
         // Fixed in Jetty 5.1.15 but we are running 5.1.12
