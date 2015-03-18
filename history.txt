@@ -1,3 +1,12 @@
+2015-03-18 zzz
+ * NetDB:
+  - Send exploratory lookups directly to the floodfill if
+    we are already connected to him
+  - Don't encrypt RI lookups when overloaded
+  - Don't explore when overloaded
+ * Tunnels: Drop instead of reject requests on high job lag
+ * UPnP: Update to cyberlink 3.0
+
 2015-03-16 zzz
  * Apache Tomcat 6.0.43
  * NetDB: Send RI lookups directly to the floodfill if
