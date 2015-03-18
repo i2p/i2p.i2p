@@ -38,6 +38,11 @@ public class CreateLeaseSetMessage extends I2CPMessageImpl {
         return _sessionId;
     }
 
+    @Override
+    public SessionId sessionId() {
+        return _sessionId;
+    }
+
     public void setSessionId(SessionId id) {
         _sessionId = id;
     }

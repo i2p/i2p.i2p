@@ -51,9 +51,11 @@ class ClientManager {
     protected final List<ClientListenerRunner> _listeners;
     // Destination --> ClientConnectionRunner
     // Locked for adds/removes but not lookups
+    // If a runner has multiple sessions it will be in here multiple times, one for each dest
     private final Map<Destination, ClientConnectionRunner>  _runners;
     // Same as what's in _runners, but for fast lookup by Hash
     // Locked for adds/removes but not lookups
+    // If a runner has multiple sessions it will be in here multiple times, one for each dest
     private final Map<Hash, ClientConnectionRunner>  _runnersByHash;
     // ClientConnectionRunner for clients w/out a Dest yet
     private final Set<ClientConnectionRunner> _pendingRunners;
@@ -203,21 +205,41 @@ class ClientManager {
         }
     }
     
+    /**
+     *  Remove all sessions for this runner.
+     */
     public void unregisterConnection(ClientConnectionRunner runner) {
-        _log.warn("Unregistering (dropping) a client connection");
+        if (_log.shouldLog(Log.WARN))
+            _log.warn("Unregistering (dropping) a client connection");
         synchronized (_pendingRunners) {
             _pendingRunners.remove(runner);
         }
-        if ( (runner.getConfig() != null) && (runner.getConfig().getDestination() != null) ) {
-            // after connection establishment
-            Destination dest = runner.getConfig().getDestination();
-            synchronized (_runners) {
-                SessionId id = runner.getSessionId();
-                if (id != null)
-                    _runnerSessionIds.remove(id);
+
+        List<SessionId> ids = runner.getSessionIds();
+        List<Destination> dests = runner.getDestinations();
+        synchronized (_runners) {
+            for (SessionId id : ids) {
+                _runnerSessionIds.remove(id);
+            }
+            for (Destination dest : dests) {
                 _runners.remove(dest);
                 _runnersByHash.remove(dest.calculateHash());
             }
+        }
+    }
+    
+    /**
+     *  Remove only the following session. Does not remove the runner if it has more.
+     *
+     *  @since 0.9.19
+     */
+    public void unregisterSession(SessionId id, Destination dest) {
+        if (_log.shouldLog(Log.WARN))
+            _log.warn("Unregistering client session "  + id);
+        synchronized (_runners) {
+            _runnerSessionIds.remove(id);
+            _runners.remove(dest);
+            _runnersByHash.remove(dest.calculateHash());
         }
     }
     
@@ -228,8 +250,7 @@ class ClientManager {
      *
      *  @return SessionStatusMessage return code, 1 for success, != 1 for failure
      */
-    public int destinationEstablished(ClientConnectionRunner runner) {
-        Destination dest = runner.getConfig().getDestination();
+    public int destinationEstablished(ClientConnectionRunner runner, Destination dest) {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("DestinationEstablished called for destination " + dest.calculateHash().toBase64());
 
@@ -244,9 +265,10 @@ class ClientManager {
             } else {
                 SessionId id = locked_getNextSessionId();
                 if (id != null) {
-                    runner.setSessionId(id);
+                    Hash h = dest.calculateHash();
+                    runner.setSessionId(h, id);
                     _runners.put(dest, runner);
-                    _runnersByHash.put(dest.calculateHash(), runner);
+                    _runnersByHash.put(h, runner);
                     rv = SessionStatusMessage.STATUS_CREATED;
                 } else {
                     rv = SessionStatusMessage.STATUS_REFUSED;
@@ -310,8 +332,11 @@ class ClientManager {
                 // sender went away
                 return;
             }
-            ClientMessage msg = new ClientMessage(toDest, payload, runner.getConfig(),
-                                                  runner.getConfig().getDestination(), msgId,
+            SessionConfig config = runner.getConfig(fromDest.calculateHash());
+            if (config == null)
+                return;
+            ClientMessage msg = new ClientMessage(toDest, payload, config,
+                                                  fromDest, msgId,
                                                   messageNonce, expiration, flags);
             _ctx.clientMessagePool().add(msg, true);
         }
@@ -347,7 +372,7 @@ class ClientManager {
         public void runJob() {
             _to.receiveMessage(_toDest, _fromDest, _payload);
             if (_from != null) {
-                _from.updateMessageDeliveryStatus(_msgId, _messageNonce, MessageStatusMessage.STATUS_SEND_SUCCESS_LOCAL);
+                _from.updateMessageDeliveryStatus(_fromDest, _msgId, _messageNonce, MessageStatusMessage.STATUS_SEND_SUCCESS_LOCAL);
             }
         }
     }
@@ -410,7 +435,9 @@ class ClientManager {
         if (destHash == null) return true;
         ClientConnectionRunner runner = getRunner(destHash);
         if (runner == null) return true;
-        return !Boolean.parseBoolean(runner.getConfig().getOptions().getProperty(ClientManagerFacade.PROP_CLIENT_ONLY));
+        SessionConfig config = runner.getConfig(destHash);
+        if (config == null) return true;
+        return !Boolean.parseBoolean(config.getOptions().getProperty(ClientManagerFacade.PROP_CLIENT_ONLY));
     }
 
     /**
@@ -437,7 +464,7 @@ class ClientManager {
     public SessionConfig getClientSessionConfig(Destination dest) {
         ClientConnectionRunner runner = getRunner(dest);
         if (runner != null)
-            return runner.getConfig();
+            return runner.getConfig(dest.calculateHash());
         else
             return null;
     }
@@ -475,7 +502,7 @@ class ClientManager {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Delivering status " + status + " to " 
                            + fromDest.calculateHash() + " for message " + id);
-            runner.updateMessageDeliveryStatus(id, messageNonce, status);
+            runner.updateMessageDeliveryStatus(fromDest, id, messageNonce, status);
         } else {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Cannot deliver status " + status + " to " 
@@ -499,7 +526,7 @@ class ClientManager {
         if (dest != null) {
             ClientConnectionRunner runner = getRunner(dest);
             if (runner != null) {
-                runner.reportAbuse(reason, severity);
+                runner.reportAbuse(dest, reason, severity);
             }
         } else {
             for (Destination d : _runners.keySet()) {
@@ -577,21 +604,22 @@ class ClientManager {
 
         public void runJob() {
             ClientConnectionRunner runner;
-            if (_msg.getDestination() != null) 
-                runner = getRunner(_msg.getDestination());
+            Destination dest = _msg.getDestination();
+            if (dest != null) 
+                runner = getRunner(dest);
             else 
                 runner = getRunner(_msg.getDestinationHash());
 
             if (runner != null) {
                 //_ctx.statManager().addRateData("client.receiveMessageSize", 
                 //                                   _msg.getPayload().getSize(), 0);
-                runner.receiveMessage(_msg.getDestination(), null, _msg.getPayload());
+                runner.receiveMessage(dest, null, _msg.getPayload());
             } else {
                 // no client connection...
                 // we should pool these somewhere...
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Message received but we don't have a connection to " 
-                              + _msg.getDestination() + "/" + _msg.getDestinationHash() 
+                              + dest + "/" + _msg.getDestinationHash() 
                               + " currently.  DROPPED");
             }
         }

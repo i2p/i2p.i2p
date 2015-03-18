@@ -8,10 +8,12 @@ package net.i2p.router.client;
  *
  */
 
+import net.i2p.data.Destination;
 import net.i2p.data.i2cp.AbuseReason;
 import net.i2p.data.i2cp.AbuseSeverity;
 import net.i2p.data.i2cp.I2CPMessageException;
 import net.i2p.data.i2cp.ReportAbuseMessage;
+import net.i2p.data.i2cp.SessionId;
 import net.i2p.router.JobImpl;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
@@ -23,17 +25,22 @@ import net.i2p.util.Log;
 class ReportAbuseJob extends JobImpl {
     private final Log _log;
     private final ClientConnectionRunner _runner;
+    private final Destination _dest;
     private final String _reason;
     private final int _severity;
-    public ReportAbuseJob(RouterContext context, ClientConnectionRunner runner, String reason, int severity) {
+
+    public ReportAbuseJob(RouterContext context, ClientConnectionRunner runner,
+                          Destination dest, String reason, int severity) {
         super(context);
         _log = context.logManager().getLog(ReportAbuseJob.class);
         _runner = runner;
+        _dest = dest;
         _reason = reason;
         _severity = severity;
     }
     
     public String getName() { return "Report Abuse"; }
+
     public void runJob() {
         if (_runner.isDead()) return;
         AbuseReason res = new AbuseReason();
@@ -41,9 +48,11 @@ class ReportAbuseJob extends JobImpl {
         AbuseSeverity sev = new AbuseSeverity();
         sev.setSeverity(_severity);
         ReportAbuseMessage msg = new ReportAbuseMessage();
-        msg.setMessageId(null);
         msg.setReason(res);
-        msg.setSessionId(_runner.getSessionId());
+        SessionId id = _runner.getSessionId(_dest.calculateHash());
+        if (id == null)
+            return;
+        msg.setSessionId(id);
         msg.setSeverity(sev);
         try {
             _runner.doSend(msg);

@@ -50,9 +50,9 @@ class I2PSessionImpl2 extends I2PSessionImpl {
 
     private static final long REMOVE_EXPIRED_TIME = 63*1000;
 
-     /**
-      * for extension by SimpleSession (no dest)
-      */
+    /**
+     * for extension by SimpleSession (no dest)
+     */
     protected I2PSessionImpl2(I2PAppContext context, Properties options,
                               I2PClientMessageHandlerMap handlerMap) {
         super(context, options, handlerMap);
@@ -61,15 +61,17 @@ class I2PSessionImpl2 extends I2PSessionImpl {
     }
 
     /**
+     * for extension by I2PSessionMuxedImpl
+     *
      * Create a new session, reading the Destination, PrivateKey, and SigningPrivateKey
      * from the destKeyStream, and using the specified options to connect to the router
      *
      * @param destKeyStream stream containing the private key data,
      *                             format is specified in {@link net.i2p.data.PrivateKeyFile PrivateKeyFile}
      * @param options set of options to configure the router with, if null will use System properties
-     * @throws I2PSessionException if there is a problem loading the private keys or 
+     * @throws I2PSessionException if there is a problem loading the private keys
      */
-    public I2PSessionImpl2(I2PAppContext ctx, InputStream destKeyStream, Properties options) throws I2PSessionException {
+    protected I2PSessionImpl2(I2PAppContext ctx, InputStream destKeyStream, Properties options) throws I2PSessionException {
         super(ctx, destKeyStream, options);
         _sendingStates = new ConcurrentHashMap<Long, MessageState>(32);
         _sendMessageNonce = new AtomicLong();
@@ -90,6 +92,26 @@ class I2PSessionImpl2 extends I2PSessionImpl {
         _context.statManager().createRateStat("i2cp.receiveStatusTime.4", "How long it took to get status=4 back", "i2cp", new long[] { 10*60*1000 });
         _context.statManager().createRateStat("i2cp.receiveStatusTime.5", "How long it took to get status=5 back", "i2cp", new long[] { 10*60*1000 });
         //_context.statManager().createRateStat("i2cp.receiveStatusTime", "How long it took to get any status", "i2cp", new long[] { 10*60*1000 });
+        _context.statManager().createRateStat("i2cp.tx.msgCompressed", "compressed size transferred", "i2cp", new long[] { 30*60*1000 });
+        _context.statManager().createRateStat("i2cp.tx.msgExpanded", "size before compression", "i2cp", new long[] { 30*60*1000 });
+    }
+
+    /*
+     * For extension by SubSession via I2PSessionMuxedImpl
+     *
+     * @param destKeyStream stream containing the private key data,
+     *                             format is specified in {@link net.i2p.data.PrivateKeyFile PrivateKeyFile}
+     * @param options set of options to configure the router with, if null will use System properties
+     * @since 0.9.19
+     */
+    protected I2PSessionImpl2(I2PSessionImpl primary, InputStream destKeyStream, Properties options) throws I2PSessionException {
+        super(primary, destKeyStream, options);
+        _sendingStates = new ConcurrentHashMap<Long, MessageState>(32);
+        _sendMessageNonce = new AtomicLong();
+        _noEffort = "none".equals(getOptions().getProperty(I2PClient.PROP_RELIABILITY, "").toLowerCase(Locale.US));
+        _context.statManager().createRateStat("i2cp.receiveStatusTime.1", "How long it took to get status=1 back", "i2cp", new long[] { 10*60*1000 });
+        _context.statManager().createRateStat("i2cp.receiveStatusTime.4", "How long it took to get status=4 back", "i2cp", new long[] { 10*60*1000 });
+        _context.statManager().createRateStat("i2cp.receiveStatusTime.5", "How long it took to get status=5 back", "i2cp", new long[] { 10*60*1000 });
         _context.statManager().createRateStat("i2cp.tx.msgCompressed", "compressed size transferred", "i2cp", new long[] { 30*60*1000 });
         _context.statManager().createRateStat("i2cp.tx.msgExpanded", "size before compression", "i2cp", new long[] { 30*60*1000 });
     }

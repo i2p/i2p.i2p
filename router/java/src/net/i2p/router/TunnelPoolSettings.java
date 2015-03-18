@@ -1,11 +1,13 @@
 package net.i2p.router;
 
+import java.util.Set;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 
 import net.i2p.data.Base64;
 import net.i2p.data.Hash;
+import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.NativeBigInteger;
 import net.i2p.util.RandomSource;
 import net.i2p.util.SystemVersion;
@@ -31,6 +33,8 @@ public class TunnelPoolSettings {
     private final Properties _unknownOptions;
     private Hash _randomKey;
     private int _priority;
+    private final Set<Hash> _aliases;
+    private Hash _aliasOf;
     
     /** prefix used to override the router's defaults for clients */
     // unimplemented
@@ -119,6 +123,10 @@ public class TunnelPoolSettings {
         _randomKey = generateRandomKey();
         if (_isExploratory && !_isInbound)
             _priority = EXPLORATORY_PRIORITY;
+        if (!_isExploratory)
+            _aliases = new ConcurrentHashSet<Hash>(4);
+        else
+            _aliases = null;
     }
     
     /** how many tunnels should be available at all times */
@@ -206,6 +214,34 @@ public class TunnelPoolSettings {
     
     /** what destination is this a client tunnel for (or null if exploratory) */
     public Hash getDestination() { return _destination; }
+    
+    /**
+     *  Other destinations that use the same tunnel (or null if exploratory)
+     *  Modifiable, concurrent, not a copy
+     *  @since 0.9.19
+     */
+    public Set<Hash> getAliases() {
+        return _aliases;
+    }
+
+    /**
+     *  Other destination that this is an alias of (or null).
+     *  If non-null, don't build tunnels.
+     *  @since 0.9.19
+     */
+    public Hash getAliasOf() {
+        return _aliasOf;
+    }
+
+
+    /**
+     *  Set other destination that this is an alias of (or null).
+     *  If non-null, don't build tunnels.
+     *  @since 0.9.19
+     */
+    public void setAliasOf(Hash h) {
+        _aliasOf = h;
+    }
 
     /**
      *  random key used for peer ordering
@@ -235,7 +271,7 @@ public class TunnelPoolSettings {
     public int getPriority() { return _priority; }
 
     public Properties getUnknownOptions() { return _unknownOptions; }
-    
+
     /**
      *  @param prefix non-null
      */

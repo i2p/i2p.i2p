@@ -82,6 +82,24 @@ class I2PSessionMuxedImpl extends I2PSessionImpl2 {
         // discards the one in super(), sorry about that... (no it wasn't started yet)
         _availabilityNotifier = new MuxedAvailabilityNotifier();
     }
+
+    /*
+     * For extension by SubSession
+     *
+     * @param destKeyStream stream containing the private key data,
+     *                             format is specified in {@link net.i2p.data.PrivateKeyFile PrivateKeyFile}
+     * @param options set of options to configure the router with, if null will use System properties
+     * @since 0.9.19
+     */
+    protected I2PSessionMuxedImpl(I2PSessionImpl primary, InputStream destKeyStream, Properties options) throws I2PSessionException {
+        super(primary, destKeyStream, options);
+        // also stored in _sessionListener but we keep it in _demultipexer
+        // as well so we don't have to keep casting
+        _demultiplexer =  new I2PSessionDemultiplexer(primary.getContext());
+        super.setSessionListener(_demultiplexer);
+        // discards the one in super(), sorry about that... (no it wasn't started yet)
+        _availabilityNotifier = new MuxedAvailabilityNotifier();
+    }
     
     /** listen on all protocols and ports */
     @Override

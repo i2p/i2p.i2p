@@ -16,6 +16,7 @@ import net.i2p.data.i2cp.I2CPMessage;
 import net.i2p.data.i2cp.I2CPMessageException;
 import net.i2p.data.i2cp.RequestLeaseSetMessage;
 import net.i2p.data.i2cp.RequestVariableLeaseSetMessage;
+import net.i2p.data.i2cp.SessionId;
 import net.i2p.router.JobImpl;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
@@ -63,13 +64,16 @@ class RequestLeaseSetJob extends JobImpl {
         //    _log.debug("Adding fudge " + fudge);
         endTime += fudge;
 
+        SessionId id = _runner.getSessionId(_requestState.getRequested().getDestination().calculateHash());
+        if (id == null)
+            return;
         I2CPMessage msg;
         if (getContext().getProperty(PROP_VARIABLE, DFLT_VARIABLE) &&
             (_runner instanceof QueuedClientConnectionRunner ||
              RequestVariableLeaseSetMessage.isSupported(_runner.getClientVersion()))) {
             // new style - leases will have individual expirations
             RequestVariableLeaseSetMessage rmsg = new RequestVariableLeaseSetMessage();
-            rmsg.setSessionId(_runner.getSessionId());
+            rmsg.setSessionId(id);
             for (int i = 0; i < requested.getLeaseCount(); i++) {
                 Lease lease = requested.getLease(i);
                 if (lease.getEndDate().getTime() < endTime) {
@@ -90,7 +94,7 @@ class RequestLeaseSetJob extends JobImpl {
             RequestLeaseSetMessage rmsg = new RequestLeaseSetMessage();
             Date end = new Date(endTime);
             rmsg.setEndDate(end);
-            rmsg.setSessionId(_runner.getSessionId());
+            rmsg.setSessionId(id);
             for (int i = 0; i < requested.getLeaseCount(); i++) {
                 Lease lease = requested.getLease(i);
                 rmsg.addEndpoint(lease.getGateway(),
@@ -144,8 +148,7 @@ class RequestLeaseSetJob extends JobImpl {
                 CheckLeaseRequestStatus.this.getContext().statManager().addRateData("client.requestLeaseSetTimeout", 1);
                 if (_log.shouldLog(Log.ERROR)) {
                     long waited = System.currentTimeMillis() - _start;
-                    _log.error("Failed to receive a leaseSet in the time allotted (" + waited + "): " + _requestState + " for " 
-                             + _runner.getConfig().getDestination().calculateHash().toBase64());
+                    _log.error("Failed to receive a leaseSet in the time allotted (" + waited + "): " + _requestState);
                 }
                 if (_requestState.getOnFailed() != null)
                     RequestLeaseSetJob.this.getContext().jobQueue().addJob(_requestState.getOnFailed());

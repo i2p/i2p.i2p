@@ -97,7 +97,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         ctx.statManager().createRateStat("tunnel.testAborted", "Tunnel test could not occur, since there weren't any tunnels to test with", "Tunnels", 
                                          RATES);
     }
-    
+
     /**
      * Pick a random inbound exploratory tunnel.
      * Warning - selectInboundExploratoryTunnel(Hash) is preferred.
@@ -113,7 +113,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         }
         return info;
     }
-    
+
     /**
      * Pick a random inbound tunnel from the given destination's pool.
      * Warning - selectOutboundTunnel(Hash, Hash) is preferred.
@@ -132,7 +132,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
                      " but there isn't a pool?");
         return null;
     }
-    
+
     /**
      * Pick a random outbound exploratory tunnel.
      * Warning - selectOutboundExploratoryTunnel(Hash) is preferred.
@@ -148,7 +148,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         }
         return info;
     }
-    
+
     /**
      * Pick a random outbound tunnel from the given destination's pool.
      * Warning - selectOutboundTunnel(Hash, Hash) is preferred.
@@ -164,7 +164,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         }
         return null;
     }
-    
+
     /**
      * Pick the inbound exploratory tunnel with the gateway closest to the given hash.
      * By using this instead of the random selectTunnel(),
@@ -184,7 +184,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         }
         return info;
     }
-    
+
     /**
      * Pick the inbound tunnel with the gateway closest to the given hash
      * from the given destination's pool.
@@ -208,7 +208,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
                      " but there isn't a pool?");
         return null;
     }
-    
+
     /**
      * Pick the outbound exploratory tunnel with the endpoint closest to the given hash.
      * By using this instead of the random selectTunnel(),
@@ -228,7 +228,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         }
         return info;
     }
-    
+
     /**
      * Pick the outbound tunnel with the endpoint closest to the given hash
      * from the given destination's pool.
@@ -249,7 +249,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         }
         return null;
     }
-    
+
     /**
      *  Expensive (iterates through all tunnels of all pools) and unnecessary.
      *  @deprecated unused
@@ -267,7 +267,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         if (info != null) return info;
         return null;
     }
-    
+
     /** @return number of inbound exploratory tunnels */
     public int getFreeTunnelCount() { 
             return _inboundExploratory.size(); 
@@ -304,10 +304,11 @@ public class TunnelPoolManager implements TunnelManagerFacade {
             return pool.getTunnelCount();
         return 0;
     }
-    
+
     public int getParticipatingCount() { return _context.tunnelDispatcher().getParticipatingCount(); }
+
     public long getLastParticipatingExpiration() { return _context.tunnelDispatcher().getLastParticipatingExpiration(); }
-    
+
     /**
      *  @return (number of part. tunnels) / (estimated total number of hops in our expl.+client tunnels)
      *  100 max.
@@ -329,7 +330,6 @@ public class TunnelPoolManager implements TunnelManagerFacade {
             return 100d;
         return Math.min(part / (double) count, 100d);
     }
-
 
     public boolean isValidTunnel(Hash client, TunnelInfo tunnel) {
         if (tunnel.getExpiration() < _context.clock().now())
@@ -386,17 +386,18 @@ public class TunnelPoolManager implements TunnelManagerFacade {
             pool.setSettings(settings);
         }
     }
-    
+
     public synchronized void restart() { 
         _handler.restart();
         _executor.restart();
         shutdownExploratory();
         startup();
     }
-        
+
     /**
      *  Used only at session startup.
      *  Do not use to change settings.
+     *  Do not use for aliased destinations; use addAlias().
      */
     public void buildTunnels(Destination client, ClientTunnelSettings settings) {
         Hash dest = client.calculateHash();
@@ -434,8 +435,68 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         else
             outbound.startup();
     }
-    
-    
+
+    /**
+     *  Add another destination to the same tunnels.
+     *  Must have same encryption key an a different signing key.
+     *  @throws IllegalArgumentException if not
+     *  @return success
+     *  @since 0.9.19
+     */
+    public boolean addAlias(Destination dest, ClientTunnelSettings settings, Destination existingClient) {
+        if (dest.getSigningPublicKey().equals(existingClient.getSigningPublicKey()))
+            throw new IllegalArgumentException("signing key must differ");
+        if (!dest.getPublicKey().equals(existingClient.getPublicKey()))
+            throw new IllegalArgumentException("encryption key mismatch");
+        Hash h = dest.calculateHash();
+        Hash e = existingClient.calculateHash();
+        synchronized(this) {
+            TunnelPool inbound = _clientInboundPools.get(e);
+            TunnelPool outbound = _clientOutboundPools.get(e);
+/////// gah same tunnel pool or different?
+            if (inbound == null || outbound == null)
+                return false;
+            _clientInboundPools.put(h, inbound);
+            _clientOutboundPools.put(h, outbound);
+        }
+        return true;
+    }
+
+    /**
+     *  Remove a destination for the same tunnels as another.
+     *  @since 0.9.19
+     */
+    public void removeAlias(Destination dest) {
+        Hash h = dest.calculateHash();
+        synchronized(this) {
+            TunnelPool inbound = _clientInboundPools.remove(h);
+            if (inbound != null) {
+                Hash p = inbound.getSettings().getAliasOf();
+                if (p != null) {
+                    TunnelPool pri = _clientInboundPools.get(p);
+                    if (pri != null) {
+                        Set<Hash> aliases = pri.getSettings().getAliases();
+                        if (aliases != null)
+                            aliases.remove(h);
+                    }
+                }
+            }
+            TunnelPool outbound = _clientOutboundPools.remove(h);
+            if (outbound != null) {
+                Hash p = inbound.getSettings().getAliasOf();
+                if (p != null) {
+                    TunnelPool pri = _clientInboundPools.get(p);
+                    if (pri != null) {
+                        Set<Hash> aliases = pri.getSettings().getAliases();
+                        if (aliases != null)
+                            aliases.remove(h);
+                    }
+                }
+            }
+            // TODO if primary already vanished...
+        }
+    }
+
     private static class DelayedStartup implements SimpleTimer.TimedEvent {
         private final TunnelPool pool;
 
@@ -469,7 +530,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         if (outbound != null)
             outbound.shutdown();
     }
-    
+
     /** queue a recurring test job if appropriate */
     void buildComplete(PooledTunnelCreatorConfig cfg) {
         if (cfg.getLength() > 1 &&
@@ -518,7 +579,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         _context.jobQueue().addJob(new BootstrapPool(_context, _inboundExploratory));
         _context.jobQueue().addJob(new BootstrapPool(_context, _outboundExploratory));
     }
-    
+
     private static class BootstrapPool extends JobImpl {
         private TunnelPool _pool;
         public BootstrapPool(RouterContext ctx, TunnelPool pool) {
@@ -531,7 +592,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
             _pool.buildFallback();
         }
     }
-    
+
     /**
      *  Cannot be restarted
      */
@@ -546,7 +607,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
             _inboundExploratory.shutdown();
             _outboundExploratory.shutdown();
     }
-    
+
     /** list of TunnelPool instances currently in play */
     public void listPools(List<TunnelPool> out) {
         out.addAll(_clientInboundPools.values());

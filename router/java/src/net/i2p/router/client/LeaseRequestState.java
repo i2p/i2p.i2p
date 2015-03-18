@@ -40,6 +40,7 @@ class LeaseRequestState {
     
     /** created lease set from client - FIXME always null */
     public LeaseSet getGranted() { return _grantedLeaseSet; }
+
     /** FIXME unused - why? */
     public void setGranted(LeaseSet ls) { _grantedLeaseSet = ls; }
 

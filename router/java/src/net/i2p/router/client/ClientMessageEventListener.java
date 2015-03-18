@@ -195,12 +195,13 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
      */
     private void handleCreateSession(CreateSessionMessage message) {
         SessionConfig in = message.getSessionConfig();
+        Destination dest = in.getDestination();
         if (in.verifySignature()) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Signature verified correctly on create session message");
         } else {
             // For now, we do NOT send a SessionStatusMessage - see javadoc above
-            int itype = in.getDestination().getCertificate().getCertificateType();
+            int itype = dest.getCertificate().getCertificateType();
             SigType stype = SigType.getByCode(itype);
             if (stype == null || !stype.isAvailable()) {
                 _log.error("Client requested unsupported signature type " + itype);
@@ -217,7 +218,7 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
         if (!checkAuth(inProps))
             return;
 
-        SessionId id = _runner.getSessionId();
+        SessionId id = _runner.getSessionId(dest.calculateHash());
         if (id != null) {
             _runner.disconnectClient("Already have session " + id);
             return;
@@ -226,11 +227,12 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
         // Copy over the whole config structure so we don't later corrupt it on
         // the client side if we change settings or later get a
         // ReconfigureSessionMessage
-        SessionConfig cfg = new SessionConfig(in.getDestination());
+        SessionConfig cfg = new SessionConfig(dest);
         cfg.setSignature(in.getSignature());
         Properties props = new Properties();
         props.putAll(in.getOptions());
         cfg.setOptions(props);
+        boolean isPrimary = _runner.getSessionIds().isEmpty();
         int status = _runner.sessionEstablished(cfg);
         if (status != SessionStatusMessage.STATUS_CREATED) {
             // For now, we do NOT send a SessionStatusMessage - see javadoc above
@@ -246,11 +248,29 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
             _runner.disconnectClient(msg);
             return;
         }
-        sendStatusMessage(status);
+        sendStatusMessage(id, status);
 
         if (_log.shouldLog(Log.INFO))
-            _log.info("Session " + _runner.getSessionId() + " established for " + _runner.getDestHash());
-        startCreateSessionJob();
+            _log.info("Session " + id + " established for " + dest.calculateHash());
+        if (isPrimary) {
+            startCreateSessionJob(cfg);
+        } else {
+            SessionConfig pcfg = _runner.getPrimaryConfig();
+            if (pcfg != null) {
+                ///////////
+                // new tunnel name etc.
+                ClientTunnelSettings settings = new ClientTunnelSettings(dest.calculateHash());
+                // all the primary options, then the overrides from the alias
+                props.putAll(pcfg.getOptions());
+                props.putAll(props);
+                settings.readFromProperties(props);
+                boolean ok = _context.tunnelManager().addAlias(dest, settings, pcfg.getDestination());
+                if (!ok) {
+                    _log.error("Add alias failed");
+                    // send status message...
+                }
+            }
+        }
     }
     
     /**
@@ -296,8 +316,8 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
      *  @since 0.9.8
      *
      */
-    protected void startCreateSessionJob() {
-        _context.jobQueue().addJob(new CreateSessionJob(_context, _runner));
+    protected void startCreateSessionJob(SessionConfig config) {
+        _context.jobQueue().addJob(new CreateSessionJob(_context, config));
     }
     
     /**
@@ -311,7 +331,8 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
         long beforeDistribute = _context.clock().now();
         MessageId id = _runner.distributeMessage(message);
         long timeToDistribute = _context.clock().now() - beforeDistribute;
-        _runner.ackSendMessage(id, message.getNonce());
+        // TODO validate session id
+        _runner.ackSendMessage(message.getSessionId(), id, message.getNonce());
         _context.statManager().addRateData("client.distributeTime", timeToDistribute);
         if ( (timeToDistribute > 50) && (_log.shouldLog(Log.INFO)) )
             _log.info("Took too long to distribute the message (which holds up the ack): " + timeToDistribute);
@@ -328,7 +349,8 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
             _log.debug("Handling recieve begin: id = " + message.getMessageId());
         MessagePayloadMessage msg = new MessagePayloadMessage();
         msg.setMessageId(message.getMessageId());
-        msg.setSessionId(_runner.getSessionId().getSessionId());
+        // TODO validate session id
+        msg.setSessionId(message.getSessionId());
         Payload payload = _runner.getPayload(new MessageId(message.getMessageId()));
         if (payload == null) {
             if (_log.shouldLog(Log.WARN))
@@ -357,9 +379,18 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
     }
     
     private void handleDestroySession(DestroySessionMessage message) {
-        if (_log.shouldLog(Log.INFO))
-            _log.info("Destroying client session " + _runner.getSessionId());
-        _runner.stopRunning();
+        SessionId id = message.getSessionId();
+        SessionConfig cfg = _runner.getConfig(id);
+        _runner.removeSession(id);
+        int left = _runner.getSessionIds().size();
+        if (left <= 0) {
+            _runner.stopRunning();
+        } else {
+            if (cfg != null)
+                _context.tunnelManager().removeAlias(cfg.getDestination());
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Still " + left + " sessions left");
+        }
     }
     
     /** override for testing */
@@ -370,7 +401,13 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
             _runner.disconnectClient("Invalid CreateLeaseSetMessage");
             return;
         }
-        Destination dest = _runner.getConfig().getDestination();
+        SessionId id = message.getSessionId();
+        SessionConfig config = _runner.getConfig(id);
+        if (config == null) {
+            _log.error("Unknown session in CLSM");
+            return;
+        }
+        Destination dest = config.getDestination();
         Destination ndest = message.getLeaseSet().getDestination();
         if (!dest.equals(ndest)) {
             if (_log.shouldLog(Log.ERROR))
@@ -414,8 +451,7 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
             return;
         }
         if (_log.shouldLog(Log.INFO))
-            _log.info("New lease set granted for destination " 
-                      + _runner.getDestHash());
+            _log.info("New lease set granted for destination " + dest);
 
         // leaseSetCreated takes care of all the LeaseRequestState stuff (including firing any jobs)
         _runner.leaseSetCreated(message.getLeaseSet());
@@ -423,6 +459,7 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
 
     /** override for testing */
     protected void handleDestLookup(DestLookupMessage message) {
+        // no session id in DLM
         _context.jobQueue().addJob(new LookupDestJob(_context, _runner, message.getHash(),
                                                      _runner.getDestHash()));
     }
@@ -432,10 +469,12 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
      * @since 0.9.11
      */
     protected void handleHostLookup(HostLookupMessage message) {
+        Hash h = _runner.getDestHash(message.getSessionId());
+        if (h == null)
+            return;  // ok?
         _context.jobQueue().addJob(new LookupDestJob(_context, _runner, message.getReqID(),
                                                      message.getTimeout(), message.getSessionId(),
-                                                     message.getHash(), message.getHostname(),
-                                                     _runner.getDestHash()));
+                                                     message.getHash(), message.getHostname(), h));
     }
 
     /**
@@ -447,32 +486,37 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
      * ClientConnectionRunner.sessionEstablished(). Those can't be changed later.
      */
     private void handleReconfigureSession(ReconfigureSessionMessage message) {
+        SessionId id = message.getSessionId();
+        SessionConfig config = _runner.getConfig(id);
+        if (config == null) {
+            _log.error("Unknown session");
+            sendStatusMessage(id, SessionStatusMessage.STATUS_INVALID);
+            //_runner.stopRunning(); // ok?
+            return;
+        }
         if (_log.shouldLog(Log.INFO))
-            _log.info("Updating options - old: " + _runner.getConfig() + " new: " + message.getSessionConfig());
-        if (!message.getSessionConfig().getDestination().equals(_runner.getConfig().getDestination())) {
+            _log.info("Updating options - old: " + _runner.getConfig(id) + " new: " + message.getSessionConfig());
+        if (!message.getSessionConfig().getDestination().equals(config.getDestination())) {
             _log.error("Dest mismatch");
-            sendStatusMessage(SessionStatusMessage.STATUS_INVALID);
+            sendStatusMessage(id, SessionStatusMessage.STATUS_INVALID);
             _runner.stopRunning();
             return;
         }
-        _runner.getConfig().getOptions().putAll(message.getSessionConfig().getOptions());
-        Hash dest = _runner.getDestHash();
+        Hash dest = config.getDestination().calculateHash();
+        config.getOptions().putAll(message.getSessionConfig().getOptions());
         ClientTunnelSettings settings = new ClientTunnelSettings(dest);
         Properties props = new Properties();
-        props.putAll(_runner.getConfig().getOptions());
+        props.putAll(config.getOptions());
         settings.readFromProperties(props);
         _context.tunnelManager().setInboundSettings(dest,
                                                     settings.getInboundSettings());
         _context.tunnelManager().setOutboundSettings(dest,
                                                      settings.getOutboundSettings());
-        sendStatusMessage(SessionStatusMessage.STATUS_UPDATED);
+        sendStatusMessage(id, SessionStatusMessage.STATUS_UPDATED);
     }
     
-    private void sendStatusMessage(int status) {
+    private void sendStatusMessage(SessionId id, int status) {
         SessionStatusMessage msg = new SessionStatusMessage();
-        SessionId id = _runner.getSessionId();
-        if (id == null)
-            id = ClientManager.UNKNOWN_SESSION_ID;
         msg.setSessionId(id);
         msg.setStatus(status);
         try {

@@ -14,6 +14,7 @@ import net.i2p.data.i2cp.I2CPMessageException;
 import net.i2p.data.i2cp.MessageId;
 import net.i2p.data.i2cp.MessagePayloadMessage;
 import net.i2p.data.i2cp.MessageStatusMessage;
+import net.i2p.data.i2cp.SessionId;
 import net.i2p.router.JobImpl;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
@@ -26,14 +27,20 @@ import net.i2p.util.Log;
 class MessageReceivedJob extends JobImpl {
     private final Log _log;
     private final ClientConnectionRunner _runner;
+    private final Destination _toDest;
     private final Payload _payload;
     private final boolean _sendDirect;
 
+    /**
+     *  @param toDest requred to pick session
+     *  @param fromDest ignored, generally null
+     */
     public MessageReceivedJob(RouterContext ctx, ClientConnectionRunner runner, Destination toDest,
                               Destination fromDest, Payload payload, boolean sendDirect) {
         super(ctx);
         _log = ctx.logManager().getLog(MessageReceivedJob.class);
         _runner = runner;
+        _toDest = toDest;
         _payload = payload;
         _sendDirect = sendDirect;
     }
@@ -43,8 +50,8 @@ class MessageReceivedJob extends JobImpl {
     public void runJob() {
         if (_runner.isDead()) return;
         MessageId id = null;
-        long nextID = _runner.getNextMessageId();
         try {
+            long nextID = _runner.getNextMessageId();
             if (_sendDirect) {
                 sendMessage(nextID);
             } else {
@@ -55,7 +62,7 @@ class MessageReceivedJob extends JobImpl {
         } catch (I2CPMessageException ime) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Error writing out the message", ime);
-            if (!_sendDirect)
+            if (id != null && !_sendDirect)
                 _runner.removePayload(id);
         }
     }
@@ -69,7 +76,13 @@ class MessageReceivedJob extends JobImpl {
         //               + " (with nonce=1)", new Exception("available"));
         MessageStatusMessage msg = new MessageStatusMessage();
         msg.setMessageId(id.getMessageId());
-        msg.setSessionId(_runner.getSessionId().getSessionId());
+        SessionId sid = _runner.getSessionId(_toDest.calculateHash());
+        if (sid == null) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("No session for " + _toDest.calculateHash());
+            return;
+        }
+        msg.setSessionId(sid.getSessionId());
         msg.setSize(size);
         // has to be >= 0, it is initialized to -1
         msg.setNonce(1);
@@ -84,7 +97,13 @@ class MessageReceivedJob extends JobImpl {
     private void sendMessage(long id) throws I2CPMessageException {
         MessagePayloadMessage msg = new MessagePayloadMessage();
         msg.setMessageId(id);
-        msg.setSessionId(_runner.getSessionId().getSessionId());
+        SessionId sid = _runner.getSessionId(_toDest.calculateHash());
+        if (sid == null) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("No session for " + _toDest.calculateHash());
+            return;
+        }
+        msg.setSessionId(sid.getSessionId());
         msg.setPayload(_payload);
         _runner.doSend(msg);
     }

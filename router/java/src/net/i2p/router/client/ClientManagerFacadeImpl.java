@@ -90,7 +90,7 @@ public class ClientManagerFacadeImpl extends ClientManagerFacade implements Inte
         for (Destination dest : _manager.getRunnerDestinations()) {
             ClientConnectionRunner runner = _manager.getRunner(dest);
             if ( (runner == null) || (runner.getIsDead())) continue;
-            LeaseSet ls = runner.getLeaseSet();
+            LeaseSet ls = runner.getLeaseSet(dest.calculateHash());
             if (ls == null)
                 continue; // still building
             long howLongAgo = _context.clock().now() - ls.getEarliestLeaseDate();

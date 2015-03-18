@@ -1,14 +1,17 @@
 package net.i2p.client.streaming.impl;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.ConnectException;
 import java.net.NoRouteToHostException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -37,6 +40,7 @@ public class I2PSocketManagerFull implements I2PSocketManager {
     private final I2PAppContext _context;
     private final Log _log;
     private final I2PSession _session;
+    private final List<I2PSession> _subsessions;
     private final I2PServerSocketFull _serverSocket;
     private StandardServerSocket _realServerSocket;
     private final ConnectionOptions _defaultOptions;
@@ -80,6 +84,7 @@ public class I2PSocketManagerFull implements I2PSocketManager {
     public I2PSocketManagerFull(I2PAppContext context, I2PSession session, Properties opts, String name) {
         _context = context;
         _session = session;
+        _subsessions = new CopyOnWriteArrayList<I2PSession>();
         _log = _context.logManager().getLog(I2PSocketManagerFull.class);
         
         _name = name + " " + (__managerId.incrementAndGet());
@@ -115,6 +120,39 @@ public class I2PSocketManagerFull implements I2PSocketManager {
      */
     public I2PSession getSession() {
         return _session;
+    }
+    
+//////////// gahhh we want a socket manager, not a session
+    /**
+     *  @return a new subsession, non-null
+     *  @param privateKeyStream null for transient, if non-null must have same encryption keys as primary session
+     *                          and different signing keys
+     *  @param opts subsession options if any, may be null
+     *  @since 0.9.19
+     */
+    public I2PSession addSubsession(InputStream privateKeyStream, Properties opts) throws I2PSessionException {
+        I2PSession rv = _session.addSubsession(privateKeyStream, opts);
+        _subsessions.add(rv);
+        return rv;
+    }
+    
+    /**
+     *  Remove the subsession
+     *
+     *  @since 0.9.19
+     */
+    public void removeSubsession(I2PSession session) {
+        _session.removeSubsession(session);
+        _subsessions.remove(session);
+        // ...
+    }
+    
+    /**
+     *  @return a list of subsessions, non-null, does not include the primary session
+     *  @since 0.9.19
+     */
+    public List<I2PSession> getSubsessions() {
+        return _session.getSubsessions();
     }
     
     public ConnectionManager getConnectionManager() {

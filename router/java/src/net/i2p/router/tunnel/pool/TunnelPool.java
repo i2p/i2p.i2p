@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 import java.util.TreeSet;
 
 import net.i2p.data.Hash;
@@ -609,6 +610,12 @@ public class TunnelPool {
             }
             if (ls != null) {
                 _context.clientManager().requestLeaseSet(_settings.getDestination(), ls);
+                Set<Hash> aliases = _settings.getAliases();
+                if (aliases != null && !aliases.isEmpty()) {
+                    for (Hash h : aliases) {
+                        _context.clientManager().requestLeaseSet(h, ls);
+                    }
+                }
             }
         }
     }
