@@ -34,7 +34,7 @@ class FloodfillMonitorJob extends JobImpl {
 
     private static final int MIN_FF = 5000;
     private static final int MAX_FF = 999999;
-    private static final String PROP_FLOODFILL_PARTICIPANT = "router.floodfillParticipant";
+    static final String PROP_FLOODFILL_PARTICIPANT = "router.floodfillParticipant";
     
     public FloodfillMonitorJob(RouterContext context, FloodfillNetworkDatabaseFacade facade) {
         super(context);

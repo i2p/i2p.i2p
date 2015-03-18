@@ -94,7 +94,11 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
      */
     @Override
     public synchronized void shutdown() {
-        if (_floodfillEnabled) {
+        // only if not forced ff or not restarting
+        if (_floodfillEnabled &&
+            (!_context.getBooleanProperty(FloodfillMonitorJob.PROP_FLOODFILL_PARTICIPANT) ||
+             !(_context.router().scheduledGracefulExitCode() == Router.EXIT_HARD_RESTART ||
+               _context.router().scheduledGracefulExitCode() == Router.EXIT_GRACEFUL_RESTART))) {
             // turn off to build a new RI...
             _floodfillEnabled = false;
             // true -> publish inline
