@@ -1,6 +1,9 @@
 package net.i2p.router.networkdb.reseed;
 
 import java.io.File;
+import java.io.InputStream;
+import java.io.IOException;
+import java.net.URL;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import net.i2p.router.RouterContext;
@@ -107,6 +110,55 @@ public class ReseedChecker {
     }
 
     /**
+     *  Start a reseed from a zip or su3 URI.
+     *
+     *  @return true if a reseed was started, false if already in progress
+     *  @throws IllegalArgumentException if it doesn't end with zip or su3
+     *  @since 0.9.19
+     */
+    public boolean requestReseed(URL url) throws IllegalArgumentException {
+        if (_inProgress.compareAndSet(false, true)) {
+            Reseeder reseeder = new Reseeder(_context, this);
+            try {
+                reseeder.requestReseed(url);
+                return true;
+            } catch (IllegalArgumentException iae) {
+                done();
+                throw iae;
+            } catch (Throwable t) {
+                _log.error("Reseed failed to start", t);
+                done();
+                return false;
+            }
+        } else {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Reseed already in progress");
+            return false;
+        }
+    }
+
+    /**
+     *  Reseed from a zip or su3 input stream. Blocking.
+     *
+     *  @return true if a reseed was started, false if already in progress
+     *  @throws IOException if already in progress or on most other errors
+     *  @since 0.9.19
+     */
+    public int requestReseed(InputStream in) throws IOException {
+        // don't really need to check for in progress here
+        if (_inProgress.compareAndSet(false, true)) {
+            try {
+                Reseeder reseeder = new Reseeder(_context, this);
+                return reseeder.requestReseed(in);
+            } finally {
+                done();
+            }
+        } else {
+            throw new IOException("Reseed already in progress");
+        }
+    }
+
+    /**         .
      *  Is a reseed in progress?
      *
      *  @since 0.9

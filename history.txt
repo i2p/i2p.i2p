@@ -1,9 +1,20 @@
+2015-03-19 zzz
+ * Reseed:
+  - Add form to manually reseed from zip or su3 URL
+  - Add form to manually reseed from local zip or su3 file
+  - Add form to create reseed zip file to share
+  - Backend support and refactoring in reseed code
+
 2015-03-18 zzz
  * NetDB:
   - Send exploratory lookups directly to the floodfill if
     we are already connected to him
   - Don't encrypt RI lookups when overloaded
   - Don't explore when overloaded
+  - Don't publish non-ff RI on exit if we are coming right back
+ * Router: Allow disabling the setting of some System properties, for embedded applications
+ * StatisticsManager: Publish dummy LS count if we just started
+ * Streaming: Reduce min RTO again
  * Tunnels: Drop instead of reject requests on high job lag
  * UPnP: Update to cyberlink 3.0
 

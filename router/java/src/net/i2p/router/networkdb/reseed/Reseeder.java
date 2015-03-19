@@ -1,9 +1,12 @@
 package net.i2p.router.networkdb.reseed;
 
+import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -130,11 +133,87 @@ public class Reseeder {
         _checker = rc;
     }
 
+    /**
+     *  Start a reseed using the default reseed URLs.
+     *  Supports su3 and directories.
+     *  Threaded, nonblocking.
+     */
     void requestReseed() {
         ReseedRunner reseedRunner = new ReseedRunner();
         // set to daemon so it doesn't hang a shutdown
         Thread reseed = new I2PAppThread(reseedRunner, "Reseed", true);
         reseed.start();
+    }
+
+    /**
+     *  Start a reseed from a single zip or su3 URL only.
+     *  Threaded, nonblocking.
+     *
+     *  @throws IllegalArgumentException if it doesn't end with zip or su3
+     *  @since 0.9.19
+     */
+    void requestReseed(URL url) throws IllegalArgumentException {
+        ReseedRunner reseedRunner = new ReseedRunner(url);
+        // set to daemon so it doesn't hang a shutdown
+        Thread reseed = new I2PAppThread(reseedRunner, "Reseed", true);
+        reseed.start();
+    }
+
+    /**
+     *  Start a reseed from a zip or su3 input stream.
+     *  Blocking, inline. Should be fast.
+     *  This will close the stream.
+     *
+     *  @return number of valid routerinfos imported
+     *  @throws IOException on most errors
+     *  @since 0.9.19
+     */
+    int requestReseed(InputStream in) throws IOException {
+        byte[] su3Magic = DataHelper.getASCII(SU3File.MAGIC);
+        byte[] zipMagic = new byte[] { 0x1F, (byte) 0x8B, 0x08 };
+        int len = Math.max(su3Magic.length, zipMagic.length);
+        byte[] magic = new byte[len];
+        File tmp =  null;
+        OutputStream out = null;
+        try {
+            DataHelper.read(in, magic);
+            boolean isSU3;
+            if (DataHelper.eq(magic, 0, su3Magic, 0, su3Magic.length))
+                isSU3 = true;
+            else if (DataHelper.eq(magic, 0, zipMagic, 0, zipMagic.length))
+                isSU3 = false;
+            else
+                throw new IOException("Not a zip or su3 file");
+            tmp =  new File(_context.getTempDir(), "manualreseeds-" + _context.random().nextInt() + (isSU3 ? ".su3" : ".zip"));
+            out = new BufferedOutputStream(new SecureFileOutputStream(tmp));
+            out.write(magic);
+            byte buf[] = new byte[16*1024];
+            int read = 0;
+            while ( (read = in.read(buf)) != -1) 
+                out.write(buf, 0, read);
+            out.close();
+            int[] stats;
+            ReseedRunner reseedRunner = new ReseedRunner();
+            // inline
+            if (isSU3)
+                stats = reseedRunner.extractSU3(tmp);
+            else
+                stats = reseedRunner.extractZip(tmp);
+            int fetched = stats[0];
+            int errors = stats[1];
+            if (fetched <= 0)
+                throw new IOException("No seeds extracted");
+            _checker.setStatus(
+                _("Reseeding: got router info from file ({0} successful, {1} errors).", fetched, errors));
+            System.err.println("Reseed got " + fetched + " router infos from file with " + errors + " errors");
+            _context.router().eventLog().addEvent(EventLog.RESEED, fetched + " from file");
+            return fetched;
+        } finally {
+            try { in.close(); } catch (IOException ioe) {}
+            if (out != null)  try { out.close(); } catch (IOException ioe) {}
+            if (tmp != null)
+                tmp.delete();
+        }
     }
 
     private class ReseedRunner implements Runnable, EepGet.StatusListener {
@@ -147,8 +226,28 @@ public class Reseeder {
         /** bytes per sec for each su3 downloaded */
         private final List<Long> _bandwidths;
         private static final int MAX_DATE_SETS = 2;
+        private final URL _url;
 
+        /**
+         *  Start a reseed from the default URL list
+         */
         public ReseedRunner() {
+            _url = null;
+            _bandwidths = new ArrayList<Long>(4);
+        }
+
+        /**
+         *  Start a reseed from this URL only, or null for trying one or more from the default list.
+         *
+         *  @param url if non-null, must be a zip or su3 URL, NOT a directory
+         *  @throws IllegalArgumentException if it doesn't end with zip or su3
+         *  @since 0.9.19
+         */
+        public ReseedRunner(URL url) throws IllegalArgumentException {
+            String lc = url.getPath().toLowerCase(Locale.US);
+            if (!(lc.endsWith(".zip") || lc.endsWith(".su3")))
+                throw new IllegalArgumentException("Reseed URL must end with .zip or .su3");
+            _url = url;
             _bandwidths = new ArrayList<Long>(4);
         }
 
@@ -173,7 +272,18 @@ public class Reseeder {
                 _proxyPort = _context.getProperty(PROP_PROXY_PORT, -1);
             }
             System.out.println("Reseed start");
-            int total = reseed(false);
+            int total;
+            if (_url != null) {
+                String lc = _url.getPath().toLowerCase(Locale.US);
+                if (lc.endsWith(".su3"))
+                    total = reseedSU3(_url, false);
+                else if (lc.endsWith(".zip"))
+                    total = reseedZip(_url, false);
+                else
+                    throw new IllegalArgumentException("Must end with .zip or .su3");
+            } else {
+                total = reseed(false);
+            }
             if (total >= 50) {
                 System.out.println("Reseed complete, " + total + " received");
                 _checker.setError("");
@@ -319,6 +429,18 @@ public class Reseeder {
                 Collections.shuffle(URLList2, _context.random());
                 URLList.addAll(URLList2);
             }
+            return reseed(URLList, echoStatus);
+        }
+
+        /**
+        * Reseed has been requested, so lets go ahead and do it.  Fetch all of
+        * the routerInfo-*.dat files from the specified URLs
+        * save them into this router's netDb dir.
+        *
+        * @param echoStatus apparently always false
+        * @return count of routerinfos successfully fetched
+        */
+        private int reseed(List<URL> URLList, boolean echoStatus) {
             int total = 0;
             for (int i = 0; i < URLList.size() && _isRunning; i++) {
                 URL url = URLList.get(i);
@@ -470,12 +592,38 @@ public class Reseeder {
          *  @return count of routerinfos successfully fetched
          *  @since 0.9.14
          **/
-        private int reseedSU3(URL seedURL, boolean echoStatus) {
+        public int reseedSU3(URL seedURL, boolean echoStatus) {
+            return reseedSU3OrZip(seedURL, true, echoStatus);
+        }
+
+        /**
+         *  Fetch a zip file containing routerInfo files
+         *
+         *  We update the status here.
+         *
+         *  @param seedURL the URL of the zip file
+         *  @param echoStatus apparently always false
+         *  @return count of routerinfos successfully fetched
+         *  @since 0.9.19
+         **/
+        public int reseedZip(URL seedURL, boolean echoStatus) {
+            return reseedSU3OrZip(seedURL, false, echoStatus);
+        }
+
+        /**
+         *  Fetch an su3 or zip file containing routerInfo files
+         *
+         *  We update the status here.
+         *
+         *  @param seedURL the URL of the SU3 or zip file
+         *  @param echoStatus apparently always false
+         *  @return count of routerinfos successfully fetched
+         *  @since 0.9.19
+         **/
+        private int reseedSU3OrZip(URL seedURL, boolean isSU3, boolean echoStatus) {
             int fetched = 0;
             int errors = 0;
             File contentRaw = null;
-            File zip = null;
-            File tmpDir = null;
             try {
                 _checker.setStatus(_("Reseeding: fetching seed URL."));
                 System.err.println("Reseeding from " + seedURL);
@@ -497,6 +645,37 @@ public class Reseeder {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Rcvd " + sz + " bytes in " + totalTime + " ms from " + seedURL);
                 }
+                int[] stats;
+                if (isSU3)
+                    stats = extractSU3(contentRaw);
+                else
+                    stats = extractZip(contentRaw);
+                fetched = stats[0];
+                errors = stats[1];
+            } catch (Throwable t) {
+                System.err.println("Error reseeding: " + t);
+                _log.error("Error reseeding", t);
+                errors++;
+            } finally {
+                if (contentRaw != null)
+                    contentRaw.delete();
+            }
+            _checker.setStatus(
+                _("Reseeding: fetching router info from seed URL ({0} successful, {1} errors).", fetched, errors));
+            System.err.println("Reseed got " + fetched + " router infos from " + seedURL + " with " + errors + " errors");
+            return fetched;
+        }
+
+
+        /**
+         *  @return 2 ints: number successful and number of errors
+         *  @since 0.9.19 pulled from reseedSU3
+         */
+        public int[] extractSU3(File contentRaw) throws IOException {
+            int fetched = 0;
+            int errors = 0;
+            File zip = null;
+            try {
                 SU3File su3 = new SU3File(_context, contentRaw);
                 zip = new File(_context.getTempDir(), "reseed-" + _context.random().nextInt() + ".zip");
                 su3.verifyAndMigrate(zip);
@@ -514,6 +693,35 @@ public class Reseeder {
                             throw new IOException("su3 file too old");
                     }
                 } catch (NumberFormatException nfe) {}
+
+                int[] stats = extractZip(zip);
+                fetched = stats[0];
+                errors = stats[1];
+            } catch (Throwable t) {
+                System.err.println("Error reseeding: " + t);
+                _log.error("Error reseeding", t);
+                errors++;
+            } finally {
+                contentRaw.delete();
+                if (zip != null)
+                    zip.delete();
+            }
+
+            int[] rv = new int[2];
+            rv[0] = fetched;
+            rv[1] = errors;
+            return rv;
+        }
+
+        /**
+         *  @return 2 ints: number successful and number of errors
+         *  @since 0.9.19 pulled from reseedSU3
+         */
+        public int[] extractZip(File zip) throws IOException {
+            int fetched = 0;
+            int errors = 0;
+            File tmpDir = null;
+            try {
                 tmpDir = new File(_context.getTempDir(), "reseeds-" + _context.random().nextInt());
                 if (!FileUtil.extractZip(zip, tmpDir))
                     throw new IOException("Bad zip file");
@@ -559,24 +767,17 @@ public class Reseeder {
                     if (errors >= 5)
                         break;
                 }
-            } catch (Throwable t) {
-                System.err.println("Error reseeding: " + t);
-                _log.error("Error reseeding", t);
-                errors++;
             } finally {
-                if (contentRaw != null)
-                    contentRaw.delete();
-                if (zip != null)
-                    zip.delete();
                 if (tmpDir != null)
                     FileUtil.rmdir(tmpDir, false);
             }
-            _checker.setStatus(
-                _("Reseeding: fetching router info from seed URL ({0} successful, {1} errors).", fetched, errors));
-            System.err.println("Reseed got " + fetched + " router infos from " + seedURL + " with " + errors + " errors");
+
             if (fetched > 0)
                 _context.netDb().rescan();
-            return fetched;
+            int[] rv = new int[2];
+            rv[0] = fetched;
+            rv[1] = errors;
+            return rv;
         }
 
         /**

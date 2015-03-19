@@ -1,10 +1,16 @@
 package net.i2p.router.web;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.io.IOException;
+import java.net.URL;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.i2p.data.DataHelper;
 import net.i2p.router.networkdb.reseed.Reseeder;
 
 /**
@@ -25,11 +31,72 @@ public class ConfigReseedHandler extends FormHandler {
                 // skip the nonce checking in ReseedHandler
                 addFormNotice(_("Starting reseed process"));
             }
-            return;
-        }
-        if (_action.equals(_("Save changes"))) {
+        } else if (_action.equals(_("Reseed from URL"))) {
+            String val = getJettyString("url");
+            if (val != null)
+                val = val.trim();
+            if (val == null || val.length() == 0) {
+                addFormError(_("You must enter a URL"));
+                return;
+            }
+            URL url;
+            try {
+                url = new URL(val);
+            } catch (MalformedURLException mue) {
+                addFormError(_("Bad URL {0}", val));
+                return;
+            }
+            try {
+                if (!_context.netDb().reseedChecker().requestReseed(url)) {
+                    addFormError(_("Reseeding is already in progress"));
+                } else {
+                    // wait a while for completion but not forever
+                    for (int i = 0; i < 20; i++) {
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException ie) {}
+                        if (!_context.netDb().reseedChecker().inProgress()) {
+                            String status = _context.netDb().reseedChecker().getStatus();
+                            if (status.length() > 0)
+                                addFormNotice(status);
+                            else
+                                addFormNotice(_("Ressed complete, check summary bar for status"));
+                            return;
+                        }
+                    }
+                    if (_context.netDb().reseedChecker().inProgress()) {
+                        String status = _context.netDb().reseedChecker().getStatus();
+                        if (status.length() > 0)
+                            addFormNotice(status);
+                        else
+                            addFormNotice(_("Ressed in progress, check summary bar for status"));
+                    }
+                }
+            } catch (IllegalArgumentException iae) {
+                addFormError(_("Bad URL {0}", val) + " - " + iae.getMessage());
+            }
+        } else if (_action.equals(_("Reseed from file"))) {
+            //////// FIXME multipart
+            String val = getJettyString("file");
+            if (val == null || val.length() == 0) {
+                addFormError(_("You must enter a file"));
+                return;
+            }
+            ByteArrayInputStream bais = new ByteArrayInputStream(DataHelper.getASCII(val));
+            try {
+                int count = _context.netDb().reseedChecker().requestReseed(bais);
+                if (count <= 0) {
+                    addFormError(_("Reseed from file failed"));
+                } else {
+                    addFormNotice(ngettext("Reseed successful, loaded {0} router info from file",
+                                           "Reseed successful, loaded {0} router infos from file",
+                                           count));
+                }
+            } catch (IOException ioe) {
+                addFormError(_("Reseed from file failed") + " - " + ioe);
+            }
+        } else if (_action.equals(_("Save changes"))) {
             saveChanges();
-            return;
         }
         //addFormError(_("Unsupported") + ' ' + _action + '.');
     }
@@ -83,5 +150,10 @@ public class ConfigReseedHandler extends FormHandler {
             addFormNotice(_("Configuration saved successfully."));
         else
             addFormError(_("Error saving the configuration (applied but not saved) - please see the error logs"));
+    }
+
+    /** translate (ngettext) @since 0.9.19 */
+    public String ngettext(String s, String p, int n) {
+        return Messages.getString(n, s, p, _context);
     }
 }

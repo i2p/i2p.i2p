@@ -19,7 +19,39 @@
 
 <jsp:useBean class="net.i2p.router.web.ConfigReseedHandler" id="formhandler" scope="request" />
 <%@include file="formhandler.jsi" %>
+
 <div class="configure"><form action="" method="POST">
+<input type="hidden" name="nonce" value="<%=pageNonce%>" >
+<h3><%=intl._("Manual Reseed from URL")%></h3>
+<p><%=intl._("Enter zip or su3 URL")%> :
+<input name="url" type="text" size="60" value="" />
+</p>
+<div class="formaction">
+<input type="submit" name="action" class="download" value="<%=intl._("Reseed from URL")%>" />
+</div></form></div>
+
+<div class="configure">
+<form action="" method="POST" enctype="multipart/form-data" >
+<input type="hidden" name="nonce" value="<%=pageNonce%>" >
+<h3><%=intl._("Manual Reseed from File")%></h3>
+<p><%=intl._("Select zip or su3 file")%> :
+<input name="file" type="file" value="" />
+</p>
+<div class="formaction">
+<input type="submit" name="action" class="download" value="<%=intl._("Reseed from file")%>" />
+</div></form></div>
+
+<div class="configure">
+<form action="/createreseed" method="GET">
+<h3><%=intl._("Create Reseed File")%></h3>
+<p><%=intl._("Create a new reseed zip file you may share for others to reseed manually.")%>
+</p>
+<div class="formaction">
+<input type="submit" name="action" class="go" value="<%=intl._("Create reseed file")%>" />
+</div></form></div>
+
+<div class="configure">
+<form action="" method="POST">
 <input type="hidden" name="nonce" value="<%=pageNonce%>" >
 <h3><%=intl._("Reseeding Configuration")%></h3>
 <p><%=intl._("Reseeding is the bootstrapping process used to find other routers when you first install I2P, or when your router has too few router references remaining.")%>
@@ -71,7 +103,7 @@
 -->
 
 </table></div>
-<hr><div class="formaction">
+<div class="formaction">
 <input type="submit" class="cancel" name="foo" value="<%=intl._("Cancel")%>" />
 <input type="submit" name="action" class="download" value="<%=intl._("Save changes and reseed now")%>" />
 <input type="submit" name="action" class="accept" value="<%=intl._("Save changes")%>" />
