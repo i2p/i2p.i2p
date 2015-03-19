@@ -1824,7 +1824,7 @@ public class WebMail extends HttpServlet
 						name = "part" + part.hashCode();
 					String name2 = sanitizeFilename(name);
 					response.setContentType( "application/zip; name=\"" + name2 + ".zip\"" );
-					response.addHeader( "Content-Disposition:", "attachment; filename=\"" + name2 + ".zip\"" );
+					response.addHeader( "Content-Disposition", "attachment; filename=\"" + name2 + ".zip\"" );
 					ZipEntry entry = new ZipEntry( name );
 					zip.putNextEntry( entry );
 					zip.write( content.content, content.offset, content.length );
@@ -1862,7 +1862,7 @@ public class WebMail extends HttpServlet
 			response.setContentType("message/rfc822");
 			response.setContentLength(content.length);
 			// cache-control?
-			response.addHeader( "Content-Disposition:", "attachment; filename=\"" + name + ".eml\"" );
+			response.addHeader( "Content-Disposition", "attachment; filename=\"" + name + ".eml\"" );
 			response.getOutputStream().write(content.content, content.offset, content.length);
 			return true;
 		} catch (IOException e) {
