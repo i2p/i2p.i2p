@@ -79,7 +79,7 @@ public class Reseeder {
               //"http://us.reseed.i2p2.no/" + "," +
               // Down (ticket #1422)
               //"http://jp.reseed.i2p2.no/" + "," +
-              "http://uk.reseed.i2p2.no/";
+              "http://uk.reseed.i2p2.no/" + "," +
               "http://netdb.i2p2.no/"; // Only SU3 (v3) support
 
     /** @since 0.8.2 */
