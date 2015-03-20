@@ -1,6 +1,5 @@
 package net.i2p.router.web;
 
-import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.IOException;
 import java.net.URL;
@@ -10,7 +9,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.i2p.data.DataHelper;
 import net.i2p.router.networkdb.reseed.Reseeder;
 
 /**
@@ -76,15 +74,14 @@ public class ConfigReseedHandler extends FormHandler {
                 addFormError(_("Bad URL {0}", val) + " - " + iae.getMessage());
             }
         } else if (_action.equals(_("Reseed from file"))) {
-            //////// FIXME multipart
-            String val = getJettyString("file");
-            if (val == null || val.length() == 0) {
-                addFormError(_("You must enter a file"));
-                return;
-            }
-            ByteArrayInputStream bais = new ByteArrayInputStream(DataHelper.getASCII(val));
+            InputStream in = _requestWrapper.getInputStream("file");
             try {
-                int count = _context.netDb().reseedChecker().requestReseed(bais);
+                // non-null but zero bytes if no file entered, don't know why
+                if (in == null || in.available() <= 0) {
+                    addFormError(_("You must enter a file"));
+                    return;
+                }
+                int count = _context.netDb().reseedChecker().requestReseed(in);
                 if (count <= 0) {
                     addFormError(_("Reseed from file failed"));
                 } else {
@@ -94,6 +91,10 @@ public class ConfigReseedHandler extends FormHandler {
                 }
             } catch (IOException ioe) {
                 addFormError(_("Reseed from file failed") + " - " + ioe);
+            } finally {
+                // it's really a ByteArrayInputStream but we'll play along...
+                if (in != null)
+                    try { in.close(); } catch (IOException ioe) {}
             }
         } else if (_action.equals(_("Save changes"))) {
             saveChanges();

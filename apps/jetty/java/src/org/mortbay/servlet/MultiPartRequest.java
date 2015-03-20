@@ -263,7 +263,7 @@ public class MultiPartRequest
     {
         // Get first boundary
         String line = _in.readLine();
-        if (!line.equals(_boundary))
+        if (line == null || !line.equals(_boundary))
         {
             //log.warn(line);
             throw new IOException("Missing initial multi part boundary");

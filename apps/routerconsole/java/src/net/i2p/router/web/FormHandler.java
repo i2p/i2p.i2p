@@ -7,6 +7,7 @@ import java.util.Map;
 
 import net.i2p.data.DataHelper;
 import net.i2p.router.RouterContext;
+import net.i2p.servlet.RequestWrapper;
 import net.i2p.util.Log;
 
 /**
@@ -21,7 +22,10 @@ import net.i2p.util.Log;
 public abstract class FormHandler {
     protected RouterContext _context;
     protected Log _log;
+    /** Not for multipart/form-data, will be null */
     protected Map _settings;
+    /** Only for multipart/form-data. Warning, parameters are NOT XSS filtered */
+    protected RequestWrapper _requestWrapper;
     private String _nonce, _nonce1, _nonce2;
     protected String _action;
     protected String _method;
@@ -60,6 +64,15 @@ public abstract class FormHandler {
      * @since 0.9.4 consolidated from numerous FormHandlers
      */
     public void setSettings(Map settings) { _settings = new HashMap(settings); }
+
+    /**
+     *  Only set by formhandler.jsi for multipart/form-data
+     *
+     *  @since 0.9.19
+     */
+    public void setRequestWrapper(RequestWrapper rw) {
+        _requestWrapper = rw;
+    }
 
     /**
      *  Same as HelperBase

@@ -69,6 +69,7 @@ import javax.servlet.http.HttpSessionBindingListener;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
+import net.i2p.servlet.RequestWrapper;
 
 /**
  * @author susi23

@@ -24,6 +24,8 @@
             <!-- Depend on classes instead of jars where available -->
             <classpath>
                 <pathelement location="../../core/java/build/obj" />
+                <pathelement location="../jetty/jettylib/javax.servlet.jar" />
+                <pathelement location="../jetty/jettylib/jetty-i2p.jar" />
             </classpath>
         </depend>
     </target>
@@ -38,6 +40,7 @@
             <compilerarg line="${javac.compilerargs}" />
             <classpath>
                 <pathelement location="../jetty/jettylib/javax.servlet.jar" />
+                <pathelement location="../jetty/jettylib/jetty-i2p.jar" />
                 <pathelement location="../../core/java/build/i2p.jar" />
             </classpath>
         </javac>
