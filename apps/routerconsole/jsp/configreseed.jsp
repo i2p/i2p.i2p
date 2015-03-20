@@ -31,7 +31,7 @@
 </div></form></div>
 
 <div class="configure">
-<form action="" method="POST" enctype="multipart/form-data" >
+<form action="" method="POST" enctype="multipart/form-data" accept-charset="UTF-8">
 <input type="hidden" name="nonce" value="<%=pageNonce%>" >
 <h3><%=intl._("Manual Reseed from File")%></h3>
 <p><%=intl._("Select zip or su3 file")%> :
