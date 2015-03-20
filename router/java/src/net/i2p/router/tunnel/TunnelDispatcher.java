@@ -950,8 +950,8 @@ public class TunnelDispatcher implements Service {
         public LeaveTunnel(RouterContext ctx) {
             super(ctx);
             _configs = new LinkedBlockingQueue<HopConfig>();
-            // 20 min no tunnels accepted + 10 min tunnel expiration
-            getTiming().setStartAfter(ctx.clock().now() + 30*60*1000);
+            // 10 min no tunnels accepted + 10 min tunnel expiration
+            getTiming().setStartAfter(ctx.clock().now() + 20*60*1000);
             getContext().jobQueue().addJob(LeaveTunnel.this);
         }
         
