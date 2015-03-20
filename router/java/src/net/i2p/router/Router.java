@@ -873,7 +873,7 @@ public class Router implements RouterClock.ClockShiftListener {
      *
      *  TODO just return a string instead of passing in the RI? See PublishLocalRouterInfoJob.
      *
-     *  @param an unpublished ri we are generating.
+     *  @param ri an unpublished ri we are generating.
      */
     public void addCapabilities(RouterInfo ri) {
         int bwLim = Math.min(_context.bandwidthLimiter().getInboundKBytesPerSecond(),
