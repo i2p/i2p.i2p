@@ -170,7 +170,7 @@ public class Reseeder {
      */
     int requestReseed(InputStream in) throws IOException {
         byte[] su3Magic = DataHelper.getASCII(SU3File.MAGIC);
-        byte[] zipMagic = new byte[] { 0x1F, (byte) 0x8B, 0x08 };
+        byte[] zipMagic = new byte[] { 0x50, 0x4b, 0x03, 0x04 };
         int len = Math.max(su3Magic.length, zipMagic.length);
         byte[] magic = new byte[len];
         File tmp =  null;
