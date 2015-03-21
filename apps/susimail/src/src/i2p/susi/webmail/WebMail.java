@@ -1829,6 +1829,7 @@ public class WebMail extends HttpServlet
 					ZipEntry entry = new ZipEntry( name );
 					zip.putNextEntry( entry );
 					zip.write( content.content, content.offset, content.length );
+					zip.closeEntry();
 					zip.finish();
 					shown = true;
 				} catch (IOException e) {

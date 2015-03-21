@@ -1,6 +1,10 @@
 package net.i2p.router.web;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.InputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
@@ -13,11 +17,15 @@ import java.util.Set;
 
 import net.i2p.app.ClientApp;
 import net.i2p.app.ClientAppState;
+import net.i2p.crypto.SU3File;
+import net.i2p.crypto.TrustedUpdate;
+import net.i2p.data.DataHelper;
 import net.i2p.router.client.ClientManagerFacadeImpl;
 import net.i2p.router.startup.ClientAppConfig;
 import net.i2p.router.startup.LoadClientAppsJob;
 import net.i2p.router.update.ConsoleUpdateManager;
 import static net.i2p.update.UpdateType.*;
+import net.i2p.util.SecureFileOutputStream;
 
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
 
@@ -62,6 +70,15 @@ public class ConfigClientsHandler extends FormHandler {
                 (_context.getBooleanPropertyDefaultTrue(ConfigClientsHelper.PROP_ENABLE_PLUGIN_INSTALL) ||
                  isAdvanced()))
                 installPlugin();
+            else
+                addFormError("Plugins disabled");
+            return;
+        }
+        if (_action.equals(_("Install Plugin from File"))) {
+            if (pluginsEnabled &&
+                (_context.getBooleanPropertyDefaultTrue(ConfigClientsHelper.PROP_ENABLE_PLUGIN_INSTALL) ||
+                 isAdvanced()))
+                installPluginFromFile();
             else
                 addFormError("Plugins disabled");
             return;
@@ -388,6 +405,73 @@ public class ConfigClientsHandler extends FormHandler {
         installPlugin(null, url);
     }
 
+    /**
+     *  @since 0.9.19
+     */
+    private void installPluginFromFile() {
+        InputStream in = _requestWrapper.getInputStream("pluginFile");
+        // go to some trouble to verify it's an su3 or xpi2p file before
+        // passing it along, so we can display a good error message
+        byte[] su3Magic = DataHelper.getASCII(SU3File.MAGIC);
+        byte[] zipMagic = new byte[] { 0x50, 0x4b, 0x03, 0x04 };
+        byte[] magic = new byte[TrustedUpdate.HEADER_BYTES + zipMagic.length];
+        File tmp =  null;
+        OutputStream out = null;
+        try {
+            // non-null but zero bytes if no file entered, don't know why
+            if (in == null || in.available() <= 0) {
+                addFormError(_("You must enter a file"));
+                return;
+            }
+            DataHelper.read(in, magic);
+            boolean isSU3 = DataHelper.eq(magic, 0, su3Magic, 0, su3Magic.length);
+            if (!isSU3) {
+                if (!DataHelper.eq(magic, TrustedUpdate.HEADER_BYTES, zipMagic, 0, zipMagic.length)) {
+                    String name = _requestWrapper.getFilename("pluginFile");
+                    if (name == null)
+                        name = "File";
+                    throw new IOException(name + " is not an xpi2p or su3 plugin");
+                }
+            }
+            tmp =  new File(_context.getTempDir(), "plugin-" + _context.random().nextInt() + (isSU3 ? ".su3" : ".xpi2p"));
+            out = new BufferedOutputStream(new SecureFileOutputStream(tmp));
+            out.write(magic);
+            byte buf[] = new byte[16*1024];
+            int read = 0;
+            while ( (read = in.read(buf)) != -1)  {
+                out.write(buf, 0, read);
+            }
+            out.close();
+            String url = tmp.toURI().toString();
+            // threaded... TODO inline to get better result to UI?
+            installPlugin(null, url);
+            // above sleeps 1000, give it some more time?
+            // or check for complete?
+            ConsoleUpdateManager mgr = UpdateHandler.updateManager(_context);
+            if (mgr == null)
+                return;
+            for (int i = 0; i < 10; i++) {
+                if (!mgr.isUpdateInProgress(PLUGIN)) {
+                    tmp.delete();
+                    break;
+                }
+                try {
+                   Thread.sleep(1000);
+                } catch (InterruptedException ie) {}
+             }
+             String status = mgr.getStatus();
+             if (status != null && status.length() > 0)
+                 addFormNoticeNoEscape(status);
+        } catch (IOException ioe) {
+            addFormError(_("Install from file failed") + " - " + ioe.getMessage());
+        } finally {
+            // it's really a ByteArrayInputStream but we'll play along...
+            if (in != null)
+                try { in.close(); } catch (IOException ioe) {}
+            if (out != null)  try { out.close(); } catch (IOException ioe) {}
+        }
+    }
+
     private void updatePlugin(String app) {
         Properties props = PluginStarter.pluginProperties(_context, app);
         String url = props.getProperty("updateURL.su3");
@@ -434,10 +518,14 @@ public class ConfigClientsHandler extends FormHandler {
             addFormError(_("Bad URL {0}", url));
             return;
         }
-        if (mgr.installPlugin(app, uri))
-            addFormNotice(_("Downloading plugin from {0}", url));
-        else
+        if (mgr.installPlugin(app, uri)) {
+            if (url.startsWith("file:"))
+                addFormNotice(_("Installing plugin from {0}", uri.getPath()));
+            else
+                addFormNotice(_("Downloading plugin from {0}", url));
+        } else {
             addFormError("Cannot install, check logs");
+        }
         // So that update() will post a status to the summary bar before we reload
         try {
            Thread.sleep(1000);

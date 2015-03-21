@@ -130,6 +130,7 @@ class ReseedBundler {
                 entry.setTime(ri.getPublished());
                 zip.putNextEntry(entry);
                 ri.writeBytes(zip);
+                zip.closeEntry();
             }
         } catch (DataFormatException dfe) {
             rv.delete();

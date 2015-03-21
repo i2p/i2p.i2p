@@ -67,7 +67,8 @@ class PluginUpdateHandler implements Checker, Updater {
     public UpdateTask update(UpdateType type, UpdateMethod method, List<URI> updateSources,
                                String appName, String newVersion, long maxTime) {
         if (type != UpdateType.PLUGIN ||
-            method != UpdateMethod.HTTP || updateSources.isEmpty())
+            (method != UpdateMethod.HTTP && method != UpdateMethod.FILE) ||
+            updateSources.isEmpty())
             return null;
         Properties props = PluginStarter.pluginProperties(_context, appName);
         String oldVersion = props.getProperty("version");

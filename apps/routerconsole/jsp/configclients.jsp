@@ -115,7 +115,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
 <form action="" method="POST">
 <input type="hidden" name="nonce" value="<%=pageNonce%>" >
  <jsp:getProperty name="clientshelper" property="form3" />
-<hr><div class="formaction">
+<div class="formaction">
  <input type="submit" class="cancel" name="foo" value="<%=intl._("Cancel")%>" />
  <input type="submit" name="action" class="accept" value="<%=intl._("Save Plugin Configuration")%>" />
 </div></form></div>
@@ -123,43 +123,44 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
        } // pluginUpdateEnabled
        if (clientshelper.isPluginInstallEnabled()) {
 %>
-<h3><a name="plugin"></a><%=intl._("Plugin Installation")%></h3><p>
+<h3><a name="plugin"></a><%=intl._("Plugin Installation from URL")%></h3><p>
  <%=intl._("Look for available plugins on {0}.", "<a href=\"http://plugins.i2p\">plugins.i2p</a>")%>
  <%=intl._("To install a plugin, enter the download URL:")%>
  </p>
-<%
-       } // pluginInstallEnabled
-       if (clientshelper.isPluginInstallEnabled() || clientshelper.isPluginUpdateEnabled()) {
-%>
 <div class="wideload">
 <form action="configclients" method="POST">
 <input type="hidden" name="nonce" value="<%=pageNonce%>" >
-<%
-           if (clientshelper.isPluginInstallEnabled()) {
-%>
 <p>
  <input type="text" size="60" name="pluginURL" >
  </p><hr><div class="formaction">
  <input type="submit" name="action" class="default" value="<%=intl._("Install Plugin")%>" />
  <input type="submit" class="cancel" name="foo" value="<%=intl._("Cancel")%>" />
  <input type="submit" name="action" class="download" value="<%=intl._("Install Plugin")%>" />
-</div>
+</div></form></div>
+
+
+<div class="wideload">
+<h3><a name="plugin"></a><%=intl._("Plugin Installation from File")%></h3>
+<form action="configclients" method="POST" enctype="multipart/form-data" accept-charset="UTF-8">
+<input type="hidden" name="nonce" value="<%=pageNonce%>" >
+<p><%=intl._("Install plugin from file.")%>
+<br><%=intl._("Select xpi2p or su3 file")%> :
+<input type="file" name="pluginFile" >
+</p><hr><div class="formaction">
+<input type="submit" name="action" class="download" value="<%=intl._("Install Plugin from File")%>" />
+</div></form></div>
 <%
-           } // pluginInstallEnabled
+       } // pluginInstallEnabled
+       if (clientshelper.isPluginUpdateEnabled()) {
 %>
-</div>
-<%
-           if (clientshelper.isPluginUpdateEnabled()) {
-%>
-<hr><div class="formaction">
+<h3><a name="plugin"></a><%=intl._("Update All Plugins")%></h3>
+<div class="formaction">
+<form action="configclients" method="POST">
+<input type="hidden" name="nonce" value="<%=pageNonce%>" >
  <input type="submit" name="action" class="reload" value="<%=intl._("Update All Installed Plugins")%>" />
-</div>
-<%
-           } // pluginUpdateEnabled
-%>
 </form></div>
 <%
-       } // pluginInstallEnabled || pluginUpdateEnabled
+       } // pluginUpdateEnabled
    } // showPlugins
 %>
 </div></div></body></html>
