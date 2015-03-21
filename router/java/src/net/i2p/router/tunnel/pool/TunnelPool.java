@@ -332,8 +332,11 @@ public class TunnelPool {
      */
     private int getAdjustedTotalQuantity() {
         int rv = _settings.getTotalQuantity();
-        if (_settings.isExploratory() && _context.netDb().floodfillEnabled())
-            rv += 3;
+        // TODO high-bw non-ff also
+        if (_settings.isExploratory() && _context.netDb().floodfillEnabled() &&
+            _context.router().getUptime() > 5*60*1000) {
+            rv += 2;
+        }
         if (_settings.isExploratory() && rv > 1) {
             RateStat e = _context.statManager().getRate("tunnel.buildExploratoryExpire");
             RateStat r = _context.statManager().getRate("tunnel.buildExploratoryReject");
