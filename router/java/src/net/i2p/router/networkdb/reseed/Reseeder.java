@@ -79,8 +79,7 @@ public class Reseeder {
               //"http://us.reseed.i2p2.no/" + "," +
               // Down (ticket #1422)
               //"http://jp.reseed.i2p2.no/" + "," +
-              // Down (ticket #1487)
-              //"http://uk.reseed.i2p2.no/";
+              "http://uk.reseed.i2p2.no/" + "," +
               "http://netdb.i2p2.no/"; // Only SU3 (v3) support
 
     /** @since 0.8.2 */
@@ -91,8 +90,7 @@ public class Reseeder {
               "https://i2p.mooo.com/netDb/" + "," +
               "https://netdb.i2p2.no/" + "," + // Only SU3 (v3) support
               "https://us.reseed.i2p2.no:444/" + "," +
-              // Down (ticket #1487)
-              //"https://uk.reseed.i2p2.no:444/" + "," +
+              "https://uk.reseed.i2p2.no:444/" + "," +
               // Down (ticket #1422)
               //"https://jp.reseed.i2p2.no:444/" + "," +
               "https://link.mx24.eu/" + "," + // Only HTTPS and SU3 (v3) support
