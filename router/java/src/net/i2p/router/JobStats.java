@@ -55,24 +55,27 @@ public class JobStats {
     public long getTotalTime() { return _totalTime.get(); }
     public long getMaxTime() { return _maxTime; }
     public long getMinTime() { return _minTime; }
-    public long getAvgTime() { 
+
+    public double getAvgTime() { 
         long numRuns = _numRuns.get();
         if (numRuns > 0) 
-            return _totalTime.get() / numRuns; 
+            return _totalTime.get() / (double) numRuns; 
         else 
             return 0; 
     }
     public long getTotalPendingTime() { return _totalPendingTime.get(); }
     public long getMaxPendingTime() { return _maxPendingTime; }
     public long getMinPendingTime() { return _minPendingTime; }
-    public long getAvgPendingTime() { 
+
+    public double getAvgPendingTime() { 
         long numRuns = _numRuns.get();
         if (numRuns > 0) 
-            return _totalPendingTime.get() / numRuns; 
+            return _totalPendingTime.get() / (double) numRuns; 
         else 
             return 0; 
     }
     
+/****
     @Override
     public int hashCode() { return _job.hashCode(); }
 
@@ -100,4 +103,5 @@ public class JobStats {
         buf.append(getMaxPendingTime()).append("ms/").append(getMinPendingTime()).append("ms avg/max/min)");
         return buf.toString();
     }
+****/
 }

@@ -1494,11 +1494,11 @@ public class DataHelper {
      * @since 0.8.2
      */
     public static String formatDuration2(long ms) {
+        if (ms == 0)
+            return "0";
         String t;
         long ams = ms >= 0 ? ms : 0 - ms;
-        if (ms == 0) {
-            return "0";
-        } else if (ams < 3 * 1000) {
+        if (ams < 3 * 1000) {
             // NOTE TO TRANSLATORS: Feel free to translate all these as you see fit, there are several options...
             // spaces or not, '.' or not, plural or not. Try not to make it too long, it is used in
             // a lot of tables.
@@ -1535,6 +1535,42 @@ public class DataHelper {
         if (ms < 0)
             t = t.replace("-", "&minus;");
         // do it here to keep &nbsp; out of the tags for translator sanity
+        return t.replace(" ", "&nbsp;");
+    }
+    
+    /**
+     * Like formatDuration2(long) but with microsec and nanosec also.
+     *
+     * @since 0.9.19
+     */
+    public static String formatDuration2(double ms) {
+        if (ms == 0d)
+            return "0";
+        String t;
+        double adms = ms >= 0 ? ms : 0 - ms;
+        long lms = (long) ms;
+        long ams = lms >= 0 ? lms : 0 - lms;
+        if (adms < 0.000000001d) {
+            return "0";
+        } else if (adms < 0.001d) {
+            t = ngettext("1 ns", "{0,number,###} ns", (int) Math.round(ms * 1000000d));
+        } else if (adms < 1.0d) {
+            t = ngettext("1 μs", "{0,number,###} μs", (int) Math.round(ms * 1000d));
+        } else if (ams < 3 * 1000) {
+            t = ngettext("1 ms", "{0,number,####} ms", (int) Math.round(ms));
+        } else if (ams < 2 * 60 * 1000) {
+            t = ngettext("1 sec", "{0} sec", (int) (ms / 1000));
+        } else if (ams < 120 * 60 * 1000) {
+            t = ngettext("1 min", "{0} min", (int) (ms / (60 * 1000)));
+        } else if (ams < 2 * 24 * 60 * 60 * 1000) {
+            t = ngettext("1 hour", "{0} hours", (int) (ms / (60 * 60 * 1000)));
+        } else if (ams > 1000l * 24l * 60l * 60l * 1000l) {
+            return _("n/a");
+        } else {
+            t = ngettext("1 day", "{0} days", (int) (ms / (24 * 60 * 60 * 1000)));
+        }
+        if (ms < 0)
+            t = t.replace("-", "&minus;");
         return t.replace(" ", "&nbsp;");
     }
     
