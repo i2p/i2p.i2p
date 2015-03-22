@@ -1662,6 +1662,12 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
     private void runPing(String allargs, Logging l) {
         if (allargs.length() != 0) {
             _clientOptions.setProperty(I2Ping.PROP_COMMAND, allargs);
+            if (ownDest) {
+                if (!_clientOptions.containsKey("inbound.nickname"))
+                    _clientOptions.setProperty("inbound.nickname", "I2Ping");
+                if (!_clientOptions.containsKey("outbound.nickname"))
+                    _clientOptions.setProperty("outbound.nickname", "I2Ping");
+            }
             I2PTunnelTask task = new I2Ping(l, ownDest, this, this);
             addtask(task);
             notifyEvent("pingTaskId", Integer.valueOf(task.getId()));
