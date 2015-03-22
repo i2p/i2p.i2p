@@ -44,6 +44,7 @@ class ReseedBundler {
     private final RouterContext _context;
     private final static String ROUTERINFO_PREFIX = "routerInfo-";
     private final static String ROUTERINFO_SUFFIX = ".dat";
+    private static final int MINIMUM = 50;
 
     public ReseedBundler(RouterContext ctx) {
         _context = ctx;
@@ -118,7 +119,10 @@ class ReseedBundler {
         }
 
         if (toWrite.isEmpty())
-            throw new IOException("No router infos to include");
+            throw new IOException("No router infos to include. Reseed yourself first.");
+        if (toWrite.size() < Math.min(count, MINIMUM))
+            throw new IOException("Not enough router infos to include, wanted " + count +
+                                  " but only found " + toWrite.size() + ". Please try again later.");
 
         File rv = new File(_context.getTempDir(), "genreseed-" + _context.random().nextInt() + ".zip");
         ZipOutputStream zip = null;
