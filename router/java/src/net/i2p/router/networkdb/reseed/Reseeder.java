@@ -167,6 +167,8 @@ public class Reseeder {
      *  @since 0.9.19
      */
     int requestReseed(InputStream in) throws IOException {
+        _checker.setError("");
+        _checker.setStatus("Reseeding from file");
         byte[] su3Magic = DataHelper.getASCII(SU3File.MAGIC);
         byte[] zipMagic = new byte[] { 0x50, 0x4b, 0x03, 0x04 };
         int len = Math.max(su3Magic.length, zipMagic.length);
@@ -282,7 +284,7 @@ public class Reseeder {
             } else {
                 total = reseed(false);
             }
-            if (total >= 50) {
+            if (total >= 20) {
                 System.out.println("Reseed complete, " + total + " received");
                 _checker.setError("");
             } else if (total > 0) {
@@ -294,12 +296,15 @@ public class Reseeder {
                 System.out.println(
                      "Ensure that nothing blocks outbound HTTP, check the logs, " +
                      "and if nothing helps, read the FAQ about reseeding manually.");
+                String old = _checker.getError();
                 _checker.setError(_("Reseed failed.") + ' '  +
-                                               _("See {0} for help.",
-                                                 "<a target=\"_top\" href=\"/configreseed\">" + _("reseed configuration page") + "</a>"));
+                                  _("See {0} for help.",
+                                    "<a target=\"_top\" href=\"/configreseed\">" + _("reseed configuration page") + "</a>") +
+                                  "<br>" + old);
             }
             _isRunning = false;
-            _checker.setStatus("");
+            // ReseedChecker will set timer to clean up
+            //_checker.setStatus("");
             _context.router().eventLog().addEvent(EventLog.RESEED, Integer.toString(total));
         }
 
@@ -328,6 +333,8 @@ public class Reseeder {
                 _log.warn("EepGet failed on " + url, cause);
             else
                 _log.logAlways(Log.WARN, "EepGet failed on " + url + " : " + cause);
+            if (cause != null && cause.getMessage() != null)
+                _checker.setError(DataHelper.escapeHTML(cause.getMessage()));
         }
 
         public void bytesTransferred(long alreadyTransferred, int currentWrite, long bytesTransferred, long bytesRemaining, String url) {}

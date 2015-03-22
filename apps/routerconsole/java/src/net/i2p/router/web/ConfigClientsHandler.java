@@ -450,13 +450,13 @@ public class ConfigClientsHandler extends FormHandler {
             ConsoleUpdateManager mgr = UpdateHandler.updateManager(_context);
             if (mgr == null)
                 return;
-            for (int i = 0; i < 10; i++) {
+            for (int i = 0; i < 20; i++) {
                 if (!mgr.isUpdateInProgress(PLUGIN)) {
                     tmp.delete();
                     break;
                 }
                 try {
-                   Thread.sleep(1000);
+                   Thread.sleep(500);
                 } catch (InterruptedException ie) {}
              }
              String status = mgr.getStatus();

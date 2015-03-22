@@ -6,9 +6,11 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import net.i2p.data.DataHelper;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Addresses;
 import net.i2p.util.Log;
+import net.i2p.util.SimpleTimer;
 
 /**
  *  Moved from RouterConsoleRunner.java
@@ -31,6 +33,7 @@ public class ReseedChecker {
     private volatile String _lastError = "";
 
     public static final int MINIMUM = 50;
+    private static final long STATUS_CLEAN_TIME = 20*60*1000;
 
     /**
      *  All reseeding must be done through this instance.
@@ -123,6 +126,8 @@ public class ReseedChecker {
                 reseeder.requestReseed(url);
                 return true;
             } catch (IllegalArgumentException iae) {
+                if (iae.getMessage() != null)
+                    setError(DataHelper.escapeHTML(iae.getMessage()));
                 done();
                 throw iae;
             } catch (Throwable t) {
@@ -150,6 +155,11 @@ public class ReseedChecker {
             try {
                 Reseeder reseeder = new Reseeder(_context, this);
                 return reseeder.requestReseed(in);
+            } catch (IOException ioe) {
+                if (ioe.getMessage() != null)
+                    setError(DataHelper.escapeHTML(ioe.getMessage()));
+                done();
+                throw ioe;
             } finally {
                 done();
             }
@@ -174,11 +184,13 @@ public class ReseedChecker {
      */
     void done() {
         _inProgress.set(false);
+        _context.simpleScheduler().addEvent(new StatusCleaner(_lastStatus, _lastError), STATUS_CLEAN_TIME);
     }
 
     /**
      *  Status from current reseed attempt,
      *  probably empty if no reseed in progress.
+     *  May include HTML.
      *
      *  @return non-null, may be empty
      *  @since 0.9
@@ -198,7 +210,8 @@ public class ReseedChecker {
     }
 
     /**
-     *  Error from last or current reseed attempt
+     *  Error from last or current reseed attempt.
+     *  May include HTML.
      *
      *  @return non-null, may be empty
      *  @since 0.9
@@ -217,4 +230,22 @@ public class ReseedChecker {
         _lastError = s;
     }
 
+    /**
+     *  @since 0.9.19
+     */
+    private class StatusCleaner implements SimpleTimer.TimedEvent {
+        private final String _status, _error;
+
+        public StatusCleaner(String status, String error) {
+            _status = status;
+            _error = error;
+        }
+
+        public void timeReached() {
+            if (_status.equals(getStatus()))
+                setStatus("");
+            if (_error.equals(getError()))
+                setError("");
+        }
+    }
 }

@@ -153,6 +153,17 @@ public abstract class FormHandler {
     }
     
     /**
+     * Add an error message to display
+     * Use if it includes a link or other formatting.
+     * Does not escape '<' and '>' before queueing
+     * @since 0.9.19
+     */
+    protected void addFormErrorNoEscape(String msg) {
+        if (msg == null) return;
+        _errors.add(msg);
+    }
+    
+    /**
      * Display everything, wrap it in a div for consistent presentation
      *
      */

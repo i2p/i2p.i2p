@@ -1,3 +1,11 @@
+2015-03-22 zzz
+ * Console: Better status feedback on manual reseed from URL
+ * NetDB: Don't become floodfill w/o ECDSA support
+ * Reseed: Better status feedback and cleanup in summary bar
+
+2015-03-21 zzz
+ * Console: Support plugin installation from local file
+
 2015-03-20 zzz
  * Reseed:
   - Move multipart form support from susimail to jetty-i2p.jar

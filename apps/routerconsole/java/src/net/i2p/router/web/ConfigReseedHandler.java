@@ -49,25 +49,23 @@ public class ConfigReseedHandler extends FormHandler {
                     addFormError(_("Reseeding is already in progress"));
                 } else {
                     // wait a while for completion but not forever
-                    for (int i = 0; i < 20; i++) {
+                    for (int i = 0; i < 40; i++) {
                         try {
-                            Thread.sleep(1000);
+                            Thread.sleep(500);
                         } catch (InterruptedException ie) {}
-                        if (!_context.netDb().reseedChecker().inProgress()) {
-                            String status = _context.netDb().reseedChecker().getStatus();
-                            if (status.length() > 0)
-                                addFormNotice(status);
-                            else
-                                addFormNotice(_("Ressed complete, check summary bar for status"));
-                            return;
-                        }
+                        if (!_context.netDb().reseedChecker().inProgress())
+                            break;
                     }
-                    if (_context.netDb().reseedChecker().inProgress()) {
-                        String status = _context.netDb().reseedChecker().getStatus();
-                        if (status.length() > 0)
-                            addFormNotice(status);
-                        else
-                            addFormNotice(_("Ressed in progress, check summary bar for status"));
+                    String status = _context.netDb().reseedChecker().getStatus();
+                    String error = _context.netDb().reseedChecker().getError();
+                    if (error.length() > 0) {
+                        addFormErrorNoEscape(error);
+                    } else if (status.length() > 0) {
+                        addFormNoticeNoEscape(status);
+                    } else if (_context.netDb().reseedChecker().inProgress()) {
+                        addFormNotice(_("Reseed in progress, check summary bar for status"));
+                    } else {
+                        addFormNotice(_("Reseed complete, check summary bar for status"));
                     }
                 }
             } catch (IllegalArgumentException iae) {
