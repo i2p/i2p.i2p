@@ -11,11 +11,12 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.SynchronousQueue;
-import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import net.i2p.I2PAppContext;
 import net.i2p.app.*;
@@ -43,6 +44,7 @@ public class TunnelControllerGroup implements ClientApp {
     static final String DEFAULT_CONFIG_FILE = "i2ptunnel.config";
     
     private final List<TunnelController> _controllers;
+    private final ReadWriteLock _controllersLock;
     private final String _configFile;
     
     private static final String REGISTERED_NAME = "i2ptunnel";
@@ -105,6 +107,7 @@ public class TunnelControllerGroup implements ClientApp {
         _mgr = mgr;
         _log = _context.logManager().getLog(TunnelControllerGroup.class);
         _controllers = new ArrayList<TunnelController>();
+        _controllersLock = new ReentrantReadWriteLock(true);
         if (args == null || args.length <= 0)
             _configFile = DEFAULT_CONFIG_FILE;
         else if (args.length == 1)
@@ -243,14 +246,19 @@ public class TunnelControllerGroup implements ClientApp {
     public synchronized void loadControllers(String configFile) {
         changeState(STARTING);
         Properties cfg = loadConfig(configFile);
-        int i = 0; 
-        while (true) {
-            String type = cfg.getProperty("tunnel." + i + ".type");
-            if (type == null) 
-                break;
-            TunnelController controller = new TunnelController(cfg, "tunnel." + i + ".");
-            _controllers.add(controller);
-            i++;
+        int i = 0;
+        _controllersLock.writeLock().lock();
+        try {
+            while (true) {
+                String type = cfg.getProperty("tunnel." + i + ".type");
+                if (type == null) 
+                    break;
+                TunnelController controller = new TunnelController(cfg, "tunnel." + i + ".");
+                _controllers.add(controller);
+                i++;
+            }
+        } finally {
+            _controllersLock.writeLock().unlock();
         }
         I2PAppThread startupThread = new I2PAppThread(new StartControllers(), "Startup tunnels");
         startupThread.start();
@@ -263,10 +271,15 @@ public class TunnelControllerGroup implements ClientApp {
     private class StartControllers implements Runnable {
         public void run() {
             synchronized(TunnelControllerGroup.this) {
-                for (int i = 0; i < _controllers.size(); i++) {
-                    TunnelController controller = _controllers.get(i);
-                    if (controller.getStartOnLoad())
-                        controller.startTunnel();
+                _controllersLock.readLock().lock();
+                try {
+                    for (int i = 0; i < _controllers.size(); i++) {
+                        TunnelController controller = _controllers.get(i);
+                        if (controller.getStartOnLoad())
+                            controller.startTunnel();
+                    }
+                } finally {
+                    _controllersLock.readLock().unlock();
                 }
             }
         }
@@ -289,19 +302,31 @@ public class TunnelControllerGroup implements ClientApp {
      *
      */
     public synchronized void unloadControllers() {
-        destroyAllControllers();
-        _controllers.clear();
+        _controllersLock.writeLock().lock();
+        try {
+            destroyAllControllers();
+            _controllers.clear();
+        } finally {
+            _controllersLock.writeLock().unlock();
+        }
         if (_log.shouldLog(Log.INFO))
             _log.info("All controllers stopped and unloaded");
     }
-    
+
     /**
      * Add the given tunnel to the set of known controllers (but dont add it to
      * a config file or start it or anything)
      *
      */
-    public synchronized void addController(TunnelController controller) { _controllers.add(controller); }
-    
+    public synchronized void addController(TunnelController controller) {
+        _controllersLock.writeLock().lock();
+        try {
+            _controllers.add(controller);
+        } finally {
+            _controllersLock.writeLock().unlock();
+        }
+    }
+
     /**
      * Stop and remove the given tunnel
      *
@@ -311,7 +336,12 @@ public class TunnelControllerGroup implements ClientApp {
         if (controller == null) return new ArrayList<String>();
         controller.stopTunnel();
         List<String> msgs = controller.clearMessages();
-        _controllers.remove(controller);
+        _controllersLock.writeLock().lock();
+        try {
+            _controllers.remove(controller);
+        } finally {
+            _controllersLock.writeLock().unlock();
+        }
         msgs.add("Tunnel " + controller.getName() + " removed");
         return msgs;
     }
@@ -323,13 +353,18 @@ public class TunnelControllerGroup implements ClientApp {
      */
     public synchronized List<String> stopAllControllers() {
         List<String> msgs = new ArrayList<String>();
-        for (int i = 0; i < _controllers.size(); i++) {
-            TunnelController controller = _controllers.get(i);
-            controller.stopTunnel();
-            msgs.addAll(controller.clearMessages());
+        _controllersLock.readLock().lock();
+        try {
+            for (int i = 0; i < _controllers.size(); i++) {
+                TunnelController controller = _controllers.get(i);
+                controller.stopTunnel();
+                msgs.addAll(controller.clearMessages());
+            }
+            if (_log.shouldLog(Log.INFO))
+                _log.info(_controllers.size() + " controllers stopped");
+        } finally {
+            _controllersLock.readLock().unlock();
         }
-        if (_log.shouldLog(Log.INFO))
-            _log.info(_controllers.size() + " controllers stopped");
         return msgs;
     }
     
@@ -355,14 +390,19 @@ public class TunnelControllerGroup implements ClientApp {
      */
     public synchronized List<String> startAllControllers() {
         List<String> msgs = new ArrayList<String>();
-        for (int i = 0; i < _controllers.size(); i++) {
-            TunnelController controller = _controllers.get(i);
-            controller.startTunnelBackground();
-            msgs.addAll(controller.clearMessages());
-        }
+        _controllersLock.readLock().lock();
+        try {
+            for (int i = 0; i < _controllers.size(); i++) {
+                TunnelController controller = _controllers.get(i);
+                controller.startTunnelBackground();
+                msgs.addAll(controller.clearMessages());
+            }
 
-        if (_log.shouldLog(Log.INFO))
-            _log.info(_controllers.size() + " controllers started");
+            if (_log.shouldLog(Log.INFO))
+                _log.info(_controllers.size() + " controllers started");
+        } finally {
+            _controllersLock.readLock().unlock();
+        }
         return msgs;
     }
     
@@ -373,13 +413,18 @@ public class TunnelControllerGroup implements ClientApp {
      */
     public synchronized List<String> restartAllControllers() {
         List<String> msgs = new ArrayList<String>();
-        for (int i = 0; i < _controllers.size(); i++) {
-            TunnelController controller = _controllers.get(i);
-            controller.restartTunnel();
-            msgs.addAll(controller.clearMessages());
+        _controllersLock.readLock().lock();
+        try {
+            for (int i = 0; i < _controllers.size(); i++) {
+                TunnelController controller = _controllers.get(i);
+                controller.restartTunnel();
+                msgs.addAll(controller.clearMessages());
+            }
+            if (_log.shouldLog(Log.INFO))
+                _log.info(_controllers.size() + " controllers restarted");
+        } finally {
+            _controllersLock.readLock().unlock();
         }
-        if (_log.shouldLog(Log.INFO))
-            _log.info(_controllers.size() + " controllers restarted");
         return msgs;
     }
     
@@ -388,11 +433,16 @@ public class TunnelControllerGroup implements ClientApp {
      *
      * @return list of messages the tunnels have generated
      */
-    public synchronized List<String> clearAllMessages() {
+    public List<String> clearAllMessages() {
         List<String> msgs = new ArrayList<String>();
-        for (int i = 0; i < _controllers.size(); i++) {
-            TunnelController controller = _controllers.get(i);
-            msgs.addAll(controller.clearMessages());
+        _controllersLock.readLock().lock();
+        try {
+            for (int i = 0; i < _controllers.size(); i++) {
+                TunnelController controller = _controllers.get(i);
+                msgs.addAll(controller.clearMessages());
+            }
+        } finally {
+            _controllersLock.readLock().unlock();
         }
         return msgs;
     }
@@ -419,10 +469,15 @@ public class TunnelControllerGroup implements ClientApp {
             parent.mkdirs();
         
         Properties map = new OrderedProperties();
-        for (int i = 0; i < _controllers.size(); i++) {
-            TunnelController controller = _controllers.get(i);
-            Properties cur = controller.getConfig("tunnel." + i + ".");
-            map.putAll(cur);
+        _controllersLock.readLock().lock();
+        try {
+            for (int i = 0; i < _controllers.size(); i++) {
+                TunnelController controller = _controllers.get(i);
+                Properties cur = controller.getConfig("tunnel." + i + ".");
+                map.putAll(cur);
+            }
+        } finally {
+            _controllersLock.readLock().unlock();
         }
         
         DataHelper.storeProps(map, cfgFile);
@@ -460,8 +515,13 @@ public class TunnelControllerGroup implements ClientApp {
      *
      * @return list of TunnelController objects
      */
-    public synchronized List<TunnelController> getControllers() {
-        return new ArrayList<TunnelController>(_controllers);
+    public List<TunnelController> getControllers() {
+        _controllersLock.readLock().lock();
+        try {
+            return new ArrayList<TunnelController>(_controllers);
+        } finally {
+            _controllersLock.readLock().unlock();
+        }
     }
     
     
