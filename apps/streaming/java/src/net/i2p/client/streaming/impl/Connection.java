@@ -12,6 +12,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import net.i2p.I2PAppContext;
 import net.i2p.client.I2PSession;
+import net.i2p.client.streaming.I2PSocketException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.util.Log;
@@ -606,7 +607,7 @@ class Connection {
     public void resetReceived() {
         if (!_resetReceived.compareAndSet(false, true))
             return;
-        IOException ioe = new IOException("Reset received");
+        IOException ioe = new I2PSocketException(I2PSocketException.STATUS_CONNECTION_RESET);
         _outputStream.streamErrorOccurred(ioe);
         _inputStream.streamErrorOccurred(ioe);
         _connectionError = "Connection reset";

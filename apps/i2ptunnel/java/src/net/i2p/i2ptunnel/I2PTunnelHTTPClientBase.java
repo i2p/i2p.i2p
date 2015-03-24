@@ -607,6 +607,8 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
             error = usingWWWProxy ? "nolsp" : "nols";
         } else if (status == MessageStatusMessage.STATUS_SEND_FAILURE_UNSUPPORTED_ENCRYPTION) {
             error = usingWWWProxy ? "encp" : "enc";
+        } else if (status == I2PSocketException.STATUS_CONNECTION_RESET) {
+            error = usingWWWProxy ? "resetp" : "reset";
         } else {
             error = usingWWWProxy ? "dnfp" : "dnf";
         }
@@ -638,7 +640,7 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
 
     /**
      *  No jump servers
-     *  @param extraMessage extra message
+     *  @param extraMessage extra message or null, will be HTML-escaped
      *  @since 0.9.14
      */
     protected void writeErrorMessage(byte[] errMessage, String extraMessage,
@@ -649,7 +651,7 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
 
     /**
      *  @param jumpServers comma- or space-separated list, or null
-     *  @param extraMessage extra message
+     *  @param extraMessage extra message or null, will be HTML-escaped
      *  @since 0.9.14
      */
     protected void writeErrorMessage(byte[] errMessage, String extraMessage,
@@ -672,7 +674,7 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
                 out.write((":</b> " + wwwProxy).getBytes());
             }
             if (extraMessage != null) {
-                out.write(("<br><br><b>" + extraMessage + "</b>").getBytes());
+                out.write(("<br><br><b>" + DataHelper.escapeHTML(extraMessage) + "</b>").getBytes());
             }
             if (jumpServers != null && jumpServers.length() > 0) {
                 boolean first = true;

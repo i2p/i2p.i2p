@@ -262,9 +262,12 @@ class ConnectionManager {
                     // Ditto for blacklist / whitelist
                     // This is a tradeoff, because it will keep retransmitting the SYN for a while,
                     // thus more inbound, but let's not spend several KB on the outbound.
-                    if (_log.shouldLog(Log.INFO))
-                        _log.info("Dropping RST to " + h);
-                    return null;
+                    if (!Boolean.valueOf(_context.getProperty("i2p.streaming.sendResetOnBlock"))) {
+                        // this is the default. Set property to send reset for debugging.
+                        if (_log.shouldLog(Log.INFO))
+                            _log.info("Dropping RST to " + h);
+                        return null;
+                    }
                 }
             }
             PacketLocal reply = new PacketLocal(_context, from);

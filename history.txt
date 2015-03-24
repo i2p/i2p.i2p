@@ -1,3 +1,11 @@
+2015-03-24 zzz
+ * Streaming: Throw I2PSocketException when connection is reset,
+   display new error page in HTTP client (ticket #643)
+
+2015-03-23 zzz
+ * Javadoc: Add missing package.html files (ticket #1109)
+ * Summary bar: linkify news headings, remove 'show news' link
+
 2015-03-22 zzz
  * Console: Better status feedback on manual reseed from URL
  * NetDB: Don't become floodfill w/o ECDSA support
@@ -13,7 +21,7 @@
   - Finish manual reseed from local file
 
 2015-03-19 zzz
- * Reseed:
+ * Reseed (ticket #1369):
   - Add form to manually reseed from zip or su3 URL
   - Add form to manually reseed from local zip or su3 file
   - Add form to create reseed zip file to share
