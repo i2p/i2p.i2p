@@ -327,7 +327,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
 
             long afterHandle = getTunnel().getContext().clock().now();
             long timeToHandle = afterHandle - afterAccept;
-            getTunnel().getContext().statManager().addRateData("i2ptunnel.httpserver.blockingHandleTime", timeToHandle, 0);
+            getTunnel().getContext().statManager().addRateData("i2ptunnel.httpserver.blockingHandleTime", timeToHandle);
             if ( (timeToHandle > 1000) && (_log.shouldLog(Log.WARN)) )
                 _log.warn("Took a while to handle the request for " + remoteHost + ':' + remotePort +
                           " [" + timeToHandle +
@@ -696,7 +696,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
             }
         }
         if (trimmed > 0)
-            ctx.statManager().addRateData("i2ptunnel.httpNullWorkaround", trimmed, 0);
+            ctx.statManager().addRateData("i2ptunnel.httpNullWorkaround", trimmed);
         
         int i = 0;
         while (true) {

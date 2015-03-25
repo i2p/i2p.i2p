@@ -33,19 +33,17 @@ import net.i2p.util.Translate;
  */
 public abstract class LocalHTTPServer {
 
-    private final static byte[] ERR_404 =
-        ("HTTP/1.1 404 Not Found\r\n"+
+    private final static String ERR_404 =
+         "HTTP/1.1 404 Not Found\r\n"+
          "Content-Type: text/plain\r\n"+
          "\r\n"+
-         "HTTP Proxy local file not found")
-        .getBytes();
+         "HTTP Proxy local file not found";
 
-    private final static byte[] ERR_ADD =
-        ("HTTP/1.1 409 Bad\r\n"+
+    private final static String ERR_ADD =
+         "HTTP/1.1 409 Bad\r\n"+
          "Content-Type: text/plain\r\n"+
          "\r\n"+
-         "Add to addressbook failed - bad parameters")
-        .getBytes();
+         "Add to addressbook failed - bad parameters";
 
     /**
      *  Very simple web server.
@@ -69,14 +67,13 @@ public abstract class LocalHTTPServer {
      *  @param targetRequest decoded path only, non-null
      *  @param query raw (encoded), may be null
      */
-    public static void serveLocalFile(OutputStream out, String method, String targetRequest, String query, String proxyNonce) {
+    public static void serveLocalFile(OutputStream out, String method, String targetRequest,
+                                      String query, String proxyNonce) throws IOException {
         //System.err.println("targetRequest: \"" + targetRequest + "\"");
         // a home page message for the curious...
         if (targetRequest.equals("/")) {
-            try {
-                out.write(("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nCache-Control: max-age=86400\r\n\r\nI2P HTTP proxy OK").getBytes());
-                out.flush();
-            } catch (IOException ioe) {}
+            out.write(("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nCache-Control: max-age=86400\r\n\r\nI2P HTTP proxy OK").getBytes("UTF-8"));
+            out.flush();
             return;
         }
         if ((method.equals("GET") || method.equals("HEAD")) &&
@@ -104,12 +101,10 @@ public abstract class LocalHTTPServer {
                 else if (filename.endsWith(".jpg"))
                     type = "image/jpeg";
                 else type = "text/html";
-                try {
-                    out.write("HTTP/1.1 200 OK\r\nContent-Type: ".getBytes());
-                    out.write(type.getBytes());
-                    out.write("\r\nCache-Control: max-age=86400\r\n\r\n".getBytes());
-                    FileUtil.readFile(filename, themesDir.getAbsolutePath(), out);
-                } catch (IOException ioe) {}
+                out.write("HTTP/1.1 200 OK\r\nContent-Type: ".getBytes("UTF-8"));
+                out.write(type.getBytes("UTF-8"));
+                out.write("\r\nCache-Control: max-age=86400\r\n\r\n".getBytes("UTF-8"));
+                FileUtil.readFile(filename, themesDir.getAbsolutePath(), out);
                 return;
             }
         }
@@ -153,31 +148,24 @@ public abstract class LocalHTTPServer {
             //System.err.println("book         : \"" + book          + "\"");
             //System.err.println("nonce        : \"" + nonce         + "\"");
             if (proxyNonce.equals(nonce) && url != null && host != null && dest != null) {
-                try {
-                    NamingService ns = I2PAppContext.getGlobalContext().namingService();
-                    Properties nsOptions = new Properties();
-                    nsOptions.setProperty("list", book);
-                    if (referer != null && referer.startsWith("http")) {
-                        String from = "<a href=\"" + referer + "\">" + referer + "</a>";
-                        nsOptions.setProperty("s", _("Added via address helper from {0}", from));
-                    } else {
-                        nsOptions.setProperty("s", _("Added via address helper"));
-                    }
-                    boolean success = ns.put(host, dest, nsOptions);
-                    writeRedirectPage(out, success, host, book, url);
-                    return;
-                } catch (IOException ioe) {}
+                NamingService ns = I2PAppContext.getGlobalContext().namingService();
+                Properties nsOptions = new Properties();
+                nsOptions.setProperty("list", book);
+                if (referer != null && referer.startsWith("http")) {
+                    String from = "<a href=\"" + referer + "\">" + referer + "</a>";
+                    nsOptions.setProperty("s", _("Added via address helper from {0}", from));
+                } else {
+                    nsOptions.setProperty("s", _("Added via address helper"));
+                }
+                boolean success = ns.put(host, dest, nsOptions);
+                writeRedirectPage(out, success, host, book, url);
+                return;
             }
-            try {
-                out.write(ERR_ADD);
-                out.flush();
-            } catch (IOException ioe) {}
-            return;
+            out.write(ERR_ADD.getBytes("UTF-8"));
+        } else {
+            out.write(ERR_404.getBytes("UTF-8"));
         }
-        try {
-            out.write(ERR_404);
-            out.flush();
-        } catch (IOException ioe) {}
+        out.flush();
     }
 
     /** @since 0.8.7 */

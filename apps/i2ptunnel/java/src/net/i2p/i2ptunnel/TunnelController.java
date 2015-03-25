@@ -983,7 +983,7 @@ public class TunnelController implements Logging {
      * @return list of messages pulled off (each is a String, earliest first)
      */
     public List<String> clearMessages() { 
-        List<String> rv = null;
+        List<String> rv;
         synchronized (_messages) {
             rv = new ArrayList<String>(_messages);
             _messages.clear();

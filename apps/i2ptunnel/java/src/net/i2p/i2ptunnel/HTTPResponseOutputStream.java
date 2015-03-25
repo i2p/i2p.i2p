@@ -328,9 +328,9 @@ class HTTPResponseOutputStream extends FilterOutputStream {
                 if (compressed > 0 && expanded > 0) {
                     // only update the stats if we did something
                     double ratio = compressed/expanded;
-                    _context.statManager().addRateData("i2ptunnel.httpCompressionRatio", (int)(100d*ratio), 0);
-                    _context.statManager().addRateData("i2ptunnel.httpCompressed", (long)compressed, 0);
-                    _context.statManager().addRateData("i2ptunnel.httpExpanded", (long)expanded, 0);
+                    _context.statManager().addRateData("i2ptunnel.httpCompressionRatio", (int)(100d*ratio));
+                    _context.statManager().addRateData("i2ptunnel.httpCompressed", (long)compressed);
+                    _context.statManager().addRateData("i2ptunnel.httpExpanded", (long)expanded);
                 }
             }
         }
