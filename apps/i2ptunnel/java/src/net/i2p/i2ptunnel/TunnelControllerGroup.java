@@ -246,7 +246,7 @@ public class TunnelControllerGroup implements ClientApp {
                 for (int i = 0; i < _controllers.size(); i++) {
                     TunnelController controller = _controllers.get(i);
                     if (controller.getStartOnLoad())
-                        controller.startTunnel();
+                        controller.startTunnelBackground();
                 }
             }
         }

@@ -106,11 +106,6 @@ public class I2PTunnelConnectClient extends I2PTunnelHTTPClientBase implements R
                                I2PTunnel tunnel) throws IllegalArgumentException {
         super(localPort, ownDest, l, notifyThis, "HTTPS Proxy on " + tunnel.listenHost + ':' + localPort + " #" + (++__clientId), tunnel);
 
-        if (waitEventValue("openBaseClientResult").equals("error")) {
-            notifyEvent("openConnectClientResult", "error");
-            return;
-        }
-
         if (wwwProxy != null) {
             StringTokenizer tok = new StringTokenizer(wwwProxy, ", ");
             while (tok.hasMoreTokens())

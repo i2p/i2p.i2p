@@ -32,11 +32,6 @@ public class I2PTunnelClient extends I2PTunnelClientBase {
               "Standard client on " + tunnel.listenHost + ':' + localPort,
               tunnel, pkf);
 
-        if (waitEventValue("openBaseClientResult").equals("error")) {
-            notifyEvent("openClientResult", "error");
-            return;
-        }
-
         StringTokenizer tok = new StringTokenizer(destinations, ", ");
         dests = new ArrayList(1);
         while (tok.hasMoreTokens()) {
