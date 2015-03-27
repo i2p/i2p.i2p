@@ -216,10 +216,6 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
         _proxyNonce = Long.toString(_context.random().nextLong());
 
         //proxyList = new ArrayList(); // We won't use outside of i2p
-        if(waitEventValue("openBaseClientResult").equals("error")) {
-            notifyEvent("openHTTPClientResult", "error");
-            return;
-        }
 
         if(wwwProxy != null) {
             StringTokenizer tok = new StringTokenizer(wwwProxy, ", ");
