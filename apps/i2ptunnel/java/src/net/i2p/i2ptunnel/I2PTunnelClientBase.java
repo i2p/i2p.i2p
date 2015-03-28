@@ -104,11 +104,6 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
         _context.statManager().createRateStat("i2ptunnel.client.buildRunTime", "How long it takes to run a queued socket into an i2ptunnel runner?", "I2PTunnel", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
         _log = _context.logManager().getLog(getClass());
 
-        synchronized (_executorLock) {
-            if (_executor == null)
-                _executor = new CustomThreadPoolExecutor();
-        }
-
         startup();
     }
 
