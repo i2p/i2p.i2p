@@ -1,3 +1,7 @@
+2015-03-25 zzz
+ * i2ptunnel HTTP client: Replace all getBytes() calls
+   with a Writer or getBytes("UTF-8") (ticket #457)
+
 2015-03-24 zzz
  * Streaming: Throw I2PSocketException when connection is reset,
    display new error page in HTTP client (ticket #643)
