@@ -541,6 +541,7 @@ public class Router implements RouterClock.ClockShiftListener {
      *  or the system lacks entropy
      *
      *  @since public as of 0.9 for Android and other embedded uses
+     *  @throws IllegalStateException if called more than once
      */
     public synchronized void runRouter() {
         synchronized(_stateLock) {
@@ -1002,6 +1003,8 @@ public class Router implements RouterClock.ClockShiftListener {
      * Rebuild a new identity the hard way - delete all of our old identity 
      * files, then reboot the router.
      *
+     *  Calls exit(), never returns.
+     *
      *  Not for external use.
      */
     public synchronized void rebuildNewIdentity() {
@@ -1063,10 +1066,16 @@ public class Router implements RouterClock.ClockShiftListener {
     
     /**
      *  Shutdown with no chance of cancellation.
-     *  Blocking, will call exit() and not return unless setKillVMOnExit(false) was previously called.
+     *  Blocking, will call exit() and not return unless setKillVMOnExit(false) was previously called,
+     *  or a final shutdown is already in progress.
      *  May take several seconds as it runs all the shutdown hooks.
+     *
+     *  @param exitCode one of the EXIT_* values, non-negative
+     *  @throws IllegalArgumentException if exitCode negative
      */
     public synchronized void shutdown(int exitCode) {
+        if (exitCode < 0)
+            throw new IllegalArgumentException();
         synchronized(_stateLock) {
             if (_state == State.FINAL_SHUTDOWN_1 ||
                 _state == State.FINAL_SHUTDOWN_2 ||
@@ -1088,8 +1097,13 @@ public class Router implements RouterClock.ClockShiftListener {
      *  Cancel the JVM runtime hook before calling this.
      *  Called by the ShutdownHook.
      *  NOT to be called by others, use shutdown().
+     *
+     *  @param exitCode one of the EXIT_* values, non-negative
+     *  @throws IllegalArgumentException if exitCode negative
      */
     public synchronized void shutdown2(int exitCode) {
+        if (exitCode < 0)
+            throw new IllegalArgumentException();
         changeState(State.FINAL_SHUTDOWN_2);
         // help us shut down esp. after OOM
         int priority = (exitCode == EXIT_OOM) ? Thread.MAX_PRIORITY - 1 : Thread.NORM_PRIORITY + 2;
@@ -1184,6 +1198,8 @@ public class Router implements RouterClock.ClockShiftListener {
 
     /**
      *  Cancel the JVM runtime hook before calling this.
+     *
+     *  @param exitCode one of the EXIT_* values, non-negative
      */
     private synchronized void finalShutdown(int exitCode) {
         changeState(State.FINAL_SHUTDOWN_3);
@@ -1232,6 +1248,8 @@ public class Router implements RouterClock.ClockShiftListener {
      * the graceful shutdown (prior to actual shutdown ;), call 
      * {@link #cancelGracefulShutdown}.
      *
+     * Exit code will be EXIT_GRACEFUL.
+     *
      * Shutdown delay will be from zero to 11 minutes.
      */
     public void shutdownGracefully() {
@@ -1246,9 +1264,12 @@ public class Router implements RouterClock.ClockShiftListener {
      *
      * Returns silently if a final shutdown is already in progress.
      *
-     * @param exitCode VM exit code
+     * @param exitCode one of the EXIT_* values, non-negative
+     * @throws IllegalArgumentException if exitCode negative
      */
     public void shutdownGracefully(int exitCode) {
+        if (exitCode < 0)
+            throw new IllegalArgumentException();
         synchronized(_stateLock) {
             if (isFinalShutdownInProgress())
                 return; // too late
@@ -1283,6 +1304,8 @@ public class Router implements RouterClock.ClockShiftListener {
 
     /**
      * What exit code do we plan on using when we shut down (or -1, if there isn't a graceful shutdown planned)
+     *
+     * @return one of the EXIT_* values or -1
      */
     public int scheduledGracefulExitCode() { return _gracefulExitCode; }
 
@@ -1375,12 +1398,12 @@ public class Router implements RouterClock.ClockShiftListener {
      *  @since 0.8.8
      */
     public void clockShift(long delta) {
+        if (delta > -60*1000 && delta < 60*1000)
+            return;
         synchronized(_stateLock) {
             if (gracefulShutdownInProgress() || !isAlive())
                 return;
         }
-        if (delta > -60*1000 && delta < 60*1000)
-            return;
         _eventLog.addEvent(EventLog.CLOCK_SHIFT, Long.toString(delta));
         // update the routing key modifier
         _context.routerKeyGenerator().generateDateBasedModData();
@@ -1484,6 +1507,8 @@ public class Router implements RouterClock.ClockShiftListener {
     /**
      * Context must be available.
      * Unzip update file found in the router dir OR base dir, to the base dir
+     *
+     * If successfull, will call exit() and never return.
      *
      * If we can't write to the base dir, complain.
      * Note: _log not available here.
