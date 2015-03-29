@@ -125,6 +125,9 @@ public class JobQueue {
      */
     private final Object _runnerLock = new Object();
     
+    /** 
+     *  Does not start the pumper. Caller MUST call startup.
+     */
     public JobQueue(RouterContext context) {
         _context = context;
         _log = context.logManager().getLog(JobQueue.class);
@@ -143,16 +146,12 @@ public class JobQueue {
         _context.statManager().createRateStat("jobQueue.jobWait", "How long does a job sit on the job queue?", "JobQueue", new long[] { 60*60*1000l, 24*60*60*1000l });
         //_context.statManager().createRateStat("jobQueue.jobRunnerInactive", "How long are runners inactive?", "JobQueue", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
 
-        _alive = true;
         _readyJobs = new LinkedBlockingQueue<Job>();
         _timedJobs = new TreeSet<Job>(new JobComparator());
         _jobLock = new Object();
         _queueRunners = new ConcurrentHashMap<Integer,JobQueueRunner>(RUNNERS);
         _jobStats = new ConcurrentHashMap<String,JobStats>();
         _pumper = new QueuePumper();
-        I2PThread pumperThread = new I2PThread(_pumper, "Job Queue Pumper", true);
-        //pumperThread.setPriority(I2PThread.NORM_PRIORITY+1);
-        pumperThread.start();
     }
     
     /**
@@ -329,6 +328,17 @@ public class JobQueue {
         runQueue(RUNNERS);
     }
     
+    /** 
+     *  Start the pumper.
+     *  @since 0.9.19
+     */
+    public void startup() {
+        _alive = true;
+        I2PThread pumperThread = new I2PThread(_pumper, "Job Queue Pumper", true);
+        //pumperThread.setPriority(I2PThread.NORM_PRIORITY+1);
+        pumperThread.start();
+    }
+
     /** @deprecated do you really want to do this? */
     public void restart() {
         synchronized (_jobLock) {
