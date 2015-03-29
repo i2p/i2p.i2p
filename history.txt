@@ -1,3 +1,6 @@
+2015-03-29 zzz
+ * I2CP: Prevent NPE (ticket #1503)
+
 2015-03-25 zzz
  * i2ptunnel HTTP client: Replace all getBytes() calls
    with a Writer or getBytes("UTF-8") (ticket #457)

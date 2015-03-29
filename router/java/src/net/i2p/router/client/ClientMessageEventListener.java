@@ -306,6 +306,13 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
      *
      */
     private void handleSendMessage(SendMessageMessage message) {
+        SessionConfig cfg = _runner.getConfig();
+        if (cfg == null) {
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("SendMessage w/o session");
+            _runner.disconnectClient("SendMessage w/o session");
+            return;
+        }
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("handleSendMessage called");
         long beforeDistribute = _context.clock().now();
@@ -370,7 +377,14 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
             _runner.disconnectClient("Invalid CreateLeaseSetMessage");
             return;
         }
-        Destination dest = _runner.getConfig().getDestination();
+        SessionConfig cfg = _runner.getConfig();
+        if (cfg == null) {
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("CreateLeaseSet w/o session");
+            _runner.disconnectClient("CreateLeaseSet w/o session");
+            return;
+        }
+        Destination dest = cfg.getDestination();
         Destination ndest = message.getLeaseSet().getDestination();
         if (!dest.equals(ndest)) {
             if (_log.shouldLog(Log.ERROR))
@@ -447,19 +461,26 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
      * ClientConnectionRunner.sessionEstablished(). Those can't be changed later.
      */
     private void handleReconfigureSession(ReconfigureSessionMessage message) {
+        SessionConfig cfg = _runner.getConfig();
+        if (cfg == null) {
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("ReconfigureSession w/o session");
+            _runner.disconnectClient("ReconfigureSession w/o session");
+            return;
+        }
         if (_log.shouldLog(Log.INFO))
-            _log.info("Updating options - old: " + _runner.getConfig() + " new: " + message.getSessionConfig());
-        if (!message.getSessionConfig().getDestination().equals(_runner.getConfig().getDestination())) {
+            _log.info("Updating options - old: " + cfg + " new: " + message.getSessionConfig());
+        if (!message.getSessionConfig().getDestination().equals(cfg.getDestination())) {
             _log.error("Dest mismatch");
             sendStatusMessage(SessionStatusMessage.STATUS_INVALID);
             _runner.stopRunning();
             return;
         }
-        _runner.getConfig().getOptions().putAll(message.getSessionConfig().getOptions());
+        cfg.getOptions().putAll(message.getSessionConfig().getOptions());
         Hash dest = _runner.getDestHash();
         ClientTunnelSettings settings = new ClientTunnelSettings(dest);
         Properties props = new Properties();
-        props.putAll(_runner.getConfig().getOptions());
+        props.putAll(cfg.getOptions());
         settings.readFromProperties(props);
         _context.tunnelManager().setInboundSettings(dest,
                                                     settings.getInboundSettings());
