@@ -139,6 +139,8 @@ class UPnPManager {
     public synchronized void rescan() {
         if (!_shouldBeRunning)
             return;
+        if (_context.router().gracefulShutdownInProgress())
+            return;
         long now = System.currentTimeMillis();
         if (_lastRescan + RESCAN_MIN_DELAY > now)
             return;
