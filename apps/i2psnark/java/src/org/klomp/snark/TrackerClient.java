@@ -912,7 +912,7 @@ public class TrackerClient implements Runnable {
         if (path == null || path.length() < 517 ||
             !path.startsWith("/"))
             return null;
-        String[] parts = path.substring(1).split("/?&;", 2);
+        String[] parts = path.substring(1).split("[/\\?&;]", 2);
         return ConvertToHash.getHash(parts[0]);
     }
     return null;
