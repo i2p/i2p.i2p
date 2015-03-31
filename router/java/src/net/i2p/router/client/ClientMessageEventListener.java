@@ -161,6 +161,11 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
         _runner.disconnected();
     }
     
+    /**
+     *  Defaults in GetDateMessage options are NOT honored.
+     *  Defaults are not serialized out-of-JVM, and the router does not recognize defaults in-JVM.
+     *  Client side must promote defaults to the primary map.
+     */
     private void handleGetDate(GetDateMessage message) {
         // sent by clients >= 0.8.7
         String clientVersion = message.getVersion();
@@ -192,6 +197,9 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
      * sending the DisconnectMessage... but right now the client will send _us_ a
      * DisconnectMessage in return, and not wait around for our DisconnectMessage.
      * So keep it simple.
+     *
+     * Defaults in SessionConfig options are, in general, NOT honored.
+     * In-JVM client side must promote defaults to the primary map.
      */
     private void handleCreateSession(CreateSessionMessage message) {
         SessionConfig in = message.getSessionConfig();
@@ -459,6 +467,9 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
      *
      * Note that this does NOT update the few options handled in
      * ClientConnectionRunner.sessionEstablished(). Those can't be changed later.
+     *
+     * Defaults in SessionConfig options are, in general, NOT honored.
+     * In-JVM client side must promote defaults to the primary map.
      */
     private void handleReconfigureSession(ReconfigureSessionMessage message) {
         SessionConfig cfg = _runner.getConfig();

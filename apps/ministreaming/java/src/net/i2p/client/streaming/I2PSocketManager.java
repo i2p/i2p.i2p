@@ -73,6 +73,9 @@ public interface I2PSocketManager {
 
     /**
      *  Create a modified copy of the current options, to be used in a setDefaultOptions() call.
+     *
+     *  As of 0.9.19, defaults in opts are honored.
+     *
      *  @param opts The new options, may be null
      */
     public I2PSocketOptions buildOptions(Properties opts);

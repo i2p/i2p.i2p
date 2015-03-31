@@ -113,6 +113,8 @@ public class TunnelController implements Logging {
      * the prefix should be used (and, in turn, that prefix should be stripped off
      * before being interpreted by this controller)
      * 
+     * Defaults in config properties are not recommended, they may or may not be honored.
+     * 
      * @param config original key=value mapping non-null
      * @param prefix beginning of key values that are relevant to this tunnel
      */
@@ -121,6 +123,7 @@ public class TunnelController implements Logging {
     }
 
     /**
+     * Defaults in config properties are not recommended, they may or may not be honored.
      * 
      * @param config original key=value mapping non-null
      * @param prefix beginning of key values that are relevant to this tunnel
@@ -506,6 +509,7 @@ public class TunnelController implements Logging {
     
     /**
      *  These are the ones stored with a prefix of "option."
+     *  Defaults in config properties are not honored.
      *
      *  @return keys with the "option." prefix stripped, non-null
      *  @since 0.9.1 Much better than getClientOptions()

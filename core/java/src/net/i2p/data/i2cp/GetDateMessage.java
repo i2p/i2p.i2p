@@ -45,6 +45,10 @@ public class GetDateMessage extends I2CPMessageImpl {
     }
 
     /**
+     *  Defaults in GetDateMessage options are, in general, NOT honored.
+     *  Defaults are not serialized out-of-JVM, and the router does not recognize defaults in-JVM.
+     *  Client side must promote defaults to the primary map.
+     *
      *  @param version the client's version String to be sent to the router; may be null;
      *                 must be non-null if options is non-null and non-empty.
      *  @param options Client options to be sent to the router; primarily for authentication; may be null;

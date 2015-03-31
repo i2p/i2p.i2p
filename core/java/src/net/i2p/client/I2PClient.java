@@ -72,6 +72,8 @@ public interface I2PClient {
      * the router how to handle the new session, and to configure the end to end
      * encryption.
      *
+     * As of 0.9.19, defaults in options are honored.
+     *
      * @param destKeyStream location from which to read the Destination, PrivateKey, and SigningPrivateKey from,
      *                      format is specified in {@link net.i2p.data.PrivateKeyFile PrivateKeyFile}
      * @param options set of options to configure the router with, if null will use System properties

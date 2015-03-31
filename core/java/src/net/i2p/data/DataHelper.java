@@ -172,11 +172,13 @@ public class DataHelper {
      * Property keys and values must not contain '=' or ';', this is not checked and they are not escaped
      * Keys and values must be 255 bytes or less,
      * Formatted length must not exceed 65535 bytes
-     * @throws DataFormatException if either is too long.
+     *
+     * Properties from the defaults table of props (if any) are not written out by this method.
      *
      * @param rawStream stream to write to
      * @param props properties to write out
-     * @throws DataFormatException if there is not enough valid data to write out
+     * @throws DataFormatException if there is not enough valid data to write out,
+     *                             or a length limit is exceeded
      * @throws IOException if there is an IO error writing out the data
      */
     public static void writeProperties(OutputStream rawStream, Properties props) 
@@ -190,7 +192,8 @@ public class DataHelper {
      * Property keys and values must not contain '=' or ';', this is not checked and they are not escaped
      * Keys and values must be 255 bytes or less,
      * Formatted length must not exceed 65535 bytes
-     * @throws DataFormatException if either is too long.
+     *
+     * Properties from the defaults table of props (if any) are not written out by this method.
      *
      * jrandom disabled UTF-8 in mid-2004, for performance reasons,
      * i.e. slow foo.getBytes("UTF-8")
@@ -199,6 +202,7 @@ public class DataHelper {
      * Use utf8 = false for RouterAddress (fast, non UTF-8)
      * Use utf8 = true for SessionConfig (slow, UTF-8)
      * @param props source may be null
+     * @throws DataFormatException if a length limit is exceeded
      */
     public static void writeProperties(OutputStream rawStream, Properties props, boolean utf8) 
             throws DataFormatException, IOException {
@@ -212,6 +216,8 @@ public class DataHelper {
      * Property keys and values must not contain '=' or ';', this is not checked and they are not escaped
      * Keys and values must be 255 bytes or less,
      * Formatted length must not exceed 65535 bytes
+     *
+     * Properties from the defaults table of props (if any) are not written out by this method.
      *
      * jrandom disabled UTF-8 in mid-2004, for performance reasons,
      * i.e. slow foo.getBytes("UTF-8")
@@ -268,6 +274,8 @@ public class DataHelper {
      * Formatted length must not exceed 65535 bytes
      * Strings will be UTF-8 encoded in the byte array.
      * Warning - confusing method name, Properties is the source.
+     *
+     * Properties from the defaults table of props (if any) are not written out by this method.
      *
      * @deprecated unused
      *
@@ -363,6 +371,8 @@ public class DataHelper {
      * Keys and values must be 255 bytes or less,
      * Formatted length must not exceed 65535 bytes
      * Warning - confusing method name, Properties is the source.
+     *
+     * Properties from the defaults table of props (if any) are not written out by this method.
      *
      * @throws DataFormatException if key, value, or total is too long
      */
@@ -476,6 +486,8 @@ public class DataHelper {
      * Writes the props to the file, unsorted (unless props is an OrderedProperties)
      * Note that this does not escape the \r or \n that are unescaped in loadProps() above.
      * As of 0.8.1, file will be mode 600.
+     *
+     * Properties from the defaults table of props (if any) are not written out by this method.
      *
      * Leading or trailing whitespace in values is not checked but
      * will be trimmed by loadProps()

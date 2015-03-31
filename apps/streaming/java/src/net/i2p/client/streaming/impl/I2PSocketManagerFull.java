@@ -102,6 +102,9 @@ public class I2PSocketManagerFull implements I2PSocketManager {
 
     /**
      *  Create a modified copy of the current options, to be used in a setDefaultOptions() call.
+     *
+     *  As of 0.9.19, defaults in opts are honored.
+     *
      *  @param opts The new options, may be null
      */
     public I2PSocketOptions buildOptions(Properties opts) {
@@ -216,6 +219,7 @@ public class I2PSocketManagerFull implements I2PSocketManager {
      *  Parameters in the I2PSocketOptions interface may be changed directly
      *  with the setters; no need to use this method for those.
      *  This does NOT update the underlying I2CP or tunnel options; use getSession().updateOptions() for that.
+     *
      *  @param options as created from a call to buildOptions(properties), non-null
      */
     public void setDefaultOptions(I2PSocketOptions options) {

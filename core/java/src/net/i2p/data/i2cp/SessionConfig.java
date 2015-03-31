@@ -91,6 +91,10 @@ public class SessionConfig extends DataStructureImpl {
      * Configure the session with the given options;
      * keys and values 255 bytes (not chars) max each
      *
+     * Defaults in SessionConfig options are, in general, NOT honored.
+     * Defaults are not serialized out-of-JVM, and the router does not recognize defaults in-JVM.
+     * Client side must promote defaults to the primary map.
+     *
      * @param options Properties for this session
      */
     public void setOptions(Properties options) {

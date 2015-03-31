@@ -47,6 +47,9 @@ class I2PSocketOptionsImpl implements I2PSocketOptions {
     /**
      *  Sets max buffer size, connect timeout, read timeout, and write timeout
      *  from properties. Does not set local port or remote port.
+     *
+     *  As of 0.9.19, defaults in opts are honored.
+     *
      *  @param opts may be null
      */
     public I2PSocketOptionsImpl(Properties opts) {
@@ -56,17 +59,20 @@ class I2PSocketOptionsImpl implements I2PSocketOptions {
     /**
      *  Sets max buffer size, connect timeout, read timeout, and write timeout
      *  from properties. Does not set local port or remote port.
+     *
+     *  As of 0.9.19, defaults in opts are honored.
+     *
      *  @param opts may be null
      */
     public void setProperties(Properties opts) {
         if (opts == null) return;
-        if (opts.containsKey(PROP_BUFFER_SIZE))
+        if (opts.getProperty(PROP_BUFFER_SIZE) != null)
             _maxBufferSize = getInt(opts, PROP_BUFFER_SIZE, DEFAULT_BUFFER_SIZE);
-        if (opts.containsKey(PROP_CONNECT_TIMEOUT))
+        if (opts.getProperty(PROP_CONNECT_TIMEOUT) != null)
             _connectTimeout = getInt(opts, PROP_CONNECT_TIMEOUT, DEFAULT_CONNECT_TIMEOUT);
-        if (opts.containsKey(PROP_READ_TIMEOUT))
+        if (opts.getProperty(PROP_READ_TIMEOUT) != null)
             _readTimeout = getInt(opts, PROP_READ_TIMEOUT, -1);
-        if (opts.containsKey(PROP_WRITE_TIMEOUT))
+        if (opts.getProperty(PROP_WRITE_TIMEOUT) != null)
             _writeTimeout = getInt(opts, PROP_WRITE_TIMEOUT, DEFAULT_WRITE_TIMEOUT);
     }
     
@@ -95,6 +101,9 @@ class I2PSocketOptionsImpl implements I2PSocketOptions {
         }
     }
     
+    /**
+     *  Not part of the API, not for external use.
+     */
     public static double getDouble(Properties opts, String name, double defaultVal) {
         if (opts == null) return defaultVal;
         String val = opts.getProperty(name);
