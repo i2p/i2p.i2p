@@ -1,3 +1,6 @@
+2015-03-31 zzz
+ * i2ptunnel: Fix multiple SSL outproxies in HTTP client
+
 2015-03-29 zzz
  * I2CP: Prevent NPE (ticket #1503)
 

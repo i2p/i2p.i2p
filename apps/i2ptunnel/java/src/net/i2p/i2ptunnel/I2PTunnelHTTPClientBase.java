@@ -215,11 +215,14 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
         // see TunnelController.setSessionOptions()
         String proxies = props.getProperty("proxyList");
         if (proxies != null) {
-            StringTokenizer tok = new StringTokenizer(proxies, ", ");
+            StringTokenizer tok = new StringTokenizer(proxies, ",; \r\n\t");
             synchronized(_proxyList) {
                 _proxyList.clear();
-                while (tok.hasMoreTokens())
-                    _proxyList.add(tok.nextToken().trim());
+                while (tok.hasMoreTokens()) {
+                    String p = tok.nextToken().trim();
+                    if (p.length() > 0)
+                        _proxyList.add(tok.nextToken().trim());
+                }
             }
         } else {
             synchronized(_proxyList) {
@@ -664,11 +667,14 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
         Writer out = new BufferedWriter(new OutputStreamWriter(outs, "UTF-8"));
         out.write(errMessage);
         if (targetRequest != null) {
-            String uri = targetRequest.replace("&", "&amp;");
+            String uri = DataHelper.escapeHTML(targetRequest);
             out.write("<a href=\"");
             out.write(uri);
             out.write("\">");
-            out.write(uri);
+            if (targetRequest.length() > 80)
+                out.write(DataHelper.escapeHTML(targetRequest.substring(0, 75)) + "&hellip;");
+            else
+                out.write(uri);
             out.write("</a>");
             if (usingWWWProxy) {
                 out.write("<br><br><b>");

@@ -1224,7 +1224,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
         String s = getTunnel().getClientOptions().getProperty(PROP_SSL_OUTPROXIES);
         if (s == null)
             return null;
-        String[] p = s.split(", ");
+        String[] p = s.split("[,; \r\n\t]");
         if (p.length == 0)
             return null;
         // todo doesn't check for ""
