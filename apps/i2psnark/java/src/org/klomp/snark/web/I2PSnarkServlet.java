@@ -1095,7 +1095,7 @@ public class I2PSnarkServlet extends BasicServlet {
                 }
             }
         } else if ("Save".equals(action)) {
-            String dataDir = req.getParameter("dataDir");
+            String dataDir = req.getParameter("nofilter_dataDir");
             boolean filesPublic = req.getParameter("filesPublic") != null;
             boolean autoStart = req.getParameter("autoStart") != null;
             String seedPct = req.getParameter("seedPct");
@@ -2138,7 +2138,8 @@ public class I2PSnarkServlet extends BasicServlet {
                   "<table border=\"0\"><tr><td>");
 
         out.write(_("Data directory"));
-        out.write(": <td><input name=\"dataDir\" size=\"80\" value=\"" + dataDir + "\" spellcheck=\"false\"></td>\n" +
+        out.write(": <td><input name=\"nofilter_dataDir\" size=\"80\" value=\"" +
+                  DataHelper.escapeHTML(dataDir) + "\" spellcheck=\"false\"></td>\n" +
 
                   "<tr><td>");
         out.write(_("Files readable by all"));
