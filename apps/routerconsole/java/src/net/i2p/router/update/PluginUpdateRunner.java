@@ -82,16 +82,16 @@ class PluginUpdateRunner extends UpdateRunner {
         protected void update() {
 
             _updated = false;
-            if(_xpi2pURL.startsWith("file://")) {
-                updateStatus("<b>" + _("Attempting to install from file {0}", _xpi2pURL) + "</b>");
-                // strip off "file://"
-                String xpi2pfile = _xpi2pURL.substring(7);
-                if(xpi2pfile.length() == 0) {
-                        statusDone("<b>" + _("No file specified {0}", _xpi2pURL) + "</b>");
+            if (_xpi2pURL.startsWith("file:") || _method == UpdateMethod.FILE) {
+                // strip off file:// or just file:
+                String xpi2pfile = _uri.getPath();
+                if(xpi2pfile == null || xpi2pfile.length() == 0) {
+                        statusDone("<b>" + _("Bad URL {0}", _xpi2pURL) + "</b>");
                 } else {
                     // copy the contents of from to _updateFile
                     long alreadyTransferred = (new File(xpi2pfile)).getAbsoluteFile().length();
                     if(FileUtil.copy((new File(xpi2pfile)).getAbsolutePath(), _updateFile, true, false)) {
+                        updateStatus("<b>" + _("Attempting to install from file {0}", _xpi2pURL) + "</b>");
                         transferComplete(alreadyTransferred, alreadyTransferred, 0L, _xpi2pURL, _updateFile, false);
                     } else {
                         statusDone("<b>" + _("Failed to install from file {0}, copy failed.", _xpi2pURL) + "</b>");

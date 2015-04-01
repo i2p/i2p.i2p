@@ -1,5 +1,6 @@
 package net.i2p.stat;
 
+import java.text.Collator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -216,7 +217,7 @@ public class StatManager {
             String gname = stat.getGroupName();
             SortedSet<String> names = groups.get(gname);
             if (names == null) {
-                names = new TreeSet<String>();
+                names = new TreeSet<String>(Collator.getInstance());
                 groups.put(gname, names);
             }
             names.add(stat.getName());
@@ -225,7 +226,7 @@ public class StatManager {
             String gname = stat.getGroupName();
             SortedSet<String> names = groups.get(gname);
             if (names == null) {
-                names = new TreeSet<String>();
+                names = new TreeSet<String>(Collator.getInstance());
                 groups.put(gname, names);
             }
             names.add(stat.getName());

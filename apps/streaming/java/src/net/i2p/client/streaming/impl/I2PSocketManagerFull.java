@@ -102,6 +102,9 @@ public class I2PSocketManagerFull implements I2PSocketManager {
 
     /**
      *  Create a modified copy of the current options, to be used in a setDefaultOptions() call.
+     *
+     *  As of 0.9.19, defaults in opts are honored.
+     *
      *  @param opts The new options, may be null
      */
     public I2PSocketOptions buildOptions(Properties opts) {
@@ -179,6 +182,30 @@ public class I2PSocketManagerFull implements I2PSocketManager {
     }
 
     /**
+     * Ping the specified peer, returning true if they replied to the ping within 
+     * the timeout specified, false otherwise.  This call blocks.
+     *
+     * Uses the ports specified.
+     *
+     * @param peer Destination to ping
+     * @param localPort 0 - 65535
+     * @param remotePort 0 - 65535
+     * @param timeoutMs timeout in ms, greater than zero
+     * @param payload to include in the ping
+     * @return the payload received in the pong, zero-length if none, null on failure or timeout
+     * @throws IllegalArgumentException
+     * @since 0.9.18
+     */
+    public byte[] ping(Destination peer, int localPort, int remotePort, long timeoutMs, byte[] payload) {
+        if (localPort < 0 || localPort > 65535 ||
+            remotePort < 0 || remotePort > 65535)
+            throw new IllegalArgumentException("bad port");
+        if (timeoutMs <= 0)
+            throw new IllegalArgumentException("bad timeout");
+        return _connectionManager.ping(peer, localPort, remotePort, timeoutMs, payload);
+    }
+
+    /**
      * How long should we wait for the client to .accept() a socket before
      * sending back a NACK/Close?  
      *
@@ -192,6 +219,7 @@ public class I2PSocketManagerFull implements I2PSocketManager {
      *  Parameters in the I2PSocketOptions interface may be changed directly
      *  with the setters; no need to use this method for those.
      *  This does NOT update the underlying I2CP or tunnel options; use getSession().updateOptions() for that.
+     *
      *  @param options as created from a call to buildOptions(properties), non-null
      */
     public void setDefaultOptions(I2PSocketOptions options) {
@@ -394,7 +422,14 @@ public class I2PSocketManagerFull implements I2PSocketManager {
         return rv;
     }
 
+    /**
+     *  For logging / diagnostics only
+     */
     public String getName() { return _name; }
+
+    /**
+     *  For logging / diagnostics only
+     */
     public void setName(String name) { _name = name; }
     
     

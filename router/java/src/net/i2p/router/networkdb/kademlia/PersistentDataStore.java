@@ -327,15 +327,17 @@ class PersistentDataStore extends TransientDataStore {
     }
     
     /**
-     *  This is mostly for manual reseeding, i.e. the user manually
+     *  This was mostly for manual reseeding, i.e. the user manually
      *  copies RI files to the directory. Nobody does this,
      *  so this is run way too often.
+     *
+     *  But it's also for migrating and reading the files after a reseed.
      *  Reseed task calls wakeup() on completion.
      *  As of 0.9.4, also initiates an automatic reseed if necessary.
      */
     private class ReadJob extends JobImpl {
-        private long _lastModified;
-        private long _lastReseed;
+        private volatile long _lastModified;
+        private volatile long _lastReseed;
         private static final int MIN_ROUTERS = KademliaNetworkDatabaseFacade.MIN_RESEED;
         private static final long MIN_RESEED_INTERVAL = 90*60*1000;
 
@@ -364,6 +366,7 @@ class PersistentDataStore extends TransientDataStore {
                 _log.info("Rereading new files");
                 // synch with the writer job
                 synchronized (_dbDir) {
+                    // _lastModified must be 0 for the first run
                     readFiles();
                 }
                 _lastModified = now;
@@ -429,14 +432,21 @@ class PersistentDataStore extends TransientDataStore {
             }
             
             if (!_initialized) {
-                if (_facade.reseedChecker().checkReseed(routerCount))
-                    _lastReseed = _context.clock().now();
                 _initialized = true;
+                if (_facade.reseedChecker().checkReseed(routerCount)) {
+                    _lastReseed = _context.clock().now();
+                    // checkReseed will call wakeup() when done and we will run again
+                } else {
+                    _context.router().setNetDbReady();
+                }
             } else if (_lastReseed < _context.clock().now() - MIN_RESEED_INTERVAL) {
                 int count = Math.min(routerCount, size());
                 if (count < MIN_ROUTERS) {
                     if (_facade.reseedChecker().checkReseed(count))
                         _lastReseed = _context.clock().now();
+                        // checkReseed will call wakeup() when done and we will run again
+                } else {
+                    _context.router().setNetDbReady();
                 }
             }
         }

@@ -143,6 +143,11 @@ if [ ! -n $LANG ]; then
         done
 fi
 
+# Mac OSX 10.10 requires the parameter bellow to run without a icon in the Dock.
+if [ "`uname -s`" = "Darwin" ]; then
+    export JAVA_TOOL_OPTIONS="-Djava.awt.headless=true"
+fi
+
 # When installing on On Mac OSX platforms, the following domain will be used to
 #  prefix the plist file name.
 PLIST_DOMAIN=org.tanukisoftware.wrapper

@@ -83,7 +83,7 @@ import net.i2p.util.OrderedProperties;
  *  An I2PTunnel tracks one or more I2PTunnelTasks and one or more I2PSessions.
  *  Usually one of each.
  *
- *  Todo: Most events are not listened to elsewhere, so error propagation is poor
+ *  TODO: Most events are not listened to elsewhere, so error propagation is poor
  */
 public class I2PTunnel extends EventDispatcherImpl implements Logging {
     private final Log _log;
@@ -539,6 +539,8 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
      * Generic options used for clients and servers.
      * This DOES update a running TunnelTask, but NOT the session.
      * A more efficient runClientOptions().
+     *
+     * Defaults in opts properties are not recommended, they may or may not be honored.
      *
      * @param opts non-null
      * @since 0.9.1
@@ -1662,6 +1664,12 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
     private void runPing(String allargs, Logging l) {
         if (allargs.length() != 0) {
             _clientOptions.setProperty(I2Ping.PROP_COMMAND, allargs);
+            if (ownDest) {
+                if (!_clientOptions.containsKey("inbound.nickname"))
+                    _clientOptions.setProperty("inbound.nickname", "I2Ping");
+                if (!_clientOptions.containsKey("outbound.nickname"))
+                    _clientOptions.setProperty("outbound.nickname", "I2Ping");
+            }
             I2PTunnelTask task = new I2Ping(l, ownDest, this, this);
             addtask(task);
             notifyEvent("pingTaskId", Integer.valueOf(task.getId()));

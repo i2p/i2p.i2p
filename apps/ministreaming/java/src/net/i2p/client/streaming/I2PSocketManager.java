@@ -73,6 +73,9 @@ public interface I2PSocketManager {
 
     /**
      *  Create a modified copy of the current options, to be used in a setDefaultOptions() call.
+     *
+     *  As of 0.9.19, defaults in opts are honored.
+     *
      *  @param opts The new options, may be null
      */
     public I2PSocketOptions buildOptions(Properties opts);
@@ -158,7 +161,31 @@ public interface I2PSocketManager {
      */
     public boolean ping(Destination peer, int localPort, int remotePort, long timeoutMs);
 
+    /**
+     * Ping the specified peer, returning true if they replied to the ping within 
+     * the timeout specified, false otherwise.  This call blocks.
+     *
+     * Uses the ports specified.
+     *
+     * @param peer Destination to ping
+     * @param localPort 0 - 65535
+     * @param remotePort 0 - 65535
+     * @param timeoutMs timeout in ms, greater than zero
+     * @param payload to include in the ping
+     * @return the payload received in the pong, zero-length if none, null on failure or timeout
+     * @throws IllegalArgumentException
+     * @since 0.9.18
+     */
+    public byte[] ping(Destination peer, int localPort, int remotePort, long timeoutMs, byte[] payload);
+
+    /**
+     *  For logging / diagnostics only
+     */
     public String getName();
+
+    /**
+     *  For logging / diagnostics only
+     */
     public void setName(String name);
 
     /**

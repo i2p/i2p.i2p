@@ -849,8 +849,8 @@ class EstablishState {
                     _log.debug(prefix()+"Clock skew: " + diff + " ms");
                 }
 
-                sendInboundConfirm(_aliceIdent, tsA);
                 _con.setRemotePeer(_aliceIdent);
+                sendInboundConfirm(_aliceIdent, tsA);
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug(prefix()+"e_bobSig is " + _e_bobSig.length + " bytes long");
                 byte iv[] = _curEncrypted;  // reuse buf

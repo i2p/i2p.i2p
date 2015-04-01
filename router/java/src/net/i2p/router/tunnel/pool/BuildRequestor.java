@@ -81,7 +81,7 @@ abstract class BuildRequestor {
                 else if (isIB && i == len - 1)
                     id = ctx.tunnelDispatcher().getNewIBEPID();
                 else
-                    id = ctx.random().nextLong(TunnelId.MAX_ID_VALUE);
+                    id = 1 + ctx.random().nextLong(TunnelId.MAX_ID_VALUE - 1);
                 cfg.getConfig(i).setReceiveTunnelId(DataHelper.toLong(4, id));
             }
             
@@ -138,6 +138,7 @@ abstract class BuildRequestor {
                     pairedTunnel = mgr.selectOutboundTunnel();
                     if (pairedTunnel != null &&
                         pairedTunnel.getLength() <= 1 &&
+                        mgr.getOutboundSettings().getLength() > 0 &&
                         mgr.getOutboundSettings().getLength() + mgr.getOutboundSettings().getLengthVariance() > 0) {
                         // don't build using a zero-hop expl.,
                         // as it is both very bad for anonomyity,
@@ -150,6 +151,7 @@ abstract class BuildRequestor {
                     pairedTunnel = mgr.selectInboundTunnel();
                     if (pairedTunnel != null &&
                         pairedTunnel.getLength() <= 1 &&
+                        mgr.getInboundSettings().getLength() > 0 &&
                         mgr.getInboundSettings().getLength() + mgr.getInboundSettings().getLengthVariance() > 0) {
                         // ditto
                         pairedTunnel = null;

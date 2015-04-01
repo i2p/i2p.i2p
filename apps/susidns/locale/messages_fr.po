@@ -17,7 +17,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-09-17 21:49+0000\n"
-"PO-Revision-Date: 2014-09-18 16:04+0000\n"
+"PO-Revision-Date: 2014-11-26 22:11+0000\n"
 "Last-Translator: Towinet\n"
 "Language-Team: French (http://www.transifex.com/projects/p/I2P/language/fr/)\n"
 "MIME-Version: 1.0\n"
@@ -499,7 +499,7 @@ msgstr "Options"
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:176
 msgid "File containing the list of subscriptions URLs (no need to change)"
-msgstr "fichier contenant la liste des URLs de souscriptions (inutile de modifier)"
+msgstr "Fichier contenant la liste des URLs de souscription (inutile de le modifier)"
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:178
 msgid "Update interval in hours"
@@ -517,29 +517,29 @@ msgstr "Votre hosts.txt (ne pas modifier)"
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:184
 msgid "Your personal addressbook, these hosts will be published"
-msgstr "Votre carnet d'adresses personnel: ces hôtes peuvent être publiés"
+msgstr "Votre carnet d'adresses personnel, ces hôtes seront publiés"
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:186
 msgid "Your private addressbook, it is never published"
-msgstr "Votre carnet d'adresses privé n'est jamais publié"
+msgstr "Votre carnet d'adresses privé, il n'est jamais publié"
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:188
 msgid "Port for your eepProxy (no need to change)"
-msgstr "Port de votre proxy eep (inutile de modifier)"
+msgstr "Port de votre proxy eep (inutile de le modifier)"
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:190
 msgid "Hostname for your eepProxy (no need to change)"
-msgstr "nom d'hôte de votre proxy eep (inutile de modifier)"
+msgstr "Nom d'hôte de votre proxy eep (inutile de le modifier)"
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:192
 msgid "Whether to update the published addressbook"
-msgstr "S'il faut actualiser le carnet d'adresses publié"
+msgstr "Faut-il actualiser le carnet d'adresses publié"
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:194
 msgid ""
 "File containing the etags header from the fetched subscription URLs (no need"
 " to change)"
-msgstr "Fichier contenant les en-têtes etag des URLs de souscription (inutile de changer)"
+msgstr "Fichier contenant les en-têtes \"etag\" issues des URLs de souscription (inutile de le changer)"
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:196
 msgid ""
@@ -549,11 +549,11 @@ msgstr "Fichier contenant les tampons horaires de modification de chaque URL de 
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:198
 msgid "File to log activity to (change to /dev/null if you like)"
-msgstr "Fichier d'historiques (modifiez en /dev/null si ça vous chante) "
+msgstr "Fichier d'historique (modifiez-le en /dev/null si cela vous chante)"
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:200
 msgid "Name of the theme to use (defaults to 'light')"
-msgstr "Nom du thème à utiliser ('light' par défaut)"
+msgstr "Nom du thème à utiliser (par défaut c'est 'light')"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:112
 msgid "addressbook"

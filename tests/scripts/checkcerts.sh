@@ -20,7 +20,7 @@ SOON=60
 
 date2julian() {
     # Julian date conversion adapted from a post (its code released into the public
-    # domain) by Tapani Tarvainen to comp.unix.shell (1998) for portability
+    # domain) by Tapani Tarvainen to comp.unix.shell 1998)) for portability
     # (e.g. using 'expr' instead of requiring Bash, ksh, or zsh).
     #   $1 = Month
     #   $2 = Day
@@ -90,7 +90,7 @@ getmonth() {
 checkcert() {
     if [ $OPENSSL ]; then
         # OpenSSL's format: Mar  7 16:08:35 2022 GMT
-        DATA=$(openssl x509 -enddate -noout -in $1| cut -d'=' -f2-)
+        DATA=$(openssl x509 -enddate -noout -in $1 | cut -d'=' -f2-)
     else
         # Certtool's format: Mon Mar 07 16:08:35 UTC 2022
         DATA=$(certtool -i < "$1" | sed -e '/Not\sAfter/!d' -e 's/^.*:\s\(.*\)/\1/')
@@ -99,6 +99,26 @@ checkcert() {
         DATA="$2 $3 $4 $6 GMT"
     fi
     echo $DATA
+}
+
+get_bits() {
+    if [ $OPENSSL ]; then
+        BITS=$(openssl x509 -text -noout -in $1 | sed -e '/Public-Key/!d' \
+            -e 's/\s\+Public-Key: (\([0-9]\+\) bit)/\1 bits/')
+    else
+        BITS=$(certtool -i < $1 | sed -e '/^.*Algorithm Security Level/!d' \
+            -e 's/.*(\([0-9]\+\) bits).*/\1 bits/')
+    fi
+}
+
+get_sigtype() {
+    if [ $OPENSSL ]; then
+        TYPE=$(openssl x509 -text -noout -in $1 | sed -e '/Signature Algorithm/!d' \
+            -e 's/\s\+Signature Algorithm:\s\+\(.\+\)/\1/' | head -n1)
+    else
+        TYPE=$(certtool -i < $1 | sed -e '/^.*Signature Algorithm:/!d' \
+            -e 's/.*:\s\+\(.*\)/\1/')
+    fi
 }
 
 print_status() {
@@ -164,6 +184,8 @@ do
     else
        compute_dates
     fi
+    get_bits $i && get_sigtype $i
+    printf '%s - %s\n\n' "$BITS" "$TYPE"
     if grep '\s$' $i > /dev/null 2>&1; then
         echo "********* Trailing whitespace found in file $i *********"
         FAIL=1

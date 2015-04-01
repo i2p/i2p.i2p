@@ -176,7 +176,7 @@ public class EepGet {
     public static void main(String args[]) {
         String proxyHost = "127.0.0.1";
         int proxyPort = 4444;
-        int numRetries = 5;
+        int numRetries = 0;
         int markSize = 1024;
         int lineLen = 40;
         long inactivityTimeout = INACTIVITY_TIMEOUT;
@@ -360,7 +360,7 @@ public class EepGet {
 
     private static void usage() {
         System.err.println("eepget [-p 127.0.0.1[:4444]] [-c] [-o outputFile]\n" +
-                           "       [-n #retries] (default 5)\n" +
+                           "       [-n #retries] (default 0)\n" +
                            "       [-m markSize] (default 1024)\n" +
                            "       [-l lineLen]  (default 40)\n" +
                            "       [-t timeout]  (default 60 sec)\n" +
@@ -1312,18 +1312,32 @@ public class EepGet {
         return buf.toString();
     }
 
+    /**
+     *  After fetch, the received value from the server, or null if none.
+     *  Before fetch, and after some errors, may be the value passed in the constructor.
+     */
     public String getETag() {
         return _etag;
     }
     
+    /**
+     *  After fetch, the received value from the server, or null if none.
+     *  Before fetch, and after some errors, may be the value passed in the constructor.
+     */
     public String getLastModified() {
         return _lastModified;
     }
     
+    /**
+     *  @return true if the server returned 304
+     */
     public boolean getNotModified() {
         return _notModified;
     }
     
+    /**
+     *  After fetch, the received value from the server, or null if none.
+     */
     public String getContentType() {
         return _contentType;
     }

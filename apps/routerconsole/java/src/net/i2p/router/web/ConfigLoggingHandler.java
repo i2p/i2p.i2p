@@ -126,6 +126,7 @@ public class ConfigLoggingHandler extends FormHandler {
             }
         }
         
+     /*** disable
         if ( (_filename != null) && (_filename.trim().length() > 0) ) {
             _filename = _filename.trim();
             String old = _context.logManager().getBaseLogfilename();
@@ -138,6 +139,7 @@ public class ConfigLoggingHandler extends FormHandler {
                               + " (note: will not take effect until next rotation)");
             }
         }
+      ***/
         
         if ( (_recordFormat != null) && (_recordFormat.trim().length() > 0) ) {
             _recordFormat = _recordFormat.trim();

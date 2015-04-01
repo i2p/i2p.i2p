@@ -38,6 +38,7 @@ import net.i2p.data.Hash;
 import net.i2p.data.KeysAndCert;
 import net.i2p.data.Signature;
 import net.i2p.data.SimpleDataStructure;
+import net.i2p.router.Router;
 import net.i2p.util.Clock;
 import net.i2p.util.Log;
 import net.i2p.util.OrderedProperties;
@@ -84,9 +85,17 @@ public class RouterInfo extends DatabaseEntry {
     public static final String PROP_CAPABILITIES = "caps";
     public static final char CAPABILITY_HIDDEN = 'H';
 
-    // Public string of chars which serve as bandwidth capacity markers
-    // NOTE: individual chars defined in Router.java
-    public static final String BW_CAPABILITY_CHARS = "KLMNO";
+    /** Public string of chars which serve as bandwidth capacity markers
+     * NOTE: individual chars defined in Router.java
+     */
+    public static final String BW_CAPABILITY_CHARS = "" +
+        Router.CAPABILITY_BW12 +
+        Router.CAPABILITY_BW32 +
+        Router.CAPABILITY_BW64 +
+        Router.CAPABILITY_BW128 +
+        Router.CAPABILITY_BW256 +
+        Router.CAPABILITY_BW512 +
+        Router.CAPABILITY_BW_UNLIMITED;
     
     public RouterInfo() {
         _addresses = new ArrayList<RouterAddress>(2);
@@ -277,6 +286,8 @@ public class RouterInfo extends DatabaseEntry {
      * Configure a set of options or statistics that the router can expose.
      * Makes a copy.
      *
+     * Warning, clears all capabilities, must be called BEFORE addCapability().
+     *
      * @param options if null, clears current options
      * @throws IllegalStateException if RouterInfo is already signed
      */
@@ -372,6 +383,9 @@ public class RouterInfo extends DatabaseEntry {
      */
     public int getNetworkId() {
         String id = _options.getProperty(PROP_NETWORK_ID);
+        // shortcut
+        if ("2".equals(id))
+            return 2;
         if (id != null) {
             try {
                 return Integer.parseInt(id);
@@ -421,6 +435,8 @@ public class RouterInfo extends DatabaseEntry {
     }
 
     /**
+     * Warning, must be called AFTER setOptions().
+     *
      * @throws IllegalStateException if RouterInfo is already signed
      */
     public void addCapability(char cap) {
@@ -429,13 +445,14 @@ public class RouterInfo extends DatabaseEntry {
 
             String caps = _options.getProperty(PROP_CAPABILITIES);
             if (caps == null)
-                _options.setProperty(PROP_CAPABILITIES, ""+cap);
+                _options.setProperty(PROP_CAPABILITIES, String.valueOf(cap));
             else if (caps.indexOf(cap) == -1)
                 _options.setProperty(PROP_CAPABILITIES, caps + cap);
     }
 
     /**
      * @throws IllegalStateException if RouterInfo is already signed
+     * @deprecated unused
      */
     public void delCapability(char cap) {
         if (_signature != null)

@@ -19,14 +19,53 @@
 
 <jsp:useBean class="net.i2p.router.web.ConfigReseedHandler" id="formhandler" scope="request" />
 <%@include file="formhandler.jsi" %>
-<div class="configure"><form action="" method="POST">
-<input type="hidden" name="nonce" value="<%=pageNonce%>" >
-<h3><%=intl._("Reseeding Configuration")%></h3>
+
 <p><%=intl._("Reseeding is the bootstrapping process used to find other routers when you first install I2P, or when your router has too few router references remaining.")%>
 <%=intl._("If reseeding has failed, you should first check your network connection.")%>
-<p><b><%=intl._("The default settings will work for most people.")%></b>
-<%=intl._("Change these only if HTTP is blocked by a restrictive firewall, reseed has failed, and you have access to an HTTP proxy.")%>
 <%=intl._("See {0} for instructions on reseeding manually.", "<a href=\"https://geti2p.net/faq#manual_reseed\">" + intl._("the FAQ") + "</a>")%>
+</p>
+
+<div class="configure"><form action="" method="POST">
+<input type="hidden" name="nonce" value="<%=pageNonce%>" >
+<h3><%=intl._("Manual Reseed from URL")%></h3>
+<p><%=intl._("Enter zip or su3 URL")%> :
+<input name="url" type="text" size="60" value="" />
+<br><%=intl._("The su3 format is preferred, as it will be verifed as signed by a trusted source.")%>
+<%=intl._("The zip format is unsigned; use a zip file only from a source that you trust.")%>
+</p>
+<div class="formaction">
+<input type="submit" name="action" class="download" value="<%=intl._("Reseed from URL")%>" />
+</div></form></div>
+
+<div class="configure">
+<form action="" method="POST" enctype="multipart/form-data" accept-charset="UTF-8">
+<input type="hidden" name="nonce" value="<%=pageNonce%>" >
+<h3><%=intl._("Manual Reseed from File")%></h3>
+<p><%=intl._("Select zip or su3 file")%> :
+<input name="file" type="file" value="" />
+<br><%=intl._("The su3 format is preferred, as it will be verifed as signed by a trusted source.")%>
+<%=intl._("The zip format is unsigned; use a zip file only from a source that you trust.")%>
+</p>
+<div class="formaction">
+<input type="submit" name="action" class="download" value="<%=intl._("Reseed from file")%>" />
+</div></form></div>
+
+<div class="configure">
+<form action="/createreseed" method="GET">
+<h3><%=intl._("Create Reseed File")%></h3>
+<p><%=intl._("Create a new reseed zip file you may share for others to reseed manually.")%>
+<%=intl._("This file will never contain your own router's identity or IP.")%>
+</p>
+<div class="formaction">
+<input type="submit" name="action" class="go" value="<%=intl._("Create reseed file")%>" />
+</div></form></div>
+
+<div class="configure">
+<form action="" method="POST">
+<input type="hidden" name="nonce" value="<%=pageNonce%>" >
+<h3><%=intl._("Reseeding Configuration")%></h3>
+<p><b><%=intl._("The default settings will work for most people.")%></b>
+<%=intl._("Change these only if HTTPS is blocked by a restrictive firewall and reseed has failed.")%>
 </p>
 <div class="wideload">
 <table border="0" cellspacing="5">
@@ -71,7 +110,7 @@
 -->
 
 </table></div>
-<hr><div class="formaction">
+<div class="formaction">
 <input type="submit" class="cancel" name="foo" value="<%=intl._("Cancel")%>" />
 <input type="submit" name="action" class="download" value="<%=intl._("Save changes and reseed now")%>" />
 <input type="submit" name="action" class="accept" value="<%=intl._("Save changes")%>" />

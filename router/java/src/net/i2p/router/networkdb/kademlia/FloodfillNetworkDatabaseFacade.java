@@ -66,6 +66,8 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
         _context.statManager().createRateStat("netDb.searchReplyNotValidated", "How many search replies we get that we are NOT able to validate (fetch)", "NetworkDatabase", new long[] { 5*60*1000l, 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
         _context.statManager().createRateStat("netDb.searchReplyValidationSkipped", "How many search replies we get from unreliable peers that we skip?", "NetworkDatabase", new long[] { 5*60*1000l, 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
         _context.statManager().createRateStat("netDb.republishQuantity", "How many peers do we need to send a found leaseSet to?", "NetworkDatabase", new long[] { 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
+        // for ISJ
+        _context.statManager().createRateStat("netDb.RILookupDirect", "Was an iterative RI lookup sent directly?", "NetworkDatabase", new long[] { 60*60*1000 });
     }
 
     @Override
@@ -92,7 +94,11 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
      */
     @Override
     public synchronized void shutdown() {
-        if (_floodfillEnabled) {
+        // only if not forced ff or not restarting
+        if (_floodfillEnabled &&
+            (!_context.getBooleanProperty(FloodfillMonitorJob.PROP_FLOODFILL_PARTICIPANT) ||
+             !(_context.router().scheduledGracefulExitCode() == Router.EXIT_HARD_RESTART ||
+               _context.router().scheduledGracefulExitCode() == Router.EXIT_GRACEFUL_RESTART))) {
             // turn off to build a new RI...
             _floodfillEnabled = false;
             // true -> publish inline
@@ -191,6 +197,11 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
             List<Hash> nextPeers = sel.selectFloodfillParticipants(nkey, NEXT_FLOOD_QTY, getKBuckets());
             int i = 0;
             for (Hash h : nextPeers) {
+                // Don't flood an RI back to itself
+                // Not necessary, a ff will do its own flooding (reply token == 0)
+                // But other implementations may not...
+                if (h.equals(key))
+                    continue;
                 // todo key cert skip?
                 if (!peers.contains(h)) {
                     peers.add(h);
@@ -206,19 +217,22 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
             RouterInfo target = lookupRouterInfoLocally(peer);
             if ( (target == null) || (_context.banlist().isBanlisted(peer)) )
                 continue;
-            // Don't flood a RI back to itself
+            // Don't flood an RI back to itself
             // Not necessary, a ff will do its own flooding (reply token == 0)
-            //if (peer.equals(target.getIdentity().getHash()))
-            //    continue;
+            // But other implementations may not...
+            if (ds.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO && peer.equals(key))
+                continue;
             if (peer.equals(_context.routerHash()))
                 continue;
             DatabaseStoreMessage msg = new DatabaseStoreMessage(_context);
             msg.setEntry(ds);
             OutNetMessage m = new OutNetMessage(_context, msg, _context.clock().now()+FLOOD_TIMEOUT, FLOOD_PRIORITY, target);
-            // note send failure but don't give credit on success
-            // might need to change this
             Job floodFail = new FloodFailedJob(_context, peer);
             m.setOnFailedSendJob(floodFail);
+            // we want to give credit on success, even if we aren't sure,
+            // because otherwise no use noting failure
+            Job floodGood = new FloodSuccessJob(_context, peer);
+            m.setOnSendJob(floodGood);
             _context.commSystem().processMessage(m);
             flooded++;
             if (_log.shouldLog(Log.INFO))
@@ -240,6 +254,23 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
         public String getName() { return "Flood failed"; }
         public void runJob() {
             getContext().profileManager().dbStoreFailed(_peer);
+        }
+    }
+
+    /**
+     *  Note in the profile that the store succeeded
+     *  @since 0.9.19
+     */
+    private static class FloodSuccessJob extends JobImpl {
+        private final Hash _peer;
+    
+        public FloodSuccessJob(RouterContext ctx, Hash peer) {
+            super(ctx);
+            _peer = peer;
+        }
+        public String getName() { return "Flood succeeded"; }
+        public void runJob() {
+            getContext().profileManager().dbStoreSuccessful(_peer);
         }
     }
 

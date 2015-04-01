@@ -389,7 +389,7 @@ public class TunnelDispatcher implements Service {
         long rv;
         TunnelId tid;
         do {
-            rv = _context.random().nextLong(TunnelId.MAX_ID_VALUE);
+            rv = 1 + _context.random().nextLong(TunnelId.MAX_ID_VALUE - 1);
             tid = new TunnelId(rv);
         } while (_outboundGateways.containsKey(tid));
         return rv;
@@ -406,7 +406,7 @@ public class TunnelDispatcher implements Service {
         long rv;
         TunnelId tid;
         do {
-            rv = _context.random().nextLong(TunnelId.MAX_ID_VALUE);
+            rv = 1 + _context.random().nextLong(TunnelId.MAX_ID_VALUE - 1);
             tid = new TunnelId(rv);
         } while (_participants.containsKey(tid));
         return rv;
@@ -423,7 +423,7 @@ public class TunnelDispatcher implements Service {
         long rv;
         TunnelId tid;
         do {
-            rv = _context.random().nextLong(TunnelId.MAX_ID_VALUE);
+            rv = 1 + _context.random().nextLong(TunnelId.MAX_ID_VALUE - 1);
             tid = new TunnelId(rv);
         } while (_inboundGateways.containsKey(tid));
         return rv;
@@ -612,7 +612,7 @@ public class TunnelDispatcher implements Service {
      * endpoint.
      *
      * @param msg raw message to deliver to the target peer
-     * @param outboundTunnel tunnel to send the message out
+     * @param outboundTunnel tunnel to send the message out, or null for direct
      * @param targetPeer peer to receive the message
      */
     public void dispatchOutbound(I2NPMessage msg, TunnelId outboundTunnel, Hash targetPeer) {
@@ -626,7 +626,7 @@ public class TunnelDispatcher implements Service {
      *
      * @param msg raw message to deliver to the targetTunnel on the targetPeer
      * @param outboundTunnel tunnel to send the message out
-     * @param targetTunnel tunnel on the targetPeer to deliver the message to
+     * @param targetTunnel tunnel on the targetPeer to deliver the message to, or null for direct
      * @param targetPeer gateway to the tunnel to receive the message
      */
     public void dispatchOutbound(I2NPMessage msg, TunnelId outboundTunnel, TunnelId targetTunnel, Hash targetPeer) {
@@ -950,8 +950,8 @@ public class TunnelDispatcher implements Service {
         public LeaveTunnel(RouterContext ctx) {
             super(ctx);
             _configs = new LinkedBlockingQueue<HopConfig>();
-            // 20 min no tunnels accepted + 10 min tunnel expiration
-            getTiming().setStartAfter(ctx.clock().now() + 30*60*1000);
+            // 10 min no tunnels accepted + 10 min tunnel expiration
+            getTiming().setStartAfter(ctx.clock().now() + 20*60*1000);
             getContext().jobQueue().addJob(LeaveTunnel.this);
         }
         

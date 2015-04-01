@@ -95,15 +95,19 @@ public class RouterClock extends Clock {
         long delta = offsetMs - _offset;
         if (!force) {
             if ((offsetMs > MAX_OFFSET) || (offsetMs < 0 - MAX_OFFSET)) {
-                getLog().error("Maximum offset shift exceeded [" + offsetMs + "], NOT HONORING IT");
+                Log log = getLog();
+                if (log.shouldLog(Log.WARN))
+                    log.warn("Maximum offset shift exceeded [" + offsetMs + "], NOT HONORING IT");
                 return;
             }
             
             // only allow substantial modifications before the first 10 minutes
             if (_alreadyChanged && (System.currentTimeMillis() - _startedOn > 10 * 60 * 1000)) {
                 if ( (delta > MAX_LIVE_OFFSET) || (delta < 0 - MAX_LIVE_OFFSET) ) {
-                    getLog().log(Log.CRIT, "The clock has already been updated, but you want to change it by "
-                                           + delta + " to " + offsetMs + "?  Did something break?");
+                    Log log = getLog();
+                    if (log.shouldLog(Log.WARN))
+                        log.warn("The clock has already been updated, ignoring request to change it by "
+                                           + delta + " to " + offsetMs, new Exception());
                     return;
                 }
             }
@@ -118,7 +122,9 @@ public class RouterClock extends Clock {
             // only listen to a worse stratum if it's been a while
             if (_alreadyChanged && stratum > _lastStratum &&
                 System.currentTimeMillis() - _lastChanged < MIN_DELAY_FOR_WORSE_STRATUM) {
-                getLog().debug("Ignoring update from a stratum " + stratum +
+                Log log = getLog();
+                if (log.shouldLog(Log.DEBUG))
+                    log.debug("Ignoring update from a stratum " + stratum +
                               " clock, we recently had an update from a stratum " + _lastStratum + " clock");
                 return;
             }
@@ -142,7 +148,9 @@ public class RouterClock extends Clock {
                                        "ms to " + predictedPeerClockSkew + "ms. Bad time server?");
                         return;
                     } else {
-                        getLog().debug("Approving clock offset " + offsetMs + "ms (current " + _offset +
+                        Log log = getLog();
+                        if (log.shouldLog(Log.DEBUG))
+                            log.debug("Approving clock offset " + offsetMs + "ms (current " + _offset +
                                        "ms) since it would decrease peer clock skew from " + currentPeerClockSkew +
                                        "ms to " + predictedPeerClockSkew + "ms.");
                     }
@@ -167,7 +175,9 @@ public class RouterClock extends Clock {
             _context.statManager().addRateData("clock.skew", delta);
             _desiredOffset = offsetMs;
         } else {
-            getLog().log(Log.INFO, "Initializing clock offset to " + offsetMs + "ms, Stratum " + stratum);
+            Log log = getLog();
+            if (log.shouldLog(Log.INFO))
+                log.info("Initializing clock offset to " + offsetMs + "ms, Stratum " + stratum);
             _alreadyChanged = true;
             _offset = offsetMs;
             _desiredOffset = offsetMs;

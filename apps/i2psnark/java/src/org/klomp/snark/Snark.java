@@ -1288,7 +1288,8 @@ public class Snark
         totalUploaders += c.uploaders;
     }
     int limit = _util.getMaxUploaders();
-    // debug("Total uploaders: " + totalUploaders + " Limit: " + limit, Snark.DEBUG);
+    if (_log.shouldLog(Log.DEBUG))
+        _log.debug("Total uploaders: " + totalUploaders + " Limit: " + limit);
     return totalUploaders > limit;
   }
 

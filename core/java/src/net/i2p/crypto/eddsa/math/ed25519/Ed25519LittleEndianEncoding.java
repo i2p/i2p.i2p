@@ -70,7 +70,7 @@ public class Ed25519LittleEndianEncoding extends Encoding {
 
         // Step 1:
         // Calculate q
-        q = (19 * h9 + (((int) 1) << 24)) >> 25;
+        q = (19 * h9 + (1 << 24)) >> 25;
         q = (h0 + q) >> 26;
         q = (h1 + q) >> 25;
         q = (h2 + q) >> 26;

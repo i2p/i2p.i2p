@@ -383,9 +383,7 @@ class ClientConnectionRunner {
     void disconnectClient(String reason, int logLevel) {
         if (_log.shouldLog(logLevel))
             _log.log(logLevel, "Disconnecting the client - " 
-                     + reason
-                     + " config: "
-                     + _config);
+                     + reason);
         DisconnectMessage msg = new DisconnectMessage();
         if (reason.length() > 255)
             reason = reason.substring(0, 255);

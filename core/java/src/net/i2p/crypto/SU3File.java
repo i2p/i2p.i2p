@@ -50,6 +50,7 @@ public class SU3File {
     private String _version;
     private int _versionLength;
     private String _signer;
+    private int _signatureLength;
     private int _signerLength;
     private int _fileType = -1;
     private ContentType _contentType;
@@ -125,7 +126,7 @@ public class SU3File {
     private static final ContentType DEFAULT_CONTENT_TYPE = ContentType.UNKNOWN;
     // avoid early ctx init
     //private static final SigType DEFAULT_SIG_TYPE = SigType.DSA_SHA1;
-    private static final int DEFAULT_SIG_CODE = 0;
+    private static final int DEFAULT_SIG_CODE = 6;
 
     /**
      *
@@ -265,16 +266,16 @@ public class SU3File {
         // In verifyAndMigrate it reads this far then rewinds, but we don't need to here
         if (_sigType == null)
             throw new IOException("unknown sig type: " + sigTypeCode);
-        _signerLength = (int) DataHelper.readLong(in, 2);
-        if (_signerLength != _sigType.getSigLen())
+        _signatureLength = (int) DataHelper.readLong(in, 2);
+        if (_signatureLength != _sigType.getSigLen())
             throw new IOException("bad sig length");
         skip(in, 1);
         int _versionLength = in.read();
         if (_versionLength < MIN_VERSION_BYTES)
             throw new IOException("bad version length");
         skip(in, 1);
-        int signerLen = in.read();
-        if (signerLen <= 0)
+        _signerLength = in.read();
+        if (_signerLength <= 0)
             throw new IOException("bad signer length");
         _contentLength = DataHelper.readLong(in, 8);
         if (_contentLength <= 0)
@@ -302,9 +303,9 @@ public class SU3File {
         }
         _version = new String(data, 0, zbyte, "UTF-8");
 
-        data = new byte[signerLen];
+        data = new byte[_signerLength];
         bytesRead = DataHelper.read(in, data);
-        if (bytesRead != signerLen)
+        if (bytesRead != _signerLength)
             throw new EOFException();
         _signer = DataHelper.getUTF8(data);
 
@@ -413,6 +414,9 @@ public class SU3File {
                 din.on(false);
                 Signature signature = new Signature(_sigType);
                 signature.readBytes(in);
+                int avail = in.available();
+                if (avail > 0)
+                    throw new IOException(avail + " bytes data after sig");
                 SimpleDataStructure hash = _sigType.getHashInstance();
                 hash.setData(sha);
                 //System.out.println("hash\n" + HexDump.dump(sha));
@@ -593,7 +597,7 @@ public class SU3File {
             } else if ("keygen".equals(cmd)) {
                 ok = genKeysCLI(stype, a.get(0), a.get(1), a.get(2));
             } else if ("extract".equals(cmd)) {
-                ok = extractCLI(a.get(0), a.get(1), shouldVerify);
+                ok = extractCLI(a.get(0), a.get(1), shouldVerify, kfile);
             } else {
                 showUsageCLI();
             }
@@ -822,6 +826,11 @@ public class SU3File {
                 System.out.println("Private key for " + signerName + " not found in keystore " + privateKeyFile);
                 return false;
             }
+            // now fix the sig type based on the private key
+            SigType oldType = type;
+            type = SigUtil.fromJavaKey(pk).getType();
+            if (oldType != type)
+                System.out.println("Warning: Using private key type " + type + ", ignoring specified type " + oldType);
             SU3File file = new SU3File(signedFile);
             file.write(new File(inputFile), ftype, ctype.getCode(), version, signerName, pk, type);
             System.out.println("Input file '" + inputFile + "' signed and written to '" + signedFile + "'");
@@ -861,10 +870,12 @@ public class SU3File {
      *  @return success
      *  @since 0.9.9
      */
-    private static final boolean extractCLI(String signedFile, String outFile, boolean verifySig) {
+    private static final boolean extractCLI(String signedFile, String outFile, boolean verifySig, String pkFile) {
         InputStream in = null;
         try {
             SU3File file = new SU3File(signedFile);
+            if (pkFile != null)
+                file.setPublicKeyCertificate(new File(pkFile));
             file.setVerifySignature(verifySig);
             File out = new File(outFile);
             boolean ok = file.verifyAndMigrate(out);
@@ -968,6 +979,11 @@ public class SU3File {
         } catch (GeneralSecurityException gse) {
             IOException ioe = new IOException("cert error");
             ioe.initCause(gse);
+            throw ioe;
+        } catch (IllegalArgumentException iae) {
+            // java 1.8.0_40-b10, openSUSE
+            IOException ioe = new IOException("cert error");
+            ioe.initCause(iae);
             throw ioe;
         } finally {
             try { if (fis != null) fis.close(); } catch (IOException foo) {}

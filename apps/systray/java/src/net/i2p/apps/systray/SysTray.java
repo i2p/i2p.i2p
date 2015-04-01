@@ -37,7 +37,6 @@ public class SysTray implements SysTrayMenuListener {
     private static SysTray        _instance;
     private static String         _portString;
     private static boolean        _showIcon;
-    private static UrlLauncher    _urlLauncher    = new UrlLauncher();
     private static final boolean _is64 = SystemVersion.is64Bit();
 
     static {
@@ -84,17 +83,18 @@ public class SysTray implements SysTrayMenuListener {
     private static void openRouterConsole(String url) {
 
         String browser = null;
+        UrlLauncher urlLauncher = new UrlLauncher();
 
         if (_browserString == null || _browserString.equals("default")) {
             try {
-                if (_urlLauncher.openUrl(url))
+                if (urlLauncher.openUrl(url))
                     return;
             } catch (Exception ex) {
                 // Fall through.
             }
         } else {
             try {
-                if (_urlLauncher.openUrl(url, _browserString))
+                if (urlLauncher.openUrl(url, _browserString))
                     return;
             } catch (Exception ex) {
                 // Fall through.

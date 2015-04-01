@@ -174,8 +174,9 @@ public class SAMStreamSend {
         }
         
         public boolean openConnection() {
+            FileInputStream fin = null;
             try {
-                FileInputStream fin = new FileInputStream(_destFile);
+                fin = new FileInputStream(_destFile);
                 byte dest[] = new byte[1024];
                 int read = DataHelper.read(fin, dest);
 
@@ -200,6 +201,12 @@ public class SAMStreamSend {
             } catch (IOException ioe) {
                 _log.error("Unable to connect", ioe);
                 return false;
+            } finally {
+                if(fin != null) {
+                    try {
+                        fin.close();
+                    } catch(IOException ioe) {}
+                }
             }
         }
         

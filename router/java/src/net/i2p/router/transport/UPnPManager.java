@@ -13,6 +13,7 @@ import net.i2p.router.RouterContext;
 import static net.i2p.router.transport.Transport.AddressSource.SOURCE_UPNP;
 import net.i2p.util.Addresses;
 import net.i2p.util.Log;
+import net.i2p.util.SimpleTimer2;
 import net.i2p.util.Translate;
 
 import org.cybergarage.util.Debug;
@@ -34,8 +35,12 @@ class UPnPManager {
     private final UPnP _upnp;
     private final UPnPCallback _upnpCallback;
     private volatile boolean _isRunning;
+    private volatile boolean _shouldBeRunning;
+    private volatile long _lastRescan;
+    private volatile boolean _errorLogged;
     private InetAddress _detectedAddress;
     private final TransportManager _manager;
+    private final SimpleTimer2.TimedEvent _rescanner;
     /**
      *  This is the TCP HTTP Event listener
      *  We move these so we don't conflict with other users of the same upnp library
@@ -46,6 +51,12 @@ class UPnPManager {
     /** this is the UDP SSDP Search reply listener */
     private static final String PROP_SSDP_PORT = "i2np.upnp.SSDPPort";
     private static final int DEFAULT_SSDP_PORT = 7653;
+    private static final long RESCAN_MIN_DELAY = 60*1000;
+    private static final long RESCAN_SHORT_DELAY = 2*60*1000;
+    // minimum UPnP announce interval is 30 minutes. Let's be faster
+    // 30 minutes is also the default "lease time" in cybergarage.
+    // It expires after 31 minutes.
+    private static final long RESCAN_LONG_DELAY = 14*60*1000;
 
     public UPnPManager(RouterContext context, TransportManager manager) {
         _context = context;
@@ -60,6 +71,7 @@ class UPnPManager {
         _upnp.setHTTPPort(_context.getProperty(PROP_HTTP_PORT, DEFAULT_HTTP_PORT));
         _upnp.setSSDPPort(_context.getProperty(PROP_SSDP_PORT, DEFAULT_SSDP_PORT));
         _upnpCallback = new UPnPCallback();
+        _rescanner = new Rescanner();
     }
     
     /**
@@ -68,6 +80,7 @@ class UPnPManager {
     public synchronized void start() {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("UPnP Start");
+        _shouldBeRunning = true;
         if (!_isRunning) {
             long b = _context.clock().now();
             try {
@@ -76,10 +89,18 @@ class UPnPManager {
                     _log.info("UPnP runPlugin took " + (_context.clock().now() - b));
             } catch (Exception e) {
                 // NPE in UPnP (ticket #728), can't let it bring us down
-                _log.error("UPnP error, please report", e);
+                if (!_errorLogged) {
+                    _log.error("UPnP error, please report", e);
+                    _errorLogged = true;
+                }
             }
         }
-        if (!_isRunning) {
+        if (_isRunning) {
+            _rescanner.schedule(RESCAN_LONG_DELAY);
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("UPnP Start Done");
+        } else {
+            _rescanner.schedule(RESCAN_SHORT_DELAY);
             // Do we have a non-loopback, non-broadcast address?
             // If not, that's why it failed (HTTPServer won't start)
             if (!Addresses.isConnected())
@@ -90,15 +111,71 @@ class UPnPManager {
     }
 
     /**
-     *  Blocking, may take a while
+     *  Blocking, may take a while, up to 20 seconds
      */
     public synchronized void stop() {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("UPnP Stop");
+        _shouldBeRunning = false;
+        _rescanner.cancel();
         if (_isRunning)
             _upnp.terminate();
         _isRunning = false;
         _detectedAddress = null;
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("UPnP Stop Done");
+    }
+
+    /**
+     *  Call when IP or network connectivity might have changed.
+     *  Starts UPnP if previous start failed, else starts a search.
+     *  Must have called start() first, and not called stop().
+     *
+     *  Should be fast. This only starts the search, the responses
+     *  will come in over the MX time (3 seconds).
+     *
+     *  @since 0.9.18
+     */
+    public synchronized void rescan() {
+        if (!_shouldBeRunning)
+            return;
+        if (_context.router().gracefulShutdownInProgress())
+            return;
+        long now = System.currentTimeMillis();
+        if (_lastRescan + RESCAN_MIN_DELAY > now)
+            return;
+        _lastRescan = now;
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("UPnP Rescan Start");
+        if (_isRunning) {
+            // TODO default search MX (jitter) is 3 seconds... reduce?
+            // See also:
+            // Adaptive Jitter Control for UPnP M-Search
+            // Kevin Mills and Christopher Dabrowski
+            _upnp.search();
+        } else {
+            start();
+        }
+    }
+
+    /**
+     * Initiate a UPnP search
+     *
+     * @since 0.9.18
+     */
+    private class Rescanner extends SimpleTimer2.TimedEvent {
+
+        /** caller must schedule() */
+        public Rescanner() {
+            super(_context.simpleTimer2());
+        }
+
+        public void timeReached() {
+            if (_shouldBeRunning) {
+                rescan();
+                reschedule(_isRunning ? RESCAN_LONG_DELAY : RESCAN_SHORT_DELAY);
+            }
+        }
     }
     
     /**
@@ -192,6 +269,10 @@ class UPnPManager {
         }
     }
 
+    /**
+     *  Warning - blocking, very slow, queries the active router,
+     *  will take many seconds if it has vanished.
+     */
     public String renderStatusHTML() {
         if (!_isRunning)
             return "<h3><a name=\"upnp\"></a>" + _("UPnP is not enabled") + "</h3>\n";

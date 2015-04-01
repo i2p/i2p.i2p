@@ -4,8 +4,10 @@ certificates/r31453.ovh.net
 certificates/75.145.125.59.crt
 certificates/forum.i2p2.de.crt
 certificates/cowpuncher.drollette.com.crt
+certificates/ssl/www.cacert.org.crt
 certificates/ssl/i2p.feared.eu.crt
 certificates/ssl/reseed.pkol.de.crt
+certificates/ssl/cert.smartcom.org.crt
 # old translated proxy error pages
 docs/ahelper-conflict-header_ar.ht
 docs/ahelper-conflict-header_de.ht
@@ -86,3 +88,7 @@ certificates/www.cacert.org.crt
 certificates/ssl/i2pprojekt.de.crt
 # no longer used
 certificates/ssl/netdb.i2p2.de.crt
+certificates/ssl/cloudflare.com.crt
+certificates/ssl/webpack.de.crt
+certificates/reseed/sindu_at_mail.i2p.crt
+certificates/ssl/i2p-netdb.innovatio.no.crt

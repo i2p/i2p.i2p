@@ -67,7 +67,7 @@
             <echo message="The following command will install all of the dependencies for you:" />
             <echo message=" " />
             <echo message="apt-get install debhelper ant debconf default-jdk gettext libgmp3-dev po-debconf fakeroot build-essential \" />
-            <echo message="                   quilt libcommons-logging-java" />
+            <echo message="                   quilt libcommons-logging-java dh-apparmor" />
             <echo message=" " />
             <echo message="Once the dependencies are installed, run &quot;ant debian&quot;"/>
             <echo message="to patch the source and build the packages." />
@@ -286,6 +286,7 @@
     <!-- jar (not war) for Android -->
     <target name="buildAddressbookJar" depends="buildCore" >
         <ant dir="apps/addressbook/" target="jar" />
+        <copy file="apps/addressbook/dist/addressbook.jar" todir="build/" />
     </target>
 
     <target name="buildAddressbook" depends="buildCore, buildJetty" >
@@ -293,10 +294,11 @@
         <copy file="apps/addressbook/dist/addressbook.war" todir="build/" />
     </target>
 
-    <!-- jar only (no war) for Android -->
-    <target name="buildI2PTunnelJar" depends="buildStreaming" >
-        <ant dir="apps/i2ptunnel/java/" target="jar" />
+    <!-- Both jars and no war, for Android -->
+    <target name="buildI2PTunnelJars" depends="buildStreaming" >
+        <ant dir="apps/i2ptunnel/java/" target="uiJar" />
         <copy file="apps/i2ptunnel/java/build/i2ptunnel.jar" todir="build/" />
+        <copy file="apps/i2ptunnel/java/build/i2ptunnel-ui.jar" todir="build/" />
     </target>
 
     <target name="buildI2PTunnel" depends="buildStreaming, buildJetty" >
@@ -678,7 +680,7 @@
             windowtitle="I2P Anonymous Network - Java Documentation - Version ${release.number}">
             <group title="Core SDK (i2p.jar)" packages="net.i2p:net.i2p.*:net.i2p.client:net.i2p.client.*:net.i2p.internal:net.i2p.internal.*:freenet.support.CPUInformation:org.bouncycastle.oldcrypto:org.bouncycastle.oldcrypto.*:gnu.crypto.*:gnu.getopt:gnu.gettext:com.nettgryppa.security:net.metanotion:net.metanotion.*" />
             <group title="Streaming Library" packages="net.i2p.client.streaming:net.i2p.client.streaming.impl" />
-            <group title="Router" packages="net.i2p.router:net.i2p.router.*:net.i2p.data.i2np:net.i2p.data.router:org.cybergarage.*:org.freenetproject:org.xlattice.crypto.filters" />
+            <group title="Router" packages="net.i2p.router:net.i2p.router.*:net.i2p.data.i2np:net.i2p.data.router:org.cybergarage:org.cybergarage.*:org.freenetproject:org.xlattice.crypto.filters" />
             <group title="Router Console" packages="net.i2p.router.web:net.i2p.router.update:net.i2p.router.news" />
             <!-- apps and bridges starting here, alphabetical please -->
             <group title="Addressbook Application" packages="net.i2p.addressbook" />
@@ -688,11 +690,11 @@
             <group title="I2PSnark Application" packages="org.klomp.snark:org.klomp.snark.*" />
             <group title="I2PTunnel Application" packages="net.i2p.i2ptunnel:net.i2p.i2ptunnel.*" />
             <group title="Installer Utilities" packages="net.i2p.installer" />
-            <group title="Jetty Starter and Logging" packages="net.i2p.jetty:net.i2p.servlet:net.i2p.servlet.*" />
+            <group title="Jetty Utilities" packages="net.i2p.jetty:net.i2p.servlet:net.i2p.servlet.*:org.mortbay.servlet:org.mortbay.util" />
             <group title="SAM Bridge" packages="net.i2p.sam" />
             <group title="SAM Demos" packages="net.i2p.sam.client" />
             <group title="SusiDNS Application" packages="i2p.susi.dns" />
-            <group title="SusiMail Application" packages="i2p.susi.webmail:i2p.susi.webmail.*:i2p.susi.debug:i2p.susi.util:org.mortbay.servlet:org.mortbay.util" />
+            <group title="SusiMail Application" packages="i2p.susi.webmail:i2p.susi.webmail.*:i2p.susi.debug:i2p.susi.util" />
             <group title="Systray Application" packages="net.i2p.apps.systray" />
             <sourcepath>
                 <pathelement location="core/java/src" />
@@ -1135,6 +1137,7 @@
         <copy file="history.txt" todir="pkg-temp/" overwrite="true" />
         <mkdir dir="pkg-temp/scripts" />
         <copy file="apps/proxyscript/i2pProxy.pac" todir="pkg-temp/scripts/" />
+        <copy file="apps/apparmor/home.i2p.i2prouter" todir="pkg-temp/scripts/" />
         <copy file="installer/resources/startconsole.html" todir="pkg-temp/docs/" />
         <copy file="installer/resources/start.ico" todir="pkg-temp/docs/" />
         <copy file="installer/resources/console.ico" todir="pkg-temp/docs/" />
@@ -1384,6 +1387,7 @@
         </copy>
         <concat append="true" destfile="pkg-temp/history.txt">&#10;&#10;----------------&#10;&#10;EARLIER HISTORY IS AVAILABLE IN THE SOURCE PACKAGE"</concat>
         <copy file="installer/resources/deletelist.txt" todir="pkg-temp/" />
+        <copy file="installer/resources/blocklist.txt" todir="pkg-temp/" />
     </target>
 
     <target name="prepupdateSmall" depends="buildSmall, prepupdateRouter, prepjupdatefixes, prepthemeupdates">

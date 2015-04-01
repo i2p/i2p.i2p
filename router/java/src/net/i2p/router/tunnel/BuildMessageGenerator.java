@@ -154,7 +154,7 @@ public abstract class BuildMessageGenerator {
      * Encrypt the records so their hop ident is visible at the appropriate times.
      *
      * Note that this layer-encrypts the build records for the message in-place.
-     * Only call this onece for a given message.
+     * Only call this once for a given message.
      *
      * @param order list of hop #s as Integers.  For instance, if (order.get(1) is 4), it is peer cfg.getPeer(4)
      */

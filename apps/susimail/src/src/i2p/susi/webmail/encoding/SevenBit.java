@@ -71,13 +71,13 @@ public class SevenBit implements Encoding {
 		int backupOffset = offset;
 		while( length-- > 0 ) {
 			byte b = in[offset++];
-			if( b > 32 && b < 127 )
+			if( b >= 32 && b < 127 )
 				continue;
-			if( b == ' ' || b == '\t' )
+			if( b == '\t' )
 				continue;
 			if( b == '\r' || b == '\n' )
 				continue;
-			throw new DecodingException( "No 8bit Data allowed (" + b + ")" );
+			throw new DecodingException( "No 8 bit data allowed in 7 bit encoding (" + b + ')' );
 		}
 		return new ReadBuffer(in, backupOffset, backupLength);
 	}

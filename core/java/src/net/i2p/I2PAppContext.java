@@ -406,9 +406,11 @@ public class I2PAppContext {
                 } else if (_tmpDir.mkdir()) {
                     _tmpDir.deleteOnExit();
                 } else {
-                    System.err.println("Could not create temp dir " + _tmpDir.getAbsolutePath());
+                    System.err.println("WARNING: Could not create temp dir " + _tmpDir.getAbsolutePath());
                     _tmpDir = new SecureDirectory(_routerDir, "tmp");
-                    _tmpDir.mkdir();
+                    _tmpDir.mkdirs();
+                    if (!_tmpDir.exists())
+                        System.err.println("ERROR: Could not create temp dir " + _tmpDir.getAbsolutePath());
                 }
             }
         }

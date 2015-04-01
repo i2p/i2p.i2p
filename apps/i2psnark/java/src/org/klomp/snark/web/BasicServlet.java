@@ -358,6 +358,7 @@ class BasicServlet extends HttpServlet
             writeHeaders(response, content, content_length);
             response.setStatus(416);
             response.setHeader("Content-Range", InclusiveByteRange.to416HeaderRangeString(content_length));
+            in.close();
             return;
         }
 

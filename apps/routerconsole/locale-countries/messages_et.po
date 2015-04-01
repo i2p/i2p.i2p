@@ -2,21 +2,23 @@
 # Copyright (C) 2009 The I2P Project
 # This file is distributed under the same license as the routerconsole package.
 # To contribute translations, see http://www.i2p2.de/newdevelopers
-# foo <foo@bar>, 2009.
-#
+# 
+# Translators:
+# foo <foo@bar>, 2009
+# Marie Nepeta <hellomynameiscatbug@gmail.com>, 2014
 msgid ""
 msgstr ""
-"Project-Id-Version: I2P routerconsole\n"
+"Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-10-14 13:34+0000\n"
-"PO-Revision-Date: 2011-12-29 00:00+0000\n"
-"Last-Translator: ajutine <ajutine@nowhere.none>\n"
-"Language-Team: ajutine <ajutine@nowhere.none>\n"
-"Language: et\n"
+"POT-Creation-Date: 2013-10-14 13:33+0000\n"
+"PO-Revision-Date: 2014-11-25 12:39+0000\n"
+"Last-Translator: Marie Nepeta <hellomynameiscatbug@gmail.com>\n"
+"Language-Team: Estonian (Estonia) (http://www.transifex.com/projects/p/I2P/language/et_EE/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"Language: et_EE\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 msgid "Anonymous Proxy"
 msgstr "Anonüümne proxy"
@@ -181,7 +183,7 @@ msgid "Cape Verde"
 msgstr "Cape Verde"
 
 msgid "Curaçao"
-msgstr ""
+msgstr "Curaçao"
 
 msgid "Christmas Island"
 msgstr "Jõulusaar"
@@ -564,9 +566,8 @@ msgstr "Poola"
 msgid "Saint Pierre and Miquelon"
 msgstr "Saint Pierre ja Miquelon"
 
-#, fuzzy
 msgid "Pitcairn Islands"
-msgstr "Neitsisaared"
+msgstr "Pitcairni saared"
 
 msgid "Puerto Rico"
 msgstr "Puerto Rico"
@@ -659,7 +660,7 @@ msgid "Swaziland"
 msgstr "Swaasimaa"
 
 msgid "Turks and Caicos Islands"
-msgstr ""
+msgstr "Turksi ja Caicose saared"
 
 msgid "Chad"
 msgstr "Tšaad"
@@ -713,7 +714,7 @@ msgid "Uganda"
 msgstr "Uganda"
 
 msgid "United States Minor Outlying Islands"
-msgstr ""
+msgstr "Ühendriikide hajasaared"
 
 msgid "United States"
 msgstr "Ameerika Ühendriigid"
@@ -762,4 +763,3 @@ msgstr "Zambia"
 
 msgid "Zimbabwe"
 msgstr "Zimbabwe"
-

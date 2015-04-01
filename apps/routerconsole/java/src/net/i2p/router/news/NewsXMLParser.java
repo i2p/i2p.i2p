@@ -152,19 +152,28 @@ public class NewsXMLParser {
     private static NewsMetadata extractNewsMetadata(Node feed) throws I2PParserException {
         NewsMetadata rv = new NewsMetadata();
         Node n = feed.getNode("title");
-        if (n != null)
+        if (n != null) {
             rv.feedTitle = n.getValue();
+            if (rv.feedTitle != null)
+                rv.feedTitle = rv.feedTitle.trim();
+        }
         n = feed.getNode("subtitle");
-        if (n != null)
+        if (n != null) {
             rv.feedSubtitle = n.getValue();
+            if (rv.feedSubtitle != null)
+                rv.feedSubtitle = rv.feedTitle.trim();
+        }
         n = feed.getNode("id");
-        if (n != null)
+        if (n != null) {
             rv.feedID = n.getValue();
+            if (rv.feedTitle != null)
+                rv.feedTitle = rv.feedTitle.trim();
+        }
         n = feed.getNode("updated");
         if (n != null) {
             String v = n.getValue();
             if (v != null) {
-                long time = RFC3339Date.parse3339Date(v);
+                long time = RFC3339Date.parse3339Date(v.trim());
                 if (time > 0)
                     rv.feedUpdated = time;
             }
@@ -179,20 +188,23 @@ public class NewsXMLParser {
             // release attributes
             String a = r.getAttributeValue("date");
             if (a.length() > 0) {
-                long time = RFC3339Date.parse3339Date(a);
+                long time = RFC3339Date.parse3339Date(a.trim());
                 if (time > 0)
                     release.date = time;
             }
             a = r.getAttributeValue("minVersion");
             if (a.length() > 0)
-                release.minVersion = a;
+                release.minVersion = a.trim();
             a = r.getAttributeValue("minJavaVersion");
             if (a.length() > 0)
-                release.minJavaVersion = a;
+                release.minJavaVersion = a.trim();
             // release nodes
             n = r.getNode("i2p:version");
-            if (n != null)
+            if (n != null) {
                 release.i2pVersion = n.getValue();
+                if (release.i2pVersion != null)
+                    release.i2pVersion = release.i2pVersion.trim();
+            }
 
             List<NewsMetadata.Update> updates = new ArrayList<NewsMetadata.Update>();
             List<Node> updateNodes = getNodes(r, "i2p:update");
@@ -207,7 +219,7 @@ public class NewsXMLParser {
                 if (types.contains(type))
                     throw new I2PParserException("update with duplicate type");
                 NewsMetadata.Update update = new NewsMetadata.Update();
-                update.type = type;
+                update.type = type.trim();
                 types.add(type);
                 int totalSources = 0;
 
@@ -216,7 +228,7 @@ public class NewsXMLParser {
                     // returns "" for none
                     String href = t.getAttributeValue("href");
                     if (href.length() > 0) {
-                        update.torrent = href;
+                        update.torrent = href.trim();
                         totalSources += 1;
                     }
                 }
@@ -241,31 +253,46 @@ public class NewsXMLParser {
         for (Node entry : entries) {
             NewsEntry e = new NewsEntry();
             Node n = entry.getNode("title");
-            if (n != null)
+            if (n != null) {
                 e.title = n.getValue();
+                if (e.title != null)
+                    e.title = e.title.trim();
+            }
             n = entry.getNode("link");
-            if (n != null)
+            if (n != null) {
                 e.link = n.getValue();
+                if (e.link != null)
+                    e.link = e.link.trim();
+            }
             n = entry.getNode("id");
-            if (n != null)
+            if (n != null) {
                 e.id = n.getValue();
+                if (e.id != null)
+                    e.id = e.id.trim();
+            }
             n = entry.getNode("updated");
             if (n != null) {
                 String v = n.getValue();
                 if (v != null) {
-                    long time = RFC3339Date.parse3339Date(v);
+                    long time = RFC3339Date.parse3339Date(v.trim());
                     if (time > 0)
                         e.updated = time;
                 }
             }
             n = entry.getNode("summary");
-            if (n != null)
+            if (n != null) {
                 e.summary = n.getValue();
+                if (e.summary != null)
+                    e.summary = e.summary.trim();
+            }
             n = entry.getNode("author");
             if (n != null) {
                 n = n.getNode("name");
-                if (n != null)
+                if (n != null) {
                     e.authorName = n.getValue();
+                    if (e.authorName != null)
+                        e.authorName = e.authorName.trim();
+                }
             }
             n = entry.getNode("content");
             if (n != null) {

@@ -25,7 +25,9 @@
   <hr><div class="formaction">
  <input type="submit" class="stop" name="action" value="<%=intl._("Shutdown gracefully")%>" >
  <input type="submit" class="stop" name="action" value="<%=intl._("Shutdown immediately")%>" >
- <input type="submit" class="cancel" name="action" value="<%=intl._("Cancel graceful shutdown")%>" >
+ <% if (formhandler.shouldShowCancelGraceful()) { %>
+     <input type="submit" class="cancel" name="action" value="<%=intl._("Cancel graceful shutdown")%>" >
+ <% } %>
  </div>
  <% if (System.getProperty("wrapper.version") != null) { %>
  <p><%=intl._("If you want the router to restart itself after shutting down, you can choose one of the following.")%> 

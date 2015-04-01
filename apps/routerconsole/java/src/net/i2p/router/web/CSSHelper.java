@@ -59,7 +59,7 @@ public class CSSHelper extends HelperBase {
         // Protected with nonce in css.jsi
         if (lang != null && lang.length() >= 2 && lang.length() <= 6 &&
             lang.replaceAll("[a-zA-Z_]", "").length() == 0) {
-            Map m = new HashMap(2);
+            Map<String, String> m = new HashMap<String, String>(2);
             int under = lang.indexOf('_');
             if (under < 0) {
                 m.put(Messages.PROP_LANG, lang.toLowerCase(Locale.US));

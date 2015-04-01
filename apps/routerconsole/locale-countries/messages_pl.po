@@ -2,10 +2,11 @@
 # Copyright (C) 2009 The I2P Project
 # This file is distributed under the same license as the routerconsole package.
 # To contribute translations, see http://www.i2p2.de/newdevelopers
-#
+# 
 # Translators:
 # PolishAnon <b790979@klzlk.com>, 2011-2012
 # Warton <businesshehe@yahoo.com>, 2011-2012
+# polacco <polacco@i2pmail.org>, 2014
 # polacco <polacco@i2pmail.org>, 2012
 # PolishAnon <b790979@klzlk.com>, 2011
 # Tracerneo <ziolkoneo@gmail.com>, 2013
@@ -13,17 +14,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-11-19 23:01+0000\n"
-"PO-Revision-Date: 2013-10-23 21:02+0000\n"
-"Last-Translator: Tracerneo <ziolkoneo@gmail.com>\n"
-"Language-Team: Polish (http://www.transifex.com/projects/p/I2P/language/"
-"pl/)\n"
-"Language: pl\n"
+"POT-Creation-Date: 2013-10-14 13:33+0000\n"
+"PO-Revision-Date: 2014-11-23 20:42+0000\n"
+"Last-Translator: polacco <polacco@i2pmail.org>\n"
+"Language-Team: Polish (http://www.transifex.com/projects/p/I2P/language/pl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 "
-"|| n%100>=20) ? 1 : 2);\n"
+"Language: pl\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
 msgid "Anonymous Proxy"
 msgstr "Anonimowe proxy"
@@ -149,7 +148,7 @@ msgid "The Democratic Republic of the Congo"
 msgstr "Demokratyczna Republika Konga"
 
 msgid "Central African Republic"
-msgstr "Republika Środkowej Afryki"
+msgstr "Republika Środkowoafrykańska"
 
 msgid "Congo"
 msgstr "Kongo"
@@ -170,7 +169,7 @@ msgid "Cameroon"
 msgstr "Kamerun"
 
 msgid "China"
-msgstr "Chiny"
+msgstr "Chińska Republika Ludowa"
 
 msgid "Colombia"
 msgstr "Kolumbia"
@@ -185,7 +184,7 @@ msgid "Cuba"
 msgstr "Kuba"
 
 msgid "Cape Verde"
-msgstr "Wyspy Zielonego Przylądka"
+msgstr "Republika Zielonego Przylądka"
 
 msgid "Curaçao"
 msgstr "Curaçao"
@@ -389,7 +388,7 @@ msgid "Comoros"
 msgstr "Komory"
 
 msgid "Saint Kitts and Nevis"
-msgstr "Saint Kitts and Nevis"
+msgstr "Saint Kitts i Nevis"
 
 msgid "The Democratic People's Republic of Korea"
 msgstr "Korea Północna"
@@ -575,7 +574,7 @@ msgid "Pitcairn Islands"
 msgstr "Wyspy Pitcairn"
 
 msgid "Puerto Rico"
-msgstr "Puerto Rico"
+msgstr "Portoryko"
 
 msgid "Palestinian Territory"
 msgstr "Palestyna"
@@ -680,7 +679,7 @@ msgid "Thailand"
 msgstr "Tajlandia"
 
 msgid "Tajikistan"
-msgstr "Tadżikistan"
+msgstr "Tadżykistan"
 
 msgid "Tokelau"
 msgstr "Tokelau"
@@ -701,16 +700,16 @@ msgid "Turkey"
 msgstr "Turcja"
 
 msgid "Trinidad and Tobago"
-msgstr "Trinidad i Tobago"
+msgstr "Trynidad i Tobago"
 
 msgid "Tuvalu"
 msgstr "Tuvalu"
 
 msgid "Taiwan"
-msgstr "Tajwan"
+msgstr "Republika Chińska"
 
 msgid "United Republic of Tanzania"
-msgstr "Zjednoczonej Republiki Tanzanii"
+msgstr "Tanzania"
 
 msgid "Ukraine"
 msgstr "Ukraina"

@@ -36,7 +36,9 @@ import java.util.Locale;
 import java.util.Random;
 import java.util.Set;
 
+import net.i2p.crypto.SigType;
 import net.i2p.data.DataHelper;
+import net.i2p.data.Destination;
 import net.i2p.data.Hash;
 import net.i2p.util.ConvertToHash;
 import net.i2p.util.I2PAppThread;
@@ -88,6 +90,8 @@ public class TrackerClient implements Runnable {
   private static final int DHT_ANNOUNCE_PEERS = 4;
   public static final int PORT = 6881;
   private static final int MAX_TRACKERS = 12;
+  // tracker.welterde.i2p
+  private static final Hash DSA_ONLY_TRACKER = ConvertToHash.getHash("cfmqlafjfmgkzbt4r3jsfyhgsr5abgxryl6fnz3d3y5a365di5aa.b32.i2p");
 
   private final I2PSnarkUtil _util;
   private final MetaInfo meta;
@@ -156,6 +160,7 @@ public class TrackerClient implements Runnable {
       consecutiveFails = 0;
       runStarted = false;
       _fastUnannounce = false;
+      snark.setTrackerProblems(null);
       _thread = new I2PAppThread(this, _threadName + " #" + (++_runCount), true);
       _thread.start();
       started = true;
@@ -362,12 +367,21 @@ public class TrackerClient implements Runnable {
       if (h == null) {
           if (_log.shouldLog(Log.WARN))
               _log.warn("Bad announce URL: [" + ann + ']');
-         return false;
+          return false;
+      }
+      // comment this out if tracker.welterde.i2p upgrades
+      if (h.equals(DSA_ONLY_TRACKER)) {
+          Destination dest = _util.getMyDestination();
+          if (dest != null && dest.getSigType() != SigType.DSA_SHA1) {
+              if (_log.shouldLog(Log.WARN))
+                  _log.warn("Skipping incompatible tracker: " + ann);
+              return false;
+          }
       }
       if (existing.size() >= MAX_TRACKERS) {
           if (_log.shouldLog(Log.INFO))
               _log.info("Not using announce URL, we have enough: [" + ann + ']');
-         return false;
+          return false;
       }
       boolean rv = existing.add(h);
       if (!rv) {
@@ -898,7 +912,7 @@ public class TrackerClient implements Runnable {
         if (path == null || path.length() < 517 ||
             !path.startsWith("/"))
             return null;
-        String[] parts = path.substring(1).split("/?&;", 2);
+        String[] parts = path.substring(1).split("[/\\?&;]", 2);
         return ConvertToHash.getHash(parts[0]);
     }
     return null;

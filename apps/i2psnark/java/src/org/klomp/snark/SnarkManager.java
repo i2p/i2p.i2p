@@ -118,8 +118,8 @@ public class SnarkManager implements CompleteListener {
     public static final String PROP_PRIVATETRACKERS = "i2psnark.privatetrackers";
     private static final String PROP_USE_DHT = "i2psnark.enableDHT";
 
-    public static final int MIN_UP_BW = 2;
-    public static final int DEFAULT_MAX_UP_BW = 10;
+    public static final int MIN_UP_BW = 10;
+    public static final int DEFAULT_MAX_UP_BW = 25;
     public static final int DEFAULT_STARTUP_DELAY = 3; 
     public static final int DEFAULT_REFRESH_DELAY_SECS = 60;
     private static final int DEFAULT_PAGE_SIZE = 50;
@@ -164,7 +164,7 @@ public class SnarkManager implements CompleteListener {
     public static final Set<String> DEFAULT_TRACKER_ANNOUNCES;
 
     /** host names for config form */
-    public static final Set<String> KNOWN_OPENTRACKERS = new HashSet(Arrays.asList(new String[] {
+    public static final Set<String> KNOWN_OPENTRACKERS = new HashSet<String>(Arrays.asList(new String[] {
         "tracker.welterde.i2p", "cfmqlafjfmgkzbt4r3jsfyhgsr5abgxryl6fnz3d3y5a365di5aa.b32.i2p",
         "opentracker.dg2.i2p", "w7tpbzncbcocrqtwwm3nezhnnsw4ozadvi2hmvzdhrqzfxfum7wa.b32.i2p",
         "tracker.thebland.i2p", "s5ikrdyjwbcgxmqetxb3nyheizftms7euacuub2hic7defkh3xhq.b32.i2p",
@@ -175,7 +175,7 @@ public class SnarkManager implements CompleteListener {
     }));
 
     static {
-        Set<String> ann = new HashSet();
+        Set<String> ann = new HashSet<String>(8);
         for (int i = 1; i < DEFAULT_TRACKERS.length; i += 2) {
             if (DEFAULT_TRACKERS[i-1].equals("TheBland") && !SigType.ECDSA_SHA256_P256.isAvailable())
                 continue;

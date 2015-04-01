@@ -78,7 +78,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
          "\r\n"+
          "<html><head><title>503 Service Unavailable</title></head>\n"+
          "<body><h2>503 Service Unavailable</h2>\n" +
-         "<p>This I2P eepsite is unavailable. It may be down or undergoing maintenance.</p>\n" +
+         "<p>This I2P website is unavailable. It may be down or undergoing maintenance.</p>\n" +
          "</body></html>")
          .getBytes();
 
@@ -220,8 +220,20 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                 (headers.containsKey("X-Forwarded-For") ||
                  headers.containsKey("X-Forwarded-Server") ||
                  headers.containsKey("X-Forwarded-Host"))) {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Refusing inproxy access: " + peerHash.toBase64());
+                if (_log.shouldLog(Log.WARN)) {
+                    StringBuilder buf = new StringBuilder();
+                    buf.append("Refusing inproxy access: ").append(peerHash.toBase64());
+                    List<String> h = headers.get("X-Forwarded-For");
+                    if (h != null)
+                        buf.append(" from: ").append(h.get(0));
+                    h = headers.get("X-Forwarded-Server");
+                    if (h != null)
+                        buf.append(" via: ").append(h.get(0));
+                    h = headers.get("X-Forwarded-Host");
+                    if (h != null)
+                        buf.append(" for: ").append(h.get(0));
+                    _log.warn(buf.toString());
+                }
                 try {
                     // Send a 403, so the user doesn't get an HTTP Proxy error message
                     // and blame his router or the network.
@@ -315,7 +327,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
 
             long afterHandle = getTunnel().getContext().clock().now();
             long timeToHandle = afterHandle - afterAccept;
-            getTunnel().getContext().statManager().addRateData("i2ptunnel.httpserver.blockingHandleTime", timeToHandle, 0);
+            getTunnel().getContext().statManager().addRateData("i2ptunnel.httpserver.blockingHandleTime", timeToHandle);
             if ( (timeToHandle > 1000) && (_log.shouldLog(Log.WARN)) )
                 _log.warn("Took a while to handle the request for " + remoteHost + ':' + remotePort +
                           " [" + timeToHandle +
@@ -684,7 +696,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
             }
         }
         if (trimmed > 0)
-            ctx.statManager().addRateData("i2ptunnel.httpNullWorkaround", trimmed, 0);
+            ctx.statManager().addRateData("i2ptunnel.httpNullWorkaround", trimmed);
         
         int i = 0;
         while (true) {

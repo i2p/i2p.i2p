@@ -1,0 +1,63 @@
+# Last Modified: Thu Jan 29 03:17:01 2015
+# vim:syntax=apparmor et ts=4 sw=4
+
+#include <abstractions/base>
+#include <abstractions/fonts>
+#include <abstractions/nameservice>
+#include <abstractions/ssl_certs>
+#include <abstractions/user-tmp>
+
+network inet stream,
+network inet6 stream,
+
+# Needed for Java
+@{PROC}                                                 r,
+@{PROC}/[0-9]*/net/if_inet6                             r,
+@{PROC}/[0-9]*/net/ipv6_route                           r,
+@{PROC}/[0-9]*/status                                   r,
+/dev/random                                             r,
+/dev/urandom                                            r,
+/sys/devices/system/cpu/                                r,
+/sys/devices/system/cpu/**                              r,
+
+/etc/ssl/certs/java/**                                  r,
+/etc/timezone                                           r,
+/usr/share/javazi/**                                    r,
+
+/etc/java-*-openjdk/**                                  r,
+/usr/lib/jvm/default-java/jre/bin/java                  rix,
+/usr/lib/jvm/java-*-openjdk-*/jre/bin/java              rix,
+/usr/lib/jvm/java-*-openjdk-*/jre/lib/i386/client/classes.jsa m,
+/usr/lib/jvm/java-*-openjdk-*/jre/bin/keytool           rix,
+
+# Oracle Java is needed on the Raspberry Pi and is included in Raspbian's repositories
+/usr/lib/jvm/jdk-*-oracle-*/jre/bin/java                rix,
+/usr/lib/jvm/jdk-*-oracle-*/jre/bin/keytool             rix,
+
+# needed for I2P's graphs
+/etc/fonts/**                                            r,
+/usr/share/java/java-atk-wrapper.jar                     r,
+
+# I2P specific
+/etc/default/i2p                                        r,
+/usr/share/i2p/**                                       r,
+# Used by some plugins
+/usr/share/java/eclipse-ecj-*.jar                       r,
+
+# Tanuki java wrapper
+/etc/i2p/wrapper.config                                 r,
+/usr/sbin/wrapper                                       rix,
+/usr/share/java/wrapper*.jar                            r,
+
+/{,var/}tmp/                                            rwm,
+owner /{,var/}tmp/**                                    rwklm,
+
+# Prevent spamming the logs
+deny /dev/tty                                           rw,
+deny @{PROC}/[0-9]*/fd/                                 r,
+deny /usr/sbin/                                         r,
+deny /var/cache/fontconfig/                             wk,
+
+# Used by some versions of the Tanuki wrapper, not needed by I2P
+deny /usr/share/java/hamcrest*.jar                      r,
+deny /usr/share/java/junit*.jar                         r,

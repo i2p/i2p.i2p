@@ -27,7 +27,7 @@
  <div class="wideload">
       <table border="0" cellspacing="5">
         <tr><td class="mediumtags" align="right"><b><%=intl._("Log file")%>:</b></td>
-          <td><input type="text" name="logfilename" size="40" value="<jsp:getProperty name="logginghelper" property="logFilePattern" />" >
+          <td><input type="text" name="logfilename" size="40" disabled="disabled" title="<%=intl._("Edit {0} to change", "logger.config")%>" value="<jsp:getProperty name="logginghelper" property="logFilePattern" />" >
             <br> <i><%=intl._("(the symbol '@' will be replaced during log rotation)")%></i></td>
         </tr><tr><td class="mediumtags" align="right"><b><%=intl._("Log record format")%>:</b></td>
           <td><input type="text" name="logformat" size="20" value="<jsp:getProperty name="logginghelper" property="recordPattern" />" >

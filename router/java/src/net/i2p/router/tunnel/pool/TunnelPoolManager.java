@@ -344,9 +344,16 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         return pool.listTunnels().contains(tunnel);
     }
 
+    /** exploratory */
     public TunnelPoolSettings getInboundSettings() { return _inboundExploratory.getSettings(); }
+
+    /** exploratory */
     public TunnelPoolSettings getOutboundSettings() { return _outboundExploratory.getSettings(); }
+
+    /** exploratory */
     public void setInboundSettings(TunnelPoolSettings settings) { _inboundExploratory.setSettings(settings); }
+
+    /** exploratory */
     public void setOutboundSettings(TunnelPoolSettings settings) { _outboundExploratory.setSettings(settings); }
 
     public TunnelPoolSettings getInboundSettings(Hash client) { 
@@ -497,6 +504,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         if (!_executor.isRunning()) {
             I2PThread t = new I2PThread(_executor, "BuildExecutor", true);
             t.start();
+            _handler.init();
             for (int i = 1; i <= _numHandlerThreads; i++) {
                 I2PThread hThread = new I2PThread(_handler, "BuildHandler " + i + '/' + _numHandlerThreads, true);
                 hThread.start();

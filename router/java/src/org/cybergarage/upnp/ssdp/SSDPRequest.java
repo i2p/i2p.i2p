@@ -108,4 +108,18 @@ public class SSDPRequest extends HTTPRequest
 		String cacheCtrl = getHeaderValue(HTTP.CACHE_CONTROL);
 		return SSDP.getLeaseTime(cacheCtrl);
 	}
+
+	////////////////////////////////////////////////
+	//	BootId
+	////////////////////////////////////////////////
+
+	public void setBootId(int bootId)
+	{
+		setHeader(HTTP.BOOTID_UPNP_ORG, bootId);
+	}
+
+	public int getBootId()
+	{
+		return getIntegerHeaderValue(HTTP.BOOTID_UPNP_ORG);
+	}
 }

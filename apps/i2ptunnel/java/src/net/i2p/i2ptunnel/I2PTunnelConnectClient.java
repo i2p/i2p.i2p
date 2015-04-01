@@ -59,24 +59,22 @@ public class I2PTunnelConnectClient extends I2PTunnelHTTPClientBase implements R
 
     public static final String AUTH_REALM = "I2P SSL Proxy";
 
-    private final static byte[] ERR_BAD_PROTOCOL =
-        ("HTTP/1.1 405 Bad Method\r\n"+
+    private final static String ERR_BAD_PROTOCOL =
+         "HTTP/1.1 405 Bad Method\r\n"+
          "Content-Type: text/html; charset=iso-8859-1\r\n"+
          "Cache-control: no-cache\r\n"+
          "\r\n"+
          "<html><body><H1>I2P ERROR: METHOD NOT ALLOWED</H1>"+
          "The request uses a bad protocol. "+
-         "The Connect Proxy supports CONNECT requests ONLY. Other methods such as GET are not allowed - Maybe you wanted the HTTP Proxy?.<BR>")
-        .getBytes();
+         "The Connect Proxy supports CONNECT requests ONLY. Other methods such as GET are not allowed - Maybe you wanted the HTTP Proxy?.<BR>";
     
-    private final static byte[] ERR_LOCALHOST =
-        ("HTTP/1.1 403 Access Denied\r\n"+
+    private final static String ERR_LOCALHOST =
+         "HTTP/1.1 403 Access Denied\r\n"+
          "Content-Type: text/html; charset=iso-8859-1\r\n"+
          "Cache-control: no-cache\r\n"+
          "\r\n"+
          "<html><body><H1>I2P ERROR: REQUEST DENIED</H1>"+
-         "Your browser is misconfigured. Do not use the proxy to access the router console or other localhost destinations.<BR>")
-        .getBytes();
+         "Your browser is misconfigured. Do not use the proxy to access the router console or other localhost destinations.<BR>";
     
     /**
      * @throws IllegalArgumentException if the I2PTunnel does not contain
@@ -273,7 +271,7 @@ public class I2PTunnelConnectClient extends I2PTunnelHTTPClientBase implements R
 
             Destination clientDest = _context.namingService().lookup(destination);
             if (clientDest == null) {
-                byte[] header;
+                String header;
                 if (usingWWWProxy)
                     header = getErrorPage("dnfp", ERR_DESTINATION_UNKNOWN);
                 else
@@ -289,7 +287,7 @@ public class I2PTunnelConnectClient extends I2PTunnelHTTPClientBase implements R
             if (usingWWWProxy)
                 data = newRequest.toString().getBytes("ISO-8859-1");
             else
-                response = SUCCESS_RESPONSE;
+                response = SUCCESS_RESPONSE.getBytes("UTF-8");
             OnTimeout onTimeout = new OnTimeout(s, s.getOutputStream(), targetRequest, usingWWWProxy, currentProxy, requestId);
             Thread t = new I2PTunnelRunner(s, i2ps, sockLock, data, response, mySockets, onTimeout);
             // we are called from an unlimited thread pool, so run inline
@@ -311,10 +309,10 @@ public class I2PTunnelConnectClient extends I2PTunnelHTTPClientBase implements R
         }
     }
 
-    private static void writeErrorMessage(byte[] errMessage, OutputStream out) throws IOException {
+    private static void writeErrorMessage(String errMessage, OutputStream out) throws IOException {
         if (out == null)
             return;
-        out.write(errMessage);
+        out.write(errMessage.getBytes("UTF-8"));
         writeFooter(out);
     }
 }

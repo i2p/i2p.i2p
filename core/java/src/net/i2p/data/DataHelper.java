@@ -172,11 +172,13 @@ public class DataHelper {
      * Property keys and values must not contain '=' or ';', this is not checked and they are not escaped
      * Keys and values must be 255 bytes or less,
      * Formatted length must not exceed 65535 bytes
-     * @throws DataFormatException if either is too long.
+     *
+     * Properties from the defaults table of props (if any) are not written out by this method.
      *
      * @param rawStream stream to write to
      * @param props properties to write out
-     * @throws DataFormatException if there is not enough valid data to write out
+     * @throws DataFormatException if there is not enough valid data to write out,
+     *                             or a length limit is exceeded
      * @throws IOException if there is an IO error writing out the data
      */
     public static void writeProperties(OutputStream rawStream, Properties props) 
@@ -190,7 +192,8 @@ public class DataHelper {
      * Property keys and values must not contain '=' or ';', this is not checked and they are not escaped
      * Keys and values must be 255 bytes or less,
      * Formatted length must not exceed 65535 bytes
-     * @throws DataFormatException if either is too long.
+     *
+     * Properties from the defaults table of props (if any) are not written out by this method.
      *
      * jrandom disabled UTF-8 in mid-2004, for performance reasons,
      * i.e. slow foo.getBytes("UTF-8")
@@ -199,6 +202,7 @@ public class DataHelper {
      * Use utf8 = false for RouterAddress (fast, non UTF-8)
      * Use utf8 = true for SessionConfig (slow, UTF-8)
      * @param props source may be null
+     * @throws DataFormatException if a length limit is exceeded
      */
     public static void writeProperties(OutputStream rawStream, Properties props, boolean utf8) 
             throws DataFormatException, IOException {
@@ -212,6 +216,8 @@ public class DataHelper {
      * Property keys and values must not contain '=' or ';', this is not checked and they are not escaped
      * Keys and values must be 255 bytes or less,
      * Formatted length must not exceed 65535 bytes
+     *
+     * Properties from the defaults table of props (if any) are not written out by this method.
      *
      * jrandom disabled UTF-8 in mid-2004, for performance reasons,
      * i.e. slow foo.getBytes("UTF-8")
@@ -268,6 +274,8 @@ public class DataHelper {
      * Formatted length must not exceed 65535 bytes
      * Strings will be UTF-8 encoded in the byte array.
      * Warning - confusing method name, Properties is the source.
+     *
+     * Properties from the defaults table of props (if any) are not written out by this method.
      *
      * @deprecated unused
      *
@@ -363,6 +371,8 @@ public class DataHelper {
      * Keys and values must be 255 bytes or less,
      * Formatted length must not exceed 65535 bytes
      * Warning - confusing method name, Properties is the source.
+     *
+     * Properties from the defaults table of props (if any) are not written out by this method.
      *
      * @throws DataFormatException if key, value, or total is too long
      */
@@ -476,6 +486,8 @@ public class DataHelper {
      * Writes the props to the file, unsorted (unless props is an OrderedProperties)
      * Note that this does not escape the \r or \n that are unescaped in loadProps() above.
      * As of 0.8.1, file will be mode 600.
+     *
+     * Properties from the defaults table of props (if any) are not written out by this method.
      *
      * Leading or trailing whitespace in values is not checked but
      * will be trimmed by loadProps()
@@ -680,17 +692,21 @@ public class DataHelper {
     }
     
     /**
+     * Big endian.
+     *
      * @param numBytes 1-8
      * @param value non-negative
+     * @return an array of length numBytes
      */
     public static byte[] toLong(int numBytes, long value) throws IllegalArgumentException {
-        if (value < 0) throw new IllegalArgumentException("Negative value not allowed");
         byte val[] = new byte[numBytes];
         toLong(val, 0, numBytes, value);
         return val;
     }
     
     /**
+     * Big endian.
+     *
      * @param numBytes 1-8
      * @param value non-negative
      */
@@ -712,6 +728,7 @@ public class DataHelper {
      * @since 0.8.12
      */
     public static void toLongLE(byte target[], int offset, int numBytes, long value) {
+        if (numBytes <= 0 || numBytes > 8) throw new IllegalArgumentException("Invalid number of bytes");
         if (value < 0) throw new IllegalArgumentException("Negative value not allowed");
         int limit = offset + numBytes;
         for (int i = offset; i < limit; i++) {
@@ -721,6 +738,8 @@ public class DataHelper {
     }
     
     /**
+     * Big endian.
+     *
      * @param src if null returns 0
      * @param numBytes 1-8
      * @return non-negative
@@ -728,6 +747,7 @@ public class DataHelper {
      * @throws IllegalArgumentException if negative (only possible if numBytes = 8)
      */
     public static long fromLong(byte src[], int offset, int numBytes) {
+        if (numBytes <= 0 || numBytes > 8) throw new IllegalArgumentException("Invalid number of bytes");
         if ( (src == null) || (src.length == 0) )
             return 0;
         
@@ -752,6 +772,7 @@ public class DataHelper {
      * @since 0.8.12
      */
     public static long fromLongLE(byte src[], int offset, int numBytes) {
+        if (numBytes <= 0 || numBytes > 8) throw new IllegalArgumentException("Invalid number of bytes");
         long rv = 0;
         for (int i = offset + numBytes - 1; i >= offset; i--) {
             rv <<= 8;
@@ -1485,11 +1506,11 @@ public class DataHelper {
      * @since 0.8.2
      */
     public static String formatDuration2(long ms) {
+        if (ms == 0)
+            return "0";
         String t;
         long ams = ms >= 0 ? ms : 0 - ms;
-        if (ms == 0) {
-            return "0";
-        } else if (ams < 3 * 1000) {
+        if (ams < 3 * 1000) {
             // NOTE TO TRANSLATORS: Feel free to translate all these as you see fit, there are several options...
             // spaces or not, '.' or not, plural or not. Try not to make it too long, it is used in
             // a lot of tables.
@@ -1526,6 +1547,42 @@ public class DataHelper {
         if (ms < 0)
             t = t.replace("-", "&minus;");
         // do it here to keep &nbsp; out of the tags for translator sanity
+        return t.replace(" ", "&nbsp;");
+    }
+    
+    /**
+     * Like formatDuration2(long) but with microsec and nanosec also.
+     *
+     * @since 0.9.19
+     */
+    public static String formatDuration2(double ms) {
+        if (ms == 0d)
+            return "0";
+        String t;
+        double adms = ms >= 0 ? ms : 0 - ms;
+        long lms = (long) ms;
+        long ams = lms >= 0 ? lms : 0 - lms;
+        if (adms < 0.000000001d) {
+            return "0";
+        } else if (adms < 0.001d) {
+            t = ngettext("1 ns", "{0,number,###} ns", (int) Math.round(ms * 1000000d));
+        } else if (adms < 1.0d) {
+            t = ngettext("1 μs", "{0,number,###} μs", (int) Math.round(ms * 1000d));
+        } else if (ams < 3 * 1000) {
+            t = ngettext("1 ms", "{0,number,####} ms", (int) Math.round(ms));
+        } else if (ams < 2 * 60 * 1000) {
+            t = ngettext("1 sec", "{0} sec", (int) (ms / 1000));
+        } else if (ams < 120 * 60 * 1000) {
+            t = ngettext("1 min", "{0} min", (int) (ms / (60 * 1000)));
+        } else if (ams < 2 * 24 * 60 * 60 * 1000) {
+            t = ngettext("1 hour", "{0} hours", (int) (ms / (60 * 60 * 1000)));
+        } else if (ams > 1000l * 24l * 60l * 60l * 1000l) {
+            return _("n/a");
+        } else {
+            t = ngettext("1 day", "{0} days", (int) (ms / (24 * 60 * 60 * 1000)));
+        }
+        if (ms < 0)
+            t = t.replace("-", "&minus;");
         return t.replace(" ", "&nbsp;");
     }
     

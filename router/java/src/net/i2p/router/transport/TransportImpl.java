@@ -143,8 +143,27 @@ public abstract class TransportImpl implements Transport {
         RouterInfo ri = _context.router().getRouterInfo();
         if (ri != null) {
             char bw = ri.getBandwidthTier().charAt(0);
-            if (bw > Router.CAPABILITY_BW12 && bw <= Router.CAPABILITY_BW256)
-                def *= (1 + bw - Router.CAPABILITY_BW12);
+            switch (bw) {
+                case Router.CAPABILITY_BW12:
+                case 'u':  // unknown
+                default:
+                    break;
+                case Router.CAPABILITY_BW32:
+                    def *= 2;
+                    break;
+                case Router.CAPABILITY_BW64:
+                    def *= 3;
+                    break;
+                case Router.CAPABILITY_BW128:
+                    def *= 4;
+                    break;
+                case Router.CAPABILITY_BW256:
+                // TODO
+                case Router.CAPABILITY_BW512:
+                case Router.CAPABILITY_BW_UNLIMITED:
+                    def *= 7;
+                    break;
+            }
         }
         if (_context.netDb().floodfillEnabled()) {
             // && !SystemVersion.isWindows()) {

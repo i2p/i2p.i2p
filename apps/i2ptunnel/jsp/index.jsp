@@ -19,7 +19,7 @@
 <jsp:useBean class="net.i2p.i2ptunnel.web.Messages" id="intl" scope="request" />
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-    <title><%=intl._("I2P Tunnel Manager - List")%></title>
+    <title><%=intl._("Hidden Services Manager")%></title>
     
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
@@ -83,7 +83,7 @@
     <div id="localServerTunnelList" class="panel">
         <div class="header">
             
-    <h4><%=intl._("I2P Server Tunnels")%></h4>
+    <h4><%=intl._("I2P Hidden Services")%></h4>
         </div>
 
         
@@ -187,10 +187,10 @@
             <form id="addNewServerTunnelForm" action="edit"> 
             <div class="toolbox">
                     
-        <label><%=intl._("New server tunnel")%>:</label>
+        <label><%=intl._("New hidden service")%>:</label>
                     <select name="type">
-                        <option value="server"><%=intl._("Standard")%></option>
                         <option value="httpserver">HTTP</option>
+                        <option value="server"><%=intl._("Standard")%></option>
                         <option value="httpbidirserver">HTTP bidir</option>
                         <option value="ircserver">IRC</option>
                         <option value="streamrserver">Streamr</option>

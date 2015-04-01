@@ -1,3 +1,269 @@
+2015-04-01 zzz
+ * I2CP: Allow larger client clock skew (ticket #1503)
+ * i2psnark: Fix changing data directory on Windows (ticket #1503)
+
+2015-03-31 zzz
+ * API: Fix some client-side APIs to honor defaults in Properties;
+   add javadocs to specify where we do and don't (ticket #1491)
+ * i2ptunnel: Fix multiple SSL outproxies in HTTP client
+
+2015-03-29 zzz
+ * I2CP: Prevent NPE (ticket #1503)
+
+2015-03-25 zzz
+ * i2ptunnel HTTP client: Replace all getBytes() calls
+   with a Writer or getBytes("UTF-8") (ticket #457)
+
+2015-03-24 zzz
+ * Streaming: Throw I2PSocketException when connection is reset,
+   display new error page in HTTP client (ticket #643)
+
+2015-03-23 zzz
+ * Javadoc: Add missing package.html files (ticket #1109)
+ * Summary bar: linkify news headings, remove 'show news' link
+
+2015-03-22 zzz
+ * Console: Better status feedback on manual reseed from URL
+ * NetDB: Don't become floodfill w/o ECDSA support
+ * Reseed: Better status feedback and cleanup in summary bar
+
+2015-03-21 zzz
+ * Console: Support plugin installation from local file
+
+2015-03-20 zzz
+ * Reseed:
+  - Move multipart form support from susimail to jetty-i2p.jar
+    so console can use it
+  - Finish manual reseed from local file
+
+2015-03-19 zzz
+ * Reseed (ticket #1369):
+  - Add form to manually reseed from zip or su3 URL
+  - Add form to manually reseed from local zip or su3 file
+  - Add form to create reseed zip file to share
+  - Backend support and refactoring in reseed code
+
+2015-03-18 zzz
+ * NetDB:
+  - Send exploratory lookups directly to the floodfill if
+    we are already connected to him
+  - Don't encrypt RI lookups when overloaded
+  - Don't explore when overloaded
+  - Don't publish non-ff RI on exit if we are coming right back
+ * Router: Allow disabling the setting of some System properties, for embedded applications
+ * StatisticsManager: Publish dummy LS count if we just started
+ * Streaming: Reduce min RTO again
+ * Tunnels: Drop instead of reject requests on high job lag
+ * UPnP: Update to cyberlink 3.0
+
+2015-03-16 zzz
+ * Apache Tomcat 6.0.43
+ * NetDB: Send RI lookups directly to the floodfill if
+   we are already connected to him
+ * Router:
+   - Republish RI early if capabilities change
+   - Increase exploratory tunnel quantity if floodfill
+ * Throttle: Reject tunnels based on job lag
+
+2015-03-15 zzz
+ * Job Queue:
+   - Fix overload dropping
+   - Add drop count to job stats
+   - Decrease overload threshold again
+ * NetDb: Track flood success
+
+2015-03-13 zzz
+ * i2psnark:
+   - Auto-reduce tunnel quantity based on peer count
+   - Increase max tunnels
+ * Job Queue:
+   - Drop garlic message decryption jobs on overload
+   - Decrease overload threshold
+
+2015-03-13 dg
+ * Router: create router.integratedPeers (floodfills) stat, and 
+   allow graphing of it.
+
+2015-03-08 zzz
+ * i2psnark: Increase min and default bandwidth
+ * Throttle: Tweak messages during probabalistic rejection
+ * Transport: Add missing bogons to IP validity check
+
+* 2015-02-22 0.9.18 released
+
+2015-02-18 kytv
+ * Updates to geoip.txt and geoipv6.dat.gz based on Maxmind GeoLite Country
+   database from 2015-02-04.
+
+2015-02-15 dg
+ * FloodfillMonitorJob: 
+   - Use lifetime average value for job lag
+   - Change the job lag limit to less than 25ms
+   - Consider and set the limit of backlogged tunnels to less than 5
+
+2015-02-10 dg
+ * I2PSnark, Jetty, SAM, crypto: findbugs resource leaks.
+
+2015-02-07 zzz
+ * SSU: Limit range for valid clock skew
+ * Transport: Ban routers if they are too old and we are non-DSA
+
+2015-02-06 zzz
+ * NetDB: Reduce max job lag for floodfill
+ * NTCP: Block IP for a while when incoming connection is dropped before
+   receiving a message. Possible workaround for tickets #551, #1075, #1411.
+ * Transport:
+   - Decrease DH refiller initial delay and increase buffer size
+     to reduce chance of running out on high-bandwidth routers
+   - Add event log for reachability change
+
+2015-02-01 zzz
+ * Crypto: Catch IAE in generateCertificate()
+ * NetDB: Don't flood an RI back to itself. While Java ffs self-flood,
+   other implementations may not.
+ * OCMOSJ: Pick a OB tunnel at random, not with the OBEP closest
+   to the lease, as that may be hurting connection reliability.
+ * Router: Call warmupCrypto() earlier in the initialization
+
+2015-01-31 zzz
+ * Console:
+   - Don't display invalid IPv6 addresses as options on /confignet
+   - Disable changing log path
+ * NetDb:
+   - Encrypt lookups for 32-bit x86 also
+   - Disable floodfill in laptop mode
+ * PRNG: Don't hang forever at startup waiting for SecureRandom init
+ * Transport: Set 4 MBps max bw due to bloom filter
+
+2015-01-30 zzz
+ * HTTP Proxy: More error page changes
+ * NTCP: Throttle event pumper if looping too fast (tickets #551, #1075, #1411)
+
+2015-01-29 zzz
+ * SSU:
+   - Fix replaceExternalAddress churn when firewalled
+   - Sort introducers in router address, so we won't force a republish
+     due to a different ordering of the same introducers
+   - Don't publish an address if we need introducers but don't have any,
+     so the user won't see a 'firewalled with inbound NTCP enabled' message
+   - Fix transition from firewalled to non-firewalled
+
+2015-01-28 zzz
+ * UPnP:
+  - Rescan for devices periodically and when reachability changes (tickets #661, #959)
+  - Callback when device removed
+  - Consolidate callbacks
+  - Clear ignored devices after primary device removed
+    to allow one to be promoted on rescan
+  - Don't put "I2P" in registered protocol name
+  - Add uptime to UPnP info
+  - HTML escaping
+  - Remove static log on Android
+
+2015-01-11 zzz
+ * i2psnark: Skip incompatible welterde tracker if we are ECDSA
+ * I2PTunnel: Add option for multihoming optimization
+
+2015-01-10 zzz
+ * NetDB: Stubs for bandwidth estimation during reseed (ticket #935)
+
+2015-01-09 zzz
+ * NetDB: Publish RI faster when costs change (ticket #1437)
+
+2015-01-08 zzz
+ * Console, i2ptunnel, proxy: Renaming of various things to "hidden services"
+
+2015-01-07 zzz
+ * ClientAppConfig: Start i2ptunnel sooner (ticket #1162)
+ * NetDB: Possible fixes for reseed completion not recognized (ticket #1384)
+ * Router:
+   - Add startup/shutdown state machine
+   - Don't reset uptime after a soft restart
+ * Startup: Accept tunnels after 10 minutes instead of 20 (ticket #1152)
+ * Tunnels:
+   - Cleanup, catch more cases of zero-hop configuration
+   - Temporarily increase exploratory tunnel quantity at startup,
+     so that netdb refresh will work better
+
+2015-01-05 zzz
+ * Blocklist:
+   - Rewrite to read and merge multiple files
+   - Include in update, use version in base dir too
+   - Increase limits
+   - Bug fixes
+ * EepGet: Change command line default to 0 retries
+ * Latency reduction all over:
+   - SSU: Reduce ack delay
+   - Streaming: Reduce min RTO and flusher delay
+   - Tunnels: Reduce GW batching time
+ * Streaming:
+   - Add API for sending/receiving payload in ping/pong
+   - Fix PcapWriter
+ * UrlLauncher:
+   - Configure browser with routerconsole.browser (ticket #1159)
+   - Convert to ClientApp interface
+
+2015-01-03 zzz
+ * I2CP: Use configured leaseset keys if available
+ * I2PTunnel: Persist leaseset keys
+
+2014-12-15 zzz
+ * Console: Prevent two-word translations from splitting across lines in summary bar
+ * Crypto: EdDSA cleanups
+ * i2psnark: Unchoke new peer sooner
+ * SSU: reduce log level of uncaught errors processing I2NP message
+ * SU3:
+   - Don't require specification of sig type when signing
+   - Implement 'extract -k'
+   - Fix getContentOffset()
+   - Fail on excess data after signature
+ * Tunnels: Raise concurrent build limit
+
+2014-12-08 zzz
+ * HTTP Proxy: Fix parsing of ECDSA address helper
+ * NetDB: Increase lookup throttle time
+
+2014-12-05 zzz
+Prop from i2p.i2p.zzz.test2:
+ * Console:
+   - Show b32 for local leasesets also on netdb LS tab
+ * Data:
+   - Disallow duplicate keys in a Mapping
+   - Add RouterInfo.getVersion()
+ * I2NP:
+   - Move some data structures away from ByteArray; offsets were always zero
+     - New BuildRequestRecord constructors
+     - BuildRequestRecord field becomes final byte[222]
+     - IV becomes byte[16]
+     - Build record becomes EncryptedBuildRecord
+   - Remove extra copy in BuildRequestRecord.encryptRecord()
+   - Remove unused BuildRequestRecord.readOurIdentityMatches()
+   - DatabaseStoreMessage: Mask the unused bits in the type field for future use
+ * i2psnark: Reduce auto-stop threshold for update torrent
+ * I2PTunnel: Reduce i2ptunnel threads, more thread pooling.
+   - Move client pool from static inI2PTunnelClientBase to TCG.
+   - Use client pool for some server threads
+   - Run some things inline that were formerly threads
+ * KeyGenerator: main() test improvements
+ * Logger: Configurable flush interval
+ * Plugins: Another fix for restarting a ClientApp plugin
+ * Profiles: Change slice selection argument from an int to an enum for clarity
+ * SusiMail:
+   - Add save-as button
+   - Fix encoding for filename in Content-Disposition header
+ * Transport:
+   - Disallow standard I2P application ports as the router port
+   - Increase default class O conn. limits to 350 NTCP, 1050 SSU
+ * Update: Use last-modified instead of last-checked for the next
+   if-modified-since fetch, to fix failing to fetch the latest news
+
+* 2014-11-30 0.9.17 released
+
+2014-11-28 kytv
+ * Updated PO files from Transifex
+ * Updates to geoip.txt and geoipv6.dat.gz based on Maxmind GeoLite Country
+   database from 2014-11-05.
+
 2014-11-26 zzz
  * BuildRequestor: Reduce delay when client build can't find
    a paired tunnel (ticket #1412)

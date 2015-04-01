@@ -49,6 +49,7 @@ import net.i2p.util.VersionComparator;
  */
 class NewsFetcher extends UpdateRunner {
     private String _lastModified;
+    private long _newLastModified;
     private final File _newsFile;
     private final File _tempFile;
     /** is the news newer */
@@ -61,7 +62,7 @@ class NewsFetcher extends UpdateRunner {
         super(ctx, mgr, NEWS, uris);
         _newsFile = new File(ctx.getRouterDir(), NewsHelper.NEWS_FILE);
         _tempFile = new File(ctx.getTempDir(), "tmp-" + ctx.random().nextLong() + TEMP_NEWS_FILE);
-        long lastMod = NewsHelper.lastChecked(ctx);
+        long lastMod = NewsHelper.lastUpdated(ctx);
         if (lastMod > 0)
             _lastModified = RFC822Date.to822Date(lastMod);
     }
@@ -100,11 +101,16 @@ class NewsFetcher extends UpdateRunner {
                     get = new EepGet(_context, false, null, 0, 0, _tempFile.getAbsolutePath(), newsURL, true, null, _lastModified);
                 get.addStatusListener(this);
                 long start = _context.clock().now();
+                // will be adjusted in headerReceived() below
+                _newLastModified = start;
                 if (get.fetch()) {
                     int status = get.getStatusCode();
                     if (status == 200 || status == 304) {
-                        _context.router().saveConfig(NewsHelper.PROP_LAST_CHECKED,
-                                                 Long.toString(start));
+                        Map<String, String> opts = new HashMap<String, String>(2);
+                        opts.put(NewsHelper.PROP_LAST_CHECKED, Long.toString(start));
+                        if (status == 200 && _isNewer)
+                            opts.put(NewsHelper.PROP_LAST_UPDATED, Long.toString(_newLastModified));
+                        _context.router().saveConfig(opts, null);
                         return;
                     }
                 }
@@ -330,6 +336,19 @@ class NewsFetcher extends UpdateRunner {
     public void bytesTransferred(long alreadyTransferred, int currentWrite, long bytesTransferred, long bytesRemaining, String url) {}
 
     /**
+     *  Overriden to get the last-modified header
+     */
+    @Override
+    public void headerReceived(String url, int attemptNum, String key, String val) {
+        if ("Last-Modified".equals(key)) {
+            long lm = RFC822Date.parse822Date(val);
+            // _newLastModified was set to start time in fetchNews() above
+            if (lm > 0 && lm < _newLastModified)
+                _newLastModified = lm;
+        }
+    }
+
+    /**
      *  Copies the file from temp dir to the news location,
      *  calls checkForUpdates()
      */
@@ -338,8 +357,7 @@ class NewsFetcher extends UpdateRunner {
         if (_log.shouldLog(Log.INFO))
             _log.info("News fetched from " + url + " with " + (alreadyTransferred+bytesTransferred));
         
-        long now = _context.clock().now();
-        if (_tempFile.exists()) {
+        if (_tempFile.exists() && _tempFile.length() > 0) {
             File from;
             if (url.endsWith(".su3")) {
                 try {
@@ -355,8 +373,8 @@ class NewsFetcher extends UpdateRunner {
             boolean copied = FileUtil.rename(from, _newsFile);
             _tempFile.delete();
             if (copied) {
-                String newVer = Long.toString(now);
-                _context.router().saveConfig(NewsHelper.PROP_LAST_UPDATED, newVer);
+                // this is either the start time or the Last-Modified header
+                String newVer = Long.toString(_newLastModified);
                 // fixme su3 version ? but it will be older than file version, which is older than now.
                 _mgr.notifyVersionAvailable(this, _currentURI, NEWS, "", HTTP,
                                             null, newVer, "");

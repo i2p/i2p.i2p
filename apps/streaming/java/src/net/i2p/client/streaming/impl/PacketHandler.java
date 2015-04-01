@@ -361,7 +361,7 @@ class PacketHandler {
     }
     
     private void receivePong(Packet packet) {
-        _manager.receivePong(packet.getReceiveStreamId());
+        _manager.receivePong(packet.getReceiveStreamId(), packet.getPayload());
     }
     
     private static final boolean isValidMatch(long conStreamId, long packetStreamId) {

@@ -12,6 +12,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import net.i2p.I2PAppContext;
 import net.i2p.client.I2PSession;
+import net.i2p.client.streaming.I2PSocketException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.util.Log;
@@ -85,7 +86,7 @@ class Connection {
     private long _lifetimeDupMessageReceived;
     
     public static final long MAX_RESEND_DELAY = 45*1000;
-    public static final long MIN_RESEND_DELAY = 2*1000;
+    public static final long MIN_RESEND_DELAY = 750;
 
     /**
      *  Wait up to 5 minutes after disconnection so we can ack/close packets.
@@ -606,7 +607,7 @@ class Connection {
     public void resetReceived() {
         if (!_resetReceived.compareAndSet(false, true))
             return;
-        IOException ioe = new IOException("Reset received");
+        IOException ioe = new I2PSocketException(I2PSocketException.STATUS_CONNECTION_RESET);
         _outputStream.streamErrorOccurred(ioe);
         _inputStream.streamErrorOccurred(ioe);
         _connectionError = "Connection reset";
@@ -978,7 +979,7 @@ class Connection {
     
     public int getLastCongestionSeenAt() { return _lastCongestionSeenAt; }
 
-    void congestionOccurred() {
+    private void congestionOccurred() {
         // if we hit congestion and e.g. 5 packets are resent,
         // dont set the size to (winSize >> 4).  only set the
         if (_ackSinceCongestion.compareAndSet(true,false)) {

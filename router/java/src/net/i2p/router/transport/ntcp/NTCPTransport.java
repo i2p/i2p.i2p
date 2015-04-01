@@ -106,7 +106,7 @@ public class NTCPTransport extends TransportImpl {
     /**
      *  RI sigtypes supported in 0.9.16
      */
-    private static final String MIN_SIGTYPE_VERSION = "0.9.16";
+    public static final String MIN_SIGTYPE_VERSION = "0.9.16";
 
 
     public NTCPTransport(RouterContext ctx, DHSessionKeyBuilder.Factory dh) {
@@ -122,6 +122,7 @@ public class NTCPTransport extends TransportImpl {
         _context.statManager().createRateStat("ntcp.failsafeWrites", "How many times do we need to proactively add in an extra nio write to a peer at any given failsafe pass?", "ntcp", RATES);
         _context.statManager().createRateStat("ntcp.failsafeCloses", "How many times do we need to proactively close an idle connection to a peer at any given failsafe pass?", "ntcp", RATES);
         _context.statManager().createRateStat("ntcp.failsafeInvalid", "How many times do we close a connection to a peer to work around a JVM bug?", "ntcp", RATES);
+        _context.statManager().createRateStat("ntcp.failsafeThrottle", "Delay event pumper", "ntcp", RATES);
         _context.statManager().createRateStat("ntcp.accept", "", "ntcp", RATES);
         _context.statManager().createRateStat("ntcp.attemptBanlistedPeer", "", "ntcp", RATES);
         _context.statManager().createRateStat("ntcp.attemptUnreachablePeer", "", "ntcp", RATES);
@@ -198,15 +199,16 @@ public class NTCPTransport extends TransportImpl {
 
     /**
      * @param con that is established
-     * @return the previous connection to the same peer, null if no such.
+     * @return the previous connection to the same peer, must be closed by caller, null if no such.
      */
     NTCPConnection inboundEstablished(NTCPConnection con) {
         _context.statManager().addRateData("ntcp.inboundEstablished", 1);
-        markReachable(con.getRemotePeer().calculateHash(), true);
+        Hash peer = con.getRemotePeer().calculateHash();
+        markReachable(peer, true);
         //_context.banlist().unbanlistRouter(con.getRemotePeer().calculateHash());
         NTCPConnection old;
         synchronized (_conLock) {
-            old = _conByIdent.put(con.getRemotePeer().calculateHash(), con);
+            old = _conByIdent.put(peer, con);
         }
         return old;
     }
@@ -245,7 +247,8 @@ public class NTCPTransport extends TransportImpl {
                 return;
             }
             if (isNew) {
-                con.send(msg); // doesn't do anything yet, just enqueues it
+                // doesn't do anything yet, just enqueues it
+                con.send(msg);
                 // As of 0.9.12, don't send our info if the first message is
                 // doing the same (common when connecting to a floodfill).
                 // Also, put the info message after whatever we are trying to send
@@ -475,6 +478,9 @@ public class NTCPTransport extends TransportImpl {
             return (con != null) && con.isEstablished() && con.tooBacklogged();
     }
 
+    /**
+     * @return usually the con passed in, but possibly a second connection with the same peer...
+     */
     NTCPConnection removeCon(NTCPConnection con) {
         NTCPConnection removed = null;
         RouterIdentity ident = con.getRemotePeer();

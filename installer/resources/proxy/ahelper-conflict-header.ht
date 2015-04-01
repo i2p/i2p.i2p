@@ -19,7 +19,7 @@ Proxy-Connection: close
 <h3>_("Warning: Destination Key Conflict")</h3>
 <p>
 _("The addresshelper link you followed specifies a different destination key than a host entry in your host database.")
-_("Someone could be trying to impersonate another eepsite, or people have given two eepsites identical names.")
+_("Someone could be trying to impersonate another website, or people have given two websites identical names.")
 </p>
 <p>
 _("You can resolve the conflict by considering which key you trust, and either discarding the addresshelper link, discarding the host entry from your host database, or naming one of them differently.")

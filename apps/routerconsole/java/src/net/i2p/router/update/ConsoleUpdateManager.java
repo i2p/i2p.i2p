@@ -188,6 +188,7 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
         PluginUpdateHandler puh = new PluginUpdateHandler(_context, this);
         register((Checker)puh, PLUGIN, HTTP, 0);
         register((Updater)puh, PLUGIN, HTTP, 0);
+        register((Updater)puh, PLUGIN, FILE, 0);
         // Don't do this until we can prevent it from retrying the same thing again...
         // handled inside P.U.H. for now
         //register((Updater)puh, PLUGIN, FILE, 0);
@@ -523,7 +524,8 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
         UpdateItem item = new UpdateItem(PLUGIN, name);
         VersionAvailable va = _available.get(item);
         if (va == null) {
-            va = new VersionAvailable("", "", HTTP, uris);
+            UpdateMethod method = "file".equals(uri.getScheme()) ? FILE : HTTP;
+            va = new VersionAvailable("", "", method, uris);
             _available.putIfAbsent(item, va);
         }
         if (_log.shouldLog(Log.WARN))
@@ -971,8 +973,8 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
      *  @param t may be null
      */
     public void notifyTaskFailed(UpdateTask task, String reason, Throwable t) {
-        if (_log.shouldLog(Log.WARN))
-            _log.warn("Failed " + task + " for " + task.getType() + ": " + reason, t);
+        if (_log.shouldLog(Log.ERROR))
+            _log.error("Failed " + task + " for " + task.getType() + ": " + reason, t);
         List<RegisteredUpdater> toTry = _downloaders.get(task);
         if (toTry != null) {
             UpdateItem ui = new UpdateItem(task.getType(), task.getID());
@@ -988,8 +990,27 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
         _downloaders.remove(task);
         _activeCheckers.remove(task);
         // any other types that shouldn't display?
-        if (task.getURI() != null && task.getType() != TYPE_DUMMY)
-            finishStatus("<b>" + _("Transfer failed from {0}", linkify(task.getURI().toString())) + "</b>");
+        if (task.getURI() != null && task.getType() != TYPE_DUMMY) {
+            StringBuilder buf = new StringBuilder(256);
+            buf.append("<b>");
+            String uri = task.getURI().toString();
+            if (uri.startsWith("file:") || task.getMethod() == FILE) {
+                uri = DataHelper.stripHTML(task.getURI().getPath());
+                buf.append(_("Install failed from {0}", uri));
+            } else {
+                buf.append(_("Transfer failed from {0}"));
+            }
+            if (reason != null && reason.length() > 0) {
+                buf.append("<br>");
+                buf.append(reason);
+            }
+            if (t != null && t.getMessage() != null && t.getMessage().length() > 0) {
+                buf.append("<br>");
+                buf.append(DataHelper.stripHTML(t.getMessage()));
+            }
+            buf.append("</b>");
+            finishStatus(buf.toString());
+        }
     }
 
     /**
@@ -1271,11 +1292,11 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
             _context.router().saveConfig(NewsHelper.PROP_LAST_UPDATE_TIME, Long.toString(modtime));
 
             if ("install".equals(policy)) {
-                _log.log(Log.CRIT, "Update was VERIFIED, restarting to install it");
+                _log.log(Log.CRIT, "Update was downloaded and verified, restarting to install it");
                 updateStatus("<b>" + _("Update verified") + "</b><br>" + _("Restarting"));
                 restart();
             } else {
-                _log.log(Log.CRIT, "Update was VERIFIED, will be installed at next restart");
+                _log.logAlways(Log.WARN, "Update was downloaded and verified, will be installed at next restart");
                 // SummaryHelper will display restart info separately
                 updateStatus("");
             }

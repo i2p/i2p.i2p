@@ -71,7 +71,7 @@ Debian wrapper.config to try to prevent confusion.
  
  # Priority at which to run the wrapper.  See "man nice" for valid priorities.
  #  nice is only used if a priority is specified.
-@@ -172,75 +163,8 @@
+@@ -177,75 +168,8 @@
         exit 1
  fi
  
@@ -147,7 +147,7 @@ Debian wrapper.config to try to prevent confusion.
  if [ -n "$FIXED_COMMAND" ]
  then
      COMMAND="$FIXED_COMMAND"
-@@ -1014,7 +938,6 @@
+@@ -1019,7 +943,6 @@
          if [ "X$pid" = "X" ]
          then
              eval echo " `gettext 'WARNING: $APP_LONG_NAME may have failed to start.'`"
@@ -155,7 +155,7 @@ Debian wrapper.config to try to prevent confusion.
          else
              eval echo ' running: PID:$pid'
          fi
-@@ -1817,7 +1740,7 @@
+@@ -1822,7 +1745,7 @@
  }
  
  showsetusermesg()  {
@@ -164,7 +164,7 @@ Debian wrapper.config to try to prevent confusion.
  }
  
  checkifstartingasroot() {
-@@ -1825,7 +1748,7 @@
+@@ -1830,7 +1753,7 @@
          echo "`gettext 'Running I2P as the root user is *not* recommended.'`"
          showsetusermesg
          echo
@@ -173,7 +173,7 @@ Debian wrapper.config to try to prevent confusion.
          exit 1
      fi
  }
-@@ -1890,24 +1813,10 @@
+@@ -1895,24 +1818,10 @@
              status
              ;;
  
@@ -367,16 +367,16 @@ Debian wrapper.config to try to prevent confusion.
 @@ -185,7 +185,7 @@
  msgstr ""
  
- #: ../i2prouter:1820
+ #: ../i2prouter:1825
 -msgid "Please edit i2prouter and set the variable RUN_AS_USER"
 +msgid "Please edit /etc/default/i2p and set the variable RUN_AS_USER"
  msgstr ""
  
- #: ../i2prouter:1825
+ #: ../i2prouter:1830
 @@ -193,5 +193,5 @@
  msgstr ""
  
- #: ../i2prouter:1828
+ #: ../i2prouter:1833
 -msgid "To run as root anyway, edit i2prouter and set ALLOW_ROOT=true."
 +msgid "To run as root anyway, edit /etc/default/i2p and set ALLOW_ROOT=true."
  msgstr ""

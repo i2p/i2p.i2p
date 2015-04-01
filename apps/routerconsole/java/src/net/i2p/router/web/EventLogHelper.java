@@ -44,6 +44,7 @@ public class EventLogHelper extends FormHandler {
         EventLog.NEW_IDENT, _x("New router identity"),
         EventLog.NOT_FLOODFILL, _x("Disabled floodfill"),
         EventLog.OOM, _x("Out of memory error"),
+        EventLog.REACHABILITY, _x("Reachability change"),
         EventLog.REKEYED, _x("New router identity"),
         EventLog.RESEED, _x("Reseeded router"),
         EventLog.SOFT_RESTART, _x("Soft restart"),

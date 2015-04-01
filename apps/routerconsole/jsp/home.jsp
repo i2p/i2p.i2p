@@ -111,11 +111,11 @@
    }  // shouldShowSearch()
 %>
   <div class="ag2">
-    <h4 class="app"><%=intl._("Eepsites of Interest")%></h4>
+    <h4 class="app"><%=intl._("Hidden Services of Interest")%></h4>
     <jsp:getProperty name="homehelper" property="favorites" /><br>
   </div>
   <div class="ag2">
-    <h4 class="app2"><%=intl._("Local Services")%></h4>
+    <h4 class="app2"><%=intl._("Applications and Configuration")%></h4>
     <jsp:getProperty name="homehelper" property="services" /><br>
     <div class="clearer">&nbsp;</div>
   </div>

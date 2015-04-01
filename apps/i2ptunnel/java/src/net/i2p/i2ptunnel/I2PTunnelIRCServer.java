@@ -67,7 +67,7 @@ public class I2PTunnelIRCServer extends I2PTunnelServer implements Runnable {
     
     private final static byte[] ERR_UNAVAILABLE =
         (":ircserver.i2p 499 you :" +
-         "This I2P IRC server is unvailable. It may be down or undergoing maintenance. " +
+         "This I2P IRC server is unavailable. It may be down or undergoing maintenance. " +
          "Please try again later." +
          "\r\n")
          .getBytes();

@@ -71,21 +71,27 @@ public class Clock implements Timestamper.UpdateListener {
         long delta = offsetMs - _offset;
         if (!force) {
             if ((offsetMs > MAX_OFFSET) || (offsetMs < 0 - MAX_OFFSET)) {
-                getLog().error("Maximum offset shift exceeded [" + offsetMs + "], NOT HONORING IT");
+                Log log = getLog();
+                if (log.shouldLog(Log.WARN))
+                    log.warn("Maximum offset shift exceeded [" + offsetMs + "], NOT HONORING IT");
                 return;
             }
             
             // only allow substantial modifications before the first 10 minutes
             if (_alreadyChanged && (System.currentTimeMillis() - _startedOn > 10 * 60 * 1000)) {
                 if ( (delta > MAX_LIVE_OFFSET) || (delta < 0 - MAX_LIVE_OFFSET) ) {
-                    getLog().log(Log.CRIT, "The clock has already been updated, but you want to change it by "
+                    Log log = getLog();
+                    if (log.shouldLog(Log.WARN))
+                        log.warn("The clock has already been updated, but you want to change it by "
                                            + delta + " to " + offsetMs + "?  Did something break?");
                     return;
                 }
             }
             
             if ((delta < MIN_OFFSET_CHANGE) && (delta > 0 - MIN_OFFSET_CHANGE)) {
-                getLog().debug("Not changing offset since it is only " + delta + "ms");
+                Log log = getLog();
+                if (log.shouldLog(Log.DEBUG))
+                    log.debug("Not changing offset since it is only " + delta + "ms");
                 _alreadyChanged = true;
                 return;
             }
@@ -102,7 +108,9 @@ public class Clock implements Timestamper.UpdateListener {
             }
             _context.statManager().addRateData("clock.skew", delta, 0);
         } else {
-            getLog().log(Log.INFO, "Initializing clock offset to " + offsetMs + "ms from " + _offset + "ms");
+            Log log = getLog();
+            if (log.shouldLog(Log.INFO))
+                log.info("Initializing clock offset to " + offsetMs + "ms from " + _offset + "ms");
         }
         _alreadyChanged = true;
         _offset = offsetMs;

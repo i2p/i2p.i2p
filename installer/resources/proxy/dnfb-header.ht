@@ -18,7 +18,7 @@ Proxy-Connection: close
 <div class="warning" id="warning">
 <h3>_("Warning: Invalid Destination")</h3>
 <p>
-_("The eepsite destination specified was not valid, or was otherwise unreachable.")
+_("The website destination specified was not valid, or was otherwise unreachable.")
 _("Perhaps you pasted in the wrong Base 64 string or the link you are following is bad.")
 _("The I2P host could also be offline.")
 _("You may want to {0}retry{1}.", "<a href=\"javascript:window.location.reload()\">", "</a>")

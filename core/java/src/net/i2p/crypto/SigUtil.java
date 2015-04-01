@@ -18,6 +18,7 @@ import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
+import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.DSAPrivateKeySpec;
 import java.security.spec.DSAPublicKeySpec;
 import java.security.spec.ECParameterSpec;
@@ -97,6 +98,55 @@ public class SigUtil {
     }
 
     /**
+     *  Use if SigType is unknown.
+     *  For efficiency, use fromJavakey(pk, type) if type is known.
+     *
+     *  @param pk JAVA key!
+     *  @throws IllegalArgumentException on unknown type
+     *  @since 0.9.18
+     */
+    public static SigningPublicKey fromJavaKey(PublicKey pk)
+                              throws GeneralSecurityException {
+        if (pk instanceof DSAPublicKey) {
+            return fromJavaKey((DSAPublicKey) pk);
+        }
+        if (pk instanceof ECPublicKey) {
+            ECPublicKey k = (ECPublicKey) pk;
+            AlgorithmParameterSpec spec = k.getParams();
+            SigType type;
+            if (spec.equals(SigType.ECDSA_SHA256_P256.getParams()))
+                type = SigType.ECDSA_SHA256_P256;
+            else if (spec.equals(SigType.ECDSA_SHA384_P384.getParams()))
+                type = SigType.ECDSA_SHA384_P384;
+            else if (spec.equals(SigType.ECDSA_SHA512_P521.getParams()))
+                type = SigType.ECDSA_SHA512_P521;
+            else
+                throw new IllegalArgumentException("Unknown EC type");
+            return fromJavaKey(k, type);
+        }
+        if (pk instanceof EdDSAPublicKey) {
+            return fromJavaKey((EdDSAPublicKey) pk, SigType.EdDSA_SHA512_Ed25519);
+        }
+        if (pk instanceof RSAPublicKey) {
+            RSAPublicKey k = (RSAPublicKey) pk;
+            int sz = k.getModulus().bitLength();
+            SigType type;
+            if (sz <= ((RSAKeyGenParameterSpec) SigType.RSA_SHA256_2048.getParams()).getKeysize())
+                type = SigType.RSA_SHA256_2048;
+            else if (sz <= ((RSAKeyGenParameterSpec) SigType.RSA_SHA384_3072.getParams()).getKeysize())
+                type = SigType.RSA_SHA384_3072;
+            else if (sz <= ((RSAKeyGenParameterSpec) SigType.RSA_SHA512_4096.getParams()).getKeysize())
+                type = SigType.RSA_SHA512_4096;
+            else
+                throw new IllegalArgumentException("Unknown RSA type");
+            return fromJavaKey(k, type);
+        }
+        throw new IllegalArgumentException("Unknown type");
+    }
+
+    /**
+     *  Use if SigType is known.
+     *
      *  @param pk JAVA key!
      */
     public static SigningPublicKey fromJavaKey(PublicKey pk, SigType type)
@@ -116,6 +166,55 @@ public class SigUtil {
     }
 
     /**
+     *  Use if SigType is unknown.
+     *  For efficiency, use fromJavakey(pk, type) if type is known.
+     *
+     *  @param pk JAVA key!
+     *  @throws IllegalArgumentException on unknown type
+     *  @since 0.9.18
+     */
+    public static SigningPrivateKey fromJavaKey(PrivateKey pk)
+                              throws GeneralSecurityException {
+        if (pk instanceof DSAPrivateKey) {
+            return fromJavaKey((DSAPrivateKey) pk);
+        }
+        if (pk instanceof ECPrivateKey) {
+            ECPrivateKey k = (ECPrivateKey) pk;
+            AlgorithmParameterSpec spec = k.getParams();
+            SigType type;
+            if (spec.equals(SigType.ECDSA_SHA256_P256.getParams()))
+                type = SigType.ECDSA_SHA256_P256;
+            else if (spec.equals(SigType.ECDSA_SHA384_P384.getParams()))
+                type = SigType.ECDSA_SHA384_P384;
+            else if (spec.equals(SigType.ECDSA_SHA512_P521.getParams()))
+                type = SigType.ECDSA_SHA512_P521;
+            else
+                throw new IllegalArgumentException("Unknown EC type");
+            return fromJavaKey(k, type);
+        }
+        if (pk instanceof EdDSAPrivateKey) {
+            return fromJavaKey((EdDSAPrivateKey) pk, SigType.EdDSA_SHA512_Ed25519);
+        }
+        if (pk instanceof RSAPrivateKey) {
+            RSAPrivateKey k = (RSAPrivateKey) pk;
+            int sz = k.getModulus().bitLength();
+            SigType type;
+            if (sz <= ((RSAKeyGenParameterSpec) SigType.RSA_SHA256_2048.getParams()).getKeysize())
+                type = SigType.RSA_SHA256_2048;
+            else if (sz <= ((RSAKeyGenParameterSpec) SigType.RSA_SHA384_3072.getParams()).getKeysize())
+                type = SigType.RSA_SHA384_3072;
+            else if (sz <= ((RSAKeyGenParameterSpec) SigType.RSA_SHA512_4096.getParams()).getKeysize())
+                type = SigType.RSA_SHA512_4096;
+            else
+                throw new IllegalArgumentException("Unknown RSA type");
+            return fromJavaKey(k, type);
+        }
+        throw new IllegalArgumentException("Unknown type");
+    }
+
+    /**
+     *  Use if SigType is known.
+     *
      *  @param pk JAVA key!
      */
     public static SigningPrivateKey fromJavaKey(PrivateKey pk, SigType type)

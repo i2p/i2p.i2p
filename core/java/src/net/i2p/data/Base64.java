@@ -726,7 +726,7 @@ public class Base64 {
      * As of 0.9.14, whitespace will cause an error.
      * Prior to that, it was ignored.
      *
-     * @param s the strind to decode
+     * @param s the string to decode
      * @return The data as a string, or null on error
      * @since 1.4
      */

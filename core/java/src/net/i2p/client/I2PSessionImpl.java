@@ -235,6 +235,8 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
      * Create a new session, reading the Destination, PrivateKey, and SigningPrivateKey
      * from the destKeyStream, and using the specified options to connect to the router
      *
+     * As of 0.9.19, defaults in options are honored.
+     *
      * @param destKeyStream stream containing the private key data,
      *                             format is specified in {@link net.i2p.data.PrivateKeyFile PrivateKeyFile}
      * @param options set of options to configure the router with, if null will use System properties
@@ -314,11 +316,14 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
         }
     }
 
-    /** save some memory, don't pass along the pointless properties */
+    /**
+     *  Save some memory, don't pass along the pointless properties.
+     *  As of 0.9.19, defaults from options will be promoted to real values in rv.
+     *  @return a new Properties without defaults
+     */
     private Properties filter(Properties options) {
         Properties rv = new Properties();
-        for (Object oKey : options.keySet()) { // TODO-Java6: s/keySet()/stringPropertyNames()/
-            String key = (String) oKey;
+        for (String key : options.stringPropertyNames()) {
             if (key.startsWith("java.") ||
                 key.startsWith("user.") ||
                 key.startsWith("os.") ||
@@ -787,7 +792,9 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     I2CPMessageProducer getProducer() { return _producer; }
 
     /**
-     * Retrieve the configuration options
+     * Retrieve the configuration options, filtered.
+     * All defaults passed in via constructor have been promoted to the primary map.
+     *
      * @return non-null, if insantiated with null options, this will be the System properties.
      */
     Properties getOptions() { return _options; }

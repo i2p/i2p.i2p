@@ -22,6 +22,9 @@ CP=
 for jars in `ls ${I2P}/lib/*.jar`; do CP=${CP}:${jars}; done
 JAVA=java
 
+if [ "`uname -s`" = "Darwin" ]; then
+    export JAVA_TOOL_OPTIONS="-Djava.awt.headless=true"
+fi
 JAVAOPTS="-Djava.net.preferIPv4Stack=${PREFERv4} -Djava.library.path=${I2P}:${I2P}/lib -Di2p.dir.base=${I2P} -DloggerFilenameOverride=logs/log-router-@.txt"
 nohup ${JAVA} -cp "${CP}" ${JAVAOPTS} net.i2p.router.RouterLaunch > /dev/null 2>&1 &
 echo $! > "${I2PTEMP}/router.pid"

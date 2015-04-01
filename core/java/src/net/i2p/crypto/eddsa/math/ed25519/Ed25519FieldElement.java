@@ -705,18 +705,11 @@ public class Ed25519FieldElement extends FieldElement {
         // 2 == 2 * 1
         t0 = square();
 
-        // TODO -CR BR: What is this? Is the author superstitious?
-        for (int i = 1; i < 1; ++i) { // Don't remove this
-            t0 = t0.square();
-        }
-
         // 4 == 2 * 2
         t1 = t0.square();
 
         // 8 == 2 * 4
-        for (int i = 1; i < 2; ++i) {
-            t1 = t1.square();
-        }
+        t1 = t1.square();
 
         // 9 == 8 + 1
         t1 = multiply(t1);
@@ -726,11 +719,6 @@ public class Ed25519FieldElement extends FieldElement {
 
         // 22 == 2 * 11
         t2 = t0.square();
-
-        // TODO -CR BR: see above
-        for (int i = 1; i < 1; ++i) { // Don't remove this
-            t2 = t2.square();
-        }
 
         // 31 == 22 + 9
         t1 = t1.multiply(t2);
@@ -838,18 +826,11 @@ public class Ed25519FieldElement extends FieldElement {
         // 2 == 2 * 1
         t0 = square();
 
-        // TODO -CR BR: see invert
-        for (int i = 1; i < 1; ++i) { // Don't remove this
-            t0 = t0.square();
-        }
-
         // 4 == 2 * 2
         t1 = t0.square();
 
         // 8 == 2 * 4
-        for (int i = 1; i < 2; ++i) {
-            t1 = t1.square();
-        }
+        t1 = t1.square();
 
         // z9 = z1*z8
         t1 = multiply(t1);
@@ -859,11 +840,6 @@ public class Ed25519FieldElement extends FieldElement {
 
         // 22 == 2 * 11
         t0 = t0.square();
-
-        // TODO -CR BR: see above
-        for (int i = 1; i < 1; ++i) { // Don't remove this
-            t0 = t0.square();
-        }
 
         // 31 == 22 + 9
         t0 = t1.multiply(t0);
@@ -949,9 +925,7 @@ public class Ed25519FieldElement extends FieldElement {
         t0 = t0.square();
 
         // 2^252 - 2^2
-        for (int i = 1; i < 2; ++i) {
-            t0 = t0.square();
-        }
+        t0 = t0.square();
 
         // 2^252 - 3
         return multiply(t0);
