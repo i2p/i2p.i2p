@@ -30,7 +30,7 @@
 <h3><%=intl._("Manual Reseed from URL")%></h3>
 <p><%=intl._("Enter zip or su3 URL")%> :
 <input name="url" type="text" size="60" value="" />
-<br><%=intl._("The su3 format is preferred, as it will be verifed as signed by a trusted source.")%>
+<br><%=intl._("The su3 format is preferred, as it will be verified as signed by a trusted source.")%>
 <%=intl._("The zip format is unsigned; use a zip file only from a source that you trust.")%>
 </p>
 <div class="formaction">
@@ -43,7 +43,7 @@
 <h3><%=intl._("Manual Reseed from File")%></h3>
 <p><%=intl._("Select zip or su3 file")%> :
 <input name="file" type="file" value="" />
-<br><%=intl._("The su3 format is preferred, as it will be verifed as signed by a trusted source.")%>
+<br><%=intl._("The su3 format is preferred, as it will be verified as signed by a trusted source.")%>
 <%=intl._("The zip format is unsigned; use a zip file only from a source that you trust.")%>
 </p>
 <div class="formaction">
