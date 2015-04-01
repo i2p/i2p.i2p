@@ -139,6 +139,10 @@ public class JobQueue {
                                               "How many jobs do we drop due to insane overload?", 
                                               "JobQueue", 
                                               new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
+        _context.statManager().createRateStat("jobQueue.queuedJobs",
+                                              "How many scheduled jobs are there?",
+                                              "JobQueue",
+                                              new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
         // following are for JobQueueRunner
         _context.statManager().createRateStat("jobQueue.jobRun", "How long jobs take", "JobQueue", new long[] { 60*60*1000l, 24*60*60*1000l });
         _context.statManager().createRateStat("jobQueue.jobRunSlow", "How long jobs that take over a second take", "JobQueue", new long[] { 60*60*1000l, 24*60*60*1000l });
@@ -213,6 +217,7 @@ public class JobQueue {
         }
         
         _context.statManager().addRateData("jobQueue.readyJobs", numReady);
+        _context.statManager().addRateData("jobQueue.queuedJobs", _timedJobs.size());
         if (dropped) {
             _context.statManager().addRateData("jobQueue.droppedJobs", 1);
             if (_log.shouldLog(Log.WARN))
