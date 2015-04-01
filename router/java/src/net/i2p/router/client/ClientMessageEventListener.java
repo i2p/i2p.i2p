@@ -12,6 +12,7 @@ import java.util.Properties;
 
 import net.i2p.CoreVersion;
 import net.i2p.crypto.SigType;
+import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
 import net.i2p.data.Payload;
@@ -213,6 +214,15 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
             if (stype == null || !stype.isAvailable()) {
                 _log.error("Client requested unsupported signature type " + itype);
                 _runner.disconnectClient("Unsupported signature type " + itype);
+            } else if (in.tooOld()) {
+                long skew = _context.clock().now() - in.getCreationDate().getTime();
+                String msg = "Create session message client clock skew? ";
+                if (skew >= 0)
+                    msg += DataHelper.formatDuration(skew) + " in the past";
+                else
+                    msg += DataHelper.formatDuration(0 - skew) + " in the future";
+                _log.error(msg);
+                _runner.disconnectClient(msg);
             } else {
                 _log.error("Signature verification failed on a create session message");
                 _runner.disconnectClient("Invalid signature on CreateSessionMessage");

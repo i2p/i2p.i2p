@@ -1,4 +1,10 @@
+2015-04-01 zzz
+ * I2CP: Allow larger client clock skew (ticket #1503)
+ * i2psnark: Fix changing data directory on Windows (ticket #1503)
+
 2015-03-31 zzz
+ * API: Fix some client-side APIs to honor defaults in Properties;
+   add javadocs to specify where we do and don't (ticket #1491)
  * i2ptunnel: Fix multiple SSL outproxies in HTTP client
 
 2015-03-29 zzz

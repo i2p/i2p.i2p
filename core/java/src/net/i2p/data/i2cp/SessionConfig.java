@@ -41,15 +41,18 @@ public class SessionConfig extends DataStructureImpl {
     private Properties _options;
 
     /** 
-     * if the client authorized this session more than the specified period ago, 
-     * refuse it, since it may be a replay attack
+     * If the client authorized this session more than the specified period ago, 
+     * refuse it, since it may be a replay attack.
      *
+     * Really? See also ClientManager.REQUEST_LEASESET_TIMEOUT.
+     * If I2CP replay attacks are a thing, there's a lot more to do.
      */
-    private final static long OFFSET_VALIDITY = 30 * 1000;
+    private final static long OFFSET_VALIDITY = 3*60*1000;
 
     public SessionConfig() {
         this(null);
     }
+
     public SessionConfig(Destination dest) {
         _destination = dest;
         _creationDate = new Date(Clock.getInstance().now());
@@ -124,6 +127,9 @@ public class SessionConfig extends DataStructureImpl {
     /**
      * Verify that the signature matches the destination's signing public key.
      *
+     * Note that this also returns false if the creation date is too far in the
+     * past or future. See tooOld() and getCreationDate().
+     *
      * @return true only if the signature matches
      */
     public boolean verifySignature() {
@@ -158,6 +164,9 @@ public class SessionConfig extends DataStructureImpl {
         return ok;
     }
 
+    /**
+     *  Misnamed, could be too old or too far in the future.
+     */
     public boolean tooOld() {
         long now = Clock.getInstance().now();
         long earliestValid = now - OFFSET_VALIDITY;
