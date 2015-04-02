@@ -156,6 +156,7 @@ class IntelInfoImpl extends CPUIDCPUInfo implements IntelCPUInfo
                     isPentiumMCompatible = true;
                     isCore2Compatible = true;
                     isX64 = true;
+                }
                 if (extmodel >= 2) {
                     isCoreiCompatible = true;
                 }
@@ -343,6 +344,12 @@ class IntelInfoImpl extends CPUIDCPUInfo implements IntelCPUInfo
                     case 0x3e:
                         modelString = "Xeon Ivy Bridge (22nm)";
                         break;
+                        
+                        
+                // following are for extended model == 4
+                // most flags are set above
+                // isCoreiCompatible = true is the default
+                
                     // Atom Silvermont / Bay Trail / Avoton 22 nm
                     // Supports SSE 4.2
                     case 0x4d:
@@ -359,12 +366,10 @@ class IntelInfoImpl extends CPUIDCPUInfo implements IntelCPUInfo
             break;
 
             case 7: {
-                // Flags TODO
                 modelString = "Intel Itanium model " + model;
             }
             break;
 
-            // 15 + 0
             case 15: {
                 isPentiumCompatible = true;
                 isPentiumMMXCompatible = true;
@@ -397,9 +402,7 @@ class IntelInfoImpl extends CPUIDCPUInfo implements IntelCPUInfo
             }
             break;
 
-            // 15 + 1
             case 16: {
-                // Flags TODO
                 modelString = "Intel Itanium II model " + model;
             }
         }
