@@ -196,14 +196,16 @@ public class NativeBigInteger extends BigInteger {
     private final static String sCPUType; //The CPU Type to optimize for (one of the above strings)
     
     static {
-        if (_isX86) // Don't try to resolve CPU type on non x86 hardware
+        if (_isX86) {// Don't try to resolve CPU type on non x86 hardware
             sCPUType = resolveCPUType();
-        else if (_isArm)
+        }
+        else if (_isArm) {
             sCPUType = JBIGI_OPTIMIZATION_ARM;
-        else if (_isPPC && !_isMac)
-	    sCPUType = JBIGI_OPTIMIZATION_PPC;
-	else
-	    sCPUType = null;
+        } else if (_isPPC && !_isMac) {
+        	sCPUType = JBIGI_OPTIMIZATION_PPC;
+        } else {
+        	sCPUType = null;
+        }
         loadNative();
     }
     
