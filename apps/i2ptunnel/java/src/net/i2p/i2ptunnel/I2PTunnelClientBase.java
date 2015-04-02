@@ -398,7 +398,7 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
             if (log != null)
                 log.log("Error opening key file " + ioe);
             _log.error("Error opening key file", ioe);
-            throw new IllegalArgumentException("Error opening key file " + ioe);
+            throw new IllegalArgumentException("Error opening key file", ioe);
         } finally {
             if (fis != null)
                 try { fis.close(); } catch (IOException ioe) {}
@@ -500,6 +500,8 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
     }
         
     private void startup() {
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("startup " + _clientId, new Exception("I did it"));
         // prevent JVM exit when running outside the router
         boolean isDaemon = getTunnel().getContext().isRouterContext();
         Thread t = new I2PAppThread(this, "Client " + _clientId, isDaemon);

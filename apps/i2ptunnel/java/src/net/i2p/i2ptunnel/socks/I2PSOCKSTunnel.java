@@ -33,7 +33,12 @@ public class I2PSOCKSTunnel extends I2PTunnelClientBase {
     //	  I2PSOCKSTunnel(localPort, l, ownDest, (EventDispatcher)null);
     //}
 
-    /** @param pkf private key file name or null for transient key */
+    /**
+     *  As of 0.9.20 this is fast, and does NOT connect the manager to the router,
+     *  or open the local socket. You MUST call startRunning() for that.
+     *
+     *  @param pkf private key file name or null for transient key
+     */
     public I2PSOCKSTunnel(int localPort, Logging l, boolean ownDest, EventDispatcher notifyThis, I2PTunnel tunnel, String pkf) {
         super(localPort, ownDest, l, notifyThis, "SOCKS Proxy on " + tunnel.listenHost + ':' + localPort, tunnel, pkf);
 
@@ -44,8 +49,6 @@ public class I2PSOCKSTunnel extends I2PTunnelClientBase {
 
         setName("SOCKS Proxy on " + tunnel.listenHost + ':' + localPort);
         parseOptions();
-        startRunning();
-
         notifyEvent("openSOCKSTunnelResult", "ok");
     }
 

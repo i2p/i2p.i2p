@@ -32,6 +32,9 @@ public class I2PTunnelClient extends I2PTunnelClientBase {
     protected long readTimeout = DEFAULT_READ_TIMEOUT;
 
     /**
+     * As of 0.9.20 this is fast, and does NOT connect the manager to the router,
+     * or open the local socket. You MUST call startRunning() for that.
+     *
      * @param destinations peers we target, comma- or space-separated. Since 0.9.9, each dest may be appended with :port
      * @throws IllegalArgumentException if the I2PTunnel does not contain
      *                                  valid config to contact the router
@@ -63,9 +66,6 @@ public class I2PTunnelClient extends I2PTunnelClientBase {
         }
 
         setName(getLocalPort() + " -> " + destinations);
-
-        startRunning();
-
         notifyEvent("openClientResult", "ok");
     }
 

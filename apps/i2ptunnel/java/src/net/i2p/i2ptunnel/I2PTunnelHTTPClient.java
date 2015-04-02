@@ -192,6 +192,9 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
      *  This constructor always starts the tunnel (ignoring the i2cp.delayOpen option).
      *  It is used to add a client to an existing socket manager.
      *
+     *  As of 0.9.20 this is fast, and does NOT connect the manager to the router,
+     *  or open the local socket. You MUST call startRunning() for that.
+     *
      *  @param sockMgr the existing socket manager
      */
     public I2PTunnelHTTPClient(int localPort, Logging l, I2PSocketManager sockMgr, I2PTunnel tunnel, EventDispatcher notifyThis, long clientId) {
@@ -200,12 +203,13 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
         // proxyList = new ArrayList();
 
         setName("HTTP Proxy on " + getTunnel().listenHost + ':' + localPort);
-        startRunning();
-
         notifyEvent("openHTTPClientResult", "ok");
     }
 
     /**
+     *  As of 0.9.20 this is fast, and does NOT connect the manager to the router,
+     *  or open the local socket. You MUST call startRunning() for that.
+     *
      * @throws IllegalArgumentException if the I2PTunnel does not contain
      *                                  valid config to contact the router
      */
@@ -225,9 +229,6 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
         }
 
         setName("HTTP Proxy on " + tunnel.listenHost + ':' + localPort);
-
-        startRunning();
-
         notifyEvent("openHTTPClientResult", "ok");
     }
 
@@ -607,6 +608,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                                                            _("i2paddresshelper cannot help you with a destination like that!") +
                                                            "</p>").getBytes("UTF-8"));
                                                 writeFooter(out);
+                                                reader.drain();
                                                 // XXX: should closeSocket(s) be in a finally block?
                                             } catch (IOException ioe) {
                                                 // ignore
@@ -721,7 +723,6 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                             out.write(getErrorPage("localhost", ERR_LOCALHOST).getBytes("UTF-8"));
                             writeFooter(out);
                             reader.drain();
-                            s.close();
                         } catch (IOException ioe) {
                             // ignore
                         } finally {
