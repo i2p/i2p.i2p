@@ -156,8 +156,8 @@ class IntelInfoImpl extends CPUIDCPUInfo implements IntelCPUInfo
                     isPentiumMCompatible = true;
                     isCore2Compatible = true;
                     isX64 = true;
-                    if (extmodel >= 2)
-                        isCoreiCompatible = true;
+                if (extmodel >= 2) {
+                    isCoreiCompatible = true;
                 }
                 switch (model) {
                     case 0:
@@ -329,21 +329,20 @@ class IntelInfoImpl extends CPUIDCPUInfo implements IntelCPUInfo
                         break;
                     // Ivy Bridge 22 nm
                     case 0x3a:
-                        modelString = "Ivy Bridge";
+                        modelString = "Ivy Bridge (22nm)";
                         break;
                     // Haswell 22 nm
                     case 0x3c:
-                        modelString = "Haswell";
+                        modelString = "Haswell (22nm)";
                         break;
                     // Broadwell 14 nm
                     case 0x3d:
-                        modelString = "Broadwell";
+                        modelString = "Broadwell (14nm)";
                         break;
-
-                // following are for extended model == 4
-                // most flags are set above
-                // isCoreiCompatible = true is the default
-
+                    // Ivy Bridge 22 nm
+                    case 0x3e:
+                        modelString = "Xeon Ivy Bridge (22nm)";
+                        break;
                     // Atom Silvermont / Bay Trail / Avoton 22 nm
                     // Supports SSE 4.2
                     case 0x4d:
@@ -351,8 +350,7 @@ class IntelInfoImpl extends CPUIDCPUInfo implements IntelCPUInfo
                         modelString = "Bay Trail / Avoton";
                         break;
 
-                // others
-
+                    // others
                     default:
                         modelString = "Intel model " + model;
                         break;
