@@ -1,3 +1,7 @@
+2015-04-03 zzz
+ * i2ptunnel: Fix stopping tunnel on bad args when starting
+ * wrapper.config: Remove old mortbay Jetty parameters
+
 2015-04-01 zzz
  * I2CP: Allow larger client clock skew (ticket #1503)
  * i2psnark: Fix changing data directory on Windows (ticket #1503)
