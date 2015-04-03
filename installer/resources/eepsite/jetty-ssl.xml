@@ -185,11 +185,14 @@
     <Arg>
       <New class="org.eclipse.jetty.server.ssl.SslSelectChannelConnector">
         <Arg><Ref id="sslContextFactory" /></Arg>
-        <Set name="Port">7668</Set>
+        <Set name="host">127.0.0.1</Set>
+        <Set name="port">7668</Set>
         <Set name="maxIdleTime">600000</Set>
         <Set name="useDirectBuffers">false</Set>
-        <Set name="Acceptors">2</Set>
-        <Set name="AcceptQueueSize">100</Set>
+        <Set name="acceptors">1</Set>
+        <Set name="statsOn">false</Set>
+        <Set name="lowResourcesConnections">5000</Set>
+        <Set name="lowResourcesMaxIdleTime">5000</Set>
         <Set name="ExcludeCipherSuites">
           <Array type="java.lang.String">
             <Item>SSL_DH_anon_EXPORT_WITH_DES40_CBC_SHA</Item>
