@@ -221,7 +221,7 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
                 while (tok.hasMoreTokens()) {
                     String p = tok.nextToken().trim();
                     if (p.length() > 0)
-                        _proxyList.add(tok.nextToken().trim());
+                        _proxyList.add(p);
                 }
             }
         } else {
