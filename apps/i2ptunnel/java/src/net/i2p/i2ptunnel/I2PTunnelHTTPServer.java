@@ -4,6 +4,7 @@
 package net.i2p.i2ptunnel;
 
 import java.io.BufferedInputStream;
+import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,6 +12,7 @@ import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -63,9 +65,12 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
     private static final String SERVER_HEADER = "Server";
     private static final String X_POWERED_BY_HEADER = "X-Powered-By";
     private static final String[] SERVER_SKIPHEADERS = {SERVER_HEADER, X_POWERED_BY_HEADER};
+    /** timeout for first request line */
     private static final long HEADER_TIMEOUT = 15*1000;
+    /** total timeout for the request and all the headers */
     private static final long TOTAL_HEADER_TIMEOUT = 2 * HEADER_TIMEOUT;
     private static final long START_INTERVAL = (60 * 1000) * 3;
+    private static final int MAX_LINE_LENGTH = 8*1024;
     private long _startedOn = 0L;
     private ConnThrottler _postThrottler;
 
@@ -206,12 +211,9 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
             long afterAccept = getTunnel().getContext().clock().now();
             // The headers _should_ be in the first packet, but
             // may not be, depending on the client-side options
-            socket.setReadTimeout(HEADER_TIMEOUT);
-
-            InputStream in = socket.getInputStream();
 
             StringBuilder command = new StringBuilder(128);
-            Map<String, List<String>> headers = readHeaders(in, command,
+            Map<String, List<String>> headers = readHeaders(socket, null, command,
                 CLIENT_SKIPHEADERS, getTunnel().getContext());
             long afterHeaders = getTunnel().getContext().clock().now();
 
@@ -435,7 +437,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
 
                 //Change headers to protect server identity
                 StringBuilder command = new StringBuilder(128);
-                Map<String, List<String>> headers = readHeaders(serverin, command,
+                Map<String, List<String>> headers = readHeaders(null, serverin, command,
                     SERVER_SKIPHEADERS, _ctx);
                 String modifiedHeaders = formatHeaders(headers, command);
                 compressedOut.write(modifiedHeaders.getBytes());
@@ -671,15 +673,33 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
     	}
     }
 
-    protected static Map<String, List<String>> readHeaders(InputStream in, StringBuilder command,
+    /**
+     *  From I2P to server: socket non-null, in null.
+     *  From server to I2P: socket null, in non-null.
+     *
+     *  @param socket if null, use in as InputStream
+     *  @param in if null, use socket.getInputStream() as InputStream
+     *  @param command out parameter, first line
+     *  @param command out parameter, first line
+     *  @throws SocketTimeoutException if timeout is reached before newline
+     *  @throws EOFException if EOF is reached before newline
+     *  @throws LineTooLongException if too long
+     *  @throws IOException on other errors in the underlying stream
+     */
+    private static Map<String, List<String>> readHeaders(I2PSocket socket, InputStream in, StringBuilder command,
                                                            String[] skipHeaders, I2PAppContext ctx) throws IOException {
     	HashMap<String, List<String>> headers = new HashMap<String, List<String>>();
         StringBuilder buf = new StringBuilder(128);
         
         // slowloris / darkloris
         long expire = ctx.clock().now() + TOTAL_HEADER_TIMEOUT;
-        boolean ok = DataHelper.readLine(in, command);
-        if (!ok) throw new IOException("EOF reached while reading the HTTP command [" + command.toString() + "]");
+        if (socket != null) {
+            readLine(socket, command, HEADER_TIMEOUT);
+        } else {
+             boolean ok = DataHelper.readLine(in, command);
+             if (!ok)
+                 throw new IOException("EOF reached before the end of the headers [" + buf.toString() + "]");
+        }
         
         //if (_log.shouldLog(Log.DEBUG))
         //    _log.debug("Read the http command [" + command.toString() + "]");
@@ -703,14 +723,19 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
             if (++i > MAX_HEADERS)
                 throw new IOException("Too many header lines - max " + MAX_HEADERS);
             buf.setLength(0);
-            ok = DataHelper.readLine(in, buf);
-            if (!ok) throw new IOException("EOF reached before the end of the headers [" + buf.toString() + "]");
+            if (socket != null) {
+                readLine(socket, buf, expire - ctx.clock().now());
+            } else {
+                 boolean ok = DataHelper.readLine(in, buf);
+                 if (!ok)
+                     throw new IOException("EOF reached before the end of the headers [" + buf.toString() + "]");
+            }
             if ( (buf.length() == 0) || 
                  ((buf.charAt(0) == '\n') || (buf.charAt(0) == '\r')) ) {
                 // end of headers reached
                 return headers;
             } else {
-                if (ctx.clock().now() > expire)
+                if (ctx.clock().now() >= expire)
                     throw new IOException("Headers took too long [" + buf.toString() + "]");
                 int split = buf.indexOf(":");
                 if (split <= 0) throw new IOException("Invalid HTTP header, missing colon [" + buf.toString() + "]");
@@ -750,6 +775,60 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                 //if (_log.shouldLog(Log.DEBUG))
                 //    _log.debug("Read the header [" + name + "] = [" + value + "]");
             }
+        }
+    }
+
+    /**
+     *  Read a line teriminated by newline, with a total read timeout.
+     *
+     *  Warning - strips \n but not \r
+     *  Warning - 8KB line length limit as of 0.7.13, @throws IOException if exceeded
+     *  Warning - not UTF-8
+     *
+     *  @param buf output
+     *  @param timeout throws SocketTimeoutException immediately if zero or negative
+     *  @throws SocketTimeoutException if timeout is reached before newline
+     *  @throws EOFException if EOF is reached before newline
+     *  @throws LineTooLongException if too long
+     *  @throws IOException on other errors in the underlying stream
+     *  @since 0.9.19 modified from DataHelper
+     */
+    private static void readLine(I2PSocket socket, StringBuilder buf, long timeout) throws IOException {
+        if (timeout <= 0)
+            throw new SocketTimeoutException();
+        long expires = System.currentTimeMillis() + timeout;
+        InputStream in = socket.getInputStream();
+        int c;
+        int i = 0;
+        socket.setReadTimeout(timeout);
+        while ( (c = in.read()) != -1) {
+            if (++i > MAX_LINE_LENGTH)
+                throw new LineTooLongException("Line too long - max " + MAX_LINE_LENGTH);
+            if (c == '\n')
+                break;
+            long newTimeout = expires - System.currentTimeMillis();
+            if (newTimeout <= 0)
+                throw new SocketTimeoutException();
+            buf.append((char)c);
+            if (newTimeout != timeout) {
+                timeout = newTimeout;
+                socket.setReadTimeout(timeout);
+            }
+        }
+        if (c == -1) {
+            if (System.currentTimeMillis() >= expires)
+                throw new SocketTimeoutException();
+            else
+                throw new EOFException();
+        }
+    }
+
+    /**
+     *  @since 0.9.19
+     */
+    private static class LineTooLongException extends IOException {
+        public LineTooLongException(String s) {
+            super(s);
         }
     }
 }

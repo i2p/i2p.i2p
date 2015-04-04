@@ -170,10 +170,15 @@ class MessageInputStream extends InputStream {
     /** 
      * how long a read() call should block (if less than 0, block indefinitely,
      * but if it is 0, do not block at all)
-     * @return how long read calls should block, 0 or less indefinitely block
+     * @return how long read calls should block, 0 for nonblocking, negative to indefinitely block
      */
     public int getReadTimeout() { return _readTimeout; }
 
+    /** 
+     * how long a read() call should block (if less than 0, block indefinitely,
+     * but if it is 0, do not block at all)
+     * @param timeout how long read calls should block, 0 for nonblocking, negative to indefinitely block
+     */
     public void setReadTimeout(int timeout) {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Changing read timeout from " + _readTimeout + " to " + timeout);
@@ -230,7 +235,8 @@ class MessageInputStream extends InputStream {
      */
     public boolean messageReceived(long messageId, ByteArray payload) {
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("received " + messageId + " with " + (payload != null ? payload.getValid()+"" : "no payload"));
+            _log.debug("received msg ID " + messageId + " with " +
+                       (payload != null ? payload.getValid() + " bytes" : "no payload"));
         synchronized (_dataLock) {
             if (messageId <= _highestReadyBlockId) {
                 if (_log.shouldLog(Log.INFO))
@@ -261,6 +267,10 @@ class MessageInputStream extends InputStream {
                     cur++;
                     _highestReadyBlockId++;
                 }
+                                        // FIXME Javadocs for setReadTimeout() say we will throw
+                                        // an InterruptedIOException.
+                                        // Java throws a SocketTimeoutException.
+                                        // We do neither.
             } else {
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Message is out of order: " + messageId);
@@ -275,23 +285,41 @@ class MessageInputStream extends InputStream {
         return true;
     }
     
+    /**
+     *  On a read timeout, this returns -1
+     *  (doesn't throw SocketTimeoutException like Socket)
+     *  (doesn't throw InterruptedIOException like our javadocs say)
+     */
     public int read() throws IOException {
         int read = read(_oneByte, 0, 1);
-        if (read < 0)
+        if (read <= 0)
             return -1;
         return _oneByte[0] & 0xff;
     }
     
+    /**
+     *  On a read timeout, this returns 0
+     *  (doesn't throw SocketTimeoutException like Socket)
+     *  (doesn't throw InterruptedIOException like our javadocs say)
+     */
     @Override
     public int read(byte target[]) throws IOException {
         return read(target, 0, target.length);
     }
     
+    /**
+     *  On a read timeout, this returns 0
+     *  (doesn't throw SocketTimeoutException like Socket)
+     *  (doesn't throw InterruptedIOException like our javadocs say)
+     */
     @Override
     public int read(byte target[], int offset, int length) throws IOException {
-        long expiration = -1;
-        if (_readTimeout > 0)
-            expiration = _readTimeout + System.currentTimeMillis();
+        int readTimeout = _readTimeout;
+        long expiration;
+        if (readTimeout > 0)
+            expiration = readTimeout + System.currentTimeMillis();
+        else
+            expiration = -1;
         synchronized (_dataLock) {
             if (_locallyClosed) throw new IOException("Already locally closed");
             throwAnyError();
@@ -310,10 +338,10 @@ class MessageInputStream extends InputStream {
                                            + "] got EOF after " + _readTotal + " " + toString());
                             return -1;
                         } else {
-                            if (_readTimeout < 0) {
+                            if (readTimeout < 0) {
                                 if (_log.shouldLog(Log.DEBUG))
                                     _log.debug("read(...," + offset+", " + length+ ")[" + i 
-                                               + ") with no timeout: " + toString());
+                                               + "] with no timeout: " + toString());
                                 try {
                                     _dataLock.wait();
                                 } catch (InterruptedException ie) {
@@ -323,14 +351,14 @@ class MessageInputStream extends InputStream {
                                 }
                                 if (_log.shouldLog(Log.DEBUG))
                                     _log.debug("read(...," + offset+", " + length+ ")[" + i 
-                                               + ") with no timeout complete: " + toString());
+                                               + "] with no timeout complete: " + toString());
                                 throwAnyError();
-                            } else if (_readTimeout > 0) {
+                            } else if (readTimeout > 0) {
                                 if (_log.shouldLog(Log.DEBUG))
                                     _log.debug("read(...," + offset+", " + length+ ")[" + i 
-                                               + ") with timeout: " + _readTimeout + ": " + toString());
+                                               + "] with timeout: " + readTimeout + ": " + toString());
                                 try {
-                                    _dataLock.wait(_readTimeout);
+                                    _dataLock.wait(readTimeout);
                                 } catch (InterruptedException ie) {
                                     IOException ioe2 = new InterruptedIOException("Interrupted read");
                                     ioe2.initCause(ie);
@@ -338,21 +366,30 @@ class MessageInputStream extends InputStream {
                                 }
                                 if (_log.shouldLog(Log.DEBUG))
                                     _log.debug("read(...," + offset+", " + length+ ")[" + i 
-                                               + ") with timeout complete: " + _readTimeout + ": " + toString());
+                                               + "] with timeout complete: " + readTimeout + ": " + toString());
                                 throwAnyError();
                             } else { // readTimeout == 0
                                 // noop, don't block
                                 if (_log.shouldLog(Log.DEBUG))
                                     _log.debug("read(...," + offset+", " + length+ ")[" + i 
-                                               + ") with nonblocking setup: " + toString());
+                                               + "] with nonblocking setup: " + toString());
                                 return i;
                             }
                             if (_readyDataBlocks.isEmpty()) {
-                                if ( (_readTimeout > 0) && (expiration < System.currentTimeMillis()) ) {
-                                    if (_log.shouldLog(Log.INFO))
-                                        _log.info("read(...," + offset+", " + length+ ")[" + i 
-                                                   + ") expired: " + toString());
-                                    return i;
+                                if (readTimeout > 0) {
+                                    long remaining = expiration - System.currentTimeMillis();
+                                    if (remaining <= 0) {
+                                        // FIXME Javadocs for setReadTimeout() say we will throw
+                                        // an InterruptedIOException.
+                                        // Java throws a SocketTimeoutException.
+                                        // We do neither.
+                                        if (_log.shouldLog(Log.INFO))
+                                            _log.info("read(...," + offset+", " + length+ ")[" + i 
+                                                       + "] expired: " + toString());
+                                        return i;
+                                    } else {
+                                        readTimeout = (int) remaining;
+                                    }
                                 }
                             }
                         }

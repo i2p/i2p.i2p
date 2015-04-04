@@ -1,3 +1,11 @@
+2015-04-04 zzz
+ * i2ptunnel:
+   - Better timeout handling when reading headers in HTTP server (ticket #723)
+   - Fix NoSuchElementException processing proxyList caused by 03-31 checkin
+ * Streaming:
+   - Fix read timeout on input stream (ticket #723)
+   - Fix read() returning 0 instead of -1 on read timeout (ticket #335)
+
 2015-04-03 zzz
  * i2ptunnel: Fix stopping tunnel on bad args when starting
  * wrapper.config: Remove old mortbay Jetty parameters
