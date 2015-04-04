@@ -122,6 +122,51 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
          "<p>This I2P website is not configured for SSL.</p>\n" +
          "</body></html>";
 
+    private final static String ERR_REQUEST_URI_TOO_LONG =
+         "HTTP/1.1 414 Request URI too long\r\n"+
+         "Content-Type: text/html; charset=iso-8859-1\r\n"+
+         "Cache-control: no-cache\r\n"+
+         "Connection: close\r\n"+
+         "Proxy-Connection: close\r\n"+
+         "\r\n"+
+         "<html><head><title>414 Request URI Too Long</title></head>\n"+
+         "<body><h2>414 Request URI too long</h2>\n" +
+         "</body></html>";
+
+    private final static String ERR_HEADERS_TOO_LARGE =
+         "HTTP/1.1 431 Request header fields too large\r\n"+
+         "Content-Type: text/html; charset=iso-8859-1\r\n"+
+         "Cache-control: no-cache\r\n"+
+         "Connection: close\r\n"+
+         "Proxy-Connection: close\r\n"+
+         "\r\n"+
+         "<html><head><title>431 Request Header Fields Too Large</title></head>\n"+
+         "<body><h2>431 Request header fields too large</h2>\n" +
+         "</body></html>";
+
+    private final static String ERR_REQUEST_TIMEOUT =
+         "HTTP/1.1 408 Request timeout\r\n"+
+         "Content-Type: text/html; charset=iso-8859-1\r\n"+
+         "Cache-control: no-cache\r\n"+
+         "Connection: close\r\n"+
+         "Proxy-Connection: close\r\n"+
+         "\r\n"+
+         "<html><head><title>408 Request Timeout</title></head>\n"+
+         "<body><h2>408 Request timeout</h2>\n" +
+         "</body></html>";
+
+    private final static String ERR_BAD_REQUEST =
+         "HTTP/1.1 400 Bad Request\r\n"+
+         "Content-Type: text/html; charset=iso-8859-1\r\n"+
+         "Cache-control: no-cache\r\n"+
+         "Connection: close\r\n"+
+         "Proxy-Connection: close\r\n"+
+         "\r\n"+
+         "<html><head><title>400 Bad Request</title></head>\n"+
+         "<body><h2>400 Bad request</h2>\n" +
+         "</body></html>";
+
+
     public I2PTunnelHTTPServer(InetAddress host, int port, String privData, String spoofHost, Logging l, EventDispatcher notifyThis, I2PTunnel tunnel) {
         super(host, port, privData, l, notifyThis, tunnel);
         setupI2PTunnelHTTPServer(spoofHost);
@@ -242,8 +287,63 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
             // may not be, depending on the client-side options
 
             StringBuilder command = new StringBuilder(128);
-            Map<String, List<String>> headers = readHeaders(socket, null, command,
-                CLIENT_SKIPHEADERS, getTunnel().getContext());
+            Map<String, List<String>> headers;
+            try {
+                // catch specific exceptions thrown, to return a good
+                // error to the client
+                headers = readHeaders(socket, null, command,
+                                      CLIENT_SKIPHEADERS, getTunnel().getContext());
+            } catch (SocketTimeoutException ste) {
+                try {
+                    socket.getOutputStream().write(ERR_REQUEST_TIMEOUT.getBytes("UTF-8"));
+                } catch (IOException ioe) {
+                } finally {
+                     try { socket.close(); } catch (IOException ioe) {}
+                }
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Error while receiving the new HTTP request", ste);
+                return;
+            } catch (EOFException eofe) {
+                try {
+                    socket.getOutputStream().write(ERR_BAD_REQUEST.getBytes("UTF-8"));
+                } catch (IOException ioe) {
+                } finally {
+                     try { socket.close(); } catch (IOException ioe) {}
+                }
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Error while receiving the new HTTP request", eofe);
+                return;
+            } catch (LineTooLongException ltle) {
+                try {
+                    socket.getOutputStream().write(ERR_HEADERS_TOO_LARGE.getBytes("UTF-8"));
+                } catch (IOException ioe) {
+                } finally {
+                     try { socket.close(); } catch (IOException ioe) {}
+                }
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Error while receiving the new HTTP request", ltle);
+                return;
+            } catch (RequestTooLongException rtle) {
+                try {
+                    socket.getOutputStream().write(ERR_REQUEST_URI_TOO_LONG.getBytes("UTF-8"));
+                } catch (IOException ioe) {
+                } finally {
+                     try { socket.close(); } catch (IOException ioe) {}
+                }
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Error while receiving the new HTTP request", rtle);
+                return;
+            } catch (BadRequestException bre) {
+                try {
+                    socket.getOutputStream().write(ERR_BAD_REQUEST.getBytes("UTF-8"));
+                } catch (IOException ioe) {
+                } finally {
+                     try { socket.close(); } catch (IOException ioe) {}
+                }
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Error while receiving the new HTTP request", bre);
+                return;
+            }
             long afterHeaders = getTunnel().getContext().clock().now();
 
             Properties opts = getTunnel().getClientOptions();
@@ -709,10 +809,11 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
      *  @param socket if null, use in as InputStream
      *  @param in if null, use socket.getInputStream() as InputStream
      *  @param command out parameter, first line
-     *  @param command out parameter, first line
      *  @throws SocketTimeoutException if timeout is reached before newline
      *  @throws EOFException if EOF is reached before newline
-     *  @throws LineTooLongException if too long
+     *  @throws LineTooLongException if one header too long, or too many headers
+     *  @throws RequestTooLongException if too long
+     *  @throws BadRequestException on bad headers
      *  @throws IOException on other errors in the underlying stream
      */
     private static Map<String, List<String>> readHeaders(I2PSocket socket, InputStream in, StringBuilder command,
@@ -723,11 +824,16 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
         // slowloris / darkloris
         long expire = ctx.clock().now() + TOTAL_HEADER_TIMEOUT;
         if (socket != null) {
-            readLine(socket, command, HEADER_TIMEOUT);
+            try {
+                readLine(socket, command, HEADER_TIMEOUT);
+            } catch (LineTooLongException ltle) {
+                // convert for first line
+                throw new RequestTooLongException("Request too long - max " + MAX_LINE_LENGTH);
+            }
         } else {
              boolean ok = DataHelper.readLine(in, command);
              if (!ok)
-                 throw new IOException("EOF reached before the end of the headers [" + buf.toString() + "]");
+                 throw new EOFException("EOF reached before the end of the headers [" + buf.toString() + "]");
         }
         
         //if (_log.shouldLog(Log.DEBUG))
@@ -749,25 +855,27 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
         
         int i = 0;
         while (true) {
-            if (++i > MAX_HEADERS)
-                throw new IOException("Too many header lines - max " + MAX_HEADERS);
+            if (++i > MAX_HEADERS) {
+                throw new LineTooLongException("Too many header lines - max " + MAX_HEADERS);
+            }
             buf.setLength(0);
             if (socket != null) {
                 readLine(socket, buf, expire - ctx.clock().now());
             } else {
                  boolean ok = DataHelper.readLine(in, buf);
                  if (!ok)
-                     throw new IOException("EOF reached before the end of the headers [" + buf.toString() + "]");
+                     throw new BadRequestException("EOF reached before the end of the headers [" + buf.toString() + "]");
             }
             if ( (buf.length() == 0) || 
                  ((buf.charAt(0) == '\n') || (buf.charAt(0) == '\r')) ) {
                 // end of headers reached
                 return headers;
             } else {
-                if (ctx.clock().now() >= expire)
-                    throw new IOException("Headers took too long [" + buf.toString() + "]");
+                if (ctx.clock().now() > expire) {
+                    throw new SocketTimeoutException("Headers took too long [" + buf.toString() + "]");
+                }
                 int split = buf.indexOf(":");
-                if (split <= 0) throw new IOException("Invalid HTTP header, missing colon [" + buf.toString() + "]");
+                if (split <= 0) throw new BadRequestException("Invalid HTTP header, missing colon [" + buf.toString() + "]");
                 String name = buf.substring(0, split).trim();
                 String value = null;
                 if (buf.length() > split + 1)
@@ -857,6 +965,24 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
      */
     private static class LineTooLongException extends IOException {
         public LineTooLongException(String s) {
+            super(s);
+        }
+    }
+
+    /**
+     *  @since 0.9.20
+     */
+    private static class RequestTooLongException extends IOException {
+        public RequestTooLongException(String s) {
+            super(s);
+        }
+    }
+
+    /**
+     *  @since 0.9.20
+     */
+    private static class BadRequestException extends IOException {
+        public BadRequestException(String s) {
             super(s);
         }
     }
