@@ -580,7 +580,7 @@ public class TunnelController implements Logging {
      */
     public void stopTunnel() {
         synchronized (this) {
-            if (_state != TunnelState.RUNNING)
+            if (_state != TunnelState.STARTING && _state != TunnelState.RUNNING)
                 return;
             changeState(TunnelState.STOPPING);
         }
