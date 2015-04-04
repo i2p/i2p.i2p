@@ -71,6 +71,11 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
     private static final long TOTAL_HEADER_TIMEOUT = 2 * HEADER_TIMEOUT;
     private static final long START_INTERVAL = (60 * 1000) * 3;
     private static final int MAX_LINE_LENGTH = 8*1024;
+    /** ridiculously long, just to prevent OOM DOS @since 0.7.13 */
+    private static final int MAX_HEADERS = 60;
+    /** Includes request, just to prevent OOM DOS @since 0.9.20 */
+    private static final int MAX_TOTAL_HEADER_SIZE = 32*1024;
+    
     private long _startedOn = 0L;
     private ConnThrottler _postThrottler;
 
@@ -762,9 +767,6 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
         return buf.toString();
     }
     
-    /** ridiculously long, just to prevent OOM DOS @since 0.7.13 */
-    private static final int MAX_HEADERS = 60;
-    
     /**
      * Add an entry to the multimap.
      */
@@ -811,7 +813,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
      *  @param command out parameter, first line
      *  @throws SocketTimeoutException if timeout is reached before newline
      *  @throws EOFException if EOF is reached before newline
-     *  @throws LineTooLongException if one header too long, or too many headers
+     *  @throws LineTooLongException if one header too long, or too many headers, or total size too big
      *  @throws RequestTooLongException if too long
      *  @throws BadRequestException on bad headers
      *  @throws IOException on other errors in the underlying stream
@@ -833,7 +835,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
         } else {
              boolean ok = DataHelper.readLine(in, command);
              if (!ok)
-                 throw new EOFException("EOF reached before the end of the headers [" + buf.toString() + "]");
+                 throw new EOFException("EOF reached before the end of the headers");
         }
         
         //if (_log.shouldLog(Log.DEBUG))
@@ -853,6 +855,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
         if (trimmed > 0)
             ctx.statManager().addRateData("i2ptunnel.httpNullWorkaround", trimmed);
         
+        int totalSize = command.length();
         int i = 0;
         while (true) {
             if (++i > MAX_HEADERS) {
@@ -864,7 +867,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
             } else {
                  boolean ok = DataHelper.readLine(in, buf);
                  if (!ok)
-                     throw new BadRequestException("EOF reached before the end of the headers [" + buf.toString() + "]");
+                     throw new BadRequestException("EOF reached before the end of the headers");
             }
             if ( (buf.length() == 0) || 
                  ((buf.charAt(0) == '\n') || (buf.charAt(0) == '\r')) ) {
@@ -872,10 +875,14 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                 return headers;
             } else {
                 if (ctx.clock().now() > expire) {
-                    throw new SocketTimeoutException("Headers took too long [" + buf.toString() + "]");
+                    throw new SocketTimeoutException("Headers took too long");
                 }
                 int split = buf.indexOf(":");
-                if (split <= 0) throw new BadRequestException("Invalid HTTP header, missing colon [" + buf.toString() + "]");
+                if (split <= 0)
+                    throw new BadRequestException("Invalid HTTP header, missing colon");
+                totalSize += buf.length();
+                if (totalSize > MAX_TOTAL_HEADER_SIZE)
+                    throw new LineTooLongException("Req+headers too big");
                 String name = buf.substring(0, split).trim();
                 String value = null;
                 if (buf.length() > split + 1)
