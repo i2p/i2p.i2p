@@ -262,16 +262,16 @@ Debian wrapper.config to try to prevent confusion.
  
  # Java Bits.  On applicable platforms, tells the JVM to run in 32 or 64-bit mode.
  wrapper.java.additional.auto_bits=TRUE
-@@ -76,7 +68,7 @@
+@@ -74,7 +66,7 @@
+ # Java Additional Parameters
+ # Numbers must be consecutive (except for stripquotes)
  wrapper.java.additional.1=-DloggerFilenameOverride=logs/log-router-@.txt
- wrapper.java.additional.2=-Dorg.mortbay.http.Version.paranoid=true
- wrapper.java.additional.3=-Dorg.mortbay.xml.XmlParser.NotValidating=true
--wrapper.java.additional.4=-Di2p.dir.base="$INSTALL_PATH"
-+wrapper.java.additional.4=-Di2p.dir.base=/usr/share/i2p
- wrapper.java.additional.4.stripquotes=TRUE
+-wrapper.java.additional.2=-Di2p.dir.base="$INSTALL_PATH"
++wrapper.java.additional.2=-Di2p.dir.base=/usr/share/i2p
+ wrapper.java.additional.2.stripquotes=TRUE
  
- # On some IPv6 enabled systems, I2P and other network-enabled java applications
-@@ -143,11 +135,7 @@
+ # Prevent the JVM from exporting stats (and thereby causing hundreds of
+@@ -146,11 +138,7 @@
  # You may wish to change this.
  # NOTE: On Linux/Mac this is overridden in the i2prouter script; changes here will have no effect.
  # System temp directory:
@@ -284,7 +284,7 @@ Debian wrapper.config to try to prevent confusion.
  
  # Format of output for the log file.
  # The format consists of the tokens 'L' for log level, 'P' for prefix, 'D' for thread,
-@@ -217,11 +205,7 @@
+@@ -220,11 +208,7 @@
  # Linux/Mac users, do not set here, see settings in the i2prouter script.
  # Directory must exist or the wrapper will fail to start.
  # System temp directory:
@@ -297,7 +297,7 @@ Debian wrapper.config to try to prevent confusion.
  #
  # From i2prouter:
  #
-@@ -235,10 +219,7 @@
+@@ -238,10 +222,7 @@
  # Linux/Mac users, do not set here, see settings in the i2prouter script.
  # Directory must exist or the wrapper will fail to start.
  # System temp directory:
@@ -309,7 +309,7 @@ Debian wrapper.config to try to prevent confusion.
  
  #********************************************************************
  # Wrapper General Properties
-@@ -255,30 +236,3 @@
+@@ -258,30 +239,3 @@
  wrapper.umask=0022
  wrapper.java.umask=0022
  wrapper.logfile.umask=0077
