@@ -266,7 +266,7 @@ public class I2PSSLSocketFactory {
         for (int i = 0; i < p.length; i++) {
             // if we left SSLv3 in there, we don't support TLS,
             // so we should't remove the SSL ciphers
-            if (p.equals("SSLv3"))
+            if (p[i].equals("SSLv3"))
                 return;
         }
         socket.setEnabledProtocols(p);
