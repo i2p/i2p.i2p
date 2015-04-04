@@ -75,7 +75,7 @@ public class JobQueue {
 
     /** default max # job queue runners operating */
     private final static int DEFAULT_MAX_RUNNERS = 1;
-    /** router.config parameter to override the max runners @deprecated unimplemented */
+    /** router.config parameter to override the max runners */
     private final static String PROP_MAX_RUNNERS = "router.maxJobRunners";
     
     /** how frequently should we check and update the max runners */
@@ -330,7 +330,7 @@ public class JobQueue {
     
     public void allowParallelOperation() { 
         _allowParallelOperation = true; 
-        runQueue(RUNNERS);
+        runQueue(_context.getProperty(PROP_MAX_RUNNERS, RUNNERS));
     }
     
     /** 

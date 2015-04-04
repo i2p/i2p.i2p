@@ -74,8 +74,8 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
     private long _startedOn = 0L;
     private ConnThrottler _postThrottler;
 
-    private final static byte[] ERR_UNAVAILABLE =
-        ("HTTP/1.1 503 Service Unavailable\r\n"+
+    private final static String ERR_UNAVAILABLE =
+         "HTTP/1.1 503 Service Unavailable\r\n"+
          "Content-Type: text/html; charset=iso-8859-1\r\n"+
          "Cache-control: no-cache\r\n"+
          "Connection: close\r\n"+
@@ -84,11 +84,10 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
          "<html><head><title>503 Service Unavailable</title></head>\n"+
          "<body><h2>503 Service Unavailable</h2>\n" +
          "<p>This I2P website is unavailable. It may be down or undergoing maintenance.</p>\n" +
-         "</body></html>")
-         .getBytes();
+         "</body></html>";
 
-    private final static byte[] ERR_DENIED =
-        ("HTTP/1.1 403 Denied\r\n"+
+    private final static String ERR_DENIED =
+         "HTTP/1.1 403 Denied\r\n"+
          "Content-Type: text/html; charset=iso-8859-1\r\n"+
          "Cache-control: no-cache\r\n"+
          "Connection: close\r\n"+
@@ -97,11 +96,10 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
          "<html><head><title>403 Denied</title></head>\n"+
          "<body><h2>403 Denied</h2>\n" +
          "<p>Denied due to excessive requests. Please try again later.</p>\n" +
-         "</body></html>")
-         .getBytes();
+         "</body></html>";
 
-    private final static byte[] ERR_INPROXY =
-        ("HTTP/1.1 403 Denied\r\n"+
+    private final static String ERR_INPROXY =
+         "HTTP/1.1 403 Denied\r\n"+
          "Content-Type: text/html; charset=iso-8859-1\r\n"+
          "Cache-control: no-cache\r\n"+
          "Connection: close\r\n"+
@@ -110,8 +108,19 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
          "<html><head><title>403 Denied</title></head>\n"+
          "<body><h2>403 Denied</h2>\n" +
          "<p>Inproxy access denied. You must run <a href=\"https://geti2p.net/\">I2P</a> to access this site.</p>\n" +
-         "</body></html>")
-         .getBytes();
+         "</body></html>";
+
+    private final static String ERR_SSL =
+         "HTTP/1.1 503 Service Unavailable\r\n"+
+         "Content-Type: text/html; charset=iso-8859-1\r\n"+
+         "Cache-control: no-cache\r\n"+
+         "Connection: close\r\n"+
+         "Proxy-Connection: close\r\n"+
+         "\r\n"+
+         "<html><head><title>503 Service Unavailable</title></head>\n"+
+         "<body><h2>503 Service Unavailable</h2>\n" +
+         "<p>This I2P website is not configured for SSL.</p>\n" +
+         "</body></html>";
 
     public I2PTunnelHTTPServer(InetAddress host, int port, String privData, String spoofHost, Logging l, EventDispatcher notifyThis, I2PTunnel tunnel) {
         super(host, port, privData, l, notifyThis, tunnel);
@@ -208,7 +217,27 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
         //local is fast, so synchronously. Does not need that many
         //threads.
         try {
+            if (socket.getLocalPort() == 443) {
+                if (getTunnel().getClientOptions().getProperty("targetForPort.443") == null) {
+                    try {
+                        socket.getOutputStream().write(ERR_SSL.getBytes("UTF-8"));
+                    } catch (IOException ioe) {
+                    } finally {
+                        try {
+                            socket.close();
+                        } catch (IOException ioe) {}
+                    }
+                    return;
+                }
+                Socket s = getSocket(socket.getPeerDestination().calculateHash(), 443);
+                Runnable t = new I2PTunnelRunner(s, socket, slock, null, null,
+                                                 null, (I2PTunnelRunner.FailCallback) null);
+                _clientExecutor.execute(t);
+                return;
+            }
+
             long afterAccept = getTunnel().getContext().clock().now();
+
             // The headers _should_ be in the first packet, but
             // may not be, depending on the client-side options
 
@@ -239,7 +268,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                 try {
                     // Send a 403, so the user doesn't get an HTTP Proxy error message
                     // and blame his router or the network.
-                    socket.getOutputStream().write(ERR_INPROXY);
+                    socket.getOutputStream().write(ERR_INPROXY.getBytes("UTF-8"));
                 } catch (IOException ioe) {}
                 try {
                     socket.close();
@@ -256,7 +285,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                     try {
                         // Send a 403, so the user doesn't get an HTTP Proxy error message
                         // and blame his router or the network.
-                        socket.getOutputStream().write(ERR_DENIED);
+                        socket.getOutputStream().write(ERR_DENIED.getBytes("UTF-8"));
                     } catch (IOException ioe) {}
                     try {
                         socket.close();
@@ -341,7 +370,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
             try {
                 // Send a 503, so the user doesn't get an HTTP Proxy error message
                 // and blame his router or the network.
-                socket.getOutputStream().write(ERR_UNAVAILABLE);
+                socket.getOutputStream().write(ERR_UNAVAILABLE.getBytes("UTF-8"));
             } catch (IOException ioe) {}
             try {
                 socket.close();
@@ -362,7 +391,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
             try {
                 // Send a 503, so the user doesn't get an HTTP Proxy error message
                 // and blame his router or the network.
-                socket.getOutputStream().write(ERR_UNAVAILABLE);
+                socket.getOutputStream().write(ERR_UNAVAILABLE.getBytes("UTF-8"));
             } catch (IOException ioe) {}
             try {
                 socket.close();
@@ -453,7 +482,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                 try {
                     if (browserout == null)
                         browserout = _browser.getOutputStream();
-                    browserout.write(ERR_UNAVAILABLE);
+                    browserout.write(ERR_UNAVAILABLE.getBytes("UTF-8"));
                 } catch (IOException ioe) {}
             } catch (IOException ioe) {
                 if (_log.shouldLog(Log.WARN))
