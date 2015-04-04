@@ -199,24 +199,23 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
         cur += DataHelper.DATE_LENGTH;
         int size = (int)DataHelper.fromLong(data, cur, 2);
         cur += 2;
-        //Hash h = new Hash();
-        byte hdata[] = new byte[CHECKSUM_LENGTH];
-        System.arraycopy(data, cur, hdata, 0, CHECKSUM_LENGTH);
-        cur += CHECKSUM_LENGTH;
-        //h.setData(hdata);
 
         if (cur + size > data.length || headerSize + size > maxLen)
-            throw new I2NPMessageException("Payload is too short [" 
+            throw new I2NPMessageException("Payload is too short ["
                                            + "data.len=" + data.length
                                            + "maxLen=" + maxLen
                                            + " offset=" + offset
-                                           + " cur=" + cur 
+                                           + " cur=" + cur
                                            + " wanted=" + size + "]: " + getClass().getSimpleName());
 
         int sz = Math.min(size, maxLen - headerSize);
         byte[] calc = SimpleByteCache.acquire(Hash.HASH_LENGTH);
-        _context.sha().calculateHash(data, cur, sz, calc, 0);
-        boolean eq = DataHelper.eq(hdata, 0, calc, 0, CHECKSUM_LENGTH);
+        
+        // Compare the checksum in data to the checksum of the data after the checksum
+        _context.sha().calculateHash(data, cur + CHECKSUM_LENGTH, sz, calc, 0);
+        boolean eq = DataHelper.eq(data, cur, calc, 0, CHECKSUM_LENGTH);
+        cur += CHECKSUM_LENGTH;
+
         SimpleByteCache.release(calc);
         if (!eq)
             throw new I2NPMessageException("Bad checksum on " + size + " byte I2NP " + getClass().getSimpleName());
