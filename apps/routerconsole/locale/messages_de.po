@@ -3635,7 +3635,7 @@ msgstr "Mittelwert"
 
 #: ../java/src/net/i2p/router/web/StatsGenerator.java:173
 msgid "Highest average"
-msgstr "höchster Durchscnittslwert"
+msgstr "höchster Durchschnittswert"
 
 #: ../java/src/net/i2p/router/web/StatsGenerator.java:200
 #, java-format
