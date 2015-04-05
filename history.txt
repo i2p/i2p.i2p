@@ -1,3 +1,6 @@
+2015-04-05 zzz
+ * IRC Server: Better timeout handling reading initial lines (ticket #723)
+
 2015-04-04 zzz
  * i2ptunnel:
    - Better timeout handling when reading headers in HTTP server (ticket #723)
