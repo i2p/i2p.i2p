@@ -595,12 +595,7 @@ class EstablishmentManager {
                 }
                 
         if (_outboundStates.size() < getMaxConcurrentEstablish() && !_queuedOutbound.isEmpty()) {
-            // in theory shouldn't need locking, but
-            // getting IllegalStateExceptions on old Java 5,
-            // which hoses this state.
-            synchronized(_queuedOutbound) {
-                locked_admitQueued();
-            }
+            locked_admitQueued();
         }
             //remaining = _queuedOutbound.size();
 
