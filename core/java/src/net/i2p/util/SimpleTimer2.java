@@ -136,11 +136,11 @@ public class SimpleTimer2 {
             throw new IllegalArgumentException("addEvent null");
 
         new TimedEvent(SimpleTimer2.getInstance(), timeoutMs) {
-			@Override
-			public void timeReached() {
-				event.timeReached();
-			}
-    	};
+            @Override
+            public void timeReached() {
+                event.timeReached();
+            }
+        };
     }
     
     /**
@@ -155,14 +155,14 @@ public class SimpleTimer2 {
      * @param timeoutMs run subsequent iterations of this event every timeoutMs ms
      */
     public void addPeriodicEvent(final SimpleTimer.TimedEvent event, final long timeoutMs) {
-    	
+        
         new PeriodicTimedEvent(SimpleTimer2.getInstance(), timeoutMs) {
-			@Override
-			public void timeReached() {
-				event.timeReached();
-			}
-    	};
-	}
+            @Override
+            public void timeReached() {
+                event.timeReached();
+            }
+        };
+    }
     
     /**
      * Schedule periodic event
@@ -175,15 +175,15 @@ public class SimpleTimer2 {
      * @param delay run the first iteration of this event after delay ms
      * @param timeoutMs run subsequent iterations of this event every timeoutMs ms
      */
-	public void addPeriodicEvent(final SimpleTimer.TimedEvent event, final long delay,  final long timeoutMs) {
-		
+    public void addPeriodicEvent(final SimpleTimer.TimedEvent event, final long delay,  final long timeoutMs) {
+        
         new PeriodicTimedEvent(SimpleTimer2.getInstance(), delay, timeoutMs) {
-			@Override
-			public void timeReached() {
-				event.timeReached();
-			}
-    	};		
-	}
+            @Override
+            public void timeReached() {
+                event.timeReached();
+            }
+        };        
+    }
 
     /** 
      * state of a given TimedEvent
@@ -465,14 +465,14 @@ public class SimpleTimer2 {
     }
     
     public static abstract class PeriodicTimedEvent extends TimedEvent {
-    	private long _timeoutMs;
+        private long _timeoutMs;
         
         /**
          * Schedule periodic event
          * 
          * @param timeoutMs run subsequent iterations of this event every timeoutMs ms
          */
-    	public PeriodicTimedEvent(SimpleTimer2 pool, long timeoutMs) {
+        public PeriodicTimedEvent(SimpleTimer2 pool, long timeoutMs) {
             super(pool, timeoutMs);
             _timeoutMs = timeoutMs;
         }
@@ -490,8 +490,8 @@ public class SimpleTimer2 {
         
         @Override
         public void run() {
-        	super.run();
-        	schedule(_timeoutMs);
+            super.run();
+            schedule(_timeoutMs);
         }
     }
 }
