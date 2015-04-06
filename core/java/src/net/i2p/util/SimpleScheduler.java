@@ -30,6 +30,7 @@ public class SimpleScheduler {
 
     /**
      *  If you have a context, use context.simpleScheduler() instead
+     *  @deprecated in 0.9.19
      */
     public static SimpleScheduler getInstance() {
         return I2PAppContext.getGlobalContext().simpleScheduler();
@@ -46,6 +47,7 @@ public class SimpleScheduler {
     /**
      *  To be instantiated by the context.
      *  Others should use context.simpleTimer() instead
+     *  @deprecated in 0.9.19
      */
     public SimpleScheduler(I2PAppContext context) {
         this(context, "SimpleScheduler");
@@ -54,6 +56,7 @@ public class SimpleScheduler {
     /**
      *  To be instantiated by the context.
      *  Others should use context.simpleTimer() instead
+     *  @deprecated in 0.9.19
      */
     private SimpleScheduler(I2PAppContext context, String name) {
         _log = context.logManager().getLog(SimpleScheduler.class);

@@ -102,7 +102,7 @@ public abstract class TransportImpl implements Transport {
         _unreachableEntries = new HashMap<Hash, Long>(32);
         _wasUnreachableEntries = new HashMap<Hash, Long>(32);
         _localAddresses = new ConcurrentHashSet<InetAddress>(4);
-        _context.simpleScheduler().addPeriodicEvent(new CleanupUnreachable(), 2 * UNREACHABLE_PERIOD, UNREACHABLE_PERIOD / 2);
+        _context.simpleTimer2().addPeriodicEvent(new CleanupUnreachable(), 2 * UNREACHABLE_PERIOD, UNREACHABLE_PERIOD / 2);
     }
 
     /**

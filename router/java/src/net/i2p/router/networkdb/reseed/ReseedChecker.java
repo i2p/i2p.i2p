@@ -184,7 +184,7 @@ public class ReseedChecker {
      */
     void done() {
         _inProgress.set(false);
-        _context.simpleScheduler().addEvent(new StatusCleaner(_lastStatus, _lastError), STATUS_CLEAN_TIME);
+        _context.simpleTimer2().addEvent(new StatusCleaner(_lastStatus, _lastError), STATUS_CLEAN_TIME);
     }
 
     /**

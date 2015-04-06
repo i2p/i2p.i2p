@@ -328,7 +328,7 @@ public class I2PSnarkUtil {
             return rv;
         } catch (I2PException ie) {
             _banlist.add(dest);
-            _context.simpleScheduler().addEvent(new Unbanlist(dest), 10*60*1000);
+            _context.simpleTimer2().addEvent(new Unbanlist(dest), 10*60*1000);
             IOException ioe = new IOException("Unable to reach the peer " + peer);
             ioe.initCause(ie);
             throw ioe;

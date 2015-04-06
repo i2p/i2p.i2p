@@ -557,7 +557,7 @@ class ClientConnectionRunner {
                     // theirs is newer
                 } else {
                     // ours is newer, so wait a few secs and retry
-                    _context.simpleScheduler().addEvent(new Rerequest(set, expirationTime, onCreateJob, onFailedJob), 3*1000);
+                    _context.simpleTimer2().addEvent(new Rerequest(set, expirationTime, onCreateJob, onFailedJob), 3*1000);
                 }
                 // fire onCreated?
                 return; // already requesting

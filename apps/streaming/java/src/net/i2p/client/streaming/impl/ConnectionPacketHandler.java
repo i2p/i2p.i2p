@@ -213,7 +213,7 @@ class ConnectionPacketHandler {
                     final long delay = nextSendTime - now;
                     if (_log.shouldLog(Log.DEBUG)) 
                         _log.debug("scheduling ack in "+delay);
-                    _context.simpleScheduler().addEvent(new AckDup(con), delay);
+                    _context.simpleTimer2().addEvent(new AckDup(con), delay);
                 }
 
             } else {

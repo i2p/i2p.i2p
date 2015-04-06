@@ -270,7 +270,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         //_context.statManager().createRateStat("udp.packetAuthTime", "How long it takes to encrypt and MAC a packet for sending", "udp", RATES);
         //_context.statManager().createRateStat("udp.packetAuthTimeSlow", "How long it takes to encrypt and MAC a packet for sending (when its slow)", "udp", RATES);
 
-        _context.simpleScheduler().addPeriodicEvent(new PingIntroducers(), MIN_EXPIRE_TIMEOUT * 3 / 4);
+        _context.simpleTimer2().addPeriodicEvent(new PingIntroducers(), MIN_EXPIRE_TIMEOUT * 3 / 4);
     }
     
     /**
@@ -1235,7 +1235,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                     RemoteHostId remote = peer.getRemoteHostId();
                     _dropList.add(remote);
                     _context.statManager().addRateData("udp.dropPeerDroplist", 1);
-                    _context.simpleScheduler().addEvent(new RemoveDropList(remote), DROPLIST_PERIOD);
+                    _context.simpleTimer2().addEvent(new RemoveDropList(remote), DROPLIST_PERIOD);
                 }
                 markUnreachable(peerHash);
                 _context.banlist().banlistRouter(peerHash, "Part of the wrong network, version = " + ((RouterInfo) entry).getVersion());

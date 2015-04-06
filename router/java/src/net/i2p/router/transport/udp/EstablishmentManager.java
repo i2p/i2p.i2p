@@ -748,7 +748,7 @@ class EstablishmentManager {
         _transport.send(dsm, peer);
 
         // just do this inline
-        //_context.simpleScheduler().addEvent(new PublishToNewInbound(peer), 0);
+        //_context.simpleTimer2().addEvent(new PublishToNewInbound(peer), 0);
 
             Hash hash = peer.getRemotePeer();
             if ((hash != null) && (!_context.banlist().isBanlisted(hash)) && (!_transport.isUnreachable(hash))) {

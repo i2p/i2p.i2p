@@ -84,7 +84,7 @@ class TunnelGatewayPumper implements Runnable {
                         // in case another packet came in
                         _wantsPumping.remove(gw);
                         if (_backlogged.add(gw))
-                            _context.simpleScheduler().addEvent(new Requeue(gw), REQUEUE_TIME);
+                            _context.simpleTimer2().addEvent(new Requeue(gw), REQUEUE_TIME);
                     }
                     gw = null;
                     if (_wantsPumping.isEmpty()) {
