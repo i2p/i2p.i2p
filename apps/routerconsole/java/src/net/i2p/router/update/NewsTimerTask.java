@@ -38,7 +38,7 @@ class NewsTimerTask implements SimpleTimer.TimedEvent {
         delay += _context.random().nextLong(INITIAL_DELAY);
         if (_log.shouldLog(Log.INFO))
             _log.info("Scheduling first news check in " + DataHelper.formatDuration(delay));
-        ctx.simpleScheduler().addPeriodicEvent(this, delay, RUN_DELAY);
+        ctx.simpleTimer2().addPeriodicEvent(this, delay, RUN_DELAY);
         // UpdateManager calls NewsFetcher to check the existing news at startup
     }
 

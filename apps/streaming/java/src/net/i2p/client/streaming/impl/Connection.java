@@ -781,7 +781,7 @@ class Connection {
     private boolean scheduleDisconnectEvent() {
         if (!_disconnectScheduledOn.compareAndSet(0, _context.clock().now()))
             return false;
-        _context.simpleScheduler().addEvent(new DisconnectEvent(), DISCONNECT_TIMEOUT);
+        _context.simpleTimer2().addEvent(new DisconnectEvent(), DISCONNECT_TIMEOUT);
         return true;
     }
 

@@ -1353,7 +1353,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
         boolean close = Boolean.parseBoolean(_options.getProperty("i2cp.closeOnIdle"));
         if (reduce || close) {
             updateActivity();
-            _context.simpleScheduler().addEvent(new SessionIdleTimer(_context, this, reduce, close), SessionIdleTimer.MINIMUM_TIME);
+            _context.simpleTimer2().addEvent(new SessionIdleTimer(_context, this, reduce, close), SessionIdleTimer.MINIMUM_TIME);
         }
     }
 

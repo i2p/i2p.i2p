@@ -26,7 +26,7 @@ class RequestThrottler {
     RequestThrottler(RouterContext ctx) {
         this.context = ctx;
         this.counter = new ObjectCounter<Hash>();
-        ctx.simpleScheduler().addPeriodicEvent(new Cleaner(), CLEAN_TIME);
+        ctx.simpleTimer2().addPeriodicEvent(new Cleaner(), CLEAN_TIME);
     }
 
     /** increments before checking */

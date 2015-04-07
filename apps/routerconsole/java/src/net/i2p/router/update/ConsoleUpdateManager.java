@@ -193,7 +193,7 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
         // handled inside P.U.H. for now
         //register((Updater)puh, PLUGIN, FILE, 0);
         new NewsTimerTask(_context, this);
-        _context.simpleScheduler().addPeriodicEvent(new TaskCleaner(), TASK_CLEANER_TIME);
+        _context.simpleTimer2().addPeriodicEvent(new TaskCleaner(), TASK_CLEANER_TIME);
         changeState(RUNNING);
         if (_cmgr != null)
             _cmgr.register(this);
@@ -1397,7 +1397,7 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
 
     private void finishStatus(String msg) {
         updateStatus(msg);
-        _context.simpleScheduler().addEvent(new StatusCleaner(msg), STATUS_CLEAN_TIME);
+        _context.simpleTimer2().addEvent(new StatusCleaner(msg), STATUS_CLEAN_TIME);
     }
 
     private class StatusCleaner implements SimpleTimer.TimedEvent {

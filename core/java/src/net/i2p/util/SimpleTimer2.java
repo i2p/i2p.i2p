@@ -124,6 +124,66 @@ public class SimpleTimer2 {
     private ScheduledFuture schedule(TimedEvent t, long timeoutMs) {
         return _executor.schedule(t, timeoutMs, TimeUnit.MILLISECONDS);
     }
+    
+    /**
+     * Queue up the given event to be fired no sooner than timeoutMs from now.
+     *
+     * @param event
+     * @param timeoutMs 
+     */
+    public void addEvent(final SimpleTimer.TimedEvent event, long timeoutMs) {
+        if (event == null)
+            throw new IllegalArgumentException("addEvent null");
+
+        new TimedEvent(SimpleTimer2.getInstance(), timeoutMs) {
+            @Override
+            public void timeReached() {
+                event.timeReached();
+            }
+        };
+    }
+    
+    /**
+     * Schedule periodic event
+     * 
+     * The TimedEvent must not do its own rescheduling.
+     * As all Exceptions are caught in run(), these will not prevent
+     * subsequent executions (unlike SimpleTimer, where the TimedEvent does
+     * its own rescheduling).
+     * 
+     * @param delay run the first iteration of this event after delay ms
+     * @param timeoutMs run subsequent iterations of this event every timeoutMs ms
+     */
+    public void addPeriodicEvent(final SimpleTimer.TimedEvent event, final long timeoutMs) {
+        
+        new PeriodicTimedEvent(SimpleTimer2.getInstance(), timeoutMs) {
+            @Override
+            public void timeReached() {
+                event.timeReached();
+            }
+        };
+    }
+    
+    /**
+     * Schedule periodic event
+     * 
+     * The TimedEvent must not do its own rescheduling.
+     * As all Exceptions are caught in run(), these will not prevent
+     * subsequent executions (unlike SimpleTimer, where the TimedEvent does
+     * its own rescheduling).
+     * 
+     * @param delay run the first iteration of this event after delay ms
+     * @param timeoutMs run subsequent iterations of this event every timeoutMs ms
+     */
+    public void addPeriodicEvent(final SimpleTimer.TimedEvent event, final long delay,  final long timeoutMs) {
+        
+        new PeriodicTimedEvent(SimpleTimer2.getInstance(), delay, timeoutMs) {
+            @Override
+            public void timeReached() {
+                event.timeReached();
+            }
+        };        
+    }
 
     /** 
      * state of a given TimedEvent
@@ -140,6 +200,7 @@ public class SimpleTimer2 {
         RUNNING,
         CANCELLED
     };
+    
     
     /**
      * Similar to SimpleTimer.TimedEvent but users must extend instead of implement,
@@ -228,7 +289,6 @@ public class SimpleTimer2 {
                 break;
               case SCHEDULED: // nothing
             }
-            
         }
 
         /**
@@ -402,6 +462,37 @@ public class SimpleTimer2 {
             " Active: " + _executor.getActiveCount() + '/' + _executor.getPoolSize() +
             " Completed: " + _executor.getCompletedTaskCount() +
             " Queued: " + _executor.getQueue().size();
+    }
+    
+    public static abstract class PeriodicTimedEvent extends TimedEvent {
+        private long _timeoutMs;
+        
+        /**
+         * Schedule periodic event
+         * 
+         * @param timeoutMs run subsequent iterations of this event every timeoutMs ms
+         */
+        public PeriodicTimedEvent(SimpleTimer2 pool, long timeoutMs) {
+            super(pool, timeoutMs);
+            _timeoutMs = timeoutMs;
+        }
+        
+        /**
+         * Schedule periodic event
+         * 
+         * @param delay run the first iteration of this event after delay ms
+         * @param timeoutMs run subsequent iterations of this event every timeoutMs ms
+         */
+        public PeriodicTimedEvent(SimpleTimer2 pool, long delay, long timeoutMs) {
+            super(pool, delay);
+            _timeoutMs = timeoutMs;
+        }
+        
+        @Override
+        public void run() {
+            super.run();
+            schedule(_timeoutMs);
+        }
     }
 }
 
