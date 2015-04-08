@@ -157,7 +157,7 @@ public class SimpleTimer2 {
      */
     public void addPeriodicEvent(final SimpleTimer.TimedEvent event, final long timeoutMs) {
         
-        new PeriodicTimedEvent(SimpleTimer2.getInstance(), timeoutMs, timeoutMs) {
+        new PeriodicTimedEvent(this, timeoutMs, timeoutMs) {
             @Override
             public void timeReached() {
                 event.timeReached();
@@ -179,7 +179,7 @@ public class SimpleTimer2 {
      */
     public void addPeriodicEvent(final SimpleTimer.TimedEvent event, final long delay,  final long timeoutMs) {
         
-        new PeriodicTimedEvent(SimpleTimer2.getInstance(), delay, timeoutMs) {
+        new PeriodicTimedEvent(this, delay, timeoutMs) {
             @Override
             public void timeReached() {
                 event.timeReached();
