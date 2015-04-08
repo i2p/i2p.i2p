@@ -29,12 +29,17 @@ class BloomFilterIVValidator implements IVValidator {
     private static final int MIN_SHARE_KBPS_TO_USE_BLOOM = 64;
     private static final int MIN_SHARE_KBPS_FOR_BIG_BLOOM = 512;
     private static final int MIN_SHARE_KBPS_FOR_HUGE_BLOOM = 1536;
+    private static final int MIN_SHARE_KBPS_FOR_HUGE2_BLOOM = 4096;
     private static final long MIN_MEM_TO_USE_BLOOM = 64*1024*1024l;
     private static final long MIN_MEM_FOR_BIG_BLOOM = 128*1024*1024l;
     private static final long MIN_MEM_FOR_HUGE_BLOOM = 256*1024*1024l;
+    private static final long MIN_MEM_FOR_HUGE2_BLOOM = 384*1024*1024l;
     /** for testing */
     private static final String PROP_FORCE = "router.forceDecayingBloomFilter";
 
+    /**
+     *  @param Kbps share bandwidth
+     */
     public BloomFilterIVValidator(RouterContext ctx, int KBps) {
         _context = ctx;
         // Select the filter based on share bandwidth and memory.
@@ -48,7 +53,11 @@ class BloomFilterIVValidator implements IVValidator {
             if (KBps >= MIN_SHARE_KBPS_TO_USE_BLOOM)
                 warn(maxMemory, KBps, MIN_MEM_TO_USE_BLOOM, MIN_SHARE_KBPS_TO_USE_BLOOM);
             _filter = new DecayingHashSet(ctx, HALFLIFE_MS, 16, "TunnelIVV"); // appx. 4MB max
+        } else if (KBps >= MIN_SHARE_KBPS_FOR_HUGE2_BLOOM && maxMemory >= MIN_MEM_FOR_HUGE2_BLOOM) {
+            _filter = new DecayingBloomFilter(ctx, HALFLIFE_MS, 16, "TunnelIVV", 26);  // 16MB fixed
         } else if (KBps >= MIN_SHARE_KBPS_FOR_HUGE_BLOOM && maxMemory >= MIN_MEM_FOR_HUGE_BLOOM) {
+            if (KBps >= MIN_SHARE_KBPS_FOR_HUGE2_BLOOM)
+                warn(maxMemory, KBps, MIN_MEM_FOR_HUGE2_BLOOM, MIN_SHARE_KBPS_FOR_HUGE2_BLOOM);
             _filter = new DecayingBloomFilter(ctx, HALFLIFE_MS, 16, "TunnelIVV", 25);  // 8MB fixed
         } else if (KBps >= MIN_SHARE_KBPS_FOR_BIG_BLOOM && maxMemory >= MIN_MEM_FOR_BIG_BLOOM) {
             if (KBps >= MIN_SHARE_KBPS_FOR_HUGE_BLOOM)
