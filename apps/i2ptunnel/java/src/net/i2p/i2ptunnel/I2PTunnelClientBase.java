@@ -420,31 +420,33 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
      * @since 0.9.20
      */
     private void connectManager() {
-        // shadows instance _log
-        Log _log = getTunnel().getContext().logManager().getLog(I2PTunnelClientBase.class);
-        Logging log = this.l;
         int retries = 0;
         while (sockMgr.getSession().isClosed()) {
             try {
                 sockMgr.getSession().connect();
             } catch (I2PSessionException ise) {
+                // shadows instance _log
+                Log _log = getTunnel().getContext().logManager().getLog(I2PTunnelClientBase.class);
+                Logging log = this.l;
                 // try to make this error sensible as it will happen...
                 String portNum = getTunnel().port;
                 if (portNum == null)
                     portNum = "7654";
-                String msg = "Unable to connect to the router at " + getTunnel().host + ':' + portNum +
+                String msg;
+                if (getTunnel().getContext().isRouterContext())
+                    msg = "Unable to connect to the router at " + getTunnel().host + ':' + portNum +
                              " and build tunnels for the client";
+                else
+                    msg = "Unable to build tunnels for the client";
                 if (++retries < MAX_RETRIES) {
                     if (log != null)
                         log.log(msg + ", retrying in " + (RETRY_DELAY / 1000) + " seconds");
-                    _log.error(msg + ", retrying in " + (RETRY_DELAY / 1000) + " seconds");
+                    _log.error(msg + ", retrying in " + (RETRY_DELAY / 1000) + " seconds", ise);
                 } else {
                     if (log != null)
                         log.log(msg + ", giving up");
-                    _log.log(Log.CRIT, msg + ", giving up");
-                    // not clear if callers can handle null
-                    //return null;
-                    throw new IllegalArgumentException(msg);
+                    _log.log(Log.CRIT, msg + ", giving up", ise);
+                    throw new IllegalArgumentException(msg, ise);
                 }
                 try { Thread.sleep(RETRY_DELAY); } catch (InterruptedException ie) {}
             }
