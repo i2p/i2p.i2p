@@ -36,6 +36,8 @@ class BloomFilterIVValidator implements IVValidator {
     private static final long MIN_MEM_FOR_HUGE2_BLOOM = 384*1024*1024l;
     /** for testing */
     private static final String PROP_FORCE = "router.forceDecayingBloomFilter";
+    /** for testing */
+    private static final String PROP_DISABLE = "router.disableDecayingBloomFilter";
 
     /**
      *  @param Kbps share bandwidth
@@ -49,6 +51,8 @@ class BloomFilterIVValidator implements IVValidator {
         long maxMemory = SystemVersion.getMaxMemory();
         if (_context.getBooleanProperty(PROP_FORCE)) {
             _filter = new DecayingBloomFilter(ctx, HALFLIFE_MS, 16, "TunnelIVV");  // 2MB fixed
+        } else if (_context.getBooleanProperty(PROP_DISABLE)) {
+            _filter = null;
         } else if (KBps < MIN_SHARE_KBPS_TO_USE_BLOOM || maxMemory < MIN_MEM_TO_USE_BLOOM) {
             if (KBps >= MIN_SHARE_KBPS_TO_USE_BLOOM)
                 warn(maxMemory, KBps, MIN_MEM_TO_USE_BLOOM, MIN_SHARE_KBPS_TO_USE_BLOOM);
@@ -73,6 +77,8 @@ class BloomFilterIVValidator implements IVValidator {
     }
     
     public boolean receiveIV(byte ivData[], int ivOffset, byte payload[], int payloadOffset) {
+        if (_filter == null)  // testing only
+            return true;
         byte[] buf = SimpleByteCache.acquire(HopProcessor.IV_LENGTH);
         DataHelper.xor(ivData, ivOffset, payload, payloadOffset, buf, 0, HopProcessor.IV_LENGTH);
         boolean dup = _filter.add(buf); 
@@ -81,7 +87,10 @@ class BloomFilterIVValidator implements IVValidator {
         return !dup; // return true if it is OK, false if it isn't
     }
 
-    public void destroy() { _filter.stopDecaying(); }
+    public void destroy() {
+        if (_filter != null)
+            _filter.stopDecaying();
+    }
 
     /** @since 0.9.20 */
     private void warn(long maxMemory, int KBps, long recMaxMem, int threshKBps) {
