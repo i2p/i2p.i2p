@@ -151,12 +151,13 @@ public class SimpleTimer2 {
      * subsequent executions (unlike SimpleTimer, where the TimedEvent does
      * its own rescheduling).
      * 
+     * @since 0.9.20
      * @param delay run the first iteration of this event after delay ms
      * @param timeoutMs run subsequent iterations of this event every timeoutMs ms
      */
     public void addPeriodicEvent(final SimpleTimer.TimedEvent event, final long timeoutMs) {
         
-        new PeriodicTimedEvent(SimpleTimer2.getInstance(), timeoutMs) {
+        new PeriodicTimedEvent(SimpleTimer2.getInstance(), timeoutMs, timeoutMs) {
             @Override
             public void timeReached() {
                 event.timeReached();
@@ -172,6 +173,7 @@ public class SimpleTimer2 {
      * subsequent executions (unlike SimpleTimer, where the TimedEvent does
      * its own rescheduling).
      * 
+     * @since 0.9.20
      * @param delay run the first iteration of this event after delay ms
      * @param timeoutMs run subsequent iterations of this event every timeoutMs ms
      */
@@ -466,16 +468,6 @@ public class SimpleTimer2 {
     
     public static abstract class PeriodicTimedEvent extends TimedEvent {
         private long _timeoutMs;
-        
-        /**
-         * Schedule periodic event
-         * 
-         * @param timeoutMs run subsequent iterations of this event every timeoutMs ms
-         */
-        public PeriodicTimedEvent(SimpleTimer2 pool, long timeoutMs) {
-            super(pool, timeoutMs);
-            _timeoutMs = timeoutMs;
-        }
         
         /**
          * Schedule periodic event
