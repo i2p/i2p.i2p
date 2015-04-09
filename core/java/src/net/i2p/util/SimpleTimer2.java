@@ -135,7 +135,7 @@ public class SimpleTimer2 {
         if (event == null)
             throw new IllegalArgumentException("addEvent null");
 
-        new TimedEvent(SimpleTimer2.getInstance(), timeoutMs) {
+        new TimedEvent(this, timeoutMs) {
             @Override
             public void timeReached() {
                 event.timeReached();
