@@ -190,7 +190,6 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
     private void setupI2PTunnelHTTPServer(String spoofHost) {
         _spoofHost = (spoofHost != null && spoofHost.trim().length() > 0) ? spoofHost.trim() : null;
         getTunnel().getContext().statManager().createRateStat("i2ptunnel.httpserver.blockingHandleTime", "how long the blocking handle takes to complete", "I2PTunnel.HTTPServer", new long[] { 60*1000, 10*60*1000, 3*60*60*1000 });
-        getTunnel().getContext().statManager().createRateStat("i2ptunnel.httpNullWorkaround", "How often an http server works around a streaming lib or i2ptunnel bug", "I2PTunnel.HTTPServer", new long[] { 60*1000, 10*60*1000 });
     }
 
     @Override
@@ -840,20 +839,6 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
         
         //if (_log.shouldLog(Log.DEBUG))
         //    _log.debug("Read the http command [" + command.toString() + "]");
-        
-        // FIXME we probably don't need or want this in the outgoing direction
-        int trimmed = 0;
-        if (command.length() > 0) {
-            for (int i = 0; i < command.length(); i++) {
-                if (command.charAt(i) == 0) {
-                    command = command.deleteCharAt(i);
-                    i--;
-                    trimmed++;
-                }
-            }
-        }
-        if (trimmed > 0)
-            ctx.statManager().addRateData("i2ptunnel.httpNullWorkaround", trimmed);
         
         int totalSize = command.length();
         int i = 0;
