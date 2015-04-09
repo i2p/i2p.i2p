@@ -89,8 +89,7 @@ trans.id = apps/routerconsole/locale-news/messages_id.po
 trans.it = apps/routerconsole/locale-news/messages_it.po
 trans.ja = apps/routerconsole/locale-news/messages_ja.po
 trans.ko = apps/routerconsole/locale-news/messages_ko.po
-;; currently fails check
-;;trans.mg = apps/routerconsole/locale-news/messages_mg.po
+trans.mg = apps/routerconsole/locale-news/messages_mg.po
 trans.nb = apps/routerconsole/locale-news/messages_nb.po
 trans.nl = apps/routerconsole/locale-news/messages_nl.po
 trans.pl = apps/routerconsole/locale-news/messages_pl.po
@@ -221,8 +220,7 @@ trans.hu = apps/susimail/locale/messages_hu.po
 trans.id = apps/susimail/locale/messages_id.po
 trans.it = apps/susimail/locale/messages_it.po
 trans.ja = apps/susimail/locale/messages_ja.po
-;; currently fails check
-;;trans.mg = apps/susimail/locale/messages_mg.po
+trans.mg = apps/susimail/locale/messages_mg.po
 trans.nl = apps/susimail/locale/messages_nl.po
 trans.pl = apps/susimail/locale/messages_pl.po
 trans.pt = apps/susimail/locale/messages_pt.po

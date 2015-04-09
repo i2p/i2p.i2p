@@ -4,15 +4,16 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
 # Translators:
-# tuliouel, 2013
+# wtfisthis <low_fps11@yahoo.com>, 2015
+# Tulio Simoes Martins Padilha <tuliouel@gmail.com>, 2013
 # tuliouel, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-07-13 21:46+0000\n"
-"PO-Revision-Date: 2014-02-23 16:51+0000\n"
-"Last-Translator: kytv <killyourtv@i2pmail.org>\n"
+"PO-Revision-Date: 2015-03-31 20:55+0000\n"
+"Last-Translator: wtfisthis <low_fps11@yahoo.com>\n"
 "Language-Team: Portuguese (http://www.transifex.com/projects/p/I2P/language/pt/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -63,4 +64,4 @@ msgstr "Quando você vê uma conexão no lado esquerdo chamada \"shared clients\
 msgid ""
 "Point your IRC client to {0}localhost:6668{1} and say hi to us on "
 "{2}#i2p{3}."
-msgstr ""
+msgstr "Redireciona o teu cliente de IRC para {0}localhost:6668{1}  e vem dizer ola em {2}#i2p{3}."
