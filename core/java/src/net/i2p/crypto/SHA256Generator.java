@@ -77,8 +77,9 @@ public final class SHA256Generator {
             digest.digest(out, outOffset, Hash.HASH_LENGTH);
         } catch (DigestException e) {
             throw new RuntimeException(e);
+        } finally {
+            release(digest);
         }
-        release(digest);
     }
     
     private MessageDigest acquire() {

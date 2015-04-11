@@ -1508,7 +1508,7 @@ public class Router implements RouterClock.ClockShiftListener {
      * Context must be available.
      * Unzip update file found in the router dir OR base dir, to the base dir
      *
-     * If successfull, will call exit() and never return.
+     * If successful, will call exit() and never return.
      *
      * If we can't write to the base dir, complain.
      * Note: _log not available here.

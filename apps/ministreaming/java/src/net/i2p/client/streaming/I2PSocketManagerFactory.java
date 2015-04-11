@@ -227,7 +227,7 @@ public class I2PSocketManagerFactory {
         Properties syscopy = (Properties) System.getProperties().clone();
         for (Map.Entry<Object, Object> e : syscopy.entrySet()) {
             String name = (String) e.getKey();
-            if (opts.getProperty(name) != null)
+            if (opts.getProperty(name) == null)
                 opts.setProperty(name, (String) e.getValue());
         }
         // as of 0.8.1 (I2CP default is BestEffort)

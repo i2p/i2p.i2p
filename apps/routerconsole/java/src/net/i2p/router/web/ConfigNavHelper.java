@@ -27,6 +27,7 @@ public class ConfigNavHelper extends HelperBase {
                                            _x("Clients"), _x("Peers"), _x("Keyring"), _x("Logging"), _x("Stats"),
                                            _x("Reseeding"), _x("Advanced") };
 
+    /** @since 0.9.19 */
     private static class Tab {
         public final String page, title;
         public Tab(String p, String t) {
@@ -34,6 +35,7 @@ public class ConfigNavHelper extends HelperBase {
         }
     }
 
+    /** @since 0.9.19 */
     private class TabComparator implements Comparator<Tab> {
          private static final long serialVersionUID = 1L;
          private final Collator coll;
