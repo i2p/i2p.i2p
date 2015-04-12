@@ -1,3 +1,5 @@
+* 2015-04-12 0.9.19 released
+
 2015-04-11 zzz
  * Updates after review
 
