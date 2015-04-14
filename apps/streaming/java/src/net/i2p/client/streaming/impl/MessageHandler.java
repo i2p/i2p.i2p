@@ -54,7 +54,7 @@ class MessageHandler implements I2PSessionMuxedListener {
         try {
             data = session.receiveMessage(msgId);
         } catch (I2PSessionException ise) {
-            _context.statManager().addRateData("stream.packetReceiveFailure", 1, 0);
+            _context.statManager().addRateData("stream.packetReceiveFailure", 1);
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Error receiving the message", ise);
             return;
@@ -67,7 +67,7 @@ class MessageHandler implements I2PSessionMuxedListener {
             packet.setLocalPort(toPort);
             _manager.getPacketHandler().receivePacket(packet);
         } catch (IllegalArgumentException iae) {
-            _context.statManager().addRateData("stream.packetReceiveFailure", 1, 0);
+            _context.statManager().addRateData("stream.packetReceiveFailure", 1);
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Received an invalid packet", iae);
         }

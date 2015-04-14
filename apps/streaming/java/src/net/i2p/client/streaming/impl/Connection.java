@@ -307,6 +307,7 @@ class Connection {
         reply.setFlag(Packet.FLAG_SIGNATURE_INCLUDED);
         reply.setSendStreamId(_sendStreamId);
         reply.setReceiveStreamId(_receiveStreamId);
+        // TODO remove this someday, as of 0.9.20 we do not require it
         reply.setOptionalFrom(_connectionManager.getSession().getMyDestination());
         reply.setLocalPort(_localPort);
         reply.setRemotePort(_remotePort);
@@ -1359,8 +1360,8 @@ class Connection {
                         //getOptions().setRTT(getOptions().getRTT() + 10*1000);
                         getOptions().setWindowSize(newWindowSize);
 
-                        if (_log.shouldLog(Log.WARN))
-                            _log.warn("Congestion, resending packet " + _packet.getSequenceNum() + " (new windowSize " + newWindowSize 
+                        if (_log.shouldLog(Log.INFO))
+                            _log.info("Congestion, resending packet " + _packet.getSequenceNum() + " (new windowSize " + newWindowSize 
                                       + "/" + getOptions().getWindowSize() + ") for " + Connection.this.toString());
 
                         windowAdjusted();
