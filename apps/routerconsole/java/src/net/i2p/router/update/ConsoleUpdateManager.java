@@ -973,8 +973,9 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
      *  @param t may be null
      */
     public void notifyTaskFailed(UpdateTask task, String reason, Throwable t) {
-        if (_log.shouldLog(Log.ERROR))
-            _log.error("Failed " + task + " for " + task.getType() + ": " + reason, t);
+        int level = task.getType() == TYPE_DUMMY ? Log.WARN : Log.ERROR;
+        if (_log.shouldLog(level))
+            _log.log(level, "Failed " + task + " for " + task.getType() + ": " + reason, t);
         List<RegisteredUpdater> toTry = _downloaders.get(task);
         if (toTry != null) {
             UpdateItem ui = new UpdateItem(task.getType(), task.getID());
