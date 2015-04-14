@@ -11,7 +11,7 @@ network inet stream,
 network inet6 stream,
 
   # Needed by Java
-  owner @{PROC}                                           r,
+  @{PROC}                                                 r,
   owner @{PROC}/[0-9]*/                                   r,
   owner @{PROC}/[0-9]*/status                             r,
   /dev/random                                             r,
