@@ -131,13 +131,15 @@ public class SimpleTimer2 {
      * @param event
      * @param timeoutMs 
      */
-    public void addEvent(final SimpleTimer.TimedEvent event, long timeoutMs) {
+    public void addEvent(final SimpleTimer.TimedEvent event, final long timeoutMs) {
         if (event == null)
             throw new IllegalArgumentException("addEvent null");
 
         new TimedEvent(this, timeoutMs) {
+        	long absTime = System.currentTimeMillis() + timeoutMs;
             @Override
             public void timeReached() {
+            	System.out.println("Event scheduled for: " + absTime + " started at: " + System.currentTimeMillis() + ", diff: " + (System.currentTimeMillis() - absTime));
                 event.timeReached();
             }
         };
@@ -152,17 +154,10 @@ public class SimpleTimer2 {
      * its own rescheduling).
      * 
      * @since 0.9.20
-     * @param delay run the first iteration of this event after delay ms
      * @param timeoutMs run subsequent iterations of this event every timeoutMs ms
      */
     public void addPeriodicEvent(final SimpleTimer.TimedEvent event, final long timeoutMs) {
-        
-        new PeriodicTimedEvent(this, timeoutMs, timeoutMs) {
-            @Override
-            public void timeReached() {
-                event.timeReached();
-            }
-        };
+        addPeriodicEvent(event, timeoutMs, timeoutMs);
     }
     
     /**
