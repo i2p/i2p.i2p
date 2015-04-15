@@ -136,10 +136,8 @@ public class SimpleTimer2 {
             throw new IllegalArgumentException("addEvent null");
 
         new TimedEvent(this, timeoutMs) {
-        	long absTime = System.currentTimeMillis() + timeoutMs;
             @Override
             public void timeReached() {
-            	System.out.println("Event scheduled for: " + absTime + " started at: " + System.currentTimeMillis() + ", diff: " + (System.currentTimeMillis() - absTime));
                 event.timeReached();
             }
         };
