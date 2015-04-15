@@ -2241,7 +2241,7 @@ public class SnarkManager implements CompleteListener {
      * Stop all running torrents, and close the tunnel after a delay
      * to allow for announces.
      * If called at router shutdown via Jetty shutdown hook -> webapp destroy() -> stop(),
-     * the tunnel won't actually be closed as the SimpleScheduler is already shutdown
+     * the tunnel won't actually be closed as the SimpleTimer2 is already shutdown
      * or will be soon, so we delay a few seconds inline.
      * @param finalShutdown if true, sleep at the end if any torrents were running
      * @since 0.9.1

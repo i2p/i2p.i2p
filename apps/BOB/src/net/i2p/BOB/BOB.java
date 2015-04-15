@@ -38,7 +38,6 @@ import net.i2p.I2PAppContext;
 import net.i2p.app.*;
 import net.i2p.client.I2PClient;
 import net.i2p.util.I2PAppThread;
-import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer2;
 
 /**
@@ -214,9 +213,7 @@ public class BOB implements Runnable, ClientApp {
 		// Re-reading the config file in each thread is pretty damn stupid.
 		String configLocation = System.getProperty(PROP_CONFIG_LOCATION, "bob.config");
 		// This is here just to ensure there is no interference with our threadgroups.
-		SimpleScheduler Y1 = SimpleScheduler.getInstance();
 		SimpleTimer2 Y2 = SimpleTimer2.getInstance();
-		i = Y1.hashCode();
 		i = Y2.hashCode();
 		{
 			File cfg = new File(configLocation);

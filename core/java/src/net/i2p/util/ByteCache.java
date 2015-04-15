@@ -69,7 +69,7 @@ public final class ByteCache {
     /**
      * Get a cache responsible for objects of the given size.
      * Warning, if you store the result in a static field, the cleaners will
-     * not operate after a restart on Android, as the old context's SimpleScheduler will have shut down.
+     * not operate after a restart on Android, as the old context's SimpleTimer2 will have shut down.
      * TODO tie this to the context or clean up all calls.
      *
      * @param cacheSize how large we want the cache to grow 
