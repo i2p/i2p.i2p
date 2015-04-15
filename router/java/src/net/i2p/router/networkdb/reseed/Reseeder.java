@@ -88,6 +88,7 @@ public class Reseeder {
               "https://netdb.rows.io:444/" + "," + // Only HTTPS and SU3 (v3) support
               "https://i2pseed.zarrenspry.info/" + "," + // Only HTTPS and SU3 (v3) support
               "https://i2p.mooo.com/netDb/" + "," +
+              "https://193.150.121.66/netDb/" + "," +
               "https://netdb.i2p2.no/" + "," + // Only SU3 (v3) support
               "https://us.reseed.i2p2.no:444/" + "," +
               "https://uk.reseed.i2p2.no:444/" + "," +

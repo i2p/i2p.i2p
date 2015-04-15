@@ -1,9 +1,35 @@
-i2p (0.9.18-1) UNRELEASED; urgency=medium
+i2p (0.9.18-1) unstable; urgency=medium
 
-  * New upstream release
-  * Confine with AppArmor
+  * New Upstream Version
+  * Daemon runs confined with AppArmor
+    Bug Fixes
+    - Fix parsing of ECDSA address helper in HTTP client proxy
+    - Fix news last-modified processing which prevented notification of update
+    - Improve handling of UPnP device changes
+    - Don't hang at startup forever waiting for entropy
+    - Possible fixes for high CPU usage in NTCP
+    Other
+    - Publish router info faster when address costs change
+    - Start i2ptunnel 90s sooner
+    - Accept tunnels 10m sooner
+    - Increase exploratory tunnel quantity during initial exploration
+    - Latency reductions in several places
+    - Add startup browser configuration with advanced config
+      routerconsole.browser
+    - Persistent leaseset keys to eliminate correlation with restart
+    - Faster unchoking of new peers in i2psnark
+    - More aggressive throttling of lookups at floodfills
+    - Tunnel build request record refactoring
+    - Reduce thread usage in i2ptunnel
+    - Add i2ptunnel server option for multihomed sites
+    - Disallow some common I2P application ports as router ports
+    - Increase connection limits for fast routers
+    - Add Save-As button for SusiMail messages
+    - Use 'hidden service' terminology in the console
+    - Encrypted netdb lookups for 32-bit x86
+    - Translation updates
 
- -- Kill Your TV <killyourtv@i2pmail.org>  Sun, 22 Feb 2015 00:00:00 +0000
+ -- Kill Your TV <killyourtv@i2pmail.org>  Sun, 22 Feb 2015 22:23:50 +0000
 
 i2p (0.9.17-1) unstable; urgency=medium
 

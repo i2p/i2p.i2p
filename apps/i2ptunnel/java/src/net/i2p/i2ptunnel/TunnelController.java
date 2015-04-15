@@ -44,6 +44,7 @@ public class TunnelController implements Logging {
     private List<I2PSession> _sessions;
     private volatile TunnelState _state;
 
+    /** @since 0.9.19 */
     private enum TunnelState {
         START_ON_LOAD,
         STARTING,
@@ -849,6 +850,7 @@ public class TunnelController implements Logging {
         return true;
     }
 
+    /** @since 0.9.19 */
     private synchronized void changeState(TunnelState state) {
         _state = state;
     }

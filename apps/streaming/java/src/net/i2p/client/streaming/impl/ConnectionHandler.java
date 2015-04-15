@@ -249,6 +249,7 @@ class ConnectionHandler {
         reply.setAckThrough(packet.getSequenceNum());
         reply.setSendStreamId(packet.getReceiveStreamId());
         reply.setReceiveStreamId(0);
+        // TODO remove this someday, as of 0.9.20 we do not require it
         reply.setOptionalFrom(_manager.getSession().getMyDestination());
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Sending RST: " + reply + " because of " + packet);

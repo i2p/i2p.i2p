@@ -357,6 +357,8 @@ public class Router implements RouterClock.ClockShiftListener {
      */
     private void startupStuff() {
         // *********  Start no threads before here ********* //
+        _log = _context.logManager().getLog(Router.class);
+
         //
         // NOW we can start the ping file thread.
         if (!SystemVersion.isAndroid())
@@ -391,8 +393,8 @@ public class Router implements RouterClock.ClockShiftListener {
 
         _routerInfo = null;
         _higherVersionSeen = false;
-        _log = _context.logManager().getLog(Router.class);
-        _log.info("New router created with config file " + _configFilename);
+        if (_log.shouldLog(Log.INFO))
+            _log.info("New router created with config file " + _configFilename);
         _oomListener = new OOMListener(_context);
 
         _shutdownHook = new ShutdownHook(_context);
@@ -1508,7 +1510,7 @@ public class Router implements RouterClock.ClockShiftListener {
      * Context must be available.
      * Unzip update file found in the router dir OR base dir, to the base dir
      *
-     * If successfull, will call exit() and never return.
+     * If successful, will call exit() and never return.
      *
      * If we can't write to the base dir, complain.
      * Note: _log not available here.

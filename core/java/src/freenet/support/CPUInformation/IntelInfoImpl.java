@@ -156,9 +156,8 @@ class IntelInfoImpl extends CPUIDCPUInfo implements IntelCPUInfo
                     isPentiumMCompatible = true;
                     isCore2Compatible = true;
                     isX64 = true;
-                }
-                if (extmodel >= 2) {
-                    isCoreiCompatible = true;
+                    if (extmodel >= 2)
+                        isCoreiCompatible = true;
                 }
                 switch (model) {
                     case 0:

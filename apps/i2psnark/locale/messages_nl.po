@@ -7,13 +7,14 @@
 # ducki2p <ducki2p@gmail.com>, 2011
 # foo <foo@bar>, 2009
 # Nathan Follens, 2015
+# Nathan Follens, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-02-06 18:28+0000\n"
-"PO-Revision-Date: 2015-02-02 10:43+0000\n"
-"Last-Translator: Nathan Follens\n"
+"POT-Creation-Date: 2015-03-29 14:30+0000\n"
+"PO-Revision-Date: 2015-02-18 19:51+0000\n"
+"Last-Translator: kytv <killyourtv@i2pmail.org>\n"
 "Language-Team: Dutch (http://www.transifex.com/projects/p/I2P/language/nl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -21,11 +22,11 @@ msgstr ""
 "Language: nl\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../java/src/org/klomp/snark/IdleChecker.java:69
+#: ../java/src/org/klomp/snark/IdleChecker.java:75
 msgid "No more torrents running."
 msgstr "Er draaien geen torrents meer."
 
-#: ../java/src/org/klomp/snark/IdleChecker.java:70
+#: ../java/src/org/klomp/snark/IdleChecker.java:76
 #: ../java/src/org/klomp/snark/SnarkManager.java:2283
 #: ../java/src/org/klomp/snark/SnarkManager.java:2294
 msgid "I2P tunnel closed."
@@ -409,7 +410,7 @@ msgstr "Stoppen van alle torrents en sluiten van I2P tunnel."
 msgid "Closing I2P tunnel after notifying trackers."
 msgstr "Bezig met sluiten van I2P-tunnel na verwittigen van trackers."
 
-#: ../java/src/org/klomp/snark/TrackerClient.java:244
+#: ../java/src/org/klomp/snark/TrackerClient.java:245
 #, java-format
 msgid "No valid trackers for {0} - enable opentrackers or DHT?"
 msgstr "Geen geldige trackers voor {0} - open trackers of DHT aanzetten?"

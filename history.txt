@@ -1,3 +1,13 @@
+* 2015-04-12 0.9.19 released
+
+2015-04-11 zzz
+ * Updates after review
+
+2015-04-09 kytv
+ * Updates to geoip.txt and geoipv6.dat.gz based on Maxmind GeoLite Country
+   database from 2015-04-07.
+ * Translation updates
+
 2015-04-05 zzz
  * IRC Server: Better timeout handling reading initial lines (ticket #723)
 

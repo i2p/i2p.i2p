@@ -31,6 +31,13 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
     protected final Log _log;
     protected final I2PAppContext _context;
     protected long _expiration;
+
+    /**
+     *  Warning, lazily initialized by readBytes(), writeBytes(), toByteArray(),
+     *  getUniqueId(), and setUniqueId(); otherwise will be -1.
+     *  Extending classes should take care when accessing this field;
+     *  to ensure initialization, use getUniqueId() instead.
+     */
     protected long _uniqueId = -1;
 
     public final static long DEFAULT_EXPIRATION_MS = 1*60*1000; // 1 minute by default
@@ -257,7 +264,7 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
     }
 
     /**
-     *  The ID is set to a random value in the constructor but it can be overridden here.
+     *  The ID is set to a random value when written but it can be overridden here.
      */
     public void setUniqueId(long id) { _uniqueId = id; }
 

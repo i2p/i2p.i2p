@@ -158,7 +158,6 @@ public class ReseedChecker {
             } catch (IOException ioe) {
                 if (ioe.getMessage() != null)
                     setError(DataHelper.escapeHTML(ioe.getMessage()));
-                done();
                 throw ioe;
             } finally {
                 done();
