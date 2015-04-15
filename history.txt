@@ -1,5 +1,11 @@
 2015-04-15 tuna
- * SimpleScheduler: Deprecated, functionaltiy moved to SimpleTimer2
+ * SimpleScheduler: Deprecated, functionaltiy moved to SimpleTimer2 (ticket #1069)
+
+2015-04-13 zzz
+ * Router: Fix NPE on bad share bandwidth config (ticket #1524)
+ * Streaming: Handle reset packets without a FROM field, validate
+              signature using connection's destination
+ * Update: Don't log an error for the "dummy" updater (ticket #1525)
 
 * 2015-04-12 0.9.19 released
 
