@@ -1,6 +1,8 @@
 2015-04-16 zzz
  * I2CP: Run DistributeLocal jobs inline (ticket #1506)
  * i2psnark: Increase max tunnels to 10
+ * i2ptunnel: Don't start tunnels in constructors (ticket #815)
+ * NetDB: Reduce max search depth
  * Transport: Fix active peer count for NTCP
 
 2015-04-15 tuna
