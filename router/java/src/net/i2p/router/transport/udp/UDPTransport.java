@@ -2239,7 +2239,6 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             super.afterSend(m, true);
     }
 
-    @Override
     public int countPeers() {
             return _peersByIdent.size();
     }

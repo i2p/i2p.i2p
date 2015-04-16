@@ -492,6 +492,10 @@ public class NTCPTransport extends TransportImpl {
         return removed;
     }
 
+    public int countPeers() {
+            return _conByIdent.size();
+    }
+
     /**
      * How many peers have we talked to in the last 5 minutes?
      * As of 0.9.20, actually returns active peer count, not total.

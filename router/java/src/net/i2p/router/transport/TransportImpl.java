@@ -107,10 +107,8 @@ public abstract class TransportImpl implements Transport {
 
     /**
      * How many peers are we connected to?
-     * For NTCP, this is the same as active,
-     * but SSU actually looks at idle time for countActivePeers()
      */
-    public int countPeers() { return countActivePeers(); }
+    public abstract int countPeers();
 
     /**
      *  How many peers are we currently connected to, that we have
@@ -161,10 +159,10 @@ public abstract class TransportImpl implements Transport {
                     def *= 4;
                     break;
                 case Router.CAPABILITY_BW256:
-                    def *= 6;
+                    def *= 7;
                     break;
                 case Router.CAPABILITY_BW512:
-                    def *= 8;
+                    def *= 9;
                     break;
                 case Router.CAPABILITY_BW_UNLIMITED:
                     def *= 12;
