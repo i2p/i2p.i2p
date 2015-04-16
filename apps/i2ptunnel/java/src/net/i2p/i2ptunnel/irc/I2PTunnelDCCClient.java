@@ -37,6 +37,9 @@ public class I2PTunnelDCCClient extends I2PTunnelClientBase {
     public static final String CONNECT_STOP_EVENT = "connectionStopped";
 
     /**
+     * As of 0.9.20 this is fast, and does NOT connect the manager to the router,
+     * or open the local socket. You MUST call startRunning() for that.
+     *
      * @param dest the target, presumably b32
      * @param localPort if 0, use any port, get actual port selected with getLocalPort()
      * @throws IllegalArgumentException if the I2PTunnel does not contain
@@ -51,8 +54,6 @@ public class I2PTunnelDCCClient extends I2PTunnelClientBase {
         _expires = tunnel.getContext().clock().now() + INBOUND_EXPIRE;
 
         setName("DCC send -> " + dest + ':' + remotePort);
-
-        startRunning();
     }
 
     /**
