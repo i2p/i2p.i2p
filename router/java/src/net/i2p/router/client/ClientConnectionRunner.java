@@ -476,6 +476,8 @@ class ClientConnectionRunner {
     /**
      * Asynchronously deliver the message to the current runner
      *
+     * Note that no failure indication is available.
+     * Fails silently on e.g. queue overflow to client, client dead, etc.
      */ 
     void receiveMessage(Destination toDest, Destination fromDest, Payload payload) {
         if (_dead) return;

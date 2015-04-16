@@ -1,3 +1,8 @@
+2015-04-16 zzz
+ * I2CP: Run DistributeLocal jobs inline (ticket #1506)
+ * i2psnark: Increase max tunnels to 10
+ * Transport: Fix active peer count for NTCP
+
 2015-04-15 tuna
  * SimpleScheduler: Deprecated, functionaltiy moved to SimpleTimer2 (ticket #1069)
 
