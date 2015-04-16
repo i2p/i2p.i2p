@@ -113,14 +113,17 @@ public abstract class TransportImpl implements Transport {
     public int countPeers() { return countActivePeers(); }
 
     /**
-     * How many peers active in the last few minutes?
+     *  How many peers are we currently connected to, that we have
+     *  sent a message to or received a message from in the last five minutes.
      */
-    public int countActivePeers() { return 0; }
+    public abstract int countActivePeers();
 
     /**
-     * How many peers are we actively sending messages to (this minute)
+     *  How many peers are we currently connected to, that we have
+     *  sent a message to in the last minute.
+     *  Unused for anything, to be removed.
      */
-    public int countActiveSendPeers() { return 0; }
+    public abstract int countActiveSendPeers();
 
     /** ...and 50/100/150/200/250 for BW Tiers K/L/M/N/O */
     private static final int MAX_CONNECTION_FACTOR = 50;
@@ -158,10 +161,13 @@ public abstract class TransportImpl implements Transport {
                     def *= 4;
                     break;
                 case Router.CAPABILITY_BW256:
-                // TODO
+                    def *= 6;
+                    break;
                 case Router.CAPABILITY_BW512:
+                    def *= 8;
+                    break;
                 case Router.CAPABILITY_BW_UNLIMITED:
-                    def *= 7;
+                    def *= 12;
                     break;
             }
         }

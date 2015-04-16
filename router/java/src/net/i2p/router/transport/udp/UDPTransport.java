@@ -2244,23 +2244,25 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             return _peersByIdent.size();
     }
 
-    @Override
     public int countActivePeers() {
-        long now = _context.clock().now();
+        long old = _context.clock().now() - 5*60*1000;
         int active = 0;
         for (PeerState peer : _peersByIdent.values()) {
-                if (now-peer.getLastReceiveTime() <= 5*60*1000)
-                    active++;
+            // PeerState initializes times at construction,
+            // so check message count also
+            if ((peer.getMessagesReceived() > 0 && peer.getLastReceiveTime() >= old) ||
+                (peer.getMessagesSent() > 0 && peer.getLastSendTime() >= old)) {
+                active++;
             }
+        }
         return active;
     }
     
-    @Override
     public int countActiveSendPeers() {
-        long now = _context.clock().now();
+        long old = _context.clock().now() - 60*1000;
         int active = 0;
         for (PeerState peer : _peersByIdent.values()) {
-                if (now-peer.getLastSendFullyTime() <= 1*60*1000)
+                if (peer.getLastSendFullyTime() >= old)
                     active++;
             }
         return active;

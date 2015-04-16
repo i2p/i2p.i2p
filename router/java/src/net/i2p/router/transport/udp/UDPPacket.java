@@ -240,8 +240,10 @@ class UDPPacket implements CDQEntry {
                 }
             }
         } else {
-            //if (_log.shouldLog(Log.WARN))
-            //    _log.warn("Payload length is " + payloadLength);
+            Log log = _context.logManager().getLog(UDPPacket.class);
+            if (log.shouldLog(Log.WARN))
+                log.warn("Payload length is " + payloadLength + ", too short!\n" +
+                         net.i2p.util.HexDump.dump(_data, _packet.getOffset(), _packet.getLength()));
         }
         
         //_afterValidate = _context.clock().now();
