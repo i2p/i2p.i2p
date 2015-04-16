@@ -2269,13 +2269,13 @@ public class I2PSnarkServlet extends BasicServlet {
         out.write("<tr><td>");
         out.write(_("Inbound Settings"));
         out.write(":<td>");
-        out.write(renderOptions(1, 8, 3, options.remove("inbound.quantity"), "inbound.quantity", TUNNEL));
+        out.write(renderOptions(1, 10, 3, options.remove("inbound.quantity"), "inbound.quantity", TUNNEL));
         out.write("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
         out.write(renderOptions(0, 4, 3, options.remove("inbound.length"), "inbound.length", HOP));
         out.write("<tr><td>");
         out.write(_("Outbound Settings"));
         out.write(":<td>");
-        out.write(renderOptions(1, 8, 3, options.remove("outbound.quantity"), "outbound.quantity", TUNNEL));
+        out.write(renderOptions(1, 10, 3, options.remove("outbound.quantity"), "outbound.quantity", TUNNEL));
         out.write("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
         out.write(renderOptions(0, 4, 3, options.remove("outbound.length"), "outbound.length", HOP));
 
