@@ -939,7 +939,7 @@ public class I2PAppContext {
     /**
      * Use instead of SimpleScheduler.getInstance()
      * @since 0.9 to replace static instance in the class
-     * @deprecated in 0.9.19
+     * @deprecated in 0.9.20, use simpleTimer2()
      */
     public SimpleScheduler simpleScheduler() {
         if (!_simpleSchedulerInitialized)
@@ -948,7 +948,7 @@ public class I2PAppContext {
     }
 
     /**
-     * @deprecated in 0.9.19
+     * @deprecated in 0.9.20
      */
     private void initializeSimpleScheduler() {
         synchronized (_lock18) {

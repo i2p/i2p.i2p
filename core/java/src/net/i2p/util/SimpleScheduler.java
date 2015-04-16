@@ -24,6 +24,8 @@ import net.i2p.I2PAppContext;
  * For periodic events, use addPeriodicEvent(). Unlike SimpleTimer,
  * uncaught Exceptions will not prevent subsequent executions.
  *
+ * @deprecated in 0.9.20, use SimpleTimer2 instead
+ *
  * @author zzz
  */
 public class SimpleScheduler {
