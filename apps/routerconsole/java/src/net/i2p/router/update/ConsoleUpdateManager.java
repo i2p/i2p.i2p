@@ -912,10 +912,13 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
                 break;
 
             case PLUGIN:
-                if (!success)
-                    msg = "<b>" + _("Update check failed for plugin {0}", task.getID()) + "</b>";
-                else if (!newer)
+                if (!success) {
+                    msg = _("Update check failed for plugin {0}", task.getID());
+                    _log.logAlways(Log.WARN, msg);
+                    msg = "<b>" + msg + "</b>";
+                } else if (!newer) {
                     msg = "<b>" + _("No new version is available for plugin {0}", task.getID()) + "</b>";
+                }
                 /// else success.... message for that?
 
                 break;
