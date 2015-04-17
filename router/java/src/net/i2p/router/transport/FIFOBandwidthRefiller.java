@@ -70,8 +70,12 @@ public class FIFOBandwidthRefiller implements Runnable {
     public static final int MIN_INBOUND_BANDWIDTH_PEAK = 3;
     /** For now, until there is some tuning and safe throttling, we set the floor at a 3KBps during burst */
     public static final int MIN_OUTBOUND_BANDWIDTH_PEAK = 3;
-    /** Max for reasonable bloom filter false positive rate. See util/DecayingBloomFilter and tunnel/BloomFilterIVValidator */
-    public static final int MAX_OUTBOUND_BANDWIDTH = 4096;
+    /**
+     *  Max for reasonable Bloom filter false positive rate.
+     *  Do not increase without adding a new Bloom filter size!
+     *  See util/DecayingBloomFilter and tunnel/BloomFilterIVValidator.
+     */
+    public static final int MAX_OUTBOUND_BANDWIDTH = 8192;
     
     /** 
      * how often we replenish the queues.  
