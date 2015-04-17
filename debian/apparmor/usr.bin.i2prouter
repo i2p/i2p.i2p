@@ -27,6 +27,7 @@
   /bin/uname                            rix,
   /bin/which                            rix,
   /etc/default/i2p                      r,
+  /etc/lsb-release                      r,
 
   /usr/bin/{,g,m}awk                    rix,
   /usr/bin/cut                          rix,
