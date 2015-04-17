@@ -85,7 +85,8 @@ public class TunnelControllerGroup implements ClientApp {
                 I2PAppContext ctx = I2PAppContext.getGlobalContext();
                 if (SystemVersion.isAndroid() || !ctx.isRouterContext()) {
                     _instance = new TunnelControllerGroup(ctx, null, null);
-                    _instance.startup();
+                    if (!SystemVersion.isAndroid())
+                        _instance.startup();
                 } // else wait for the router to start it
             }
             return _instance; 
