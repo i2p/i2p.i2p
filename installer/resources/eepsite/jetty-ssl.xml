@@ -94,9 +94,9 @@
 <!-- If I2P is not running, edit the file ~/.i2p/clients.config      -->
 <!-- to add the argument "/path/to/.i2p/eepsite/jetty-ssl.xml"       -->
 <!-- at the end of the line:                                         -->
-<--    clientApp.3.args="eepsite/jetty.xml"                          -->
+<!--    clientApp.3.args="eepsite/jetty.xml"                         -->
 <!-- so it now looks like:                                           -->
-<--    clientApp.3.args="/path to/.i2p/eepsite/jetty.xml" "/path/to/.i2p/eepsite/jetty-ssl.xml" -->
+<!--    clientApp.3.args="/path to/.i2p/eepsite/jetty.xml" "/path/to/.i2p/eepsite/jetty-ssl.xml" -->
 <!--                                                                 -->
 <!--                                                                 -->
 <!-- Step 6:                                                         -->
