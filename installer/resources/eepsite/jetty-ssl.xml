@@ -1,35 +1,255 @@
 <?xml version="1.0"?>
 <!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure.dtd">
 
+<!-- ========================================================================= -->
+<!-- If you have a 'split' directory installation, with configuration          -->
+<!-- files in ~/.i2p (Linux) or %APPDATA%\I2P (Windows), be sure to            -->
+<!-- edit the file in the configuration directory, NOT the install directory.  -->
+<!-- When running as a Linux daemon, the configuration directory is            -->
+<!-- /var/lib/i2p and the install directory is /usr/share/i2p .                -->
+<!--                                                                           -->
+<!-- ========================================================================= -->
+
 <!-- =============================================================== -->
 <!-- Configure SSL for the Jetty Server                              -->
 <!-- this configuration file should be used in combination with      -->
-<!-- other configuration files.  e.g.                                -->
-<!--    java -jar start.jar etc/jetty-ssl.xml                        -->
+<!-- other configuration files.                                      -->
 <!--                                                                 -->
-<!--  alternately, add to the start.ini for easier usage             -->
 <!-- =============================================================== -->
+<!-- Add a HTTPS SSL listener on port 7668                           -->
+<!--                                                                 -->
+<!-- NOTE:                                                           -->
+<!--                                                                 -->
+<!-- While I2P already encrypts end-to-end, HTTPS support            -->
+<!-- is valuable for authentication.                                 -->
+<!--                                                                 -->
+<!-- These instructions are to add SSL support to an existing        -->
+<!-- HTTP Jetty website.                                             -->
+<!--                                                                 -->
+<!-- For HTTPS ONLY, create a standard server tunnel                 -->
+<!-- (NOT HTTP server), and skip step 8.                             -->
+<!--                                                                 -->
+<!-- For non-Jetty servers (e.g. Apache), follow your server         -->
+<!-- instructions to generate and configure the certificates,        -->
+<!-- and skip steps 1-7.                                             -->
+<!--                                                                 -->
+<!-- =============================================================== -->
+<!--                                                                 -->
+<!-- To add SSL support for your existing website:                   -->
+<!--                                                                 -->
+<!-- Step 1:                                                         -->
+<!-- Get the b32 for your wehsite, it's the link at the              -->
+<!-- "preview" button in the Hidden Services Manager in              -->
+<!-- the console. If you aren't running i2p, you can                 -->
+<!-- get it from your private key file                               -->
+<!-- (probably ~/.i2p/eepsite/eepPriv.dat)                           -->
+<!-- with the command:                                               -->
+<!--     java -cp ~/i2p/lib/i2p.jar net.i2p.data.PrivateKeyFile ~/.i2p/eepsite/eepPriv.dat  -->
+<!-- Save the b32 to put in the certificate's CN in Step 2.          -->
+<!--                                                                 -->
+<!--                                                                 -->
+<!-- Step 2:                                                         -->
+<!-- Generate selfsigned certificates.                               -->
+<!-- We recommend two: one for the hostname, and one for the b32.    -->
+<!-- Note that server-side SNI to serve the correct certificate      -->
+<!-- requires Java 8. Otherwise it will pick one.                    -->
+<!-- (at random? first one?)                                         -->
+<!-- Change the CN and key password in the example, of course.       -->
+<!-- It's OK to keep the keystore password as "changeit" if you like.  -->
+<!-- Use the same passwords for both certificates.                   -->
+<!-- See https://wiki.eclipse.org/Jetty/Howto/Configure_SSL          -->
+<!-- for alternate methods.                                          -->
+<!--
+   keytool -genkey -keystore ~/.i2p/eepsite/etc/keystore.ks -storepass changeit -alias b32 -dname CN=biglongkey.b32.i2p,OU=Eepsite,O=XX,L=XX,ST=XX,C=XX -validity 3652 -keyalg RSA -keysize 2048 -keypass myKeyPassword 
+   keytool -genkey -keystore ~/.i2p/eepsite/etc/keystore.ks -storepass changeit -alias hostname -dname CN=example.i2p,OU=Eepsite,O=XX,L=XX,ST=XX,C=XX -validity 3652 -keyalg RSA -keysize 2048 -keypass myKeyPassword 
+   chmod 600 ~/.i2p/eepsite/etc/keystore.ks
+ -->
+<!--                                                                 -->
+<!-- But does SNI work? see:                                         -->
+<!-- http://blog.ivanristic.com/2014/03/ssl-tls-improvements-in-java-8.html -->
+<!-- http://stackoverflow.com/questions/20887504/tls-extension-server-name-indication-sni-value-not-available-on-server-side -->
+<!--                                                                 -->
+<!-- And no, you can't get a real certificate for an i2p             -->
+<!-- address from a Certificate Authority, but someday               -->
+<!-- it may be possible. Here's how Tor did it:                      -->
+<!-- https://cabforum.org/2015/02/18/ballot-144-validation-rules-dot-onion-names/ -->
+<!--                                                                 -->
+<!--                                                                 -->
+<!-- Step 3:                                                         -->
+<!-- Update this configuration file.                                 -->
+<!-- Edit the KeyStorePassword, TrustStorePassword, and              -->
+<!-- KeyManagerPassword below to match the passwords from Step 2.    -->
+<!--                                                                 -->
+<!--                                                                 -->
+<!-- Step 4:                                                         -->
+<!-- If running I2P, stop the website Jetty on /configclients        -->
+<!-- in the console.                                                 -->
+<!--                                                                 -->
+<!--                                                                 -->
+<!-- Step 5:                                                         -->
+<!-- Configure Jetty to read in this file at startup.                -->
+<!-- If running I2P, edit the website Jetty on /configclients        -->
+<!-- to add the argument "/path/to/.i2p/eepsite/jetty-ssl.xml".      -->
+<!--                                                                 -->
+<!-- If I2P is not running, edit the file ~/.i2p/clients.config      -->
+<!-- to add the argument "/path/to/.i2p/eepsite/jetty-ssl.xml"       -->
+<!-- at the end of the line:                                         -->
+<--    clientApp.3.args="eepsite/jetty.xml"                          -->
+<!-- so it now looks like:                                           -->
+<--    clientApp.3.args="/path to/.i2p/eepsite/jetty.xml" "/path/to/.i2p/eepsite/jetty-ssl.xml" -->
+<!--                                                                 -->
+<!--                                                                 -->
+<!-- Step 6:                                                         -->
+<!-- Start Jetty.                                                    -->
+<!-- If running I2P, start the website Jetty on /configclients       -->
+<!-- in the console.                                                 -->
+<!-- If I2P is not running, start it.                                -->
+<!--                                                                 -->
+<!-- Now go to the /logs page in the console and check for errors    -->
+<!-- in both the router and wrapper logs.                            -->
+<!--                                                                 -->
+<!--                                                                 -->
+<!-- Step 7:                                                         -->
+<!-- Test Jetty.                                                     -->
+<!-- If there were no errors, test your Jetty SSL by                 -->
+<!-- going to https://127.0.0.1:7668/ in your browser.               -->
+<!-- You will have to confirm the security exception for             -->
+<!-- the selfsigned certificate.                                     -->
+<!--                                                                 -->
+<!--                                                                 -->
+<!-- Step 8:                                                         -->
+<!-- Configure i2ptunnel.                                            -->
+<!-- Tell i2ptunnel to route SSL to port 7668 by adding the          -->
+<!-- following custom option on the i2ptunnel edit page              -->
+<!-- for your website:                                               -->
+<!--        targetForPort.443=127.0.0.1:7668                         -->
+<!-- Also, verify that "Use SSL" near the top is NOT set.            -->
+<!-- That would be SSL-over-SSL, which won't work.                   -->
+<!--                                                                 -->
+<!--                                                                 -->
+<!-- Step 9:                                                         -->
+<!-- Start the tunnel if it isn't started.                           -->
+<!--                                                                 -->
+<!--                                                                 -->
+<!-- Step 10:                                                        -->
+<!-- In the i2ptunnel HTTP Client configuration,                     -->
+<!-- enable "Allow SSL to I2P addresses" if it isn't already.        -->
+<!--                                                                 -->
+<!--                                                                 -->
+<!-- Step 11:                                                        -->
+<!-- Test SSL via i2ptunnel.                                         -->
+<!-- Test SSL to your website through I2P by entering                -->
+<!-- https://yoursite.i2p/ in your browser.                          -->
+<!-- If it doesn't work, check the /logs page in the console.        -->
+<!-- You may need to adjust your browser proxy settings to           -->
+<!-- ensure that https i2p URLs are fetched through the I2P proxy.   -->
+<!-- For example, in privoxy, add                                    -->
+<!-- https://*.i2p/* and https://*.i2p:*/*                           -->
+<!--                                                                 -->
+<!--                                                                 -->
+<!-- Step 12:                                                        -->
+<!-- Tell your users.                                                -->
+<!-- Put a link to the https version on your                         -->
+<!-- home page. Remind them that in                                  -->
+<!-- the i2ptunnel HTTP Client configuration,                        -->
+<!-- enable "Allow SSL to I2P addresses" if it isn't already.        -->
+<!-- Remind them to confirm the security exception for               -->
+<!-- the selfsigned certificate (but not one for a hostname          -->
+<!-- mismatch) (but see SNI issues above).                           -->
+<!-- Users may need to adjust their browser proxy settings to        -->
+<!-- ensure that https i2p URLs are fetched through the I2P proxy.   -->
+<!-- For example, in privoxy, add                                    -->
+<!-- https://*.i2p/* and https://*.i2p:*/*                           -->
+<!--                                                                 -->
+<!-- Decide what link to use. The hostname is not secure,            -->
+<!-- as users may have a different hostname in their browser.        -->
+<!-- Also, new address helpers won't work with SSL.                  -->
+<!-- The b32 is the recommended hostname.                            -->
+<!--                                                                 -->
+<!--                                                                 -->
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+
 <Configure id="Server" class="org.eclipse.jetty.server.Server">
 
   <!-- if NIO is not available, use org.eclipse.jetty.server.ssl.SslSocketConnector -->
   
   <New id="sslContextFactory" class="org.eclipse.jetty.http.ssl.SslContextFactory">
-    <Set name="KeyStore">./eepsite/etc/keystore</Set>
-    <Set name="KeyStorePassword">OBF:1vny1zlo1x8e1vnw1vn61x8g1zlu1vn4</Set>
-    <Set name="KeyManagerPassword">OBF:1u2u1wml1z7s1z7a1wnl1u2g</Set>
-    <Set name="TrustStore">./eepsite/etc/keystore</Set>
-    <Set name="TrustStorePassword">OBF:1vny1zlo1x8e1vnw1vn61x8g1zlu1vn4</Set>
+    <Set name="KeyStore">./eepsite/etc/keystore.ks</Set>
+    <Set name="KeyStorePassword">changeit</Set>
+    <Set name="KeyManagerPassword">myKeyPassword</Set>
+    <Set name="TrustStore">./eepsite/etc/keystore.ks</Set>
+    <Set name="TrustStorePassword">changeit</Set>
   </New>
 
   <Call name="addConnector">
     <Arg>
       <New class="org.eclipse.jetty.server.ssl.SslSelectChannelConnector">
         <Arg><Ref id="sslContextFactory" /></Arg>
-        <Set name="Port">8443</Set>
+        <Set name="host">127.0.0.1</Set>
+        <Set name="port">7668</Set>
         <Set name="maxIdleTime">600000</Set>
         <Set name="useDirectBuffers">false</Set>
-        <Set name="Acceptors">2</Set>
-        <Set name="AcceptQueueSize">100</Set>
+        <Set name="acceptors">1</Set>
+        <Set name="statsOn">false</Set>
+        <Set name="lowResourcesConnections">5000</Set>
+        <Set name="lowResourcesMaxIdleTime">5000</Set>
+        <Set name="ExcludeCipherSuites">
+          <Array type="java.lang.String">
+            <Item>SSL_DH_anon_EXPORT_WITH_DES40_CBC_SHA</Item>
+            <Item>SSL_DH_anon_EXPORT_WITH_RC4_40_MD5</Item>
+            <Item>SSL_DH_anon_WITH_3DES_EDE_CBC_SHA</Item>
+            <Item>SSL_DH_anon_WITH_DES_CBC_SHA</Item>
+            <Item>SSL_DH_anon_WITH_RC4_128_MD5</Item>
+            <Item>SSL_DHE_DSS_EXPORT_WITH_DES40_CBC_SHA</Item>
+            <Item>SSL_DHE_DSS_WITH_DES_CBC_SHA</Item>
+            <Item>SSL_DHE_RSA_EXPORT_WITH_DES40_CBC_SHA</Item>
+            <Item>SSL_DHE_RSA_WITH_DES_CBC_SHA</Item>
+            <Item>SSL_RSA_EXPORT_WITH_DES40_CBC_SHA</Item>
+            <Item>SSL_RSA_EXPORT_WITH_RC4_40_MD5</Item>
+            <Item>SSL_RSA_WITH_DES_CBC_SHA</Item>
+            <Item>SSL_RSA_WITH_NULL_MD5</Item>
+            <Item>SSL_RSA_WITH_NULL_SHA</Item>
+            <Item>TLS_DH_anon_WITH_AES_128_CBC_SHA</Item>
+            <Item>TLS_DH_anon_WITH_AES_128_CBC_SHA256</Item>
+            <Item>TLS_DH_anon_WITH_AES_128_GCM_SHA256</Item>
+            <Item>TLS_DH_anon_WITH_AES_256_CBC_SHA</Item>
+            <Item>TLS_DH_anon_WITH_AES_256_CBC_SHA256</Item>
+            <Item>TLS_DH_anon_WITH_AES_256_GCM_SHA384</Item>
+            <Item>TLS_ECDH_anon_WITH_3DES_EDE_CBC_SHA</Item>
+            <Item>TLS_ECDH_anon_WITH_AES_128_CBC_SHA</Item>
+            <Item>TLS_ECDH_anon_WITH_AES_256_CBC_SHA</Item>
+            <Item>TLS_ECDH_anon_WITH_NULL_SHA</Item>
+            <Item>TLS_ECDH_anon_WITH_RC4_128_SHA</Item>
+            <Item>TLS_ECDH_ECDSA_WITH_NULL_SHA</Item>
+            <Item>TLS_ECDHE_ECDSA_WITH_NULL_SHA</Item>
+            <Item>TLS_ECDHE_RSA_WITH_NULL_SHA</Item>
+            <Item>TLS_ECDH_RSA_WITH_NULL_SHA</Item>
+            <Item>TLS_KRB5_EXPORT_WITH_DES_CBC_40_MD5</Item>
+            <Item>TLS_KRB5_EXPORT_WITH_DES_CBC_40_SHA</Item>
+            <Item>TLS_KRB5_EXPORT_WITH_RC4_40_MD5</Item>
+            <Item>TLS_KRB5_EXPORT_WITH_RC4_40_SHA</Item>
+            <Item>TLS_KRB5_WITH_3DES_EDE_CBC_MD5</Item>
+            <Item>TLS_KRB5_WITH_3DES_EDE_CBC_SHA</Item>
+            <Item>TLS_KRB5_WITH_DES_CBC_MD5</Item>
+            <Item>TLS_KRB5_WITH_DES_CBC_SHA</Item>
+            <Item>TLS_KRB5_WITH_RC4_128_MD5</Item>
+            <Item>TLS_KRB5_WITH_RC4_128_SHA</Item>
+            <Item>TLS_RSA_WITH_NULL_SHA256</Item>
+            <Item>SSL_DHE_DSS_WITH_3DES_EDE_CBC_SHA</Item>
+            <Item>SSL_DHE_RSA_WITH_3DES_EDE_CBC_SHA</Item>
+            <Item>SSL_RSA_WITH_3DES_EDE_CBC_SHA</Item>
+            <Item>SSL_RSA_WITH_RC4_128_MD5</Item>
+            <Item>SSL_RSA_WITH_RC4_128_SHA</Item>
+            <Item>TLS_ECDH_ECDSA_WITH_RC4_128_SHA</Item>
+            <Item>TLS_ECDH_RSA_WITH_RC4_128_SHA</Item>
+            <Item>TLS_ECDHE_ECDSA_WITH_RC4_128_SHA</Item>
+            <Item>TLS_ECDHE_RSA_WITH_RC4_128_SHA</Item>
+            <Item>TLS_ECDH_ECDSA_WITH_3DES_EDE_CBC_SHA</Item>
+            <Item>TLS_ECDH_RSA_WITH_3DES_EDE_CBC_SHA</Item>
+            <Item>TLS_ECDHE_ECDSA_WITH_3DES_EDE_CBC_SHA</Item>
+            <Item>TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA</Item>
+          </Array>
+        </Set>
       </New>
     </Arg>
   </Call>

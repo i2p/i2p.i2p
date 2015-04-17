@@ -23,6 +23,9 @@
   </servlet-mapping>
   <session-config>
     <session-timeout>1440</session-timeout>
+    <cookie-config>
+      <http-only>true</http-only>
+    </cookie-config>
   </session-config>
   <!-- tomcat (untested) -->
   <context-param>

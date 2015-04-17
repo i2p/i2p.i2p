@@ -904,10 +904,14 @@ public class EepGet {
                 _keepFetching = false;
                 _notModified = true;
                 return; 
+            case 400: // bad req
             case 401: // server auth
             case 403: // bad req
             case 404: // not found
+            case 408: // req timeout
             case 409: // bad addr helper
+            case 414: // URI too long
+            case 431: // headers too long
             case 503: // no outproxy
                 _transferFailed = true;
                 if (_alreadyTransferred > 0 || !_shouldWriteErrorToOutput) {
