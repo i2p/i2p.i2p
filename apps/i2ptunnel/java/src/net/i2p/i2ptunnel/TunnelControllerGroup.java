@@ -45,6 +45,8 @@ public class TunnelControllerGroup implements ClientApp {
     
     private final List<TunnelController> _controllers;
     private final ReadWriteLock _controllersLock;
+    private volatile boolean _controllersLoaded;
+    private final Object _controllersLoadedLock = new Object();
     private final String _configFile;
     
     private static final String REGISTERED_NAME = "i2ptunnel";
@@ -109,6 +111,7 @@ public class TunnelControllerGroup implements ClientApp {
         _log = _context.logManager().getLog(TunnelControllerGroup.class);
         _controllers = new ArrayList<TunnelController>();
         _controllersLock = new ReentrantReadWriteLock(true);
+        _controllersLoaded = false;
         if (args == null || args.length <= 0)
             _configFile = DEFAULT_CONFIG_FILE;
         else if (args.length == 1)
@@ -148,6 +151,7 @@ public class TunnelControllerGroup implements ClientApp {
      */
     public void startup() {
         loadControllers(_configFile);
+        startControllers();
         if (_mgr != null)
             _mgr.register(this);
             // RouterAppManager registers its own shutdown hook
@@ -245,14 +249,18 @@ public class TunnelControllerGroup implements ClientApp {
      * @throws IllegalArgumentException if unable to load from file
      */
     public synchronized void loadControllers(String configFile) {
-        changeState(STARTING);
+        synchronized (_controllersLoadedLock) {
+            if (_controllersLoaded)
+                return;
+        }
+
         Properties cfg = loadConfig(configFile);
         int i = 0;
         _controllersLock.writeLock().lock();
         try {
             while (true) {
                 String type = cfg.getProperty("tunnel." + i + ".type");
-                if (type == null) 
+                if (type == null)
                     break;
                 TunnelController controller = new TunnelController(cfg, "tunnel." + i + ".");
                 _controllers.add(controller);
@@ -261,11 +269,21 @@ public class TunnelControllerGroup implements ClientApp {
         } finally {
             _controllersLock.writeLock().unlock();
         }
-        I2PAppThread startupThread = new I2PAppThread(new StartControllers(), "Startup tunnels");
-        startupThread.start();
-        
+
+        synchronized (_controllersLoadedLock) {
+            _controllersLoaded = true;
+        }
         if (_log.shouldLog(Log.INFO))
             _log.info(i + " controllers loaded from " + configFile);
+    }
+
+    /**
+     * Start all of the tunnels. Must call loadControllers() first.
+     */
+    private synchronized void startControllers() {
+        changeState(STARTING);
+        I2PAppThread startupThread = new I2PAppThread(new StartControllers(), "Startup tunnels");
+        startupThread.start();
         changeState(RUNNING);
     }
     
@@ -295,6 +313,7 @@ public class TunnelControllerGroup implements ClientApp {
     public synchronized void reloadControllers() {
         unloadControllers();
         loadControllers(_configFile);
+        startControllers();
     }
     
     /**
@@ -303,12 +322,21 @@ public class TunnelControllerGroup implements ClientApp {
      *
      */
     public synchronized void unloadControllers() {
+        synchronized (_controllersLoadedLock) {
+            if (!_controllersLoaded)
+                return;
+        }
+
         _controllersLock.writeLock().lock();
         try {
             destroyAllControllers();
             _controllers.clear();
         } finally {
             _controllersLock.writeLock().unlock();
+        }
+
+        synchronized (_controllersLoadedLock) {
+            _controllersLoaded = false;
         }
         if (_log.shouldLog(Log.INFO))
             _log.info("All controllers stopped and unloaded");
@@ -512,11 +540,20 @@ public class TunnelControllerGroup implements ClientApp {
     }
     
     /**
-     * Retrieve a list of tunnels known
+     * Retrieve a list of tunnels known.
+     *
+     * Side effect: if the tunnels have not been loaded from config yet, they
+     * will be.
      *
      * @return list of TunnelController objects
+     * @throws IllegalArgumentException if unable to load config from file
      */
     public List<TunnelController> getControllers() {
+        synchronized (_controllersLoadedLock) {
+            if (!_controllersLoaded)
+                loadControllers(_configFile);
+        }
+
         _controllersLock.readLock().lock();
         try {
             return new ArrayList<TunnelController>(_controllers);
