@@ -1090,7 +1090,7 @@ class EstablishState {
             log.warn("prepareOutbound() on verified state, doing nothing!");
         }
 
-        @Override public String toString() { return "VerifiedEstablishState";}
+        @Override public String toString() { return "VerifiedEstablishState: ";}
     }
 
     /**
@@ -1108,7 +1108,7 @@ class EstablishState {
             log.warn("prepareOutbound() on verified state, doing nothing!");
         }
 
-        @Override public String toString() { return "FailedEstablishState";}
+        @Override public String toString() { return "FailedEstablishState: ";}
     }
 
     /** @deprecated unused */

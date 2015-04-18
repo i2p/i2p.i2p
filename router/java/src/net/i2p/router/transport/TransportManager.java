@@ -286,6 +286,10 @@ public class TransportManager implements TransportEventListener {
     
     int getTransportCount() { return _transports.size(); }
     
+    /**
+     *  How many peers are we currently connected to, that we have
+     *  sent a message to or received a message from in the last five minutes.
+     */
     public int countActivePeers() { 
         int peers = 0;
         for (Transport t : _transports.values()) {
@@ -294,6 +298,11 @@ public class TransportManager implements TransportEventListener {
         return peers;
     }
     
+    /**
+     *  How many peers are we currently connected to, that we have
+     *  sent a message to in the last minute.
+     *  Unused for anything, to be removed.
+     */
     public int countActiveSendPeers() { 
         int peers = 0;
         for (Transport t : _transports.values()) {

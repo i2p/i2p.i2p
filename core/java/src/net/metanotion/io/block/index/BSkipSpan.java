@@ -69,7 +69,7 @@ public class BSkipSpan extends SkipSpan {
 	protected int overflowPage;
 
 	protected int prevPage;
-	protected int nextPage;
+	protected int nextPage = 0;
 	protected Serializer keySer;
 	protected Serializer valSer;
 

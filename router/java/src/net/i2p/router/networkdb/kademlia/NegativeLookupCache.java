@@ -1,12 +1,13 @@
 package net.i2p.router.networkdb.kademlia;
 
 import java.util.Map;
+
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
 import net.i2p.util.LHMCache;
 import net.i2p.util.ObjectCounter;
-import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
+import net.i2p.util.SimpleTimer2;
 
 /**
  * Track lookup fails
@@ -24,7 +25,7 @@ class NegativeLookupCache {
     public NegativeLookupCache() {
         this.counter = new ObjectCounter<Hash>();
         this.badDests = new LHMCache<Hash, Destination>(MAX_BAD_DESTS);
-        SimpleScheduler.getInstance().addPeriodicEvent(new Cleaner(), CLEAN_TIME);
+        SimpleTimer2.getInstance().addPeriodicEvent(new Cleaner(), CLEAN_TIME);
     }
 
     public void lookupFailed(Hash h) {

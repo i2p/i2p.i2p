@@ -431,7 +431,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         // don't delay the outbound if it already exists, as this opens up a large
         // race window with removeTunnels() below
         if (delayOutbound)
-            _context.simpleScheduler().addEvent(new DelayedStartup(outbound), 1000);
+            _context.simpleTimer2().addEvent(new DelayedStartup(outbound), 1000);
         else
             outbound.startup();
     }
@@ -573,7 +573,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         }
         
         _inboundExploratory.startup();
-        _context.simpleScheduler().addEvent(new DelayedStartup(_outboundExploratory), 3*1000);
+        _context.simpleTimer2().addEvent(new DelayedStartup(_outboundExploratory), 3*1000);
         
         // try to build up longer tunnels
         _context.jobQueue().addJob(new BootstrapPool(_context, _inboundExploratory));

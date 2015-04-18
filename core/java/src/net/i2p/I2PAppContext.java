@@ -406,9 +406,11 @@ public class I2PAppContext {
                 } else if (_tmpDir.mkdir()) {
                     _tmpDir.deleteOnExit();
                 } else {
-                    System.err.println("Could not create temp dir " + _tmpDir.getAbsolutePath());
+                    System.err.println("WARNING: Could not create temp dir " + _tmpDir.getAbsolutePath());
                     _tmpDir = new SecureDirectory(_routerDir, "tmp");
-                    _tmpDir.mkdir();
+                    _tmpDir.mkdirs();
+                    if (!_tmpDir.exists())
+                        System.err.println("ERROR: Could not create temp dir " + _tmpDir.getAbsolutePath());
                 }
             }
         }
@@ -937,6 +939,7 @@ public class I2PAppContext {
     /**
      * Use instead of SimpleScheduler.getInstance()
      * @since 0.9 to replace static instance in the class
+     * @deprecated in 0.9.20, use simpleTimer2()
      */
     public SimpleScheduler simpleScheduler() {
         if (!_simpleSchedulerInitialized)
@@ -944,6 +947,9 @@ public class I2PAppContext {
         return _simpleScheduler;
     }
 
+    /**
+     * @deprecated in 0.9.20
+     */
     private void initializeSimpleScheduler() {
         synchronized (_lock18) {
             if (_simpleScheduler == null)

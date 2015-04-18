@@ -233,7 +233,7 @@ public class SnarkManager implements CompleteListener {
         // only if default instance
         if ("i2psnark".equals(_contextName))
             // delay until UpdateManager is there
-            _context.simpleScheduler().addEvent(new Register(), 4*60*1000);
+            _context.simpleTimer2().addEvent(new Register(), 4*60*1000);
         // Not required, Jetty has a shutdown hook
         //_context.addShutdownTask(new SnarkManagerShutdown());
         _idleChecker = new IdleChecker(this, _peerCoordinatorSet);
@@ -2241,7 +2241,7 @@ public class SnarkManager implements CompleteListener {
      * Stop all running torrents, and close the tunnel after a delay
      * to allow for announces.
      * If called at router shutdown via Jetty shutdown hook -> webapp destroy() -> stop(),
-     * the tunnel won't actually be closed as the SimpleScheduler is already shutdown
+     * the tunnel won't actually be closed as the SimpleTimer2 is already shutdown
      * or will be soon, so we delay a few seconds inline.
      * @param finalShutdown if true, sleep at the end if any torrents were running
      * @since 0.9.1
@@ -2272,7 +2272,7 @@ public class SnarkManager implements CompleteListener {
                     dht.stop();
                 // Schedule this even for final shutdown, as there's a chance
                 // that it's just this webapp that is stopping.
-                _context.simpleScheduler().addEvent(new Disconnector(), 60*1000);
+                _context.simpleTimer2().addEvent(new Disconnector(), 60*1000);
                 addMessage(_("Closing I2P tunnel after notifying trackers."));
                 if (finalShutdown) {
                     try { Thread.sleep(5*1000); } catch (InterruptedException ie) {}

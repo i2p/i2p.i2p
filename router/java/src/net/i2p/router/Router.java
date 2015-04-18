@@ -8,15 +8,10 @@ package net.i2p.router;
  *
  */
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -49,7 +44,6 @@ import net.i2p.router.util.EventLog;
 import net.i2p.stat.RateStat;
 import net.i2p.stat.StatManager;
 import net.i2p.util.ByteCache;
-import net.i2p.util.FileUtil;
 import net.i2p.util.FortunaRandomSource;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.I2PThread;
@@ -113,23 +107,36 @@ public class Router implements RouterClock.ClockShiftListener {
     private final static String DNS_CACHE_TIME = "" + (5*60);
     private static final String EVENTLOG = "eventlog.txt";
     private static final String PROP_JBIGI = "jbigi.loadedResource";
+    public static final String UPDATE_FILE = "i2pupdate.zip";
         
     private static final String originalTimeZoneID;
     static {
-        // grumble about sun's java caching DNS entries *forever* by default
-        // so lets just keep 'em for a short time
-        System.setProperty("sun.net.inetaddr.ttl", DNS_CACHE_TIME);
-        System.setProperty("sun.net.inetaddr.negative.ttl", DNS_CACHE_TIME);
-        System.setProperty("networkaddress.cache.ttl", DNS_CACHE_TIME);
-        System.setProperty("networkaddress.cache.negative.ttl", DNS_CACHE_TIME);
-        System.setProperty("http.agent", "I2P");
-        // (no need for keepalive)
-        System.setProperty("http.keepAlive", "false");
+        //
+        // If embedding I2P you may wish to disable one or more of the following
+        // via the associated System property. Since 0.9.19.
+        //
+        if (System.getProperty("I2P_DISABLE_DNS_CACHE_OVERRIDE") == null) {
+            // grumble about sun's java caching DNS entries *forever* by default
+            // so lets just keep 'em for a short time
+            System.setProperty("sun.net.inetaddr.ttl", DNS_CACHE_TIME);
+            System.setProperty("sun.net.inetaddr.negative.ttl", DNS_CACHE_TIME);
+            System.setProperty("networkaddress.cache.ttl", DNS_CACHE_TIME);
+            System.setProperty("networkaddress.cache.negative.ttl", DNS_CACHE_TIME);
+        }
+        if (System.getProperty("I2P_DISABLE_HTTP_AGENT_OVERRIDE") == null) {
+            System.setProperty("http.agent", "I2P");
+        }
+        if (System.getProperty("I2P_DISABLE_HTTP_KEEPALIVE_OVERRIDE") == null) {
+            // (no need for keepalive)
+            System.setProperty("http.keepAlive", "false");
+        }
         // Save it for LogManager
         originalTimeZoneID = TimeZone.getDefault().getID();
-        System.setProperty("user.timezone", "GMT");
-        // just in case, lets make it explicit...
-        TimeZone.setDefault(TimeZone.getTimeZone("GMT"));
+        if (System.getProperty("I2P_DISABLE_TIMEZONE_OVERRIDE") == null) {
+            System.setProperty("user.timezone", "GMT");
+            // just in case, lets make it explicit...
+            TimeZone.setDefault(TimeZone.getTimeZone("GMT"));
+        }
         // https://www.kb.cert.org/vuls/id/402580
         // http://docs.codehaus.org/display/JETTY/SystemProperties
         // Fixed in Jetty 5.1.15 but we are running 5.1.12
@@ -345,6 +352,8 @@ public class Router implements RouterClock.ClockShiftListener {
      */
     private void startupStuff() {
         // *********  Start no threads before here ********* //
+        _log = _context.logManager().getLog(Router.class);
+
         //
         // NOW we can start the ping file thread.
         if (!SystemVersion.isAndroid())
@@ -379,8 +388,8 @@ public class Router implements RouterClock.ClockShiftListener {
 
         _routerInfo = null;
         _higherVersionSeen = false;
-        _log = _context.logManager().getLog(Router.class);
-        _log.info("New router created with config file " + _configFilename);
+        if (_log.shouldLog(Log.INFO))
+            _log.info("New router created with config file " + _configFilename);
         _oomListener = new OOMListener(_context);
 
         _shutdownHook = new ShutdownHook(_context);
@@ -529,6 +538,7 @@ public class Router implements RouterClock.ClockShiftListener {
      *  or the system lacks entropy
      *
      *  @since public as of 0.9 for Android and other embedded uses
+     *  @throws IllegalStateException if called more than once
      */
     public synchronized void runRouter() {
         synchronized(_stateLock) {
@@ -563,7 +573,7 @@ public class Router implements RouterClock.ClockShiftListener {
         _context.inNetMessagePool().startup();
         startupQueue();
         //_context.jobQueue().addJob(new CoalesceStatsJob(_context));
-        _context.simpleScheduler().addPeriodicEvent(new CoalesceStatsEvent(_context), COALESCE_TIME);
+        _context.simpleTimer2().addPeriodicEvent(new CoalesceStatsEvent(_context), COALESCE_TIME);
         _context.jobQueue().addJob(new UpdateRoutingKeyModifierJob(_context));
         //_context.adminManager().startup();
         _context.blocklist().startup();
@@ -827,7 +837,7 @@ public class Router implements RouterClock.ClockShiftListener {
             if (blockingRebuild)
                 r.timeReached();
             else
-                _context.simpleScheduler().addEvent(r, 0);
+                _context.simpleTimer2().addEvent(r, 0);
         } catch (DataFormatException dfe) {
             _log.log(Log.CRIT, "Internal error - unable to sign our own address?!", dfe);
         }
@@ -861,7 +871,7 @@ public class Router implements RouterClock.ClockShiftListener {
      *
      *  TODO just return a string instead of passing in the RI? See PublishLocalRouterInfoJob.
      *
-     *  @param an unpublished ri we are generating.
+     *  @param ri an unpublished ri we are generating.
      */
     public void addCapabilities(RouterInfo ri) {
         int bwLim = Math.min(_context.bandwidthLimiter().getInboundKBytesPerSecond(),
@@ -990,6 +1000,8 @@ public class Router implements RouterClock.ClockShiftListener {
      * Rebuild a new identity the hard way - delete all of our old identity 
      * files, then reboot the router.
      *
+     *  Calls exit(), never returns.
+     *
      *  Not for external use.
      */
     public synchronized void rebuildNewIdentity() {
@@ -1051,10 +1063,16 @@ public class Router implements RouterClock.ClockShiftListener {
     
     /**
      *  Shutdown with no chance of cancellation.
-     *  Blocking, will call exit() and not return unless setKillVMOnExit(false) was previously called.
+     *  Blocking, will call exit() and not return unless setKillVMOnExit(false) was previously called,
+     *  or a final shutdown is already in progress.
      *  May take several seconds as it runs all the shutdown hooks.
+     *
+     *  @param exitCode one of the EXIT_* values, non-negative
+     *  @throws IllegalArgumentException if exitCode negative
      */
     public synchronized void shutdown(int exitCode) {
+        if (exitCode < 0)
+            throw new IllegalArgumentException();
         synchronized(_stateLock) {
             if (_state == State.FINAL_SHUTDOWN_1 ||
                 _state == State.FINAL_SHUTDOWN_2 ||
@@ -1076,8 +1094,13 @@ public class Router implements RouterClock.ClockShiftListener {
      *  Cancel the JVM runtime hook before calling this.
      *  Called by the ShutdownHook.
      *  NOT to be called by others, use shutdown().
+     *
+     *  @param exitCode one of the EXIT_* values, non-negative
+     *  @throws IllegalArgumentException if exitCode negative
      */
     public synchronized void shutdown2(int exitCode) {
+        if (exitCode < 0)
+            throw new IllegalArgumentException();
         changeState(State.FINAL_SHUTDOWN_2);
         // help us shut down esp. after OOM
         int priority = (exitCode == EXIT_OOM) ? Thread.MAX_PRIORITY - 1 : Thread.NORM_PRIORITY + 2;
@@ -1172,6 +1195,8 @@ public class Router implements RouterClock.ClockShiftListener {
 
     /**
      *  Cancel the JVM runtime hook before calling this.
+     *
+     *  @param exitCode one of the EXIT_* values, non-negative
      */
     private synchronized void finalShutdown(int exitCode) {
         changeState(State.FINAL_SHUTDOWN_3);
@@ -1220,6 +1245,8 @@ public class Router implements RouterClock.ClockShiftListener {
      * the graceful shutdown (prior to actual shutdown ;), call 
      * {@link #cancelGracefulShutdown}.
      *
+     * Exit code will be EXIT_GRACEFUL.
+     *
      * Shutdown delay will be from zero to 11 minutes.
      */
     public void shutdownGracefully() {
@@ -1234,9 +1261,12 @@ public class Router implements RouterClock.ClockShiftListener {
      *
      * Returns silently if a final shutdown is already in progress.
      *
-     * @param exitCode VM exit code
+     * @param exitCode one of the EXIT_* values, non-negative
+     * @throws IllegalArgumentException if exitCode negative
      */
     public void shutdownGracefully(int exitCode) {
+        if (exitCode < 0)
+            throw new IllegalArgumentException();
         synchronized(_stateLock) {
             if (isFinalShutdownInProgress())
                 return; // too late
@@ -1271,6 +1301,8 @@ public class Router implements RouterClock.ClockShiftListener {
 
     /**
      * What exit code do we plan on using when we shut down (or -1, if there isn't a graceful shutdown planned)
+     *
+     * @return one of the EXIT_* values or -1
      */
     public int scheduledGracefulExitCode() { return _gracefulExitCode; }
 
@@ -1363,12 +1395,12 @@ public class Router implements RouterClock.ClockShiftListener {
      *  @since 0.8.8
      */
     public void clockShift(long delta) {
+        if (delta > -60*1000 && delta < 60*1000)
+            return;
         synchronized(_stateLock) {
             if (gracefulShutdownInProgress() || !isAlive())
                 return;
         }
-        if (delta > -60*1000 && delta < 60*1000)
-            return;
         _eventLog.addEvent(EventLog.CLOCK_SHIFT, Long.toString(delta));
         // update the routing key modifier
         _context.routerKeyGenerator().generateDateBasedModData();
@@ -1460,195 +1492,9 @@ public class Router implements RouterClock.ClockShiftListener {
             // If it does an update, it never returns.
             // I guess it's better to have the other-router check above this, we don't want to
             // overwrite an existing running router's jar files. Other than ours.
-            r.installUpdates();
+            InstallUpdate.installUpdates(r);
             // *********  Start no threads before here ********* //
             r.runRouter();
-        }
-    }
-    
-    public static final String UPDATE_FILE = "i2pupdate.zip";
-    private static final String DELETE_FILE = "deletelist.txt";
-    
-    /**
-     * Context must be available.
-     * Unzip update file found in the router dir OR base dir, to the base dir
-     *
-     * If we can't write to the base dir, complain.
-     * Note: _log not available here.
-     */
-    private void installUpdates() {
-        File updateFile = new File(_context.getRouterDir(), UPDATE_FILE);
-        boolean exists = updateFile.exists();
-        if (!exists) {
-            updateFile = new File(_context.getBaseDir(), UPDATE_FILE);
-            exists = updateFile.exists();
-        }
-        if (exists) {
-            // do a simple permissions test, if it fails leave the file in place and don't restart
-            File test = new File(_context.getBaseDir(), "history.txt");
-            if ((test.exists() && !test.canWrite()) || (!_context.getBaseDir().canWrite())) {
-                System.out.println("ERROR: No write permissions on " + _context.getBaseDir() +
-                                   " to extract software update file");
-                // carry on
-                return;
-            }
-            System.out.println("INFO: Update file exists [" + UPDATE_FILE + "] - installing");
-            // verify the whole thing first
-            // we could remember this fails, and not bother restarting, but who cares...
-            boolean ok = FileUtil.verifyZip(updateFile);
-            if (ok) {
-                // This may be useful someday. First added in 0.8.2
-                // Moved above the extract so we don't NCDFE
-                _config.put("router.updateLastInstalled", "" + System.currentTimeMillis());
-                // Set the last version to the current version, since 0.8.13
-                _config.put("router.previousVersion", RouterVersion.VERSION);
-                _config.put("router.previousFullVersion", RouterVersion.FULL_VERSION);
-                saveConfig();
-                ok = FileUtil.extractZip(updateFile, _context.getBaseDir());
-            }
-
-            // Very important - we have now trashed our jars.
-            // After this point, do not use any new I2P classes, or they will fail to load
-            // and we will die with NCDFE.
-            // Ideally, do not use I2P classes at all, new or not.
-            try {
-                if (ok) {
-                    // We do this here so we may delete old jars before we restart
-                    deleteListedFiles();
-                    System.out.println("INFO: Update installed");
-                } else {
-                    System.out.println("ERROR: Update failed!");
-                }
-                if (!ok) {
-                    // we can't leave the file in place or we'll continually restart, so rename it
-                    File bad = new File(_context.getRouterDir(), "BAD-" + UPDATE_FILE);
-                    boolean renamed = updateFile.renameTo(bad);
-                    if (renamed) {
-                        System.out.println("Moved update file to " + bad.getAbsolutePath());
-                    } else {
-                        System.out.println("Deleting file " + updateFile.getAbsolutePath());
-                        ok = true;  // so it will be deleted
-                    }
-                }
-                if (ok) {
-                    boolean deleted = updateFile.delete();
-                    if (!deleted) {
-                        System.out.println("ERROR: Unable to delete the update file!");
-                        updateFile.deleteOnExit();
-                    }
-                }
-                // exit whether ok or not
-                if (_context.hasWrapper())
-                    System.out.println("INFO: Restarting after update");
-                else
-                    System.out.println("WARNING: Exiting after update, restart I2P");
-            } catch (Throwable t) {
-                // hide the NCDFE
-                // hopefully the update file got deleted or we will loop
-            }
-            System.exit(EXIT_HARD_RESTART);
-        } else {
-            deleteJbigiFiles();
-            // It was here starting in 0.8.12 so it could be used the very first time
-            // Now moved up so it is usually run only after an update
-            // But the first time before jetty 6 it will run here...
-            // Here we can't remove jars
-            deleteListedFiles();
-        }
-    }
-
-    /**
-     *  Remove extracted libjbigi.so and libjcpuid.so files if we have a newer jbigi.jar,
-     *  so the new ones will be extracted.
-     *  We do this after the restart, not after the extract, because it's safer, and
-     *  because people may upgrade their jbigi.jar file manually.
-     *
-     *  Copied from NativeBigInteger, which we can't access here or the
-     *  libs will get loaded.
-     */
-    private void deleteJbigiFiles() {
-            boolean isX86 = SystemVersion.isX86();
-            String osName = System.getProperty("os.name").toLowerCase(Locale.US);
-            boolean isWin = SystemVersion.isWindows();
-            boolean isMac = SystemVersion.isMac();
-            // only do this on these OSes
-            boolean goodOS = isWin || isMac ||
-                             osName.contains("linux") || osName.contains("freebsd");
-
-            // only do this on these x86
-            File jbigiJar = new File(_context.getBaseDir(), "lib/jbigi.jar");
-            if (isX86 && goodOS && jbigiJar.exists()) {
-                String libPrefix = (isWin ? "" : "lib");
-                String libSuffix = (isWin ? ".dll" : isMac ? ".jnilib" : ".so");
-
-                File jcpuidLib = new File(_context.getBaseDir(), libPrefix + "jcpuid" + libSuffix);
-                if (jcpuidLib.canWrite() && jbigiJar.lastModified() > jcpuidLib.lastModified()) {
-                    String path = jcpuidLib.getAbsolutePath();
-                    boolean success = FileUtil.copy(path, path + ".bak", true, true);
-                    if (success) {
-                        boolean success2 = jcpuidLib.delete();
-                        if (success2) {
-                            System.out.println("New jbigi.jar detected, moved jcpuid library to " +
-                                               path + ".bak");
-                            System.out.println("Check logs for successful installation of new library");
-                        }
-                    }
-                }
-
-                File jbigiLib = new File(_context.getBaseDir(), libPrefix + "jbigi" + libSuffix);
-                if (jbigiLib.canWrite() && jbigiJar.lastModified() > jbigiLib.lastModified()) {
-                    String path = jbigiLib.getAbsolutePath();
-                    boolean success = FileUtil.copy(path, path + ".bak", true, true);
-                    if (success) {
-                        boolean success2 = jbigiLib.delete();
-                        if (success2) {
-                            System.out.println("New jbigi.jar detected, moved jbigi library to " +
-                                               path + ".bak");
-                            System.out.println("Check logs for successful installation of new library");
-                        }
-                    }
-                }
-            }
-    }
-    
-    /**
-     *  Delete all files listed in the delete file.
-     *  Format: One file name per line, comment lines start with '#'.
-     *  All file names must be relative to $I2P, absolute file names not allowed.
-     *  We probably can't remove old jars this way.
-     *  Fails silently.
-     *  Use no new I2P classes here so it may be called after zip extraction.
-     *  @since 0.8.12
-     */
-    private void deleteListedFiles() {
-        File deleteFile = new File(_context.getBaseDir(), DELETE_FILE);
-        if (!deleteFile.exists())
-            return;
-        // this is similar to FileUtil.readTextFile() but we can't use any I2P classes here
-        FileInputStream fis = null;
-        BufferedReader in = null;
-        try {
-            fis = new FileInputStream(deleteFile);
-            in = new BufferedReader(new InputStreamReader(fis, "UTF-8"));
-            String line;
-            while ( (line = in.readLine()) != null) {
-                String fl = line.trim();
-                if (fl.contains("..") || fl.startsWith("#") || fl.length() == 0)
-                    continue;
-                File df = new File(fl);
-                if (df.isAbsolute())
-                    continue;
-                df = new File(_context.getBaseDir(), fl);
-                if (df.exists() && !df.isDirectory()) {
-                    if (df.delete())
-                        System.out.println("INFO: File [" + fl + "] deleted");
-                }
-            }
-        } catch (IOException ioe) {}
-        finally {
-            if (in != null) try { in.close(); } catch(IOException ioe) {}
-            if (deleteFile.delete())
-                System.out.println("INFO: File [" + DELETE_FILE + "] deleted");
         }
     }
 
@@ -1710,7 +1556,7 @@ public class Router implements RouterClock.ClockShiftListener {
      */
     private void beginMarkingLiveliness() {
         File f = getPingFile();
-        _context.simpleScheduler().addPeriodicEvent(new MarkLiveliness(this, f), 0, LIVELINESS_DELAY - (5*1000));
+        _context.simpleTimer2().addPeriodicEvent(new MarkLiveliness(this, f), 0, LIVELINESS_DELAY - (5*1000));
     }
     
     public static final String PROP_BANDWIDTH_SHARE_PERCENTAGE = "router.sharePercentage";

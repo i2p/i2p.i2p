@@ -127,7 +127,7 @@ class UDPReceiver {
             long delay = ARTIFICIAL_DELAY_BASE + _context.random().nextInt(ARTIFICIAL_DELAY);
             if (_log.shouldLog(Log.INFO))
                 _log.info("Delay packet " + packet + " for " + delay);
-            SimpleScheduler.getInstance().addEvent(new ArtificiallyDelayedReceive(packet), delay);
+            SimpleTimer2.getInstance().addEvent(new ArtificiallyDelayedReceive(packet), delay);
             return -1;
         }
 **********/

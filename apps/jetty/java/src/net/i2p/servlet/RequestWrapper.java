@@ -21,7 +21,7 @@
  *  
  * $Revision: 1.3 $
  */
-package i2p.susi.webmail;
+package net.i2p.servlet;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -48,13 +48,15 @@ import org.mortbay.servlet.MultiPartRequest;
  *
  *  The filter would have been added in web.xml,
  *  see that file, where it's commented out.
+ *  Filter isn't supported until Tomcat 7 (Servlet 3.0)
  *
- * @author user
+ *  @author user
+ *  @since 0.9.19 moved from susimail so it may be used by routerconsole too
  */
-class RequestWrapper {
+public class RequestWrapper {
 
 	private final HttpServletRequest httpRequest;
-	private MultiPartRequest multiPartRequest;
+	private final MultiPartRequest multiPartRequest;
 	private final Hashtable<String, String> cache;
 	private Hashtable<String, Integer> cachedParameterNames;
 
@@ -65,14 +67,16 @@ class RequestWrapper {
 		cache = new Hashtable<String, String>();
 		this.httpRequest = httpRequest;
 		String contentType = httpRequest.getContentType();
+		MultiPartRequest mpr = null;
 		if( contentType != null && contentType.toLowerCase(Locale.US).startsWith( "multipart/form-data" ) ) {
 			try {
-				multiPartRequest = new MultiPartRequest( httpRequest );
+				mpr = new MultiPartRequest( httpRequest );
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
+		multiPartRequest = mpr;
 	}
 
 	/**

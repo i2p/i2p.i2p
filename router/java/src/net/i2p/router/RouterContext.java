@@ -181,6 +181,7 @@ public class RouterContext extends I2PAppContext {
         }
         _clientMessagePool = new ClientMessagePool(this);
         _jobQueue = new JobQueue(this);
+        _jobQueue.startup();
         _inNetMessagePool = new InNetMessagePool(this);
         _outNetMessagePool = new OutNetMessagePool(this);
         _messageHistory = new MessageHistory(this);

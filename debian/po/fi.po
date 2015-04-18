@@ -3,13 +3,13 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# oselotti, 2014
+# oselotti, 2014-2015
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: https://trac.i2p2.de/\n"
-"POT-Creation-Date: 2011-12-27 22:25+0000\n"
-"PO-Revision-Date: 2014-09-07 08:58+0000\n"
+"POT-Creation-Date: 2015-02-18 22:14+0000\n"
+"PO-Revision-Date: 2015-03-29 15:00+0000\n"
 "Last-Translator: oselotti\n"
 "Language-Team: Finnish (http://www.transifex.com/projects/p/I2P/language/fi/)\n"
 "MIME-Version: 1.0\n"
@@ -75,3 +75,17 @@ msgid ""
 "High bandwidth routers, as well as routers with a lot of active torrents / "
 "plugins, may need to have this value increased."
 msgstr "Suurikaistaiset reitittimet, sekä reitittimet, joilla on paljon aktiivisia torrenteja / lisäosia, saattavat tarvita tämän arvon korotettuna."
+
+#. Type: boolean
+#. Description
+#: ../i2p.templates:5001
+msgid "Run I2P daemon confined with AppArmor"
+msgstr "Suorita I2P-daemon AppArmorin kanssa"
+
+#. Type: boolean
+#. Description
+#: ../i2p.templates:5001
+msgid ""
+"With this option enabled I2P will be sandboxed with AppArmor, restricting "
+"which files and directories may be accessed by I2P."
+msgstr "Jos tämä asetus on päällä, I2P hiekkalaatikoidaan AppArmorilla, rajoittaen tiedostot ja hakemistot, jotka ovat I2P:n saatavissa."

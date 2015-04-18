@@ -1,9 +1,120 @@
+2015-04-17 zzz
+Prop from i2p.i2p.zzz.test2:
+ * Console: Set session cookies to HttpOnly
+ * i2psnark: Remove extra mime types in i2psnark web.xml;
+   added to Jetty's default by now, or in our mime.properties file
+ * i2ptunnel:
+   - Send HTTP server port 443 traffic to the server
+     transparently, to support HTTPS over the same tunnel, if so configured
+   - Add check for total header size in HTTP server
+   - Return specific error pages to client on errors
+     in HTTP header processing in the HTTP server (ticket #1507)
+ * Jetty:
+   -  Add extensive help to jetty-ssl.xml
+   -  Set session cookies to HttpOnly in all webapps
+ * JobQueue: Make number of runners configurable
+ * Router: Move update extraction code to new class in tasks/
+ * Tunnels:
+   - Add bloom filter warning if high bandwidth but low memory
+   - Add new Bloom filter size, increase bandwidth limit (ticket #1505)
+   - Add config to disable Bloom filter for testing
+
+2015-04-16 zzz
+ * I2CP: Run DistributeLocal jobs inline (ticket #1506)
+ * i2psnark: Increase max tunnels to 10
+ * i2ptunnel: Don't start tunnels in constructors (ticket #815)
+ * NetDB: Reduce max search depth
+ * Transport: Fix active peer count for NTCP
+
+2015-04-15 tuna
+ * SimpleScheduler: Deprecated, functionaltiy moved to SimpleTimer2 (ticket #1069)
+
+2015-04-13 zzz
+ * Router: Fix NPE on bad share bandwidth config (ticket #1524)
+ * Streaming: Handle reset packets without a FROM field, validate
+              signature using connection's destination
+ * Update: Don't log an error for the "dummy" updater (ticket #1525)
+
+* 2015-04-12 0.9.19 released
+
+2015-04-11 zzz
+ * Updates after review
+
+2015-04-09 kytv
+ * Updates to geoip.txt and geoipv6.dat.gz based on Maxmind GeoLite Country
+   database from 2015-04-07.
+ * Translation updates
+
+2015-04-05 zzz
+ * IRC Server: Better timeout handling reading initial lines (ticket #723)
+
+2015-04-04 zzz
+ * i2ptunnel:
+   - Better timeout handling when reading headers in HTTP server (ticket #723)
+   - Fix NoSuchElementException processing proxyList caused by 03-31 checkin
+ * Streaming:
+   - Fix read timeout on input stream (ticket #723)
+   - Fix read() returning 0 instead of -1 on read timeout (ticket #335)
+
+2015-04-03 zzz
+ * i2ptunnel: Fix stopping tunnel on bad args when starting
+ * wrapper.config: Remove old mortbay Jetty parameters
+
+2015-04-01 zzz
+ * I2CP: Allow larger client clock skew (ticket #1503)
+ * i2psnark: Fix changing data directory on Windows (ticket #1503)
+
+2015-03-31 zzz
+ * API: Fix some client-side APIs to honor defaults in Properties;
+   add javadocs to specify where we do and don't (ticket #1491)
+ * i2ptunnel: Fix multiple SSL outproxies in HTTP client
+
+2015-03-29 zzz
+ * I2CP: Prevent NPE (ticket #1503)
+
+2015-03-25 zzz
+ * i2ptunnel HTTP client: Replace all getBytes() calls
+   with a Writer or getBytes("UTF-8") (ticket #457)
+
+2015-03-24 zzz
+ * Streaming: Throw I2PSocketException when connection is reset,
+   display new error page in HTTP client (ticket #643)
+
+2015-03-23 zzz
+ * Javadoc: Add missing package.html files (ticket #1109)
+ * Summary bar: linkify news headings, remove 'show news' link
+
+2015-03-22 zzz
+ * Console: Better status feedback on manual reseed from URL
+ * NetDB: Don't become floodfill w/o ECDSA support
+ * Reseed: Better status feedback and cleanup in summary bar
+
+2015-03-21 zzz
+ * Console: Support plugin installation from local file
+
+2015-03-20 zzz
+ * Reseed:
+  - Move multipart form support from susimail to jetty-i2p.jar
+    so console can use it
+  - Finish manual reseed from local file
+
+2015-03-19 zzz
+ * Reseed (ticket #1369):
+  - Add form to manually reseed from zip or su3 URL
+  - Add form to manually reseed from local zip or su3 file
+  - Add form to create reseed zip file to share
+  - Backend support and refactoring in reseed code
+
 2015-03-18 zzz
  * NetDB:
   - Send exploratory lookups directly to the floodfill if
     we are already connected to him
   - Don't encrypt RI lookups when overloaded
   - Don't explore when overloaded
+  - Don't publish non-ff RI on exit if we are coming right back
+ * Router: Allow disabling the setting of some System properties, for embedded applications
+ * StatisticsManager: Publish dummy LS count if we just started
+ * Streaming: Reduce min RTO again
  * Tunnels: Drop instead of reject requests on high job lag
  * UPnP: Update to cyberlink 3.0
 

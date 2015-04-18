@@ -12,6 +12,7 @@ import java.util.Properties;
 
 import net.i2p.CoreVersion;
 import net.i2p.crypto.SigType;
+import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
 import net.i2p.data.Payload;
@@ -161,6 +162,11 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
         _runner.disconnected();
     }
     
+    /**
+     *  Defaults in GetDateMessage options are NOT honored.
+     *  Defaults are not serialized out-of-JVM, and the router does not recognize defaults in-JVM.
+     *  Client side must promote defaults to the primary map.
+     */
     private void handleGetDate(GetDateMessage message) {
         // sent by clients >= 0.8.7
         String clientVersion = message.getVersion();
@@ -192,6 +198,9 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
      * sending the DisconnectMessage... but right now the client will send _us_ a
      * DisconnectMessage in return, and not wait around for our DisconnectMessage.
      * So keep it simple.
+     *
+     * Defaults in SessionConfig options are, in general, NOT honored.
+     * In-JVM client side must promote defaults to the primary map.
      */
     private void handleCreateSession(CreateSessionMessage message) {
         SessionConfig in = message.getSessionConfig();
@@ -206,6 +215,15 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
             if (stype == null || !stype.isAvailable()) {
                 _log.error("Client requested unsupported signature type " + itype);
                 _runner.disconnectClient("Unsupported signature type " + itype);
+            } else if (in.tooOld()) {
+                long skew = _context.clock().now() - in.getCreationDate().getTime();
+                String msg = "Create session message client clock skew? ";
+                if (skew >= 0)
+                    msg += DataHelper.formatDuration(skew) + " in the past";
+                else
+                    msg += DataHelper.formatDuration(0 - skew) + " in the future";
+                _log.error(msg);
+                _runner.disconnectClient(msg);
             } else {
                 _log.error("Signature verification failed on a create session message");
                 _runner.disconnectClient("Invalid signature on CreateSessionMessage");
@@ -326,6 +344,14 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
      *
      */
     private void handleSendMessage(SendMessageMessage message) {
+        SessionId sid = message.getSessionId();
+        SessionConfig cfg = _runner.getConfig(sid);
+        if (cfg == null) {
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("SendMessage w/o session");
+            _runner.disconnectClient("SendMessage w/o session");
+            return;
+        }
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("handleSendMessage called");
         long beforeDistribute = _context.clock().now();
@@ -402,12 +428,14 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
             return;
         }
         SessionId id = message.getSessionId();
-        SessionConfig config = _runner.getConfig(id);
-        if (config == null) {
-            _log.error("Unknown session in CLSM");
+        SessionConfig cfg = _runner.getConfig(id);
+        if (cfg == null) {
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("CreateLeaseSet w/o session");
+            _runner.disconnectClient("CreateLeaseSet w/o session");
             return;
         }
-        Destination dest = config.getDestination();
+        Destination dest = cfg.getDestination();
         Destination ndest = message.getLeaseSet().getDestination();
         if (!dest.equals(ndest)) {
             if (_log.shouldLog(Log.ERROR))
@@ -484,29 +512,33 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
      *
      * Note that this does NOT update the few options handled in
      * ClientConnectionRunner.sessionEstablished(). Those can't be changed later.
+     *
+     * Defaults in SessionConfig options are, in general, NOT honored.
+     * In-JVM client side must promote defaults to the primary map.
      */
     private void handleReconfigureSession(ReconfigureSessionMessage message) {
         SessionId id = message.getSessionId();
-        SessionConfig config = _runner.getConfig(id);
-        if (config == null) {
-            _log.error("Unknown session");
-            sendStatusMessage(id, SessionStatusMessage.STATUS_INVALID);
-            //_runner.stopRunning(); // ok?
+        SessionConfig cfg = _runner.getConfig(id);
+        if (cfg == null) {
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("ReconfigureSession w/o session");
+            //sendStatusMessage(id, SessionStatusMessage.STATUS_INVALID);
+            _runner.disconnectClient("ReconfigureSession w/o session");
             return;
         }
         if (_log.shouldLog(Log.INFO))
-            _log.info("Updating options - old: " + _runner.getConfig(id) + " new: " + message.getSessionConfig());
-        if (!message.getSessionConfig().getDestination().equals(config.getDestination())) {
+            _log.info("Updating options - old: " + cfg + " new: " + message.getSessionConfig());
+        if (!message.getSessionConfig().getDestination().equals(cfg.getDestination())) {
             _log.error("Dest mismatch");
             sendStatusMessage(id, SessionStatusMessage.STATUS_INVALID);
             _runner.stopRunning();
             return;
         }
-        Hash dest = config.getDestination().calculateHash();
-        config.getOptions().putAll(message.getSessionConfig().getOptions());
+        Hash dest = cfg.getDestination().calculateHash();
+        cfg.getOptions().putAll(message.getSessionConfig().getOptions());
         ClientTunnelSettings settings = new ClientTunnelSettings(dest);
         Properties props = new Properties();
-        props.putAll(config.getOptions());
+        props.putAll(cfg.getOptions());
         settings.readFromProperties(props);
         _context.tunnelManager().setInboundSettings(dest,
                                                     settings.getInboundSettings());

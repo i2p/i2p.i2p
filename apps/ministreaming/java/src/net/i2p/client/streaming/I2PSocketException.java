@@ -20,7 +20,18 @@ public class I2PSocketException extends SocketException {
     private static final String BUNDLE_NAME = "net.i2p.client.streaming.messages";
 
     /**
-     *  Use canned message for this status code
+     *  Router and I2CP status codes are 0 - 511. Start ours at 512.
+     *  @since 0.9.19
+     */
+    public static final int STATUS_CONNECTION_RESET = 512;
+
+    /**
+     *  Use canned message for this status code.
+     *
+     *  Standard codes from the router are 0-255, defined in MessageStatusMessage.
+     *  Standard codes from client-side I2CP are 256-511, defined in SendMessageStatusListener.
+     *  Standard codes from streaming are 512-767, defined here.
+     *
      *  @param status >= 0 from MessageStatusMessage or SendMessageStatusListener
      */
     public I2PSocketException(int status) {
@@ -104,6 +115,9 @@ public class I2PSocketException extends SocketException {
 
             case SendMessageStatusListener.STATUS_CANCELLED:
                 return _x("Local destination shutdown");
+
+            case STATUS_CONNECTION_RESET:
+                return _x("Connection was reset");
 
             case CUSTOM:
                 return super.getMessage();

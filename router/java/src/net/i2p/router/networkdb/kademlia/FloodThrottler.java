@@ -2,8 +2,8 @@ package net.i2p.router.networkdb.kademlia;
 
 import net.i2p.data.Hash;
 import net.i2p.util.ObjectCounter;
-import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
+import net.i2p.util.SimpleTimer2;
 
 /**
  * Count how often we have recently flooded a key
@@ -18,7 +18,7 @@ class FloodThrottler {
 
     FloodThrottler() {
         this.counter = new ObjectCounter<Hash>();
-        SimpleScheduler.getInstance().addPeriodicEvent(new Cleaner(), CLEAN_TIME);
+        SimpleTimer2.getInstance().addPeriodicEvent(new Cleaner(), CLEAN_TIME);
     }
 
     /** increments before checking */

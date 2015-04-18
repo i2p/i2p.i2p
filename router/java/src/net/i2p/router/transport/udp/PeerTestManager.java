@@ -207,7 +207,7 @@ class PeerTestManager {
         test.incrementPacketsRelayed();
         sendTestToBob();
         
-        _context.simpleScheduler().addEvent(new ContinueTest(test.getNonce()), RESEND_TIMEOUT);
+        _context.simpleTimer2().addEvent(new ContinueTest(test.getNonce()), RESEND_TIMEOUT);
     }
     
     private class ContinueTest implements SimpleTimer.TimedEvent {
@@ -246,7 +246,7 @@ class PeerTestManager {
                         sendTestToCharlie();
                     }
                     // retx at 4, 10, 17, 25 elapsed time
-                    _context.simpleScheduler().addEvent(ContinueTest.this, RESEND_TIMEOUT + (sent*1000));
+                    _context.simpleTimer2().addEvent(ContinueTest.this, RESEND_TIMEOUT + (sent*1000));
                 }
             }
         }
@@ -702,7 +702,7 @@ class PeerTestManager {
             
             if (isNew) {
                 _activeTests.put(Long.valueOf(nonce), state);
-                _context.simpleScheduler().addEvent(new RemoveTest(nonce), MAX_CHARLIE_LIFETIME);
+                _context.simpleTimer2().addEvent(new RemoveTest(nonce), MAX_CHARLIE_LIFETIME);
             }
 
             UDPPacket packet = _packetBuilder.buildPeerTestToBob(bobIP, from.getPort(), aliceIP, alicePort,
@@ -805,7 +805,7 @@ class PeerTestManager {
             
             if (isNew) {
                 _activeTests.put(Long.valueOf(nonce), state);
-                _context.simpleScheduler().addEvent(new RemoveTest(nonce), MAX_CHARLIE_LIFETIME);
+                _context.simpleTimer2().addEvent(new RemoveTest(nonce), MAX_CHARLIE_LIFETIME);
             }
             
             UDPPacket packet = _packetBuilder.buildPeerTestToCharlie(aliceIP, from.getPort(), aliceIntroKey, nonce, 

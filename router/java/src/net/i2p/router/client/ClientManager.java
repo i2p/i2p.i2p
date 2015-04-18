@@ -321,8 +321,10 @@ class ClientManager {
                 // sender went away
                 return;
             }
-            // TODO can we just run this inline instead?
-            _ctx.jobQueue().addJob(new DistributeLocal(toDest, runner, sender, fromDest, payload, msgId, messageNonce));
+            // run this inline so we don't clog up the job queue
+            Job j = new DistributeLocal(toDest, runner, sender, fromDest, payload, msgId, messageNonce);
+            //_ctx.jobQueue().addJob(j);
+            j.runJob();
         } else {
             // remote.  w00t
             if (_log.shouldLog(Log.DEBUG))
@@ -371,6 +373,8 @@ class ClientManager {
 
         public void runJob() {
             _to.receiveMessage(_toDest, _fromDest, _payload);
+            // note that receiveMessage() does not indicate a failure,
+            // so a queue overflow is not recognized. we always return success.
             if (_from != null) {
                 _from.updateMessageDeliveryStatus(_fromDest, _msgId, _messageNonce, MessageStatusMessage.STATUS_SEND_SUCCESS_LOCAL);
             }

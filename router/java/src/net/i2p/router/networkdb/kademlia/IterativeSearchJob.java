@@ -69,10 +69,14 @@ class IterativeSearchJob extends FloodSearchJob {
     private final Hash _fromLocalDest;
     /** testing */
     private static Hash _alwaysQueryHash;
+    /** Max number of peers to query */
+    private final int _totalSearchLimit;
 
     private static final int MAX_NON_FF = 3;
     /** Max number of peers to query */
-    private static final int TOTAL_SEARCH_LIMIT = 7;
+    private static final int TOTAL_SEARCH_LIMIT = 6;
+    /** Max number of peers to query if we are ff */
+    private static final int TOTAL_SEARCH_LIMIT_WHEN_FF = 3;
     /** TOTAL_SEARCH_LIMIT * SINGLE_SEARCH_TIME, plus some extra */
     private static final int MAX_SEARCH_TIME = 30*1000;
     /**
@@ -121,9 +125,11 @@ class IterativeSearchJob extends FloodSearchJob {
         _expiration = _timeoutMs + ctx.clock().now();
         _rkey = ctx.routingKeyGenerator().getRoutingKey(key);
         _toTry = new TreeSet<Hash>(new XORComparator<Hash>(_rkey));
+        _totalSearchLimit = (facade.floodfillEnabled() && ctx.router().getUptime() > 30*60*1000) ?
+                            TOTAL_SEARCH_LIMIT_WHEN_FF : TOTAL_SEARCH_LIMIT;
         _unheardFrom = new HashSet<Hash>(CONCURRENT_SEARCHES);
-        _failedPeers = new HashSet<Hash>(TOTAL_SEARCH_LIMIT);
-        _sentTime = new ConcurrentHashMap<Hash, Long>(TOTAL_SEARCH_LIMIT);
+        _failedPeers = new HashSet<Hash>(_totalSearchLimit);
+        _sentTime = new ConcurrentHashMap<Hash, Long>(_totalSearchLimit);
         _fromLocalDest = fromLocalDest;
         if (fromLocalDest != null && !isLease && _log.shouldLog(Log.WARN))
             _log.warn("Search for RI " + key + " down client tunnel " + fromLocalDest, new Exception());
@@ -144,9 +150,9 @@ class IterativeSearchJob extends FloodSearchJob {
         if (ks != null) {
             // Ideally we would add the key to an exclude list, so we don't try to query a ff peer for itself,
             // but we're passing the rkey not the key, so we do it below instead in certain cases.
-            floodfillPeers = ((FloodfillPeerSelector)_facade.getPeerSelector()).selectFloodfillParticipants(_rkey, TOTAL_SEARCH_LIMIT, ks);
+            floodfillPeers = ((FloodfillPeerSelector)_facade.getPeerSelector()).selectFloodfillParticipants(_rkey, _totalSearchLimit, ks);
         } else {
-            floodfillPeers = new ArrayList<Hash>(TOTAL_SEARCH_LIMIT);
+            floodfillPeers = new ArrayList<Hash>(_totalSearchLimit);
         }
 
         // For testing or local networks... we will
@@ -227,13 +233,13 @@ class IterativeSearchJob extends FloodSearchJob {
                 if (pend >= MAX_CONCURRENT)
                     return;
                 int done = _failedPeers.size();
-                if (done >= TOTAL_SEARCH_LIMIT) {
+                if (done >= _totalSearchLimit) {
                     failed();
                     return;
                 }
                 // even if pend and todo are empty, we don't fail, as there may be more peers
                 // coming via newPeerToTry()
-                if (done + pend >= TOTAL_SEARCH_LIMIT)
+                if (done + pend >= _totalSearchLimit)
                     return;
                 if (_alwaysQueryHash != null &&
                     !_unheardFrom.contains(_alwaysQueryHash) &&

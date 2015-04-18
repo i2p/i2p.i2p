@@ -60,11 +60,7 @@ public class EditBean extends IndexBean {
     }
 
     public String getSpoofedHost(int tunnel) {
-        TunnelController tun = getController(tunnel);
-        if (tun != null && tun.getSpoofedHost() != null)
-            return DataHelper.escapeHTML(tun.getSpoofedHost());
-        else
-            return "";
+        return DataHelper.escapeHTML(_helper.getSpoofedHost(tunnel));
     }
 
     public String getPrivateKeyFile(int tunnel) {
@@ -97,19 +93,11 @@ public class EditBean extends IndexBean {
     }
     
     public boolean startAutomatically(int tunnel) {
-        TunnelController tun = getController(tunnel);
-        if (tun != null)
-            return tun.getStartOnLoad();
-        else
-            return false;
+        return _helper.shouldStartAutomatically(tunnel);
     }
     
     public boolean isSharedClient(int tunnel) {
-        TunnelController tun = getController(tunnel);
-        if (tun != null)
-            return Boolean.parseBoolean(tun.getSharedClient());
-        else
-            return false;
+        return _helper.isSharedClient(tunnel);
     }
     
     public boolean shouldDelay(int tunnel) {

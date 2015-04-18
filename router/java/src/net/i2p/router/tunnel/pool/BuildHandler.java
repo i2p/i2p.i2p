@@ -661,8 +661,10 @@ class BuildHandler implements Runnable {
             // Previous and next hop the same? Don't help somebody be evil. Drop it without a reply.
             // A-B-C-A is not preventable
             if (nextPeer.equals(from)) {
+                // i2pd does this
                 _context.statManager().addRateData("tunnel.rejectHostile", 1);
-                _log.error("Dropping build request with the same previous and next hop");
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Dropping build request with the same previous and next hop");
                 return;
             }
         }

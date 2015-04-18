@@ -256,7 +256,7 @@ public class DatabaseStoreMessage extends FastI2NPMessageImpl {
         StringBuilder buf = new StringBuilder();
         buf.append("[DatabaseStoreMessage: ");
         buf.append("\n\tExpiration: ").append(new Date(_expiration));
-        buf.append("\n\tUnique ID: ").append(_uniqueId);
+        buf.append("\n\tUnique ID: ").append(getUniqueId());
         if (_replyToken != 0) {
             buf.append("\n\tReply token: ").append(_replyToken);
             buf.append("\n\tReply tunnel: ").append(_replyTunnel);

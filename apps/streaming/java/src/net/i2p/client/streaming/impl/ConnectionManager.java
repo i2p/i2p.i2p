@@ -262,9 +262,12 @@ class ConnectionManager {
                     // Ditto for blacklist / whitelist
                     // This is a tradeoff, because it will keep retransmitting the SYN for a while,
                     // thus more inbound, but let's not spend several KB on the outbound.
-                    if (_log.shouldLog(Log.INFO))
-                        _log.info("Dropping RST to " + h);
-                    return null;
+                    if (!Boolean.valueOf(_context.getProperty("i2p.streaming.sendResetOnBlock"))) {
+                        // this is the default. Set property to send reset for debugging.
+                        if (_log.shouldLog(Log.INFO))
+                            _log.info("Dropping RST to " + h);
+                        return null;
+                    }
                 }
             }
             PacketLocal reply = new PacketLocal(_context, from);
@@ -293,7 +296,7 @@ class ConnectionManager {
             return null;
         }
         
-        _context.statManager().addRateData("stream.connectionReceived", 1, 0);
+        _context.statManager().addRateData("stream.connectionReceived", 1);
         return con;
     }
     
@@ -451,7 +454,7 @@ class ConnectionManager {
                 break;
         }
         
-        _context.statManager().addRateData("stream.connectionCreated", 1, 0);
+        _context.statManager().addRateData("stream.connectionCreated", 1);
         return con;
     }
 
@@ -539,7 +542,7 @@ class ConnectionManager {
 
 
         if (_dayThrottler != null && _dayThrottler.shouldThrottle(h)) {
-            _context.statManager().addRateData("stream.con.throttledDay", 1, 0);
+            _context.statManager().addRateData("stream.con.throttledDay", 1);
             if (_defaultOptions.getMaxConnsPerDay() <= 0)
                 return "throttled by" +
                         " total limit of " + _defaultOptions.getMaxTotalConnsPerDay() +
@@ -553,7 +556,7 @@ class ConnectionManager {
                         " per day";
         }
         if (_hourThrottler != null && _hourThrottler.shouldThrottle(h)) {
-            _context.statManager().addRateData("stream.con.throttledHour", 1, 0);
+            _context.statManager().addRateData("stream.con.throttledHour", 1);
             if (_defaultOptions.getMaxConnsPerHour() <= 0)
                 return "throttled by" +
                         " total limit of " + _defaultOptions.getMaxTotalConnsPerHour() +
@@ -567,7 +570,7 @@ class ConnectionManager {
                         " per hour";
         }
         if (_minuteThrottler != null && _minuteThrottler.shouldThrottle(h)) {
-            _context.statManager().addRateData("stream.con.throttledMinute", 1, 0);
+            _context.statManager().addRateData("stream.con.throttledMinute", 1);
             if (_defaultOptions.getMaxConnsPerMinute() <= 0)
                 return "throttled by" +
                         " total limit of " + _defaultOptions.getMaxTotalConnsPerMinute() +

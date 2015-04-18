@@ -30,7 +30,6 @@ import java.util.concurrent.atomic.AtomicLong;
 import net.i2p.I2PAppContext;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
-//import net.i2p.util.SimpleScheduler;
 //import net.i2p.util.SimpleTimer;
 
 class PeerConnectionOut implements Runnable
@@ -480,7 +479,6 @@ class PeerConnectionOut implements Runnable
     m.len = length;
     // since we have the data already loaded, queue a timeout to remove it
     // no longer prefetched
-    //SimpleScheduler.getInstance().addEvent(new RemoveTooSlow(m), SEND_TIMEOUT);
     addMessage(m);
   }
 

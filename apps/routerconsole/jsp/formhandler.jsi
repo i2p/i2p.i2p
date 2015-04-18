@@ -29,12 +29,31 @@
         // nonce1 will be null, removed in setAttibute below
     }
 
-    // Put all the params in the map, some handlers use this instead of individual setters
-    // We also call all of the setters below.
-    formhandler.setSettings(request.getParameterMap());
 
+    String contentType = request.getContentType();
+    if (contentType != null && contentType.toLowerCase(java.util.Locale.US).startsWith( "multipart/form-data")) {
+        // For multipart/form-data, we must decode things enough to get the action and nonce
+        // so FormHandler will validate.
+        // The handler must get everything else through the wrapper. No other properties will be set.
+        // All parameters other than nonce and action must be retrieved through the wrapper.
+        // Warning, parameters are NOT XSS filtered.
+        net.i2p.servlet.RequestWrapper requestWrapper = new net.i2p.servlet.RequestWrapper(request);
+        String action = requestWrapper.getParameter("action");
+        if (action != null)
+            formhandler.setAction(action);
+        String nonce = requestWrapper.getParameter("nonce");
+        if (nonce != null)
+            formhandler.setNonce(nonce);
+        formhandler.setRequestWrapper(requestWrapper);
+    } else {
+        // Put all the params in the map, some handlers use this instead of individual setters
+        // We also call all of the setters below.
+        formhandler.setSettings(request.getParameterMap());
 %>
 <jsp:setProperty name="formhandler" property="*" />
+<%
+    }
+%>
 <jsp:getProperty name="formhandler" property="allMessages" />
 <%
 

@@ -53,7 +53,7 @@ public class IndexBean {
     private String _curNonce;
     //private long _nextNonce;
 
-    private TunnelConfig _config;
+    private final TunnelConfig _config;
     private boolean _removeConfirmed;
     private int _hashCashValue;
     private int _certType;
@@ -329,11 +329,8 @@ public class IndexBean {
      *  No validation
      */
     public String getClientPort(int tunnel) {
-        TunnelController tun = getController(tunnel);
-        if (tun != null && tun.getListenPort() != null)
-            return tun.getListenPort();
-        else
-            return "";
+        int port = _helper.getClientPort(tunnel);
+        return port > 0 ? Integer.toString(port) : "";
     }
     
     /**
@@ -667,12 +664,7 @@ public class IndexBean {
 
     /** @since 0.9.9 */
     public boolean isSSLEnabled(int tunnel) {
-        TunnelController tun = getController(tunnel);
-        if (tun != null) {
-            Properties opts = tun.getClientOptionProps();
-            return Boolean.parseBoolean(opts.getProperty(I2PTunnelServer.PROP_USE_SSL));
-        }
-        return false;
+        return _helper.isSSLEnabled(tunnel);
     }
 
     /** @since 0.9.12 */
@@ -682,12 +674,7 @@ public class IndexBean {
 
     /** @since 0.9.12 */
     public boolean isRejectInproxy(int tunnel) {
-        TunnelController tun = getController(tunnel);
-        if (tun != null) {
-            Properties opts = tun.getClientOptionProps();
-            return Boolean.parseBoolean(opts.getProperty(I2PTunnelHTTPServer.OPT_REJECT_INPROXY));
-        }
-        return false;
+        return _helper.getRejectInproxy(tunnel);
     }
 
     /** @since 0.9.13 */

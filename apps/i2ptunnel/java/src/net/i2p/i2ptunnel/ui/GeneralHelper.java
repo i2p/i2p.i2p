@@ -44,8 +44,8 @@ public class GeneralHelper {
 
     private static final String OPT = TunnelController.PFX_OPTION;
 
-    private I2PAppContext _context;
-    protected TunnelControllerGroup _group;
+    private final I2PAppContext _context;
+    protected final TunnelControllerGroup _group;
 
     public GeneralHelper(TunnelControllerGroup tcg) {
         this(I2PAppContext.getGlobalContext(), tcg);
@@ -260,7 +260,7 @@ public class GeneralHelper {
 
     public String getSpoofedHost(int tunnel) {
         TunnelController tun = getController(tunnel);
-        return (tun != null && tun.getSpoofedHost() != null) ? tun.getSpoofedHost() :"";
+        return (tun != null && tun.getSpoofedHost() != null) ? tun.getSpoofedHost() : "";
     }
 
     public String getPrivateKeyFile(int tunnel) {
@@ -284,6 +284,18 @@ public class GeneralHelper {
                 return tun.getListenOnInterface();
         } else
             return "127.0.0.1";
+    }
+
+    public int getClientPort(int tunnel) {
+        TunnelController tun = getController(tunnel);
+        if (tun != null && tun.getListenPort() != null) {
+            try {
+                return Integer.parseInt(tun.getListenPort());
+            } catch (NumberFormatException e) {
+                return -1;
+            }
+        } else
+            return -1;
     }
 
     public int getTunnelStatus(int tunnel) {
@@ -463,6 +475,10 @@ public class GeneralHelper {
         return getBooleanProperty(tunnel, I2PTunnelIRCClient.PROP_DCC);
     }
 
+    public boolean isSSLEnabled(int tunnel) {
+        return getBooleanProperty(tunnel, I2PTunnelServer.PROP_USE_SSL);
+    }
+
     public String getEncryptKey(int tunnel) {
         return getProperty(tunnel, "i2cp.leaseSetKey", "");
     }
@@ -606,6 +622,10 @@ public class GeneralHelper {
 
     public int getPostTotalBanTime(int tunnel) {
         return getProperty(tunnel, I2PTunnelHTTPServer.OPT_POST_TOTAL_BAN_TIME, I2PTunnelHTTPServer.DEFAULT_POST_TOTAL_BAN_TIME) / 60;
+    }
+
+    public boolean getRejectInproxy(int tunnel) {
+        return getBooleanProperty(tunnel, I2PTunnelHTTPServer.OPT_REJECT_INPROXY);
     }
 
     public boolean getUniqueLocal(int tunnel) {

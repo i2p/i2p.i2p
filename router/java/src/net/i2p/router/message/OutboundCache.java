@@ -101,7 +101,7 @@ public class OutboundCache {
     
     public OutboundCache(RouterContext ctx) {
         _context = ctx;
-        _context.simpleScheduler().addPeriodicEvent(new OCMOSJCacheCleaner(), CLEAN_INTERVAL, CLEAN_INTERVAL);
+        _context.simpleTimer2().addPeriodicEvent(new OCMOSJCacheCleaner(), CLEAN_INTERVAL, CLEAN_INTERVAL);
     }
 
     /**

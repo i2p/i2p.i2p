@@ -60,7 +60,7 @@ class IntelInfoImpl extends CPUIDCPUInfo implements IntelCPUInfo
     {
         // http://en.wikipedia.org/wiki/Cpuid
         // http://web.archive.org/web/20110307080258/http://www.intel.com/Assets/PDF/appnote/241618.pdf
-        // http://www.intel.com/content/dam/www/public/us/en/documents/manuals/64-ia-32-architectures-software-developer-vol-2a-manual.pdf
+        // http://www.intel.com/content/dam/www/public/us/en/documents/manuals/64-ia-32-architectures-software-developer-manual-325462.pdf
         String modelString = null;
         int family = CPUID.getCPUFamily();
         int model = CPUID.getCPUModel();
@@ -329,21 +329,31 @@ class IntelInfoImpl extends CPUIDCPUInfo implements IntelCPUInfo
                         break;
                     // Ivy Bridge 22 nm
                     case 0x3a:
-                        modelString = "Ivy Bridge";
+                        modelString = "Ivy Bridge (22nm)";
                         break;
                     // Haswell 22 nm
                     case 0x3c:
-                        modelString = "Haswell";
+                        modelString = "Haswell (22nm)";
                         break;
                     // Broadwell 14 nm
                     case 0x3d:
-                        modelString = "Broadwell";
+                        modelString = "Broadwell (14nm)";
                         break;
-
+                    // Ivy Bridge 22 nm
+                    case 0x3e:
+                        modelString = "Xeon Ivy Bridge (22nm)";
+                        break;
+                        
+                        
                 // following are for extended model == 4
                 // most flags are set above
                 // isCoreiCompatible = true is the default
-
+                
+                    // 22 nm
+                    case 0x45:
+                        modelString = "Mobile Celeron";
+                        break;
+                
                     // Atom Silvermont / Bay Trail / Avoton 22 nm
                     // Supports SSE 4.2
                     case 0x4d:
@@ -351,8 +361,7 @@ class IntelInfoImpl extends CPUIDCPUInfo implements IntelCPUInfo
                         modelString = "Bay Trail / Avoton";
                         break;
 
-                // others
-
+                    // others
                     default:
                         modelString = "Intel model " + model;
                         break;
@@ -361,12 +370,10 @@ class IntelInfoImpl extends CPUIDCPUInfo implements IntelCPUInfo
             break;
 
             case 7: {
-                // Flags TODO
                 modelString = "Intel Itanium model " + model;
             }
             break;
 
-            // 15 + 0
             case 15: {
                 isPentiumCompatible = true;
                 isPentiumMMXCompatible = true;
@@ -399,9 +406,7 @@ class IntelInfoImpl extends CPUIDCPUInfo implements IntelCPUInfo
             }
             break;
 
-            // 15 + 1
             case 16: {
-                // Flags TODO
                 modelString = "Intel Itanium II model " + model;
             }
         }

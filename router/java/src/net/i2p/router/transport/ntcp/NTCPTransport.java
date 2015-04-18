@@ -492,22 +492,38 @@ public class NTCPTransport extends TransportImpl {
         return removed;
     }
 
+    public int countPeers() {
+            return _conByIdent.size();
+    }
+
     /**
-     * How many peers can we talk to right now?
-     *
+     * How many peers have we talked to in the last 5 minutes?
+     * As of 0.9.20, actually returns active peer count, not total.
      */
-    @Override
-    public int countActivePeers() { return _conByIdent.size(); }
+    public int countActivePeers() {
+        int active = 0;
+        for (NTCPConnection con : _conByIdent.values()) {
+            // con initializes times at construction,
+            // so check message count also
+            if ((con.getMessagesSent() > 0 && con.getTimeSinceSend() <= 5*60*1000) ||
+                (con.getMessagesReceived() > 0 && con.getTimeSinceReceive() <= 5*60*1000)) {
+                active++;
+            }
+        }
+        return active;
+    }
 
     /**
      * How many peers are we actively sending messages to (this minute)
      */
-    @Override
     public int countActiveSendPeers() {
         int active = 0;
         for (NTCPConnection con : _conByIdent.values()) {
-                if ( (con.getTimeSinceSend() <= 60*1000) || (con.getTimeSinceReceive() <= 60*1000) )
-                    active++;
+            // con initializes times at construction,
+            // so check message count also
+            if (con.getMessagesSent() > 0 && con.getTimeSinceSend() <= 60*1000) {
+                active++;
+            }
         }
         return active;
     }

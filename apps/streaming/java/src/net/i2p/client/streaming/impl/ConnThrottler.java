@@ -5,8 +5,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import net.i2p.data.Hash;
 import net.i2p.util.ObjectCounter;
 import net.i2p.util.RandomSource;
-import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
+import net.i2p.util.SimpleTimer2;
 
 /**
  * Count how often we have received an incoming connection
@@ -33,7 +33,7 @@ class ConnThrottler {
         // shorten the initial period by a random amount
         // to prevent correlation across destinations
         // and identification of router startup time
-        SimpleScheduler.getInstance().addPeriodicEvent(new Cleaner(),
+        SimpleTimer2.getInstance().addPeriodicEvent(new Cleaner(),
                                                        (period / 2) + RandomSource.getInstance().nextLong(period / 2),
                                                        period);
     }

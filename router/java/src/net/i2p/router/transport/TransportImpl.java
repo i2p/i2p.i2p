@@ -102,25 +102,26 @@ public abstract class TransportImpl implements Transport {
         _unreachableEntries = new HashMap<Hash, Long>(32);
         _wasUnreachableEntries = new HashMap<Hash, Long>(32);
         _localAddresses = new ConcurrentHashSet<InetAddress>(4);
-        _context.simpleScheduler().addPeriodicEvent(new CleanupUnreachable(), 2 * UNREACHABLE_PERIOD, UNREACHABLE_PERIOD / 2);
+        _context.simpleTimer2().addPeriodicEvent(new CleanupUnreachable(), 2 * UNREACHABLE_PERIOD, UNREACHABLE_PERIOD / 2);
     }
 
     /**
      * How many peers are we connected to?
-     * For NTCP, this is the same as active,
-     * but SSU actually looks at idle time for countActivePeers()
      */
-    public int countPeers() { return countActivePeers(); }
+    public abstract int countPeers();
 
     /**
-     * How many peers active in the last few minutes?
+     *  How many peers are we currently connected to, that we have
+     *  sent a message to or received a message from in the last five minutes.
      */
-    public int countActivePeers() { return 0; }
+    public abstract int countActivePeers();
 
     /**
-     * How many peers are we actively sending messages to (this minute)
+     *  How many peers are we currently connected to, that we have
+     *  sent a message to in the last minute.
+     *  Unused for anything, to be removed.
      */
-    public int countActiveSendPeers() { return 0; }
+    public abstract int countActiveSendPeers();
 
     /** ...and 50/100/150/200/250 for BW Tiers K/L/M/N/O */
     private static final int MAX_CONNECTION_FACTOR = 50;
@@ -158,10 +159,13 @@ public abstract class TransportImpl implements Transport {
                     def *= 4;
                     break;
                 case Router.CAPABILITY_BW256:
-                // TODO
-                case Router.CAPABILITY_BW512:
-                case Router.CAPABILITY_BW_UNLIMITED:
                     def *= 7;
+                    break;
+                case Router.CAPABILITY_BW512:
+                    def *= 9;
+                    break;
+                case Router.CAPABILITY_BW_UNLIMITED:
+                    def *= 12;
                     break;
             }
         }

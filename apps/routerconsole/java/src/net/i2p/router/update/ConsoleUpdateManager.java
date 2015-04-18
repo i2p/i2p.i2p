@@ -188,11 +188,12 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
         PluginUpdateHandler puh = new PluginUpdateHandler(_context, this);
         register((Checker)puh, PLUGIN, HTTP, 0);
         register((Updater)puh, PLUGIN, HTTP, 0);
+        register((Updater)puh, PLUGIN, FILE, 0);
         // Don't do this until we can prevent it from retrying the same thing again...
         // handled inside P.U.H. for now
         //register((Updater)puh, PLUGIN, FILE, 0);
         new NewsTimerTask(_context, this);
-        _context.simpleScheduler().addPeriodicEvent(new TaskCleaner(), TASK_CLEANER_TIME);
+        _context.simpleTimer2().addPeriodicEvent(new TaskCleaner(), TASK_CLEANER_TIME);
         changeState(RUNNING);
         if (_cmgr != null)
             _cmgr.register(this);
@@ -523,7 +524,8 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
         UpdateItem item = new UpdateItem(PLUGIN, name);
         VersionAvailable va = _available.get(item);
         if (va == null) {
-            va = new VersionAvailable("", "", HTTP, uris);
+            UpdateMethod method = "file".equals(uri.getScheme()) ? FILE : HTTP;
+            va = new VersionAvailable("", "", method, uris);
             _available.putIfAbsent(item, va);
         }
         if (_log.shouldLog(Log.WARN))
@@ -910,10 +912,13 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
                 break;
 
             case PLUGIN:
-                if (!success)
-                    msg = "<b>" + _("Update check failed for plugin {0}", task.getID()) + "</b>";
-                else if (!newer)
+                if (!success) {
+                    msg = _("Update check failed for plugin {0}", task.getID());
+                    _log.logAlways(Log.WARN, msg);
+                    msg = "<b>" + msg + "</b>";
+                } else if (!newer) {
                     msg = "<b>" + _("No new version is available for plugin {0}", task.getID()) + "</b>";
+                }
                 /// else success.... message for that?
 
                 break;
@@ -971,8 +976,9 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
      *  @param t may be null
      */
     public void notifyTaskFailed(UpdateTask task, String reason, Throwable t) {
-        if (_log.shouldLog(Log.WARN))
-            _log.warn("Failed " + task + " for " + task.getType() + ": " + reason, t);
+        int level = task.getType() == TYPE_DUMMY ? Log.WARN : Log.ERROR;
+        if (_log.shouldLog(level))
+            _log.log(level, "Failed " + task + " for " + task.getType() + ": " + reason, t);
         List<RegisteredUpdater> toTry = _downloaders.get(task);
         if (toTry != null) {
             UpdateItem ui = new UpdateItem(task.getType(), task.getID());
@@ -988,8 +994,27 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
         _downloaders.remove(task);
         _activeCheckers.remove(task);
         // any other types that shouldn't display?
-        if (task.getURI() != null && task.getType() != TYPE_DUMMY)
-            finishStatus("<b>" + _("Transfer failed from {0}", linkify(task.getURI().toString())) + "</b>");
+        if (task.getURI() != null && task.getType() != TYPE_DUMMY) {
+            StringBuilder buf = new StringBuilder(256);
+            buf.append("<b>");
+            String uri = task.getURI().toString();
+            if (uri.startsWith("file:") || task.getMethod() == FILE) {
+                uri = DataHelper.stripHTML(task.getURI().getPath());
+                buf.append(_("Install failed from {0}", uri));
+            } else {
+                buf.append(_("Transfer failed from {0}"));
+            }
+            if (reason != null && reason.length() > 0) {
+                buf.append("<br>");
+                buf.append(reason);
+            }
+            if (t != null && t.getMessage() != null && t.getMessage().length() > 0) {
+                buf.append("<br>");
+                buf.append(DataHelper.stripHTML(t.getMessage()));
+            }
+            buf.append("</b>");
+            finishStatus(buf.toString());
+        }
     }
 
     /**
@@ -1376,7 +1401,7 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
 
     private void finishStatus(String msg) {
         updateStatus(msg);
-        _context.simpleScheduler().addEvent(new StatusCleaner(msg), STATUS_CLEAN_TIME);
+        _context.simpleTimer2().addEvent(new StatusCleaner(msg), STATUS_CLEAN_TIME);
     }
 
     private class StatusCleaner implements SimpleTimer.TimedEvent {

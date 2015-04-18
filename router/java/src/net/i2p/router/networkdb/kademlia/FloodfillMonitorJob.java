@@ -2,6 +2,7 @@ package net.i2p.router.networkdb.kademlia;
 
 import java.util.List;
 
+import net.i2p.crypto.SigType;
 import net.i2p.data.Hash;
 import net.i2p.data.router.RouterAddress;
 import net.i2p.data.router.RouterInfo;
@@ -34,7 +35,7 @@ class FloodfillMonitorJob extends JobImpl {
 
     private static final int MIN_FF = 5000;
     private static final int MAX_FF = 999999;
-    private static final String PROP_FLOODFILL_PARTICIPANT = "router.floodfillParticipant";
+    static final String PROP_FLOODFILL_PARTICIPANT = "router.floodfillParticipant";
     
     public FloodfillMonitorJob(RouterContext context, FloodfillNetworkDatabaseFacade facade) {
         super(context);
@@ -67,8 +68,7 @@ class FloodfillMonitorJob extends JobImpl {
     }
 
     private boolean shouldBeFloodfill() {
-        // Only if not shutting down...
-        if (getContext().router().gracefulShutdownInProgress())
+        if (!SigType.ECDSA_SHA256_P256.isAvailable())
             return false;
 
         // Hidden trumps netDb.floodfillParticipant=true
@@ -82,6 +82,10 @@ class FloodfillMonitorJob extends JobImpl {
             return false;
 
         // auto from here down
+
+        // Only if not shutting down...
+        if (getContext().router().gracefulShutdownInProgress())
+            return false;
 
         // ARM ElG decrypt is too slow
         if (SystemVersion.isARM())
@@ -105,8 +109,9 @@ class FloodfillMonitorJob extends JobImpl {
         if (ri == null)
             return false;
         char bw = ri.getBandwidthTier().charAt(0);
-        // Only if class N or O...
-        if (bw < Router.CAPABILITY_BW128 || bw > Router.CAPABILITY_BW256)
+        // Only if class N, O, P, X
+        if (bw != Router.CAPABILITY_BW128 && bw != Router.CAPABILITY_BW256 &&
+            bw != Router.CAPABILITY_BW512 && bw != Router.CAPABILITY_BW_UNLIMITED)
             return false;
 
         // This list will not include ourselves...

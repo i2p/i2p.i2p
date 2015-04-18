@@ -32,8 +32,19 @@ public abstract class CommSystemFacade implements Service {
     /** Create the list of RouterAddress structures based on the router's config */
     public List<RouterAddress> createAddresses() { return Collections.emptyList(); }
     
+    /**
+     *  How many peers are we currently connected to, that we have
+     *  sent a message to or received a message from in the last five minutes.
+     */
     public int countActivePeers() { return 0; }
+
+    /**
+     *  How many peers are we currently connected to, that we have
+     *  sent a message to in the last minute.
+     *  Unused for anything, to be removed.
+     */
     public int countActiveSendPeers() { return 0; }
+
     public boolean haveInboundCapacity(int pct) { return true; }
     public boolean haveOutboundCapacity(int pct) { return true; }
     public boolean haveHighOutboundCapacity() { return true; }

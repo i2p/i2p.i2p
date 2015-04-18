@@ -273,9 +273,12 @@ public class TunnelPoolSettings {
     public Properties getUnknownOptions() { return _unknownOptions; }
 
     /**
+     *  Defaults in props are NOT honored.
+     *  In-JVM client side must promote defaults to the primary map.
+     *
      *  @param prefix non-null
      */
-    public void readFromProperties(String prefix, Map<Object, Object> props) {
+    public void readFromProperties(String prefix, Properties props) {
         for (Map.Entry<Object, Object> e : props.entrySet()) {
             String name = (String) e.getKey();
             String value = (String) e.getValue();

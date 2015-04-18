@@ -69,7 +69,7 @@ public class ConfigUpdateHandler extends FormHandler {
     private static final String PACK200_URLS =
     "http://echelon.i2p/i2p/i2pupdate.su2\r\n" +
     "http://inr.i2p/i2p/i2pupdate.su2\r\n" +
-    "http://meeh.i2p/i2pupdate/i2pupdate.su2\r\n" +
+    //"http://meeh.i2p/i2pupdate/i2pupdate.su2\r\n" +
     "http://stats.i2p/i2p/i2pupdate.su2\r\n" +
     // "http://www.i2p2.i2p/_static/i2pupdate.su2\r\n" +
     "http://update.dg.i2p/files/i2pupdate.su2\r\n" +
@@ -79,7 +79,7 @@ public class ConfigUpdateHandler extends FormHandler {
     private static final String NO_PACK200_URLS =
     "http://echelon.i2p/i2p/i2pupdate.sud\r\n" +
     "http://inr.i2p/i2p/i2pupdate.sud\r\n" +
-    "http://meeh.i2p/i2pupdate/i2pupdate.sud\r\n" +
+    //"http://meeh.i2p/i2pupdate/i2pupdate.sud\r\n" +
     "http://stats.i2p/i2p/i2pupdate.sud\r\n" +
     // "http://www.i2p2.i2p/_static/i2pupdate.sud\r\n" +
     "http://update.dg.i2p/files/i2pupdate.sud\r\n" +
@@ -113,7 +113,7 @@ public class ConfigUpdateHandler extends FormHandler {
     private static final String DEFAULT_SU3_UPDATE_URLS =
     "http://echelon.i2p/i2p/i2pupdate.su3\r\n" +
     "http://inr.i2p/i2p/i2pupdate.su3\r\n" +
-    "http://meeh.i2p/i2pupdate/i2pupdate.su3\r\n" +
+    //"http://meeh.i2p/i2pupdate/i2pupdate.su3\r\n" +
     "http://stats.i2p/i2p/i2pupdate.su3\r\n" +
     // "http://www.i2p2.i2p/_static/i2pupdate.su3\r\n" +
     "http://update.dg.i2p/files/i2pupdate.su3\r\n" +

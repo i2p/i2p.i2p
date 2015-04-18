@@ -123,7 +123,7 @@ class ConnectionPacketHandler {
         }
         con.getOptions().setChoke(0);
 
-        _context.statManager().addRateData("stream.con.receiveMessageSize", packet.getPayloadSize(), 0);
+        _context.statManager().addRateData("stream.con.receiveMessageSize", packet.getPayloadSize());
         
         boolean allowAck = true;
         final boolean isSYN = packet.isFlagSet(Packet.FLAG_SYNCHRONIZE);
@@ -190,7 +190,7 @@ class ConnectionPacketHandler {
             }
         } else {
             if ( (seqNum > 0) || (packet.getPayloadSize() > 0) || isSYN) {
-                _context.statManager().addRateData("stream.con.receiveDuplicateSize", packet.getPayloadSize(), 0);
+                _context.statManager().addRateData("stream.con.receiveDuplicateSize", packet.getPayloadSize());
                 con.incrementDupMessagesReceived(1);
         
                 // take note of congestion
@@ -199,8 +199,8 @@ class ConnectionPacketHandler {
                 final int ackDelay = con.getOptions().getSendAckDelay();
                 final long lastSendTime = con.getLastSendTime();
                 
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn(String.format("%s congestion.. dup packet %s ackDelay %d lastSend %s ago",
+                if (_log.shouldLog(Log.INFO))
+                    _log.info(String.format("%s congestion.. dup packet %s ackDelay %d lastSend %s ago",
                                     con, packet, ackDelay, DataHelper.formatDuration(now - lastSendTime)));
                 
                 final long nextSendTime = lastSendTime + ackDelay;
@@ -213,7 +213,7 @@ class ConnectionPacketHandler {
                     final long delay = nextSendTime - now;
                     if (_log.shouldLog(Log.DEBUG)) 
                         _log.debug("scheduling ack in "+delay);
-                    _context.simpleScheduler().addEvent(new AckDup(con), delay);
+                    _context.simpleTimer2().addEvent(new AckDup(con), delay);
                 }
 
             } else {
@@ -344,9 +344,9 @@ class ConnectionPacketHandler {
                 }
                 if (firstAck) {
                     if (con.isInbound())
-                        _context.statManager().addRateData("stream.con.initialRTT.in", highestRTT, 0);
+                        _context.statManager().addRateData("stream.con.initialRTT.in", highestRTT);
                     else
-                        _context.statManager().addRateData("stream.con.initialRTT.out", highestRTT, 0);
+                        _context.statManager().addRateData("stream.con.initialRTT.out", highestRTT);
                 }
             }
             _context.statManager().addRateData("stream.con.packetsAckedPerMessageReceived", acked.size(), highestRTT);
@@ -513,10 +513,17 @@ class ConnectionPacketHandler {
 
     /**
      * Make sure this RST packet is valid, and if it is, act on it.
+     *
+     * Prior to 0.9.20, the reset packet must contain a FROM field,
+     * and we used that for verification.
+     * As of 0.9.20, we correctly use the connection's remote peer.
      */
     private void verifyReset(Packet packet, Connection con) {
         if (con.getReceiveStreamId() == packet.getSendStreamId()) {
-            boolean ok = packet.verifySignature(_context, packet.getOptionalFrom(), null);
+            Destination from = con.getRemotePeer();
+            if (from == null)
+                from = packet.getOptionalFrom();
+            boolean ok = packet.verifySignature(_context, from, null);
             if (!ok) {
                 if (_log.shouldLog(Log.ERROR))
                     _log.error("Received unsigned / forged RST on " + con);

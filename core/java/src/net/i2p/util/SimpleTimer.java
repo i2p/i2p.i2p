@@ -14,7 +14,7 @@ import net.i2p.I2PAppContext;
  * they b0rk the timer).
  *
  * WARNING - Deprecated.
- * This is an inefficient mess. Use SimpleScheduler or SimpleTimer2 if possible.
+ * This is an inefficient mess. Use  SimpleTimer2 if possible.
  */
 public class SimpleTimer {
 

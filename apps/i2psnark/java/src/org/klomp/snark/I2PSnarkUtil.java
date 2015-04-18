@@ -105,8 +105,8 @@ public class I2PSnarkUtil {
         // This is used for both announce replies and .torrent file downloads,
         // so it must be available even if not connected to I2CP.
         // so much for multiple instances
-        _tmpDir = new SecureDirectory(ctx.getTempDir(), baseName);
-        FileUtil.rmdir(_tmpDir, false);
+        _tmpDir = new SecureDirectory(ctx.getTempDir(), baseName + '-' + ctx.random().nextInt());
+        //FileUtil.rmdir(_tmpDir, false);
         _tmpDir.mkdirs();
     }
     
@@ -328,7 +328,7 @@ public class I2PSnarkUtil {
             return rv;
         } catch (I2PException ie) {
             _banlist.add(dest);
-            _context.simpleScheduler().addEvent(new Unbanlist(dest), 10*60*1000);
+            _context.simpleTimer2().addEvent(new Unbanlist(dest), 10*60*1000);
             IOException ioe = new IOException("Unable to reach the peer " + peer);
             ioe.initCause(ie);
             throw ioe;

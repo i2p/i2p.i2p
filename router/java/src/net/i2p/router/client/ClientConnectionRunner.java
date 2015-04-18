@@ -696,6 +696,8 @@ class ClientConnectionRunner {
     /**
      * Asynchronously deliver the message to the current runner
      *
+     * Note that no failure indication is available.
+     * Fails silently on e.g. queue overflow to client, client dead, etc.
      * @param fromDest generally null when from remote, non-null if from local
      */ 
     void receiveMessage(Destination toDest, Destination fromDest, Payload payload) {
@@ -786,7 +788,7 @@ class ClientConnectionRunner {
                     // theirs is newer
                 } else {
                     // ours is newer, so wait a few secs and retry
-                    _context.simpleScheduler().addEvent(new Rerequest(set, expirationTime, onCreateJob, onFailedJob), 3*1000);
+                    _context.simpleTimer2().addEvent(new Rerequest(set, expirationTime, onCreateJob, onFailedJob), 3*1000);
                 }
                 // fire onCreated?
                 return; // already requesting

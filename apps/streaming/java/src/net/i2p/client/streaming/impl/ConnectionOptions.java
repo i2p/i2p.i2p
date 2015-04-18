@@ -264,6 +264,9 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
     /**
      *  Sets max buffer size, connect timeout, read timeout, and write timeout
      *  from properties. Does not set local port or remote port.
+     *
+     *  As of 0.9.19, defaults in opts are honored.
+     *
      *  @param opts may be null
      */
     public ConnectionOptions(Properties opts) {
@@ -388,66 +391,68 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
     
     /**
      *  Note: NOT part of the interface
+     *
+     *  As of 0.9.19, defaults in opts are honored.
      */
     @Override
     public void setProperties(Properties opts) {
         super.setProperties(opts);
         if (opts == null) return;
-        if (opts.containsKey(PROP_MAX_WINDOW_SIZE))
+        if (opts.getProperty(PROP_MAX_WINDOW_SIZE) != null)
             setMaxWindowSize(getInt(opts, PROP_MAX_WINDOW_SIZE, Connection.MAX_WINDOW_SIZE));
-        if (opts.containsKey(PROP_CONNECT_DELAY))
+        if (opts.getProperty(PROP_CONNECT_DELAY) != null)
             setConnectDelay(getInt(opts, PROP_CONNECT_DELAY, -1));
-        if (opts.containsKey(PROP_PROFILE))
+        if (opts.getProperty(PROP_PROFILE) != null)
             setProfile(getInt(opts, PROP_PROFILE, PROFILE_BULK));
-        if (opts.containsKey(PROP_MAX_MESSAGE_SIZE))
+        if (opts.getProperty(PROP_MAX_MESSAGE_SIZE) != null)
             setMaxMessageSize(getInt(opts, PROP_MAX_MESSAGE_SIZE, Packet.MAX_PAYLOAD_SIZE));
-        if (opts.containsKey(PROP_INITIAL_RECEIVE_WINDOW))
+        if (opts.getProperty(PROP_INITIAL_RECEIVE_WINDOW) != null)
             setReceiveWindow(getInt(opts, PROP_INITIAL_RECEIVE_WINDOW, 1));
-        if (opts.containsKey(PROP_INITIAL_RESEND_DELAY))
+        if (opts.getProperty(PROP_INITIAL_RESEND_DELAY) != null)
             setResendDelay(getInt(opts, PROP_INITIAL_RESEND_DELAY, 1000));
-        if (opts.containsKey(PROP_INITIAL_ACK_DELAY))
+        if (opts.getProperty(PROP_INITIAL_ACK_DELAY) != null)
             setSendAckDelay(getInt(opts, PROP_INITIAL_ACK_DELAY, DEFAULT_INITIAL_ACK_DELAY));
-        if (opts.containsKey(PROP_INITIAL_WINDOW_SIZE))
+        if (opts.getProperty(PROP_INITIAL_WINDOW_SIZE) != null)
             setWindowSize(getInt(opts, PROP_INITIAL_WINDOW_SIZE, INITIAL_WINDOW_SIZE));
-        if (opts.containsKey(PROP_MAX_RESENDS))
+        if (opts.getProperty(PROP_MAX_RESENDS) != null)
             setMaxResends(getInt(opts, PROP_MAX_RESENDS, DEFAULT_MAX_SENDS));
         // handled in super()
-        //if (opts.containsKey(PROP_WRITE_TIMEOUT))
+        //if (opts.getProperty(PROP_WRITE_TIMEOUT))
         //    setWriteTimeout(getInt(opts, PROP_WRITE_TIMEOUT, -1));
-        if (opts.containsKey(PROP_INACTIVITY_TIMEOUT))
+        if (opts.getProperty(PROP_INACTIVITY_TIMEOUT) != null)
             setInactivityTimeout(getInt(opts, PROP_INACTIVITY_TIMEOUT, DEFAULT_INACTIVITY_TIMEOUT));
-        if (opts.containsKey(PROP_INACTIVITY_ACTION))
+        if (opts.getProperty(PROP_INACTIVITY_ACTION) != null)
             setInactivityAction(getInt(opts, PROP_INACTIVITY_ACTION, DEFAULT_INACTIVITY_ACTION));
         setInboundBufferSize(getMaxMessageSize() * (Connection.MAX_WINDOW_SIZE + 2));
-        if (opts.contains(PROP_CONGESTION_AVOIDANCE_GROWTH_RATE_FACTOR))
+        if (opts.getProperty(PROP_CONGESTION_AVOIDANCE_GROWTH_RATE_FACTOR) != null)
             setCongestionAvoidanceGrowthRateFactor(getInt(opts, PROP_CONGESTION_AVOIDANCE_GROWTH_RATE_FACTOR,
                                                           DEFAULT_CONGESTION_AVOIDANCE_GROWTH_RATE_FACTOR));
-        if (opts.contains(PROP_SLOW_START_GROWTH_RATE_FACTOR))
+        if (opts.getProperty(PROP_SLOW_START_GROWTH_RATE_FACTOR) != null)
             setSlowStartGrowthRateFactor(getInt(opts, PROP_SLOW_START_GROWTH_RATE_FACTOR,
                                                 DEFAULT_SLOW_START_GROWTH_RATE_FACTOR));
-        if (opts.containsKey(PROP_CONNECT_TIMEOUT))
+        if (opts.getProperty(PROP_CONNECT_TIMEOUT) != null)
             // overrides default in super()
             setConnectTimeout(getInt(opts, PROP_CONNECT_TIMEOUT, Connection.DEFAULT_CONNECT_TIMEOUT));
-        if (opts.containsKey(PROP_ANSWER_PINGS))
+        if (opts.getProperty(PROP_ANSWER_PINGS) != null)
             setAnswerPings(getBool(opts, PROP_ANSWER_PINGS, DEFAULT_ANSWER_PINGS));
-        if (opts.containsKey(PROP_ENFORCE_PROTO))
+        if (opts.getProperty(PROP_ENFORCE_PROTO) != null)
             setEnforceProtocol(getBool(opts, PROP_ENFORCE_PROTO, DEFAULT_ENFORCE_PROTO));
-        if (opts.containsKey(PROP_DISABLE_REJ_LOG))
+        if (opts.getProperty(PROP_DISABLE_REJ_LOG) != null)
             setDisableRejectLogging(getBool(opts, PROP_DISABLE_REJ_LOG, false));
         initLists(opts);
-        if (opts.containsKey(PROP_MAX_CONNS_MIN))
+        if (opts.getProperty(PROP_MAX_CONNS_MIN) != null)
             _maxConnsPerMinute = getInt(opts, PROP_MAX_CONNS_MIN, 0);
-        if (opts.containsKey(PROP_MAX_CONNS_HOUR))
+        if (opts.getProperty(PROP_MAX_CONNS_HOUR) != null)
             _maxConnsPerHour = getInt(opts, PROP_MAX_CONNS_HOUR, 0);
-        if (opts.containsKey(PROP_MAX_CONNS_DAY))
+        if (opts.getProperty(PROP_MAX_CONNS_DAY) != null)
             _maxConnsPerDay = getInt(opts, PROP_MAX_CONNS_DAY, 0);
-        if (opts.containsKey(PROP_MAX_TOTAL_CONNS_MIN))
+        if (opts.getProperty(PROP_MAX_TOTAL_CONNS_MIN) != null)
             _maxTotalConnsPerMinute = getInt(opts, PROP_MAX_TOTAL_CONNS_MIN, 0);
-        if (opts.containsKey(PROP_MAX_TOTAL_CONNS_HOUR))
+        if (opts.getProperty(PROP_MAX_TOTAL_CONNS_HOUR) != null)
             _maxTotalConnsPerHour = getInt(opts, PROP_MAX_TOTAL_CONNS_HOUR, 0);
-        if (opts.containsKey(PROP_MAX_TOTAL_CONNS_DAY))
+        if (opts.getProperty(PROP_MAX_TOTAL_CONNS_DAY) != null)
             _maxTotalConnsPerDay = getInt(opts, PROP_MAX_TOTAL_CONNS_DAY, 0);
-        if (opts.containsKey(PROP_MAX_STREAMS))
+        if (opts.getProperty(PROP_MAX_STREAMS) != null)
             _maxConns = getInt(opts, PROP_MAX_STREAMS, 0);
         
         _rto = getInt(opts, PROP_INITIAL_RTO, INITIAL_RTO);

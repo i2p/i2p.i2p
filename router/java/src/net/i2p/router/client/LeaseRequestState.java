@@ -29,7 +29,7 @@ class LeaseRequestState {
     private boolean _successful;
 
     /**
-     *  @param expiration absolute time
+     *  @param expiration absolute time, when the request expires (not when the LS expires)
      */
     public LeaseRequestState(Job onGranted, Job onFailed, long expiration, LeaseSet requested) {
         _onGranted = onGranted;

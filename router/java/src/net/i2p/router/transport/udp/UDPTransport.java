@@ -270,7 +270,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         //_context.statManager().createRateStat("udp.packetAuthTime", "How long it takes to encrypt and MAC a packet for sending", "udp", RATES);
         //_context.statManager().createRateStat("udp.packetAuthTimeSlow", "How long it takes to encrypt and MAC a packet for sending (when its slow)", "udp", RATES);
 
-        _context.simpleScheduler().addPeriodicEvent(new PingIntroducers(), MIN_EXPIRE_TIMEOUT * 3 / 4);
+        _context.simpleTimer2().addPeriodicEvent(new PingIntroducers(), MIN_EXPIRE_TIMEOUT * 3 / 4);
     }
     
     /**
@@ -1235,7 +1235,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                     RemoteHostId remote = peer.getRemoteHostId();
                     _dropList.add(remote);
                     _context.statManager().addRateData("udp.dropPeerDroplist", 1);
-                    _context.simpleScheduler().addEvent(new RemoveDropList(remote), DROPLIST_PERIOD);
+                    _context.simpleTimer2().addEvent(new RemoveDropList(remote), DROPLIST_PERIOD);
                 }
                 markUnreachable(peerHash);
                 _context.banlist().banlistRouter(peerHash, "Part of the wrong network, version = " + ((RouterInfo) entry).getVersion());
@@ -2239,28 +2239,29 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             super.afterSend(m, true);
     }
 
-    @Override
     public int countPeers() {
             return _peersByIdent.size();
     }
 
-    @Override
     public int countActivePeers() {
-        long now = _context.clock().now();
+        long old = _context.clock().now() - 5*60*1000;
         int active = 0;
         for (PeerState peer : _peersByIdent.values()) {
-                if (now-peer.getLastReceiveTime() <= 5*60*1000)
-                    active++;
+            // PeerState initializes times at construction,
+            // so check message count also
+            if ((peer.getMessagesReceived() > 0 && peer.getLastReceiveTime() >= old) ||
+                (peer.getMessagesSent() > 0 && peer.getLastSendTime() >= old)) {
+                active++;
             }
+        }
         return active;
     }
     
-    @Override
     public int countActiveSendPeers() {
-        long now = _context.clock().now();
+        long old = _context.clock().now() - 60*1000;
         int active = 0;
         for (PeerState peer : _peersByIdent.values()) {
-                if (now-peer.getLastSendFullyTime() <= 1*60*1000)
+                if (peer.getLastSendFullyTime() >= old)
                     active++;
             }
         return active;

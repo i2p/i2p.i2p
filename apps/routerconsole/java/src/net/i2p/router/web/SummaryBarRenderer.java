@@ -607,6 +607,7 @@ public class SummaryBarRenderer {
             if (newsContent != "") {
                 buf.append("<ul>\n");
                 // Parse news content for headings.
+                boolean foundEntry = false;
                 int start = newsContent.indexOf("<h3>");
                 while (start >= 0) {
                     // Add offset to start:
@@ -622,16 +623,19 @@ public class SummaryBarRenderer {
                     int end = newsContent.indexOf("</h3>");
                     if (end >= 0) {
                         String heading = newsContent.substring(0, end);
-                        buf.append("<li>")
+                        buf.append("<li><a href=\"/?news=1&amp;consoleNonce=")
+                           .append(consoleNonce)
+                           .append("\">")
                            .append(heading)
-                           .append("</li>\n");
+                           .append("</a></li>\n");
+                        foundEntry = true;
                     }
                     start = newsContent.indexOf("<h3>");
                 }
                 buf.append("</ul>\n");
                 // Set up string containing <a> to show news.
                 String requestURI = _helper.getRequestURI();
-                if (requestURI.contains("/home")) {
+                if (requestURI.contains("/home") && !foundEntry) {
                     buf.append("<a href=\"/?news=1&amp;consoleNonce=")
                        .append(consoleNonce)
                        .append("\">")

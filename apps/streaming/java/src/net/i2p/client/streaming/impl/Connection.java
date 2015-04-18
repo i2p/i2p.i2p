@@ -12,6 +12,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import net.i2p.I2PAppContext;
 import net.i2p.client.I2PSession;
+import net.i2p.client.streaming.I2PSocketException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.util.Log;
@@ -28,8 +29,8 @@ class Connection {
     private final Log _log;
     private final ConnectionManager _connectionManager;
     private Destination _remotePeer;
-    private long _sendStreamId;
-    private long _receiveStreamId;
+    private final AtomicLong _sendStreamId = new AtomicLong();
+    private final AtomicLong _receiveStreamId = new AtomicLong();
     private volatile long _lastSendTime;
     private final AtomicLong _lastSendId;
     private final AtomicBoolean _resetReceived = new AtomicBoolean();
@@ -40,12 +41,13 @@ class Connection {
     private final MessageInputStream _inputStream;
     private final MessageOutputStream _outputStream;
     private final SchedulerChooser _chooser;
-    private volatile long _nextSendTime;
-    private long _ackedPackets;
+    /** Locking: _nextSendLock */
+    private long _nextSendTime;
+    private final AtomicLong _ackedPackets = new AtomicLong();
     private final long _createdOn;
     private final AtomicLong _closeSentOn = new AtomicLong();
     private final AtomicLong _closeReceivedOn = new AtomicLong();
-    private int _unackedPacketsReceived;
+    private final AtomicInteger _unackedPacketsReceived = new AtomicInteger();
     private long _congestionWindowEnd;
     private volatile long _highestAckedThrough;
     private final boolean _isInbound;
@@ -69,23 +71,25 @@ class Connection {
     private final AtomicBoolean _ackSinceCongestion;
     /** Notify this on connection (or connection failure) */
     private final Object _connectLock;
+    /** Locking for _nextSendTime */
+    private final Object _nextSendLock;
     /** how many messages have been resent and not yet ACKed? */
     private final AtomicInteger _activeResends = new AtomicInteger();
     private final ConEvent _connectionEvent;
     private final int _randomWait;
-    private int _localPort;
-    private int _remotePort;
+    private final int _localPort;
+    private final int _remotePort;
     private final SimpleTimer2 _timer;
     
-    private long _lifetimeBytesSent;
+    private final AtomicLong _lifetimeBytesSent = new AtomicLong();
     /** TBD for tcpdump-compatible ack output */
     private long _lowestBytesAckedThrough;
-    private long _lifetimeBytesReceived;
-    private long _lifetimeDupMessageSent;
-    private long _lifetimeDupMessageReceived;
+    private final AtomicLong _lifetimeBytesReceived = new AtomicLong();
+    private final AtomicLong _lifetimeDupMessageSent = new AtomicLong();
+    private final AtomicLong _lifetimeDupMessageReceived = new AtomicLong();
     
     public static final long MAX_RESEND_DELAY = 45*1000;
-    public static final long MIN_RESEND_DELAY = 1000;
+    public static final long MIN_RESEND_DELAY = 750;
 
     /**
      *  Wait up to 5 minutes after disconnection so we can ack/close packets.
@@ -128,6 +132,9 @@ class Connection {
         if (opts != null) {
             _localPort = opts.getLocalPort();
             _remotePort = opts.getPort();
+        } else {
+            _localPort = 0;
+            _remotePort = 0;
         }
         _options = (opts != null ? opts : new ConnectionOptions());
         _outputStream.setWriteTimeout((int)_options.getWriteTimeout());
@@ -144,6 +151,7 @@ class Connection {
         _activityTimer = new ActivityTimer();
         _ackSinceCongestion = new AtomicBoolean(true);
         _connectLock = new Object();
+        _nextSendLock = new Object();
         _connectionEvent = new ConEvent();
         _randomWait = _context.random().nextInt(10*1000); // just do this once to reduce usage
         // all createRateStats in ConnectionManager
@@ -300,18 +308,19 @@ class Connection {
         if (_resetReceived.get()) return;
         // Unconditionally set
         _resetSentOn.set(now);
-        if ( (_remotePeer == null) || (_sendStreamId <= 0) ) return;
+        if ( (_remotePeer == null) || (_sendStreamId.get() <= 0) ) return;
         PacketLocal reply = new PacketLocal(_context, _remotePeer);
         reply.setFlag(Packet.FLAG_RESET);
         reply.setFlag(Packet.FLAG_SIGNATURE_INCLUDED);
-        reply.setSendStreamId(_sendStreamId);
-        reply.setReceiveStreamId(_receiveStreamId);
+        reply.setSendStreamId(_sendStreamId.get());
+        reply.setReceiveStreamId(_receiveStreamId.get());
+        // TODO remove this someday, as of 0.9.20 we do not require it
         reply.setOptionalFrom(_connectionManager.getSession().getMyDestination());
         reply.setLocalPort(_localPort);
         reply.setRemotePort(_remotePort);
         // this just sends the packet - no retries or whatnot
         if (_outboundQueue.enqueue(reply)) {
-            _unackedPacketsReceived = 0;
+            _unackedPacketsReceived.set(0);
             _lastSendTime = _context.clock().now();
             resetActivityTimer();
         }
@@ -391,7 +400,7 @@ class Connection {
         //_context.statManager().getStatLog().addData(Packet.toId(_sendStreamId), "stream.rtt", _options.getRTT(), _options.getWindowSize());
         
         if (_outboundQueue.enqueue(packet)) {        
-            _unackedPacketsReceived = 0;
+            _unackedPacketsReceived.set(0);
             _lastSendTime = _context.clock().now();
             resetActivityTimer();
         }        
@@ -498,10 +507,10 @@ class Connection {
               }   // for
             }   // !isEmpty()
             if (acked != null) {
+                _ackedPackets.addAndGet(acked.size());
                 for (int i = 0; i < acked.size(); i++) {
                     PacketLocal p = acked.get(i);
                     // removed from _outboundPackets above in iterator
-                    _ackedPackets++;
                     if (p.getNumSends() > 1) {
                         _activeResends.decrementAndGet();
                         if (_log.shouldLog(Log.DEBUG))
@@ -606,7 +615,7 @@ class Connection {
     public void resetReceived() {
         if (!_resetReceived.compareAndSet(false, true))
             return;
-        IOException ioe = new IOException("Reset received");
+        IOException ioe = new I2PSocketException(I2PSocketException.STATUS_CONNECTION_RESET);
         _outputStream.streamErrorOccurred(ioe);
         _inputStream.streamErrorOccurred(ioe);
         _connectionError = "Connection reset";
@@ -780,7 +789,7 @@ class Connection {
     private boolean scheduleDisconnectEvent() {
         if (!_disconnectScheduledOn.compareAndSet(0, _context.clock().now()))
             return false;
-        _context.simpleScheduler().addEvent(new DisconnectEvent(), DISCONNECT_TIMEOUT);
+        _context.simpleTimer2().addEvent(new DisconnectEvent(), DISCONNECT_TIMEOUT);
         return true;
     }
 
@@ -808,26 +817,34 @@ class Connection {
         _connectionManager.updateOptsFromShare(this);
     }
     
-    private boolean _sendStreamIdSet = false;
-    /** what stream do we send data to the peer on?
-     * @return non-global stream sending ID
+    /**
+     *  What stream do we send data to the peer on?
+     *  @return non-global stream sending ID, or 0 if unknown
      */
-    public long getSendStreamId() { return _sendStreamId; }
+    public long getSendStreamId() { return _sendStreamId.get(); }
+
+    /**
+     *  @param id 0 to 0xffffffff
+     *  @throws RuntimeException if already set to nonzero
+     */
     public void setSendStreamId(long id) { 
-        if (_sendStreamIdSet) throw new RuntimeException("Send stream ID already set [" + _sendStreamId + ", " + id + "]");
-        _sendStreamIdSet = true;
-        _sendStreamId = id; 
+        if (!_sendStreamId.compareAndSet(0, id))
+            throw new RuntimeException("Send stream ID already set [" + _sendStreamId + ", " + id + "]");
     }
     
-    private boolean _receiveStreamIdSet = false;
-    /** The stream ID of a peer connection that sends data to us. (may be null)
-     * @return receive stream ID, or null if there isn't one
+    /**
+     *  The stream ID of a peer connection that sends data to us, or zero if unknown.
+     *  @return receive stream ID, or 0 if unknown
      */
-    public long getReceiveStreamId() { return _receiveStreamId; }
+    public long getReceiveStreamId() { return _receiveStreamId.get(); }
+
+    /**
+     *  @param id 0 to 0xffffffff
+     *  @throws RuntimeException if already set to nonzero
+     */
     public void setReceiveStreamId(long id) { 
-        if (_receiveStreamIdSet) throw new RuntimeException("Receive stream ID already set [" + _receiveStreamId + ", " + id + "]");
-        _receiveStreamIdSet = true;
-        _receiveStreamId = id; 
+        if (!_receiveStreamId.compareAndSet(0, id))
+            throw new RuntimeException("Receive stream ID already set [" + _receiveStreamId + ", " + id + "]");
         synchronized (_connectLock) { _connectLock.notifyAll(); }
     }
     
@@ -890,14 +907,14 @@ class Connection {
     
     public ConnectionPacketHandler getPacketHandler() { return _handler; }
     
-    public long getLifetimeBytesSent() { return _lifetimeBytesSent; }
-    public long getLifetimeBytesReceived() { return _lifetimeBytesReceived; }
-    public long getLifetimeDupMessagesSent() { return _lifetimeDupMessageSent; }
-    public long getLifetimeDupMessagesReceived() { return _lifetimeDupMessageReceived; }
-    public void incrementBytesSent(int bytes) { _lifetimeBytesSent += bytes; }
-    public void incrementDupMessagesSent(int msgs) { _lifetimeDupMessageSent += msgs; }
-    public void incrementBytesReceived(int bytes) { _lifetimeBytesReceived += bytes; }
-    public void incrementDupMessagesReceived(int msgs) { _lifetimeDupMessageReceived += msgs; }
+    public long getLifetimeBytesSent() { return _lifetimeBytesSent.get(); }
+    public long getLifetimeBytesReceived() { return _lifetimeBytesReceived.get(); }
+    public long getLifetimeDupMessagesSent() { return _lifetimeDupMessageSent.get(); }
+    public long getLifetimeDupMessagesReceived() { return _lifetimeDupMessageReceived.get(); }
+    public void incrementBytesSent(int bytes) { _lifetimeBytesSent.addAndGet(bytes); }
+    public void incrementDupMessagesSent(int msgs) { _lifetimeDupMessageSent.addAndGet(msgs); }
+    public void incrementBytesReceived(int bytes) { _lifetimeBytesReceived.addAndGet(bytes); }
+    public void incrementDupMessagesReceived(int msgs) { _lifetimeDupMessageReceived.addAndGet(msgs); }
     
     /** 
      * Time when the scheduler next want to send a packet, or -1 if 
@@ -905,7 +922,11 @@ class Connection {
      * instance, or want to delay an ACK.
      * @return the next time the scheduler will want to send a packet, or -1 if never.
      */
-    public long getNextSendTime() { return _nextSendTime; }
+    public long getNextSendTime() {
+        synchronized(_nextSendLock) {
+            return _nextSendTime;
+        }
+    }
 
     /**
      *  If the next send time is currently >= 0 (i.e. not "never"),
@@ -915,31 +936,26 @@ class Connection {
      *  options.getSendAckDelay() from now (1000 ms)
      */
     public void setNextSendTime(long when) { 
-        if (_nextSendTime >= 0) {
-            if (when < _nextSendTime)
-                _nextSendTime = when;
-        } else {
-            _nextSendTime = when; 
-        }
+        synchronized(_nextSendLock) {
+            if (_nextSendTime >= 0) {
+                if (when < _nextSendTime)
+                    _nextSendTime = when;
+            } else {
+                _nextSendTime = when; 
+            }
 
-        if (_nextSendTime >= 0) {
-            long max = _context.clock().now() + _options.getSendAckDelay();
-            if (max < _nextSendTime)
-                _nextSendTime = max;
+            if (_nextSendTime >= 0) {
+                long max = _context.clock().now() + _options.getSendAckDelay();
+                if (max < _nextSendTime)
+                    _nextSendTime = max;
+            }
         }
-        
-        //if (_log.shouldLog(Log.DEBUG) && false) {
-        //    if (_nextSendTime <= 0) 
-        //        _log.debug("set next send time to an unknown time", new Exception(toString()));
-        //    else
-        //        _log.debug("set next send time to " + (_nextSendTime-_context.clock().now()) + "ms from now", new Exception(toString()));
-        //}
     }
     
     /** how many packets have we sent and the other side has ACKed?
      * @return Count of how many packets ACKed.
      */
-    public long getAckedPackets() { return _ackedPackets; }
+    public long getAckedPackets() { return _ackedPackets.get(); }
     public long getCreatedOn() { return _createdOn; }
 
     /** @return 0 if not sent */
@@ -954,8 +970,9 @@ class Connection {
             _updatedShareOpts = true;
         }
     }
-    public void incrementUnackedPacketsReceived() { _unackedPacketsReceived++; }
-    public int getUnackedPacketsReceived() { return _unackedPacketsReceived; }
+
+    public void incrementUnackedPacketsReceived() { _unackedPacketsReceived.incrementAndGet(); }
+    public int getUnackedPacketsReceived() { return _unackedPacketsReceived.get(); }
 
     /** how many packets have we sent but not yet received an ACK for?
      * @return Count of packets in-flight.
@@ -1001,7 +1018,7 @@ class Connection {
     void waitForConnect() {
         long expiration = _context.clock().now() + _options.getConnectTimeout();
         while (true) {
-            if (_connected.get() && (_receiveStreamId > 0) && (_sendStreamId > 0) ) {
+            if (_connected.get() && (_receiveStreamId.get() > 0) && (_sendStreamId.get() > 0) ) {
                 // w00t
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("waitForConnect(): Connected and we have stream IDs");
@@ -1163,13 +1180,15 @@ class Connection {
     public String toString() { 
         StringBuilder buf = new StringBuilder(256);
         buf.append("[Connection ");
-        if (_receiveStreamId > 0)
-            buf.append(Packet.toId(_receiveStreamId));
+        long id = _receiveStreamId.get();
+        if (id > 0)
+            buf.append(Packet.toId(id));
         else
             buf.append("unknown");
         buf.append('/');
-        if (_sendStreamId > 0)
-            buf.append(Packet.toId(_sendStreamId));
+        id = _sendStreamId.get();
+        if (id > 0)
+            buf.append(Packet.toId(id));
         else
             buf.append("unknown");
         if (_isInbound)
@@ -1258,17 +1277,17 @@ class Connection {
      */
     class ResendPacketEvent extends SimpleTimer2.TimedEvent {
         private final PacketLocal _packet;
-        private long _nextSendTime;
+        private long _nextSend;
 
         public ResendPacketEvent(PacketLocal packet, long delay) {
             super(_timer);
             _packet = packet;
-            _nextSendTime = delay + _context.clock().now();
+            _nextSend = delay + _context.clock().now();
             packet.setResendPacketEvent(ResendPacketEvent.this);
             schedule(delay);
         }
         
-        public long getNextSendTime() { return _nextSendTime; }
+        public long getNextSendTime() { return _nextSend; }
         public void timeReached() { retransmit(); }
         /**
          * Retransmit the packet if we need to.  
@@ -1318,7 +1337,7 @@ class Connection {
                                   + _activeResends + " active resend, "
                                   + _outboundPackets.size() + " unacked, window size = " + _options.getWindowSize());
                     forceReschedule(1333);
-                    _nextSendTime = 1333 + _context.clock().now();
+                    _nextSend = 1333 + _context.clock().now();
                     return false;
                 }
                 
@@ -1339,9 +1358,9 @@ class Connection {
                 // bugfix release 0.7.8, we weren't dividing by 1000
                 _packet.setResendDelay(getOptions().getResendDelay() / 1000);
                 if (_packet.getReceiveStreamId() <= 0)
-                    _packet.setReceiveStreamId(_receiveStreamId);
+                    _packet.setReceiveStreamId(_receiveStreamId.get());
                 if (_packet.getSendStreamId() <= 0)
-                    _packet.setSendStreamId(_sendStreamId);
+                    _packet.setSendStreamId(_sendStreamId.get());
                 
                 int newWindowSize = getOptions().getWindowSize();
 
@@ -1358,8 +1377,8 @@ class Connection {
                         //getOptions().setRTT(getOptions().getRTT() + 10*1000);
                         getOptions().setWindowSize(newWindowSize);
 
-                        if (_log.shouldLog(Log.WARN))
-                            _log.warn("Congestion, resending packet " + _packet.getSequenceNum() + " (new windowSize " + newWindowSize 
+                        if (_log.shouldLog(Log.INFO))
+                            _log.info("Congestion, resending packet " + _packet.getSequenceNum() + " (new windowSize " + newWindowSize 
                                       + "/" + getOptions().getWindowSize() + ") for " + Connection.this.toString());
 
                         windowAdjusted();
@@ -1405,7 +1424,7 @@ class Connection {
                     if ( (timeout > MAX_RESEND_DELAY) || (timeout <= 0) )
                         timeout = MAX_RESEND_DELAY;
                     // set this before enqueue() as it passes it on to the router
-                    _nextSendTime = timeout + _context.clock().now();
+                    _nextSend = timeout + _context.clock().now();
 
                     if (_outboundQueue.enqueue(_packet)) {
                         // first resend for this packet ?
@@ -1420,7 +1439,7 @@ class Connection {
                                   " (wsize "
                                   + newWindowSize + " lifetime " 
                                   + (_context.clock().now() - _packet.getCreatedOn()) + "ms)");
-                        _unackedPacketsReceived = 0;
+                        _unackedPacketsReceived.set(0);
                         _lastSendTime = _context.clock().now();
                         // timer reset added 0.9.1
                         resetActivityTimer();

@@ -53,7 +53,7 @@ public interface ClientApp {
     public String getName();
 
     /**
-     *  The dislplay name of the ClientApp, used in user interfaces.
+     *  The display name of the ClientApp, used in user interfaces.
      *  The app must translate.
      *  @return non-null
      */
