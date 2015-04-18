@@ -32,7 +32,7 @@ class MessageReceivedJob extends JobImpl {
     private final boolean _sendDirect;
 
     /**
-     *  @param toDest requred to pick session
+     *  @param toDest non-null, required to pick session
      *  @param fromDest ignored, generally null
      */
     public MessageReceivedJob(RouterContext ctx, ClientConnectionRunner runner, Destination toDest,

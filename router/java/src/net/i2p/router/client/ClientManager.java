@@ -627,7 +627,10 @@ class ClientManager {
             if (runner != null) {
                 //_ctx.statManager().addRateData("client.receiveMessageSize", 
                 //                                   _msg.getPayload().getSize(), 0);
-                runner.receiveMessage(dest, null, _msg.getPayload());
+                if (dest != null)
+                    runner.receiveMessage(dest, null, _msg.getPayload());
+                else
+                    runner.receiveMessage(_msg.getDestinationHash(), null, _msg.getPayload());
             } else {
                 // no client connection...
                 // we should pool these somewhere...
