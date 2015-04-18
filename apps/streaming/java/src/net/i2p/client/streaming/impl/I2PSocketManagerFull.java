@@ -11,7 +11,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -40,7 +40,7 @@ public class I2PSocketManagerFull implements I2PSocketManager {
     private final I2PAppContext _context;
     private final Log _log;
     private final I2PSession _session;
-    private final List<I2PSession> _subsessions;
+    private final ConcurrentHashMap<I2PSession, ConnectionManager> _subsessions;
     private final I2PServerSocketFull _serverSocket;
     private StandardServerSocket _realServerSocket;
     private final ConnectionOptions _defaultOptions;
@@ -84,7 +84,7 @@ public class I2PSocketManagerFull implements I2PSocketManager {
     public I2PSocketManagerFull(I2PAppContext context, I2PSession session, Properties opts, String name) {
         _context = context;
         _session = session;
-        _subsessions = new CopyOnWriteArrayList<I2PSession>();
+        _subsessions = new ConcurrentHashMap<I2PSession, ConnectionManager>(4);
         _log = _context.logManager().getLog(I2PSocketManagerFull.class);
         
         _name = name + " " + (__managerId.incrementAndGet());
@@ -125,7 +125,6 @@ public class I2PSocketManagerFull implements I2PSocketManager {
         return _session;
     }
     
-//////////// gahhh we want a socket manager, not a session
     /**
      *  @return a new subsession, non-null
      *  @param privateKeyStream null for transient, if non-null must have same encryption keys as primary session
@@ -135,7 +134,17 @@ public class I2PSocketManagerFull implements I2PSocketManager {
      */
     public I2PSession addSubsession(InputStream privateKeyStream, Properties opts) throws I2PSessionException {
         I2PSession rv = _session.addSubsession(privateKeyStream, opts);
-        _subsessions.add(rv);
+        ConnectionOptions defaultOptions = new ConnectionOptions(opts);
+        ConnectionManager connectionManager = new ConnectionManager(_context, rv, defaultOptions);
+        ConnectionManager old = _subsessions.putIfAbsent(rv, connectionManager);
+        if (old != null) {
+            // shouldn't happen
+            _session.removeSubsession(rv);
+            connectionManager.shutdown();
+            throw new I2PSessionException("dup");
+        }
+        if (_log.shouldLog(Log.WARN))
+            _log.warn("Added subsession " + rv);
         return rv;
     }
     
@@ -146,8 +155,15 @@ public class I2PSocketManagerFull implements I2PSocketManager {
      */
     public void removeSubsession(I2PSession session) {
         _session.removeSubsession(session);
-        _subsessions.remove(session);
-        // ...
+        ConnectionManager cm = _subsessions.remove(session);
+        if (cm != null) {
+            cm.shutdown();
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Removeed subsession " + session);
+        } else {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Subsession not found to remove " + session);
+        }
     }
     
     /**
@@ -335,6 +351,7 @@ public class I2PSocketManagerFull implements I2PSocketManager {
         if (_log.shouldLog(Log.INFO))
             _log.info("Connecting to " + peer.calculateHash().toBase64().substring(0,6) 
                       + " with options: " + opts);
+// fixme pick the subsession here
         // the following blocks unless connect delay > 0
         Connection con = _connectionManager.connect(peer, opts);
         if (con == null)
@@ -419,6 +436,12 @@ public class I2PSocketManagerFull implements I2PSocketManager {
         }
         _connectionManager.setAllowIncomingConnections(false);
         _connectionManager.shutdown();
+        if (!_subsessions.isEmpty()) {
+            for (I2PSession sess : _subsessions.keySet()) {
+                 removeSubsession(sess);
+            }
+        }
+
         // should we destroy the _session too?
         // yes, since the old lib did (and SAM wants it to, and i dont know why not)
         if ( (_session != null) && (!_session.isClosed()) ) {

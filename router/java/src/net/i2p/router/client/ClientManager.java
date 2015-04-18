@@ -392,7 +392,8 @@ class ClientManager {
      *
      * @param dest Destination from which the LeaseSet's authorization should be requested
      * @param set LeaseSet with requested leases - this object must be updated to contain the 
-     *            signed version (as well as any changed/added/removed Leases)
+     *            signed version (as well as any changed/added/removed Leases).
+     *            The LeaseSet contains Leases only; it is unsigned and does not have the destination set.
      * @param timeout ms to wait before failing
      * @param onCreateJob Job to run after the LeaseSet is authorized
      * @param onFailedJob Job to run after the timeout passes without receiving authorization
@@ -405,15 +406,24 @@ class ClientManager {
                           + dest.calculateHash().toBase64() + ".  disconnected?");
             _ctx.jobQueue().addJob(onFailedJob);
         } else {
-            runner.requestLeaseSet(set, timeout, onCreateJob, onFailedJob);
+            runner.requestLeaseSet(dest.calculateHash(), set, timeout, onCreateJob, onFailedJob);
         }
     }
 
+    /**
+     * Request that a particular client authorize the Leases contained in the 
+     * LeaseSet.
+     *
+     * @param dest Destination from which the LeaseSet's authorization should be requested
+     * @param ls  LeaseSet with requested leases - this object must be updated to contain the 
+     *            signed version (as well as any changed/added/removed Leases).
+     *            The LeaseSet contains Leases only; it is unsigned and does not have the destination set.
+     */
     public void requestLeaseSet(Hash dest, LeaseSet ls) {
         ClientConnectionRunner runner = getRunner(dest);
         if (runner != null)  {
             // no need to fire off any jobs...
-            runner.requestLeaseSet(ls, REQUEST_LEASESET_TIMEOUT, null, null);
+            runner.requestLeaseSet(dest, ls, REQUEST_LEASESET_TIMEOUT, null, null);
         }
     }
     

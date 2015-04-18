@@ -723,18 +723,26 @@ class ClientConnectionRunner {
      * within the timeout specified, queue up the onFailedJob.  This call does not
      * block.
      *
+     * @param h the Destination's hash
      * @param set LeaseSet with requested leases - this object must be updated to contain the 
      *            signed version (as well as any changed/added/removed Leases)
+     *            The LeaseSet contains Leases and destination only, it is unsigned.
      * @param expirationTime ms to wait before failing
      * @param onCreateJob Job to run after the LeaseSet is authorized, null OK
      * @param onFailedJob Job to run after the timeout passes without receiving authorization, null OK
      */
-    void requestLeaseSet(LeaseSet set, long expirationTime, Job onCreateJob, Job onFailedJob) {
+    void requestLeaseSet(Hash h, LeaseSet set, long expirationTime, Job onCreateJob, Job onFailedJob) {
         if (_dead) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Requesting leaseSet from a dead client: " + set);
             if (onFailedJob != null)
                 _context.jobQueue().addJob(onFailedJob);
+            return;
+        }
+        SessionParams sp = _sessions.get(h);
+        if (sp == null) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Requesting leaseSet for an unknown sesssion");
             return;
         }
         // We can't use LeaseSet.equals() here because the dest, keys, and sig on
@@ -748,10 +756,9 @@ class ClientConnectionRunner {
         int leases = set.getLeaseCount();
         // synch so _currentLeaseSet isn't changed out from under us
         LeaseSet current = null;
+        Destination dest = sp.dest;
         synchronized (this) {
-            Destination dest = set.getDestination();
-            if (dest != null)
-                current = getLeaseSet(dest.calculateHash());
+            current = sp.currentLeaseSet;
             if (current != null && current.getLeaseCount() == leases) {
                 for (int i = 0; i < leases; i++) {
                     if (! current.getLease(i).getTunnelId().equals(set.getLease(i).getTunnelId()))
@@ -770,10 +777,6 @@ class ClientConnectionRunner {
         }
         if (_log.shouldLog(Log.INFO))
             _log.info("Current leaseSet " + current + "\nNew leaseSet " + set);
-        Hash h = set.getDestination().calculateHash();
-        SessionParams sp = _sessions.get(h);
-        if (sp == null)
-            return;
         LeaseRequestState state;
         synchronized (this) {
             state = sp.leaseRequest;
@@ -788,12 +791,15 @@ class ClientConnectionRunner {
                     // theirs is newer
                 } else {
                     // ours is newer, so wait a few secs and retry
+                    set.setDestination(dest);
                     _context.simpleTimer2().addEvent(new Rerequest(set, expirationTime, onCreateJob, onFailedJob), 3*1000);
                 }
                 // fire onCreated?
                 return; // already requesting
             } else {
-                sp.leaseRequest = state = new LeaseRequestState(onCreateJob, onFailedJob, _context.clock().now() + expirationTime, set);
+                set.setDestination(dest);
+                sp.leaseRequest = state = new LeaseRequestState(onCreateJob, onFailedJob,
+                                                                _context.clock().now() + expirationTime, set);
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("New request: " + state);
             }
@@ -807,6 +813,7 @@ class ClientConnectionRunner {
         private final Job _onCreate;
         private final Job _onFailed;
 
+        /** @param ls dest must be set */
         public Rerequest(LeaseSet ls, long expirationTime, Job onCreate, Job onFailed) {
             _ls = ls;
             _expirationTime = expirationTime;
@@ -815,7 +822,7 @@ class ClientConnectionRunner {
         }
 
         public void timeReached() {
-            requestLeaseSet(_ls, _expirationTime, _onCreate, _onFailed);
+            requestLeaseSet(_ls.getDestination().calculateHash(), _ls, _expirationTime, _onCreate, _onFailed);
         }
     }
     

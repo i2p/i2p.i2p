@@ -251,6 +251,7 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
         props.putAll(in.getOptions());
         cfg.setOptions(props);
         boolean isPrimary = _runner.getSessionIds().isEmpty();
+        // this sets the session id
         int status = _runner.sessionEstablished(cfg);
         if (status != SessionStatusMessage.STATUS_CREATED) {
             // For now, we do NOT send a SessionStatusMessage - see javadoc above
@@ -266,6 +267,8 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
             _runner.disconnectClient(msg);
             return;
         }
+        // get the new session ID
+        id = _runner.getSessionId(dest.calculateHash());
         sendStatusMessage(id, status);
 
         if (_log.shouldLog(Log.INFO))

@@ -267,6 +267,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
         }
         _routerSupportsFastReceive = _context.isRouterContext();
         _routerSupportsHostLookup = _context.isRouterContext();
+        _routerSupportsSubsessions = _context.isRouterContext();
     }
 
     /**
@@ -338,7 +339,10 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
             if (id != null)
                 _subsessionMap.remove(id);
             /// tell the subsession
-            ///....
+            try {
+                // doesn't really throw
+                session.destroySession();
+            } catch (I2PSessionException ise) {}
         }
     }
     
@@ -893,7 +897,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
                 synchronized (_subsessionLock) {
                     for (SubSession sess : _subsessions) {
                         if (sess.getSessionId() == null) {
-                            sub.messageReceived(reader, message);
+                            sess.messageReceived(reader, message);
                             id = sess.getSessionId();
                             if (id != null) {
                                 if (id.equals(_sessionId)) {

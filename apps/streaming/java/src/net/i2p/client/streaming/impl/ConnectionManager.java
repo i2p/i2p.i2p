@@ -429,7 +429,8 @@ class ConnectionManager {
                     // try { _connectionLock.wait(remaining); } catch (InterruptedException ie) {}
                     try { Thread.sleep(remaining/4); } catch (InterruptedException ie) {}
                 } else { 
-                    con = new Connection(_context, this, _schedulerChooser, _timer, _outboundQueue, _conPacketHandler, opts, false);
+                    con = new Connection(_context, this, _schedulerChooser, _timer,
+                                         _outboundQueue, _conPacketHandler, opts, false);
                     con.setRemotePeer(peer);
                     assignReceiveStreamId(con);
                     break; // stop looping as a psuedo-wait
