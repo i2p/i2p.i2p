@@ -1,5 +1,7 @@
 package net.i2p.client.streaming.impl;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.ConnectException;
@@ -17,13 +19,19 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
+import net.i2p.client.I2PClient;
 import net.i2p.client.I2PSession;
 import net.i2p.client.I2PSessionException;
 import net.i2p.client.streaming.I2PServerSocket;
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.client.streaming.I2PSocketManager;
 import net.i2p.client.streaming.I2PSocketOptions;
+import net.i2p.crypto.SigType;
+import net.i2p.data.Certificate;
 import net.i2p.data.Destination;
+import net.i2p.data.PrivateKey;
+import net.i2p.data.PublicKey;
+import net.i2p.data.SimpleDataStructure;
 import net.i2p.util.Log;
 
 /**
@@ -133,6 +141,27 @@ public class I2PSocketManagerFull implements I2PSocketManager {
      *  @since 0.9.19
      */
     public I2PSession addSubsession(InputStream privateKeyStream, Properties opts) throws I2PSessionException {
+        if (privateKeyStream == null) {
+            ByteArrayOutputStream keyStream = new ByteArrayOutputStream(1024);
+            try {
+                SigType type = getSigType(opts);
+                if (type != SigType.DSA_SHA1) {
+                    // hassle, have to set up the padding and cert, see I2PClientImpl
+                    throw new I2PSessionException("type " + type + " unsupported");
+                }
+                PublicKey pub = _session.getMyDestination().getPublicKey();
+                PrivateKey priv = _session.getDecryptionKey();
+                SimpleDataStructure[] keys = _context.keyGenerator().generateSigningKeys(type);
+                pub.writeBytes(keyStream);
+                keys[0].writeBytes(keyStream); // signing pub
+                Certificate.NULL_CERT.writeBytes(keyStream);
+                priv.writeBytes(keyStream);
+                keys[1].writeBytes(keyStream); // signing priv
+            } catch (Exception e) {
+                throw new I2PSessionException("Error creating keys", e);
+            }
+            privateKeyStream = new ByteArrayInputStream(keyStream.toByteArray());
+        }
         I2PSession rv = _session.addSubsession(privateKeyStream, opts);
         ConnectionOptions defaultOptions = new ConnectionOptions(opts);
         ConnectionManager connectionManager = new ConnectionManager(_context, rv, defaultOptions);
@@ -146,6 +175,27 @@ public class I2PSocketManagerFull implements I2PSocketManager {
         if (_log.shouldLog(Log.WARN))
             _log.warn("Added subsession " + rv);
         return rv;
+    }
+
+    /**
+     *  @param opts may be null
+     *  @since 0.9.20 copied from I2PSocketManagerFactory
+     */
+    private SigType getSigType(Properties opts) {
+        if (opts != null) {
+            String st = opts.getProperty(I2PClient.PROP_SIGTYPE);
+            if (st != null) {
+                SigType rv = SigType.parseSigType(st);
+                if (rv != null && rv.isAvailable())
+                    return rv;
+                if (rv != null)
+                    st = rv.toString();
+                _log.logAlways(Log.WARN, "Unsupported sig type " + st +
+                                         ", reverting to " + I2PClient.DEFAULT_SIGTYPE);
+                // TODO throw instead?
+            }
+        }
+        return I2PClient.DEFAULT_SIGTYPE;
     }
     
     /**

@@ -25,6 +25,7 @@ import javax.net.ssl.SSLServerSocketFactory;
 
 import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
+import net.i2p.client.I2PClient;
 import net.i2p.client.I2PSession;
 import net.i2p.client.I2PSessionException;
 import net.i2p.client.streaming.I2PSocket;
@@ -332,7 +333,7 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
         name = props.getProperty("outbound.nickname");
         if (name != null)
             props.setProperty("outbound.nickname", name + " (DSA)");
-        // TODO set sig type in props?
+        props.setProperty(I2PClient.PROP_SIGTYPE, "DSA_SHA1");
         try {
             return socketManager.addSubsession(null, props);
         } catch (I2PSessionException ise) {
