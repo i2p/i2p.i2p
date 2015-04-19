@@ -139,7 +139,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
         CLOSED
     }
 
-    private State _state = State.CLOSED;
+    protected State _state = State.CLOSED;
     protected final Object _stateLock = new Object();
 
     /** 

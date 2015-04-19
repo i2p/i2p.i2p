@@ -326,9 +326,9 @@ class I2PSessionMuxedImpl extends I2PSessionImpl2 {
 
     protected class MuxedAvailabilityNotifier extends AvailabilityNotifier {
         private final LinkedBlockingQueue<MsgData> _msgs;
-        private volatile boolean _alive = false;
+        private volatile boolean _alive;
         private static final int POISON_SIZE = -99999;
-        private final AtomicBoolean stopping = new AtomicBoolean(false);
+        private final AtomicBoolean stopping = new AtomicBoolean();
 
         public MuxedAvailabilityNotifier() {
             _msgs = new LinkedBlockingQueue<MsgData>();
@@ -336,12 +336,12 @@ class I2PSessionMuxedImpl extends I2PSessionImpl2 {
 
         @Override
         public void stopNotifying() {
-            boolean again = true;
             synchronized (stopping) {
                 if( !stopping.getAndSet(true)) {
-                    if (_alive == true) {
+                    _msgs.clear();
+                    if (_alive) {
                         // System.out.println("I2PSessionMuxedImpl.stopNotifying()");
-                        _msgs.clear();
+                        boolean again = true;
                         while(again) {
                             try {
                                 _msgs.put(new MsgData(0, POISON_SIZE, 0, 0, 0));
@@ -351,8 +351,8 @@ class I2PSessionMuxedImpl extends I2PSessionImpl2 {
                                 continue;
                             }
                         }
+                        _alive = false;
                     }
-                    _alive = false;
                     stopping.set(false);
                 }
                 // stopping.notifyAll();
@@ -366,17 +366,24 @@ class I2PSessionMuxedImpl extends I2PSessionImpl2 {
             try {
                 _msgs.put(new MsgData((int)(msgId & 0xffffffff), size, proto, fromPort, toPort));
             } catch (InterruptedException ie) {}
+            if (!_alive && _log.shouldLog(Log.WARN))
+                _log.warn(getPrefix() + "message available but notifier not running");
         }
 
         @Override
         public void run() {
-            MsgData msg;
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug(getPrefix() + "starting muxed availability notifier");
+            _msgs.clear();
             _alive=true;
             while (_alive) {
+                MsgData msg;
                 try {
                     msg = _msgs.take();
                 } catch (InterruptedException ie) {
-                    _log.debug("I2PSessionMuxedImpl.run() InterruptedException " + String.valueOf(_msgs.size()) + " Messages, Alive " + _alive);
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("I2PSessionMuxedImpl.run() InterruptedException " +
+                                    String.valueOf(_msgs.size()) + " Messages, Alive " + _alive);
                     continue;
                 }
                 if (msg.size == POISON_SIZE) {

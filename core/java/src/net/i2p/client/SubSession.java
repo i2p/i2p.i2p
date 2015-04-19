@@ -22,8 +22,11 @@ import net.i2p.data.Destination;
 import net.i2p.data.Hash;
 import net.i2p.data.PrivateKey;
 import net.i2p.data.SigningPrivateKey;
+import net.i2p.data.i2cp.CreateLeaseSetMessage;
+import net.i2p.data.i2cp.CreateSessionMessage;
 import net.i2p.data.i2cp.I2CPMessage;
 import net.i2p.data.i2cp.SessionId;
+import net.i2p.util.I2PAppThread;
 
 /**
  *  An additional session using another session's connection.
@@ -105,7 +108,19 @@ class SubSession extends I2PSessionMuxedImpl {
      */
     @Override
     public void connect() throws I2PSessionException {
+        synchronized(_stateLock) {
+            if (_state != State.OPEN) {
+                _state = State.OPENING;
+            }
+        }
         _primary.connect();
+        synchronized(_stateLock) {
+            if (_state != State.OPEN) {
+                Thread notifier = new I2PAppThread(_availabilityNotifier, "ClientNotifier " + getPrefix(), true);
+                notifier.start();
+                _state = State.OPEN;
+            }
+        }
     }
 
     /**
@@ -115,7 +130,7 @@ class SubSession extends I2PSessionMuxedImpl {
     @Override
     public boolean isClosed() {
         // FIXME
-        return /* getSessionId() == null || */  _primary.isClosed();
+        return super.isClosed() || _primary.isClosed();
     }
 
     /**
@@ -126,7 +141,12 @@ class SubSession extends I2PSessionMuxedImpl {
      */
     @Override
     void sendMessage(I2CPMessage message) throws I2PSessionException {
-        if (isClosed())
+        // workaround for now, as primary will send out our CreateSession
+        // from his connect, while we are still closed.
+        // If we did it in connect() we wouldn't need this
+        if (isClosed() &&
+            message.getType() != CreateSessionMessage.MESSAGE_TYPE &&
+            message.getType() != CreateLeaseSetMessage.MESSAGE_TYPE)
             throw new I2PSessionException("Already closed");
         _primary.sendMessage(message);
     }
@@ -153,6 +173,7 @@ class SubSession extends I2PSessionMuxedImpl {
         if (_availabilityNotifier != null)
             _availabilityNotifier.stopNotifying();
         if (_sessionListener != null) _sessionListener.disconnected(this);
+        changeState(State.CLOSED);
     }
 
     /**

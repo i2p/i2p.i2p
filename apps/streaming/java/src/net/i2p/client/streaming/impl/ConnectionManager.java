@@ -891,4 +891,12 @@ class ConnectionManager {
         if (req != null) 
             req.pong(payload);
     }
+
+    /**
+     *  @since 0.9.20
+     */
+    @Override
+    public String toString() {
+        return "ConnectionManager for " + _session;
+    }
 }

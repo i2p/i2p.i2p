@@ -388,11 +388,16 @@ public class I2PSocketManagerFull implements I2PSocketManager {
     }
 
     private void verifySession() throws I2PException {
+        verifySession(_connectionManager);
+    }
+
+    /** @since 0.9.20 */
+    private void verifySession(ConnectionManager cm) throws I2PException {
         if (_isDestroyed.get())
             throw new I2PException("Session was closed");
-        if (!_connectionManager.getSession().isClosed())
+        if (!cm.getSession().isClosed())
             return;
-        _connectionManager.getSession().connect();
+        cm.getSession().connect();
     }
     
     /**
@@ -411,7 +416,6 @@ public class I2PSocketManagerFull implements I2PSocketManager {
      */
     public I2PSocket connect(Destination peer, I2PSocketOptions options) 
                              throws I2PException, NoRouteToHostException {
-        verifySession();
         if (options == null)
             options = _defaultOptions;
         ConnectionOptions opts = null;
@@ -437,6 +441,7 @@ public class I2PSocketManagerFull implements I2PSocketManager {
                 }
             }
         }
+        verifySession(cm);
         // the following blocks unless connect delay > 0
         Connection con = cm.connect(peer, opts);
         if (con == null)
