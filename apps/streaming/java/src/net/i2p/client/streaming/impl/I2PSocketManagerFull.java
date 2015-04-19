@@ -61,9 +61,38 @@ public class I2PSocketManagerFull implements I2PSocketManager {
     private final ConnectionManager _connectionManager;
     private final AtomicBoolean _isDestroyed = new AtomicBoolean();
 
+    /** @since 0.9.20 */
     private static final Set<Hash> _dsaOnly = new HashSet<Hash>(16);
     private static final String[] DSA_ONLY_HASHES = {
-        "3t5Ar2NCTIOId70uzX2bZyJljR0aBogxMEzNyHirB7A="   // forum.i2p
+        // list from http://zzz.i2p/topics/1682?page=1#p8414
+        // bzr.welterde.i2p
+        "Cvs1gCZTTkgD2Z2byh2J9atPmh5~I8~L7BNQnQl0hUE=",
+        // docs.i2p2.i2p
+        "WCXV87RdrF6j-mnn6qt7kVSBifHTlPL0PmVMFWwaolo=",
+        // flibusta.i2p
+        "yy2hYtqqfl84N9skwdRkeM7baFMXHKyDWU3XRShlEo8=",
+        // forum.i2p
+        "3t5Ar2NCTIOId70uzX2bZyJljR0aBogxMEzNyHirB7A=",
+        // i2jump.i2p
+        "9vaoGZbOaeqdRK2qEunlwRM9mUSW-I9R4OON35TDKK4=",
+        // irc.welterde.i2p
+        "5rjezx4McFk3bNhoJV-NTLlQW1AR~jiUcN6DOWMCCVc=",
+        // lists.i2p2.i2p
+        "qwtgoFoMSK0TOtbT4ovBX1jHUzCoZCPzrJVxjKD7RCg=",
+        // mtn.i2p2.i2p
+        "X5VDzYaoX9-P6bAWnrVSR5seGLkOeORP2l3Mh4drXPo=",
+        // nntp.welterde.i2p
+        "VXwmNIwMy1BcUVmut0oZ72jbWoqFzvxJukmS-G8kAAE=",
+        // paste.i2p2.i2p
+        "DoyMyUUgOSTddvRpqYfKHFPPjkkX~iQmResyfjjBYWs=",
+        // syndie.wetlerde.i2p
+        "xMxC54BFgyp-~zzrQI3F8m2CK--9XMcNmSAep6RH4Kk=",
+        // ugha.i2p
+        "zsu3WF~QLBxZXH-gHq9MuZE6y8ROZmMF7dA2MbMMKkY=",
+        // tracker.welterde.i2p
+        "EVkFgKkrDKyGfI7TIuDmlHoAmvHC~FbnY946DfujR0A=",
+        // www.i2p2.i2p
+        "im9gytzKT15mT1sB5LC9bHXCcwytQ4EPcrGQhoam-4w="
     };
     
     static {
