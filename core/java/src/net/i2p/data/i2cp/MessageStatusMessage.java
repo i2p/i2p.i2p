@@ -285,6 +285,12 @@ public class MessageStatusMessage extends I2CPMessageImpl {
             return "GUARANTEED SUCCESS ";
         case STATUS_SEND_SUCCESS_LOCAL:
             return "LOCAL SUCCESS      ";
+        case STATUS_SEND_BEST_EFFORT_FAILURE:
+            return "PROBABLE FAILURE   ";
+        case STATUS_SEND_FAILURE_NO_TUNNELS:
+            return "NO LOCAL TUNNELS   ";
+        case STATUS_SEND_FAILURE_NO_LEASESET:
+            return "LEASESET NOT FOUND ";
         default:
             return "SEND FAILURE CODE: " + status;
         }

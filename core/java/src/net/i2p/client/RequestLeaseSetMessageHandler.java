@@ -88,9 +88,8 @@ class RequestLeaseSetMessageHandler extends HandlerImpl {
             String sspk = session.getOptions().getProperty("i2cp.leaseSetSigningPrivateKey");
             PrivateKey privKey = null;
             SigningPrivateKey signingPrivKey = null;
-            boolean useOldKeys;
             if (spk != null && sspk != null) {
-                useOldKeys = true;
+                boolean useOldKeys = true;
                 int colon = sspk.indexOf(':');
                 SigType type = dest.getSigType();
                 if (colon > 0) {
@@ -111,6 +110,7 @@ class RequestLeaseSetMessageHandler extends HandlerImpl {
                         signingPrivKey.fromBase64(sspk);
                     } catch (DataFormatException iae) {
                         useOldKeys = false;
+                        signingPrivKey = null;
                     }
                 }
                 if (useOldKeys) {
@@ -118,20 +118,36 @@ class RequestLeaseSetMessageHandler extends HandlerImpl {
                         privKey = new PrivateKey();
                         privKey.fromBase64(spk);
                     } catch (DataFormatException iae) {
-                        useOldKeys = false;
+                        privKey = null;
                     }
                 }
-            } else {
-                useOldKeys = false;
             }
-            if (useOldKeys)
-                li = new LeaseInfo(privKey, signingPrivKey);
-            else
+            if (privKey == null && !_existingLeaseSets.isEmpty()) {
+                // look for keypair from another dest using same pubkey
+                PublicKey pk = dest.getPublicKey();
+                for (Map.Entry<Destination, LeaseInfo> e : _existingLeaseSets.entrySet()) {
+                    if (pk.equals(e.getKey().getPublicKey())) {
+                        privKey = e.getValue().getPrivateKey();
+                        if (_log.shouldLog(Log.DEBUG))
+                            _log.debug("Creating new leaseInfo keys for " + dest + " with private key from " + e.getKey());
+                        break;
+                    }
+                }
+            }
+            if (privKey != null) {
+                if (signingPrivKey != null) {
+                    li = new LeaseInfo(privKey, signingPrivKey);
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("Creating new leaseInfo keys for " + dest + " WITH configured private keys");
+                } else {
+                    li = new LeaseInfo(privKey, dest);
+                }
+            } else {
                 li = new LeaseInfo(dest);
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Creating new leaseInfo keys for " + dest + " without configured private keys");
+            }
             _existingLeaseSets.put(dest, li);
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Creating new leaseInfo keys for "  
-                           + dest + " using configured private keys? " + useOldKeys);
         } else {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Caching the old leaseInfo keys for " 
@@ -178,6 +194,9 @@ class RequestLeaseSetMessageHandler extends HandlerImpl {
         private final SigningPublicKey _signingPubKey;
         private final SigningPrivateKey _signingPrivKey;
 
+        /**
+         *  New keys
+         */
         public LeaseInfo(Destination dest) {
             SimpleDataStructure encKeys[] = KeyGenerator.getInstance().generatePKIKeys();
             // must be same type as the Destination's signing key
@@ -194,6 +213,7 @@ class RequestLeaseSetMessageHandler extends HandlerImpl {
         }
 
         /**
+         *  Existing keys
          *  @since 0.9.18
          */
         public LeaseInfo(PrivateKey privKey, SigningPrivateKey signingPrivKey) {
@@ -201,6 +221,23 @@ class RequestLeaseSetMessageHandler extends HandlerImpl {
             _privKey = privKey;
             _signingPubKey = KeyGenerator.getSigningPublicKey(signingPrivKey);
             _signingPrivKey = signingPrivKey;
+        }
+
+        /**
+         *  Existing crypto key, new signing key
+         *  @since 0.9.20
+         */
+        public LeaseInfo(PrivateKey privKey, Destination dest) {
+            SimpleDataStructure signKeys[];
+            try {
+                signKeys = KeyGenerator.getInstance().generateSigningKeys(dest.getSigningPublicKey().getType());
+            } catch (GeneralSecurityException gse) {
+                throw new IllegalStateException(gse);
+            }
+            _pubKey = KeyGenerator.getPublicKey(privKey);
+            _privKey = privKey;
+            _signingPubKey = (SigningPublicKey) signKeys[0];
+            _signingPrivKey = (SigningPrivateKey) signKeys[1];
         }
 
         public PublicKey getPublicKey() {

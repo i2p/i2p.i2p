@@ -161,6 +161,9 @@ public class I2PSocketManagerFull implements I2PSocketManager {
      */
     public I2PSession addSubsession(InputStream privateKeyStream, Properties opts) throws I2PSessionException {
         if (privateKeyStream == null) {
+            // We don't actually need the same pubkey in the dest, just in the LS.
+            // The dest one is unused. But this is how we find the LS keys
+            // to reuse in RequestLeaseSetMessageHandler.
             ByteArrayOutputStream keyStream = new ByteArrayOutputStream(1024);
             try {
                 SigType type = getSigType(opts);
