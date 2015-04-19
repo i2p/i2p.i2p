@@ -451,14 +451,35 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         Hash h = dest.calculateHash();
         Hash e = existingClient.calculateHash();
         synchronized(this) {
-            TunnelPool inbound = _clientInboundPools.get(e);
-            TunnelPool outbound = _clientOutboundPools.get(e);
-/////// gah same tunnel pool or different?
-            if (inbound == null || outbound == null)
+            TunnelPool inbound = _clientInboundPools.get(h);
+            TunnelPool outbound = _clientOutboundPools.get(h);
+            if (inbound != null || outbound != null) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("already have alias " + dest);
                 return false;
+            }
+            TunnelPool eInbound = _clientInboundPools.get(e);
+            TunnelPool eOutbound = _clientOutboundPools.get(e);
+            if (eInbound == null || eOutbound == null) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("primary not found " + existingClient);
+                return false;
+            }
+            eInbound.getSettings().getAliases().add(h);
+            eOutbound.getSettings().getAliases().add(h);
+            TunnelPoolSettings newIn = settings.getInboundSettings();
+            TunnelPoolSettings newOut = settings.getOutboundSettings();
+            newIn.setAliasOf(e);
+            newOut.setAliasOf(e);
+            inbound = new AliasedTunnelPool(_context, this, newIn, eInbound);
+            outbound = new AliasedTunnelPool(_context, this, newOut, eOutbound);
             _clientInboundPools.put(h, inbound);
             _clientOutboundPools.put(h, outbound);
+            inbound.startup();
+            outbound.startup();
         }
+        if (_log.shouldLog(Log.WARN))
+            _log.warn("Added " + h + " as alias for " + e + " with settings " + settings);
         return true;
     }
 
@@ -483,9 +504,9 @@ public class TunnelPoolManager implements TunnelManagerFacade {
             }
             TunnelPool outbound = _clientOutboundPools.remove(h);
             if (outbound != null) {
-                Hash p = inbound.getSettings().getAliasOf();
+                Hash p = outbound.getSettings().getAliasOf();
                 if (p != null) {
-                    TunnelPool pri = _clientInboundPools.get(p);
+                    TunnelPool pri = _clientOutboundPools.get(p);
                     if (pri != null) {
                         Set<Hash> aliases = pri.getSettings().getAliases();
                         if (aliases != null)

@@ -647,6 +647,8 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
             // now send CreateSessionMessages for all subsessions, one at a time, must wait for each response
             synchronized(_subsessionLock) {
                 for (SubSession ss : _subsessions) {
+                   if (_log.shouldLog(Log.INFO))
+                       _log.info(getPrefix() + "Connecting subsession " + ss);
                     _producer.connect(ss);
                 }
             }

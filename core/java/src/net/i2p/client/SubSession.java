@@ -114,7 +114,8 @@ class SubSession extends I2PSessionMuxedImpl {
      */
     @Override
     public boolean isClosed() {
-        return getSessionId() == null || _primary.isClosed();
+        // FIXME
+        return /* getSessionId() == null || */  _primary.isClosed();
     }
 
     /**

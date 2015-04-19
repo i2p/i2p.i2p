@@ -248,9 +248,18 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
         SessionConfig cfg = new SessionConfig(dest);
         cfg.setSignature(in.getSignature());
         Properties props = new Properties();
-        props.putAll(in.getOptions());
-        cfg.setOptions(props);
         boolean isPrimary = _runner.getSessionIds().isEmpty();
+        if (!isPrimary) {
+            // all the primary options, then the overrides from the alias
+            SessionConfig pcfg = _runner.getPrimaryConfig();
+            if (pcfg != null) {
+                props.putAll(pcfg.getOptions());
+            } else {
+                _log.error("no primary config?");
+            }
+        }
+        props.putAll(inProps);
+        cfg.setOptions(props);
         // this sets the session id
         int status = _runner.sessionEstablished(cfg);
         if (status != SessionStatusMessage.STATUS_CREATED) {
@@ -269,28 +278,27 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
         }
         // get the new session ID
         id = _runner.getSessionId(dest.calculateHash());
-        sendStatusMessage(id, status);
 
         if (_log.shouldLog(Log.INFO))
             _log.info("Session " + id + " established for " + dest.calculateHash());
         if (isPrimary) {
+            sendStatusMessage(id, status);
             startCreateSessionJob(cfg);
         } else {
             SessionConfig pcfg = _runner.getPrimaryConfig();
             if (pcfg != null) {
-                ///////////
-                // new tunnel name etc.
                 ClientTunnelSettings settings = new ClientTunnelSettings(dest.calculateHash());
-                // all the primary options, then the overrides from the alias
-                props.putAll(pcfg.getOptions());
-                props.putAll(props);
                 settings.readFromProperties(props);
                 boolean ok = _context.tunnelManager().addAlias(dest, settings, pcfg.getDestination());
                 if (!ok) {
                     _log.error("Add alias failed");
-                    // send status message...
+                    status = SessionStatusMessage.STATUS_REFUSED;
                 }
+            } else {
+                _log.error("no primary config?");
+                status = SessionStatusMessage.STATUS_INVALID;
             }
+            sendStatusMessage(id, status);
         }
     }
     

@@ -31,13 +31,13 @@ import net.i2p.util.Log;
  */
 public class TunnelPool {
     private final List<PooledTunnelCreatorConfig> _inProgress = new ArrayList<PooledTunnelCreatorConfig>();
-    private final RouterContext _context;
-    private final Log _log;
+    protected final RouterContext _context;
+    protected final Log _log;
     private TunnelPoolSettings _settings;
     private final List<TunnelInfo> _tunnels;
     private final TunnelPeerSelector _peerSelector;
     private final TunnelPoolManager _manager;
-    private volatile boolean _alive;
+    protected volatile boolean _alive;
     private long _lifetimeProcessed;
     private TunnelInfo _lastSelected;
     private long _lastSelectionPeriod;
@@ -119,19 +119,15 @@ public class TunnelPool {
         }
     }
 
-    void refreshSettings() {
-        if (!_settings.isExploratory()) {
+    private void refreshSettings() {
+        if (!_settings.isExploratory())
             return; // don't override client specified settings
-        } else {
-            if (_settings.isExploratory()) {
-                Properties props = new Properties();
-                props.putAll(_context.router().getConfigMap());
-                if (_settings.isInbound())
-                    _settings.readFromProperties(TunnelPoolSettings.PREFIX_INBOUND_EXPLORATORY, props);
-                else
-                    _settings.readFromProperties(TunnelPoolSettings.PREFIX_OUTBOUND_EXPLORATORY, props);
-            }
-        }
+        Properties props = new Properties();
+        props.putAll(_context.router().getConfigMap());
+        if (_settings.isInbound())
+            _settings.readFromProperties(TunnelPoolSettings.PREFIX_INBOUND_EXPLORATORY, props);
+        else
+            _settings.readFromProperties(TunnelPoolSettings.PREFIX_OUTBOUND_EXPLORATORY, props);
     }
     
     /** 
@@ -413,11 +409,15 @@ public class TunnelPool {
     public List<PooledTunnelCreatorConfig> listPending() { synchronized (_inProgress) { return new ArrayList<PooledTunnelCreatorConfig>(_inProgress); } }
     
     /** duplicate of size(), let's pick one */
-    int getTunnelCount() { synchronized (_tunnels) { return _tunnels.size(); } }
+    int getTunnelCount() { return size(); }
     
     public TunnelPoolSettings getSettings() { return _settings; }
 
     void setSettings(TunnelPoolSettings settings) { 
+        if (settings != null && _settings != null) {
+            settings.getAliases().addAll(_settings.getAliases());
+            settings.setAliasOf(_settings.getAliasOf());
+        }
         _settings = settings; 
         if (_settings != null) {
             if (_log.shouldLog(Log.INFO))
@@ -717,7 +717,7 @@ public class TunnelPool {
      *
      * @return null on failure
      */
-    private LeaseSet locked_buildNewLeaseSet() {
+    protected LeaseSet locked_buildNewLeaseSet() {
         if (!_alive)
             return null;
 
