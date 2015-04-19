@@ -11,6 +11,7 @@ import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -29,9 +30,11 @@ import net.i2p.client.streaming.I2PSocketOptions;
 import net.i2p.crypto.SigType;
 import net.i2p.data.Certificate;
 import net.i2p.data.Destination;
+import net.i2p.data.Hash;
 import net.i2p.data.PrivateKey;
 import net.i2p.data.PublicKey;
 import net.i2p.data.SimpleDataStructure;
+import net.i2p.util.ConvertToHash;
 import net.i2p.util.Log;
 
 /**
@@ -57,7 +60,23 @@ public class I2PSocketManagerFull implements I2PSocketManager {
     private static final AtomicInteger __managerId = new AtomicInteger();
     private final ConnectionManager _connectionManager;
     private final AtomicBoolean _isDestroyed = new AtomicBoolean();
+
+    private static final Set<Hash> _dsaOnly = new HashSet<Hash>(16);
+    private static final String[] DSA_ONLY_HASHES = {
+        "3t5Ar2NCTIOId70uzX2bZyJljR0aBogxMEzNyHirB7A="   // forum.i2p
+    };
     
+    static {
+        for (int i = 0; i < DSA_ONLY_HASHES.length; i++) {
+            String s = DSA_ONLY_HASHES[i];
+            Hash h = ConvertToHash.getHash(s);
+            if (h != null)
+                _dsaOnly.add(h);
+            else
+                System.out.println("Bad hash " + s);
+        }
+    }
+
     /**
      * How long to wait for the client app to accept() before sending back CLOSE?
      * This includes the time waiting in the queue.  Currently set to 5 seconds.
@@ -401,9 +420,22 @@ public class I2PSocketManagerFull implements I2PSocketManager {
         if (_log.shouldLog(Log.INFO))
             _log.info("Connecting to " + peer.calculateHash().toBase64().substring(0,6) 
                       + " with options: " + opts);
-// fixme pick the subsession here
+        // pick the subsession here
+        ConnectionManager cm = _connectionManager;
+        if (!_subsessions.isEmpty()) {
+            Hash h = peer.calculateHash();
+            if (_dsaOnly.contains(h)) {
+                // FIXME just taking the first one for now
+                for (Map.Entry<I2PSession, ConnectionManager> e : _subsessions.entrySet()) {
+                    if (e.getKey().getMyDestination().getSigType() == SigType.DSA_SHA1) {
+                        cm = e.getValue();
+                        break;
+                    }
+                }
+            }
+        }
         // the following blocks unless connect delay > 0
-        Connection con = _connectionManager.connect(peer, opts);
+        Connection con = cm.connect(peer, opts);
         if (con == null)
             throw new TooManyStreamsException("Too many streams, max " + _defaultOptions.getMaxConns());
         I2PSocketFull socket = new I2PSocketFull(con,_context);

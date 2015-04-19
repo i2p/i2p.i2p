@@ -34,6 +34,7 @@ public class AliasedTunnelPool extends TunnelPool {
         if (_log.shouldLog(Log.INFO))
             _log.info(toString() + ": Startup() called, was already alive? " + _alive, new Exception());
         _alive = true;
+        super.refreshLeaseSet();
     }
     
     @Override

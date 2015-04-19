@@ -607,7 +607,7 @@ public class TunnelPool {
         if (_settings.isInbound() && !_settings.isExploratory()) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug(toString() + ": refreshing leaseSet on tunnel expiration (but prior to grace timeout)");
-            LeaseSet ls = null;
+            LeaseSet ls;
             synchronized (_tunnels) {
                 ls = locked_buildNewLeaseSet();
             }

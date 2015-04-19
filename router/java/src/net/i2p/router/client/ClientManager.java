@@ -401,7 +401,7 @@ class ClientManager {
     public void requestLeaseSet(Destination dest, LeaseSet set, long timeout, Job onCreateJob, Job onFailedJob) {
         ClientConnectionRunner runner = getRunner(dest);
         if (runner == null) {
-            if (_log.shouldLog(Log.ERROR))
+            if (_log.shouldLog(Log.WARN))
                 _log.warn("Cannot request the lease set, as we can't find a client runner for " 
                           + dest.calculateHash().toBase64() + ".  disconnected?");
             _ctx.jobQueue().addJob(onFailedJob);
@@ -424,6 +424,10 @@ class ClientManager {
         if (runner != null)  {
             // no need to fire off any jobs...
             runner.requestLeaseSet(dest, ls, REQUEST_LEASESET_TIMEOUT, null, null);
+        } else {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Cannot request the lease set, as we can't find a client runner for " 
+                          + dest + ".  disconnected?");
         }
     }
     

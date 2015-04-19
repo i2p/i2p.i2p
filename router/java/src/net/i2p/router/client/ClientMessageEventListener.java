@@ -289,16 +289,19 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
             if (pcfg != null) {
                 ClientTunnelSettings settings = new ClientTunnelSettings(dest.calculateHash());
                 settings.readFromProperties(props);
+                // addAlias() sends the create lease set msg, so we have to send the SMS first
+                sendStatusMessage(id, status);
                 boolean ok = _context.tunnelManager().addAlias(dest, settings, pcfg.getDestination());
                 if (!ok) {
                     _log.error("Add alias failed");
-                    status = SessionStatusMessage.STATUS_REFUSED;
+                    // FIXME cleanup
                 }
             } else {
                 _log.error("no primary config?");
                 status = SessionStatusMessage.STATUS_INVALID;
+                sendStatusMessage(id, status);
+                // FIXME cleanup
             }
-            sendStatusMessage(id, status);
         }
     }
     
