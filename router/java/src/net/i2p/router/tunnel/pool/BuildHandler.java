@@ -745,7 +745,7 @@ class BuildHandler implements Runnable {
                 response = TunnelHistory.TUNNEL_REJECT_BANDWIDTH;
             } else {
                 char bw = ri.getBandwidthTier().charAt(0);
-                if (bw != 'O' && bw != 'N' &&
+                if (bw != 'O' && bw != 'N' && bw != 'P' && bw != 'X' &&
                     ((isInGW && ! _context.commSystem().haveInboundCapacity(87)) ||
                      (isOutEnd && ! _context.commSystem().haveOutboundCapacity(87)))) {
                         _context.statManager().addRateData("tunnel.rejectConnLimits", 1);
