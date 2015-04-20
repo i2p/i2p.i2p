@@ -11,6 +11,7 @@ import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.io.OutputStream;
 import java.net.ConnectException;
+import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -82,9 +83,9 @@ public class EepGet {
     protected boolean _transferFailed;
     protected boolean _headersRead;
     protected boolean _aborted;
-    private long _fetchHeaderTimeout;
+    protected int _fetchHeaderTimeout;
     private long _fetchEndTime;
-    protected long _fetchInactivityTimeout;
+    protected int _fetchInactivityTimeout;
     protected int _redirects;
     protected String _redirectLocation;
     protected boolean _isGzippedResponse;
@@ -96,8 +97,8 @@ public class EepGet {
 
     /** this will be replaced by the HTTP Proxy if we are using it */
     protected static final String USER_AGENT = "Wget/1.11.4";
-    protected static final long CONNECT_TIMEOUT = 45*1000;
-    protected static final long INACTIVITY_TIMEOUT = 60*1000;
+    protected static final int CONNECT_TIMEOUT = 45*1000;
+    protected static final int INACTIVITY_TIMEOUT = 60*1000;
     /** maximum times to try without getting any data at all, even if numRetries is higher @since 0.7.14 */
     protected static final int MAX_COMPLETE_FAILS = 5;
 
@@ -577,9 +578,9 @@ public class EepGet {
      * @param inactivityTimeout <= 0 for default 60 sec
      */
     public boolean fetch(long fetchHeaderTimeout, long totalTimeout, long inactivityTimeout) {
-        _fetchHeaderTimeout = fetchHeaderTimeout;
+        _fetchHeaderTimeout = (int) Math.min(fetchHeaderTimeout, Integer.MAX_VALUE);
         _fetchEndTime = (totalTimeout > 0 ? System.currentTimeMillis() + totalTimeout : -1);
-        _fetchInactivityTimeout = inactivityTimeout;
+        _fetchInactivityTimeout = (int) Math.min(inactivityTimeout, Integer.MAX_VALUE);
         _keepFetching = true;
 
         if (_log.shouldLog(Log.DEBUG))
@@ -677,6 +678,10 @@ public class EepGet {
             else
                 timeout.setInactivityTimeout(INACTIVITY_TIMEOUT);
         }
+        if (_fetchInactivityTimeout > 0)
+            _proxy.setSoTimeout(_fetchInactivityTimeout);
+        else
+            _proxy.setSoTimeout(INACTIVITY_TIMEOUT);
         
         if (_redirectLocation != null) {
             // we also are here after a 407
@@ -911,6 +916,7 @@ public class EepGet {
             case 408: // req timeout
             case 409: // bad addr helper
             case 414: // URI too long
+            case 429: // too many requests
             case 431: // headers too long
             case 503: // no outproxy
                 _transferFailed = true;
@@ -1193,7 +1199,13 @@ public class EepGet {
                     int port = url.getPort();
                     if (port == -1)
                         port = 80;
-                    _proxy = new Socket(host, port);
+                    if (_fetchHeaderTimeout > 0) {
+                        _proxy = new Socket();
+                        _proxy.setSoTimeout(_fetchHeaderTimeout);
+                        _proxy.connect(new InetSocketAddress(host, port), _fetchHeaderTimeout);
+                    } else {
+                        _proxy = new Socket(host, port);
+                    }
                 } else {
                     throw new MalformedURLException("URL is not supported:" + _actualURL);
                 }

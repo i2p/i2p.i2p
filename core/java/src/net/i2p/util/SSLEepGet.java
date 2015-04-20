@@ -44,6 +44,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
+import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.KeyStore;
@@ -409,6 +410,10 @@ public class SSLEepGet extends EepGet {
             else
                 timeout.setInactivityTimeout(60*1000);
         }        
+        if (_fetchInactivityTimeout > 0)
+            _proxy.setSoTimeout(_fetchInactivityTimeout);
+        else
+            _proxy.setSoTimeout(INACTIVITY_TIMEOUT);
 
         if (_redirectLocation != null) {
             throw new IOException("Server redirect to " + _redirectLocation + " not allowed");
@@ -550,9 +555,15 @@ public class SSLEepGet extends EepGet {
                 if (port == -1)
                     port = 443;
                 if (_sslContext != null)
-                    _proxy = _sslContext.getSocketFactory().createSocket(host, port);
+                    _proxy = _sslContext.getSocketFactory().createSocket();
                 else
-                    _proxy = SSLSocketFactory.getDefault().createSocket(host, port);
+                    _proxy = SSLSocketFactory.getDefault().createSocket();
+                if (_fetchHeaderTimeout > 0) {
+                    _proxy.setSoTimeout(_fetchHeaderTimeout);
+                    _proxy.connect(new InetSocketAddress(host, port), _fetchHeaderTimeout);
+                } else {
+                    _proxy.connect(new InetSocketAddress(host, port));
+                }
                 SSLSocket socket = (SSLSocket) _proxy;
                 I2PSSLSocketFactory.setProtocolsAndCiphers(socket);
             } else {
