@@ -73,14 +73,17 @@ public class Reseeder {
      *         URLs are constructed, and because SSLEepGet doesn't follow redirects.
      */
     public static final String DEFAULT_SEED_URL =
-              "http://i2p.mooo.com/netDb/" + "," +
-              "http://193.150.121.66/netDb/" + "," +
               // Disable due to misconfiguation (ticket #1466)
               //"http://us.reseed.i2p2.no/" + "," +
               // Down (ticket #1422)
               //"http://jp.reseed.i2p2.no/" + "," +
-              "http://uk.reseed.i2p2.no/" + "," +
-              "http://netdb.i2p2.no/"; // Only SU3 (v3) support
+
+              // Disabling everything, use SSL
+              //"http://i2p.mooo.com/netDb/" + "," +
+              //"http://193.150.121.66/netDb/" + "," +
+              //"http://uk.reseed.i2p2.no/" + "," +
+              //"http://netdb.i2p2.no/"; // Only SU3 (v3) support
+              "";
 
     /** @since 0.8.2 */
     public static final String DEFAULT_SSL_SEED_URL =
