@@ -404,36 +404,68 @@ public class Reseeder {
             boolean defaulted = URLs == null;
             boolean SSLDisable = _context.getBooleanProperty(PROP_SSL_DISABLE);
             boolean SSLRequired = _context.getBooleanPropertyDefaultTrue(PROP_SSL_REQUIRED);
+
             if (defaulted) {
                 if (SSLDisable)
                     URLs = DEFAULT_SEED_URL;
                 else
                     URLs = DEFAULT_SSL_SEED_URL;
-            }
-            StringTokenizer tok = new StringTokenizer(URLs, " ,");
-            while (tok.hasMoreTokens()) {
-                String u = tok.nextToken().trim();
-                if (!u.endsWith("/"))
-                    u = u + '/';
-                try {
-                    URLList.add(new URL(u));
-                } catch (MalformedURLException mue) {}
-            }
-            Collections.shuffle(URLList, _context.random());
-            if (defaulted && !SSLDisable && !SSLRequired) {
-                // put the non-SSL at the end of the SSL
-                List<URL> URLList2 = new ArrayList<URL>();
-                tok = new StringTokenizer(DEFAULT_SEED_URL, " ,");
+                StringTokenizer tok = new StringTokenizer(URLs, " ,");
                 while (tok.hasMoreTokens()) {
                     String u = tok.nextToken().trim();
                     if (!u.endsWith("/"))
                         u = u + '/';
                     try {
-                        URLList2.add(new URL(u));
+                        URLList.add(new URL(u));
                     } catch (MalformedURLException mue) {}
                 }
-                Collections.shuffle(URLList2, _context.random());
-                URLList.addAll(URLList2);
+                Collections.shuffle(URLList, _context.random());
+                if (!SSLDisable && !SSLRequired) {
+                    // put the non-SSL at the end of the SSL
+                    List<URL> URLList2 = new ArrayList<URL>();
+                    tok = new StringTokenizer(DEFAULT_SEED_URL, " ,");
+                    while (tok.hasMoreTokens()) {
+                        String u = tok.nextToken().trim();
+                        if (!u.endsWith("/"))
+                            u = u + '/';
+                        try {
+                            URLList2.add(new URL(u));
+                        } catch (MalformedURLException mue) {}
+                    }
+                    Collections.shuffle(URLList2, _context.random());
+                    URLList.addAll(URLList2);
+                }
+            } else {
+                // custom list given
+                List<URL> SSLList = new ArrayList<URL>();
+                List<URL> nonSSLList = new ArrayList<URL>();
+                StringTokenizer tok = new StringTokenizer(URLs, " ,");
+                while (tok.hasMoreTokens()) {
+                    // format tokens
+                    String u = tok.nextToken().trim();
+                    if (!u.endsWith("/"))
+                        u = u + '/';
+                    // check if ssl or not then add to respective list
+                    if (u.startsWith("https")) {
+                        try {
+                            SSLList.add(new URL(u));
+                        } catch (MalformedURLException mue) {}
+                    } else {
+                        try {
+                            nonSSLList.add(new URL(u));
+                        } catch (MalformedURLException mue) {}
+                    }
+                }
+                // shuffle lists
+                // depending on preferences, add lists to URLList
+                if (!SSLDisable) {
+                    Collections.shuffle(SSLList,_context.random());
+                    URLList.addAll(SSLList);
+                }
+                if (SSLDisable || !SSLRequired) {
+                    Collections.shuffle(nonSSLList, _context.random());
+                    URLList.addAll(nonSSLList);
+                }
             }
             return reseed(URLList, echoStatus);
         }
