@@ -678,10 +678,13 @@ public class EepGet {
             else
                 timeout.setInactivityTimeout(INACTIVITY_TIMEOUT);
         }
-        if (_fetchInactivityTimeout > 0)
-            _proxy.setSoTimeout(_fetchInactivityTimeout);
-        else
-            _proxy.setSoTimeout(INACTIVITY_TIMEOUT);
+        if (!_shouldProxy) {
+            // we only set the soTimeout before the headers if not proxied
+            if (_fetchInactivityTimeout > 0)
+                _proxy.setSoTimeout(_fetchInactivityTimeout);
+            else
+                _proxy.setSoTimeout(INACTIVITY_TIMEOUT);
+        }
         
         if (_redirectLocation != null) {
             // we also are here after a 407
