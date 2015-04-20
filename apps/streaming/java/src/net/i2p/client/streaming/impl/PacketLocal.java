@@ -9,6 +9,7 @@ import net.i2p.I2PAppContext;
 import net.i2p.data.Destination;
 import net.i2p.data.SessionKey;
 import net.i2p.data.SessionTag;
+import net.i2p.data.SigningPrivateKey;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleTimer2;
 
@@ -189,8 +190,49 @@ class PacketLocal extends Packet implements MessageOutputStream.WriteStatus {
     public int getNACKs() { return _nackCount.get(); }
     
     public void setResendPacketEvent(SimpleTimer2.TimedEvent evt) { _resendEvent = evt; }
+
+    /**
+     * Sign and write the packet to the buffer (starting at the offset) and return
+     * the number of bytes written.
+     *
+     * @param buffer data to be written
+     * @param offset starting point in the buffer
+     * @param ctx Application Context
+     * @param key signing key
+     * @return Count of bytes written
+     * @throws IllegalStateException if there is data missing or otherwise b0rked
+     * @since 0.9.20 moved from Packet
+     */
+    public int writeSignedPacket(byte buffer[], int offset, I2PAppContext ctx, SigningPrivateKey key) throws IllegalStateException {
+        setFlag(FLAG_SIGNATURE_INCLUDED);
+        int size = writePacket(buffer, offset, key.getType().getSigLen());
+        _optionSignature = ctx.dsa().sign(buffer, offset, size, key);
+        //if (false) {
+        //    Log l = ctx.logManager().getLog(Packet.class);
+        //    l.error("Signing: " + toString());
+        //    l.error(Base64.encode(buffer, 0, size));
+        //    l.error("Signature: " + Base64.encode(_optionSignature.getData()));
+        //}
+        // jump into the signed data and inject the signature where we 
+        // previously placed a bunch of zeroes
+        int signatureOffset = offset 
+                              //+ 4 // sendStreamId
+                              //+ 4 // receiveStreamId
+                              //+ 4 // sequenceNum
+                              //+ 4 // ackThrough
+                              //+ 1 // resendDelay
+                              //+ 2 // flags
+                              //+ 2 // optionSize
+                              + 21
+                              + (_nacks != null ? 4*_nacks.length + 1 : 1)
+                              + (isFlagSet(FLAG_DELAY_REQUESTED) ? 2 : 0)
+                              + (isFlagSet(FLAG_FROM_INCLUDED) ? _optionFrom.size() : 0)
+                              + (isFlagSet(FLAG_MAX_PACKET_SIZE_INCLUDED) ? 2 : 0);
+        System.arraycopy(_optionSignature.getData(), 0, buffer, signatureOffset, _optionSignature.length());
+        return size;
+    }
     
-	@Override
+    @Override
     public StringBuilder formatAsString() {
         StringBuilder buf = super.formatAsString();
         
