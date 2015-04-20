@@ -60,8 +60,10 @@ public class Reseeder {
     /** limit to spend on a single host, to avoid getting stuck on one that is seriously overloaded */
     private static final int MAX_TIME_PER_HOST = 7 * 60 * 1000;
     private static final long MAX_FILE_AGE = 30*24*60*60*1000L;
-    /** change to false if hosts not ready at release */
+    /** Don't disable this! */
     private static final boolean ENABLE_SU3 = true;
+    /** if false, use su3 only, and disable fallback reading directory index and individual dat files */
+    private static final boolean ENABLE_NON_SU3 = true;
 
     /**
      *  NOTE - URLs that are in both the standard and SSL groups must use the same hostname,
@@ -497,8 +499,10 @@ public class Reseeder {
                         dl = reseedSU3(new URL(url.toString() + SU3_FILENAME), echoStatus);
                     } catch (MalformedURLException mue) {}
                 }
-                if (dl <= 0)
-                    dl = reseedOne(url, echoStatus);
+                if (ENABLE_NON_SU3) {
+                    if (dl <= 0)
+                        dl = reseedOne(url, echoStatus);
+                }
                 if (dl > 0) {
                     total += dl;
                     // Don't go on to the next URL if we have enough
