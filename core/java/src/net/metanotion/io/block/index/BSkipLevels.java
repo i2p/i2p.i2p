@@ -30,7 +30,9 @@ package net.metanotion.io.block.index;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -61,7 +63,16 @@ public class BSkipLevels extends SkipLevels {
 	public final BlockFile bf;
 	private final BSkipList bsl;
 	private boolean isKilled;
+	// the level pages, passed from the constructor to initializeLevels(),
+	// NOT kept up to date
+	private final int[] lps;
 
+	/**
+	 *  Non-recursive initializer initializeLevels()
+	 *  MUST be called on the first BSkipLevel in the skiplist
+	 *  after the constructor, unless it's a new empty
+	 *  level and init() was previously called.
+	 */
 	public BSkipLevels(BlockFile bf, int levelPage, BSkipList bsl) throws IOException {
 		this.levelPage = levelPage;
 		this.bf = bf;
@@ -88,25 +99,57 @@ public class BSkipLevels extends SkipLevels {
 
 		this.levels = new BSkipLevels[maxLen];
 		if (bf.log.shouldLog(Log.DEBUG))
-			bf.log.debug("Reading New BSkipLevels with " + nonNull + " / " + maxLen + " valid levels page " + levelPage);
+			bf.log.debug("Reading New BSkipLevels with " + nonNull + " / " + maxLen + " valid levels page " + levelPage +
+				     " in skiplist " + bsl);
 		// We have to read now because new BSkipLevels() will move the file pointer
-		int[] lps = new int[nonNull];
+		lps = new int[nonNull];
 		for(int i = 0; i < nonNull; i++) {
 			lps[i] = bf.file.readUnsignedInt();
 		}
+	}
 
+	/**
+	 *  Non-recursive initializer.
+	 *  MUST be called on the first BSkipLevel in the skiplist
+	 *  after the constructor, unless it's a new empty
+	 *  level and init() was previously called.
+	 *  Only call on the first skiplevel in the list!
+	 *
+	 *  @since 0.9.20
+	 */
+	public void initializeLevels() {
+		List<BSkipLevels> toInit = new ArrayList<BSkipLevels>(32);
+		List<BSkipLevels> nextInit = new ArrayList<BSkipLevels>(32);
+		initializeLevels(toInit);
+		while (!toInit.isEmpty()) {
+			for (BSkipLevels bsl : toInit) {
+				bsl.initializeLevels(nextInit);
+			}
+			List<BSkipLevels> tmp = toInit;
+			toInit = nextInit;
+			nextInit = tmp;
+			nextInit.clear();
+		}
+	}
+
+	/**
+	 *  Non-recursive initializer.
+	 *  MUST be called after constructor.
+	 *
+	 *  @param nextInit out parameter, next levels to initialize
+	 *  @since 0.9.20
+	 */
+	private void initializeLevels(List<BSkipLevels> nextInit) {
 		boolean fail = false;
-		for(int i = 0; i < nonNull; i++) {
+		for(int i = 0; i < lps.length; i++) {
 			int lp = lps[i];
 			if(lp != 0) {
 				levels[i] = bsl.levelHash.get(Integer.valueOf(lp));
 				if(levels[i] == null) {
 					try {
-						// FIXME this will explode the stack if too big
-						// Redo this without recursion?
-						// Lots of recursion in super to be fixed also...
-						levels[i] = new BSkipLevels(bf, lp, bsl);
-						bsl.levelHash.put(Integer.valueOf(lp), levels[i]);
+						BSkipLevels lev = new BSkipLevels(bf, lp, bsl);
+						levels[i] = lev;
+						nextInit.add(lev);
 					} catch (IOException ioe) {
 						bf.log.error("Corrupt database, bad level " + i +
 						                    " at page " + lp, ioe);
@@ -129,7 +172,9 @@ public class BSkipLevels extends SkipLevels {
 				// TODO also check that the level[] array is not out-of-order
 			} else {
 				if (bf.log.shouldLog(Log.WARN))
-					bf.log.warn("WTF " + this + " i = " + i + " of " + nonNull + " / " + maxLen + " valid levels but page is zero");
+					bf.log.warn("WTF " + this + " i = " + i + " of " +
+						    lps.length + " / " + levels.length +
+						    " valid levels but page is zero");
 				levels[i] = null;
 				fail = true;
 			}
@@ -200,6 +245,7 @@ public class BSkipLevels extends SkipLevels {
 			if (bf.log.shouldLog(Log.DEBUG))
 				bf.log.debug("New BSkipLevels height " + levels + " page " + page);
 			return new BSkipLevels(bf, page, bsl);
+			// do not need to call initLevels() here
 		} catch (IOException ioe) { throw new RuntimeException("Error creating database page", ioe); }
 	}
 
@@ -382,7 +428,8 @@ public class BSkipLevels extends SkipLevels {
 
 	@Override
 	public String toString() {
-		String rv = "BSL height: " + levels.length + " page: " + levelPage + " span: " + bottom;
+		String rv = "BSLevel height: " + levels.length + " page: " + levelPage + " span: " + bottom +
+			    " in skiplist " + bsl;
 		if (isKilled)
 			rv += " KILLED";
 		return rv;

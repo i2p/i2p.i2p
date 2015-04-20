@@ -91,7 +91,9 @@ public class BSkipList extends SkipList {
 			first = new IBSkipSpan(bf, this, firstSpanPage, key, val);
 		else
 			first = new BSkipSpan(bf, this, firstSpanPage, key, val);
-		stack = new BSkipLevels(bf, firstLevelPage, this);
+		BSkipLevels bstack = new BSkipLevels(bf, firstLevelPage, this);
+		bstack.initializeLevels();
+		stack = bstack;
 		int total = 0;
 		for (BSkipSpan ss : spanHash.values()) {
 			total += ss.nKeys;
