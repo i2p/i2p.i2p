@@ -45,7 +45,7 @@ public class TunnelControllerGroup implements ClientApp {
     
     private final List<TunnelController> _controllers;
     private final ReadWriteLock _controllersLock;
-    private volatile boolean _controllersLoaded;
+    private boolean _controllersLoaded;
     private final Object _controllersLoadedLock = new Object();
     private final String _configFile;
     
@@ -111,7 +111,6 @@ public class TunnelControllerGroup implements ClientApp {
         _log = _context.logManager().getLog(TunnelControllerGroup.class);
         _controllers = new ArrayList<TunnelController>();
         _controllersLock = new ReentrantReadWriteLock(true);
-        _controllersLoaded = false;
         if (args == null || args.length <= 0)
             _configFile = DEFAULT_CONFIG_FILE;
         else if (args.length == 1)
@@ -241,8 +240,10 @@ public class TunnelControllerGroup implements ClientApp {
     }
     
     /**
-     * Load up all of the tunnels configured in the given file (but do not start
-     * them)
+     * Load up all of the tunnels configured in the given file.
+     * Prior to 0.9.20, also started the tunnels.
+     * As of 0.9.20, does not start the tunnels, you must call startup()
+     * or getInstance() instead of loadControllers().
      *
      * DEPRECATED for use outside this class. Use startup() or getInstance().
      *
@@ -279,6 +280,7 @@ public class TunnelControllerGroup implements ClientApp {
 
     /**
      * Start all of the tunnels. Must call loadControllers() first.
+     * @since 0.9.20
      */
     private synchronized void startControllers() {
         changeState(STARTING);
