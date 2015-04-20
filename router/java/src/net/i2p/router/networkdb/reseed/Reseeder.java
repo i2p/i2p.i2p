@@ -293,10 +293,11 @@ public class Reseeder {
                 _checker.setError(ngettext("Reseed fetched only 1 router.",
                                                         "Reseed fetched only {0} routers.", total));
             } else {
-                System.out.println("Reseed failed, check network connection");
-                System.out.println(
-                     "Ensure that nothing blocks outbound HTTP, check the logs, " +
-                     "and if nothing helps, read the FAQ about reseeding manually.");
+                if (total == 0) {
+                    System.out.println("Reseed failed, check network connection");
+                    System.out.println("Ensure that nothing blocks outbound HTTP or HTTPS, check the logs, " +
+                                       "and if nothing helps, read the FAQ about reseeding manually.");
+                } // else < 0, no valid URLs
                 String old = _checker.getError();
                 _checker.setError(_("Reseed failed.") + ' '  +
                                   _("See {0} for help.",
@@ -396,7 +397,7 @@ public class Reseeder {
         * - Otherwise just the http randomly.
         *
         * @param echoStatus apparently always false
-        * @return count of routerinfos successfully fetched
+        * @return count of routerinfos successfully fetched, or -1 if no valid URLs
         */
         private int reseed(boolean echoStatus) {
             List<URL> URLList = new ArrayList<URL>();
@@ -466,6 +467,11 @@ public class Reseeder {
                     Collections.shuffle(nonSSLList, _context.random());
                     URLList.addAll(nonSSLList);
                 }
+            }
+            if (URLList.isEmpty()) {
+                System.out.println("No valid reseed URLs");
+                _checker.setError("No valid reseed URLs");
+                return -1;
             }
             return reseed(URLList, echoStatus);
         }
