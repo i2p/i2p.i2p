@@ -570,7 +570,11 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
         }
 
         public void run() {
-            blockingHandle(_i2ps);   
+            try {
+                blockingHandle(_i2ps);   
+            } catch (Throwable t) {
+                _log.error("Uncaught error in i2ptunnel server", t);
+            }
         }
     }
     

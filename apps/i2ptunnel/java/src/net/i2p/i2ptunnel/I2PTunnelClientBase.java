@@ -752,10 +752,17 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
      * Blocking runner, used during the connection establishment
      */
     private class BlockingRunner implements Runnable {
-        private Socket _s;
+        private final Socket _s;
         public BlockingRunner(Socket s) { _s = s; }
         public void run() {
-            clientConnectionRun(_s);
+            try {
+                clientConnectionRun(_s);
+            } catch (Throwable t) {
+                // probably an IllegalArgumentException from
+                // connecting to the router in a delay-open or
+                // close-on-idle tunnel (in connectManager() above)
+                _log.error("Uncaught error in i2ptunnel client", t);
+            }
         }
     }
     
