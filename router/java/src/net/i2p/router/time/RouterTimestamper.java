@@ -30,7 +30,7 @@ public class RouterTimestamper extends Timestamper {
     private int _consecutiveFails;
     private volatile boolean _disabled;
     private final boolean _daemon;
-    private boolean _initialized;
+    private volatile boolean _initialized;
     private boolean _wellSynced;
     private volatile boolean _isRunning;
     private Thread _timestamperThread;
@@ -199,10 +199,13 @@ public class RouterTimestamper extends Timestamper {
                     }
                 }
                 
-                boolean wasInitialized = _initialized;
-                if (!wasInitialized)
-                    _initialized = true;
-                synchronized (this) { notifyAll(); }
+                boolean wasInitialized;
+                synchronized (this) {
+                    wasInitialized = _initialized;
+                    if (!wasInitialized)
+                        _initialized = true;
+                    notifyAll();
+                }
                 if (!wasInitialized) {
                     // let the log manager get initialized
                     try { Thread.sleep(10*1000); } catch (InterruptedException ie) {}
