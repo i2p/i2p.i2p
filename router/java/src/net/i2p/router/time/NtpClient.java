@@ -117,9 +117,10 @@ class NtpClient {
      * @since 0.7.12
      */
     private static long[] currentTimeAndStratum(String serverName) {
+        DatagramSocket socket = null;
         try {
             // Send request
-            DatagramSocket socket = new DatagramSocket();
+            socket = new DatagramSocket();
             InetAddress address = InetAddress.getByName(serverName);
             byte[] buf = new NtpMessage().toByteArray();
             DatagramPacket packet = new DatagramPacket(buf, buf.length, address, NTP_PORT);
@@ -135,12 +136,7 @@ class NtpClient {
             // Get response
             packet = new DatagramPacket(buf, buf.length);
             socket.setSoTimeout(10*1000);
-            try {
-                socket.receive(packet);
-            } catch (InterruptedIOException iie) {
-                socket.close();
-                return null;
-            }
+            socket.receive(packet);
 
             // Immediately record the incoming timestamp
             double destinationTimestamp = (System.currentTimeMillis()/1000.0) + SECONDS_1900_TO_EPOCH;
@@ -152,7 +148,6 @@ class NtpClient {
             //                        (msg.receiveTimestamp-msg.transmitTimestamp);
             double localClockOffset = ((msg.receiveTimestamp - msg.originateTimestamp) +
                                        (msg.transmitTimestamp - destinationTimestamp)) / 2;
-            socket.close();
 
             // Stratum must be between 1 (atomic) and 15 (maximum defined value)
             // Anything else is right out, treat such responses like errors
@@ -169,10 +164,13 @@ class NtpClient {
         } catch (IOException ioe) {
             //ioe.printStackTrace();
             return null;
+        } finally {
+            if (socket != null)
+                socket.close();
         }
     }
     
-/****/
+/****
     public static void main(String[] args) throws IOException {
         // Process command-line args
         if(args.length <= 0) {
@@ -203,5 +201,5 @@ class NtpClient {
         "more details.");
         
     }
-/****/
+****/
 }
