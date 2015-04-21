@@ -63,7 +63,7 @@ public class Reseeder {
     /** Don't disable this! */
     private static final boolean ENABLE_SU3 = true;
     /** if false, use su3 only, and disable fallback reading directory index and individual dat files */
-    private static final boolean ENABLE_NON_SU3 = true;
+    private static final boolean ENABLE_NON_SU3 = false;
 
     /**
      *  NOTE - URLs that are in both the standard and SSL groups must use the same hostname,
