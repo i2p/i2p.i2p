@@ -40,7 +40,7 @@ public class RouterClock extends Clock {
     /** use system time for this */
     private long _lastChanged;
     private int _lastStratum;
-    private final Timestamper _timeStamper;
+    private final RouterTimestamper _timeStamper;
 
     /**
      *  If the system clock shifts by this much,
@@ -53,6 +53,9 @@ public class RouterClock extends Clock {
     private final Set<ClockShiftListener> _shiftListeners;
     private volatile long _lastShiftNanos;
 
+    /**
+     *  Does not start. Caller MUST call start()
+     */
     public RouterClock(RouterContext context) {
         super(context);
         _lastStratum = WORST_STRATUM;
@@ -60,6 +63,14 @@ public class RouterClock extends Clock {
         _shiftListeners = new CopyOnWriteArraySet<ClockShiftListener>();
         _lastShiftNanos = System.nanoTime();
         _timeStamper = new RouterTimestamper(context, this);
+    }
+
+    /**
+     *  Cannot be stopped, but RouterTimestamper registers a shutdown task.
+     *  @since 0.9.20
+     */
+    public void start() {
+        _timeStamper.startTimestamper();
     }
 
     /**

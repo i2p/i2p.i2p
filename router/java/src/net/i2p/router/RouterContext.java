@@ -483,8 +483,11 @@ public class RouterContext extends I2PAppContext {
     @Override
     protected void initializeClock() {
         synchronized (_lock1) {
-            if (_clock == null)
-                _clock = new RouterClock(this);
+            if (_clock == null) {
+                RouterClock rc = new RouterClock(this);
+                rc.start();
+                _clock = rc;
+            }
             _clockInitialized = true;
         }
     }
