@@ -82,7 +82,7 @@ class EventPumper implements Runnable {
     private static final long BLOCKED_IP_FREQ = 3*60*1000;
 
     /** tunnel test now disabled, but this should be long enough to allow an active tunnel to get started */
-    private static final long MIN_EXPIRE_IDLE_TIME = 135*1000l;
+    private static final long MIN_EXPIRE_IDLE_TIME = 120*1000l;
     private static final long MAX_EXPIRE_IDLE_TIME = 11*60*1000l;
 
     /**
