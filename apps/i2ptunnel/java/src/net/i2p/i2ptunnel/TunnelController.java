@@ -209,7 +209,7 @@ public class TunnelController implements Logging {
             if (_state != TunnelState.STOPPED && _state != TunnelState.START_ON_LOAD)
                 return;
         }
-        new I2PAppThread(new Runnable() { public void run() { startTunnel(); } }).start();
+        new I2PAppThread(new Runnable() { public void run() { startTunnel(); } }, "Tunnel Starter " + getName()).start();
     }
     
     /**
