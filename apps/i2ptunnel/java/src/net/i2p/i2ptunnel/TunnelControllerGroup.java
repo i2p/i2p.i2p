@@ -102,6 +102,7 @@ public class TunnelControllerGroup implements ClientApp {
      *  @param mgr may be null
      *  @param args one arg, the config file, if not absolute will be relative to the context's config dir,
      *              if empty or null, the default is i2ptunnel.config
+     *  @throws IllegalArgumentException if too many args
      *  @since 0.9.4
      */
     public TunnelControllerGroup(I2PAppContext context, ClientAppManager mgr, String[] args) {
@@ -149,7 +150,19 @@ public class TunnelControllerGroup implements ClientApp {
      *  @since 0.9.4
      */
     public void startup() {
-        loadControllers(_configFile);
+        try {
+            loadControllers(_configFile);
+        } catch (IllegalArgumentException iae) {
+            if (DEFAULT_CONFIG_FILE.equals(_configFile) && !_context.isRouterContext()) {
+                // for i2ptunnel command line
+                synchronized (_controllersLoadedLock) {
+                    _controllersLoaded = true;
+                }
+                _log.logAlways(Log.WARN, "Not in router context and no preconfigured tunnels");
+            } else {
+                throw iae;
+            }
+        }
         startControllers();
         if (_mgr != null)
             _mgr.register(this);
@@ -274,8 +287,12 @@ public class TunnelControllerGroup implements ClientApp {
         synchronized (_controllersLoadedLock) {
             _controllersLoaded = true;
         }
-        if (_log.shouldLog(Log.INFO))
-            _log.info(i + " controllers loaded from " + configFile);
+        if (i > 0) {
+            if (_log.shouldLog(Log.INFO))
+                _log.info(i + " controllers loaded from " + configFile);
+        } else {
+            _log.logAlways(Log.WARN, "No i2ptunnel configurations found in " + configFile);
+        }
     }
 
     /**
@@ -294,6 +311,10 @@ public class TunnelControllerGroup implements ClientApp {
             synchronized(TunnelControllerGroup.this) {
                 _controllersLock.readLock().lock();
                 try {
+                    if (_controllers.size() <= 0) {
+                        _log.logAlways(Log.WARN, "No configured tunnels to start");
+                        return;
+                    }
                     for (int i = 0; i < _controllers.size(); i++) {
                         TunnelController controller = _controllers.get(i);
                         if (controller.getStartOnLoad())

@@ -8,6 +8,8 @@ import net.i2p.data.Lease;
 import net.i2p.data.LeaseSet;
 import net.i2p.data.i2cp.I2CPMessageException;
 import net.i2p.data.i2cp.I2CPMessageReader;
+import net.i2p.data.i2cp.MessageId;
+import net.i2p.data.i2cp.MessageStatusMessage;
 import net.i2p.data.i2cp.RequestVariableLeaseSetMessage;
 import net.i2p.router.Job;
 import net.i2p.router.RouterContext;
@@ -51,6 +53,27 @@ class LocalClientConnectionRunner extends ClientConnectionRunner {
             doSend(msg);
         } catch (I2CPMessageException ime) {
             ime.printStackTrace();
+        }
+    }
+
+    /**
+     *  No job queue, so super NPEs
+     */
+    @Override
+    void updateMessageDeliveryStatus(MessageId id, long messageNonce, int status) {
+        if (messageNonce <= 0)
+            return;
+        MessageStatusMessage msg = new MessageStatusMessage();
+        msg.setMessageId(id.getMessageId());
+        msg.setSessionId(getSessionId().getSessionId());
+        // has to be >= 0, it is initialized to -1
+        msg.setNonce(messageNonce);
+        msg.setSize(0);
+        msg.setStatus(status);
+        try {
+            doSend(msg);
+        } catch (I2CPMessageException ime) {
+            _log.warn("Error updating the status for " + id, ime);
         }
     }
 

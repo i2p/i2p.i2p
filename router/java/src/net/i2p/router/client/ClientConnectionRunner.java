@@ -165,7 +165,9 @@ class ClientConnectionRunner {
      */
     public synchronized void stopRunning() {
         if (_dead) return;
-        if (_context.router().isAlive() && _log.shouldLog(Log.WARN)) 
+        // router may be null in unit tests
+        if ((_context.router() == null || _context.router().isAlive()) &&
+            _log.shouldWarn()) 
             _log.warn("Stop the I2CP connection!  current leaseSet: " 
                       + _currentLeaseSet, new Exception("Stop client connection"));
         _dead = true;

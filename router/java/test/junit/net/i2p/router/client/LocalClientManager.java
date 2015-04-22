@@ -73,7 +73,7 @@ class LocalClientManager extends ClientManager {
         ClientManager mgr = new LocalClientManager(ctx, port);
         mgr.start();
         System.out.println("Listening on port " + port);
-        try { Thread.sleep(5*60*1000); } catch (InterruptedException ie) {}
+        try { Thread.sleep(60*60*1000); } catch (InterruptedException ie) {}
         System.out.println("Done listening on port " + port);
     }
 }
