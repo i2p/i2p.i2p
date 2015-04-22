@@ -506,7 +506,7 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
             _log.debug("startup " + _clientId, new Exception("I did it"));
         // prevent JVM exit when running outside the router
         boolean isDaemon = getTunnel().getContext().isRouterContext();
-        Thread t = new I2PAppThread(this, "Client " + _clientId, isDaemon);
+        Thread t = new I2PAppThread(this, "I2PTunnel Client " + getTunnel().listenHost + ':' + localPort, isDaemon);
         t.start();
         open = true;
         synchronized (this) {
