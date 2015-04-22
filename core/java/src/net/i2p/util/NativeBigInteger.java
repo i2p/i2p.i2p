@@ -914,6 +914,10 @@ public class NativeBigInteger extends BigInteger {
             // the preferred selection
             rv.add(_libPrefix + getMiddleName1() + primary + _libSuffix);
 
+            // core2 is always a fallback for corei
+            if (primary.equals(JBIGI_OPTIMIZATION_COREI))
+                rv.add(_libPrefix + getMiddleName1() + JBIGI_OPTIMIZATION_CORE2 + _libSuffix);
+
             // athlon64 is always a fallback for 64 bit
             if (_is64 && !primary.equals(JBIGI_OPTIMIZATION_ATHLON64))
                 rv.add(_libPrefix + getMiddleName1() + JBIGI_OPTIMIZATION_ATHLON64 + _libSuffix);
