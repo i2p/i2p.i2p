@@ -48,6 +48,7 @@ MISC_MINGW_PLATFORMS=""
 # starting with k10 added for 6.0.0
 # As of GMP 6.0.0, libgmp 3,
 # the following architectures appear to build to identical code:
+#    coreisbr coreihwl coreibwl
 #    core2 corei
 #    bulldozer piledriver streamroller excavator
 #    bobcat jaguar
@@ -56,10 +57,10 @@ MISC_MINGW_PLATFORMS=""
 #
 # Even more duplicates are in 32-bit mode, so it doesn't pay to have everything for 32 bit.
 #
-X86_64_PLATFORMS="atom athlon64 core2 corei nano pentium4 k10 bobcat jaguar bulldozer piledriver steamroller excavator"
+X86_64_PLATFORMS="coreisbr coreihwl coreibwl bobcat jaguar bulldozer piledriver steamroller excavator atom athlon64 core2 corei nano pentium4 k10"
 
-# Note! these are 32bit _ONLY_
-X86_PLATFORMS="pentium pentiummmx pentium2 pentium3 pentiumm k6 k62 k63 athlon geode viac3 viac32 ${X86_64_PLATFORMS}"
+# Note! these are 32bit _ONLY_ (after the 64 bit ones)
+X86_PLATFORMS="${X86_64_PLATFORMS} pentium pentiummmx pentium2 pentium3 pentiumm k6 k62 k63 athlon geode viac3 viac32"
 
 MINGW_PLATFORMS="${X86_PLATFORMS} ${MISC_MINGW_PLATFORMS}"
 LINUX_PLATFORMS="${X86_PLATFORMS} ${MISC_LINUX_PLATFORMS}"
@@ -289,7 +290,7 @@ fi
 # Don't touch this one.
 NO_PLATFORM=none
 
-for x in $NO_PLATFORM $PLATFORM_LIST
+for x in $PLATFORM_LIST $NO_PLATFORM
 do
         (
                 if [ ! -d bin/$x ]; then
