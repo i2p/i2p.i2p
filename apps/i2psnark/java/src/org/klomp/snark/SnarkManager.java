@@ -27,6 +27,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import net.i2p.I2PAppContext;
 import net.i2p.app.ClientAppManager;
+import net.i2p.crypto.SHA1Hash;
 import net.i2p.crypto.SigType;
 import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
@@ -535,6 +536,27 @@ public class SnarkManager implements CompleteListener {
         String hex = I2PSnarkUtil.toHex(ih);
         File subdir = new SecureDirectory(confDir, SUBDIR_PREFIX + B64.charAt((ih[0] >> 2) & 0x3f));
         return new File(subdir, hex + CONFIG_FILE_SUFFIX);
+    }
+
+    /**
+     *  Extract the info hash from a config file name
+     *  @return null for invalid name
+     *  @since 0.9.20
+     */
+    private static SHA1Hash configFileToInfoHash(File file) {
+        String name = file.getName();
+        if (name.length() != 40 + CONFIG_FILE_SUFFIX.length() || !name.endsWith(CONFIG_FILE_SUFFIX))
+            return null;
+        String hex = name.substring(0, 40);
+        byte[] ih = new byte[20];
+        try {
+            for (int i = 0; i < 20; i++) {
+                ih[i] = (byte) (Integer.parseInt(hex.substring(i*2, (i*2) + 2), 16) & 0xff);
+            }
+        } catch (NumberFormatException nfe) {
+           return null;
+        }
+        return new SHA1Hash(ih);
     }
 
     /** null to set initial defaults */
@@ -1356,6 +1378,7 @@ public class SnarkManager implements CompleteListener {
         snark.stopTorrent();
         _magnets.remove(snark.getName());
         removeMagnetStatus(snark.getInfoHash());
+        removeTorrentStatus(snark);
     }
     
     /**
@@ -1684,16 +1707,79 @@ public class SnarkManager implements CompleteListener {
     /**
      * Remove the status of a torrent by removing the config file.
      */
-    public void removeTorrentStatus(MetaInfo metainfo) {
-        byte[] ih = metainfo.getInfoHash();
+    private void removeTorrentStatus(Snark snark) {
+        byte[] ih = snark.getInfoHash();
         File conf = configFile(_configDir, ih);
         synchronized (_configLock) {
-            conf.delete();
+            boolean ok = conf.delete();
+            if (ok) {
+                if (_log.shouldInfo())
+                    _log.info("Deleted " + conf + " for " + snark.getName());
+            } else {
+                if (_log.shouldWarn())
+                    _log.warn("Failed to delete " + conf + " for " + snark.getName());
+            }
             File subdir = conf.getParentFile();
             String[] files = subdir.list();
             if (files != null && files.length == 0)
                 subdir.delete();
         }
+    }
+    
+    /**
+     *  Remove all orphaned torrent status files, which weren't removed
+     *  before 0.9.20, and could be left around after a manual delete also.
+     *  Run this once at startup.
+     *  @since 0.9.20
+     */
+    private void cleanupTorrentStatus() {
+        Set<SHA1Hash> torrents = new HashSet<SHA1Hash>(32);
+        int found = 0;
+        int totalDeleted = 0;
+        synchronized (_snarks) {
+            for (Snark snark : _snarks.values()) {
+                torrents.add(new SHA1Hash(snark.getMetaInfo().getInfoHash()));
+            }
+            synchronized (_configLock) {
+                for (int i = 0; i < B64.length(); i++) {
+                    File subdir = new File(_configDir, SUBDIR_PREFIX + B64.charAt(i));
+                    File[] configs = subdir.listFiles();
+                    if (configs == null)
+                        continue;
+                    int deleted = 0;
+                    for (int j = 0; j < configs.length; j++) {
+                        File config = configs[j];
+                        SHA1Hash ih = configFileToInfoHash(config);
+                        if (ih == null)
+                            continue;
+                        found++;
+                        if (torrents.contains(ih)) {
+                            if (_log.shouldInfo())
+                                _log.info("Torrent for " + config + " exists");
+                        } else {
+                            boolean ok = config.delete();
+                            if (ok) {
+                                if (_log.shouldInfo())
+                                    _log.info("Deleted " + config + " for " + ih);
+                                deleted++;
+                            } else {
+                                if (_log.shouldWarn())
+                                    _log.warn("Failed to delete " + config + " for " + ih);
+                            }
+                        }
+                    }
+                    if (deleted == configs.length) {
+                        if (_log.shouldInfo())
+                            _log.info("Deleting " + subdir);
+                        subdir.delete();
+                    }
+                    totalDeleted += deleted;
+                }
+            }
+        }
+        if (_log.shouldInfo())
+            _log.info("Cleanup found " + torrents.size() + " torrents and " + found +
+                      " configs, deleted " + totalDeleted + " old configs");
     }
     
     /**
@@ -1753,7 +1839,8 @@ public class SnarkManager implements CompleteListener {
     }
     
     /**
-     * Stop the torrent, leaving it on the list of torrents unless told to remove it
+     * Stop the torrent, leaving it on the list of torrents unless told to remove it.
+     * If shouldRemove is true, removes the config file also.
      */
     public Snark stopTorrent(String filename, boolean shouldRemove) {
         File sfile = new File(filename);
@@ -1781,6 +1868,8 @@ public class SnarkManager implements CompleteListener {
                 // I2PServerSocket.accept() call properly?)
                 ////_util.
             }
+            if (shouldRemove)
+                removeTorrentStatus(torrent);
             if (!wasStopped)
                 addMessage(_("Torrent stopped: \"{0}\"", torrent.getBaseName()));
         }
@@ -1788,7 +1877,8 @@ public class SnarkManager implements CompleteListener {
     }
 
     /**
-     * Stop the torrent, leaving it on the list of torrents unless told to remove it
+     * Stop the torrent, leaving it on the list of torrents unless told to remove it.
+     * If shouldRemove is true, removes the config file also.
      * @since 0.8.4
      */
     public void stopTorrent(Snark torrent, boolean shouldRemove) {
@@ -1801,11 +1891,13 @@ public class SnarkManager implements CompleteListener {
         torrent.stopTorrent();
         if (!wasStopped)
             addMessage(_("Torrent stopped: \"{0}\"", torrent.getBaseName()));
+        if (shouldRemove)
+            removeTorrentStatus(torrent);
     }
 
     /**
      * Stop the torrent and delete the torrent file itself, but leaving the data
-     * behind.
+     * behind. Removes saved config file also.
      * Holds the snarks lock to prevent interference from the DirMonitor.
      */
     public void removeTorrent(String filename) {
@@ -1818,9 +1910,6 @@ public class SnarkManager implements CompleteListener {
             File torrentFile = new File(filename);
             torrentFile.delete();
         }
-        Storage storage = torrent.getStorage();
-        if (storage != null)
-            removeTorrentStatus(storage.getMetaInfo());
         addMessage(_("Torrent removed: \"{0}\"", torrent.getBaseName()));
     }
     
@@ -1853,6 +1942,7 @@ public class SnarkManager implements CompleteListener {
                     _log.error("Error in the DirectoryMonitor", e);
                 }
                 if (doMagnets) {
+                    // first run only
                     try {
                         addMagnets();
                         doMagnets = false;
@@ -1861,6 +1951,9 @@ public class SnarkManager implements CompleteListener {
                     }
                     if (!_snarks.isEmpty())
                         addMessage(_("Up bandwidth limit is {0} KBps", _util.getMaxUpBW()));
+                    // To fix bug where files were left behind,
+                    // but also good for when user removes snarks when i2p is not running
+                    cleanupTorrentStatus();
                 }
                 try { Thread.sleep(60*1000); } catch (InterruptedException ie) {}
             }
