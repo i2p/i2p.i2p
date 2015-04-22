@@ -62,6 +62,7 @@ public class EepGet {
     protected List<String> _extraHeaders;
 
     protected boolean _keepFetching;
+    // The proxy or the actual site if not proxied. Warning - null when extended by I2PSocketEepGet
     protected Socket _proxy;
     protected OutputStream _proxyOut;
     protected InputStream _proxyIn;
@@ -678,7 +679,8 @@ public class EepGet {
             else
                 timeout.setInactivityTimeout(INACTIVITY_TIMEOUT);
         }
-        if (!_shouldProxy) {
+        // _proxy is null when extended by I2PSocketEepGet
+        if (_proxy != null && !_shouldProxy) {
             // we only set the soTimeout before the headers if not proxied
             if (_fetchInactivityTimeout > 0)
                 _proxy.setSoTimeout(_fetchInactivityTimeout);
@@ -914,10 +916,12 @@ public class EepGet {
                 return; 
             case 400: // bad req
             case 401: // server auth
+            case 402: // payment required
             case 403: // bad req
             case 404: // not found
             case 408: // req timeout
             case 409: // bad addr helper
+            case 410: // gone
             case 414: // URI too long
             case 429: // too many requests
             case 431: // headers too long

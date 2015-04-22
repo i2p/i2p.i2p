@@ -1,3 +1,9 @@
+2015-04-22 zzz
+ * i2psnark: Fix deletion of config files, cleanup old ones (ticket #1498)
+ * I2PSocketEepGet: Fix i2psnark NPE caused by -6 (ticket #1543)
+ * NTCP: Reduce min send finisher threads to 1
+ * PortMapper: Status output for /debug
+
 2015-04-21 zzz
  * i2ptunnel: Log uncaught errors in thread pool
  * Reseed: Disable non-su3 reseeding
