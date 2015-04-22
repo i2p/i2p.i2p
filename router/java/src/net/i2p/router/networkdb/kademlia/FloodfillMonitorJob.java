@@ -88,7 +88,7 @@ class FloodfillMonitorJob extends JobImpl {
             return false;
 
         // ARM ElG decrypt is too slow
-        if (SystemVersion.isARM())
+        if (SystemVersion.isARM() || SystemVersion.isAndroid())
             return false;
 
         if (getContext().getBooleanProperty(UDPTransport.PROP_LAPTOP_MODE))
