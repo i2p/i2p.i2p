@@ -114,7 +114,7 @@ class PacketHandler {
     
     private static final SimpleDateFormat _fmt = new SimpleDateFormat("HH:mm:ss.SSS");
 
-    /** logs to System.out, and router log at debug level */
+    /** logs to router log at debug level */
     void displayPacket(Packet packet, String prefix, String suffix) {
         StringBuilder buf = new StringBuilder(256);
         synchronized (_fmt) {
@@ -125,7 +125,7 @@ class PacketHandler {
         if (suffix != null)
             buf.append(" ").append(suffix);
         String str = buf.toString();
-        System.out.println(str);
+        //System.out.println(str);
         _log.debug(str);
     }
     

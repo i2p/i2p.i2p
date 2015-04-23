@@ -546,7 +546,11 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
      * @return round trip time estimate in ms
      */
     public synchronized int getRTT() { return _rtt; }
-    public void setRTT(int ms) { 
+
+    /**
+     *  not public, use updateRTT()
+     */
+    private void setRTT(int ms) { 
         synchronized (_trend) {
             _trend[0] = _trend[1];
             _trend[1] = _trend[2];
@@ -569,6 +573,7 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
 
     /** used in TCB @since 0.9.8 */
     synchronized int getRTTDev() { return _rttDev; }
+
     private synchronized void setRTTDev(int rttDev) { _rttDev = rttDev; }
     
     /** 
@@ -619,6 +624,9 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
         }
     }
     
+    /**
+     *  @param measuredValue must be positive
+     */
     public synchronized void updateRTT(int measuredValue) {
         switch(_initState) {
         case INIT:

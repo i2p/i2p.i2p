@@ -194,7 +194,10 @@ class ConnectionPacketHandler {
                     _log.info(String.format("%s congestion.. dup packet %s ackDelay %d lastSend %s ago",
                                     con, packet, ackDelay, DataHelper.formatDuration(now - lastSendTime)));
                 
-                final long nextSendTime = lastSendTime + ackDelay;
+                // If this is longer than his RTO, he will always retransmit, and
+                // will be stuck at a window size of 1 forever. So we take the minimum
+                // of the ackDelay and half our estimated RTT to be sure.
+                final long nextSendTime = lastSendTime + Math.min(ackDelay, con.getOptions().getRTT() / 2);
                 if (nextSendTime <= now) {
                     if (_log.shouldLog(Log.DEBUG)) 
                         _log.debug("immediate ack");
@@ -203,7 +206,7 @@ class ConnectionPacketHandler {
                 } else {
                     final long delay = nextSendTime - now;
                     if (_log.shouldLog(Log.DEBUG)) 
-                        _log.debug("scheduling ack in "+delay);
+                        _log.debug("scheduling ack in " + delay);
                     _context.simpleTimer2().addEvent(new AckDup(con), delay);
                 }
 
