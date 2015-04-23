@@ -100,11 +100,12 @@ class PacketHandler {
         
         Connection con = (sendId > 0 ? _manager.getConnectionByInboundId(sendId) : null); 
         if (con != null) {
-            if (_log.shouldLog(Log.INFO))
+            if (_log.shouldDebug())
                 displayPacket(packet, "RECV", "wsize " + con.getOptions().getWindowSize() + " rto " + con.getOptions().getRTO());
             receiveKnownCon(con, packet);
         } else {
-            displayPacket(packet, "UNKN", null);
+            if (_log.shouldDebug())
+                displayPacket(packet, "UNKN", null);
             receiveUnknownCon(packet, sendId, queueIfNoConn);
         }
         // Don't log here, wait until we have the conn to make the dumps easier to follow
@@ -112,8 +113,9 @@ class PacketHandler {
     }
     
     private static final SimpleDateFormat _fmt = new SimpleDateFormat("HH:mm:ss.SSS");
+
+    /** logs to System.out, and router log at debug level */
     void displayPacket(Packet packet, String prefix, String suffix) {
-        if (!_log.shouldLog(Log.INFO)) return;
         StringBuilder buf = new StringBuilder(256);
         synchronized (_fmt) {
             buf.append(_fmt.format(new Date()));
@@ -124,8 +126,7 @@ class PacketHandler {
             buf.append(" ").append(suffix);
         String str = buf.toString();
         System.out.println(str);
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug(str);
+        _log.debug(str);
     }
     
     private void receiveKnownCon(Connection con, Packet packet) {

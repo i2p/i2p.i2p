@@ -103,23 +103,14 @@ class ConnectionPacketHandler {
             }
         }
         
-        if (packet.getPayloadSize() > 0) {
-            // Here, for the purposes of calculating whether the input stream is full,
-            // we assume all the not-ready blocks are the max message size.
-            // This prevents us from getting DoSed by accepting unlimited out-of-order small messages
-            long ready = con.getInputStream().getHighestReadyBlockId();
-            int available = con.getOptions().getInboundBufferSize() - con.getInputStream().getTotalReadySize();
-            int allowedBlocks = available/con.getOptions().getMaxMessageSize();
-            if (seqNum > ready + allowedBlocks) {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Inbound buffer exceeded on connection " + con + " (" 
-                              + ready + "/"+ (ready+allowedBlocks) + "/" + available
-                              + ": dropping " + packet);
-                con.getOptions().setChoke(61*1000);
-                packet.releasePayload();
-                con.ackImmediately();
-                return;
-            }
+        if (!con.getInputStream().canAccept(seqNum, packet.getPayloadSize())) {
+            if (_log.shouldWarn())
+                _log.warn("Inbound buffer exceeded on connection " + con +
+                          ", dropping " + packet);
+            con.getOptions().setChoke(61*1000);
+            packet.releasePayload();
+            con.ackImmediately();
+            return;
         }
         con.getOptions().setChoke(0);
 

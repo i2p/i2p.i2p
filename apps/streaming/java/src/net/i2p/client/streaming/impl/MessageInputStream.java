@@ -33,6 +33,7 @@ class MessageInputStream extends InputStream {
      *
      */
     private final List<ByteArray> _readyDataBlocks;
+    /** current byte index into _readyDataBlocks.get(0) */
     private int _readyDataBlockIndex;
     /** highest message ID used in the readyDataBlocks */
     private long _highestReadyBlockId;
@@ -55,12 +56,16 @@ class MessageInputStream extends InputStream {
     private IOException _streamError;
     private long _readTotal;
     //private ByteCache _cache;
-    
+    private final int _maxMessageSize;
+    private final int _maxWindowSize;
+    private final int _maxBufferSize;
     private final byte[] _oneByte = new byte[1];
-    
     private final Object _dataLock;
     
-    public MessageInputStream(I2PAppContext ctx) {
+    private static final int MIN_READY_BUFFERS = 16;
+
+
+    public MessageInputStream(I2PAppContext ctx, int maxMessageSize, int maxWindowSize, int maxBufferSize) {
         _log = ctx.logManager().getLog(MessageInputStream.class);
         _readyDataBlocks = new ArrayList<ByteArray>(4);
         _highestReadyBlockId = -1;
@@ -68,6 +73,9 @@ class MessageInputStream extends InputStream {
         _readTimeout = -1;
         _notYetReadyBlocks = new HashMap<Long, ByteArray>(4);
         _dataLock = new Object();
+        _maxMessageSize = maxMessageSize;
+        _maxWindowSize = maxWindowSize;
+        _maxBufferSize = maxBufferSize;
         //_cache = ByteCache.getInstance(128, Packet.MAX_PAYLOAD_SIZE);
     }
     
@@ -89,6 +97,62 @@ class MessageInputStream extends InputStream {
         }
     }
     
+    /**
+     *  Determine if this packet will fit in our buffering limits.
+     *
+     *  @return true if we have room. If false, do not call messageReceived()
+     *  @since 0.9.20 moved from ConnectionPacketHandler.receivePacket() so it can all be under one lock,
+     *         and we can efficiently do several checks
+     */
+    public boolean canAccept(long messageId, int payloadSize) { 
+        if (payloadSize <= 0)
+            return true;
+        if (messageId < MIN_READY_BUFFERS)
+            return true;
+        synchronized (_dataLock) {
+            // always accept if closed, will be processed elsewhere
+            if (_locallyClosed)
+                return true;
+            // ready dup check
+            // we always allow sequence numbers less than or equal to highest received
+            if (messageId <= _highestReadyBlockId)
+                return true;
+            // shortcut test, assuming all ready and not ready blocks are max size,
+            // to avoid iterating through all the ready blocks in getTotalReadySize()
+            if ((_readyDataBlocks.size() + _notYetReadyBlocks.size()) * _maxMessageSize < _maxBufferSize)
+                return true;
+            // not ready dup check
+            if (_notYetReadyBlocks.containsKey(Long.valueOf(messageId)))
+                return true;
+            // less efficient starting here
+            // Here, for the purposes of calculating whether the input stream is full,
+            // we assume all the not-ready blocks are the max message size.
+            // This prevents us from getting DoSed by accepting unlimited out-of-order small messages
+            int available = _maxBufferSize - getTotalReadySize();
+            if (available <= 0) {
+                if (_log.shouldWarn())
+                    _log.warn("Dropping message " + messageId + ", inbound buffer exceeded: available = " +
+                              available);
+                return false;
+            }
+            // following code screws up if available < 0
+            int allowedBlocks = available / _maxMessageSize;
+            if (messageId > _highestReadyBlockId + allowedBlocks) {
+                if (_log.shouldWarn())
+                    _log.warn("Dropping message " + messageId + ", inbound buffer exceeded: " +
+                              _highestReadyBlockId + '/' + (_highestReadyBlockId + allowedBlocks) + '/' + available);
+                return false;
+            }
+            // This prevents us from getting DoSed by accepting unlimited in-order small messages
+            if (_readyDataBlocks.size() >= 4 * _maxWindowSize) {
+                if (_log.shouldWarn())
+                    _log.warn("Dropping message " + messageId + ", too many ready blocks");
+                return false;
+            }
+        }
+        return true;
+    }
+
     /**
      * Retrieve the message IDs that are holes in our sequence - ones 
      * past the highest ready ID and below the highest received message 
@@ -227,7 +291,7 @@ class MessageInputStream extends InputStream {
     /**
      * A new message has arrived - toss it on the appropriate queue (moving 
      * previously pending messages to the ready queue if it fills the gap, etc).
-     * This does no limiting of pending data - it must be limited in ConnectionPacketHandler.
+     * This does no limiting of pending data - see canAccept() for limiting.
      *
      * @param messageId ID of the message
      * @param payload message payload, may be null or have null or zero-length data
@@ -486,10 +550,9 @@ class MessageInputStream extends InputStream {
             int numBytes = 0;
             for (int i = 0; i < _readyDataBlocks.size(); i++) {
                 ByteArray cur = _readyDataBlocks.get(i);
+                numBytes += cur.getValid();
                 if (i == 0)
-                    numBytes += cur.getValid() - _readyDataBlockIndex;
-                else
-                    numBytes += cur.getValid();
+                    numBytes -= _readyDataBlockIndex;
             }
             return numBytes;
         }

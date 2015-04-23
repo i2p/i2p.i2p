@@ -124,9 +124,11 @@ class Connection {
         _isInbound = isInbound;
         _log = _context.logManager().getLog(Connection.class);
         _receiver = new ConnectionDataReceiver(_context, this);
-        _inputStream = new MessageInputStream(_context);
+        _options = (opts != null ? opts : new ConnectionOptions());
+        _inputStream = new MessageInputStream(_context, _options.getMaxMessageSize(),
+                                              _options.getMaxWindowSize(), _options.getInboundBufferSize());
         // FIXME pass through a passive flush delay setting as the 4th arg
-        _outputStream = new MessageOutputStream(_context, timer, _receiver, (opts == null ? Packet.MAX_PAYLOAD_SIZE : opts.getMaxMessageSize()));
+        _outputStream = new MessageOutputStream(_context, timer, _receiver, _options.getMaxMessageSize());
         _timer = timer;
         _outboundPackets = new TreeMap<Long, PacketLocal>();
         if (opts != null) {
@@ -136,7 +138,6 @@ class Connection {
             _localPort = 0;
             _remotePort = 0;
         }
-        _options = (opts != null ? opts : new ConnectionOptions());
         _outputStream.setWriteTimeout((int)_options.getWriteTimeout());
         _inputStream.setReadTimeout((int)_options.getReadTimeout());
         _lastSendId = new AtomicLong(-1);

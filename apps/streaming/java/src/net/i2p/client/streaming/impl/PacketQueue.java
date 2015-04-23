@@ -214,7 +214,8 @@ class PacketQueue implements SendMessageStatusListener {
             }
             Connection c = packet.getConnection();
             String suffix = (c != null ? "wsize " + c.getOptions().getWindowSize() + " rto " + c.getOptions().getRTO() : null);
-            _connectionManager.getPacketHandler().displayPacket(packet, "SEND", suffix);
+            if (_log.shouldDebug())
+                _connectionManager.getPacketHandler().displayPacket(packet, "SEND", suffix);
             if (I2PSocketManagerFull.pcapWriter != null &&
                 _context.getBooleanProperty(I2PSocketManagerFull.PROP_PCAP))
                 packet.logTCPDump();
