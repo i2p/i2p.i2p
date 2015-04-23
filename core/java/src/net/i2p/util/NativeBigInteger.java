@@ -883,9 +883,14 @@ public class NativeBigInteger extends BigInteger {
                 // add 64 bit variants at the front
                 if (!primary.equals(JBIGI_OPTIMIZATION_ATHLON64))
                     rv.add(_libPrefix + getMiddleName1() + primary + "_64" + _libSuffix);
+                // 64 bit core2 is always a fallback for 64 bit corei
+                if (primary.equals(JBIGI_OPTIMIZATION_COREI))
+                    rv.add(_libPrefix + getMiddleName1() + JBIGI_OPTIMIZATION_CORE2 + "_64" + _libSuffix);
                 // athlon64_64 is always a fallback for 64 bit
                 rv.add(_libPrefix + getMiddleName1() + JBIGI_OPTIMIZATION_ATHLON64 + "_64" + _libSuffix);
             }
+
+            // 32 bit below here
 
             if (_isArm) {
                 Map<String, String> cpuinfo = getCPUInfo();
