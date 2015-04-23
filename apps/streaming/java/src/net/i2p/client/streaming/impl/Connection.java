@@ -89,7 +89,7 @@ class Connection {
     private final AtomicLong _lifetimeDupMessageReceived = new AtomicLong();
     
     public static final long MAX_RESEND_DELAY = 45*1000;
-    public static final long MIN_RESEND_DELAY = 750;
+    public static final long MIN_RESEND_DELAY = 100;
 
     /**
      *  Wait up to 5 minutes after disconnection so we can ack/close packets.

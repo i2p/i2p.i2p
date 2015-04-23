@@ -107,7 +107,7 @@ class ConnectionPacketHandler {
             // Here, for the purposes of calculating whether the input stream is full,
             // we assume all the not-ready blocks are the max message size.
             // This prevents us from getting DoSed by accepting unlimited out-of-order small messages
-            long ready = con.getInputStream().getHighestReadyBockId();
+            long ready = con.getInputStream().getHighestReadyBlockId();
             int available = con.getOptions().getInboundBufferSize() - con.getInputStream().getTotalReadySize();
             int allowedBlocks = available/con.getOptions().getMaxMessageSize();
             if (seqNum > ready + allowedBlocks) {

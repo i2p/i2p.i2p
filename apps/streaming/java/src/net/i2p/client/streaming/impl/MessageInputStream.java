@@ -74,7 +74,7 @@ class MessageInputStream extends InputStream {
     /** What is the highest block ID we've completely received through?
      * @return highest data block ID completely received or -1 for none
      */
-    public long getHighestReadyBockId() { 
+    public long getHighestReadyBlockId() { 
         synchronized (_dataLock) {
             return _highestReadyBlockId; 
         }

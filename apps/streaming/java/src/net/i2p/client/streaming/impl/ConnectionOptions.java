@@ -129,7 +129,8 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
     static final int INITIAL_WINDOW_SIZE = 6;
     static final int DEFAULT_MAX_SENDS = 8;
     public static final int DEFAULT_INITIAL_RTT = 8*1000;    
-    public static final int DEFAULT_INITIAL_ACK_DELAY = 1000;  
+    private static final int MAX_RTT = 60*1000;    
+    private static final int DEFAULT_INITIAL_ACK_DELAY = 750;  
     static final int MIN_WINDOW_SIZE = 1;
     private static final boolean DEFAULT_ANSWER_PINGS = true;
     private static final int DEFAULT_INACTIVITY_TIMEOUT = 90*1000;
@@ -559,8 +560,8 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
         
         synchronized(this) {
             _rtt = ms; 
-            if (_rtt > 60*1000)
-                _rtt = 60*1000;
+            if (_rtt > MAX_RTT)
+                _rtt = MAX_RTT;
         }
     }
 
