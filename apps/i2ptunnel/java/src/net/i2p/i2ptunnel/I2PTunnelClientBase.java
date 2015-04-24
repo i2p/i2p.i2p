@@ -491,6 +491,8 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
                     // FIXME there is a loop in buildSocketManager(), do we really need another one here?
                     // no matter, buildSocketManager() now throws an IllegalArgumentException
                     try { Thread.sleep(10*1000); } catch (InterruptedException ie) {}
+                } else {
+                    l.log("Tunnels ready for client: " + _handlerName);
                 }
             }
             // can't be null unless we limit the loop above
@@ -498,7 +500,6 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
             //    l.log("Invalid I2CP configuration");
             //    throw new IllegalArgumentException("Socket manager could not be created");
             //}
-            l.log("Tunnels ready for client: " + _handlerName);
 
         } // else delay creating session until createI2PSocket() is called
         startup();
@@ -720,6 +721,7 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
             }
             if (open) {
                 _log.error("Error listening for connections on " + addr + " port " + localPort, ex);
+                l.log("Error listening for connections on " + addr + " port " + localPort + ": " + ex);
                 notifyEvent("openBaseClientResult", "error");
                 close(true);
             }
