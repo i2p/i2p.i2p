@@ -19,34 +19,26 @@ class IntelInfoImpl extends CPUIDCPUInfo implements IntelCPUInfo
     private static boolean isAtomCompatible;
     private static boolean isCore2Compatible;
     private static boolean isCoreiCompatible;
+    private static boolean isSandyCompatible;
+    private static boolean isIvyCompatible;
+    private static boolean isHaswellCompatible;
+    private static boolean isBroadwellCompatible;
     
     // If modelString != null, the cpu is considered correctly identified.
     private static final String smodel = identifyCPU();
-    
     public boolean IsPentiumCompatible(){ return isPentiumCompatible; }
-
     public boolean IsPentiumMMXCompatible(){ return isPentiumMMXCompatible; }
-
     public boolean IsPentium2Compatible(){ return isPentium2Compatible; }
-
     public boolean IsPentium3Compatible(){ return isPentium3Compatible; }
-
     public boolean IsPentium4Compatible(){ return isPentium4Compatible; }
-
     public boolean IsPentiumMCompatible(){ return isPentiumMCompatible; }
-
     public boolean IsAtomCompatible(){ return isAtomCompatible; }
-
-    /**
-     * Supports the SSE 3 instructions
-     */
     public boolean IsCore2Compatible(){ return isCore2Compatible; }
-
-    /**
-     * Supports the SSE 3, 4.1, 4.2 instructions.
-     * In general, this requires 45nm or smaller process.
-     */
-    public boolean IsCoreiCompatible(){ return isCoreiCompatible; }    
+    public boolean IsCoreiCompatible(){ return isCoreiCompatible; }
+    public boolean IsSandyCompatible(){ return isSandyCompatible; }
+    public boolean IsIvyCompatible(){ return isIvyCompatible; }
+    public boolean IsHaswellCompatible(){ return isHaswellCompatible; }
+    public boolean IsBroadwellCompatible(){ return isBroadwellCompatible; }
 
     public String getCPUModelString() throws UnknownCPUException
     {
@@ -238,7 +230,7 @@ class IntelInfoImpl extends CPUIDCPUInfo implements IntelCPUInfo
                         isPentiumMCompatible = true;
                         isCore2Compatible = true;
                         isX64 = true;
-                        modelString = "Core 2 (Conroe)";
+                        modelString = "Penryn";
                         break;
 
                 // following are for extended model == 1
@@ -246,16 +238,16 @@ class IntelInfoImpl extends CPUIDCPUInfo implements IntelCPUInfo
 
                     // Celeron 65 nm
                     case 0x16:
-                        modelString = "Celeron";
+                        modelString = "Merom";
                         break;
                     // Penryn 45 nm
                     case 0x17:
-                        modelString = "Core 2 (45nm)";
+                        modelString = "Penryn";
                         break;
                     // Nehalem 45 nm
                     case 0x1a:
                         isCoreiCompatible = true;
-                        modelString = "Core i7 (45nm)";
+                        modelString = "Nehalem";
                         break;
                     // Atom Pineview / Silverthorne 45 nm
                     case 0x1c:
@@ -269,12 +261,12 @@ class IntelInfoImpl extends CPUIDCPUInfo implements IntelCPUInfo
                     // Penryn 45 nm
                     case 0x1d:
                         isCoreiCompatible = true;
-                        modelString = "Xeon MP (45nm)";
+                        modelString = "Penryn";
                         break;
                     // Nehalem 45 nm
                     case 0x1e:
                         isCoreiCompatible = true;
-                        modelString = "Core i5/i7 (45nm)";
+                        modelString = "Nehalem";
                         break;
 
                 // following are for extended model == 2
@@ -283,37 +275,40 @@ class IntelInfoImpl extends CPUIDCPUInfo implements IntelCPUInfo
 
                     // Westmere 32 nm
                     case 0x25:
-                        modelString = "Core i3 or i5/i7 mobile (32nm)";
+                        modelString = "Westmere";
                         break;
                     // Atom Lincroft 45 nm
                     case 0x26:
                         isAtomCompatible = true;
                         // Supports SSE 3
                         isCoreiCompatible = false;
-                        modelString = "Atom Z600";
+                        modelString = "Atom";
                         break;
                     // Sandy bridge 32 nm
                     case 0x2a:
-                        modelString = "Sandy Bridge H/M";
+                        isSandyCompatible = true;
+                        modelString = "Sandy Bridge";
                         break;
+                    // Details unknown, please add a proper model string if 0x2B model is found 
                     case 0x2b:
                         modelString = "Core i7/i5 (32nm)";
                         break;
                     // Westmere
                     case 0x2c:
-                        modelString = "Core i7 (32nm)";
+                        modelString = "Westmere";
                         break;
-                    // Sandy bridge 32 nm
+                    // Sandy Bridge 32 nm
                     case 0x2d:
-                        modelString = "Sandy Bridge EP";
+                        isSandyCompatible = true;
+                        modelString = "Sandy Bridge";
                         break;
                     // Nehalem 45 nm
                     case 0x2e:
-                        modelString = "Xeon MP (45nm)";
+                        modelString = "Nehalem";
                         break;
                     // Westmere 32 nm
                     case 0x2f:
-                        modelString = "Xeon MP (32nm)";
+                        modelString = "Westemere";
                         break;
 
                 // following are for extended model == 3
@@ -325,18 +320,28 @@ class IntelInfoImpl extends CPUIDCPUInfo implements IntelCPUInfo
                         isAtomCompatible = true;
                         // Supports SSE 3
                         isCore2Compatible = false;
-                        modelString = "Atom N2000/D2000";
+                        isCoreiCompatible = false;
+                        modelString = "Atom";
                         break;
                     // Ivy Bridge 22 nm
                     case 0x3a:
+                        isSandyCompatible = true;
+                        isIvyCompatible = true;
                         modelString = "Ivy Bridge";
                         break;
                     // Haswell 22 nm
                     case 0x3c:
+                        isSandyCompatible = true;
+                        isIvyCompatible = true;
+                        isHaswellCompatible = true;
                         modelString = "Haswell";
                         break;
                     // Broadwell 14 nm
                     case 0x3d:
+                        isSandyCompatible = true;
+                        isIvyCompatible = true;
+                        isHaswellCompatible = true;
+                        isBroadwellCompatible = true;
                         modelString = "Broadwell";
                         break;
 
@@ -344,15 +349,34 @@ class IntelInfoImpl extends CPUIDCPUInfo implements IntelCPUInfo
                 // most flags are set above
                 // isCoreiCompatible = true is the default
 
-                    // Atom Silvermont / Bay Trail / Avoton 22 nm
+                    // Haswell 22 nm
+                    case 0x45:
+                        isSandyCompatible = true;
+                        isIvyCompatible = true;
+                        isHaswellCompatible = true;
+                        modelString = "Haswell";
+                        break;
+                    // Haswell 22 nm
+                    case 0x46:
+                        isSandyCompatible = true;
+                        isIvyCompatible = true;
+                        isHaswellCompatible = true;
+                        modelString = "Haswell";
+                        break;
+                    // Quark 32nm
+                    case 0x4a:
+                        isCore2Compatible = false;
+                        isCoreiCompatible = false;
+                        modelString = "Quark";
+                        break;                
+                    // Silvermont 22 nm
                     // Supports SSE 4.2
                     case 0x4d:
                         isAtomCompatible = true;
-                        modelString = "Bay Trail / Avoton";
+                        modelString = "Atom";
                         break;
 
-                // others
-
+                    // others
                     default:
                         modelString = "Intel model " + model;
                         break;
