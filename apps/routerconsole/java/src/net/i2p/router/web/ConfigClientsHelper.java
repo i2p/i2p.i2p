@@ -204,7 +204,7 @@ public class ConfigClientsHelper extends HelperBase {
            .append(_("Control")).append("</th><th align=\"left\">")
            .append(_("Description")).append("</th></tr>\n");
         Properties props = RouterConsoleRunner.webAppProperties(_context);
-        Set<String> keys = new TreeSet(props.keySet());
+        Set<String> keys = new TreeSet<String>(props.stringPropertyNames());
         for (String name : keys) {
             if (name.startsWith(RouterConsoleRunner.PREFIX) && name.endsWith(RouterConsoleRunner.ENABLED)) {
                 String app = name.substring(RouterConsoleRunner.PREFIX.length(), name.lastIndexOf(RouterConsoleRunner.ENABLED));
@@ -233,7 +233,7 @@ public class ConfigClientsHelper extends HelperBase {
            .append(_("Control")).append("</th><th align=\"left\">")
            .append(_("Description")).append("</th></tr>\n");
         Properties props = PluginStarter.pluginProperties();
-        Set<String> keys = new TreeSet(props.keySet());
+        Set<String> keys = new TreeSet<String>(props.stringPropertyNames());
         for (String name : keys) {
             if (name.startsWith(PluginStarter.PREFIX) && name.endsWith(PluginStarter.ENABLED)) {
                 String app = name.substring(PluginStarter.PREFIX.length(), name.lastIndexOf(PluginStarter.ENABLED));

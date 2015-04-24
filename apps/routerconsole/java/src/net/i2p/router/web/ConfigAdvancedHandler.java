@@ -55,7 +55,7 @@ public class ConfigAdvancedHandler extends FormHandler {
                 return;
             }
 
-            for (Object key : props.keySet()) {
+            for (String key : props.stringPropertyNames()) {
                 unsetKeys.remove(key);
             }
 

@@ -1,7 +1,6 @@
 package net.i2p.router.web;
 
 import java.util.List;
-import java.util.Iterator;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
@@ -33,14 +32,12 @@ public class ConfigLoggingHelper extends HelperBase {
         StringBuilder buf = new StringBuilder(32*1024);
         Properties limits = _context.logManager().getLimits();
         TreeSet<String> sortedLogs = new TreeSet<String>();
-        for (Iterator iter = limits.keySet().iterator(); iter.hasNext(); ) {
-            String prefix = (String)iter.next();
+        for (String prefix : limits.stringPropertyNames()) {
             sortedLogs.add(prefix);
         }
         
         buf.append("<textarea name=\"levels\" rows=\"4\" cols=\"60\" wrap=\"off\" spellcheck=\"false\">");
-        for (Iterator iter = sortedLogs.iterator(); iter.hasNext(); ) {
-            String prefix = (String)iter.next();
+        for (String prefix : sortedLogs) {
             String level = limits.getProperty(prefix);
             buf.append(prefix).append('=').append(level).append('\n');
         }
@@ -97,7 +94,7 @@ public class ConfigLoggingHelper extends HelperBase {
      */
     public String getNewClassBox() {
         List<Log> logs = _context.logManager().getLogs();
-        Set limits = _context.logManager().getLimits().keySet();
+        Set<String> limits = _context.logManager().getLimits().stringPropertyNames();
         TreeSet<String> sortedLogs = new TreeSet<String>();
 
         for (Log log : logs) {

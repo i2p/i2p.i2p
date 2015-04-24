@@ -8,7 +8,6 @@ import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -346,9 +345,8 @@ public class ConfigClientsHandler extends FormHandler {
 
     private void saveWebAppChanges() {
         Properties props = RouterConsoleRunner.webAppProperties(_context);
-        Set keys = props.keySet();
-        for (Iterator iter = keys.iterator(); iter.hasNext(); ) {
-            String name = (String)iter.next();
+        Set<String> keys = props.stringPropertyNames();
+        for (String name : keys) {
             if (! (name.startsWith(RouterConsoleRunner.PREFIX) && name.endsWith(RouterConsoleRunner.ENABLED)))
                 continue;
             String app = name.substring(RouterConsoleRunner.PREFIX.length(), name.lastIndexOf(RouterConsoleRunner.ENABLED));
@@ -362,9 +360,8 @@ public class ConfigClientsHandler extends FormHandler {
 
     private void savePluginChanges() {
         Properties props = PluginStarter.pluginProperties();
-        Set keys = props.keySet();
-        for (Iterator iter = keys.iterator(); iter.hasNext(); ) {
-            String name = (String)iter.next();
+        Set<String> keys = props.stringPropertyNames();
+        for (String name : keys) {
             if (! (name.startsWith(PluginStarter.PREFIX) && name.endsWith(PluginStarter.ENABLED)))
                 continue;
             String app = name.substring(PluginStarter.PREFIX.length(), name.lastIndexOf(PluginStarter.ENABLED));
