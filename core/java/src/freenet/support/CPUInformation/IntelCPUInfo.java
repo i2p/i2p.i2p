@@ -58,4 +58,36 @@ public interface IntelCPUInfo extends CPUInfo {
      * @return true if the CPU implements at least a Corei level instruction/feature set.
      */
     public boolean IsCoreiCompatible();
+    
+    /**
+     * Supports the SSE 3, 4.1, 4.2 instructions.
+     * Supports the AVX 1 instructions.
+     * In general, this requires 32nm or smaller process.
+     * @return true if the CPU implements at least a SandyBridge level instruction/feature set.
+     */
+    public boolean IsSandyCompatible();
+    
+    /**
+     * Supports the SSE 3, 4.1, 4.2 instructions.
+     * Supports the AVX 1 instructions.
+     * In general, this requires 22nm or smaller process.
+     * @return true if the CPU implements at least a IvyBridge level instruction/feature set.
+     */
+    public boolean IsIvyCompatible();
+    
+    /**
+     * Supports the SSE 3, 4.1, 4.2 instructions.
+     * Supports the AVX 1, 2 instructions.
+     * In general, this requires 22nm or smaller process.
+     * @return true if the CPU implements at least a Haswell level instruction/feature set.
+     */
+    public boolean IsHaswellCompatible();
+    
+    /**
+     * Supports the SSE 3, 4.1, 4.2 instructions.
+     * Supports the AVX 1, 2 instructions.
+     * In general, this requires 14nm or smaller process.
+     * @return true if the CPU implements at least a Broadwell level instruction/feature set.
+     */
+    public boolean IsBroadwellCompatible();
 }
