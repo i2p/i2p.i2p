@@ -322,7 +322,7 @@ public class CPUID {
             System.out.println("Is K6-compatible: "+((AMDCPUInfo)c).IsK6Compatible());
             System.out.println("Is K6_2-compatible: "+((AMDCPUInfo)c).IsK6_2_Compatible());
             System.out.println("Is K6_3-compatible: "+((AMDCPUInfo)c).IsK6_3_Compatible());
-            System.out.println("Is K6-compatible: "+((AMDCPUInfo)c).IsGeodeCompatible());
+            System.out.println("Is Geode-compatible: "+((AMDCPUInfo)c).IsGeodeCompatible());
             System.out.println("Is Athlon-compatible: "+((AMDCPUInfo)c).IsAthlonCompatible());
             System.out.println("Is Athlon64-compatible: "+((AMDCPUInfo)c).IsAthlon64Compatible());
             System.out.println("Is Bobcat-compatible: "+((AMDCPUInfo)c).IsBobcatCompatible());
