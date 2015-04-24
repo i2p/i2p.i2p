@@ -26,6 +26,7 @@ import net.i2p.util.EepGet;
 import net.i2p.util.FileUtil;
 import net.i2p.util.Log;
 import net.i2p.util.OrderedProperties;
+import net.i2p.util.PortMapper;
 import net.i2p.util.SecureDirectory;
 import net.i2p.util.SecureFile;
 import net.i2p.util.VersionComparator;
@@ -98,11 +99,23 @@ class PluginUpdateRunner extends UpdateRunner {
                     }
                 }
             } else {
-                updateStatus("<b>" + _("Downloading plugin from {0}", _xpi2pURL) + "</b>");
                 // use the same settings as for updater
-                boolean shouldProxy = _context.getProperty(ConfigUpdateHandler.PROP_SHOULD_PROXY, ConfigUpdateHandler.DEFAULT_SHOULD_PROXY);
+                //boolean shouldProxy = _context.getProperty(ConfigUpdateHandler.PROP_SHOULD_PROXY, ConfigUpdateHandler.DEFAULT_SHOULD_PROXY);
+                // always proxy, or else FIXME
+                boolean shouldProxy = true;
                 String proxyHost = _context.getProperty(ConfigUpdateHandler.PROP_PROXY_HOST, ConfigUpdateHandler.DEFAULT_PROXY_HOST);
                 int proxyPort = ConfigUpdateHandler.proxyPort(_context);
+                if (shouldProxy && proxyPort == ConfigUpdateHandler.DEFAULT_PROXY_PORT_INT &&
+                    proxyHost.equals(ConfigUpdateHandler.DEFAULT_PROXY_HOST) &&
+                    _context.portMapper().getPort(PortMapper.SVC_HTTP_PROXY) < 0) {
+                    String msg = _("HTTP client proxy tunnel must be running");
+                    if (_log.shouldWarn())
+                        _log.warn(msg);
+                    statusDone("<b>" + msg + "</b>");
+                    _mgr.notifyTaskFailed(this, msg, null);
+                    return;
+                }
+                updateStatus("<b>" + _("Downloading plugin from {0}", _xpi2pURL) + "</b>");
                 try {
                     if (shouldProxy)
                         // 10 retries!!

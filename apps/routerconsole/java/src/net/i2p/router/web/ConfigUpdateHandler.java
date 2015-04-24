@@ -152,6 +152,17 @@ public class ConfigUpdateHandler extends FormHandler {
                 addFormError(_("Update or check already in progress"));
                 return;
             }
+
+            boolean shouldProxy = _context.getProperty(PROP_SHOULD_PROXY_NEWS, DEFAULT_SHOULD_PROXY_NEWS);
+            String proxyHost = _context.getProperty(PROP_PROXY_HOST, DEFAULT_PROXY_HOST);
+            int proxyPort = proxyPort(_context);
+            if (shouldProxy && proxyPort == ConfigUpdateHandler.DEFAULT_PROXY_PORT_INT &&
+                proxyHost.equals(ConfigUpdateHandler.DEFAULT_PROXY_HOST) &&
+                _context.portMapper().getPort(PortMapper.SVC_HTTP_PROXY) < 0) {
+                addFormError(_("HTTP client proxy tunnel must be running"));
+                return;
+            }
+
             boolean a1 = mgr.checkAvailable(NEWS, 30*1000) != null;
             boolean a2 = false;
             if ((!a1) && _updateUnsigned && _zipURL != null && _zipURL.length() > 0)

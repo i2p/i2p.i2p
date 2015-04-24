@@ -32,6 +32,7 @@ import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.FileUtil;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
+import net.i2p.util.PortMapper;
 import net.i2p.util.SimpleTimer2;
 import net.i2p.util.Translate;
 import net.i2p.util.VersionComparator;
@@ -144,6 +145,17 @@ public class PluginStarter implements Runnable {
                 } catch (InterruptedException ie) {}
                 if (loop++ > 40) break;
             } while (mgr.isUpdateInProgress(TYPE_DUMMY));
+        }
+
+        String proxyHost = ctx.getProperty(ConfigUpdateHandler.PROP_PROXY_HOST, ConfigUpdateHandler.DEFAULT_PROXY_HOST);
+        int proxyPort = ConfigUpdateHandler.proxyPort(ctx);
+        if (proxyPort == ConfigUpdateHandler.DEFAULT_PROXY_PORT_INT &&
+            proxyHost.equals(ConfigUpdateHandler.DEFAULT_PROXY_HOST) &&
+            ctx.portMapper().getPort(PortMapper.SVC_HTTP_PROXY) < 0) {
+            mgr.notifyComplete(null, Messages.getString("Plugin update check failed", ctx) +
+                                     " - " +
+                                     Messages.getString("HTTP client proxy tunnel must be running", ctx));
+            return;
         }
 
         Log log = ctx.logManager().getLog(PluginStarter.class);

@@ -3,11 +3,13 @@ package net.i2p.router.update;
 import java.io.File;
 import java.net.URI;
 import java.util.List;
+
 import net.i2p.crypto.TrustedUpdate;
 import net.i2p.router.RouterContext;
 import net.i2p.router.web.ConfigUpdateHandler;
 import net.i2p.update.*;
 import net.i2p.util.PartialEepGet;
+import net.i2p.util.PortMapper;
 
 /**
  * Check for an updated version of a plugin.
@@ -52,12 +54,22 @@ class PluginUpdateChecker extends UpdateRunner {
         protected void update() {
             // must be set for super
             _isPartial = true;
-            updateStatus("<b>" + _("Checking for update of plugin {0}", _appName) + "</b>");
             // use the same settings as for updater
             // always proxy, or else FIXME
             //boolean shouldProxy = Boolean.valueOf(_context.getProperty(ConfigUpdateHandler.PROP_SHOULD_PROXY, ConfigUpdateHandler.DEFAULT_SHOULD_PROXY)).booleanValue();
             String proxyHost = _context.getProperty(ConfigUpdateHandler.PROP_PROXY_HOST, ConfigUpdateHandler.DEFAULT_PROXY_HOST);
             int proxyPort = ConfigUpdateHandler.proxyPort(_context);
+            if (proxyPort == ConfigUpdateHandler.DEFAULT_PROXY_PORT_INT &&
+                proxyHost.equals(ConfigUpdateHandler.DEFAULT_PROXY_HOST) &&
+                _context.portMapper().getPort(PortMapper.SVC_HTTP_PROXY) < 0) {
+                String msg = _("HTTP client proxy tunnel must be running");
+                if (_log.shouldWarn())
+                    _log.warn(msg);
+                updateStatus("<b>" + msg + "</b>");
+                _mgr.notifyCheckComplete(this, false, false);
+                return;
+            }
+            updateStatus("<b>" + _("Checking for update of plugin {0}", _appName) + "</b>");
             _baos.reset();
             try {
                 _get = new PartialEepGet(_context, proxyHost, proxyPort, _baos, _currentURI.toString(), TrustedUpdate.HEADER_BYTES);
