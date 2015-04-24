@@ -506,9 +506,9 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
             _log.debug("startup " + _clientId, new Exception("I did it"));
         // prevent JVM exit when running outside the router
         boolean isDaemon = getTunnel().getContext().isRouterContext();
+        open = true;
         Thread t = new I2PAppThread(this, "I2PTunnel Client " + getTunnel().listenHost + ':' + localPort, isDaemon);
         t.start();
-        open = true;
         synchronized (this) {
             while (!listenerReady && open) {
                 try {
@@ -638,18 +638,21 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
 
     /**
      *  Non-final since 0.9.11.
-     *  Any overrides must set listenerReady = true.
+     *  open will be true before being called.
+     *  Any overrides must set listenerReady = true and then notifyAll() if setup is successful,
+     *  and must call close() and then notifyAll() on failure or termination.
      */
     public void run() {
-        try {
-            InetAddress addr = getListenHost(l);
-            if (addr == null) {
-                open = false;
-                synchronized (this) {
-                    notifyAll();
-                }
-                return;
+        InetAddress addr = getListenHost(l);
+        if (addr == null) {
+            close(true);
+            open = false;
+            synchronized (this) {
+                notifyAll();
             }
+            return;
+        }
+        try {
             Properties opts = getTunnel().getClientOptions();
             boolean useSSL = Boolean.parseBoolean(opts.getProperty(PROP_USE_SSL));
             if (useSSL) {
@@ -681,7 +684,7 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
             // Notify constructor that port is ready
             synchronized (this) {
                 listenerReady = true;
-                notify();
+                notifyAll();
             }
 
             // Wait until we are authorized to process data
@@ -709,14 +712,14 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
                 manageConnection(s);
             }
         } catch (IOException ex) {
-            if (open) {
-                _log.error("Error listening for connections on " + localPort, ex);
-                notifyEvent("openBaseClientResult", "error");
-            }
             synchronized (sockLock) {
                 mySockets.clear();
             }
-            open = false;
+            if (open) {
+                _log.error("Error listening for connections on " + addr + " port " + localPort, ex);
+                notifyEvent("openBaseClientResult", "error");
+                close(true);
+            }
             synchronized (this) {
                 notifyAll();
             }
@@ -766,6 +769,18 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
         }
     }
     
+    /**
+     *  Note that the tunnel can be reopened after this by calling startRunning().
+     *  This may not release all resources. In particular, the I2PSocketManager remains
+     *  and it may have timer threads that continue running.
+     *
+     *  To release all resources permanently, call destroy().
+     *
+     *  Does nothing if open is already false.
+     *  Sets open = false but does not notifyAll().
+     *
+     *  @return success
+     */
     public boolean close(boolean forced) {
         if (_log.shouldLog(Log.INFO))
             _log.info("close() called: forced = " + forced + " open = " + open + " sockMgr = " + sockMgr);
@@ -801,8 +816,8 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
             try {
                 if (ss != null) ss.close();
             } catch (IOException ex) {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("error closing", ex);
+                if (_log.shouldDebug())
+                    _log.debug("error closing", ex);
                 return false;
             }
             //l.log("Client closed.");

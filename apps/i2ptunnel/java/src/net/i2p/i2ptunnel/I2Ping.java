@@ -67,7 +67,7 @@ public class I2Ping extends I2PTunnelClientBase {
         // Notify constructor that port is ready
         synchronized (this) {
             listenerReady = true;
-            notify();
+            notifyAll();
         }
         l.log("*** I2Ping results:");
         try {
