@@ -42,11 +42,6 @@ public class I2PSOCKSTunnel extends I2PTunnelClientBase {
     public I2PSOCKSTunnel(int localPort, Logging l, boolean ownDest, EventDispatcher notifyThis, I2PTunnel tunnel, String pkf) {
         super(localPort, ownDest, l, notifyThis, "SOCKS Proxy on " + tunnel.listenHost + ':' + localPort, tunnel, pkf);
 
-        if (waitEventValue("openBaseClientResult").equals("error")) {
-            notifyEvent("openSOCKSTunnelResult", "error");
-            return;
-        }
-
         setName("SOCKS Proxy on " + tunnel.listenHost + ':' + localPort);
         parseOptions();
         notifyEvent("openSOCKSTunnelResult", "ok");

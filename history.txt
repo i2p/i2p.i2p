@@ -1,3 +1,12 @@
+2015-04-24 zzz
+ * i2ptunnel: Fix Socks and SocksIRC tunnels not starting
+
+2015-04-23 zzz
+ * Streaming:
+   - Reduce min RTO for quicker recovery after packet loss
+   - Reduce default initial ack delay
+   - More efficient checking for input buffer overflow
+
 2015-04-22 zzz
  * i2psnark: Fix deletion of config files, cleanup old ones (ticket #1498)
  * I2PSocketEepGet: Fix i2psnark NPE caused by -6 (ticket #1543)
