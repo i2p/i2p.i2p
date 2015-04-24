@@ -293,9 +293,13 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
         _context.statManager().createRateStat("i2ptunnel.httpCompressed", "compressed size transferred", "I2PTunnel", new long[] { 60*60*1000 });
         _context.statManager().createRateStat("i2ptunnel.httpExpanded", "size transferred after expansion", "I2PTunnel", new long[] { 60*60*1000 });
         super.startRunning();
-        this.isr = new InternalSocketRunner(this);
-        this.isr.start();
-        _context.portMapper().register(PortMapper.SVC_HTTP_PROXY, getLocalPort());
+        if (open) {
+            this.isr = new InternalSocketRunner(this);
+            this.isr.start();
+            int port = getLocalPort();
+            _context.portMapper().register(PortMapper.SVC_HTTP_PROXY, port);
+            _context.portMapper().register(PortMapper.SVC_HTTPS_PROXY, port);
+        }
     }
 
     /**
@@ -303,9 +307,14 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
      */
     @Override
     public boolean close(boolean forced) {
+        int port = getLocalPort();
         int reg = _context.portMapper().getPort(PortMapper.SVC_HTTP_PROXY);
-        if(reg == getLocalPort()) {
+        if (reg == port) {
             _context.portMapper().unregister(PortMapper.SVC_HTTP_PROXY);
+        }
+        reg = _context.portMapper().getPort(PortMapper.SVC_HTTPS_PROXY);
+        if (reg == port) {
+            _context.portMapper().unregister(PortMapper.SVC_HTTPS_PROXY);
         }
         boolean rv = super.close(forced);
         if(this.isr != null) {

@@ -53,7 +53,7 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
     protected boolean _ownDest;
 
     protected Destination dest;
-    private int localPort;
+    private volatile int localPort;
     private final String _handlerName;
 
     /**
@@ -476,6 +476,9 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
      *
      * This will be fast if i2cp.delayOpen is true, but could take
      * a LONG TIME if it is false, as it connects to the router and builds tunnels.
+     *
+     * Extending classes must check the value of boolean open after calling
+     * super.startRunning(), if false then something went wrong.
      *
      */
     public void startRunning() {

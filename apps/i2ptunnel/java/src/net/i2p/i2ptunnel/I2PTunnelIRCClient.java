@@ -198,7 +198,8 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase {
     @Override
     public void startRunning() {
         super.startRunning();
-        _context.portMapper().register(PortMapper.SVC_IRC, getLocalPort());
+        if (open)
+            _context.portMapper().register(PortMapper.SVC_IRC, getLocalPort());
     }
 
     @Override
