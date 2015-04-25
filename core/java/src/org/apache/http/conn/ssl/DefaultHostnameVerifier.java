@@ -49,24 +49,23 @@ import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLSession;
 import javax.security.auth.x500.X500Principal;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.http.annotation.Immutable;
 import org.apache.http.conn.util.InetAddressUtils;
 import org.apache.http.conn.util.PublicSuffixMatcher;
+
+import net.i2p.I2PAppContext;
+import net.i2p.util.Log;
 
 /**
  * Default {@link javax.net.ssl.HostnameVerifier} implementation.
  *
  * @since 4.4
  */
-@Immutable
 public final class DefaultHostnameVerifier implements HostnameVerifier {
 
     final static int DNS_NAME_TYPE        = 2;
     final static int IP_ADDRESS_TYPE      = 7;
 
-    private final Log log = LogFactory.getLog(getClass());
+    private final Log log = I2PAppContext.getGlobalContext().logManager().getLog(getClass());
 
     private final PublicSuffixMatcher publicSuffixMatcher;
 
@@ -86,8 +85,8 @@ public final class DefaultHostnameVerifier implements HostnameVerifier {
             verify(host, x509);
             return true;
         } catch(final SSLException ex) {
-            if (log.isDebugEnabled()) {
-                log.debug(ex.getMessage(), ex);
+            if (log.shouldWarn()) {
+                log.warn(ex.getMessage(), ex);
             }
             return false;
         }

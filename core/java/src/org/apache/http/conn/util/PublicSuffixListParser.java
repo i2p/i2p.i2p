@@ -32,7 +32,6 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.http.annotation.Immutable;
 
 /**
  * Parses the list from <a href="http://publicsuffix.org/">publicsuffix.org</a>
@@ -40,7 +39,6 @@ import org.apache.http.annotation.Immutable;
  *
  * @since 4.4
  */
-@Immutable
 public final class PublicSuffixListParser {
 
     private static final int MAX_LINE_LEN = 256;

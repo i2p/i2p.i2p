@@ -29,7 +29,6 @@ package org.apache.http.conn.util;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.http.annotation.Immutable;
 import org.apache.http.util.Args;
 
 /**
@@ -41,7 +40,6 @@ import org.apache.http.util.Args;
  *
  * @since 4.4
  */
-@Immutable
 public final class PublicSuffixList {
 
     private final List<String> rules;

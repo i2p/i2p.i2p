@@ -29,14 +29,12 @@ package org.apache.http.conn.util;
 
 import java.util.regex.Pattern;
 
-import org.apache.http.annotation.Immutable;
 
 /**
  * A collection of utilities relating to InetAddresses.
  *
  * @since 4.0
  */
-@Immutable
 public class InetAddressUtils {
 
     private InetAddressUtils() {
