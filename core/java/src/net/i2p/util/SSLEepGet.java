@@ -55,7 +55,7 @@ import java.util.Arrays;
 import java.util.Locale;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
-import javax.net.ssl.SSLHandshakeException;
+import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLParameters;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
@@ -83,7 +83,9 @@ import net.i2p.data.DataHelper;
  */
 public class SSLEepGet extends EepGet {
     /** if true, save cert chain on cert error */
-    private boolean _saveCerts;
+    private int _saveCerts;
+    /** if true, don't do hostname verification */
+    private boolean _bypassVerification;
     /** true if called from main(), used for logging */
     private boolean _commandLine;
     /** may be null if init failed */
@@ -154,15 +156,20 @@ public class SSLEepGet extends EepGet {
      * SSLEepGet -s https://foo/bar
      */ 
     public static void main(String args[]) {
-        boolean saveCerts = false;
+        int saveCerts = 0;
+        boolean noVerify = false;
         boolean error = false;
-        Getopt g = new Getopt("ssleepget", args, "s");
+        Getopt g = new Getopt("ssleepget", args, "sz");
         try {
             int c;
             while ((c = g.getopt()) != -1) {
               switch (c) {
                 case 's':
-                    saveCerts = true;
+                    saveCerts++;
+                    break;
+
+                case 'z':
+                    noVerify = true;
                     break;
 
                 case '?':
@@ -194,8 +201,10 @@ public class SSLEepGet extends EepGet {
         }
 
         SSLEepGet get = new SSLEepGet(I2PAppContext.getGlobalContext(), out, url);
-        if (saveCerts)
-            get._saveCerts = true;
+        if (saveCerts > 0)
+            get._saveCerts = saveCerts;
+        if (noVerify)
+            get._bypassVerification = true;
         get._commandLine = true;
         get.addStatusListener(get.new CLIStatusListener(1024, 40));
         if(!get.fetch(45*1000, -1, 60*1000))
@@ -203,8 +212,10 @@ public class SSLEepGet extends EepGet {
     }
     
     private static void usage() {
-        System.err.println("Usage: SSLEepGet https://url\n" +
-                           "To save unknown certs, use: SSLEepGet -s https://url");
+        System.err.println("Usage: SSLEepGet [-sz] https://url\n" +
+                           "  -s save unknown certs\n" +
+                           "  -s -s save all certs\n" +
+                           "  -z bypass hostname verification");
     }
 
     /**
@@ -352,7 +363,7 @@ public class SSLEepGet extends EepGet {
         for (int k = 0; k < chain.length; k++) {
             X509Certificate cert = chain[k];
             String name = host + '-' + (k + 1) + ".crt";
-            System.out.println("NOTE: Saving untrusted X509 certificate as " + name);
+            System.out.println("NOTE: Saving X509 certificate as " + name);
             System.out.println("      Issuer:     " + cert.getIssuerX500Principal());
             System.out.println("      Valid From: " + cert.getNotBefore());
             System.out.println("      Valid To:   " + cert.getNotAfter());
@@ -364,7 +375,6 @@ public class SSLEepGet extends EepGet {
             CertUtil.saveCert(cert, new File(name));
         }
         System.out.println("NOTE: To trust them, copy the certificate file(s) to the certificates directory and rerun without the -s option");
-        System.out.println("NOTE: EepGet failed, certificate error follows:");
     }
 
     /**
@@ -554,18 +564,28 @@ public class SSLEepGet extends EepGet {
                 port = url.getPort();
                 if (port == -1)
                     port = 443;
+                // Warning, createSocket() followed by connect(InetSocketAddress)
+                // disables SNI, at least on Java 7.
+                // So we must do createSocket(host, port) and then setSoTimeout;
+                // we can't crate a disconnected socket and then call setSoTimeout, sadly.
                 if (_sslContext != null)
-                    _proxy = _sslContext.getSocketFactory().createSocket();
+                    _proxy = _sslContext.getSocketFactory().createSocket(host, port);
                 else
-                    _proxy = SSLSocketFactory.getDefault().createSocket();
+                    _proxy = SSLSocketFactory.getDefault().createSocket(host, port);
                 if (_fetchHeaderTimeout > 0) {
                     _proxy.setSoTimeout(_fetchHeaderTimeout);
-                    _proxy.connect(new InetSocketAddress(host, port), _fetchHeaderTimeout);
-                } else {
-                    _proxy.connect(new InetSocketAddress(host, port));
                 }
                 SSLSocket socket = (SSLSocket) _proxy;
                 I2PSSLSocketFactory.setProtocolsAndCiphers(socket);
+                if (!_bypassVerification) {
+                    try {
+                        I2PSSLSocketFactory.verifyHostname(_context, socket, host);
+                    } catch (SSLException ssle) {
+                        if (_saveCerts > 0 && _stm != null)
+                            saveCerts(host, _stm);
+                        throw ssle;
+                    }
+                }
             } else {
                 throw new MalformedURLException("Only https supported: " + _actualURL);
             }
@@ -581,12 +601,14 @@ public class SSLEepGet extends EepGet {
         try {
             _proxyOut.write(DataHelper.getUTF8(req));
             _proxyOut.flush();
-        } catch (SSLHandshakeException sslhe) {
+            if (_saveCerts > 1 && _stm != null)
+                saveCerts(host, _stm);
+        } catch (SSLException sslhe) {
             // this maybe would be better done in the catch in super.fetch(), but
             // then we'd have to copy it all over here.
             _log.error("SSL negotiation error with " + host + ':' + port +
                        " - self-signed certificate or untrusted certificate authority?", sslhe);
-            if (_saveCerts && _stm != null)
+            if (_saveCerts > 0 && _stm != null)
                 saveCerts(host, _stm);
             else if (_commandLine) {
                 System.out.println("FAILED (probably due to untrusted certificates) - Run with -s option to save certificates");

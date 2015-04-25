@@ -678,7 +678,7 @@
             splitindex="true"
             doctitle="I2P Javadocs for Release ${release.number} Build ${i2p.build.number}${build.extra}"
             windowtitle="I2P Anonymous Network - Java Documentation - Version ${release.number}">
-            <group title="Core SDK (i2p.jar)" packages="net.i2p:net.i2p.*:net.i2p.client:net.i2p.client.*:net.i2p.internal:net.i2p.internal.*:freenet.support.CPUInformation:org.bouncycastle.oldcrypto:org.bouncycastle.oldcrypto.*:gnu.crypto.*:gnu.getopt:gnu.gettext:com.nettgryppa.security:net.metanotion:net.metanotion.*" />
+            <group title="Core SDK (i2p.jar)" packages="net.i2p:net.i2p.*:net.i2p.client:net.i2p.client.*:net.i2p.internal:net.i2p.internal.*:freenet.support.CPUInformation:org.bouncycastle.oldcrypto:org.bouncycastle.oldcrypto.*:gnu.crypto.*:gnu.getopt:gnu.gettext:com.nettgryppa.security:net.metanotion:net.metanotion.*:org.apache.http.conn.ssl:org.apache.http.conn.util:org.apache.http.util" />
             <group title="Streaming Library" packages="net.i2p.client.streaming:net.i2p.client.streaming.impl" />
             <group title="Router" packages="net.i2p.router:net.i2p.router.*:net.i2p.data.i2np:net.i2p.data.router:org.cybergarage:org.cybergarage.*:org.freenetproject:org.xlattice.crypto.filters" />
             <group title="Router Console" packages="net.i2p.router.web:net.i2p.router.update:net.i2p.router.news" />
@@ -1406,6 +1406,9 @@
         <!-- small enough to include for now -->
         <copy file="installer/resources/geoipv6.dat.gz" todir="pkg-temp/geoip/" />
         <copy file="installer/resources/continents.txt" todir="pkg-temp/geoip/" />
+      <!--
+        <copy file="installer/resources/public-suffix-list.txt" todir="pkg-temp/geoip/" />
+       -->
     </target>
 
     <target name="prepupdateRouter" depends="buildrouter, deletepkg-temp">
@@ -1424,6 +1427,9 @@
         <copy file="installer/resources/geoipv6.dat.gz" todir="pkg-temp/geoip/" />
         <copy file="installer/resources/countries.txt" todir="pkg-temp/geoip/" />
         <copy file="installer/resources/continents.txt" todir="pkg-temp/geoip/" />
+      <!--
+        <copy file="installer/resources/public-suffix-list.txt" todir="pkg-temp/geoip/" />
+       -->
     </target>
 
     <!-- All jetty jars required for update.
