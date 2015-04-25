@@ -1,5 +1,16 @@
+2015-04-25 zzz
+ * I2PSSLSocketFactory: Add hostname verification
+ * SSLEepGet:
+   - Rework recent setSoTimeout code changes, as they broke SNI
+   - Add option to save certs even if no errors
+   - Add option to disable hostname verification
+
 2015-04-24 zzz
- * i2ptunnel: Fix Socks and SocksIRC tunnels not starting
+ * Util: Catch and convert OOM in I2PThread.start()
+ * i2ptunnel:
+   - Fix Socks and SocksIRC tunnels not starting
+   - Fix shutdown of client tunnels on server socket errors,
+ * Updates: Fail fast if HTTP proxy is not running (ticket #1530)
 
 2015-04-23 zzz
  * Streaming:
