@@ -92,8 +92,7 @@ public class Reseeder {
     public static final String DEFAULT_SSL_SEED_URL =
               "https://reseed.i2p-projekt.de/" + "," + // Only HTTPS
               "https://netdb.rows.io:444/" + "," + // Only HTTPS and SU3 (v3) support
-              // temp disabled until SNI supported or cert changed
-              //"https://i2pseed.zarrenspry.info/" + "," + // Only HTTPS and SU3 (v3) support
+              "https://i2pseed.zarrenspry.info/" + "," + // Only HTTPS and SU3 (v3) support
               "https://i2p.mooo.com/netDb/" + "," +
               "https://193.150.121.66/netDb/" + "," +
               "https://netdb.i2p2.no/" + "," + // Only SU3 (v3) support, SNI required
