@@ -199,14 +199,14 @@ class ConnectionPacketHandler {
                 // of the ackDelay and half our estimated RTT to be sure.
                 final long nextSendTime = lastSendTime + Math.min(ackDelay, con.getOptions().getRTT() / 2);
                 if (nextSendTime <= now) {
-                    if (_log.shouldLog(Log.DEBUG)) 
-                        _log.debug("immediate ack");
+                    if (_log.shouldLog(Log.INFO)) 
+                        _log.info("immediate ack");
                     con.ackImmediately();
                     _context.statManager().updateFrequency("stream.ack.dup.immediate");
                 } else {
                     final long delay = nextSendTime - now;
-                    if (_log.shouldLog(Log.DEBUG)) 
-                        _log.debug("scheduling ack in " + delay);
+                    if (_log.shouldLog(Log.INFO)) 
+                        _log.info("scheduling ack in " + delay);
                     _context.simpleTimer2().addEvent(new AckDup(con), delay);
                 }
 
@@ -437,8 +437,8 @@ class ConnectionPacketHandler {
             con.getOptions().setWindowSize(newWindowSize);
             con.setCongestionWindowEnd(newWindowSize + lowest);
                                 
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("New window size " + newWindowSize + "/" + oldWindow + "/" + con.getOptions().getWindowSize() + " congestionSeenAt: "
+            if (_log.shouldLog(Log.INFO))
+                _log.info("New window size " + newWindowSize + "/" + oldWindow + "/" + con.getOptions().getWindowSize() + " congestionSeenAt: "
                            + con.getLastCongestionSeenAt() + " (#resends: " + numResends 
                            + ") for " + con);
         } else {
