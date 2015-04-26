@@ -96,7 +96,7 @@ public class MessagePayloadMessage extends I2CPMessageImpl {
         int size = 2 + 4 + 4 + _payload.getSize();
         try {
             DataHelper.writeLong(out, 4, size);
-            DataHelper.writeLong(out, 1, getType());
+            DataHelper.writeLong(out, 1, MESSAGE_TYPE);
             DataHelper.writeLong(out, 2, _sessionId);
             DataHelper.writeLong(out, 4, _messageId);
             DataHelper.writeLong(out, 4, _payload.getSize());
