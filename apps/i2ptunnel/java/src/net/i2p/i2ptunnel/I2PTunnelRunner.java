@@ -198,6 +198,7 @@ public class I2PTunnelRunner extends I2PAppThread implements I2PSocket.SocketErr
 
     /** 
      * When was the last data for this runner sent or received?  
+     * As of 0.9.20, returns -1 always!
      *
      * @return date (ms since the epoch), or -1 if no data has been transferred yet
      * @deprecated unused
@@ -206,9 +207,11 @@ public class I2PTunnelRunner extends I2PAppThread implements I2PSocket.SocketErr
         return lastActivityOn;
     }
 
+/****
     private void updateActivity() {
         lastActivityOn = Clock.getInstance().now();
     }
+****/
 
     /**
      * When this runner started up transferring data
@@ -448,28 +451,33 @@ public class I2PTunnelRunner extends I2PAppThread implements I2PSocket.SocketErr
             try {
                 int len;
                 while ((len = in.read(buffer)) != -1) {
-                    out.write(buffer, 0, len);
-                    if (_toI2P)
-                        totalSent += len;
-                    else
-                        totalReceived += len;
-
-                    if (len > 0) updateActivity();
+                    if (len > 0) {
+                        out.write(buffer, 0, len);
+                        if (_toI2P)
+                            totalSent += len;
+                        else
+                            totalReceived += len;
+                        //updateActivity();
+                    }
 
                     if (in.available() == 0) {
                         //if (_log.shouldLog(Log.DEBUG))
                         //    _log.debug("Flushing after sending " + len + " bytes through");
                         if (_log.shouldLog(Log.DEBUG))
                             _log.debug(direction + ": " + len + " bytes flushed through " + (_toI2P ? "to " : "from ")
-                                       + i2ps.getPeerDestination().calculateHash().toBase64().substring(0,6));
-                        try {
-                            Thread.sleep(I2PTunnel.PACKET_DELAY);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
+                                       + to);
+                        if (_toI2P) {
+                            try {
+                                Thread.sleep(5);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                            
+                            if (in.available() <= 0)
+                                out.flush();
+                        } else {
+                            out.flush();
                         }
-                        
-                        if (in.available() <= 0)
-                            out.flush(); // make sure the data get though
                     }
                 }
                 //out.flush(); // close() flushes
