@@ -20,11 +20,13 @@ import net.i2p.util.Log;
 public class MessageInputStreamTest extends TestCase {
     private I2PAppContext _context;
     private Log _log;
+    private ConnectionOptions _options;
     
     @Before
     public void setUp() {
         _context = I2PAppContext.getGlobalContext();
         _log = _context.logManager().getLog(MessageInputStreamTest.class);
+        _options = new ConnectionOptions();
     }
     
     @Test
@@ -32,7 +34,8 @@ public class MessageInputStreamTest extends TestCase {
         byte orig[] = new byte[256*1024];
         _context.random().nextBytes(orig);
         
-        MessageInputStream in = new MessageInputStream(_context);
+        MessageInputStream in = new MessageInputStream(_context, _options.getMaxMessageSize(),
+                                                       _options.getMaxWindowSize(), _options.getInboundBufferSize());
         for (int i = 0; i < orig.length / 1024; i++) {
             byte msg[] = new byte[1024];
             System.arraycopy(orig, i*1024, msg, 0, 1024);
@@ -58,7 +61,8 @@ public class MessageInputStreamTest extends TestCase {
         byte orig[] = new byte[256*1024];
         _context.random().nextBytes(orig);
         
-        MessageInputStream in = new MessageInputStream(_context);
+        MessageInputStream in = new MessageInputStream(_context, _options.getMaxMessageSize(),
+                                                       _options.getMaxWindowSize(), _options.getInboundBufferSize());
         ArrayList<Integer> order = new ArrayList<Integer>(32);
         for (int i = 0; i < orig.length / 1024; i++)
             order.add(new Integer(i));
@@ -90,7 +94,8 @@ public class MessageInputStreamTest extends TestCase {
         byte orig[] = new byte[256*1024];
         _context.random().nextBytes(orig);
         
-        MessageInputStream in = new MessageInputStream(_context);
+        MessageInputStream in = new MessageInputStream(_context, _options.getMaxMessageSize(),
+                                                       _options.getMaxWindowSize(), _options.getInboundBufferSize());
         for (int n = 0; n < 3; n++) {
             ArrayList<Integer> order = new ArrayList<Integer>(32);
             for (int i = 0; i < orig.length / 1024; i++)
@@ -125,7 +130,8 @@ public class MessageInputStreamTest extends TestCase {
         byte read[] = new byte[orig.length];
         _context.random().nextBytes(orig);
         
-        MessageInputStream in = new MessageInputStream(_context);
+        MessageInputStream in = new MessageInputStream(_context, _options.getMaxMessageSize(),
+                                                       _options.getMaxWindowSize(), _options.getInboundBufferSize());
         ArrayList<Integer> order = new ArrayList<Integer>(32);
         for (int i = 0; i < orig.length / 1024; i++)
             order.add(new Integer(i));
