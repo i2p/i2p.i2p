@@ -37,6 +37,7 @@ import net.i2p.util.Log;
 import net.i2p.util.SecureDirectory;
 import net.i2p.util.SecureFileOutputStream;
 import net.i2p.util.SSLEepGet;
+import net.i2p.util.SystemVersion;
 import net.i2p.util.Translate;
 
 /**
@@ -91,10 +92,11 @@ public class Reseeder {
     public static final String DEFAULT_SSL_SEED_URL =
               "https://reseed.i2p-projekt.de/" + "," + // Only HTTPS
               "https://netdb.rows.io:444/" + "," + // Only HTTPS and SU3 (v3) support
-              "https://i2pseed.zarrenspry.info/" + "," + // Only HTTPS and SU3 (v3) support
+              // temp disabled until SNI supported or cert changed
+              //"https://i2pseed.zarrenspry.info/" + "," + // Only HTTPS and SU3 (v3) support
               "https://i2p.mooo.com/netDb/" + "," +
               "https://193.150.121.66/netDb/" + "," +
-              "https://netdb.i2p2.no/" + "," + // Only SU3 (v3) support
+              "https://netdb.i2p2.no/" + "," + // Only SU3 (v3) support, SNI required
               "https://us.reseed.i2p2.no:444/" + "," +
               "https://uk.reseed.i2p2.no:444/" + "," +
               // Down (ticket #1422)
@@ -220,6 +222,16 @@ public class Reseeder {
             if (tmp != null)
                 tmp.delete();
         }
+    }
+
+    /**
+     *  Since Java 7 or Android 2.3 (API 9),
+     *  which is the lowest Android we support anyway.
+     *
+     *  @since 0.9.20
+     */
+    private static boolean isSNISupported() {
+        return SystemVersion.isJava7() || SystemVersion.isAndroid();
     }
 
     private class ReseedRunner implements Runnable, EepGet.StatusListener {
@@ -472,6 +484,11 @@ public class Reseeder {
                     Collections.shuffle(nonSSLList, _context.random());
                     URLList.addAll(nonSSLList);
                 }
+            }
+            if (!isSNISupported()) {
+                try {
+                    URLList.remove(new URL("https://netdb.i2p2.no/"));
+                } catch (MalformedURLException mue) {}
             }
             if (URLList.isEmpty()) {
                 System.out.println("No valid reseed URLs");
