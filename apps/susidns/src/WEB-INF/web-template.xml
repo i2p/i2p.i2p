@@ -42,6 +42,11 @@
         <url-pattern>/index</url-pattern>
     </servlet-mapping>
 
+    <servlet-mapping>
+        <servlet-name>i2p.susi.dns.jsp.export_jsp</servlet-name>
+        <url-pattern>/export</url-pattern>
+    </servlet-mapping>
+
     <session-config>
         <session-timeout>
             30

@@ -15,7 +15,9 @@ import java.io.InputStreamReader;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -358,6 +360,102 @@ public class SingleFileNamingService extends NamingService {
         } catch (IOException ioe) {
             _log.error("getEntries error", ioe);
             return Collections.emptyMap();
+        } finally {
+            if (in != null) try { in.close(); } catch (IOException ioe) {}
+            releaseReadLock();
+        }
+    }
+
+    /**
+     *  Overridden since we store base64 natively.
+     *
+     *  @param options As follows:
+     *                 Key "search": return only those matching substring
+     *                 Key "startsWith": return only those starting with
+     *                                   ("[0-9]" allowed)
+     *  @return all mappings (matching the options if non-null)
+     *          or empty Map if none.
+     *          Returned Map is not sorted.
+     *  @since 0.9.20
+     */
+    public Map<String, String> getBase64Entries(Properties options) {
+        if (!_file.exists())
+            return Collections.emptyMap();
+        String searchOpt = null;
+        String startsWith = null;
+        if (options != null) {
+            searchOpt = options.getProperty("search");
+            startsWith = options.getProperty("startsWith");
+        }
+        BufferedReader in = null;
+        getReadLock();
+        try {
+            in = new BufferedReader(new InputStreamReader(new FileInputStream(_file), "UTF-8"), 16*1024);
+            String line = null;
+            Map<String, String> rv = new HashMap<String, String>();
+            while ( (line = in.readLine()) != null) {
+                if (line.length() <= 0)
+                    continue;
+                if (startsWith != null) {
+                    if (startsWith.equals("[0-9]")) {
+                        if (line.charAt(0) < '0' || line.charAt(0) > '9')
+                            continue;
+                    } else if (!line.startsWith(startsWith)) {
+                        continue;
+                    }
+                }
+                if (line.startsWith("#"))
+                    continue;
+                if (line.indexOf('#') > 0)  // trim off any end of line comment
+                    line = line.substring(0, line.indexOf('#')).trim();
+                int split = line.indexOf('=');
+                if (split <= 0)
+                    continue;
+                String key = line.substring(0, split);
+                if (searchOpt != null && key.indexOf(searchOpt) < 0)
+                    continue;
+                String b64 = line.substring(split+1);   //.trim() ??????????????
+                if (b64.length() < 387)
+                    continue;
+                rv.put(key, b64);
+            }
+            if (searchOpt == null && startsWith == null) {
+                _lastWrite = _file.lastModified();
+                _size = rv.size();
+            }
+            return rv;
+        } catch (IOException ioe) {
+            _log.error("getEntries error", ioe);
+            return Collections.emptyMap();
+        } finally {
+            if (in != null) try { in.close(); } catch (IOException ioe) {}
+            releaseReadLock();
+        }
+    }
+
+    /**
+     *  Overridden for efficiency.
+     *  Output is not sorted.
+     *
+     *  @param options ignored
+     *  @since 0.9.20
+     */
+    public void export(Writer out, Properties options) throws IOException {
+        out.write("# Address book: ");
+        out.write(getName());
+        out.write('\n');
+        out.write("# Exported: ");
+        out.write((new Date()).toString());
+        out.write('\n');
+        BufferedReader in = null;
+        getReadLock();
+        try {
+            in = new BufferedReader(new InputStreamReader(new FileInputStream(_file), "UTF-8"), 16*1024);
+            String line = null;
+            while ( (line = in.readLine()) != null) {
+                out.write(line);
+                out.write('\n');
+            }
         } finally {
             if (in != null) try { in.close(); } catch (IOException ioe) {}
             releaseReadLock();

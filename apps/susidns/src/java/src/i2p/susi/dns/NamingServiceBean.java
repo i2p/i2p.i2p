@@ -21,12 +21,15 @@
 
 package i2p.susi.dns;
 
+import java.io.IOException;
+import java.io.Writer;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
+import java.util.SortedMap;
 
 import net.i2p.client.naming.NamingService;
 import net.i2p.data.DataFormatException;
@@ -196,7 +199,8 @@ public class NamingServiceBean extends AddressbookBean
 				}
 			}
 			AddressBean array[] = list.toArray(new AddressBean[list.size()]);
-			Arrays.sort( array, sorter );
+			if (!(results instanceof SortedMap))
+			    Arrays.sort( array, sorter );
 			entries = array;
 
 			message = generateLoadMessage();
@@ -350,5 +354,22 @@ public class NamingServiceBean extends AddressbookBean
 		AddressBean rv = new AddressBean(this.detail, dest.toBase64());
 		rv.setProperties(outProps);
 		return rv;
+	}
+
+	/**
+	 *  @since 0.9.20
+	 */
+	public void export(Writer out) throws IOException {
+		Properties searchProps = new Properties();
+		// only blockfile needs this
+		searchProps.setProperty("list", getFileName());
+		if (filter != null) {
+			String startsAt = filter.equals("0-9") ? "[0-9]" : filter;
+			searchProps.setProperty("startsWith", startsAt);
+		}
+		if (search != null && search.length() > 0)
+			searchProps.setProperty("search", search.toLowerCase(Locale.US));
+		getNamingService().export(out, searchProps);
+		// No post-filtering for hosts.txt naming services. It is what it is.
 	}
 }
