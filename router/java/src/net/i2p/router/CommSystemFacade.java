@@ -123,38 +123,197 @@ public abstract class CommSystemFacade implements Service {
      */
     public DHSessionKeyBuilder.Factory getDHFactory() { return null; }
 
+    /*
+     *  Reachability status codes
+     *
+     *	IPv4	IPv6	Status
+     *	----	----	------
+     *	ok	ok	OK 0
+     *	ok	x	OK 0
+     *	ok	unk	OK/UNKNOWN 1
+     *	ok	fw	OK/FIREWALLED 2
+     *
+     *	x	ok	DISABLED/OK 5
+     *	x	x	HOSED 12
+     *	x	unk	DISABLED/UNKNOWN 10
+     *	x	fw	DISABLED/FIREWALLED 11
+     *
+     *	unk	ok	UNKNOWN/OK 3
+     *	unk	x	UNKNOWN 14
+     *	unk	unk	UNKNOWN 14
+     *	unk	fw	UNKNOWN/FIREWALLED 9
+     *
+     *	fw	ok	FIREWALLED/OK 4
+     *	fw	x	FIREWALLED 8
+     *	fw	unk	FIREWALLED/UNKNOWN 7
+     *	fw	fw	FIREWALLED 8
+     *
+     *	sym	any	DIFFERENT 6 (TODO add IPv6 states or not worth it?)
+     *	disconnected	DISCONNECTED 12
+     *	hosed		HOSED 13
+     */
+
     /** 
      * These must be increasing in "badness" (see TransportManager.java),
      * but UNKNOWN must be last.
      *
      * We are able to receive unsolicited connections
+     * on all enabled transports
      */
     public static final short STATUS_OK = 0;
+
+    /** 
+     *  We have an IPv6 transport enabled and a public IPv6 address.
+     *  We can receive unsolicited connections on IPv4.
+     *  We might be able to receive unsolicited connections on IPv6.
+     *  @since 0.9.20
+     */
+    public static final short STATUS_IPV4_OK_IPV6_UNKNOWN = 1;
+
+    /** 
+     *  We have an IPv6 transport enabled and a public IPv6 address.
+     *  We can receive unsolicited connections on IPv4.
+     *  We cannot receive unsolicited connections on IPv6.
+     *  @since 0.9.20
+     */
+    public static final short STATUS_IPV4_OK_IPV6_FIREWALLED = 2;
+
+    /** 
+     *  We have an IPv6 transport enabled and a public IPv6 address.
+     *  We may be able to receive unsolicited connections on IPv4.
+     *  We can receive unsolicited connections on IPv6.
+     *  @since 0.9.20
+     */
+    public static final short STATUS_IPV4_UNKNOWN_IPV6_OK = 3;
+
+    /** 
+     *  We have an IPv6 transport enabled and a public IPv6 address.
+     *  We cannot receive unsolicited connections on IPv4.
+     *  We can receive unsolicited connections on IPv6.
+     *  @since 0.9.20
+     */
+    public static final short STATUS_IPV4_FIREWALLED_IPV6_OK = 4;
+
+    /** 
+     *  We have an IPv6 transport enabled and a public IPv6 address.
+     *  IPv4 is disabled.
+     *  We can receive unsolicited connections on IPv6.
+     *  @since 0.9.20
+     */
+    public static final short STATUS_IPV4_DISABLED_IPV6_OK = 5;
+
     /**
      * We are behind a symmetric NAT which will make our 'from' address look 
      * differently when we talk to multiple people
      *
      */
-    public static final short STATUS_DIFFERENT = 1;
+    public static final short STATUS_DIFFERENT = 6;
+
+    /** 
+     *  We have an IPv6 transport enabled and a public IPv6 address.
+     *  We cannot receive unsolicited connections on IPv4.
+     *  We might be able to receive unsolicited connections on IPv6.
+     *  @since 0.9.20
+     */
+    public static final short STATUS_IPV4_FIREWALLED_IPV6_UNKNOWN = 7;
+
     /**
      * We are able to talk to peers that we initiate communication with, but
-     * cannot receive unsolicited connections
+     * cannot receive unsolicited connections, i.e. Firewalled,
+     * on all enabled transports.
      */
-    public static final short STATUS_REJECT_UNSOLICITED = 2;
+    public static final short STATUS_REJECT_UNSOLICITED = 8;
+
+    /** 
+     *  We have an IPv6 transport enabled and a public IPv6 address.
+     *  We may be able to receive unsolicited connections on IPv4.
+     *  We cannot receive unsolicited connections on IPv6.
+     *  @since 0.9.20
+     */
+    public static final short STATUS_IPV4_UNKNOWN_IPV6_FIREWALLED = 9;
+
+    /** 
+     *  We have an IPv6 transport enabled and a public IPv6 address.
+     *  IPv4 is disabled.
+     *  We might be able to receive unsolicited connections on IPv6.
+     *  @since 0.9.20
+     */
+    public static final short STATUS_IPV4_DISABLED_IPV6_UNKNOWN = 10;
+
+    /** 
+     *  We have an IPv6 transport enabled and a public IPv6 address.
+     *  IPv4 is disabled.
+     *  We can receive unsolicited connections on IPv6.
+     *  @since 0.9.20
+     */
+    public static final short STATUS_IPV4_DISABLED_IPV6_FIREWALLED = 11;
+
     /**
-     *  We have no network interface at all
+     *  We have no network interface at all enabled transports
      *  @since 0.9.4
      */
-    public static final short STATUS_DISCONNECTED = 3;
+    public static final short STATUS_DISCONNECTED = 12;
+
     /**
      * Our detection system is broken (SSU bind port failed)
      */
-    public static final short STATUS_HOSED = 4;
+    public static final short STATUS_HOSED = 13;
+
     /**
-     * Our reachability is unknown
+     * Our reachability is unknown on all
      */
-    public static final short STATUS_UNKNOWN = 5;
+    public static final short STATUS_UNKNOWN = 14;
+
+    /** 
+     *  Since the codes may change.
+     *  @since 0.9.20
+     */
+    public enum Status {
+        OK(STATUS_OK, _x("OK")),
+        IPV4_OK_IPV6_UNKNOWN(STATUS_IPV4_OK_IPV6_UNKNOWN, _x("IPv4: OK; IPv6: Testing")),
+        IPV4_OK_IPV6_FIREWALLED(STATUS_IPV4_OK_IPV6_FIREWALLED, _x("IPv4: OK; IPv6: Firewalled")),
+        IPV4_UNKNOWN_IPV6_OK(STATUS_IPV4_UNKNOWN_IPV6_OK, _x("IPv4: Testing; IPv6: OK")),
+        IPV4_FIREWALLED_IPV6_OK(STATUS_IPV4_FIREWALLED_IPV6_OK, _x("IPv4: Firewalled; IPv6: OK")),
+        IPV4_DISABLED_IPV6_OK(STATUS_IPV4_DISABLED_IPV6_OK, _x("IPv4: Disabled; IPv6: OK")),
+        DIFFERENT(STATUS_DIFFERENT, _x("Symmetric NAT")),
+        IPV4_FIREWALLED_IPV6_UNKNOWN(STATUS_IPV4_FIREWALLED_IPV6_UNKNOWN, _x("IPv4: Firewalled; IPv6: Unknown")),
+        REJECT_UNSOLICITED(STATUS_REJECT_UNSOLICITED, _x("Firewalled")),
+        IPV4_UNKNOWN_IPV6_FIREWALLED(STATUS_IPV4_UNKNOWN_IPV6_FIREWALLED, _x("IPv4: Testing; IPv6: Firewalled")),
+        IPV4_DISABLED_IPV6_UNKNOWN(STATUS_IPV4_DISABLED_IPV6_UNKNOWN, _x("IPv4: Disabled; IPv6: Unknown")),
+        IPV4_DISABLED_IPV6_FIREWALLED(STATUS_IPV4_DISABLED_IPV6_FIREWALLED, _x("IPv4: Disabled; IPv6: Firewalled")),
+        DISCONNECTED(STATUS_DISCONNECTED, _x("Disconnected")),
+        HOSED(STATUS_HOSED, _x("Port Conflict")),
+        UNKNOWN(STATUS_UNKNOWN, _x("Testing"));
+
+        private final int code;
+        private final String status;
+
+        Status(int code, String status) {
+            this.code = code;
+            this.status = status;
+        }
+
+        public int getCode() {
+            return code;
+        }
+
+        /** 
+         *  Readable status, not translated
+         */
+        public String toStatusString() {
+            return status;
+        }
+
+        @Override
+        public String toString() {
+            return super.toString() + " (" + toStatusString() + ')';
+        }
     
+        /** 
+         *  Tag for translation.
+         */
+        private static String _x(String s) { return s; }
+    }
 }
 
 /** unused
