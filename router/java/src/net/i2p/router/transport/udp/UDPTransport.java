@@ -30,6 +30,7 @@ import net.i2p.data.SessionKey;
 import net.i2p.data.i2np.DatabaseStoreMessage;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.router.CommSystemFacade;
+import net.i2p.router.CommSystemFacade.Status;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
@@ -77,7 +78,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private final ExpirePeerEvent _expireEvent;
     private final PeerTestEvent _testEvent;
     private final PacketBuilder _destroyBuilder;
-    private short _reachabilityStatus;
+    private Status _reachabilityStatus;
     private long _reachabilityStatusLastUpdated;
     private int _reachabilityStatusUnchanged;
     private long _introducersSelectedOn;
@@ -245,7 +246,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         _expireTimeout = EXPIRE_TIMEOUT;
         _expireEvent = new ExpirePeerEvent();
         _testEvent = new PeerTestEvent();
-        _reachabilityStatus = CommSystemFacade.STATUS_UNKNOWN;
+        _reachabilityStatus = Status.UNKNOWN;
         _introManager = new IntroductionManager(_context, this);
         _introducersSelectedOn = -1;
         _lastInboundReceivedOn = -1;
@@ -430,7 +431,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         }
         if (_endpoints.isEmpty()) {
             _log.log(Log.CRIT, "Unable to open UDP port");
-            setReachabilityStatus(CommSystemFacade.STATUS_HOSED);
+            setReachabilityStatus(Status.HOSED);
             return;
         }
         if (newPort > 0 &&
@@ -508,7 +509,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             _log.log(Log.CRIT, "UDP port failure: " + endpoint);
             if (_endpoints.isEmpty()) {
                 _log.log(Log.CRIT, "No more UDP sockets open");
-                setReachabilityStatus(CommSystemFacade.STATUS_HOSED);
+                setReachabilityStatus(Status.HOSED);
                 // TODO restart?
             }
             rebuildExternalAddress();
@@ -725,7 +726,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         // Assume if we have an interface with a public IP that we aren't firewalled.
         // If this is wrong, the peer test will figure it out and change the status.
         if (changed && ip.length == 4 && source == SOURCE_INTERFACE)
-            setReachabilityStatus(CommSystemFacade.STATUS_OK);
+            setReachabilityStatus(Status.OK);
     }
 
     /**
@@ -743,7 +744,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 _log.warn("UPnP has failed to open the SSU port: " + port + " reason: " + reason);
         }
         if (success && ip != null && getExternalIP() != null)
-            setReachabilityStatus(CommSystemFacade.STATUS_OK);
+            setReachabilityStatus(Status.OK);
     }
 
     /**
@@ -980,8 +981,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         String prop = _context.getProperty(PROP_FIXED_PORT);
         if (prop != null)
             return Boolean.parseBoolean(prop);
-        int status = getReachabilityStatus();
-        return status != CommSystemFacade.STATUS_REJECT_UNSOLICITED;
+        Status status = getReachabilityStatus();
+        return status != Status.REJECT_UNSOLICITED;
     }
 
     /** 
@@ -1187,7 +1188,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         
         synchronized(_rebuildLock) {
             rebuildIfNecessary();
-            if (getReachabilityStatus() != CommSystemFacade.STATUS_OK &&
+            if (getReachabilityStatus() != Status.OK &&
                 _reachabilityStatusUnchanged < 7) {
                 _testEvent.forceRunSoon();
             }
@@ -1560,7 +1561,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 return _cachedBid[FAST_BID];
         } else {
             // If we don't have a port, all is lost
-            if ( _reachabilityStatus == CommSystemFacade.STATUS_HOSED) {
+            if ( _reachabilityStatus == Status.HOSED) {
                 markUnreachable(to);
                 return null;
             }
@@ -2087,10 +2088,10 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             return true;
         }
         *******************/
-        short status = getReachabilityStatus();
+        Status status = getReachabilityStatus();
         switch (status) {
-            case CommSystemFacade.STATUS_REJECT_UNSOLICITED:
-            case CommSystemFacade.STATUS_DIFFERENT:
+            case REJECT_UNSOLICITED:
+            case DIFFERENT:
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Require introducers, because our status is " + status);
                 return true;
@@ -2695,7 +2696,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             long longInactivityCutoff = now - EXPIRE_TIMEOUT;
             long pingCutoff = now - (2 * 60*60*1000);
             long pingFirewallCutoff = now - PING_FIREWALL_CUTOFF;
-            boolean shouldPingFirewall = _reachabilityStatus != CommSystemFacade.STATUS_OK;
+            boolean shouldPingFirewall = _reachabilityStatus != Status.OK;
             int currentListenPort = getListenPort(false);
             boolean pingOneOnly = shouldPingFirewall && getExternalPort(false) == currentListenPort;
             boolean shortLoop = shouldPingFirewall;
@@ -2772,17 +2773,17 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         }
     }
     
-    void setReachabilityStatus(short status) { 
+    void setReachabilityStatus(Status status) { 
         synchronized (_rebuildLock) {
             locked_setReachabilityStatus(status);
         }
     }
 
-    private void locked_setReachabilityStatus(short status) { 
-        short old = _reachabilityStatus;
+    private void locked_setReachabilityStatus(Status status) { 
+        Status old = _reachabilityStatus;
         long now = _context.clock().now();
         switch (status) {
-            case CommSystemFacade.STATUS_OK:
+            case OK:
                 // TODO if OK but internal port != external port, should we have
                 // a different status state? ...as we don't know if the TCP
                 // port will be mapped the same way or not...
@@ -2791,22 +2792,22 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 _reachabilityStatus = status; 
                 _reachabilityStatusLastUpdated = now;
                 break;
-            case CommSystemFacade.STATUS_DIFFERENT:
+            case DIFFERENT:
                 _context.statManager().addRateData("udp.statusDifferent", 1);
                 _reachabilityStatus = status; 
                 _reachabilityStatusLastUpdated = now;
                 break;
-            case CommSystemFacade.STATUS_REJECT_UNSOLICITED:
+            case REJECT_UNSOLICITED:
                 _context.statManager().addRateData("udp.statusReject", 1);
 // if old != unsolicited && now - lastUpdated > STATUS_GRACE_PERIOD)
 //
                 // fall through...
-            case CommSystemFacade.STATUS_DISCONNECTED:
-            case CommSystemFacade.STATUS_HOSED:
+            case DISCONNECTED:
+            case HOSED:
                 _reachabilityStatus = status; 
                 _reachabilityStatusLastUpdated = now;
                 break;
-            case CommSystemFacade.STATUS_UNKNOWN:
+            case UNKNOWN:
             default:
                 _context.statManager().addRateData("udp.statusUnknown", 1);
                 //if (now - _reachabilityStatusLastUpdated < STATUS_GRACE_PERIOD) {
@@ -2819,17 +2820,17 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 break;
         }
         _testEvent.setLastTested();
-        if (status != CommSystemFacade.STATUS_UNKNOWN) {
+        if (status != Status.UNKNOWN) {
             if (status != old)
                 _reachabilityStatusUnchanged = 0;
             else
                 _reachabilityStatusUnchanged++;
         }
-        if ( (status != old) && (status != CommSystemFacade.STATUS_UNKNOWN) ) {
+        if ( (status != old) && (status != Status.UNKNOWN) ) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Old status: " + old + " New status: " + status + " from: ", new Exception("traceback"));
-            if (old != CommSystemFacade.STATUS_UNKNOWN)
-                _context.router().eventLog().addEvent(EventLog.REACHABILITY, Integer.toString(status));
+            if (old != Status.UNKNOWN)
+                _context.router().eventLog().addEvent(EventLog.REACHABILITY, status.toStatusString());
             // Always rebuild when the status changes, even if our address hasn't changed,
             // as rebuildExternalAddress() calls replaceAddress() which calls CSFI.notifyReplaceAddress()
             // which will start up NTCP inbound when we transition to OK.
@@ -2844,18 +2845,20 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
 
     private static final String PROP_REACHABILITY_STATUS_OVERRIDE = "i2np.udp.status";
 
-    @Override
-    public short getReachabilityStatus() { 
+    /**
+     * Previously returned short, now enum as of 0.9.20
+     */
+    public Status getReachabilityStatus() { 
         String override = _context.getProperty(PROP_REACHABILITY_STATUS_OVERRIDE);
         if (override == null)
             return _reachabilityStatus;
             
         if ("ok".equals(override))
-            return CommSystemFacade.STATUS_OK;
+            return Status.OK;
         else if ("err-reject".equals(override))
-            return CommSystemFacade.STATUS_REJECT_UNSOLICITED;
+            return Status.REJECT_UNSOLICITED;
         else if ("err-different".equals(override))
-            return CommSystemFacade.STATUS_DIFFERENT;
+            return Status.DIFFERENT;
         
         return _reachabilityStatus; 
     }

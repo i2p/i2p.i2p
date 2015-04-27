@@ -34,7 +34,7 @@ import net.i2p.data.router.RouterAddress;
 import net.i2p.data.router.RouterIdentity;
 import net.i2p.data.router.RouterInfo;
 import net.i2p.data.i2np.I2NPMessage;
-import net.i2p.router.CommSystemFacade;
+import net.i2p.router.CommSystemFacade.Status;
 import net.i2p.router.Job;
 import net.i2p.router.MessageSelector;
 import net.i2p.router.OutNetMessage;
@@ -726,7 +726,10 @@ public abstract class TransportImpl implements Transport {
     public void renderStatusHTML(Writer out) throws IOException {}
     public void renderStatusHTML(Writer out, String urlBase, int sortFlags) throws IOException { renderStatusHTML(out); }
 
-    public short getReachabilityStatus() { return CommSystemFacade.STATUS_UNKNOWN; }
+    /**
+     *  Previously returned short, now enum as of 0.9.20
+     */
+    public abstract Status getReachabilityStatus();
 
     /**
      * @deprecated unused
@@ -752,9 +755,9 @@ public abstract class TransportImpl implements Transport {
 
     /** called when we can't reach a peer */
     public void markUnreachable(Hash peer) {
-        short status = _context.commSystem().getReachabilityStatus();
-        if (status == CommSystemFacade.STATUS_DISCONNECTED ||
-            status == CommSystemFacade.STATUS_HOSED)
+        Status status = _context.commSystem().getStatus();
+        if (status == Status.DISCONNECTED ||
+            status == Status.HOSED)
             return;
         Long now = Long.valueOf(_context.clock().now());
         synchronized (_unreachableEntries) {

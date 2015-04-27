@@ -32,6 +32,7 @@ import net.i2p.data.SigningPrivateKey;
 import net.i2p.data.SigningPublicKey;
 import net.i2p.data.i2np.GarlicMessage;
 import net.i2p.data.router.RouterInfo;
+import net.i2p.router.CommSystemFacade.Status;
 import net.i2p.router.message.GarlicMessageHandler;
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import net.i2p.router.startup.CreateRouterInfoJob;
@@ -919,17 +920,20 @@ public class Router implements RouterClock.ClockShiftListener {
             ri.addCapability(CAPABILITY_UNREACHABLE);
             return;
         }
-        switch (_context.commSystem().getReachabilityStatus()) {
-            case CommSystemFacade.STATUS_OK:
+        switch (_context.commSystem().getStatus()) {
+            case OK:
                 ri.addCapability(CAPABILITY_REACHABLE);
                 break;
-            case CommSystemFacade.STATUS_DIFFERENT:
-            case CommSystemFacade.STATUS_REJECT_UNSOLICITED:
+
+            case DIFFERENT:
+            case REJECT_UNSOLICITED:
                 ri.addCapability(CAPABILITY_UNREACHABLE);
                 break;
-            case CommSystemFacade.STATUS_DISCONNECTED:
-            case CommSystemFacade.STATUS_HOSED:
-            case CommSystemFacade.STATUS_UNKNOWN:
+
+            case DISCONNECTED:
+            case HOSED:
+            case UNKNOWN:
+            default:
                 // no explicit capability
                 break;
         }

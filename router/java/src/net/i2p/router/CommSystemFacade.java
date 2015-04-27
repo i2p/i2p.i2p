@@ -64,9 +64,17 @@ public abstract class CommSystemFacade implements Service {
     
     /**
      * Determine under what conditions we are remotely reachable.
-     *
+     * For internal use only.
+     * Not recommended for plugins or embedded applications, as
+     * the integer codes may change. Use getStatus() instead.
      */
-    public short getReachabilityStatus() { return STATUS_OK; }
+    public short getReachabilityStatus() { return (short) getStatus().getCode(); }
+    
+    /**
+     * Determine under what conditions we are remotely reachable.
+     * @since 0.9.20
+     */
+    public Status getStatus() { return Status.OK; }
 
     /**
      * @deprecated unused

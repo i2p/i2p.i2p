@@ -28,7 +28,7 @@ import net.i2p.data.router.RouterAddress;
 import net.i2p.data.router.RouterIdentity;
 import net.i2p.data.router.RouterInfo;
 import net.i2p.data.i2np.I2NPMessage;
-import net.i2p.router.CommSystemFacade;
+import net.i2p.router.CommSystemFacade.Status;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
 import static net.i2p.router.transport.Transport.AddressSource.*;
@@ -371,12 +371,15 @@ public class TransportManager implements TransportEventListener {
         return skews;
     }
     
-    /** @return the best status of any transport */
-    public short getReachabilityStatus() { 
-        short rv = CommSystemFacade.STATUS_UNKNOWN;
+    /**
+     *  Previously returned short, now enum as of 0.9.20
+     *  @return the best status of any transport
+     */
+    public Status getReachabilityStatus() { 
+        Status rv = Status.UNKNOWN;
         for (Transport t : _transports.values()) {
-            short s = t.getReachabilityStatus();
-            if (s < rv)
+            Status s = t.getReachabilityStatus();
+            if (s.getCode() < rv.getCode())
                 rv = s;
         }
         return rv;

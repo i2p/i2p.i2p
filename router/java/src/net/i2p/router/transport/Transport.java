@@ -16,6 +16,7 @@ import java.util.Vector;
 import net.i2p.data.Hash;
 import net.i2p.data.router.RouterAddress;
 import net.i2p.data.router.RouterInfo;
+import net.i2p.router.CommSystemFacade.Status;
 import net.i2p.router.OutNetMessage;
 
 /**
@@ -131,7 +132,11 @@ public interface Transport {
     public List<String> getMostRecentErrorMessages();
     
     public void renderStatusHTML(Writer out, String urlBase, int sortFlags) throws IOException;
-    public short getReachabilityStatus();
+
+    /**
+     *  Previously returned short, now enum as of 0.9.20
+     */
+    public Status getReachabilityStatus();
 
     /**
      * @deprecated unused

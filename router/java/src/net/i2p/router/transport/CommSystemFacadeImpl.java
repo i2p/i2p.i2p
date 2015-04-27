@@ -176,13 +176,16 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         return _manager.getMostRecentErrorMessages(); 
     }
 
+    /**
+     *  @since 0.9.20
+     */
     @Override
-    public short getReachabilityStatus() { 
+    public Status getStatus() { 
         if (!_netMonitorStatus)
-            return STATUS_DISCONNECTED;
-        short rv = _manager.getReachabilityStatus(); 
-        if (rv != STATUS_HOSED && _context.router().isHidden())
-            return STATUS_OK;
+            return Status.DISCONNECTED;
+        Status rv = _manager.getReachabilityStatus(); 
+        if (rv != Status.HOSED && _context.router().isHidden())
+            return Status.OK;
         return rv; 
     }
 

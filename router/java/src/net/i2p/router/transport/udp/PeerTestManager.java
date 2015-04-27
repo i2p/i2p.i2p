@@ -12,7 +12,7 @@ import net.i2p.data.DataHelper;
 import net.i2p.data.router.RouterAddress;
 import net.i2p.data.router.RouterInfo;
 import net.i2p.data.SessionKey;
-import net.i2p.router.CommSystemFacade;
+import net.i2p.router.CommSystemFacade.Status;
 import net.i2p.router.RouterContext;
 import static net.i2p.router.transport.udp.PeerTestState.Role.*;
 import net.i2p.router.transport.TransportUtil;
@@ -364,7 +364,7 @@ class PeerTestManager {
                 // why are we doing this instead of calling testComplete() ?
                 _currentTestComplete = true;
                 _context.statManager().addRateData("udp.statusKnownCharlie", 1);
-                honorStatus(CommSystemFacade.STATUS_UNKNOWN);
+                honorStatus(Status.UNKNOWN);
                 _currentTest = null;
                 return;
             }
@@ -433,7 +433,6 @@ class PeerTestManager {
      */
     private void testComplete(boolean forgetTest) {
         _currentTestComplete = true;
-        short status = -1;
         PeerTestState test = _currentTest;
 
         // Don't do this or we won't call honorStatus()
@@ -443,25 +442,26 @@ class PeerTestManager {
         //    return;
         // }
 
+        Status status;
         if (test.getAlicePortFromCharlie() > 0) {
             // we received a second message from charlie
             if ( (test.getAlicePort() == test.getAlicePortFromCharlie()) &&
                  (test.getAliceIP() != null) && (test.getAliceIPFromCharlie() != null) &&
                  (test.getAliceIP().equals(test.getAliceIPFromCharlie())) ) {
-                status = CommSystemFacade.STATUS_OK;
+                status = Status.OK;
             } else {
-                status = CommSystemFacade.STATUS_DIFFERENT;
+                status = Status.DIFFERENT;
             }
         } else if (test.getReceiveCharlieTime() > 0) {
             // we received only one message from charlie
-            status = CommSystemFacade.STATUS_UNKNOWN;
+            status = Status.UNKNOWN;
         } else if (test.getReceiveBobTime() > 0) {
             // we received a message from bob but no messages from charlie
-            status = CommSystemFacade.STATUS_REJECT_UNSOLICITED;
+            status = Status.REJECT_UNSOLICITED;
         } else {
             // we never received anything from bob - he is either down, 
             // ignoring us, or unable to get a Charlie to respond
-            status = CommSystemFacade.STATUS_UNKNOWN;
+            status = Status.UNKNOWN;
         }
         
         if (_log.shouldLog(Log.INFO))
@@ -477,7 +477,7 @@ class PeerTestManager {
      * necessary).
      *
      */
-    private void honorStatus(short status) {
+    private void honorStatus(Status status) {
         if (_log.shouldLog(Log.INFO))
             _log.info("Test results: status = " + status);
         _transport.setReachabilityStatus(status);

@@ -31,7 +31,7 @@ import net.i2p.data.router.RouterIdentity;
 import net.i2p.data.router.RouterInfo;
 import net.i2p.data.i2np.DatabaseStoreMessage;
 import net.i2p.data.i2np.I2NPMessage;
-import net.i2p.router.CommSystemFacade;
+import net.i2p.router.CommSystemFacade.Status;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
 import net.i2p.router.transport.Transport;
@@ -1162,17 +1162,18 @@ public class NTCPTransport extends TransportImpl {
      *
      * We have to be careful here because much of the router console code assumes
      * that the reachability status is really just the UDP status.
+     *
+     * Previously returned short, now enum as of 0.9.20
      */
-    @Override
-    public short getReachabilityStatus() { 
+    public Status getReachabilityStatus() { 
         // If we have an IPv4 address
         if (isAlive() && getCurrentAddress(false) != null) {
                 for (NTCPConnection con : _conByIdent.values()) {
                     if (con.isInbound())
-                        return CommSystemFacade.STATUS_OK;
+                        return Status.OK;
                 }
         }
-        return CommSystemFacade.STATUS_UNKNOWN;
+        return Status.UNKNOWN;
     }
 
     /**
