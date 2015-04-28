@@ -67,6 +67,8 @@ public abstract class CommSystemFacade implements Service {
      * For internal use only.
      * Not recommended for plugins or embedded applications, as
      * the integer codes may change. Use getStatus() instead.
+     *
+     * @deprecated use getStatus()
      */
     public short getReachabilityStatus() { return (short) getStatus().getCode(); }
     
@@ -176,7 +178,7 @@ public abstract class CommSystemFacade implements Service {
      *  We might be able to receive unsolicited connections on IPv6.
      *  @since 0.9.20
      */
-    public static final short STATUS_IPV4_OK_IPV6_UNKNOWN = 1;
+    public static final short STATUS_IPV4_OK_IPV6_UNKNOWN = 2;
 
     /** 
      *  We have an IPv6 transport enabled and a public IPv6 address.
@@ -184,7 +186,7 @@ public abstract class CommSystemFacade implements Service {
      *  We cannot receive unsolicited connections on IPv6.
      *  @since 0.9.20
      */
-    public static final short STATUS_IPV4_OK_IPV6_FIREWALLED = 2;
+    public static final short STATUS_IPV4_OK_IPV6_FIREWALLED = 1;
 
     /** 
      *  We have an IPv6 transport enabled and a public IPv6 address.
@@ -192,7 +194,7 @@ public abstract class CommSystemFacade implements Service {
      *  We can receive unsolicited connections on IPv6.
      *  @since 0.9.20
      */
-    public static final short STATUS_IPV4_UNKNOWN_IPV6_OK = 3;
+    public static final short STATUS_IPV4_UNKNOWN_IPV6_OK = 4;
 
     /** 
      *  We have an IPv6 transport enabled and a public IPv6 address.
@@ -200,7 +202,7 @@ public abstract class CommSystemFacade implements Service {
      *  We can receive unsolicited connections on IPv6.
      *  @since 0.9.20
      */
-    public static final short STATUS_IPV4_FIREWALLED_IPV6_OK = 4;
+    public static final short STATUS_IPV4_FIREWALLED_IPV6_OK = 3;
 
     /** 
      *  We have an IPv6 transport enabled and a public IPv6 address.
@@ -223,14 +225,14 @@ public abstract class CommSystemFacade implements Service {
      *  We might be able to receive unsolicited connections on IPv6.
      *  @since 0.9.20
      */
-    public static final short STATUS_IPV4_FIREWALLED_IPV6_UNKNOWN = 7;
+    public static final short STATUS_IPV4_FIREWALLED_IPV6_UNKNOWN = 8;
 
     /**
      * We are able to talk to peers that we initiate communication with, but
      * cannot receive unsolicited connections, i.e. Firewalled,
      * on all enabled transports.
      */
-    public static final short STATUS_REJECT_UNSOLICITED = 8;
+    public static final short STATUS_REJECT_UNSOLICITED = 7;
 
     /** 
      *  We have an IPv6 transport enabled and a public IPv6 address.
@@ -246,7 +248,7 @@ public abstract class CommSystemFacade implements Service {
      *  We might be able to receive unsolicited connections on IPv6.
      *  @since 0.9.20
      */
-    public static final short STATUS_IPV4_DISABLED_IPV6_UNKNOWN = 10;
+    public static final short STATUS_IPV4_DISABLED_IPV6_UNKNOWN = 11;
 
     /** 
      *  We have an IPv6 transport enabled and a public IPv6 address.
@@ -254,7 +256,7 @@ public abstract class CommSystemFacade implements Service {
      *  We can receive unsolicited connections on IPv6.
      *  @since 0.9.20
      */
-    public static final short STATUS_IPV4_DISABLED_IPV6_FIREWALLED = 11;
+    public static final short STATUS_IPV4_DISABLED_IPV6_FIREWALLED = 10;
 
     /**
      *  We have no network interface at all enabled transports
@@ -277,17 +279,20 @@ public abstract class CommSystemFacade implements Service {
      *  @since 0.9.20
      */
     public enum Status {
+        /** IPv4 OK, IPv6 OK or disabled or no address */
         OK(STATUS_OK, _x("OK")),
         IPV4_OK_IPV6_UNKNOWN(STATUS_IPV4_OK_IPV6_UNKNOWN, _x("IPv4: OK; IPv6: Testing")),
         IPV4_OK_IPV6_FIREWALLED(STATUS_IPV4_OK_IPV6_FIREWALLED, _x("IPv4: OK; IPv6: Firewalled")),
         IPV4_UNKNOWN_IPV6_OK(STATUS_IPV4_UNKNOWN_IPV6_OK, _x("IPv4: Testing; IPv6: OK")),
         IPV4_FIREWALLED_IPV6_OK(STATUS_IPV4_FIREWALLED_IPV6_OK, _x("IPv4: Firewalled; IPv6: OK")),
         IPV4_DISABLED_IPV6_OK(STATUS_IPV4_DISABLED_IPV6_OK, _x("IPv4: Disabled; IPv6: OK")),
+        /** IPv4 symmetric NAT, IPv6 any state */
         DIFFERENT(STATUS_DIFFERENT, _x("Symmetric NAT")),
-        IPV4_FIREWALLED_IPV6_UNKNOWN(STATUS_IPV4_FIREWALLED_IPV6_UNKNOWN, _x("IPv4: Firewalled; IPv6: Unknown")),
+        IPV4_FIREWALLED_IPV6_UNKNOWN(STATUS_IPV4_FIREWALLED_IPV6_UNKNOWN, _x("IPv4: Firewalled; IPv6: Testing")),
+        /** IPv4 firewalled, IPv6 firewalled or disabled or no address */
         REJECT_UNSOLICITED(STATUS_REJECT_UNSOLICITED, _x("Firewalled")),
         IPV4_UNKNOWN_IPV6_FIREWALLED(STATUS_IPV4_UNKNOWN_IPV6_FIREWALLED, _x("IPv4: Testing; IPv6: Firewalled")),
-        IPV4_DISABLED_IPV6_UNKNOWN(STATUS_IPV4_DISABLED_IPV6_UNKNOWN, _x("IPv4: Disabled; IPv6: Unknown")),
+        IPV4_DISABLED_IPV6_UNKNOWN(STATUS_IPV4_DISABLED_IPV6_UNKNOWN, _x("IPv4: Disabled; IPv6: Testing")),
         IPV4_DISABLED_IPV6_FIREWALLED(STATUS_IPV4_DISABLED_IPV6_FIREWALLED, _x("IPv4: Disabled; IPv6: Firewalled")),
         DISCONNECTED(STATUS_DISCONNECTED, _x("Disconnected")),
         HOSED(STATUS_HOSED, _x("Port Conflict")),
@@ -306,6 +311,202 @@ public abstract class CommSystemFacade implements Service {
         }
 
         /** 
+         *  merge the new Status with the old Status
+         */
+        public static Status merge(Status oldStatus, Status newStatus) {
+            // shortcut newStatus
+            if (oldStatus == newStatus || newStatus == UNKNOWN)
+                return oldStatus;
+            // shortcut oldStatus
+            if (oldStatus == UNKNOWN || oldStatus == DISCONNECTED || oldStatus == HOSED)
+                return newStatus;
+            switch (newStatus) {
+                case IPV4_OK_IPV6_UNKNOWN:
+                    switch (oldStatus) {
+                        // cases where we already knew both states
+                        case OK:
+                        case IPV4_FIREWALLED_IPV6_OK:
+                        case IPV4_DISABLED_IPV6_OK:
+                            return OK;
+
+                        case IPV4_OK_IPV6_FIREWALLED:
+                            return oldStatus;
+
+                        case DIFFERENT:
+                        case REJECT_UNSOLICITED:
+                            return newStatus;
+
+                        case IPV4_DISABLED_IPV6_FIREWALLED:
+                            return IPV4_OK_IPV6_FIREWALLED;
+
+                        // cases where we already knew the IPv6 state only
+                        case IPV4_UNKNOWN_IPV6_OK:
+                            return OK;
+
+                        case IPV4_UNKNOWN_IPV6_FIREWALLED:
+                            return IPV4_OK_IPV6_FIREWALLED;
+
+                        // cases where we already knew the IPv4 state only
+                        case IPV4_OK_IPV6_UNKNOWN:
+                        case IPV4_FIREWALLED_IPV6_UNKNOWN:
+                        case IPV4_DISABLED_IPV6_UNKNOWN:
+                            return newStatus;
+
+                        default:
+                            return newStatus;
+                    }
+
+                case IPV4_UNKNOWN_IPV6_OK:
+                    switch (oldStatus) {
+                        // cases where we already knew both states
+                        case OK:
+                        case IPV4_OK_IPV6_FIREWALLED:
+                            return OK;
+
+                        case IPV4_FIREWALLED_IPV6_OK:
+                        case IPV4_DISABLED_IPV6_OK:
+                        case DIFFERENT: // TODO
+                            return oldStatus;
+
+                        case REJECT_UNSOLICITED:
+                            return IPV4_FIREWALLED_IPV6_OK;
+
+                        case IPV4_DISABLED_IPV6_FIREWALLED:
+                            return IPV4_DISABLED_IPV6_OK;
+
+                        // cases where we already knew the IPv6 state only
+                        case IPV4_UNKNOWN_IPV6_OK:
+                        case IPV4_UNKNOWN_IPV6_FIREWALLED:
+                            return newStatus;
+
+                        // cases where we already knew the IPv4 state only
+                        case IPV4_OK_IPV6_UNKNOWN:
+                            return OK;
+
+                        case IPV4_FIREWALLED_IPV6_UNKNOWN:
+                            return IPV4_FIREWALLED_IPV6_OK;
+
+                        case IPV4_DISABLED_IPV6_UNKNOWN:
+                            return IPV4_DISABLED_IPV6_OK;
+
+                        default:
+                            return newStatus;
+                    }
+
+                case IPV4_FIREWALLED_IPV6_UNKNOWN:
+                    switch (oldStatus) {
+                        // cases where we already knew both states
+                        case OK:
+                        case IPV4_DISABLED_IPV6_OK:
+                        case IPV4_FIREWALLED_IPV6_OK:
+                            return IPV4_FIREWALLED_IPV6_OK;
+
+                        case IPV4_OK_IPV6_FIREWALLED:
+                        case IPV4_DISABLED_IPV6_FIREWALLED:
+                            return REJECT_UNSOLICITED;
+
+                        case DIFFERENT:
+                        case REJECT_UNSOLICITED:
+                            return newStatus;
+
+                        // cases where we already knew the IPv6 state only
+                        case IPV4_UNKNOWN_IPV6_OK:
+                            return IPV4_FIREWALLED_IPV6_OK;
+
+                        case IPV4_UNKNOWN_IPV6_FIREWALLED:
+                            return REJECT_UNSOLICITED;
+
+                        // cases where we already knew the IPv4 state only
+                        case IPV4_OK_IPV6_UNKNOWN:
+                        case IPV4_FIREWALLED_IPV6_UNKNOWN:
+                        case IPV4_DISABLED_IPV6_UNKNOWN:
+                            return newStatus;
+
+                        default:
+                            return newStatus;
+                    }
+
+                case IPV4_UNKNOWN_IPV6_FIREWALLED:
+                    switch (oldStatus) {
+                        // cases where we already knew both states
+                        case OK:
+                            return IPV4_OK_IPV6_FIREWALLED;
+
+                        case IPV4_OK_IPV6_FIREWALLED:
+                            return oldStatus;
+
+                        case REJECT_UNSOLICITED:
+                        case IPV4_FIREWALLED_IPV6_OK:
+                        case IPV4_DISABLED_IPV6_FIREWALLED:
+                            return REJECT_UNSOLICITED;
+
+                        case IPV4_DISABLED_IPV6_OK:
+                            return IPV4_DISABLED_IPV6_FIREWALLED;
+
+                        case DIFFERENT: // TODO
+                            return oldStatus;
+
+                        // cases where we already knew the IPv6 state only
+                        case IPV4_UNKNOWN_IPV6_OK:
+                        case IPV4_UNKNOWN_IPV6_FIREWALLED:
+                            return newStatus;
+
+                        // cases where we already knew the IPv4 state only
+                        case IPV4_OK_IPV6_UNKNOWN:
+                            return IPV4_OK_IPV6_FIREWALLED;
+
+                        case IPV4_FIREWALLED_IPV6_UNKNOWN:
+                            return REJECT_UNSOLICITED;
+
+                        case IPV4_DISABLED_IPV6_UNKNOWN:
+                            return IPV4_DISABLED_IPV6_FIREWALLED;
+
+                        default:
+                            return newStatus;
+                    }
+
+                case IPV4_DISABLED_IPV6_UNKNOWN:
+                    switch (oldStatus) {
+                        // cases where we already knew both states
+                        case OK:
+                        case IPV4_DISABLED_IPV6_OK:
+                        case IPV4_FIREWALLED_IPV6_OK:
+                            return IPV4_DISABLED_IPV6_OK;
+
+                        case IPV4_OK_IPV6_FIREWALLED:
+                        case IPV4_DISABLED_IPV6_FIREWALLED:
+                        case REJECT_UNSOLICITED:
+                            return IPV4_DISABLED_IPV6_FIREWALLED;
+
+                        case DIFFERENT:
+                            return newStatus;
+
+                        // cases where we already knew the IPv6 state only
+                        case IPV4_UNKNOWN_IPV6_OK:
+                            return IPV4_DISABLED_IPV6_OK;
+
+                        case IPV4_UNKNOWN_IPV6_FIREWALLED:
+                            return IPV4_DISABLED_IPV6_FIREWALLED;
+
+                        // cases where we already knew the IPv4 state only
+                        case IPV4_OK_IPV6_UNKNOWN:
+                        case IPV4_FIREWALLED_IPV6_UNKNOWN:
+                        case IPV4_DISABLED_IPV6_UNKNOWN:
+                            return newStatus;
+
+                        default:
+                            return newStatus;
+                    }
+
+                case UNKNOWN:
+                    return oldStatus;
+
+                default:
+                    return newStatus;
+            }
+        }
+
+        /** 
          *  Readable status, not translated
          */
         public String toStatusString() {
@@ -314,7 +515,7 @@ public abstract class CommSystemFacade implements Service {
 
         @Override
         public String toString() {
-            return super.toString() + " (" + toStatusString() + ')';
+            return super.toString() + " (" + code + "; " + status + ')';
         }
     
         /** 
