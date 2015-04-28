@@ -493,9 +493,8 @@ public class JobQueue {
                 for (int i = _queueRunners.size(); i < numThreads; i++) {
                     JobQueueRunner runner = new JobQueueRunner(_context, i);
                     _queueRunners.put(Integer.valueOf(i), runner);
-                    Thread t = new I2PThread(runner, "JobQueue " + _runnerId.incrementAndGet() + '/' + numThreads, false);
-                    //t.setPriority(I2PThread.MAX_PRIORITY-1);
-                    t.start();
+                    runner.setName("JobQueue " + _runnerId.incrementAndGet() + '/' + numThreads);
+                    runner.start();
                 }
             } else if (_queueRunners.size() == numThreads) {
                 for (JobQueueRunner runner : _queueRunners.values()) {

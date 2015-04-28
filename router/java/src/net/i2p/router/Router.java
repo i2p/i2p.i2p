@@ -559,7 +559,8 @@ public class Router implements RouterClock.ClockShiftListener {
         try {
             Runtime.getRuntime().addShutdownHook(_shutdownHook);
         } catch (IllegalStateException ise) {}
-        I2PThread.addOOMEventListener(_oomListener);
+        if (!SystemVersion.isAndroid())
+            I2PThread.addOOMEventListener(_oomListener);
         
         _context.keyManager().startup();
         
