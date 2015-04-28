@@ -58,6 +58,8 @@ public class OOMListener implements I2PThread.OOMEventListener {
         try { 
             _context.router().eventLog().addEvent(EventLog.OOM);
         } catch (OutOfMemoryError oome) {}
-        _context.router().shutdown(Router.EXIT_OOM); 
+        try { 
+            _context.router().shutdown(Router.EXIT_OOM); 
+        } catch (OutOfMemoryError oome) {}
     }
 }
