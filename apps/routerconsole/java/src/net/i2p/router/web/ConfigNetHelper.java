@@ -7,7 +7,7 @@ import java.util.Set;
 
 import net.i2p.data.DataHelper;
 import net.i2p.data.router.RouterAddress;
-import net.i2p.router.CommSystemFacade;
+import net.i2p.router.CommSystemFacade.Status;
 import net.i2p.router.Router;
 import net.i2p.router.transport.TransportManager;
 import net.i2p.router.transport.TransportUtil;
@@ -148,14 +148,18 @@ public class ConfigNetHelper extends HelperBase {
         return "";
     }
 
+    /**
+     *  This isn't updated for the new statuses, but it's commented out in the jsp.
+     *  @deprecated unused, to be fixed if needed
+     */
     public String getRequireIntroductionsChecked() {
-        short status = _context.commSystem().getReachabilityStatus();
+        Status status = _context.commSystem().getStatus();
         switch (status) {
-            case CommSystemFacade.STATUS_OK:
-            case CommSystemFacade.STATUS_UNKNOWN:
+            case OK:
+            case UNKNOWN:
                 return getChecked(UDPTransport.PROP_FORCE_INTRODUCERS);
-            case CommSystemFacade.STATUS_DIFFERENT:
-            case CommSystemFacade.STATUS_REJECT_UNSOLICITED:
+            case DIFFERENT:
+            case REJECT_UNSOLICITED:
             default:
                 return CHECKED;
         }

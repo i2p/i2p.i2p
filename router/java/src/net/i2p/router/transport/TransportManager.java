@@ -650,6 +650,11 @@ public class TransportManager implements TransportEventListener {
      *  will take many seconds if it has vanished.
      */
     public void renderStatusHTML(Writer out, String urlBase, int sortFlags) throws IOException {
+        out.write("<p>");
+        out.write(_("Status"));
+        out.write(": ");
+        out.write(_(getReachabilityStatus().toStatusString()));
+        out.write("</p>");
         TreeMap<String, Transport> transports = new TreeMap<String, Transport>();
         for (Transport t : _transports.values()) {
             transports.put(t.getStyle(), t);

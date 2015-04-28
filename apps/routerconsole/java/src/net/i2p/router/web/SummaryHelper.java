@@ -17,7 +17,7 @@ import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
 import net.i2p.data.router.RouterAddress;
 import net.i2p.data.router.RouterInfo;
-import net.i2p.router.CommSystemFacade;
+import net.i2p.router.CommSystemFacade.Status;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.router.RouterVersion;
@@ -154,34 +154,48 @@ public class SummaryHelper extends HelperBase {
         if (routerInfo == null)
             return _("Testing");
 
-        int status = _context.commSystem().getReachabilityStatus();
+        Status status = _context.commSystem().getStatus();
         switch (status) {
-            case CommSystemFacade.STATUS_OK:
+            case OK:
+            case IPV4_OK_IPV6_UNKNOWN:
+            case IPV4_OK_IPV6_FIREWALLED:
+            case IPV4_UNKNOWN_IPV6_OK:
+            case IPV4_FIREWALLED_IPV6_OK:
+            case IPV4_DISABLED_IPV6_OK:
                 RouterAddress ra = routerInfo.getTargetAddress("NTCP");
                 if (ra == null)
-                    return _("OK");
+                    return _(status.toStatusString());
                 byte[] ip = ra.getIP();
                 if (ip == null)
                     return _("ERR-Unresolved TCP Address");
                 // TODO set IPv6 arg based on configuration?
                 if (TransportUtil.isPubliclyRoutable(ip, true))
-                    return _("OK");
+                    return _(status.toStatusString());
                 return _("ERR-Private TCP Address");
-            case CommSystemFacade.STATUS_DIFFERENT:
+
+            case DIFFERENT:
                 return _("ERR-SymmetricNAT");
-            case CommSystemFacade.STATUS_REJECT_UNSOLICITED:
+
+            case REJECT_UNSOLICITED:
+            case IPV4_FIREWALLED_IPV6_UNKNOWN:
+            case IPV4_DISABLED_IPV6_FIREWALLED:
                 if (routerInfo.getTargetAddress("NTCP") != null)
                     return _("WARN-Firewalled with Inbound TCP Enabled");
                 if (((FloodfillNetworkDatabaseFacade)_context.netDb()).floodfillEnabled())
                     return _("WARN-Firewalled and Floodfill");
                 //if (_context.router().getRouterInfo().getCapabilities().indexOf('O') >= 0)
                 //    return _("WARN-Firewalled and Fast");
-                return _("Firewalled");
-            case CommSystemFacade.STATUS_DISCONNECTED:
+                return _(status.toStatusString());
+
+            case DISCONNECTED:
                 return _("Disconnected - check network cable");
-            case CommSystemFacade.STATUS_HOSED:
+
+            case HOSED:
                 return _("ERR-UDP Port In Use - Set i2np.udp.internalPort=xxxx in advanced config and restart");
-            case CommSystemFacade.STATUS_UNKNOWN: // fallthrough
+
+            case UNKNOWN:
+            case IPV4_UNKNOWN_IPV6_FIREWALLED:
+            case IPV4_DISABLED_IPV6_UNKNOWN:
             default:
                 ra = routerInfo.getTargetAddress("SSU");
                 if (ra == null && _context.router().getUptime() > 5*60*1000) {
@@ -193,7 +207,7 @@ public class SummaryHelper extends HelperBase {
                     else
                         return _("WARN-Firewalled with UDP Disabled");
                 }
-                return _("Testing");
+                return _(status.toStatusString());
         }
     }
     

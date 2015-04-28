@@ -36,20 +36,22 @@ fi
 # list specific files in core/ and router/ here, so we don't scan the whole tree
 ROUTERFILES="\
    ../../../core/java/src/net/i2p/data/DataHelper.java \
-   ../../../core/java/src/net/i2p/util/LogWriter.java \
-   ../../../router/java/src/net/i2p/router/tasks/CoalesceStatsEvent.java \
-   ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java \
-   ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java \
-   ../../../router/java/src/net/i2p/router/transport/TransportManager.java \
-   ../../../router/java/src/net/i2p/router/transport/GetBidsJob.java \
    ../../../router/java/src/net/i2p/router/Blocklist.java \
-   ../../../router/java/src/net/i2p/router/transport/ntcp/EstablishState.java \
+   ../../../router/java/src/net/i2p/router/CommSystemFacade.java \
+   ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java \
    ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java \
+   ../../../router/java/src/net/i2p/router/tasks/CoalesceStatsEvent.java \
    ../../../router/java/src/net/i2p/router/transport/CommSystemFacadeImpl.java \
+   ../../../router/java/src/net/i2p/router/transport/GetBidsJob.java \
+   ../../../router/java/src/net/i2p/router/transport/TransportManager.java \
+   ../../../router/java/src/net/i2p/router/transport/UPnP.java \
+   ../../../router/java/src/net/i2p/router/transport/UPnPManager.java \
+   ../../../router/java/src/net/i2p/router/transport/ntcp/EstablishState.java \
    ../../../router/java/src/net/i2p/router/transport/ntcp/NTCPTransport.java \
    ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java \
-   ../../../router/java/src/net/i2p/router/transport/UPnP.java \
-   ../../../router/java/src/net/i2p/router/transport/UPnPManager.java"
+   ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java \
+   ../../../core/java/src/net/i2p/util/LogWriter.java \
+"
 
 # add ../java/ so the refs will work in the po file
 JPATHS="../java/src ../jsp/WEB-INF ../java/strings $ROUTERFILES"

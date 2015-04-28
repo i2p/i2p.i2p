@@ -2,6 +2,7 @@ package net.i2p.router.transport.ntcp;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.Inet6Address;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.CancelledKeyException;
@@ -24,7 +25,7 @@ import net.i2p.I2PAppContext;
 import net.i2p.data.ByteArray;
 import net.i2p.data.router.RouterAddress;
 import net.i2p.data.router.RouterIdentity;
-import net.i2p.router.CommSystemFacade;
+import net.i2p.router.CommSystemFacade.Status;
 import net.i2p.router.RouterContext;
 import net.i2p.router.transport.FIFOBandwidthLimiter;
 import net.i2p.util.Addresses;
@@ -546,7 +547,7 @@ class EventPumper implements Runnable {
             }
 
             // BUGFIX for firewalls. --Sponge
-            if (_context.commSystem().getReachabilityStatus() != CommSystemFacade.STATUS_OK)
+            if (shouldSetKeepAlive(chan))
                 chan.socket().setKeepAlive(true);
 
             SelectionKey ckey = chan.register(_selector, SelectionKey.OP_READ);
@@ -567,7 +568,7 @@ class EventPumper implements Runnable {
                 _log.debug("processing connect for " + con + ": connected? " + connected);
             if (connected) {
                 // BUGFIX for firewalls. --Sponge
-                if (_context.commSystem().getReachabilityStatus() != CommSystemFacade.STATUS_OK)
+                if (shouldSetKeepAlive(chan))
                     chan.socket().setKeepAlive(true);
                 con.setKey(key);
                 con.outboundConnected();
@@ -590,7 +591,21 @@ class EventPumper implements Runnable {
                 _log.warn("error connecting on " + con, ncpe);
         }
     }
-    
+
+    /**
+     *  @since 0.9.20
+     */
+    private boolean shouldSetKeepAlive(SocketChannel chan) {
+        if (chan.socket().getInetAddress() instanceof Inet6Address)
+            return false;
+        Status status = _context.commSystem().getStatus();
+        if (status == Status.OK ||
+            status == Status.IPV4_OK_IPV6_UNKNOWN ||
+            status == Status.IPV4_OK_IPV6_FIREWALLED)
+            return false;
+        return true;
+    }
+
     /**
      *  OP_READ will always be set before this is called.
      *  This method will disable the interest if no more reads remain because of inbound bandwidth throttling.

@@ -18,7 +18,7 @@ import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.router.RouterInfo;
 import net.i2p.kademlia.KBucketSet;
 import net.i2p.kademlia.XORComparator;
-import net.i2p.router.CommSystemFacade;
+import net.i2p.router.CommSystemFacade.Status;
 import net.i2p.router.Job;
 import net.i2p.router.MessageSelector;
 import net.i2p.router.OutNetMessage;
@@ -509,7 +509,7 @@ class IterativeSearchJob extends FloodSearchJob {
             _dead = true;
         }
         _facade.complete(_key);
-        if (getContext().commSystem().getReachabilityStatus() != CommSystemFacade.STATUS_DISCONNECTED)
+        if (getContext().commSystem().getStatus() != Status.DISCONNECTED)
             _facade.lookupFailed(_key);
         getContext().messageRegistry().unregisterPending(_out);
         int tries;

@@ -922,17 +922,26 @@ public class Router implements RouterClock.ClockShiftListener {
         }
         switch (_context.commSystem().getStatus()) {
             case OK:
+            case IPV4_OK_IPV6_UNKNOWN:
+            case IPV4_OK_IPV6_FIREWALLED:
+            case IPV4_FIREWALLED_IPV6_OK:
+            case IPV4_DISABLED_IPV6_OK:
+            case IPV4_UNKNOWN_IPV6_OK:
                 ri.addCapability(CAPABILITY_REACHABLE);
                 break;
 
             case DIFFERENT:
             case REJECT_UNSOLICITED:
+            case IPV4_DISABLED_IPV6_FIREWALLED:
                 ri.addCapability(CAPABILITY_UNREACHABLE);
                 break;
 
             case DISCONNECTED:
             case HOSED:
             case UNKNOWN:
+            case IPV4_UNKNOWN_IPV6_FIREWALLED:
+            case IPV4_DISABLED_IPV6_UNKNOWN:
+            case IPV4_FIREWALLED_IPV6_UNKNOWN:
             default:
                 // no explicit capability
                 break;
