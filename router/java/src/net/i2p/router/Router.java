@@ -928,6 +928,7 @@ public class Router implements RouterClock.ClockShiftListener {
             case IPV4_FIREWALLED_IPV6_OK:
             case IPV4_DISABLED_IPV6_OK:
             case IPV4_UNKNOWN_IPV6_OK:
+            case IPV4_SNAT_IPV6_OK:
                 ri.addCapability(CAPABILITY_REACHABLE);
                 break;
 
@@ -943,6 +944,7 @@ public class Router implements RouterClock.ClockShiftListener {
             case IPV4_UNKNOWN_IPV6_FIREWALLED:
             case IPV4_DISABLED_IPV6_UNKNOWN:
             case IPV4_FIREWALLED_IPV6_UNKNOWN:
+            case IPV4_SNAT_IPV6_UNKNOWN:
             default:
                 // no explicit capability
                 break;

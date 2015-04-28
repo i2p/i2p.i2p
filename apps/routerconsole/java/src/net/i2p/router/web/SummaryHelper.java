@@ -162,6 +162,7 @@ public class SummaryHelper extends HelperBase {
             case IPV4_UNKNOWN_IPV6_OK:
             case IPV4_FIREWALLED_IPV6_OK:
             case IPV4_DISABLED_IPV6_OK:
+            case IPV4_SNAT_IPV6_OK:
                 RouterAddress ra = routerInfo.getTargetAddress("NTCP");
                 if (ra == null)
                     return _(status.toStatusString());
@@ -173,6 +174,7 @@ public class SummaryHelper extends HelperBase {
                     return _(status.toStatusString());
                 return _("ERR-Private TCP Address");
 
+            case IPV4_SNAT_IPV6_UNKNOWN:
             case DIFFERENT:
                 return _("ERR-SymmetricNAT");
 

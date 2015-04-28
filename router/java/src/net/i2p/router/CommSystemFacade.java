@@ -213,11 +213,27 @@ public abstract class CommSystemFacade implements Service {
     public static final short STATUS_IPV4_DISABLED_IPV6_OK = 5;
 
     /**
+     *  We are behind a symmetric NAT which will make our 'from' address look 
+     *  differently when we talk to multiple people
+     *  We can receive unsolicited connections on IPv6.
+     *  @since 0.9.20
+     */
+    public static final short STATUS_IPV4_SNAT_IPV6_OK = 6;
+
+    /**
      * We are behind a symmetric NAT which will make our 'from' address look 
      * differently when we talk to multiple people
      *
      */
-    public static final short STATUS_DIFFERENT = 6;
+    public static final short STATUS_DIFFERENT = 7;
+
+    /**
+     *  We are behind a symmetric NAT which will make our 'from' address look 
+     *  differently when we talk to multiple people
+     *  We might be able to receive unsolicited connections on IPv6.
+     *  @since 0.9.20
+     */
+    public static final short STATUS_IPV4_SNAT_IPV6_UNKNOWN = 8;
 
     /** 
      *  We have an IPv6 transport enabled and a public IPv6 address.
@@ -225,14 +241,14 @@ public abstract class CommSystemFacade implements Service {
      *  We might be able to receive unsolicited connections on IPv6.
      *  @since 0.9.20
      */
-    public static final short STATUS_IPV4_FIREWALLED_IPV6_UNKNOWN = 8;
+    public static final short STATUS_IPV4_FIREWALLED_IPV6_UNKNOWN = 10;
 
     /**
      * We are able to talk to peers that we initiate communication with, but
      * cannot receive unsolicited connections, i.e. Firewalled,
      * on all enabled transports.
      */
-    public static final short STATUS_REJECT_UNSOLICITED = 7;
+    public static final short STATUS_REJECT_UNSOLICITED = 9;
 
     /** 
      *  We have an IPv6 transport enabled and a public IPv6 address.
@@ -240,7 +256,7 @@ public abstract class CommSystemFacade implements Service {
      *  We cannot receive unsolicited connections on IPv6.
      *  @since 0.9.20
      */
-    public static final short STATUS_IPV4_UNKNOWN_IPV6_FIREWALLED = 9;
+    public static final short STATUS_IPV4_UNKNOWN_IPV6_FIREWALLED = 11;
 
     /** 
      *  We have an IPv6 transport enabled and a public IPv6 address.
@@ -248,7 +264,7 @@ public abstract class CommSystemFacade implements Service {
      *  We might be able to receive unsolicited connections on IPv6.
      *  @since 0.9.20
      */
-    public static final short STATUS_IPV4_DISABLED_IPV6_UNKNOWN = 11;
+    public static final short STATUS_IPV4_DISABLED_IPV6_UNKNOWN = 13;
 
     /** 
      *  We have an IPv6 transport enabled and a public IPv6 address.
@@ -256,23 +272,23 @@ public abstract class CommSystemFacade implements Service {
      *  We can receive unsolicited connections on IPv6.
      *  @since 0.9.20
      */
-    public static final short STATUS_IPV4_DISABLED_IPV6_FIREWALLED = 10;
+    public static final short STATUS_IPV4_DISABLED_IPV6_FIREWALLED = 12;
 
     /**
      *  We have no network interface at all enabled transports
      *  @since 0.9.4
      */
-    public static final short STATUS_DISCONNECTED = 12;
+    public static final short STATUS_DISCONNECTED = 14;
 
     /**
      * Our detection system is broken (SSU bind port failed)
      */
-    public static final short STATUS_HOSED = 13;
+    public static final short STATUS_HOSED = 15;
 
     /**
      * Our reachability is unknown on all
      */
-    public static final short STATUS_UNKNOWN = 14;
+    public static final short STATUS_UNKNOWN = 16;
 
     /** 
      *  Since the codes may change.
@@ -286,8 +302,10 @@ public abstract class CommSystemFacade implements Service {
         IPV4_UNKNOWN_IPV6_OK(STATUS_IPV4_UNKNOWN_IPV6_OK, _x("IPv4: Testing; IPv6: OK")),
         IPV4_FIREWALLED_IPV6_OK(STATUS_IPV4_FIREWALLED_IPV6_OK, _x("IPv4: Firewalled; IPv6: OK")),
         IPV4_DISABLED_IPV6_OK(STATUS_IPV4_DISABLED_IPV6_OK, _x("IPv4: Disabled; IPv6: OK")),
-        /** IPv4 symmetric NAT, IPv6 any state */
+        IPV4_SNAT_IPV6_OK(STATUS_IPV4_SNAT_IPV6_OK, _x("IPv4: Symmetric NAT; IPv6: OK")),
+        /** IPv4 symmetric NAT, IPv6 firewalled or disabled or no address */
         DIFFERENT(STATUS_DIFFERENT, _x("Symmetric NAT")),
+        IPV4_SNAT_IPV6_UNKNOWN(STATUS_IPV4_SNAT_IPV6_UNKNOWN, _x("IPv4: Symmetric NAT; IPv6: Testing")),
         IPV4_FIREWALLED_IPV6_UNKNOWN(STATUS_IPV4_FIREWALLED_IPV6_UNKNOWN, _x("IPv4: Firewalled; IPv6: Testing")),
         /** IPv4 firewalled, IPv6 firewalled or disabled or no address */
         REJECT_UNSOLICITED(STATUS_REJECT_UNSOLICITED, _x("Firewalled")),
@@ -327,6 +345,7 @@ public abstract class CommSystemFacade implements Service {
                         case OK:
                         case IPV4_FIREWALLED_IPV6_OK:
                         case IPV4_DISABLED_IPV6_OK:
+                        case IPV4_SNAT_IPV6_OK:
                             return OK;
 
                         case IPV4_OK_IPV6_FIREWALLED:
@@ -350,6 +369,7 @@ public abstract class CommSystemFacade implements Service {
                         case IPV4_OK_IPV6_UNKNOWN:
                         case IPV4_FIREWALLED_IPV6_UNKNOWN:
                         case IPV4_DISABLED_IPV6_UNKNOWN:
+                        case IPV4_SNAT_IPV6_UNKNOWN:
                             return newStatus;
 
                         default:
@@ -365,7 +385,8 @@ public abstract class CommSystemFacade implements Service {
 
                         case IPV4_FIREWALLED_IPV6_OK:
                         case IPV4_DISABLED_IPV6_OK:
-                        case DIFFERENT: // TODO
+                        case DIFFERENT:
+                        case IPV4_SNAT_IPV6_OK:
                             return oldStatus;
 
                         case REJECT_UNSOLICITED:
@@ -389,6 +410,9 @@ public abstract class CommSystemFacade implements Service {
                         case IPV4_DISABLED_IPV6_UNKNOWN:
                             return IPV4_DISABLED_IPV6_OK;
 
+                        case IPV4_SNAT_IPV6_UNKNOWN:
+                            return IPV4_SNAT_IPV6_OK;
+
                         default:
                             return newStatus;
                     }
@@ -399,6 +423,7 @@ public abstract class CommSystemFacade implements Service {
                         case OK:
                         case IPV4_DISABLED_IPV6_OK:
                         case IPV4_FIREWALLED_IPV6_OK:
+                        case IPV4_SNAT_IPV6_OK:
                             return IPV4_FIREWALLED_IPV6_OK;
 
                         case IPV4_OK_IPV6_FIREWALLED:
@@ -420,6 +445,7 @@ public abstract class CommSystemFacade implements Service {
                         case IPV4_OK_IPV6_UNKNOWN:
                         case IPV4_FIREWALLED_IPV6_UNKNOWN:
                         case IPV4_DISABLED_IPV6_UNKNOWN:
+                        case IPV4_SNAT_IPV6_UNKNOWN:
                             return newStatus;
 
                         default:
@@ -443,7 +469,8 @@ public abstract class CommSystemFacade implements Service {
                         case IPV4_DISABLED_IPV6_OK:
                             return IPV4_DISABLED_IPV6_FIREWALLED;
 
-                        case DIFFERENT: // TODO
+                        case DIFFERENT:
+                        case IPV4_SNAT_IPV6_OK:
                             return oldStatus;
 
                         // cases where we already knew the IPv6 state only
@@ -461,6 +488,9 @@ public abstract class CommSystemFacade implements Service {
                         case IPV4_DISABLED_IPV6_UNKNOWN:
                             return IPV4_DISABLED_IPV6_FIREWALLED;
 
+                        case IPV4_SNAT_IPV6_UNKNOWN:
+                            return DIFFERENT;
+
                         default:
                             return newStatus;
                     }
@@ -471,6 +501,7 @@ public abstract class CommSystemFacade implements Service {
                         case OK:
                         case IPV4_DISABLED_IPV6_OK:
                         case IPV4_FIREWALLED_IPV6_OK:
+                        case IPV4_SNAT_IPV6_OK:
                             return IPV4_DISABLED_IPV6_OK;
 
                         case IPV4_OK_IPV6_FIREWALLED:
@@ -492,6 +523,42 @@ public abstract class CommSystemFacade implements Service {
                         case IPV4_OK_IPV6_UNKNOWN:
                         case IPV4_FIREWALLED_IPV6_UNKNOWN:
                         case IPV4_DISABLED_IPV6_UNKNOWN:
+                        case IPV4_SNAT_IPV6_UNKNOWN:
+                            return newStatus;
+
+                        default:
+                            return newStatus;
+                    }
+
+                case IPV4_SNAT_IPV6_UNKNOWN:
+                    switch (oldStatus) {
+                        // cases where we already knew both states
+                        case OK:
+                        case IPV4_DISABLED_IPV6_OK:
+                        case IPV4_FIREWALLED_IPV6_OK:
+                        case IPV4_SNAT_IPV6_OK:
+                            return IPV4_SNAT_IPV6_OK;
+
+                        case IPV4_OK_IPV6_FIREWALLED:
+                        case IPV4_DISABLED_IPV6_FIREWALLED:
+                        case REJECT_UNSOLICITED:
+                            return DIFFERENT;
+
+                        case DIFFERENT:
+                            return newStatus;
+
+                        // cases where we already knew the IPv6 state only
+                        case IPV4_UNKNOWN_IPV6_OK:
+                            return IPV4_SNAT_IPV6_OK;
+
+                        case IPV4_UNKNOWN_IPV6_FIREWALLED:
+                            return DIFFERENT;
+
+                        // cases where we already knew the IPv4 state only
+                        case IPV4_OK_IPV6_UNKNOWN:
+                        case IPV4_FIREWALLED_IPV6_UNKNOWN:
+                        case IPV4_DISABLED_IPV6_UNKNOWN:
+                        case IPV4_SNAT_IPV6_UNKNOWN:
                             return newStatus;
 
                         default:
