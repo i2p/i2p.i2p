@@ -53,6 +53,7 @@ class IntelInfoImpl extends CPUIDCPUInfo implements IntelCPUInfo
         // http://en.wikipedia.org/wiki/Cpuid
         // http://web.archive.org/web/20110307080258/http://www.intel.com/Assets/PDF/appnote/241618.pdf
         // http://www.intel.com/content/dam/www/public/us/en/documents/manuals/64-ia-32-architectures-software-developer-vol-2a-manual.pdf
+    	// #include "llvm/Support/Host.h", http://llvm.org/docs/doxygen/html/Host_8cpp_source.html
         String modelString = null;
         int family = CPUID.getCPUFamily();
         int model = CPUID.getCPUModel();
