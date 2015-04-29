@@ -250,7 +250,8 @@ public class RouterClock extends Clock {
             long desiredOffset = _desiredOffset;
             if (desiredOffset > offset) {
                 // slew forward
-                _offset = ++offset;
+                offset += Math.min(10, sinceLastSlewed / MAX_SLEW);
+                _offset = offset;
             } else if (desiredOffset < offset) {
                 // slew backward, but don't let the clock go backward
                 // this should be the first call since systemNow
