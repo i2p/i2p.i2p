@@ -176,7 +176,7 @@ public class RouterClock extends Clock {
         // a previous step adjustment.
         // This allows NTP to trump a peer offset after a soft restart
         if (_alreadyChanged &&
-            (stratum >= _lastStratum || _startedOn - System.currentTimeMillis() > 60*1000)) {
+            (stratum >= _lastStratum || System.currentTimeMillis() - _startedOn > 60*1000)) {
             // Update the target offset, slewing will take care of the rest
             if (delta > 15*1000)
                 getLog().logAlways(Log.WARN, "Warning - Updating target clock offset to " + offsetMs + "ms from " + _offset + "ms, Stratum " + stratum);
