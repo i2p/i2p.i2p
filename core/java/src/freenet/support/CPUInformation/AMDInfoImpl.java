@@ -63,6 +63,7 @@ class AMDInfoImpl extends CPUIDCPUInfo implements AMDCPUInfo
     private static String identifyCPU()
     {
         // http://en.wikipedia.org/wiki/Cpuid
+    	// #include "llvm/Support/Host.h", http://llvm.org/docs/doxygen/html/Host_8cpp_source.html
         String modelString = null;
         int family = CPUID.getCPUFamily();
         int model = CPUID.getCPUModel();
