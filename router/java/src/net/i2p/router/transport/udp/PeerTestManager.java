@@ -448,16 +448,16 @@ class PeerTestManager {
             if ( (test.getAlicePort() == test.getAlicePortFromCharlie()) &&
                  (test.getAliceIP() != null) && (test.getAliceIPFromCharlie() != null) &&
                  (test.getAliceIP().equals(test.getAliceIPFromCharlie())) ) {
-                status = Status.OK;
+                status = Status.IPV4_OK_IPV6_UNKNOWN;
             } else {
-                status = Status.DIFFERENT;
+                status = Status.IPV4_SNAT_IPV6_UNKNOWN;
             }
         } else if (test.getReceiveCharlieTime() > 0) {
             // we received only one message from charlie
             status = Status.UNKNOWN;
         } else if (test.getReceiveBobTime() > 0) {
             // we received a message from bob but no messages from charlie
-            status = Status.REJECT_UNSOLICITED;
+            status = Status.IPV4_FIREWALLED_IPV6_UNKNOWN;
         } else {
             // we never received anything from bob - he is either down, 
             // ignoring us, or unable to get a Charlie to respond

@@ -84,11 +84,14 @@ public class NTCPTransport extends TransportImpl {
      *  TODO periodically update via CSFI.NetMonitor?
      */
     private boolean _haveIPv6Address;
+    private long _lastInboundIPv4;
+    private long _lastInboundIPv6;
 
     public final static String PROP_I2NP_NTCP_HOSTNAME = "i2np.ntcp.hostname";
     public final static String PROP_I2NP_NTCP_PORT = "i2np.ntcp.port";
     public final static String PROP_I2NP_NTCP_AUTO_PORT = "i2np.ntcp.autoport";
     public final static String PROP_I2NP_NTCP_AUTO_IP = "i2np.ntcp.autoip";
+    private static final String PROP_ADVANCED = "routerconsole.advanced";
     public static final int DEFAULT_COST = 10;
     
     /** this is rarely if ever used, default is to bind to wildcard address */
@@ -210,6 +213,10 @@ public class NTCPTransport extends TransportImpl {
         synchronized (_conLock) {
             old = _conByIdent.put(peer, con);
         }
+        if (con.isIPv6())
+            _lastInboundIPv6 = con.getCreated();
+        else
+            _lastInboundIPv4 = con.getCreated();
         return old;
     }
 
@@ -231,6 +238,7 @@ public class NTCPTransport extends TransportImpl {
                         con = new NTCPConnection(_context, this, ident, addr);
                         if (_log.shouldLog(Log.DEBUG))
                             _log.debug("Send on a new con: " + con + " at " + addr + " for " + ih);
+                        // Note that outbound conns go in the map BEFORE establishment
                         _conByIdent.put(ih, con);
                     } else {
                         // race, RI changed out from under us
@@ -528,7 +536,11 @@ public class NTCPTransport extends TransportImpl {
         return active;
     }
 
-    /** @param skew in seconds */
+    /**
+     *  A positive number means our clock is ahead of theirs.
+     *
+     *  @param skew in seconds
+     */
     void setLastBadSkew(long skew) {
         _lastBadSkew = skew;
     }
@@ -536,13 +548,18 @@ public class NTCPTransport extends TransportImpl {
     /**
      * Return our peer clock skews on this transport.
      * Vector composed of Long, each element representing a peer skew in seconds.
+     * A positive number means our clock is ahead of theirs.
      */
     @Override
     public Vector<Long> getClockSkews() {
         Vector<Long> skews = new Vector<Long>();
+        // Omit ones established too long ago,
+        // since the skew is only set at startup (or after a meta message)
+        // and won't include effects of later offset adjustments
+        long tooOld = _context.clock().now() - 10*60*1000;
 
         for (NTCPConnection con : _conByIdent.values()) {
-            if (con.isEstablished())
+            if (con.isEstablished() && con.getCreated() > tooOld)
                 skews.addElement(Long.valueOf(con.getClockSkew()));
         }
 
@@ -622,11 +639,11 @@ public class NTCPTransport extends TransportImpl {
      *
      *  Doesn't actually restart unless addr is non-null and
      *  the port is different from the current listen port.
-     *  If addr is null, removes all addresses.
+     *  If addr is null, removes IPv4 addresses only.
      *
      *  If we had interface addresses before, we lost them.
      *
-     *  @param addr may be null
+     *  @param addr may be null to indicate remove the IPv4 address only
      */
     private synchronized void restartListening(RouterAddress addr) {
         if (addr != null) {
@@ -637,7 +654,16 @@ public class NTCPTransport extends TransportImpl {
                 replaceAddress(addr);
             // UDPTransport.rebuildExternalAddress() calls router.rebuildRouterInfo()
         } else {
-            replaceAddress(null);
+            // can't do this, want to remove IPv4 only
+            //replaceAddress(null);
+            for (RouterAddress ra : _currentAddresses) {
+                byte[] ip = ra.getIP();
+                if (ip != null && ip.length == 4) {
+                    // COWAL
+                    _currentAddresses.remove(ra);
+                }
+            }
+            _lastInboundIPv4 = 0;
         }
     }
 
@@ -920,6 +946,7 @@ public class NTCPTransport extends TransportImpl {
     /**
      *  UDP changed addresses, tell NTCP and (possibly) restart
      *
+     *  @param ip typ. IPv4 or IPv6 non-local; may be null to indicate IPv4 failure or port info only
      *  @since IPv6 moved from CSFI.notifyReplaceAddress()
      */
     @Override
@@ -958,20 +985,21 @@ public class NTCPTransport extends TransportImpl {
      *  UDP changed addresses, tell NTCP and restart.
      *  Port may be set to indicate requested port even if ip is null.
      *
-     *  @param ip previously validated
+     *  @param ip previously validated; may be null to indicate IPv4 failure or port info only
      *  @since IPv6 moved from CSFI.notifyReplaceAddress()
      */
     private synchronized void externalAddressReceived(byte[] ip, int port) {
-        // FIXME just take first IPv4 address for now
+        // FIXME just take first address for now
         // FIXME if SSU set to hostname, NTCP will be set to IP
-        RouterAddress oldAddr = getCurrentAddress(false);
+        boolean isIPv6 = ip != null && ip.length == 16;
+        RouterAddress oldAddr = getCurrentAddress(isIPv6);
         if (_log.shouldLog(Log.INFO))
             _log.info("Changing NTCP Address? was " + oldAddr);
 
         OrderedProperties newProps = new OrderedProperties();
         int cost;
         if (oldAddr == null) {
-            cost = getDefaultCost(ip != null && ip.length == 16);
+            cost = getDefaultCost(isIPv6);
         } else {
             cost = oldAddr.getCost();
             newProps.putAll(oldAddr.getOptionsMap());
@@ -1163,16 +1191,81 @@ public class NTCPTransport extends TransportImpl {
      * We have to be careful here because much of the router console code assumes
      * that the reachability status is really just the UDP status.
      *
+     * This only returns OK, DISABLED, or UNKNOWN for IPv4 and IPv6.
+     * We leave the FIREWALLED status for UDP.
+     *
      * Previously returned short, now enum as of 0.9.20
      */
     public Status getReachabilityStatus() { 
-        // If we have an IPv4 address
-        if (isAlive() && getCurrentAddress(false) != null) {
-                for (NTCPConnection con : _conByIdent.values()) {
-                    if (con.isInbound())
-                        return Status.OK;
-                }
+        if (!isAlive())
+            return Status.UNKNOWN;
+        TransportUtil.IPv6Config config = getIPv6Config();
+        boolean v4Disabled, v6Disabled;
+        if (config == IPV6_DISABLED) {
+            v4Disabled = false;
+            v6Disabled = true;
+        } else if (config == IPV6_ONLY) {
+            v4Disabled = true;
+            v6Disabled = false;
+        } else {
+            v4Disabled = false;
+            v6Disabled = false;
         }
+        boolean hasV4 = getCurrentAddress(false) != null;
+        // or use _haveIPv6Addrnss ??
+        boolean hasV6 = getCurrentAddress(true) != null;
+        if (!hasV4 && !hasV6)
+            return Status.UNKNOWN;
+        long now = _context.clock().now();
+        boolean v4OK = hasV4 && !v4Disabled && now - _lastInboundIPv4 < 10*60*1000;
+        boolean v6OK = hasV6 && !v6Disabled && now - _lastInboundIPv6 < 30*60*1000;
+        if (v4OK) {
+            if (v6OK)
+                return Status.OK;
+            if (v6Disabled)
+                return Status.OK;
+            if (!hasV6)
+                return Status.IPV4_OK_IPV6_UNKNOWN;
+        }
+        if (v6OK) {
+            if (v4Disabled)
+                return Status.IPV4_DISABLED_IPV6_OK;
+            if (!hasV4)
+                return Status.IPV4_UNKNOWN_IPV6_OK;
+        }
+        for (NTCPConnection con : _conByIdent.values()) {
+            if (con.isInbound()) {
+                if (con.isIPv6()) {
+                    if (hasV6)
+                        v6OK = true;
+                } else {
+                    if (hasV4)
+                        v4OK = true;
+                }
+                if (v4OK) {
+                    if (v6OK)
+                        return Status.OK;
+                    if (v6Disabled)
+                        return Status.OK;
+                    if (!hasV6)
+                        return Status.IPV4_OK_IPV6_UNKNOWN;
+                }
+                if (v6OK) {
+                    if (v4Disabled)
+                        return Status.IPV4_DISABLED_IPV6_OK;
+                    if (!hasV4)
+                        return Status.IPV4_UNKNOWN_IPV6_OK;
+                }
+            }
+        }
+        if (v4OK)
+            return Status.IPV4_OK_IPV6_UNKNOWN;
+        if (v6OK)
+            return Status.IPV4_UNKNOWN_IPV6_OK;
+        if (v4Disabled)
+            return Status.IPV4_DISABLED_IPV6_UNKNOWN;
+        if (v6Disabled)
+            return Status.UNKNOWN;
         return Status.UNKNOWN;
     }
 
@@ -1197,6 +1290,8 @@ public class NTCPTransport extends TransportImpl {
         NTCPConnection.releaseResources();
         replaceAddress(null);
         _endpoints.clear();
+        _lastInboundIPv4 = 0;
+        _lastInboundIPv6 = 0;
     }
 
     public static final String STYLE = "NTCP";
@@ -1215,10 +1310,19 @@ public class NTCPTransport extends TransportImpl {
         long totalSend = 0;
         long totalRecv = 0;
 
+        if (!_context.getBooleanProperty(PROP_ADVANCED)) {
+            for (Iterator<NTCPConnection> iter = peers.iterator(); iter.hasNext(); ) {
+                 // outbound conns get put in the map before they are established
+                 if (!iter.next().isEstablished())
+                     iter.remove();
+            }
+        }
+
         StringBuilder buf = new StringBuilder(512);
         buf.append("<h3 id=\"ntcpcon\">").append(_("NTCP connections")).append(": ").append(peers.size());
         buf.append(". ").append(_("Limit")).append(": ").append(getMaxConnections());
         buf.append(". ").append(_("Timeout")).append(": ").append(DataHelper.formatDuration2(_pumper.getIdleTimeout()));
+        buf.append(". ").append(_("Status")).append(": ").append(_(getReachabilityStatus().toStatusString()));
         buf.append(".</h3>\n" +
                    "<table>\n" +
                    "<tr><th><a href=\"#def.peer\">").append(_("Peer")).append("</a></th>" +

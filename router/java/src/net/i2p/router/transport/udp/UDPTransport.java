@@ -258,10 +258,10 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         _context.statManager().createRateStat("udp.alreadyConnected", "What is the lifetime of a reestablished session", "udp", RATES);
         _context.statManager().createRateStat("udp.droppedPeer", "How long ago did we receive from a dropped peer (duration == session lifetime", "udp", RATES);
         _context.statManager().createRateStat("udp.droppedPeerInactive", "How long ago did we receive from a dropped peer (duration == session lifetime)", "udp", RATES);
-        _context.statManager().createRateStat("udp.statusOK", "How many times the peer test returned OK", "udp", RATES);
-        _context.statManager().createRateStat("udp.statusDifferent", "How many times the peer test returned different IP/ports", "udp", RATES);
-        _context.statManager().createRateStat("udp.statusReject", "How many times the peer test returned reject unsolicited", "udp", RATES);
-        _context.statManager().createRateStat("udp.statusUnknown", "How many times the peer test returned an unknown result", "udp", RATES);
+        //_context.statManager().createRateStat("udp.statusOK", "How many times the peer test returned OK", "udp", RATES);
+        //_context.statManager().createRateStat("udp.statusDifferent", "How many times the peer test returned different IP/ports", "udp", RATES);
+        //_context.statManager().createRateStat("udp.statusReject", "How many times the peer test returned reject unsolicited", "udp", RATES);
+        //_context.statManager().createRateStat("udp.statusUnknown", "How many times the peer test returned an unknown result", "udp", RATES);
         _context.statManager().createRateStat("udp.addressTestInsteadOfUpdate", "How many times we fire off a peer test of ourselves instead of adjusting our own reachable address?", "udp", RATES);
         _context.statManager().createRateStat("udp.addressUpdated", "How many times we adjust our own reachable IP address", "udp", RATES);
         _context.statManager().createRateStat("udp.proactiveReestablish", "How long a session was idle for when we proactively reestablished it", "udp", RATES);
@@ -662,9 +662,14 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      */
     private static final int ALLOW_IP_CHANGE_INTERVAL = 2*60*1000;
     
-    void inboundConnectionReceived() { 
-        // use OS clock since its an ordering thing, not a time thing
-        _lastInboundReceivedOn = System.currentTimeMillis(); 
+    void inboundConnectionReceived(boolean isIPv6) {
+        if (isIPv6) {
+            if (_currentOurV6Address != null)
+                setReachabilityStatus(Status.IPV4_UNKNOWN_IPV6_OK);
+        } else {
+            // use OS clock since its an ordering thing, not a time thing
+            _lastInboundReceivedOn = System.currentTimeMillis(); 
+        }
     }
     
     // temp prevent multiples
@@ -725,8 +730,14 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         boolean changed = changeAddress(ip, port);
         // Assume if we have an interface with a public IP that we aren't firewalled.
         // If this is wrong, the peer test will figure it out and change the status.
-        if (changed && ip.length == 4 && source == SOURCE_INTERFACE)
-            setReachabilityStatus(Status.OK);
+        if (changed && source == SOURCE_INTERFACE) {
+            if (ip.length == 4)
+                setReachabilityStatus(Status.IPV4_OK_IPV6_UNKNOWN);
+            else if (ip.length == 16)
+                // TODO should we set both to unknown and wait for an inbound v6 conn,
+                // since there's no v6 testing?
+                setReachabilityStatus(Status.IPV4_UNKNOWN_IPV6_OK);
+        }
     }
 
     /**
@@ -744,7 +755,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 _log.warn("UPnP has failed to open the SSU port: " + port + " reason: " + reason);
         }
         if (success && ip != null && getExternalIP() != null)
-            setReachabilityStatus(Status.OK);
+            setReachabilityStatus(Status.IPV4_OK_IPV6_UNKNOWN);
     }
 
     /**
@@ -2092,6 +2103,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         switch (status) {
             case REJECT_UNSOLICITED:
             case DIFFERENT:
+            case IPV4_FIREWALLED_IPV6_OK:
+            case IPV4_FIREWALLED_IPV6_UNKNOWN:
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Require introducers, because our status is " + status);
                 return true;
@@ -2289,6 +2302,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     /**
      * Return our peer clock skews on this transport.
      * Vector composed of Long, each element representing a peer skew in seconds.
+     * A positive number means our clock is ahead of theirs.
      */
     @Override
     public Vector<Long> getClockSkews() {
@@ -2348,6 +2362,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         buf.append("<h3 id=\"udpcon\">").append(_("UDP connections")).append(": ").append(peers.size());
         buf.append(". ").append(_("Limit")).append(": ").append(getMaxConnections());
         buf.append(". ").append(_("Timeout")).append(": ").append(DataHelper.formatDuration2(_expireTimeout));
+        buf.append(". ").append(_("Status")).append(": ").append(_(_reachabilityStatus.toStatusString()));
         buf.append(".</h3>\n");
         buf.append("<table>\n");
         buf.append("<tr><th class=\"smallhead\" nowrap><a href=\"#def.peer\">").append(_("Peer")).append("</a><br>");
@@ -2779,58 +2794,49 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         }
     }
 
-    private void locked_setReachabilityStatus(Status status) { 
+    private void locked_setReachabilityStatus(Status newStatus) { 
         Status old = _reachabilityStatus;
-        long now = _context.clock().now();
-        switch (status) {
-            case OK:
-                // TODO if OK but internal port != external port, should we have
-                // a different status state? ...as we don't know if the TCP
-                // port will be mapped the same way or not...
-                // Right now, we assume it is and hope for the best for TCP.
-                _context.statManager().addRateData("udp.statusOK", 1);
-                _reachabilityStatus = status; 
-                _reachabilityStatusLastUpdated = now;
-                break;
-            case DIFFERENT:
-                _context.statManager().addRateData("udp.statusDifferent", 1);
-                _reachabilityStatus = status; 
-                _reachabilityStatusLastUpdated = now;
-                break;
-            case REJECT_UNSOLICITED:
-                _context.statManager().addRateData("udp.statusReject", 1);
-// if old != unsolicited && now - lastUpdated > STATUS_GRACE_PERIOD)
-//
-                // fall through...
-            case DISCONNECTED:
-            case HOSED:
-                _reachabilityStatus = status; 
-                _reachabilityStatusLastUpdated = now;
-                break;
-            case UNKNOWN:
-            default:
-                _context.statManager().addRateData("udp.statusUnknown", 1);
-                //if (now - _reachabilityStatusLastUpdated < STATUS_GRACE_PERIOD) {
-                //    _testEvent.forceRun();
-                //    SimpleTimer.getInstance().addEvent(_testEvent, 5*1000);
-                //} else {
-                //    _reachabilityStatus = status;
-                //    _reachabilityStatusLastUpdated = now;
-                //}
-                break;
-        }
+        // merge new status into old
+        Status status = Status.merge(old, newStatus);
         _testEvent.setLastTested();
-        if (status != Status.UNKNOWN) {
-            if (status != old)
-                _reachabilityStatusUnchanged = 0;
-            else
-                _reachabilityStatusUnchanged++;
+        // now modify if we are IPv6 only
+        TransportUtil.IPv6Config config = getIPv6Config();
+        if (config == IPV6_ONLY) {
+            if (status == Status.IPV4_UNKNOWN_IPV6_OK)
+                status = Status.IPV4_DISABLED_IPV6_OK;
+            else if (status == Status.IPV4_UNKNOWN_IPV6_FIREWALLED)
+                status = Status.IPV4_DISABLED_IPV6_FIREWALLED;
+            else if (status == Status.UNKNOWN)
+                status = Status.IPV4_DISABLED_IPV6_UNKNOWN;
         }
-        if ( (status != old) && (status != Status.UNKNOWN) ) {
+        if (status != Status.UNKNOWN) {
+            // now modify if we have no IPv6 address
+            if (_currentOurV6Address == null) {
+                if (status == Status.IPV4_OK_IPV6_UNKNOWN)
+                    status = Status.OK;
+                else if (status == Status.IPV4_FIREWALLED_IPV6_UNKNOWN)
+                    status = Status.REJECT_UNSOLICITED;
+                else if (status == Status.IPV4_SNAT_IPV6_UNKNOWN)
+                    status = Status.DIFFERENT;
+            }
+
+            if (status != old) {
+                _reachabilityStatusUnchanged = 0;
+                long now = _context.clock().now();
+                _reachabilityStatusLastUpdated = now;
+                _reachabilityStatus = status;
+            } else {
+                _reachabilityStatusUnchanged++;
+            }
+        }
+        if (status != old) {
             if (_log.shouldLog(Log.WARN))
-                _log.warn("Old status: " + old + " New status: " + status + " from: ", new Exception("traceback"));
+                _log.warn("Old status: " + old + " New status: " + status +
+                          " Caused by update: " + newStatus +
+                          " from: ", new Exception("traceback"));
             if (old != Status.UNKNOWN)
-                _context.router().eventLog().addEvent(EventLog.REACHABILITY, status.toStatusString());
+                _context.router().eventLog().addEvent(EventLog.REACHABILITY,
+                   "from " + _(old.toStatusString()) + " to " +  _(status.toStatusString()));
             // Always rebuild when the status changes, even if our address hasn't changed,
             // as rebuildExternalAddress() calls replaceAddress() which calls CSFI.notifyReplaceAddress()
             // which will start up NTCP inbound when we transition to OK.
@@ -2838,7 +2844,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 rebuildExternalAddress();
         } else {
             if (_log.shouldLog(Log.INFO))
-                _log.info("Status unchanged: " + _reachabilityStatus + " (" + _reachabilityStatusUnchanged + " consecutive times), last updated " +
+                _log.info("Status unchanged: " + _reachabilityStatus +
+                          " after update: " + newStatus +
+                          " (unchanged " + _reachabilityStatusUnchanged + " consecutive times), last updated " +
                           DataHelper.formatDuration(_context.clock().now() - _reachabilityStatusLastUpdated) + " ago");
         }
     }

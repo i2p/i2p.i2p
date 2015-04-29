@@ -705,7 +705,8 @@ class EstablishmentManager {
         
         _transport.addRemotePeerState(peer);
         
-        _transport.inboundConnectionReceived();
+        boolean isIPv6 = state.getSentIP().length == 16;
+        _transport.inboundConnectionReceived(isIPv6);
         _transport.setIP(remote.calculateHash(), state.getSentIP());
         
         _context.statManager().addRateData("udp.inboundEstablishTime", state.getLifetime(), 0);

@@ -1,5 +1,8 @@
 2015-04-29 zzz
- * Transports: Fix clock skew calculations
+ * Clock: Make forward slewing work better
+ * Transports:
+   - Fix clock skew calculations
+   - Track IPv4/v6 reachability separately (ticket #1458)
 
 2015-04-28 zzz
  * JobQueueRunner: Don't call System.exit() on OOM,
