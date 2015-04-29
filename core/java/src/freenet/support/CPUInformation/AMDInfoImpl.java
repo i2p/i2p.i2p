@@ -16,7 +16,12 @@ class AMDInfoImpl extends CPUIDCPUInfo implements AMDCPUInfo
     private static boolean isAthlonCompatible;
     private static boolean isAthlon64Compatible;
     private static boolean isBobcatCompatible;
+    private static boolean isJaguarCompatible;
     private static boolean isBulldozerCompatible;
+    private static boolean isPiledriverCompatible;
+    private static boolean isSteamrollerCompatible;
+    private static boolean isExcavatorCompatible;
+
 
     // If modelString != null, the cpu is considered correctly identified.
     private static final String smodel = identifyCPU();
@@ -34,9 +39,18 @@ class AMDInfoImpl extends CPUIDCPUInfo implements AMDCPUInfo
     public boolean IsAthlon64Compatible(){ return isAthlon64Compatible; }
 
     public boolean IsBobcatCompatible(){ return isBobcatCompatible; }
+    
+    public boolean IsJaguarCompatible(){ return isJaguarCompatible; }
 
     public boolean IsBulldozerCompatible(){ return isBulldozerCompatible; }
 
+    public boolean IsPiledriverCompatible(){ return isPiledriverCompatible; }
+
+    public boolean IsSteamrollerCompatible(){ return isSteamrollerCompatible; }
+
+    public boolean IsExcavatorCompatible(){ return isExcavatorCompatible; }
+
+    
     public String getCPUModelString() throws UnknownCPUException
     {
         if (smodel != null)
@@ -407,26 +421,23 @@ class AMDInfoImpl extends CPUIDCPUInfo implements AMDCPUInfo
             isK6_3_Compatible = true;
             isAthlonCompatible = true;
             isAthlon64Compatible = true;
-            isBobcatCompatible = true;
             isBulldozerCompatible = true;
             isX64 = true;
-            switch (model) {
-                // 32 nm
-                case 1:                    
-                    modelString = "Bulldozer FX-6100/8100";
-                    break;
-                // 32 nm
-                case 2:                    
-                    modelString = "Bulldozer FX-6300/8300";
-                    break;
-                // 28 nm ?
-                case 3:                    
-                    modelString = "Bulldozer FX-6500/8500";
-                    break;
-                default:
-                    modelString = "AMD Bulldozer model " + model;
-                    break;
-            }
+	        if (model >= 0x50 && model <= 0x5F) {
+	        	isPiledriverCompatible = true;
+	        	isSteamrollerCompatible = true;
+	        	isExcavatorCompatible = true;
+	            modelString = "Excavator";
+	        } else if (model >= 0x30 && model <= 0x3F) {
+	        	isPiledriverCompatible = true;
+	        	isSteamrollerCompatible = true;
+	            modelString = "Steamroller";
+	        } else if (model >= 0x10 && model <= 0x1F) {
+	        	isPiledriverCompatible = true;
+	        	modelString = "Piledriver";
+	        } else {
+	        	modelString = "Bulldozer";
+	        }
           }
           break;
 
@@ -438,15 +449,9 @@ class AMDInfoImpl extends CPUIDCPUInfo implements AMDCPUInfo
             isAthlonCompatible = true;
             isAthlon64Compatible = true;
             isBobcatCompatible = true;
+            isJaguarCompatible = true;
             isX64 = true;
-            switch (model) {
-                case 0:                    
-                    modelString = "Athlon 5350 APU";
-                    break;
-                default:
-                    modelString = "AMD Jaguar APU model " + model;
-                    break;
-            }
+            modelString = "Jaguar";
           }
           break;
         }
