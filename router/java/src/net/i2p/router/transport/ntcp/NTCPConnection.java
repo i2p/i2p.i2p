@@ -267,7 +267,9 @@ class NTCPConnection {
     public void setRemotePeer(RouterIdentity ident) { _remotePeer = ident; }
 
     /** 
-     * @param clockSkew alice's clock minus bob's clock in seconds (may be negative, obviously, but |val| should
+     * We are Bob.
+     *
+     * @param clockSkew OUR clock minus ALICE's clock in seconds (may be negative, obviously, but |val| should
      *                  be under 1 minute)
      * @param prevWriteEnd exactly 16 bytes, not copied, do not corrupt
      * @param prevReadEnd 16 or more bytes, last 16 bytes copied
@@ -284,7 +286,9 @@ class NTCPConnection {
     }
     
     /** 
-     * @param clockSkew alice's clock minus bob's clock in seconds (may be negative, obviously, but |val| should
+     * We are Bob.
+     *
+     * @param clockSkew OUR clock minus ALICE's clock in seconds (may be negative, obviously, but |val| should
      *                  be under 1 minute)
      * @param prevWriteEnd exactly 16 bytes, not copied, do not corrupt
      * @param prevReadEnd 16 or more bytes, last 16 bytes copied
@@ -306,7 +310,10 @@ class NTCPConnection {
         return rv;
     }
 
-    /** @return seconds */
+    /**
+     * A positive number means our clock is ahead of theirs.
+     *  @return seconds
+     */
     public long getClockSkew() { return _clockSkew; }
 
     /** @return milliseconds */
@@ -345,6 +352,12 @@ class NTCPConnection {
 
     /** @return milliseconds */
     public long getTimeSinceCreated() { return System.currentTimeMillis()-_created; }
+
+    /**
+     *  @return when this connection was created (not established)
+     *  @since 0.9.20
+     */
+    public long getCreated() { return _created; }
 
     /**
      *  workaround for EventPumper
@@ -595,7 +608,9 @@ class NTCPConnection {
 ***********/
     
     /** 
-     * @param clockSkew alice's clock minus bob's clock in seconds (may be negative, obviously, but |val| should
+     * We are Alice.
+     *
+     * @param clockSkew OUR clock minus BOB's clock in seconds (may be negative, obviously, but |val| should
      *                  be under 1 minute)
      * @param prevWriteEnd exactly 16 bytes, not copied, do not corrupt
      * @param prevReadEnd 16 or more bytes, last 16 bytes copied
@@ -1304,6 +1319,7 @@ class NTCPConnection {
             _context.statManager().addRateData("ntcp.receiveMeta", newSkew);
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Received NTCP metadata, old skew of " + _clockSkew + " s, new skew of " + newSkew + "s.");
+            // FIXME does not account for RTT
             _clockSkew = newSkew;
         }
     }

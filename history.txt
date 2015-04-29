@@ -1,3 +1,25 @@
+2015-04-29 zzz
+ * Transports: Fix clock skew calculations
+
+2015-04-28 zzz
+ * JobQueueRunner: Don't call System.exit() on OOM,
+   let the shutdown progress normally;
+   Make it an I2PThread instead of a Runner so we can
+   call fireOOM() for consistent logging (ticket #1549)
+ * Router: Don't add OOM listener on Android so
+   we don't hang onto the context
+
+2015-04-27 zzz
+ * NamingService: Add export methods
+ * SusiDNS: Add export support, no UI yet
+ * Transports:
+   - Convert internal state to enums, prep for tracking
+     IPv4/v6 reachability separately (ticket #1458)
+   - Don't set TCP keepalive for IPv6
+
+2015-04-26 zzz
+ * i2ptunnel: Reduce sleep time in runners to reduce latency
+
 2015-04-25 zzz
  * I2PSSLSocketFactory: Add hostname verification
  * SSLEepGet:

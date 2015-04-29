@@ -610,6 +610,7 @@ class PacketHandler {
             _state = 44;
             long recvOn = packet.getBegin();
             long sendOn = reader.readTimestamp() * 1000;
+            // Positive when we are ahead of them
             long skew = recvOn - sendOn;
             int type = reader.readPayloadType();
             // if it's a bad type, the whole packet is probably corrupt

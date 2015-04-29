@@ -357,6 +357,7 @@ public class TransportManager implements TransportEventListener {
     /**
      * Return our peer clock skews on all transports.
      * Vector composed of Long, each element representing a peer skew in seconds.
+     * A positive number means our clock is ahead of theirs.
      * Note: this method returns them in whimsical order.
      */
     public Vector<Long> getClockSkews() {

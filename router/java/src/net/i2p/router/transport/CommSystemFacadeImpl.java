@@ -105,6 +105,9 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
      * @param percentToInclude 1-100
      * @return Framed average clock skew of connected peers in milliseconds, or the clock offset if we cannot answer.
      * Average is calculated over the middle "percentToInclude" peers.
+     *
+     * A positive number means our clock is ahead of theirs.
+     *
      * Todo: change Vectors to milliseconds
      */
     @Override
@@ -518,7 +521,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         public void timeReached() {
              // use the same % as in RouterClock so that check will never fail
              // This is their our offset w.r.t. them...
-             long peerOffset = getFramedAveragePeerClockSkew(50);
+             long peerOffset = getFramedAveragePeerClockSkew(33);
              if (peerOffset == 0)
                  return;
              long currentOffset = _context.clock().getOffset();

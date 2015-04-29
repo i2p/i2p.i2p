@@ -29,7 +29,7 @@ public class RouterClock extends Clock {
      *  1/50 is 12s in a 10m tunnel lifetime, that should be fine.
      *  All of this is @since 0.7.12
      */
-    private static final long MAX_SLEW = 50;
+    private static final long MAX_SLEW = 25;
     public static final int DEFAULT_STRATUM = 8;
     private static final int WORST_STRATUM = 16;
 
@@ -49,6 +49,9 @@ public class RouterClock extends Clock {
      */
     private static final long MASSIVE_SHIFT_FORWARD = 150*1000;
     private static final long MASSIVE_SHIFT_BACKWARD = 61*1000;
+
+    /** testing only */
+    private static final String PROP_DISABLE_ADJUSTMENT = "time.disableOffset";
 
     private final Set<ClockShiftListener> _shiftListeners;
     private volatile long _lastShiftNanos;
@@ -145,25 +148,26 @@ public class RouterClock extends Clock {
                 _alreadyChanged) {
 
                 // Try calculating peer clock skew
-                long currentPeerClockSkew = ((RouterContext)_context).commSystem().getFramedAveragePeerClockSkew(50);
+                long currentPeerClockSkew = ((RouterContext)_context).commSystem().getFramedAveragePeerClockSkew(33);
 
                     // Predict the effect of applying the proposed clock offset
                     long predictedPeerClockSkew = currentPeerClockSkew + delta;
 
                     // Fail sanity check if applying the offset would increase peer clock skew
+                    Log log = getLog();
                     if ((Math.abs(predictedPeerClockSkew) > (Math.abs(currentPeerClockSkew) + 5*1000)) ||
                         (Math.abs(predictedPeerClockSkew) > 20*1000)) {
 
-                        getLog().error("Ignoring clock offset " + offsetMs + "ms (current " + _offset +
+                        if (log.shouldWarn())
+                            log.warn("Ignoring clock offset " + offsetMs + "ms (current " + _offset +
                                        "ms) since it would increase peer clock skew from " + currentPeerClockSkew +
-                                       "ms to " + predictedPeerClockSkew + "ms. Bad time server?");
+                                       "ms to " + predictedPeerClockSkew + "ms. Stratrum: " + stratum);
                         return;
                     } else {
-                        Log log = getLog();
-                        if (log.shouldLog(Log.DEBUG))
-                            log.debug("Approving clock offset " + offsetMs + "ms (current " + _offset +
+                        if (log.shouldInfo())
+                            log.info("Approving clock offset " + offsetMs + "ms (current " + _offset +
                                        "ms) since it would decrease peer clock skew from " + currentPeerClockSkew +
-                                       "ms to " + predictedPeerClockSkew + "ms.");
+                                       "ms to " + predictedPeerClockSkew + "ms. Stratrum: " + stratum);
                     }
             } // check sanity
         }
@@ -184,16 +188,24 @@ public class RouterClock extends Clock {
                 _statCreated = true;
             }
             _context.statManager().addRateData("clock.skew", delta);
-            _desiredOffset = offsetMs;
+            if (_context.getBooleanProperty(PROP_DISABLE_ADJUSTMENT)) {
+                getLog().error("Clock adjustment disabled", new Exception());
+            } else {
+                _desiredOffset = offsetMs;
+            }
         } else {
             Log log = getLog();
             if (log.shouldLog(Log.INFO))
                 log.info("Initializing clock offset to " + offsetMs + "ms, Stratum " + stratum);
             _alreadyChanged = true;
-            _offset = offsetMs;
-            _desiredOffset = offsetMs;
-            // this is used by the JobQueue
-            fireOffsetChanged(delta);
+            if (_context.getBooleanProperty(PROP_DISABLE_ADJUSTMENT)) {
+                log.error("Clock adjustment disabled", new Exception());
+            } else {
+                _offset = offsetMs;
+                _desiredOffset = offsetMs;
+                // this is used by the JobQueue
+                fireOffsetChanged(delta);
+            }
         }
         _lastChanged = System.currentTimeMillis();
         _lastStratum = stratum;
