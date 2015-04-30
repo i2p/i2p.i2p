@@ -1,5 +1,10 @@
+2015-04-30 zzz
+ * Transports:
+   - Correctly handle IPv4 firewalled, IPv6 not (ticket #1458)
+
 2015-04-29 zzz
  * Clock: Make forward slewing work better
+ * I2CP: Periodically send a SetDate message to external clients
  * Transports:
    - Fix clock skew calculations
    - Track IPv4/v6 reachability separately (ticket #1458)
