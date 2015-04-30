@@ -602,7 +602,7 @@ public class NTCPTransport extends TransportImpl {
         // try once again to prevent two pumpers which is fatal
         if (_pumper.isAlive())
             return;
-        if (_log.shouldLog(Log.WARN)) _log.warn("Starting ntcp transport listening");
+        if (_log.shouldLog(Log.WARN)) _log.warn("Starting NTCP transport listening");
 
         startIt();
         RouterAddress addr = configureLocalAddress();
@@ -636,16 +636,19 @@ public class NTCPTransport extends TransportImpl {
 
     /**
      *  Only called by externalAddressReceived().
+     *  Calls replaceAddress() or removeAddress().
+     *  To remove all addresses, call replaceAddress(null) directly.
      *
      *  Doesn't actually restart unless addr is non-null and
      *  the port is different from the current listen port.
-     *  If addr is null, removes IPv4 addresses only.
+     *  If addr is null, removes the addresses specified (v4 or v6)
      *
      *  If we had interface addresses before, we lost them.
      *
-     *  @param addr may be null to indicate remove the IPv4 address only
+     *  @param addr may be null to indicate remove the address
+     *  @param ipv6 ignored if addr is non-null
      */
-    private synchronized void restartListening(RouterAddress addr) {
+    private synchronized void restartListening(RouterAddress addr, boolean ipv6) {
         if (addr != null) {
             RouterAddress myAddress = bindAddress(addr.getPort());
             if (myAddress != null)
@@ -654,16 +657,11 @@ public class NTCPTransport extends TransportImpl {
                 replaceAddress(addr);
             // UDPTransport.rebuildExternalAddress() calls router.rebuildRouterInfo()
         } else {
-            // can't do this, want to remove IPv4 only
-            //replaceAddress(null);
-            for (RouterAddress ra : _currentAddresses) {
-                byte[] ip = ra.getIP();
-                if (ip != null && ip.length == 4) {
-                    // COWAL
-                    _currentAddresses.remove(ra);
-                }
-            }
-            _lastInboundIPv4 = 0;
+            removeAddress(ipv6);
+            if (ipv6)
+                _lastInboundIPv6 = 0;
+            else
+                _lastInboundIPv4 = 0;
         }
     }
 
@@ -952,7 +950,7 @@ public class NTCPTransport extends TransportImpl {
     @Override
     public void externalAddressReceived(AddressSource source, byte[] ip, int port) {
         if (_log.shouldLog(Log.WARN))
-            _log.warn("Received address: " + Addresses.toString(ip, port) + " from: " + source);
+            _log.warn("Received address: " + Addresses.toString(ip, port) + " from: " + source, new Exception());
         if ((source == SOURCE_INTERFACE || source == SOURCE_SSU)
              && ip != null && ip.length == 16) {
             // must be set before isValid() call
@@ -978,8 +976,35 @@ public class NTCPTransport extends TransportImpl {
         // ignore UPnP for now, get everything from SSU
         if (source != SOURCE_SSU)
             return;
-        externalAddressReceived(ip, port);
+        boolean isIPv6 = ip != null && ip.length == 16;
+        externalAddressReceived(ip, isIPv6, port);
     }
+
+    /**
+     *  Notify a transport of an external address change.
+     *  This may be from a local interface, UPnP, a config change, etc.
+     *  This should not be called if the ip didn't change
+     *  (from that source's point of view), or is a local address.
+     *  May be called multiple times for IPv4 or IPv6.
+     *  The transport should also do its own checking on whether to accept
+     *  notifications from this source.
+     *
+     *  This can be called after the transport is running.
+     *
+     *  TODO externalAddressRemoved(source, ip, port)
+     *
+     *  @param source defined in Transport.java
+     *  @since 0.9.20
+     */
+    @Override
+    public void externalAddressRemoved(AddressSource source, boolean ipv6) {
+        if (_log.shouldWarn())
+            _log.warn("Removing address, ipv6? " + ipv6 + " from: " + source, new Exception());
+        // ignore UPnP for now, get everything from SSU
+        if (source != SOURCE_SSU)
+            return;
+        externalAddressReceived(null, ipv6, 0);
+    }    
     
     /**
      *  UDP changed addresses, tell NTCP and restart.
@@ -988,10 +1013,9 @@ public class NTCPTransport extends TransportImpl {
      *  @param ip previously validated; may be null to indicate IPv4 failure or port info only
      *  @since IPv6 moved from CSFI.notifyReplaceAddress()
      */
-    private synchronized void externalAddressReceived(byte[] ip, int port) {
+    private synchronized void externalAddressReceived(byte[] ip, boolean isIPv6, int port) {
         // FIXME just take first address for now
         // FIXME if SSU set to hostname, NTCP will be set to IP
-        boolean isIPv6 = ip != null && ip.length == 16;
         RouterAddress oldAddr = getCurrentAddress(isIPv6);
         if (_log.shouldLog(Log.INFO))
             _log.info("Changing NTCP Address? was " + oldAddr);
@@ -1136,13 +1160,11 @@ public class NTCPTransport extends TransportImpl {
         //while (isAlive()) {
         //    try { Thread.sleep(5*1000); } catch (InterruptedException ie) {}
         //}
-        restartListening(newAddr);
+        restartListening(newAddr, isIPv6);
         if (_log.shouldLog(Log.WARN))
-            _log.warn("Updating NTCP Address with " + newAddr);
+            _log.warn("Updating NTCP Address (ipv6? " + isIPv6 + ") with " + newAddr);
         return;     	
     }
-    
-
 
     /**
      *  If we didn't used to be forwarded, and we have an address,

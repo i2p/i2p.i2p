@@ -238,7 +238,34 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
             if (udp != null)
                 port = udp.getRequestedPort();
         }
-        _manager.externalAddressReceived(Transport.AddressSource.SOURCE_SSU, ip, port);
+        if (ip != null || port > 0)
+            _manager.externalAddressReceived(Transport.AddressSource.SOURCE_SSU, ip, port);
+        else
+            notifyRemoveAddress(false);
+    }
+
+    /** 
+     *  Tell other transports our address changed
+     *
+     *  @param address non-null; but address's host/IP may be null
+     *  @since 0.9.20
+     */
+    @Override
+    public void notifyRemoveAddress(RouterAddress address) {
+        // just keep this simple for now, multiple v4 or v6 addresses not yet supported
+        notifyRemoveAddress(address != null &&
+                            address.getIP() != null &&
+                            address.getIP().length == 16);
+    }
+
+    /** 
+     *  Tell other transports our address changed
+     *
+     *  @since 0.9.20
+     */
+    @Override
+    public void notifyRemoveAddress(boolean ipv6) {
+        _manager.externalAddressRemoved(Transport.AddressSource.SOURCE_SSU, ipv6);
     }
 
     /**

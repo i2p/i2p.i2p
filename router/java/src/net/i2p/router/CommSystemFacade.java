@@ -113,7 +113,19 @@ public abstract class CommSystemFacade implements Service {
     /** 
      * Tell other transports our address changed
      */
-    public void notifyReplaceAddress(RouterAddress UDPAddr) {}
+    public void notifyReplaceAddress(RouterAddress address) {}
+
+    /** 
+     * Tell other transports our address changed
+     * @since 0.9.20
+     */
+    public void notifyRemoveAddress(RouterAddress address) {}
+
+    /** 
+     * Tell other transports our address changed
+     * @since 0.9.20
+     */
+    public void notifyRemoveAddress(boolean ipv6) {}
 
     /**
      *  Pluggable transport

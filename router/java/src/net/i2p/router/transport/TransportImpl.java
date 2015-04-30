@@ -554,6 +554,7 @@ public abstract class TransportImpl implements Transport {
      *  with the same IP length (4 or 16) with the given one.
      *  TODO: Allow multiple addresses of the same length.
      *  Calls listener.transportAddressChanged()
+     *  To remove all IPv4 or IPv6 addresses, use removeAddress(boolean).
      *
      *  @param address null to remove all
      */
@@ -566,6 +567,7 @@ public abstract class TransportImpl implements Transport {
             boolean isIPv6 = TransportUtil.isIPv6(address);
             for (RouterAddress ra : _currentAddresses) {
                 if (isIPv6 == TransportUtil.isIPv6(ra))
+                    // COWAL
                     _currentAddresses.remove(ra);
             }
             _currentAddresses.add(address);
@@ -574,6 +576,61 @@ public abstract class TransportImpl implements Transport {
              _log.warn(getStyle() + " now has " + _currentAddresses.size() + " addresses");
         if (_listener != null)
             _listener.transportAddressChanged();
+    }
+
+    /**
+     *  Remove only this address.
+     *  Calls listener.transportAddressChanged().
+     *  To remove all IPv4 or IPv6 addresses, use removeAddress(boolean).
+     *  To remove all IPv4 and IPv6 addresses, use replaceAddress(null).
+     *
+     *  @param ipv6 true to remove all IPv6 addresses, false to remove all IPv4 addresses
+     *  @since 0.9.20
+     */
+    protected void removeAddress(RouterAddress address) {
+        if (_log.shouldWarn())
+             _log.warn("Removing address " + address, new Exception());
+        boolean changed = _currentAddresses.remove(address);
+            changed = true;
+        if (changed) {
+            if (_log.shouldWarn())
+                 _log.warn(getStyle() + " now has " + _currentAddresses.size() + " addresses");
+            if (_listener != null)
+                _listener.transportAddressChanged();
+        } else {
+            if (_log.shouldWarn())
+                 _log.warn(getStyle() + " no addresses removed");
+        }
+    }
+
+    /**
+     *  Remove all existing addresses with the specified IP length (4 or 16).
+     *  Calls listener.transportAddressChanged().
+     *  To remove all IPv4 and IPv6 addresses, use replaceAddress(null).
+     *
+     *  @param ipv6 true to remove all IPv6 addresses, false to remove all IPv4 addresses
+     *  @since 0.9.20
+     */
+    protected void removeAddress(boolean ipv6) {
+        if (_log.shouldWarn())
+             _log.warn("Removing addresses, ipv6? " + ipv6, new Exception());
+        boolean changed = false;
+        for (RouterAddress ra : _currentAddresses) {
+            if (ipv6 == TransportUtil.isIPv6(ra)) {
+                // COWAL
+                if (_currentAddresses.remove(ra))
+                    changed = true;
+            }
+        }
+        if (changed) {
+            if (_log.shouldWarn())
+                 _log.warn(getStyle() + " now has " + _currentAddresses.size() + " addresses");
+            if (_listener != null)
+                _listener.transportAddressChanged();
+        } else {
+            if (_log.shouldWarn())
+                 _log.warn(getStyle() + " no addresses removed");
+        }
     }
 
     /**
@@ -698,6 +755,26 @@ public abstract class TransportImpl implements Transport {
      *  @param port 0 for unknown or unchanged
      */
     public void externalAddressReceived(AddressSource source, byte[] ip, int port) {}
+
+    /**
+     *  Notify a transport of an external address change.
+     *  This may be from a local interface, UPnP, a config change, etc.
+     *  This should not be called if the ip didn't change
+     *  (from that source's point of view), or is a local address.
+     *  May be called multiple times for IPv4 or IPv6.
+     *  The transport should also do its own checking on whether to accept
+     *  notifications from this source.
+     *
+     *  This can be called after the transport is running.
+     *
+     *  TODO externalAddressRemoved(source, ip, port)
+     *
+     *  This implementation does nothing. Transports should override if they want notification.
+     *
+     *  @param source defined in Transport.java
+     *  @since 0.9.20
+     */
+    public void externalAddressRemoved(AddressSource source, boolean ipv6) {}
 
     /**
      *  Notify a transport of the results of trying to forward a port.

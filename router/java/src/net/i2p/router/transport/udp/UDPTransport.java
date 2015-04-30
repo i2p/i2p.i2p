@@ -92,6 +92,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      *  TODO periodically update via CSFI.NetMonitor?
      */
     private boolean _haveIPv6Address;
+    private long _lastInboundIPv6;
     
     /** do we need to rebuild our external router address asap? */
     private boolean _needsRebuild;
@@ -464,6 +465,20 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         // TransportManager.startListening() calls router.rebuildRouterInfo()
         if (newPort > 0 && bindToAddrs.isEmpty()) {
             for (InetAddress ia : getSavedLocalAddresses()) {
+                // Discovered or configured addresses are presumed good at the start.
+                // when externalAddressReceived() was called with SOURCE_INTERFACE,
+                // isAlive() was false, so setReachabilityStatus() was not called
+                // TODO should we set both to unknown and wait for an inbound v6 conn,
+                // since there's no v6 testing?
+                if (ia.getAddress().length == 16) {
+                    // FIXME we need to check and time out after an hour of no inbound ipv6,
+                    // change to firewalled maybe? but we don't have any test to restore
+                    // a v6 address after it's removed.
+                    _lastInboundIPv6 = _context.clock().now();
+                    setReachabilityStatus(Status.IPV4_UNKNOWN_IPV6_OK);
+                } else {
+                    setReachabilityStatus(Status.IPV4_OK_IPV6_UNKNOWN);
+                }
                 rebuildExternalAddress(ia.getHostAddress(), newPort, false);
             }
         }
@@ -497,6 +512,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         _introManager.reset();
         UDPPacket.clearCache();
         UDPAddress.clearCache();
+        _lastInboundIPv6 = 0;
     }
 
     /**
@@ -664,6 +680,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     
     void inboundConnectionReceived(boolean isIPv6) {
         if (isIPv6) {
+            _lastInboundIPv6 = _context.clock().now();
             if (_currentOurV6Address != null)
                 setReachabilityStatus(Status.IPV4_UNKNOWN_IPV6_OK);
         } else {
@@ -775,8 +792,6 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      * @param ourPort >= 1024
      */
     void externalAddressReceived(Hash from, byte ourIP[], int ourPort) {
-        if (ourIP.length != 4)
-            return;
         boolean isValid = isValid(ourIP) &&
                           TransportUtil.isValidPort(ourPort);
         boolean explicitSpecified = explicitAddressSpecified();
@@ -785,6 +800,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             _log.info("External address received: " + Addresses.toString(ourIP, ourPort) + " from " 
                       + from + ", isValid? " + isValid + ", explicitSpecified? " + explicitSpecified 
                       + ", receivedInboundRecent? " + inboundRecent + " status " + _reachabilityStatus);
+        if (ourIP.length != 4) {
+            return;
+        }
         
         if (explicitSpecified) 
             return;
@@ -993,7 +1011,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         if (prop != null)
             return Boolean.parseBoolean(prop);
         Status status = getReachabilityStatus();
-        return status != Status.REJECT_UNSOLICITED;
+        return status != Status.REJECT_UNSOLICITED &&
+               status != Status.IPV4_FIREWALLED_IPV6_OK &&
+               status != Status.IPV4_FIREWALLED_IPV6_UNKNOWN;
     }
 
     /** 
@@ -1035,6 +1055,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      *  @since 0.9.3
      */
     void changePeerPort(PeerState peer, int newPort) {
+        // this happens a lot
         int oldPort;
         synchronized (_addDropLock) {
             oldPort = peer.getRemotePort();
@@ -1044,8 +1065,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 _peersByRemoteHost.put(peer.getRemoteHostId(), peer);
             }
         }
-        if (_log.shouldLog(Log.WARN) && oldPort != newPort)
-            _log.warn("Changed port from " + oldPort + " to " + newPort + " for " + peer);
+        if (_log.shouldInfo() && oldPort != newPort)
+            _log.info("Changed port from " + oldPort + " to " + newPort + " for " + peer);
     }
 
     /**
@@ -1131,8 +1152,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         if (remotePeer != null) {
             oldPeer = _peersByIdent.put(remotePeer, peer);
             if ( (oldPeer != null) && (oldPeer != peer) ) {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Peer already connected (PBID): old=" + oldPeer + " new=" + peer);
+                // this happens a lot
+                if (_log.shouldInfo())
+                    _log.info("Peer already connected (PBID): old=" + oldPeer + " new=" + peer);
                 // transfer over the old state/inbound message fragments/etc
                 peer.loadFrom(oldPeer);
                 oldEstablishedOn = oldPeer.getKeyEstablishedTime();
@@ -1147,8 +1169,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             RemoteHostId oldID = oldPeer.getRemoteHostId();
             if (!remoteId.equals(oldID)) {
                 // leak fix, remove old address
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn(remotePeer + " changed address FROM " + oldID + " TO " + remoteId);
+                if (_log.shouldInfo())
+                    _log.info(remotePeer + " changed address FROM " + oldID + " TO " + remoteId);
                 PeerState oldPeer2 = _peersByRemoteHost.remove(oldID);
                 // different ones in the two maps? shouldn't happen
                 if (oldPeer2 != oldPeer && oldPeer2 != null) {
@@ -1532,8 +1554,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         // max of 1000 pps
         int toSleep = Math.max(8, (1000 / burstps));
         int count = 0;
-        if (_log.shouldLog(Log.WARN))
-            _log.warn("Sending destroy to : " + howMany + " peers");
+        if (_log.shouldInfo())
+            _log.info("Sending destroy to : " + howMany + " peers");
         for (PeerState peer : _peersByIdent.values()) {
             sendDestroy(peer);
             // 1000 per second * 48 bytes = 400 KBps
@@ -1858,6 +1880,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
 
     /**
      *  Update our IPv4 or IPv6 address and optionally tell the router to rebuild and republish the router info.
+     *  FIXME no way to remove an IPv6 address
      *
      *  @param host new validated IPv4 or IPv6 or DNS hostname or null
      *  @param port new validated port or 0/-1
@@ -1972,7 +1995,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
 
             if (wantsRebuild) {
                 if (_log.shouldLog(Log.INFO))
-                    _log.info("Address rebuilt: " + addr);
+                    _log.info("Address rebuilt: " + addr, new Exception());
                 replaceAddress(addr);
                 if (allowRebuildRouterInfo)
                     _context.router().rebuildRouterInfo();
@@ -1999,9 +2022,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             if (hasCurrentAddress()) {
                 // We must remove current address, otherwise the user will see
                 // "firewalled with inbound NTCP enabled" warning in console.
-                // Unfortunately this will remove any IPv6 also,
-                // but we don't have a method to remove just the IPv4 address. FIXME
-                replaceAddress(null);
+                // Remove the IPv4 address only
+                removeAddress(false);
                 if (allowRebuildRouterInfo)
                     _context.router().rebuildRouterInfo();
             }
@@ -2047,6 +2069,30 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     protected void replaceAddress(RouterAddress address) {
         super.replaceAddress(address);
         _context.commSystem().notifyReplaceAddress(address);
+    }
+
+    /**
+     *  Remove then tell NTCP that we changed.
+     *
+     *  @since 0.9.20
+     */
+    @Override
+    protected void removeAddress(RouterAddress address) {
+        super.removeAddress(address);
+        _context.commSystem().notifyRemoveAddress(address);
+    }
+
+    /**
+     *  Remove then tell NTCP that we changed.
+     *
+     *  @since 0.9.20
+     */
+    @Override
+    protected void removeAddress(boolean ipv6) {
+        super.removeAddress(ipv6);
+        if (ipv6)
+            _lastInboundIPv6 = 0;
+        _context.commSystem().notifyRemoveAddress(ipv6);
     }
 
     /**
@@ -2858,16 +2904,14 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      */
     public Status getReachabilityStatus() { 
         String override = _context.getProperty(PROP_REACHABILITY_STATUS_OVERRIDE);
-        if (override == null)
-            return _reachabilityStatus;
-            
-        if ("ok".equals(override))
-            return Status.OK;
-        else if ("err-reject".equals(override))
-            return Status.REJECT_UNSOLICITED;
-        else if ("err-different".equals(override))
-            return Status.DIFFERENT;
-        
+        if (override != null) {
+            if ("ok".equals(override))
+                return Status.OK;
+            else if ("err-reject".equals(override))
+                return Status.REJECT_UNSOLICITED;
+            else if ("err-different".equals(override))
+                return Status.DIFFERENT;
+        }
         return _reachabilityStatus; 
     }
 

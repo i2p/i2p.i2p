@@ -160,7 +160,6 @@ public class SummaryHelper extends HelperBase {
             case IPV4_OK_IPV6_UNKNOWN:
             case IPV4_OK_IPV6_FIREWALLED:
             case IPV4_UNKNOWN_IPV6_OK:
-            case IPV4_FIREWALLED_IPV6_OK:
             case IPV4_DISABLED_IPV6_OK:
             case IPV4_SNAT_IPV6_OK:
                 RouterAddress ra = routerInfo.getTargetAddress("NTCP");
@@ -179,10 +178,12 @@ public class SummaryHelper extends HelperBase {
                 return _("ERR-SymmetricNAT");
 
             case REJECT_UNSOLICITED:
-            case IPV4_FIREWALLED_IPV6_UNKNOWN:
             case IPV4_DISABLED_IPV6_FIREWALLED:
                 if (routerInfo.getTargetAddress("NTCP") != null)
                     return _("WARN-Firewalled with Inbound TCP Enabled");
+                // fall through...
+            case IPV4_FIREWALLED_IPV6_OK:
+            case IPV4_FIREWALLED_IPV6_UNKNOWN:
                 if (((FloodfillNetworkDatabaseFacade)_context.netDb()).floodfillEnabled())
                     return _("WARN-Firewalled and Floodfill");
                 //if (_context.router().getRouterInfo().getCapabilities().indexOf('O') >= 0)

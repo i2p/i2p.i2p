@@ -193,7 +193,8 @@ public class TransportManager implements TransportEventListener {
 
     /**
      * Initialize from interfaces, and callback from UPnP or SSU.
-     * Tell all transports... but don't loop
+     * See CSFI.notifyReplaceAddress().
+     * Tell all transports... but don't loop.
      *
      */
     public void externalAddressReceived(Transport.AddressSource source, byte[] ip, int port) {
@@ -201,6 +202,21 @@ public class TransportManager implements TransportEventListener {
             // don't loop
             if (!(source == SOURCE_SSU && t.getStyle().equals(UDPTransport.STYLE)))
                 t.externalAddressReceived(source, ip, port);
+        }
+    }
+
+    /**
+     *  Remove all ipv4 or ipv6 addresses.
+     *  See CSFI.notifyRemoveAddress().
+     *  Tell all transports... but don't loop.
+     *
+     *  @since 0.9.20
+     */
+    public void externalAddressRemoved(Transport.AddressSource source, boolean ipv6) {
+        for (Transport t : _transports.values()) {
+            // don't loop
+            if (!(source == SOURCE_SSU && t.getStyle().equals(UDPTransport.STYLE)))
+                t.externalAddressRemoved(source, ipv6);
         }
     }
 
