@@ -433,6 +433,7 @@
         </condition>
     </target>
 
+    <target name="bump" depends="bumpBuild" />
     <target name="bumpBuild" depends="checkIfBumped, getBuildNumber" unless="bumped.already">
         <script language="javascript">
             <![CDATA[
