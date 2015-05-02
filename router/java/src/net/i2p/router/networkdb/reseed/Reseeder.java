@@ -78,8 +78,6 @@ public class Reseeder {
     public static final String DEFAULT_SEED_URL =
               // Disable due to misconfiguation (ticket #1466)
               //"http://us.reseed.i2p2.no/" + "," +
-              // Down (ticket #1422)
-              //"http://jp.reseed.i2p2.no/" + "," +
 
               // Disabling everything, use SSL
               //"http://i2p.mooo.com/netDb/" + "," +
@@ -98,8 +96,6 @@ public class Reseeder {
               "https://netdb.i2p2.no/" + "," + // Only SU3 (v3) support, SNI required
               "https://us.reseed.i2p2.no:444/" + "," +
               "https://uk.reseed.i2p2.no:444/" + "," +
-              // Down (ticket #1422)
-              //"https://jp.reseed.i2p2.no:444/" + "," +
               "https://link.mx24.eu/" + "," + // Only HTTPS and SU3 (v3) support
               "https://ieb9oopo.mooo.com/"; // Only HTTPS and SU3 (v3) support
 
