@@ -481,6 +481,16 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 }
                 rebuildExternalAddress(ia.getHostAddress(), newPort, false);
             }
+        } else if (newPort > 0 && !bindToAddrs.isEmpty()) {
+            for (InetAddress ia : bindToAddrs) {
+                if (ia.getAddress().length == 16) {
+                    _lastInboundIPv6 = _context.clock().now();
+                    setReachabilityStatus(Status.IPV4_UNKNOWN_IPV6_OK);
+                } else {
+                    setReachabilityStatus(Status.IPV4_OK_IPV6_UNKNOWN);
+                }
+                rebuildExternalAddress(ia.getHostAddress(), newPort, false);
+            }
         }
         rebuildExternalAddress(false);
     }
@@ -680,10 +690,15 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     
     void inboundConnectionReceived(boolean isIPv6) {
         if (isIPv6) {
+            // FIXME we need to check and time out after an hour of no inbound ipv6,
+            // change to firewalled maybe? but we don't have any test to restore
+            // a v6 address after it's removed.
             _lastInboundIPv6 = _context.clock().now();
             if (_currentOurV6Address != null)
                 setReachabilityStatus(Status.IPV4_UNKNOWN_IPV6_OK);
         } else {
+            // Introduced connections are still inbound, this is not evidence
+            // that we are not firewalled.
             // use OS clock since its an ordering thing, not a time thing
             _lastInboundReceivedOn = System.currentTimeMillis(); 
         }
@@ -1221,7 +1236,14 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         
         synchronized(_rebuildLock) {
             rebuildIfNecessary();
-            if (getReachabilityStatus() != Status.OK &&
+            Status status = getReachabilityStatus();
+            if (status != Status.OK &&
+                status != Status.IPV4_OK_IPV6_UNKNOWN &&
+                status != Status.IPV4_OK_IPV6_FIREWALLED &&
+                status != Status.IPV4_DISABLED_IPV6_OK &&
+                status != Status.IPV4_DISABLED_IPV6_UNKNOWN &&
+                status != Status.IPV4_DISABLED_IPV6_FIREWALLED &&
+                status != Status.DISCONNECTED &&
                 _reachabilityStatusUnchanged < 7) {
                 _testEvent.forceRunSoon();
             }
@@ -1997,6 +2019,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Address rebuilt: " + addr, new Exception());
                 replaceAddress(addr);
+                // warning, this calls back into us with allowRebuildRouterInfo = false,
+                // via CSFI.createAddresses->TM.getAddresses()->updateAddress()->REA
                 if (allowRebuildRouterInfo)
                     _context.router().rebuildRouterInfo();
             } else {
@@ -2024,6 +2048,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 // "firewalled with inbound NTCP enabled" warning in console.
                 // Remove the IPv4 address only
                 removeAddress(false);
+                // warning, this calls back into us with allowRebuildRouterInfo = false,
+                // via CSFI.createAddresses->TM.getAddresses()->updateAddress()->REA
                 if (allowRebuildRouterInfo)
                     _context.router().rebuildRouterInfo();
             }
@@ -2863,6 +2889,11 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 else if (status == Status.IPV4_FIREWALLED_IPV6_UNKNOWN)
                     status = Status.REJECT_UNSOLICITED;
                 else if (status == Status.IPV4_SNAT_IPV6_UNKNOWN)
+                    status = Status.DIFFERENT;
+                // prevent firewalled -> OK -> firewalled+OK
+                else if (status == Status.IPV4_FIREWALLED_IPV6_OK)
+                    status = Status.REJECT_UNSOLICITED;
+                else if (status == Status.IPV4_SNAT_IPV6_OK)
                     status = Status.DIFFERENT;
             }
 
