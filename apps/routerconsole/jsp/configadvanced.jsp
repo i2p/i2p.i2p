@@ -24,12 +24,26 @@
 <%@include file="formhandler.jsi" %>
  <div class="configure">
  <div class="wideload">
+<h3><%=intl._("Floodfill Configuration")%></h3>
+<p><%=intl._("Floodill participation helps the network, but may use more of your computer's resources.")%></p>
+<form action="" method="POST">
+<input type="hidden" name="nonce" value="<%=pageNonce%>" >
+<input type="hidden" name="action" value="ff" >
+<input type="radio" class="optbox" name="ff" value="auto" <%=advancedhelper.getFFChecked(2) %> >
+<%=intl._("Automatic")%><br>
+<input type="radio" class="optbox" name="ff" value="true" <%=advancedhelper.getFFChecked(1) %> >
+<%=intl._("Force On")%><br>
+<input type="radio" class="optbox" name="ff" value="false" <%=advancedhelper.getFFChecked(0) %> >
+<%=intl._("Disable")%><br>
+<div class="formaction">
+<input type="submit" name="shouldsave" class="accept" value="<%=intl._("Save changes")%>" >
+</div></form>
+<h3><%=intl._("Advanced I2P Configuration")%></h3>
 <% if (advancedhelper.isAdvanced()) { %>
  <form action="" method="POST">
  <input type="hidden" name="nonce" value="<%=pageNonce%>" >
  <input type="hidden" name="action" value="blah" >
 <% }  // isAdvanced %>
- <h3><%=intl._("Advanced I2P Configuration")%></h3>
  <textarea rows="32" cols="60" name="nofilter_config" wrap="off" spellcheck="false" <% if (!advancedhelper.isAdvanced()) { %>readonly="readonly"<% } %>><jsp:getProperty name="advancedhelper" property="settings" /></textarea><br><hr>
 <% if (advancedhelper.isAdvanced()) { %>
       <div class="formaction">

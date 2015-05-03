@@ -6,8 +6,9 @@ import java.util.TreeMap;
 import net.i2p.data.DataHelper;
 
 public class ConfigAdvancedHelper extends HelperBase {
-    public ConfigAdvancedHelper() {}
-    
+    private final static String CHECKED = " checked=\"checked\" ";
+    static final String PROP_FLOODFILL_PARTICIPANT = "router.floodfillParticipant";
+
     public String getSettings() {
         StringBuilder buf = new StringBuilder(4*1024);
         TreeMap<String, String> sorted = new TreeMap<String, String>();
@@ -23,5 +24,15 @@ public class ConfigAdvancedHelper extends HelperBase {
     /** @since 0.9.14.1 */
     public String getConfigFileName() {
         return _context.router().getConfigFilename();
+    }
+
+    /** @since 0.9.20 */
+    public String getFFChecked(int mode) {
+        String ff = _context.getProperty(PROP_FLOODFILL_PARTICIPANT, "auto");
+        if ((mode == 0 && ff.equals("false")) ||
+            (mode == 1 && ff.equals("true")) ||
+            (mode == 2 && ff.equals("auto")))
+            return CHECKED;
+        return "";
     }
 }
