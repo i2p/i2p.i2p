@@ -1,6 +1,13 @@
+2015-05-03 zzz
+ * SusiDNS: Add export button
+
+2015-05-02 zzz
+ * Console: Fix Indonesian translations
+ * Jetty 8.1.17.v20150415
+ * Transports: Cleanup of ticket #1458 fixes
+
 2015-04-30 zzz
- * Transports:
-   - Correctly handle IPv4 firewalled, IPv6 not (ticket #1458)
+ * Transports: Correctly handle IPv4 firewalled, IPv6 not (ticket #1458)
 
 2015-04-29 zzz
  * Clock: Make forward slewing work better

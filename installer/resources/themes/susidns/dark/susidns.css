@@ -252,6 +252,12 @@ input.delete {
      min-height: 22px;
 }
 
+input.export {
+     background: #ddf url('/themes/console/images/arrow_right.png') no-repeat 2px center;
+     padding: 2px 3px 2px 20px;
+     min-height: 22px;
+}
+
 input.reload {
      background: #ddf url('/themes/console/images/arrow_refresh.png') no-repeat 2px center;
      padding: 2px 3px 2px 20px;

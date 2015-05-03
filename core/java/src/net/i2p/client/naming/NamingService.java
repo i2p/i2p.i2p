@@ -290,6 +290,11 @@ public abstract class NamingService {
         Map<String, String> entries = getBase64Entries(options);
         out.write("# Address book: ");
         out.write(getName());
+        if (options != null) {
+            String list = options.getProperty("list");
+            if (list != null)
+                out.write(" (" + list + ')');
+        }
         out.write('\n');
         int sz = entries.size();
         if (sz <= 0) {
