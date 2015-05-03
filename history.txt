@@ -1,4 +1,6 @@
 2015-05-03 zzz
+ * Router: Allow class M to become floodfill;
+   add bandwidth classes P and X (ticket #1447)
  * SusiDNS: Add export button
 
 2015-05-02 zzz

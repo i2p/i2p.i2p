@@ -898,14 +898,12 @@ public class Router implements RouterClock.ClockShiftListener {
         } else if (bwLim <= 2000) {    // TODO adjust threshold
             // 512 supported as of 0.9.18;
             // Add 256 as well for compatibility
-            // TODO uncomment
-            //ri.addCapability(CAPABILITY_BW512);
+            ri.addCapability(CAPABILITY_BW512);
             ri.addCapability(CAPABILITY_BW256);
         } else {
             // Unlimited supported as of 0.9.18;
             // Add 256 as well for compatibility
-            // TODO uncomment
-            //ri.addCapability(CAPABILITY_BW_UNLIMITED);
+            ri.addCapability(CAPABILITY_BW_UNLIMITED);
             ri.addCapability(CAPABILITY_BW256);
         }
         
