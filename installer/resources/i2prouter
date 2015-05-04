@@ -546,13 +546,12 @@ setup_openbsd() {
         set -e   # abort in case of error
         # Package java-tanukiwrapper-3.5.19.1 misspells 'tanuki'
         if [ -e "$pkg_path/lib/tanukuwrapper/libwrapper.so" ]; then
-            cp "$pkg_path/lib/tanukuwrapper/libwrapper.so" "$I2P/lib/libwrapper.so"
+            ln -sf "$pkg_path/lib/tanukuwrapper/libwrapper.so" "$I2P/lib/libwrapper.so"
         else    # they fixed the path
-            cp "$pkg_path/lib/tanukiwrapper/libwrapper.so" "$I2P/lib/libwrapper.so"
+            ln -sf "$pkg_path/lib/tanukiwrapper/libwrapper.so" "$I2P/lib/libwrapper.so"
         fi
-        cp "$pkg_path/share/java/classes/tanukiwrapper.jar" "$I2P/lib/wrapper.jar"
-        cp "$pkg_path/sbin/tanukiwrapper" "$WRAPPER_CMD"
-        chmod +x "$WRAPPER_CMD"
+        ln -sf "$pkg_path/share/java/classes/tanukiwrapper.jar" "$I2P/lib/wrapper.jar"
+        ln -sf "$pkg_path/sbin/tanukiwrapper" "$WRAPPER_CMD"
     fi
     set +e
 }
