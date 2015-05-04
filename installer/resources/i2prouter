@@ -527,6 +527,42 @@ outputFile() {
     fi
 }
 
+setup_openbsd() {
+    if ! pkg_info -qe 'java-tanukiwrapper->=3.5.19'; then
+        echo "Java wrapper not found. Either:"
+        echo "- install the package java-tanukiwrapper then start I2P again; or"
+        echo "- start I2P with $I2P/runplain.sh"
+        exit 1
+    else
+        # Wrapper package is installed so let's try copying the bits into the proper places
+        pkg_path=$(pkg_info -v java-tanukiwrapper   | awk '/^@cwd/{print $2}')
+        if [ -z $pkg_path ]; then
+            # Fallback, but we shouldn't end up here
+            echo "Unable to locate ${WRAPPER_CMD} in ${I2P}!"
+            echo
+            unsupported
+            exit 1
+        fi
+        set -e   # abort in case of error
+        # Package java-tanukiwrapper-3.5.19.1 misspells 'tanuki'
+        if [ -e "$pkg_path/lib/tanukuwrapper/libwrapper.so" ]; then
+            cp "$pkg_path/lib/tanukuwrapper/libwrapper.so" "$I2P/lib/libwrapper.so"
+        else    # they fixed the path
+            cp "$pkg_path/lib/tanukiwrapper/libwrapper.so" "$I2P/lib/libwrapper.so"
+        fi
+        cp "$pkg_path/share/java/classes/tanukiwrapper.jar" "$I2P/lib/wrapper.jar"
+        cp "$pkg_path/sbin/tanukiwrapper" "$WRAPPER_CMD"
+        chmod +x "$WRAPPER_CMD"
+    fi
+    set +e
+}
+
+if [ "$DIST_OS"="openbsd" -a ! -f "$WRAPPER_CMD" ]; then
+    # We handle it here because Tanuki doesn't ship OpenBSD binaries.
+    # We don't either, but they are (finally!) in OpenBSD itself.
+    setup_openbsd
+fi
+
 # Decide on the wrapper binary to use.
 # If the bits of the OS could be detected, we will try to look for the
 #  binary with the correct bits value.  If it doesn't exist, fall back
