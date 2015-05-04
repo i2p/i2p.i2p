@@ -61,6 +61,9 @@ class MessageInputStream extends InputStream {
     private final int _maxBufferSize;
     private final byte[] _oneByte = new byte[1];
     private final Object _dataLock;
+
+    /** only in _notYetReadyBlocks, never in _readyDataBlocks */
+    private static final ByteArray DUMMY_BA = new ByteArray(null);
     
     private static final int MIN_READY_BUFFERS = 16;
 
@@ -320,9 +323,9 @@ class MessageInputStream extends InputStream {
                 _highestReadyBlockId = messageId;
                 long cur = _highestReadyBlockId + 1;
                 // now pull in any previously pending blocks
-                while (_notYetReadyBlocks.containsKey(Long.valueOf(cur))) {
-                    ByteArray ba = _notYetReadyBlocks.remove(Long.valueOf(cur));
-                    if ( (ba != null) && (ba.getData() != null) && (ba.getValid() > 0) ) {
+                ByteArray ba;
+                while ((ba = _notYetReadyBlocks.remove(Long.valueOf(cur))) != null) {
+                    if (ba.getData() != null && ba.getValid() > 0) {
                         _readyDataBlocks.add(ba);
                     }
                     
@@ -336,13 +339,17 @@ class MessageInputStream extends InputStream {
                                         // Java throws a SocketTimeoutException.
                                         // We do neither.
             } else {
-                if (_log.shouldLog(Log.INFO))
-                    _log.info("Message is out of order: " + messageId);
-                // _notYetReadyBlocks size is limited in ConnectionPacketHandler.
-                if (_locallyClosed) // dont need the payload, just the msgId in order
-                    _notYetReadyBlocks.put(Long.valueOf(messageId), new ByteArray(null));
-                else
+                // _notYetReadyBlocks size is limited in canAccept()
+                if (_locallyClosed) {
+                    if (_log.shouldInfo())
+                        _log.info("Message received on closed stream: " + messageId);
+                    // dont need the payload, just the msgId in order
+                    _notYetReadyBlocks.put(Long.valueOf(messageId), DUMMY_BA);
+                } else {
+                    if (_log.shouldInfo())
+                        _log.info("Message is out of order: " + messageId);
                     _notYetReadyBlocks.put(Long.valueOf(messageId), payload);
+                }
             }
             _dataLock.notifyAll();
         }

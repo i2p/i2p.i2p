@@ -1517,7 +1517,7 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
         if (tasks.isEmpty()) {
             System.exit(0);
         }
-        l.log("There are running tasks. Try 'list'.");
+        l.log("There are running tasks. Try 'list' or 'close all'.");
         //notifyEvent("quitResult", "error");
     }
 
