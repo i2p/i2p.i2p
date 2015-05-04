@@ -147,7 +147,7 @@ Debian wrapper.config to try to prevent confusion.
  if [ -n "$FIXED_COMMAND" ]
  then
      COMMAND="$FIXED_COMMAND"
-@@ -1019,7 +943,6 @@
+@@ -1055,7 +979,6 @@
          if [ "X$pid" = "X" ]
          then
              eval echo " `gettext 'WARNING: $APP_LONG_NAME may have failed to start.'`"
@@ -155,7 +155,7 @@ Debian wrapper.config to try to prevent confusion.
          else
              eval echo ' running: PID:$pid'
          fi
-@@ -1822,7 +1745,7 @@
+@@ -1858,7 +1781,7 @@
  }
  
  showsetusermesg()  {
@@ -164,7 +164,7 @@ Debian wrapper.config to try to prevent confusion.
  }
  
  checkifstartingasroot() {
-@@ -1830,7 +1753,7 @@
+@@ -1866,7 +1789,7 @@
          echo "`gettext 'Running I2P as the root user is *not* recommended.'`"
          showsetusermesg
          echo
@@ -173,7 +173,7 @@ Debian wrapper.config to try to prevent confusion.
          exit 1
      fi
  }
-@@ -1895,24 +1818,10 @@
+@@ -1931,24 +1854,10 @@
              status
              ;;
  
