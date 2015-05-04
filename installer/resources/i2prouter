@@ -997,7 +997,11 @@ console() {
 
         # The string passed to eval must handles spaces in paths correctly.
         COMMAND_LINE="$CMDNICE \"$WRAPPER_CMD\" \"$WRAPPER_CONF\" wrapper.syslog.ident=\"$APP_NAME\" wrapper.java.command=\"$JAVABINARY\" wrapper.pidfile=\"$PIDFILE\" wrapper.name=\"$APP_NAME\" wrapper.displayname=\"$APP_LONG_NAME\" $ANCHORPROP $STATUSPROP $COMMANDPROP $LOCKPROP $LOGPROP $ADDITIONAL_PARA"
-        eval $COMMAND_LINE || failed
+        eval $COMMAND_LINE
+        local RETVAL=$?
+        if [ $RETVAL -ne '0' ] && [ $RETVAL -ne '2' ]; then
+            failed
+        fi
     else
         eval echo `gettext '$APP_LONG_NAME is already running.'`
         exit 1
