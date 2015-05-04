@@ -1,4 +1,12 @@
+2015-05-04 zzz
+ * i2ptunnel:
+   - Close input stream when HTTP client decompressor
+     terminates (ticket #1506)
+   - Add Connection: close headers to errors and proxy.i2p responses
+     where it was missing (ticket #1531)
+
 2015-05-03 zzz
+ * Console: Add floodfill configuration form to /configadvanced
  * Router: Allow class M to become floodfill;
    add bandwidth classes P and X (ticket #1447)
  * SusiDNS: Add export button

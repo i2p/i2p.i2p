@@ -63,6 +63,8 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
             "HTTP/1.1 407 Proxy Authentication Required\r\n" +
             "Content-Type: text/html; charset=UTF-8\r\n" +
             "Cache-control: no-cache\r\n" +
+            "Connection: close\r\n"+
+            "Proxy-Connection: close\r\n"+
             "Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.5\r\n" + // try to get a UTF-8-encoded response back for the password
             "Proxy-Authenticate: ";
     // put the auth type and realm in between
@@ -78,6 +80,8 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
          "HTTP/1.1 503 Service Unavailable\r\n"+
          "Content-Type: text/html; charset=iso-8859-1\r\n"+
          "Cache-control: no-cache\r\n"+
+         "Connection: close\r\n"+
+         "Proxy-Connection: close\r\n"+
          "\r\n"+
          "<html><body><H1>I2P ERROR: No outproxy found</H1>"+
          "Your request was for a site outside of I2P, but you have no "+
@@ -87,6 +91,8 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
             "HTTP/1.1 503 Service Unavailable\r\n" +
             "Content-Type: text/html; charset=iso-8859-1\r\n" +
             "Cache-control: no-cache\r\n" +
+            "Connection: close\r\n"+
+            "Proxy-Connection: close\r\n"+
             "\r\n" +
             "<html><body><H1>I2P ERROR: DESTINATION NOT FOUND</H1>" +
             "That I2P Destination was not found. Perhaps you pasted in the " +
