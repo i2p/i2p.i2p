@@ -84,8 +84,8 @@ public class SendMessageMessage extends I2CPMessageImpl {
      */
     @Override
     public void readMessage(InputStream in, int length, int type) throws I2CPMessageException, IOException {
-        if (type != MESSAGE_TYPE)
-            throw new I2CPMessageException("Invalid message type (found: " + type + " supported: " + MESSAGE_TYPE
+        if (type != getType())
+            throw new I2CPMessageException("Invalid message type (found: " + type + " supported: " + getType()
                                            + " class: " + getClass().getName() + ")");
         if (length < 0) throw new IOException("Negative payload size");
 
@@ -129,7 +129,7 @@ public class SendMessageMessage extends I2CPMessageImpl {
         
         try {
             DataHelper.writeLong(out, 4, len);
-            DataHelper.writeLong(out, 1, MESSAGE_TYPE);
+            DataHelper.writeLong(out, 1, getType());
             _sessionId.writeBytes(out);
             _destination.writeBytes(out);
             _payload.writeBytes(out);
