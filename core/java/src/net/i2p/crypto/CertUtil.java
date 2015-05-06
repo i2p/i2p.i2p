@@ -53,6 +53,8 @@ public class CertUtil {
            }
            wr.println("-----END CERTIFICATE-----");
            wr.flush();
+           if (wr.checkError())
+               throw new IOException("Failed write to " + file);
            return true;
         } catch (CertificateEncodingException cee) {
             error("Error writing X509 Certificate " + file.getAbsolutePath(), cee);

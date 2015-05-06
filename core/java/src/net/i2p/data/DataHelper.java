@@ -529,6 +529,11 @@ public class DataHelper {
             out.flush();
             fos.getFD().sync();
             out.close();
+            if (out.checkError()) {
+                out = null;
+                tmpFile.delete();
+                throw new IOException("Failed to write properties to " + tmpFile);
+            }
             out = null;
             if (!FileUtil.rename(tmpFile, file))
                 throw new IOException("Failed rename from " + tmpFile + " to " + file);
