@@ -813,6 +813,14 @@ public abstract class TransportImpl implements Transport {
      */
     public void recheckReachability() {}
 
+    /**
+     *  @param transportStyle ignored
+     *  @since 0.9.20
+     */
+    protected boolean isIPv4Firewalled() {
+        return TransportUtil.isIPv4Firewalled(_context, getStyle());
+    }
+
     public boolean isBacklogged(Hash dest) { return false; }
     public boolean isEstablished(Hash dest) { return false; }
 

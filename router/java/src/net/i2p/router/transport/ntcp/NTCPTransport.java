@@ -1344,7 +1344,9 @@ public class NTCPTransport extends TransportImpl {
         buf.append("<h3 id=\"ntcpcon\">").append(_("NTCP connections")).append(": ").append(peers.size());
         buf.append(". ").append(_("Limit")).append(": ").append(getMaxConnections());
         buf.append(". ").append(_("Timeout")).append(": ").append(DataHelper.formatDuration2(_pumper.getIdleTimeout()));
-        buf.append(". ").append(_("Status")).append(": ").append(_(getReachabilityStatus().toStatusString()));
+        if (_context.getBooleanProperty(PROP_ADVANCED)) {
+            buf.append(". ").append(_("Status")).append(": ").append(_(getReachabilityStatus().toStatusString()));
+        }
         buf.append(".</h3>\n" +
                    "<table>\n" +
                    "<tr><th><a href=\"#def.peer\">").append(_("Peer")).append("</a></th>" +

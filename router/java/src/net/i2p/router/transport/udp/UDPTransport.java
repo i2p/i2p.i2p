@@ -167,6 +167,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     public static final String PROP_BIND_INTERFACE = "i2np.udp.bindInterface";
     /** override the "large" (max) MTU, default is PeerState.LARGE_MTU */
     private static final String PROP_DEFAULT_MTU = "i2np.udp.mtu";
+    private static final String PROP_ADVANCED = "routerconsole.advanced";
         
     private static final String CAP_TESTING = "" + UDPAddress.CAPACITY_TESTING;
     private static final String CAP_TESTING_INTRO = "" + UDPAddress.CAPACITY_TESTING + UDPAddress.CAPACITY_INTRODUCER;
@@ -457,6 +458,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         //if (SHOULD_FLOOD_PEERS)
         //    _flooder.startup();
         _expireEvent.setIsAlive(true);
+        _reachabilityStatus = Status.UNKNOWN;
         _testEvent.setIsAlive(true); // this queues it for 3-6 minutes in the future...
         _testEvent.reschedule(10*1000); // lets requeue it for Real Soon
 
@@ -477,7 +479,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                     _lastInboundIPv6 = _context.clock().now();
                     setReachabilityStatus(Status.IPV4_UNKNOWN_IPV6_OK);
                 } else {
-                    setReachabilityStatus(Status.IPV4_OK_IPV6_UNKNOWN);
+                    if (!isIPv4Firewalled())
+                        setReachabilityStatus(Status.IPV4_OK_IPV6_UNKNOWN);
                 }
                 rebuildExternalAddress(ia.getHostAddress(), newPort, false);
             }
@@ -487,10 +490,17 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                     _lastInboundIPv6 = _context.clock().now();
                     setReachabilityStatus(Status.IPV4_UNKNOWN_IPV6_OK);
                 } else {
-                    setReachabilityStatus(Status.IPV4_OK_IPV6_UNKNOWN);
+                    if (!isIPv4Firewalled())
+                        setReachabilityStatus(Status.IPV4_OK_IPV6_UNKNOWN);
                 }
                 rebuildExternalAddress(ia.getHostAddress(), newPort, false);
             }
+        }
+        if (isIPv4Firewalled()) {
+            if (_lastInboundIPv6 > 0)
+                setReachabilityStatus(Status.IPV4_FIREWALLED_IPV6_UNKNOWN);
+            else
+                setReachabilityStatus(Status.REJECT_UNSOLICITED);
         }
         rebuildExternalAddress(false);
     }
@@ -763,12 +773,14 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         // Assume if we have an interface with a public IP that we aren't firewalled.
         // If this is wrong, the peer test will figure it out and change the status.
         if (changed && source == SOURCE_INTERFACE) {
-            if (ip.length == 4)
-                setReachabilityStatus(Status.IPV4_OK_IPV6_UNKNOWN);
-            else if (ip.length == 16)
+            if (ip.length == 4) {
+                if (!isIPv4Firewalled())
+                    setReachabilityStatus(Status.IPV4_OK_IPV6_UNKNOWN);
+            } else if (ip.length == 16) {
                 // TODO should we set both to unknown and wait for an inbound v6 conn,
                 // since there's no v6 testing?
                 setReachabilityStatus(Status.IPV4_UNKNOWN_IPV6_OK);
+            }
         }
     }
 
@@ -786,8 +798,10 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             else
                 _log.warn("UPnP has failed to open the SSU port: " + port + " reason: " + reason);
         }
-        if (success && ip != null && getExternalIP() != null)
-            setReachabilityStatus(Status.IPV4_OK_IPV6_UNKNOWN);
+        if (success && ip != null && getExternalIP() != null) {
+            if (!isIPv4Firewalled())
+                setReachabilityStatus(Status.IPV4_OK_IPV6_UNKNOWN);
+        }
     }
 
     /**
@@ -2434,7 +2448,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         buf.append("<h3 id=\"udpcon\">").append(_("UDP connections")).append(": ").append(peers.size());
         buf.append(". ").append(_("Limit")).append(": ").append(getMaxConnections());
         buf.append(". ").append(_("Timeout")).append(": ").append(DataHelper.formatDuration2(_expireTimeout));
-        buf.append(". ").append(_("Status")).append(": ").append(_(_reachabilityStatus.toStatusString()));
+        if (_context.getBooleanProperty(PROP_ADVANCED)) {
+            buf.append(". ").append(_("Status")).append(": ").append(_(_reachabilityStatus.toStatusString()));
+        }
         buf.append(".</h3>\n");
         buf.append("<table>\n");
         buf.append("<tr><th class=\"smallhead\" nowrap><a href=\"#def.peer\">").append(_("Peer")).append("</a><br>");
@@ -3003,7 +3019,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     }
     
     private boolean shouldTest() {
-        return ! _context.router().isHidden();
+        return ! (_context.router().isHidden() ||
+                  isIPv4Firewalled());
         //String val = _context.getProperty(PROP_SHOULD_TEST);
         //return ( (val != null) && ("true".equals(val)) );
     }
@@ -3053,6 +3070,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
          *  @since 0.9.13
          */
         public synchronized void forceRunSoon() {
+            if (isIPv4Firewalled())
+                return;
             _forceRun = true;
             reschedule(MIN_TEST_FREQUENCY);
         }
@@ -3063,6 +3082,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
          *  @since 0.9.13
          */
         public synchronized void forceRunImmediately() {
+            if (isIPv4Firewalled())
+                return;
             _lastTested.set(0);
             _forceRun = true;
             reschedule(5*1000);

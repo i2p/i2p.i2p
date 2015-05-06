@@ -93,6 +93,11 @@ public class ConfigNetHelper extends HelperBase {
         return getChecked(UDPTransport.PROP_LAPTOP_MODE);
     }
 
+    /** @since 0.9.20 */
+    public String getIPv4FirewalledChecked() {
+        return getChecked(TransportUtil.PROP_IPV4_FIREWALLED);
+    }
+
     public String getTcpAutoPortChecked(int mode) {
         String port = _context.getProperty(PROP_I2NP_NTCP_PORT); 
         boolean specified = port != null && port.length() > 0;

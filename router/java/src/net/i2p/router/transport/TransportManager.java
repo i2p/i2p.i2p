@@ -60,6 +60,8 @@ public class TransportManager implements TransportEventListener {
     public final static String PROP_ENABLE_NTCP = "i2np.ntcp.enable";
     /** default true */
     public final static String PROP_ENABLE_UPNP = "i2np.upnp.enable";
+
+    private static final String PROP_ADVANCED = "routerconsole.advanced";
     
     /** not forever, since they may update */
     private static final long SIGTYPE_BANLIST_DURATION = 36*60*60*1000L;
@@ -667,11 +669,13 @@ public class TransportManager implements TransportEventListener {
      *  will take many seconds if it has vanished.
      */
     public void renderStatusHTML(Writer out, String urlBase, int sortFlags) throws IOException {
-        out.write("<p>");
-        out.write(_("Status"));
-        out.write(": ");
-        out.write(_(getReachabilityStatus().toStatusString()));
-        out.write("</p>");
+        if (_context.getBooleanProperty(PROP_ADVANCED)) {
+            out.write("<p><b>");
+            out.write(_("Status"));
+            out.write(": ");
+            out.write(_(getReachabilityStatus().toStatusString()));
+            out.write("</b></p>");
+        }
         TreeMap<String, Transport> transports = new TreeMap<String, Transport>();
         for (Transport t : _transports.values()) {
             transports.put(t.getStyle(), t);
