@@ -175,6 +175,7 @@
         <attribute name="infile" />
         <attribute name="outfile" />
         <attribute name="sigtype" />
+        <attribute name="su3.ver" />
         <sequential>
         <input message="Enter su3 private signing key store:" addproperty="release.privkey.su3" />
         <fail message="You must enter an existing file path." >
@@ -211,7 +212,7 @@
                 <arg value="@{infile}" />
                 <arg value="@{outfile}" />
                 <arg value="${release.privkey.su3}" />
-                <arg value="${release.number}" />
+                <arg value="@{su3.ver}" />
                 <arg value="${release.signer.su3}" />
             </java>
             <echo message="Verify version and VALID signature:" />
@@ -256,6 +257,14 @@
          Do not put ant tasks in the sub-build.xmls anymore,
          so the build will go faster.
       -->
+
+    <target name="-setepoch">
+        <script language="javascript">
+            <![CDATA[
+              property = project.setProperty("epoch",Math.floor((new Date()).getTime()/1000));
+            ]]>
+        </script>
+    </target>
 
     <target name="buildBOB" depends="buildStreaming" >
         <ant dir="apps/BOB/" target="jar" />
@@ -1219,11 +1228,11 @@
         </fail>
     </target>
 
-    <target name="i2pseeds" depends="-areRouterInfosEnabled, prepRouterInfos">
+    <target name="i2pseeds" depends="-setepoch, -areRouterInfosEnabled, prepRouterInfos">
         <delete file="i2pseeds.zip" />
         <delete file="i2pseeds.su3" />
         <zip destfile="i2pseeds.zip" basedir="pkg-temp/netDb" whenempty="fail" />
-        <su3sign infile="i2pseeds.zip" sigtype="RESEED" outfile="i2pseeds.su3" />
+        <su3sign infile="i2pseeds.zip" sigtype="RESEED" outfile="i2pseeds.su3" su3.ver="${epoch}" />
     </target>
 
     <!-- this is no longer required, izpack 4.3.0 supports headless installs with java -jar i2pinstall.exe -console -->
@@ -1289,7 +1298,7 @@
     <target name="updaterRouter" depends="prepupdateRouter, zipit" />
 
     <target name="-sign-update" depends="buildrouter">
-        <su3sign infile="i2pupdate200.zip" sigtype="ROUTER" outfile="i2pupdate.su3" />
+        <su3sign infile="i2pupdate200.zip" sigtype="ROUTER" outfile="i2pupdate.su3" su3.ver="${full.version}" />
     </target>
 
     <target name="signed-updater200" depends="updater200, -sign-update" />
@@ -1769,7 +1778,7 @@
         <!-- now build and verify the packed su2 from the packed zip -->
         <sudsign infile="i2pupdate200.zip" outfile="i2pupdate.su2" />
         <!-- now build and verify the packed su3 from the packed zip -->
-        <su3sign infile="i2pupdate200.zip" sigtype="ROUTER" outfile="i2pupdate.su3" />
+        <su3sign infile="i2pupdate200.zip" sigtype="ROUTER" outfile="i2pupdate.su3" su3.ver="${release.number}" />
         <!-- this will use the monotonerc file in the current workspace -->
         <echo message="Checking out fresh copy into ../i2p-${release.number} for tarballing:" />
         <delete dir="../i2p-${release.number}" />
