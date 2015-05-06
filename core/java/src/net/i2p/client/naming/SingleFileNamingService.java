@@ -443,10 +443,11 @@ public class SingleFileNamingService extends NamingService {
     public void export(Writer out, Properties options) throws IOException {
         out.write("# Address book: ");
         out.write(getName());
-        out.write('\n');
+        final String nl = System.getProperty("line.separator", "\n");
+        out.write(nl);
         out.write("# Exported: ");
         out.write((new Date()).toString());
-        out.write('\n');
+        out.write(nl);
         BufferedReader in = null;
         getReadLock();
         try {
@@ -454,7 +455,7 @@ public class SingleFileNamingService extends NamingService {
             String line = null;
             while ( (line = in.readLine()) != null) {
                 out.write(line);
-                out.write('\n');
+                out.write(nl);
             }
         } finally {
             if (in != null) try { in.close(); } catch (IOException ioe) {}

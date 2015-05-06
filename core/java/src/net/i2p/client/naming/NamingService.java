@@ -295,23 +295,26 @@ public abstract class NamingService {
             if (list != null)
                 out.write(" (" + list + ')');
         }
-        out.write('\n');
+        final String nl = System.getProperty("line.separator", "\n");
+        out.write(nl);
         int sz = entries.size();
         if (sz <= 0) {
-            out.write("# No entries\n");
+            out.write("# No entries");
+            out.write(nl);
             return;
         }
         out.write("# Exported: ");
         out.write((new Date()).toString());
-        out.write('\n');
+        out.write(nl);
         if (sz > 1) {
-            out.write("# " + sz + " entries\n");
+            out.write("# " + sz + " entries");
+            out.write(nl);
         }
         for (Map.Entry<String, String> e : entries.entrySet()) {
             out.write(e.getKey());
             out.write('=');
             out.write(e.getValue());
-            out.write('\n');
+            out.write(nl);
         }
     }
 
