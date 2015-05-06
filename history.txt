@@ -1,3 +1,8 @@
+2015-05-06 zzz
+ * Naming services: Export address books with Windows
+   line endings on Windows (ticket #1557)
+ * Transport: Add config to force IPv4 (only) to firewalled (ticket #1541)
+
 2015-05-04 zzz
  * i2ptunnel:
    - Close input stream when HTTP client decompressor
