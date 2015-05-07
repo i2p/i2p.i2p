@@ -584,7 +584,6 @@ public abstract class TransportImpl implements Transport {
      *  To remove all IPv4 or IPv6 addresses, use removeAddress(boolean).
      *  To remove all IPv4 and IPv6 addresses, use replaceAddress(null).
      *
-     *  @param ipv6 true to remove all IPv6 addresses, false to remove all IPv4 addresses
      *  @since 0.9.20
      */
     protected void removeAddress(RouterAddress address) {
@@ -814,7 +813,6 @@ public abstract class TransportImpl implements Transport {
     public void recheckReachability() {}
 
     /**
-     *  @param transportStyle ignored
      *  @since 0.9.20
      */
     protected boolean isIPv4Firewalled() {
