@@ -55,7 +55,7 @@ class SAMv3Handler extends SAMv1Handler
 	interface Session {
 		String getNick();
 		void close();
-		boolean sendBytes(String dest, byte[] data) throws DataFormatException;
+		boolean sendBytes(String dest, byte[] data) throws DataFormatException, I2PSessionException;
 	}
 	
 	/**

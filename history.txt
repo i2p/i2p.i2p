@@ -1,4 +1,6 @@
 2015-05-07 zzz
+ * SAM: Close datagram or raw session when underlying
+   I2P session closes (ticket #1563)
  * Update: Add support for su3-signed development builds (ticket #1381)
 
 2015-05-06 zzz

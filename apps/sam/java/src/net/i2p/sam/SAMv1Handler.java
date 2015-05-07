@@ -466,6 +466,8 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
 
                 if (!getDatagramSession().sendBytes(dest, data)) {
                     _log.error("DATAGRAM SEND failed");
+                    // a message send failure is no reason to drop the SAM session
+                    // for raw and repliable datagrams, just carry on our merry way
                     return true;
                 }
 
@@ -484,6 +486,9 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Invalid key specified with DATAGRAM SEND message",
                            e);
+                return false;
+            } catch (I2PSessionException e) {
+                _log.error("Session error with DATAGRAM SEND message", e);
                 return false;
             }
         } else {
@@ -546,6 +551,8 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
 
                 if (!getRawSession().sendBytes(dest, data)) {
                     _log.error("RAW SEND failed");
+                    // a message send failure is no reason to drop the SAM session
+                    // for raw and repliable datagrams, just carry on our merry way
                     return true;
                 }
 
@@ -564,6 +571,9 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Invalid key specified with RAW SEND message",
                            e);
+                return false;
+            } catch (I2PSessionException e) {
+                _log.error("Session error with RAW SEND message", e);
                 return false;
             }
         } else {
@@ -646,6 +656,8 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
             if (!getStreamSession().sendBytes(id, getClientSocket().socket().getInputStream(), size)) { // data)) {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("STREAM SEND [" + size + "] failed");
+                // a message send failure is no reason to drop the SAM session
+                // for style=stream, tell the client the stream failed, and kill the virtual connection..
                 boolean rv = writeString("STREAM CLOSED RESULT=CANT_REACH_PEER ID=" + id + " MESSAGE=\"Send of " + size + " bytes failed\"\n");
                 getStreamSession().closeConnection(id);
                 return rv;

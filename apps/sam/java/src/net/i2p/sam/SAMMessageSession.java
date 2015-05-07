@@ -92,9 +92,10 @@ abstract class SAMMessageSession {
      * @param data Bytes to be sent
      *
      * @return True if the data was sent, false otherwise
-     * @throws DataFormatException 
+     * @throws DataFormatException on unknown / bad dest
+     * @throws I2PSessionException on serious error, probably session closed
      */
-    public abstract boolean sendBytes(String dest, byte[] data) throws DataFormatException;
+    public abstract boolean sendBytes(String dest, byte[] data) throws DataFormatException, I2PSessionException;
 
     /**
      * Actually send bytes through the SAM message-based session I2PSession
@@ -108,21 +109,18 @@ abstract class SAMMessageSession {
      *
      * @return True if the data was sent, false otherwise
      * @throws DataFormatException on unknown / bad dest
+     * @throws I2PSessionException on serious error, probably session closed
      */
     protected boolean sendBytesThroughMessageSession(String dest, byte[] data,
-                                                     int proto, int fromPort, int toPort) throws DataFormatException {
+                                        int proto, int fromPort, int toPort)
+                                        throws DataFormatException, I2PSessionException {
 	Destination d = SAMUtils.getDest(dest);
 
 	if (_log.shouldLog(Log.DEBUG)) {
 	    _log.debug("Sending " + data.length + " bytes to " + dest);
 	}
 
-	try {
-	    return session.sendMessage(d, data, proto, fromPort, toPort);
-	} catch (I2PSessionException e) {
-	    _log.error("I2PSessionException while sending data", e);
-	    return false;
-	}
+	return session.sendMessage(d, data, proto, fromPort, toPort);
     }
 
     /**
