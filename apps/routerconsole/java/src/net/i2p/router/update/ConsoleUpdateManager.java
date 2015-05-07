@@ -140,6 +140,7 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
         notifyInstalled(NEWS, "", Long.toString(NewsHelper.lastUpdated(_context)));
         notifyInstalled(ROUTER_SIGNED, "", RouterVersion.VERSION);
         notifyInstalled(ROUTER_SIGNED_SU3, "", RouterVersion.VERSION);
+        notifyInstalled(ROUTER_DEV_SU3, "", RouterVersion.FULL_VERSION);
         // hack to init from the current news file... do this before we register Updaters
         // This will not kick off any Updaters as none are yet registered
         (new NewsFetcher(_context, this, Collections.<URI> emptyList())).checkForUpdates();
