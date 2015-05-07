@@ -73,6 +73,8 @@ class NewsFetcher extends UpdateRunner {
         _isRunning = true;
         try {
             fetchNews();
+        } catch (Throwable t) {
+            _mgr.notifyTaskFailed(this, "", t);
         } finally {
             _mgr.notifyCheckComplete(this, _isNewer, _success);
             _isRunning = false;

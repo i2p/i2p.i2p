@@ -27,6 +27,8 @@ public class ConfigUpdateHandler extends FormHandler {
     private String _trustedKeys;
     private boolean _updateUnsigned;
     private String _zipURL;
+    private boolean _updateDevSU3;
+    private String _devSU3URL;
 
     public static final String PROP_NEWS_URL = "router.newsURL";
 //  public static final String DEFAULT_NEWS_URL = "http://dev.i2p.net/cgi-bin/cvsweb.cgi/i2p/news.xml?rev=HEAD";
@@ -60,6 +62,17 @@ public class ConfigUpdateHandler extends FormHandler {
     public static final String PROP_ZIP_URL = "router.updateUnsignedURL";
     
     public static final String PROP_UPDATE_URL = "router.updateURL";
+
+    /**
+     *  default false
+     *  @since 0.9.20
+     */
+    public static final String PROP_UPDATE_DEV_SU3 = "router.updateDevSU3";
+    /**
+     *  no default
+     *  @since 0.9.20
+     */
+    public static final String PROP_DEV_SU3_URL = "router.updateDevSU3URL";
 
     /**
      *  Changed as of release 0.8 to support both .sud and .su2
@@ -163,11 +176,14 @@ public class ConfigUpdateHandler extends FormHandler {
                 return;
             }
 
-            boolean a1 = mgr.checkAvailable(NEWS, 30*1000) != null;
+            boolean a1 = mgr.checkAvailable(NEWS, 40*1000) != null;
             boolean a2 = false;
-            if ((!a1) && _updateUnsigned && _zipURL != null && _zipURL.length() > 0)
-                a2 = mgr.checkAvailable(ROUTER_UNSIGNED, 30*1000) != null;
-            if (a1 || a2) {
+            boolean a3 = false;
+            if ((!a1) && _updateDevSU3 && _devSU3URL != null && _devSU3URL.length() > 0)
+                a2 = mgr.checkAvailable(ROUTER_DEV_SU3, 40*1000) != null;
+            if ((!a2) && _updateUnsigned && _zipURL != null && _zipURL.length() > 0)
+                a3 = mgr.checkAvailable(ROUTER_UNSIGNED, 40*1000) != null;
+            if (a1 || a2 || a3) {
                 if ( (_updatePolicy == null) || (!_updatePolicy.equals("notify")) )
                     addFormNotice(_("Update available, attempting to download now"));
                 else
@@ -220,8 +236,10 @@ public class ConfigUpdateHandler extends FormHandler {
         
         changes.put(PROP_SHOULD_PROXY, Boolean.toString(_updateThroughProxy));
         changes.put(PROP_SHOULD_PROXY_NEWS, Boolean.toString(_newsThroughProxy));
-        if (isAdvanced())
+        if (isAdvanced()) {
             changes.put(PROP_UPDATE_UNSIGNED, Boolean.toString(_updateUnsigned));
+            changes.put(PROP_UPDATE_DEV_SU3, Boolean.toString(_updateDevSU3));
+        }
         
         String oldFreqStr = _context.getProperty(PROP_REFRESH_FREQUENCY, DEFAULT_REFRESH_FREQUENCY);
         long oldFreq = DEFAULT_REFRESH_FREQ;
@@ -276,6 +294,18 @@ public class ConfigUpdateHandler extends FormHandler {
             }
         }
         
+        if ( (_devSU3URL != null) && (_devSU3URL.length() > 0) ) {
+            String oldURL = _context.router().getConfigSetting(PROP_DEV_SU3_URL);
+            if ( (oldURL == null) || (!_devSU3URL.equals(oldURL)) ) {
+                if (isAdvanced()) {
+                    changes.put(PROP_DEV_SU3_URL, _devSU3URL);
+                    addFormNotice(_("Updating signed development build URL to {0}", _devSU3URL));
+                } else {
+                    addFormError("Changing signed update URL disabled");
+                }
+            }
+        }
+        
         _context.router().saveConfig(changes, null);
     }
     
@@ -293,4 +323,8 @@ public class ConfigUpdateHandler extends FormHandler {
     public void setZipURL(String url) { _zipURL = url; }
      /** @since 0.9.9 */
     public void setNewsThroughProxy(String foo) { _newsThroughProxy = true; }
+    /** @since 0.9.20 */
+    public void setUpdateDevSU3(String foo) { _updateDevSU3  = true; }
+    /** @since 0.9.20 */
+    public void setDevSU3URL(String url) { _devSU3URL = url; }
 }

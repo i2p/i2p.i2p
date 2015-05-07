@@ -40,16 +40,6 @@ class PluginUpdateChecker extends UpdateRunner {
     @Override
     public String getID() { return _appName; }
     
-    @Override
-    public void run() {
-        _isRunning = true;
-        try {
-            update();
-        } finally {
-            _isRunning = false;
-        }
-    }
-
         @Override
         protected void update() {
             // must be set for super

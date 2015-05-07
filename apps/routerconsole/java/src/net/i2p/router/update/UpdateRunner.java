@@ -47,8 +47,6 @@ class UpdateRunner extends I2PAppThread implements UpdateTask, EepGet.StatusList
     protected URI _currentURI;
     private final String _currentVersion;
 
-    private static final String SIGNED_UPDATE_FILE = "i2pupdate.sud";
-
     protected static final long CONNECT_TIMEOUT = 55*1000;
     protected static final long INACTIVITY_TIMEOUT = 5*60*1000;
     protected static final long NOPROXY_INACTIVITY_TIMEOUT = 60*1000;

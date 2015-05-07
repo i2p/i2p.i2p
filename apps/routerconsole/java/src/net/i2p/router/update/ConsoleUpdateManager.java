@@ -82,6 +82,7 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
     private static final long STATUS_CLEAN_TIME = 20*60*1000;
     private static final long TASK_CLEANER_TIME = 15*60*1000;
     private static final String PROP_UNSIGNED_AVAILABLE = "router.updateUnsignedAvailable";
+    private static final String PROP_DEV_SU3_AVAILABLE = "router.updateDevSU3Available";
 
     /**
      *  @param args ignored
@@ -174,6 +175,7 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
         // TODO see NewsFetcher
         //register(u, ROUTER_SIGNED, HTTPS_CLEARNET, -5);
         //register(u, ROUTER_SIGNED, HTTP_CLEARNET, -10);
+
         UnsignedUpdateHandler uuh = new UnsignedUpdateHandler(_context, this);
         register((Checker)uuh, ROUTER_UNSIGNED, HTTP, 0);
         register((Updater)uuh, ROUTER_UNSIGNED, HTTP, 0);
@@ -185,6 +187,19 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
                 _available.put(new UpdateItem(ROUTER_UNSIGNED, ""), newVA);
             }
         }
+
+        DevSU3UpdateHandler dsuh = new DevSU3UpdateHandler(_context, this);
+        register((Checker)dsuh, ROUTER_DEV_SU3, HTTP, 0);
+        register((Updater)dsuh, ROUTER_DEV_SU3, HTTP, 0);
+        newVersion = _context.getProperty(PROP_DEV_SU3_AVAILABLE);
+        if (newVersion != null) {
+            List<URI> updateSources = dsuh.getUpdateSources();
+            if (dsuh != null) {
+                VersionAvailable newVA = new VersionAvailable(newVersion, "", HTTP, updateSources);
+                _available.put(new UpdateItem(ROUTER_DEV_SU3, ""), newVA);
+            }
+        }
+
         PluginUpdateHandler puh = new PluginUpdateHandler(_context, this);
         register((Checker)puh, PLUGIN, HTTP, 0);
         register((Updater)puh, PLUGIN, HTTP, 0);
@@ -652,7 +667,8 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
      *  Call once for each type/method pair.
      */
     public void register(Updater updater, UpdateType type, UpdateMethod method, int priority) {
-        if ((type == ROUTER_SIGNED || type == ROUTER_UNSIGNED || type == ROUTER_SIGNED_SU3) &&
+        if ((type == ROUTER_SIGNED || type == ROUTER_UNSIGNED ||
+             type == ROUTER_SIGNED_SU3 || type == ROUTER_DEV_SU3) &&
             NewsHelper.dontInstall(_context)) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Ignoring registration for " + type + ", router updates disabled");
@@ -813,8 +829,11 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
                 break;
 
             case ROUTER_UNSIGNED:
+            case ROUTER_DEV_SU3:
                 // save across restarts
-                _context.router().saveConfig(PROP_UNSIGNED_AVAILABLE, newVersion);
+                String prop = type == ROUTER_UNSIGNED ? PROP_UNSIGNED_AVAILABLE
+                                                      : PROP_DEV_SU3_AVAILABLE;
+                _context.router().saveConfig(prop, newVersion);
                 // fall through
 
             case ROUTER_SIGNED:
@@ -822,6 +841,7 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
                 if (shouldInstall() &&
                     !(isUpdateInProgress(ROUTER_SIGNED) ||
                       isUpdateInProgress(ROUTER_SIGNED_SU3) ||
+                      isUpdateInProgress(ROUTER_DEV_SU3) ||
                       isUpdateInProgress(ROUTER_UNSIGNED))) {
                     if (_log.shouldLog(Log.INFO))
                         _log.info("Updating " + ui + " after notify");
@@ -908,6 +928,7 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
             case ROUTER_SIGNED:
             case ROUTER_SIGNED_SU3:
             case ROUTER_UNSIGNED:
+            case ROUTER_DEV_SU3:
                 // ConfigUpdateHandler, SummaryHelper, SummaryBarRenderer handle status display
                 break;
 
@@ -1061,6 +1082,14 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
                 }
                 break;
 
+            case ROUTER_DEV_SU3:
+                rv = handleSu3File(task.getURI(), actualVersion, file);
+                if (rv) {
+                    _context.router().saveConfig(PROP_DEV_SU3_AVAILABLE, null);
+                    notifyDownloaded(task.getType(), task.getID(), actualVersion);
+                }
+                break;
+
             case PLUGIN:     // file handled in PluginUpdateRunner
             default:         // assume Updater installed it
                 rv = true;
@@ -1111,6 +1140,7 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
         if (type == ROUTER_SIGNED) {
             _downloaded.remove(new UpdateItem(ROUTER_UNSIGNED, ""));
             _downloaded.remove(new UpdateItem(ROUTER_SIGNED_SU3, ""));
+            _downloaded.remove(new UpdateItem(ROUTER_DEV_SU3, ""));
             // remove available from other type
             UpdateItem altui = new UpdateItem(ROUTER_SIGNED_SU3, id);
             Version old = _available.get(altui);
@@ -1121,6 +1151,7 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
         } else if (type == ROUTER_SIGNED_SU3) {
             _downloaded.remove(new UpdateItem(ROUTER_SIGNED, ""));
             _downloaded.remove(new UpdateItem(ROUTER_UNSIGNED, ""));
+            _downloaded.remove(new UpdateItem(ROUTER_DEV_SU3, ""));
             // remove available from other type
             UpdateItem altui = new UpdateItem(ROUTER_SIGNED, id);
             Version old = _available.get(altui);
@@ -1131,6 +1162,11 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
         } else if (type == ROUTER_UNSIGNED) {
             _downloaded.remove(new UpdateItem(ROUTER_SIGNED, ""));
             _downloaded.remove(new UpdateItem(ROUTER_SIGNED_SU3, ""));
+            _downloaded.remove(new UpdateItem(ROUTER_DEV_SU3, ""));
+        } else if (type == ROUTER_DEV_SU3) {
+            _downloaded.remove(new UpdateItem(ROUTER_SIGNED, ""));
+            _downloaded.remove(new UpdateItem(ROUTER_SIGNED_SU3, ""));
+            _downloaded.remove(new UpdateItem(ROUTER_UNSIGNED, ""));
         }
         Version old = _available.get(ui);
         if (old != null && old.compareTo(ver) <= 0)
@@ -1198,6 +1234,15 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
                 if (url != null) {
                     try {
                         return Collections.singletonList(new URI(url));
+                    } catch (URISyntaxException use) {}
+                }
+                break;
+
+            case ROUTER_DEV_SU3:
+                String url3 = _context.getProperty(ConfigUpdateHandler.PROP_DEV_SU3_URL);
+                if (url3 != null) {
+                    try {
+                        return Collections.singletonList(new URI(url3));
                     } catch (URISyntaxException use) {}
                 }
                 break;

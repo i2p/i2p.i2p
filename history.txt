@@ -1,4 +1,8 @@
+2015-05-07 zzz
+ * Update: Add support for su3-signed development builds (ticket #1381)
+
 2015-05-06 zzz
+ * Datagram: Convert IOE to DFE and throw on error (ticket #1562)
  * Naming services: Export address books with Windows
    line endings on Windows (ticket #1557)
  * Transport: Add config to force IPv4 (only) to firewalled (ticket #1541)
@@ -122,7 +126,7 @@ Prop from i2p.i2p.zzz.test2:
  * Transport: Fix active peer count for NTCP
 
 2015-04-15 tuna
- * SimpleScheduler: Deprecated, functionaltiy moved to SimpleTimer2 (ticket #1069)
+ * SimpleScheduler: Deprecated, functionality moved to SimpleTimer2 (ticket #1069)
 
 2015-04-13 zzz
  * Router: Fix NPE on bad share bandwidth config (ticket #1524)

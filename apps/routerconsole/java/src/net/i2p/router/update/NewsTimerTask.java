@@ -101,15 +101,13 @@ class NewsTimerTask implements SimpleTimer.TimedEvent {
                _context.getBooleanProperty(ConfigUpdateHandler.PROP_UPDATE_UNSIGNED) &&
                !NewsHelper.dontInstall(_context);
     }
-
-    /**
-     * HEAD the update url, and if the last-mod time is newer than the last update we
-     * downloaded, as stored in the properties, then we download it using eepget.
-     *
-     * Non-blocking
-     */
-    private void fetchUnsignedHead() {
-        _mgr.check(ROUTER_UNSIGNED);
+    
+    /** @since 0.9.20 */
+    private boolean shouldFetchDevSU3() {
+        String url = _context.getProperty(ConfigUpdateHandler.PROP_DEV_SU3_URL);
+        return url != null && url.length() > 0 &&
+               _context.getBooleanProperty(ConfigUpdateHandler.PROP_UPDATE_DEV_SU3) &&
+               !NewsHelper.dontInstall(_context);
     }
 
     /**
@@ -126,12 +124,19 @@ class NewsTimerTask implements SimpleTimer.TimedEvent {
         public void run() {
             // blocking
             fetchNews();
+            if (shouldFetchDevSU3()) {
+                // give it a sec for the download to kick in, if it's going to
+                try { Thread.sleep(5*1000); } catch (InterruptedException ie) {}
+                if (!_mgr.isCheckInProgress() && !_mgr.isUpdateInProgress())
+                    // nonblocking
+                    _mgr.check(ROUTER_DEV_SU3);
+            }
             if (shouldFetchUnsigned()) {
                 // give it a sec for the download to kick in, if it's going to
                 try { Thread.sleep(5*1000); } catch (InterruptedException ie) {}
                 if (!_mgr.isCheckInProgress() && !_mgr.isUpdateInProgress())
                     // nonblocking
-                    fetchUnsignedHead();
+                    _mgr.check(ROUTER_UNSIGNED);
             }
         }
     }
