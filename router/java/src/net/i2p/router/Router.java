@@ -20,6 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import gnu.getopt.Getopt;
 
+import net.i2p.client.I2PSessionImpl;
 import net.i2p.crypto.SigUtil;
 import net.i2p.data.Base64;
 import net.i2p.data.Certificate;
@@ -418,6 +419,7 @@ public class Router implements RouterClock.ClockShiftListener {
         PublicKey.clearCache();
         SigningPublicKey.clearCache();
         SigUtil.clearCaches();
+        I2PSessionImpl.clearCache();
     }
 
     /**

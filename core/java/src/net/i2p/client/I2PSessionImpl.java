@@ -59,9 +59,14 @@ import net.i2p.util.VersionComparator;
  * Implementation of an I2P session running over TCP.  This class is NOT thread safe -
  * only one thread should send messages at any given time
  *
+ * Public only for clearCache().
+ * Except for methods definied in I2PSession and I2CPMessageEventListener,
+ * not maintained as a public API, not for external use.
+ * Use I2PClientFactory to get an I2PClient and then createSession().
+ *
  * @author jrandom
  */
-abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessageEventListener {
+public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessageEventListener {
     protected final Log _log;
     /** who we are */
     private final Destination _myDestination;
@@ -1146,6 +1151,13 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
             this.hash = null;
             this.name = name;
             this.nonce = nonce;
+        }
+    }
+
+    /** @since 0.9.20 */
+    public static void clearCache() {
+        synchronized (_lookupCache) {
+            _lookupCache.clear();
         }
     }
 
