@@ -504,6 +504,10 @@ public class Reseeder {
         private int reseed(List<URL> URLList, boolean echoStatus) {
             int total = 0;
             for (int i = 0; i < URLList.size() && _isRunning; i++) {
+                if (_context.router().gracefulShutdownInProgress()) {
+                    System.out.println("Reseed aborted, shutdown in progress");
+                    return total;
+                }
                 URL url = URLList.get(i);
                 int dl = 0;
                 if (ENABLE_SU3) {
