@@ -1416,8 +1416,13 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
     }
 
     static String linkify(String url) {
-        String durl = url.length() <= 28 ? url :
-                                           url.substring(0, 25) + "&hellip;";
+        String durl = url;
+        if (durl.startsWith("http://"))
+            durl = durl.substring(7);
+        else if (durl.startsWith("https://"))
+            durl = durl.substring(8);
+        if (durl.length() > 28)
+            durl = durl.substring(0, 25) + "&hellip;";
         return "<a target=\"_blank\" href=\"" + url + "\"/>" + durl + "</a>";
     }
 
