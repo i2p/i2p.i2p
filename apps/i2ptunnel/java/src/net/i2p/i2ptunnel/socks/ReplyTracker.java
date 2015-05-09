@@ -23,6 +23,10 @@ public class ReplyTracker<S extends Sink> implements Source, Sink {
 
     public void start() {}
 
+    /**
+     *  May throw RuntimeException from underlying sink
+     *  @throws RuntimeException
+     */
     public void send(Destination to, byte[] data) {
         this.cache.put(to, this.reply);
         this.sink.send(to, data);

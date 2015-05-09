@@ -22,6 +22,10 @@ public class MultiSink<S extends Sink> implements Source, Sink {
 
     public void start() {}
 
+    /**
+     *  May throw RuntimeException from underlying sinks
+     *  @throws RuntimeException
+     */
     public void send(Destination from, byte[] data) {
         Sink s = this.cache.get(from);
         if (s == null) {

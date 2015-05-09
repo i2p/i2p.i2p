@@ -180,6 +180,7 @@ import net.i2p.util.EventDispatcher;
      *
      * @param to - ignored if configured for a single destination
      * (we use the dest specified in the constructor)
+     * @throws RuntimeException if session is closed
      */
     public void send(Destination to, byte[] data) {
         _i2pSink.send(to, data);
