@@ -10,8 +10,9 @@ import net.i2p.I2PAppContext;
 import net.i2p.router.web.HomeHelper.App;
 
 public class NavHelper {
-    private static Map<String, String> _apps = new ConcurrentHashMap<String, String>(4);
-    private static Map<String, String> _tooltips = new ConcurrentHashMap<String, String>(4);
+    private static final Map<String, String> _apps = new ConcurrentHashMap<String, String>(4);
+    private static final Map<String, String> _tooltips = new ConcurrentHashMap<String, String>(4);
+    private static final Map<String, String> _icons = new ConcurrentHashMap<String, String>(4);
     
     /**
      * To register a new client application so that it shows up on the router
@@ -19,20 +20,24 @@ public class NavHelper {
      *
      * @param name pretty name the app will be called in the link
      * @param path full path pointing to the application's root 
-     *             (e.g. /i2ptunnel/index.jsp)
+     *             (e.g. /i2ptunnel/index.jsp), non-null
+     * @param tooltip HTML escaped text or null
+     * @param iconpath path-only URL starting with /, HTML escaped, or null
+     * @since 0.9.20 added iconpath parameter
      */
-    public static void registerApp(String name, String path) {
+    public static void registerApp(String name, String path, String tooltip, String iconpath) {
         _apps.put(name, path);
-    }
+        if (tooltip != null)
+            _tooltips.put(name, tooltip);
+        if (iconpath != null && iconpath.startsWith("/"))
+            _icons.put(name, iconpath);
 
-    public static void registerApp(String name, String path, String tooltip) {
-        _apps.put(name, path);
-        _tooltips.put(name, tooltip);
     }
 
     public static void unregisterApp(String name) {
         _apps.remove(name);
         _tooltips.remove(name);
+        _icons.remove(name);
     }
     
     /**
@@ -76,9 +81,11 @@ public class NavHelper {
             String tip = _tooltips.get(name);
             if (tip == null)
                 tip = "";
-            // hardcoded hack
             String icon;
-            if (path.equals("/i2pbote/index.jsp"))
+            if (_icons.containsKey(name))
+                icon = _icons.get(name);
+            // hardcoded hack
+            else if (path.equals("/i2pbote/index.jsp"))
                 icon = "/themes/console/images/email.png";
             else
                 icon = "/themes/console/images/plugin.png";

@@ -261,6 +261,7 @@ public class PluginStarter implements Runnable {
     public static boolean startPlugin(RouterContext ctx, String appName) throws Exception {
         Log log = ctx.logManager().getLog(PluginStarter.class);
         File pluginDir = new File(ctx.getConfigDir(), PLUGIN_DIR + '/' + appName);
+        String iconfile = null;
         if ((!pluginDir.exists()) || (!pluginDir.isDirectory())) {
             log.error("Cannot start nonexistent plugin: " + appName);
             disablePlugin(appName);
@@ -287,6 +288,9 @@ public class PluginStarter implements Runnable {
         }
 
         Properties props = pluginProperties(ctx, appName);
+
+
+
 
         String minVersion = ConfigClientsHelper.stripHTML(props, "min-i2p-version");
         if (minVersion != null &&
@@ -380,6 +384,16 @@ public class PluginStarter implements Runnable {
                         log.error("Error resolving '" + fileNames[i] + "' in '" + webappDir, ioe);
                     }
                 }
+                // Check for iconfile in plugin.properties
+                String icfile = ConfigClientsHelper.stripHTML(props, "console-icon");
+                if (icfile != null && !icfile.contains("..")) {
+                    StringBuilder buf = new StringBuilder(32);
+                    buf.append('/').append(appName);
+                    if (!icfile.startsWith("/"))
+                        buf.append('/');
+                    buf.append(icfile);
+                    iconfile = buf.toString();
+                }
             }
         } else {
             log.error("No console web server to start plugins?");
@@ -409,7 +423,6 @@ public class PluginStarter implements Runnable {
                     Translate.clearCache();
             }
         }
-
         // add summary bar link
         String name = ConfigClientsHelper.stripHTML(props, "consoleLinkName_" + Messages.getLanguage(ctx));
         if (name == null)
@@ -419,10 +432,7 @@ public class PluginStarter implements Runnable {
             String tip = ConfigClientsHelper.stripHTML(props, "consoleLinkTooltip_" + Messages.getLanguage(ctx));
             if (tip == null)
                 tip = ConfigClientsHelper.stripHTML(props, "consoleLinkTooltip");
-            if (tip != null)
-                NavHelper.registerApp(name, url, tip);
-            else
-                NavHelper.registerApp(name, url);
+            NavHelper.registerApp(name, url, tip, iconfile);
         }
 
         return true;

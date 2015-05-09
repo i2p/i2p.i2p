@@ -1,3 +1,9 @@
+2015-05-09 zzz
+ * Plugins: Add support for custom icons (ticket #1550)
+
+2015-05-08 zzz
+ * Reseed: Don't reseed while shutting down (ticket #1565)
+
 2015-05-07 zzz
  * SAM: Close datagram or raw session when underlying
    I2P session closes (ticket #1563)
