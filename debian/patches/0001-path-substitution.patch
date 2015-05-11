@@ -147,7 +147,7 @@ Debian wrapper.config to try to prevent confusion.
  if [ -n "$FIXED_COMMAND" ]
  then
      COMMAND="$FIXED_COMMAND"
-@@ -1055,7 +979,6 @@
+@@ -1058,7 +982,6 @@
          if [ "X$pid" = "X" ]
          then
              eval echo " `gettext 'WARNING: $APP_LONG_NAME may have failed to start.'`"
@@ -155,7 +155,7 @@ Debian wrapper.config to try to prevent confusion.
          else
              eval echo ' running: PID:$pid'
          fi
-@@ -1858,7 +1781,7 @@
+@@ -1861,7 +1784,7 @@
  }
  
  showsetusermesg()  {
@@ -164,7 +164,7 @@ Debian wrapper.config to try to prevent confusion.
  }
  
  checkifstartingasroot() {
-@@ -1866,7 +1789,7 @@
+@@ -1869,7 +1792,7 @@
          echo "`gettext 'Running I2P as the root user is *not* recommended.'`"
          showsetusermesg
          echo
@@ -173,7 +173,7 @@ Debian wrapper.config to try to prevent confusion.
          exit 1
      fi
  }
-@@ -1931,24 +1854,10 @@
+@@ -1934,24 +1857,10 @@
              status
              ;;
  
@@ -214,7 +214,7 @@ Debian wrapper.config to try to prevent confusion.
 +I2PTEMP="/tmp"
  
  # Having IPv6 enabled can cause problems with certain configurations. Changing the
- # next value to true may help. 
+ # next value to true may help.
 --- a/installer/resources/wrapper.config
 +++ b/installer/resources/wrapper.config
 @@ -8,22 +8,13 @@
