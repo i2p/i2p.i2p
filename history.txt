@@ -1,4 +1,8 @@
+2015-05-11 zzz
+ * Util: Fix corruption of cached ReusableGZIPInputStreams
+
 2015-05-09 zzz
+ * i2ptunnel: Improve error handling in UDP tunnels
  * Plugins: Add support for custom icons (ticket #1550)
 
 2015-05-08 zzz
