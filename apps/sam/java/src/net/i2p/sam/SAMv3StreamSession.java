@@ -74,6 +74,7 @@ class SAMv3StreamSession  extends SAMStreamSession implements SAMv3Handler.Sessi
 
 	    /**
 	     * Connect the SAM STREAM session to the specified Destination
+	     * for a single connection, using the socket stolen from the handler.
 	     *
 	     * @param handler The handler that communicates with the requesting client
 	     * @param dest Base64-encoded Destination to connect to
@@ -87,7 +88,7 @@ class SAMv3StreamSession  extends SAMStreamSession implements SAMv3Handler.Sessi
 	     * @throws IOException 
 	     */
 	    public void connect ( SAMv3Handler handler, String dest, Properties props ) 
-	    throws I2PException, ConnectException, NoRouteToHostException, 
+	        throws I2PException, ConnectException, NoRouteToHostException, 
 	    		DataFormatException, InterruptedIOException, IOException {
 
 	    	boolean verbose = (props.getProperty("SILENT", "false").equals("false"));
@@ -117,13 +118,17 @@ class SAMv3StreamSession  extends SAMStreamSession implements SAMv3Handler.Sessi
 	        WritableByteChannel toClient   = handler.getClientSocket();
 	        WritableByteChannel toI2P      = Channels.newChannel(i2ps.getOutputStream());
 	        
-	        (new Thread(rec.getThreadGroup(), new I2PAppThread(new Pipe(fromClient,toI2P, "SAMPipeClientToI2P"), "SAMPipeClientToI2P"), "SAMPipeClientToI2P")).start();
-	        (new Thread(rec.getThreadGroup(), new I2PAppThread(new Pipe(fromI2P,toClient, "SAMPipeI2PToClient"), "SAMPipeI2PToClient"), "SAMPipeI2PToClient")).start();
-	        
+		SAMBridge bridge = handler.getBridge();
+		(new Thread(rec.getThreadGroup(),
+		            new Pipe(fromClient, toI2P, bridge),
+		            "ConnectV3 SAMPipeClientToI2P")).start();
+		(new Thread(rec.getThreadGroup(),
+		            new Pipe(fromI2P, toClient, bridge),
+		            "ConnectV3 SAMPipeI2PToClient")).start();
 	    }
 
 	    /**
-	     * Accept an incoming STREAM
+	     * Accept a single incoming STREAM on the socket stolen from the handler.
 	     *
 	     * @param handler The handler that communicates with the requesting client
 	     * @param verbose If true, SAM will send the Base64-encoded peer Destination of an
@@ -150,8 +155,7 @@ class SAMv3StreamSession  extends SAMStreamSession implements SAMv3Handler.Sessi
 	    		this.socketServer = this.socketMgr.getServerSocket();
 	    	}
 	    	
-			I2PSocket i2ps;
-			i2ps = this.socketServer.accept();
+		I2PSocket i2ps = this.socketServer.accept();
 
 	    	synchronized( this.socketServerLock )
 	    	{
@@ -159,11 +163,11 @@ class SAMv3StreamSession  extends SAMStreamSession implements SAMv3Handler.Sessi
 	    	}
 	    	
 	    	SAMv3Handler.SessionRecord rec = SAMv3Handler.sSessionsHash.get(nick);
-	        
-	        if ( rec==null || i2ps==null ) throw new InterruptedIOException() ;
-	        
-			if (verbose)
-				handler.notifyStreamIncomingConnection(i2ps.getPeerDestination()) ;
+
+		if ( rec==null || i2ps==null ) throw new InterruptedIOException() ;
+
+		if (verbose)
+			handler.notifyStreamIncomingConnection(i2ps.getPeerDestination()) ;
 
 	        handler.stealSocket() ;
 	        ReadableByteChannel fromClient = handler.getClientSocket();
@@ -171,8 +175,13 @@ class SAMv3StreamSession  extends SAMStreamSession implements SAMv3Handler.Sessi
 	        WritableByteChannel toClient   = handler.getClientSocket();
 	        WritableByteChannel toI2P      = Channels.newChannel(i2ps.getOutputStream());
 	        
-	        (new Thread(rec.getThreadGroup(), new I2PAppThread(new Pipe(fromClient,toI2P, "SAMPipeClientToI2P"), "SAMPipeClientToI2P"), "SAMPipeClientToI2P")).start();
-	        (new Thread(rec.getThreadGroup(), new I2PAppThread(new Pipe(fromI2P,toClient, "SAMPipeI2PToClient"), "SAMPipeI2PToClient"), "SAMPipeI2PToClient")).start();	        
+		SAMBridge bridge = handler.getBridge();
+		(new Thread(rec.getThreadGroup(),
+		            new Pipe(fromClient, toI2P, bridge),
+		            "AcceptV3 SAMPipeClientToI2P")).start();
+		(new Thread(rec.getThreadGroup(),
+		            new Pipe(fromI2P, toClient, bridge),
+		            "AcceptV3 SAMPipeI2PToClient")).start();
 	    }
 
 	    
@@ -210,10 +219,10 @@ class SAMv3StreamSession  extends SAMStreamSession implements SAMv3Handler.Sessi
 	    	}
 	    	
 	    	SocketForwarder forwarder = new SocketForwarder(host, port, this, verbose);
-	    	(new Thread(rec.getThreadGroup(), new I2PAppThread(forwarder, "SAMStreamForwarder"), "SAMStreamForwarder")).start();
+	    	(new Thread(rec.getThreadGroup(), forwarder, "SAMV3StreamForwarder")).start();
 	    }
 	    
-	    private static class SocketForwarder extends Thread
+	    private static class SocketForwarder implements Runnable
 	    {
 	    	private final String host;
 	    	private final int port;
@@ -261,8 +270,10 @@ class SAMv3StreamSession  extends SAMStreamSession implements SAMv3Handler.Sessi
 	    				ReadableByteChannel fromI2P    = Channels.newChannel(i2ps.getInputStream());
 	    				WritableByteChannel toClient   = clientServerSock ;
 	    				WritableByteChannel toI2P      = Channels.newChannel(i2ps.getOutputStream());
-	    				(new I2PAppThread(new Pipe(fromClient,toI2P, "SAMPipeClientToI2P"), "SAMPipeClientToI2P")).start();
-	    				(new I2PAppThread(new Pipe(fromI2P,toClient, "SAMPipeI2PToClient"), "SAMPipeI2PToClient")).start();
+	    				(new I2PAppThread(new Pipe(fromClient, toI2P, null),
+					                  "ForwardV3 SAMPipeClientToI2P")).start();
+	    				(new I2PAppThread(new Pipe(fromI2P,toClient, null),
+					                  "ForwardV3 SAMPipeI2PToClient")).start();
 
 	    			} catch (IOException e) {
 	    				try {
@@ -277,48 +288,62 @@ class SAMv3StreamSession  extends SAMStreamSession implements SAMv3Handler.Sessi
 	    	}
 	    }
 
-	    private static class Pipe extends Thread
+	    private static class Pipe implements Runnable, Handler
 	    {
 	    	private final ReadableByteChannel in  ;
 	    	private final WritableByteChannel out ;
 	    	private final ByteBuffer buf ;
+		private final SAMBridge bridge;
 	    	
-	    	public Pipe(ReadableByteChannel in, WritableByteChannel out, String name)
+		/**
+		 *  @param bridge may be null
+		 */
+	    	public Pipe(ReadableByteChannel in, WritableByteChannel out, SAMBridge bridge)
 	    	{
-	    		super(name);
 	    		this.in  = in ;
 	    		this.out = out ;
 	    		this.buf = ByteBuffer.allocate(BUFFER_SIZE) ;
+			this.bridge = bridge;
 	    	}
 	    	
-	    	public void run()
-	    	{
-    			try {
-    				while (!Thread.interrupted() && (in.read(buf)>=0 || buf.position() != 0)) {
-	    				 buf.flip();
-	    				 out.write(buf);
-	    				 buf.compact();
-	    			}
-	    		}
-				catch (IOException e)
-				{
-					this.interrupt();
+		public void run() {
+			if (bridge != null)
+				bridge.register(this);
+			try {
+				while (!Thread.interrupted() && (in.read(buf)>=0 || buf.position() != 0)) {
+					 buf.flip();
+					 out.write(buf);
+					 buf.compact();
 				}
-    			try {
-    				in.close();
-    			}
-    			catch (IOException e) {}
-    			try {
-    				buf.flip();
-    				while (buf.hasRemaining())
-    					out.write(buf);
-    			}
-    			catch (IOException e) {}
-    			try {
-    				out.close();
-    			}
-    			catch (IOException e) {}
-	    	}
+			} catch (IOException ioe) {
+				// ignore
+			} finally {
+				try {
+					in.close();
+				} catch (IOException e) {}
+				try {
+					buf.flip();
+					while (buf.hasRemaining()) {
+						out.write(buf);
+					}
+				} catch (IOException e) {}
+				try {
+					out.close();
+				} catch (IOException e) {}
+				if (bridge != null)
+					bridge.unregister(this);
+			}
+		}
+
+		/**
+		 *  Handler interface
+		 *  @since 0.9.20
+		 */
+		public void stopHandling() {
+			try {
+				in.close();
+			} catch (IOException e) {}
+		}
 	    }
 	    
 	    public I2PServerSocket getSocketServer()

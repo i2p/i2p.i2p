@@ -72,6 +72,7 @@ abstract class SAMMessageSession {
 
         handler = new SAMMessageSessionHandler(destStream, props);
 
+        // FIXME don't start threads in constructors
         Thread t = new I2PAppThread(handler, "SAMMessageSessionHandler");
         t.start();
     }
@@ -125,7 +126,6 @@ abstract class SAMMessageSession {
 
     /**
      * Close a SAM message-based session.
-     *
      */
     public void close() {
         handler.stopRunning();

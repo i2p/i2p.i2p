@@ -60,8 +60,9 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
      * @throws SAMException
      * @throws IOException 
      */
-    public SAMv1Handler(SocketChannel s, int verMajor, int verMinor) throws SAMException, IOException {
-        this(s, verMajor, verMinor, new Properties());
+    public SAMv1Handler(SocketChannel s, int verMajor, int verMinor,
+                        SAMBridge parent) throws SAMException, IOException {
+        this(s, verMajor, verMinor, new Properties(), parent);
     }
     /**
      * Create a new SAM version 1 handler.  This constructor expects
@@ -75,13 +76,14 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
      * @throws SAMException
      * @throws IOException 
      */
-    public SAMv1Handler(SocketChannel s, int verMajor, int verMinor, Properties i2cpProps) throws SAMException, IOException {
-        super(s, verMajor, verMinor, i2cpProps);
+    public SAMv1Handler(SocketChannel s, int verMajor, int verMinor,
+                        Properties i2cpProps, SAMBridge parent) throws SAMException, IOException {
+        super(s, verMajor, verMinor, i2cpProps, parent);
         _id = __id.incrementAndGet();
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("SAM version 1 handler instantiated");
 
-    if ( ! verifVersion() ) {
+        if ( ! verifVersion() ) {
             throw new SAMException("BUG! Wrong protocol version!");
         }
     }
@@ -183,8 +185,7 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
             }
         } catch (IOException e) {
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Caught IOException ("
-                       + e.getMessage() + ") for message [" + msg + "]", e);
+                _log.debug("Caught IOException for message [" + msg + "]", e);
         } catch (Exception e) {
             _log.error("Unexpected exception for message [" + msg + "]", e);
         } finally {
@@ -193,7 +194,8 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
             try {
                 closeClientSocket();
             } catch (IOException e) {
-                _log.error("Error closing socket: " + e.getMessage());
+                if (_log.shouldWarn())
+                    _log.warn("Error closing socket", e);
             }
             if (getRawSession() != null) {
             	getRawSession().close();
@@ -797,7 +799,7 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
     public void receiveRawBytes(byte data[]) throws IOException {
         if (getRawSession() == null) {
             _log.error("BUG! Received raw bytes, but session is null!");
-            throw new NullPointerException("BUG! RAW session is null!");
+            return;
         }
 
         ByteArrayOutputStream msg = new ByteArrayOutputStream();
@@ -818,7 +820,7 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
 
         if (getRawSession() == null) {
             _log.error("BUG! Got raw receiving stop, but session is null!");
-            throw new NullPointerException("BUG! RAW session is null!");
+            return;
         }
 
         try {
@@ -833,7 +835,7 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
     public void receiveDatagramBytes(Destination sender, byte data[]) throws IOException {
         if (getDatagramSession() == null) {
             _log.error("BUG! Received datagram bytes, but session is null!");
-            throw new NullPointerException("BUG! DATAGRAM session is null!");
+            return;
         }
 
         ByteArrayOutputStream msg = new ByteArrayOutputStream();
@@ -855,7 +857,7 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
 
         if (getDatagramSession() == null) {
             _log.error("BUG! Got datagram receiving stop, but session is null!");
-            throw new NullPointerException("BUG! DATAGRAM session is null!");
+            return;
         }
 
         try {
@@ -873,7 +875,7 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
         if ( getStreamSession() == null )
         {
             _log.error ( "BUG! Want to answer to stream SEND, but session is null!" );
-            throw new NullPointerException ( "BUG! STREAM session is null!" );
+            return;
         }
     
         if ( !writeString ( "STREAM SEND ID=" + id
@@ -891,7 +893,7 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
         if ( getStreamSession() == null )
         {
             _log.error ( "BUG! Stream outgoing buffer is free, but session is null!" );
-            throw new NullPointerException ( "BUG! STREAM session is null!" );
+            return;
         }
     
         if ( !writeString ( "STREAM READY_TO_SEND ID=" + id + "\n" ) )
@@ -904,7 +906,7 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
     public void notifyStreamIncomingConnection(int id, Destination d) throws IOException {
         if (getStreamSession() == null) {
             _log.error("BUG! Received stream connection, but session is null!");
-            throw new NullPointerException("BUG! STREAM session is null!");
+            return;
         }
 
         if (!writeString("STREAM CONNECTED DESTINATION="
@@ -914,18 +916,16 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
         }
     }
 
+    /** @param msg may be null */
     public void notifyStreamOutgoingConnection ( int id, String result, String msg ) throws IOException
     {
         if ( getStreamSession() == null )
         {
             _log.error ( "BUG! Received stream connection, but session is null!" );
-            throw new NullPointerException ( "BUG! STREAM session is null!" );
+            return;
         }
 
-        String msgString = "" ;
-
-        if ( msg != null ) msgString = " MESSAGE=\"" + msg + "\"";
-
+        String msgString = createMessageString(msg);
         if ( !writeString ( "STREAM STATUS RESULT="
                         + result
                         + " ID=" + id
@@ -935,11 +935,36 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
             throw new IOException ( "Error notifying connection to SAM client" );
         }
     }
+
+    /**
+     *  Create a string to be appended to a status.
+     *
+     *  @param msg may be null
+     *  @return non-null, "" if msg is null, MESSAGE=msg or MESSAGE="msg a b c"
+     *           with leading space if msg is non-null
+     *  @since 0.9.20
+     */
+    protected static String createMessageString(String msg) {
+        String rv;
+        if ( msg != null ) {
+            msg = msg.replace("\n", " ");
+            msg = msg.replace("\r", " ");
+            if (!msg.startsWith("\"")) {
+                msg = msg.replace("\"", "");
+                if (msg.contains("\"") || msg.contains("\t"))
+                    msg = '"' + msg + '"';
+            }
+            rv = " MESSAGE=\"" + msg + "\"";
+        } else {
+            rv = "";
+        }
+        return rv;
+    }
   
     public void receiveStreamBytes(int id, ByteBuffer data) throws IOException {
         if (getStreamSession() == null) {
             _log.error("Received stream bytes, but session is null!");
-            throw new NullPointerException("BUG! STREAM session is null!");
+            return;
         }
 
         String msgText = "STREAM RECEIVED ID=" + id +" SIZE=" + data.remaining() + "\n";
@@ -956,16 +981,15 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
         }
     }
 
+    /** @param msg may be null */
     public void notifyStreamDisconnection(int id, String result, String msg) throws IOException {
         if (getStreamSession() == null) {
             _log.error("BUG! Received stream disconnection, but session is null!");
-            throw new NullPointerException("BUG! STREAM session is null!");
+            return;
         }
 
-        // FIXME: msg should be escaped!
-        if (!writeString("STREAM CLOSED ID=" + id + " RESULT=" + result
-                         + (msg == null ? "" : (" MESSAGE=" + msg))
-                         + "\n")) {
+        String msgString = createMessageString(msg);
+        if (!writeString("STREAM CLOSED ID=" + id + " RESULT=" + result + msgString + '\n')) {
             throw new IOException("Error notifying disconnection to SAM client");
         }
     }
@@ -976,7 +1000,7 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
 
         if (getStreamSession() == null) {
             _log.error("BUG! Got stream receiving stop, but session is null!");
-            throw new NullPointerException("BUG! STREAM session is null!");
+            return;
         }
 
         try {
