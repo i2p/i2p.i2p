@@ -263,6 +263,7 @@ class SAMv3StreamSession  extends SAMStreamSession implements SAMv3Handler.Sessi
 
 	    			// build pipes between both sockets
 	    			try {
+					clientServerSock.socket().setKeepAlive(true);
 	    				if (this.verbose)
 	    					SAMv3Handler.notifyStreamIncomingConnection(
 	    							clientServerSock, i2ps.getPeerDestination());

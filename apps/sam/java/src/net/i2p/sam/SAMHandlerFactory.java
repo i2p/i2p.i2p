@@ -46,6 +46,7 @@ class SAMHandlerFactory {
         try {
             Socket sock = s.socket();
             sock.setSoTimeout(HELLO_TIMEOUT);
+            sock.setKeepAlive(true);
             String line = DataHelper.readLine(sock.getInputStream());
             sock.setSoTimeout(0);
             if (line == null) {
