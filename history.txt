@@ -1,3 +1,9 @@
+2015-02-12 dg
+ * Job Queue/stats: add stat/graph for amount of scheduled jobs (router.tunnelBacklog)
+ * FloodfillMonitorJob:
+   - Use avg of router.tunnelBacklog instead of current backlog
+ * Some language/spelling fixes
+
 2015-05-11 zzz
  * Util: Fix corruption of cached ReusableGZIPInputStreams
 

@@ -25,7 +25,7 @@ public class TunnelGatewayMessage extends FastI2NPMessageImpl {
     //private Exception _creator;
     
     public final static int MESSAGE_TYPE = 19;
-    /** if we can't deliver a tunnel message in 10s, fuck it */
+    /** if we can't deliver a tunnel message in 10s, forget it */
     private static final int EXPIRATION_PERIOD = 10*1000;
     
     public TunnelGatewayMessage(I2PAppContext context) {

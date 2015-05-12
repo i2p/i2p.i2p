@@ -60,7 +60,7 @@ import net.i2p.util.VersionComparator;
  * only one thread should send messages at any given time
  *
  * Public only for clearCache().
- * Except for methods definied in I2PSession and I2CPMessageEventListener,
+ * Except for methods defined in I2PSession and I2CPMessageEventListener,
  * not maintained as a public API, not for external use.
  * Use I2PClientFactory to get an I2PClient and then createSession().
  *

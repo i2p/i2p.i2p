@@ -642,7 +642,6 @@ public class Router implements RouterClock.ClockShiftListener {
             File f = new File(filename);
             if (f.canRead()) {
                 DataHelper.loadProps(props, f);
-                // dont be a wanker
                 props.remove(PROP_SHUTDOWN_IN_PROGRESS);
             } else {
                 if (log != null)

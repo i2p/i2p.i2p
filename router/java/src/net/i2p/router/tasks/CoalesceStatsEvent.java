@@ -39,6 +39,7 @@ public class CoalesceStatsEvent implements SimpleTimer.TimedEvent {
         ctx.statManager().createRateStat("router.activeSendPeers", "How many peers we've sent to this minute", "Throttle", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
         ctx.statManager().createRequiredRateStat("router.fastPeers", _x("Known fast peers"), "Throttle", new long[] { 5*60*1000, 60*60*1000 });
         ctx.statManager().createRateStat("router.integratedPeers", _x("Known integrated (floodfill) peers"), "Throttle", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
+        ctx.statManager().createRateStat("router.tunnelBacklog", _x("Size of tunnel acceptor backlog"), "Tunnels", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
         _maxMemory = Runtime.getRuntime().maxMemory();
         String legend = "(Bytes)";
         if (_maxMemory < Long.MAX_VALUE)
@@ -68,6 +69,7 @@ public class CoalesceStatsEvent implements SimpleTimer.TimedEvent {
         getContext().statManager().addRateData("bw.sendRate", (long)getContext().bandwidthLimiter().getSendBps());
         getContext().statManager().addRateData("bw.recvRate", (long)getContext().bandwidthLimiter().getReceiveBps());
         
+        getContext().statManager().addRateData("router.tunnelBacklog", getContext().tunnelManager().getInboundBuildQueueSize(), 60*1000);
         long used = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
         getContext().statManager().addRateData("router.memoryUsed", used);
         if (_maxMemory - used < LOW_MEMORY_THRESHOLD)

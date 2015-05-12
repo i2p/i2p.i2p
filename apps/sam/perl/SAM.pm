@@ -758,7 +758,7 @@ sub recv {
 	# this means we can load more. Dangerous loop but well...
 	
 	while(length($self->{inbuffer}) < $self->{bytestoread}) {
-	  # this should definately end some day
+	  # this should definitely end some day
 	  $counter++;
 	  if($counter > 10000) {
             $self->log("Error: SAM::recv(): WTF, could not fill inbuffer as predicted by SAM header");
