@@ -162,7 +162,7 @@ class FloodfillMonitorJob extends JobImpl {
         RateStat lagStat = getContext().statManager().getRate("jobQueue.jobLag");
         RateStat queueStat = getContext().statManager().getRate("router.tunnelBacklog");
         happy = happy && lagStat.getRate(60*60*1000L).getAvgOrLifetimeAvg() < 25;
-        happy = happy && getContext().tunnelManager().queueStat.getRate(60*60*1000L).getAvgOrLifetimeAvg() < 5;
+        happy = happy && queueStat.getRate(60*60*1000L).getAvgOrLifetimeAvg() < 5;
         happy = happy && getContext().tunnelManager().getInboundBuildQueueSize() < 5;
         // Only if we're pretty well integrated...
         happy = happy && _facade.getKnownRouters() >= 400;
