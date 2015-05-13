@@ -76,7 +76,7 @@ class DevSU3UpdateChecker extends UpdateRunner {
             _mgr.notifyVersionAvailable(this, _currentURI, UpdateType.ROUTER_DEV_SU3, "", UpdateMethod.HTTP,
                                         _urls, newVersion, RouterVersion.FULL_VERSION);
         } else {
-            updateStatus("<b>" + _("No new version found at {0}", linkify(url)) + "</b>");
+            //updateStatus("<b>" + _("No new version found at {0}", linkify(url)) + "</b>");
             if (_log.shouldWarn())
                 _log.warn("Found old version \"" + newVersion + "\" at " + url);
         }
