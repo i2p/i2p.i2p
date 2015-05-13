@@ -1,3 +1,8 @@
+2015-05-13 zzz
+ * Console: Fix URLs caught in XSS filter on /confighome (ticket #1569)
+ * i2psnark: Fix deletion of single-file torrent outside snark dir (ticket #1544)
+ * NTCP: Catch race in Reader (ticket #1534)
+
 2015-02-12 dg
  * Job Queue/stats: add stat/graph for amount of scheduled jobs (router.tunnelBacklog)
  * FloodfillMonitorJob:

@@ -1047,19 +1047,20 @@ public class I2PSnarkServlet extends BasicServlet {
                             File f = new File(name);
                             f.delete();
                             _manager.addMessage(_("Torrent file deleted: {0}", f.getAbsolutePath()));
-                            List<List<String>> files = meta.getFiles();
-                            String dataFile = snark.getBaseName();
-                            f = new File(_manager.getDataDir(), dataFile);
-                            if (files == null) { // single file torrent
-                                if (f.delete())
-                                    _manager.addMessage(_("Data file deleted: {0}", f.getAbsolutePath()));
-                                else
-                                    _manager.addMessage(_("Data file could not be deleted: {0}", f.getAbsolutePath()));
-                                break;
-                            }
                             Storage storage = snark.getStorage();
                             if (storage == null)
                                 break;
+                            List<List<String>> files = meta.getFiles();
+                            if (files == null) { // single file torrent
+                                for (File df : storage.getFiles()) {
+                                    // should be only one
+                                    if (df.delete())
+                                        _manager.addMessage(_("Data file deleted: {0}", df.getAbsolutePath()));
+                                    else
+                                        _manager.addMessage(_("Data file could not be deleted: {0}", df.getAbsolutePath()));
+                                }
+                                break;
+                            }
                             // step 1 delete files
                             for (File df : storage.getFiles()) {
                                 if (df.delete()) {
