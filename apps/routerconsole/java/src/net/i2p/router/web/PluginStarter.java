@@ -867,11 +867,11 @@ public class PluginStarter implements Runnable {
 
         boolean isClientThreadRunning = isClientThreadRunning(pluginName, ctx);
         if (log.shouldLog(Log.DEBUG))
-            log.debug("plugin name = <" + pluginName + ">; threads running? " + isClientThreadRunning + "; webapp runing? " + isWarRunning + "; jobs running? " + isJobRunning);
+            log.debug("plugin name = <" + pluginName + ">; threads running? " + isClientThreadRunning + "; webapp running? " + isWarRunning + "; jobs running? " + isJobRunning);
         return isClientThreadRunning || isWarRunning || isJobRunning;
         //
         //if (log.shouldLog(Log.DEBUG))
-        //    log.debug("plugin name = <" + pluginName + ">; threads running? " + isClientThreadRunning(pluginName) + "; webapp runing? " + WebAppStarter.isWebAppRunning(pluginName) + "; jobs running? " + isJobRunning);
+        //    log.debug("plugin name = <" + pluginName + ">; threads running? " + isClientThreadRunning(pluginName) + "; webapp running? " + WebAppStarter.isWebAppRunning(pluginName) + "; jobs running? " + isJobRunning);
         //return isClientThreadRunning(pluginName) || WebAppStarter.isWebAppRunning(pluginName) || isJobRunning;
         //
     }
