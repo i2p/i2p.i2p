@@ -194,10 +194,14 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
         register((Updater)dsuh, ROUTER_DEV_SU3, HTTP, 0);
         newVersion = _context.getProperty(PROP_DEV_SU3_AVAILABLE);
         if (newVersion != null) {
-            List<URI> updateSources = dsuh.getUpdateSources();
-            if (dsuh != null) {
-                VersionAvailable newVA = new VersionAvailable(newVersion, "", HTTP, updateSources);
-                _available.put(new UpdateItem(ROUTER_DEV_SU3, ""), newVA);
+            if (VersionComparator.comp(newVersion, RouterVersion.FULL_VERSION) > 0) {
+                List<URI> updateSources = dsuh.getUpdateSources();
+                if (dsuh != null) {
+                    VersionAvailable newVA = new VersionAvailable(newVersion, "", HTTP, updateSources);
+                    _available.put(new UpdateItem(ROUTER_DEV_SU3, ""), newVA);
+                }
+            } else {
+                _context.router().saveConfig(PROP_DEV_SU3_AVAILABLE, null);
             }
         }
 
