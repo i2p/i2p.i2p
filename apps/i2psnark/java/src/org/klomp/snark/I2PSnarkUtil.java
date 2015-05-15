@@ -456,7 +456,7 @@ public class I2PSnarkUtil {
             return null;
     }
     
-    String getOurIPString() {
+    public String getOurIPString() {
         Destination dest = getMyDestination();
         if (dest != null)
             return dest.toBase64();
