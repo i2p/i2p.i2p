@@ -448,6 +448,7 @@ public class Router implements RouterClock.ClockShiftListener {
      *  saveConfig(String name, String value) or saveConfig(Map toAdd, Set toRemove) is recommended.
      *
      *  @since 0.8.13
+     *  @deprecated use saveConfig(String name, String value) or saveConfig(Map toAdd, Set toRemove)
      */
     public void setConfigSetting(String name, String value) { 
             _config.put(name, value); 
@@ -458,6 +459,7 @@ public class Router implements RouterClock.ClockShiftListener {
      *  saveConfig(String name, String value) or saveConfig(Map toAdd, Set toRemove) is recommended.
      *
      *  @since 0.8.13
+     *  @deprecated use saveConfig(String name, String value) or saveConfig(Map toAdd, Set toRemove)
      */
     public void removeConfigSetting(String name) { 
             _config.remove(name); 
