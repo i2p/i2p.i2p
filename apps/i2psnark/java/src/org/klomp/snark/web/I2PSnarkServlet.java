@@ -670,14 +670,15 @@ public class I2PSnarkServlet extends BasicServlet {
             out.write("<tfoot><tr>\n" +
                       "    <th align=\"left\" colspan=\"6\">");
             out.write("&nbsp;");
-            out.write(_("Dest: "));
+            out.write(_("Dest") + ":");
+            out.write("&nbsp;");
             String IPString = _manager.util().getOurIPString();
             if(!IPString.equals("unknown")) {
                 // Only truncate if it's an actual dest
                 IPString = "<i>" + IPString.substring(0, 4) + "</i>";
             } else {
-		IPString = IPString + ".";
-	    }
+                IPString = IPString + ".";
+            }
             out.write(IPString);
             out.write("&nbsp;");
             out.write(_("Totals"));
