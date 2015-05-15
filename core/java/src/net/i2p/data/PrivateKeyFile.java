@@ -41,7 +41,7 @@ import net.i2p.util.SecureFileOutputStream;
  *     - Certificate if length != 0
  *  - Private key (256 bytes)
  *  - Signing Private key (20 bytes, or length specified by key certificate)
- * Total 663 bytes
+ * Total: 663 or more bytes
  *</pre>
  *
  * @author welterde, zzz
