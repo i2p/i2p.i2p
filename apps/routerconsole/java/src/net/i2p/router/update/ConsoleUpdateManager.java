@@ -183,7 +183,7 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
         String newVersion = _context.getProperty(PROP_UNSIGNED_AVAILABLE);
         if (newVersion != null) {
             List<URI> updateSources = uuh.getUpdateSources();
-            if (uuh != null) {
+            if (updateSources != null) {
                 VersionAvailable newVA = new VersionAvailable(newVersion, "", HTTP, updateSources);
                 _available.put(new UpdateItem(ROUTER_UNSIGNED, ""), newVA);
             }
@@ -196,7 +196,7 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
         if (newVersion != null) {
             if (VersionComparator.comp(newVersion, RouterVersion.FULL_VERSION) > 0) {
                 List<URI> updateSources = dsuh.getUpdateSources();
-                if (dsuh != null) {
+                if (updateSources != null) {
                     VersionAvailable newVA = new VersionAvailable(newVersion, "", HTTP, updateSources);
                     _available.put(new UpdateItem(ROUTER_DEV_SU3, ""), newVA);
                 }
