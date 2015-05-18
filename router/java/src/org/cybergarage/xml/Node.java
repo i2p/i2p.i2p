@@ -284,11 +284,16 @@ public class Node
 	////////////////////////////////////////////////
 	//	equals
 	////////////////////////////////////////////////
-	
-	public boolean equals(Node otherNode) {
-		if (otherNode == null)
+	@Override
+	public boolean equals(Object o) {
+	    if (this == o)
+	        return true;
+		if (o == null)
+			return false;
+		if (!(o instanceof Node))
 			return false;
 
+		Node otherNode = (Node) o;
 		String thisNodeString = toString();
 		String otherNodeString = otherNode.toString();
 		

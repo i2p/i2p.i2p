@@ -2,7 +2,7 @@ package net.i2p.router.tasks;
 
 import net.i2p.data.DataHelper;
 import net.i2p.router.Job;
-import net.i2p.router.CommSystemFacade;
+import net.i2p.router.CommSystemFacade.Status;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.router.util.EventLog;
@@ -133,7 +133,7 @@ public class RouterWatchdog implements Runnable {
         boolean ok = verifyJobQueueLiveliness();
         // If we aren't connected to the network that's why there's nobody to talk to
         long netErrors = 0;
-        if (_context.commSystem().getReachabilityStatus() == CommSystemFacade.STATUS_DISCONNECTED) {
+        if (_context.commSystem().getStatus() == Status.DISCONNECTED) {
             netErrors = 10;
         } else {
             RateStat rs = _context.statManager().getRate("udp.sendException");

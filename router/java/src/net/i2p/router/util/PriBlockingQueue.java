@@ -11,7 +11,7 @@ import net.i2p.util.Log;
 
 /**
  *  Priority Blocking Queue using methods in the entries,
- *  as definied in PQEntry, to store priority and sequence number,
+ *  as defined in PQEntry, to store priority and sequence number,
  *  ensuring FIFO order within a priority.
  *
  *  Input: add(), offer(), and put() are overridden to add a sequence number.

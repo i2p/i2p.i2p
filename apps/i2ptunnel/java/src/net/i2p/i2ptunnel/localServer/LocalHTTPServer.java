@@ -36,14 +36,27 @@ public abstract class LocalHTTPServer {
     private final static String ERR_404 =
          "HTTP/1.1 404 Not Found\r\n"+
          "Content-Type: text/plain\r\n"+
+         "Connection: close\r\n"+
+         "Proxy-Connection: close\r\n"+
          "\r\n"+
          "HTTP Proxy local file not found";
 
     private final static String ERR_ADD =
          "HTTP/1.1 409 Bad\r\n"+
          "Content-Type: text/plain\r\n"+
+         "Connection: close\r\n"+
+         "Proxy-Connection: close\r\n"+
          "\r\n"+
          "Add to addressbook failed - bad parameters";
+
+    private final static String OK =
+         "HTTP/1.1 200 OK\r\n" +
+         "Content-Type: text/plain\r\n" +
+         "Cache-Control: max-age=86400\r\n" +
+         "Connection: close\r\n"+
+         "Proxy-Connection: close\r\n"+
+         "\r\n"+
+         "I2P HTTP proxy OK";
 
     /**
      *  Very simple web server.
@@ -72,7 +85,7 @@ public abstract class LocalHTTPServer {
         //System.err.println("targetRequest: \"" + targetRequest + "\"");
         // a home page message for the curious...
         if (targetRequest.equals("/")) {
-            out.write(("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nCache-Control: max-age=86400\r\n\r\nI2P HTTP proxy OK").getBytes("UTF-8"));
+            out.write(OK.getBytes("UTF-8"));
             out.flush();
             return;
         }
@@ -103,7 +116,7 @@ public abstract class LocalHTTPServer {
                 else type = "text/html";
                 out.write("HTTP/1.1 200 OK\r\nContent-Type: ".getBytes("UTF-8"));
                 out.write(type.getBytes("UTF-8"));
-                out.write("\r\nCache-Control: max-age=86400\r\n\r\n".getBytes("UTF-8"));
+                out.write("\r\nCache-Control: max-age=86400\r\nConnection: close\r\nProxy-Connection: close\r\n\r\n".getBytes("UTF-8"));
                 FileUtil.readFile(filename, themesDir.getAbsolutePath(), out);
                 return;
             }
@@ -181,6 +194,8 @@ public abstract class LocalHTTPServer {
             tbook = book;
         out.write(("HTTP/1.1 200 OK\r\n"+
                   "Content-Type: text/html; charset=UTF-8\r\n"+
+                  "Connection: close\r\n"+
+                  "Proxy-Connection: close\r\n"+
                   "\r\n"+
                   "<html><head>"+
                   "<title>" + _("Redirecting to {0}", host) + "</title>\n" +

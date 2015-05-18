@@ -33,7 +33,8 @@ trans.de = apps/i2ptunnel/locale-proxy/messages_de.po
 trans.es = apps/i2ptunnel/locale-proxy/messages_es.po
 trans.fr = apps/i2ptunnel/locale-proxy/messages_fr.po
 trans.hu = apps/i2ptunnel/locale-proxy/messages_hu.po
-trans.id = apps/i2ptunnel/locale-proxy/messages_id.po
+;; Java converts id to in
+trans.id = apps/i2ptunnel/locale-proxy/messages_in.po
 trans.it = apps/i2ptunnel/locale-proxy/messages_it.po
 trans.nb = apps/i2ptunnel/locale-proxy/messages_nb.po
 trans.nl = apps/i2ptunnel/locale-proxy/messages_nl.po
@@ -85,12 +86,12 @@ trans.es = apps/routerconsole/locale-news/messages_es.po
 trans.fi = apps/routerconsole/locale-news/messages_fi.po
 trans.fr = apps/routerconsole/locale-news/messages_fr.po
 trans.he = apps/routerconsole/locale-news/messages_he.po
-trans.id = apps/routerconsole/locale-news/messages_id.po
+;; Java converts id to in
+trans.id = apps/routerconsole/locale-news/messages_in.po
 trans.it = apps/routerconsole/locale-news/messages_it.po
 trans.ja = apps/routerconsole/locale-news/messages_ja.po
 trans.ko = apps/routerconsole/locale-news/messages_ko.po
-;; currently fails check
-;;trans.mg = apps/routerconsole/locale-news/messages_mg.po
+trans.mg = apps/routerconsole/locale-news/messages_mg.po
 trans.nb = apps/routerconsole/locale-news/messages_nb.po
 trans.nl = apps/routerconsole/locale-news/messages_nl.po
 trans.pl = apps/routerconsole/locale-news/messages_pl.po
@@ -218,11 +219,11 @@ trans.es = apps/susimail/locale/messages_es.po
 trans.fi = apps/susimail/locale/messages_fi.po
 trans.fr = apps/susimail/locale/messages_fr.po
 trans.hu = apps/susimail/locale/messages_hu.po
-trans.id = apps/susimail/locale/messages_id.po
+;; Java converts id to in
+trans.id = apps/susimail/locale/messages_in.po
 trans.it = apps/susimail/locale/messages_it.po
 trans.ja = apps/susimail/locale/messages_ja.po
-;; currently fails check
-;;trans.mg = apps/susimail/locale/messages_mg.po
+trans.mg = apps/susimail/locale/messages_mg.po
 trans.nl = apps/susimail/locale/messages_nl.po
 trans.pl = apps/susimail/locale/messages_pl.po
 trans.pt = apps/susimail/locale/messages_pt.po
@@ -298,7 +299,8 @@ trans.de = core/java/src/gnu/getopt/MessagesBundle_de.properties
 trans.es = core/java/src/gnu/getopt/MessagesBundle_es.properties
 trans.fr = core/java/src/gnu/getopt/MessagesBundle_fr.properties
 trans.hu = core/java/src/gnu/getopt/MessagesBundle_hu.properties
-trans.id = core/java/src/gnu/getopt/MessagesBundle_id.properties
+;; Java converts id to in
+trans.id = core/java/src/gnu/getopt/MessagesBundle_in.properties
 trans.it = core/java/src/gnu/getopt/MessagesBundle_it.properties
 trans.ja = core/java/src/gnu/getopt/MessagesBundle_ja.properties
 trans.ko = core/java/src/gnu/getopt/MessagesBundle_ko.properties
@@ -323,7 +325,8 @@ source_lang = en
 trans.de = apps/ministreaming/locale/messages_de.po
 trans.es = apps/ministreaming/locale/messages_es.po
 trans.fr = apps/ministreaming/locale/messages_fr.po
-trans.id = apps/ministreaming/locale/messages_id.po
+;; Java converts id to in
+trans.id = apps/ministreaming/locale/messages_in.po
 trans.it = apps/ministreaming/locale/messages_it.po
 trans.nb = apps/ministreaming/locale/messages_nb.po
 trans.pl = apps/ministreaming/locale/messages_pl.po

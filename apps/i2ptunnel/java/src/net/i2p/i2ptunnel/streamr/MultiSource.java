@@ -27,6 +27,10 @@ public class MultiSource implements Source, Sink {
         this.sinks.clear();
     }
 
+    /**
+     *  May throw RuntimeException from underlying sinks
+     *  @throws RuntimeException
+     */
     public void send(Destination ignored_from, byte[] data) {
         for(Destination dest : this.sinks) {
             this.sink.send(dest, data);

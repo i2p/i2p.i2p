@@ -17,6 +17,7 @@ import net.i2p.internal.InternalClientManager;
 import net.i2p.router.client.ClientManagerFacadeImpl;
 import net.i2p.router.crypto.TransientSessionKeyManager;
 import net.i2p.router.dummy.*;
+import net.i2p.router.message.GarlicMessageParser;
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import net.i2p.router.peermanager.PeerManagerFacadeImpl;
 import net.i2p.router.peermanager.ProfileManagerImpl;
@@ -68,6 +69,7 @@ public class RouterContext extends I2PAppContext {
     private RouterThrottle _throttle;
     private RouterAppManager _appManager;
     private RouterKeyGenerator _routingKeyGenerator;
+    private GarlicMessageParser _garlicMessageParser;
     private final Set<Runnable> _finalShutdownTasks;
     // split up big lock on this to avoid deadlocks
     private volatile boolean _initialized;
@@ -179,6 +181,7 @@ public class RouterContext extends I2PAppContext {
             _clientManagerFacade = new DummyClientManagerFacade(this);
             // internal client manager is null
         }
+        _garlicMessageParser = new GarlicMessageParser(this);
         _clientMessagePool = new ClientMessagePool(this);
         _jobQueue = new JobQueue(this);
         _jobQueue.startup();
@@ -483,8 +486,11 @@ public class RouterContext extends I2PAppContext {
     @Override
     protected void initializeClock() {
         synchronized (_lock1) {
-            if (_clock == null)
-                _clock = new RouterClock(this);
+            if (_clock == null) {
+                RouterClock rc = new RouterClock(this);
+                rc.start();
+                _clock = rc;
+            }
             _clockInitialized = true;
         }
     }
@@ -617,5 +623,15 @@ public class RouterContext extends I2PAppContext {
      */
     public RouterKeyGenerator routerKeyGenerator() {
         return _routingKeyGenerator;
+    }
+
+    /**
+     * Since we only need one.
+     *
+     * @return non-null after initAll()
+     * @since 0.9.20
+     */
+    public GarlicMessageParser garlicMessageParser() {
+        return _garlicMessageParser;
     }
 }

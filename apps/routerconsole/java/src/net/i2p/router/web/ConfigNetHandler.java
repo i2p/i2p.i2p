@@ -50,6 +50,7 @@ public class ConfigNetHandler extends FormHandler {
     private boolean _ratesOnly;
     private boolean _udpDisabled;
     private String _ipv6Mode;
+    private boolean _ipv4Firewalled;
     private final Map<String, String> changes = new HashMap<String, String>();
     private static final String PROP_HIDDEN = Router.PROP_HIDDEN_HIDDEN; // see Router for other choice
     
@@ -79,8 +80,12 @@ public class ConfigNetHandler extends FormHandler {
     public void setNtcpAutoPort(String mode) {
         _ntcpAutoPort = mode.equals("2");
     }
+
     public void setUpnp(String moo) { _upnp = true; }
     public void setLaptop(String moo) { _laptop = true; }
+
+    /** @since 0.9.20 */
+    public void setIPv4Firewalled(String moo) { _ipv4Firewalled = true; }
     
     public void setHostname(String hostname) { 
         _hostname = (hostname != null ? hostname.trim() : null); 
@@ -347,6 +352,16 @@ public class ConfigNetHandler extends FormHandler {
                     addFormNotice(_("Disabling laptop mode"));
             }
             changes.put(UDPTransport.PROP_LAPTOP_MODE, "" + _laptop);
+
+            if (Boolean.parseBoolean(_context.getProperty(TransportUtil.PROP_IPV4_FIREWALLED)) !=
+                _ipv4Firewalled) {
+                if (_ipv4Firewalled)
+                    addFormNotice(_("Disabling inbound IPv4"));
+                else
+                    addFormNotice(_("Enabling inbound IPv4"));
+                restartRequired = true;
+            }
+            changes.put(TransportUtil.PROP_IPV4_FIREWALLED, "" + _ipv4Firewalled);
 
             if (_context.getBooleanPropertyDefaultTrue(TransportManager.PROP_ENABLE_UDP) !=
                 !_udpDisabled) {

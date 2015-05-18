@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import net.i2p.data.DataHelper;
 import net.i2p.router.RouterContext;
 import net.i2p.util.PortMapper;
 
@@ -209,17 +210,22 @@ public class HomeHelper extends HelperBase {
                 buf.append("<img height=\"16\" alt=\"\" src=\"").append(app.icon).append("\">");
             }
             buf.append("</td><td align=\"left\">")
-               .append(app.name)
-               .append("</td><td align=\"left\"><a href=\"")
-               .append(app.url.replace("&", "&amp;"))
-               .append("\">")
-               .append(app.url.replace("&", "&amp;"))
-               .append("</a></td></tr>\n");
+               .append(DataHelper.escapeHTML(app.name))
+               .append("</td><td align=\"left\"><a href=\"");
+            String url = DataHelper.escapeHTML(app.url);
+            buf.append(url)
+               .append("\">");
+            // truncate before escaping
+            if (app.url.length() > 50)
+                buf.append(DataHelper.escapeHTML(app.url.substring(0, 48))).append("&hellip;");
+            else
+                buf.append(url);
+            buf.append("</a></td></tr>\n");
         }
         buf.append("<tr><td colspan=\"2\" align=\"center\"><b>")
            .append(_("Add")).append(":</b>" +
-                   "</td><td align=\"left\"><input type=\"text\" name=\"name\"></td>" +
-                   "<td align=\"left\"><input type=\"text\" size=\"40\" name=\"url\"></td></tr>");
+                   "</td><td align=\"left\"><input type=\"text\" name=\"nofilter_name\"></td>" +
+                   "<td align=\"left\"><input type=\"text\" size=\"40\" name=\"nofilter_url\"></td></tr>");
         buf.append("</table>\n");
         return buf.toString();
     }

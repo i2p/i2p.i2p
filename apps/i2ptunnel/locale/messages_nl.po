@@ -7,13 +7,14 @@
 # ducki2p <ducki2p@gmail.com>, 2011
 # foo <foo@bar>, 2009
 # Desirius <martinjefmeyers@gmail.com>, 2014
+# Nathan Follens, 2015
 # skoning <skoning@onenetbeyond.org>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-02-06 18:28+0000\n"
-"PO-Revision-Date: 2015-02-06 18:33+0000\n"
+"POT-Creation-Date: 2015-03-29 14:30+0000\n"
+"PO-Revision-Date: 2015-03-29 14:31+0000\n"
 "Last-Translator: kytv <killyourtv@i2pmail.org>\n"
 "Language-Team: Dutch (http://www.transifex.com/projects/p/I2P/language/nl/)\n"
 "MIME-Version: 1.0\n"
@@ -22,147 +23,139 @@ msgstr ""
 "Language: nl\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:474
-#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:484
+#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:361
+#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:371
 msgid "internal"
 msgstr "intern"
 
-#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:560
+#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:405
 #, java-format
 msgid "{0} inbound, {0} outbound tunnel"
 msgid_plural "{0} inbound, {0} outbound tunnels"
 msgstr[0] "{0} inkomende, {0} uitgaande tunnel"
 msgstr[1] "{0} inkomende, {0} uitgaande tunnels"
 
-#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:564
+#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:409
 msgid "lower bandwidth and reliability"
 msgstr "verlaag bandbreedte en betrouwbaarheid"
 
-#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:566
+#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:411
 msgid "standard bandwidth and reliability"
 msgstr "standaard bandbreedte en betrouwbaarheid"
 
-#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:568
+#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:413
 msgid "higher bandwidth and reliability"
 msgstr "hogere bandbreedte en betrouwbaarheid"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:132
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:87
 msgid "Tunnels are not initialized yet, please reload in two minutes."
 msgstr "Tunnels zijn nog niet klaar, ververs over twee minuten."
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:205
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:160
 msgid ""
 "Invalid form submission, probably because you used the 'back' or 'reload' "
 "button on your browser. Please resubmit."
 msgstr "Ongeldige formulier verzonden, waarschijnlijk doordat je de 'back' of 'reload' button van je browser hebt gebruikt. Verzend opnieuw."
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:207
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:162
 msgid ""
 "If the problem persists, verify that you have cookies enabled in your "
 "browser."
-msgstr "Als dit probleem blijft bestaan, kijk dan of uw browser cookies toestaat."
+msgstr "Als dit probleem blijft bestaan, kijk dan of je browser cookies toestaat."
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:253
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:208
 msgid "Configuration reloaded for all tunnels"
 msgstr "Configuratie van alle tunnels opnieuw geladen"
 
 #. and give them something to look at in any case
 #. FIXME name will be HTML escaped twice
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:267
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:222
 msgid "Starting tunnel"
 msgstr "Opstarten van tunnel"
 
 #. and give them something to look at in any case
 #. FIXME name will be HTML escaped twice
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:281
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:236
 msgid "Stopping tunnel"
 msgstr "Stoppen van tunnel"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:370
-msgid "Configuration changes saved"
-msgstr "Configuratie wijzigingen opgeslagen"
-
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:373
-msgid "Failed to save configuration"
-msgstr "Opslaan van de configuratie mislukt"
-
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:500
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:325
 msgid "New Tunnel"
 msgstr "Nieuwe Tunnel"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:523
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:543
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:661
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:345
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:365
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:451
 msgid "Port not set"
 msgstr "Poort niet opgegeven"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:526
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:663
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:348
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:453
 msgid "Invalid port"
 msgstr "Ongeldige poort"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:529
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:351
 msgid "Warning - ports less than 1024 are not recommended"
 msgstr "Waarschuwing - poorten lager dan 1024 worden niet aangeraden"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:538
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:360
 msgid "Warning - duplicate port"
 msgstr "Waarschuwing - dubbele poort"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:555
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:377
 msgid "Standard client"
-msgstr "Standaard client"
+msgstr "Standaardcliënt"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:556
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:378
 msgid "HTTP/HTTPS client"
-msgstr "HTTP/HTTPS cliënt"
+msgstr "HTTP/HTTPS-cliënt"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:557
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:379
 msgid "IRC client"
-msgstr "IRC client"
+msgstr "IRC-cliënt"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:558
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:380
 msgid "Standard server"
 msgstr "Standaard server"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:559
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:381
 msgid "HTTP server"
 msgstr "HTTP server"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:560
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:382
 msgid "SOCKS 4/4a/5 proxy"
 msgstr "SOCKS 4/4a/5 proxy"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:561
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:383
 msgid "SOCKS IRC proxy"
 msgstr "SOCKS IRC proxy"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:562
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:384
 msgid "CONNECT/SSL/HTTPS proxy"
 msgstr "CONNECT/SSL/HTTPS proxy"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:563
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:385
 msgid "IRC server"
-msgstr "IRC server"
+msgstr "IRC-server"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:564
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:386
 msgid "Streamr client"
-msgstr "Streamr client"
+msgstr "Streamr-cliënt"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:565
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:387
 msgid "Streamr server"
-msgstr "Streamr server"
+msgstr "Streamr-server"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:566
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:388
 msgid "HTTP bidir"
 msgstr "HTTP bidir"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:655
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:445
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:317
 msgid "Host not set"
 msgstr "Host niet opgegeven"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:657
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:447
 msgid "Invalid address"
 msgstr "Ongeldig adres"
 
@@ -170,11 +163,11 @@ msgstr "Ongeldig adres"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:82
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:85
 msgid "Hidden Services Manager"
-msgstr ""
+msgstr "Verborgen diensten-beheerder"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:86
 msgid "Edit Client Tunnel"
-msgstr ""
+msgstr "Cliënt-tunnel bewerken"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:114
 msgid "Edit proxy settings"
@@ -278,13 +271,13 @@ msgstr "b32 niet aanbevolen"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:281
 msgid "Shared Client"
-msgstr "Gedeelde Client"
+msgstr "Gedeelde cliënt"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:285
 msgid ""
 "(Share tunnels with other clients and irc/httpclients? Change requires "
 "restart of client proxy)"
-msgstr "(Deel tunnels met andere clients en irc/httpclients? Wijziging vereist herstart van de client proxy)"
+msgstr "(Tunnels delen met andere cliënten en irc/httpclients? Wijziging vereist herstart van de cliëntproxy)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:289
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:174
@@ -305,7 +298,7 @@ msgstr "Geavanceerde netwerk opties"
 msgid ""
 "(NOTE: when this client proxy is configured to share tunnels, then these "
 "options are for all the shared proxy clients!)"
-msgstr "(OPMERKING: wanneer deze client proxy is geconfigureerd om tunnels te delen, dan zijn deze opties van toepassing voor alle gedeelde proxy clients!)"
+msgstr "(OPMERKING: wanneer deze cliëntproxy is geconfigureerd om tunnels te delen, dan zijn deze opties van toepassing voor alle gedeelde proxycliënten!)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:309
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:307
@@ -320,7 +313,7 @@ msgstr "Lengte"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:318
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:316
 msgid "0 hop tunnel (no anonymity)"
-msgstr "0 hop tunnel (geen anoniemiteit)"
+msgstr "0 hop tunnel (geen anonimiteit)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:322
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:320
@@ -387,7 +380,7 @@ msgstr "Aantal"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:386
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:384
 msgid "Backup Count"
-msgstr "Backup Aantal"
+msgstr "Backup-aantal"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:393
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:391
@@ -432,7 +425,7 @@ msgstr "bulk connection (downloads/websites/BT)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:433
 msgid "Delay Connect"
-msgstr "Vertraagde Connectie"
+msgstr "Verbinden vertragen"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:437
 msgid "for request/response connections"
@@ -441,7 +434,7 @@ msgstr "voor request/response connecties"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:441
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:433
 msgid "Router I2CP Address"
-msgstr "Router I2CP Adres"
+msgstr "Router I2CP-adres"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:443
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:192
@@ -504,7 +497,7 @@ msgstr "Sluit tunnels wanneer in rust"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:489
 msgid "New Keys on Reopen"
-msgstr "Nieuwe Sleutels bij Heropenen"
+msgstr "Nieuwe sleutels bij heropenen"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:497
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:469
@@ -555,7 +548,7 @@ msgstr "Alleen experts!"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:592
 msgid "Local Authorization"
-msgstr "Lokale Autorisatie"
+msgstr "Lokale autorisatie"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:598
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:608
@@ -569,11 +562,11 @@ msgstr "Wachtwoord"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:602
 msgid "Outproxy Authorization"
-msgstr "Uitgaande Proxy Autorisatie"
+msgstr "Uitgaande proxy-autorisatie"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:619
 msgid "Jump URL List"
-msgstr "Spring URL Lijst"
+msgstr "Spring URL-lijst"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:625
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:647
@@ -584,12 +577,12 @@ msgstr "Aangepaste opties"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:651
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:705
 msgid "Cancel"
-msgstr "Annuleer"
+msgstr "Annuleren"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:633
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:655
 msgid "Delete"
-msgstr "Verwijder"
+msgstr "Verwijderen"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:635
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:657
@@ -598,19 +591,19 @@ msgstr "Opslaan"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:86
 msgid "Edit Hidden Service"
-msgstr ""
+msgstr "Verborgen dienst bewerken"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:114
 msgid "Edit server settings"
-msgstr "Bewerk server instellingen"
+msgstr "Serverinstellingen bewerken"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:122
 msgid "New server settings"
-msgstr "Nieuwe server instellingen"
+msgstr "Nieuwe serverinstellingen"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:255
 msgid "Website name"
-msgstr "Website naam"
+msgstr "Websitenaam"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:259
 msgid "(leave blank for outproxies)"
@@ -626,23 +619,23 @@ msgstr "Toevoegen aan lokaal adresboek"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:299
 msgid "Hostname Signature"
-msgstr "Hostnaam Handtekening"
+msgstr "Hostnaamhandtekening"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:451
 msgid "Encrypt Leaseset"
-msgstr "Versleutel Leaseset"
+msgstr "Leaseset versleutelen"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:457
 msgid "Encryption Key"
-msgstr "Encryptie Sleutel"
+msgstr "Versleutelingssleutel"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:461
 msgid "Generate New Key"
-msgstr "Genereer Nieuwe Sleutel"
+msgstr "Nieuwe sleutel aanmaken"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:463
 msgid "Generate"
-msgstr "Genereer"
+msgstr "Aanmaken"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:465
 msgid "(Tunnel must be stopped first)"
@@ -650,7 +643,7 @@ msgstr "(Tunnel moet eerst gestopt worden)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:467
 msgid "Restricted Access List"
-msgstr "Beperkte Toegangs Lijst"
+msgstr "Beperkte toegangslijst"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:473
 msgid "Whitelist"
@@ -666,15 +659,15 @@ msgstr "Toegangslijst"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:488
 msgid "Block Access via Inproxies"
-msgstr "Blokkeer Toegang via Inproxies"
+msgstr "Toegang via inproxies blokkeren"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:497
 msgid "Unique Local Address per Client"
-msgstr "Uniek Lokaal Adres per Cliënt"
+msgstr "Uniek lokaal adres per cliënt"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:503
 msgid "Optimize for Multihoming"
-msgstr ""
+msgstr "Optimaliseren voor multihoming"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:509
 msgid "Inbound connection limits (0=unlimited)"
@@ -683,7 +676,7 @@ msgstr "Inkomende connectie limieten (0=onbeperkt)"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:511
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:542
 msgid "Per client"
-msgstr "Per client"
+msgstr "Per cliënt"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:513
 msgid "Per minute"
@@ -724,35 +717,35 @@ msgstr "POST limiet periode (minuten)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:620
 msgid "Experts only! Changes B32!"
-msgstr "Alleen experts! Verandert B32!"
+msgstr "Alleen voor experts! Verandert B32!"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:99
 msgid "Status Messages"
-msgstr "Status Berichten"
+msgstr "Statusberichten"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:103
 msgid "Refresh"
-msgstr "Ververs"
+msgstr "Verversen"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:111
 msgid "Tunnel Wizard"
-msgstr "Tunnel Setup"
+msgstr "Tunnel-setup"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:115
 msgid "Stop All"
-msgstr "Stop Alles"
+msgstr "Alles stoppen"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:119
 msgid "Start All"
-msgstr "Start Alles"
+msgstr "Alles starten"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:123
 msgid "Restart All"
-msgstr "Herstart Alles"
+msgstr "Alles herstarten"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:126
 msgid "I2P Hidden Services"
-msgstr ""
+msgstr "I2P verborgen diensten"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:130
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:151
@@ -763,7 +756,7 @@ msgstr "Verwijst naar"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:184
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:188
 msgid "Preview"
-msgstr "Preview"
+msgstr "Voorbeeld"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:134
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:208
@@ -774,16 +767,16 @@ msgstr "Status"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:194
 msgid "Base32 Address"
-msgstr "Base32 Adres"
+msgstr "Base32-adres"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:202
 msgid "No Preview"
-msgstr "Geen Preview"
+msgstr "Geen voorbeeld"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:215
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:331
 msgid "Starting..."
-msgstr "Starten..."
+msgstr "Bezig met starten..."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:222
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:236
@@ -810,7 +803,7 @@ msgstr "Start"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:265
 msgid "New hidden service"
-msgstr ""
+msgstr "Nieuwe verborgen dienst"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:267
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:436
@@ -825,11 +818,11 @@ msgstr "Standaard"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:269
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:438
 msgid "Create"
-msgstr "Creëer"
+msgstr "Aanmaken"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:271
 msgid "I2P Client Tunnels"
-msgstr "I2P Client Tunnels"
+msgstr "I2P cliënt-tunnels"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:279
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:310
@@ -858,16 +851,16 @@ msgstr "geen"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:434
 msgid "New client tunnel"
-msgstr "Nieuwe client tunnel"
+msgstr "Nieuwe cliënt-tunnel"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:122
 msgid "I2P Tunnel Manager - Tunnel Creation Wizard"
-msgstr "I2P Tunnel Manager - Tunnel Aanmaken Setup"
+msgstr "I2P-tunnelbeheerder - tunnel aanmaken setup"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:142
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:570
 msgid "Server or client tunnel?"
-msgstr "Server of cliënt tunnel?"
+msgstr "Server of cliënt-tunnel?"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:148
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:574
@@ -902,33 +895,33 @@ msgstr "Setup voltooid"
 msgid ""
 "This wizard will take you through the various options available for creating"
 " tunnels in I2P."
-msgstr "Deze wizard helpt u door de verschillende opties voor het maken van tunnels in I2P."
+msgstr "Deze wizard helpt je door de verschillende opties voor het maken van tunnels in I2P."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:194
 msgid ""
 "The first thing to decide is whether you want to create a server or a client"
 " tunnel."
-msgstr "Beslis als eerste of u een server of een client tunnel wilt maken."
+msgstr "Beslis eerst of je een server of een cliënt-tunnel wil maken."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:196
 msgid ""
 "If you need to connect to a remote service, such as an IRC server inside I2P"
 " or a code repository, then you will require a CLIENT tunnel."
-msgstr "Als u wilt verbinden met een service, zoals een IRC server in I2P, of een code repository, dan heeft u een CLIENT tunnel nodig."
+msgstr "Als je wil verbinden met een dienst zoals een IRC-server in I2P, of een code-repository, heb je een CLIËNT-tunnel nodig."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:198
 msgid ""
 "On the other hand, if you wish to host a service for others to connect to "
 "you'll need to create a SERVER tunnel."
-msgstr "Anderszijds, als u voor anderen een service wilt hosten, dan heeft u een SERVER tunnel nodig."
+msgstr "Anderzijds, als je voor anderen een dienst wil hosten heb je een SERVER-tunnel nodig."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:200
 msgid "Server Tunnel"
-msgstr "Server Tunnel"
+msgstr "Server-tunnel"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:202
 msgid "Client Tunnel"
-msgstr "Cliënt Tunnel"
+msgstr "Cliënt-tunnel"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:220
 msgid "There are several types of tunnels to choose from:"
@@ -943,7 +936,7 @@ msgstr "Basis tunnel om naar een enkele service binnen I2P te verbinden."
 msgid ""
 "Try this if none of the tunnel types below fit your requirements, or you "
 "don't know what type of tunnel you need."
-msgstr "Probeer dit als geen van de tunneltypes bij u past, of als u niet weet wat voor een tunnel u nodig heeft."
+msgstr "Probeer dit als geen van de tunneltypes bij je past, of als je niet weet wat voor een tunnel je nodig hebt."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:232
 msgid "Tunnel that acts as an HTTP proxy for reaching eepsites inside I2P."
@@ -954,7 +947,7 @@ msgid ""
 "Set your browser to use this tunnel as an http proxy, or set your "
 "\"http_proxy\" environment variable for command-line applications in "
 "GNU/Linux."
-msgstr "Stel uw browser in om deze tunnel als http proxy te gebruiken, of zet uw \"http_proxy\" environment variable voor command-line applicaties in GNU/Linux."
+msgstr "Stel je browser in om deze tunnel als http-proxy te gebruiken, of zet je \"http_proxy\" environment variable voor commandoregel-applicaties in GNU/Linux."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:236
 msgid ""
@@ -964,69 +957,69 @@ msgstr "Websites buiten I2P kunnen ook bereikt worden als een HTTP proxy in I2P 
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:238
 msgid "Customised client tunnel specific for IRC connections."
-msgstr "Handmatige client tunnel specifiek voor IRC verbindingen."
+msgstr "Handmatige cliënt-tunnel specifiek voor IRC-verbindingen."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:240
 msgid ""
 "With this tunnel type, your IRC client will be able to connect to an IRC "
 "network inside I2P."
-msgstr "Met dit type tunnel kan uw IRC client verbinding maken met een IRC netwerk binnen I2P."
+msgstr "Met dit type tunnel kan je IRC-cliënt verbinding maken met een IRC-netwerk binnen I2P."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:242
 msgid ""
 "Each IRC network in I2P that you wish to connect to will require its own "
 "tunnel. (See Also, SOCKS IRC)"
-msgstr "Elk IRC netwerk in I2P waar u mee wilt verbinden heeft een eigen tunnel nodig. (Zie ook SOCKS IRC)"
+msgstr "Elk IRC-netwerk in I2P waar je mee wil verbinden heeft een eigen tunnel nodig. (Zie ook SOCKS IRC)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:244
 msgid "A tunnel that implements the SOCKS protocol."
-msgstr "Een tunnel die het SOCKS protocol implementeert."
+msgstr "Een tunnel die het SOCKS-protocol implementeert."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:246
 msgid ""
 "This enables both TCP and UDP connections to be made through a SOCKS "
 "outproxy within I2P."
-msgstr "Dit zorgt ervoor dat zowel TCP als UDP connecties gemaakt kunnen worden via een SOCKS outproxy in I2P."
+msgstr "Dit zorgt ervoor dat zowel TCP- als UDP-connecties gemaakt kunnen worden via een SOCKS-outproxy in I2P."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:248
 msgid ""
 "A client tunnel implementing the SOCKS protocol, which is customised for "
 "connecting to IRC networks."
-msgstr "Een tunnel die het SOCKS protocol implementeert, speciaal om met IRC netwerken te verbinden."
+msgstr "Een cliënt-tunnel die het SOCKS-protocol implementeert, speciaal om met IRC-netwerken te verbinden."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:250
 msgid ""
 "With this tunnel type, IRC networks in I2P can be reached by typing the I2P "
 "address into your IRC client, and configuring the IRC client to use this "
 "SOCKS tunnel."
-msgstr "Met dit tunnel type, kunnen IRC netwerken in I2P bereikt worden door het I2P adres in je IRC cliënt in te voeren en de IRC cliënt te configureren om deze SOCKS tunnel te gebruiken."
+msgstr "Met dit tunnel type kunnen IRC-netwerken in I2P bereikt worden door het I2P-adres in je IRC-cliënt in te voeren en de IRC-cliënt te configureren om deze SOCKS-tunnel te gebruiken."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:252
 msgid ""
 "This means that only one I2P tunnel is required rather than a separate "
 "tunnel per IRC network."
-msgstr "Dit betekend dat er maar één I2P tunnel nodig is in plaats van een aparte tunnel voor elk IRC netwerk."
+msgstr "Dit betekent dat er maar één I2P-tunnel nodig is in plaats van een aparte tunnel voor elk IRC-netwerk."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:254
 msgid ""
 "IRC networks outside I2P can also be reached if a SOCKS outproxy within I2P "
 "is known, though it depends on whether or not the outproxy has been blocked "
 "by the IRC network."
-msgstr "IRC netwerken buiten I2P kunnen ook bereikt worden als een SOCKS outproxy in I2P bekend is, hoewel het er ook vanaf hangt of de outproxy is geblokkeerd door het IRC netwerk of niet."
+msgstr "IRC-netwerken buiten I2P kunnen ook bereikt worden als een SOCKS-outproxy in I2P bekend is, hoewel het er ook van afhangt of de outproxy is geblokkeerd door het IRC-netwerk of niet."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:256
 msgid "A client tunnel that implements the HTTP CONNECT command."
-msgstr "Een cliënt tunnel die de HTTP CONNECT command implementeert."
+msgstr "Een cliënt-tunnel die het HTTP CONNECT-commando implementeert."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:258
 msgid ""
 "This enables TCP connections to be made through an HTTP outproxy, assuming "
 "the proxy supports the CONNECT command."
-msgstr "Dit zorgt ervoor dat TCP connecties gemaakt kunnen worden door een HTTP outproxy, zolang de proxy de CONNECT command ondersteunt."
+msgstr "Dit zorgt ervoor dat TCP-connecties gemaakt kunnen worden door een HTTP-outproxy, zolang de proxy het CONNECT-commando ondersteunt."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:260
 msgid "A customised client tunnel for Streamr."
-msgstr "Een aangepaste cliënt tunnel voor Streamr."
+msgstr "Een aangepaste cliënt-tunnel voor Streamr."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:270
 msgid "A basic server tunnel for hosting a generic service inside I2P."
@@ -1088,7 +1081,7 @@ msgstr "Scheid meerdere proxies met komma's."
 msgid ""
 "Type in the I2P destination of the service that this client tunnel should "
 "connect to."
-msgstr "Vul de I2P bestemming in van de service waarmee deze cliënt tunnel moet verbinden."
+msgstr "Vul de I2P-bestemming in van de dienst waarmee deze cliënt-tunnel moet verbinden."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:379
 msgid ""
@@ -1108,11 +1101,11 @@ msgstr "Dit is de poort waar de service verbindingen op ontvangt."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:456
 msgid "This is the port that the client tunnel will be accessed from locally."
-msgstr "Dit is de poort waarop de client tunnel lokaal toegankelijk is."
+msgstr "Dit is de poort waarop de cliënt-tunnel lokaal toegankelijk is."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:458
 msgid "This is also the client port for the HTTPBidir server tunnel."
-msgstr "Dit is ook de client poort voor de HTTPBidir server tunnel."
+msgstr "Dit is ook de cliënt-poort voor de HTTPBidir server tunnel."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:477
 msgid ""
@@ -1122,13 +1115,13 @@ msgstr "Voor wat moet deze tunnel toegankelijk zijn? Alleen deze machine, het he
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:479
 msgid "You will most likely want to just allow 127.0.0.1"
-msgstr "Waarschijnlijk wilt u alleen 127.0.0.1 toelaten"
+msgstr "Waarschijnlijk wil je alleen 127.0.0.1 toelaten"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:521
 msgid ""
 "The I2P router can automatically start this tunnel for you when the router "
 "is started."
-msgstr "De I2P router kan deze tunnel automatisch starten voor u zodra de router wordt gestart."
+msgstr "De I2P-router kan deze tunnel automatisch voor je starten zodra de router wordt gestart."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:523
 msgid ""
@@ -1145,7 +1138,7 @@ msgstr "De setup heeft genoeg informatie verzameld om de tunnel te maken."
 msgid ""
 "Upon clicking the Save button below, the wizard will set up the tunnel, and "
 "take you back to the main I2PTunnel page."
-msgstr "Als je op de Opslaan knop hier onder drukt, zal de setup de tunnel maken en de hoofd I2PTunnel pagina weergeven."
+msgstr "Als je op de Opslaan-knop hieronder drukt, zal de setup de tunnel maken en de hoofd I2PTunnel pagina weergeven."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:556
 msgid ""
@@ -1167,24 +1160,24 @@ msgstr "Omdat je ervoor gekozen hebt de tunnel niet automatisch te laten starten
 msgid ""
 "You can do this by clicking the Start button on the main page which "
 "corresponds to the new tunnel."
-msgstr "Dit kan je doen door op de Start knop, op de hoofd pagina van de nieuwe tunnel, te klikken."
+msgstr "Dit kan je doen door op de Start-knop, op de hoofdpagina van de nieuwe tunnel, te klikken."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:568
 msgid "Below is a summary of the options you chose:"
-msgstr "Hier onder een opsomming van de door u gekozen opties:"
+msgstr "Hieronder een opsomming van de door jou gekozen opties:"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:666
 msgid ""
 "Alongside these basic settings, there are a number of advanced options for "
 "tunnel configuration."
-msgstr "Naast de basis instellingen, zijn er een aantal geavanceerde opties voor tunnel configuratie."
+msgstr "Naast de basisinstellingen zijn er een aantal geavanceerde opties voor tunnelconfiguratie."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:668
 msgid ""
 "The wizard will set reasonably sensible default values for these, but you "
 "can view and/or edit these by clicking on the tunnel's name in the main "
 "I2PTunnel page."
-msgstr "De wizard zal redelijkerwijs de juiste waarden selecteren, maar u kunt ze bekijken en/of veranderen door op de naam van de tunnel op de I2PTunnel pagina te klikken."
+msgstr "De wizard zal redelijkerwijs de juiste waarden selecteren, maar je kan ze bekijken en/of veranderen door op de naam van de tunnel op de I2PTunnel-pagina te klikken."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:710
 msgid "Previous"
@@ -1192,7 +1185,7 @@ msgstr "Vorige"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:718
 msgid "Save Tunnel"
-msgstr "Tunnel Opslaan"
+msgstr "Tunnel opslaan"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:724
 msgid "Finish"

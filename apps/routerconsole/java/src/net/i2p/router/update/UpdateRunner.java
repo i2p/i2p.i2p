@@ -16,6 +16,7 @@ import net.i2p.util.EepGet;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 import net.i2p.util.PartialEepGet;
+import net.i2p.util.PortMapper;
 import net.i2p.util.SSLEepGet;
 import net.i2p.util.VersionComparator;
 
@@ -45,8 +46,6 @@ class UpdateRunner extends I2PAppThread implements UpdateTask, EepGet.StatusList
     protected final ByteArrayOutputStream _baos;
     protected URI _currentURI;
     private final String _currentVersion;
-
-    private static final String SIGNED_UPDATE_FILE = "i2pupdate.sud";
 
     protected static final long CONNECT_TIMEOUT = 55*1000;
     protected static final long INACTIVITY_TIMEOUT = 5*60*1000;
@@ -150,6 +149,16 @@ class UpdateRunner extends I2PAppThread implements UpdateTask, EepGet.StatusList
             if (shouldProxy) {
                 proxyHost = _context.getProperty(ConfigUpdateHandler.PROP_PROXY_HOST, ConfigUpdateHandler.DEFAULT_PROXY_HOST);
                 proxyPort = ConfigUpdateHandler.proxyPort(_context);
+                if (proxyPort == ConfigUpdateHandler.DEFAULT_PROXY_PORT_INT &&
+                    proxyHost.equals(ConfigUpdateHandler.DEFAULT_PROXY_HOST) &&
+                    _context.portMapper().getPort(PortMapper.SVC_HTTP_PROXY) < 0) {
+                    String msg = _("HTTP client proxy tunnel must be running");
+                    if (_log.shouldWarn())
+                        _log.warn(msg);
+                    updateStatus("<b>" + msg + "</b>");
+                    _mgr.notifyTaskFailed(this, msg, null);
+                    return;
+                }
             } else {
                 // TODO, wrong method, fail
                 proxyHost = null;
@@ -170,9 +179,10 @@ class UpdateRunner extends I2PAppThread implements UpdateTask, EepGet.StatusList
 
         if (_urls.isEmpty()) {
             // not likely, don't bother translating
-            updateStatus("<b>Update source list is empty, cannot download update</b>");
-            _log.error("Update source list is empty - cannot download update");
-            _mgr.notifyTaskFailed(this, "", null);
+            String msg = "Update source list is empty, cannot download update";
+            updateStatus("<b>" + msg + "</b>");
+            _log.error(msg);
+            _mgr.notifyTaskFailed(this, msg, null);
             return;
         }
 

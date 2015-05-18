@@ -7,12 +7,16 @@
  */
 package net.i2p.client.naming;
 
+import java.io.IOException;
+import java.io.Writer;
 import java.lang.reflect.Constructor;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 import net.i2p.I2PAppContext;
@@ -235,14 +239,83 @@ public abstract class NamingService {
      *  Warning - This will bring the whole database into memory
      *  if options is null, empty, or unsupported, use with caution.
      *
+     *  This implementation calls getEntries(options) and returns a SortedMap.
+     *  Subclasses should override if they store base64 natively.
+     *
      *  @param options NamingService-specific, can be null
      *  @return all mappings (matching the options if non-null)
      *          or empty Map if none;
      *          Returned Map is not necessarily sorted, implementation dependent
-     *  @since 0.8.7
+     *  @since 0.8.7, implemented in 0.9.20
      */
     public Map<String, String> getBase64Entries(Properties options) {
-        return Collections.emptyMap();
+        Map<String, Destination> entries = getEntries(options);
+        if (entries.size() <= 0)
+            return Collections.emptyMap();
+        Map<String, String> rv = new TreeMap<String, String>();
+        for (Map.Entry<String, Destination> e : entries.entrySet()) {
+             rv.put(e.getKey(), e.getValue().toBase64());
+        }
+        return rv;
+    }
+
+    /**
+     *  Export in a hosts.txt format.
+     *  Output is not necessarily sorted, implementation dependent.
+     *  Output may or may not contain comment lines, implementation dependent.
+     *  Caller must close writer.
+     *
+     *  This implementation calls getBase64Entries().
+     *  Subclasses should override if they store in a hosts.txt format natively.
+     *
+     *  @since 0.9.20
+     */
+    public void export(Writer out) throws IOException {
+        export(out, null);
+    }
+
+    /**
+     *  Export in a hosts.txt format.
+     *  Output is not necessarily sorted, implementation dependent.
+     *  Output may or may not contain comment lines, implementation dependent.
+     *  Caller must close writer.
+     *
+     *  This implementation calls getBase64Entries(options).
+     *  Subclasses should override if they store in a hosts.txt format natively.
+     *
+     *  @param options NamingService-specific, can be null
+     *  @since 0.9.20
+     */
+    public void export(Writer out, Properties options) throws IOException {
+        Map<String, String> entries = getBase64Entries(options);
+        out.write("# Address book: ");
+        out.write(getName());
+        if (options != null) {
+            String list = options.getProperty("list");
+            if (list != null)
+                out.write(" (" + list + ')');
+        }
+        final String nl = System.getProperty("line.separator", "\n");
+        out.write(nl);
+        int sz = entries.size();
+        if (sz <= 0) {
+            out.write("# No entries");
+            out.write(nl);
+            return;
+        }
+        out.write("# Exported: ");
+        out.write((new Date()).toString());
+        out.write(nl);
+        if (sz > 1) {
+            out.write("# " + sz + " entries");
+            out.write(nl);
+        }
+        for (Map.Entry<String, String> e : entries.entrySet()) {
+            out.write(e.getKey());
+            out.write('=');
+            out.write(e.getValue());
+            out.write(nl);
+        }
     }
 
     /**

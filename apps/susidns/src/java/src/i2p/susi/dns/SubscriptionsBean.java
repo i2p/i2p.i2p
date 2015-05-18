@@ -112,6 +112,8 @@ public class SubscriptionsBean extends BaseBean
 				out.println(url);
 			}
 			out.close();
+                        if (out.checkError())
+                            throw new IOException("Failed write to " + file);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

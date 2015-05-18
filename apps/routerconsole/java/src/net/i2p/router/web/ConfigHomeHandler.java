@@ -58,18 +58,21 @@ public class ConfigHomeHandler extends FormHandler {
             else
                 apps = HomeHelper.buildApps(_context, config);
             if (adding) {
-                String name = getJettyString("name");
+                String name = getJettyString("nofilter_name");
                 if (name == null || name.length() <= 0) {
                     addFormError(_("No name entered"));
                     return;
                 }
-                String url = getJettyString("url");
+                String url = getJettyString("nofilter_url");
                 if (url == null || url.length() <= 0) {
                     addFormError(_("No URL entered"));
                     return;
                 }
-                name = DataHelper.escapeHTML(name).replace(",", "&#44;");   // HomeHelper.S
-                url = DataHelper.escapeHTML(url).replace(",", "&#44;");
+                // these would get double-escaped so we can't do it this way...
+                //name = DataHelper.escapeHTML(name).replace(",", "&#44;");
+                //url = DataHelper.escapeHTML(url).replace(",", "&#44;");
+                name = name.replace(",", ".");
+                url = url.replace(",", "."); // fail
                 HomeHelper.App app = null;
                 if ("1".equals(group))
                     app = new HomeHelper.App(name, "", url, "/themes/console/images/eepsite.png");

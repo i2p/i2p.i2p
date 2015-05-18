@@ -131,7 +131,7 @@ public class BatchedFragmentTest extends FragmentTest {
      */
     public void runBatches() {
         //success += testBatched(1, false, false, 1024, false, false);
-        // this takes a long fucking time
+        // this takes a long long time
         for (int i = 1; i <= 1024; i++) {
             testBatched(i, false, false, 1024, false, false, 1024, false, false);
             testBatched(i, true, false, 1024, false, false, 1024, false, false);

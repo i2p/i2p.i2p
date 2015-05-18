@@ -89,8 +89,8 @@ public class GarlicClove extends DataStructureImpl {
      */
     public int readBytes(byte source[], int offset) throws DataFormatException {
         int cur = offset;
-        _instructions = new DeliveryInstructions();
-        cur += _instructions.readBytes(source, cur);
+        _instructions = DeliveryInstructions.create(source, offset);
+        cur += _instructions.getSize();
         //if (_log.shouldLog(Log.DEBUG))
         //    _log.debug("Read instructions: " + _instructions);
         try {

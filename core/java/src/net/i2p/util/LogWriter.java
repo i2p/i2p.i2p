@@ -74,6 +74,9 @@ class LogWriter extends LogWriterBase {
         }
     }
 
+    /**
+     *  @since 0.9.19
+     */
     protected void flushWriter() {
         try {
             if (_currentOut != null)
@@ -84,6 +87,9 @@ class LogWriter extends LogWriterBase {
         }
     }
 
+    /**
+     *  @since 0.9.19 renamed from closeFile()
+     */
     protected void closeWriter() {
         Writer out = _currentOut;
         if (out != null) {

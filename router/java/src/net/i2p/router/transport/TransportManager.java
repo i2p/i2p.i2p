@@ -28,7 +28,7 @@ import net.i2p.data.router.RouterAddress;
 import net.i2p.data.router.RouterIdentity;
 import net.i2p.data.router.RouterInfo;
 import net.i2p.data.i2np.I2NPMessage;
-import net.i2p.router.CommSystemFacade;
+import net.i2p.router.CommSystemFacade.Status;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
 import static net.i2p.router.transport.Transport.AddressSource.*;
@@ -60,6 +60,8 @@ public class TransportManager implements TransportEventListener {
     public final static String PROP_ENABLE_NTCP = "i2np.ntcp.enable";
     /** default true */
     public final static String PROP_ENABLE_UPNP = "i2np.upnp.enable";
+
+    private static final String PROP_ADVANCED = "routerconsole.advanced";
     
     /** not forever, since they may update */
     private static final long SIGTYPE_BANLIST_DURATION = 36*60*60*1000L;
@@ -193,7 +195,8 @@ public class TransportManager implements TransportEventListener {
 
     /**
      * Initialize from interfaces, and callback from UPnP or SSU.
-     * Tell all transports... but don't loop
+     * See CSFI.notifyReplaceAddress().
+     * Tell all transports... but don't loop.
      *
      */
     public void externalAddressReceived(Transport.AddressSource source, byte[] ip, int port) {
@@ -201,6 +204,21 @@ public class TransportManager implements TransportEventListener {
             // don't loop
             if (!(source == SOURCE_SSU && t.getStyle().equals(UDPTransport.STYLE)))
                 t.externalAddressReceived(source, ip, port);
+        }
+    }
+
+    /**
+     *  Remove all ipv4 or ipv6 addresses.
+     *  See CSFI.notifyRemoveAddress().
+     *  Tell all transports... but don't loop.
+     *
+     *  @since 0.9.20
+     */
+    public void externalAddressRemoved(Transport.AddressSource source, boolean ipv6) {
+        for (Transport t : _transports.values()) {
+            // don't loop
+            if (!(source == SOURCE_SSU && t.getStyle().equals(UDPTransport.STYLE)))
+                t.externalAddressRemoved(source, ipv6);
         }
     }
 
@@ -286,6 +304,10 @@ public class TransportManager implements TransportEventListener {
     
     int getTransportCount() { return _transports.size(); }
     
+    /**
+     *  How many peers are we currently connected to, that we have
+     *  sent a message to or received a message from in the last five minutes.
+     */
     public int countActivePeers() { 
         int peers = 0;
         for (Transport t : _transports.values()) {
@@ -294,6 +316,11 @@ public class TransportManager implements TransportEventListener {
         return peers;
     }
     
+    /**
+     *  How many peers are we currently connected to, that we have
+     *  sent a message to in the last minute.
+     *  Unused for anything, to be removed.
+     */
     public int countActiveSendPeers() { 
         int peers = 0;
         for (Transport t : _transports.values()) {
@@ -348,6 +375,7 @@ public class TransportManager implements TransportEventListener {
     /**
      * Return our peer clock skews on all transports.
      * Vector composed of Long, each element representing a peer skew in seconds.
+     * A positive number means our clock is ahead of theirs.
      * Note: this method returns them in whimsical order.
      */
     public Vector<Long> getClockSkews() {
@@ -362,12 +390,15 @@ public class TransportManager implements TransportEventListener {
         return skews;
     }
     
-    /** @return the best status of any transport */
-    public short getReachabilityStatus() { 
-        short rv = CommSystemFacade.STATUS_UNKNOWN;
+    /**
+     *  Previously returned short, now enum as of 0.9.20
+     *  @return the best status of any transport
+     */
+    public Status getReachabilityStatus() { 
+        Status rv = Status.UNKNOWN;
         for (Transport t : _transports.values()) {
-            short s = t.getReachabilityStatus();
-            if (s < rv)
+            Status s = t.getReachabilityStatus();
+            if (s.getCode() < rv.getCode())
                 rv = s;
         }
         return rv;
@@ -638,6 +669,13 @@ public class TransportManager implements TransportEventListener {
      *  will take many seconds if it has vanished.
      */
     public void renderStatusHTML(Writer out, String urlBase, int sortFlags) throws IOException {
+        if (_context.getBooleanProperty(PROP_ADVANCED)) {
+            out.write("<p><b>");
+            out.write(_("Status"));
+            out.write(": ");
+            out.write(_(getReachabilityStatus().toStatusString()));
+            out.write("</b></p>");
+        }
         TreeMap<String, Transport> transports = new TreeMap<String, Transport>();
         for (Transport t : _transports.values()) {
             transports.put(t.getStyle(), t);

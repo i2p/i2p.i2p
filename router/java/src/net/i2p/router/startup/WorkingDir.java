@@ -322,6 +322,8 @@ public class WorkingDir {
                 out.println(s);
             }
             System.err.println("Copied " + oldFile + " with modifications");
+            if (out.checkError())
+                throw new IOException("Failed write to " + newFile);
             return true;
         } catch (IOException ioe) {
             if (in != null) {

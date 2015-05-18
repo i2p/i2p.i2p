@@ -124,6 +124,81 @@ public class SimpleTimer2 {
     private ScheduledFuture schedule(TimedEvent t, long timeoutMs) {
         return _executor.schedule(t, timeoutMs, TimeUnit.MILLISECONDS);
     }
+    
+    /**
+     * Queue up the given event to be fired no sooner than timeoutMs from now.
+     *
+     * For transition from SimpleScheduler. Uncancellable.
+     * New code should use SimpleTimer2.TimedEvent.
+     *
+     * @param event to be run once
+     * @param timeoutMs run after this delay
+     * @since 0.9.20
+     */
+    public void addEvent(final SimpleTimer.TimedEvent event, final long timeoutMs) {
+        if (event == null)
+            throw new IllegalArgumentException("addEvent null");
+
+        new TimedEvent(this, timeoutMs) {
+            @Override
+            public void timeReached() {
+                event.timeReached();
+            }
+
+            @Override
+            public String toString() {
+                return event.toString();
+            }
+        };
+    }
+    
+    /**
+     * Schedule periodic event
+     *
+     * The TimedEvent must not do its own rescheduling.
+     * As all Exceptions are caught in run(), these will not prevent
+     * subsequent executions (unlike SimpleTimer, where the TimedEvent does
+     * its own rescheduling).
+     * 
+     * For transition from SimpleScheduler. Uncancellable.
+     * New code should use SimpleTimer2.TimedEvent.
+     * 
+     * @since 0.9.20
+     * @param timeoutMs run first and subsequent iterations of this event every timeoutMs ms
+     */
+    public void addPeriodicEvent(final SimpleTimer.TimedEvent event, final long timeoutMs) {
+        addPeriodicEvent(event, timeoutMs, timeoutMs);
+    }
+    
+    /**
+     * Schedule periodic event
+     * 
+     * The TimedEvent must not do its own rescheduling.
+     * As all Exceptions are caught in run(), these will not prevent
+     * subsequent executions (unlike SimpleTimer, where the TimedEvent does
+     * its own rescheduling).
+     * 
+     * For transition from SimpleScheduler. Uncancellable.
+     * New code should use SimpleTimer2.TimedEvent.
+     * 
+     * @since 0.9.20
+     * @param delay run the first iteration of this event after delay ms
+     * @param timeoutMs run subsequent iterations of this event every timeoutMs ms
+     */
+    public void addPeriodicEvent(final SimpleTimer.TimedEvent event, final long delay,  final long timeoutMs) {
+        
+        new PeriodicTimedEvent(this, delay, timeoutMs) {
+            @Override
+            public void timeReached() {
+                event.timeReached();
+            }
+
+            @Override
+            public String toString() {
+                return event.toString();
+            }
+        };        
+    }
 
     /** 
      * state of a given TimedEvent
@@ -140,6 +215,7 @@ public class SimpleTimer2 {
         RUNNING,
         CANCELLED
     };
+    
     
     /**
      * Similar to SimpleTimer.TimedEvent but users must extend instead of implement,
@@ -228,7 +304,6 @@ public class SimpleTimer2 {
                 break;
               case SCHEDULED: // nothing
             }
-            
         }
 
         /**
@@ -402,6 +477,31 @@ public class SimpleTimer2 {
             " Active: " + _executor.getActiveCount() + '/' + _executor.getPoolSize() +
             " Completed: " + _executor.getCompletedTaskCount() +
             " Queued: " + _executor.getQueue().size();
+    }
+    
+    /**
+     * For transition from SimpleScheduler.
+     * @since 0.9.20
+     */
+    private static abstract class PeriodicTimedEvent extends TimedEvent {
+        private long _timeoutMs;
+        
+        /**
+         * Schedule periodic event
+         * 
+         * @param delay run the first iteration of this event after delay ms
+         * @param timeoutMs run subsequent iterations of this event every timeoutMs ms
+         */
+        public PeriodicTimedEvent(SimpleTimer2 pool, long delay, long timeoutMs) {
+            super(pool, delay);
+            _timeoutMs = timeoutMs;
+        }
+        
+        @Override
+        public void run() {
+            super.run();
+            schedule(_timeoutMs);
+        }
     }
 }
 

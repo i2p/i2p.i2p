@@ -17,7 +17,7 @@ import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
 import net.i2p.data.router.RouterAddress;
 import net.i2p.data.router.RouterInfo;
-import net.i2p.router.CommSystemFacade;
+import net.i2p.router.CommSystemFacade.Status;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.router.RouterVersion;
@@ -154,34 +154,51 @@ public class SummaryHelper extends HelperBase {
         if (routerInfo == null)
             return _("Testing");
 
-        int status = _context.commSystem().getReachabilityStatus();
+        Status status = _context.commSystem().getStatus();
         switch (status) {
-            case CommSystemFacade.STATUS_OK:
+            case OK:
+            case IPV4_OK_IPV6_UNKNOWN:
+            case IPV4_OK_IPV6_FIREWALLED:
+            case IPV4_UNKNOWN_IPV6_OK:
+            case IPV4_DISABLED_IPV6_OK:
+            case IPV4_SNAT_IPV6_OK:
                 RouterAddress ra = routerInfo.getTargetAddress("NTCP");
                 if (ra == null)
-                    return _("OK");
+                    return _(status.toStatusString());
                 byte[] ip = ra.getIP();
                 if (ip == null)
                     return _("ERR-Unresolved TCP Address");
                 // TODO set IPv6 arg based on configuration?
                 if (TransportUtil.isPubliclyRoutable(ip, true))
-                    return _("OK");
+                    return _(status.toStatusString());
                 return _("ERR-Private TCP Address");
-            case CommSystemFacade.STATUS_DIFFERENT:
+
+            case IPV4_SNAT_IPV6_UNKNOWN:
+            case DIFFERENT:
                 return _("ERR-SymmetricNAT");
-            case CommSystemFacade.STATUS_REJECT_UNSOLICITED:
+
+            case REJECT_UNSOLICITED:
+            case IPV4_DISABLED_IPV6_FIREWALLED:
                 if (routerInfo.getTargetAddress("NTCP") != null)
                     return _("WARN-Firewalled with Inbound TCP Enabled");
+                // fall through...
+            case IPV4_FIREWALLED_IPV6_OK:
+            case IPV4_FIREWALLED_IPV6_UNKNOWN:
                 if (((FloodfillNetworkDatabaseFacade)_context.netDb()).floodfillEnabled())
                     return _("WARN-Firewalled and Floodfill");
                 //if (_context.router().getRouterInfo().getCapabilities().indexOf('O') >= 0)
                 //    return _("WARN-Firewalled and Fast");
-                return _("Firewalled");
-            case CommSystemFacade.STATUS_DISCONNECTED:
+                return _(status.toStatusString());
+
+            case DISCONNECTED:
                 return _("Disconnected - check network cable");
-            case CommSystemFacade.STATUS_HOSED:
+
+            case HOSED:
                 return _("ERR-UDP Port In Use - Set i2np.udp.internalPort=xxxx in advanced config and restart");
-            case CommSystemFacade.STATUS_UNKNOWN: // fallthrough
+
+            case UNKNOWN:
+            case IPV4_UNKNOWN_IPV6_FIREWALLED:
+            case IPV4_DISABLED_IPV6_UNKNOWN:
             default:
                 ra = routerInfo.getTargetAddress("SSU");
                 if (ra == null && _context.router().getUptime() > 5*60*1000) {
@@ -193,7 +210,7 @@ public class SummaryHelper extends HelperBase {
                     else
                         return _("WARN-Firewalled with UDP Disabled");
                 }
-                return _("Testing");
+                return _(status.toStatusString());
         }
     }
     
@@ -640,20 +657,31 @@ public class SummaryHelper extends HelperBase {
     }
 ********/
 
-    private boolean updateAvailable() { 
+    private static boolean updateAvailable() { 
         return NewsHelper.isUpdateAvailable();
     }
 
     private boolean unsignedUpdateAvailable() { 
-        return NewsHelper.isUnsignedUpdateAvailable();
+        return NewsHelper.isUnsignedUpdateAvailable(_context);
     }
 
-    private String getUpdateVersion() { 
-        return NewsHelper.updateVersion();
+    /** @since 0.9.20 */
+    private boolean devSU3UpdateAvailable() { 
+        return NewsHelper.isDevSU3UpdateAvailable(_context);
     }
 
-    private String getUnsignedUpdateVersion() { 
+    private static String getUpdateVersion() { 
+        return DataHelper.escapeHTML(NewsHelper.updateVersion());
+    }
+
+    private static String getUnsignedUpdateVersion() { 
+        // value is a formatted date, does not need escaping
         return NewsHelper.unsignedUpdateVersion();
+    }
+
+    /** @since 0.9.20 */
+    private static String getDevSU3UpdateVersion() { 
+        return DataHelper.escapeHTML(NewsHelper.devSU3UpdateVersion());
     }
 
     /**
@@ -670,8 +698,11 @@ public class SummaryHelper extends HelperBase {
             needSpace = true;
         }
         String dver = NewsHelper.updateVersionDownloaded();
-        if (dver == null)
-            dver = NewsHelper.unsignedVersionDownloaded();
+        if (dver == null) {
+            dver = NewsHelper.devSU3VersionDownloaded();
+            if (dver == null)
+                dver = NewsHelper.unsignedVersionDownloaded();
+        }
         if (dver != null &&
             !NewsHelper.isUpdateInProgress() &&
             !_context.router().gracefulShutdownInProgress()) {
@@ -684,11 +715,12 @@ public class SummaryHelper extends HelperBase {
                 buf.append(_("Click Restart to install"));
             else
                 buf.append(_("Click Shutdown and restart to install"));
-            buf.append(' ').append(_("Version {0}", dver));
+            buf.append(' ').append(_("Version {0}", DataHelper.escapeHTML(dver)));
             buf.append("</b></h4>");
         }
         boolean avail = updateAvailable();
         boolean unsignedAvail = unsignedUpdateAvailable();
+        boolean devSU3Avail = devSU3UpdateAvailable();
         String constraint = avail ? NewsHelper.updateConstraint() : null;
         if (avail && constraint != null &&
             !NewsHelper.isUpdateInProgress() &&
@@ -702,7 +734,7 @@ public class SummaryHelper extends HelperBase {
             buf.append(constraint).append("</b></h4>");
             avail = false;
         }
-        if ((avail || unsignedAvail) &&
+        if ((avail || unsignedAvail || devSU3Avail) &&
             !NewsHelper.isUpdateInProgress() &&
             !_context.router().gracefulShutdownInProgress() &&
             _context.portMapper().getPort(PortMapper.SVC_HTTP_PROXY) > 0 &&  // assume using proxy for now
@@ -722,6 +754,14 @@ public class SummaryHelper extends HelperBase {
                     buf.append("<button type=\"submit\" class=\"download\" name=\"updateAction\" value=\"signed\" >")
                        // Note to translators: parameter is a version, e.g. "0.8.4"
                        .append(_("Download {0} Update", getUpdateVersion()))
+                       .append("</button><br>\n");
+                }
+                if (devSU3Avail) {
+                    buf.append("<button type=\"submit\" class=\"download\" name=\"updateAction\" value=\"DevSU3\" >")
+                       // Note to translators: parameter is a router version, e.g. "0.9.19-16"
+                       // <br> is optional, to help the browser make the lines even in the button
+                       // If the translation is shorter than the English, you should probably not include <br>
+                       .append(_("Download Signed<br>Development Update<br>{0}", getDevSU3UpdateVersion()))
                        .append("</button><br>\n");
                 }
                 if (unsignedAvail) {

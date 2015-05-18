@@ -348,6 +348,12 @@ class PersistentDataStore extends TransientDataStore {
         public String getName() { return "DB Read Job"; }
 
         public void runJob() {
+            if (getContext().router().gracefulShutdownInProgress()) {
+                // don't cause more disk I/O while saving,
+                // or start a reseed
+                requeue(READ_DELAY);
+                return;
+            }
             long now = getContext().clock().now();
             // check directory mod time to save a lot of object churn in scanning all the file names
             long lastMod = _dbDir.lastModified();

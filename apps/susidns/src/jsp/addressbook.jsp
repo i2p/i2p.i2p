@@ -178,7 +178,20 @@ ${book.loadBookMessages}
 </div></form>
 </c:if>
 
+<form action="export" method="GET" target="_top">
+<div id="buttons">
+<p class="buttons">
+<input type="hidden" name="book" value="${book.book}">
+<c:if test="${book.search} != null && ${book.search}.length() > 0">
+<input type="hidden" name="search" value="${book.search}">
 </c:if>
+<c:if test="${book.hasFilter}">
+<input type="hidden" name="filter" value="${book.filter}">
+</c:if>
+<input type="submit" class="export" value="<%=intl._("Export in hosts.txt format")%>" />
+</p></div></form>
+
+</c:if><% /* book.notEmpty */ %>
 
 <c:if test="${book.isEmpty}">
 <div id="book">

@@ -82,7 +82,7 @@ class PeerManager {
             _peersByCapability.put(Character.valueOf(Character.toLowerCase(TRACKED_CAPS.charAt(i))), new ConcurrentHashSet<Hash>());
         loadProfilesInBackground();
         ////_context.jobQueue().addJob(new EvaluateProfilesJob(_context));
-        //SimpleScheduler.getInstance().addPeriodicEvent(new Reorg(), 0, REORGANIZE_TIME);
+        //SimpleTimer2.getInstance().addPeriodicEvent(new Reorg(), 0, REORGANIZE_TIME);
         //new Reorg();
         //_context.jobQueue().addJob(new PersistProfilesJob(_context, this));
     }

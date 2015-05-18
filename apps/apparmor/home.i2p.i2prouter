@@ -1,4 +1,4 @@
-# Last Modified: Mon, 16 Feb 2015
+# Last Modified: Sun Apr 12 22:08:32 2015
 # vim:syntax=apparmor et ts=8 sw=4
 
 #include <tunables/global>
@@ -18,20 +18,20 @@ $INSTALL_PATH/{i2prouter,runplain.sh} flags=(complain) {
   owner $INSTALL_PATH/**                                  rwklm,
 
   # Needed for Java
-  @{PROC}                                                 r,
-  @{PROC}/[0-9]*/net/if_inet6                             r,
-  @{PROC}/[0-9]*/net/ipv6_route                           r,
-  @{PROC}/[0-9]*/status                                   r,
-  @{PROC}/[0-9]*/stat                                     r,
-  @{PROC}/[0-9]*/cmdline                                  r,
-  @{PROC}/1/comm                                          r,
+  owner @{PROC}                                           r,
+  owner @{PROC}/[0-9]*/                                   r,
+  owner @{PROC}/[0-9]*/status                             r,
+  owner @{PROC}/[0-9]*/stat                               r,
+  owner @{PROC}/[0-9]*/cmdline                            r,
   @{PROC}/uptime                                          r,
   @{PROC}/sys/kernel/pid_max                              r,
   /sys/devices/system/cpu/                                r,
   /sys/devices/system/cpu/**                              r,
+
   /dev/random                                             r,
   /dev/urandom                                            r,
 
+  @{PROC}/1/comm                                          r,
 
   /etc/ssl/certs/java/**                                  r,
   /etc/timezone                                           r,
@@ -51,16 +51,7 @@ $INSTALL_PATH/{i2prouter,runplain.sh} flags=(complain) {
 
 
   # Fonts are needed for I2P's graphs
-  /etc/fonts/**                                           r,
-  /usr/share/fontconfig/                                  r,
-  /usr/share/fontconfig/**                                r,
-  /usr/share/fonts/                                       r,
-  /usr/share/fonts/**                                     r,
-  /usr/share/fonts/truetype/                              r,
-  /usr/share/fonts/truetype/**                            r,
   /usr/share/java/java-atk-wrapper.jar                    r,
-  /var/cache/fontconfig/                                  r,
-  /var/cache/fontconfig/**                                r,
 
   # Used by some plugins
   /usr/share/java/eclipse-ecj-*.jar                       r,

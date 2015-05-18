@@ -259,8 +259,27 @@ class IntroductionManager {
             stag = String.valueOf(tag);
         }
 
+        @Override
         public int compareTo(Introducer i) {
             return skey.compareTo(i.skey);
+        }
+        
+        @Override
+        public boolean equals(Object o) {
+        	if (o == null) {
+        		return false;
+        	}
+        	if (!(o instanceof Introducer)) {
+        		return false;
+        	}
+        	
+        	Introducer i = (Introducer) o;
+        	return this.compareTo(i) == 0;
+        }
+        
+        @Override
+        public int hashCode() {
+        	return skey.hashCode(); 
         }
     }
 

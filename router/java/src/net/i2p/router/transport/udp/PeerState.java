@@ -574,13 +574,25 @@ class PeerState {
     /**
      *  Update the moving-average clock skew based on the current difference.
      *  The raw skew will be adjusted for RTT/2 here.
+     *  A positive number means our clock is ahead of theirs.
      *  @param skew milliseconds, NOT adjusted for RTT.
-     *              A positive number means our clock is ahead of theirs.
      */
     public void adjustClockSkew(long skew) { 
         // the real one-way delay is much less than RTT / 2, due to ack delays,
         // so add a fudge factor
-        double adj = 0.1 * (skew + CLOCK_SKEW_FUDGE - (_rtt / 2)); 
+        long actualSkew = skew + CLOCK_SKEW_FUDGE - (_rtt / 2); 
+        //_log.error("Skew " + skew + " actualSkew " + actualSkew + " rtt " + _rtt + " pktsRcvd " + _packetsReceived);
+        // First time...
+        // This is important because we need accurate
+        // skews right from the beginning, since the median is taken
+        // and fed to the timestamper. Lots of connections only send a few packets.
+        if (_packetsReceived <= 1) {
+            synchronized(_clockSkewLock) {
+                _clockSkew = actualSkew; 
+            }
+            return;
+        }
+        double adj = 0.1 * actualSkew; 
         synchronized(_clockSkewLock) {
             _clockSkew = (long) (0.9*_clockSkew + adj); 
         }

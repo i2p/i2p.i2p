@@ -309,7 +309,7 @@ class HTTPResponseOutputStream extends FilterOutputStream {
             } catch (OutOfMemoryError oom) {
                 _log.error("OOM in HTTP Decompressor", oom);
             } finally {
-                if (_log.shouldLog(Log.INFO) && (_in != null))
+                if (_log.shouldInfo())
                     _log.info("After decompression, written=" + written + 
                                 " read=" + _in.getTotalRead() 
                                 + ", expanded=" + _in.getTotalExpanded() + ", remaining=" + _in.getRemaining() 
@@ -319,19 +319,20 @@ class HTTPResponseOutputStream extends FilterOutputStream {
                 if (_out != null) try { 
                     _out.close(); 
                 } catch (IOException ioe) {}
+                try { 
+                    _in.close(); 
+                } catch (IOException ioe) {}
             }
 
-            if (_in != null) {
-                double compressed = _in.getTotalRead();
-                double expanded = _in.getTotalExpanded();
-                ReusableGZIPInputStream.release(_in);
-                if (compressed > 0 && expanded > 0) {
-                    // only update the stats if we did something
-                    double ratio = compressed/expanded;
-                    _context.statManager().addRateData("i2ptunnel.httpCompressionRatio", (int)(100d*ratio));
-                    _context.statManager().addRateData("i2ptunnel.httpCompressed", (long)compressed);
-                    _context.statManager().addRateData("i2ptunnel.httpExpanded", (long)expanded);
-                }
+            double compressed = _in.getTotalRead();
+            double expanded = _in.getTotalExpanded();
+            ReusableGZIPInputStream.release(_in);
+            if (compressed > 0 && expanded > 0) {
+                // only update the stats if we did something
+                double ratio = compressed/expanded;
+                _context.statManager().addRateData("i2ptunnel.httpCompressionRatio", (int)(100d*ratio));
+                _context.statManager().addRateData("i2ptunnel.httpCompressed", (long)compressed);
+                _context.statManager().addRateData("i2ptunnel.httpExpanded", (long)expanded);
             }
         }
     }

@@ -51,11 +51,13 @@ public class NewsHelper extends ContentHelper {
         return mgr.isUpdateInProgress(ROUTER_SIGNED) ||
                mgr.isUpdateInProgress(ROUTER_SIGNED_SU3) ||
                mgr.isUpdateInProgress(ROUTER_UNSIGNED) ||
+               mgr.isUpdateInProgress(ROUTER_DEV_SU3) ||
                mgr.isUpdateInProgress(TYPE_DUMMY);
     }
 
     /**
-     *  Will be false if already downloaded
+     *  Release update only.
+     *  Will be false if already downloaded.
      *  @since 0.9.4 moved from NewsFetcher
      */
     public static boolean isUpdateAvailable() {
@@ -66,7 +68,8 @@ public class NewsHelper extends ContentHelper {
     }
 
     /**
-     *  Available version, will be null if already downloaded
+     *  Release update only.
+     *  Available version, will be null if already downloaded.
      *  @return null if none
      *  @since 0.9.4 moved from NewsFetcher
      */
@@ -80,6 +83,7 @@ public class NewsHelper extends ContentHelper {
     }
 
     /**
+     *  Release update only.
      *  Translated message about new version available but constrained
      *  @return null if none
      *  @since 0.9.9
@@ -91,7 +95,8 @@ public class NewsHelper extends ContentHelper {
     }
 
     /**
-     *  Already downloaded but not installed version
+     *  Release update only.
+     *  Already downloaded but not installed version.
      *  @return null if none
      *  @since 0.9.4
      */
@@ -105,13 +110,14 @@ public class NewsHelper extends ContentHelper {
     }
 
     /**
-     *  Will be false if already downloaded
+     *  Will be false if already downloaded or if dev update disabled.
      *  @since 0.9.4 moved from NewsFetcher
      */
-    public static boolean isUnsignedUpdateAvailable() {
+    public static boolean isUnsignedUpdateAvailable(RouterContext ctx) {
         ConsoleUpdateManager mgr = ConsoleUpdateManager.getInstance();
         if (mgr == null) return false;
-        return mgr.getUpdateAvailable(ROUTER_UNSIGNED) != null;
+        return mgr.getUpdateAvailable(ROUTER_UNSIGNED) != null &&
+               ctx.getBooleanProperty(ConfigUpdateHandler.PROP_UPDATE_UNSIGNED);
     }
 
     /**
@@ -133,6 +139,38 @@ public class NewsHelper extends ContentHelper {
         ConsoleUpdateManager mgr = ConsoleUpdateManager.getInstance();
         if (mgr == null) return null;
         return formatUnsignedVersion(mgr.getUpdateDownloaded(ROUTER_UNSIGNED));
+    }
+
+    /**
+     *  Will be false if already downloaded or if dev update disabled.
+     *  @since 0.9.20
+     */
+    public static boolean isDevSU3UpdateAvailable(RouterContext ctx) {
+        ConsoleUpdateManager mgr = ConsoleUpdateManager.getInstance();
+        if (mgr == null) return false;
+        return mgr.getUpdateAvailable(ROUTER_DEV_SU3) != null &&
+               ctx.getBooleanProperty(ConfigUpdateHandler.PROP_UPDATE_DEV_SU3);
+    }
+
+    /**
+     *  @return null if none
+     *  @since 0.9.20
+     */
+    public static String devSU3UpdateVersion() {
+        ConsoleUpdateManager mgr = ConsoleUpdateManager.getInstance();
+        if (mgr == null) return null;
+        return mgr.getUpdateAvailable(ROUTER_DEV_SU3);
+    }
+
+    /**
+     *  Already downloaded but not installed version
+     *  @return null if none
+     *  @since 0.9.20
+     */
+    public static String devSU3VersionDownloaded() {
+        ConsoleUpdateManager mgr = ConsoleUpdateManager.getInstance();
+        if (mgr == null) return null;
+        return mgr.getUpdateDownloaded(ROUTER_DEV_SU3);
     }
 
     /**

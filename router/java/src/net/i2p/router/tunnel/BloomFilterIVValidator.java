@@ -40,7 +40,7 @@ class BloomFilterIVValidator implements IVValidator {
     private static final String PROP_DISABLE = "router.disableDecayingBloomFilter";
 
     /**
-     *  @param Kbps share bandwidth
+     *  @param KBps share bandwidth
      */
     public BloomFilterIVValidator(RouterContext ctx, int KBps) {
         _context = ctx;

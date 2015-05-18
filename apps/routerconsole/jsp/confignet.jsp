@@ -51,6 +51,10 @@
     <%=intl._("Laptop mode - Change router identity and UDP port when IP changes for enhanced anonymity")%>
     (<i><%=intl._("Experimental")%></i>)
  </p><p>
+ <%=intl._("IPv4 Configuration")%>:<br>
+    <input type="checkbox" class="optbox" name="IPv4Firewalled" value="true" <jsp:getProperty name="nethelper" property="IPv4FirewalledChecked" /> >
+    <%=intl._("Disable inbound (Firewalled by Carrier-grade NAT or DS-Lite)")%>
+ </p><p>
  <%=intl._("IPv6 Configuration")%>:<br>
     <input type="radio" class="optbox" name="ipv6" value="false" <%=nethelper.getIPv6Checked("false") %> >
     <%=intl._("Disable IPv6")%><br>

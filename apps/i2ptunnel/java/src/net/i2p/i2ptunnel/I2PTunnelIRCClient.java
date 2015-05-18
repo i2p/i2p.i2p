@@ -41,6 +41,9 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase {
     public static final String PROP_DCC = "i2ptunnel.ircclient.enableDCC";
 
     /**
+     *  As of 0.9.20 this is fast, and does NOT connect the manager to the router,
+     *  or open the local socket. You MUST call startRunning() for that.
+     *
      * @param destinations peers we target, comma- or space-separated. Since 0.9.9, each dest may be appended with :port
      * @throws IllegalArgumentException if the I2PTunnel does not contain
      *                                  valid config to contact the router
@@ -80,8 +83,6 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase {
 
         _dccEnabled = Boolean.parseBoolean(tunnel.getClientOptions().getProperty(PROP_DCC));
         // TODO add some prudent tunnel options (or is it too late?)
-
-        startRunning();
 
         notifyEvent("openIRCClientResult", "ok");
     }
@@ -197,7 +198,8 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase {
     @Override
     public void startRunning() {
         super.startRunning();
-        _context.portMapper().register(PortMapper.SVC_IRC, getLocalPort());
+        if (open)
+            _context.portMapper().register(PortMapper.SVC_IRC, getLocalPort());
     }
 
     @Override

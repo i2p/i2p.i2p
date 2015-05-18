@@ -91,6 +91,8 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
             "HTTP/1.1 403 Access Denied\r\n" +
             "Content-Type: text/html; charset=iso-8859-1\r\n" +
             "Cache-control: no-cache\r\n" +
+            "Connection: close\r\n"+
+            "Proxy-Connection: close\r\n"+
             "\r\n" +
             "<html><body><H1>I2P ERROR: REQUEST DENIED</H1>" +
             "You attempted to connect to a non-I2P website or location.<BR>";
@@ -112,6 +114,8 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
             "HTTP/1.1 503 Service Unavailable\r\n" +
             "Content-Type: text/html; charset=iso-8859-1\r\n" +
             "Cache-control: no-cache\r\n" +
+            "Connection: close\r\n"+
+            "Proxy-Connection: close\r\n"+
             "\r\n" +
             "<html><body><H1>I2P ERROR: No outproxy found</H1>" +
             "Your request was for a site outside of I2P, but you have no " +
@@ -121,6 +125,8 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
             "HTTP/1.1 409 Conflict\r\n" +
             "Content-Type: text/html; charset=iso-8859-1\r\n" +
             "Cache-control: no-cache\r\n" +
+            "Connection: close\r\n"+
+            "Proxy-Connection: close\r\n"+
             "\r\n" +
             "<html><body><H1>I2P ERROR: Destination key conflict</H1>" +
             "The addresshelper link you followed specifies a different destination key " +
@@ -136,6 +142,8 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
             "HTTP/1.1 404 Not Found\r\n" +
             "Content-Type: text/html; charset=iso-8859-1\r\n" +
             "Cache-control: no-cache\r\n" +
+            "Connection: close\r\n"+
+            "Proxy-Connection: close\r\n"+
             "\r\n" +
             "<html><body><H1>I2P ERROR: Helper key not resolvable.</H1>" +
             "The helper key you put for i2paddresshelper= is not resolvable. " +
@@ -146,6 +154,8 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
             "HTTP/1.1 409 New Address\r\n" +
             "Content-Type: text/html; charset=iso-8859-1\r\n" +
             "Cache-control: no-cache\r\n" +
+            "Connection: close\r\n"+
+            "Proxy-Connection: close\r\n"+
             "\r\n" +
             "<html><body><H1>New Host Name with Address Helper</H1>" +
             "The address helper link you followed is for a new host name that is not in your address book. " +
@@ -157,6 +167,8 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
             "HTTP/1.1 403 Bad Protocol\r\n" +
             "Content-Type: text/html; charset=iso-8859-1\r\n" +
             "Cache-control: no-cache\r\n" +
+            "Connection: close\r\n"+
+            "Proxy-Connection: close\r\n"+
             "\r\n" +
             "<html><body><H1>I2P ERROR: NON-HTTP PROTOCOL</H1>" +
             "The request uses a bad protocol. " +
@@ -166,6 +178,8 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
             "HTTP/1.1 403 Bad URI\r\n" +
             "Content-Type: text/html; charset=iso-8859-1\r\n" +
             "Cache-control: no-cache\r\n" +
+            "Connection: close\r\n"+
+            "Proxy-Connection: close\r\n"+
             "\r\n" +
             "<html><body><H1>I2P ERROR: INVALID REQUEST URI</H1>" +
             "The request URI is invalid, and probably contains illegal characters. " +
@@ -175,6 +189,8 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
             "HTTP/1.1 403 Access Denied\r\n" +
             "Content-Type: text/html; charset=iso-8859-1\r\n" +
             "Cache-control: no-cache\r\n" +
+            "Connection: close\r\n"+
+            "Proxy-Connection: close\r\n"+
             "\r\n" +
             "<html><body><H1>I2P ERROR: REQUEST DENIED</H1>" +
             "Your browser is misconfigured. Do not use the proxy to access the router console or other localhost destinations.<BR>";
@@ -183,6 +199,8 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
             "HTTP/1.1 403 SSL Rejected\r\n" +
             "Content-Type: text/html; charset=iso-8859-1\r\n" +
             "Cache-control: no-cache\r\n" +
+            "Connection: close\r\n"+
+            "Proxy-Connection: close\r\n"+
             "\r\n" +
             "<html><body><H1>I2P ERROR: SSL to I2P address rejected</H1>" +
             "SSL for to .i2p addresses denied by configuration." +
@@ -192,6 +210,9 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
      *  This constructor always starts the tunnel (ignoring the i2cp.delayOpen option).
      *  It is used to add a client to an existing socket manager.
      *
+     *  As of 0.9.20 this is fast, and does NOT connect the manager to the router,
+     *  or open the local socket. You MUST call startRunning() for that.
+     *
      *  @param sockMgr the existing socket manager
      */
     public I2PTunnelHTTPClient(int localPort, Logging l, I2PSocketManager sockMgr, I2PTunnel tunnel, EventDispatcher notifyThis, long clientId) {
@@ -200,12 +221,13 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
         // proxyList = new ArrayList();
 
         setName("HTTP Proxy on " + getTunnel().listenHost + ':' + localPort);
-        startRunning();
-
         notifyEvent("openHTTPClientResult", "ok");
     }
 
     /**
+     *  As of 0.9.20 this is fast, and does NOT connect the manager to the router,
+     *  or open the local socket. You MUST call startRunning() for that.
+     *
      * @throws IllegalArgumentException if the I2PTunnel does not contain
      *                                  valid config to contact the router
      */
@@ -216,10 +238,6 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
         _proxyNonce = Long.toString(_context.random().nextLong());
 
         //proxyList = new ArrayList(); // We won't use outside of i2p
-        if(waitEventValue("openBaseClientResult").equals("error")) {
-            notifyEvent("openHTTPClientResult", "error");
-            return;
-        }
 
         if(wwwProxy != null) {
             StringTokenizer tok = new StringTokenizer(wwwProxy, ", ");
@@ -229,9 +247,6 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
         }
 
         setName("HTTP Proxy on " + tunnel.listenHost + ':' + localPort);
-
-        startRunning();
-
         notifyEvent("openHTTPClientResult", "ok");
     }
 
@@ -296,9 +311,13 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
         _context.statManager().createRateStat("i2ptunnel.httpCompressed", "compressed size transferred", "I2PTunnel", new long[] { 60*60*1000 });
         _context.statManager().createRateStat("i2ptunnel.httpExpanded", "size transferred after expansion", "I2PTunnel", new long[] { 60*60*1000 });
         super.startRunning();
-        this.isr = new InternalSocketRunner(this);
-        this.isr.start();
-        _context.portMapper().register(PortMapper.SVC_HTTP_PROXY, getLocalPort());
+        if (open) {
+            this.isr = new InternalSocketRunner(this);
+            this.isr.start();
+            int port = getLocalPort();
+            _context.portMapper().register(PortMapper.SVC_HTTP_PROXY, port);
+            _context.portMapper().register(PortMapper.SVC_HTTPS_PROXY, port);
+        }
     }
 
     /**
@@ -306,9 +325,14 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
      */
     @Override
     public boolean close(boolean forced) {
+        int port = getLocalPort();
         int reg = _context.portMapper().getPort(PortMapper.SVC_HTTP_PROXY);
-        if(reg == getLocalPort()) {
+        if (reg == port) {
             _context.portMapper().unregister(PortMapper.SVC_HTTP_PROXY);
+        }
+        reg = _context.portMapper().getPort(PortMapper.SVC_HTTPS_PROXY);
+        if (reg == port) {
+            _context.portMapper().unregister(PortMapper.SVC_HTTPS_PROXY);
         }
         boolean rv = super.close(forced);
         if(this.isr != null) {
@@ -611,6 +635,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                                                            _("i2paddresshelper cannot help you with a destination like that!") +
                                                            "</p>").getBytes("UTF-8"));
                                                 writeFooter(out);
+                                                reader.drain();
                                                 // XXX: should closeSocket(s) be in a finally block?
                                             } catch (IOException ioe) {
                                                 // ignore
@@ -725,7 +750,6 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                             out.write(getErrorPage("localhost", ERR_LOCALHOST).getBytes("UTF-8"));
                             writeFooter(out);
                             reader.drain();
-                            s.close();
                         } catch (IOException ioe) {
                             // ignore
                         } finally {
@@ -1153,6 +1177,8 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                 try {
                     out.write(("HTTP/1.1 301 Address Helper Accepted\r\n" +
                         "Location: " + uri + "\r\n" +
+                        "Connection: close\r\n"+
+                        "Proxy-Connection: close\r\n"+
                         "\r\n").getBytes("UTF-8"));
                 } catch (IOException ioe) {
                     // ignore
@@ -1378,6 +1404,8 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
     private final static String ERR_HELPER_DISABLED =
             "HTTP/1.1 403 Disabled\r\n" +
             "Content-Type: text/plain\r\n" +
+            "Connection: close\r\n"+
+            "Proxy-Connection: close\r\n"+
             "\r\n" +
             "Address helpers disabled";
 

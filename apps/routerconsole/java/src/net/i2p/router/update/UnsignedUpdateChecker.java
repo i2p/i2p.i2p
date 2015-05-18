@@ -8,6 +8,7 @@ import net.i2p.router.util.RFC822Date;
 import net.i2p.router.web.ConfigUpdateHandler;
 import net.i2p.update.*;
 import net.i2p.util.EepHead;
+import net.i2p.util.PortMapper;
 
 /**
  *  Does a simple EepHead to get the last-modified header.
@@ -21,8 +22,6 @@ class UnsignedUpdateChecker extends UpdateRunner {
     private final long _ms;
     private boolean _unsignedUpdateAvailable;
 
-    protected static final String SIGNED_UPDATE_FILE = "i2pupdate.sud";
-
     public UnsignedUpdateChecker(RouterContext ctx, ConsoleUpdateManager mgr,
                                  List<URI> uris, long lastUpdateTime) { 
         super(ctx, mgr, UpdateType.ROUTER_UNSIGNED, uris);
@@ -35,6 +34,8 @@ class UnsignedUpdateChecker extends UpdateRunner {
         boolean success = false;
         try {
             success = fetchUnsignedHead();
+        } catch (Throwable t) {
+            _mgr.notifyTaskFailed(this, "", t);
         } finally {
             _mgr.notifyCheckComplete(this, _unsignedUpdateAvailable, success);
             _isRunning = false;
@@ -55,7 +56,17 @@ class UnsignedUpdateChecker extends UpdateRunner {
         //boolean shouldProxy = Boolean.valueOf(_context.getProperty(ConfigUpdateHandler.PROP_SHOULD_PROXY, ConfigUpdateHandler.DEFAULT_SHOULD_PROXY)).booleanValue();
         String proxyHost = _context.getProperty(ConfigUpdateHandler.PROP_PROXY_HOST, ConfigUpdateHandler.DEFAULT_PROXY_HOST);
         int proxyPort = _context.getProperty(ConfigUpdateHandler.PROP_PROXY_PORT, ConfigUpdateHandler.DEFAULT_PROXY_PORT_INT);
+        if (proxyPort == ConfigUpdateHandler.DEFAULT_PROXY_PORT_INT &&
+            proxyHost.equals(ConfigUpdateHandler.DEFAULT_PROXY_HOST) &&
+            _context.portMapper().getPort(PortMapper.SVC_HTTP_PROXY) < 0) {
+            String msg = _("HTTP client proxy tunnel must be running");
+            if (_log.shouldWarn())
+                _log.warn(msg);
+            updateStatus("<b>" + msg + "</b>");
+            return false;
+        }
 
+        //updateStatus("<b>" + _("Checking for development build update") + "</b>");
         try {
             EepHead get = new EepHead(_context, proxyHost, proxyPort, 0, url);
             if (get.fetch()) {
@@ -73,7 +84,7 @@ class UnsignedUpdateChecker extends UpdateRunner {
                 return true;
             }
         } catch (Throwable t) {
-            _log.error("Error fetching the unsigned update", t);
+            _log.error("Error fetching the update", t);
         }
         return false;
     }

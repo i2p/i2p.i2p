@@ -95,6 +95,14 @@ public class ConfigUpdateHelper extends HelperBase {
             return "<input type=\"checkbox\" class=\"optbox\" value=\"true\" name=\"updateUnsigned\" >";
     }
     
+    /** @since 0.9.20 */
+    public String getUpdateDevSU3() {
+        if (_context.getBooleanProperty(ConfigUpdateHandler.PROP_UPDATE_DEV_SU3))
+            return "<input type=\"checkbox\" class=\"optbox\" value=\"true\" name=\"updateDevSU3\" checked=\"checked\" >";
+        else
+            return "<input type=\"checkbox\" class=\"optbox\" value=\"true\" name=\"updateDevSU3\" >";
+    }
+    
     private static final long PERIODS[] = new long[] { 12*60*60*1000l, 24*60*60*1000l,
                                                        36*60*60*1000l, 48*60*60*1000l,
                                                        3*24*60*60*1000l, 7*24*60*60*1000l,
@@ -166,6 +174,11 @@ public class ConfigUpdateHelper extends HelperBase {
 
     public String getZipURL() {
         return _context.getProperty(ConfigUpdateHandler.PROP_ZIP_URL, "");
+    }
+
+    /** @since 0.9.20 */
+    public String getDevSU3URL() {
+        return _context.getProperty(ConfigUpdateHandler.PROP_DEV_SU3_URL, "");
     }
 
     public String getNewsStatus() { 

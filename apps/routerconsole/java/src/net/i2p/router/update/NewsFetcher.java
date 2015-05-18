@@ -36,6 +36,7 @@ import static net.i2p.update.UpdateMethod.*;
 import net.i2p.util.EepGet;
 import net.i2p.util.FileUtil;
 import net.i2p.util.Log;
+import net.i2p.util.PortMapper;
 import net.i2p.util.ReusableGZIPInputStream;
 import net.i2p.util.SecureFileOutputStream;
 import net.i2p.util.SSLEepGet;
@@ -72,6 +73,8 @@ class NewsFetcher extends UpdateRunner {
         _isRunning = true;
         try {
             fetchNews();
+        } catch (Throwable t) {
+            _mgr.notifyTaskFailed(this, "", t);
         } finally {
             _mgr.notifyCheckComplete(this, _isNewer, _success);
             _isRunning = false;
@@ -82,6 +85,13 @@ class NewsFetcher extends UpdateRunner {
         boolean shouldProxy = _context.getProperty(ConfigUpdateHandler.PROP_SHOULD_PROXY_NEWS, ConfigUpdateHandler.DEFAULT_SHOULD_PROXY_NEWS);
         String proxyHost = _context.getProperty(ConfigUpdateHandler.PROP_PROXY_HOST, ConfigUpdateHandler.DEFAULT_PROXY_HOST);
         int proxyPort = ConfigUpdateHandler.proxyPort(_context);
+        if (shouldProxy && proxyPort == ConfigUpdateHandler.DEFAULT_PROXY_PORT_INT &&
+            proxyHost.equals(ConfigUpdateHandler.DEFAULT_PROXY_HOST) &&
+            _context.portMapper().getPort(PortMapper.SVC_HTTP_PROXY) < 0) {
+            if (_log.shouldWarn())
+                _log.warn("Cannot fetch news - HTTP client tunnel not running");
+            return;
+        }
 
         for (URI uri : _urls) {
              _currentURI = uri;

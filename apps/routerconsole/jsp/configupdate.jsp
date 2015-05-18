@@ -64,6 +64,10 @@
           <td><textarea cols="60" rows="6" name="updateURL" wrap="off" spellcheck="false"><jsp:getProperty name="updatehelper" property="updateURL" /></textarea></td>
         </tr><tr><td class="mediumtags" align="right"><b><%=intl._("Trusted keys")%>:</b></td>
           <td><textarea cols="60" rows="6" name="trustedKeys" wrap="off" spellcheck="false"><jsp:getProperty name="updatehelper" property="trustedKeys" /></textarea></td></tr>
+        <tr><td id="devSU3build" class="mediumtags" align="right"><b><%=intl._("Update with signed development builds?")%></b></td>
+          <td><jsp:getProperty name="updatehelper" property="updateDevSU3" /></td>
+        </tr><tr><td class="mediumtags" align="right"><b><%=intl._("Signed Build URL")%>:</b></td>
+          <td><input type="text" size="60" name="devSU3URL" value="<jsp:getProperty name="updatehelper" property="devSU3URL" />"></td></tr>
         <tr><td id="unsignedbuild" class="mediumtags" align="right"><b><%=intl._("Update with unsigned development builds?")%></b></td>
           <td><jsp:getProperty name="updatehelper" property="updateUnsigned" /></td>
         </tr><tr><td class="mediumtags" align="right"><b><%=intl._("Unsigned Build URL")%>:</b></td>

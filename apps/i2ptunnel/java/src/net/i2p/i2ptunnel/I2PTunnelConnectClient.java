@@ -63,6 +63,8 @@ public class I2PTunnelConnectClient extends I2PTunnelHTTPClientBase implements R
          "HTTP/1.1 405 Bad Method\r\n"+
          "Content-Type: text/html; charset=iso-8859-1\r\n"+
          "Cache-control: no-cache\r\n"+
+         "Connection: close\r\n"+
+         "Proxy-Connection: close\r\n"+
          "\r\n"+
          "<html><body><H1>I2P ERROR: METHOD NOT ALLOWED</H1>"+
          "The request uses a bad protocol. "+
@@ -72,11 +74,16 @@ public class I2PTunnelConnectClient extends I2PTunnelHTTPClientBase implements R
          "HTTP/1.1 403 Access Denied\r\n"+
          "Content-Type: text/html; charset=iso-8859-1\r\n"+
          "Cache-control: no-cache\r\n"+
+         "Connection: close\r\n"+
+         "Proxy-Connection: close\r\n"+
          "\r\n"+
          "<html><body><H1>I2P ERROR: REQUEST DENIED</H1>"+
          "Your browser is misconfigured. Do not use the proxy to access the router console or other localhost destinations.<BR>";
     
     /**
+     *  As of 0.9.20 this is fast, and does NOT connect the manager to the router,
+     *  or open the local socket. You MUST call startRunning() for that.
+     *
      * @throws IllegalArgumentException if the I2PTunnel does not contain
      *                                  valid config to contact the router
      */
@@ -85,11 +92,6 @@ public class I2PTunnelConnectClient extends I2PTunnelHTTPClientBase implements R
                                I2PTunnel tunnel) throws IllegalArgumentException {
         super(localPort, ownDest, l, notifyThis, "HTTPS Proxy on " + tunnel.listenHost + ':' + localPort, tunnel);
 
-        if (waitEventValue("openBaseClientResult").equals("error")) {
-            notifyEvent("openConnectClientResult", "error");
-            return;
-        }
-
         if (wwwProxy != null) {
             StringTokenizer tok = new StringTokenizer(wwwProxy, ", ");
             while (tok.hasMoreTokens())
@@ -97,8 +99,6 @@ public class I2PTunnelConnectClient extends I2PTunnelHTTPClientBase implements R
         }
 
         setName("HTTPS Proxy on " + tunnel.listenHost + ':' + localPort);
-
-        startRunning();
     }
 
     /** 
@@ -124,7 +124,8 @@ public class I2PTunnelConnectClient extends I2PTunnelHTTPClientBase implements R
     @Override
     public void startRunning() {
         super.startRunning();
-        _context.portMapper().register(PortMapper.SVC_HTTPS_PROXY, getLocalPort());
+        if (open)
+            _context.portMapper().register(PortMapper.SVC_HTTPS_PROXY, getLocalPort());
     }
 
     @Override

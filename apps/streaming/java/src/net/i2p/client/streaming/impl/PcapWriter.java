@@ -272,7 +272,7 @@ public class PcapWriter {
                 // TODO just use a recent high unackedIn count?
                 // following is from ConnectionPacketHandler
                 // this is not interesting, we have lots of buffers
-                long ready = con.getInputStream().getHighestReadyBockId();
+                long ready = con.getInputStream().getHighestReadyBlockId();
                 int available = con.getOptions().getInboundBufferSize() - con.getInputStream().getTotalReadySize();
                 int allowedBlocks = available/con.getOptions().getMaxMessageSize();
                 window = (ready + allowedBlocks) - pkt.getSequenceNum();

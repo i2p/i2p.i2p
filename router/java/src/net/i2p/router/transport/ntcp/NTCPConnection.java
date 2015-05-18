@@ -172,7 +172,7 @@ class NTCPConnection {
     public NTCPConnection(RouterContext ctx, NTCPTransport transport, SocketChannel chan, SelectionKey key) {
         _context = ctx;
         _log = ctx.logManager().getLog(getClass());
-        _created = System.currentTimeMillis();
+        _created = ctx.clock().now();
         _transport = transport;
         _remAddr = null;
         _chan = chan;
@@ -200,7 +200,7 @@ class NTCPConnection {
     public NTCPConnection(RouterContext ctx, NTCPTransport transport, RouterIdentity remotePeer, RouterAddress remAddr) {
         _context = ctx;
         _log = ctx.logManager().getLog(getClass());
-        _created = System.currentTimeMillis();
+        _created = ctx.clock().now();
         _transport = transport;
         _remotePeer = remotePeer;
         _remAddr = remAddr;
@@ -267,7 +267,9 @@ class NTCPConnection {
     public void setRemotePeer(RouterIdentity ident) { _remotePeer = ident; }
 
     /** 
-     * @param clockSkew alice's clock minus bob's clock in seconds (may be negative, obviously, but |val| should
+     * We are Bob.
+     *
+     * @param clockSkew OUR clock minus ALICE's clock in seconds (may be negative, obviously, but |val| should
      *                  be under 1 minute)
      * @param prevWriteEnd exactly 16 bytes, not copied, do not corrupt
      * @param prevReadEnd 16 or more bytes, last 16 bytes copied
@@ -284,7 +286,9 @@ class NTCPConnection {
     }
     
     /** 
-     * @param clockSkew alice's clock minus bob's clock in seconds (may be negative, obviously, but |val| should
+     * We are Bob.
+     *
+     * @param clockSkew OUR clock minus ALICE's clock in seconds (may be negative, obviously, but |val| should
      *                  be under 1 minute)
      * @param prevWriteEnd exactly 16 bytes, not copied, do not corrupt
      * @param prevReadEnd 16 or more bytes, last 16 bytes copied
@@ -298,15 +302,18 @@ class NTCPConnection {
         System.arraycopy(prevReadEnd, prevReadEnd.length - BLOCK_SIZE, _prevReadBlock, 0, BLOCK_SIZE);
         //if (_log.shouldLog(Log.DEBUG))
         //    _log.debug("Inbound established, prevWriteEnd: " + Base64.encode(prevWriteEnd) + " prevReadEnd: " + Base64.encode(prevReadEnd));
-        _establishedOn = System.currentTimeMillis();
+        _establishedOn = _context.clock().now();
         NTCPConnection rv = _transport.inboundEstablished(this);
-        _nextMetaTime = System.currentTimeMillis() + (META_FREQUENCY / 2) + _context.random().nextInt(META_FREQUENCY);
-        _nextInfoTime = System.currentTimeMillis() + (INFO_FREQUENCY / 2) + _context.random().nextInt(INFO_FREQUENCY);
+        _nextMetaTime = _establishedOn + (META_FREQUENCY / 2) + _context.random().nextInt(META_FREQUENCY);
+        _nextInfoTime = _establishedOn + (INFO_FREQUENCY / 2) + _context.random().nextInt(INFO_FREQUENCY);
         _establishState = EstablishState.VERIFIED;
         return rv;
     }
 
-    /** @return seconds */
+    /**
+     * A positive number means our clock is ahead of theirs.
+     *  @return seconds
+     */
     public long getClockSkew() { return _clockSkew; }
 
     /** @return milliseconds */
@@ -314,7 +321,7 @@ class NTCPConnection {
         if (!isEstablished())
             return getTimeSinceCreated();
         else
-            return System.currentTimeMillis()-_establishedOn; 
+            return _context.clock().now() -_establishedOn; 
     }
 
     public long getMessagesSent() { return _messagesWritten.get(); }
@@ -338,13 +345,19 @@ class NTCPConnection {
     }
 
     /** @return milliseconds */
-    public long getTimeSinceSend() { return System.currentTimeMillis()-_lastSendTime; }
+    public long getTimeSinceSend() { return _context.clock().now()-_lastSendTime; }
 
     /** @return milliseconds */
-    public long getTimeSinceReceive() { return System.currentTimeMillis()-_lastReceiveTime; }
+    public long getTimeSinceReceive() { return _context.clock().now()-_lastReceiveTime; }
 
     /** @return milliseconds */
-    public long getTimeSinceCreated() { return System.currentTimeMillis()-_created; }
+    public long getTimeSinceCreated() { return _context.clock().now()-_created; }
+
+    /**
+     *  @return when this connection was created (not established)
+     *  @since 0.9.20
+     */
+    public long getCreated() { return _created; }
 
     /**
      *  workaround for EventPumper
@@ -595,7 +608,9 @@ class NTCPConnection {
 ***********/
     
     /** 
-     * @param clockSkew alice's clock minus bob's clock in seconds (may be negative, obviously, but |val| should
+     * We are Alice.
+     *
+     * @param clockSkew OUR clock minus BOB's clock in seconds (may be negative, obviously, but |val| should
      *                  be under 1 minute)
      * @param prevWriteEnd exactly 16 bytes, not copied, do not corrupt
      * @param prevReadEnd 16 or more bytes, last 16 bytes copied
@@ -610,13 +625,13 @@ class NTCPConnection {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Outbound established, prevWriteEnd: " + Base64.encode(prevWriteEnd) + " prevReadEnd: " + Base64.encode(prevReadEnd));
 
-        _establishedOn = System.currentTimeMillis();
+        _establishedOn = _context.clock().now();
         _establishState = EstablishState.VERIFIED;
         _transport.markReachable(getRemotePeer().calculateHash(), false);
         //_context.banlist().unbanlistRouter(getRemotePeer().calculateHash(), NTCPTransport.STYLE);
         boolean msgs = !_outbound.isEmpty();
-        _nextMetaTime = System.currentTimeMillis() + (META_FREQUENCY / 2) + _context.random().nextInt(META_FREQUENCY);
-        _nextInfoTime = System.currentTimeMillis() + (INFO_FREQUENCY / 2) + _context.random().nextInt(INFO_FREQUENCY);
+        _nextMetaTime = _establishedOn + (META_FREQUENCY / 2) + _context.random().nextInt(META_FREQUENCY);
+        _nextInfoTime = _establishedOn + (INFO_FREQUENCY / 2) + _context.random().nextInt(INFO_FREQUENCY);
         if (msgs)
             _transport.getWriter().wantsWrite(this, "outbound established");
     }
@@ -768,9 +783,10 @@ class NTCPConnection {
             return;
         }
         
-        if (_nextMetaTime <= System.currentTimeMillis()) {
+        long now = _context.clock().now();
+        if (_nextMetaTime <= now) {
             sendMeta();
-            _nextMetaTime = System.currentTimeMillis() + (META_FREQUENCY / 2) + _context.random().nextInt(META_FREQUENCY / 2);
+            _nextMetaTime = now + (META_FREQUENCY / 2) + _context.random().nextInt(META_FREQUENCY / 2);
         }
       
         OutNetMessage msg = null;
@@ -840,10 +856,10 @@ class NTCPConnection {
         // for every 6-12 hours that we are connected to a peer, send them
 	// our updated netDb info (they may not accept it and instead query
 	// the floodfill netDb servers, but they may...)
-        if (_nextInfoTime <= System.currentTimeMillis()) {
+        if (_nextInfoTime <= now) {
             // perhaps this should check to see if we are bw throttled, etc?
             enqueueInfoMessage();
-            _nextInfoTime = System.currentTimeMillis() + (INFO_FREQUENCY / 2) + _context.random().nextInt(INFO_FREQUENCY);
+            _nextInfoTime = now + (INFO_FREQUENCY / 2) + _context.random().nextInt(INFO_FREQUENCY);
         }
     }
     
@@ -944,7 +960,7 @@ class NTCPConnection {
                 EventPumper.releaseBuf(buf);
                 return;
             }
-            _context.statManager().addRateData("ntcp.throttledReadComplete", (System.currentTimeMillis()-req.getRequestTime()));
+            _context.statManager().addRateData("ntcp.throttledReadComplete", (_context.clock().now()-req.getRequestTime()));
             recv(buf);
             // our reads used to be bw throttled (during which time we were no
             // longer interested in reading from the network), but we aren't
@@ -963,7 +979,7 @@ class NTCPConnection {
             removeOBRequest(req);
             ByteBuffer buf = (ByteBuffer)req.attachment();
             if (!_closed.get()) {
-                _context.statManager().addRateData("ntcp.throttledWriteComplete", (System.currentTimeMillis()-req.getRequestTime()));
+                _context.statManager().addRateData("ntcp.throttledWriteComplete", (_context.clock().now()-req.getRequestTime()));
                 write(buf);
             }
         }
@@ -1069,7 +1085,7 @@ class NTCPConnection {
                 }
             }
             if (msg != null) {
-                _lastSendTime = System.currentTimeMillis();
+                _lastSendTime = _context.clock().now();
                 _context.statManager().addRateData("ntcp.sendTime", msg.getSendTime());
                 if (_log.shouldLog(Log.DEBUG)) {
                     _log.debug("I2NP message " + _messagesWritten + "/" + msg.getMessageId() + " sent after " 
@@ -1115,7 +1131,7 @@ class NTCPConnection {
      *  Stats only for console
      */
     private void updateStats() {
-        long now = System.currentTimeMillis();
+        long now = _context.clock().now();
         long time = now - _lastRateUpdated;
         // If enough time has passed...
         // Perhaps should synchronize, but if so do the time check before synching...
@@ -1304,6 +1320,7 @@ class NTCPConnection {
             _context.statManager().addRateData("ntcp.receiveMeta", newSkew);
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Received NTCP metadata, old skew of " + _clockSkew + " s, new skew of " + newSkew + "s.");
+            // FIXME does not account for RTT
             _clockSkew = newSkew;
         }
     }
@@ -1452,7 +1469,7 @@ class NTCPConnection {
                 readMeta(buf);
                 init();
             } else {
-                _stateBegin = System.currentTimeMillis();
+                _stateBegin = _context.clock().now();
                 _dataBuf = acquireReadBuf();
                 System.arraycopy(buf, 2, _dataBuf.getData(), 0, buf.length-2);
                 _nextWrite += buf.length-2;
@@ -1510,7 +1527,7 @@ class NTCPConnection {
                     // So use the new handler method that limits the size.
                     h.readMessage(_dataBuf.getData(), 0, _size);
                     I2NPMessage read = h.lastRead();
-                    long timeToRecv = System.currentTimeMillis() - _stateBegin;
+                    long timeToRecv = _context.clock().now() - _stateBegin;
                     releaseHandler(h);
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("I2NP message " + _messagesRead + "/" + (read != null ? read.getUniqueId() : 0) 
@@ -1523,7 +1540,7 @@ class NTCPConnection {
 
                     if (read != null) {
                         _transport.messageReceived(read, _remotePeer, null, timeToRecv, _size);
-                        _lastReceiveTime = System.currentTimeMillis();
+                        _lastReceiveTime = _context.clock().now();
                         _messagesRead.incrementAndGet();
                     }
                 } catch (I2NPMessageException ime) {

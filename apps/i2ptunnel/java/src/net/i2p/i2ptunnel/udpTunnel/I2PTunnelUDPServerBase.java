@@ -195,6 +195,7 @@ public class I2PTunnelUDPServerBase extends I2PTunnelTask implements Source, Sin
      *  Sink Methods
      *
      * @param to
+     * @throws RuntimeException if session is closed
      *
      */
     public void send(Destination to, byte[] data) {

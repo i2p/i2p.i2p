@@ -79,10 +79,21 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
             _manager.restart();
     }
     
+    /**
+     *  How many peers are we currently connected to, that we have
+     *  sent a message to or received a message from in the last five minutes.
+     */
     @Override
     public int countActivePeers() { return _manager.countActivePeers(); }
+
+    /**
+     *  How many peers are we currently connected to, that we have
+     *  sent a message to in the last minute.
+     *  Unused for anything, to be removed.
+     */
     @Override
     public int countActiveSendPeers() { return _manager.countActiveSendPeers(); } 
+
     @Override
     public boolean haveInboundCapacity(int pct) { return _manager.haveInboundCapacity(pct); } 
     @Override
@@ -94,6 +105,9 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
      * @param percentToInclude 1-100
      * @return Framed average clock skew of connected peers in milliseconds, or the clock offset if we cannot answer.
      * Average is calculated over the middle "percentToInclude" peers.
+     *
+     * A positive number means our clock is ahead of theirs.
+     *
      * Todo: change Vectors to milliseconds
      */
     @Override
@@ -165,13 +179,16 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         return _manager.getMostRecentErrorMessages(); 
     }
 
+    /**
+     *  @since 0.9.20
+     */
     @Override
-    public short getReachabilityStatus() { 
+    public Status getStatus() { 
         if (!_netMonitorStatus)
-            return STATUS_DISCONNECTED;
-        short rv = _manager.getReachabilityStatus(); 
-        if (rv != STATUS_HOSED && _context.router().isHidden())
-            return STATUS_OK;
+            return Status.DISCONNECTED;
+        Status rv = _manager.getReachabilityStatus(); 
+        if (rv != Status.HOSED && _context.router().isHidden())
+            return Status.OK;
         return rv; 
     }
 
@@ -221,7 +238,34 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
             if (udp != null)
                 port = udp.getRequestedPort();
         }
-        _manager.externalAddressReceived(Transport.AddressSource.SOURCE_SSU, ip, port);
+        if (ip != null || port > 0)
+            _manager.externalAddressReceived(Transport.AddressSource.SOURCE_SSU, ip, port);
+        else
+            notifyRemoveAddress(false);
+    }
+
+    /** 
+     *  Tell other transports our address changed
+     *
+     *  @param address non-null; but address's host/IP may be null
+     *  @since 0.9.20
+     */
+    @Override
+    public void notifyRemoveAddress(RouterAddress address) {
+        // just keep this simple for now, multiple v4 or v6 addresses not yet supported
+        notifyRemoveAddress(address != null &&
+                            address.getIP() != null &&
+                            address.getIP().length == 16);
+    }
+
+    /** 
+     *  Tell other transports our address changed
+     *
+     *  @since 0.9.20
+     */
+    @Override
+    public void notifyRemoveAddress(boolean ipv6) {
+        _manager.externalAddressRemoved(Transport.AddressSource.SOURCE_SSU, ipv6);
     }
 
     /**
@@ -278,7 +322,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
     private static final int LOOKUP_TIME = 30*60*1000;
 
     private void startGeoIP() {
-        _context.simpleScheduler().addEvent(new QueueAll(), START_DELAY);
+        _context.simpleTimer2().addEvent(new QueueAll(), START_DELAY);
     }
 
     /**
@@ -296,7 +340,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
                     continue;
                 _geoIP.add(ip);
             }
-            _context.simpleScheduler().addPeriodicEvent(new Lookup(), 5000, LOOKUP_TIME);
+            _context.simpleTimer2().addPeriodicEvent(new Lookup(), 5000, LOOKUP_TIME);
         }
     }
 
@@ -491,7 +535,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
 
     /** @since 0.7.12 */
     private void startTimestamper() {
-        _context.simpleScheduler().addPeriodicEvent(new Timestamper(), TIME_START_DELAY,  TIME_REPEAT_DELAY);
+        _context.simpleTimer2().addPeriodicEvent(new Timestamper(), TIME_START_DELAY,  TIME_REPEAT_DELAY);
     }
 
     /**
@@ -504,7 +548,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         public void timeReached() {
              // use the same % as in RouterClock so that check will never fail
              // This is their our offset w.r.t. them...
-             long peerOffset = getFramedAveragePeerClockSkew(50);
+             long peerOffset = getFramedAveragePeerClockSkew(33);
              if (peerOffset == 0)
                  return;
              long currentOffset = _context.clock().getOffset();

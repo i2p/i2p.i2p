@@ -5,13 +5,14 @@
 # 
 # Translators:
 # testsubject67 <deborinha97@hotmail.com>, 2014
+# blueboy, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-11-19 21:48+0000\n"
-"PO-Revision-Date: 2014-11-19 21:48+0000\n"
-"Last-Translator: kytv <killyourtv@i2pmail.org>\n"
+"POT-Creation-Date: 2015-03-29 14:30+0000\n"
+"PO-Revision-Date: 2015-04-05 13:44+0000\n"
+"Last-Translator: blueboy\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/projects/p/I2P/language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -19,11 +20,11 @@ msgstr ""
 "Language: pt_BR\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: ../java/src/org/klomp/snark/IdleChecker.java:69
+#: ../java/src/org/klomp/snark/IdleChecker.java:75
 msgid "No more torrents running."
 msgstr ""
 
-#: ../java/src/org/klomp/snark/IdleChecker.java:70
+#: ../java/src/org/klomp/snark/IdleChecker.java:76
 #: ../java/src/org/klomp/snark/SnarkManager.java:2283
 #: ../java/src/org/klomp/snark/SnarkManager.java:2294
 msgid "I2P tunnel closed."
@@ -407,7 +408,7 @@ msgstr "Parando todos os torrents e fechando o túnel I2P"
 msgid "Closing I2P tunnel after notifying trackers."
 msgstr ""
 
-#: ../java/src/org/klomp/snark/TrackerClient.java:240
+#: ../java/src/org/klomp/snark/TrackerClient.java:245
 #, java-format
 msgid "No valid trackers for {0} - enable opentrackers or DHT?"
 msgstr ""
@@ -516,11 +517,11 @@ msgstr ""
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:461
 msgid "Hide Peers"
-msgstr "Ocultar Peers"
+msgstr "Ocultar Pares"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:467
 msgid "Show Peers"
-msgstr "Mostrar Peers"
+msgstr "Mostrar Pares"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:490
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2634
@@ -635,7 +636,7 @@ msgstr[1] "{0} torrents"
 msgid "1 connected peer"
 msgid_plural "{0} connected peers"
 msgstr[0] "1 peer conectado"
-msgstr[1] "{0} peers conectados"
+msgstr[1] "{0} pares conectados"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:687
 #, java-format
@@ -845,7 +846,7 @@ msgstr "Erro de tracker"
 msgid "1 peer"
 msgid_plural "{0} peers"
 msgstr[0] "1 peer"
-msgstr[1] "{0} peers"
+msgstr[1] "{0} pares"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1489
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1490
@@ -883,7 +884,7 @@ msgstr "Estagnado"
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1547
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1548
 msgid "No Peers"
-msgstr "Sem peers"
+msgstr "Sem pares"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1550
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1551
@@ -965,19 +966,19 @@ msgstr "Seed"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1801
 msgid "Uninteresting (The peer has no pieces we need)"
-msgstr "Desinteressante (O peer não tem as peças de interesse)"
+msgstr "Desinteressante (O par não tem partes que precisemos)"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1803
 msgid "Choked (The peer is not allowing us to request pieces)"
-msgstr "Engasgado (O peer não deixa solicitar as peças)"
+msgstr "Engasgado (O par não está nos permitindo solicitar partes)"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1823
 msgid "Uninterested (We have no pieces the peer needs)"
-msgstr "Desinteressado (Peer não precisa das peças)"
+msgstr "Desinteressado (Não temos quaisquer partes que o par precise)"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1825
 msgid "Choking (We are not allowing the peer to request pieces)"
-msgstr "Engasgando (Peer está impossibilitado de solicitar peças)"
+msgstr "Engasgando (O par está impossibilitado de solicitar partes)"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1941
 #, java-format
@@ -1114,7 +1115,7 @@ msgstr "Limite total do uploader"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2228
 msgid "peers"
-msgstr "peers"
+msgstr "pares"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2232
 msgid "Up bandwidth limit"

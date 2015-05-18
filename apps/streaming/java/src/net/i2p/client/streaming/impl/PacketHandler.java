@@ -100,11 +100,12 @@ class PacketHandler {
         
         Connection con = (sendId > 0 ? _manager.getConnectionByInboundId(sendId) : null); 
         if (con != null) {
-            if (_log.shouldLog(Log.INFO))
+            if (_log.shouldDebug())
                 displayPacket(packet, "RECV", "wsize " + con.getOptions().getWindowSize() + " rto " + con.getOptions().getRTO());
             receiveKnownCon(con, packet);
         } else {
-            displayPacket(packet, "UNKN", null);
+            if (_log.shouldDebug())
+                displayPacket(packet, "UNKN", null);
             receiveUnknownCon(packet, sendId, queueIfNoConn);
         }
         // Don't log here, wait until we have the conn to make the dumps easier to follow
@@ -112,8 +113,9 @@ class PacketHandler {
     }
     
     private static final SimpleDateFormat _fmt = new SimpleDateFormat("HH:mm:ss.SSS");
+
+    /** logs to router log at debug level */
     void displayPacket(Packet packet, String prefix, String suffix) {
-        if (!_log.shouldLog(Log.INFO)) return;
         StringBuilder buf = new StringBuilder(256);
         synchronized (_fmt) {
             buf.append(_fmt.format(new Date()));
@@ -123,9 +125,8 @@ class PacketHandler {
         if (suffix != null)
             buf.append(" ").append(suffix);
         String str = buf.toString();
-        System.out.println(str);
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug(str);
+        //System.out.println(str);
+        _log.debug(str);
     }
     
     private void receiveKnownCon(Connection con, Packet packet) {
@@ -246,6 +247,7 @@ class PacketHandler {
         reply.setFlag(Packet.FLAG_SIGNATURE_INCLUDED);
         reply.setSendStreamId(packet.getReceiveStreamId());
         reply.setReceiveStreamId(packet.getSendStreamId());
+        // TODO remove this someday, as of 0.9.20 we do not require it
         reply.setOptionalFrom(_manager.getSession().getMyDestination());
         reply.setLocalPort(packet.getLocalPort());
         reply.setRemotePort(packet.getRemotePort());
@@ -268,14 +270,15 @@ class PacketHandler {
             }
             packet.releasePayload();
         } else {
-            if (_log.shouldLog(Log.WARN) && !packet.isFlagSet(Packet.FLAG_SYNCHRONIZE))
-                _log.warn("Packet received on an unknown stream (and not an ECHO or SYN): " + packet);
+            // this happens a lot
+            if (_log.shouldLog(Log.INFO) && !packet.isFlagSet(Packet.FLAG_SYNCHRONIZE))
+                _log.info("Packet received on an unknown stream (and not an ECHO or SYN): " + packet);
             if (sendId <= 0) {
                 Connection con = _manager.getConnectionByOutboundId(packet.getReceiveStreamId());
                 if (con != null) {
                     if ( (con.getHighestAckedThrough() <= 5) && (packet.getSequenceNum() <= 5) ) {
-                        if (_log.shouldLog(Log.WARN))
-                            _log.warn("Received additional packet w/o SendStreamID after the syn on " + con + ": " + packet);
+                        if (_log.shouldLog(Log.INFO))
+                            _log.info("Received additional packet w/o SendStreamID after the syn on " + con + ": " + packet);
                         receiveKnownCon(con, packet);
                         return;
                     } else {

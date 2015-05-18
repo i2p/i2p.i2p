@@ -80,9 +80,10 @@ class SAMDatagramSession extends SAMMessageSession {
      * @param data Bytes to be sent
      *
      * @return True if the data was sent, false otherwise
-     * @throws DataFormatException 
+     * @throws DataFormatException on unknown / bad dest
+     * @throws I2PSessionException on serious error, probably session closed
      */
-    public boolean sendBytes(String dest, byte[] data) throws DataFormatException {
+    public boolean sendBytes(String dest, byte[] data) throws DataFormatException, I2PSessionException {
         if (data.length > DGRAM_SIZE_MAX)
             throw new DataFormatException("Datagram size exceeded (" + data.length + ")");
         byte[] dgram ;

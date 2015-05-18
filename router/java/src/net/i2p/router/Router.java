@@ -20,6 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import gnu.getopt.Getopt;
 
+import net.i2p.client.I2PSessionImpl;
 import net.i2p.crypto.SigUtil;
 import net.i2p.data.Base64;
 import net.i2p.data.Certificate;
@@ -32,6 +33,7 @@ import net.i2p.data.SigningPrivateKey;
 import net.i2p.data.SigningPublicKey;
 import net.i2p.data.i2np.GarlicMessage;
 import net.i2p.data.router.RouterInfo;
+import net.i2p.router.CommSystemFacade.Status;
 import net.i2p.router.message.GarlicMessageHandler;
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import net.i2p.router.startup.CreateRouterInfoJob;
@@ -352,6 +354,8 @@ public class Router implements RouterClock.ClockShiftListener {
      */
     private void startupStuff() {
         // *********  Start no threads before here ********* //
+        _log = _context.logManager().getLog(Router.class);
+
         //
         // NOW we can start the ping file thread.
         if (!SystemVersion.isAndroid())
@@ -386,8 +390,8 @@ public class Router implements RouterClock.ClockShiftListener {
 
         _routerInfo = null;
         _higherVersionSeen = false;
-        _log = _context.logManager().getLog(Router.class);
-        _log.info("New router created with config file " + _configFilename);
+        if (_log.shouldLog(Log.INFO))
+            _log.info("New router created with config file " + _configFilename);
         _oomListener = new OOMListener(_context);
 
         _shutdownHook = new ShutdownHook(_context);
@@ -415,6 +419,7 @@ public class Router implements RouterClock.ClockShiftListener {
         PublicKey.clearCache();
         SigningPublicKey.clearCache();
         SigUtil.clearCaches();
+        I2PSessionImpl.clearCache();
     }
 
     /**
@@ -443,6 +448,7 @@ public class Router implements RouterClock.ClockShiftListener {
      *  saveConfig(String name, String value) or saveConfig(Map toAdd, Set toRemove) is recommended.
      *
      *  @since 0.8.13
+     *  @deprecated use saveConfig(String name, String value) or saveConfig(Map toAdd, Set toRemove)
      */
     public void setConfigSetting(String name, String value) { 
             _config.put(name, value); 
@@ -453,6 +459,7 @@ public class Router implements RouterClock.ClockShiftListener {
      *  saveConfig(String name, String value) or saveConfig(Map toAdd, Set toRemove) is recommended.
      *
      *  @since 0.8.13
+     *  @deprecated use saveConfig(String name, String value) or saveConfig(Map toAdd, Set toRemove)
      */
     public void removeConfigSetting(String name) { 
             _config.remove(name); 
@@ -556,7 +563,8 @@ public class Router implements RouterClock.ClockShiftListener {
         try {
             Runtime.getRuntime().addShutdownHook(_shutdownHook);
         } catch (IllegalStateException ise) {}
-        I2PThread.addOOMEventListener(_oomListener);
+        if (!SystemVersion.isAndroid())
+            I2PThread.addOOMEventListener(_oomListener);
         
         _context.keyManager().startup();
         
@@ -571,7 +579,7 @@ public class Router implements RouterClock.ClockShiftListener {
         _context.inNetMessagePool().startup();
         startupQueue();
         //_context.jobQueue().addJob(new CoalesceStatsJob(_context));
-        _context.simpleScheduler().addPeriodicEvent(new CoalesceStatsEvent(_context), COALESCE_TIME);
+        _context.simpleTimer2().addPeriodicEvent(new CoalesceStatsEvent(_context), COALESCE_TIME);
         _context.jobQueue().addJob(new UpdateRoutingKeyModifierJob(_context));
         //_context.adminManager().startup();
         _context.blocklist().startup();
@@ -636,7 +644,6 @@ public class Router implements RouterClock.ClockShiftListener {
             File f = new File(filename);
             if (f.canRead()) {
                 DataHelper.loadProps(props, f);
-                // dont be a wanker
                 props.remove(PROP_SHUTDOWN_IN_PROGRESS);
             } else {
                 if (log != null)
@@ -835,7 +842,7 @@ public class Router implements RouterClock.ClockShiftListener {
             if (blockingRebuild)
                 r.timeReached();
             else
-                _context.simpleScheduler().addEvent(r, 0);
+                _context.simpleTimer2().addEvent(r, 0);
         } catch (DataFormatException dfe) {
             _log.log(Log.CRIT, "Internal error - unable to sign our own address?!", dfe);
         }
@@ -894,14 +901,12 @@ public class Router implements RouterClock.ClockShiftListener {
         } else if (bwLim <= 2000) {    // TODO adjust threshold
             // 512 supported as of 0.9.18;
             // Add 256 as well for compatibility
-            // TODO uncomment
-            //ri.addCapability(CAPABILITY_BW512);
+            ri.addCapability(CAPABILITY_BW512);
             ri.addCapability(CAPABILITY_BW256);
         } else {
             // Unlimited supported as of 0.9.18;
             // Add 256 as well for compatibility
-            // TODO uncomment
-            //ri.addCapability(CAPABILITY_BW_UNLIMITED);
+            ri.addCapability(CAPABILITY_BW_UNLIMITED);
             ri.addCapability(CAPABILITY_BW256);
         }
         
@@ -917,17 +922,31 @@ public class Router implements RouterClock.ClockShiftListener {
             ri.addCapability(CAPABILITY_UNREACHABLE);
             return;
         }
-        switch (_context.commSystem().getReachabilityStatus()) {
-            case CommSystemFacade.STATUS_OK:
+        switch (_context.commSystem().getStatus()) {
+            case OK:
+            case IPV4_OK_IPV6_UNKNOWN:
+            case IPV4_OK_IPV6_FIREWALLED:
+            case IPV4_FIREWALLED_IPV6_OK:
+            case IPV4_DISABLED_IPV6_OK:
+            case IPV4_UNKNOWN_IPV6_OK:
+            case IPV4_SNAT_IPV6_OK:
                 ri.addCapability(CAPABILITY_REACHABLE);
                 break;
-            case CommSystemFacade.STATUS_DIFFERENT:
-            case CommSystemFacade.STATUS_REJECT_UNSOLICITED:
+
+            case DIFFERENT:
+            case REJECT_UNSOLICITED:
+            case IPV4_DISABLED_IPV6_FIREWALLED:
                 ri.addCapability(CAPABILITY_UNREACHABLE);
                 break;
-            case CommSystemFacade.STATUS_DISCONNECTED:
-            case CommSystemFacade.STATUS_HOSED:
-            case CommSystemFacade.STATUS_UNKNOWN:
+
+            case DISCONNECTED:
+            case HOSED:
+            case UNKNOWN:
+            case IPV4_UNKNOWN_IPV6_FIREWALLED:
+            case IPV4_DISABLED_IPV6_UNKNOWN:
+            case IPV4_FIREWALLED_IPV6_UNKNOWN:
+            case IPV4_SNAT_IPV6_UNKNOWN:
+            default:
                 // no explicit capability
                 break;
         }
@@ -1554,7 +1573,7 @@ public class Router implements RouterClock.ClockShiftListener {
      */
     private void beginMarkingLiveliness() {
         File f = getPingFile();
-        _context.simpleScheduler().addPeriodicEvent(new MarkLiveliness(this, f), 0, LIVELINESS_DELAY - (5*1000));
+        _context.simpleTimer2().addPeriodicEvent(new MarkLiveliness(this, f), 0, LIVELINESS_DELAY - (5*1000));
     }
     
     public static final String PROP_BANDWIDTH_SHARE_PERCENTAGE = "router.sharePercentage";

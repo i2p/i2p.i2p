@@ -165,7 +165,9 @@ class ClientConnectionRunner {
      */
     public synchronized void stopRunning() {
         if (_dead) return;
-        if (_context.router().isAlive() && _log.shouldLog(Log.WARN)) 
+        // router may be null in unit tests
+        if ((_context.router() == null || _context.router().isAlive()) &&
+            _log.shouldWarn()) 
             _log.warn("Stop the I2CP connection!  current leaseSet: " 
                       + _currentLeaseSet, new Exception("Stop client connection"));
         _dead = true;
@@ -476,6 +478,8 @@ class ClientConnectionRunner {
     /**
      * Asynchronously deliver the message to the current runner
      *
+     * Note that no failure indication is available.
+     * Fails silently on e.g. queue overflow to client, client dead, etc.
      */ 
     void receiveMessage(Destination toDest, Destination fromDest, Payload payload) {
         if (_dead) return;
@@ -557,7 +561,7 @@ class ClientConnectionRunner {
                     // theirs is newer
                 } else {
                     // ours is newer, so wait a few secs and retry
-                    _context.simpleScheduler().addEvent(new Rerequest(set, expirationTime, onCreateJob, onFailedJob), 3*1000);
+                    _context.simpleTimer2().addEvent(new Rerequest(set, expirationTime, onCreateJob, onFailedJob), 3*1000);
                 }
                 // fire onCreated?
                 return; // already requesting

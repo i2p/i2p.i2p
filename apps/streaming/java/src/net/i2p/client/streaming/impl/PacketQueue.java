@@ -85,17 +85,10 @@ class PacketQueue implements SendMessageStatusListener {
         //if (tagsSent == null)
         //    tagsSent = new HashSet(0);
 
-        // cache this from before sendMessage
-        String conStr = null;
-        if (_log.shouldLog(Log.DEBUG))
-            conStr = (packet.getConnection() != null ? packet.getConnection().toString() : "");
         if (packet.getAckTime() > 0) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Not resending " + packet);
             return false;
-        } else {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Sending... " + packet);
         }
     
         ByteArray ba = _cache.acquire();
@@ -205,16 +198,10 @@ class PacketQueue implements SendMessageStatusListener {
             //packet.setKeyUsed(keyUsed);
             //packet.setTagsSent(tagsSent);
             packet.incrementSends();
-            if (_log.shouldLog(Log.DEBUG)) {
-                String msg = "SEND " + packet
-                             + " send # " + packet.getNumSends()
-                             + " sendTime: " + (end-begin)
-                             + " con: " + conStr;
-                _log.debug(msg);
-            }
             Connection c = packet.getConnection();
             String suffix = (c != null ? "wsize " + c.getOptions().getWindowSize() + " rto " + c.getOptions().getRTO() : null);
-            _connectionManager.getPacketHandler().displayPacket(packet, "SEND", suffix);
+            if (_log.shouldDebug())
+                _connectionManager.getPacketHandler().displayPacket(packet, "SEND", suffix);
             if (I2PSocketManagerFull.pcapWriter != null &&
                 _context.getBooleanProperty(I2PSocketManagerFull.PROP_PCAP))
                 packet.logTCPDump();

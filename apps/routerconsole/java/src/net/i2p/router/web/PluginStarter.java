@@ -32,6 +32,7 @@ import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.FileUtil;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
+import net.i2p.util.PortMapper;
 import net.i2p.util.SimpleTimer2;
 import net.i2p.util.Translate;
 import net.i2p.util.VersionComparator;
@@ -146,6 +147,17 @@ public class PluginStarter implements Runnable {
             } while (mgr.isUpdateInProgress(TYPE_DUMMY));
         }
 
+        String proxyHost = ctx.getProperty(ConfigUpdateHandler.PROP_PROXY_HOST, ConfigUpdateHandler.DEFAULT_PROXY_HOST);
+        int proxyPort = ConfigUpdateHandler.proxyPort(ctx);
+        if (proxyPort == ConfigUpdateHandler.DEFAULT_PROXY_PORT_INT &&
+            proxyHost.equals(ConfigUpdateHandler.DEFAULT_PROXY_HOST) &&
+            ctx.portMapper().getPort(PortMapper.SVC_HTTP_PROXY) < 0) {
+            mgr.notifyComplete(null, Messages.getString("Plugin update check failed", ctx) +
+                                     " - " +
+                                     Messages.getString("HTTP client proxy tunnel must be running", ctx));
+            return;
+        }
+
         Log log = ctx.logManager().getLog(PluginStarter.class);
         int updated = 0;
         for (Map.Entry<String, String> entry : toUpdate.entrySet()) {
@@ -249,6 +261,7 @@ public class PluginStarter implements Runnable {
     public static boolean startPlugin(RouterContext ctx, String appName) throws Exception {
         Log log = ctx.logManager().getLog(PluginStarter.class);
         File pluginDir = new File(ctx.getConfigDir(), PLUGIN_DIR + '/' + appName);
+        String iconfile = null;
         if ((!pluginDir.exists()) || (!pluginDir.isDirectory())) {
             log.error("Cannot start nonexistent plugin: " + appName);
             disablePlugin(appName);
@@ -275,6 +288,9 @@ public class PluginStarter implements Runnable {
         }
 
         Properties props = pluginProperties(ctx, appName);
+
+
+
 
         String minVersion = ConfigClientsHelper.stripHTML(props, "min-i2p-version");
         if (minVersion != null &&
@@ -368,6 +384,16 @@ public class PluginStarter implements Runnable {
                         log.error("Error resolving '" + fileNames[i] + "' in '" + webappDir, ioe);
                     }
                 }
+                // Check for iconfile in plugin.properties
+                String icfile = ConfigClientsHelper.stripHTML(props, "console-icon");
+                if (icfile != null && !icfile.contains("..")) {
+                    StringBuilder buf = new StringBuilder(32);
+                    buf.append('/').append(appName);
+                    if (!icfile.startsWith("/"))
+                        buf.append('/');
+                    buf.append(icfile);
+                    iconfile = buf.toString();
+                }
             }
         } else {
             log.error("No console web server to start plugins?");
@@ -397,7 +423,6 @@ public class PluginStarter implements Runnable {
                     Translate.clearCache();
             }
         }
-
         // add summary bar link
         String name = ConfigClientsHelper.stripHTML(props, "consoleLinkName_" + Messages.getLanguage(ctx));
         if (name == null)
@@ -407,10 +432,7 @@ public class PluginStarter implements Runnable {
             String tip = ConfigClientsHelper.stripHTML(props, "consoleLinkTooltip_" + Messages.getLanguage(ctx));
             if (tip == null)
                 tip = ConfigClientsHelper.stripHTML(props, "consoleLinkTooltip");
-            if (tip != null)
-                NavHelper.registerApp(name, url, tip);
-            else
-                NavHelper.registerApp(name, url);
+            NavHelper.registerApp(name, url, tip, iconfile);
         }
 
         return true;
@@ -845,11 +867,11 @@ public class PluginStarter implements Runnable {
 
         boolean isClientThreadRunning = isClientThreadRunning(pluginName, ctx);
         if (log.shouldLog(Log.DEBUG))
-            log.debug("plugin name = <" + pluginName + ">; threads running? " + isClientThreadRunning + "; webapp runing? " + isWarRunning + "; jobs running? " + isJobRunning);
+            log.debug("plugin name = <" + pluginName + ">; threads running? " + isClientThreadRunning + "; webapp running? " + isWarRunning + "; jobs running? " + isJobRunning);
         return isClientThreadRunning || isWarRunning || isJobRunning;
         //
         //if (log.shouldLog(Log.DEBUG))
-        //    log.debug("plugin name = <" + pluginName + ">; threads running? " + isClientThreadRunning(pluginName) + "; webapp runing? " + WebAppStarter.isWebAppRunning(pluginName) + "; jobs running? " + isJobRunning);
+        //    log.debug("plugin name = <" + pluginName + ">; threads running? " + isClientThreadRunning(pluginName) + "; webapp running? " + WebAppStarter.isWebAppRunning(pluginName) + "; jobs running? " + isJobRunning);
         //return isClientThreadRunning(pluginName) || WebAppStarter.isWebAppRunning(pluginName) || isJobRunning;
         //
     }

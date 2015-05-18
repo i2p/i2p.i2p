@@ -1,6 +1,5 @@
 package net.i2p.router.web;
 
-import java.util.Iterator;
 import java.util.Properties;
 import java.util.Set;
 
@@ -181,8 +180,7 @@ public class ConfigTunnelsHelper extends HelperBase {
                        "<td colspan=\"2\" align=\"center\"><input name=\"").append(index);
             buf.append(".inboundOptions\" type=\"text\" size=\"32\" disabled=\"disabled\" " +
                        "value=\"");
-            for (Iterator iter = props.keySet().iterator(); iter.hasNext(); ) {
-                String prop = (String)iter.next();
+            for (String prop : props.stringPropertyNames()) {
                 String val = props.getProperty(prop);
                 buf.append(prop).append('=').append(val).append(' ');
             }
@@ -194,8 +192,7 @@ public class ConfigTunnelsHelper extends HelperBase {
                        "<td colspan=\"2\" align=\"center\"><input name=\"").append(index);
             buf.append(".outboundOptions\" type=\"text\" size=\"32\" disabled=\"disabled\" " +
                        "value=\"");
-            for (Iterator iter = props.keySet().iterator(); iter.hasNext(); ) {
-                String prop = (String)iter.next();
+            for (String prop : props.stringPropertyNames()) {
                 String val = props.getProperty(prop);
                 buf.append(prop).append('=').append(val).append(' ');
             }

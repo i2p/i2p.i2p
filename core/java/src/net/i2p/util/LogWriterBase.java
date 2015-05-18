@@ -16,6 +16,7 @@ import java.util.Queue;
  * the log.  This also periodically instructs the LogManager to reread its config
  * file.
  *
+ * @since 0.9.19 pulled from LogWriter so Android may extend
  */
 abstract class LogWriterBase implements Runnable {
     /** every 10 seconds? why? Just have the gui force a reread after a change?? */

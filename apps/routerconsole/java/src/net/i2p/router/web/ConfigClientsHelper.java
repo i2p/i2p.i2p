@@ -1,9 +1,13 @@
 package net.i2p.router.web;
 
+import java.text.Collator;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
@@ -116,8 +120,18 @@ public class ConfigClientsHelper extends HelperBase {
         
         boolean allowEdit = isClientChangeEnabled();
         List<ClientAppConfig> clients = ClientAppConfig.getClientApps(_context);
+        List<CAC> cacs = new ArrayList<CAC>(clients.size());
         for (int cur = 0; cur < clients.size(); cur++) {
             ClientAppConfig ca = clients.get(cur);
+            String xname = ca.clientName;
+            if (xname.length() > 0)
+                xname = _(xname);
+            cacs.add(new CAC(cur, ca, xname));
+        }
+        Collections.sort(cacs, new CACComparator());
+        for (CAC cac : cacs) {
+            ClientAppConfig ca = cac.config;
+            int cur = cac.index;
             boolean isConsole = ca.className.equals("net.i2p.router.web.RouterConsoleRunner");
             boolean showStart;
             boolean showStop;
@@ -155,6 +169,32 @@ public class ConfigClientsHelper extends HelperBase {
         return buf.toString();
     }
 
+    /** @since 0.9.20 */
+    private static class CAC {
+        public final int index;
+        public final ClientAppConfig config;
+        public final String xname;
+
+        public CAC(int idx, ClientAppConfig cfg, String xn) {
+            index = idx; config = cfg; xname = xn;
+        }
+    }
+
+    /** @since 0.9.20 */
+    private class CACComparator implements Comparator<CAC> {
+         private static final long serialVersionUID = 1L;
+         private final Collator coll;
+
+         public CACComparator() {
+             super();
+             coll = Collator.getInstance(new Locale(Messages.getLanguage(_context)));
+         }
+
+         public int compare(CAC l, CAC r) {
+             return coll.compare(l.xname, r.xname);
+        }
+    }
+
     /** webapps */
     public String getForm2() {
         StringBuilder buf = new StringBuilder(1024);
@@ -164,7 +204,7 @@ public class ConfigClientsHelper extends HelperBase {
            .append(_("Control")).append("</th><th align=\"left\">")
            .append(_("Description")).append("</th></tr>\n");
         Properties props = RouterConsoleRunner.webAppProperties(_context);
-        Set<String> keys = new TreeSet(props.keySet());
+        Set<String> keys = new TreeSet<String>(props.stringPropertyNames());
         for (String name : keys) {
             if (name.startsWith(RouterConsoleRunner.PREFIX) && name.endsWith(RouterConsoleRunner.ENABLED)) {
                 String app = name.substring(RouterConsoleRunner.PREFIX.length(), name.lastIndexOf(RouterConsoleRunner.ENABLED));
@@ -193,7 +233,7 @@ public class ConfigClientsHelper extends HelperBase {
            .append(_("Control")).append("</th><th align=\"left\">")
            .append(_("Description")).append("</th></tr>\n");
         Properties props = PluginStarter.pluginProperties();
-        Set<String> keys = new TreeSet(props.keySet());
+        Set<String> keys = new TreeSet<String>(props.stringPropertyNames());
         for (String name : keys) {
             if (name.startsWith(PluginStarter.PREFIX) && name.endsWith(PluginStarter.ENABLED)) {
                 String app = name.substring(PluginStarter.PREFIX.length(), name.lastIndexOf(PluginStarter.ENABLED));

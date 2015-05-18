@@ -138,6 +138,7 @@ class PacketBuilder {
 
     /** IPv4 only */
     public static final int IP_HEADER_SIZE = 20;
+    /** Same for IPv4 and IPv6 */
     public static final int UDP_HEADER_SIZE = 8;
 
     /** 74 */
@@ -541,10 +542,10 @@ class PacketBuilder {
                        " data size " + dataSize +
                        " pkt size " + (off + (ipHeaderSize + UDP_HEADER_SIZE)) +
                        " MTU " + currentMTU +
-                       ' ' + availableForAcks + " for all acks " +
-                       availableForExplicitAcks + " for full acks " + 
-                       explicitToSend + " full acks included " +
-                       partialAcksToSend + " partial acks included " +
+                       ' ' + availableForAcks + " for all acks, " +
+                       availableForExplicitAcks + " for full acks, " + 
+                       explicitToSend + " full acks included, " +
+                       partialAcksToSend + " partial acks included, " +
                        " Fragments: " + DataHelper.toString(fragments), new Exception());
         }
         

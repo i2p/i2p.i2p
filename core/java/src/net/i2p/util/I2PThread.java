@@ -76,6 +76,29 @@ public class I2PThread extends Thread {
     }
 ****/
     
+    /**
+     *  Overridden to provide useful info to users on OOM, and to prevent
+     *  shutting down the whole JVM for what is most likely not a heap issue.
+     *  If the calling thread is an I2PThread an OOM would shut down the JVM.
+     *  Telling the user to increase the heap size may make the problem worse.
+     *  We may be able to continue without this thread, particularly in app context.
+     *
+     *  @since 0.9.20
+     */
+    @Override
+    public void start() {
+        try {
+            super.start();
+        } catch (OutOfMemoryError oom) {
+            System.out.println("ERROR: Thread could not be started: " + getName());
+            if (!(SystemVersion.isWindows() || SystemVersion.isAndroid())) {
+                System.out.println("Check ulimit -u, /etc/security/limits.conf, or /proc/sys/kernel/threads-max");
+            }
+            oom.printStackTrace();
+            throw new RuntimeException("Thread could not be started", oom);
+        }
+    }
+    
     @Override
     public void run() {
         //_name = Thread.currentThread().getName();

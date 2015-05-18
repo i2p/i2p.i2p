@@ -63,6 +63,19 @@ public class DeliveryInstructions extends DataStructureImpl {
      */
     public static final DeliveryInstructions LOCAL = new LocalInstructions();
 
+    /**
+     *  Returns immutable local instructions, or new
+     *
+     *  @since 0.9.20
+     */
+    public static DeliveryInstructions create(byte[] data, int offset) throws DataFormatException {
+        if (data[offset] == 0)
+            return LOCAL;
+        DeliveryInstructions rv = new DeliveryInstructions();
+        rv.readBytes(data, offset);
+        return rv;
+    }
+
     public DeliveryInstructions() {
         _deliveryMode = -1;
     }

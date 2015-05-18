@@ -19,6 +19,7 @@ import java.util.Set;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 
+import net.i2p.CoreVersion;
 import net.i2p.client.I2PSessionException;
 import net.i2p.crypto.SessionKeyManager;
 import net.i2p.data.Destination;
@@ -26,11 +27,13 @@ import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
 import net.i2p.data.Payload;
 import net.i2p.data.i2cp.I2CPMessage;
+import net.i2p.data.i2cp.I2CPMessageException;
 import net.i2p.data.i2cp.MessageId;
 import net.i2p.data.i2cp.MessageStatusMessage;
 import net.i2p.data.i2cp.SessionConfig;
 import net.i2p.data.i2cp.SessionId;
 import net.i2p.data.i2cp.SessionStatusMessage;
+import net.i2p.data.i2cp.SetDateMessage;
 import net.i2p.internal.I2CPMessageQueue;
 import net.i2p.router.ClientManagerFacade;
 import net.i2p.router.ClientMessage;
@@ -39,6 +42,7 @@ import net.i2p.router.JobImpl;
 import net.i2p.router.RouterContext;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
+import net.i2p.util.SimpleTimer2;
 import net.i2p.util.SystemVersion;
 
 /**
@@ -61,6 +65,7 @@ class ClientManager {
     protected final RouterContext _ctx;
     protected final int _port;
     protected volatile boolean _isStarted;
+    private final SimpleTimer2.TimedEvent _clientTimestamper;
 
     /** Disable external interface, allow internal clients only @since 0.8.3 */
     private static final String PROP_DISABLE_EXTERNAL = "i2cp.disableInterface";
@@ -96,6 +101,7 @@ class ClientManager {
         _pendingRunners = new HashSet<ClientConnectionRunner>();
         _runnerSessionIds = new HashSet<SessionId>();
         _port = port;
+        _clientTimestamper = new ClientTimestamper();
         // following are for RequestLeaseSetJob
         _ctx.statManager().createRateStat("client.requestLeaseSetSuccess", "How frequently the router requests successfully a new leaseSet?", "ClientMessages", new long[] { 60*60*1000 });
         _ctx.statManager().createRateStat("client.requestLeaseSetTimeout", "How frequently the router requests a new leaseSet but gets no reply?", "ClientMessages", new long[] { 60*60*1000 });
@@ -107,7 +113,10 @@ class ClientManager {
         startListeners();
     }
 
-    /** Todo: Start a 3rd listener for IPV6? */
+    /**
+     *  Call from synchronized method
+     *  Todo: Start a 3rd listener for IPV6?
+     */
     protected void startListeners() {
         ClientListenerRunner listener;
         if (SystemVersion.isAndroid()) {
@@ -125,6 +134,7 @@ class ClientManager {
             Thread t = new I2PThread(listener, "ClientListener:" + _port, true);
             t.start();
             _listeners.add(listener);
+            _clientTimestamper.schedule(ClientTimestamper.LOOP_TIME);
         }
         _isStarted = true;
     }
@@ -162,6 +172,7 @@ class ClientManager {
             runner.disconnectClient(msg, Log.WARN);
         }
         _runnersByHash.clear();
+        _clientTimestamper.cancel();
     }
     
     /**
@@ -299,8 +310,10 @@ class ClientManager {
                 // sender went away
                 return;
             }
-            // TODO can we just run this inline instead?
-            _ctx.jobQueue().addJob(new DistributeLocal(toDest, runner, sender, fromDest, payload, msgId, messageNonce));
+            // run this inline so we don't clog up the job queue
+            Job j = new DistributeLocal(toDest, runner, sender, fromDest, payload, msgId, messageNonce);
+            //_ctx.jobQueue().addJob(j);
+            j.runJob();
         } else {
             // remote.  w00t
             if (_log.shouldLog(Log.DEBUG))
@@ -346,6 +359,8 @@ class ClientManager {
 
         public void runJob() {
             _to.receiveMessage(_toDest, _fromDest, _payload);
+            // note that receiveMessage() does not indicate a failure,
+            // so a queue overflow is not recognized. we always return success.
             if (_from != null) {
                 _from.updateMessageDeliveryStatus(_msgId, _messageNonce, MessageStatusMessage.STATUS_SEND_SUCCESS_LOCAL);
             }
@@ -594,6 +609,43 @@ class ClientManager {
                               + _msg.getDestination() + "/" + _msg.getDestinationHash() 
                               + " currently.  DROPPED");
             }
+        }
+    }
+
+    /**
+     *  Tell external clients the time periodically
+     *
+     *  @since 0.9.20
+     */
+    private class ClientTimestamper extends SimpleTimer2.TimedEvent {
+
+        public static final long LOOP_TIME = 10*60*1000;
+
+        /** must call schedule() later */
+        public ClientTimestamper() {
+            super(_ctx.simpleTimer2());
+        }
+
+        public void timeReached() {
+            if (!_isStarted)
+                return;
+            for (ClientConnectionRunner runner : _runners.values()) {
+                if (runner instanceof QueuedClientConnectionRunner)
+                    continue;
+                if (runner.isDead())
+                    continue;
+                if (runner.getConfig() == null)
+                    continue;  // simple session or no session yet
+                if (runner.getLeaseSet() == null)
+                    continue;  // don't confuse client while waiting for CreateLeaseSet msg
+                try {
+                    // only send version if the client can handle it (0.8.7 or greater)
+                    runner.doSend(new SetDateMessage(runner.getClientVersion() != null ?
+                                                     CoreVersion.VERSION : null));
+                } catch (I2CPMessageException ime) {}
+            }
+            if (_isStarted)
+                schedule(LOOP_TIME);
         }
     }
 }

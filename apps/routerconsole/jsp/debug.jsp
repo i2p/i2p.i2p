@@ -39,6 +39,11 @@
     ctx.routerAppManager().renderStatusHTML(out);
 
     /*
+     *  Print out the status for the PortMapper
+     */
+    ctx.portMapper().renderStatusHTML(out);
+
+    /*
      *  Print out the status for all the SessionKeyManagers
      */
     out.print("<h2>Router SKM</h2>");

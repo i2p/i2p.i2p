@@ -63,6 +63,13 @@ public class ReseedChecker {
             return false;
         }
 
+        if (_context.router().gracefulShutdownInProgress()) {
+            String s = "Only " + count + " peers remaining but reseed disabled by shutdown in progress";
+            _lastError = s;
+            _log.logAlways(Log.WARN, s);
+            return false;
+        }
+
         // we check the i2p installation directory for a flag telling us not to reseed, 
         // but also check the home directory for that flag too, since new users installing i2p
         // don't have an installation directory that they can put the flag in yet.
@@ -158,7 +165,6 @@ public class ReseedChecker {
             } catch (IOException ioe) {
                 if (ioe.getMessage() != null)
                     setError(DataHelper.escapeHTML(ioe.getMessage()));
-                done();
                 throw ioe;
             } finally {
                 done();
@@ -184,7 +190,7 @@ public class ReseedChecker {
      */
     void done() {
         _inProgress.set(false);
-        _context.simpleScheduler().addEvent(new StatusCleaner(_lastStatus, _lastError), STATUS_CLEAN_TIME);
+        _context.simpleTimer2().addEvent(new StatusCleaner(_lastStatus, _lastError), STATUS_CLEAN_TIME);
     }
 
     /**

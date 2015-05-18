@@ -88,7 +88,7 @@ class FloodfillMonitorJob extends JobImpl {
             return false;
 
         // ARM ElG decrypt is too slow
-        if (SystemVersion.isARM())
+        if (SystemVersion.isARM() || SystemVersion.isAndroid())
             return false;
 
         if (getContext().getBooleanProperty(UDPTransport.PROP_LAPTOP_MODE))
@@ -109,8 +109,9 @@ class FloodfillMonitorJob extends JobImpl {
         if (ri == null)
             return false;
         char bw = ri.getBandwidthTier().charAt(0);
-        // Only if class N, O, P, X
-        if (bw != Router.CAPABILITY_BW128 && bw != Router.CAPABILITY_BW256 &&
+        // Only if class M, N, O, P, X
+        if (bw != Router.CAPABILITY_BW64 &&
+            bw != Router.CAPABILITY_BW128 && bw != Router.CAPABILITY_BW256 &&
             bw != Router.CAPABILITY_BW512 && bw != Router.CAPABILITY_BW_UNLIMITED)
             return false;
 
@@ -159,8 +160,9 @@ class FloodfillMonitorJob extends JobImpl {
         // For reference, the avg lifetime job lag on my Pi is 6.
         // Should we consider avg. dropped ff jobs?
         RateStat lagStat = getContext().statManager().getRate("jobQueue.jobLag");
+        RateStat queueStat = getContext().statManager().getRate("router.tunnelBacklog");
         happy = happy && lagStat.getRate(60*60*1000L).getAvgOrLifetimeAvg() < 25;
-        happy = happy && getContext().tunnelManager().getInboundBuildQueueSize() < 5;
+        happy = happy && queueStat.getRate(60*60*1000L).getAvgOrLifetimeAvg() < 5;
         // Only if we're pretty well integrated...
         happy = happy && _facade.getKnownRouters() >= 400;
         happy = happy && getContext().commSystem().countActivePeers() >= 50;

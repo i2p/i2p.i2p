@@ -1,5 +1,10 @@
 package net.i2p.util;
 
+import java.io.IOException;
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 import net.i2p.I2PAppContext;
@@ -72,5 +77,19 @@ public class PortMapper {
         if (port == null)
             return def;
         return port.intValue();
+    }
+
+    /**
+     *  For debugging only
+     *  @since 0.9.20
+     */
+    public void renderStatusHTML(Writer out) throws IOException {
+        List<String> services = new ArrayList(_dir.keySet());
+        out.write("<h2>Port Mapper</h2><table><tr><th>Service<th>Port\n");
+        Collections.sort(services);
+        for (String s : services) {
+            out.write("<tr><td>" + s + "<td>" + _dir.get(s) + '\n');
+        }
+        out.write("</table>\n");
     }
 }

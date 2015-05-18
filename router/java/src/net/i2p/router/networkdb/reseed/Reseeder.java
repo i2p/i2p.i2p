@@ -37,6 +37,7 @@ import net.i2p.util.Log;
 import net.i2p.util.SecureDirectory;
 import net.i2p.util.SecureFileOutputStream;
 import net.i2p.util.SSLEepGet;
+import net.i2p.util.SystemVersion;
 import net.i2p.util.Translate;
 
 /**
@@ -60,8 +61,10 @@ public class Reseeder {
     /** limit to spend on a single host, to avoid getting stuck on one that is seriously overloaded */
     private static final int MAX_TIME_PER_HOST = 7 * 60 * 1000;
     private static final long MAX_FILE_AGE = 30*24*60*60*1000L;
-    /** change to false if hosts not ready at release */
+    /** Don't disable this! */
     private static final boolean ENABLE_SU3 = true;
+    /** if false, use su3 only, and disable fallback reading directory index and individual dat files */
+    private static final boolean ENABLE_NON_SU3 = false;
 
     /**
      *  NOTE - URLs that are in both the standard and SSL groups must use the same hostname,
@@ -73,14 +76,15 @@ public class Reseeder {
      *         URLs are constructed, and because SSLEepGet doesn't follow redirects.
      */
     public static final String DEFAULT_SEED_URL =
-              "http://i2p.mooo.com/netDb/" + "," +
-              "http://193.150.121.66/netDb/" + "," +
               // Disable due to misconfiguation (ticket #1466)
               //"http://us.reseed.i2p2.no/" + "," +
-              // Down (ticket #1422)
-              //"http://jp.reseed.i2p2.no/" + "," +
-              "http://uk.reseed.i2p2.no/" + "," +
-              "http://netdb.i2p2.no/"; // Only SU3 (v3) support
+
+              // Disabling everything, use SSL
+              //"http://i2p.mooo.com/netDb/" + "," +
+              //"http://193.150.121.66/netDb/" + "," +
+              //"http://uk.reseed.i2p2.no/" + "," +
+              //"http://netdb.i2p2.no/"; // Only SU3 (v3) support
+              "";
 
     /** @since 0.8.2 */
     public static final String DEFAULT_SSL_SEED_URL =
@@ -88,11 +92,10 @@ public class Reseeder {
               "https://netdb.rows.io:444/" + "," + // Only HTTPS and SU3 (v3) support
               "https://i2pseed.zarrenspry.info/" + "," + // Only HTTPS and SU3 (v3) support
               "https://i2p.mooo.com/netDb/" + "," +
-              "https://netdb.i2p2.no/" + "," + // Only SU3 (v3) support
+              "https://193.150.121.66/netDb/" + "," +
+              "https://netdb.i2p2.no/" + "," + // Only SU3 (v3) support, SNI required
               "https://us.reseed.i2p2.no:444/" + "," +
               "https://uk.reseed.i2p2.no:444/" + "," +
-              // Down (ticket #1422)
-              //"https://jp.reseed.i2p2.no:444/" + "," +
               "https://link.mx24.eu/" + "," + // Only HTTPS and SU3 (v3) support
               "https://ieb9oopo.mooo.com/"; // Only HTTPS and SU3 (v3) support
 
@@ -216,6 +219,16 @@ public class Reseeder {
         }
     }
 
+    /**
+     *  Since Java 7 or Android 2.3 (API 9),
+     *  which is the lowest Android we support anyway.
+     *
+     *  @since 0.9.20
+     */
+    private static boolean isSNISupported() {
+        return SystemVersion.isJava7() || SystemVersion.isAndroid();
+    }
+
     private class ReseedRunner implements Runnable, EepGet.StatusListener {
         private boolean _isRunning;
         private String _proxyHost;
@@ -292,10 +305,11 @@ public class Reseeder {
                 _checker.setError(ngettext("Reseed fetched only 1 router.",
                                                         "Reseed fetched only {0} routers.", total));
             } else {
-                System.out.println("Reseed failed, check network connection");
-                System.out.println(
-                     "Ensure that nothing blocks outbound HTTP, check the logs, " +
-                     "and if nothing helps, read the FAQ about reseeding manually.");
+                if (total == 0) {
+                    System.out.println("Reseed failed, check network connection");
+                    System.out.println("Ensure that nothing blocks outbound HTTP or HTTPS, check the logs, " +
+                                       "and if nothing helps, read the FAQ about reseeding manually.");
+                } // else < 0, no valid URLs
                 String old = _checker.getError();
                 _checker.setError(_("Reseed failed.") + ' '  +
                                   _("See {0} for help.",
@@ -395,7 +409,7 @@ public class Reseeder {
         * - Otherwise just the http randomly.
         *
         * @param echoStatus apparently always false
-        * @return count of routerinfos successfully fetched
+        * @return count of routerinfos successfully fetched, or -1 if no valid URLs
         */
         private int reseed(boolean echoStatus) {
             List<URL> URLList = new ArrayList<URL>();
@@ -403,36 +417,78 @@ public class Reseeder {
             boolean defaulted = URLs == null;
             boolean SSLDisable = _context.getBooleanProperty(PROP_SSL_DISABLE);
             boolean SSLRequired = _context.getBooleanPropertyDefaultTrue(PROP_SSL_REQUIRED);
+
             if (defaulted) {
                 if (SSLDisable)
                     URLs = DEFAULT_SEED_URL;
                 else
                     URLs = DEFAULT_SSL_SEED_URL;
-            }
-            StringTokenizer tok = new StringTokenizer(URLs, " ,");
-            while (tok.hasMoreTokens()) {
-                String u = tok.nextToken().trim();
-                if (!u.endsWith("/"))
-                    u = u + '/';
-                try {
-                    URLList.add(new URL(u));
-                } catch (MalformedURLException mue) {}
-            }
-            Collections.shuffle(URLList, _context.random());
-            if (defaulted && !SSLDisable && !SSLRequired) {
-                // put the non-SSL at the end of the SSL
-                List<URL> URLList2 = new ArrayList<URL>();
-                tok = new StringTokenizer(DEFAULT_SEED_URL, " ,");
+                StringTokenizer tok = new StringTokenizer(URLs, " ,");
                 while (tok.hasMoreTokens()) {
                     String u = tok.nextToken().trim();
                     if (!u.endsWith("/"))
                         u = u + '/';
                     try {
-                        URLList2.add(new URL(u));
+                        URLList.add(new URL(u));
                     } catch (MalformedURLException mue) {}
                 }
-                Collections.shuffle(URLList2, _context.random());
-                URLList.addAll(URLList2);
+                Collections.shuffle(URLList, _context.random());
+                if (!SSLDisable && !SSLRequired) {
+                    // put the non-SSL at the end of the SSL
+                    List<URL> URLList2 = new ArrayList<URL>();
+                    tok = new StringTokenizer(DEFAULT_SEED_URL, " ,");
+                    while (tok.hasMoreTokens()) {
+                        String u = tok.nextToken().trim();
+                        if (!u.endsWith("/"))
+                            u = u + '/';
+                        try {
+                            URLList2.add(new URL(u));
+                        } catch (MalformedURLException mue) {}
+                    }
+                    Collections.shuffle(URLList2, _context.random());
+                    URLList.addAll(URLList2);
+                }
+            } else {
+                // custom list given
+                List<URL> SSLList = new ArrayList<URL>();
+                List<URL> nonSSLList = new ArrayList<URL>();
+                StringTokenizer tok = new StringTokenizer(URLs, " ,");
+                while (tok.hasMoreTokens()) {
+                    // format tokens
+                    String u = tok.nextToken().trim();
+                    if (!u.endsWith("/"))
+                        u = u + '/';
+                    // check if ssl or not then add to respective list
+                    if (u.startsWith("https")) {
+                        try {
+                            SSLList.add(new URL(u));
+                        } catch (MalformedURLException mue) {}
+                    } else {
+                        try {
+                            nonSSLList.add(new URL(u));
+                        } catch (MalformedURLException mue) {}
+                    }
+                }
+                // shuffle lists
+                // depending on preferences, add lists to URLList
+                if (!SSLDisable) {
+                    Collections.shuffle(SSLList,_context.random());
+                    URLList.addAll(SSLList);
+                }
+                if (SSLDisable || !SSLRequired) {
+                    Collections.shuffle(nonSSLList, _context.random());
+                    URLList.addAll(nonSSLList);
+                }
+            }
+            if (!isSNISupported()) {
+                try {
+                    URLList.remove(new URL("https://netdb.i2p2.no/"));
+                } catch (MalformedURLException mue) {}
+            }
+            if (URLList.isEmpty()) {
+                System.out.println("No valid reseed URLs");
+                _checker.setError("No valid reseed URLs");
+                return -1;
             }
             return reseed(URLList, echoStatus);
         }
@@ -448,6 +504,10 @@ public class Reseeder {
         private int reseed(List<URL> URLList, boolean echoStatus) {
             int total = 0;
             for (int i = 0; i < URLList.size() && _isRunning; i++) {
+                if (_context.router().gracefulShutdownInProgress()) {
+                    System.out.println("Reseed aborted, shutdown in progress");
+                    return total;
+                }
                 URL url = URLList.get(i);
                 int dl = 0;
                 if (ENABLE_SU3) {
@@ -455,8 +515,10 @@ public class Reseeder {
                         dl = reseedSU3(new URL(url.toString() + SU3_FILENAME), echoStatus);
                     } catch (MalformedURLException mue) {}
                 }
-                if (dl <= 0)
-                    dl = reseedOne(url, echoStatus);
+                if (ENABLE_NON_SU3) {
+                    if (dl <= 0)
+                        dl = reseedOne(url, echoStatus);
+                }
                 if (dl > 0) {
                     total += dl;
                     // Don't go on to the next URL if we have enough

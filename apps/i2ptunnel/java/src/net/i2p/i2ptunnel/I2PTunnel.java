@@ -887,13 +887,13 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
             if (portNum <= 0)
                 throw new IllegalArgumentException(getPrefix() + "Bad port " + args[0]);
 
-            I2PTunnelTask task;
             ownDest = !isShared;
             try {
                 String privateKeyFile = null;
                 if (args.length >= 4)
                     privateKeyFile = args[3];
-                task = new I2PTunnelClient(portNum, args[1], l, ownDest, this, this, privateKeyFile);
+                I2PTunnelClientBase task = new I2PTunnelClient(portNum, args[1], l, ownDest, this, this, privateKeyFile);
+                task.startRunning();
                 addtask(task);
                 notifyEvent("clientTaskId", Integer.valueOf(task.getId()));
             } catch (IllegalArgumentException iae) {
@@ -966,10 +966,10 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
                 }
             }
 
-            I2PTunnelTask task;
             ownDest = !isShared;
             try {
-                task = new I2PTunnelHTTPClient(clientPort, l, ownDest, proxy, this, this);
+                I2PTunnelClientBase task = new I2PTunnelHTTPClient(clientPort, l, ownDest, proxy, this, this);
+                task.startRunning();
                 addtask(task);
                 notifyEvent("httpclientTaskId", Integer.valueOf(task.getId()));
             } catch (IllegalArgumentException iae) {
@@ -1035,10 +1035,10 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
                 }
             }
 
-            I2PTunnelTask task;
             ownDest = !isShared;
             try {
-                task = new I2PTunnelConnectClient(_port, l, ownDest, proxy, this, this);
+                I2PTunnelClientBase task = new I2PTunnelConnectClient(_port, l, ownDest, proxy, this, this);
+                task.startRunning();
                 addtask(task);
             } catch (IllegalArgumentException iae) {
                 String msg = "Invalid I2PTunnel configuration to create a CONNECT client connecting to the router at " + host + ':'+ port +
@@ -1097,13 +1097,13 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
                 }
             }
 
-            I2PTunnelTask task;
             ownDest = !isShared;
             try {
                 String privateKeyFile = null;
                 if (args.length >= 4)
                     privateKeyFile = args[3];
-                task = new I2PTunnelIRCClient(_port, args[1], l, ownDest, this, this, privateKeyFile);
+                I2PTunnelClientBase task = new I2PTunnelIRCClient(_port, args[1], l, ownDest, this, this, privateKeyFile);
+                task.startRunning();
                 addtask(task);
                 notifyEvent("ircclientTaskId", Integer.valueOf(task.getId()));
             } catch (IllegalArgumentException iae) {
@@ -1160,7 +1160,8 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
             if (args.length == 3)
                 privateKeyFile = args[2];
             try {
-                I2PTunnelTask task = new I2PSOCKSTunnel(_port, l, ownDest, this, this, privateKeyFile);
+                I2PTunnelClientBase task = new I2PSOCKSTunnel(_port, l, ownDest, this, this, privateKeyFile);
+                task.startRunning();
                 addtask(task);
                 notifyEvent("sockstunnelTaskId", Integer.valueOf(task.getId()));
             } catch (IllegalArgumentException iae) {
@@ -1207,7 +1208,8 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
             if (args.length == 3)
                 privateKeyFile = args[2];
             try {
-                I2PTunnelTask task = new I2PSOCKSIRCTunnel(_port, l, ownDest, this, this, privateKeyFile);
+                I2PTunnelClientBase task = new I2PSOCKSIRCTunnel(_port, l, ownDest, this, this, privateKeyFile);
+                task.startRunning();
                 addtask(task);
                 notifyEvent("sockstunnelTaskId", Integer.valueOf(task.getId()));
             } catch (IllegalArgumentException iae) {
@@ -1326,25 +1328,30 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
      * @param l logger to receive events and output
      */
     private void runConfig(String args[], Logging l) {
-        if (args.length >= 2) {
+        if (args.length >= 1) {
             int i = 0;
-            if (args[0].equals("-s")) {
+            boolean ssl = args[0].equals("-s");
+            if (ssl) {
                 _clientOptions.setProperty("i2cp.SSL", "true");
                 i++;
             } else {
                 _clientOptions.remove("i2cp.SSL");
             }
-            host = args[i++];
-            listenHost = host;
-            port = args[i];
+            if (i < args.length) {
+                host = args[i++];
+                listenHost = host;
+            }
+            if (i < args.length)
+                port = args[i];
+            l.log("New setting: " + host + ' ' + port + (ssl ? " SSL" : " non-SSL"));
             notifyEvent("configResult", "ok");
         } else {
             boolean ssl = Boolean.parseBoolean(_clientOptions.getProperty("i2cp.SSL"));
             l.log("Usage:\n" +
-                  "  config [-s] <i2phost> <i2pport>\n" +
-                  "  sets the connection to the i2p router.\n" +
-                  "Current setting:\n" +
-                  "  " + host + ' ' + port + (ssl ? " SSL" : ""));
+                  "  config [-s] [<i2phost>] [<i2pport>]\n" +
+                  "  Sets the address and port of the I2P router.\n" +
+                  "  Use -s for SSL.\n" +
+                  "Current setting: " + host + ' ' + port + (ssl ? " SSL" : " non-SSL"));
             notifyEvent("configResult", "error");
         }
     }
@@ -1510,7 +1517,7 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
         if (tasks.isEmpty()) {
             System.exit(0);
         }
-        l.log("There are running tasks. Try 'list'.");
+        l.log("There are running tasks. Try 'list' or 'close all'.");
         //notifyEvent("quitResult", "error");
     }
 
@@ -1670,7 +1677,8 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
                 if (!_clientOptions.containsKey("outbound.nickname"))
                     _clientOptions.setProperty("outbound.nickname", "I2Ping");
             }
-            I2PTunnelTask task = new I2Ping(l, ownDest, this, this);
+            I2PTunnelClientBase task = new I2Ping(l, ownDest, this, this);
+            task.startRunning();
             addtask(task);
             notifyEvent("pingTaskId", Integer.valueOf(task.getId()));
         } else {
@@ -1747,8 +1755,8 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
      */
     public void log(String s) {
         System.out.println(s);
-        if (_log.shouldLog(Log.INFO))
-            _log.info(getPrefix() + "Display: " + s);
+        //if (_log.shouldLog(Log.INFO))
+        //    _log.info(getPrefix() + "Display: " + s);
     }
 
     /**
@@ -1766,8 +1774,7 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
             l.log("Generating new keys...");
             I2PClient client = I2PClientFactory.createClient();
             Destination d = client.createDestination(writeTo);
-            l.log("Secret key saved.\n" +
-                  "Public key: " + d.toBase64());
+            l.log("New destination: " + d.toBase32());
             writeTo.flush();
             writeTo.close();
             writePubKey(d, pubDest, l);
@@ -1790,7 +1797,7 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
         try {
             Destination d = new Destination();
             d.readBytes(readFrom);
-            l.log("Public key: " + d.toBase64());
+            l.log("Destination: " + d.toBase32());
             readFrom.close();
             writePubKey(d, pubDest, l);
         } catch (I2PException ex) {
@@ -1805,7 +1812,7 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
      * Deprecated - only used by CLI
      *
      * @param d Destination to write
-     * @param o stream to write the destination to
+     * @param o stream to write the destination to, or null for noop
      * @param l logger to send messages to
      */
     private static void writePubKey(Destination d, OutputStream o, Logging l) throws I2PException, IOException {

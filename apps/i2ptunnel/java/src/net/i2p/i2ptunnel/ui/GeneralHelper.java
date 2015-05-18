@@ -44,8 +44,8 @@ public class GeneralHelper {
 
     private static final String OPT = TunnelController.PFX_OPTION;
 
-    private I2PAppContext _context;
-    protected TunnelControllerGroup _group;
+    private final I2PAppContext _context;
+    protected final TunnelControllerGroup _group;
 
     public GeneralHelper(TunnelControllerGroup tcg) {
         this(I2PAppContext.getGlobalContext(), tcg);

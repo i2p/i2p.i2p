@@ -595,12 +595,7 @@ class EstablishmentManager {
                 }
                 
         if (_outboundStates.size() < getMaxConcurrentEstablish() && !_queuedOutbound.isEmpty()) {
-            // in theory shouldn't need locking, but
-            // getting IllegalStateExceptions on old Java 5,
-            // which hoses this state.
-            synchronized(_queuedOutbound) {
-                locked_admitQueued();
-            }
+            locked_admitQueued();
         }
             //remaining = _queuedOutbound.size();
 
@@ -710,7 +705,8 @@ class EstablishmentManager {
         
         _transport.addRemotePeerState(peer);
         
-        _transport.inboundConnectionReceived();
+        boolean isIPv6 = state.getSentIP().length == 16;
+        _transport.inboundConnectionReceived(isIPv6);
         _transport.setIP(remote.calculateHash(), state.getSentIP());
         
         _context.statManager().addRateData("udp.inboundEstablishTime", state.getLifetime(), 0);
@@ -753,7 +749,7 @@ class EstablishmentManager {
         _transport.send(dsm, peer);
 
         // just do this inline
-        //_context.simpleScheduler().addEvent(new PublishToNewInbound(peer), 0);
+        //_context.simpleTimer2().addEvent(new PublishToNewInbound(peer), 0);
 
             Hash hash = peer.getRemotePeer();
             if ((hash != null) && (!_context.banlist().isBanlisted(hash)) && (!_transport.isUnreachable(hash))) {

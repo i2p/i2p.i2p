@@ -96,7 +96,7 @@ class ConnectionHandler {
         // also check if expiration of the head is long past for overload detection with peek() ?
         boolean success = _synQueue.offer(packet); // fail immediately if full
         if (success) {
-            _context.simpleScheduler().addEvent(new TimeoutSyn(packet), _acceptTimeout);
+            _context.simpleTimer2().addEvent(new TimeoutSyn(packet), _acceptTimeout);
         } else {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Dropping new SYN request, as the queue is full");
@@ -249,6 +249,7 @@ class ConnectionHandler {
         reply.setAckThrough(packet.getSequenceNum());
         reply.setSendStreamId(packet.getReceiveStreamId());
         reply.setReceiveStreamId(0);
+        // TODO remove this someday, as of 0.9.20 we do not require it
         reply.setOptionalFrom(_manager.getSession().getMyDestination());
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Sending RST: " + reply + " because of " + packet);

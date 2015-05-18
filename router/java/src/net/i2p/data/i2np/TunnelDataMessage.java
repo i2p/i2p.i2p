@@ -31,7 +31,7 @@ public class TunnelDataMessage extends FastI2NPMessageImpl {
     
     public final static int MESSAGE_TYPE = 18;
     public static final int DATA_SIZE = 1024;
-    /** if we can't deliver a tunnel message in 10s, fuck it */
+    /** if we can't deliver a tunnel message in 10s, forget it */
     private static final int EXPIRATION_PERIOD = 10*1000;
     
     private static final ByteCache _cache;
@@ -234,7 +234,7 @@ public class TunnelDataMessage extends FastI2NPMessageImpl {
     public String toString() {
         StringBuilder buf = new StringBuilder();
         buf.append("[TunnelDataMessage:");
-        buf.append(" MessageId: ").append(_uniqueId);
+        buf.append(" MessageId: ").append(getUniqueId());
         buf.append(" Tunnel ID: ").append(_tunnelId);
         buf.append("]");
         return buf.toString();

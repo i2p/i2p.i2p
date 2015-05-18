@@ -8,7 +8,6 @@ import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -26,6 +25,7 @@ import net.i2p.router.startup.LoadClientAppsJob;
 import net.i2p.router.update.ConsoleUpdateManager;
 import static net.i2p.update.UpdateType.*;
 import net.i2p.util.SecureFileOutputStream;
+import net.i2p.util.PortMapper;
 
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
 
@@ -345,9 +345,8 @@ public class ConfigClientsHandler extends FormHandler {
 
     private void saveWebAppChanges() {
         Properties props = RouterConsoleRunner.webAppProperties(_context);
-        Set keys = props.keySet();
-        for (Iterator iter = keys.iterator(); iter.hasNext(); ) {
-            String name = (String)iter.next();
+        Set<String> keys = props.stringPropertyNames();
+        for (String name : keys) {
             if (! (name.startsWith(RouterConsoleRunner.PREFIX) && name.endsWith(RouterConsoleRunner.ENABLED)))
                 continue;
             String app = name.substring(RouterConsoleRunner.PREFIX.length(), name.lastIndexOf(RouterConsoleRunner.ENABLED));
@@ -361,9 +360,8 @@ public class ConfigClientsHandler extends FormHandler {
 
     private void savePluginChanges() {
         Properties props = PluginStarter.pluginProperties();
-        Set keys = props.keySet();
-        for (Iterator iter = keys.iterator(); iter.hasNext(); ) {
-            String name = (String)iter.next();
+        Set<String> keys = props.stringPropertyNames();
+        for (String name : keys) {
             if (! (name.startsWith(PluginStarter.PREFIX) && name.endsWith(PluginStarter.ENABLED)))
                 continue;
             String app = name.substring(PluginStarter.PREFIX.length(), name.lastIndexOf(PluginStarter.ENABLED));
@@ -490,6 +488,8 @@ public class ConfigClientsHandler extends FormHandler {
             addFormError(_("Plugin or update download already in progress."));
             return;
         }
+        if (!verifyProxy())
+            return;
         addFormNotice(_("Updating all plugins"));
         PluginStarter.updateAll(_context);
         // So that update() will post a status to the summary bar before we reload
@@ -500,6 +500,7 @@ public class ConfigClientsHandler extends FormHandler {
 
     /**
      *  @param app null for a new install
+     *  @param url http: or file:
      */
     private void installPlugin(String app, String url) {
         ConsoleUpdateManager mgr = UpdateHandler.updateManager(_context);
@@ -517,6 +518,10 @@ public class ConfigClientsHandler extends FormHandler {
         } catch (URISyntaxException use) {
             addFormError(_("Bad URL {0}", url));
             return;
+        }
+        if (!url.startsWith("file:")) {
+            if (!verifyProxy())
+                return;
         }
         if (mgr.installPlugin(app, uri)) {
             if (url.startsWith("file:"))
@@ -538,12 +543,35 @@ public class ConfigClientsHandler extends FormHandler {
             addFormError("Update manager not registered, cannot check");
             return;
         }
+        if (!verifyProxy())
+            return;
         mgr.check(PLUGIN, app);
         addFormNotice(_("Checking plugin {0} for updates", app));
         // So that update() will post a status to the summary bar before we reload
         try {
            Thread.sleep(1000);
         } catch (InterruptedException ie) {}
+    }
+
+    /**
+     *  Plugin checks, updates, and installs are always proxied.
+     *  See if the proxy tunnel is available, unless we're configured
+     *  to use something else (probably not).
+     *  Outputs form error if returning false.
+     *
+     *  @return true if available
+     *  @since 0.9.20
+     */
+    private boolean verifyProxy() {
+        String proxyHost = _context.getProperty(ConfigUpdateHandler.PROP_PROXY_HOST, ConfigUpdateHandler.DEFAULT_PROXY_HOST);
+        int proxyPort = ConfigUpdateHandler.proxyPort(_context);
+        boolean rv = !
+            (proxyPort == ConfigUpdateHandler.DEFAULT_PROXY_PORT_INT &&
+             proxyHost.equals(ConfigUpdateHandler.DEFAULT_PROXY_HOST) &&
+             _context.portMapper().getPort(PortMapper.SVC_HTTP_PROXY) < 0);
+        if (!rv)
+            addFormError(_("HTTP client proxy tunnel must be running"));
+        return rv;
     }
 
     private void startPlugin(String app) {

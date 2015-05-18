@@ -60,7 +60,7 @@ class IntelInfoImpl extends CPUIDCPUInfo implements IntelCPUInfo
     {
         // http://en.wikipedia.org/wiki/Cpuid
         // http://web.archive.org/web/20110307080258/http://www.intel.com/Assets/PDF/appnote/241618.pdf
-        // http://www.intel.com/content/dam/www/public/us/en/documents/manuals/64-ia-32-architectures-software-developer-vol-2a-manual.pdf
+        // http://www.intel.com/content/dam/www/public/us/en/documents/manuals/64-ia-32-architectures-software-developer-manual-325462.pdf
         String modelString = null;
         int family = CPUID.getCPUFamily();
         int model = CPUID.getCPUModel();
@@ -156,9 +156,8 @@ class IntelInfoImpl extends CPUIDCPUInfo implements IntelCPUInfo
                     isPentiumMCompatible = true;
                     isCore2Compatible = true;
                     isX64 = true;
-                }
-                if (extmodel >= 2) {
-                    isCoreiCompatible = true;
+                    if (extmodel >= 2)
+                        isCoreiCompatible = true;
                 }
                 switch (model) {
                     case 0:
@@ -349,6 +348,11 @@ class IntelInfoImpl extends CPUIDCPUInfo implements IntelCPUInfo
                 // following are for extended model == 4
                 // most flags are set above
                 // isCoreiCompatible = true is the default
+                
+                    // 22 nm
+                    case 0x45:
+                        modelString = "Mobile Celeron";
+                        break;
                 
                     // Atom Silvermont / Bay Trail / Avoton 22 nm
                     // Supports SSE 4.2

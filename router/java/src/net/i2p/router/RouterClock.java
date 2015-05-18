@@ -29,7 +29,7 @@ public class RouterClock extends Clock {
      *  1/50 is 12s in a 10m tunnel lifetime, that should be fine.
      *  All of this is @since 0.7.12
      */
-    private static final long MAX_SLEW = 50;
+    private static final long MAX_SLEW = 25;
     public static final int DEFAULT_STRATUM = 8;
     private static final int WORST_STRATUM = 16;
 
@@ -40,7 +40,7 @@ public class RouterClock extends Clock {
     /** use system time for this */
     private long _lastChanged;
     private int _lastStratum;
-    private final Timestamper _timeStamper;
+    private final RouterTimestamper _timeStamper;
 
     /**
      *  If the system clock shifts by this much,
@@ -50,9 +50,15 @@ public class RouterClock extends Clock {
     private static final long MASSIVE_SHIFT_FORWARD = 150*1000;
     private static final long MASSIVE_SHIFT_BACKWARD = 61*1000;
 
+    /** testing only */
+    private static final String PROP_DISABLE_ADJUSTMENT = "time.disableOffset";
+
     private final Set<ClockShiftListener> _shiftListeners;
     private volatile long _lastShiftNanos;
 
+    /**
+     *  Does not start. Caller MUST call start()
+     */
     public RouterClock(RouterContext context) {
         super(context);
         _lastStratum = WORST_STRATUM;
@@ -60,6 +66,14 @@ public class RouterClock extends Clock {
         _shiftListeners = new CopyOnWriteArraySet<ClockShiftListener>();
         _lastShiftNanos = System.nanoTime();
         _timeStamper = new RouterTimestamper(context, this);
+    }
+
+    /**
+     *  Cannot be stopped, but RouterTimestamper registers a shutdown task.
+     *  @since 0.9.20
+     */
+    public void start() {
+        _timeStamper.startTimestamper();
     }
 
     /**
@@ -134,25 +148,26 @@ public class RouterClock extends Clock {
                 _alreadyChanged) {
 
                 // Try calculating peer clock skew
-                long currentPeerClockSkew = ((RouterContext)_context).commSystem().getFramedAveragePeerClockSkew(50);
+                long currentPeerClockSkew = ((RouterContext)_context).commSystem().getFramedAveragePeerClockSkew(33);
 
                     // Predict the effect of applying the proposed clock offset
                     long predictedPeerClockSkew = currentPeerClockSkew + delta;
 
                     // Fail sanity check if applying the offset would increase peer clock skew
+                    Log log = getLog();
                     if ((Math.abs(predictedPeerClockSkew) > (Math.abs(currentPeerClockSkew) + 5*1000)) ||
                         (Math.abs(predictedPeerClockSkew) > 20*1000)) {
 
-                        getLog().error("Ignoring clock offset " + offsetMs + "ms (current " + _offset +
+                        if (log.shouldWarn())
+                            log.warn("Ignoring clock offset " + offsetMs + "ms (current " + _offset +
                                        "ms) since it would increase peer clock skew from " + currentPeerClockSkew +
-                                       "ms to " + predictedPeerClockSkew + "ms. Bad time server?");
+                                       "ms to " + predictedPeerClockSkew + "ms. Stratrum: " + stratum);
                         return;
                     } else {
-                        Log log = getLog();
-                        if (log.shouldLog(Log.DEBUG))
-                            log.debug("Approving clock offset " + offsetMs + "ms (current " + _offset +
+                        if (log.shouldInfo())
+                            log.info("Approving clock offset " + offsetMs + "ms (current " + _offset +
                                        "ms) since it would decrease peer clock skew from " + currentPeerClockSkew +
-                                       "ms to " + predictedPeerClockSkew + "ms.");
+                                       "ms to " + predictedPeerClockSkew + "ms. Stratrum: " + stratum);
                     }
             } // check sanity
         }
@@ -161,7 +176,7 @@ public class RouterClock extends Clock {
         // a previous step adjustment.
         // This allows NTP to trump a peer offset after a soft restart
         if (_alreadyChanged &&
-            (stratum >= _lastStratum || _startedOn - System.currentTimeMillis() > 60*1000)) {
+            (stratum >= _lastStratum || System.currentTimeMillis() - _startedOn > 60*1000)) {
             // Update the target offset, slewing will take care of the rest
             if (delta > 15*1000)
                 getLog().logAlways(Log.WARN, "Warning - Updating target clock offset to " + offsetMs + "ms from " + _offset + "ms, Stratum " + stratum);
@@ -173,16 +188,24 @@ public class RouterClock extends Clock {
                 _statCreated = true;
             }
             _context.statManager().addRateData("clock.skew", delta);
-            _desiredOffset = offsetMs;
+            if (_context.getBooleanProperty(PROP_DISABLE_ADJUSTMENT)) {
+                getLog().error("Clock adjustment disabled", new Exception());
+            } else {
+                _desiredOffset = offsetMs;
+            }
         } else {
             Log log = getLog();
             if (log.shouldLog(Log.INFO))
                 log.info("Initializing clock offset to " + offsetMs + "ms, Stratum " + stratum);
             _alreadyChanged = true;
-            _offset = offsetMs;
-            _desiredOffset = offsetMs;
-            // this is used by the JobQueue
-            fireOffsetChanged(delta);
+            if (_context.getBooleanProperty(PROP_DISABLE_ADJUSTMENT)) {
+                log.error("Clock adjustment disabled", new Exception());
+            } else {
+                _offset = offsetMs;
+                _desiredOffset = offsetMs;
+                // this is used by the JobQueue
+                fireOffsetChanged(delta);
+            }
         }
         _lastChanged = System.currentTimeMillis();
         _lastStratum = stratum;
@@ -227,7 +250,8 @@ public class RouterClock extends Clock {
             long desiredOffset = _desiredOffset;
             if (desiredOffset > offset) {
                 // slew forward
-                _offset = ++offset;
+                offset += Math.min(10, sinceLastSlewed / MAX_SLEW);
+                _offset = offset;
             } else if (desiredOffset < offset) {
                 // slew backward, but don't let the clock go backward
                 // this should be the first call since systemNow

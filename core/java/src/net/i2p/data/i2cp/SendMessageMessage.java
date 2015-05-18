@@ -74,7 +74,7 @@ public class SendMessageMessage extends I2CPMessageImpl {
 
     @Override
     protected void doReadMessage(InputStream in, int size) throws I2CPMessageException, IOException {
-        if (true) throw new IllegalStateException("wtf, do not run me");
+        throw new UnsupportedOperationException();
     }
 
     /**

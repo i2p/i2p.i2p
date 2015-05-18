@@ -169,6 +169,21 @@ public class ResettableGZIPInputStream extends InflaterInputStream {
     }
 
     /**
+     *  Does NOT call super.close(), as it cannot be reused if we do that.
+     *  Broken before 0.9.20.
+     *  @since 0.9.20
+     */
+    @Override
+    public void close() throws IOException {
+        len = 0;
+        inf.reset();
+        _complete = false;
+        _crc32.reset();
+        _buf1[0] = 0x0;
+        _extraByteInputStream.close();
+    }
+
+    /**
      *  Moved from i2ptunnel HTTPResponseOutputStream.InternalGZIPInputStream
      *  @since 0.8.9
      */

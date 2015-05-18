@@ -1,5 +1,6 @@
 package net.i2p.router.tasks;
 
+import java.io.File;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import net.i2p.router.Router;
@@ -48,7 +49,8 @@ public class OOMListener implements I2PThread.OOMEventListener {
             log.log(Log.CRIT, "free mem: " + Runtime.getRuntime().freeMemory() + 
                               " total mem: " + Runtime.getRuntime().totalMemory());
             if (_context.hasWrapper())
-                log.log(Log.CRIT, "To prevent future shutdowns, increase wrapper.java.maxmemory in $I2P/wrapper.config");
+                log.log(Log.CRIT, "To prevent future shutdowns, increase wrapper.java.maxmemory in " +
+                                  _context.getBaseDir() + File.separatorChar + "wrapper.config");
         } catch (OutOfMemoryError oome) {}
         try { 
             ThreadDump.dump(_context, 1);
@@ -56,6 +58,8 @@ public class OOMListener implements I2PThread.OOMEventListener {
         try { 
             _context.router().eventLog().addEvent(EventLog.OOM);
         } catch (OutOfMemoryError oome) {}
-        _context.router().shutdown(Router.EXIT_OOM); 
+        try { 
+            _context.router().shutdown(Router.EXIT_OOM); 
+        } catch (OutOfMemoryError oome) {}
     }
 }

@@ -14,5 +14,5 @@
 <h1><%=intl._("Web Application Not Running")%></h1>
 <div class="sorry" id="warning">
 <%=intl._("The requested web application is not running.")%>
-<%=intl._("Please visit the <a href=\"/configclients.jsp#webapp\">config clients page</a> to start it.")%>
+<%=intl._("Please visit the {0}config clients page{1} to start it.", "<a href=\"/configclients.jsp#webapp\" target=\"_top\">", "</a>")%>
 </div></body></html>

@@ -670,6 +670,17 @@ public class I2PSnarkServlet extends BasicServlet {
             out.write("<tfoot><tr>\n" +
                       "    <th align=\"left\" colspan=\"6\">");
             out.write("&nbsp;");
+            out.write(_("Dest") + ":");
+            out.write("&nbsp;");
+            String IPString = _manager.util().getOurIPString();
+            if(!IPString.equals("unknown")) {
+                // Only truncate if it's an actual dest
+                IPString = "<i>" + IPString.substring(0, 4) + "</i>";
+            } else {
+                IPString = IPString + ".";
+            }
+            out.write(IPString);
+            out.write("&nbsp;");
             out.write(_("Totals"));
             out.write(":&nbsp;");
             out.write(ngettext("1 torrent", "{0} torrents", total));
@@ -1047,19 +1058,20 @@ public class I2PSnarkServlet extends BasicServlet {
                             File f = new File(name);
                             f.delete();
                             _manager.addMessage(_("Torrent file deleted: {0}", f.getAbsolutePath()));
-                            List<List<String>> files = meta.getFiles();
-                            String dataFile = snark.getBaseName();
-                            f = new File(_manager.getDataDir(), dataFile);
-                            if (files == null) { // single file torrent
-                                if (f.delete())
-                                    _manager.addMessage(_("Data file deleted: {0}", f.getAbsolutePath()));
-                                else
-                                    _manager.addMessage(_("Data file could not be deleted: {0}", f.getAbsolutePath()));
-                                break;
-                            }
                             Storage storage = snark.getStorage();
                             if (storage == null)
                                 break;
+                            List<List<String>> files = meta.getFiles();
+                            if (files == null) { // single file torrent
+                                for (File df : storage.getFiles()) {
+                                    // should be only one
+                                    if (df.delete())
+                                        _manager.addMessage(_("Data file deleted: {0}", df.getAbsolutePath()));
+                                    else
+                                        _manager.addMessage(_("Data file could not be deleted: {0}", df.getAbsolutePath()));
+                                }
+                                break;
+                            }
                             // step 1 delete files
                             for (File df : storage.getFiles()) {
                                 if (df.delete()) {
@@ -2269,13 +2281,13 @@ public class I2PSnarkServlet extends BasicServlet {
         out.write("<tr><td>");
         out.write(_("Inbound Settings"));
         out.write(":<td>");
-        out.write(renderOptions(1, 8, 3, options.remove("inbound.quantity"), "inbound.quantity", TUNNEL));
+        out.write(renderOptions(1, 10, 3, options.remove("inbound.quantity"), "inbound.quantity", TUNNEL));
         out.write("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
         out.write(renderOptions(0, 4, 3, options.remove("inbound.length"), "inbound.length", HOP));
         out.write("<tr><td>");
         out.write(_("Outbound Settings"));
         out.write(":<td>");
-        out.write(renderOptions(1, 8, 3, options.remove("outbound.quantity"), "outbound.quantity", TUNNEL));
+        out.write(renderOptions(1, 10, 3, options.remove("outbound.quantity"), "outbound.quantity", TUNNEL));
         out.write("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
         out.write(renderOptions(0, 4, 3, options.remove("outbound.length"), "outbound.length", HOP));
 

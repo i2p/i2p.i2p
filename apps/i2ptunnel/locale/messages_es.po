@@ -17,8 +17,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-02-06 18:28+0000\n"
-"PO-Revision-Date: 2015-02-06 22:46+0000\n"
+"POT-Creation-Date: 2015-03-29 14:30+0000\n"
+"PO-Revision-Date: 2015-04-01 03:23+0000\n"
 "Last-Translator: strel\n"
 "Language-Team: Spanish (http://www.transifex.com/projects/p/I2P/language/es/)\n"
 "MIME-Version: 1.0\n"
@@ -27,147 +27,139 @@ msgstr ""
 "Language: es\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:474
-#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:484
+#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:361
+#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:371
 msgid "internal"
 msgstr "interno"
 
-#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:560
+#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:405
 #, java-format
 msgid "{0} inbound, {0} outbound tunnel"
 msgid_plural "{0} inbound, {0} outbound tunnels"
-msgstr[0] "{0} túnel de entrada {0} túnel de salida"
-msgstr[1] "{0} túneles de entrada {0} túneles de salida"
+msgstr[0] "{0} de entrada, {0} túnel de salida"
+msgstr[1] "{0} de entrada, {0} túneles de salida"
 
-#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:564
+#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:409
 msgid "lower bandwidth and reliability"
-msgstr "ancho de banda bajo y seguridad"
+msgstr "menor ancho de banda y fiabilidad"
 
-#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:566
+#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:411
 msgid "standard bandwidth and reliability"
-msgstr "ancho de banda estándar y seguridad"
+msgstr "ancho de banda y fiabilidad estándar"
 
-#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:568
+#: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:413
 msgid "higher bandwidth and reliability"
-msgstr "alto ancho de banda y seguridad"
+msgstr "mayor ancho de banda y fiabilidad"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:132
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:87
 msgid "Tunnels are not initialized yet, please reload in two minutes."
-msgstr "Todavía no se han inicializado los túneles, recargue en dos minutos."
+msgstr "Todavía no se han inicializado los túneles, vuelva a cargar en dos minutos."
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:205
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:160
 msgid ""
 "Invalid form submission, probably because you used the 'back' or 'reload' "
 "button on your browser. Please resubmit."
-msgstr "El formulario presentado es inválido, probablemente porque has utilizado el botón 'atrás' o 'recargar' de tu navegador. Por favor, ¡vuelve a enviarlo!"
+msgstr "Envío no válido de formulario, probablemente a causa de que haya utilizado el botón 'atrás' o 'recargar' de su navegador. Por favor, reenvíelo."
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:207
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:162
 msgid ""
 "If the problem persists, verify that you have cookies enabled in your "
 "browser."
-msgstr "Si el problema persiste, verifique que tiene activadas las cookies en su navegador."
+msgstr "Si el problema persiste, verifique que tenga activadas las cookies en su navegador."
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:253
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:208
 msgid "Configuration reloaded for all tunnels"
-msgstr "Configuración recargada para todos los túneles"
+msgstr "Configuración cargada de nuevo para todos los túneles"
 
 #. and give them something to look at in any case
 #. FIXME name will be HTML escaped twice
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:267
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:222
 msgid "Starting tunnel"
 msgstr "Inicializando el túnel"
 
 #. and give them something to look at in any case
 #. FIXME name will be HTML escaped twice
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:281
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:236
 msgid "Stopping tunnel"
 msgstr "Deteniendo el túnel"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:370
-msgid "Configuration changes saved"
-msgstr "Cambios en la configuración guardados"
-
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:373
-msgid "Failed to save configuration"
-msgstr "No se pudo guardar la configuración"
-
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:500
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:325
 msgid "New Tunnel"
 msgstr "Nuevo túnel"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:523
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:543
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:661
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:345
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:365
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:451
 msgid "Port not set"
 msgstr "Puerto no establecido"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:526
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:663
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:348
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:453
 msgid "Invalid port"
 msgstr "Puerto no válido"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:529
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:351
 msgid "Warning - ports less than 1024 are not recommended"
-msgstr "Advertencia: no se recomienda usar puertos inferiores al 1024"
+msgstr "Advertencia - Se desaconseja utilizar puertos inferiores al 1024"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:538
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:360
 msgid "Warning - duplicate port"
 msgstr "Advertencia - Puerto duplicado"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:555
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:377
 msgid "Standard client"
 msgstr "Cliente estándar"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:556
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:378
 msgid "HTTP/HTTPS client"
 msgstr "Cliente HTTP/HTTPS"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:557
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:379
 msgid "IRC client"
 msgstr "Cliente IRC"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:558
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:380
 msgid "Standard server"
 msgstr "Servidor estándar"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:559
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:381
 msgid "HTTP server"
 msgstr "Servidor HTTP"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:560
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:382
 msgid "SOCKS 4/4a/5 proxy"
 msgstr "Proxy SOCKS 4/4a/5"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:561
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:383
 msgid "SOCKS IRC proxy"
 msgstr "Proxy IRC SOCKS"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:562
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:384
 msgid "CONNECT/SSL/HTTPS proxy"
 msgstr "Proxy CONNECT/SSL/HTTPS"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:563
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:385
 msgid "IRC server"
 msgstr "Servidor de IRC"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:564
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:386
 msgid "Streamr client"
 msgstr "Cliente Streamr"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:565
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:387
 msgid "Streamr server"
 msgstr "Servidor Streamr"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:566
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:388
 msgid "HTTP bidir"
 msgstr "HTTP bidir"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:655
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:445
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:317
 msgid "Host not set"
 msgstr "Host no establecido"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:657
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:447
 msgid "Invalid address"
 msgstr "Dirección no válida"
 
@@ -223,7 +215,7 @@ msgstr "Objetivo"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:182
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:219
 msgid "Access Point"
-msgstr "Punto de Acceso"
+msgstr "Punto de acceso"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:187
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:200
@@ -238,7 +230,7 @@ msgstr "requerido"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:234
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:485
 msgid "Reachable by"
-msgstr "Accesible por"
+msgstr "Alcanzable por"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:229
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:212
@@ -248,15 +240,15 @@ msgstr "¿Utiliza SSL?"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:238
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:361
 msgid "Outproxies"
-msgstr "Outproxis"
+msgstr "Proxys de salida"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:245
 msgid "SSL Outproxies"
-msgstr "Proxys SSL salientes"
+msgstr "Proxys SSL de salida"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:251
 msgid "Use Outproxy Plugin"
-msgstr "Usar complemento de proxy saliente ('Outproxy')"
+msgstr "Utilizar complemento de proxy de salida"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:255
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:293
@@ -269,12 +261,12 @@ msgstr "(Marca la casilla para \"SÍ\")"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:260
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:381
 msgid "Tunnel Destination"
-msgstr "Túnel del Destino"
+msgstr "Destino I2P del túnel"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:272
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:385
 msgid "name, name:port, or destination"
-msgstr "nombre, nombre:puerto, o destino"
+msgstr "nombre, nombre:puerto, o destino I2P"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:275
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:389
@@ -289,7 +281,7 @@ msgstr "Túnel Compartido"
 msgid ""
 "(Share tunnels with other clients and irc/httpclients? Change requires "
 "restart of client proxy)"
-msgstr "(¿Compartir túneles con otros clientes y clientes de IRC/http? Cambiar esto requiere reiniciar el proxy de cliente)"
+msgstr "(¿Compartir túneles con otros clientes y clientes de IRC/HTTP? Cambiar esto requiere reiniciar el proxy del cliente)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:289
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:174
@@ -304,7 +296,7 @@ msgstr "Habilitar DCC"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:305
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:305
 msgid "Advanced networking options"
-msgstr "Opciones de red avanzadas"
+msgstr "Opciones avanzadas de red"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:307
 msgid ""
@@ -578,7 +570,7 @@ msgstr "Autorización outproxy"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:619
 msgid "Jump URL List"
-msgstr "Lista de URL de salto"
+msgstr "Lista de URLs de servicios de salto (jump)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:625
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:647

@@ -23,6 +23,7 @@ public abstract class TransportUtil {
 
     public static final String NTCP_IPV6_CONFIG = "i2np.ntcp.ipv6";
     public static final String SSU_IPV6_CONFIG = "i2np.udp.ipv6";
+    public static final String PROP_IPV4_FIREWALLED = "i2np.ipv4.firewalled";
 
     public enum IPv6Config {
         /** IPv6 disabled */
@@ -81,6 +82,14 @@ public abstract class TransportUtil {
         if (c != null)
             return c;
         return DEFAULT_IPV6_CONFIG;
+    }
+
+    /**
+     *  @param transportStyle ignored
+     *  @since 0.9.20
+     */
+    public static boolean isIPv4Firewalled(RouterContext ctx, String transportStyle) {
+        return ctx.getBooleanProperty(PROP_IPV4_FIREWALLED);
     }
 
     /**

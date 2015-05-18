@@ -17,14 +17,18 @@ public class ConfigAdvancedHandler extends FormHandler {
     //private boolean _forceRestart;
     private boolean _shouldSave;
     private String _config;
+    private String _ff;
     
     @Override
     protected void processForm() {
         if (_shouldSave) {
-            if (isAdvanced())
+            if ("ff".equals(_action) && _ff != null) {
+                saveFF();
+            } else if (isAdvanced()) {
                 saveChanges();
-            else
+            } else {
                 addFormError("Save disabled, edit the router.config file to make changes") ;
+            }
         } else {
             // noop
         }
@@ -33,6 +37,9 @@ public class ConfigAdvancedHandler extends FormHandler {
     public void setShouldsave(String moo) { _shouldSave = true; }
     //public void setRestart(String moo) { _forceRestart = true; }
     
+    /** @since 0.9.20 */
+    public void setFf(String ff) { _ff = ff; }
+
     public void setNofilter_config(String val) {
         _config = val;
     }
@@ -55,7 +62,7 @@ public class ConfigAdvancedHandler extends FormHandler {
                 return;
             }
 
-            for (Object key : props.keySet()) {
+            for (String key : props.stringPropertyNames()) {
                 unsetKeys.remove(key);
             }
 
@@ -71,5 +78,14 @@ public class ConfigAdvancedHandler extends FormHandler {
             //    addFormNotice("Soft restart complete");
             //}
         }
+    }
+
+    /** @since 0.9.20 */
+    private void saveFF() {
+        boolean saved = _context.router().saveConfig(ConfigAdvancedHelper.PROP_FLOODFILL_PARTICIPANT, _ff);
+        if (saved) 
+            addFormNotice(_("Configuration saved successfully"));
+        else
+            addFormError(_("Error saving the configuration (applied but not saved) - please see the error logs"));
     }
 }

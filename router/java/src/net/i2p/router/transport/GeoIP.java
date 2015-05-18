@@ -73,7 +73,7 @@ public class GeoIP {
     
     static final String PROP_GEOIP_ENABLED = "routerconsole.geoip.enable";
     public static final String PROP_GEOIP_DIR = "geoip.dir";
-    static final String GEOIP_DIR_DEFAULT = "geoip";
+    public static final String GEOIP_DIR_DEFAULT = "geoip";
     static final String GEOIP_FILE_DEFAULT = "geoip.txt";
     static final String COUNTRY_FILE_DEFAULT = "countries.txt";
     public static final String PROP_IP_COUNTRY = "i2np.lastCountry";

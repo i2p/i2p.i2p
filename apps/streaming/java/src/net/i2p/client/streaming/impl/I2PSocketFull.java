@@ -52,7 +52,7 @@ class I2PSocketFull implements I2PSocket {
         Connection c = _connection;
         if (c == null) return;
         if (log.shouldLog(Log.INFO))
-            log.info("close() called, connected? " + c.getIsConnected() + " : " + c);
+            log.info("close() called, connected? " + c.getIsConnected() + " : " + c, new Exception());
         if (c.getIsConnected()) {
             MessageInputStream in = c.getInputStream();
             in.close();

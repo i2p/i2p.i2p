@@ -5,6 +5,7 @@
 # 
 # Translators:
 # "blabla", 2011
+# blabla <blabla@trash-mail.com>, 2015
 # blabla <blabla@trash-mail.com>, 2012
 # D.A. Loader, 2012
 # ducki2p <ducki2p@gmail.com>, 2011
@@ -21,9 +22,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-11-19 21:48+0000\n"
-"PO-Revision-Date: 2014-11-20 00:31+0000\n"
-"Last-Translator: Ettore Atalan <atalanttore@googlemail.com>\n"
+"POT-Creation-Date: 2015-03-29 14:30+0000\n"
+"PO-Revision-Date: 2015-03-07 12:54+0000\n"
+"Last-Translator: blabla <blabla@trash-mail.com>\n"
 "Language-Team: German (http://www.transifex.com/projects/p/I2P/language/de/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -31,11 +32,11 @@ msgstr ""
 "Language: de\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../java/src/org/klomp/snark/IdleChecker.java:69
+#: ../java/src/org/klomp/snark/IdleChecker.java:75
 msgid "No more torrents running."
 msgstr "Keine weiteren Torrents laufen."
 
-#: ../java/src/org/klomp/snark/IdleChecker.java:70
+#: ../java/src/org/klomp/snark/IdleChecker.java:76
 #: ../java/src/org/klomp/snark/SnarkManager.java:2283
 #: ../java/src/org/klomp/snark/SnarkManager.java:2294
 msgid "I2P tunnel closed."
@@ -419,7 +420,7 @@ msgstr "Alle Torrents stoppen und den I2P-Tunnel schließen."
 msgid "Closing I2P tunnel after notifying trackers."
 msgstr "Der I2P-Tunnel wird nach Benachrichtigung der Tracker geschlossen."
 
-#: ../java/src/org/klomp/snark/TrackerClient.java:240
+#: ../java/src/org/klomp/snark/TrackerClient.java:245
 #, java-format
 msgid "No valid trackers for {0} - enable opentrackers or DHT?"
 msgstr "Keine gültigen Tracker für {0}. OpenTrackers oder DHT aktivieren?"
@@ -866,7 +867,7 @@ msgstr "Starten"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1498
 msgid "Seeding"
-msgstr "Verteilvorgang"
+msgstr "Verteile"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1502
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1516

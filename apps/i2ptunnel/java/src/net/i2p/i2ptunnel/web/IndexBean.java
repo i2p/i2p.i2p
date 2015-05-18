@@ -53,7 +53,7 @@ public class IndexBean {
     private String _curNonce;
     //private long _nextNonce;
 
-    private TunnelConfig _config;
+    private final TunnelConfig _config;
     private boolean _removeConfirmed;
     private int _hashCashValue;
     private int _certType;

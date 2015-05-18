@@ -1,5 +1,6 @@
 package net.i2p.i2ptunnel.udp;
 
+import java.io.IOException;
 import java.net.DatagramSocket;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
@@ -12,13 +13,15 @@ import net.i2p.data.Destination;
  */
 public class UDPSink implements Sink {
 
+    /**
+     *  @throws IllegalArgumentException on DatagramSocket IOException
+     */
     public UDPSink(InetAddress host, int port) {
         // create socket
         try {
             this.sock = new DatagramSocket();
-        } catch(Exception e) {
-            // TODO: fail better
-            throw new RuntimeException("failed to open udp-socket", e);
+        } catch (IOException e) {
+            throw new IllegalArgumentException("failed to open udp-socket", e);
         }
         
         this.remoteHost = host;
@@ -27,6 +30,10 @@ public class UDPSink implements Sink {
         this.remotePort = port;
     }
     
+    /**
+     *  @param src ignored
+     *  @throws RuntimeException on DatagramSocket IOException
+     */
     public void send(Destination src, byte[] data) {
         // if data.length > this.sock.getSendBufferSize() ...
 
@@ -36,9 +43,8 @@ public class UDPSink implements Sink {
         // send packet
         try {
             this.sock.send(packet);
-        } catch(Exception e) {
-            // TODO: fail a bit better
-            e.printStackTrace();
+        } catch (IOException ioe) {
+            throw new RuntimeException("failed to send data", ioe);
         }
     }
     

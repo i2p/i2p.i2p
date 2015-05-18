@@ -1,3 +1,175 @@
+2015-05-13 zzz
+ * Console: Fix URLs caught in XSS filter on /confighome (ticket #1569)
+ * i2psnark: Fix deletion of single-file torrent outside snark dir (ticket #1544)
+ * NTCP: Catch race in Reader (ticket #1534)
+
+2015-02-12 dg
+ * Job Queue/stats: add stat/graph for amount of scheduled jobs (router.tunnelBacklog)
+ * FloodfillMonitorJob:
+   - Use avg of router.tunnelBacklog instead of current backlog
+ * Some language/spelling fixes
+
+2015-05-11 zzz
+ * Util: Fix corruption of cached ReusableGZIPInputStreams
+
+2015-05-09 zzz
+ * i2ptunnel: Improve error handling in UDP tunnels
+ * Plugins: Add support for custom icons (ticket #1550)
+
+2015-05-08 zzz
+ * Reseed: Don't reseed while shutting down (ticket #1565)
+
+2015-05-07 zzz
+ * SAM: Close datagram or raw session when underlying
+   I2P session closes (ticket #1563)
+ * Update: Add support for su3-signed development builds (ticket #1381)
+
+2015-05-06 zzz
+ * Datagram: Convert IOE to DFE and throw on error (ticket #1562)
+ * Naming services: Export address books with Windows
+   line endings on Windows (ticket #1557)
+ * Transport: Add config to force IPv4 (only) to firewalled (ticket #1541)
+
+2015-05-04 zzz
+ * i2ptunnel:
+   - Close input stream when HTTP client decompressor
+     terminates (ticket #1506)
+   - Add Connection: close headers to errors and proxy.i2p responses
+     where it was missing (ticket #1531)
+
+2015-05-03 zzz
+ * Console: Add floodfill configuration form to /configadvanced
+ * Router: Allow class M to become floodfill;
+   add bandwidth classes P and X (ticket #1447)
+ * SusiDNS: Add export button
+
+2015-05-02 zzz
+ * Console: Fix Indonesian translations
+ * Jetty 8.1.17.v20150415
+ * Transports: Cleanup of ticket #1458 fixes
+
+2015-04-30 zzz
+ * Transports: Correctly handle IPv4 firewalled, IPv6 not (ticket #1458)
+
+2015-04-29 zzz
+ * Clock: Make forward slewing work better
+ * I2CP: Periodically send a SetDate message to external clients
+ * Transports:
+   - Fix clock skew calculations
+   - Track IPv4/v6 reachability separately (ticket #1458)
+
+2015-04-28 zzz
+ * JobQueueRunner: Don't call System.exit() on OOM,
+   let the shutdown progress normally;
+   Make it an I2PThread instead of a Runner so we can
+   call fireOOM() for consistent logging (ticket #1549)
+ * Router: Don't add OOM listener on Android so
+   we don't hang onto the context
+
+2015-04-27 zzz
+ * NamingService: Add export methods
+ * SusiDNS: Add export support, no UI yet
+ * Transports:
+   - Convert internal state to enums, prep for tracking
+     IPv4/v6 reachability separately (ticket #1458)
+   - Don't set TCP keepalive for IPv6
+
+2015-04-26 zzz
+ * i2ptunnel: Reduce sleep time in runners to reduce latency
+
+2015-04-25 zzz
+ * I2PSSLSocketFactory: Add hostname verification
+ * SSLEepGet:
+   - Rework recent setSoTimeout code changes, as they broke SNI
+   - Add option to save certs even if no errors
+   - Add option to disable hostname verification
+
+2015-04-24 zzz
+ * Util: Catch and convert OOM in I2PThread.start()
+ * i2ptunnel:
+   - Fix Socks and SocksIRC tunnels not starting
+   - Fix shutdown of client tunnels on server socket errors,
+ * Updates: Fail fast if HTTP proxy is not running (ticket #1530)
+
+2015-04-23 zzz
+ * Streaming:
+   - Reduce min RTO for quicker recovery after packet loss
+   - Reduce default initial ack delay
+   - More efficient checking for input buffer overflow
+
+2015-04-22 zzz
+ * i2psnark: Fix deletion of config files, cleanup old ones (ticket #1498)
+ * I2PSocketEepGet: Fix i2psnark NPE caused by -6 (ticket #1543)
+ * NTCP: Reduce min send finisher threads to 1
+ * PortMapper: Status output for /debug
+
+2015-04-21 zzz
+ * i2ptunnel: Log uncaught errors in thread pool
+ * Reseed: Disable non-su3 reseeding
+ * Router timestamper:
+   - Add country-to-continent mapping
+   - Add continent zones as fallback
+   - Don't start threads in constructors
+ * Transports: Reduce idle timeouts
+
+2015-04-20 zzz
+ * Blockfile: Unroll recursive initialization
+ * EepGet: Set soTimeout for non-proxied fetches to enforce
+   header timeout and prevent long reseed hangs
+ * Reseed:
+   - Honor SSL/non-SSL setting when custom reseed list is set (ticket #1136)
+   - Remove all default HTTP URLs (ticket #1514)
+
+2015-04-17 zzz
+Prop from i2p.i2p.zzz.test2:
+ * Console: Set session cookies to HttpOnly
+ * i2psnark: Remove extra mime types in i2psnark web.xml;
+   added to Jetty's default by now, or in our mime.properties file
+ * i2ptunnel:
+   - Send HTTP server port 443 traffic to the server
+     transparently, to support HTTPS over the same tunnel, if so configured
+   - Add check for total header size in HTTP server
+   - Return specific error pages to client on errors
+     in HTTP header processing in the HTTP server (ticket #1507)
+ * Jetty:
+   -  Add extensive help to jetty-ssl.xml
+   -  Set session cookies to HttpOnly in all webapps
+ * JobQueue: Make number of runners configurable
+ * Router: Move update extraction code to new class in tasks/
+ * Tunnels:
+   - Add bloom filter warning if high bandwidth but low memory
+   - Add new Bloom filter size, increase bandwidth limit (ticket #1505)
+   - Add config to disable Bloom filter for testing
+
+2015-04-16 zzz
+ * I2CP: Run DistributeLocal jobs inline (ticket #1506)
+ * i2psnark: Increase max tunnels to 10
+ * i2ptunnel: Don't start tunnels in constructors (ticket #815)
+ * NetDB: Reduce max search depth
+ * Transport: Fix active peer count for NTCP
+
+2015-04-15 tuna
+ * SimpleScheduler: Deprecated, functionality moved to SimpleTimer2 (ticket #1069)
+
+2015-04-13 zzz
+ * Router: Fix NPE on bad share bandwidth config (ticket #1524)
+ * Streaming: Handle reset packets without a FROM field, validate
+              signature using connection's destination
+ * Update: Don't log an error for the "dummy" updater (ticket #1525)
+
+* 2015-04-12 0.9.19 released
+
+2015-04-11 zzz
+ * Updates after review
+
+2015-04-09 kytv
+ * Updates to geoip.txt and geoipv6.dat.gz based on Maxmind GeoLite Country
+   database from 2015-04-07.
+ * Translation updates
+
+2015-04-05 zzz
+ * IRC Server: Better timeout handling reading initial lines (ticket #723)
+
 2015-04-04 zzz
  * i2ptunnel:
    - Better timeout handling when reading headers in HTTP server (ticket #723)
