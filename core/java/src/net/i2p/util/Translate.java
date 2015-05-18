@@ -218,5 +218,6 @@ public abstract class Translate {
     public static void clearCache() {
         _missing.clear();
         _bundles.clear();
+        ResourceBundle.clearCache();
     }
 }
