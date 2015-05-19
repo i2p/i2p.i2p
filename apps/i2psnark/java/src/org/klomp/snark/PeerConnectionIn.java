@@ -98,8 +98,6 @@ class PeerConnectionIn implements Runnable
               }
             
             byte b = din.readByte();
-            Message m = new Message();
-            m.type = b;
             switch (b)
               {
               case Message.CHOKE:

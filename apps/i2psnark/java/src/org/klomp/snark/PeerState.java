@@ -165,9 +165,15 @@ class PeerState implements DataLoader
    *  @since 0.9.21
    */
   private void bitfieldMessage(byte[] bitmap, boolean isAll) {
+    if (_log.shouldLog(Log.DEBUG)) {
+        if (bitmap != null)
+            _log.debug(peer + " rcv bitfield bytes: " + bitmap.length);
+        else if (isAll) 
+            _log.debug(peer + " rcv bitfield HAVE_ALL");
+        else
+            _log.debug(peer + " rcv bitfield HAVE_NONE");
+    }
     synchronized(this) {
-        if (_log.shouldLog(Log.DEBUG))
-          _log.debug(peer + " rcv bitfield");
         if (bitfield != null)
           {
             // XXX - Be liberal in what you accept?

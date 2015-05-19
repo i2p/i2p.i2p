@@ -286,6 +286,8 @@ class PeerConnectionOut implements Runnable
                     r.piece = m.piece;
                     r.begin = m.begin;
                     r.length = m.length;
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("Send " + peer + ": " + r);
                     try {
                         r.sendMessage(dout);
                     } catch (IOException ioe) {}
@@ -525,7 +527,8 @@ class PeerConnectionOut implements Runnable
   }
 
   /**
-   *  Remove all Request messages from the queue
+   *  Remove all Request messages from the queue.
+   *  Does not send a cancel message.
    *  @since 0.8.2
    */
   void cancelRequestMessages() {
@@ -537,9 +540,12 @@ class PeerConnectionOut implements Runnable
       }
   }
 
-  // Called by the PeerState when the other side doesn't want this
-  // request to be handled anymore. Removes any pending Piece Message
-  // from out send queue.
+  /**
+   *  Called by the PeerState when the other side doesn't want this
+   *  request to be handled anymore. Removes any pending Piece Message
+   *  from out send queue.
+   *  Does not send a cancel message.
+   */
   void cancelRequest(int piece, int begin, int length)
   {
     synchronized (sendQueue)

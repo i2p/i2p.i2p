@@ -90,17 +90,20 @@ abstract class ExtensionHandler {
             peer.setHandshakeMap(map);
             Map<String, BEValue> msgmap = map.get("m").getMap();
 
-            if (msgmap.get(TYPE_PEX) != null) {
-                if (log.shouldLog(Log.DEBUG))
-                    log.debug("Peer supports PEX extension: " + peer);
-                // peer state calls peer listener calls sendPEX()
-            }
+            if (log.shouldLog(Log.DEBUG))
+                log.debug("Peer " + peer + " supports extensions: " + msgmap.keySet());
 
-            if (msgmap.get(TYPE_DHT) != null) {
-                if (log.shouldLog(Log.DEBUG))
-                    log.debug("Peer supports DHT extension: " + peer);
-                // peer state calls peer listener calls sendDHT()
-            }
+            //if (msgmap.get(TYPE_PEX) != null) {
+            //    if (log.shouldLog(Log.DEBUG))
+            //        log.debug("Peer supports PEX extension: " + peer);
+            //    // peer state calls peer listener calls sendPEX()
+            //}
+
+            //if (msgmap.get(TYPE_DHT) != null) {
+            //    if (log.shouldLog(Log.DEBUG))
+            //        log.debug("Peer supports DHT extension: " + peer);
+            //    // peer state calls peer listener calls sendDHT()
+            //}
 
             MagnetState state = peer.getMagnetState();
 

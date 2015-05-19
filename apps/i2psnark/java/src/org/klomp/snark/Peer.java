@@ -82,12 +82,12 @@ public class Peer implements Comparable<Peer>
   //  bytes per bt spec:                         0011223344556677
   private static final long OPTION_EXTENSION = 0x0000000000100000l;
   private static final long OPTION_FAST      = 0x0000000000000004l;
-  private static final long OPTION_DHT       = 0x0000000000000001l;
+  //private static final long OPTION_DHT       = 0x0000000000000001l;
   /** we use a different bit since the compact format is different */
 /* no, let's use an extension message
   static final long OPTION_I2P_DHT   = 0x0000000040000000l;
 */
-  private static final long OPTION_AZMP      = 0x1000000000000000l;
+  //private static final long OPTION_AZMP      = 0x1000000000000000l;
   private long options;
 
   /**
@@ -388,7 +388,7 @@ public class Peer implements Comparable<Peer>
     if (options != 0) {
         // send them something in runConnection() above
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Peer supports options 0x" + Long.toString(options, 16) + ": " + toString());
+            _log.debug("Peer supports options 0x" + Long.toHexString(options) + ": " + toString());
     }
 
     return bs;
