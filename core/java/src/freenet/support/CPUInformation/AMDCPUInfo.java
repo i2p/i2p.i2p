@@ -52,15 +52,15 @@ public interface AMDCPUInfo extends CPUInfo {
      */
 	public boolean IsBulldozerCompatible();
     /**
-     * @return true if the CPU present in the machine is at least a 'bulldozer' CPU
+     * @return true if the CPU present in the machine is at least a 'piledriver' CPU
      */
 	public boolean IsPiledriverCompatible();
     /**
-     * @return true if the CPU present in the machine is at least a 'bulldozer' CPU
+     * @return true if the CPU present in the machine is at least a 'steamroller' CPU
      */
 	public boolean IsSteamrollerCompatible();
     /**
-     * @return true if the CPU present in the machine is at least a 'bulldozer' CPU
+     * @return true if the CPU present in the machine is at least a 'excavator' CPU
      */
 	public boolean IsExcavatorCompatible();
 
