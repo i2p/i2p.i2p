@@ -79,15 +79,15 @@ public class Peer implements Comparable<Peer>
   private long uploaded_old[] = {-1,-1,-1};
   private long downloaded_old[] = {-1,-1,-1};
 
-  //  bytes per bt spec:                 0011223344556677
-  static final long OPTION_EXTENSION = 0x0000000000100000l;
-  static final long OPTION_FAST      = 0x0000000000000004l;
-  static final long OPTION_DHT       = 0x0000000000000001l;
+  //  bytes per bt spec:                         0011223344556677
+  private static final long OPTION_EXTENSION = 0x0000000000100000l;
+  private static final long OPTION_FAST      = 0x0000000000000004l;
+  private static final long OPTION_DHT       = 0x0000000000000001l;
   /** we use a different bit since the compact format is different */
 /* no, let's use an extension message
   static final long OPTION_I2P_DHT   = 0x0000000040000000l;
 */
-  static final long OPTION_AZMP      = 0x1000000000000000l;
+  private static final long OPTION_AZMP      = 0x1000000000000000l;
   private long options;
 
   /**
@@ -338,6 +338,9 @@ public class Peer implements Comparable<Peer>
     dout.write("BitTorrent protocol".getBytes("UTF-8"));
     // Handshake write - options
     long myOptions = OPTION_EXTENSION;
+    // we can't handle HAVE_ALL or HAVE_NONE if we don't know the number of pieces
+    if (metainfo != null)
+        myOptions |= OPTION_FAST;
     // FIXME get util here somehow
     //if (util.getDHT() != null)
     //    myOptions |= OPTION_I2P_DHT;
@@ -391,9 +394,9 @@ public class Peer implements Comparable<Peer>
     return bs;
   }
 
-  /** @since 0.8.4 */
-  public long getOptions() {
-      return options;
+  /** @since 0.9.21 */
+  public boolean supportsFast() {
+      return (options & OPTION_FAST) != 0;
   }
 
   /** @since 0.8.4 */

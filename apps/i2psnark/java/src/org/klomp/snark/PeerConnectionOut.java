@@ -277,11 +277,20 @@ class PeerConnectionOut implements Runnable
         while (it.hasNext())
           {
             Message m = it.next();
-            if (m.type == type)
-              {
+            if (m.type == type) {
                 it.remove();
                 removed = true;
-              }
+                if (type == Message.PIECE && peer.supportsFast()) {
+                    Message r = new Message();
+                    r.type = Message.REJECT;
+                    r.piece = m.piece;
+                    r.begin = m.begin;
+                    r.length = m.length;
+                    try {
+                        r.sendMessage(dout);
+                    } catch (IOException ioe) {}
+                }
+            }
           }
         sendQueue.notifyAll();
       }
@@ -349,12 +358,19 @@ class PeerConnectionOut implements Runnable
 
   void sendBitfield(BitField bitfield)
   {
-    Message m = new Message();
-    m.type = Message.BITFIELD;
-    m.data = bitfield.getFieldBytes();
-    m.off = 0;
-    m.len = m.data.length;
-    addMessage(m);
+    boolean fast = peer.supportsFast();
+    if (fast && bitfield.complete()) {
+        sendHaveAll();
+    } else if (fast && bitfield.count() <= 0) {
+        sendHaveNone();
+    } else {
+       Message m = new Message();
+       m.type = Message.BITFIELD;
+       m.data = bitfield.getFieldBytes();
+       m.off = 0;
+       m.len = m.data.length;
+       addMessage(m);
+    }
   }
 
   /** reransmit requests not received in 7m */
@@ -557,6 +573,52 @@ class PeerConnectionOut implements Runnable
     Message m = new Message();
     m.type = Message.PORT;
     m.piece = port;
+    addMessage(m);
+  }
+
+  /**
+   *  Unused
+   *  @since 0.9.21
+   */
+  void sendSuggest(int piece) {
+    Message m = new Message();
+    m.type = Message.SUGGEST;
+    m.piece = piece;
+    addMessage(m);
+  }
+
+  /** @since 0.9.21 */
+  private void sendHaveAll() {
+    Message m = new Message();
+    m.type = Message.HAVE_ALL;
+    addMessage(m);
+  }
+
+  /** @since 0.9.21 */
+  private void sendHaveNone() {
+    Message m = new Message();
+    m.type = Message.HAVE_NONE;
+    addMessage(m);
+  }
+
+  /** @since 0.9.21 */
+  void sendReject(int piece, int begin, int length) {
+    Message m = new Message();
+    m.type = Message.REJECT;
+    m.piece = piece;
+    m.begin = begin;
+    m.length = length;
+    addMessage(m);
+  }
+
+  /**
+   *  Unused
+   *  @since 0.9.21
+   */
+  void sendAllowedFast(int piece) {
+    Message m = new Message();
+    m.type = Message.ALLOWED_FAST;
+    m.piece = piece;
     addMessage(m);
   }
 }

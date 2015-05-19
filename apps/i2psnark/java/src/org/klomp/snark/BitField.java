@@ -20,6 +20,8 @@
 
 package org.klomp.snark;
 
+import java.util.Arrays;
+
 
 /**
  * Container of a byte array representing set and unset bits.
@@ -66,7 +68,7 @@ public class BitField
 
   /**
    * This returns the actual byte array used.  Changes to this array
-   * effect this BitField.  Note that some bits at the end of the byte
+   * affect this BitField.  Note that some bits at the end of the byte
    * array are supposed to be always unset if they represent bits
    * bigger then the size of the bitfield.
    */
@@ -103,6 +105,16 @@ public class BitField
             bitfield[index] |= mask;
         }
     }
+  }
+
+  /**
+   * Sets all bits to true.
+   *
+   * @since 0.9.21
+   */
+  public void setAll() {
+      Arrays.fill(bitfield, (byte) 0xff);
+      count = size;
   }
 
   /**

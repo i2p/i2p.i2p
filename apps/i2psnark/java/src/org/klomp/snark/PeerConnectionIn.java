@@ -102,40 +102,46 @@ class PeerConnectionIn implements Runnable
             m.type = b;
             switch (b)
               {
-              case 0:
+              case Message.CHOKE:
                 ps.chokeMessage(true);
                 if (_log.shouldLog(Log.DEBUG)) 
                     _log.debug("Received choke from " + peer);
                 break;
-              case 1:
+
+              case Message.UNCHOKE:
                 ps.chokeMessage(false);
                 if (_log.shouldLog(Log.DEBUG)) 
                     _log.debug("Received unchoke from " + peer);
                 break;
-              case 2:
+
+              case Message.INTERESTED:
                 ps.interestedMessage(true);
                 if (_log.shouldLog(Log.DEBUG)) 
                     _log.debug("Received interested from " + peer);
                 break;
-              case 3:
+
+              case Message.UNINTERESTED:
                 ps.interestedMessage(false);
                 if (_log.shouldLog(Log.DEBUG)) 
                     _log.debug("Received not interested from " + peer);
                 break;
-              case 4:
+
+              case Message.HAVE:
                 piece = din.readInt();
                 ps.haveMessage(piece);
                 if (_log.shouldLog(Log.DEBUG)) 
                     _log.debug("Received havePiece(" + piece + ") from " + peer);
                 break;
-              case 5:
+
+              case Message.BITFIELD:
                 byte[] bitmap = new byte[i-1];
                 din.readFully(bitmap);
                 ps.bitfieldMessage(bitmap);
                 if (_log.shouldLog(Log.DEBUG)) 
                     _log.debug("Received bitmap from " + peer  + ": size=" + (i-1) /* + ": " + ps.bitfield */ );
                 break;
-              case 6:
+
+              case Message.REQUEST:
                 piece = din.readInt();
                 begin = din.readInt();
                 len = din.readInt();
@@ -143,7 +149,8 @@ class PeerConnectionIn implements Runnable
                 if (_log.shouldLog(Log.DEBUG)) 
                     _log.debug("Received request(" + piece + "," + begin + ") from " + peer);
                 break;
-              case 7:
+
+              case Message.PIECE:
                 piece = din.readInt();
                 begin = din.readInt();
                 len = i-9;
@@ -165,7 +172,8 @@ class PeerConnectionIn implements Runnable
                         _log.debug("Received UNWANTED data(" + piece + "," + begin + ") from " + peer);
                   }
                 break;
-              case 8:
+
+              case Message.CANCEL:
                 piece = din.readInt();
                 begin = din.readInt();
                 len = din.readInt();
@@ -173,13 +181,15 @@ class PeerConnectionIn implements Runnable
                 if (_log.shouldLog(Log.DEBUG)) 
                     _log.debug("Received cancel(" + piece + "," + begin + ") from " + peer);
                 break;
-              case 9:  // PORT message
+
+              case Message.PORT:
                 int port = din.readUnsignedShort();
                 ps.portMessage(port);
                 if (_log.shouldLog(Log.DEBUG)) 
                     _log.debug("Received port message from " + peer);
                 break;
-              case 20:  // Extension message
+
+              case Message.EXTENSION:
                 int id = din.readUnsignedByte();
                 byte[] payload = new byte[i-2];
                 din.readFully(payload);
@@ -187,6 +197,43 @@ class PeerConnectionIn implements Runnable
                     _log.debug("Received extension message from " + peer);
                 ps.extensionMessage(id, payload);
                 break;
+
+              // fast extensions below here
+              case Message.SUGGEST:
+                piece = din.readInt();
+                ps.suggestMessage(piece);
+                if (_log.shouldLog(Log.DEBUG)) 
+                    _log.debug("Received suggest(" + piece + ") from " + peer);
+                break;
+
+              case Message.HAVE_ALL:
+                ps.haveMessage(true);
+                if (_log.shouldLog(Log.DEBUG)) 
+                    _log.debug("Received have_all from " + peer);
+                break;
+
+              case Message.HAVE_NONE:
+                ps.haveMessage(false);
+                if (_log.shouldLog(Log.DEBUG)) 
+                    _log.debug("Received have_none from " + peer);
+                break;
+
+              case Message.REJECT:
+                piece = din.readInt();
+                begin = din.readInt();
+                len = din.readInt();
+                ps.rejectMessage(piece, begin, len);
+                if (_log.shouldLog(Log.DEBUG)) 
+                    _log.debug("Received reject(" + piece + ',' + begin + ',' + len + ") from " + peer);
+                break;
+
+              case Message.ALLOWED_FAST:
+                piece = din.readInt();
+                ps.allowedFastMessage(piece);
+                if (_log.shouldLog(Log.DEBUG)) 
+                    _log.debug("Received allowed_fast(" + piece + ") from " + peer);
+                break;
+
               default:
                 byte[] bs = new byte[i-1];
                 din.readFully(bs);
