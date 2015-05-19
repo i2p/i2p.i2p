@@ -357,7 +357,7 @@ class PacketHandler {
                         } else {
                             if (_log.shouldLog(Log.WARN))
                                 _log.warn("Validation with existing con failed, and validation as reestablish failed too.  DROP " + packet);
-                            _context.statManager().addRateData("udp.droppedInvalidReestablish", packet.getLifetime(), packet.getExpiration());
+                            _context.statManager().addRateData("udp.droppedInvalidReestablish", packet.getLifetime());
                         }
                         return;
                     }
@@ -455,7 +455,7 @@ class PacketHandler {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Cannot validate rcvd pkt (path) wasCached? " + alreadyFailed + ": " + packet);
 
-                _context.statManager().addRateData("udp.droppedInvalidEstablish", packet.getLifetime(), packet.getExpiration());
+                _context.statManager().addRateData("udp.droppedInvalidEstablish", packet.getLifetime());
                 switch (peerType) {
                     case INBOUND_FALLBACK:
                         _context.statManager().addRateData("udp.droppedInvalidEstablish.inbound", packet.getLifetime(), packet.getTimeSinceReceived());
@@ -532,7 +532,7 @@ class PacketHandler {
                 _state = 34;
                 receivePacket(reader, packet, INBOUND_FALLBACK);
             } else {
-                _context.statManager().addRateData("udp.droppedInvalidInboundEstablish", packet.getLifetime(), packet.getExpiration());
+                _context.statManager().addRateData("udp.droppedInvalidInboundEstablish", packet.getLifetime());
             }
         }
 
@@ -638,12 +638,12 @@ class PacketHandler {
             if (skew > GRACE_PERIOD) {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Packet too far in the past: " + new Date(sendOn) + ": " + packet);
-                _context.statManager().addRateData("udp.droppedInvalidSkew", skew, packet.getExpiration());
+                _context.statManager().addRateData("udp.droppedInvalidSkew", skew);
                 return;
             } else if (skew < 0 - GRACE_PERIOD) {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Packet too far in the future: " + new Date(sendOn) + ": " + packet);
-                _context.statManager().addRateData("udp.droppedInvalidSkew", 0-skew, packet.getExpiration());
+                _context.statManager().addRateData("udp.droppedInvalidSkew", 0-skew);
                 return;
             }
 
@@ -790,7 +790,7 @@ class PacketHandler {
                     _state = 52;
                     if (_log.shouldLog(Log.WARN))
                         _log.warn("Dropping type " + type + " auth " + auth + ": " + packet);
-                    _context.statManager().addRateData("udp.droppedInvalidUnknown", packet.getLifetime(), packet.getExpiration());
+                    _context.statManager().addRateData("udp.droppedInvalidUnknown", packet.getLifetime());
                     return;
             }
         }
