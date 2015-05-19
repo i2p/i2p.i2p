@@ -45,7 +45,8 @@ class IntelInfoImpl extends CPUIDCPUInfo implements IntelCPUInfo
         if (smodel != null)
             return smodel;
         throw new UnknownCPUException("Unknown Intel CPU; Family="+CPUID.getCPUFamily() + '/' + CPUID.getCPUExtendedFamily()+
-                                      ", Model="+CPUID.getCPUModel() + '/' + CPUID.getCPUExtendedModel());
+                                      ", Model="+CPUID.getCPUModel() + '/' + CPUID.getCPUExtendedModel());    	// 
+
     }
     
     private static String identifyCPU()
@@ -148,7 +149,6 @@ class IntelInfoImpl extends CPUIDCPUInfo implements IntelCPUInfo
                     isPentium4Compatible = true;
                     isPentiumMCompatible = true;
                     isCore2Compatible = true;
-                    isX64 = true;
                     if (extmodel >= 2)
                         isCoreiCompatible = true;
                 }
@@ -204,7 +204,6 @@ class IntelInfoImpl extends CPUIDCPUInfo implements IntelCPUInfo
                         isPentium2Compatible = true;
                         isPentium3Compatible = true;
                         isPentiumMCompatible = true;
-                        isX64 = true;
                         modelString = "Pentium M (Banias)";
                         break;
                     case 10:
@@ -221,7 +220,6 @@ class IntelInfoImpl extends CPUIDCPUInfo implements IntelCPUInfo
                         isPentium2Compatible = true;
                         isPentium3Compatible = true;
                         isPentiumMCompatible = true;
-                        isX64 = true;
                         modelString = "Core (Yonah)";
                         break;
                     case 14:
@@ -230,7 +228,6 @@ class IntelInfoImpl extends CPUIDCPUInfo implements IntelCPUInfo
                         isPentium3Compatible = true;
                         isPentiumMCompatible = true;
                         isCore2Compatible = true;
-                        isX64 = true;
                         modelString = "Penryn";
                         break;
 
@@ -256,7 +253,6 @@ class IntelInfoImpl extends CPUIDCPUInfo implements IntelCPUInfo
                         // Some support SSE3? true for Pineview? TBD...
                         isCore2Compatible = false;
                         isPentium4Compatible = false;
-                        isX64 = true;
                         modelString = "Atom";
                         break;
                     // Penryn 45 nm
@@ -345,6 +341,19 @@ class IntelInfoImpl extends CPUIDCPUInfo implements IntelCPUInfo
                         isBroadwellCompatible = true;
                         modelString = "Broadwell";
                         break;
+                    // Ivy Bridge 22 nm
+                    case 0x3e:
+                        isSandyCompatible = true;
+                        isIvyCompatible = true;
+                        modelString = "Ivy Bridge";
+                        break;
+                    // Haswell 22 nm
+                    case 0x3f:
+                        isSandyCompatible = true;
+                        isIvyCompatible = true;
+                        isHaswellCompatible = true;
+                        modelString = "Haswell";
+                        break;
 
                 // following are for extended model == 4
                 // most flags are set above
@@ -410,11 +419,9 @@ class IntelInfoImpl extends CPUIDCPUInfo implements IntelCPUInfo
                         modelString = "Pentium IV (90 nm)";
                         break;
                     case 4:
-                        isX64 = true;
                         modelString = "Pentium IV (90 nm)";
                         break;
                     case 6:
-                        isX64 = true;
                         modelString = "Pentium IV (65 nm)";
                         break;
                     default:
@@ -431,9 +438,5 @@ class IntelInfoImpl extends CPUIDCPUInfo implements IntelCPUInfo
             }
         }
         return modelString;
-    }
-
-    public boolean hasX64() {
-        return isX64;
     }
 }

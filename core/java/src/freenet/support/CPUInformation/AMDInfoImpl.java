@@ -23,9 +23,6 @@ class AMDInfoImpl extends CPUIDCPUInfo implements AMDCPUInfo
     private static boolean isExcavatorCompatible;
 
 
-    // If modelString != null, the cpu is considered correctly identified.
-    private static final String smodel = identifyCPU();
-
     public boolean IsK6Compatible(){ return isK6Compatible; }
 
     public boolean IsK6_2_Compatible(){ return isK6_2_Compatible; }
@@ -53,14 +50,14 @@ class AMDInfoImpl extends CPUIDCPUInfo implements AMDCPUInfo
     
     public String getCPUModelString() throws UnknownCPUException
     {
+        String smodel = identifyCPU();
         if (smodel != null)
             return smodel;
         throw new UnknownCPUException("Unknown AMD CPU; Family="+CPUID.getCPUFamily() + '/' + CPUID.getCPUExtendedFamily()+
                                       ", Model="+CPUID.getCPUModel() + '/' + CPUID.getCPUExtendedModel());
     }
     
-
-    private static String identifyCPU()
+    private String identifyCPU()
     {
         // http://en.wikipedia.org/wiki/Cpuid
     	// #include "llvm/Support/Host.h", http://llvm.org/docs/doxygen/html/Host_8cpp_source.html
@@ -196,7 +193,6 @@ class AMDInfoImpl extends CPUIDCPUInfo implements AMDCPUInfo
             isK6_3_Compatible = true;
             isAthlonCompatible = true;
             isAthlon64Compatible = true;
-            isX64 = true;
             switch (model) {
                 case 4:
                     modelString = "Athlon 64/Mobile XP-M";
@@ -328,7 +324,6 @@ class AMDInfoImpl extends CPUIDCPUInfo implements AMDCPUInfo
             isK6_3_Compatible = true;
             isAthlonCompatible = true;
             isAthlon64Compatible = true;
-            isX64 = true;
             switch (model) {
                 case 2:
                     modelString = "Phenom / Athlon / Opteron Gen 3 (Barcelona/Agena/Toliman/Kuma, 65 nm)";
@@ -365,7 +360,6 @@ class AMDInfoImpl extends CPUIDCPUInfo implements AMDCPUInfo
             isK6_3_Compatible = true;
             isAthlonCompatible = true;
             isAthlon64Compatible = true;
-            isX64 = true;
             switch (model) {
                 case 3:
                     modelString = "AMD Turion X2/Athlon X2/Sempron (Lion/Sable, 65 nm)";
@@ -388,7 +382,6 @@ class AMDInfoImpl extends CPUIDCPUInfo implements AMDCPUInfo
             isK6_3_Compatible = true;
             isAthlonCompatible = true;
             isAthlon64Compatible = true;
-            isX64 = true;
             modelString = "AMD APU model " + model;
           }
           break;
@@ -401,7 +394,6 @@ class AMDInfoImpl extends CPUIDCPUInfo implements AMDCPUInfo
             isAthlonCompatible = true;
             isAthlon64Compatible = true;
             isBobcatCompatible = true;
-            isX64 = true;
             switch (model) {
                 case 1:                    
                 // Case 3 is uncertain but most likely a Bobcat APU
@@ -423,7 +415,10 @@ class AMDInfoImpl extends CPUIDCPUInfo implements AMDCPUInfo
             isAthlonCompatible = true;
             isAthlon64Compatible = true;
             isBulldozerCompatible = true;
-            isX64 = true;
+            if (!this.hasAVX()) {
+            	modelString = "Bulldozer";
+            	break;
+            }
 	        if (model >= 0x50 && model <= 0x5F) {
 	        	isPiledriverCompatible = true;
 	        	isSteamrollerCompatible = true;
@@ -433,7 +428,7 @@ class AMDInfoImpl extends CPUIDCPUInfo implements AMDCPUInfo
 	        	isPiledriverCompatible = true;
 	        	isSteamrollerCompatible = true;
 	            modelString = "Steamroller";
-	        } else if (model >= 0x10 && model <= 0x1F) {
+	        } else if ((model >= 0x10 && model <= 0x1F) || hasTBM()) {
 	        	isPiledriverCompatible = true;
 	        	modelString = "Piledriver";
 	        } else {
@@ -451,17 +446,10 @@ class AMDInfoImpl extends CPUIDCPUInfo implements AMDCPUInfo
             isAthlon64Compatible = true;
             isBobcatCompatible = true;
             isJaguarCompatible = true;
-            isX64 = true;
             modelString = "Jaguar";
           }
           break;
         }
         return modelString;
     }
-
-    public boolean hasX64()
-    {
-        return isX64;
-    }
-
 }

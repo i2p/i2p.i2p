@@ -62,10 +62,39 @@ public interface CPUInfo
      * @return true iff the CPU support the SSE4A instruction set.
      */
     public boolean hasSSE4A();
-
+    
+    /**
+     * @return true iff the CPU supports the AVX instruction set.
+     * @since 0.9.21
+     */
+    public boolean hasAVX();
+    
+    /**
+     * @return true iff the CPU supports the AVX2 instruction set.
+     * @since 0.9.21
+     */
+    public boolean hasAVX2();
+    
+    /**
+     * @return true iff the CPU supports the full AVX512 instruction set.
+     * @since 0.9.21
+     */
+    public boolean hasAVX512();
+    
+    /**
+     * @return true iff the CPU supports TBM.
+     * @since 0.9.21
+     */
+    public boolean hasTBM();
     /**
      * @return true iff the CPU supports the AES-NI instruction set.
      * @since 0.9.14
      */
     public boolean hasAES();
+    
+    /**
+     * @return true iff the CPU supports the 64-bit support
+     * @since 0.9.21
+     */
+    public boolean hasX64();
 }
