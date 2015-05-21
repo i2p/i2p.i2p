@@ -5,6 +5,7 @@ profile system_i2p {
   #include <abstractions/i2p>
 
   owner /{,lib/live/mount/overlay/}var/lib/i2p/** rwkl,
+  owner /{,lib/live/mount/overlay/}var/lib/i2p/i2p-config/eepsite/cgi-bin rix,
   owner /{,lib/live/mount/overlay/}var/log/i2p/* rw,
 
   owner /{,var/}run/i2p/{i2p,routerjvm}.pid rw,
