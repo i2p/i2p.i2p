@@ -4,17 +4,19 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
 # Translators:
+# asteryx <asteryx82@gmail.com>, 2015
 # Denis Blank <gribua@gmail.com>, 2011
 # Denis Blank <gribua@gmail.com>, 2012
 # LinuxChata, 2014
-# madjong <madjong@i2pmail.org>, 2014
+# madjong <madjong@i2pmail.org>, 2014-2015
+# brianhopes <voganc-12@live.ru>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-03-29 14:30+0000\n"
-"PO-Revision-Date: 2015-03-29 14:31+0000\n"
-"Last-Translator: kytv <killyourtv@i2pmail.org>\n"
+"PO-Revision-Date: 2015-05-07 07:43+0000\n"
+"Last-Translator: brianhopes <voganc-12@live.ru>\n"
 "Language-Team: Ukrainian (Ukraine) (http://www.transifex.com/projects/p/I2P/language/uk_UA/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -163,11 +165,11 @@ msgstr "Невірна адреса"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:82
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:85
 msgid "Hidden Services Manager"
-msgstr ""
+msgstr "Менеджер прихованих сервісів"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:86
 msgid "Edit Client Tunnel"
-msgstr ""
+msgstr "Редагувати клієнтський тунель"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:114
 msgid "Edit proxy settings"
@@ -591,7 +593,7 @@ msgstr "Зберегти"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:86
 msgid "Edit Hidden Service"
-msgstr ""
+msgstr "Редагувати прихований сервіс"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:114
 msgid "Edit server settings"
@@ -667,7 +669,7 @@ msgstr "Унікальна локальна адреса для кожного �
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:503
 msgid "Optimize for Multihoming"
-msgstr ""
+msgstr "Оптимізувати для множинної адресації"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:509
 msgid "Inbound connection limits (0=unlimited)"
@@ -745,7 +747,7 @@ msgstr "Перезапустити все"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:126
 msgid "I2P Hidden Services"
-msgstr ""
+msgstr "Приховані сервіси I2P"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:130
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:151
@@ -803,7 +805,7 @@ msgstr "Запустити"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:265
 msgid "New hidden service"
-msgstr ""
+msgstr "Новий прихований сервіс"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:267
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:436
@@ -992,20 +994,20 @@ msgid ""
 "With this tunnel type, IRC networks in I2P can be reached by typing the I2P "
 "address into your IRC client, and configuring the IRC client to use this "
 "SOCKS tunnel."
-msgstr ""
+msgstr "З цим типом тунель IRC мережі в I2P будуть досяжні шляхом введення I2P-адреси в IRC клієнті і налаштуванні його на використання цього тунелю SOCKS."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:252
 msgid ""
 "This means that only one I2P tunnel is required rather than a separate "
 "tunnel per IRC network."
-msgstr ""
+msgstr "Це означає, що необхідний лише один I2P тунель, замість окремих тунелів для кожної IRC мережі."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:254
 msgid ""
 "IRC networks outside I2P can also be reached if a SOCKS outproxy within I2P "
 "is known, though it depends on whether or not the outproxy has been blocked "
 "by the IRC network."
-msgstr ""
+msgstr "IRC-мережі поза I2P також можуть бути доступні, якщо відомий SOCKS outproxy в I2P, але це залежить від того, заблокований чи ні outproxy IRC-мережею."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:256
 msgid "A client tunnel that implements the HTTP CONNECT command."
@@ -1015,7 +1017,7 @@ msgstr "Клієнтський тунель, що реалізує команд�
 msgid ""
 "This enables TCP connections to be made through an HTTP outproxy, assuming "
 "the proxy supports the CONNECT command."
-msgstr ""
+msgstr "Це дозволяє TCP з'єднанням йти через HTTP outproxy, якщо проксі підтримує метод CONNECT."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:260
 msgid "A customised client tunnel for Streamr."
@@ -1037,21 +1039,21 @@ msgstr "Використовуйте цей тип тунелю, якщо хоч
 msgid ""
 "A customised server tunnel that can both serve HTTP data and connect to "
 "other server tunnels."
-msgstr ""
+msgstr "Налаштувати сервер тунелю, який може служити як сервер даних HTTP і підключення до інших тунелів сервера."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:280
 msgid "This tunnel type is predominantly used when running a Seedless server."
-msgstr ""
+msgstr "Цей тип тунелю зазвичай використовується разом з Seedless сервером."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:282
 msgid "A customised server tunnel for hosting IRC networks inside I2P."
-msgstr ""
+msgstr "Налаштуваний тунель для розміщення IRC мереж всередині I2P."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:284
 msgid ""
 "Usually, a separate tunnel needs to be created for each IRC server that is "
 "to be accessible inside I2P."
-msgstr ""
+msgstr "Зазвичай для кожного IRC сервера, який повинен бути доступний всередині I2P, потрібен окремий тунель."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:286
 msgid "A customised server tunnel for Streamr."
@@ -1065,102 +1067,102 @@ msgstr "Введіть ім’я і опис для тунелю."
 msgid ""
 "These can be anything you want - they are just for ease of identifying the "
 "tunnel in the routerconsole."
-msgstr ""
+msgstr "Тут може бути що завгодно - просто для зручності ідентифікації тунелю в консолі."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:357
 msgid ""
 "If you know of any outproxies for this type of tunnel (either HTTP or "
 "SOCKS), fill them in below."
-msgstr ""
+msgstr "Якщо знаєте якісь вихідні проксі для цього типу тунелю (HTTP або SOCKS), введіть їх нижче."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:359
 msgid "Separate multiple proxies with commas."
-msgstr ""
+msgstr "Розділяйте кілька адрес проксі комами."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:377
 msgid ""
 "Type in the I2P destination of the service that this client tunnel should "
 "connect to."
-msgstr ""
+msgstr "Введіть адресу призначення для служби всередині I2P до якої повинен підключатися клієнтський тунель."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:379
 msgid ""
 "This could be the full base 64 destination key, or an I2P URL from your "
 "address book."
-msgstr ""
+msgstr "Це може бути повним ключем призначення base64 або I2P URL з адресної книги."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:412
 msgid ""
 "This is the IP that your service is running on, this is usually on the same "
 "machine so 127.0.0.1 is autofilled."
-msgstr ""
+msgstr "Це IP-адреса, на якій працює сервіс. Зазвичай така сама, як у машини, тому 127.0.0.1 введено автоматично."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:435
 msgid "This is the port that the service is accepting connections on."
-msgstr ""
+msgstr "Це порт, на який сервіс приймає з’єднання."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:456
 msgid "This is the port that the client tunnel will be accessed from locally."
-msgstr ""
+msgstr "Це порт, через який буде доступ до тунелю з локалі."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:458
 msgid "This is also the client port for the HTTPBidir server tunnel."
-msgstr ""
+msgstr "Це також клієнтський порт для серверного тунелю HTTPBidir."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:477
 msgid ""
 "How do you want this tunnel to be accessed? By just this machine, your "
 "entire subnet, or external internet?"
-msgstr ""
+msgstr "Як ви хочете отримувати доступ до цього тунелю? Лише з цієї машини, локальної мережі чи інтернету?"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:479
 msgid "You will most likely want to just allow 127.0.0.1"
-msgstr ""
+msgstr "Скоріш за все ви захочете дозволити лише для 127.0.0.1"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:521
 msgid ""
 "The I2P router can automatically start this tunnel for you when the router "
 "is started."
-msgstr ""
+msgstr "Роутер I2P може автоматично запускати цей тунель, коли I2P запущено."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:523
 msgid ""
 "This can be useful for frequently-used tunnels (especially server tunnels), "
 "but for tunnels that are only used occassionally it would mean that the I2P "
 "router is creating and maintaining unnecessary tunnels."
-msgstr ""
+msgstr "Це може бути корисно для часто використовуваних тунелів (особливо серверних тунелів), але для тунелів які використовуються тільки іноді це означатиме що маршрутизатор I2P створює і підтримує зайві тунелі."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:549
 msgid "The wizard has now collected enough information to create your tunnel."
-msgstr ""
+msgstr "Майстер отримав достатньо інформації для того, щоб створити тунель."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:551
 msgid ""
 "Upon clicking the Save button below, the wizard will set up the tunnel, and "
 "take you back to the main I2PTunnel page."
-msgstr ""
+msgstr "Після натискання кнопки \"Зберегти\" майстер створить тунель і поверне вас на головну сторінку I2PTunnel."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:556
 msgid ""
 "Because you chose to automatically start the tunnel when the router starts, "
 "you don't have to do anything further."
-msgstr ""
+msgstr "Оскільки ви вибрали запускати тунель автоматично при запуску роутера, більше нічого робити не потрібно."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:558
 msgid "The router will start the tunnel once it has been set up."
-msgstr ""
+msgstr "Роутер запустить тунель як тільки його буде налаштовно."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:562
 msgid ""
 "Because you chose not to automatically start the tunnel, you will have to "
 "manually start it."
-msgstr ""
+msgstr "Тунель прийдеться запустити самотужки, оскільки ви не вибрали, щоб це було автоматично."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:564
 msgid ""
 "You can do this by clicking the Start button on the main page which "
 "corresponds to the new tunnel."
-msgstr ""
+msgstr "Ви можете це зробити, натиснувши кнопку \"Пуск\" на головній сторінці, яка відповідає за новий тунель."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:568
 msgid "Below is a summary of the options you chose:"
@@ -1170,14 +1172,14 @@ msgstr "Нижче є вибрані вами параметри:"
 msgid ""
 "Alongside these basic settings, there are a number of advanced options for "
 "tunnel configuration."
-msgstr ""
+msgstr "Крім цих основних налаштувань існує і певний набір розширених налаштувань для конфігурації тунелю."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:668
 msgid ""
 "The wizard will set reasonably sensible default values for these, but you "
 "can view and/or edit these by clicking on the tunnel's name in the main "
 "I2PTunnel page."
-msgstr ""
+msgstr "Майстер встановить розумні параметри за замовчуванням, але ви можете їх відредагувати натиснувши на назву тунелю на головній сторінці тунелів I2P."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:710
 msgid "Previous"
