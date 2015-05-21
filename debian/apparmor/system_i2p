@@ -1,7 +1,8 @@
+# Last Modified: Thu May 21 18:30:32 2015
 # vim:syntax=apparmor et
 #include <tunables/global>
 
-profile system_i2p {
+profile system_i2p flags=(complain) {
   #include <abstractions/i2p>
 
   owner /{,lib/live/mount/overlay/}var/lib/i2p/** rwkl,
