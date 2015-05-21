@@ -16,8 +16,6 @@
   owner @{PROC}/[0-9]*/status                             r,
   @{PROC}/[0-9]*/net/ipv6_route                           r,
   @{PROC}/[0-9]*/net/if_inet6                             r,
-  /dev/random                                             r,
-  /dev/urandom                                            r,
   /sys/devices/system/cpu/                                r,
   /sys/devices/system/cpu/**                              r,
 
