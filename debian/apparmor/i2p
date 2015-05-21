@@ -1,4 +1,4 @@
-# Last Modified: Sun Apr 12 22:08:32 2015
+# Last Modified: Thu May 21 18:30:32 2015
 # vim:syntax=apparmor et ts=4 sw=4
 
   #include <abstractions/base>
@@ -60,6 +60,8 @@
   deny /usr/sbin/                                         r,
   deny /var/cache/fontconfig/                             wk,
 
-  # Used by some versions of the Tanuki wrapper, not needed by I2P
+  # Some versions of the Tanuki wrapper package will try to load these jars but
+  # they are  not needed by I2P. The deny rule here will prevent the logs from
+  # being spammed.
   deny /usr/share/java/hamcrest*.jar                      r,
   deny /usr/share/java/junit*.jar                         r,
