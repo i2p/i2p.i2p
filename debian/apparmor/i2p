@@ -1,14 +1,14 @@
 # Last Modified: Sun Apr 12 22:08:32 2015
 # vim:syntax=apparmor et ts=4 sw=4
 
-#include <abstractions/base>
-#include <abstractions/fonts>
-#include <abstractions/nameservice>
-#include <abstractions/ssl_certs>
-#include <abstractions/user-tmp>
+  #include <abstractions/base>
+  #include <abstractions/fonts>
+  #include <abstractions/nameservice>
+  #include <abstractions/ssl_certs>
+  #include <abstractions/user-tmp>
 
-network inet stream,
-network inet6 stream,
+  network inet stream,
+  network inet6 stream,
 
   # Needed by Java
   @{PROC}                                                 r,
