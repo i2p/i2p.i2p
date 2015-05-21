@@ -1,3 +1,40 @@
+i2p (0.9.19-3) unstable; urgency=medium
+
+  * A couple more apparmor profile tweaks
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Tue, 14 Apr 2015 20:35:39 +0000
+
+i2p (0.9.19-2) unstable; urgency=medium
+
+  * Fix usr.bin.i2prouter apparmor profile
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Tue, 14 Apr 2015 12:58:22 +0000
+
+i2p (0.9.19-1) unstable; urgency=medium
+
+  * New Upstream Version
+    - Floodfill performance improvements
+    - Easier ways to reseed manually from a file or URL
+    - New way to export reseed data for others
+    - Support for installing plugin from file
+    - Fixes for high CPU usage in floodfills
+    - i2ptunnel locking fixes
+    - Fixes in read timeout handling in streaming
+    - Update to UPnP library 3.0
+    - Improve tracking of floodfill lookup success
+    - Direct router info lookups if connected to floodfill
+    - Auto-adjustment of i2psnark tunnel quantity
+    - Increase exploratory tunnel quantity when floodfill
+    - Increase min and default bandwidth for i2psnark
+    - Improved strategies for dropping jobs on high job lag to prevent overload
+    - Apache Tomcat 6.0.43
+    - Translation updates
+    - Update GeoIP data
+  * debconf translation updates
+  * Minor updates to AppArmor profiles
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Sun, 12 Apr 2015 22:34:40 +0000
+
 i2p (0.9.18-1) unstable; urgency=medium
 
   * New Upstream Version
