@@ -197,9 +197,10 @@ class HTTPResponseOutputStream extends FilterOutputStream {
                                 } else if ("set-cookie".equals(lcKey)) {
                                     String lcVal = val.toLowerCase(Locale.US);
                                     if (lcVal.contains("domain=b32.i2p") ||
-                                        lcVal.contains("domain=.b32.i2p")) {
-                                        // Strip privacy-damaging "supercookie" for b32.i2p
-                                        // Let's presume the user agent ignores a cookie for "i2p"
+                                        lcVal.contains("domain=.b32.i2p") ||
+                                        lcVal.contains("domain=i2p") ||
+                                        lcVal.contains("domain=.i2p")) {
+                                        // Strip privacy-damaging "supercookies" for i2p and b32.i2p
                                         // See RFC 6265 and http://publicsuffix.org/
                                         if (_log.shouldLog(Log.INFO))
                                             _log.info("Stripping \"" + key + ": " + val + "\" from response ");
