@@ -257,7 +257,7 @@ public interface I2PSession {
     /** 
      * Have we closed the session? 
      *
-     * @return true if the session is closed
+     * @return true if the session is closed, OR connect() has not been called yet
      */
     public boolean isClosed();
     

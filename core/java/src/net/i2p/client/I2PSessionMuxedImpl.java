@@ -256,7 +256,12 @@ class I2PSessionMuxedImpl extends I2PSessionImpl2 {
      * @since 0.9.14
      */
     private byte[] prepPayload(byte[] payload, int offset, int size, int proto, int fromPort, int toPort) throws I2PSessionException {
-        if (isClosed()) throw new I2PSessionException("Already closed");
+        synchronized (_stateLock) {
+            if (_state == State.CLOSED)
+                throw new I2PSessionException("Already closed");
+            if (_state == State.INIT)
+                throw new I2PSessionException("Not open, must call connect() first");
+        }
         updateActivity();
 
         if (shouldCompress(size))

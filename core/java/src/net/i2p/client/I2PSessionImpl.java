@@ -135,7 +135,7 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
         CLOSED
     }
 
-    private State _state = State.INIT;
+    protected State _state = State.INIT;
     protected final Object _stateLock = new Object();
 
     /** 
@@ -614,7 +614,12 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
      * Report abuse with regards to the given messageId
      */
     public void reportAbuse(int msgId, int severity) throws I2PSessionException {
-        if (isClosed()) throw new I2PSessionException(getPrefix() + "Already closed");
+        synchronized (_stateLock) {
+            if (_state == State.CLOSED)
+                throw new I2PSessionException("Already closed");
+            if (_state == State.INIT)
+                throw new I2PSessionException("Not open, must call connect() first");
+        }
         _producer.reportAbuse(this, msgId, severity);
     }
 

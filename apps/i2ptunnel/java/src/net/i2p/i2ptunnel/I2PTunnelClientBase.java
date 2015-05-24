@@ -77,6 +77,16 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
 
     private volatile ThreadPoolExecutor _executor;
 
+    /** this is ONLY for shared clients */
+    private static I2PSocketManager socketManager;
+
+    /**
+     *  Only destroy and replace a static shared client socket manager if it's been connected before
+     *  @since 0.9.20
+     */
+    private enum SocketManagerState { INIT, CONNECTED }
+    private static SocketManagerState _socketManagerState = SocketManagerState.INIT;
+
     public static final String PROP_USE_SSL = I2PTunnelServer.PROP_USE_SSL;
 
     /**
@@ -239,10 +249,6 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
         connectManager();
     }
 
-    /** this is ONLY for shared clients */
-    private static I2PSocketManager socketManager;
-
-
     /**
      * This is ONLY for shared clients.
      * As of 0.9.20 this is fast, and does NOT connect the manager to the router.
@@ -283,12 +289,13 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
         Log _log = tunnel.getContext().logManager().getLog(I2PTunnelClientBase.class);
         if (socketManager != null && !socketManager.isDestroyed()) {
             I2PSession s = socketManager.getSession();
-            if (s.isClosed()) {
+            if (s.isClosed() && _socketManagerState != SocketManagerState.INIT) {
                 if (_log.shouldLog(Log.INFO))
                     _log.info(tunnel.getClientOptions().getProperty("inbound.nickname") + ": Building a new socket manager since the old one closed [s=" + s + "]");
                 tunnel.removeSession(s);
                 // make sure the old one is closed
                 socketManager.destroySocketManager();
+                _socketManagerState = SocketManagerState.INIT;
                 // We could be here a LONG time, holding the lock
                 socketManager = buildSocketManager(tunnel, pkf);
             } else {
@@ -424,6 +431,10 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
         while (sockMgr.getSession().isClosed()) {
             try {
                 sockMgr.getSession().connect();
+                synchronized(I2PTunnelClientBase.class) {
+                    if (sockMgr == socketManager)
+                        _socketManagerState = SocketManagerState.CONNECTED;
+                }
             } catch (I2PSessionException ise) {
                 // shadows instance _log
                 Log _log = getTunnel().getContext().logManager().getLog(I2PTunnelClientBase.class);
