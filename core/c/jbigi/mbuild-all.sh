@@ -236,7 +236,7 @@ make_static () {
 make_file () {
         # Nonfatal bail out on Failed build.
         echo "Attempting build for ${3}${5}${2}"
-        make && return 0
+        make -j && return 0
         cd ..
         rm -R "$2"
         printf "\n\nFAILED! ${3}${5}${2} not made.\a"
@@ -251,7 +251,8 @@ configure_file () {
         elif [ $BITS -eq 32 ] && [ "$2" != "none" ]; then
             export ABI=32
         fi
-        sleep 10
+        sleep 1
+        
         # Nonfatal bail out on unsupported platform.
         if [ $(echo $TARGET| grep -q osx) ]; then
                 ../../gmp-${1}/configure --build=${2}-apple-darwin --with-pic && return 0
