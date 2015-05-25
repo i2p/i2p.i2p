@@ -254,6 +254,7 @@ configure_file () {
         sleep 1
         
         # Nonfatal bail out on unsupported platform.
+	(cd ../../gmp-${1}; make distclean)
         if [ $(echo $TARGET| grep -q osx) ]; then
                 ../../gmp-${1}/configure --build=${2}-apple-darwin --with-pic && return 0
         else
@@ -273,12 +274,14 @@ build_file () {
         return 1
 }
 
-echo "Extracting GMP Version $VER ..."
-if [ -e gmp-$VER.tar.bz2 ]; then
+if [ ! -d gmp-$VER ]; then
+  echo "Extracting GMP Version $VER ..."
+  if [ -e gmp-$VER.tar.bz2 ]; then
     tar -xjf gmp-$VER.tar.bz2 || ( echo "Error in tarball file!" >&2 ; exit 1 )
-else
+  else
     echo "ERROR: gmp tarball not found in current directory" >&2
     exit 1
+  fi
 fi
 
 if [ ! -d bin ]; then
