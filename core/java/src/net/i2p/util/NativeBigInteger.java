@@ -178,9 +178,14 @@ public class NativeBigInteger extends BigInteger {
      * ARM
      * @since 0.9.21
      */
-    private final static String JBIGI_OPTIMIZATION_ARM_ARMV5       = "armv5";
-    private final static String JBIGI_OPTIMIZATION_ARM_ARMV6       = "armv6";
-    private final static String JBIGI_OPTIMIZATION_ARM_ARMV7       = "armv7";
+    private final static String JBIGI_OPTIMIZATION_ARM_ARMV5           = "armv5";
+    private final static String JBIGI_OPTIMIZATION_ARM_ARMV6           = "armv6";
+    private final static String JBIGI_OPTIMIZATION_ARM_ARMV7           = "armv7";
+    private final static String JBIGI_OPTIMIZATION_ARM_CORTEX_A5       = "armcortexa5";
+    private final static String JBIGI_OPTIMIZATION_ARM_CORTEX_A7       = "armcortexa7";
+    private final static String JBIGI_OPTIMIZATION_ARM_CORTEX_A8       = "armcortexa8";
+    private final static String JBIGI_OPTIMIZATION_ARM_CORTEX_A9       = "armcortexa9";
+    private final static String JBIGI_OPTIMIZATION_ARM_CORTEX_A15      = "armcortexa15";
     
     /**
      * None, no optimizations. The default fallback for x86.
@@ -200,7 +205,9 @@ public class NativeBigInteger extends BigInteger {
      * outweigh the implementation time.
      */
     private final static String[] JBIGI_COMPAT_LIST_PPC           = {JBIGI_OPTIMIZATION_PPC};
-    private final static String[] JBIGI_COMPAT_LIST_ARM           = {JBIGI_OPTIMIZATION_ARM_ARMV7, JBIGI_OPTIMIZATION_ARM_ARMV6, JBIGI_OPTIMIZATION_ARM_ARMV5};
+    private final static String[] JBIGI_COMPAT_LIST_ARM           = {JBIGI_OPTIMIZATION_ARM_CORTEX_A15, JBIGI_OPTIMIZATION_ARM_CORTEX_A9, JBIGI_OPTIMIZATION_ARM_CORTEX_A8,
+                                                                     JBIGI_OPTIMIZATION_ARM_CORTEX_A7, JBIGI_OPTIMIZATION_ARM_CORTEX_A5, JBIGI_OPTIMIZATION_ARM_ARMV7,
+                                                                     JBIGI_OPTIMIZATION_ARM_ARMV6, JBIGI_OPTIMIZATION_ARM_ARMV5};
     private final static String[] JBIGI_COMPAT_LIST_VIA           = {JBIGI_OPTIMIZATION_NANO, JBIGI_OPTIMIZATION_VIAC32, JBIGI_OPTIMIZATION_VIAC3,
                                                                      JBIGI_OPTIMIZATION_PENTIUM, JBIGI_OPTIMIZATION_X86};
     private final static String[] JBIGI_COMPAT_LIST_AMD_ATHLON    = {JBIGI_OPTIMIZATION_ATHLON64, JBIGI_OPTIMIZATION_ATHLON, JBIGI_OPTIMIZATION_K6_3,
@@ -226,9 +233,14 @@ public class NativeBigInteger extends BigInteger {
     private final static HashMap<String, String[] > JBIGI_COMPAT_MAP = new HashMap<String, String[]>(){{
         put(JBIGI_OPTIMIZATION_PPC, JBIGI_COMPAT_LIST_PPC);
 
-        put(JBIGI_OPTIMIZATION_ARM_ARMV5, JBIGI_COMPAT_LIST_ARM);
-        put(JBIGI_OPTIMIZATION_ARM_ARMV6, JBIGI_COMPAT_LIST_ARM);
-        put(JBIGI_OPTIMIZATION_ARM_ARMV7, JBIGI_COMPAT_LIST_ARM);
+        put(JBIGI_OPTIMIZATION_ARM_ARMV5,      JBIGI_COMPAT_LIST_ARM);
+        put(JBIGI_OPTIMIZATION_ARM_ARMV6,      JBIGI_COMPAT_LIST_ARM);
+        put(JBIGI_OPTIMIZATION_ARM_ARMV7,      JBIGI_COMPAT_LIST_ARM);
+        put(JBIGI_OPTIMIZATION_ARM_CORTEX_A5,  JBIGI_COMPAT_LIST_ARM);
+        put(JBIGI_OPTIMIZATION_ARM_CORTEX_A7,  JBIGI_COMPAT_LIST_ARM);
+        put(JBIGI_OPTIMIZATION_ARM_CORTEX_A8,  JBIGI_COMPAT_LIST_ARM);
+        put(JBIGI_OPTIMIZATION_ARM_CORTEX_A9,  JBIGI_COMPAT_LIST_ARM);
+        put(JBIGI_OPTIMIZATION_ARM_CORTEX_A15, JBIGI_COMPAT_LIST_ARM);
 
         put(JBIGI_OPTIMIZATION_VIAC3,  JBIGI_COMPAT_LIST_VIA);
         put(JBIGI_OPTIMIZATION_VIAC32, JBIGI_COMPAT_LIST_VIA);
@@ -317,12 +329,13 @@ public class NativeBigInteger extends BigInteger {
       * @return A string containing the CPU-type or null if CPU type is unknown
       */
     private static String resolveCPUType() {
-        
         if(_isX86) {
             try {
+                System.out.println("resolveType() x86");
                 CPUInfo c = CPUID.getInfo();
                 try {
                     _cpuModel = c.getCPUModelString();
+                    System.out.println("CPUModel: " + _cpuModel.toString());
                 } catch (UnknownCPUException e) {}
                 if (c instanceof VIACPUInfo){
                 	VIACPUInfo viacpu = (VIACPUInfo) c;
@@ -388,14 +401,51 @@ public class NativeBigInteger extends BigInteger {
             }
         } else if (_isArm) {
             Map<String, String> cpuinfo = getCPUInfo();
-            String proc = cpuinfo.get("model name");
-            if (proc != null && proc.contains("ARMv7")) {
+            String implementer = cpuinfo.get("cpu implementer");
+            String features = cpuinfo.get("features");
+            String part = cpuinfo.get("cpu part");
+            
+            if (implementer == null || part == null) {
+                return null;
+            }
+
+            // If CPU implementer is ARM
+            if (implementer.contains("0x41")) {
+                if (part.contains("0xc0f")) {
+                    return JBIGI_OPTIMIZATION_ARM_CORTEX_A15;
+                } else if (part.contains("0xc09")) {
+                    return JBIGI_OPTIMIZATION_ARM_CORTEX_A9;
+                } else if (part.contains("0xc08")) {
+                    return JBIGI_OPTIMIZATION_ARM_CORTEX_A8;
+                } else if (part.contains("0xc07")) {
+                    return JBIGI_OPTIMIZATION_ARM_CORTEX_A7;
+                } else if (part.contains("0xc05")) {
+                    return JBIGI_OPTIMIZATION_ARM_CORTEX_A5;
+                }
+            }
+
+            // We couldn't identify the implementer
+            // Let's try by looking at model name
+            String model = cpuinfo.get("model name");
+            if (model != null && model.contains("ARMv7")) {
                 return JBIGI_OPTIMIZATION_ARM_ARMV7;
-            } else if (proc != null && proc.contains("ARMv6")) {
+            } else if (model != null && model.contains("ARMv6")) {
                 return JBIGI_OPTIMIZATION_ARM_ARMV6;
-            } else if (proc != null && proc.contains("ARMv5")) {
+            } else if (model != null && model.contains("ARMv5")) {
                 return JBIGI_OPTIMIZATION_ARM_ARMV5;
             }
+            
+            // We couldn't identify the model name
+            // Let's try by looking at cpu arch
+            String arch = cpuinfo.get("cpu architecture");
+            if (arch != null && arch.equals("7")) {
+                return JBIGI_OPTIMIZATION_ARM_ARMV7;
+            } else if (arch != null && arch.equals("6")) {
+                return JBIGI_OPTIMIZATION_ARM_ARMV6;
+            } else if (arch != null && arch.equals("5")) {
+                return JBIGI_OPTIMIZATION_ARM_ARMV5;
+            }
+                
             // If we didn't find a match, return null
             return null;
         } else if (_isPPC && !_isMac) {
@@ -652,6 +702,8 @@ public class NativeBigInteger extends BigInteger {
      * <p>Compare the BigInteger.modPow vs the NativeBigInteger.modPow of some 
      * really big (2Kbit) numbers 100 different times and benchmark the 
      * performance.</p>
+     * 
+     * @param args[0] - Manually jbigi lib
      *
      */
     public static void main(String args[]) {
@@ -844,7 +896,7 @@ public class NativeBigInteger extends BigInteger {
                     List<String> toTry = getResourceList();
                     debug("loadResource list to try is: " + toTry);
                     for (String s : toTry) {
-                        debug("trying loadResource " + s);
+                        System.out.println("trying to load resource: " + s);
                         if (loadFromResource(s)) {
                             _nativeOk = true;
                             _extractedResource = s;
@@ -905,6 +957,25 @@ public class NativeBigInteger extends BigInteger {
     private static void error(String s, Throwable t) {
         if(_doLog) {
             System.err.println("ERROR: " + s);
+            if (t != null)
+                t.printStackTrace();
+        }
+        I2PAppContext.getGlobalContext().logManager().getLog(NativeBigInteger.class).error(s, t);
+        if (t != null)
+            _loadStatus = s + ' ' + t;
+        else
+            _loadStatus = s;
+    }
+    
+    /** @since 0.9.21 */
+    private static void crit(String s) {
+        crit(s, null);
+    }
+    
+    /** @since 0.9.21 */
+    private static void crit(String s, Throwable t) {
+        if(_doLog) {
+            System.err.println("CRITICAL: " + s);
             if (t != null)
                 t.printStackTrace();
         }
@@ -977,7 +1048,7 @@ public class NativeBigInteger extends BigInteger {
         //URL resource = NativeBigInteger.class.getClassLoader().getResource(resourceName);
         URL resource = ClassLoader.getSystemResource(resourceName);
         if (resource == null) {
-            info("Resource name [" + resourceName + "] was not found");
+            System.out.println("Resource name [" + resourceName + "] was not found");
             return false;
         }
 
@@ -997,14 +1068,15 @@ public class NativeBigInteger extends BigInteger {
             fos.close();
             fos = null;
             System.load(outFile.getAbsolutePath()); //System.load requires an absolute path to the lib
+            System.out.println("Loaded library: " + resource);
         } catch (UnsatisfiedLinkError ule) {
             // don't include the exception in the message - too much
-            warn("Failed to load the resource " + resourceName + " - not a valid library for this platform");
+            System.out.println("Failed to load the resource " + resourceName + " - not a valid library for this platform");
             if (outFile != null)
                 outFile.delete();
             return false;
         } catch (IOException ioe) {
-            warn("Problem writing out the temporary native library data", ioe);
+            System.out.println("Problem writing out the temporary native library data: " + ioe.toString());
             if (outFile != null)
                 outFile.delete();
             return false;
@@ -1033,6 +1105,10 @@ public class NativeBigInteger extends BigInteger {
         if (_isAndroid) {
             return Collections.emptyList();
         }
+        if (primary != null && compatList == null) {
+            crit("A bug relating to how jbigi is loaded for \"" + primary + "\" has been spotted");
+        }
+        
         if (primary != null &&
             compatList != null) {
             // Add all architectural parents of this arch to the resource list
@@ -1057,6 +1133,9 @@ public class NativeBigInteger extends BigInteger {
             error("Couldn't find the compatibility map for arch \"" + primary + "\"");
         }
         
+        
+        System.out.println("Primary: " + primary);
+        System.out.println("ResourceList: " + rv.toString());
         return rv;
     }
 
