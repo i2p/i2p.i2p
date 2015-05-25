@@ -142,7 +142,7 @@ sunos*)
         TARGET="${UNIXTYPE}"
         if $(echo "$CFLAGS" | grep -q "\-m64") ; then
             [ -z $SUFFIX ] && SUFFIX="_64"
-            PLATFORM_LIST="${X86_64_PLATFORMS}"
+            PLATFORM_LIST="${X86_PLATFORMS}"
         else
             PLATFORM_LIST="${X86_PLATFORMS}"
         fi
@@ -294,7 +294,7 @@ fi
 # Don't touch this one.
 NO_PLATFORM=none
 
-for x in $PLATFORM_LIST $NO_PLATFORM
+for x in $X86_PLATFORMS
 do
         (
                 if [ ! -d bin/$x ]; then
