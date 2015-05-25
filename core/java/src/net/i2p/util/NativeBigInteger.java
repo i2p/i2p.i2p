@@ -413,6 +413,14 @@ public class NativeBigInteger extends BigInteger {
             if (implementer.contains("0x41")) {
                 if (part.contains("0xc0f")) {
                     return JBIGI_OPTIMIZATION_ARM_CORTEX_A15;
+                } else if (part.contains("0xc0e")) {
+                    // Actually A17, but it's derived from A15
+                    // and GMP only support A15
+                    return JBIGI_OPTIMIZATION_ARM_CORTEX_A15;
+                } else if (part.contains("0xc0d")) {
+                    // Actually A12, but it's derived from A15
+                    // and GMP only supports A15
+                    return JBIGI_OPTIMIZATION_ARM_CORTEX_A15;
                 } else if (part.contains("0xc09")) {
                     return JBIGI_OPTIMIZATION_ARM_CORTEX_A9;
                 } else if (part.contains("0xc08")) {
