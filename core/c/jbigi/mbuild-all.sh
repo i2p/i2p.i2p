@@ -254,7 +254,7 @@ configure_file () {
         sleep 1
         
         # Nonfatal bail out on unsupported platform.
-	(cd ../../gmp-${1}; make distclean)
+        (cd ../../gmp-${1}; make clean)
         if [ $(echo $TARGET| grep -q osx) ]; then
                 ../../gmp-${1}/configure --build=${2}-apple-darwin --with-pic && return 0
         else
