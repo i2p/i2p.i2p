@@ -98,6 +98,8 @@ public class NativeBigInteger extends BigInteger {
     private static boolean _nativeOk;
     /** is native lib loaded and at least version 3? */
     private static boolean _nativeOk3;
+    /** is native lib loaded and at least version 3, and GMP at least version 5? */
+    private static boolean _nativeCTOk;
     private static int _jbigiVersion;
     private static String _libGMPVersion = "unknown";
     private static String _loadStatus = "uninitialized";
@@ -559,6 +561,7 @@ public class NativeBigInteger extends BigInteger {
                 int min = nativeGMPMinorVersion();
                 int pat = nativeGMPPatchVersion();
                 _libGMPVersion = maj + "." + min + "." + pat;
+                _nativeCTOk = maj >= 5;
             } catch (Throwable t) {
                 warn("jbigi version " + _jbigiVersion + " but GMP version not available???", t);
             }
@@ -635,10 +638,10 @@ public class NativeBigInteger extends BigInteger {
 
     /**
      *  @throws ArithmeticException if m &lt;= 0
-     *  @since 0.9.18 and libjbigi version 3
+     *  @since 0.9.18 and libjbigi version 3 and GMP version 5
      */
     public BigInteger modPowCT(BigInteger exponent, BigInteger m) {
-        if (_nativeOk3)
+        if (_nativeCTOk)
             return new NativeBigInteger(nativeModPowCT(toByteArray(), exponent.toByteArray(), m.toByteArray()));
         else
             return modPow(exponent, m);
