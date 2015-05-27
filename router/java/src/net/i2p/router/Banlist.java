@@ -60,6 +60,8 @@ public class Banlist {
         _log = context.logManager().getLog(Banlist.class);
         _entries = new ConcurrentHashMap<Hash, Entry>(16);
         _context.jobQueue().addJob(new Cleanup(_context));
+        // i2pd bug?
+        banlistRouterForever(Hash.FAKE_HASH, "Invalid Hash");
     }
     
     private class Cleanup extends JobImpl {
