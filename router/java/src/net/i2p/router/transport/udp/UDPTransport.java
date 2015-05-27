@@ -1310,6 +1310,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 markUnreachable(peerHash);
                 _context.banlist().banlistRouter(peerHash, "Part of the wrong network, version = " + ((RouterInfo) entry).getVersion());
                 //_context.banlist().banlistRouter(peerHash, "Part of the wrong network", STYLE);
+                if (peer != null)
+                    sendDestroy(peer);
                 dropPeer(peerHash, false, "wrong network");
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Dropping the peer " + peerHash + " because they are in the wrong net: " + entry);
@@ -1343,12 +1345,22 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     
     boolean isInDropList(RemoteHostId peer) { return _dropList.contains(peer); }
     
+    /**
+     *  This does not send a session destroy, caller must do that if desired.
+     *
+     *  @param shouldBanlist doesn't really, only sets unreachable
+     */
     void dropPeer(Hash peer, boolean shouldBanlist, String why) {
         PeerState state = getPeerState(peer);
         if (state != null)
             dropPeer(state, shouldBanlist, why);
     }
 
+    /**
+     *  This does not send a session destroy, caller must do that if desired.
+     *
+     *  @param shouldBanlist doesn't really, only sets unreachable
+     */
     void dropPeer(PeerState peer, boolean shouldBanlist, String why) {
         if (_log.shouldLog(Log.INFO)) {
             long now = _context.clock().now();
@@ -1402,6 +1414,11 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         rebuildIfNecessary();
     }
 
+    /**
+     *  This does not send a session destroy, caller must do that if desired.
+     *
+     *  @param shouldBanlist doesn't really, only sets unreachable
+     */
     private void locked_dropPeer(PeerState peer, boolean shouldBanlist, String why) {
         peer.dropOutbound();
         peer.expireInboundMessages();
@@ -1562,7 +1579,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      *
      *  @since 0.8.9
      */
-    private void sendDestroy(PeerState peer) {
+    void sendDestroy(PeerState peer) {
         // peer must be fully established
         if (peer.getCurrentCipherKey() == null)
             return;
@@ -2265,6 +2282,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 // ok, a few conseutive failures, but we /are/ getting through to them
             } else {
                 _context.statManager().addRateData("udp.dropPeerConsecutiveFailures", consecutive, msg.getPeer().getInactivityTime());
+                sendDestroy(msg.getPeer());
                 dropPeer(msg.getPeer(), false, "too many failures");
             }
             //if ( (consecutive > MAX_CONSECUTIVE_FAILED) && (msg.getPeer().getInactivityTime() > DROP_INACTIVITY_TIME))
