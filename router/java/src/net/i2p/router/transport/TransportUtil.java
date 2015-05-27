@@ -134,6 +134,7 @@ public abstract class TransportUtil {
             int a1 = addr[1] & 0xFF;
             // Carrier Grade NAT RFC 6598
             if (a0 == 100 && a1 >= 64 && a1 <= 127) return false;
+            // DHCP autoconfig RFC 3927
             if (a0 == 169 && a1 == 254) return false;
             if (a0 == 172 && a1 >= 16 && a1 <= 31) return false;
             if (a0 == 192) {
