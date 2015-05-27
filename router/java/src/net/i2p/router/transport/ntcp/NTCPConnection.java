@@ -1545,9 +1545,10 @@ class NTCPConnection {
                     }
                 } catch (I2NPMessageException ime) {
                     if (_log.shouldLog(Log.WARN)) {
-                        _log.warn("Error parsing I2NP message", ime);
-                        _log.warn("DUMP:\n" + HexDump.dump(_dataBuf.getData(), 0, _size));
-                        _log.warn("RAW:\n" + Base64.encode(_dataBuf.getData(), 0, _size));
+                        _log.warn("Error parsing I2NP message" +
+                                  "\nDUMP:\n" + HexDump.dump(_dataBuf.getData(), 0, _size) +
+                                  "\nRAW:\n" + Base64.encode(_dataBuf.getData(), 0, _size) +
+                                  ime);
                     }
                     _context.statManager().addRateData("ntcp.corruptI2NPIME", 1);
                     // Don't close the con, possible attack vector, not necessarily the peer's fault,
