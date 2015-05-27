@@ -1,3 +1,13 @@
+2015-05-27 zzz
+ * Banlist: Ban all-zero hash
+ * DataHelper: Add year output to formatDuration()
+ * Graphs: prevent NaNs if we are skewed ahead of system time
+ * NetDb: Drop all-zero lookups and stores, add stats
+ * SSU:
+   - Fix debug logging of dumped packets
+   - Drop sessions with bad clock skew, banlist peer, add stats
+   - Drop sessions with corrupt DSM, banlist peer, add stats
+
 2015-05-23 zzz
  * I2CP: Add an INIT state for session, so a newly created session
    isn't treated as CLOSED and immediately replaced by i2ptunnel,
