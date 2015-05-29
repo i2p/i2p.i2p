@@ -1,3 +1,6 @@
+2015-05-29 zzz
+ * HTTP client: Fix occasional truncation of compressed responses
+
 2015-05-27 zzz
  * Banlist: Ban all-zero hash
  * DataHelper: Add year output to formatDuration()

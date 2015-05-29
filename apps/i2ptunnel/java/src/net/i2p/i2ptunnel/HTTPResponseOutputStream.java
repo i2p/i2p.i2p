@@ -46,6 +46,7 @@ class HTTPResponseOutputStream extends FilterOutputStream {
     protected boolean _gzip;
     protected long _dataExpected;
     protected String _contentType;
+    private PipedInputStream _pipedInputStream;
 
     private static final int CACHE_SIZE = 8*1024;
     private static final ByteCache _cache = ByteCache.getInstance(8, CACHE_SIZE);
@@ -155,6 +156,8 @@ class HTTPResponseOutputStream extends FilterOutputStream {
                     responseLine = new String(_headerBuffer.getData(), 0, i+1); // includes NL
                     responseLine = filterResponseLine(responseLine);
                     responseLine = (responseLine.trim() + "\r\n");
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("Response: " + responseLine.trim());
                     out.write(responseLine.getBytes());
                 } else {
                     for (int j = lastEnd+1; j < i; j++) {
@@ -245,7 +248,30 @@ class HTTPResponseOutputStream extends FilterOutputStream {
     
     @Override
     public void close() throws IOException {
-        out.close();
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Closing " + out + " threaded?? " + shouldCompress(), new Exception("I did it"));
+        PipedInputStream pi;
+        synchronized(this) {
+            // synch with changing out field below
+            super.close();
+            pi = _pipedInputStream;
+        }
+        // Prevent truncation of gunzipped data as
+        // I2PTunnelHTTPClientRunner.close() closes the Socket after this.
+        // Closing pipe only notifies read end, doesn't wait.
+        // TODO switch to Java 6 InflaterOutputStream and get rid of Pusher thread
+        if (pi != null) {
+            for (int i = 0; i < 50; i++) {
+                if (pi.available() <= 0) {
+                    if (i > 0 && _log.shouldWarn())
+                        _log.warn("Waited " + (i*20) + " for read side to close");
+                    break;
+                }
+                try {
+                    Thread.sleep(20);
+                } catch (InterruptedException ie) {}
+            }
+        }
     }
     
     protected void beginProcessing() throws IOException {
@@ -253,7 +279,12 @@ class HTTPResponseOutputStream extends FilterOutputStream {
         PipedInputStream pi = BigPipedInputStream.getInstance();
         PipedOutputStream po = new PipedOutputStream(pi);
         Runnable r = new Pusher(pi, out);
-        out = po;
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Starting threaded decompressing pusher to " + out);
+        synchronized(this) {
+            out = po;
+            _pipedInputStream = pi;
+        }
         // TODO we should be able to do this inline somehow
         TunnelControllerGroup tcg = TunnelControllerGroup.getInstance();
         if (tcg != null) {
@@ -285,6 +316,8 @@ class HTTPResponseOutputStream extends FilterOutputStream {
         }
 
         public void run() {
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Starting pusher from " + _inRaw + " to: " + _out);
             ReusableGZIPInputStream _in = ReusableGZIPInputStream.acquire();
             long written = 0;
             ByteArray ba = null;
@@ -301,11 +334,11 @@ class HTTPResponseOutputStream extends FilterOutputStream {
                     _out.flush();
                     written += read;
                 }
-                if (_log.shouldLog(Log.INFO))
-                    _log.info("Decompressed: " + written + ", " + _in.getTotalRead() + "/" + _in.getTotalExpanded());
             } catch (IOException ioe) {
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn("Error decompressing: " + written + ", " + _in.getTotalRead() + "/" + _in.getTotalExpanded(), ioe);
+                    _log.warn("Error decompressing: " + written + ", " + _in.getTotalRead() +
+                              "/" + _in.getTotalExpanded() +
+                              " from " + _inRaw + " to: " + _out, ioe);
             } catch (OutOfMemoryError oom) {
                 _log.error("OOM in HTTP Decompressor", oom);
             } finally {
@@ -313,7 +346,8 @@ class HTTPResponseOutputStream extends FilterOutputStream {
                     _log.info("After decompression, written=" + written + 
                                 " read=" + _in.getTotalRead() 
                                 + ", expanded=" + _in.getTotalExpanded() + ", remaining=" + _in.getRemaining() 
-                                + ", finished=" + _in.getFinished());
+                                + ", finished=" + _in.getFinished() +
+                                " from " + _inRaw + " to: " + _out);
                 if (ba != null)
                     _cache.release(ba);
                 if (_out != null) try { 
