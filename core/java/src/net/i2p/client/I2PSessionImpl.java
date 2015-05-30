@@ -1202,10 +1202,15 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
             if (rv != null)
                 return rv;
         }
-        if (isClosed()) {
-            if (_log.shouldLog(Log.INFO))
-                _log.info("Session closed, cannot lookup " + h);
-            return null;
+        synchronized (_stateLock) {
+            // not before GOTDATE
+            if (_state == State.CLOSED ||
+                _state == State.INIT ||
+                _state == State.OPENING) {
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Session closed, cannot lookup " + h);
+                return null;
+            }
         }
         LookupWaiter waiter;
         long nonce;
@@ -1341,8 +1346,16 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
      *  @return null on failure
      */
     public int[] bandwidthLimits() throws I2PSessionException {
-        if (isClosed())
-            return null;
+        synchronized (_stateLock) {
+            // not before GOTDATE
+            if (_state == State.CLOSED ||
+                _state == State.INIT ||
+                _state == State.OPENING) {
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Session closed, cannot get bw limits");
+                return null;
+            }
+        }
         sendMessage(new GetBandwidthLimitsMessage());
         try {
             synchronized (_bwReceivedLock) {
