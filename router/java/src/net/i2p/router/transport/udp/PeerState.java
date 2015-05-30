@@ -172,23 +172,23 @@ class PeerState {
     private long _consecutiveSmall;
     /** when did we last check the MTU? */
     //private long _mtuLastChecked;
-    private long _mtuIncreases;
-    private long _mtuDecreases;
+    private int _mtuIncreases;
+    private int _mtuDecreases;
     /** current round trip time estimate */
-    private volatile int _rtt;
+    private int _rtt;
     /** smoothed mean deviation in the rtt */
-    private volatile int _rttDeviation;
+    private int _rttDeviation;
     /** current retransmission timeout */
-    private volatile int _rto;
+    private int _rto;
     
     /** how many packets will be considered within the retransmission rate calculation */
     static final long RETRANSMISSION_PERIOD_WIDTH = 100;
     
-    private long _messagesReceived;
-    private long _messagesSent;
-    private long _packetsTransmitted;
+    private int _messagesReceived;
+    private int _messagesSent;
+    private int _packetsTransmitted;
     /** how many packets were retransmitted within the last RETRANSMISSION_PERIOD_WIDTH packets */
-    private long _packetsRetransmitted;
+    private int _packetsRetransmitted;
 
     /** how many packets were transmitted within the last RETRANSMISSION_PERIOD_WIDTH packets */
     //private long _packetsPeriodTransmitted;
@@ -196,8 +196,8 @@ class PeerState {
     //private int _packetRetransmissionRate;
 
     /** how many dup packets were received within the last RETRANSMISSION_PERIOD_WIDTH packets */
-    private long _packetsReceivedDuplicate;
-    private long _packetsReceived;
+    private int _packetsReceivedDuplicate;
+    private int _packetsReceived;
     
     /** list of InboundMessageState for active message */
     private final Map<Long, InboundMessageState> _inboundMessages;
@@ -621,7 +621,7 @@ class PeerState {
 
     /** return the smoothed send transfer rate */
     public int getSendBps() { return _sendBps; }
-    public int getReceiveBps() { return _receiveBps; }
+    public synchronized int getReceiveBps() { return _receiveBps; }
 
     public int incrementConsecutiveFailedSends() { 
         synchronized(_outboundMessages) {
@@ -774,8 +774,7 @@ class PeerState {
     /** we received the message specified completely */
     public void messageFullyReceived(Long messageId, int bytes) { messageFullyReceived(messageId, bytes, false); }
 
-    /** FIXME synch */
-    public void messageFullyReceived(Long messageId, int bytes, boolean isForACK) {
+    public synchronized void messageFullyReceived(Long messageId, int bytes, boolean isForACK) {
         if (bytes > 0) {
             _receiveBytes += bytes;
             //if (isForACK)
@@ -1256,60 +1255,36 @@ class PeerState {
     }
     
     /** we are resending a packet, so lets jack up the rto */
-    public void messageRetransmitted(int packets) { 
-        //long now = _context.clock().now();
-        //if (true || _retransmissionPeriodStart + 1000 <= now) {
-            _packetsRetransmitted += packets;
-        /*****
-        } else {
-            _packetRetransmissionRate = (int)((float)(0.9f*_packetRetransmissionRate) + (float)(0.1f*_packetsRetransmitted));
-            //_packetsPeriodTransmitted = _packetsTransmitted - _retransmissionPeriodStart;
-            _packetsPeriodRetransmitted = (int)_packetsRetransmitted;
-            _retransmissionPeriodStart = now;
-            _packetsRetransmitted = packets;
-        }
-        *****/
+    public synchronized void messageRetransmitted(int packets) { 
         _context.statManager().addRateData("udp.congestionOccurred", _sendWindowBytes);
         _context.statManager().addRateData("udp.congestedRTO", _rto, _rttDeviation);
-        synchronized (this) {
-            congestionOccurred();
-            adjustMTU();
-        }
-        //_rto *= 2; 
+        _packetsRetransmitted += packets;
+        congestionOccurred();
+        adjustMTU();
     }
 
-    public void packetsTransmitted(int packets) { 
-        //long now = _context.clock().now();
+    public synchronized void packetsTransmitted(int packets) { 
         _packetsTransmitted += packets; 
-        //_packetsPeriodTransmitted += packets;
-        /*****
-        if (false && _retransmissionPeriodStart + 1000 <= now) {
-            _packetRetransmissionRate = (int)((float)(0.9f*_packetRetransmissionRate) + (float)(0.1f*_packetsRetransmitted));
-            _retransmissionPeriodStart = 0;
-            _packetsPeriodRetransmitted = (int)_packetsRetransmitted;
-            _packetsRetransmitted = 0;
-        }
-        *****/
     }
 
     /** how long does it usually take to get a message ACKed? */
-    public int getRTT() { return _rtt; }
+    public synchronized int getRTT() { return _rtt; }
     /** how soon should we retransmit an unacked packet? */
-    public int getRTO() { return _rto; }
+    public synchronized int getRTO() { return _rto; }
     /** how skewed are the measured RTTs? */
-    public long getRTTDeviation() { return _rttDeviation; }
+    public synchronized int getRTTDeviation() { return _rttDeviation; }
     
-    public long getMessagesSent() { return _messagesSent; }
-    public long getMessagesReceived() { return _messagesReceived; }
-    public long getPacketsTransmitted() { return _packetsTransmitted; }
-    public long getPacketsRetransmitted() { return _packetsRetransmitted; }
+    public synchronized int getMessagesSent() { return _messagesSent; }
+    public synchronized int getMessagesReceived() { return _messagesReceived; }
+    public synchronized int getPacketsTransmitted() { return _packetsTransmitted; }
+    public synchronized int getPacketsRetransmitted() { return _packetsRetransmitted; }
     //public long getPacketsPeriodTransmitted() { return _packetsPeriodTransmitted; }
     //public int getPacketsPeriodRetransmitted() { return _packetsPeriodRetransmitted; }
 
     /** avg number of packets retransmitted for every 100 packets */
     //public long getPacketRetransmissionRate() { return _packetRetransmissionRate; }
-    public long getPacketsReceived() { return _packetsReceived; }
-    public long getPacketsReceivedDuplicate() { return _packetsReceivedDuplicate; }
+    public synchronized int getPacketsReceived() { return _packetsReceived; }
+    public synchronized int getPacketsReceivedDuplicate() { return _packetsReceivedDuplicate; }
 
     private static final int MTU_RCV_DISPLAY_THRESHOLD = 20;
     /** 60 */
@@ -1322,7 +1297,7 @@ class PeerState {
     /** 
      *  @param size not including IP header, UDP header, MAC or IV
      */
-    public void packetReceived(int size) { 
+    public synchronized void packetReceived(int size) { 
         _packetsReceived++; 
         int minMTU;
         if (_remoteIP.length == 4) {
@@ -2077,6 +2052,7 @@ class PeerState {
         if (_remotePeer != null)
             buf.append(" ").append(_remotePeer.toBase64().substring(0,6));
 
+        buf.append(_isInbound? " IB " : " OB ");
         long now = _context.clock().now();
         buf.append(" recvAge: ").append(now-_lastReceiveTime);
         buf.append(" sendAge: ").append(now-_lastSendFullyTime);
