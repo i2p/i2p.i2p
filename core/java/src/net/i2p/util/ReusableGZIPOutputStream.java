@@ -75,6 +75,15 @@ public class ReusableGZIPOutputStream extends ResettableGZIPOutputStream {
     /** pull the contents of the stream written */
     public byte[] getData() { return _buffer.toByteArray(); }
     
+    /**
+     *  Clear the cache.
+     *  @since 0.9.21
+     */
+    public static void clearCache() {
+        if (_available != null)
+            _available.clear();
+    }
+
 /******
     public static void main(String args[]) {
         try {

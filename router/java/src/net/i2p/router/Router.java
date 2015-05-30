@@ -52,6 +52,8 @@ import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 import net.i2p.util.NativeBigInteger;
 import net.i2p.util.OrderedProperties;
+import net.i2p.util.ReusableGZIPInputStream;
+import net.i2p.util.ReusableGZIPOutputStream;
 import net.i2p.util.SecureFileOutputStream;
 import net.i2p.util.SimpleByteCache;
 import net.i2p.util.SystemVersion;
@@ -420,6 +422,8 @@ public class Router implements RouterClock.ClockShiftListener {
         SigningPublicKey.clearCache();
         SigUtil.clearCaches();
         I2PSessionImpl.clearCache();
+        ReusableGZIPInputStream.clearCache();
+        ReusableGZIPOutputStream.clearCache();
     }
 
     /**
