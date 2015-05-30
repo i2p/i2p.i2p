@@ -109,7 +109,8 @@ class SummaryRenderer {
     public void render(OutputStream out, int width, int height, boolean hideLegend, boolean hideGrid,
                        boolean hideTitle, boolean showEvents, int periodCount,
                        int endp, boolean showCredit, SummaryListener lsnr2, String titleOverride) throws IOException {
-        long end = _listener.now() - 75*1000;
+        // prevent NaNs if we are skewed ahead of system time
+        long end = Math.min(_listener.now(), System.currentTimeMillis()) - 75*1000;
         long period = _listener.getRate().getPeriod();
         if (endp > 0)
             end -= period * endp;

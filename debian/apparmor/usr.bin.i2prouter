@@ -1,9 +1,9 @@
-# Last Modified: Sun Apr 12 22:08:32 2015
+# Last Modified: Thu May 21 18:30:32 2015
 # vim:syntax=apparmor et ts=8 sw=4
 
 #include <tunables/global>
 
-/usr/bin/i2prouter {
+/usr/bin/i2prouter flags=(complain) {
   #include <abstractions/i2p>
   capability sys_ptrace,
 
@@ -40,7 +40,8 @@
 
   @{HOME}/.java/fonts/**                r,
   owner  @{HOME}/.i2p/                  rw,
-  owner  @{HOME}/.i2p/**                rwk,
+  owner  @{HOME}/.i2p/**                rwkl,
+  owner  @{HOME}/.i2p/eepsite/cgi-bin/** rix,
 
   # Prevent spamming the logs
   deny owner @{HOME}/.java/             wk,

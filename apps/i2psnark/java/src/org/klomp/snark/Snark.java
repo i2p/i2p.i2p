@@ -290,6 +290,7 @@ public class Snark
 
   /**
    * multitorrent
+   * @throws RuntimeException via fatal()
    */
   public Snark(I2PSnarkUtil util, String torrent, String ip, int user_port,
         StorageListener slistener, CoordinatorListener clistener,
@@ -304,6 +305,7 @@ public class Snark
    * multitorrent
    *
    * @param baseFile if null, use rootDir/torrentName; if non-null, use it instead
+   * @throws RuntimeException via fatal()
    * @since 0.9.11
    */
   public Snark(I2PSnarkUtil util, String torrent, String ip, int user_port,
@@ -478,6 +480,7 @@ public class Snark
    *  @param torrent a fake name for now (not a file name)
    *  @param ih 20-byte info hash
    *  @param trackerURL may be null
+   *  @throws RuntimeException via fatal()
    *  @since 0.8.4
    */
   public Snark(I2PSnarkUtil util, String torrent, byte[] ih, String trackerURL,
@@ -531,6 +534,8 @@ public class Snark
   /**
    * Start up contacting peers and querying the tracker.
    * Blocks if tunnel is not yet open.
+   *
+   * @throws RuntimeException via fatal()
    */
   public synchronized void startTorrent() {
       starting = true;

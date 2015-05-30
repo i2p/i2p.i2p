@@ -1,10 +1,12 @@
+# Last Modified: Thu May 21 18:30:32 2015
 # vim:syntax=apparmor et
 #include <tunables/global>
 
-profile system_i2p {
+profile system_i2p flags=(complain) {
   #include <abstractions/i2p>
 
   owner /{,lib/live/mount/overlay/}var/lib/i2p/** rwkl,
+  owner /{,lib/live/mount/overlay/}var/lib/i2p/i2p-config/eepsite/cgi-bin rix,
   owner /{,lib/live/mount/overlay/}var/log/i2p/* rw,
 
   owner /{,var/}run/i2p/{i2p,routerjvm}.pid rw,

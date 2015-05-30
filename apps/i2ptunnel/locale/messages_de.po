@@ -10,20 +10,21 @@
 # D.A. Loader, 2012
 # driz <driz@i2pmail.org>, 2012
 # ducki2p <ducki2p@gmail.com>, 2011
-# Ettore Atalan <atalanttore@googlemail.com>, 2014
+# Ettore Atalan <atalanttore@googlemail.com>, 2014-2015
 # foo <foo@bar>, 2009
 # Lars Schimmer <echelon@i2pmail.org>, 2014-2015
 # mixxy, 2011
 # nextloop <ga25day@mytum.de>, 2013
 # pirr <pirr@tormail.org>, 2012
+# Robin <robinflohr@gmail.com>, 2015
 # zeroflag <zeroflag@i2pmail.org>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-03-29 14:30+0000\n"
-"PO-Revision-Date: 2015-03-29 14:31+0000\n"
-"Last-Translator: kytv <killyourtv@i2pmail.org>\n"
+"PO-Revision-Date: 2015-05-09 13:05+0000\n"
+"Last-Translator: Lars Schimmer <echelon@i2pmail.org>\n"
 "Language-Team: German (http://www.transifex.com/projects/p/I2P/language/de/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -116,7 +117,7 @@ msgstr "Standardklient"
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:378
 msgid "HTTP/HTTPS client"
-msgstr "HTTP/HTTPS-Client"
+msgstr "HTTP/HTTPS-Klient"
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:379
 msgid "IRC client"
@@ -171,7 +172,7 @@ msgstr "ungültige Adresse"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:82
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:85
 msgid "Hidden Services Manager"
-msgstr "Verwaltung der Versteckten Services"
+msgstr "Verwaltung der versteckten Services"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:86
 msgid "Edit Client Tunnel"
@@ -248,11 +249,11 @@ msgstr "Ausgehende Proxies"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:245
 msgid "SSL Outproxies"
-msgstr "SSL Outproxies"
+msgstr "SSL-Ausgangsproxies"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:251
 msgid "Use Outproxy Plugin"
-msgstr "Das Outproxy Plugin benutzen"
+msgstr "Ausgangsproxy-Plugin verwenden"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:255
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:293
@@ -270,7 +271,7 @@ msgstr "Ziel des Tunnels"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:272
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:385
 msgid "name, name:port, or destination"
-msgstr "Name, Name:Port oder Destination"
+msgstr "Name, Name:Port oder Ziel"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:275
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:389
@@ -279,7 +280,7 @@ msgstr "B32-Adressen nicht empfohlen"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:281
 msgid "Shared Client"
-msgstr "versch. Klienten"
+msgstr "mehrere Klienten"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:285
 msgid ""
@@ -570,7 +571,7 @@ msgstr "Passwort"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:602
 msgid "Outproxy Authorization"
-msgstr "Outproxy Autorisation"
+msgstr "Ausgangsproxy-Autorisierung"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:619
 msgid "Jump URL List"
@@ -667,7 +668,7 @@ msgstr "Zugangsliste"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:488
 msgid "Block Access via Inproxies"
-msgstr "Blockiere den Zugang von In-Proxies"
+msgstr "Zugang über Eingangsproxies blockieren"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:497
 msgid "Unique Local Address per Client"
@@ -843,7 +844,7 @@ msgstr "Wartestellung"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:389
 msgid "Outproxy"
-msgstr "Ausgehender Proxy"
+msgstr "Ausgangsproxy"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:392
 msgid "Destination"
@@ -987,7 +988,7 @@ msgstr "ein Tunnel, der das SOCKS-Protokoll implementiert"
 msgid ""
 "This enables both TCP and UDP connections to be made through a SOCKS "
 "outproxy within I2P."
-msgstr "Dies aktiviert TCP und UDP Verbindungen, die durch ein Socks-Outproxy in I2P gemacht werden können."
+msgstr "Dies aktiviert TCP und UDP Verbindungen, die durch einen SOCKS-Ausgangsproxy in I2P gemacht werden können."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:248
 msgid ""
@@ -1013,7 +1014,7 @@ msgid ""
 "IRC networks outside I2P can also be reached if a SOCKS outproxy within I2P "
 "is known, though it depends on whether or not the outproxy has been blocked "
 "by the IRC network."
-msgstr "Auch mit IRC-Netzwerken außerhalb von I2P kann man sich so verbinden - vorausgesetzt, ein vom betreffenden IRC-Netzwerk nicht blockierter SOCKS-Outproxy in I2P ist bekannt."
+msgstr "Auch mit IRC-Netzwerken außerhalb von I2P kann man sich so verbinden - vorausgesetzt, ein vom betreffenden IRC-Netzwerk nicht blockierter SOCKS-Ausgangsproxy in I2P ist bekannt."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:256
 msgid "A client tunnel that implements the HTTP CONNECT command."
@@ -1023,7 +1024,7 @@ msgstr "ein Kliententunnel, in dem der HTTP-CONNECT-Befehl implementiert wurde"
 msgid ""
 "This enables TCP connections to be made through an HTTP outproxy, assuming "
 "the proxy supports the CONNECT command."
-msgstr "Dies erlaubt das Aufbauen von TCP-Verbindungen über einen HTTP-Outproxy, vorausgessetzt, der Proxy unterstützt dies."
+msgstr "Dies erlaubt das Aufbauen von TCP-Verbindungen über einen HTTP-Ausgangsproxy, vorausgesetzt, der Proxy unterstützt den CONNECT-Befehl."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:260
 msgid "A customised client tunnel for Streamr."
@@ -1079,7 +1080,7 @@ msgstr "Du kannst es nennen wie du willst, der Name dient nur des leichten Auffi
 msgid ""
 "If you know of any outproxies for this type of tunnel (either HTTP or "
 "SOCKS), fill them in below."
-msgstr "Wenn du andere Outproxys dieses Typs kennst (entweder HTTP oder SOCKS), kannst du sie hier eintragen."
+msgstr "Wenn Sie andere Ausgangsproxies dieses Typs kennen (entweder HTTP oder SOCKS), geben Sie sie hier ein."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:359
 msgid "Separate multiple proxies with commas."

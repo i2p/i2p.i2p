@@ -125,6 +125,8 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
      *  @since 0.9.8
      */
     protected enum State {
+        /** @since 0.9.20 */
+        INIT,
         OPENING,
         /** @since 0.9.11 */
         GOTDATE,
@@ -133,7 +135,7 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
         CLOSED
     }
 
-    private State _state = State.CLOSED;
+    protected State _state = State.INIT;
     protected final Object _stateLock = new Object();
 
     /** 
@@ -434,6 +436,9 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
             boolean loop = true;
             while (loop) {
                 switch (_state) {
+                    case INIT:
+                        loop = false;
+                        break;
                     case CLOSED:
                         if (wasOpening)
                             throw new I2PSessionException("connect by other thread failed");
@@ -581,8 +586,8 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
                 synchronized(_stateLock) {
                     if (_state == State.GOTDATE)
                         break;
-                    if (_state != State.OPENING)
-                        throw new IOException("Socket closed");
+                    if (_state != State.OPENING && _state != State.INIT)
+                        throw new IOException("Socket closed, state=" + _state);
                     // InterruptedException caught by caller
                     _stateLock.wait(1000);
                 }
@@ -609,7 +614,12 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
      * Report abuse with regards to the given messageId
      */
     public void reportAbuse(int msgId, int severity) throws I2PSessionException {
-        if (isClosed()) throw new I2PSessionException(getPrefix() + "Already closed");
+        synchronized (_stateLock) {
+            if (_state == State.CLOSED)
+                throw new I2PSessionException("Already closed");
+            if (_state == State.INIT)
+                throw new I2PSessionException("Not open, must call connect() first");
+        }
         _producer.reportAbuse(this, msgId, severity);
     }
 
@@ -815,11 +825,11 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
 
     /**
      *  Has the session been closed (or not yet connected)?
-     *  False when open and during transitions. Unsynchronized.
+     *  False when open and during transitions. Synchronized.
      */
     public boolean isClosed() {
         synchronized (_stateLock) {
-            return _state == State.CLOSED;
+            return _state == State.CLOSED || _state == State.INIT;
         }
     }
 
@@ -830,9 +840,13 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
      * @throws I2PSessionException if the message is malformed or there is an error writing it out
      */
     void sendMessage(I2CPMessage message) throws I2PSessionException {
-        if (isClosed()) {
-            throw new I2PSessionException("Already closed");
-        } else if (_queue != null) {
+        synchronized (_stateLock) {
+            if (_state == State.CLOSED)
+                throw new I2PSessionException("Already closed");
+            if (_state == State.INIT)
+                throw new I2PSessionException("Not open, must call connect() first");
+        }
+        if (_queue != null) {
             // internal
             try {
                 if (!_queue.offer(message, MAX_SEND_WAIT))
@@ -841,7 +855,8 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
                 throw new I2PSessionException("Interrupted", ie);
             }
         } else if (_writer == null) {
-            throw new I2PSessionException("Already closed");
+            // race here
+            throw new I2PSessionException("Already closed or not open");
         } else {
             _writer.addMessage(message);
         }
@@ -885,7 +900,7 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
      */
     public void destroySession(boolean sendDisconnect) {
         synchronized(_stateLock) {
-            if (_state == State.CLOSING || _state == State.CLOSED)
+            if (_state == State.CLOSING || _state == State.CLOSED || _state == State.INIT)
                 return;
             changeState(State.CLOSING);
         }
@@ -965,7 +980,7 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
     protected void disconnect() {
         State oldState;
         synchronized(_stateLock) {
-            if (_state == State.CLOSING || _state == State.CLOSED)
+            if (_state == State.CLOSING || _state == State.CLOSED || _state == State.INIT)
                 return;
             oldState = _state;
             changeState(State.CLOSING);

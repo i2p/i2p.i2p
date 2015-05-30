@@ -2,21 +2,23 @@
 # Copyright (C) 2009 The I2P Project
 # This file is distributed under the same license as the routerconsole package.
 # To contribute translations, see http://www.i2p2.de/newdevelopers
-#
-#   <kia___@hushmail.com>, 2011.
+# 
+# Translators:
+# cacapo <handelsehorisont@gmail.com>, 2015
+# KIA <kia___@hushmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-10-14 13:33+0000\n"
-"PO-Revision-Date: 2011-07-13 21:43+0000\n"
-"Last-Translator: KIA <kia___@hushmail.com>\n"
-"Language-Team: Danish (http://www.transifex.net/projects/p/I2P/team/da/)\n"
-"Language: da\n"
+"PO-Revision-Date: 2015-05-02 06:35+0000\n"
+"Last-Translator: cacapo <handelsehorisont@gmail.com>\n"
+"Language-Team: Danish (http://www.transifex.com/projects/p/I2P/language/da/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"Language: da\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 msgid "Anonymous Proxy"
 msgstr "Anonym Proxy"
@@ -135,9 +137,8 @@ msgstr "Belize"
 msgid "Canada"
 msgstr "Canada"
 
-#, fuzzy
 msgid "Cocos (Keeling) Islands"
-msgstr "Cookøerne"
+msgstr "Cocosøerne (Keelingøerne)"
 
 msgid "The Democratic Republic of the Congo"
 msgstr "Den Demokratiske Republik Congo"
@@ -182,11 +183,10 @@ msgid "Cape Verde"
 msgstr "Kap Verde"
 
 msgid "Curaçao"
-msgstr ""
+msgstr "Curaçao"
 
-#, fuzzy
 msgid "Christmas Island"
-msgstr "Caymanøerne"
+msgstr "Juleøen"
 
 msgid "Cyprus"
 msgstr "Cypern"
@@ -222,7 +222,7 @@ msgid "Egypt"
 msgstr "Egypten"
 
 msgid "Western Sahara"
-msgstr ""
+msgstr "Vestsahara"
 
 msgid "Eritrea"
 msgstr "Eritrea"
@@ -234,7 +234,7 @@ msgid "Ethiopia"
 msgstr "Etiopien"
 
 msgid "European Union"
-msgstr ""
+msgstr "Den Europæiske Union"
 
 msgid "Finland"
 msgstr "Finland"
@@ -270,7 +270,7 @@ msgid "French Guiana"
 msgstr "Fransk Guiana"
 
 msgid "Guernsey"
-msgstr ""
+msgstr "Guernsey"
 
 msgid "Ghana"
 msgstr "Ghana"
@@ -386,9 +386,8 @@ msgstr "Comorerne"
 msgid "Saint Kitts and Nevis"
 msgstr "Saint Kitts og Nevis"
 
-#, fuzzy
 msgid "The Democratic People's Republic of Korea"
-msgstr "Den Demokratiske Republik Congo"
+msgstr "Nordkorea"
 
 msgid "Republic of Korea"
 msgstr "Sydkorea"
@@ -567,9 +566,8 @@ msgstr "Polen"
 msgid "Saint Pierre and Miquelon"
 msgstr "Saint Pierre og Miquelon"
 
-#, fuzzy
 msgid "Pitcairn Islands"
-msgstr "Jomfruøerne"
+msgstr "Pitcairn"
 
 msgid "Puerto Rico"
 msgstr "Puerto Rico"
@@ -622,15 +620,14 @@ msgstr "Sverige"
 msgid "Singapore"
 msgstr "Singapore"
 
-#, fuzzy
 msgid "Saint Helena"
-msgstr "Saint Lucia"
+msgstr "Saint Helena"
 
 msgid "Slovenia"
 msgstr "Slovenien"
 
 msgid "Svalbard and Jan Mayen"
-msgstr ""
+msgstr "Svalbard og Jan Mayen"
 
 msgid "Slovakia"
 msgstr "Slovakiet"
@@ -766,4 +763,3 @@ msgstr "Zambia"
 
 msgid "Zimbabwe"
 msgstr "Zimbabwe"
-

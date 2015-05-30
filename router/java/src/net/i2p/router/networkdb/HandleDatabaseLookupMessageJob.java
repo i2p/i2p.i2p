@@ -83,6 +83,14 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
             return;
         }
 
+        // i2pd bug?
+        if (_message.getSearchKey().equals(Hash.FAKE_HASH)) {
+            if (_log.shouldWarn())
+                 _log.warn("Zero lookup", new Exception());
+             getContext().statManager().addRateData("netDb.DLMAllZeros", 1);
+            return;
+        }
+
         DatabaseLookupMessage.Type lookupType = _message.getSearchType();
         // only lookup once, then cast to correct type
         DatabaseEntry dbe = getContext().netDb().lookupLocally(_message.getSearchKey());

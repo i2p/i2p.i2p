@@ -171,6 +171,10 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         context.statManager().createRateStat("netDb.replyTimeout", "How long after a netDb send does the timeout expire (when the peer doesn't reply in time)?", "NetworkDatabase", new long[] { 60*60*1000l });
         // following is for RepublishLeaseSetJob
         context.statManager().createRateStat("netDb.republishLeaseSetCount", "How often we republish a leaseSet?", "NetworkDatabase", new long[] { 60*60*1000l });
+        // following is for DatabaseStoreMessage
+        context.statManager().createRateStat("netDb.DSMAllZeros", "Store with zero key", "NetworkDatabase", new long[] { 60*60*1000l });
+        // following is for HandleDatabaseLookupMessageJob
+        context.statManager().createRateStat("netDb.DLMAllZeros", "Lookup with zero key", "NetworkDatabase", new long[] { 60*60*1000l });
     }
     
     @Override

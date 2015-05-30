@@ -26,15 +26,15 @@ class UDPPacket implements CDQEntry {
     private final DatagramPacket _packet;
     private volatile short _priority;
     private volatile long _initializeTime;
-    private volatile long _expiration;
+    //private volatile long _expiration;
     private final byte[] _data;
     private final byte[] _validateBuf;
     private final byte[] _ivBuf;
     private volatile int _markedType;
-    private volatile RemoteHostId _remoteHost;
-    private volatile boolean _released;
-    private volatile Exception _releasedBy;
-    private volatile Exception _acquiredBy;
+    private RemoteHostId _remoteHost;
+    private boolean _released;
+    //private volatile Exception _releasedBy;
+    //private volatile Exception _acquiredBy;
     private long _enqueueTime;
     private long _receivedTime;
     //private long _beforeValidate;
@@ -112,7 +112,7 @@ class UDPPacket implements CDQEntry {
         init(ctx);
     }
 
-    private void init(I2PAppContext ctx) {
+    private synchronized void init(I2PAppContext ctx) {
         _context = ctx;
         //_dataBuf = _dataCache.acquire();
         Arrays.fill(_data, (byte)0);
@@ -146,20 +146,20 @@ class UDPPacket implements CDQEntry {
   ****/
 
     /** */
-    public DatagramPacket getPacket() { verifyNotReleased(); return _packet; }
-    public short getPriority() { verifyNotReleased(); return _priority; }
-    public long getExpiration() { verifyNotReleased(); return _expiration; }
-    public long getBegin() { verifyNotReleased(); return _initializeTime; }
+    public synchronized DatagramPacket getPacket() { verifyNotReleased(); return _packet; }
+    public synchronized short getPriority() { verifyNotReleased(); return _priority; }
+    //public long getExpiration() { verifyNotReleased(); return _expiration; }
+    public synchronized long getBegin() { verifyNotReleased(); return _initializeTime; }
     public long getLifetime() { /** verifyNotReleased(); */ return _context.clock().now() - _initializeTime; }
-    public void resetBegin() { _initializeTime = _context.clock().now(); }
+    public synchronized void resetBegin() { _initializeTime = _context.clock().now(); }
     /** flag this packet as a particular type for accounting purposes */
-    public void markType(int type) { verifyNotReleased(); _markedType = type; }
+    public synchronized void markType(int type) { verifyNotReleased(); _markedType = type; }
     /** 
      * flag this packet as a particular type for accounting purposes, with
      * 1 implying the packet is an ACK, otherwise it is a data packet
      *
      */
-    public int getMarkedType() { verifyNotReleased(); return _markedType; }
+    public synchronized int getMarkedType() { verifyNotReleased(); return _markedType; }
     
     private int _messageType;
     private int _fragmentCount;
@@ -174,7 +174,7 @@ class UDPPacket implements CDQEntry {
     /** only for debugging and stats */
     void setFragmentCount(int count) { _fragmentCount = count; }
 
-    RemoteHostId getRemoteHost() {
+    synchronized RemoteHostId getRemoteHost() {
         if (_remoteHost == null) {
             //long before = System.currentTimeMillis();
             InetAddress addr = _packet.getAddress();
@@ -193,7 +193,7 @@ class UDPPacket implements CDQEntry {
      * MAC matches, false otherwise.
      *
      */
-    public boolean validate(SessionKey macKey) {
+    public synchronized boolean validate(SessionKey macKey) {
         verifyNotReleased(); 
         //_beforeValidate = _context.clock().now();
         boolean eq = false;
@@ -242,7 +242,7 @@ class UDPPacket implements CDQEntry {
         } else {
             Log log = _context.logManager().getLog(UDPPacket.class);
             if (log.shouldLog(Log.WARN))
-                log.warn("Payload length is " + payloadLength + ", too short!\n" +
+                log.warn("Payload length is " + payloadLength + ", too short! From: " + getRemoteHost() + '\n' +
                          net.i2p.util.HexDump.dump(_data, _packet.getOffset(), _packet.getLength()));
         }
         
@@ -256,7 +256,7 @@ class UDPPacket implements CDQEntry {
      * with the decrypted data (leaving the MAC and IV unaltered)
      * 
      */
-    public void decrypt(SessionKey cipherKey) {
+    public synchronized void decrypt(SessionKey cipherKey) {
         verifyNotReleased(); 
         System.arraycopy(_data, MAC_SIZE, _ivBuf, 0, IV_SIZE);
         int len = _packet.getLength();
@@ -279,7 +279,7 @@ class UDPPacket implements CDQEntry {
     public void setEnqueueTime(long now) { _enqueueTime = now; }
 
     /** a packet handler has pulled it off the inbound queue */
-    void received() { _receivedTime = _context.clock().now(); }
+    synchronized void received() { _receivedTime = _context.clock().now(); }
 
     /** a packet handler has decrypted and verified the packet and is about to parse out the good bits */
     //void beforeReceiveFragments() { _beforeReceiveFragments = _context.clock().now(); }
@@ -293,7 +293,7 @@ class UDPPacket implements CDQEntry {
     public long getEnqueueTime() { return _enqueueTime; }
 
     /** a packet handler has pulled it off the inbound queue */
-    long getTimeSinceReceived() { return (_receivedTime > 0 ? _context.clock().now() - _receivedTime : 0); }
+    synchronized long getTimeSinceReceived() { return (_receivedTime > 0 ? _context.clock().now() - _receivedTime : 0); }
 
     /** a packet handler has decrypted and verified the packet and is about to parse out the good bits */
     //long getTimeSinceReceiveFragments() { return (_beforeReceiveFragments > 0 ? _context.clock().now() - _beforeReceiveFragments : 0); }
@@ -343,16 +343,20 @@ class UDPPacket implements CDQEntry {
         UDPPacket rv = null;
         if (CACHE) {
             rv = _packetCache.poll();
-            if (rv != null)
-                rv.init(ctx);
+            if (rv != null) {
+                synchronized(rv) {
+                    if (!rv._released) {
+                        Log log = rv._context.logManager().getLog(UDPPacket.class);
+                        log.error("Unreleased cached packet", new Exception());
+                        rv = null;
+                    } else {
+                        rv.init(ctx);
+                    }
+                }
+            }
         }
         if (rv == null)
             rv = new UDPPacket(ctx);
-        //if (rv._acquiredBy != null) {
-        //    _log.log(Log.CRIT, "Already acquired!  current stack trace is:", new Exception());
-        //    _log.log(Log.CRIT, "Earlier acquired:", rv._acquiredBy);
-        //}
-        //rv._acquiredBy = new Exception("acquired on");
         return rv;
     }
 
@@ -364,7 +368,7 @@ class UDPPacket implements CDQEntry {
         release();
     }
 
-    public void release() {
+    public synchronized void release() {
         verifyNotReleased();
         _released = true;
         //_releasedBy = new Exception("released by");
@@ -385,7 +389,7 @@ class UDPPacket implements CDQEntry {
             _packetCache.clear();
     }
 
-    private void verifyNotReleased() {
+    private synchronized void verifyNotReleased() {
         if (!CACHE) return;
         if (_released) {
             Log log = _context.logManager().getLog(UDPPacket.class);

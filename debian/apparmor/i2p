@@ -1,14 +1,14 @@
-# Last Modified: Sun Apr 12 22:08:32 2015
+# Last Modified: Thu May 21 18:30:32 2015
 # vim:syntax=apparmor et ts=4 sw=4
 
-#include <abstractions/base>
-#include <abstractions/fonts>
-#include <abstractions/nameservice>
-#include <abstractions/ssl_certs>
-#include <abstractions/user-tmp>
+  #include <abstractions/base>
+  #include <abstractions/fonts>
+  #include <abstractions/nameservice>
+  #include <abstractions/ssl_certs>
+  #include <abstractions/user-tmp>
 
-network inet stream,
-network inet6 stream,
+  network inet stream,
+  network inet6 stream,
 
   # Needed by Java
   @{PROC}                                                 r,
@@ -16,8 +16,6 @@ network inet6 stream,
   owner @{PROC}/[0-9]*/status                             r,
   @{PROC}/[0-9]*/net/ipv6_route                           r,
   @{PROC}/[0-9]*/net/if_inet6                             r,
-  /dev/random                                             r,
-  /dev/urandom                                            r,
   /sys/devices/system/cpu/                                r,
   /sys/devices/system/cpu/**                              r,
 
@@ -62,6 +60,8 @@ network inet6 stream,
   deny /usr/sbin/                                         r,
   deny /var/cache/fontconfig/                             wk,
 
-  # Used by some versions of the Tanuki wrapper, not needed by I2P
+  # Some versions of the Tanuki wrapper package will try to load these jars but
+  # they are  not needed by I2P. The deny rule here will prevent the logs from
+  # being spammed.
   deny /usr/share/java/hamcrest*.jar                      r,
   deny /usr/share/java/junit*.jar                         r,
