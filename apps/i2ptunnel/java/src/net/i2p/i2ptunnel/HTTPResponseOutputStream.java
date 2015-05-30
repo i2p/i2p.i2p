@@ -10,20 +10,13 @@ package net.i2p.i2ptunnel;
 
 import java.io.FilterOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
 import java.util.Locale;
-import java.util.concurrent.RejectedExecutionException;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.ByteArray;
-import net.i2p.util.BigPipedInputStream;
 import net.i2p.util.ByteCache;
-import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
-import net.i2p.util.ReusableGZIPInputStream;
 
 /**
  * This does the transparent gzip decompression on the client side.
@@ -46,7 +39,6 @@ class HTTPResponseOutputStream extends FilterOutputStream {
     protected boolean _gzip;
     protected long _dataExpected;
     protected String _contentType;
-    private PipedInputStream _pipedInputStream;
 
     private static final int CACHE_SIZE = 8*1024;
     private static final ByteCache _cache = ByteCache.getInstance(8, CACHE_SIZE);
@@ -251,124 +243,17 @@ class HTTPResponseOutputStream extends FilterOutputStream {
     public void close() throws IOException {
         if (_log.shouldLog(Log.INFO))
             _log.info("Closing " + out + " threaded?? " + shouldCompress(), new Exception("I did it"));
-        PipedInputStream pi;
         synchronized(this) {
             // synch with changing out field below
             super.close();
-            pi = _pipedInputStream;
-        }
-        // Prevent truncation of gunzipped data as
-        // I2PTunnelHTTPClientRunner.close() closes the Socket after this.
-        // Closing pipe only notifies read end, doesn't wait.
-        // TODO switch to Java 6 InflaterOutputStream and get rid of Pusher thread
-        if (pi != null) {
-            for (int i = 0; i < 50; i++) {
-                if (pi.available() <= 0) {
-                    if (i > 0 && _log.shouldWarn())
-                        _log.warn("Waited " + (i*20) + " for read side to close");
-                    break;
-                }
-                try {
-                    Thread.sleep(20);
-                } catch (InterruptedException ie) {}
-            }
         }
     }
     
     protected void beginProcessing() throws IOException {
         //out.flush();
-        PipedInputStream pi = BigPipedInputStream.getInstance();
-        PipedOutputStream po = new PipedOutputStream(pi);
-        Runnable r = new Pusher(pi, out);
-        if (_log.shouldLog(Log.INFO))
-            _log.info("Starting threaded decompressing pusher to " + out);
+        OutputStream po = new GunzipOutputStream(out);
         synchronized(this) {
             out = po;
-            _pipedInputStream = pi;
-        }
-        // TODO we should be able to do this inline somehow
-        TunnelControllerGroup tcg = TunnelControllerGroup.getInstance();
-        if (tcg != null) {
-            // Run in the client thread pool, as there should be an unused thread
-            // there after the accept().
-            // Overridden in I2PTunnelHTTPServer, where it does not use the client pool.
-            try {
-                tcg.getClientExecutor().execute(r);
-            } catch (RejectedExecutionException ree) {
-                // shouldn't happen
-                throw ree;
-            }
-        } else {
-            // Fallback in case TCG.getInstance() is null, never instantiated
-            // and we were not started by TCG.
-            // Maybe a plugin loaded before TCG? Should be rare.
-            Thread t = new I2PAppThread(r, "Pusher");
-            t.start();
-        }
-    }
-    
-    private class Pusher implements Runnable {
-        private final InputStream _inRaw;
-        private final OutputStream _out;
-
-        public Pusher(InputStream in, OutputStream out) {
-            _inRaw = in;
-            _out = out;
-        }
-
-        public void run() {
-            if (_log.shouldLog(Log.INFO))
-                _log.info("Starting pusher from " + _inRaw + " to: " + _out);
-            ReusableGZIPInputStream _in = ReusableGZIPInputStream.acquire();
-            long written = 0;
-            ByteArray ba = null;
-            try {
-                // blocking
-                _in.initialize(_inRaw);
-                ba = _cache.acquire();
-                byte buf[] = ba.getData();
-                int read = -1;
-                while ( (read = _in.read(buf)) != -1) {
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("Read " + read + " and writing it to the browser/streams");
-                    _out.write(buf, 0, read);
-                    _out.flush();
-                    written += read;
-                }
-            } catch (IOException ioe) {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Error decompressing: " + written + ", " + _in.getTotalRead() +
-                              "/" + _in.getTotalExpanded() +
-                              " from " + _inRaw + " to: " + _out, ioe);
-            } catch (OutOfMemoryError oom) {
-                _log.error("OOM in HTTP Decompressor", oom);
-            } finally {
-                if (_log.shouldInfo())
-                    _log.info("After decompression, written=" + written + 
-                                " read=" + _in.getTotalRead() 
-                                + ", expanded=" + _in.getTotalExpanded() + ", remaining=" + _in.getRemaining() 
-                                + ", finished=" + _in.getFinished() +
-                                " from " + _inRaw + " to: " + _out);
-                if (ba != null)
-                    _cache.release(ba);
-                if (_out != null) try { 
-                    _out.close(); 
-                } catch (IOException ioe) {}
-                try { 
-                    _in.close(); 
-                } catch (IOException ioe) {}
-            }
-
-            double compressed = _in.getTotalRead();
-            double expanded = _in.getTotalExpanded();
-            ReusableGZIPInputStream.release(_in);
-            if (compressed > 0 && expanded > 0) {
-                // only update the stats if we did something
-                double ratio = compressed/expanded;
-                _context.statManager().addRateData("i2ptunnel.httpCompressionRatio", (int)(100d*ratio));
-                _context.statManager().addRateData("i2ptunnel.httpCompressed", (long)compressed);
-                _context.statManager().addRateData("i2ptunnel.httpExpanded", (long)expanded);
-            }
         }
     }
 
