@@ -252,6 +252,8 @@ class I2PSessionImpl2 extends I2PSessionImpl {
                 throw new I2PSessionException("Already closed");
             if (_state == State.INIT)
                 throw new I2PSessionException("Not open, must call connect() first");
+            if (_state == State.OPENING || _state == State.GOTDATE) // not before GOTDATE or session
+                throw new I2PSessionException("Session not open yet");
         }
         updateActivity();
 

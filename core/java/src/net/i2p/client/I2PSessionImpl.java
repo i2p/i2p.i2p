@@ -619,6 +619,8 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
                 throw new I2PSessionException("Already closed");
             if (_state == State.INIT)
                 throw new I2PSessionException("Not open, must call connect() first");
+            if (_state == State.OPENING) // not before GOTDATE
+                throw new I2PSessionException("Session not open yet");
         }
         _producer.reportAbuse(this, msgId, severity);
     }
