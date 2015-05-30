@@ -1,3 +1,6 @@
+2015-05-30 zzz
+ * i2ptunnel: Fix +/- variance config (ticket #1587)
+
 2015-05-29 zzz
  * HTTP client: Fix occasional truncation of compressed responses
 
