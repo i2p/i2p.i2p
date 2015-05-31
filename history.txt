@@ -1,3 +1,6 @@
+2015-05-31 zzz
+ * Fortuna: Catch AIOOBE (ticket #1576)
+
 2015-05-30 zzz
  * i2ptunnel: Fix +/- variance config (ticket #1587)
 

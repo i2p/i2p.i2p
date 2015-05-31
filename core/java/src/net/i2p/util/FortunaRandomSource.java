@@ -262,8 +262,14 @@ public class FortunaRandomSource extends RandomSource implements EntropyHarveste
     /** reseed the fortuna */
     @Override
     public void feedEntropy(String source, byte[] data, int offset, int len) {
-        synchronized(_fortuna) {
-            _fortuna.addRandomBytes(data, offset, len);
+        try {
+            synchronized(_fortuna) {
+                _fortuna.addRandomBytes(data, offset, len);
+            }
+        } catch (Exception e) {
+            // AIOOBE seen, root cause unknown, ticket #1576
+            Log log = _context.logManager().getLog(FortunaRandomSource.class);
+            log.warn("feedEntropy()", e);
         }
     }
     
