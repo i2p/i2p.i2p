@@ -97,8 +97,7 @@ abstract class LogWriterBase implements Runnable {
                         dupCount++;
                     } else {
                         if (dupCount > 0) {
-                            writeRecord(_last.getPriority(), dupMessage(dupCount, _last, false));
-                            _manager.getBuffer().add(dupMessage(dupCount, _last, true));
+                            writeDupMessage(dupCount, _last);
                             dupCount = 0;
                         }
                         writeRecord(rec);
@@ -106,8 +105,7 @@ abstract class LogWriterBase implements Runnable {
                     _last = rec;
                 }
                 if (dupCount > 0) {
-                    writeRecord(_last.getPriority(), dupMessage(dupCount, _last, false));
-                    _manager.getBuffer().add(dupMessage(dupCount, _last, true));
+                    writeDupMessage(dupCount, _last);
                 }
                 flushWriter();
             }
@@ -123,6 +121,21 @@ abstract class LogWriterBase implements Runnable {
                 }
             }
         }
+    }
+
+    /**
+     *  Write a msg with the date stamp of the last duplicate
+     *  @since 0.9.21
+     */
+    private void writeDupMessage(int dupCount, LogRecord lastRecord) {
+        String dmsg = dupMessage(dupCount, lastRecord, false);
+        writeRecord(lastRecord.getPriority(), dmsg);
+        if (_manager.getDisplayOnScreenLevel() <= lastRecord.getPriority() && _manager.displayOnScreen())
+            System.out.print(dmsg);
+        dmsg = dupMessage(dupCount, lastRecord, true);
+        _manager.getBuffer().add(dmsg);
+        if (lastRecord.getPriority() >= Log.CRIT)
+            _manager.getBuffer().addCritical(dmsg);
     }
 
     /**
