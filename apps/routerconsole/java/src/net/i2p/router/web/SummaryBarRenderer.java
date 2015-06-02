@@ -665,6 +665,10 @@ public class SummaryBarRenderer {
      *  @since 0.9.18
      */
     private static String nbsp(String s) {
-        return s.replace(" ", "&nbsp;");
+        // if it's too long, this makes it worse
+        if (s.length() <= 30)
+            return s.replace(" ", "&nbsp;");
+        else
+            return s;
     }
 }
