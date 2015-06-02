@@ -37,7 +37,8 @@ class UPnPManager {
     private volatile boolean _isRunning;
     private volatile boolean _shouldBeRunning;
     private volatile long _lastRescan;
-    private volatile boolean _errorLogged;
+    private boolean _errorLogged;
+    private boolean _disconLogged;
     private InetAddress _detectedAddress;
     private final TransportManager _manager;
     private final SimpleTimer2.TimedEvent _rescanner;
@@ -103,10 +104,14 @@ class UPnPManager {
             _rescanner.schedule(RESCAN_SHORT_DELAY);
             // Do we have a non-loopback, non-broadcast address?
             // If not, that's why it failed (HTTPServer won't start)
-            if (!Addresses.isConnected())
-                _log.logAlways(Log.WARN, "UPnP start failed - no network connection?");
-            else
+            if (!Addresses.isConnected()) {
+                if (!_disconLogged) {
+                    _log.logAlways(Log.WARN, "UPnP start failed - no network connection?");
+                    _disconLogged = true;
+                }
+            } else {
                 _log.error("UPnP start failed - port conflict?");
+            }
         }
     }
 
