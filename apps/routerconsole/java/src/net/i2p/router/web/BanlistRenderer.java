@@ -61,7 +61,9 @@ public class BanlistRenderer {
             buf.append("<li>").append(_context.commSystem().renderPeerHTML(key));
             buf.append(' ');
             String expireString = DataHelper.formatDuration2(expires);
-            if (expires < 5l*24*60*60*1000)
+            if (key.equals(Hash.FAKE_HASH))
+                buf.append(_("Permanently banned"));
+            else if (expires < 5l*24*60*60*1000)
                 buf.append(_("Temporary ban expiring in {0}", expireString));
             else
                 buf.append(_("Banned until restart or in {0}", expireString));
@@ -75,8 +77,10 @@ public class BanlistRenderer {
                 else
                     buf.append(_(entry.cause));
             }
-            buf.append(" (<a href=\"configpeer?peer=").append(key.toBase64())
-               .append("#unsh\">").append(_("unban now")).append("</a>)");
+            if (!key.equals(Hash.FAKE_HASH)) {
+                buf.append(" (<a href=\"configpeer?peer=").append(key.toBase64())
+                   .append("#unsh\">").append(_("unban now")).append("</a>)");
+            }
             buf.append("</li>\n");
         }
         buf.append("</ul>\n");
