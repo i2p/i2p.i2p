@@ -1491,7 +1491,7 @@ public class DataHelper {
             return (ms / (60 * 1000)) + "m";
         } else if (ms < 3 * 24 * 60 * 60 * 1000) {
             return (ms / (60 * 60 * 1000)) + "h";
-        } else if (ms < 1000L * 24 * 60 * 60 * 1000) {
+        } else if (ms < 3L * 365 * 24 * 60 * 60 * 1000) {
             return (ms / (24 * 60 * 60 * 1000)) + "d";
         } else if (ms < 1000L * 365 * 24 * 60 * 60 * 1000) {
             return (ms / (365L * 24 * 60 * 60 * 1000)) + "y";
@@ -1539,7 +1539,7 @@ public class DataHelper {
             // hours
             // alternates: hrs, hr., hrs.
             t = ngettext("1 hour", "{0} hours", (int) (ms / (60 * 60 * 1000)));
-        } else if (ams < 1000L * 24 * 60 * 60 * 1000) {
+        } else if (ams < 3L * 365 * 24 * 60 * 60 * 1000) {
             // days
             t = ngettext("1 day", "{0} days", (int) (ms / (24 * 60 * 60 * 1000)));
         } else if (ams < 1000L * 365 * 24 * 60 * 60 * 1000) {
@@ -1586,7 +1586,7 @@ public class DataHelper {
             t = ngettext("1 min", "{0} min", (int) (ms / (60 * 1000)));
         } else if (ams < 2 * 24 * 60 * 60 * 1000) {
             t = ngettext("1 hour", "{0} hours", (int) (ms / (60 * 60 * 1000)));
-        } else if (ams < 1000L * 24 * 60 * 60 * 1000) {
+        } else if (ams < 3L * 365 * 24 * 60 * 60 * 1000) {
             // days
             t = ngettext("1 day", "{0} days", (int) (ms / (24 * 60 * 60 * 1000)));
         } else if (ams < 1000L * 365 * 24 * 60 * 60 * 1000) {
