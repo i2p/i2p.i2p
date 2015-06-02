@@ -33,6 +33,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.atomic.AtomicLong;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.ByteArray;
@@ -87,8 +88,8 @@ class PeerCoordinator implements PeerListener
   // final static int MAX_DOWNLOADERS = MAX_CONNECTIONS;
   // int downloaders = 0;
 
-  private long uploaded;
-  private long downloaded;
+  private final AtomicLong uploaded = new AtomicLong();
+  private final AtomicLong downloaded = new AtomicLong();
   final static int RATE_DEPTH = 3; // make following arrays RATE_DEPTH long
   private final long uploaded_old[] = {-1,-1,-1};
   private final long downloaded_old[] = {-1,-1,-1};
@@ -279,7 +280,7 @@ class PeerCoordinator implements PeerListener
    */
   public long getUploaded()
   {
-    return uploaded;
+    return uploaded.get();
   }
 
   /**
@@ -287,7 +288,7 @@ class PeerCoordinator implements PeerListener
    *  @since 0.9.15
    */
   public void setUploaded(long up) {
-      uploaded = up;
+      uploaded.set(up);
   }
 
   /**
@@ -295,7 +296,7 @@ class PeerCoordinator implements PeerListener
    */
   public long getDownloaded()
   {
-    return downloaded;
+    return downloaded.get();
   }
 
   /**
@@ -944,7 +945,7 @@ class PeerCoordinator implements PeerListener
    */
   public void uploaded(Peer peer, int size)
   {
-    uploaded += size;
+    uploaded.addAndGet(size);
 
     //if (listener != null)
     //  listener.peerChange(this, peer);
@@ -955,7 +956,7 @@ class PeerCoordinator implements PeerListener
    */
   public void downloaded(Peer peer, int size)
   {
-    downloaded += size;
+    downloaded.addAndGet(size);
 
     //if (listener != null)
     //  listener.peerChange(this, peer);
@@ -1004,7 +1005,7 @@ class PeerCoordinator implements PeerListener
             else
               {
                 // Oops. We didn't actually download this then... :(
-                downloaded -= metainfo.getPieceLength(piece);
+                downloaded.addAndGet(0 - metainfo.getPieceLength(piece));
                 _log.warn("Got BAD piece " + piece + "/" + metainfo.getPieces() + " from " + peer + " for " + metainfo.getName());
                 return false; // No need to announce BAD piece to peers.
               }
