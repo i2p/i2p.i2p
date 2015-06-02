@@ -457,6 +457,7 @@ public class I2PSnarkServlet extends BasicServlet {
             out.write(" <a href=\"" + _contextPath + '/');
             if (peerParam != null) {
                 // disable peer view
+                out.write(getQueryString(req, "", null, null));
                 out.write("\">");
                 tx = _("Hide Peers");
                 out.write(toThemeImg("hidepeers", tx, tx));
