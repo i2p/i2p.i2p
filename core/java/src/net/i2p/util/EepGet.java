@@ -923,6 +923,8 @@ public class EepGet {
             case 409: // bad addr helper
             case 410: // gone
             case 414: // URI too long
+            case 418: // backoff
+            case 420: // backoff
             case 429: // too many requests
             case 431: // headers too long
             case 503: // no outproxy
