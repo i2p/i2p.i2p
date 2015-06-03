@@ -29,7 +29,6 @@ class PacketQueue implements SendMessageStatusListener {
     private final I2PAppContext _context;
     private final Log _log;
     private final I2PSession _session;
-    private final ConnectionManager _connectionManager;
     private final ByteCache _cache = ByteCache.getInstance(64, 36*1024);
     private final Map<Long, Connection> _messageStatusMap;
     private volatile boolean _dead;
@@ -46,10 +45,9 @@ class PacketQueue implements SendMessageStatusListener {
     private static final long REMOVE_EXPIRED_TIME = 67*1000;
     private static final boolean ENABLE_STATUS_LISTEN = true;
 
-    public PacketQueue(I2PAppContext context, I2PSession session, ConnectionManager mgr) {
+    public PacketQueue(I2PAppContext context, I2PSession session) {
         _context = context;
         _session = session;
-        _connectionManager = mgr;
         _log = context.logManager().getLog(PacketQueue.class);
         _messageStatusMap = new ConcurrentHashMap<Long, Connection>(16);
         new RemoveExpired();
@@ -213,8 +211,10 @@ class PacketQueue implements SendMessageStatusListener {
                 _log.debug(msg);
             }
             Connection c = packet.getConnection();
-            String suffix = (c != null ? "wsize " + c.getOptions().getWindowSize() + " rto " + c.getOptions().getRTO() : null);
-            _connectionManager.getPacketHandler().displayPacket(packet, "SEND", suffix);
+            if (c != null) {
+                String suffix = "wsize " + c.getOptions().getWindowSize() + " rto " + c.getOptions().getRTO();
+                c.getConnectionManager().getPacketHandler().displayPacket(packet, "SEND", suffix);
+            }
             if (I2PSocketManagerFull.pcapWriter != null &&
                 _context.getBooleanProperty(I2PSocketManagerFull.PROP_PCAP))
                 packet.logTCPDump();

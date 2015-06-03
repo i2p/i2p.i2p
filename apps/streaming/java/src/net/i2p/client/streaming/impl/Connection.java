@@ -873,6 +873,9 @@ class Connection {
      */
     public void setOptions(ConnectionOptions opts) { _options = opts; }
         
+    /** @since 0.9.21 */
+    public ConnectionManager getConnectionManager() { return _connectionManager; }
+
     public I2PSession getSession() { return _connectionManager.getSession(); }
     public I2PSocketFull getSocket() { return _socket; }
     public void setSocket(I2PSocketFull socket) { _socket = socket; }

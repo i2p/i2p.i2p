@@ -88,7 +88,7 @@ class ConnectionManager {
         // As of 0.9.1, listen on configured port (default 0 = all)
         int protocol = defaultOptions.getEnforceProtocol() ? I2PSession.PROTO_STREAMING : I2PSession.PROTO_ANY;
         _session.addMuxedSessionListener(_messageHandler, protocol, defaultOptions.getLocalPort());
-        _outboundQueue = new PacketQueue(_context, _session, this);
+        _outboundQueue = new PacketQueue(_context, _session);
         _recentlyClosed = new LHMCache<Long, Object>(32);
         /** Socket timeout for accept() */
         _soTimeout = -1;
