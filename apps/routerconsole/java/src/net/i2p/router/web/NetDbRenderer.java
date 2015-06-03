@@ -78,7 +78,14 @@ public class NetDbRenderer {
         }
     }
 
-    public void renderRouterInfoHTML(Writer out, String routerPrefix) throws IOException {
+    /**
+     *  One String must be non-null
+     *
+     *  @param routerPrefix may be null. "." for our router only
+     *  @param version may be null
+     *  @param country may be null
+     */
+    public void renderRouterInfoHTML(Writer out, String routerPrefix, String version, String country) throws IOException {
         StringBuilder buf = new StringBuilder(4*1024);
         if (".".equals(routerPrefix)) {
             renderRouterInfo(buf, _context.router().getRouterInfo(), true, true);
@@ -87,13 +94,23 @@ public class NetDbRenderer {
             Set<RouterInfo> routers = _context.netDb().getRouters();
             for (RouterInfo ri : routers) {
                 Hash key = ri.getIdentity().getHash();
-                if (key.toBase64().startsWith(routerPrefix)) {
+                if ((routerPrefix != null && key.toBase64().startsWith(routerPrefix)) ||
+                    (version != null && version.equals(ri.getVersion())) ||
+                    (country != null && country.equals(_context.commSystem().getCountry(key)))) {
                     renderRouterInfo(buf, ri, false, true);
                     notFound = false;
                 }
             }
-            if (notFound)
-                buf.append(_("Router") + ' ').append(routerPrefix).append(' ' + _("not found in network database") );
+            if (notFound) {
+                buf.append(_("Router")).append(' ');
+                if (routerPrefix != null)
+                    buf.append(routerPrefix);
+                else if (version != null)
+                    buf.append(version);
+                else if (country != null)
+                    buf.append(country);
+                buf.append(' ').append(_("not found in network database"));
+            }
         }
         out.write(buf.toString());
         out.flush();
@@ -320,8 +337,9 @@ public class NetDbRenderer {
             buf.append("<tr><th>" + _("Version") + "</th><th>" + _("Count") + "</th></tr>\n");
             for (String routerVersion : versionList) {
                 int num = versions.count(routerVersion);
-                buf.append("<tr><td align=\"center\">").append(DataHelper.stripHTML(routerVersion));
-                buf.append("</td><td align=\"center\">").append(num).append("</td></tr>\n");
+                String ver = DataHelper.stripHTML(routerVersion);
+                buf.append("<tr><td align=\"center\"><a href=\"/netdb?v=").append(ver).append("\">").append(ver);
+                buf.append("</a></td><td align=\"center\">").append(num).append("</td></tr>\n");
             }
             buf.append("</table>\n");
         }
@@ -353,9 +371,9 @@ public class NetDbRenderer {
             for (String country : countryList) {
                 int num = countries.count(country);
                 buf.append("<tr><td><img height=\"11\" width=\"16\" alt=\"").append(country.toUpperCase(Locale.US)).append("\"");
-                buf.append(" src=\"/flags.jsp?c=").append(country).append("\"> ");
+                buf.append(" src=\"/flags.jsp?c=").append(country).append("\"> <a href=\"/netdb?c=").append(country).append("\">");
                 buf.append(getTranslatedCountry(country));
-                buf.append("</td><td align=\"center\">").append(num).append("</td></tr>\n");
+                buf.append("</a></td><td align=\"center\">").append(num).append("</td></tr>\n");
             }
             buf.append("</table>\n");
         }

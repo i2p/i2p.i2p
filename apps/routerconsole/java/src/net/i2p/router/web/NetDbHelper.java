@@ -5,6 +5,8 @@ import net.i2p.data.DataHelper;
 
 public class NetDbHelper extends HelperBase {
     private String _routerPrefix;
+    private String _version;
+    private String _country;
     private int _full;
     private boolean _lease;
     private boolean _debug;
@@ -33,6 +35,18 @@ public class NetDbHelper extends HelperBase {
             _routerPrefix = DataHelper.stripHTML(r);  // XSS
     }
 
+    /** @since 0.9.21 */
+    public void setVersion(String v) {
+        if (v != null)
+            _version = DataHelper.stripHTML(v);  // XSS
+    }
+
+    /** @since 0.9.21 */
+    public void setCountry(String c) {
+        if (c != null)
+            _country = DataHelper.stripHTML(c);  // XSS
+    }
+
     public void setFull(String f) {
         try {
             _full = Integer.parseInt(f);
@@ -59,8 +73,8 @@ public class NetDbHelper extends HelperBase {
         NetDbRenderer renderer = new NetDbRenderer(_context);
         try {
             renderNavBar();
-            if (_routerPrefix != null)
-                renderer.renderRouterInfoHTML(_out, _routerPrefix);
+            if (_routerPrefix != null || _version!= null || _country != null)
+                renderer.renderRouterInfoHTML(_out, _routerPrefix, _version, _country);
             else if (_lease)
                 renderer.renderLeaseSetHTML(_out, _debug);
             else
