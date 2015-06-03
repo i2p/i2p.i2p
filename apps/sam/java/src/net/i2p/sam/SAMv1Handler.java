@@ -951,10 +951,10 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
             msg = msg.replace("\r", " ");
             if (!msg.startsWith("\"")) {
                 msg = msg.replace("\"", "");
-                if (msg.contains("\"") || msg.contains("\t"))
+                if (msg.contains(" ") || msg.contains("\t"))
                     msg = '"' + msg + '"';
             }
-            rv = " MESSAGE=\"" + msg + "\"";
+            rv = " MESSAGE=" + msg;
         } else {
             rv = "";
         }
