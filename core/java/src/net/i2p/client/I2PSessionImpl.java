@@ -493,6 +493,7 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
                         try {
                             I2PSSLSocketFactory fact = new I2PSSLSocketFactory(_context, false, "certificates/i2cp");
                             _socket = fact.createSocket(_hostname, _portNum);
+                            _socket.setKeepAlive(true);
                         } catch (GeneralSecurityException gse) {
                             IOException ioe = new IOException("SSL Fail");
                             ioe.initCause(gse);
@@ -500,6 +501,7 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
                         }
                     } else {
                         _socket = new Socket(_hostname, _portNum);
+                        _socket.setKeepAlive(true);
                     }
                     // _socket.setSoTimeout(1000000); // Uhmmm we could really-really use a real timeout, and handle it.
                     OutputStream out = _socket.getOutputStream();

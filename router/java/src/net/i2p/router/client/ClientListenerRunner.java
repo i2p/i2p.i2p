@@ -93,6 +93,7 @@ class ClientListenerRunner implements Runnable {
                         if (validate(socket)) {
                             if (_log.shouldLog(Log.DEBUG))
                                 _log.debug("Connection received");
+                            socket.setKeepAlive(true);
                             runConnection(socket);
                         } else {
                             if (_log.shouldLog(Log.WARN))

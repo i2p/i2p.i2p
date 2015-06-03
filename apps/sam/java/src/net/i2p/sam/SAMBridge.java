@@ -19,9 +19,13 @@ import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 import net.i2p.I2PAppContext;
 import net.i2p.app.*;
@@ -30,6 +34,7 @@ import net.i2p.data.DataFormatException;
 import net.i2p.data.Destination;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
+import net.i2p.util.PortMapper;
 
 /**
  * SAM bridge implementation.
@@ -55,6 +60,7 @@ public class SAMBridge implements Runnable, ClientApp {
      * destination keys (Destination+PrivateKey+SigningPrivateKey)
      */
     private final Map<String,String> nameToPrivKeys;
+    private final Set<Handler> _handlers;
 
     private volatile boolean acceptConnections = true;
 
@@ -95,6 +101,7 @@ public class SAMBridge implements Runnable, ClientApp {
         _listenPort = options.port;
         persistFilename = options.keyFile;
         nameToPrivKeys = new HashMap<String,String>(8);
+        _handlers = new HashSet<Handler>(8);
         this.i2cpProps = options.opts;
         _state = INITIALIZED;
     }
@@ -124,6 +131,7 @@ public class SAMBridge implements Runnable, ClientApp {
         _listenPort = listenPort;
         persistFilename = persistFile;
         nameToPrivKeys = new HashMap<String,String>(8);
+        _handlers = new HashSet<Handler>(8);
         loadKeys();
         try {
             openSocket();
@@ -209,8 +217,9 @@ public class SAMBridge implements Runnable, ClientApp {
     }
     
     /**
-     * Load up the keys from the persistFilename
-     *
+     * Load up the keys from the persistFilename.
+     * TODO use DataHelper
+     * TODO store in config dir, not base dir
      */
     private void loadKeys() {
         synchronized (nameToPrivKeys) {
@@ -218,7 +227,7 @@ public class SAMBridge implements Runnable, ClientApp {
             BufferedReader br = null;
             try {
                 br = new BufferedReader(new InputStreamReader(
-                        new FileInputStream(persistFilename)));
+                        new FileInputStream(persistFilename), "UTF-8"));
                 String line = null;
                 while ( (line = br.readLine()) != null) {
                     int eq = line.indexOf('=');
@@ -226,6 +235,8 @@ public class SAMBridge implements Runnable, ClientApp {
                     String privKeys = line.substring(eq+1);
                     nameToPrivKeys.put(name, privKeys);
                 }
+                if (_log.shouldInfo())
+                    _log.info("Loaded " + nameToPrivKeys.size() + " private keys from " + persistFilename);
             } catch (FileNotFoundException fnfe) {
                 _log.warn("Key file does not exist at " + persistFilename);
             } catch (IOException ioe) {
@@ -237,8 +248,9 @@ public class SAMBridge implements Runnable, ClientApp {
     }
     
     /**
-     * Store the current keys to disk in the location specified on creation
-     *
+     * Store the current keys to disk in the location specified on creation.
+     * TODO use DataHelper
+     * TODO store in config dir, not base dir
      */
     private void storeKeys() {
         synchronized (nameToPrivKeys) {
@@ -248,11 +260,13 @@ public class SAMBridge implements Runnable, ClientApp {
                 for (Map.Entry<String, String> entry : nameToPrivKeys.entrySet()) {
                     String name = entry.getKey();
                     String privKeys = entry.getValue();
-                    out.write(name.getBytes());
+                    out.write(name.getBytes("UTF-8"));
                     out.write('=');
-                    out.write(privKeys.getBytes());
+                    out.write(privKeys.getBytes("UTF-8"));
                     out.write('\n');
                 }
+                if (_log.shouldInfo())
+                    _log.info("Saved " + nameToPrivKeys.size() + " private keys to " + persistFilename);
             } catch (IOException ioe) {
                 _log.error("Error writing out the SAM keys to " + persistFilename, ioe);
             } finally {
@@ -261,6 +275,51 @@ public class SAMBridge implements Runnable, ClientApp {
         }
     }
     
+    /**
+     * Handlers must call on startup
+     * @since 0.9.20
+     */
+    public void register(Handler handler) {
+        if (_log.shouldInfo())
+            _log.info("Register " + handler);
+        synchronized (_handlers) {
+            _handlers.add(handler);
+        }
+    }
+    
+    /**
+     * Handlers must call on stop
+     * @since 0.9.20
+     */
+    public void unregister(Handler handler) {
+        if (_log.shouldInfo())
+            _log.info("Unregister " + handler);
+        synchronized (_handlers) {
+            _handlers.remove(handler);
+        }
+    }
+
+    /**
+     * Stop all the handlers.
+     * @since 0.9.20
+     */
+    private void stopHandlers() {
+        List<Handler> handlers = null;
+        synchronized (_handlers) {
+            if (!_handlers.isEmpty()) {
+                handlers = new ArrayList<Handler>(_handlers);
+                _handlers.clear();
+            }
+        }
+        if (handlers != null) {
+            for (Handler handler : handlers) {
+                if (_log.shouldInfo())
+                    _log.info("Stopping " + handler);
+                handler.stopHandling();
+            }
+        }
+    }
+
     ////// begin ClientApp interface, use only if using correct construtor
 
     /**
@@ -270,6 +329,9 @@ public class SAMBridge implements Runnable, ClientApp {
         if (_state != INITIALIZED)
             return;
         changeState(STARTING);
+        synchronized (_handlers) {
+            _handlers.clear();
+        }
         loadKeys();
         try {
             openSocket();
@@ -285,7 +347,8 @@ public class SAMBridge implements Runnable, ClientApp {
     }
 
     /**
-     *  Does NOT stop existing sessions.
+     *  As of 0.9.20, stops running handlers and sessions.
+     *
      *  @since 0.9.6
      */
     public synchronized void shutdown(String[] args) {
@@ -293,11 +356,11 @@ public class SAMBridge implements Runnable, ClientApp {
             return;
         changeState(STOPPING);
         acceptConnections = false;
+        stopHandlers();
         if (_runner != null)
             _runner.interrupt();
         else
             changeState(STOPPED);
-        // TODO does not stop active connections / sessions
     }
 
     /**
@@ -375,7 +438,7 @@ public class SAMBridge implements Runnable, ClientApp {
      *  @since 0.9.6
      */
     private void startThread() {
-        I2PAppThread t = new I2PAppThread(this, "SAMListener");
+        I2PAppThread t = new I2PAppThread(this, "SAMListener " + _listenPort);
         if (Boolean.parseBoolean(System.getProperty("sam.shutdownOnOOM"))) {
             t.addOOMEventThreadListener(new I2PAppThread.OOMEventListener() {
                 public void outOfMemory(OutOfMemoryError err) {
@@ -487,6 +550,7 @@ public class SAMBridge implements Runnable, ClientApp {
         changeState(RUNNING);
         if (_mgr != null)
             _mgr.register(this);
+        I2PAppContext.getGlobalContext().portMapper().register(PortMapper.SVC_SAM, _listenPort);
         try {
             while (acceptConnections) {
                 SocketChannel s = serverSocket.accept();
@@ -495,18 +559,19 @@ public class SAMBridge implements Runnable, ClientApp {
                                + s.socket().getInetAddress().toString() + ":"
                                + s.socket().getPort());
 
-                class HelloHandler implements Runnable {
-                        private final SocketChannel s;
-                        private final SAMBridge parent;
+                class HelloHandler implements Runnable, Handler {
+                    private final SocketChannel s;
+                    private final SAMBridge parent;
 
-                	HelloHandler(SocketChannel s, SAMBridge parent) { 
+                    HelloHandler(SocketChannel s, SAMBridge parent) { 
                 		this.s = s ;
                 		this.parent = parent ;
-                	}
+                    }
 
-                	public void run() {
+                    public void run() {
+                        parent.register(this);
                         try {
-                            SAMHandler handler = SAMHandlerFactory.createSAMHandler(s, i2cpProps);
+                            SAMHandler handler = SAMHandlerFactory.createSAMHandler(s, i2cpProps, parent);
                             if (handler == null) {
                                 if (_log.shouldLog(Log.DEBUG))
                                     _log.debug("SAM handler has not been instantiated");
@@ -515,7 +580,6 @@ public class SAMBridge implements Runnable, ClientApp {
                                 } catch (IOException e) {}
                                 return;
                             }
-                            handler.setBridge(parent);
                             handler.startHandling();
                         } catch (SAMException e) {
                             if (_log.shouldLog(Log.ERROR))
@@ -526,11 +590,17 @@ public class SAMBridge implements Runnable, ClientApp {
                         } catch (Exception ee) {
                             try { s.close(); } catch (IOException ioe) {}
                             _log.log(Log.CRIT, "Unexpected error handling SAM connection", ee);
-                        }                		
-                	}
+                        } finally {
+                            parent.unregister(this);
+                        }
+                    }
+
+                    /** @since 0.9.20 */
+                    public void stopHandling() {
+                        try { s.close(); } catch (IOException ioe) {}
+                    }
                 }
-                // TODO: Handler threads are not saved or tracked and cannot be stopped
-                new I2PAppThread(new HelloHandler(s,this), "HelloHandler").start();
+                new I2PAppThread(new HelloHandler(s,this), "SAM HelloHandler").start();
             }
             changeState(STOPPING);
         } catch (Exception e) {
@@ -546,6 +616,8 @@ public class SAMBridge implements Runnable, ClientApp {
                 if (serverSocket != null)
                     serverSocket.close();
             } catch (IOException e) {}
+            I2PAppContext.getGlobalContext().portMapper().unregister(PortMapper.SVC_SAM);
+            stopHandlers();
             changeState(STOPPED);
         }
     }

@@ -212,6 +212,7 @@ class SAMUtils {
     }
 
     /* Dump a Properties object in an human-readable form */
+/****
     private static String dumpProperties(Properties props) {
         StringBuilder builder = new StringBuilder();
         String key, val;
@@ -231,6 +232,7 @@ class SAMUtils {
         
         return builder.toString();
     }
+****/
     
 /****
     public static void main(String args[]) {

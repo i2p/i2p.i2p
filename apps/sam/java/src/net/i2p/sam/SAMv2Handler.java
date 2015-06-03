@@ -34,9 +34,10 @@ class SAMv2Handler extends SAMv1Handler implements SAMRawReceiver, SAMDatagramRe
 		 * @param verMajor SAM major version to manage (should be 2)
 		 * @param verMinor SAM minor version to manage
 		 */
-		public SAMv2Handler ( SocketChannel s, int verMajor, int verMinor ) throws SAMException, IOException
+		public SAMv2Handler(SocketChannel s, int verMajor, int verMinor,
+		                     SAMBridge parent) throws SAMException, IOException
 		{
-			this ( s, verMajor, verMinor, new Properties() );
+			this(s, verMajor, verMinor, new Properties(), parent);
 		}
 
 		/**
@@ -50,9 +51,10 @@ class SAMv2Handler extends SAMv1Handler implements SAMRawReceiver, SAMDatagramRe
 		 * @param i2cpProps properties to configure the I2CP connection (host, port, etc)
 		 */
 
-		public SAMv2Handler ( SocketChannel s, int verMajor, int verMinor, Properties i2cpProps ) throws SAMException, IOException
+		public SAMv2Handler(SocketChannel s, int verMajor, int verMinor,
+		                    Properties i2cpProps, SAMBridge parent) throws SAMException, IOException
 		{
-			super ( s, verMajor, verMinor, i2cpProps );
+			super(s, verMajor, verMinor, i2cpProps, parent);
 		}
 		
 		@Override

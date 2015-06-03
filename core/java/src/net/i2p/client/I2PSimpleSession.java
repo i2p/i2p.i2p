@@ -89,6 +89,7 @@ class I2PSimpleSession extends I2PSessionImpl2 {
                     } else {
                         _socket = new Socket(_hostname, _portNum);
                     }
+                    _socket.setKeepAlive(true);
                     OutputStream out = _socket.getOutputStream();
                     out.write(I2PClient.PROTOCOL_BYTE);
                     out.flush();
