@@ -301,7 +301,6 @@ public class I2PSSLSocketFactory {
             // is not a viable option because the default HostnameVerifier expects to only be called
             // in the case that there is a mismatch (and therefore always returns false) while some
             // of the AsyncHttpClient providers (e.g. Netty, the default) call it on all connections.
-            // in the case that there is a mismatch (and therefore always returns false) while some
             // To make matters worse, the check is not trivial (consider SAN and wildcard matching)
             // and is implemented in sun.security.util.HostnameChecker (a Sun internal proprietary API).
             // This leaves the developer in the position of either depending on an internal API or
