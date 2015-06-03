@@ -1,3 +1,35 @@
+2015-06-03 zzz
+Prop from i2p.i2p.zzz.sam:
+ * I2CP: Set keepalive on sockets (ticket #1573)
+ * SAM:
+   - Close sockets and stop tunnels when router-side SAM stops (ticket #1572)
+   - Better checks for quoting status message strings (ticket #1488)
+   - Set encoding for sam.keys file
+   - Don't throw NPE on rare stream errors
+   - Comment out unused dumpProperties()
+   - Cleanups, log tweaks, thread name tweaks
+   - Set keepalive on sockets (ticket #1573)
+Prop from i2p.i2p.zzz.test2:
+ * Console:
+   -  Don't allow unbanning of all-zero hash
+   -  Nicer "move" icons on /configsidebar, add tooltips
+   -  Prevent bad line-wrap of very long menu items
+ * HTTP Client: Greatly simplify decompression by using InflaterOutputStream
+ * I2CP: Prevent sending messages before handshake with router is complete
+ * i2psnark:
+   - Add support for fast extensions (BEP 6)
+   - Don't say 'download finished' unless we downloaded something
+   - Don't lose sort param when hiding peers
+ * i2ptunnel: Strip top-level supercookies too
+ * LogWriter: Write dup message to wrapper log and crit buf also (ticket #1585)
+ * Reseed: Only log reseed network disconnected warning once
+ * Router: Add gzip and translate caches to clearCaches()
+ * Susidns, addressbook: Don't attempt to fetch subscriptions if
+   HTTP proxy is down (ticket #1530)
+ * SSU: More synchronization in PeerState
+ * Stats: Reduce number of rates in required stats to save memory
+ * UPnP: Only log network disconnected warning once
+
 * 2015-06-02 0.9.20 released
 
 2015-05-31 zzz
