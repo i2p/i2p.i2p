@@ -227,28 +227,19 @@ class ProfileOrganizerRenderer {
             else
                 buf.append("<td>&nbsp;</td>");
             buf.append("<td align=\"right\">").append(num(prof.getIntegrationValue())).append("</td>");
-            long time;
-            time = now - prof.getLastHeardAbout();
-            buf.append("<td align=\"right\">").append(DataHelper.formatDuration2(time)).append("</td>");
-            time = now - prof.getLastHeardFrom();
-            buf.append("<td align=\"right\">").append(DataHelper.formatDuration2(time)).append("</td>");
-            time = now - prof.getLastSendSuccessful();
-            buf.append("<td align=\"right\">").append(DataHelper.formatDuration2(time)).append("</td>");
-            time = now - prof.getLastSendFailed();
-            buf.append("<td align=\"right\">").append(DataHelper.formatDuration2(time)).append("</td>");
+            buf.append("<td align=\"right\">").append(formatInterval(now, prof.getLastHeardAbout())).append("</td>");
+            buf.append("<td align=\"right\">").append(formatInterval(now, prof.getLastHeardFrom())).append("</td>");
+            buf.append("<td align=\"right\">").append(formatInterval(now, prof.getLastSendSuccessful())).append("</td>");
+            buf.append("<td align=\"right\">").append(formatInterval(now, prof.getLastSendFailed())).append("</td>");
             buf.append("<td align=\"right\">").append(avg(prof, 10*60*1000l, ra)).append("</td>");
             buf.append("<td align=\"right\">").append(avg(prof, 60*60*1000l, ra)).append("</td>");
             buf.append("<td align=\"right\">").append(avg(prof, 24*60*60*1000l, ra)).append("</td>");
             DBHistory dbh = prof.getDBHistory();
             if (dbh != null) {
-                time = now - dbh.getLastLookupSuccessful();
-                buf.append("<td align=\"right\">").append(DataHelper.formatDuration2(time)).append("</td>");
-                time = now - dbh.getLastLookupFailed();
-                buf.append("<td align=\"right\">").append(DataHelper.formatDuration2(time)).append("</td>");
-                time = now - dbh.getLastStoreSuccessful();
-                buf.append("<td align=\"right\">").append(DataHelper.formatDuration2(time)).append("</td>");
-                time = now - dbh.getLastStoreFailed();
-                buf.append("<td align=\"right\">").append(DataHelper.formatDuration2(time)).append("</td>");
+                buf.append("<td align=\"right\">").append(formatInterval(now, dbh.getLastLookupSuccessful())).append("</td>");
+                buf.append("<td align=\"right\">").append(formatInterval(now, dbh.getLastLookupFailed())).append("</td>");
+                buf.append("<td align=\"right\">").append(formatInterval(now, dbh.getLastStoreSuccessful())).append("</td>");
+                buf.append("<td align=\"right\">").append(formatInterval(now, dbh.getLastStoreFailed())).append("</td>");
                 buf.append("<td align=\"right\">").append(davg(dbh, 60*60*1000l, ra)).append("</td>");
                 buf.append("<td align=\"right\">").append(davg(dbh, 24*60*60*1000l, ra)).append("</td>");
             } else {
@@ -367,6 +358,13 @@ class ProfileOrganizerRenderer {
                 return "0%";
             double avg = 0.5 + 100 * ra.getAverage();
             return ((int) avg) + "%";
+    }
+
+    /** @since 0.9.21 */
+    private String formatInterval(long now, long then) {
+        if (then <= 0)
+            return _(NA);
+        return DataHelper.formatDuration2(now - then);
     }
 
     /** translate a string */
