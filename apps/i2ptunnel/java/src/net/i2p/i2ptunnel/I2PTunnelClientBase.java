@@ -119,9 +119,13 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
 
     /**
      * The main constructor.
-     *
-     * As of 0.9.20 this is fast, and does NOT connect the manager to the router,
+     * <p/>
+     * As of 0.9.21 this is fast, and does NOT connect the manager to the router,
      * or open the local socket. You MUST call startRunning() for that.
+     * <p/>
+     * (0.9.20 claimed to be fast, but due to a bug it DID connect the manager
+     * to the router. It did NOT open the local socket however, so it was still
+     * necessary to call startRunning() for that.)
      *
      * @param localPort if 0, use any port, get actual port selected with getLocalPort()
      * @throws IllegalArgumentException if the I2CP configuration is b0rked so
@@ -135,9 +139,13 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
 
     /**
      * Use this to build a client with a persistent private key.
-     *
-     * As of 0.9.20 this is fast, and does NOT connect the manager to the router,
+     * <p/>
+     * As of 0.9.21 this is fast, and does NOT connect the manager to the router,
      * or open the local socket. You MUST call startRunning() for that.
+     * <p/>
+     * (0.9.20 claimed to be fast, but due to a bug it DID connect the manager
+     * to the router. It did NOT open the local socket however, so it was still
+     * necessary to call startRunning() for that.)
      *
      * @param localPort if 0, use any port, get actual port selected with getLocalPort()
      * @param pkf Path to the private key file, or null to generate a transient key
@@ -178,27 +186,6 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
             tunnel.getClientOptions().setProperty("i2cp.dontPublishLeaseSet", "true");
         if (tunnel.getClientOptions().getProperty("i2p.streaming.answerPings") == null)
             tunnel.getClientOptions().setProperty("i2p.streaming.answerPings", "false");
-        
-        boolean openNow = !Boolean.parseBoolean(tunnel.getClientOptions().getProperty("i2cp.delayOpen"));
-        if (openNow) {
-            while (sockMgr == null) {
-                verifySocketManager();
-                if (sockMgr == null) {
-                    _log.error("Unable to connect to router and build tunnels for " + handlerName);
-                    // FIXME there is a loop in buildSocketManager(), do we really need another one here?
-                    // no matter, buildSocketManager() now throws an IllegalArgumentException
-                    try { Thread.sleep(10*1000); } catch (InterruptedException ie) {}
-                }
-            }
-            // can't be null unless we limit the loop above
-            //if (sockMgr == null) {
-            //    l.log("Invalid I2CP configuration");
-            //    throw new IllegalArgumentException("Socket manager could not be created");
-            //}
-            l.log("Tunnels ready for client: " + handlerName);
-
-        } // else delay creating session until createI2PSocket() is called
-        
     }
     
     /**

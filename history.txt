@@ -1,3 +1,7 @@
+2015-06-04 str4d
+ * i2ptunnel:
+   - Don't connect manager to router in constructor (ticket #815)
+
 2015-06-03 zzz
 Prop from i2p.i2p.zzz.sam:
  * I2CP: Set keepalive on sockets (ticket #1573)
