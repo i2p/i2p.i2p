@@ -90,8 +90,11 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
     public static final String PROP_USE_SSL = I2PTunnelServer.PROP_USE_SSL;
 
     /**
-     *  This constructor always starts the tunnel (ignoring the i2cp.delayOpen option).
-     *  It is used to add a client to an existing socket manager.
+     * This constructor is used to add a client to an existing socket manager.
+     * <p/>
+     * As of 0.9.21 this does NOT open the local socket. You MUST call
+     * {@link #startRunning()} for that. The local socket will be opened
+     * immediately (ignoring the <code>i2cp.delayOpen</code> option).
      *
      *  @param localPort if 0, use any port, get actual port selected with getLocalPort()
      *  @param sktMgr the existing socket manager
@@ -113,8 +116,6 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
         _context.statManager().createRateStat("i2ptunnel.client.manageTime", "How long it takes to accept a socket and fire it into an i2ptunnel runner (or queue it for the pool)?", "I2PTunnel", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("i2ptunnel.client.buildRunTime", "How long it takes to run a queued socket into an i2ptunnel runner?", "I2PTunnel", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
         _log = _context.logManager().getLog(getClass());
-
-        startup();
     }
 
     /**
@@ -523,7 +524,7 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
 
         if (open && listenerReady) {
             boolean openNow = !Boolean.parseBoolean(getTunnel().getClientOptions().getProperty("i2cp.delayOpen"));
-            if (openNow)
+            if (openNow || chained)
                 l.log("Client ready, listening on " + getTunnel().listenHost + ':' + localPort);
             else
                 l.log("Client ready, listening on " + getTunnel().listenHost + ':' + localPort + ", delaying tunnel open until required");

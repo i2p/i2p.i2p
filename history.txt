@@ -1,6 +1,7 @@
 2015-06-04 str4d
  * i2ptunnel:
    - Don't connect manager to router in constructor (ticket #815)
+   - Don't call startup() in chained constructor (ticket #1593)
 
 2015-06-03 zzz
 Prop from i2p.i2p.zzz.sam:
