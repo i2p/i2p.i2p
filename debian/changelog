@@ -1,3 +1,54 @@
+i2p (0.9.20-1) unstable; urgency=medium
+
+  * New Upstream Version
+   - Add support for address book export
+   - Add support for SSL in HTTP server tunnel
+   - Allow class 'M' (64-128 KBps share bandwidth) to become floodfill
+   - Raise connection limits for new classes 'P' (512-2000 KBps share
+     bandwidth) and 'X' (over 2000 KBps)
+   - Add support for signed development builds
+   - Clock skew fixes
+   - Fixes and configuration for when IPv4 is firewalled but IPv6 still works
+   - Locking fixes for i2ptunnel clients to prevent hangs at startup
+   - Verify hostnames when reseeding
+   - Fix deletion of config files for deleted torrents in i2psnark
+   - Fix hangs fetching proxy.i2p local resources via Privoxy
+   - Fixes for duplicate shared clients
+   - Fix for occasional page truncation in HTTP client
+   - Fixes for handling corrupted SSU packets
+   - Fix closing of SAM sessions when I2P session closes
+   - Reduce NTCP threads
+   - Eliminate SimpleScheduler threads
+   - Add continent-based NTP servers as fallbacks for country-based ones
+   - Remove all default non-SSL reseed hosts
+   - Disable fallback to non-su3 reseeding
+   - Several fixes in streaming for better "loopback" performance,
+     may or may not help in real world
+   - Reduce latency in i2ptunnel
+   - Add a larger Bloom filter for very high bandwidth and memory
+   - Add Bloom filter warning when configured for high bandwidth but not
+     enough memory
+   - Reduce max netdb search depth to reduce floodfill load
+   - Improved header processing and error handling in i2ptunnel HTTP server
+   - Better error handling and user feedback when HTTP client tunnel is
+     disabled
+   - More changes to improve floodfill capacity
+   - New configuration for forcing IPv4 (only) to firewalled on /confignet
+   - New configuration for floodfill on /configadvanced
+   - Show separate IPv4 and IPv6 status in summary bar when appropriate
+   - Better handling of corrupt SSU packets
+   - Jetty 8.1.17.v20150415
+   - Translation updates
+   - Update GeoIP data (new installs and PPA only)
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Tue, 02 Jun 2015 18:36:42 +0000
+
+i2p (0.9.19-4) unstable; urgency=medium
+
+  * Re-enable systemd unit file
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Thu, 30 Apr 2015 22:54:56 +0000
+
 i2p (0.9.19-3) unstable; urgency=medium
 
   * A couple more apparmor profile tweaks
