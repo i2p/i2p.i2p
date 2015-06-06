@@ -5,7 +5,6 @@
   #include <abstractions/fonts>
   #include <abstractions/nameservice>
   #include <abstractions/ssl_certs>
-  #include <abstractions/user-tmp>
 
   network inet stream,
   network inet6 stream,
@@ -51,8 +50,9 @@
   /usr/share/java/wrapper*.jar                            r,
 
   # 'm' is needed by the I2P-Bote plugin
-  /{,var/}tmp/                                            rwm,
-  owner /{,var/}tmp/**                                    rwklm,
+  /{,lib/live/mount/overlay/}tmp/                         rwm,
+  owner /{,lib/live/mount/overlay/}tmp/i2p-daemon/        rwm,
+  owner /{,lib/live/mount/overlay/}tmp/i2p-daemon/**      rwklm,
 
   # Prevent spamming the logs
   deny /dev/tty                                           rw,
