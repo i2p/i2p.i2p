@@ -1,3 +1,6 @@
+2015-06-06 str4d
+ * newsxml: Don't use XXX for parsing dates on Android
+
 2015-06-04 str4d
  * i2ptunnel:
    - Don't connect manager to router in constructor (ticket #815)
