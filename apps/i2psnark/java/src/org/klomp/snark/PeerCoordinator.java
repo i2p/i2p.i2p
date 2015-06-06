@@ -322,16 +322,22 @@ class PeerCoordinator implements PeerListener
    */
   public long getDownloadRate()
   {
+    if (halted)
+        return 0;
     return getRate(downloaded_old);
   }
 
   public long getUploadRate()
   {
+    if (halted)
+        return 0;
     return getRate(uploaded_old);
   }
 
   public long getCurrentUploadRate()
   {
+    if (halted)
+        return 0;
     // no need to synchronize, only one value
     long r = uploaded_old[0];
     if (r <= 0)
