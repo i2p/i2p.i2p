@@ -25,7 +25,16 @@
  <div class="configure">
  <div class="wideload">
 <h3><%=intl._("Floodfill Configuration")%></h3>
-<p><%=intl._("Floodill participation helps the network, but may use more of your computer's resources.")%></p>
+<p><%=intl._("Floodill participation helps the network, but may use more of your computer's resources.")%>
+</p><p>
+<%
+    if (advancedhelper.isFloodfill()) {
+%><%=intl._("This router is currently a floodfill participant.")%><%
+    } else {
+%><%=intl._("This router is not currently a floodfill participant.")%><%
+    }
+%>
+</p>
 <form action="" method="POST">
 <input type="hidden" name="nonce" value="<%=pageNonce%>" >
 <input type="hidden" name="action" value="ff" >

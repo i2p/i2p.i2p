@@ -7,6 +7,7 @@ import java.util.Properties;
 import java.util.Set;
 
 import net.i2p.data.DataHelper;
+import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 
 /**
  * Handler to deal with form submissions from the advanced config form and act
@@ -83,6 +84,14 @@ public class ConfigAdvancedHandler extends FormHandler {
     /** @since 0.9.20 */
     private void saveFF() {
         boolean saved = _context.router().saveConfig(ConfigAdvancedHelper.PROP_FLOODFILL_PARTICIPANT, _ff);
+        if (_ff.equals("false") || _ff.equals("true")) {
+            FloodfillNetworkDatabaseFacade fndf = (FloodfillNetworkDatabaseFacade) _context.netDb();
+            boolean wasFF = fndf.floodfillEnabled();
+            boolean isFF = _ff.equals("true");
+            fndf.setFloodfillEnabled(isFF);
+            if (wasFF != isFF)
+                _context.router().rebuildRouterInfo();
+        }
         if (saved) 
             addFormNotice(_("Configuration saved successfully"));
         else

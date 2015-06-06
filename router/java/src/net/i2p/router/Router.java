@@ -72,6 +72,7 @@ public class Router implements RouterClock.ClockShiftListener {
     /** full path */
     private String _configFilename;
     private RouterInfo _routerInfo;
+    private final Object _routerInfoLock = new Object();
     /** not for external use */
     public final Object routerInfoFileLock = new Object();
     private final Object _configFileLock = new Object();
@@ -489,14 +490,20 @@ public class Router implements RouterClock.ClockShiftListener {
      *  Our current router info.
      *  Warning, may be null if called very early.
      */
-    public RouterInfo getRouterInfo() { return _routerInfo; }
+    public RouterInfo getRouterInfo() {
+        synchronized (_routerInfoLock) {
+            return _routerInfo;
+        }
+    }
 
     /**
      *  Caller must ensure info is valid - no validation done here.
      *  Not for external use.
      */
     public void setRouterInfo(RouterInfo info) { 
-        _routerInfo = info; 
+        synchronized (_routerInfoLock) {
+            _routerInfo = info; 
+        }
         if (_log.shouldLog(Log.INFO))
             _log.info("setRouterInfo() : " + info, new Exception("I did it"));
         if (info != null)
@@ -817,7 +824,17 @@ public class Router implements RouterClock.ClockShiftListener {
     public void rebuildRouterInfo(boolean blockingRebuild) {
         if (_log.shouldLog(Log.INFO))
             _log.info("Rebuilding new routerInfo");
+        synchronized (_routerInfoLock) {
+            locked_rebuildRouterInfo(blockingRebuild);
+        }
+    }
         
+
+    /**
+     * Rebuild and republish our routerInfo since something significant 
+     * has changed.
+     */
+    private void locked_rebuildRouterInfo(boolean blockingRebuild) {
         RouterInfo ri = null;
         if (_routerInfo != null)
             ri = new RouterInfo(_routerInfo);
@@ -957,7 +974,10 @@ public class Router implements RouterClock.ClockShiftListener {
     }
     
     public boolean isHidden() {
-        RouterInfo ri = _routerInfo;
+        RouterInfo ri;
+        synchronized (_routerInfoLock) {
+            ri = _routerInfo;
+        }
         if ( (ri != null) && (ri.isHidden()) )
             return true;
         String h = _context.getProperty(PROP_HIDDEN_HIDDEN);

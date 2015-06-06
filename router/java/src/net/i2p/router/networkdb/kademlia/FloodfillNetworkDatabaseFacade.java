@@ -277,7 +277,7 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
     @Override
     protected PeerSelector createPeerSelector() { return new FloodfillPeerSelector(_context); }
     
-    synchronized void setFloodfillEnabled(boolean yes) {
+    public synchronized void setFloodfillEnabled(boolean yes) {
         _floodfillEnabled = yes;
         if (yes && _floodThrottler == null) {
             _floodThrottler = new FloodThrottler();
