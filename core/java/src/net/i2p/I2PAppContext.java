@@ -23,7 +23,6 @@ import net.i2p.data.Base64;
 import net.i2p.data.RoutingKeyGenerator;
 import net.i2p.internal.InternalClientManager;
 import net.i2p.stat.StatManager;
-import net.i2p.update.UpdateManager;
 import net.i2p.util.Clock;
 import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.FileUtil;
