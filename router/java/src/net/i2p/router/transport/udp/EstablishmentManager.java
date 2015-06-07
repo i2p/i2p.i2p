@@ -850,11 +850,20 @@ class EstablishmentManager {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Peer " + state + " sent us an invalid DH parameter", ippe);
             _inboundStates.remove(state.getRemoteHostId());
+            state.fail();
             return;
         }
-        _transport.send(_builder.buildSessionCreatedPacket(state,
+        UDPPacket pkt = _builder.buildSessionCreatedPacket(state,
                                                            _transport.getExternalPort(state.getSentIP().length == 16),
-                                                           _transport.getIntroKey()));
+                                                           _transport.getIntroKey());
+        if (pkt == null) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Peer " + state + " sent us an invalid IP?");
+            _inboundStates.remove(state.getRemoteHostId());
+            state.fail();
+            return;
+        }
+        _transport.send(pkt);
         state.createdPacketSent();
     }
 
