@@ -8,6 +8,7 @@ import net.i2p.router.RouterContext;
 import net.i2p.router.util.EventLog;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
+import net.i2p.util.SystemVersion;
 
 /**
  *  Kaboom
@@ -48,9 +49,19 @@ public class OOMListener implements I2PThread.OOMEventListener {
             log.log(Log.CRIT, "Thread ran out of memory, shutting down I2P", oom);
             log.log(Log.CRIT, "free mem: " + Runtime.getRuntime().freeMemory() + 
                               " total mem: " + Runtime.getRuntime().totalMemory());
-            if (_context.hasWrapper())
+            if (_context.hasWrapper()) {
+                // Can't find any System property or wrapper property that gives
+                // you the actual config file path, have to guess
+                String path;
+                if (!SystemVersion.isWindows() && !SystemVersion.isMac() &&
+                    "i2psvc".equals(System.getProperty("user.name"))) {
+                    path = "/etc/i2p";
+                } else {
+                    path = _context.getBaseDir().toString();
+                }
                 log.log(Log.CRIT, "To prevent future shutdowns, increase wrapper.java.maxmemory in " +
-                                  _context.getBaseDir() + File.separatorChar + "wrapper.config");
+                                  path + File.separatorChar + "wrapper.config");
+            }
         } catch (OutOfMemoryError oome) {}
         try { 
             ThreadDump.dump(_context, 1);

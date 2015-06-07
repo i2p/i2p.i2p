@@ -96,12 +96,22 @@ class BloomFilterIVValidator implements IVValidator {
     private void warn(long maxMemory, int KBps, long recMaxMem, int threshKBps) {
         if (SystemVersion.isAndroid())
             return;
+        // Can't find any System property or wrapper property that gives
+        // you the actual config file path, have to guess
+        // TODO if !SystemVersion.hasWrapper ...
+        String path;
+        if (!SystemVersion.isWindows() && !SystemVersion.isMac() &&
+            "i2psvc".equals(System.getProperty("user.name"))) {
+            path = "/etc/i2p";
+        } else {
+            path = _context.getBaseDir().toString();
+        }
         String msg =
             "Configured for " + DataHelper.formatSize(KBps *1024) +
             "Bps share bandwidth but only " +
             DataHelper.formatSize(maxMemory) + "B available memory." +
             " Recommend increasing wrapper.java.maxmemory in " +
-            _context.getBaseDir() + File.separatorChar + "wrapper.config" +
+            path + File.separatorChar + "wrapper.config" +
             // getMaxMemory() returns significantly lower than wrapper config, so add 10%
             " to at least " + (recMaxMem * 11 / 10 / (1024*1024)) + " (MB)" +
             " if the actual share bandwidth exceeds " +
