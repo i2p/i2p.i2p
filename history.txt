@@ -1,6 +1,8 @@
 2015-06-08 dg
  * Language fixes
  * Make netDb.storeFloodNew graphable for testing (#1195)
+ * Directly connect to nearby floodfills to share our RI
+   to speed up integration of new floodfills (#1195)
 
 2015-06-06 str4d
  * newsxml: Don't use XXX for parsing dates on Android
