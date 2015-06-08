@@ -679,9 +679,10 @@ class ClientManager {
                     continue;
                 if (runner.isDead())
                     continue;
-                if (runner.getConfig() == null)
+                SessionConfig cfg = runner.getPrimaryConfig();
+                if (cfg == null)
                     continue;  // simple session or no session yet
-                if (runner.getLeaseSet() == null)
+                if (runner.getLeaseSet(cfg.getDestination().calculateHash()) == null)
                     continue;  // don't confuse client while waiting for CreateLeaseSet msg
                 try {
                     // only send version if the client can handle it (0.8.7 or greater)
