@@ -25,12 +25,14 @@ import javax.net.ssl.SSLServerSocketFactory;
 
 import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
+import net.i2p.client.I2PClient;
 import net.i2p.client.I2PSession;
 import net.i2p.client.I2PSessionException;
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.client.streaming.I2PSocketManager;
 import net.i2p.client.streaming.I2PSocketManagerFactory;
 import net.i2p.client.streaming.I2PSocketOptions;
+import net.i2p.crypto.SigType;
 import net.i2p.data.Destination;
 import net.i2p.util.EventDispatcher;
 import net.i2p.util.I2PAppThread;
@@ -287,6 +289,10 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
                 _socketManagerState = SocketManagerState.INIT;
                 // We could be here a LONG time, holding the lock
                 socketManager = buildSocketManager(tunnel, pkf);
+                // FIXME may not be the right place for this
+                I2PSession sub = addSubsession(tunnel);
+                if (sub != null && _log.shouldLog(Log.WARN))
+                    _log.warn("Added subsession " + sub);
             } else {
                 if (_log.shouldLog(Log.INFO))
                     _log.info(tunnel.getClientOptions().getProperty("inbound.nickname") + ": Not building a new socket manager since the old one is open [s=" + s + "]");
@@ -299,8 +305,39 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
             if (_log.shouldLog(Log.INFO))
                 _log.info(tunnel.getClientOptions().getProperty("inbound.nickname") + ": Building a new socket manager since there is no other one");
             socketManager = buildSocketManager(tunnel, pkf);
+            I2PSession sub = addSubsession(tunnel);
+            if (sub != null && _log.shouldLog(Log.WARN))
+                _log.warn("Added subsession " + sub);
         }
         return socketManager;
+    }
+
+    /**
+     *  Add a subsession to a shared client if necessary.
+     *
+     *  @since 0.9.20
+     */
+    protected static synchronized I2PSession addSubsession(I2PTunnel tunnel) {
+        I2PSession sess = socketManager.getSession();
+        if (sess.getMyDestination().getSigType() == SigType.DSA_SHA1)
+            return null;
+        Properties props = new Properties();
+        props.putAll(tunnel.getClientOptions());
+        String name = props.getProperty("inbound.nickname");
+        if (name != null)
+            props.setProperty("inbound.nickname", name + " (DSA)");
+        name = props.getProperty("outbound.nickname");
+        if (name != null)
+            props.setProperty("outbound.nickname", name + " (DSA)");
+        props.setProperty(I2PClient.PROP_SIGTYPE, "DSA_SHA1");
+        try {
+            return socketManager.addSubsession(null, props);
+        } catch (I2PSessionException ise) {
+            Log log = tunnel.getContext().logManager().getLog(I2PTunnelClientBase.class);
+            if (log.shouldLog(Log.WARN))
+                log.warn("Failed to add subssession", ise);
+            return null;
+        }
     }
 
     /**

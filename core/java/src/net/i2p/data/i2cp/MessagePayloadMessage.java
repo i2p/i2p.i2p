@@ -37,6 +37,16 @@ public class MessagePayloadMessage extends I2CPMessageImpl {
         return _sessionId;
     }
 
+    /**
+     * Return the SessionId for this message.
+     *
+     * @since 0.9.19
+     */
+    @Override
+    public SessionId sessionId() {
+        return _sessionId >= 0 ? new SessionId(_sessionId) : null;
+    }
+
     /** @param id 0-65535 */
     public void setSessionId(long id) {
         _sessionId = (int) id;

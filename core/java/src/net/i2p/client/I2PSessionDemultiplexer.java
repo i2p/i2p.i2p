@@ -74,7 +74,9 @@ public class I2PSessionDemultiplexer implements I2PSessionMuxedListener {
      *  (Streaming lib)
      */
     public void addListener(I2PSessionListener l, int proto, int port) {
-        _listeners.put(key(proto, port), new NoPortsListener(l));
+        I2PSessionListener old = _listeners.put(key(proto, port), new NoPortsListener(l));
+        if (old != null && _log.shouldLog(Log.WARN))
+            _log.warn("Listener " + l + " replaces " + old + " for proto: " + proto + " port: " + port);
     }
 
     /**
@@ -82,7 +84,9 @@ public class I2PSessionDemultiplexer implements I2PSessionMuxedListener {
      *  UDP perhaps
      */
     public void addMuxedListener(I2PSessionMuxedListener l, int proto, int port) {
-        _listeners.put(key(proto, port), l);
+        I2PSessionListener old = _listeners.put(key(proto, port), l);
+        if (old != null && _log.shouldLog(Log.WARN))
+            _log.warn("Listener " + l + " replaces " + old + " for proto: " + proto + " port: " + port);
     }
 
     public void removeListener(int proto, int port) {

@@ -82,6 +82,24 @@ class I2PSessionMuxedImpl extends I2PSessionImpl2 {
         // discards the one in super(), sorry about that... (no it wasn't started yet)
         _availabilityNotifier = new MuxedAvailabilityNotifier();
     }
+
+    /*
+     * For extension by SubSession
+     *
+     * @param destKeyStream stream containing the private key data,
+     *                             format is specified in {@link net.i2p.data.PrivateKeyFile PrivateKeyFile}
+     * @param options set of options to configure the router with, if null will use System properties
+     * @since 0.9.19
+     */
+    protected I2PSessionMuxedImpl(I2PSessionImpl primary, InputStream destKeyStream, Properties options) throws I2PSessionException {
+        super(primary, destKeyStream, options);
+        // also stored in _sessionListener but we keep it in _demultipexer
+        // as well so we don't have to keep casting
+        _demultiplexer =  new I2PSessionDemultiplexer(primary.getContext());
+        super.setSessionListener(_demultiplexer);
+        // discards the one in super(), sorry about that... (no it wasn't started yet)
+        _availabilityNotifier = new MuxedAvailabilityNotifier();
+    }
     
     /** listen on all protocols and ports */
     @Override
@@ -315,9 +333,9 @@ class I2PSessionMuxedImpl extends I2PSessionImpl2 {
 
     protected class MuxedAvailabilityNotifier extends AvailabilityNotifier {
         private final LinkedBlockingQueue<MsgData> _msgs;
-        private volatile boolean _alive = false;
+        private volatile boolean _alive;
         private static final int POISON_SIZE = -99999;
-        private final AtomicBoolean stopping = new AtomicBoolean(false);
+        private final AtomicBoolean stopping = new AtomicBoolean();
 
         public MuxedAvailabilityNotifier() {
             _msgs = new LinkedBlockingQueue<MsgData>();
@@ -325,12 +343,12 @@ class I2PSessionMuxedImpl extends I2PSessionImpl2 {
 
         @Override
         public void stopNotifying() {
-            boolean again = true;
             synchronized (stopping) {
                 if( !stopping.getAndSet(true)) {
-                    if (_alive == true) {
+                    _msgs.clear();
+                    if (_alive) {
                         // System.out.println("I2PSessionMuxedImpl.stopNotifying()");
-                        _msgs.clear();
+                        boolean again = true;
                         while(again) {
                             try {
                                 _msgs.put(new MsgData(0, POISON_SIZE, 0, 0, 0));
@@ -340,8 +358,8 @@ class I2PSessionMuxedImpl extends I2PSessionImpl2 {
                                 continue;
                             }
                         }
+                        _alive = false;
                     }
-                    _alive = false;
                     stopping.set(false);
                 }
                 // stopping.notifyAll();
@@ -355,17 +373,24 @@ class I2PSessionMuxedImpl extends I2PSessionImpl2 {
             try {
                 _msgs.put(new MsgData((int)(msgId & 0xffffffff), size, proto, fromPort, toPort));
             } catch (InterruptedException ie) {}
+            if (!_alive && _log.shouldLog(Log.WARN))
+                _log.warn(getPrefix() + "message available but notifier not running");
         }
 
         @Override
         public void run() {
-            MsgData msg;
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug(getPrefix() + "starting muxed availability notifier");
+            _msgs.clear();
             _alive=true;
             while (_alive) {
+                MsgData msg;
                 try {
                     msg = _msgs.take();
                 } catch (InterruptedException ie) {
-                    _log.debug("I2PSessionMuxedImpl.run() InterruptedException " + String.valueOf(_msgs.size()) + " Messages, Alive " + _alive);
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("I2PSessionMuxedImpl.run() InterruptedException " +
+                                    String.valueOf(_msgs.size()) + " Messages, Alive " + _alive);
                     continue;
                 }
                 if (msg.size == POISON_SIZE) {

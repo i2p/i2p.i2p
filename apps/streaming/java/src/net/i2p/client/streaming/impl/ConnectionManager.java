@@ -88,7 +88,7 @@ class ConnectionManager {
         // As of 0.9.1, listen on configured port (default 0 = all)
         int protocol = defaultOptions.getEnforceProtocol() ? I2PSession.PROTO_STREAMING : I2PSession.PROTO_ANY;
         _session.addMuxedSessionListener(_messageHandler, protocol, defaultOptions.getLocalPort());
-        _outboundQueue = new PacketQueue(_context, _session, this);
+        _outboundQueue = new PacketQueue(_context, _session);
         _recentlyClosed = new LHMCache<Long, Object>(32);
         /** Socket timeout for accept() */
         _soTimeout = -1;
@@ -429,7 +429,8 @@ class ConnectionManager {
                     // try { _connectionLock.wait(remaining); } catch (InterruptedException ie) {}
                     try { Thread.sleep(remaining/4); } catch (InterruptedException ie) {}
                 } else { 
-                    con = new Connection(_context, this, _schedulerChooser, _timer, _outboundQueue, _conPacketHandler, opts, false);
+                    con = new Connection(_context, this, _schedulerChooser, _timer,
+                                         _outboundQueue, _conPacketHandler, opts, false);
                     con.setRemotePeer(peer);
                     assignReceiveStreamId(con);
                     break; // stop looping as a psuedo-wait
@@ -889,5 +890,13 @@ class ConnectionManager {
         PingRequest req = _pendingPings.remove(Long.valueOf(pingId));
         if (req != null) 
             req.pong(payload);
+    }
+
+    /**
+     *  @since 0.9.20
+     */
+    @Override
+    public String toString() {
+        return "ConnectionManager for " + _session;
     }
 }

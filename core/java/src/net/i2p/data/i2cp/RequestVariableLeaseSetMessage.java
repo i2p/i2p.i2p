@@ -55,6 +55,16 @@ public class RequestVariableLeaseSetMessage extends I2CPMessageImpl {
         return _sessionId;
     }
 
+    /**
+     * Return the SessionId for this message.
+     *
+     * @since 0.9.19
+     */
+    @Override
+    public SessionId sessionId() {
+        return _sessionId;
+    }
+
     public void setSessionId(SessionId id) {
         _sessionId = id;
     }

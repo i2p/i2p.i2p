@@ -1,26 +1,40 @@
 package net.i2p.client.streaming.impl;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.ConnectException;
 import java.net.NoRouteToHostException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
+import net.i2p.client.I2PClient;
 import net.i2p.client.I2PSession;
 import net.i2p.client.I2PSessionException;
 import net.i2p.client.streaming.I2PServerSocket;
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.client.streaming.I2PSocketManager;
 import net.i2p.client.streaming.I2PSocketOptions;
+import net.i2p.crypto.SigType;
+import net.i2p.data.Certificate;
 import net.i2p.data.Destination;
+import net.i2p.data.Hash;
+import net.i2p.data.PrivateKey;
+import net.i2p.data.PublicKey;
+import net.i2p.data.SimpleDataStructure;
+import net.i2p.util.ConvertToHash;
 import net.i2p.util.Log;
 
 /**
@@ -37,6 +51,7 @@ public class I2PSocketManagerFull implements I2PSocketManager {
     private final I2PAppContext _context;
     private final Log _log;
     private final I2PSession _session;
+    private final ConcurrentHashMap<I2PSession, ConnectionManager> _subsessions;
     private final I2PServerSocketFull _serverSocket;
     private StandardServerSocket _realServerSocket;
     private final ConnectionOptions _defaultOptions;
@@ -45,7 +60,52 @@ public class I2PSocketManagerFull implements I2PSocketManager {
     private static final AtomicInteger __managerId = new AtomicInteger();
     private final ConnectionManager _connectionManager;
     private final AtomicBoolean _isDestroyed = new AtomicBoolean();
+
+    /** @since 0.9.20 */
+    private static final Set<Hash> _dsaOnly = new HashSet<Hash>(16);
+    private static final String[] DSA_ONLY_HASHES = {
+        // list from http://zzz.i2p/topics/1682?page=1#p8414
+        // bzr.welterde.i2p
+        "Cvs1gCZTTkgD2Z2byh2J9atPmh5~I8~L7BNQnQl0hUE=",
+        // docs.i2p2.i2p
+        "WCXV87RdrF6j-mnn6qt7kVSBifHTlPL0PmVMFWwaolo=",
+        // flibusta.i2p
+        "yy2hYtqqfl84N9skwdRkeM7baFMXHKyDWU3XRShlEo8=",
+        // forum.i2p
+        "3t5Ar2NCTIOId70uzX2bZyJljR0aBogxMEzNyHirB7A=",
+        // i2jump.i2p
+        "9vaoGZbOaeqdRK2qEunlwRM9mUSW-I9R4OON35TDKK4=",
+        // irc.welterde.i2p
+        "5rjezx4McFk3bNhoJV-NTLlQW1AR~jiUcN6DOWMCCVc=",
+        // lists.i2p2.i2p
+        "qwtgoFoMSK0TOtbT4ovBX1jHUzCoZCPzrJVxjKD7RCg=",
+        // mtn.i2p2.i2p
+        "X5VDzYaoX9-P6bAWnrVSR5seGLkOeORP2l3Mh4drXPo=",
+        // nntp.welterde.i2p
+        "VXwmNIwMy1BcUVmut0oZ72jbWoqFzvxJukmS-G8kAAE=",
+        // paste.i2p2.i2p
+        "DoyMyUUgOSTddvRpqYfKHFPPjkkX~iQmResyfjjBYWs=",
+        // syndie.wetlerde.i2p
+        "xMxC54BFgyp-~zzrQI3F8m2CK--9XMcNmSAep6RH4Kk=",
+        // ugha.i2p
+        "zsu3WF~QLBxZXH-gHq9MuZE6y8ROZmMF7dA2MbMMKkY=",
+        // tracker.welterde.i2p
+        "EVkFgKkrDKyGfI7TIuDmlHoAmvHC~FbnY946DfujR0A=",
+        // www.i2p2.i2p
+        "im9gytzKT15mT1sB5LC9bHXCcwytQ4EPcrGQhoam-4w="
+    };
     
+    static {
+        for (int i = 0; i < DSA_ONLY_HASHES.length; i++) {
+            String s = DSA_ONLY_HASHES[i];
+            Hash h = ConvertToHash.getHash(s);
+            if (h != null)
+                _dsaOnly.add(h);
+            else
+                System.out.println("Bad hash " + s);
+        }
+    }
+
     /**
      * How long to wait for the client app to accept() before sending back CLOSE?
      * This includes the time waiting in the queue.  Currently set to 5 seconds.
@@ -80,6 +140,7 @@ public class I2PSocketManagerFull implements I2PSocketManager {
     public I2PSocketManagerFull(I2PAppContext context, I2PSession session, Properties opts, String name) {
         _context = context;
         _session = session;
+        _subsessions = new ConcurrentHashMap<I2PSession, ConnectionManager>(4);
         _log = _context.logManager().getLog(I2PSocketManagerFull.class);
         
         _name = name + " " + (__managerId.incrementAndGet());
@@ -118,6 +179,100 @@ public class I2PSocketManagerFull implements I2PSocketManager {
      */
     public I2PSession getSession() {
         return _session;
+    }
+    
+    /**
+     *  @return a new subsession, non-null
+     *  @param privateKeyStream null for transient, if non-null must have same encryption keys as primary session
+     *                          and different signing keys
+     *  @param opts subsession options if any, may be null
+     *  @since 0.9.19
+     */
+    public I2PSession addSubsession(InputStream privateKeyStream, Properties opts) throws I2PSessionException {
+        if (privateKeyStream == null) {
+            // We don't actually need the same pubkey in the dest, just in the LS.
+            // The dest one is unused. But this is how we find the LS keys
+            // to reuse in RequestLeaseSetMessageHandler.
+            ByteArrayOutputStream keyStream = new ByteArrayOutputStream(1024);
+            try {
+                SigType type = getSigType(opts);
+                if (type != SigType.DSA_SHA1) {
+                    // hassle, have to set up the padding and cert, see I2PClientImpl
+                    throw new I2PSessionException("type " + type + " unsupported");
+                }
+                PublicKey pub = _session.getMyDestination().getPublicKey();
+                PrivateKey priv = _session.getDecryptionKey();
+                SimpleDataStructure[] keys = _context.keyGenerator().generateSigningKeys(type);
+                pub.writeBytes(keyStream);
+                keys[0].writeBytes(keyStream); // signing pub
+                Certificate.NULL_CERT.writeBytes(keyStream);
+                priv.writeBytes(keyStream);
+                keys[1].writeBytes(keyStream); // signing priv
+            } catch (Exception e) {
+                throw new I2PSessionException("Error creating keys", e);
+            }
+            privateKeyStream = new ByteArrayInputStream(keyStream.toByteArray());
+        }
+        I2PSession rv = _session.addSubsession(privateKeyStream, opts);
+        ConnectionOptions defaultOptions = new ConnectionOptions(opts);
+        ConnectionManager connectionManager = new ConnectionManager(_context, rv, defaultOptions);
+        ConnectionManager old = _subsessions.putIfAbsent(rv, connectionManager);
+        if (old != null) {
+            // shouldn't happen
+            _session.removeSubsession(rv);
+            connectionManager.shutdown();
+            throw new I2PSessionException("dup");
+        }
+        if (_log.shouldLog(Log.WARN))
+            _log.warn("Added subsession " + rv);
+        return rv;
+    }
+
+    /**
+     *  @param opts may be null
+     *  @since 0.9.20 copied from I2PSocketManagerFactory
+     */
+    private SigType getSigType(Properties opts) {
+        if (opts != null) {
+            String st = opts.getProperty(I2PClient.PROP_SIGTYPE);
+            if (st != null) {
+                SigType rv = SigType.parseSigType(st);
+                if (rv != null && rv.isAvailable())
+                    return rv;
+                if (rv != null)
+                    st = rv.toString();
+                _log.logAlways(Log.WARN, "Unsupported sig type " + st +
+                                         ", reverting to " + I2PClient.DEFAULT_SIGTYPE);
+                // TODO throw instead?
+            }
+        }
+        return I2PClient.DEFAULT_SIGTYPE;
+    }
+    
+    /**
+     *  Remove the subsession
+     *
+     *  @since 0.9.19
+     */
+    public void removeSubsession(I2PSession session) {
+        _session.removeSubsession(session);
+        ConnectionManager cm = _subsessions.remove(session);
+        if (cm != null) {
+            cm.shutdown();
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Removeed subsession " + session);
+        } else {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Subsession not found to remove " + session);
+        }
+    }
+    
+    /**
+     *  @return a list of subsessions, non-null, does not include the primary session
+     *  @since 0.9.19
+     */
+    public List<I2PSession> getSubsessions() {
+        return _session.getSubsessions();
     }
     
     public ConnectionManager getConnectionManager() {
@@ -262,11 +417,16 @@ public class I2PSocketManagerFull implements I2PSocketManager {
     }
 
     private void verifySession() throws I2PException {
+        verifySession(_connectionManager);
+    }
+
+    /** @since 0.9.20 */
+    private void verifySession(ConnectionManager cm) throws I2PException {
         if (_isDestroyed.get())
             throw new I2PException("Session was closed");
-        if (!_connectionManager.getSession().isClosed())
+        if (!cm.getSession().isClosed())
             return;
-        _connectionManager.getSession().connect();
+        cm.getSession().connect();
     }
     
     /**
@@ -285,7 +445,6 @@ public class I2PSocketManagerFull implements I2PSocketManager {
      */
     public I2PSocket connect(Destination peer, I2PSocketOptions options) 
                              throws I2PException, NoRouteToHostException {
-        verifySession();
         if (options == null)
             options = _defaultOptions;
         ConnectionOptions opts = null;
@@ -297,8 +456,23 @@ public class I2PSocketManagerFull implements I2PSocketManager {
         if (_log.shouldLog(Log.INFO))
             _log.info("Connecting to " + peer.calculateHash().toBase64().substring(0,6) 
                       + " with options: " + opts);
+        // pick the subsession here
+        ConnectionManager cm = _connectionManager;
+        if (!_subsessions.isEmpty()) {
+            Hash h = peer.calculateHash();
+            if (_dsaOnly.contains(h)) {
+                // FIXME just taking the first one for now
+                for (Map.Entry<I2PSession, ConnectionManager> e : _subsessions.entrySet()) {
+                    if (e.getKey().getMyDestination().getSigType() == SigType.DSA_SHA1) {
+                        cm = e.getValue();
+                        break;
+                    }
+                }
+            }
+        }
+        verifySession(cm);
         // the following blocks unless connect delay > 0
-        Connection con = _connectionManager.connect(peer, opts);
+        Connection con = cm.connect(peer, opts);
         if (con == null)
             throw new TooManyStreamsException("Too many streams, max " + _defaultOptions.getMaxConns());
         I2PSocketFull socket = new I2PSocketFull(con,_context);
@@ -381,6 +555,12 @@ public class I2PSocketManagerFull implements I2PSocketManager {
         }
         _connectionManager.setAllowIncomingConnections(false);
         _connectionManager.shutdown();
+        if (!_subsessions.isEmpty()) {
+            for (I2PSession sess : _subsessions.keySet()) {
+                 removeSubsession(sess);
+            }
+        }
+
         // should we destroy the _session too?
         // yes, since the old lib did (and SAM wants it to, and i dont know why not)
         if ( (_session != null) && (!_session.isClosed()) ) {

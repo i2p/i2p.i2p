@@ -23,6 +23,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -43,6 +44,7 @@ import net.i2p.data.i2cp.I2CPMessage;
 import net.i2p.data.i2cp.I2CPMessageReader;
 import net.i2p.data.i2cp.MessagePayloadMessage;
 import net.i2p.data.i2cp.SessionId;
+import net.i2p.data.i2cp.SessionStatusMessage;
 import net.i2p.internal.I2CPMessageQueue;
 import net.i2p.internal.InternalClientManager;
 import net.i2p.internal.QueuedI2CPMessageReader;
@@ -80,6 +82,15 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
     private SessionId _sessionId;
     /** currently granted lease set, or null */
     private volatile LeaseSet _leaseSet;
+
+    // subsession stuff
+    // registered subsessions
+    private final List<SubSession> _subsessions;
+    // established subsessions
+    private final ConcurrentHashMap<SessionId, SubSession> _subsessionMap;
+    private final Object _subsessionLock = new Object();
+    private static final String MIN_SUBSESSION_VERSION = "0.9.19";
+    private volatile boolean _routerSupportsSubsessions;
 
     /** hostname of router - will be null if in RouterContext */
     protected final String _hostname;
@@ -186,6 +197,9 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
                                     TEST_LOOKUP ||
                                      (routerVersion != null && routerVersion.length() > 0 &&
                                       VersionComparator.comp(routerVersion, MIN_HOST_LOOKUP_VERSION) >= 0);
+        _routerSupportsSubsessions = _context.isRouterContext() ||
+                                     (routerVersion != null && routerVersion.length() > 0 &&
+                                      VersionComparator.comp(routerVersion, MIN_SUBSESSION_VERSION) >= 0);
         synchronized (_stateLock) {
             if (_state == State.OPENING) {
                 _state = State.GOTDATE;
@@ -203,18 +217,42 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
      */
     protected I2PSessionImpl(I2PAppContext context, Properties options,
                              I2PClientMessageHandlerMap handlerMap) {
-        this(context, options, handlerMap, false);
+        this(context, options, handlerMap, null, false);
     }
-    
+
+    /*
+     * For extension by SubSession via I2PSessionMuxedImpl and I2PSessionImpl2
+     *
+     * @param destKeyStream stream containing the private key data,
+     *                             format is specified in {@link net.i2p.data.PrivateKeyFile PrivateKeyFile}
+     * @param options set of options to configure the router with, if null will use System properties
+     * @since 0.9.19
+     */
+    protected I2PSessionImpl(I2PSessionImpl primary, InputStream destKeyStream, Properties options) throws I2PSessionException {
+        this(primary.getContext(), options, primary.getHandlerMap(), primary.getProducer(), true);
+        _availabilityNotifier = new AvailabilityNotifier();
+        try {
+            readDestination(destKeyStream);
+        } catch (DataFormatException dfe) {
+            throw new I2PSessionException("Error reading the destination key stream", dfe);
+        } catch (IOException ioe) {
+            throw new I2PSessionException("Error reading the destination key stream", ioe);
+        }
+    }
+
     /**
      * Basic setup of finals
      * @since 0.9.7
      */
     private I2PSessionImpl(I2PAppContext context, Properties options,
-                           I2PClientMessageHandlerMap handlerMap, boolean hasDest) {
+                           I2PClientMessageHandlerMap handlerMap,
+                           I2CPMessageProducer producer,
+                           boolean hasDest) {
         _context = context;
         _handlerMap = handlerMap;
         _log = context.logManager().getLog(getClass());
+        _subsessions = new CopyOnWriteArrayList<SubSession>();
+        _subsessionMap = new ConcurrentHashMap<SessionId, SubSession>(4);
         if (options == null)
             options = (Properties) System.getProperties().clone();
         _options = loadConfig(options);
@@ -222,7 +260,7 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
         _portNum = getPort();
         _fastReceive = Boolean.parseBoolean(_options.getProperty(I2PClient.PROP_FAST_RECEIVE));
         if (hasDest) {
-            _producer = new I2CPMessageProducer(context);
+            _producer = producer;
             _availableMessages = new ConcurrentHashMap<Long, MessagePayloadMessage>();
             _myDestination = new Destination();
             _privateKey = new PrivateKey();
@@ -236,6 +274,7 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
         }
         _routerSupportsFastReceive = _context.isRouterContext();
         _routerSupportsHostLookup = _context.isRouterContext();
+        _routerSupportsSubsessions = _context.isRouterContext();
     }
 
     /**
@@ -247,10 +286,10 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
      * @param destKeyStream stream containing the private key data,
      *                             format is specified in {@link net.i2p.data.PrivateKeyFile PrivateKeyFile}
      * @param options set of options to configure the router with, if null will use System properties
-     * @throws I2PSessionException if there is a problem loading the private keys or 
+     * @throws I2PSessionException if there is a problem loading the private keys
      */
     public I2PSessionImpl(I2PAppContext context, InputStream destKeyStream, Properties options) throws I2PSessionException {
-        this(context, options, new I2PClientMessageHandlerMap(context), true);
+        this(context, options, new I2PClientMessageHandlerMap(context), new I2CPMessageProducer(context), true);
         _availabilityNotifier = new AvailabilityNotifier();
         try {
             readDestination(destKeyStream);
@@ -258,6 +297,69 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
             throw new I2PSessionException("Error reading the destination key stream", dfe);
         } catch (IOException ioe) {
             throw new I2PSessionException("Error reading the destination key stream", ioe);
+        }
+    }
+    
+    /**
+     *  Router must be connected or was connected... for now.
+     *
+     *  @return a new subsession, non-null
+     *  @param privateKeyStream null for transient, if non-null must have same encryption keys as primary session
+     *                          and different signing keys
+     *  @param opts subsession options if any, may be null
+     *  @since 0.9.19
+     */
+    public I2PSession addSubsession(InputStream privateKeyStream, Properties opts) throws I2PSessionException {
+        if (!_routerSupportsSubsessions)
+            throw new I2PSessionException("Router does not support subsessions");
+        SubSession sub;
+        synchronized(_subsessionLock) {
+            if (_subsessions.size() > _subsessionMap.size())
+                throw new I2PSessionException("Subsession request already pending");
+            sub = new SubSession(this, privateKeyStream, opts);
+            for (SubSession ss : _subsessions) {
+                 if (ss.getDecryptionKey().equals(sub.getDecryptionKey()) &&
+                     ss.getPrivateKey().equals(sub.getPrivateKey())) {
+                    throw new I2PSessionException("Dup subsession");
+                }
+            }
+            _subsessions.add(sub);
+        }
+
+        synchronized (_stateLock) {
+            if (_state == State.OPEN) {
+                _producer.connect(sub);
+            } // else will be called in connect()
+        }
+        return sub;
+    }
+    
+    /**
+     *  @since 0.9.19
+     */
+    public void removeSubsession(I2PSession session) {
+        if (!(session instanceof SubSession))
+            return;
+        synchronized(_subsessionLock) {
+            _subsessions.remove(session);
+            SessionId id = ((SubSession) session).getSessionId();
+            if (id != null)
+                _subsessionMap.remove(id);
+            /// tell the subsession
+            try {
+                // doesn't really throw
+                session.destroySession();
+            } catch (I2PSessionException ise) {}
+        }
+    }
+    
+    /**
+     *  @return a list of subsessions, non-null, does not include the primary session
+     *  @since 0.9.19
+     */
+    public List<I2PSession> getSubsessions() {
+        synchronized(_subsessionLock) {
+            return new ArrayList<I2PSession>(_subsessions);
         }
     }
 
@@ -553,6 +655,16 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
             startIdleMonitor();
             startVerifyUsage();
             success = true;
+
+            // now send CreateSessionMessages for all subsessions, one at a time, must wait for each response
+            synchronized(_subsessionLock) {
+                for (SubSession ss : _subsessions) {
+                   if (_log.shouldLog(Log.INFO))
+                       _log.info(getPrefix() + "Connecting subsession " + ss);
+                    _producer.connect(ss);
+                }
+            }
+
         } catch (InterruptedException ie) {
             throw new I2PSessionException("Interrupted", ie);
         } catch (UnknownHostException uhe) {
@@ -763,19 +875,80 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
     /**
      * The I2CPMessageEventListener callback.
      * Recieve notification of some I2CP message and handle it if possible.
+     *
+     * We route the message based on message type AND session ID.
+     *
+     * The following types never contain a session ID and are not routable to
+     * a subsession:
+     *     BandwidthLimitsMessage, DestReplyMessage
+     *
+     * The following types may not ontain a valid session ID
+     * even when intended for a subsession, so we must take special care:
+     *     SessionStatusMessage
+     *
      * @param reader unused
      */
     public void messageReceived(I2CPMessageReader reader, I2CPMessage message) {
-        I2CPMessageHandler handler = _handlerMap.getHandler(message.getType());
-        if (handler == null) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn(getPrefix() + "Unknown message or unhandleable message received: type = "
-                          + message.getType());
+        int type = message.getType();
+        SessionId id = message.sessionId();
+        if (id == null || id.equals(_sessionId) ||
+            (_sessionId == null && id != null && type == SessionStatusMessage.MESSAGE_TYPE)) {
+            // it's for us
+            I2CPMessageHandler handler = _handlerMap.getHandler(type);
+            if (handler != null) {
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug(getPrefix() + "Message received of type " + type
+                               + " to be handled by " + handler.getClass().getSimpleName());
+                handler.handleMessage(message, this);
+            } else {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn(getPrefix() + "Unknown message or unhandleable message received: type = "
+                              + type);
+            }
         } else {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug(getPrefix() + "Message received of type " + message.getType()
-                           + " to be handled by " + handler.getClass().getSimpleName());
-            handler.handleMessage(message, this);
+            SubSession sub = _subsessionMap.get(id);
+            if (sub != null) {
+                // it's for a subsession
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug(getPrefix() + "Message received of type " + type
+                               + " to be handled by " + sub);
+                sub.messageReceived(reader, message);
+            } else if (id != null && type == SessionStatusMessage.MESSAGE_TYPE) {
+                // look for a subsession without a session
+                synchronized (_subsessionLock) {
+                    for (SubSession sess : _subsessions) {
+                        if (sess.getSessionId() == null) {
+                            sess.messageReceived(reader, message);
+                            id = sess.getSessionId();
+                            if (id != null) {
+                                if (id.equals(_sessionId)) {
+                                    // shouldnt happen
+                                    sess.setSessionId(null);
+                                    if (_log.shouldLog(Log.WARN))
+                                        _log.warn("Dup or our session id " + id);
+                                } else {
+                                    SubSession old = _subsessionMap.putIfAbsent(id, sess);
+                                    if (old != null) {
+                                        // shouldnt happen
+                                        sess.setSessionId(null);
+                                        if (_log.shouldLog(Log.WARN))
+                                            _log.warn("Dup session id " + id);
+                                    }
+                                }
+                            }
+                            return;
+                        }
+                        if (_log.shouldLog(Log.WARN))
+                            _log.warn(getPrefix() + "No session " + id + " to handle message: type = "
+                                      + type);
+                    }
+                }
+            } else {
+                // it's for nobody
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn(getPrefix() + "No session " + id + " to handle message: type = "
+                              + type);
+            }
         }
     }
 
@@ -809,6 +982,18 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
      * Retrieve the helper that generates I2CP messages
      */
     I2CPMessageProducer getProducer() { return _producer; }
+
+    /**
+     *  For Subsessions
+     *  @since 0.9.19
+     */
+    I2PClientMessageHandlerMap getHandlerMap() { return _handlerMap; }
+
+    /**
+     *  For Subsessions
+     *  @since 0.9.19
+     */
+    I2PAppContext getContext() { return _context; }
 
     /**
      * Retrieve the configuration options, filtered.
@@ -923,6 +1108,7 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
         if (_availabilityNotifier != null)
             _availabilityNotifier.stopNotifying();
         closeSocket();
+        _subsessionMap.clear();
         if (_sessionListener != null) _sessionListener.disconnected(this);
     }
 

@@ -18,6 +18,7 @@ import net.i2p.data.i2np.VariableTunnelBuildReplyMessage;
 import net.i2p.router.ClientMessage;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelInfo;
+import net.i2p.router.TunnelPoolSettings;
 import net.i2p.router.message.GarlicMessageReceiver;
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import net.i2p.util.Log;
@@ -204,11 +205,11 @@ class InboundMessageDistributor implements GarlicMessageReceiver.CloveReceiver {
      *
      */
     public void handleClove(DeliveryInstructions instructions, I2NPMessage data) {
+        int type = data.getType();
         switch (instructions.getDeliveryMode()) {
             case DeliveryInstructions.DELIVERY_MODE_LOCAL:
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("local delivery instructions for clove: " + data.getClass().getSimpleName());
-                int type = data.getType();
                 if (type == GarlicMessage.MESSAGE_TYPE) {
                     _receiver.receive((GarlicMessage)data);
                 } else if (type == DatabaseStoreMessage.MESSAGE_TYPE) {
@@ -296,28 +297,45 @@ class InboundMessageDistributor implements GarlicMessageReceiver.CloveReceiver {
                             _context.inNetMessagePool().add(data, null, null);
                 }
                 return;
+
             case DeliveryInstructions.DELIVERY_MODE_DESTINATION:
+                Hash to = instructions.getDestination();
                 // Can we route UnknownI2NPMessages to a destination too?
-                if (!(data instanceof DataMessage)) {
+                if (type != DataMessage.MESSAGE_TYPE) {
                     if (_log.shouldLog(Log.ERROR))
                         _log.error("cant send a " + data.getClass().getSimpleName() + " to a destination");
-                } else if ( (_client != null) && (_client.equals(instructions.getDestination())) ) {
+                } else if (_client != null && _client.equals(to)) {
                     if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("data message came down a tunnel for " 
-                                   + _client);
+                        _log.debug("data message came down a tunnel for " + _client);
                     DataMessage dm = (DataMessage)data;
                     Payload payload = new Payload();
                     payload.setEncryptedData(dm.getData());
                     ClientMessage m = new ClientMessage(_client, payload);
                     _context.clientManager().messageReceived(m);
+                } else if (_client != null) {
+                    // Shared tunnel?
+                    TunnelPoolSettings tgt = _context.tunnelManager().getInboundSettings(to);
+                    if (tgt != null && _client.equals(tgt.getAliasOf())) {
+                        // same as above, just different log
+                        if (_log.shouldLog(Log.DEBUG))
+                            _log.debug("data message came down a tunnel for " 
+                                       + _client + " targeting shared " + to);
+                        DataMessage dm = (DataMessage)data;
+                        Payload payload = new Payload();
+                        payload.setEncryptedData(dm.getData());
+                        ClientMessage m = new ClientMessage(to, payload);
+                        _context.clientManager().messageReceived(m);
+                    } else {
+                        if (_log.shouldLog(Log.ERROR))
+                            _log.error("Data message came down a tunnel for " 
+                                   +  _client + " but targetted " + to);
+                    }
                 } else {
                     if (_log.shouldLog(Log.ERROR))
-                        _log.error("this data message came down a tunnel for " 
-                                   + (_client == null ? "no one" : _client)
-                                   + " but targetted "
-                                   + instructions.getDestination());
+                        _log.error("Data message came down an exploratory tunnel targeting " + to);
                 }
                 return;
+
             case DeliveryInstructions.DELIVERY_MODE_ROUTER: // fall through
             case DeliveryInstructions.DELIVERY_MODE_TUNNEL:
                 if (_log.shouldLog(Log.INFO))
@@ -325,6 +343,7 @@ class InboundMessageDistributor implements GarlicMessageReceiver.CloveReceiver {
                                + ", treat recursively to prevent leakage");
                 distribute(data, instructions.getRouter(), instructions.getTunnelId());
                 return;
+
             default:
                 if (_log.shouldLog(Log.ERROR))
                     _log.error("Unknown instruction " + instructions.getDeliveryMode() + ": " + instructions);

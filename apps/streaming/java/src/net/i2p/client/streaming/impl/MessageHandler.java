@@ -50,7 +50,7 @@ class MessageHandler implements I2PSessionMuxedListener {
      * @param size size of the message
      */
     public void messageAvailable(I2PSession session, int msgId, long size, int proto, int fromPort, int toPort) {
-        byte data[] = null;
+        byte data[];
         try {
             data = session.receiveMessage(msgId);
         } catch (I2PSessionException ise) {
@@ -59,7 +59,17 @@ class MessageHandler implements I2PSessionMuxedListener {
                 _log.warn("Error receiving the message", ise);
             return;
         }
-        if (data == null) return;
+        if (data == null) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Received null data on " + session + " proto: " + proto +
+                          " fromPort: " + fromPort + " toPort: " + toPort);
+            return;
+        }
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Received " + data.length + " bytes on " + session +
+                       " (" + _manager + ')' +
+                       " proto: " + proto +
+                       " fromPort: " + fromPort + " toPort: " + toPort);
         Packet packet = new Packet();
         try {
             packet.readPacket(data, 0, data.length);

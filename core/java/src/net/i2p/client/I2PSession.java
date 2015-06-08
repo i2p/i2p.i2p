@@ -9,6 +9,8 @@ package net.i2p.client;
  *
  */
 
+import java.io.InputStream;
+import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
@@ -21,7 +23,7 @@ import net.i2p.data.SigningPrivateKey;
 /**
  * <p>Define the standard means of sending and receiving messages on the 
  * I2P network by using the I2CP (the client protocol).  This is done over a 
- * bidirectional TCP socket and never sends any private keys.
+ * bidirectional TCP socket.
  *
  * End to end encryption in I2PSession was disabled in release 0.6.
  *
@@ -247,6 +249,27 @@ public interface I2PSession {
      *
      */
     public void destroySession() throws I2PSessionException;
+    
+    /**
+     *  @return a new subsession, non-null
+     *  @param privateKeyStream null for transient, if non-null must have same encryption keys as primary session
+     *                          and different signing keys
+     *  @param opts subsession options if any, may be null
+     *  @since 0.9.19
+     */
+    public I2PSession addSubsession(InputStream privateKeyStream, Properties opts) throws I2PSessionException;
+    
+    /**
+     *  @return a list of subsessions, non-null, does not include the primary session
+     *  @since 0.9.19
+     */
+    public void removeSubsession(I2PSession session);
+    
+    /**
+     *  @return a list of subsessions, non-null, does not include the primary session
+     *  @since 0.9.19
+     */
+    public List<I2PSession> getSubsessions();
 
     /**
      * Actually connect the session and start receiving/sending messages

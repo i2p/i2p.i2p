@@ -90,7 +90,7 @@ public class ClientManagerFacadeImpl extends ClientManagerFacade implements Inte
         for (Destination dest : _manager.getRunnerDestinations()) {
             ClientConnectionRunner runner = _manager.getRunner(dest);
             if ( (runner == null) || (runner.getIsDead())) continue;
-            LeaseSet ls = runner.getLeaseSet();
+            LeaseSet ls = runner.getLeaseSet(dest.calculateHash());
             if (ls == null)
                 continue; // still building
             long howLongAgo = _context.clock().now() - ls.getEarliestLeaseDate();
@@ -115,6 +115,7 @@ public class ClientManagerFacadeImpl extends ClientManagerFacade implements Inte
      * @param dest Destination from which the LeaseSet's authorization should be requested
      * @param set LeaseSet with requested leases - this object must be updated to contain the 
      *            signed version (as well as any changed/added/removed Leases)
+     *            The LeaseSet contains Leases only; it is unsigned and does not have the destination set.
      * @param timeout ms to wait before failing
      * @param onCreateJob Job to run after the LeaseSet is authorized
      * @param onFailedJob Job to run after the timeout passes without receiving authorization
@@ -126,6 +127,15 @@ public class ClientManagerFacadeImpl extends ClientManagerFacade implements Inte
             _log.error("Null manager on requestLeaseSet!");
     }
     
+    /**
+     * Request that a particular client authorize the Leases contained in the 
+     * LeaseSet.
+     *
+     * @param dest Destination from which the LeaseSet's authorization should be requested
+     * @param ls  LeaseSet with requested leases - this object must be updated to contain the 
+     *            signed version (as well as any changed/added/removed Leases).
+     *            The LeaseSet contains Leases only; it is unsigned and does not have the destination set.
+     */
     public void requestLeaseSet(Hash dest, LeaseSet set) { 
         if (_manager != null)
             _manager.requestLeaseSet(dest, set);
