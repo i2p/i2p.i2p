@@ -215,7 +215,7 @@ public class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                 // ERR: see comment in HandleDatabaseLookupMessageJob regarding hidden mode
                 //else if (!_message.getRouterInfo().isHidden())
                 long floodEnd = System.currentTimeMillis();
-                getContext().statManager().addRateData("netDb.storeFloodNew", floodEnd-floodBegin);
+                getContext().statManager().addRateData("netDb.storeFloodNew", floodEnd-floodBegin, 60*1000);
             } else {
                 // don't flood it *again*
                 getContext().statManager().addRateData("netDb.storeFloodOld", 1);
