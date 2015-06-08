@@ -270,13 +270,13 @@ class ConnectionManager {
                     }
                 }
             }
-            PacketLocal reply = new PacketLocal(_context, from);
+            PacketLocal reply = new PacketLocal(_context, from, synPacket.getSession());
             reply.setFlag(Packet.FLAG_RESET);
             reply.setFlag(Packet.FLAG_SIGNATURE_INCLUDED);
             reply.setAckThrough(synPacket.getSequenceNum());
             reply.setSendStreamId(synPacket.getReceiveStreamId());
             reply.setReceiveStreamId(0);
-            reply.setOptionalFrom(_session.getMyDestination());
+            reply.setOptionalFrom();
             reply.setLocalPort(synPacket.getLocalPort());
             reply.setRemotePort(synPacket.getRemotePort());
             // this just sends the packet - no retries or whatnot
@@ -329,7 +329,7 @@ class ConnectionManager {
                 return false;
             }
         }
-        PacketLocal pong = new PacketLocal(_context, dest);
+        PacketLocal pong = new PacketLocal(_context, dest, ping.getSession());
         pong.setFlag(Packet.FLAG_ECHO | Packet.FLAG_NO_ACK);
         pong.setReceiveStreamId(ping.getSendStreamId());
         pong.setLocalPort(ping.getLocalPort());
@@ -734,12 +734,12 @@ class ConnectionManager {
                         boolean blocking, PingNotifier notifier) {
         PingRequest req = new PingRequest(notifier);
         long id = assignPingId(req);
-        PacketLocal packet = new PacketLocal(_context, peer);
+        PacketLocal packet = new PacketLocal(_context, peer, _session);
         packet.setSendStreamId(id);
         packet.setFlag(Packet.FLAG_ECHO |
                        Packet.FLAG_NO_ACK |
                        Packet.FLAG_SIGNATURE_INCLUDED);
-        packet.setOptionalFrom(_session.getMyDestination());
+        packet.setOptionalFrom();
         packet.setLocalPort(fromPort);
         packet.setRemotePort(toPort);
         if (timeoutMs > MAX_PING_TIMEOUT)
@@ -780,12 +780,12 @@ class ConnectionManager {
                         byte[] payload) {
         PingRequest req = new PingRequest(null);
         long id = assignPingId(req);
-        PacketLocal packet = new PacketLocal(_context, peer);
+        PacketLocal packet = new PacketLocal(_context, peer, _session);
         packet.setSendStreamId(id);
         packet.setFlag(Packet.FLAG_ECHO |
                        Packet.FLAG_NO_ACK |
                        Packet.FLAG_SIGNATURE_INCLUDED);
-        packet.setOptionalFrom(_session.getMyDestination());
+        packet.setOptionalFrom();
         packet.setLocalPort(fromPort);
         packet.setRemotePort(toPort);
         packet.setPayload(new ByteArray(payload));

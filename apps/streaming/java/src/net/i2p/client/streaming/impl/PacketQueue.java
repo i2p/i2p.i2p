@@ -99,7 +99,7 @@ class PacketQueue implements SendMessageStatusListener {
             int size = 0;
             long beforeWrite = System.currentTimeMillis();
             if (packet.shouldSign())
-                size = packet.writeSignedPacket(buf, 0, _context, _session.getPrivateKey());
+                size = packet.writeSignedPacket(buf, 0);
             else
                 size = packet.writePacket(buf, 0);
             long writeTime = System.currentTimeMillis() - beforeWrite;
@@ -197,7 +197,7 @@ class PacketQueue implements SendMessageStatusListener {
             //packet.setTagsSent(tagsSent);
             packet.incrementSends();
             Connection c = packet.getConnection();
-            if (c != null) {
+            if (c != null && _log.shouldDebug()) {
                 String suffix = "wsize " + c.getOptions().getWindowSize() + " rto " + c.getOptions().getRTO();
                 c.getConnectionManager().getPacketHandler().displayPacket(packet, "SEND", suffix);
             }

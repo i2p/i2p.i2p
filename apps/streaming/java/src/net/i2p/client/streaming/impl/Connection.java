@@ -310,13 +310,13 @@ class Connection {
         // Unconditionally set
         _resetSentOn.set(now);
         if ( (_remotePeer == null) || (_sendStreamId.get() <= 0) ) return;
-        PacketLocal reply = new PacketLocal(_context, _remotePeer);
+        PacketLocal reply = new PacketLocal(_context, _remotePeer, this);
         reply.setFlag(Packet.FLAG_RESET);
         reply.setFlag(Packet.FLAG_SIGNATURE_INCLUDED);
         reply.setSendStreamId(_sendStreamId.get());
         reply.setReceiveStreamId(_receiveStreamId.get());
         // TODO remove this someday, as of 0.9.20 we do not require it
-        reply.setOptionalFrom(_connectionManager.getSession().getMyDestination());
+        reply.setOptionalFrom();
         reply.setLocalPort(_localPort);
         reply.setRemotePort(_remotePort);
         // this just sends the packet - no retries or whatnot

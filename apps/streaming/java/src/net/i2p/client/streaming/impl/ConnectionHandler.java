@@ -243,14 +243,14 @@ class ConnectionHandler {
                 _log.warn("Received a spoofed SYN packet: they said they were " + packet.getOptionalFrom());
             return;
         }
-        PacketLocal reply = new PacketLocal(_context, packet.getOptionalFrom());
+        PacketLocal reply = new PacketLocal(_context, packet.getOptionalFrom(), packet.getSession());
         reply.setFlag(Packet.FLAG_RESET);
         reply.setFlag(Packet.FLAG_SIGNATURE_INCLUDED);
         reply.setAckThrough(packet.getSequenceNum());
         reply.setSendStreamId(packet.getReceiveStreamId());
         reply.setReceiveStreamId(0);
         // TODO remove this someday, as of 0.9.20 we do not require it
-        reply.setOptionalFrom(_manager.getSession().getMyDestination());
+        reply.setOptionalFrom();
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Sending RST: " + reply + " because of " + packet);
         // this just sends the packet - no retries or whatnot
@@ -292,6 +292,7 @@ class ConnectionHandler {
         public static final int POISON_MAX_DELAY_REQUEST = Packet.MAX_DELAY_REQUEST + 1;
 
         public PoisonPacket() {
+            super(null);
             setOptionalDelay(POISON_MAX_DELAY_REQUEST);
         }
     }
