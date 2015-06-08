@@ -101,7 +101,7 @@ class SearchUpdateReplyFoundJob extends JobImpl implements ReplyJob {
             _job.replyFound((DatabaseSearchReplyMessage)message, _peer);
         } else {
             if (_log.shouldLog(Log.ERROR))
-                _log.error(getJobId() + ": WTF, reply job matched a strange message: " + message);
+                _log.error(getJobId() + ": What?! Reply job matched a strange message: " + message);
             return;
         }
         

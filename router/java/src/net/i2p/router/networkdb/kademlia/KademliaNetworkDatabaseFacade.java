@@ -646,7 +646,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         try {
             store(h, localLeaseSet);
         } catch (IllegalArgumentException iae) {
-            _log.error("wtf, locally published leaseSet is not valid?", iae);
+            _log.error("locally published leaseSet is not valid?", iae);
             throw iae;
         }
         if (!_context.clientManager().shouldPublishLeaseSet(h))

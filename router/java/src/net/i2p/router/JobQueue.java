@@ -591,7 +591,7 @@ public class JobQueue {
             } catch (Throwable t) {
                 _context.clock().removeUpdateListener(this);
                 if (_log.shouldLog(Log.ERROR))
-                    _log.error("wtf, pumper killed", t);
+                    _log.error("pumper killed?!", t);
             }
         }
 

@@ -117,7 +117,7 @@ class JobQueueRunner extends I2PThread {
                 //if ( (jobNum % 10) == 0)
                 //    System.gc();
             } catch (Throwable t) {
-                _log.log(Log.CRIT, "WTF, error running?", t);
+                _log.log(Log.CRIT, "error running?", t);
             }
         }
         //_state = 16;

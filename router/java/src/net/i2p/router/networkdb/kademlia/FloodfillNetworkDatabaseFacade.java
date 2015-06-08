@@ -129,7 +129,7 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
      */
     @Override
     public void publish(RouterInfo localRouterInfo) throws IllegalArgumentException {
-        if (localRouterInfo == null) throw new IllegalArgumentException("wtf, null localRouterInfo?");
+        if (localRouterInfo == null) throw new IllegalArgumentException("impossible: null localRouterInfo?");
         // should this be after super? why not publish locally?
         if (_context.router().isHidden()) return; // DE-nied!
         super.publish(localRouterInfo);

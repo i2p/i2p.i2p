@@ -115,7 +115,7 @@ public class PeerTestJob extends JobImpl {
     private void testPeer(RouterInfo peer) {
         TunnelInfo inTunnel = getInboundTunnelId(); 
         if (inTunnel == null) {
-            _log.warn("No tunnels to get peer test replies through!  wtf!");
+            _log.warn("No tunnels to get peer test replies through!");
             return;
         }
         TunnelId inTunnelId = inTunnel.getReceiveTunnelId(0);
@@ -123,7 +123,7 @@ public class PeerTestJob extends JobImpl {
         RouterInfo inGateway = getContext().netDb().lookupRouterInfoLocally(inTunnel.getPeer(0));
         if (inGateway == null) {
             if (_log.shouldLog(Log.WARN))
-                _log.warn("We can't find the gateway to our inbound tunnel?! wtf");
+                _log.warn("We can't find the gateway to our inbound tunnel?! Impossible?");
             return;
         }
 	
@@ -135,7 +135,7 @@ public class PeerTestJob extends JobImpl {
 	
         TunnelInfo outTunnel = getOutboundTunnelId();
         if (outTunnel == null) {
-            _log.warn("No tunnels to send search out through!  wtf!");
+            _log.warn("No tunnels to send search out through! Something is wrong...");
             return;
         }
         

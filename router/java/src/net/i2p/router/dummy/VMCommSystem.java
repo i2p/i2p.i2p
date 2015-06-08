@@ -122,7 +122,7 @@ public class VMCommSystem extends CommSystemFacade {
 
                 _ctx.inNetMessagePool().add(msg, null, _from);
             } catch (Exception e) {
-                _log.error("wtf, error reading/formatting a VM message?", e);
+                _log.error("Error reading/formatting a VM message? Something is not right...", e);
             }
         }
         public String getName() { return "Receive Message"; }

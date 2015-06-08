@@ -48,7 +48,7 @@ public class UnknownI2NPMessage extends FastI2NPMessageImpl {
             throw new IllegalStateException();
         if (type != _type) throw new I2NPMessageException("Message type is incorrect for this message");
         if (dataSize > MAX_SIZE)
-            throw new I2NPMessageException("wtf, size=" + dataSize);
+            throw new I2NPMessageException("size mismatch, too big, size=" + dataSize);
         _data = new byte[dataSize];
         System.arraycopy(data, offset, _data, 0, dataSize);
     }

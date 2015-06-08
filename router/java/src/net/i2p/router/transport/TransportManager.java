@@ -530,7 +530,7 @@ public class TransportManager implements TransportEventListener {
         if (msg == null)
             throw new IllegalArgumentException("Null message?  no bidding on a null outNetMessage!");
         if (_context.router().getRouterInfo().equals(msg.getTarget()))
-            throw new IllegalArgumentException("WTF, bids for a message bound to ourselves?");
+            throw new IllegalArgumentException("Bids for a message bound to ourselves?");
 
         List<TransportBid> rv = new ArrayList<TransportBid>(_transports.size());
         Set<String> failedTransports = msg.getFailedTransports();

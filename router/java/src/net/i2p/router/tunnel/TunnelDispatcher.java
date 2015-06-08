@@ -630,7 +630,7 @@ public class TunnelDispatcher implements Service {
      * @param targetPeer gateway to the tunnel to receive the message
      */
     public void dispatchOutbound(I2NPMessage msg, TunnelId outboundTunnel, TunnelId targetTunnel, Hash targetPeer) {
-        if (outboundTunnel == null) throw new IllegalArgumentException("wtf, null outbound tunnel?");
+        if (outboundTunnel == null) throw new IllegalArgumentException("null outbound tunnel?");
         long before = _context.clock().now();
         TunnelGateway gw = _outboundGateways.get(outboundTunnel);
         if (gw != null) {
@@ -677,7 +677,7 @@ public class TunnelDispatcher implements Service {
         //long dispatchTime = _context.clock().now() - before;
         //if (dispatchTime > 1000) {
         //    if (_log.shouldLog(Log.WARN))
-        //        _log.warn("wtf, took " + dispatchTime + " to dispatch " + msg + " out " + outboundTunnel + " in " + gw);
+        //        _log.warn("slow? took " + dispatchTime + " to dispatch " + msg + " out " + outboundTunnel + " in " + gw);
         //}
         //if (gw instanceof TunnelGatewayZeroHop)
         //    _context.statManager().addRateData("tunnel.dispatchOutboundZeroHopTime", dispatchTime, dispatchTime);

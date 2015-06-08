@@ -188,7 +188,7 @@ class InboundMessageDistributor implements GarlicMessageReceiver.CloveReceiver {
             TunnelId outId = out.getSendTunnelId(0);
             if (outId == null) {
                 if (_log.shouldLog(Log.ERROR))
-                    _log.error("wtf, outbound tunnel has no outboundId? " + out 
+                    _log.error("strange? outbound tunnel has no outboundId? " + out 
                                + " failing to distribute " + msg);
                 return;
             }

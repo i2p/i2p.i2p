@@ -1,3 +1,6 @@
+2015-06-08 dg
+ * Language fixes
+
 2015-06-06 str4d
  * newsxml: Don't use XXX for parsing dates on Android
 
@@ -4347,7 +4350,7 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
     - Use new synchronized change-and-save-config methods
       to eliminate races with ReadConfigJob
   * Tunnels:
-    - When a peer is shitlisted, fail all our tunnels where
+    - When a peer is banlisted, fail all our tunnels where
       that peer is the adjacent hop. In particular this
       will remove outbound tunnels when we can't contact
       the first hop, and enable quicker recovery.
@@ -4866,7 +4869,7 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
 
 2011-09-30 zzz
   * logs.jsp: Add wrapper version
-  * Shitlist: Shorten time
+  * Banlist: Shorten time
   * Wrapper: Update armv7 to 3.5.12
 
 2011-09-30 kytv
@@ -4957,7 +4960,7 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
     tunnels from being expired and causing high CPU usage
 
 2011-09-08 zzz
-  * Blocklist: Include IP in shitlist reason
+  * Blocklist: Include IP in banlist reason
   * Ministreaming: Drop old classes replaced by streaming
     years ago.
   * NTCP: Hopefully fix race NPE, thx devzero
@@ -7129,7 +7132,7 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
     * Transport clock skews:
       - Store and report UDP clock skews even for large values, so
         a badly skewed local clock will be reported to the console
-      - Don't shitlist for NTCP clock skew if we don't know what time it is
+      - Don't banlist for NTCP clock skew if we don't know what time it is
       - If NTP hasn't worked yet, have NTCP or SSU update the clock one time
       - Include failed clock skew in NTCP skew vector if there aren't many connections
       - Don't include NTCP clock skews for non-established connections
@@ -7491,7 +7494,7 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
     * addressbook: Move class to net.i2p.addressbook
     * build: Take two test scripts out of the installer
     * i2psnark: Bye TPB
-    * Shitlist: Fix bug from two checkins ago, all were forever
+    * Banlist: Fix bug from two checkins ago, all were forever
 
 2009-11-14 zzz
     * HTTP Proxy:
@@ -7506,7 +7509,7 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
 2009-11-11 zzz
     * Console: Some colon cleansing
     * FloodfillPeerSelector: Adjustments
-    * Shitlist: Move HTML renderer to router console,
+    * Banlist: Move HTML renderer to router console,
       add cause parameter for ease of translation,
       tag all causes
 
@@ -7854,13 +7857,13 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
     * logs.jsp: Add system encoding
     * Ministreaming: Cleanups, deprecation, move demos out of the lib
     * netdb.jsp: Flags for leases
-    * NTCP: Clean up clock skew shitlist message
+    * NTCP: Clean up clock skew banlist message
     * profiles.jsp:
       - Rename the Failing column
       - Reduce the time cutoff again to 90m (was 2h)
     * readme*html: localhost -> 127.0.0.1
     * Router: Don't do some things when we are shutting down
-    * Shitlist: Clean up expire message
+    * Banlist: Clean up expire message
     * Stats:
       - Fix BufferedStatsLog so it works at all
       - Don't instantiate BufferedStatsLog unless stats.logFilters
@@ -7926,7 +7929,7 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
            including our own
         2) It randomly dies after a while
     * Console:
-      - Rename the shitlist and the blocklist
+      - Rename the banlist and the blocklist
       - Try to reduce servlet problems on iframe
       - Select server or client icon for local dests
     * EepHead: New
@@ -8661,7 +8664,7 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
         spiff up tunnels.jsp and profiles.jsp.
         Existing installs can get files with 'ant updaterWIthGeoIP'
         or in the console docs bundle 'ant consoleDocs'
-      - Use flags for shitlist and peers.jsp too
+      - Use flags for banlist and peers.jsp too
       - Tweak tunnels.jsp to show class letters
       - Hide in-progress details on tunnels.jsp
       - Add a little color to confignav
@@ -9142,7 +9145,7 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
       - Plug in-progress build leak
 
 2009-02-07 zzz
-    * ClientConnectionRunner, Shitlist, TunnelDispatcher:
+    * ClientConnectionRunner, Banlist, TunnelDispatcher:
       Update using concurrent
     * Streaming ConnectionHandler: Bound SYN queue and
       use concurrent to prevent blowup
@@ -9290,13 +9293,13 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
       - Floodfills periodically shuffle their KBuckets, and
         FloodfillPeerSelector sorts more keys, so that
         exploration works well
-    * Shitlist: Reduce max time to 30m (was 60m)
+    * Banlist: Reduce max time to 30m (was 60m)
     * Streaming:
       - Reduce default initial window size from 12 to 6,
          to account for the MTU increase in the last release
          and try to limit initial packet loss
       - Reduce fast retransmit threshold from 3 to 2
-    * Transport: Don't shitlist a peer if we are at our
+    * Transport: Don't banlist a peer if we are at our
       connection limit
 
 2009-01-03 zzz
@@ -9420,7 +9423,7 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
 
 2008-11-21 zzz
     * Cache DNS and negative DNS for 5m (was 1m and forever)
-    * Delay shitlist cleaner at startup
+    * Delay banlist cleaner at startup
     * Strip wrapper properties from client config
     * Define multiple cert type
     * Prohibit negative maxSends in streaming
@@ -9628,7 +9631,7 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
     * configpeer.jsp: Add blocklist info
     * help.jsp: Add link to German FAQ
     * tunnels.jsp: Fix inactive participating count
-    * SearchReplyJob: Don't look up references to shitlisted peers
+    * SearchReplyJob: Don't look up references to banlisted peers
     * TunnelPeerSelector: Avoid a peer for 20s after a reject or timeout
 
 2008-09-20 zzz
@@ -9691,7 +9694,7 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
 2008-09-06 zzz
     * EepGet command line: Fix byte counts after a failed resume
     * NTCP: Mark unreachable on outbound connection timeout
-    * Shitlist: Fix partial shitlisting (still unused though)
+    * Banlist: Fix partial banlisting (still unused though)
     * Summary Bar: Warn if firewalled and floodfill
     * Throttle: Combine current and last bw measurement,
       reduce default max tunnels to 2500 (was 3000)
@@ -9735,16 +9738,16 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
 2008-08-04 zzz
     * Floodfill Peer Selector:
       - Avoid peers whose netdb is old, or have a recent failed store,
-        or are forever-shitlisted
+        or are forever-banlisted
 
 2008-07-30 zzz
     * Blocklists:
       - New, disabled by default, except for blocking of
-        forever-shitlisted peers. See source for instructions
+        forever-banlisted peers. See source for instructions
         and file format.
     * Transport - Reject peers from inbound connections:
       - Check IP against blocklist
-      - Check router hash against forever-shitlist, then block IP
+      - Check router hash against forever-banlist, then block IP
 
 2008-07-16 zzz
     * configpeer.jsp: New
@@ -9776,7 +9779,7 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
       - Change some logging from WARN to INFO
       - Clean up toString()
     * SSU:
-      - Try to pick better introducers by checking shitlist,
+      - Try to pick better introducers by checking banlist,
         wasUnreachable list, failing list, and idle times
       - To keep introducer connections up and valid,
         periodically send a "ping" (a data packet with no data and no acks)
@@ -9863,8 +9866,8 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
 
 2008-06-07 zzz
     * NetDb: Tweak some logging on lease problems
-    * Shitlist:
-      - Add shitlistForever() and isShitlistedForever(), unused for now
+    * Banlist:
+      - Add banlistForever() and isBanlistedForever(), unused for now
       - Sort the HTML output by router hash
     * netdb.jsp:
       - Sort the lease HTML output by dest hash, local first
@@ -9906,7 +9909,7 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
         (for SAM for example). Defaults to true of course.
     * Logging: Move common WARN output to DEBUG so we can ask users to
         set the default log level to WARN without massive spewage
-    * ProfileOrganizer: Restrict !isSelectable() (i.e. shitlisted) peers from the High Capacity tier,
+    * ProfileOrganizer: Restrict !isSelectable() (i.e. banlisted) peers from the High Capacity tier,
       not just the Fast tier, since we don't use them for tunnels anyway
     * SAM: Add some compiler flexibility to two obscure makefiles
     * i2psnark: Change displayed peer idents to match that shown by bytemonsoon
@@ -10069,7 +10072,7 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
 2008-04-17 zzz
     * Reachability:
       - Track unreachable peers persistently
-        (i.e. separately from shitlist, and not cleared when they contact us)
+        (i.e. separately from banlist, and not cleared when they contact us)
       - Exclude detected unreachable peers from inbound tunnels
       - Exclude detected unreachable peers from selected leases
       - Exclude detected unreachable floodfill peers from lookups
@@ -10077,15 +10080,15 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
 
 2008-04-16 zzz
     * SSU/Reachability:
-      - Extend shitlist time from 4-8m to 40-60m
-      - Add some shitlist logging
-      - Don't shitlist twice when unreachable on all transports
+      - Extend banlist time from 4-8m to 40-60m
+      - Add some banlist logging
+      - Don't banlist twice when unreachable on all transports
       - Exclude netDb-listed unreachable peers from inbound tunnels;
         this won't help much since there are very few of these now
       - Remove 10s delay on inbound UDP connections used for the
         0.6.1.10 transition
       - Track and display UDP connection direction on peers.jsp
-      - Show shitlist status in-line on profiles.jsp
+      - Show banlist status in-line on profiles.jsp
 
 2008-04-15 zzz
     * SSU Reachability/PeerTestManager:
@@ -10183,7 +10186,7 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
 
 2008-03-14 zzz
     * Floodfill Search:
-       - Prefer heard-from, unfailing, unshitlisted floodfill peers
+       - Prefer heard-from, unfailing, unbanlisted floodfill peers
 
 2008-03-14 zzz
     * ProfileOrganizer:
@@ -10968,8 +10971,8 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
       new "identlog.txt" text file in the I2P install directory.  For
       debugging purposes, publish the count of how many identities the
       router has cycled through, though not the identities itself.
-    * Cleaned up the way the multitransport shitlisting worked, and
-      added per-transport shitlists
+    * Cleaned up the way the multitransport banlisting worked, and
+      added per-transport banlists
     * When dropping a router reference locally, first fire a netDb
       lookup for the entry
     * Take the peer selection filters into account when organizing the
@@ -10999,7 +11002,7 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
       even if those shouldn't exist)
 
 2006-07-14  jrandom
-    * Improve the multitransport shitlisting (thanks Complication!)
+    * Improve the multitransport banlisting (thanks Complication!)
     * Allow routers with a capacity of 16-32KBps to be used in tunnels under
       the default configuration (thanks for the stats Complication!)
     * Properly allow older router references to load on startup
@@ -11021,7 +11024,7 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
       GNU/Classpath based JVMs
     * Adjust the Fortuna PRNG's pooling system to reduce contention on
       refill with a background thread to refill the output buffer
-    * Add per-transport support for the shitlist
+    * Add per-transport support for the banlist
     * Add a new async pumped tunnel gateway to reduce tunnel dispatcher
       contention
 
@@ -11091,7 +11094,7 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
     * SSU modifications to cut down on unnecessary connection failures
 
 2006-05-16  jrandom
-    * Further shitlist randomizations
+    * Further banlist randomizations
     * Adjust the stats monitored for detecting cpu overload when dropping new
       tunnel requests
 
@@ -11304,7 +11307,7 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
       picker.
     * Cut down on subsequent streaming lib reset packets transmitted
     * Use a larger MTU more often
-    * Allow netDb searches to query shitlisted peers, as the queries are
+    * Allow netDb searches to query banlisted peers, as the queries are
       indirect.
     * Add an option to disable non-floodfill netDb searches (non-floodfill
       searches are used by default, but can be disabled by adding
@@ -11366,7 +11369,7 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
       searches outside the floodfill set)
     * Fix to the SSU IP detection code so we won't use introducers when we
       don't need them (thanks Complication!)
-    * Add a brief shitlist to i2psnark so it doesn't keep on trying to reach
+    * Add a brief banlist to i2psnark so it doesn't keep on trying to reach
       peers given to it
     * Don't let netDb searches wander across too many peers
     * Don't use the 1s bandwidth usage in the tunnel participation throttle,
@@ -11925,7 +11928,7 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
       left to the (work in progress) web UI.
 
 2005-12-14  jrandom
-    * Fix to drop peer references when we shitlist people again (thanks zzz!)
+    * Fix to drop peer references when we banlist people again (thanks zzz!)
     * Further I2PSnark fixes to deal with arbitrary torrent info attributes
       (thanks Complication!)
 
@@ -12024,7 +12027,7 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
       separate jdom or rome, as they're inside syndie.war.
 
 2005-11-30  jrandom
-    * Don't let the TCP transport alone shitlist a peer, since other
+    * Don't let the TCP transport alone banlist a peer, since other
       transports may be working.  Also display whether TCP connections are
       inbound or outbound on the peers page.
     * Fixed some substantial bugs in the SSU introducers where we wouldn't
@@ -12092,7 +12095,7 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
       address (read: SSU IP or port).  This only offers minimal additional
       protection against trivial attackers, but should provide functional
       improvement for people who have periodic IP changes, since their new
-      router address would not be shitlisted while their old one would be.
+      router address would not be banlisted while their old one would be.
     * Added further infrastructure for restricted route operation, but its use
       is not recommended.
 
@@ -12240,10 +12243,10 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
     * Improved the bandwidth throtting on tunnel participation, especially for
       low bandwidth peers.
     * Improved failure handling in SSU with proactive reestablishment of
-      failing idle peers, and rather than shitlisting a peer who failed too
+      failing idle peers, and rather than banlisting a peer who failed too
       much, drop the SSU session and allow a new attempt (which, if it fails,
-      will cause a shitlisting)
-    * Clarify the cause of the shitlist on the profiles page, and include
+      will cause a banlisting)
+    * Clarify the cause of the banlist on the profiles page, and include
       bandwidth limiter info at the bottom of the peers page.
 
 2005-10-26  jrandom
@@ -12256,7 +12259,7 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
 2005-10-25  jrandom
     * Defer netDb searches for newly referenced peers until we actually want
       them
-    * Ignore netDb references to peers on our shitlist
+    * Ignore netDb references to peers on our banlist
     * Set the timeout for end to end client messages to the max delay after
       finding the leaseSet, so we don't have as many expired messages floating
       around.
@@ -12471,7 +12474,7 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
       reseeding - useful on OSes that make it hard to create dot files.
       Thanks Complication (and anon)!
     * Fixed the installer version string (thanks Frontier!)
-    * Added cleaner rejection of invalid IP addresses, shitlist those who send
+    * Added cleaner rejection of invalid IP addresses, banlist those who send
       us invalid IP addresses, verify again that we are not sending invalid IP
       addresses, and log an error if it happens. (Thanks Complication, ptm,
       and adab!)
@@ -12499,7 +12502,7 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
       instead of k/cwin)
     * Limit the number of inbound SSU sessions being built at once (using
       half of the i2np.udp.maxConcurrentEstablish config prop)
-    * Don't shitlist on a message send failure alone (unless there aren't any
+    * Don't banlist on a message send failure alone (unless there aren't any
       common transports).
     * More careful bandwidth bursting
 
@@ -12636,7 +12639,7 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
 2005-09-13  jrandom
     * More careful error handling with introductions (thanks dust!)
     * Fix the forceIntroducers checkbox on config.jsp (thanks Complication!)
-    * Hide the shitlist on the summary so it doesn't confuse new users.
+    * Hide the banlist on the summary so it doesn't confuse new users.
 
 2005-09-12  comwiz
     * Migrated the router tests to junit
@@ -12743,8 +12746,8 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
 2005-08-24  jrandom
     * Catch errors with corrupt tunnel messages more gracefully (no need to
       kill the thread and cause an OOM...)
-    * Don't skip shitlisted peers for netDb store messages, as they aren't
-      necessarily shitlisted by other people (though they probably are).
+    * Don't skip banlisted peers for netDb store messages, as they aren't
+      necessarily banlisted by other people (though they probably are).
     * Adjust the netDb store per-peer timeout based on each particular peer's
       profile (timeout = 4x their average netDb store response time)
     * Don't republish leaseSets to *failed* peers - send them to peers who
@@ -12787,14 +12790,14 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
       netDb.
     * Don't overwrite the status with 'unknown' unless we haven't had a valid
       status in a while.
-    * Make sure to avoid shitlisted peers for peer testing.
+    * Make sure to avoid banlisted peers for peer testing.
     * When we get an unknown result to a peer test, try again soon afterwards.
     * When a peer tells us that our address is different from what we expect,
       if we've done a recent peer test with a result of OK, fire off a peer
       test to make sure our IP/port is still valid.  If our test is old or the
       result was not OK, accept their suggestion, but queue up a peer test for
       later.
-    * Don't try to do a netDb store to a shitlisted peer, and adjust the way
+    * Don't try to do a netDb store to a banlisted peer, and adjust the way
       we monitor netDb store progress (to clear up the high netDb.storePeers
       stat)
 
@@ -13426,7 +13429,7 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
     * Fix a fencepost in the tunnel building so that e.g. a variance of
       2 means +/- 2, not +/- 1 (thanks dm!)
     * Avoid an NPE on client disconnect
-    * Never select a shitlisted peer to participate in a tunnel
+    * Never select a banlisted peer to participate in a tunnel
     * Have netDb store messages timeout after 10s, not the full 60s (duh)
     * Keep session tags around for a little longer, just in case (grr)
     * Cleaned up some closing event issues on the streaming lib
@@ -14276,7 +14279,7 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
       (thanks Jonva!)
 
 2004-10-04  jrandom
-    * Update the shitlist to reject a peer for an exponentially increasing
+    * Update the banlist to reject a peer for an exponentially increasing
       period of time (with an upper bounds of an hour).
     * Various minor stat and debugging fixes
 
@@ -14290,7 +14293,7 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
       such as "dbResponseTime" or "tunnelTestResponseTime".
 
 2004-10-02  jrandom
-    * Assure that we quickly fail messages bound for shitlisted peers.
+    * Assure that we quickly fail messages bound for banlisted peers.
     * Address a race on startup where the first peer contacted could hang the
       router (thanks Romster!)
     * Only whine about an intermittent inability to query the time server once

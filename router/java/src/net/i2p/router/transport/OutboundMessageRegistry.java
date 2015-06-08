@@ -195,9 +195,9 @@ public class OutboundMessageRegistry {
      */
     private void registerPending(OutNetMessage msg, boolean allowEmpty) {
         if ( (!allowEmpty) && (msg.getMessage() == null) )
-                throw new IllegalArgumentException("OutNetMessage doesn't contain an I2NPMessage? wtf");
+                throw new IllegalArgumentException("OutNetMessage doesn't contain an I2NPMessage? Impossible?");
         MessageSelector sel = msg.getReplySelector();
-        if (sel == null) throw new IllegalArgumentException("No reply selector?  wtf");
+        if (sel == null) throw new IllegalArgumentException("No reply selector? Impossible?");
 
         if (!_activeMessages.add(msg))
             return; // dont add dups

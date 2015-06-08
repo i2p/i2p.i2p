@@ -173,7 +173,7 @@ class CapacityCalculator {
             case 30*60*1000: return .3;
             case 60*60*1000: return .2;
             case 24*60*60*1000: return .1;
-            default: throw new IllegalArgumentException("wtf, period [" + period + "]???");
+            default: throw new IllegalArgumentException("undefined period passed, period [" + period + "]???");
         }
     }
 }

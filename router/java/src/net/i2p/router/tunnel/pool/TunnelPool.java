@@ -749,7 +749,7 @@ public class TunnelPool {
             TunnelId inId = tunnel.getReceiveTunnelId(0);
             Hash gw = tunnel.getPeer(0);
             if ( (inId == null) || (gw == null) ) {
-                _log.error(toString() + ": wtf, tunnel has no inbound gateway/tunnelId? " + tunnel);
+                _log.error(toString() + ": broken? tunnel has no inbound gateway/tunnelId? " + tunnel);
                 continue;
             }
             Lease lease = new Lease();
