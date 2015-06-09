@@ -146,11 +146,28 @@ public interface UpdateManager {
     public String checkAvailable(UpdateType type, String id, long maxWait);
     
     /**
-     *  Is any download in progress?
-     *  Does not include checks.
+     *  Is a router update being downloaded?
+     *  @return true iff router update is being downloaded
+     *  @since 0.9.21
      */
     public boolean isUpdateInProgress();
     
+    /**
+     *  Is a router update being downloaded?
+     *  @param type the UpdateType of this request
+     *  @return true iff router update is being downloaded
+     *  @since 0.9.21
+     */
+    public boolean isUpdateInProgress(UpdateType type);
+    
+    /**
+     *  Is a router update being downloaded?
+     *  @param type the UpdateType of this request
+     *  @param id of this request
+     *  @return true iff router update is being downloaded
+     *  @since 0.9.21
+     */
+    public boolean isUpdateInProgress(UpdateType type, String id);
     /**
      *  Non-blocking. Does not check.
      *  Fails if check or update already in progress.
