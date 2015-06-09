@@ -183,7 +183,6 @@ public interface UpdateManager {
      *  Fails if check or update already in progress.
      *  If returns true, then call isUpdateInProgress() in a loop
      *  @param type the UpdateType of this request   
-     *  @param maxTime not honored by all Updaters
      *  @return true if task started
      *  @since 0.9.21
      */

@@ -281,8 +281,6 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
      *  Blocking.
      *  An available update may still have a constraint or lack sources.
      *  @param type the UpdateType of this request
-     *  @param id id of this request
-     *  @param maxWait max time to block
      *  @return new version or null if nothing newer is available
      *  @since 0.9.21
      */
