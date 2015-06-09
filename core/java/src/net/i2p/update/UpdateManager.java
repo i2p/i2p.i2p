@@ -146,6 +146,12 @@ public interface UpdateManager {
     public String checkAvailable(UpdateType type, String id, long maxWait);
     
     /**
+     *  Is any download in progress?
+     *  Does not include checks.
+     */
+    public boolean isUpdateInProgress();
+    
+    /**
      *  Non-blocking. Does not check.
      *  Fails if check or update already in progress.
      *  If returns true, then call isUpdateInProgress() in a loop
