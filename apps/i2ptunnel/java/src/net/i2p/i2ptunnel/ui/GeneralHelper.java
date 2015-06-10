@@ -439,12 +439,12 @@ public class GeneralHelper {
         }
         if (type == null) {
             // same default logic as in TunnelController.setConfig()
-            if ((!TunnelController.isClient(ttype) ||
-                ((TunnelController.TYPE_IRC_CLIENT.equals(ttype) ||
-                  TunnelController.TYPE_SOCKS_IRC.equals(ttype) ||
-                  TunnelController.TYPE_STREAMR_CLIENT.equals(ttype) ||
-                  TunnelController.TYPE_STD_CLIENT.equals(ttype)) &&
-                 !isShared)))
+            if (!TunnelController.isClient(ttype) ||
+                TunnelController.TYPE_IRC_CLIENT.equals(ttype) ||
+                TunnelController.TYPE_SOCKS_IRC.equals(ttype) ||
+                TunnelController.TYPE_STREAMR_CLIENT.equals(ttype) ||
+                TunnelController.TYPE_STD_CLIENT.equals(ttype) ||
+                (TunnelController.TYPE_HTTP_CLIENT.equals(ttype) && isShared))
                 type = TunnelController.PREFERRED_SIGTYPE;
             else
                 type = SigType.DSA_SHA1;
