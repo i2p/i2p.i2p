@@ -226,7 +226,7 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
      * @param destKeyStream stream containing the private key data,
      *                             format is specified in {@link net.i2p.data.PrivateKeyFile PrivateKeyFile}
      * @param options set of options to configure the router with, if null will use System properties
-     * @since 0.9.19
+     * @since 0.9.21
      */
     protected I2PSessionImpl(I2PSessionImpl primary, InputStream destKeyStream, Properties options) throws I2PSessionException {
         this(primary.getContext(), options, primary.getHandlerMap(), primary.getProducer(), true);
@@ -307,7 +307,7 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
      *  @param privateKeyStream null for transient, if non-null must have same encryption keys as primary session
      *                          and different signing keys
      *  @param opts subsession options if any, may be null
-     *  @since 0.9.19
+     *  @since 0.9.21
      */
     public I2PSession addSubsession(InputStream privateKeyStream, Properties opts) throws I2PSessionException {
         if (!_routerSupportsSubsessions)
@@ -335,7 +335,7 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
     }
     
     /**
-     *  @since 0.9.19
+     *  @since 0.9.21
      */
     public void removeSubsession(I2PSession session) {
         if (!(session instanceof SubSession))
@@ -355,7 +355,7 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
     
     /**
      *  @return a list of subsessions, non-null, does not include the primary session
-     *  @since 0.9.19
+     *  @since 0.9.21
      */
     public List<I2PSession> getSubsessions() {
         synchronized(_subsessionLock) {
@@ -985,13 +985,13 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
 
     /**
      *  For Subsessions
-     *  @since 0.9.19
+     *  @since 0.9.21
      */
     I2PClientMessageHandlerMap getHandlerMap() { return _handlerMap; }
 
     /**
      *  For Subsessions
-     *  @since 0.9.19
+     *  @since 0.9.21
      */
     I2PAppContext getContext() { return _context; }
 

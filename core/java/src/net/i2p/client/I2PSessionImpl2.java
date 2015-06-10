@@ -102,7 +102,7 @@ class I2PSessionImpl2 extends I2PSessionImpl {
      * @param destKeyStream stream containing the private key data,
      *                             format is specified in {@link net.i2p.data.PrivateKeyFile PrivateKeyFile}
      * @param options set of options to configure the router with, if null will use System properties
-     * @since 0.9.19
+     * @since 0.9.21
      */
     protected I2PSessionImpl2(I2PSessionImpl primary, InputStream destKeyStream, Properties options) throws I2PSessionException {
         super(primary, destKeyStream, options);

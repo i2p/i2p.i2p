@@ -42,18 +42,18 @@ public interface I2PSocketManager {
      *  @param privateKeyStream null for transient, if non-null must have same encryption keys as primary session
      *                          and different signing keys
      *  @param opts subsession options if any, may be null
-     *  @since 0.9.19
+     *  @since 0.9.21
      */
     public I2PSession addSubsession(InputStream privateKeyStream, Properties opts) throws I2PSessionException;
     
     /**
-     *  @since 0.9.19
+     *  @since 0.9.21
      */
     public void removeSubsession(I2PSession session);
     
     /**
      *  @return a list of subsessions, non-null, does not include the primary session
-     *  @since 0.9.19
+     *  @since 0.9.21
      */
     public List<I2PSession> getSubsessions();
 

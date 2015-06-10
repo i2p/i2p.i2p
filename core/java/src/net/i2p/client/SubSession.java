@@ -43,7 +43,7 @@ import net.i2p.util.I2PAppThread;
  *  While the I2CP protocol, in theory, allows for fully independent sessions
  *  over the same I2CP connection, this is not currently supported by the router.
  *
- *  @since 0.9.19
+ *  @since 0.9.21
  */
 class SubSession extends I2PSessionMuxedImpl {
     private final I2PSessionMuxedImpl _primary;
@@ -64,7 +64,6 @@ class SubSession extends I2PSessionMuxedImpl {
     /**
      *  Unsupported in a subsession.
      *  @throws UnsupportedOperationException always
-     *  @since 0.9.19
      */
     @Override
     public I2PSession addSubsession(InputStream destKeyStream, Properties opts) throws I2PSessionException {
@@ -74,7 +73,6 @@ class SubSession extends I2PSessionMuxedImpl {
     /**
      *  Unsupported in a subsession.
      *  Does nothing.
-     *  @since 0.9.19
      */
     @Override
     public void removeSubsession(I2PSession session) {}
@@ -82,7 +80,6 @@ class SubSession extends I2PSessionMuxedImpl {
     /**
      *  Unsupported in a subsession.
      *  @return empty list always
-     *  @since 0.9.19
      */
     @Override
     public List<I2PSession> getSubsessions() {

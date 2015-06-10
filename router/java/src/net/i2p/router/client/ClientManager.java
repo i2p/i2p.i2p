@@ -242,7 +242,7 @@ class ClientManager {
     /**
      *  Remove only the following session. Does not remove the runner if it has more.
      *
-     *  @since 0.9.19
+     *  @since 0.9.21
      */
     public void unregisterSession(SessionId id, Destination dest) {
         if (_log.shouldLog(Log.WARN))

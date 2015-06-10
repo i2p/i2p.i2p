@@ -115,7 +115,7 @@ class ClientConnectionRunner {
 
     /**
      *  For multisession
-     *  @since 0.9.19
+     *  @since 0.9.21
      */
     private static class SessionParams {
         final Destination dest;
@@ -213,7 +213,7 @@ class ClientConnectionRunner {
      *  Current client's config,
      *  will be null if session not found
      *  IS subsession aware.
-     *  @since 0.9.19 added hash param
+     *  @since 0.9.21 added hash param
      */
     public SessionConfig getConfig(Hash h) {
         SessionParams sp  = _sessions.get(h);
@@ -226,7 +226,7 @@ class ClientConnectionRunner {
      *  Current client's config,
      *  will be null if session not found
      *  IS subsession aware.
-     *  @since 0.9.19 added id param
+     *  @since 0.9.21 added id param
      */
     public SessionConfig getConfig(SessionId id) {
         for (SessionParams sp : _sessions.values()) {
@@ -239,7 +239,7 @@ class ClientConnectionRunner {
     /**
      *  Primary client's config,
      *  will be null if session not set up
-     *  @since 0.9.19
+     *  @since 0.9.21
      */
     public SessionConfig getPrimaryConfig() {
         for (SessionParams sp : _sessions.values()) {
@@ -273,7 +273,7 @@ class ClientConnectionRunner {
      *  Currently allocated leaseSet.
      *  IS subsession aware. Returns primary leaseset only.
      *  @return leaseSet or null if not yet set or unknown hash
-     *  @since 0.9.19 added hash parameter
+     *  @since 0.9.21 added hash parameter
      */
     public LeaseSet getLeaseSet(Hash h) {
         SessionParams sp = _sessions.get(h);
@@ -312,7 +312,7 @@ class ClientConnectionRunner {
     /**
      *  Return the hash for the given ID
      *  @return hash or null if unknown
-     *  @since 0.9.19
+     *  @since 0.9.21
      */
     public Hash getDestHash(SessionId id) {
         for (Map.Entry<Hash, SessionParams> e : _sessions.entrySet()) {
@@ -325,7 +325,7 @@ class ClientConnectionRunner {
     /**
      *  Return the dest for the given ID
      *  @return dest or null if unknown
-     *  @since 0.9.19
+     *  @since 0.9.21
      */
     public Destination getDestination(SessionId id) {
         for (SessionParams sp : _sessions.values()) {
@@ -340,7 +340,7 @@ class ClientConnectionRunner {
      *
      *  @param h the local target
      *  @return current client's sessionId or null if not yet set or not a valid hash
-     *  @since 0.9.19
+     *  @since 0.9.21
      */
     SessionId getSessionId(Hash h) {
         SessionParams sp = _sessions.get(h);
@@ -353,7 +353,7 @@ class ClientConnectionRunner {
      *  Subsession aware.
      *
      *  @return all current client's sessionIds, non-null
-     *  @since 0.9.19
+     *  @since 0.9.21
      */
     List<SessionId> getSessionIds() {
         List<SessionId> rv = new ArrayList<SessionId>(_sessions.size());
@@ -369,7 +369,7 @@ class ClientConnectionRunner {
      *  Subsession aware.
      *
      *  @return all current client's destinations, non-null
-     *  @since 0.9.19
+     *  @since 0.9.21
      */
     List<Destination> getDestinations() {
         List<Destination> rv = new ArrayList<Destination>(_sessions.size());
@@ -384,7 +384,7 @@ class ClientConnectionRunner {
      *
      *  @param hash for the session
      *  @throws IllegalStateException if already set
-     *  @since 0.9.19 added hash param
+     *  @since 0.9.21 added hash param
      */
     void setSessionId(Hash hash, SessionId id) {
         if (hash == null)
@@ -398,7 +398,7 @@ class ClientConnectionRunner {
     /**
      *  Kill the session. Caller must kill runner if none left.
      *
-     *  @since 0.9.19
+     *  @since 0.9.21
      */
     void removeSession(SessionId id) {
         boolean isPrimary = false;
@@ -430,7 +430,7 @@ class ClientConnectionRunner {
     /**
      *  Data for the current leaseRequest, or null if there is no active leaseSet request.
      *  Not subsession aware. Returns primary ID only.
-     *  @since 0.9.19 added hash param
+     *  @since 0.9.21 added hash param
      */
     LeaseRequestState getLeaseRequest(Hash h) {
         SessionParams sp = _sessions.get(h);
@@ -720,7 +720,7 @@ class ClientConnectionRunner {
      *
      * @param toHash non-null
      * @param fromDest generally null when from remote, non-null if from local
-     * @since 0.9.20
+     * @since 0.9.21
      */ 
     void receiveMessage(Hash toHash, Destination fromDest, Payload payload) {
         SessionParams sp = _sessions.get(toHash);

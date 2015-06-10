@@ -225,7 +225,7 @@ class RequestLeaseSetMessageHandler extends HandlerImpl {
 
         /**
          *  Existing crypto key, new signing key
-         *  @since 0.9.20
+         *  @since 0.9.21
          */
         public LeaseInfo(PrivateKey privKey, Destination dest) {
             SimpleDataStructure signKeys[];
