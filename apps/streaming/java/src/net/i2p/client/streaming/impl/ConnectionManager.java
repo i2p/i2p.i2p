@@ -214,7 +214,8 @@ class ConnectionManager {
         ConnectionOptions opts = new ConnectionOptions(_defaultOptions);
         opts.setPort(synPacket.getRemotePort());
         opts.setLocalPort(synPacket.getLocalPort());
-        Connection con = new Connection(_context, this, _schedulerChooser, _timer, _outboundQueue, _conPacketHandler, opts, true);
+        Connection con = new Connection(_context, this, synPacket.getSession(), _schedulerChooser,
+                                        _timer, _outboundQueue, _conPacketHandler, opts, true);
         _tcbShare.updateOptsFromShare(con);
         boolean reject = false;
         int active = 0;
@@ -393,9 +394,10 @@ class ConnectionManager {
      *
      * @param peer Destination to contact
      * @param opts Connection's options
+     * @param session generally the session from the constructor, but could be a subsession
      * @return new connection, or null if we have exceeded our limit
      */
-    public Connection connect(Destination peer, ConnectionOptions opts) {
+    public Connection connect(Destination peer, ConnectionOptions opts, I2PSession session) {
         Connection con = null;
         long expiration = _context.clock().now();
         long tmout = opts.getConnectTimeout();
@@ -429,7 +431,7 @@ class ConnectionManager {
                     // try { _connectionLock.wait(remaining); } catch (InterruptedException ie) {}
                     try { Thread.sleep(remaining/4); } catch (InterruptedException ie) {}
                 } else { 
-                    con = new Connection(_context, this, _schedulerChooser, _timer,
+                    con = new Connection(_context, this, session, _schedulerChooser, _timer,
                                          _outboundQueue, _conPacketHandler, opts, false);
                     con.setRemotePeer(peer);
                     assignReceiveStreamId(con);
@@ -591,7 +593,12 @@ class ConnectionManager {
 
     public MessageHandler getMessageHandler() { return _messageHandler; }
     public PacketHandler getPacketHandler() { return _packetHandler; }
+
+    /**
+     * This is the primary session only
+     */
     public I2PSession getSession() { return _session; }
+
     public void updateOptsFromShare(Connection con) { _tcbShare.updateOptsFromShare(con); }
     public void updateShareOpts(Connection con) { _tcbShare.updateShareOpts(con); }
     // Both of these methods are 

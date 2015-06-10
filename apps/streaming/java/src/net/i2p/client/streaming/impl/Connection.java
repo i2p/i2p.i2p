@@ -28,6 +28,7 @@ class Connection {
     private final I2PAppContext _context;
     private final Log _log;
     private final ConnectionManager _connectionManager;
+    private final I2PSession _session;
     private Destination _remotePeer;
     private final AtomicLong _sendStreamId = new AtomicLong();
     private final AtomicLong _receiveStreamId = new AtomicLong();
@@ -112,12 +113,14 @@ class Connection {
     /**
      *  @param opts may be null
      */
-    public Connection(I2PAppContext ctx, ConnectionManager manager, SchedulerChooser chooser,
+    public Connection(I2PAppContext ctx, ConnectionManager manager,
+                      I2PSession session, SchedulerChooser chooser,
                       SimpleTimer2 timer,
                       PacketQueue queue, ConnectionPacketHandler handler, ConnectionOptions opts,
                       boolean isInbound) {
         _context = ctx;
         _connectionManager = manager;
+        _session = session;
         _chooser = chooser;
         _outboundQueue = queue;
         _handler = handler;
@@ -877,7 +880,7 @@ class Connection {
     /** @since 0.9.21 */
     public ConnectionManager getConnectionManager() { return _connectionManager; }
 
-    public I2PSession getSession() { return _connectionManager.getSession(); }
+    public I2PSession getSession() { return _session; }
     public I2PSocketFull getSocket() { return _socket; }
     public void setSocket(I2PSocketFull socket) { _socket = socket; }
     
