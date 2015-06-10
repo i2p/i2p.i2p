@@ -28,7 +28,6 @@ import net.i2p.util.SimpleTimer2;
 class PacketQueue implements SendMessageStatusListener {
     private final I2PAppContext _context;
     private final Log _log;
-    private final I2PSession _session;
     private final ByteCache _cache = ByteCache.getInstance(64, 36*1024);
     private final Map<Long, Connection> _messageStatusMap;
     private volatile boolean _dead;
@@ -45,9 +44,8 @@ class PacketQueue implements SendMessageStatusListener {
     private static final long REMOVE_EXPIRED_TIME = 67*1000;
     private static final boolean ENABLE_STATUS_LISTEN = true;
 
-    public PacketQueue(I2PAppContext context, I2PSession session) {
+    public PacketQueue(I2PAppContext context) {
         _context = context;
-        _session = session;
         _log = context.logManager().getLog(PacketQueue.class);
         _messageStatusMap = new ConcurrentHashMap<Long, Connection>(16);
         new RemoveExpired();
@@ -153,14 +151,15 @@ class PacketQueue implements SendMessageStatusListener {
                     options.setTagThreshold(thresh);
                 }
             }
+            I2PSession session = packet.getSession();
             if (listenForStatus) {
-                long id = _session.sendMessage(packet.getTo(), buf, 0, size,
+                long id = session.sendMessage(packet.getTo(), buf, 0, size,
                                  I2PSession.PROTO_STREAMING, packet.getLocalPort(), packet.getRemotePort(),
                                  options, this);
                 _messageStatusMap.put(Long.valueOf(id), packet.getConnection());
                 sent = true;
             } else {
-                sent = _session.sendMessage(packet.getTo(), buf, 0, size,
+                sent = session.sendMessage(packet.getTo(), buf, 0, size,
                                  I2PSession.PROTO_STREAMING, packet.getLocalPort(), packet.getRemotePort(),
                                  options);
             }
