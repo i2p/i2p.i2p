@@ -152,13 +152,13 @@ public interface TunnelManagerFacade extends Service {
      *  Must have same encryption key an a different signing key.
      *  @throws IllegalArgumentException if not
      *  @return success
-     *  @since 0.9.19
+     *  @since 0.9.21
      */
     public boolean addAlias(Destination dest, ClientTunnelSettings settings, Destination existingClient);
 
     /**
      *  Remove another destination to the same tunnels.
-     *  @since 0.9.19
+     *  @since 0.9.21
      */
     public void removeAlias(Destination dest);
     
