@@ -73,7 +73,7 @@ public interface I2CPMessage extends DataStructure {
      * some return a long, so we define a new method here.
      *
      * @return SessionId or null if this message type does not include a SessionId
-     * @since 0.9.19
+     * @since 0.9.21
      */
     public SessionId sessionId();
 }

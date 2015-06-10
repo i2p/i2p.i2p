@@ -135,7 +135,7 @@ public abstract class I2CPMessageImpl extends DataStructureImpl implements I2CPM
      * some return a long, so we define a new method here.
      *
      * @return null always. Extending classes with a SessionId must override.
-     * @since 0.9.19
+     * @since 0.9.21
      */
     public SessionId sessionId() { return null; }
 }

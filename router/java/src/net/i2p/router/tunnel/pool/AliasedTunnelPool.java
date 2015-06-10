@@ -15,7 +15,7 @@ import net.i2p.util.Log;
  *  A tunnel pool with its own settings and Destination,
  *  but uses another pool for its tunnels.
  *
- *  @since 0.9.20
+ *  @since 0.9.21
  */
 public class AliasedTunnelPool extends TunnelPool {
     

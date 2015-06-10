@@ -218,7 +218,7 @@ public class TunnelPoolSettings {
     /**
      *  Other destinations that use the same tunnel (or null if exploratory)
      *  Modifiable, concurrent, not a copy
-     *  @since 0.9.19
+     *  @since 0.9.21
      */
     public Set<Hash> getAliases() {
         return _aliases;
@@ -227,7 +227,7 @@ public class TunnelPoolSettings {
     /**
      *  Other destination that this is an alias of (or null).
      *  If non-null, don't build tunnels.
-     *  @since 0.9.19
+     *  @since 0.9.21
      */
     public Hash getAliasOf() {
         return _aliasOf;
@@ -237,7 +237,7 @@ public class TunnelPoolSettings {
     /**
      *  Set other destination that this is an alias of (or null).
      *  If non-null, don't build tunnels.
-     *  @since 0.9.19
+     *  @since 0.9.21
      */
     public void setAliasOf(Hash h) {
         _aliasOf = h;

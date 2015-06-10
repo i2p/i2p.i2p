@@ -441,7 +441,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
      *  Must have same encryption key an a different signing key.
      *  @throws IllegalArgumentException if not
      *  @return success
-     *  @since 0.9.19
+     *  @since 0.9.21
      */
     public boolean addAlias(Destination dest, ClientTunnelSettings settings, Destination existingClient) {
         if (dest.getSigningPublicKey().equals(existingClient.getSigningPublicKey()))
@@ -485,7 +485,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
 
     /**
      *  Remove a destination for the same tunnels as another.
-     *  @since 0.9.19
+     *  @since 0.9.21
      */
     public void removeAlias(Destination dest) {
         Hash h = dest.calculateHash();

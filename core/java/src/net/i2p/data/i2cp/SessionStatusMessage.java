@@ -45,7 +45,7 @@ public class SessionStatusMessage extends I2CPMessageImpl {
     /**
      * Return the SessionId for this message.
      *
-     * @since 0.9.19
+     * @since 0.9.21
      */
     @Override
     public SessionId sessionId() {
