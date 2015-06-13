@@ -52,8 +52,9 @@ abstract class CPUIDCPUInfo implements CPUInfo
      */
     public boolean hasAVX()
     {
-        return (CPUID.getECXCPUFlags() & (1 << 28)) != 0 && //AVX: ECX Bit 28
-               (CPUID.getECXCPUFlags() & (1 << 27)) != 0;   //XSAVE enabled by OS: ECX Bit 27
+        int ecx = CPUID.getECXCPUFlags();
+        return (ecx & (1 << 28)) != 0 && //AVX: ECX Bit 28
+               (ecx & (1 << 27)) != 0;   //XSAVE enabled by OS: ECX Bit 27
     }
 
     /**
