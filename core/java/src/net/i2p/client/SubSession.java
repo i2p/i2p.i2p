@@ -1,14 +1,5 @@
 package net.i2p.client;
 
-/*
- * free (adj.): unencumbered; not under the control of others
- * Written by jrandom in 2003 and released into the public domain 
- * with no warranty of any kind, either expressed or implied.  
- * It probably won't  make your computer catch on fire, or eat 
- * your children, but it might.  Use at your own risk.
- *
- */
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -126,7 +117,6 @@ class SubSession extends I2PSessionMuxedImpl {
      */
     @Override
     public boolean isClosed() {
-        // FIXME
         return super.isClosed() || _primary.isClosed();
     }
 
@@ -293,8 +283,8 @@ class SubSession extends I2PSessionMuxedImpl {
     }
 
     /**
-     *  This may not work???????????, as the reply does not contain a session ID, so
-     *  it won't be routed back to us?
+     *  This won't be called, as the reply does not contain a session ID, so
+     *  it won't be routed back to us
      */
     @Override
     public int[] bandwidthLimits() throws I2PSessionException {

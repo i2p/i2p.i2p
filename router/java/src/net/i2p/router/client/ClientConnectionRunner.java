@@ -53,7 +53,7 @@ import net.i2p.util.SimpleTimer;
 /**
  * Bridge the router and the client - managing state for a client.
  *
- * As of release 0.9.19, multiple sessions are supported on a single
+ * As of release 0.9.21, multiple sessions are supported on a single
  * I2CP connection. These sessions share tunnels and some configuration.
  *
  * @author jrandom

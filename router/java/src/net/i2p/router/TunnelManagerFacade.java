@@ -149,7 +149,7 @@ public interface TunnelManagerFacade extends Service {
 
     /**
      *  Add another destination to the same tunnels.
-     *  Must have same encryption key an a different signing key.
+     *  Must have same encryption key and a different signing key.
      *  @throws IllegalArgumentException if not
      *  @return success
      *  @since 0.9.21

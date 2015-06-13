@@ -882,7 +882,7 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
      * a subsession:
      *     BandwidthLimitsMessage, DestReplyMessage
      *
-     * The following types may not ontain a valid session ID
+     * The following types may not contain a valid session ID
      * even when intended for a subsession, so we must take special care:
      *     SessionStatusMessage
      *
