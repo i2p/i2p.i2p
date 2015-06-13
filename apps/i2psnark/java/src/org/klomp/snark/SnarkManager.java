@@ -1738,7 +1738,7 @@ public class SnarkManager implements CompleteListener {
         int totalDeleted = 0;
         synchronized (_snarks) {
             for (Snark snark : _snarks.values()) {
-                torrents.add(new SHA1Hash(snark.getMetaInfo().getInfoHash()));
+                torrents.add(new SHA1Hash(snark.getInfoHash()));
             }
             synchronized (_configLock) {
                 for (int i = 0; i < B64.length(); i++) {
