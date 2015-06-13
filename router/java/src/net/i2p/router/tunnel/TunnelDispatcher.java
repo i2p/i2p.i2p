@@ -211,7 +211,8 @@ public class TunnelDispatcher implements Service {
         ctx.statManager().createRequiredRateStat("tunnel.corruptMessage", "Corrupt messages received", 
                                               "Tunnels", RATES);
         // following are for InboundMessageDistributor
-        ctx.statManager().createRateStat("tunnel.dropDangerousClientTunnelMessage", "How many tunnel messages come down a client tunnel that we shouldn't expect (lifetime is the 'I2NP type')", "Tunnels", new long[] { 60*60*1000 });
+        ctx.statManager().createRateStat("tunnel.dropDangerousClientTunnelMessage", "(lifetime is the I2NP type)", "Tunnels", new long[] { 60*60*1000 });
+        ctx.statManager().createRateStat("tunnel.dropDangerousExplTunnelMessage", "(lifetime is the I2NP type)", "Tunnels", new long[] { 60*60*1000 });
         ctx.statManager().createRateStat("tunnel.handleLoadClove", "When do we receive load test cloves", "Tunnels", new long[] { 60*60*1000 });
         // following is for PumpedTunnelGateway
         ctx.statManager().createRateStat("tunnel.dropGatewayOverflow", "Dropped message at GW, queue full", "Tunnels", new long[] { 60*60*1000 });

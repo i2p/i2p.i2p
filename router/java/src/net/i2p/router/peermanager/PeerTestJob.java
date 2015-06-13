@@ -24,7 +24,8 @@ import net.i2p.util.Log;
  * selection to the peer manager and tests the peer by sending it a useless
  * database store message
  *
- * TODO - What's the point? Disable this? See also notes in PeerManager.selectPeers()
+ * TODO - What's the point? Disable this? See also notes in PeerManager.selectPeers().
+ * TODO - Use something besides sending the peer's RI to itself?
  */
 public class PeerTestJob extends JobImpl {
     private final Log _log;
@@ -82,6 +83,7 @@ public class PeerTestJob extends JobImpl {
     
     /**
      * Retrieve a group of 0 or more peers that we want to test. 
+     * Returned list will not include ourselves.
      *
      * @return set of RouterInfo structures
      */
@@ -110,7 +112,8 @@ public class PeerTestJob extends JobImpl {
     
     /**
      * Fire off the necessary jobs and messages to test the given peer
-     *
+     * The message is a store of the peer's RI to itself,
+     * with a reply token.
      */
     private void testPeer(RouterInfo peer) {
         TunnelInfo inTunnel = getInboundTunnelId(); 
@@ -130,7 +133,7 @@ public class PeerTestJob extends JobImpl {
         int timeoutMs = getTestTimeout();
         long expiration = getContext().clock().now() + timeoutMs;
 
-        long nonce = getContext().random().nextLong(I2NPMessage.MAX_ID_VALUE);
+        long nonce = 1 + getContext().random().nextLong(I2NPMessage.MAX_ID_VALUE - 1);
         DatabaseStoreMessage msg = buildMessage(peer, inTunnelId, inGateway.getIdentity().getHash(), nonce, expiration);
 	
         TunnelInfo outTunnel = getOutboundTunnelId();
@@ -172,7 +175,9 @@ public class PeerTestJob extends JobImpl {
     }
 
     /**
-     * Build a message to test the peer with 
+     * Build a message to test the peer with.
+     * The message is a store of the peer's RI to itself,
+     * with a reply token.
      */
     private DatabaseStoreMessage buildMessage(RouterInfo peer, TunnelId replyTunnel, Hash replyGateway, long nonce, long expiration) {
         DatabaseStoreMessage msg = new DatabaseStoreMessage(getContext());

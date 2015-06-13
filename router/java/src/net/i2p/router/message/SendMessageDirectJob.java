@@ -43,15 +43,33 @@ public class SendMessageDirectJob extends JobImpl {
     private boolean _sent;
     private long _searchOn;
     
+    /**
+     * @param toPeer may be ourselves
+     */
     public SendMessageDirectJob(RouterContext ctx, I2NPMessage message, Hash toPeer, int timeoutMs, int priority) {
         this(ctx, message, toPeer, null, null, null, null, timeoutMs, priority);
     }
 
-    public SendMessageDirectJob(RouterContext ctx, I2NPMessage message, Hash toPeer, ReplyJob onSuccess, Job onFail, MessageSelector selector, int timeoutMs, int priority) {
+    /**
+     * @param toPeer may be ourselves
+     * @param onSuccess may be null
+     * @param onFail may be null
+     * @param selector be null
+     */
+    public SendMessageDirectJob(RouterContext ctx, I2NPMessage message, Hash toPeer, ReplyJob onSuccess,
+                                Job onFail, MessageSelector selector, int timeoutMs, int priority) {
         this(ctx, message, toPeer, null, onSuccess, onFail, selector, timeoutMs, priority);
     }
 
-    public SendMessageDirectJob(RouterContext ctx, I2NPMessage message, Hash toPeer, Job onSend, ReplyJob onSuccess, Job onFail, MessageSelector selector, int timeoutMs, int priority) {
+    /**
+     * @param toPeer may be ourselves
+     * @param onSend may be null
+     * @param onSuccess may be null
+     * @param onFail may be null
+     * @param selector be null
+     */
+    public SendMessageDirectJob(RouterContext ctx, I2NPMessage message, Hash toPeer, Job onSend, ReplyJob onSuccess,
+                                Job onFail, MessageSelector selector, int timeoutMs, int priority) {
         super(ctx);
         _log = getContext().logManager().getLog(SendMessageDirectJob.class);
         _message = message;

@@ -117,8 +117,8 @@ class InboundMessageDistributor implements GarlicMessageReceiver.CloveReceiver {
                         }
                         return;
                     } else if (dsm.getReplyToken() != 0) {
-                        if (_log.shouldLog(Log.WARN))
-                            _log.warn("Dropping LS DSM w/ reply token down a tunnel for " + _client + ": " + msg);
+                        _context.statManager().addRateData("tunnel.dropDangerousClientTunnelMessage", 1, type);
+                        _log.error("Dropping LS DSM w/ reply token down a tunnel for " + _client + ": " + msg);
                         return;
                     } else {
                         // allow DSM of our own key (used by FloodfillVerifyStoreJob)
@@ -142,6 +142,33 @@ class InboundMessageDistributor implements GarlicMessageReceiver.CloveReceiver {
                     _log.error("Dropped dangerous message down a tunnel for " + _client + ": " + msg, new Exception("cause"));
                     return;
 
+            } // switch
+        } else {
+            // expl. tunnel
+            switch (type) {
+                case DatabaseStoreMessage.MESSAGE_TYPE:
+                    DatabaseStoreMessage dsm = (DatabaseStoreMessage) msg;
+                    if (dsm.getReplyToken() != 0) {
+                        _context.statManager().addRateData("tunnel.dropDangerousExplTunnelMessage", 1, type);
+                        _log.error("Dropping DSM w/ reply token down a expl. tunnel: " + msg);
+                        return;
+                    }
+                    if (dsm.getEntry().getType() == DatabaseEntry.KEY_TYPE_LEASESET)
+                        ((LeaseSet)dsm.getEntry()).setReceivedAsReply();
+                    break;
+
+                case DatabaseSearchReplyMessage.MESSAGE_TYPE:
+                case DeliveryStatusMessage.MESSAGE_TYPE:
+                case GarlicMessage.MESSAGE_TYPE:
+                case TunnelBuildReplyMessage.MESSAGE_TYPE:
+                case VariableTunnelBuildReplyMessage.MESSAGE_TYPE:
+                    // these are safe, handled below
+                    break;
+
+                default:
+                    _context.statManager().addRateData("tunnel.dropDangerousExplTunnelMessage", 1, type);
+                    _log.error("Dropped dangerous message down expl tunnel: " + msg, new Exception("cause"));
+                    return;
             } // switch
         } // client != null
 

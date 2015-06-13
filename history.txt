@@ -1,3 +1,12 @@
+2015-06-13 zzz
+ * i2psnark: Fix NPE (ticket #1602)
+ * NetDB:
+   - Improve routing of DatabaseStoreMessage acks
+   - Send our own RI unsolicited in reply if we aren't floodfill
+   - Don't ack or flood a store of an unknown type
+ * PeerTestJob: Don't generate zero reply token
+ * Tunnels: More checks of messages received down exploratory tunnels
+
 2015-06-08 dg
  * Language fixes
  * Make netDb.storeFloodNew graphable for testing (#1195)
@@ -5,6 +14,15 @@
    to speed up integration of new floodfills (#1195)
  * Silence Irc{Inbound,Outbound}Filter warnings about 'no streams'
    when we can't connect to an IRC server. Change to WARN.
+
+2015-06-07 zzz
+ * Logs: Correct wrapper.config location when running as a service
+ * NetDB: Fix early NPE
+ * SSU: Possible fix for NPE in establisher
+
+2015-06-06 zzz
+ * Console: Add indication of current ff status on /configadvanced,
+   change immediately when config changes, force republish
 
 2015-06-06 str4d
  * newsxml: Don't use XXX for parsing dates on Android

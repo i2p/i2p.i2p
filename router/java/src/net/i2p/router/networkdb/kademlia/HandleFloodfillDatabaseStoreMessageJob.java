@@ -14,14 +14,19 @@ import java.util.Date;
 import net.i2p.data.DatabaseEntry;
 import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
+import net.i2p.data.TunnelId;
 import net.i2p.data.router.RouterAddress;
 import net.i2p.data.router.RouterIdentity;
 import net.i2p.data.router.RouterInfo;
 import net.i2p.data.i2np.DatabaseStoreMessage;
 import net.i2p.data.i2np.DeliveryStatusMessage;
+import net.i2p.data.i2np.TunnelGatewayMessage;
+import net.i2p.router.Job;
 import net.i2p.router.JobImpl;
+import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelInfo;
+import net.i2p.router.message.SendMessageDirectJob;
 import net.i2p.util.Log;
 
 /**
@@ -34,8 +39,15 @@ public class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
     private final RouterIdentity _from;
     private Hash _fromHash;
     private final FloodfillNetworkDatabaseFacade _facade;
+    private final static int REPLY_TIMEOUT = 60*1000;
+    private final static int MESSAGE_PRIORITY = OutNetMessage.PRIORITY_NETDB_REPLY;
 
-    public HandleFloodfillDatabaseStoreMessageJob(RouterContext ctx, DatabaseStoreMessage receivedMessage, RouterIdentity from, Hash fromHash, FloodfillNetworkDatabaseFacade facade) {
+    /**
+     * @param receivedMessage must never have reply token set if it came down a tunnel
+     */
+    public HandleFloodfillDatabaseStoreMessageJob(RouterContext ctx, DatabaseStoreMessage receivedMessage,
+                                                  RouterIdentity from, Hash fromHash,
+                                                  FloodfillNetworkDatabaseFacade facade) {
         super(ctx);
         _log = ctx.logManager().getLog(getClass());
         _message = receivedMessage;
@@ -136,6 +148,7 @@ public class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                 // somebody has our keys... 
                 if (getContext().routerHash().equals(key)) {
                     //getContext().statManager().addRateData("netDb.storeLocalRouterInfoAttempt", 1, 0);
+                    // This is initiated by PeerTestJob from another peer
                     // throw rather than return, so that we send the ack below (prevent easy attack)
                     dontBlamePeer = true;
                     throw new IllegalArgumentException("Peer attempted to store our RouterInfo");
@@ -170,15 +183,18 @@ public class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Invalid DatabaseStoreMessage data type - " + entry.getType() 
                            + ": " + _message);
+            // don't ack or flood
+            return;
         }
         
         long recvEnd = System.currentTimeMillis();
         getContext().statManager().addRateData("netDb.storeRecvTime", recvEnd-recvBegin);
         
-        // ack even if invalid or unsupported
+        // ack even if invalid
+        // in particular, ack our own RI (from PeerTestJob)
         // TODO any cases where we shouldn't?
         if (_message.getReplyToken() > 0)
-            sendAck();
+            sendAck(key);
         long ackEnd = System.currentTimeMillis();
         
         if (_from != null)
@@ -223,7 +239,7 @@ public class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
         }
     }
     
-    private void sendAck() {
+    private void sendAck(Hash storedKey) {
         DeliveryStatusMessage msg = new DeliveryStatusMessage(getContext());
         msg.setMessageId(_message.getReplyToken());
         // Randomize for a little protection against clock-skew fingerprinting.
@@ -231,31 +247,62 @@ public class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
         // TODO just set to 0?
         // TODO we have no session to garlic wrap this with, needs new message
         msg.setArrival(getContext().clock().now() - getContext().random().nextInt(3*1000));
-        /*
-        if (FloodfillNetworkDatabaseFacade.floodfillEnabled(getContext())) {
-            // no need to do anything but send it where they ask
+        // may be null
+        TunnelId replyTunnel = _message.getReplyTunnel();
+        // A store of our own RI, only if we are not FF
+        DatabaseStoreMessage msg2;
+        if (getContext().netDb().floodfillEnabled() ||
+            storedKey.equals(getContext().routerHash())) {
+            // don't send our RI if the store was our RI (from PeerTestJob)
+            msg2 = null;
+        } else {
+            // we aren't ff, send a go-away message
+            msg2 = new DatabaseStoreMessage(getContext());
+            RouterInfo me = getContext().router().getRouterInfo();
+            msg2.setEntry(me);
+            if (_log.shouldWarn())
+                _log.warn("Got a store w/ reply token, but we aren't ff: from: " + _from +
+                          " fromHash: " + _fromHash + " msg: " + _message, new Exception());
+        }
+        Hash toPeer = _message.getReplyGateway();
+        boolean toUs = getContext().routerHash().equals(toPeer);
+        // to reduce connection congestion, send directly if connected already,
+        // else through an exploratory tunnel.
+        if (toUs && replyTunnel != null) {
+            // if we are the gateway, act as if we received it
             TunnelGatewayMessage tgm = new TunnelGatewayMessage(getContext());
             tgm.setMessage(msg);
-            tgm.setTunnelId(_message.getReplyTunnel());
+            tgm.setTunnelId(replyTunnel);
             tgm.setMessageExpiration(msg.getMessageExpiration());
-            
-            getContext().jobQueue().addJob(new SendMessageDirectJob(getContext(), tgm, _message.getReplyGateway(), 10*1000, 200));
+            getContext().tunnelDispatcher().dispatch(tgm);
+            if (msg2 != null) {
+                TunnelGatewayMessage tgm2 = new TunnelGatewayMessage(getContext());
+                tgm2.setMessage(msg2);
+                tgm2.setTunnelId(replyTunnel);
+                tgm2.setMessageExpiration(msg.getMessageExpiration());
+                getContext().tunnelDispatcher().dispatch(tgm2);
+            }
+        } else if (toUs || getContext().commSystem().isEstablished(toPeer)) {
+            Job send = new SendMessageDirectJob(getContext(), msg, toPeer, REPLY_TIMEOUT, MESSAGE_PRIORITY);
+            send.runJob();
+            if (msg2 != null) {
+                Job send2 = new SendMessageDirectJob(getContext(), msg2, toPeer, REPLY_TIMEOUT, MESSAGE_PRIORITY);
+                send2.runJob();
+            }
         } else {
-         */
-            TunnelInfo outTunnel = selectOutboundTunnel();
+            // pick tunnel with endpoint closest to toPeer
+            TunnelInfo outTunnel = getContext().tunnelManager().selectOutboundExploratoryTunnel(toPeer);
             if (outTunnel == null) {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("No outbound tunnel could be found");
                 return;
-            } else {
-                getContext().tunnelDispatcher().dispatchOutbound(msg, outTunnel.getSendTunnelId(0),
-                                                                 _message.getReplyTunnel(), _message.getReplyGateway());
             }
-        //}
-    }
-
-    private TunnelInfo selectOutboundTunnel() {
-        return getContext().tunnelManager().selectOutboundTunnel();
+            getContext().tunnelDispatcher().dispatchOutbound(msg, outTunnel.getSendTunnelId(0),
+                                                             replyTunnel, toPeer);
+            if (msg2 != null)
+                getContext().tunnelDispatcher().dispatchOutbound(msg2, outTunnel.getSendTunnelId(0),
+                                                                 replyTunnel, toPeer);
+        }
     }
  
     public String getName() { return "Handle Database Store Message"; }
