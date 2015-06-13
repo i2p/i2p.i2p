@@ -25,7 +25,7 @@ MISC_DARWIN_PLATFORMS="powerpc powerpc64 powerpc64le powerpcle"
 # please add them here.
 # Do NOT add any X86 platforms, do that below in the x86 platform list.
 #
-MISC_LINUX_PLATFORMS="hppa2.0 alphaev56 armv5tel mips64el itanium itanium2 ultrasparc2 ultrasparc2i alphaev6 powerpc970 powerpc7455 powerpc7447"
+MISC_LINUX_PLATFORMS="hppa2.0 alphaev56 mips64el itanium itanium2 ultrasparc2 ultrasparc2i alphaev6 powerpc970 powerpc7455 powerpc7447"
 
 #
 # If you know of other platforms i2p on *BSD works on,
@@ -42,21 +42,23 @@ MISC_OPENBSD_PLATFORMS="alphaev56 ultrasparc2i sgi powerpc powerpc64 hppa2.0 alp
 MISC_MINGW_PLATFORMS=""
 
 #
+# ARM
+#
+# These platforms exist as of GMP 6.0.0.
+# Some of them will be renamed in the next version of GMP.
+ARM_PLATFORMS="armv5 armv6 armv7a armcortex8 armcortex9 armcortex15"
+# Rename output of armv7a to armv7 since that's what NBI expects.
+# This is due to versions after GMP 6.0.0 changing the target name.
+TRANSLATE_NAME_armv7a="armv7"
+
+#
+# X86_64
+#
 # Are there any other X86 platforms that work on i2p? Add them here.
 #
 # Note! these build on 32bit as 32bit when operating as 32bit...
 # starting with k10 added for 6.0.0
 # As of GMP 6.0.0, libgmp 3,
-# the following architectures appear to build to identical code:
-#    coreisbr coreihwl coreibwl
-#    core2 corei
-#    bulldozer piledriver streamroller excavator
-#    bobcat jaguar
-#    k62 k63
-#    viac32 pentium3
-#
-# Even more duplicates are in 32-bit mode, so it doesn't pay to have everything for 32 bit.
-#
 X86_64_PLATFORMS="coreisbr coreihwl coreibwl bobcat jaguar bulldozer piledriver steamroller excavator atom athlon64 core2 corei nano pentium4 k10"
 
 # Note! these are 32bit _ONLY_ (after the 64 bit ones)
@@ -176,6 +178,8 @@ linux*|*kfreebsd)
                 #        TARGET="$TARGET-ia64";;
                 x86)
                         PLATFORM_LIST="${X86_PLATFORMS}";;
+                arm*)
+                        PLATFORM_LIST="${ARM_PLATFORMS}";;
                 *)
                         PLATFORM_LIST="${LINUX_PLATFORMS}";;
         esac
@@ -229,7 +233,12 @@ esac
 make_static () {
         echo "Attempting .${4} creation for ${3}${5}${2}${6}"
         ../../build_jbigi.sh static || return 1
-        cp ${3}.${4} ../../lib/net/i2p/util/${3}${5}${2}${6}.${4}
+        PLATFORM="${2}"
+        eval TRANSLATED_NAME=\$TRANSLATE_NAME_$PLATFORM
+        if [ -n "$TRANSLATED_NAME" ]; then
+            PLATFORM="${TRANSLATED_NAME}"
+        fi
+        cp ${3}.${4} ../../lib/net/i2p/util/${3}${5}${PLATFORM}${6}.${4}
         return 0
 }
 
@@ -251,8 +260,7 @@ configure_file () {
         elif [ $BITS -eq 32 ] && [ "$2" != "none" ]; then
             export ABI=32
         fi
-        sleep 1
-        
+
         # Nonfatal bail out on unsupported platform.
         (cd ../../gmp-${1}; make clean)
         if [ $(echo $TARGET| grep -q osx) ]; then
@@ -291,10 +299,8 @@ if [ ! -d lib/net/i2p/util ]; then
         mkdir -p lib/net/i2p/util
 fi
 
-# Don't touch this one.
-NO_PLATFORM=none
 
-for x in $X86_PLATFORMS
+for x in $PLATFORM_LIST
 do
         (
                 if [ ! -d bin/$x ]; then
