@@ -51,11 +51,16 @@
 
   # 'm' is needed by the I2P-Bote plugin
   /{,lib/live/mount/overlay/}tmp/                         rwm,
+  owner /{,lib/live/mount/overlay/}tmp/hsperfdata_i2psvc/ rwk,
+  owner /{,lib/live/mount/overlay/}tmp/hsperfdata_i2psvc/** rw,
+  owner /{,lib/live/mount/overlay/}tmp/wrapper[0-9]*.tmp   rwk,
+  owner /{,lib/live/mount/overlay/}tmp/wrapper[0-9]*.tmp/** rw,
   owner /{,lib/live/mount/overlay/}tmp/i2p-daemon/        rwm,
   owner /{,lib/live/mount/overlay/}tmp/i2p-daemon/**      rwklm,
 
   # Prevent spamming the logs
   deny /dev/tty                                           rw,
+  deny /{,lib/live/mount/overlay/}var/tmp/                r,
   deny @{PROC}/[0-9]*/fd/                                 r,
   deny /usr/sbin/                                         r,
   deny /var/cache/fontconfig/                             wk,
