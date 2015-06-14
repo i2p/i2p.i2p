@@ -59,10 +59,11 @@ TRANSLATE_NAME_armv7a="armv7"
 # Note! these build on 32bit as 32bit when operating as 32bit...
 # starting with k10 added for 6.0.0
 # As of GMP 6.0.0, libgmp 3,
-X86_64_PLATFORMS="coreisbr coreihwl coreibwl bobcat jaguar bulldozer piledriver steamroller excavator atom athlon64 core2 corei nano pentium4 k10"
+X86_64_PLATFORMS="coreisbr coreihwl coreibwl bobcat jaguar bulldozer piledriver steamroller excavator atom athlon64 core2 corei nano pentium4 k10 x86_64"
+TRANSLATE_NAME_x86_64="x86" # The _64 tag will be appended to the filename at another place.
 
 # Note! these are 32bit _ONLY_ (after the 64 bit ones)
-X86_PLATFORMS="${X86_64_PLATFORMS} pentium pentiummmx pentium2 pentium3 pentiumm k6 k62 k63 athlon geode viac3 viac32"
+X86_PLATFORMS="${X86_64_PLATFORMS} pentium pentiummmx pentium2 pentium3 pentiumm k6 k62 k63 athlon geode viac3 viac32 x86"
 
 MINGW_PLATFORMS="${X86_PLATFORMS} ${MISC_MINGW_PLATFORMS}"
 LINUX_PLATFORMS="${X86_PLATFORMS} ${MISC_LINUX_PLATFORMS}"
