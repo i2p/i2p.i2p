@@ -95,3 +95,4 @@ certificates/ssl/i2p-netdb.innovatio.no.crt
 certificates/ssl/jp.reseed.i2p2.no.crt
 certificates/ssl/ieb9oopo.mooo.com2.crt
 certificates/ssl/netdb.i2p2.no2.crt
+certificates/ssl/i2p.mooo.com2.crt
