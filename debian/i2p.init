@@ -32,7 +32,6 @@ WRAPPERLOG="/var/log/i2p/wrapper.log"
 RUN_DAEMON="False"
 NICE=0
 I2PUSER="i2psvc"
-USE_AA="yes"
 
 I2P_ARGS="/etc/i2p/wrapper.config \
  wrapper.java.additional.1=-DloggerFilenameOverride=/var/log/i2p/log-router-@.txt \
@@ -67,6 +66,15 @@ if [ -z "$RUN_DAEMON" ]; then
     exit 1
 fi
 
+case "$CONFINE_WITH_APPARMOR" in
+    [NnFf]*)
+        USE_AA="no"
+        ;;
+    *)
+        USE_AA="yes"
+        ;;
+esac
+
 case "$RUN_DAEMON" in
     [NnFf]*)
         log_action_msg "$DESC daemon disabled in /etc/default/$NAME".
@@ -83,6 +91,7 @@ esac
 
 do_start()
 {
+    [ ! -z $ULIMIT ] && ulimit -n $ULIMIT
     start-stop-daemon --start --quiet --pidfile $PIDFILE --exec $DAEMON --test > /dev/null 2>&1 \
         || return 1
     [ -d $RUN ] || mkdir $RUN > /dev/null 2>&1

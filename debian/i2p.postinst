@@ -6,7 +6,7 @@ I2PHOME=/var/lib/i2p
 I2PSYSUSER=i2psvc
 
 conffile="/etc/default/i2p"
-#systemdservice="/lib/systemd/system/i2p.service"
+systemdservice="/lib/systemd/system/i2p.service"
 
 # Source debconf library -- we have a Depends line
 # to make sure it is there...
@@ -25,6 +25,7 @@ case "$1" in
             echo >> $conffile
             echo "RUN_DAEMON=" >> $conffile
             echo "I2PUSER=" >> $conffile
+            echo "ULIMIT=" >> $conffile
             echo "CONFINE_WITH_APPARMOR=" >> $conffile
             echo "# The next value is also wrapper.java.maxmemory in /etc/i2p/wrapper.config" >> $conffile
             echo "MEMORYLIMIT=" >> $conffile
@@ -49,6 +50,8 @@ case "$1" in
             echo "I2PUSER=" >> $conffile
         test -z "$MEMORYLIMIT" || grep -Eq '^ *MEMORYLIMIT=' $conffile || \
             echo "MEMORYLIMIT=" >> $conffile
+        test -z "$ULIMIT" || grep -Eq '^ *ULIMIT=' $conffile || \
+            echo "ULIMIT=" >> $conffile
         test -z "$CONFINE_WITH_APPARMOR" || grep -Eq '^ *CONFINE_WITH_APPARMOR=' $conffile || \
             echo "CONFINE_WITH_APPARMOR=" >> $conffile
 
@@ -57,8 +60,6 @@ case "$1" in
             I2PUSER="i2psvc"
         fi
 
-
-
         sed -e "s/^ *RUN_DAEMON=.*/RUN_DAEMON=\"$RUN_DAEMON\"/" \
             -e "s/^ *I2PUSER=.*/I2PUSER=\"$I2PUSER\"/" \
             -e "s/^ *MEMORYLIMIT=.*/MEMORYLIMIT=\"$MEMORYLIMIT\"/" \
@@ -66,19 +67,19 @@ case "$1" in
             < $conffile > $conffile.tmp
         mv -f $conffile.tmp $conffile
 
-#        if [ -e "$systemdservice" ]; then
-#            sed -e "s/User=.*/User=$I2PUSER/" < "$systemdservice" > "$systemdservice.tmp"
-#            mv -f "$systemdservice.tmp" "$systemdservice"
-#            chmod 0644 -f "$systemdservice"
-#            if grep -q 'systemd' /proc/1/comm > /dev/null 2>&1; then
-#                systemctl --system daemon-reload
-#                if [ $RUN_DAEMON = 'true' ]; then
-#                    systemctl enable i2p.service
-#                else
-#                    systemctl disable i2p.service
-#                fi
-#            fi
-#        fi
+        if [ -e "$systemdservice" ]; then
+            sed -e "s/User=.*/User=$I2PUSER/" < "$systemdservice" > "$systemdservice.tmp"
+            mv -f "$systemdservice.tmp" "$systemdservice"
+            chmod 0644 -f "$systemdservice"
+            if grep -q 'systemd' /proc/1/comm > /dev/null 2>&1; then
+                systemctl --system daemon-reload
+                if [ $RUN_DAEMON = 'true' ]; then
+                    systemctl enable i2p.service
+                else
+                    systemctl disable i2p.service
+                fi
+            fi
+        fi
 
         sed -e "s/^ *wrapper\.java\.maxmemory=.*/wrapper\.java\.maxmemory=$MEMORYLIMIT/" \
             < /etc/i2p/wrapper.config > /etc/i2p/wrapper.config.tmp
