@@ -220,14 +220,14 @@ class ClientManager {
      *  Remove all sessions for this runner.
      */
     public void unregisterConnection(ClientConnectionRunner runner) {
-        if (_log.shouldLog(Log.WARN))
-            _log.warn("Unregistering (dropping) a client connection");
         synchronized (_pendingRunners) {
             _pendingRunners.remove(runner);
         }
 
         List<SessionId> ids = runner.getSessionIds();
         List<Destination> dests = runner.getDestinations();
+        if (_log.shouldLog(Log.WARN))
+            _log.warn("Unregistering (dropping) a client connection with ids: " + ids);
         synchronized (_runners) {
             for (SessionId id : ids) {
                 _runnerSessionIds.remove(id);

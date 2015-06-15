@@ -426,8 +426,6 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
         if (left <= 0) {
             _runner.stopRunning();
         } else {
-            if (cfg != null)
-                _context.tunnelManager().removeAlias(cfg.getDestination());
             if (_log.shouldLog(Log.INFO))
                 _log.info("Still " + left + " sessions left");
         }

@@ -491,9 +491,11 @@ public class SummaryHelper extends HelperBase {
         public int compare(Destination lhs, Destination rhs) {
             String lname = getName(lhs);
             String rname = getName(rhs);
-            if (lname.equals(xsc))
+            boolean lshared = lname.startsWith("shared clients") || lname.startsWith(xsc);
+            boolean rshared = rname.startsWith("shared clients") || rname.startsWith(xsc);
+            if (lshared && !rshared)
                 return -1;
-            if (rname.equals(xsc))
+            if (rshared && !lshared)
                 return 1;
             return Collator.getInstance().compare(lname, rname);
         }

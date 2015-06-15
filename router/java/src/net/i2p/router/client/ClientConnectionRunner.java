@@ -202,6 +202,8 @@ class ClientConnectionRunner {
             LeaseSet ls = sp.currentLeaseSet;
             if (ls != null)
                 _context.netDb().unpublish(ls);
+            if (!sp.isPrimary)
+                _context.tunnelManager().removeAlias(sp.dest);
         }
         synchronized (_alreadyProcessed) {
             _alreadyProcessed.clear();
@@ -414,15 +416,21 @@ class ClientConnectionRunner {
                 if (ls != null)
                     _context.netDb().unpublish(ls);
                 isPrimary = sp.isPrimary;
+                if (!isPrimary)
+                    _context.tunnelManager().removeAlias(sp.dest);
+                break;
             }
         }
-        if (isPrimary) {
+        if (isPrimary && !_sessions.isEmpty()) {
             // kill all the others also
             for (SessionParams sp : _sessions.values()) {
-                _manager.unregisterSession(id, sp.dest);
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Destroying remaining client subsession " + sp.sessionId);
+                _manager.unregisterSession(sp.sessionId, sp.dest);
                 LeaseSet ls = sp.currentLeaseSet;
                 if (ls != null)
                     _context.netDb().unpublish(ls);
+                _context.tunnelManager().removeAlias(sp.dest);
             }
         }
     }
