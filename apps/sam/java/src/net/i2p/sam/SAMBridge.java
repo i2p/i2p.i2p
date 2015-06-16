@@ -65,7 +65,6 @@ public class SAMBridge implements Runnable, ClientApp {
     private volatile boolean acceptConnections = true;
 
     private final ClientAppManager _mgr;
-    private final String[] _args;
     private volatile ClientAppState _state = UNINITIALIZED;
 
     private static final int SAM_LISTENPORT = 7656;
@@ -95,7 +94,6 @@ public class SAMBridge implements Runnable, ClientApp {
     public SAMBridge(I2PAppContext context, ClientAppManager mgr, String[] args) throws Exception {
         _log = context.logManager().getLog(SAMBridge.class);
         _mgr = mgr;
-        _args = args;
         Options options = getOptions(args);
         _listenHost = options.host;
         _listenPort = options.port;
@@ -126,7 +124,6 @@ public class SAMBridge implements Runnable, ClientApp {
     public SAMBridge(String listenHost, int listenPort, Properties i2cpProps, String persistFile) {
         _log = I2PAppContext.getGlobalContext().logManager().getLog(SAMBridge.class);
         _mgr = null;
-        _args = new String[] {listenHost, Integer.toString(listenPort) };  // placeholder
         _listenHost = listenHost;
         _listenPort = listenPort;
         persistFilename = persistFile;
@@ -381,7 +378,7 @@ public class SAMBridge implements Runnable, ClientApp {
      *  @since 0.9.6
      */
     public String getDisplayName() {
-        return "SAM " + Arrays.toString(_args);
+        return "SAM " + _listenHost + ':' + _listenPort;
     }
 
     ////// end ClientApp interface
