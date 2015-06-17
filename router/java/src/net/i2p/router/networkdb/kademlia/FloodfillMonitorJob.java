@@ -6,6 +6,7 @@ import net.i2p.crypto.SigType;
 import net.i2p.data.Hash;
 import net.i2p.data.router.RouterAddress;
 import net.i2p.data.router.RouterInfo;
+import net.i2p.router.Job;
 import net.i2p.router.JobImpl;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
@@ -55,13 +56,27 @@ class FloodfillMonitorJob extends JobImpl {
             } else {
                 getContext().router().eventLog().addEvent(EventLog.NOT_FLOODFILL);
             }
-            getContext().router().rebuildRouterInfo();
+            getContext().router().rebuildRouterInfo(true);
+            Job routerInfoFlood = new FloodfillRouterInfoFloodJob(getContext(), _facade);
+            if(getContext().router().getUptime() < 5*60*1000) {
+                // Needed to prevent race if router.floodfillParticipant=true (not auto)
+                routerInfoFlood.getTiming().setStartAfter(getContext().clock().now() + 5*60*1000);
+                getContext().jobQueue().addJob(routerInfoFlood);
+                if(_log.shouldLog(Log.DEBUG)) {
+                    _log.logAlways(Log.DEBUG, "Deferring our FloodfillRouterInfoFloodJob run because of low uptime.");
+                }
+            } else {
+                routerInfoFlood.runJob();
+                if(_log.shouldLog(Log.DEBUG)) {
+                    _log.logAlways(Log.DEBUG, "Running FloodfillRouterInfoFloodJob");
+                }
+            }
         }
         if (_log.shouldLog(Log.INFO))
             _log.info("Should we be floodfill? " + ff);
         int delay = (REQUEUE_DELAY / 2) + getContext().random().nextInt(REQUEUE_DELAY);
         // there's a lot of eligible non-floodfills, keep them from all jumping in at once
-        // To do: somehow assess the size of the network to make this adaptive?
+        // TODO: somehow assess the size of the network to make this adaptive?
         if (!ff)
             delay *= 4; // this was 7, reduced for moar FFs --zab
         requeue(delay);

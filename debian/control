@@ -12,7 +12,7 @@ Build-Depends: debhelper (>= 7.0.50~)
  ,default-jdk | openjdk-7-jdk | openjdk-6-jdk
  ,dh-apparmor
  ,gettext
- ,libgmp3-dev
+ ,libgmp-dev (>= 2:5.0.5)
 # uncomment the next line for official builds
 # ,libservice-wrapper-java
  ,libcommons-logging-java

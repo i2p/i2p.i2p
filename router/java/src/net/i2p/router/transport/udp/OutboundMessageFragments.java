@@ -178,7 +178,7 @@ class OutboundMessageFragments {
     public void add(OutboundMessageState state) {
         PeerState peer = state.getPeer();
         if (peer == null)
-            throw new RuntimeException("wtf, null peer for " + state);
+            throw new RuntimeException("null peer for " + state);
         peer.add(state);
         add(peer);
         //_context.statManager().addRateData("udp.outboundActiveCount", active, 0);

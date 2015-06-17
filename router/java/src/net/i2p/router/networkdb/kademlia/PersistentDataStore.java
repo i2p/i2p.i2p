@@ -484,7 +484,7 @@ class PersistentDataStore extends TransientDataStore {
                 // don't overwrite recent netdb RIs with reseed data
                 return fileDate > _knownDate + (60*60*1000);
             } else {
-                // wtf - prevent injection from reseeding
+                // safety measure - prevent injection from reseeding
                 _log.error("Prevented LS overwrite by RI " + _key + " from " + _routerFile);
                 return false;
             }

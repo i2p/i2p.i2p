@@ -164,7 +164,7 @@ public class I2NPMessageReader {
                         _listener.disconnected(I2NPMessageReader.this);
                         cancelRunner();
                     } catch (Exception e) {
-                        _log.log(Log.CRIT, "wtf, error reading", e);
+                        _log.log(Log.CRIT, "error reading msg!", e);
                         _listener.readError(I2NPMessageReader.this, e);
                         _listener.disconnected(I2NPMessageReader.this);
                         cancelRunner();

@@ -370,7 +370,7 @@ class BatchedPreprocessor extends TrivialPreprocessor {
         
         if (offset <= 0) {
             StringBuilder buf = new StringBuilder(128);
-            buf.append("wtf, written offset is ").append(offset);
+            buf.append("uh? written offset is ").append(offset);
             buf.append(" for ").append(startAt).append(" through ").append(sendThrough);
             for (int i = startAt; i <= sendThrough; i++) {
                 buf.append(" ").append(pending.get(i).toString());

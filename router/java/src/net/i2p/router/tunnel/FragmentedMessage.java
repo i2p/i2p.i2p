@@ -164,7 +164,7 @@ class FragmentedMessage {
     }
     public int getCompleteSize() {
         if (!_lastReceived) 
-            throw new IllegalStateException("wtf, don't get the completed size when we're not complete");
+            throw new IllegalStateException("don't get the completed size when we're not complete!");
         if (_releasedAfter > 0) {
              RuntimeException e = new RuntimeException("use after free in FragmentedMessage");
              _log.error("FM completeSize()", e);
@@ -175,7 +175,7 @@ class FragmentedMessage {
             ByteArray ba = _fragments[i];
             // NPE seen here, root cause unknown
             if (ba == null) 
-                throw new IllegalStateException("wtf, don't get the completed size when we're not complete - null fragment i=" + i + " of " + _highFragmentNum);
+                throw new IllegalStateException("don't get the completed size when we're not complete! - null fragment i=" + i + " of " + _highFragmentNum);
             size += ba.getValid();
         }
         return size;

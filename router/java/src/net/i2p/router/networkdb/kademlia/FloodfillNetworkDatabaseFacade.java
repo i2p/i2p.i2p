@@ -40,7 +40,7 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
      *  Was 7 through release 0.9; 5 for 0.9.1.
      *  4 as of 0.9.2; 3 as of 0.9.9
      */
-    private static final int MAX_TO_FLOOD = 3;
+    public static final int MAX_TO_FLOOD = 3;
     
     private static final int FLOOD_PRIORITY = OutNetMessage.PRIORITY_NETDB_FLOOD;
     private static final int FLOOD_TIMEOUT = 30*1000;
@@ -129,7 +129,7 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
      */
     @Override
     public void publish(RouterInfo localRouterInfo) throws IllegalArgumentException {
-        if (localRouterInfo == null) throw new IllegalArgumentException("wtf, null localRouterInfo?");
+        if (localRouterInfo == null) throw new IllegalArgumentException("impossible: null localRouterInfo?");
         // should this be after super? why not publish locally?
         if (_context.router().isHidden()) return; // DE-nied!
         super.publish(localRouterInfo);

@@ -852,7 +852,7 @@ public class Router implements RouterClock.ClockShiftListener {
             addCapabilities(ri);
             SigningPrivateKey key = _context.keyManager().getSigningPrivateKey();
             if (key == null) {
-                _log.log(Log.CRIT, "Internal error - signing private key not known?  wtf");
+                _log.log(Log.CRIT, "Internal error - signing private key not known? Impossible?");
                 return;
             }
             ri.sign(key);

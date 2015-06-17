@@ -83,7 +83,7 @@ class LoadRouterInfoJob extends JobImpl {
         try {
             // if we have a routerinfo but no keys, things go bad in a hurry:
             // CRIT   ...rkdb.PublishLocalRouterInfoJob: Internal error - signing private key not known?  rescheduling publish for 30s
-            // CRIT      net.i2p.router.Router         : Internal error - signing private key not known?  wtf
+            // CRIT      net.i2p.router.Router         : Internal error - signing private key not known? Impossible?
             // CRIT   ...sport.udp.EstablishmentManager: Error in the establisher java.lang.NullPointerException
             // at net.i2p.router.transport.udp.PacketBuilder.buildSessionConfirmedPacket(PacketBuilder.java:574)
             // so pretend the RI isn't there if there is no keyfile

@@ -43,6 +43,8 @@ public class RouterTimestamper extends Timestamper {
     /** how many times do we have to query if we are changing the clock? */
     private static final int DEFAULT_CONCURRING_SERVERS = 3;
     private static final int MAX_CONSECUTIVE_FAILS = 10;
+    private static final int DEFAULT_TIMEOUT = 10*1000;
+    private static final int SHORT_TIMEOUT = 5*1000;
     
     public static final String PROP_QUERY_FREQUENCY = "time.queryFrequencyMs";
     public static final String PROP_SERVER_LIST = "time.sntpServerList";
@@ -177,7 +179,7 @@ public class RouterTimestamper extends Timestamper {
                             if (_log != null && _log.shouldDebug())
                                 _log.debug("Querying servers " + servers);
                             try {
-                                lastFailed = !queryTime(servers.toArray(new String[servers.size()]));
+                                lastFailed = !queryTime(servers.toArray(new String[servers.size()]), SHORT_TIMEOUT);
                             } catch (IllegalArgumentException iae) {
                                 if (!lastFailed && _log != null && _log.shouldWarn())
                                     _log.warn("Unable to reach any regional NTP servers: " + servers);
@@ -192,7 +194,7 @@ public class RouterTimestamper extends Timestamper {
                         if (_log != null && _log.shouldDebug())
                             _log.debug("Querying servers " + _servers);
                         try {
-                            lastFailed = !queryTime(_servers.toArray(new String[_servers.size()]));
+                            lastFailed = !queryTime(_servers.toArray(new String[_servers.size()]), DEFAULT_TIMEOUT);
                         } catch (IllegalArgumentException iae) {
                             lastFailed = true;
                         }
@@ -259,18 +261,18 @@ public class RouterTimestamper extends Timestamper {
     /**
      * True if the time was queried successfully, false if it couldn't be
      */
-    private boolean queryTime(String serverList[]) throws IllegalArgumentException {
+    private boolean queryTime(String serverList[], int perServerTimeout) throws IllegalArgumentException {
         long found[] = new long[_concurringServers];
         long now = -1;
         int stratum = -1;
         long expectedDelta = 0;
         _wellSynced = false;
         for (int i = 0; i < _concurringServers; i++) {
-            if (i > 0) {
-                // this delays startup when net is disconnected or the timeserver list is bad, don't make it too long
-                try { Thread.sleep(2*1000); } catch (InterruptedException ie) {}
-            }
-            long[] timeAndStratum = NtpClient.currentTimeAndStratum(serverList);
+            //if (i > 0) {
+            //    // this delays startup when net is disconnected or the timeserver list is bad, don't make it too long
+            //    try { Thread.sleep(2*1000); } catch (InterruptedException ie) {}
+            //}
+            long[] timeAndStratum = NtpClient.currentTimeAndStratum(serverList, perServerTimeout);
             now = timeAndStratum[0];
             stratum = (int) timeAndStratum[1];
             long delta = now - _context.clock().now();

@@ -352,7 +352,7 @@ class BuildHandler implements Runnable {
                         default:
                             _context.statManager().addRateData("tunnel.receiveRejectionCritical", 1);
                     }
-                    // penalize peer based on their bitchiness level
+                    // penalize peer based on their reported error level
                     _context.profileManager().tunnelRejected(peer, rtt, howBad);
                     _context.messageHistory().tunnelParticipantRejected(peer, "peer rejected after " + rtt + " with " + howBad + ": " + cfg.toString());
                 }
