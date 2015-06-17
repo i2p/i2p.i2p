@@ -33,6 +33,8 @@ import net.i2p.util.Log;
 import net.i2p.util.VersionComparator;
 
 /**
+ *  Stores through this always request a reply.
+ *
  *  Unused directly - see FloodfillStoreJob
  */
 class StoreJob extends JobImpl {

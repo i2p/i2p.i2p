@@ -193,7 +193,8 @@ class PeerManager {
     }
     
     /**
-     * Find some peers that meet the criteria and we have the netDb info for locally
+     * Find some peers that meet the criteria and we have the netDb info for locally.
+     * Returned list will not include ourselves.
      *
      * Only used by PeerTestJob (PURPOSE_TEST)
      */

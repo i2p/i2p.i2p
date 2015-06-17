@@ -21,6 +21,7 @@ import net.i2p.util.Log;
  * Also called when opting out of ff to call off the hounds ASAP.
  * Currently floods FNDF.MAX_TO_FLOOD * 2 routers nearest to us.
  *
+ * @since 0.9.21
  */
 class FloodfillRouterInfoFloodJob extends JobImpl {
     private final Log _log;
