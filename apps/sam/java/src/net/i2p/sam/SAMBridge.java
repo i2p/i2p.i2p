@@ -27,6 +27,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import gnu.getopt.Getopt;
+
 import net.i2p.I2PAppContext;
 import net.i2p.app.*;
 import static net.i2p.app.ClientAppState.*;
@@ -72,12 +74,12 @@ public class SAMBridge implements Runnable, ClientApp {
     public static final String DEFAULT_SAM_KEYFILE = "sam.keys";
     public static final String PROP_TCP_HOST = "sam.tcp.host";
     public static final String PROP_TCP_PORT = "sam.tcp.port";
-    protected static final String DEFAULT_TCP_HOST = "0.0.0.0";
+    protected static final String DEFAULT_TCP_HOST = "127.0.0.1";
     protected static final String DEFAULT_TCP_PORT = "7656";
     
     public static final String PROP_DATAGRAM_HOST = "sam.udp.host";
     public static final String PROP_DATAGRAM_PORT = "sam.udp.port";
-    protected static final String DEFAULT_DATAGRAM_HOST = "0.0.0.0";
+    protected static final String DEFAULT_DATAGRAM_HOST = "127.0.0.1";
     protected static final String DEFAULT_DATAGRAM_PORT = "7655";
 
 
@@ -456,9 +458,11 @@ public class SAMBridge implements Runnable, ClientApp {
         private final String host, keyFile;
         private final int port;
         private final Properties opts;
+        private final boolean isSSL;
 
-        public Options(String host, int port, Properties opts, String keyFile) {
+        public Options(String host, int port, boolean isSSL, Properties opts, String keyFile) {
             this.host = host; this.port = port; this.opts = opts; this.keyFile = keyFile;
+            this.isSSL = isSSL;
         }
     }
     
@@ -479,67 +483,115 @@ public class SAMBridge implements Runnable, ClientApp {
         String keyfile = DEFAULT_SAM_KEYFILE;
         int port = SAM_LISTENPORT;
         String host = DEFAULT_TCP_HOST;
+        boolean isSSL = false;
         Properties opts = null;
-        if (args.length > 0) {
-       		opts = parseOptions(args, 0);
-       		keyfile = args[0];
-       		int portIndex = 1;
-       		try {
-       			if (args.length>portIndex) port = Integer.parseInt(args[portIndex]);
-       		} catch (NumberFormatException nfe) {
-       			host = args[portIndex];
-       			portIndex++;
-       			try {
-       				if (args.length>portIndex) port = Integer.parseInt(args[portIndex]);
-       			} catch (NumberFormatException nfe1) {
-       				port = Integer.parseInt(opts.getProperty(SAMBridge.PROP_TCP_PORT, SAMBridge.DEFAULT_TCP_PORT));
-       				host = opts.getProperty(SAMBridge.PROP_TCP_HOST, SAMBridge.DEFAULT_TCP_HOST);
-       			}
-       		}
+        Getopt g = new Getopt("SAM", args, "hs");
+        int c;
+        while ((c = g.getopt()) != -1) {
+          switch (c) {
+            case 's':
+                isSSL = true;
+                break;
+
+            case 'h':
+            case '?':
+            case ':':
+            default:
+                throw new HelpRequestedException();
+          }  // switch
+        } // while
+
+        int startArgs = g.getOptind();
+        // possible args before ones containing '=';
+        // (none)
+        // key port
+        // key host port
+        int startOpts;
+        for (startOpts = startArgs; startOpts < args.length; startOpts++) {
+            if (args[startOpts].contains("="))
+                break;
         }
-        return new Options(host, port, opts, keyfile);
+        int numArgs = startOpts - startArgs;
+        switch (numArgs) {
+            case 0:
+                break;
+
+            case 2:
+                keyfile = args[startArgs];
+                try {
+                    port = Integer.parseInt(args[startArgs + 1]);
+                } catch (NumberFormatException nfe) {
+                    throw new HelpRequestedException();
+                }
+                break;
+
+            case 3:
+                keyfile = args[startArgs];
+                host = args[startArgs + 1];
+                try {
+                    port = Integer.parseInt(args[startArgs + 2]);
+                } catch (NumberFormatException nfe) {
+                    throw new HelpRequestedException();
+                }
+                break;
+
+            default:
+                throw new HelpRequestedException();
+        }
+
+        int remaining = args.length - startOpts;
+        if (remaining > 0) {
+       		opts = parseOptions(args, startOpts);
+        }
+        return new Options(host, port, isSSL, opts, keyfile);
     }
 
+    /**
+     *  Parse key=value options starting at startArgs.
+     *  @throws HelpRequestedException on any item not of the form key=value.
+     */
     private static Properties parseOptions(String args[], int startArgs) throws HelpRequestedException {
         Properties props = new Properties();
-        // skip over first few options
         for (int i = startArgs; i < args.length; i++) {
-        	if (args[i].equals("-h")) throw new HelpRequestedException();
             int eq = args[i].indexOf('=');
-            if (eq <= 0) continue;
-            if (eq >= args[i].length()-1) continue;
+            if (eq <= 0)
+                throw new HelpRequestedException();
+            if (eq >= args[i].length()-1)
+                throw new HelpRequestedException();
             String key = args[i].substring(0, eq);
             String val = args[i].substring(eq+1);
             key = key.trim();
             val = val.trim();
             if ( (key.length() > 0) && (val.length() > 0) )
                 props.setProperty(key, val);
+            else
+                throw new HelpRequestedException();
         }
         return props;
     }
     
     private static void usage() {
-        System.err.println("Usage: SAMBridge [keyfile [listenHost] listenPortNum[ name=val]*]");
-        System.err.println("or:");
-        System.err.println("       SAMBridge [ name=val ]*");
-        System.err.println(" keyfile: location to persist private keys (default sam.keys)");
-        System.err.println(" listenHost: interface to listen on (0.0.0.0 for all interfaces)");
-        System.err.println(" listenPort: port to listen for SAM connections on (default 7656)");
-        System.err.println(" name=val: options to pass when connecting via I2CP, such as ");
-        System.err.println("           i2cp.host=localhost and i2cp.port=7654");
-        System.err.println("");
-        System.err.println("Host and ports of the SAM bridge can be specified with the alternate");
-        System.err.println("form by specifying options "+SAMBridge.PROP_TCP_HOST+" and/or "+
-        		SAMBridge.PROP_TCP_PORT);
-        System.err.println("");
-        System.err.println("Options "+SAMBridge.PROP_DATAGRAM_HOST+" and "+SAMBridge.PROP_DATAGRAM_PORT+
-        		" specify the listening ip");
-        System.err.println("range and the port of SAM datagram server. This server is");
-        System.err.println("only launched after a client creates the first SAM datagram");
-        System.err.println("or raw session, after a handshake with SAM version >= 3.0.");
-        System.err.println("");
-        System.err.println("The option loglevel=[DEBUG|WARN|ERROR|CRIT] can be used");
-        System.err.println("for tuning the log verbosity.\n");
+        System.err.println("Usage: SAMBridge [keyfile [listenHost] listenPortNum[ name=val]*]\n" +
+                           "or:\n" +
+                           "       SAMBridge [ name=val ]*\n" +
+                           " keyfile: location to persist private keys (default sam.keys)\n" +
+                           " listenHost: interface to listen on (0.0.0.0 for all interfaces)\n" +
+                           " listenPort: port to listen for SAM connections on (default 7656)\n" +
+                           " name=val: options to pass when connecting via I2CP, such as \n" +
+                           "           i2cp.host=localhost and i2cp.port=7654\n" +
+                           "\n" +
+                           "Host and ports of the SAM bridge can be specified with the alternate\n" +
+                           "form by specifying options "+SAMBridge.PROP_TCP_HOST+" and/or "+
+                           SAMBridge.PROP_TCP_PORT +
+                           "\n" +
+                           "Options "+SAMBridge.PROP_DATAGRAM_HOST+" and "+SAMBridge.PROP_DATAGRAM_PORT+
+                           " specify the listening ip\n" +
+                           "range and the port of SAM datagram server. This server is\n" +
+                           "only launched after a client creates the first SAM datagram\n" +
+                           "or raw session, after a handshake with SAM version >= 3.0.\n" +
+                           "\n" +
+                           "The option loglevel=[DEBUG|WARN|ERROR|CRIT] can be used\n" +
+                           "for tuning the log verbosity.");
     }
     
     public void run() {
