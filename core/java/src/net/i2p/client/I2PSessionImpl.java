@@ -81,7 +81,7 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
     /** this session's Id */
     private SessionId _sessionId;
     /** currently granted lease set, or null */
-    private volatile LeaseSet _leaseSet;
+    protected volatile LeaseSet _leaseSet;
 
     // subsession stuff
     // registered subsessions
@@ -130,7 +130,7 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
     protected final I2PAppContext _context;
 
     /** monitor for waiting until a lease set has been granted */
-    private final Object _leaseSetWait = new Object();
+    protected final Object _leaseSetWait = new Object();
 
     /**
      *  @since 0.9.8

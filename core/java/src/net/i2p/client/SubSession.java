@@ -101,12 +101,36 @@ class SubSession extends I2PSessionMuxedImpl {
                 _state = State.OPENING;
             }
         }
-        _primary.connect();
-        synchronized(_stateLock) {
-            if (_state != State.OPEN) {
-                Thread notifier = new I2PAppThread(_availabilityNotifier, "ClientNotifier " + getPrefix(), true);
-                notifier.start();
-                _state = State.OPEN;
+        boolean success = false;
+        try {
+            _primary.connect();
+            // wait until we have created a lease set
+            int waitcount = 0;
+            while (_leaseSet == null) {
+                if (waitcount++ > 5*60) {
+                    throw new IOException("No tunnels built after waiting 5 minutes. Your network connection may be down, or there is severe network congestion.");
+                }
+                synchronized (_leaseSetWait) {
+                    // InterruptedException caught below
+                    _leaseSetWait.wait(1000);
+                }
+            }
+            synchronized(_stateLock) {
+                if (_state != State.OPEN) {
+                    Thread notifier = new I2PAppThread(_availabilityNotifier, "ClientNotifier " + getPrefix(), true);
+                    notifier.start();
+                    _state = State.OPEN;
+                }
+            }
+            success = true;
+        } catch (InterruptedException ie) {
+            throw new I2PSessionException("Interrupted", ie);
+        } catch (IOException ioe) {
+            throw new I2PSessionException(getPrefix() + "Cannot connect to the router on " + _hostname + ':' + _portNum, ioe);
+        } finally {
+            if (!success) {
+                _availabilityNotifier.stopNotifying();
+                changeState(State.CLOSED);
             }
         }
     }

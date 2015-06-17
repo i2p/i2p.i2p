@@ -228,9 +228,12 @@ class ClientConnectionRunner {
      *  Current client's config,
      *  will be null if session not found
      *  IS subsession aware.
+     *  Returns null if id is null.
      *  @since 0.9.21 added id param
      */
     public SessionConfig getConfig(SessionId id) {
+        if (id == null)
+            return null;
         for (SessionParams sp : _sessions.values()) {
             if (id.equals(sp.sessionId))
                 return sp.config;
@@ -317,6 +320,8 @@ class ClientConnectionRunner {
      *  @since 0.9.21
      */
     public Hash getDestHash(SessionId id) {
+        if (id == null)
+            return null;
         for (Map.Entry<Hash, SessionParams> e : _sessions.entrySet()) {
             if (id.equals(e.getValue().sessionId))
                 return e.getKey();
@@ -330,6 +335,8 @@ class ClientConnectionRunner {
      *  @since 0.9.21
      */
     public Destination getDestination(SessionId id) {
+        if (id == null)
+            return null;
         for (SessionParams sp : _sessions.values()) {
             if (id.equals(sp.sessionId))
                 return sp.dest;
@@ -391,6 +398,8 @@ class ClientConnectionRunner {
     void setSessionId(Hash hash, SessionId id) {
         if (hash == null)
             throw new IllegalStateException();
+        if (id == null)
+            throw new NullPointerException();
         SessionParams sp = _sessions.get(hash);
         if (sp == null || sp.sessionId != null)
             throw new IllegalStateException();
@@ -403,6 +412,8 @@ class ClientConnectionRunner {
      *  @since 0.9.21
      */
     void removeSession(SessionId id) {
+        if (id == null)
+            return;
         boolean isPrimary = false;
         for (Iterator<SessionParams> iter = _sessions.values().iterator(); iter.hasNext(); ) {
             SessionParams sp = iter.next();
@@ -813,18 +824,20 @@ class ClientConnectionRunner {
         synchronized (this) {
             state = sp.leaseRequest;
             if (state != null) {
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Already requesting " + state);
                 LeaseSet requested = state.getRequested();
                 LeaseSet granted = state.getGranted();
                 long ours = set.getEarliestLeaseDate();
                 if ( ( (requested != null) && (requested.getEarliestLeaseDate() > ours) ) || 
                      ( (granted != null) && (granted.getEarliestLeaseDate() > ours) ) ) {
                     // theirs is newer
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("Already requesting, theirs newer, do nothing: " + state);
                 } else {
                     // ours is newer, so wait a few secs and retry
                     set.setDestination(dest);
                     _context.simpleTimer2().addEvent(new Rerequest(set, expirationTime, onCreateJob, onFailedJob), 3*1000);
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("Already requesting, ours newer, wait 3 sec: " + state);
                 }
                 // fire onCreated?
                 return; // already requesting

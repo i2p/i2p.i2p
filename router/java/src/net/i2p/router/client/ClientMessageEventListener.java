@@ -80,7 +80,11 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
      *
      */
     public void messageReceived(I2CPMessageReader reader, I2CPMessage message) {
-        if (_runner.isDead()) return;
+        if (_runner.isDead()) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Received but runner dead: \n" + message);
+            return;
+        }
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Message received: \n" + message);
         int type = message.getType();
@@ -362,8 +366,8 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
         SessionConfig cfg = _runner.getConfig(sid);
         if (cfg == null) {
             if (_log.shouldLog(Log.ERROR))
-                _log.error("SendMessage w/o session");
-            _runner.disconnectClient("SendMessage w/o session");
+                _log.error("SendMessage w/o session: " + sid);
+            _runner.disconnectClient("SendMessage w/o session: " + sid);
             return;
         }
         if (_log.shouldLog(Log.DEBUG))
@@ -372,10 +376,10 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
         MessageId id = _runner.distributeMessage(message);
         long timeToDistribute = _context.clock().now() - beforeDistribute;
         // TODO validate session id
-        _runner.ackSendMessage(message.getSessionId(), id, message.getNonce());
+        _runner.ackSendMessage(sid, id, message.getNonce());
         _context.statManager().addRateData("client.distributeTime", timeToDistribute);
-        if ( (timeToDistribute > 50) && (_log.shouldLog(Log.INFO)) )
-            _log.info("Took too long to distribute the message (which holds up the ack): " + timeToDistribute);
+        if ( (timeToDistribute > 50) && (_log.shouldLog(Log.DEBUG)) )
+            _log.debug("Took too long to distribute the message (which holds up the ack): " + timeToDistribute);
     }
 
     
@@ -386,7 +390,7 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
     private void handleReceiveBegin(ReceiveMessageBeginMessage message) {
         if (_runner.isDead()) return;
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Handling recieve begin: id = " + message.getMessageId());
+            _log.debug("Handling receive begin: id = " + message.getMessageId());
         MessagePayloadMessage msg = new MessagePayloadMessage();
         msg.setMessageId(message.getMessageId());
         // TODO validate session id
@@ -409,7 +413,7 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
     }
     
     /**
-     * The client told us that the message has been recieved completely.  This currently
+     * The client told us that the message has been received completely.  This currently
      * does not do any security checking prior to removing the message from the 
      * pending queue, though it should.
      *
@@ -443,8 +447,8 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
         SessionConfig cfg = _runner.getConfig(id);
         if (cfg == null) {
             if (_log.shouldLog(Log.ERROR))
-                _log.error("CreateLeaseSet w/o session");
-            _runner.disconnectClient("CreateLeaseSet w/o session");
+                _log.error("CreateLeaseSet w/o session: " + id);
+            _runner.disconnectClient("CreateLeaseSet w/o session: " + id);
             return;
         }
         Destination dest = cfg.getDestination();
@@ -533,9 +537,9 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
         SessionConfig cfg = _runner.getConfig(id);
         if (cfg == null) {
             if (_log.shouldLog(Log.ERROR))
-                _log.error("ReconfigureSession w/o session");
+                _log.error("ReconfigureSession w/o session: " + id);
             //sendStatusMessage(id, SessionStatusMessage.STATUS_INVALID);
-            _runner.disconnectClient("ReconfigureSession w/o session");
+            _runner.disconnectClient("ReconfigureSession w/o session: " + id);
             return;
         }
         if (_log.shouldLog(Log.INFO))

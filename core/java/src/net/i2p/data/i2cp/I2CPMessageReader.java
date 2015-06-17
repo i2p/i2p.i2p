@@ -158,6 +158,20 @@ public class I2CPMessageReader {
         }
 
         public void run() {
+            try {
+                run2();
+            } catch (Exception e) {
+                _log.log(Log.CRIT, "Uncaught I2CP error", e);
+                _listener.readError(I2CPMessageReader.this, e);
+                cancelRunner();
+            }
+        }
+
+        /**
+         * Called by run()
+         * @since 0.9.21
+         */
+        protected void run2() {
             while (_stayAlive) {
                 while (_doRun) {
                     // do read
