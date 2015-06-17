@@ -8,6 +8,10 @@ Prop from i2p.i2p.zzz.multisess:
    - Add support for 'aliased' local destinations that use the same tunnel pools
    - No UI or config support, no server support, may be added later
    - Catch uncaught exceptions in ClientConnectionRunner and stop connection
+   - When socket is closed, set sessionID and LS to null,
+     close subsession and set its sessionID and LS to null
+   - Checks on client side for null session ID
+   - Check for null session in Destroy Session message
 
 2015-06-13 zzz
  * i2psnark: Fix NPE (ticket #1602)

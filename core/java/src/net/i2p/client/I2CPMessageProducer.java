@@ -34,6 +34,7 @@ import net.i2p.data.i2cp.ReportAbuseMessage;
 import net.i2p.data.i2cp.SendMessageMessage;
 import net.i2p.data.i2cp.SendMessageExpiresMessage;
 import net.i2p.data.i2cp.SessionConfig;
+import net.i2p.data.i2cp.SessionId;
 import net.i2p.util.Log;
 
 /**
@@ -154,7 +155,12 @@ class I2CPMessageProducer {
         } else
             msg = new SendMessageMessage();
         msg.setDestination(dest);
-        msg.setSessionId(session.getSessionId());
+        SessionId sid = session.getSessionId();
+        if (sid == null) {
+            _log.error(session.toString() + " send message w/o session", new Exception());
+            return;
+        }
+        msg.setSessionId(sid);
         msg.setNonce(nonce);
         Payload data = createPayload(dest, payload, null, null, null, null);
         msg.setPayload(data);
@@ -176,7 +182,12 @@ class I2CPMessageProducer {
             return;
         SendMessageMessage msg = new SendMessageExpiresMessage(options);
         msg.setDestination(dest);
-        msg.setSessionId(session.getSessionId());
+        SessionId sid = session.getSessionId();
+        if (sid == null) {
+            _log.error(session.toString() + " send message w/o session", new Exception());
+            return;
+        }
+        msg.setSessionId(sid);
         msg.setNonce(nonce);
         Payload data = createPayload(dest, payload, null, null, null, null);
         msg.setPayload(data);
@@ -352,7 +363,12 @@ class I2CPMessageProducer {
         msg.setLeaseSet(leaseSet);
         msg.setPrivateKey(priv);
         msg.setSigningPrivateKey(signingPriv);
-        msg.setSessionId(session.getSessionId());
+        SessionId sid = session.getSessionId();
+        if (sid == null) {
+            _log.error(session.toString() + " create LS w/o session", new Exception());
+            return;
+        }
+        msg.setSessionId(sid);
         session.sendMessage(msg);
     }
 
@@ -381,7 +397,12 @@ class I2CPMessageProducer {
             throw new I2PSessionException("Unable to sign the session config", dfe);
         }
         msg.setSessionConfig(cfg);
-        msg.setSessionId(session.getSessionId());
+        SessionId sid = session.getSessionId();
+        if (sid == null) {
+            _log.error(session.toString() + " update config w/o session", new Exception());
+            return;
+        }
+        msg.setSessionId(sid);
         session.sendMessage(msg);
     }
 }

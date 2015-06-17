@@ -502,6 +502,8 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
     }
 
     protected void changeState(State state) {
+        if (_log.shouldInfo())
+            _log.info(getPrefix() + "Change state to " + state);
         synchronized (_stateLock) {
             _state = state;
             _stateLock.notifyAll();
@@ -891,8 +893,9 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
     public void messageReceived(I2CPMessageReader reader, I2CPMessage message) {
         int type = message.getType();
         SessionId id = message.sessionId();
-        if (id == null || id.equals(_sessionId) ||
-            (_sessionId == null && id != null && type == SessionStatusMessage.MESSAGE_TYPE)) {
+        SessionId currId = _sessionId;
+        if (id == null || id.equals(currId) ||
+            (currId == null && id != null && type == SessionStatusMessage.MESSAGE_TYPE)) {
             // it's for us
             I2CPMessageHandler handler = _handlerMap.getHandler(type);
             if (handler != null) {
@@ -1123,6 +1126,13 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
             locked_closeSocket();
             changeState(State.CLOSED);
         }
+        synchronized (_subsessionLock) {
+            for (SubSession sess : _subsessions) {
+                sess.changeState(State.CLOSED);
+                sess.setSessionId(null);
+                sess.setLeaseSet(null);
+            }
+        }
     }
 
     /**
@@ -1152,6 +1162,8 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
                 _socket = null; // so when propogateError calls closeSocket, it doesnt loop
             }
         }
+        setSessionId(null);
+        setLeaseSet(null);
     }
 
     /**
@@ -1238,8 +1250,10 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
             buf.append(s);
         else
             buf.append(getClass().getSimpleName());
-        if (_sessionId != null)
-            buf.append(" #").append(_sessionId.getSessionId());
+        SessionId id = _sessionId;
+        if (id != null)
+            buf.append(" #").append(id.getSessionId());
+        buf.append(' ').append(_state.toString());
         buf.append("]: ");
         return buf.toString();
     }

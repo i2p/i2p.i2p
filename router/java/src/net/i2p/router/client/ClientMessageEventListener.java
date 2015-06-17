@@ -8,6 +8,7 @@ package net.i2p.router.client;
  *
  */
 
+import java.util.List;
 import java.util.Properties;
 
 import net.i2p.CoreVersion;
@@ -30,6 +31,7 @@ import net.i2p.data.i2cp.I2CPMessageException;
 import net.i2p.data.i2cp.I2CPMessageReader;
 import net.i2p.data.i2cp.MessageId;
 import net.i2p.data.i2cp.MessagePayloadMessage;
+import net.i2p.data.i2cp.MessageStatusMessage;
 import net.i2p.data.i2cp.ReceiveMessageBeginMessage;
 import net.i2p.data.i2cp.ReceiveMessageEndMessage;
 import net.i2p.data.i2cp.ReconfigureSessionMessage;
@@ -365,9 +367,28 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
         SessionId sid = message.getSessionId();
         SessionConfig cfg = _runner.getConfig(sid);
         if (cfg == null) {
+            List<SessionId> current = _runner.getSessionIds();
+            String msg = "SendMessage invalid session: " + sid + " current: " + current;
             if (_log.shouldLog(Log.ERROR))
-                _log.error("SendMessage w/o session: " + sid);
-            _runner.disconnectClient("SendMessage w/o session: " + sid);
+                _log.error(msg);
+            // Just drop the message for now, don't kill the whole socket...
+            // bugs on client side, esp. prior to 0.9.21, may cause sending
+            // of messages before the session is established
+            //_runner.disconnectClient(msg);
+            // do this instead:
+            if (sid != null && message.getNonce() > 0) {
+                MessageStatusMessage status = new MessageStatusMessage();
+                status.setSessionId(sid.getSessionId());
+                status.setSize(0);
+                status.setNonce(message.getNonce()); 
+                status.setStatus(MessageStatusMessage.STATUS_SEND_FAILURE_BAD_SESSION);
+                try {
+                    _runner.doSend(status);
+                } catch (I2CPMessageException ime) {
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Error writing out the message status message", ime);
+                }
+            }
             return;
         }
         if (_log.shouldLog(Log.DEBUG))
@@ -424,10 +445,14 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
     
     private void handleDestroySession(DestroySessionMessage message) {
         SessionId id = message.getSessionId();
-        SessionConfig cfg = _runner.getConfig(id);
-        _runner.removeSession(id);
+        if (id != null) {
+            _runner.removeSession(id);
+        } else {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("destroy session with null ID");
+        }
         int left = _runner.getSessionIds().size();
-        if (left <= 0) {
+        if (left <= 0 || id == null) {
             _runner.stopRunning();
         } else {
             if (_log.shouldLog(Log.INFO))
@@ -446,9 +471,11 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
         SessionId id = message.getSessionId();
         SessionConfig cfg = _runner.getConfig(id);
         if (cfg == null) {
+            List<SessionId> current = _runner.getSessionIds();
+            String msg = "CreateLeaseSet invalid session: " + id + " current: " + current;
             if (_log.shouldLog(Log.ERROR))
-                _log.error("CreateLeaseSet w/o session: " + id);
-            _runner.disconnectClient("CreateLeaseSet w/o session: " + id);
+                _log.error(msg);
+            _runner.disconnectClient(msg);
             return;
         }
         Destination dest = cfg.getDestination();
@@ -536,10 +563,12 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
         SessionId id = message.getSessionId();
         SessionConfig cfg = _runner.getConfig(id);
         if (cfg == null) {
+            List<SessionId> current = _runner.getSessionIds();
+            String msg = "ReconfigureSession invalid session: " + id + " current: " + current;
             if (_log.shouldLog(Log.ERROR))
-                _log.error("ReconfigureSession w/o session: " + id);
+                _log.error(msg);
             //sendStatusMessage(id, SessionStatusMessage.STATUS_INVALID);
-            _runner.disconnectClient("ReconfigureSession w/o session: " + id);
+            _runner.disconnectClient(msg);
             return;
         }
         if (_log.shouldLog(Log.INFO))
