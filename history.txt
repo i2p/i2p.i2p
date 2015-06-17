@@ -1,3 +1,14 @@
+2015-06-17 zzz
+Prop from i2p.i2p.zzz.multisess:
+ * Router, I2CP, Streaming, i2ptunnel:
+   - Multisession support and multiple destinations in one tunnel pool
+   - Connections to Hardcoded blacklist of destinations that do not
+     support ECDSA will use the DSA session
+   - Change shared clients to ECDSA by default, with a DSA subsession
+   - Add support for 'aliased' local destinations that use the same tunnel pools
+   - No UI or config support, no server support, may be added later
+   - Catch uncaught exceptions in ClientConnectionRunner and stop connection
+
 2015-06-13 zzz
  * i2psnark: Fix NPE (ticket #1602)
  * NetDB:
@@ -5,6 +16,8 @@
    - Send our own RI unsolicited in reply if we aren't floodfill
    - Don't ack or flood a store of an unknown type
  * PeerTestJob: Don't generate zero reply token
+ * Timestamper: Reduce NTP timeouts to shorten startup time
+   when NTP is blocked
  * Tunnels: More checks of messages received down exploratory tunnels
 
 2015-06-08 dg
