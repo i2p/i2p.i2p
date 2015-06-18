@@ -1,3 +1,17 @@
+i2p (0.9.20-2) unstable; urgency=medium
+
+  [str4d]
+  * i2ptunnel: Don't connect manager to router in constructor (ticket #815)
+  * i2ptunnel: Don't call startup() in chained constructor (ticket #1593)
+  * Define I2PTunnelClientBase stats in one place
+
+  [killyourtv]
+  * Tighten apparmor rules for TMPDIR
+  * Add support for specifying limits to the initscript
+  * Fix NPE in I2PSnark (I2P Trac #1602)
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Sun, 14 Jun 2015 16:11:33 +0000
+
 i2p (0.9.20-1) unstable; urgency=medium
 
   * New Upstream Version
