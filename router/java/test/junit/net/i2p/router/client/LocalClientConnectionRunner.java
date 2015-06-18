@@ -42,9 +42,9 @@ class LocalClientConnectionRunner extends ClientConnectionRunner {
      *  don't instantiate a RequestLeaseSetJob
      */
     @Override
-    void requestLeaseSet(LeaseSet set, long expirationTime, Job onCreateJob, Job onFailedJob) {
+    void requestLeaseSet(Hash h, LeaseSet set, long expirationTime, Job onCreateJob, Job onFailedJob) {
         RequestVariableLeaseSetMessage msg = new RequestVariableLeaseSetMessage();
-        msg.setSessionId(getSessionId());
+        msg.setSessionId(getSessionId(h));
         for (int i = 0; i < set.getLeaseCount(); i++) {
             Lease lease = set.getLease(i);
             msg.addEndpoint(lease);
@@ -60,12 +60,12 @@ class LocalClientConnectionRunner extends ClientConnectionRunner {
      *  No job queue, so super NPEs
      */
     @Override
-    void updateMessageDeliveryStatus(MessageId id, long messageNonce, int status) {
+    void updateMessageDeliveryStatus(Destination dest, MessageId id, long messageNonce, int status) {
         if (messageNonce <= 0)
             return;
         MessageStatusMessage msg = new MessageStatusMessage();
         msg.setMessageId(id.getMessageId());
-        msg.setSessionId(getSessionId().getSessionId());
+        msg.setSessionId(getSessionId(dest.calculateHash()).getSessionId());
         // has to be >= 0, it is initialized to -1
         msg.setNonce(messageNonce);
         msg.setSize(0);

@@ -25,6 +25,7 @@ import net.i2p.data.i2cp.GetBandwidthLimitsMessage;
 import net.i2p.data.i2cp.HostLookupMessage;
 import net.i2p.data.i2cp.HostReplyMessage;
 import net.i2p.data.i2cp.I2CPMessageException;
+import net.i2p.data.i2cp.SessionConfig;
 import net.i2p.data.i2cp.SessionId;
 import net.i2p.router.RouterContext;
 
@@ -43,7 +44,7 @@ class LocalClientMessageEventListener extends ClientMessageEventListener {
      *  Immediately send a fake leaseset
      */
     @Override
-    protected void startCreateSessionJob() {
+    protected void startCreateSessionJob(SessionConfig config) {
         long exp = _context.clock().now() + 10*60*1000;
         LeaseSet ls = new LeaseSet();
         Lease lease = new Lease();
@@ -53,7 +54,7 @@ class LocalClientMessageEventListener extends ClientMessageEventListener {
         Date date = new Date(exp);
         lease.setEndDate(date);
         ls.addLease(lease);
-        _runner.requestLeaseSet(ls, exp, null, null);
+        _runner.requestLeaseSet(config.getDestination().calculateHash(), ls, exp, null, null);
     }
 
     /**

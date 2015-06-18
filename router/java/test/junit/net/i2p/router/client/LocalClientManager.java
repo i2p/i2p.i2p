@@ -58,12 +58,12 @@ class LocalClientManager extends ClientManager {
         if (runner != null) {
             runner.receiveMessage(toDest, fromDest, payload);
             if (sender != null)
-                sender.updateMessageDeliveryStatus(msgId, messageNonce, MessageStatusMessage.STATUS_SEND_SUCCESS_LOCAL);
+                sender.updateMessageDeliveryStatus(fromDest, msgId, messageNonce, MessageStatusMessage.STATUS_SEND_SUCCESS_LOCAL);
         } else {
             // remote.  ignore.
             System.out.println("Message " + msgId + " is targeting a REMOTE destination - DROPPED");
             if (sender != null)
-                sender.updateMessageDeliveryStatus(msgId, messageNonce, MessageStatusMessage.STATUS_SEND_GUARANTEED_FAILURE);
+                sender.updateMessageDeliveryStatus(fromDest, msgId, messageNonce, MessageStatusMessage.STATUS_SEND_GUARANTEED_FAILURE);
         }
     }
 
