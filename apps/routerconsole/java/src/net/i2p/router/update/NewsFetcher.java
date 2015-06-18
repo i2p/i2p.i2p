@@ -40,6 +40,7 @@ import net.i2p.util.PortMapper;
 import net.i2p.util.ReusableGZIPInputStream;
 import net.i2p.util.SecureFileOutputStream;
 import net.i2p.util.SSLEepGet;
+import net.i2p.util.Translate;
 import net.i2p.util.VersionComparator;
 
 /**
@@ -94,8 +95,13 @@ class NewsFetcher extends UpdateRunner {
         }
 
         for (URI uri : _urls) {
-             _currentURI = uri;
-             String newsURL = uri.toString();
+            String origURL = uri.toString();
+            String newsURL = addLang(origURL);
+            try {
+                _currentURI = new URI(newsURL);
+            } catch (URISyntaxException use) {
+                _currentURI = uri;
+            }
 
             if (_tempFile.exists())
                 _tempFile.delete();
@@ -128,6 +134,29 @@ class NewsFetcher extends UpdateRunner {
                 _log.error("Error fetching the news", t);
             }
         }
+    }
+
+    /**
+     *  Add a query param for the local language to get translated news
+     *  @since 0.9.21
+     */
+    private String addLang(String url) {
+        if (url.contains("?lang=") || url.contains("&lang="))
+            return url;
+        String lang = Translate.getLanguage(_context);
+        if (lang.equals("en"))
+            return url;
+        StringBuilder buf = new StringBuilder();
+        buf.append(url);
+        if (url.contains("?"))
+            buf.append("&lang=");
+        else
+            buf.append("?lang=");
+        buf.append(lang);
+        String co = Translate.getCountry(_context);
+        if (co.length() > 0)
+            buf.append('_').append(co);
+        return buf.toString();
     }
     
     // Fake XML parsing
