@@ -123,6 +123,7 @@ class ClientConnectionRunner {
         SessionId sessionId;
         SessionConfig config;
         LeaseRequestState leaseRequest;
+        Rerequest rerequestTimer;
         LeaseSet currentLeaseSet;
 
         SessionParams(Destination d, boolean isPrimary) {
@@ -766,6 +767,8 @@ class ClientConnectionRunner {
      * within the timeout specified, queue up the onFailedJob.  This call does not
      * block.
      *
+     * Job args are always null, may need some fixups if we start using them.
+     *
      * @param h the Destination's hash
      * @param set LeaseSet with requested leases - this object must be updated to contain the 
      *            signed version (as well as any changed/added/removed Leases)
@@ -800,6 +803,7 @@ class ClientConnectionRunner {
         // synch so _currentLeaseSet isn't changed out from under us
         LeaseSet current = null;
         Destination dest = sp.dest;
+        LeaseRequestState state;
         synchronized (this) {
             current = sp.currentLeaseSet;
             if (current != null && current.getLeaseCount() == leases) {
@@ -817,11 +821,10 @@ class ClientConnectionRunner {
                     }
                 }
             }
-        }
-        if (_log.shouldLog(Log.INFO))
-            _log.info("Current leaseSet " + current + "\nNew leaseSet " + set);
-        LeaseRequestState state;
-        synchronized (this) {
+
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Current leaseSet " + current + "\nNew leaseSet " + set);
+
             state = sp.leaseRequest;
             if (state != null) {
                 LeaseSet requested = state.getRequested();
@@ -835,7 +838,9 @@ class ClientConnectionRunner {
                 } else {
                     // ours is newer, so wait a few secs and retry
                     set.setDestination(dest);
-                    _context.simpleTimer2().addEvent(new Rerequest(set, expirationTime, onCreateJob, onFailedJob), 3*1000);
+                    Rerequest timer = new Rerequest(set, expirationTime, onCreateJob, onFailedJob);
+                    sp.rerequestTimer = timer;
+                    _context.simpleTimer2().addEvent(timer, 3*1000);
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Already requesting, ours newer, wait 3 sec: " + state);
                 }
@@ -843,10 +848,24 @@ class ClientConnectionRunner {
                 return; // already requesting
             } else {
                 set.setDestination(dest);
-                sp.leaseRequest = state = new LeaseRequestState(onCreateJob, onFailedJob,
+                if (current == null && _context.tunnelManager().getOutboundClientTunnelCount(h) <= 0) {
+                    // at startup of a client, where we don't have a leaseset, wait for
+                    // an outbound tunnel also, so the client doesn't start sending data
+                    // before we are ready
+                    Rerequest timer = new Rerequest(set, expirationTime, onCreateJob, onFailedJob);
+                    sp.rerequestTimer = timer;
+                    _context.simpleTimer2().addEvent(timer, 1000);
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("No current LS but no OB tunnels, wait 1 sec for " + h);
+                    return;
+                } else {
+                    // so the timer won't fire off with an older LS request
+                    sp.rerequestTimer = null;
+                    sp.leaseRequest = state = new LeaseRequestState(onCreateJob, onFailedJob,
                                                                 _context.clock().now() + expirationTime, set);
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("New request: " + state);
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("New request: " + state);
+                }
             }
         }
         _context.jobQueue().addJob(new RequestLeaseSetJob(_context, this, state));
@@ -867,6 +886,20 @@ class ClientConnectionRunner {
         }
 
         public void timeReached() {
+            Hash h = _ls.getDestination().calculateHash();
+            SessionParams sp = _sessions.get(h);
+            if (sp == null) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("cancelling rerequest, session went away");
+                return;
+            }
+            synchronized(ClientConnectionRunner.this) {
+                if (sp.rerequestTimer != Rerequest.this) {
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("cancelling rerequest, newer request came in");
+                    return;
+                }
+            }
             requestLeaseSet(_ls.getDestination().calculateHash(), _ls, _expirationTime, _onCreate, _onFailed);
         }
     }
