@@ -1,4 +1,4 @@
-package net.i2p.client;
+package net.i2p.client.impl;
 
 /*
  * free (adj.): unencumbered; not under the control of others
@@ -15,6 +15,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
 import net.i2p.I2PAppContext;
+import net.i2p.client.I2PSessionException;
+import net.i2p.client.SendMessageOptions;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.Destination;
 import net.i2p.data.LeaseSet;

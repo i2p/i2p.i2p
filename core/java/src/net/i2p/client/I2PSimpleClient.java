@@ -12,6 +12,7 @@ import java.util.Properties;
 
 import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
+import net.i2p.client.impl.I2PSimpleSession;
 import net.i2p.crypto.SigType;
 import net.i2p.data.Certificate;
 import net.i2p.data.Destination;

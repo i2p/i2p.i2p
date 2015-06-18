@@ -132,7 +132,7 @@ public class ClientManagerFacadeImpl extends ClientManagerFacade implements Inte
      * LeaseSet.
      *
      * @param dest Destination from which the LeaseSet's authorization should be requested
-     * @param ls  LeaseSet with requested leases - this object must be updated to contain the 
+     * @param set LeaseSet with requested leases - this object must be updated to contain the 
      *            signed version (as well as any changed/added/removed Leases).
      *            The LeaseSet contains Leases only; it is unsigned and does not have the destination set.
      */

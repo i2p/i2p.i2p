@@ -260,7 +260,6 @@ public interface I2PSession {
     public I2PSession addSubsession(InputStream privateKeyStream, Properties opts) throws I2PSessionException;
     
     /**
-     *  @return a list of subsessions, non-null, does not include the primary session
      *  @since 0.9.21
      */
     public void removeSubsession(I2PSession session);

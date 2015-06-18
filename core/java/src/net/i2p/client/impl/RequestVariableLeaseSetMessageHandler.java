@@ -1,4 +1,4 @@
-package net.i2p.client;
+package net.i2p.client.impl;
 
 /*
  * free (adj.): unencumbered; not under the control of others

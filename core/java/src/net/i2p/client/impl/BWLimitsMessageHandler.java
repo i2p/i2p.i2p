@@ -1,4 +1,4 @@
-package net.i2p.client;
+package net.i2p.client.impl;
 
 /*
  * Released into the public domain 

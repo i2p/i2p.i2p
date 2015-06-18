@@ -1,4 +1,4 @@
-package net.i2p.client;
+package net.i2p.client.impl;
 
 /*
  * free (adj.): unencumbered; not under the control of others
@@ -17,6 +17,9 @@ import java.util.Properties;
 
 import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
+import net.i2p.client.I2PClient;
+import net.i2p.client.I2PSession;
+import net.i2p.client.I2PSessionException;
 import net.i2p.crypto.KeyGenerator;
 import net.i2p.crypto.SigType;
 import net.i2p.data.Certificate;
@@ -36,7 +39,7 @@ import net.i2p.util.RandomSource;
  *
  * @author jrandom
  */
-class I2PClientImpl implements I2PClient {
+public class I2PClientImpl implements I2PClient {
 
     /**
      * Create a destination with a DSA 1024/160 signature type and a null certificate.

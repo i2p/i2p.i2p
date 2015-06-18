@@ -1,4 +1,4 @@
-package net.i2p.client;
+package net.i2p.client.impl;
 
 /*
  * free (adj.): unencumbered; not under the control of others
@@ -20,6 +20,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 import net.i2p.I2PAppContext;
+import net.i2p.client.I2PClient;
+import net.i2p.client.I2PSessionException;
+import net.i2p.client.I2PSessionListener;
+import net.i2p.client.I2PSessionMuxedListener;
+import net.i2p.client.SendMessageOptions;
+import net.i2p.client.SendMessageStatusListener;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.SessionKey;

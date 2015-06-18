@@ -1,4 +1,4 @@
-package net.i2p.client;
+package net.i2p.client.impl;
 
 /*
  * Released into the public domain 
@@ -16,6 +16,8 @@ import java.util.Properties;
 
 import net.i2p.CoreVersion;
 import net.i2p.I2PAppContext;
+import net.i2p.client.I2PClient;
+import net.i2p.client.I2PSessionException;
 import net.i2p.data.i2cp.BandwidthLimitsMessage;
 import net.i2p.data.i2cp.DestReplyMessage;
 import net.i2p.data.i2cp.DisconnectMessage;
@@ -37,7 +39,7 @@ import net.i2p.util.OrderedProperties;
  *
  * @author zzz
  */
-class I2PSimpleSession extends I2PSessionImpl2 {
+public class I2PSimpleSession extends I2PSessionImpl2 {
 
     private static final int BUF_SIZE = 1024;
 

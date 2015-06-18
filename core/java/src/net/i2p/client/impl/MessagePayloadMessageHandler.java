@@ -1,4 +1,4 @@
-package net.i2p.client;
+package net.i2p.client.impl;
 
 /*
  * free (adj.): unencumbered; not under the control of others
@@ -10,6 +10,7 @@ package net.i2p.client;
  */
 
 import net.i2p.I2PAppContext;
+import net.i2p.client.I2PSessionException;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.Payload;
 import net.i2p.data.i2cp.I2CPMessage;

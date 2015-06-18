@@ -1,9 +1,13 @@
-package net.i2p.client;
+package net.i2p.client.impl;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.Map;
 
 import net.i2p.I2PAppContext;
+import net.i2p.client.I2PSession;
+import net.i2p.client.I2PSessionException;
+import net.i2p.client.I2PSessionListener;
+import net.i2p.client.I2PSessionMuxedListener;
 import net.i2p.util.Log;
 
 /*

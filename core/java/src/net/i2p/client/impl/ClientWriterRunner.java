@@ -1,4 +1,4 @@
-package net.i2p.client;
+package net.i2p.client.impl;
 
 import java.io.BufferedOutputStream;
 import java.io.IOException;
@@ -9,6 +9,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 import net.i2p.I2PAppContext;
+import net.i2p.client.I2PSessionException;
 import net.i2p.data.i2cp.I2CPMessage;
 import net.i2p.data.i2cp.I2CPMessageException;
 import net.i2p.internal.PoisonI2CPMessage;

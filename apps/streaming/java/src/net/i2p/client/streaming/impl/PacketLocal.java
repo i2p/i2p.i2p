@@ -207,8 +207,6 @@ class PacketLocal extends Packet implements MessageOutputStream.WriteStatus {
      *
      * @param buffer data to be written
      * @param offset starting point in the buffer
-     * @param ctx Application Context
-     * @param key signing key
      * @return Count of bytes written
      * @throws IllegalStateException if there is data missing or otherwise b0rked
      * @since 0.9.20 moved from Packet

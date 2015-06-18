@@ -1,4 +1,4 @@
-package net.i2p.client;
+package net.i2p.client.impl;
 
 /*
  * public domain
@@ -8,9 +8,14 @@ import java.io.InputStream;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.Properties;
 import java.util.Set;
-
 import java.util.concurrent.atomic.AtomicBoolean;
+
 import net.i2p.I2PAppContext;
+import net.i2p.client.I2PSessionException;
+import net.i2p.client.I2PSessionListener;
+import net.i2p.client.I2PSessionMuxedListener;
+import net.i2p.client.SendMessageOptions;
+import net.i2p.client.SendMessageStatusListener;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.SessionKey;

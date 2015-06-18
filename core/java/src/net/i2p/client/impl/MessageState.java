@@ -1,8 +1,10 @@
-package net.i2p.client;
+package net.i2p.client.impl;
 
 import java.util.concurrent.atomic.AtomicLong;
 
 import net.i2p.I2PAppContext;
+import net.i2p.client.I2PSession;
+import net.i2p.client.SendMessageStatusListener;
 import net.i2p.data.i2cp.MessageId;
 import net.i2p.data.i2cp.MessageStatusMessage;
 import net.i2p.util.Log;

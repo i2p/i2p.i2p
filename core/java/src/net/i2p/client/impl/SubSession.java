@@ -1,4 +1,4 @@
-package net.i2p.client;
+package net.i2p.client.impl;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.Properties;
 
 import net.i2p.I2PAppContext;
+import net.i2p.client.I2PSession;
+import net.i2p.client.I2PSessionException;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
 import net.i2p.data.PrivateKey;

@@ -1,4 +1,4 @@
-package net.i2p.client;
+package net.i2p.client.impl;
 
 /*
  * free (adj.): unencumbered; not under the control of others
@@ -29,6 +29,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import net.i2p.CoreVersion;
 import net.i2p.I2PAppContext;
+import net.i2p.client.DomainSocketFactory;
+import net.i2p.client.I2PClient;
+import net.i2p.client.I2PSession;
+import net.i2p.client.I2PSessionException;
+import net.i2p.client.I2PSessionListener;
 import net.i2p.data.Base32;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.Destination;
