@@ -42,9 +42,11 @@ import net.i2p.data.LeaseSet;
 import net.i2p.data.PrivateKey;
 import net.i2p.data.SigningPrivateKey;
 import net.i2p.data.i2cp.DestLookupMessage;
+import net.i2p.data.i2cp.DestReplyMessage;
 import net.i2p.data.i2cp.GetBandwidthLimitsMessage;
 import net.i2p.data.i2cp.GetDateMessage;
 import net.i2p.data.i2cp.HostLookupMessage;
+import net.i2p.data.i2cp.HostReplyMessage;
 import net.i2p.data.i2cp.I2CPMessage;
 import net.i2p.data.i2cp.I2CPMessageReader;
 import net.i2p.data.i2cp.MessagePayloadMessage;
@@ -900,7 +902,9 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
         SessionId id = message.sessionId();
         SessionId currId = _sessionId;
         if (id == null || id.equals(currId) ||
-            (currId == null && id != null && type == SessionStatusMessage.MESSAGE_TYPE)) {
+            (currId == null && id != null && type == SessionStatusMessage.MESSAGE_TYPE) ||
+            ((id == null || id.getSessionId() == 65535) &&
+             (type == HostReplyMessage.MESSAGE_TYPE || type == DestReplyMessage.MESSAGE_TYPE))) {
             // it's for us
             I2CPMessageHandler handler = _handlerMap.getHandler(type);
             if (handler != null) {

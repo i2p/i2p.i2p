@@ -540,11 +540,22 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
      * @since 0.9.11
      */
     protected void handleHostLookup(HostLookupMessage message) {
-        Hash h = _runner.getDestHash(message.getSessionId());
-        if (h == null)
-            return;  // ok?
+        SessionId sid = message.getSessionId();
+        Hash h;
+        if (sid != null) {
+            h = _runner.getDestHash(sid);
+        } else {
+            // fixup if necessary
+            if (message.getReqID() >= 0)
+                sid = new SessionId(65535);
+            h = null;
+        }
+        if (h == null) {
+            h = _runner.getDestHash();
+            // h may still be null, an LS lookup for b32 will go out expl. tunnels
+        }
         _context.jobQueue().addJob(new LookupDestJob(_context, _runner, message.getReqID(),
-                                                     message.getTimeout(), message.getSessionId(),
+                                                     message.getTimeout(), sid,
                                                      message.getHash(), message.getHostname(), h));
     }
 

@@ -303,15 +303,15 @@ class ClientConnectionRunner {
     /**
      *  Equivalent to getConfig().getDestination().calculateHash();
      *  will be null before session is established
-     *  Not subsession aware. Returns random hash from the sessions.
+     *  Not subsession aware. Returns primary session hash.
      *  Don't use if you can help it.
      *
      *  @return primary hash or null if not yet set
      */
     public Hash getDestHash() {
-        for (Hash h : _sessions.keySet()) {
-            return h;
-        }
+        SessionConfig cfg = getPrimaryConfig();
+        if (cfg != null)
+            return cfg.getDestination().calculateHash();
         return null;
     }
 
@@ -890,17 +890,17 @@ class ClientConnectionRunner {
             SessionParams sp = _sessions.get(h);
             if (sp == null) {
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn("cancelling rerequest, session went away");
+                    _log.warn("cancelling rerequest, session went away: " + h);
                 return;
             }
             synchronized(ClientConnectionRunner.this) {
                 if (sp.rerequestTimer != Rerequest.this) {
                     if (_log.shouldLog(Log.WARN))
-                        _log.warn("cancelling rerequest, newer request came in");
+                        _log.warn("cancelling rerequest, newer request came in: " + h);
                     return;
                 }
             }
-            requestLeaseSet(_ls.getDestination().calculateHash(), _ls, _expirationTime, _onCreate, _onFailed);
+            requestLeaseSet(h, _ls, _expirationTime, _onCreate, _onFailed);
         }
     }
     

@@ -1,4 +1,5 @@
 2015-06-19 zzz
+ * I2CP: Fix simple session lookups, broken in prop
  * I2PSocketEepGet: Do hostname lookups in-session for efficiency
  * Tunnels: Increase default max tunnels
 
