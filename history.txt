@@ -1,3 +1,17 @@
+2015-06-19 zzz
+ * I2PSocketEepGet: Do hostname lookups in-session for efficiency
+ * Tunnels: Increase default max tunnels
+
+2015-06-18 zzz
+ * I2CP:
+   - Don't send the first LS request to the client until we have
+     at least one OB tunnel, so the client waits until we are ready.
+   - Fixes to prevent multiple pending LS requests
+   - Move client-side implementation classes to
+     new package net.i2p.client.impl, leaving only the
+     factories and interfaces in net.i2p.client
+ * Update: Add language param to news fetch for translated news (ticket #1425)
+
 2015-06-17 zzz
 Prop from i2p.i2p.zzz.multisess:
  * Router, I2CP, Streaming, i2ptunnel:
