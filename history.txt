@@ -1,5 +1,6 @@
 2015-06-20 dg
  * I2PSnark: Auto-start now only starts torrents which were running at shutdown (#766)
+ * NetDB: Don't say we stored, and don't flood, if we're shutting down
 
 2015-06-19 zzz
  * I2CP: Fix simple session lookups, broken in prop
@@ -37,6 +38,7 @@ Prop from i2p.i2p.zzz.multisess:
    - Improve routing of DatabaseStoreMessage acks
    - Send our own RI unsolicited in reply if we aren't floodfill
    - Don't ack or flood a store of an unknown type
+   - Don't say we stored, and don't flood if we're shutting down
  * PeerTestJob: Don't generate zero reply token
  * Timestamper: Reduce NTP timeouts to shorten startup time
    when NTP is blocked

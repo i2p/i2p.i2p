@@ -216,6 +216,7 @@ public class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
         // flood it
         if (invalidMessage == null &&
             getContext().netDb().floodfillEnabled() &&
+            !getContext().router().gracefulShutdownInProgress() &&
             _message.getReplyToken() > 0) {
             if (wasNew) {
                 // DOS prevention
@@ -251,7 +252,7 @@ public class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
         TunnelId replyTunnel = _message.getReplyTunnel();
         // A store of our own RI, only if we are not FF
         DatabaseStoreMessage msg2;
-        if (getContext().netDb().floodfillEnabled() ||
+        if ((getContext().netDb().floodfillEnabled() && !getContext().router().gracefulShutdownInProgress()) ||
             storedKey.equals(getContext().routerHash())) {
             // don't send our RI if the store was our RI (from PeerTestJob)
             msg2 = null;
