@@ -89,6 +89,7 @@ public class SnarkManager implements CompleteListener {
     public static final String PROP_UPBW_MAX = "i2psnark.upbw.max";
     public static final String PROP_DIR = "i2psnark.dir";
     private static final String PROP_META_PREFIX = "i2psnark.zmeta.";
+    private static final String PROP_META_RUNNING = "running";
     private static final String PROP_META_STAMP = "stamp";
     private static final String PROP_META_BASE = "base";
     private static final String PROP_META_BITFIELD = "bitfield";
@@ -1270,7 +1271,10 @@ public class SnarkManager implements CompleteListener {
             return;
         }
         // ok, snark created, now lets start it up or configure it further
-        if (!dontAutoStart && shouldAutoStart()) {
+        Properties config = getConfig(torrent);
+        boolean running = Boolean.parseBoolean(config.getProperty(PROP_META_RUNNING));
+        // Were we running last time?
+        if (!dontAutoStart && shouldAutoStart() && running) {
             torrent.startTorrent();
             addMessage(_("Torrent added and started: \"{0}\"", torrent.getBaseName()));
         } else {
@@ -1431,7 +1435,7 @@ public class SnarkManager implements CompleteListener {
                 return false;
             }
             // so addTorrent won't recheck
-            saveTorrentStatus(metainfo, bitfield, null, baseFile, true, 0); // no file priorities
+            saveTorrentStatus(metainfo, bitfield, null, baseFile, true, 0, snark.isStopped()); // no file priorities
             try {
                 locked_writeMetaInfo(metainfo, filename, areFilesPublic());
                 // hold the lock for a long time
@@ -1626,7 +1630,7 @@ public class SnarkManager implements CompleteListener {
             return;
         saveTorrentStatus(meta, storage.getBitField(), storage.getFilePriorities(),
                           storage.getBase(), storage.getPreserveFileNames(),
-                          snark.getUploaded());
+                          snark.getUploaded(), snark.isStopped());
     }
 
     /**
@@ -1641,14 +1645,14 @@ public class SnarkManager implements CompleteListener {
      * @param base may be null
      */
     private void saveTorrentStatus(MetaInfo metainfo, BitField bitfield, int[] priorities,
-                                   File base, boolean preserveNames, long uploaded) {
+                                   File base, boolean preserveNames, long uploaded, boolean stopped) {
         synchronized (_configLock) {
-            locked_saveTorrentStatus(metainfo, bitfield, priorities, base, preserveNames, uploaded);
+            locked_saveTorrentStatus(metainfo, bitfield, priorities, base, preserveNames, uploaded, stopped);
         }
     }
 
     private void locked_saveTorrentStatus(MetaInfo metainfo, BitField bitfield, int[] priorities,
-                                          File base, boolean preserveNames, long uploaded) {
+                                          File base, boolean preserveNames, long uploaded, boolean stopped) {
         byte[] ih = metainfo.getInfoHash();
         String bfs;
         if (bitfield.complete()) {
@@ -1657,11 +1661,13 @@ public class SnarkManager implements CompleteListener {
           byte[] bf = bitfield.getFieldBytes();
           bfs = Base64.encode(bf);
         }
+        boolean running = !stopped;
         Properties config = getConfig(ih);
         config.setProperty(PROP_META_STAMP, Long.toString(System.currentTimeMillis()));
         config.setProperty(PROP_META_BITFIELD, bfs);
         config.setProperty(PROP_META_PRESERVE_NAMES, Boolean.toString(preserveNames));
         config.setProperty(PROP_META_UPLOADED, Long.toString(uploaded));
+        config.setProperty(PROP_META_RUNNING, Boolean.toString(running));
         if (base != null)
             config.setProperty(PROP_META_BASE, base.getAbsolutePath());
 
@@ -1989,7 +1995,8 @@ public class SnarkManager implements CompleteListener {
         Storage storage = snark.getStorage();
         if (meta != null && storage != null)
             saveTorrentStatus(meta, storage.getBitField(), storage.getFilePriorities(),
-                              storage.getBase(), storage.getPreserveFileNames(), snark.getUploaded());
+                              storage.getBase(), storage.getPreserveFileNames(), snark.getUploaded(), 
+                              snark.isStopped());
     }
     
     /**
@@ -2012,7 +2019,8 @@ public class SnarkManager implements CompleteListener {
                 return null;
             }
             saveTorrentStatus(meta, storage.getBitField(), null,
-                              storage.getBase(), storage.getPreserveFileNames(), 0);
+                              storage.getBase(), storage.getPreserveFileNames(), 0, 
+                              snark.isStopped());
             // temp for addMessage() in case canonical throws
             String name = storage.getBaseName();
             try {
@@ -2350,6 +2358,7 @@ public class SnarkManager implements CompleteListener {
                 if (count == 0)
                     addMessage(_("Stopping all torrents and closing the I2P tunnel."));
                 count++;
+                saveTorrentStatus(snark);
                 if (finalShutdown)
                     snark.stopTorrent(true);
                 else

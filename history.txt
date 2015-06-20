@@ -1,3 +1,6 @@
+2015-06-20 dg
+ * I2PSnark: Auto-start now only starts torrents which were running at shutdown (#766)
+
 2015-06-19 zzz
  * I2CP: Fix simple session lookups, broken in prop
  * I2PSocketEepGet: Do hostname lookups in-session for efficiency
