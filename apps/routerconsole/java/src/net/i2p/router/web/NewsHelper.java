@@ -28,6 +28,11 @@ public class NewsHelper extends ContentHelper {
     public static final String PROP_LAST_CHECKED = "routerconsole.newsLastChecked";
     /** @since 0.9.4 */
     public static final String PROP_LAST_UPDATED = "routerconsole.newsLastUpdated";
+    /**
+     * Default true
+     * @since 0.9.21
+     */
+    public static final String PROP_TRANSLATE = "routerconsole.newsTranslate";
     public static final String NEWS_FILE = "docs/news.xml";
 
     /**

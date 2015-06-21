@@ -95,13 +95,8 @@ class NewsFetcher extends UpdateRunner {
         }
 
         for (URI uri : _urls) {
-            String origURL = uri.toString();
-            String newsURL = addLang(origURL);
-            try {
-                _currentURI = new URI(newsURL);
-            } catch (URISyntaxException use) {
-                _currentURI = uri;
-            }
+            _currentURI = addLang(uri);
+            String newsURL = _currentURI.toString();
 
             if (_tempFile.exists())
                 _tempFile.delete();
@@ -137,18 +132,25 @@ class NewsFetcher extends UpdateRunner {
     }
 
     /**
-     *  Add a query param for the local language to get translated news
+     *  Add a query param for the local language to get translated news.
+     *  Unchanged if disabled by property, if language is english,
+     *  or if URI already contains a language paramter
+     *
      *  @since 0.9.21
      */
-    private String addLang(String url) {
-        if (url.contains("?lang=") || url.contains("&lang="))
-            return url;
+    private URI addLang(URI uri) {
+        if (!_context.getBooleanPropertyDefaultTrue(NewsHelper.PROP_TRANSLATE))
+            return uri;
         String lang = Translate.getLanguage(_context);
         if (lang.equals("en"))
-            return url;
+            return uri;
+        String query = uri.getRawQuery();
+        if (query != null && (query.startsWith("lang=") || query.contains("&lang=")))
+            return uri;
+        String url = uri.toString();
         StringBuilder buf = new StringBuilder();
         buf.append(url);
-        if (url.contains("?"))
+        if (query != null)
             buf.append("&lang=");
         else
             buf.append("?lang=");
@@ -156,7 +158,11 @@ class NewsFetcher extends UpdateRunner {
         String co = Translate.getCountry(_context);
         if (co.length() > 0)
             buf.append('_').append(co);
-        return buf.toString();
+        try {
+            return new URI(buf.toString());
+        } catch (URISyntaxException use) {
+            return uri;
+        }
     }
     
     // Fake XML parsing
