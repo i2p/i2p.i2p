@@ -34,6 +34,7 @@ class Dummy {
         // note that if the wording changes in i2ptunnel.config, we have to
         // keep the old string here as well for existing installs
         _("shared clients");
+        _("shared clients (DSA)");
         _("IRC proxy");
         _("eepsite");
         _("I2P webserver");
@@ -79,21 +80,5 @@ class Dummy {
         _("port");
         // capabilities
         _("caps");
-        // introducer host
-        _("ihost0");
-        _("ihost1");
-        _("ihost2");
-        // introducer port
-        _("iport0");
-        _("iport1");
-        _("iport2");
-        // introducer key
-        _("ikey0");
-        _("ikey1");
-        _("ikey2");
-        // introducer tag
-        _("itag0");
-        _("itag1");
-        _("itag2");
     }
 }
