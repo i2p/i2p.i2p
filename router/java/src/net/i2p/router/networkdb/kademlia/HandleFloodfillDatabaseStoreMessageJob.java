@@ -216,7 +216,6 @@ public class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
         // flood it
         if (invalidMessage == null &&
             getContext().netDb().floodfillEnabled() &&
-            !getContext().router().gracefulShutdownInProgress() &&
             _message.getReplyToken() > 0) {
             if (wasNew) {
                 // DOS prevention

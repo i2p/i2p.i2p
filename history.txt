@@ -1,3 +1,7 @@
+2015-06-22 dg
+ * NetDB: Partially revert last NetDB change: flood because we don't want to create a hole in the DHT 
+   before publisher resends to somebody else.
+
 2015-06-20 dg
  * I2PSnark: Auto-start now only starts torrents which were running at shutdown (#766)
  * NetDB: Don't say we stored, and don't flood, if we're shutting down
