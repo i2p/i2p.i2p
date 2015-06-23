@@ -1,3 +1,11 @@
+2015-06-23 zzz
+ * Console: Fix NPE on /configtunnels
+ * GeoIP: Add countries and flags for Asia/Pacific, Bonaire, St. Barts,
+   St. Maarten, South Sudan
+ * I2CP: Don't try to decrypt an LS before it's encrypted (ticket #1608)
+ * Router: Increase default outbound bandwidth to 60 KBps;
+   raise class L/M boundary to match so defaulted routers are still L
+
 2015-06-22 dg
  * NetDB: Partially revert last NetDB change: flood because we don't want to create a hole in the DHT 
    before publisher resends to somebody else.

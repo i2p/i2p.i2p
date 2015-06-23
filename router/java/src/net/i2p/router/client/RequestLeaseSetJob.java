@@ -64,7 +64,7 @@ class RequestLeaseSetJob extends JobImpl {
         //    _log.debug("Adding fudge " + fudge);
         endTime += fudge;
 
-        SessionId id = _runner.getSessionId(_requestState.getRequested().getDestination().calculateHash());
+        SessionId id = _runner.getSessionId(requested.getDestination().calculateHash());
         if (id == null)
             return;
         I2CPMessage msg;
