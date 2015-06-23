@@ -415,8 +415,10 @@ public class TunnelPool {
 
     void setSettings(TunnelPoolSettings settings) { 
         if (settings != null && _settings != null) {
-            settings.getAliases().addAll(_settings.getAliases());
-            settings.setAliasOf(_settings.getAliasOf());
+            if (!(settings.isExploratory() || _settings.isExploratory())) {
+                settings.getAliases().addAll(_settings.getAliases());
+                settings.setAliasOf(_settings.getAliasOf());
+            }
         }
         _settings = settings; 
         if (_settings != null) {
