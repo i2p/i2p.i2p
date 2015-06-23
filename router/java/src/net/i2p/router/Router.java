@@ -911,7 +911,7 @@ public class Router implements RouterClock.ClockShiftListener {
             ri.addCapability(force.charAt(0));
         } else if (bwLim < 12) {
             ri.addCapability(CAPABILITY_BW12);
-        } else if (bwLim <= 32) {
+        } else if (bwLim <= 48) {
             ri.addCapability(CAPABILITY_BW32);
         } else if (bwLim <= 64) {
             ri.addCapability(CAPABILITY_BW64);
