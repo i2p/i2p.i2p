@@ -16,6 +16,7 @@ AL,Albania
 AM,Armenia
 AN,Netherlands Antilles
 AO,Angola
+AP,Asia/Pacific Region
 AQ,Antarctica
 AR,Argentina
 AS,American Samoa
@@ -33,9 +34,11 @@ BG,Bulgaria
 BH,Bahrain
 BI,Burundi
 BJ,Benin
+BL,Saint Barthélemy
 BM,Bermuda
 BN,Brunei Darussalam
 BO,Bolivia
+BQ,Bonaire
 BR,Brazil
 BS,Bahamas
 BT,Bhutan
@@ -45,7 +48,7 @@ BY,Belarus
 BZ,Belize
 CA,Canada
 CC,Cocos (Keeling) Islands
-CD,The Democratic Republic of the Congo
+CD,Congo
 CF,Central African Republic
 CG,Congo
 CH,Switzerland
@@ -80,7 +83,7 @@ EU,European Union
 FI,Finland
 FJ,Fiji
 FK,Falkland Islands (Malvinas)
-FM,Federated States of Micronesia
+FM,Micronesia
 FO,Faroe Islands
 FR,France
 GA,Gabon
@@ -114,7 +117,7 @@ IM,Isle of Man
 IN,India
 IO,British Indian Ocean Territory
 IQ,Iraq
-IR,Islamic Republic of Iran
+IR,Iran
 IS,Iceland
 IT,Italy
 JE,Jersey
@@ -127,7 +130,7 @@ KH,Cambodia
 KI,Kiribati
 KM,Comoros
 KN,Saint Kitts and Nevis
-KP,The Democratic People's Republic of Korea
+KP,North Korea
 KR,Republic of Korea
 KW,Kuwait
 KY,Cayman Islands
@@ -142,19 +145,19 @@ LS,Lesotho
 LT,Lithuania
 LU,Luxembourg
 LV,Latvia
-LY,Libyan Arab Jamahiriya
+LY,Libya
 MA,Morocco
 MC,Monaco
-MD,Republic of Moldova
+MD,Moldova
 ME,Montenegro
 MF,Saint Martin
 MG,Madagascar
 MH,Marshall Islands
-MK,The Former Yugoslav Republic of Macedonia
+MK,Macedonia
 ML,Mali
 MM,Myanmar
 MN,Mongolia
-MO,Macao
+MO,Macau
 MP,Northern Mariana Islands
 MQ,Martinique
 MR,Mauritania
@@ -214,9 +217,11 @@ SM,San Marino
 SN,Senegal
 SO,Somalia
 SR,Suriname
+SS,South Sudan
 ST,Sao Tome and Principe
 SV,El Salvador
-SY,Syrian Arab Republic
+SX,Sint Maarten
+SY,Syria
 SZ,Swaziland
 TC,Turks and Caicos Islands
 TD,Chad
@@ -233,19 +238,19 @@ TR,Turkey
 TT,Trinidad and Tobago
 TV,Tuvalu
 TW,Taiwan
-TZ,United Republic of Tanzania
+TZ,Tanzania
 UA,Ukraine
 UG,Uganda
 UM,United States Minor Outlying Islands
 US,United States
 UY,Uruguay
 UZ,Uzbekistan
-VA,Holy See (Vatican City State)
+VA,Vatican
 VC,Saint Vincent and the Grenadines
 VE,Venezuela
 VG,Virgin Islands
 VI,Virgin Islands
-VN,Viet Nam
+VN,Vietnam
 VU,Vanuatu
 WF,Wallis and Futuna
 WS,Samoa
