@@ -2261,7 +2261,6 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
 
     void failed(OutboundMessageState msg, boolean allowPeerFailure) {
         if (msg == null) return;
-        int consecutive = 0;
         OutNetMessage m = msg.getMessage();
         if ( allowPeerFailure && (msg.getPeer() != null) && 
              ( (msg.getMaxSends() >= OutboundMessageFragments.MAX_VOLLEYS) ||
@@ -2273,7 +2272,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             //                + " lastReceived: " + recvDelay
             //                + " lastSentFully: " + sendDelay
             //                + " expired? " + msg.isExpired());
-            consecutive = msg.getPeer().incrementConsecutiveFailedSends();
+            int consecutive = msg.getPeer().incrementConsecutiveFailedSends();
             if (_log.shouldLog(Log.INFO))
                 _log.info("Consecutive failure #" + consecutive 
                           + " on " + msg.toString()

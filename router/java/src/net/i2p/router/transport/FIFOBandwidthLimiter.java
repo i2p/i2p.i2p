@@ -717,8 +717,8 @@ public class FIFOBandwidthLimiter {
             _availableInbound.addAndGet(0 - requested);
             _totalAllocatedInboundBytes.addAndGet(requested);
         }
-        if (_log.shouldLog(Log.INFO))
-            _log.info("IB shortcut for " + requested + "B? " + rv);
+        //if (_log.shouldLog(Log.INFO))
+        //    _log.info("IB shortcut for " + requested + "B? " + rv);
         return rv;
     }
     
@@ -739,8 +739,8 @@ public class FIFOBandwidthLimiter {
             _availableOutbound.addAndGet(0 - requested);
             _totalAllocatedOutboundBytes.addAndGet(requested);
         }
-        if (_log.shouldLog(Log.INFO))
-            _log.info("OB shortcut for " + requested + "B? " + rv);
+        //if (_log.shouldLog(Log.INFO))
+        //    _log.info("OB shortcut for " + requested + "B? " + rv);
         return rv;
     }
 
@@ -809,7 +809,12 @@ public class FIFOBandwidthLimiter {
         public int getTotalRequested() { return _total; }
         public int getPendingRequested() { return _total - _allocated; }
         public boolean getAborted() { return _aborted; }
-        public void abort() { _aborted = true; }
+        public void abort() {
+            _aborted = true;
+            // so isComplete() will return true
+            _allocated = _total;
+            notifyAllocation();
+        }
         public CompleteListener getCompleteListener() { return _lsnr; }
 
         public void setCompleteListener(CompleteListener lsnr) {
@@ -829,6 +834,10 @@ public class FIFOBandwidthLimiter {
         
         private boolean isComplete() { return _allocated >= _total; }
         
+        /**
+         *  May return without allocating.
+         *  Check getPendingRequested() > 0 in a loop.
+         */
         public void waitForNextAllocation() {
             _waited = true;
             _allocationsSinceWait = 0;
@@ -838,7 +847,7 @@ public class FIFOBandwidthLimiter {
                     if (isComplete())
                         complete = true;
                     else
-                        wait();
+                        wait(100);
                 }
             } catch (InterruptedException ie) {}
             if (complete && _lsnr != null)
@@ -899,7 +908,11 @@ public class FIFOBandwidthLimiter {
         public int getTotalRequested();
         /** how many bytes were requested and haven't yet been allocated? */
         public int getPendingRequested();
-        /** block until we are allocated some more bytes */
+        /**
+         *  Block until we are allocated some more bytes.
+         *  May return without allocating.
+         *  Check getPendingRequested() > 0 in a loop.
+         */
         public void waitForNextAllocation();
         /** we no longer want the data requested (the connection closed) */
         public void abort();
