@@ -77,9 +77,9 @@ class SAMv3RawSession extends SAMRawSession  implements SAMv3Handler.Session, SA
     	}
 	}
 	
-	public void receiveRawBytes(byte[] data) throws IOException {
+	public void receiveRawBytes(byte[] data, int proto, int fromPort, int toPort) throws IOException {
 		if (this.clientAddress==null) {
-			this.handler.receiveRawBytes(data);
+			this.handler.receiveRawBytes(data, proto, fromPort, toPort);
 		} else {
 			ByteBuffer msgBuf = ByteBuffer.allocate(data.length);
 			msgBuf.put(data);

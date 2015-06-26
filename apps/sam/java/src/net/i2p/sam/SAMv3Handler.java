@@ -50,7 +50,7 @@ class SAMv3Handler extends SAMv1Handler
 	public static final SessionsDB sSessionsHash = new SessionsDB();
 	private volatile boolean stolenSocket;
 	private volatile boolean streamForwardingSocket;
-
+	private final boolean sendPorts;
 	
 	interface Session {
 		String getNick();
@@ -88,6 +88,7 @@ class SAMv3Handler extends SAMv1Handler
 	                    Properties i2cpProps, SAMBridge parent) throws SAMException, IOException
 	{
 		super(s, verMajor, verMinor, i2cpProps, parent);
+	        sendPorts = (verMajor == 3 && verMinor >= 2) || verMajor > 3;
 		if (_log.shouldLog(Log.DEBUG))
 			_log.debug("SAM version 3 handler instantiated");
 	}
@@ -808,7 +809,7 @@ class SAMv3Handler extends SAMv1Handler
 		try {
 			try {
 				streamForwardingSocket = true ;
-				((SAMv3StreamSession)streamSession).startForwardingIncoming(props);
+				((SAMv3StreamSession)streamSession).startForwardingIncoming(props, sendPorts);
 				notifyStreamResult( true, "OK", null );
 				return true ;
 			} catch (SAMException e) {
@@ -858,19 +859,32 @@ class SAMv3Handler extends SAMv1Handler
 		}
 	}
 
-	public void notifyStreamIncomingConnection(Destination d) throws IOException {
+	public void notifyStreamIncomingConnection(Destination d, int fromPort, int toPort) throws IOException {
 	    if (getStreamSession() == null) {
 	        _log.error("BUG! Received stream connection, but session is null!");
 	        throw new NullPointerException("BUG! STREAM session is null!");
 	    }
-
-	    if (!writeString(d.toBase64() + "\n")) {
+	    StringBuilder buf = new StringBuilder(600);
+	    buf.append(d.toBase64());
+	    if (sendPorts) {
+		buf.append(" FROM_PORT=").append(fromPort).append(" TO_PORT=").append(toPort);
+	    }
+	    buf.append('\n');
+	    if (!writeString(buf.toString())) {
 	        throw new IOException("Error notifying connection to SAM client");
 	    }
 	}
 	
 	public static void notifyStreamIncomingConnection(SocketChannel client, Destination d) throws IOException {
 	    if (!writeString(d.toBase64() + "\n", client)) {
+	        throw new IOException("Error notifying connection to SAM client");
+	    }
+	}
+	
+	/** @since 0.9.22 */
+	public static void notifyStreamIncomingConnection(SocketChannel client, Destination d,
+	                                                  int fromPort, int toPort) throws IOException {
+	    if (!writeString(d.toBase64() + " FROM_PORT=" + fromPort + " TO_PORT=" + toPort + '\n', client)) {
 	        throw new IOException("Error notifying connection to SAM client");
 	    }
 	}

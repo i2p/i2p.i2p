@@ -166,9 +166,10 @@ class SAMv3StreamSession  extends SAMStreamSession implements SAMv3Handler.Sessi
 
 		if ( rec==null || i2ps==null ) throw new InterruptedIOException() ;
 
-		if (verbose)
-			handler.notifyStreamIncomingConnection(i2ps.getPeerDestination()) ;
-
+		if (verbose) {
+			handler.notifyStreamIncomingConnection(i2ps.getPeerDestination(),
+			                                       i2ps.getPort(), i2ps.getLocalPort());
+		}
 	        handler.stealSocket() ;
 	        ReadableByteChannel fromClient = handler.getClientSocket();
 	        ReadableByteChannel fromI2P    = Channels.newChannel(i2ps.getInputStream());
@@ -185,7 +186,7 @@ class SAMv3StreamSession  extends SAMStreamSession implements SAMv3Handler.Sessi
 	    }
 
 	    
-	    public void startForwardingIncoming( Properties props ) throws SAMException, InterruptedIOException
+	    public void startForwardingIncoming(Properties props, boolean sendPorts) throws SAMException, InterruptedIOException
 	    {
 	    	SAMv3Handler.SessionRecord rec = SAMv3Handler.sSessionsHash.get(nick);
 	    	boolean verbose = props.getProperty("SILENT", "false").equals("false");
@@ -218,7 +219,7 @@ class SAMv3StreamSession  extends SAMStreamSession implements SAMv3Handler.Sessi
 	    		this.socketServer = this.socketMgr.getServerSocket();
 	    	}
 	    	
-	    	SocketForwarder forwarder = new SocketForwarder(host, port, this, verbose);
+	    	SocketForwarder forwarder = new SocketForwarder(host, port, this, verbose, sendPorts);
 	    	(new Thread(rec.getThreadGroup(), forwarder, "SAMV3StreamForwarder")).start();
 	    }
 	    
@@ -227,13 +228,14 @@ class SAMv3StreamSession  extends SAMStreamSession implements SAMv3Handler.Sessi
 	    	private final String host;
 	    	private final int port;
 	    	private final SAMv3StreamSession session;
-	    	private final boolean verbose;
+	    	private final boolean verbose, sendPorts;
 	    	
-	    	SocketForwarder(String host, int port, SAMv3StreamSession session, boolean verbose) {
+	    	SocketForwarder(String host, int port, SAMv3StreamSession session, boolean verbose, boolean sendPorts) {
 	    		this.host = host ;
 	    		this.port = port ;
 	    		this.session = session ;
 	    		this.verbose = verbose ;
+	    		this.sendPorts = sendPorts;
 	    	}
 	    	
 	    	public void run()
@@ -264,9 +266,16 @@ class SAMv3StreamSession  extends SAMStreamSession implements SAMv3Handler.Sessi
 	    			// build pipes between both sockets
 	    			try {
 					clientServerSock.socket().setKeepAlive(true);
-	    				if (this.verbose)
-	    					SAMv3Handler.notifyStreamIncomingConnection(
+	    				if (this.verbose) {
+						if (sendPorts) {
+	    					       SAMv3Handler.notifyStreamIncomingConnection(
+	    							clientServerSock, i2ps.getPeerDestination(),
+								i2ps.getPort(), i2ps.getLocalPort());
+						} else {
+	    					       SAMv3Handler.notifyStreamIncomingConnection(
 	    							clientServerSock, i2ps.getPeerDestination());
+						}
+					}
 	    				ReadableByteChannel fromClient = clientServerSock ;
 	    				ReadableByteChannel fromI2P    = Channels.newChannel(i2ps.getInputStream());
 	    				WritableByteChannel toClient   = clientServerSock ;

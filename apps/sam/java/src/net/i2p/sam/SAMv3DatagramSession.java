@@ -71,11 +71,18 @@ class SAMv3DatagramSession extends SAMDatagramSession implements SAMv3Handler.Se
     	}
 	}
 
-	public void receiveDatagramBytes(Destination sender, byte[] data) throws IOException {
+	public void receiveDatagramBytes(Destination sender, byte[] data, int proto,
+	                                 int fromPort, int toPort) throws IOException {
 		if (this.clientAddress==null) {
-			this.handler.receiveDatagramBytes(sender, data);
+			this.handler.receiveDatagramBytes(sender, data, proto, fromPort, toPort);
 		} else {
-			String msg = sender.toBase64()+"\n";
+			StringBuilder buf = new StringBuilder(600);
+			buf.append(sender.toBase64());
+			if ((handler.verMajor == 3 && handler.verMinor >= 2) || handler.verMajor > 3) {
+				buf.append(" FROM_PORT=").append(fromPort).append(" TO_PORT=").append(toPort);
+			}
+			buf.append('\n');
+			String msg = buf.toString();
 			ByteBuffer msgBuf = ByteBuffer.allocate(msg.length()+data.length);
 			msgBuf.put(DataHelper.getASCII(msg));
 			msgBuf.put(data);

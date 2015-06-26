@@ -18,7 +18,7 @@ import net.i2p.client.I2PClient;
 import net.i2p.client.I2PClientFactory;
 import net.i2p.client.I2PSession;
 import net.i2p.client.I2PSessionException;
-import net.i2p.client.I2PSessionListener;
+import net.i2p.client.I2PSessionMuxedListener;
 import net.i2p.data.Base64;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.Destination;
@@ -135,7 +135,7 @@ abstract class SAMMessageSession {
      * Handle a new received message
      * @param msg Message payload
      */
-    protected abstract void messageReceived(byte[] msg);
+    protected abstract void messageReceived(byte[] msg, int proto, int fromPort, int toPort);
     
     /**
      * Do whatever is needed to shutdown the SAM session
@@ -157,7 +157,7 @@ abstract class SAMMessageSession {
      *
      * @author human
      */
-    class SAMMessageSessionHandler implements Runnable, I2PSessionListener {
+    class SAMMessageSessionHandler implements Runnable, I2PSessionMuxedListener {
 
         private final Object runningLock = new Object();
         private volatile boolean stillRunning = true;
@@ -186,7 +186,7 @@ abstract class SAMMessageSession {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("I2P session connected");
 
-            session.setSessionListener(this);
+            session.addMuxedSessionListener(this, I2PSession.PROTO_ANY, I2PSession.PORT_ANY);
         }
 
         /**
@@ -217,6 +217,7 @@ abstract class SAMMessageSession {
                 _log.debug("Shutting down SAM message-based session handler");
             
             shutDown();
+            session.removeListener(I2PSession.PROTO_ANY, I2PSession.PORT_ANY);
             
             try {
                 if (_log.shouldLog(Log.DEBUG))
@@ -242,7 +243,15 @@ abstract class SAMMessageSession {
             stopRunning();
         }
             
-        public void messageAvailable(I2PSession session, int msgId, long size){
+        public void messageAvailable(I2PSession session, int msgId, long size) {
+            messageAvailable(session, msgId, size, I2PSession.PROTO_UNSPECIFIED,
+                             I2PSession.PORT_UNSPECIFIED, I2PSession.PORT_UNSPECIFIED);
+        }
+
+        /** @since 0.9.22 */
+        public void messageAvailable(I2PSession session, int msgId, long size,
+                                     int proto, int fromPort, int toPort) {
+
             if (_log.shouldLog(Log.DEBUG)) {
                 _log.debug("I2P message available (id: " + msgId
                            + "; size: " + size + ")");
@@ -256,7 +265,7 @@ abstract class SAMMessageSession {
                                + HexDump.dump(msg));
                 }
                 
-                messageReceived(msg);
+                messageReceived(msg, proto, fromPort, toPort);
             } catch (I2PSessionException e) {
                 _log.error("Error fetching I2P message", e);
                 stopRunning();

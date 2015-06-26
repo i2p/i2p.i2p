@@ -796,16 +796,21 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
     }
     
     // SAMRawReceiver implementation
-    public void receiveRawBytes(byte data[]) throws IOException {
+    public void receiveRawBytes(byte data[], int proto, int fromPort, int toPort) throws IOException {
         if (getRawSession() == null) {
             _log.error("BUG! Received raw bytes, but session is null!");
             return;
         }
 
-        ByteArrayOutputStream msg = new ByteArrayOutputStream();
+        ByteArrayOutputStream msg = new ByteArrayOutputStream(64 + data.length);
 
-        String msgText = "RAW RECEIVED SIZE=" + data.length + "\n";
+        String msgText = "RAW RECEIVED SIZE=" + data.length;
         msg.write(DataHelper.getASCII(msgText));
+        if ((verMajor == 3 && verMinor >= 2) || verMajor > 3) {
+            msgText = " PROTOCOL=" + proto + " FROM_PORT=" + fromPort + " TO_PORT=" + toPort;
+            msg.write(DataHelper.getASCII(msgText));
+        }
+        msg.write((byte) '\n');
         msg.write(data);
         
         if (_log.shouldLog(Log.DEBUG))
@@ -832,17 +837,23 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
     }
 
     // SAMDatagramReceiver implementation
-    public void receiveDatagramBytes(Destination sender, byte data[]) throws IOException {
+    public void receiveDatagramBytes(Destination sender, byte data[], int proto,
+                                     int fromPort, int toPort) throws IOException {
         if (getDatagramSession() == null) {
             _log.error("BUG! Received datagram bytes, but session is null!");
             return;
         }
 
-        ByteArrayOutputStream msg = new ByteArrayOutputStream();
+        ByteArrayOutputStream msg = new ByteArrayOutputStream(100 + data.length);
 
         String msgText = "DATAGRAM RECEIVED DESTINATION=" + sender.toBase64()
-                         + " SIZE=" + data.length + "\n";
+                         + " SIZE=" + data.length;
         msg.write(DataHelper.getASCII(msgText));
+        if ((verMajor == 3 && verMinor >= 2) || verMajor > 3) {
+            msgText = " FROM_PORT=" + fromPort + " TO_PORT=" + toPort;
+            msg.write(DataHelper.getASCII(msgText));
+        }
+        msg.write((byte) '\n');
         
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("sending to client: " + msgText);

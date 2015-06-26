@@ -80,9 +80,9 @@ class SAMRawSession extends SAMMessageSession {
                                               I2PSession.PORT_UNSPECIFIED, I2PSession.PORT_UNSPECIFIED);
     }
 
-    protected void messageReceived(byte[] msg) {
+    protected void messageReceived(byte[] msg, int proto, int fromPort, int toPort) {
         try {
-            recv.receiveRawBytes(msg);
+            recv.receiveRawBytes(msg, proto, fromPort, toPort);
         } catch (IOException e) {
             _log.error("Error forwarding message to receiver", e);
             close();

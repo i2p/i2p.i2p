@@ -95,7 +95,7 @@ class SAMDatagramSession extends SAMMessageSession {
                                               I2PSession.PORT_UNSPECIFIED, I2PSession.PORT_UNSPECIFIED);
     }
 
-    protected void messageReceived(byte[] msg) {
+    protected void messageReceived(byte[] msg, int proto, int fromPort, int toPort) {
         byte[] payload;
         Destination sender;
         try {
@@ -117,7 +117,7 @@ class SAMDatagramSession extends SAMMessageSession {
         }
 
         try {
-            recv.receiveDatagramBytes(sender, payload);
+            recv.receiveDatagramBytes(sender, payload, proto, fromPort, toPort);
         } catch (IOException e) {
             _log.error("Error forwarding message to receiver", e);
             close();

@@ -35,8 +35,8 @@ abstract class SAMHandler implements Runnable, Handler {
     private final Object socketWLock = new Object(); // Guards writings on socket
     protected final SocketChannel socket;
 
-    protected final int verMajor;
-    protected final int verMinor;
+    public final int verMajor;
+    public final int verMinor;
     
     /** I2CP options configuring the I2CP connection (port, host, numHops, etc) */
     protected final Properties i2cpProps;
