@@ -97,6 +97,22 @@ class SAMv3StreamSession  extends SAMStreamSession implements SAMv3Handler.Sessi
 	        I2PSocketOptions opts = socketMgr.buildOptions(props);
 	        if (props.getProperty(I2PSocketOptions.PROP_CONNECT_TIMEOUT) == null)
 	            opts.setConnectTimeout(60 * 1000);
+	        String fromPort = props.getProperty("FROM_PORT");
+	        if (fromPort != null) {
+	            try {
+	                opts.setLocalPort(Integer.parseInt(fromPort));
+	            } catch (NumberFormatException nfe) {
+	                throw new I2PException("Bad port " + fromPort);
+	            }
+	        }
+	        String toPort = props.getProperty("TO_PORT");
+	        if (toPort != null) {
+	            try {
+	                opts.setPort(Integer.parseInt(toPort));
+	            } catch (NumberFormatException nfe) {
+	                throw new I2PException("Bad port " + toPort);
+	            }
+	        }
 
 	        if (_log.shouldLog(Log.DEBUG))
 	            _log.debug("Connecting new I2PSocket...");
