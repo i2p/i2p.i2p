@@ -36,6 +36,7 @@ import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.util.Log;
 import net.i2p.util.I2PAppThread;
+import net.i2p.util.PasswordManager;
 
 /**
  * Class able to handle a SAM version 3 client connection.
@@ -425,6 +426,8 @@ class SAMv3Handler extends SAMv1Handler
 				} else if (domain.equals("RAW")) {
 					// TODO not yet overridden, ID is ignored, most recent RAW session is used
 					canContinue = execRawMessage(opcode, props);
+				} else if (domain.equals("AUTH")) {
+					canContinue = execAuthMessage(opcode, props);
 				} else {
 					if (_log.shouldLog(Log.DEBUG))
 						_log.debug("Unrecognized message domain: \""
@@ -889,5 +892,40 @@ class SAMv3Handler extends SAMv1Handler
 	    }
 	}
 
+	/** @since 0.9.22 */
+	private boolean execAuthMessage(String opcode, Properties props) {
+		if (opcode.equals("ENABLE")) {
+			i2cpProps.setProperty(SAMBridge.PROP_AUTH, "true");
+		} else if (opcode.equals("DISABLE")) {
+			i2cpProps.setProperty(SAMBridge.PROP_AUTH, "false");
+		} else if (opcode.equals("ADD")) {
+			String user = props.getProperty("USER");
+			String pw = props.getProperty("PASSWORD");
+			if (user == null || pw == null)
+				return writeString("AUTH STATUS RESULT=I2P_ERROR MESSAGE=\"USER and PASSWORD required\"\n");
+			String prop = SAMBridge.PROP_PW_PREFIX + user + SAMBridge.PROP_PW_SUFFIX;
+			if (i2cpProps.containsKey(prop))
+				return writeString("AUTH STATUS RESULT=I2P_ERROR MESSAGE=\"user " + user + " already exists\"\n");
+			PasswordManager pm = new PasswordManager(I2PAppContext.getGlobalContext());
+			String shash = pm.createHash(pw);
+			i2cpProps.setProperty(prop, shash);
+		} else if (opcode.equals("REMOVE")) {
+			String user = props.getProperty("USER");
+			if (user == null)
+				return writeString("AUTH STATUS RESULT=I2P_ERROR MESSAGE=\"USER required\"\n");
+			String prop = SAMBridge.PROP_PW_PREFIX + user + SAMBridge.PROP_PW_SUFFIX;
+			if (!i2cpProps.containsKey(prop))
+				return writeString("AUTH STATUS RESULT=I2P_ERROR MESSAGE=\"user " + user + " not found\"\n");
+			i2cpProps.remove(prop);
+		} else {
+			return writeString("AUTH STATUS RESULT=I2P_ERROR MESSAGE=\"Unknown AUTH command\"\n");
+		}
+		try {
+			bridge.saveConfig();
+			return writeString("AUTH STATUS RESULT=OK\n");
+		} catch (IOException ioe) {
+			return writeString("AUTH STATUS RESULT=I2P_ERROR MESSAGE=\"Config save failed: " + ioe + "\"\n");
+		}
+	}
 }
 

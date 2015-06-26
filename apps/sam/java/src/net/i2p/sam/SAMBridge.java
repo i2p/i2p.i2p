@@ -58,6 +58,7 @@ public class SAMBridge implements Runnable, ClientApp {
     private final int _listenPort;
     private final Properties i2cpProps;
     private final boolean _useSSL;
+    private final File _configFile;
     private volatile Thread _runner;
 
     /** 
@@ -117,6 +118,7 @@ public class SAMBridge implements Runnable, ClientApp {
         if (_useSSL && !SystemVersion.isJava7())
             throw new IllegalArgumentException("SSL requires Java 7 or higher");
         persistFilename = options.keyFile;
+        _configFile = options.configFile;
         nameToPrivKeys = new HashMap<String,String>(8);
         _handlers = new HashSet<Handler>(8);
         this.i2cpProps = options.opts;
@@ -140,7 +142,8 @@ public class SAMBridge implements Runnable, ClientApp {
      * @param persistFile location to store/load named keys to/from
      * @throws RuntimeException if a server socket can't be opened
      */
-    public SAMBridge(String listenHost, int listenPort, boolean isSSL, Properties i2cpProps, String persistFile) {
+    public SAMBridge(String listenHost, int listenPort, boolean isSSL, Properties i2cpProps,
+                     String persistFile, File configFile) {
         _log = I2PAppContext.getGlobalContext().logManager().getLog(SAMBridge.class);
         _mgr = null;
         _listenHost = listenHost;
@@ -150,6 +153,7 @@ public class SAMBridge implements Runnable, ClientApp {
             throw new IllegalArgumentException("SSL requires Java 7 or higher");
         this.i2cpProps = i2cpProps;
         persistFilename = persistFile;
+        _configFile = configFile;
         nameToPrivKeys = new HashMap<String,String>(8);
         _handlers = new HashSet<Handler>(8);
         loadKeys();
@@ -451,7 +455,8 @@ public class SAMBridge implements Runnable, ClientApp {
     public static void main(String args[]) {
         try {
             Options options = getOptions(args);
-            SAMBridge bridge = new SAMBridge(options.host, options.port, options.isSSL, options.opts, options.keyFile);
+            SAMBridge bridge = new SAMBridge(options.host, options.port, options.isSSL, options.opts,
+                                             options.keyFile, options.configFile);
             bridge.startThread();
         } catch (RuntimeException e) {
             e.printStackTrace();
@@ -490,10 +495,12 @@ public class SAMBridge implements Runnable, ClientApp {
         private final int port;
         private final Properties opts;
         private final boolean isSSL;
+        private final File configFile;
 
-        public Options(String host, int port, boolean isSSL, Properties opts, String keyFile) {
+        public Options(String host, int port, boolean isSSL, Properties opts, String keyFile, File configFile) {
             this.host = host; this.port = port; this.opts = opts; this.keyFile = keyFile;
             this.isSSL = isSSL;
+            this.configFile = configFile;
         }
     }
     
@@ -614,7 +621,7 @@ public class SAMBridge implements Runnable, ClientApp {
         if (remaining > 0) {
        		parseOptions(args, startOpts, opts);
         }
-        return new Options(host, port, isSSL, opts, keyfile);
+        return new Options(host, port, isSSL, opts, keyfile, file);
     }
 
     /**
@@ -741,5 +748,10 @@ public class SAMBridge implements Runnable, ClientApp {
             stopHandlers();
             changeState(STOPPED);
         }
+    }
+
+    /** @since 0.9.22 */
+    public void saveConfig() throws IOException {
+        DataHelper.storeProps(i2cpProps, _configFile);
     }
 }
