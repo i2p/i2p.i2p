@@ -23,6 +23,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import net.i2p.I2PException;
 import net.i2p.client.I2PClient;
+import net.i2p.client.I2PSession;
 import net.i2p.client.I2PSessionException;
 import net.i2p.crypto.SigType;
 import net.i2p.data.Base64;
@@ -438,25 +439,44 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
             }
 
             int size;
-            {
-                String strsize = props.getProperty("SIZE");
-                if (strsize == null) {
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("Size not specified in DATAGRAM SEND message");
-                    return false;
-                }
+            String strsize = props.getProperty("SIZE");
+            if (strsize == null) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Size not specified in DATAGRAM SEND message");
+                return false;
+            }
+            try {
+                size = Integer.parseInt(strsize);
+            } catch (NumberFormatException e) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Invalid DATAGRAM SEND size specified: " + strsize);
+                return false;
+            }
+            if (!checkDatagramSize(size)) {
+                if (_log.shouldLog(Log.WARN))
+                     _log.warn("Specified size (" + size
+                           + ") is out of protocol limits");
+                return false;
+            }
+            int proto = I2PSession.PROTO_DATAGRAM;
+            int fromPort = I2PSession.PORT_UNSPECIFIED;
+            int toPort = I2PSession.PORT_UNSPECIFIED;
+            String s = props.getProperty("FROM_PORT");
+            if (s != null) {
                 try {
-                    size = Integer.parseInt(strsize);
+                    fromPort = Integer.parseInt(s);
                 } catch (NumberFormatException e) {
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("Invalid DATAGRAM SEND size specified: " + strsize);
-                    return false;
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Invalid DATAGRAM SEND port specified: " + s);
                 }
-                if (!checkDatagramSize(size)) {
-                    if (_log.shouldLog(Log.DEBUG))
-                         _log.debug("Specified size (" + size
-                               + ") is out of protocol limits");
-                    return false;
+            }
+            s = props.getProperty("TO_PORT");
+            if (s != null) {
+                try {
+                    toPort = Integer.parseInt(s);
+                } catch (NumberFormatException e) {
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Invalid RAW SEND port specified: " + s);
                 }
             }
 
@@ -466,7 +486,7 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
 
                 in.readFully(data);
 
-                if (!getDatagramSession().sendBytes(dest, data)) {
+                if (!getDatagramSession().sendBytes(dest, data, proto, fromPort, toPort)) {
                     _log.error("DATAGRAM SEND failed");
                     // a message send failure is no reason to drop the SAM session
                     // for raw and repliable datagrams, just carry on our merry way
@@ -523,25 +543,53 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
             }
 
             int size;
-            {
-                String strsize = props.getProperty("SIZE");
-                if (strsize == null) {
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("Size not specified in RAW SEND message");
-                    return false;
-                }
+            String strsize = props.getProperty("SIZE");
+            if (strsize == null) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Size not specified in RAW SEND message");
+                return false;
+            }
+            try {
+                size = Integer.parseInt(strsize);
+            } catch (NumberFormatException e) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Invalid RAW SEND size specified: " + strsize);
+                return false;
+            }
+            if (!checkSize(size)) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Specified size (" + size
+                           + ") is out of protocol limits");
+                return false;
+            }
+            int proto = I2PSession.PROTO_DATAGRAM_RAW;
+            int fromPort = I2PSession.PORT_UNSPECIFIED;
+            int toPort = I2PSession.PORT_UNSPECIFIED;
+            String s = props.getProperty("PROTOCOL");
+            if (s != null) {
                 try {
-                    size = Integer.parseInt(strsize);
+                    proto = Integer.parseInt(s);
                 } catch (NumberFormatException e) {
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("Invalid RAW SEND size specified: " + strsize);
-                    return false;
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Invalid RAW SEND protocol specified: " + s);
                 }
-                if (!checkSize(size)) {
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("Specified size (" + size
-                               + ") is out of protocol limits");
-                    return false;
+            }
+            s = props.getProperty("FROM_PORT");
+            if (s != null) {
+                try {
+                    fromPort = Integer.parseInt(s);
+                } catch (NumberFormatException e) {
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Invalid RAW SEND port specified: " + s);
+                }
+            }
+            s = props.getProperty("TO_PORT");
+            if (s != null) {
+                try {
+                    toPort = Integer.parseInt(s);
+                } catch (NumberFormatException e) {
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Invalid RAW SEND port specified: " + s);
                 }
             }
 
@@ -551,7 +599,7 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
 
                 in.readFully(data);
 
-                if (!getRawSession().sendBytes(dest, data)) {
+                if (!getRawSession().sendBytes(dest, data, proto, fromPort, toPort)) {
                     _log.error("RAW SEND failed");
                     // a message send failure is no reason to drop the SAM session
                     // for raw and repliable datagrams, just carry on our merry way

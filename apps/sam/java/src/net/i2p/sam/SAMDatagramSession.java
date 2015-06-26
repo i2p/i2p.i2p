@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-import net.i2p.client.I2PSession;
 import net.i2p.client.I2PSessionException;
 import net.i2p.client.datagram.I2PDatagramDissector;
 import net.i2p.client.datagram.I2PDatagramMaker;
@@ -83,16 +82,15 @@ class SAMDatagramSession extends SAMMessageSession {
      * @throws DataFormatException on unknown / bad dest
      * @throws I2PSessionException on serious error, probably session closed
      */
-    public boolean sendBytes(String dest, byte[] data) throws DataFormatException, I2PSessionException {
+    public boolean sendBytes(String dest, byte[] data, int proto,
+                             int fromPort, int toPort) throws DataFormatException, I2PSessionException {
         if (data.length > DGRAM_SIZE_MAX)
             throw new DataFormatException("Datagram size exceeded (" + data.length + ")");
         byte[] dgram ;
         synchronized (dgramMaker) {
         	dgram = dgramMaker.makeI2PDatagram(data);
         }
-        // TODO pass ports through
-        return sendBytesThroughMessageSession(dest, dgram, I2PSession.PROTO_DATAGRAM,
-                                              I2PSession.PORT_UNSPECIFIED, I2PSession.PORT_UNSPECIFIED);
+        return sendBytesThroughMessageSession(dest, dgram, proto, fromPort, toPort);
     }
 
     protected void messageReceived(byte[] msg, int proto, int fromPort, int toPort) {

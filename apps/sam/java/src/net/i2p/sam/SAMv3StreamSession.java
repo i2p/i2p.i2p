@@ -415,7 +415,11 @@ class SAMv3StreamSession  extends SAMStreamSession implements SAMv3Handler.Sessi
 	        socketMgr.destroySocketManager();
 	    }
 
-	    public boolean sendBytes(String s, byte[] b) throws DataFormatException
+	    /**
+	     *  Unsupported
+	     *  @throws DataFormatException always
+	     */
+	    public boolean sendBytes(String s, byte[] b, int pr, int fp, int tp) throws DataFormatException
 	    {
 	    	throw new DataFormatException(null);
 	    }

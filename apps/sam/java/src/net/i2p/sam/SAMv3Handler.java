@@ -28,6 +28,7 @@ import java.util.StringTokenizer;
 import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
 import net.i2p.client.I2PClient;
+import net.i2p.client.I2PSession;
 import net.i2p.client.I2PSessionException;
 import net.i2p.crypto.SigType;
 import net.i2p.data.Base64;
@@ -56,7 +57,8 @@ class SAMv3Handler extends SAMv1Handler
 	interface Session {
 		String getNick();
 		void close();
-		boolean sendBytes(String dest, byte[] data) throws DataFormatException, I2PSessionException;
+		boolean sendBytes(String dest, byte[] data, int proto,
+		                  int fromPort, int toPort) throws DataFormatException, I2PSessionException;
 	}
 	
 	/**
@@ -189,14 +191,16 @@ class SAMv3Handler extends SAMv1Handler
 			try {
 				String header = DataHelper.readLine(is).trim();
 				StringTokenizer tok = new StringTokenizer(header, " ");
-				if (tok.countTokens() != 3) {
+				if (tok.countTokens() < 3) {
 					// This is not a correct message, for sure
-					//_log.debug("Error in message format");
-					// FIXME log? throw?
+					warn("Bad datagram header received");
 					return;
 				}
 				String version = tok.nextToken();
-				if (!"3.0".equals(version)) return ;
+				if (!version.startsWith("3")) {
+					warn("Bad datagram header received");
+					return;
+				}
 				String nick = tok.nextToken();
 				String dest = tok.nextToken();
 
@@ -204,17 +208,65 @@ class SAMv3Handler extends SAMv1Handler
 				is.read(data);
 				SessionRecord rec = sSessionsHash.get(nick);
 				if (rec!=null) {
-					rec.getHandler().session.sendBytes(dest,data);
+					Properties sprops = rec.getProps();
+					String pr = sprops.getProperty("PROTOCOL");
+					String fp = sprops.getProperty("FROM_PORT");
+					String tp = sprops.getProperty("TO_PORT");
+					while (tok.hasMoreTokens()) {
+						String t = tok.nextToken();
+						if (t.startsWith("PROTOCOL="))
+							pr = t.substring("PROTOTCOL=".length());
+						else if (t.startsWith("FROM_PORT="))
+							fp = t.substring("FROM_PORT=".length());
+						else if (t.startsWith("TO_PORT="))
+							tp = t.substring("TO_PORT=".length());
+					}
+					int proto = I2PSession.PROTO_UNSPECIFIED;
+					int fromPort = I2PSession.PORT_UNSPECIFIED;
+					int toPort = I2PSession.PORT_UNSPECIFIED;
+					if (pr != null) {
+						try {
+							proto = Integer.parseInt(pr);
+						} catch (NumberFormatException nfe) {
+							warn("Bad datagram header received");
+							return;
+						}
+					}
+					if (fp != null) {
+						try {
+							fromPort = Integer.parseInt(fp);
+						} catch (NumberFormatException nfe) {
+							warn("Bad datagram header received");
+							return;
+						}
+					}
+					if (tp != null) {
+						try {
+							toPort = Integer.parseInt(tp);
+						} catch (NumberFormatException nfe) {
+							warn("Bad datagram header received");
+							return;
+						}
+					}
+					rec.getHandler().session.sendBytes(dest,data, proto, fromPort, toPort);
 				} else {
-					Log log = I2PAppContext.getGlobalContext().logManager().getLog(SAMv3Handler.class);
-					if (log.shouldLog(Log.WARN))
-						log.warn("Dropping datagram, no session for " + nick);
+					warn("Dropping datagram, no session for " + nick);
 				}
 			} catch (Exception e) {
-				Log log = I2PAppContext.getGlobalContext().logManager().getLog(SAMv3Handler.class);
-				if (log.shouldLog(Log.WARN))
-					log.warn("Error handling datagram", e);
+				warn("Error handling datagram", e);
 			}
+		}
+
+		/** @since 0.9.22 */
+		private static void warn(String s) {
+			warn(s, null);
+		}
+
+		/** @since 0.9.22 */
+		private static void warn(String s, Throwable t) {
+			Log log = I2PAppContext.getGlobalContext().logManager().getLog(SAMv3Handler.class);
+			if (log.shouldLog(Log.WARN))
+				log.warn(s, t);
 		}
 	}
 	

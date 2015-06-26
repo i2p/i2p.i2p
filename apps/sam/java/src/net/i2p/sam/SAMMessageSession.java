@@ -96,7 +96,8 @@ abstract class SAMMessageSession {
      * @throws DataFormatException on unknown / bad dest
      * @throws I2PSessionException on serious error, probably session closed
      */
-    public abstract boolean sendBytes(String dest, byte[] data) throws DataFormatException, I2PSessionException;
+    public abstract boolean sendBytes(String dest, byte[] data, int proto,
+                                      int fromPort, int toPort) throws DataFormatException, I2PSessionException;
 
     /**
      * Actually send bytes through the SAM message-based session I2PSession
