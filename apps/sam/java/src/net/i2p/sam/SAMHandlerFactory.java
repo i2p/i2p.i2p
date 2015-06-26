@@ -18,6 +18,7 @@ import java.util.StringTokenizer;
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
 import net.i2p.util.Log;
+import net.i2p.util.PasswordManager;
 import net.i2p.util.VersionComparator;
 
 /**
@@ -93,6 +94,20 @@ class SAMHandlerFactory {
             SAMHandler.writeString("HELLO REPLY RESULT=NOVERSION\n", s);
             return null;
         }
+
+        if (Boolean.valueOf(i2cpProps.getProperty(SAMBridge.PROP_AUTH))) {
+            String user = props.getProperty("USER");
+            String pw = props.getProperty("PASSWORD");
+            if (user == null || pw == null)
+                throw new SAMException("USER and PASSWORD required");
+            String savedPW = i2cpProps.getProperty(SAMBridge.PROP_PW_PREFIX + user + SAMBridge.PROP_PW_SUFFIX);
+            if (savedPW == null)
+                throw new SAMException("Authorization failed");
+            PasswordManager pm = new PasswordManager(I2PAppContext.getGlobalContext());
+            if (!pm.checkHash(savedPW, pw))
+                throw new SAMException("Authorization failed");
+        }
+
         // Let's answer positively
         if (!SAMHandler.writeString("HELLO REPLY RESULT=OK VERSION=" + ver + "\n", s))
             throw new SAMException("Error writing to socket");       

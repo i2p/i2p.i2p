@@ -85,6 +85,9 @@ public class SAMBridge implements Runnable, ClientApp {
     private static final String PROP_SAM_SSL = "sam.useSSL";
     public static final String PROP_TCP_HOST = "sam.tcp.host";
     public static final String PROP_TCP_PORT = "sam.tcp.port";
+    public static final String PROP_AUTH = "sam.auth";
+    public static final String PROP_PW_PREFIX = "sam.auth.";
+    public static final String PROP_PW_SUFFIX = ".shash";
     protected static final String DEFAULT_TCP_HOST = "127.0.0.1";
     protected static final String DEFAULT_TCP_PORT = "7656";
     
