@@ -11,9 +11,16 @@ package net.i2p.sam;
 import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.net.ConnectException;
+import java.net.InetSocketAddress;
 import java.net.NoRouteToHostException;
+import java.net.SocketTimeoutException;
+import java.security.GeneralSecurityException;
 import java.util.Properties;
 
+import javax.net.ssl.SSLException;
+import javax.net.ssl.SSLSocket;
+
+import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
 import net.i2p.client.streaming.I2PServerSocket;
 import net.i2p.client.streaming.I2PSocket;
@@ -21,6 +28,7 @@ import net.i2p.client.streaming.I2PSocketOptions;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.Destination;
 import net.i2p.util.I2PAppThread;
+import net.i2p.util.I2PSSLSocketFactory;
 import net.i2p.util.Log;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
@@ -41,6 +49,7 @@ class SAMv3StreamSession  extends SAMStreamSession implements SAMv3Handler.Sessi
 		
 		private final Object socketServerLock = new Object();
 		private I2PServerSocket socketServer;
+		private static I2PSSLSocketFactory _sslSocketFactory;
 	
 		private final String nick ;
 		
@@ -91,7 +100,7 @@ class SAMv3StreamSession  extends SAMStreamSession implements SAMv3Handler.Sessi
 	        throws I2PException, ConnectException, NoRouteToHostException, 
 	    		DataFormatException, InterruptedIOException, IOException {
 
-	    	boolean verbose = (props.getProperty("SILENT", "false").equals("false"));
+	    	boolean verbose = !Boolean.parseBoolean(props.getProperty("SILENT"));
 	        Destination d = SAMUtils.getDest(dest);
 
 	        I2PSocketOptions opts = socketMgr.buildOptions(props);
@@ -202,10 +211,13 @@ class SAMv3StreamSession  extends SAMStreamSession implements SAMv3Handler.Sessi
 	    }
 
 	    
+	    /**
+	     *  Forward sockets from I2P to the host/port provided
+	     */
 	    public void startForwardingIncoming(Properties props, boolean sendPorts) throws SAMException, InterruptedIOException
 	    {
 	    	SAMv3Handler.SessionRecord rec = SAMv3Handler.sSessionsHash.get(nick);
-	    	boolean verbose = props.getProperty("SILENT", "false").equals("false");
+	    	boolean verbose = !Boolean.parseBoolean(props.getProperty("SILENT"));
 	        
 	        if ( rec==null ) throw new InterruptedIOException() ;
 	        
@@ -223,7 +235,7 @@ class SAMv3StreamSession  extends SAMStreamSession implements SAMv3Handler.Sessi
 	                if (_log.shouldLog(Log.DEBUG))
 		    		_log.debug("no host specified. Taken from the client socket : " + host +':'+port);
 	    	}
-
+		boolean isSSL = Boolean.parseBoolean(props.getProperty("SSL"));
 	    	
 	    	synchronized( this.socketServerLock )
 	    	{
@@ -235,23 +247,28 @@ class SAMv3StreamSession  extends SAMStreamSession implements SAMv3Handler.Sessi
 	    		this.socketServer = this.socketMgr.getServerSocket();
 	    	}
 	    	
-	    	SocketForwarder forwarder = new SocketForwarder(host, port, this, verbose, sendPorts);
+	    	SocketForwarder forwarder = new SocketForwarder(host, port, isSSL, this, verbose, sendPorts);
 	    	(new Thread(rec.getThreadGroup(), forwarder, "SAMV3StreamForwarder")).start();
 	    }
 	    
+	    /**
+	     *  Forward sockets from I2P to the host/port provided
+	     */
 	    private static class SocketForwarder implements Runnable
 	    {
 	    	private final String host;
 	    	private final int port;
 	    	private final SAMv3StreamSession session;
-	    	private final boolean verbose, sendPorts;
+	    	private final boolean isSSL, verbose, sendPorts;
 	    	
-	    	SocketForwarder(String host, int port, SAMv3StreamSession session, boolean verbose, boolean sendPorts) {
+	    	SocketForwarder(String host, int port, boolean isSSL,
+		                SAMv3StreamSession session, boolean verbose, boolean sendPorts) {
 	    		this.host = host ;
 	    		this.port = port ;
 	    		this.session = session ;
 	    		this.verbose = verbose ;
 	    		this.sendPorts = sendPorts;
+			this.isSSL = isSSL;
 	    	}
 	    	
 	    	public void run()
@@ -259,24 +276,62 @@ class SAMv3StreamSession  extends SAMStreamSession implements SAMv3Handler.Sessi
 	    		while (session.getSocketServer()!=null) {
 	    			
 	    			// wait and accept a connection from I2P side
-	    			I2PSocket i2ps = null ;
+	    			I2PSocket i2ps;
 	    			try {
 	    				i2ps = session.getSocketServer().accept();
-	    			} catch (Exception e) {}
-	    			
-	    			if (i2ps==null) {
-	    				continue ;
-	    			}
+	    				if (i2ps == null)
+		    				continue;
+				} catch (SocketTimeoutException ste) {
+					continue;
+				} catch (ConnectException ce) {
+					Log log = I2PAppContext.getGlobalContext().logManager().getLog(SAMv3StreamSession.class);
+					if (log.shouldLog(Log.WARN))
+						log.warn("Error accepting", ce);
+					try { Thread.sleep(50); } catch (InterruptedException ie) {}
+					continue;
+				} catch (I2PException ipe) {
+					Log log = I2PAppContext.getGlobalContext().logManager().getLog(SAMv3StreamSession.class);
+					if (log.shouldLog(Log.WARN))
+						log.warn("Error accepting", ipe);
+					break;
+				}
 
 	    			// open a socket towards client
-	    			java.net.InetSocketAddress addr = new java.net.InetSocketAddress(host,port);
 	    			
-	    			SocketChannel clientServerSock = null ;
+	    			SocketChannel clientServerSock;
 	    			try {
-	    				clientServerSock = SocketChannel.open(addr) ;
-	    			}
-	    			catch ( IOException e ) {
-	    				continue ;
+					if (isSSL) {
+						I2PAppContext ctx =  I2PAppContext.getGlobalContext();
+						synchronized(SAMv3StreamSession.class) {
+							if (_sslSocketFactory == null) {
+								try {
+									_sslSocketFactory = new I2PSSLSocketFactory(
+									    ctx, true, "certificates/sam");
+								} catch (GeneralSecurityException gse) {
+									Log log = ctx.logManager().getLog(SAMv3StreamSession.class);
+									log.error("SSL error", gse);
+									try {
+										i2ps.close();
+									} catch (IOException ee) {}
+									throw new RuntimeException("SSL error", gse);
+								}
+							}
+						}
+						SSLSocket sock = (SSLSocket) _sslSocketFactory.createSocket(host, port);
+						I2PSSLSocketFactory.verifyHostname(ctx, sock, host);
+		    				clientServerSock = new SSLSocketChannel(sock);
+		    			} else {
+		    				InetSocketAddress addr = new InetSocketAddress(host, port);
+		    				clientServerSock = SocketChannel.open(addr) ;
+		    			}
+	    			} catch (IOException ioe) {
+					Log log = I2PAppContext.getGlobalContext().logManager().getLog(SAMv3StreamSession.class);
+					if (log.shouldLog(Log.WARN))
+						log.warn("Error forwarding", ioe);
+					try {
+						i2ps.close();
+					} catch (IOException ee) {}
+					continue;
 	    			}
 
 	    			// build pipes between both sockets

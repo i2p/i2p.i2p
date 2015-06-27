@@ -837,7 +837,7 @@ class SAMv3Handler extends SAMv1Handler
 					_log.debug("No parameters specified in STREAM CONNECT message");
 				return false;
 			}
-			boolean verbose = props.getProperty("SILENT","false").equals("false");
+		    	boolean verbose = !Boolean.parseBoolean(props.getProperty("SILENT"));
 		
 			String dest = props.getProperty("DESTINATION");
 			if (dest == null) {
@@ -877,7 +877,7 @@ class SAMv3Handler extends SAMv1Handler
 		return false ;
 	}
 
-	protected boolean execStreamForwardIncoming( Properties props ) {
+	private boolean execStreamForwardIncoming( Properties props ) {
 		try {
 			try {
 				streamForwardingSocket = true ;
@@ -894,9 +894,9 @@ class SAMv3Handler extends SAMv1Handler
 		return false ;		
 	}
 
-	protected boolean execStreamAccept( Properties props )
+	private boolean execStreamAccept( Properties props )
 	{
-		boolean verbose = props.getProperty( "SILENT", "false").equals("false");
+	    	boolean verbose = !Boolean.parseBoolean(props.getProperty("SILENT"));
 		try {
 			try {
 				notifyStreamResult(verbose, "OK", null);

@@ -95,7 +95,7 @@ class SAMHandlerFactory {
             return null;
         }
 
-        if (Boolean.valueOf(i2cpProps.getProperty(SAMBridge.PROP_AUTH))) {
+        if (Boolean.parseBoolean(i2cpProps.getProperty(SAMBridge.PROP_AUTH))) {
             String user = props.getProperty("USER");
             String pw = props.getProperty("PASSWORD");
             if (user == null || pw == null)
