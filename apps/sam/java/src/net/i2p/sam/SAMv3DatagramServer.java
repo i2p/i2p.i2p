@@ -97,7 +97,7 @@ class SAMv3DatagramServer implements Handler {
 	 *  Only call once.
 	 *  @since 0.9.22
 	 */
-	public void start() {
+	private synchronized void start() {
 		_listener.start();
 		if (_parent != null)
 			_parent.register(this);
@@ -107,7 +107,7 @@ class SAMv3DatagramServer implements Handler {
 	 *  Cannot be restarted.
 	 *  @since 0.9.22
 	 */
-	public void stopHandling() {
+	public synchronized void stopHandling() {
 		synchronized(SAMv3DatagramServer.class) {
 			if (server != null) {
 				try {
