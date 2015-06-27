@@ -520,12 +520,12 @@ class SAMv3Handler extends SAMv1Handler
 				// Create the session
 
 				if (style.equals("RAW")) {
-					SAMv3DatagramServer.getInstance(i2cpProps);
+					SAMv3DatagramServer.getInstance(bridge, i2cpProps);
 					SAMv3RawSession v3 = newSAMRawSession(nick);
                                         rawSession = v3;
 					this.session = v3;
 				} else if (style.equals("DATAGRAM")) {
-					SAMv3DatagramServer.getInstance(i2cpProps);
+					SAMv3DatagramServer.getInstance(bridge, i2cpProps);
 					SAMv3DatagramSession v3 = newSAMDatagramSession(nick);
 					datagramSession = v3;
 					this.session = v3;

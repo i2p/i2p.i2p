@@ -32,18 +32,21 @@ import net.i2p.util.Log;
  *
  *  @since 0.9.22 moved from SAMv3Handler
  */
-class SAMv3DatagramServer  {
+class SAMv3DatagramServer implements Handler {
 	
 	private static SAMv3DatagramServer _instance;
 	private static DatagramChannel server;
+	private final Thread _listener;
+	private final SAMBridge _parent;
 	
 	/**
 	 *  Returns the singleton.
 	 *  If this is the first call, will be instantiated and will listen
 	 *  on the default host:port 127.0.0.1:7655.
+	 *  Don't make this the first call.
 	 */
 	public static SAMv3DatagramServer getInstance() throws IOException {
-		return getInstance(new Properties());
+		return getInstance(null, new Properties());
 	}
 		
 	/**
@@ -54,15 +57,24 @@ class SAMv3DatagramServer  {
 	 *
 	 *  @param props ignored unless this is the first call
 	 */
-	public static SAMv3DatagramServer getInstance(Properties props) throws IOException {
+	public static SAMv3DatagramServer getInstance(SAMBridge parent, Properties props) throws IOException {
 		synchronized(SAMv3DatagramServer.class) {
-			if (_instance==null)
-				_instance = new SAMv3DatagramServer(props);
-			return _instance ;
+			if (_instance==null) {
+				_instance = new SAMv3DatagramServer(parent, props);
+				_instance.start();
+			}
 		}
+		return _instance;
 	}
 	
-	private SAMv3DatagramServer(Properties props) throws IOException {
+	/**
+	 *  Does not start listener.
+	 *  Caller must call start().
+	 *
+	 *  @param parent may be null
+	 */
+	private SAMv3DatagramServer(SAMBridge parent, Properties props) throws IOException {
+		_parent = parent;
 		synchronized(SAMv3DatagramServer.class) {
 			if (server==null)
 				server = DatagramChannel.open();
@@ -78,13 +90,41 @@ class SAMv3DatagramServer  {
 		}
 		
 		server.socket().bind(new InetSocketAddress(host, port));
-		new I2PAppThread(new Listener(server), "DatagramListener").start();
+		_listener = new I2PAppThread(new Listener(server), "SAM DatagramListener " + port);
+	}
+	
+	/**
+	 *  Only call once.
+	 *  @since 0.9.22
+	 */
+	public void start() {
+		_listener.start();
+		if (_parent != null)
+			_parent.register(this);
+	}
+	
+	/**
+	 *  Cannot be restarted.
+	 *  @since 0.9.22
+	 */
+	public void stopHandling() {
+		synchronized(SAMv3DatagramServer.class) {
+			if (server != null) {
+				try {
+					server.close();
+				} catch (IOException ioe) {}
+				server = null;
+			}
+		}
+		_listener.interrupt();
+		if (_parent != null)
+			_parent.unregister(this);
 	}
 	
 	public void send(SocketAddress addr, ByteBuffer msg) throws IOException {
 		server.send(msg, addr);
 	}
-	
+
 	private static class Listener implements Runnable {
 		
 		private final DatagramChannel server;
