@@ -197,15 +197,13 @@ class SAMv3Handler extends SAMv1Handler
 					return;
 				}
 				String version = tok.nextToken();
-				if (!version.startsWith("3")) {
+				if (!version.startsWith("3.")) {
 					warn("Bad datagram header received");
 					return;
 				}
 				String nick = tok.nextToken();
 				String dest = tok.nextToken();
 
-				byte[] data = new byte[is.available()];
-				is.read(data);
 				SessionRecord rec = sSessionsHash.get(nick);
 				if (rec!=null) {
 					Properties sprops = rec.getProps();
@@ -248,6 +246,9 @@ class SAMv3Handler extends SAMv1Handler
 							return;
 						}
 					}
+					// TODO too many allocations and copies. One here and one in Listener above.
+					byte[] data = new byte[is.available()];
+					is.read(data);
 					rec.getHandler().session.sendBytes(dest,data, proto, fromPort, toPort);
 				} else {
 					warn("Dropping datagram, no session for " + nick);
@@ -448,13 +449,29 @@ class SAMv3Handler extends SAMv1Handler
 				}
 
 				tok = new StringTokenizer(msg, " ");
-				if (tok.countTokens() < 2) {
+				int count = tok.countTokens();
+				if (count <= 0) {
 					// This is not a correct message, for sure
 					if (_log.shouldLog(Log.DEBUG))
-						_log.debug("Error in message format");
-					break;
+						_log.debug("Ignoring whitespace");
+					continue;
 				}
 				domain = tok.nextToken();
+				// these may not have a second token
+				if (domain.equals("PING")) {
+					execPingMessage(tok);
+					continue;
+				} else if (domain.equals("PONG")) {
+					execPongMessage(tok);
+					continue;
+				}
+				if (count <= 1) {
+					// This is not a correct message, for sure
+					if (writeString(domain + " STATUS RESULT=I2P_ERROR MESSAGE=\"command not specified\"\n"))
+						continue;
+					else
+						break;
+				}
 				opcode = tok.nextToken();
 				if (_log.shouldLog(Log.DEBUG)) {
 					_log.debug("Parsing (domain: \"" + domain
@@ -978,6 +995,29 @@ class SAMv3Handler extends SAMv1Handler
 		} catch (IOException ioe) {
 			return writeString("AUTH STATUS RESULT=I2P_ERROR MESSAGE=\"Config save failed: " + ioe + "\"\n");
 		}
+	}
+
+	/**
+	 * Handle a PING.
+	 * Send a PONG.
+	 * @since 0.9.22
+	 */
+	private void execPingMessage(StringTokenizer tok) {
+		StringBuilder buf = new StringBuilder();
+		buf.append("PONG");
+		while (tok.hasMoreTokens()) {
+			buf.append(' ').append(tok.nextToken());
+		}
+		buf.append('\n');
+		writeString(buf.toString());
+	}
+
+	/**
+	 * Handle a PONG.
+	 * @since 0.9.22
+	 */
+	private void execPongMessage(StringTokenizer tok) {
+		// TODO. We don't send PINGs yet.
 	}
 }
 
