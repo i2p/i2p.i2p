@@ -46,14 +46,11 @@ class SAMHandlerFactory {
 
         try {
             Socket sock = s.socket();
-            sock.setSoTimeout(HELLO_TIMEOUT);
             sock.setKeepAlive(true);
-            String line = DataHelper.readLine(sock.getInputStream());
+            StringBuilder buf = new StringBuilder(128);
+            ReadLine.readLine(sock, buf, HELLO_TIMEOUT);
+            String line = buf.toString();
             sock.setSoTimeout(0);
-            if (line == null) {
-                log.debug("Connection closed by client");
-                return null;
-            }
             tok = new StringTokenizer(line.trim(), " ");
         } catch (SocketTimeoutException e) {
             throw new SAMException("Timeout waiting for HELLO VERSION", e);
