@@ -22,7 +22,7 @@ class SAMv3RawSession extends SAMRawSession  implements SAMv3Handler.Session, SA
 	
 	private final String nick;
 	private final SAMv3Handler handler;
-	private final SAMv3Handler.DatagramServer server;
+	private final SAMv3DatagramServer server;
 	private final SocketAddress clientAddress;
 
 	public String getNick() { return nick; }
@@ -43,7 +43,7 @@ class SAMv3RawSession extends SAMRawSession  implements SAMv3Handler.Session, SA
 		);
 		this.nick = nick ;
 		this.recv = this ;  // replacement
-		this.server = SAMv3Handler.DatagramServer.getInstance() ;
+		this.server = SAMv3DatagramServer.getInstance() ;
 		SAMv3Handler.SessionRecord rec = SAMv3Handler.sSessionsHash.get(nick);
 		if (rec == null)
 			throw new InterruptedIOException() ;
