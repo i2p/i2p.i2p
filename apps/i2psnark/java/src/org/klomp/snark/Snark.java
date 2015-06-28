@@ -626,7 +626,10 @@ public class Snark
         pc.halt();
     Storage st = storage;
     if (st != null) {
-        boolean changed = storage.isChanged() || getUploaded() != savedUploaded;
+        // TODO: Cache the config-in-mem to compare vs config-on-disk
+        // (needed for auto-save to not double-save in some cases)
+        //boolean changed = storage.isChanged() || getUploaded() != savedUploaded;
+        boolean changed = true;
         try { 
             storage.close(); 
         } catch (IOException ioe) {

@@ -105,7 +105,7 @@ public class SnarkManager implements CompleteListener {
     public static final String PROP_FILES_PUBLIC = "i2psnark.filesPublic";
     public static final String PROP_OLD_AUTO_START = "i2snark.autoStart";   // oops
     public static final String PROP_AUTO_START = "i2psnark.autoStart";      // convert in migration to new config file
-    public static final String DEFAULT_AUTO_START = "false";
+    public static final String DEFAULT_AUTO_START = "true";
     //public static final String PROP_LINK_PREFIX = "i2psnark.linkPrefix";
     //public static final String DEFAULT_LINK_PREFIX = "file:///";
     public static final String PROP_STARTUP_DELAY = "i2psnark.startupDelay";
@@ -2358,7 +2358,6 @@ public class SnarkManager implements CompleteListener {
                 if (count == 0)
                     addMessage(_("Stopping all torrents and closing the I2P tunnel."));
                 count++;
-                saveTorrentStatus(snark);
                 if (finalShutdown)
                     snark.stopTorrent(true);
                 else
