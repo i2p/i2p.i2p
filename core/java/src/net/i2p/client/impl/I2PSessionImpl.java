@@ -1254,6 +1254,7 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
     protected String getPrefix() {
         StringBuilder buf = new StringBuilder();
         buf.append('[');
+        buf.append(_state.toString()).append(' ');
         String s = _options.getProperty("inbound.nickname");
         if (s != null)
             buf.append(s);
@@ -1262,7 +1263,6 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
         SessionId id = _sessionId;
         if (id != null)
             buf.append(" #").append(id.getSessionId());
-        buf.append(' ').append(_state.toString());
         buf.append("]: ");
         return buf.toString();
     }
