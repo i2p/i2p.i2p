@@ -11,6 +11,7 @@ import java.util.Map;
 import net.i2p.crypto.SigType;
 import net.i2p.data.DataHelper;
 import net.i2p.router.RouterContext;
+import net.i2p.util.PortMapper;
 
 /**
  *  Refactored from summarynoframe.jsp to save ~100KB
@@ -146,7 +147,11 @@ public class SummaryBarRenderer {
            .append(nbsp(_("Torrents")))
            .append("</a>\n" +
 
-                   "<a href=\"http://127.0.0.1:7658/\" target=\"_blank\" title=\"")
+                   "<a href=\"http://")
+           .append(_context.portMapper().getHost(PortMapper.SVC_EEPSITE, "127.0.0.1"))
+           .append(':')
+           .append(_context.portMapper().getPort(PortMapper.SVC_EEPSITE, 7658))
+           .append("/\" target=\"_blank\" title=\"")
            .append(_("Local web server"))
            .append("\">")
            .append(nbsp(_("Website")))

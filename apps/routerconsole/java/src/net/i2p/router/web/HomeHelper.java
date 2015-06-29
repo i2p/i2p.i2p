@@ -167,13 +167,22 @@ public class HomeHelper extends HelperBase {
         ctx.router().saveConfig(prop, buf.toString());
     }
 
-    private static String renderApps(Collection<App> apps) {
+    private String renderApps(Collection<App> apps) {
+        String website = _("Website");
         StringBuilder buf = new StringBuilder(1024);
         buf.append("<div class=\"appgroup\">");
         for (App app : apps) {
+            String url;
+            if (app.name.equals(website) && app.url.equals("http://127.0.0.1:7658/")) {
+                // fixup eepsite link
+                url = "http://" + _context.portMapper().getHost(PortMapper.SVC_EEPSITE, "127.0.0.1") +
+                      ':' + _context.portMapper().getPort(PortMapper.SVC_EEPSITE, 7658) + '/';
+            } else {
+                url = app.url;
+            }
             buf.append("<div class=\"app\">" +
                        "<div class=\"appimg\">" +
-                       "<a href=\"").append(app.url).append("\">" +
+                       "<a href=\"").append(url).append("\">" +
                        "<img class=\"");
             // toopie is 54x68, not 16x16, needs special alignment and sizing
             if (app.icon.endsWith("/itoopie_sm.png"))
@@ -184,7 +193,7 @@ public class HomeHelper extends HelperBase {
                        "</div>" +
                        "<table class=\"app\"><tr class=\"app\"><td class=\"app\">" +
                        "<div class=\"applabel\">" +
-                       "<a href=\"").append(app.url).append("\" title=\"").append(app.desc).append("\">").append(app.name).append("</a>" +
+                       "<a href=\"").append(url).append("\" title=\"").append(app.desc).append("\">").append(app.name).append("</a>" +
                        "</div>" +
                        "</td></tr></table>" +
                        "</div>\n");

@@ -1,3 +1,14 @@
+2015-06-29 zzz
+ * Transport: More fixes for SSU stalling
+
+2015-06-28 zzz
+ * Apache Tomcat 6.0.44
+
+2015-06-25 zzz
+ * Console: Use registered host/port for eepsite link (ticket #1604)
+ * Jetty starter: Register host/port when started
+ * PortMapper: Add hostname support
+
 2015-06-24 zzz
  * Transport: Add failsafe to prevent complete SSU stall waiting
    for bandwidth limiter
