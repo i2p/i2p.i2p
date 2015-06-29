@@ -1067,9 +1067,16 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 		I2PAppContext ctx = new I2PAppContext(props);
 		UPnP upnp = new UPnP(ctx);
 		ControlPoint cp = new ControlPoint();
-		System.out.println("Searching for UPnP devices:");
+		long start = System.currentTimeMillis();
 		cp.start();
+		long s2 = System.currentTimeMillis();
+		System.out.println("Start took " + (s2 - start));
+		System.out.println("Searching for UPnP devices");
+		start = System.currentTimeMillis();
 		cp.search();
+		s2 = System.currentTimeMillis();
+		System.out.println("Search kickoff took " + (s2 - start));
+		System.out.println("Waiting 10 seconds for responses");
 		Thread.sleep(10000);
 		//while(true) {
 			DeviceList list = cp.getDeviceList();
@@ -1081,7 +1088,7 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 				Device device = it.next();
 				upnp.listSubDev(device.toString(), device, sb);
 				System.out.println("Here is the listing for device " + (++i) +
-				                   ' ' + device.getFriendlyName() + " :");
+				                   ": " + device.getFriendlyName() + " :");
 				System.out.println(sb.toString());
 				sb.setLength(0);
 			}
