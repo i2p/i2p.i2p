@@ -11,6 +11,7 @@ package net.i2p.client;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 import net.i2p.client.datagram.DatagramTest;
+import net.i2p.client.impl.I2PSessionTest;
 
 /**
  * @author Comwiz

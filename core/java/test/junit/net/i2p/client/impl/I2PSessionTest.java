@@ -1,4 +1,4 @@
-package net.i2p.client;
+package net.i2p.client.impl;
 /*
  * free (adj.): unencumbered; not under the control of others
  * Written by jrandom in 2003 and released into the public domain 
@@ -15,6 +15,10 @@ import java.util.Set;
 
 import junit.framework.TestCase;
 import net.i2p.I2PAppContext;
+import net.i2p.client.I2PClientFactory;
+import net.i2p.client.I2PSession;
+import net.i2p.client.I2PSessionException;
+import net.i2p.client.I2PSessionListener;
 import net.i2p.data.Destination;
 
 
