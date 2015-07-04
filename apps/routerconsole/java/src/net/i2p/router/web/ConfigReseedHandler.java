@@ -96,11 +96,21 @@ public class ConfigReseedHandler extends FormHandler {
             }
         } else if (_action.equals(_("Save changes"))) {
             saveChanges();
+        } else if (_action.equals(_("Reset URL list"))) {
+        	resetUrlList();
         }
         //addFormError(_("Unsupported") + ' ' + _action + '.');
     }
 
-    /** @since 0.8.9 */
+	private void resetUrlList() {
+		if (_context.router().saveConfig(Reseeder.PROP_RESEED_URL, null))
+			addFormNotice(_("URL list reset successfully"));
+		else
+			addFormError(_("URL list reset Error"));
+
+	}
+
+	/** @since 0.8.9 */
     private void saveString(String config, String param) {
         String val = getJettyString(param);
         if (val != null && val.length() > 0)
