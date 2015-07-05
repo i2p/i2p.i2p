@@ -32,6 +32,9 @@ class UDPSender {
 
     private static final int TYPE_POISON = 99999;
 
+    // Queue needs to be big enough that we can compete with NTCP for
+    // bandwidth requests, and so CoDel can work well.
+    // When full, packets back up into the PacketPusher thread, pre-CoDel.
     private static final int MIN_QUEUE_SIZE = 64;
     private static final int MAX_QUEUE_SIZE = 384;
     
@@ -195,9 +198,11 @@ class UDPSender {
             packet.release();
             return;
         }
+        packet.requestOutboundBandwidth();
         try {
             _outboundQueue.put(packet);
         } catch (InterruptedException ie) {
+            packet.release();
             return;
         }
         //size = _outboundQueue.size();
@@ -229,17 +234,18 @@ class UDPSender {
                     // ?? int size2 = packet.getPacket().getLength();
                     if (size > 0) {
                         //_context.bandwidthLimiter().requestOutbound(req, size, "UDP sender");
-                        FIFOBandwidthLimiter.Request req =
-                              _context.bandwidthLimiter().requestOutbound(size, 0, "UDP sender");
-                        // failsafe, don't wait forever
-                        int waitCount = 0;
-                        while (req.getPendingRequested() > 0 && waitCount++ < 5) {
-                            req.waitForNextAllocation();
-                        }
-                        if (waitCount >= 5) {
-                            // tell FBL we didn't send it, but send it anyway
-                            req.abort();
-                            _context.statManager().addRateData("udp.sendFailsafe", 1);
+                        FIFOBandwidthLimiter.Request req = packet.getBandwidthRequest();
+                        if (req != null) {
+                            // failsafe, don't wait forever
+                            int waitCount = 0;
+                            while (req.getPendingRequested() > 0 && waitCount++ < 5) {
+                                req.waitForNextAllocation();
+                            }
+                            if (waitCount >= 5) {
+                                // tell FBL we didn't send it, but send it anyway
+                                req.abort();
+                                _context.statManager().addRateData("udp.sendFailsafe", 1);
+                            }
                         }
                     }
                     

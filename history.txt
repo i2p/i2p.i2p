@@ -1,3 +1,7 @@
+2015-07-05 zzz
+ * SSU: Compete better with NTCP for outbound bandwidth allocations
+ * Transport: Adjust thread priorities to prevent I/O stalling
+
 2015-06-29 zzz
  * Transport: More fixes for SSU stalling
 

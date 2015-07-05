@@ -6,11 +6,11 @@ import java.util.Arrays;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import net.i2p.I2PAppContext;
 import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
 import net.i2p.data.SessionKey;
 import net.i2p.router.RouterContext;
+import net.i2p.router.transport.FIFOBandwidthLimiter;
 import net.i2p.router.util.CDQEntry;
 import net.i2p.util.Addresses;
 import net.i2p.util.Log;
@@ -22,7 +22,7 @@ import net.i2p.util.SystemVersion;
  *
  */
 class UDPPacket implements CDQEntry {
-    private I2PAppContext _context;
+    private RouterContext _context;
     private final DatagramPacket _packet;
     private volatile short _priority;
     private volatile long _initializeTime;
@@ -43,6 +43,7 @@ class UDPPacket implements CDQEntry {
     //private long _afterHandlingTime;
     private int _validateCount;
     // private boolean _isInbound;
+    private FIFOBandwidthLimiter.Request _bandwidthRequest;
   
     //  Warning - this mixes contexts in a multi-router JVM
     private static final Queue<UDPPacket> _packetCache;
@@ -102,7 +103,7 @@ class UDPPacket implements CDQEntry {
     
     private static final int MAX_VALIDATE_SIZE = MAX_PACKET_SIZE;
 
-    private UDPPacket(I2PAppContext ctx) {
+    private UDPPacket(RouterContext ctx) {
         //ctx.statManager().createRateStat("udp.fetchRemoteSlow", "How long it takes to grab the remote ip info", "udp", UDPTransport.RATES);
         // the data buffer is clobbered on init(..), but we need it to bootstrap
         _data = new byte[MAX_PACKET_SIZE];
@@ -112,7 +113,7 @@ class UDPPacket implements CDQEntry {
         init(ctx);
     }
 
-    private synchronized void init(I2PAppContext ctx) {
+    private synchronized void init(RouterContext ctx) {
         _context = ctx;
         //_dataBuf = _dataCache.acquire();
         Arrays.fill(_data, (byte)0);
@@ -231,7 +232,7 @@ class UDPPacket implements CDQEntry {
                     str.append("\n\tCalc HMAC: ").append(Base64.encode(calc, 0, MAC_SIZE));
                     str.append("\n\tRead HMAC: ").append(Base64.encode(_data, _packet.getOffset(), MAC_SIZE));
                     str.append("\n\tUsing key: ").append(macKey.toBase64());
-                    if (DataHelper.eq(macKey.getData(), 0, ((RouterContext)_context).routerHash().getData(), 0, 32))
+                    if (DataHelper.eq(macKey.getData(), 0, _context.routerHash().getData(), 0, 32))
                         str.append(" (Intro)");
                     else
                         str.append(" (Session)");
@@ -300,6 +301,40 @@ class UDPPacket implements CDQEntry {
     /** a packet handler has finished parsing out the good bits */
     //long getTimeSinceHandling() { return (_afterHandlingTime > 0 ? _context.clock().now() - _afterHandlingTime : 0); }
     
+    /**
+     *  So that we can compete with NTCP, we want to request bandwidth
+     *  in parallel, on the way into the queue, not on the way out.
+     *  Call before enqueueing.
+     *  @since 0.9.21
+     *  @deprecated unused
+     */
+    public synchronized void requestInboundBandwidth() {
+        verifyNotReleased();
+        _bandwidthRequest = _context.bandwidthLimiter().requestInbound(_packet.getLength(), "UDP receiver");
+    }
+    
+    /**
+     *  So that we can compete with NTCP, we want to request bandwidth
+     *  in parallel, on the way into the queue, not on the way out.
+     *  Call before enqueueing.
+     *  @since 0.9.21
+     */
+    public synchronized void requestOutboundBandwidth() {
+        verifyNotReleased();
+        _bandwidthRequest = _context.bandwidthLimiter().requestOutbound(_packet.getLength(), 0, "UDP sender");
+    }
+    
+    /**
+     *  So that we can compete with NTCP, we want to request bandwidth
+     *  in parallel, on the way into the queue, not on the way out.
+     *  Call after dequeueing.
+     *  @since 0.9.21
+     */
+    public synchronized FIFOBandwidthLimiter.Request getBandwidthRequest() {
+        verifyNotReleased();
+        return _bandwidthRequest;
+    }
+
     // Following 5: All used only for stats in PacketHandler, commented out
 
     /** when it was pulled off the endpoint receive queue */
@@ -339,7 +374,7 @@ class UDPPacket implements CDQEntry {
     /**
      *  @param inbound unused
      */
-    public static UDPPacket acquire(I2PAppContext ctx, boolean inbound) {
+    public static UDPPacket acquire(RouterContext ctx, boolean inbound) {
         UDPPacket rv = null;
         if (CACHE) {
             rv = _packetCache.poll();
@@ -375,6 +410,13 @@ class UDPPacket implements CDQEntry {
         //_acquiredBy = null;
         //
         //_dataCache.release(_dataBuf);
+        if (_bandwidthRequest != null) {
+            synchronized(_bandwidthRequest) {
+                if (_bandwidthRequest.getPendingRequested() > 0)
+                    _bandwidthRequest.abort();
+            }
+            _bandwidthRequest = null;
+        }
         if (!CACHE)
             return;
         _packetCache.offer(this);
