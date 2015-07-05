@@ -17,6 +17,8 @@ import java.util.concurrent.CopyOnWriteArraySet;
  * In case its useful later...
  * (e.g. w/ native programatic thread dumping, etc)
  *
+ * As of 0.9.21, I2PThreads are initialized to NORM_PRIORITY
+ * (not the priority of the creating thread).
  */
 public class I2PThread extends Thread {
     /**
@@ -31,36 +33,42 @@ public class I2PThread extends Thread {
 
     public I2PThread() {
         super();
+        setPriority(NORM_PRIORITY);
         //if ( (_log == null) || (_log.shouldLog(Log.DEBUG)) )
         //    _createdBy = new Exception("Created by");
     }
 
     public I2PThread(String name) {
         super(name);
+        setPriority(NORM_PRIORITY);
         //if ( (_log == null) || (_log.shouldLog(Log.DEBUG)) )
         //    _createdBy = new Exception("Created by");
     }
 
     public I2PThread(Runnable r) {
         super(r);
+        setPriority(NORM_PRIORITY);
         //if ( (_log == null) || (_log.shouldLog(Log.DEBUG)) )
         //    _createdBy = new Exception("Created by");
     }
 
     public I2PThread(Runnable r, String name) {
         super(r, name);
+        setPriority(NORM_PRIORITY);
         //if ( (_log == null) || (_log.shouldLog(Log.DEBUG)) )
         //    _createdBy = new Exception("Created by");
     }
     public I2PThread(Runnable r, String name, boolean isDaemon) {
         super(r, name);
 	setDaemon(isDaemon);
+        setPriority(NORM_PRIORITY);
         //if ( (_log == null) || (_log.shouldLog(Log.DEBUG)) )
         //    _createdBy = new Exception("Created by");
     }
     
     public I2PThread(ThreadGroup g, Runnable r) {
         super(g, r);
+        setPriority(NORM_PRIORITY);
         //if ( (_log == null) || (_log.shouldLog(Log.DEBUG)) )
         //    _createdBy = new Exception("Created by");
     }
