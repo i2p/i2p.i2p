@@ -417,6 +417,8 @@ public class KeyGenerator {
             RandomSource.getInstance().nextBytes(src);
             long start = System.nanoTime();
             Signature sig = DSAEngine.getInstance().sign(src, privkey);
+            if (sig == null)
+                throw new GeneralSecurityException("signature generation failed");
             long mid = System.nanoTime();
             boolean ok = DSAEngine.getInstance().verifySignature(sig, src, pubkey);
             long end = System.nanoTime();

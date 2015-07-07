@@ -121,7 +121,11 @@ public class SessionConfig extends DataStructureImpl {
     public void signSessionConfig(SigningPrivateKey signingKey) throws DataFormatException {
         byte data[] = getBytes();
         if (data == null) throw new DataFormatException("Unable to retrieve bytes for signing");
+        if (signingKey == null)
+            throw new DataFormatException("No signing key");
         _signature = DSAEngine.getInstance().sign(data, signingKey);
+        if (_signature == null)
+            throw new DataFormatException("Signature failed with " + signingKey.getType() + " key");
     }
 
     /**

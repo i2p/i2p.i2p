@@ -285,8 +285,8 @@ public class DSAEngine {
             try {
                 return altSign(data, offset, length, signingKey);
             } catch (GeneralSecurityException gse) {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn(type + " Sign Fail", gse);
+                if (_log.shouldLog(Log.ERROR))
+                    _log.error(type + " Sign Fail", gse);
                 return null;
             }
         }

@@ -171,8 +171,12 @@ public abstract class DatabaseEntry extends DataStructureImpl {
             throw new IllegalStateException();
         byte[] bytes = getBytes();
         if (bytes == null) throw new DataFormatException("Not enough data to sign");
+        if (key == null)
+            throw new DataFormatException("No signing key");
         // now sign with the key 
         _signature = DSAEngine.getInstance().sign(bytes, key);
+        if (_signature == null)
+            throw new DataFormatException("Signature failed with " + key.getType() + " key");
     }
 
     /**

@@ -216,6 +216,8 @@ class PacketLocal extends Packet implements MessageOutputStream.WriteStatus {
         SigningPrivateKey key = _session.getPrivateKey();
         int size = writePacket(buffer, offset, key.getType().getSigLen());
         _optionSignature = _context.dsa().sign(buffer, offset, size, key);
+        if (_optionSignature == null)
+            throw new IllegalStateException("Signature failed");
         //if (false) {
         //    Log l = ctx.logManager().getLog(Packet.class);
         //    l.error("Signing: " + toString());
