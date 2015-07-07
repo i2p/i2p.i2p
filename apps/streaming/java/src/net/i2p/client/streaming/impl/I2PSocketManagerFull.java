@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.StringTokenizer;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -105,6 +106,11 @@ public class I2PSocketManagerFull implements I2PSocketManager {
                 System.out.println("Bad hash " + s);
         }
     }
+
+    /** cache of the property to detect changes */
+    private static volatile String _userDsaList = "";
+    private static final Set<Hash> _userDsaOnly = new ConcurrentHashSet<Hash>(4);
+    private static final String PROP_DSALIST = "i2p.streaming.dsalist";
 
     /**
      * How long to wait for the client app to accept() before sending back CLOSE?
@@ -478,8 +484,9 @@ public class I2PSocketManagerFull implements I2PSocketManager {
         // pick the subsession here
         I2PSession session = _session;
         if (!_subsessions.isEmpty()) {
+            updateUserDsaList();
             Hash h = peer.calculateHash();
-            if (_dsaOnly.contains(h)) {
+            if (_dsaOnly.contains(h) || (!_userDsaOnly.isEmpty() && _userDsaOnly.contains(h))) {
                 // FIXME just taking the first one for now
                 for (I2PSession sess : _subsessions) {
                     if (sess.getMyDestination().getSigType() == SigType.DSA_SHA1) {
@@ -501,6 +508,40 @@ public class I2PSocketManagerFull implements I2PSocketManager {
             throw new NoRouteToHostException(con.getConnectionError());
         }
         return socket;
+    }
+
+    /**
+     * Update the global user DSA-only list.
+     * This does not affect the hardcoded DSA_ONLY_HASHES list above,
+     * the user can only add, not remove.
+     *
+     * @since 0.9.21
+     */
+    private void updateUserDsaList() {
+        String hashes = _context.getProperty(PROP_DSALIST, "");
+        if (!_userDsaList.equals(hashes)) {
+            // rebuild _userDsaOnly when property changes
+            synchronized(_userDsaOnly) {
+                if (hashes.length() > 0) {
+                    Set<Hash> newSet = new HashSet<Hash>();
+                    StringTokenizer tok = new StringTokenizer(hashes, ",; ");
+                    while (tok.hasMoreTokens()) {
+                        String hashstr = tok.nextToken();
+                        Hash hh = ConvertToHash.getHash(hashstr);
+                        if (hh != null)
+                            newSet.add(hh);
+                        else
+                            _log.error("Bad " + PROP_DSALIST + " entry: " + hashstr);
+                    }
+                    _userDsaOnly.addAll(newSet);
+                    _userDsaOnly.retainAll(newSet);
+                    _userDsaList = hashes;
+                } else {
+                    _userDsaOnly.clear();
+                    _userDsaList = "";
+                }
+            }
+        }
     }
 
     /**
