@@ -671,17 +671,6 @@ public class I2PSnarkServlet extends BasicServlet {
             out.write("<tfoot><tr>\n" +
                       "    <th align=\"left\" colspan=\"6\">");
             out.write("&nbsp;");
-            out.write(_("Dest") + ":");
-            out.write("&nbsp;");
-            String IPString = _manager.util().getOurIPString();
-            if(!IPString.equals("unknown")) {
-                // Only truncate if it's an actual dest
-                IPString = "<i>" + IPString.substring(0, 4) + "</i>";
-            } else {
-                IPString = IPString + ".";
-            }
-            out.write(IPString);
-            out.write("&nbsp;");
             out.write(_("Totals"));
             out.write(":&nbsp;");
             out.write(ngettext("1 torrent", "{0} torrents", total));
@@ -698,6 +687,17 @@ public class I2PSnarkServlet extends BasicServlet {
                     out.write(", ");
                     out.write(ngettext("1 DHT peer", "{0} DHT peers", dhts));
                 }
+            }
+            String IPString = _manager.util().getOurIPString();
+            if(!IPString.equals("unknown")) {
+                // Only truncate if it's an actual dest
+                out.write(";&nbsp;");
+                out.write(_("Dest"));
+                out.write(":&nbsp;<tt>");
+                out.write(IPString.substring(0, 4));
+                out.write("</tt>");
+            }
+            if (dht != null) {
                 if (showDebug)
                     out.write(dht.renderStatusHTML());
             }
