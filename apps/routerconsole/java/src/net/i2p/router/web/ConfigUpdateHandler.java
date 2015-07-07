@@ -34,10 +34,12 @@ public class ConfigUpdateHandler extends FormHandler {
 //  public static final String DEFAULT_NEWS_URL = "http://dev.i2p.net/cgi-bin/cvsweb.cgi/i2p/news.xml?rev=HEAD";
     /** very old default */
     public static final String OLD_DEFAULT_NEWS_URL = "http://complication.i2p/news.xml";
-    /** old default */
+    /** older default */
     public static final String DEFAULT_NEWS_URL = "http://echelon.i2p/i2p/news.xml";
-    /** current default */
-    public static final String DEFAULT_NEWS_URL_SU3 = "http://echelon.i2p/news/news.su3";
+    /** old default */
+    public static final String OLD_DEFAULT_NEWS_URL_SU3 = "http://echelon.i2p/news/news.su3";
+    /** current default, i2pnews.i2p, run by echelon */
+    public static final String DEFAULT_NEWS_URL_SU3 = "http://tc73n4kivdroccekirco7rhgxdg5f3cjvbaapabupeyzrqwv5guq.b32.i2p/news.su3";
     public static final String PROP_REFRESH_FREQUENCY = "router.newsRefreshFrequency";
     public static final long DEFAULT_REFRESH_FREQ = 36*60*60*1000l;
     public static final String DEFAULT_REFRESH_FREQUENCY = Long.toString(DEFAULT_REFRESH_FREQ);

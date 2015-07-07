@@ -34,7 +34,8 @@ public class ConfigUpdateHelper extends HelperBase {
     public static String getNewsURL(I2PAppContext ctx) {
         String url = ctx.getProperty(ConfigUpdateHandler.PROP_NEWS_URL);
         if (url != null && !url.equals(ConfigUpdateHandler.OLD_DEFAULT_NEWS_URL) &&
-            !url.equals(ConfigUpdateHandler.DEFAULT_NEWS_URL))
+            !url.equals(ConfigUpdateHandler.DEFAULT_NEWS_URL) &&
+            !url.equals(ConfigUpdateHandler.OLD_DEFAULT_NEWS_URL_SU3))
             return url;
         else
             return ConfigUpdateHandler.DEFAULT_NEWS_URL_SU3;
