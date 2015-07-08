@@ -77,7 +77,7 @@ import net.i2p.util.RandomSource;
 class NtpMessage {
     /**
      * This is a two-bit code warning of an impending leap second to be
-     * inserted/deleted in the last minute of the current day.  It's values
+     * inserted/deleted in the last minute of the current day.  Its values
      * may be as follows:
      *
      * Value     Meaning

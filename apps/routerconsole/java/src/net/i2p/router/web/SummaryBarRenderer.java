@@ -506,7 +506,7 @@ public class SummaryBarRenderer {
            .append("</td></tr>\n" +
 
                    "<tr title=\"")
-           .append(_("Tunnels we are participating in, directly contributing bandwith to the network"))
+           .append(_("Tunnels we are participating in, directly contributing bandwidth to the network"))
            .append("\">" +
                    "<td align=\"left\"><b>")
            .append(_("Participating"))
