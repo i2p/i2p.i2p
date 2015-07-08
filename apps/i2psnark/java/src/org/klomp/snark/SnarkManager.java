@@ -1272,7 +1272,13 @@ public class SnarkManager implements CompleteListener {
         }
         // ok, snark created, now lets start it up or configure it further
         Properties config = getConfig(torrent);
-        boolean running = Boolean.parseBoolean(config.getProperty(PROP_META_RUNNING));
+        boolean running;
+        String  prop = config.getProperty(PROP_META_RUNNING);
+        if(prop == null || Boolean.parseBoolean(prop)) {
+            running = true;
+        } else {
+            running = false;
+        }        
         // Were we running last time?
         if (!dontAutoStart && shouldAutoStart() && running) {
             torrent.startTorrent();
@@ -1432,10 +1438,12 @@ public class SnarkManager implements CompleteListener {
             Snark snark = getTorrentByInfoHash(metainfo.getInfoHash());
             if (snark != null) {
                 addMessage(_("Torrent with this info hash is already running: {0}", snark.getBaseName()));
+                saveTorrentStatus(metainfo, bitfield, null, baseFile, true, 0, false); // no file priorities
                 return false;
+            } else {
+                saveTorrentStatus(metainfo, bitfield, null, baseFile, true, 0, true); // no file priorities
             }
-            // so addTorrent won't recheck
-            saveTorrentStatus(metainfo, bitfield, null, baseFile, true, 0, snark.isStopped()); // no file priorities
+            // so addTorrent won't recheck            
             try {
                 locked_writeMetaInfo(metainfo, filename, areFilesPublic());
                 // hold the lock for a long time

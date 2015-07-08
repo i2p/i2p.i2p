@@ -617,7 +617,6 @@ public class Snark
    * @since 0.9.1
    */
   public synchronized void stopTorrent(boolean fast) {
-    stopped = true;
     TrackerClient tc = trackerclient;
     if (tc != null)
         tc.halt(fast);
@@ -630,15 +629,16 @@ public class Snark
         // (needed for auto-save to not double-save in some cases)
         //boolean changed = storage.isChanged() || getUploaded() != savedUploaded;
         boolean changed = true;
+        if (changed && completeListener != null)
+            completeListener.updateStatus(this);
         try { 
             storage.close(); 
         } catch (IOException ioe) {
             System.out.println("Error closing " + torrent);
             ioe.printStackTrace();
         }
-        if (changed && completeListener != null)
-            completeListener.updateStatus(this);
     }
+    stopped = true;
     if (pc != null && _peerCoordinatorSet != null)
         _peerCoordinatorSet.remove(pc);
     if (_peerCoordinatorSet == null)
