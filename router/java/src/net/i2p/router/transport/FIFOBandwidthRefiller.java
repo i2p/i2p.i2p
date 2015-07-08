@@ -75,7 +75,7 @@ public class FIFOBandwidthRefiller implements Runnable {
      *  Do not increase without adding a new Bloom filter size!
      *  See util/DecayingBloomFilter and tunnel/BloomFilterIVValidator.
      */
-    public static final int MAX_OUTBOUND_BANDWIDTH = 8192;
+    public static final int MAX_OUTBOUND_BANDWIDTH = 16384;
     
     /** 
      * how often we replenish the queues.  

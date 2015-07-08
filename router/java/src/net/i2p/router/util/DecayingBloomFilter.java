@@ -86,16 +86,24 @@ public class DecayingBloomFilter {
         this(context, durationMs, entryBytes, name, context.getProperty("router.decayingBloomFilterM", DEFAULT_M));
     }
 
-    /** @param m filter size exponent */
+    /**
+     * @param m filter size exponent, max is 29
+     */
     public DecayingBloomFilter(I2PAppContext context, int durationMs, int entryBytes, String name, int m) {
         _context = context;
         _log = context.logManager().getLog(DecayingBloomFilter.class);
         _entryBytes = entryBytes;
         _name = name;
         int k = DEFAULT_K;
-        // max is (23,11) or (26,10); see KeySelector for details
-        if (m > DEFAULT_M)
+        // max is (23,11) or (26,10) or (29,9); see KeySelector for details
+        if (m > DEFAULT_M) {
             k--;
+            if (m > 26) {
+                k--;
+                if (m > 29)
+                    throw new IllegalArgumentException("Max m is 29");
+            }
+        }
         _current = new BloomSHA1(m, k);
         _previous = new BloomSHA1(m, k);
         _durationMs = durationMs;
@@ -375,6 +383,9 @@ public class DecayingBloomFilter {
      *
      *  Following stats for m=26, k=10:
      *  4096 7.3E-6; 5120 4.5E-5; 6144 1.8E-4; 8192 0.14%; 10240 0.6%, 12288 1.7%
+     *
+     *  Following stats for m=27, k=9:
+     *  8192 1.1E-5; 10240 5.6E-5; 12288 2.0E-4; 14336 5.8E-4; 16384 0.14%
      *</pre>
      */
 /*****
