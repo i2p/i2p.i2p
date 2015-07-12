@@ -3,6 +3,7 @@ package net.i2p.crypto;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
@@ -45,7 +46,7 @@ public class CertUtil {
            // Get the encoded form which is suitable for exporting
            byte[] buf = cert.getEncoded();
            os = new SecureFileOutputStream(file);
-           wr = new PrintWriter(os);
+           wr = new PrintWriter(new OutputStreamWriter(os, "UTF-8"));
            wr.println("-----BEGIN CERTIFICATE-----");
            String b64 = Base64.encode(buf, true);     // true = use standard alphabet
            for (int i = 0; i < b64.length(); i += LINE_LENGTH) {

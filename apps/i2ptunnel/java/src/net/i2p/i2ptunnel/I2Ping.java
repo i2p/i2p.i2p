@@ -4,8 +4,9 @@
 package net.i2p.i2ptunnel;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
@@ -157,7 +158,7 @@ public class I2Ping extends I2PTunnelClientBase {
       }
 
       if (hostListFile != null) {
-            BufferedReader br = new BufferedReader(new FileReader(hostListFile));
+            BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(hostListFile), "UTF-8"));
             String line;
             List<PingHandler> pingHandlers = new ArrayList<PingHandler>();
             int i = 0;

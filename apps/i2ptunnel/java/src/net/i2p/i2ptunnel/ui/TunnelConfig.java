@@ -319,7 +319,7 @@ public class TunnelConfig {
         if (val)
             _booleanOptions.add(I2PTunnelHTTPClient.PROP_ACCEPT);
         else
-            _booleanOptions.add(I2PTunnelHTTPClient.PROP_ACCEPT);
+            _booleanOptions.remove(I2PTunnelHTTPClient.PROP_ACCEPT);
     }
     public void setAllowInternalSSL(boolean val) {
         if (val)

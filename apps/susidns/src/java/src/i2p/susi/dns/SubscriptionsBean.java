@@ -27,9 +27,11 @@ package i2p.susi.dns;
 import java.io.ByteArrayInputStream;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -71,7 +73,7 @@ public class SubscriptionsBean extends BaseBean
 			StringBuilder buf = new StringBuilder();
 			BufferedReader br = null;
 			try {
-				br = new BufferedReader( new FileReader( file ) );
+				br = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"));
 				String line;
 				while( ( line = br.readLine() ) != null ) {
 					buf.append( line );
@@ -108,7 +110,7 @@ public class SubscriptionsBean extends BaseBean
                                     urls.add(line);
 			}
 			Collections.sort(urls);
-			PrintWriter out = new PrintWriter( new SecureFileOutputStream( file ) );
+			PrintWriter out = new PrintWriter(new OutputStreamWriter(new SecureFileOutputStream(file), "UTF-8"));
 			for (String url : urls) {
 				out.println(url);
 			}
