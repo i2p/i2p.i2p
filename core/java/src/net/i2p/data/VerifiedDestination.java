@@ -87,7 +87,7 @@ public class VerifiedDestination extends Destination {
      *  zeros and see if it meets our minimum effort.
      */
     protected boolean verifyHashCashCert() {
-        String hcs = new String(_certificate.getPayload());
+        String hcs = DataHelper.getUTF8(_certificate.getPayload());
         int end1 = 0;
         for (int i = 0; i < 3; i++) {
             end1 = 1 + hcs.indexOf(':', end1);

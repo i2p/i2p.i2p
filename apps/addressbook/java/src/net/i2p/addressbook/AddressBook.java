@@ -159,8 +159,13 @@ class AddressBook {
      * @since 0.8.7
      */
     public Iterator<Map.Entry<String, String>> iterator() {
-        if (this.subFile != null)
-            return new ConfigIterator(this.subFile);
+        if (this.subFile != null) {
+            try {
+                return new ConfigIterator(this.subFile);
+            } catch (IOException ioe) {
+                return new ConfigIterator();
+            }
+       }
         return this.addresses.entrySet().iterator();
     }
 

@@ -572,7 +572,7 @@ public class Reseeder {
                     System.err.println("Reseed got no router infos from " + seedURL);
                     return 0;
                 }
-                String content = new String(contentRaw);
+                String content = DataHelper.getUTF8(contentRaw);
                 // This isn't really URLs, but Base64 hashes
                 // but they may include % encoding
                 Set<String> urls = new HashSet<String>(1024);

@@ -54,11 +54,9 @@ class ConfigIterator implements Iterator<Map.Entry<String, String>> {
     /**
      *  An iterator over the key/value pairs in the file.
      */
-    public ConfigIterator(File file) {
-        try {
+    public ConfigIterator(File file) throws IOException {
             FileInputStream fileStream = new FileInputStream(file);
-            input = new BufferedReader(new InputStreamReader(fileStream));
-        } catch (IOException ioe) {}
+            input = new BufferedReader(new InputStreamReader(fileStream, "UTF-8"));
     }
 
     public boolean hasNext() {

@@ -1,8 +1,7 @@
 package net.i2p.router.web;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
+import java.io.StringWriter;
 
 
 public class TunnelHelper extends HelperBase {
@@ -15,9 +14,9 @@ public class TunnelHelper extends HelperBase {
                 renderer.renderStatusHTML(_out);
                 return "";
             } else {
-                ByteArrayOutputStream baos = new ByteArrayOutputStream(32*1024);
-                renderer.renderStatusHTML(new OutputStreamWriter(baos));
-                return new String(baos.toByteArray());
+                StringWriter sw = new StringWriter(32*1024);
+                renderer.renderStatusHTML(sw);
+                return sw.toString();
             }
         } catch (IOException ioe) {
             ioe.printStackTrace();

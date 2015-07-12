@@ -24,6 +24,7 @@ import net.i2p.I2PException;
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.client.streaming.I2PSocketOptions;
 import net.i2p.data.DataFormatException;
+import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.i2ptunnel.I2PTunnelHTTPClientBase;
 import net.i2p.i2ptunnel.I2PTunnel;
@@ -226,7 +227,7 @@ public class SOCKS5Server extends SOCKSServer {
                 }
                 byte addr[] = new byte[addrLen];
                 in.readFully(addr);
-                connHostName = new String(addr);
+                connHostName = DataHelper.getUTF8(addr);
             }
             _log.debug("DOMAINNAME address type in request: " + connHostName);
             break;

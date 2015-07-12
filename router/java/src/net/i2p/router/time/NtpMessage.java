@@ -442,7 +442,13 @@ class NtpMessage {
         // or stratum-1 (primary) servers, this is a four-character ASCII
         // string, left justified and zero padded to 32 bits.
         if(stratum==0 || stratum==1) {
-            return new String(ref);
+            StringBuilder buf = new StringBuilder(4);
+            for (int i = 0; i < 4; i++) {
+                if (ref[i] == 0)
+                    break;
+                buf.append((char) (ref[i] & 0xff));
+            }
+            return buf.toString();
         }
         
         // In NTP Version 3 secondary servers, this is the 32-bit IPv4

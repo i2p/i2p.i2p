@@ -15,6 +15,7 @@ import java.util.Locale;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.ByteArray;
+import net.i2p.data.DataHelper;
 import net.i2p.util.ByteCache;
 import net.i2p.util.Log;
 
@@ -145,7 +146,7 @@ class HTTPResponseOutputStream extends FilterOutputStream {
         for (int i = 0; i < _headerBuffer.getValid(); i++) {
             if (isNL(_headerBuffer.getData()[i])) {
                 if (lastEnd == -1) {
-                    responseLine = new String(_headerBuffer.getData(), 0, i+1); // includes NL
+                    responseLine = DataHelper.getUTF8(_headerBuffer.getData(), 0, i+1); // includes NL
                     responseLine = filterResponseLine(responseLine);
                     responseLine = (responseLine.trim() + "\r\n");
                     if (_log.shouldLog(Log.INFO))
@@ -158,12 +159,12 @@ class HTTPResponseOutputStream extends FilterOutputStream {
                             int valLen = i-(j+1);
                             if ( (keyLen <= 0) || (valLen < 0) )
                                 throw new IOException("Invalid header @ " + j);
-                            String key = new String(_headerBuffer.getData(), lastEnd+1, keyLen);
+                            String key = DataHelper.getUTF8(_headerBuffer.getData(), lastEnd+1, keyLen);
                             String val = null;
                             if (valLen == 0)
                                 val = "";
                             else
-                                val = new String(_headerBuffer.getData(), j+2, valLen).trim();
+                                val = DataHelper.getUTF8(_headerBuffer.getData(), j+2, valLen).trim();
                             
                             if (_log.shouldLog(Log.INFO))
                                 _log.info("Response header [" + key + "] = [" + val + "]");

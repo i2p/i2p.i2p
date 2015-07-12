@@ -9,12 +9,13 @@ package net.i2p.util;
  *
  */
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Date;
 
 import net.i2p.I2PAppContext;
+import net.i2p.data.DataHelper;
 
 /**
  * Render a log record according to the log manager's settings
@@ -71,16 +72,11 @@ class LogRecordFormatter {
         }
         buf.append(NL);
         if (rec.getThrowable() != null) {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream(512);
-            PrintWriter pw = new PrintWriter(baos, true);
+            StringWriter sw = new StringWriter(512);
+            PrintWriter pw = new PrintWriter(sw, true);
             rec.getThrowable().printStackTrace(pw);
-            try {
-                pw.flush();
-                baos.flush();
-            } catch (IOException ioe) { // nop
-            }
-            byte tb[] = baos.toByteArray();
-            buf.append(new String(tb));
+            sw.flush();
+            buf.append(sw.toString());
         }
         return buf.toString();
     }

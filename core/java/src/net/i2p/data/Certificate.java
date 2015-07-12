@@ -262,7 +262,7 @@ public class Certificate extends DataStructureImpl {
         } else {
             buf.append(" payload size: ").append(_payload.length);
             if (getCertificateType() == CERTIFICATE_TYPE_HASHCASH) {
-                buf.append(" Stamp: ").append(new String(_payload));
+                buf.append(" Stamp: ").append(DataHelper.getUTF8(_payload));
             } else if (getCertificateType() == CERTIFICATE_TYPE_SIGNED && _payload.length == CERTIFICATE_LENGTH_SIGNED_WITH_HASH) {
                 buf.append(" Signed by hash: ").append(Base64.encode(_payload, Signature.SIGNATURE_BYTES, Hash.HASH_LENGTH));
             } else {

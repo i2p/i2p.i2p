@@ -116,7 +116,7 @@ class ConfigParser {
     public static Map<String, String>  parse(File file) throws IOException {
         FileInputStream fileStream = new FileInputStream(file);
         BufferedReader input = new BufferedReader(new InputStreamReader(
-                fileStream));
+                fileStream, "UTF-8"));
         Map<String, String>  rv = parse(input);
         try {
             fileStream.close();
@@ -205,7 +205,7 @@ class ConfigParser {
     public static List<String> parseSubscriptions(File file) throws IOException {
         FileInputStream fileStream = new FileInputStream(file);
         BufferedReader input = new BufferedReader(new InputStreamReader(
-                fileStream));
+                fileStream, "UTF-8"));
         List<String> rv = parseSubscriptions(input);
         try {
             fileStream.close();

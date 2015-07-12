@@ -94,7 +94,7 @@ public class SAMReader {
                     _log.error("Error reading from SAM", ioe);
                 }
                 
-                String line = new String(baos.toByteArray());
+                String line = DataHelper.getUTF8(baos.toByteArray());
                 baos.reset();
                 
                 if (line == null) {

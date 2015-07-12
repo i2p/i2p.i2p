@@ -1,8 +1,7 @@
 package net.i2p.router.web;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
+import java.io.StringWriter;
 import java.io.Serializable;
 import java.io.Writer;
 import java.util.ArrayList;
@@ -25,9 +24,9 @@ public class JobQueueHelper extends HelperBase {
                 renderStatusHTML(_out);
                 return "";
             } else {
-                ByteArrayOutputStream baos = new ByteArrayOutputStream(32*1024);
-                renderStatusHTML(new OutputStreamWriter(baos));
-                return new String(baos.toByteArray());
+                StringWriter sw = new StringWriter(32*1024);
+                renderStatusHTML(sw);
+                return sw.toString();
             }
         } catch (IOException ioe) {
             ioe.printStackTrace();
