@@ -52,8 +52,6 @@ import net.i2p.util.EventDispatcher;
     private static final AtomicLong __clientId = new AtomicLong();
     protected long _clientId;
 
-    protected Destination dest;
-
     private final Object startLock = new Object();
     
     private final I2PSession _session;
@@ -98,6 +96,7 @@ import net.i2p.util.EventDispatcher;
         // create a session
         try {
             ByteArrayInputStream in = new ByteArrayInputStream(key);
+            // FIXME this may not pick up non-default I2CP host/port settings from tunnel
             _session = client.createSession(in, tunnel.getClientOptions());
             connected(_session);
         } catch(Exception exc) {

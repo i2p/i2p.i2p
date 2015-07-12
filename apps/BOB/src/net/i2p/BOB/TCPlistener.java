@@ -30,12 +30,11 @@ import net.i2p.client.streaming.I2PSocketManager;
  */
 public class TCPlistener implements Runnable {
 
-	private NamedDB info,  database;
-	private Logger _log;
-	public I2PSocketManager socketManager;
-	public I2PServerSocket serverSocket;
-	private ServerSocket listener;
-	private AtomicBoolean lives;
+	private final NamedDB info,  database;
+	private final Logger _log;
+	private final I2PSocketManager socketManager;
+	private final ServerSocket listener;
+	private final AtomicBoolean lives;
 
 	/**
 	 * Constructor

@@ -27,7 +27,6 @@ import net.i2p.util.Log;
 public class I2PSOCKSTunnel extends I2PTunnelClientBase {
 
     private HashMap<String, List<String>> proxies = null;  // port# + "" or "default" -> hostname list
-    protected Destination outProxyDest = null;
 
     //public I2PSOCKSTunnel(int localPort, Logging l, boolean ownDest) {
     //	  I2PSOCKSTunnel(localPort, l, ownDest, (EventDispatcher)null);

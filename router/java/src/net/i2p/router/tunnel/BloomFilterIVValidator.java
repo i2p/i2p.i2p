@@ -113,7 +113,7 @@ class BloomFilterIVValidator implements IVValidator {
             path = _context.getBaseDir().toString();
         }
         String msg =
-            "Configured for " + DataHelper.formatSize(KBps *1024) +
+            "Configured for " + DataHelper.formatSize(KBps *1024L) +
             "Bps share bandwidth but only " +
             DataHelper.formatSize(maxMemory) + "B available memory." +
             " Recommend increasing wrapper.java.maxmemory in " +
@@ -121,7 +121,7 @@ class BloomFilterIVValidator implements IVValidator {
             // getMaxMemory() returns significantly lower than wrapper config, so add 10%
             " to at least " + (recMaxMem * 11 / 10 / (1024*1024)) + " (MB)" +
             " if the actual share bandwidth exceeds " +
-            DataHelper.formatSize(threshKBps * 1024) + "Bps.";
+            DataHelper.formatSize(threshKBps * 1024L) + "Bps.";
         System.out.println("WARN: " + msg);
         _context.logManager().getLog(BloomFilterIVValidator.class).logAlways(Log.WARN, msg);
     }

@@ -1,3 +1,15 @@
+2015-07-12 zzz
+ * Findbugs all over
+
+2015-07-08 zzz
+ * Tunnels: New Bloom filter size, increase bandwidth limit (ticket #1505)
+
+2015-07-07 zzz
+ * Crypto: Check for error return from sign()
+ * i2psnark: Tweak dest display in footer
+ * Streaming: New config to add to DSA-only list
+ * Updates: New news URL
+
 2015-07-05 zzz
  * SSU: Compete better with NTCP for outbound bandwidth allocations
  * Transport: Adjust thread priorities to prevent I/O stalling
@@ -26,8 +38,8 @@
    raise class L/M boundary to match so defaulted routers are still L
 
 2015-06-22 dg
- * NetDB: Partially revert last NetDB change: flood because we don't want to create a hole in the DHT 
-   before publisher resends to somebody else.
+ * NetDB: Partially revert last NetDB change: flood because we don't want
+   to create a hole in the DHT before publisher resends to somebody else.
 
 2015-06-20 dg
  * I2PSnark: Auto-start now only starts torrents which were running at shutdown (#766)

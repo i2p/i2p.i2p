@@ -30,16 +30,15 @@ import net.i2p.client.streaming.I2PSocketManager;
  */
 public class I2Plistener implements Runnable {
 
-	private NamedDB info,  database;
-	private Logger _log;
-	public I2PSocketManager socketManager;
-	public I2PServerSocket serverSocket;
-	private AtomicBoolean lives;
+	private final NamedDB info,  database;
+	private final Logger _log;
+	private final I2PServerSocket serverSocket;
+	private final AtomicBoolean lives;
 
 	/**
 	 * Constructor
 	 * @param SS
-	 * @param S
+	 * @param S unused
 	 * @param info
 	 * @param database
 	 * @param _log
@@ -48,7 +47,6 @@ public class I2Plistener implements Runnable {
 		this.database = database;
 		this.info = info;
 		this._log = _log;
-		this.socketManager = S;
 		this.serverSocket = SS;
 		this.lives = lives;
 	}

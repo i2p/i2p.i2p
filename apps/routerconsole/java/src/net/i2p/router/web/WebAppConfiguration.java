@@ -1,6 +1,8 @@
 package net.i2p.router.web;
 
 import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Arrays;
@@ -108,7 +110,7 @@ public class WebAppConfiguration implements Configuration {
             return;
         StringTokenizer tok = new StringTokenizer(cp, " ,");
         StringBuilder buf = new StringBuilder();
-        Set<URL> systemCP = getSystemClassPath();
+        Set<URI> systemCP = getSystemClassPath();
         while (tok.hasMoreTokens()) {
             if (buf.length() > 0)
                 buf.append(',');
@@ -127,8 +129,8 @@ public class WebAppConfiguration implements Configuration {
             // TODO: Add a classpath to the command line in i2pstandalone.xml?
             File jfile = new File(path);
             File jdir = jfile.getParentFile();
-            if (systemCP.contains(jfile.toURI().toURL()) ||
-                (jdir != null && systemCP.contains(jdir.toURI().toURL()))) {
+            if (systemCP.contains(jfile.toURI()) ||
+                (jdir != null && systemCP.contains(jdir.toURI()))) {
                 //System.err.println("Not adding " + path + " to classpath for " + appName + ", already in system classpath");
                 // Ticket #957... don't know why...
                 if (!ctxPath.equals("/susimail"))
@@ -151,13 +153,20 @@ public class WebAppConfiguration implements Configuration {
         }
     }
 
-    /** @since 0.9 */
-    private static Set<URL> getSystemClassPath() {
+    /**
+     * Convert URL to URI so there's no blocking equals(),
+     * not that there's really any hostnames in here,
+     * but keep findbugs happy.
+     * @since 0.9
+     */
+    private static Set<URI> getSystemClassPath() {
         URLClassLoader urlClassLoader = (URLClassLoader) ClassLoader.getSystemClassLoader();
         URL urls[] = urlClassLoader.getURLs();
-        Set<URL> rv = new HashSet<URL>(32);
+        Set<URI> rv = new HashSet<URI>(32);
         for (int i = 0; i < urls.length; i++) {
-            rv.add(urls[i]);
+            try {
+                rv.add(urls[i].toURI());
+            } catch (URISyntaxException use) {}
         }
         return rv;
     }
