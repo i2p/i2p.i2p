@@ -45,11 +45,11 @@
 </p><p>
 <%
     if (ERROR_THROWABLE != null) {
-        java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream(2048);
-        java.io.PrintStream ps = new java.io.PrintStream(baos);
-        ERROR_THROWABLE.printStackTrace(ps);
-        ps.close();
-        String trace = baos.toString();
+        java.io.StringWriter sw = new java.io.StringWriter(2048);
+        java.io.PrintWriter pw = new java.io.PrintWriter(sw);
+        ERROR_THROWABLE.printStackTrace(pw);
+        pw.flush();
+        String trace = sw.toString();
         trace = trace.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
         trace = trace.replace("\n", "<br>&nbsp;&nbsp;&nbsp;&nbsp;\n");
         out.print(trace);

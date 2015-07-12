@@ -252,7 +252,7 @@ public class WorkingDir {
         }
         System.setProperty(PROP_WRAPPER_LOG, logfile.getAbsolutePath());
         try {
-            PrintStream ps = new PrintStream(new SecureFileOutputStream(logfile, true));
+            PrintStream ps = new PrintStream(new SecureFileOutputStream(logfile, true), true, "UTF-8");
             System.setOut(ps);
             System.setErr(ps);
         } catch (IOException ioe) {

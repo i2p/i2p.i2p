@@ -28,6 +28,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataFormatException;
+import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.util.FileUtil;
 import net.i2p.util.Log;
@@ -235,7 +236,7 @@ public class SingleFileNamingService extends NamingService {
             // FIXME fails if previous last line didn't have a trailing \n
             out.write(hostname.getBytes("UTF-8"));
             out.write('=');
-            out.write(d.toBase64().getBytes());
+            out.write(DataHelper.getASCII(d.toBase64()));
             out.write('\n');
             out.close();
             for (NamingServiceListener nsl : _listeners) { 

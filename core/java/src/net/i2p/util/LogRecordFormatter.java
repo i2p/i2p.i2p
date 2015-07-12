@@ -73,9 +73,9 @@ class LogRecordFormatter {
         buf.append(NL);
         if (rec.getThrowable() != null) {
             StringWriter sw = new StringWriter(512);
-            PrintWriter pw = new PrintWriter(sw, true);
+            PrintWriter pw = new PrintWriter(sw);
             rec.getThrowable().printStackTrace(pw);
-            sw.flush();
+            pw.flush();
             buf.append(sw.toString());
         }
         return buf.toString();

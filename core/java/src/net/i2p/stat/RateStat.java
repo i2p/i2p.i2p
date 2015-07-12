@@ -184,7 +184,7 @@ public class RateStat {
         buf.append("# Rate: ").append(_groupName).append(": ").append(_statName).append(NL);
         buf.append("# ").append(_description).append(NL);
         buf.append("# ").append(NL).append(NL);
-        out.write(buf.toString().getBytes());
+        out.write(buf.toString().getBytes("UTF-8"));
         buf.setLength(0);
         for (Rate r: _rates){
             buf.append("#######").append(NL);
@@ -193,7 +193,7 @@ public class RateStat {
             buf.append(NL);
             String curPrefix = prefix + "." + DataHelper.formatDuration(r.getPeriod());
             r.store(curPrefix, buf);
-            out.write(buf.toString().getBytes());
+            out.write(buf.toString().getBytes("UTF-8"));
             buf.setLength(0);
         }
     }
