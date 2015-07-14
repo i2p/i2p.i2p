@@ -624,6 +624,11 @@ public class Snark
     if (pc != null)
         pc.halt();
     Storage st = storage;
+    if (!fast)
+        // HACK: Needed a way to distinguish between user-stop and 
+        // shutdown-stop. stopTorrent(true) is in stopAllTorrents().
+        // (#766)
+        stopped = true;
     if (st != null) {
         // TODO: Cache the config-in-mem to compare vs config-on-disk
         // (needed for auto-save to not double-save in some cases)
@@ -638,7 +643,9 @@ public class Snark
             ioe.printStackTrace();
         }
     }
-    stopped = true;
+    if (fast)
+        // HACK: See above if(!fast)
+        stopped = true;
     if (pc != null && _peerCoordinatorSet != null)
         _peerCoordinatorSet.remove(pc);
     if (_peerCoordinatorSet == null)

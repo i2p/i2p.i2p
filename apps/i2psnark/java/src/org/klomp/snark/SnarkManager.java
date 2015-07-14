@@ -105,7 +105,7 @@ public class SnarkManager implements CompleteListener {
     public static final String PROP_FILES_PUBLIC = "i2psnark.filesPublic";
     public static final String PROP_OLD_AUTO_START = "i2snark.autoStart";   // oops
     public static final String PROP_AUTO_START = "i2psnark.autoStart";      // convert in migration to new config file
-    public static final String DEFAULT_AUTO_START = "true";
+    public static final String DEFAULT_AUTO_START = "false";
     //public static final String PROP_LINK_PREFIX = "i2psnark.linkPrefix";
     //public static final String DEFAULT_LINK_PREFIX = "file:///";
     public static final String PROP_STARTUP_DELAY = "i2psnark.startupDelay";
@@ -1278,7 +1278,7 @@ public class SnarkManager implements CompleteListener {
             running = true;
         } else {
             running = false;
-        }        
+        }
         // Were we running last time?
         if (!dontAutoStart && shouldAutoStart() && running) {
             torrent.startTorrent();
@@ -1438,7 +1438,6 @@ public class SnarkManager implements CompleteListener {
             Snark snark = getTorrentByInfoHash(metainfo.getInfoHash());
             if (snark != null) {
                 addMessage(_("Torrent with this info hash is already running: {0}", snark.getBaseName()));
-                saveTorrentStatus(metainfo, bitfield, null, baseFile, true, 0, false); // no file priorities
                 return false;
             } else {
                 saveTorrentStatus(metainfo, bitfield, null, baseFile, true, 0, true); // no file priorities
@@ -2129,7 +2128,7 @@ public class SnarkManager implements CompleteListener {
                 try {
                     // Snark.fatal() throws a RuntimeException
                     // don't let one bad torrent kill the whole loop
-                    addTorrent(name, null, !shouldAutoStart());
+                    addTorrent(name, null, false);
                 } catch (Exception e) {
                     addMessage(_("Error: Could not add the torrent {0}", name) + ": " + e);
                     _log.error("Unable to add the torrent " + name, e);

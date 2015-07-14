@@ -68,7 +68,7 @@ class IterativeLookupJob extends JobImpl {
                     }
                     RouterInfo ri = getContext().netDb().lookupRouterInfoLocally(peer);
                     if (ri == null) {
-                        // Take it on faith that its ff to speed things up, we don't need the RI
+                        // Take it on faith that it's ff to speed things up, we don't need the RI
                         // to query it.
                         // Zero-hop outbound tunnel will be failed in ISJ.sendQuery()
                         _search.newPeerToTry(peer);
