@@ -10,6 +10,7 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -18,6 +19,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.TimeZone;
 
 import net.i2p.crypto.SU3File;
 import net.i2p.crypto.TrustedUpdate;
@@ -553,11 +555,19 @@ class NewsFetcher extends UpdateRunner {
             out.write("-->\n");
             if (entries == null)
                 return;
+            DateFormat fmt = DateFormat.getDateInstance(DateFormat.SHORT);
+            // the router sets the JVM time zone to UTC but saves the original here so we can get it
+            String systemTimeZone = _context.getProperty("i2p.systemTimeZone");
+            if (systemTimeZone != null)
+                fmt.setTimeZone(TimeZone.getTimeZone(systemTimeZone));
             for (NewsEntry e : entries) {
                 if (e.title == null || e.content == null)
                     continue;
-                out.write("<!-- Entry Date: " + (new Date(e.updated)) + " -->\n");
+                Date date = new Date(e.updated);
+                out.write("<!-- Entry Date: " + date + " -->\n");
                 out.write("<h3>");
+                out.write(fmt.format(date));
+                out.write(": ");
                 out.write(e.title);
                 out.write("</h3>\n");
                 out.write(e.content);
