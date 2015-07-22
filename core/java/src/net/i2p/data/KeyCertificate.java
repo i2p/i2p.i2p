@@ -122,7 +122,7 @@ public class KeyCertificate extends Certificate {
     /**
      *  Signing Key extra data, if any, is first in the array.
      *  Crypto Key extra data, if any, is second in the array,
-     *  at offset max(0, 128 - getSigType().getPubkeyLen()
+     *  at offset max(0, getSigType().getPubkeyLen() - 128)
      *
      *  @return null if unset or none
      */
@@ -148,7 +148,7 @@ public class KeyCertificate extends Certificate {
         SigType type = getSigType();
         if (type == null)
             throw new UnsupportedOperationException("unknown sig type");
-        int extra = 128 - type.getPubkeyLen();
+        int extra = Math.max(0, type.getPubkeyLen() - 128);
         if (_payload.length == HEADER_LENGTH + extra)
             return getExtraKeyData();
         byte[] rv = new byte[extra];

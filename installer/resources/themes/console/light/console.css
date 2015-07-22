@@ -251,6 +251,7 @@ div.newsheadings {
 div.newsheadings li {
      list-style: none outside url('images/newsbullet_mini.png');
      margin: 0 -4px 2px 8px;
+     line-height: 140%;
 }
 
 div.tunnels {

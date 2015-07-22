@@ -1,3 +1,6 @@
+2015-07-16 zzz
+ * Console: Add dates to news headings
+
 2015-07-12 zzz
  * Findbugs all over
 

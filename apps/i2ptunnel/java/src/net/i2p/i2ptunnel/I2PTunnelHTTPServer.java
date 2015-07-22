@@ -817,7 +817,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
      *  @throws BadRequestException on bad headers
      *  @throws IOException on other errors in the underlying stream
      */
-    private static Map<String, List<String>> readHeaders(I2PSocket socket, InputStream in, StringBuilder command,
+    static Map<String, List<String>> readHeaders(I2PSocket socket, InputStream in, StringBuilder command,
                                                            String[] skipHeaders, I2PAppContext ctx) throws IOException {
     	HashMap<String, List<String>> headers = new HashMap<String, List<String>>();
         StringBuilder buf = new StringBuilder(128);
