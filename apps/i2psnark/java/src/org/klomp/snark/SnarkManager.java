@@ -1278,7 +1278,7 @@ public class SnarkManager implements CompleteListener {
             running = true;
         } else {
             running = false;
-        }
+        }        
         // Were we running last time?
         if (!dontAutoStart && shouldAutoStart() && running) {
             torrent.startTorrent();
@@ -2128,7 +2128,7 @@ public class SnarkManager implements CompleteListener {
                 try {
                     // Snark.fatal() throws a RuntimeException
                     // don't let one bad torrent kill the whole loop
-                    addTorrent(name, null, false);
+                    addTorrent(name, null, !shouldAutoStart());
                 } catch (Exception e) {
                     addMessage(_("Error: Could not add the torrent {0}", name) + ": " + e);
                     _log.error("Unable to add the torrent " + name, e);
