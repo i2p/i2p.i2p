@@ -48,19 +48,25 @@ public class Certificate extends DataStructureImpl {
 
     /**
      * If null cert, return immutable static instance, else create new
-     * @throws AIOOBE if not enough bytes, FIXME should throw DataFormatException
+     * @throws DataFormatException if not enough bytes
      * @since 0.8.3
      */
-    public static Certificate create(byte[] data, int off) {
-        int type = data[off] & 0xff;
-        int length = (int) DataHelper.fromLong(data, off + 1, 2);
-        if (type == 0 && length == 0)
-            return NULL_CERT;
-        // from here down roughly the same as readBytes() below
-        if (length == 0)
-            return new Certificate(type, null);
-        byte[] payload = new byte[length];
-        System.arraycopy(data, off + 3, payload, 0, length);
+    public static Certificate create(byte[] data, int off) throws DataFormatException {
+    	int type;
+    	byte[] payload;
+    	try {
+            type = data[off] & 0xff;
+            int length = (int) DataHelper.fromLong(data, off + 1, 2);
+            if (type == 0 && length == 0)
+                return NULL_CERT;
+            // from here down roughly the same as readBytes() below
+            if (length == 0)
+                return new Certificate(type, null);
+            payload = new byte[length];
+            System.arraycopy(data, off + 3, payload, 0, length);
+    	} catch (ArrayIndexOutOfBoundsException aioobe) {
+    		throw new DataFormatException("not enough bytes", aioobe);
+    	}
         if (type == CERTIFICATE_TYPE_KEY) {
             try {
                 return new KeyCertificate(payload);
