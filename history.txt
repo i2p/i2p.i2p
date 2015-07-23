@@ -1,3 +1,9 @@
+2015-07-21 str4d
+ * Core: Throw DFE in Certificate.create() instead of AIOOBE (ticket #1016)
+
+2015-07-21 str4d
+ * Core: Fix parsing bug in KeyCertificate
+
 2015-07-16 zzz
  * Console: Add dates to news headings
 
