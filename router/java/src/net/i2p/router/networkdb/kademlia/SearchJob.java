@@ -445,7 +445,11 @@ class SearchJob extends JobImpl {
         long expiration = getContext().clock().now() + timeout;
 
         I2NPMessage msg = buildMessage(inTunnelId, inTunnel.getPeer(0), expiration, router);	
-	
+        if (msg == null) {
+            getContext().jobQueue().addJob(new FailedJob(getContext(), router));
+            return;
+        }
+
         TunnelInfo outTunnel = getContext().tunnelManager().selectOutboundExploratoryTunnel(to);
         if (outTunnel == null) {
             _log.warn("No tunnels to send search out through! Impossible?");
@@ -480,6 +484,10 @@ class SearchJob extends JobImpl {
         // use the 4-arg one so we pick up the override in ExploreJob
         //I2NPMessage msg = buildMessage(expiration);
         I2NPMessage msg = buildMessage(null, router.getIdentity().getHash(), expiration, router);	
+        if (msg == null) {
+            getContext().jobQueue().addJob(new FailedJob(getContext(), router));
+            return;
+        }
 
         if (_log.shouldLog(Log.DEBUG))
             _log.debug(getJobId() + ": Sending router search directly to " + router.getIdentity().getHash()

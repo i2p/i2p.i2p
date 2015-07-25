@@ -1,3 +1,7 @@
+2015-07-25 zzz
+ * i2psnark: Fix total_size in metadata message (ticket #1618)
+ * NetDB: Fix NPE (ticket #1619)
+
 2015-07-21 str4d
  * Core: Throw DFE in Certificate.create() instead of AIOOBE (ticket #1016)
 
