@@ -40,21 +40,21 @@
         </javac>
     </target>
 
-    <target name="compileTest" depends="jar">
-	<mkdir dir="./buildTest" />
-	<mkdir dir="./buildTest/obj" />
+    <target name="compileDemo" depends="jar">
+	<mkdir dir="./buildDemo" />
+	<mkdir dir="./buildDemo/obj" />
         <javac
-            srcdir="./test/junit"
+            srcdir="./demo"
             debug="true" deprecation="on" source="${javac.version}" target="${javac.version}"
             includeAntRuntime="false"
-            destdir="./buildTest/obj"
+            destdir="./buildDemo/obj"
             classpath="../../../core/java/build/i2p.jar:./build/mstreaming.jar" >
             <compilerarg line="${javac.compilerargs}" />
         </javac>
     </target>
 
-    <target name="jarTest" depends="jar, compileTest">
-        <jar destfile="./build/mstreamingTest.jar" basedir="./buildTest/obj" includes="**/*.class" update="true" />
+    <target name="jarDemo" depends="jar, compileDemo">
+        <jar destfile="./build/mstreamingDemo.jar" basedir="./buildDemo/obj" includes="**/*.class" update="true" />
     </target>
 
     <target name="listChangedFiles" depends="jarUpToDate" if="shouldListChanges" >
@@ -140,7 +140,7 @@
     </target>
     <target name="clean">
         <delete dir="./build" />
-	<delete dir="./buildTest" />
+	<delete dir="./buildDemo" />
     </target>
     <target name="cleandep" depends="clean">
     </target>

@@ -39,7 +39,7 @@
     </target>
     <target name="builddeptest">
         <ant dir="../../../core/java" target="jar" />
-        <ant dir="../../../apps/ministreaming/java/" target="jarTest" />
+        <ant dir="../../../apps/ministreaming/java/" target="jar" />
     </target>
     <target name="junit.compileTest" depends="builddeptest, compile">
 
@@ -61,7 +61,6 @@
             <classpath>
                 <pathelement location="../../../core/java/build/i2p.jar" />
                 <pathelement location="../../ministreaming/java/build/mstreaming.jar" />
-                <pathelement location="../../ministreaming/java/build/mstreamingTest.jar" />
                 <pathelement location="${junit.home}/junit4.jar" />
                 <pathelement location="${hamcrest.home}/hamcrest.jar" />
                 <pathelement location="${hamcrest.home}/hamcrest-all.jar" />
@@ -120,7 +119,6 @@
                 <pathelement location="../../../core/java/build/i2ptest.jar" />
                 <pathelement location="../../../core/java/build/i2p.jar" />
                 <pathelement location="../../ministreaming/java/build/mstreaming.jar" />
-                <pathelement location="../../ministreaming/java/build/mstreamingTest.jar" />
                 <pathelement location="../../build/jbigi.jar" />
                 <pathelement location="${with.clover}" />
                 <pathelement location="${with.cobertura}" />
