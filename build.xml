@@ -1607,6 +1607,7 @@
     <target name="junit.test" depends="buildProperties, jbigi" >
         <ant dir="core/java/" target="junit.test" />
         <ant dir="router/java/" target="junit.test" />
+        <ant dir="apps/ministreaming/java/" target="junit.test" />
         <ant dir="apps/streaming/java/" target="junit.test" />
     </target>
     <target name="scalatest.test" depends="buildProperties, jbigi" >
@@ -1618,6 +1619,7 @@
         <!-- both junit and scala -->
         <ant dir="core/java/" target="test" />
         <ant dir="router/java/" target="test" />
+        <ant dir="apps/ministreaming/java/" target="test" />
         <ant dir="apps/streaming/java/" target="test" />
     </target>
     <target name="scalatest.report" depends="buildProperties" >
@@ -1627,22 +1629,26 @@
     <target name="junit.report" depends="buildProperties" >
         <ant dir="core/java/" target="junit.report" />
         <ant dir="router/java/" target="junit.report" />
+        <ant dir="apps/ministreaming/java/" target="junit.report" />
         <ant dir="apps/streaming/java/" target="junit.report" />
     </target>
     <target name="clover.report" depends="buildProperties" if="with.clover">
         <ant dir="core/java/" target="clover.report" />
         <ant dir="router/java/" target="clover.report" />
+        <ant dir="apps/ministreaming/java" target="clover.report" />
         <ant dir="apps/streaming/java" target="clover.report" />
     </target>
     <target name="cobertura.report" depends="buildProperties" if="with.cobertura">
         <ant dir="core/java/" target="cobertura.report" />
         <ant dir="router/java/" target="cobertura.report" />
+        <ant dir="apps/ministreaming/java" target="cobertura.report" />
         <ant dir="apps/streaming/java" target="cobertura.report" />
     </target>
     <target name="test.report" depends="junit.report, scalatest.report, clover.report, cobertura.report"/>
     <target name="fulltest" depends="buildProperties, jbigi" >
         <ant dir="core/java/" target="fulltest" />
         <ant dir="router/java/" target="fulltest" />
+        <ant dir="apps/ministreaming/java" target="fulltest" />
         <ant dir="apps/streaming/java" target="fulltest" />
     </target>
     <target name="jenkins.cobertura.report" depends="cobertura.report">
@@ -1658,6 +1664,11 @@
             match='filename="net' replace='filename="router/java/src/net'/>
         <replaceregexp byline="true" file="reports/router/cobertura/coverage.xml"
             match="&lt;source&gt;./src" replace="&lt;source&gt;router/java/src"/>
+
+        <replaceregexp byline="true" file="reports/ministreaming/cobertura/coverage.xml"
+            match='filename="net' replace='filename="apps/ministreaming/java/src/net'/>
+        <replaceregexp byline="true" file="reports/ministreaming/cobertura/coverage.xml"
+            match="&lt;source&gt;./src" replace="&lt;source&gt;apps/ministreaming/java/src"/>
 
         <replaceregexp byline="true" file="reports/streaming/cobertura/coverage.xml"
             match='filename="net' replace='filename="apps/streaming/java/src/net'/>
