@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: https://trac.i2p2.de/\n"
 "POT-Creation-Date: 2015-02-18 22:14+0000\n"
-"PO-Revision-Date: 2015-03-29 15:00+0000\n"
+"PO-Revision-Date: 2015-06-07 16:29+0000\n"
 "Last-Translator: YF <yfdyh000@gmail.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/projects/p/I2P/language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -47,7 +47,7 @@ msgid ""
 " a daemon. To use an **existing** I2P profile you may enter a different "
 "account name here. For example, if your previous I2P installation is at "
 "/home/user/i2p, you may enter 'user' here."
-msgstr "I2P后台服务默认以i2psvc账户运行。要使用*已有*的I2P配置文件，您可以输入不同的账户名。例如，如果您之前的I2P安装在 /home/user/i2p，此处可输入'user'。"
+msgstr "I2P后台服务默认以 i2psvc 账户运行。要使用*已有*的I2P配置文件，您可以输入不同的账户名。例如，如果您之前的I2P安装在 /home/user/i2p，此处可输入 'user'。"
 
 #. Type: string
 #. Description
@@ -55,19 +55,19 @@ msgstr "I2P后台服务默认以i2psvc账户运行。要使用*已有*的I2P配�
 msgid ""
 "Very important: If a user other than the default of 'i2psvc' is entered "
 "here, the chosen username *MUST* already exist."
-msgstr "重要：如果您输入默认'i2psvc'以外的账户，此账户务必已经存在。"
+msgstr "重要：如果您输入默认的 'i2psvc' 以外的账户，此账户必须已经存在。"
 
 #. Type: string
 #. Description
 #: ../i2p.templates:4001
 msgid "Memory that can be allocated to I2P:"
-msgstr "I2P 可用最大内存："
+msgstr "I2P 最多可占用内存："
 
 #. Type: string
 #. Description
 #: ../i2p.templates:4001
 msgid "By default, I2P will only be allowed to use up to 128MB of RAM."
-msgstr "I2P 默认最大内存128M。"
+msgstr "默认情况下，I2P 最多只允许使用 128MB 系统内存。"
 
 #. Type: string
 #. Description

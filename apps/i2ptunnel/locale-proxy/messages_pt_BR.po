@@ -12,7 +12,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-05-14 08:33+0000\n"
-"PO-Revision-Date: 2015-05-20 21:06+0000\n"
+"PO-Revision-Date: 2015-06-10 16:40+0000\n"
 "Last-Translator: blueboy\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/projects/p/I2P/language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
@@ -97,7 +97,7 @@ msgstr "Informação: novo nome de host com auxiliar de endereço"
 msgid ""
 "The address helper link you followed is for a new host name that is not in "
 "your address book."
-msgstr ""
+msgstr "O linque do auxiliar de endereço que você acompanhou é para um novo nome de host que não está no seu livro de endereços."
 
 #: ../java/build/Proxy.java:13
 msgid "You may save this host name to your local address book."
@@ -106,7 +106,7 @@ msgstr "Você pode salvar esse nome de host no seu livro local de endereços."
 #: ../java/build/Proxy.java:14
 msgid ""
 "If you save it to your address book, you will not see this message again."
-msgstr ""
+msgstr "Se você salvá-lo no seu livro de endereços, não verá novamente essa mensagem."
 
 #: ../java/build/Proxy.java:15
 msgid ""
@@ -118,7 +118,7 @@ msgstr ""
 msgid ""
 "If you do not wish to visit this host, click the \"back\" button on your "
 "browser."
-msgstr ""
+msgstr "Se você não deseja visitar esse host, clique no botão \"voltar\" no seu navegador."
 
 #: ../java/build/Proxy.java:17 ../java/build/Proxy.java:23
 msgid "Warning: Destination Key Conflict"
@@ -211,7 +211,7 @@ msgstr ""
 msgid ""
 "The proxy could be temporarily unavailable, too busy, or it has blocked your"
 " access."
-msgstr ""
+msgstr "O proxy pode estar temporariamente indisponível, sobrecarregado ou bloqueando o seu acesso."
 
 #: ../java/build/Proxy.java:65 ../java/build/Proxy.java:147
 #: ../java/build/Proxy.java:181 ../java/build/Proxy.java:193
@@ -227,7 +227,7 @@ msgstr ""
 msgid ""
 "If you continue to have trouble you may want to edit your outproxy list "
 "{0}here{1}."
-msgstr ""
+msgstr "Se continuar a ter problemas e quiser editar a sua lista de proxies de saída, {0}clique aqui{1}."
 
 #: ../java/build/Proxy.java:75
 msgid ""
@@ -255,7 +255,7 @@ msgstr "O seu navegador está mal-configurado."
 msgid ""
 "Do not use the proxy to access the router console, localhost, or local LAN "
 "destinations."
-msgstr ""
+msgstr "Não use o proxy para acessar o painel do roteador, localhost ou destinos da LAN local."
 
 #: ../java/build/Proxy.java:86 ../java/build/Proxy.java:92
 msgid "Warning: No Outproxy Configured"
@@ -279,7 +279,7 @@ msgstr "O website estava inalcançável."
 msgid ""
 "The website is offline, there is network congestion, or your router is not "
 "yet well-integrated with peers."
-msgstr ""
+msgstr "O website está fora do ar, há congestionamento na rede ou o seu roteador não está ainda bem integrado com os pares."
 
 #: ../java/build/Proxy.java:106 ../java/build/Proxy.java:112
 msgid "Warning: Invalid Destination"
@@ -315,7 +315,7 @@ msgstr ""
 
 #: ../java/build/Proxy.java:127
 msgid "Other protocols such as FTP are not allowed."
-msgstr ""
+msgstr "Outros protocolos como FTP não são permitidos."
 
 #: ../java/build/Proxy.java:135
 msgid "The connection to the website was reset while the page was loading."
@@ -325,7 +325,7 @@ msgstr ""
 msgid ""
 "The website could be temporarily unavailable, too busy, or it has blocked "
 "your access."
-msgstr ""
+msgstr "O site pode estar temporariamente indisponível, sobrecarregado ou bloqueando o seu acesso."
 
 #: ../java/build/Proxy.java:139 ../java/build/Proxy.java:145
 msgid "Outproxy Unreachable"
@@ -339,7 +339,7 @@ msgstr ""
 
 #: ../java/build/Proxy.java:150
 msgid "Website Unknown"
-msgstr ""
+msgstr "Site Desconhecido"
 
 #: ../java/build/Proxy.java:156
 msgid "Website Not Found in Addressbook"
@@ -402,7 +402,7 @@ msgstr "O proxy de saída está provavelmente fora do ar, mas pode ser também c
 
 #: ../java/build/Proxy.java:191
 msgid "The HTTP Outproxy was not found."
-msgstr ""
+msgstr "O Proxy de Saída HTTP não foi encontrado."
 
 #: ../java/build/Proxy.java:192
 msgid ""

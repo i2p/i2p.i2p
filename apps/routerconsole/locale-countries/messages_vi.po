@@ -3,973 +3,774 @@
 # This file is distributed under the same license as the routerconsole package.
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
-# dich_tran <tran.nathan@gmail.com>, 2011.
+# Translators:
+# dich_tran <thnhan@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
-"Report-Msgid-Bugs-To: https://trac.i2p2.de/\n"
-"POT-Creation-Date: 2011-06-11 08:22+0000\n"
-"PO-Revision-Date: 2011-06-11 08:42+0000\n"
-"Last-Translator: ducki2p <ducki2p@gmail.com>\n"
-"Language-Team: Vietnamese (http://www.transifex.net/projects/p/I2P/team/vi/)\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-07-17 01:08+0000\n"
+"PO-Revision-Date: 2015-07-17 01:31+0000\n"
+"Last-Translator: kytv <killyourtv@i2pmail.org>\n"
+"Language-Team: Vietnamese (http://www.transifex.com/projects/p/I2P/language/vi/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: vi\n"
-"Plural-Forms: nplurals=1; plural=0\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 
-#. Automatically generated pseudo-java for xgettext - do not edit
-#. Translators may wish to translate a few of these, do not bother to
-#. translate all of them!!
-#: ../java/build/Countries.java:3
 msgid "Anonymous Proxy"
 msgstr ""
 
-#: ../java/build/Countries.java:4
 msgid "Satellite Provider"
 msgstr ""
 
-#: ../java/build/Countries.java:5
 msgid "Andorra"
 msgstr "Andorra"
 
-#: ../java/build/Countries.java:6
 msgid "United Arab Emirates"
 msgstr "United Arab Emirates"
 
-#: ../java/build/Countries.java:7
 msgid "Afghanistan"
 msgstr "Afghanistan"
 
-#: ../java/build/Countries.java:8
 msgid "Antigua and Barbuda"
 msgstr "Antigua và Barbuda"
 
-#: ../java/build/Countries.java:9
 msgid "Anguilla"
 msgstr "Anguilla"
 
-#: ../java/build/Countries.java:10
 msgid "Albania"
 msgstr "Albania"
 
-#: ../java/build/Countries.java:11
 msgid "Armenia"
 msgstr "Armenia"
 
-#: ../java/build/Countries.java:12
 msgid "Netherlands Antilles"
 msgstr "Netherlands Antilles"
 
-#: ../java/build/Countries.java:13
 msgid "Angola"
 msgstr "Angola"
 
-#: ../java/build/Countries.java:14
+msgid "Asia/Pacific Region"
+msgstr ""
+
 msgid "Antarctica"
 msgstr "Nam Cực"
 
-#: ../java/build/Countries.java:15
 msgid "Argentina"
 msgstr "Argentina"
 
-#: ../java/build/Countries.java:16
 msgid "American Samoa"
 msgstr "Samoa thuộc Mỹ"
 
-#: ../java/build/Countries.java:17
 msgid "Austria"
 msgstr "Áo"
 
-#: ../java/build/Countries.java:18
 msgid "Australia"
 msgstr "Úc"
 
-#: ../java/build/Countries.java:19
 msgid "Aruba"
 msgstr "Aruba"
 
-#: ../java/build/Countries.java:20
 msgid "Åland Islands"
 msgstr ""
 
-#: ../java/build/Countries.java:21
 msgid "Azerbaijan"
 msgstr "Azerbaijan"
 
-#: ../java/build/Countries.java:22
 msgid "Bosnia and Herzegovina"
 msgstr "Bosnia và Herzegovina"
 
-#: ../java/build/Countries.java:23
 msgid "Barbados"
 msgstr "Barbados"
 
-#: ../java/build/Countries.java:24
 msgid "Bangladesh"
 msgstr "Bangladesh"
 
-#: ../java/build/Countries.java:25
 msgid "Belgium"
 msgstr "Bỉ"
 
-#: ../java/build/Countries.java:26
 msgid "Burkina Faso"
 msgstr "Burkina Faso"
 
-#: ../java/build/Countries.java:27
 msgid "Bulgaria"
 msgstr "Bulgaria"
 
-#: ../java/build/Countries.java:28
 msgid "Bahrain"
 msgstr "Bahrain"
 
-#: ../java/build/Countries.java:29
 msgid "Burundi"
 msgstr "Burundi"
 
-#: ../java/build/Countries.java:30
 msgid "Benin"
 msgstr "Benin"
 
-#: ../java/build/Countries.java:31
+msgid "Saint Barthélemy"
+msgstr ""
+
 msgid "Bermuda"
 msgstr "Bermuda"
 
-#: ../java/build/Countries.java:32
 msgid "Brunei Darussalam"
 msgstr "Brunei Darussalam"
 
-#: ../java/build/Countries.java:33
 msgid "Bolivia"
 msgstr ""
 
-#: ../java/build/Countries.java:34
+msgid "Bonaire"
+msgstr ""
+
 msgid "Brazil"
 msgstr "Ba Tây"
 
-#: ../java/build/Countries.java:35
 msgid "Bahamas"
 msgstr "Bahamas"
 
-#: ../java/build/Countries.java:36
 msgid "Bhutan"
 msgstr "Bhutan"
 
-#: ../java/build/Countries.java:37
 msgid "Bouvet Island"
 msgstr "Bouvet Island"
 
-#: ../java/build/Countries.java:38
 msgid "Botswana"
 msgstr "Botswana"
 
-#: ../java/build/Countries.java:39
 msgid "Belarus"
 msgstr "Belarus"
 
-#: ../java/build/Countries.java:40
 msgid "Belize"
 msgstr "Belize"
 
-#: ../java/build/Countries.java:41
 msgid "Canada"
 msgstr "Canada"
 
-#: ../java/build/Countries.java:42
-msgid "The Democratic Republic of the Congo"
-msgstr "Cộng hòa Dân chủ Congo"
+msgid "Cocos (Keeling) Islands"
+msgstr ""
 
-#: ../java/build/Countries.java:43
-msgid "Central African Republic"
-msgstr "Cộng hòa Trung Phi"
-
-#: ../java/build/Countries.java:44
 msgid "Congo"
 msgstr "Congo"
 
-#: ../java/build/Countries.java:45
+msgid "Central African Republic"
+msgstr "Cộng hòa Trung Phi"
+
 msgid "Switzerland"
 msgstr "Thụy Sĩ"
 
-#: ../java/build/Countries.java:46
 msgid "Cote D'Ivoire"
 msgstr "Cote D'Ivoire"
 
-#: ../java/build/Countries.java:47
 msgid "Cook Islands"
 msgstr "Quần đảo Cook"
 
-#: ../java/build/Countries.java:48
 msgid "Chile"
 msgstr "Chile"
 
-#: ../java/build/Countries.java:49
 msgid "Cameroon"
 msgstr "Cameroon"
 
-#: ../java/build/Countries.java:50
 msgid "China"
 msgstr "Trung Quốc"
 
-#: ../java/build/Countries.java:51
 msgid "Colombia"
 msgstr "Colombia"
 
-#: ../java/build/Countries.java:52
 msgid "Costa Rica"
 msgstr "Costa Rica"
 
-#: ../java/build/Countries.java:53
 msgid "Serbia and Montenegro"
 msgstr "Serbia và Montenegro"
 
-#: ../java/build/Countries.java:54
 msgid "Cuba"
 msgstr "Cuba"
 
-#: ../java/build/Countries.java:55
 msgid "Cape Verde"
 msgstr "Cape Verde"
 
-#: ../java/build/Countries.java:56
+msgid "Curaçao"
+msgstr ""
+
+msgid "Christmas Island"
+msgstr ""
+
 msgid "Cyprus"
 msgstr "Cyprus"
 
-#: ../java/build/Countries.java:57
 msgid "Czech Republic"
 msgstr "Tiệp"
 
-#: ../java/build/Countries.java:58
 msgid "Germany"
 msgstr "Đức"
 
-#: ../java/build/Countries.java:59
 msgid "Djibouti"
 msgstr "Djibouti"
 
-#: ../java/build/Countries.java:60
 msgid "Denmark"
 msgstr "Đan Mạch"
 
-#: ../java/build/Countries.java:61
 msgid "Dominica"
 msgstr "Dominica"
 
-#: ../java/build/Countries.java:62
 msgid "Dominican Republic"
 msgstr "Cộng Hòa Dominican"
 
-#: ../java/build/Countries.java:63
 msgid "Algeria"
 msgstr "Algeria"
 
-#: ../java/build/Countries.java:64
 msgid "Ecuador"
 msgstr "Ecuador"
 
-#: ../java/build/Countries.java:65
 msgid "Estonia"
 msgstr "Estonia"
 
-#: ../java/build/Countries.java:66
 msgid "Egypt"
 msgstr "Ai Cập"
 
-#: ../java/build/Countries.java:67
+msgid "Western Sahara"
+msgstr ""
+
 msgid "Eritrea"
 msgstr "Eritrea"
 
-#: ../java/build/Countries.java:68
 msgid "Spain"
 msgstr "Tây Ban Nha"
 
-#: ../java/build/Countries.java:69
 msgid "Ethiopia"
 msgstr "Ethiopia"
 
-#: ../java/build/Countries.java:70
+msgid "European Union"
+msgstr ""
+
 msgid "Finland"
 msgstr "Phần Lan"
 
-#: ../java/build/Countries.java:71
 msgid "Fiji"
 msgstr "Fiji"
 
-#: ../java/build/Countries.java:72
 msgid "Falkland Islands (Malvinas)"
 msgstr "Quần đảo Falkland (Malvinas)"
 
-#: ../java/build/Countries.java:73
-msgid "Federated States of Micronesia"
-msgstr "Liên bang Micronesia"
+msgid "Micronesia"
+msgstr ""
 
-#: ../java/build/Countries.java:74
 msgid "Faroe Islands"
 msgstr "Quần đảo Faroe"
 
-#: ../java/build/Countries.java:75
 msgid "France"
 msgstr "Pháp"
 
-#: ../java/build/Countries.java:76
 msgid "Gabon"
 msgstr "Gabon"
 
-#: ../java/build/Countries.java:77
 msgid "United Kingdom"
 msgstr "Anh"
 
-#: ../java/build/Countries.java:78
 msgid "Grenada"
 msgstr "Grenada"
 
-#: ../java/build/Countries.java:79
 msgid "Georgia"
 msgstr "Georgia"
 
-#: ../java/build/Countries.java:80
 msgid "French Guiana"
 msgstr "Guiana thuộc Pháp"
 
-#: ../java/build/Countries.java:81
+msgid "Guernsey"
+msgstr ""
+
 msgid "Ghana"
 msgstr "Ghana"
 
-#: ../java/build/Countries.java:82
 msgid "Gibraltar"
 msgstr "Gibraltar"
 
-#: ../java/build/Countries.java:83
 msgid "Greenland"
 msgstr "Greenland"
 
-#: ../java/build/Countries.java:84
 msgid "Gambia"
 msgstr "Gambia"
 
-#: ../java/build/Countries.java:85
 msgid "Guinea"
 msgstr "Guinea"
 
-#: ../java/build/Countries.java:86
 msgid "Guadeloupe"
 msgstr "Guadeloupe"
 
-#: ../java/build/Countries.java:87
 msgid "Equatorial Guinea"
 msgstr "Equatorial Guinea"
 
-#: ../java/build/Countries.java:88
 msgid "Greece"
 msgstr "Hy Lạp"
 
-#: ../java/build/Countries.java:89
 msgid "South Georgia and the South Sandwich Islands"
 msgstr "Quần đảo Nam Georgia và Nam Sandwich"
 
-#: ../java/build/Countries.java:90
 msgid "Guatemala"
 msgstr "Guatemala"
 
-#: ../java/build/Countries.java:91
 msgid "Guam"
 msgstr "Guam"
 
-#: ../java/build/Countries.java:92
 msgid "Guinea-Bissau"
 msgstr "Guinea-Bissau"
 
-#: ../java/build/Countries.java:93
 msgid "Guyana"
 msgstr "Guyana"
 
-#: ../java/build/Countries.java:94
 msgid "Hong Kong"
 msgstr "Hong Kong"
 
-#: ../java/build/Countries.java:95
 msgid "Honduras"
 msgstr "Honduras"
 
-#: ../java/build/Countries.java:96
 msgid "Croatia"
 msgstr "Croatia"
 
-#: ../java/build/Countries.java:97
 msgid "Haiti"
 msgstr "Haiti"
 
-#: ../java/build/Countries.java:98
 msgid "Hungary"
 msgstr "Hungary"
 
-#: ../java/build/Countries.java:99
 msgid "Indonesia"
 msgstr "Indonesia"
 
-#: ../java/build/Countries.java:100
 msgid "Ireland"
 msgstr "Ireland"
 
-#: ../java/build/Countries.java:101
 msgid "Israel"
 msgstr "Do Thái"
 
-#: ../java/build/Countries.java:102
 msgid "Isle of Man"
 msgstr ""
 
-#: ../java/build/Countries.java:103
 msgid "India"
 msgstr "Ấn Độ"
 
-#: ../java/build/Countries.java:104
 msgid "British Indian Ocean Territory"
 msgstr "Lãnh thổ Ấn Độ Dương thuộc Anh"
 
-#: ../java/build/Countries.java:105
 msgid "Iraq"
 msgstr "Iraq"
 
-#: ../java/build/Countries.java:106
-msgid "Islamic Republic of Iran"
-msgstr "Iran"
+msgid "Iran"
+msgstr ""
 
-#: ../java/build/Countries.java:107
 msgid "Iceland"
 msgstr "Iceland"
 
-#: ../java/build/Countries.java:108
 msgid "Italy"
 msgstr "Ý"
 
-#: ../java/build/Countries.java:109
 msgid "Jersey"
 msgstr ""
 
-#: ../java/build/Countries.java:110
 msgid "Jamaica"
 msgstr "Jamaica"
 
-#: ../java/build/Countries.java:111
 msgid "Jordan"
 msgstr "Jordan"
 
-#: ../java/build/Countries.java:112
 msgid "Japan"
 msgstr "Nhật Bản"
 
-#: ../java/build/Countries.java:113
 msgid "Kenya"
 msgstr "Kenya"
 
-#: ../java/build/Countries.java:114
 msgid "Kyrgyzstan"
 msgstr "Kyrgyzstan"
 
-#: ../java/build/Countries.java:115
 msgid "Cambodia"
 msgstr "Campuchia"
 
-#: ../java/build/Countries.java:116
 msgid "Kiribati"
 msgstr "Kiribati"
 
-#: ../java/build/Countries.java:117
 msgid "Comoros"
 msgstr "Comoros"
 
-#: ../java/build/Countries.java:118
 msgid "Saint Kitts and Nevis"
 msgstr "Saint Kitts và Nevis"
 
-#: ../java/build/Countries.java:119
+msgid "North Korea"
+msgstr ""
+
 msgid "Republic of Korea"
 msgstr "Hàn Quốc"
 
-#: ../java/build/Countries.java:120
 msgid "Kuwait"
 msgstr "Kuwait"
 
-#: ../java/build/Countries.java:121
 msgid "Cayman Islands"
 msgstr "Quần đảo Cayman"
 
-#: ../java/build/Countries.java:122
 msgid "Kazakhstan"
 msgstr "Kazakhstan"
 
-#: ../java/build/Countries.java:123
 msgid "Lao People's Democratic Republic"
 msgstr "Lào"
 
-#: ../java/build/Countries.java:124
 msgid "Lebanon"
 msgstr "Lebanon"
 
-#: ../java/build/Countries.java:125
 msgid "Saint Lucia"
 msgstr "Saint Lucia"
 
-#: ../java/build/Countries.java:126
 msgid "Liechtenstein"
 msgstr "Liechtenstein"
 
-#: ../java/build/Countries.java:127
 msgid "Sri Lanka"
 msgstr "Sri Lanka"
 
-#: ../java/build/Countries.java:128
 msgid "Liberia"
 msgstr "Liberia"
 
-#: ../java/build/Countries.java:129
 msgid "Lesotho"
 msgstr "Lesotho"
 
-#: ../java/build/Countries.java:130
 msgid "Lithuania"
 msgstr "Lithuania"
 
-#: ../java/build/Countries.java:131
 msgid "Luxembourg"
 msgstr "Luxembourg"
 
-#: ../java/build/Countries.java:132
 msgid "Latvia"
 msgstr "Latvia"
 
-#: ../java/build/Countries.java:133
-msgid "Libyan Arab Jamahiriya"
-msgstr "Libyan Arab Jamahiriya"
+msgid "Libya"
+msgstr ""
 
-#: ../java/build/Countries.java:134
 msgid "Morocco"
 msgstr "Ma-rốc"
 
-#: ../java/build/Countries.java:135
 msgid "Monaco"
 msgstr "Monaco"
 
-#: ../java/build/Countries.java:136
-msgid "Republic of Moldova"
-msgstr "Cộng hòa Moldova"
+msgid "Moldova"
+msgstr ""
 
-#: ../java/build/Countries.java:137
 msgid "Montenegro"
 msgstr ""
 
-#: ../java/build/Countries.java:138
 msgid "Saint Martin"
 msgstr ""
 
-#: ../java/build/Countries.java:139
 msgid "Madagascar"
 msgstr "Madagascar"
 
-#: ../java/build/Countries.java:140
 msgid "Marshall Islands"
 msgstr "Quần đảo Marshall"
 
-#: ../java/build/Countries.java:141
-msgid "The Former Yugoslav Republic of Macedonia"
-msgstr "Cộng hoà Nam Tư cũ Macedonia"
+msgid "Macedonia"
+msgstr ""
 
-#: ../java/build/Countries.java:142
 msgid "Mali"
 msgstr "Mali"
 
-#: ../java/build/Countries.java:143
 msgid "Myanmar"
 msgstr "Miến Điện"
 
-#: ../java/build/Countries.java:144
 msgid "Mongolia"
 msgstr "Mông Cổ"
 
-#: ../java/build/Countries.java:145
-msgid "Macao"
-msgstr "Macao"
+msgid "Macau"
+msgstr ""
 
-#: ../java/build/Countries.java:146
 msgid "Northern Mariana Islands"
 msgstr "Quần đảo Bắc Mariana"
 
-#: ../java/build/Countries.java:147
 msgid "Martinique"
 msgstr "Martinique"
 
-#: ../java/build/Countries.java:148
 msgid "Mauritania"
 msgstr "Mauritania"
 
-#: ../java/build/Countries.java:149
 msgid "Montserrat"
 msgstr "Montserrat"
 
-#: ../java/build/Countries.java:150
 msgid "Malta"
 msgstr "Malta"
 
-#: ../java/build/Countries.java:151
 msgid "Mauritius"
 msgstr "Mauritius"
 
-#: ../java/build/Countries.java:152
 msgid "Maldives"
 msgstr "Maldives"
 
-#: ../java/build/Countries.java:153
 msgid "Malawi"
 msgstr "Malawi"
 
-#: ../java/build/Countries.java:154
 msgid "Mexico"
 msgstr "Mexico"
 
-#: ../java/build/Countries.java:155
 msgid "Malaysia"
 msgstr "Malaysia"
 
-#: ../java/build/Countries.java:156
 msgid "Mozambique"
 msgstr "Mozambique"
 
-#: ../java/build/Countries.java:157
 msgid "Namibia"
 msgstr "Namibia"
 
-#: ../java/build/Countries.java:158
 msgid "New Caledonia"
 msgstr "New Caledonia"
 
-#: ../java/build/Countries.java:159
 msgid "Niger"
 msgstr "Niger"
 
-#: ../java/build/Countries.java:160
 msgid "Norfolk Island"
 msgstr "Norfolk Island"
 
-#: ../java/build/Countries.java:161
 msgid "Nigeria"
 msgstr "Nigeria"
 
-#: ../java/build/Countries.java:162
 msgid "Nicaragua"
 msgstr "Nicaragua"
 
-#: ../java/build/Countries.java:163
 msgid "Netherlands"
 msgstr "Hà Lan"
 
-#: ../java/build/Countries.java:164
 msgid "Norway"
 msgstr "Na Uy"
 
-#: ../java/build/Countries.java:165
 msgid "Nepal"
 msgstr "Nepal"
 
-#: ../java/build/Countries.java:166
 msgid "Nauru"
 msgstr "Nauru"
 
-#: ../java/build/Countries.java:167
 msgid "Niue"
 msgstr "Niue"
 
-#: ../java/build/Countries.java:168
 msgid "New Zealand"
 msgstr "New Zealand"
 
-#: ../java/build/Countries.java:169
 msgid "Oman"
 msgstr "Oman"
 
-#: ../java/build/Countries.java:170
 msgid "Panama"
 msgstr "Panama"
 
-#: ../java/build/Countries.java:171
 msgid "Peru"
 msgstr "Peru"
 
-#: ../java/build/Countries.java:172
 msgid "French Polynesia"
 msgstr "Polynésie thuộc Pháp"
 
-#: ../java/build/Countries.java:173
 msgid "Papua New Guinea"
 msgstr "Papua New Guinea"
 
-#: ../java/build/Countries.java:174
 msgid "Philippines"
 msgstr "Phi-líp-pin"
 
-#: ../java/build/Countries.java:175
 msgid "Pakistan"
 msgstr "Pakistan"
 
-#: ../java/build/Countries.java:176
 msgid "Poland"
 msgstr "Ba Lan"
 
-#: ../java/build/Countries.java:177
 msgid "Saint Pierre and Miquelon"
 msgstr "Saint Pierre và Miquelon"
 
-#: ../java/build/Countries.java:178
+msgid "Pitcairn Islands"
+msgstr ""
+
 msgid "Puerto Rico"
 msgstr "Puerto Rico"
 
-#: ../java/build/Countries.java:179
 msgid "Palestinian Territory"
 msgstr "Lãnh thổ Palestine"
 
-#: ../java/build/Countries.java:180
 msgid "Portugal"
 msgstr "Bồ Đào Nha"
 
-#: ../java/build/Countries.java:181
 msgid "Palau"
 msgstr "Palau"
 
-#: ../java/build/Countries.java:182
 msgid "Paraguay"
 msgstr "Paraguay"
 
-#: ../java/build/Countries.java:183
 msgid "Qatar"
 msgstr "Qatar"
 
-#: ../java/build/Countries.java:184
 msgid "Réunion"
 msgstr "Réunion"
 
-#: ../java/build/Countries.java:185
 msgid "Romania"
 msgstr "Romania"
 
-#: ../java/build/Countries.java:186
 msgid "Serbia"
 msgstr "Serbia"
 
-#: ../java/build/Countries.java:187
 msgid "Russian Federation"
 msgstr "Liên bang Nga"
 
-#: ../java/build/Countries.java:188
 msgid "Rwanda"
 msgstr "Rwanda"
 
-#: ../java/build/Countries.java:189
 msgid "Saudi Arabia"
 msgstr "Ả Rập Saudi"
 
-#: ../java/build/Countries.java:190
 msgid "Solomon Islands"
 msgstr "Quần đảo Solomon"
 
-#: ../java/build/Countries.java:191
 msgid "Seychelles"
 msgstr "Seychelles"
 
-#: ../java/build/Countries.java:192
 msgid "Sudan"
 msgstr "Sudan"
 
-#: ../java/build/Countries.java:193
 msgid "Sweden"
 msgstr "Thụy Điển"
 
-#: ../java/build/Countries.java:194
 msgid "Singapore"
 msgstr "Singapore"
 
-#: ../java/build/Countries.java:195
+msgid "Saint Helena"
+msgstr ""
+
 msgid "Slovenia"
 msgstr "Slovenia"
 
-#: ../java/build/Countries.java:196
+msgid "Svalbard and Jan Mayen"
+msgstr ""
+
 msgid "Slovakia"
 msgstr "Slovakia"
 
-#: ../java/build/Countries.java:197
 msgid "Sierra Leone"
 msgstr "Sierra Leone"
 
-#: ../java/build/Countries.java:198
 msgid "San Marino"
 msgstr "San Marino"
 
-#: ../java/build/Countries.java:199
 msgid "Senegal"
 msgstr "Senegal"
 
-#: ../java/build/Countries.java:200
 msgid "Somalia"
 msgstr "Somalia"
 
-#: ../java/build/Countries.java:201
 msgid "Suriname"
 msgstr "Suriname"
 
-#: ../java/build/Countries.java:202
+msgid "South Sudan"
+msgstr ""
+
 msgid "Sao Tome and Principe"
 msgstr "Sao Tome và Principe"
 
-#: ../java/build/Countries.java:203
 msgid "El Salvador"
 msgstr "El Salvador"
 
-#: ../java/build/Countries.java:204
-msgid "Syrian Arab Republic"
-msgstr "Syria"
+msgid "Sint Maarten"
+msgstr ""
 
-#: ../java/build/Countries.java:205
+msgid "Syria"
+msgstr ""
+
 msgid "Swaziland"
 msgstr "Swaziland"
 
-#: ../java/build/Countries.java:206
 msgid "Turks and Caicos Islands"
 msgstr "Quần đảo Turks và Caicos"
 
-#: ../java/build/Countries.java:207
 msgid "Chad"
 msgstr "Cá hồng"
 
-#: ../java/build/Countries.java:208
 msgid "French Southern Territories"
 msgstr "Nam lãnh thổ thuộc Pháp"
 
-#: ../java/build/Countries.java:209
 msgid "Togo"
 msgstr "Togo"
 
-#: ../java/build/Countries.java:210
 msgid "Thailand"
 msgstr "Thái Lan"
 
-#: ../java/build/Countries.java:211
 msgid "Tajikistan"
 msgstr "Tajikistan"
 
-#: ../java/build/Countries.java:212
 msgid "Tokelau"
 msgstr "Tokelau"
 
-#: ../java/build/Countries.java:213
 msgid "Timor-Leste"
 msgstr "Timor-Leste"
 
-#: ../java/build/Countries.java:214
 msgid "Turkmenistan"
 msgstr "Turkmenistan"
 
-#: ../java/build/Countries.java:215
 msgid "Tunisia"
 msgstr "Tunisia"
 
-#: ../java/build/Countries.java:216
 msgid "Tonga"
 msgstr "Tonga"
 
-#: ../java/build/Countries.java:217
 msgid "Turkey"
 msgstr "Thổ Nhỉ Kỳ"
 
-#: ../java/build/Countries.java:218
 msgid "Trinidad and Tobago"
 msgstr "Trinidad và Tobago"
 
-#: ../java/build/Countries.java:219
 msgid "Tuvalu"
 msgstr "Tuvalu"
 
-#: ../java/build/Countries.java:220
 msgid "Taiwan"
 msgstr "Đài Loan"
 
-#: ../java/build/Countries.java:221
-msgid "United Republic of Tanzania"
-msgstr "Tanzania"
+msgid "Tanzania"
+msgstr ""
 
-#: ../java/build/Countries.java:222
 msgid "Ukraine"
 msgstr "Ukraine"
 
-#: ../java/build/Countries.java:223
 msgid "Uganda"
 msgstr "Uganda"
 
-#: ../java/build/Countries.java:224
 msgid "United States Minor Outlying Islands"
 msgstr "Hoa Kỳ đảo nhỏ bên ngoài"
 
-#: ../java/build/Countries.java:225
 msgid "United States"
 msgstr "Hoa Kỳ"
 
-#: ../java/build/Countries.java:226
 msgid "Uruguay"
 msgstr "Uruguay"
 
-#: ../java/build/Countries.java:227
 msgid "Uzbekistan"
 msgstr "Uzbekistan"
 
-#: ../java/build/Countries.java:228
-msgid "Holy See (Vatican City State)"
-msgstr "Tòa Thánh (Vatican City State)"
+msgid "Vatican"
+msgstr ""
 
-#: ../java/build/Countries.java:229
 msgid "Saint Vincent and the Grenadines"
 msgstr "Saint Vincent và Grenadines"
 
-#: ../java/build/Countries.java:230
 msgid "Venezuela"
 msgstr "Venezuela"
 
-#: ../java/build/Countries.java:231 ../java/build/Countries.java:232
 msgid "Virgin Islands"
 msgstr "Quần đảo Virgin"
 
-#: ../java/build/Countries.java:233
-msgid "Viet Nam"
-msgstr "Việt Nam"
+msgid "Vietnam"
+msgstr ""
 
-#: ../java/build/Countries.java:234
 msgid "Vanuatu"
 msgstr "Vanuatu"
 
-#: ../java/build/Countries.java:235
 msgid "Wallis and Futuna"
 msgstr "Wallis và Futuna"
 
-#: ../java/build/Countries.java:236
 msgid "Samoa"
 msgstr "Samoa"
 
-#: ../java/build/Countries.java:237
 msgid "Yemen"
 msgstr "Yemen"
 
-#: ../java/build/Countries.java:238
 msgid "Mayotte"
 msgstr "Mayotte"
 
-#: ../java/build/Countries.java:239
 msgid "South Africa"
 msgstr "Nam Phi"
 
-#: ../java/build/Countries.java:240
 msgid "Zambia"
 msgstr "Zambia"
 
-#: ../java/build/Countries.java:241
 msgid "Zimbabwe"
 msgstr "Zimbabwe"
-

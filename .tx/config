@@ -270,6 +270,8 @@ source_lang = en
 ;;trans.ca = installer/resources/locale/po/messages_ca.po
 trans.de = installer/resources/locale/po/messages_de.po
 trans.es = installer/resources/locale/po/messages_es.po
+;; currently fails check
+;;trans.fi = installer/resources/locale/po/messages_fi.po
 trans.fr = installer/resources/locale/po/messages_fr.po
 trans.id = installer/resources/locale/po/messages_id.po
 trans.it = installer/resources/locale/po/messages_it.po
@@ -297,6 +299,7 @@ type = PROPERTIES
 trans.cs = core/java/src/gnu/getopt/MessagesBundle_cs.properties
 trans.de = core/java/src/gnu/getopt/MessagesBundle_de.properties
 trans.es = core/java/src/gnu/getopt/MessagesBundle_es.properties
+trans.fi = core/java/src/gnu/getopt/MessagesBundle_fi.properties
 trans.fr = core/java/src/gnu/getopt/MessagesBundle_fr.properties
 trans.hu = core/java/src/gnu/getopt/MessagesBundle_hu.properties
 ;; Java converts id to in
@@ -322,6 +325,7 @@ trans.zh_CN = core/java/src/gnu/getopt/MessagesBundle_zh.properties
 [I2P.streaming]
 source_file = apps/ministreaming/locale/messages_en.po
 source_lang = en
+trans.ca = apps/ministreaming/locale/messages_ca.po
 trans.de = apps/ministreaming/locale/messages_de.po
 trans.es = apps/ministreaming/locale/messages_es.po
 trans.fr = apps/ministreaming/locale/messages_fr.po
@@ -332,6 +336,7 @@ trans.nb = apps/ministreaming/locale/messages_nb.po
 trans.pl = apps/ministreaming/locale/messages_pl.po
 trans.ro = apps/ministreaming/locale/messages_ro.po
 trans.ru_RU = apps/ministreaming/locale/messages_ru.po
+trans.sv_SE = apps/ministreaming/locale/messages_sv.po
 trans.uk_UA = apps/ministreaming/locale/messages_uk.po
 trans.zh_CN = apps/ministreaming/locale/messages_zh.po
 

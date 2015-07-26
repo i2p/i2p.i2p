@@ -4,13 +4,14 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
 # Translators:
+# benewfy <benewfy@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-05-14 08:33+0000\n"
-"PO-Revision-Date: 2015-05-14 08:34+0000\n"
-"Last-Translator: kytv <killyourtv@i2pmail.org>\n"
+"POT-Creation-Date: 2015-07-17 01:13+0000\n"
+"PO-Revision-Date: 2015-06-29 12:27+0000\n"
+"Last-Translator: benewfy <benewfy@gmail.com>\n"
 "Language-Team: Hungarian (http://www.transifex.com/projects/p/I2P/language/hu/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -66,7 +67,7 @@ msgstr "Aláírt"
 
 #: ../src/java/src/i2p/susi/dns/AddressBean.java:233
 msgid "Key"
-msgstr ""
+msgstr "Kulcs"
 
 #: ../src/java/src/i2p/susi/dns/AddressBean.java:235
 #: ../src/java/src/i2p/susi/dns/AddressBean.java:260
@@ -222,7 +223,7 @@ msgstr "HIBA: Nem sikerült a címjegyzék-fálj írása."
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:326
 #: ../src/java/src/i2p/susi/dns/ConfigBean.java:108
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:316
-#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:153
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:157
 msgid ""
 "Invalid form submission, probably because you used the \"back\" or "
 "\"reload\" button on your browser. Please resubmit."
@@ -231,14 +232,14 @@ msgstr "Úrlap küldése sikertelen, valószínűleg a \"vissza\" vagy az \"újr
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:328
 #: ../src/java/src/i2p/susi/dns/ConfigBean.java:110
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:318
-#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:155
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:159
 msgid ""
 "If the problem persists, verify that you have cookies enabled in your "
 "browser."
-msgstr ""
+msgstr "Ha a probléma fennáll, ellenőrizd, hogy a sütik engedélyezve vannak-e a böngésződben."
 
 #: ../src/java/src/i2p/susi/dns/ConfigBean.java:99
-#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:128
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:131
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:160
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:151
 msgid "Save"
@@ -249,7 +250,7 @@ msgid "Configuration saved."
 msgstr "Beállítás elmentve."
 
 #: ../src/java/src/i2p/susi/dns/ConfigBean.java:102
-#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:147
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:151
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:158
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:149
 msgid "Reload"
@@ -278,16 +279,16 @@ msgstr "{0} Célállomás hozzáadása sikertelen a {1} névszolgáltatóhoz"
 msgid "Failed to delete Destination for {0} from naming service {1}"
 msgstr "{0} Célállomás törlése sikertelen a {1} névszolgáltatóból"
 
-#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:140
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:144
 msgid ""
 "Subscriptions saved, updating addressbook from subscription sources now."
 msgstr "Feliratkozás elmentve, címjegyzék a feliratkozási források használatával frissítés alatt."
 
-#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:145
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:149
 msgid "Subscriptions saved."
 msgstr "Feliratkozások elmentve."
 
-#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:149
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:153
 msgid "Subscriptions reloaded."
 msgstr "Feliratkozások újratöltve."
 
@@ -435,7 +436,7 @@ msgstr "Mégse"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:373
 msgid "Export in hosts.txt format"
-msgstr ""
+msgstr "Exportálás hosts.txt formátumba"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:396
 msgid "This address book is empty."
@@ -549,7 +550,7 @@ msgstr "Fájl, ami a működést naplózza (megváltoztathatod /dev/null -ra, ha
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:200
 msgid "Name of the theme to use (defaults to 'light')"
-msgstr ""
+msgstr "Használni kívánt téma neve (alapértelmezett 'light')"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:112
 msgid "addressbook"
@@ -629,7 +630,7 @@ msgstr "Elosztott források vagy \"feliratkozások\" használata a hosts.txt fá
 #, java-format
 msgid ""
 "In the default configuration, the address book is only subscribed to {0}."
-msgstr ""
+msgstr "Az alapértelmezett konfigurációban a címjegyzék csak ehhez van feliratkozva: {0}."
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:145
 msgid ""
@@ -641,7 +642,7 @@ msgstr "További oldalakra való feliratkozás egyszerű, pusztán add hozzá a 
 msgid ""
 "For more information on naming in I2P, see <a href=\"http://i2p-"
 "projekt.i2p/naming.html\" target=\"_top\">the overview</a>."
-msgstr ""
+msgstr "További információkért az I2P-ben történő névadásról nézd meg <a href=\"http://i2p-projekt.i2p/naming.html\" target=\"_top\">az áttekintést</a>."
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:149
 msgid "How does the addressbook application work?"
@@ -706,7 +707,7 @@ msgstr "Azok az URL-ek közzétett hosts.txt fájlokra hivatkoznak."
 msgid ""
 "The default subscription is the hosts.txt from {0}, which is updated "
 "infrequently."
-msgstr ""
+msgstr "Az alapértelmezett feliratkozás a hosts.txt tőle: {0}, ami ritkán volt frissítve."
 
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:161
 msgid ""
