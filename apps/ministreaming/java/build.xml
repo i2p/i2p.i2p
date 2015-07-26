@@ -188,8 +188,11 @@
         <cobertura-instrument todir="./build/obj_cobertura">
             <fileset dir="./build/obj">
                 <include name="**/*.class"/>
+                <!-- exclude stub classes -->
+                <exclude name="net/i2p/client/streaming/I2PSocketManagerFull.class" />
                 <!-- exclude Test classes -->
                 <exclude name="**/*Test.class" />
+                <exclude name="net/i2p/client/streaming/impl/I2PSocketManagerFull.class" />
                 <!-- exclude anything not in net.i2p.* -->
                 <exclude name="org/cybergarage/**/*.class" />
                 <exclude name="org/freenetproject/**/*.class" />
