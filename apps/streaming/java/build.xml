@@ -84,6 +84,8 @@
                 <include name="**/*.class"/>
                 <!-- exclude Test classes -->
                 <exclude name="**/*Test.class" />
+                <exclude name="**/*IT.class" />
+                <exclude name="**/StreamingITBase.class" />
                 <!-- exclude anything not in net.i2p.* -->
                 <exclude name="org/cybergarage/**/*.class" />
                 <exclude name="org/freenetproject/**/*.class" />
@@ -126,6 +128,7 @@
             <batchtest todir="../../../reports/streaming/junit/">
                 <fileset dir="./test/junit">
                     <include name="**/*Test.java" />
+                    <include name="**/*IT.java" if="runIntegrationTests" />
                 </fileset>
             </batchtest>
             <formatter type="xml"/>

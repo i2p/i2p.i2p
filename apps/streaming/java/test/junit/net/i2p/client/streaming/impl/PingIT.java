@@ -13,7 +13,7 @@ import net.i2p.client.I2PClient;
 import net.i2p.client.I2PClientFactory;
 import net.i2p.client.I2PSession;
 
-public class PingTest extends TestCase {
+public class PingIT extends TestCase {
 
     @Test
     public void test() throws Exception {

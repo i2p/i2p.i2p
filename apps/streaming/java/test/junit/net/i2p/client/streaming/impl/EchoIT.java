@@ -17,7 +17,7 @@ import net.i2p.util.Log;
 /**
  *
  */
-public class EchoTest extends StreamingTestBase {
+public class EchoIT extends StreamingITBase {
     private Log _log;
     private I2PSession _client;
     private I2PSession _server;
@@ -25,7 +25,7 @@ public class EchoTest extends StreamingTestBase {
     @Test
     public void test() throws Exception {
         I2PAppContext context = I2PAppContext.getGlobalContext();
-        _log = context.logManager().getLog(ConnectTest.class);
+        _log = context.logManager().getLog(ConnectIT.class);
         _log.debug("creating server session");
         _server = createSession();
         _log.debug("running server");

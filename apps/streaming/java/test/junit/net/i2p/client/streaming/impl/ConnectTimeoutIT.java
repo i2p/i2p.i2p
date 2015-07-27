@@ -17,7 +17,7 @@ import net.i2p.util.Log;
  * Try to connect to a new nonexistant peer and, of course,
  * timeout.
  */
-public class ConnectTimeoutTest  extends StreamingTestBase {
+public class ConnectTimeoutIT  extends StreamingITBase {
     private Log _log;
     private I2PSession _client;
     private Destination _serverDest;
@@ -25,7 +25,7 @@ public class ConnectTimeoutTest  extends StreamingTestBase {
     @Test
     public void testNonexistant() throws Exception {
         I2PAppContext context = I2PAppContext.getGlobalContext();
-        _log = context.logManager().getLog(ConnectTest.class);
+        _log = context.logManager().getLog(ConnectIT.class);
         _log.debug("creating server dest");
         _serverDest = I2PClientFactory.createClient().createDestination(new ByteArrayOutputStream());
         _log.debug("creating client session");
