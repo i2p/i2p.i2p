@@ -181,14 +181,15 @@ public class MessageInputStreamTest {
         int numMsgs = _options.getInboundBufferSize() / _options.getMaxMessageSize();
         byte orig[] = new byte[_options.getInboundBufferSize()];
         _context.random().nextBytes(orig);
-        for (int i = 0; i < numMsgs - 1; i++) {
+        for (int i = 0; i < numMsgs - 2; i++) {
             byte msg[] = new byte[_options.getMaxMessageSize()];
             System.arraycopy(orig, i*_options.getMaxMessageSize(), msg, 0, _options.getMaxMessageSize());
             in.messageReceived(i, new ByteArray(msg));
         }
-        // Add one half-size msg
+        // Add two half-size messages (to get past shortcut)
         byte msg[] = new byte[_options.getMaxMessageSize()/2];
         System.arraycopy(orig, (numMsgs-1)*_options.getMaxMessageSize(), msg, 0, _options.getMaxMessageSize()/2);
+        in.messageReceived(numMsgs - 2, new ByteArray(msg));
         in.messageReceived(numMsgs - 1, new ByteArray(msg));
         // Check that it predicts only one more msgId will be accepted
         assertTrue(in.canAccept(numMsgs, 1));
