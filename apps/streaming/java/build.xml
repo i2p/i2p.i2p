@@ -90,6 +90,7 @@
                 <include name="**/*.class"/>
                 <!-- exclude Test classes -->
                 <exclude name="**/*Test.class" />
+                <exclude name="**/*TestBase.class" />
                 <exclude name="**/*IT.class" />
                 <exclude name="**/*IT$*.class" />
                 <exclude name="**/StreamingITBase.class" />
