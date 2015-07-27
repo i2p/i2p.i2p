@@ -1,3 +1,9 @@
+2015-07-27 zzz
+ * Update: Fix processing of translated news su3 files
+
+2015-07-26 zzz
+ * Update translations
+
 2015-07-25 zzz
  * i2psnark: Fix total_size in metadata message (ticket #1618)
  * NetDB: Fix NPE (ticket #1619)

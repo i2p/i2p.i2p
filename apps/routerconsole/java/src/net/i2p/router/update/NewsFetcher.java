@@ -406,7 +406,9 @@ class NewsFetcher extends UpdateRunner {
         
         if (_tempFile.exists() && _tempFile.length() > 0) {
             File from;
-            if (url.endsWith(".su3")) {
+            // TODO check magic number instead?
+            // But then a corrupt file would be displayed as-is...
+            if (url.endsWith(".su3") || url.contains(".su3?")) {
                 try {
                     from = processSU3();
                 } catch (IOException ioe) {
