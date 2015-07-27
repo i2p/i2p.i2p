@@ -1,7 +1,6 @@
 package net.i2p.client.streaming.impl;
 
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.*;
 import net.i2p.I2PAppContext;
 import net.i2p.util.Clock;
@@ -15,7 +14,7 @@ import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
-public abstract class SchedulerImplTestBase {
+public abstract class TaskSchedulerTestBase {
 
     @Rule
     public MockitoRule rule = MockitoJUnit.rule();
@@ -24,15 +23,20 @@ public abstract class SchedulerImplTestBase {
     @Mock protected Clock clock;
     @Mock protected SimpleTimer2 timer;
 
-    protected SchedulerDead scheduler;
+    protected TaskScheduler scheduler;
 
     @Before
     public void setUp() {
         when(context.clock()).thenReturn(clock);
         when(context.simpleTimer2()).thenReturn(timer);
 
-        initScheduler();
+        scheduler = createScheduler();
     }
 
-    protected abstract void initScheduler();
+    protected abstract TaskScheduler createScheduler();
+
+    @Test
+    public void testAccept_null() {
+        assertFalse(scheduler.accept(null));
+    }
 }

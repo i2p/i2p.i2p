@@ -6,19 +6,13 @@ import static org.mockito.Mockito.*;
 import org.junit.Test;
 import org.mockito.Mock;
 
-public class SchedulerDeadTest extends SchedulerImplTestBase {
+public class SchedulerDeadTest extends TaskSchedulerTestBase {
 
-    private SchedulerDead s;
     @Mock private Connection con;
     @Mock private ConnectionOptions opts;
 
-    protected void initScheduler() {
-        s = new SchedulerDead(context);
-    }
-
-    @Test
-    public void testAccept_null() {
-        assertFalse(s.accept(null));
+    protected TaskScheduler createScheduler() {
+        return new SchedulerDead(context);
     }
 
     private void setMocks(int now, int discSchOn, int connTimeout, int lifetime, int sendStreamId) {
@@ -33,24 +27,24 @@ public class SchedulerDeadTest extends SchedulerImplTestBase {
     @Test
     public void testAccept_nothingLeftToDo() {
         setMocks(10*60*1000, 9*60*1000 - Connection.DISCONNECT_TIMEOUT, 0, 0, 0);
-        assertTrue(s.accept(con));
+        assertTrue(scheduler.accept(con));
     }
 
     @Test
     public void testAccept_noDisconnectScheduled() {
         setMocks(10*60*1000, 0, 0, 0, 0);
-        assertFalse(s.accept(con));
+        assertFalse(scheduler.accept(con));
     }
 
     @Test
     public void testAccept_timedOut() {
         setMocks(0, 0, Connection.DISCONNECT_TIMEOUT/2, Connection.DISCONNECT_TIMEOUT, 0);
-        assertTrue(s.accept(con));
+        assertTrue(scheduler.accept(con));
     }
 
     @Test
     public void testEventOccurred() {
-        s.eventOccurred(con);
+        scheduler.eventOccurred(con);
         verify(con).disconnectComplete();
     }
 }
