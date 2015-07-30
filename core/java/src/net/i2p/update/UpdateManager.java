@@ -178,6 +178,7 @@ public interface UpdateManager {
      *  @since 0.9.21
      */
     public boolean isUpdateInProgress(UpdateType type, String id);
+
     /**
      *  Non-blocking. Does not check.
      *  Fails if check or update already in progress.
@@ -225,6 +226,7 @@ public interface UpdateManager {
     /**
      *  The status on any update current or last finished.
      *  @return status or ""
+     *  @since 0.9.21
      */
     public String getStatus();
 

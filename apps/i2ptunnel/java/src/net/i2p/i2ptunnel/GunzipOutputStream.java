@@ -25,7 +25,7 @@ class GunzipOutputStream extends InflaterOutputStream {
     private final CRC32 _crc32;
     private final byte _buf1[] = new byte[1];
     private boolean _complete;
-    private byte _footer[] = new byte[FOOTER_SIZE];
+    private final byte _footer[] = new byte[FOOTER_SIZE];
     private long _bytesReceived;
     private long _bytesReceivedAtCompletion;
     

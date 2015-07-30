@@ -1050,7 +1050,7 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
                 uri = DataHelper.stripHTML(task.getURI().getPath());
                 buf.append(_("Install failed from {0}", uri));
             } else {
-                buf.append(_("Transfer failed from {0}"));
+                buf.append(_("Transfer failed from {0}", uri));
             }
             if (reason != null && reason.length() > 0) {
                 buf.append("<br>");

@@ -136,7 +136,7 @@ class NewsFetcher extends UpdateRunner {
     /**
      *  Add a query param for the local language to get translated news.
      *  Unchanged if disabled by property, if language is english,
-     *  or if URI already contains a language paramter
+     *  or if URI already contains a language parameter
      *
      *  @since 0.9.21
      */

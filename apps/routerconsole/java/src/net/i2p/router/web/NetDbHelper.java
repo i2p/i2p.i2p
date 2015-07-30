@@ -73,7 +73,7 @@ public class NetDbHelper extends HelperBase {
         NetDbRenderer renderer = new NetDbRenderer(_context);
         try {
             renderNavBar();
-            if (_routerPrefix != null || _version!= null || _country != null)
+            if (_routerPrefix != null || _version != null || _country != null)
                 renderer.renderRouterInfoHTML(_out, _routerPrefix, _version, _country);
             else if (_lease)
                 renderer.renderLeaseSetHTML(_out, _debug);
