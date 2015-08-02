@@ -1,3 +1,51 @@
+i2p (0.9.21-2) unstable; urgency=medium
+
+  * Add exception to apparmor rules for scrypt, needed by I2P-Bote
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Sun, 02 Aug 2015 15:00:30 +0000
+
+i2p (0.9.21-1) unstable; urgency=medium
+
+  * New Upstream Version
+    - Add multisession support for dual-signature crypto on the same tunnels
+    - Use multisession for shared clients
+    - Increase default outbound bandwidth limit to 60 KBps
+    - Increase default maximum participating tunnels
+    - Floodfills will send database store acks directly if connected, for efficiency
+    - Set TCP keepalive on I2CP and SAM sockets
+    - More efficient decompression in HTTP proxy, use less threads
+    - Add support for fast extensions in i2psnark
+    - i2psnark only autostarts torrents that were running previously
+    - Add support for translated console news
+    - SSU fixes to compete better with NTCP for bandwidth when limited
+    - Fixes to prevent SSU stalls
+    - Wait for outbound tunnels before sending first leaseset to client, to
+      prevent dropping first message
+    - Clean up resources correctly when SAM stops
+    - Better error handling and notification when HTTP proxy is not running
+    - More i2ptunnel fixes at startup and shutdown of tunnels
+    - Fix total_size in i2psnark metadata message
+    - Restore dates in console news headers
+    - Several I2CP fixes
+    - Use same session for naming lookups in I2PSocketEepGet
+    - Increase max bandwidth to 16 MBps, add larger Bloom filter
+    - New floodfills will send their info to nearby floodfills to speed integration
+    - Apache Tomcat 6.0.44
+    - Translation updates
+  * Drop the following patches; included in 0.9.21:
+    - 0005-i2ptunnel-Don-t-connect-manager-to-router-in-constru.patch
+    - 0006-i2ptunnel-Don-t-call-startup-in-chained-constructor-.patch
+    - 0007-Define-I2PTunnelClientBase-stats-in-one-place.patch
+    - 0008-i2psnark-Fix-NPE-ticket-1602.patch
+
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Fri, 31 Jul 2015 20:01:42 +0000
+
+i2p (0.9.20-3) unstable; urgency=medium
+
+  * Add datagram exception to the apparmor profile
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Sat, 20 Jun 2015 11:22:28 +0000
 i2p (0.9.20-2) unstable; urgency=medium
 
   [str4d]
