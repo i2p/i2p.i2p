@@ -284,7 +284,7 @@ public class I2PSSLSocketFactory {
             host.equals("localhost") ||
             host.equals("127.0.0.1") ||
             host.equals("::1") ||
-            host.equals("0:0:0:0:0:0:0::1")) {
+            host.equals("0:0:0:0:0:0:0:1")) {
             if (log.shouldWarn())
                 log.warn("Skipping hostname validation for " + host);
             return;
