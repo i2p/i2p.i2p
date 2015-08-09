@@ -40,18 +40,20 @@ import org.eclipse.jetty.security.ConstraintMapping;
 import org.eclipse.jetty.security.ConstraintSecurityHandler;
 import org.eclipse.jetty.security.authentication.DigestAuthenticator;
 import org.eclipse.jetty.server.AbstractConnector;
+import org.eclipse.jetty.server.ConnectionFactory;
 import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.HttpConfiguration;
+import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.NCSARequestLog;
+import org.eclipse.jetty.server.SecureRequestCustomizer;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.bio.SocketConnector;
+import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.server.SslConnectionFactory;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
 import org.eclipse.jetty.server.handler.DefaultHandler;
 import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.server.handler.HandlerWrapper;
 import org.eclipse.jetty.server.handler.RequestLogHandler;
-import org.eclipse.jetty.server.nio.SelectChannelConnector;
-import org.eclipse.jetty.server.ssl.SslSocketConnector;
-import org.eclipse.jetty.server.ssl.SslSelectChannelConnector;
 import org.eclipse.jetty.servlet.ServletHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.webapp.WebAppContext;
@@ -327,6 +329,22 @@ public class RouterConsoleRunner implements RouterApp {
      *			DefaultHandler
      *			RequestLogHandler (opt)
      *</pre>
+     *
+     *  Porting to Jetty 9:
+     *
+     *  http://dev.eclipse.org/mhonarc/lists/jetty-dev/msg01952.html
+     *  You are missing a few facts about Jetty 9.1 ...
+     *  First, there are no longer any blocking connectors.
+     *  Its all async / nio connectors now. (mainly because that's the direction that the servlet api 3.1 is taking)
+     *
+     *  Next, there is only 1 connector.   The ServerConnector.
+     *  However, it takes 1 or more ConnectionFactory implementations to know how to handle the incoming connection.
+     *  We have factories for HTTP (0.9 thru 1.1), SPDY, SSL-http, and SSL-npn so far.
+     *  This list of factories will expand as the future of connectivity to web servers is ever growing (think HTTP/2)
+     *
+     *  Use the embedded examples for help understanding this.
+     *  http://git.eclipse.org/c/jetty/org.eclipse.jetty.project.git/tree/examples/embedded/src/main/java/org/eclipse/jetty/embedded/ManyConnectors.java?id=jetty-9.1.0.RC0
+     *
      */
     public void startConsole() {
         File workDir = new SecureDirectory(_context.getTempDir(), "jetty-work");
@@ -339,8 +357,9 @@ public class RouterConsoleRunner implements RouterApp {
 
         // so Jetty can find WebAppConfiguration
         System.setProperty("jetty.class.path", _context.getBaseDir() + "/lib/routerconsole.jar");
-        _server = new Server();
-        _server.setGracefulShutdown(1000);
+        // FIXME
+        // http://dev.eclipse.org/mhonarc/lists/jetty-users/msg03487.html
+        //_server.setGracefulShutdown(1000);
 
         // In Jetty 6, QTP was not concurrent, so we switched to
         // ThreadPoolExecutor with a fixed-size queue, a set maxThreads,
@@ -372,14 +391,11 @@ public class RouterConsoleRunner implements RouterApp {
             // class not found...
             //System.out.println("INFO: Jetty concurrent ThreadPool unavailable, using QueuedThreadPool");
             LinkedBlockingQueue<Runnable> lbq = new LinkedBlockingQueue<Runnable>(4*MAX_THREADS);
-            QueuedThreadPool qtp = new QueuedThreadPool(lbq);
-            // min and max threads will be set below
-            //qtp.setMinThreads(MIN_THREADS);
-            //qtp.setMaxThreads(MAX_THREADS);
-            qtp.setMaxIdleTimeMs(MAX_IDLE_TIME);
+            // min and max threads will be reset below
+            QueuedThreadPool qtp = new QueuedThreadPool(MAX_THREADS, MIN_THREADS, MAX_IDLE_TIME, lbq);
             qtp.setName(THREAD_NAME);
             qtp.setDaemon(true);
-            _server.setThreadPool(qtp);
+            _server = new Server(qtp);
         //}
 
         HandlerCollection hColl = new HandlerCollection();
@@ -465,27 +481,15 @@ public class RouterConsoleRunner implements RouterApp {
                         } finally {
                             if (testSock != null) try { testSock.close(); } catch (IOException ioe) {}
                         }
-                        //if (host.indexOf(":") >= 0) // IPV6 - requires patched Jetty 5
-                        //    _server.addListener('[' + host + "]:" + _listenPort);
-                        //else
-                        //    _server.addListener(host + ':' + _listenPort);
-                        AbstractConnector lsnr;
-                        if (SystemVersion.isJava6() && !SystemVersion.isGNU()) {
-                            SelectChannelConnector slsnr = new SelectChannelConnector();
-                            slsnr.setUseDirectBuffers(false);  // default true seems to be leaky
-                            lsnr = slsnr;
-                        } else {
-                            // Jetty 6 and NIO on Java 5 don't get along that well
-                            // Also: http://jira.codehaus.org/browse/JETTY-1238
-                            // "Do not use GCJ with Jetty, it will not work."
-                            // Actually it does if you don't use NIO
-                            lsnr = new SocketConnector();
-                        }
+                        HttpConfiguration httpConfig = new HttpConfiguration();
+                        // number of acceptors, (default) number of selectors
+                        ServerConnector lsnr = new ServerConnector(_server, 1, 0,
+                                                                   new HttpConnectionFactory(httpConfig));
+                        //lsnr.setUseDirectBuffers(false);  // default true seems to be leaky
                         lsnr.setHost(host);
                         lsnr.setPort(lport);
-                        lsnr.setMaxIdleTime(90*1000);  // default 10 sec
+                        lsnr.setIdleTimeout(90*1000);  // default 10 sec
                         lsnr.setName("ConsoleSocket");   // all with same name will use the same thread pool
-                        lsnr.setAcceptors(1);          // default changed to 2 somewhere in Jetty 7?
                         //_server.addConnector(lsnr);
                         connectors.add(lsnr);
                         boundAddresses++;
@@ -541,22 +545,19 @@ public class RouterConsoleRunner implements RouterApp {
                             } finally {
                                 if (testSock != null) try { testSock.close(); } catch (IOException ioe) {}
                             }
-                            // TODO if class not found use SslChannelConnector
-                            AbstractConnector ssll;
-                            if (SystemVersion.isJava6() && !SystemVersion.isGNU()) {
-                                SslSelectChannelConnector sssll = new SslSelectChannelConnector(sslFactory);
-                                sssll.setUseDirectBuffers(false);  // default true seems to be leaky
-                                ssll = sssll;
-                            } else {
-                                // Jetty 6 and NIO on Java 5 don't get along that well
-                                SslSocketConnector sssll = new SslSocketConnector(sslFactory);
-                                ssll = sssll;
-                            }
+                            HttpConfiguration httpConfig = new HttpConfiguration();
+                            httpConfig.setSecureScheme("https");
+                            httpConfig.setSecurePort(sslPort);
+                            httpConfig.addCustomizer(new SecureRequestCustomizer());
+                            // number of acceptors, (default) number of selectors
+                            ServerConnector ssll = new ServerConnector(_server, 1, 0,
+                                                                       new SslConnectionFactory(sslFactory, "http/1.1"),
+                                                                       new HttpConnectionFactory(httpConfig));
+                            //sssll.setUseDirectBuffers(false);  // default true seems to be leaky
                             ssll.setHost(host);
                             ssll.setPort(sslPort);
-                            ssll.setMaxIdleTime(90*1000);  // default 10 sec
+                            ssll.setIdleTimeout(90*1000);  // default 10 sec
                             ssll.setName("ConsoleSocket");   // all with same name will use the same thread pool
-                            ssll.setAcceptors(1);          // default changed to 2 somewhere in Jetty 7?
                             //_server.addConnector(ssll);
                             connectors.add(ssll);
                             boundAddresses++;
