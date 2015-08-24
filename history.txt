@@ -1,3 +1,17 @@
+2015-08-25 zzz
+ * i2psnark:
+   - Return partial piece to coordinator after reject
+   - Fix tracking of downloaded portion of piece after reject
+   - Send reject on receipt of bad request
+   - Mark piece unrequested after receiving bad data, so it
+     will be requested again, but not from the same peer
+   - Fix NPE in Request constructor on error
+   - Fix stuck before completion due to reject handling (ticket #1633)
+
+2015-08-02 zzz
+ * Console: Fix SSL excluded ciphers (thx lazyg)
+ * SU3File: Add keystore password command line option
+
 * 2015-07-31 0.9.21 released
 
 2015-07-27 zzz

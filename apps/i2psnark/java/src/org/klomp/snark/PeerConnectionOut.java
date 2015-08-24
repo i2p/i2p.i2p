@@ -170,6 +170,8 @@ class PeerConnectionOut implements Runnable
                 lastSent = System.currentTimeMillis();
 
                 // Remove all piece messages after sending a choke message.
+                // FiXME this causes REJECT messages to be sent before sending the CHOKE;
+                // BEP 6 recommends sending them after.
                 if (m.type == Message.CHOKE)
                   removeMessage(Message.PIECE);
 

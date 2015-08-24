@@ -21,6 +21,7 @@
 package org.klomp.snark;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -238,6 +239,8 @@ class PeerState implements DataLoader
     }
 
     // Sanity check
+    // There is no check here that we actually have the piece;
+    // this will be caught in loadData() below
     if (piece < 0
         || piece >= metainfo.getPieces()
         || begin < 0
@@ -251,6 +254,8 @@ class PeerState implements DataLoader
                       + ", " + begin
                       + ", " + length
                       + "' message from " + peer);
+        if (peer.supportsFast())
+            out.sendReject(piece, begin, length);
         return;
       }
 
@@ -281,7 +286,8 @@ class PeerState implements DataLoader
   /**
    *  This is the callback that PeerConnectionOut calls
    *
-   *  @return bytes or null for errors
+   *  @return bytes or null for errors such as not having the piece yet
+   *  @throws RuntimeException on IOE getting the data
    *  @since 0.8.2
    */
   public ByteArray loadData(int piece, int begin, int length) {
@@ -291,6 +297,8 @@ class PeerState implements DataLoader
         // XXX - Protocol error-> diconnect?
         if (_log.shouldLog(Log.WARN))
           _log.warn("Got request for unknown piece: " + piece);
+        if (peer.supportsFast())
+            out.sendReject(piece, begin, length);
         return null;
       }
 
@@ -303,6 +311,8 @@ class PeerState implements DataLoader
                       + ", " + begin
                       + ", " + length
                       + "' message from " + peer);
+        if (peer.supportsFast())
+            out.sendReject(piece, begin, length);
         return null;
       }
 
@@ -360,6 +370,11 @@ class PeerState implements DataLoader
           {
             if (_log.shouldLog(Log.WARN))
               _log.warn("Got BAD " + req.getPiece() + " from " + peer);
+            synchronized(this) {
+                // so we don't ask again
+                if (bitfield != null)
+                    bitfield.clear(req.getPiece());
+            }
           }
       }
 
@@ -493,7 +508,12 @@ class PeerState implements DataLoader
       for (Integer p : pcs) {
           Request req = getLowestOutstandingRequest(p.intValue());
           if (req != null) {
-              req.getPartialPiece().setDownloaded(req.off);
+              PartialPiece pp = req.getPartialPiece();
+              synchronized(pp) {
+                  int dl = pp.getDownloaded();
+                  if (req.off != dl)
+                      req = new Request(pp, dl, 1);
+              }
               rv.add(req);
           }
       }
@@ -598,6 +618,13 @@ class PeerState implements DataLoader
 
   /**
    *  BEP 6
+   *  If the peer rejects lower chunks but not higher ones, thus creating holes,
+   *  we won't figure it out and the piece will fail, since we don't currently
+   *  keep a chunk bitmap in PartialPiece.
+   *  As long as the peer rejects all the chunks, or rejects only the last chunks,
+   *  no holes are created and we will be fine. The reject messages may be in any order,
+   *  just don't make a hole when it's over.
+   *
    *  @since 0.9.21
    */
   void rejectMessage(int piece, int begin, int length) {
@@ -605,10 +632,34 @@ class PeerState implements DataLoader
            _log.info("Got reject(" + piece + ',' + begin + ',' + length + ") from " + peer);
       out.cancelRequest(piece, begin, length);
       synchronized(this) {
+          Request deletedRequest = null;
+          // for this piece only
+          boolean haveMoreRequests = false;
           for (Iterator<Request> iter = outstandingRequests.iterator(); iter.hasNext(); ) {
               Request req = iter.next();
-              if (req.getPiece() == piece && req.off == begin && req.len == length)
-                  iter.remove();
+              if (req.getPiece() == piece) {
+                  if (req.off == begin && req.len == length) {
+                      iter.remove();
+                      deletedRequest = req;
+                  } else {
+                      haveMoreRequests = true;
+                  }
+              }
+          }
+          if (deletedRequest != null && !haveMoreRequests) {
+              // We must return the piece to the coordinator
+              // Create a new fake request so we can set the offset correctly
+              PartialPiece pp = deletedRequest.getPartialPiece();
+              int downloaded = pp.getDownloaded();
+              Request req;
+              if (deletedRequest.off == downloaded)
+                  req = deletedRequest;
+              else
+                  req = new Request(pp, downloaded, 1);
+              List<Request> pcs = Collections.singletonList(req);
+              listener.savePartialPieces(this.peer, pcs);
+              if (_log.shouldWarn()) 
+                  _log.warn("Returned to coord. w/ offset " + pp.getDownloaded() + " due to reject(" + piece + ',' + begin + ',' + length + ") from " + peer);
           }
           if (lastRequest != null && lastRequest.getPiece() == piece &&
               lastRequest.off == begin && lastRequest.len == length)
