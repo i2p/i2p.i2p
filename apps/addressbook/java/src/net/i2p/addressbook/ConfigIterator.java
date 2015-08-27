@@ -22,6 +22,7 @@
 package net.i2p.addressbook;
 
 import java.io.BufferedReader;
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -41,7 +42,7 @@ import java.util.NoSuchElementException;
  *
  *  @since 0.8.7
  */
-class ConfigIterator implements Iterator<Map.Entry<String, String>> {
+class ConfigIterator implements Iterator<Map.Entry<String, String>>, Closeable {
 
     private BufferedReader input;
     private ConfigEntry next;

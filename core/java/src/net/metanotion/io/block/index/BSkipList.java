@@ -28,6 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package net.metanotion.io.block.index;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.util.HashMap;
 
@@ -50,7 +51,7 @@ import net.i2p.util.Log;
  *
  * Always fits on one page.
  */
-public class BSkipList extends SkipList {
+public class BSkipList extends SkipList implements Closeable {
 	private static final long MAGIC = 0x536b69704c697374l;  // "SkipList"
 	public int firstSpanPage = 0;
 	public int firstLevelPage = 0;

@@ -20,6 +20,7 @@
 
 package org.klomp.snark;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -50,7 +51,7 @@ import net.i2p.util.SystemVersion;
 /**
  * Maintains pieces on disk. Can be used to store and retrieve pieces.
  */
-public class Storage
+public class Storage implements Closeable
 {
   private final MetaInfo metainfo;
   private final List<TorrentFile> _torrentFiles;

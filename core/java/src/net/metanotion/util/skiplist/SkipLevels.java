@@ -28,12 +28,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package net.metanotion.util.skiplist;
 
+import java.io.Flushable;
+
 import net.metanotion.io.block.BlockFile;
 
 import net.i2p.I2PAppContext;
 import net.i2p.util.Log;
 
-public class SkipLevels {
+public class SkipLevels implements Flushable {
 	/** We can't have more than 2**32 pages */
 	public static final int MAX_SIZE = 32;
 

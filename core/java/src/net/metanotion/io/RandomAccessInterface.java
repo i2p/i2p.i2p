@@ -28,9 +28,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package net.metanotion.io;
 
+import java.io.Closeable;
 import java.io.IOException;
 
-public interface RandomAccessInterface {
+public interface RandomAccessInterface extends Closeable {
 	public long getFilePointer() throws IOException;
 	public long length() throws IOException;
 	public int read() throws IOException;

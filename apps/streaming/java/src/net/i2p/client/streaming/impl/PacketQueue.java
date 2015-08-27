@@ -1,5 +1,6 @@
 package net.i2p.client.streaming.impl;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
@@ -25,7 +26,7 @@ import net.i2p.util.SimpleTimer2;
  *<p>
  * MessageOutputStream -> ConnectionDataReceiver -> Connection -> PacketQueue -> I2PSession
  */
-class PacketQueue implements SendMessageStatusListener {
+class PacketQueue implements SendMessageStatusListener, Closeable {
     private final I2PAppContext _context;
     private final Log _log;
     private final ByteCache _cache = ByteCache.getInstance(64, 36*1024);
