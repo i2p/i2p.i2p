@@ -577,8 +577,6 @@ public class Router implements RouterClock.ClockShiftListener {
         if (!SystemVersion.isAndroid())
             I2PThread.addOOMEventListener(_oomListener);
         
-        _context.keyManager().startup();
-        
         setupHandlers();
         //if (ALLOW_DYNAMIC_KEYS) {
         //    if ("true".equalsIgnoreCase(_context.getProperty(Router.PROP_HIDDEN, "false")))

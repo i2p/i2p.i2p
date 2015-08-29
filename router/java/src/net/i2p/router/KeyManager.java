@@ -60,6 +60,11 @@ public class KeyManager {
         _leaseSetKeys = new ConcurrentHashMap<Hash, LeaseSetKeys>();
     }
     
+    /**
+     *  Read keys in from disk, blocking
+     *
+     *  @deprecated we never read keys in anymore
+     */
     public void startup() {
         // run inline so keys are loaded immediately
         (new SynchronizeKeysJob()).runJob();
@@ -79,17 +84,29 @@ public class KeyManager {
         queueWrite();
     }
 
-    /** router */
-    public PrivateKey getPrivateKey() { return _privateKey; }
+    /**
+     * Router key
+     * @return will be null on error or before startup() or setKeys() is called
+     */
+    public synchronized PrivateKey getPrivateKey() { return _privateKey; }
 
-    /** router */
-    public PublicKey getPublicKey() { return _publicKey; }
+    /**
+     * Router key
+     * @return will be null on error or before startup() or setKeys() is called
+     */
+    public synchronized PublicKey getPublicKey() { return _publicKey; }
 
-    /** router */
-    public SigningPrivateKey getSigningPrivateKey() { return _signingPrivateKey; }
+    /**
+     * Router key
+     * @return will be null on error or before startup() or setKeys() is called
+     */
+    public synchronized SigningPrivateKey getSigningPrivateKey() { return _signingPrivateKey; }
 
-    /** router */
-    public SigningPublicKey getSigningPublicKey() { return _signingPublicKey; }
+    /**
+     * Router key
+     * @return will be null on error or before startup() or setKeys() is called
+     */
+    public synchronized SigningPublicKey getSigningPublicKey() { return _signingPublicKey; }
     
     /** client */
     public void registerKeys(Destination dest, SigningPrivateKey leaseRevocationPrivateKey, PrivateKey endpointDecryptionKey) {
@@ -216,6 +233,11 @@ public class KeyManager {
                 _signingPublicKey  = (SigningPublicKey) readin;
         }
 
+        /**
+         *  @param param non-null, filled-in if exists is true, or without data if exists is false
+         *  @param exists write to file if true, read from file if false
+         *  @return structure or null on read error
+         */
         private DataStructure syncKey(File keyFile, DataStructure structure, boolean exists) {
             OutputStream out = null;
             InputStream in = null;

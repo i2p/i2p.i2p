@@ -1,3 +1,10 @@
+2015-08-29 zzz
+ * Router:
+   - Change default RI sig type to Ed25519, with a 10% chance od
+     rekeying from DSA at each restart
+   - Don't initialize KeyManager before selecting sig type
+   - Don't log KeyManager error when changing sig type
+
 2015-08-25 zzz
  * i2psnark:
    - Return partial piece to coordinator after reject
@@ -7,6 +14,7 @@
      will be requested again, but not from the same peer
    - Fix NPE in Request constructor on error
    - Fix stuck before completion due to reject handling (ticket #1633)
+   - Fix orphaned temp files due to reject handling (ticket #1635)
 
 2015-08-02 zzz
  * Console: Fix SSL excluded ciphers (thx lazyg)
