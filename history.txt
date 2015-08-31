@@ -1,3 +1,7 @@
+2015-08-31 zzz
+ * Data: Cache P256 and Ed255i9 key certificates
+ * i2psnark: Change default sig type to Ed25519
+
 2015-08-29 zzz
  * Router:
    - Change default RI sig type to Ed25519, with a 10% chance od
