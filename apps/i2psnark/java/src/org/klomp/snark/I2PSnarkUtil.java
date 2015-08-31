@@ -14,6 +14,7 @@ import java.util.Set;
 
 import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
+import net.i2p.client.I2PClient;
 import net.i2p.client.I2PSession;
 import net.i2p.client.I2PSessionException;
 import net.i2p.client.streaming.I2PServerSocket;
@@ -255,6 +256,8 @@ public class I2PSnarkUtil {
                 opts.setProperty("i2p.streaming.disableRejectLogging", "true");
             if (opts.getProperty("i2p.streaming.answerPings") == null)
                 opts.setProperty("i2p.streaming.answerPings", "false");
+            if (opts.getProperty(I2PClient.PROP_SIGTYPE) == null)
+                opts.setProperty(I2PClient.PROP_SIGTYPE, "EdDSA_SHA512_Ed25519");
             _manager = I2PSocketManagerFactory.createManager(_i2cpHost, _i2cpPort, opts);
             _connecting = false;
         }
