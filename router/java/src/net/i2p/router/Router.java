@@ -398,7 +398,7 @@ public class Router implements RouterClock.ClockShiftListener {
         _oomListener = new OOMListener(_context);
 
         _shutdownHook = new ShutdownHook(_context);
-        _gracefulShutdownDetector = new I2PAppThread(new GracefulShutdown(_context), "Graceful shutdown hook", true);
+        _gracefulShutdownDetector = new I2PAppThread(new GracefulShutdown(_context), "Graceful ShutdownHook", true);
         _gracefulShutdownDetector.setPriority(Thread.NORM_PRIORITY + 1);
         _gracefulShutdownDetector.start();
         
