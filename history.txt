@@ -1,3 +1,7 @@
+2015-09-04 zzz
+ * UPnP: Fix "content not allowed in trailing section"
+   (tickets #481, #1653)
+
 2015-08-31 zzz
  * Data: Cache P256 and Ed255i9 key certificates
  * i2psnark: Change default sig type to Ed25519
