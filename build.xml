@@ -450,7 +450,7 @@
             if (newBuildNumber != 'unknown' && newBuildNumber != null) {
                 echo = project.createTask("echo");
                 project.setProperty("new.i2p.build.number", newBuildNumber);
-                echo.setMessage("Build number is now: " + newBuildNumber);
+                echo.setMessage("Build number is now: " + newBuildNumber + project.getProperty("build.extra"));
                 echo.perform();
             }
             ]]>
