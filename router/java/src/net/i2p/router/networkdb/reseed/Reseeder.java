@@ -89,7 +89,7 @@ public class Reseeder {
     /** @since 0.8.2 */
     public static final String DEFAULT_SSL_SEED_URL =
               "https://reseed.i2p-projekt.de/" + "," + // Only HTTPS
-              "https://netdb.rows.io:444/" + "," + // Only HTTPS and SU3 (v3) support
+              //"https://netdb.rows.io:444/" + "," + // Only HTTPS and SU3 (v3) support
               "https://i2pseed.zarrenspry.info/" + "," + // Only HTTPS and SU3 (v3) support
               "https://i2p.mooo.com/netDb/" + "," +
               // ticket #1596
