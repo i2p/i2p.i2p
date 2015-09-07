@@ -1247,7 +1247,7 @@ public class SnarkManager implements CompleteListener {
                             _log.info("New Snark, torrent: " + filename + " base: " + baseFile);
                         torrent = new Snark(_util, filename, null, -1, null, null, this,
                                             _peerCoordinatorSet, _connectionAcceptor,
-                                            false, dataDir.getPath(), baseFile);
+                                            shouldAutoStart(), dataDir.getPath(), baseFile);
                         loadSavedFilePriorities(torrent);
                         synchronized (_snarks) {
                             _snarks.put(filename, torrent);
@@ -1278,7 +1278,7 @@ public class SnarkManager implements CompleteListener {
             running = true;
         } else {
             running = false;
-        }        
+        }
         // Were we running last time?
         if (!dontAutoStart && shouldAutoStart() && running) {
             torrent.startTorrent();
