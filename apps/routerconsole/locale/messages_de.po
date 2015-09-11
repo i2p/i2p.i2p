@@ -27,9 +27,9 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-07-17 01:05+0000\n"
-"PO-Revision-Date: 2015-07-17 01:31+0000\n"
-"Last-Translator: kytv <killyourtv@i2pmail.org>\n"
-"Language-Team: German (http://www.transifex.com/projects/p/I2P/language/de/)\n"
+"PO-Revision-Date: 2015-08-21 21:13+0000\n"
+"Last-Translator: Lars Schimmer <echelon@i2pmail.org>\n"
+"Language-Team: German (http://www.transifex.com/otf/I2P/language/de/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -100,8 +100,8 @@ msgstr[1] "{0} Tage"
 #, java-format
 msgid "1 year"
 msgid_plural "{0} years"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "1 Jahr"
+msgstr[1] "{0} Jahre"
 
 #: ../../../core/java/src/net/i2p/data/DataHelper.java:1549
 #: ../../../core/java/src/net/i2p/data/DataHelper.java:1596
@@ -1200,7 +1200,7 @@ msgstr "Keine neue Version unter {0} gefunden"
 
 #: ../java/src/net/i2p/router/web/BanlistRenderer.java:65
 msgid "Permanently banned"
-msgstr ""
+msgstr "permanent gesperrte IP's"
 
 #: ../java/src/net/i2p/router/web/BanlistRenderer.java:67
 #, java-format
@@ -4128,7 +4128,7 @@ msgstr "Tunnel, die wir zur Verfügung stellen oder nutzen, um auf Dienste im Ne
 msgid ""
 "Tunnels we are participating in, directly contributing bandwidth to the "
 "network"
-msgstr ""
+msgstr "Tunnel an denen wir teilnehmen, die direkt Bandbreite dem Netzwerk zur Verfügung stellen."
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:512
 msgid "Participating"
@@ -4352,11 +4352,11 @@ msgstr "ganz oben"
 
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:930
 msgid "Move to top"
-msgstr ""
+msgstr "Nach oben verschieben"
 
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:940
 msgid "Move up"
-msgstr ""
+msgstr "Nach oben verschieben"
 
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:948
 msgid "Down"
@@ -4364,7 +4364,7 @@ msgstr "runter"
 
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:953
 msgid "Move down"
-msgstr ""
+msgstr "nach unten verschieben"
 
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:958
 msgid "Bottom"
@@ -4372,7 +4372,7 @@ msgstr "ganz unten"
 
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:963
 msgid "Move to bottom"
-msgstr ""
+msgstr "Zum Ende verschieben"
 
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:975
 msgid "Select a section to add"
@@ -4581,7 +4581,7 @@ msgstr "nach dem Starten die Routerkonsole im Browser anzeigen"
 
 #: ../java/strings/Strings.java:37
 msgid "shared clients (DSA)"
-msgstr ""
+msgstr "mehrere Klienten (DSA)"
 
 #: ../java/strings/Strings.java:38
 msgid "IRC proxy"
@@ -4951,11 +4951,11 @@ msgstr "Floodfill-Teilnahme hilft dem Netzwerk, kann aber die Systemressourcen s
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:442
 msgid "This router is currently a floodfill participant."
-msgstr ""
+msgstr "Dieser Router ist zur Zeit Teilnehmer am FloodFill Netz."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:446
 msgid "This router is not currently a floodfill participant."
-msgstr ""
+msgstr "Dieser Router ist zur Zeit kein Teilnehmer am FloodFill Netz."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:457
 msgid "Automatic"

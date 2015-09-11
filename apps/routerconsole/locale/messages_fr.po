@@ -25,9 +25,9 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-07-17 01:05+0000\n"
-"PO-Revision-Date: 2015-07-22 09:12+0000\n"
+"PO-Revision-Date: 2015-08-14 04:29+0000\n"
 "Last-Translator: Towinet\n"
-"Language-Team: French (http://www.transifex.com/projects/p/I2P/language/fr/)\n"
+"Language-Team: French (http://www.transifex.com/otf/I2P/language/fr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -3782,7 +3782,7 @@ msgstr "Intégration"
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:272
 msgid "is the peer banned, or unreachable, or failing tunnel tests?"
-msgstr "le pair est-il banni, injoignable, ou alors les tests de tunnels échouent ?"
+msgstr "le pair est-il banni, injoignable, ou alors les tests de tunnels échouent-ils ?"
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:272
 msgid "status"
@@ -6312,7 +6312,7 @@ msgstr "Contrôle de mises à jour"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:451
 msgid "News Updates"
-msgstr "Mises à jour des nouvelles"
+msgstr "Mises à jour des actualités"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:459
 msgid "Update In Progress"
@@ -6332,7 +6332,7 @@ msgstr "Méthode de mise à jour"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:487
 msgid "Fetch news through the eepProxy?"
-msgstr "Récupérer news à travers le eepProxy ?"
+msgstr "Récupérer les actualités à travers l'eepProxy ?"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:491
 msgid "Update through the eepProxy?"

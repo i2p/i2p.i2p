@@ -4,6 +4,7 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
 # Translators:
+# Anders Nilsson <locally@devode.se>, 2015
 # cacapo <handelsehorisont@gmail.com>, 2015
 # hottuna <i2p@robertfoss.se>, 2013
 # hottuna <i2p@robertfoss.se>, 2013
@@ -14,9 +15,9 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-07-13 21:46+0000\n"
-"PO-Revision-Date: 2015-04-09 17:47+0000\n"
-"Last-Translator: cacapo <handelsehorisont@gmail.com>\n"
-"Language-Team: Swedish (Sweden) (http://www.transifex.com/projects/p/I2P/language/sv_SE/)\n"
+"PO-Revision-Date: 2015-08-26 06:24+0000\n"
+"Last-Translator: Anders Nilsson <locally@devode.se>\n"
+"Language-Team: Swedish (Sweden) (http://www.transifex.com/otf/I2P/language/sv_SE/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -24,7 +25,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 msgid "Congratulations on getting I2P installed!"
-msgstr "Grattis för din I2P installation!"
+msgstr "Grattis till din I2P-installation!"
 
 msgid "Welcome to I2P!"
 msgstr "Välkommen till I2P!"

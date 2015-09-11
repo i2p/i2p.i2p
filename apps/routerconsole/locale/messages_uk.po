@@ -6,15 +6,16 @@
 # Translators:
 # naeto <a89393@rmqkr.net>, 2012
 # Anton Zub <azb.0x7dc@gmail.com>, 2014
-# Denis Blank <gribua@gmail.com>, 2011
-# Denis Blank <gribua@gmail.com>, 2011
-# Denis Blank <gribua@gmail.com>, 2011
+# Denis Lysenko <gribua@gmail.com>, 2011,2015
+# Denis Lysenko <gribua@gmail.com>, 2011
+# Denis Lysenko <gribua@gmail.com>, 2011
 # jonny_nut, 2014
 # jonny_nut, 2014
 # LinuxChata, 2014
 # LinuxChata, 2014
 # madjong <madjong@i2pmail.org>, 2015
 # madjong <madjong@i2pmail.org>, 2015
+# Maxym Mykhalchuk, 2015
 # naeto <a89393@rmqkr.net>, 2012
 # puxud <puxud@alivance.com>, 2014
 # puxud <puxud@alivance.com>, 2014
@@ -24,9 +25,9 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-07-17 01:05+0000\n"
-"PO-Revision-Date: 2015-07-17 01:31+0000\n"
-"Last-Translator: kytv <killyourtv@i2pmail.org>\n"
-"Language-Team: Ukrainian (Ukraine) (http://www.transifex.com/projects/p/I2P/language/uk_UA/)\n"
+"PO-Revision-Date: 2015-08-07 16:30+0000\n"
+"Last-Translator: Denis Lysenko <gribua@gmail.com>\n"
+"Language-Team: Ukrainian (Ukraine) (http://www.transifex.com/otf/I2P/language/uk_UA/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -102,9 +103,9 @@ msgstr[2] "{0} днів"
 #, java-format
 msgid "1 year"
 msgid_plural "{0} years"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "{0} рік"
+msgstr[1] "{0} роки"
+msgstr[2] "{0} років"
 
 #: ../../../core/java/src/net/i2p/data/DataHelper.java:1549
 #: ../../../core/java/src/net/i2p/data/DataHelper.java:1596
@@ -526,7 +527,7 @@ msgstr "Підключений"
 #: ../../../router/java/src/net/i2p/router/transport/ntcp/NTCPTransport.java:1358
 #: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2491
 msgid "Skew"
-msgstr "Нахил"
+msgstr "Відхилення"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:738
 msgid "The difference between the peer's clock and your own"
@@ -729,7 +730,7 @@ msgstr "{0} порт {1,number,#####} не пропущено через UPnP."
 #: ../../../router/java/src/net/i2p/router/transport/ntcp/EstablishState.java:877
 #, java-format
 msgid "Excessive clock skew: {0}"
-msgstr ""
+msgstr "Надмірне відхилення годинника: {0}"
 
 #: ../../../router/java/src/net/i2p/router/transport/ntcp/NTCPTransport.java:1344
 msgid "NTCP connections"
@@ -789,67 +790,67 @@ msgstr "Сортування по хешу вузла"
 
 #: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2477
 msgid "Direction/Introduction"
-msgstr ""
+msgstr "Напрямок/Введення"
 
 #: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2480
 msgid "Sort by idle inbound"
-msgstr "Порядком за вхідню бездіяльність"
+msgstr "Сортувати за простоєм на вході"
 
 #: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2482
 msgid "Sort by idle outbound"
-msgstr "Порядком за вихідню бездіяльність"
+msgstr "Сортувати за простоєм на виході"
 
 #: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2485
 msgid "Sort by inbound rate"
-msgstr "Порядком за вхідну ставку"
+msgstr "Сортувати за швидкістю на вході"
 
 #: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2487
 msgid "Sort by outbound rate"
-msgstr "Порядком за вихідну ставку"
+msgstr "Сортувати за швидкістю на виході"
 
 #: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2490
 msgid "Sort by connection uptime"
-msgstr "Порядком за тривалість зв'язку"
+msgstr "Сортувати за тривалістю роботи"
 
 #: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2492
 msgid "Sort by clock skew"
-msgstr "Порядком за нахилом такту"
+msgstr "Сортувати за відхиленням годинника"
 
 #: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2495
 msgid "Sort by congestion window"
-msgstr ""
+msgstr "Сортувати за вікном затору"
 
 #: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2497
 msgid "Sort by slow start threshold"
-msgstr ""
+msgstr "Сортувати за порогом повільного старту"
 
 #: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2500
 msgid "Sort by round trip time"
-msgstr ""
+msgstr "Сортувати за часом проходження сигналу туди і назад"
 
 #: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2504
 msgid "Sort by retransmission timeout"
-msgstr ""
+msgstr "Сортувати за таймаутом ретрансляції"
 
 #: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2507
 msgid "Sort by outbound maximum transmit unit"
-msgstr ""
+msgstr "Сортувати за максимальною одиницею передачі на виході"
 
 #: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2509
 msgid "Sort by packets sent"
-msgstr ""
+msgstr "Сортувати за кількістю переданих пакетів"
 
 #: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2511
 msgid "Sort by packets received"
-msgstr ""
+msgstr "Сортувати за кількістю отриманих пакетів"
 
 #: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2514
 msgid "Sort by packets retransmitted"
-msgstr ""
+msgstr "Сортувати за кількістю ретрансльованих пакетів"
 
 #: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2516
 msgid "Sort by packets received more than once"
-msgstr ""
+msgstr "Сортувати за кількістю отриманих пакетів отриманих декілька разів"
 
 #: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2536
 msgid "We offered to introduce them"
@@ -861,7 +862,7 @@ msgstr "Вони пропонують представити нас"
 
 #: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2542
 msgid "Choked"
-msgstr ""
+msgstr "Давка"
 
 #: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2550
 msgid "1 fail"
@@ -877,7 +878,7 @@ msgstr "{0} збоїв"
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:166
 #: ../java/src/net/i2p/router/web/ProfilesHelper.java:13
 msgid "Banned"
-msgstr "Забороненo"
+msgstr "Забанений"
 
 #: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2617
 msgid "backlogged"
@@ -885,11 +886,11 @@ msgstr "перевантажений"
 
 #: ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java:250
 msgid "Dropping tunnel requests: Too slow"
-msgstr "Відхиляю запити на тунелі: надто повільно працює"
+msgstr "Відхиляю запити на тунелі: занадто повільна обробка запитів"
 
 #: ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java:260
 msgid "Dropping tunnel requests: High job lag"
-msgstr ""
+msgstr "Відхиляю запити на тунелі: велике відставання обробки запитів"
 
 #. don't even bother, since we are so overloaded locally
 #: ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java:451
@@ -898,15 +899,15 @@ msgstr "Відхиляю запити на тунелі: перевантаже�
 
 #: ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java:693
 msgid "Rejecting tunnels: Hidden mode"
-msgstr "Видхилення тунелів: прихований режим"
+msgstr "Не приймаємо тунелі: прихований режим"
 
 #: ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java:721
 msgid "Rejecting tunnels: Request overload"
-msgstr "Видхилення тунелів: забагато запитів"
+msgstr "Не приймаємо тунелі: забагато запитів"
 
 #: ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java:752
 msgid "Rejecting tunnels: Connection limit"
-msgstr "Відхиляю тунелі: обмеження кількості з’єднань"
+msgstr "Не приймаємо тунелі: досягнутий ліміт кількості з'єднань"
 
 #: ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java:964
 #: ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java:997
@@ -915,7 +916,7 @@ msgstr "Відхиляю запити на тунелі: високе наван
 
 #: ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java:1076
 msgid "Dropping tunnel requests: Queue time"
-msgstr ""
+msgstr "Відхиляю запити на тунелі: завеликий час у черзі"
 
 #: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:884
 #, java-format
@@ -974,7 +975,7 @@ msgstr "з {0}"
 #: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1396
 #, java-format
 msgid "Unsigned update file from {0} is corrupt"
-msgstr ""
+msgstr "Непідписане оновлення з {0} пошкоджено"
 
 #: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1425
 #, java-format
@@ -1207,7 +1208,7 @@ msgstr "Нової версії на {0} не знайдено"
 
 #: ../java/src/net/i2p/router/web/BanlistRenderer.java:65
 msgid "Permanently banned"
-msgstr ""
+msgstr "Забанений назавжди"
 
 #: ../java/src/net/i2p/router/web/BanlistRenderer.java:67
 #, java-format
@@ -1217,7 +1218,7 @@ msgstr "Тимчасовий бан завершується через {0}"
 #: ../java/src/net/i2p/router/web/BanlistRenderer.java:69
 #, java-format
 msgid "Banned until restart or in {0}"
-msgstr ""
+msgstr "Забанений до перезапуску або до {0}"
 
 #: ../java/src/net/i2p/router/web/BanlistRenderer.java:82
 msgid "unban now"
@@ -1401,7 +1402,7 @@ msgstr "Зупинено плагін {0}"
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:180
 #, java-format
 msgid "Stopped webapp {0}"
-msgstr ""
+msgstr "Зупинено веб-додаток {0}"
 
 #. label (IE)
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:209
@@ -1449,11 +1450,11 @@ msgstr "Конфігурацію плагіна збережено"
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:387
 #: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:202
 msgid "WebApp"
-msgstr "WebApp"
+msgstr "Web-додаток"
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:387
 msgid "started"
-msgstr "почато"
+msgstr "запущено"
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:389
 msgid "Failed to start"
@@ -1461,7 +1462,7 @@ msgstr "Помилка запуску"
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:394
 msgid "Failed to find server."
-msgstr "Провал пошуку за сервер"
+msgstr "Не вдалося знайти сервер."
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:400
 msgid "No plugin URL specified."
@@ -1484,7 +1485,7 @@ msgstr "Не вказано URL оновлення для {0}"
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:488
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:512
 msgid "Plugin or update download already in progress."
-msgstr ""
+msgstr "Плагін або оновлення вже завантажується."
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:493
 msgid "Updating all plugins"
@@ -2047,7 +2048,7 @@ msgstr "Забанити пір до наступного запуску"
 #: ../java/src/net/i2p/router/web/ConfigPeerHandler.java:23
 #, java-format
 msgid "Manually banned via {0}"
-msgstr ""
+msgstr "Заблоковані вручну задопомогою {0}"
 
 #: ../java/src/net/i2p/router/web/ConfigPeerHandler.java:24
 msgid "banned until restart"
@@ -2210,12 +2211,12 @@ msgstr "М’яка зупинка"
 
 #: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:203
 msgid "Graceful shutdown initiated"
-msgstr ""
+msgstr "Запущена м'яка зупинка"
 
 #: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:209
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:477
 msgid "Cancel graceful shutdown"
-msgstr ""
+msgstr "М'яка зупинка відмінена"
 
 #: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:211
 msgid "Graceful shutdown cancelled"
@@ -2228,12 +2229,12 @@ msgstr "М’який перезапуск"
 
 #: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:217
 msgid "Graceful restart requested"
-msgstr ""
+msgstr "Запитаний м'який перезапуск "
 
 #: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:218
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:493
 msgid "Hard restart"
-msgstr ""
+msgstr "Жорсткий перезапуск"
 
 #: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:223
 msgid "Hard restart requested"
@@ -4212,7 +4213,7 @@ msgstr ""
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:150
 #, java-format
 msgid "ERR-Clock Skew of {0}"
-msgstr ""
+msgstr "ПОМИЛКА-Відхилення годинника {0}"
 
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:170
 msgid "ERR-Unresolved TCP Address"
@@ -5716,13 +5717,13 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:760
 msgid "ERR - Clock Skew"
-msgstr ""
+msgstr "ПОМИЛКА - Відхилення годинника"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:762
 msgid ""
 "Your system's clock is skewed, which will make it difficult to participate "
 "in the network."
-msgstr ""
+msgstr "Ваш системний годинник занадто відхилився, вам буде важко приймати участь у мережі."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:764
 msgid "Correct your clock setting if this error persists."

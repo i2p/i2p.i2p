@@ -6,7 +6,8 @@
 # Translators:
 # a1678991 <nfgantanku@yahoo.co.jp>, 2015
 # g3600303 <g3600303@trbvm.com>, 2015
-# タカハシ <gomidori@live.jp>, 2013-2014
+# タカハシ <indexial@outlook.jp>, 2013-2014
+# タカハシ <indexial@outlook.jp>, 2015
 # luixxiul, 2013
 # rafe <rafe.kun@gmail.com>, 2015
 # rafe <rafe.kun@gmail.com>, 2015
@@ -17,9 +18,9 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-07-17 01:05+0000\n"
-"PO-Revision-Date: 2015-07-17 01:31+0000\n"
-"Last-Translator: kytv <killyourtv@i2pmail.org>\n"
-"Language-Team: Japanese (http://www.transifex.com/projects/p/I2P/language/ja/)\n"
+"PO-Revision-Date: 2015-08-31 09:17+0000\n"
+"Last-Translator: タカハシ <indexial@outlook.jp>\n"
+"Language-Team: Japanese (http://www.transifex.com/otf/I2P/language/ja/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -85,7 +86,7 @@ msgstr[0] "{0} 日"
 #, java-format
 msgid "1 year"
 msgid_plural "{0} years"
-msgstr[0] ""
+msgstr[0] "{0} 年"
 
 #: ../../../core/java/src/net/i2p/data/DataHelper.java:1549
 #: ../../../core/java/src/net/i2p/data/DataHelper.java:1596
@@ -97,13 +98,13 @@ msgstr "n/a"
 #, java-format
 msgid "1 ns"
 msgid_plural "{0,number,###} ns"
-msgstr[0] ""
+msgstr[0] "{0,number,###} ns"
 
 #: ../../../core/java/src/net/i2p/data/DataHelper.java:1580
 #, java-format
 msgid "1 μs"
 msgid_plural "{0,number,###} μs"
-msgstr[0] ""
+msgstr[0] "{0,number,###} μs"
 
 #: ../../../router/java/src/net/i2p/router/Blocklist.java:201
 #, java-format
@@ -154,40 +155,40 @@ msgstr "OK"
 
 #: ../../../router/java/src/net/i2p/router/CommSystemFacade.java:312
 msgid "IPv4: OK; IPv6: Testing"
-msgstr ""
+msgstr "IPv4: OK; IPv6: テスト中"
 
 #: ../../../router/java/src/net/i2p/router/CommSystemFacade.java:313
 msgid "IPv4: OK; IPv6: Firewalled"
-msgstr ""
+msgstr "IPv4: OK; IPv6: ファイアーウォール有効"
 
 #: ../../../router/java/src/net/i2p/router/CommSystemFacade.java:314
 msgid "IPv4: Testing; IPv6: OK"
-msgstr ""
+msgstr "IPv4: テスト中; IPv6: OK"
 
 #: ../../../router/java/src/net/i2p/router/CommSystemFacade.java:315
 msgid "IPv4: Firewalled; IPv6: OK"
-msgstr ""
+msgstr "IPv4: ファイアーウォール有効; IPv6: OK"
 
 #: ../../../router/java/src/net/i2p/router/CommSystemFacade.java:316
 msgid "IPv4: Disabled; IPv6: OK"
-msgstr ""
+msgstr "IPv4: 無効; IPv6: OK"
 
 #: ../../../router/java/src/net/i2p/router/CommSystemFacade.java:317
 msgid "IPv4: Symmetric NAT; IPv6: OK"
-msgstr ""
+msgstr "IPv4: 対称型NAT; IPv6: OK"
 
 #. * IPv4 symmetric NAT, IPv6 firewalled or disabled or no address
 #: ../../../router/java/src/net/i2p/router/CommSystemFacade.java:319
 msgid "Symmetric NAT"
-msgstr ""
+msgstr "対称型NAT"
 
 #: ../../../router/java/src/net/i2p/router/CommSystemFacade.java:320
 msgid "IPv4: Symmetric NAT; IPv6: Testing"
-msgstr ""
+msgstr "IPv4: 対称型NAT; IPv6: テスト中"
 
 #: ../../../router/java/src/net/i2p/router/CommSystemFacade.java:321
 msgid "IPv4: Firewalled; IPv6: Testing"
-msgstr ""
+msgstr "IPv4: ファイアーウォール有効; IPv6: テスト中"
 
 #. * IPv4 firewalled, IPv6 firewalled or disabled or no address
 #: ../../../router/java/src/net/i2p/router/CommSystemFacade.java:323
@@ -197,23 +198,23 @@ msgstr "警告-ファイアーウォールされ、高速"
 
 #: ../../../router/java/src/net/i2p/router/CommSystemFacade.java:324
 msgid "IPv4: Testing; IPv6: Firewalled"
-msgstr ""
+msgstr "IPv4: テスト中; IPv6: ファイアーウォール有効"
 
 #: ../../../router/java/src/net/i2p/router/CommSystemFacade.java:325
 msgid "IPv4: Disabled; IPv6: Testing"
-msgstr ""
+msgstr "IPv4: 無効; IPv6: テスト中"
 
 #: ../../../router/java/src/net/i2p/router/CommSystemFacade.java:326
 msgid "IPv4: Disabled; IPv6: Firewalled"
-msgstr ""
+msgstr "IPv4: 無効; IPv6: ファイアーウォール有効"
 
 #: ../../../router/java/src/net/i2p/router/CommSystemFacade.java:327
 msgid "Disconnected"
-msgstr ""
+msgstr "切断"
 
 #: ../../../router/java/src/net/i2p/router/CommSystemFacade.java:328
 msgid "Port Conflict"
-msgstr ""
+msgstr "ポート競合"
 
 #: ../../../router/java/src/net/i2p/router/CommSystemFacade.java:329
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:155
@@ -283,7 +284,7 @@ msgstr "トンネルを拒否中"
 #: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:212
 #, java-format
 msgid "Reseeding: got router info from file ({0} successful, {1} errors)."
-msgstr ""
+msgstr "再シード中: ファイルからルータ情報を取得 ({0} 成功, {1} 個エラー)。"
 
 #: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:284
 #: ../java/src/net/i2p/router/web/ConfigNavHelper.java:28
@@ -351,11 +352,11 @@ msgstr "既知の高速なピア"
 
 #: ../../../router/java/src/net/i2p/router/tasks/CoalesceStatsEvent.java:41
 msgid "Known integrated (floodfill) peers"
-msgstr ""
+msgstr "基地の統合された (floodfill) ピア"
 
 #: ../../../router/java/src/net/i2p/router/tasks/CoalesceStatsEvent.java:42
 msgid "Size of tunnel acceptor backlog"
-msgstr ""
+msgstr "トンネル受け入れバックログのサイズ"
 
 #: ../../../router/java/src/net/i2p/router/transport/CommSystemFacadeImpl.java:502
 msgid "NetDb entry"
@@ -373,7 +374,7 @@ msgstr "サポートされていない署名形式です"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:618
 msgid "No support for our signature type"
-msgstr ""
+msgstr "署名タイプに非対応"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:622
 msgid "Unreachable on any transport"
@@ -862,7 +863,7 @@ msgstr "トンネル要求ドロップ: 遅すぎます"
 
 #: ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java:260
 msgid "Dropping tunnel requests: High job lag"
-msgstr ""
+msgstr "トンネルリクエストを中断: 高いジョブラグ"
 
 #. don't even bother, since we are so overloaded locally
 #: ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java:451
@@ -871,7 +872,7 @@ msgstr "トンネル要求ドロップ: 過負荷"
 
 #: ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java:693
 msgid "Rejecting tunnels: Hidden mode"
-msgstr ""
+msgstr "トンネルを拒否: Hidden モード"
 
 #: ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java:721
 msgid "Rejecting tunnels: Request overload"
@@ -913,7 +914,7 @@ msgstr "{0}B 転送"
 #: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1051
 #, java-format
 msgid "Install failed from {0}"
-msgstr ""
+msgstr "{0} からのインストールに失敗"
 
 #: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1053
 #: ../java/src/net/i2p/router/update/UpdateRunner.java:298
@@ -965,7 +966,7 @@ msgstr "{0} へのコピーに失敗"
 #: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:177
 #: ../java/src/net/i2p/router/web/PluginStarter.java:157
 msgid "HTTP client proxy tunnel must be running"
-msgstr ""
+msgstr "HTTPクライアントプロキシトンネルが起動している必要があります"
 
 #. set status before thread to ensure UI feedback
 #: ../java/src/net/i2p/router/update/DevSU3UpdateHandler.java:91
@@ -1180,7 +1181,7 @@ msgstr "{0} に新しいバージョンが見つかりませんでした"
 
 #: ../java/src/net/i2p/router/web/BanlistRenderer.java:65
 msgid "Permanently banned"
-msgstr ""
+msgstr "永久的に禁止されました"
 
 #: ../java/src/net/i2p/router/web/BanlistRenderer.java:67
 #, java-format
@@ -1343,7 +1344,7 @@ msgstr "プラグインをインストール"
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:77
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:639
 msgid "Install Plugin from File"
-msgstr ""
+msgstr "ファイルからプラグインをインストール"
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:86
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:650
@@ -1443,11 +1444,11 @@ msgstr "プラグインURLが指定されていません。"
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:421
 #: ../java/src/net/i2p/router/web/ConfigReseedHandler.java:79
 msgid "You must enter a file"
-msgstr ""
+msgstr "ファイルを入力する必要があります"
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:464
 msgid "Install from file failed"
-msgstr ""
+msgstr "ファイルからのインストール失敗"
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:479
 #, java-format
@@ -1466,7 +1467,7 @@ msgstr "全てのプラグインをアップデート中"
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:528
 #, java-format
 msgid "Installing plugin from {0}"
-msgstr ""
+msgstr "{0} からプラグインをインストール中"
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:549
 #, java-format
@@ -1963,11 +1964,11 @@ msgstr "ラップトップモードを無効化中"
 
 #: ../java/src/net/i2p/router/web/ConfigNetHandler.java:359
 msgid "Disabling inbound IPv4"
-msgstr ""
+msgstr "着信 IPv4を無効化中"
 
 #: ../java/src/net/i2p/router/web/ConfigNetHandler.java:361
 msgid "Enabling inbound IPv4"
-msgstr ""
+msgstr "着信 IPv4を有効化中"
 
 #: ../java/src/net/i2p/router/web/ConfigNetHandler.java:369
 msgid "Disabling UDP"
@@ -2080,35 +2081,35 @@ msgstr "リシードプロセスを開始"
 #: ../java/src/net/i2p/router/web/ConfigReseedHandler.java:32
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:491
 msgid "Reseed from URL"
-msgstr ""
+msgstr "URLからリシード"
 
 #: ../java/src/net/i2p/router/web/ConfigReseedHandler.java:37
 msgid "You must enter a URL"
-msgstr ""
+msgstr "URLを入力する必要があります"
 
 #: ../java/src/net/i2p/router/web/ConfigReseedHandler.java:66
 msgid "Reseed in progress, check summary bar for status"
-msgstr ""
+msgstr "リシード進行中、ステータスの概要バーをチェックしてください。"
 
 #: ../java/src/net/i2p/router/web/ConfigReseedHandler.java:68
 msgid "Reseed complete, check summary bar for status"
-msgstr ""
+msgstr "リシード完了、ステータスの概要バーをチェックしてください"
 
 #: ../java/src/net/i2p/router/web/ConfigReseedHandler.java:74
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:503
 msgid "Reseed from file"
-msgstr ""
+msgstr "ファイルからリシード"
 
 #: ../java/src/net/i2p/router/web/ConfigReseedHandler.java:84
 #: ../java/src/net/i2p/router/web/ConfigReseedHandler.java:91
 msgid "Reseed from file failed"
-msgstr ""
+msgstr "ファイルからのリシード失敗"
 
 #: ../java/src/net/i2p/router/web/ConfigReseedHandler.java:86
 #, java-format
 msgid "Reseed successful, loaded {0} router info from file"
 msgid_plural "Reseed successful, loaded {0} router infos from file"
-msgstr[0] ""
+msgstr[0] "リシード成功、ファイルから {0} 件のルータ情報を読み込みました"
 
 #: ../java/src/net/i2p/router/web/ConfigReseedHandler.java:149
 msgid "Configuration saved successfully."
@@ -2487,11 +2488,11 @@ msgstr "ユーザー {0} を削除しました"
 
 #: ../java/src/net/i2p/router/web/ConfigUIHelper.java:25
 msgid "Set theme universally across all apps"
-msgstr ""
+msgstr "全アプリにテーマを設定"
 
 #: ../java/src/net/i2p/router/web/ConfigUIHelper.java:37
 msgid "Force the mobile console to be used"
-msgstr ""
+msgstr "モバイルコンソールの使用を強制する"
 
 #: ../java/src/net/i2p/router/web/ConfigUIHelper.java:76
 msgid "Arabic"
@@ -2499,7 +2500,7 @@ msgstr "アラビア語"
 
 #: ../java/src/net/i2p/router/web/ConfigUIHelper.java:77
 msgid "Czech"
-msgstr ""
+msgstr "チェコ語"
 
 #: ../java/src/net/i2p/router/web/ConfigUIHelper.java:78
 msgid "Danish"
@@ -2515,7 +2516,7 @@ msgstr "エストニア語"
 
 #: ../java/src/net/i2p/router/web/ConfigUIHelper.java:81
 msgid "Greek"
-msgstr ""
+msgstr "ギリシャ語"
 
 #: ../java/src/net/i2p/router/web/ConfigUIHelper.java:82
 msgid "English"
@@ -2547,7 +2548,7 @@ msgstr "日本語"
 
 #: ../java/src/net/i2p/router/web/ConfigUIHelper.java:89
 msgid "Malagasy"
-msgstr ""
+msgstr "マラガシ語"
 
 #: ../java/src/net/i2p/router/web/ConfigUIHelper.java:90
 msgid "Dutch"
@@ -2576,7 +2577,7 @@ msgstr "ロシア語"
 
 #: ../java/src/net/i2p/router/web/ConfigUIHelper.java:97
 msgid "Slovak"
-msgstr ""
+msgstr "スロバキア語"
 
 #: ../java/src/net/i2p/router/web/ConfigUIHelper.java:98
 msgid "Swedish"
@@ -2636,7 +2637,7 @@ msgstr "利用可能なアップデートなし"
 #: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:216
 #, java-format
 msgid "Updating news URL to {0}"
-msgstr ""
+msgstr "ニュース URL を  {0} に更新中"
 
 #: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:223
 #: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:231
@@ -2648,28 +2649,28 @@ msgstr "内部"
 #: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:227
 #, java-format
 msgid "Updating proxy host to {0}"
-msgstr ""
+msgstr "プロキシホストを {0} に更新中"
 
 #: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:235
 #, java-format
 msgid "Updating proxy port to {0}"
-msgstr ""
+msgstr "プロキシのポートを {0} に更新中"
 
 #: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:251
 #, java-format
 msgid "Updating refresh frequency to {0}"
-msgstr ""
+msgstr "更新頻度を {0} に更新中"
 
 #: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:252
 #: ../java/src/net/i2p/router/web/ConfigUpdateHelper.java:130
 #: ../java/src/net/i2p/router/web/GraphHelper.java:377
 msgid "Never"
-msgstr ""
+msgstr "二度としない"
 
 #: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:259
 #, java-format
 msgid "Updating update policy to {0}"
-msgstr ""
+msgstr "アップデート設定を {0} に更新中"
 
 #: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:268
 msgid "Updating update URLs."
@@ -2682,12 +2683,12 @@ msgstr "信頼されているキーを更新中。"
 #: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:292
 #, java-format
 msgid "Updating unsigned update URL to {0}"
-msgstr ""
+msgstr "未署名の更新 URL を {0} に更新中"
 
 #: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:304
 #, java-format
 msgid "Updating signed development build URL to {0}"
-msgstr ""
+msgstr "署名された開発ビルドの URL を{0} に更新中"
 
 #: ../java/src/net/i2p/router/web/ConfigUpdateHelper.java:132
 msgid "Every"
@@ -2711,7 +2712,7 @@ msgstr "実行を中止しました"
 
 #: ../java/src/net/i2p/router/web/EventLogHelper.java:35
 msgid "Enabled floodfill"
-msgstr ""
+msgstr "floodfill を有効化"
 
 #: ../java/src/net/i2p/router/web/EventLogHelper.java:36
 msgid "Changed IP"
@@ -2723,7 +2724,7 @@ msgstr "ポートが変更されました"
 
 #: ../java/src/net/i2p/router/web/EventLogHelper.java:38
 msgid "Clock shifted"
-msgstr ""
+msgstr "クロックがシフトされました"
 
 #: ../java/src/net/i2p/router/web/EventLogHelper.java:39
 msgid "Crashed"
@@ -2752,7 +2753,7 @@ msgstr "新しいルーターidentity"
 
 #: ../java/src/net/i2p/router/web/EventLogHelper.java:45
 msgid "Disabled floodfill"
-msgstr ""
+msgstr "floodfill が無効になりました"
 
 #: ../java/src/net/i2p/router/web/EventLogHelper.java:46
 msgid "Out of memory error"
@@ -2760,11 +2761,11 @@ msgstr "エラー：メモリ不足"
 
 #: ../java/src/net/i2p/router/web/EventLogHelper.java:47
 msgid "Reachability change"
-msgstr ""
+msgstr "到達可能性の変更"
 
 #: ../java/src/net/i2p/router/web/EventLogHelper.java:49
 msgid "Reseeded router"
-msgstr ""
+msgstr "ルーターをリシードしました"
 
 #: ../java/src/net/i2p/router/web/EventLogHelper.java:50
 msgid "Soft restart"
@@ -2792,7 +2793,7 @@ msgstr "イベント表示"
 
 #: ../java/src/net/i2p/router/web/EventLogHelper.java:106
 msgid "Events since"
-msgstr ""
+msgstr "以降のイベント"
 
 #: ../java/src/net/i2p/router/web/EventLogHelper.java:111
 msgid "Event type"
@@ -2814,17 +2815,17 @@ msgstr "イベントはありません"
 #: ../java/src/net/i2p/router/web/EventLogHelper.java:171
 #, java-format
 msgid "No events found in previous {0}"
-msgstr ""
+msgstr "過去 {0} にイベントはありませんでした"
 
 #: ../java/src/net/i2p/router/web/EventLogHelper.java:174
 #, java-format
 msgid "No \"{0}\" events found"
-msgstr ""
+msgstr "\"{0} イベントはありませんでした"
 
 #: ../java/src/net/i2p/router/web/EventLogHelper.java:175
 #, java-format
 msgid "No \"{0}\" events found in previous {1}"
-msgstr ""
+msgstr "\"{0}\" イベントは過去 {1} にありませんでした"
 
 #: ../java/src/net/i2p/router/web/EventLogHelper.java:179
 #: ../java/src/net/i2p/router/web/JobQueueHelper.java:143
@@ -2849,7 +2850,7 @@ msgstr "無効なフォームからの送信、おそらくブラウザで「戻
 msgid ""
 "If the problem persists, verify that you have cookies enabled in your "
 "browser."
-msgstr ""
+msgstr "問題が続く場合、クッキーがブラウザで有効になっているか確認してください。"
 
 #: ../java/src/net/i2p/router/web/GraphHelper.java:162
 msgid "Combined bandwidth graph"
@@ -2860,7 +2861,7 @@ msgstr "複合帯域幅グラフ"
 #: ../java/src/net/i2p/router/web/GraphHelper.java:236
 #, java-format
 msgid "{0} for {1}"
-msgstr ""
+msgstr "{1} 間 {0}"
 
 #: ../java/src/net/i2p/router/web/GraphHelper.java:223
 #: ../java/src/net/i2p/router/web/StatSummarizer.java:332
@@ -2870,7 +2871,7 @@ msgstr "帯域幅使用率"
 #: ../java/src/net/i2p/router/web/GraphHelper.java:238
 #, java-format
 msgid "ending {0} ago"
-msgstr ""
+msgstr "{0} 前に終了"
 
 #: ../java/src/net/i2p/router/web/GraphHelper.java:253
 msgid "Larger"
@@ -2898,19 +2899,19 @@ msgstr "より遅い"
 
 #: ../java/src/net/i2p/router/web/GraphHelper.java:290
 msgid "Larger interval"
-msgstr ""
+msgstr "インターバルを大きく"
 
 #: ../java/src/net/i2p/router/web/GraphHelper.java:296
 msgid "Smaller interval"
-msgstr ""
+msgstr "インターバルを小さく"
 
 #: ../java/src/net/i2p/router/web/GraphHelper.java:303
 msgid "Previous interval"
-msgstr ""
+msgstr "過去のインターバル"
 
 #: ../java/src/net/i2p/router/web/GraphHelper.java:314
 msgid "Next interval"
-msgstr ""
+msgstr "次のインターバル"
 
 #: ../java/src/net/i2p/router/web/GraphHelper.java:321
 #: ../java/src/net/i2p/router/web/GraphHelper.java:361
@@ -2924,7 +2925,7 @@ msgstr "イベントを図示"
 
 #: ../java/src/net/i2p/router/web/GraphHelper.java:324
 msgid "All times are UTC."
-msgstr ""
+msgstr "時間はすべて UTC です。"
 
 #: ../java/src/net/i2p/router/web/GraphHelper.java:356
 msgid "Configure Graph Display"
@@ -2966,11 +2967,11 @@ msgstr "更新遅延"
 
 #: ../java/src/net/i2p/router/web/GraphHelper.java:381
 msgid "Store graph data on disk?"
-msgstr ""
+msgstr "ディスク上にグラフデータを保存しますか？"
 
 #: ../java/src/net/i2p/router/web/GraphHelper.java:387
 msgid "Save settings and redraw graphs"
-msgstr ""
+msgstr "設定を保温してグラフを再描画する"
 
 #: ../java/src/net/i2p/router/web/GraphHelper.java:443
 msgid "Graph settings saved"
@@ -3088,7 +3089,7 @@ msgstr "FAQ"
 
 #: ../java/src/net/i2p/router/web/HomeHelper.java:47
 msgid "Frequently Asked Questions"
-msgstr ""
+msgstr "よくある質問"
 
 #: ../java/src/net/i2p/router/web/HomeHelper.java:48
 msgid "Community forum"
@@ -3102,7 +3103,7 @@ msgstr "フォーラム"
 msgid ""
 "A public anonymous Git hosting site - supports pulling via Git and HTTP and "
 "pushing via SSH"
-msgstr ""
+msgstr "公開匿名 Git ホスティングサイト - Git および HTTP を通じた pull とSSH を通じた push をサポートします"
 
 #: ../java/src/net/i2p/router/web/HomeHelper.java:49
 msgid "Anonymous Git Hosting"
@@ -3110,7 +3111,7 @@ msgstr "Anonymous Git Hosting"
 
 #: ../java/src/net/i2p/router/web/HomeHelper.java:50
 msgid "HiddenGate"
-msgstr ""
+msgstr "HiddenGate"
 
 #: ../java/src/net/i2p/router/web/HomeHelper.java:51
 msgid "Microblog"
@@ -3118,7 +3119,7 @@ msgstr "マイクロブログ"
 
 #: ../java/src/net/i2p/router/web/HomeHelper.java:51
 msgid "Your premier microblogging service on I2P"
-msgstr ""
+msgstr "I2P で最もよく使う短文投稿サービス"
 
 #: ../java/src/net/i2p/router/web/HomeHelper.java:52
 msgid "Javadocs"
@@ -3135,7 +3136,7 @@ msgstr "技術仕様"
 #. + I + "education.png" + S +
 #: ../java/src/net/i2p/router/web/HomeHelper.java:55
 msgid "Debian and Tahoe-LAFS repositories"
-msgstr ""
+msgstr "Debian と Tahoe-LAFS のレポジトリ"
 
 #: ../java/src/net/i2p/router/web/HomeHelper.java:56
 msgid "Free Web Hosting"
@@ -3189,19 +3190,19 @@ msgstr "技術仕様"
 
 #: ../java/src/net/i2p/router/web/HomeHelper.java:65
 msgid "Trac Wiki"
-msgstr ""
+msgstr "Trac Wiki"
 
 #: ../java/src/net/i2p/router/web/HomeHelper.java:66
 msgid "Ugha's Wiki"
-msgstr ""
+msgstr "Ugha's Wiki"
 
 #: ../java/src/net/i2p/router/web/HomeHelper.java:67
 msgid "Seedless and the Robert BitTorrent applications"
-msgstr ""
+msgstr "Seedless および Robert BitTorrent アプリケーション"
 
 #: ../java/src/net/i2p/router/web/HomeHelper.java:67
 msgid "Sponge's main site"
-msgstr ""
+msgstr "Sponge のメインサイト"
 
 #: ../java/src/net/i2p/router/web/HomeHelper.java:108
 msgid "The HTTP proxy is not up"
@@ -3210,7 +3211,7 @@ msgstr "HTTPプロキシは起動していません"
 #: ../java/src/net/i2p/router/web/HomeHelper.java:110
 #, java-format
 msgid "Your browser is not properly configured to use the HTTP proxy at {0}"
-msgstr ""
+msgstr "あなたのブラウザは {0} で HTTP プロキシを使用するように正しく設定されていません"
 
 #: ../java/src/net/i2p/router/web/HomeHelper.java:210
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:906
@@ -3223,11 +3224,11 @@ msgstr "URL"
 
 #: ../java/src/net/i2p/router/web/JobQueueHelper.java:50
 msgid "I2P Job Queue"
-msgstr ""
+msgstr "I2P ジョブキュー"
 
 #: ../java/src/net/i2p/router/web/JobQueueHelper.java:51
 msgid "Job runners"
-msgstr ""
+msgstr "有効なジョブ"
 
 #: ../java/src/net/i2p/router/web/JobQueueHelper.java:56
 msgid "Active jobs"
@@ -3236,30 +3237,30 @@ msgstr "有効なジョブ"
 #: ../java/src/net/i2p/router/web/JobQueueHelper.java:59
 #, java-format
 msgid "started {0} ago"
-msgstr ""
+msgstr "{0} 前に開始"
 
 #: ../java/src/net/i2p/router/web/JobQueueHelper.java:64
 msgid "Just finished jobs"
-msgstr ""
+msgstr "たった今ジョブが終了しました"
 
 #: ../java/src/net/i2p/router/web/JobQueueHelper.java:67
 #, java-format
 msgid "finished {0} ago"
-msgstr ""
+msgstr "{0} 前に終了"
 
 #: ../java/src/net/i2p/router/web/JobQueueHelper.java:72
 msgid "Ready/waiting jobs"
-msgstr ""
+msgstr "準備完了/待機中のジョブ"
 
 #: ../java/src/net/i2p/router/web/JobQueueHelper.java:89
 msgid "Scheduled jobs"
-msgstr ""
+msgstr "スケジュールされたジョブ"
 
 #. translators: {0} is a job name, {1} is a time, e.g. 6 min
 #: ../java/src/net/i2p/router/web/JobQueueHelper.java:99
 #, java-format
 msgid "{0} will start in {1}"
-msgstr ""
+msgstr "{0} は {1} 後に開始します"
 
 #: ../java/src/net/i2p/router/web/JobQueueHelper.java:113
 msgid "Total Job Statistics"
@@ -3268,7 +3269,7 @@ msgstr "合計ジョブ統計"
 #: ../java/src/net/i2p/router/web/JobQueueHelper.java:124
 #: ../java/src/net/i2p/router/web/JobQueueHelper.java:141
 msgid "Job"
-msgstr ""
+msgstr "ジョブ"
 
 #: ../java/src/net/i2p/router/web/JobQueueHelper.java:124
 msgid "Queued"
@@ -3276,11 +3277,11 @@ msgstr "キュー"
 
 #: ../java/src/net/i2p/router/web/JobQueueHelper.java:141
 msgid "Runs"
-msgstr ""
+msgstr "有効"
 
 #: ../java/src/net/i2p/router/web/JobQueueHelper.java:142
 msgid "Dropped"
-msgstr ""
+msgstr "中断"
 
 #: ../java/src/net/i2p/router/web/JobQueueHelper.java:143
 #: ../java/src/net/i2p/router/web/JobQueueHelper.java:145
@@ -3304,7 +3305,7 @@ msgstr "保留中"
 #: ../java/src/net/i2p/router/web/JobQueueHelper.java:197
 #: ../java/src/net/i2p/router/web/NetDbHelper.java:16
 msgid "Summary"
-msgstr ""
+msgstr "概要"
 
 #: ../java/src/net/i2p/router/web/LogsHelper.java:49
 #: ../java/src/net/i2p/router/web/LogsHelper.java:103
@@ -3322,22 +3323,22 @@ msgstr "ログメッセージなし"
 #. 0
 #: ../java/src/net/i2p/router/web/NetDbHelper.java:17
 msgid "Local Router"
-msgstr ""
+msgstr "ローカルルーター"
 
 #. 1
 #: ../java/src/net/i2p/router/web/NetDbHelper.java:18
 msgid "Router Lookup"
-msgstr ""
+msgstr "ルーター調査"
 
 #. 2
 #: ../java/src/net/i2p/router/web/NetDbHelper.java:19
 msgid "All Routers"
-msgstr ""
+msgstr "すべてのルーター"
 
 #. 3
 #: ../java/src/net/i2p/router/web/NetDbHelper.java:20
 msgid "All Routers with Full Stats"
-msgstr ""
+msgstr "すべてのルーター（全ステータス）"
 
 #. 4
 #. 5
@@ -3374,7 +3375,7 @@ msgstr "宛先"
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:173
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:185
 msgid "Add to local addressbook"
-msgstr ""
+msgstr "ローカルのアドレス帳に追加"
 
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:190
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:217
@@ -3433,7 +3434,7 @@ msgstr "次のピアの情報: "
 
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:433
 msgid "Full entry"
-msgstr ""
+msgstr "フルエントリ"
 
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:440
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:152
@@ -3459,7 +3460,7 @@ msgstr "公開済み"
 
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:449
 msgid "Signing Key"
-msgstr ""
+msgstr "署名キー"
 
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:451
 msgid "Address(es)"
@@ -3495,31 +3496,31 @@ msgstr "NTCP 及びイントロデューサー付き SSU"
 
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:491
 msgid "IPv6 Only SSU, introducers"
-msgstr ""
+msgstr "IPv6 のみ SSU、イントロデューサー"
 
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:491
 msgid "IPv6 SSU"
-msgstr ""
+msgstr "IPv6 SSU"
 
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:491
 msgid "IPv6 SSU, introducers"
-msgstr ""
+msgstr "IPv6 SSU、イントロデューサー"
 
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:492
 msgid "IPv6 NTCP"
-msgstr ""
+msgstr "IPv6 NTCP"
 
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:492
 msgid "IPv6 NTCP, SSU"
-msgstr ""
+msgstr "IPv6 NTCP, SSU"
 
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:492
 msgid "IPv6 NTCP, SSU, introducers"
-msgstr ""
+msgstr "IPv6 NTCP, SSU, イントロデューサー"
 
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:492
 msgid "IPv6 Only NTCP, SSU, introducers"
-msgstr ""
+msgstr "IPv6 のみ NTCP, SSU, イントロデューサー"
 
 #: ../java/src/net/i2p/router/web/NewsHelper.java:295
 #, java-format
@@ -3533,49 +3534,49 @@ msgstr "ニュースは {0} に最終確認。"
 
 #: ../java/src/net/i2p/router/web/NewsHelper.java:310
 msgid "Hide news"
-msgstr ""
+msgstr "ニュースを非表示"
 
 #: ../java/src/net/i2p/router/web/NewsHelper.java:313
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:647
 msgid "Show news"
-msgstr ""
+msgstr "ニュースを表示"
 
 #: ../java/src/net/i2p/router/web/PluginStarter.java:140
 msgid "Checking for plugin updates"
-msgstr ""
+msgstr "プラグインのアップデートをチェック中"
 
 #: ../java/src/net/i2p/router/web/PluginStarter.java:155
 msgid "Plugin update check failed"
-msgstr ""
+msgstr "プラグインのアップデート確認失敗"
 
 #: ../java/src/net/i2p/router/web/PluginStarter.java:193
 #, java-format
 msgid "1 plugin updated"
 msgid_plural "{0} plugins updated"
-msgstr[0] ""
+msgstr[0] "{0} 個のプラグインをアップデートしました"
 
 #: ../java/src/net/i2p/router/web/PluginStarter.java:195
 msgid "Plugin update check complete"
-msgstr ""
+msgstr "プラグインのアップデート確認完了"
 
 #. buf.append("<h2>").append(_("Peer Profiles")).append("</h2>\n<p>");
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:79
 #, java-format
 msgid "Showing 1 recent profile."
 msgid_plural "Showing {0} recent profiles."
-msgstr[0] ""
+msgstr[0] "{0} 件の最近のプロファイルを表示"
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:81
 #, java-format
 msgid "Hiding 1 older profile."
 msgid_plural "Hiding {0} older profiles."
-msgstr[0] ""
+msgstr[0] "{0} 件のもっと昔のプロファイルを非表示"
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:83
 #, java-format
 msgid "Hiding 1 standard profile."
 msgid_plural "Hiding {0} standard profiles."
-msgstr[0] ""
+msgstr[0] "{0} 件の標準プロファイルを非表示"
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:88
 msgid "Groups (Caps)"
@@ -3765,16 +3766,16 @@ msgstr "ステータス"
 #. 0
 #: ../java/src/net/i2p/router/web/ProfilesHelper.java:12
 msgid "Floodfill "
-msgstr ""
+msgstr "Floodfill "
 
 #. 2
 #: ../java/src/net/i2p/router/web/ProfilesHelper.java:14
 msgid "All"
-msgstr ""
+msgstr "すべて"
 
 #: ../java/src/net/i2p/router/web/SearchHelper.java:74
 msgid "Select search engine"
-msgstr ""
+msgstr "検索エンジンを選択"
 
 #: ../java/src/net/i2p/router/web/StatsGenerator.java:57
 msgid "GO"
@@ -3834,7 +3835,7 @@ msgstr "生涯平均頻度"
 #, java-format
 msgid "1 event"
 msgid_plural "{0} events"
-msgstr[0] ""
+msgstr[0] "{0}件のイベント"
 
 #: ../java/src/net/i2p/router/web/StatsGenerator.java:168
 msgid "rate"
@@ -3852,12 +3853,12 @@ msgstr "最大平均"
 #, java-format
 msgid "There was 1 event in this period."
 msgid_plural "There were {0} events in this period."
-msgstr[0] ""
+msgstr[0] "この期間中に {0} 件のイベントがありました。"
 
 #: ../java/src/net/i2p/router/web/StatsGenerator.java:202
 #, java-format
 msgid "The period ended {0} ago."
-msgstr ""
+msgstr "その期間は {0} 前に終了しました。"
 
 #: ../java/src/net/i2p/router/web/StatsGenerator.java:204
 msgid "No events"
@@ -3959,13 +3960,13 @@ msgstr "テキストのルーターパフォーマンス統計"
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:233
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:438
 msgid "Local Tunnels"
-msgstr ""
+msgstr "ローカルトンネル"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:235
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/i2ptunnelmgr_jsp.java:164
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/i2ptunnelmgr_jsp.java:337
 msgid "Hidden Services Manager"
-msgstr ""
+msgstr "Hidden サービスマネージャー"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:253
 msgid "General"
@@ -3979,7 +3980,7 @@ msgstr "ローカル識別子は一意な I2P ルーターの識別子であり�
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:259
 msgid "Never disclose this to anyone, as it can reveal your real world ip."
-msgstr ""
+msgstr "実際の IP がばれかねないので、誰にもこれを明かさないでください。"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:261
 msgid "Local Identity"
@@ -4014,23 +4015,23 @@ msgstr "最適な I2P パフォーマンスを得るためにファイアーウ�
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:337
 msgid "See more information on the wiki"
-msgstr ""
+msgstr "wiki 上で詳細を表示"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:339
 msgid "Warning: ECDSA is not available. Update your Java or OS"
-msgstr ""
+msgstr "警告: ECDSA が利用できません。 Java または OS を更新してください"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:351
 msgid "Configure I2P Updates"
-msgstr ""
+msgstr "I2P のアップデートを構成"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:353
 msgid "I2P Update"
-msgstr ""
+msgstr "I2P アップデート"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:378
 msgid "Peers we've been talking to in the last few minutes/last hour"
-msgstr ""
+msgstr "過去数分/数時間内に通信したピア"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:381
 msgid "Active"
@@ -4038,7 +4039,7 @@ msgstr "アクティブ"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:390
 msgid "The number of peers available for building client tunnels"
-msgstr ""
+msgstr "クライアントトンネルのビルドに利用できるピアノ数"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:393
 msgid "Fast"
@@ -4092,13 +4093,13 @@ msgstr "予備"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:500
 msgid "Tunnels we are using to provide or access services on the network"
-msgstr ""
+msgstr "ネットワーク上でサービスを提供またはアクセスするために使用しているトンネル"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:509
 msgid ""
 "Tunnels we are participating in, directly contributing bandwidth to the "
 "network"
-msgstr ""
+msgstr "参加していて、ネットワークの帯域幅に直接貢献しているトンネル"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:512
 msgid "Participating"
@@ -4108,7 +4109,7 @@ msgstr "参加中"
 msgid ""
 "The ratio of tunnel hops we provide to tunnel hops we use - a value greater "
 "than 1.00 indicates a positive contribution to the network"
-msgstr ""
+msgstr "使用するトンネルホップに提供しているトンネルのホップ率 - 1000より大きな値はネットワークへのポジティブな貢献を示します"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:521
 msgid "Share ratio"
@@ -4124,7 +4125,7 @@ msgstr "混雑状態"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:541
 msgid "Indicates router performance"
-msgstr ""
+msgstr "ルーターパフォーマンスを表示"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:544
 msgid "Job lag"
@@ -4132,7 +4133,7 @@ msgstr "ジョブラグ"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:550
 msgid "Indicates how quickly outbound messages to other I2P routers are sent"
-msgstr ""
+msgstr "ほかの I2P のルーターへの送信メッセージが送られた際の速さを表示"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:553
 msgid "Message delay"
@@ -4140,7 +4141,7 @@ msgstr "メッセージ遅延"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:560
 msgid "Round trip time for a tunnel test"
-msgstr ""
+msgstr "トンネルテストのラウンドトリップ時間"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:563
 msgid "Tunnel lag"
@@ -4148,7 +4149,7 @@ msgstr "トンネルラグ"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:570
 msgid "Queued requests from other routers to participate in tunnels"
-msgstr ""
+msgstr "トンネルに参加しているほかのルーターからのリクエストをキューに入れました"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:573
 msgid "Backlog"
@@ -4156,7 +4157,7 @@ msgstr "バックラグ"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:608
 msgid "News &amp; Updates"
-msgstr ""
+msgstr "ニュースとアップデート"
 
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:143
 msgid "ERR-Client Manager I2CP Error - check logs"
@@ -4169,7 +4170,7 @@ msgstr "ERR-{0} のクロックスキュー"
 
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:170
 msgid "ERR-Unresolved TCP Address"
-msgstr ""
+msgstr "エラー - 解決できない TCP アドレス"
 
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:174
 msgid "ERR-Private TCP Address"
@@ -4215,7 +4216,7 @@ msgstr "クライアント及びサーバートンネルを追加・削除・編
 
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:450
 msgid "Hidden Service"
-msgstr ""
+msgstr "Hidden サービス"
 
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:454
 msgid "Show tunnels"
@@ -4274,13 +4275,13 @@ msgstr "バージョン {0} "
 
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:734
 msgid "Update available"
-msgstr ""
+msgstr "アップデートが利用できます"
 
 #. Note to translators: parameter is a version, e.g. "0.8.4"
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:758
 #, java-format
 msgid "Download {0} Update"
-msgstr ""
+msgstr "{0} のアップデートをダウンロード"
 
 #. Note to translators: parameter is a router version, e.g. "0.9.19-16"
 #. <br> is optional, to help the browser make the lines even in the button
@@ -4289,7 +4290,7 @@ msgstr ""
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:766
 #, java-format
 msgid "Download Signed<br>Development Update<br>{0}"
-msgstr ""
+msgstr "署名されている<br>開発アップデートをダウンロード<br>{0}"
 
 #. Note to translators: parameter is a date and time, e.g. "02-Mar 20:34 UTC"
 #. <br> is optional, to help the browser make the lines even in the button
@@ -4298,7 +4299,7 @@ msgstr ""
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:774
 #, java-format
 msgid "Download Unsigned<br>Update {0}"
-msgstr ""
+msgstr "署名されていない {0}"
 
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:798
 msgid "Help with firewall configuration"
@@ -4306,7 +4307,7 @@ msgstr "ファイアーウォールの構成に役立ちます"
 
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:800
 msgid "Check network connection and NAT/firewall"
-msgstr ""
+msgstr "ネットワーク接続および NAT/ファイアーウォールを確認してください"
 
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:819
 msgid "Reseed"
@@ -4314,39 +4315,39 @@ msgstr "リシード"
 
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:908
 msgid "Order"
-msgstr ""
+msgstr "順序"
 
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:925
 msgid "Top"
-msgstr ""
+msgstr "上部"
 
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:930
 msgid "Move to top"
-msgstr ""
+msgstr "上部に移動"
 
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:940
 msgid "Move up"
-msgstr ""
+msgstr "上に移動"
 
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:948
 msgid "Down"
-msgstr ""
+msgstr "下"
 
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:953
 msgid "Move down"
-msgstr ""
+msgstr "下に移動"
 
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:958
 msgid "Bottom"
-msgstr ""
+msgstr "下部"
 
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:963
 msgid "Move to bottom"
-msgstr ""
+msgstr "下部に移動"
 
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:975
 msgid "Select a section to add"
-msgstr ""
+msgstr "追加するセクションを選択"
 
 #: ../java/src/net/i2p/router/web/SummaryRenderer.java:142
 #, java-format
@@ -5307,7 +5308,7 @@ msgstr "IPアドレスが変わった際の動作"
 msgid ""
 "Laptop mode - Change router identity and UDP port when IP changes for "
 "enhanced anonymity"
-msgstr "ノートパソコンモード - より良い匿名性のため、IPアドレスが変わった際にルータのIDとUDPポートを変更する"
+msgstr "ノートパソコンモード - 匿名性を向上させるため、IPアドレスが変わった際にルータのIDとUDPポートを変更する"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:530
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:560
