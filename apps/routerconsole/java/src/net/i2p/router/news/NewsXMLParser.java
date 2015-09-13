@@ -432,6 +432,10 @@ public class NewsXMLParser {
     }
 
     public static void main(String[] args) {
+        if (args.length != 1) {
+            System.err.println("Usage: NewsXMLParser file.xml");
+            System.exit(1);
+        }
         try {
             I2PAppContext ctx = new I2PAppContext();
             Debug.initialize(ctx);
