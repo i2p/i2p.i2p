@@ -33,7 +33,7 @@ import org.cybergarage.xml.ParserException;
  *
  *  @since 0.9.23
  */
-public class PersistNews {
+class PersistNews {
 
     private static final String DIR = "docs/news";
     private static final String PFX = "news-";

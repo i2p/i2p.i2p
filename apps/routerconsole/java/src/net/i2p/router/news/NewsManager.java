@@ -57,6 +57,8 @@ public class NewsManager implements RouterApp {
         if (!_currentNews.isEmpty())
             return new ArrayList(_currentNews);
         // load old news.xml
+        if (_log.shouldWarn())
+            _log.warn("no real XML, falling back to news.xml");
         List<NewsEntry> rv = parseOldNews();
         if (!rv.isEmpty()) {
             _currentNews = rv;
@@ -65,6 +67,8 @@ public class NewsManager implements RouterApp {
         }
         // load and translate initialnews
         // We don't save it to _currentNews, as the language may change
+        if (_log.shouldWarn())
+            _log.warn("no news.xml, falling back to initialNews");
         return parseInitialNews();
     }
 
@@ -112,6 +116,8 @@ public class NewsManager implements RouterApp {
     public synchronized void startup() {
         changeState(STARTING);
         _currentNews = PersistNews.load(_context);
+        if (_log.shouldWarn())
+            _log.warn("Initialized with " + _currentNews.size() + " entries");
         changeState(RUNNING);
         if (_cmgr != null)
             _cmgr.register(this);
