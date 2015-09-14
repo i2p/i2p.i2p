@@ -247,6 +247,10 @@ public class NewsXMLParser {
         return rv;
     }
 
+    /**
+     *  This does not check for any missing values.
+     *  Any fields in any NewsEntry may be null.
+     */
     private List<NewsEntry> extractNewsEntries(Node feed) throws I2PParserException {
         List<NewsEntry> rv = new ArrayList<NewsEntry>();
         List<Node> entries = getNodes(feed, "entry");
@@ -345,8 +349,10 @@ public class NewsXMLParser {
 
     /**
      *  Helper to get all Nodes matching the name
+     *
+     *  @return non-null
      */
-    private static List<Node> getNodes(Node node, String name) {
+    static List<Node> getNodes(Node node, String name) {
         List<Node> rv = new ArrayList<Node>();
         int count = node.getNNodes();
         for (int i = 0; i < count; i++) {
@@ -432,8 +438,8 @@ public class NewsXMLParser {
     }
 
     public static void main(String[] args) {
-        if (args.length != 1) {
-            System.err.println("Usage: NewsXMLParser file.xml");
+        if (args.length <= 0 || args.length > 2) {
+            System.err.println("Usage: NewsXMLParser file.xml [parserMode]");
             System.exit(1);
         }
         try {
@@ -454,9 +460,22 @@ public class NewsXMLParser {
             System.out.println("Release timestamp: " + latestRelease.date);
             System.out.println("Feed timestamp: " + ud.feedUpdated);
             System.out.println("Found " + entries.size() + " news entries");
+            Set<String> uuids = new HashSet<String>(entries.size());
             for (int i = 0; i < entries.size(); i++) {
                 NewsEntry e = entries.get(i);
-                System.out.println("News #" + (i+1) + ": " + e.title + '\n' + e.content);
+                System.out.println("\n****** News #" + (i+1) + ": " + e.title + '\n' + e.content);
+                if (e.id == null)
+                    throw new IOException("missing ID");
+                if (e.title == null)
+                    throw new IOException("missing title");
+                if (e.content == null)
+                    throw new IOException("missing content");
+                if (e.authorName == null)
+                    throw new IOException("missing author");
+                if (e.updated == 0)
+                    throw new IOException("missing updated");
+                if (!uuids.add(e.id))
+                    throw new IOException("duplicate ID");
             }
         } catch (IOException ioe) {
             ioe.printStackTrace();
