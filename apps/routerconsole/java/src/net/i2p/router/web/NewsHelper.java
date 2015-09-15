@@ -204,37 +204,12 @@ public class NewsHelper extends ContentHelper {
         return mgr.getStatus();
     }
 
-    private static final String BUNDLE_NAME = "net.i2p.router.news.messages";
-
     /**
      *  If we haven't downloaded news yet, use the translated initial news file
      */
     @Override
     public String getContent() {
-        File news = new File(_page);
-        if (!news.exists()) {
-            _page = (new File(_context.getBaseDir(), "docs/initialNews/initialNews.xml")).getAbsolutePath();
-            // don't use super, translate on-the-fly
-            Reader reader = null;
-            try {
-                char[] buf = new char[512];
-                StringBuilder out = new StringBuilder(2048);
-                reader = new TranslateReader(_context, BUNDLE_NAME, new FileInputStream(_page));
-                int len;
-                while((len = reader.read(buf)) > 0) {
-                    out.append(buf, 0, len);
-                }
-                return out.toString();
-            } catch (IOException ioe) {
-                return "";
-            } finally {
-                try {
-                    if (reader != null)
-                        reader.close();
-                } catch (IOException foo) {}
-            }
-        }
-        return super.getContent();
+        return NewsFeedHelper.getEntries(_context, 0, 2);
     }
 
     /**
@@ -312,7 +287,10 @@ public class NewsHelper extends ContentHelper {
                  buf.append(" <a href=\"/?news=1&amp;consoleNonce=").append(consoleNonce).append("\">")
                     .append(Messages.getString("Show news", ctx));
              }
-             buf.append("</a>");
+             buf.append("</a>" +
+                        " - <a href=\"/news\">")
+                .append(Messages.getString("Show all news", ctx))
+                .append("</a>");
          }
          return buf.toString();
     }

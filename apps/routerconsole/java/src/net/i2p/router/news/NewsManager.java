@@ -4,10 +4,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.Reader;
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 import net.i2p.I2PAppContext;
 import net.i2p.app.ClientAppManager;
@@ -34,7 +37,13 @@ public class NewsManager implements RouterApp {
     private final ClientAppManager _cmgr;
     private volatile ClientAppState _state = UNINITIALIZED;
     private List<NewsEntry> _currentNews;
-    private NewsMetadata _currentMetadata;
+    // TODO
+    // Metadata is persisted in the old news.xml format by
+    // NewsFetcher.outputOldNewsXML() and read in at startup by
+    // ConsoleUpdateManager.startup() and NewsFetcher.checkForUpdates().
+    // While running, the UpdateManager keeps the metadata.
+    // NewsHelper looks at the news.xml timestamp.
+    //private NewsMetadata _currentMetadata;
 
     public static final String APP_NAME = "news";
     private static final String BUNDLE_NAME = "net.i2p.router.news.messages";
@@ -93,10 +102,13 @@ public class NewsManager implements RouterApp {
             String id = e.id;
             if (id == null)
                 continue;
+            String title = e.title;
             boolean found = false;
             for (int i = 0; i < _currentNews.size(); i++) {
                 NewsEntry old = _currentNews.get(i);
-                if (id.equals(old.id)) {
+                // try to prevent dups with those created from old news.xml,
+                // where the UUID is the title
+                if (id.equals(old.id) || (title != null && title.equals(old.id))) {
                     _currentNews.set(i, e);
                     found = true;
                     break;
@@ -156,7 +168,7 @@ public class NewsManager implements RouterApp {
         String newsContent = FileUtil.readTextFile(file.toString(), -1, true);
         if (newsContent == null || newsContent.equals(""))
             return Collections.emptyList();
-        return parseNews(newsContent);
+        return parseNews(newsContent, false);
     }
 
     private List<NewsEntry> parseInitialNews() {
@@ -171,7 +183,7 @@ public class NewsManager implements RouterApp {
             while((len = reader.read(buf)) > 0) {
                 out.append(buf, 0, len);
             }
-            List<NewsEntry> rv = parseNews(out.toString());
+            List<NewsEntry> rv = parseNews(out.toString(), true);
             if (!rv.isEmpty()) {
                 rv.get(0).updated = RFC3339Date.parse3339Date("2015-01-01");
             } else {
@@ -191,7 +203,12 @@ public class NewsManager implements RouterApp {
         }
     }
 
-    private List<NewsEntry> parseNews(String newsContent) {
+    /**
+     *  Used for initialNews.xml and news.xml
+     *
+     *  @param addMissingDiv true for initialNews, false for news.xml
+     */
+    private List<NewsEntry> parseNews(String newsContent, boolean addMissingDiv) {
         List<NewsEntry> rv = new ArrayList<NewsEntry>();
         // Parse news content for headings.
         boolean foundEntry = false;
@@ -205,10 +222,28 @@ public class NewsManager implements RouterApp {
             if (newsContent.length() > start + 16 &&
                 newsContent.substring(start + 4, start + 6).equals("20") &&
                 newsContent.substring(start + 14, start + 16).equals(": ")) {
+                // initialNews.xml, or old news.xml from server
                 entry.updated = RFC3339Date.parse3339Date(newsContent.substring(start + 4, start + 14));
                 newsContent = newsContent.substring(start+16);
             } else {
                 newsContent = newsContent.substring(start+4);
+                int colon = newsContent.indexOf(": ");
+                if (colon > 0 && colon <= 10) {
+                    //  Parse the format we wrote it out in, in NewsFetcher.outputOldNewsXML()
+                    //  Doesn't work if the date has a : in it, but SHORT hopefully does not
+                    DateFormat fmt = DateFormat.getDateInstance(DateFormat.SHORT);
+                    // the router sets the JVM time zone to UTC but saves the original here so we can get it
+                    String systemTimeZone = _context.getProperty("i2p.systemTimeZone");
+                    if (systemTimeZone != null)
+                        fmt.setTimeZone(TimeZone.getTimeZone(systemTimeZone));
+                    try {
+                        Date date = fmt.parse(newsContent.substring(0, colon));
+                        entry.updated = date.getTime();
+                        newsContent = newsContent.substring(colon + 2);
+                    } catch (ParseException pe) {
+                        // can't find date, will be zero
+                    }
+                }
             }
             int end = newsContent.indexOf("</h3>");
             if (end >= 0) {
@@ -222,6 +257,10 @@ public class NewsManager implements RouterApp {
                     entry.content = newsContent.substring(0, end);
                 else
                     entry.content = newsContent;
+                // initialNews.xml has the <div> before the <h3>, not after, so we lose it...
+                // add it back.
+                if (addMissingDiv)
+                    entry.content = "<div>\n" + entry.content;
                 rv.add(entry);
                 start = end;
             }

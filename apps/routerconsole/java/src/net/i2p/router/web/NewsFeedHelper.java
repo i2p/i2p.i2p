@@ -20,7 +20,7 @@ import net.i2p.router.news.NewsManager;
 public class NewsFeedHelper extends HelperBase {
     
     private int _start = 0;
-    private int _limit = 3;
+    private int _limit = 2;
 
     /**
      *  @param limit less than or equal to zero means all
@@ -62,16 +62,16 @@ public class NewsFeedHelper extends HelperBase {
             for (NewsEntry entry : entries) {
                 if (i++ < start)
                     continue;
-                buf.append("<h3>");
+                buf.append("<div class=\"newsentry\"><h3>");
                 if (entry.updated > 0) {
                     Date date = new Date(entry.updated);
                     buf.append(fmt.format(date))
                        .append(": ");
                 }
                 buf.append(entry.title)
-                   .append("</h3>\n")
+                   .append("</h3>\n<div class=\"newscontent\">\n")
                    .append(entry.content)
-                   .append("\n");
+                   .append("\n</div></div>\n");
                 if (i >= start + max)
                     break;
             }

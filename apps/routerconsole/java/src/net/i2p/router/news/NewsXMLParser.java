@@ -97,10 +97,11 @@ public class NewsXMLParser {
      *
      *  @param file XML content only. Any su3 or gunzip handling must have
      *              already happened.
+     *  @return the root node
      *  @throws IOException on any parse error
      */
-    public void parse(File file) throws IOException {
-        parse(new BufferedInputStream(new FileInputStream(file)));
+    public Node parse(File file) throws IOException {
+        return parse(new BufferedInputStream(new FileInputStream(file)));
     }
 
     /**
@@ -108,15 +109,17 @@ public class NewsXMLParser {
      *
      *  @param in XML content only. Any su3 or gunzip handling must have
      *            already happened.
+     *  @return the root node
      *  @throws IOException on any parse error
      */
-    public void parse(InputStream in) throws IOException {
+    public Node parse(InputStream in) throws IOException {
         _entries = null;
         _metadata = null;
         XMLParser parser = new XMLParser(_context);
         try {
             Node root = parser.parse(in);
             extract(root);
+            return root;
         } catch (ParserException pe) {
             throw new I2PParserException(pe);
         }
@@ -352,7 +355,7 @@ public class NewsXMLParser {
      *
      *  @return non-null
      */
-    static List<Node> getNodes(Node node, String name) {
+    public static List<Node> getNodes(Node node, String name) {
         List<Node> rv = new ArrayList<Node>();
         int count = node.getNNodes();
         for (int i = 0; i < count; i++) {

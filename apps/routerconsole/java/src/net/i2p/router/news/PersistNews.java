@@ -35,7 +35,7 @@ import org.cybergarage.xml.ParserException;
  */
 class PersistNews {
 
-    private static final String DIR = "docs/news";
+    private static final String DIR = "docs/feed/news";
     private static final String PFX = "news-";
     private static final String SFX = ".xml.gz";
     private static final String XML_START = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
@@ -207,6 +207,8 @@ class PersistNews {
     }
 
     /**
+     *  Unused for now, as we don't have any way to remember it's deleted.
+     *
      *  @return success
      */
     public static boolean delete(I2PAppContext ctx, NewsEntry entry) {

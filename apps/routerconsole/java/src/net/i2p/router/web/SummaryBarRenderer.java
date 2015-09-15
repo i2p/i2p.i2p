@@ -3,14 +3,20 @@ package net.i2p.router.web;
 import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
+import java.text.DateFormat;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 
+import net.i2p.app.ClientAppManager;
 import net.i2p.crypto.SigType;
 import net.i2p.data.DataHelper;
 import net.i2p.router.RouterContext;
+import net.i2p.router.news.NewsEntry;
+import net.i2p.router.news.NewsManager;
 import net.i2p.util.PortMapper;
 
 /**
@@ -604,49 +610,45 @@ public class SummaryBarRenderer {
         String consoleNonce = CSSHelper.getNonce();
         if (consoleNonce != null) {
             // Set up title and pre-headings stuff.
-            buf.append("<h3><a href=\"/configupdate\">")
+            //buf.append("<h3><a href=\"/configupdate\">")
+            buf.append("<h3><a href=\"/news\">")
                .append(_("News &amp; Updates"))
                .append("</a></h3><hr class=\"b\"><div class=\"newsheadings\">\n");
             // Get news content.
-            String newsContent = newshelper.getContent();
-            if (newsContent != "") {
+            List<NewsEntry> entries = Collections.emptyList();
+            ClientAppManager cmgr = _context.clientAppManager();
+            if (cmgr != null) {
+                NewsManager nmgr = (NewsManager) cmgr.getRegisteredApp(NewsManager.APP_NAME);
+                if (nmgr != null)
+                    entries = nmgr.getEntries();
+            }
+            if (!entries.isEmpty()) {
                 buf.append("<ul>\n");
-                // Parse news content for headings.
-                boolean foundEntry = false;
-                int start = newsContent.indexOf("<h3>");
-                while (start >= 0) {
-                    // Add offset to start:
-                    // 4 - gets rid of <h3>
-                    // 16 - gets rid of the date as well (assuming form "<h3>yyyy-mm-dd: Foobarbaz...")
-                    // Don't truncate the "congratulations" in initial news
-                    if (newsContent.length() > start + 16 &&
-                        newsContent.substring(start + 4, start + 6).equals("20") &&
-                        newsContent.substring(start + 14, start + 16).equals(": "))
-                        newsContent = newsContent.substring(start+16, newsContent.length());
-                    else
-                        newsContent = newsContent.substring(start+4, newsContent.length());
-                    int end = newsContent.indexOf("</h3>");
-                    if (end >= 0) {
-                        String heading = newsContent.substring(0, end);
-                        buf.append("<li><a href=\"/?news=1&amp;consoleNonce=")
-                           .append(consoleNonce)
-                           .append("\">")
-                           .append(heading)
-                           .append("</a></li>\n");
-                        foundEntry = true;
+                DateFormat fmt = DateFormat.getDateInstance(DateFormat.SHORT);
+                // the router sets the JVM time zone to UTC but saves the original here so we can get it
+                String systemTimeZone = _context.getProperty("i2p.systemTimeZone");
+                if (systemTimeZone != null)
+                    fmt.setTimeZone(TimeZone.getTimeZone(systemTimeZone));
+                int i = 0;
+                final int max = 2;
+                for (NewsEntry entry : entries) {
+                    buf.append("<li><a href=\"/?news=1&amp;consoleNonce=")
+                       .append(consoleNonce)
+                       .append("\">");
+                    if (entry.updated > 0) {
+                        Date date = new Date(entry.updated);
+                        buf.append(fmt.format(date))
+                           .append(": ");
                     }
-                    start = newsContent.indexOf("<h3>");
+                    buf.append(entry.title)
+                       .append("</a></li>\n");
+                    if (++i >= max)
+                        break;
                 }
                 buf.append("</ul>\n");
-                // Set up string containing <a> to show news.
-                String requestURI = _helper.getRequestURI();
-                if (requestURI.contains("/home") && !foundEntry) {
-                    buf.append("<a href=\"/?news=1&amp;consoleNonce=")
-                       .append(consoleNonce)
-                       .append("\">")
-                       .append(_("Show news"))
-                       .append("</a>\n");
-                }
+                //buf.append("<a href=\"/news\">")
+                //   .append(_("Show all news"))
+                //   .append("</a>\n");
             } else {
                 buf.append("<center><i>")
                    .append(_("none"))

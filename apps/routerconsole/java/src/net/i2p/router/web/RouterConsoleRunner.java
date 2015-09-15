@@ -26,8 +26,9 @@ import net.i2p.crypto.KeyStoreUtil;
 import net.i2p.data.DataHelper;
 import net.i2p.jetty.I2PLogger;
 import net.i2p.router.RouterContext;
-import net.i2p.router.update.ConsoleUpdateManager;
 import net.i2p.router.app.RouterApp;
+import net.i2p.router.news.NewsManager;
+import net.i2p.router.update.ConsoleUpdateManager;
 import net.i2p.util.Addresses;
 import net.i2p.util.FileUtil;
 import net.i2p.util.I2PAppThread;
@@ -706,6 +707,8 @@ public class RouterConsoleRunner implements RouterApp {
         
             ConsoleUpdateManager um = new ConsoleUpdateManager(_context, _mgr, null);
             um.start();
+            NewsManager nm = new NewsManager(_context, _mgr, null);
+            nm.startup();
         
             if (PluginStarter.pluginsEnabled(_context)) {
                 t = new I2PAppThread(new PluginStarter(_context), "PluginStarter", true);

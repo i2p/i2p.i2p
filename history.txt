@@ -1,3 +1,9 @@
+2015-09-15 zzz
+ * Console:
+   - Store news feed items separately on disk in XML, like a real feed reader
+   - Limit display to 2 news items in summary bar, /home and /console
+   - New /news page to show all news (ticket #1425)
+
 * 2015-09-12 0.9.22 released
 
 2015-09-11 kytv
