@@ -39,6 +39,8 @@ import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import gnu.getopt.Getopt;
+
 import net.i2p.I2PAppContext;
 import net.i2p.crypto.SHA1;
 import net.i2p.data.ByteArray;
@@ -123,10 +125,12 @@ public class Storage implements Closeable
    *
    * @param announce may be null
    * @param listener may be null
+   * @param created_by may be null
    * @throws IOException when creating and/or checking files fails.
    */
   public Storage(I2PSnarkUtil util, File baseFile, String announce,
                  List<List<String>> announce_list,
+                 String created_by,
                  boolean privateTorrent, StorageListener listener)
     throws IOException
   {
@@ -195,7 +199,7 @@ public class Storage implements Closeable
     byte[] piece_hashes = fast_digestCreate();
     metainfo = new MetaInfo(announce, baseFile.getName(), null, files,
                             lengthsList, piece_size, piece_hashes, total, privateTorrent,
-                            announce_list);
+                            announce_list, created_by);
 
   }
 
@@ -1373,18 +1377,44 @@ public class Storage implements Closeable
    *  @since 0.9.4
    */
   public static void main(String[] args) {
-      if (args.length < 1 || args.length > 2) {
-          System.err.println("Usage: Storage file-or-dir [announceURL]");
+      boolean error = false;
+      String created_by = null;
+      String announce = null;
+      Getopt g = new Getopt("Storage", args, "a:c:");
+      try {
+          int c;
+          while ((c = g.getopt()) != -1) {
+            switch (c) {
+              case 'a':
+                  announce = g.getOptarg();
+                  break;
+
+              case 'c':
+                  created_by = g.getOptarg();
+                  break;
+
+              case '?':
+              case ':':
+              default:
+                  error = true;
+                  break;
+            }  // switch
+          } // while
+      } catch (Exception e) {
+          e.printStackTrace();
+          error = true;
+      }
+      if (error || args.length - g.getOptind() != 1) {
+          System.err.println("Usage: Storage [-a announceURL] [-c created-by] file-or-dir");
           System.exit(1);
       }
-      File base = new File(args[0]);
-      String announce = args.length == 2 ? args[1] : null;
+      File base = new File(args[g.getOptind()]);
       I2PAppContext ctx = I2PAppContext.getGlobalContext();
       I2PSnarkUtil util = new I2PSnarkUtil(ctx);
       File file = null;
       FileOutputStream out = null;
       try {
-          Storage storage = new Storage(util, base, announce, null, false, null);
+          Storage storage = new Storage(util, base, announce, null, created_by, false, null);
           MetaInfo meta = storage.getMetaInfo();
           file = new File(storage.getBaseName() + ".torrent");
           out = new FileOutputStream(file);

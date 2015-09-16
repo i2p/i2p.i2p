@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.TreeMap;
 
 import javax.servlet.ServletConfig;
@@ -1230,7 +1231,7 @@ public class I2PSnarkServlet extends BasicServlet {
                         // it shouldn't be THAT bad, so keep it in this thread.
                         // TODO thread it for big torrents, perhaps a la FetchAndAdd
                         boolean isPrivate = _manager.getPrivateTrackers().contains(announceURL);
-                        Storage s = new Storage(_manager.util(), baseFile, announceURL, announceList, isPrivate, null);
+                        Storage s = new Storage(_manager.util(), baseFile, announceURL, announceList, null, isPrivate, null);
                         s.close(); // close the files... maybe need a way to pass this Storage to addTorrent rather than starting over
                         MetaInfo info = s.getMetaInfo();
                         File torrentFile = new File(_manager.getDataDir(), s.getBaseName() + ".torrent");
@@ -2763,13 +2764,17 @@ public class I2PSnarkServlet extends BasicServlet {
                        .append("</td></tr>\n");
                 }
                 long dat = meta.getCreationDate();
+                SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+                String systemTimeZone = _context.getProperty("i2p.systemTimeZone");
+                if (systemTimeZone != null)
+                    fmt.setTimeZone(TimeZone.getTimeZone(systemTimeZone));
                 if (dat > 0) {
-                    String date = (new SimpleDateFormat("yyyy-MM-dd HH:mm")).format(new Date(dat));
+                    String date = fmt.format(new Date(dat));
                     buf.append("<tr><td>");
                     toThemeImg(buf, "details");
                     buf.append(" <b>")
                        .append(_("Created")).append(":</b> ")
-                       .append(date).append(" UTC")
+                       .append(date)
                        .append("</td></tr>\n");
                 }
                 String cby = meta.getCreatedBy();
@@ -2781,6 +2786,25 @@ public class I2PSnarkServlet extends BasicServlet {
                     buf.append(" <b>")
                        .append(_("Created By")).append(":</b> ")
                        .append(DataHelper.stripHTML(cby))
+                       .append("</td></tr>\n");
+                }
+                long[] dates = _manager.getSavedAddedAndCompleted(snark);
+                if (dates[0] > 0) {
+                    String date = fmt.format(new Date(dates[0]));
+                    buf.append("<tr><td>");
+                    toThemeImg(buf, "details");
+                    buf.append(" <b>")
+                       .append(_("Added")).append(":</b> ")
+                       .append(date)
+                       .append("</td></tr>\n");
+                }
+                if (dates[1] > 0) {
+                    String date = fmt.format(new Date(dates[1]));
+                    buf.append("<tr><td>");
+                    toThemeImg(buf, "details");
+                    buf.append(" <b>")
+                       .append(_("Completed")).append(":</b> ")
+                       .append(date)
                        .append("</td></tr>\n");
                 }
             }

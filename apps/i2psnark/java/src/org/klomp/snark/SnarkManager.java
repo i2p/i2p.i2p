@@ -96,6 +96,8 @@ public class SnarkManager implements CompleteListener {
     private static final String PROP_META_PRIORITY = "priority";
     private static final String PROP_META_PRESERVE_NAMES = "preserveFileNames";
     private static final String PROP_META_UPLOADED = "uploaded";
+    private static final String PROP_META_ADDED = "added";
+    private static final String PROP_META_COMPLETED = "completed";
     //private static final String PROP_META_BITFIELD_SUFFIX = ".bitfield";
     //private static final String PROP_META_PRIORITY_SUFFIX = ".priority";
     private static final String PROP_META_MAGNET_PREFIX = "i2psnark.magnet.";
@@ -1623,6 +1625,25 @@ public class SnarkManager implements CompleteListener {
         }
         return 0;
     }
+
+    /**
+     * Get setting for a torrent from the config file.
+     * @return non-null, rv[0] is added time or 0; rv[1] is completed time or 0
+     * @since 0.9.23
+     */
+    public long[] getSavedAddedAndCompleted(Snark snark) {
+        long[] rv = new long[2];
+        Properties config = getConfig(snark);
+        if (config != null) {
+            try {
+                rv[0] = Long.parseLong(config.getProperty(PROP_META_ADDED));
+            } catch (NumberFormatException nfe) {}
+            try {
+                rv[1] = Long.parseLong(config.getProperty(PROP_META_COMPLETED));
+            } catch (NumberFormatException nfe) {}
+        }
+        return rv;
+    }
     
     /**
      * Save the completion status of a torrent and other data in the config file
@@ -1661,19 +1682,25 @@ public class SnarkManager implements CompleteListener {
     private void locked_saveTorrentStatus(MetaInfo metainfo, BitField bitfield, int[] priorities,
                                           File base, boolean preserveNames, long uploaded, boolean stopped) {
         byte[] ih = metainfo.getInfoHash();
+        Properties config = getConfig(ih);
+        String now = Long.toString(System.currentTimeMillis());
+        config.setProperty(PROP_META_STAMP, now);
+        if (config.getProperty(PROP_META_ADDED) == null)
+            config.setProperty(PROP_META_ADDED, now);
         String bfs;
         if (bitfield.complete()) {
           bfs = ".";
+          if (config.getProperty(PROP_META_COMPLETED) == null)
+              config.setProperty(PROP_META_COMPLETED, now);
         } else {
           byte[] bf = bitfield.getFieldBytes();
           bfs = Base64.encode(bf);
+          config.remove(PROP_META_COMPLETED);
         }
-        boolean running = !stopped;
-        Properties config = getConfig(ih);
-        config.setProperty(PROP_META_STAMP, Long.toString(System.currentTimeMillis()));
         config.setProperty(PROP_META_BITFIELD, bfs);
         config.setProperty(PROP_META_PRESERVE_NAMES, Boolean.toString(preserveNames));
         config.setProperty(PROP_META_UPLOADED, Long.toString(uploaded));
+        boolean running = !stopped;
         config.setProperty(PROP_META_RUNNING, Boolean.toString(running));
         if (base != null)
             config.setProperty(PROP_META_BASE, base.getAbsolutePath());
