@@ -74,6 +74,11 @@ public class NewsFeedHelper extends HelperBase {
                 buf.append(entry.title);
                 if (entry.link != null)
                     buf.append("</a>");
+                if (entry.authorName != null) {
+                    buf.append(" <font size=\"-2\">(<i>")
+                       .append(Messages.getString("by {0}", DataHelper.escapeHTML(entry.authorName), ctx))
+                       .append("</i>)</font>\n");
+                }
                 buf.append("</h3>\n<div class=\"newscontent\">\n")
                    .append(entry.content)
                    .append("\n</div></div>\n");
