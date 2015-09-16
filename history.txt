@@ -1,3 +1,12 @@
+2015-09-16 zzz
+ * Build:
+   - Include geoip in update files for next release
+   - Add created-by string to release torrents
+ * i2psnark:
+   - Store torrent added and completed times in config files, display on details page
+   - Add metainfo creation command line support for created-by string
+ * Profiles: Bias slightly away from floodfills
+
 2015-09-15 zzz
  * Console:
    - Store news feed items separately on disk in XML, like a real feed reader
