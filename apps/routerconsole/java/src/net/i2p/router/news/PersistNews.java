@@ -155,9 +155,9 @@ class PersistNews {
         }
         n = entry.getNode("link");
         if (n != null) {
-            e.link = n.getValue();
-            if (e.link != null)
-                e.link = e.link.trim();
+            String a = n.getAttributeValue("href");
+            if (a.length() > 0)
+                e.link = a.trim();
         }
         n = entry.getNode("id");
         if (n != null) {
@@ -231,6 +231,7 @@ class PersistNews {
         return PFX + Base64.encode(hash) + SFX;
     }
 
+/****
     public static void main(String[] args) {
         if (args.length != 1) {
             System.err.println("Usage: PersistNews file.xml");
@@ -262,4 +263,5 @@ class PersistNews {
             System.out.println("\n****** News #" + (i+1) + ": " + e.title + '\n' + e.content);
         }
     }
+****/
 }

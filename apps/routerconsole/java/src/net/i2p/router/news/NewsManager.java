@@ -269,6 +269,7 @@ public class NewsManager implements RouterApp {
         return rv;
     }
 
+/****
     public static void main(String[] args) {
         if (args.length != 0) {
             System.err.println("Usage: NewsManager");
@@ -281,7 +282,9 @@ public class NewsManager implements RouterApp {
         System.out.println("Loaded " + entries.size() + " news entries");
         for (int i = 0; i < entries.size(); i++) {
             NewsEntry e = entries.get(i);
-            System.out.println("\n****** News #" + (i+1) + ": " + e.title + ' ' + new Date(e.updated) + '\n' + e.content);
+            System.out.println("\n****** News #" + (i+1) + ": " + e.title + ' ' + new Date(e.updated) +
+                               "\nLink: " + e.link + '\n' + e.content);
         }
     }
+****/
 }

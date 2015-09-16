@@ -8,6 +8,7 @@ import java.util.TimeZone;
 
 import net.i2p.I2PAppContext;
 import net.i2p.app.ClientAppManager;
+import net.i2p.data.DataHelper;
 import net.i2p.router.news.NewsEntry;
 import net.i2p.router.news.NewsManager;
 
@@ -68,8 +69,12 @@ public class NewsFeedHelper extends HelperBase {
                     buf.append(fmt.format(date))
                        .append(": ");
                 }
-                buf.append(entry.title)
-                   .append("</h3>\n<div class=\"newscontent\">\n")
+                if (entry.link != null)
+                    buf.append("<a href=\"").append(DataHelper.escapeHTML(entry.link)).append("\">");
+                buf.append(entry.title);
+                if (entry.link != null)
+                    buf.append("</a>");
+                buf.append("</h3>\n<div class=\"newscontent\">\n")
                    .append(entry.content)
                    .append("\n</div></div>\n");
                 if (i >= start + max)
