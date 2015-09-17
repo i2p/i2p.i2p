@@ -1,6 +1,7 @@
 2015-09-17 zzz
  * i2psnark:
    - Store magnet parameters across restart (ticket #1485)
+   - Don't delete torrent config file after error on initial startup (ticket #1658)
 
 2015-09-16 zzz
  * Build:

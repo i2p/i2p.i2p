@@ -1755,6 +1755,8 @@ public class SnarkManager implements CompleteListener {
             subdir.mkdirs();
         try {
             DataHelper.storeProps(config, conf);
+            if (_log.shouldInfo())
+                _log.info("Saved config to " + conf);
         } catch (IOException ioe) {
             _log.error("Unable to save the config to " + conf);
         }
@@ -2013,13 +2015,15 @@ public class SnarkManager implements CompleteListener {
                 File dir = getDataDir();
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Directory Monitor loop over " + dir.getAbsolutePath());
+                boolean ok;
                 try {
                     // Don't let this interfere with .torrent files being added or deleted
                     synchronized (_snarks) {
-                        monitorTorrents(dir);
+                        ok = monitorTorrents(dir);
                     }
                 } catch (Exception e) {
                     _log.error("Error in the DirectoryMonitor", e);
+                    ok = false;
                 }
                 if (doMagnets) {
                     // first run only
@@ -2033,7 +2037,11 @@ public class SnarkManager implements CompleteListener {
                         addMessage(_("Up bandwidth limit is {0} KBps", _util.getMaxUpBW()));
                     // To fix bug where files were left behind,
                     // but also good for when user removes snarks when i2p is not running
-                    cleanupTorrentStatus();
+                    // Don't run if there was an error, as we would delete the torrent config
+                    // file(s) and we don't want to do that. We'll do the cleanup the next
+                    // time i2psnark starts. See ticket #1658.
+                    if (ok)
+                        cleanupTorrentStatus();
                 }
                 try { Thread.sleep(60*1000); } catch (InterruptedException ie) {}
             }
@@ -2182,8 +2190,11 @@ public class SnarkManager implements CompleteListener {
 
     /**
      *  caller must synchronize on _snarks
+     *
+     *  @return success, false if an error adding any torrent.
      */
-    private void monitorTorrents(File dir) {
+    private boolean monitorTorrents(File dir) {
+        boolean rv = true;
         String fileNames[] = dir.list(TorrentFilenameFilter.instance());
         List<String> foundNames = new ArrayList<String>(0);
         if (fileNames != null) {
@@ -2213,6 +2224,7 @@ public class SnarkManager implements CompleteListener {
                 } catch (Exception e) {
                     addMessage(_("Error: Could not add the torrent {0}", name) + ": " + e);
                     _log.error("Unable to add the torrent " + name, e);
+                    rv = false;
                 }
             }
         }
@@ -2233,6 +2245,7 @@ public class SnarkManager implements CompleteListener {
                 }
             }
         }
+        return rv;
     }
 
     /** translate */
