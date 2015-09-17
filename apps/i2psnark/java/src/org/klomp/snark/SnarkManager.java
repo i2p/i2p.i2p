@@ -98,6 +98,10 @@ public class SnarkManager implements CompleteListener {
     private static final String PROP_META_UPLOADED = "uploaded";
     private static final String PROP_META_ADDED = "added";
     private static final String PROP_META_COMPLETED = "completed";
+    private static final String PROP_META_MAGNET = "magnet";
+    private static final String PROP_META_MAGNET_DN = "magnet_dn";
+    private static final String PROP_META_MAGNET_TR = "magnet_tr";
+    private static final String PROP_META_MAGNET_DIR = "magnet_dir";
     //private static final String PROP_META_BITFIELD_SUFFIX = ".bitfield";
     //private static final String PROP_META_PRIORITY_SUFFIX = ".priority";
     private static final String PROP_META_MAGNET_PREFIX = "i2psnark.magnet.";
@@ -1357,7 +1361,7 @@ public class SnarkManager implements CompleteListener {
             // Tell the dir monitor not to delete us
             _magnets.add(name);
             if (updateStatus)
-                saveMagnetStatus(ih);
+                saveMagnetStatus(ih, dirPath, trackerURL, name);
             _snarks.put(name, torrent);
         }
         if (autoStart) {
@@ -1668,6 +1672,7 @@ public class SnarkManager implements CompleteListener {
      * The status is either a bitfield converted to Base64 or "." for a completed
      * torrent to save space in the config file and in memory.
      *
+     * @param metainfo non-null
      * @param bitfield non-null
      * @param priorities may be null
      * @param base may be null
@@ -1730,9 +1735,20 @@ public class SnarkManager implements CompleteListener {
         } else {
             config.remove(PROP_META_PRIORITY);
         }
+        // magnet properties, no longer apply, we have the metainfo
+        config.remove(PROP_META_MAGNET);
+        config.remove(PROP_META_MAGNET_DIR);
+        config.remove(PROP_META_MAGNET_DN);
+        config.remove(PROP_META_MAGNET_TR);
 
         // TODO save closest DHT nodes too
+        locked_saveTorrentStatus(ih, config);
+    }
 
+    /**
+     *  @since 0.9.23
+     */
+    private void locked_saveTorrentStatus(byte[] ih, Properties config) {
         File conf = configFile(_configDir, ih);
         File subdir = conf.getParentFile();
         if (!subdir.exists())
@@ -1823,14 +1839,38 @@ public class SnarkManager implements CompleteListener {
     }
     
     /**
-     *  Just remember we have it
+     *  Just remember we have it.
+     *  This used to simply store a line in the config file,
+     *  but now we also save it in its own config file,
+     *  just like other torrents, so we can remember the directory, tracker, etc.
+     *
+     *  @param dir may be null
+     *  @param trackerURL may be null
+     *  @param dn may be null
      *  @since 0.8.4
      */
-    public void saveMagnetStatus(byte[] ih) {
+    public void saveMagnetStatus(byte[] ih, String dir, String trackerURL, String dn) {
+        // i2psnark.config file
         String infohash = Base64.encode(ih);
         infohash = infohash.replace('=', '$');
         _config.setProperty(PROP_META_MAGNET_PREFIX + infohash, ".");
-        saveConfig();
+        // its own config file
+        Properties config = new OrderedProperties();
+        config.setProperty(PROP_META_MAGNET, "true");
+        if (dir != null)
+            config.setProperty(PROP_META_MAGNET_DIR, dir);
+        if (trackerURL != null)
+            config.setProperty(PROP_META_MAGNET_TR, trackerURL);
+        if (dn != null)
+            config.setProperty(PROP_META_MAGNET_DN, dn);
+        String now = Long.toString(System.currentTimeMillis());
+        config.setProperty(PROP_META_ADDED, now);
+        config.setProperty(PROP_META_STAMP, now);
+        // save
+        synchronized (_configLock) {
+            saveConfig();
+            locked_saveTorrentStatus(ih, config);
+        }
     }
     
     /**
@@ -1840,8 +1880,8 @@ public class SnarkManager implements CompleteListener {
     public void removeMagnetStatus(byte[] ih) {
         String infohash = Base64.encode(ih);
         infohash = infohash.replace('=', '$');
-        _config.remove(PROP_META_MAGNET_PREFIX + infohash);
-        saveConfig();
+        if (_config.remove(PROP_META_MAGNET_PREFIX + infohash) != null)
+            saveConfig();
     }
     
     /**
@@ -2109,21 +2149,35 @@ public class SnarkManager implements CompleteListener {
 
     /**
      * Add all magnets from the config file
+     *
      * @since 0.8.4
      */
     private void addMagnets() {
-        for (Object o : _config.keySet()) {
-            String k = (String) o;
+        boolean changed = false;
+        for (Iterator iter = _config.keySet().iterator(); iter.hasNext(); ) {
+            String k = (String) iter.next();
             if (k.startsWith(PROP_META_MAGNET_PREFIX)) {
                 String b64 = k.substring(PROP_META_MAGNET_PREFIX.length());
                 b64 = b64.replace('$', '=');
                 byte[] ih = Base64.decode(b64);
                 // ignore value - TODO put tracker URL in value
-                if (ih != null && ih.length == 20)
-                    addMagnet(_("Magnet") + ' ' + I2PSnarkUtil.toHex(ih), ih, null, false);
-                // else remove from config?
+                if (ih != null && ih.length == 20) {
+                    Properties config = getConfig(ih);
+                    String name = config.getProperty(PROP_META_MAGNET_DN);
+                    if (name == null)
+                        name = _("Magnet") + ' ' + I2PSnarkUtil.toHex(ih);
+                    String tracker = config.getProperty(PROP_META_MAGNET_TR);
+                    String dir = config.getProperty(PROP_META_MAGNET_DIR);
+                    File dirf = (dir != null) ? (new File(dir)) : null;
+                    addMagnet(name, ih, tracker, false, dirf);
+                } else {
+                    iter.remove();
+                    changed = true;
+                }
             }
         }
+        if (changed)
+            saveConfig();
     }
 
     /**

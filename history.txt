@@ -1,3 +1,7 @@
+2015-09-17 zzz
+ * i2psnark:
+   - Store magnet parameters across restart (ticket #1485)
+
 2015-09-16 zzz
  * Build:
    - Include geoip in update files for next release
