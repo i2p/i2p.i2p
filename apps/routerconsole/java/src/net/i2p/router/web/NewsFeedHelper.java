@@ -66,8 +66,9 @@ public class NewsFeedHelper extends HelperBase {
                 buf.append("<div class=\"newsentry\"><h3>");
                 if (entry.updated > 0) {
                     Date date = new Date(entry.updated);
-                    buf.append(fmt.format(date))
-                       .append(": ");
+                    buf.append("<font size=\"-1\">")
+                       .append(fmt.format(date))
+                       .append(":</font> ");
                 }
                 if (entry.link != null)
                     buf.append("<a href=\"").append(DataHelper.escapeHTML(entry.link)).append("\">");
