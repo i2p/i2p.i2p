@@ -881,7 +881,9 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                     } else if(lowercaseLine.startsWith("accept")) {
                         // strip the accept-blah headers, as they vary dramatically from
                         // browser to browser
-                        if(!Boolean.parseBoolean(getTunnel().getClientOptions().getProperty(PROP_ACCEPT))) {
+                        // But allow Accept-Encoding: gzip, deflate
+                        if(!lowercaseLine.startsWith("accept-encoding: ") &&
+                           !Boolean.parseBoolean(getTunnel().getClientOptions().getProperty(PROP_ACCEPT))) {
                             line = null;
                             continue;
                         }
@@ -933,8 +935,8 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                         // according to rfc2616 s14.3, this *should* force identity, even if
                         // an explicit q=0 for gzip doesn't.  tested against orion.i2p, and it
                         // seems to work.
-                        if(!Boolean.parseBoolean(getTunnel().getClientOptions().getProperty(PROP_ACCEPT)))
-                            newRequest.append("Accept-Encoding: \r\n");
+                        //if (!Boolean.parseBoolean(getTunnel().getClientOptions().getProperty(PROP_ACCEPT)))
+                        //    newRequest.append("Accept-Encoding: \r\n");
                         if (!usingInternalOutproxy)
                             newRequest.append("X-Accept-Encoding: x-i2p-gzip;q=1.0, identity;q=0.5, deflate;q=0, gzip;q=0, *;q=0\r\n");
                     }

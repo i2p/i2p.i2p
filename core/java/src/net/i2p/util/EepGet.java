@@ -755,6 +755,8 @@ public class EepGet {
         Thread pusher = null;
         _decompressException = null;
         if (_isGzippedResponse) {
+            if (_log.shouldInfo())
+                _log.info("Gzipped response, starting decompressor");
             PipedInputStream pi = BigPipedInputStream.getInstance();
             PipedOutputStream po = new PipedOutputStream(pi);
             pusher = new I2PAppThread(new Gunzipper(pi, _out), "EepGet Decompressor");
@@ -1160,17 +1162,13 @@ public class EepGet {
         lookahead[1] = lookahead[2];
         lookahead[2] = (byte)cur;
     }
+
     private static boolean isEndOfHeaders(byte lookahead[]) {
-        byte first = lookahead[0];
-        byte second = lookahead[1];
-        byte third = lookahead[2];
-        return (isNL(second) && isNL(third)) || //   \n\n
-               (isNL(first) && isNL(third));    // \n\r\n
+        return lookahead[2] == NL &&
+               (lookahead[0] == NL || lookahead[1] == NL);    // \n\n or \n\r\n
     }
 
-    /** we ignore any potential \r, since we trim it on write anyway */
     private static final byte NL = '\n';
-    private static boolean isNL(byte b) { return (b == NL); }
 
     /**
      *  @param timeout may be null
@@ -1315,7 +1313,8 @@ public class EepGet {
             buf.append("Content-length: ").append(_postData.length()).append("\r\n");
         // This will be replaced if we are going through I2PTunnelHTTPClient
         buf.append("Accept-Encoding: ");
-        if ((!_shouldProxy) &&
+        // as of 0.9.23, the proxy passes the Accept-Encoding header through
+        if (  /* (!_shouldProxy) && */
             // This is kindof a hack, but if we are downloading a gzip file
             // we don't want to transparently gunzip it and save it as a .gz file.
             (!path.endsWith(".gz")) && (!path.endsWith(".tgz")))
