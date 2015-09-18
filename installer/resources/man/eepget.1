@@ -1,4 +1,4 @@
-.TH EEEPGET 1 "February 5, 2014" "" "Eepget - I2P Downloader"
+.TH EEEPGET 1 "September 18, 2015" "" "Eepget - I2P Downloader"
 
 .SH NAME
 Eepget \- I2P downloader
@@ -15,7 +15,7 @@ regular Internet are supported.
 .P
 Eepget is able to cope with slow or unstable network connections; if a download
 is not successful because of a network problem, it will keep retrying until the
-whole file has been retrieved (by default up to three times).  If supported by
+whole file has been retrieved (if the -n option is set).  If supported by
 the remote server, eepget will instruct the server to continue the download
 from the point of interruption.
 
@@ -53,7 +53,7 @@ Controls the progress display. \fB\ markSize \fP is the number of bytes one '#' 
 .B
 \fB\-n\fR retries
 .TP
-Specify the number of times to retry downloading if the download isn't successful. If this option is not specified, eepget will retry downloading the file 5 times.
+Specify the number of times to retry downloading if the download isn't successful. If this option is not specified, eepget will not retry.
 .TP
 
 .B
