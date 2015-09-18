@@ -1475,7 +1475,8 @@ public class I2PSnarkServlet extends BasicServlet {
         } else if (snark.isAllocating()) {
             statusString = toThemeImg("stalled", "", _("Allocating")) + "</td>" +
                            "<td class=\"snarkTorrentStatus\">" + _("Allocating");
-        } else if (err != null && curPeers == 0) {
+        } else if (err != null && isRunning && curPeers == 0) {
+        //} else if (err != null && curPeers == 0) {
             // Also don't show if seeding... but then we won't see the not-registered error
             //       && remaining != 0 && needed != 0) {
             // let's only show this if we have no peers, otherwise PEX and DHT should bail us out, user doesn't care
@@ -1486,19 +1487,19 @@ public class I2PSnarkServlet extends BasicServlet {
             //                   curPeers + thinsp(noThinsp) +
             //                   ngettext("1 peer", "{0} peers", knownPeers) + "</a>";
             //else if (isRunning)
-            if (isRunning)
+            //if (isRunning) {
                 statusString = toThemeImg("trackererror", "", err) + "</td>" +
                                "<td class=\"snarkTorrentStatus\">" + _("Tracker Error") +
                                ": " + curPeers + thinsp(noThinsp) +
                                ngettext("1 peer", "{0} peers", knownPeers);
-            else {
-                if (err.length() > MAX_DISPLAYED_ERROR_LENGTH)
-                    err = DataHelper.escapeHTML(err.substring(0, MAX_DISPLAYED_ERROR_LENGTH)) + "&hellip;";
-                else
-                    err = DataHelper.escapeHTML(err);
-                statusString = toThemeImg("trackererror", "", err) + "</td>" +
-                               "<td class=\"snarkTorrentStatus\">" + _("Tracker Error");
-            }
+            //} else {
+            //    if (err.length() > MAX_DISPLAYED_ERROR_LENGTH)
+            //        err = DataHelper.escapeHTML(err.substring(0, MAX_DISPLAYED_ERROR_LENGTH)) + "&hellip;";
+            //    else
+            //        err = DataHelper.escapeHTML(err);
+            //    statusString = toThemeImg("trackererror", "", err) + "</td>" +
+            //                   "<td class=\"snarkTorrentStatus\">" + _("Tracker Error");
+            //}
         } else if (snark.isStarting()) {
             statusString = toThemeImg("stalled", "", _("Starting")) + "</td>" +
                            "<td class=\"snarkTorrentStatus\">" + _("Starting");
