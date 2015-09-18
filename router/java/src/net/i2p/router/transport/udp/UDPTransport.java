@@ -86,6 +86,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private final DHSessionKeyBuilder.Factory _dhFactory;
     private int _mtu;
     private int _mtu_ipv6;
+    private boolean _mismatchLogged;
 
     /**
      *  Do we have a public IPv6 address?
@@ -1229,10 +1230,12 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             _expireEvent.remove(oldPeer2);
         }
 
-        if (_log.shouldLog(Log.WARN) && _peersByIdent.size() != _peersByRemoteHost.size())
+        if (_log.shouldLog(Log.WARN) && !_mismatchLogged && _peersByIdent.size() != _peersByRemoteHost.size()) {
+            _mismatchLogged = true;
             _log.warn("Size Mismatch after add: " + peer
                        + " byIDsz = " + _peersByIdent.size()
                        + " byHostsz = " + _peersByRemoteHost.size());
+        }
         
         _activeThrottle.unchoke(peer.getRemotePeer());
         markReachable(peer.getRemotePeer(), peer.isInbound());
