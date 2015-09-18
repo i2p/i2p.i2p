@@ -341,29 +341,28 @@ public class Storage implements Closeable
    *  @return number of bytes remaining; -1 if unknown file
    *  @since 0.7.14
    */
+/****
   public long remaining(int fileIndex) {
       if (fileIndex < 0 || fileIndex >= _torrentFiles.size())
           return -1;
+      if (complete())
+          return 0;
       long bytes = 0;
       for (int i = 0; i < _torrentFiles.size(); i++) {
           TorrentFile tf = _torrentFiles.get(i);
           if (i == fileIndex) {
-              File f = tf.RAFfile;
-              if (complete())
-                  return 0;
-              int psz = piece_size;
               long start = bytes;
               long end = start + tf.length;
-              int pc = (int) (bytes / psz);
+              int pc = (int) (bytes / piece_size);
               long rv = 0;
               if (!bitfield.get(pc))
-                  rv = Math.min(psz - (start % psz), tf.length);
-              for (int j = pc + 1; (((long)j) * psz) < end && j < pieces; j++) {
+                  rv = Math.min(piece_size - (start % piece_size), tf.length);
+              for (int j = pc + 1; (((long)j) * piece_size) < end && j < pieces; j++) {
                   if (!bitfield.get(j)) {
-                      if (((long)(j+1))*psz < end)
-                          rv += psz;
+                      if (((long)(j+1))*piece_size < end)
+                          rv += piece_size;
                       else
-                          rv += end - (((long)j) * psz);
+                          rv += end - (((long)j) * piece_size);
                   }
               }
               return rv;
@@ -371,6 +370,40 @@ public class Storage implements Closeable
           bytes += tf.length;
       }
       return -1;
+  }
+****/
+
+  /**
+   *  For efficiency, calculate remaining bytes for all files at once
+   *
+   *  @return number of bytes remaining for each file, use indexOf() to get index for a file
+   *  @since 0.9.23
+   */
+  public long[] remaining() {
+      long[] rv = new long[_torrentFiles.size()];
+      if (complete())
+          return rv;
+      long bytes = 0;
+      for (int i = 0; i < _torrentFiles.size(); i++) {
+          TorrentFile tf = _torrentFiles.get(i);
+          long start = bytes;
+          long end = start + tf.length;
+          int pc = (int) (bytes / piece_size);
+          long rvi = 0;
+          if (!bitfield.get(pc))
+              rvi = Math.min(piece_size - (start % piece_size), tf.length);
+          for (int j = pc + 1; (((long)j) * piece_size) < end && j < pieces; j++) {
+              if (!bitfield.get(j)) {
+                  if (((long)(j+1))*piece_size < end)
+                      rvi += piece_size;
+                  else
+                      rvi += end - (((long)j) * piece_size);
+              }
+          }
+          rv[i] = rvi;
+          bytes += tf.length;
+      }
+      return rv;
   }
 
   /**
@@ -455,9 +488,8 @@ public class Storage implements Closeable
       int file = 0;
       long pcEnd = -1;
       long fileEnd = _torrentFiles.get(0).length - 1;
-      int psz = piece_size;
       for (int i = 0; i < rv.length; i++) {
-          pcEnd += psz;
+          pcEnd += piece_size;
           int pri = _torrentFiles.get(file).priority;
           while (fileEnd <= pcEnd && file < _torrentFiles.size() - 1) {
               file++;

@@ -1,7 +1,21 @@
+2015-09-18 zzz
+ * EepGet:
+   - Send Accept-Encoding: gzip even when proxied
+   - Fix man page (ticket #1631)
+ * i2psnark:
+   - Don't display "Tracker Error" if torrent is stopped (ticket #1654)
+   - Improve directory listing efficiency (ticket #1079)
+ * i2ptunnel:
+   - Pass Accept-Encoding header through HTTP client and server proxies,
+     to allow end-to-end compression
+   - Don't do transparent response compression if response
+     Content-Encoding indicates it is already compressed
+ * Streaming: Move remaining timers from the context to streaming's SimpleTimer2
+
 2015-09-17 zzz
  * i2psnark:
    - Store magnet parameters across restart (ticket #1485)
-   - Don't delete torrent config file after error on initial startup (ticket #1658)
+   - Don't delete torrent config file after error on initial startup (tickets #1575, #1658)
 
 2015-09-16 zzz
  * Build:

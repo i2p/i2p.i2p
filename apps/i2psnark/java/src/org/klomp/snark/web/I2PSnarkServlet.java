@@ -2936,8 +2936,10 @@ public class I2PSnarkServlet extends BasicServlet {
 
         Storage storage = snark != null ? snark.getStorage() : null;
         List<Sorters.FileAndIndex> fileList = new ArrayList<Sorters.FileAndIndex>(ls.length);
+        // precompute remaining for all files for efficiency
+        long[] remainingArray = (storage != null) ? storage.remaining() : null;
         for (int i = 0; i < ls.length; i++) {
-            fileList.add(new Sorters.FileAndIndex(ls[i], storage));
+            fileList.add(new Sorters.FileAndIndex(ls[i], storage, remainingArray));
         }
 
         boolean showSort = fileList.size() > 1;

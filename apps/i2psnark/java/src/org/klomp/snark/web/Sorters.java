@@ -356,13 +356,14 @@ class Sorters {
 
         /**
          *  @param storage may be null
+         *  @param remaining precomputed, non-null iff storage is non-null
          */
-        public FileAndIndex(File file, Storage storage) {
+        public FileAndIndex(File file, Storage storage, long[] remainingArray) {
             this.file = file;
             index = storage != null ? storage.indexOf(file) : -1;
             if (index >= 0) {
                 isDirectory = false;
-                remaining = storage.remaining(index);
+                remaining = remainingArray[index];
                 priority = storage.getPriority(index);
             } else {
                 isDirectory = file.isDirectory();
