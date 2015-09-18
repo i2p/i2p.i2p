@@ -45,11 +45,11 @@ class PacketQueue implements SendMessageStatusListener, Closeable {
     private static final long REMOVE_EXPIRED_TIME = 67*1000;
     private static final boolean ENABLE_STATUS_LISTEN = true;
 
-    public PacketQueue(I2PAppContext context) {
+    public PacketQueue(I2PAppContext context, SimpleTimer2 timer) {
         _context = context;
         _log = context.logManager().getLog(PacketQueue.class);
         _messageStatusMap = new ConcurrentHashMap<Long, Connection>(16);
-        new RemoveExpired();
+        new RemoveExpired(timer);
         // all createRateStats in ConnectionManager
     }
 
@@ -328,8 +328,8 @@ class PacketQueue implements SendMessageStatusListener, Closeable {
      */
     private class RemoveExpired extends SimpleTimer2.TimedEvent {
         
-        public RemoveExpired() {
-             super(_context.simpleTimer2(), REMOVE_EXPIRED_TIME);
+        public RemoveExpired(SimpleTimer2 timer) {
+             super(timer, REMOVE_EXPIRED_TIME);
         }
 
         public void timeReached() {

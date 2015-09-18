@@ -74,11 +74,11 @@ class ConnectionManager {
         _pendingPings = new ConcurrentHashMap<Long,PingRequest>(4);
         _messageHandler = new MessageHandler(_context, this);
         _packetHandler = new PacketHandler(_context, this);
-        _connectionHandler = new ConnectionHandler(_context, this);
         _schedulerChooser = new SchedulerChooser(_context);
         _conPacketHandler = new ConnectionPacketHandler(_context);
         _timer = new RetransmissionTimer(_context, "Streaming Timer " +
                                          session.getMyDestination().calculateHash().toBase64().substring(0, 4));
+        _connectionHandler = new ConnectionHandler(_context, this, _timer);
         _tcbShare = new TCBShare(_context, _timer);
         // PROTO_ANY is for backward compatibility (pre-0.7.1)
         // TODO change proto to PROTO_STREAMING someday.
@@ -88,7 +88,7 @@ class ConnectionManager {
         // As of 0.9.1, listen on configured port (default 0 = all)
         int protocol = defaultOptions.getEnforceProtocol() ? I2PSession.PROTO_STREAMING : I2PSession.PROTO_ANY;
         _session.addMuxedSessionListener(_messageHandler, protocol, defaultOptions.getLocalPort());
-        _outboundQueue = new PacketQueue(_context);
+        _outboundQueue = new PacketQueue(_context, _timer);
         _recentlyClosed = new LHMCache<Long, Object>(32);
         /** Socket timeout for accept() */
         _soTimeout = -1;
@@ -839,7 +839,7 @@ class ConnectionManager {
         private final PingNotifier _notifier;
 
         public PingFailed(Long id, PingNotifier notifier) { 
-            super(_context.simpleTimer2());
+            super(_timer);
             _id = id;
             _notifier = notifier;
         }

@@ -9,6 +9,7 @@ import net.i2p.I2PAppContext;
 import net.i2p.data.Destination;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleTimer;
+import net.i2p.util.SimpleTimer2;
 
 /**
  * Receive new connection attempts
@@ -23,6 +24,7 @@ class ConnectionHandler {
     private final Log _log;
     private final ConnectionManager _manager;
     private final LinkedBlockingQueue<Packet> _synQueue;
+    private final SimpleTimer2 _timer;
     private volatile boolean _active;
     private int _acceptTimeout;
     
@@ -37,10 +39,11 @@ class ConnectionHandler {
     private static final int MAX_QUEUE_SIZE = 64;
     
     /** Creates a new instance of ConnectionHandler */
-    public ConnectionHandler(I2PAppContext context, ConnectionManager mgr) {
+    public ConnectionHandler(I2PAppContext context, ConnectionManager mgr, SimpleTimer2 timer) {
         _context = context;
         _log = context.logManager().getLog(ConnectionHandler.class);
         _manager = mgr;
+        _timer = timer;
         _synQueue = new LinkedBlockingQueue<Packet>(MAX_QUEUE_SIZE);
         _acceptTimeout = DEFAULT_ACCEPT_TIMEOUT;
     }
@@ -96,7 +99,7 @@ class ConnectionHandler {
         // also check if expiration of the head is long past for overload detection with peek() ?
         boolean success = _synQueue.offer(packet); // fail immediately if full
         if (success) {
-            _context.simpleTimer2().addEvent(new TimeoutSyn(packet), _acceptTimeout);
+            _timer.addEvent(new TimeoutSyn(packet), _acceptTimeout);
         } else {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Dropping new SYN request, as the queue is full");

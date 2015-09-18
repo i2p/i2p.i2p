@@ -793,7 +793,7 @@ class Connection {
     private boolean scheduleDisconnectEvent() {
         if (!_disconnectScheduledOn.compareAndSet(0, _context.clock().now()))
             return false;
-        _context.simpleTimer2().addEvent(new DisconnectEvent(), DISCONNECT_TIMEOUT);
+        schedule(new DisconnectEvent(), DISCONNECT_TIMEOUT);
         return true;
     }
 
@@ -806,6 +806,24 @@ class Connection {
         public void timeReached() {
             disconnectComplete();
         }
+    }
+    
+    /**
+     *  Called from SchedulerImpl
+     *
+     *  @since 0.9.23 moved here so we can use our timer
+     */
+    public void scheduleConnectionEvent(long msToWait) {
+        schedule(_connectionEvent, msToWait);
+    }
+    
+    /**
+     *  Schedule something on our timer.
+     *
+     *  @since 0.9.23
+     */
+    public void schedule(SimpleTimer.TimedEvent event, long msToWait) {
+        _timer.addEvent(event, msToWait);
     }
     
     private boolean _remotePeerSet = false;
@@ -1254,8 +1272,6 @@ class Connection {
         return buf.toString();
     }
 
-    public SimpleTimer.TimedEvent getConnectionEvent() { return _connectionEvent; }
-    
     /**
      * fired to reschedule event notification
      */
