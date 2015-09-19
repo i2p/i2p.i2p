@@ -76,7 +76,8 @@ class SubscriptionIterator implements Iterator<AddressBook> {
     public AddressBook next() {
         Subscription sub = this.subIterator.next();
         if (sub.getLastFetched() + this.delay < I2PAppContext.getGlobalContext().clock().now() &&
-            I2PAppContext.getGlobalContext().portMapper().getPort(PortMapper.SVC_HTTP_PROXY) >= 0) {
+            I2PAppContext.getGlobalContext().portMapper().getPort(PortMapper.SVC_HTTP_PROXY) >= 0 &&
+            !I2PAppContext.getGlobalContext().getBooleanProperty("i2p.vmCommSystem")) {
             //System.err.println("Fetching addressbook from " + sub.getLocation());
             return new AddressBook(sub, this.proxyHost, this.proxyPort);
         } else {

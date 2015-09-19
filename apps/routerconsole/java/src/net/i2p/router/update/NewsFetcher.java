@@ -99,6 +99,11 @@ class NewsFetcher extends UpdateRunner {
                 _log.warn("Cannot fetch news - HTTP client tunnel not running");
             return;
         }
+        if (shouldProxy && _context.commSystem().isDummy()) {
+            if (_log.shouldWarn())
+                _log.warn("Cannot fetch news - VM Comm system");
+            return;
+        }
 
         for (URI uri : _urls) {
             _currentURI = addLang(uri);
