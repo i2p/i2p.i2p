@@ -73,6 +73,7 @@ public class Storage implements Closeable
   private boolean changed;
   private volatile boolean _isChecking;
   private final AtomicInteger _allocateCount = new AtomicInteger();
+  private final AtomicInteger _checkProgress = new AtomicInteger();
 
   /** The default piece size. */
   private static final int DEFAULT_PIECE_SIZE = 256*1024;
@@ -309,6 +310,18 @@ public class Storage implements Closeable
    */
   public boolean isChecking() {
       return _isChecking;
+  }
+
+  /**
+   *  If checking is in progress, return completion 0-100,
+   *  else return 100.
+   *  @since 0.9.23
+   */
+  public double getCheckingProgress() {
+      if (_isChecking)
+          return _checkProgress.get() / (double) pieces;
+      else
+          return 100.0d;
   }
 
   /**
@@ -869,6 +882,7 @@ public class Storage implements Closeable
 
   private void locked_checkCreateFiles(boolean recheck) throws IOException
   {
+    _checkProgress.set(0);
     // Whether we are resuming or not,
     // if any of the files already exists we assume we are resuming.
     boolean resume = false;
@@ -885,13 +899,16 @@ public class Storage implements Closeable
 
     // Make sure all files are available and of correct length
     // The files should all exist as they have been created with zero length by createFilesFromNames()
+    long lengthProgress = 0;
     for (TorrentFile tf : _torrentFiles)
       {
         long length = tf.RAFfile.length();
+        lengthProgress += tf.length;
         if(tf.RAFfile.exists() && length == tf.length)
           {
             if (listener != null)
               listener.storageAllocated(this, length);
+            _checkProgress.set(0);
             resume = true; // XXX Could dynamicly check
           }
         else if (length == 0) {
@@ -903,6 +920,8 @@ public class Storage implements Closeable
                   tf.closeRAF();
               } catch (IOException ioe) {}
           }
+          if (!resume)
+              _checkProgress.set((int) (pieces * lengthProgress / total_length));
         } else {
           String msg = "File '" + tf.name + "' exists, but has wrong length (expected " +
                        tf.length + " but found " + length + ") - repairing corruption";
@@ -911,6 +930,7 @@ public class Storage implements Closeable
           _log.error(msg);
           changed = true;
           resume = true;
+          _checkProgress.set(0);
           _probablyComplete = false; // to force RW
           synchronized(tf) {
               RandomAccessFile raf = tf.checkRAF();
@@ -931,6 +951,7 @@ public class Storage implements Closeable
         long pieceEnd = 0;
         for (int i = 0; i < pieces; i++)
           {
+            _checkProgress.set(i);
             int length = getUncheckedPiece(i, piece);
             boolean correctHash = metainfo.checkPiece(i, piece, 0, length);
             // close as we go so we don't run out of file descriptors
@@ -957,6 +978,7 @@ public class Storage implements Closeable
           }
       }
 
+    _checkProgress.set(pieces);
     _probablyComplete = complete();
     // close all the files so we don't end up with a zillion open ones;
     // we will reopen as needed

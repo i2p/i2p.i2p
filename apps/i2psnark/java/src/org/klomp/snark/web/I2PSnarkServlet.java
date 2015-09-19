@@ -1471,7 +1471,8 @@ public class I2PSnarkServlet extends BasicServlet {
         String statusString;
         if (snark.isChecking()) {
             statusString = toThemeImg("stalled", "", _("Checking")) + "</td>" +
-                           "<td class=\"snarkTorrentStatus\">" + _("Checking");
+                           "<td class=\"snarkTorrentStatus\">" + _("Checking") + ' ' +
+                           (new DecimalFormat("0.00%")).format(snark.getCheckingProgress());
         } else if (snark.isAllocating()) {
             statusString = toThemeImg("stalled", "", _("Allocating")) + "</td>" +
                            "<td class=\"snarkTorrentStatus\">" + _("Allocating");
@@ -2924,8 +2925,9 @@ public class I2PSnarkServlet extends BasicServlet {
                 buf.append("<tr><td>");
                 toThemeImg(buf, "file");
                 if (snark.isChecking()) {
-                    buf.append("&nbsp;<b>").append(_("Checking")).append("&hellip;</b>&nbsp;&nbsp;&nbsp;")
-                       .append("<a href=\"").append(base).append("\">")
+                    buf.append("&nbsp;<b>").append(_("Checking")).append("&hellip; ")
+                       .append((new DecimalFormat("0.00%")).format(snark.getCheckingProgress()))
+                       .append("&nbsp;&nbsp;&nbsp;<a href=\"").append(base).append("\">")
                        .append(_("Refresh page for results")).append("</a>");
                 } else if (snark.isStarting()) {
                     buf.append("&nbsp;<b>").append(_("Starting")).append("&hellip;</b>");

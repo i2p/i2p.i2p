@@ -746,6 +746,18 @@ public class Snark
     }
 
     /**
+     *  If checking is in progress, return completion 0-100,
+     *  else return 100.
+     *  @since 0.9.23
+     */
+    public double getCheckingProgress() {
+        if (storage != null && storage.isChecking())
+            return storage.getCheckingProgress();
+        else
+            return 100.0d;
+    }
+
+    /**
      *  Disk allocation (ballooning) in progress.
      *  @since 0.9.3
      */
