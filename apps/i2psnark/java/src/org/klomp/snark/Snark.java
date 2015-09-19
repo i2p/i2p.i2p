@@ -1264,7 +1264,8 @@ public class Snark
 
   public void setWantedPieces(Storage storage)
   {
-    coordinator.setWantedPieces();
+    if (coordinator != null)
+        coordinator.setWantedPieces();
   }
 
   ///////////// End StorageListener methods

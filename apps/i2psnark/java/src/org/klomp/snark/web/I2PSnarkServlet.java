@@ -2613,10 +2613,21 @@ public class I2PSnarkServlet extends BasicServlet {
             String[] val = postParams.get("nonce");
             if (val != null) {
                 String nonce = val[0];
-                if (String.valueOf(_nonce).equals(nonce))
-                    savePriorities(snark, postParams);
-                else
+                if (String.valueOf(_nonce).equals(nonce)) {
+                    if (postParams.get("savepri") != null) {
+                        savePriorities(snark, postParams);
+                    } else if (postParams.get("stop") != null) {
+                        _manager.stopTorrent(snark, false);
+                    } else if (postParams.get("start") != null) {
+                        _manager.startTorrent(snark);
+                    } else if (postParams.get("recheck") != null) {
+                        _manager.recheckTorrent(snark);
+                    } else {
+                        _manager.addMessage("Unknown command");
+                    }
+                } else {
                     _manager.addMessage("Please retry form submission (bad nonce)");
+                }
             }
             return null;
         }
@@ -2639,6 +2650,7 @@ public class I2PSnarkServlet extends BasicServlet {
             r = new File("");
         }
 
+        boolean showStopStart = snark != null;
         boolean showPriority = snark != null && snark.getStorage() != null && !snark.getStorage().complete() &&
                                r.isDirectory();
 
@@ -2668,7 +2680,8 @@ public class I2PSnarkServlet extends BasicServlet {
         
         if (parent)  // always true
             buf.append("<div class=\"page\"><div class=\"mainsection\">");
-        if (showPriority) {
+        // for stop/start/check
+        if (showStopStart || showPriority) {
             buf.append("<form action=\"").append(base).append("\" method=\"POST\">\n");
             buf.append("<input type=\"hidden\" name=\"nonce\" value=\"").append(_nonce).append("\" >\n");
             if (sortParam != null) {
@@ -2905,7 +2918,36 @@ public class I2PSnarkServlet extends BasicServlet {
                .append(":</b> ")
                .append(formatSize(snark.getPieceLength(0)))
                .append("</td></tr>\n");
+
+            // buttons
+            if (showStopStart) {
+                buf.append("<tr><td>");
+                toThemeImg(buf, "file");
+                if (snark.isChecking()) {
+                    buf.append("&nbsp;<b>").append(_("Checking")).append("&hellip;</b>&nbsp;&nbsp;&nbsp;")
+                       .append("<a href=\"").append(base).append("\">")
+                       .append(_("Refresh page for results")).append("</a>");
+                } else if (snark.isStarting()) {
+                    buf.append("&nbsp;<b>").append(_("Starting")).append("&hellip;</b>");
+                } else if (snark.isAllocating()) {
+                    buf.append("&nbsp;<b>").append(_("Allocating")).append("&hellip;</b>");
+                } else {
+                    boolean isRunning = !snark.isStopped();
+                    buf.append(" <input type=\"submit\" value=\"");
+                    if (isRunning)
+                        buf.append(_("Stop")).append("\" name=\"stop\" class=\"stoptorrent\">\n");
+                    else
+                        buf.append(_("Start")).append("\" name=\"start\" class=\"starttorrent\">\n");
+                    buf.append("&nbsp;&nbsp;&nbsp;<input type=\"submit\" name=\"recheck\" value=\"").append(_("Force Recheck"));
+                    if (isRunning)
+                        buf.append("\" class=\"disabled\" disabled=\"disabled\">\n");
+                    else
+                        buf.append("\" class=\"reload\">\n");
+                }
+                buf.append("</td></tr>\n");
+            }
         } else {
+            // snark == null
             // shouldn't happen
             buf.append("<tr><th>Not found<br>resource=\"").append(r.toString())
                .append("\"<br>base=\"").append(base)
@@ -3158,7 +3200,8 @@ public class I2PSnarkServlet extends BasicServlet {
                        "</th></tr></thead>\n");
         }
         buf.append("</table>\n");
-        if (showPriority)
+        // for stop/start/check
+        if (showStopStart || showPriority)
             buf.append("</form>");
         buf.append("</div></div></BODY></HTML>\n");
 

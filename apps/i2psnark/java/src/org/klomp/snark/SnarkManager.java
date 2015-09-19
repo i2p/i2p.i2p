@@ -8,6 +8,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Serializable;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -2364,26 +2365,34 @@ public class SnarkManager implements CompleteListener {
     public void startTorrent(byte[] infoHash) {
         for (Snark snark : _snarks.values()) {
             if (DataHelper.eq(infoHash, snark.getInfoHash())) {
-                if (snark.isStarting() || !snark.isStopped()) {
-                    addMessage("Torrent already started");
-                    return;
-                }
-                boolean connected = _util.connected();
-                if ((!connected) && !_util.isConnecting())
-                    addMessage(_("Opening the I2P tunnel"));
-                addMessage(_("Starting up torrent {0}", snark.getBaseName()));
-                if (connected) {
-                    snark.startTorrent();
-                } else {
-                    // mark it for the UI
-                    snark.setStarting();
-                    (new I2PAppThread(new ThreadedStarter(snark), "TorrentStarter", true)).start();
-                    try { Thread.sleep(200); } catch (InterruptedException ie) {}
-                }
+                startTorrent(snark);
                 return;
             }
         }
         addMessage("Torrent not found?");
+    }
+
+    /**
+     *  If not connected, thread it, otherwise inline
+     *  @since 0.9.23
+     */
+    public void startTorrent(Snark snark) {
+        if (snark.isStarting() || !snark.isStopped()) {
+            addMessage("Torrent already started");
+            return;
+        }
+        boolean connected = _util.connected();
+        if ((!connected) && !_util.isConnecting())
+            addMessage(_("Opening the I2P tunnel"));
+        addMessage(_("Starting up torrent {0}", snark.getBaseName()));
+        if (connected) {
+            snark.startTorrent();
+        } else {
+            // mark it for the UI
+            snark.setStarting();
+            (new I2PAppThread(new ThreadedStarter(snark), "TorrentStarter", true)).start();
+            try { Thread.sleep(200); } catch (InterruptedException ie) {}
+        }
     }
 
     /**
@@ -2495,6 +2504,55 @@ public class SnarkManager implements CompleteListener {
                 _util.disconnect();
                 _stopping = false;
                 addMessage(_("I2P tunnel closed."));
+            }
+        }
+    }
+
+    /**
+     *  Threaded. Torrent must be stopped.
+     *  @since 0.9.23
+     */
+    public void recheckTorrent(Snark snark) {
+        if (snark.isStarting() || !snark.isStopped()) {
+            addMessage("Cannot check " + snark.getBaseName() + ", torrent already started");
+            return;
+        }
+        Storage storage = snark.getStorage();
+        if (storage == null) {
+            addMessage("Cannot check " + snark.getBaseName() + ", no storage");
+            return;
+        }
+        (new I2PAppThread(new ThreadedRechecker(snark), "TorrentRechecker", true)).start();
+        try { Thread.sleep(200); } catch (InterruptedException ie) {}
+    }
+
+    /**
+     *  @since 0.9.23
+     */
+    private class ThreadedRechecker implements Runnable {
+        private final Snark snark;
+        /** must have non-null storage */
+        public ThreadedRechecker(Snark s) { snark = s; }
+        public void run() {
+            try {
+                if (_log.shouldWarn())
+                    _log.warn("Starting recheck of " + snark.getBaseName());
+                boolean changed = snark.getStorage().recheck();
+                if (changed)
+                    updateStatus(snark);
+                if (_log.shouldWarn())
+                    _log.warn("Finished recheck of " + snark.getBaseName() + " changed? " + changed);
+                if (changed) {
+                    int pieces = snark.getPieces();
+                    double completion = (pieces - snark.getNeeded()) / (double) pieces;
+                    String complete = (new DecimalFormat("0.00%")).format(completion);
+                    addMessage(_("Finished recheck of torrent {0}, now {1} complete", snark.getBaseName(), complete));
+                } else {
+                    addMessage(_("Finished recheck of torrent {0}, unchanged", snark.getBaseName()));
+                }
+            } catch (Exception e) {
+                _log.error("Error rechecking " + snark.getBaseName(), e);
+                addMessage(_("Error checking the torrent {0}", snark.getBaseName()) + ": " + e);
             }
         }
     }

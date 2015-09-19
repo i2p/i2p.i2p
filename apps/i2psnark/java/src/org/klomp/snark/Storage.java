@@ -533,6 +533,9 @@ public class Storage implements Closeable
   /**
    * Creates (and/or checks) all files from the metainfo file list.
    * Only call this once, and only after the constructor with the metainfo.
+   * Use recheck() to check again later.
+   *
+   * @throws IllegalStateException if called more than once
    */
   public void check() throws IOException
   {
@@ -543,6 +546,9 @@ public class Storage implements Closeable
    * Creates (and/or checks) all files from the metainfo file list.
    * Use a saved bitfield and timestamp from a config file.
    * Only call this once, and only after the constructor with the metainfo.
+   * Use recheck() to check again later.
+   *
+   * @throws IllegalStateException if called more than once
    */
   public void check(long savedTime, BitField savedBitField) throws IOException
   {
@@ -819,6 +825,24 @@ public class Storage implements Closeable
           } while (f != null && rv.add(f));
       }
       return rv;
+  }
+
+  /**
+   *  Blocking. Holds lock.
+   *  Recommend running only when stopped.
+   *  Caller should thread.
+   *  Calls listener.setWantedPieces() on completion if anything changed.
+   *
+   *  @return true if anything changed, false otherwise
+   *  @since 0.9.23
+   */
+  public boolean recheck() throws IOException {
+      int previousNeeded = needed;
+      checkCreateFiles(true);
+      boolean changed = previousNeeded != needed;
+      if (listener != null && changed)
+          listener.setWantedPieces(this);
+      return changed;
   }
 
   /**
