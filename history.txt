@@ -1,3 +1,6 @@
+2015-09-20 dg
+ * /configreseed: Add 'Reset URL list' button for revert to default hosts (ticket #1554, thanks dzirtt@gmail.com)
+
 2015-09-19 zzz
  * i2psnark: Add recheck/start/stop buttons to details page (ticket #372)
 
