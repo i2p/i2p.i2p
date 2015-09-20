@@ -746,15 +746,15 @@ public class Snark
     }
 
     /**
-     *  If checking is in progress, return completion 0-100,
-     *  else return 100.
+     *  If checking is in progress, return completion 0.0 ... 1.0,
+     *  else return 1.0.
      *  @since 0.9.23
      */
     public double getCheckingProgress() {
         if (storage != null && storage.isChecking())
             return storage.getCheckingProgress();
         else
-            return 100.0d;
+            return 1.0d;
     }
 
     /**
