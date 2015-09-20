@@ -1286,7 +1286,7 @@ public class Snark
   /** SnarkSnutdown callback unused */
   public void shutdown()
   {
-    // Should not be necessary since all non-deamon threads should
+    // Should not be necessary since all non-daemon threads should
     // have died. But in reality this does not always happen.
     //System.exit(0);
   }
