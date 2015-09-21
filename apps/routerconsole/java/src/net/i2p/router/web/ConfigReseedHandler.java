@@ -106,7 +106,7 @@ public class ConfigReseedHandler extends FormHandler {
         if (_context.router().saveConfig(Reseeder.PROP_RESEED_URL, null))
 	    addFormNotice(_("URL list reset successfully"));
         else
-            addFormError(_("URL list reset failed"));
+            addFormError(_("Error saving the configuration (applied but not saved) - please see the error logs"));
     }
 
     /** @since 0.8.9 */
