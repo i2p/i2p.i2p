@@ -1242,30 +1242,34 @@ public class SnarkManager implements CompleteListener {
                     }
                     String rejectMessage = validateTorrent(info);
                     if (rejectMessage != null) {
-                        sfile.delete();
-                        addMessage(rejectMessage);
-                        return;
-                    } else {
-                        // TODO load saved closest DHT nodes and pass to the Snark ?
-                        // This may take a LONG time
-                        if (baseFile == null)
-                            baseFile = getSavedBaseFile(info.getInfoHash());
-                        if (_log.shouldLog(Log.INFO))
-                            _log.info("New Snark, torrent: " + filename + " base: " + baseFile);
-                        torrent = new Snark(_util, filename, null, -1, null, null, this,
-                                            _peerCoordinatorSet, _connectionAcceptor,
-                                            shouldAutoStart(), dataDir.getPath(), baseFile);
-                        loadSavedFilePriorities(torrent);
-                        synchronized (_snarks) {
-                            _snarks.put(filename, torrent);
-                        }
+                        throw new IOException(rejectMessage);
+                    }
+
+                    // TODO load saved closest DHT nodes and pass to the Snark ?
+                    // This may take a LONG time
+                    if (baseFile == null)
+                        baseFile = getSavedBaseFile(info.getInfoHash());
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("New Snark, torrent: " + filename + " base: " + baseFile);
+                    torrent = new Snark(_util, filename, null, -1, null, null, this,
+                                        _peerCoordinatorSet, _connectionAcceptor,
+                                        shouldAutoStart(), dataDir.getPath(), baseFile);
+                    loadSavedFilePriorities(torrent);
+                    synchronized (_snarks) {
+                        _snarks.put(filename, torrent);
                     }
                 } catch (IOException ioe) {
-                    String err = _("Torrent in \"{0}\" is invalid", sfile.getName()) + ": " + ioe.getMessage();
+                    String err = _("Torrent in \"{0}\" is invalid", sfile.toString()) + ": " + ioe.getMessage();
                     addMessage(err);
                     _log.error(err, ioe);
-                    if (sfile.exists())
-                        sfile.delete();
+                    File rename = new File(filename + ".BAD");
+                    if (rename.exists()) {
+                        if (sfile.delete())
+                            addMessage(_("Torrent file deleted: {0}", sfile.toString()));
+                    } else {
+                        if (FileUtil.rename(sfile, rename))
+                            addMessage(_("Torrent file moved from {0} to {1}", sfile.toString(), rename.toString()));
+                    }
                     return;
                 } catch (OutOfMemoryError oom) {
                     addMessage(_("ERROR - Out of memory, cannot create torrent from {0}", sfile.getName()) + ": " + oom.getMessage());
@@ -1895,18 +1899,18 @@ public class SnarkManager implements CompleteListener {
     private String validateTorrent(MetaInfo info) {
         List<List<String>> files = info.getFiles();
         if ( (files != null) && (files.size() > MAX_FILES_PER_TORRENT) ) {
-            return _("Too many files in \"{0}\" ({1}), deleting it!", info.getName(), files.size());
+            return _("Too many files in \"{0}\" ({1})!", info.getName(), files.size());
         } else if ( (files == null) && (info.getName().endsWith(".torrent")) ) {
-            return _("Torrent file \"{0}\" cannot end in \".torrent\", deleting it!", info.getName());
+            return _("Torrent file \"{0}\" cannot end in \".torrent\"!", info.getName());
         } else if (info.getPieces() <= 0) {
-            return _("No pieces in \"{0}\",  deleting it!", info.getName());
+            return _("No pieces in \"{0}\"!", info.getName());
         } else if (info.getPieces() > Storage.MAX_PIECES) {
-            return _("Too many pieces in \"{0}\", limit is {1}, deleting it!", info.getName(), Storage.MAX_PIECES);
+            return _("Too many pieces in \"{0}\", limit is {1}!", info.getName(), Storage.MAX_PIECES);
         } else if (info.getPieceLength(0) > Storage.MAX_PIECE_SIZE) {
-            return _("Pieces are too large in \"{0}\" ({1}B), deleting it.", info.getName(), DataHelper.formatSize2(info.getPieceLength(0))) + ' ' +
+            return _("Pieces are too large in \"{0}\" ({1}B)!", info.getName(), DataHelper.formatSize2(info.getPieceLength(0))) + ' ' +
                    _("Limit is {0}B", DataHelper.formatSize2(Storage.MAX_PIECE_SIZE));
         } else if (info.getTotalLength() <= 0) {
-            return _("Torrent \"{0}\" has no data, deleting it!", info.getName());
+            return _("Torrent \"{0}\" has no data!", info.getName());
         } else if (info.getTotalLength() > Storage.MAX_TOTAL_SIZE) {
             System.out.println("torrent info: " + info.toString());
             List<Long> lengths = info.getLengths();
@@ -1914,7 +1918,7 @@ public class SnarkManager implements CompleteListener {
                 for (int i = 0; i < lengths.size(); i++)
                     System.out.println("File " + i + " is " + lengths.get(i) + " long.");
             
-            return _("Torrents larger than {0}B are not supported yet, deleting \"{1}\"", Storage.MAX_TOTAL_SIZE, info.getName());
+            return _("Torrents larger than {0}B are not supported yet \"{1}\"!", Storage.MAX_TOTAL_SIZE, info.getName());
         } else {
             // ok
             return null;

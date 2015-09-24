@@ -3274,7 +3274,7 @@ public class I2PSnarkServlet extends BasicServlet {
                 icon = "itoopie_xxsm";
             else
                 icon = "compress";
-        } else if (mime.equals("application/x-gtar") ||
+        } else if (mime.equals("application/x-gtar") || mime.equals("application/x-xz") ||
                  mime.equals("application/compress") || mime.equals("application/gzip") ||
                  mime.equals("application/x-7z-compressed") || mime.equals("application/x-rar-compressed") ||
                  mime.equals("application/x-tar") || mime.equals("application/x-bzip2"))
