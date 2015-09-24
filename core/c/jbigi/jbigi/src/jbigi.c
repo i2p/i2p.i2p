@@ -102,7 +102,7 @@ JNIEXPORT jbyteArray JNICALL Java_net_i2p_util_NativeBigInteger_nativeModPow
         // disallow negative exponents to avoid divide by zero exception if no inverse exists
         convert_j2mp(env, jexp,  &mexp);
         if (mpz_sgn(mexp) < 0) {
-            mpz_clears(mmod, mexp, 0);
+            mpz_clears(mmod, mexp, NULL);
             jclass exc = (*env)->FindClass(env, "java/lang/ArithmeticException");
             (*env)->ThrowNew(env, exc, "Exponent cannot be negative");
             return 0;
@@ -117,7 +117,7 @@ JNIEXPORT jbyteArray JNICALL Java_net_i2p_util_NativeBigInteger_nativeModPow
 
         convert_mp2j(env, mmod, &jresult);
 
-        mpz_clears(mbase, mexp, mmod, 0);
+        mpz_clears(mbase, mexp, mmod, NULL);
 
         return jresult;
 }
@@ -170,7 +170,7 @@ JNIEXPORT jbyteArray JNICALL Java_net_i2p_util_NativeBigInteger_nativeModPowCT
         // disallow negative or zero exponents as specified in the GMP docs
         convert_j2mp(env, jexp,  &mexp);
         if (mpz_sgn(mexp) <= 0) {
-            mpz_clears(mmod, mexp, 0);
+            mpz_clears(mmod, mexp, NULL);
             jclass exc = (*env)->FindClass(env, "java/lang/ArithmeticException");
             (*env)->ThrowNew(env, exc, "Exponent must be positive");
             return 0;
@@ -182,7 +182,7 @@ JNIEXPORT jbyteArray JNICALL Java_net_i2p_util_NativeBigInteger_nativeModPowCT
 
         convert_mp2j(env, mmod, &jresult);
 
-        mpz_clears(mbase, mexp, mmod, 0);
+        mpz_clears(mbase, mexp, mmod, NULL);
 
         return jresult;
 }
@@ -236,7 +236,7 @@ JNIEXPORT jbyteArray JNICALL Java_net_i2p_util_NativeBigInteger_nativeModInverse
         mpz_init(mgcd);
         mpz_gcd(mgcd, mbase, mmod);
         if (mpz_cmp_si(mgcd, 1) != 0) {
-            mpz_clears(mbase, mexp, mmod, mgcd, 0);
+            mpz_clears(mbase, mexp, mmod, mgcd, NULL);
             jclass exc = (*env)->FindClass(env, "java/lang/ArithmeticException");
             (*env)->ThrowNew(env, exc, "Not coprime in nativeModInverse()");
             return 0;
@@ -249,7 +249,7 @@ JNIEXPORT jbyteArray JNICALL Java_net_i2p_util_NativeBigInteger_nativeModInverse
 
         convert_mp2j(env, mmod, &jresult);
 
-        mpz_clears(mbase, mexp, mmod, mgcd, 0);
+        mpz_clears(mbase, mexp, mmod, mgcd, NULL);
 
         return jresult;
 }
