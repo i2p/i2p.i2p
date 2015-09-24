@@ -1259,6 +1259,8 @@ public class SnarkManager implements CompleteListener {
                         _snarks.put(filename, torrent);
                     }
                 } catch (IOException ioe) {
+                    // close before rename/delete for windows
+                    if (fis != null) try { fis.close(); fis = null; } catch (IOException ioe2) {}
                     String err = _("Torrent in \"{0}\" is invalid", sfile.toString()) + ": " + ioe.getMessage();
                     addMessage(err);
                     _log.error(err, ioe);
