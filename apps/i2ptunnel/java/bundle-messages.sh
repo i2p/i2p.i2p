@@ -29,7 +29,7 @@ if which find|grep -q -i windows ; then
 	export PATH=.:/bin:/usr/local/bin:$PATH
 fi
 # Fast mode - update ondemond
-# set LG2 to the language you need in envrionment varibales to enable this
+# set LG2 to the language you need in environment variables to enable this
 
 # add ../java/ so the refs will work in the po file
 JPATHS="../java/src/net/i2p/i2ptunnel/web ../jsp/WEB-INF"

@@ -351,7 +351,7 @@ public class TranslateReader extends FilterReader {
         public void tag(List<String> args) {
             if (args.size() <= 0)
                 return;
-            _out.print("\t_(");
+            _out.print("\t_t(");
             for (int i = 0; i < args.size(); i++) {
                 if (i > 0)
                     _out.print(", ");
