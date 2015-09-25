@@ -356,7 +356,7 @@ class Sorters {
 
         /**
          *  @param storage may be null
-         *  @param remaining precomputed, non-null iff storage is non-null
+         *  @param remainingArray precomputed, non-null iff storage is non-null
          */
         public FileAndIndex(File file, Storage storage, long[] remainingArray) {
             this.file = file;
