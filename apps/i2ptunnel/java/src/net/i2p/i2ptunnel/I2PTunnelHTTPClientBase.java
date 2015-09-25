@@ -684,7 +684,7 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
             out.write("</a>");
             if (usingWWWProxy) {
                 out.write("<br><br><b>");
-                out.write(_("HTTP Outproxy"));
+                out.write(_t("HTTP Outproxy"));
                 out.write(":</b> " + wwwProxy);
             }
             if (extraMessage != null) {
@@ -723,7 +723,7 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
                     if (first) {
                         first = false;
                         out.write("<br><br><h3>");
-                        out.write(_("Click a link below for an address helper from a jump service"));
+                        out.write(_t("Click a link below for an address helper from a jump service"));
                         out.write("</h3>\n");
                     } else {
                         out.write("<br>");
@@ -733,7 +733,7 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
                     out.write(uri);
                     out.write("\">");
                     // Translators: parameter is a host name
-                    out.write(_("{0} jump service", jumphost));
+                    out.write(_t("{0} jump service", jumphost));
                     out.write("</a>\n");
                 }
             }
@@ -778,7 +778,7 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
      *  Translate
      *  @since 0.9.14 moved from I2PTunnelHTTPClient
      */
-    protected String _(String key) {
+    protected String _t(String key) {
         return Translate.getString(key, _context, BUNDLE_NAME);
     }
 
@@ -787,7 +787,7 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
      *  {0}
      *  @since 0.9.14 moved from I2PTunnelHTTPClient
      */
-    protected String _(String key, Object o) {
+    protected String _t(String key, Object o) {
         return Translate.getString(key, o, _context, BUNDLE_NAME);
     }
 
@@ -796,7 +796,7 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
      *  {0} and {1}
      *  @since 0.9.14 moved from I2PTunnelHTTPClient
      */
-    protected String _(String key, Object o, Object o2) {
+    protected String _t(String key, Object o, Object o2) {
         return Translate.getString(key, o, o2, _context, BUNDLE_NAME);
     }
 }

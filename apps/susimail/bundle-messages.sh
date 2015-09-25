@@ -63,13 +63,13 @@ do
         echo "Updating the $i file from the tags..."
 		# extract strings from java and jsp files, and update messages.po files
 		# translate calls must be one of the forms:
-		# _("foo")
+		# _t("foo")
 		# _x("foo")
 		# To start a new translation, copy the header from an old translation to the new .po file,
 		# then ant distclean poupdate.
 		find $JPATHS -name *.java > $TMPFILE
 		xgettext -f $TMPFILE -F -L java --from-code=UTF-8 --add-comments\
-	                 --keyword=_ --keyword=_x \
+	                 --keyword=_t --keyword=_x \
 		         -o ${i}t
 		if [ $? -ne 0 ]
 		then

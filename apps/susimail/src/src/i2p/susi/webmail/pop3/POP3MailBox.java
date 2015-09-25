@@ -99,7 +99,7 @@ public class POP3MailBox implements NewMailListener {
 		sizes = new HashMap<Integer, Integer>();
 		synchronizer = new Object();
 		// this appears in the UI so translate
-		lastLine = _("No response from server");
+		lastLine = _t("No response from server");
 		lastActive = new AtomicLong(System.currentTimeMillis());
 		lastChecked = new AtomicLong();
 		delayedDeleter = new DelayedDeleter(this);
@@ -665,15 +665,15 @@ public class POP3MailBox implements NewMailListener {
 						idleCloser = new IdleCloser(this);
 				} else {
 					if (lastError.equals(""))
-						lastError = _("Error connecting to server");
+						lastError = _t("Error connecting to server");
 					close();
 				}
 			}
 			catch (NumberFormatException e1) {
-				lastError = _("Error opening mailbox") + ": " + e1;
+				lastError = _t("Error opening mailbox") + ": " + e1;
 			}
 			catch (IOException e1) {
-				lastError = _("Error opening mailbox") + ": " + e1.getLocalizedMessage();
+				lastError = _t("Error opening mailbox") + ": " + e1.getLocalizedMessage();
 			}
 		}
 	}
@@ -748,7 +748,7 @@ public class POP3MailBox implements NewMailListener {
 			}
 		} else {
 			Debug.debug(Debug.DEBUG, "sendCmd1a: (" + cmd + ") NO RESPONSE");
-			lastError = _("No response from server");
+			lastError = _t("No response from server");
 			throw new IOException(lastError);
 		}
 		return result;
@@ -790,7 +790,7 @@ public class POP3MailBox implements NewMailListener {
 			String foo = DataHelper.readLine(in);
 			updateActivity();
 			if (foo == null) {
-				lastError = _("No response from server");
+				lastError = _t("No response from server");
 				throw new IOException(lastError);
 			}
 			sr.response = foo.trim();
@@ -1022,7 +1022,7 @@ public class POP3MailBox implements NewMailListener {
 			e = e.substring(5);
 		// translate this common error
 		if (e.trim().equals("Login failed."))
-			e = _("Login failed");
+			e = _t("Login failed");
 		return e;
 	}
 
@@ -1257,7 +1257,7 @@ public class POP3MailBox implements NewMailListener {
 	}
 
 	/** translate */
-	private static String _(String s) {
+	private static String _t(String s) {
 		return Messages.getString(s);
 	}
 }

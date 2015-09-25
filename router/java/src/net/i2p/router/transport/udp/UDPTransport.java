@@ -2465,58 +2465,58 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         int numPeers = 0;
         
         StringBuilder buf = new StringBuilder(512);
-        buf.append("<h3 id=\"udpcon\">").append(_("UDP connections")).append(": ").append(peers.size());
-        buf.append(". ").append(_("Limit")).append(": ").append(getMaxConnections());
-        buf.append(". ").append(_("Timeout")).append(": ").append(DataHelper.formatDuration2(_expireTimeout));
+        buf.append("<h3 id=\"udpcon\">").append(_t("UDP connections")).append(": ").append(peers.size());
+        buf.append(". ").append(_t("Limit")).append(": ").append(getMaxConnections());
+        buf.append(". ").append(_t("Timeout")).append(": ").append(DataHelper.formatDuration2(_expireTimeout));
         if (_context.getBooleanProperty(PROP_ADVANCED)) {
-            buf.append(". ").append(_("Status")).append(": ").append(_(_reachabilityStatus.toStatusString()));
+            buf.append(". ").append(_t("Status")).append(": ").append(_t(_reachabilityStatus.toStatusString()));
         }
         buf.append(".</h3>\n");
         buf.append("<table>\n");
-        buf.append("<tr><th class=\"smallhead\" nowrap><a href=\"#def.peer\">").append(_("Peer")).append("</a><br>");
+        buf.append("<tr><th class=\"smallhead\" nowrap><a href=\"#def.peer\">").append(_t("Peer")).append("</a><br>");
         if (sortFlags != FLAG_ALPHA)
-            appendSortLinks(buf, urlBase, sortFlags, _("Sort by peer hash"), FLAG_ALPHA);
+            appendSortLinks(buf, urlBase, sortFlags, _t("Sort by peer hash"), FLAG_ALPHA);
         buf.append("</th><th class=\"smallhead\" nowrap><a href=\"#def.dir\" title=\"")
-           .append(_("Direction/Introduction")).append("\">").append(_("Dir"))
-           .append("</a></th><th class=\"smallhead\" nowrap><a href=\"#def.ipv6\">").append(_("IPv6"))
-           .append("</a></th><th class=\"smallhead\" nowrap><a href=\"#def.idle\">").append(_("Idle")).append("</a><br>");
-        appendSortLinks(buf, urlBase, sortFlags, _("Sort by idle inbound"), FLAG_IDLE_IN);
+           .append(_t("Direction/Introduction")).append("\">").append(_t("Dir"))
+           .append("</a></th><th class=\"smallhead\" nowrap><a href=\"#def.ipv6\">").append(_t("IPv6"))
+           .append("</a></th><th class=\"smallhead\" nowrap><a href=\"#def.idle\">").append(_t("Idle")).append("</a><br>");
+        appendSortLinks(buf, urlBase, sortFlags, _t("Sort by idle inbound"), FLAG_IDLE_IN);
         buf.append(" / ");
-        appendSortLinks(buf, urlBase, sortFlags, _("Sort by idle outbound"), FLAG_IDLE_OUT);
+        appendSortLinks(buf, urlBase, sortFlags, _t("Sort by idle outbound"), FLAG_IDLE_OUT);
         buf.append("</th>");
-        buf.append("<th class=\"smallhead\" nowrap><a href=\"#def.rate\">").append(_("In/Out")).append("</a><br>");
-        appendSortLinks(buf, urlBase, sortFlags, _("Sort by inbound rate"), FLAG_RATE_IN);
+        buf.append("<th class=\"smallhead\" nowrap><a href=\"#def.rate\">").append(_t("In/Out")).append("</a><br>");
+        appendSortLinks(buf, urlBase, sortFlags, _t("Sort by inbound rate"), FLAG_RATE_IN);
         buf.append(" / ");
-        appendSortLinks(buf, urlBase, sortFlags, _("Sort by outbound rate"), FLAG_RATE_OUT);
+        appendSortLinks(buf, urlBase, sortFlags, _t("Sort by outbound rate"), FLAG_RATE_OUT);
         buf.append("</th>\n");
-        buf.append("<th class=\"smallhead\" nowrap><a href=\"#def.up\">").append(_("Up")).append("</a><br>");
-        appendSortLinks(buf, urlBase, sortFlags, _("Sort by connection uptime"), FLAG_UPTIME);
-        buf.append("</th><th class=\"smallhead\" nowrap><a href=\"#def.skew\">").append(_("Skew")).append("</a><br>");
-        appendSortLinks(buf, urlBase, sortFlags, _("Sort by clock skew"), FLAG_SKEW);
+        buf.append("<th class=\"smallhead\" nowrap><a href=\"#def.up\">").append(_t("Up")).append("</a><br>");
+        appendSortLinks(buf, urlBase, sortFlags, _t("Sort by connection uptime"), FLAG_UPTIME);
+        buf.append("</th><th class=\"smallhead\" nowrap><a href=\"#def.skew\">").append(_t("Skew")).append("</a><br>");
+        appendSortLinks(buf, urlBase, sortFlags, _t("Sort by clock skew"), FLAG_SKEW);
         buf.append("</th>\n");
         buf.append("<th class=\"smallhead\" nowrap><a href=\"#def.cwnd\">CWND</a><br>");
-        appendSortLinks(buf, urlBase, sortFlags, _("Sort by congestion window"), FLAG_CWND);
+        appendSortLinks(buf, urlBase, sortFlags, _t("Sort by congestion window"), FLAG_CWND);
         buf.append("</th><th class=\"smallhead\" nowrap><a href=\"#def.ssthresh\">SST</a><br>");
-        appendSortLinks(buf, urlBase, sortFlags, _("Sort by slow start threshold"), FLAG_SSTHRESH);
+        appendSortLinks(buf, urlBase, sortFlags, _t("Sort by slow start threshold"), FLAG_SSTHRESH);
         buf.append("</th>\n");
         buf.append("<th class=\"smallhead\" nowrap><a href=\"#def.rtt\">RTT</a><br>");
-        appendSortLinks(buf, urlBase, sortFlags, _("Sort by round trip time"), FLAG_RTT);
-        //buf.append("</th><th class=\"smallhead\" nowrap><a href=\"#def.dev\">").append(_("Dev")).append("</a><br>");
-        //appendSortLinks(buf, urlBase, sortFlags, _("Sort by round trip time deviation"), FLAG_DEV);
+        appendSortLinks(buf, urlBase, sortFlags, _t("Sort by round trip time"), FLAG_RTT);
+        //buf.append("</th><th class=\"smallhead\" nowrap><a href=\"#def.dev\">").append(_t("Dev")).append("</a><br>");
+        //appendSortLinks(buf, urlBase, sortFlags, _t("Sort by round trip time deviation"), FLAG_DEV);
         buf.append("</th><th class=\"smallhead\" nowrap><a href=\"#def.rto\">RTO</a><br>");
-        appendSortLinks(buf, urlBase, sortFlags, _("Sort by retransmission timeout"), FLAG_RTO);
+        appendSortLinks(buf, urlBase, sortFlags, _t("Sort by retransmission timeout"), FLAG_RTO);
         buf.append("</th>\n");
         buf.append("<th class=\"smallhead\" nowrap><a href=\"#def.mtu\">MTU</a><br>");
-        appendSortLinks(buf, urlBase, sortFlags, _("Sort by outbound maximum transmit unit"), FLAG_MTU);
-        buf.append("</th><th class=\"smallhead\" nowrap><a href=\"#def.send\">").append(_("TX")).append("</a><br>");
-        appendSortLinks(buf, urlBase, sortFlags, _("Sort by packets sent"), FLAG_SEND);
-        buf.append("</th><th class=\"smallhead\" nowrap><a href=\"#def.recv\">").append(_("RX")).append("</a><br>");
-        appendSortLinks(buf, urlBase, sortFlags, _("Sort by packets received"), FLAG_RECV);
+        appendSortLinks(buf, urlBase, sortFlags, _t("Sort by outbound maximum transmit unit"), FLAG_MTU);
+        buf.append("</th><th class=\"smallhead\" nowrap><a href=\"#def.send\">").append(_t("TX")).append("</a><br>");
+        appendSortLinks(buf, urlBase, sortFlags, _t("Sort by packets sent"), FLAG_SEND);
+        buf.append("</th><th class=\"smallhead\" nowrap><a href=\"#def.recv\">").append(_t("RX")).append("</a><br>");
+        appendSortLinks(buf, urlBase, sortFlags, _t("Sort by packets received"), FLAG_RECV);
         buf.append("</th>\n");
-        buf.append("<th class=\"smallhead\" nowrap><a href=\"#def.resent\">").append(_("Dup TX")).append("</a><br>");
-        appendSortLinks(buf, urlBase, sortFlags, _("Sort by packets retransmitted"), FLAG_RESEND);
-        buf.append("</th><th class=\"smallhead\" nowrap><a href=\"#def.dupRecv\">").append(_("Dup RX")).append("</a><br>");
-        appendSortLinks(buf, urlBase, sortFlags, _("Sort by packets received more than once"), FLAG_DUP);
+        buf.append("<th class=\"smallhead\" nowrap><a href=\"#def.resent\">").append(_t("Dup TX")).append("</a><br>");
+        appendSortLinks(buf, urlBase, sortFlags, _t("Sort by packets retransmitted"), FLAG_RESEND);
+        buf.append("</th><th class=\"smallhead\" nowrap><a href=\"#def.dupRecv\">").append(_t("Dup RX")).append("</a><br>");
+        appendSortLinks(buf, urlBase, sortFlags, _t("Sort by packets received more than once"), FLAG_DUP);
         buf.append("</th></tr>\n");
         out.write(buf.toString());
         buf.setLength(0);
@@ -2532,17 +2532,17 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             //    buf.append(' ').append(_context.blocklist().toStr(ip));
             buf.append("</td><td class=\"cells\" nowrap align=\"left\">");
             if (peer.isInbound())
-                buf.append("<img src=\"/themes/console/images/inbound.png\" alt=\"Inbound\" title=\"").append(_("Inbound")).append("\">");
+                buf.append("<img src=\"/themes/console/images/inbound.png\" alt=\"Inbound\" title=\"").append(_t("Inbound")).append("\">");
             else
-                buf.append("<img src=\"/themes/console/images/outbound.png\" alt=\"Outbound\" title=\"").append(_("Outbound")).append("\">");
+                buf.append("<img src=\"/themes/console/images/outbound.png\" alt=\"Outbound\" title=\"").append(_t("Outbound")).append("\">");
             if (peer.getWeRelayToThemAs() > 0)
-                buf.append("&nbsp;&nbsp;<img src=\"/themes/console/images/outbound.png\" height=\"8\" width=\"12\" alt=\"^\" title=\"").append(_("We offered to introduce them")).append("\">");
+                buf.append("&nbsp;&nbsp;<img src=\"/themes/console/images/outbound.png\" height=\"8\" width=\"12\" alt=\"^\" title=\"").append(_t("We offered to introduce them")).append("\">");
             if (peer.getTheyRelayToUsAs() > 0)
-                buf.append("&nbsp;&nbsp;<img src=\"/themes/console/images/inbound.png\" height=\"8\" width=\"12\" alt=\"V\" title=\"").append(_("They offered to introduce us")).append("\">");
+                buf.append("&nbsp;&nbsp;<img src=\"/themes/console/images/inbound.png\" height=\"8\" width=\"12\" alt=\"V\" title=\"").append(_t("They offered to introduce us")).append("\">");
             
             boolean appended = false;
             if (_activeThrottle.isChoked(peer.getRemotePeer())) {
-                buf.append("<br><i>").append(_("Choked")).append("</i>");
+                buf.append("<br><i>").append(_t("Choked")).append("</i>");
                 appended = true;
             }
             int cfs = peer.getConsecutiveFailedSends();
@@ -2550,15 +2550,15 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 if (!appended) buf.append("<br>");
                 buf.append(" <i>");
                 if (cfs == 1)
-                    buf.append(_("1 fail"));
+                    buf.append(_t("1 fail"));
                 else
-                    buf.append(_("{0} fails", cfs));
+                    buf.append(_t("{0} fails", cfs));
                 buf.append("</i>");
                 appended = true;
             }
             if (_context.banlist().isBanlisted(peer.getRemotePeer(), STYLE)) {
                 if (!appended) buf.append("<br>");
-                buf.append(" <i>").append(_("Banned")).append("</i>");
+                buf.append(" <i>").append(_t("Banned")).append("</i>");
                 appended = true;
             }
             //byte[] ip = getIP(peer.getRemotePeer());
@@ -2617,7 +2617,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             buf.append(THINSP).append(peer.getConcurrentSendWindow());
             buf.append(THINSP).append(peer.getConsecutiveSendRejections());
             if (peer.isBacklogged())
-                buf.append(' ').append(_("backlogged"));
+                buf.append(' ').append(_t("backlogged"));
             buf.append("</td>");
 
             buf.append("<td class=\"cells\" align=\"right\">");
@@ -2949,7 +2949,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                           " from: ", new Exception("traceback"));
             if (old != Status.UNKNOWN)
                 _context.router().eventLog().addEvent(EventLog.REACHABILITY,
-                   "from " + _(old.toStatusString()) + " to " +  _(status.toStatusString()));
+                   "from " + _t(old.toStatusString()) + " to " +  _t(status.toStatusString()));
             // Always rebuild when the status changes, even if our address hasn't changed,
             // as rebuildExternalAddress() calls replaceAddress() which calls CSFI.notifyReplaceAddress()
             // which will start up NTCP inbound when we transition to OK.

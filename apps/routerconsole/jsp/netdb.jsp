@@ -10,7 +10,7 @@
 <%@include file="summaryajax.jsi" %>
 </head><body onload="initAjax()">
 <%@include file="summary.jsi" %>
-<h1><%=intl._("I2P Network Database")%></h1>
+<h1><%=intl._t("I2P Network Database")%></h1>
 <div class="main" id="main">
  <div class="wideload">
  <jsp:useBean class="net.i2p.router.web.NetDbHelper" id="netdbHelper" scope="request" />

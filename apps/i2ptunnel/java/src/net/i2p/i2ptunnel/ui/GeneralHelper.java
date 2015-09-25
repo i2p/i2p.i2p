@@ -146,11 +146,11 @@ public class GeneralHelper {
         List<String> rv = tcg.clearAllMessages();
         try {
             tcg.saveConfig();
-            rv.add(0, _("Configuration changes saved", context));
+            rv.add(0, _t("Configuration changes saved", context));
         } catch (IOException ioe) {
             Log log = context.logManager().getLog(GeneralHelper.class);
             log.error("Failed to save config file", ioe);
-            rv.add(0, _("Failed to save configuration", context) + ": " + ioe.toString());
+            rv.add(0, _t("Failed to save configuration", context) + ": " + ioe.toString());
         }
         return rv;
     }
@@ -714,7 +714,7 @@ public class GeneralHelper {
         return def;
     }
 
-    protected static String _(String key, I2PAppContext context) {
-        return Messages._(key, context);
+    protected static String _t(String key, I2PAppContext context) {
+        return Messages._t(key, context);
     }
 }

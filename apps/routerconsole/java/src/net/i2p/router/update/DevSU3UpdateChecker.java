@@ -44,14 +44,14 @@ class DevSU3UpdateChecker extends UpdateRunner {
         if (proxyPort == ConfigUpdateHandler.DEFAULT_PROXY_PORT_INT &&
             proxyHost.equals(ConfigUpdateHandler.DEFAULT_PROXY_HOST) &&
             _context.portMapper().getPort(PortMapper.SVC_HTTP_PROXY) < 0) {
-            String msg = _("HTTP client proxy tunnel must be running");
+            String msg = _t("HTTP client proxy tunnel must be running");
             if (_log.shouldWarn())
                 _log.warn(msg);
             updateStatus("<b>" + msg + "</b>");
             _mgr.notifyCheckComplete(this, false, false);
             return;
         }
-        //updateStatus("<b>" + _("Checking for development build update") + "</b>");
+        //updateStatus("<b>" + _t("Checking for development build update") + "</b>");
         _baos.reset();
         try {
             _get = new PartialEepGet(_context, proxyHost, proxyPort, _baos, _currentURI.toString(), TrustedUpdate.HEADER_BYTES);
@@ -76,7 +76,7 @@ class DevSU3UpdateChecker extends UpdateRunner {
             _mgr.notifyVersionAvailable(this, _currentURI, UpdateType.ROUTER_DEV_SU3, "", UpdateMethod.HTTP,
                                         _urls, newVersion, RouterVersion.FULL_VERSION);
         } else {
-            //updateStatus("<b>" + _("No new version found at {0}", linkify(url)) + "</b>");
+            //updateStatus("<b>" + _t("No new version found at {0}", linkify(url)) + "</b>");
             if (_log.shouldWarn())
                 _log.warn("Found old version \"" + newVersion + "\" at " + url);
         }

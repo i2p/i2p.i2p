@@ -9,7 +9,7 @@
 <%@include file="summaryajax.jsi" %>
 </head><body onload="initAjax()">
 <%@include file="summary.jsi" %>
-<h1><%=intl._("Latest News")%></h1>
+<h1><%=intl._t("Latest News")%></h1>
 <div class="main" id="main">
 <jsp:useBean class="net.i2p.router.web.NewsFeedHelper" id="feedHelper" scope="request" />
 <jsp:setProperty name="feedHelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />

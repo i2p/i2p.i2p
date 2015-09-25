@@ -43,24 +43,24 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title><%=intl._("subscriptions")%> - susidns</title>
+<title><%=intl._t("subscriptions")%> - susidns</title>
 <link rel="stylesheet" type="text/css" href="<%=subs.getTheme()%>susidns.css">
 </head>
 <body>
 <div class="page">
 <div id="logo">
-<a href="index"><img src="<%=subs.getTheme()%>images/logo.png" alt="" title="<%=intl._("Overview")%>" border="0"/></a>
+<a href="index"><img src="<%=subs.getTheme()%>images/logo.png" alt="" title="<%=intl._t("Overview")%>" border="0"/></a>
 </div><hr>
 <div id="navi">
 <p>
-<%=intl._("Address books")%>:
-<a href="addressbook?book=private"><%=intl._("private")%></a> |
-<a href="addressbook?book=master"><%=intl._("master")%></a> |
-<a href="addressbook?book=router"><%=intl._("router")%></a> |
-<a href="addressbook?book=published"><%=intl._("published")%></a> *
-<%=intl._("Subscriptions")%> *
-<a href="config"><%=intl._("Configuration")%></a> *
-<a href="index"><%=intl._("Overview")%></a>
+<%=intl._t("Address books")%>:
+<a href="addressbook?book=private"><%=intl._t("private")%></a> |
+<a href="addressbook?book=master"><%=intl._t("master")%></a> |
+<a href="addressbook?book=router"><%=intl._t("router")%></a> |
+<a href="addressbook?book=published"><%=intl._t("published")%></a> *
+<%=intl._t("Subscriptions")%> *
+<a href="config"><%=intl._t("Configuration")%></a> *
+<a href="index"><%=intl._t("Overview")%></a>
 </p>
 </div><hr>
 <div id="headline">
@@ -73,18 +73,18 @@
 <textarea name="content" rows="10" cols="80">${subs.content}</textarea>
 </div>
 <div id="buttons">
-<input class="reload" type="submit" name="action" value="<%=intl._("Reload")%>" >
-<input class="accept" type="submit" name="action" value="<%=intl._("Save")%>" >
+<input class="reload" type="submit" name="action" value="<%=intl._t("Reload")%>" >
+<input class="accept" type="submit" name="action" value="<%=intl._t("Save")%>" >
 </div>
 </form>
 <div id="help">
 <p class="help">
-<%=intl._("The subscription file contains a list of i2p URLs.")%>
-<%=intl._("The addressbook application regularly checks this list for new eepsites.")%>
-<%=intl._("Those URLs refer to published hosts.txt files.")%>
-<%=intl._("The default subscription is the hosts.txt from {0}, which is updated infrequently.", "i2p-projekt.i2p")%>
-<%=intl._("So it is a good idea to add additional subscriptions to sites that have the latest addresses.")%>
-<a href="http://i2p-projekt.i2p/faq.html#subscriptions" target="_top"><%=intl._("See the FAQ for a list of subscription URLs.")%></a>
+<%=intl._t("The subscription file contains a list of i2p URLs.")%>
+<%=intl._t("The addressbook application regularly checks this list for new eepsites.")%>
+<%=intl._t("Those URLs refer to published hosts.txt files.")%>
+<%=intl._t("The default subscription is the hosts.txt from {0}, which is updated infrequently.", "i2p-projekt.i2p")%>
+<%=intl._t("So it is a good idea to add additional subscriptions to sites that have the latest addresses.")%>
+<a href="http://i2p-projekt.i2p/faq.html#subscriptions" target="_top"><%=intl._t("See the FAQ for a list of subscription URLs.")%></a>
 </p>
 </div>
 <div id="footer">

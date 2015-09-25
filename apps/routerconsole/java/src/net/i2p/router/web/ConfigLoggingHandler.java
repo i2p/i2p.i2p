@@ -79,7 +79,7 @@ public class ConfigLoggingHandler extends FormHandler {
                     props.setProperty(_newLogClass, _newLogLevel);
                 _context.logManager().setLimits(props);
                 shouldSave = true;
-                addFormNotice(_("Log overrides updated"));
+                addFormNotice(_t("Log overrides updated"));
             } catch (IOException ioe) {
                 // shouldn't ever happen (BAIS shouldnt cause an IOE)
                 _context.logManager().getLog(ConfigLoggingHandler.class).error("Error reading from the props?", ioe);
@@ -160,7 +160,7 @@ public class ConfigLoggingHandler extends FormHandler {
             boolean saved = _context.logManager().saveConfig();
 
             if (saved) 
-                addFormNotice(_("Log configuration saved"));
+                addFormNotice(_t("Log configuration saved"));
             else
                 addFormError("Error saving the configuration (applied but not saved) - please see the error logs");
         }

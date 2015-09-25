@@ -816,7 +816,7 @@ msgid "Enter valid tracker name and URLs"
 msgstr "Zadajte platný názov a URL stopovača"
 
 #. "<input type=\"reset\" class=\"cancel\"
-#. value=\"").append(_("Cancel")).append("\">\n" +
+#. value=\"").append(_t("Cancel")).append("\">\n" +
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1361
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2410
 msgid "Restore defaults"

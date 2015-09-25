@@ -215,13 +215,13 @@ class NewsFetcher extends UpdateRunner {
                             _log.debug("Found version: [" + ver + "]");
                         if (TrustedUpdate.needsUpdate(RouterVersion.VERSION, ver)) {
                             if (NewsHelper.isUpdateDisabled(_context)) {
-                                String msg = _mgr._("In-network updates disabled. Check package manager.");
+                                String msg = _mgr._t("In-network updates disabled. Check package manager.");
                                 _log.logAlways(Log.WARN, "Cannot update to version " + ver + ": " + msg);
                                 _mgr.notifyVersionConstraint(this, _currentURI, ROUTER_SIGNED, "", ver, msg);
                                 return;
                             }
                             if (NewsHelper.isBaseReadonly(_context)) {
-                                String msg = _mgr._("No write permission for I2P install directory.");
+                                String msg = _mgr._t("No write permission for I2P install directory.");
                                 _log.logAlways(Log.WARN, "Cannot update to version " + ver + ": " + msg);
                                 _mgr.notifyVersionConstraint(this, _currentURI, ROUTER_SIGNED, "", ver, msg);
                                 return;
@@ -229,7 +229,7 @@ class NewsFetcher extends UpdateRunner {
                             String minRouter = args.get(MIN_VERSION_KEY);
                             if (minRouter != null) {
                                 if (VersionComparator.comp(RouterVersion.VERSION, minRouter) < 0) {
-                                    String msg = _mgr._("You must first update to version {0}", minRouter);
+                                    String msg = _mgr._t("You must first update to version {0}", minRouter);
                                     _log.logAlways(Log.WARN, "Cannot update to version " + ver + ": " + msg);
                                     _mgr.notifyVersionConstraint(this, _currentURI, ROUTER_SIGNED, "", ver, msg);
                                     return;
@@ -239,7 +239,7 @@ class NewsFetcher extends UpdateRunner {
                             if (minJava != null) {
                                 String ourJava = System.getProperty("java.version");
                                 if (VersionComparator.comp(ourJava, minJava) < 0) {
-                                    String msg = _mgr._("Requires Java version {0} but installed Java version is {1}", minJava, ourJava);
+                                    String msg = _mgr._t("Requires Java version {0} but installed Java version is {1}", minJava, ourJava);
                                     _log.logAlways(Log.WARN, "Cannot update to version " + ver + ": " + msg);
                                     _mgr.notifyVersionConstraint(this, _currentURI, ROUTER_SIGNED, "", ver, msg);
                                     return;

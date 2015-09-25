@@ -814,7 +814,7 @@ msgid "Enter valid tracker name and URLs"
 msgstr "请输入有效的 Tracker 名称与链接"
 
 #. "<input type=\"reset\" class=\"cancel\"
-#. value=\"").append(_("Cancel")).append("\">\n" +
+#. value=\"").append(_t("Cancel")).append("\">\n" +
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1361
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2410
 msgid "Restore defaults"

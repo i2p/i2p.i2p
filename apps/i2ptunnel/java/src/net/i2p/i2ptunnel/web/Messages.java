@@ -16,11 +16,11 @@ public class Messages {
     }
 
     /** lang in routerconsole.lang property, else current locale */
-    public String _(String key) {
+    public String _t(String key) {
         return Translate.getString(key, _context, BUNDLE_NAME);
     }
 
-    public static String _(String key, I2PAppContext ctx) {
+    public static String _t(String key, I2PAppContext ctx) {
         return Translate.getString(key, ctx, BUNDLE_NAME);
     }
 
@@ -32,11 +32,11 @@ public class Messages {
      *    The {0} will be replaced by the parameter.
      *    Single quotes must be doubled, i.e. ' -> '' in the string.
      *  @param o parameter, not translated.
-     *    To tranlslate parameter also, use _("foo {0} bar", _("baz"))
+     *    To tranlslate parameter also, use _t("foo {0} bar", _t("baz"))
      *    Do not double the single quotes in the parameter.
      *    Use autoboxing to call with ints, longs, floats, etc.
      */
-    public String _(String s, Object o) {
+    public String _t(String s, Object o) {
         return Translate.getString(s, o, _context, BUNDLE_NAME);
     }
 

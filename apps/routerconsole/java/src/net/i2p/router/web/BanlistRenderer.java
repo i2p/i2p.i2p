@@ -45,7 +45,7 @@ public class BanlistRenderer {
         
         entries.putAll(_context.banlist().getEntries());
         if (entries.isEmpty()) {
-            buf.append("<i>").append(_("none")).append("</i>");
+            buf.append("<i>").append(_t("none")).append("</i>");
             out.write(buf.toString());
             return;
         }
@@ -62,24 +62,24 @@ public class BanlistRenderer {
             buf.append(' ');
             String expireString = DataHelper.formatDuration2(expires);
             if (key.equals(Hash.FAKE_HASH))
-                buf.append(_("Permanently banned"));
+                buf.append(_t("Permanently banned"));
             else if (expires < 5l*24*60*60*1000)
-                buf.append(_("Temporary ban expiring in {0}", expireString));
+                buf.append(_t("Temporary ban expiring in {0}", expireString));
             else
-                buf.append(_("Banned until restart or in {0}", expireString));
+                buf.append(_t("Banned until restart or in {0}", expireString));
             Set<String> transports = entry.transports;
             if ( (transports != null) && (!transports.isEmpty()) )
                 buf.append(" on the following transport: ").append(transports);
             if (entry.cause != null) {
                 buf.append("<br>\n");
                 if (entry.causeCode != null)
-                    buf.append(_(entry.cause, entry.causeCode));
+                    buf.append(_t(entry.cause, entry.causeCode));
                 else
-                    buf.append(_(entry.cause));
+                    buf.append(_t(entry.cause));
             }
             if (!key.equals(Hash.FAKE_HASH)) {
                 buf.append(" (<a href=\"configpeer?peer=").append(key.toBase64())
-                   .append("#unsh\">").append(_("unban now")).append("</a>)");
+                   .append("#unsh\">").append(_t("unban now")).append("</a>)");
             }
             buf.append("</li>\n");
         }
@@ -89,23 +89,23 @@ public class BanlistRenderer {
     }
 
     /** translate a string */
-    private String _(String s) {
+    private String _t(String s) {
         return Messages.getString(s, _context);
     }
 
     /**
      *  translate a string with a parameter
-     *  This is a lot more expensive than _(s), so use sparingly.
+     *  This is a lot more expensive than _t(s), so use sparingly.
      *
      *  @param s string to be translated containing {0}
      *    The {0} will be replaced by the parameter.
      *    Single quotes must be doubled, i.e. ' -> '' in the string.
      *  @param o parameter, not translated.
-     *    To tranlslate parameter also, use _("foo {0} bar", _("baz"))
+     *    To tranlslate parameter also, use _t("foo {0} bar", _t("baz"))
      *    Do not double the single quotes in the parameter.
      *    Use autoboxing to call with ints, longs, floats, etc.
      */
-    private String _(String s, Object o) {
+    private String _t(String s, Object o) {
         return Messages.getString(s, o, _context);
     }
 }

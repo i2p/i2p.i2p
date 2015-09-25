@@ -42,9 +42,9 @@ public class ConfigLoggingHelper extends HelperBase {
             buf.append(prefix).append('=').append(level).append('\n');
         }
         buf.append("</textarea><br>\n");
-        buf.append("<i>").append(_("Add additional logging statements above. Example: net.i2p.router.tunnel=WARN")).append("</i><br>");
-        buf.append("<i>").append(_("Or put entries in the logger.config file. Example: logger.record.net.i2p.router.tunnel=WARN")).append("</i><br>");
-        buf.append("<i>").append(_("Valid levels are DEBUG, INFO, WARN, ERROR, CRIT")).append("</i>\n");
+        buf.append("<i>").append(_t("Add additional logging statements above. Example: net.i2p.router.tunnel=WARN")).append("</i><br>");
+        buf.append("<i>").append(_t("Or put entries in the logger.config file. Example: logger.record.net.i2p.router.tunnel=WARN")).append("</i><br>");
+        buf.append("<i>").append(_t("Valid levels are DEBUG, INFO, WARN, ERROR, CRIT")).append("</i>\n");
 
       /****
         // this is too big and ugly
@@ -78,11 +78,11 @@ public class ConfigLoggingHelper extends HelperBase {
             buf.append("<option value=\"").append(l).append('\"');
             if (l.equals(cur))
                 buf.append(" selected=\"selected\"");
-            buf.append('>').append(_(l)).append("</option>\n");
+            buf.append('>').append(_t(l)).append("</option>\n");
         }        
         
         if (showRemove)
-            buf.append("<option value=\"remove\">").append(_("Remove")).append("</option>");
+            buf.append("<option value=\"remove\">").append(_t("Remove")).append("</option>");
         buf.append("</select>\n");
         return buf.toString();
     }
@@ -119,7 +119,7 @@ public class ConfigLoggingHelper extends HelperBase {
         StringBuilder buf = new StringBuilder(65536);
         buf.append("<select name=\"newlogclass\">\n" +
                    "<option value=\"\" selected=\"selected\">")
-           .append(_("Select a class to add"))
+           .append(_t("Select a class to add"))
            .append("</option>\n");
 
         for (String l : sortedLogs) {

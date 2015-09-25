@@ -209,7 +209,7 @@ public class Reseeder {
             if (fetched <= 0)
                 throw new IOException("No seeds extracted");
             _checker.setStatus(
-                _("Reseeding: got router info from file ({0} successful, {1} errors).", fetched, errors));
+                _t("Reseeding: got router info from file ({0} successful, {1} errors).", fetched, errors));
             System.err.println("Reseed got " + fetched + " router infos from file with " + errors + " errors");
             _context.router().eventLog().addEvent(EventLog.RESEED, fetched + " from file");
             return fetched;
@@ -281,7 +281,7 @@ public class Reseeder {
         private void run2() {
             _isRunning = true;
             _checker.setError("");
-            _checker.setStatus(_("Reseeding"));
+            _checker.setStatus(_t("Reseeding"));
             if (_context.getBooleanProperty(PROP_PROXY_ENABLE)) {
                 _proxyHost = _context.getProperty(PROP_PROXY_HOST);
                 _proxyPort = _context.getProperty(PROP_PROXY_PORT, -1);
@@ -313,9 +313,9 @@ public class Reseeder {
                                        "and if nothing helps, read the FAQ about reseeding manually.");
                 } // else < 0, no valid URLs
                 String old = _checker.getError();
-                _checker.setError(_("Reseed failed.") + ' '  +
-                                  _("See {0} for help.",
-                                    "<a target=\"_top\" href=\"/configreseed\">" + _("reseed configuration page") + "</a>") +
+                _checker.setError(_t("Reseed failed.") + ' '  +
+                                  _t("See {0} for help.",
+                                    "<a target=\"_top\" href=\"/configreseed\">" + _t("reseed configuration page") + "</a>") +
                                   "<br>" + old);
             }
             _isRunning = false;
@@ -563,7 +563,7 @@ public class Reseeder {
             try {
                 // Don't use context clock as we may be adjusting the time
                 final long timeLimit = System.currentTimeMillis() + MAX_TIME_PER_HOST;
-                _checker.setStatus(_("Reseeding: fetching seed URL."));
+                _checker.setStatus(_t("Reseeding: fetching seed URL."));
                 System.err.println("Reseeding from " + seedURL);
                 byte contentRaw[] = readURL(seedURL);
                 if (contentRaw == null) {
@@ -620,7 +620,7 @@ public class Reseeder {
                      iter.hasNext() && fetched < 200 && System.currentTimeMillis() < timeLimit; ) {
                     try {
                         _checker.setStatus(
-                            _("Reseeding: fetching router info from seed URL ({0} successful, {1} errors).", fetched, errors));
+                            _t("Reseeding: fetching router info from seed URL ({0} successful, {1} errors).", fetched, errors));
 
                         if (!fetchSeed(seedURL.toString(), iter.next()))
                             continue;
@@ -694,7 +694,7 @@ public class Reseeder {
             int errors = 0;
             File contentRaw = null;
             try {
-                _checker.setStatus(_("Reseeding: fetching seed URL."));
+                _checker.setStatus(_t("Reseeding: fetching seed URL."));
                 System.err.println("Reseeding from " + seedURL);
                 // don't use context time, as we may be step-changing it
                 // from the server header
@@ -730,7 +730,7 @@ public class Reseeder {
                     contentRaw.delete();
             }
             _checker.setStatus(
-                _("Reseeding: fetching router info from seed URL ({0} successful, {1} errors).", fetched, errors));
+                _t("Reseeding: fetching router info from seed URL ({0} successful, {1} errors).", fetched, errors));
             System.err.println("Reseed got " + fetched + " router infos from " + seedURL + " with " + errors + " errors");
             return fetched;
         }
@@ -1002,17 +1002,17 @@ public class Reseeder {
     private static final String BUNDLE_NAME = "net.i2p.router.web.messages";
 
     /** translate */
-    private String _(String key) {
+    private String _t(String key) {
         return Translate.getString(key, _context, BUNDLE_NAME);
     }
 
     /** translate */
-    private String _(String s, Object o) {
+    private String _t(String s, Object o) {
         return Translate.getString(s, o, _context, BUNDLE_NAME);
     }
 
     /** translate */
-    private String _(String s, Object o, Object o2) {
+    private String _t(String s, Object o, Object o2) {
         return Translate.getString(s, o, o2, _context, BUNDLE_NAME);
     }
 

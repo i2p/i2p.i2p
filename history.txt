@@ -1,3 +1,6 @@
+2015-09-25 dg
+ * Rename _() for translation to _t() for Java 9 compatibility (ticket #1456)
+
 2015-09-20 dg
  * /configreseed: Add 'Reset URL list' button for revert to default hosts (ticket #1554, thanks dzirtt@gmail.com)
 

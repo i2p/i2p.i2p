@@ -211,7 +211,7 @@ public class SMTPClient {
 		try {
 			socket = new Socket( host, port );
 		} catch (Exception e) {
-			error += _("Cannot connect") + ": " + e.getMessage() + '\n';
+			error += _t("Cannot connect") + ": " + e.getMessage() + '\n';
 			ok = false;
 		}
 		try {
@@ -222,7 +222,7 @@ public class SMTPClient {
 				socket.setSoTimeout(120*1000);
 				int result = sendCmd(null);
 				if (result != 220) {
-					error += _("Server refused connection") + " (" + result +  ")\n";
+					error += _t("Server refused connection") + " (" + result +  ")\n";
 					ok = false;
 				}
 			}
@@ -234,7 +234,7 @@ public class SMTPClient {
 				if (r.result == 250) {
 					supportsPipelining = r.recv.contains("PIPELINING");
 				} else {
-					error += _("Server refused connection") + " (" + r.result +  ")\n";
+					error += _t("Server refused connection") + " (" + r.result +  ")\n";
 					ok = false;
 				}
 			}
@@ -246,7 +246,7 @@ public class SMTPClient {
 				cmds.add(new SendExpect(base64.encode(user), 334));
 				cmds.add(new SendExpect(base64.encode(pass), 235));
 				if (sendCmds(cmds) != 3) {
-					error += _("Login failed") + '\n';
+					error += _t("Login failed") + '\n';
 					ok = false;
 				}
 			}
@@ -259,7 +259,7 @@ public class SMTPClient {
 				cmds.add(new SendExpect("DATA", 354));
 				if (sendCmds(cmds) != cmds.size()) {
 					// TODO which recipient?
-					error += _("Mail rejected") + '\n';
+					error += _t("Mail rejected") + '\n';
 					ok = false;
 				}
 			}
@@ -273,10 +273,10 @@ public class SMTPClient {
 				if (result == 250)
 					mailSent = true;
 				else
-					error += _("Error sending mail") + " (" + result +  ")\n";
+					error += _t("Error sending mail") + " (" + result +  ")\n";
 			}
 		} catch (IOException e) {
-			error += _("Error sending mail") + ": " + e.getMessage() + '\n';
+			error += _t("Error sending mail") + ": " + e.getMessage() + '\n';
 
 		} catch (EncodingException e) {
 			error += e.getMessage();
@@ -324,7 +324,7 @@ public class SMTPClient {
 	}
 
 	/** translate */
-	private static String _(String s) {
+	private static String _t(String s) {
 		return Messages.getString(s);
 	}
 }

@@ -329,7 +329,7 @@ public class StatSummarizer implements Runnable {
         else if (height <= 0)
             height = GraphHelper.DEFAULT_Y;
         txLsnr.renderPng(out, width, height, hideLegend, hideGrid, hideTitle, showEvents, periodCount,
-                         end, showCredit, rxLsnr, _("Bandwidth usage"));
+                         end, showCredit, rxLsnr, _t("Bandwidth usage"));
         return true;
     }
     
@@ -375,7 +375,7 @@ public class StatSummarizer implements Runnable {
     private static final boolean IS_WIN = SystemVersion.isWindows();
 
     /** translate a string */
-    private String _(String s) {
+    private String _t(String s) {
         // the RRD font doesn't have zh chars, at least on my system
         // Works on 1.5.9 except on windows
         if (IS_WIN && "zh".equals(Messages.getLanguage(_context)))

@@ -105,9 +105,9 @@ public class HomeHelper extends HelperBase {
     public String getProxyStatus() {
         int port = _context.portMapper().getPort(PortMapper.SVC_HTTP_PROXY);
         if (port <= 0)
-            return _("The HTTP proxy is not up");
+            return _t("The HTTP proxy is not up");
         return "<img src=\"http://console.i2p/onepixel.png?" + _context.random().nextInt() + "\"" +
-               " alt=\"" + _("Your browser is not properly configured to use the HTTP proxy at {0}",
+               " alt=\"" + _t("Your browser is not properly configured to use the HTTP proxy at {0}",
                              _context.getProperty(ConfigUpdateHandler.PROP_PROXY_HOST, ConfigUpdateHandler.DEFAULT_PROXY_HOST) + ':' + port) +
                "\">";
     }
@@ -168,7 +168,7 @@ public class HomeHelper extends HelperBase {
     }
 
     private String renderApps(Collection<App> apps) {
-        String website = _("Website");
+        String website = _t("Website");
         StringBuilder buf = new StringBuilder(1024);
         buf.append("<div class=\"appgroup\">");
         for (App app : apps) {
@@ -205,11 +205,11 @@ public class HomeHelper extends HelperBase {
     private String renderConfig(Collection<App> apps) {
         StringBuilder buf = new StringBuilder(1024);
         buf.append("<table><tr><th>")
-           .append(_("Remove"))
+           .append(_t("Remove"))
            .append("</th><th colspan=\"2\">")
-           .append(_("Name"))
+           .append(_t("Name"))
            .append("</th><th>")
-           .append(_("URL"))
+           .append(_t("URL"))
            .append("</th></tr>\n");
         for (App app : apps) {
             buf.append("<tr><td align=\"center\"><input type=\"checkbox\" class=\"optbox\" name=\"delete_")
@@ -232,7 +232,7 @@ public class HomeHelper extends HelperBase {
             buf.append("</a></td></tr>\n");
         }
         buf.append("<tr><td colspan=\"2\" align=\"center\"><b>")
-           .append(_("Add")).append(":</b>" +
+           .append(_t("Add")).append(":</b>" +
                    "</td><td align=\"left\"><input type=\"text\" name=\"nofilter_name\"></td>" +
                    "<td align=\"left\"><input type=\"text\" size=\"40\" name=\"nofilter_url\"></td></tr>");
         buf.append("</table>\n");

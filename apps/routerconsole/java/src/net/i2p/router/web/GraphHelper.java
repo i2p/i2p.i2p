@@ -159,7 +159,7 @@ public class GraphHelper extends FormHandler {
                            + "&amp;w=" + (3 * _width)
                            + "&amp;h=" + (3 * _height)
                            + "\">");
-                String title = _("Combined bandwidth graph");
+                String title = _t("Combined bandwidth graph");
                 _out.write("<img class=\"statimage\""
                            + " src=\"viewstat.jsp?stat=bw.combined"
                            + "&amp;periodCount=" + _periodCount 
@@ -171,7 +171,7 @@ public class GraphHelper extends FormHandler {
             for (SummaryListener lsnr : ordered) {
                 Rate r = lsnr.getRate();
                 // e.g. "statname for 60m"
-                String title = _("{0} for {1}", r.getRateStat().getName(), DataHelper.formatDuration2(_periodCount * r.getPeriod()));
+                String title = _t("{0} for {1}", r.getRateStat().getName(), DataHelper.formatDuration2(_periodCount * r.getPeriod()));
                 _out.write("<a href=\"graph?stat="
                            + r.getRateStat().getName() 
                            + '.' + r.getPeriod() 
@@ -194,7 +194,7 @@ public class GraphHelper extends FormHandler {
 
             // FIXME jrobin doesn't support setting the timezone, will have to mod TimeAxis.java
             // 0.9.1 - all graphs currently state UTC on them, so this text blurb is unnecessary,
-            //_out.write("<p><i>" + _("All times are UTC.") + "</i></p>\n");
+            //_out.write("<p><i>" + _t("All times are UTC.") + "</i></p>\n");
         } catch (IOException ioe) {
             ioe.printStackTrace();
         }
@@ -220,7 +220,7 @@ public class GraphHelper extends FormHandler {
             if (_stat.equals("bw.combined")) {
                 period = 60000;
                 name = _stat;
-                displayName = _("Bandwidth usage");
+                displayName = _t("Bandwidth usage");
             } else {
                 Set<Rate> rates = StatSummarizer.instance().parseSpecs(_stat);
                 if (rates.size() != 1) {
@@ -233,9 +233,9 @@ public class GraphHelper extends FormHandler {
                 displayName = name;
             }
             _out.write("<h3>");
-            _out.write(_("{0} for {1}", displayName, DataHelper.formatDuration2(_periodCount * period)));
+            _out.write(_t("{0} for {1}", displayName, DataHelper.formatDuration2(_periodCount * period)));
             if (_end > 0)
-                _out.write(' ' + _("ending {0} ago", DataHelper.formatDuration2(_end * period)));
+                _out.write(' ' + _t("ending {0} ago", DataHelper.formatDuration2(_end * period)));
 
             _out.write("</h3><img class=\"statimage\" border=\"0\""
                        + " src=\"viewstat.jsp?stat="
@@ -250,57 +250,57 @@ public class GraphHelper extends FormHandler {
 
             if (_width < MAX_X && _height < MAX_Y) {
                 _out.write(link(_stat, _showEvents, _periodCount, _end, _width * 3 / 2, _height * 3 / 2));
-                _out.write(_("Larger"));
+                _out.write(_t("Larger"));
                 _out.write("</a> - ");
             }
 
             if (_width > MIN_X && _height > MIN_Y) {
                 _out.write(link(_stat, _showEvents, _periodCount, _end, _width * 2 / 3, _height * 2 / 3));
-                _out.write(_("Smaller"));
+                _out.write(_t("Smaller"));
                 _out.write("</a> - ");
             }
 
             if (_height < MAX_Y) {
                 _out.write(link(_stat, _showEvents, _periodCount, _end, _width, _height * 3 / 2));
-                _out.write(_("Taller"));
+                _out.write(_t("Taller"));
                 _out.write("</a> - ");
             }
 
             if (_height > MIN_Y) {
                 _out.write(link(_stat, _showEvents, _periodCount, _end, _width, _height * 2 / 3));
-                _out.write(_("Shorter"));
+                _out.write(_t("Shorter"));
                 _out.write("</a> - ");
             }
 
             if (_width < MAX_X) {
                 _out.write(link(_stat, _showEvents, _periodCount, _end, _width * 3 / 2, _height));
-                _out.write(_("Wider"));
+                _out.write(_t("Wider"));
                 _out.write("</a> - ");
             }
 
             if (_width > MIN_X) {
                 _out.write(link(_stat, _showEvents, _periodCount, _end, _width * 2 / 3, _height));
-                _out.write(_("Narrower"));
+                _out.write(_t("Narrower"));
                 _out.write("</a>");
             }
 
             _out.write("<br>");
             if (_periodCount < MAX_C) {
                 _out.write(link(_stat, _showEvents, _periodCount * 2, _end, _width, _height));
-                _out.write(_("Larger interval"));
+                _out.write(_t("Larger interval"));
                 _out.write("</a> - ");
             }
 
             if (_periodCount > MIN_C) {
                 _out.write(link(_stat, _showEvents, _periodCount / 2, _end, _width, _height));
-                _out.write(_("Smaller interval"));
+                _out.write(_t("Smaller interval"));
                 _out.write("</a>");
             }
 
             _out.write("<br>");
             if (_periodCount < MAX_C) {
                 _out.write(link(_stat, _showEvents, _periodCount, _end + _periodCount, _width, _height));
-                _out.write(_("Previous interval"));
+                _out.write(_t("Previous interval"));
                 _out.write("</a>");
             }
 
@@ -311,17 +311,17 @@ public class GraphHelper extends FormHandler {
                 if (_periodCount < MAX_C)
                     _out.write(" - ");
                 _out.write(link(_stat, _showEvents, _periodCount, end, _width, _height));
-                _out.write(_("Next interval"));
+                _out.write(_t("Next interval"));
                 _out.write("</a> ");
             }
 
             _out.write("<br>");
             _out.write(link(_stat, !_showEvents, _periodCount, _end, _width, _height));
             if (!_stat.equals("bw.combined"))
-                _out.write(_showEvents ? _("Plot averages") : _("plot events"));
+                _out.write(_showEvents ? _t("Plot averages") : _t("plot events"));
             _out.write("</a>");
 
-            _out.write("</p><p><i>" + _("All times are UTC.") + "</i></p>\n");
+            _out.write("</p><p><i>" + _t("All times are UTC.") + "</i></p>\n");
         } catch (IOException ioe) {
             ioe.printStackTrace();
         }
@@ -353,17 +353,17 @@ public class GraphHelper extends FormHandler {
         // So just use the "shared/console nonce".
         String nonce = CSSHelper.getNonce();
         try {
-            _out.write("<br><h3>" + _("Configure Graph Display") + " [<a href=\"configstats\">" + _("Select Stats") + "</a>]</h3>");
+            _out.write("<br><h3>" + _t("Configure Graph Display") + " [<a href=\"configstats\">" + _t("Select Stats") + "</a>]</h3>");
             _out.write("<form action=\"graphs\" method=\"POST\">\n" +
                        "<input type=\"hidden\" name=\"action\" value=\"save\">\n" +
                        "<input type=\"hidden\" name=\"nonce\" value=\"" + nonce + "\" >\n");
-            _out.write(_("Periods") + ": <input size=\"5\" style=\"text-align: right;\" type=\"text\" name=\"periodCount\" value=\"" + _periodCount + "\"><br>\n");
-            _out.write(_("Plot averages") + ": <input type=\"radio\" class=\"optbox\" name=\"showEvents\" value=\"false\" " + (_showEvents ? "" : "checked=\"checked\" ") + "> ");
-            _out.write(_("or")+ " " +_("plot events") + ": <input type=\"radio\" class=\"optbox\" name=\"showEvents\" value=\"true\" "+ (_showEvents ? "checked=\"checked\" " : "") + "><br>\n");
-            _out.write(_("Image sizes") + ": " + _("width") + ": <input size=\"4\" style=\"text-align: right;\" type=\"text\" name=\"width\" value=\"" + _width 
-                       + "\"> " + _("pixels") + ", " + _("height") + ": <input size=\"4\" style=\"text-align: right;\" type=\"text\" name=\"height\" value=\"" + _height  
-                       + "\"> " + _("pixels") + "<br>\n");
-            _out.write(_("Refresh delay") + ": <select name=\"refreshDelay\">");
+            _out.write(_t("Periods") + ": <input size=\"5\" style=\"text-align: right;\" type=\"text\" name=\"periodCount\" value=\"" + _periodCount + "\"><br>\n");
+            _out.write(_t("Plot averages") + ": <input type=\"radio\" class=\"optbox\" name=\"showEvents\" value=\"false\" " + (_showEvents ? "" : "checked=\"checked\" ") + "> ");
+            _out.write(_t("or")+ " " +_t("plot events") + ": <input type=\"radio\" class=\"optbox\" name=\"showEvents\" value=\"true\" "+ (_showEvents ? "checked=\"checked\" " : "") + "><br>\n");
+            _out.write(_t("Image sizes") + ": " + _t("width") + ": <input size=\"4\" style=\"text-align: right;\" type=\"text\" name=\"width\" value=\"" + _width 
+                       + "\"> " + _t("pixels") + ", " + _t("height") + ": <input size=\"4\" style=\"text-align: right;\" type=\"text\" name=\"height\" value=\"" + _height  
+                       + "\"> " + _t("pixels") + "<br>\n");
+            _out.write(_t("Refresh delay") + ": <select name=\"refreshDelay\">");
             for (int i = 0; i < times.length; i++) {
                 _out.write("<option value=\"");
                 _out.write(Integer.toString(times[i]));
@@ -374,17 +374,17 @@ public class GraphHelper extends FormHandler {
                 if (times[i] > 0)
                     _out.write(DataHelper.formatDuration2(times[i] * 1000));
                 else
-                    _out.write(_("Never"));
+                    _out.write(_t("Never"));
                 _out.write("</option>\n");
             }
             _out.write("</select><br>\n" +
-                       _("Store graph data on disk?") +
+                       _t("Store graph data on disk?") +
                        " <input type=\"checkbox\" class=\"optbox\" value=\"true\" name=\"persistent\"");
             boolean persistent = _context.getBooleanPropertyDefaultTrue(SummaryListener.PROP_PERSISTENT);
             if (persistent)
                 _out.write(" checked=\"checked\"");
             _out.write(">" +
-                       "<hr><div class=\"formaction\"><input type=\"submit\" class=\"accept\" value=\"" + _("Save settings and redraw graphs") + "\"></div></form>");
+                       "<hr><div class=\"formaction\"><input type=\"submit\" class=\"accept\" value=\"" + _t("Save settings and redraw graphs") + "\"></div></form>");
         } catch (IOException ioe) {
             ioe.printStackTrace();
         }
@@ -440,7 +440,7 @@ public class GraphHelper extends FormHandler {
             changes.put(PROP_EVENTS, "" + _showEvents);
             changes.put(SummaryListener.PROP_PERSISTENT, "" + _persistent);
             _context.router().saveConfig(changes, null);
-            addFormNotice(_("Graph settings saved"));
+            addFormNotice(_t("Graph settings saved"));
         }
     }
 

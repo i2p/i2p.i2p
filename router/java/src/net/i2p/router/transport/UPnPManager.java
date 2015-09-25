@@ -280,7 +280,7 @@ class UPnPManager {
      */
     public String renderStatusHTML() {
         if (!_isRunning)
-            return "<h3><a name=\"upnp\"></a>" + _("UPnP is not enabled") + "</h3>\n";
+            return "<h3><a name=\"upnp\"></a>" + _t("UPnP is not enabled") + "</h3>\n";
         return _upnp.renderStatusHTML();
     }
 
@@ -289,7 +289,7 @@ class UPnPManager {
     /**
      *  Translate
      */
-    private final String _(String s) {
+    private final String _t(String s) {
         return Translate.getString(s, _context, BUNDLE_NAME);
     }
 
