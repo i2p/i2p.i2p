@@ -1443,8 +1443,10 @@ public class Router implements RouterClock.ClockShiftListener {
         _eventLog.addEvent(EventLog.CLOCK_SHIFT, Long.toString(delta));
         // update the routing key modifier
         _context.routerKeyGenerator().generateDateBasedModData();
-        if (_context.commSystem().countActivePeers() <= 0)
-            return;
+        // Commented because this check makes no sense (#1014)
+        // .. and 'active' is relative to our broken time.
+        //if (_context.commSystem().countActivePeers() <= 0)
+        //    return;
         if (delta > 0)
             _log.error("Restarting after large clock shift forward by " + DataHelper.formatDuration(delta));
         else
