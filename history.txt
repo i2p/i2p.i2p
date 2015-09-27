@@ -1,3 +1,7 @@
+2015-09-27 dg
+ * Router: Fix soft restarts for 'massive' clock jumps (over +150s or -61s) and recover from standby
+   and hibernate (ticket #1014).
+
 2015-09-27 zzz
  * Console:
    - Export SSL cert on creation
@@ -9,8 +13,7 @@
  * Tunnels: Use max of 2 not-failing peers in an exploratory tunnel,
    use high cap for the rest; change outbound exploratory
    default length from 2 + 0-1 to 3+0.
- * Router: Fix soft restarts for 'massive' clock jumps (over +150s or -61s) and recover from standby
-   and hibernate (ticket #1014).
+ * Util: Speed up IP address validation by using Apache's implementation (ticket #1198)
 
 2015-09-25 dg
  * Rename _() for translation to _t() for Java 9 compatibility (ticket #1456)
