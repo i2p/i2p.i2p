@@ -33,12 +33,12 @@ class ExploratoryPeerSelector extends TunnelPeerSelector {
             return null;
         }
         
-        if (false && shouldSelectExplicit(settings)) {
-            List<Hash> rv = selectExplicit(settings, length);
-            if (l.shouldLog(Log.DEBUG))
-                l.debug("Explicit peers selected: " + rv);
-            return rv;
-        }
+        //if (false && shouldSelectExplicit(settings)) {
+        //    List<Hash> rv = selectExplicit(settings, length);
+        //    if (l.shouldLog(Log.DEBUG))
+        //        l.debug("Explicit peers selected: " + rv);
+        //    return rv;
+        //}
         
         Set<Hash> exclude = getExclude(settings.isInbound(), true);
         exclude.add(ctx.routerHash());
@@ -55,34 +55,43 @@ class ExploratoryPeerSelector extends TunnelPeerSelector {
         // FloodfillNetworkDatabaseFacade fac = (FloodfillNetworkDatabaseFacade)ctx.netDb();
         // exclude.addAll(fac.getFloodfillPeers());
         HashSet<Hash> matches = new HashSet<Hash>(length);
-        boolean exploreHighCap = shouldPickHighCap();
 
-        //
-        // We don't honor IP Restriction here, to be fixed
-        //
+        if (length > 0) {
+            boolean exploreHighCap = shouldPickHighCap();
 
-        // If hidden and inbound, use fast peers - that we probably have recently
-        // connected to and so they have our real RI - to maximize the chance
-        // that the adjacent hop can connect to us.
-        if (settings.isInbound() && ctx.router().isHidden()) {
-            if (l.shouldLog(Log.INFO))
-                l.info("EPS SFP " + length + (settings.isInbound() ? " IB" : " OB") + " exclude " + exclude.size());
-            ctx.profileOrganizer().selectFastPeers(length, exclude, matches);
-        } else if (exploreHighCap) {
-            if (l.shouldLog(Log.INFO))
-                l.info("EPS SHCP " + length + (settings.isInbound() ? " IB" : " OB") + " exclude " + exclude.size());
-            ctx.profileOrganizer().selectHighCapacityPeers(length, exclude, matches);
-        } else if (ctx.commSystem().haveHighOutboundCapacity()) {
-            if (l.shouldLog(Log.INFO))
-                l.info("EPS SNFP " + length + (settings.isInbound() ? " IB" : " OB") + " exclude " + exclude.size());
-            ctx.profileOrganizer().selectNotFailingPeers(length, exclude, matches, false);
-        } else { // use only connected peers so we don't make more connections
-            if (l.shouldLog(Log.INFO))
-                l.info("EPS SANFP " + length + (settings.isInbound() ? " IB" : " OB") + " exclude " + exclude.size());
-            ctx.profileOrganizer().selectActiveNotFailingPeers(length, exclude, matches);
+            //
+            // We don't honor IP Restriction here, to be fixed
+            //
+
+            // If hidden and inbound, use fast peers - that we probably have recently
+            // connected to and so they have our real RI - to maximize the chance
+            // that the adjacent hop can connect to us.
+            if (settings.isInbound() && ctx.router().isHidden()) {
+                if (l.shouldLog(Log.INFO))
+                    l.info("EPS SFP " + length + (settings.isInbound() ? " IB" : " OB") + " exclude " + exclude.size());
+                ctx.profileOrganizer().selectFastPeers(length, exclude, matches);
+            } else if (exploreHighCap) {
+                if (l.shouldLog(Log.INFO))
+                    l.info("EPS SHCP " + length + (settings.isInbound() ? " IB" : " OB") + " exclude " + exclude.size());
+                ctx.profileOrganizer().selectHighCapacityPeers(length, exclude, matches);
+            } else if (ctx.commSystem().haveHighOutboundCapacity()) {
+                if (l.shouldLog(Log.INFO))
+                    l.info("EPS SNFP " + length + (settings.isInbound() ? " IB" : " OB") + " exclude " + exclude.size());
+                // As of 0.9.23, we include a max of 2 not failing peers,
+                // to improve build success on 3-hop tunnels.
+                // Peer org credits existing items in matches
+                if (length > 2)
+                    ctx.profileOrganizer().selectHighCapacityPeers(length - 2, exclude, matches);
+                ctx.profileOrganizer().selectNotFailingPeers(length, exclude, matches, false);
+            } else { // use only connected peers so we don't make more connections
+                if (l.shouldLog(Log.INFO))
+                    l.info("EPS SANFP " + length + (settings.isInbound() ? " IB" : " OB") + " exclude " + exclude.size());
+                ctx.profileOrganizer().selectActiveNotFailingPeers(length, exclude, matches);
+            }
+            
+            matches.remove(ctx.routerHash());
         }
-        
-        matches.remove(ctx.routerHash());
+
         ArrayList<Hash> rv = new ArrayList<Hash>(matches);
         if (rv.size() > 1)
             orderPeers(rv, settings.getRandomKey());
