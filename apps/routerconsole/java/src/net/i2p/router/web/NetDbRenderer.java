@@ -35,6 +35,7 @@ import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelPoolSettings;
 import net.i2p.router.util.HashDistance;   // debug
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
+import net.i2p.util.Log;
 import net.i2p.util.ObjectCounter;
 import net.i2p.util.Translate;
 import net.i2p.util.VersionComparator;
@@ -141,16 +142,20 @@ public class NetDbRenderer {
         int rapCount = 0;
         BigInteger median = null;
         int c = 0;
-        if (debug) {
+        if (leases.isEmpty()) {
+          if (!debug)
+              buf.append("<i>").append(_t("none")).append("</i>");
+        } else {
+          if (debug) {
             // Find the center of the RAP leasesets
             for (LeaseSet ls : leases) {
                 if (ls.getReceivedAsPublished())
                     rapCount++;
             }
             medianCount = rapCount / 2;
-        }
-        long now = _context.clock().now();
-        for (LeaseSet ls : leases) {
+          }
+          long now = _context.clock().now();
+          for (LeaseSet ls : leases) {
             Destination dest = ls.getDestination();
             Hash key = dest.calculateHash();
             buf.append("<b>").append(_t("LeaseSet")).append(": ").append(key.toBase64()).append("</b>\n");
@@ -223,7 +228,8 @@ public class NetDbRenderer {
             buf.append("<hr>\n");
             out.write(buf.toString());
             buf.setLength(0);
-        }
+          } // for each
+        }  // !empty
         if (debug) {
             FloodfillNetworkDatabaseFacade netdb = (FloodfillNetworkDatabaseFacade)_context.netDb();
             buf.append("<p><b>Total Leasesets: ").append(leases.size());
@@ -281,6 +287,8 @@ public class NetDbRenderer {
             out.flush();
             return;
         }
+        Log log = _context.logManager().getLog(NetDbRenderer.class);
+        long start = System.currentTimeMillis();
         
         boolean full = mode == 1;
         boolean shortStats = mode == 2;
@@ -319,6 +327,10 @@ public class NetDbRenderer {
                 transportCount[classifyTransports(ri)]++;
             }
         }
+        long end = System.currentTimeMillis();
+        if (log.shouldWarn())
+            log.warn("part 1 took " + (end - start));
+        start = end;
             
      //
      // don't bother to reindent
@@ -346,6 +358,10 @@ public class NetDbRenderer {
         buf.append("</td><td style=\"vertical-align: top;\">");
         out.write(buf.toString());
         buf.setLength(0);
+        end = System.currentTimeMillis();
+        if (log.shouldWarn())
+            log.warn("part 2 took " + (end - start));
+        start = end;
             
         // transports table
         buf.append("<table>\n");
@@ -361,6 +377,10 @@ public class NetDbRenderer {
         buf.append("</td><td style=\"vertical-align: top;\">");
         out.write(buf.toString());
         buf.setLength(0);
+        end = System.currentTimeMillis();
+        if (log.shouldWarn())
+            log.warn("part 3 took " + (end - start));
+        start = end;
 
         // country table
         List<String> countryList = new ArrayList<String>(countries.objects());
@@ -379,6 +399,10 @@ public class NetDbRenderer {
         }
 
         buf.append("</td></tr></table>");
+        end = System.currentTimeMillis();
+        if (log.shouldWarn())
+            log.warn("part 4 took " + (end - start));
+        start = end;
 
      //
      // don't bother to reindent
