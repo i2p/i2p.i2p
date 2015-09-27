@@ -373,6 +373,9 @@ public class TranslateReader extends FilterReader {
         }
     }
 
+    /**
+     *  Do not comment out, used to extract tags as a part of the build process.
+     */
     public static void main(String[] args) {
         try {
             if (args.length >= 2 && args[0].equals("test"))
