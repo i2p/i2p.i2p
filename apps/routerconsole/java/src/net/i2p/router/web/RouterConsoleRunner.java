@@ -760,6 +760,13 @@ public class RouterConsoleRunner implements RouterApp {
                     changes.put(PROP_KEY_PASSWORD, keyPassword);
                     _context.router().saveConfig(changes, null);
                 } catch (Exception e) {}  // class cast exception
+                // export cert, fails silently
+                File dir = new SecureDirectory(_context.getConfigDir(), "certificates");
+                dir.mkdir();
+                dir = new SecureDirectory(dir, "console");
+                dir.mkdir();
+                File certFile = new File(dir, "console.local.crt");
+                KeyStoreUtil.exportCert(ks, DEFAULT_KEYSTORE_PASSWORD, "console", certFile);
             }
         }
         if (success) {
