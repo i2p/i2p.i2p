@@ -147,6 +147,7 @@ ${book.loadBookMessages}
 <th>&nbsp;</th>
 </c:if>
 
+<% if (book.getEntries().length > 0) { /* Don't show if no results. Can't figure out how to do this with c:if */ %>
 <th><%=intl._t("Name")%></th>
 <th colspan="2"><%=intl._t("Links")%></th>
 <th><%=intl._t("Destination")%></th>
@@ -166,18 +167,23 @@ ${book.loadBookMessages}
 <td class="destinations"><textarea rows="1" style="height:3em;" wrap="off" cols="40" readonly="readonly" name="dest_${addr.name}" >${addr.destination}</textarea></td>
 </tr>
 </c:forEach>
+<% } /* book..getEntries().length() > 0 */ %>
 </table>
 </div>
 
+<% if (book.getEntries().length > 0) { /* Don't show if no results. Can't figure out how to do this with c:if */ %>
 <c:if test="${book.master || book.router || book.published || book.private}">
 <div id="buttons">
 <p class="buttons">
 <input class="cancel" type="reset" value="<%=intl._t("Cancel")%>" >
 <input class="delete" type="submit" name="action" value="<%=intl._t("Delete Selected")%>" >
 </p>
-</div></form>
+</div>
 </c:if>
+<% } /* book..getEntries().length() > 0 */ %>
+</form>
 
+<% if (book.getEntries().length > 0) { /* Don't show if no results. Can't figure out how to do this with c:if */ %>
 <form action="export" method="GET" target="_top">
 <div id="buttons">
 <p class="buttons">
@@ -190,6 +196,7 @@ ${book.loadBookMessages}
 </c:if>
 <input type="submit" class="export" value="<%=intl._t("Export in hosts.txt format")%>" />
 </p></div></form>
+<% } /* book..getEntries().length() > 0 */ %>
 
 </c:if><% /* book.notEmpty */ %>
 
