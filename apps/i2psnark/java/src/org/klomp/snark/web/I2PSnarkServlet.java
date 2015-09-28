@@ -981,6 +981,12 @@ public class I2PSnarkServlet extends BasicServlet {
                 } else if (newURL.startsWith(MagnetURI.MAGNET) || newURL.startsWith(MagnetURI.MAGGOT)) {
                     addMagnet(newURL, dir);
                 } else if (newURL.length() == 40 && newURL.replaceAll("[a-fA-F0-9]", "").length() == 0) {
+                    // hex
+                    newURL = newURL.toUpperCase(Locale.US);
+                    addMagnet(MagnetURI.MAGNET_FULL + newURL, dir);
+                } else if (newURL.length() == 32 && newURL.replaceAll("[a-zA-Z2-7]", "").length() == 0) {
+                    // b32
+                    newURL = newURL.toUpperCase(Locale.US);
                     addMagnet(MagnetURI.MAGNET_FULL + newURL, dir);
                 } else {
                     _manager.addMessage(_t("Invalid URL: Must start with \"http://\", \"{0}\", or \"{1}\"",
