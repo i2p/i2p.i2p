@@ -81,7 +81,6 @@ public class Reseeder {
 
               // Disabling everything, use SSL
               //"http://i2p.mooo.com/netDb/" + "," +
-              //"http://193.150.121.66/netDb/" + "," +
               //"http://uk.reseed.i2p2.no/" + "," +
               //"http://netdb.i2p2.no/"; // Only SU3 (v3) support
               "";
@@ -92,8 +91,6 @@ public class Reseeder {
               //"https://netdb.rows.io:444/" + "," + // Only HTTPS and SU3 (v3) support
               "https://i2pseed.zarrenspry.info/" + "," + // Only HTTPS and SU3 (v3) support
               "https://i2p.mooo.com/netDb/" + "," +
-              // ticket #1596
-              // "https://193.150.121.66/netDb/" + "," +
               "https://netdb.i2p2.no/" + "," + // Only SU3 (v3) support, SNI required
               "https://us.reseed.i2p2.no:444/" + "," +
               "https://uk.reseed.i2p2.no:444/" + "," +
