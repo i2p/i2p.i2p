@@ -12,34 +12,38 @@ if [ ! -f "$JAVA_HOME/include/jni.h" ]; then
     exit 1
 fi
 
-case `uname -s` in
-MINGW*)
-        JAVA_HOME="c:/software/j2sdk1.4.2_05"
+
+# Allow TARGET to be overridden (e.g. for use with cross compilers)
+[ -z $TARGET ] && TARGET=$(uname -s | tr "[A-Z]" "[a-z]")
+
+# Note, this line does not support windows (and needs to generate a win32/win64 string for that to work)
+BUILD_OS=$(uname -s | tr "[A-Z]" "[a-z]")
+echo "TARGET=$TARGET"
+
+case "$TARGET" in
+mingw*|windows*)
         COMPILEFLAGS="-Wall"
-        INCLUDES="-I. -I../../jbigi/include -I$JAVA_HOME/include/win32/ -I$JAVA_HOME/include/"
+        INCLUDES="-I. -I../../jbigi/include -I$JAVA_HOME/include -I$JAVA_HOME/include/$BUILD_OS -I/usr/local/include"
         LINKFLAGS="-shared -Wl,--kill-at"
         LIBFILE="jbigi.dll";;
 CYGWIN*)
-        JAVA_HOME="c:/software/j2sdk1.4.2_05"
         COMPILEFLAGS="-Wall -mno-cygwin"
-        INCLUDES="-I. -I../../jbigi/include -I$JAVA_HOME/include/win32/ -I$JAVA_HOME/include/"
+        INCLUDES="-I. -I../../jbigi/include -I$JAVA_HOME/include/$BUILD_OS/ -I$JAVA_HOME/include/"
         LINKFLAGS="-shared -Wl,--kill-at"
         LIBFILE="jbigi.dll";;
-Darwin*)
-        JAVA_HOME=$(/usr/libexec/java_home)
+darwin*)
         COMPILEFLAGS="-fPIC -Wall"
-        INCLUDES="-I. -I../../jbigi/include -I$JAVA_HOME/include"
-        LINKFLAGS="-dynamiclib -framework JavaVM"
+        INCLUDES="-I. -I../../jbigi/include -I$JAVA_HOME/include -I$JAVA_HOME/include/$BUILD_OS -I/usr/local/include"
+        LINKFLAGS="-m64 -dynamiclib -framework JavaVM"
         LIBFILE="libjbigi.jnilib";;
 SunOS*|OpenBSD*|NetBSD*|*FreeBSD*|Linux*)
-        UNIXTYPE=$(uname -s | tr "[A-Z]" "[a-z]")
-        if [ $UNIXTYPE = "sunos" ]; then
-            UNIXTYPE="solaris"
-        elif [ $UNIXTYPE = "gnu/kfreebsd" ]; then
-            UNIXTYPE="linux"
+        if [ $BUILD_OS = "sunos" ]; then
+            BUILD_OS="solaris"
+        elif [ $BUILD_OS = "gnu/kfreebsd" ]; then
+            BUILD_OS="linux"
         fi
         COMPILEFLAGS="-fPIC -Wall $CFLAGS"
-        INCLUDES="-I. -I../../jbigi/include -I$JAVA_HOME/include -I$JAVA_HOME/include/${UNIXTYPE} -I/usr/local/include"
+        INCLUDES="-I. -I../../jbigi/include -I$JAVA_HOME/include -I$JAVA_HOME/include/$BUILD_OS -I/usr/local/include"
         LINKFLAGS="-shared -Wl,-soname,libjbigi.so"
         LIBFILE="libjbigi.so";;
 *)
@@ -56,9 +60,17 @@ else
         STATICLIBS=".libs/libgmp.a"
 fi
 
+[ $BITS -eq 32 ] && COMPILEFLAGS="-m32 $COMPILEFLAGS"
+[ $BITS -eq 64 ] && COMPILEFLAGS="-m64 $COMPILEFLAGS"
+
 echo "Compiling C code..."
 rm -f jbigi.o $LIBFILE
+echo "JAVA_HOME: $JAVA_HOME"
+echo "INCLUDESs: $INCLUDES"
+echo "LD: $LD"
+echo "Compile: \"$CC -c $COMPILEFLAGS $INCLUDES ../../jbigi/src/jbigi.c || exit 1\""
 $CC -c $COMPILEFLAGS $INCLUDES ../../jbigi/src/jbigi.c || exit 1
+echo "Link: \"$CC $LINKFLAGS $INCLUDES -o $LIBFILE jbigi.o $INCLUDELIBS $STATICLIBS $LIBPATH || exit 1\""
 $CC $LINKFLAGS $INCLUDES -o $LIBFILE jbigi.o $INCLUDELIBS $STATICLIBS $LIBPATH || exit 1
 
 exit 0
