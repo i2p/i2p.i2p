@@ -31,7 +31,7 @@ CYGWIN*)
         INCLUDES="-I. -I../../jbigi/include -I$JAVA_HOME/include/$BUILD_OS/ -I$JAVA_HOME/include/"
         LINKFLAGS="-shared -Wl,--kill-at"
         LIBFILE="jbigi.dll";;
-darwin*)
+darwin*|osx)
         COMPILEFLAGS="-fPIC -Wall"
         INCLUDES="-I. -I../../jbigi/include -I$JAVA_HOME/include -I$JAVA_HOME/include/$BUILD_OS -I/usr/local/include"
         LINKFLAGS="-m64 -dynamiclib -framework JavaVM"
