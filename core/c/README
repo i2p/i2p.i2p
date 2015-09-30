@@ -30,11 +30,11 @@ go into jbigi/ and run build-all.sh (the results will be under jbigi/lib/)
 Build for more than one target at a time
 ========================================
 
-./mbuild.sh is used to build a whole set of binaries at a time.
+jbigi/mbuild-all.sh is used to build a whole set of binaries at a time.
 Each run will build a set of binaries for a specific platform.
 
-Windows cross-compilation
--------------------------
+Linux -> Windows cross-compilation
+----------------------------------
 Install ming-w64 (on debian or whichever package that provides i686-w64-mingw32 and x86_64_w64_mingw32).
 
 To build the 32-bit binaries run something like this:
@@ -42,6 +42,17 @@ To build the 32-bit binaries run something like this:
 
 To build the 64-bit binaries run something like this:
     CC=x86_64-w64-mingw32-gcc TARGET=windows BITS=64 ./mbuild-all.sh
+
+Linux -> FreeBSD cross-compilation
+----------------------------------
+Install gcc-multilib (on debian or whichever package that provides the C runtime)
+I used clang3.6 as CC, but gcc or most other things should work too.
+
+To build the 32-bit binaries run something like this:
+    TARGET=freebsd BITS=32 ./mbuild-all.sh
+
+To build the 64-bit binaries run something like this:
+    TARGET=freebsd BITS=64 ./mbuild-all.sh
 
 
 Installation and testing
