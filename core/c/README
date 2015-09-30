@@ -54,6 +54,10 @@ To build the 32-bit binaries run something like this:
 To build the 64-bit binaries run something like this:
     TARGET=freebsd BITS=64 ./mbuild-all.sh
 
+OSX Compilation
+---------------
+No working cross-compilation setup has been found. The gmp6 binaries were produced on an OSX host.
+
 
 Installation and testing
 ========================
