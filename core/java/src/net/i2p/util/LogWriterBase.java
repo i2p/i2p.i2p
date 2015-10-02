@@ -67,10 +67,12 @@ abstract class LogWriterBase implements Runnable {
 
     public void run() {
         _write = true;
+        // don't bother on Android
+        final boolean shouldReadConfig = !SystemVersion.isAndroid();
         try {
             while (_write) {
                 flushRecords();
-                if (_write)
+                if (_write && shouldReadConfig)
                     rereadConfig();
             }
         } catch (Exception e) {
