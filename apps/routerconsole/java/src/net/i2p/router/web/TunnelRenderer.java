@@ -66,11 +66,13 @@ public class TunnelRenderer {
         }
         
         List<HopConfig> participating = _context.tunnelDispatcher().listParticipatingTunnels();
-        Collections.sort(participating, new TunnelComparator());
-        out.write("<h2><a name=\"participating\"></a>" + _t("Participating tunnels") + "</h2><table>\n");
-        out.write("<tr><th>" + _t("Receive on") + "</th><th>" + _t("From") + "</th><th>"
+        out.write("<h2><a name=\"participating\"></a>" + _t("Participating tunnels") + "</h2>\n");
+        if (!participating.isEmpty()) {
+            Collections.sort(participating, new TunnelComparator());
+            out.write("<table><tr><th>" + _t("Receive on") + "</th><th>" + _t("From") + "</th><th>"
                   + _t("Send on") + "</th><th>" + _t("To") + "</th><th>" + _t("Expiration") + "</th>"
                   + "<th>" + _t("Usage") + "</th><th>" + _t("Rate") + "</th><th>" + _t("Role") + "</th></tr>\n");
+        }
         long processed = 0;
         RateStat rs = _context.statManager().getRate("tunnel.participatingMessageCount");
         if (rs != null)
@@ -125,10 +127,14 @@ public class TunnelRenderer {
                 out.write("<td class=\"cells\" align=\"center\">" + _t("Participant") + "</td>");
             out.write("</tr>\n");
         }
-        out.write("</table>\n");
+        if (!participating.isEmpty())
+            out.write("</table>\n");
         if (displayed > DISPLAY_LIMIT)
             out.write("<div class=\"statusnotes\"><b>" + _t("Limited display to the {0} tunnels with the highest usage", DISPLAY_LIMIT)  + "</b></div>\n");
-        out.write("<div class=\"statusnotes\"><b>" + _t("Inactive participating tunnels") + ": " + inactive + "</b></div>\n");
+        if (inactive > 0)
+            out.write("<div class=\"statusnotes\"><b>" + _t("Inactive participating tunnels") + ": " + inactive + "</b></div>\n");
+        else if (displayed <= 0)
+            out.write("<div class=\"statusnotes\"><b>" + _t("none") + "</b></div>\n");
         out.write("<div class=\"statusnotes\"><b>" + _t("Lifetime bandwidth usage") + ": " + DataHelper.formatSize2(processed*1024) + "B</b></div>\n");
         //renderPeers(out);
         out.write("</div>");
