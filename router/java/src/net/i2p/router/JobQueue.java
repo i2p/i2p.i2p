@@ -27,6 +27,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import net.i2p.data.DataHelper;
 import net.i2p.router.message.HandleGarlicMessageJob;
 import net.i2p.router.networkdb.kademlia.HandleFloodfillDatabaseLookupMessageJob;
+import net.i2p.router.RouterClock;
 import net.i2p.util.Clock;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
@@ -516,9 +517,10 @@ public class JobQueue {
      * max number of runners.
      *
      */
-    private final class QueuePumper implements Runnable, Clock.ClockUpdateListener {
+    private final class QueuePumper implements Runnable, Clock.ClockUpdateListener, RouterClock.ClockShiftListener {
         public QueuePumper() { 
             _context.clock().addUpdateListener(this);
+            ((RouterClock) _context.clock()).addShiftListener(this);
         }
         public void run() {
             try {
@@ -590,6 +592,7 @@ public class JobQueue {
                 } // while (_alive)
             } catch (Throwable t) {
                 _context.clock().removeUpdateListener(this);
+                ((RouterClock) _context.clock()).removeShiftListener(this);
                 if (_log.shouldLog(Log.ERROR))
                     _log.error("pumper killed?!", t);
             }
@@ -600,6 +603,10 @@ public class JobQueue {
             synchronized (_jobLock) {
                 _jobLock.notifyAll();
             }
+        }
+
+        public void clockShift(long delta) {
+            offsetChanged(delta);
         }
 
     }
