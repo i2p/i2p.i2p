@@ -18,12 +18,9 @@ FreeBSD*)
 	exit;;
 esac
 
-VER=6.0.0
-TARVER=${VER}a
-TAR=gmp-${TARVER}.tar.bz2
+# Import gmp version variables and download gmp.
+. ./download_gmp.sh
 
-echo "Extracting GMP Version $VER ..."
-tar -xjf $TAR
 echo "Building..."
 mkdir -p lib/net/i2p/util
 
@@ -37,7 +34,7 @@ for x in \
 do
 	mkdir -p bin/$x
 	cd bin/$x
-	../../gmp-$VER/configure --with-pic --build=$x
+	../../gmp-$GMP_VER/configure --with-pic --build=$x
 	make clean
 	make
 	sh ../../build_jbigi.sh static

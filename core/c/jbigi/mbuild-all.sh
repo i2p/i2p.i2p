@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 #
 # Run with BITS=32 to generate 32-bit libs on a 64-bit platform
 # On Ubuntu you will need sudo apt-get install gcc-multilib libc6-i386 libc6-dev-i386
@@ -51,12 +51,12 @@ TRANSLATE_NAME_armv7a="armv7"
 # starting with k10 added for 6.0.0
 # As of GMP 6.0.0, libgmp 3,
 X86_64_PLATFORMS="coreisbr coreihwl coreibwl bobcat jaguar bulldozer piledriver steamroller excavator atom athlon64 core2 corei nano pentium4 k10 x86_64"
-TRANSLATE_NAME_x86_64="none" # Rename x86_64 to none_64
+TRANSLATE_NAME_x86_64="none" # Rename x86_64 to none_64, since that is what NativeBigInteger refers to it as
 
 # Note! these are 32bit _ONLY_ (after the 64 bit ones)
 # Also note that the 64-bit entry "x86_64" is filtered out since it already has the more appropriate "i386" entry
-X86_PLATFORMS="${X86_64_PLATFORMS//x86_64} pentium pentiummmx pentium2 pentium3 pentiumm k6 k62 k63 athlon geode viac3 viac32 i386"
-TRANSLATE_NAME_i386="none" # Rename i386 to none
+X86_PLATFORMS="$(echo $X86_64_PLATFORMS | sed 's/x86_64//g') pentium pentiummmx pentium2 pentium3 pentiumm k6 k62 k63 athlon geode viac3 viac32 i386"
+TRANSLATE_NAME_i386="none" # Rename i386 to none, , since that is what NativeBigInteger refers to it as
 
 DARWIN_PLATFORMS="core2 corei coreisbr coreihwl coreibwl"
 MINGW_PLATFORMS="${X86_PLATFORMS} ${MISC_MINGW_PLATFORMS}"
@@ -68,7 +68,7 @@ OPENBSD_PLATFORM="${X86_PLATFORMS} ${MISC_OPENBSD_PLATFORMS}"
 
 
 # Import gmp version variables and download gmp.
-source ./download_gmp.sh
+. ./download_gmp.sh
 
 # If JAVA_HOME isn't set we'll try to figure it out
 [ -z $JAVA_HOME ] && . ../find-java-home
@@ -96,9 +96,11 @@ if [ -z $CC ]; then
 fi
 
 if [ $BITS -eq 32 ]; then
+  export ABI=32
   export CFLAGS="-m32"
   export LDFLAGS="-m32"
 elif [ $BITS -eq 64 ]; then
+  export ABI=64
   export CFLAGS="-m64"
   export LDFLAGS="-m64"
 else
@@ -138,8 +140,8 @@ if [ "$TARGET" != "$BUILD_OS" ]; then
       ;;
     *)
       echo "No recognized cross-compiler provided in CC env variable."
-      [ $BITS -eq 32 ] && echo "For 32-bit targets, i686-w64-mingw32-gcc recommended"
-      [ $BITS -eq 64 ] && echo "For 64-bit targets, x86_64-w64-mingw32-gcc recommended"
+      [ $BITS -eq 32 ] && echo "For 32-bit targets, i686-w64-mingw32-gcc is recommended"
+      [ $BITS -eq 64 ] && echo "For 64-bit targets, x86_64-w64-mingw32-gcc is recommended"
       exit 1;
       ;;
     esac
@@ -147,8 +149,8 @@ if [ "$TARGET" != "$BUILD_OS" ]; then
   freebsd*)
     HOST_CONFIGURE_FLAG="\$2-pc-freebsd"
   ;;
-  darwin*)
-    HOST_CONFIGURE_FLAG="\$2-apple-darwin"
+  darwin*|osx)
+    HOST_CONFIGURE_FLAG="\$2-darwin"
 #     case "$CC" in
 #     *i*86*darwin*)
 
@@ -181,7 +183,7 @@ mingw*|windows*)
                 PLATFORM_LIST="${X86_PLATFORMS}"
         fi
         echo "Building ${TARGET} .dlls for all architectures";;
-darwin*)
+darwin*|osx)
         NAME="libjbigi"
         TYPE="jnilib"
         TARGET="osx"
@@ -315,20 +317,15 @@ configure_file () {
             # before the eval: "$2_VENDOR_OS"
             # and this after:  "x86_VENDOR_OS"
             eval HOST_CONFIGURE_FLAG=$HOST_CONFIGURE_FLAG
-            echo "gmp-${1}/configure --host=${HOST_CONFIGURE_FLAG} --with-pic"
+            echo "../../gmp-${1}/configure --host=${HOST_CONFIGURE_FLAG} --with-pic && return 0"
             ../../gmp-${1}/configure --host=${HOST_CONFIGURE_FLAG} --with-pic && return 0
         else
             # We're not cross-compiling, we are however building
             # optimized versions for other platforms on our OS.
-            echo "gmp-${1}/configure --build=${2} --with-pic"
-            ../../gmp-${1}/configure --build=${2} --with-pic && return 0
+            echo "../../gmp-${1}/configure --build=${2}-${BUILD_OS} --with-pic && return 0"
+            ../../gmp-${1}/configure --build=${2}-${BUILD_OS} --with-pic && return 0
         fi
-        kate config.log
-#        if [ $(echo $TARGET| grep -q darwin) ]; then
-                
- #       else
-  #              ../../gmp-${1}/configure --build=${2} ${HOST_CONFIGURE_FLAG} --with-pic && return 0
-   #     fi
+
         cd ..
         
         rm -R "$2"

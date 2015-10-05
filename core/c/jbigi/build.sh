@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 #
 #  Build the jbigi library for i2p
 #
@@ -21,7 +21,7 @@ rm -rf bin/local
 mkdir -p lib bin/local
 
 # Import gmp version variables and download gmp.
-source ./download_gmp.sh
+. ./download_gmp.sh
 
 
 # If JAVA_HOME isn't set, try to figure it out on our own

@@ -6,7 +6,7 @@ export GMP_DIR="gmp-$GMP_VER"
 export GMP_TAR="gmp-$GMP_TARVER.tar.bz2"
 
 
-function download_tar
+download_tar()
 {
   GMP_TAR_URL="https://gmplib.org/download/gmp/${GMP_TAR}"
   if [ $(which wget) ]; then
@@ -21,7 +21,7 @@ function download_tar
   fi
 }
 
-function extract_tar
+extract_tar()
 {
   tar -xjf ${GMP_TAR} > /dev/null 2>&1 || (rm -f ${GMP_TAR} && download_tar && extract_tar || exit 1)
 }
