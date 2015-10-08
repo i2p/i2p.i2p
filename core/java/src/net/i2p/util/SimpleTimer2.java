@@ -257,6 +257,8 @@ public class SimpleTimer2 {
         private long _nextRun;
         /** whether this was scheduled during RUNNING state.  LOCKING: this */
         private boolean _rescheduleAfterRun;
+        /** whether this was cancelled during RUNNING state.  LOCKING: this */
+        private boolean _cancelAfterRun;
         
         /** must call schedule() later */
         public TimedEvent(SimpleTimer2 pool) {
@@ -290,7 +292,8 @@ public class SimpleTimer2 {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Scheduling: " + this + " timeout = " + timeoutMs + " state: " + _state);
             if (timeoutMs <= 0) {
-                if (_log.shouldLog(Log.WARN))
+                // streaming timers do call with timeoutMs == 0
+                if (timeoutMs < 0 && _log.shouldLog(Log.WARN))
                     _log.warn("Timeout <= 0: " + this + " timeout = " + timeoutMs + " state: " + _state);
                 timeoutMs = 1; // otherwise we may execute before _future is updated, which is fine
                                // except it triggers 'early execution' warning logging
@@ -298,6 +301,7 @@ public class SimpleTimer2 {
 
             // always set absolute time of execution
             _nextRun = timeoutMs + System.currentTimeMillis();
+            _cancelAfterRun = false;
             
             switch(_state) {
               case RUNNING:
@@ -373,7 +377,9 @@ public class SimpleTimer2 {
               case CANCELLED:  // fall through
               case IDLE: 
                 break; // my preference is to throw IllegalState here, but let it be.
-              case RUNNING:    // fall through
+              case RUNNING:
+                _cancelAfterRun = true;
+                return true;
               case SCHEDULED:
                 boolean cancelled = _future.cancel(false);
                 if (cancelled)
@@ -447,11 +453,16 @@ public class SimpleTimer2 {
                       case CANCELLED:
                         break; // nothing
                       case RUNNING: 
-                        _state = TimedEventState.IDLE; 
-                        // do we need to reschedule?
-                        if (_rescheduleAfterRun) {
-                            _rescheduleAfterRun = false;
-                            schedule(_nextRun - System.currentTimeMillis());
+                        if (_cancelAfterRun) {
+                            _cancelAfterRun = false;
+                            _state = TimedEventState.CANCELLED;
+                        } else {
+                            _state = TimedEventState.IDLE; 
+                            // do we need to reschedule?
+                            if (_rescheduleAfterRun) {
+                                _rescheduleAfterRun = false;
+                                schedule(_nextRun - System.currentTimeMillis());
+                            }
                         }
                     }
                 }

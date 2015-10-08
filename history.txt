@@ -1,3 +1,15 @@
+2015-10-08 zzz
+ * SimpleTimer2: Additional fix for uncaught IllegalStateException
+   affecting streaming timers (ticket #1672)
+
+2015-10-02 zzz
+ * Router: Don't check config files for reload on Android
+
+2015-09-28 zzz
+ * Addressbook: Fix isValidDest() for EC/Ed dests
+ * i2psnark: Support adding plain base 32 hashes
+ * Susimail: Hide headers and buttons if search results are empty
+
 2015-09-27 dg
  * Router: Fix soft restarts for 'massive' clock jumps (over +150s or -61s) and recover from standby
    and hibernate (ticket #1014).

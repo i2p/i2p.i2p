@@ -1311,7 +1311,9 @@ class Connection {
         }
         
         public long getNextSendTime() { return _nextSend; }
+
         public void timeReached() { retransmit(); }
+
         /**
          * Retransmit the packet if we need to.  
          *
@@ -1323,7 +1325,7 @@ class Connection {
          *
          * @return true if the packet was sent, false if it was not
          */
-        public boolean retransmit() {
+        private boolean retransmit() {
             if (_packet.getAckTime() > 0) 
                 return false;
             
