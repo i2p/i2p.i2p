@@ -26,7 +26,7 @@ mingw*|windows*)
         INCLUDES="-I. -I../../jbigi/include -I$JAVA_HOME/include -I$JAVA_HOME/include/$BUILD_OS -I/usr/local/include"
         LINKFLAGS="-shared -Wl,--kill-at"
         LIBFILE="jbigi.dll";;
-CYGWIN*)
+cygwin*)
         COMPILEFLAGS="-Wall -mno-cygwin"
         INCLUDES="-I. -I../../jbigi/include -I$JAVA_HOME/include/$BUILD_OS/ -I$JAVA_HOME/include/"
         LINKFLAGS="-shared -Wl,--kill-at"
@@ -34,9 +34,9 @@ CYGWIN*)
 darwin*|osx)
         COMPILEFLAGS="-fPIC -Wall"
         INCLUDES="-I. -I../../jbigi/include -I$JAVA_HOME/include -I$JAVA_HOME/include/$BUILD_OS -I/usr/local/include"
-        LINKFLAGS="-m64 -dynamiclib -framework JavaVM"
+        LINKFLAGS="-dynamiclib -framework JavaVM"
         LIBFILE="libjbigi.jnilib";;
-SunOS*|OpenBSD*|NetBSD*|*FreeBSD*|Linux*)
+sunos*|openbsd*|netbsd*|*freebsd*|linux*)
         if [ $BUILD_OS = "sunos" ]; then
             BUILD_OS="solaris"
         elif [ $BUILD_OS = "gnu/kfreebsd" ]; then
@@ -60,17 +60,13 @@ else
         STATICLIBS=".libs/libgmp.a"
 fi
 
-[ $BITS -eq 32 ] && COMPILEFLAGS="-m32 $COMPILEFLAGS"
-[ $BITS -eq 64 ] && COMPILEFLAGS="-m64 $COMPILEFLAGS"
+[ $BITS -eq 32 ] && COMPILEFLAGS="-m32 $COMPILEFLAGS" && LINKFLAGS="-m32 $LINKFLAGS"
+[ $BITS -eq 64 ] && COMPILEFLAGS="-m64 $COMPILEFLAGS" && LINKFLqAGS="-m64 $LINKFLAGS"
 
 echo "Compiling C code..."
-rm -f jbigi.o $LIBFILE
-echo "JAVA_HOME: $JAVA_HOME"
-echo "INCLUDESs: $INCLUDES"
-echo "LD: $LD"
-echo "Compile: \"$CC -c $COMPILEFLAGS $INCLUDES ../../jbigi/src/jbigi.c || exit 1\""
+echo "Compile: \"$CC -c $COMPILEFLAGS $INCLUDES ../../jbigi/src/jbigi.c\""
 $CC -c $COMPILEFLAGS $INCLUDES ../../jbigi/src/jbigi.c || exit 1
-echo "Link: \"$CC $LINKFLAGS $INCLUDES -o $LIBFILE jbigi.o $INCLUDELIBS $STATICLIBS $LIBPATH || exit 1\""
+echo "Link: \"$CC $LINKFLAGS $INCLUDES -o $LIBFILE jbigi.o $INCLUDELIBS $STATICLIBS $LIBPATH\""
 $CC $LINKFLAGS $INCLUDES -o $LIBFILE jbigi.o $INCLUDELIBS $STATICLIBS $LIBPATH || exit 1
 
 exit 0
