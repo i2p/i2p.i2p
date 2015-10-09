@@ -793,17 +793,17 @@ public class NativeBigInteger extends BigInteger {
 ****/
 
     /**
-     *  @parm mode 1: modPow; 2: modPowCT 3: modInverse
+     *  @param mode 1: modPow; 2: modPowCT 3: modInverse
      */
     private static void runModPowTest(int numRuns, int mode, boolean nativeOnly) {
         SecureRandom rand = RandomSource.getInstance();
         /* the sample numbers are elG generator/prime so we can test with reasonable numbers */
-        byte[] _sampleGenerator = CryptoConstants.elgg.toByteArray();
-        byte[] _samplePrime = CryptoConstants.elgp.toByteArray();
+        byte[] sampleGenerator = CryptoConstants.elgg.toByteArray();
+        byte[] samplePrime = CryptoConstants.elgp.toByteArray();
 
-        BigInteger jg = new BigInteger(_sampleGenerator);
-        NativeBigInteger ng = new NativeBigInteger(_sampleGenerator);
-        BigInteger jp = new BigInteger(_samplePrime);
+        BigInteger jg = new BigInteger(sampleGenerator);
+        NativeBigInteger ng = CryptoConstants.elgg;
+        BigInteger jp = new BigInteger(samplePrime);
 
         long totalTime = 0;
         long javaTime = 0;
@@ -811,7 +811,10 @@ public class NativeBigInteger extends BigInteger {
         int runsProcessed = 0;
         for (int i = 0; i < 1000; i++) {
             // JIT warmup
-            BigInteger bi = new NativeBigInteger(16, rand);
+            BigInteger bi;
+            do {
+                bi = new BigInteger(16, rand);
+            } while (bi.signum() == 0);
             if (mode == 1)
                 jg.modPow(bi, jp);
             else if (mode == 2)
@@ -820,10 +823,18 @@ public class NativeBigInteger extends BigInteger {
                 bi.modInverse(jp);
         }
         BigInteger myValue = null, jval;
+        final NativeBigInteger g = CryptoConstants.elgg;
+        final NativeBigInteger p = CryptoConstants.elgp;
+        // Our ElG prime P is 1061 bits, so make K smaller so there's
+        // no chance of it being equal to or a multiple of P, i.e. not coprime,
+        // so the modInverse test won't fail
+        final int numBits = (mode == 3) ? 1060 : 2048;
         for (runsProcessed = 0; runsProcessed < numRuns; runsProcessed++) {
-            BigInteger bi = new BigInteger(2048, rand); // 2048, rand); //
-            NativeBigInteger g = new NativeBigInteger(_sampleGenerator);
-            NativeBigInteger p = new NativeBigInteger(_samplePrime);
+            // 0 is not coprime with anything
+            BigInteger bi;
+            do {
+                bi = new BigInteger(numBits, rand);
+            } while (bi.signum() == 0);
             NativeBigInteger k = new NativeBigInteger(1, bi.toByteArray());
             //// Native
             long beforeModPow = System.nanoTime();

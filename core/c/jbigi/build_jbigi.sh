@@ -61,7 +61,7 @@ else
 fi
 
 [ $BITS -eq 32 ] && COMPILEFLAGS="-m32 $COMPILEFLAGS" && LINKFLAGS="-m32 $LINKFLAGS"
-[ $BITS -eq 64 ] && COMPILEFLAGS="-m64 $COMPILEFLAGS" && LINKFLqAGS="-m64 $LINKFLAGS"
+[ $BITS -eq 64 ] && COMPILEFLAGS="-m64 $COMPILEFLAGS" && LINKFLAGS="-m64 $LINKFLAGS"
 
 echo "Compiling C code..."
 echo "Compile: \"$CC -c $COMPILEFLAGS $INCLUDES ../../jbigi/src/jbigi.c\""
