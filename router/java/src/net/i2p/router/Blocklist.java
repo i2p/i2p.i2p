@@ -917,7 +917,7 @@ public class Blocklist {
         singles.addAll(_singleIPBlocklist);
         if (!(singles.isEmpty() && _singleIPv6Blocklist.isEmpty())) {
             out.write("<table><tr><th align=\"center\" colspan=\"2\"><b>");
-            out.write(_("IPs Banned Until Restart"));
+            out.write(_t("IPs Banned Until Restart"));
             out.write("</b></td></tr>");
             // first 0 - 127
             for (Integer ii : singles) {
@@ -954,11 +954,11 @@ public class Blocklist {
         }
         if (_blocklistSize > 0) {
             out.write("<table><tr><th align=\"center\" colspan=\"2\"><b>");
-            out.write(_("IPs Permanently Banned"));
+            out.write(_t("IPs Permanently Banned"));
             out.write("</b></th></tr><tr><td align=\"center\" width=\"50%\"><b>");
-            out.write(_("From"));
+            out.write(_t("From"));
             out.write("</b></td><td align=\"center\" width=\"50%\"><b>");
-            out.write(_("To"));
+            out.write(_t("To"));
             out.write("</b></td></tr>");
             int max = Math.min(_blocklistSize, MAX_DISPLAY);
             int displayed = 0;
@@ -994,7 +994,7 @@ public class Blocklist {
             out.write("</table>");
         } else {
             out.write("<br><i>");
-            out.write(_("none"));
+            out.write(_t("none"));
             out.write("</i>");
         }
         out.flush();
@@ -1030,7 +1030,7 @@ public class Blocklist {
     private static final String BUNDLE_NAME = "net.i2p.router.web.messages";
 
     /** translate */
-    private String _(String key) {
+    private String _t(String key) {
         return Translate.getString(key, _context, BUNDLE_NAME);
     }
 

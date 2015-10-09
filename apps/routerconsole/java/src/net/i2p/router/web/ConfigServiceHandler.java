@@ -196,60 +196,60 @@ public class ConfigServiceHandler extends FormHandler {
     protected void processForm() {
         if (_action == null) return;
         
-        if (_("Shutdown gracefully").equals(_action)) {
+        if (_t("Shutdown gracefully").equals(_action)) {
             if (_context.hasWrapper())
                 registerWrapperNotifier(Router.EXIT_GRACEFUL, false);
             _context.router().shutdownGracefully();
-            addFormNotice(_("Graceful shutdown initiated"));
-        } else if (_("Shutdown immediately").equals(_action)) {
+            addFormNotice(_t("Graceful shutdown initiated"));
+        } else if (_t("Shutdown immediately").equals(_action)) {
             if (_context.hasWrapper())
                 registerWrapperNotifier(Router.EXIT_HARD, false);
             _context.router().shutdown(Router.EXIT_HARD);
-            addFormNotice(_("Shutdown immediately"));
-        } else if (_("Cancel graceful shutdown").equals(_action)) {
+            addFormNotice(_t("Shutdown immediately"));
+        } else if (_t("Cancel graceful shutdown").equals(_action)) {
             _context.router().cancelGracefulShutdown();
-            addFormNotice(_("Graceful shutdown cancelled"));
-        } else if (_("Graceful restart").equals(_action)) {
+            addFormNotice(_t("Graceful shutdown cancelled"));
+        } else if (_t("Graceful restart").equals(_action)) {
             // should have wrapper if restart button is visible
             if (_context.hasWrapper())
                 registerWrapperNotifier(Router.EXIT_GRACEFUL_RESTART, false);
             _context.router().shutdownGracefully(Router.EXIT_GRACEFUL_RESTART);
-            addFormNotice(_("Graceful restart requested"));
-        } else if (_("Hard restart").equals(_action)) {
+            addFormNotice(_t("Graceful restart requested"));
+        } else if (_t("Hard restart").equals(_action)) {
             // should have wrapper if restart button is visible
             if (_context.hasWrapper())
                 registerWrapperNotifier(Router.EXIT_HARD_RESTART, false);
             _context.router().shutdown(Router.EXIT_HARD_RESTART);
-            addFormNotice(_("Hard restart requested"));
-        } else if (_("Rekey and Restart").equals(_action)) {
-            addFormNotice(_("Rekeying after graceful restart"));
+            addFormNotice(_t("Hard restart requested"));
+        } else if (_t("Rekey and Restart").equals(_action)) {
+            addFormNotice(_t("Rekeying after graceful restart"));
             registerWrapperNotifier(Router.EXIT_GRACEFUL_RESTART, true);
             _context.router().shutdownGracefully(Router.EXIT_GRACEFUL_RESTART);
-        } else if (_("Rekey and Shutdown").equals(_action)) {
-            addFormNotice(_("Rekeying after graceful shutdown"));
+        } else if (_t("Rekey and Shutdown").equals(_action)) {
+            addFormNotice(_t("Rekeying after graceful shutdown"));
             registerWrapperNotifier(Router.EXIT_GRACEFUL, true);
             _context.router().shutdownGracefully(Router.EXIT_GRACEFUL);
-        } else if (_("Run I2P on startup").equals(_action)) {
+        } else if (_t("Run I2P on startup").equals(_action)) {
             installService();
-        } else if (_("Don't run I2P on startup").equals(_action)) {
+        } else if (_t("Don't run I2P on startup").equals(_action)) {
             uninstallService();
-        } else if (_("Dump threads").equals(_action)) {
+        } else if (_t("Dump threads").equals(_action)) {
             try {
                 WrapperManager.requestThreadDump();
             } catch (Throwable t) {
                 addFormError("Warning: unable to contact the service manager - " + t.getMessage());
             }
             File wlog = LogsHelper.wrapperLogFile(_context);
-            addFormNotice(_("Threads dumped to {0}", wlog.getAbsolutePath()));
-        } else if (_("View console on startup").equals(_action)) {
+            addFormNotice(_t("Threads dumped to {0}", wlog.getAbsolutePath()));
+        } else if (_t("View console on startup").equals(_action)) {
             browseOnStartup(true);
-            addFormNotice(_("Console is to be shown on startup"));
-        } else if (_("Do not view console on startup").equals(_action)) {
+            addFormNotice(_t("Console is to be shown on startup"));
+        } else if (_t("Do not view console on startup").equals(_action)) {
             browseOnStartup(false);
-            addFormNotice(_("Console is not to be shown on startup"));
-        } else if (_("Force GC").equals(_action)) {
+            addFormNotice(_t("Console is not to be shown on startup"));
+        } else if (_t("Force GC").equals(_action)) {
             Runtime.getRuntime().gc();
-            addFormNotice(_("Full garbage collection requested"));
+            addFormNotice(_t("Full garbage collection requested"));
         } else {
             //addFormNotice("Blah blah blah.  whatever.  I'm not going to " + _action);
         }
@@ -258,18 +258,18 @@ public class ConfigServiceHandler extends FormHandler {
     private void installService() {
         try { 
             Runtime.getRuntime().exec("install_i2p_service_winnt.bat");
-            addFormNotice(_("Service installed"));
+            addFormNotice(_t("Service installed"));
         } catch (IOException ioe) {
-            addFormError(_("Warning: unable to install the service") + " - " + ioe.getMessage());
+            addFormError(_t("Warning: unable to install the service") + " - " + ioe.getMessage());
         }
     }
 
     private void uninstallService() {
         try { 
             Runtime.getRuntime().exec("uninstall_i2p_service_winnt.bat");
-            addFormNotice(_("Service removed"));
+            addFormNotice(_t("Service removed"));
         } catch (IOException ioe) {
-            addFormError(_("Warning: unable to remove the service") + " - " + ioe.getMessage());
+            addFormError(_t("Warning: unable to remove the service") + " - " + ioe.getMessage());
         }
     }
 

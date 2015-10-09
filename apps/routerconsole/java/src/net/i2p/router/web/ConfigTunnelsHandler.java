@@ -27,7 +27,7 @@ public class ConfigTunnelsHandler extends FormHandler {
     }
     
     public void setShouldsave(String moo) { 
-        if ( (moo != null) && (moo.equals(_("Save changes"))) )
+        if ( (moo != null) && (moo.equals(_t("Save changes"))) )
             _shouldSave = true; 
     }
     
@@ -127,14 +127,14 @@ public class ConfigTunnelsHandler extends FormHandler {
         if (updated > 0)
             // the count isn't really correct anyway, since we don't check for actual changes
             //addFormNotice("Updated settings for " + updated + " pools.");
-            addFormNotice(_("Updated settings for all pools."));
+            addFormNotice(_t("Updated settings for all pools."));
         
         if (saveRequired) {
             boolean saved = _context.router().saveConfig(changes, null);
             if (saved) 
-                addFormNotice(_("Exploratory tunnel configuration saved successfully."));
+                addFormNotice(_t("Exploratory tunnel configuration saved successfully."));
             else
-                addFormError(_("Error saving the configuration (applied but not saved) - please see the error logs."));
+                addFormError(_t("Error saving the configuration (applied but not saved) - please see the error logs."));
         }
     }
 

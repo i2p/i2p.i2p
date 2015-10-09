@@ -204,7 +204,7 @@ class MailPart {
 		}
 		Encoding enc = EncodingFactory.getEncoding(encg);
 		if(enc == null)
-			throw new DecodingException(_("No encoder found for encoding \\''{0}\\''.", WebMail.quoteHTML(encg)));
+			throw new DecodingException(_t("No encoder found for encoding \\''{0}\\''.", WebMail.quoteHTML(encg)));
 		return enc.decode(buffer.content, beginBody + offset, end - beginBody - offset);
 	}
 
@@ -294,7 +294,7 @@ class MailPart {
 	}
 
 	/** translate */
-	private static String _(String s, Object o) {
+	private static String _t(String s, Object o) {
 		return Messages.getString(s, o);
 	}
 }

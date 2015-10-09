@@ -157,6 +157,12 @@ public class PluginStarter implements Runnable {
                                      Messages.getString("HTTP client proxy tunnel must be running", ctx));
             return;
         }
+        if (ctx.commSystem().isDummy()) {
+            mgr.notifyComplete(null, Messages.getString("Plugin update check failed", ctx) +
+                                     " - " +
+                                     "VM Comm System");
+            return;
+        }
 
         Log log = ctx.logManager().getLog(PluginStarter.class);
         int updated = 0;

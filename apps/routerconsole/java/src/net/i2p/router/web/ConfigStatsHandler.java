@@ -113,16 +113,16 @@ public class ConfigStatsHandler extends FormHandler {
         changes.put(StatManager.PROP_STAT_FULL, "" + _isFull);
         _context.router().saveConfig(changes, null);
         if (!_stats.isEmpty())
-            addFormNotice(_("Stat filter and location updated successfully to") + ": " + stats.toString());
+            addFormNotice(_t("Stat filter and location updated successfully to") + ": " + stats.toString());
         if (fullChanged) {
             if (_isFull)
-                addFormNotice(_("Full statistics enabled"));
+                addFormNotice(_t("Full statistics enabled"));
             else
-                addFormNotice(_("Full statistics disabled"));
-            addFormNotice(_("Restart required to take effect"));
+                addFormNotice(_t("Full statistics disabled"));
+            addFormNotice(_t("Restart required to take effect"));
         }
         if (graphsChanged)
-            addFormNoticeNoEscape(_("Graph list updated, may take up to 60s to be reflected on the {0}Graphs Page{1}", "<a href=\"graphs\">", "</a>"));
+            addFormNoticeNoEscape(_t("Graph list updated, may take up to 60s to be reflected on the {0}Graphs Page{1}", "<a href=\"graphs\">", "</a>"));
     }
     
 }

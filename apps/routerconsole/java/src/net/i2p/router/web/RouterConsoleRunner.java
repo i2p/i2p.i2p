@@ -26,8 +26,9 @@ import net.i2p.crypto.KeyStoreUtil;
 import net.i2p.data.DataHelper;
 import net.i2p.jetty.I2PLogger;
 import net.i2p.router.RouterContext;
-import net.i2p.router.update.ConsoleUpdateManager;
 import net.i2p.router.app.RouterApp;
+import net.i2p.router.news.NewsManager;
+import net.i2p.router.update.ConsoleUpdateManager;
 import net.i2p.util.Addresses;
 import net.i2p.util.FileUtil;
 import net.i2p.util.I2PAppThread;
@@ -517,7 +518,7 @@ public class RouterConsoleRunner implements RouterApp {
                     sslFactory.setKeyManagerPassword(_context.getProperty(PROP_KEY_PASSWORD, "thisWontWork"));
                     sslFactory.addExcludeProtocols(I2PSSLSocketFactory.EXCLUDE_PROTOCOLS.toArray(
                                                    new String[I2PSSLSocketFactory.EXCLUDE_PROTOCOLS.size()]));
-                    sslFactory.addExcludeCipherSuites(I2PSSLSocketFactory.INCLUDE_CIPHERS.toArray(
+                    sslFactory.addExcludeCipherSuites(I2PSSLSocketFactory.EXCLUDE_CIPHERS.toArray(
                                                       new String[I2PSSLSocketFactory.EXCLUDE_CIPHERS.size()]));
                     StringTokenizer tok = new StringTokenizer(_sslListenHost, " ,");
                     while (tok.hasMoreTokens()) {
@@ -706,6 +707,8 @@ public class RouterConsoleRunner implements RouterApp {
         
             ConsoleUpdateManager um = new ConsoleUpdateManager(_context, _mgr, null);
             um.start();
+            NewsManager nm = new NewsManager(_context, _mgr, null);
+            nm.startup();
         
             if (PluginStarter.pluginsEnabled(_context)) {
                 t = new I2PAppThread(new PluginStarter(_context), "PluginStarter", true);
@@ -757,6 +760,13 @@ public class RouterConsoleRunner implements RouterApp {
                     changes.put(PROP_KEY_PASSWORD, keyPassword);
                     _context.router().saveConfig(changes, null);
                 } catch (Exception e) {}  // class cast exception
+                // export cert, fails silently
+                File dir = new SecureDirectory(_context.getConfigDir(), "certificates");
+                dir.mkdir();
+                dir = new SecureDirectory(dir, "console");
+                dir.mkdir();
+                File certFile = new File(dir, "console.local.crt");
+                KeyStoreUtil.exportCert(ks, DEFAULT_KEYSTORE_PASSWORD, "console", certFile);
             }
         }
         if (success) {

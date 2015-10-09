@@ -250,8 +250,12 @@ div.newsheadings {
 
 div.newsheadings li {
      list-style: none outside url('images/newsbullet_mini.png');
-     margin: 0 -4px 2px 8px;
-     line-height: 140%;
+     margin: 4px -4px 2px 10px;
+     line-height: 120%;
+}
+
+div.newsheadings li:first-child {
+     margin-top: 0;
 }
 
 div.tunnels {

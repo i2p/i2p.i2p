@@ -1,6 +1,20 @@
 Release checklist
 -----------------
 
+One week before:
+	Make announcement on Transifex with checkin deadline
+
+
+A day or two before:
+Write the release announcement and push to Transifex:
+	Checkout i2p.newsxml branch
+	See README for setup
+	./create_new_entry.sh
+	tx push -s
+	mtn ci
+	Make announcement on Transifex asking for news translation
+
+
 Ensure all translation updates are imported from Transifex
 Sync with mtn.i2p2.i2p
 Start with a clean checkout mtn -d i2p.mtn co --branch=i2p.i2p
@@ -66,9 +80,11 @@ Generate PGP signatures:
 (end of tasks automated by 'ant release')
 =========================================
 
-Add magnet links to news.xml
+Add magnet links, change release dates and release number in to old-format news.xml,
+and distribute to news hosts
+In the i2p.newsxml branch, edit magnet links, release dates and release number in data/releases.json, and check in
 
-Seed update torrents
+Seed update torrents (su2 and su3)
 
 Notify the following people:
 	All in-network update hosts

@@ -4,6 +4,7 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
 # Translators:
+# Denis Lysenko <gribua@gmail.com>, 2015
 # madjong <madjong@i2pmail.org>, 2015
 # puxud <puxud@alivance.com>, 2014
 msgid ""
@@ -11,9 +12,9 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-03-29 14:30+0000\n"
-"PO-Revision-Date: 2015-04-10 13:47+0000\n"
-"Last-Translator: madjong <madjong@i2pmail.org>\n"
-"Language-Team: Ukrainian (Ukraine) (http://www.transifex.com/projects/p/I2P/language/uk_UA/)\n"
+"PO-Revision-Date: 2015-08-07 17:12+0000\n"
+"Last-Translator: Denis Lysenko <gribua@gmail.com>\n"
+"Language-Team: Ukrainian (Ukraine) (http://www.transifex.com/otf/I2P/language/uk_UA/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -22,11 +23,11 @@ msgstr ""
 
 #: ../java/src/net/i2p/client/streaming/I2PSocketException.java:69
 msgid "Message timeout"
-msgstr ""
+msgstr "Тайм-аут повідомлення"
 
 #: ../java/src/net/i2p/client/streaming/I2PSocketException.java:72
 msgid "Failed delivery to local destination"
-msgstr ""
+msgstr "Не вдалось доставити до локального призначення"
 
 #: ../java/src/net/i2p/client/streaming/I2PSocketException.java:75
 #: ../java/src/net/i2p/client/streaming/I2PSocketException.java:108
@@ -51,11 +52,11 @@ msgstr ""
 
 #: ../java/src/net/i2p/client/streaming/I2PSocketException.java:90
 msgid "Buffer overflow"
-msgstr ""
+msgstr "Буфер заповнено"
 
 #: ../java/src/net/i2p/client/streaming/I2PSocketException.java:93
 msgid "Message expired"
-msgstr ""
+msgstr "Повідомлення застаріло"
 
 #: ../java/src/net/i2p/client/streaming/I2PSocketException.java:96
 msgid "Local lease set invalid"

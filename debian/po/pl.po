@@ -4,13 +4,14 @@
 # 
 # Translators:
 # PolishAnon <b790979@klzlk.com>, 2011, 2012
+# seb, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: https://trac.i2p2.de/\n"
 "POT-Creation-Date: 2015-02-18 22:14+0000\n"
-"PO-Revision-Date: 2015-03-29 14:31+0000\n"
-"Last-Translator: kytv <killyourtv@i2pmail.org>\n"
+"PO-Revision-Date: 2015-06-09 20:57+0000\n"
+"Last-Translator: seb\n"
 "Language-Team: Polish (http://www.transifex.com/projects/p/I2P/language/pl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -80,7 +81,7 @@ msgstr "Rutery z wysoka przepustowościa oraz rutery z wieloma aktywnymi torrent
 #. Description
 #: ../i2p.templates:5001
 msgid "Run I2P daemon confined with AppArmor"
-msgstr ""
+msgstr "Uruchom I2P deamon ograniczony przez AppArmor"
 
 #. Type: boolean
 #. Description
@@ -88,4 +89,4 @@ msgstr ""
 msgid ""
 "With this option enabled I2P will be sandboxed with AppArmor, restricting "
 "which files and directories may be accessed by I2P."
-msgstr ""
+msgstr "Z tą opcją I2P będzie w sandboxie z AppArmor, broniąc plików i folderów do których I2P mogłoby mieć dostęp."

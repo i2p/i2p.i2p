@@ -35,6 +35,7 @@ import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelPoolSettings;
 import net.i2p.router.util.HashDistance;   // debug
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
+import net.i2p.util.Log;
 import net.i2p.util.ObjectCounter;
 import net.i2p.util.Translate;
 import net.i2p.util.VersionComparator;
@@ -102,14 +103,14 @@ public class NetDbRenderer {
                 }
             }
             if (notFound) {
-                buf.append(_("Router")).append(' ');
+                buf.append(_t("Router")).append(' ');
                 if (routerPrefix != null)
                     buf.append(routerPrefix);
                 else if (version != null)
                     buf.append(version);
                 else if (country != null)
                     buf.append(country);
-                buf.append(' ').append(_("not found in network database"));
+                buf.append(' ').append(_t("not found in network database"));
             }
         }
         out.write(buf.toString());
@@ -141,24 +142,28 @@ public class NetDbRenderer {
         int rapCount = 0;
         BigInteger median = null;
         int c = 0;
-        if (debug) {
+        if (leases.isEmpty()) {
+          if (!debug)
+              buf.append("<i>").append(_t("none")).append("</i>");
+        } else {
+          if (debug) {
             // Find the center of the RAP leasesets
             for (LeaseSet ls : leases) {
                 if (ls.getReceivedAsPublished())
                     rapCount++;
             }
             medianCount = rapCount / 2;
-        }
-        long now = _context.clock().now();
-        for (LeaseSet ls : leases) {
+          }
+          long now = _context.clock().now();
+          for (LeaseSet ls : leases) {
             Destination dest = ls.getDestination();
             Hash key = dest.calculateHash();
-            buf.append("<b>").append(_("LeaseSet")).append(": ").append(key.toBase64()).append("</b>\n");
+            buf.append("<b>").append(_t("LeaseSet")).append(": ").append(key.toBase64()).append("</b>\n");
             if (_context.clientManager().isLocal(dest)) {
-                buf.append(" (<a href=\"tunnels#" + key.toBase64().substring(0,4) + "\">" + _("Local") + "</a> ");
+                buf.append(" (<a href=\"tunnels#" + key.toBase64().substring(0,4) + "\">" + _t("Local") + "</a> ");
                 if (! _context.clientManager().shouldPublishLeaseSet(key))
-                    buf.append(_("Unpublished") + ' ');
-                buf.append(_("Destination") + ' ');
+                    buf.append(_t("Unpublished") + ' ');
+                buf.append(_t("Destination") + ' ');
                 TunnelPoolSettings in = _context.tunnelManager().getInboundSettings(key);
                 if (in != null && in.getDestinationNickname() != null)
                     buf.append(in.getDestinationNickname());
@@ -170,10 +175,10 @@ public class NetDbRenderer {
                 String host = _context.namingService().reverseLookup(dest);
                 if (host == null) {
                     buf.append("<a href=\"/susidns/addressbook.jsp?book=private&amp;destination=")
-                       .append(dest.toBase64()).append("#add\">").append(_("Add to local addressbook")).append("</a><br>\n");    
+                       .append(dest.toBase64()).append("#add\">").append(_t("Add to local addressbook")).append("</a><br>\n");    
                 }
             } else {
-                buf.append(" (").append(_("Destination")).append(' ');
+                buf.append(" (").append(_t("Destination")).append(' ');
                 String host = _context.namingService().reverseLookup(dest);
                 if (host != null) {
                     buf.append("<a href=\"http://").append(host).append("/\">").append(host).append("</a>)<br>\n");
@@ -182,14 +187,14 @@ public class NetDbRenderer {
                     buf.append(dest.toBase64().substring(0, 6)).append(")<br>\n" +
                                "<a href=\"http://").append(b32).append("\">").append(b32).append("</a><br>\n" +
                                "<a href=\"/susidns/addressbook.jsp?book=private&amp;destination=")
-                       .append(dest.toBase64()).append("#add\">").append(_("Add to local addressbook")).append("</a><br>\n");    
+                       .append(dest.toBase64()).append("#add\">").append(_t("Add to local addressbook")).append("</a><br>\n");    
                 }
             }
             long exp = ls.getLatestLeaseDate()-now;
             if (exp > 0)
-                buf.append(_("Expires in {0}", DataHelper.formatDuration2(exp)));
+                buf.append(_t("Expires in {0}", DataHelper.formatDuration2(exp)));
             else
-                buf.append(_("Expired {0} ago", DataHelper.formatDuration2(0-exp)));
+                buf.append(_t("Expired {0} ago", DataHelper.formatDuration2(0-exp)));
             buf.append("<br>\n");
             if (debug) {
                 buf.append("RAP? " + ls.getReceivedAsPublished());
@@ -208,22 +213,23 @@ public class NetDbRenderer {
             }
             for (int i = 0; i < ls.getLeaseCount(); i++) {
                 Lease lease = ls.getLease(i);
-                buf.append(_("Lease")).append(' ').append(i + 1).append(": ").append(_("Gateway")).append(' ');
+                buf.append(_t("Lease")).append(' ').append(i + 1).append(": ").append(_t("Gateway")).append(' ');
                 buf.append(_context.commSystem().renderPeerHTML(lease.getGateway()));
-                buf.append(' ').append(_("Tunnel")).append(' ').append(lease.getTunnelId().getTunnelId()).append(' ');
+                buf.append(' ').append(_t("Tunnel")).append(' ').append(lease.getTunnelId().getTunnelId()).append(' ');
                 if (debug) {
                     long exl = lease.getEndDate().getTime() - now;
                     if (exl > 0)
-                        buf.append(_("Expires in {0}", DataHelper.formatDuration2(exl)));
+                        buf.append(_t("Expires in {0}", DataHelper.formatDuration2(exl)));
                     else
-                        buf.append(_("Expired {0} ago", DataHelper.formatDuration2(0-exl)));
+                        buf.append(_t("Expired {0} ago", DataHelper.formatDuration2(0-exl)));
                 }
                 buf.append("<br>\n");
             }
             buf.append("<hr>\n");
             out.write(buf.toString());
             buf.setLength(0);
-        }
+          } // for each
+        }  // !empty
         if (debug) {
             FloodfillNetworkDatabaseFacade netdb = (FloodfillNetworkDatabaseFacade)_context.netDb();
             buf.append("<p><b>Total Leasesets: ").append(leases.size());
@@ -277,10 +283,12 @@ public class NetDbRenderer {
      */
     public void renderStatusHTML(Writer out, int mode) throws IOException {
         if (!_context.netDb().isInitialized()) {
-            out.write(_("Not initialized"));
+            out.write(_t("Not initialized"));
             out.flush();
             return;
         }
+        Log log = _context.logManager().getLog(NetDbRenderer.class);
+        long start = System.currentTimeMillis();
         
         boolean full = mode == 1;
         boolean shortStats = mode == 2;
@@ -319,6 +327,10 @@ public class NetDbRenderer {
                 transportCount[classifyTransports(ri)]++;
             }
         }
+        long end = System.currentTimeMillis();
+        if (log.shouldWarn())
+            log.warn("part 1 took " + (end - start));
+        start = end;
             
      //
      // don't bother to reindent
@@ -327,14 +339,14 @@ public class NetDbRenderer {
 
         // the summary table
         buf.append("<table border=\"0\" cellspacing=\"30\"><tr><th colspan=\"3\">")
-           .append(_("Network Database Router Statistics"))
+           .append(_t("Network Database Router Statistics"))
            .append("</th></tr><tr><td style=\"vertical-align: top;\">");
         // versions table
         List<String> versionList = new ArrayList<String>(versions.objects());
         if (!versionList.isEmpty()) {
             Collections.sort(versionList, Collections.reverseOrder(new VersionComparator()));
             buf.append("<table>\n");
-            buf.append("<tr><th>" + _("Version") + "</th><th>" + _("Count") + "</th></tr>\n");
+            buf.append("<tr><th>" + _t("Version") + "</th><th>" + _t("Count") + "</th></tr>\n");
             for (String routerVersion : versionList) {
                 int num = versions.count(routerVersion);
                 String ver = DataHelper.stripHTML(routerVersion);
@@ -346,14 +358,18 @@ public class NetDbRenderer {
         buf.append("</td><td style=\"vertical-align: top;\">");
         out.write(buf.toString());
         buf.setLength(0);
+        end = System.currentTimeMillis();
+        if (log.shouldWarn())
+            log.warn("part 2 took " + (end - start));
+        start = end;
             
         // transports table
         buf.append("<table>\n");
-        buf.append("<tr><th align=\"left\">" + _("Transports") + "</th><th>" + _("Count") + "</th></tr>\n");
+        buf.append("<tr><th align=\"left\">" + _t("Transports") + "</th><th>" + _t("Count") + "</th></tr>\n");
         for (int i = 0; i < TNAMES.length; i++) {
             int num = transportCount[i];
             if (num > 0) {
-                buf.append("<tr><td>").append(_(TNAMES[i]));
+                buf.append("<tr><td>").append(_t(TNAMES[i]));
                 buf.append("</td><td align=\"center\">").append(num).append("</td></tr>\n");
             }
         }
@@ -361,13 +377,17 @@ public class NetDbRenderer {
         buf.append("</td><td style=\"vertical-align: top;\">");
         out.write(buf.toString());
         buf.setLength(0);
+        end = System.currentTimeMillis();
+        if (log.shouldWarn())
+            log.warn("part 3 took " + (end - start));
+        start = end;
 
         // country table
         List<String> countryList = new ArrayList<String>(countries.objects());
         if (!countryList.isEmpty()) {
             Collections.sort(countryList, new CountryComparator());
             buf.append("<table>\n");
-            buf.append("<tr><th align=\"left\">" + _("Country") + "</th><th>" + _("Count") + "</th></tr>\n");
+            buf.append("<tr><th align=\"left\">" + _t("Country") + "</th><th>" + _t("Count") + "</th></tr>\n");
             for (String country : countryList) {
                 int num = countries.count(country);
                 buf.append("<tr><td><img height=\"11\" width=\"16\" alt=\"").append(country.toUpperCase(Locale.US)).append("\"");
@@ -379,6 +399,10 @@ public class NetDbRenderer {
         }
 
         buf.append("</td></tr></table>");
+        end = System.currentTimeMillis();
+        if (log.shouldWarn())
+            log.warn("part 4 took " + (end - start));
+        start = end;
 
      //
      // don't bother to reindent
@@ -426,29 +450,29 @@ public class NetDbRenderer {
         String hash = info.getIdentity().getHash().toBase64();
         buf.append("<table><tr><th><a name=\"").append(hash.substring(0, 6)).append("\" ></a>");
         if (isUs) {
-            buf.append("<a name=\"our-info\" ></a><b>" + _("Our info") + ": ").append(hash).append("</b></th></tr><tr><td>\n");
+            buf.append("<a name=\"our-info\" ></a><b>" + _t("Our info") + ": ").append(hash).append("</b></th></tr><tr><td>\n");
         } else {
-            buf.append("<b>" + _("Peer info for") + ":</b> ").append(hash).append("\n");
+            buf.append("<b>" + _t("Peer info for") + ":</b> ").append(hash).append("\n");
             if (!full) {
-                buf.append("[<a href=\"netdb?r=").append(hash.substring(0, 6)).append("\" >").append(_("Full entry")).append("</a>]");
+                buf.append("[<a href=\"netdb?r=").append(hash.substring(0, 6)).append("\" >").append(_t("Full entry")).append("</a>]");
             }
             buf.append("</th></tr><tr><td>\n");
         }
         
         long age = _context.clock().now() - info.getPublished();
         if (isUs && _context.router().isHidden()) {
-            buf.append("<b>").append(_("Hidden")).append(", ").append(_("Updated")).append(":</b> ")
-               .append(_("{0} ago", DataHelper.formatDuration2(age))).append("<br>\n");
+            buf.append("<b>").append(_t("Hidden")).append(", ").append(_t("Updated")).append(":</b> ")
+               .append(_t("{0} ago", DataHelper.formatDuration2(age))).append("<br>\n");
         } else if (age > 0) {
-            buf.append("<b>").append(_("Published")).append(":</b> ")
-               .append(_("{0} ago", DataHelper.formatDuration2(age))).append("<br>\n");
+            buf.append("<b>").append(_t("Published")).append(":</b> ")
+               .append(_t("{0} ago", DataHelper.formatDuration2(age))).append("<br>\n");
         } else {
             // shouldnt happen
-            buf.append("<b>" + _("Published") + ":</b> in ").append(DataHelper.formatDuration2(0-age)).append("???<br>\n");
+            buf.append("<b>" + _t("Published") + ":</b> in ").append(DataHelper.formatDuration2(0-age)).append("???<br>\n");
         }
-        buf.append("<b>").append(_("Signing Key")).append(":</b> ")
+        buf.append("<b>").append(_t("Signing Key")).append(":</b> ")
            .append(info.getIdentity().getSigningPublicKey().getType().toString());
-        buf.append("<br>\n<b>" + _("Address(es)") + ":</b> ");
+        buf.append("<br>\n<b>" + _t("Address(es)") + ":</b> ");
         String country = _context.commSystem().getCountry(info.getIdentity().getHash());
         if(country != null) {
             buf.append("<img height=\"11\" width=\"16\" alt=\"").append(country.toUpperCase(Locale.US)).append('\"');
@@ -460,17 +484,17 @@ public class NetDbRenderer {
             buf.append("<b>").append(DataHelper.stripHTML(style)).append(":</b> ");
             int cost = addr.getCost();
             if (!((style.equals("SSU") && cost == 5) || (style.equals("NTCP") && cost == 10)))
-                buf.append('[').append(_("cost")).append('=').append("" + cost).append("] ");
+                buf.append('[').append(_t("cost")).append('=').append("" + cost).append("] ");
             Map<Object, Object> p = addr.getOptionsMap();
             for (Map.Entry<Object, Object> e : p.entrySet()) {
                 String name = (String) e.getKey();
                 String val = (String) e.getValue();
-                buf.append('[').append(_(DataHelper.stripHTML(name))).append('=').append(DataHelper.stripHTML(val)).append("] ");
+                buf.append('[').append(_t(DataHelper.stripHTML(name))).append('=').append(DataHelper.stripHTML(val)).append("] ");
             }
         }
         buf.append("</td></tr>\n");
         if (full) {
-            buf.append("<tr><td>" + _("Stats") + ": <br><code>");
+            buf.append("<tr><td>" + _t("Stats") + ": <br><code>");
             Map<Object, Object> p = info.getOptionsMap();
             for (Map.Entry<Object, Object> e : p.entrySet()) {
                 String key = (String) e.getKey();
@@ -514,7 +538,7 @@ public class NetDbRenderer {
     }
 
     /** translate a string */
-    private String _(String s) {
+    private String _t(String s) {
         return Messages.getString(s, _context);
     }
 
@@ -525,17 +549,17 @@ public class NetDbRenderer {
 
     /**
      *  translate a string with a parameter
-     *  This is a lot more expensive than _(s), so use sparingly.
+     *  This is a lot more expensive than _t(s), so use sparingly.
      *
      *  @param s string to be translated containing {0}
      *    The {0} will be replaced by the parameter.
      *    Single quotes must be doubled, i.e. ' -> '' in the string.
      *  @param o parameter, not translated.
-     *    To tranlslate parameter also, use _("foo {0} bar", _("baz"))
+     *    To tranlslate parameter also, use _t("foo {0} bar", _t("baz"))
      *    Do not double the single quotes in the parameter.
      *    Use autoboxing to call with ints, longs, floats, etc.
      */
-    private String _(String s, Object o) {
+    private String _t(String s, Object o) {
         return Messages.getString(s, o, _context);
     }
 }

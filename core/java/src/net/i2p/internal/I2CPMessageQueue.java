@@ -1,5 +1,7 @@
 package net.i2p.internal;
 
+import java.io.Closeable;
+
 import net.i2p.data.i2cp.I2CPMessage;
 
 /**
@@ -15,7 +17,7 @@ import net.i2p.data.i2cp.I2CPMessage;
  * @author zzz
  * @since 0.8.3
  */
-public abstract class I2CPMessageQueue {
+public abstract class I2CPMessageQueue implements Closeable {
 
     /**
      *  Send a message, nonblocking.

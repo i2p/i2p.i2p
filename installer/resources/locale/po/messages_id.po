@@ -2,197 +2,200 @@
 # Copyright (C) 2012 The I2P Project
 # This file is distributed under the same license as the routerconsole package.
 # To contribute translations, see http://www.i2p2.de/newdevelopers
-# 
+#
 # Translators:
 # Khairul Agasta <khairuldroids@gmail.com>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-02-06 18:28+0000\n"
+"POT-Creation-Date: 2015-07-17 01:16+0000\n"
 "PO-Revision-Date: 2014-08-29 06:04+0000\n"
 "Last-Translator: Khairul Agasta <khairuldroids@gmail.com>\n"
-"Language-Team: Indonesian (http://www.transifex.com/projects/p/I2P/language/id/)\n"
+"Language-Team: Indonesian (http://www.transifex.com/projects/p/I2P/language/"
+"id/)\n"
+"Language: id\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: id\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 #: ../i2prouter:221
 msgid "Failed to load the wrapper"
 msgstr "Gagal memuat wrapper"
 
-#: ../i2prouter:943 ../i2prouter:967 ../i2prouter:1041 ../i2prouter:1069
-#: ../i2prouter:1090
+#: ../i2prouter:978 ../i2prouter:1006 ../i2prouter:1080 ../i2prouter:1108
+#: ../i2prouter:1129
 #, sh-format
 msgid "$APP_LONG_NAME is already running."
 msgstr "$APP_LONG_NAME sudah berjalan."
 
-#: ../i2prouter:954
+#: ../i2prouter:989
 #, sh-format
 msgid "Running $APP_LONG_NAME"
 msgstr "Menjalankan $APP_LONG_NAME"
 
-#: ../i2prouter:974
+#: ../i2prouter:1013
 #, sh-format
 msgid "Waiting for $APP_LONG_NAME"
 msgstr "Menunggu $APP_LONG_NAME"
 
-#: ../i2prouter:1021
+#: ../i2prouter:1060
 #, sh-format
 msgid "WARNING: $APP_LONG_NAME may have failed to start."
 msgstr "PERINGATAN: $APP_LONG_NAME mungkin gagal memulai."
 
-#: ../i2prouter:1035 ../i2prouter:1063 ../i2prouter:1269 ../i2prouter:1558
+#: ../i2prouter:1074 ../i2prouter:1102 ../i2prouter:1308 ../i2prouter:1597
 msgid "Must be root to perform this action."
 msgstr "Harus sudah root untuk melaksanakan tindakan ini."
 
-#: ../i2prouter:1079
+#: ../i2prouter:1118
 #, sh-format
 msgid "Starting $APP_LONG_NAME"
 msgstr "Memulai $APP_LONG_NAME"
 
-#: ../i2prouter:1101
+#: ../i2prouter:1140
 #, sh-format
 msgid "Stopping $APP_LONG_NAME"
 msgstr "Menghentikan $APP_LONG_NAME"
 
-#: ../i2prouter:1105 ../i2prouter:1173 ../i2prouter:1726
+#: ../i2prouter:1144 ../i2prouter:1212 ../i2prouter:1765
 #, sh-format
 msgid "$APP_LONG_NAME was not running."
 msgstr "$APP_LONG_NAME tidak berjalan."
 
-#: ../i2prouter:1118 ../i2prouter:1126 ../i2prouter:1188 ../i2prouter:1196
+#: ../i2prouter:1157 ../i2prouter:1165 ../i2prouter:1227 ../i2prouter:1235
 #, sh-format
 msgid "Unable to stop $APP_LONG_NAME."
 msgstr "Tidak dapat menghentikan $APP_LONG_NAME."
 
-#: ../i2prouter:1144
+#: ../i2prouter:1183
 #, sh-format
 msgid "Waiting for $APP_LONG_NAME to exit"
 msgstr "Menunggu $APP_LONG_NAME untuk mengakhiri"
 
-#: ../i2prouter:1158
+#: ../i2prouter:1197
 #, sh-format
 msgid "Failed to stop $APP_LONG_NAME."
 msgstr "Gagal menghentikan $APP_LONG_NAME."
 
-#: ../i2prouter:1161
+#: ../i2prouter:1200
 #, sh-format
 msgid "Stopped $APP_LONG_NAME."
 msgstr "$APP_LONG_NAME dihentikan."
 
-#: ../i2prouter:1169
+#: ../i2prouter:1208
 #, sh-format
 msgid "Stopping $APP_LONG_NAME gracefully"
 msgstr "Menghentikan $APP_LONG_NAME dengan halus"
 
-#: ../i2prouter:1215
+#: ../i2prouter:1254
 #, sh-format
 msgid "$APP_LONG_NAME is not running."
 msgstr "$APP_LONG_NAME tidak berjalan."
 
-#: ../i2prouter:1220
+#: ../i2prouter:1259
 #, sh-format
 msgid "$APP_LONG_NAME is running: PID:$pid"
 msgstr "$APP_LONG_NAME sedang berjalan: PID:$pid"
 
-#: ../i2prouter:1223
+#: ../i2prouter:1262
 #, sh-format
 msgid "$APP_LONG_NAME is running: PID:$pid, Wrapper:$STATUS, Java:$JAVASTATUS"
-msgstr "$APP_LONG_NAME sudah berjalan: PID:$pid, Wrapper:$STATUS, Java:$JAVASTATUS"
+msgstr ""
+"$APP_LONG_NAME sudah berjalan: PID:$pid, Wrapper:$STATUS, Java:$JAVASTATUS"
 
-#: ../i2prouter:1276 ../i2prouter:1288 ../i2prouter:1307 ../i2prouter:1324
-#: ../i2prouter:1391 ../i2prouter:1411 ../i2prouter:1425 ../i2prouter:1439
-#: ../i2prouter:1467 ../i2prouter:1505 ../i2prouter:1540
+#: ../i2prouter:1315 ../i2prouter:1327 ../i2prouter:1346 ../i2prouter:1363
+#: ../i2prouter:1430 ../i2prouter:1450 ../i2prouter:1464 ../i2prouter:1478
+#: ../i2prouter:1506 ../i2prouter:1544 ../i2prouter:1579
 #, sh-format
 msgid "The $APP_LONG_NAME daemon is already installed."
 msgstr "Daemon $APP_LONG_NAME sudah terpasang."
 
-#: ../i2prouter:1279 ../i2prouter:1294 ../i2prouter:1396 ../i2prouter:1428
-#: ../i2prouter:1442 ../i2prouter:1456 ../i2prouter:1470 ../i2prouter:1508
-#: ../i2prouter:1543
+#: ../i2prouter:1318 ../i2prouter:1333 ../i2prouter:1435 ../i2prouter:1467
+#: ../i2prouter:1481 ../i2prouter:1495 ../i2prouter:1509 ../i2prouter:1547
+#: ../i2prouter:1582
 #, sh-format
 msgid "Installing the $APP_LONG_NAME daemon"
 msgstr "Memasang daemon $APP_LONG_NAME"
 
-#: ../i2prouter:1550
+#: ../i2prouter:1589
 #, sh-format
 msgid "Install not currently supported for $DIST_OS"
 msgstr "Memasang saat ini tidak didukung untuk $DIST_OS"
 
-#: ../i2prouter:1566 ../i2prouter:1579 ../i2prouter:1593 ../i2prouter:1602
-#: ../i2prouter:1612 ../i2prouter:1636 ../i2prouter:1649 ../i2prouter:1661
-#: ../i2prouter:1679 ../i2prouter:1692 ../i2prouter:1706
+#: ../i2prouter:1605 ../i2prouter:1618 ../i2prouter:1632 ../i2prouter:1641
+#: ../i2prouter:1651 ../i2prouter:1675 ../i2prouter:1688 ../i2prouter:1700
+#: ../i2prouter:1718 ../i2prouter:1731 ../i2prouter:1745
 #, sh-format
 msgid "Removing $APP_LONG_NAME daemon"
 msgstr "Menghapus daemon $APP_LONG_NAME"
 
-#: ../i2prouter:1572 ../i2prouter:1587 ../i2prouter:1596 ../i2prouter:1606
-#: ../i2prouter:1617 ../i2prouter:1630 ../i2prouter:1642 ../i2prouter:1655
-#: ../i2prouter:1673 ../i2prouter:1686 ../i2prouter:1700 ../i2prouter:1711
+#: ../i2prouter:1611 ../i2prouter:1626 ../i2prouter:1635 ../i2prouter:1645
+#: ../i2prouter:1656 ../i2prouter:1669 ../i2prouter:1681 ../i2prouter:1694
+#: ../i2prouter:1712 ../i2prouter:1725 ../i2prouter:1739 ../i2prouter:1750
 #, sh-format
 msgid "The $APP_LONG_NAME daemon is not currently installed."
 msgstr "Daemon $APP_LONG_NAME saat ini belum dipasang"
 
-#: ../i2prouter:1715
+#: ../i2prouter:1754
 #, sh-format
 msgid "Remove not currently supported for $DIST_OS"
 msgstr "Menghapus saat ini tidak didukung untuk $DIST_OS"
 
-#: ../i2prouter:1802
+#: ../i2prouter:1841
 msgid "Commands:"
 msgstr "Perintah:"
 
-#: ../i2prouter:1803
+#: ../i2prouter:1842
 msgid "Launch in the current console."
 msgstr "Luncurkan dalam konsol saat ini."
 
-#: ../i2prouter:1804
+#: ../i2prouter:1843
 msgid "Start in the background as a daemon process."
 msgstr "Mulai di latar sebagai proses daemon."
 
-#: ../i2prouter:1805
+#: ../i2prouter:1844
 msgid "Stop if running as a daemon or in another console."
 msgstr "Hentikan jika berjalan sebagai daemon atau pada konsol lain."
 
-#: ../i2prouter:1806
+#: ../i2prouter:1845
 msgid "Stop gracefully, may take up to 11 minutes."
 msgstr "Menghentikan dengan halus,  bisa memakan waktu hingga 11 menit."
 
-#: ../i2prouter:1807
+#: ../i2prouter:1846
 msgid "Stop if running and then start."
 msgstr "Hentikan jika berjalan dan kemudian memulainya."
 
-#: ../i2prouter:1808
+#: ../i2prouter:1847
 msgid "Restart only if already running."
 msgstr "Memulai ulang hanya jika sudah berjalan."
 
-#: ../i2prouter:1809
+#: ../i2prouter:1848
 msgid "Query the current status."
 msgstr "Menanyakan status saat ini."
 
-#: ../i2prouter:1810
+#: ../i2prouter:1849
 msgid "Install to start automatically when system boots."
 msgstr "Pasang untuk memulai secara otomatis ketika sistem boot."
 
-#: ../i2prouter:1811
+#: ../i2prouter:1850
 msgid "Uninstall."
 msgstr "Copot."
 
-#: ../i2prouter:1812
+#: ../i2prouter:1851
 msgid "Request a Java thread dump if running."
 msgstr "Meminta thread buangan Java jika berjalan."
 
-#: ../i2prouter:1825
-msgid "Please edit i2prouter and set the variable RUN_AS_USER"
-msgstr "Silahkan mengedit i2prouter dan setel variabel RUN_AS_USER"
+#: ../i2prouter:1864
+msgid "Please edit /etc/default/i2p and set the variable RUN_AS_USER"
+msgstr "Silahkan mengedit /etc/default/i2p dan setel variabel RUN_AS_USER"
 
-#: ../i2prouter:1830
+#: ../i2prouter:1869
 msgid "Running I2P as the root user is *not* recommended."
 msgstr "Menjalankan I2P sebagai pengguna root adalah *tidak* direkomendasikan."
 
-#: ../i2prouter:1833
-msgid "To run as root anyway, edit i2prouter and set ALLOW_ROOT=true."
-msgstr "Untuk menjalankan sebagai root, edit i2prouter dan setel ALLOW_ROOT=true."
+#: ../i2prouter:1872
+msgid "To run as root anyway, edit /etc/default/i2p and set ALLOW_ROOT=true."
+msgstr ""
+"Untuk menjalankan sebagai root, edit /etc/default/i2p dan setel ALLOW_ROOT=true."

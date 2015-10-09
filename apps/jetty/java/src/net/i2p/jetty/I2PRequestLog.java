@@ -465,7 +465,7 @@ public class I2PRequestLog extends AbstractLifeCycle implements RequestLog
         else 
             _ignorePathMap = null;
         
-        _writer = new OutputStreamWriter(_out);
+        _writer = new OutputStreamWriter(_out, "UTF-8");
         _buffers = new ArrayList<Utf8StringBuilder>();
         _copy = new char[1024];
         super.doStart();

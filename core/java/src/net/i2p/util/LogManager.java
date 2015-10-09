@@ -10,6 +10,7 @@ package net.i2p.util;
  */
 
 import java.io.File;
+import java.io.Flushable;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
@@ -37,7 +38,7 @@ import net.i2p.data.DataHelper;
  * writes them where appropriate.
  * 
  */
-public class LogManager {
+public class LogManager implements Flushable {
     public final static String CONFIG_LOCATION_PROP = "loggerConfigLocation";
     public final static String FILENAME_OVERRIDE_PROP = "loggerFilenameOverride";
     public final static String CONFIG_LOCATION_DEFAULT = "logger.config";

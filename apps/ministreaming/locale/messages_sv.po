@@ -1,0 +1,94 @@
+# I2P
+# Copyright (C) 2014 The I2P Project
+# This file is distributed under the same license as the streaming package.
+# To contribute translations, see http://www.i2p2.de/newdevelopers
+# 
+# Translators:
+# cacapo <handelsehorisont@gmail.com>, 2015
+msgid ""
+msgstr ""
+"Project-Id-Version: I2P\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-03-29 14:30+0000\n"
+"PO-Revision-Date: 2015-05-19 05:18+0000\n"
+"Last-Translator: cacapo <handelsehorisont@gmail.com>\n"
+"Language-Team: Swedish (Sweden) (http://www.transifex.com/projects/p/I2P/language/sv_SE/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: sv_SE\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:69
+msgid "Message timeout"
+msgstr "Meddelande-timeout"
+
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:72
+msgid "Failed delivery to local destination"
+msgstr "Leverans till lokal destination misslyckades"
+
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:75
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:108
+msgid "Local router failure"
+msgstr "Lokalt routerfel"
+
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:78
+msgid "Local network failure"
+msgstr "Lokalt nätverksfel"
+
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:81
+msgid "Session closed"
+msgstr "Sessionen stängd"
+
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:84
+msgid "Invalid message"
+msgstr "Ogiltigt meddelande"
+
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:87
+msgid "Invalid message options"
+msgstr "Ogiltigt meddelandealternativ"
+
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:90
+msgid "Buffer overflow"
+msgstr "Buffer overflow"
+
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:93
+msgid "Message expired"
+msgstr "Meddelande utgånget"
+
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:96
+msgid "Local lease set invalid"
+msgstr "Lokalt leaseset ogiltigt"
+
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:99
+msgid "No local tunnels"
+msgstr "Inga lokala tunnlar"
+
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:102
+msgid "Unsupported encryption options"
+msgstr "Krypteringsalternativ stöds ej"
+
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:105
+msgid "Invalid destination"
+msgstr "Ogiltig destination"
+
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:111
+msgid "Destination lease set expired"
+msgstr "Destinationens leaseset har gått ut."
+
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:114
+msgid "Destination lease set not found"
+msgstr "Destinationens leaseset hittades inte"
+
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:117
+msgid "Local destination shutdown"
+msgstr "Lokal destination stängs ner"
+
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:120
+msgid "Connection was reset"
+msgstr "Anslutningen startades om"
+
+#. Translate this one here, can't do it later
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:127
+msgid "Failure code"
+msgstr "Felkod"

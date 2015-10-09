@@ -30,7 +30,7 @@ if which find|grep -q -i windows ; then
 	export PATH=.:/bin:/usr/local/bin:$PATH
 fi
 # Fast mode - update ondemond
-# set LG2 to the language you need in envrionment varibales to enable this
+# set LG2 to the language you need in environment variables to enable this
 
 #
 # generate strings/Countries.java from ../../../installer/resources/countries.txt
@@ -43,7 +43,7 @@ then
 	mkdir -p build
         echo '// Automatically generated pseudo-java for xgettext - do not edit' > $JFILE
 	echo '// Translators may wish to translate a few of these, do not bother to translate all of them!!' >> $JFILE
-	sed -e '/^#/d' -e 's/..,\(..*\)/_("\1");/' $CFILE >> $JFILE
+	sed -e '/^#/d' -e 's/..,\(..*\)/_t("\1");/' $CFILE >> $JFILE
 fi
 
 # add ../java/ so the refs will work in the po file
@@ -76,16 +76,16 @@ do
 	 	echo "Updating the $i file from the tags..."
 		# extract strings from java and jsp files, and update messages.po files
 		# translate calls must be one of the forms:
-		# _("foo")
+		# _t("foo")
 		# _x("foo")
-		# intl._("foo")
+		# intl._t("foo")
 		# intl.title("foo")
 		# In a jsp, you must use a helper or handler that has the context set.
 		# To start a new translation, copy the header from an old translation to the new .po file,
 		# then ant distclean updater.
 		find $JPATHS -name *.java > $TMPFILE
 		xgettext -f $TMPFILE -L java --from-code=UTF-8 --no-location\
-	                 --keyword=_ \
+	                 --keyword=_t \
 		         -o ${i}t
 		if [ $? -ne 0 ]
 		then

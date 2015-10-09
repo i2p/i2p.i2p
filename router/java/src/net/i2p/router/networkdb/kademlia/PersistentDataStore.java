@@ -13,6 +13,7 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FilenameFilter;
+import java.io.Flushable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -193,7 +194,7 @@ class PersistentDataStore extends TransientDataStore {
      * we will soon have to implement a scheme for keeping only
      * a subset of all DatabaseEntrys in memory and keeping the rest on disk.
      */
-    private class Writer implements Runnable {
+    private class Writer implements Runnable, Flushable {
         private final Map<Hash, DatabaseEntry>_keys;
         private final Object _waitLock;
         private volatile boolean _quit;

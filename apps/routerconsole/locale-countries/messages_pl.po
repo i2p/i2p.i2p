@@ -9,15 +9,16 @@
 # polacco <polacco@i2pmail.org>, 2014
 # polacco <polacco@i2pmail.org>, 2012
 # PolishAnon <b790979@klzlk.com>, 2011
+# Taporpo Ne <taporpone@gmail.com>, 2015
 # Tracerneo <ziolkoneo@gmail.com>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-10-14 13:33+0000\n"
-"PO-Revision-Date: 2014-11-23 20:42+0000\n"
-"Last-Translator: polacco <polacco@i2pmail.org>\n"
-"Language-Team: Polish (http://www.transifex.com/projects/p/I2P/language/pl/)\n"
+"POT-Creation-Date: 2015-07-17 01:08+0000\n"
+"PO-Revision-Date: 2015-08-30 16:58+0000\n"
+"Last-Translator: Taporpo Ne <taporpone@gmail.com>\n"
+"Language-Team: Polish (http://www.transifex.com/otf/I2P/language/pl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -56,6 +57,9 @@ msgstr "Antyle Holenderskie"
 
 msgid "Angola"
 msgstr "Angola"
+
+msgid "Asia/Pacific Region"
+msgstr "Azja Pacyficzna"
 
 msgid "Antarctica"
 msgstr "Antarktyda"
@@ -108,6 +112,9 @@ msgstr "Burundi"
 msgid "Benin"
 msgstr "Benin"
 
+msgid "Saint Barthélemy"
+msgstr "Saint Barthélemy"
+
 msgid "Bermuda"
 msgstr "Bermudy"
 
@@ -116,6 +123,9 @@ msgstr "Brunei Darussalam"
 
 msgid "Bolivia"
 msgstr "Boliwia"
+
+msgid "Bonaire"
+msgstr "Bonaire"
 
 msgid "Brazil"
 msgstr "Brazylia"
@@ -144,14 +154,11 @@ msgstr "Kanada"
 msgid "Cocos (Keeling) Islands"
 msgstr "Wyspy Kokosowe"
 
-msgid "The Democratic Republic of the Congo"
-msgstr "Demokratyczna Republika Konga"
+msgid "Congo"
+msgstr "Kongo"
 
 msgid "Central African Republic"
 msgstr "Republika Środkowoafrykańska"
-
-msgid "Congo"
-msgstr "Kongo"
 
 msgid "Switzerland"
 msgstr "Szwajcaria"
@@ -249,7 +256,7 @@ msgstr "Fidżi"
 msgid "Falkland Islands (Malvinas)"
 msgstr "Falklandy (Malwiny)"
 
-msgid "Federated States of Micronesia"
+msgid "Micronesia"
 msgstr "Mikronezja"
 
 msgid "Faroe Islands"
@@ -351,7 +358,7 @@ msgstr "Brytyjskie Terytorium Oceanu Indyjskiego"
 msgid "Iraq"
 msgstr "Irak"
 
-msgid "Islamic Republic of Iran"
+msgid "Iran"
 msgstr "Iran"
 
 msgid "Iceland"
@@ -390,7 +397,7 @@ msgstr "Komory"
 msgid "Saint Kitts and Nevis"
 msgstr "Saint Kitts i Nevis"
 
-msgid "The Democratic People's Republic of Korea"
+msgid "North Korea"
 msgstr "Korea Północna"
 
 msgid "Republic of Korea"
@@ -435,7 +442,7 @@ msgstr "Luksemburg"
 msgid "Latvia"
 msgstr "Łotwa"
 
-msgid "Libyan Arab Jamahiriya"
+msgid "Libya"
 msgstr "Libia"
 
 msgid "Morocco"
@@ -444,7 +451,7 @@ msgstr "Maroko"
 msgid "Monaco"
 msgstr "Monako"
 
-msgid "Republic of Moldova"
+msgid "Moldova"
 msgstr "Mołdawia"
 
 msgid "Montenegro"
@@ -459,7 +466,7 @@ msgstr "Madagaskar"
 msgid "Marshall Islands"
 msgstr "Wyspy Marshalla"
 
-msgid "The Former Yugoslav Republic of Macedonia"
+msgid "Macedonia"
 msgstr "Macedonia"
 
 msgid "Mali"
@@ -471,7 +478,7 @@ msgstr "Mjanma"
 msgid "Mongolia"
 msgstr "Mongolia"
 
-msgid "Macao"
+msgid "Macau"
 msgstr "Makao"
 
 msgid "Northern Mariana Islands"
@@ -651,13 +658,19 @@ msgstr "Somalia"
 msgid "Suriname"
 msgstr "Surinam"
 
+msgid "South Sudan"
+msgstr "Południowy Sudan"
+
 msgid "Sao Tome and Principe"
 msgstr "Wyspy Świętego Tomasza i Książęca"
 
 msgid "El Salvador"
 msgstr "Salwador"
 
-msgid "Syrian Arab Republic"
+msgid "Sint Maarten"
+msgstr "Sint Maarten"
+
+msgid "Syria"
 msgstr "Syria"
 
 msgid "Swaziland"
@@ -708,7 +721,7 @@ msgstr "Tuvalu"
 msgid "Taiwan"
 msgstr "Republika Chińska"
 
-msgid "United Republic of Tanzania"
+msgid "Tanzania"
 msgstr "Tanzania"
 
 msgid "Ukraine"
@@ -729,7 +742,7 @@ msgstr "Urugwaj"
 msgid "Uzbekistan"
 msgstr "Uzbekistan"
 
-msgid "Holy See (Vatican City State)"
+msgid "Vatican"
 msgstr "Watykan"
 
 msgid "Saint Vincent and the Grenadines"
@@ -741,7 +754,7 @@ msgstr "Wenezuela"
 msgid "Virgin Islands"
 msgstr "Wyspy Dziewicze"
 
-msgid "Viet Nam"
+msgid "Vietnam"
 msgstr "Wietnam"
 
 msgid "Vanuatu"

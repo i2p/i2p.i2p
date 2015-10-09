@@ -10,9 +10,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-10-14 13:33+0000\n"
-"PO-Revision-Date: 2015-05-02 06:35+0000\n"
-"Last-Translator: cacapo <handelsehorisont@gmail.com>\n"
+"POT-Creation-Date: 2015-07-17 01:08+0000\n"
+"PO-Revision-Date: 2015-07-17 01:31+0000\n"
+"Last-Translator: kytv <killyourtv@i2pmail.org>\n"
 "Language-Team: Danish (http://www.transifex.com/projects/p/I2P/language/da/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -52,6 +52,9 @@ msgstr "Hollandske Antiller"
 
 msgid "Angola"
 msgstr "Angola"
+
+msgid "Asia/Pacific Region"
+msgstr ""
 
 msgid "Antarctica"
 msgstr "Antarktis"
@@ -104,6 +107,9 @@ msgstr "Burundi"
 msgid "Benin"
 msgstr "Benin"
 
+msgid "Saint Barthélemy"
+msgstr ""
+
 msgid "Bermuda"
 msgstr "Bermuda"
 
@@ -112,6 +118,9 @@ msgstr "Brunei Darussalam"
 
 msgid "Bolivia"
 msgstr "Bolivia"
+
+msgid "Bonaire"
+msgstr ""
 
 msgid "Brazil"
 msgstr "Brasilien"
@@ -140,14 +149,11 @@ msgstr "Canada"
 msgid "Cocos (Keeling) Islands"
 msgstr "Cocosøerne (Keelingøerne)"
 
-msgid "The Democratic Republic of the Congo"
-msgstr "Den Demokratiske Republik Congo"
+msgid "Congo"
+msgstr "Congo"
 
 msgid "Central African Republic"
 msgstr "Centralafrikanske Republik"
-
-msgid "Congo"
-msgstr "Congo"
 
 msgid "Switzerland"
 msgstr "Schweiz"
@@ -245,8 +251,8 @@ msgstr "Fiji"
 msgid "Falkland Islands (Malvinas)"
 msgstr "Falklandsøerne (Malvinas)"
 
-msgid "Federated States of Micronesia"
-msgstr "Mikronesiens Forenede Stater"
+msgid "Micronesia"
+msgstr ""
 
 msgid "Faroe Islands"
 msgstr "Færøerne"
@@ -347,8 +353,8 @@ msgstr "British Indian Ocean Territory (Chagosøerne)"
 msgid "Iraq"
 msgstr "Irak"
 
-msgid "Islamic Republic of Iran"
-msgstr "Den islamiske republik Iran"
+msgid "Iran"
+msgstr ""
 
 msgid "Iceland"
 msgstr "Island"
@@ -386,8 +392,8 @@ msgstr "Comorerne"
 msgid "Saint Kitts and Nevis"
 msgstr "Saint Kitts og Nevis"
 
-msgid "The Democratic People's Republic of Korea"
-msgstr "Nordkorea"
+msgid "North Korea"
+msgstr ""
 
 msgid "Republic of Korea"
 msgstr "Sydkorea"
@@ -431,8 +437,8 @@ msgstr "Luxembourg"
 msgid "Latvia"
 msgstr "Letland"
 
-msgid "Libyan Arab Jamahiriya"
-msgstr "Libyen"
+msgid "Libya"
+msgstr ""
 
 msgid "Morocco"
 msgstr "Marokko"
@@ -440,8 +446,8 @@ msgstr "Marokko"
 msgid "Monaco"
 msgstr "Monaco"
 
-msgid "Republic of Moldova"
-msgstr "Republikken Moldova"
+msgid "Moldova"
+msgstr ""
 
 msgid "Montenegro"
 msgstr "Montenegro"
@@ -455,8 +461,8 @@ msgstr "Madagaskar"
 msgid "Marshall Islands"
 msgstr "Marshalløerne"
 
-msgid "The Former Yugoslav Republic of Macedonia"
-msgstr "Den Tidligere Jugoslaviske Republik Makedonien"
+msgid "Macedonia"
+msgstr ""
 
 msgid "Mali"
 msgstr "Mali"
@@ -467,8 +473,8 @@ msgstr "Myanmar"
 msgid "Mongolia"
 msgstr "Mongoliet"
 
-msgid "Macao"
-msgstr "Macao"
+msgid "Macau"
+msgstr ""
 
 msgid "Northern Mariana Islands"
 msgstr "Nordmarianerne"
@@ -647,14 +653,20 @@ msgstr "Somalia"
 msgid "Suriname"
 msgstr "Surinam"
 
+msgid "South Sudan"
+msgstr ""
+
 msgid "Sao Tome and Principe"
 msgstr "Sao Tome og Principe"
 
 msgid "El Salvador"
 msgstr "El Salvador"
 
-msgid "Syrian Arab Republic"
-msgstr "Syriske Arabiske Republik"
+msgid "Sint Maarten"
+msgstr ""
+
+msgid "Syria"
+msgstr ""
 
 msgid "Swaziland"
 msgstr "Swaziland"
@@ -704,8 +716,8 @@ msgstr "Tuvalu"
 msgid "Taiwan"
 msgstr "Taiwan"
 
-msgid "United Republic of Tanzania"
-msgstr "den Forenede Republik Tanzania"
+msgid "Tanzania"
+msgstr ""
 
 msgid "Ukraine"
 msgstr "Ukraine"
@@ -725,8 +737,8 @@ msgstr "Uruguay"
 msgid "Uzbekistan"
 msgstr "Usbekistan"
 
-msgid "Holy See (Vatican City State)"
-msgstr "Pavestolen (Vatikanstaten)"
+msgid "Vatican"
+msgstr ""
 
 msgid "Saint Vincent and the Grenadines"
 msgstr "Saint Vincent og Grenadinerne"
@@ -737,8 +749,8 @@ msgstr "Venezuela"
 msgid "Virgin Islands"
 msgstr "Jomfruøerne"
 
-msgid "Viet Nam"
-msgstr "Vietnam"
+msgid "Vietnam"
+msgstr ""
 
 msgid "Vanuatu"
 msgstr "Vanuatu"

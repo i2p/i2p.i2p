@@ -746,6 +746,18 @@ public class Snark
     }
 
     /**
+     *  If checking is in progress, return completion 0.0 ... 1.0,
+     *  else return 1.0.
+     *  @since 0.9.23
+     */
+    public double getCheckingProgress() {
+        if (storage != null && storage.isChecking())
+            return storage.getCheckingProgress();
+        else
+            return 1.0d;
+    }
+
+    /**
      *  Disk allocation (ballooning) in progress.
      *  @since 0.9.3
      */
@@ -1264,7 +1276,8 @@ public class Snark
 
   public void setWantedPieces(Storage storage)
   {
-    coordinator.setWantedPieces();
+    if (coordinator != null)
+        coordinator.setWantedPieces();
   }
 
   ///////////// End StorageListener methods
@@ -1273,7 +1286,7 @@ public class Snark
   /** SnarkSnutdown callback unused */
   public void shutdown()
   {
-    // Should not be necessary since all non-deamon threads should
+    // Should not be necessary since all non-daemon threads should
     // have died. But in reality this does not always happen.
     //System.exit(0);
   }

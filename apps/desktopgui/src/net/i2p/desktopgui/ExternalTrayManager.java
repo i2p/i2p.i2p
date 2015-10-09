@@ -20,7 +20,7 @@ public class ExternalTrayManager extends TrayManager {
     @Override
     public PopupMenu getMainMenu() {
         PopupMenu popup = new PopupMenu();
-        MenuItem startItem = new MenuItem(_("Start I2P"));
+        MenuItem startItem = new MenuItem(_t("Start I2P"));
         startItem.addActionListener(new ActionListener() {
 
             @Override
@@ -35,7 +35,7 @@ public class ExternalTrayManager extends TrayManager {
                     
                     @Override
                     protected void done() {
-                        trayIcon.displayMessage(_("Starting"), _("I2P is starting!"), TrayIcon.MessageType.INFO);
+                        trayIcon.displayMessage(_t("Starting"), _t("I2P is starting!"), TrayIcon.MessageType.INFO);
                         //Hide the tray icon.
                         //We cannot stop the desktopgui program entirely,
                         //since that risks killing the I2P process as well.

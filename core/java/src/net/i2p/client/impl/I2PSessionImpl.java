@@ -96,7 +96,7 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
     // established subsessions
     private final ConcurrentHashMap<SessionId, SubSession> _subsessionMap;
     private final Object _subsessionLock = new Object();
-    private static final String MIN_SUBSESSION_VERSION = "0.9.19";
+    private static final String MIN_SUBSESSION_VERSION = "0.9.21";
     private volatile boolean _routerSupportsSubsessions;
 
     /** hostname of router - will be null if in RouterContext */

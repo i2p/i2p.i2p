@@ -671,9 +671,9 @@ public class TransportManager implements TransportEventListener {
     public void renderStatusHTML(Writer out, String urlBase, int sortFlags) throws IOException {
         if (_context.getBooleanProperty(PROP_ADVANCED)) {
             out.write("<p><b>");
-            out.write(_("Status"));
+            out.write(_t("Status"));
             out.write(": ");
-            out.write(_(getReachabilityStatus().toStatusString()));
+            out.write(_t(getReachabilityStatus().toStatusString()));
             out.write("</b></p>");
         }
         TreeMap<String, Transport> transports = new TreeMap<String, Transport>();
@@ -689,7 +689,7 @@ public class TransportManager implements TransportEventListener {
         }
 
         StringBuilder buf = new StringBuilder(4*1024);
-        buf.append("<h3>").append(_("Router Transport Addresses")).append("</h3><pre>\n");
+        buf.append("<h3>").append(_t("Router Transport Addresses")).append("</h3><pre>\n");
         for (Transport t : _transports.values()) {
             if (t.hasCurrentAddress()) {
                 for (RouterAddress ra : t.getCurrentAddresses()) {
@@ -697,7 +697,7 @@ public class TransportManager implements TransportEventListener {
                     buf.append("\n\n");
                 }
             } else {
-                buf.append(_("{0} is used for outbound connections only", t.getStyle()));
+                buf.append(_t("{0} is used for outbound connections only", t.getStyle()));
                 buf.append("\n\n");
             }
         }
@@ -708,7 +708,7 @@ public class TransportManager implements TransportEventListener {
         } else if (_upnpManager != null) {
             out.write(_upnpManager.renderStatusHTML());
         } else {
-            out.write("<h3><a name=\"upnp\"></a>" + _("UPnP is not enabled") + "</h3>\n");
+            out.write("<h3><a name=\"upnp\"></a>" + _t("UPnP is not enabled") + "</h3>\n");
         }
         out.write("</p>\n");
         out.flush();
@@ -717,38 +717,38 @@ public class TransportManager implements TransportEventListener {
 
     private final String getTransportsLegend() {
         StringBuilder buf = new StringBuilder(1024);
-        buf.append("<h3 id=\"help\">").append(_("Help")).append("</h3><div class=\"configure\"><p>")
-           .append(_("Your transport connection limits are automatically set based on your configured bandwidth."))
+        buf.append("<h3 id=\"help\">").append(_t("Help")).append("</h3><div class=\"configure\"><p>")
+           .append(_t("Your transport connection limits are automatically set based on your configured bandwidth."))
            .append('\n')
-           .append(_("To override these limits, add the settings i2np.ntcp.maxConnections=nnn and i2np.udp.maxConnections=nnn on the advanced configuration page."))
+           .append(_t("To override these limits, add the settings i2np.ntcp.maxConnections=nnn and i2np.udp.maxConnections=nnn on the advanced configuration page."))
            .append("</p></div>\n");
-        buf.append("<h3>").append(_("Definitions")).append("</h3><div class=\"configure\">" +
-                   "<p><b id=\"def.peer\">").append(_("Peer")).append("</b>: ").append(_("The remote peer, identified by router hash")).append("<br>\n" +
-                   "<b id=\"def.dir\">").append(_("Dir")).append("</b>: " +
-                   "<img alt=\"Inbound\" src=\"/themes/console/images/inbound.png\"> ").append(_("Inbound connection")).append("<br>\n" +
+        buf.append("<h3>").append(_t("Definitions")).append("</h3><div class=\"configure\">" +
+                   "<p><b id=\"def.peer\">").append(_t("Peer")).append("</b>: ").append(_t("The remote peer, identified by router hash")).append("<br>\n" +
+                   "<b id=\"def.dir\">").append(_t("Dir")).append("</b>: " +
+                   "<img alt=\"Inbound\" src=\"/themes/console/images/inbound.png\"> ").append(_t("Inbound connection")).append("<br>\n" +
                    "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
-                   "<img alt=\"Outbound\" src=\"/themes/console/images/outbound.png\"> ").append(_("Outbound connection")).append("<br>\n" +
+                   "<img alt=\"Outbound\" src=\"/themes/console/images/outbound.png\"> ").append(_t("Outbound connection")).append("<br>\n" +
                    "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
-                   "<img src=\"/themes/console/images/inbound.png\" alt=\"V\" height=\"8\" width=\"12\"> ").append(_("They offered to introduce us (help other peers traverse our firewall)")).append("<br>\n" +
+                   "<img src=\"/themes/console/images/inbound.png\" alt=\"V\" height=\"8\" width=\"12\"> ").append(_t("They offered to introduce us (help other peers traverse our firewall)")).append("<br>\n" +
                    "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
-                   "<img src=\"/themes/console/images/outbound.png\" alt=\"^\" height=\"8\" width=\"12\"> ").append(_("We offered to introduce them (help other peers traverse their firewall)")).append("<br>\n" +
-                   "<b id=\"def.idle\">").append(_("Idle")).append("</b>: ").append(_("How long since a packet has been received / sent")).append("<br>\n" +
-                   "<b id=\"def.rate\">").append(_("In/Out")).append("</b>: ").append(_("The smoothed inbound / outbound transfer rate (KBytes per second)")).append("<br>\n" +
-                   "<b id=\"def.up\">").append(_("Up")).append("</b>: ").append(_("How long ago this connection was established")).append("<br>\n" +
-                   "<b id=\"def.skew\">").append(_("Skew")).append("</b>: ").append(_("The difference between the peer's clock and your own")).append("<br>\n" +
-                   "<b id=\"def.cwnd\">CWND</b>: ").append(_("The congestion window, which is how many bytes can be sent without an acknowledgement")).append(" / <br>\n" +
-                   "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ").append(_("The number of sent messages awaiting acknowledgement")).append(" /<br>\n" +
-                   "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ").append(_("The maximum number of concurrent messages to send")).append(" /<br>\n"+
-                   "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ").append(_("The number of pending sends which exceed congestion window")).append("<br>\n" +
-                   "<b id=\"def.ssthresh\">SST</b>: ").append(_("The slow start threshold")).append("<br>\n" +
-                   "<b id=\"def.rtt\">RTT</b>: ").append(_("The round trip time in milliseconds")).append("<br>\n" +
-                   //"<b id=\"def.dev\">").append(_("Dev")).append("</b>: ").append(_("The standard deviation of the round trip time in milliseconds")).append("<br>\n" +
-                   "<b id=\"def.rto\">RTO</b>: ").append(_("The retransmit timeout in milliseconds")).append("<br>\n" +
-                   "<b id=\"def.mtu\">MTU</b>: ").append(_("Current maximum send packet size / estimated maximum receive packet size (bytes)")).append("<br>\n" +
-                   "<b id=\"def.send\">").append(_("TX")).append("</b>: ").append(_("The total number of packets sent to the peer")).append("<br>\n" +
-                   "<b id=\"def.recv\">").append(_("RX")).append("</b>: ").append(_("The total number of packets received from the peer")).append("<br>\n" +
-                   "<b id=\"def.resent\">").append(_("Dup TX")).append("</b>: ").append(_("The total number of packets retransmitted to the peer")).append("<br>\n" +
-                   "<b id=\"def.dupRecv\">").append(_("Dup RX")).append("</b>: ").append(_("The total number of duplicate packets received from the peer")).append("</p>" +
+                   "<img src=\"/themes/console/images/outbound.png\" alt=\"^\" height=\"8\" width=\"12\"> ").append(_t("We offered to introduce them (help other peers traverse their firewall)")).append("<br>\n" +
+                   "<b id=\"def.idle\">").append(_t("Idle")).append("</b>: ").append(_t("How long since a packet has been received / sent")).append("<br>\n" +
+                   "<b id=\"def.rate\">").append(_t("In/Out")).append("</b>: ").append(_t("The smoothed inbound / outbound transfer rate (KBytes per second)")).append("<br>\n" +
+                   "<b id=\"def.up\">").append(_t("Up")).append("</b>: ").append(_t("How long ago this connection was established")).append("<br>\n" +
+                   "<b id=\"def.skew\">").append(_t("Skew")).append("</b>: ").append(_t("The difference between the peer's clock and your own")).append("<br>\n" +
+                   "<b id=\"def.cwnd\">CWND</b>: ").append(_t("The congestion window, which is how many bytes can be sent without an acknowledgement")).append(" / <br>\n" +
+                   "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ").append(_t("The number of sent messages awaiting acknowledgement")).append(" /<br>\n" +
+                   "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ").append(_t("The maximum number of concurrent messages to send")).append(" /<br>\n"+
+                   "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ").append(_t("The number of pending sends which exceed congestion window")).append("<br>\n" +
+                   "<b id=\"def.ssthresh\">SST</b>: ").append(_t("The slow start threshold")).append("<br>\n" +
+                   "<b id=\"def.rtt\">RTT</b>: ").append(_t("The round trip time in milliseconds")).append("<br>\n" +
+                   //"<b id=\"def.dev\">").append(_t("Dev")).append("</b>: ").append(_t("The standard deviation of the round trip time in milliseconds")).append("<br>\n" +
+                   "<b id=\"def.rto\">RTO</b>: ").append(_t("The retransmit timeout in milliseconds")).append("<br>\n" +
+                   "<b id=\"def.mtu\">MTU</b>: ").append(_t("Current maximum send packet size / estimated maximum receive packet size (bytes)")).append("<br>\n" +
+                   "<b id=\"def.send\">").append(_t("TX")).append("</b>: ").append(_t("The total number of packets sent to the peer")).append("<br>\n" +
+                   "<b id=\"def.recv\">").append(_t("RX")).append("</b>: ").append(_t("The total number of packets received from the peer")).append("<br>\n" +
+                   "<b id=\"def.resent\">").append(_t("Dup TX")).append("</b>: ").append(_t("The total number of packets retransmitted to the peer")).append("<br>\n" +
+                   "<b id=\"def.dupRecv\">").append(_t("Dup RX")).append("</b>: ").append(_t("The total number of duplicate packets received from the peer")).append("</p>" +
                    "</div>\n");
         return buf.toString();
     }
@@ -770,14 +770,14 @@ public class TransportManager implements TransportEventListener {
     /**
      *  Translate
      */
-    private final String _(String s) {
+    private final String _t(String s) {
         return Translate.getString(s, _context, BUNDLE_NAME);
     }
 
     /**
      *  Translate
      */
-    private final String _(String s, Object o) {
+    private final String _t(String s, Object o) {
         return Translate.getString(s, o, _context, BUNDLE_NAME);
     }
 }

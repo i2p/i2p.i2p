@@ -128,7 +128,7 @@ public class SubscriptionsBean extends BaseBean
 		if( action != null ) {
                         if (_context.getBooleanProperty(PROP_PW_ENABLE) ||
 			    (serial != null && serial.equals(lastSerial))) {
-				if (action.equals(_("Save"))) {
+				if (action.equals(_t("Save"))) {
 					save();
 				/*******
 					String nonce = System.getProperty("addressbook.nonce");
@@ -141,22 +141,22 @@ public class SubscriptionsBean extends BaseBean
 				*******/
 					if (content != null && content.length() > 2 &&
 					    _context.portMapper().getPort(PortMapper.SVC_HTTP_PROXY) > 0) {
-						message = _("Subscriptions saved, updating addressbook from subscription sources now.");
+						message = _t("Subscriptions saved, updating addressbook from subscription sources now.");
 						          // + "<img height=\"1\" width=\"1\" alt=\"\" " +
 						          // "src=\"/addressbook/?wakeup=1&nonce=" + nonce + "\">";
 						_context.namingService().requestUpdate(null);
 					} else {
-						message = _("Subscriptions saved.");
+						message = _t("Subscriptions saved.");
 					}
-				} else if (action.equals(_("Reload"))) {
+				} else if (action.equals(_t("Reload"))) {
 					reloadSubs();
-					message = _("Subscriptions reloaded.");
+					message = _t("Subscriptions reloaded.");
 				}
 			}			
 			else {
-				message = _("Invalid form submission, probably because you used the \"back\" or \"reload\" button on your browser. Please resubmit.")
+				message = _t("Invalid form submission, probably because you used the \"back\" or \"reload\" button on your browser. Please resubmit.")
                                           + ' ' +
-                                          _("If the problem persists, verify that you have cookies enabled in your browser.");
+                                          _t("If the problem persists, verify that you have cookies enabled in your browser.");
 			}
 		}
 		if( message.length() > 0 )

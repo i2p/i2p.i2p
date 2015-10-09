@@ -59,7 +59,7 @@ public class ConfigAdvancedHandler extends FormHandler {
             } catch (IOException ioe) {
                 _log.error("Config error", ioe);
                 addFormError(ioe.toString());
-                addFormError(_("Error updating the configuration - please see the error logs"));
+                addFormError(_t("Error updating the configuration - please see the error logs"));
                 return;
             }
 
@@ -69,9 +69,9 @@ public class ConfigAdvancedHandler extends FormHandler {
 
             boolean saved = _context.router().saveConfig(props, unsetKeys);
             if (saved) 
-                addFormNotice(_("Configuration saved successfully"));
+                addFormNotice(_t("Configuration saved successfully"));
             else
-                addFormError(_("Error saving the configuration (applied but not saved) - please see the error logs"));
+                addFormError(_t("Error saving the configuration (applied but not saved) - please see the error logs"));
             
             //if (_forceRestart) {
             //    addFormNotice("Performing a soft restart");
@@ -93,8 +93,8 @@ public class ConfigAdvancedHandler extends FormHandler {
                 _context.router().rebuildRouterInfo();
         }
         if (saved) 
-            addFormNotice(_("Configuration saved successfully"));
+            addFormNotice(_t("Configuration saved successfully"));
         else
-            addFormError(_("Error saving the configuration (applied but not saved) - please see the error logs"));
+            addFormError(_t("Error saving the configuration (applied but not saved) - please see the error logs"));
     }
 }

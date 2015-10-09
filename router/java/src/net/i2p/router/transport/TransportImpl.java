@@ -983,7 +983,7 @@ public abstract class TransportImpl implements Transport {
      *  Translate
      *  @since 0.9.8 moved from transports
      */
-    protected String _(String s) {
+    protected String _t(String s) {
         return Translate.getString(s, _context, BUNDLE_NAME);
     }
 
@@ -991,7 +991,7 @@ public abstract class TransportImpl implements Transport {
      *  Translate
      *  @since 0.9.8 moved from transports
      */
-    protected String _(String s, Object o) {
+    protected String _t(String s, Object o) {
         return Translate.getString(s, o, _context, BUNDLE_NAME);
     }
 

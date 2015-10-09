@@ -248,9 +248,9 @@ public abstract class FormHandler {
         }
         
         if (!_nonce.equals(_nonce1) && !_nonce.equals(_nonce2)) {
-                addFormError(_("Invalid form submission, probably because you used the 'back' or 'reload' button on your browser. Please resubmit.")
+                addFormError(_t("Invalid form submission, probably because you used the 'back' or 'reload' button on your browser. Please resubmit.")
                              + ' ' +
-                             _("If the problem persists, verify that you have cookies enabled in your browser."));
+                             _t("If the problem persists, verify that you have cookies enabled in your browser."));
                 _valid = false;
         }
     }
@@ -291,28 +291,28 @@ public abstract class FormHandler {
     }
 
     /** translate a string */
-    public String _(String s) {
+    public String _t(String s) {
         return Messages.getString(s, _context);
     }
 
     /**
      *  translate a string with a parameter
-     *  This is a lot more expensive than _(s), so use sparingly.
+     *  This is a lot more expensive than _t(s), so use sparingly.
      *
      *  @param s string to be translated containing {0}
      *    The {0} will be replaced by the parameter.
      *    Single quotes must be doubled, i.e. ' -> '' in the string.
      *  @param o parameter, not translated.
-     *    To tranlslate parameter also, use _("foo {0} bar", _("baz"))
+     *    To tranlslate parameter also, use _t("foo {0} bar", _t("baz"))
      *    Do not double the single quotes in the parameter.
      *    Use autoboxing to call with ints, longs, floats, etc.
      */
-    public String _(String s, Object o) {
+    public String _t(String s, Object o) {
         return Messages.getString(s, o, _context);
     }
 
     /** two params @since 0.8.2 */
-    public String _(String s, Object o, Object o2) {
+    public String _t(String s, Object o, Object o2) {
         return Messages.getString(s, o, o2, _context);
     }
 

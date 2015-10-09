@@ -7,7 +7,9 @@
   #include <abstractions/ssl_certs>
 
   network inet stream,
+  network inet dgram,
   network inet6 stream,
+  network inet6 dgram,
 
   # Needed by Java
   @{PROC}                                                 r,
@@ -53,8 +55,11 @@
   /{,lib/live/mount/overlay/}tmp/                         rwm,
   owner /{,lib/live/mount/overlay/}tmp/hsperfdata_i2psvc/ rwk,
   owner /{,lib/live/mount/overlay/}tmp/hsperfdata_i2psvc/** rw,
-  owner /{,lib/live/mount/overlay/}tmp/wrapper[0-9]*.tmp   rwk,
-  owner /{,lib/live/mount/overlay/}tmp/wrapper[0-9]*.tmp/** rw,
+  owner /{,lib/live/mount/overlay/}tmp/wrapper*           rwk,
+  owner /{,lib/live/mount/overlay/}tmp/wrapper*/**        rw,
+  # Scrypt used by I2P-Bote
+  owner /{,lib/live/mount/overlay/}tmp/scrypt*            rwk,
+  owner /{,lib/live/mount/overlay/}tmp/scrypt*/**         rw,
   owner /{,lib/live/mount/overlay/}tmp/i2p-daemon/        rwm,
   owner /{,lib/live/mount/overlay/}tmp/i2p-daemon/**      rwklm,
 

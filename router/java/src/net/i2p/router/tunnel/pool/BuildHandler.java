@@ -640,7 +640,9 @@ class BuildHandler implements Runnable {
             _context.statManager().addRateData("tunnel.rejectHostile", 1);
             // We are 2 hops in a row? Drop it without a reply.
             // No way to recognize if we are every other hop, but see below
-            _log.error("Dropping build request, we are the next hop");
+            // old i2pd
+            if (_log.shouldWarn())
+                _log.warn("Dropping build request, we are the next hop");
             return;
         }
         // previous test should be sufficient to keep it from getting here but maybe not?

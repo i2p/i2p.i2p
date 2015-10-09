@@ -1,5 +1,6 @@
 package net.i2p.router.transport.ntcp;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.net.Inet6Address;
 import java.nio.ByteBuffer;
@@ -64,7 +65,7 @@ import net.i2p.util.VersionComparator;
  *</pre>
  *
  */
-class NTCPConnection {
+class NTCPConnection implements Closeable {
     private final RouterContext _context;
     private final Log _log;
     private SocketChannel _chan;

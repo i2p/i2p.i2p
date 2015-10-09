@@ -8,6 +8,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Serializable;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -96,6 +97,12 @@ public class SnarkManager implements CompleteListener {
     private static final String PROP_META_PRIORITY = "priority";
     private static final String PROP_META_PRESERVE_NAMES = "preserveFileNames";
     private static final String PROP_META_UPLOADED = "uploaded";
+    private static final String PROP_META_ADDED = "added";
+    private static final String PROP_META_COMPLETED = "completed";
+    private static final String PROP_META_MAGNET = "magnet";
+    private static final String PROP_META_MAGNET_DN = "magnet_dn";
+    private static final String PROP_META_MAGNET_TR = "magnet_tr";
+    private static final String PROP_META_MAGNET_DIR = "magnet_dir";
     //private static final String PROP_META_BITFIELD_SUFFIX = ".bitfield";
     //private static final String PROP_META_PRIORITY_SUFFIX = ".priority";
     private static final String PROP_META_MAGNET_PREFIX = "i2psnark.magnet.";
@@ -769,9 +776,9 @@ public class SnarkManager implements CompleteListener {
                     _util.setMaxUploaders(limit);
                     changed = true;
                     _config.setProperty(PROP_UPLOADERS_TOTAL, Integer.toString(limit));
-                    addMessage(_("Total uploaders limit changed to {0}", limit));
+                    addMessage(_t("Total uploaders limit changed to {0}", limit));
                 } else {
-                    addMessage(_("Minimum total uploaders limit is {0}", Snark.MIN_TOTAL_UPLOADERS));
+                    addMessage(_t("Minimum total uploaders limit is {0}", Snark.MIN_TOTAL_UPLOADERS));
                 }
             }
         }
@@ -783,9 +790,9 @@ public class SnarkManager implements CompleteListener {
                     _util.setMaxUpBW(limit);
                     changed = true;
                     _config.setProperty(PROP_UPBW_MAX, Integer.toString(limit));
-                    addMessage(_("Up BW limit changed to {0}KBps", limit));
+                    addMessage(_t("Up BW limit changed to {0}KBps", limit));
                 } else {
-                    addMessage(_("Minimum up bandwidth limit is {0}KBps", MIN_UP_BW));
+                    addMessage(_t("Minimum up bandwidth limit is {0}KBps", MIN_UP_BW));
                 }
             }
         }
@@ -797,7 +804,7 @@ public class SnarkManager implements CompleteListener {
                 	    _util.setStartupDelay(minutes);
 	                    changed = true;
         	            _config.setProperty(PROP_STARTUP_DELAY, Integer.toString(minutes));
-                	    addMessage(_("Startup delay changed to {0}", DataHelper.formatDuration2(minutes * (60L * 1000))));
+                	    addMessage(_t("Startup delay changed to {0}", DataHelper.formatDuration2(minutes * (60L * 1000))));
                 }
 	}
 
@@ -808,9 +815,9 @@ public class SnarkManager implements CompleteListener {
 	            changed = true;
 	            _config.setProperty(PROP_REFRESH_DELAY, Integer.toString(secs));
                     if (secs >= 0)
-	                addMessage(_("Refresh time changed to {0}", DataHelper.formatDuration2(secs * 1000)));
+	                addMessage(_t("Refresh time changed to {0}", DataHelper.formatDuration2(secs * 1000)));
 	            else
-	                addMessage(_("Refresh disabled"));
+	                addMessage(_t("Refresh disabled"));
 	        }
 	    } catch (NumberFormatException nfe) {}
 	}
@@ -826,7 +833,7 @@ public class SnarkManager implements CompleteListener {
                     changed = true;
                     pageSize = Integer.toString(size);
                     _config.setProperty(PROP_PAGE_SIZE, pageSize);
-                    addMessage(_("Page size changed to {0}", pageSize));
+                    addMessage(_t("Page size changed to {0}", pageSize));
                 }
             } catch (NumberFormatException nfe) {}
         }
@@ -835,18 +842,18 @@ public class SnarkManager implements CompleteListener {
             dataDir = DataHelper.stripHTML(dataDir.trim());
             File dd = new File(dataDir);
             if (!dd.isAbsolute()) {
-                addMessage(_("Data directory must be an absolute path") + ": " + dataDir);
+                addMessage(_t("Data directory must be an absolute path") + ": " + dataDir);
             } else if (!dd.exists()) {
-                addMessage(_("Data directory does not exist") + ": " + dataDir);
+                addMessage(_t("Data directory does not exist") + ": " + dataDir);
             } else if (!dd.isDirectory()) {
-                addMessage(_("Not a directory") + ": " + dataDir);
+                addMessage(_t("Not a directory") + ": " + dataDir);
             } else if (!dd.canRead()) {
-                addMessage(_("Unreadable") + ": " + dataDir);
+                addMessage(_t("Unreadable") + ": " + dataDir);
             } else {
                 changed = true;
                 interruptMonitor = true;
                 _config.setProperty(PROP_DIR, dataDir);
-                addMessage(_("Data directory changed to {0}", dataDir));
+                addMessage(_t("Data directory changed to {0}", dataDir));
             }
 
         }
@@ -901,37 +908,37 @@ public class SnarkManager implements CompleteListener {
                     p.putAll(opts);
                     _util.setI2CPConfig(i2cpHost, port, p);
                     _util.setMaxUpBW(getInt(PROP_UPBW_MAX, DEFAULT_MAX_UP_BW));
-                    addMessage(_("I2CP and tunnel changes will take effect after stopping all torrents"));
+                    addMessage(_t("I2CP and tunnel changes will take effect after stopping all torrents"));
                 } else if (!reconnect) {
                     // The usual case, the other two are if not in router context
                     _config.setProperty(PROP_I2CP_OPTS, i2cpOpts.trim());
-                    addMessage(_("I2CP options changed to {0}", i2cpOpts));
+                    addMessage(_t("I2CP options changed to {0}", i2cpOpts));
                     _util.setI2CPConfig(oldI2CPHost, oldI2CPPort, opts);
                 } else {
                     // Won't happen, I2CP host/port, are hidden in the GUI if in router context
                     if (_util.connected()) {
                         _util.disconnect();
-                        addMessage(_("Disconnecting old I2CP destination"));
+                        addMessage(_t("Disconnecting old I2CP destination"));
                     }
-                    addMessage(_("I2CP settings changed to {0}", i2cpHost + ':' + port + ' ' + i2cpOpts));
+                    addMessage(_t("I2CP settings changed to {0}", i2cpHost + ':' + port + ' ' + i2cpOpts));
                     _util.setI2CPConfig(i2cpHost, port, opts);
                     _util.setMaxUpBW(getInt(PROP_UPBW_MAX, DEFAULT_MAX_UP_BW));
                     boolean ok = _util.connect();
                     if (!ok) {
-                        addMessage(_("Unable to connect with the new settings, reverting to the old I2CP settings"));
+                        addMessage(_t("Unable to connect with the new settings, reverting to the old I2CP settings"));
                         _util.setI2CPConfig(oldI2CPHost, oldI2CPPort, oldOpts);
                         ok = _util.connect();
                         if (!ok)
-                            addMessage(_("Unable to reconnect with the old settings!"));
+                            addMessage(_t("Unable to reconnect with the old settings!"));
                     } else {
-                        addMessage(_("Reconnected on the new I2CP destination"));
+                        addMessage(_t("Reconnected on the new I2CP destination"));
                         _config.setProperty(PROP_I2CP_HOST, i2cpHost.trim());
                         _config.setProperty(PROP_I2CP_PORT, "" + port);
                         _config.setProperty(PROP_I2CP_OPTS, i2cpOpts.trim());
                         // no PeerAcceptors/I2PServerSockets to deal with, since all snarks are inactive
                         for (Snark snark : _snarks.values()) {
                             if (snark.restartAcceptor()) {
-                                addMessage(_("I2CP listener restarted for \"{0}\"", snark.getBaseName()));
+                                addMessage(_t("I2CP listener restarted for \"{0}\"", snark.getBaseName()));
                                 // this is the common ConnectionAcceptor, so we only need to do it once
                                 break;
                             }
@@ -945,44 +952,44 @@ public class SnarkManager implements CompleteListener {
             _config.setProperty(PROP_FILES_PUBLIC, Boolean.toString(filesPublic));
             _util.setFilesPublic(filesPublic);
             if (filesPublic)
-                addMessage(_("New files will be publicly readable"));
+                addMessage(_t("New files will be publicly readable"));
             else
-                addMessage(_("New files will not be publicly readable"));
+                addMessage(_t("New files will not be publicly readable"));
             changed = true;
         }
 
         if (shouldAutoStart() != autoStart) {
             _config.setProperty(PROP_AUTO_START, Boolean.toString(autoStart));
             if (autoStart)
-                addMessage(_("Enabled autostart"));
+                addMessage(_t("Enabled autostart"));
             else
-                addMessage(_("Disabled autostart"));
+                addMessage(_t("Disabled autostart"));
             changed = true;
         }
         if (_util.shouldUseOpenTrackers() != useOpenTrackers) {
             _config.setProperty(PROP_USE_OPENTRACKERS, useOpenTrackers + "");
             if (useOpenTrackers)
-                addMessage(_("Enabled open trackers - torrent restart required to take effect."));
+                addMessage(_t("Enabled open trackers - torrent restart required to take effect."));
             else
-                addMessage(_("Disabled open trackers - torrent restart required to take effect."));
+                addMessage(_t("Disabled open trackers - torrent restart required to take effect."));
             _util.setUseOpenTrackers(useOpenTrackers);
             changed = true;
         }
         if (_util.shouldUseDHT() != useDHT) {
             _config.setProperty(PROP_USE_DHT, Boolean.toString(useDHT));
             if (useDHT)
-                addMessage(_("Enabled DHT."));
+                addMessage(_t("Enabled DHT."));
             else
-                addMessage(_("Disabled DHT."));
+                addMessage(_t("Disabled DHT."));
             if (_util.connected())
-                addMessage(_("DHT change requires tunnel shutdown and reopen"));
+                addMessage(_t("DHT change requires tunnel shutdown and reopen"));
             _util.setUseDHT(useDHT);
             changed = true;
         }
         if (theme != null) {
             if(!theme.equals(_config.getProperty(PROP_THEME))) {
                 _config.setProperty(PROP_THEME, theme);
-                addMessage(_("{0} theme loaded, return to main i2psnark page to view.", theme));
+                addMessage(_t("{0} theme loaded, return to main i2psnark page to view.", theme));
                 changed = true;
             }
         }
@@ -992,7 +999,7 @@ public class SnarkManager implements CompleteListener {
                 // Data dir changed. this will stop and remove all old torrents, and add the new ones
                 _monitor.interrupt();
         } else {
-            addMessage(_("Configuration unchanged."));
+            addMessage(_t("Configuration unchanged."));
         }
     }
     
@@ -1024,7 +1031,7 @@ public class SnarkManager implements CompleteListener {
         if (ot == null)
             ot = getListConfig(PROP_OPENTRACKERS, DEFAULT_OPENTRACKERS);
         _util.setOpenTrackers(ot);
-        addMessage(_("Open Tracker list changed - torrent restart required to take effect."));
+        addMessage(_t("Open Tracker list changed - torrent restart required to take effect."));
         saveConfig();
     }
 
@@ -1034,7 +1041,7 @@ public class SnarkManager implements CompleteListener {
      */
     public void savePrivateTrackers(List<String> pt) {
         setListConfig(PROP_PRIVATETRACKERS, pt);
-        addMessage(_("Private tracker list changed - affects newly created torrents only."));
+        addMessage(_t("Private tracker list changed - affects newly created torrents only."));
         saveConfig();
     }
 
@@ -1080,7 +1087,7 @@ public class SnarkManager implements CompleteListener {
                 DataHelper.storeProps(_config, _configFile);
             }
         } catch (IOException ioe) {
-            addMessage(_("Unable to save the config to {0}", _configFile.getAbsolutePath()));
+            addMessage(_t("Unable to save the config to {0}", _configFile.getAbsolutePath()));
         }
     }
     
@@ -1161,10 +1168,10 @@ public class SnarkManager implements CompleteListener {
      */
     private void addTorrent(String filename, File baseFile, boolean dontAutoStart, File dataDir) {
         if ((!dontAutoStart) && !_util.connected()) {
-            addMessage(_("Connecting to I2P"));
+            addMessage(_t("Connecting to I2P"));
             boolean ok = _util.connect();
             if (!ok) {
-                addMessage(_("Error connecting to I2P - check your I2CP settings!"));
+                addMessage(_t("Error connecting to I2P - check your I2CP settings!"));
                 return;
             }
         }
@@ -1173,7 +1180,7 @@ public class SnarkManager implements CompleteListener {
             filename = sfile.getCanonicalPath();
         } catch (IOException ioe) {
             _log.error("Unable to add the torrent " + filename, ioe);
-            addMessage(_("Error: Could not add the torrent {0}", filename) + ": " + ioe);
+            addMessage(_t("Error: Could not add the torrent {0}", filename) + ": " + ioe);
             return;
         }
         if (dataDir == null)
@@ -1196,7 +1203,7 @@ public class SnarkManager implements CompleteListener {
                     fis = new FileInputStream(sfile);
                 } catch (IOException ioe) {
                     // catch this here so we don't try do delete it below
-                    addMessage(_("Cannot open \"{0}\"", sfile.getName()) + ": " + ioe.getMessage());
+                    addMessage(_t("Cannot open \"{0}\"", sfile.getName()) + ": " + ioe.getMessage());
                     return;
                 }
 
@@ -1215,53 +1222,59 @@ public class SnarkManager implements CompleteListener {
                     Snark snark = getTorrentByInfoHash(info.getInfoHash());
                     if (snark != null) {
                         // TODO - if the existing one is a magnet, delete it and add the metainfo instead?
-                        addMessage(_("Torrent with this info hash is already running: {0}", snark.getBaseName()));
+                        addMessage(_t("Torrent with this info hash is already running: {0}", snark.getBaseName()));
                         return;
                     }
 
                     if (!TrackerClient.isValidAnnounce(info.getAnnounce())) {
                         if (info.isPrivate()) {
-                            addMessage(_("ERROR - No I2P trackers in private torrent \"{0}\"", info.getName()));
+                            addMessage(_t("ERROR - No I2P trackers in private torrent \"{0}\"", info.getName()));
                         } else if (!_util.getOpenTrackers().isEmpty()) {
-                            addMessage(_("Warning - No I2P trackers in \"{0}\", will announce to I2P open trackers and DHT only.", info.getName()));
-                            //addMessage(_("Warning - No I2P trackers in \"{0}\", will announce to I2P open trackers only.", info.getName()));
+                            addMessage(_t("Warning - No I2P trackers in \"{0}\", will announce to I2P open trackers and DHT only.", info.getName()));
+                            //addMessage(_t("Warning - No I2P trackers in \"{0}\", will announce to I2P open trackers only.", info.getName()));
                         } else if (_util.shouldUseDHT()) {
-                            addMessage(_("Warning - No I2P trackers in \"{0}\", and open trackers are disabled, will announce to DHT only.", info.getName()));
+                            addMessage(_t("Warning - No I2P trackers in \"{0}\", and open trackers are disabled, will announce to DHT only.", info.getName()));
                         } else {
-                            addMessage(_("Warning - No I2P trackers in \"{0}\", and DHT and open trackers are disabled, you should enable open trackers or DHT before starting the torrent.", info.getName()));
-                            //addMessage(_("Warning - No I2P Trackers found in \"{0}\". Make sure Open Tracker is enabled before starting this torrent.", info.getName()));
+                            addMessage(_t("Warning - No I2P trackers in \"{0}\", and DHT and open trackers are disabled, you should enable open trackers or DHT before starting the torrent.", info.getName()));
+                            //addMessage(_t("Warning - No I2P Trackers found in \"{0}\". Make sure Open Tracker is enabled before starting this torrent.", info.getName()));
                             dontAutoStart = true;
                         }
                     }
                     String rejectMessage = validateTorrent(info);
                     if (rejectMessage != null) {
-                        sfile.delete();
-                        addMessage(rejectMessage);
-                        return;
-                    } else {
-                        // TODO load saved closest DHT nodes and pass to the Snark ?
-                        // This may take a LONG time
-                        if (baseFile == null)
-                            baseFile = getSavedBaseFile(info.getInfoHash());
-                        if (_log.shouldLog(Log.INFO))
-                            _log.info("New Snark, torrent: " + filename + " base: " + baseFile);
-                        torrent = new Snark(_util, filename, null, -1, null, null, this,
-                                            _peerCoordinatorSet, _connectionAcceptor,
-                                            false, dataDir.getPath(), baseFile);
-                        loadSavedFilePriorities(torrent);
-                        synchronized (_snarks) {
-                            _snarks.put(filename, torrent);
-                        }
+                        throw new IOException(rejectMessage);
+                    }
+
+                    // TODO load saved closest DHT nodes and pass to the Snark ?
+                    // This may take a LONG time
+                    if (baseFile == null)
+                        baseFile = getSavedBaseFile(info.getInfoHash());
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("New Snark, torrent: " + filename + " base: " + baseFile);
+                    torrent = new Snark(_util, filename, null, -1, null, null, this,
+                                        _peerCoordinatorSet, _connectionAcceptor,
+                                        shouldAutoStart(), dataDir.getPath(), baseFile);
+                    loadSavedFilePriorities(torrent);
+                    synchronized (_snarks) {
+                        _snarks.put(filename, torrent);
                     }
                 } catch (IOException ioe) {
-                    String err = _("Torrent in \"{0}\" is invalid", sfile.getName()) + ": " + ioe.getMessage();
+                    // close before rename/delete for windows
+                    if (fis != null) try { fis.close(); fis = null; } catch (IOException ioe2) {}
+                    String err = _t("Torrent in \"{0}\" is invalid", sfile.toString()) + ": " + ioe.getMessage();
                     addMessage(err);
                     _log.error(err, ioe);
-                    if (sfile.exists())
-                        sfile.delete();
+                    File rename = new File(filename + ".BAD");
+                    if (rename.exists()) {
+                        if (sfile.delete())
+                            addMessage(_t("Torrent file deleted: {0}", sfile.toString()));
+                    } else {
+                        if (FileUtil.rename(sfile, rename))
+                            addMessage(_t("Torrent file moved from {0} to {1}", sfile.toString(), rename.toString()));
+                    }
                     return;
                 } catch (OutOfMemoryError oom) {
-                    addMessage(_("ERROR - Out of memory, cannot create torrent from {0}", sfile.getName()) + ": " + oom.getMessage());
+                    addMessage(_t("ERROR - Out of memory, cannot create torrent from {0}", sfile.getName()) + ": " + oom.getMessage());
                     return;
                 } finally {
                     if (fis != null) try { fis.close(); } catch (IOException ioe) {}
@@ -1278,13 +1291,13 @@ public class SnarkManager implements CompleteListener {
             running = true;
         } else {
             running = false;
-        }        
+        }
         // Were we running last time?
         if (!dontAutoStart && shouldAutoStart() && running) {
             torrent.startTorrent();
-            addMessage(_("Torrent added and started: \"{0}\"", torrent.getBaseName()));
+            addMessage(_t("Torrent added and started: \"{0}\"", torrent.getBaseName()));
         } else {
-            addMessage(_("Torrent added: \"{0}\"", torrent.getBaseName()));
+            addMessage(_t("Torrent added: \"{0}\"", torrent.getBaseName()));
         }
     }
     
@@ -1349,28 +1362,28 @@ public class SnarkManager implements CompleteListener {
         synchronized (_snarks) {
             Snark snark = getTorrentByInfoHash(ih);
             if (snark != null) {
-                addMessage(_("Torrent with this info hash is already running: {0}", snark.getBaseName()));
+                addMessage(_t("Torrent with this info hash is already running: {0}", snark.getBaseName()));
                 return null;
             }
             // Tell the dir monitor not to delete us
             _magnets.add(name);
             if (updateStatus)
-                saveMagnetStatus(ih);
+                saveMagnetStatus(ih, dirPath, trackerURL, name);
             _snarks.put(name, torrent);
         }
         if (autoStart) {
             startTorrent(ih);
-            addMessage(_("Fetching {0}", name));
+            addMessage(_t("Fetching {0}", name));
             DHT dht = _util.getDHT();
             boolean shouldWarn = _util.connected() &&
                                  _util.getOpenTrackers().isEmpty() &&
                                  ((!_util.shouldUseDHT()) || dht == null || dht.size() <= 0);
             if (shouldWarn) {
-                addMessage(_("Open trackers are disabled and we have no DHT peers. " +
+                addMessage(_t("Open trackers are disabled and we have no DHT peers. " +
                              "Fetch of {0} may not succeed until you start another torrent, enable open trackers, or enable DHT.", name));
             }
         } else {
-            addMessage(_("Adding {0}", name));
+            addMessage(_t("Adding {0}", name));
         }
         return torrent;
     }
@@ -1403,7 +1416,7 @@ public class SnarkManager implements CompleteListener {
         synchronized (_snarks) {
             Snark snark = getTorrentByInfoHash(torrent.getInfoHash());
             if (snark != null) {
-                addMessage(_("Download already running: {0}", snark.getBaseName()));
+                addMessage(_t("Download already running: {0}", snark.getBaseName()));
                 return;
             }
             String name = torrent.getName();
@@ -1437,7 +1450,7 @@ public class SnarkManager implements CompleteListener {
         synchronized (_snarks) {
             Snark snark = getTorrentByInfoHash(metainfo.getInfoHash());
             if (snark != null) {
-                addMessage(_("Torrent with this info hash is already running: {0}", snark.getBaseName()));
+                addMessage(_t("Torrent with this info hash is already running: {0}", snark.getBaseName()));
                 return false;
             } else {
                 saveTorrentStatus(metainfo, bitfield, null, baseFile, true, 0, true); // no file priorities
@@ -1448,7 +1461,7 @@ public class SnarkManager implements CompleteListener {
                 // hold the lock for a long time
                 addTorrent(filename, baseFile, dontAutoStart);
             } catch (IOException ioe) {
-                addMessage(_("Failed to copy torrent file to {0}", filename));
+                addMessage(_t("Failed to copy torrent file to {0}", filename));
                 _log.error("Failed to write torrent file", ioe);
                 return false;
             }
@@ -1474,7 +1487,7 @@ public class SnarkManager implements CompleteListener {
         synchronized (_snarks) {
             boolean success = FileUtil.copy(fromfile.getAbsolutePath(), filename, false);
             if (!success) {
-                addMessage(_("Failed to copy torrent file to {0}", filename));
+                addMessage(_t("Failed to copy torrent file to {0}", filename));
                 _log.error("Failed to write torrent file to " + filename);
                 return;
             }
@@ -1623,6 +1636,25 @@ public class SnarkManager implements CompleteListener {
         }
         return 0;
     }
+
+    /**
+     * Get setting for a torrent from the config file.
+     * @return non-null, rv[0] is added time or 0; rv[1] is completed time or 0
+     * @since 0.9.23
+     */
+    public long[] getSavedAddedAndCompleted(Snark snark) {
+        long[] rv = new long[2];
+        Properties config = getConfig(snark);
+        if (config != null) {
+            try {
+                rv[0] = Long.parseLong(config.getProperty(PROP_META_ADDED));
+            } catch (NumberFormatException nfe) {}
+            try {
+                rv[1] = Long.parseLong(config.getProperty(PROP_META_COMPLETED));
+            } catch (NumberFormatException nfe) {}
+        }
+        return rv;
+    }
     
     /**
      * Save the completion status of a torrent and other data in the config file
@@ -1647,6 +1679,7 @@ public class SnarkManager implements CompleteListener {
      * The status is either a bitfield converted to Base64 or "." for a completed
      * torrent to save space in the config file and in memory.
      *
+     * @param metainfo non-null
      * @param bitfield non-null
      * @param priorities may be null
      * @param base may be null
@@ -1661,19 +1694,25 @@ public class SnarkManager implements CompleteListener {
     private void locked_saveTorrentStatus(MetaInfo metainfo, BitField bitfield, int[] priorities,
                                           File base, boolean preserveNames, long uploaded, boolean stopped) {
         byte[] ih = metainfo.getInfoHash();
+        Properties config = getConfig(ih);
+        String now = Long.toString(System.currentTimeMillis());
+        config.setProperty(PROP_META_STAMP, now);
+        if (config.getProperty(PROP_META_ADDED) == null)
+            config.setProperty(PROP_META_ADDED, now);
         String bfs;
         if (bitfield.complete()) {
           bfs = ".";
+          if (config.getProperty(PROP_META_COMPLETED) == null)
+              config.setProperty(PROP_META_COMPLETED, now);
         } else {
           byte[] bf = bitfield.getFieldBytes();
           bfs = Base64.encode(bf);
+          config.remove(PROP_META_COMPLETED);
         }
-        boolean running = !stopped;
-        Properties config = getConfig(ih);
-        config.setProperty(PROP_META_STAMP, Long.toString(System.currentTimeMillis()));
         config.setProperty(PROP_META_BITFIELD, bfs);
         config.setProperty(PROP_META_PRESERVE_NAMES, Boolean.toString(preserveNames));
         config.setProperty(PROP_META_UPLOADED, Long.toString(uploaded));
+        boolean running = !stopped;
         config.setProperty(PROP_META_RUNNING, Boolean.toString(running));
         if (base != null)
             config.setProperty(PROP_META_BASE, base.getAbsolutePath());
@@ -1703,15 +1742,28 @@ public class SnarkManager implements CompleteListener {
         } else {
             config.remove(PROP_META_PRIORITY);
         }
+        // magnet properties, no longer apply, we have the metainfo
+        config.remove(PROP_META_MAGNET);
+        config.remove(PROP_META_MAGNET_DIR);
+        config.remove(PROP_META_MAGNET_DN);
+        config.remove(PROP_META_MAGNET_TR);
 
         // TODO save closest DHT nodes too
+        locked_saveTorrentStatus(ih, config);
+    }
 
+    /**
+     *  @since 0.9.23
+     */
+    private void locked_saveTorrentStatus(byte[] ih, Properties config) {
         File conf = configFile(_configDir, ih);
         File subdir = conf.getParentFile();
         if (!subdir.exists())
             subdir.mkdirs();
         try {
             DataHelper.storeProps(config, conf);
+            if (_log.shouldInfo())
+                _log.info("Saved config to " + conf);
         } catch (IOException ioe) {
             _log.error("Unable to save the config to " + conf);
         }
@@ -1796,14 +1848,38 @@ public class SnarkManager implements CompleteListener {
     }
     
     /**
-     *  Just remember we have it
+     *  Just remember we have it.
+     *  This used to simply store a line in the config file,
+     *  but now we also save it in its own config file,
+     *  just like other torrents, so we can remember the directory, tracker, etc.
+     *
+     *  @param dir may be null
+     *  @param trackerURL may be null
+     *  @param dn may be null
      *  @since 0.8.4
      */
-    public void saveMagnetStatus(byte[] ih) {
+    public void saveMagnetStatus(byte[] ih, String dir, String trackerURL, String dn) {
+        // i2psnark.config file
         String infohash = Base64.encode(ih);
         infohash = infohash.replace('=', '$');
         _config.setProperty(PROP_META_MAGNET_PREFIX + infohash, ".");
-        saveConfig();
+        // its own config file
+        Properties config = new OrderedProperties();
+        config.setProperty(PROP_META_MAGNET, "true");
+        if (dir != null)
+            config.setProperty(PROP_META_MAGNET_DIR, dir);
+        if (trackerURL != null)
+            config.setProperty(PROP_META_MAGNET_TR, trackerURL);
+        if (dn != null)
+            config.setProperty(PROP_META_MAGNET_DN, dn);
+        String now = Long.toString(System.currentTimeMillis());
+        config.setProperty(PROP_META_ADDED, now);
+        config.setProperty(PROP_META_STAMP, now);
+        // save
+        synchronized (_configLock) {
+            saveConfig();
+            locked_saveTorrentStatus(ih, config);
+        }
     }
     
     /**
@@ -1813,8 +1889,8 @@ public class SnarkManager implements CompleteListener {
     public void removeMagnetStatus(byte[] ih) {
         String infohash = Base64.encode(ih);
         infohash = infohash.replace('=', '$');
-        _config.remove(PROP_META_MAGNET_PREFIX + infohash);
-        saveConfig();
+        if (_config.remove(PROP_META_MAGNET_PREFIX + infohash) != null)
+            saveConfig();
     }
     
     /**
@@ -1825,18 +1901,18 @@ public class SnarkManager implements CompleteListener {
     private String validateTorrent(MetaInfo info) {
         List<List<String>> files = info.getFiles();
         if ( (files != null) && (files.size() > MAX_FILES_PER_TORRENT) ) {
-            return _("Too many files in \"{0}\" ({1}), deleting it!", info.getName(), files.size());
+            return _t("Too many files in \"{0}\" ({1})!", info.getName(), files.size());
         } else if ( (files == null) && (info.getName().endsWith(".torrent")) ) {
-            return _("Torrent file \"{0}\" cannot end in \".torrent\", deleting it!", info.getName());
+            return _t("Torrent file \"{0}\" cannot end in \".torrent\"!", info.getName());
         } else if (info.getPieces() <= 0) {
-            return _("No pieces in \"{0}\",  deleting it!", info.getName());
+            return _t("No pieces in \"{0}\"!", info.getName());
         } else if (info.getPieces() > Storage.MAX_PIECES) {
-            return _("Too many pieces in \"{0}\", limit is {1}, deleting it!", info.getName(), Storage.MAX_PIECES);
+            return _t("Too many pieces in \"{0}\", limit is {1}!", info.getName(), Storage.MAX_PIECES);
         } else if (info.getPieceLength(0) > Storage.MAX_PIECE_SIZE) {
-            return _("Pieces are too large in \"{0}\" ({1}B), deleting it.", info.getName(), DataHelper.formatSize2(info.getPieceLength(0))) + ' ' +
-                   _("Limit is {0}B", DataHelper.formatSize2(Storage.MAX_PIECE_SIZE));
+            return _t("Pieces are too large in \"{0}\" ({1}B)!", info.getName(), DataHelper.formatSize2(info.getPieceLength(0))) + ' ' +
+                   _t("Limit is {0}B", DataHelper.formatSize2(Storage.MAX_PIECE_SIZE));
         } else if (info.getTotalLength() <= 0) {
-            return _("Torrent \"{0}\" has no data, deleting it!", info.getName());
+            return _t("Torrent \"{0}\" has no data!", info.getName());
         } else if (info.getTotalLength() > Storage.MAX_TOTAL_SIZE) {
             System.out.println("torrent info: " + info.toString());
             List<Long> lengths = info.getLengths();
@@ -1844,7 +1920,7 @@ public class SnarkManager implements CompleteListener {
                 for (int i = 0; i < lengths.size(); i++)
                     System.out.println("File " + i + " is " + lengths.get(i) + " long.");
             
-            return _("Torrents larger than {0}B are not supported yet, deleting \"{1}\"", Storage.MAX_TOTAL_SIZE, info.getName());
+            return _t("Torrents larger than {0}B are not supported yet \"{1}\"!", Storage.MAX_TOTAL_SIZE, info.getName());
         } else {
             // ok
             return null;
@@ -1861,7 +1937,7 @@ public class SnarkManager implements CompleteListener {
             filename = sfile.getCanonicalPath();
         } catch (IOException ioe) {
             _log.error("Unable to remove the torrent " + filename, ioe);
-            addMessage(_("Error: Could not remove the torrent {0}", filename) + ": " + ioe.getMessage());
+            addMessage(_t("Error: Could not remove the torrent {0}", filename) + ": " + ioe.getMessage());
             return null;
         }
         int remaining = 0;
@@ -1884,7 +1960,7 @@ public class SnarkManager implements CompleteListener {
             if (shouldRemove)
                 removeTorrentStatus(torrent);
             if (!wasStopped)
-                addMessage(_("Torrent stopped: \"{0}\"", torrent.getBaseName()));
+                addMessage(_t("Torrent stopped: \"{0}\"", torrent.getBaseName()));
         }
         return torrent;
     }
@@ -1903,7 +1979,7 @@ public class SnarkManager implements CompleteListener {
         boolean wasStopped = torrent.isStopped();
         torrent.stopTorrent();
         if (!wasStopped)
-            addMessage(_("Torrent stopped: \"{0}\"", torrent.getBaseName()));
+            addMessage(_t("Torrent stopped: \"{0}\"", torrent.getBaseName()));
         if (shouldRemove)
             removeTorrentStatus(torrent);
     }
@@ -1923,7 +1999,7 @@ public class SnarkManager implements CompleteListener {
             File torrentFile = new File(filename);
             torrentFile.delete();
         }
-        addMessage(_("Torrent removed: \"{0}\"", torrent.getBaseName()));
+        addMessage(_t("Torrent removed: \"{0}\"", torrent.getBaseName()));
     }
     
     private class DirMonitor implements Runnable {
@@ -1931,7 +2007,7 @@ public class SnarkManager implements CompleteListener {
             // don't bother delaying if auto start is false
             long delay = (60L * 1000) * getStartupDelayMinutes();
             if (delay > 0 && shouldAutoStart()) {
-                addMessage(_("Adding torrents in {0}", DataHelper.formatDuration2(delay)));
+                addMessage(_t("Adding torrents in {0}", DataHelper.formatDuration2(delay)));
                 try { Thread.sleep(delay); } catch (InterruptedException ie) {}
                 // Remove that first message
                 if (_messages.size() == 1)
@@ -1946,13 +2022,15 @@ public class SnarkManager implements CompleteListener {
                 File dir = getDataDir();
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Directory Monitor loop over " + dir.getAbsolutePath());
+                boolean ok;
                 try {
                     // Don't let this interfere with .torrent files being added or deleted
                     synchronized (_snarks) {
-                        monitorTorrents(dir);
+                        ok = monitorTorrents(dir);
                     }
                 } catch (Exception e) {
                     _log.error("Error in the DirectoryMonitor", e);
+                    ok = false;
                 }
                 if (doMagnets) {
                     // first run only
@@ -1963,10 +2041,14 @@ public class SnarkManager implements CompleteListener {
                         _log.error("Error in the DirectoryMonitor", e);
                     }
                     if (!_snarks.isEmpty())
-                        addMessage(_("Up bandwidth limit is {0} KBps", _util.getMaxUpBW()));
+                        addMessage(_t("Up bandwidth limit is {0} KBps", _util.getMaxUpBW()));
                     // To fix bug where files were left behind,
                     // but also good for when user removes snarks when i2p is not running
-                    cleanupTorrentStatus();
+                    // Don't run if there was an error, as we would delete the torrent config
+                    // file(s) and we don't want to do that. We'll do the cleanup the next
+                    // time i2psnark starts. See ticket #1658.
+                    if (ok)
+                        cleanupTorrentStatus();
                 }
                 try { Thread.sleep(60*1000); } catch (InterruptedException ie) {}
             }
@@ -1990,7 +2072,7 @@ public class SnarkManager implements CompleteListener {
             buf.append('/');
         buf.append("\">").append(base).append("</a>");
         if (snark.getDownloaded() > 0)
-            addMessageNoEscape(_("Download finished: {0}", buf.toString())); //  + " (" + _("size: {0}B", DataHelper.formatSize2(len)) + ')');
+            addMessageNoEscape(_t("Download finished: {0}", buf.toString())); //  + " (" + _t("size: {0}B", DataHelper.formatSize2(len)) + ')');
         updateStatus(snark);
     }
     
@@ -2045,11 +2127,11 @@ public class SnarkManager implements CompleteListener {
                 }
                 _magnets.remove(snark.getName());
                 removeMagnetStatus(snark.getInfoHash());
-                addMessage(_("Metainfo received for {0}", snark.getName()));
-                addMessage(_("Starting up torrent {0}", storage.getBaseName()));
+                addMessage(_t("Metainfo received for {0}", snark.getName()));
+                addMessage(_t("Starting up torrent {0}", storage.getBaseName()));
                 return name;
             } catch (IOException ioe) {
-                addMessage(_("Failed to copy torrent file to {0}", name));
+                addMessage(_t("Failed to copy torrent file to {0}", name));
                 _log.error("Failed to write torrent file", ioe);
             }
         }
@@ -2061,7 +2143,7 @@ public class SnarkManager implements CompleteListener {
      * @since 0.9
      */
     public void fatal(Snark snark, String error) {
-        addMessage(_("Error on torrent {0}", snark.getName()) + ": " + error);
+        addMessage(_t("Error on torrent {0}", snark.getName()) + ": " + error);
     }
     
     /**
@@ -2082,27 +2164,44 @@ public class SnarkManager implements CompleteListener {
 
     /**
      * Add all magnets from the config file
+     *
      * @since 0.8.4
      */
     private void addMagnets() {
-        for (Object o : _config.keySet()) {
-            String k = (String) o;
+        boolean changed = false;
+        for (Iterator iter = _config.keySet().iterator(); iter.hasNext(); ) {
+            String k = (String) iter.next();
             if (k.startsWith(PROP_META_MAGNET_PREFIX)) {
                 String b64 = k.substring(PROP_META_MAGNET_PREFIX.length());
                 b64 = b64.replace('$', '=');
                 byte[] ih = Base64.decode(b64);
                 // ignore value - TODO put tracker URL in value
-                if (ih != null && ih.length == 20)
-                    addMagnet(_("Magnet") + ' ' + I2PSnarkUtil.toHex(ih), ih, null, false);
-                // else remove from config?
+                if (ih != null && ih.length == 20) {
+                    Properties config = getConfig(ih);
+                    String name = config.getProperty(PROP_META_MAGNET_DN);
+                    if (name == null)
+                        name = _t("Magnet") + ' ' + I2PSnarkUtil.toHex(ih);
+                    String tracker = config.getProperty(PROP_META_MAGNET_TR);
+                    String dir = config.getProperty(PROP_META_MAGNET_DIR);
+                    File dirf = (dir != null) ? (new File(dir)) : null;
+                    addMagnet(name, ih, tracker, false, dirf);
+                } else {
+                    iter.remove();
+                    changed = true;
+                }
             }
         }
+        if (changed)
+            saveConfig();
     }
 
     /**
      *  caller must synchronize on _snarks
+     *
+     *  @return success, false if an error adding any torrent.
      */
-    private void monitorTorrents(File dir) {
+    private boolean monitorTorrents(File dir) {
+        boolean rv = true;
         String fileNames[] = dir.list(TorrentFilenameFilter.instance());
         List<String> foundNames = new ArrayList<String>(0);
         if (fileNames != null) {
@@ -2124,14 +2223,15 @@ public class SnarkManager implements CompleteListener {
                 // already known.  noop
             } else {
                 if (shouldAutoStart() && !_util.connect())
-                    addMessage(_("Unable to connect to I2P!"));
+                    addMessage(_t("Unable to connect to I2P!"));
                 try {
                     // Snark.fatal() throws a RuntimeException
                     // don't let one bad torrent kill the whole loop
                     addTorrent(name, null, !shouldAutoStart());
                 } catch (Exception e) {
-                    addMessage(_("Error: Could not add the torrent {0}", name) + ": " + e);
+                    addMessage(_t("Error: Could not add the torrent {0}", name) + ": " + e);
                     _log.error("Unable to add the torrent " + name, e);
+                    rv = false;
                 }
             }
         }
@@ -2152,20 +2252,21 @@ public class SnarkManager implements CompleteListener {
                 }
             }
         }
+        return rv;
     }
 
     /** translate */
-    private String _(String s) {
+    private String _t(String s) {
         return _util.getString(s);
     }
 
     /** translate */
-    private String _(String s, Object o) {
+    private String _t(String s, Object o) {
         return _util.getString(s, o);
     }
 
     /** translate */
-    private String _(String s, Object o, Object o2) {
+    private String _t(String s, Object o, Object o2) {
         return _util.getString(s, o, o2);
     }
 
@@ -2270,26 +2371,34 @@ public class SnarkManager implements CompleteListener {
     public void startTorrent(byte[] infoHash) {
         for (Snark snark : _snarks.values()) {
             if (DataHelper.eq(infoHash, snark.getInfoHash())) {
-                if (snark.isStarting() || !snark.isStopped()) {
-                    addMessage("Torrent already started");
-                    return;
-                }
-                boolean connected = _util.connected();
-                if ((!connected) && !_util.isConnecting())
-                    addMessage(_("Opening the I2P tunnel"));
-                addMessage(_("Starting up torrent {0}", snark.getBaseName()));
-                if (connected) {
-                    snark.startTorrent();
-                } else {
-                    // mark it for the UI
-                    snark.setStarting();
-                    (new I2PAppThread(new ThreadedStarter(snark), "TorrentStarter", true)).start();
-                    try { Thread.sleep(200); } catch (InterruptedException ie) {}
-                }
+                startTorrent(snark);
                 return;
             }
         }
         addMessage("Torrent not found?");
+    }
+
+    /**
+     *  If not connected, thread it, otherwise inline
+     *  @since 0.9.23
+     */
+    public void startTorrent(Snark snark) {
+        if (snark.isStarting() || !snark.isStopped()) {
+            addMessage("Torrent already started");
+            return;
+        }
+        boolean connected = _util.connected();
+        if ((!connected) && !_util.isConnecting())
+            addMessage(_t("Opening the I2P tunnel"));
+        addMessage(_t("Starting up torrent {0}", snark.getBaseName()));
+        if (connected) {
+            snark.startTorrent();
+        } else {
+            // mark it for the UI
+            snark.setStarting();
+            (new I2PAppThread(new ThreadedStarter(snark), "TorrentStarter", true)).start();
+            try { Thread.sleep(200); } catch (InterruptedException ie) {}
+        }
     }
 
     /**
@@ -2300,7 +2409,7 @@ public class SnarkManager implements CompleteListener {
         if (_util.connected()) {
             startAll();
         } else {
-            addMessage(_("Opening the I2P tunnel and starting all torrents."));
+            addMessage(_t("Opening the I2P tunnel and starting all torrents."));
             for (Snark snark : _snarks.values()) {
                 // mark it for the UI
                 snark.setStarting();
@@ -2363,7 +2472,7 @@ public class SnarkManager implements CompleteListener {
         for (Snark snark : _snarks.values()) {
             if (!snark.isStopped()) {
                 if (count == 0)
-                    addMessage(_("Stopping all torrents and closing the I2P tunnel."));
+                    addMessage(_t("Stopping all torrents and closing the I2P tunnel."));
                 count++;
                 if (finalShutdown)
                     snark.stopTorrent(true);
@@ -2382,14 +2491,14 @@ public class SnarkManager implements CompleteListener {
                 // Schedule this even for final shutdown, as there's a chance
                 // that it's just this webapp that is stopping.
                 _context.simpleTimer2().addEvent(new Disconnector(), 60*1000);
-                addMessage(_("Closing I2P tunnel after notifying trackers."));
+                addMessage(_t("Closing I2P tunnel after notifying trackers."));
                 if (finalShutdown) {
                     try { Thread.sleep(5*1000); } catch (InterruptedException ie) {}
                 }
             } else {
                 _util.disconnect();
                 _stopping = false;
-                addMessage(_("I2P tunnel closed."));
+                addMessage(_t("I2P tunnel closed."));
             }
         }
     }
@@ -2400,7 +2509,56 @@ public class SnarkManager implements CompleteListener {
             if (_util.connected()) {
                 _util.disconnect();
                 _stopping = false;
-                addMessage(_("I2P tunnel closed."));
+                addMessage(_t("I2P tunnel closed."));
+            }
+        }
+    }
+
+    /**
+     *  Threaded. Torrent must be stopped.
+     *  @since 0.9.23
+     */
+    public void recheckTorrent(Snark snark) {
+        if (snark.isStarting() || !snark.isStopped()) {
+            addMessage("Cannot check " + snark.getBaseName() + ", torrent already started");
+            return;
+        }
+        Storage storage = snark.getStorage();
+        if (storage == null) {
+            addMessage("Cannot check " + snark.getBaseName() + ", no storage");
+            return;
+        }
+        (new I2PAppThread(new ThreadedRechecker(snark), "TorrentRechecker", true)).start();
+        try { Thread.sleep(200); } catch (InterruptedException ie) {}
+    }
+
+    /**
+     *  @since 0.9.23
+     */
+    private class ThreadedRechecker implements Runnable {
+        private final Snark snark;
+        /** must have non-null storage */
+        public ThreadedRechecker(Snark s) { snark = s; }
+        public void run() {
+            try {
+                if (_log.shouldWarn())
+                    _log.warn("Starting recheck of " + snark.getBaseName());
+                boolean changed = snark.getStorage().recheck();
+                if (changed)
+                    updateStatus(snark);
+                if (_log.shouldWarn())
+                    _log.warn("Finished recheck of " + snark.getBaseName() + " changed? " + changed);
+                if (changed) {
+                    int pieces = snark.getPieces();
+                    double completion = (pieces - snark.getNeeded()) / (double) pieces;
+                    String complete = (new DecimalFormat("0.00%")).format(completion);
+                    addMessage(_t("Finished recheck of torrent {0}, now {1} complete", snark.getBaseName(), complete));
+                } else {
+                    addMessage(_t("Finished recheck of torrent {0}, unchanged", snark.getBaseName()));
+                }
+            } catch (Exception e) {
+                _log.error("Error rechecking " + snark.getBaseName(), e);
+                addMessage(_t("Error checking the torrent {0}", snark.getBaseName()) + ": " + e);
             }
         }
     }

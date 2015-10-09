@@ -1,3 +1,124 @@
+2015-10-08 zzz
+ * SimpleTimer2: Additional fix for uncaught IllegalStateException
+   affecting streaming timers (ticket #1672)
+
+2015-10-02 zzz
+ * Router: Don't check config files for reload on Android
+
+2015-09-28 zzz
+ * Addressbook: Fix isValidDest() for EC/Ed dests
+ * i2psnark: Support adding plain base 32 hashes
+ * Susimail: Hide headers and buttons if search results are empty
+
+2015-09-27 dg
+ * Router: Fix soft restarts for 'massive' clock jumps (over +150s or -61s) and recover from standby
+   and hibernate (ticket #1014).
+
+2015-09-27 zzz
+ * Console:
+   - Export SSL cert on creation
+   - New /certs page to show local SSL certs
+   - Show 'none' if no leasesets
+ * SimpleTimer2: Fix bug in forceReschedule() that caused subsequent uncaught IllegalStateException,
+   affected streaming timers
+ * Streaming: Move throttler from context timer to streaming timer
+ * Tunnels: Use max of 2 not-failing peers in an exploratory tunnel,
+   use high cap for the rest; change outbound exploratory
+   default length from 2 + 0-1 to 3+0.
+ * Util: Speed up IP address validation by using Apache's implementation (ticket #1198)
+
+2015-09-25 dg
+ * Rename _() for translation to _t() for Java 9 compatibility (ticket #1456)
+
+2015-09-20 dg
+ * /configreseed: Add 'Reset URL list' button for revert to default hosts (ticket #1554, thanks dzirtt@gmail.com)
+
+2015-09-19 zzz
+ * i2psnark: Add recheck/start/stop buttons to details page (ticket #372)
+
+2015-09-18 zzz
+ * EepGet:
+   - Send Accept-Encoding: gzip even when proxied
+   - Fix man page (ticket #1631)
+ * i2psnark:
+   - Don't display "Tracker Error" if torrent is stopped (ticket #1654)
+   - Improve directory listing efficiency (ticket #1079)
+ * i2ptunnel:
+   - Pass Accept-Encoding header through HTTP client and server proxies,
+     to allow end-to-end compression
+   - Don't do transparent response compression if response
+     Content-Encoding indicates it is already compressed
+ * Streaming: Move remaining timers from the context to streaming's SimpleTimer2
+
+2015-09-17 zzz
+ * i2psnark:
+   - Store magnet parameters across restart (ticket #1485)
+   - Don't delete torrent config file after error on initial startup (tickets #1575, #1658)
+
+2015-09-16 zzz
+ * Build:
+   - Include geoip in update files for next release
+   - Add created-by string to release torrents
+ * i2psnark:
+   - Store torrent added and completed times in config files, display on details page
+   - Add metainfo creation command line support for created-by string
+ * Profiles: Bias slightly away from floodfills
+
+2015-09-15 zzz
+ * Console:
+   - Store news feed items separately on disk in XML, like a real feed reader
+   - Limit display to 2 news items in summary bar, /home and /console
+   - New /news page to show all news (ticket #1425)
+
+* 2015-09-12 0.9.22 released
+
+2015-09-11 kytv
+ * Updates to geoip.txt and geoipv6.dat.gz based on Maxmind GeoLite Country
+   database from 2015-09-02.
+ * Translation updates pulled from Transifex
+
+2015-09-04 zzz
+ * UPnP: Fix "content not allowed in trailing section"
+   (tickets #481, #1653)
+
+2015-08-31 zzz
+ * Data: Cache P256 and Ed255i9 key certificates
+ * i2psnark: Change default sig type to Ed25519
+
+2015-08-29 zzz
+ * Router:
+   - Change default RI sig type to Ed25519, with a 10% chance od
+     rekeying from DSA at each restart
+   - Don't initialize KeyManager before selecting sig type
+   - Don't log KeyManager error when changing sig type
+
+2015-08-25 zzz
+ * i2psnark:
+   - Return partial piece to coordinator after reject
+   - Fix tracking of downloaded portion of piece after reject
+   - Send reject on receipt of bad request
+   - Mark piece unrequested after receiving bad data, so it
+     will be requested again, but not from the same peer
+   - Fix NPE in Request constructor on error
+   - Fix stuck before completion due to reject handling (ticket #1633)
+   - Fix orphaned temp files due to reject handling (ticket #1635)
+
+2015-08-02 zzz
+ * Console: Fix SSL excluded ciphers (thx lazyg)
+ * SU3File: Add keystore password command line option
+
+* 2015-07-31 0.9.21 released
+
+2015-07-27 zzz
+ * Update: Fix processing of translated news su3 files
+
+2015-07-26 zzz
+ * Update translations
+
+2015-07-25 zzz
+ * i2psnark: Fix total_size in metadata message (ticket #1618)
+ * NetDB: Fix NPE (ticket #1619)
+
 2015-07-21 str4d
  * Core: Throw DFE in Certificate.create() instead of AIOOBE (ticket #1016)
 

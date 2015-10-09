@@ -4,6 +4,8 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Map;
 
+import org.apache.http.conn.util.InetAddressUtils;
+
 import net.i2p.data.Base64;
 import net.i2p.data.router.RouterAddress;
 import net.i2p.data.SessionKey;
@@ -262,12 +264,9 @@ class UDPAddress {
         }
         if (rv == null) {
             try {
-                boolean isIPv4 = host.replaceAll("[0-9\\.]", "").length() == 0;
-                if (isIPv4 && host.replaceAll("[0-9]", "").length() != 3)
-                    return null;
                 rv = InetAddress.getByName(host);
-                if (isIPv4 ||
-                    host.replaceAll("[0-9a-fA-F:]", "").length() == 0) {
+                if (InetAddressUtils.isIPv4Address(host) ||
+                    InetAddressUtils.isIPv6Address(host)) {
                     synchronized (_inetAddressCache) {
                         _inetAddressCache.put(host, rv);
                     }

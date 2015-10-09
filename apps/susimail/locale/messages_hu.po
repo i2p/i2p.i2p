@@ -348,16 +348,16 @@ msgstr "Új"
 
 #. In theory, these are valid and will apply to the first checked message,
 #. but that's not obvious and did it work?
-#. button( REPLY, _("Reply") ) +
-#. button( REPLYALL, _("Reply All") ) +
-#. button( FORWARD, _("Forward") ) + spacer +
-#. button( DELETE, _("Delete") ) + spacer +
+#. button( REPLY, _t("Reply") ) +
+#. button( REPLYALL, _t("Reply All") ) +
+#. button( FORWARD, _t("Forward") ) + spacer +
+#. button( DELETE, _t("Delete") ) + spacer +
 #: src/src/i2p/susi/webmail/WebMail.java:2186
 msgid "Check Mail"
 msgstr "Új Levelek Ellenőrzése"
 
 #. if (Config.hasConfigFile())
-#. out.println(button( RELOAD, _("Reload Config") ) + spacer);
+#. out.println(button( RELOAD, _t("Reload Config") ) + spacer);
 #: src/src/i2p/susi/webmail/WebMail.java:2189
 msgid "Logout"
 msgstr "Kijelentkezés"

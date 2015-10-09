@@ -345,17 +345,17 @@ Debian wrapper.config to try to prevent confusion.
 @@ -195,15 +195,15 @@
  msgstr "Falls gestartet, fordere einen Java Thread dump an"
  
- #: ../i2prouter:1807
+ #: ../i2prouter:1864
 -msgid "Please edit i2prouter and set the variable RUN_AS_USER"
 -msgstr "Bitte bearbeite i2prouter und setze die Variable RUN_AS_USER"
 +msgid "Please edit /etc/default/i2p and set the variable RUN_AS_USER"
 +msgstr "Bitte bearbeite /etc/default/i2p und setze die Variable RUN_AS_USER"
  
- #: ../i2prouter:1812
+ #: ../i2prouter:1869
  msgid "Running I2P as the root user is *not* recommended."
  msgstr "I2P als root Benutzer auszuführen ist *nicht* empfehlenswert."
  
- #: ../i2prouter:1815
+ #: ../i2prouter:1872
 -msgid "To run as root anyway, edit i2prouter and set ALLOW_ROOT=true."
 +msgid "To run as root anyway, edit /etc/default/i2p and set ALLOW_ROOT=true."
  msgstr ""
@@ -367,16 +367,16 @@ Debian wrapper.config to try to prevent confusion.
 @@ -185,7 +185,7 @@
  msgstr ""
  
- #: ../i2prouter:1825
+ #: ../i2prouter:1864
 -msgid "Please edit i2prouter and set the variable RUN_AS_USER"
 +msgid "Please edit /etc/default/i2p and set the variable RUN_AS_USER"
  msgstr ""
  
- #: ../i2prouter:1830
+ #: ../i2prouter:1869
 @@ -193,5 +193,5 @@
  msgstr ""
  
- #: ../i2prouter:1833
+ #: ../i2prouter:1872
 -msgid "To run as root anyway, edit i2prouter and set ALLOW_ROOT=true."
 +msgid "To run as root anyway, edit /etc/default/i2p and set ALLOW_ROOT=true."
  msgstr ""
@@ -385,16 +385,16 @@ Debian wrapper.config to try to prevent confusion.
 @@ -187,7 +187,7 @@
  msgstr ""
  
- #: ../i2prouter:1807
+ #: ../i2prouter:1864
 -msgid "Please edit i2prouter and set the variable RUN_AS_USER"
 +msgid "Please edit /etc/default/i2p and set the variable RUN_AS_USER"
  msgstr ""
  
- #: ../i2prouter:1812
+ #: ../i2prouter:1869
 @@ -195,5 +195,5 @@
  msgstr ""
  
- #: ../i2prouter:1815
+ #: ../i2prouter:1872
 -msgid "To run as root anyway, edit i2prouter and set ALLOW_ROOT=true."
 +msgid "To run as root anyway, edit /etc/default/i2p and set ALLOW_ROOT=true."
  msgstr ""
@@ -403,57 +403,59 @@ Debian wrapper.config to try to prevent confusion.
 @@ -187,13 +187,13 @@
  msgstr "请求Java转储(如果在运行)。"
  
- #: ../i2prouter:1807
+ #: ../i2prouter:1864
 -msgid "Please edit i2prouter and set the variable RUN_AS_USER"
 -msgstr "请编辑 i2prouter 设置 RUN_AS_USER 变量"
 +msgid "Please edit /etc/default/i2p and set the variable RUN_AS_USER"
 +msgstr "请编辑 /etc/default/i2p 设置 RUN_AS_USER 变量"
  
- #: ../i2prouter:1812
+ #: ../i2prouter:1869
  msgid "Running I2P as the root user is *not* recommended."
  msgstr "推荐 *不要* 以 root 身份运行 I2P 。"
  
- #: ../i2prouter:1815
+ #: ../i2prouter:1872
 -msgid "To run as root anyway, edit i2prouter and set ALLOW_ROOT=true."
 -msgstr "要以root运行，请编辑 i2prouter 并设置 ALLOW_ROOT=true。"
 +msgid "To run as root anyway, edit /etc/default/i2p and set ALLOW_ROOT=true."
 +msgstr "要以root运行，请编辑 /etc/default/i2p 并设置 ALLOW_ROOT=true。"
 --- a/installer/resources/locale/po/messages_tr.po
 +++ b/installer/resources/locale/po/messages_tr.po
-@@ -186,13 +186,13 @@
+@@ -188,15 +188,15 @@
  msgstr "Çalışıyorsa Java iş parçacığı dökümü isteyin."
  
- #: ../i2prouter:1796
+ #: ../i2prouter:1864
 -msgid "Please edit i2prouter and set the variable RUN_AS_USER"
 -msgstr "i2prouter dosyasını düzenleyin ve RUN_AS_USER değişkenini ayarlayın"
 +msgid "Please edit /etc/default/i2p and set the variable RUN_AS_USER"
 +msgstr "/etc/default/i2p dosyasını düzenleyin ve RUN_AS_USER değişkenini ayarlayın"
  
- #: ../i2prouter:1801
+ #: ../i2prouter:1869
  msgid "Running I2P as the root user is *not* recommended."
  msgstr "I2P yazılımının root olarak çalıştırmanız *önerilmez*."
  
- #: ../i2prouter:1804
+ #: ../i2prouter:1872
 -msgid "To run as root anyway, edit i2prouter and set ALLOW_ROOT=true."
--msgstr "Root olarak çalıştırmak için i2prouter dosyasını düzenleyin ve ALLOW_ROOT=true ayarını yapın."
-+msgid "To run as root anyway, edit /etc/defalt/i2p and set ALLOW_ROOT=true."
-+msgstr "Root olarak çalıştırmak için /etc/default/i2p dosyasını düzenleyin ve ALLOW_ROOT=true ayarını yapın."
++msgid "To run as root anyway, edit /etc/default/i2p and set ALLOW_ROOT=true."
+ msgstr ""
+-"Root olarak çalıştırmak için i2prouter dosyasını düzenleyin ve "
++"Root olarak çalıştırmak için /etc/default/i2p dosyasını düzenleyin ve "
+ "ALLOW_ROOT=true ayarını yapın."
 --- a/installer/resources/locale/po/messages_es.po
 +++ b/installer/resources/locale/po/messages_es.po
 @@ -193,15 +193,15 @@
  msgstr "Solicitar un volcado del hilo JAVA si se está ejecutando."
  
- #: ../i2prouter:1807
+ #: ../i2prouter:1864
 -msgid "Please edit i2prouter and set the variable RUN_AS_USER"
 -msgstr "Por favor edite i2prouter e introduzca la variable RUN_AS_USER"
 +msgid "Please edit /etc/default/i2p and set the variable RUN_AS_USER"
 +msgstr "Por favor edite /etc/default/i2p e introduzca la variable RUN_AS_USER"
  
- #: ../i2prouter:1812
+ #: ../i2prouter:1869
  msgid "Running I2P as the root user is *not* recommended."
  msgstr "\"No\" se recomienda ejecutar I2P como root."
  
- #: ../i2prouter:1815
+ #: ../i2prouter:1872
 -msgid "To run as root anyway, edit i2prouter and set ALLOW_ROOT=true."
 +msgid "To run as root anyway, edit /etc/default/i2p and set ALLOW_ROOT=true."
  msgstr ""
@@ -465,17 +467,17 @@ Debian wrapper.config to try to prevent confusion.
 @@ -189,15 +189,15 @@
  msgstr "Requisitar o histórico Java se iniciado."
  
- #: ../i2prouter:1796
+ #: ../i2prouter:1864
 -msgid "Please edit i2prouter and set the variable RUN_AS_USER"
 -msgstr "Favor editar o arquivo i2prouter e configurar a variável RUN_AS_USER"
 +msgid "Please edit /etc/default/i2p and set the variable RUN_AS_USER"
 +msgstr "Favor editar o arquivo /etc/default/i2p e configurar a variável RUN_AS_USER"
  
- #: ../i2prouter:1801
+ #: ../i2prouter:1869
  msgid "Running I2P as the root user is *not* recommended."
  msgstr "Iniciar I2P como permissões root *não* é recomendado."
  
- #: ../i2prouter:1804
+ #: ../i2prouter:1872
 -msgid "To run as root anyway, edit i2prouter and set ALLOW_ROOT=true."
 +msgid "To run as root anyway, edit /etc/default/i2p and set ALLOW_ROOT=true."
  msgstr ""
@@ -487,18 +489,18 @@ Debian wrapper.config to try to prevent confusion.
 @@ -190,8 +190,8 @@
  msgstr "Request a Java thread dump if running."
  
- #: ../i2prouter:1807
+ #: ../i2prouter:1864
 -msgid "Please edit i2prouter and set the variable RUN_AS_USER"
 -msgstr "Veuillez éditer i2prouter et paramétrer la variable RUN_AS_USER"
 +msgid "Please edit /etc/default/i2p and set the variable RUN_AS_USER"
 +msgstr "Veuillez éditer /etc/default/i2p et paramétrer la variable RUN_AS_USER"
  
- #: ../i2prouter:1812
+ #: ../i2prouter:1869
  msgid "Running I2P as the root user is *not* recommended."
 @@ -199,7 +199,7 @@
  "Faire fonctionner I2P en tant qu'utilisateur root n'est *pas* recommandé."
  
- #: ../i2prouter:1815
+ #: ../i2prouter:1872
 -msgid "To run as root anyway, edit i2prouter and set ALLOW_ROOT=true."
 +msgid "To run as root anyway, edit /etc/default/i2p and set ALLOW_ROOT=true."
  msgstr ""
@@ -507,40 +509,43 @@ Debian wrapper.config to try to prevent confusion.
  "ALLOW_ROOT=true."
 --- a/installer/resources/locale/po/messages_ru.po
 +++ b/installer/resources/locale/po/messages_ru.po
-@@ -191,13 +191,13 @@
+@@ -193,16 +193,16 @@
  msgstr "Запросить дамп нитей Java, если запущено."
  
- #: ../i2prouter:1807
+ #: ../i2prouter:1864
 -msgid "Please edit i2prouter and set the variable RUN_AS_USER"
--msgstr "Пожалуйста, отредактируйте i2prouter и установите переменную RUN_AS_USER"
 +msgid "Please edit /etc/default/i2p and set the variable RUN_AS_USER"
-+msgstr "Пожалуйста, отредактируйте /etc/default/i2p и установите переменную RUN_AS_USER"
+ msgstr ""
+-"Пожалуйста, отредактируйте i2prouter и установите переменную RUN_AS_USER"
++"Пожалуйста, отредактируйте /etc/default/i2p и установите переменную RUN_AS_USER"
  
- #: ../i2prouter:1812
+ #: ../i2prouter:1869
  msgid "Running I2P as the root user is *not* recommended."
  msgstr "Запускать I2P от имени root'а *НЕ* рекомендуется."
  
- #: ../i2prouter:1815
+ #: ../i2prouter:1872
 -msgid "To run as root anyway, edit i2prouter and set ALLOW_ROOT=true."
--msgstr "Чтобы всё равно запустить под root'ом, отредактируйте i2prouter и установите ALLOW_ROOT=true."
 +msgid "To run as root anyway, edit /etc/default/i2p and set ALLOW_ROOT=true."
-+msgstr "Чтобы всё равно запустить под root'ом, отредактируйте /etc/default/i2p и установите ALLOW_ROOT=true."
+ msgstr ""
+-"Чтобы всё равно запустить под root'ом, отредактируйте i2prouter и установите "
++"Чтобы всё равно запустить под root'ом, отредактируйте /etc/default/i2p и установите "
+ "ALLOW_ROOT=true."
 --- a/installer/resources/locale/po/messages_sv.po
 +++ b/installer/resources/locale/po/messages_sv.po
 @@ -187,14 +187,14 @@
  msgstr "Fråga efter en Java thread dump vid drift."
  
- #: ../i2prouter:1807
+ #: ../i2prouter:1864
 -msgid "Please edit i2prouter and set the variable RUN_AS_USER"
 -msgstr "Var god ändra i2prouter och set variabeln RUN_AS_USER"
 +msgid "Please edit /etc/default/i2p and set the variable RUN_AS_USER"
 +msgstr "Var god ändra /etc/default/i2p och set variabeln RUN_AS_USER"
  
- #: ../i2prouter:1812
+ #: ../i2prouter:1869
  msgid "Running I2P as the root user is *not* recommended."
  msgstr "Att köra I2P som användare root är *inte* rekommenderat."
  
- #: ../i2prouter:1815
+ #: ../i2prouter:1872
 -msgid "To run as root anyway, edit i2prouter and set ALLOW_ROOT=true."
 +msgid "To run as root anyway, edit /etc/default/i2p and set ALLOW_ROOT=true."
  msgstr ""
@@ -551,17 +556,17 @@ Debian wrapper.config to try to prevent confusion.
 @@ -187,15 +187,15 @@
  msgstr "Solicitarea dump-ului firului Java daca este pornit"
  
- #: ../i2prouter:1807
+ #: ../i2prouter:1864
 -msgid "Please edit i2prouter and set the variable RUN_AS_USER"
 -msgstr "Vă rugăm să editați i2prouter și setați variabila RUN_AS_USER "
 +msgid "Please edit /etc/default/i2p and set the variable RUN_AS_USER"
 +msgstr "Vă rugăm să editați /etc/default/i2p și setați variabila RUN_AS_USER "
  
- #: ../i2prouter:1812
+ #: ../i2prouter:1869
  msgid "Running I2P as the root user is *not* recommended."
  msgstr "Rularea I2P ca root *nu* este recomandată."
  
- #: ../i2prouter:1815
+ #: ../i2prouter:1872
 -msgid "To run as root anyway, edit i2prouter and set ALLOW_ROOT=true."
 +msgid "To run as root anyway, edit /etc/default/i2p and set ALLOW_ROOT=true."
  msgstr ""
@@ -570,81 +575,87 @@ Debian wrapper.config to try to prevent confusion.
  "true."
 --- a/installer/resources/locale/po/messages_pt_BR.po
 +++ b/installer/resources/locale/po/messages_pt_BR.po
-@@ -187,13 +187,13 @@
- msgstr ""
+@@ -190,15 +190,15 @@
+ msgstr "Solicitar um despejo de thread se está sendo executado."
  
- #: ../i2prouter:1807
+ #: ../i2prouter:1864
 -msgid "Please edit i2prouter and set the variable RUN_AS_USER"
 -msgstr "Por favor, edite i2prouter e especifique a variável RUN_AS_USER"
 +msgid "Please edit /etc/default/i2p and set the variable RUN_AS_USER"
 +msgstr "Por favor, edite /etc/default/i2p e especifique a variável RUN_AS_USER"
  
- #: ../i2prouter:1812
+ #: ../i2prouter:1869
  msgid "Running I2P as the root user is *not* recommended."
  msgstr "Executar o roteador I2P como usuário root *não* é recomendado."
  
- #: ../i2prouter:1815
+ #: ../i2prouter:1872
 -msgid "To run as root anyway, edit i2prouter and set ALLOW_ROOT=true."
--msgstr "De qualquer forma, se quiser mesmo executar o roteador como root, edite i2prouter e ponha ALLOW_ROOT=true."
 +msgid "To run as root anyway, edit /etc/default/i2p and set ALLOW_ROOT=true."
-+msgstr "De qualquer forma, se quiser mesmo executar o roteador como root, edite /etc/default/i2p e ponha ALLOW_ROOT=true."
+ msgstr ""
+ "De qualquer forma, se quiser mesmo executar o roteador como root, edite "
+-"i2prouter e ponha ALLOW_ROOT=true."
++"/etc/default/i2p e ponha ALLOW_ROOT=true."
 --- a/installer/resources/locale/po/messages_pl.po
 +++ b/installer/resources/locale/po/messages_pl.po
-@@ -186,13 +186,13 @@
+@@ -191,13 +191,13 @@
  msgstr "Zażądaj zrzutu wątków Java jeśli jest uruchomiona."
  
- #: ../i2prouter:1807
+ #: ../i2prouter:1864
 -msgid "Please edit i2prouter and set the variable RUN_AS_USER"
 -msgstr "Proszę edytuj i2prouter i ustaw zmienną RUN_AS_USER"
 +msgid "Please edit /etc/default/i2p and set the variable RUN_AS_USER"
 +msgstr "Proszę edytuj /etc/default/i2p i ustaw zmienną RUN_AS_USER"
  
- #: ../i2prouter:1812
+ #: ../i2prouter:1869
  msgid "Running I2P as the root user is *not* recommended."
  msgstr "Nie jest polecane uruchamianie I2P jako root."
  
- #: ../i2prouter:1815
+ #: ../i2prouter:1872
 -msgid "To run as root anyway, edit i2prouter and set ALLOW_ROOT=true."
 -msgstr "Aby uruchomić jako root, edytuj i2prouter i ustaw ALLOW_ROOT=true."
 +msgid "To run as root anyway, edit /etc/default/i2p and set ALLOW_ROOT=true."
 +msgstr "Aby uruchomić jako root, edytuj /etc/default/i2p i ustaw ALLOW_ROOT=true."
 --- a/installer/resources/locale/po/messages_ja.po
 +++ b/installer/resources/locale/po/messages_ja.po
-@@ -186,13 +186,13 @@
+@@ -189,15 +189,15 @@
  msgstr "起動中の場合、 Java スレッドダンプを要求"
  
- #: ../i2prouter:1807
+ #: ../i2prouter:1864
 -msgid "Please edit i2prouter and set the variable RUN_AS_USER"
 -msgstr "i2prouter を編集して、変数 RUN_AS_USER を設定してください"
 +msgid "Please edit /etc/default/i2p and set the variable RUN_AS_USER"
 +msgstr "/etc/default/i2p を編集して、変数 RUN_AS_USER を設定してください"
  
- #: ../i2prouter:1812
+ #: ../i2prouter:1869
  msgid "Running I2P as the root user is *not* recommended."
  msgstr "root ユーザーとしての I2P の起動は推奨され*ません*。"
  
- #: ../i2prouter:1815
+ #: ../i2prouter:1872
 -msgid "To run as root anyway, edit i2prouter and set ALLOW_ROOT=true."
--msgstr "とにかく root として起動し、 i2prouter を編集して、ALLOW_ROOT=true と設定する。"
 +msgid "To run as root anyway, edit /etc/default/i2p and set ALLOW_ROOT=true."
-+msgstr "とにかく root として起動し、/etc/default/i2p を編集して、ALLOW_ROOT=true と設定する。"
+ msgstr ""
+-"とにかく root として起動し、 i2prouter を編集して、ALLOW_ROOT=true と設定す"
++"とにかく root として起動し、 /etc/default/i2p を編集して、ALLOW_ROOT=true と設定す"
+ "る。"
 --- a/installer/resources/locale/po/messages_sk.po
 +++ b/installer/resources/locale/po/messages_sk.po
-@@ -187,13 +187,13 @@
+@@ -189,15 +189,15 @@
  msgstr "Vyžiadať zrušenie vlákna Javy, ak je spustený."
  
- #: ../i2prouter:1807
+ #: ../i2prouter:1864
 -msgid "Please edit i2prouter and set the variable RUN_AS_USER"
 -msgstr "Prosím upravte i2prouter a nastavte premennú RUN_AS_USER"
 +msgid "Please edit /etc/default/i2p and set the variable RUN_AS_USER"
 +msgstr "Prosím upravte /etc/default/i2p a nastavte premennú RUN_AS_USER"
  
- #: ../i2prouter:1812
+ #: ../i2prouter:1869
  msgid "Running I2P as the root user is *not* recommended."
  msgstr "Spúšťať I2P ako root *nie* je odporúčané."
  
- #: ../i2prouter:1815
+ #: ../i2prouter:1872
 -msgid "To run as root anyway, edit i2prouter and set ALLOW_ROOT=true."
--msgstr "Ak ho chcete spustiť ako root aj tak, upravte i2prouter a nastavte ALLOW_ROOT=true."
 +msgid "To run as root anyway, edit /etc/default/i2p and set ALLOW_ROOT=true."
-+msgstr "Ak ho chcete spustiť ako root aj tak, upravte /etc/default/i2p a nastavte ALLOW_ROOT=true."
+ msgstr ""
+-"Ak ho chcete spustiť ako root aj tak, upravte i2prouter a nastavte "
++"Ak ho chcete spustiť ako root aj tak, upravte /etc/default/i2p a nastavte "
+ "ALLOW_ROOT=true."

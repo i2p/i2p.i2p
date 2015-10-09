@@ -110,6 +110,16 @@ class LoadRouterInfoJob extends JobImpl {
                 // check if the sigtype config changed
                 SigType cstype = CreateRouterInfoJob.getSigTypeConfig(getContext());
                 boolean sigTypeChanged = stype != cstype;
+                if (sigTypeChanged && getContext().getProperty(CreateRouterInfoJob.PROP_ROUTER_SIGTYPE) == null) {
+                    // Not explicitly configured, and default has changed
+                    // Give a 10% chance of rekeying for each restart
+                    // TODO reduce from 20 to ~3 (i.e. increase probability) in future release
+                    if (getContext().random().nextInt(20) > 0) {
+                        sigTypeChanged = false;
+                        if (_log.shouldWarn())
+                            _log.warn("Deferring RI rekey from " + stype + " to " + cstype);
+                    }
+                }
 
                 if (sigTypeChanged || shouldRebuild(privkey)) {
                     if (sigTypeChanged)
