@@ -522,6 +522,7 @@ public class JobQueue {
             _context.clock().addUpdateListener(this);
             ((RouterClock) _context.clock()).addShiftListener(this);
         }
+
         public void run() {
             try {
                 while (_alive) {
@@ -591,10 +592,11 @@ public class JobQueue {
                     } catch (InterruptedException ie) {}
                 } // while (_alive)
             } catch (Throwable t) {
-                _context.clock().removeUpdateListener(this);
-                ((RouterClock) _context.clock()).removeShiftListener(this);
                 if (_log.shouldLog(Log.ERROR))
                     _log.error("pumper killed?!", t);
+            } finally {
+                _context.clock().removeUpdateListener(this);
+                ((RouterClock) _context.clock()).removeShiftListener(this);
             }
         }
 
@@ -605,8 +607,20 @@ public class JobQueue {
             }
         }
 
+        /**
+         *  Clock shift listener.
+         *  Only adjust timings for negative shifts.
+         *  For positive shifts, just wake up the pumper.
+         *  @since 0.9.23
+         */
         public void clockShift(long delta) {
-            offsetChanged(delta);
+            if (delta < 0) {
+                offsetChanged(delta);
+            } else {
+                synchronized (_jobLock) {
+                    _jobLock.notifyAll();
+                }
+            }
         }
 
     }
