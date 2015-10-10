@@ -299,12 +299,12 @@ public class RouterConsoleRunner implements RouterApp {
             log.logAlways(net.i2p.util.Log.WARN, s);
             System.out.println("Warning: " + s);
             if (noJava7) {
-                s = "Java 7 will be required by mid-2015, please upgrade soon";
+                s = "Java 7 will be required by late 2015, please upgrade soon";
                 log.logAlways(net.i2p.util.Log.WARN, s);
                 System.out.println("Warning: " + s);
             }
             if (noPack200) {
-                s = "Pack200 will be required by mid-2015, please upgrade Java soon";
+                s = "Pack200 will be required by late 2015, please upgrade Java soon";
                 log.logAlways(net.i2p.util.Log.WARN, s);
                 System.out.println("Warning: " + s);
             }
