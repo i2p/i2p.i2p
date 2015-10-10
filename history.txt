@@ -1,3 +1,9 @@
+2015-10-10 zzz
+ * i2psnark: Increase max piece size to 16 MB, max files to 999,
+   close files faster based on file count (tickets #1626, #1671)
+ * JobQueue: Only adjust timing for negative clock shifts
+ * NamingServices: Add support for lookups prefixed with "www."
+
 2015-10-08 zzz
  * SimpleTimer2: Additional fix for uncaught IllegalStateException
    affecting streaming timers (ticket #1672)
@@ -29,6 +35,9 @@
 
 2015-09-25 dg
  * Rename _() for translation to _t() for Java 9 compatibility (ticket #1456)
+
+2015-09-24 zzz
+  - Rename bad .torrent files instead of deleting them
 
 2015-09-20 dg
  * /configreseed: Add 'Reset URL list' button for revert to default hosts (ticket #1554, thanks dzirtt@gmail.com)

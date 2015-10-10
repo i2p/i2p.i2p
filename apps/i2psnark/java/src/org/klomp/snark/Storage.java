@@ -78,7 +78,7 @@ public class Storage implements Closeable
   /** The default piece size. */
   private static final int DEFAULT_PIECE_SIZE = 256*1024;
   /** bigger than this will be rejected */
-  public static final int MAX_PIECE_SIZE = 8*1024*1024;
+  public static final int MAX_PIECE_SIZE = 16*1024*1024;
   /** The maximum number of pieces in a torrent. */
   public static final int MAX_PIECES = 10*1024;
   public static final long MAX_TOTAL_SIZE = MAX_PIECE_SIZE * (long) MAX_PIECES;
@@ -820,6 +820,14 @@ public class Storage implements Closeable
   }
 
   /**
+   *  Does not include directories.
+   *  @since 0.9.23
+   */
+  public int getFileCount() {
+      return _torrentFiles.size();
+  }
+
+  /**
    *  Includes the base for a multi-file torrent.
    *  Sorted bottom-up for easy deletion.
    *  Slow. Use for deletion only.
@@ -958,11 +966,9 @@ public class Storage implements Closeable
             pieceEnd += length;
             while (fileEnd <= pieceEnd) {
                 TorrentFile tf = _torrentFiles.get(file);
-                synchronized(tf) {
-                    try {
-                        tf.closeRAF();
-                    } catch (IOException ioe) {}
-                }
+                try {
+                    tf.closeRAF();
+                } catch (IOException ioe) {}
                 if (++file >= _torrentFiles.size())
                     break;
                 fileEnd += _torrentFiles.get(file).length;
@@ -1035,9 +1041,7 @@ public class Storage implements Closeable
     for (TorrentFile tf : _torrentFiles)
       {
         try {
-          synchronized(tf) {
             tf.closeRAF();
-          }
         } catch (IOException ioe) {
             _log.error("Error closing " + tf, ioe);
             // gobble gobble
@@ -1262,17 +1266,15 @@ public class Storage implements Closeable
     return length;
   }
 
-  private static final long RAFCloseDelay = 4*60*1000;
+  private static final long RAF_CLOSE_DELAY = 4*60*1000;
 
   /**
    * Close unused RAFs - call periodically
    */
   public void cleanRAFs() {
-    long cutoff = System.currentTimeMillis() - RAFCloseDelay;
+    long cutoff = System.currentTimeMillis() - RAF_CLOSE_DELAY;
     for (TorrentFile tf : _torrentFiles) {
-      synchronized(tf) {
          tf.closeRAF(cutoff);
-      }
     }
   }
 

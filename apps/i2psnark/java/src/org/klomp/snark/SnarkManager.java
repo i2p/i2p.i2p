@@ -1092,7 +1092,7 @@ public class SnarkManager implements CompleteListener {
     }
     
     /** hardcoded for sanity.  perhaps this should be customizable, for people who increase their ulimit, etc. */
-    public static final int MAX_FILES_PER_TORRENT = 512;
+    public static final int MAX_FILES_PER_TORRENT = 999;
     
     /**
      *  Set of canonical .torrent filenames that we are dealing with.
