@@ -621,11 +621,33 @@ public class BlockfileNamingService extends DummyNamingService {
     ////////// Start NamingService API
 
     /*
+     *
+     * Will strip a "www." prefix and retry if lookup fails
+     *
+     * @param hostname upper/lower case ok
      * @param options If non-null and contains the key "list", lookup in
      *                that list only, otherwise all lists
      */
     @Override
     public Destination lookup(String hostname, Properties lookupOptions, Properties storedOptions) {
+        Destination rv = lookup2(hostname, lookupOptions, storedOptions);
+        if (rv == null) {
+            // if hostname starts with "www.", strip and try again
+            // but not for www.i2p
+            hostname = hostname.toLowerCase(Locale.US);
+            if (hostname.startsWith("www.") && hostname.length() > 7) {
+                hostname = hostname.substring(4);
+                rv = lookup2(hostname, lookupOptions, storedOptions);
+            }
+        }
+        return rv;
+    }
+
+    /*
+     * @param options If non-null and contains the key "list", lookup in
+     *                that list only, otherwise all lists
+     */
+    private Destination lookup2(String hostname, Properties lookupOptions, Properties storedOptions) {
         String listname = null;
         if (lookupOptions != null)
             listname = lookupOptions.getProperty("list");
