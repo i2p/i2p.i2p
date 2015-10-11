@@ -18,6 +18,8 @@ public abstract class SystemVersion {
     private static final boolean _isArm = System.getProperty("os.arch").startsWith("arm");
     private static final boolean _isX86 = System.getProperty("os.arch").contains("86") ||
                                           System.getProperty("os.arch").equals("amd64");
+    private static final boolean _isGentoo = System.getProperty("os.version").contains("gentoo") ||
+                                             System.getProperty("os.version").contains("hardened");  // Funtoo
     private static final boolean _isAndroid;
     private static final boolean _isApache;
     private static final boolean _isGNU;
@@ -27,6 +29,7 @@ public abstract class SystemVersion {
     private static final boolean _oneDotSix;
     private static final boolean _oneDotSeven;
     private static final boolean _oneDotEight;
+    private static final boolean _oneDotNine;
     private static final int _androidSDK;
 
     static {
@@ -62,10 +65,12 @@ public abstract class SystemVersion {
             _oneDotSix = _androidSDK >= 9;
             _oneDotSeven = _androidSDK >= 19;
             _oneDotEight = false;
+            _oneDotNine = false;
         } else {
             _oneDotSix = VersionComparator.comp(System.getProperty("java.version"), "1.6") >= 0;
             _oneDotSeven = _oneDotSix && VersionComparator.comp(System.getProperty("java.version"), "1.7") >= 0;
             _oneDotEight = _oneDotSeven && VersionComparator.comp(System.getProperty("java.version"), "1.8") >= 0;
+            _oneDotNine = _oneDotEight && VersionComparator.comp(System.getProperty("java.version"), "1.9") >= 0;
         }
     }
 
@@ -93,6 +98,13 @@ public abstract class SystemVersion {
      */
     public static boolean isGNU() {
         return _isGNU;
+    }
+
+    /**
+     *  @since 0.9.23
+     */
+    public static boolean isGentoo() {
+        return _isGentoo;
     }
 
     /**
@@ -137,6 +149,15 @@ public abstract class SystemVersion {
      */
     public static boolean isJava8() {
         return _oneDotEight;
+    }
+
+    /**
+     *
+     *  @return true if Java 1.9 or higher, false for Android.
+     *  @since 0.9.23
+     */
+    public static boolean isJava9() {
+        return _oneDotNine;
     }
 
     /**

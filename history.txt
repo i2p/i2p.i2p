@@ -1,8 +1,12 @@
+2015-10-11 zzz
+ * Crypto: Test for broken Gentoo ECDSA support
+
 2015-10-10 zzz
  * i2psnark: Increase max piece size to 16 MB, max files to 999,
    close files faster based on file count (tickets #1626, #1671)
  * JobQueue: Only adjust timing for negative clock shifts
  * NamingServices: Add support for lookups prefixed with "www."
+ * Startup: Increase rekey probability
 
 2015-10-08 zzz
  * SimpleTimer2: Additional fix for uncaught IllegalStateException
