@@ -2751,7 +2751,7 @@ public class I2PSnarkServlet extends BasicServlet {
                     buf.append("</td></tr>");
                 }
                 List<List<String>> alist = meta.getAnnounceList();
-                if (alist != null) {
+                if (alist != null && !alist.isEmpty()) {
                     buf.append("<tr><td>");
                     toThemeImg(buf, "details");
                     buf.append(" <b>")
@@ -2768,13 +2768,13 @@ public class I2PSnarkServlet extends BasicServlet {
                         }
                         buf.append("] ");
                     }
-                    buf.append("</td></tr>");
+                    buf.append("</td></tr>\n");
                 }
             }
 
             if (meta != null) {
                 String com = meta.getComment();
-                if (com != null) {
+                if (com != null && com.length() > 0) {
                     if (com.length() > 1024)
                         com = com.substring(0, 1024);
                     buf.append("<tr><td>");
@@ -2799,7 +2799,7 @@ public class I2PSnarkServlet extends BasicServlet {
                        .append("</td></tr>\n");
                 }
                 String cby = meta.getCreatedBy();
-                if (cby != null) {
+                if (cby != null && cby.length() > 0) {
                     if (cby.length() > 128)
                         cby = com.substring(0, 128);
                     buf.append("<tr><td>");
