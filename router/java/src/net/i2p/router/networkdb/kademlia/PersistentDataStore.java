@@ -648,7 +648,10 @@ public class PersistentDataStore extends TransientDataStore {
         return new File(dir, DIR_PREFIX + b64.charAt(0) + File.separatorChar + ROUTERINFO_PREFIX + b64 + ROUTERINFO_SUFFIX);
     }
     
-    private static Hash getRouterInfoHash(String filename) {
+    /**
+     *  Package private for installer BundleRouterInfos
+     */
+    static Hash getRouterInfoHash(String filename) {
         return getHash(filename, ROUTERINFO_PREFIX, ROUTERINFO_SUFFIX);
     }
     
