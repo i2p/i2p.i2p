@@ -20,6 +20,7 @@ import net.i2p.crypto.SigType;
 import net.i2p.data.Certificate;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
+import net.i2p.data.Hash;
 import net.i2p.data.PrivateKey;
 import net.i2p.data.PublicKey;
 import net.i2p.data.SigningPrivateKey;
@@ -30,6 +31,7 @@ import net.i2p.data.router.RouterPrivateKeyFile;
 import net.i2p.router.JobImpl;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
+import net.i2p.router.networkdb.kademlia.PersistentDataStore;
 import net.i2p.util.Log;
 
 /**
@@ -122,9 +124,18 @@ class LoadRouterInfoJob extends JobImpl {
                 }
 
                 if (sigTypeChanged || shouldRebuild(privkey)) {
+                    if (_us != null) {
+                        Hash h = _us.getIdentity().getHash();
+                        _log.logAlways(Log.WARN, "Deleting old router identity " + h.toBase64());
+                        // the netdb hasn't started yet, but we want to delete the RI
+                        File f = PersistentDataStore.getRouterInfoFile(getContext(), h);
+                        f.delete();
+                        // the banlist can be called at any time
+                        getContext().banlist().banlistRouterForever(h, "Our previous identity");
+                        _us = null;
+                    }
                     if (sigTypeChanged)
                         _log.logAlways(Log.WARN, "Rebuilding RouterInfo with new signature type " + cstype);
-                    _us = null;
                     // windows... close before deleting
                     if (fis1 != null) {
                         try { fis1.close(); } catch (IOException ioe) {}
