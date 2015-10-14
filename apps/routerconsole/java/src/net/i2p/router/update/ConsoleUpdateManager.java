@@ -39,6 +39,7 @@ import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.FileUtil;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleTimer;
+import net.i2p.util.SystemVersion;
 import net.i2p.util.VersionComparator;
 
 /**
@@ -184,7 +185,11 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
         if (newVersion != null) {
             List<URI> updateSources = uuh.getUpdateSources();
             if (updateSources != null) {
-                VersionAvailable newVA = new VersionAvailable(newVersion, "", HTTP, updateSources);
+                VersionAvailable newVA;
+                if (SystemVersion.isJava7())
+                    newVA = new VersionAvailable(newVersion, "", HTTP, updateSources);
+                else
+                    newVA = new VersionAvailable(newVersion, "Requires Java 7");
                 _available.put(new UpdateItem(ROUTER_UNSIGNED, ""), newVA);
             }
         }
@@ -197,7 +202,11 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
             if (VersionComparator.comp(newVersion, RouterVersion.FULL_VERSION) > 0) {
                 List<URI> updateSources = dsuh.getUpdateSources();
                 if (updateSources != null) {
-                    VersionAvailable newVA = new VersionAvailable(newVersion, "", HTTP, updateSources);
+                    VersionAvailable newVA;
+                    if (SystemVersion.isJava7())
+                        newVA = new VersionAvailable(newVersion, "", HTTP, updateSources);
+                    else
+                        newVA = new VersionAvailable(newVersion, "Requires Java 7");
                     _available.put(new UpdateItem(ROUTER_DEV_SU3, ""), newVA);
                 }
             } else {
@@ -846,6 +855,14 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
             _available.put(ui, newVA);
             shouldUpdate = true;
         }
+
+        // save across restarts
+        if (type == ROUTER_UNSIGNED) {
+            _context.router().saveConfig(PROP_UNSIGNED_AVAILABLE, newVersion);
+        } else if (type == ROUTER_DEV_SU3) {
+            _context.router().saveConfig(PROP_DEV_SU3_AVAILABLE, newVersion);
+        }
+
         if (!shouldUpdate)
             return false;
 
@@ -857,12 +874,6 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
 
             case ROUTER_UNSIGNED:
             case ROUTER_DEV_SU3:
-                // save across restarts
-                String prop = type == ROUTER_UNSIGNED ? PROP_UNSIGNED_AVAILABLE
-                                                      : PROP_DEV_SU3_AVAILABLE;
-                _context.router().saveConfig(prop, newVersion);
-                // fall through
-
             case ROUTER_SIGNED:
             case ROUTER_SIGNED_SU3:
                 if (shouldInstall() &&
