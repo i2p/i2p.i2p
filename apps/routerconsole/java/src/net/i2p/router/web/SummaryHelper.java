@@ -724,6 +724,8 @@ public class SummaryHelper extends HelperBase {
         boolean unsignedAvail = unsignedUpdateAvailable();
         boolean devSU3Avail = devSU3UpdateAvailable();
         String constraint = avail ? NewsHelper.updateConstraint() : null;
+        String unsignedConstraint = unsignedAvail ? NewsHelper.unsignedUpdateConstraint() : null;
+        String devSU3Constraint = devSU3Avail ? NewsHelper.devSU3UpdateConstraint() : null;
         if (avail && constraint != null &&
             !NewsHelper.isUpdateInProgress() &&
             !_context.router().gracefulShutdownInProgress()) {
@@ -735,6 +737,30 @@ public class SummaryHelper extends HelperBase {
             buf.append(_t("Version {0}", getUpdateVersion())).append("<br>");
             buf.append(constraint).append("</b></h4>");
             avail = false;
+        }
+        if (unsignedAvail && unsignedConstraint != null &&
+            !NewsHelper.isUpdateInProgress() &&
+            !_context.router().gracefulShutdownInProgress()) {
+            if (needSpace)
+                buf.append("<hr>");
+            else
+                needSpace = true;
+            buf.append("<h4><b>").append(_t("Update available")).append(":<br>");
+            buf.append(_t("Version {0}", getUnsignedUpdateVersion())).append("<br>");
+            buf.append(unsignedConstraint).append("</b></h4>");
+            unsignedAvail = false;
+        }
+        if (devSU3Avail && devSU3Constraint != null &&
+            !NewsHelper.isUpdateInProgress() &&
+            !_context.router().gracefulShutdownInProgress()) {
+            if (needSpace)
+                buf.append("<hr>");
+            else
+                needSpace = true;
+            buf.append("<h4><b>").append(_t("Update available")).append(":<br>");
+            buf.append(_t("Version {0}", getDevSU3UpdateVersion())).append("<br>");
+            buf.append(devSU3Constraint).append("</b></h4>");
+            devSU3Avail = false;
         }
         if ((avail || unsignedAvail || devSU3Avail) &&
             !NewsHelper.isUpdateInProgress() &&

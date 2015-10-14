@@ -100,6 +100,28 @@ public class NewsHelper extends ContentHelper {
     }
 
     /**
+     *  Translated message about new version available but constrained
+     *  @return null if none
+     *  @since 0.9.23
+     */
+    public static String unsignedUpdateConstraint() {
+        ConsoleUpdateManager mgr = ConsoleUpdateManager.getInstance();
+        if (mgr == null) return null;
+        return mgr.getUpdateConstraint(ROUTER_UNSIGNED, "");
+    }
+
+    /**
+     *  Translated message about new version available but constrained
+     *  @return null if none
+     *  @since 0.9.23
+     */
+    public static String devSU3UpdateConstraint() {
+        ConsoleUpdateManager mgr = ConsoleUpdateManager.getInstance();
+        if (mgr == null) return null;
+        return mgr.getUpdateConstraint(ROUTER_DEV_SU3, "");
+    }
+
+    /**
      *  Release update only.
      *  Already downloaded but not installed version.
      *  @return null if none
