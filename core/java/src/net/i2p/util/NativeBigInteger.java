@@ -1159,8 +1159,6 @@ public class NativeBigInteger extends BigInteger {
             if (rv.isEmpty()) {
                 error("Couldn't find the arch \"" + primary + "\" in its compatibility map \"" + compatList.toString() + "\"");
             }
-        } else {
-            error("Couldn't find the compatibility map for arch \"" + primary + "\"");
         }
         
         //System.out.println("Primary: " + primary);
