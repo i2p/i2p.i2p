@@ -984,8 +984,9 @@ class PeerCoordinator implements PeerListener
     }
     int piece = pp.getPiece();
     
-    synchronized(wantedPieces)
-      {
+    // try/catch outside the synch to avoid deadlock in the catch
+    try {
+      synchronized(wantedPieces) {
         Piece p = new Piece(piece);
         if (!wantedPieces.contains(p))
           {
@@ -1001,8 +1002,7 @@ class PeerCoordinator implements PeerListener
             }
           }
         
-        try
-          {
+          // try/catch moved outside of synch
             // this takes forever if complete, as it rechecks
             if (storage.putPiece(pp))
               {
@@ -1028,21 +1028,21 @@ class PeerCoordinator implements PeerListener
                     _log.warn("Got BAD piece " + piece + "/" + metainfo.getPieces() + " from " + peer + " for " + metainfo.getName());
                 return false; // No need to announce BAD piece to peers.
               }
-          }
-        catch (IOException ioe)
-          {
+
+        wantedPieces.remove(p);
+        wantedBytes -= metainfo.getPieceLength(p.getId());
+      }  // synch
+    } catch (IOException ioe) {
             String msg = "Error writing storage (piece " + piece + ") for " + metainfo.getName() + ": " + ioe;
             _log.error(msg, ioe);
             if (listener != null) {
                 listener.addMessage(msg);
                 listener.addMessage("Fatal storage error: Stopping torrent " + metainfo.getName());
             }
+            // deadlock was here
             snark.stopTorrent();
             throw new RuntimeException(msg, ioe);
-          }
-        wantedPieces.remove(p);
-        wantedBytes -= metainfo.getPieceLength(p.getId());
-      }
+    }
 
     // just in case
     removePartialPiece(piece);
