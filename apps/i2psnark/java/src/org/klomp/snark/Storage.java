@@ -86,6 +86,7 @@ public class Storage implements Closeable
   private static final Map<String, String> _filterNameCache = new ConcurrentHashMap<String, String>();
 
   private static final boolean _isWindows = SystemVersion.isWindows();
+  private static final boolean _isARM = SystemVersion.isARM();
 
   private static final int BUFSIZE = PeerState.PARTSIZE;
   private static final ByteCache _cache = ByteCache.getInstance(16, BUFSIZE);
@@ -1400,7 +1401,9 @@ public class Storage implements Closeable
           // Windows will zero-fill up to the point of the write, which
           // will make the file fairly unfragmented, on average, at least until
           // near the end where it will get exponentially more fragmented.
-          if (!_isWindows)
+          // Also don't ballon on ARM, as a proxy for solid state disk, where fragmentation doesn't matter too much.
+          // Actual detection of SSD is almost impossible.
+          if (!_isWindows && !_isARM)
               isSparse = true;
       }
 
