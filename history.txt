@@ -1,3 +1,16 @@
+2015-10-16 zzz
+ * i2psnark:
+   - Fix deadlock (ticket #1432)
+   - Add "smart sort" option, set sort based on language (tickets #637, #1303)
+
+2015-10-14 zzz
+ * Update:
+   - Require Java 7 to download dev builds (ticket #1669)
+   - Fix persistence of the available dev version
+
+2015-10-13 zzz
+ * Startup: Delete our old RI from netDB when rekeying
+
 2015-10-11 zzz
  * Crypto: Test for broken Gentoo ECDSA support
 

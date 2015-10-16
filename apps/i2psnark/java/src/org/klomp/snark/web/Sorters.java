@@ -6,6 +6,8 @@ import java.text.Collator;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.klomp.snark.MetaInfo;
 import org.klomp.snark.Snark;
@@ -17,6 +19,13 @@ import org.klomp.snark.Storage;
  *  @since 0.9.16 from TorrentNameComparator, moved from I2PSnarkservlet
  */
 class Sorters {
+
+    /**
+     * See below
+     */
+    private static final Pattern PATTERN_DE, PATTERN_EN, PATTERN_ES, PATTERN_FR,
+                                 PATTERN_IT, PATTERN_NL, PATTERN_PT;
+    private static Pattern _pattern;
 
     /**
      *  Negative is reverse
@@ -113,8 +122,8 @@ class Sorters {
 
 
     /**
-     *  Sort alphabetically in current locale, ignore case, ignore leading "the "
-     *  (I guess this is worth it, a lot of torrents start with "The "
+     *  Sort alphabetically in current locale, ignore case, ignore leading
+     *  articles such as "the" if the pattern is set by setPattern()
      *  @since 0.7.14
      */
     private static class TorrentNameComparator implements Comparator<Snark>, Serializable {
@@ -130,13 +139,16 @@ class Sorters {
             if (l.getStorage() != null && r.getStorage() == null)
                 return 1;
             String ls = l.getBaseName();
-            String llc = ls.toLowerCase(Locale.US);
-            if (llc.startsWith("the ") || llc.startsWith("the.") || llc.startsWith("the_"))
-                ls = ls.substring(4);
             String rs = r.getBaseName();
-            String rlc = rs.toLowerCase(Locale.US);
-            if (rlc.startsWith("the ") || rlc.startsWith("the.") || rlc.startsWith("the_"))
-                rs = rs.substring(4);
+            Pattern p = _pattern;
+            if (p != null) {
+                Matcher m = p.matcher(ls);
+                if (m.matches())
+                    ls = ls.substring(m.group(1).length());
+                m = p.matcher(rs);
+                if (m.matches())
+                    rs = rs.substring(m.group(1).length());
+            }
             return Collator.getInstance().compare(ls, rs);
         }
     }
@@ -528,4 +540,104 @@ class Sorters {
             return r.priority - l.priority;
         }
     }
+
+    /*
+     *  Match an indefinite or definite article in the language,
+     *  followed by one or more whitespace, '.', or '_'.
+     *  Does not match "partitive" articles.
+     *
+     *  https://en.wikipedia.org/wiki/Article_%28grammar%29
+     *  http://www.loc.gov/marc/bibliographic/bdapndxf.html
+     */
+    static {
+        PATTERN_DE = Pattern.compile(
+            // can't make the non-capturing innner group work
+            //"^((?:" +
+            "^((" +
+            "der|die|das|des|dem|den|ein|eine|einer|eines|einem|einen" +
+            ")[\\s\\._]+).*",
+            Pattern.CASE_INSENSITIVE);
+        PATTERN_EN = Pattern.compile(
+            "^((" +
+            "a|an|the" +
+            ")[\\s\\._]+).*",
+            Pattern.CASE_INSENSITIVE);
+        PATTERN_ES = Pattern.compile(
+            "^((" +
+            "el|la|lo|los|las|un|una|unos|unas" +
+            ")[\\s\\._]+).*",
+            Pattern.CASE_INSENSITIVE);
+        PATTERN_FR = Pattern.compile(
+            // note l' doesn't require whitespace after
+            "^(l'|((" +
+            "le|la|les|un|une|des" +
+            ")[\\s\\._]+)).*",
+            Pattern.CASE_INSENSITIVE);
+        PATTERN_IT = Pattern.compile(
+            // note l' and un' don't require whitespace after
+            "^(l'|un'|((" +
+            "il|lo|la|i|gli|le|uno|una|un" +
+            ")[\\s\\._]+)).*",
+            Pattern.CASE_INSENSITIVE);
+        PATTERN_NL = Pattern.compile(
+            "^((" +
+            "de|het|het'n|een|een'n" +
+            ")[\\s\\._]+).*",
+            Pattern.CASE_INSENSITIVE);
+        PATTERN_PT = Pattern.compile(
+            "^((" +
+            "o|a|os|as|um|uma|uns|umas" +
+            ")[\\s\\._]+).*",
+            Pattern.CASE_INSENSITIVE);
+    }
+
+    /**
+     * Sets static field, oh well
+     * @param lang null for none
+     * @since 0.9.23
+     */
+    public static void setPattern(String lang) {
+        Pattern p;
+        if (lang == null)
+            p = null;
+        else if (lang.equals("de"))
+            p = PATTERN_DE;
+        else if (lang.equals("en"))
+            p = PATTERN_EN;
+        else if (lang.equals("es"))
+            p = PATTERN_ES;
+        else if (lang.equals("fr"))
+            p = PATTERN_FR;
+        else if (lang.equals("it"))
+            p = PATTERN_IT;
+        else if (lang.equals("nl"))
+            p = PATTERN_NL;
+        else if (lang.equals("pt"))
+            p = PATTERN_PT;
+        else
+            p = null;
+        _pattern = p;
+    }
+
+/****
+    public static final void main(String[] args) {
+        if (args.length != 2) {
+            System.out.println("Usage: Sorters lang 'string'");
+            System.exit(1);
+        }
+        String lang = args[0];
+        setPattern(lang);
+        if (_pattern == null) {
+            System.out.println("Unsupported " + lang);
+            System.exit(1);
+        }
+        String s = args[1];
+        Matcher m = _pattern.matcher(s);
+        if (m.matches()) {
+            System.out.println("Match is \"" + m.group(1) + '"');
+        } else {
+            System.out.println("No match for \"" + s + '"');
+        }
+    }
+****/
 }

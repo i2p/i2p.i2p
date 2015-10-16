@@ -32,6 +32,7 @@ import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.util.Log;
 import net.i2p.util.SecureFile;
+import net.i2p.util.Translate;
 
 import org.klomp.snark.I2PSnarkUtil;
 import org.klomp.snark.MagnetURI;
@@ -1118,6 +1119,7 @@ public class I2PSnarkServlet extends BasicServlet {
             String dataDir = req.getParameter("nofilter_dataDir");
             boolean filesPublic = req.getParameter("filesPublic") != null;
             boolean autoStart = req.getParameter("autoStart") != null;
+            boolean smartSort = req.getParameter("smartSort") != null;
             String seedPct = req.getParameter("seedPct");
             String eepHost = req.getParameter("eepHost");
             String eepPort = req.getParameter("eepPort");
@@ -1133,7 +1135,7 @@ public class I2PSnarkServlet extends BasicServlet {
             boolean useDHT = req.getParameter("useDHT") != null;
             //String openTrackers = req.getParameter("openTrackers");
             String theme = req.getParameter("theme");
-            _manager.updateConfig(dataDir, filesPublic, autoStart, refreshDel, startupDel, pageSize,
+            _manager.updateConfig(dataDir, filesPublic, autoStart, smartSort, refreshDel, startupDel, pageSize,
                                   seedPct, eepHost, eepPort, i2cpHost, i2cpPort, i2cpOpts,
                                   upLimit, upBW, useOpenTrackers, useDHT, theme);
             // update servlet
@@ -1401,6 +1403,10 @@ public class I2PSnarkServlet extends BasicServlet {
                     sort = Integer.parseInt(ssort);
                 } catch (NumberFormatException nfe) {}
             }
+            if (_manager.isSmartSortEnabled())
+                Sorters.setPattern(Translate.getLanguage(_manager.util().getContext()));
+            else
+                Sorters.setPattern(null);
             try {
                 Collections.sort(rv, Sorters.getComparator(sort, this));
             } catch (IllegalArgumentException iae) {
@@ -2144,6 +2150,7 @@ public class I2PSnarkServlet extends BasicServlet {
         String dataDir = _manager.getDataDir().getAbsolutePath();
         boolean filesPublic = _manager.areFilesPublic();
         boolean autoStart = _manager.shouldAutoStart();
+        boolean smartSort = _manager.isSmartSortEnabled();
         boolean useOpenTrackers = _manager.util().shouldUseOpenTrackers();
         //String openTrackers = _manager.util().getOpenTrackerString();
         boolean useDHT = _manager.util().shouldUseDHT();
@@ -2177,6 +2184,14 @@ public class I2PSnarkServlet extends BasicServlet {
                   + (autoStart ? "checked " : "") 
                   + "title=\"");
         out.write(_t("If checked, automatically start torrents that are added"));
+        out.write("\" >" +
+
+                  "<tr><td>");
+        out.write(_t("Smart torrent sorting"));
+        out.write(": <td><input type=\"checkbox\" class=\"optbox\" name=\"smartSort\" value=\"true\" " 
+                  + (smartSort ? "checked " : "") 
+                  + "title=\"");
+        out.write(_t("If checked, ignore words such as 'the' when sorting"));
         out.write("\" >" +
 
                   "<tr><td>");

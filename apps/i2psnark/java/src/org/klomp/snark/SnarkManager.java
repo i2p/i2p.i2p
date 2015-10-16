@@ -126,6 +126,7 @@ public class SnarkManager implements CompleteListener {
     public static final String PROP_OPENTRACKERS = "i2psnark.opentrackers";
     public static final String PROP_PRIVATETRACKERS = "i2psnark.privatetrackers";
     private static final String PROP_USE_DHT = "i2psnark.enableDHT";
+    private static final String PROP_SMART_SORT = "i2psnark.smartSort";
 
     public static final int MIN_UP_BW = 10;
     public static final int DEFAULT_MAX_UP_BW = 25;
@@ -339,6 +340,17 @@ public class SnarkManager implements CompleteListener {
 
     public boolean shouldAutoStart() {
         return Boolean.parseBoolean(_config.getProperty(PROP_AUTO_START, DEFAULT_AUTO_START));
+    }
+    
+    /**
+     *  @return default true
+     *  @since 0.9.23
+     */
+    public boolean isSmartSortEnabled() {
+        String val = _config.getProperty(PROP_SMART_SORT);
+        if (val == null)
+            return true;
+        return Boolean.parseBoolean(val);
     }
 
 /****
@@ -736,19 +748,19 @@ public class SnarkManager implements CompleteListener {
     /**
      *  all params may be null or need trimming
      */
-    public void updateConfig(String dataDir, boolean filesPublic, boolean autoStart, String refreshDelay,
+    public void updateConfig(String dataDir, boolean filesPublic, boolean autoStart, boolean smartSort, String refreshDelay,
                              String startDelay, String pageSize, String seedPct, String eepHost, 
                              String eepPort, String i2cpHost, String i2cpPort, String i2cpOpts,
                              String upLimit, String upBW, boolean useOpenTrackers, boolean useDHT, String theme) {
         synchronized(_configLock) {
-            locked_updateConfig(dataDir, filesPublic, autoStart, refreshDelay,
+            locked_updateConfig(dataDir, filesPublic, autoStart, smartSort,refreshDelay,
                                 startDelay,  pageSize,  seedPct,  eepHost, 
                                 eepPort,  i2cpHost,  i2cpPort,  i2cpOpts,
                                 upLimit,  upBW, useOpenTrackers, useDHT,  theme);
         }
     }
 
-    private void locked_updateConfig(String dataDir, boolean filesPublic, boolean autoStart, String refreshDelay,
+    private void locked_updateConfig(String dataDir, boolean filesPublic, boolean autoStart, boolean smartSort, String refreshDelay,
                              String startDelay, String pageSize, String seedPct, String eepHost, 
                              String eepPort, String i2cpHost, String i2cpPort, String i2cpOpts,
                              String upLimit, String upBW, boolean useOpenTrackers, boolean useDHT, String theme) {
@@ -966,6 +978,16 @@ public class SnarkManager implements CompleteListener {
                 addMessage(_t("Disabled autostart"));
             changed = true;
         }
+
+        if (isSmartSortEnabled() != smartSort) {
+            _config.setProperty(PROP_SMART_SORT, Boolean.toString(smartSort));
+            if (smartSort)
+                addMessage(_t("Enabled smart sort"));
+            else
+                addMessage(_t("Disabled smart sort"));
+            changed = true;
+        }
+
         if (_util.shouldUseOpenTrackers() != useOpenTrackers) {
             _config.setProperty(PROP_USE_OPENTRACKERS, useOpenTrackers + "");
             if (useOpenTrackers)
