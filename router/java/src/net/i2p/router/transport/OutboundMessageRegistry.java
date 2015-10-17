@@ -96,6 +96,7 @@ public class OutboundMessageRegistry {
      * @return non-null List of OutNetMessage describing messages that were waiting for 
      *         the payload
      */
+    @SuppressWarnings("unchecked")
     public List<OutNetMessage> getOriginalMessages(I2NPMessage message) {
         List<MessageSelector> matchedSelectors = null;
         List<MessageSelector> removedSelectors = null;
@@ -193,6 +194,7 @@ public class OutboundMessageRegistry {
     /**
      *  @param allowEmpty is msg.getMessage() allowed to be null?
      */
+    @SuppressWarnings("unchecked")
     private void registerPending(OutNetMessage msg, boolean allowEmpty) {
         if ( (!allowEmpty) && (msg.getMessage() == null) )
                 throw new IllegalArgumentException("OutNetMessage doesn't contain an I2NPMessage? Impossible?");
@@ -229,6 +231,7 @@ public class OutboundMessageRegistry {
     /**
      *  @param msg may be be null
      */
+    @SuppressWarnings("unchecked")
     public void unregisterPending(OutNetMessage msg) {
         if (msg == null) return;
         MessageSelector sel = msg.getReplySelector();
@@ -262,6 +265,7 @@ public class OutboundMessageRegistry {
             _nextExpire = -1;
         }
 
+        @SuppressWarnings("unchecked")
         public void timeReached() {
             long now = _context.clock().now();
             List<MessageSelector> removing = new ArrayList<MessageSelector>(8);

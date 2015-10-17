@@ -611,6 +611,7 @@ public class Router implements RouterClock.ClockShiftListener {
      * This is synchronized with saveConfig().
      * Not for external use.
      */
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     public void readConfig() {
         synchronized(_configFileLock) {
             String f = getConfigFilename();
@@ -1391,6 +1392,7 @@ public class Router implements RouterClock.ClockShiftListener {
      * @return success
      * @since 0.8.13
      */
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     public boolean saveConfig(Map toAdd, Collection<String> toRemove) {
         synchronized(_configFileLock) {
             if (toAdd != null)
