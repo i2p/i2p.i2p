@@ -5,6 +5,7 @@ import java.security.NoSuchAlgorithmException;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
+import net.i2p.crypto.CryptoCheck;
 import net.i2p.crypto.SigType;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
@@ -57,7 +58,7 @@ public class CryptoChecker {
                     log.logAlways(Log.WARN, s);
                 System.out.println(s);
             }
-            if (!isUnlimited()) {
+            if (!CryptoCheck.isUnlimited()) {
                 s = "Please consider installing the Java Cryptography Unlimited Strength Jurisdiction Policy Files from ";
                 //if (SystemVersion.isJava8())
                 //    s  += JRE8;
@@ -77,28 +78,6 @@ public class CryptoChecker {
             // called from main()
             System.out.println("All crypto available");
         }
-    }
-
-    /**
-     *  Copied from CryptixAESEngine
-     */
-    private static boolean isUnlimited() {
-        try {
-            if (Cipher.getMaxAllowedKeyLength("AES") < 256)
-                return false;
-        } catch (NoSuchAlgorithmException e) {
-            return false;
-        } catch (NoSuchMethodError e) {
-            // JamVM, gij
-            try {
-                Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");
-                SecretKeySpec key = new SecretKeySpec(new byte[32], "AES");
-                cipher.init(Cipher.ENCRYPT_MODE, key);
-            } catch (GeneralSecurityException gse) {
-                return false;
-            }
-        }
-        return true;
     }
 
     public static void main(String[] args) {
