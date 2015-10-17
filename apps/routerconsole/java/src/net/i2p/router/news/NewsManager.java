@@ -64,7 +64,7 @@ public class NewsManager implements RouterApp {
      */
     public synchronized List<NewsEntry> getEntries() {
         if (!_currentNews.isEmpty())
-            return new ArrayList(_currentNews);
+            return new ArrayList<NewsEntry>(_currentNews);
         // load old news.xml
         if (_log.shouldWarn())
             _log.warn("no real XML, falling back to news.xml");

@@ -264,6 +264,7 @@ public class PluginStarter implements Runnable {
      *  @return true on success
      *  @throws just about anything, caller would be wise to catch Throwable
      */
+    @SuppressWarnings("deprecation")
     public static boolean startPlugin(RouterContext ctx, String appName) throws Exception {
         Log log = ctx.logManager().getLog(PluginStarter.class);
         File pluginDir = new File(ctx.getConfigDir(), PLUGIN_DIR + '/' + appName);
@@ -344,9 +345,11 @@ public class PluginStarter implements Runnable {
         if (tfiles != null) {
             for (int i = 0; i < tfiles.length; i++) {
                 String name = tfiles[i].getName();
-                if (tfiles[i].isDirectory() && (!Arrays.asList(STANDARD_THEMES).contains(tfiles[i])))
+                if (tfiles[i].isDirectory() && (!Arrays.asList(STANDARD_THEMES).contains(tfiles[i]))) {
+                    // deprecated
                     ctx.router().setConfigSetting(ConfigUIHelper.PROP_THEME_PFX + name, tfiles[i].getAbsolutePath());
                     // we don't need to save
+                }
             }
         }
 
@@ -543,7 +546,7 @@ public class PluginStarter implements Runnable {
 
         boolean deleted = FileUtil.rmdir(pluginDir, false);
         Properties props = pluginProperties();
-        for (Iterator iter = props.keySet().iterator(); iter.hasNext(); ) {
+        for (Iterator<?> iter = props.keySet().iterator(); iter.hasNext(); ) {
             String name = (String)iter.next();
             if (name.startsWith(PREFIX + appName + '.'))
                 iter.remove();
@@ -973,7 +976,7 @@ public class PluginStarter implements Runnable {
     private static void addPath(URL u) throws Exception {
         URLClassLoader urlClassLoader = (URLClassLoader) ClassLoader.getSystemClassLoader();
         Class<URLClassLoader> urlClass = URLClassLoader.class;
-        Method method = urlClass.getDeclaredMethod("addURL", new Class[]{URL.class});
+        Method method = urlClass.getDeclaredMethod("addURL", URL.class);
         method.setAccessible(true);
         method.invoke(urlClassLoader, new Object[]{u});
     }

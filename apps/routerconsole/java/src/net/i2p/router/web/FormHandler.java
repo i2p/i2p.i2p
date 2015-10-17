@@ -23,6 +23,7 @@ public abstract class FormHandler {
     protected RouterContext _context;
     protected Log _log;
     /** Not for multipart/form-data, will be null */
+    @SuppressWarnings("rawtypes")
     protected Map _settings;
     /** Only for multipart/form-data. Warning, parameters are NOT XSS filtered */
     protected RequestWrapper _requestWrapper;
@@ -63,6 +64,7 @@ public abstract class FormHandler {
      *
      * @since 0.9.4 consolidated from numerous FormHandlers
      */
+    @SuppressWarnings({"rawtypes", "unchecked"})
     public void setSettings(Map settings) { _settings = new HashMap(settings); }
 
     /**

@@ -212,14 +212,16 @@ public class TunnelRenderer {
         }
         out.write("</table>\n");
         if (in != null) {
-            List pending = in.listPending();
+            // PooledTunnelCreatorConfig
+            List<?> pending = in.listPending();
             if (!pending.isEmpty()) {
                 out.write("<div class=\"statusnotes\"><center><b>" + _t("Build in progress") + ": " + pending.size() + " " + _t("inbound") + "</b></center></div>\n");
                 live += pending.size();
             }
         }
         if (outPool != null) {
-            List pending = outPool.listPending();
+            // PooledTunnelCreatorConfig
+            List<?> pending = outPool.listPending();
             if (!pending.isEmpty()) {
                 out.write("<div class=\"statusnotes\"><center><b>" + _t("Build in progress") + ": " + pending.size() + " " + _t("outbound") + "</b></center></div>\n");
                 live += pending.size();
