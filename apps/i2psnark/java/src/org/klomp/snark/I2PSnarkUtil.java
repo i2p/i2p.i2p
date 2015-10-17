@@ -136,6 +136,7 @@ public class I2PSnarkUtil {
     
     public boolean configured() { return _configured; }
     
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public void setI2CPConfig(String i2cpHost, int i2cpPort, Map opts) {
         if (i2cpHost != null)
             _i2cpHost = i2cpHost;

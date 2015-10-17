@@ -288,7 +288,7 @@ public class WebMail extends HttpServlet
 	 */
 	private static class SenderSorter extends SorterBase {
 
-		private final Comparator collator = Collator.getInstance();
+		private final Comparator<Object> collator = Collator.getInstance();
 
 		public SenderSorter( MailCache mailCache )
 		{
@@ -307,7 +307,7 @@ public class WebMail extends HttpServlet
 	 * @author susi
 	 */
 	private static class SubjectSorter extends SorterBase {
-		private final Comparator collator = Collator.getInstance();
+		private final Comparator<Object> collator = Collator.getInstance();
 
 		public SubjectSorter( MailCache mailCache )
 		{
@@ -2299,7 +2299,7 @@ public class WebMail extends HttpServlet
 	/**
 	 *  first prev next last
 	 */
-	private static void showPageButtons(PrintWriter out, Folder folder) {
+	private static void showPageButtons(PrintWriter out, Folder<?> folder) {
 		out.println(
 			"<br>" +
 			( folder.isFirstPage() ?

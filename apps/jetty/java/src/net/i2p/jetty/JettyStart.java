@@ -72,6 +72,7 @@ public class JettyStart implements ClientApp {
     /**
      *  Modified from XmlConfiguration.main()
      */
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public void parseArgs(String[] args) throws Exception {
         Properties properties=new Properties();
         XmlConfiguration last=null;

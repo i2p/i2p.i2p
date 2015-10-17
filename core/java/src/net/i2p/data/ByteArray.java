@@ -16,7 +16,7 @@ import java.io.Serializable;
  * maps, and the like.
  *
  */
-public class ByteArray implements Serializable, Comparable {
+public class ByteArray implements Serializable, Comparable<ByteArray> {
     private byte[] _data;
     private int _valid;
     private int _offset;
@@ -85,9 +85,8 @@ public class ByteArray implements Serializable, Comparable {
         return (llen == rlen) && DataHelper.eq(lhs, loff, rhs, roff, llen);
     }
     
-    public final int compareTo(Object obj) {
-        if (obj.getClass() != getClass()) throw new ClassCastException("invalid object: " + obj);
-        return DataHelper.compareTo(_data, ((ByteArray)obj).getData());
+    public final int compareTo(ByteArray ba) {
+        return DataHelper.compareTo(_data, ba.getData());
     }
     
     @Override

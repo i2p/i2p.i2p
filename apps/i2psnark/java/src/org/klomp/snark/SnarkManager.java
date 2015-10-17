@@ -2191,7 +2191,7 @@ public class SnarkManager implements CompleteListener {
      */
     private void addMagnets() {
         boolean changed = false;
-        for (Iterator iter = _config.keySet().iterator(); iter.hasNext(); ) {
+        for (Iterator<?> iter = _config.keySet().iterator(); iter.hasNext(); ) {
             String k = (String) iter.next();
             if (k.startsWith(PROP_META_MAGNET_PREFIX)) {
                 String b64 = k.substring(PROP_META_MAGNET_PREFIX.length());

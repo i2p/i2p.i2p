@@ -42,8 +42,8 @@ class ECConstants {
         if (Security.getProvider("BC") == null) {
             try {
                 Class<?> cls = Class.forName("org.bouncycastle.jce.provider.BouncyCastleProvider");
-                Constructor<?> con = cls.getConstructor(new Class[0]);
-                Provider bc = (Provider)con.newInstance(new Object[0]);
+                Constructor<?> con = cls.getConstructor();
+                Provider bc = (Provider)con.newInstance();
                 Security.addProvider(bc);
                 log("Added BC provider");
                 loaded = true;
