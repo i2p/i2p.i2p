@@ -122,7 +122,7 @@ public class SimpleTimer2 {
         }
     }
 
-    private ScheduledFuture schedule(TimedEvent t, long timeoutMs) {
+    private ScheduledFuture<?> schedule(TimedEvent t, long timeoutMs) {
         return _executor.schedule(t, timeoutMs, TimeUnit.MILLISECONDS);
     }
     
@@ -248,7 +248,7 @@ public class SimpleTimer2 {
         private final SimpleTimer2 _pool;
         private int _fuzz;
         protected static final int DEFAULT_FUZZ = 3;
-        private ScheduledFuture _future; // _executor.remove() doesn't work so we have to use this
+        private ScheduledFuture<?> _future; // _executor.remove() doesn't work so we have to use this
                                          // ... and I expect cancelling this way is more efficient
 
         /** state of the current event.  All access should be under lock. */

@@ -84,6 +84,7 @@ public class I2PAppContext {
     private RandomSource _random;
     private KeyGenerator _keyGenerator;
     protected KeyRing _keyRing; // overridden in RouterContext
+    @SuppressWarnings("deprecation")
     private SimpleScheduler _simpleScheduler;
     private SimpleTimer _simpleTimer;
     private SimpleTimer2 _simpleTimer2;
@@ -532,7 +533,7 @@ public class I2PAppContext {
      * @return set of Strings containing the names of defined system properties
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
-	public Set<String> getPropertyNames() { 
+    public Set<String> getPropertyNames() { 
         // clone to avoid ConcurrentModificationException
         Set<String> names = new HashSet<String>((Set<String>) (Set) ((Properties) System.getProperties().clone()).keySet()); // TODO-Java6: s/keySet()/stringPropertyNames()/
         if (_overrideProps != null)
@@ -940,6 +941,7 @@ public class I2PAppContext {
      * @since 0.9 to replace static instance in the class
      * @deprecated in 0.9.20, use simpleTimer2()
      */
+    @SuppressWarnings("deprecation")
     public SimpleScheduler simpleScheduler() {
         if (!_simpleSchedulerInitialized)
             initializeSimpleScheduler();

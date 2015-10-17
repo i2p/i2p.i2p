@@ -132,7 +132,7 @@ class I2CPMessageProducer {
      * @param newKey unused - no end-to-end crypto
      */
     public void sendMessage(I2PSessionImpl session, Destination dest, long nonce, byte[] payload, SessionTag tag,
-                            SessionKey key, Set tags, SessionKey newKey, long expires) throws I2PSessionException {
+                            SessionKey key, Set<SessionTag> tags, SessionKey newKey, long expires) throws I2PSessionException {
         sendMessage(session, dest, nonce, payload, expires, 0);
     }
 
