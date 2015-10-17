@@ -8,7 +8,7 @@
 <%@include file="summaryajax.jsi" %>
 </head><body onload="initAjax()">
 <%
-    String consoleNonce = intl.getNonce();
+    String consoleNonce = net.i2p.router.web.CSSHelper.getNonce();
 %>
 <jsp:useBean class="net.i2p.router.web.NewsHelper" id="newshelper" scope="request" />
 <jsp:setProperty name="newshelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />

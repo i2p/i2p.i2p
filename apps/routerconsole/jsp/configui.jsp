@@ -31,7 +31,7 @@ input.default {
 <%@include file="formhandler.jsi" %>
 <div class="configure"><div class="topshimten"><h3><%=uihelper._t("Router Console Theme")%></h3></div>
  <form action="" method="POST">
- <input type="hidden" name="consoleNonce" value="<%=intl.getNonce()%>" >
+ <input type="hidden" name="consoleNonce" value="<%=net.i2p.router.web.CSSHelper.getNonce()%>" >
  <input type="hidden" name="nonce" value="<%=pageNonce%>" >
  <input type="hidden" name="action" value="blah" >
 <%

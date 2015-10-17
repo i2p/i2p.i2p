@@ -56,7 +56,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                   %><h4><%=intl._t("New server settings")%></h4><% 
                 } %>
                 <input type="hidden" name="tunnel" value="<%=curTunnel%>" />
-                <input type="hidden" name="nonce" value="<%=editBean.getNextNonce()%>" />
+                <input type="hidden" name="nonce" value="<%=net.i2p.i2ptunnel.web.IndexBean.getNextNonce()%>" />
                 <input type="hidden" name="type" value="<%=tunnelType%>" />
                 <%
                 // these are four keys that are generated automatically on first save,

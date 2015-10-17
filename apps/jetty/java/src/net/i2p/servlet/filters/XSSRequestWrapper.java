@@ -84,11 +84,10 @@ public class XSSRequestWrapper extends HttpServletRequestWrapper {
      *  Parameter names starting with "nofilter_" will not be filtered.
      */
     @Override
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    public Map getParameterMap() {
-        Map rv = new HashMap();
-        for (Enumeration keys = getParameterNames(); keys.hasMoreElements(); ) {
-             String k = (String) keys.nextElement();
+    public Map<String, String[]> getParameterMap() {
+        Map<String, String[]> rv = new HashMap<String, String[]>();
+        for (Enumeration<String> keys = getParameterNames(); keys.hasMoreElements(); ) {
+             String k = keys.nextElement();
              String[] v = getParameterValues(k);
              if (v != null)
                  rv.put(k, v);

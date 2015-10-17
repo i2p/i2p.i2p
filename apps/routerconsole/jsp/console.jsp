@@ -10,7 +10,7 @@
 <%@include file="summaryajax.jsi" %>
 </head><body onload="initAjax()">
 <%
-    String consoleNonce = intl.getNonce();
+    String consoleNonce = net.i2p.router.web.CSSHelper.getNonce();
 %>
 
 <%@include file="summary.jsi" %>
