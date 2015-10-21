@@ -118,6 +118,7 @@ public class SimpleTimer2 {
 //                (new Exception("OWCH! DAMN! Wrong ThreadGroup `" + name +"', `" + rv.getName() + "'")).printStackTrace();
 //           }
             rv.setDaemon(true);
+            rv.setPriority(Thread.NORM_PRIORITY + 1);
             return rv;
         }
     }
