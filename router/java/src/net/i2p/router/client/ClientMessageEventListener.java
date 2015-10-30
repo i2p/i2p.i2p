@@ -196,7 +196,6 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
     private void handleSetDate(SetDateMessage message) {
         //_context.clock().setNow(message.getDate().getTime());
     }
-	
     
     /** 
      * Handle a CreateSessionMessage.
@@ -378,6 +377,7 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
             // do this instead:
             if (sid != null && message.getNonce() > 0) {
                 MessageStatusMessage status = new MessageStatusMessage();
+                status.setMessageId(_runner.getNextMessageId());
                 status.setSessionId(sid.getSessionId());
                 status.setSize(0);
                 status.setNonce(message.getNonce()); 
@@ -461,7 +461,7 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
     }
     
     /** override for testing */
-    protected void handleCreateLeaseSet(CreateLeaseSetMessage message) {	
+    protected void handleCreateLeaseSet(CreateLeaseSetMessage message) {
         if ( (message.getLeaseSet() == null) || (message.getPrivateKey() == null) || (message.getSigningPrivateKey() == null) ) {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Null lease set granted: " + message);

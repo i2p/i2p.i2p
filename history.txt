@@ -1,3 +1,6 @@
+2015-10-30 zzz
+ * Router: Fix cascading I2CP error (ticket #1692)
+
 2015-10-21 zzz
  * i2psnark: More consistency and torrent links in messages
  * Router: Increase timer thread priority
