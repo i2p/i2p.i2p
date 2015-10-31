@@ -993,6 +993,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 // save PROP_EXTERNAL_PORT
                 _context.router().saveConfig(changes, null);
             }
+            // deadlock thru here ticket #1699
             _context.router().rebuildRouterInfo();
         }
         _testEvent.forceRunImmediately();
@@ -2115,6 +2116,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      *  @since 0.9.18
      */
     private RouterAddress getCurrentExternalAddress(boolean isIPv6) {
+        // deadlock thru here ticket #1699
         synchronized (_rebuildLock) {
             return isIPv6 ? _currentOurV6Address : _currentOurV4Address;
         }

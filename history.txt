@@ -1,3 +1,7 @@
+2015-10-31 zzz
+ * Convert remaining Threads to I2PThread or I2PAppThread
+ * UPnP: Fix deadlock in callbacks (ticket #1699)
+
 2015-10-30 zzz
  * Router: Fix cascading I2CP error (ticket #1692)
 
