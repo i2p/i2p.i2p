@@ -38,8 +38,16 @@ public class I2PAppThread extends I2PThread {
     public I2PAppThread(Runnable r, String name) {
         super(r, name);
     }
+
     public I2PAppThread(Runnable r, String name, boolean isDaemon) {
         super(r, name, isDaemon);
+    }
+
+    /**
+     *  @since 0.9.23
+     */
+    public I2PAppThread(ThreadGroup group, Runnable r, String name) {
+        super(group, r, name);
     }
     
     @Override

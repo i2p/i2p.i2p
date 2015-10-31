@@ -19,6 +19,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
 import net.i2p.util.Addresses;
+import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 import net.i2p.util.Translate;
 
@@ -994,7 +995,7 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 		}
 		if (_log.shouldLog(Log.INFO))
 			_log.info("Starting thread to forward " + portsToForwardNow.size() + " ports");
-	        Thread t = new Thread(new RegisterPortsThread(portsToForwardNow));
+	        Thread t = new I2PThread(new RegisterPortsThread(portsToForwardNow));
 		t.setName("UPnP Port Opener " + __id.incrementAndGet());
 		t.setDaemon(true);
 		t.start();
@@ -1034,7 +1035,7 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 	private void unregisterPorts(Set<ForwardPort> portsToForwardNow) {
 		if (_log.shouldLog(Log.INFO))
 			_log.info("Starting thread to un-forward " + portsToForwardNow.size() + " ports");
-	        Thread t = new Thread(new UnregisterPortsThread(portsToForwardNow));
+	        Thread t = new I2PThread(new UnregisterPortsThread(portsToForwardNow));
 		t.setName("UPnP Port Closer " + __id.incrementAndGet());
 		t.setDaemon(true);
 		t.start();

@@ -73,6 +73,14 @@ public class I2PThread extends Thread {
         //    _createdBy = new Exception("Created by");
     }
 
+    /**
+     *  @since 0.9.23
+     */
+    public I2PThread(ThreadGroup group, Runnable r, String name) {
+        super(group, r, name);
+        setPriority(NORM_PRIORITY);
+    }
+
 /****
     private void log(int level, String msg) { log(level, msg, null); }
 

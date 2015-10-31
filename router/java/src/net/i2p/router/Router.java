@@ -1141,7 +1141,7 @@ public class Router implements RouterClock.ClockShiftListener {
                 _log.warn("Running shutdown task " + task.getClass());
             try {
                 //task.run();
-                Thread t = new Thread(task, "Shutdown task " + task.getClass().getName());
+                Thread t = new I2PAppThread(task, "Shutdown task " + task.getClass().getName());
                 t.setDaemon(true);
                 t.start();
                 try {
@@ -1454,7 +1454,7 @@ public class Router implements RouterClock.ClockShiftListener {
         ((RouterClock) _context.clock()).removeShiftListener(this);
         // Let's not stop accepting tunnels, etc
         //_started = _context.clock().now();
-        Thread t = new Thread(new Restarter(_context), "Router Restart");
+        Thread t = new I2PThread(new Restarter(_context), "Router Restart");
         t.setPriority(Thread.NORM_PRIORITY + 1);
         t.start();
     }    
