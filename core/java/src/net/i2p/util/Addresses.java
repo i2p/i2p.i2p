@@ -231,10 +231,10 @@ public abstract class Addresses {
         I2PAppContext ctx = I2PAppContext.getCurrentContext();
         if (ctx != null && ctx.isRouterContext()) {
             long maxMemory = SystemVersion.getMaxMemory();
-            long min = 128;
+            long min = 256;
             long max = 4096;
-            // 512 nominal for 128 MB
-            size = (int) Math.max(min, Math.min(max, 1 + (maxMemory / (256*1024))));
+            // 1024 nominal for 128 MB
+            size = (int) Math.max(min, Math.min(max, 1 + (maxMemory / (128*1024))));
         } else {
             size = 32;
         }
