@@ -24,6 +24,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import gnu.getopt.Getopt;
 
@@ -312,22 +314,52 @@ public class EepGet {
             System.exit(1);
     }
 
+    /**
+     * Parse URL for a viable filename.
+     * 
+     * @param   url  a URL giving the location of an online resource
+     * @return       a filename to save the resource as on local filesystem
+     */
     public static String suggestName(String url) {
-        int last = url.lastIndexOf('/');
-        if ((last < 0) || (url.lastIndexOf('#') > last))
-            last = url.lastIndexOf('#');
-        if ((last < 0) || (url.lastIndexOf('?') > last))
-            last = url.lastIndexOf('?');
-        if ((last < 0) || (url.lastIndexOf('=') > last))
-            last = url.lastIndexOf('=');
+        URL nameURL = null;  // URL object
+        String name;         // suggested name
 
-        String name = null;
-        if (last >= 0)
-            name = sanitize(url.substring(last+1));
-        if ( (name != null) && (name.length() > 0) )
-            return name;
-        else
-            return sanitize(url);
+        try {
+            nameURL = new URL(url);
+        } catch (MalformedURLException e) {
+            System.err.println("Please enter a properly formed URL.");
+            System.exit(1);
+        }
+
+        String path = nameURL.getPath();  // discard any URI queries
+
+        // if no file specified, eepget scrapes webpage - use domain as name
+        Pattern slashes = Pattern.compile("/+");
+        Matcher matcher = slashes.matcher(path);
+        // if empty path or just /'s - nameURL lets multiple /'s through
+        if (path.equals("") || matcher.matches()) {
+            name = sanitize(nameURL.getAuthority());
+        // if path specified
+        } else {
+            int last = path.lastIndexOf('/');
+            // if last / not at end of string, use following string as filename
+            if (last != path.length() - 1) {
+                name = sanitize(path.substring(last + 1));
+            // if there's a trailing / group look for previous / as trim point
+            } else {
+                int i = 1;
+                int slash;
+                while (true) {
+                    slash = path.lastIndexOf('/', last - i);
+                    if (slash != last - i) {
+                        break;
+                    }
+                    i += 1;
+                }
+                name = sanitize(path.substring(slash + 1, path.length() - i));
+            }
+        }
+        return name;
     }
 
 
