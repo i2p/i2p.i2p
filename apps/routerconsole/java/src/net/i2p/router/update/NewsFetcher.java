@@ -21,12 +21,14 @@ import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.TimeZone;
 
+import net.i2p.app.ClientAppManager;
 import net.i2p.crypto.SU3File;
 import net.i2p.crypto.TrustedUpdate;
 import net.i2p.data.DataHelper;
 import net.i2p.router.RouterContext;
 import net.i2p.router.RouterVersion;
 import net.i2p.router.news.NewsEntry;
+import net.i2p.router.news.NewsManager;
 import net.i2p.router.news.NewsMetadata;
 import net.i2p.router.news.NewsXMLParser;
 import net.i2p.router.util.RFC822Date;
@@ -44,6 +46,8 @@ import net.i2p.util.SecureFileOutputStream;
 import net.i2p.util.SSLEepGet;
 import net.i2p.util.Translate;
 import net.i2p.util.VersionComparator;
+
+import org.cybergarage.xml.Node;
 
 /**
  * Task to fetch updates to the news.xml, and to keep
@@ -93,6 +97,11 @@ class NewsFetcher extends UpdateRunner {
             _context.portMapper().getPort(PortMapper.SVC_HTTP_PROXY) < 0) {
             if (_log.shouldWarn())
                 _log.warn("Cannot fetch news - HTTP client tunnel not running");
+            return;
+        }
+        if (shouldProxy && _context.commSystem().isDummy()) {
+            if (_log.shouldWarn())
+                _log.warn("Cannot fetch news - VM Comm system");
             return;
         }
 
@@ -206,13 +215,13 @@ class NewsFetcher extends UpdateRunner {
                             _log.debug("Found version: [" + ver + "]");
                         if (TrustedUpdate.needsUpdate(RouterVersion.VERSION, ver)) {
                             if (NewsHelper.isUpdateDisabled(_context)) {
-                                String msg = _mgr._("In-network updates disabled. Check package manager.");
+                                String msg = _mgr._t("In-network updates disabled. Check package manager.");
                                 _log.logAlways(Log.WARN, "Cannot update to version " + ver + ": " + msg);
                                 _mgr.notifyVersionConstraint(this, _currentURI, ROUTER_SIGNED, "", ver, msg);
                                 return;
                             }
                             if (NewsHelper.isBaseReadonly(_context)) {
-                                String msg = _mgr._("No write permission for I2P install directory.");
+                                String msg = _mgr._t("No write permission for I2P install directory.");
                                 _log.logAlways(Log.WARN, "Cannot update to version " + ver + ": " + msg);
                                 _mgr.notifyVersionConstraint(this, _currentURI, ROUTER_SIGNED, "", ver, msg);
                                 return;
@@ -220,7 +229,7 @@ class NewsFetcher extends UpdateRunner {
                             String minRouter = args.get(MIN_VERSION_KEY);
                             if (minRouter != null) {
                                 if (VersionComparator.comp(RouterVersion.VERSION, minRouter) < 0) {
-                                    String msg = _mgr._("You must first update to version {0}", minRouter);
+                                    String msg = _mgr._t("You must first update to version {0}", minRouter);
                                     _log.logAlways(Log.WARN, "Cannot update to version " + ver + ": " + msg);
                                     _mgr.notifyVersionConstraint(this, _currentURI, ROUTER_SIGNED, "", ver, msg);
                                     return;
@@ -230,7 +239,7 @@ class NewsFetcher extends UpdateRunner {
                             if (minJava != null) {
                                 String ourJava = System.getProperty("java.version");
                                 if (VersionComparator.comp(ourJava, minJava) < 0) {
-                                    String msg = _mgr._("Requires Java version {0} but installed Java version is {1}", minJava, ourJava);
+                                    String msg = _mgr._t("Requires Java version {0} but installed Java version is {1}", minJava, ourJava);
                                     _log.logAlways(Log.WARN, "Cannot update to version " + ver + ": " + msg);
                                     _mgr.notifyVersionConstraint(this, _currentURI, ROUTER_SIGNED, "", ver, msg);
                                     return;
@@ -475,10 +484,21 @@ class NewsFetcher extends UpdateRunner {
                 xml = to1;
             }
             NewsXMLParser parser = new NewsXMLParser(_context);
-            parser.parse(xml);
+            Node root = parser.parse(xml);
             xml.delete();
             NewsMetadata data = parser.getMetadata();
             List<NewsEntry> entries = parser.getEntries();
+            // add entries to the news manager
+            ClientAppManager cmgr = _context.clientAppManager();
+            if (cmgr != null) {
+                NewsManager nmgr = (NewsManager) cmgr.getRegisteredApp(NewsManager.APP_NAME);
+                if (nmgr != null) {
+                    nmgr.addEntries(entries);
+                    List<Node> nodes = NewsXMLParser.getNodes(root, "entry");
+                    nmgr.storeEntries(nodes);
+                }
+            }
+            // store entries and metadata in old news.xml format
             String sudVersion = su3.getVersionString();
             String signingKeyName = su3.getSignerString();
             File to3 = new File(_context.getTempDir(), "tmp3-" + _context.random().nextInt() + ".xml");

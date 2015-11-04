@@ -288,7 +288,7 @@ public class WebMail extends HttpServlet
 	 */
 	private static class SenderSorter extends SorterBase {
 
-		private final Comparator collator = Collator.getInstance();
+		private final Comparator<Object> collator = Collator.getInstance();
 
 		public SenderSorter( MailCache mailCache )
 		{
@@ -307,7 +307,7 @@ public class WebMail extends HttpServlet
 	 * @author susi
 	 */
 	private static class SubjectSorter extends SorterBase {
-		private final Comparator collator = Collator.getInstance();
+		private final Comparator<Object> collator = Collator.getInstance();
 
 		public SubjectSorter( MailCache mailCache )
 		{
@@ -322,11 +322,11 @@ public class WebMail extends HttpServlet
 			} else if (as.toLowerCase().startsWith("fwd:")) {
 				as = as.substring(4).trim();
 			} else {
-				String xre = _("Re:").toLowerCase();
+				String xre = _t("Re:").toLowerCase();
 				if (as.toLowerCase().startsWith(xre)) {
 					as = as.substring(xre.length()).trim();
 				} else {
-					String xfwd = _("Fwd:").toLowerCase();
+					String xfwd = _t("Fwd:").toLowerCase();
 					if (as.toLowerCase().startsWith(xfwd))
 						as = as.substring(xfwd.length()).trim();
 				}
@@ -336,11 +336,11 @@ public class WebMail extends HttpServlet
 			} else if (bs.toLowerCase().startsWith("fwd:")) {
 				bs = bs.substring(4).trim();
 			} else {
-				String xre = _("Re:").toLowerCase();
+				String xre = _t("Re:").toLowerCase();
 				if (bs.toLowerCase().startsWith(xre)) {
 					bs = bs.substring(xre.length()).trim();
 				} else {
-					String xfwd = _("Fwd:").toLowerCase();
+					String xfwd = _t("Fwd:").toLowerCase();
 					if (bs.toLowerCase().startsWith(xfwd))
 						bs = bs.substring(xfwd.length()).trim();
 				}
@@ -577,7 +577,7 @@ public class WebMail extends HttpServlet
 					( mailPart.description != null ? mailPart.description + ", " : "" ) +
 					( mailPart.filename != null ? mailPart.filename + ", " : "" ) +
 					( mailPart.name != null ? mailPart.name + ", " : "" ) +
-					( mailPart.type != null ? '(' + mailPart.type + ')' : _("unknown") ) );
+					( mailPart.type != null ? '(' + mailPart.type + ')' : _t("unknown") ) );
 			
 			if( level == 0 && mailPart.version == null ) {
 				/*
@@ -598,7 +598,7 @@ public class WebMail extends HttpServlet
 						charset = "US-ASCII";
 						// don't show this in text mode which is used to include the mail in the reply or forward
 						if (html)
-							reason += _("Warning: no charset found, fallback to US-ASCII.") + br;
+							reason += _t("Warning: no charset found, fallback to US-ASCII.") + br;
 					}
 					try {
 						ReadBuffer decoded = mailPart.decode(0);
@@ -612,11 +612,11 @@ public class WebMail extends HttpServlet
 					}
 					catch( UnsupportedEncodingException uee ) {
 						showBody = false;
-						reason = _("Charset \\''{0}\\'' not supported.", quoteHTML( mailPart.charset )) + br;
+						reason = _t("Charset \\''{0}\\'' not supported.", quoteHTML( mailPart.charset )) + br;
 					}
 					catch (Exception e1) {
 						showBody = false;
-						reason += _("Part ({0}) not shown, because of {1}", ident, e1.toString()) + br;
+						reason += _t("Part ({0}) not shown, because of {1}", ident, e1.toString()) + br;
 					}
 			}
 			if( html )
@@ -652,16 +652,16 @@ public class WebMail extends HttpServlet
 						type.equals("application/x-7z-compressed") || type.equals("application/x-rar-compressed") ||
 						type.equals("application/x-tar") || type.equals("application/x-bzip2"))) {
 						out.println( "<a href=\"" + myself + "?" + RAW_ATTACHMENT + "=" +
-							 mailPart.hashCode() + "\">" + _("Download attachment {0}", ident) + "</a>");
+							 mailPart.hashCode() + "\">" + _t("Download attachment {0}", ident) + "</a>");
 					} else {
 						out.println( "<a target=\"_blank\" href=\"" + myself + "?" + DOWNLOAD + "=" +
-							 mailPart.hashCode() + "\">" + _("Download attachment {0}", ident) + "</a>" +
-							 " (" + _("File is packed into a zipfile for security reasons.") + ')');
+							 mailPart.hashCode() + "\">" + _t("Download attachment {0}", ident) + "</a>" +
+							 " (" + _t("File is packed into a zipfile for security reasons.") + ')');
 					}
 					out.println( "</p>" );					
 				}
 				else {
-					out.println( _("Attachment ({0}).", ident) );
+					out.println( _t("Attachment ({0}).", ident) );
 				}
 			}
 			if( html )
@@ -712,52 +712,52 @@ public class WebMail extends HttpServlet
 			if (buttonPressed(request, LOGIN) || offline) {
 				
 				if( user == null || user.length() == 0 ) {
-					sessionObject.error += _("Need username for authentication.") + '\n';
+					sessionObject.error += _t("Need username for authentication.") + '\n';
 					doContinue = false;
 				}
 				if( pass == null || pass.length() == 0 ) {
-					sessionObject.error += _("Need password for authentication.") + '\n';
+					sessionObject.error += _t("Need password for authentication.") + '\n';
 					doContinue = false;
 				}
 				if( host == null || host.length() == 0 ) {
-					sessionObject.error += _("Need hostname for connect.") + '\n';
+					sessionObject.error += _t("Need hostname for connect.") + '\n';
 					doContinue = false;
 				}
 				int pop3PortNo = 0;
 				if( pop3Port == null || pop3Port.length() == 0 ) {
-					sessionObject.error += _("Need port number for pop3 connect.") + '\n';
+					sessionObject.error += _t("Need port number for pop3 connect.") + '\n';
 					doContinue = false;
 				}
 				else {
 					try {
 						pop3PortNo = Integer.parseInt( pop3Port );
 						if( pop3PortNo < 0 || pop3PortNo > 65535 ) {
-							sessionObject.error += _("POP3 port number is not in range 0..65535.") + '\n';
+							sessionObject.error += _t("POP3 port number is not in range 0..65535.") + '\n';
 							doContinue = false;
 						}
 					}
 					catch( NumberFormatException nfe )
 					{
-						sessionObject.error += _("POP3 port number is invalid.") + '\n';
+						sessionObject.error += _t("POP3 port number is invalid.") + '\n';
 						doContinue = false;
 					}
 				}
 				int smtpPortNo = 0;
 				if( smtpPort == null || smtpPort.length() == 0 ) {
-					sessionObject.error += _("Need port number for smtp connect.") + '\n';
+					sessionObject.error += _t("Need port number for smtp connect.") + '\n';
 					doContinue = false;
 				}
 				else {
 					try {
 						smtpPortNo = Integer.parseInt( smtpPort );
 						if( smtpPortNo < 0 || smtpPortNo > 65535 ) {
-							sessionObject.error += _("SMTP port number is not in range 0..65535.") + '\n';
+							sessionObject.error += _t("SMTP port number is not in range 0..65535.") + '\n';
 							doContinue = false;
 						}
 					}
 					catch( NumberFormatException nfe )
 					{
-						sessionObject.error += _("SMTP port number is invalid.") + '\n';
+						sessionObject.error += _t("SMTP port number is invalid.") + '\n';
 						doContinue = false;
 					}
 				}
@@ -831,10 +831,10 @@ public class WebMail extends HttpServlet
 				sessionObject.mailbox = null;
 				sessionObject.mailCache = null;
 			}
-			sessionObject.info += _("User logged out.") + '\n';
+			sessionObject.info += _t("User logged out.") + '\n';
 			sessionObject.state = STATE_AUTH;
 		} else if( sessionObject.mailbox == null ) {
-			sessionObject.error += _("Internal error, lost connection.") + '\n';
+			sessionObject.error += _t("Internal error, lost connection.") + '\n';
 			sessionObject.state = STATE_AUTH;
 		}
 	}
@@ -988,10 +988,10 @@ public class WebMail extends HttpServlet
 								sessionObject.replyTo = mail.reply;
 							else if( mail.sender != null && Mail.validateAddress( mail.sender ) )
 								sessionObject.replyTo = mail.sender;
-							sessionObject.subject = _("Re:") + ' ' + mail.formattedSubject;
+							sessionObject.subject = _t("Re:") + ' ' + mail.formattedSubject;
 							StringWriter text = new StringWriter();
 							PrintWriter pw = new PrintWriter( text );
-							pw.println( _("On {0} {1} wrote:", mail.formattedDate + " UTC", sessionObject.replyTo) );
+							pw.println( _t("On {0} {1} wrote:", mail.formattedDate + " UTC", sessionObject.replyTo) );
 							StringWriter text2 = new StringWriter();
 							PrintWriter pw2 = new PrintWriter( text2 );
 							showPart( pw2, part, 0, TEXT_ONLY );
@@ -1026,7 +1026,7 @@ public class WebMail extends HttpServlet
 								sessionObject.replyCC = buf.toString();
 						}
 						if( forward ) {
-							sessionObject.subject = _("Fwd:") + ' ' + mail.formattedSubject;
+							sessionObject.subject = _t("Fwd:") + ' ' + mail.formattedSubject;
 							String sender = null;
 							if( mail.reply != null && Mail.validateAddress( mail.reply ) )
 								sender = Mail.getAddress( mail.reply );
@@ -1038,7 +1038,7 @@ public class WebMail extends HttpServlet
 							pw.println();
 							pw.println();
 							pw.println();
-							pw.println( "---- " + _("begin forwarded mail") + " ----" );
+							pw.println( "---- " + _t("begin forwarded mail") + " ----" );
 							pw.println( "From: " + sender );
 							if( mail.to != null ) {
 								String pad = "To: ";
@@ -1060,14 +1060,14 @@ public class WebMail extends HttpServlet
 								pw.print( "Date: " + mail.dateString );
 							pw.println();
 							showPart( pw, part, 0, TEXT_ONLY );
-							pw.println( "----  " + _("end forwarded mail") + "  ----" );
+							pw.println( "----  " + _t("end forwarded mail") + "  ----" );
 							pw.flush();
 							sessionObject.body = text.toString();
 						}
 						sessionObject.state = STATE_NEW;
 					}
 					else {
-						sessionObject.error += _("Could not fetch mail body.") + '\n';
+						sessionObject.error += _t("Could not fetch mail body.") + '\n';
 					}
 				}
 			}
@@ -1097,7 +1097,7 @@ public class WebMail extends HttpServlet
 				}
 				catch( NumberFormatException nfe )
 				{
-					sessionObject.error += _("Message id not valid.") + '\n';
+					sessionObject.error += _t("Message id not valid.") + '\n';
 				}
 			}
 		}
@@ -1135,7 +1135,7 @@ public class WebMail extends HttpServlet
 			int pageSize = Config.getProperty( Folder.PAGESIZE, Folder.DEFAULT_PAGESIZE );
 			if( pageSize != oldPageSize )
 				sessionObject.folder.setPageSize( pageSize );
-			sessionObject.info = _("Configuration reloaded");
+			sessionObject.info = _t("Configuration reloaded");
 		}
 		if( buttonPressed( request, REFRESH ) ) {
 			// TODO how to do a "No new mail" message?
@@ -1196,16 +1196,16 @@ public class WebMail extends HttpServlet
 								);
 							}
 							else {
-								sessionObject.error += _("No Encoding found for {0}", encodeTo) + '\n';
+								sessionObject.error += _t("No Encoding found for {0}", encodeTo) + '\n';
 							}
 						}
 						catch (EncodingException e1) {
-							sessionObject.error += _("Could not encode data: {0}", e1.getMessage());
+							sessionObject.error += _t("Could not encode data: {0}", e1.getMessage());
 						}
 					}
 				}
 				catch (IOException e) {
-					sessionObject.error += _("Error reading uploaded file: {0}", e.getMessage()) + '\n';
+					sessionObject.error += _t("Error reading uploaded file: {0}", e.getMessage()) + '\n';
 				}
 			}
 		}
@@ -1290,10 +1290,10 @@ public class WebMail extends HttpServlet
 				}
 			} catch( NumberFormatException nfe ) {}
 			// error if we get here
-			sessionObject.error += _("Attachment not found.");
+			sessionObject.error += _t("Attachment not found.");
 			if (isRaw) {
 				try {
-					response.sendError(404, _("Attachment not found."));
+					response.sendError(404, _t("Attachment not found."));
 				} catch (IOException ioe) {}
 			}
 		}
@@ -1320,9 +1320,9 @@ public class WebMail extends HttpServlet
 				return true;
 		}
 		// error if we get here
-		sessionObject.error += _("Message not found.");
+		sessionObject.error += _t("Message not found.");
 		try {
-			response.sendError(404, _("Message not found."));
+			response.sendError(404, _t("Message not found."));
 		} catch (IOException ioe) {}
 		return true;
 	}
@@ -1367,7 +1367,7 @@ public class WebMail extends HttpServlet
 					sessionObject.folder.setPageSize( pageSize );
 			}
 			catch( NumberFormatException nfe ) {
-				sessionObject.error += _("Invalid pagesize number, resetting to default value.") + '\n';
+				sessionObject.error += _t("Invalid pagesize number, resetting to default value.") + '\n';
 			}
 		}
 		if( buttonPressed( request, PREVPAGE ) ) {
@@ -1391,7 +1391,7 @@ public class WebMail extends HttpServlet
 			if (m > 0)
 				sessionObject.reallyDelete = true;
 			else
-				sessionObject.error += _("No messages marked for deletion.") + '\n';
+				sessionObject.error += _t("No messages marked for deletion.") + '\n';
 		}
 		else {
 			if( buttonPressed( request, REALLYDELETE ) ) {
@@ -1408,7 +1408,7 @@ public class WebMail extends HttpServlet
 					sessionObject.folder.removeElements(toDelete);
 					sessionObject.pageChanged = true;
 					sessionObject.info += ngettext("1 message deleted.", "{0} messages deleted.", numberDeleted);
-					//sessionObject.error += _("Error deleting message: {0}", sessionObject.mailbox.lastError()) + '\n';
+					//sessionObject.error += _t("Error deleting message: {0}", sessionObject.mailbox.lastError()) + '\n';
 				}
 			}
 			sessionObject.reallyDelete = false;
@@ -1474,7 +1474,7 @@ public class WebMail extends HttpServlet
 				boolean release = !Boolean.parseBoolean(props.getProperty(CONFIG_DEBUG));
 				Debug.setLevel( release ? Debug.ERROR : Debug.DEBUG );
 				sessionObject.state = sessionObject.folder != null ? STATE_LIST : STATE_AUTH;
-				sessionObject.info = _("Configuration saved");
+				sessionObject.info = _t("Configuration saved");
 			} catch (IOException ioe) {
 				sessionObject.error = ioe.toString();
 			}
@@ -1495,7 +1495,7 @@ public class WebMail extends HttpServlet
 			} catch (IOException ioe) {
 				sessionObject.error = ioe.toString();
 			} catch( NumberFormatException nfe ) {
-				sessionObject.error += _("Invalid pagesize number, resetting to default value.") + '\n';
+				sessionObject.error += _t("Invalid pagesize number, resetting to default value.") + '\n';
 			}
 		} else if (buttonPressed(request, CANCEL)) {
 			sessionObject.state = (sessionObject.folder != null) ? STATE_LIST : STATE_AUTH;
@@ -1694,7 +1694,7 @@ public class WebMail extends HttpServlet
 				 * build subtitle
 				 */
 				if( sessionObject.state == STATE_AUTH )
-					subtitle = _("Login");
+					subtitle = _t("Login");
 				else if( sessionObject.state == STATE_LIST ) {
 					// mailbox.getNumMails() forces a connection, don't use it
 					// Not only does it slow things down, but a failure causes all our messages to "vanish"
@@ -1705,11 +1705,11 @@ public class WebMail extends HttpServlet
 					if (mail != null && mail.shortSubject != null)
 						subtitle = mail.shortSubject; // already HTML encoded
 					else
-						subtitle = _("Show Message");
+						subtitle = _t("Show Message");
 				} else if( sessionObject.state == STATE_NEW ) {
-					subtitle = _("New Message");
+					subtitle = _t("New Message");
 				} else if( sessionObject.state == STATE_CONFIG ) {
-					subtitle = _("Configuration");
+					subtitle = _t("Configuration");
 				}
 
 				response.setContentType( "text/html" );
@@ -1720,7 +1720,7 @@ public class WebMail extends HttpServlet
 				out.println( "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n<html>\n" +
 					"<head>\n" +
 					"<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\n" +
-					"<title>" + _("SusiMail") + " - " + subtitle + "</title>\n" +
+					"<title>" + _t("SusiMail") + " - " + subtitle + "</title>\n" +
 					"<link rel=\"stylesheet\" type=\"text/css\" href=\"" + sessionObject.themePath + "susimail.css\">\n" );
 				if (sessionObject.isMobile ) {
 					out.println( "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes\" />\n" +
@@ -1733,7 +1733,7 @@ public class WebMail extends HttpServlet
 					out.println(
 						"<script type=\"text/javascript\">\n" +
 							"window.onbeforeunload = function () {" +
-								"return \"" + _("Message has not been sent. Do you want to discard it?") + "\";" +
+								"return \"" + _t("Message has not been sent. Do you want to discard it?") + "\";" +
 							"};\n" +
 						"</script>"
 					);
@@ -1795,7 +1795,7 @@ public class WebMail extends HttpServlet
 						content = part.decode(2);
 					}
 					catch (DecodingException e) {
-						sessionObject.error += _("Error decoding content: {0}", e.getMessage()) + '\n';
+						sessionObject.error += _t("Error decoding content: {0}", e.getMessage()) + '\n';
 						content = null;
 					}
 			}
@@ -1904,7 +1904,7 @@ public class WebMail extends HttpServlet
 		String to = request.getParameter( NEW_TO );
 		String cc = request.getParameter( NEW_CC );
 		String bcc = request.getParameter( NEW_BCC );
-		String subject = request.getParameter( NEW_SUBJECT, _("no subject") );
+		String subject = request.getParameter( NEW_SUBJECT, _t("no subject") );
 		String text = request.getParameter( NEW_TEXT, "" );
 
 		boolean fixed = Boolean.parseBoolean(Config.getProperty( CONFIG_SENDER_FIXED, "true" ));
@@ -1921,13 +1921,13 @@ public class WebMail extends HttpServlet
 		
 		if( from == null || !Mail.validateAddress( from ) ) {
 			ok = false;
-			sessionObject.error += _("Found no valid sender address.") + '\n';
+			sessionObject.error += _t("Found no valid sender address.") + '\n';
 		}
 		else {
 			sender = Mail.getAddress( from );
 			if( sender == null || sender.length() == 0 ) {
 				ok = false;
-				sessionObject.error += _("Found no valid address in \\''{0}\\''.", quoteHTML( from )) + '\n';
+				sessionObject.error += _t("Found no valid address in \\''{0}\\''.", quoteHTML( from )) + '\n';
 			}
 		}
 		
@@ -1948,7 +1948,7 @@ public class WebMail extends HttpServlet
 		
 		if( toList.isEmpty() ) {
 			ok = false;
-			sessionObject.error += _("No recipients found.") + '\n';
+			sessionObject.error += _t("No recipients found.") + '\n';
 		}
 		Encoding qp = EncodingFactory.getEncoding( "quoted-printable" );
 		Encoding hl = EncodingFactory.getEncoding( "HEADERLINE" );
@@ -2012,7 +2012,7 @@ public class WebMail extends HttpServlet
 						sessionObject.user, sessionObject.pass,
 						sender, recipients.toArray(), sessionObject.sentMail ) ) {
 					
-					sessionObject.info += _("Mail sent.");
+					sessionObject.info += _t("Mail sent.");
 					
 					sessionObject.sentMail = null;	
 					if( sessionObject.attachments != null )
@@ -2056,12 +2056,12 @@ public class WebMail extends HttpServlet
 	private static void showCompose( PrintWriter out, SessionObject sessionObject, RequestWrapper request )
 	{
 		out.println("<div class=\"topbuttons\">");
-		out.println( button( SEND, _("Send") ) + spacer +
-				button( CANCEL, _("Cancel") ));
+		out.println( button( SEND, _t("Send") ) + spacer +
+				button( CANCEL, _t("Cancel") ));
 		out.println("</div>");
 		//if (Config.hasConfigFile())
-		//	out.println(button( RELOAD, _("Reload Config") ) + spacer);
-		//out.println(button( LOGOUT, _("Logout") ) );
+		//	out.println(button( RELOAD, _t("Reload Config") ) + spacer);
+		//out.println(button( LOGOUT, _t("Logout") ) );
 
 		String from = request.getParameter( NEW_FROM );
 		boolean fixed = Boolean.parseBoolean(Config.getProperty( CONFIG_SENDER_FIXED, "true" ));
@@ -2100,23 +2100,23 @@ public class WebMail extends HttpServlet
 		
 		out.println( "<table cellspacing=\"0\" cellpadding=\"5\">\n" +
 				"<tr><td colspan=\"2\" align=\"center\"><hr></td></tr>\n" +
-				"<tr><td align=\"right\">" + _("From") + ":</td><td align=\"left\"><input type=\"text\" size=\"80\" name=\"" + NEW_FROM + "\" value=\"" + quoteHTML(from) + "\" " + ( fixed ? "disabled" : "" ) +"></td></tr>\n" +
-				"<tr><td align=\"right\">" + _("To") + ":</td><td align=\"left\"><input type=\"text\" size=\"80\" name=\"" + NEW_TO + "\" value=\"" + quoteHTML(to) + "\"></td></tr>\n" +
-				"<tr><td align=\"right\">" + _("Cc") + ":</td><td align=\"left\"><input type=\"text\" size=\"80\" name=\"" + NEW_CC + "\" value=\"" + quoteHTML(cc) + "\"></td></tr>\n" +
-				"<tr><td align=\"right\">" + _("Bcc") + ":</td><td align=\"left\"><input type=\"text\" size=\"80\" name=\"" + NEW_BCC + "\" value=\"" + quoteHTML(bcc) + "\"></td></tr>\n" +
-				"<tr><td align=\"right\">" + _("Bcc to self") + ": </td><td align=\"left\"><input type=\"checkbox\" class=\"optbox\" name=\"" + NEW_BCC_TO_SELF + "\" value=\"1\" " + (sessionObject.bccToSelf ? "checked" : "" ) + "></td></tr>\n" +
-				"<tr><td align=\"right\">" + _("Subject") + ":</td><td align=\"left\"><input type=\"text\" size=\"80\" name=\"" + NEW_SUBJECT + "\" value=\"" + quoteHTML(subject) + "\"></td></tr>\n" +
+				"<tr><td align=\"right\">" + _t("From") + ":</td><td align=\"left\"><input type=\"text\" size=\"80\" name=\"" + NEW_FROM + "\" value=\"" + quoteHTML(from) + "\" " + ( fixed ? "disabled" : "" ) +"></td></tr>\n" +
+				"<tr><td align=\"right\">" + _t("To") + ":</td><td align=\"left\"><input type=\"text\" size=\"80\" name=\"" + NEW_TO + "\" value=\"" + quoteHTML(to) + "\"></td></tr>\n" +
+				"<tr><td align=\"right\">" + _t("Cc") + ":</td><td align=\"left\"><input type=\"text\" size=\"80\" name=\"" + NEW_CC + "\" value=\"" + quoteHTML(cc) + "\"></td></tr>\n" +
+				"<tr><td align=\"right\">" + _t("Bcc") + ":</td><td align=\"left\"><input type=\"text\" size=\"80\" name=\"" + NEW_BCC + "\" value=\"" + quoteHTML(bcc) + "\"></td></tr>\n" +
+				"<tr><td align=\"right\">" + _t("Bcc to self") + ": </td><td align=\"left\"><input type=\"checkbox\" class=\"optbox\" name=\"" + NEW_BCC_TO_SELF + "\" value=\"1\" " + (sessionObject.bccToSelf ? "checked" : "" ) + "></td></tr>\n" +
+				"<tr><td align=\"right\">" + _t("Subject") + ":</td><td align=\"left\"><input type=\"text\" size=\"80\" name=\"" + NEW_SUBJECT + "\" value=\"" + quoteHTML(subject) + "\"></td></tr>\n" +
 				"<tr><td colspan=\"2\" align=\"center\"><textarea cols=\"" + Config.getProperty( CONFIG_COMPOSER_COLS, 80 )+ "\" rows=\"" + Config.getProperty( CONFIG_COMPOSER_ROWS, 10 )+ "\" name=\"" + NEW_TEXT + "\">" + text + "</textarea>" +
 				"<tr class=\"bottombuttons\"><td colspan=\"2\" align=\"center\"><hr></td></tr>\n" +
-				"<tr class=\"bottombuttons\"><td align=\"right\">" + _("Add Attachment") + ":</td><td align=\"left\"><input type=\"file\" size=\"50%\" name=\"" + NEW_FILENAME + "\" value=\"\"></td></tr>" +
+				"<tr class=\"bottombuttons\"><td align=\"right\">" + _t("Add Attachment") + ":</td><td align=\"left\"><input type=\"file\" size=\"50%\" name=\"" + NEW_FILENAME + "\" value=\"\"></td></tr>" +
 				// TODO disable/hide in JS if no file selected
-				"<tr class=\"bottombuttons\"><td>&nbsp;</td><td align=\"left\">" + button(NEW_UPLOAD, _("Add another attachment")) + "</td></tr>");
+				"<tr class=\"bottombuttons\"><td>&nbsp;</td><td align=\"left\">" + button(NEW_UPLOAD, _t("Add another attachment")) + "</td></tr>");
 		
 		if( sessionObject.attachments != null && !sessionObject.attachments.isEmpty() ) {
 			boolean wroteHeader = false;
 			for( Attachment attachment : sessionObject.attachments ) {
 				if( !wroteHeader ) {
-					out.println("<tr><td align=\"right\">" + _("Attachments") + ":</td>");
+					out.println("<tr><td align=\"right\">" + _t("Attachments") + ":</td>");
 					wroteHeader = true;
 				} else {
 					out.println("<tr><td align=\"right\">&nbsp;</td>");
@@ -2125,7 +2125,7 @@ public class WebMail extends HttpServlet
 			}
 			// TODO disable in JS if none selected
 			out.println("<tr class=\"bottombuttons\"><td>&nbsp;</td><td align=\"left\">" +
-			            button( DELETE_ATTACHMENT, _("Delete selected attachments") ) +
+			            button( DELETE_ATTACHMENT, _t("Delete selected attachments") ) +
 				    "</td></tr>");
 		}
 		out.println( "</table>" );
@@ -2144,28 +2144,28 @@ public class WebMail extends HttpServlet
 		
 		out.println( "<table cellspacing=\"3\" cellpadding=\"5\">\n" +
 			// current postman hq length limits 16/12, new postman version 32/32
-			"<tr><td align=\"right\" width=\"30%\">" + _("User") + "</td><td width=\"40%\" align=\"left\"><input type=\"text\" size=\"32\" name=\"" + USER + "\" value=\"" + "\"> @mail.i2p</td></tr>\n" +
-			"<tr><td align=\"right\" width=\"30%\">" + _("Password") + "</td><td width=\"40%\" align=\"left\"><input type=\"password\" size=\"32\" name=\"pass\" value=\"" + "\"></td></tr>\n");
+			"<tr><td align=\"right\" width=\"30%\">" + _t("User") + "</td><td width=\"40%\" align=\"left\"><input type=\"text\" size=\"32\" name=\"" + USER + "\" value=\"" + "\"> @mail.i2p</td></tr>\n" +
+			"<tr><td align=\"right\" width=\"30%\">" + _t("Password") + "</td><td width=\"40%\" align=\"left\"><input type=\"password\" size=\"32\" name=\"pass\" value=\"" + "\"></td></tr>\n");
 		// which is better?
 		//if (!fixed) {
 		if (true) {
 		    out.println(
-			"<tr><td align=\"right\" width=\"30%\">" + _("Host") + "</td><td width=\"40%\" align=\"left\"><input type=\"text\" size=\"32\" name=\"" + HOST +"\" value=\"" + quoteHTML(host) + "\"" + ( fixed ? " disabled" : "" ) + "></td></tr>\n" +
-			"<tr><td align=\"right\" width=\"30%\">" + _("POP3 Port") + "</td><td width=\"40%\" align=\"left\"><input type=\"text\" style=\"text-align: right;\" size=\"5\" name=\"" + POP3 +"\" value=\"" + quoteHTML(pop3) + "\"" + ( fixed ? " disabled" : "" ) + "></td></tr>\n" +
-			"<tr><td align=\"right\" width=\"30%\">" + _("SMTP Port") + "</td><td width=\"40%\" align=\"left\"><input type=\"text\" style=\"text-align: right;\" size=\"5\" name=\"" + SMTP +"\" value=\"" + quoteHTML(smtp) + "\"" + ( fixed ? " disabled" : "" ) + "></td></tr>\n");
+			"<tr><td align=\"right\" width=\"30%\">" + _t("Host") + "</td><td width=\"40%\" align=\"left\"><input type=\"text\" size=\"32\" name=\"" + HOST +"\" value=\"" + quoteHTML(host) + "\"" + ( fixed ? " disabled" : "" ) + "></td></tr>\n" +
+			"<tr><td align=\"right\" width=\"30%\">" + _t("POP3 Port") + "</td><td width=\"40%\" align=\"left\"><input type=\"text\" style=\"text-align: right;\" size=\"5\" name=\"" + POP3 +"\" value=\"" + quoteHTML(pop3) + "\"" + ( fixed ? " disabled" : "" ) + "></td></tr>\n" +
+			"<tr><td align=\"right\" width=\"30%\">" + _t("SMTP Port") + "</td><td width=\"40%\" align=\"left\"><input type=\"text\" style=\"text-align: right;\" size=\"5\" name=\"" + SMTP +"\" value=\"" + quoteHTML(smtp) + "\"" + ( fixed ? " disabled" : "" ) + "></td></tr>\n");
 		}
 		out.println(
 			"<tr><td colspan=\"2\">&nbsp;</td></tr>\n" +
-			"<tr><td></td><td align=\"left\">" + button( LOGIN, _("Login") ) + spacer +
-			 button(OFFLINE, _("Read Mail Offline") ) +
+			"<tr><td></td><td align=\"left\">" + button( LOGIN, _t("Login") ) + spacer +
+			 button(OFFLINE, _t("Read Mail Offline") ) +
 			 //spacer +
-			 //" <input class=\"cancel\" type=\"reset\" value=\"" + _("Reset") + "\">" +
+			 //" <input class=\"cancel\" type=\"reset\" value=\"" + _t("Reset") + "\">" +
 			 spacer +
-			 button(CONFIGURE, _("Settings")) +
+			 button(CONFIGURE, _t("Settings")) +
 			"</td></tr>\n" +
 			"<tr><td colspan=\"2\">&nbsp;</td></tr>\n" +
-			"<tr><td></td><td align=\"left\"><a href=\"http://hq.postman.i2p/?page_id=14\">" + _("Learn about I2P mail") + "</a></td></tr>\n" +
-			"<tr><td></td><td align=\"left\"><a href=\"http://hq.postman.i2p/?page_id=16\">" + _("Create Account") + "</a></td></tr>\n" +
+			"<tr><td></td><td align=\"left\"><a href=\"http://hq.postman.i2p/?page_id=14\">" + _t("Learn about I2P mail") + "</a></td></tr>\n" +
+			"<tr><td></td><td align=\"left\"><a href=\"http://hq.postman.i2p/?page_id=16\">" + _t("Create Account") + "</a></td></tr>\n" +
 			"</table>");
 	}
 
@@ -2178,17 +2178,17 @@ public class WebMail extends HttpServlet
 	private static void showFolder( PrintWriter out, SessionObject sessionObject, RequestWrapper request )
 	{
 		out.println("<div class=\"topbuttons\">");
-		out.println( button( NEW, _("New") ) + spacer);
+		out.println( button( NEW, _t("New") ) + spacer);
 			// In theory, these are valid and will apply to the first checked message,
 			// but that's not obvious and did it work?
-			//button( REPLY, _("Reply") ) +
-			//button( REPLYALL, _("Reply All") ) +
-			//button( FORWARD, _("Forward") ) + spacer +
-			//button( DELETE, _("Delete") ) + spacer +
-		out.println(button( REFRESH, _("Check Mail") ) + spacer);
+			//button( REPLY, _t("Reply") ) +
+			//button( REPLYALL, _t("Reply All") ) +
+			//button( FORWARD, _t("Forward") ) + spacer +
+			//button( DELETE, _t("Delete") ) + spacer +
+		out.println(button( REFRESH, _t("Check Mail") ) + spacer);
 		//if (Config.hasConfigFile())
-		//	out.println(button( RELOAD, _("Reload Config") ) + spacer);
-		out.println(button( LOGOUT, _("Logout") ));
+		//	out.println(button( RELOAD, _t("Reload Config") ) + spacer);
+		out.println(button( LOGOUT, _t("Logout") ));
 		if (sessionObject.folder.getPages() > 1)
 			showPageButtons(out, sessionObject.folder);
 		out.println("</div>");
@@ -2199,12 +2199,12 @@ public class WebMail extends HttpServlet
 		out.println("<table id=\"mailbox\" cellspacing=\"0\" cellpadding=\"5\">\n" +
 			"<tr><td colspan=\"9\"><hr></td></tr>\n<tr>" +
 			thSpacer +
-			thSpacer + "<th>" + sortHeader( SORT_SENDER, _("From"), sessionObject.imgPath, curSort, curOrder ) + "</th>" +
-			thSpacer + "<th>" + sortHeader( SORT_SUBJECT, _("Subject"), sessionObject.imgPath, curSort, curOrder ) + "</th>" +
-			thSpacer + "<th>" + sortHeader( SORT_DATE, _("Date"), sessionObject.imgPath, curSort, curOrder ) +
+			thSpacer + "<th>" + sortHeader( SORT_SENDER, _t("From"), sessionObject.imgPath, curSort, curOrder ) + "</th>" +
+			thSpacer + "<th>" + sortHeader( SORT_SUBJECT, _t("Subject"), sessionObject.imgPath, curSort, curOrder ) + "</th>" +
+			thSpacer + "<th>" + sortHeader( SORT_DATE, _t("Date"), sessionObject.imgPath, curSort, curOrder ) +
 			//sortHeader( SORT_ID, "", sessionObject.imgPath ) +
 			"</th>" +
-			thSpacer + "<th>" + sortHeader( SORT_SIZE, _("Size"), sessionObject.imgPath, curSort, curOrder ) + "</th></tr>" );
+			thSpacer + "<th>" + sortHeader( SORT_SIZE, _t("Size"), sessionObject.imgPath, curSort, curOrder ) + "</th></tr>" );
 		int bg = 0;
 		int i = 0;
 		for( Iterator<String> it = sessionObject.folder.currentPageIterator(); it != null && it.hasNext(); ) {
@@ -2245,12 +2245,12 @@ public class WebMail extends HttpServlet
 					"<td><input type=\"checkbox\" class=\"optbox\" name=\"check" + i + "\" value=\"1\"" + 
 					" onclick=\"deleteboxclicked();\" " +
 					( idChecked ? "checked" : "" ) + ">" + "</td><td " + jslink + ">" +
-					(mail.isNew() ? "<img src=\"/susimail/icons/flag_green.png\" alt=\"\" title=\"" + _("Message is new") + "\">" : "&nbsp;") + "</td><td " + jslink + ">" +
+					(mail.isNew() ? "<img src=\"/susimail/icons/flag_green.png\" alt=\"\" title=\"" + _t("Message is new") + "\">" : "&nbsp;") + "</td><td " + jslink + ">" +
                                         // mail.shortSender and mail.shortSubject already html encoded
 					link + mail.shortSender + "</a></td><td " + jslink + ">" +
-					(mail.hasAttachment() ? "<img src=\"/susimail/icons/attach.png\" alt=\"\" title=\"" + _("Message has an attachment") + "\">" : "&nbsp;") + "</td><td " + jslink + ">" +
+					(mail.hasAttachment() ? "<img src=\"/susimail/icons/attach.png\" alt=\"\" title=\"" + _t("Message has an attachment") + "\">" : "&nbsp;") + "</td><td " + jslink + ">" +
 					link + mail.shortSubject + "</a></td><td " + jslink + ">" +
-					(mail.isSpam() ? "<img src=\"/susimail/icons/flag_red.png\" alt=\"\" title=\"" + _("Message is spam") + "\">" : "&nbsp;") + "</td><td " + jslink + ">" +
+					(mail.isSpam() ? "<img src=\"/susimail/icons/flag_red.png\" alt=\"\" title=\"" + _t("Message is spam") + "\">" : "&nbsp;") + "</td><td " + jslink + ">" +
 					// don't let date get split across lines
 					mail.localFormattedDate.replace(" ", "&nbsp;") + "</td><td " + jslink + ">&nbsp;</td><td align=\"right\" " + jslink + ">" +
 					((mail.getSize() > 0) ? (DataHelper.formatSize2(mail.getSize()) + 'B') : "???") + "</td></tr>" );
@@ -2258,7 +2258,7 @@ public class WebMail extends HttpServlet
 			i++;
 		}
 		if (i == 0)
-			out.println("<tr><td colspan=\"9\" align=\"center\"><i>" + _("No messages") + "</i></td></tr>\n</table>");
+			out.println("<tr><td colspan=\"9\" align=\"center\"><i>" + _t("No messages") + "</i></td></tr>\n</table>");
 		if (i > 0) {
 			out.println( "<tr class=\"bottombuttons\"><td colspan=\"9\"><hr></td></tr>");
 			if (sessionObject.folder.getPages() > 1 && i > 30) {
@@ -2270,27 +2270,27 @@ public class WebMail extends HttpServlet
 			out.println("<tr class=\"bottombuttons\"><td colspan=\"5\" align=\"left\">");
 			if( sessionObject.reallyDelete ) {
 				// TODO ngettext
-				out.println("<p class=\"error\">" + _("Really delete the marked messages?") +
-						"</p>" + button( REALLYDELETE, _("Yes, really delete them!") ) +
-						"<br>" + button( CLEAR, _("Cancel")));
+				out.println("<p class=\"error\">" + _t("Really delete the marked messages?") +
+						"</p>" + button( REALLYDELETE, _t("Yes, really delete them!") ) +
+						"<br>" + button( CLEAR, _t("Cancel")));
 			} else {
-				out.println(button( DELETE, _("Delete Selected") ) + "<br>");
+				out.println(button( DELETE, _t("Delete Selected") ) + "<br>");
 				out.print(
-					button( MARKALL, _("Mark All") ) +
+					button( MARKALL, _t("Mark All") ) +
 					"&nbsp;" +
-					button( CLEAR, _("Clear All") ));
+					button( CLEAR, _t("Clear All") ));
 					//"<br>" + 
-					//button( INVERT, _("Invert Selection") ) +
+					//button( INVERT, _t("Invert Selection") ) +
 					//"<br>");
 			}
 			out.print("</td>\n<td colspan=\"4\" align=\"right\">");
 			// moved to config page
 			//out.print(
-			//	_("Page Size") + ":&nbsp;<input type=\"text\" style=\"text-align: right;\" name=\"" + PAGESIZE + "\" size=\"4\" value=\"" +  sessionObject.folder.getPageSize() + "\">" +
+			//	_t("Page Size") + ":&nbsp;<input type=\"text\" style=\"text-align: right;\" name=\"" + PAGESIZE + "\" size=\"4\" value=\"" +  sessionObject.folder.getPageSize() + "\">" +
 			//	"&nbsp;" + 
-			//	button( SETPAGESIZE, _("Set") ) );
+			//	button( SETPAGESIZE, _t("Set") ) );
 			out.print("<br>");
-			out.print(button(CONFIGURE, _("Settings")));
+			out.print(button(CONFIGURE, _t("Settings")));
 			out.println("</td></tr>");
 		}
 		out.println( "</table>");
@@ -2299,18 +2299,18 @@ public class WebMail extends HttpServlet
 	/**
 	 *  first prev next last
 	 */
-	private static void showPageButtons(PrintWriter out, Folder folder) {
+	private static void showPageButtons(PrintWriter out, Folder<?> folder) {
 		out.println(
 			"<br>" +
 			( folder.isFirstPage() ?
-						button2( FIRSTPAGE, _("First") ) + "&nbsp;" + button2( PREVPAGE, _("Previous") ) :
-						button( FIRSTPAGE, _("First") ) + "&nbsp;" + button( PREVPAGE, _("Previous") ) ) +
+						button2( FIRSTPAGE, _t("First") ) + "&nbsp;" + button2( PREVPAGE, _t("Previous") ) :
+						button( FIRSTPAGE, _t("First") ) + "&nbsp;" + button( PREVPAGE, _t("Previous") ) ) +
 			" &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
-			_("Page {0} of {1}", folder.getCurrentPage(), folder.getPages()) +
+			_t("Page {0} of {1}", folder.getCurrentPage(), folder.getPages()) +
 			"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; " +
 			( folder.isLastPage() ? 
-						button2( NEXTPAGE, _("Next") ) + "&nbsp;" + button2( LASTPAGE, _("Last") ) :
-						button( NEXTPAGE, _("Next") ) + "&nbsp;" + button( LASTPAGE, _("Last") ) )
+						button2( NEXTPAGE, _t("Next") ) + "&nbsp;" + button2( LASTPAGE, _t("Last") ) :
+						button( NEXTPAGE, _t("Next") ) + "&nbsp;" + button( LASTPAGE, _t("Last") ) )
 		);
 	}
 
@@ -2322,7 +2322,7 @@ public class WebMail extends HttpServlet
 	private static void showMessage( PrintWriter out, SessionObject sessionObject )
 	{
 		if( sessionObject.reallyDelete ) {
-			out.println( "<p class=\"error\">" + _("Really delete this message?") + " " + button( REALLYDELETE, _("Yes, really delete it!") ) + "</p>" );
+			out.println( "<p class=\"error\">" + _t("Really delete this message?") + " " + button( REALLYDELETE, _t("Yes, really delete it!") ) + "</p>" );
 		}
 		Mail mail = sessionObject.mailCache.getMail( sessionObject.showUIDL, MailCache.FetchMode.ALL );
 		if(!RELEASE && mail != null && mail.hasBody()) {
@@ -2334,31 +2334,31 @@ public class WebMail extends HttpServlet
 			out.println( "-->" );
 		}
 		out.println("<div class=\"topbuttons\">");
-		out.println( button( NEW, _("New") ) + spacer +
-			button( REPLY, _("Reply") ) +
-			button( REPLYALL, _("Reply All") ) +
-			button( FORWARD, _("Forward") ) + spacer +
-			button( SAVE_AS, _("Save As") ) + spacer);
+		out.println( button( NEW, _t("New") ) + spacer +
+			button( REPLY, _t("Reply") ) +
+			button( REPLYALL, _t("Reply All") ) +
+			button( FORWARD, _t("Forward") ) + spacer +
+			button( SAVE_AS, _t("Save As") ) + spacer);
 		if (sessionObject.reallyDelete)
-			out.println(button2(DELETE, _("Delete")));
+			out.println(button2(DELETE, _t("Delete")));
 		else
-			out.println(button(DELETE, _("Delete")));
+			out.println(button(DELETE, _t("Delete")));
 		out.println("<br>" +
-			( sessionObject.folder.isFirstElement( sessionObject.showUIDL ) ? button2( PREV, _("Previous") ) : button( PREV, _("Previous") ) ) + spacer +
-			button( LIST, _("Back to Folder") ) + spacer +
-			( sessionObject.folder.isLastElement( sessionObject.showUIDL ) ? button2( NEXT, _("Next") ) : button( NEXT, _("Next") ) ));
+			( sessionObject.folder.isFirstElement( sessionObject.showUIDL ) ? button2( PREV, _t("Previous") ) : button( PREV, _t("Previous") ) ) + spacer +
+			button( LIST, _t("Back to Folder") ) + spacer +
+			( sessionObject.folder.isLastElement( sessionObject.showUIDL ) ? button2( NEXT, _t("Next") ) : button( NEXT, _t("Next") ) ));
 		out.println("</div>");
 		//if (Config.hasConfigFile())
-		//	out.println(button( RELOAD, _("Reload Config") ) + spacer);
-		//out.println(button( LOGOUT, _("Logout") ) );
+		//	out.println(button( RELOAD, _t("Reload Config") ) + spacer);
+		//out.println(button( LOGOUT, _t("Logout") ) );
 		if( mail != null ) {
 			out.println( "<table cellspacing=\"0\" cellpadding=\"5\">\n" +
 					"<tr><td colspan=\"2\" align=\"center\"><hr></td></tr>\n" +
-					"<tr class=\"mailhead\"><td align=\"right\" valign=\"top\">" + _("From") +
+					"<tr class=\"mailhead\"><td align=\"right\" valign=\"top\">" + _t("From") +
 					":</td><td align=\"left\">" + quoteHTML( mail.sender ) + "</td></tr>\n" +
-					"<tr class=\"mailhead\"><td align=\"right\" valign=\"top\">" + _("Subject") +
+					"<tr class=\"mailhead\"><td align=\"right\" valign=\"top\">" + _t("Subject") +
 					":</td><td align=\"left\">" + quoteHTML( mail.formattedSubject ) + "</td></tr>\n" +
-					"<tr class=\"mailhead\"><td align=\"right\" valign=\"top\">" + _("Date") +
+					"<tr class=\"mailhead\"><td align=\"right\" valign=\"top\">" + _t("Date") +
 					":</td><td align=\"left\">" + mail.quotedDate + "</td></tr>\n" +
 					"<tr><td colspan=\"2\" align=\"center\"><hr></td></tr>" );
 			if( mail.hasPart()) {
@@ -2366,11 +2366,11 @@ public class WebMail extends HttpServlet
 				showPart( out, mail.getPart(), 0, SHOW_HTML );
 			}
 			else {
-				out.println( "<tr class=\"mailbody\"><td colspan=\"2\" align=\"center\"><p class=\"error\">" + _("Could not fetch mail body.") + "</p></td></tr>" );
+				out.println( "<tr class=\"mailbody\"><td colspan=\"2\" align=\"center\"><p class=\"error\">" + _t("Could not fetch mail body.") + "</p></td></tr>" );
 			}
 		}
 		else {
-			out.println( "<tr class=\"mailbody\"><td colspan=\"2\" align=\"center\"><p class=\"error\">" + _("Could not fetch mail.") + "</p></td></tr>" );
+			out.println( "<tr class=\"mailbody\"><td colspan=\"2\" align=\"center\"><p class=\"error\">" + _t("Could not fetch mail.") + "</p></td></tr>" );
 		}
 		out.println( "<tr><td colspan=\"2\" align=\"center\"><hr></td></tr>\n</table>" );
 	}
@@ -2388,13 +2388,13 @@ public class WebMail extends HttpServlet
 			sz = Config.getProperty(Folder.PAGESIZE, Folder.DEFAULT_PAGESIZE);
 		out.println("<div class=\"topbuttons\">");
 		out.println(
-			_("Folder Page Size") + ":&nbsp;<input type=\"text\" style=\"text-align: right;\" name=\"" + PAGESIZE +
+			_t("Folder Page Size") + ":&nbsp;<input type=\"text\" style=\"text-align: right;\" name=\"" + PAGESIZE +
 			"\" size=\"4\" value=\"" +  sz + "\">" +
 			"&nbsp;" + 
-			button( SETPAGESIZE, _("Set") ) );
+			button( SETPAGESIZE, _t("Set") ) );
 		out.println("<p>");
 		out.println("</div>");
-		out.print(_("Advanced Configuration"));
+		out.print(_t("Advanced Configuration"));
 		Properties config = Config.getProperties();
 		out.print(":</p><textarea cols=\"80\" rows=\"" + Math.max(8, config.size() + 2) + "\" spellcheck=\"false\" name=\"" + CONFIG_TEXT + "\">");
 		for (Map.Entry<Object, Object> e : config.entrySet()) {
@@ -2405,23 +2405,23 @@ public class WebMail extends HttpServlet
 		out.println("</textarea>");
 		out.println("<div id=\"bottombuttons\">");
 		out.println("<br>");
-		out.println(button(SAVE, _("Save Configuration")));
-		out.println(button(CANCEL, _("Cancel")));
+		out.println(button(SAVE, _t("Save Configuration")));
+		out.println(button(CANCEL, _t("Cancel")));
 		out.println("</div>");
 	}
 
 	/** translate */
-	private static String _(String s) {
+	private static String _t(String s) {
 		return Messages.getString(s);
 	}
 
 	/** translate */
-	private static String _(String s, Object o) {
+	private static String _t(String s, Object o) {
 		return Messages.getString(s, o);
 	}
 
 	/** translate */
-	private static String _(String s, Object o, Object o2) {
+	private static String _t(String s, Object o, Object o2) {
 		return Messages.getString(s, o, o2);
 	}
 	

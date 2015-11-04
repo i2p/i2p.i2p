@@ -33,6 +33,8 @@ public class PortMapper {
     public static final String SVC_BOB = "BOB";
     /** not necessary, already in config? */
     public static final String SVC_I2CP = "I2CP";
+    /** @since 0.9.23 */
+    public static final String SVC_I2CP_SSL = "I2CP-SSL";
 
     /**
      *  @param context unused for now
@@ -109,7 +111,7 @@ public class PortMapper {
      *  @since 0.9.20
      */
     public void renderStatusHTML(Writer out) throws IOException {
-        List<String> services = new ArrayList(_dir.keySet());
+        List<String> services = new ArrayList<String>(_dir.keySet());
         out.write("<h2>Port Mapper</h2><table><tr><th>Service<th>Host<th>Port\n");
         Collections.sort(services);
         for (String s : services) {

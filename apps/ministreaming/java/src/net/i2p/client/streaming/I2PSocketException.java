@@ -124,7 +124,7 @@ public class I2PSocketException extends SocketException {
 
             default:
                 // Translate this one here, can't do it later
-                return _("Failure code") + ": " + _status;
+                return _t("Failure code") + ": " + _status;
         }
     }
 
@@ -136,13 +136,13 @@ public class I2PSocketException extends SocketException {
         String s = getMessage();
         if (s == null)
             return null;
-        return _(s);
+        return _t(s);
     }
 
     /**
      *  Translate
      */
-    private static String _(String s) {
+    private static String _t(String s) {
         return Translate.getString(s, I2PAppContext.getGlobalContext(), BUNDLE_NAME);
     }
 

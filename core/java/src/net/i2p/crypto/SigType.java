@@ -11,7 +11,9 @@ import java.util.Map;
 
 import net.i2p.crypto.eddsa.spec.EdDSANamedCurveTable;
 import net.i2p.data.Hash;
+import net.i2p.data.SigningPrivateKey;
 import net.i2p.data.SimpleDataStructure;
+import net.i2p.util.SystemVersion;
 
 /**
  * Defines the properties for various signature types
@@ -193,8 +195,24 @@ public enum SigType {
             return true;
         try {
             getParams();
-            if (getBaseAlgorithm() != SigAlgo.EdDSA)
-                Signature.getInstance(getAlgorithmName());
+            if (getBaseAlgorithm() != SigAlgo.EdDSA) {
+                Signature jsig = Signature.getInstance(getAlgorithmName());
+                if (getBaseAlgorithm() == SigAlgo.EC && SystemVersion.isGentoo() ) {
+                    // Do a full keygen/sign test on Gentoo, because it lies. Keygen works but sigs fail.
+                    // https://bugs.gentoo.org/show_bug.cgi?id=528338
+                    // http://icedtea.classpath.org/bugzilla/show_bug.cgi?id=2497
+                    // http://zzz.i2p/topics/1931
+                    // Be sure nothing in the code paths below calls isAvailable()
+                    // get an I2P keypair
+                    SimpleDataStructure[] keys = KeyGenerator.getInstance().generateSigningKeys(this);
+                    SigningPrivateKey privKey = (SigningPrivateKey) keys[1];
+                    // convert privkey back to Java key and sign
+                    jsig.initSign(SigUtil.toJavaECKey(privKey));
+                    // use the pubkey as random data
+                    jsig.update(keys[0].getData());
+                    jsig.sign();
+                }
+            }
             getDigestInstance();
             getHashInstance();
         } catch (Exception e) {

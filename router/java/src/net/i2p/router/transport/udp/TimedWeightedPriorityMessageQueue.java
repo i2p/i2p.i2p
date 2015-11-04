@@ -57,6 +57,7 @@ class TimedWeightedPriorityMessageQueue implements MessageQueue, OutboundMessage
      *                  specifically, this means how many messages in this queue
      *                  should be pulled off in a row before moving on to the next.
      */
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     public TimedWeightedPriorityMessageQueue(RouterContext ctx, int[] priorityLimits, int[] weighting, FailedListener lsnr) {
         _context = ctx;
         _log = ctx.logManager().getLog(TimedWeightedPriorityMessageQueue.class);

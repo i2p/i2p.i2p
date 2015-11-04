@@ -256,9 +256,9 @@ public class I2PSocketManagerFactory {
             Class<?> cls = Class.forName(classname);
             if (!I2PSocketManager.class.isAssignableFrom(cls))
                 throw new IllegalArgumentException(classname + " is not an I2PSocketManager");
-            Constructor<I2PSocketManager> con = (Constructor<I2PSocketManager>)
-                  cls.getConstructor(new Class[] {I2PAppContext.class, I2PSession.class, Properties.class, String.class});
-            I2PSocketManager mgr = con.newInstance(new Object[] {context, session, opts, name});
+            Constructor<?> con =
+                  cls.getConstructor(I2PAppContext.class, I2PSession.class, Properties.class, String.class);
+            I2PSocketManager mgr = (I2PSocketManager) con.newInstance(new Object[] {context, session, opts, name});
             return mgr;
         } catch (Throwable t) {
             getLog().log(Log.CRIT, "Error loading " + classname, t);

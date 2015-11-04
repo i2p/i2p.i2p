@@ -1,3 +1,144 @@
+2015-11-04 zzz
+ * Threads: More conversions to I2PAppThread
+ * Timers: Improve OutboundMessageRegistry locking (ticket #1694)
+
+2015-11-02 z3r0fox
+ * EepGet: Fix command line filename selection (ticket #1616)
+
+2015-11-01 zzz
+ * Utils: Double IP lookup cache size (ticket #1700)
+
+2015-10-31 zzz
+ * Convert remaining Threads to I2PThread or I2PAppThread
+ * UPnP: Fix deadlock in callbacks (ticket #1699)
+
+2015-10-30 zzz
+ * Router: Fix cascading I2CP error (ticket #1692)
+
+2015-10-21 zzz
+ * i2psnark: More consistency and torrent links in messages
+ * Router: Increase timer thread priority
+
+2015-10-17 zzz
+ * Crypto:
+   - Consolidate duplicate unlimited strength crypto check code
+   - Disable TLS_DHE_DSS_WITH_AES_128_CBC_SHA
+
+2015-10-16 zzz
+ * Console: Add Java 6 warning to summary bar
+ * i2psnark:
+   - Fix deadlock (ticket #1432)
+   - Add "smart sort" option, set sort based on language (tickets #637, #1303)
+   - Don't balloon files on ARM (ticket #1684)
+
+2015-10-14 zzz
+ * Update:
+   - Require Java 7 to download dev builds (ticket #1669)
+   - Fix persistence of the available dev version
+
+2015-10-13 zzz
+ * Startup: Delete our old RI from netDB when rekeying
+
+2015-10-11 zzz
+ * Crypto: Test for broken Gentoo ECDSA support
+
+2015-10-10 zzz
+ * i2psnark: Increase max piece size to 16 MB, max files to 999,
+   close files faster based on file count (tickets #1626, #1671)
+ * JobQueue: Only adjust timing for negative clock shifts
+ * NamingServices: Add support for lookups prefixed with "www."
+ * Startup: Increase rekey probability
+
+2015-10-08 zzz
+ * SimpleTimer2: Additional fix for uncaught IllegalStateException
+   affecting streaming timers (ticket #1672)
+
+2015-10-02 zzz
+ * Router: Don't check config files for reload on Android
+
+2015-09-28 zzz
+ * Addressbook: Fix isValidDest() for EC/Ed dests
+ * i2psnark: Support adding plain base 32 hashes
+ * Susimail: Hide headers and buttons if search results are empty
+
+2015-09-27 dg
+ * Router: Fix soft restarts for 'massive' clock jumps (over +150s or -61s) and recover from standby
+   and hibernate (ticket #1014).
+
+2015-09-27 zzz
+ * Console:
+   - Export SSL cert on creation
+   - New /certs page to show local SSL certs
+   - Show 'none' if no leasesets
+ * SimpleTimer2: Fix bug in forceReschedule() that caused subsequent uncaught IllegalStateException,
+   affected streaming timers
+ * Streaming: Move throttler from context timer to streaming timer
+ * Tunnels: Use max of 2 not-failing peers in an exploratory tunnel,
+   use high cap for the rest; change outbound exploratory
+   default length from 2 + 0-1 to 3+0.
+ * Util: Speed up IP address validation by using Apache's implementation (ticket #1198)
+
+2015-09-25 dg
+ * Rename _() for translation to _t() for Java 9 compatibility (ticket #1456)
+
+2015-09-24 zzz
+  - Rename bad .torrent files instead of deleting them
+
+2015-09-20 dg
+ * /configreseed: Add 'Reset URL list' button for revert to default hosts (ticket #1554, thanks dzirtt@gmail.com)
+
+2015-09-19 zzz
+ * i2psnark: Add recheck/start/stop buttons to details page (ticket #372)
+
+2015-09-18 zzz
+ * EepGet:
+   - Send Accept-Encoding: gzip even when proxied
+   - Fix man page (ticket #1631)
+ * i2psnark:
+   - Don't display "Tracker Error" if torrent is stopped (ticket #1654)
+   - Improve directory listing efficiency (ticket #1079)
+ * i2ptunnel:
+   - Pass Accept-Encoding header through HTTP client and server proxies,
+     to allow end-to-end compression
+   - Don't do transparent response compression if response
+     Content-Encoding indicates it is already compressed
+ * Streaming: Move remaining timers from the context to streaming's SimpleTimer2
+
+2015-09-17 zzz
+ * i2psnark:
+   - Store magnet parameters across restart (ticket #1485)
+   - Don't delete torrent config file after error on initial startup (tickets #1575, #1658)
+
+2015-09-16 zzz
+ * Build:
+   - Include geoip in update files for next release
+   - Add created-by string to release torrents
+ * i2psnark:
+   - Store torrent added and completed times in config files, display on details page
+   - Add metainfo creation command line support for created-by string
+ * Profiles: Bias slightly away from floodfills
+
+2015-09-15 zzz
+ * Console:
+   - Store news feed items separately on disk in XML, like a real feed reader
+   - Limit display to 2 news items in summary bar, /home and /console
+   - New /news page to show all news (ticket #1425)
+
+* 2015-09-12 0.9.22 released
+
+2015-09-11 kytv
+ * Updates to geoip.txt and geoipv6.dat.gz based on Maxmind GeoLite Country
+   database from 2015-09-02.
+ * Translation updates pulled from Transifex
+
+2015-09-04 zzz
+ * UPnP: Fix "content not allowed in trailing section"
+   (tickets #481, #1653)
+
+2015-08-31 zzz
+ * Data: Cache P256 and Ed255i9 key certificates
+ * i2psnark: Change default sig type to Ed25519
+
 2015-08-29 zzz
  * Router:
    - Change default RI sig type to Ed25519, with a 10% chance od

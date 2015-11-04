@@ -62,7 +62,7 @@ import net.i2p.util.Translate;
 /**
  * Main driver for the router.
  *
- * For embedded use, instantiate and then call runRouter().
+ * For embedded use, instantiate, call setKillVMOnEnd(false), and then call runRouter().
  *
  */
 public class Router implements RouterClock.ClockShiftListener {
@@ -77,7 +77,6 @@ public class Router implements RouterClock.ClockShiftListener {
     public final Object routerInfoFileLock = new Object();
     private final Object _configFileLock = new Object();
     private long _started;
-    private boolean _higherVersionSeen;
     private boolean _killVMOnEnd;
     private int _gracefulExitCode;
     private I2PThread.OOMEventListener _oomListener;
@@ -392,13 +391,12 @@ public class Router implements RouterClock.ClockShiftListener {
         CryptoChecker.warnUnavailableCrypto(_context);
 
         _routerInfo = null;
-        _higherVersionSeen = false;
         if (_log.shouldLog(Log.INFO))
             _log.info("New router created with config file " + _configFilename);
         _oomListener = new OOMListener(_context);
 
         _shutdownHook = new ShutdownHook(_context);
-        _gracefulShutdownDetector = new I2PAppThread(new GracefulShutdown(_context), "Graceful shutdown hook", true);
+        _gracefulShutdownDetector = new I2PAppThread(new GracefulShutdown(_context), "Graceful ShutdownHook", true);
         _gracefulShutdownDetector.setPriority(Thread.NORM_PRIORITY + 1);
         _gracefulShutdownDetector.start();
         
@@ -511,20 +509,6 @@ public class Router implements RouterClock.ClockShiftListener {
     }
 
     /**
-     * True if the router has tried to communicate with another router who is running a higher
-     * incompatible protocol version.  
-     * @deprecated unused
-     */
-    public boolean getHigherVersionSeen() { return _higherVersionSeen; }
-
-    /**
-     * True if the router has tried to communicate with another router who is running a higher
-     * incompatible protocol version.  
-     * @deprecated unused
-     */
-    public void setHigherVersionSeen(boolean seen) { _higherVersionSeen = seen; }
-    
-    /**
      *  Used only by routerconsole.. to be deprecated?
      */
     public long getWhenStarted() { return _started; }
@@ -577,7 +561,9 @@ public class Router implements RouterClock.ClockShiftListener {
         if (!SystemVersion.isAndroid())
             I2PThread.addOOMEventListener(_oomListener);
         
-        setupHandlers();
+        // message handlers
+        _context.inNetMessagePool().registerHandlerJobBuilder(GarlicMessage.MESSAGE_TYPE, new GarlicMessageHandler(_context));
+
         //if (ALLOW_DYNAMIC_KEYS) {
         //    if ("true".equalsIgnoreCase(_context.getProperty(Router.PROP_HIDDEN, "false")))
         //        killKeys();
@@ -586,7 +572,7 @@ public class Router implements RouterClock.ClockShiftListener {
         _context.messageValidator().startup();
         _context.tunnelDispatcher().startup();
         _context.inNetMessagePool().startup();
-        startupQueue();
+        _context.jobQueue().runQueue(1);
         //_context.jobQueue().addJob(new CoalesceStatsJob(_context));
         _context.simpleTimer2().addPeriodicEvent(new CoalesceStatsEvent(_context), COALESCE_TIME);
         _context.jobQueue().addJob(new UpdateRoutingKeyModifierJob(_context));
@@ -625,6 +611,7 @@ public class Router implements RouterClock.ClockShiftListener {
      * This is synchronized with saveConfig().
      * Not for external use.
      */
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     public void readConfig() {
         synchronized(_configFileLock) {
             String f = getConfigFilename();
@@ -1080,15 +1067,6 @@ public class Router implements RouterClock.ClockShiftListener {
             saveConfig(PROP_JBIGI, loaded);
     }
     
-    private void startupQueue() {
-        _context.jobQueue().runQueue(1);
-    }
-    
-    private void setupHandlers() {
-        _context.inNetMessagePool().registerHandlerJobBuilder(GarlicMessage.MESSAGE_TYPE, new GarlicMessageHandler(_context));
-        //_context.inNetMessagePool().registerHandlerJobBuilder(TunnelMessage.MESSAGE_TYPE, new TunnelMessageHandler(_context));
-    }
-    
     /** shut down after all tunnels are gone */
     public static final int EXIT_GRACEFUL = 2;
     /** shut down immediately */
@@ -1163,7 +1141,7 @@ public class Router implements RouterClock.ClockShiftListener {
                 _log.warn("Running shutdown task " + task.getClass());
             try {
                 //task.run();
-                Thread t = new Thread(task, "Shutdown task " + task.getClass().getName());
+                Thread t = new I2PAppThread(task, "Shutdown task " + task.getClass().getName());
                 t.setDaemon(true);
                 t.start();
                 try {
@@ -1414,6 +1392,7 @@ public class Router implements RouterClock.ClockShiftListener {
      * @return success
      * @since 0.8.13
      */
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     public boolean saveConfig(Map toAdd, Collection<String> toRemove) {
         synchronized(_configFileLock) {
             if (toAdd != null)
@@ -1443,8 +1422,10 @@ public class Router implements RouterClock.ClockShiftListener {
         _eventLog.addEvent(EventLog.CLOCK_SHIFT, Long.toString(delta));
         // update the routing key modifier
         _context.routerKeyGenerator().generateDateBasedModData();
-        if (_context.commSystem().countActivePeers() <= 0)
-            return;
+        // Commented because this check makes no sense (#1014)
+        // .. and 'active' is relative to our broken time.
+        //if (_context.commSystem().countActivePeers() <= 0)
+        //    return;
         if (delta > 0)
             _log.error("Restarting after large clock shift forward by " + DataHelper.formatDuration(delta));
         else
@@ -1473,7 +1454,7 @@ public class Router implements RouterClock.ClockShiftListener {
         ((RouterClock) _context.clock()).removeShiftListener(this);
         // Let's not stop accepting tunnels, etc
         //_started = _context.clock().now();
-        Thread t = new Thread(new Restarter(_context), "Router Restart");
+        Thread t = new I2PThread(new Restarter(_context), "Router Restart");
         t.setPriority(Thread.NORM_PRIORITY + 1);
         t.start();
     }    
@@ -1580,7 +1561,7 @@ public class Router implements RouterClock.ClockShiftListener {
         if (f.exists()) {
             long lastWritten = f.lastModified();
             if (System.currentTimeMillis()-lastWritten > LIVELINESS_DELAY) {
-                System.err.println("WARN: Old router was not shut down gracefully, deleting router.ping");
+                System.err.println("WARN: Old router was not shut down gracefully, deleting " + f);
                 f.delete();
             } else {
                 return false;

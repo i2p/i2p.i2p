@@ -165,7 +165,7 @@ class PeerManager {
      *  @since 0.8.8
      */
     private void loadProfilesInBackground() {
-        (new Thread(new ProfileLoader())).start();
+        (new I2PThread(new ProfileLoader())).start();
     }
 
     /**

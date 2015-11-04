@@ -18,6 +18,7 @@ import net.i2p.client.I2PClient;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
+import net.i2p.util.PortMapper;
 
 /**
  * Listen for connections on the specified port, and toss them onto the client manager's
@@ -78,13 +79,18 @@ class ClientListenerRunner implements Runnable {
     protected void runServer() {
         _running = true;
         int curDelay = 1000;
+        final String portMapperService = (this instanceof SSLClientListenerRunner) ? PortMapper.SVC_I2CP_SSL
+                                                                                   : PortMapper.SVC_I2CP;
         while (_running) {
             try {
                 _socket = getServerSocket();
                 
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("ServerSocket created, before accept: " + _socket);
-                
+                if (_port > 0) {
+                    // not for DomainClientListenerRunner
+                    _context.portMapper().register(portMapperService, _socket.getInetAddress().getHostAddress(), _port);
+                }                
                 curDelay = 1000;
                 _listening = true;
                 while (_running) {
@@ -115,6 +121,11 @@ class ClientListenerRunner implements Runnable {
             } catch (IOException ioe) {
                 if (isAlive()) 
                     _log.error("Error listening on port " + _port, ioe);
+            } finally {
+                if (_port > 0) {
+                    // not for DomainClientListenerRunner
+                    _context.portMapper().unregister(portMapperService);
+                }                
             }
             
             _listening = false;

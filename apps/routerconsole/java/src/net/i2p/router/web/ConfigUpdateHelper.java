@@ -51,13 +51,13 @@ public class ConfigUpdateHelper extends HelperBase {
 
     public String getProxyHost() {
         if (isInternal())
-            return _("internal") + "\" readonly=\"readonly";
+            return _t("internal") + "\" readonly=\"readonly";
         return _context.getProperty(ConfigUpdateHandler.PROP_PROXY_HOST, ConfigUpdateHandler.DEFAULT_PROXY_HOST);
     }
 
     public String getProxyPort() {
         if (isInternal())
-            return _("internal") + "\" readonly=\"readonly";
+            return _t("internal") + "\" readonly=\"readonly";
         return Integer.toString(ConfigUpdateHandler.proxyPort(_context));
     }
 
@@ -127,9 +127,9 @@ public class ConfigUpdateHelper extends HelperBase {
                 buf.append("\" selected=\"selected");
             
             if (PERIODS[i] == -1)
-                buf.append("\">").append(_("Never")).append("</option>\n");
+                buf.append("\">").append(_t("Never")).append("</option>\n");
             else
-                buf.append("\">").append(_("Every")).append(' ').append(DataHelper.formatDuration2(PERIODS[i])).append("</option>\n");
+                buf.append("\">").append(_t("Every")).append(' ').append(DataHelper.formatDuration2(PERIODS[i])).append("</option>\n");
         }
         buf.append("</select>\n");
         return buf.toString();
@@ -147,14 +147,14 @@ public class ConfigUpdateHelper extends HelperBase {
         buf.append("<option value=\"notify\"");
         if ("notify".equals(policy) || _dontInstall)
             buf.append(" selected=\"selected\"");
-        buf.append('>').append(_("Notify only")).append("</option>");
+        buf.append('>').append(_t("Notify only")).append("</option>");
 
         buf.append("<option value=\"download\"");
         if (_dontInstall)
             buf.append(" disabled=\"disabled\"");
         else if ("download".equals(policy))
             buf.append(" selected=\"selected\"");
-        buf.append('>').append(_("Download and verify only")).append("</option>");
+        buf.append('>').append(_t("Download and verify only")).append("</option>");
         
         if (_context.hasWrapper()) {
             buf.append("<option value=\"install\"");
@@ -162,7 +162,7 @@ public class ConfigUpdateHelper extends HelperBase {
                 buf.append(" disabled=\"disabled\"");
             else if ("install".equals(policy))
                 buf.append(" selected=\"selected\"");
-            buf.append('>').append(_("Download, verify, and restart")).append("</option>");
+            buf.append('>').append(_t("Download, verify, and restart")).append("</option>");
         }
         
         buf.append("</select>\n");

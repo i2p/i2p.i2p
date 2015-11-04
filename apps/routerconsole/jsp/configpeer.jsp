@@ -10,7 +10,7 @@
 </head><body onload="initAjax()">
 
 <%@include file="summary.jsi" %>
-<h1><%=intl._("I2P Peer Configuration")%></h1>
+<h1><%=intl._t("I2P Peer Configuration")%></h1>
 <div class="main" id="main">
  <%@include file="confignav.jsi" %>
 
@@ -29,38 +29,38 @@
  <a name="sh"> </a>
  <a name="unsh"> </a>
  <a name="bonus"> </a>
- <h2><%=intl._("Manual Peer Controls")%></h2>
- <div class="mediumtags"><p><%=intl._("Router Hash")%>:
+ <h2><%=intl._t("Manual Peer Controls")%></h2>
+ <div class="mediumtags"><p><%=intl._t("Router Hash")%>:
 <input type="text" size="55" name="peer" value="<%=peer%>" /></p></div>
- <h3><%=intl._("Manually Ban / Unban a Peer")%></h3>
- <p><%=intl._("Banning will prevent the participation of this peer in tunnels you create.")%></p>
+ <h3><%=intl._t("Manually Ban / Unban a Peer")%></h3>
+ <p><%=intl._t("Banning will prevent the participation of this peer in tunnels you create.")%></p>
       <div class="formaction">
-        <input type="submit" name="action" class="delete" value="<%=intl._("Ban peer until restart")%>" />
-        <input type="submit" name="action" class="accept" value="<%=intl._("Unban peer")%>" />
+        <input type="submit" name="action" class="delete" value="<%=intl._t("Ban peer until restart")%>" />
+        <input type="submit" name="action" class="accept" value="<%=intl._t("Unban peer")%>" />
         <% if (! "".equals(peer)) { %>
         <!-- <font color="blue">&lt;---- click to verify action</font> -->
         <% } %>
       </div>
 
- <h3><%=intl._("Adjust Profile Bonuses")%></h3>
- <p><%=intl._("Bonuses may be positive or negative, and affect the peer's inclusion in Fast and High Capacity tiers. Fast peers are used for client tunnels, and High Capacity peers are used for some exploratory tunnels. Current bonuses are displayed on the")%> <a href="profiles"><%=intl._("profiles page")%></a>.</p>
+ <h3><%=intl._t("Adjust Profile Bonuses")%></h3>
+ <p><%=intl._t("Bonuses may be positive or negative, and affect the peer's inclusion in Fast and High Capacity tiers. Fast peers are used for client tunnels, and High Capacity peers are used for some exploratory tunnels. Current bonuses are displayed on the")%> <a href="profiles"><%=intl._t("profiles page")%></a>.</p>
  <% long speed = 0; long capacity = 0;
     if (! "".equals(peer)) {
         // get existing bonus values?
     }
  %>
- <div class="mediumtags"><p><%=intl._("Speed")%>:
+ <div class="mediumtags"><p><%=intl._t("Speed")%>:
  <input type="text" size="8" name="speed" value="<%=speed%>" />
- <%=intl._("Capacity")%>:
+ <%=intl._t("Capacity")%>:
  <input type="text" size="8" name="capacity" value="<%=capacity%>" />
- <input type="submit" name="action" class="add" value="<%=intl._("Adjust peer bonuses")%>" /></p></div>
+ <input type="submit" name="action" class="add" value="<%=intl._t("Adjust peer bonuses")%>" /></p></div>
  </form>
- <a name="banlist"> </a><h2><%=intl._("Banned Peers")%></h2>
+ <a name="banlist"> </a><h2><%=intl._t("Banned Peers")%></h2>
  <jsp:useBean class="net.i2p.router.web.ProfilesHelper" id="profilesHelper" scope="request" />
  <jsp:setProperty name="profilesHelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
  <% profilesHelper.storeWriter(out); %>
  <jsp:getProperty name="profilesHelper" property="banlistSummary" />
- <div class="wideload"><h2><%=intl._("Banned IPs")%></h2>
+ <div class="wideload"><h2><%=intl._t("Banned IPs")%></h2>
  <jsp:getProperty name="peerhelper" property="blocklistSummary" />
 
 </div><hr></div></div></body></html>

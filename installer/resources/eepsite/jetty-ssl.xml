@@ -248,6 +248,8 @@
             <Item>TLS_ECDH_RSA_WITH_3DES_EDE_CBC_SHA</Item>
             <Item>TLS_ECDHE_ECDSA_WITH_3DES_EDE_CBC_SHA</Item>
             <Item>TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA</Item>
+            <Item>TLS_DHE_DSS_WITH_AES_128_CBC_SHA</Item>
+            <!-- Please keep this list in sync with the one in I2PSSLSocketFactory -->
           </Array>
         </Set>
       </New>

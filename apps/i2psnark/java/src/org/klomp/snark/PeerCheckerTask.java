@@ -267,7 +267,23 @@ class PeerCheckerTask implements Runnable
 
         // close out unused files, but we don't need to do it every time
         Storage storage = coordinator.getStorage();
-        if (storage != null && (_runCount % 4) == 0) {
+        if (storage != null) {
+            // The more files a torrent has, the more often we call the cleaner,
+            // to keep from running out of FDs
+            int files = storage.getFileCount();
+            int skip;
+            if (files == 1)
+                skip = 6;
+            else if (files <= 4)
+                skip = 4;
+            else if (files <= 20)
+                skip = 3;
+            else if (files <= 50)
+                skip = 2;
+            else
+                skip = 1;
+
+            if ((_runCount % skip) == 0)
                 storage.cleanRAFs();
         }
 

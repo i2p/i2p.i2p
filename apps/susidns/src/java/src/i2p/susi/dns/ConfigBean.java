@@ -96,18 +96,18 @@ public class ConfigBean extends BaseBean implements Serializable {
 		if( action != null ) {
                         if (I2PAppContext.getGlobalContext().getBooleanProperty(BaseBean.PROP_PW_ENABLE) ||
 			    (serial != null && serial.equals(lastSerial))) {
-				if(action.equals(_("Save"))) {
+				if(action.equals(_t("Save"))) {
 					save();
-					message = _("Configuration saved.");
-				} else if (action.equals(_("Reload"))) {
+					message = _t("Configuration saved.");
+				} else if (action.equals(_t("Reload"))) {
 					reload();
-					message = _("Configuration reloaded.");
+					message = _t("Configuration reloaded.");
 				}
 			}			
 			else {
-				message = _("Invalid form submission, probably because you used the \"back\" or \"reload\" button on your browser. Please resubmit.")
+				message = _t("Invalid form submission, probably because you used the \"back\" or \"reload\" button on your browser. Please resubmit.")
                                           + ' ' +
-                                          _("If the problem persists, verify that you have cookies enabled in your browser.");
+                                          _t("If the problem persists, verify that you have cookies enabled in your browser.");
 			}
 		}
 		if( message.length() > 0 )

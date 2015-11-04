@@ -83,6 +83,7 @@ public class LocaleWebAppHandler extends HandlerWrapper
                 if (lang != null && lang.length() > 0 && !lang.equals("en")) {
                     String testPath = pathInContext.substring(0, len - 4) + '_' + lang + ".jsp";
                     // Do we have a servlet for the new path that isn't the catchall *.jsp?
+                    @SuppressWarnings("rawtypes")
                     Map.Entry servlet = _wac.getServletHandler().getHolderEntry(testPath);
                     if (servlet != null) {
                         String servletPath = (String) servlet.getKey();
@@ -130,7 +131,7 @@ public class LocaleWebAppHandler extends HandlerWrapper
     /**
      *  Mysteriously removed from Jetty 7
      */
-    private void setInitParams(Map params) {
+    private void setInitParams(Map<?,?> params) {
         setInitParams(_wac, params);
     }
 
@@ -138,7 +139,7 @@ public class LocaleWebAppHandler extends HandlerWrapper
      *  @since Jetty 7
      */
     public static void setInitParams(WebAppContext context, Map<?,?> params) {
-        for (Map.Entry e : params.entrySet()) {
+        for (Map.Entry<?,?> e : params.entrySet()) {
             context.setInitParameter((String)e.getKey(), (String)e.getValue());
         }
     }

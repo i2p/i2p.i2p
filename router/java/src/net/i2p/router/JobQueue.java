@@ -27,6 +27,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import net.i2p.data.DataHelper;
 import net.i2p.router.message.HandleGarlicMessageJob;
 import net.i2p.router.networkdb.kademlia.HandleFloodfillDatabaseLookupMessageJob;
+import net.i2p.router.RouterClock;
 import net.i2p.util.Clock;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
@@ -340,7 +341,7 @@ public class JobQueue {
     public void startup() {
         _alive = true;
         I2PThread pumperThread = new I2PThread(_pumper, "Job Queue Pumper", true);
-        //pumperThread.setPriority(I2PThread.NORM_PRIORITY+1);
+        pumperThread.setPriority(Thread.NORM_PRIORITY + 1);
         pumperThread.start();
     }
 
@@ -516,10 +517,12 @@ public class JobQueue {
      * max number of runners.
      *
      */
-    private final class QueuePumper implements Runnable, Clock.ClockUpdateListener {
+    private final class QueuePumper implements Runnable, Clock.ClockUpdateListener, RouterClock.ClockShiftListener {
         public QueuePumper() { 
             _context.clock().addUpdateListener(this);
+            ((RouterClock) _context.clock()).addShiftListener(this);
         }
+
         public void run() {
             try {
                 while (_alive) {
@@ -589,9 +592,11 @@ public class JobQueue {
                     } catch (InterruptedException ie) {}
                 } // while (_alive)
             } catch (Throwable t) {
-                _context.clock().removeUpdateListener(this);
                 if (_log.shouldLog(Log.ERROR))
                     _log.error("pumper killed?!", t);
+            } finally {
+                _context.clock().removeUpdateListener(this);
+                ((RouterClock) _context.clock()).removeShiftListener(this);
             }
         }
 
@@ -599,6 +604,22 @@ public class JobQueue {
             updateJobTimings(delta);
             synchronized (_jobLock) {
                 _jobLock.notifyAll();
+            }
+        }
+
+        /**
+         *  Clock shift listener.
+         *  Only adjust timings for negative shifts.
+         *  For positive shifts, just wake up the pumper.
+         *  @since 0.9.23
+         */
+        public void clockShift(long delta) {
+            if (delta < 0) {
+                offsetChanged(delta);
+            } else {
+                synchronized (_jobLock) {
+                    _jobLock.notifyAll();
+                }
             }
         }
 

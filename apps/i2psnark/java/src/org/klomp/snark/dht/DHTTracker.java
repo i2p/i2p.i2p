@@ -106,6 +106,7 @@ class DHTTracker {
      *  @param noSeeds true if we do not want seeds in the result
      *  @return list or empty list (never null)
      */
+    @SuppressWarnings({"unchecked", "rawtypes"})
     List<Hash> getPeers(InfoHash ih, int max, boolean noSeeds) {
         Peers peers = _torrents.get(ih);
         if (peers == null || max <= 0)

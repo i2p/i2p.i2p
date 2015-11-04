@@ -66,7 +66,7 @@ public class EventLogHelper extends FormHandler {
     public void setContextId(String contextId) {
         super.setContextId(contextId);
         for (int i = 0; i < _events.length; i += 2) {
-            _xevents.put(_events[i], _(_events[i + 1]));
+            _xevents.put(_events[i], _t(_events[i + 1]));
         }
     }
     
@@ -99,27 +99,27 @@ public class EventLogHelper extends FormHandler {
         // So just use the "shared/console nonce".
         String nonce = CSSHelper.getNonce();
         try {
-            _out.write("<br><h3>" + _("Display Events") + "</h3>");
+            _out.write("<br><h3>" + _t("Display Events") + "</h3>");
             _out.write("<form action=\"events\" method=\"POST\">\n" +
                        "<input type=\"hidden\" name=\"action\" value=\"save\">\n" +
                        "<input type=\"hidden\" name=\"nonce\" value=\"" + nonce + "\" >\n");
-            _out.write(_("Events since") + ": <select name=\"from\">");
+            _out.write(_t("Events since") + ": <select name=\"from\">");
             for (int i = 0; i < _times.length; i++) {
                 writeOption(_times[i]);
             }
             _out.write("</select><br>");
-            _out.write(_("Event type") + ": <select name=\"type\">");
+            _out.write(_t("Event type") + ": <select name=\"type\">");
             // sorted by translated display string
             Map<String, String> events = new TreeMap<String, String>(Collator.getInstance());
             for (int i = 0; i < _events.length; i += 2) {
                 events.put(_xevents.get(_events[i]), _events[i]);
             }
-            writeOption(_("All events"), ALL);
+            writeOption(_t("All events"), ALL);
             for (Map.Entry<String, String> e : events.entrySet()) {
                 writeOption(e.getKey(), e.getValue());
             }
             _out.write("</select>" +
-                       "<hr><div class=\"formaction\"><input type=\"submit\" class=\"accept\" value=\"" + _("Filter events") + "\"></div></form>");
+                       "<hr><div class=\"formaction\"><input type=\"submit\" class=\"accept\" value=\"" + _t("Filter events") + "\"></div></form>");
         } catch (IOException ioe) {
             ioe.printStackTrace();
         }
@@ -145,7 +145,7 @@ public class EventLogHelper extends FormHandler {
              _out.write(" selected=\"selected\"");
          _out.write(">");
          if (age == 0)
-             _out.write(_("All events"));
+             _out.write(_t("All events"));
          else
              _out.write(DataHelper.formatDuration2(age));
          _out.write("</option>\n");
@@ -167,21 +167,21 @@ public class EventLogHelper extends FormHandler {
         if (events.isEmpty()) {
             if (isAll) {
                 if (_age == 0)
-                    return _("No events found");
-                return _("No events found in previous {0}", DataHelper.formatDuration2(_age));
+                    return _t("No events found");
+                return _t("No events found in previous {0}", DataHelper.formatDuration2(_age));
             }
             if (_age == 0)
-                return _("No \"{0}\" events found", xev);
-            return _("No \"{0}\" events found in previous {1}", xev, DataHelper.formatDuration2(_age));
+                return _t("No \"{0}\" events found", xev);
+            return _t("No \"{0}\" events found in previous {1}", xev, DataHelper.formatDuration2(_age));
         }
         StringBuilder buf = new StringBuilder(2048);
         buf.append("<table><tr><th>");
-        buf.append(_("Time"));
+        buf.append(_t("Time"));
         buf.append("</th><th>");
         if (isAll) {
-            buf.append(_("Event"));
+            buf.append(_t("Event"));
             buf.append("</th><th>");
-            buf.append(_("Details"));
+            buf.append(_t("Details"));
         } else {
             buf.append(xev);
         }

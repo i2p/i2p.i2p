@@ -42,7 +42,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title><%=intl._("Introduction")%> - SusiDNS</title>
+<title><%=intl._t("Introduction")%> - SusiDNS</title>
 <link rel="stylesheet" type="text/css" href="<%=base.getTheme()%>susidns.css">
 </head>
 <body>
@@ -53,39 +53,39 @@
 <hr>
 <div id="navi">
 <p>
-<%=intl._("Address books")%>:
-<a href="addressbook?book=private"><%=intl._("private")%></a> |
-<a href="addressbook?book=master"><%=intl._("master")%></a> |
-<a href="addressbook?book=router"><%=intl._("router")%></a> |
-<a href="addressbook?book=published"><%=intl._("published")%></a> *
-<a href="subscriptions"><%=intl._("Subscriptions")%></a> *
-<a href="config"><%=intl._("Configuration")%></a> *
-<%=intl._("Overview")%>
+<%=intl._t("Address books")%>:
+<a href="addressbook?book=private"><%=intl._t("private")%></a> |
+<a href="addressbook?book=master"><%=intl._t("master")%></a> |
+<a href="addressbook?book=router"><%=intl._t("router")%></a> |
+<a href="addressbook?book=published"><%=intl._t("published")%></a> *
+<a href="subscriptions"><%=intl._t("Subscriptions")%></a> *
+<a href="config"><%=intl._t("Configuration")%></a> *
+<%=intl._t("Overview")%>
 </p>
 </div>
 <hr>
 <div id="content">
-<h3><%=intl._("What is the addressbook?")%></h3>
+<h3><%=intl._t("What is the addressbook?")%></h3>
 <p>
-<%=intl._("The addressbook application is part of your I2P installation.")%>
-<%=intl._("It regularly updates your hosts.txt file from distributed sources or \"subscriptions\".")%>
+<%=intl._t("The addressbook application is part of your I2P installation.")%>
+<%=intl._t("It regularly updates your hosts.txt file from distributed sources or \"subscriptions\".")%>
 </p>
 <p>
-<%=intl._("In the default configuration, the address book is only subscribed to {0}.", "i2p-projekt.i2p")%>
-<%=intl._("Subscribing to additional sites is easy, just add them to your <a href=\"subscriptions\">subscriptions</a> file.")%>
+<%=intl._t("In the default configuration, the address book is only subscribed to {0}.", "i2p-projekt.i2p")%>
+<%=intl._t("Subscribing to additional sites is easy, just add them to your <a href=\"subscriptions\">subscriptions</a> file.")%>
 </p>
 <p>
-<%=intl._("For more information on naming in I2P, see <a href=\"http://i2p-projekt.i2p/naming.html\" target=\"_top\">the overview</a>.")%>
+<%=intl._t("For more information on naming in I2P, see <a href=\"http://i2p-projekt.i2p/naming.html\" target=\"_top\">the overview</a>.")%>
 </p>
-<h3><%=intl._("How does the addressbook application work?")%></h3>
+<h3><%=intl._t("How does the addressbook application work?")%></h3>
 <p>
-<%=intl._("The addressbook application regularly polls your subscriptions and merges their content into your \"router\" address book.")%>
-<%=intl._("Then it merges your \"master\" address book into the router address book as well.")%>
-<%=intl._("If configured, the router address book is now written to the \"published\" address book, which will be publicly available if you are running an eepsite.")%>
+<%=intl._t("The addressbook application regularly polls your subscriptions and merges their content into your \"router\" address book.")%>
+<%=intl._t("Then it merges your \"master\" address book into the router address book as well.")%>
+<%=intl._t("If configured, the router address book is now written to the \"published\" address book, which will be publicly available if you are running an eepsite.")%>
 </p><p>
-<%=intl._("The router also uses a private address book (not shown in the picture), which is not merged or published.")%>
-<%=intl._("Hosts in the private address book can be accessed by you but their addresses are never distributed to others.")%>
-<%=intl._("The private address book can also be used for aliases of hosts in your other address books.")%>
+<%=intl._t("The router also uses a private address book (not shown in the picture), which is not merged or published.")%>
+<%=intl._t("Hosts in the private address book can be accessed by you but their addresses are never distributed to others.")%>
+<%=intl._t("The private address book can also be used for aliases of hosts in your other address books.")%>
 </p>
 <center><img src="/themes/susidns/images/how.png" border="0" alt="address book working scheme" title="How the address book works" class="illustrate" /></center>
 </div>

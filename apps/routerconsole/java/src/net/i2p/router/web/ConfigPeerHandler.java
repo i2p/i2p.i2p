@@ -17,26 +17,26 @@ public class ConfigPeerHandler extends FormHandler {
         if ("Save Configuration".equals(_action)) {
             _context.router().saveConfig();
             addFormNotice("Settings saved - not really!!!!!");
-        } else if (_action.equals(_("Ban peer until restart"))) {
+        } else if (_action.equals(_t("Ban peer until restart"))) {
             Hash h = getHash();
             if (h != null) {
-                _context.banlist().banlistRouterForever(h, _("Manually banned via {0}"), "<a href=\"configpeer\">configpeer</a>");
-                addFormNotice(_("Peer") + " " + _peer + " " + _("banned until restart") );
+                _context.banlist().banlistRouterForever(h, _t("Manually banned via {0}"), "<a href=\"configpeer\">configpeer</a>");
+                addFormNotice(_t("Peer") + " " + _peer + " " + _t("banned until restart") );
                 return;
             }
-            addFormError(_("Invalid peer"));
-        } else if (_action.equals(_("Unban peer"))) {
+            addFormError(_t("Invalid peer"));
+        } else if (_action.equals(_t("Unban peer"))) {
             Hash h = getHash();
             if (h != null) {
                 if (_context.banlist().isBanlisted(h)) {
                     _context.banlist().unbanlistRouter(h);
-                    addFormNotice(_("Peer") + " " + _peer + " " + _("unbanned") );
+                    addFormNotice(_t("Peer") + " " + _peer + " " + _t("unbanned") );
                 } else
-                    addFormNotice(_("Peer") + " " + _peer + " " + _("is not currently banned") );
+                    addFormNotice(_t("Peer") + " " + _peer + " " + _t("is not currently banned") );
                 return;
             }
-            addFormError(_("Invalid peer"));
-        } else if (_action.equals(_("Adjust peer bonuses"))) {
+            addFormError(_t("Invalid peer"));
+        } else if (_action.equals(_t("Adjust peer bonuses"))) {
             Hash h = getHash();
             if (h != null) {
                 PeerProfile prof = _context.profileOrganizer().getProfile(h);
@@ -44,23 +44,23 @@ public class ConfigPeerHandler extends FormHandler {
                     try {
                         prof.setSpeedBonus(Long.parseLong(_speed));
                     } catch (NumberFormatException nfe) {
-                        addFormError(_("Bad speed value"));
+                        addFormError(_t("Bad speed value"));
                     }
                     try {
                         prof.setCapacityBonus(Long.parseLong(_capacity));
                     } catch (NumberFormatException nfe) {
-                        addFormError(_("Bad capacity value"));
+                        addFormError(_t("Bad capacity value"));
                     }
                     addFormNotice("Bonuses adjusted for " + _peer);
                 } else
                     addFormError("No profile exists for " + _peer);
                 return;
             }
-            addFormError(_("Invalid peer"));
+            addFormError(_t("Invalid peer"));
         } else if (_action.startsWith("Check")) {
-            addFormError(_("Unsupported"));
+            addFormError(_t("Unsupported"));
         } else {
-            //addFormError(_("Unsupported") + ' ' + _action + '.');
+            //addFormError(_t("Unsupported") + ' ' + _action + '.');
         }
     }
     

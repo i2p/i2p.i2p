@@ -549,7 +549,7 @@ msgstr "El umbral del algoritmo de comienzo lento"
 msgid "The round trip time in milliseconds"
 msgstr "El periodo de ida y vuelta en milisegundos"
 
-#. "<b id=\"def.dev\">").append(_("Dev")).append("</b>: ").append(_("The
+#. "<b id=\"def.dev\">").append(_t("Dev")).append("</b>: ").append(_t("The
 #. standard deviation of the round trip time in
 #. milliseconds")).append("<br>\n" +
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:746
@@ -3580,7 +3580,7 @@ msgstr[1] "{0} complementos actualizados"
 msgid "Plugin update check complete"
 msgstr "Búsqueda de actualizaciones de complementos finalizada"
 
-#. buf.append("<h2>").append(_("Peer Profiles")).append("</h2>\n<p>");
+#. buf.append("<h2>").append(_t("Peer Profiles")).append("</h2>\n<p>");
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:79
 #, java-format
 msgid "Showing 1 recent profile."

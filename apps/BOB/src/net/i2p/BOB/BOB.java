@@ -338,7 +338,7 @@ public class BOB implements Runnable, ClientApp {
 
 				if (g) {
 					DoCMDS conn_c = new DoCMDS(spin, lock, server, props, database, _log);
-					Thread t = new Thread(conn_c);
+					Thread t = new I2PAppThread(conn_c);
 					t.setName("BOB.DoCMDS " + i);
 					t.start();
 					i++;

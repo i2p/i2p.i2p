@@ -39,6 +39,7 @@ import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.FileUtil;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleTimer;
+import net.i2p.util.SystemVersion;
 import net.i2p.util.VersionComparator;
 
 /**
@@ -184,7 +185,11 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
         if (newVersion != null) {
             List<URI> updateSources = uuh.getUpdateSources();
             if (updateSources != null) {
-                VersionAvailable newVA = new VersionAvailable(newVersion, "", HTTP, updateSources);
+                VersionAvailable newVA;
+                if (SystemVersion.isJava7())
+                    newVA = new VersionAvailable(newVersion, "", HTTP, updateSources);
+                else
+                    newVA = new VersionAvailable(newVersion, "Requires Java 7");
                 _available.put(new UpdateItem(ROUTER_UNSIGNED, ""), newVA);
             }
         }
@@ -197,7 +202,11 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
             if (VersionComparator.comp(newVersion, RouterVersion.FULL_VERSION) > 0) {
                 List<URI> updateSources = dsuh.getUpdateSources();
                 if (updateSources != null) {
-                    VersionAvailable newVA = new VersionAvailable(newVersion, "", HTTP, updateSources);
+                    VersionAvailable newVA;
+                    if (SystemVersion.isJava7())
+                        newVA = new VersionAvailable(newVersion, "", HTTP, updateSources);
+                    else
+                        newVA = new VersionAvailable(newVersion, "Requires Java 7");
                     _available.put(new UpdateItem(ROUTER_DEV_SU3, ""), newVA);
                 }
             } else {
@@ -323,7 +332,7 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
                     t = r.checker.check(type, r.method, id, current, maxWait);
                     if (t != null) {
                          if (_log.shouldLog(Log.INFO))
-                             _log.info("Starting " + r);
+                             _log.info("Starting " + r, new Exception());
                         _activeCheckers.add(t);
                         t.start();
                     }
@@ -366,7 +375,7 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
                     UpdateTask t = r.checker.check(type, r.method, id, current, DEFAULT_CHECK_TIME);
                     if (t != null) {
                          if (_log.shouldLog(Log.INFO))
-                             _log.info("Starting " + r);
+                             _log.info("Starting " + r, new Exception());
                         _activeCheckers.add(t);
                         t.start();
                         break;
@@ -670,7 +679,7 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
                         // race window here
                         //  store the remaining ones for retrying
                         if (_log.shouldLog(Log.INFO))
-                            _log.info("Starting " + r);
+                            _log.info("Starting " + r, new Exception());
                         _downloaders.put(t, toTry);
                         t.start();
                         return t;
@@ -846,6 +855,14 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
             _available.put(ui, newVA);
             shouldUpdate = true;
         }
+
+        // save across restarts
+        if (type == ROUTER_UNSIGNED) {
+            _context.router().saveConfig(PROP_UNSIGNED_AVAILABLE, newVersion);
+        } else if (type == ROUTER_DEV_SU3) {
+            _context.router().saveConfig(PROP_DEV_SU3_AVAILABLE, newVersion);
+        }
+
         if (!shouldUpdate)
             return false;
 
@@ -857,12 +874,6 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
 
             case ROUTER_UNSIGNED:
             case ROUTER_DEV_SU3:
-                // save across restarts
-                String prop = type == ROUTER_UNSIGNED ? PROP_UNSIGNED_AVAILABLE
-                                                      : PROP_DEV_SU3_AVAILABLE;
-                _context.router().saveConfig(prop, newVersion);
-                // fall through
-
             case ROUTER_SIGNED:
             case ROUTER_SIGNED_SU3:
                 if (shouldInstall() &&
@@ -881,7 +892,7 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
                 break;
 
             case PLUGIN:
-                msg = "<b>" + _("New plugin version {0} is available", newVersion) + "</b>";
+                msg = "<b>" + _t("New plugin version {0} is available", newVersion) + "</b>";
                 break;
 
             default:
@@ -961,11 +972,11 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
 
             case PLUGIN:
                 if (!success) {
-                    msg = _("Update check failed for plugin {0}", task.getID());
+                    msg = _t("Update check failed for plugin {0}", task.getID());
                     _log.logAlways(Log.WARN, msg);
                     msg = "<b>" + msg + "</b>";
                 } else if (!newer) {
-                    msg = "<b>" + _("No new version is available for plugin {0}", task.getID()) + "</b>";
+                    msg = "<b>" + _t("No new version is available for plugin {0}", task.getID()) + "</b>";
                 }
                 /// else success.... message for that?
 
@@ -989,7 +1000,7 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
             buf.append(_pct.format(pct));
         }
         buf.append("<br>\n");
-        buf.append(_("{0}B transferred", DataHelper.formatSize2(downloaded)));
+        buf.append(_t("{0}B transferred", DataHelper.formatSize2(downloaded)));
         updateStatus(buf.toString());
     }
 
@@ -1048,9 +1059,9 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
             String uri = task.getURI().toString();
             if (uri.startsWith("file:") || task.getMethod() == FILE) {
                 uri = DataHelper.stripHTML(task.getURI().getPath());
-                buf.append(_("Install failed from {0}", uri));
+                buf.append(_t("Install failed from {0}", uri));
             } else {
-                buf.append(_("Transfer failed from {0}", uri));
+                buf.append(_t("Transfer failed from {0}", uri));
             }
             if (reason != null && reason.length() > 0) {
                 buf.append("<br>");
@@ -1325,7 +1336,7 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
      */
     private boolean handleRouterFile(URI uri, String actualVersion, File f, boolean isSU3) {
         String url = uri.toString();
-        updateStatus("<b>" + _("Update downloaded") + "</b>");
+        updateStatus("<b>" + _t("Update downloaded") + "</b>");
         File to = new File(_context.getRouterDir(), Router.UPDATE_FILE);
         String err;
         // Process the file
@@ -1369,7 +1380,7 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
 
             if ("install".equals(policy)) {
                 _log.log(Log.CRIT, "Update was downloaded and verified, restarting to install it");
-                updateStatus("<b>" + _("Update verified") + "</b><br>" + _("Restarting"));
+                updateStatus("<b>" + _t("Update verified") + "</b><br>" + _t("Restarting"));
                 restart();
             } else {
                 _log.logAlways(Log.WARN, "Update was downloaded and verified, will be installed at next restart");
@@ -1378,7 +1389,7 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
             }
         } else {
             _log.log(Log.CRIT, err + " from " + url);
-            updateStatus("<b>" + err + ' ' + _("from {0}", linkify(url)) + " </b>");
+            updateStatus("<b>" + err + ' ' + _t("from {0}", linkify(url)) + " </b>");
         }
         return err == null;
     }
@@ -1389,11 +1400,11 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
      */
     private boolean handleUnsignedFile(URI uri, String lastmod, File updFile) {
         if (FileUtil.verifyZip(updFile)) {
-            updateStatus("<b>" + _("Update downloaded") + "</b>");
+            updateStatus("<b>" + _t("Update downloaded") + "</b>");
         } else {
             updFile.delete();
             String url = uri.toString();
-            updateStatus("<b>" + _("Unsigned update file from {0} is corrupt", url) + "</b>");
+            updateStatus("<b>" + _t("Unsigned update file from {0} is corrupt", url) + "</b>");
             _log.log(Log.CRIT, "Corrupt zip file from " + url);
             return false;
         }
@@ -1413,7 +1424,7 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
             _context.router().saveConfig(NewsHelper.PROP_LAST_UPDATE_TIME, Long.toString(modtime));
             if ("install".equals(policy)) {
                 _log.log(Log.CRIT, "Update was downloaded, restarting to install it");
-                updateStatus("<b>" + _("Update downloaded") + "</b><br>" + _("Restarting"));
+                updateStatus("<b>" + _t("Update downloaded") + "</b><br>" + _t("Restarting"));
                 restart();
             } else {
                 _log.logAlways(Log.WARN, "Update was downloaded, will be installed at next restart");
@@ -1422,7 +1433,7 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
             }
         } else {
             _log.log(Log.CRIT, "Failed copy to " + to);
-            updateStatus("<b>" + _("Failed copy to {0}", to.getAbsolutePath()) + "</b>");
+            updateStatus("<b>" + _t("Failed copy to {0}", to.getAbsolutePath()) + "</b>");
         }
         return copied;
     }
@@ -1453,14 +1464,14 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
     }
 
     /** translate a string */
-    public String _(String s) {
+    public String _t(String s) {
         return Messages.getString(s, _context);
     }
 
     /**
      *  translate a string with a parameter
      */
-    public String _(String s, Object o) {
+    public String _t(String s, Object o) {
         return Messages.getString(s, o, _context);
     }
 
@@ -1468,7 +1479,7 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
      *  translate a string with parameters
      *  @since 0.9.9
      */
-    public String _(String s, Object o, Object o2) {
+    public String _t(String s, Object o, Object o2) {
         return Messages.getString(s, o, o2, _context);
     }
 

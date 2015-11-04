@@ -114,7 +114,7 @@ public class SummaryHelper extends HelperBase {
         long diff = Math.abs(ms);
         if (diff < 3000)
             return "";
-        return " (" + DataHelper.formatDuration2(diff) + " " + _("skew") + ")";
+        return " (" + DataHelper.formatDuration2(diff) + " " + _t("skew") + ")";
     }
 **/
     
@@ -140,19 +140,19 @@ public class SummaryHelper extends HelperBase {
             return "VM Comm System";
         if (_context.router().getUptime() > 60*1000 && (!_context.router().gracefulShutdownInProgress()) &&
             !_context.clientManager().isAlive())
-            return _("ERR-Client Manager I2CP Error - check logs");  // not a router problem but the user should know
+            return _t("ERR-Client Manager I2CP Error - check logs");  // not a router problem but the user should know
         // Warn based on actual skew from peers, not update status, so if we successfully offset
         // the clock, we don't complain.
         //if (!_context.clock().getUpdatedSuccessfully())
         long skew = _context.commSystem().getFramedAveragePeerClockSkew(33);
         // Display the actual skew, not the offset
         if (Math.abs(skew) > 30*1000)
-            return _("ERR-Clock Skew of {0}", DataHelper.formatDuration2(Math.abs(skew)));
+            return _t("ERR-Clock Skew of {0}", DataHelper.formatDuration2(Math.abs(skew)));
         if (_context.router().isHidden())
-            return _("Hidden");
+            return _t("Hidden");
         RouterInfo routerInfo = _context.router().getRouterInfo();
         if (routerInfo == null)
-            return _("Testing");
+            return _t("Testing");
 
         Status status = _context.commSystem().getStatus();
         switch (status) {
@@ -164,37 +164,37 @@ public class SummaryHelper extends HelperBase {
             case IPV4_SNAT_IPV6_OK:
                 RouterAddress ra = routerInfo.getTargetAddress("NTCP");
                 if (ra == null)
-                    return _(status.toStatusString());
+                    return _t(status.toStatusString());
                 byte[] ip = ra.getIP();
                 if (ip == null)
-                    return _("ERR-Unresolved TCP Address");
+                    return _t("ERR-Unresolved TCP Address");
                 // TODO set IPv6 arg based on configuration?
                 if (TransportUtil.isPubliclyRoutable(ip, true))
-                    return _(status.toStatusString());
-                return _("ERR-Private TCP Address");
+                    return _t(status.toStatusString());
+                return _t("ERR-Private TCP Address");
 
             case IPV4_SNAT_IPV6_UNKNOWN:
             case DIFFERENT:
-                return _("ERR-SymmetricNAT");
+                return _t("ERR-SymmetricNAT");
 
             case REJECT_UNSOLICITED:
             case IPV4_DISABLED_IPV6_FIREWALLED:
                 if (routerInfo.getTargetAddress("NTCP") != null)
-                    return _("WARN-Firewalled with Inbound TCP Enabled");
+                    return _t("WARN-Firewalled with Inbound TCP Enabled");
                 // fall through...
             case IPV4_FIREWALLED_IPV6_OK:
             case IPV4_FIREWALLED_IPV6_UNKNOWN:
                 if (((FloodfillNetworkDatabaseFacade)_context.netDb()).floodfillEnabled())
-                    return _("WARN-Firewalled and Floodfill");
+                    return _t("WARN-Firewalled and Floodfill");
                 //if (_context.router().getRouterInfo().getCapabilities().indexOf('O') >= 0)
-                //    return _("WARN-Firewalled and Fast");
-                return _(status.toStatusString());
+                //    return _t("WARN-Firewalled and Fast");
+                return _t(status.toStatusString());
 
             case DISCONNECTED:
-                return _("Disconnected - check network cable");
+                return _t("Disconnected - check network cable");
 
             case HOSED:
-                return _("ERR-UDP Port In Use - Set i2np.udp.internalPort=xxxx in advanced config and restart");
+                return _t("ERR-UDP Port In Use - Set i2np.udp.internalPort=xxxx in advanced config and restart");
 
             case UNKNOWN:
             case IPV4_UNKNOWN_IPV6_FIREWALLED:
@@ -203,14 +203,14 @@ public class SummaryHelper extends HelperBase {
                 ra = routerInfo.getTargetAddress("SSU");
                 if (ra == null && _context.router().getUptime() > 5*60*1000) {
                     if (getActivePeers() <= 0)
-                        return _("ERR-No Active Peers, Check Network Connection and Firewall");
+                        return _t("ERR-No Active Peers, Check Network Connection and Firewall");
                     else if (_context.getProperty(ConfigNetHelper.PROP_I2NP_NTCP_HOSTNAME) == null ||
                         _context.getProperty(ConfigNetHelper.PROP_I2NP_NTCP_PORT) == null)
-                        return _("ERR-UDP Disabled and Inbound TCP host/port not set");
+                        return _t("ERR-UDP Disabled and Inbound TCP host/port not set");
                     else
-                        return _("WARN-Firewalled with UDP Disabled");
+                        return _t("WARN-Firewalled with UDP Disabled");
                 }
-                return _(status.toStatusString());
+                return _t(status.toStatusString());
         }
     }
     
@@ -434,8 +434,8 @@ public class SummaryHelper extends HelperBase {
         
         StringBuilder buf = new StringBuilder(512);
         buf.append("<h3><a href=\"/i2ptunnelmgr\" target=\"_top\" title=\"")
-           .append(_("Add/remove/edit &amp; control your client and server tunnels"))
-           .append("\">").append(_("Local Tunnels"))
+           .append(_t("Add/remove/edit &amp; control your client and server tunnels"))
+           .append("\">").append(_t("Local Tunnels"))
            .append("</a></h3><hr class=\"b\"><div class=\"tunnels\">");
         if (!clients.isEmpty()) {
             Collections.sort(clients, new AlphaComparator());
@@ -447,11 +447,11 @@ public class SummaryHelper extends HelperBase {
                 
                 buf.append("<tr><td align=\"right\"><img src=\"/themes/console/images/");
                 if (_context.clientManager().shouldPublishLeaseSet(h))
-                    buf.append("server.png\" alt=\"Server\" title=\"").append(_("Hidden Service")).append("\">");
+                    buf.append("server.png\" alt=\"Server\" title=\"").append(_t("Hidden Service")).append("\">");
                 else
-                    buf.append("client.png\" alt=\"Client\" title=\"").append(_("Client")).append("\">");
+                    buf.append("client.png\" alt=\"Client\" title=\"").append(_t("Client")).append("\">");
                 buf.append("</td><td align=\"left\"><b><a href=\"tunnels#").append(h.toBase64().substring(0,4));
-                buf.append("\" target=\"_top\" title=\"").append(_("Show tunnels")).append("\">");
+                buf.append("\" target=\"_top\" title=\"").append(_t("Show tunnels")).append("\">");
                 if (name.length() <= 20)
                     buf.append(DataHelper.escapeHTML(name));
                 else
@@ -462,20 +462,20 @@ public class SummaryHelper extends HelperBase {
                     long timeToExpire = ls.getEarliestLeaseDate() - _context.clock().now();
                     if (timeToExpire < 0) {
                         // red or yellow light                 
-                        buf.append("<td><img src=\"/themes/console/images/local_inprogress.png\" alt=\"").append(_("Rebuilding")).append("&hellip;\" title=\"").append(_("Leases expired")).append(" ").append(DataHelper.formatDuration2(0-timeToExpire));
-                        buf.append(" ").append(_("ago")).append(". ").append(_("Rebuilding")).append("&hellip;\"></td></tr>\n");                    
+                        buf.append("<td><img src=\"/themes/console/images/local_inprogress.png\" alt=\"").append(_t("Rebuilding")).append("&hellip;\" title=\"").append(_t("Leases expired")).append(" ").append(DataHelper.formatDuration2(0-timeToExpire));
+                        buf.append(" ").append(_t("ago")).append(". ").append(_t("Rebuilding")).append("&hellip;\"></td></tr>\n");                    
                     } else {
                         // green light 
-                        buf.append("<td><img src=\"/themes/console/images/local_up.png\" alt=\"Ready\" title=\"").append(_("Ready")).append("\"></td></tr>\n");
+                        buf.append("<td><img src=\"/themes/console/images/local_up.png\" alt=\"Ready\" title=\"").append(_t("Ready")).append("\"></td></tr>\n");
                     }
                 } else {
                     // yellow light
-                    buf.append("<td><img src=\"/themes/console/images/local_inprogress.png\" alt=\"").append(_("Building")).append("&hellip;\" title=\"").append(_("Building tunnels")).append("&hellip;\"></td></tr>\n");
+                    buf.append("<td><img src=\"/themes/console/images/local_inprogress.png\" alt=\"").append(_t("Building")).append("&hellip;\" title=\"").append(_t("Building tunnels")).append("&hellip;\"></td></tr>\n");
                 }
             }
             buf.append("</table>");
         } else {
-            buf.append("<center><i>").append(_("none")).append("</i></center>");
+            buf.append("<center><i>").append(_t("none")).append("</i></center>");
         }
         buf.append("</div>\n");
         return buf.toString();
@@ -486,7 +486,7 @@ public class SummaryHelper extends HelperBase {
      *  Inner class, can't be Serializable
      */
     private class AlphaComparator implements Comparator<Destination> {
-        private final String xsc = _("shared clients");
+        private final String xsc = _t("shared clients");
 
         public int compare(Destination lhs, Destination rhs) {
             String lname = getName(lhs);
@@ -511,9 +511,9 @@ public class SummaryHelper extends HelperBase {
             if (name == null)
                 name = d.calculateHash().toBase64().substring(0,6);
             else
-                name = _(name);
+                name = _t(name);
         } else {
-            name = _(name);
+            name = _t(name);
         }
         return name;
     }
@@ -712,18 +712,20 @@ public class SummaryHelper extends HelperBase {
                 buf.append("<hr>");
             else
                 needSpace = true;
-            buf.append("<h4><b>").append(_("Update downloaded")).append("<br>");
+            buf.append("<h4><b>").append(_t("Update downloaded")).append("<br>");
             if (_context.hasWrapper())
-                buf.append(_("Click Restart to install"));
+                buf.append(_t("Click Restart to install"));
             else
-                buf.append(_("Click Shutdown and restart to install"));
-            buf.append(' ').append(_("Version {0}", DataHelper.escapeHTML(dver)));
+                buf.append(_t("Click Shutdown and restart to install"));
+            buf.append(' ').append(_t("Version {0}", DataHelper.escapeHTML(dver)));
             buf.append("</b></h4>");
         }
         boolean avail = updateAvailable();
         boolean unsignedAvail = unsignedUpdateAvailable();
         boolean devSU3Avail = devSU3UpdateAvailable();
         String constraint = avail ? NewsHelper.updateConstraint() : null;
+        String unsignedConstraint = unsignedAvail ? NewsHelper.unsignedUpdateConstraint() : null;
+        String devSU3Constraint = devSU3Avail ? NewsHelper.devSU3UpdateConstraint() : null;
         if (avail && constraint != null &&
             !NewsHelper.isUpdateInProgress() &&
             !_context.router().gracefulShutdownInProgress()) {
@@ -731,10 +733,34 @@ public class SummaryHelper extends HelperBase {
                 buf.append("<hr>");
             else
                 needSpace = true;
-            buf.append("<h4><b>").append(_("Update available")).append(":<br>");
-            buf.append(_("Version {0}", getUpdateVersion())).append("<br>");
+            buf.append("<h4><b>").append(_t("Update available")).append(":<br>");
+            buf.append(_t("Version {0}", getUpdateVersion())).append("<br>");
             buf.append(constraint).append("</b></h4>");
             avail = false;
+        }
+        if (unsignedAvail && unsignedConstraint != null &&
+            !NewsHelper.isUpdateInProgress() &&
+            !_context.router().gracefulShutdownInProgress()) {
+            if (needSpace)
+                buf.append("<hr>");
+            else
+                needSpace = true;
+            buf.append("<h4><b>").append(_t("Update available")).append(":<br>");
+            buf.append(_t("Version {0}", getUnsignedUpdateVersion())).append("<br>");
+            buf.append(unsignedConstraint).append("</b></h4>");
+            unsignedAvail = false;
+        }
+        if (devSU3Avail && devSU3Constraint != null &&
+            !NewsHelper.isUpdateInProgress() &&
+            !_context.router().gracefulShutdownInProgress()) {
+            if (needSpace)
+                buf.append("<hr>");
+            else
+                needSpace = true;
+            buf.append("<h4><b>").append(_t("Update available")).append(":<br>");
+            buf.append(_t("Version {0}", getDevSU3UpdateVersion())).append("<br>");
+            buf.append(devSU3Constraint).append("</b></h4>");
+            devSU3Avail = false;
         }
         if ((avail || unsignedAvail || devSU3Avail) &&
             !NewsHelper.isUpdateInProgress() &&
@@ -755,7 +781,7 @@ public class SummaryHelper extends HelperBase {
                 if (avail) {
                     buf.append("<button type=\"submit\" class=\"download\" name=\"updateAction\" value=\"signed\" >")
                        // Note to translators: parameter is a version, e.g. "0.8.4"
-                       .append(_("Download {0} Update", getUpdateVersion()))
+                       .append(_t("Download {0} Update", getUpdateVersion()))
                        .append("</button><br>\n");
                 }
                 if (devSU3Avail) {
@@ -763,7 +789,7 @@ public class SummaryHelper extends HelperBase {
                        // Note to translators: parameter is a router version, e.g. "0.9.19-16"
                        // <br> is optional, to help the browser make the lines even in the button
                        // If the translation is shorter than the English, you should probably not include <br>
-                       .append(_("Download Signed<br>Development Update<br>{0}", getDevSU3UpdateVersion()))
+                       .append(_t("Download Signed<br>Development Update<br>{0}", getDevSU3UpdateVersion()))
                        .append("</button><br>\n");
                 }
                 if (unsignedAvail) {
@@ -771,7 +797,7 @@ public class SummaryHelper extends HelperBase {
                        // Note to translators: parameter is a date and time, e.g. "02-Mar 20:34 UTC"
                        // <br> is optional, to help the browser make the lines even in the button
                        // If the translation is shorter than the English, you should probably not include <br>
-                       .append(_("Download Unsigned<br>Update {0}", getUnsignedUpdateVersion()))
+                       .append(_t("Download Unsigned<br>Update {0}", getUnsignedUpdateVersion()))
                        .append("</button><br>\n");
                 }
                 buf.append("</form>\n");
@@ -795,9 +821,9 @@ public class SummaryHelper extends HelperBase {
         StringBuilder buf = new StringBuilder(256);
         if (showFirewallWarning()) {
             buf.append("<h4><a href=\"/confignet\" target=\"_top\" title=\"")
-               .append(_("Help with firewall configuration"))
+               .append(_t("Help with firewall configuration"))
                .append("\">")
-               .append(_("Check network connection and NAT/firewall"))
+               .append(_t("Check network connection and NAT/firewall"))
                .append("</a></h4>");
         }
 
@@ -816,7 +842,7 @@ public class SummaryHelper extends HelperBase {
                 String uri = getRequestURI();
                 buf.append("<p><form action=\"").append(uri).append("\" method=\"POST\">\n");
                 buf.append("<input type=\"hidden\" name=\"reseedNonce\" value=\"").append(nonce).append("\" >\n");
-                buf.append("<button type=\"submit\" class=\"reload\" value=\"Reseed\" >").append(_("Reseed")).append("</button></form></p>\n");
+                buf.append("<button type=\"submit\" class=\"reload\" value=\"Reseed\" >").append(_t("Reseed")).append("</button></form></p>\n");
             }
         }
         // If a new reseed ain't running, and the last reseed had errors, show error message
@@ -901,18 +927,18 @@ public class SummaryHelper extends HelperBase {
 
         StringBuilder buf = new StringBuilder(2048);
         buf.append("<table class=\"sidebarconf\"><tr><th>")
-           .append(_("Remove"))
+           .append(_t("Remove"))
            .append("</th><th>")
-           .append(_("Name"))
+           .append(_t("Name"))
            .append("</th><th colspan=\"2\">")
-           .append(_("Order"))
+           .append(_t("Order"))
            .append("</th></tr>\n");
         for (String section : sections) {
             int i = sections.indexOf(section);
             buf.append("<tr><td align=\"center\"><input type=\"checkbox\" class=\"optbox\" name=\"delete_")
                .append(i)
                .append("\"></td><td align=\"left\">")
-               .append(_(sectionNames.get(section)))
+               .append(_t(sectionNames.get(section)))
                .append("</td><td align=\"right\"><input type=\"hidden\" name=\"order_")
                .append(i).append('_').append(section)
                .append("\" value=\"")
@@ -922,22 +948,22 @@ public class SummaryHelper extends HelperBase {
                 buf.append("<button type=\"submit\" class=\"buttonTop\" name=\"action\" value=\"move_")
                    .append(i)
                    .append("_top\"><img alt=\"")
-                   .append(_("Top"))
+                   .append(_t("Top"))
                    .append("\" src=\"")
                    .append(imgPath)
                    .append("move_top.png")
                    .append("\" title=\"")
-                   .append(_("Move to top"))
+                   .append(_t("Move to top"))
                    .append("\"/></button>");
                 buf.append("<button type=\"submit\" class=\"buttonUp\" name=\"action\" value=\"move_")
                    .append(i)
                    .append("_up\"><img alt=\"")
-                   .append(_("Up"))
+                   .append(_t("Up"))
                    .append("\" src=\"")
                    .append(imgPath)
                    .append("move_up.png")
                    .append("\" title=\"")
-                   .append(_("Move up"))
+                   .append(_t("Move up"))
                    .append("\"/></button>");
             }
             buf.append("</td><td align=\"left\">");
@@ -945,34 +971,34 @@ public class SummaryHelper extends HelperBase {
                 buf.append("<button type=\"submit\" class=\"buttonDown\" name=\"action\" value=\"move_")
                    .append(i)
                    .append("_down\"><img alt=\"")
-                   .append(_("Down"))
+                   .append(_t("Down"))
                    .append("\" src=\"")
                    .append(imgPath)
                    .append("move_down.png")
                    .append("\" title=\"")
-                   .append(_("Move down"))
+                   .append(_t("Move down"))
                    .append("\"/></button>");
                 buf.append("<button type=\"submit\" class=\"buttonBottom\" name=\"action\" value=\"move_")
                    .append(i)
                    .append("_bottom\"><img alt=\"")
-                   .append(_("Bottom"))
+                   .append(_t("Bottom"))
                    .append("\" src=\"")
                    .append(imgPath)
                    .append("move_bottom.png")
                    .append("\" title=\"")
-                   .append(_("Move to bottom"))
+                   .append(_t("Move to bottom"))
                    .append("\"/></button>");
             }
             buf.append("</td></tr>\n");
         }
         buf.append("<tr><td align=\"center\">" +
                    "<input type=\"submit\" name=\"action\" class=\"delete\" value=\"")
-           .append(_("Delete selected"))
+           .append(_t("Delete selected"))
            .append("\"></td><td align=\"left\"><b>")
-           .append(_("Add")).append(":</b> " +
+           .append(_t("Add")).append(":</b> " +
                    "<select name=\"name\">\n" +
                    "<option value=\"\" selected=\"selected\">")
-           .append(_("Select a section to add"))
+           .append(_t("Select a section to add"))
            .append("</option>\n");
 
         for (String s : sortedSections) {
@@ -986,7 +1012,7 @@ public class SummaryHelper extends HelperBase {
            .append("\"></td>" +
                    "<td align=\"center\" colspan=\"2\">" +
                    "<input type=\"submit\" name=\"action\" class=\"add\" value=\"")
-           .append(_("Add item"))
+           .append(_t("Add item"))
            .append("\"></td></tr>")
            .append("</table>\n");
         return buf.toString();

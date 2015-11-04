@@ -43,10 +43,10 @@ public class ConfigNetHelper extends HelperBase {
     public String getUdpIP() {
         RouterAddress addr = _context.router().getRouterInfo().getTargetAddress("SSU");
         if (addr == null)
-            return _("unknown");
+            return _t("unknown");
         String rv = addr.getHost();
         if (rv == null)
-            return _("unknown");
+            return _t("unknown");
         return rv;
     }
 
@@ -58,10 +58,10 @@ public class ConfigNetHelper extends HelperBase {
       /****
         RouterAddress addr = _context.router().getRouterInfo().getTargetAddress("SSU");
         if (addr == null)
-            return _("unknown");
+            return _t("unknown");
         UDPAddress ua = new UDPAddress(addr);
         if (ua.getPort() <= 0)
-            return _("unknown");
+            return _t("unknown");
         return "" + ua.getPort();
       ****/
         // Since we can't get to UDPTransport.getRequestedPort() from here, just use
@@ -253,8 +253,8 @@ public class ConfigNetHelper extends HelperBase {
         return kbytesToBits(getShareBandwidth());
     }
     private String kbytesToBits(int kbytes) {
-        return DataHelper.formatSize(kbytes * (8 * 1024L)) + ' ' + _("bits per second") +
-               ' ' + _("or {0} bytes per month maximum", DataHelper.formatSize(kbytes * (1024L * 60 * 60 * 24 * 31)));
+        return DataHelper.formatSize(kbytes * (8 * 1024L)) + ' ' + _t("bits per second") +
+               ' ' + _t("or {0} bytes per month maximum", DataHelper.formatSize(kbytes * (1024L * 60 * 60 * 24 * 31)));
     }
     public String getInboundBurstRate() {
         return "" + _context.bandwidthLimiter().getInboundBurstKBytesPerSecond();

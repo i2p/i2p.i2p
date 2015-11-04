@@ -128,7 +128,7 @@ public class AddressBean
 			    c >= 0x5b && c <= 0x60 ||
 			    c >= 0x7b && c <= 0x7f) {
 				String bad = "\"" + c + "\" (0x" + Integer.toHexString(c) + ')';
-				throw new IllegalArgumentException(_("Host name \"{0}\" contains illegal character {1}",
+				throw new IllegalArgumentException(_t("Host name \"{0}\" contains illegal character {1}",
                                                                      host, bad));
 			}
 			if (c == DOT2)
@@ -141,21 +141,21 @@ public class AddressBean
 				needsIDN = true;
 		}
 		if (host.startsWith("-"))
-			throw new IllegalArgumentException(_("Host name cannot start with \"{0}\"", "-"));
+			throw new IllegalArgumentException(_t("Host name cannot start with \"{0}\"", "-"));
 		if (host.startsWith("."))
-			throw new IllegalArgumentException(_("Host name cannot start with \"{0}\"", "."));
+			throw new IllegalArgumentException(_t("Host name cannot start with \"{0}\"", "."));
 		if (host.endsWith("-"))
-			throw new IllegalArgumentException(_("Host name cannot end with \"{0}\"", "-"));
+			throw new IllegalArgumentException(_t("Host name cannot end with \"{0}\"", "-"));
 		if (host.endsWith("."))
-			throw new IllegalArgumentException(_("Host name cannot end with \"{0}\"", "."));
+			throw new IllegalArgumentException(_t("Host name cannot end with \"{0}\"", "."));
 		if (needsIDN) {
 			if (host.startsWith("xn--"))
-				throw new IllegalArgumentException(_("Host name cannot start with \"{0}\"", "xn--"));
+				throw new IllegalArgumentException(_t("Host name cannot start with \"{0}\"", "xn--"));
 			if (host.contains(".xn--"))
-				throw new IllegalArgumentException(_("Host name cannot contain \"{0}\"", ".xn--"));
+				throw new IllegalArgumentException(_t("Host name cannot contain \"{0}\"", ".xn--"));
 			if (haveIDN)
 				return IDN.toASCII(host, IDN.ALLOW_UNASSIGNED);
-			throw new IllegalArgumentException(_("Host name \"{0}\" requires conversion to ASCII but the conversion library is unavailable in this JVM", host));
+			throw new IllegalArgumentException(_t("Host name \"{0}\" requires conversion to ASCII but the conversion library is unavailable in this JVM", host));
 		}
 		return host;
 	}
@@ -216,7 +216,7 @@ public class AddressBean
 		// (4 / 3) * (pubkey length + signing key length)
 		String cert = destination.substring(512);
                 if (cert.equals("AAAA"))
-			return _("None");
+			return _t("None");
 		byte[] enc = Base64.decode(cert);
 		if (enc == null)
 			// shouldn't happen
@@ -224,15 +224,15 @@ public class AddressBean
 		int type = enc[0] & 0xff;
 		switch (type) {
 			case Certificate.CERTIFICATE_TYPE_HASHCASH:
-				return _("Hashcash");
+				return _t("Hashcash");
 			case Certificate.CERTIFICATE_TYPE_HIDDEN:
-				return _("Hidden");
+				return _t("Hidden");
 			case Certificate.CERTIFICATE_TYPE_SIGNED:
-				return _("Signed");
+				return _t("Signed");
 			case Certificate.CERTIFICATE_TYPE_KEY:
-				return _("Key");
+				return _t("Key");
 			default:
-				return _("Type {0}", type);
+				return _t("Type {0}", type);
 		}
 	}
 
@@ -244,20 +244,20 @@ public class AddressBean
 		// (4 / 3) * (pubkey length + signing key length)
 		String cert = destination.substring(512);
 		if (cert.equals("AAAA"))
-			return _("DSA 1024 bit");
+			return _t("DSA 1024 bit");
 		byte[] enc = Base64.decode(cert);
 		if (enc == null)
 			// shouldn't happen
 			return "invalid";
 		int type = enc[0] & 0xff;
 		if (type != Certificate.CERTIFICATE_TYPE_KEY)
-			return _("DSA 1024 bit");
+			return _t("DSA 1024 bit");
 		int st = ((enc[3] & 0xff) << 8) | (enc[4] & 0xff);
 		if (st == 0)
-			return _("DSA 1024 bit");
+			return _t("DSA 1024 bit");
 		SigType stype = SigType.getByCode(st);
                 if (stype == null)
-			return _("Type {0}", st);
+			return _t("Type {0}", st);
                 return stype.toString();
 	}
 
@@ -281,17 +281,17 @@ public class AddressBean
 	}
 
 	/** translate */
-	private static String _(String s) {
+	private static String _t(String s) {
 		return Messages.getString(s);
 	}
 
 	/** translate */
-	private static String _(String s, Object o) {
+	private static String _t(String s, Object o) {
 		return Messages.getString(s, o);
 	}
 
 	/** translate */
-	private static String _(String s, Object o, Object o2) {
+	private static String _t(String s, Object o, Object o2) {
 		return Messages.getString(s, o, o2);
 	}
 }

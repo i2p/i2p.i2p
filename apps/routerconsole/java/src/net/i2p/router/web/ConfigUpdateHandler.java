@@ -157,14 +157,14 @@ public class ConfigUpdateHandler extends FormHandler {
     protected void processForm() {
         if (_action == null)
             return;
-        if (_action.equals(_("Check for updates"))) {
+        if (_action.equals(_t("Check for updates"))) {
             ConsoleUpdateManager mgr = UpdateHandler.updateManager(_context);
             if (mgr == null) {
                 addFormError("Update manager not registered, cannot check");
                 return;
             }
             if (mgr.isUpdateInProgress() || mgr.isCheckInProgress()) {
-                addFormError(_("Update or check already in progress"));
+                addFormError(_t("Update or check already in progress"));
                 return;
             }
 
@@ -174,7 +174,7 @@ public class ConfigUpdateHandler extends FormHandler {
             if (shouldProxy && proxyPort == ConfigUpdateHandler.DEFAULT_PROXY_PORT_INT &&
                 proxyHost.equals(ConfigUpdateHandler.DEFAULT_PROXY_HOST) &&
                 _context.portMapper().getPort(PortMapper.SVC_HTTP_PROXY) < 0) {
-                addFormError(_("HTTP client proxy tunnel must be running"));
+                addFormError(_t("HTTP client proxy tunnel must be running"));
                 return;
             }
 
@@ -187,19 +187,19 @@ public class ConfigUpdateHandler extends FormHandler {
                 a3 = mgr.checkAvailable(ROUTER_UNSIGNED, 40*1000) != null;
             if (a1 || a2 || a3) {
                 if ( (_updatePolicy == null) || (!_updatePolicy.equals("notify")) )
-                    addFormNotice(_("Update available, attempting to download now"));
+                    addFormNotice(_t("Update available, attempting to download now"));
                 else
-                    addFormNotice(_("Update available, click button on left to download"));
+                    addFormNotice(_t("Update available, click button on left to download"));
                 // So that update() will post a status to the summary bar before we reload
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException ie) {}
             } else
-                addFormNotice(_("No update available"));
+                addFormNotice(_t("No update available"));
             return;
         }
 
-        if (!_action.equals(_("Save")))
+        if (!_action.equals(_t("Save")))
             return;
 
         Map<String, String> changes = new HashMap<String, String>();
@@ -213,26 +213,26 @@ public class ConfigUpdateHandler extends FormHandler {
                     changes.put(PROP_NEWS_URL, _newsURL);
                     // this invalidates the news
                     changes.put(NewsHelper.PROP_LAST_CHECKED, "0");
-                    addFormNotice(_("Updating news URL to {0}", _newsURL));
+                    addFormNotice(_t("Updating news URL to {0}", _newsURL));
                 } else {
                     addFormError("Changing news URL disabled");
                 }
             }
         }
         
-        if (_proxyHost != null && _proxyHost.length() > 0 && !_proxyHost.equals(_("internal"))) {
+        if (_proxyHost != null && _proxyHost.length() > 0 && !_proxyHost.equals(_t("internal"))) {
             String oldHost = _context.router().getConfigSetting(PROP_PROXY_HOST);
             if ( (oldHost == null) || (!_proxyHost.equals(oldHost)) ) {
                 changes.put(PROP_PROXY_HOST, _proxyHost);
-                addFormNotice(_("Updating proxy host to {0}", _proxyHost));
+                addFormNotice(_t("Updating proxy host to {0}", _proxyHost));
             }
         }
         
-        if (_proxyPort != null && _proxyPort.length() > 0 && !_proxyPort.equals(_("internal"))) {
+        if (_proxyPort != null && _proxyPort.length() > 0 && !_proxyPort.equals(_t("internal"))) {
             String oldPort = _context.router().getConfigSetting(PROP_PROXY_PORT);
             if ( (oldPort == null) || (!_proxyPort.equals(oldPort)) ) {
                 changes.put(PROP_PROXY_PORT, _proxyPort);
-                addFormNotice(_("Updating proxy port to {0}", _proxyPort));
+                addFormNotice(_t("Updating proxy port to {0}", _proxyPort));
             }
         }
         
@@ -248,15 +248,15 @@ public class ConfigUpdateHandler extends FormHandler {
         try { oldFreq = Long.parseLong(oldFreqStr); } catch (NumberFormatException nfe) {}
         if (_refreshFrequency != oldFreq) {
             changes.put(PROP_REFRESH_FREQUENCY, ""+_refreshFrequency);
-            addFormNoticeNoEscape(_("Updating refresh frequency to {0}",
-                            _refreshFrequency <= 0 ? _("Never") : DataHelper.formatDuration2(_refreshFrequency)));
+            addFormNoticeNoEscape(_t("Updating refresh frequency to {0}",
+                            _refreshFrequency <= 0 ? _t("Never") : DataHelper.formatDuration2(_refreshFrequency)));
         }
 
         if ( (_updatePolicy != null) && (_updatePolicy.length() > 0) ) {
             String oldPolicy = _context.router().getConfigSetting(PROP_UPDATE_POLICY);
             if ( (oldPolicy == null) || (!_updatePolicy.equals(oldPolicy)) ) {
                 changes.put(PROP_UPDATE_POLICY, _updatePolicy);
-                addFormNotice(_("Updating update policy to {0}", _updatePolicy));
+                addFormNotice(_t("Updating update policy to {0}", _updatePolicy));
             }
         }
 
@@ -265,7 +265,7 @@ public class ConfigUpdateHandler extends FormHandler {
             String oldURL = _context.router().getConfigSetting(PROP_UPDATE_URL);
             if ( (oldURL == null) || (!_updateURL.equals(oldURL)) ) {
                 changes.put(PROP_UPDATE_URL, _updateURL);
-                addFormNotice(_("Updating update URLs."));
+                addFormNotice(_t("Updating update URLs."));
             }
         }
 
@@ -277,7 +277,7 @@ public class ConfigUpdateHandler extends FormHandler {
                 // note that keys are not validated here and no console error message will be generated
                 if (isAdvanced()) {
                     changes.put(PROP_TRUSTED_KEYS, _trustedKeys);
-                    addFormNotice(_("Updating trusted keys."));
+                    addFormNotice(_t("Updating trusted keys."));
                 } else {
                     addFormError("Changing trusted keys disabled");
                 }
@@ -289,7 +289,7 @@ public class ConfigUpdateHandler extends FormHandler {
             if ( (oldURL == null) || (!_zipURL.equals(oldURL)) ) {
                 if (isAdvanced()) {
                     changes.put(PROP_ZIP_URL, _zipURL);
-                    addFormNotice(_("Updating unsigned update URL to {0}", _zipURL));
+                    addFormNotice(_t("Updating unsigned update URL to {0}", _zipURL));
                 } else {
                     addFormError("Changing unsigned update URL disabled");
                 }
@@ -301,7 +301,7 @@ public class ConfigUpdateHandler extends FormHandler {
             if ( (oldURL == null) || (!_devSU3URL.equals(oldURL)) ) {
                 if (isAdvanced()) {
                     changes.put(PROP_DEV_SU3_URL, _devSU3URL);
-                    addFormNotice(_("Updating signed development build URL to {0}", _devSU3URL));
+                    addFormNotice(_t("Updating signed development build URL to {0}", _devSU3URL));
                 } else {
                     addFormError("Changing signed update URL disabled");
                 }

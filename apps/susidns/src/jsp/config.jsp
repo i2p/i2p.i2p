@@ -44,24 +44,24 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title><%=intl._("configuration")%> - susidns</title>
+<title><%=intl._t("configuration")%> - susidns</title>
 <link rel="stylesheet" type="text/css" href="<%=base.getTheme()%>susidns.css">
 </head>
 <body>
 <div class="page">
 <div id="logo">
-<a href="index"><img src="<%=base.getTheme()%>images/logo.png" alt="" title="<%=intl._("Overview")%>" border="0"/></a>
+<a href="index"><img src="<%=base.getTheme()%>images/logo.png" alt="" title="<%=intl._t("Overview")%>" border="0"/></a>
 </div><hr>
 <div id="navi">
 <p>
-<%=intl._("Address books")%>:
-<a href="addressbook?book=private"><%=intl._("private")%></a> |
-<a href="addressbook?book=master"><%=intl._("master")%></a> |
-<a href="addressbook?book=router"><%=intl._("router")%></a> |
-<a href="addressbook?book=published"><%=intl._("published")%></a> *
-<a href="subscriptions"><%=intl._("Subscriptions")%></a> *
-<%=intl._("Configuration")%> *
-<a href="index"><%=intl._("Overview")%></a>
+<%=intl._t("Address books")%>:
+<a href="addressbook?book=private"><%=intl._t("private")%></a> |
+<a href="addressbook?book=master"><%=intl._t("master")%></a> |
+<a href="addressbook?book=router"><%=intl._t("router")%></a> |
+<a href="addressbook?book=published"><%=intl._t("published")%></a> *
+<a href="subscriptions"><%=intl._t("Subscriptions")%></a> *
+<%=intl._t("Configuration")%> *
+<a href="index"><%=intl._t("Overview")%></a>
 </p>
 </div><hr>
 <div id="headline">
@@ -74,65 +74,65 @@
 <textarea name="config" rows="10" cols="80">${cfg.config}</textarea>
 </div>
 <div id="buttons">
-<input class="reload" type="submit" name="action" value="<%=intl._("Reload")%>" >
-<input class="accept" type="submit" name="action" value="<%=intl._("Save")%>" >
+<input class="reload" type="submit" name="action" value="<%=intl._t("Reload")%>" >
+<input class="accept" type="submit" name="action" value="<%=intl._t("Save")%>" >
 </div>
 </form>
 <div id="help">
-<h3><%=intl._("Hints")%></h3>
+<h3><%=intl._t("Hints")%></h3>
 <ol>
 <li>
-<%=intl._("File and directory paths here are relative to the addressbook's working directory, which is normally ~/.i2p/addressbook/ (Linux) or %APPDATA%\\I2P\\addressbook\\ (Windows).")%>
+<%=intl._t("File and directory paths here are relative to the addressbook's working directory, which is normally ~/.i2p/addressbook/ (Linux) or %APPDATA%\\I2P\\addressbook\\ (Windows).")%>
 </li>
 <li>
-<%=intl._("If you want to manually add lines to an addressbook, add them to the private or master addressbooks.")%>
-<%=intl._("The router addressbook and the published addressbook are updated by the addressbook application.")%>
+<%=intl._t("If you want to manually add lines to an addressbook, add them to the private or master addressbooks.")%>
+<%=intl._t("The router addressbook and the published addressbook are updated by the addressbook application.")%>
 </li>
 <li>
-<%=intl._("When you publish your addressbook, ALL destinations from the master and router addressbooks appear there.")%>
-<%=intl._("Use the private addressbook for private destinations, these are not published.")%>
+<%=intl._t("When you publish your addressbook, ALL destinations from the master and router addressbooks appear there.")%>
+<%=intl._t("Use the private addressbook for private destinations, these are not published.")%>
 </li>
 </ol>
-<h3><%=intl._("Options")%></h3>
+<h3><%=intl._t("Options")%></h3>
 <ul>
 <li><b>subscriptions</b> -
-<%=intl._("File containing the list of subscriptions URLs (no need to change)")%>
+<%=intl._t("File containing the list of subscriptions URLs (no need to change)")%>
 </li>
 <li><b>update_delay</b> -
-<%=intl._("Update interval in hours")%>
+<%=intl._t("Update interval in hours")%>
 </li>
 <li><b>published_addressbook</b> -
-<%=intl._("Your public hosts.txt file (choose a path within your webserver document root)")%>
+<%=intl._t("Your public hosts.txt file (choose a path within your webserver document root)")%>
 </li>
 <li><b>router_addressbook</b> -
-<%=intl._("Your hosts.txt (don't change)")%>
+<%=intl._t("Your hosts.txt (don't change)")%>
 </li>
 <li><b>master_addressbook</b> -
-<%=intl._("Your personal addressbook, these hosts will be published")%>
+<%=intl._t("Your personal addressbook, these hosts will be published")%>
 </li>
 <li><b>private_addressbook</b> -
-<%=intl._("Your private addressbook, it is never published")%>
+<%=intl._t("Your private addressbook, it is never published")%>
 </li>
 <li><b>proxy_port</b> -
-<%=intl._("Port for your eepProxy (no need to change)")%>
+<%=intl._t("Port for your eepProxy (no need to change)")%>
 </li>
 <li><b>proxy_host</b> -
-<%=intl._("Hostname for your eepProxy (no need to change)")%>
+<%=intl._t("Hostname for your eepProxy (no need to change)")%>
 </li>
 <li><b>should_publish</b> -
-<%=intl._("Whether to update the published addressbook")%>
+<%=intl._t("Whether to update the published addressbook")%>
 </li>
 <li><b>etags</b> -
-<%=intl._("File containing the etags header from the fetched subscription URLs (no need to change)")%>
+<%=intl._t("File containing the etags header from the fetched subscription URLs (no need to change)")%>
 </li>
 <li><b>last_modified</b> -
-<%=intl._("File containing the modification timestamp for each fetched subscription URL (no need to change)")%>
+<%=intl._t("File containing the modification timestamp for each fetched subscription URL (no need to change)")%>
 </li>
 <li><b>log</b> -
-<%=intl._("File to log activity to (change to /dev/null if you like)")%>
+<%=intl._t("File to log activity to (change to /dev/null if you like)")%>
 </li>
 <li><b>theme</b> -
-<%=intl._("Name of the theme to use (defaults to 'light')")%>
+<%=intl._t("Name of the theme to use (defaults to 'light')")%>
 </li>
 </ul>
 </div>

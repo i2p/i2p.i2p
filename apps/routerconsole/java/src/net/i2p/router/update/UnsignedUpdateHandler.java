@@ -88,7 +88,7 @@ class UnsignedUpdateHandler implements Checker, Updater {
             return null;
         UpdateRunner update = new UnsignedUpdateRunner(_context, _mgr, updateSources);
         // set status before thread to ensure UI feedback
-        _mgr.notifyProgress(update, "<b>" + _mgr._("Updating") + "</b>");
+        _mgr.notifyProgress(update, "<b>" + _mgr._t("Updating") + "</b>");
         return update;
     }
 }

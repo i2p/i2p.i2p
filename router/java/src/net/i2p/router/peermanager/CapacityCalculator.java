@@ -1,6 +1,8 @@
 package net.i2p.router.peermanager;
 
-import net.i2p.I2PAppContext;
+import net.i2p.data.router.RouterInfo;
+import net.i2p.router.RouterContext;
+import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import net.i2p.stat.Rate;
 import net.i2p.stat.RateAverages;
 import net.i2p.stat.RateStat;
@@ -25,6 +27,9 @@ class CapacityCalculator {
     private static final double BONUS_SAME_COUNTRY = 0;
     private static final double BONUS_XOR = .25;
     private static final double PENALTY_UNREACHABLE = 2;
+    // we make this a bonus for non-ff, not a penalty for ff, so we
+    // don't drive the ffs below the default
+    private static final double BONUS_NON_FLOODFILL = 0.5;
     
     public static double calc(PeerProfile profile) {
         double capacity;
@@ -54,7 +59,7 @@ class CapacityCalculator {
         
         // now take into account non-rejection tunnel rejections (which haven't 
         // incremented the rejection counter, since they were only temporary)
-        I2PAppContext context = profile.getContext();
+        RouterContext context = profile.getContext();
         long now = context.clock().now();
         if (profile.getTunnelHistory().getLastRejectedTransient() > now - 5*60*1000)
             capacity = 1;
@@ -83,8 +88,15 @@ class CapacityCalculator {
         // penalize unreachable peers
         if (profile.wasUnreachable())
             capacity -= PENALTY_UNREACHABLE;
+
+        // credit non-floodfill to reduce conn limit issues at floodfills
+        // TODO only if we aren't floodfill ourselves?
+        RouterInfo ri = context.netDb().lookupRouterInfoLocally(profile.getPeer());
+        if (!FloodfillNetworkDatabaseFacade.isFloodfill(ri))
+            capacity += BONUS_NON_FLOODFILL;
+
         // a tiny tweak to break ties and encourage closeness, -.25 to +.25
-            capacity -= profile.getXORDistance() * (BONUS_XOR / 128);
+        capacity -= profile.getXORDistance() * (BONUS_XOR / 128);
 
         capacity += profile.getCapacityBonus();
         if (capacity < 0)

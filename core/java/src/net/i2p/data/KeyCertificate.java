@@ -17,15 +17,41 @@ public class KeyCertificate extends Certificate {
 
     public static final int HEADER_LENGTH = 4;
 
+    /** @since 0.9.22 pkg private for Certificate.create() */
+    static final byte[] Ed25519_PAYLOAD = new byte[] {
+        0, (byte) (SigType.EdDSA_SHA512_Ed25519.getCode()), 0, 0
+    };
+
+    /** @since 0.9.22 pkg private for Certificate.create() */
+    static final byte[] ECDSA256_PAYLOAD = new byte[] {
+        0, (byte) (SigType.ECDSA_SHA256_P256.getCode()), 0, 0
+    };
+
+    /**
+     *  An immutable ElG/ECDSA-P256 certificate.
+     */
     public static final KeyCertificate ELG_ECDSA256_CERT;
+
+    /**
+     *  An immutable ElG/Ed25519 certificate.
+     *  @since 0.9.22
+     */
+    public static final KeyCertificate ELG_Ed25519_CERT;
+
     static {
         KeyCertificate kc;
         try {
             kc = new ECDSA256Cert();
         } catch (DataFormatException dfe) {
-            kc = null;  // won't happen
+            throw new RuntimeException(dfe);  // won't happen
         }
         ELG_ECDSA256_CERT = kc;
+        try {
+            kc = new Ed25519Cert();
+        } catch (DataFormatException dfe) {
+            throw new RuntimeException(dfe);  // won't happen
+        }
+        ELG_Ed25519_CERT = kc;
     }
 
     /**
@@ -185,19 +211,17 @@ public class KeyCertificate extends Certificate {
 
     /**
      *  An immutable ElG/ECDSA-256 certificate.
-     *  @since 0.8.3
      */
     private static final class ECDSA256Cert extends KeyCertificate {
         private static final byte[] ECDSA256_DATA = new byte[] {
             CERTIFICATE_TYPE_KEY, 0, HEADER_LENGTH, 0, (byte) (SigType.ECDSA_SHA256_P256.getCode()), 0, 0
         };
         private static final int ECDSA256_LENGTH = ECDSA256_DATA.length;
-        private static final byte[] ECDSA256_PAYLOAD = new byte[] {
-                                        0, (byte) (SigType.ECDSA_SHA256_P256.getCode()), 0, 0
-        };
+        private final int _hashcode;
 
         public ECDSA256Cert() throws DataFormatException {
             super(ECDSA256_PAYLOAD);
+            _hashcode = super.hashCode();
         }
 
         /** @throws RuntimeException always */
@@ -246,7 +270,75 @@ public class KeyCertificate extends Certificate {
         /** Overridden for efficiency */
         @Override
         public int hashCode() {
-            return 1234567;
+            return _hashcode;
+        }
+    }
+
+    /**
+     *  An immutable ElG/Ed25519 certificate.
+     *  @since 0.9.22
+     */
+    private static final class Ed25519Cert extends KeyCertificate {
+        private static final byte[] ED_DATA = new byte[] { CERTIFICATE_TYPE_KEY,
+                                                           0, HEADER_LENGTH,
+                                                           0, (byte) SigType.EdDSA_SHA512_Ed25519.getCode(),
+                                                           0, 0
+        };
+        private static final int ED_LENGTH = ED_DATA.length;
+        private final int _hashcode;
+
+        public Ed25519Cert() throws DataFormatException {
+            super(Ed25519_PAYLOAD);
+            _hashcode = super.hashCode();
+        }
+
+        /** @throws RuntimeException always */
+        @Override
+        public void setCertificateType(int type) {
+            throw new RuntimeException("Data already set");
+        }
+
+        /** @throws RuntimeException always */
+        @Override
+        public void setPayload(byte[] payload) {
+            throw new RuntimeException("Data already set");
+        }
+    
+        /** @throws RuntimeException always */
+        @Override
+        public void readBytes(InputStream in) throws DataFormatException, IOException {
+            throw new RuntimeException("Data already set");
+        }
+    
+        /** Overridden for efficiency */
+        @Override
+        public void writeBytes(OutputStream out) throws IOException {
+            out.write(ED_DATA);
+        }
+    
+        /** Overridden for efficiency */
+        @Override
+        public int writeBytes(byte target[], int offset) {
+            System.arraycopy(ED_DATA, 0, target, offset, ED_LENGTH);
+            return ED_LENGTH;
+        }
+    
+        /** @throws RuntimeException always */
+        @Override
+        public int readBytes(byte source[], int offset) throws DataFormatException {
+            throw new RuntimeException("Data already set");
+        }
+    
+        /** Overridden for efficiency */
+        @Override
+        public int size() {
+            return ED_LENGTH;
+        }
+    
+        /** Overridden for efficiency */
+        @Override
+        public int hashCode() {
+            return _hashcode;
         }
     }
 }

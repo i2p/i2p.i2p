@@ -8,7 +8,7 @@
 <%@include file="summaryajax.jsi" %>
 </head><body onload="initAjax()">
 <%
-    String consoleNonce = intl.getNonce();
+    String consoleNonce = net.i2p.router.web.CSSHelper.getNonce();
 %>
 <jsp:useBean class="net.i2p.router.web.NewsHelper" id="newshelper" scope="request" />
 <jsp:setProperty name="newshelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
@@ -23,12 +23,12 @@
 <div class="routersummaryouter">
  <div class="routersummary">
   <div style="height: 36px;">
-   <a href="/console"><img src="<%=intl.getTheme(request.getHeader("User-Agent"))%>images/i2plogo.png" alt="<%=intl._("I2P Router Console")%>" title="<%=intl._("I2P Router Console")%>"></a>
+   <a href="/console"><img src="<%=intl.getTheme(request.getHeader("User-Agent"))%>images/i2plogo.png" alt="<%=intl._t("I2P Router Console")%>" title="<%=intl._t("I2P Router Console")%>"></a>
   </div>
 <%
     if (!intl.allowIFrame(request.getHeader("User-Agent"))) {
 %>
-  <a href="/summaryframe"><%=intl._("Summary Bar")%></a>
+  <a href="/summaryframe"><%=intl._t("Summary Bar")%></a>
 <%
     }
 %>
@@ -39,7 +39,7 @@
  </div>
 </div>
 
-<h1><%=intl._("I2P Router Console")%></h1>
+<h1><%=intl._t("I2P Router Console")%></h1>
 
 <%
    if (newshelper.shouldShowNews()) {
@@ -57,7 +57,7 @@
 <jsp:useBean class="net.i2p.router.web.HomeHelper" id="homehelper" scope="request" />
 <jsp:setProperty name="homehelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
 <% if (homehelper.shouldShowWelcome()) { %>
-<div class="welcome" title="<%=intl._("Click a flag to select a language. Click 'configure language' below to change it later.")%>">
+<div class="welcome" title="<%=intl._t("Click a flag to select a language. Click 'configure language' below to change it later.")%>">
   <div class="langbox" id="langbox">
     <a href="/home?lang=en&amp;consoleNonce=<%=consoleNonce%>"><img height="11" width="16" style="padding: 0 2px;" src="/flags.jsp?c=us" title="English" alt="English"></a>
     <a href="/home?lang=ar&amp;consoleNonce=<%=consoleNonce%>"><img height="11" width="16" style="padding: 0 2px;" src="/flags.jsp?c=lang_ar" title="عربية" alt="عربية"></a>
@@ -87,7 +87,7 @@
     <a href="/home?lang=uk&amp;consoleNonce=<%=consoleNonce%>"><img height="11" width="16" style="padding: 0 2px;" src="/flags.jsp?c=ua" title="Українська" alt="Українська"></a>
     <a href="/home?lang=vi&amp;consoleNonce=<%=consoleNonce%>"><img height="11" width="16" style="padding: 0 2px;" src="/flags.jsp?c=vn" title="Tiếng Việt" alt="Tiếng Việt"></a>
   </div>
-  <h2><%=intl._("Welcome to I2P")%></h2>
+  <h2><%=intl._t("Welcome to I2P")%></h2>
 </div>
 <% }  // shouldShowWelcome %>
 
@@ -100,7 +100,7 @@
       <table class="search"><tr><td align="right">
         <input size="40" type="text" class="search" name="query" />
       </td><td align="left">
-        <button type="submit" value="search" class="search"><%=intl._("Search I2P")%></button>
+        <button type="submit" value="search" class="search"><%=intl._t("Search I2P")%></button>
       </td><td align="left">
         <jsp:useBean class="net.i2p.router.web.SearchHelper" id="searchhelper" scope="request" />
         <jsp:setProperty name="searchhelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
@@ -112,11 +112,11 @@
    }  // shouldShowSearch()
 %>
   <div class="ag2">
-    <h4 class="app"><%=intl._("Hidden Services of Interest")%></h4>
+    <h4 class="app"><%=intl._t("Hidden Services of Interest")%></h4>
     <jsp:getProperty name="homehelper" property="favorites" /><br>
   </div>
   <div class="ag2">
-    <h4 class="app2"><%=intl._("Applications and Configuration")%></h4>
+    <h4 class="app2"><%=intl._t("Applications and Configuration")%></h4>
     <jsp:getProperty name="homehelper" property="services" /><br>
     <div class="clearer">&nbsp;</div>
   </div>

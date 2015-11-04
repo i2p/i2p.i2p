@@ -47,16 +47,17 @@ public class Certificate extends DataStructureImpl {
     public final static int CERTIFICATE_TYPE_KEY = 5;
 
     /**
-     * If null cert, return immutable static instance, else create new
+     * If null, P256 key, or Ed25519 key cert, return immutable static instance, else create new
      * @throws DataFormatException if not enough bytes
      * @since 0.8.3
      */
     public static Certificate create(byte[] data, int off) throws DataFormatException {
     	int type;
     	byte[] payload;
+        int length;
     	try {
             type = data[off] & 0xff;
-            int length = (int) DataHelper.fromLong(data, off + 1, 2);
+            length = (int) DataHelper.fromLong(data, off + 1, 2);
             if (type == 0 && length == 0)
                 return NULL_CERT;
             // from here down roughly the same as readBytes() below
@@ -68,6 +69,12 @@ public class Certificate extends DataStructureImpl {
     		throw new DataFormatException("not enough bytes", aioobe);
     	}
         if (type == CERTIFICATE_TYPE_KEY) {
+            if (length == 4) {
+                if (Arrays.equals(payload, KeyCertificate.Ed25519_PAYLOAD))
+                    return KeyCertificate.ELG_Ed25519_CERT;
+                if (Arrays.equals(payload, KeyCertificate.ECDSA256_PAYLOAD))
+                    return KeyCertificate.ELG_ECDSA256_CERT;
+            }
             try {
                 return new KeyCertificate(payload);
             } catch (DataFormatException dfe) {
@@ -78,7 +85,7 @@ public class Certificate extends DataStructureImpl {
     }
 
     /**
-     * If null cert, return immutable static instance, else create new
+     * If null, P256 key, or Ed25519 key cert, return immutable static instance, else create new
      * @since 0.8.3
      */
     public static Certificate create(InputStream in) throws DataFormatException, IOException {
@@ -93,8 +100,15 @@ public class Certificate extends DataStructureImpl {
         int read = DataHelper.read(in, payload);
         if (read != length)
             throw new DataFormatException("Not enough bytes for the payload (read: " + read + " length: " + length + ')');
-        if (type == CERTIFICATE_TYPE_KEY)
+        if (type == CERTIFICATE_TYPE_KEY) {
+            if (length == 4) {
+                if (Arrays.equals(payload, KeyCertificate.Ed25519_PAYLOAD))
+                    return KeyCertificate.ELG_Ed25519_CERT;
+                if (Arrays.equals(payload, KeyCertificate.ECDSA256_PAYLOAD))
+                    return KeyCertificate.ELG_ECDSA256_CERT;
+            }
             return new KeyCertificate(payload);
+        }
         return new Certificate(type, payload);
     }
 

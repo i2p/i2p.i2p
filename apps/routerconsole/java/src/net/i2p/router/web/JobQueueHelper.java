@@ -47,29 +47,29 @@ public class JobQueueHelper extends HelperBase {
         int numRunners = _context.jobQueue().getJobs(readyJobs, timedJobs, activeJobs, justFinishedJobs);
         
         StringBuilder buf = new StringBuilder(32*1024);
-        buf.append("<b><div class=\"joblog\"><h3>").append(_("I2P Job Queue")).append("</h3><br><div class=\"wideload\">")
-           .append(_("Job runners")).append(": ").append(numRunners)
+        buf.append("<b><div class=\"joblog\"><h3>").append(_t("I2P Job Queue")).append("</h3><br><div class=\"wideload\">")
+           .append(_t("Job runners")).append(": ").append(numRunners)
            .append("</b><br>\n");
 
         long now = _context.clock().now();
 
-        buf.append("<hr><b>").append(_("Active jobs")).append(": ").append(activeJobs.size()).append("</b><ol>\n");
+        buf.append("<hr><b>").append(_t("Active jobs")).append(": ").append(activeJobs.size()).append("</b><ol>\n");
         for (int i = 0; i < activeJobs.size(); i++) {
             Job j = activeJobs.get(i);
-            buf.append("<li>(").append(_("started {0} ago", DataHelper.formatDuration2(now-j.getTiming().getStartAfter()))).append("): ");
+            buf.append("<li>(").append(_t("started {0} ago", DataHelper.formatDuration2(now-j.getTiming().getStartAfter()))).append("): ");
             buf.append(j.toString()).append("</li>\n");
         }
         buf.append("</ol>\n");
 
-        buf.append("<hr><b>").append(_("Just finished jobs")).append(": ").append(justFinishedJobs.size()).append("</b><ol>\n");
+        buf.append("<hr><b>").append(_t("Just finished jobs")).append(": ").append(justFinishedJobs.size()).append("</b><ol>\n");
         for (int i = 0; i < justFinishedJobs.size(); i++) {
             Job j = justFinishedJobs.get(i);
-            buf.append("<li>(").append(_("finished {0} ago", DataHelper.formatDuration2(now-j.getTiming().getActualEnd()))).append("): ");
+            buf.append("<li>(").append(_t("finished {0} ago", DataHelper.formatDuration2(now-j.getTiming().getActualEnd()))).append("): ");
             buf.append(j.toString()).append("</li>\n");
         }
         buf.append("</ol>\n");
 
-        buf.append("<hr><b>").append(_("Ready/waiting jobs")).append(": ").append(readyJobs.size()).append("</b><ol>\n");
+        buf.append("<hr><b>").append(_t("Ready/waiting jobs")).append(": ").append(readyJobs.size()).append("</b><ol>\n");
         ObjectCounter<String> counter = new ObjectCounter<String>();
         for (int i = 0; i < readyJobs.size(); i++) {
             Job j = readyJobs.get(i);
@@ -86,7 +86,7 @@ public class JobQueueHelper extends HelperBase {
         out.write(buf.toString());
         buf.setLength(0);
 
-        buf.append("<hr><b>").append(_("Scheduled jobs")).append(": ").append(timedJobs.size()).append("</b><ol>\n");
+        buf.append("<hr><b>").append(_t("Scheduled jobs")).append(": ").append(timedJobs.size()).append("</b><ol>\n");
         long prev = Long.MIN_VALUE;
         counter.clear();
         for (int i = 0; i < timedJobs.size(); i++) {
@@ -96,7 +96,7 @@ public class JobQueueHelper extends HelperBase {
                 continue;
             long time = j.getTiming().getStartAfter() - now;
             // translators: {0} is a job name, {1} is a time, e.g. 6 min
-            buf.append("<li>").append(_("{0} will start in {1}", j.getName(), DataHelper.formatDuration2(time)));
+            buf.append("<li>").append(_t("{0} will start in {1}", j.getName(), DataHelper.formatDuration2(time)));
             // debug, don't bother translating
             if (time < 0)
                 buf.append(" <b>DELAYED</b>");
@@ -110,7 +110,7 @@ public class JobQueueHelper extends HelperBase {
         out.write(buf.toString());
         buf.setLength(0);
         
-        buf.append("<hr><b>").append(_("Total Job Statistics")).append("</b>\n");
+        buf.append("<hr><b>").append(_t("Total Job Statistics")).append("</b>\n");
         getJobStats(buf);
         out.write(buf.toString());
     }
@@ -121,7 +121,7 @@ public class JobQueueHelper extends HelperBase {
         if (names.size() < 4)
             return;
         buf.append("<table style=\"width: 30%; margin-left: 100px;\">\n" +
-                   "<tr><th>").append(_("Job")).append("</th><th>").append(_("Queued")).append("<th>");
+                   "<tr><th>").append(_t("Job")).append("</th><th>").append(_t("Queued")).append("<th>");
         Collections.sort(names, new JobCountComparator(counter));
         for (String name : names) {
             buf.append("<tr><td>").append(name)
@@ -138,12 +138,12 @@ public class JobQueueHelper extends HelperBase {
      */
     private void getJobStats(StringBuilder buf) { 
         buf.append("<table>\n" +
-                   "<tr><th>").append(_("Job")).append("</th><th>").append(_("Runs")).append("</th>" +
-                   "<th>").append(_("Dropped")).append("</th>" +
-                   "<th>").append(_("Time")).append("</th><th><i>").append(_("Avg")).append("</i></th><th><i>")
-           .append(_("Max")).append("</i></th><th><i>").append(_("Min")).append("</i></th>" +
-                   "<th>").append(_("Pending")).append("</th><th><i>").append(_("Avg")).append("</i></th><th><i>")
-           .append(_("Max")).append("</i></th><th><i>").append(_("Min")).append("</i></th></tr>\n");
+                   "<tr><th>").append(_t("Job")).append("</th><th>").append(_t("Runs")).append("</th>" +
+                   "<th>").append(_t("Dropped")).append("</th>" +
+                   "<th>").append(_t("Time")).append("</th><th><i>").append(_t("Avg")).append("</i></th><th><i>")
+           .append(_t("Max")).append("</i></th><th><i>").append(_t("Min")).append("</i></th>" +
+                   "<th>").append(_t("Pending")).append("</th><th><i>").append(_t("Avg")).append("</i></th><th><i>")
+           .append(_t("Max")).append("</i></th><th><i>").append(_t("Min")).append("</i></th></tr>\n");
         long totRuns = 0;
         long totDropped = 0;
         long totExecTime = 0;
@@ -194,7 +194,7 @@ public class JobQueueHelper extends HelperBase {
         }
 
         buf.append("<tr class=\"tablefooter\">");
-        buf.append("<td><b>").append(_("Summary")).append("</b></td>");
+        buf.append("<td><b>").append(_t("Summary")).append("</b></td>");
         buf.append("<td align=\"right\">").append(totRuns).append("</td>");
         buf.append("<td align=\"right\">").append(totDropped).append("</td>");
         buf.append("<td align=\"right\">").append(DataHelper.formatDuration2(totExecTime)).append("</td>");

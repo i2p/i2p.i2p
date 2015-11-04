@@ -539,7 +539,7 @@ msgstr ""
 msgid "The round trip time in milliseconds"
 msgstr "Rundtur i millisekunder"
 
-#. "<b id=\"def.dev\">").append(_("Dev")).append("</b>: ").append(_("The
+#. "<b id=\"def.dev\">").append(_t("Dev")).append("</b>: ").append(_t("The
 #. standard deviation of the round trip time in
 #. milliseconds")).append("<br>\n" +
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:746
@@ -3570,7 +3570,7 @@ msgstr[1] ""
 msgid "Plugin update check complete"
 msgstr ""
 
-#. buf.append("<h2>").append(_("Peer Profiles")).append("</h2>\n<p>");
+#. buf.append("<h2>").append(_t("Peer Profiles")).append("</h2>\n<p>");
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:79
 #, java-format
 msgid "Showing 1 recent profile."

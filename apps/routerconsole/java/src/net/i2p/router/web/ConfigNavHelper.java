@@ -62,7 +62,7 @@ public class ConfigNavHelper extends HelperBase {
             buf.append("<center>");
         List<Tab> tabs = new ArrayList<Tab>(pages.length);
         for (int i = 0; i < pages.length; i++) {
-            tabs.add(new Tab(pages[i], _(titles[i])));
+            tabs.add(new Tab(pages[i], _t(titles[i])));
         }
         Collections.sort(tabs, new TabComparator());
         for (int i = 0; i < tabs.size(); i++) {

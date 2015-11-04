@@ -19,6 +19,7 @@ import net.i2p.client.SendMessageStatusListener;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.SessionKey;
+import net.i2p.data.SessionTag;
 import net.i2p.data.i2cp.MessagePayloadMessage;
 import net.i2p.util.Log;
 
@@ -163,7 +164,7 @@ class I2PSessionMuxedImpl extends I2PSessionImpl2 {
      */
     @Override
     public boolean sendMessage(Destination dest, byte[] payload, int offset, int size,
-                               SessionKey keyUsed, Set tagsSent, long expires)
+                               SessionKey keyUsed, Set<SessionTag> tagsSent, long expires)
                    throws I2PSessionException {
         return sendMessage(dest, payload, offset, size, keyUsed, tagsSent, 0, PROTO_UNSPECIFIED, PORT_UNSPECIFIED, PORT_UNSPECIFIED);
     }
@@ -173,7 +174,7 @@ class I2PSessionMuxedImpl extends I2PSessionImpl2 {
      * @param tagsSent unused - no end-to-end crypto
      */
     @Override
-    public boolean sendMessage(Destination dest, byte[] payload, int offset, int size, SessionKey keyUsed, Set tagsSent,
+    public boolean sendMessage(Destination dest, byte[] payload, int offset, int size, SessionKey keyUsed, Set<SessionTag> tagsSent,
                                int proto, int fromport, int toport) throws I2PSessionException {
         return sendMessage(dest, payload, offset, size, keyUsed, tagsSent, 0, proto, fromport, toport);
     }
@@ -192,7 +193,7 @@ class I2PSessionMuxedImpl extends I2PSessionImpl2 {
      */
     @Override
     public boolean sendMessage(Destination dest, byte[] payload, int offset, int size,
-                               SessionKey keyUsed, Set tagsSent, long expires,
+                               SessionKey keyUsed, Set<SessionTag> tagsSent, long expires,
                                int proto, int fromPort, int toPort)
                    throws I2PSessionException {
         return sendMessage(dest, payload, offset, size, keyUsed, tagsSent, 0, proto, fromPort, toPort, 0);
@@ -213,7 +214,7 @@ class I2PSessionMuxedImpl extends I2PSessionImpl2 {
      */
     @Override
     public boolean sendMessage(Destination dest, byte[] payload, int offset, int size,
-                               SessionKey keyUsed, Set tagsSent, long expires,
+                               SessionKey keyUsed, Set<SessionTag> tagsSent, long expires,
                                int proto, int fromPort, int toPort, int flags)
                    throws I2PSessionException {
         payload = prepPayload(payload, offset, size, proto, fromPort, toPort);

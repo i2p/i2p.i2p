@@ -27,6 +27,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import net.i2p.I2PAppContext;
 import net.i2p.util.EepGet;
@@ -48,6 +49,26 @@ class AddressBook {
     private final File subFile;
     private boolean modified;
     private static final boolean DEBUG = false;
+
+    private static final int MIN_DEST_LENGTH = 516;
+    private static final int MAX_DEST_LENGTH = MIN_DEST_LENGTH + 100;  // longer than any known cert type for now
+
+    /**
+     * 5-67 chars lower/upper case
+     */
+    private static final Pattern HOST_PATTERN =
+        Pattern.compile("^[0-9a-zA-Z\\.-]{5,67}$");
+
+    /**
+     * 52 chars lower/upper case
+     * Always ends in 'a' or 'q'
+     */
+    private static final Pattern B32_PATTERN =
+        Pattern.compile("^[2-7a-zA-Z]{51}[aAqQ]$");
+
+    /** not a complete qualification, just a quick check */
+    private static final Pattern B64_PATTERN =
+        Pattern.compile("^[0-9a-zA-Z~-]{" + MIN_DEST_LENGTH + ',' + MAX_DEST_LENGTH + "}={0,2}$");
 
     /**
      * Construct an AddressBook from the contents of the Map addresses.
@@ -206,9 +227,6 @@ class AddressBook {
         return "Map containing " + this.addresses.size() + " entries";
     }
 
-    private static final int MIN_DEST_LENGTH = 516;
-    private static final int MAX_DEST_LENGTH = MIN_DEST_LENGTH + 100;  // longer than any known cert type for now
-
     /**
      * Do basic validation of the hostname
      * hostname was already converted to lower case by ConfigParser.parse()
@@ -225,9 +243,10 @@ class AddressBook {
 		host.indexOf("..") < 0 &&
                 // IDN - basic check, not complete validation
                 (host.indexOf("--") < 0 || host.startsWith("xn--") || host.indexOf(".xn--") > 0) &&
-                host.replaceAll("[a-z0-9.-]", "").length() == 0 &&
+                HOST_PATTERN.matcher(host).matches() &&
                 // Base32 spoofing (52chars.i2p)
-                (! (host.length() == 56 && host.substring(0,52).replaceAll("[a-z2-7]", "").length() == 0)) &&
+                // We didn't do it this way, we use a .b32.i2p suffix, but let's prohibit it anyway
+                (! (host.length() == 56 && B32_PATTERN.matcher(host.substring(0,52)).matches())) &&
                 // ... or maybe we do Base32 this way ...
                 (! host.equals("b32.i2p")) &&
                 (! host.endsWith(".b32.i2p")) &&
@@ -251,7 +270,7 @@ class AddressBook {
 		 (dest.length() > MIN_DEST_LENGTH && dest.length() <= MAX_DEST_LENGTH)) &&
 		// B64 comes in groups of 2, 3, or 4 chars, but never 1
 		((dest.length() % 4) != 1) &&
-                dest.replaceAll("[a-zA-Z0-9~-]", "").length() == 0
+                B64_PATTERN.matcher(dest).matches()
                 ;	
     }
 
@@ -337,4 +356,27 @@ class AddressBook {
     protected void finalize() {
         delete();
     }
+
+/****
+    public static void main(String[] args) {
+        String[] tests = { "foo.i2p",
+                           "3bnipzzu67cdq2rcygyxz52xhvy6ylokn4zfrk36ywn6pixmaoza.b32.i2p",
+                           "9rhEy4dT9fMlcSOhDzfWRxCV2aen4Zp4eSthOf5f9gVKMa4PtQJ-wEzm2KEYeDXkbM6wEDvMQ6ou4LIniSE6bSAwy7fokiXk5oabels-sJmftnQWRbZyyXEAsLc3gpJJvp9km7kDyZ0z0YGL5tf3S~OaWdptB5tSBOAOjm6ramcYZMWhyUqm~xSL1JyXUqWEHRYwhoDJNL6-L516VpDYVigMBpIwskjeFGcqK8BqWAe0bRwxIiFTPN6Ck8SDzQvS1l1Yj-zfzg3X3gOknzwR8nrHUkjsWtEB6nhbOr8AR21C9Hs0a7MUJvSe2NOuBoNTrtxT76jDruI78JcG5r~WKl6M12yM-SqeBNE9hQn2QCHeHAKju7FdRCbqaZ99IwyjfwvZbkiYYQVN1xlUuGaXrj98XDzK7GORYdH-PrVGfEbMXQ40KLHUWHz8w4tQXAOQrCHEichod0RIzuuxo3XltCWKrf1xGZhkAo9bk2qXi6digCijvYNaKmQdXZYWW~RtAAAA",
+                           "6IZTYacjlXjSAxu-uXEO5oGsj-f4tfePHEvGjs5pu-AMXMwD7-xFdi8kdobDMJp9yRAl96U7yLl~0t9zHeqqYmNeZnDSkTmAcSC2PT45ZJDXBobKi1~a77zuqfPwnzEatYfW3GL1JQAEkAmiwNJoG7ThTZ3zT7W9ekVJpHi9mivpTbaI~rALLfuAg~Mvr60nntZHjqhEZuiU4dTXrmc5nykl~UaMnBdwHL4jKmoN5CotqHyLYZfp74fdD-Oq4SkhuBhU8wkBIM3lz3Ul1o6-s0lNUMdYJq1CyxnyP7jeekdfAlSx4P4sU4M0dPaYvPdOFWPWwBuEh0pCs5Mj01B2xeEBhpV~xSLn6ru5Vq98TrmaR33KHxd76OYYFsWwzVbBuMVSd800XpBghGFucGw01YHYsPh3Afb01sXbf8Nb1bkxCy~DsrmoH4Ww3bpx66JhRTWvg5al3oWlCX51CnJUqaaK~dPL-pBvAyLKIA5aYvl8ca66jtA7AFDxsOb2texBBQAEAAcAAA==",
+                           "te9Ky7XvVcLLr5vQqvfmOasg915P3-ddP3iDqpMMk7v5ufFKobLAX~1k-E4WVsJVlkYvkHVOjxix-uT1IdewKmLd81s5wZtz0GQ3ZC6p0C3S2cOxz7kQqf7QYSR0BrhZC~2du3-GdQO9TqNmsnHrah5lOZf0LN2JFEFPqg8ZB5JNm3JjJeSqePBRk3zAUogNaNK3voB1MVI0ZROKopXAJM4XMERNqI8tIH4ngGtV41SEJJ5pUFrrTx~EiUPqmSEaEA6UDYZiqd23ZlewZ31ExXQj97zvkuhKCoS9A9MNkzZejJhP-TEXWF8~KHur9f51H--EhwZ42Aj69-3GuNjsMdTwglG5zyIfhd2OspxJrXzCPqIV2sXn80IbPgwxHu0CKIJ6X43B5vTyVu87QDI13MIRNGWNZY5KmM5pilGP7jPkOs4xQDo4NHzpuJR5igjWgJIBPU6fI9Pzq~BMzjLiZOMp8xNWey1zKC96L0eX4of1MG~oUvq0qmIHGNa1TlUwBQAEAAEAAA==",
+                           "(*&(*&(*&(*",
+                           "9rhEy4dT9fMlcSOhDzfWRxCV2aen4Zp4eSthOf5f9gVKMa4PtQJ-wEzm2KEYeDXkbM6wEDvMQ6ou4LIniSE6bSAwy7fokiXk5oabels-sJmftnQWRbZyyXEAsLc3gpJJvp9km7kDyZ0z0YGL5tf3S~OaWdptB5tSBOAOjm6ramcYZMWhyUqm~xSL1JyXUqWEHRYwhoDJNL6-L516VpDYVigMBpIwskjeFGcqK8BqWAe0bRwxIiFTPN6Ck8SDzQvS1l1Yj-zfzg3X3gOknzwR8nrHUkjsWtEB6nhbOr8AR21C9Hs0a7MUJvSe2NOuBoNTrtxT76jDruI78JcG5r~WKl6M12yM-SqeBNE9hQn2QCHeHAKju7FdRCbqaZ99IwyjfwvZbkiYYQVN1xlUuGaXrj98XDzK7GORYdH-PrVGfEbMXQ40KLHUWHz8w4tQXAOQrCHEichod0RIzuuxo3XltCWKrf1xGZhkAo9bk2qXi6digCijvYNaKmQdXZYWW~RtAAA",
+                           "6IZTYacjlXjSAxu-uXEO5oGsj-f4tfePHEvGjs5pu-AMXMwD7-xFdi8kdobDMJp9yRAl96U7yLl~0t9zHeqqYmNeZnDSkTmAcSC2PT45ZJDXBobKi1~a77zuqfPwnzEatYfW3GL1JQAEkAmiwNJoG7ThTZ3zT7W9ekVJpHi9mivpTbaI~rALLfuAg~Mvr60nntZHjqhEZuiU4dTXrmc5nykl~UaMnBdwHL4jKmoN5CotqHyLYZfp74fdD-Oq4SkhuBhU8wkBIM3lz3Ul1o6-s0lNUMdYJq1CyxnyP7jeekdfAlSx4P4sU4M0dPaYvPdOFWPWwBuEh0pCs5Mj01B2xeEBhpV~xSLn6ru5Vq98TrmaR33KHxd76OYYFsWwzVbBuMVSd800XpBghGFucGw01YHYsPh3Afb01sXbf8Nb1bkxCy~DsrmoH4Ww3bpx66JhRTWvg5al3oWlCX51CnJUqaaK~dPL-pBvAyLKIA5aYvl8ca66jtA7AFDxsOb2texBBQAEAAcAAA===",
+                           "!e9Ky7XvVcLLr5vQqvfmOasg915P3-ddP3iDqpMMk7v5ufFKobLAX~1k-E4WVsJVlkYvkHVOjxix-uT1IdewKmLd81s5wZtz0GQ3ZC6p0C3S2cOxz7kQqf7QYSR0BrhZC~2du3-GdQO9TqNmsnHrah5lOZf0LN2JFEFPqg8ZB5JNm3JjJeSqePBRk3zAUogNaNK3voB1MVI0ZROKopXAJM4XMERNqI8tIH4ngGtV41SEJJ5pUFrrTx~EiUPqmSEaEA6UDYZiqd23ZlewZ31ExXQj97zvkuhKCoS9A9MNkzZejJhP-TEXWF8~KHur9f51H--EhwZ42Aj69-3GuNjsMdTwglG5zyIfhd2OspxJrXzCPqIV2sXn80IbPgwxHu0CKIJ6X43B5vTyVu87QDI13MIRNGWNZY5KmM5pilGP7jPkOs4xQDo4NHzpuJR5igjWgJIBPU6fI9Pzq~BMzjLiZOMp8xNWey1zKC96L0eX4of1MG~oUvq0qmIHGNa1TlUwBQAEAAEAAA==",
+                           "x"
+        };
+        for (String s : tests) {
+            test(s);
+        }
+    }
+
+    public static void test(String s) {
+        System.out.println(s + " valid host? " + isValidKey(s) + " valid dest? " + isValidDest(s));
+    }
+****/
 }

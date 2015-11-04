@@ -37,7 +37,7 @@
    }
 
    String conNonceParam = request.getParameter("consoleNonce");
-   if (intl.getNonce().equals(conNonceParam)) {
+   if (net.i2p.router.web.CSSHelper.getNonce().equals(conNonceParam)) {
        intl.setLang(request.getParameter("lang"));
        intl.setNews(request.getParameter("news"));
    }

@@ -763,7 +763,7 @@ public class LogManager implements Flushable {
 
     private static final AtomicInteger __id = new AtomicInteger();
 
-    private class ShutdownHook extends Thread {
+    private class ShutdownHook extends I2PAppThread {
         private final int _id;
         public ShutdownHook() {
             _id = __id.incrementAndGet();

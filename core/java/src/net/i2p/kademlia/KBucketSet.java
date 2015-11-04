@@ -628,6 +628,7 @@ public class KBucketSet<T extends SimpleDataStructure> {
      *  @param data size <= SDS length, else throws IAE
      *              Can be 1 bigger if top byte is zero
      */
+    @SuppressWarnings("unchecked")
     private T makeKey(byte[] data) {
         int len = _us.length();
         int dlen = data.length;

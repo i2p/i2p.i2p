@@ -44,8 +44,10 @@ import net.i2p.util.SecureFileOutputStream;
  * Write out keys to disk when we get them and periodically read ones we don't know
  * about into memory, with newly read routers are also added to the routing table.
  *
+ * Public only for access to static methods by startup classes
+ *
  */
-class PersistentDataStore extends TransientDataStore {
+public class PersistentDataStore extends TransientDataStore {
     private final File _dbDir;
     private final KademliaNetworkDatabaseFacade _facade;
     private final Writer _writer;
@@ -630,7 +632,25 @@ class PersistentDataStore extends TransientDataStore {
             return ROUTERINFO_PREFIX + b64 + ROUTERINFO_SUFFIX;
         return DIR_PREFIX + b64.charAt(0) + File.separatorChar + ROUTERINFO_PREFIX + b64 + ROUTERINFO_SUFFIX;
     }
+
+    /**
+     *  The persistent RI file for a hash.
+     *  This is available before the netdb subsystem is running, so we can delete our old RI.
+     *
+     *  @return non-null, should be absolute, does not necessarily exist
+     *  @since 0.9.23
+     */
+    public static File getRouterInfoFile(RouterContext ctx, Hash hash) {
+        String b64 = hash.toBase64();
+        File dir = new File(ctx.getRouterDir(), ctx.getProperty(KademliaNetworkDatabaseFacade.PROP_DB_DIR, KademliaNetworkDatabaseFacade.DEFAULT_DB_DIR));
+        if (ctx.getBooleanProperty(PROP_FLAT))
+            return new File(dir, ROUTERINFO_PREFIX + b64 + ROUTERINFO_SUFFIX);
+        return new File(dir, DIR_PREFIX + b64.charAt(0) + File.separatorChar + ROUTERINFO_PREFIX + b64 + ROUTERINFO_SUFFIX);
+    }
     
+    /**
+     *  Package private for installer BundleRouterInfos
+     */
     static Hash getRouterInfoHash(String filename) {
         return getHash(filename, ROUTERINFO_PREFIX, ROUTERINFO_SUFFIX);
     }
