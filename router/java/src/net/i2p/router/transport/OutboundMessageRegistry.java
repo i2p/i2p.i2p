@@ -330,12 +330,14 @@ public class OutboundMessageRegistry {
                 if (r > 0 || e > 0 || a > 0)
                     _log.debug("Expired: " + e + " remaining: " + r + " active: " + a);
             }
-            if (_nextExpire <= now)
-                _nextExpire = now + 10*1000;
-            schedule(_nextExpire - now);
+            synchronized(this) {
+                if (_nextExpire <= now)
+                    _nextExpire = now + 10*1000;
+                schedule(_nextExpire - now);
+            }
         }
 
-        public void scheduleExpiration(MessageSelector sel) {
+        public synchronized void scheduleExpiration(MessageSelector sel) {
             long now = _context.clock().now();
             if ( (_nextExpire <= now) || (sel.getExpiration() < _nextExpire) ) {
                 _nextExpire = sel.getExpiration();

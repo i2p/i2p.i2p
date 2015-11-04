@@ -416,13 +416,15 @@ public class SimpleTimer2 {
                   case IDLE:  // fall through
                   case RUNNING:
                     throw new IllegalStateException(this + " not possible to be in " + _state);
-                  case SCHEDULED: // proceed, switch to IDLE in case I need to reschedule
-                    _state = TimedEventState.IDLE;
+                  case SCHEDULED:
+                    // proceed, will switch to IDLE to reschedule
                 }
                                                
                 // if I was rescheduled by the user, re-submit myself to the executor.
-                int difference = (int)(_nextRun - before); // careful with long uptimes
+                long difference = _nextRun - before; // careful with long uptimes
                 if (difference > _fuzz) {
+                    // proceed, switch to IDLE to reschedule
+                    _state = TimedEventState.IDLE;
                     schedule(difference); 
                     return;
                 }
@@ -437,10 +439,12 @@ public class SimpleTimer2 {
             else if (_log.shouldLog(Log.WARN))
                 _log.warn(_pool + " no _future " + this);
             // This can be an incorrect warning especially after a schedule(0)
-            if (_log.shouldLog(Log.WARN) && delay > 100)
-                _log.warn(_pool + " early execution " + delay + ": " + this);
-            else if (_log.shouldLog(Log.WARN) && delay < -1000)
-                _log.warn(" late execution " + (0 - delay) + ": " + this + _pool.debug());
+            if (_log.shouldWarn()) {
+                if (delay > 100)
+                    _log.warn(_pool + " early execution " + delay + ": " + this);
+                else if (delay < -1000)
+                    _log.warn(" late execution " + (0 - delay) + ": " + this + _pool.debug());
+            }
             try {
                 timeReached();
             } catch (Throwable t) {
