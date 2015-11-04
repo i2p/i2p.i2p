@@ -26,6 +26,7 @@ import java.util.Properties;
 import net.i2p.I2PAppContext;
 import net.i2p.app.*;
 import static net.i2p.app.ClientAppState.*;
+import net.i2p.util.I2PAppThread;
 import net.i2p.util.PortMapper;
 
 import org.eclipse.jetty.server.Connector;
@@ -109,7 +110,7 @@ public class JettyStart implements ClientApp {
         }
     }
 
-    private class Starter extends Thread {
+    private class Starter extends I2PAppThread {
         public Starter() {
             super("JettyStarter");
             changeState(STARTING);
@@ -161,7 +162,7 @@ public class JettyStart implements ClientApp {
         }
     }
 
-    private class Stopper extends Thread {
+    private class Stopper extends I2PAppThread {
         public Stopper() {
             super("JettyStopper");
             changeState(STOPPING);
