@@ -1,3 +1,13 @@
+2015-11-04 zzz
+ * Threads: More conversions to I2PAppThread
+ * Timers: Improve OutboundMessageRegistry locking (ticket #1694)
+
+2015-11-02 z3r0fox
+ * EepGet: Fix command line filename selection (ticket #1616)
+
+2015-11-01 zzz
+ * Utils: Double IP lookup cache size (ticket #1700)
+
 2015-10-31 zzz
  * Convert remaining Threads to I2PThread or I2PAppThread
  * UPnP: Fix deadlock in callbacks (ticket #1699)
