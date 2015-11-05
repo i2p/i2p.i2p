@@ -68,7 +68,7 @@ public class InternalSocket extends Socket {
     }
 
     @Override
-    public void close() {
+    public synchronized void close() {
         try {
             if (_is != null) {
                 _is.close();
@@ -84,7 +84,7 @@ public class InternalSocket extends Socket {
     }
 
     @Override
-    public boolean isClosed() {
+    public synchronized boolean isClosed() {
         return _is == null || _os == null;
     }
 
