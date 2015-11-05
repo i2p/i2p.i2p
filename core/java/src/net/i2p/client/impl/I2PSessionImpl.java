@@ -209,8 +209,7 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
                                       VersionComparator.comp(routerVersion, MIN_SUBSESSION_VERSION) >= 0);
         synchronized (_stateLock) {
             if (_state == State.OPENING) {
-                _state = State.GOTDATE;
-                _stateLock.notifyAll();
+                changeState(State.GOTDATE);
             }
         }
     }
@@ -635,7 +634,7 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
                 auth.setProperty(PROP_USER, _options.getProperty(PROP_USER));
                 auth.setProperty(PROP_PW, _options.getProperty(PROP_PW));
             }
-            sendMessage(new GetDateMessage(CoreVersion.VERSION, auth));
+            sendMessage_unchecked(new GetDateMessage(CoreVersion.VERSION, auth));
             waitForDate();
 
             if (_log.shouldLog(Log.DEBUG)) _log.debug(getPrefix() + "Before producer.connect()");
@@ -737,14 +736,7 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
      * Report abuse with regards to the given messageId
      */
     public void reportAbuse(int msgId, int severity) throws I2PSessionException {
-        synchronized (_stateLock) {
-            if (_state == State.CLOSED)
-                throw new I2PSessionException("Already closed");
-            if (_state == State.INIT)
-                throw new I2PSessionException("Not open, must call connect() first");
-            if (_state == State.OPENING) // not before GOTDATE
-                throw new I2PSessionException("Session not open yet");
-        }
+        verifyOpen();
         _producer.reportAbuse(this, msgId, severity);
     }
 
@@ -1035,18 +1027,58 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
     }
 
     /**
+     *  Throws I2PSessionException if uninitialized, closed or closing.
+     *  Blocks if opening.
+     *
+     *  @since 0.9.23
+     */
+    protected void verifyOpen() throws I2PSessionException {
+        synchronized (_stateLock) {
+            while (true) {
+                switch (_state) {
+                    case INIT:
+                        throw new I2PSessionException("Not open, must call connect() first");
+
+                    case OPENING:  // fall thru
+                    case GOTDATE:
+                        try {
+                            _stateLock.wait(5*1000);
+                            continue;
+                        } catch (InterruptedException ie) {
+                            throw new I2PSessionException("Interrupted", ie);
+                        }
+
+                    case OPEN:
+                        return;
+
+                    case CLOSING:  // fall thru
+                    case CLOSED:
+                        throw new I2PSessionException("Already closed");
+                }
+            }
+        }
+    }
+
+    /**
      * Deliver an I2CP message to the router
      * As of 0.9.3, may block for several seconds if the write queue to the router is full
      *
      * @throws I2PSessionException if the message is malformed or there is an error writing it out
      */
     void sendMessage(I2CPMessage message) throws I2PSessionException {
-        synchronized (_stateLock) {
-            if (_state == State.CLOSED)
-                throw new I2PSessionException("Already closed");
-            if (_state == State.INIT)
-                throw new I2PSessionException("Not open, must call connect() first");
-        }
+        verifyOpen();
+        sendMessage_unchecked(message);
+    }
+
+    /**
+     * Deliver an I2CP message to the router.
+     * Does NOT check state. Call only from connect() or other methods that need to
+     * send messages when not in OPEN state.
+     *
+     * @throws I2PSessionException if the message is malformed or there is an error writing it out
+     * @since 0.9.23
+     */
+    void sendMessage_unchecked(I2CPMessage message) throws I2PSessionException {
         if (_queue != null) {
             // internal
             try {
@@ -1055,11 +1087,13 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
             } catch (InterruptedException ie) {
                 throw new I2PSessionException("Interrupted", ie);
             }
-        } else if (_writer == null) {
-            // race here
-            throw new I2PSessionException("Already closed or not open");
         } else {
-            _writer.addMessage(message);
+            ClientWriterRunner writer = _writer;
+            if (writer == null) {
+                throw new I2PSessionException("Already closed or not open");
+            } else {
+                writer.addMessage(message);
+            }
         }
     }
 
@@ -1441,11 +1475,11 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
                 SessionId id = _sessionId;
                 if (id == null)
                     id = new SessionId(65535);
-                sendMessage(new HostLookupMessage(id, h, nonce, maxWait));
+                sendMessage_unchecked(new HostLookupMessage(id, h, nonce, maxWait));
             } else {
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Sending DestLookup for " + h);
-                sendMessage(new DestLookupMessage(h));
+                sendMessage_unchecked(new DestLookupMessage(h));
             }
             try {
                 synchronized (waiter) {
@@ -1533,7 +1567,7 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
             SessionId id = _sessionId;
             if (id == null)
                 id = new SessionId(65535);
-            sendMessage(new HostLookupMessage(id, name, nonce, maxWait));
+            sendMessage_unchecked(new HostLookupMessage(id, name, nonce, maxWait));
             try {
                 synchronized (waiter) {
                     waiter.wait(maxWait);
@@ -1567,7 +1601,7 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
                 return null;
             }
         }
-        sendMessage(new GetBandwidthLimitsMessage());
+        sendMessage_unchecked(new GetBandwidthLimitsMessage());
         try {
             synchronized (_bwReceivedLock) {
                 _bwReceivedLock.wait(5*1000);

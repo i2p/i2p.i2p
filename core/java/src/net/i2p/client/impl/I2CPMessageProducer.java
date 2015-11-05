@@ -102,7 +102,7 @@ class I2CPMessageProducer {
         if (_log.shouldLog(Log.DEBUG)) _log.debug("config signed");
         msg.setSessionConfig(cfg);
         if (_log.shouldLog(Log.DEBUG)) _log.debug("config loaded into message");
-        session.sendMessage(msg);
+        session.sendMessage_unchecked(msg);
         if (_log.shouldLog(Log.DEBUG)) _log.debug("config message sent");
     }
 
@@ -114,7 +114,7 @@ class I2CPMessageProducer {
         if (session.isClosed()) return;
         DestroySessionMessage dmsg = new DestroySessionMessage();
         dmsg.setSessionId(session.getSessionId());
-        session.sendMessage(dmsg);
+        session.sendMessage_unchecked(dmsg);
         // use DisconnectMessage only if we fail and drop connection... 
         // todo: update the code to fire off DisconnectMessage on socket error
         //DisconnectMessage msg = new DisconnectMessage();
@@ -371,7 +371,7 @@ class I2CPMessageProducer {
             return;
         }
         msg.setSessionId(sid);
-        session.sendMessage(msg);
+        session.sendMessage_unchecked(msg);
     }
 
     /**

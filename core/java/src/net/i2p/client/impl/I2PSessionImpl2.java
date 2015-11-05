@@ -276,14 +276,7 @@ class I2PSessionImpl2 extends I2PSessionImpl {
     public boolean sendMessage(Destination dest, byte[] payload, int offset, int size, SessionKey keyUsed, Set<SessionTag> tagsSent, long expires)
                    throws I2PSessionException {
         if (_log.shouldLog(Log.DEBUG)) _log.debug("sending message");
-        synchronized (_stateLock) {
-            if (_state == State.CLOSED)
-                throw new I2PSessionException("Already closed");
-            if (_state == State.INIT)
-                throw new I2PSessionException("Not open, must call connect() first");
-            if (_state == State.OPENING || _state == State.GOTDATE) // not before GOTDATE or session
-                throw new I2PSessionException("Session not open yet");
-        }
+        verifyOpen();
         updateActivity();
 
         // Sadly there is no way to send something completely uncompressed in a backward-compatible way,

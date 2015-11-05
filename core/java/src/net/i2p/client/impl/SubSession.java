@@ -100,7 +100,7 @@ class SubSession extends I2PSessionMuxedImpl {
     public void connect() throws I2PSessionException {
         synchronized(_stateLock) {
             if (_state != State.OPEN) {
-                _state = State.OPENING;
+                changeState(State.OPENING);
             }
         }
         boolean success = false;
@@ -121,7 +121,7 @@ class SubSession extends I2PSessionMuxedImpl {
                 if (_state != State.OPEN) {
                     Thread notifier = new I2PAppThread(_availabilityNotifier, "ClientNotifier " + getPrefix(), true);
                     notifier.start();
-                    _state = State.OPEN;
+                    changeState(State.OPEN);
                 }
             }
             success = true;
@@ -161,7 +161,20 @@ class SubSession extends I2PSessionMuxedImpl {
             message.getType() != CreateSessionMessage.MESSAGE_TYPE &&
             message.getType() != CreateLeaseSetMessage.MESSAGE_TYPE)
             throw new I2PSessionException("Already closed");
-        _primary.sendMessage(message);
+        _primary.sendMessage_unchecked(message);
+    }
+
+    /**
+     * Deliver an I2CP message to the router.
+     * Does NOT check state. Call only from connect() or other methods that need to
+     * send messages when not in OPEN state.
+     *
+     * @throws I2PSessionException if the message is malformed or there is an error writing it out
+     * @since 0.9.23
+     */
+    @Override
+    void sendMessage_unchecked(I2CPMessage message) throws I2PSessionException {
+        _primary.sendMessage_unchecked(message);
     }
 
     /**
