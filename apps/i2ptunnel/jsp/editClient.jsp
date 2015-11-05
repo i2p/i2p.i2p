@@ -268,7 +268,12 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                     <option value="1"<%=(tunnelDepth == 1 ? " selected=\"selected\"" : "") %>><%=intl._t("1 hop tunnel (low anonymity)")%></option>
                     <option value="2"<%=(tunnelDepth == 2 ? " selected=\"selected\"" : "") %>><%=intl._t("2 hop tunnel (medium anonymity)")%></option>
                     <option value="3"<%=(tunnelDepth == 3 ? " selected=\"selected\"" : "") %>><%=intl._t("3 hop tunnel (high anonymity)")%></option>
-                <% if (tunnelDepth > 3) { 
+                <% if (editBean.isAdvanced()) {
+                  %><option value="4"<%=(tunnelDepth == 4 ? " selected=\"selected\"" : "") %>>4 hop tunnel</option>
+                    <option value="5"<%=(tunnelDepth == 5 ? " selected=\"selected\"" : "") %>>5 hop tunnel</option>
+                    <option value="6"<%=(tunnelDepth == 6 ? " selected=\"selected\"" : "") %>>6 hop tunnel</option>
+                    <option value="7"<%=(tunnelDepth == 7 ? " selected=\"selected\"" : "") %>>7 hop tunnel</option>
+                <% } else if (tunnelDepth > 3) { 
                 %>    <option value="<%=tunnelDepth%>" selected="selected"><%=tunnelDepth%> <%=intl._t("hop tunnel (very poor performance)")%></option>
                 <% }
               %></select>
