@@ -1,3 +1,7 @@
+2015-11-05 zzz
+ * I2CP: Fix additional connections getting rejected during tunnel open (ticket #1650)
+ * Streaming: Split blacklist into one for EC and one for Ed
+
 2015-11-04 zzz
  * Threads: More conversions to I2PAppThread
  * Timers: Improve OutboundMessageRegistry locking (ticket #1694)
