@@ -51,8 +51,7 @@ public class HomeHelper extends HelperBase {
         _x("Forum") + S + _x("Community forum") + S + "http://forum.i2p/" + S + I + "group.png" + S +
         _x("Anonymous Git Hosting") + S + _x("A public anonymous Git hosting site - supports pulling via Git and HTTP and pushing via SSH") + S + "http://git.repo.i2p/" + S + I + "git-logo.png" + S +
         "hiddengate.i2p" + S + _x("HiddenGate") + S + "http://hiddengate.i2p/" + S + I + "hglogo32.png" + S +
-                                                                                                              // FIXME **********
-        _x("I2P Wiki") + S + _x("Anonymous wiki - share the knowledge") + S + "http://i2pwiki.i2p/" + S + I + "errortriangle.png" + S +
+        _x("I2P Wiki") + S + _x("Anonymous wiki - share the knowledge") + S + "http://i2pwiki.i2p/" + S + I + "i2pwiki_logo.png" + S +
         "Ident " + _x("Microblog") + S + _x("Your premier microblogging service on I2P") + S + "http://id3nt.i2p/" + S + I + "ident_icon_blue.png" + S +
         _x("Javadocs") + S + _x("Technical documentation") + S + "http://i2p-javadocs.i2p/" + S + I + "education.png" + S +
         //"jisko.i2p" + S + _x("Simple and fast microblogging website") + S + "http://jisko.i2p/" + S + I + "jisko_console_icon.png" + S +
