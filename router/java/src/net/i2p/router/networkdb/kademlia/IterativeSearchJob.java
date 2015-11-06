@@ -187,11 +187,15 @@ class IterativeSearchJob extends FloodSearchJob {
                 floodfillPeers.add(iter.next());
             }
         }
-        _toTry.addAll(floodfillPeers);
-        // don't ask ourselves or the target
-        _toTry.remove(getContext().routerHash());
-        _toTry.remove(_key);
-        if (_toTry.isEmpty()) {
+        final boolean empty;
+        synchronized(this) {
+            _toTry.addAll(floodfillPeers);
+            // don't ask ourselves or the target
+            _toTry.remove(getContext().routerHash());
+            _toTry.remove(_key);
+            empty = _toTry.isEmpty();
+        }
+        if (empty) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn(getJobId() + ": ISJ for " + _key + " had no peers to send to");
             // no floodfill peers, fail
@@ -227,23 +231,26 @@ class IterativeSearchJob extends FloodSearchJob {
         }
         while (true) {
             Hash peer;
+            final int done, pend;
             synchronized (this) {
                 if (_dead) return;
-                int pend = _unheardFrom.size();
+                pend = _unheardFrom.size();
                 if (pend >= MAX_CONCURRENT)
                     return;
-                int done = _failedPeers.size();
-                if (done >= _totalSearchLimit) {
-                    failed();
-                    return;
-                }
-                // even if pend and todo are empty, we don't fail, as there may be more peers
-                // coming via newPeerToTry()
-                if (done + pend >= _totalSearchLimit)
-                    return;
+                done = _failedPeers.size();
+            }
+            if (done >= _totalSearchLimit) {
+                failed();
+                return;
+            }
+            // even if pend and todo are empty, we don't fail, as there may be more peers
+            // coming via newPeerToTry()
+            if (done + pend >= _totalSearchLimit)
+                return;
+            synchronized(this) {
                 if (_alwaysQueryHash != null &&
-                    !_unheardFrom.contains(_alwaysQueryHash) &&
-                    !_failedPeers.contains(_alwaysQueryHash)) {
+                        !_unheardFrom.contains(_alwaysQueryHash) &&
+                        !_failedPeers.contains(_alwaysQueryHash)) {
                     // For testing or local networks... we will
                     // pretend that the specified router is floodfill, and always closest-to-the-key.
                     // May be set after startup but can't be changed or unset later.
@@ -513,12 +520,14 @@ class IterativeSearchJob extends FloodSearchJob {
             _facade.lookupFailed(_key);
         getContext().messageRegistry().unregisterPending(_out);
         int tries;
+        final List<Hash> unheard;
         synchronized(this) {
             tries = _unheardFrom.size() + _failedPeers.size();
-            // blame the unheard-from (others already blamed in failed() above)
-            for (Hash h : _unheardFrom)
-                getContext().profileManager().dbLookupFailed(h);
+            unheard = new ArrayList<Hash>(_unheardFrom);
         }
+        // blame the unheard-from (others already blamed in failed() above)
+        for (Hash h : unheard)
+            getContext().profileManager().dbLookupFailed(h);
         long time = System.currentTimeMillis() - _created;
         if (_log.shouldLog(Log.INFO)) {
             long timeRemaining = _expiration - getContext().clock().now();
