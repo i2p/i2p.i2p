@@ -100,7 +100,7 @@ class NTCPSendFinisher {
                 // appx 0.1 ms
                 //_context.statManager().addRateData("ntcp.sendFinishTime", _context.clock().now() - _queued, 0);
             } catch (Throwable t) {
-                _log.log(Log.CRIT, " wtf, afterSend borked", t);
+                _log.log(Log.CRIT, " afterSend broken?", t);
             }
         }
     }

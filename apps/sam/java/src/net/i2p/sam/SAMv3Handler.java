@@ -48,8 +48,8 @@ class SAMv3Handler extends SAMv1Handler
 	
 	private Session session;
 	public static final SessionsDB sSessionsHash = new SessionsDB();
-	private boolean stolenSocket;
-	private boolean streamForwardingSocket;
+	private volatile boolean stolenSocket;
+	private volatile boolean streamForwardingSocket;
 
 	
 	interface Session {
@@ -67,9 +67,10 @@ class SAMv3Handler extends SAMv1Handler
 	 * @param verMajor SAM major version to manage (should be 3)
 	 * @param verMinor SAM minor version to manage
 	 */
-	public SAMv3Handler ( SocketChannel s, int verMajor, int verMinor ) throws SAMException, IOException
+	public SAMv3Handler(SocketChannel s, int verMajor, int verMinor,
+                            SAMBridge parent) throws SAMException, IOException
 	{
-		this ( s, verMajor, verMinor, new Properties() );
+		this(s, verMajor, verMinor, new Properties(), parent);
 	}
 
 	/**
@@ -83,9 +84,10 @@ class SAMv3Handler extends SAMv1Handler
 	 * @param i2cpProps properties to configure the I2CP connection (host, port, etc)
 	 */
 
-	public SAMv3Handler ( SocketChannel s, int verMajor, int verMinor, Properties i2cpProps ) throws SAMException, IOException
+	public SAMv3Handler(SocketChannel s, int verMajor, int verMinor,
+	                    Properties i2cpProps, SAMBridge parent) throws SAMException, IOException
 	{
-		super ( s, verMajor, verMinor, i2cpProps );
+		super(s, verMajor, verMinor, i2cpProps, parent);
 		if (_log.shouldLog(Log.DEBUG))
 			_log.debug("SAM version 3 handler instantiated");
 	}
@@ -214,6 +216,9 @@ class SAMv3Handler extends SAMv1Handler
 		}
 	}
 	
+	/**
+	 *  The values in the SessionsDB
+	 */
 	public static class SessionRecord
 	{
 		private final String m_dest ;
@@ -266,11 +271,14 @@ class SAMv3Handler extends SAMv1Handler
 		}
 	}
 
+	/**
+	 *  basically a HashMap from String to SessionRecord
+	 */
 	public static class SessionsDB
 	{
 		private static final long serialVersionUID = 0x1;
 
-		static class ExistingIdException   extends Exception {
+		static class ExistingIdException extends Exception {
 			private static final long serialVersionUID = 0x1;
 		}
 
@@ -284,6 +292,7 @@ class SAMv3Handler extends SAMv1Handler
 			map = new HashMap<String, SessionRecord>() ;
 		}
 
+		/** @return success */
 		synchronized public boolean put( String nick, SessionRecord session )
 			throws ExistingIdException, ExistingDestException
 		{
@@ -305,17 +314,12 @@ class SAMv3Handler extends SAMv1Handler
 				return false ;
 		}
 
+		/** @return true if removed */
 		synchronized public boolean del( String nick )
 		{
-			SessionRecord rec = map.get(nick);
-			
-			if ( rec!=null ) {
-				map.remove(nick);
-				return true ;
-			}
-			else
-				return false ;
+			return map.remove(nick) != null;
 		}
+
 		synchronized public SessionRecord get(String nick)
 		{
 			return map.get(nick);
@@ -332,10 +336,21 @@ class SAMv3Handler extends SAMv1Handler
 		return this.socket.socket().getInetAddress().getHostAddress();
 	}
 	
+	/**
+	 *  For SAMv3StreamSession connect and accept
+	 */
 	public void stealSocket()
 	{
 		stolenSocket = true ;
 		this.stopHandling();
+	}
+	
+	/**
+	 *  For SAMv3StreamSession
+	 *  @since 0.9.20
+	 */
+	SAMBridge getBridge() {
+		return bridge;
 	}
 	
 	public void handle() {
@@ -348,7 +363,7 @@ class SAMv3Handler extends SAMv1Handler
 
 		this.thread.setName("SAMv3Handler " + _id);
 		if (_log.shouldLog(Log.DEBUG))
-			_log.debug("SAM handling started");
+			_log.debug("SAMv3 handling started");
 
 		try {
 			InputStream in = getClientSocket().socket().getInputStream();
@@ -422,8 +437,7 @@ class SAMv3Handler extends SAMv1Handler
 			}
 		} catch (IOException e) {
 			if (_log.shouldLog(Log.DEBUG))
-				_log.debug("Caught IOException ("
-					+ e.getMessage() + ") for message [" + msg + "]", e);
+				_log.debug("Caught IOException for message [" + msg + "]", e);
 		} catch (Exception e) {
 			_log.error("Unexpected exception for message [" + msg + "]", e);
 		} finally {
@@ -435,7 +449,8 @@ class SAMv3Handler extends SAMv1Handler
 				try {
 					closeClientSocket();
 				} catch (IOException e) {
-					_log.error("Error closing socket: " + e.getMessage());
+					if (_log.shouldWarn())
+						_log.warn("Error closing socket", e);
 				}
 			}
 			if (streamForwardingSocket) 
@@ -444,20 +459,40 @@ class SAMv3Handler extends SAMv1Handler
 					try {
 						((SAMv3StreamSession)streamSession).stopForwardingIncoming();
 					} catch (SAMException e) {
-						_log.error("Error while stopping forwarding connections: " + e.getMessage());
+						if (_log.shouldWarn())
+							_log.warn("Error while stopping forwarding connections", e);
 					} catch (InterruptedIOException e) {
-						_log.error("Interrupted while stopping forwarding connections: " + e.getMessage());
+						if (_log.shouldWarn())
+							_log.warn("Interrupted while stopping forwarding connections", e);
 					}
 				}
 			}
-		
-
-
 			die();
 		}
 	}
 
-	protected void die() {
+	/**
+	 * Stop the SAM handler, close the socket,
+	 * unregister with the bridge.
+         *
+         * Overridden to not close the client socket if stolen.
+         *
+         * @since 0.9.20
+	 */
+	@Override
+	public void stopHandling() {
+	    synchronized (stopLock) {
+	        stopHandler = true;
+	    }
+	    if (!stolenSocket) {
+		try {
+		    closeClientSocket();
+		} catch (IOException e) {}
+	    }
+	    bridge.unregister(this);
+	}
+
+	private void die() {
 		SessionRecord rec = null ;
 		
 		if (session!=null) {
@@ -813,20 +848,15 @@ class SAMv3Handler extends SAMv1Handler
 	}
 	
 
-	public void notifyStreamResult(boolean verbose, String result, String message) throws IOException
-    {
+	public void notifyStreamResult(boolean verbose, String result, String message) throws IOException {
 		if (!verbose) return ;
-		
-		String out = "STREAM STATUS RESULT="+result;
-		if (message!=null)
-			out = out + " MESSAGE=\"" + message + "\"";
-		out = out + '\n';
+		String msgString = createMessageString(message);
+		String out = "STREAM STATUS RESULT=" + result + msgString + '\n';
         
-        if ( !writeString ( out ) )
-        {
-            throw new IOException ( "Error notifying connection to SAM client" );
-        }
-    }
+		if (!writeString(out)) {
+			throw new IOException ( "Error notifying connection to SAM client" );
+		}
+	}
 
 	public void notifyStreamIncomingConnection(Destination d) throws IOException {
 	    if (getStreamSession() == null) {

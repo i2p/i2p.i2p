@@ -19,30 +19,30 @@ public class ConfigSummaryHandler extends FormHandler {
     protected void processForm() {
         if (_action == null) return;
         String group = getJettyString("group");
-        boolean deleting = _action.equals(_("Delete selected"));
-        boolean adding = _action.equals(_("Add item"));
-        boolean saving = _action.equals(_("Save order"));
+        boolean deleting = _action.equals(_t("Delete selected"));
+        boolean adding = _action.equals(_t("Add item"));
+        boolean saving = _action.equals(_t("Save order"));
         boolean moving = _action.startsWith("move_");
-        if (_action.equals(_("Save")) && "0".equals(group)) {
+        if (_action.equals(_t("Save")) && "0".equals(group)) {
             try {
                 int refreshInterval = Integer.parseInt(getJettyString("refreshInterval"));
                 if (refreshInterval >= CSSHelper.MIN_REFRESH) {
                     _context.router().saveConfig(CSSHelper.PROP_REFRESH, "" + refreshInterval);
-                    addFormNotice(_("Refresh interval changed"));
+                    addFormNotice(_t("Refresh interval changed"));
                 } else
-                    addFormError(_("Refresh interval must be at least {0} seconds", CSSHelper.MIN_REFRESH));
+                    addFormError(_t("Refresh interval must be at least {0} seconds", CSSHelper.MIN_REFRESH));
             } catch (java.lang.NumberFormatException e) {
-                addFormError(_("Refresh interval must be a number"));
+                addFormError(_t("Refresh interval must be a number"));
                 return;
             }
-        } else if (_action.equals(_("Restore full default"))) {
+        } else if (_action.equals(_t("Restore full default"))) {
             _context.router().saveConfig(SummaryHelper.PROP_SUMMARYBAR + "default", SummaryHelper.DEFAULT_FULL);
-            addFormNotice(_("Full summary bar default restored.") + " " +
-                          _("Summary bar will refresh shortly."));
-        } else if (_action.equals(_("Restore minimal default"))) {
+            addFormNotice(_t("Full summary bar default restored.") + " " +
+                          _t("Summary bar will refresh shortly."));
+        } else if (_action.equals(_t("Restore minimal default"))) {
             _context.router().saveConfig(SummaryHelper.PROP_SUMMARYBAR + "default", SummaryHelper.DEFAULT_MINIMAL);
-            addFormNotice(_("Minimal summary bar default restored.") + " " +
-                          _("Summary bar will refresh shortly."));
+            addFormNotice(_t("Minimal summary bar default restored.") + " " +
+                          _t("Summary bar will refresh shortly."));
         } else if (adding || deleting || saving || moving) {
             Map<Integer, String> sections = new TreeMap<Integer, String>();
             for (Object o : _settings.keySet()) {
@@ -58,19 +58,19 @@ public class ConfigSummaryHandler extends FormHandler {
                     int order = Integer.parseInt(v);
                     sections.put(order, k);
                 } catch (java.lang.NumberFormatException e) {
-                    addFormError(_("Order must be an integer"));
+                    addFormError(_t("Order must be an integer"));
                     return;
                 }
             }
             if (adding) {
                 String name = getJettyString("name");
                 if (name == null || name.length() <= 0) {
-                    addFormError(_("No section selected"));
+                    addFormError(_t("No section selected"));
                     return;
                 }
                 String order = getJettyString("order");
                 if (order == null || order.length() <= 0) {
-                    addFormError(_("No order entered"));
+                    addFormError(_t("No order entered"));
                     return;
                 }
                 name = DataHelper.escapeHTML(name).replace(",", "&#44;");
@@ -78,9 +78,9 @@ public class ConfigSummaryHandler extends FormHandler {
                 try {
                     int ki = Integer.parseInt(order);
                     sections.put(ki, name);
-                    addFormNotice(_("Added") + ": " + name);
+                    addFormNotice(_t("Added") + ": " + name);
                 } catch (java.lang.NumberFormatException e) {
-                    addFormError(_("Order must be an integer"));
+                    addFormError(_t("Order must be an integer"));
                     return;
                 }
             } else if (deleting) {
@@ -104,7 +104,7 @@ public class ConfigSummaryHandler extends FormHandler {
                     if (toDelete.contains(i)) {
                         String removedName = sections.get(i);
                         iter.remove();
-                        addFormNotice(_("Removed") + ": " + removedName);
+                        addFormNotice(_t("Removed") + ": " + removedName);
                     }
                 }
             } else if (moving) {
@@ -126,17 +126,17 @@ public class ConfigSummaryHandler extends FormHandler {
                         sections.put(i + n, sections.get(i));
                         sections.put(i, temp);
                     }
-                    addFormNotice(_("Moved") + ": " + sections.get(to));
+                    addFormNotice(_t("Moved") + ": " + sections.get(to));
                 } catch (java.lang.NumberFormatException e) {
-                    addFormError(_("Order must be an integer"));
+                    addFormError(_t("Order must be an integer"));
                     return;
                 }
             }
             SummaryHelper.saveSummaryBarSections(_context, "default", sections);
-            addFormNotice(_("Saved order of sections.") + " " +
-                          _("Summary bar will refresh shortly."));
+            addFormNotice(_t("Saved order of sections.") + " " +
+                          _t("Summary bar will refresh shortly."));
         } else {
-            //addFormError(_("Unsupported"));
+            //addFormError(_t("Unsupported"));
         }
     }
 

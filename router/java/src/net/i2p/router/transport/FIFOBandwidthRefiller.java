@@ -56,9 +56,9 @@ public class FIFOBandwidthRefiller implements Runnable {
      *  of moving the default bandwidth class from L to M, or maybe
      *  adjusting bandwidth class boundaries.
      */
-    public static final int DEFAULT_OUTBOUND_BANDWIDTH = 40;
+    public static final int DEFAULT_OUTBOUND_BANDWIDTH = 60;
     public static final int DEFAULT_INBOUND_BURST_BANDWIDTH = 96;
-    public static final int DEFAULT_OUTBOUND_BURST_BANDWIDTH = 40;
+    public static final int DEFAULT_OUTBOUND_BURST_BANDWIDTH = 60;
 
     public static final int DEFAULT_BURST_SECONDS = 60;
     
@@ -75,7 +75,7 @@ public class FIFOBandwidthRefiller implements Runnable {
      *  Do not increase without adding a new Bloom filter size!
      *  See util/DecayingBloomFilter and tunnel/BloomFilterIVValidator.
      */
-    public static final int MAX_OUTBOUND_BANDWIDTH = 8192;
+    public static final int MAX_OUTBOUND_BANDWIDTH = 16384;
     
     /** 
      * how often we replenish the queues.  

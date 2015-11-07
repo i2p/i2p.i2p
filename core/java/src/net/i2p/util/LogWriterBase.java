@@ -67,10 +67,12 @@ abstract class LogWriterBase implements Runnable {
 
     public void run() {
         _write = true;
+        // don't bother on Android
+        final boolean shouldReadConfig = !SystemVersion.isAndroid();
         try {
             while (_write) {
                 flushRecords();
-                if (_write)
+                if (_write && shouldReadConfig)
                     rereadConfig();
             }
         } catch (Exception e) {
@@ -145,7 +147,7 @@ abstract class LogWriterBase implements Runnable {
     private String dupMessage(int dupCount, LogRecord lastRecord, boolean reverse) {
         String arrows = reverse ? "&darr;&darr;&darr;" : "^^^";
         return LogRecordFormatter.getWhen(_manager, lastRecord) + ' ' + arrows + ' ' +
-               _(dupCount, "1 similar message omitted", "{0} similar messages omitted") + ' ' + arrows + '\n';
+               _t(dupCount, "1 similar message omitted", "{0} similar messages omitted") + ' ' + arrows + '\n';
     }
     
     private static final String BUNDLE_NAME = "net.i2p.router.web.messages";
@@ -154,7 +156,7 @@ abstract class LogWriterBase implements Runnable {
      *  gettext
      *  @since 0.9.3
      */
-    private String _(int a, String b, String c) {
+    private String _t(int a, String b, String c) {
         return Translate.getString(a, b, c, _manager.getContext(), BUNDLE_NAME);
     }
 

@@ -233,7 +233,17 @@ class UPnPManager {
         public void portForwardStatus(Map<ForwardPort,ForwardPortStatus> statuses) {
             if (_log.shouldLog(Log.DEBUG))
                  _log.debug("UPnP Callback:");
+            // Let's not have two of these running at once.
+            // Deadlock reported in ticket #1699
+            // and the locking isn't foolproof in UDPTransport.
+            // UPnP runs the callbacks in a thread, so we can block.
+            // There is only one UPnPCallback, so lock on this
+            synchronized(this) {
+                locked_PFS(statuses);
+            }
+        }
 
+        private void locked_PFS(Map<ForwardPort,ForwardPortStatus> statuses) {
             byte[] ipaddr = null;
             DetectedIP[] ips = _upnp.getAddress();
             if (ips != null) {
@@ -244,6 +254,7 @@ class UPnPManager {
                             _log.debug("External address: " + ip.publicAddress + " type: " + ip.natType);
                         if (!ip.publicAddress.equals(_detectedAddress)) {
                             _detectedAddress = ip.publicAddress;
+                            // deadlock path 1
                             _manager.externalAddressReceived(SOURCE_UPNP, _detectedAddress.getAddress(), 0);
                         }
                         ipaddr = ip.publicAddress.getAddress();
@@ -269,6 +280,7 @@ class UPnPManager {
                 else
                     continue;
                 boolean success = fps.status >= ForwardPortStatus.MAYBE_SUCCESS;
+                // deadlock path 2
                 _manager.forwardPortStatus(style, ipaddr, fp.portNumber, fps.externalPort, success, fps.reasonString);
             }
         }
@@ -280,7 +292,7 @@ class UPnPManager {
      */
     public String renderStatusHTML() {
         if (!_isRunning)
-            return "<h3><a name=\"upnp\"></a>" + _("UPnP is not enabled") + "</h3>\n";
+            return "<h3><a name=\"upnp\"></a>" + _t("UPnP is not enabled") + "</h3>\n";
         return _upnp.renderStatusHTML();
     }
 
@@ -289,7 +301,7 @@ class UPnPManager {
     /**
      *  Translate
      */
-    private final String _(String s) {
+    private final String _t(String s) {
         return Translate.getString(s, _context, BUNDLE_NAME);
     }
 

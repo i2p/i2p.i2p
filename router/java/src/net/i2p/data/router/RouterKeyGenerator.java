@@ -52,6 +52,8 @@ public class RouterKeyGenerator extends RoutingKeyGenerator {
     public RouterKeyGenerator(I2PAppContext context) {
         _log = context.logManager().getLog(RoutingKeyGenerator.class);
         _context = context;
+        // make sure GMT is set, azi2phelper Vuze plugin is disabling static JVM TZ setting in Router.java
+        _fmt.setCalendar(_cal);
         // ensure non-null mod data
         generateDateBasedModData();
     }
@@ -61,14 +63,10 @@ public class RouterKeyGenerator extends RoutingKeyGenerator {
     private volatile long _nextMidnight;
     private volatile long _lastChanged;
 
-    private final static Calendar _cal = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT"));
+    private final Calendar _cal = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT"));
     private static final String FORMAT = "yyyyMMdd";
     private static final int LENGTH = FORMAT.length();
-    private final static SimpleDateFormat _fmt = new SimpleDateFormat(FORMAT, Locale.US);
-    static {
-        // make sure GMT is set, azi2phelper Vuze plugin is disabling static JVM TZ setting in Router.java
-        _fmt.setCalendar(_cal);
-    }
+    private final SimpleDateFormat _fmt = new SimpleDateFormat(FORMAT, Locale.US);
 
     /**
      *  The current (today's) mod data.

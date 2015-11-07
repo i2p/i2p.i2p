@@ -44,28 +44,7 @@ public class CryptixAESEngine extends AESEngine {
     
     /** see test results below */
     private static final int MIN_SYSTEM_AES_LENGTH = 704;
-    private static final boolean USE_SYSTEM_AES;
-    static {
-        boolean systemOK = false;
-        if (hasAESNI()) {
-            try {
-                systemOK = Cipher.getMaxAllowedKeyLength("AES") >= 256;
-            } catch (GeneralSecurityException gse) {
-                // a NoSuchAlgorithmException
-            } catch (NoSuchMethodError nsme) {
-                // JamVM, gij
-                try {
-                    Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");
-                    SecretKeySpec key = new SecretKeySpec(new byte[32], "AES");
-                    cipher.init(Cipher.ENCRYPT_MODE, key);
-                    systemOK = true;
-                } catch (GeneralSecurityException gse) {
-                }
-            }
-        }
-        USE_SYSTEM_AES = systemOK;
-        //System.out.println("Using system AES? " + systemOK);
-    }
+    private static final boolean USE_SYSTEM_AES = hasAESNI() && CryptoCheck.isUnlimited();
 
     /**
      *  Do we have AES-NI support in the processor and JVM?

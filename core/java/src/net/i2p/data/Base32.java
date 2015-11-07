@@ -101,8 +101,8 @@ public class Base32 {
     }
 
     private static byte[] read(InputStream in) throws IOException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream(4096);
-        byte buf[] = new byte[4096];
+        ByteArrayOutputStream baos = new ByteArrayOutputStream(64);
+        byte buf[] = new byte[64];
         while (true) {
             int read = in.read(buf);
             if (read < 0) break;
@@ -118,7 +118,7 @@ public class Base32 {
     }
 
     private static void decode(InputStream in, OutputStream out) throws IOException {
-        byte decoded[] = decode(new String(read(in)));
+        byte decoded[] = decode(DataHelper.getUTF8(read(in)));
         if (decoded == null) {
             System.out.println("FAIL");
             return;
@@ -199,7 +199,7 @@ public class Base32 {
         byte[] b = decode(s);
         if (b == null)
             return null;
-        return new String(b);
+        return DataHelper.getUTF8(b);
     }
 
     /**

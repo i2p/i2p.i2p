@@ -139,7 +139,7 @@ class ProfilePersistenceHelper {
         add(buf, "tunnelPeakTunnel1mThroughput", profile.getPeakTunnel1mThroughputKBps(), "KBytes/sec");
         buf.append(NL);
         
-        out.write(buf.toString().getBytes());
+        out.write(buf.toString().getBytes("UTF-8"));
         
         if (profile.getIsExpanded()) {
             // only write out expanded data if, uh, we've got it

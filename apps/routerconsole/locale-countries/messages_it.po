@@ -2,29 +2,28 @@
 # Copyright (C) 2009 The I2P Project
 # This file is distributed under the same license as the routerconsole package.
 # To contribute translations, see http://www.i2p2.de/newdevelopers
-#
+# 
 # Translators:
-# BadCluster <badcluster@i2pmail.org>, 2012
+# Bad Cluster <badcluster@i2pmail.org>, 2012
 # Leelium <bovas85@gmail.com>, 2012
 #   <colomboi2p@ymail.com>, 2012
-# fletcherlynd <fletcherlynd@hotmail.com>, 2013
+# Fletcher Lynd <fletcherlynd@hotmail.com>, 2013
 # ironbishop <ironbishop@fsfe.org>, 2011
 # mkkid <jokjok@hotmail.it>, 2011
 # danimoth <kronat@tiscali.it>, 2011
-# Tony Goodyear <fswitch20@hotmail.com>, 2012
+# spawned76 <fswitch20@hotmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-11-19 22:58+0000\n"
-"PO-Revision-Date: 2013-11-02 23:22+0000\n"
-"Last-Translator: fletcherlynd <fletcherlynd@hotmail.com>\n"
-"Language-Team: Italian (http://www.transifex.com/projects/p/I2P/language/"
-"it/)\n"
-"Language: it\n"
+"POT-Creation-Date: 2015-07-17 01:08+0000\n"
+"PO-Revision-Date: 2015-07-17 01:31+0000\n"
+"Last-Translator: kytv <killyourtv@i2pmail.org>\n"
+"Language-Team: Italian (http://www.transifex.com/projects/p/I2P/language/it/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: it\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 msgid "Anonymous Proxy"
@@ -59,6 +58,9 @@ msgstr "Antille Olandesi"
 
 msgid "Angola"
 msgstr "Angola"
+
+msgid "Asia/Pacific Region"
+msgstr ""
 
 msgid "Antarctica"
 msgstr "Antartide"
@@ -111,6 +113,9 @@ msgstr "Burundi"
 msgid "Benin"
 msgstr "Repubblica del Benin"
 
+msgid "Saint Barthélemy"
+msgstr ""
+
 msgid "Bermuda"
 msgstr "Bermuda"
 
@@ -119,6 +124,9 @@ msgstr "Brunei"
 
 msgid "Bolivia"
 msgstr "Bolivia"
+
+msgid "Bonaire"
+msgstr ""
 
 msgid "Brazil"
 msgstr "Brasile"
@@ -147,14 +155,11 @@ msgstr "Canada"
 msgid "Cocos (Keeling) Islands"
 msgstr "Isole Cocos (Keeling)"
 
-msgid "The Democratic Republic of the Congo"
-msgstr "Repubblica Democratica del Congo"
+msgid "Congo"
+msgstr "Congo"
 
 msgid "Central African Republic"
 msgstr "Repubblica Centrafricana"
-
-msgid "Congo"
-msgstr "Congo"
 
 msgid "Switzerland"
 msgstr "Svizzera"
@@ -252,8 +257,8 @@ msgstr "Fiji"
 msgid "Falkland Islands (Malvinas)"
 msgstr "Isole Falkland (Malvinas)"
 
-msgid "Federated States of Micronesia"
-msgstr "Stati federati di Micronesia"
+msgid "Micronesia"
+msgstr ""
 
 msgid "Faroe Islands"
 msgstr "Isole Faroe"
@@ -354,8 +359,8 @@ msgstr "Territori Britannici dell'oceano Indiano"
 msgid "Iraq"
 msgstr "Iraq"
 
-msgid "Islamic Republic of Iran"
-msgstr "Repubblica Islamica dell'Iran"
+msgid "Iran"
+msgstr ""
 
 msgid "Iceland"
 msgstr "Islanda"
@@ -393,8 +398,8 @@ msgstr "Comore"
 msgid "Saint Kitts and Nevis"
 msgstr "Saint Kitts e Nevis"
 
-msgid "The Democratic People's Republic of Korea"
-msgstr "Repubblica Democratica di Korea"
+msgid "North Korea"
+msgstr ""
 
 msgid "Republic of Korea"
 msgstr "Repubblica di Corea"
@@ -438,8 +443,8 @@ msgstr "Lussemburgo"
 msgid "Latvia"
 msgstr "Lettonia"
 
-msgid "Libyan Arab Jamahiriya"
-msgstr "Jamahiriya araba libica"
+msgid "Libya"
+msgstr ""
 
 msgid "Morocco"
 msgstr "Marocco"
@@ -447,8 +452,8 @@ msgstr "Marocco"
 msgid "Monaco"
 msgstr "Monaco"
 
-msgid "Republic of Moldova"
-msgstr "Repubblica di Moldova"
+msgid "Moldova"
+msgstr ""
 
 msgid "Montenegro"
 msgstr "Montenegro"
@@ -462,8 +467,8 @@ msgstr "Madagascar"
 msgid "Marshall Islands"
 msgstr "Isole Marshall"
 
-msgid "The Former Yugoslav Republic of Macedonia"
-msgstr "L'ex Repubblica iugoslava di Macedonia"
+msgid "Macedonia"
+msgstr ""
 
 msgid "Mali"
 msgstr "Mali"
@@ -474,8 +479,8 @@ msgstr "Myanmar"
 msgid "Mongolia"
 msgstr "Mongolia"
 
-msgid "Macao"
-msgstr "Macao"
+msgid "Macau"
+msgstr ""
 
 msgid "Northern Mariana Islands"
 msgstr "Isole Marianne Settentrionali"
@@ -654,14 +659,20 @@ msgstr "Somalia"
 msgid "Suriname"
 msgstr "Suriname"
 
+msgid "South Sudan"
+msgstr ""
+
 msgid "Sao Tome and Principe"
 msgstr "Sao Tome e Principe"
 
 msgid "El Salvador"
 msgstr "El Salvador"
 
-msgid "Syrian Arab Republic"
-msgstr "Repubblica araba siriana"
+msgid "Sint Maarten"
+msgstr ""
+
+msgid "Syria"
+msgstr ""
 
 msgid "Swaziland"
 msgstr "Swaziland"
@@ -711,8 +722,8 @@ msgstr "Tuvalu"
 msgid "Taiwan"
 msgstr "Taiwan"
 
-msgid "United Republic of Tanzania"
-msgstr "Repubblica Unita della Tanzania"
+msgid "Tanzania"
+msgstr ""
 
 msgid "Ukraine"
 msgstr "Ucraina"
@@ -732,8 +743,8 @@ msgstr "Uruguay"
 msgid "Uzbekistan"
 msgstr "Uzbekistan"
 
-msgid "Holy See (Vatican City State)"
-msgstr "Santa Sede (Stato della Città del Vaticano)"
+msgid "Vatican"
+msgstr ""
 
 msgid "Saint Vincent and the Grenadines"
 msgstr "Saint Vincent e Grenadine"
@@ -744,8 +755,8 @@ msgstr "Venezuela"
 msgid "Virgin Islands"
 msgstr "Isole Vergini"
 
-msgid "Viet Nam"
-msgstr "Viet Nam"
+msgid "Vietnam"
+msgstr ""
 
 msgid "Vanuatu"
 msgstr "Vanuatu"

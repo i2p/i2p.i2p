@@ -74,6 +74,16 @@ public class HostReplyMessage extends I2CPMessageImpl {
     }
 
     /**
+     * Return the SessionId for this message.
+     *
+     * @since 0.9.21
+     */
+    @Override
+    public SessionId sessionId() {
+        return _sessionId;
+    }
+
+    /**
      *  @return 0 to 2**32 - 1
      */
     public long getReqID() {

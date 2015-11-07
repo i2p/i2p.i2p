@@ -61,7 +61,7 @@ function toggleAll(category)
 </script>
 </head><body onLoad="init();">
 <%@include file="summary.jsi" %>
-<h1><%=intl._("I2P Stats Configuration")%></h1>
+<h1><%=intl._t("I2P Stats Configuration")%></h1>
 <div class="main" id="main">
  <%@include file="confignav.jsi" %>
 
@@ -73,44 +73,44 @@ function toggleAll(category)
  <form id="statsForm" name="statsForm" action="" method="POST">
  <input type="hidden" name="action" value="foo" >
  <input type="hidden" name="nonce" value="<%=pageNonce%>" >
- <h3><%=intl._("Configure I2P Stat Collection")%></h3>
- <p><%=intl._("Enable full stats?")%>
+ <h3><%=intl._t("Configure I2P Stat Collection")%></h3>
+ <p><%=intl._t("Enable full stats?")%>
  <input type="checkbox" class="optbox" name="isFull" value="true" <%
  if (statshelper.getIsFull()) { %>checked="checked" <% } %> >
- (<%=intl._("change requires restart to take effect")%>)<br>
+ (<%=intl._t("change requires restart to take effect")%>)<br>
 <%
 
   // stats.log for devs only and grows without bounds, not recommended
   boolean shouldShowLog = statshelper.shouldShowLog();
   if (shouldShowLog) {
 
-%><%=intl._("Stat file")%>: <input type="text" name="filename" value="<%=statshelper.getFilename()%>" ><br>
+%><%=intl._t("Stat file")%>: <input type="text" name="filename" value="<%=statshelper.getFilename()%>" ><br>
 Warning - Log with care, stat file grows without limit.<br>
 <%
 
   }  // shouldShowLog
 
-%><%=intl._("Filter")%>: (<a href="javascript:void(null);" onclick="toggleAll('*')"><%=intl._("toggle all")%></a>)<br></p>
+%><%=intl._t("Filter")%>: (<a href="javascript:void(null);" onclick="toggleAll('*')"><%=intl._t("toggle all")%></a>)<br></p>
  <div class="wideload">
  <table>
  <% while (statshelper.hasMoreStats()) {
       while (statshelper.groupRequired()) { %>
  <tr class="tablefooter">
      <td align="left" colspan="3" id=<%=statshelper.getCurrentGroupName()%>>
-     <b><%=intl._(statshelper.getCurrentGroupName())%></b>
-     (<a href="javascript:void(null);" onclick="toggleAll('<%=statshelper.getCurrentGroupName()%>')"><%=intl._("toggle all")%></a>)
+     <b><%=intl._t(statshelper.getCurrentGroupName())%></b>
+     (<a href="javascript:void(null);" onclick="toggleAll('<%=statshelper.getCurrentGroupName()%>')"><%=intl._t("toggle all")%></a>)
      </td></tr>
  <tr class="tablefooter">
 <%
 
   if (shouldShowLog) {
 
-%>  <td align="center"><b><%=intl._("Log")%></b></td>
+%>  <td align="center"><b><%=intl._t("Log")%></b></td>
 <%
 
   }  // shouldShowLog
 
-%>    <td align="center"><b><%=intl._("Graph")%></b></td>
+%>    <td align="center"><b><%=intl._t("Graph")%></b></td>
     <td></td></tr>
         <%
      } // end iterating over required groups for the current stat %>
@@ -139,14 +139,14 @@ Warning - Log with care, stat file grows without limit.<br>
 
 %> <tr><td colspan="3"></td></tr>
  <tr><td align="center"><input type="checkbox" class="optbox" name="explicitFilter" ></td>
-     <td colspan="2"><%=intl._("Advanced filter")%>:
+     <td colspan="2"><%=intl._t("Advanced filter")%>:
      <input type="text" name="explicitFilterValue" value="<%=statshelper.getExplicitFilter()%>" size="40" ></td></tr>
 <%
 
   }  // shouldShowLog
 
 %>   <tr class="tablefooter"><td colspan="3" align="right">
-<input type="reset" class="cancel" value="<%=intl._("Cancel")%>" >
-<input type="submit" name="shouldsave" class="accept" value="<%=intl._("Save changes")%>" >
+<input type="reset" class="cancel" value="<%=intl._t("Cancel")%>" >
+<input type="submit" name="shouldsave" class="accept" value="<%=intl._t("Save changes")%>" >
 </td></tr>
 </table></div></form></div></div></body></html>

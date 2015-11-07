@@ -33,7 +33,7 @@ public class TunnelRenderer {
     }
     
     public void renderStatusHTML(Writer out) throws IOException {
-        out.write("<div class=\"wideload\"><h2><a name=\"exploratory\" ></a>" + _("Exploratory tunnels") + " (<a href=\"/configtunnels#exploratory\">" + _("configure") + "</a>)</h2>\n");
+        out.write("<div class=\"wideload\"><h2><a name=\"exploratory\" ></a>" + _t("Exploratory tunnels") + " (<a href=\"/configtunnels#exploratory\">" + _t("configure") + "</a>)</h2>\n");
         renderPool(out, _context.tunnelManager().getInboundExploratoryPool(), _context.tunnelManager().getOutboundExploratoryPool());
         
         List<Hash> destinations = null;
@@ -57,20 +57,22 @@ public class TunnelRenderer {
             if (name == null)
                 name = client.toBase64().substring(0,4);
             out.write("<h2><a name=\"" + client.toBase64().substring(0,4)
-                      + "\" ></a>" + _("Client tunnels for") + ' ' + DataHelper.escapeHTML(_(name)));
+                      + "\" ></a>" + _t("Client tunnels for") + ' ' + DataHelper.escapeHTML(_t(name)));
             if (isLocal)
-                out.write(" (<a href=\"/configtunnels#" + client.toBase64().substring(0,4) +"\">" + _("configure") + "</a>)</h2>\n");
+                out.write(" (<a href=\"/configtunnels#" + client.toBase64().substring(0,4) +"\">" + _t("configure") + "</a>)</h2>\n");
             else
-                out.write(" (" + _("dead") + ")</h2>\n");
+                out.write(" (" + _t("dead") + ")</h2>\n");
             renderPool(out, in, outPool);
         }
         
         List<HopConfig> participating = _context.tunnelDispatcher().listParticipatingTunnels();
-        Collections.sort(participating, new TunnelComparator());
-        out.write("<h2><a name=\"participating\"></a>" + _("Participating tunnels") + "</h2><table>\n");
-        out.write("<tr><th>" + _("Receive on") + "</th><th>" + _("From") + "</th><th>"
-                  + _("Send on") + "</th><th>" + _("To") + "</th><th>" + _("Expiration") + "</th>"
-                  + "<th>" + _("Usage") + "</th><th>" + _("Rate") + "</th><th>" + _("Role") + "</th></tr>\n");
+        out.write("<h2><a name=\"participating\"></a>" + _t("Participating tunnels") + "</h2>\n");
+        if (!participating.isEmpty()) {
+            Collections.sort(participating, new TunnelComparator());
+            out.write("<table><tr><th>" + _t("Receive on") + "</th><th>" + _t("From") + "</th><th>"
+                  + _t("Send on") + "</th><th>" + _t("To") + "</th><th>" + _t("Expiration") + "</th>"
+                  + "<th>" + _t("Usage") + "</th><th>" + _t("Rate") + "</th><th>" + _t("Role") + "</th></tr>\n");
+        }
         long processed = 0;
         RateStat rs = _context.statManager().getRate("tunnel.participatingMessageCount");
         if (rs != null)
@@ -108,7 +110,7 @@ public class TunnelRenderer {
             if (timeLeft > 0)
                 out.write("<td class=\"cells\" align=\"center\">" + DataHelper.formatDuration2(timeLeft) + "</td>");
             else
-                out.write("<td class=\"cells\" align=\"center\">(" + _("grace period") + ")</td>");
+                out.write("<td class=\"cells\" align=\"center\">(" + _t("grace period") + ")</td>");
             out.write("<td class=\"cells\" align=\"center\">" + cfg.getProcessedMessagesCount() + " KB</td>");
             int lifetime = (int) ((_context.clock().now() - cfg.getCreation()) / 1000);
             if (lifetime <= 0)
@@ -118,18 +120,22 @@ public class TunnelRenderer {
             int bps = 1024 * cfg.getProcessedMessagesCount() / lifetime;
             out.write("<td class=\"cells\" align=\"center\">" + bps + " Bps</td>");
             if (cfg.getSendTo() == null)
-                out.write("<td class=\"cells\" align=\"center\">" + _("Outbound Endpoint") + "</td>");
+                out.write("<td class=\"cells\" align=\"center\">" + _t("Outbound Endpoint") + "</td>");
             else if (cfg.getReceiveFrom() == null)
-                out.write("<td class=\"cells\" align=\"center\">" + _("Inbound Gateway") + "</td>");
+                out.write("<td class=\"cells\" align=\"center\">" + _t("Inbound Gateway") + "</td>");
             else
-                out.write("<td class=\"cells\" align=\"center\">" + _("Participant") + "</td>");
+                out.write("<td class=\"cells\" align=\"center\">" + _t("Participant") + "</td>");
             out.write("</tr>\n");
         }
-        out.write("</table>\n");
+        if (!participating.isEmpty())
+            out.write("</table>\n");
         if (displayed > DISPLAY_LIMIT)
-            out.write("<div class=\"statusnotes\"><b>" + _("Limited display to the {0} tunnels with the highest usage", DISPLAY_LIMIT)  + "</b></div>\n");
-        out.write("<div class=\"statusnotes\"><b>" + _("Inactive participating tunnels") + ": " + inactive + "</b></div>\n");
-        out.write("<div class=\"statusnotes\"><b>" + _("Lifetime bandwidth usage") + ": " + DataHelper.formatSize2(processed*1024) + "B</b></div>\n");
+            out.write("<div class=\"statusnotes\"><b>" + _t("Limited display to the {0} tunnels with the highest usage", DISPLAY_LIMIT)  + "</b></div>\n");
+        if (inactive > 0)
+            out.write("<div class=\"statusnotes\"><b>" + _t("Inactive participating tunnels") + ": " + inactive + "</b></div>\n");
+        else if (displayed <= 0)
+            out.write("<div class=\"statusnotes\"><b>" + _t("none") + "</b></div>\n");
+        out.write("<div class=\"statusnotes\"><b>" + _t("Lifetime bandwidth usage") + ": " + DataHelper.formatSize2(processed*1024) + "B</b></div>\n");
         //renderPeers(out);
         out.write("</div>");
     }
@@ -159,16 +165,16 @@ public class TunnelRenderer {
             if (info.getLength() > maxLength)
                 maxLength = info.getLength();
         }
-        out.write("<table><tr><th>" + _("In/Out") + "</th><th>" + _("Expiry") + "</th><th>" + _("Usage") + "</th><th>" + _("Gateway") + "</th>");
+        out.write("<table><tr><th>" + _t("In/Out") + "</th><th>" + _t("Expiry") + "</th><th>" + _t("Usage") + "</th><th>" + _t("Gateway") + "</th>");
         if (maxLength > 3) {
             out.write("<th align=\"center\" colspan=\"" + (maxLength - 2));
-            out.write("\">" + _("Participants") + "</th>");
+            out.write("\">" + _t("Participants") + "</th>");
         }
         else if (maxLength == 3) {
-            out.write("<th>" + _("Participant") + "</th>");
+            out.write("<th>" + _t("Participant") + "</th>");
         }
         if (maxLength > 1) {
-            out.write("<th>" + _("Endpoint") + "</th>");
+            out.write("<th>" + _t("Endpoint") + "</th>");
         }
         out.write("</tr>\n");
         for (int i = 0; i < tunnels.size(); i++) {
@@ -206,24 +212,26 @@ public class TunnelRenderer {
         }
         out.write("</table>\n");
         if (in != null) {
-            List pending = in.listPending();
+            // PooledTunnelCreatorConfig
+            List<?> pending = in.listPending();
             if (!pending.isEmpty()) {
-                out.write("<div class=\"statusnotes\"><center><b>" + _("Build in progress") + ": " + pending.size() + " " + _("inbound") + "</b></center></div>\n");
+                out.write("<div class=\"statusnotes\"><center><b>" + _t("Build in progress") + ": " + pending.size() + " " + _t("inbound") + "</b></center></div>\n");
                 live += pending.size();
             }
         }
         if (outPool != null) {
-            List pending = outPool.listPending();
+            // PooledTunnelCreatorConfig
+            List<?> pending = outPool.listPending();
             if (!pending.isEmpty()) {
-                out.write("<div class=\"statusnotes\"><center><b>" + _("Build in progress") + ": " + pending.size() + " " + _("outbound") + "</b></center></div>\n");
+                out.write("<div class=\"statusnotes\"><center><b>" + _t("Build in progress") + ": " + pending.size() + " " + _t("outbound") + "</b></center></div>\n");
                 live += pending.size();
             }
         }
         if (live <= 0)
-            out.write("<div class=\"statusnotes\"><center><b>" + _("No tunnels; waiting for the grace period to end.") + "</b></center></div>\n");
-        out.write("<div class=\"statusnotes\"><center><b>" + _("Lifetime bandwidth usage") + ": " +
-                  DataHelper.formatSize2(processedIn*1024) + "B " + _("in") + ", " +
-                  DataHelper.formatSize2(processedOut*1024) + "B " + _("out") + "</b></center></div>");
+            out.write("<div class=\"statusnotes\"><center><b>" + _t("No tunnels; waiting for the grace period to end.") + "</b></center></div>\n");
+        out.write("<div class=\"statusnotes\"><center><b>" + _t("Lifetime bandwidth usage") + ": " +
+                  DataHelper.formatSize2(processedIn*1024) + "B " + _t("in") + ", " +
+                  DataHelper.formatSize2(processedOut*1024) + "B " + _t("out") + "</b></center></div>");
     }
     
 /****
@@ -241,8 +249,8 @@ public class TunnelRenderer {
         List<Hash> peerList = new ArrayList(peers);
         Collections.sort(peerList, new CountryComparator(this._context.commSystem()));
 
-        out.write("<h2><a name=\"peers\"></a>" + _("Tunnel Counts By Peer") + "</h2>\n");
-        out.write("<table><tr><th>" + _("Peer") + "</th><th>" + _("Our Tunnels") + "</th><th>" + _("% of total") + "</th><th>" + _("Participating Tunnels") + "</th><th>" + _("% of total") + "</th></tr>\n");
+        out.write("<h2><a name=\"peers\"></a>" + _t("Tunnel Counts By Peer") + "</h2>\n");
+        out.write("<table><tr><th>" + _t("Peer") + "</th><th>" + _t("Our Tunnels") + "</th><th>" + _t("% of total") + "</th><th>" + _t("Participating Tunnels") + "</th><th>" + _t("% of total") + "</th></tr>\n");
         for (Hash h : peerList) {
              out.write("<tr> <td class=\"cells\" align=\"center\">");
              out.write(netDbLink(h));
@@ -260,7 +268,7 @@ public class TunnelRenderer {
                  out.write('0');
              out.write('\n');
         }
-        out.write("<tr class=\"tablefooter\"> <td align=\"center\"><b>" + _("Totals") + "</b> <td align=\"center\"><b>" + tunnelCount);
+        out.write("<tr class=\"tablefooter\"> <td align=\"center\"><b>" + _t("Totals") + "</b> <td align=\"center\"><b>" + tunnelCount);
         out.write("</b> <td>&nbsp;</td> <td align=\"center\"><b>" + partCount);
         out.write("</b> <td>&nbsp;</td></tr></table></div>\n");
     }
@@ -343,12 +351,12 @@ public class TunnelRenderer {
     }
 
     /** translate a string */
-    private String _(String s) {
+    private String _t(String s) {
         return Messages.getString(s, _context);
     }
 
     /** translate a string */
-    public String _(String s, Object o) {
+    public String _t(String s, Object o) {
         return Messages.getString(s, o, _context);
     }
 }

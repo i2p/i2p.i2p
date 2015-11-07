@@ -19,7 +19,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.util.concurrent.atomic.AtomicBoolean;
+
 import net.i2p.client.streaming.I2PSocket;
+import net.i2p.util.I2PAppThread;
 
 /**
  * Process I2P->TCP
@@ -111,8 +113,8 @@ public class I2PtoTCP implements Runnable {
 					// setup to cross the streams
 					TCPio conn_c = new TCPio(in, Iout, lives); // app -> I2P
 					TCPio conn_a = new TCPio(Iin, out, lives); // I2P -> app
-					t = new Thread(conn_c, Thread.currentThread().getName() + " TCPioA");
-					q = new Thread(conn_a, Thread.currentThread().getName() + " TCPioB");
+					t = new I2PAppThread(conn_c, Thread.currentThread().getName() + " TCPioA");
+					q = new I2PAppThread(conn_a, Thread.currentThread().getName() + " TCPioB");
 					// Fire!
 					t.start();
 					q.start();

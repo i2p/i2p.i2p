@@ -38,13 +38,15 @@ class SAMHandlerFactory {
      * @throws SAMException if the connection handshake (HELLO message) was malformed
      * @return A SAM protocol handler, or null if the client closed before the handshake
      */
-    public static SAMHandler createSAMHandler(SocketChannel s, Properties i2cpProps) throws SAMException {
+    public static SAMHandler createSAMHandler(SocketChannel s, Properties i2cpProps,
+                                              SAMBridge parent) throws SAMException {
         StringTokenizer tok;
         Log log = I2PAppContext.getGlobalContext().logManager().getLog(SAMHandlerFactory.class);
 
         try {
             Socket sock = s.socket();
             sock.setSoTimeout(HELLO_TIMEOUT);
+            sock.setKeepAlive(true);
             String line = DataHelper.readLine(sock.getInputStream());
             sock.setSoTimeout(0);
             if (line == null) {
@@ -103,13 +105,13 @@ class SAMHandlerFactory {
         try {
             switch (verMajor) {
             case 1:
-                handler = new SAMv1Handler(s, verMajor, verMinor, i2cpProps);
+                handler = new SAMv1Handler(s, verMajor, verMinor, i2cpProps, parent);
                 break;
             case 2:
-                handler = new SAMv2Handler(s, verMajor, verMinor, i2cpProps);
+                handler = new SAMv2Handler(s, verMajor, verMinor, i2cpProps, parent);
                 break;
             case 3:
-            	handler = new SAMv3Handler(s, verMajor, verMinor, i2cpProps);
+            	handler = new SAMv3Handler(s, verMajor, verMinor, i2cpProps, parent);
             	break;
             default:
                 log.error("BUG! Trying to initialize the wrong SAM version!");

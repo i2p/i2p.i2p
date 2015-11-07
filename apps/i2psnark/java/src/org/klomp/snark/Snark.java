@@ -617,7 +617,6 @@ public class Snark
    * @since 0.9.1
    */
   public synchronized void stopTorrent(boolean fast) {
-    stopped = true;
     TrackerClient tc = trackerclient;
     if (tc != null)
         tc.halt(fast);
@@ -625,17 +624,28 @@ public class Snark
     if (pc != null)
         pc.halt();
     Storage st = storage;
+    if (!fast)
+        // HACK: Needed a way to distinguish between user-stop and 
+        // shutdown-stop. stopTorrent(true) is in stopAllTorrents().
+        // (#766)
+        stopped = true;
     if (st != null) {
-        boolean changed = storage.isChanged() || getUploaded() != savedUploaded;
+        // TODO: Cache the config-in-mem to compare vs config-on-disk
+        // (needed for auto-save to not double-save in some cases)
+        //boolean changed = storage.isChanged() || getUploaded() != savedUploaded;
+        boolean changed = true;
+        if (changed && completeListener != null)
+            completeListener.updateStatus(this);
         try { 
             storage.close(); 
         } catch (IOException ioe) {
             System.out.println("Error closing " + torrent);
             ioe.printStackTrace();
         }
-        if (changed && completeListener != null)
-            completeListener.updateStatus(this);
     }
+    if (fast)
+        // HACK: See above if(!fast)
+        stopped = true;
     if (pc != null && _peerCoordinatorSet != null)
         _peerCoordinatorSet.remove(pc);
     if (_peerCoordinatorSet == null)
@@ -733,6 +743,18 @@ public class Snark
      */
     public boolean isChecking() {
         return storage != null && storage.isChecking();
+    }
+
+    /**
+     *  If checking is in progress, return completion 0.0 ... 1.0,
+     *  else return 1.0.
+     *  @since 0.9.23
+     */
+    public double getCheckingProgress() {
+        if (storage != null && storage.isChecking())
+            return storage.getCheckingProgress();
+        else
+            return 1.0d;
     }
 
     /**
@@ -1254,7 +1276,8 @@ public class Snark
 
   public void setWantedPieces(Storage storage)
   {
-    coordinator.setWantedPieces();
+    if (coordinator != null)
+        coordinator.setWantedPieces();
   }
 
   ///////////// End StorageListener methods
@@ -1263,7 +1286,7 @@ public class Snark
   /** SnarkSnutdown callback unused */
   public void shutdown()
   {
-    // Should not be necessary since all non-deamon threads should
+    // Should not be necessary since all non-daemon threads should
     // have died. But in reality this does not always happen.
     //System.exit(0);
   }

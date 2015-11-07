@@ -92,8 +92,8 @@ public class CryptoConstants {
         if (ECConstants.isBCAvailable()) {
             try {
                 Class<?> cls = Class.forName("org.bouncycastle.jce.spec.ElGamalParameterSpec");
-                Constructor<?> con = cls.getConstructor(new Class[] {BigInteger.class, BigInteger.class});
-                spec = (AlgorithmParameterSpec)con.newInstance(new Object[] {elgp, elgg});
+                Constructor<?> con = cls.getConstructor(BigInteger.class, BigInteger.class);
+                spec = (AlgorithmParameterSpec)con.newInstance(elgp, elgg);
                 //System.out.println("BC ElG spec loaded");
             } catch (Exception e) {
                 //System.out.println("BC ElG spec failed");

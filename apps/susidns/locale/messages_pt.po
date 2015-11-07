@@ -4,6 +4,7 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
 # Translators:
+# wtfisthis <low_fps11@yahoo.com>, 2015
 # Rafael Ferrari, 2013
 # Rafael Ferrari, 2013
 # Ruthein Alex <rutweiller@hotmail.com>, 2012
@@ -11,9 +12,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-05-14 08:33+0000\n"
-"PO-Revision-Date: 2015-05-14 08:34+0000\n"
-"Last-Translator: kytv <killyourtv@i2pmail.org>\n"
+"POT-Creation-Date: 2015-07-17 01:13+0000\n"
+"PO-Revision-Date: 2015-06-08 21:12+0000\n"
+"Last-Translator: wtfisthis <low_fps11@yahoo.com>\n"
 "Language-Team: Portuguese (http://www.transifex.com/projects/p/I2P/language/pt/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -69,7 +70,7 @@ msgstr "Assinado"
 
 #: ../src/java/src/i2p/susi/dns/AddressBean.java:233
 msgid "Key"
-msgstr ""
+msgstr "Chave"
 
 #: ../src/java/src/i2p/susi/dns/AddressBean.java:235
 #: ../src/java/src/i2p/susi/dns/AddressBean.java:260
@@ -225,7 +226,7 @@ msgstr "ERRO: Não foi possível gravar no arquivo do livro de endereços."
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:326
 #: ../src/java/src/i2p/susi/dns/ConfigBean.java:108
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:316
-#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:153
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:157
 msgid ""
 "Invalid form submission, probably because you used the \"back\" or "
 "\"reload\" button on your browser. Please resubmit."
@@ -234,14 +235,14 @@ msgstr "Requisição inválida, por favor tentar novamente."
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:328
 #: ../src/java/src/i2p/susi/dns/ConfigBean.java:110
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:318
-#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:155
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:159
 msgid ""
 "If the problem persists, verify that you have cookies enabled in your "
 "browser."
 msgstr "Se o problema persistir, verificar se o seu navegador está aceitando cookies."
 
 #: ../src/java/src/i2p/susi/dns/ConfigBean.java:99
-#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:128
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:131
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:160
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:151
 msgid "Save"
@@ -252,7 +253,7 @@ msgid "Configuration saved."
 msgstr "Configuração salva."
 
 #: ../src/java/src/i2p/susi/dns/ConfigBean.java:102
-#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:147
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:151
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:158
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:149
 msgid "Reload"
@@ -281,16 +282,16 @@ msgstr "Falha ao adicionar o Destino para {0} ao serviço de nomes {1}"
 msgid "Failed to delete Destination for {0} from naming service {1}"
 msgstr "Falha ao remover o Destino para {0} do serviço de nomes {1}"
 
-#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:140
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:144
 msgid ""
 "Subscriptions saved, updating addressbook from subscription sources now."
 msgstr "Inscrições salvas, atualizando o livro de endereços agora."
 
-#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:145
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:149
 msgid "Subscriptions saved."
 msgstr "Inscrições salvas."
 
-#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:149
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:153
 msgid "Subscriptions reloaded."
 msgstr "Inscrições recarregadas."
 
@@ -438,7 +439,7 @@ msgstr "Cancelar"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:373
 msgid "Export in hosts.txt format"
-msgstr ""
+msgstr "Exportar em formato host.txt"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:396
 msgid "This address book is empty."
@@ -632,7 +633,7 @@ msgstr "Ele atualiza o seu arquivo hosts.txt regularmente de fontes distribuída
 #, java-format
 msgid ""
 "In the default configuration, the address book is only subscribed to {0}."
-msgstr ""
+msgstr "Na configuração padrão, o livro de endereços está inscrito apenas no  {0}."
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:145
 msgid ""

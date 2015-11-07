@@ -297,7 +297,7 @@ public class Peer implements Comparable<Peer>
   
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Start running the reader with " + toString());
-        // Use this thread for running the incomming connection.
+        // Use this thread for running the incoming connection.
         // The outgoing connection creates its own Thread.
         out.startup();
         Thread.currentThread().setName("Snark reader from " + peerID);

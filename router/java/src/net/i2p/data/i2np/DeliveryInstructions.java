@@ -357,8 +357,8 @@ public class DeliveryInstructions extends DataStructureImpl {
         int offset = 0;
         offset += getAdditionalInfo(rv, offset);
         if (offset != additionalSize)
-            //_log.log(Log.CRIT, "wtf, additionalSize = " + additionalSize + ", offset = " + offset);
-            throw new IllegalStateException("wtf, additionalSize = " + additionalSize + ", offset = " + offset);
+            //_log.log(Log.CRIT, "size mismatch, additionalSize = " + additionalSize + ", offset = " + offset);
+            throw new IllegalStateException("size mismatch, additionalSize = " + additionalSize + ", offset = " + offset);
         return rv;
     }
 

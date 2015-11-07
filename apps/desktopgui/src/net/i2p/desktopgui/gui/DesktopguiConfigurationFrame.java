@@ -40,10 +40,10 @@ public class DesktopguiConfigurationFrame extends javax.swing.JFrame {
         cancelButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle(_("Tray icon configuration"));
+        setTitle(_t("Tray icon configuration"));
 
         desktopguiEnabled.setSelected(true);
-        desktopguiEnabled.setText(_("Should tray icon be enabled?"));
+        desktopguiEnabled.setText(_t("Should tray icon be enabled?"));
         desktopguiEnabled.setActionCommand("shouldDesktopguiBeEnabled");
 
         okButton.setText("OK");
@@ -98,8 +98,8 @@ public class DesktopguiConfigurationFrame extends javax.swing.JFrame {
         configureDesktopgui();
     }//GEN-LAST:event_okButtonMouseReleased
 
-    protected static String _(String s) {
-        return DesktopguiTranslator._(s);
+    protected static String _t(String s) {
+        return DesktopguiTranslator._t(s);
     }
 
     private void configureDesktopgui() {

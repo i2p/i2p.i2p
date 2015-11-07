@@ -146,9 +146,9 @@ public class CSSHelper extends HelperBase {
     public String title(String s) {
          StringBuilder buf = new StringBuilder(128);
          buf.append("<title>")
-            .append(_("I2P Router Console"))
+            .append(_t("I2P Router Console"))
             .append(" - ")
-            .append(_(s))
+            .append(_t(s))
             .append("</title>");
          return buf.toString();
     }

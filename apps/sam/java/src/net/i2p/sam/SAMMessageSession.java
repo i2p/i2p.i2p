@@ -9,6 +9,7 @@ package net.i2p.sam;
  */
 
 import java.io.ByteArrayInputStream;
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -31,7 +32,7 @@ import net.i2p.util.Log;
  *
  * @author human
  */
-abstract class SAMMessageSession {
+abstract class SAMMessageSession implements Closeable {
 
     protected final Log _log;
     private I2PSession session;
@@ -72,6 +73,7 @@ abstract class SAMMessageSession {
 
         handler = new SAMMessageSessionHandler(destStream, props);
 
+        // FIXME don't start threads in constructors
         Thread t = new I2PAppThread(handler, "SAMMessageSessionHandler");
         t.start();
     }
@@ -125,7 +127,6 @@ abstract class SAMMessageSession {
 
     /**
      * Close a SAM message-based session.
-     *
      */
     public void close() {
         handler.stopRunning();

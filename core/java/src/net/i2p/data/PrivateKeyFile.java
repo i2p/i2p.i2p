@@ -405,7 +405,10 @@ public class PrivateKeyFile {
         System.arraycopy(this.dest.getPublicKey().getData(), 0, data, 0, PublicKey.KEYSIZE_BYTES);
         System.arraycopy(this.dest.getSigningPublicKey().getData(), 0, data, PublicKey.KEYSIZE_BYTES, SigningPublicKey.KEYSIZE_BYTES);
         byte[] payload = new byte[Hash.HASH_LENGTH + Signature.SIGNATURE_BYTES];
-        byte[] sig = DSAEngine.getInstance().sign(new ByteArrayInputStream(data), spk2).getData();
+        Signature sign = DSAEngine.getInstance().sign(new ByteArrayInputStream(data), spk2);
+        if (sign == null)
+            return null;
+        byte[] sig = sign.getData();
         System.arraycopy(sig, 0, payload, 0, Signature.SIGNATURE_BYTES);
         // Add dest2's Hash for reference
         byte[] h2 = d2.calculateHash().getData();

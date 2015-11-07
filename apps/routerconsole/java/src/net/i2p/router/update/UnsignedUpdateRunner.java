@@ -38,7 +38,7 @@ class UnsignedUpdateRunner extends UpdateRunner {
             if (proxyPort == ConfigUpdateHandler.DEFAULT_PROXY_PORT_INT &&
                 proxyHost.equals(ConfigUpdateHandler.DEFAULT_PROXY_HOST) &&
                 _context.portMapper().getPort(PortMapper.SVC_HTTP_PROXY) < 0) {
-                String msg = _("HTTP client proxy tunnel must be running");
+                String msg = _t("HTTP client proxy tunnel must be running");
                 if (_log.shouldWarn())
                     _log.warn(msg);
                 updateStatus("<b>" + msg + "</b>");

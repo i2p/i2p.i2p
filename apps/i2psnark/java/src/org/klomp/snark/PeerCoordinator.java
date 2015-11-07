@@ -322,16 +322,22 @@ class PeerCoordinator implements PeerListener
    */
   public long getDownloadRate()
   {
+    if (halted)
+        return 0;
     return getRate(downloaded_old);
   }
 
   public long getUploadRate()
   {
+    if (halted)
+        return 0;
     return getRate(uploaded_old);
   }
 
   public long getCurrentUploadRate()
   {
+    if (halted)
+        return 0;
     // no need to synchronize, only one value
     long r = uploaded_old[0];
     if (r <= 0)
@@ -914,6 +920,7 @@ class PeerCoordinator implements PeerListener
    * Returns a byte array containing the requested piece or null of
    * the piece is unknown.
    *
+   * @return bytes or null for errors such as not having the piece yet
    * @throws RuntimeException on IOE getting the data
    */
   public ByteArray gotRequest(Peer peer, int piece, int off, int len)
@@ -977,8 +984,9 @@ class PeerCoordinator implements PeerListener
     }
     int piece = pp.getPiece();
     
-    synchronized(wantedPieces)
-      {
+    // try/catch outside the synch to avoid deadlock in the catch
+    try {
+      synchronized(wantedPieces) {
         Piece p = new Piece(piece);
         if (!wantedPieces.contains(p))
           {
@@ -994,8 +1002,7 @@ class PeerCoordinator implements PeerListener
             }
           }
         
-        try
-          {
+          // try/catch moved outside of synch
             // this takes forever if complete, as it rechecks
             if (storage.putPiece(pp))
               {
@@ -1004,26 +1011,38 @@ class PeerCoordinator implements PeerListener
               }
             else
               {
+                // so we will try again
+                markUnrequested(peer, piece);
+                // just in case
+                removePartialPiece(piece);
                 // Oops. We didn't actually download this then... :(
                 downloaded.addAndGet(0 - metainfo.getPieceLength(piece));
-                _log.warn("Got BAD piece " + piece + "/" + metainfo.getPieces() + " from " + peer + " for " + metainfo.getName());
+                // Mark this peer as not having the piece. PeerState will update its bitfield.
+                for (Piece pc : wantedPieces) {
+                    if (pc.getId() == piece) {
+                        pc.removePeer(peer);
+                        break;
+                    }
+                }
+                if (_log.shouldWarn())
+                    _log.warn("Got BAD piece " + piece + "/" + metainfo.getPieces() + " from " + peer + " for " + metainfo.getName());
                 return false; // No need to announce BAD piece to peers.
               }
-          }
-        catch (IOException ioe)
-          {
+
+        wantedPieces.remove(p);
+        wantedBytes -= metainfo.getPieceLength(p.getId());
+      }  // synch
+    } catch (IOException ioe) {
             String msg = "Error writing storage (piece " + piece + ") for " + metainfo.getName() + ": " + ioe;
             _log.error(msg, ioe);
             if (listener != null) {
                 listener.addMessage(msg);
                 listener.addMessage("Fatal storage error: Stopping torrent " + metainfo.getName());
             }
+            // deadlock was here
             snark.stopTorrent();
             throw new RuntimeException(msg, ioe);
-          }
-        wantedPieces.remove(p);
-        wantedBytes -= metainfo.getPieceLength(p.getId());
-      }
+    }
 
     // just in case
     removePartialPiece(piece);
@@ -1135,8 +1154,9 @@ class PeerCoordinator implements PeerListener
    *
    *  Also mark the piece unrequested if this peer was the only one.
    *
-   *  @param peer partials, must include the zero-offset (empty) ones too
-   *              No dup pieces, piece.setDownloaded() must be set
+   *  @param peer partials, must include the zero-offset (empty) ones too.
+   *              No dup pieces, piece.setDownloaded() must be set.
+   *              len field in Requests is ignored.
    *  @since 0.8.2
    */
   public void savePartialPieces(Peer peer, List<Request> partials)

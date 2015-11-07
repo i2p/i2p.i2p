@@ -47,7 +47,8 @@ public class TunnelConfig {
     private String _i2cpPort;
     private int _tunnelDepth = -1;
     private int _tunnelQuantity = -1;
-    private int _tunnelVariance = -1;
+    // -2 or higher is valid
+    private int _tunnelVariance = -3;
     private int _tunnelBackupQuantity = -1;
     private boolean _connectDelay;
     private String _customOptions;
@@ -318,7 +319,7 @@ public class TunnelConfig {
         if (val)
             _booleanOptions.add(I2PTunnelHTTPClient.PROP_ACCEPT);
         else
-            _booleanOptions.add(I2PTunnelHTTPClient.PROP_ACCEPT);
+            _booleanOptions.remove(I2PTunnelHTTPClient.PROP_ACCEPT);
     }
     public void setAllowInternalSSL(boolean val) {
         if (val)
@@ -801,7 +802,7 @@ public class TunnelConfig {
             config.setProperty("option.inbound.length", Integer.toString(_tunnelDepth));
             config.setProperty("option.outbound.length", Integer.toString(_tunnelDepth));
         }
-        if (_tunnelVariance >= 0) {
+        if (_tunnelVariance >= -2) {
             config.setProperty("option.inbound.lengthVariance", Integer.toString(_tunnelVariance));
             config.setProperty("option.outbound.lengthVariance", Integer.toString(_tunnelVariance));
         }

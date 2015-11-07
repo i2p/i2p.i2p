@@ -35,6 +35,7 @@ import net.i2p.router.RouterContext;
 import net.i2p.router.util.EventLog;
 import net.i2p.util.Log;
 import net.i2p.util.SecureFileOutputStream;
+import net.i2p.util.SystemVersion;
 
 /**
  *  Warning - misnamed. This creates a new RouterIdentity, i.e.
@@ -49,9 +50,10 @@ public class CreateRouterInfoJob extends JobImpl {
     public static final String INFO_FILENAME = "router.info";
     public static final String KEYS_FILENAME = "router.keys";
     public static final String KEYS2_FILENAME = "router.keys.dat";
-    private static final String PROP_ROUTER_SIGTYPE = "router.sigType";
-    /** TODO when changing, check isAvailable() and fallback to DSA_SHA1 */
-    private static final SigType DEFAULT_SIGTYPE = SigType.DSA_SHA1;
+    static final String PROP_ROUTER_SIGTYPE = "router.sigType";
+    /** TODO make everybody Ed */
+    private static final SigType DEFAULT_SIGTYPE = (SystemVersion.isARM() || SystemVersion.isAndroid()) ?
+                                                   SigType.DSA_SHA1 : SigType.EdDSA_SHA512_Ed25519;
 
     CreateRouterInfoJob(RouterContext ctx, Job next) {
         super(ctx);
@@ -166,7 +168,7 @@ public class CreateRouterInfoJob extends JobImpl {
      *  @since 0.9.16
      */
     public static SigType getSigTypeConfig(RouterContext ctx) {
-        SigType cstype = CreateRouterInfoJob.DEFAULT_SIGTYPE;
+        SigType cstype = DEFAULT_SIGTYPE;
         String sstype = ctx.getProperty(PROP_ROUTER_SIGTYPE);
         if (sstype != null) {
             SigType ntype = SigType.parseSigType(sstype);

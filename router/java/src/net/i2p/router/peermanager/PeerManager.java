@@ -165,7 +165,7 @@ class PeerManager {
      *  @since 0.8.8
      */
     private void loadProfilesInBackground() {
-        (new Thread(new ProfileLoader())).start();
+        (new I2PThread(new ProfileLoader())).start();
     }
 
     /**
@@ -193,7 +193,8 @@ class PeerManager {
     }
     
     /**
-     * Find some peers that meet the criteria and we have the netDb info for locally
+     * Find some peers that meet the criteria and we have the netDb info for locally.
+     * Returned list will not include ourselves.
      *
      * Only used by PeerTestJob (PURPOSE_TEST)
      */

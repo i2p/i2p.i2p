@@ -243,6 +243,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
      *  @param maxWait how long to wait for each to reply (not total) must be > 0
      *  @param parallel how many outstanding at once (unimplemented, always 1)
      */
+    @SuppressWarnings("unchecked")
     private void explore(NID target, int maxNodes, long maxWait, int parallel) {
         List<NodeInfo> nodes = _knownNodes.findClosest(target, maxNodes);
         if (nodes.isEmpty()) {
@@ -327,6 +328,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
      *  @param noSeeds true if we do not want seeds in the result
      *  @return possibly empty (never null)
      */
+    @SuppressWarnings("unchecked")
     public Collection<Hash> getPeersAndAnnounce(byte[] ih, int max, long maxWait,
                                                 int annMax, long annMaxWait,
                                                 boolean isSeed, boolean noSeeds) {
@@ -858,6 +860,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
      *  @param repliable true for all but announce
      *  @return null on error
      */
+    @SuppressWarnings("unchecked")
     private ReplyWaiter sendQuery(NodeInfo nInfo, Map<String, Object> map, boolean repliable) {
         if (nInfo.equals(_myNodeInfo))
             throw new IllegalArgumentException("wtf don't send to ourselves");
@@ -907,6 +910,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
      * @param toPort the query port, we will increment here
      *  @return success
      */
+    @SuppressWarnings("unchecked")
     private boolean sendResponse(NodeInfo nInfo, MsgID msgID, Map<String, Object> map) {
         if (nInfo.equals(_myNodeInfo))
             throw new IllegalArgumentException("wtf don't send to ourselves");

@@ -42,7 +42,7 @@ class SingleLookupJob extends JobImpl {
             Hash peer = _dsrm.getReply(i);
             if (peer.equals(getContext().routerHash())) // us
                 continue;
-            if (peer.equals(from)) // wtf
+            if (peer.equals(from)) // unusual?
                 continue;
             RouterInfo ri = getContext().netDb().lookupRouterInfoLocally(peer);
             if (ri == null)

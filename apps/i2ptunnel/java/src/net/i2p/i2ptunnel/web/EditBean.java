@@ -358,7 +358,7 @@ public class EditBean extends IndexBean {
 
     public String getI2CPHost(int tunnel) {
         if (_context.isRouterContext())
-            return _("internal");
+            return _t("internal");
         TunnelController tun = getController(tunnel);
         if (tun != null)
             return tun.getI2CPHost();
@@ -368,7 +368,7 @@ public class EditBean extends IndexBean {
     
     public String getI2CPPort(int tunnel) {
         if (_context.isRouterContext())
-            return _("internal");
+            return _t("internal");
         TunnelController tun = getController(tunnel);
         if (tun != null)
             return tun.getI2CPPort();
@@ -406,11 +406,11 @@ public class EditBean extends IndexBean {
              if (i <= 3) {
                  buf.append(" (");
                  if (i == 1)
-                     buf.append(_("lower bandwidth and reliability"));
+                     buf.append(_t("lower bandwidth and reliability"));
                  else if (i == 2)
-                     buf.append(_("standard bandwidth and reliability"));
+                     buf.append(_t("standard bandwidth and reliability"));
                  else if (i == 3)
-                     buf.append(_("higher bandwidth and reliability"));
+                     buf.append(_t("higher bandwidth and reliability"));
                  buf.append(')');
              }
              buf.append("</option>\n");

@@ -470,7 +470,8 @@ public class DHSessionKeyBuilder {
                 _log.debug("DH Precalc (minimum: " + _minSize + " max: " + _maxSize + ", delay: "
                            + _calcDelay + ")");
             _builders = new LinkedBlockingQueue<DHSessionKeyBuilder>(_maxSize);
-            setPriority(Thread.MIN_PRIORITY);
+            if (!SystemVersion.isWindows())
+                setPriority(Thread.NORM_PRIORITY - 1);
         }
         
         /**

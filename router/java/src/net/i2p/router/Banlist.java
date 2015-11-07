@@ -162,11 +162,11 @@ public class Banlist {
      */
     public boolean banlistRouter(Hash peer, String reason, String reasonCode, String transport, long expireOn) {
         if (peer == null) {
-            _log.error("wtf, why did we try to banlist null?", new Exception("banfaced"));
+            _log.error("why did we try to banlist null?", new Exception("banfaced"));
             return false;
         }
         if (peer.equals(_context.routerHash())) {
-            _log.error("wtf, why did we try to banlist ourselves?", new Exception("banfaced"));
+            _log.error("why did we try to banlist ourselves?", new Exception("banfaced"));
             return false;
         }
         boolean wasAlready = false;

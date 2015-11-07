@@ -231,6 +231,8 @@ class PacketHandler {
      *  This sends a reset back to the place this packet came from.
      *  If the packet has no 'optional from' or valid signature, this does nothing.
      *  This is not associated with a connection, so no con stats are updated.
+     *
+     *  @param packet incoming packet to be replied to
      */
     private void sendReset(Packet packet) {
         Destination from = packet.getOptionalFrom();
@@ -242,13 +244,13 @@ class PacketHandler {
                 _log.warn("Can't send reset after recv spoofed packet: " + packet);
             return;
         }
-        PacketLocal reply = new PacketLocal(_context, from);
+        PacketLocal reply = new PacketLocal(_context, from, packet.getSession());
         reply.setFlag(Packet.FLAG_RESET);
         reply.setFlag(Packet.FLAG_SIGNATURE_INCLUDED);
         reply.setSendStreamId(packet.getReceiveStreamId());
         reply.setReceiveStreamId(packet.getSendStreamId());
         // TODO remove this someday, as of 0.9.20 we do not require it
-        reply.setOptionalFrom(_manager.getSession().getMyDestination());
+        reply.setOptionalFrom();
         reply.setLocalPort(packet.getLocalPort());
         reply.setRemotePort(packet.getRemotePort());
         // this just sends the packet - no retries or whatnot

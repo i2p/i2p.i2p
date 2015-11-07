@@ -24,6 +24,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import gnu.getopt.Getopt;
 
@@ -312,22 +314,52 @@ public class EepGet {
             System.exit(1);
     }
 
+    /**
+     * Parse URL for a viable filename.
+     * 
+     * @param   url  a URL giving the location of an online resource
+     * @return       a filename to save the resource as on local filesystem
+     */
     public static String suggestName(String url) {
-        int last = url.lastIndexOf('/');
-        if ((last < 0) || (url.lastIndexOf('#') > last))
-            last = url.lastIndexOf('#');
-        if ((last < 0) || (url.lastIndexOf('?') > last))
-            last = url.lastIndexOf('?');
-        if ((last < 0) || (url.lastIndexOf('=') > last))
-            last = url.lastIndexOf('=');
+        URL nameURL = null;  // URL object
+        String name;         // suggested name
 
-        String name = null;
-        if (last >= 0)
-            name = sanitize(url.substring(last+1));
-        if ( (name != null) && (name.length() > 0) )
-            return name;
-        else
-            return sanitize(url);
+        try {
+            nameURL = new URL(url);
+        } catch (MalformedURLException e) {
+            System.err.println("Please enter a properly formed URL.");
+            System.exit(1);
+        }
+
+        String path = nameURL.getPath();  // discard any URI queries
+
+        // if no file specified, eepget scrapes webpage - use domain as name
+        Pattern slashes = Pattern.compile("/+");
+        Matcher matcher = slashes.matcher(path);
+        // if empty path or just /'s - nameURL lets multiple /'s through
+        if (path.equals("") || matcher.matches()) {
+            name = sanitize(nameURL.getAuthority());
+        // if path specified
+        } else {
+            int last = path.lastIndexOf('/');
+            // if last / not at end of string, use following string as filename
+            if (last != path.length() - 1) {
+                name = sanitize(path.substring(last + 1));
+            // if there's a trailing / group look for previous / as trim point
+            } else {
+                int i = 1;
+                int slash;
+                while (true) {
+                    slash = path.lastIndexOf('/', last - i);
+                    if (slash != last - i) {
+                        break;
+                    }
+                    i += 1;
+                }
+                name = sanitize(path.substring(slash + 1, path.length() - i));
+            }
+        }
+        return name;
     }
 
 
@@ -755,6 +787,8 @@ public class EepGet {
         Thread pusher = null;
         _decompressException = null;
         if (_isGzippedResponse) {
+            if (_log.shouldInfo())
+                _log.info("Gzipped response, starting decompressor");
             PipedInputStream pi = BigPipedInputStream.getInstance();
             PipedOutputStream po = new PipedOutputStream(pi);
             pusher = new I2PAppThread(new Gunzipper(pi, _out), "EepGet Decompressor");
@@ -1096,7 +1130,7 @@ public class EepGet {
      */
     private int handleStatus(String line) {
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Status line: [" + line + "]");
+            _log.debug("Status line: [" + line.trim() + "]");
         String[] toks = line.split(" ", 3);
         if (toks.length < 2) {
             if (_log.shouldLog(Log.WARN))
@@ -1160,17 +1194,13 @@ public class EepGet {
         lookahead[1] = lookahead[2];
         lookahead[2] = (byte)cur;
     }
+
     private static boolean isEndOfHeaders(byte lookahead[]) {
-        byte first = lookahead[0];
-        byte second = lookahead[1];
-        byte third = lookahead[2];
-        return (isNL(second) && isNL(third)) || //   \n\n
-               (isNL(first) && isNL(third));    // \n\r\n
+        return lookahead[2] == NL &&
+               (lookahead[0] == NL || lookahead[1] == NL);    // \n\n or \n\r\n
     }
 
-    /** we ignore any potential \r, since we trim it on write anyway */
     private static final byte NL = '\n';
-    private static boolean isNL(byte b) { return (b == NL); }
 
     /**
      *  @param timeout may be null
@@ -1315,7 +1345,8 @@ public class EepGet {
             buf.append("Content-length: ").append(_postData.length()).append("\r\n");
         // This will be replaced if we are going through I2PTunnelHTTPClient
         buf.append("Accept-Encoding: ");
-        if ((!_shouldProxy) &&
+        // as of 0.9.23, the proxy passes the Accept-Encoding header through
+        if (  /* (!_shouldProxy) && */
             // This is kindof a hack, but if we are downloading a gzip file
             // we don't want to transparently gunzip it and save it as a .gz file.
             (!path.endsWith(".gz")) && (!path.endsWith(".tgz")))

@@ -1,6 +1,7 @@
 package net.i2p.i2ptunnel.socks;
 
 import net.i2p.I2PAppContext;
+import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 
 /**
@@ -65,7 +66,7 @@ public class SOCKSHeader {
         int namelen = (this.header[4] & 0xff);
         byte[] nameBytes = new byte[namelen];
         System.arraycopy(nameBytes, 0, this.header, 5, namelen);
-        return new String(nameBytes);
+        return DataHelper.getUTF8(nameBytes);
     }
 
     public Destination getDestination() {

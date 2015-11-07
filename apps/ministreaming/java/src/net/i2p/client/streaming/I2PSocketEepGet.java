@@ -11,8 +11,12 @@ import java.util.Properties;
 
 import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
+import net.i2p.client.I2PSession;
+import net.i2p.client.I2PSessionException;
+import net.i2p.data.Base32;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
+import net.i2p.data.Hash;
 import net.i2p.util.EepGet;
 import net.i2p.util.SocketTimeout;
 
@@ -129,9 +133,31 @@ public class I2PSocketEepGet extends EepGet {
                     }
                 }
 
-                Destination dest = _context.namingService().lookup(host);
+                // Use existing I2PSession for lookups.
+                // This is much more efficient than using the naming service
+                Destination dest;
+                I2PSession sess = _socketManager.getSession();
+                if (sess != null && !sess.isClosed()) {
+                    try {
+                        if (host.length() == 60 && host.endsWith(".b32.i2p")) {
+                            byte[] b = Base32.decode(host.substring(0, 52));
+                            if (b != null) {
+                                Hash h = Hash.create(b);
+                                dest = sess.lookupDest(h, 20*1000);
+                            } else {
+                                dest = null;
+                            }
+                        } else {
+                            dest = sess.lookupDest(host, 20*1000);
+                        }
+                    } catch (I2PSessionException ise) {
+                        dest = null;
+                    }
+                } else {
+                    dest = _context.namingService().lookup(host);
+                }
                 if (dest == null)
-                    throw new UnknownHostException("Unknown or non-i2p host");
+                    throw new UnknownHostException("Unknown or non-i2p host: " + host);
 
                 // Set the timeouts, using the other existing options in the socket manager
                 // This currently duplicates what SocketTimeout is doing in EepGet,

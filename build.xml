@@ -100,8 +100,11 @@
                     <pathelement location="build/i2p.jar" />
                     <pathelement location="build/i2psnark.jar" />
                 </classpath>
-                <arg value="@{file}" />
+                <arg value="-a" />
                 <arg value="http://tracker2.postman.i2p/announce.php" />
+                <arg value="-c" />
+                <arg value="${build.built-by}" />
+                <arg value="@{file}" />
             </java>
         </sequential>
     </macrodef>
@@ -450,7 +453,7 @@
             if (newBuildNumber != 'unknown' && newBuildNumber != null) {
                 echo = project.createTask("echo");
                 project.setProperty("new.i2p.build.number", newBuildNumber);
-                echo.setMessage("Build number is now: " + newBuildNumber);
+                echo.setMessage("Build number is now: " + newBuildNumber + project.getProperty("build.extra"));
                 echo.perform();
             }
             ]]>
@@ -1261,8 +1264,9 @@
         <copy todir="pkg-temp/docs/" >
           <fileset dir="installer/resources/readme/" includes="readme*.html" />
           <fileset dir="installer/resources/proxy/" includes="*.ht" />
-          <!-- lang_ar.png added in 0.8.4; a1,a2,je, and eu.png added in 0.8.9; gg.png added in 0.8.10; im.png added in 0.8.12; cw.png added in 0.9.5 -->
-          <fileset dir="installer/resources/" includes="icons/flags/lang_ar.png icons/flags/gg.png icons/flags/je.png icons/flags/eu.png icons/flags/im.png icons/flags/a1.png icons/flags/a2.png icons/flags/cw.png" />
+          <!-- lang_ar.png added in 0.8.4; a1,a2,je, and eu.png added in 0.8.9; gg.png added in 0.8.10;
+               im.png added in 0.8.12; cw.png added in 0.9.5; ap,bl,bq,ss,sx added in 0.9.21 -->
+          <fileset dir="installer/resources/" includes="icons/flags/lang_ar.png icons/flags/gg.png icons/flags/je.png icons/flags/eu.png icons/flags/im.png icons/flags/a1.png icons/flags/a2.png icons/flags/cw.png icons/flags/ap.png icons/flags/bl.png icons/flags/bq.png icons/flags/ss.png icons/flags/sx.png" />
         </copy>
     </target>
 
@@ -1398,6 +1402,9 @@
         <concat append="true" destfile="pkg-temp/history.txt">&#10;&#10;----------------&#10;&#10;EARLIER HISTORY IS AVAILABLE IN THE SOURCE PACKAGE"</concat>
         <copy file="installer/resources/deletelist.txt" todir="pkg-temp/" />
         <copy file="installer/resources/blocklist.txt" todir="pkg-temp/" />
+        <copy todir="pkg-temp/man/">
+            <fileset dir="installer/resources/man/" />
+        </copy>
     </target>
 
     <target name="prepupdateSmall" depends="buildSmall, prepupdateRouter, prepjupdatefixes, prepthemeupdates">
@@ -1734,6 +1741,7 @@
             <arg value="apps/BOB/src/:apps/addressbook/java/src/:apps/i2psnark/java/src/:apps/i2ptunnel/java/src/:apps/ministreaming/java/src/:apps/routerconsole/java/src/:apps/sam/java/src/:apps/streaming/java/src/:apps/susidns/src/java/src/:apps/susimail/src/src/:apps/systray/java/src/:core/java/src/:router/java/src/:installer/java/src"/>
             <!-- start of the files to be analyzed -->
             <arg value="build/BOB.jar"/>
+            <arg value="build/addressbook.jar"/>
             <arg value="build/addressbook.war"/>
             <arg value="build/i2p.jar"/>
             <arg value="build/i2psnark.jar"/>
@@ -1761,9 +1769,11 @@
          since preppkg puts too much stuff in pkg-temp -->
 <!--
     <target name="release" depends="distclean, updaterWithJettyFixesAndJbigi , updater200WithJettyFixes, preppkg, installer, getReleaseNumber" >
-    <target name="release" depends="verifyReleaseBuildNumbers, -pre-release, distclean, testscripts, updaterWithJettyAndGeoIPRepack, updater200WithJettyAndGeoIP, delete-j6-update, installer-nowindows, delete-nonwindows, installer-windows">
 -->
+    <target name="release" depends="verifyReleaseBuildNumbers, -pre-release, distclean, testscripts, updaterWithJettyAndGeoIPRepack, updater200WithJettyAndGeoIP, delete-j6-update, installer-nowindows, delete-nonwindows, installer-windows">
+<!--
     <target name="release" depends="verifyReleaseBuildNumbers, -pre-release, distclean, testscripts, updaterWithJettyRepack, updater200WithJetty, delete-j6-update, installer-nowindows, delete-nonwindows, installer-windows">
+-->
         <echo message="New version number is ${release.number}" />
         <copy file="i2pupdate.zip" tofile="i2pupdate_${release.number}.zip" />
         <copy file="i2pinstall_${full.version}.jar" tofile="i2pinstall_${release.number}.jar" />

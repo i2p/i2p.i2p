@@ -23,7 +23,7 @@ public class InternalTrayManager extends TrayManager {
     public PopupMenu getMainMenu() {
         PopupMenu popup = new PopupMenu();
         
-        MenuItem browserLauncher = new MenuItem(_("Launch I2P Browser"));
+        MenuItem browserLauncher = new MenuItem(_t("Launch I2P Browser"));
         browserLauncher.addActionListener(new ActionListener() {
             
             @Override
@@ -47,7 +47,7 @@ public class InternalTrayManager extends TrayManager {
                 }.execute();
             }
         });
-        MenuItem desktopguiConfigurationLauncher = new MenuItem(_("Configure desktopgui"));
+        MenuItem desktopguiConfigurationLauncher = new MenuItem(_t("Configure desktopgui"));
         desktopguiConfigurationLauncher.addActionListener(new ActionListener() {
 
             @Override
@@ -64,7 +64,7 @@ public class InternalTrayManager extends TrayManager {
             }
 
         });
-        MenuItem restartItem = new MenuItem(_("Restart I2P"));
+        MenuItem restartItem = new MenuItem(_t("Restart I2P"));
         restartItem.addActionListener(new ActionListener() {
 
             @Override
@@ -82,7 +82,7 @@ public class InternalTrayManager extends TrayManager {
             }
             
         });
-        MenuItem stopItem = new MenuItem(_("Stop I2P"));
+        MenuItem stopItem = new MenuItem(_t("Stop I2P"));
         stopItem.addActionListener(new ActionListener() {
 
             @Override

@@ -47,21 +47,34 @@ public class Certificate extends DataStructureImpl {
     public final static int CERTIFICATE_TYPE_KEY = 5;
 
     /**
-     * If null cert, return immutable static instance, else create new
-     * @throws AIOOBE if not enough bytes, FIXME should throw DataFormatException
+     * If null, P256 key, or Ed25519 key cert, return immutable static instance, else create new
+     * @throws DataFormatException if not enough bytes
      * @since 0.8.3
      */
-    public static Certificate create(byte[] data, int off) {
-        int type = data[off] & 0xff;
-        int length = (int) DataHelper.fromLong(data, off + 1, 2);
-        if (type == 0 && length == 0)
-            return NULL_CERT;
-        // from here down roughly the same as readBytes() below
-        if (length == 0)
-            return new Certificate(type, null);
-        byte[] payload = new byte[length];
-        System.arraycopy(data, off + 3, payload, 0, length);
+    public static Certificate create(byte[] data, int off) throws DataFormatException {
+    	int type;
+    	byte[] payload;
+        int length;
+    	try {
+            type = data[off] & 0xff;
+            length = (int) DataHelper.fromLong(data, off + 1, 2);
+            if (type == 0 && length == 0)
+                return NULL_CERT;
+            // from here down roughly the same as readBytes() below
+            if (length == 0)
+                return new Certificate(type, null);
+            payload = new byte[length];
+            System.arraycopy(data, off + 3, payload, 0, length);
+    	} catch (ArrayIndexOutOfBoundsException aioobe) {
+    		throw new DataFormatException("not enough bytes", aioobe);
+    	}
         if (type == CERTIFICATE_TYPE_KEY) {
+            if (length == 4) {
+                if (Arrays.equals(payload, KeyCertificate.Ed25519_PAYLOAD))
+                    return KeyCertificate.ELG_Ed25519_CERT;
+                if (Arrays.equals(payload, KeyCertificate.ECDSA256_PAYLOAD))
+                    return KeyCertificate.ELG_ECDSA256_CERT;
+            }
             try {
                 return new KeyCertificate(payload);
             } catch (DataFormatException dfe) {
@@ -72,7 +85,7 @@ public class Certificate extends DataStructureImpl {
     }
 
     /**
-     * If null cert, return immutable static instance, else create new
+     * If null, P256 key, or Ed25519 key cert, return immutable static instance, else create new
      * @since 0.8.3
      */
     public static Certificate create(InputStream in) throws DataFormatException, IOException {
@@ -87,8 +100,15 @@ public class Certificate extends DataStructureImpl {
         int read = DataHelper.read(in, payload);
         if (read != length)
             throw new DataFormatException("Not enough bytes for the payload (read: " + read + " length: " + length + ')');
-        if (type == CERTIFICATE_TYPE_KEY)
+        if (type == CERTIFICATE_TYPE_KEY) {
+            if (length == 4) {
+                if (Arrays.equals(payload, KeyCertificate.Ed25519_PAYLOAD))
+                    return KeyCertificate.ELG_Ed25519_CERT;
+                if (Arrays.equals(payload, KeyCertificate.ECDSA256_PAYLOAD))
+                    return KeyCertificate.ELG_ECDSA256_CERT;
+            }
             return new KeyCertificate(payload);
+        }
         return new Certificate(type, payload);
     }
 
@@ -262,7 +282,7 @@ public class Certificate extends DataStructureImpl {
         } else {
             buf.append(" payload size: ").append(_payload.length);
             if (getCertificateType() == CERTIFICATE_TYPE_HASHCASH) {
-                buf.append(" Stamp: ").append(new String(_payload));
+                buf.append(" Stamp: ").append(DataHelper.getUTF8(_payload));
             } else if (getCertificateType() == CERTIFICATE_TYPE_SIGNED && _payload.length == CERTIFICATE_LENGTH_SIGNED_WITH_HASH) {
                 buf.append(" Signed by hash: ").append(Base64.encode(_payload, Signature.SIGNATURE_BYTES, Hash.HASH_LENGTH));
             } else {

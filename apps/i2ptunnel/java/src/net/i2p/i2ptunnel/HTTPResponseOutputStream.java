@@ -15,6 +15,7 @@ import java.util.Locale;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.ByteArray;
+import net.i2p.data.DataHelper;
 import net.i2p.util.ByteCache;
 import net.i2p.util.Log;
 
@@ -38,7 +39,10 @@ class HTTPResponseOutputStream extends FilterOutputStream {
     private final byte _buf1[];
     protected boolean _gzip;
     protected long _dataExpected;
+    /** lower-case, trimmed */
     protected String _contentType;
+    /** lower-case, trimmed */
+    protected String _contentEncoding;
 
     private static final int CACHE_SIZE = 8*1024;
     private static final ByteCache _cache = ByteCache.getInstance(8, CACHE_SIZE);
@@ -145,12 +149,12 @@ class HTTPResponseOutputStream extends FilterOutputStream {
         for (int i = 0; i < _headerBuffer.getValid(); i++) {
             if (isNL(_headerBuffer.getData()[i])) {
                 if (lastEnd == -1) {
-                    responseLine = new String(_headerBuffer.getData(), 0, i+1); // includes NL
+                    responseLine = DataHelper.getUTF8(_headerBuffer.getData(), 0, i+1); // includes NL
                     responseLine = filterResponseLine(responseLine);
                     responseLine = (responseLine.trim() + "\r\n");
                     if (_log.shouldLog(Log.INFO))
                         _log.info("Response: " + responseLine.trim());
-                    out.write(responseLine.getBytes());
+                    out.write(DataHelper.getUTF8(responseLine));
                 } else {
                     for (int j = lastEnd+1; j < i; j++) {
                         if (_headerBuffer.getData()[j] == ':') {
@@ -158,22 +162,22 @@ class HTTPResponseOutputStream extends FilterOutputStream {
                             int valLen = i-(j+1);
                             if ( (keyLen <= 0) || (valLen < 0) )
                                 throw new IOException("Invalid header @ " + j);
-                            String key = new String(_headerBuffer.getData(), lastEnd+1, keyLen);
-                            String val = null;
+                            String key = DataHelper.getUTF8(_headerBuffer.getData(), lastEnd+1, keyLen);
+                            String val;
                             if (valLen == 0)
                                 val = "";
                             else
-                                val = new String(_headerBuffer.getData(), j+2, valLen).trim();
+                                val = DataHelper.getUTF8(_headerBuffer.getData(), j+2, valLen).trim();
                             
                             if (_log.shouldLog(Log.INFO))
                                 _log.info("Response header [" + key + "] = [" + val + "]");
                             
                             String lcKey = key.toLowerCase(Locale.US);
                             if ("connection".equals(lcKey)) {
-                                out.write("Connection: close\r\n".getBytes());
+                                out.write(DataHelper.getASCII("Connection: close\r\n"));
                                 connectionSent = true;
                             } else if ("proxy-connection".equals(lcKey)) {
-                                out.write("Proxy-Connection: close\r\n".getBytes());
+                                out.write(DataHelper.getASCII("Proxy-Connection: close\r\n"));
                                 proxyConnectionSent = true;
                             } else if ("content-encoding".equals(lcKey) && "x-i2p-gzip".equals(val.toLowerCase(Locale.US))) {
                                 _gzip = true;
@@ -188,7 +192,10 @@ class HTTPResponseOutputStream extends FilterOutputStream {
                                     } catch (NumberFormatException nfe) {}
                                 } else if ("content-type".equals(lcKey)) {
                                     // save for compress decision on server side
-                                    _contentType = val;
+                                    _contentType = val.toLowerCase(Locale.US);
+                                } else if ("content-encoding".equals(lcKey)) {
+                                    // save for compress decision on server side
+                                    _contentEncoding = val.toLowerCase(Locale.US);
                                 } else if ("set-cookie".equals(lcKey)) {
                                     String lcVal = val.toLowerCase(Locale.US);
                                     if (lcVal.contains("domain=b32.i2p") ||
@@ -202,7 +209,7 @@ class HTTPResponseOutputStream extends FilterOutputStream {
                                         break;
                                     }
                                 }
-                                out.write((key.trim() + ": " + val.trim() + "\r\n").getBytes());
+                                out.write(DataHelper.getUTF8(key.trim() + ": " + val + "\r\n"));
                             }
                             break;
                         }
@@ -213,9 +220,9 @@ class HTTPResponseOutputStream extends FilterOutputStream {
         }
         
         if (!connectionSent)
-            out.write("Connection: close\r\n".getBytes());
+            out.write(DataHelper.getASCII("Connection: close\r\n"));
         if (!proxyConnectionSent)
-            out.write("Proxy-Connection: close\r\n".getBytes());
+            out.write(DataHelper.getASCII("Proxy-Connection: close\r\n"));
             
         finishHeaders();
 
@@ -236,7 +243,7 @@ class HTTPResponseOutputStream extends FilterOutputStream {
     protected boolean shouldCompress() { return _gzip; }
     
     protected void finishHeaders() throws IOException {
-        out.write("\r\n".getBytes()); // end of the headers
+        out.write(DataHelper.getASCII("\r\n")); // end of the headers
     }
     
     @Override

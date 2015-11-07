@@ -42,31 +42,31 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>${book.book} <%=intl._("addressbook")%> - susidns</title>
+<title>${book.book} <%=intl._t("addressbook")%> - susidns</title>
 <link rel="stylesheet" type="text/css" href="<%=book.getTheme()%>susidns.css">
 </head>
 <body>
 <div class="page">
 <div id="logo">
-<a href="index"><img src="<%=book.getTheme()%>images/logo.png" alt="" title="<%=intl._("Overview")%>" border="0"/></a>
+<a href="index"><img src="<%=book.getTheme()%>images/logo.png" alt="" title="<%=intl._t("Overview")%>" border="0"/></a>
 </div>
 <hr>
 <div id="navi">
 <p>
-<%=intl._("Address books")%>:
-<a href="addressbook?book=private&amp;filter=none&amp;begin=0&amp;end=49"><%=intl._("private")%></a> |
-<a href="addressbook?book=master&amp;filter=none&amp;begin=0&amp;end=49"><%=intl._("master")%></a> |
-<a href="addressbook?book=router&amp;filter=none&amp;begin=0&amp;end=49"><%=intl._("router")%></a> |
-<a href="addressbook?book=published&amp;filter=none&amp;begin=0&amp;end=49"><%=intl._("published")%></a> *
-<a href="subscriptions"><%=intl._("Subscriptions")%></a> *
-<a href="config"><%=intl._("Configuration")%></a> *
-<a href="index"><%=intl._("Overview")%></a>
+<%=intl._t("Address books")%>:
+<a href="addressbook?book=private&amp;filter=none&amp;begin=0&amp;end=49"><%=intl._t("private")%></a> |
+<a href="addressbook?book=master&amp;filter=none&amp;begin=0&amp;end=49"><%=intl._t("master")%></a> |
+<a href="addressbook?book=router&amp;filter=none&amp;begin=0&amp;end=49"><%=intl._t("router")%></a> |
+<a href="addressbook?book=published&amp;filter=none&amp;begin=0&amp;end=49"><%=intl._t("published")%></a> *
+<a href="subscriptions"><%=intl._t("Subscriptions")%></a> *
+<a href="config"><%=intl._t("Configuration")%></a> *
+<a href="index"><%=intl._t("Overview")%></a>
 </p>
 </div>
 <hr>
 <div id="headline">
-<h3><%=intl._("Address book")%>: <%=intl._(book.getBook())%></h3>
-<h4><%=intl._("Storage")%>: ${book.displayName}</h4>
+<h3><%=intl._t("Address book")%>: <%=intl._t(book.getBook())%></h3>
+<h4><%=intl._t("Storage")%>: ${book.displayName}</h4>
 </div>
 
 <div id="book">
@@ -85,49 +85,49 @@
 <jsp:setProperty name="book" property="trClass"	value="0" />
 <table class="book" cellspacing="0" cellpadding="5">
 <tr class="list${book.trClass}">
-<td><%=intl._("Host Name")%></td>
+<td><%=intl._t("Host Name")%></td>
 <td><a href="http://<%=addr.getName()%>/" target="_top"><%=addr.getDisplayName()%></a></td>
 </tr><tr class="list${book.trClass}">
 <%
     if (addr.isIDN()) {
 %>
-<td><%=intl._("Encoded Name")%></td>
+<td><%=intl._t("Encoded Name")%></td>
 <td><a href="http://<%=addr.getName()%>/" target="_top"><%=addr.getName()%></a></td>
 </tr><tr class="list${book.trClass}">
 <%
     }
 %>
-<td><%=intl._("Base 32 Address")%></td>
+<td><%=intl._t("Base 32 Address")%></td>
 <td><a href="http://<%=b32%>/" target="_top"><%=b32%></a></td>
 </tr><tr class="list${book.trClass}">
-<td><%=intl._("Base 64 Hash")%></td>
+<td><%=intl._t("Base 64 Hash")%></td>
 <td><%=addr.getB64()%></td>
 </tr><tr class="list${book.trClass}">
-<td><%=intl._("Address Helper")%></td>
-<td><a href="http://<%=addr.getName()%>/?i2paddresshelper=<%=addr.getDestination()%>" target="_top"><%=intl._("link")%></a></td>
+<td><%=intl._t("Address Helper")%></td>
+<td><a href="http://<%=addr.getName()%>/?i2paddresshelper=<%=addr.getDestination()%>" target="_top"><%=intl._t("link")%></a></td>
 </tr><tr class="list${book.trClass}">
-<td><%=intl._("Public Key")%></td>
-<td><%=intl._("ElGamal 2048 bit")%></td>
+<td><%=intl._t("Public Key")%></td>
+<td><%=intl._t("ElGamal 2048 bit")%></td>
 </tr><tr class="list${book.trClass}">
-<td><%=intl._("Signing Key")%></td>
+<td><%=intl._t("Signing Key")%></td>
 <td><%=addr.getSigType()%></td>
 </tr><tr class="list${book.trClass}">
-<td><%=intl._("Certificate")%></td>
+<td><%=intl._t("Certificate")%></td>
 <td><%=addr.getCert()%></td>
 </tr><tr class="list${book.trClass}">
-<td><%=intl._("Added Date")%></td>
+<td><%=intl._t("Added Date")%></td>
 <td><%=addr.getAdded()%></td>
 </tr><tr class="list${book.trClass}">
-<td><%=intl._("Source")%></td>
+<td><%=intl._t("Source")%></td>
 <td><%=addr.getSource()%></td>
 </tr><tr class="list${book.trClass}">
-<td><%=intl._("Last Modified")%></td>
+<td><%=intl._t("Last Modified")%></td>
 <td><%=addr.getModded()%></td>
 </tr><tr class="list${book.trClass}">
-<td><%=intl._("Notes")%></td>
+<td><%=intl._t("Notes")%></td>
 <td><%=addr.getNotes()%></td>
 </tr><tr class="list${book.trClass}">
-<td><%=intl._("Destination")%></td>
+<td><%=intl._t("Destination")%></td>
 <td class="destinations"><textarea rows="1" style="height:3em;" wrap="off" cols="70" readonly="readonly" ><%=addr.getDestination()%></textarea></td>
 </tr></table>
 </div>
@@ -138,7 +138,7 @@
 <input type="hidden" name="begin" value="0">
 <input type="hidden" name="end" value="49">
 <input type="hidden" name="checked" value="<%=detail%>">
-<input class="delete" type="submit" name="action" value="<%=intl._("Delete Entry")%>" >
+<input class="delete" type="submit" name="action" value="<%=intl._t("Delete Entry")%>" >
 </p>
 </form>
 </div>

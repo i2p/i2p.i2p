@@ -77,7 +77,7 @@ public class FetchAndAdd extends Snark implements EepGet.StatusListener, Runnabl
         _log = ctx.logManager().getLog(FetchAndAdd.class);
         _mgr = mgr;
         _url = url;
-        _name = _("Download torrent file from {0}", url);
+        _name = _t("Download torrent file from {0}", url);
         _dataDir = dataDir;
         byte[] fake = null;
         try {
@@ -90,7 +90,7 @@ public class FetchAndAdd extends Snark implements EepGet.StatusListener, Runnabl
      *  Set off by startTorrent()
      */
     public void run() {
-        _mgr.addMessageNoEscape(_("Fetching {0}", urlify(_url)));
+        _mgr.addMessageNoEscape(_t("Fetching {0}", urlify(_url)));
         File file = get();
         if (!_isRunning)  // stopped?
             return;
@@ -100,7 +100,7 @@ public class FetchAndAdd extends Snark implements EepGet.StatusListener, Runnabl
             _mgr.deleteMagnet(this);
             add(file);
         } else {
-            _mgr.addMessageNoEscape(_("Torrent was not retrieved from {0}", urlify(_url)) +
+            _mgr.addMessageNoEscape(_t("Torrent was not retrieved from {0}", urlify(_url)) +
                             ((_failCause != null) ? (": " + DataHelper.stripHTML(_failCause)) : ""));
         }
         if (file != null)
@@ -127,7 +127,7 @@ public class FetchAndAdd extends Snark implements EepGet.StatusListener, Runnabl
         out.deleteOnExit();
 
         if (!_mgr.util().connected()) {
-            _mgr.addMessage(_("Opening the I2P tunnel"));
+            _mgr.addMessage(_t("Opening the I2P tunnel"));
             if (!_mgr.util().connect())
                 return null;
         }
@@ -154,7 +154,7 @@ public class FetchAndAdd extends Snark implements EepGet.StatusListener, Runnabl
      *  This Snark may then be deleted.
      */
     private void add(File file) {
-        _mgr.addMessageNoEscape(_("Torrent fetched from {0}", urlify(_url)));
+        _mgr.addMessageNoEscape(_t("Torrent fetched from {0}", urlify(_url)));
         FileInputStream in = null;
         try {
             in = new FileInputStream(file);
@@ -163,7 +163,7 @@ public class FetchAndAdd extends Snark implements EepGet.StatusListener, Runnabl
             try { in.close(); } catch (IOException ioe) {}
             Snark snark = _mgr.getTorrentByInfoHash(fileInfoHash);
             if (snark != null) {
-                _mgr.addMessage(_("Torrent with this info hash is already running: {0}", snark.getBaseName()));
+                _mgr.addMessage(_t("Torrent with this info hash is already running: {0}", snark.getBaseName()));
                 return;
             }
 
@@ -175,9 +175,9 @@ public class FetchAndAdd extends Snark implements EepGet.StatusListener, Runnabl
 
             if (torrentFile.exists()) {
                 if (_mgr.getTorrent(canonical) != null)
-                    _mgr.addMessage(_("Torrent already running: {0}", name));
+                    _mgr.addMessage(_t("Torrent already running: {0}", name));
                 else
-                    _mgr.addMessage(_("Torrent already in the queue: {0}", name));
+                    _mgr.addMessage(_t("Torrent already in the queue: {0}", name));
             } else {
                 // This may take a LONG time to create the storage.
                 _mgr.copyAndAddTorrent(file, canonical, _dataDir);
@@ -188,9 +188,9 @@ public class FetchAndAdd extends Snark implements EepGet.StatusListener, Runnabl
                     throw new IOException("Unknown error - check logs");
             }
         } catch (IOException ioe) {
-            _mgr.addMessageNoEscape(_("Torrent at {0} was not valid", urlify(_url)) + ": " + DataHelper.stripHTML(ioe.getMessage()));
+            _mgr.addMessageNoEscape(_t("Torrent at {0} was not valid", urlify(_url)) + ": " + DataHelper.stripHTML(ioe.getMessage()));
         } catch (OutOfMemoryError oom) {
-            _mgr.addMessageNoEscape(_("ERROR - Out of memory, cannot create torrent from {0}", urlify(_url)) + ": " + DataHelper.stripHTML(oom.getMessage()));
+            _mgr.addMessageNoEscape(_t("ERROR - Out of memory, cannot create torrent from {0}", urlify(_url)) + ": " + DataHelper.stripHTML(oom.getMessage()));
         } finally {
             try { if (in != null) in.close(); } catch (IOException ioe) {}
         }
@@ -345,11 +345,11 @@ public class FetchAndAdd extends Snark implements EepGet.StatusListener, Runnabl
 
     // End of EepGet status listeners
 
-    private String _(String s) {
+    private String _t(String s) {
         return _mgr.util().getString(s);
     }
 
-    private String _(String s, String o) {
+    private String _t(String s, String o) {
         return _mgr.util().getString(s, o);
     }
 

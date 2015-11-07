@@ -28,6 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package net.metanotion.io.block;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -64,7 +65,7 @@ import net.i2p.util.Log;
  * Pages are 1 KB and are numbered starting from 1.
  * e.g. the Metaindex skiplist is at offset 1024 bytes
  */
-public class BlockFile {
+public class BlockFile implements Closeable {
 	public static final int PAGESIZE = 1024;
 	public static final long OFFSET_MOUNTED = 20;
 	public final Log log = I2PAppContext.getGlobalContext().logManager().getLog(BlockFile.class);

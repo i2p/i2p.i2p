@@ -4,6 +4,7 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
 # Translators:
+# Anders Nilsson <locally@devode.se>, 2015
 # Calle Rundgren <samaire@samaire.net>, 2013
 # cacapo <handelsehorisont@gmail.com>, 2015
 # hottuna <i2p@robertfoss.se>, 2013
@@ -14,9 +15,9 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-03-29 14:30+0000\n"
-"PO-Revision-Date: 2015-04-09 17:35+0000\n"
-"Last-Translator: cacapo <handelsehorisont@gmail.com>\n"
-"Language-Team: Swedish (Sweden) (http://www.transifex.com/projects/p/I2P/language/sv_SE/)\n"
+"PO-Revision-Date: 2015-08-25 20:41+0000\n"
+"Last-Translator: Anders Nilsson <locally@devode.se>\n"
+"Language-Team: Swedish (Sweden) (http://www.transifex.com/otf/I2P/language/sv_SE/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -108,7 +109,7 @@ msgstr "Standard klient"
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:378
 msgid "HTTP/HTTPS client"
-msgstr "HTTP/HTTPS klient"
+msgstr "HTTP/HTTPS-klient"
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:379
 msgid "IRC client"
@@ -163,11 +164,11 @@ msgstr "Ogiltig adress"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:82
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:85
 msgid "Hidden Services Manager"
-msgstr "Manager Dolda Tjänster"
+msgstr "Hanterare för dolda tjänster"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:86
 msgid "Edit Client Tunnel"
-msgstr "Redigera Klienttunnel"
+msgstr "Redigera klienttunnel"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:114
 msgid "Edit proxy settings"
@@ -240,11 +241,11 @@ msgstr "Utgående proxier"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:245
 msgid "SSL Outproxies"
-msgstr "SSL Outproxies"
+msgstr "SSL-utproxies"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:251
 msgid "Use Outproxy Plugin"
-msgstr "Använd Outproxy Plugin"
+msgstr "Använd Outproxy-plugin"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:255
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:293
@@ -313,22 +314,22 @@ msgstr "Längd"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:318
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:316
 msgid "0 hop tunnel (no anonymity)"
-msgstr "0 hop tunnel (ingen anonymitet)"
+msgstr "0-hopp tunnel (ingen anonymitet)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:322
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:320
 msgid "1 hop tunnel (low anonymity)"
-msgstr "1 hop tunnel (låg anonymitet)"
+msgstr "1-hopp tunnel (låg anonymitet)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:326
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:324
 msgid "2 hop tunnel (medium anonymity)"
-msgstr "2 hot tunnel (medium anonymitet)"
+msgstr "2-hopp tunnel (medium anonymitet)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:330
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:328
 msgid "3 hop tunnel (high anonymity)"
-msgstr "3 hop tunnel (hög anonymitet)"
+msgstr "3-hopp tunnel (hög anonymitet)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:338
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:336
@@ -519,23 +520,23 @@ msgstr "Lokalt mål"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:524
 msgid "Local Base 32"
-msgstr "Lokal Base 32"
+msgstr "Lokal bas32"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:533
 msgid "Pass User-Agent header through"
-msgstr "Förmedla User-Agent header"
+msgstr "Skicka User-Agent-fältet vidare"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:539
 msgid "Pass Referer header through"
-msgstr "Förmedla Referer header"
+msgstr "Skicka Referer-fältet vidare"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:545
 msgid "Pass Accept headers through"
-msgstr "Förmedla Accept headers"
+msgstr "Skicka Accept-fältet vidare"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:551
 msgid "Allow SSL to I2P addresses"
-msgstr "Tillåt SSL till I2P adresser"
+msgstr "Tillåt SSL till I2P-adresser"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:562
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:618
@@ -591,7 +592,7 @@ msgstr "Spara"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:86
 msgid "Edit Hidden Service"
-msgstr "Redigera Dold Tjänst"
+msgstr "Redigera dold tjänst"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:114
 msgid "Edit server settings"
@@ -663,7 +664,7 @@ msgstr "Blockera tillgång via inproxies"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:497
 msgid "Unique Local Address per Client"
-msgstr "Unik Lokal Adress per Klient"
+msgstr "Unik lokal adress per klient"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:503
 msgid "Optimize for Multihoming"
@@ -745,7 +746,7 @@ msgstr "Starta Om Alla"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:126
 msgid "I2P Hidden Services"
-msgstr "I2P Dolda Tjänster"
+msgstr "I2P Dolda tjänster"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:130
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:151

@@ -151,7 +151,7 @@ public class TunnelHistory {
         add(buf, "lifetimeAgreedTo", _lifetimeAgreedTo.get(), "How many tunnels has the peer ever agreed to participate in?");
         add(buf, "lifetimeFailed", _lifetimeFailed.get(), "How many tunnels has the peer ever agreed to participate in that failed prematurely?");
         add(buf, "lifetimeRejected", _lifetimeRejected.get(), "How many tunnels has the peer ever refused to participate in?");
-        out.write(buf.toString().getBytes());
+        out.write(buf.toString().getBytes("UTF-8"));
         _rejectRate.store(out, "tunnelHistory.rejectRate");
         _failRate.store(out, "tunnelHistory.failRate");
     }

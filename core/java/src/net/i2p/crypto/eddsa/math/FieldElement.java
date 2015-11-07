@@ -1,11 +1,15 @@
 package net.i2p.crypto.eddsa.math;
 
+import java.io.Serializable;
+
 /**
  *
  * @since 0.9.15
  *
  */
-public abstract class FieldElement {
+public abstract class FieldElement implements Serializable {
+    private static final long serialVersionUID = 1239527465875676L;
+
     protected final Field f;
 
     public FieldElement(Field f) {

@@ -25,6 +25,7 @@ import java.util.Properties;
 
 import net.i2p.I2PAppContext;
 import net.i2p.client.naming.NamingServiceUpdater;
+import net.i2p.util.I2PAppThread;
 
 /**
  * A thread that waits five minutes, then runs the addressbook daemon.  
@@ -32,7 +33,7 @@ import net.i2p.client.naming.NamingServiceUpdater;
  * @author Ragnarok
  *
  */
-public class DaemonThread extends Thread implements NamingServiceUpdater {
+public class DaemonThread extends I2PAppThread implements NamingServiceUpdater {
 
     private String[] args;
 

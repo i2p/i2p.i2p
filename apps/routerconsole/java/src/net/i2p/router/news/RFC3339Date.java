@@ -29,7 +29,8 @@ public abstract class RFC3339Date {
 
     private static final String TZF1, TZF2;
     static {
-        if (SystemVersion.isJava7()) {
+        // Android's SimpleDateFormat doesn't support XXX at any API
+        if (SystemVersion.isJava7() && !SystemVersion.isAndroid()) {
             // ISO 8601
             // These handle timezones like +1000, +10, and +10:00
             TZF1 = "yyyy-MM-dd'T'HH:mm:ssXXX";
@@ -81,7 +82,7 @@ public abstract class RFC3339Date {
         // strip the ':' out of the time zone, if present,
         // for Java 6 where we don't have the 'X' format
         int len = s.length();
-        if (!SystemVersion.isJava7() &&
+        if ((!SystemVersion.isJava7() || SystemVersion.isAndroid()) &&
             s.charAt(len - 1) != 'Z' &&
             s.charAt(len - 3) == ':' &&
             (s.charAt(len - 6) == '+' || s.charAt(len - 6) == '-')) {

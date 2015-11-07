@@ -28,6 +28,7 @@ class Connection {
     private final I2PAppContext _context;
     private final Log _log;
     private final ConnectionManager _connectionManager;
+    private final I2PSession _session;
     private Destination _remotePeer;
     private final AtomicLong _sendStreamId = new AtomicLong();
     private final AtomicLong _receiveStreamId = new AtomicLong();
@@ -112,12 +113,14 @@ class Connection {
     /**
      *  @param opts may be null
      */
-    public Connection(I2PAppContext ctx, ConnectionManager manager, SchedulerChooser chooser,
+    public Connection(I2PAppContext ctx, ConnectionManager manager,
+                      I2PSession session, SchedulerChooser chooser,
                       SimpleTimer2 timer,
                       PacketQueue queue, ConnectionPacketHandler handler, ConnectionOptions opts,
                       boolean isInbound) {
         _context = ctx;
         _connectionManager = manager;
+        _session = session;
         _chooser = chooser;
         _outboundQueue = queue;
         _handler = handler;
@@ -310,13 +313,13 @@ class Connection {
         // Unconditionally set
         _resetSentOn.set(now);
         if ( (_remotePeer == null) || (_sendStreamId.get() <= 0) ) return;
-        PacketLocal reply = new PacketLocal(_context, _remotePeer);
+        PacketLocal reply = new PacketLocal(_context, _remotePeer, this);
         reply.setFlag(Packet.FLAG_RESET);
         reply.setFlag(Packet.FLAG_SIGNATURE_INCLUDED);
         reply.setSendStreamId(_sendStreamId.get());
         reply.setReceiveStreamId(_receiveStreamId.get());
         // TODO remove this someday, as of 0.9.20 we do not require it
-        reply.setOptionalFrom(_connectionManager.getSession().getMyDestination());
+        reply.setOptionalFrom();
         reply.setLocalPort(_localPort);
         reply.setRemotePort(_remotePort);
         // this just sends the packet - no retries or whatnot
@@ -790,7 +793,7 @@ class Connection {
     private boolean scheduleDisconnectEvent() {
         if (!_disconnectScheduledOn.compareAndSet(0, _context.clock().now()))
             return false;
-        _context.simpleTimer2().addEvent(new DisconnectEvent(), DISCONNECT_TIMEOUT);
+        schedule(new DisconnectEvent(), DISCONNECT_TIMEOUT);
         return true;
     }
 
@@ -803,6 +806,24 @@ class Connection {
         public void timeReached() {
             disconnectComplete();
         }
+    }
+    
+    /**
+     *  Called from SchedulerImpl
+     *
+     *  @since 0.9.23 moved here so we can use our timer
+     */
+    public void scheduleConnectionEvent(long msToWait) {
+        schedule(_connectionEvent, msToWait);
+    }
+    
+    /**
+     *  Schedule something on our timer.
+     *
+     *  @since 0.9.23
+     */
+    public void schedule(SimpleTimer.TimedEvent event, long msToWait) {
+        _timer.addEvent(event, msToWait);
     }
     
     private boolean _remotePeerSet = false;
@@ -874,7 +895,10 @@ class Connection {
      */
     public void setOptions(ConnectionOptions opts) { _options = opts; }
         
-    public I2PSession getSession() { return _connectionManager.getSession(); }
+    /** @since 0.9.21 */
+    public ConnectionManager getConnectionManager() { return _connectionManager; }
+
+    public I2PSession getSession() { return _session; }
     public I2PSocketFull getSocket() { return _socket; }
     public void setSocket(I2PSocketFull socket) { _socket = socket; }
     
@@ -1248,8 +1272,6 @@ class Connection {
         return buf.toString();
     }
 
-    public SimpleTimer.TimedEvent getConnectionEvent() { return _connectionEvent; }
-    
     /**
      * fired to reschedule event notification
      */
@@ -1289,7 +1311,9 @@ class Connection {
         }
         
         public long getNextSendTime() { return _nextSend; }
+
         public void timeReached() { retransmit(); }
+
         /**
          * Retransmit the packet if we need to.  
          *
@@ -1301,7 +1325,7 @@ class Connection {
          *
          * @return true if the packet was sent, false if it was not
          */
-        public boolean retransmit() {
+        private boolean retransmit() {
             if (_packet.getAckTime() > 0) 
                 return false;
             

@@ -7,6 +7,7 @@ import java.util.Properties;
 import java.util.Set;
 
 import net.i2p.data.DataHelper;
+import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 
 /**
  * Handler to deal with form submissions from the advanced config form and act
@@ -58,7 +59,7 @@ public class ConfigAdvancedHandler extends FormHandler {
             } catch (IOException ioe) {
                 _log.error("Config error", ioe);
                 addFormError(ioe.toString());
-                addFormError(_("Error updating the configuration - please see the error logs"));
+                addFormError(_t("Error updating the configuration - please see the error logs"));
                 return;
             }
 
@@ -68,9 +69,9 @@ public class ConfigAdvancedHandler extends FormHandler {
 
             boolean saved = _context.router().saveConfig(props, unsetKeys);
             if (saved) 
-                addFormNotice(_("Configuration saved successfully"));
+                addFormNotice(_t("Configuration saved successfully"));
             else
-                addFormError(_("Error saving the configuration (applied but not saved) - please see the error logs"));
+                addFormError(_t("Error saving the configuration (applied but not saved) - please see the error logs"));
             
             //if (_forceRestart) {
             //    addFormNotice("Performing a soft restart");
@@ -83,9 +84,17 @@ public class ConfigAdvancedHandler extends FormHandler {
     /** @since 0.9.20 */
     private void saveFF() {
         boolean saved = _context.router().saveConfig(ConfigAdvancedHelper.PROP_FLOODFILL_PARTICIPANT, _ff);
+        if (_ff.equals("false") || _ff.equals("true")) {
+            FloodfillNetworkDatabaseFacade fndf = (FloodfillNetworkDatabaseFacade) _context.netDb();
+            boolean wasFF = fndf.floodfillEnabled();
+            boolean isFF = _ff.equals("true");
+            fndf.setFloodfillEnabled(isFF);
+            if (wasFF != isFF)
+                _context.router().rebuildRouterInfo();
+        }
         if (saved) 
-            addFormNotice(_("Configuration saved successfully"));
+            addFormNotice(_t("Configuration saved successfully"));
         else
-            addFormError(_("Error saving the configuration (applied but not saved) - please see the error logs"));
+            addFormError(_t("Error saving the configuration (applied but not saved) - please see the error logs"));
     }
 }

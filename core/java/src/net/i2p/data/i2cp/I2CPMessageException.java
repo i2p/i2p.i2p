@@ -12,7 +12,7 @@ package net.i2p.data.i2cp;
 import net.i2p.I2PException;
 
 /**
- * Represent an error serializing or deserializing an APIMessage
+ * Represent an error serializing or deserializing a message
  *
  * @author jrandom
  */

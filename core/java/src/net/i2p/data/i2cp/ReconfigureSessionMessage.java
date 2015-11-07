@@ -33,6 +33,16 @@ public class ReconfigureSessionMessage extends I2CPMessageImpl {
         return _sessionId;
     }
 
+    /**
+     * Return the SessionId for this message.
+     *
+     * @since 0.9.21
+     */
+    @Override
+    public SessionId sessionId() {
+        return _sessionId;
+    }
+
     public void setSessionId(SessionId id) {
         _sessionId = id;
     }

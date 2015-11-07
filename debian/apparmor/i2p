@@ -5,10 +5,11 @@
   #include <abstractions/fonts>
   #include <abstractions/nameservice>
   #include <abstractions/ssl_certs>
-  #include <abstractions/user-tmp>
 
   network inet stream,
+  network inet dgram,
   network inet6 stream,
+  network inet6 dgram,
 
   # Needed by Java
   @{PROC}                                                 r,
@@ -51,11 +52,20 @@
   /usr/share/java/wrapper*.jar                            r,
 
   # 'm' is needed by the I2P-Bote plugin
-  /{,var/}tmp/                                            rwm,
-  owner /{,var/}tmp/**                                    rwklm,
+  /{,lib/live/mount/overlay/}tmp/                         rwm,
+  owner /{,lib/live/mount/overlay/}tmp/hsperfdata_i2psvc/ rwk,
+  owner /{,lib/live/mount/overlay/}tmp/hsperfdata_i2psvc/** rw,
+  owner /{,lib/live/mount/overlay/}tmp/wrapper*           rwk,
+  owner /{,lib/live/mount/overlay/}tmp/wrapper*/**        rw,
+  # Scrypt used by I2P-Bote
+  owner /{,lib/live/mount/overlay/}tmp/scrypt*            rwk,
+  owner /{,lib/live/mount/overlay/}tmp/scrypt*/**         rw,
+  owner /{,lib/live/mount/overlay/}tmp/i2p-daemon/        rwm,
+  owner /{,lib/live/mount/overlay/}tmp/i2p-daemon/**      rwklm,
 
   # Prevent spamming the logs
   deny /dev/tty                                           rw,
+  deny /{,lib/live/mount/overlay/}var/tmp/                r,
   deny @{PROC}/[0-9]*/fd/                                 r,
   deny /usr/sbin/                                         r,
   deny /var/cache/fontconfig/                             wk,

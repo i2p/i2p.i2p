@@ -4,15 +4,17 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
 # Translators:
+# asteryx <asteryx82@gmail.com>, 2015
 # LinuxChata, 2014
+# Maus <ru-ko@ukr.net>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-10-14 13:33+0000\n"
-"PO-Revision-Date: 2014-07-18 21:09+0000\n"
-"Last-Translator: LinuxChata\n"
-"Language-Team: Ukrainian (Ukraine) (http://www.transifex.com/projects/p/I2P/language/uk_UA/)\n"
+"POT-Creation-Date: 2015-07-17 01:08+0000\n"
+"PO-Revision-Date: 2015-08-07 16:31+0000\n"
+"Last-Translator: Denis Lysenko <gribua@gmail.com>\n"
+"Language-Team: Ukrainian (Ukraine) (http://www.transifex.com/otf/I2P/language/uk_UA/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -51,6 +53,9 @@ msgstr "Нідерландські Антильські острови"
 
 msgid "Angola"
 msgstr "Ангола"
+
+msgid "Asia/Pacific Region"
+msgstr "Азія / Тихоокеанський регіон"
 
 msgid "Antarctica"
 msgstr "Антарктика"
@@ -103,6 +108,9 @@ msgstr "Бурунді"
 msgid "Benin"
 msgstr "Бенін"
 
+msgid "Saint Barthélemy"
+msgstr "сен- Бартельмі"
+
 msgid "Bermuda"
 msgstr "Бермуда"
 
@@ -111,6 +119,9 @@ msgstr "Бруней Даруссалам"
 
 msgid "Bolivia"
 msgstr "Болівія"
+
+msgid "Bonaire"
+msgstr "Бонайре"
 
 msgid "Brazil"
 msgstr "Бразилія"
@@ -139,14 +150,11 @@ msgstr "Канада"
 msgid "Cocos (Keeling) Islands"
 msgstr "Кокосові (Кілінгові) острови"
 
-msgid "The Democratic Republic of the Congo"
-msgstr "Демократична Республіка Конго"
+msgid "Congo"
+msgstr "Конго"
 
 msgid "Central African Republic"
 msgstr "Центральна Африканська Республіка"
-
-msgid "Congo"
-msgstr "Конго"
 
 msgid "Switzerland"
 msgstr "Швейцарія"
@@ -244,8 +252,8 @@ msgstr "Фіджі"
 msgid "Falkland Islands (Malvinas)"
 msgstr "Фолклендські острови (Мальвінські)"
 
-msgid "Federated States of Micronesia"
-msgstr "Федеративні Штати Мікронезії"
+msgid "Micronesia"
+msgstr "Мікронезія"
 
 msgid "Faroe Islands"
 msgstr "Фарерські острови"
@@ -346,8 +354,8 @@ msgstr "Британська територія в Індійському оке
 msgid "Iraq"
 msgstr "Ірак"
 
-msgid "Islamic Republic of Iran"
-msgstr "Ісламська Республіка Іран"
+msgid "Iran"
+msgstr "Іран"
 
 msgid "Iceland"
 msgstr "Ісландія"
@@ -385,8 +393,8 @@ msgstr "Комори"
 msgid "Saint Kitts and Nevis"
 msgstr "Федерація Сент-Кіттс і Невіс"
 
-msgid "The Democratic People's Republic of Korea"
-msgstr "Корейська Народно-Демократична Республіка"
+msgid "North Korea"
+msgstr "КНДР"
 
 msgid "Republic of Korea"
 msgstr "Республіка Корея"
@@ -430,7 +438,7 @@ msgstr "Люксембург"
 msgid "Latvia"
 msgstr "Латвія"
 
-msgid "Libyan Arab Jamahiriya"
+msgid "Libya"
 msgstr "Лівія"
 
 msgid "Morocco"
@@ -439,8 +447,8 @@ msgstr "Марокко"
 msgid "Monaco"
 msgstr "Монако"
 
-msgid "Republic of Moldova"
-msgstr "Республіка Молдова"
+msgid "Moldova"
+msgstr "Молдова"
 
 msgid "Montenegro"
 msgstr "Чорногорія "
@@ -454,7 +462,7 @@ msgstr "Мадагаскар"
 msgid "Marshall Islands"
 msgstr "Маршаллові острови"
 
-msgid "The Former Yugoslav Republic of Macedonia"
+msgid "Macedonia"
 msgstr "Македонія"
 
 msgid "Mali"
@@ -466,8 +474,8 @@ msgstr "М'янма"
 msgid "Mongolia"
 msgstr "Монголія"
 
-msgid "Macao"
-msgstr "Аоминь"
+msgid "Macau"
+msgstr "Аоминь або Макао"
 
 msgid "Northern Mariana Islands"
 msgstr "Північні Маріанські острови"
@@ -646,14 +654,20 @@ msgstr "Сомалі"
 msgid "Suriname"
 msgstr "Сурінам"
 
+msgid "South Sudan"
+msgstr "Південний Судан"
+
 msgid "Sao Tome and Principe"
 msgstr "Сан-Томе і Принсіпі"
 
 msgid "El Salvador"
 msgstr "Ель Сальвадор"
 
-msgid "Syrian Arab Republic"
-msgstr "Сирійська Арабська республіка"
+msgid "Sint Maarten"
+msgstr "Сінт-Мартен"
+
+msgid "Syria"
+msgstr "Сірія"
 
 msgid "Swaziland"
 msgstr "Свазиленд"
@@ -703,8 +717,8 @@ msgstr "Тувалу"
 msgid "Taiwan"
 msgstr "Тайвань"
 
-msgid "United Republic of Tanzania"
-msgstr "Об'єднана Республіка Танзанія"
+msgid "Tanzania"
+msgstr "Танзанія"
 
 msgid "Ukraine"
 msgstr "Україна"
@@ -724,8 +738,8 @@ msgstr "Уругвай"
 msgid "Uzbekistan"
 msgstr "Узбекістан"
 
-msgid "Holy See (Vatican City State)"
-msgstr "Святий Престол (Ватикан)"
+msgid "Vatican"
+msgstr "Ватикан"
 
 msgid "Saint Vincent and the Grenadines"
 msgstr "Сент Вінсент і Ґренадіни"
@@ -736,7 +750,7 @@ msgstr "Венесуела"
 msgid "Virgin Islands"
 msgstr "Віргінські острови"
 
-msgid "Viet Nam"
+msgid "Vietnam"
 msgstr "В'єтнам"
 
 msgid "Vanuatu"

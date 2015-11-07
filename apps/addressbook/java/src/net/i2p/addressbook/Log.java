@@ -23,8 +23,9 @@ package net.i2p.addressbook;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.Date;
 
 /**
@@ -56,8 +57,8 @@ class Log {
     public void append(String entry) {
         BufferedWriter bw = null;
         try {
-            bw = new BufferedWriter(new FileWriter(this.file,
-                    true));
+            bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(this.file,
+                    true), "UTF-8"));
             String timestamp = new Date().toString();
             bw.write(timestamp + " -- " + entry);
             bw.newLine();

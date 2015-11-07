@@ -568,6 +568,27 @@ class MessageInputStream extends InputStream {
     @Override
     public void close() {
         synchronized (_dataLock) {
+            if (_log.shouldLog(Log.DEBUG)) {
+                StringBuilder buf = new StringBuilder(128);
+                buf.append("close(), ready bytes: ");
+                long available = 0;
+                for (int i = 0; i < _readyDataBlocks.size(); i++) 
+                    available += _readyDataBlocks.get(i).getValid();
+                available -= _readyDataBlockIndex;
+                buf.append(available);
+                buf.append(" blocks: ").append(_readyDataBlocks.size());
+                buf.append(" not ready blocks: ");
+                long notAvailable = 0;
+                for (Long id : _notYetReadyBlocks.keySet()) {
+                    ByteArray ba = _notYetReadyBlocks.get(id);
+                    buf.append(id).append(" ");
+                    if (ba != null)
+                        notAvailable += ba.getValid();
+                }
+                buf.append("not ready bytes: ").append(notAvailable);
+                buf.append(" highest ready block: ").append(_highestReadyBlockId);
+                _log.debug(buf.toString());
+            }
             //while (_readyDataBlocks.size() > 0)
             //    _cache.release((ByteArray)_readyDataBlocks.remove(0));
             _readyDataBlocks.clear();

@@ -274,7 +274,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         //_ds = new TransientDataStore();
 //        _exploreKeys = new HashSet(64);
         _dbDir = dbDir;
-        _negativeCache = new NegativeLookupCache();
+        _negativeCache = new NegativeLookupCache(_context);
         
         createHandlers();
         
@@ -646,7 +646,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         try {
             store(h, localLeaseSet);
         } catch (IllegalArgumentException iae) {
-            _log.error("wtf, locally published leaseSet is not valid?", iae);
+            _log.error("locally published leaseSet is not valid?", iae);
             throw iae;
         }
         if (!_context.clientManager().shouldPublishLeaseSet(h))

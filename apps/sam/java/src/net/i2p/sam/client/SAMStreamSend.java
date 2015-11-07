@@ -180,7 +180,7 @@ public class SAMStreamSend {
                 byte dest[] = new byte[1024];
                 int read = DataHelper.read(fin, dest);
 
-                _remoteDestination = new String(dest, 0, read);
+                _remoteDestination = DataHelper.getUTF8(dest, 0, read);
                 synchronized (_remotePeers) {
                     _connectionId = _remotePeers.size() + 1;
                     _remotePeers.put(Integer.valueOf(_connectionId), Sender.this);

@@ -1,5 +1,10 @@
 package net.i2p.stat;
 
+import java.io.IOException;
+import java.io.OutputStream;
+
+import net.i2p.data.DataHelper;
+
 /** coordinate an event frequency over various periods */
 public class FrequencyStat {
     /** unique name of the statistic */
@@ -91,6 +96,35 @@ public class FrequencyStat {
     public boolean equals(Object obj) {
         if ((obj == null) || !(obj instanceof FrequencyStat)) return false;
         return _statName.equals(((FrequencyStat)obj)._statName);
+    }
+    
+    private final static String NL = System.getProperty("line.separator");
+    
+    /**
+     * Serializes this FrequencyStat to the provided OutputStream
+     * @param out to write to
+     * @param prefix to prepend to the stat
+     * @throws IOException if something goes wrong
+     * @since 0.9.23
+     */
+    public void store(OutputStream out, String prefix) throws IOException {
+        StringBuilder buf = new StringBuilder(1024);
+        buf.append(NL);
+        buf.append("################################################################################").append(NL);
+        buf.append("# Frequency: ").append(_groupName).append(": ").append(_statName).append(NL);
+        buf.append("# ").append(_description).append(NL);
+        buf.append("# ").append(NL).append(NL);
+        out.write(buf.toString().getBytes("UTF-8"));
+        buf.setLength(0);
+        for (Frequency r: _frequencies){
+            buf.append("#######").append(NL);
+            buf.append("# Period : ").append(DataHelper.formatDuration(r.getPeriod())).append(" for rate ")
+                .append(_groupName).append(" - ").append(_statName).append(NL);
+            buf.append(NL);
+            r.store(buf);
+            out.write(buf.toString().getBytes("UTF-8"));
+            buf.setLength(0);
+        }
     }
 
 }

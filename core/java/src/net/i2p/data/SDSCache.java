@@ -46,7 +46,6 @@ import net.i2p.util.SystemVersion;
 public class SDSCache<V extends SimpleDataStructure> {
     //private static final Log _log = I2PAppContext.getGlobalContext().logManager().getLog(SDSCache.class);
 
-    private static final Class[] conArg = new Class[] { byte[].class };
     private static final double MIN_FACTOR = 0.20;
     private static final double MAX_FACTOR = 5.0;
     private static final double FACTOR;
@@ -74,7 +73,7 @@ public class SDSCache<V extends SimpleDataStructure> {
         _cache = new LHMCache<Integer, WeakReference<V>>(size);
         _datalen = len;
         try {
-            _rvCon = rvClass.getConstructor(conArg);
+            _rvCon = rvClass.getConstructor(byte[].class);
         } catch (NoSuchMethodException e) {
             throw new RuntimeException("SDSCache init error", e);
         }

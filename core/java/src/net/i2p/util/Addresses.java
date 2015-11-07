@@ -15,6 +15,8 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import org.apache.http.conn.util.InetAddressUtils;
+
 import net.i2p.I2PAppContext;
 
 /**
@@ -229,10 +231,10 @@ public abstract class Addresses {
         I2PAppContext ctx = I2PAppContext.getCurrentContext();
         if (ctx != null && ctx.isRouterContext()) {
             long maxMemory = SystemVersion.getMaxMemory();
-            long min = 128;
+            long min = 256;
             long max = 4096;
-            // 512 nominal for 128 MB
-            size = (int) Math.max(min, Math.min(max, 1 + (maxMemory / (256*1024))));
+            // 1024 nominal for 128 MB
+            size = (int) Math.max(min, Math.min(max, 1 + (maxMemory / (128*1024))));
         } else {
             size = 32;
         }
@@ -260,12 +262,9 @@ public abstract class Addresses {
         }
         if (rv == null) {
             try {
-                boolean isIPv4 = host.replaceAll("[0-9\\.]", "").length() == 0;
-                if (isIPv4 && host.replaceAll("[0-9]", "").length() != 3)
-                    return null;
                 rv = InetAddress.getByName(host).getAddress();
-                if (isIPv4 ||
-                    host.replaceAll("[0-9a-fA-F:]", "").length() == 0) {
+                if (InetAddressUtils.isIPv4Address(host) ||
+                    InetAddressUtils.isIPv6Address(host)) {
                     synchronized (_IPAddress) {
                         _IPAddress.put(host, rv);
                     }

@@ -9,13 +9,13 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import net.i2p.I2PAppContext;
 import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.router.RouterIdentity;
 import net.i2p.data.SessionKey;
 import net.i2p.data.Signature;
+import net.i2p.router.RouterContext;
 import net.i2p.router.transport.TransportUtil;
 import net.i2p.util.Addresses;
 import net.i2p.util.Log;
@@ -99,7 +99,7 @@ around briefly, to address packet loss and reordering.</p>
  *
  */
 class PacketBuilder {
-    private final I2PAppContext _context;
+    private final RouterContext _context;
     private final Log _log;
     private final UDPTransport _transport;
     
@@ -169,7 +169,7 @@ class PacketBuilder {
     /**
      *  @param transport may be null for unit testing only
      */
-    public PacketBuilder(I2PAppContext ctx, UDPTransport transport) {
+    public PacketBuilder(RouterContext ctx, UDPTransport transport) {
         _context = ctx;
         _transport = transport;
         _log = ctx.logManager().getLog(PacketBuilder.class);

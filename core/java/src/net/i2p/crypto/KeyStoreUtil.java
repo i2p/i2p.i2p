@@ -501,6 +501,7 @@ public class KeyStoreUtil {
         l.log(level, msg, t);
     }
 
+/****
     public static void main(String[] args) {
         try {
             if (args.length > 0) {
@@ -521,4 +522,5 @@ public class KeyStoreUtil {
             e.printStackTrace();
         }
     }
+****/
 }

@@ -184,6 +184,40 @@ public class JaxpParser extends Parser
 			}
 			return rv;
 		}
+
+		/** @since 0.9.22 */
+		@Override
+		public int read(byte[] b) throws IOException {
+			return this.read(b, 0, b.length);
+		}
+
+		/** @since 0.9.22 */
+		@Override
+		public int read(byte[] b, int off, int len) throws IOException {
+			if (b == null) {
+				throw new NullPointerException();
+			} else if (off < 0 || len < 0 || len > b.length - off) {
+				throw new IndexOutOfBoundsException();
+			} else if (len == 0) {
+				return 0;
+			}
+
+			int rv = this.read();
+			if (-1 == rv) {
+				return -1;
+			}
+
+			int i = 1;
+			b[off] = (byte) rv;
+			for (; i < len; i++) {
+				rv = this.read();
+				if (-1 == rv) {
+					break;
+				}
+				b[off + i] = (byte) rv;
+			}
+			return i;
+		}
 	}
 
 	/**

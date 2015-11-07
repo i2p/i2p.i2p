@@ -18,10 +18,12 @@ package net.i2p.BOB;
 import java.net.ConnectException;
 import java.net.SocketTimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
+
 import net.i2p.I2PException;
 import net.i2p.client.streaming.I2PServerSocket;
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.client.streaming.I2PSocketManager;
+import net.i2p.util.I2PAppThread;
 
 /**
  * Listen on I2P and connect to TCP
@@ -30,16 +32,15 @@ import net.i2p.client.streaming.I2PSocketManager;
  */
 public class I2Plistener implements Runnable {
 
-	private NamedDB info,  database;
-	private Logger _log;
-	public I2PSocketManager socketManager;
-	public I2PServerSocket serverSocket;
-	private AtomicBoolean lives;
+	private final NamedDB info,  database;
+	private final Logger _log;
+	private final I2PServerSocket serverSocket;
+	private final AtomicBoolean lives;
 
 	/**
 	 * Constructor
 	 * @param SS
-	 * @param S
+	 * @param S unused
 	 * @param info
 	 * @param database
 	 * @param _log
@@ -48,7 +49,6 @@ public class I2Plistener implements Runnable {
 		this.database = database;
 		this.info = info;
 		this._log = _log;
-		this.socketManager = S;
 		this.serverSocket = SS;
 		this.lives = lives;
 	}
@@ -79,7 +79,7 @@ public class I2Plistener implements Runnable {
 						conn++;
 						// toss the connection to a new thread.
 						I2PtoTCP conn_c = new I2PtoTCP(sessSocket, info, database, lives);
-						Thread t = new Thread(conn_c, Thread.currentThread().getName() + " I2PtoTCP " + conn);
+						Thread t = new I2PAppThread(conn_c, Thread.currentThread().getName() + " I2PtoTCP " + conn);
 						t.start();
 					}
 

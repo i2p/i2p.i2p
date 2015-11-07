@@ -373,9 +373,9 @@ public abstract class TransportImpl implements Transport {
                           + "): " + allTime + "ms/" + sendTime + "ms after failing on: "
                           + msg.getFailedTransports() + " and succeeding on " + getStyle());
             if ( (allTime > 60*1000) && (sendSuccessful) ) {
-                // WTF!!@#
+                // VERY slow
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn("WTF, more than a minute slow? " + msg.getMessageType()
+                    _log.warn("Severe latency? More than a minute slow? " + msg.getMessageType()
                               + " of id " + msg.getMessageId() + " (send begin on "
                               + new Date(msg.getSendBegin()) + " / created on "
                               + new Date(msg.getCreated()) + "): " + msg);
@@ -497,7 +497,7 @@ public abstract class TransportImpl implements Transport {
             _listener.messageReceived(inMsg, remoteIdent, remoteIdentHash);
         } else {
             if (_log.shouldLog(Log.ERROR))
-                _log.error("WTF! Null listener! this = " + toString(), new Exception("Null listener"));
+                _log.error("Null listener! this = " + toString(), new Exception("Null listener"));
         }
     }
 
@@ -983,7 +983,7 @@ public abstract class TransportImpl implements Transport {
      *  Translate
      *  @since 0.9.8 moved from transports
      */
-    protected String _(String s) {
+    protected String _t(String s) {
         return Translate.getString(s, _context, BUNDLE_NAME);
     }
 
@@ -991,7 +991,7 @@ public abstract class TransportImpl implements Transport {
      *  Translate
      *  @since 0.9.8 moved from transports
      */
-    protected String _(String s, Object o) {
+    protected String _t(String s, Object o) {
         return Translate.getString(s, o, _context, BUNDLE_NAME);
     }
 

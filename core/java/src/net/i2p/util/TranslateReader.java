@@ -351,7 +351,7 @@ public class TranslateReader extends FilterReader {
         public void tag(List<String> args) {
             if (args.size() <= 0)
                 return;
-            _out.print("\t_(");
+            _out.print("\t_t(");
             for (int i = 0; i < args.size(); i++) {
                 if (i > 0)
                     _out.print(", ");
@@ -373,6 +373,9 @@ public class TranslateReader extends FilterReader {
         }
     }
 
+    /**
+     *  Do not comment out, used to extract tags as a part of the build process.
+     */
     public static void main(String[] args) {
         try {
             if (args.length >= 2 && args[0].equals("test"))

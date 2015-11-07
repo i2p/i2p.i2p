@@ -110,7 +110,7 @@ public class ResettableGZIPInputStream extends InflaterInputStream {
             //if (_lookaheadStream.getEOFReached()) {
             if (inf.finished()) {
                 verifyFooter();
-                inf.reset(); // so it doesn't bitch about missing data...
+                inf.reset(); // so it doesn't complain about missing data...
                 _complete = true;
             }
             return read;

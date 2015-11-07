@@ -228,7 +228,7 @@ public class DBHistory {
         add(buf, "unpromptedDbStoreOld", _unpromptedDbStoreOld, "How times have they sent us something we didn't ask for but have seen before?");
         add(buf, "lastLookupReceived", _lastLookupReceived, "When was the last time they send us a lookup?  (milliseconds since the epoch)");
         add(buf, "avgDelayBetweenLookupsReceived", _avgDelayBetweenLookupsReceived, "How long is it typically between each db lookup they send us?  (in milliseconds)");
-        out.write(buf.toString().getBytes());
+        out.write(buf.toString().getBytes("UTF-8"));
         _failedLookupRate.store(out, "dbHistory.failedLookupRate");
         _invalidReplyRate.store(out, "dbHistory.invalidReplyRate");
     }

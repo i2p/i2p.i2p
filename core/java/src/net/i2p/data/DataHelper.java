@@ -1548,7 +1548,7 @@ public class DataHelper {
             // years
             t = ngettext("1 year", "{0} years", (int) (ms / (365L * 24 * 60 * 60 * 1000)));
         } else {
-            return _("n/a");
+            return _t("n/a");
         }
         // Replace minus sign to work around
         // bug in Chrome (and IE?), line breaks at the minus sign
@@ -1595,7 +1595,7 @@ public class DataHelper {
             // years
             t = ngettext("1 year", "{0} years", (int) (ms / (365L * 24 * 60 * 60 * 1000)));
         } else {
-            return _("n/a");
+            return _t("n/a");
         }
         if (ms < 0)
             t = t.replace("-", "&minus;");
@@ -1604,7 +1604,7 @@ public class DataHelper {
     
     private static final String BUNDLE_NAME = "net.i2p.router.web.messages";
 
-    private static String _(String key) {
+    private static String _t(String key) {
         return Translate.getString(key, I2PAppContext.getGlobalContext(), BUNDLE_NAME);
     }
 
@@ -1695,7 +1695,7 @@ public class DataHelper {
         if (unescaped == null) return null;
         String escaped = unescaped;
         for (int i = 0; i < escapeChars.length; i++) {
-            escaped = escaped.replaceAll(escapeChars[i], escapeCodes[i]);
+            escaped = escaped.replace(escapeChars[i], escapeCodes[i]);
         }
         return escaped;
     }
@@ -1710,7 +1710,7 @@ public class DataHelper {
         if (escaped == null) return null;
         String unescaped = escaped;
         for (int i = 0; i < escapeChars.length; i++) {
-            unescaped = unescaped.replaceAll(escapeCodes[i], escapeChars[i]);
+            unescaped = unescaped.replace(escapeCodes[i], escapeChars[i]);
         }
         return unescaped;
     }
@@ -1866,7 +1866,6 @@ public class DataHelper {
      *
      *  @return null if orig is null
      *  @throws RuntimeException
-     *  @deprecated unused
      */
     public static String getUTF8(byte orig[], int offset, int len) {
         if (orig == null) return null;

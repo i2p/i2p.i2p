@@ -21,32 +21,32 @@ public class ConfigReseedHandler extends FormHandler {
     @Override
     protected void processForm() {
 
-        if (_action.equals(_("Save changes and reseed now"))) {
+        if (_action.equals(_t("Save changes and reseed now"))) {
             saveChanges();
             if (!_context.netDb().reseedChecker().requestReseed()) {
-                addFormError(_("Reseeding is already in progress"));
+                addFormError(_t("Reseeding is already in progress"));
             } else {
                 // skip the nonce checking in ReseedHandler
-                addFormNotice(_("Starting reseed process"));
+                addFormNotice(_t("Starting reseed process"));
             }
-        } else if (_action.equals(_("Reseed from URL"))) {
+        } else if (_action.equals(_t("Reseed from URL"))) {
             String val = getJettyString("url");
             if (val != null)
                 val = val.trim();
             if (val == null || val.length() == 0) {
-                addFormError(_("You must enter a URL"));
+                addFormError(_t("You must enter a URL"));
                 return;
             }
             URL url;
             try {
                 url = new URL(val);
             } catch (MalformedURLException mue) {
-                addFormError(_("Bad URL {0}", val));
+                addFormError(_t("Bad URL {0}", val));
                 return;
             }
             try {
                 if (!_context.netDb().reseedChecker().requestReseed(url)) {
-                    addFormError(_("Reseeding is already in progress"));
+                    addFormError(_t("Reseeding is already in progress"));
                 } else {
                     // wait a while for completion but not forever
                     for (int i = 0; i < 40; i++) {
@@ -63,41 +63,50 @@ public class ConfigReseedHandler extends FormHandler {
                     } else if (status.length() > 0) {
                         addFormNoticeNoEscape(status);
                     } else if (_context.netDb().reseedChecker().inProgress()) {
-                        addFormNotice(_("Reseed in progress, check summary bar for status"));
+                        addFormNotice(_t("Reseed in progress, check summary bar for status"));
                     } else {
-                        addFormNotice(_("Reseed complete, check summary bar for status"));
+                        addFormNotice(_t("Reseed complete, check summary bar for status"));
                     }
                 }
             } catch (IllegalArgumentException iae) {
-                addFormError(_("Bad URL {0}", val) + " - " + iae.getMessage());
+                addFormError(_t("Bad URL {0}", val) + " - " + iae.getMessage());
             }
-        } else if (_action.equals(_("Reseed from file"))) {
+        } else if (_action.equals(_t("Reseed from file"))) {
             InputStream in = _requestWrapper.getInputStream("file");
             try {
                 // non-null but zero bytes if no file entered, don't know why
                 if (in == null || in.available() <= 0) {
-                    addFormError(_("You must enter a file"));
+                    addFormError(_t("You must enter a file"));
                     return;
                 }
                 int count = _context.netDb().reseedChecker().requestReseed(in);
                 if (count <= 0) {
-                    addFormError(_("Reseed from file failed"));
+                    addFormError(_t("Reseed from file failed"));
                 } else {
                     addFormNotice(ngettext("Reseed successful, loaded {0} router info from file",
                                            "Reseed successful, loaded {0} router infos from file",
                                            count));
                 }
             } catch (IOException ioe) {
-                addFormError(_("Reseed from file failed") + " - " + ioe);
+                addFormError(_t("Reseed from file failed") + " - " + ioe);
             } finally {
                 // it's really a ByteArrayInputStream but we'll play along...
                 if (in != null)
                     try { in.close(); } catch (IOException ioe) {}
             }
-        } else if (_action.equals(_("Save changes"))) {
+        } else if (_action.equals(_t("Save changes"))) {
             saveChanges();
+        } else if (_action.equals(_t("Reset URL list"))) {
+            resetUrlList();
         }
-        //addFormError(_("Unsupported") + ' ' + _action + '.');
+        //addFormError(_t("Unsupported") + ' ' + _action + '.');
+    }
+
+    private void resetUrlList() {
+        if (_context.router().saveConfig(Reseeder.PROP_RESEED_URL, null))
+	    addFormNotice(_t("URL list reset successfully"));
+        else
+            addFormError(_t("Error saving the configuration (applied but not saved) - please see the error logs"));
     }
 
     /** @since 0.8.9 */
@@ -146,9 +155,9 @@ public class ConfigReseedHandler extends FormHandler {
         saveBoolean(Reseeder.PROP_PROXY_ENABLE, "enable");
         saveBoolean(Reseeder.PROP_SPROXY_ENABLE, "senable");
         if (_context.router().saveConfig(changes, removes))
-            addFormNotice(_("Configuration saved successfully."));
+            addFormNotice(_t("Configuration saved successfully."));
         else
-            addFormError(_("Error saving the configuration (applied but not saved) - please see the error logs"));
+            addFormError(_t("Error saving the configuration (applied but not saved) - please see the error logs"));
     }
 
     /** translate (ngettext) @since 0.9.19 */

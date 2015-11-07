@@ -48,31 +48,31 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>${book.book} <%=intl._("address book")%> - susidns</title>
+<title>${book.book} <%=intl._t("address book")%> - susidns</title>
 <link rel="stylesheet" type="text/css" href="<%=book.getTheme()%>susidns.css">
 </head>
 <body>
 <div class="page">
 <div id="logo">
-<a href="index"><img src="<%=book.getTheme()%>images/logo.png" alt="" title="<%=intl._("Overview")%>" border="0"/></a>
+<a href="index"><img src="<%=book.getTheme()%>images/logo.png" alt="" title="<%=intl._t("Overview")%>" border="0"/></a>
 </div>
 <hr>
 <div id="navi">
 <p>
-<%=intl._("Address books")%>:
-<a href="addressbook?book=private&amp;filter=none&amp;begin=0&amp;end=49"><%=intl._("private")%></a> |
-<a href="addressbook?book=master&amp;filter=none&amp;begin=0&amp;end=49"><%=intl._("master")%></a> |
-<a href="addressbook?book=router&amp;filter=none&amp;begin=0&amp;end=49"><%=intl._("router")%></a> |
-<a href="addressbook?book=published&amp;filter=none&amp;begin=0&amp;end=49"><%=intl._("published")%></a> *
-<a href="subscriptions"><%=intl._("Subscriptions")%></a> *
-<a href="config"><%=intl._("Configuration")%></a> *
-<a href="index"><%=intl._("Overview")%></a>
+<%=intl._t("Address books")%>:
+<a href="addressbook?book=private&amp;filter=none&amp;begin=0&amp;end=49"><%=intl._t("private")%></a> |
+<a href="addressbook?book=master&amp;filter=none&amp;begin=0&amp;end=49"><%=intl._t("master")%></a> |
+<a href="addressbook?book=router&amp;filter=none&amp;begin=0&amp;end=49"><%=intl._t("router")%></a> |
+<a href="addressbook?book=published&amp;filter=none&amp;begin=0&amp;end=49"><%=intl._t("published")%></a> *
+<a href="subscriptions"><%=intl._t("Subscriptions")%></a> *
+<a href="config"><%=intl._t("Configuration")%></a> *
+<a href="index"><%=intl._t("Overview")%></a>
 </p>
 </div>
 <hr>
 <div id="headline">
-<h3><%=intl._("Address book")%>: <%=intl._(book.getBook())%></h3>
-<h4><%=intl._("Storage")%>: ${book.displayName}</h4>
+<h3><%=intl._t("Address book")%>: <%=intl._t(book.getBook())%></h3>
+<h4><%=intl._t("Storage")%>: ${book.displayName}</h4>
 </div>
 
 <div id="messages">${book.messages}</div>
@@ -81,7 +81,7 @@ ${book.loadBookMessages}
 
 <c:if test="${book.notEmpty}">
 <div id="filter">
-<p><%=intl._("Filter")%>:
+<p><%=intl._t("Filter")%>:
 <a href="addressbook?filter=a&amp;begin=0&amp;end=49">a</a>
 <a href="addressbook?filter=b&amp;begin=0&amp;end=49">b</a>
 <a href="addressbook?filter=c&amp;begin=0&amp;end=49">c</a> 
@@ -109,11 +109,11 @@ ${book.loadBookMessages}
 <a href="addressbook?filter=y&amp;begin=0&amp;end=49">y</a>
 <a href="addressbook?filter=z&amp;begin=0&amp;end=49">z</a>
 <a href="addressbook?filter=0-9&amp;begin=0&amp;end=49">0-9</a>
-<a href="addressbook?filter=xn--&amp;begin=0&amp;end=49"><%=intl._("other")%></a>
-<a href="addressbook?filter=none&amp;begin=0&amp;end=49"><%=intl._("all")%></a></p>
+<a href="addressbook?filter=xn--&amp;begin=0&amp;end=49"><%=intl._t("other")%></a>
+<a href="addressbook?filter=none&amp;begin=0&amp;end=49"><%=intl._t("all")%></a></p>
 <c:if test="${book.hasFilter}">
-<p><%=intl._("Current filter")%>: ${book.filter}
-(<a href="addressbook?filter=none&amp;begin=0&amp;end=49"><%=intl._("clear filter")%></a>)</p>
+<p><%=intl._t("Current filter")%>: ${book.filter}
+(<a href="addressbook?filter=none&amp;begin=0&amp;end=49"><%=intl._t("clear filter")%></a>)</p>
 </c:if>
 </div>
 
@@ -122,8 +122,8 @@ ${book.loadBookMessages}
 <input type="hidden" name="begin" value="0">
 <input type="hidden" name="end" value="49">
 <table><tr>
-<td class="search"><%=intl._("Search")%>: <input class="search" type="text" name="search" value="${book.search}" size="20" ></td>
-<td class="search"><input class="search" type="submit" name="submitsearch" value="<%=intl._("Search")%>" ></td>
+<td class="search"><%=intl._t("Search")%>: <input class="search" type="text" name="search" value="${book.search}" size="20" ></td>
+<td class="search"><input class="search" type="submit" name="submitsearch" value="<%=intl._t("Search")%>" ></td>
 </tr>
 </table>
 </form></div>
@@ -147,37 +147,43 @@ ${book.loadBookMessages}
 <th>&nbsp;</th>
 </c:if>
 
-<th><%=intl._("Name")%></th>
-<th colspan="2"><%=intl._("Links")%></th>
-<th><%=intl._("Destination")%></th>
+<% if (book.getEntries().length > 0) { /* Don't show if no results. Can't figure out how to do this with c:if */ %>
+<th><%=intl._t("Name")%></th>
+<th colspan="2"><%=intl._t("Links")%></th>
+<th><%=intl._t("Destination")%></th>
 </tr>
 <!-- limit iterator, or "Form too large" may result on submit, and is a huge web page if we don't -->
 <c:forEach items="${book.entries}" var="addr" begin="${book.resultBegin}" end="${book.resultEnd}">
 <tr class="list${book.trClass}">
 <c:if test="${book.master || book.router || book.published || book.private}">
-<td class="checkbox"><input type="checkbox" name="checked" value="${addr.name}" title="<%=intl._("Mark for deletion")%>"></td>
+<td class="checkbox"><input type="checkbox" name="checked" value="${addr.name}" title="<%=intl._t("Mark for deletion")%>"></td>
 </c:if>
 <td class="names"><a href="http://${addr.name}/" target="_top">${addr.displayName}</a>
 </td><td class="names">
-<span class="addrhlpr"><a href="http://${addr.b32}/" target="_top" title="<%=intl._("Base 32 address")%>">b32</a></span>
+<span class="addrhlpr"><a href="http://${addr.b32}/" target="_top" title="<%=intl._t("Base 32 address")%>">b32</a></span>
 </td><td class="names">
-<span class="addrhlpr"><a href="details?h=${addr.name}" title="<%=intl._("More information on this entry")%>"><%=intl._("details")%></a></span>
+<span class="addrhlpr"><a href="details?h=${addr.name}" title="<%=intl._t("More information on this entry")%>"><%=intl._t("details")%></a></span>
 </td>
 <td class="destinations"><textarea rows="1" style="height:3em;" wrap="off" cols="40" readonly="readonly" name="dest_${addr.name}" >${addr.destination}</textarea></td>
 </tr>
 </c:forEach>
+<% } /* book..getEntries().length() > 0 */ %>
 </table>
 </div>
 
+<% if (book.getEntries().length > 0) { /* Don't show if no results. Can't figure out how to do this with c:if */ %>
 <c:if test="${book.master || book.router || book.published || book.private}">
 <div id="buttons">
 <p class="buttons">
-<input class="cancel" type="reset" value="<%=intl._("Cancel")%>" >
-<input class="delete" type="submit" name="action" value="<%=intl._("Delete Selected")%>" >
+<input class="cancel" type="reset" value="<%=intl._t("Cancel")%>" >
+<input class="delete" type="submit" name="action" value="<%=intl._t("Delete Selected")%>" >
 </p>
-</div></form>
+</div>
 </c:if>
+<% } /* book..getEntries().length() > 0 */ %>
+</form>
 
+<% if (book.getEntries().length > 0) { /* Don't show if no results. Can't figure out how to do this with c:if */ %>
 <form action="export" method="GET" target="_top">
 <div id="buttons">
 <p class="buttons">
@@ -188,14 +194,15 @@ ${book.loadBookMessages}
 <c:if test="${book.hasFilter}">
 <input type="hidden" name="filter" value="${book.filter}">
 </c:if>
-<input type="submit" class="export" value="<%=intl._("Export in hosts.txt format")%>" />
+<input type="submit" class="export" value="<%=intl._t("Export in hosts.txt format")%>" />
 </p></div></form>
+<% } /* book..getEntries().length() > 0 */ %>
 
 </c:if><% /* book.notEmpty */ %>
 
 <c:if test="${book.isEmpty}">
 <div id="book">
-<p class="book"><%=intl._("This address book is empty.")%></p>
+<p class="book"><%=intl._t("This address book is empty.")%></p>
 </div>
 </c:if>
 
@@ -204,16 +211,16 @@ ${book.loadBookMessages}
 <input type="hidden" name="begin" value="0">
 <input type="hidden" name="end" value="49">
 <div id="add">
-<h3><%=intl._("Add new destination")%>:</h3>
+<h3><%=intl._t("Add new destination")%>:</h3>
 <table><tr><td>
-<b><%=intl._("Host Name")%></b></td><td><input type="text" name="hostname" value="${book.hostname}" size="54">
+<b><%=intl._t("Host Name")%></b></td><td><input type="text" name="hostname" value="${book.hostname}" size="54">
 </td></tr><tr><td>
-<b><%=intl._("Destination")%></b></td><td><textarea name="destination" rows="1" style="height:3em" wrap="off" cols="70" spellcheck="false">${book.destination}</textarea>
+<b><%=intl._t("Destination")%></b></td><td><textarea name="destination" rows="1" style="height:3em" wrap="off" cols="70" spellcheck="false">${book.destination}</textarea>
 </td></tr></table>
 <p class="buttons">
-<input class="cancel" type="reset" value="<%=intl._("Cancel")%>" >
-<input class="accept" type="submit" name="action" value="<%=intl._("Replace")%>" >
-<input class="add" type="submit" name="action" value="<%=intl._("Add")%>" >
+<input class="cancel" type="reset" value="<%=intl._t("Cancel")%>" >
+<input class="accept" type="submit" name="action" value="<%=intl._t("Replace")%>" >
+<input class="add" type="submit" name="action" value="<%=intl._t("Add")%>" >
 </p>
 </div></form>
 
