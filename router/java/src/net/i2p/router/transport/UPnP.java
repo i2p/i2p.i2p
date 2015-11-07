@@ -4,9 +4,9 @@
 package net.i2p.router.transport;
 
 import java.net.InetAddress;
-import java.net.MalformedURLException;
 import java.net.UnknownHostException;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -823,17 +823,17 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 		String him = _router.getURLBase();
 		if (him != null && him.length() > 0) {
 			try {
-				URL url = new URL(him);
+				URI url = new URI(him);
 				hisIP = url.getHost();
-			} catch (MalformedURLException mue) {}
+			} catch (URISyntaxException use) {}
 		}
 		if (hisIP == null) {
 			him = _router.getLocation();
 			if (him != null && him.length() > 0) {
 				try {
-					URL url = new URL(him);
+					URI url = new URI(him);
 					hisIP = url.getHost();
-				} catch (MalformedURLException mue) {}
+				} catch (URISyntaxException use) {}
 			}
 		}
 		if (hisIP == null)

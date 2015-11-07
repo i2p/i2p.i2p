@@ -46,7 +46,8 @@ import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.security.KeyStore;
 import java.security.GeneralSecurityException;
 import java.security.cert.CertificateException;
@@ -553,11 +554,11 @@ public class SSLEepGet extends EepGet {
 
         String req = getRequest();
 
-        //try {
-            URL url = new URL(_actualURL);
-            String host = null;
-            int port = 0;
-            if ("https".equals(url.getProtocol())) {
+        String host;
+        int port;
+        try {
+            URI url = new URI(_actualURL);
+            if ("https".equals(url.getScheme())) {
                 host = url.getHost();
                 if (host.toLowerCase(Locale.US).endsWith(".i2p"))
                     throw new MalformedURLException("I2P addresses unsupported");
@@ -589,10 +590,11 @@ public class SSLEepGet extends EepGet {
             } else {
                 throw new MalformedURLException("Only https supported: " + _actualURL);
             }
-        // an MUE is an IOE
-        //} catch (MalformedURLException mue) {
-        //    throw new IOException("Request URL is invalid");
-        //}
+        } catch (URISyntaxException use) {
+            IOException ioe = new MalformedURLException("Redirected to invalid URL");
+            ioe.initCause(use);
+            throw ioe;
+        }
 
         _proxyIn = _proxy.getInputStream();
         _proxyOut = _proxy.getOutputStream();

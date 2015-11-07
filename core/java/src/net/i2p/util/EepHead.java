@@ -6,7 +6,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.net.URL;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 import gnu.getopt.Getopt;
 
@@ -176,24 +178,25 @@ public class EepHead extends EepGet {
         
         // Should we even follow redirects for HEAD?
         if (_redirectLocation != null) {
-            //try {
+            try {
                 if (_redirectLocation.startsWith("http://")) {
                     _actualURL = _redirectLocation;
                 } else { 
                     // the Location: field has been required to be an absolute URI at least since
                     // RFC 1945 (HTTP/1.0 1996), so it isn't clear what the point of this is.
                     // This oddly adds a ":" even if no port, but that seems to work.
-                    URL url = new URL(_actualURL);
+                    URI url = new URI(_actualURL);
 		    if (_redirectLocation.startsWith("/"))
                         _actualURL = "http://" + url.getHost() + ":" + url.getPort() + _redirectLocation;
                     else
                         // this blows up completely on a redirect to https://, for example
                         _actualURL = "http://" + url.getHost() + ":" + url.getPort() + "/" + _redirectLocation;
                 }
-            // an MUE is an IOE
-            //} catch (MalformedURLException mue) {
-            //    throw new IOException("Redirected from an invalid URL");
-            //}
+            } catch (URISyntaxException use) {
+                IOException ioe = new MalformedURLException("Redirected to invalid URL");
+                ioe.initCause(use);
+                throw ioe;
+            }
             AuthState as = _authState;
             if (_responseCode == 407) {
                 if (!_shouldProxy)
@@ -252,7 +255,14 @@ public class EepHead extends EepGet {
     @Override
     protected String getRequest() throws IOException {
         StringBuilder buf = new StringBuilder(512);
-        URL url = new URL(_actualURL);
+        URI url;
+        try {
+            url = new URI(_actualURL);
+        } catch (URISyntaxException use) {
+            IOException ioe = new MalformedURLException("Bad URL");
+            ioe.initCause(use);
+            throw ioe;
+        }
         String host = url.getHost();
         int port = url.getPort();
         String path = url.getPath();

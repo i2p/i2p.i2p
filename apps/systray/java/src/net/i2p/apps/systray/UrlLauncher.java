@@ -18,7 +18,8 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.Socket;
 import java.net.SocketAddress;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Locale;
 
 import net.i2p.I2PAppContext;
@@ -115,18 +116,16 @@ public class UrlLauncher implements ClientApp {
      *  @return success
      */
     private static boolean waitForServer(String urlString) {
-        URL url;
+        URI url;
         try {
-            url = new URL(urlString);
-        } catch (MalformedURLException e) {
+            url = new URI(urlString);
+        } catch (URISyntaxException e) {
             return false;
         }
         String host = url.getHost();
         int port = url.getPort();
         if (port <= 0) {
-            port = url.getDefaultPort();
-            if (port <= 0)
-                return false;
+            port = "https".equals(url.getScheme()) ? 443 : 80;
         }
         SocketAddress sa;
         try {
@@ -261,8 +260,8 @@ public class UrlLauncher implements ClientApp {
     private static boolean validateUrlFormat(String urlString) {
          try {
             // just to check validity
-            new URL(urlString);
-        } catch (MalformedURLException e) {
+            new URI(urlString);
+        } catch (URISyntaxException e) {
             return false;
         }
         return true;
