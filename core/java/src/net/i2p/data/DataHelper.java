@@ -1693,7 +1693,7 @@ public class DataHelper {
         if (unescaped == null) return null;
         String escaped = unescaped;
         for (int i = 0; i < escapeChars.length; i++) {
-            escaped = escaped.replaceAll(escapeChars[i], escapeCodes[i]);
+            escaped = escaped.replace(escapeChars[i], escapeCodes[i]);
         }
         return escaped;
     }
@@ -1708,7 +1708,7 @@ public class DataHelper {
         if (escaped == null) return null;
         String unescaped = escaped;
         for (int i = 0; i < escapeChars.length; i++) {
-            unescaped = unescaped.replaceAll(escapeCodes[i], escapeChars[i]);
+            unescaped = unescaped.replace(escapeCodes[i], escapeChars[i]);
         }
         return unescaped;
     }
