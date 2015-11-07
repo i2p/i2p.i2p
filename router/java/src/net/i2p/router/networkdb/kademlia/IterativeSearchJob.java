@@ -71,7 +71,7 @@ class IterativeSearchJob extends FloodSearchJob {
     private static Hash _alwaysQueryHash;
     /** Max number of peers to query */
     private final int _totalSearchLimit;
-
+    
     private static final int MAX_NON_FF = 3;
     /** Max number of peers to query */
     private static final int TOTAL_SEARCH_LIMIT = 6;
@@ -84,6 +84,10 @@ class IterativeSearchJob extends FloodSearchJob {
      *  Longer than the typ. response time of 1.0 - 1.5 sec, but short enough that we move
      *  on to another peer quickly.
      */
+    private final long _singleSearchTime;
+    /** 
+     * The default single search time
+     */
     private static final long SINGLE_SEARCH_TIME = 3*1000;
     /** the actual expire time for a search message */
     private static final long SINGLE_SEARCH_MSG_TIME = 10*1000;
@@ -91,6 +95,10 @@ class IterativeSearchJob extends FloodSearchJob {
      *  Use instead of CONCURRENT_SEARCHES in super() which is final.
      *  For now, we don't do concurrent, but we keep SINGLE_SEARCH_TIME very short,
      *  so we have effective concurrency in that we fail a search quickly.
+     */
+    private final int _maxConcurrent;
+    /**
+     * The default _maxConcurrent
      */
     private static final int MAX_CONCURRENT = 1;
 
@@ -128,6 +136,8 @@ class IterativeSearchJob extends FloodSearchJob {
         int totalSearchLimit = (facade.floodfillEnabled() && ctx.router().getUptime() > 30*60*1000) ?
                             TOTAL_SEARCH_LIMIT_WHEN_FF : TOTAL_SEARCH_LIMIT;
         _totalSearchLimit = ctx.getProperty("netdb.searchLimit", totalSearchLimit);
+        _singleSearchTime = ctx.getProperty("netdb.singleSearchTime", SINGLE_SEARCH_TIME);
+        _maxConcurrent = ctx.getProperty("netdb.maxConcurrent", MAX_CONCURRENT);
         _unheardFrom = new HashSet<Hash>(CONCURRENT_SEARCHES);
         _failedPeers = new HashSet<Hash>(_totalSearchLimit);
         _sentTime = new ConcurrentHashMap<Hash, Long>(_totalSearchLimit);
@@ -236,7 +246,7 @@ class IterativeSearchJob extends FloodSearchJob {
             synchronized (this) {
                 if (_dead) return;
                 pend = _unheardFrom.size();
-                if (pend >= MAX_CONCURRENT)
+                if (pend >= _maxConcurrent)
                     return;
                 done = _failedPeers.size();
             }
@@ -412,7 +422,7 @@ class IterativeSearchJob extends FloodSearchJob {
             // The timeout job is always run (never cancelled)
             // Note that the timeout is much shorter than the message expiration (see above)
             Job j = new IterativeTimeoutJob(getContext(), peer, this);
-            long expire = Math.min(_expiration, now + SINGLE_SEARCH_TIME);
+            long expire = Math.min(_expiration, now + _singleSearchTime);
             j.getTiming().setStartAfter(expire);
             getContext().jobQueue().addJob(j);
 
