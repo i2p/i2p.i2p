@@ -33,7 +33,7 @@ abstract class IRCFilter {
      */
     public static String inboundFilter(String s, StringBuffer expectedPong, DCCHelper helper) {
         
-        String field[]=s.split(" ",4);
+        String field[] = DataHelper.split(s, " ", 4);
         String command;
         int idx=0;
         final String[] allowedCommands =
@@ -274,7 +274,7 @@ abstract class IRCFilter {
      */
     public static String outboundFilter(String s, StringBuffer expectedPong, DCCHelper helper) {
 
-        String field[]=s.split(" ",3);
+        String field[] = DataHelper.split(s, " ",3);
 
         if(field[0].length()==0)
             return null; // W T F?
@@ -420,7 +420,7 @@ abstract class IRCFilter {
         int ctcp = msg.indexOf(0x01);
         if (ctcp > 0)
             msg = msg.substring(0, ctcp);
-        String[] args = msg.split(" ", 5);
+        String[] args = DataHelper.split(msg, " ", 5);
         if (args.length <= 0)
             return null;
         String type = args[0];
@@ -512,7 +512,7 @@ abstract class IRCFilter {
         int ctcp = msg.indexOf(0x01);
         if (ctcp > 0)
             msg = msg.substring(0, ctcp);
-        String[] args = msg.split(" ", 5);
+        String[] args = DataHelper.split(msg, " ", 5);
         if (args.length <= 0)
             return null;
         String type = args[0];

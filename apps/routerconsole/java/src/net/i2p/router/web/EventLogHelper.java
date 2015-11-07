@@ -202,7 +202,7 @@ public class EventLogHelper extends FormHandler {
             buf.append(fmt.format(new Date(time)));
             buf.append("</td><td>");
             if (isAll) {
-                 String[] s = event.split(" ", 2);
+                 String[] s = DataHelper.split(event, " ", 2);
                  String xs = _xevents.get(s[0]);
                  if (xs == null)
                      xs = s[0];

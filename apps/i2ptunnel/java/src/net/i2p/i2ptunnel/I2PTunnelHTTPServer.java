@@ -664,7 +664,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
          */
         @Override
         protected String filterResponseLine(String line) {
-            String[] s = line.split(" ", 3);
+            String[] s = DataHelper.split(line, " ", 3);
             if (s.length > 1 &&
                 (s[1].startsWith("3") || s[1].startsWith("5")))
                 _dataExpected = 0;

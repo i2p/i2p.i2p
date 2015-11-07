@@ -35,6 +35,7 @@ import freenet.support.CPUInformation.UnknownCPUException;
 
 import net.i2p.I2PAppContext;
 import net.i2p.crypto.CryptoConstants;
+import net.i2p.data.DataHelper;
 
 /**
  * <p>BigInteger that takes advantage of the jbigi library for the modPow operation,
@@ -734,7 +735,7 @@ public class NativeBigInteger extends BigInteger {
             in = new BufferedReader(new InputStreamReader(new FileInputStream("/proc/cpuinfo"), "ISO-8859-1"), 4096);
             String line = null;
             while ( (line = in.readLine()) != null) {
-                String[] parts = line.split(":", 2);
+                String[] parts = DataHelper.split(line, ":", 2);
                 if (parts.length < 2)
                     continue;
                 String key = parts[0].trim().toLowerCase(Locale.US);

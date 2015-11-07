@@ -224,7 +224,7 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 		boolean ignore = false;
 		String toIgnore = _context.getProperty(PROP_IGNORE);
 		if (toIgnore != null) {
-			String[] ignores = toIgnore.split("[,; \r\n\t]");
+			String[] ignores = DataHelper.split(toIgnore, "[,; \r\n\t]");
 			for (int i = 0; i < ignores.length; i++) {
 				if (ignores[i].equals(udn)) {
 					ignore = true;

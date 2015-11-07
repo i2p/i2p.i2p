@@ -996,7 +996,7 @@ public class WebMail extends HttpServlet
 							PrintWriter pw2 = new PrintWriter( text2 );
 							showPart( pw2, part, 0, TEXT_ONLY );
 							pw2.flush();
-							String[] lines = text2.toString().split( "\r\n" );
+							String[] lines = DataHelper.split(text2.toString(), "\r\n");
 							for( int i = 0; i < lines.length; i++ )
 								pw.println( "> " + lines[i] );
 							pw.flush();

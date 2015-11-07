@@ -19,6 +19,7 @@ import net.i2p.I2PException;
 import net.i2p.client.I2PSession;
 import net.i2p.client.I2PSessionException;
 import net.i2p.client.streaming.I2PSocketManager;
+import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.util.EventDispatcher;
 import net.i2p.util.I2PAppThread;
@@ -93,7 +94,7 @@ public class I2Ping extends I2PTunnelClientBase {
       int localPort = 0;
       int remotePort = 0;
       boolean error = false;
-      String[] argv = cmd.split(" ");
+      String[] argv = DataHelper.split(cmd, " ");
       Getopt g = new Getopt("ping", argv, "t:m:n:chl:f:p:");
       int c;
       while ((c = g.getopt()) != -1) {

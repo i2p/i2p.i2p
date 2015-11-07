@@ -340,7 +340,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
 
         List<InetAddress> bindToAddrs = new ArrayList<InetAddress>(4);
         if (bindTo != null) {
-            String[] bta = bindTo.split("[,; \r\n\t]");
+            String[] bta = DataHelper.split(bindTo, "[,; \r\n\t]");
             for (int i = 0; i < bta.length; i++) {
                 String bt = bta[i];
                 if (bt.length() <= 0)
@@ -1896,7 +1896,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         if (explicitAddressSpecified()) {
             host = _context.getProperty(PROP_EXTERNAL_HOST);
             if (host != null) {
-                String[] hosts = host.split("[,; \r\n\t]");
+                String[] hosts = DataHelper.split(host, "[,; \r\n\t]");
                 RouterAddress rv = null;
                 for (int i = 0; i < hosts.length; i++) {
                     String h = hosts[i];

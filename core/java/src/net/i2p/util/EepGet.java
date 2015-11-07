@@ -1131,7 +1131,7 @@ public class EepGet {
     private int handleStatus(String line) {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Status line: [" + line.trim() + "]");
-        String[] toks = line.split(" ", 3);
+        String[] toks = DataHelper.split(line, " ", 3);
         if (toks.length < 2) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("ERR: status "+  line);

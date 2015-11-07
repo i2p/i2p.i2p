@@ -42,6 +42,7 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 import net.i2p.I2PAppContext;
+import net.i2p.data.DataHelper;
 
 /**
  * data structure to hold a single message, mostly used with folder view and sorting
@@ -190,7 +191,7 @@ class Mail {
 				address.indexOf( "\r" ) != -1 )
 			return false;
 		
-		String[] tokens = address.split( "[ \t]+" );
+		String[] tokens = DataHelper.split(address, "[ \t]+");
 
 		int addresses = 0;
 		
@@ -208,7 +209,7 @@ class Mail {
 	 */
 	public static String getAddress(String address )
 	{
-		String[] tokens = address.split( "[ \t]+" );
+		String[] tokens = DataHelper.split(address, "[ \t]+");
 
 		for( int i = 0; i < tokens.length; i++ ) {
 			if( tokens[i].matches( "^[^@< \t]+@[^> \t]+$" ) )
@@ -232,7 +233,7 @@ class Mail {
 	public static boolean getRecipientsFromList( ArrayList<String> recipients, String text, boolean ok )
 	{
 		if( text != null && text.length() > 0 ) {			
-			String[] ccs = text.split( "," );
+			String[] ccs = DataHelper.split(text, ",");
 			for( int i = 0; i < ccs.length; i++ ) {
 				String recipient = ccs[i].trim();
 				if( validateAddress( recipient ) ) {

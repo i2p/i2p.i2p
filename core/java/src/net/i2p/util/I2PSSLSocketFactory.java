@@ -83,6 +83,7 @@ import javax.net.ssl.TrustManagerFactory;
 
 import net.i2p.I2PAppContext;
 import net.i2p.crypto.KeyStoreUtil;
+import net.i2p.data.DataHelper;
 
 import org.apache.http.conn.ssl.DefaultHostnameVerifier;
 import org.apache.http.conn.util.PublicSuffixList;
@@ -443,7 +444,7 @@ public class I2PSSLSocketFactory {
                 try {
                     if (line.charAt(0) == '#')
                         continue;
-                    String[] s = line.split(",");
+                    String[] s = DataHelper.split(line, ",");
                     String lc = s[0].toLowerCase(Locale.US);
                     tlds.add(lc);
                     i++;

@@ -102,7 +102,7 @@ class NodeInfo extends SimpleDataStructure {
      */
     public NodeInfo(String s) throws DataFormatException {
         super();
-        String[] parts = s.split(":", 4);
+        String[] parts = DataHelper.split(s, ":", 4);
         if (parts.length != 4)
             throw new DataFormatException("Bad format");
         byte[] nid = Base64.decode(parts[0]);
