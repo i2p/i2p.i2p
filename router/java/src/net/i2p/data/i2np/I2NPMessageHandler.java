@@ -109,7 +109,7 @@ public class I2NPMessageHandler {
     public int readMessage(byte data[], int offset, int maxLen) throws I2NPMessageException {
         int cur = offset;
         // we will assume that maxLen is >= 1 here. It's checked to be >= 16 in readBytes()
-        int type = (int)DataHelper.fromLong(data, cur, 1);
+        int type = data[cur] & 0xff;
         cur++;
         _lastReadBegin = System.currentTimeMillis();
         I2NPMessage msg = I2NPMessageImpl.createMessage(_context, type);

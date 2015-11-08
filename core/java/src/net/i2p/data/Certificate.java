@@ -215,7 +215,7 @@ public class Certificate extends DataStructureImpl {
             throw new DataFormatException("Cert is too small [" + source.length + " off=" + offset + "]");
 
         int cur = offset;
-        _type = (int)DataHelper.fromLong(source, cur, 1);
+        _type = source[cur] & 0xff;
         cur++;
         int length = (int)DataHelper.fromLong(source, cur, 2);
         cur += 2;

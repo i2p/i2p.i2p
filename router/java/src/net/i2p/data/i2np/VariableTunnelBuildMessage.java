@@ -29,7 +29,7 @@ public class VariableTunnelBuildMessage extends TunnelBuildMessage {
     @Override
     public void readMessage(byte[] data, int offset, int dataSize, int type) throws I2NPMessageException {
         // message type will be checked in super()
-        int r = (int)DataHelper.fromLong(data, offset, 1);
+        int r = data[offset] & 0xff;
         if (r <= 0 || r > MAX_RECORD_COUNT)
             throw new I2NPMessageException("Bad record count " + r);
         RECORD_COUNT = r;

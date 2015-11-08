@@ -120,7 +120,7 @@ public class BuildReplyHandler {
             return -1;
         } else {
             SimpleByteCache.release(h);
-            int rv = (int)DataHelper.fromLong(data, TunnelBuildReplyMessage.RECORD_SIZE - 1, 1);
+            int rv = data[TunnelBuildReplyMessage.RECORD_SIZE - 1] & 0xff;
             if (log.shouldLog(Log.DEBUG))
                 log.debug(reply.getUniqueId() + ": Verified: " + rv + " for record " + recordNum + "/" + hop);
             return rv;

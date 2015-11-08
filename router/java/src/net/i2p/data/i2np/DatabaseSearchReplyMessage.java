@@ -68,7 +68,7 @@ public class DatabaseSearchReplyMessage extends FastI2NPMessageImpl {
         curIndex += Hash.HASH_LENGTH;
         //_key = new Hash(keyData);
         
-        int num = (int)DataHelper.fromLong(data, curIndex, 1);
+        int num = data[curIndex] & 0xff;
         curIndex++;
         
         _peerHashes.clear();
