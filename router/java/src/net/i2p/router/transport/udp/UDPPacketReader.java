@@ -185,13 +185,13 @@ class UDPPacketReader {
         
         public int readIPSize() {
             int offset = readBodyOffset() + X_LENGTH;
-            return (int)DataHelper.fromLong(_message, offset, 1);
+            return _message[offset] & 0xff;
         }
         
         /** what IP bob is reachable on */
         public void readIP(byte target[], int targetOffset) {
             int offset = readBodyOffset() + X_LENGTH;
-            int size = (int)DataHelper.fromLong(_message, offset, 1);
+            int size = _message[offset] & 0xff;
             offset++;
             System.arraycopy(_message, offset, target, targetOffset, size);
         }
@@ -208,13 +208,13 @@ class UDPPacketReader {
         /** sizeof(IP) */
         public int readIPSize() {
             int offset = readBodyOffset() + Y_LENGTH;
-            return (int)DataHelper.fromLong(_message, offset, 1);
+            return _message[offset] & 0xff;
         }
         
         /** what IP do they think we are coming on? */
         public void readIP(byte target[], int targetOffset) {
             int offset = readBodyOffset() + Y_LENGTH;
-            int size = (int)DataHelper.fromLong(_message, offset, 1);
+            int size = _message[offset] & 0xff;
             offset++;
             System.arraycopy(_message, offset, target, targetOffset, size);
         }
@@ -340,7 +340,7 @@ class UDPPacketReader {
         public int readACKCount() {
             if (!readACKsIncluded()) return 0;
             int off = readBodyOffset() + 1;
-            return (int)DataHelper.fromLong(_message, off, 1);
+            return _message[off] & 0xff;
         }
 
         public long readACK(int index) {
@@ -355,12 +355,12 @@ class UDPPacketReader {
             if (!readACKBitfieldsIncluded()) return null;
             int off = readBodyOffset() + 1;
             if (readACKsIncluded()) {
-                int numACKs = (int)DataHelper.fromLong(_message, off, 1);
+                int numACKs = _message[off] & 0xff;
                 off++;
                 off += 4 * numACKs;
             }
             
-            int numBitfields = (int)DataHelper.fromLong(_message, off, 1);
+            int numBitfields = _message[off] & 0xff;
             off++;
             
             PacketACKBitfield rv[] = new PacketACKBitfield[numBitfields];
@@ -374,12 +374,12 @@ class UDPPacketReader {
         public int readFragmentCount() throws DataFormatException {
             int off = readBodyOffset() + 1;
             if (readACKsIncluded()) {
-                int numACKs = (int)DataHelper.fromLong(_message, off, 1);
+                int numACKs = _message[off] & 0xff;
                 off++;
                 off += 4 * numACKs;
             }
             if (readACKBitfieldsIncluded()) {
-                int numBitfields = (int)DataHelper.fromLong(_message, off, 1);
+                int numBitfields = _message[off] & 0xff;
                 off++;
 
                 for (int i = 0; i < numBitfields; i++) {
@@ -388,7 +388,7 @@ class UDPPacketReader {
                 }
             }
             if (readExtendedDataIncluded()) {
-                int size = (int)DataHelper.fromLong(_message, off, 1);
+                int size = _message[off] & 0xff;
                 off++;
                 off += size;
             }
@@ -430,12 +430,12 @@ class UDPPacketReader {
         private int getFragmentBegin(int fragmentNum) throws DataFormatException {
             int off = readBodyOffset() + 1;
             if (readACKsIncluded()) {
-                int numACKs = (int)DataHelper.fromLong(_message, off, 1);
+                int numACKs = _message[off] & 0xff;
                 off++;
                 off += 4 * numACKs;
             }
             if (readACKBitfieldsIncluded()) {
-                int numBitfields = (int)DataHelper.fromLong(_message, off, 1);
+                int numBitfields = _message[off] & 0xff;
                 off++;
 
                 PacketACKBitfield bf[] = new PacketACKBitfield[numBitfields];
@@ -445,7 +445,7 @@ class UDPPacketReader {
                 }
             }
             if (readExtendedDataIncluded()) {
-                int size = (int)DataHelper.fromLong(_message, off, 1);
+                int size = _message[off] & 0xff;
                 off++;
                 off += size;
             }
@@ -476,7 +476,7 @@ class UDPPacketReader {
             buf.append(" ");
             int off = readBodyOffset() + 1;
             if (readACKsIncluded()) {
-                int numACKs = (int)DataHelper.fromLong(_message, off, 1);
+                int numACKs = _message[off] & 0xff;
                 off++;
                 buf.append("with ACKs for ");
                 for (int i = 0; i < numACKs; i++) {
@@ -485,7 +485,7 @@ class UDPPacketReader {
                 }
             }
             if (readACKBitfieldsIncluded()) {
-                int numBitfields = (int)DataHelper.fromLong(_message, off, 1);
+                int numBitfields = _message[off] & 0xff;
                 off++;
                 buf.append("with partial ACKs for ");
 
@@ -501,7 +501,7 @@ class UDPPacketReader {
                 }
             }
             if (readExtendedDataIncluded()) {
-                int size = (int)DataHelper.fromLong(_message, off, 1);
+                int size = _message[off] & 0xff;
                 off++;
                 buf.append("with extended size of ");
                 buf.append(size);
@@ -509,7 +509,7 @@ class UDPPacketReader {
                 off += size;
             }
             
-            int numFragments = (int)DataHelper.fromLong(_message, off, 1);
+            int numFragments = _message[off] & 0xff;
             off++;
             buf.append("with fragmentCount of ");
             buf.append(numFragments);
@@ -653,13 +653,13 @@ class UDPPacketReader {
         
         public int readIPSize() {
             int offset = readBodyOffset() + NONCE_LENGTH;
-            return (int)DataHelper.fromLong(_message, offset, 1);
+            return _message[offset] & 0xff;
         }
         
         /** what IP Alice is reachable on */
         public void readIP(byte target[], int targetOffset) {
             int offset = readBodyOffset() + NONCE_LENGTH;
-            int size = (int)DataHelper.fromLong(_message, offset, 1);
+            int size = _message[offset] & 0xff;
             offset++;
             System.arraycopy(_message, offset, target, targetOffset, size);
         }
@@ -667,7 +667,7 @@ class UDPPacketReader {
         /** what IP Alice is reachable on */
         public int readPort() {
             int offset = readBodyOffset() + NONCE_LENGTH;
-            int size = (int)DataHelper.fromLong(_message, offset, 1);
+            int size = _message[offset] & 0xff;
             offset++;
             offset += size; // skip the IP
             return (int)DataHelper.fromLong(_message, offset, 2);
@@ -676,7 +676,7 @@ class UDPPacketReader {
         /** what Alice's intro key is (if known - if unknown, the key is INVALID_KEY) */
         public void readIntroKey(byte target[], int targetOffset) {
             int offset = readBodyOffset() + NONCE_LENGTH;
-            int size = (int)DataHelper.fromLong(_message, offset, 1);
+            int size = _message[offset] & 0xff;
             offset++;
             offset += size; // skip the IP
             offset += 2; // skip the port
@@ -694,7 +694,7 @@ class UDPPacketReader {
         }
         public int readIPSize() {
             int offset = readBodyOffset() + 4;
-            int rv = (int)DataHelper.fromLong(_message, offset, 1);
+            int rv = _message[offset] & 0xff;
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("read alice ip size: " + rv);
             return rv;
@@ -703,7 +703,7 @@ class UDPPacketReader {
         /** what IP Alice is reachable on */
         public void readIP(byte target[], int targetOffset) {
             int offset = readBodyOffset() + 4;
-            int size = (int)DataHelper.fromLong(_message, offset, 1);
+            int size = _message[offset] & 0xff;
             offset++;
             System.arraycopy(_message, offset, target, targetOffset, size);
             if (_log.shouldLog(Log.DEBUG))
@@ -711,7 +711,7 @@ class UDPPacketReader {
         }
         public int readPort() {
             int offset = readBodyOffset() + 4;
-            offset += DataHelper.fromLong(_message, offset, 1);
+            offset += _message[offset] & 0xff;
             offset++;
             int rv = (int)DataHelper.fromLong(_message, offset, 2);
             if (_log.shouldLog(Log.DEBUG))
@@ -722,10 +722,10 @@ class UDPPacketReader {
         /** unused */
         public int readChallengeSize() {
             int offset = readBodyOffset() + 4;
-            offset += DataHelper.fromLong(_message, offset, 1);
+            offset += _message[offset] & 0xff;
             offset++;
             offset += 2;
-            int rv = (int)DataHelper.fromLong(_message, offset, 1);
+            int rv = _message[offset] & 0xff;
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("read challenge size: " + rv);
             return rv;
@@ -734,10 +734,10 @@ class UDPPacketReader {
         /** unused */
         public void readChallengeSize(byte target[], int targetOffset) {
             int offset = readBodyOffset() + 4;
-            offset += DataHelper.fromLong(_message, offset, 1);
+            offset += _message[offset] & 0xff;
             offset++;
             offset += 2;
-            int sz = (int)DataHelper.fromLong(_message, offset, 1);
+            int sz = _message[offset] & 0xff;
             offset++;
             System.arraycopy(_message, offset, target, targetOffset, sz);
             if (_log.shouldLog(Log.DEBUG))
@@ -745,10 +745,10 @@ class UDPPacketReader {
         }
         public void readAliceIntroKey(byte target[], int targetOffset) {
             int offset = readBodyOffset() + 4;
-            offset += DataHelper.fromLong(_message, offset, 1);
+            offset += _message[offset] & 0xff;
             offset++;
             offset += 2;
-            int sz = (int)DataHelper.fromLong(_message, offset, 1);
+            int sz = _message[offset] & 0xff;
             offset++;
             offset += sz;
             System.arraycopy(_message, offset, target, targetOffset, SessionKey.KEYSIZE_BYTES);
@@ -758,10 +758,10 @@ class UDPPacketReader {
         }
         public long readNonce() {
             int offset = readBodyOffset() + 4;
-            offset += DataHelper.fromLong(_message, offset, 1);
+            offset += _message[offset] & 0xff;
             offset++;
             offset += 2;
-            int sz = (int)DataHelper.fromLong(_message, offset, 1);
+            int sz = _message[offset] & 0xff;
             offset++;
             offset += sz;
             offset += SessionKey.KEYSIZE_BYTES;
@@ -776,19 +776,19 @@ class UDPPacketReader {
     public class RelayIntroReader {
         public int readIPSize() {
             int offset = readBodyOffset();
-            return (int)DataHelper.fromLong(_message, offset, 1);
+            return _message[offset] & 0xff;
         }
         
         /** what IP Alice is reachable on */
         public void readIP(byte target[], int targetOffset) {
             int offset = readBodyOffset();
-            int size = (int)DataHelper.fromLong(_message, offset, 1);
+            int size = _message[offset] & 0xff;
             offset++;
             System.arraycopy(_message, offset, target, targetOffset, size);
         }
         public int readPort() {
             int offset = readBodyOffset();
-            offset += DataHelper.fromLong(_message, offset, 1);
+            offset += _message[offset] & 0xff;
             offset++;
             return (int)DataHelper.fromLong(_message, offset, 2);
         }
@@ -796,19 +796,19 @@ class UDPPacketReader {
         /** unused */
         public int readChallengeSize() {
             int offset = readBodyOffset();
-            offset += DataHelper.fromLong(_message, offset, 1);
+            offset += _message[offset] & 0xff;
             offset++;
             offset += 2;
-            return (int)DataHelper.fromLong(_message, offset, 1);
+            return _message[offset] & 0xff;
         }
 
         /** unused */
         public void readChallengeSize(byte target[], int targetOffset) {
             int offset = readBodyOffset();
-            offset += DataHelper.fromLong(_message, offset, 1);
+            offset += _message[offset] & 0xff;
             offset++;
             offset += 2;
-            int sz = (int)DataHelper.fromLong(_message, offset, 1);
+            int sz = _message[offset] & 0xff;
             offset++;
             System.arraycopy(_message, offset, target, targetOffset, sz);
         }
@@ -819,19 +819,19 @@ class UDPPacketReader {
     public class RelayResponseReader {
         public int readCharlieIPSize() {
             int offset = readBodyOffset();
-            return (int)DataHelper.fromLong(_message, offset, 1);
+            return _message[offset] & 0xff;
         }
         /** what IP charlie is reachable on */
         public void readCharlieIP(byte target[], int targetOffset) {
             int offset = readBodyOffset();
-            int size = (int)DataHelper.fromLong(_message, offset, 1);
+            int size = _message[offset] & 0xff;
             offset++;
             System.arraycopy(_message, offset, target, targetOffset, size);
         }
         /** what port charlie is reachable on */
         public int readCharliePort() {
             int offset = readBodyOffset();
-            offset += DataHelper.fromLong(_message, offset, 1);
+            offset += _message[offset] & 0xff;
             offset++;
             return (int)DataHelper.fromLong(_message, offset, 2);
         }
@@ -839,38 +839,38 @@ class UDPPacketReader {
         /** @deprecated unused */
         public int readAliceIPSize() {
             int offset = readBodyOffset();
-            offset += DataHelper.fromLong(_message, offset, 1);
+            offset += _message[offset] & 0xff;
             offset++;
             offset += 2;
-            return (int)DataHelper.fromLong(_message, offset, 1);
+            return _message[offset] & 0xff;
         }
         /** @deprecated unused */
         public void readAliceIP(byte target[], int targetOffset) {
             int offset = readBodyOffset();
-            offset += DataHelper.fromLong(_message, offset, 1);
+            offset += _message[offset] & 0xff;
             offset++;
             offset += 2;
-            int sz = (int)DataHelper.fromLong(_message, offset, 1);
+            int sz = _message[offset] & 0xff;
             offset++;
             System.arraycopy(_message, offset, target, targetOffset, sz);
         }
         /** @deprecated unused */
         public int readAlicePort() {
             int offset = readBodyOffset();
-            offset += DataHelper.fromLong(_message, offset, 1);
+            offset += _message[offset] & 0xff;
             offset++;
             offset += 2;
-            int sz = (int)DataHelper.fromLong(_message, offset, 1);
+            int sz = _message[offset] & 0xff;
             offset++;
             offset += sz;
             return (int)DataHelper.fromLong(_message, offset, 2);
         }
         public long readNonce() {
             int offset = readBodyOffset();
-            offset += DataHelper.fromLong(_message, offset, 1);
+            offset += _message[offset] & 0xff;
             offset++;
             offset += 2;
-            int sz = (int)DataHelper.fromLong(_message, offset, 1);
+            int sz = _message[offset] & 0xff;
             offset++;
             offset += sz;
             offset += 2;
