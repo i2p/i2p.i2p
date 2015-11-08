@@ -67,13 +67,19 @@ class UDPPacketReader {
         return (_message[_payloadBeginOffset] & 0xFF) >>> 4;
     }
     
-    /** does this packet include rekeying data? */
-    public boolean readRekeying() {
-        return (_message[_payloadBeginOffset] & (1 << 3)) != 0;
+    /**
+     * Does this packet include rekeying data in the header?
+     * Unused, should always be false.
+     */
+    public boolean isRekeyingIncluded() {
+        return (_message[_payloadBeginOffset] & UDPPacket.HEADER_FLAG_REKEY) != 0;
     }
     
-    public boolean readExtendedOptionsIncluded() {
-        return (_message[_payloadBeginOffset] & (1 << 2)) != 0;
+    /**
+     * Does this packet include extended options in the header?
+     */
+    public boolean isExtendedOptionsIncluded() {
+        return (_message[_payloadBeginOffset] & UDPPacket.HEADER_FLAG_EXTENDED_OPTIONS) != 0;
     }
     
     /** @return seconds */
@@ -81,19 +87,46 @@ class UDPPacketReader {
         return DataHelper.fromLong(_message, _payloadBeginOffset + 1, 4);
     }
     
-    public void readKeyingMaterial(byte target[], int targetOffset) {
-        if (!readRekeying())
-            throw new IllegalStateException("This packet is not rekeying!");
-        System.arraycopy(_message, _payloadBeginOffset + 1 + 4, target, targetOffset, KEYING_MATERIAL_LENGTH);
+    /**
+     * Returns rekeying data (64 bytes), or null if none.
+     * Unused, should always return null.
+     *
+     * @deprecated unused
+     */
+    @Deprecated
+    public byte[] readKeyingMaterial() {
+        if (!isRekeyingIncluded())
+            return null;
+        byte[] rv = new byte[KEYING_MATERIAL_LENGTH];
+        System.arraycopy(_message, _payloadBeginOffset + 1 + 4, rv, 0, KEYING_MATERIAL_LENGTH);
+        return rv;
+    }
+    
+    /**
+     * Returns extended option data, 0-255 bytes, or null if none.
+     *
+     * @return extended options or null if none is included
+     * @since 0.9.24
+     */
+    public byte[] readExtendedOptions() {
+        if (!isExtendedOptionsIncluded())
+            return null;
+        int offset = _payloadBeginOffset + 1 + 4;
+        if (isRekeyingIncluded())
+            offset += KEYING_MATERIAL_LENGTH;
+        int optionsSize = _message[offset++] & 0xff;
+        byte[] rv = new byte[optionsSize];
+        System.arraycopy(_message, offset, rv, 0, optionsSize);
+        return rv;
     }
     
     /** index into the message where the body begins */
     private int readBodyOffset() {
         int offset = _payloadBeginOffset + 1 + 4;
-        if (readRekeying())
+        if (isRekeyingIncluded())
             offset += KEYING_MATERIAL_LENGTH;
-        if (readExtendedOptionsIncluded()) {
-            int optionsSize = (int)DataHelper.fromLong(_message, offset, 1);
+        if (isExtendedOptionsIncluded()) {
+            int optionsSize = _message[offset] & 0xff;
             offset += optionsSize + 1;
         }
         return offset;

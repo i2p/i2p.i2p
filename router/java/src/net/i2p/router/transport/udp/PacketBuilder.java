@@ -783,10 +783,13 @@ class PacketBuilder {
      * @return ready to send packet, or null if there was a problem
      */
     public UDPPacket buildSessionRequestPacket(OutboundEstablishState state) {
+        // TODO
+        //byte[] options = new byte[3];
+        //UDPPacket packet = buildPacketHeader(SESSION_REQUEST_FLAG_BYTE, options);
         UDPPacket packet = buildPacketHeader(SESSION_REQUEST_FLAG_BYTE);
         DatagramPacket pkt = packet.getPacket();
         byte data[] = pkt.getData();
-        int off = HEADER_SIZE;
+        int off = HEADER_SIZE; // + 1 + options.length;
 
         byte toIP[] = state.getSentIP();
         if (!_transport.isValid(toIP)) {
@@ -1433,24 +1436,49 @@ class PacketBuilder {
     /**
      *  Create a new packet and add the flag byte and the time stamp.
      *  Caller should add data starting at HEADER_SIZE.
-     *  At this point, adding support for extended options and rekeying is unlikely,
-     *  but if we do, we'll have to change this.
+     *  Does not include extended options or rekeying.
      *
      *  @param flagByte contains type and flags
      *  @since 0.8.1
      */
     private UDPPacket buildPacketHeader(byte flagByte) {
+        return buildPacketHeader(flagByte, null);
+    }
+
+    /**
+     *  Create a new packet and add the flag byte and the time stamp.
+     *  Caller should add data starting at HEADER_SIZE.
+     *  (if extendedOptions != null, at HEADER_SIZE + 1 + extendedOptions.length)
+     *  Does not include rekeying.
+     *
+     *  @param flagByte contains type and flags
+     *  @param extendedOptions May be null. If non-null, we will add the associated flag here.
+     *                         255 bytes max.
+     *  @since 0.9.24
+     */
+    private UDPPacket buildPacketHeader(byte flagByte, byte[] extendedOptions) {
         UDPPacket packet = UDPPacket.acquire(_context, false);
         byte data[] = packet.getPacket().getData();
         Arrays.fill(data, 0, data.length, (byte)0x0);
         int off = UDPPacket.MAC_SIZE + UDPPacket.IV_SIZE;
         
         // header
+        if (extendedOptions != null)
+            flagByte |= UDPPacket.HEADER_FLAG_EXTENDED_OPTIONS;
         data[off] = flagByte;
         off++;
         long now = (_context.clock().now() + 500) / 1000;
         DataHelper.toLong(data, off, 4, now);
-        // todo: add support for rekeying and extended options
+        // todo: add support for rekeying
+        // extended options
+        if (extendedOptions != null) {
+            off+= 4;
+            int len = extendedOptions.length;
+            if (len > 255)
+                throw new IllegalArgumentException();
+            data[off++] = (byte) len;
+            System.arraycopy(extendedOptions, 0, data, off, len);
+        }
         return packet;
     }
 
