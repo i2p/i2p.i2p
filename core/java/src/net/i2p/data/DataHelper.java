@@ -1617,11 +1617,11 @@ public class DataHelper {
      * NOTE: formatDuration2() recommended in most cases for readability
      */
     public static String formatSize(long bytes) {
-        double val = bytes;
+        float val = bytes;
         int scale = 0;
-        while (val >= 1024) {
+        while (val >= 1024.0f) {
             scale++; 
-            val /= 1024;
+            val /= 1024.0f;
         }
         
         DecimalFormat fmt = new DecimalFormat("##0.00");
