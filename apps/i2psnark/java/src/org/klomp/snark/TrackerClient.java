@@ -875,16 +875,18 @@ public class TrackerClient implements Runnable {
   }
 
   /**
-   *  @param ann an announce URL
+   *  @param ann an announce URL, may be null, returns false if null
    *  @return true for i2p hosts only
    *  @since 0.7.12
    */
   public static boolean isValidAnnounce(String ann) {
+    if (ann == null)
+        return false;
     URI url;
     try {
-       url = new URI(ann);
+        url = new URI(ann);
     } catch (URISyntaxException use) {
-       return false;
+        return false;
     }
     return "http".equals(url.getScheme()) && url.getHost() != null &&
            (url.getHost().endsWith(".i2p") || url.getHost().equals("i2p"));
