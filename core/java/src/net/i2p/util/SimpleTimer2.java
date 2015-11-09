@@ -385,7 +385,8 @@ public class SimpleTimer2 {
                 boolean cancelled = _future.cancel(false);
                 if (cancelled)
                     _state = TimedEventState.CANCELLED;
-                else {} // log something as this could be serious, we remain RUNNING otherwise
+                else 
+                    _log.warn("could not cancel "+this);
                 return cancelled;
             }
             return false;
