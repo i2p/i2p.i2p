@@ -784,6 +784,8 @@ class PacketBuilder {
      */
     public UDPPacket buildSessionRequestPacket(OutboundEstablishState state) {
         // TODO
+        // boolean ext = state.isExtendedOptionsAllowed();
+        // if (ext)
         //byte[] options = new byte[3];
         //UDPPacket packet = buildPacketHeader(SESSION_REQUEST_FLAG_BYTE, options);
         UDPPacket packet = buildPacketHeader(SESSION_REQUEST_FLAG_BYTE);

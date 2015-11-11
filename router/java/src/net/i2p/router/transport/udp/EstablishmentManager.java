@@ -29,6 +29,7 @@ import net.i2p.router.util.DecayingBloomFilter;
 import net.i2p.util.Addresses;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
+import net.i2p.util.VersionComparator;
 
 /**
  * Coordinate the establishment of new sessions - both inbound and outbound.
@@ -126,6 +127,14 @@ class EstablishmentManager {
     /** for the DSM and or netdb store */
     private static final int DATA_MESSAGE_TIMEOUT = 10*1000;
     
+    /**
+     * Java I2P has always parsed the length of the extended options field,
+     * but i2pd hasn't recognized it until this release.
+     * No matter, the options weren't defined until this release anyway.
+     */
+    private static final String VERSION_ALLOW_EXTENDED_OPTIONS = "0.9.24";
+
+
     public EstablishmentManager(RouterContext ctx, UDPTransport transport) {
         _context = ctx;
         _log = ctx.logManager().getLog(EstablishmentManager.class);
@@ -356,8 +365,10 @@ class EstablishmentManager {
                         _transport.failed(msg, "Peer has bad key, cannot establish");
                         return;
                     }
+                    boolean allowExtendedOptions = VersionComparator.comp(toRouterInfo.getVersion(),
+                                                                          VERSION_ALLOW_EXTENDED_OPTIONS) >= 0;
                     state = new OutboundEstablishState(_context, maybeTo, to,
-                                                       toIdentity,
+                                                       toIdentity, allowExtendedOptions,
                                                        sessionKey, addr, _transport.getDHFactory());
                     OutboundEstablishState oldState = _outboundStates.putIfAbsent(to, state);
                     boolean isNew = oldState == null;
@@ -477,6 +488,7 @@ class EstablishmentManager {
             // Don't offer to relay to privileged ports.
             // Only offer for an IPv4 session.
             // TODO if already we have their RI, only offer if they need it (no 'C' cap)
+            // TODO if extended options, only if they asked for it
             if (_transport.canIntroduce() && state.getSentPort() >= 1024 &&
                 state.getSentIP().length == 4) {
                 // ensure > 0

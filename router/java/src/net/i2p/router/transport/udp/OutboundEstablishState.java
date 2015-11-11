@@ -56,6 +56,7 @@ class OutboundEstablishState {
     private RemoteHostId _remoteHostId;
     private final RemoteHostId _claimedAddress;
     private final RouterIdentity _remotePeer;
+    private final boolean _allowExtendedOptions;
     private final SessionKey _introKey;
     private final Queue<OutNetMessage> _queuedMessages;
     private OutboundState _currentState;
@@ -112,7 +113,8 @@ class OutboundEstablishState {
      */
     public OutboundEstablishState(RouterContext ctx, RemoteHostId claimedAddress,
                                   RemoteHostId remoteHostId,
-                                  RouterIdentity remotePeer, SessionKey introKey, UDPAddress addr,
+                                  RouterIdentity remotePeer, boolean allowExtendedOptions,
+                                  SessionKey introKey, UDPAddress addr,
                                   DHSessionKeyBuilder.Factory dh) {
         _context = ctx;
         _log = ctx.logManager().getLog(OutboundEstablishState.class);
@@ -125,6 +127,7 @@ class OutboundEstablishState {
         }
         _claimedAddress = claimedAddress;
         _remoteHostId = remoteHostId;
+        _allowExtendedOptions = allowExtendedOptions;
         _remotePeer = remotePeer;
         _introKey = introKey;
         _queuedMessages = new LinkedBlockingQueue<OutNetMessage>();
@@ -157,6 +160,9 @@ class OutboundEstablishState {
 
     /** @return -1 if unset */
     public long getIntroNonce() { return _introductionNonce; }
+
+    /** @since 0.9.24 */
+    public boolean isExtendedOptionsAllowed() { return _allowExtendedOptions; }
     
     /**
      *  Queue a message to be sent after the session is established.
