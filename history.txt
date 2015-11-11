@@ -1,3 +1,9 @@
+2015-11-11 zzz
+ * i2psnark:
+   - Change log level to hide socket closed error at tunnel shutdown
+   - Increase max pieces
+ * Timers: State fix 4th try (tickets #1694, #1705)
+
 2015-11-05 zzz
  * I2CP: Fix additional connections getting rejected during tunnel open (ticket #1650)
  * Streaming: Split blacklist into one for EC and one for Ed
