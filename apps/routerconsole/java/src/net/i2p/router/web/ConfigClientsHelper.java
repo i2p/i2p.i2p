@@ -322,23 +322,24 @@ public class ConfigClientsHelper extends HelperBase {
                             boolean enabled, boolean ro, boolean preventDisable, String desc, boolean edit,
                             boolean showEditButton, boolean showUpdateButton, boolean showStopButton,
                             boolean showDeleteButton, boolean showStartButton) {
-        String escapeddesc = DataHelper.escapeHTML(desc);
+        String escapedName = DataHelper.escapeHTML(name);
+        String escapedDesc = DataHelper.escapeHTML(desc);
         buf.append("<tr><td class=\"mediumtags\" align=\"right\" width=\"25%\">");
         if (urlify && enabled) {
             String link = "/";
             if (! RouterConsoleRunner.ROUTERCONSOLE.equals(name))
-                link += name + "/";
-            buf.append("<a href=\"").append(link).append("\">").append(_t(name)).append("</a>");
+                link += escapedName + "/";
+            buf.append("<a href=\"").append(link).append("\">").append(_t(escapedName)).append("</a>");
         } else if (edit && !ro) {
-            buf.append("<input type=\"text\" name=\"name").append(index).append("\" value=\"");
+            buf.append("<input type=\"text\" name=\"nofilter_name").append(index).append("\" value=\"");
             if (name.length() > 0)
-                buf.append(_t(name));
+                buf.append(_t(escapedName));
             buf.append("\" >");
         } else {
             if (name.length() > 0)
-                buf.append(_t(name));
+                buf.append(_t(escapedName));
         }
-        buf.append("</td><td align=\"center\" width=\"10%\"><input type=\"checkbox\" class=\"optbox\" name=\"").append(index).append(".enabled\" value=\"true\" ");
+        buf.append("</td><td align=\"center\" width=\"10%\"><input type=\"checkbox\" class=\"optbox\" name=\"").append(index).append(".enabled\"");
         if (enabled) {
             buf.append("checked=\"checked\" ");
             if (ro || preventDisable)
@@ -366,17 +367,17 @@ public class ConfigClientsHelper extends HelperBase {
         if (showDeleteButton && (!edit) && !ro) {
             buf.append("<button type=\"submit\" class=\"Xdelete\" name=\"action\" value=\"Delete ").append(index)
                .append("\" onclick=\"if (!confirm('")
-               .append(_t("Are you sure you want to delete {0}?", _t(name)))
+               .append(_t("Are you sure you want to delete {0}?", _t(escapedName)))
                .append("')) { return false; }\">")
                .append(_t("Delete")).append("<span class=hide> ").append(index).append("</span></button>");
         }
         buf.append("</td><td align=\"left\" width=\"50%\">");
         if (edit && !ro) {
-            buf.append("<input type=\"text\" size=\"80\" spellcheck=\"false\" name=\"desc").append(index).append("\" value=\"");
-            buf.append(escapeddesc);
+            buf.append("<input type=\"text\" size=\"80\" spellcheck=\"false\" name=\"nofilter_desc").append(index).append("\" value=\"");
+            buf.append(escapedDesc);
             buf.append("\" >");
         } else {
-            buf.append(desc);
+            buf.append(escapedDesc);
         }
         buf.append("</td></tr>\n");
     }

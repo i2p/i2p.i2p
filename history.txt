@@ -1,11 +1,16 @@
+2015-11-12 zzz
+ * Console /configclients:
+   = Fix filtering and escaping
+   - Fix autostart setting on new client, was inverted
+
 2015-11-11 zzz
  * i2psnark:
-   - Change log level to hide socket closed error at tunnel shutdown
+   - Change log level to hide socket closed error at tunnel shutdown (ticket #1687)
    - Increase max pieces
  * Timers: State fix 4th try (tickets #1694, #1705)
 
 2015-11-05 zzz
- * I2CP: Fix additional connections getting rejected during tunnel open (ticket #1650)
+ * I2CP: Fix additional connections getting rejected during tunnel open (tickets #1650, #1698)
  * Streaming: Split blacklist into one for EC and one for Ed
 
 2015-11-04 zzz
