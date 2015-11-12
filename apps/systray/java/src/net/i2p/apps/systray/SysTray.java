@@ -11,6 +11,7 @@ package net.i2p.apps.systray;
 
 import java.awt.Frame;
 import java.io.File;
+import java.io.IOException;
 
 import net.i2p.I2PAppContext;
 import net.i2p.util.SimpleTimer;
@@ -88,14 +89,14 @@ public class SysTray implements SysTrayMenuListener {
             try {
                 if (urlLauncher.openUrl(url))
                     return;
-            } catch (RuntimeException ex) {
+            } catch (IOException ex) {
                 // Fall through.
             }
         } else {
             try {
                 if (urlLauncher.openUrl(url, _browserString))
                     return;
-            } catch (RuntimeException ex) {
+            } catch (IOException ex) {
                 // Fall through.
             }
         }
