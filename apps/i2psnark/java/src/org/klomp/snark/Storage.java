@@ -748,7 +748,7 @@ public class Storage implements Closeable
                     }
                     rv = repl;
                 }
-            } catch (Exception ex) {
+            } catch (RuntimeException ex) {
                 ex.printStackTrace();
             }
         }
@@ -1483,7 +1483,7 @@ public class Storage implements Closeable
                   break;
             }  // switch
           } // while
-      } catch (Exception e) {
+      } catch (RuntimeException e) {
           e.printStackTrace();
           error = true;
       }

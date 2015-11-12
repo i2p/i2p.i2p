@@ -21,7 +21,7 @@ public class Exec {
             try { proc.exitValue(); } catch (Throwable t) { }
             Runtime.getRuntime().halt(0);
 
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             e.printStackTrace();
         }
     }

@@ -91,7 +91,7 @@ public class SingleFileNamingService extends NamingService {
                 key = getKey(hostname.substring(4));
             if (key != null)
                 return lookupBase64(key);
-        } catch (Exception ioe) {
+        } catch (IOException ioe) {
             if (_file.exists())
                 _log.error("Error loading hosts file " + _file, ioe);
             else if (_log.shouldLog(Log.WARN))
@@ -123,7 +123,7 @@ public class SingleFileNamingService extends NamingService {
                     return line.substring(0, split);
             }
             return null;
-        } catch (Exception ioe) {
+        } catch (IOException ioe) {
             if (_file.exists())
                 _log.error("Error loading hosts file " + _file, ioe);
             else if (_log.shouldLog(Log.WARN))

@@ -9,6 +9,7 @@ import java.net.NoRouteToHostException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
+import java.security.GeneralSecurityException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -259,7 +260,13 @@ public class I2PSocketManagerFull implements I2PSocketManager {
                 Certificate.NULL_CERT.writeBytes(keyStream);
                 priv.writeBytes(keyStream);
                 keys[1].writeBytes(keyStream); // signing priv
-            } catch (Exception e) {
+            } catch (GeneralSecurityException e) {
+                throw new I2PSessionException("Error creating keys", e);
+            } catch (I2PException e) {
+                throw new I2PSessionException("Error creating keys", e);
+            } catch (IOException e) {
+                throw new I2PSessionException("Error creating keys", e);
+            } catch (RuntimeException e) {
                 throw new I2PSessionException("Error creating keys", e);
             }
             privateKeyStream = new ByteArrayInputStream(keyStream.toByteArray());

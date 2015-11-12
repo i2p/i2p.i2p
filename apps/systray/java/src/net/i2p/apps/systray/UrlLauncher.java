@@ -149,7 +149,7 @@ public class UrlLauncher implements ClientApp {
                    Thread.sleep(2*1000);
                 } catch (InterruptedException ie) {}
                 return true;
-            } catch (Exception e) {}
+            } catch (IOException e) {}
             if (System.currentTimeMillis() > done)
                 break;
             try {
@@ -171,9 +171,9 @@ public class UrlLauncher implements ClientApp {
      * @return     <code>true</code> if the operation was successful, otherwise
      *             <code>false</code>.
      * 
-     * @throws Exception
+     * @throws IOException
      */ 
-    public boolean openUrl(String url) throws Exception {
+    public boolean openUrl(String url) throws IOException {
         waitForServer(url);
         if (validateUrlFormat(url)) {
             String cbrowser = _context.getProperty(PROP_BROWSER);
@@ -217,7 +217,7 @@ public class UrlLauncher implements ClientApp {
                         // No worries.
                     }
                     foo.delete();
-                } catch (Exception e) {
+                } catch (IOException e) {
                     // Defaults to IE.
                 } finally {
                     if (bufferedReader != null)
@@ -246,9 +246,9 @@ public class UrlLauncher implements ClientApp {
      * @return         <code>true</code> if the operation was successful,
      *                 otherwise <code>false</code>.
      * 
-     * @throws Exception
+     * @throws IOException
      */
-    public boolean openUrl(String url, String browser) throws Exception {
+    public boolean openUrl(String url, String browser) throws IOException {
         waitForServer(url);
         if (validateUrlFormat(url)) {
             if (_shellCommand.executeSilentAndWaitTimed(browser + " " + url, 5))
@@ -289,7 +289,7 @@ public class UrlLauncher implements ClientApp {
                 String url = _args[0];
                 openUrl(url);
                 changeState(STOPPED);
-            } catch (Exception e) {
+            } catch (IOException e) {
                 changeState(CRASHED, e);
             }
         }
@@ -354,6 +354,6 @@ public class UrlLauncher implements ClientApp {
                 launcher.openUrl(args[0]);
             else
                 launcher.openUrl("http://127.0.0.1:7657/index.jsp");
-         } catch (Exception e) {}
+         } catch (IOException e) {}
     }
 }

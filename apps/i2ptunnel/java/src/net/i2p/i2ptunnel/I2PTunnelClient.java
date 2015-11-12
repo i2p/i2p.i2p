@@ -3,6 +3,7 @@
  */
 package net.i2p.i2ptunnel;
 
+import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -10,6 +11,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
+import net.i2p.I2PException;
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.client.streaming.I2PSocketAddress;
 import net.i2p.data.Destination;
@@ -122,7 +124,17 @@ public class I2PTunnelClient extends I2PTunnelClientBase {
             // we are called from an unlimited thread pool, so run inline
             //t.start();
             t.run();
-        } catch (Exception ex) {
+        } catch (IOException ex) {
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Error connecting", ex);
+            //l.log("Error connecting: " + ex.getMessage());
+            closeSocket(s);
+            if (i2ps != null) {
+                synchronized (sockLock) {
+                    mySockets.remove(sockLock);
+                }
+            }
+        } catch (I2PException ex) {
             if (_log.shouldLog(Log.INFO))
                 _log.info("Error connecting", ex);
             //l.log("Error connecting: " + ex.getMessage());

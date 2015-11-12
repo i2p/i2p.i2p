@@ -98,7 +98,13 @@ class RebuildRouterInfoJob extends JobImpl {
                     KeyData kd = LoadRouterInfoJob.readKeyData(keyFile, keyFile2);
                     info = new RouterInfo();
                     info.setIdentity(kd.routerIdentity);
-                } catch (Exception e) {
+                } catch (DataFormatException e) {
+                    _log.log(Log.CRIT, "Error reading in the key data from " + keyFile.getAbsolutePath(), e);
+                    keyFile.delete();
+                    keyFile2.delete();
+                    rebuildRouterInfo(alreadyRunning);
+                    return;
+                } catch (IOException e) {
                     _log.log(Log.CRIT, "Error reading in the key data from " + keyFile.getAbsolutePath(), e);
                     keyFile.delete();
                     keyFile2.delete();

@@ -8,8 +8,11 @@ package net.i2p.i2ptunnel.web;
  *
  */
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Set;
+
+import net.i2p.I2PException;
 import net.i2p.crypto.SigType;
 import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
@@ -87,7 +90,8 @@ public class EditBean extends IndexBean {
                 //System.err.println("Signing " + spoof + " with " + Base64.encode(privKey.getData()));
                 Signature sig = _context.dsa().sign(spoof.getBytes("UTF-8"), privKey);
                 return Base64.encode(sig.getData());
-            } catch (Exception e) {}
+            } catch (I2PException e) {
+            } catch (IOException e) {}
         }
         return "";
     }

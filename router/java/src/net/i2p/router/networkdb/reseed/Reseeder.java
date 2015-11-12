@@ -626,7 +626,7 @@ public class Reseeder {
                             if (fetched % 60 == 0)
                                 System.out.println();
                         }
-                    } catch (Exception e) {
+                    } catch (RuntimeException e) {
                         if (_log.shouldLog(Log.INFO))
                             _log.info("Failed fetch", e);
                         errors++;

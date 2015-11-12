@@ -343,7 +343,7 @@ public class KeyGenerator {
     public static void main(String args[]) {
         try {
              main2(args);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
              e.printStackTrace();
         }
     }
@@ -381,7 +381,7 @@ public class KeyGenerator {
                 try {
                     System.out.println("Testing " + type);
                     testSig(type, runs);
-                } catch (Exception e) {
+                } catch (GeneralSecurityException e) {
                     System.out.println("error testing " + type);
                     e.printStackTrace();
                 }

@@ -9,6 +9,7 @@ package net.i2p.router;
  */
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -648,7 +649,7 @@ public class Router implements RouterClock.ClockShiftListener {
                 //else
                 //    System.err.println("WARNING: Configuration file " + filename + " does not exist");
             }
-        } catch (Exception ioe) {
+        } catch (IOException ioe) {
             if (log != null)
                 log.error("Error loading the router configuration from " + filename, ioe);
             else
@@ -1351,7 +1352,7 @@ public class Router implements RouterClock.ClockShiftListener {
                 ordered.putAll(_config);
                 DataHelper.storeProps(ordered, new File(_configFilename));
             }
-        } catch (Exception ioe) {
+        } catch (IOException ioe) {
                 // warning, _log will be null when called from constructor
                 if (_log != null)
                     _log.error("Error saving the config to " + _configFilename, ioe);

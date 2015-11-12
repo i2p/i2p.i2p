@@ -98,7 +98,8 @@ public class KeyStoreUtil {
                     try {
                         ks.load(null, DEFAULT_KEYSTORE_PASSWORD.toCharArray());
                         success = addCerts(new File(System.getProperty("java.home"), "etc/security/cacerts"), ks) > 0;
-                    } catch (Exception e) {}
+                    } catch (IOException e) {
+                    } catch (GeneralSecurityException e) {}
                 } else {
                     success = loadCerts(new File(System.getProperty("java.home"), "etc/security/cacerts.bks"), ks);
                 }
@@ -113,7 +114,8 @@ public class KeyStoreUtil {
             try {
                 // must be initted
                 ks.load(null, DEFAULT_KEYSTORE_PASSWORD.toCharArray());
-            } catch (Exception e) {}
+            } catch (IOException e) {
+            } catch (GeneralSecurityException e) {}
             error("All key store loads failed, will only load local certificates", null);
         }
         return ks;
@@ -140,13 +142,15 @@ public class KeyStoreUtil {
             try {
                 // not clear if null is allowed for password
                 ks.load(null, DEFAULT_KEYSTORE_PASSWORD.toCharArray());
-            } catch (Exception foo) {}
+            } catch (IOException foo) {
+            } catch (GeneralSecurityException e) {}
             return false;
         } catch (IOException ioe) {
             error("KeyStore load error, no default keys: " + file.getAbsolutePath(), ioe);
             try {
                 ks.load(null, DEFAULT_KEYSTORE_PASSWORD.toCharArray());
-            } catch (Exception foo) {}
+            } catch (IOException foo) {
+            } catch (GeneralSecurityException e) {}
             return false;
         } finally {
             try { if (fis != null) fis.close(); } catch (IOException foo) {}
@@ -171,7 +175,7 @@ public class KeyStoreUtil {
                     count++;
                 }
             }
-        } catch (Exception foo) {}
+        } catch (GeneralSecurityException e) {}
         return count;
     }
 
@@ -316,7 +320,10 @@ public class KeyStoreUtil {
                     error("Not overwriting key " + alias + ", already exists in " + ks, null);
                     return false;
                 }
-            } catch (Exception e) {
+            } catch (IOException e) {
+                error("Not overwriting key \"" + alias + "\", already exists in " + ks, e);
+                return false;
+            } catch (GeneralSecurityException e) {
                 error("Not overwriting key \"" + alias + "\", already exists in " + ks, e);
                 return false;
             }
@@ -354,7 +361,10 @@ public class KeyStoreUtil {
                     success = getPrivateKey(ks, ksPW, alias, keyPW) != null;
                     if (!success)
                         error("Key gen failed to get private key", null);
-                } catch (Exception e) {
+                } catch (IOException e) {
+                    error("Key gen failed to get private key", e);
+                    success = false;
+                } catch (GeneralSecurityException e) {
                     error("Key gen failed to get private key", e);
                     success = false;
                 }

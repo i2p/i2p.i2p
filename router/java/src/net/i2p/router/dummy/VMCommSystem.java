@@ -8,6 +8,7 @@ import java.util.Map;
 
 import net.i2p.data.Hash;
 import net.i2p.data.i2np.I2NPMessage;
+import net.i2p.data.i2np.I2NPMessageException;
 import net.i2p.data.i2np.I2NPMessageHandler;
 import net.i2p.router.CommSystemFacade;
 import net.i2p.router.JobImpl;
@@ -121,7 +122,7 @@ public class VMCommSystem extends CommSystemFacade {
                     ReceiveJob.this.getContext().statManager().addRateData("transport.receiveMessageLarge", 1, 1);
 
                 _ctx.inNetMessagePool().add(msg, null, _from);
-            } catch (Exception e) {
+            } catch (I2NPMessageException e) {
                 _log.error("Error reading/formatting a VM message? Something is not right...", e);
             }
         }

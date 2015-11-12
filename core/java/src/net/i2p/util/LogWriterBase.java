@@ -75,7 +75,7 @@ abstract class LogWriterBase implements Runnable {
                 if (_write && shouldReadConfig)
                     rereadConfig();
             }
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             System.err.println("Error writing the log: " + e);
             e.printStackTrace();
         }

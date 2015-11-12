@@ -215,7 +215,7 @@ class PacketHandler {
                     _state = 5;
                     handlePacket(_reader, packet);
                     _state = 6;
-                } catch (Exception e) {
+                } catch (RuntimeException e) {
                     _state = 7;
                     if (_log.shouldLog(Log.ERROR))
                         _log.error("Crazy error handling a packet: " + packet, e);

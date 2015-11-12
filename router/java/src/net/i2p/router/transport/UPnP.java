@@ -476,7 +476,7 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 		ServiceStateTable table;
 		try {
 			table = serv.getServiceStateTable();
-		} catch (Exception e) {
+		} catch (RuntimeException e) {
 			// getSCPDNode() returns null,
 			// NPE at org.cybergarage.upnp.Service.getServiceStateTable(Service.java:526)
 			sb.append(" : no state");

@@ -180,7 +180,7 @@ public class SSLEepGet extends EepGet {
                     break;
               }  // switch
             } // while
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             e.printStackTrace();
             error = true;
         }
@@ -370,7 +370,7 @@ public class SSLEepGet extends EepGet {
             System.out.println("      Valid To:   " + cert.getNotAfter());
             try {
                 cert.checkValidity();
-            } catch (Exception e) {
+            } catch (GeneralSecurityException e) {
                 System.out.println("      WARNING: Certificate is not currently valid, it cannot be used");
             }
             CertUtil.saveCert(cert, new File(name));

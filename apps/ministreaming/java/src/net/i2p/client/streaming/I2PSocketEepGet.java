@@ -274,7 +274,7 @@ public class I2PSocketEepGet extends EepGet {
                     url = args[i];
                 }
             }
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             e.printStackTrace();
             usage();
             return;

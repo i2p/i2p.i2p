@@ -399,7 +399,7 @@ class I2PSessionMuxedImpl extends I2PSessionImpl2 {
                 try {
                     _demultiplexer.messageAvailable(I2PSessionMuxedImpl.this,
                         msg.id, msg.size, msg.proto, msg.fromPort, msg.toPort);
-                } catch (Exception e) {
+                } catch (RuntimeException e) {
                     _log.error("Error notifying app of message availability", e);
                 }
             }

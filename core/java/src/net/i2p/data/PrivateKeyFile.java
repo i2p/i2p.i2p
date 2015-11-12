@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.security.GeneralSecurityException;
+import java.security.NoSuchAlgorithmException; 
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
@@ -174,7 +175,10 @@ public class PrivateKeyFile {
                 pkf.write();
                 verifySignature(pkf.getDestination());
             }
-        } catch (Exception e) {
+        } catch (I2PException e) {
+            e.printStackTrace();
+            System.exit(1);
+        } catch (IOException e) {
             e.printStackTrace();
             System.exit(1);
         }
@@ -358,7 +362,7 @@ public class PrivateKeyFile {
         HashCash hc;
         try {
             hc = HashCash.mintCash(resource, effort);
-        } catch (Exception e) {
+        } catch (NoSuchAlgorithmException e) {
             return null;
         }
         System.out.println("Generation took: " + DataHelper.formatDuration(System.currentTimeMillis() - begin));
@@ -391,7 +395,9 @@ public class PrivateKeyFile {
         Destination d2;
         try {
             d2 = pkf2.getDestination();
-        } catch (Exception e) {
+        } catch (I2PException e) {
+            return null;
+        } catch (IOException e) {
             return null;
         }
         if (d2 == null)
@@ -500,7 +506,7 @@ public class PrivateKeyFile {
         long low = Long.MAX_VALUE;
         try {
             low = HashCash.estimateTime(hashEffort);
-        } catch (Exception e) {}
+        } catch (NoSuchAlgorithmException e) {}
         // takes a lot longer than the estimate usually...
         // maybe because the resource string is much longer than used in the estimate?
         return "It is estimated that generating a HashCash Certificate with value " + hashEffort +

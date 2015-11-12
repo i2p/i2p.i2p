@@ -88,7 +88,7 @@ class UPnPManager {
                 _isRunning = _upnp.runPlugin();
                 if (_log.shouldLog(Log.INFO))
                     _log.info("UPnP runPlugin took " + (_context.clock().now() - b));
-            } catch (Exception e) {
+            } catch (RuntimeException e) {
                 // NPE in UPnP (ticket #728), can't let it bring us down
                 if (!_errorLogged) {
                     _log.error("UPnP error, please report", e);

@@ -439,7 +439,7 @@ public class ShellCommand {
                     System.out.println("ShellCommand waiting for \"" + name + '\"');
                 try {
                     process.waitFor();
-                } catch (Exception e) {
+                } catch (InterruptedException e) {
                     if (DEBUG) {
                         System.out.println("ShellCommand exception waiting for \"" + name + '\"');
                         e.printStackTrace();
@@ -457,7 +457,7 @@ public class ShellCommand {
                 if (process.exitValue() > 0)
                     return false;
             }
-        } catch (Exception e) {
+        } catch (IOException e) {
             // probably IOException, file not found from exec()
             if (DEBUG) {
                 System.out.println("ShellCommand execute exception for \"" + name + '\"');

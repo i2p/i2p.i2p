@@ -109,7 +109,7 @@ public class BundleRouterInfos {
             RouterInfo ri = new RouterInfo();
             ri.readBytes(fis, true);  // true = verify sig on read
             me = ri.getIdentity().getHash();
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             //System.out.println("Can't determine our identity");
         } finally {
             if (fis != null) try { fis.close(); } catch (IOException ioe) {}
@@ -209,7 +209,7 @@ public class BundleRouterInfos {
                     copied++;
                 else
                     System.out.println("Failed copy of " + file + " to " + toDir);
-            } catch (Exception e) {
+            } catch (RuntimeException e) {
                 System.out.println("Skipping bad " + file);
             } finally {
                 if (fis != null) try { fis.close(); } catch (IOException ioe) {}

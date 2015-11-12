@@ -98,7 +98,7 @@ public class Config {
 		try {
 			iv = Config.class.getResourceAsStream("/susimail.properties");
 			properties.load(iv);
-		} catch (Exception e) {
+		} catch (IOException e) {
 			Debug.debug(Debug.ERROR, "Could not open WEB-INF/classes/susimail.properties (possibly in jar), reason: " + e);
 		} finally {
 			if(iv != null) try { iv.close(); } catch(IOException ioe) {}
@@ -109,7 +109,7 @@ public class Config {
 				config = new OrderedProperties();
 				DataHelper.loadProps(config, cfg);
 			}
-		} catch (Exception e) {
+		} catch (IOException e) {
 			Debug.debug(Debug.ERROR, "Could not open susimail.config, reason: " + e);
 		}
 	}

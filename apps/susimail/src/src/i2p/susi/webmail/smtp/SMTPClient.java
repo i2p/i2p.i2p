@@ -210,7 +210,7 @@ public class SMTPClient {
 		
 		try {
 			socket = new Socket( host, port );
-		} catch (Exception e) {
+		} catch (IOException e) {
 			error += _t("Cannot connect") + ": " + e.getMessage() + '\n';
 			ok = false;
 		}

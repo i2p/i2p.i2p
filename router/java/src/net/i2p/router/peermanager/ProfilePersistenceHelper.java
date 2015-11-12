@@ -301,7 +301,7 @@ class ProfilePersistenceHelper {
                 _log.debug("Loaded the profile for " + peer.toBase64() + " from " + file.getName());
             
             return profile;
-        } catch (Exception e) {
+        } catch (IOException e) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Error loading properties from " + file.getAbsolutePath(), e);
             file.delete();
@@ -369,7 +369,7 @@ class ProfilePersistenceHelper {
                 return null;
             Hash h = Hash.create(b);
             return h;
-        } catch (Exception dfe) {
+        } catch (RuntimeException dfe) {
             _log.warn("Invalid base64 [" + key + "]", dfe);
             return null;
         }

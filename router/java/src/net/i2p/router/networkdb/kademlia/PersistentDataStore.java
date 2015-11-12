@@ -543,7 +543,7 @@ public class PersistentDataStore extends TransientDataStore {
                     if (_log.shouldLog(Log.INFO))
                         _log.info("Unable to read the router reference in " + _routerFile.getName(), ioe);
                     corrupt = true;
-                } catch (Exception e) {
+                } catch (RuntimeException e) {
                     // key certificate problems, etc., don't let one bad RI kill the whole thing
                     if (_log.shouldLog(Log.INFO))
                         _log.info("Unable to read the router reference in " + _routerFile.getName(), e);
@@ -666,7 +666,7 @@ public class PersistentDataStore extends TransientDataStore {
                 return null;
             Hash h = Hash.create(b);
             return h;
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             // static
             //_log.warn("Unable to fetch the key from [" + filename + "]", e);
             return null;

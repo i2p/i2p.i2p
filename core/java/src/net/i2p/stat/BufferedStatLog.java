@@ -145,7 +145,7 @@ public class BufferedStatLog implements StatLog {
                             if (_log.shouldLog(Log.DEBUG))
                                 _log.debug("writing " + writeStart +"->"+ writeEnd);
                             writeEvents(writeStart, writeEnd);
-                        } catch (Exception e) {
+                        } catch (RuntimeException e) {
                             _log.error("error writing " + writeStart +"->"+ writeEnd, e);
                         }
                     }

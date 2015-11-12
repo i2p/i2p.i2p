@@ -88,14 +88,14 @@ public class SysTray implements SysTrayMenuListener {
             try {
                 if (urlLauncher.openUrl(url))
                     return;
-            } catch (Exception ex) {
+            } catch (RuntimeException ex) {
                 // Fall through.
             }
         } else {
             try {
                 if (urlLauncher.openUrl(url, _browserString))
                     return;
-            } catch (Exception ex) {
+            } catch (RuntimeException ex) {
                 // Fall through.
             }
         }

@@ -614,7 +614,7 @@ public class WebMail extends HttpServlet
 						showBody = false;
 						reason = _t("Charset \\''{0}\\'' not supported.", quoteHTML( mailPart.charset )) + br;
 					}
-					catch (Exception e1) {
+					catch (IOException e1) {
 						showBody = false;
 						reason += _t("Part ({0}) not shown, because of {1}", ident, e1.toString()) + br;
 					}

@@ -59,7 +59,7 @@ public class I2NPMessageHandler {
                 _lastSize = msg.readBytes(in, type, _messageBuffer);
             } catch (I2NPMessageException ime) {
                 throw ime;
-            } catch (Exception e) {
+            } catch (RuntimeException e) {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Error reading the stream", e);
                 throw new I2NPMessageException("Unknown error reading the " + msg.getClass().getSimpleName(), e); 
@@ -131,7 +131,7 @@ public class I2NPMessageHandler {
             cur += _lastSize;
         } catch (I2NPMessageException ime) {
             throw ime;
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Error reading the stream", e);
             throw new I2NPMessageException("Unknown error reading the " + msg.getClass().getSimpleName(), e); 

@@ -225,7 +225,7 @@ class NodeInfo extends SimpleDataStructure {
             NodeInfo ni = (NodeInfo) o;
             // assume dest matches, ignore it
             return this.hash.equals(ni.hash) && nID.equals(ni.nID) && port == ni.port;
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             return false;
         }
     }

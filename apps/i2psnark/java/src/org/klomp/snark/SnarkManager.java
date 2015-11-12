@@ -2051,7 +2051,7 @@ public class SnarkManager implements CompleteListener {
                     synchronized (_snarks) {
                         ok = monitorTorrents(dir);
                     }
-                } catch (Exception e) {
+                } catch (RuntimeException e) {
                     _log.error("Error in the DirectoryMonitor", e);
                     ok = false;
                 }
@@ -2060,7 +2060,7 @@ public class SnarkManager implements CompleteListener {
                     try {
                         addMagnets();
                         doMagnets = false;
-                    } catch (Exception e) {
+                    } catch (RuntimeException e) {
                         _log.error("Error in the DirectoryMonitor", e);
                     }
                     if (!_snarks.isEmpty())
@@ -2266,7 +2266,7 @@ public class SnarkManager implements CompleteListener {
                     // Snark.fatal() throws a RuntimeException
                     // don't let one bad torrent kill the whole loop
                     addTorrent(name, null, !shouldAutoStart());
-                } catch (Exception e) {
+                } catch (RuntimeException e) {
                     addMessage(_t("Error: Could not add the torrent {0}", name) + ": " + e);
                     _log.error("Unable to add the torrent " + name, e);
                     rv = false;
@@ -2285,7 +2285,7 @@ public class SnarkManager implements CompleteListener {
                     // Snark.fatal() throws a RuntimeException
                     // don't let one bad torrent kill the whole loop
                     stopTorrent(name, true);
-                } catch (Exception e) {
+                } catch (RuntimeException e) {
                     // don't bother with message
                 }
             }
@@ -2467,7 +2467,7 @@ public class SnarkManager implements CompleteListener {
         public void run() {
             try {
                 run2();
-            } catch (Exception e) {
+            } catch (RuntimeException e) {
                 _log.error("Error starting", e);
             }
         }
@@ -2595,7 +2595,7 @@ public class SnarkManager implements CompleteListener {
                 } else {
                     addMessageNoEscape(_t("Finished recheck of torrent {0}, unchanged", link));
                 }
-            } catch (Exception e) {
+            } catch (IOException e) {
                 _log.error("Error rechecking " + snark.getBaseName(), e);
                 addMessage(_t("Error checking the torrent {0}", snark.getBaseName()) + ": " + e);
             }

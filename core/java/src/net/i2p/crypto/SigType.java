@@ -1,5 +1,6 @@
 package net.i2p.crypto;
 
+import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.Signature;
@@ -215,7 +216,9 @@ public enum SigType {
             }
             getDigestInstance();
             getHashInstance();
-        } catch (Exception e) {
+        } catch (GeneralSecurityException e) {
+            return false;
+        } catch (RuntimeException e) {
             return false;
         }
         return true;

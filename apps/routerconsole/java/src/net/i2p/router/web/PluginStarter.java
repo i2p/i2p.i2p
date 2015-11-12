@@ -423,7 +423,7 @@ public class PluginStarter implements Runnable {
                             addPath(f.toURI().toURL());
                             log.error("INFO: Adding translation plugin to classpath: " + f);
                             added = true;
-                        } catch (Exception e) {
+                        } catch (RuntimeException e) {
                             log.error("Plugin " + appName + " bad classpath element: " + f, e);
                         }
                     }
@@ -961,7 +961,7 @@ public class PluginStarter implements Runnable {
                 urls.add(f.toURI().toURL());
                 if (log.shouldLog(Log.WARN))
                     log.warn("INFO: Adding plugin to classpath: " + f);
-            } catch (Exception e) {
+            } catch (IOException e) {
                 log.error("Plugin client " + clientName + " bad classpath element: " + f, e);
             }
         }

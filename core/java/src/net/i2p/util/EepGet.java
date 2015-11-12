@@ -273,7 +273,7 @@ public class EepGet {
                     break;
               }  // switch
             } // while
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             e.printStackTrace();
             error = true;
         }

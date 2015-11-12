@@ -9,12 +9,14 @@ package net.i2p.i2ptunnel.web;
  */
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
 
 import net.i2p.I2PAppContext;
+import net.i2p.I2PException;
 import net.i2p.app.ClientAppManager;
 import net.i2p.app.Outproxy;
 import net.i2p.data.Certificate;
@@ -266,7 +268,7 @@ public class IndexBean {
         if (_action != null) {
             try {
                 buf.append(processAction()).append('\n');
-            } catch (Exception e) {
+            } catch (RuntimeException e) {
                 _log.log(Log.CRIT, "Error processing " + _action, e);
                 buf.append("Error: ").append(e.toString()).append('\n');
             }
@@ -972,7 +974,9 @@ public class IndexBean {
         PrivateKeyFile pkf = new PrivateKeyFile(keyFile);
         try {
             pkf.createIfAbsent();
-        } catch (Exception e) {
+        } catch (I2PException e) {
+            return "Create private key file failed: " + e;
+        } catch (IOException e) {
             return "Create private key file failed: " + e;
         }
         switch (_certType) {
@@ -1011,7 +1015,9 @@ public class IndexBean {
         try {
             pkf.write();
             newdest = pkf.getDestination();
-        } catch (Exception e) {
+        } catch (I2PException e) {
+            return "Modification failed: " + e;
+        } catch (IOException e) {
             return "Modification failed: " + e;
         }
         return "Destination modified - " +

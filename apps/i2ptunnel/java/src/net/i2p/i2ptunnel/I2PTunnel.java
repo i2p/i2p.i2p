@@ -1873,7 +1873,7 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
             try {
                 result.fromByteArray(content);
                 return result;
-            } catch (Exception ex) {
+            } catch (RuntimeException ex) {
                 if (log.shouldLog(Log.INFO)) 
                     log.info("File is not a binary destination - trying base64");
                 try {
