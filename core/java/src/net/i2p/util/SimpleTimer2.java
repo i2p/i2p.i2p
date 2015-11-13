@@ -396,7 +396,7 @@ public class SimpleTimer2 {
                 // There's probably a race here, where it's cancelled after it's running
                 // The result (if rescheduled) is a dup on the queue, see tickets 1694, 1705
                 // Mitigated by close-to-execution check in reschedule()
-                boolean cancelled = _future.cancel(false);
+                boolean cancelled = _future.cancel(true);
                 if (cancelled)
                     _state = TimedEventState.CANCELLED;
                 else
@@ -422,6 +422,10 @@ public class SimpleTimer2 {
             long before = System.currentTimeMillis();
             long delay = 0;
             synchronized(this) {
+                if (Thread.currentThread().isInterrupted()) {
+                    _log.warn("I was interrupted in run, state "+_state+" event "+this);
+                    return;
+                }
                 if (_rescheduleAfterRun)
                     throw new IllegalStateException(this + " rescheduleAfterRun cannot be true here");
                 
