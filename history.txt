@@ -1,3 +1,6 @@
+2015-11-13 zab
+ * Interrupt() when cancelling scheduled tasks
+
 2015-11-13 zzz
  * Console: Fix lifetime participating bandwidth display (ticket #1706)
 
