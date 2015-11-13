@@ -163,9 +163,14 @@ public class TunnelDispatcher implements Service {
         ctx.statManager().createRateStat("tunnel.participatingMessageDropped", 
                                          "Dropped for exceeding share limit", "Tunnels", 
                                          new long[] { 60*1000l, 60*10*1000l });
+        // count for console
         ctx.statManager().createRequiredRateStat("tunnel.participatingMessageCount", 
                                          "Number of 1KB participating messages", "Tunnels", 
                                          new long[] { 60*1000l, 60*10*1000l, 60*60*1000l });
+        // estimate for RouterThrottleImpl
+        ctx.statManager().createRequiredRateStat("tunnel.participatingMessageCountAvgPerTunnel", 
+                                         "Estimate of participating messages per tunnel lifetime", "Tunnels", 
+                                         new long[] { 60*1000l });
         ctx.statManager().createRateStat("tunnel.ownedMessageCount", 
                                          "How many messages are sent through a tunnel we created (period == failures)?", "Tunnels", 
                                          new long[] { 60*1000l, 10*60*1000l, 60*60*1000l });
@@ -711,7 +716,7 @@ public class TunnelDispatcher implements Service {
         long tooYoung = _context.clock().now() - 60*1000;
         long tooOld = tooYoung - 9*60*1000;
         for (HopConfig cfg : _participatingConfig.values()) {
-            long c = cfg.getRecentMessagesCount();
+            long c = cfg.getAndResetRecentMessagesCount();
             bw += c;
             //bwOut += cfg.getRecentSentMessagesCount();
             long created = cfg.getCreation();
@@ -720,9 +725,15 @@ public class TunnelDispatcher implements Service {
             tcount++;
             count += c;
         }
+        // This is an estimate of the average number of participating messages per tunnel
+        // in a tunnel lifetime, used only by RouterThrottleImpl
+        // 10 minutes / 50 seconds = 12
         if (tcount > 0)
-            count = count * 30 / tcount;
-        _context.statManager().addRateData("tunnel.participatingMessageCount", count, ms);
+            count = count * (10*60*1000 / ms) / tcount;
+        _context.statManager().addRateData("tunnel.participatingMessageCountAvgPerTunnel", count, ms);
+        // This is a straight count of the total participating messages, used in the router console
+        _context.statManager().addRateData("tunnel.participatingMessageCount", bw, ms);
+        // Bandwidth in bits per second
         _context.statManager().addRateData("tunnel.participatingBandwidth", bw*1024/(ms/1000), ms);
         // moved to FIFOBandwidthRefiller
         //_context.statManager().addRateData("tunnel.participatingBandwidthOut", bwOut*1024/(ms/1000), ms);

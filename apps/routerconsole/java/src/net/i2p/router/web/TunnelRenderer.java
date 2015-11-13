@@ -81,12 +81,13 @@ public class TunnelRenderer {
         int displayed = 0;
         for (int i = 0; i < participating.size(); i++) {
             HopConfig cfg = participating.get(i);
-            long count = cfg.getProcessedMessagesCount();
+            int count = cfg.getProcessedMessagesCount();
             if (count <= 0) {
                 inactive++;
                 continue;
             }
-            processed += count;
+            // everything that isn't 'recent' is already in the tunnel.participatingMessageCount stat
+            processed += cfg.getRecentMessagesCount();
             if (++displayed > DISPLAY_LIMIT)
                 continue;
             out.write("<tr>");
@@ -111,13 +112,13 @@ public class TunnelRenderer {
                 out.write("<td class=\"cells\" align=\"center\">" + DataHelper.formatDuration2(timeLeft) + "</td>");
             else
                 out.write("<td class=\"cells\" align=\"center\">(" + _t("grace period") + ")</td>");
-            out.write("<td class=\"cells\" align=\"center\">" + cfg.getProcessedMessagesCount() + " KB</td>");
+            out.write("<td class=\"cells\" align=\"center\">" + count + " KB</td>");
             int lifetime = (int) ((_context.clock().now() - cfg.getCreation()) / 1000);
             if (lifetime <= 0)
                 lifetime = 1;
             if (lifetime > 10*60)
                 lifetime = 10*60;
-            int bps = 1024 * cfg.getProcessedMessagesCount() / lifetime;
+            int bps = 1024 * count / lifetime;
             out.write("<td class=\"cells\" align=\"center\">" + bps + " Bps</td>");
             if (cfg.getSendTo() == null)
                 out.write("<td class=\"cells\" align=\"center\">" + _t("Outbound Endpoint") + "</td>");
@@ -188,7 +189,8 @@ public class TunnelRenderer {
             else
                 out.write("<tr> <td class=\"cells\" align=\"center\"><img src=\"/themes/console/images/outbound.png\" alt=\"Outbound\" title=\"Outbound\"></td>");
             out.write(" <td class=\"cells\" align=\"center\">" + DataHelper.formatDuration2(timeLeft) + "</td>\n");
-            out.write(" <td class=\"cells\" align=\"center\">" + info.getProcessedMessagesCount() + " KB</td>\n");
+            int count = info.getProcessedMessagesCount();
+            out.write(" <td class=\"cells\" align=\"center\">" + count + " KB</td>\n");
             for (int j = 0; j < info.getLength(); j++) {
                 Hash peer = info.getPeer(j);
                 TunnelId id = (info.isInbound() ? info.getReceiveTunnelId(j) : info.getSendTunnelId(j));
@@ -206,9 +208,9 @@ public class TunnelRenderer {
             out.write("</tr>\n");
             
             if (info.isInbound()) 
-                processedIn += info.getProcessedMessagesCount();
+                processedIn += count;
             else
-                processedOut += info.getProcessedMessagesCount();
+                processedOut += count;
         }
         out.write("</table>\n");
         if (in != null) {

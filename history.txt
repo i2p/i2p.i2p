@@ -1,3 +1,6 @@
+2015-11-13 zzz
+ * Console: Fix lifetime participating bandwidth display (ticket #1706)
+
 2015-11-12 zzz
  * Console /configclients:
    = Fix filtering and escaping

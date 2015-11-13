@@ -276,7 +276,7 @@ class RouterThrottleImpl implements RouterThrottle {
         
         // ok, we're not hosed, but can we handle the bandwidth requirements 
         // of another tunnel?
-        rs = _context.statManager().getRate("tunnel.participatingMessageCount");
+        rs = _context.statManager().getRate("tunnel.participatingMessageCountAvgPerTunnel");
         r = null;
         double messagesPerTunnel = DEFAULT_MESSAGES_PER_TUNNEL_ESTIMATE;
         if (rs != null) {
