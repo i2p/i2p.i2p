@@ -1168,7 +1168,7 @@ public class TunnelPool {
             int j = peers.size() - 1 - i;
             cfg.setPeer(j, peers.get(i));
             HopConfig hop = cfg.getConfig(j);
-            hop.setCreation(_context.clock().now());
+            hop.setCreation(now);
             hop.setExpiration(expiration);
             hop.setIVKey(_context.keyGenerator().generateSessionKey());
             hop.setLayerKey(_context.keyGenerator().generateSessionKey());

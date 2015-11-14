@@ -795,7 +795,8 @@ class BuildHandler implements Runnable {
             cfg.setIVKey(req.readIVKey());
             cfg.setLayerKey(req.readLayerKey());
             if (isInGW) {
-                cfg.setReceiveFrom(null);
+                // default
+                //cfg.setReceiveFrom(null);
             } else {
                 if (state.fromHash != null) {
                     cfg.setReceiveFrom(state.fromHash);
@@ -808,8 +809,9 @@ class BuildHandler implements Runnable {
             }
             cfg.setReceiveTunnelId(DataHelper.toLong(4, ourId));
             if (isOutEnd) {
-                cfg.setSendTo(null);
-                cfg.setSendTunnelId(null);
+                // default
+                //cfg.setSendTo(null);
+                //cfg.setSendTunnelId(null);
             } else {
                 cfg.setSendTo(nextPeer);
                 cfg.setSendTunnelId(DataHelper.toLong(4, nextId));

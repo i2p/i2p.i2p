@@ -156,6 +156,11 @@ public class ProfileOrganizer {
      * Blocking if a reorganize is happening.
      */
     public PeerProfile getProfile(Hash peer) {
+        if (peer.equals(_us)) {
+            if (_log.shouldWarn())
+                _log.warn("Who wanted our own profile?", new Exception("I did"));
+            return null;
+        }
         getReadLock();
         try {
             return locked_getProfile(peer);
@@ -168,6 +173,11 @@ public class ProfileOrganizer {
      * @since 0.8.12
      */
     public PeerProfile getProfileNonblocking(Hash peer) {
+        if (peer.equals(_us)) {
+            if (_log.shouldWarn())
+                _log.warn("Who wanted our own profile?", new Exception("I did"));
+            return null;
+        }
         if (tryReadLock()) {
             try {
                 return locked_getProfile(peer);
@@ -184,6 +194,11 @@ public class ProfileOrganizer {
         if (profile == null) return null;
 
         Hash peer = profile.getPeer();
+        if (peer.equals(_us)) {
+            if (_log.shouldWarn())
+                _log.warn("Who added our own profile?", new Exception("I did"));
+            return null;
+        }
 
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("New profile created for " + peer);
