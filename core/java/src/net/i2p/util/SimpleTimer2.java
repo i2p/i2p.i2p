@@ -295,7 +295,7 @@ public class SimpleTimer2 {
             if (timeoutMs <= 0) {
                 // streaming timers do call with timeoutMs == 0
                 if (timeoutMs < 0 && _log.shouldLog(Log.WARN))
-                    _log.warn("Sched. timeout <= 0: " + this + " timeout = " + timeoutMs + " state: " + _state);
+                    _log.warn("Sched. timeout < 0: " + this + " timeout = " + timeoutMs + " state: " + _state);
                 timeoutMs = 1; // otherwise we may execute before _future is updated, which is fine
                                // except it triggers 'early execution' warning logging
             }
