@@ -276,12 +276,9 @@ class Mail {
 		DateFormat localDateFormatter = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
 		DateFormat longLocalDateFormatter = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM);
 		// the router sets the JVM time zone to UTC but saves the original here so we can get it
-		String systemTimeZone = I2PAppContext.getGlobalContext().getProperty("i2p.systemTimeZone");
-		if (systemTimeZone != null) {
-			TimeZone tz = TimeZone.getTimeZone(systemTimeZone);
-			localDateFormatter.setTimeZone(tz);
-			longLocalDateFormatter.setTimeZone(tz);
-		}
+		TimeZone tz = DataHelper.getSystemTimeZone(I2PAppContext.getGlobalContext());
+		localDateFormatter.setTimeZone(tz);
+		longLocalDateFormatter.setTimeZone(tz);
 		DateFormat mailDateFormatter = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z", Locale.ENGLISH );
 		
 		error = "";

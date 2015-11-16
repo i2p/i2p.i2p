@@ -9,7 +9,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TimeZone;
 
 import net.i2p.app.ClientAppManager;
 import net.i2p.crypto.SigType;
@@ -634,9 +633,7 @@ public class SummaryBarRenderer {
                 buf.append("<ul>\n");
                 DateFormat fmt = DateFormat.getDateInstance(DateFormat.SHORT);
                 // the router sets the JVM time zone to UTC but saves the original here so we can get it
-                String systemTimeZone = _context.getProperty("i2p.systemTimeZone");
-                if (systemTimeZone != null)
-                    fmt.setTimeZone(TimeZone.getTimeZone(systemTimeZone));
+                fmt.setTimeZone(DataHelper.getSystemTimeZone(_context));
                 int i = 0;
                 final int max = 2;
                 for (NewsEntry entry : entries) {

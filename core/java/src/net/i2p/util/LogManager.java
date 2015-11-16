@@ -22,7 +22,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Queue;
 import java.util.Set;
-import java.util.TimeZone;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -479,9 +478,7 @@ public class LogManager implements Flushable {
             if (!format.equals(""))
                 fmt.applyPattern(format);
             // the router sets the JVM time zone to UTC but saves the original here so we can get it
-            String systemTimeZone = _context.getProperty("i2p.systemTimeZone");
-            if (systemTimeZone != null)
-                fmt.setTimeZone(TimeZone.getTimeZone(systemTimeZone));
+            fmt.setTimeZone(DataHelper.getSystemTimeZone(_context));
             _dateFormatPattern = format;
             _dateFormat = fmt;
             return true;

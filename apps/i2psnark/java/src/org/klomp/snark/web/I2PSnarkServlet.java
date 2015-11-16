@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.TimeZone;
 import java.util.TreeMap;
 
 import javax.servlet.ServletConfig;
@@ -2801,9 +2800,7 @@ public class I2PSnarkServlet extends BasicServlet {
                 }
                 long dat = meta.getCreationDate();
                 SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-                String systemTimeZone = _context.getProperty("i2p.systemTimeZone");
-                if (systemTimeZone != null)
-                    fmt.setTimeZone(TimeZone.getTimeZone(systemTimeZone));
+                fmt.setTimeZone(DataHelper.getSystemTimeZone(_context));
                 if (dat > 0) {
                     String date = fmt.format(new Date(dat));
                     buf.append("<tr><td>");

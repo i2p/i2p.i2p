@@ -2,9 +2,9 @@ package i2p.susi.dns;
 
 import java.util.Date;
 import java.text.DateFormat;
-import java.util.TimeZone;
 
 import net.i2p.I2PAppContext;
+import net.i2p.data.DataHelper;
 
 /**
  * Format a date in local time zone
@@ -17,9 +17,7 @@ public abstract class FormatDate
     static {
 	DateFormat fmt = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM);
 	// the router sets the JVM time zone to UTC but saves the original here so we can get it
-	String systemTimeZone = I2PAppContext.getGlobalContext().getProperty("i2p.systemTimeZone");
-	if (systemTimeZone != null)
-		fmt.setTimeZone(TimeZone.getTimeZone(systemTimeZone));
+        fmt.setTimeZone(DataHelper.getSystemTimeZone(I2PAppContext.getGlobalContext()));
 	_dateFormat = fmt;
     }
 

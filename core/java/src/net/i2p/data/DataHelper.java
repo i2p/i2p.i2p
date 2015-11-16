@@ -37,6 +37,7 @@ import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
+import java.util.TimeZone;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 import java.util.zip.Deflater;
@@ -1923,5 +1924,21 @@ public class DataHelper {
             patterns.putIfAbsent(regex, p);
         }
         return p.split(s, limit);
+    }
+
+    /**
+     *  The system's time zone, which is probably different from the
+     *  JVM time zone, because Router changes the JVM default to GMT.
+     *  It saves the old default in the context properties where we can get it.
+     *  Use this to format a time in local time zone with DateFormat.setTimeZone().
+     *
+     *  @return non-null
+     *  @since 0.9.24
+     */
+    public static TimeZone getSystemTimeZone(I2PAppContext ctx) {
+        String systemTimeZone = ctx.getProperty("i2p.systemTimeZone");
+        if (systemTimeZone != null)
+            return TimeZone.getTimeZone(systemTimeZone);
+        return TimeZone.getDefault();
     }
 }
