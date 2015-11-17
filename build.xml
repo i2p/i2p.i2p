@@ -868,6 +868,21 @@
     </target>
 
     <target name="-pre-release">
+            <fail message="javac.compilerargs must contain a -bootclasspath option in override.properties">
+                <condition>
+                    <not><contains string="${javac.compilerargs}" substring="-bootclasspath"/></not>
+                </condition>
+            </fail>
+            <fail message="build.built-by must be set in override.properties">
+                <condition>
+                    <equals arg1="${build.built-by}" arg2="unknown"/>
+                </condition>
+            </fail>
+            <fail message="require.gettext must be true">
+                <condition>
+                    <not><equals arg1="${require.gettext}" arg2="true"/></not>
+                </condition>
+            </fail>
             <echo message="================================================================" />
             <echo message="Did you update these files?" />
             <exec executable="ls" failonerror="true">
