@@ -2916,6 +2916,15 @@ public class I2PSnarkServlet extends BasicServlet {
                    .append(":</b> ")
                    .append(formatSize(needed));
             }
+            long skipped = snark.getSkippedLength();
+            if (skipped > 0) {
+                buf.append("&nbsp;");
+                toThemeImg(buf, "head_rx");
+                buf.append("&nbsp;<b>")
+                   .append(_t("Skipped"))
+                   .append(":</b> ")
+                   .append(formatSize(skipped));
+            }
             if (meta != null) {
                 List<List<String>> files = meta.getFiles();
                 int fileCount = files != null ? files.size() : 1;

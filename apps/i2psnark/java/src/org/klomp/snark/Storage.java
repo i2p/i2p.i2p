@@ -519,6 +519,31 @@ public class Storage implements Closeable
   }
 
   /**
+   *  Call setPriority() for all changed files first,
+   *  then call this.
+   *  The length of all the pieces that are not yet downloaded,
+   *  and are set to skipped.
+   *  This is not the same as the total of all skipped files,
+   *  since pieces may span multiple files.
+   *
+   *  @return 0 on error, if complete, or if only one file
+   *  @since 0.9.24
+   */
+  public long getSkippedLength() {
+      int[] pri = getPiecePriorities();
+      if (pri == null)
+          return 0;
+      long rv = 0;
+      final int end = pri.length - 1;
+      for (int i = 0; i <= end; i++) {
+          if (pri[i] <= -9 && !bitfield.get(i)) {
+              rv += (i != end) ? piece_size : metainfo.getPieceLength(i);
+          }
+      }
+      return rv;
+  }
+
+  /**
    * The BitField that tells which pieces this storage contains.
    * Do not change this since this is the current state of the storage.
    */
