@@ -101,6 +101,14 @@ class UDPPacket implements CDQEntry {
      */
     public static final byte HEADER_FLAG_EXTENDED_OPTIONS = (1 << 2);
 
+    // Extended options for session request
+    public static final int SESS_REQ_MIN_EXT_OPTIONS_LENGTH = 2;
+    // bytes 0-1 are flags
+    /**
+     * set to 1 to request a session tag, i.e. we want him to be an introducer for us
+     */
+    public static final int SESS_REQ_EXT_FLAG_REQUEST_RELAY_TAG = 0x01;
+
     // various flag fields for use in the data packets
     public static final byte DATA_FLAG_EXPLICIT_ACK = (byte)(1 << 7);
     public static final byte DATA_FLAG_ACK_BITFIELDS = (1 << 6);

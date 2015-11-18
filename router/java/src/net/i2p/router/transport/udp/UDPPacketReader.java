@@ -104,6 +104,7 @@ class UDPPacketReader {
     
     /**
      * Returns extended option data, 0-255 bytes, or null if none.
+     * Returned array does NOT include the length byte.
      *
      * @return extended options or null if none is included
      * @since 0.9.24
@@ -175,8 +176,26 @@ class UDPPacketReader {
     
     /* ------- Begin Reader Classes ------- */
 
+    /**
+     * Base
+     *
+     * @since 0.9.24
+     */
+    public abstract class Reader {
+        /**
+         * Returns extended option data from the header, 0-255 bytes, or null if none.
+         * Returned array does NOT include the length byte.
+         *
+         * @return extended options or null if none is included
+         * @since 0.9.24
+         */
+        public byte[] readExtendedOptions() {
+            return UDPPacketReader.this.readExtendedOptions();
+        }
+    }
+
     /** Help read the SessionRequest payload */
-    public class SessionRequestReader {
+    public class SessionRequestReader extends Reader {
         public static final int X_LENGTH = 256;
         public void readX(byte target[], int targetOffset) {
             int readOffset = readBodyOffset();
@@ -198,7 +217,7 @@ class UDPPacketReader {
     }
     
     /** Help read the SessionCreated payload */
-    public class SessionCreatedReader {
+    public class SessionCreatedReader extends Reader {
         public static final int Y_LENGTH = 256;
         public void readY(byte target[], int targetOffset) {
             int readOffset = readBodyOffset();
@@ -253,7 +272,7 @@ class UDPPacketReader {
     }
     
     /** parse out the confirmed message */
-    public class SessionConfirmedReader {
+    public class SessionConfirmedReader extends Reader {
         /** which fragment is this? */
         public int readCurrentFragmentNum() {
             int readOffset = readBodyOffset();
@@ -306,7 +325,7 @@ class UDPPacketReader {
     }
     
     /** parse out the data message */
-    public class DataReader {
+    public class DataReader extends Reader {
 
         /**
          *  @return the data size, NOT including IP header, UDP header, IV, or MAC
@@ -642,7 +661,7 @@ class UDPPacketReader {
     }
     
     /** Help read the PeerTest payload */
-    public class PeerTestReader {
+    public class PeerTestReader extends Reader {
         private static final int NONCE_LENGTH = 4;
         
         public long readNonce() {
@@ -683,7 +702,7 @@ class UDPPacketReader {
     }
     
     /** Help read the RelayRequest payload */
-    public class RelayRequestReader {
+    public class RelayRequestReader extends Reader {
         public long readTag() { 
             long rv = DataHelper.fromLong(_message, readBodyOffset(), 4); 
             if (_log.shouldLog(Log.DEBUG))
@@ -767,7 +786,7 @@ class UDPPacketReader {
     }
     
     /** Help read the RelayIntro payload */
-    public class RelayIntroReader {
+    public class RelayIntroReader extends Reader {
         public int readIPSize() {
             int offset = readBodyOffset();
             return _message[offset] & 0xff;
@@ -808,7 +827,7 @@ class UDPPacketReader {
     
     
     /** Help read the RelayResponse payload */
-    public class RelayResponseReader {
+    public class RelayResponseReader extends Reader {
         public int readCharlieIPSize() {
             int offset = readBodyOffset();
             return _message[offset] & 0xff;

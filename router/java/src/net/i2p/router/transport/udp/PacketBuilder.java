@@ -783,15 +783,20 @@ class PacketBuilder {
      * @return ready to send packet, or null if there was a problem
      */
     public UDPPacket buildSessionRequestPacket(OutboundEstablishState state) {
-        // TODO
-        // boolean ext = state.isExtendedOptionsAllowed();
-        // if (ext)
-        //byte[] options = new byte[3];
-        //UDPPacket packet = buildPacketHeader(SESSION_REQUEST_FLAG_BYTE, options);
-        UDPPacket packet = buildPacketHeader(SESSION_REQUEST_FLAG_BYTE);
+        int off = HEADER_SIZE;
+        byte[] options;
+        boolean ext = state.isExtendedOptionsAllowed();
+        if (ext) {
+            options = new byte[UDPPacket.SESS_REQ_MIN_EXT_OPTIONS_LENGTH];
+            if (state.needIntroduction())
+                options[1] = (byte) UDPPacket.SESS_REQ_EXT_FLAG_REQUEST_RELAY_TAG;
+            off += UDPPacket.SESS_REQ_MIN_EXT_OPTIONS_LENGTH + 1;
+        } else {
+            options = null;
+        }
+        UDPPacket packet = buildPacketHeader(SESSION_REQUEST_FLAG_BYTE, options);
         DatagramPacket pkt = packet.getPacket();
         byte data[] = pkt.getData();
-        int off = HEADER_SIZE; // + 1 + options.length;
 
         byte toIP[] = state.getSentIP();
         if (!_transport.isValid(toIP)) {
