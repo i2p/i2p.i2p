@@ -1474,6 +1474,7 @@ class PacketBuilder {
             flagByte |= UDPPacket.HEADER_FLAG_EXTENDED_OPTIONS;
         data[off] = flagByte;
         off++;
+        // Note, this is unsigned, so we're good until February 2106
         long now = (_context.clock().now() + 500) / 1000;
         DataHelper.toLong(data, off, 4, now);
         // todo: add support for rekeying

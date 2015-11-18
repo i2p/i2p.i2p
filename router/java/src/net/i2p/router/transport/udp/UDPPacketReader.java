@@ -84,6 +84,7 @@ class UDPPacketReader {
     
     /** @return seconds */
     public long readTimestamp() {
+        // Note, this is unsigned, so we're good until February 2106
         return DataHelper.fromLong(_message, _payloadBeginOffset + 1, 4);
     }
     
