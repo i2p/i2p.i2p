@@ -225,6 +225,18 @@ class NewsFetcher extends UpdateRunner {
                                 _mgr.notifyVersionConstraint(this, _currentURI, ROUTER_SIGNED, "", ver, msg);
                                 return;
                             }
+                            if (!FileUtil.isPack200Supported()) {
+                                String msg = _mgr._t("No Pack200 support in Java runtime.");
+                                _log.logAlways(Log.WARN, "Cannot update to version " + ver + ": " + msg);
+                                _mgr.notifyVersionConstraint(this, _currentURI, ROUTER_SIGNED, "", ver, msg);
+                                return;
+                            }
+                            if (!ConfigUpdateHandler.USE_SU3_UPDATE) {
+                                String msg = _mgr._t("No update certificates installed.");
+                                _log.logAlways(Log.WARN, "Cannot update to version " + ver + ": " + msg);
+                                _mgr.notifyVersionConstraint(this, _currentURI, ROUTER_SIGNED, "", ver, msg);
+                                return;
+                            }
                             String minRouter = args.get(MIN_VERSION_KEY);
                             if (minRouter != null) {
                                 if (VersionComparator.comp(RouterVersion.VERSION, minRouter) < 0) {
@@ -251,7 +263,7 @@ class NewsFetcher extends UpdateRunner {
                             // TODO clearnet URLs, notify with HTTP_CLEARNET and/or HTTPS_CLEARNET
                             Map<UpdateMethod, List<URI>> sourceMap = new HashMap<UpdateMethod, List<URI>>(4);
                             // Must do su3 first
-                            if (ConfigUpdateHandler.USE_SU3_UPDATE) {
+                            //if (ConfigUpdateHandler.USE_SU3_UPDATE) {
                                 sourceMap.put(HTTP, _mgr.getUpdateURLs(ROUTER_SIGNED_SU3, "", HTTP));
                                 addMethod(TORRENT, args.get(SU3_KEY), sourceMap);
                                 addMethod(HTTP_CLEARNET, args.get(CLEARNET_HTTP_SU3_KEY), sourceMap);
@@ -260,14 +272,14 @@ class NewsFetcher extends UpdateRunner {
                                 _mgr.notifyVersionAvailable(this, _currentURI, ROUTER_SIGNED_SU3,
                                                             "", sourceMap, ver, "");
                                 sourceMap.clear();
-                            }
-                            // now do sud/su2
-                            sourceMap.put(HTTP, _mgr.getUpdateURLs(ROUTER_SIGNED, "", HTTP));
-                            String key = FileUtil.isPack200Supported() ? SU2_KEY : SUD_KEY;
-                            addMethod(TORRENT, args.get(key), sourceMap);
+                            //}
+                            // now do sud/su2 - DISABLED
+                            //sourceMap.put(HTTP, _mgr.getUpdateURLs(ROUTER_SIGNED, "", HTTP));
+                            //String key = FileUtil.isPack200Supported() ? SU2_KEY : SUD_KEY;
+                            //addMethod(TORRENT, args.get(key), sourceMap);
                             // notify about all sources at once
-                            _mgr.notifyVersionAvailable(this, _currentURI, ROUTER_SIGNED,
-                                                        "", sourceMap, ver, "");
+                            //_mgr.notifyVersionAvailable(this, _currentURI, ROUTER_SIGNED,
+                            //                            "", sourceMap, ver, "");
                         } else {
                             if (_log.shouldLog(Log.DEBUG))
                                 _log.debug("Our version is current");
@@ -414,9 +426,8 @@ class NewsFetcher extends UpdateRunner {
         
         if (_tempFile.exists() && _tempFile.length() > 0) {
             File from;
-            // TODO check magic number instead?
-            // But then a corrupt file would be displayed as-is...
-            if (url.endsWith(".su3") || url.contains(".su3?")) {
+            // sud/su2 disabled
+            //if (url.endsWith(".su3") || url.contains(".su3?")) {
                 try {
                     from = processSU3();
                 } catch (IOException ioe) {
@@ -424,9 +435,9 @@ class NewsFetcher extends UpdateRunner {
                     _tempFile.delete();
                     return;
                 }
-            } else {
-                from = _tempFile;
-            }
+            //} else {
+            //    from = _tempFile;
+            //}
             boolean copied = FileUtil.rename(from, _newsFile);
             _tempFile.delete();
             if (copied) {
