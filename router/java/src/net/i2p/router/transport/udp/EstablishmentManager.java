@@ -136,6 +136,7 @@ class EstablishmentManager {
      *
      */
     private static final String VERSION_ALLOW_EXTENDED_OPTIONS = "0.9.22";
+    private static final String PROP_DISABLE_EXT_OPTS = "i2np.udp.disableExtendedOptions";
 
 
     public EstablishmentManager(RouterContext ctx, UDPTransport transport) {
@@ -369,7 +370,8 @@ class EstablishmentManager {
                         return;
                     }
                     boolean allowExtendedOptions = VersionComparator.comp(toRouterInfo.getVersion(),
-                                                                          VERSION_ALLOW_EXTENDED_OPTIONS) >= 0;
+                                                                          VERSION_ALLOW_EXTENDED_OPTIONS) >= 0
+                                                   && !_context.getBooleanProperty(PROP_DISABLE_EXT_OPTS);
                     // w/o ext options, it's always 'requested', no need to set
                     boolean requestIntroduction = allowExtendedOptions && _transport.introducersRequired();
                     state = new OutboundEstablishState(_context, maybeTo, to,

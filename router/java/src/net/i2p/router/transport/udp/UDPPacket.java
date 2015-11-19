@@ -85,9 +85,9 @@ class UDPPacket implements CDQEntry {
     public static final int PAYLOAD_TYPE_RELAY_INTRO = 5;
     public static final int PAYLOAD_TYPE_DATA = 6;
     public static final int PAYLOAD_TYPE_TEST = 7;
-    public static final int MAX_PAYLOAD_TYPE = PAYLOAD_TYPE_TEST;
     /** @since 0.8.1 */
     public static final int PAYLOAD_TYPE_SESSION_DESTROY = 8;
+    public static final int MAX_PAYLOAD_TYPE = PAYLOAD_TYPE_SESSION_DESTROY;
     
     // various flag fields for use in the header
     /**
