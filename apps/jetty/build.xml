@@ -149,9 +149,14 @@
         <!-- commons-logging.jar not in Jetty 6 but we have it in launch4j so copy it over,
              needed for old plugins and things. We add tomcat-juli below.
           -->
+      <!--
+        * Removed in 0.9.24, see ticket #1679
+        * Jetty now uses tomcat-juli (added below to commons-logging.jar), not commons-logging proper,
+        * and no known plugins use it either.
         <jar destfile="jettylib/commons-logging.jar" filesetmanifest="mergewithoutmain" >
             <zipfileset excludes="META-INF/LICENSE.txt META-INF/NOTICE.txt" src="../../installer/lib/launch4j/lib/commons-logging.jar" />
         </jar>
+      -->
         <ant target="copyTomcatLib" />
     </target>
 

@@ -1465,9 +1465,7 @@
     </target>
 
     <!-- All jetty jars required for update.
-         We don't need commons-el or commons-logging, they haven't changed.
          TODO do we need to bother updating jasper?
-         TODO where is JMX? We don't need it I hope.
       -->
     <target name="prepjupdate" depends="prepupdate, buildWEB">
         <copy todir="pkg-temp/lib" >
