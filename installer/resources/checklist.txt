@@ -12,6 +12,12 @@ Write the release announcement and push to Transifex:
 	./create_new_entry.sh
 	tx push -s
 	mtn ci
+
+	Checkout i2p.www branch
+	Write draft release announcement - see i2p2www/blog/README for instructions
+		Top content should be the same as the news entry
+	Push blog strings (including draft announcement) to Transifex
+
 	Make announcement on Transifex asking for news translation
 
 
@@ -22,7 +28,6 @@ You may build with Java 7 or higher, but ensure you have the Java 6 JRE installe
 
 Create override.properties with (adjust as necessary):
 -----------
-release.privkey=/path/to/private-signing.key
 release.privkey.su3=/path/to/su3keystore.ks
 release.gpg.keyid=0xnnnnnnnn
 release.signer.su3=xxx@mail.i2p
@@ -118,9 +123,8 @@ Website files to change:
 	Sync with mtn.i2p-projekt.i2p
 	hosts.txt if it changed (copy from i2p.i2p mtn branch)
 	i2p2www/__init__.py (release number)
-	i2p2www/pages/downloads/list.html (checksums)
+	i2p2www/pages/downloads/macros (checksums)
 	i2p2www/static/news/news.xml
-	New release announcement - see i2p2www/blog/README for instructions
 	Sync with mtn.i2p-projekt.i2p
 
 Wait for a few update hosts to be ready
