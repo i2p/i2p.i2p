@@ -1,3 +1,5 @@
+* 2015-11-19 0.9.23 released
+
 2015-11-19 str4d
   * build.xml: Stop building SUD and SU2 update files in "ant release" (ticket #1709)
 
