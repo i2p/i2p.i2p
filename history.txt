@@ -1,3 +1,6 @@
+2015-11-19 str4d
+  * build.xml: Stop building SUD and SU2 update files in "ant release" (ticket #1709)
+
 2015-11-15 kytv
  * Updates to geoip.txt and geoipv6.dat.gz based on Maxmind GeoLite Country
    database from 2015-11-03.
