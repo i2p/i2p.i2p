@@ -94,7 +94,33 @@ Generate PGP signatures:
 (end of tasks automated by 'ant release')
 =========================================
 
-Now test.
+Now test:
+- Save the output about checksums, sizes, and torrents to a file (traditionally shasums.txt)
+  (edit timestamps to UTC if you care)
+- Copy all the release files somewhere, make sure you have the same ones as last release
+- Verify sha256sums for release files
+- Check file sizes vs. previous release, shouldn't be smaller
+  (this one will be about 1MB bigger for the updaters due to geoip inclusion)
+- Unzip or list files from i2pupdate.zip, see if it looks right
+- For either windows or linux installer:
+  (probably should do both the first time)
+   - Rename any existing config dir (e.g. mv .i2p .i2p-save)
+   - Run installer, install to temp dir
+   - Look in temp dir, see if all the files are there
+   - Unplug ethernet / turn off wifi so RI doesn't leak
+   - i2prouter start
+   - Verify release number in console
+   - Verify welcome news
+   - Click through all the app, status, eepsite, and config pages, see if they look right
+   - Click through each of the translations, see if /console looks right
+   - Look for errors in /log (other than can't reseed errors)
+   - Look in config dir, see if all the files are there
+   - Shutdown
+   - Delete config dir
+   - Move saved config dir back
+   - Reconnect ethernet / turn wifi back on
+- Load torrents in i2psnark on your production router, verify infohashes
+
 If all goes well:
 	mtn tag h: i2p-0.x.xx
 	mtn cert t:i2p-0.x.xx branch i2p.i2p.release
