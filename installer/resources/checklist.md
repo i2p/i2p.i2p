@@ -189,6 +189,7 @@
   - Sync with mtn.i2p-projekt.i2p
   - `i2p2www/static/hosts.txt` if it changed (copy from i2p.i2p mtn branch)
   - `i2p2www/__init__.py` (release number)
+  - `i2p2www/pages/downloads/list.html` (release signer)
   - `i2p2www/pages/downloads/macros` (checksums)
   - `i2p2www/static/news/news.xml`
   - Sync with mtn.i2p-projekt.i2p
