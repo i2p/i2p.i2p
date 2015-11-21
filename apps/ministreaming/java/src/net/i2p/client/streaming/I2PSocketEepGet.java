@@ -124,11 +124,14 @@ public class I2PSocketEepGet extends EepGet {
                 // Rewrite the url to strip out the /i2p/,
                 // as the naming service accepts B64KEY (but not B64KEY.i2p atm)
                 if ("i2p".equals(host)) {
-                    String file = url.getPath();
+                    String file = url.getRawPath();
                     try {
                         int slash = 1 + file.substring(1).indexOf("/");
                         host = file.substring(1, slash);
                         _actualURL = "http://" + host + file.substring(slash);
+                        String query = url.getRawQuery();
+                        if (query != null)
+                            _actualURL = _actualURL + '?' + query;
                     } catch (IndexOutOfBoundsException ioobe) {
                         throw new MalformedURLException("Bad /i2p/ format: " + _actualURL);
                     }
@@ -214,8 +217,8 @@ public class I2PSocketEepGet extends EepGet {
             throw ioe;
         }
         //String host = url.getHost();
-        String path = url.getPath();
-        String query = url.getQuery();
+        String path = url.getRawPath();
+        String query = url.getRawQuery();
         if (query != null)
             path = path + '?' + query;
         if (!path.startsWith("/"))
@@ -242,6 +245,8 @@ public class I2PSocketEepGet extends EepGet {
         if(!uaOverridden)
             buf.append("User-Agent: " + USER_AGENT + "\r\n");
         buf.append("\r\n");
+        if (_log.shouldDebug())
+            _log.debug("Request: [" + buf.toString() + "]");
         return buf.toString();
     }
 

@@ -332,7 +332,7 @@ public class EepGet {
             System.exit(1);
         }
 
-        String path = nameURL.getPath();  // discard any URI queries
+        String path = nameURL.getRawPath();  // discard any URI queries
 
         // if no file specified, eepget scrapes webpage - use domain as name
         Pattern slashes = Pattern.compile("/+");
@@ -1288,8 +1288,8 @@ public class EepGet {
         if (host == null || host.length() <= 0)
             throw new MalformedURLException("Bad URL, no host");
         int port = url.getPort();
-        String path = url.getPath();
-        String query = url.getQuery();
+        String path = url.getRawPath();
+        String query = url.getRawQuery();
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Requesting " + _actualURL);
         // RFC 2616 sec 5.1.2 - full URL if proxied, absolute path only if not proxied

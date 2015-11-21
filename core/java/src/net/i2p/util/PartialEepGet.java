@@ -180,8 +180,8 @@ public class PartialEepGet extends EepGet {
         if (host == null || host.length() <= 0)
             throw new MalformedURLException("Bad URL, no host");
         int port = url.getPort();
-        String path = url.getPath();
-        String query = url.getQuery();
+        String path = url.getRawPath();
+        String query = url.getRawQuery();
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Requesting " + _actualURL);
         // RFC 2616 sec 5.1.2 - full URL if proxied, absolute path only if not proxied
