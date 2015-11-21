@@ -85,58 +85,44 @@
     >
     > Build and tag:
     >
-    >     ```
     >     ant pkg
-    >     ```
     >
     > Create signed update files with:
     >
-    >     ```
     >     export I2P=~/i2p
     >     java -cp $I2P/lib/i2p.jar net.i2p.crypto.TrustedUpdate sign i2pupdate.zip i2pupdate.sud /path/to/private.key 0.x.xx
     >     java -cp $I2P/lib/i2p.jar net.i2p.crypto.TrustedUpdate sign i2pupdate200.zip i2pupdate.su2 /path/to/private.key 0.x.xx
-    >     ```
     >
     > Verify signed update files with:
     >
-    >     ```
     >     java -cp $I2P/lib/i2p.jar net.i2p.crypto.TrustedUpdate showversion i2pupdate.sud
     >     java -cp $I2P/lib/i2p.jar net.i2p.crypto.TrustedUpdate verifysig i2pupdate.sud
-    >     ```
     >
     > Make the source tarball:
     >
-    >     ```
     >     Start with a clean checkout mtn -d i2p.mtn co --branch=i2p.i2p i2p-0.x.xx
     >     Double-check trust list
     >     tar cjf i2psource-0.x.xx.tar.bz2 --exclude i2p-0.x.xx/_MTN i2p-0.x.xx
     >     mv i2p-0.x.xx.tar.bz2 i2p.i2p
-    >     ```
     >
     > Rename some files:
     >
-    >     ```
     >     mv i2pinstall.exe i2pinstall-0.x.xx.exe
     >     mv i2pupdate.zip i2pupdate-0.x.xx.zip
-    >     ```
     >
     > Generate hashes:
     >
-    >     ```
     >     sha256sum i2p*0.x.xx.*
     >     sha256sum i2pupdate.sud
     >     sha256sum i2pupdate.su2
-    >     ```
     >
     > Generate PGP signatures:
     >
-    >     ```
     >     gpg -b i2pinstall-0.x xx.exe
     >     gpg -b i2psource-0.x.xx.tar.bz2
     >     gpg -b i2pupdate-0.x.xx.zip
     >     gpg -b i2pupdate.sud
     >     gpg -b i2pupdate.su2
-    >     ```
     >
     > (end of tasks automated by 'ant release')
 
