@@ -2216,6 +2216,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Require introducers, because our status is " + status);
                 return true;
+
             default:
                 if (!allowDirectUDP()) {
                     if (_log.shouldLog(Log.DEBUG))
@@ -2223,6 +2224,30 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                     return true;
                 }
                 return false;
+        }
+    }
+    
+    /**
+     *  MIGHT we require introducers?
+     *  This is like introducersRequired, but if we aren't sure, this returns true.
+     *  Used only by EstablishmentManager.
+     *
+     *  @since 0.9.24
+     */
+    boolean introducersMaybeRequired() {
+        Status status = getReachabilityStatus();
+        switch (status) {
+            case REJECT_UNSOLICITED:
+            case DIFFERENT:
+            case IPV4_FIREWALLED_IPV6_OK:
+            case IPV4_FIREWALLED_IPV6_UNKNOWN:
+            case IPV4_UNKNOWN_IPV6_OK:
+            case IPV4_UNKNOWN_IPV6_FIREWALLED:
+            case UNKNOWN:
+                return true;
+
+            default:
+                return !allowDirectUDP();
         }
     }
     

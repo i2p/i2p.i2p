@@ -788,8 +788,11 @@ class PacketBuilder {
         boolean ext = state.isExtendedOptionsAllowed();
         if (ext) {
             options = new byte[UDPPacket.SESS_REQ_MIN_EXT_OPTIONS_LENGTH];
-            if (state.needIntroduction())
+            boolean intro = state.needIntroduction();
+            if (intro)
                 options[1] = (byte) UDPPacket.SESS_REQ_EXT_FLAG_REQUEST_RELAY_TAG;
+            if (_log.shouldInfo())
+                _log.info("send sess req. w/ ext. options, need intro? " + intro + ' ' + state);
             off += UDPPacket.SESS_REQ_MIN_EXT_OPTIONS_LENGTH + 1;
         } else {
             options = null;

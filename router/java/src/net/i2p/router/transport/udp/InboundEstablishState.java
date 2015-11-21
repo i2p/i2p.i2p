@@ -155,6 +155,8 @@ class InboundEstablishState {
         byte[] ext = req.readExtendedOptions();
         if (ext != null && ext.length >= UDPPacket.SESS_REQ_MIN_EXT_OPTIONS_LENGTH) {
             _introductionRequested = (ext[1] & (byte) UDPPacket.SESS_REQ_EXT_FLAG_REQUEST_RELAY_TAG) != 0;
+            if (_log.shouldInfo())
+                _log.info("got sess req. w/ ext. options, need intro? " + _introductionRequested + ' ' + this);
         }
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Receive sessionRequest, BobIP = " + Addresses.toString(_bobIP));

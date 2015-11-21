@@ -132,10 +132,11 @@ class EstablishmentManager {
      * but i2pd hasn't recognized it until this release.
      * No matter, the options weren't defined until this release anyway.
      *
-     * FIXME 0.9.22 for testing, change to 0.9.24 for release
+**********************************************************************************************************
+     * FIXME 0.9.23 for testing, change to 0.9.24 for release
      *
      */
-    private static final String VERSION_ALLOW_EXTENDED_OPTIONS = "0.9.22";
+    private static final String VERSION_ALLOW_EXTENDED_OPTIONS = "0.9.23";
     private static final String PROP_DISABLE_EXT_OPTS = "i2np.udp.disableExtendedOptions";
 
 
@@ -373,7 +374,9 @@ class EstablishmentManager {
                                                                           VERSION_ALLOW_EXTENDED_OPTIONS) >= 0
                                                    && !_context.getBooleanProperty(PROP_DISABLE_EXT_OPTS);
                     // w/o ext options, it's always 'requested', no need to set
-                    boolean requestIntroduction = allowExtendedOptions && _transport.introducersRequired();
+                    // don't ask if they are indirect
+                    boolean requestIntroduction = allowExtendedOptions && !isIndirect &&
+                                                  _transport.introducersMaybeRequired();
                     state = new OutboundEstablishState(_context, maybeTo, to,
                                                        toIdentity, allowExtendedOptions,
                                                        requestIntroduction,
