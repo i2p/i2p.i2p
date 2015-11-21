@@ -151,7 +151,7 @@ public class ConfigClientsHelper extends HelperBase {
                        //"webConsole".equals(ca.clientName) || "Web console".equals(ca.clientName),
                        false, RouterConsoleRunner.class.getName().equals(ca.className),
                        // description
-                       ca.className + ((ca.args != null) ? " " + ca.args : ""),
+                       DataHelper.escapeHTML(ca.className + ((ca.args != null) ? " " + ca.args : "")),
                        // edit
                        allowEdit && (""+cur).equals(_edit),
                        // show edit button, show update button
@@ -212,7 +212,7 @@ public class ConfigClientsHelper extends HelperBase {
                 boolean isRunning = WebAppStarter.isWebAppRunning(app);
                 renderForm(buf, app, app, !"addressbook".equals(app),
                            "true".equals(val), RouterConsoleRunner.ROUTERCONSOLE.equals(app),
-                           RouterConsoleRunner.ROUTERCONSOLE.equals(app), app + ".war",
+                           RouterConsoleRunner.ROUTERCONSOLE.equals(app), DataHelper.escapeHTML(app + ".war"),
                            false, false, false, isRunning, false, !isRunning);
             }
         }
@@ -316,14 +316,15 @@ public class ConfigClientsHelper extends HelperBase {
     /**
      *  Misnamed, renders a single line in a table for a single client/webapp/plugin.
      *
-     *  ro trumps edit and showEditButton
+     *  @param name will be escaped here
+     *  @param ro trumps edit and showEditButton
+     *  @param escapedDesc description, must be HTML escaped, except for plugins
      */
     private void renderForm(StringBuilder buf, String index, String name, boolean urlify,
-                            boolean enabled, boolean ro, boolean preventDisable, String desc, boolean edit,
+                            boolean enabled, boolean ro, boolean preventDisable, String escapedDesc, boolean edit,
                             boolean showEditButton, boolean showUpdateButton, boolean showStopButton,
                             boolean showDeleteButton, boolean showStartButton) {
         String escapedName = DataHelper.escapeHTML(name);
-        String escapedDesc = DataHelper.escapeHTML(desc);
         buf.append("<tr><td class=\"mediumtags\" align=\"right\" width=\"25%\">");
         if (urlify && enabled) {
             String link = "/";

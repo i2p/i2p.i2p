@@ -1,3 +1,6 @@
+2015-11-21 zzz
+  * Console: Fix escaping of plugin description on /configclients (ticket #1711)
+
 * 2015-11-19 0.9.23 released
 
 2015-11-19 str4d
@@ -9,7 +12,7 @@
  * Translation updates
 
 2015-11-13 zab
- * Interrupt() when cancelling scheduled tasks
+ * Interrupt() when cancelling scheduled tasks (tickets #1694, #1705)
 
 2015-11-13 zzz
  * Console: Fix lifetime participating bandwidth display (ticket #1706)
