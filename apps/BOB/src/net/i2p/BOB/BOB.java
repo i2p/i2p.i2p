@@ -247,11 +247,11 @@ public class BOB implements Runnable, ClientApp {
 			save = true;
 		}
 		if (!props.containsKey("inbound.length")) {
-			props.setProperty("inbound.length", "1");
+			props.setProperty("inbound.length", "3");
 			save = true;
 		}
 		if (!props.containsKey("outbound.length")) {
-			props.setProperty("outbound.length", "1");
+			props.setProperty("outbound.length", "3");
 			save = true;
 		}
 		if (!props.containsKey("inbound.lengthVariance")) {

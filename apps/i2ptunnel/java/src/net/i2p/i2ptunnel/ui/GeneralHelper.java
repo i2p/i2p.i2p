@@ -9,6 +9,7 @@ import java.util.Properties;
 import java.util.TreeMap;
 
 import net.i2p.I2PAppContext;
+import net.i2p.I2PException;
 import net.i2p.client.I2PClient;
 import net.i2p.crypto.SigType;
 import net.i2p.data.DataHelper;
@@ -341,7 +342,8 @@ public class GeneralHelper {
                     rv = pkf.getDestination();
                     if (rv != null)
                         return rv;
-                } catch (Exception e) {}
+                } catch (I2PException e) {
+                } catch (IOException e) {}
             }
         }
         return null;

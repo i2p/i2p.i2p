@@ -4,9 +4,9 @@
 package net.i2p.router.transport;
 
 import java.net.InetAddress;
-import java.net.MalformedURLException;
 import java.net.UnknownHostException;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -224,7 +224,7 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 		boolean ignore = false;
 		String toIgnore = _context.getProperty(PROP_IGNORE);
 		if (toIgnore != null) {
-			String[] ignores = toIgnore.split("[,; \r\n\t]");
+			String[] ignores = DataHelper.split(toIgnore, "[,; \r\n\t]");
 			for (int i = 0; i < ignores.length; i++) {
 				if (ignores[i].equals(udn)) {
 					ignore = true;
@@ -476,7 +476,7 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 		ServiceStateTable table;
 		try {
 			table = serv.getServiceStateTable();
-		} catch (Exception e) {
+		} catch (RuntimeException e) {
 			// getSCPDNode() returns null,
 			// NPE at org.cybergarage.upnp.Service.getServiceStateTable(Service.java:526)
 			sb.append(" : no state");
@@ -823,17 +823,17 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 		String him = _router.getURLBase();
 		if (him != null && him.length() > 0) {
 			try {
-				URL url = new URL(him);
+				URI url = new URI(him);
 				hisIP = url.getHost();
-			} catch (MalformedURLException mue) {}
+			} catch (URISyntaxException use) {}
 		}
 		if (hisIP == null) {
 			him = _router.getLocation();
 			if (him != null && him.length() > 0) {
 				try {
-					URL url = new URL(him);
+					URI url = new URI(him);
 					hisIP = url.getHost();
-				} catch (MalformedURLException mue) {}
+				} catch (URISyntaxException use) {}
 			}
 		}
 		if (hisIP == null)

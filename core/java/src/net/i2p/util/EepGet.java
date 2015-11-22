@@ -15,7 +15,8 @@ import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -272,7 +273,7 @@ public class EepGet {
                     break;
               }  // switch
             } // while
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             e.printStackTrace();
             error = true;
         }
@@ -321,17 +322,17 @@ public class EepGet {
      * @return       a filename to save the resource as on local filesystem
      */
     public static String suggestName(String url) {
-        URL nameURL = null;  // URL object
+        URI nameURL = null;
         String name;         // suggested name
 
         try {
-            nameURL = new URL(url);
-        } catch (MalformedURLException e) {
+            nameURL = new URI(url);
+        } catch (URISyntaxException e) {
             System.err.println("Please enter a properly formed URL.");
             System.exit(1);
         }
 
-        String path = nameURL.getPath();  // discard any URI queries
+        String path = nameURL.getRawPath();  // discard any URI queries
 
         // if no file specified, eepget scrapes webpage - use domain as name
         Pattern slashes = Pattern.compile("/+");
@@ -722,24 +723,25 @@ public class EepGet {
         
         if (_redirectLocation != null) {
             // we also are here after a 407
-            //try {
+            try {
                 if (_redirectLocation.startsWith("http://")) {
                     _actualURL = _redirectLocation;
                 } else { 
                     // the Location: field has been required to be an absolute URI at least since
                     // RFC 1945 (HTTP/1.0 1996), so it isn't clear what the point of this is.
                     // This oddly adds a ":" even if no port, but that seems to work.
-                    URL url = new URL(_actualURL);
+                    URI url = new URI(_actualURL);
 		    if (_redirectLocation.startsWith("/"))
                         _actualURL = "http://" + url.getHost() + ":" + url.getPort() + _redirectLocation;
                     else
                         // this blows up completely on a redirect to https://, for example
                         _actualURL = "http://" + url.getHost() + ":" + url.getPort() + "/" + _redirectLocation;
                 }
-            // an MUE is an IOE
-            //} catch (MalformedURLException mue) {
-            //    throw new IOException("Redirected from an invalid URL");
-            //}
+            } catch (URISyntaxException use) {
+                IOException ioe = new MalformedURLException("Redirected to invalid URL");
+                ioe.initCause(use);
+                throw ioe;
+            }
 
             AuthState as = _authState;
             if (_responseCode == 407) {
@@ -1131,7 +1133,7 @@ public class EepGet {
     private int handleStatus(String line) {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Status line: [" + line.trim() + "]");
-        String[] toks = line.split(" ", 3);
+        String[] toks = DataHelper.split(line, " ", 3);
         if (toks.length < 2) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("ERR: status "+  line);
@@ -1226,9 +1228,9 @@ public class EepGet {
         if (_shouldProxy) {
             _proxy = InternalSocket.getSocket(_proxyHost, _proxyPort);
         } else {
-            //try {
-                URL url = new URL(_actualURL);
-                if ("http".equals(url.getProtocol())) {
+            try {
+                URI url = new URI(_actualURL);
+                if ("http".equals(url.getScheme())) {
                     String host = url.getHost();
                     String hostlc = host.toLowerCase(Locale.US);
                     if (hostlc.endsWith(".i2p"))
@@ -1248,10 +1250,11 @@ public class EepGet {
                 } else {
                     throw new MalformedURLException("URL is not supported:" + _actualURL);
                 }
-            // an MUE is an IOE
-            //} catch (MalformedURLException mue) {
-            //    throw new IOException("Request URL is invalid");
-            //}
+            } catch (URISyntaxException use) {
+                IOException ioe = new MalformedURLException("Request URL is invalid");
+                ioe.initCause(use);
+                throw ioe;
+            }
         }
         _proxyIn = _proxy.getInputStream();
         if (!(_proxy instanceof InternalSocket))
@@ -1273,13 +1276,20 @@ public class EepGet {
         boolean post = false;
         if ( (_postData != null) && (_postData.length() > 0) )
             post = true;
-        URL url = new URL(_actualURL);
+        URI url;
+        try {
+            url = new URI(_actualURL);
+        } catch (URISyntaxException use) {
+            IOException ioe = new MalformedURLException("Bad URL");
+            ioe.initCause(use);
+            throw ioe;
+        }
         String host = url.getHost();
         if (host == null || host.length() <= 0)
             throw new MalformedURLException("Bad URL, no host");
         int port = url.getPort();
-        String path = url.getPath();
-        String query = url.getQuery();
+        String path = url.getRawPath();
+        String query = url.getRawQuery();
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Requesting " + _actualURL);
         // RFC 2616 sec 5.1.2 - full URL if proxied, absolute path only if not proxied

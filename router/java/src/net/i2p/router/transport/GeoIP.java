@@ -17,6 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import net.i2p.I2PAppContext;
+import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
@@ -209,7 +210,7 @@ public class GeoIP {
                     if (line.charAt(0) == '#') {
                         continue;
                     }
-                    String[] s = line.split(",");
+                    String[] s = DataHelper.split(line, ",");
                     String lc = s[0].toLowerCase(Locale.US);
                     _codeToName.put(lc, s[1]);
                     _codeCache.put(lc, lc);
@@ -274,7 +275,7 @@ public class GeoIP {
                     if (buf.charAt(0) == '#') {
                         continue;
                     }
-                    String[] s = buf.split(",");
+                    String[] s = DataHelper.split(buf, ",");
                     long ip1 = Long.parseLong(s[0]);
                     long ip2 = Long.parseLong(s[1]);
                     while (idx < search.length && search[idx].longValue() < ip1) {

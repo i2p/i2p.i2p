@@ -585,7 +585,7 @@ class Packet {
         cur += 4;
         setAckThrough(DataHelper.fromLong(buffer, cur, 4));
         cur += 4;
-        int numNacks = (int)DataHelper.fromLong(buffer, cur, 1);
+        int numNacks = buffer[cur] & 0xff;
         cur++;
         if (length < 22 + numNacks*4)
             throw new IllegalArgumentException("Too small with " + numNacks + " nacks: " + length);
@@ -599,7 +599,7 @@ class Packet {
         } else {
             setNacks(null);
         }
-        setResendDelay((int)DataHelper.fromLong(buffer, cur, 1));
+        setResendDelay(buffer[cur] & 0xff);
         cur++;
         setFlags((int)DataHelper.fromLong(buffer, cur, 2));
         cur += 2;

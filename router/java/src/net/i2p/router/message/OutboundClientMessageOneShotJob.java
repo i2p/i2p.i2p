@@ -949,15 +949,19 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
                 if (_outTunnel.getLength() > 0)
                     size = ((size + 1023) / 1024) * 1024; // messages are in ~1KB blocks
                 
-                for (int i = 0; i < _outTunnel.getLength(); i++) {
+                // skip ourselves at first hop
+                for (int i = 1; i < _outTunnel.getLength(); i++) {
                     getContext().profileManager().tunnelTestSucceeded(_outTunnel.getPeer(i), sendTime);
                     getContext().profileManager().tunnelDataPushed(_outTunnel.getPeer(i), sendTime, size);
                 }
                 _outTunnel.incrementVerifiedBytesTransferred(size);
             }
-            if (_inTunnel != null)
-                for (int i = 0; i < _inTunnel.getLength(); i++)
+            if (_inTunnel != null) {
+                // skip ourselves at last hop
+                for (int i = 0; i < _inTunnel.getLength() - 1; i++) {
                     getContext().profileManager().tunnelTestSucceeded(_inTunnel.getPeer(i), sendTime);
+                }
+            }
         }
 
         public void setMessage(I2NPMessage msg) {}

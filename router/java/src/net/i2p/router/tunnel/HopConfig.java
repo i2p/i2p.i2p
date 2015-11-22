@@ -51,12 +51,14 @@ public class HopConfig {
     public void setReceiveTunnelId(byte id[]) { _receiveTunnelId = id; }
     public void setReceiveTunnelId(TunnelId id) { _receiveTunnelId = DataHelper.toLong(4, id.getTunnelId()); }
     
-    /** what is the previous peer in the tunnel (if any)? */
+    /** what is the previous peer in the tunnel (null if gateway) */
     public Hash getReceiveFrom() { return _receiveFrom; }
     public void setReceiveFrom(Hash from) { _receiveFrom = from; }
     
-    /** what is the next tunnel ID we are sending to? */
+    /** what is the next tunnel ID we are sending to? (null if endpoint) */
     public byte[] getSendTunnelId() { return _sendTunnelId; }
+
+    /** what is the next tunnel we are sending to? (null if endpoint) */
     public TunnelId getSendTunnel() { 
         if (_sendTunnel == null)
             _sendTunnel = getTunnel(_sendTunnelId); 
@@ -71,7 +73,7 @@ public class HopConfig {
             return new TunnelId(DataHelper.fromLong(id, 0, id.length));
     }
     
-    /** what is the next peer in the tunnel (if any)? */
+    /** what is the next peer in the tunnel (null if endpoint) */
     public Hash getSendTo() { return _sendTo; }
     public void setSendTo(Hash to) { _sendTo = to; }
     

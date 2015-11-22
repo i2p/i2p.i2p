@@ -85,7 +85,7 @@ public abstract class FastI2NPMessageImpl extends I2NPMessageImpl {
             throw new I2NPMessageException("Payload is too short " + maxLen);
         int cur = offset;
         if (type < 0) {
-            type = (int)DataHelper.fromLong(data, cur, 1);
+            type = data[cur] & 0xff;
             cur++;
         }
         _uniqueId = DataHelper.fromLong(data, cur, 4);

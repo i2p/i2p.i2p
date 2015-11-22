@@ -457,7 +457,8 @@ public class TunnelDispatcher implements Service {
                 _inboundGateways.remove(recvId);
             } else {
                 // update stats based off getCompleteCount() + getFailedCount()
-                for (int i = 0; i < cfg.getLength(); i++) {
+                // skip last hop (us)
+                for (int i = 0; i < cfg.getLength() - 1; i++) {
                     Hash peer = cfg.getPeer(i);
                     PeerProfile profile = _context.profileOrganizer().getProfile(peer);
                     if (profile != null) {

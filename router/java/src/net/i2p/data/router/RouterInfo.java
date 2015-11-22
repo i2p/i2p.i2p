@@ -724,7 +724,10 @@ public class RouterInfo extends DatabaseEntry {
                      System.err.println("Router info " + args[i] + " is invalid");
                      fail = true;
                   }
-             } catch (Exception e) {
+             } catch (IOException e) {
+                 System.err.println("Error reading " + args[i] + ": " + e);
+                 fail = true;
+             } catch (DataFormatException e) {
                  System.err.println("Error reading " + args[i] + ": " + e);
                  fail = true;
              } finally {

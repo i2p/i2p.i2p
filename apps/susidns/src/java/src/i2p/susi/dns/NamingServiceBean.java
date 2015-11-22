@@ -205,7 +205,7 @@ public class NamingServiceBean extends AddressbookBean
 
 			message = generateLoadMessage();
 		}
-		catch (Exception e) {
+		catch (RuntimeException e) {
 			warn(e);
 		}
 		if( message.length() > 0 )

@@ -197,7 +197,7 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
             throw new I2NPMessageException("Payload is too short " + maxLen);
         int cur = offset;
         if (type < 0) {
-            type = (int)DataHelper.fromLong(data, cur, 1);
+            type = data[cur] & 0xff;
             cur++;
         }
         _uniqueId = DataHelper.fromLong(data, cur, 4);
@@ -413,7 +413,7 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
      */
     public static I2NPMessage fromRawByteArray(I2PAppContext ctx, byte buffer[], int offset,
                                                int len, I2NPMessageHandler handler) throws I2NPMessageException {
-        int type = (int)DataHelper.fromLong(buffer, offset, 1);
+        int type = buffer[offset] & 0xff;
         offset++;
         I2NPMessage msg = createMessage(ctx, type);
         if (msg == null)

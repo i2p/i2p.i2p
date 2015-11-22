@@ -108,7 +108,7 @@ public enum EncType {
             return true;
         try {
             getParams();
-        } catch (Exception e) {
+        } catch (InvalidParameterSpecException e) {
             return false;
         }
         return true;

@@ -147,7 +147,7 @@ public class BlockFile implements Closeable {
 			bf.bfck(true);
 			bf.close();
 			raif.close();
-		} catch (Exception e) {
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}

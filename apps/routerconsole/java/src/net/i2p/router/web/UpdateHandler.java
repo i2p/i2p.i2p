@@ -84,7 +84,8 @@ public class UpdateHandler {
             } else if (ConfigUpdateHandler.USE_SU3_UPDATE) {
                 update(ROUTER_SIGNED_SU3);
             } else {
-                update(ROUTER_SIGNED);
+                // disabled, shouldn't get here
+                //update(ROUTER_SIGNED);
             }
         }
     }

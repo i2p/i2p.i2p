@@ -29,6 +29,7 @@ import net.i2p.router.util.DecayingBloomFilter;
 import net.i2p.util.Addresses;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
+import net.i2p.util.VersionComparator;
 
 /**
  * Coordinate the establishment of new sessions - both inbound and outbound.
@@ -126,6 +127,19 @@ class EstablishmentManager {
     /** for the DSM and or netdb store */
     private static final int DATA_MESSAGE_TIMEOUT = 10*1000;
     
+    /**
+     * Java I2P has always parsed the length of the extended options field,
+     * but i2pd hasn't recognized it until this release.
+     * No matter, the options weren't defined until this release anyway.
+     *
+**********************************************************************************************************
+     * FIXME 0.9.23 for testing, change to 0.9.24 for release
+     *
+     */
+    private static final String VERSION_ALLOW_EXTENDED_OPTIONS = "0.9.23";
+    private static final String PROP_DISABLE_EXT_OPTS = "i2np.udp.disableExtendedOptions";
+
+
     public EstablishmentManager(RouterContext ctx, UDPTransport transport) {
         _context = ctx;
         _log = ctx.logManager().getLog(EstablishmentManager.class);
@@ -356,8 +370,16 @@ class EstablishmentManager {
                         _transport.failed(msg, "Peer has bad key, cannot establish");
                         return;
                     }
+                    boolean allowExtendedOptions = VersionComparator.comp(toRouterInfo.getVersion(),
+                                                                          VERSION_ALLOW_EXTENDED_OPTIONS) >= 0
+                                                   && !_context.getBooleanProperty(PROP_DISABLE_EXT_OPTS);
+                    // w/o ext options, it's always 'requested', no need to set
+                    // don't ask if they are indirect
+                    boolean requestIntroduction = allowExtendedOptions && !isIndirect &&
+                                                  _transport.introducersMaybeRequired();
                     state = new OutboundEstablishState(_context, maybeTo, to,
-                                                       toIdentity,
+                                                       toIdentity, allowExtendedOptions,
+                                                       requestIntroduction,
                                                        sessionKey, addr, _transport.getDHFactory());
                     OutboundEstablishState oldState = _outboundStates.putIfAbsent(to, state);
                     boolean isNew = oldState == null;
@@ -477,7 +499,9 @@ class EstablishmentManager {
             // Don't offer to relay to privileged ports.
             // Only offer for an IPv4 session.
             // TODO if already we have their RI, only offer if they need it (no 'C' cap)
-            if (_transport.canIntroduce() && state.getSentPort() >= 1024 &&
+            // if extended options, only if they asked for it
+            if (state.isIntroductionRequested() &&
+                _transport.canIntroduce() && state.getSentPort() >= 1024 &&
                 state.getSentIP().length == 4) {
                 // ensure > 0
                 long tag = 1 + _context.random().nextLong(MAX_TAG_VALUE);

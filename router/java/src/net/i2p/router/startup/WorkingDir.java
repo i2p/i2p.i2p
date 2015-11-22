@@ -211,7 +211,7 @@ public class WorkingDir {
             String[] files = dir.list();
             if (files == null)
                 return false;
-            String migrated[] = MIGRATE_BASE.split(",");
+            String migrated[] = DataHelper.split(MIGRATE_BASE, ",");
             for (String file: files) {
                 for (int i = 0; i < migrated.length; i++) {
                     if (file.equals(migrated[i]))
@@ -282,7 +282,7 @@ public class WorkingDir {
 
     private static boolean migrate(String list, File olddir, File todir) {
         boolean rv = true;
-        String files[] = list.split(",");
+        String files[] = DataHelper.split(list, ",");
         for (int i = 0; i < files.length; i++) {
             File from = new File(olddir, files[i]);
             if (!copy(from, todir)) {

@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.TimeZone;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
@@ -57,9 +56,7 @@ class ConnThrottler {
         _log = log;
         // for logging
         _fmt = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.MEDIUM);
-        String systemTimeZone = I2PAppContext.getGlobalContext().getProperty("i2p.systemTimeZone");
-        if (systemTimeZone != null)
-            _fmt.setTimeZone(TimeZone.getTimeZone(systemTimeZone));
+        _fmt.setTimeZone(DataHelper.getSystemTimeZone(I2PAppContext.getGlobalContext()));
         new Cleaner();
     }
 

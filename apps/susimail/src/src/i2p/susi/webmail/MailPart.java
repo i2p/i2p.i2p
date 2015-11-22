@@ -79,7 +79,7 @@ class MailPart {
 		beginBody = bb;
 			
 		ReadBuffer decodedHeaders = EncodingFactory.getEncoding( "HEADERLINE" ).decode( buffer.content, begin, beginBody - begin );
-		headerLines = new String( decodedHeaders.content, decodedHeaders.offset, decodedHeaders.length ).split( "\r\n" );
+		headerLines = DataHelper.split(new String(decodedHeaders.content, decodedHeaders.offset, decodedHeaders.length), "\r\n");
 
 		String boundary = null;
 		String x_encoding = null;

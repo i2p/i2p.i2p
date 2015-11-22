@@ -463,7 +463,7 @@ class NTCPConnection implements Closeable {
             _transport.afterSend(msg, successful, allowRequeue, msg.getLifetime());
             if (_consecutiveBacklog > 10) { // waaay too backlogged
                 boolean wantsWrite = false;
-                try { wantsWrite = ( (_conKey.interestOps() & SelectionKey.OP_WRITE) != 0); } catch (Exception e) {}
+                try { wantsWrite = ( (_conKey.interestOps() & SelectionKey.OP_WRITE) != 0); } catch (RuntimeException e) {}
                 if (_log.shouldLog(Log.WARN)) {
 		    int blocks = _writeBufs.size();
                     _log.warn("Too backlogged for too long (" + _consecutiveBacklog + " messages for " + DataHelper.formatDuration(queueTime()) + ", sched? " + wantsWrite + ", blocks: " + blocks + ") sending to " + _remotePeer.calculateHash());
@@ -521,7 +521,7 @@ class NTCPConnection implements Closeable {
                           + ", wantsWrite? " + (0 != (_conKey.interestOps()&SelectionKey.OP_WRITE))
                           + ", currentOut set? " + currentOutboundSet
 			  + ", writeBufs: " + writeBufs + " on " + toString());
-                } catch (Exception e) {}  // java.nio.channels.CancelledKeyException
+                } catch (RuntimeException e) {}  // java.nio.channels.CancelledKeyException
             }
             //_context.statManager().addRateData("ntcp.sendBacklogTime", queueTime);
             return true;

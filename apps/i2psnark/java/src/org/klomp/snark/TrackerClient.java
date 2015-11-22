@@ -23,8 +23,8 @@ package org.klomp.snark;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -875,18 +875,20 @@ public class TrackerClient implements Runnable {
   }
 
   /**
-   *  @param ann an announce URL
+   *  @param ann an announce URL, may be null, returns false if null
    *  @return true for i2p hosts only
    *  @since 0.7.12
    */
   public static boolean isValidAnnounce(String ann) {
-    URL url;
+    if (ann == null)
+        return false;
+    URI url;
     try {
-       url = new URL(ann);
-    } catch (MalformedURLException mue) {
-       return false;
+        url = new URI(ann);
+    } catch (URISyntaxException use) {
+        return false;
     }
-    return url.getProtocol().equals("http") &&
+    return "http".equals(url.getScheme()) && url.getHost() != null &&
            (url.getHost().endsWith(".i2p") || url.getHost().equals("i2p"));
   }
 
@@ -896,13 +898,13 @@ public class TrackerClient implements Runnable {
    *  @since 0.9.5
    */
   private static Hash getHostHash(String ann) {
-    URL url;
+    URI url;
     try {
-        url = new URL(ann);
-    } catch (MalformedURLException mue) {
+        url = new URI(ann);
+    } catch (URISyntaxException use) {
         return null;
     }
-    if (!url.getProtocol().equals("http"))
+    if (!"http".equals(url.getScheme()))
         return null;
     String host = url.getHost();
     if (host.endsWith(".i2p"))
@@ -912,7 +914,7 @@ public class TrackerClient implements Runnable {
         if (path == null || path.length() < 517 ||
             !path.startsWith("/"))
             return null;
-        String[] parts = path.substring(1).split("[/\\?&;]", 2);
+        String[] parts = DataHelper.split(path.substring(1), "[/\\?&;]", 2);
         return ConvertToHash.getHash(parts[0]);
     }
     return null;

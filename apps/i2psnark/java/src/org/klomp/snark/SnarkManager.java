@@ -189,7 +189,7 @@ public class SnarkManager implements CompleteListener {
         for (int i = 1; i < DEFAULT_TRACKERS.length; i += 2) {
             if (DEFAULT_TRACKERS[i-1].equals("TheBland") && !SigType.ECDSA_SHA256_P256.isAvailable())
                 continue;
-            String urls[] = DEFAULT_TRACKERS[i].split("=", 2);
+            String urls[] = DataHelper.split(DEFAULT_TRACKERS[i], "=", 2);
             ann.add(urls[0]);
         }
         DEFAULT_TRACKER_ANNOUNCES = Collections.unmodifiableSet(ann);
@@ -1078,7 +1078,7 @@ public class SnarkManager implements CompleteListener {
             val = dflt;
         if (val == null)
             return Collections.emptyList();
-        return Arrays.asList(val.split(","));
+        return Arrays.asList(DataHelper.split(val, ","));
     }
 
     /**
@@ -1611,7 +1611,7 @@ public class SnarkManager implements CompleteListener {
             return;
         int filecount = metainfo.getFiles().size();
         int[] rv = new int[filecount];
-        String[] arr = pri.split(",");
+        String[] arr = DataHelper.split(pri, ",");
         for (int i = 0; i < filecount && i < arr.length; i++) {
             if (arr[i].length() > 0) {
                 try {
@@ -2051,7 +2051,7 @@ public class SnarkManager implements CompleteListener {
                     synchronized (_snarks) {
                         ok = monitorTorrents(dir);
                     }
-                } catch (Exception e) {
+                } catch (RuntimeException e) {
                     _log.error("Error in the DirectoryMonitor", e);
                     ok = false;
                 }
@@ -2060,7 +2060,7 @@ public class SnarkManager implements CompleteListener {
                     try {
                         addMagnets();
                         doMagnets = false;
-                    } catch (Exception e) {
+                    } catch (RuntimeException e) {
                         _log.error("Error in the DirectoryMonitor", e);
                     }
                     if (!_snarks.isEmpty())
@@ -2266,7 +2266,7 @@ public class SnarkManager implements CompleteListener {
                     // Snark.fatal() throws a RuntimeException
                     // don't let one bad torrent kill the whole loop
                     addTorrent(name, null, !shouldAutoStart());
-                } catch (Exception e) {
+                } catch (RuntimeException e) {
                     addMessage(_t("Error: Could not add the torrent {0}", name) + ": " + e);
                     _log.error("Unable to add the torrent " + name, e);
                     rv = false;
@@ -2285,7 +2285,7 @@ public class SnarkManager implements CompleteListener {
                     // Snark.fatal() throws a RuntimeException
                     // don't let one bad torrent kill the whole loop
                     stopTorrent(name, true);
-                } catch (Exception e) {
+                } catch (RuntimeException e) {
                     // don't bother with message
                 }
             }
@@ -2342,12 +2342,12 @@ public class SnarkManager implements CompleteListener {
         if ( (trackers == null) || (trackers.trim().length() <= 0) ) {
             setDefaultTrackerMap(true);
         } else {
-            String[] toks = trackers.split(",");
+            String[] toks = DataHelper.split(trackers, ",");
             for (int i = 0; i < toks.length; i += 2) {
                 String name = toks[i].trim().replace("&#44;", ",");
                 String url = toks[i+1].trim().replace("&#44;", ",");
                 if ( (name.length() > 0) && (url.length() > 0) ) {
-                    String urls[] = url.split("=", 2);
+                    String urls[] = DataHelper.split(url, "=", 2);
                     String url2 = urls.length > 1 ? urls[1] : "";
                     _trackerMap.put(name, new Tracker(name, urls[0], url2));
                 }
@@ -2367,7 +2367,7 @@ public class SnarkManager implements CompleteListener {
             String name = DEFAULT_TRACKERS[i];
             if (name.equals("TheBland") && !SigType.ECDSA_SHA256_P256.isAvailable())
                 continue;
-            String urls[] = DEFAULT_TRACKERS[i+1].split("=", 2);
+            String urls[] = DataHelper.split(DEFAULT_TRACKERS[i+1], "=", 2);
             String url2 = urls.length > 1 ? urls[1] : null;
             _trackerMap.put(name, new Tracker(name, urls[0], url2));
         }
@@ -2467,7 +2467,7 @@ public class SnarkManager implements CompleteListener {
         public void run() {
             try {
                 run2();
-            } catch (Exception e) {
+            } catch (RuntimeException e) {
                 _log.error("Error starting", e);
             }
         }
@@ -2595,7 +2595,7 @@ public class SnarkManager implements CompleteListener {
                 } else {
                     addMessageNoEscape(_t("Finished recheck of torrent {0}, unchanged", link));
                 }
-            } catch (Exception e) {
+            } catch (IOException e) {
                 _log.error("Error rechecking " + snark.getBaseName(), e);
                 addMessage(_t("Error checking the torrent {0}", snark.getBaseName()) + ": " + e);
             }

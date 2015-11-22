@@ -344,7 +344,11 @@ riCe6OlAEiNpcc6mMyIYYWFICbrDFTrDR3wXqwc/Jkcx6L5VVWoagpSzbo3yGhc=
             System.out.println("\r\nPrivate key written to: " + privateKeyFile);
             System.out.println("Public key written to: " + publicKeyFile);
             System.out.println("\r\nPublic key: " + signingPublicKey.toBase64() + "\r\n");
-        } catch (Exception e) {
+        } catch (IOException e) {
+            System.err.println("Error writing keys:");
+            e.printStackTrace();
+            return false;
+        } catch (DataFormatException e) {
             System.err.println("Error writing keys:");
             e.printStackTrace();
             return false;
@@ -758,7 +762,7 @@ riCe6OlAEiNpcc6mMyIYYWFICbrDFTrDR3wXqwc/Jkcx6L5VVWoagpSzbo3yGhc=
             bytesToSignInputStream = new SequenceInputStream(versionHeaderInputStream, fileInputStream);
             signature = _context.dsa().sign(bytesToSignInputStream, signingPrivateKey);
 
-        } catch (Exception e) {
+        } catch (IOException e) {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Error signing", e);
 

@@ -11,6 +11,7 @@ package net.i2p.util;
 
 import gnu.crypto.prng.AsyncFortunaStandalone;
 
+import java.io.IOException;
 import java.security.SecureRandom;
 
 import net.i2p.I2PAppContext;
@@ -266,7 +267,7 @@ public class FortunaRandomSource extends RandomSource implements EntropyHarveste
             synchronized(_fortuna) {
                 _fortuna.addRandomBytes(data, offset, len);
             }
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             // AIOOBE seen, root cause unknown, ticket #1576
             Log log = _context.logManager().getLog(FortunaRandomSource.class);
             log.warn("feedEntropy()", e);
@@ -290,6 +291,6 @@ public class FortunaRandomSource extends RandomSource implements EntropyHarveste
                 rand.nextBytes(buf);
                 System.out.write(buf);
             }
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (IOException e) { e.printStackTrace(); }
     }
 }

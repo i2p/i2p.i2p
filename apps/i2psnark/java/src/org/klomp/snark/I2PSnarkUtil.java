@@ -3,8 +3,8 @@ package org.klomp.snark;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -590,10 +590,10 @@ public class I2PSnarkUtil {
      */
     public boolean isKnownOpenTracker(String url) { 
         try {
-           URL u = new URL(url);
+           URI u = new URI(url);
            String host = u.getHost();
            return host != null && SnarkManager.KNOWN_OPENTRACKERS.contains(host);
-        } catch (MalformedURLException mue) {
+        } catch (URISyntaxException use) {
            return false;
         }
     }

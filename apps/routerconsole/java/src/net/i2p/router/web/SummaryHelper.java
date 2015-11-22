@@ -861,6 +861,8 @@ public class SummaryHelper extends HelperBase {
     public void storeNewsHelper(NewsHelper n) { _newshelper = n; }
     public NewsHelper getNewsHelper() { return _newshelper; }
 
+    private static final String SS = Character.toString(S);
+
     public List<String> getSummaryBarSections(String page) {
         String config = "";
         if ("home".equals(page)) {
@@ -870,7 +872,7 @@ public class SummaryHelper extends HelperBase {
             if (config == null)
                 config = _context.getProperty(PROP_SUMMARYBAR + "default", DEFAULT_FULL);
         }
-        return Arrays.asList(config.split("" + S));
+        return Arrays.asList(DataHelper.split(config, SS));
     }
 
     static void saveSummaryBarSections(RouterContext ctx, String page, Map<Integer, String> sections) {

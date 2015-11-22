@@ -862,7 +862,7 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
                             if ((duration > 100) && _log.shouldLog(Log.INFO)) 
                                 _log.info("Message availability notification for " + msgId.intValue() + " took " 
                                            + duration + " to " + _sessionListener);
-                        } catch (Exception e) {
+                        } catch (RuntimeException e) {
                             _log.log(Log.CRIT, "Error notifying app of message availability", e);
                         }
                     } else {

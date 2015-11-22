@@ -62,7 +62,7 @@ public class Peer implements Comparable<Peer>
 
   // Keeps state for in/out connections.  Non-null when the handshake
   // was successful, the connection setup and runs
-  PeerState state;
+  volatile PeerState state;
 
   /** shared across all peers on this torrent */
   MagnetState magnetState;

@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import net.i2p.data.DataHelper;
 import net.i2p.util.SecureFile;
 import net.i2p.util.SecureFileOutputStream;
 import net.i2p.util.SystemVersion;
@@ -93,7 +94,7 @@ class ConfigParser {
         inputLine = input.readLine();
         while (inputLine != null) {
             inputLine = stripComments(inputLine);
-            String[] splitLine = inputLine.split("=");
+            String[] splitLine = DataHelper.split(inputLine, "=");
             if (splitLine.length == 2) {
                 result.put(splitLine[0].trim().toLowerCase(Locale.US), splitLine[1].trim());
             }

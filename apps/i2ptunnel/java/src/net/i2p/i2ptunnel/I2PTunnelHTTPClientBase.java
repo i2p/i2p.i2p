@@ -285,7 +285,7 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
                 // We send Accept-Charset: UTF-8 in the 407 so hopefully it comes back that way inside the B64 ?
                 try {
                     String dec = new String(decoded, "UTF-8");
-                    String[] parts = dec.split(":");
+                    String[] parts = DataHelper.split(dec, ":");
                     String user = parts[0];
                     String pw = parts[1];
                     // first try pw for that user
