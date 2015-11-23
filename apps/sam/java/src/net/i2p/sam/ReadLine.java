@@ -11,7 +11,7 @@ import java.net.SocketTimeoutException;
 /**
  * Modified from I2PTunnelHTTPServer
  *
- * @since 0.9.22
+ * @since 0.9.24
  */
 class ReadLine {
 

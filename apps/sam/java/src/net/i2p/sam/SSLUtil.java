@@ -20,7 +20,7 @@ import net.i2p.util.SecureDirectory;
 /**
  * Utilities for SAM SSL server sockets.
  *
- * @since 0.9.22 adopted from net.i2p.i2ptunnel.SSLClientUtil
+ * @since 0.9.24 adopted from net.i2p.i2ptunnel.SSLClientUtil
  */
 class SSLUtil {
 

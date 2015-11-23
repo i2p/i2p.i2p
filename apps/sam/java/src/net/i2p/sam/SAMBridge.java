@@ -60,6 +60,8 @@ public class SAMBridge implements Runnable, ClientApp {
     private final boolean _useSSL;
     private final File _configFile;
     private volatile Thread _runner;
+    private final Object _v3DGServerLock = new Object();
+    private SAMv3DatagramServer _v3DGServer;
 
     /** 
      * filename in which the name to private key mapping should 
@@ -95,7 +97,8 @@ public class SAMBridge implements Runnable, ClientApp {
     public static final String PROP_DATAGRAM_HOST = "sam.udp.host";
     public static final String PROP_DATAGRAM_PORT = "sam.udp.port";
     protected static final String DEFAULT_DATAGRAM_HOST = "127.0.0.1";
-    protected static final String DEFAULT_DATAGRAM_PORT = "7655";
+    protected static final int DEFAULT_DATAGRAM_PORT_INT = 7655;
+    protected static final String DEFAULT_DATAGRAM_PORT = Integer.toString(DEFAULT_DATAGRAM_PORT_INT);
 
 
     /**
@@ -353,6 +356,40 @@ public class SAMBridge implements Runnable, ClientApp {
             }
         }
     }
+
+    /**
+     * Was a static singleton, now a singleton for this bridge.
+     * Instantiate and start server if it doesn't exist.
+     * We only listen on one host and port, as specified in the
+     * sam.udp.host and sam.udp.port properties.
+     * TODO we could have multiple servers on different hosts/ports in the future.
+     *
+     * @param props non-null instantiate and start server if it doesn't exist
+     * @param return non-null
+     * @throws IOException if can't bind to host/port, or if different than existing
+     * @since 0.9.24
+     */
+    SAMv3DatagramServer getV3DatagramServer(Properties props) throws IOException {
+        String host = props.getProperty(PROP_DATAGRAM_HOST, DEFAULT_DATAGRAM_HOST);
+        int port;
+        String portStr = props.getProperty(PROP_DATAGRAM_PORT, DEFAULT_DATAGRAM_PORT);
+        try {
+            port = Integer.parseInt(portStr);
+        } catch (NumberFormatException e) {
+            port = DEFAULT_DATAGRAM_PORT_INT;
+        }
+        synchronized (_v3DGServerLock) {
+            if (_v3DGServer == null) {
+                _v3DGServer = new SAMv3DatagramServer(this, host, port, props);
+                _v3DGServer.start();
+            } else {
+                if (_v3DGServer.getPort() != port || !_v3DGServer.getHost().equals(host))
+                    throw new IOException("Already have V3 DatagramServer with host=" + host + " port=" + port);
+            }
+            return _v3DGServer;
+        }
+    }
+
 
     ////// begin ClientApp interface, use only if using correct construtor
 
@@ -750,7 +787,7 @@ public class SAMBridge implements Runnable, ClientApp {
         }
     }
 
-    /** @since 0.9.22 */
+    /** @since 0.9.24 */
     public void saveConfig() throws IOException {
         DataHelper.storeProps(i2cpProps, _configFile);
     }

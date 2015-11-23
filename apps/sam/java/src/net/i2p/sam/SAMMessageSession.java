@@ -249,7 +249,7 @@ abstract class SAMMessageSession {
                              I2PSession.PORT_UNSPECIFIED, I2PSession.PORT_UNSPECIFIED);
         }
 
-        /** @since 0.9.22 */
+        /** @since 0.9.24 */
         public void messageAvailable(I2PSession session, int msgId, long size,
                                      int proto, int fromPort, int toPort) {
 

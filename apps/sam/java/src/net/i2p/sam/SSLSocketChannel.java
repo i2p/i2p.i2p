@@ -18,7 +18,7 @@ import javax.net.ssl.SSLSocket;
  * Simple wrapper for a SSLSocket.
  * Cannot be used for asynch ops.
  *
- * @since 0.9.22
+ * @since 0.9.24
  */
 class SSLSocketChannel extends SocketChannel {
 

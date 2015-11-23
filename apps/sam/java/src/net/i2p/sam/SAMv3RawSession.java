@@ -36,14 +36,16 @@ class SAMv3RawSession extends SAMRawSession  implements SAMv3Handler.Session, SA
 	 * @throws DataFormatException
 	 * @throws I2PSessionException
 	 */
-	public SAMv3RawSession(String nick) throws IOException, DataFormatException, I2PSessionException {
+	public SAMv3RawSession(String nick, SAMv3DatagramServer dgServer) 
+			throws IOException, DataFormatException, I2PSessionException {
 		super(SAMv3Handler.sSessionsHash.get(nick).getDest(),
 		      SAMv3Handler.sSessionsHash.get(nick).getProps(),
 		      SAMv3Handler.sSessionsHash.get(nick).getHandler()  // to be replaced by this
 		);
 		this.nick = nick ;
 		this.recv = this ;  // replacement
-		this.server = SAMv3DatagramServer.getInstance() ;
+		this.server = dgServer;
+
 		SAMv3Handler.SessionRecord rec = SAMv3Handler.sSessionsHash.get(nick);
 		if (rec == null)
 			throw new InterruptedIOException() ;

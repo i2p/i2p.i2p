@@ -250,7 +250,7 @@ class SAMv3Handler extends SAMv1Handler
 	/**
 	 *  For SAMv3DatagramServer
 	 *  @return may be null
-	 *  @since 0.9.22
+	 *  @since 0.9.24
 	 */
 	Session getSession() {
 		return session;
@@ -592,13 +592,13 @@ class SAMv3Handler extends SAMv1Handler
 				// Create the session
 
 				if (style.equals("RAW")) {
-					SAMv3DatagramServer.getInstance(bridge, i2cpProps);
-					SAMv3RawSession v3 = newSAMRawSession(nick);
+					SAMv3DatagramServer dgs = bridge.getV3DatagramServer(props);
+					SAMv3RawSession v3 = new SAMv3RawSession(nick, dgs);
                                         rawSession = v3;
 					this.session = v3;
 				} else if (style.equals("DATAGRAM")) {
-					SAMv3DatagramServer.getInstance(bridge, i2cpProps);
-					SAMv3DatagramSession v3 = newSAMDatagramSession(nick);
+					SAMv3DatagramServer dgs = bridge.getV3DatagramServer(props);
+					SAMv3DatagramSession v3 = new SAMv3DatagramSession(nick, dgs);
 					datagramSession = v3;
 					this.session = v3;
 				} else if (style.equals("STREAM")) {
@@ -650,18 +650,6 @@ class SAMv3Handler extends SAMv1Handler
 			throws IOException, DataFormatException, SAMException
 	{
 		return new SAMv3StreamSession( login ) ;
-	}
-
-	private static SAMv3RawSession newSAMRawSession(String login )
-			throws IOException, DataFormatException, SAMException, I2PSessionException
-	{
-		return new SAMv3RawSession( login ) ;
-	}
-
-	private static SAMv3DatagramSession newSAMDatagramSession(String login )
-			throws IOException, DataFormatException, SAMException, I2PSessionException
-	{
-		return new SAMv3DatagramSession( login ) ;
 	}
 
 	/* Parse and execute a STREAM message */
@@ -863,7 +851,7 @@ class SAMv3Handler extends SAMv1Handler
 	    }
 	}
 	
-	/** @since 0.9.22 */
+	/** @since 0.9.24 */
 	public static void notifyStreamIncomingConnection(SocketChannel client, Destination d,
 	                                                  int fromPort, int toPort) throws IOException {
 	    if (!writeString(d.toBase64() + " FROM_PORT=" + fromPort + " TO_PORT=" + toPort + '\n', client)) {
@@ -871,7 +859,7 @@ class SAMv3Handler extends SAMv1Handler
 	    }
 	}
 
-	/** @since 0.9.22 */
+	/** @since 0.9.24 */
 	private boolean execAuthMessage(String opcode, Properties props) {
 		if (opcode.equals("ENABLE")) {
 			i2cpProps.setProperty(SAMBridge.PROP_AUTH, "true");
@@ -910,7 +898,7 @@ class SAMv3Handler extends SAMv1Handler
 	/**
 	 * Handle a PING.
 	 * Send a PONG.
-	 * @since 0.9.22
+	 * @since 0.9.24
 	 */
 	private void execPingMessage(StringTokenizer tok) {
 		StringBuilder buf = new StringBuilder();
@@ -924,7 +912,7 @@ class SAMv3Handler extends SAMv1Handler
 
 	/**
 	 * Handle a PONG.
-	 * @since 0.9.22
+	 * @since 0.9.24
 	 */
 	private void execPongMessage(StringTokenizer tok) {
 		String s;

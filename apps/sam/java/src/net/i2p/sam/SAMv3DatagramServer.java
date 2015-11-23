@@ -26,78 +26,42 @@ import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 
 /**
- *  This is a singleton listening on 127.0.0.1:7655 or as specified by
+ *  This is the thread listening on 127.0.0.1:7655 or as specified by
  *  sam.udp.host and sam.udp.port properties.
  *  This is used for both repliable and raw datagrams.
  *
- *  @since 0.9.22 moved from SAMv3Handler
+ *  @since 0.9.24 moved from SAMv3Handler
  */
 class SAMv3DatagramServer implements Handler {
 	
-	private static SAMv3DatagramServer _instance;
-	private static DatagramChannel server;
+	private final DatagramChannel _server;
 	private final Thread _listener;
 	private final SAMBridge _parent;
-	
-	/**
-	 *  Returns the singleton.
-	 *  If this is the first call, will be instantiated and will listen
-	 *  on the default host:port 127.0.0.1:7655.
-	 *  Don't make this the first call.
-	 */
-	public static SAMv3DatagramServer getInstance() throws IOException {
-		return getInstance(null, new Properties());
-	}
-		
-	/**
-	 *  Returns the singleton.
-	 *  If this is the first call, will be instantiated and will listen
-	 *  on the specified host:port, default 127.0.0.1:7655.
-	 *  Properties are sam.udp.host and sam.udp.port.
-	 *
-	 *  @param props ignored unless this is the first call
-	 */
-	public static SAMv3DatagramServer getInstance(SAMBridge parent, Properties props) throws IOException {
-		synchronized(SAMv3DatagramServer.class) {
-			if (_instance==null) {
-				_instance = new SAMv3DatagramServer(parent, props);
-				_instance.start();
-			}
-		}
-		return _instance;
-	}
+	private final String _host;
+	private final int _port;
 	
 	/**
 	 *  Does not start listener.
 	 *  Caller must call start().
 	 *
 	 *  @param parent may be null
+	 *  @param props ignored for now
 	 */
-	private SAMv3DatagramServer(SAMBridge parent, Properties props) throws IOException {
+	public SAMv3DatagramServer(SAMBridge parent, String host, int port, Properties props) throws IOException {
 		_parent = parent;
-		synchronized(SAMv3DatagramServer.class) {
-			if (server==null)
-				server = DatagramChannel.open();
-		}
+		_server = DatagramChannel.open();
 		
-		String host = props.getProperty(SAMBridge.PROP_DATAGRAM_HOST, SAMBridge.DEFAULT_DATAGRAM_HOST);
-		String portStr = props.getProperty(SAMBridge.PROP_DATAGRAM_PORT, SAMBridge.DEFAULT_DATAGRAM_PORT);
-		int port ;
-		try {
-			port = Integer.parseInt(portStr);
-		} catch (NumberFormatException e) {
-			port = Integer.parseInt(SAMBridge.DEFAULT_DATAGRAM_PORT);
-		}
-		
-		server.socket().bind(new InetSocketAddress(host, port));
-		_listener = new I2PAppThread(new Listener(server), "SAM DatagramListener " + port);
+		_server.socket().bind(new InetSocketAddress(host, port));
+		_listener = new I2PAppThread(new Listener(_server), "SAM DatagramListener " + port);
+		_host = host;
+		_port = port;
 	}
 	
 	/**
 	 *  Only call once.
 	 *  @since 0.9.22
 	 */
-	private synchronized void start() {
+	public synchronized void start() {
 		_listener.start();
 		if (_parent != null)
 			_parent.register(this);
@@ -108,22 +72,23 @@ class SAMv3DatagramServer implements Handler {
 	 *  @since 0.9.22
 	 */
 	public synchronized void stopHandling() {
-		synchronized(SAMv3DatagramServer.class) {
-			if (server != null) {
-				try {
-					server.close();
-				} catch (IOException ioe) {}
-				server = null;
-			}
-		}
+		try {
+			_server.close();
+		} catch (IOException ioe) {}
 		_listener.interrupt();
 		if (_parent != null)
 			_parent.unregister(this);
 	}
 	
 	public void send(SocketAddress addr, ByteBuffer msg) throws IOException {
-		server.send(msg, addr);
+		_server.send(msg, addr);
 	}
+
+	/** @since 0.9.24 */
+	public String getHost() { return _host; }
+
+	/** @since 0.9.24 */
+	public int getPort() { return _port; }
 
 	private static class Listener implements Runnable {
 		
