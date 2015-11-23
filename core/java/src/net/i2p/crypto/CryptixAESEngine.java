@@ -38,7 +38,6 @@ import net.i2p.util.SystemVersion;
  */
 public class CryptixAESEngine extends AESEngine {
     private final static CryptixRijndael_Algorithm _algo = new CryptixRijndael_Algorithm();
-    private final static boolean USE_FAKE_CRYPTO = false;
     // keys are now cached in the SessionKey objects
     //private CryptixAESKeyCache _cache;
     
@@ -103,12 +102,6 @@ public class CryptixAESEngine extends AESEngine {
         if (length % 16 != 0) 
             throw new IllegalArgumentException("Only lengths mod 16 are supported here");
 
-        if (USE_FAKE_CRYPTO) {
-            _log.warn("AES Crypto disabled!  Using trivial XOR");
-            System.arraycopy(payload, payloadIndex, out, outIndex, length);
-            return;
-        }
-
         if (USE_SYSTEM_AES && length >= MIN_SYSTEM_AES_LENGTH) {
             try {
                 SecretKeySpec key = new SecretKeySpec(sessionKey.getData(), "AES");
@@ -155,12 +148,6 @@ public class CryptixAESEngine extends AESEngine {
         else if (out.length - outIndex < length)
             throw new IllegalArgumentException("out is too small (out.length=" + out.length 
                                                + " outIndex=" + outIndex + " length=" + length);
-
-        if (USE_FAKE_CRYPTO) {
-            _log.warn("AES Crypto disabled!  Using trivial XOR");
-            System.arraycopy(payload, payloadIndex, out, outIndex, length);
-            return ;
-        }
 
         if (USE_SYSTEM_AES && length >= MIN_SYSTEM_AES_LENGTH) {
             try {
