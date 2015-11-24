@@ -32,6 +32,8 @@ import net.i2p.util.SystemVersion;
  */
 public class KeyStoreUtil {
         
+    public static boolean _blacklistLogged;
+
     public static final String DEFAULT_KEYSTORE_PASSWORD = "changeit";
     private static final String DEFAULT_KEY_ALGORITHM = "RSA";
     private static final int DEFAULT_KEY_SIZE = 2048;
@@ -41,6 +43,10 @@ public class KeyStoreUtil {
      *  No reports of these in a Java keystore but just to be safe...
      */
     private static final BigInteger[] BLACKLIST_SERIAL = new BigInteger[] {
+        // CNNIC https://googleonlinesecurity.blogspot.com/2015/03/maintaining-digital-certificate-security.html
+        new BigInteger("49:33:00:01".replace(":", ""), 16),
+        // CNNIC EV root https://bugzilla.mozilla.org/show_bug.cgi?id=607208
+        new BigInteger("48:9f:00:01".replace(":", ""), 16),
         // Superfish http://blog.erratasec.com/2015/02/extracting-superfish-certificate.html
         new BigInteger("d2:fc:13:87:a9:44:dc:e7".replace(":", ""), 16),
         // eDellRoot https://www.reddit.com/r/technology/comments/3twmfv/dell_ships_laptops_with_rogue_root_ca_exactly/
@@ -54,6 +60,8 @@ public class KeyStoreUtil {
      *  to blacklist a cert without an issuer CN.
      */
     private static final String[] BLACKLIST_ISSUER_CN = new String[] {
+        "CNNIC ROOT",
+        "China Internet Network Information Center EV Certificates Root",
         "Superfish, Inc.",
         "eDellRoot"
     };
@@ -241,10 +249,13 @@ public class KeyStoreUtil {
                                 String name = CertUtil.getIssuerValue(xc, "CN");
                                 if (BLACKLIST_ISSUER_CN[i].equals(name)) {
                                     ks.deleteEntry(alias);
-                                    warn("Ignoring blacklisted certificate \"" + alias +
-                                         "\" issued by: \"" + name +
-                                         "\" s/n: " + serial.toString(16), null);
                                     count++;
+                                    if (!_blacklistLogged) {
+                                        // should this be a logAlways?
+                                        warn("Ignoring blacklisted certificate \"" + alias +
+                                             "\" issued by: \"" + name +
+                                             "\" s/n: " + serial.toString(16), null);
+                                    }
                                 }
                             }
                         }
@@ -252,6 +263,8 @@ public class KeyStoreUtil {
                 }
             }
         } catch (GeneralSecurityException e) {}
+        if (count > 0)
+            _blacklistLogged = true;
         return count;
     }
 
@@ -278,7 +291,8 @@ public class KeyStoreUtil {
                     String alias = f.getName().toLowerCase(Locale.US);
                     if (alias.endsWith(".crt") || alias.endsWith(".pem") || alias.endsWith(".key") ||
                         alias.endsWith(".der") || alias.endsWith(".key") || alias.endsWith(".p7b") ||
-                        alias.endsWith(".p7c") || alias.endsWith(".pfx") || alias.endsWith(".p12"))
+                        alias.endsWith(".p7c") || alias.endsWith(".pfx") || alias.endsWith(".p12") ||
+                        alias.endsWith(".cer"))
                         alias = alias.substring(0, alias.length() - 4);
                     boolean success = addCert(f, alias, ks);
                     if (success)
@@ -605,6 +619,7 @@ public class KeyStoreUtil {
                         System.out.println("Found " + count + " certs in " + ksf);
                         if (count > 0) {
                             // rerun blacklist as a test
+                            _blacklistLogged = false;
                             count = removeBlacklistedCerts(ks);
                             if (count > 0)
                                 System.out.println("Found " + count + " blacklisted certs in " + ksf);
