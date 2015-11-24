@@ -77,12 +77,40 @@ public class CertUtil {
      *  @return value or null if not found
      */
     public static String getSubjectValue(X509Certificate cert, String type) {
+        X500Principal p = cert.getSubjectX500Principal();
+        return getValue(p, type);
+    }
+
+    /**
+     *  Get a value out of the issuer distinguished name.
+     *
+     *  Warning - unsupported in Android (no javax.naming), returns null.
+     *
+     *  @param type e.g. "CN"
+     *  @return value or null if not found
+     *  @since 0.9.24
+     */
+    public static String getIssuerValue(X509Certificate cert, String type) {
+        X500Principal p = cert.getIssuerX500Principal();
+        return getValue(p, type);
+    }
+
+    /**
+     *  Get a value out of a X500Principal.
+     *
+     *  Warning - unsupported in Android (no javax.naming), returns null.
+     *
+     *  @param type e.g. "CN"
+     *  @return value or null if not found
+     */
+    private static String getValue(X500Principal p, String type) {
         if (SystemVersion.isAndroid()) {
             error("Don't call this in Android", new UnsupportedOperationException("I did it"));
             return null;
         }
+        if (p == null)
+            return null;
         type = type.toUpperCase(Locale.US);
-        X500Principal p = cert.getSubjectX500Principal();
         String subj = p.getName();
         try {
             LdapName name = new LdapName(subj);

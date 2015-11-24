@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.math.BigInteger;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.PrivateKey;
@@ -37,6 +38,27 @@ public class KeyStoreUtil {
     private static final int DEFAULT_KEY_VALID_DAYS = 3652;  // 10 years
 
     /**
+     *  No reports of these in a Java keystore but just to be safe...
+     */
+    private static final BigInteger[] BLACKLIST_SERIAL = new BigInteger[] {
+        // Superfish http://blog.erratasec.com/2015/02/extracting-superfish-certificate.html
+        new BigInteger("d2:fc:13:87:a9:44:dc:e7".replace(":", ""), 16),
+        // eDellRoot https://www.reddit.com/r/technology/comments/3twmfv/dell_ships_laptops_with_rogue_root_ca_exactly/
+        new BigInteger("6b:c5:7b:95:18:93:aa:97:4b:62:4a:c0:88:fc:3b:b6".replace(":", ""), 16)
+    };
+
+    /**
+     *  Corresponding issuer CN for the serial number.
+     *  Must be same number of entries as BLACKLIST_SERIAL.
+     *  See removeBlacklistedCerts() below for alternatives if we want
+     *  to blacklist a cert without an issuer CN.
+     */
+    private static final String[] BLACKLIST_ISSUER_CN = new String[] {
+        "Superfish, Inc.",
+        "eDellRoot"
+    };
+
+    /**
      *  Create a new KeyStore object, and load it from ksFile if it is
      *  non-null and it exists.
      *  If ksFile is non-null and it does not exist, create a new empty
@@ -63,6 +85,8 @@ public class KeyStoreUtil {
         if (ksFile != null && !exists) {
             OutputStream fos = null;
             try {
+                // must be initted
+                ks.load(null, DEFAULT_KEYSTORE_PASSWORD.toCharArray());
                 fos = new SecureFileOutputStream(ksFile);
                 ks.store(fos, pwchars);
             } finally {
@@ -110,7 +134,9 @@ public class KeyStoreUtil {
             }
         }
 
-        if (!success) {
+        if (success) {
+            removeBlacklistedCerts(ks);
+        } else {
             try {
                 // must be initted
                 ks.load(null, DEFAULT_KEYSTORE_PASSWORD.toCharArray());
@@ -171,8 +197,58 @@ public class KeyStoreUtil {
             for(Enumeration<String> e = ks.aliases(); e.hasMoreElements();) {
                 String alias = e.nextElement();
                 if (ks.isCertificateEntry(alias)) {
-                    info("Found cert " + alias);
+                    //info("Found cert " + alias);
                     count++;
+                }
+            }
+        } catch (GeneralSecurityException e) {}
+        return count;
+    }
+
+    /**
+     *  Remove all blacklisted X509 Certs in a key store.
+     *  Match by serial number and issuer CN, which should uniquely identify a cert,
+     *  if the CN is present. Should be faster than fingerprints.
+     *
+     *  @return number successfully removed
+     *  @since 0.9.24
+     */
+    private static int removeBlacklistedCerts(KeyStore ks) {
+        // This matches on the CN in the issuer,
+        // and we can't do that on Android.
+        // We could just match the whole string, and we will have to
+        // if we want do it on Android or match a cert that has an issuer without a CN.
+        // Or, most certs that don't have a CN have an OU, that could be a fallback.
+        // Or do sha1hash(cert.getEncoded()) but that would be slower.
+        if (SystemVersion.isAndroid())
+            return 0;
+        int count = 0;
+        try {
+            for(Enumeration<String> e = ks.aliases(); e.hasMoreElements();) {
+                String alias = e.nextElement();
+                if (ks.isCertificateEntry(alias)) {
+                    Certificate c = ks.getCertificate(alias);
+                    if (c != null && (c instanceof X509Certificate)) {
+                        X509Certificate xc = (X509Certificate) c;
+                        BigInteger serial = xc.getSerialNumber();
+                        for (int i = 0; i < BLACKLIST_SERIAL.length; i++) {
+                            // debug:
+                            //String xname = CertUtil.getIssuerValue(xc, "CN");
+                            //info("Found \"" + xname + "\" s/n: " + serial.toString(16));
+                            //if (xname == null)
+                            //    info("name is null, full issuer: " + xc.getIssuerX500Principal().getName());
+                            if (BLACKLIST_SERIAL[i].equals(serial)) {
+                                String name = CertUtil.getIssuerValue(xc, "CN");
+                                if (BLACKLIST_ISSUER_CN[i].equals(name)) {
+                                    ks.deleteEntry(alias);
+                                    warn("Ignoring blacklisted certificate \"" + alias +
+                                         "\" issued by: \"" + name +
+                                         "\" s/n: " + serial.toString(16), null);
+                                    count++;
+                                }
+                            }
+                        }
+                    }
                 }
             }
         } catch (GeneralSecurityException e) {}
@@ -513,9 +589,9 @@ public class KeyStoreUtil {
 
 /****
     public static void main(String[] args) {
+        File ksf = (args.length > 0) ? new File(args[0]) : null;
         try {
-            if (args.length > 0) {
-                File ksf = new File(args[0]);
+            if (ksf != null && !ksf.exists()) {
                 createKeyStore(ksf, DEFAULT_KEYSTORE_PASSWORD);
                 System.out.println("Created empty keystore " + ksf);
             } else {
@@ -524,6 +600,16 @@ public class KeyStoreUtil {
                     System.out.println("Loaded system keystore");
                     int count = countCerts(ks);
                     System.out.println("Found " + count + " certs");
+                    if (ksf != null && ksf.isDirectory()) {
+                        count = addCerts(ksf, ks);
+                        System.out.println("Found " + count + " certs in " + ksf);
+                        if (count > 0) {
+                            // rerun blacklist as a test
+                            count = removeBlacklistedCerts(ks);
+                            if (count > 0)
+                                System.out.println("Found " + count + " blacklisted certs in " + ksf);
+                        }
+                    }
                 } else {
                     System.out.println("FAIL");
                 }
