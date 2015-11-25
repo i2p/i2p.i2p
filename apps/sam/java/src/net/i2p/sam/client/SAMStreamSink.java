@@ -77,7 +77,7 @@ public class SAMStreamSink {
                 //boolean written = 
                	writeDest(ourDest);
                 if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Dest written");
+                    _log.debug("My destination written to " + _destFile);
             }
         }
     }
