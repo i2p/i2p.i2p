@@ -263,6 +263,11 @@ public class SAMStreamSend {
             }
             
             closed();
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Runner exiting");
+            // stop the reader, since we're only doing this once for testing
+            // you wouldn't do this in a real application
+            _reader.stopReading();
         }
     }
 }

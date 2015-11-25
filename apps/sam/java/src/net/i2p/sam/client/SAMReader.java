@@ -20,6 +20,7 @@ public class SAMReader {
     private final InputStream _inRaw;
     private final SAMClientEventListener _listener;
     private volatile boolean _live;
+    private Thread _thread;
     
     public SAMReader(I2PAppContext context, InputStream samIn, SAMClientEventListener listener) {
         _log = context.logManager().getLog(SAMReader.class);
@@ -27,13 +28,22 @@ public class SAMReader {
         _listener = listener;
     }
     
-    public void startReading() {
+    public synchronized void startReading() {
+        if (_live)
+            throw new IllegalStateException();
         _live = true;
         I2PAppThread t = new I2PAppThread(new Runner(), "SAM reader");
         t.start();
+        _thread = t;
     }
 
-    public void stopReading() { _live = false; }
+    public synchronized void stopReading() {
+        _live = false;
+        if (_thread != null) {
+            _thread.interrupt();
+            _thread = null;
+        }
+    }
     
     /**
      * Async event notification interface for SAM clients
@@ -89,10 +99,11 @@ public class SAMReader {
                     }
                     if (c == -1) {
                         _log.error("Error reading from the SAM bridge");
-                        return;
+                        break;
                     }
                 } catch (IOException ioe) {
                     _log.error("Error reading from SAM", ioe);
+                    break;
                 }
                 
                 String line = new String(baos.toByteArray());
@@ -103,14 +114,15 @@ public class SAMReader {
                     break;
                 }
                 
-                _log.debug("Line read from the bridge: " + line);
+                if (_log.shouldDebug())
+                    _log.debug("Line read from the bridge: " + line);
                 
                 StringTokenizer tok = new StringTokenizer(line);
                 
                 if (tok.countTokens() < 2) {
                     _log.error("Invalid SAM line: [" + line + "]");
                     _live = false;
-                    return;
+                    break;
                 }
                 
                 String major = tok.nextToken();
@@ -133,6 +145,8 @@ public class SAMReader {
                 
                 processEvent(major, minor, params);
             }
+            if (_log.shouldWarn())
+                _log.warn("SAMReader exiting");
         }
     }
     
