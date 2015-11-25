@@ -16,10 +16,10 @@ import net.i2p.util.Log;
  *
  */
 public class SAMReader {
-    private Log _log;
-    private InputStream _inRaw;
-    private SAMClientEventListener _listener;
-    private boolean _live;
+    private final Log _log;
+    private final InputStream _inRaw;
+    private final SAMClientEventListener _listener;
+    private volatile boolean _live;
     
     public SAMReader(I2PAppContext context, InputStream samIn, SAMClientEventListener listener) {
         _log = context.logManager().getLog(SAMReader.class);
@@ -32,6 +32,7 @@ public class SAMReader {
         I2PAppThread t = new I2PAppThread(new Runner(), "SAM reader");
         t.start();
     }
+
     public void stopReading() { _live = false; }
     
     /**

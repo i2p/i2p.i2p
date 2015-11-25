@@ -20,21 +20,21 @@ import net.i2p.util.Log;
  *
  */
 public class SAMStreamSend {
-    private I2PAppContext _context;
-    private Log _log;
-    private String _samHost;
-    private String _samPort;
-    private String _destFile;
-    private String _dataFile;
-    private String _conOptions;
+    private final I2PAppContext _context;
+    private final Log _log;
+    private final String _samHost;
+    private final String _samPort;
+    private final String _destFile;
+    private final String _dataFile;
+    private final String _conOptions;
     private Socket _samSocket;
     private OutputStream _samOut;
     private InputStream _samIn;
     private SAMReader _reader;
     //private boolean _dead;
-    private SAMEventHandler _eventHandler;
+    private final SAMEventHandler _eventHandler;
     /** Connection id (Integer) to peer (Flooder) */
-    private Map<Integer, Sender> _remotePeers;
+    private final Map<Integer, Sender> _remotePeers;
     
     public static void main(String args[]) {
         if (args.length < 4) {
@@ -165,13 +165,11 @@ public class SAMStreamSend {
         private int _connectionId; 
         private String _remoteDestination;
         private InputStream _in;
-        private boolean _closed;
+        private volatile boolean _closed;
         private long _started;
         private long _totalSent;
         
-        public Sender() {
-            _closed = false;
-        }
+        public Sender() {}
         
         public boolean openConnection() {
             FileInputStream fin = null;

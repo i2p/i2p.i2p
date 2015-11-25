@@ -20,21 +20,21 @@ import net.i2p.util.Log;
  *
  */
 public class SAMStreamSink {
-    private I2PAppContext _context;
-    private Log _log;
-    private String _samHost;
-    private String _samPort;
-    private String _destFile;
-    private String _sinkDir;
-    private String _conOptions;
+    private final I2PAppContext _context;
+    private final Log _log;
+    private final String _samHost;
+    private final String _samPort;
+    private final String _destFile;
+    private final String _sinkDir;
+    private final String _conOptions;
     private Socket _samSocket;
     private OutputStream _samOut;
     private InputStream _samIn;
     private SAMReader _reader;
     //private boolean _dead;
-    private SAMEventHandler _eventHandler;
+    private final SAMEventHandler _eventHandler;
     /** Connection id (Integer) to peer (Flooder) */
-    private Map<Integer, Sink> _remotePeers;
+    private final Map<Integer, Sink> _remotePeers;
     
     public static void main(String args[]) {
         if (args.length < 4) {
@@ -200,12 +200,12 @@ public class SAMStreamSink {
     }
     
     private class Sink {
-        private int _connectionId; 
-        private String _remoteDestination;
-        private boolean _closed;
-        private long _started;
+        private final int _connectionId; 
+        private final String _remoteDestination;
+        private volatile boolean _closed;
+        private final long _started;
         private long _lastReceivedOn;
-        private OutputStream _out;
+        private final OutputStream _out;
         
         public Sink(int conId, String remDest) throws IOException {
             _connectionId = conId;
@@ -222,6 +222,7 @@ public class SAMStreamSink {
             
             File out = File.createTempFile("sink", ".dat", sinkDir);
             _out = new FileOutputStream(out);
+            _started = _context.clock().now();
         }
         
         public int getConnectionId() { return _connectionId; }
