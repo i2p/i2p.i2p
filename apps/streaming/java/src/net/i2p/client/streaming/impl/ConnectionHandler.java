@@ -291,8 +291,12 @@ class ConnectionHandler {
     private static class PoisonPacket extends Packet {
         public static final int POISON_MAX_DELAY_REQUEST = Packet.MAX_DELAY_REQUEST + 1;
 
-        public PoisonPacket() {
-            setOptionalDelay(POISON_MAX_DELAY_REQUEST);
+        @Override
+        public int getOptionalDelay() { return POISON_MAX_DELAY_REQUEST; }
+
+        @Override
+        public String toString() {
+            return "POISON";
         }
     }
 }
