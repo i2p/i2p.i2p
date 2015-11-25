@@ -108,7 +108,7 @@ public class PasswordManager {
      *  @param shash b64 string
      *  @param pw plain text non-null, already trimmed
      *  @return if pw verified
-     *  @since 0.9.22
+     *  @since 0.9.24
      */
     public boolean checkHash(String shash, String pw) {
         byte[] shashBytes = Base64.decode(shash);
@@ -127,7 +127,7 @@ public class PasswordManager {
      *
      *  @param pw plain text non-null, already trimmed
      *  @return salted+hash b64 string
-     *  @since 0.9.22
+     *  @since 0.9.24
      */
     public String createHash(String pw) {
         byte[] salt = new byte[SALT_LENGTH];
