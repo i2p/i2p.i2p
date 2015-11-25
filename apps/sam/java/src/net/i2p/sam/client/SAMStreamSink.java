@@ -31,14 +31,12 @@ public class SAMStreamSink {
     private final String _destFile;
     private final String _sinkDir;
     private String _conOptions;
-    private Socket _samSocket;
-    private OutputStream _samOut;
-    private InputStream _samIn;
     private SAMReader _reader;
+    private boolean _isV3;
     //private boolean _dead;
     private final SAMEventHandler _eventHandler;
     /** Connection id (Integer) to peer (Flooder) */
-    private final Map<Integer, Sink> _remotePeers;
+    private final Map<String, Sink> _remotePeers;
     
     public static void main(String args[]) {
         if (args.length < 4) {
@@ -61,21 +59,20 @@ public class SAMStreamSink {
         _sinkDir = sinkDir;
         _conOptions = "";
         _eventHandler = new SinkEventHandler(_context);
-        _remotePeers = new HashMap<Integer,Sink>();
+        _remotePeers = new HashMap<String, Sink>();
     }
     
     public void startup(String version) {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Starting up");
-        boolean ok = connect();
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Connected: " + ok);
-        if (ok) {
-            _reader = new SAMReader(_context, _samIn, _eventHandler);
+        try {
+            Socket sock = connect();
+            _reader = new SAMReader(_context, sock.getInputStream(), _eventHandler);
             _reader.startReading();
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Reader created");
-            String ourDest = handshake(version);
+            OutputStream out = sock.getOutputStream();
+            String ourDest = handshake(out, version, true);
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Handshake complete.  we are " + ourDest);
             if (ourDest != null) {
@@ -84,6 +81,8 @@ public class SAMStreamSink {
             } else {
                 _reader.stopReading();
             }
+        } catch (IOException e) {
+            _log.error("Unable to connect to SAM at " + _samHost + ":" + _samPort, e);
         }
     }
     
@@ -92,10 +91,10 @@ public class SAMStreamSink {
         public SinkEventHandler(I2PAppContext ctx) { super(ctx); }
 
         @Override
-        public void streamClosedReceived(String result, int id, String message) {
+        public void streamClosedReceived(String result, String id, String message) {
             Sink sink = null;
             synchronized (_remotePeers) {
-                sink = _remotePeers.remove(Integer.valueOf(id));
+                sink = _remotePeers.remove(id);
             }
             if (sink != null) {
                 sink.closed();
@@ -107,10 +106,10 @@ public class SAMStreamSink {
         }
 
         @Override
-        public void streamDataReceived(int id, byte data[], int offset, int length) {
+        public void streamDataReceived(String id, byte data[], int offset, int length) {
             Sink sink = null;
             synchronized (_remotePeers) {
-                sink = _remotePeers.get(Integer.valueOf(id));
+                sink = _remotePeers.get(id);
             }
             if (sink != null) {
                 sink.received(data, offset, length);
@@ -120,14 +119,14 @@ public class SAMStreamSink {
         }
 
         @Override
-        public void streamConnectedReceived(String dest, int id) {  
+        public void streamConnectedReceived(String dest, String id) {  
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Connection " + id + " received from " + dest);
 
             try {
                 Sink sink = new Sink(id, dest);
                 synchronized (_remotePeers) {
-                    _remotePeers.put(Integer.valueOf(id), sink);
+                    _remotePeers.put(id, sink);
                 }
             } catch (IOException ioe) {
                 _log.error("Error creating a new sink", ioe);
@@ -135,23 +134,16 @@ public class SAMStreamSink {
         }
     }
     
-    private boolean connect() {
-        try {
-            _samSocket = new Socket(_samHost, Integer.parseInt(_samPort));
-            _samOut = _samSocket.getOutputStream();
-            _samIn = _samSocket.getInputStream();
-            return true;
-        } catch (Exception e) {
-            _log.error("Unable to connect to SAM at " + _samHost + ":" + _samPort, e);
-            return false;
-        }
+    private Socket connect() throws IOException {
+        return new Socket(_samHost, Integer.parseInt(_samPort));
     }
     
-    private String handshake(String version) {
-        synchronized (_samOut) {
+    /** @return our b64 dest or null */
+    private String handshake(OutputStream samOut, String version, boolean isMaster) {
+        synchronized (samOut) {
             try {
-                _samOut.write(("HELLO VERSION MIN=1.0 MAX=" + version + '\n').getBytes());
-                _samOut.flush();
+                samOut.write(("HELLO VERSION MIN=1.0 MAX=" + version + '\n').getBytes());
+                samOut.flush();
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Hello sent");
                 String hisVersion = _eventHandler.waitForHelloReply();
@@ -159,9 +151,9 @@ public class SAMStreamSink {
                     _log.debug("Hello reply found: " + hisVersion);
                 if (hisVersion == null) 
                     throw new IOException("Hello failed");
-                boolean isV3 = VersionComparator.comp(hisVersion, "3") >= 0;
+                _isV3 = VersionComparator.comp(hisVersion, "3") >= 0;
                 String dest;
-                if (isV3) {
+                if (_isV3) {
                     // we use the filename as the name in sam.keys
                     // and read it in ourselves
                     File keys = new File("sam.keys");
@@ -183,17 +175,19 @@ public class SAMStreamSink {
                         if (_log.shouldLog(Log.DEBUG))
                             _log.debug("Requesting new transient destination");
                     }
-                    byte[] id = new byte[5];
-                    _context.random().nextBytes(id);
-                    _conOptions = "ID=" + Base32.encode(id);
+                    if (isMaster) {
+                        byte[] id = new byte[5];
+                        _context.random().nextBytes(id);
+                        _conOptions = "ID=" + Base32.encode(id);
+                    }
                 } else {
                     // we use the filename as the name in sam.keys
                     // and give it to the SAM server
                     dest = _destFile;
                 }
                 String req = "SESSION CREATE STYLE=STREAM DESTINATION=" + dest + " " + _conOptions + "\n";
-                _samOut.write(req.getBytes());
-                _samOut.flush();
+                samOut.write(req.getBytes());
+                samOut.flush();
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Session create sent");
                 boolean ok = _eventHandler.waitForSessionCreateReply();
@@ -203,8 +197,8 @@ public class SAMStreamSink {
                     _log.debug("Session create reply found: " + ok);
 
                 req = "NAMING LOOKUP NAME=ME\n";
-                _samOut.write(req.getBytes());
-                _samOut.flush();
+                samOut.write(req.getBytes());
+                samOut.flush();
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Naming lookup sent");
                 String destination = _eventHandler.waitForNamingReply("ME");
@@ -227,11 +221,13 @@ public class SAMStreamSink {
     
     private boolean writeDest(String dest) {
         File f = new File(_destFile);
+/*
         if (f.exists()) {
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Destination file exists, not overwriting:" + _destFile);
+                _log.debug("Destination file exists, not overwriting: " + _destFile);
             return false;
         }
+*/
         FileOutputStream fos = null;
         try {
             fos = new FileOutputStream(f);
@@ -248,14 +244,14 @@ public class SAMStreamSink {
     }
     
     private class Sink {
-        private final int _connectionId; 
+        private final String _connectionId; 
         private final String _remoteDestination;
         private volatile boolean _closed;
         private final long _started;
         private long _lastReceivedOn;
         private final OutputStream _out;
         
-        public Sink(int conId, String remDest) throws IOException {
+        public Sink(String conId, String remDest) throws IOException {
             _connectionId = conId;
             _remoteDestination = remDest;
             _closed = false;
@@ -273,7 +269,7 @@ public class SAMStreamSink {
             _started = _context.clock().now();
         }
         
-        public int getConnectionId() { return _connectionId; }
+        public String getConnectionId() { return _connectionId; }
         public String getDestination() { return _remoteDestination; }
         
         public void closed() {

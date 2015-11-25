@@ -73,10 +73,10 @@ public class SAMReader {
         
         public void helloReplyReceived(boolean ok, String version);
         public void sessionStatusReceived(String result, String destination, String message);
-        public void streamStatusReceived(String result, int id, String message);
-        public void streamConnectedReceived(String remoteDestination, int id);
-        public void streamClosedReceived(String result, int id, String message);
-        public void streamDataReceived(int id, byte data[], int offset, int length);
+        public void streamStatusReceived(String result, String id, String message);
+        public void streamConnectedReceived(String remoteDestination, String id);
+        public void streamClosedReceived(String result, String id, String message);
+        public void streamDataReceived(String id, byte data[], int offset, int length);
         public void namingReplyReceived(String name, String result, String value, String message);
         public void destReplyReceived(String publicKey, String privateKey);
         
@@ -181,24 +181,17 @@ public class SAMReader {
                 String result = params.getProperty("RESULT");
                 String id = params.getProperty("ID");
                 String msg = params.getProperty("MESSAGE");
-                if (id != null) {
-                    try {
-                        _listener.streamStatusReceived(result, Integer.parseInt(id), msg);
-                    } catch (NumberFormatException nfe) {
-                        _listener.unknownMessageReceived(major, minor, params);
-                    }
-                } else {
-                    _listener.unknownMessageReceived(major, minor, params);
-                }
+                // id is null in v3, so pass it through regardless
+                //if (id != null) {
+                    _listener.streamStatusReceived(result, id, msg);
+                //} else {
+                //    _listener.unknownMessageReceived(major, minor, params);
+                //}
             } else if ("CONNECTED".equals(minor)) {
                 String dest = params.getProperty("DESTINATION");
                 String id = params.getProperty("ID");
                 if (id != null) {
-                    try {
-                        _listener.streamConnectedReceived(dest, Integer.parseInt(id));
-                    } catch (NumberFormatException nfe) {
-                        _listener.unknownMessageReceived(major, minor, params);
-                    }
+                    _listener.streamConnectedReceived(dest, id);
                 } else {
                     _listener.unknownMessageReceived(major, minor, params);
                 }
@@ -207,11 +200,7 @@ public class SAMReader {
                 String id = params.getProperty("ID");
                 String msg = params.getProperty("MESSAGE");
                 if (id != null) {
-                    try {
-                        _listener.streamClosedReceived(result, Integer.parseInt(id), msg);
-                    } catch (NumberFormatException nfe) {
-                        _listener.unknownMessageReceived(major, minor, params);
-                    }
+                    _listener.streamClosedReceived(result, id, msg);
                 } else {
                     _listener.unknownMessageReceived(major, minor, params);
                 }
@@ -220,7 +209,6 @@ public class SAMReader {
                 String size = params.getProperty("SIZE");
                 if (id != null) {
                     try {
-                        int idVal = Integer.parseInt(id);
                         int sizeVal = Integer.parseInt(size);
                         
                         byte data[] = new byte[sizeVal];
@@ -228,7 +216,7 @@ public class SAMReader {
                         if (read != sizeVal) {
                             _listener.unknownMessageReceived(major, minor, params);
                         } else {
-                            _listener.streamDataReceived(idVal, data, 0, sizeVal);
+                            _listener.streamDataReceived(id, data, 0, sizeVal);
                         }
                     } catch (NumberFormatException nfe) {
                         _listener.unknownMessageReceived(major, minor, params);

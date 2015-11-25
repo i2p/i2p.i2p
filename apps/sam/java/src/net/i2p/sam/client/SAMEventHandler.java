@@ -18,8 +18,10 @@ public class SAMEventHandler extends SAMClientEventListenerImpl {
     private String _version;
     private final Object _helloLock = new Object();
     private Boolean _sessionCreateOk;
+    private Boolean _streamStatusOk;
     private final Object _sessionCreateLock = new Object();
     private final Object _namingReplyLock = new Object();
+    private final Object _streamStatusLock = new Object();
     private final Map<String,String> _namingReplies = new HashMap<String,String>();
 
     public SAMEventHandler(I2PAppContext ctx) {
@@ -27,7 +29,7 @@ public class SAMEventHandler extends SAMClientEventListenerImpl {
         _log = ctx.logManager().getLog(getClass());
     }
     
-	@Override
+    @Override
     public void helloReplyReceived(boolean ok, String version) {
         synchronized (_helloLock) {
             if (ok)
@@ -39,7 +41,7 @@ public class SAMEventHandler extends SAMClientEventListenerImpl {
         }
     }
 
-	@Override
+    @Override
     public void sessionStatusReceived(String result, String destination, String msg) {
         synchronized (_sessionCreateLock) {
             if (SAMReader.SAMClientEventListener.SESSION_STATUS_OK.equals(result))
@@ -50,7 +52,7 @@ public class SAMEventHandler extends SAMClientEventListenerImpl {
         }
     }
 
-	@Override
+    @Override
     public void namingReplyReceived(String name, String result, String value, String msg) {
         synchronized (_namingReplyLock) {
             if (SAMReader.SAMClientEventListener.NAMING_REPLY_OK.equals(result)) 
@@ -61,7 +63,18 @@ public class SAMEventHandler extends SAMClientEventListenerImpl {
         }
     }
 
-	@Override
+    @Override
+    public void streamStatusReceived(String result, String id, String message) {
+        synchronized (_streamStatusLock) {
+            if (SAMReader.SAMClientEventListener.SESSION_STATUS_OK.equals(result))
+                _streamStatusOk = Boolean.TRUE;
+            else 
+                _streamStatusOk = Boolean.FALSE;
+            _streamStatusLock.notifyAll();
+        }
+    }
+
+    @Override
     public void unknownMessageReceived(String major, String minor, Properties params) {
         _log.error("Unhandled message: [" + major + "] [" + minor + "] [" + params + "]");
     }
@@ -102,6 +115,24 @@ public class SAMEventHandler extends SAMClientEventListenerImpl {
                         _sessionCreateLock.wait();
                     else
                         return _sessionCreateOk.booleanValue();
+                }
+            } catch (InterruptedException ie) {}
+        }
+    }
+
+    /**
+     * Wait for the stream to be created, returning true if everything went ok
+     *
+     * @return true if everything ok
+     */
+    public boolean waitForStreamStatusReply() {
+        while (true) {
+            try {
+                synchronized (_streamStatusLock) {
+                    if (_streamStatusOk == null)
+                        _streamStatusLock.wait();
+                    else
+                        return _streamStatusOk.booleanValue();
                 }
             } catch (InterruptedException ie) {}
         }
