@@ -8,9 +8,13 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 import net.i2p.I2PAppContext;
+import net.i2p.data.Base32;
+import net.i2p.data.DataHelper;
 import net.i2p.util.Log;
+import net.i2p.util.VersionComparator;
 
 /**
  * Sit around on a SAM destination, receiving lots of data and 
@@ -26,7 +30,7 @@ public class SAMStreamSink {
     private final String _samPort;
     private final String _destFile;
     private final String _sinkDir;
-    private final String _conOptions;
+    private String _conOptions;
     private Socket _samSocket;
     private OutputStream _samOut;
     private InputStream _samIn;
@@ -38,12 +42,13 @@ public class SAMStreamSink {
     
     public static void main(String args[]) {
         if (args.length < 4) {
-            System.err.println("Usage: SAMStreamSink samHost samPort myDestFile sinkDir");
+            System.err.println("Usage: SAMStreamSink samHost samPort myDestFile sinkDir [version]");
             return;
         }
-        I2PAppContext ctx = new I2PAppContext();
+        I2PAppContext ctx = I2PAppContext.getGlobalContext();
         SAMStreamSink sink = new SAMStreamSink(ctx, args[0], args[1], args[2], args[3]);
-        sink.startup();
+        String version = (args.length >= 5) ? args[4] : "1.0";
+        sink.startup(version);
     }
     
     public SAMStreamSink(I2PAppContext ctx, String samHost, String samPort, String destFile, String sinkDir) {
@@ -59,7 +64,7 @@ public class SAMStreamSink {
         _remotePeers = new HashMap<Integer,Sink>();
     }
     
-    public void startup() {
+    public void startup(String version) {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Starting up");
         boolean ok = connect();
@@ -70,14 +75,14 @@ public class SAMStreamSink {
             _reader.startReading();
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Reader created");
-            String ourDest = handshake();
+            String ourDest = handshake(version);
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Handshake complete.  we are " + ourDest);
             if (ourDest != null) {
                 //boolean written = 
                	writeDest(ourDest);
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("My destination written to " + _destFile);
+            } else {
+                _reader.stopReading();
             }
         }
     }
@@ -97,7 +102,7 @@ public class SAMStreamSink {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Connection " + sink.getConnectionId() + " closed to " + sink.getDestination());
             } else {
-                _log.error("wtf, not connected to " + id + " but we were just closed?");
+                _log.error("not connected to " + id + " but we were just closed?");
             }
         }
 
@@ -110,7 +115,7 @@ public class SAMStreamSink {
             if (sink != null) {
                 sink.received(data, offset, length);
             } else {
-                _log.error("wtf, not connected to " + id + " but we received " + length + "?");
+                _log.error("not connected to " + id + " but we received " + length + "?");
             }
         }
 
@@ -142,24 +147,58 @@ public class SAMStreamSink {
         }
     }
     
-    private String handshake() {
+    private String handshake(String version) {
         synchronized (_samOut) {
             try {
-                _samOut.write("HELLO VERSION MIN=1.0 MAX=1.0\n".getBytes());
+                _samOut.write(("HELLO VERSION MIN=1.0 MAX=" + version + '\n').getBytes());
                 _samOut.flush();
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Hello sent");
-                boolean ok = _eventHandler.waitForHelloReply();
+                String hisVersion = _eventHandler.waitForHelloReply();
                 if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Hello reply found: " + ok);
-                if (!ok) 
-                    throw new IOException("wtf, hello failed?");
-                String req = "SESSION CREATE STYLE=STREAM DESTINATION=" + _destFile + " " + _conOptions + "\n";
+                    _log.debug("Hello reply found: " + hisVersion);
+                if (hisVersion == null) 
+                    throw new IOException("Hello failed");
+                boolean isV3 = VersionComparator.comp(hisVersion, "3") >= 0;
+                String dest;
+                if (isV3) {
+                    // we use the filename as the name in sam.keys
+                    // and read it in ourselves
+                    File keys = new File("sam.keys");
+                    if (keys.exists()) {
+                        Properties opts = new Properties();
+                        DataHelper.loadProps(opts, keys);
+                        String s = opts.getProperty(_destFile);
+                        if (s != null) {
+                            dest = s;
+                        } else {
+                            dest = "TRANSIENT";
+                            (new File(_destFile)).delete();
+                            if (_log.shouldLog(Log.DEBUG))
+                                _log.debug("Requesting new transient destination");
+                        }
+                    } else {
+                        dest = "TRANSIENT";
+                        (new File(_destFile)).delete();
+                        if (_log.shouldLog(Log.DEBUG))
+                            _log.debug("Requesting new transient destination");
+                    }
+                    byte[] id = new byte[5];
+                    _context.random().nextBytes(id);
+                    _conOptions = "ID=" + Base32.encode(id);
+                } else {
+                    // we use the filename as the name in sam.keys
+                    // and give it to the SAM server
+                    dest = _destFile;
+                }
+                String req = "SESSION CREATE STYLE=STREAM DESTINATION=" + dest + " " + _conOptions + "\n";
                 _samOut.write(req.getBytes());
                 _samOut.flush();
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Session create sent");
-                ok = _eventHandler.waitForSessionCreateReply();
+                boolean ok = _eventHandler.waitForSessionCreateReply();
+                if (!ok) 
+                    throw new IOException("Session create failed");
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Session create reply found: " + ok);
 
@@ -175,7 +214,8 @@ public class SAMStreamSink {
                     _log.error("No naming lookup reply found!");
                     return null;
                 } else {
-                    _log.info(_destFile + " is located at " + destination);
+                    if (_log.shouldInfo())
+                        _log.info(_destFile + " is located at " + destination);
                 }
                 return destination;
             } catch (Exception e) {
@@ -186,10 +226,18 @@ public class SAMStreamSink {
     }
     
     private boolean writeDest(String dest) {
+        File f = new File(_destFile);
+        if (f.exists()) {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Destination file exists, not overwriting:" + _destFile);
+            return false;
+        }
         FileOutputStream fos = null;
         try {
-            fos = new FileOutputStream(_destFile);
+            fos = new FileOutputStream(f);
             fos.write(dest.getBytes());
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("My destination written to " + _destFile);
         } catch (Exception e) {
             _log.error("Error writing to " + _destFile, e);
             return false;
@@ -236,7 +284,7 @@ public class SAMStreamSink {
             try { 
                 _out.close();
             } catch (IOException ioe) {
-                _log.error("Error closing", ioe);
+                _log.info("Error closing", ioe);
             }
         }
         public void received(byte data[], int offset, int len) {

@@ -15,6 +15,7 @@ public class SAMEventHandler extends SAMClientEventListenerImpl {
     //private I2PAppContext _context;
     private final Log _log;
     private Boolean _helloOk;
+    private String _version;
     private final Object _helloLock = new Object();
     private Boolean _sessionCreateOk;
     private final Object _sessionCreateLock = new Object();
@@ -27,12 +28,13 @@ public class SAMEventHandler extends SAMClientEventListenerImpl {
     }
     
 	@Override
-    public void helloReplyReceived(boolean ok) {
+    public void helloReplyReceived(boolean ok, String version) {
         synchronized (_helloLock) {
             if (ok)
                 _helloOk = Boolean.TRUE;
             else
                 _helloOk = Boolean.FALSE;
+            _version = version;
             _helloLock.notifyAll();
         }
     }
@@ -61,7 +63,7 @@ public class SAMEventHandler extends SAMClientEventListenerImpl {
 
 	@Override
     public void unknownMessageReceived(String major, String minor, Properties params) {
-        _log.error("wrt, [" + major + "] [" + minor + "] [" + params + "]");
+        _log.error("Unhandled message: [" + major + "] [" + minor + "] [" + params + "]");
     }
 
     
@@ -70,18 +72,18 @@ public class SAMEventHandler extends SAMClientEventListenerImpl {
     //
 
     /**
-     * Wait for the connection to be established, returning true if everything 
+     * Wait for the connection to be established, returning the server version if everything 
      * went ok
-     * @return true if everything ok
+     * @return SAM server version if everything ok, or null on failure
      */
-    public boolean waitForHelloReply() {
+    public String waitForHelloReply() {
         while (true) {
             try {
                 synchronized (_helloLock) {
                     if (_helloOk == null)
                         _helloLock.wait();
                     else 
-                        return _helloOk.booleanValue();
+                        return _helloOk.booleanValue() ? _version : null;
                 }
             } catch (InterruptedException ie) {}
         }

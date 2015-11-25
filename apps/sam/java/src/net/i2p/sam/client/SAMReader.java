@@ -71,7 +71,7 @@ public class SAMReader {
         public static final String NAMING_REPLY_INVALID_KEY = "INVALID_KEY";
         public static final String NAMING_REPLY_KEY_NOT_FOUND = "KEY_NOT_FOUND";
         
-        public void helloReplyReceived(boolean ok);
+        public void helloReplyReceived(boolean ok, String version);
         public void sessionStatusReceived(String result, String destination, String message);
         public void streamStatusReceived(String result, int id, String message);
         public void streamConnectedReceived(String remoteDestination, int id);
@@ -159,10 +159,11 @@ public class SAMReader {
         if ("HELLO".equals(major)) {
             if ("REPLY".equals(minor)) {
                 String result = params.getProperty("RESULT");
-                if ("OK".equals(result))
-                    _listener.helloReplyReceived(true);
+                String version= params.getProperty("VERSION");
+                if ("OK".equals(result) && version != null)
+                    _listener.helloReplyReceived(true, version);
                 else
-                    _listener.helloReplyReceived(false);
+                    _listener.helloReplyReceived(false, version);
             } else {
                 _listener.unknownMessageReceived(major, minor, params);
             }

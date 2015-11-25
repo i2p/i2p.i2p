@@ -1,5 +1,6 @@
 package net.i2p.sam.client;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -9,9 +10,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import net.i2p.I2PAppContext;
+import net.i2p.data.Base32;
 import net.i2p.data.DataHelper;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
+import net.i2p.util.VersionComparator;
 
 /**
  * Send a file to a peer
@@ -26,7 +29,7 @@ public class SAMStreamSend {
     private final String _samPort;
     private final String _destFile;
     private final String _dataFile;
-    private final String _conOptions;
+    private String _conOptions;
     private Socket _samSocket;
     private OutputStream _samOut;
     private InputStream _samIn;
@@ -38,13 +41,14 @@ public class SAMStreamSend {
     
     public static void main(String args[]) {
         if (args.length < 4) {
-            System.err.println("Usage: SAMStreamSend samHost samPort peerDestFile dataFile");
+            System.err.println("Usage: SAMStreamSend samHost samPort peerDestFile dataFile [version]");
             return;
         }
-        I2PAppContext ctx = new I2PAppContext();
+        I2PAppContext ctx = I2PAppContext.getGlobalContext();
         //String files[] = new String[args.length - 3];
         SAMStreamSend sender = new SAMStreamSend(ctx, args[0], args[1], args[2], args[3]);
-        sender.startup();
+        String version = (args.length >= 5) ? args[4] : "1.0";
+        sender.startup(version);
     }
     
     public SAMStreamSend(I2PAppContext ctx, String samHost, String samPort, String destFile, String dataFile) {
@@ -60,7 +64,7 @@ public class SAMStreamSend {
         _remotePeers = new HashMap<Integer,Sender>();
     }
     
-    public void startup() {
+    public void startup(String version) {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Starting up");
         boolean ok = connect();
@@ -71,7 +75,7 @@ public class SAMStreamSend {
             _reader.startReading();
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Reader created");
-            String ourDest = handshake();
+            String ourDest = handshake(version);
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Handshake complete.  we are " + ourDest);
             if (ourDest != null) {
@@ -82,6 +86,8 @@ public class SAMStreamSend {
     
     private class SendEventHandler extends SAMEventHandler {
         public SendEventHandler(I2PAppContext ctx) { super(ctx); }
+
+        @Override
         public void streamClosedReceived(String result, int id, String message) {
             Sender sender = null;
             synchronized (_remotePeers) {
@@ -92,7 +98,7 @@ public class SAMStreamSend {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Connection " + sender.getConnectionId() + " closed to " + sender.getDestination());
             } else {
-                _log.error("wtf, not connected to " + id + " but we were just closed?");
+                _log.error("not connected to " + id + " but we were just closed?");
             }
         }
     }
@@ -109,24 +115,32 @@ public class SAMStreamSend {
         }
     }
     
-    private String handshake() {
+    private String handshake(String version) {
         synchronized (_samOut) {
             try {
-                _samOut.write("HELLO VERSION MIN=1.0 MAX=1.0\n".getBytes());
+                _samOut.write(("HELLO VERSION MIN=1.0 MAX=" + version + '\n').getBytes());
                 _samOut.flush();
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Hello sent");
-                boolean ok = _eventHandler.waitForHelloReply();
+                String hisVersion = _eventHandler.waitForHelloReply();
                 if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Hello reply found: " + ok);
-                if (!ok) 
-                    throw new IOException("wtf, hello failed?");
+                    _log.debug("Hello reply found: " + hisVersion);
+                if (hisVersion == null) 
+                    throw new IOException("Hello failed");
+                boolean isV3 = VersionComparator.comp(hisVersion, "3") >= 0;
+                if (isV3) {
+                    byte[] id = new byte[5];
+                    _context.random().nextBytes(id);
+                    _conOptions = "ID=" + Base32.encode(id);
+                }
                 String req = "SESSION CREATE STYLE=STREAM DESTINATION=TRANSIENT " + _conOptions + "\n";
                 _samOut.write(req.getBytes());
                 _samOut.flush();
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Session create sent");
-                ok = _eventHandler.waitForSessionCreateReply();
+                boolean ok = _eventHandler.waitForSessionCreateReply();
+                if (!ok) 
+                    throw new IOException("Session create failed");
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Session create reply found: " + ok);
 
@@ -222,6 +236,7 @@ public class SAMStreamSend {
         public void run() {
             _started = _context.clock().now();
             _context.statManager().addRateData("send." + _connectionId + ".started", 1, 0);
+            final long toSend = (new File(_dataFile)).length();
             byte data[] = new byte[1024];
             long lastSend = _context.clock().now();
             while (!_closed) {
@@ -249,6 +264,7 @@ public class SAMStreamSend {
                     }
                 } catch (IOException ioe) {
                     _log.error("Error sending", ioe);
+                    break;
                 }
             }
             
@@ -259,12 +275,14 @@ public class SAMStreamSend {
                     _samOut.flush();
                 }
             } catch (IOException ioe) {
-                _log.error("Error closing", ioe);
+                _log.info("Error closing", ioe);
             }
             
             closed();
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Runner exiting");
+            if (toSend != _totalSent)
+                _log.error("Only sent " + _totalSent + " of " + toSend + " bytes");
             // stop the reader, since we're only doing this once for testing
             // you wouldn't do this in a real application
             _reader.stopReading();

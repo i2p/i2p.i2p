@@ -7,7 +7,7 @@ import java.util.Properties;
  */
 public class SAMClientEventListenerImpl implements SAMReader.SAMClientEventListener {
     public void destReplyReceived(String publicKey, String privateKey) {}
-    public void helloReplyReceived(boolean ok) {}
+    public void helloReplyReceived(boolean ok, String version) {}
     public void namingReplyReceived(String name, String result, String value, String message) {}
     public void sessionStatusReceived(String result, String destination, String message) {}
     public void streamClosedReceived(String result, int id, String message) {}
