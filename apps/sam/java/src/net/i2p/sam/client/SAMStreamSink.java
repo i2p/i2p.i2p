@@ -127,7 +127,7 @@ public class SAMStreamSink {
                 throw new IOException("handshake failed");
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Handshake complete.  we are " + ourDest);
-            if (_isV3) {
+            if (_isV3 && mode != V1DG && mode != V1RAW) {
                 Socket sock2 = connect(isSSL);
                 out = sock2.getOutputStream();
                 eventHandler = new SinkEventHandler2(_context, sock2.getInputStream(), out);
@@ -158,7 +158,7 @@ public class SAMStreamSink {
 
         @Override
         public void streamClosedReceived(String result, String id, String message) {
-            Sink sink = null;
+            Sink sink;
             synchronized (_remotePeers) {
                 sink = _remotePeers.remove(id);
             }
@@ -173,7 +173,7 @@ public class SAMStreamSink {
 
         @Override
         public void streamDataReceived(String id, byte data[], int offset, int length) {
-            Sink sink = null;
+            Sink sink;
             synchronized (_remotePeers) {
                 sink = _remotePeers.get(id);
             }
@@ -211,6 +211,34 @@ public class SAMStreamSink {
                     _log.error("PONG fail", ioe);
                 }
             }
+        }
+
+        @Override
+        public void datagramReceived(String dest, byte[] data, int offset, int length, int fromPort, int toPort) {
+            // just get the first
+            Sink sink;
+            synchronized (_remotePeers) {
+                if (_remotePeers.isEmpty()) {
+                    _log.error("not connected but we received datagram " + length + "?");
+                    return;
+                }
+                sink = _remotePeers.values().iterator().next();
+            }
+            sink.received(data, offset, length);
+        }
+
+        @Override
+        public void rawReceived(byte[] data, int offset, int length, int fromPort, int toPort, int protocol) {
+            // just get the first
+            Sink sink;
+            synchronized (_remotePeers) {
+                if (_remotePeers.isEmpty()) {
+                    _log.error("not connected but we received raw " + length + "?");
+                    return;
+                }
+                sink = _remotePeers.values().iterator().next();
+            }
+            sink.received(data, offset, length);
         }
     }
 
@@ -369,12 +397,13 @@ public class SAMStreamSink {
                 samOut.flush();
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Session create sent");
-                boolean ok = eventHandler.waitForSessionCreateReply();
-                if (!ok) 
-                    throw new IOException("Session create failed");
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Session create reply found: " + ok);
-
+                if (mode == STREAM) {
+                    boolean ok = eventHandler.waitForSessionCreateReply();
+                    if (!ok) 
+                        throw new IOException("Session create failed");
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("Session create reply found: " + ok);
+                }
                 req = "NAMING LOOKUP NAME=ME\n";
                 samOut.write(req.getBytes());
                 samOut.flush();
@@ -386,9 +415,12 @@ public class SAMStreamSink {
                 if (destination == null) {
                     _log.error("No naming lookup reply found!");
                     return null;
-                } else {
-                    if (_log.shouldInfo())
-                        _log.info(_destFile + " is located at " + destination);
+                }
+                if (_log.shouldInfo())
+                    _log.info(_destFile + " is located at " + destination);
+                if (mode != STREAM) {
+                    // fake it so the sink starts
+                    eventHandler.streamConnectedReceived(destination, "FAKE");
                 }
                 return destination;
             } catch (IOException e) {

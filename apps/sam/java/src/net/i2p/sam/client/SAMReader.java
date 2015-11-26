@@ -80,6 +80,8 @@ public class SAMReader {
         public void streamDataReceived(String id, byte data[], int offset, int length);
         public void namingReplyReceived(String name, String result, String value, String message);
         public void destReplyReceived(String publicKey, String privateKey);
+        public void datagramReceived(String dest, byte[] data, int offset, int length, int fromPort, int toPort);
+        public void rawReceived(byte[] data, int offset, int length, int fromPort, int toPort, int protocol);
         public void pingReceived(String data);
         public void pongReceived(String data);
         
@@ -226,6 +228,73 @@ public class SAMReader {
                         _listener.unknownMessageReceived(major, minor, params);
                     }
                 } else {
+                    _listener.unknownMessageReceived(major, minor, params);
+                }
+            } else {
+                _listener.unknownMessageReceived(major, minor, params);
+            }
+        } else if ("DATAGRAM".equals(major)) {
+            if ("RECEIVED".equals(minor)) {
+                String dest = params.getProperty("DESTINATION");
+                String size = params.getProperty("SIZE");
+                String fp = params.getProperty("FROM_PORT");
+                String tp = params.getProperty("TO_PORT");
+                int fromPort = 0;
+                int toPort = 0;
+                if (dest != null) {
+                    try {
+                      if (fp != null)
+                          fromPort = Integer.parseInt(fp);
+                      if (tp != null)
+                          toPort = Integer.parseInt(tp);
+                        int sizeVal = Integer.parseInt(size);
+                        byte data[] = new byte[sizeVal];
+                        int read = DataHelper.read(_inRaw, data);
+                        if (read != sizeVal) {
+                            _listener.unknownMessageReceived(major, minor, params);
+                        } else {
+                            _listener.datagramReceived(dest, data, 0, sizeVal, fromPort, toPort);
+                        }
+                    } catch (NumberFormatException nfe) {
+                        _listener.unknownMessageReceived(major, minor, params);
+                    } catch (IOException ioe) {
+                        _live = false;
+                        _listener.unknownMessageReceived(major, minor, params);
+                    }
+                } else {
+                    _listener.unknownMessageReceived(major, minor, params);
+                }
+            } else {
+                _listener.unknownMessageReceived(major, minor, params);
+            }
+        } else if ("RAW".equals(major)) {
+            if ("RECEIVED".equals(minor)) {
+                String size = params.getProperty("SIZE");
+                String fp = params.getProperty("FROM_PORT");
+                String tp = params.getProperty("TO_PORT");
+                String pr = params.getProperty("PROTOCOL");
+                int fromPort = 0;
+                int toPort = 0;
+                int protocol = 18;
+                try {
+                    if (fp != null)
+                        fromPort = Integer.parseInt(fp);
+                    if (tp != null)
+                        toPort = Integer.parseInt(tp);
+                    if (pr != null)
+                        protocol = Integer.parseInt(pr);
+                    int sizeVal = Integer.parseInt(size);
+                    byte data[] = new byte[sizeVal];
+                    int read = DataHelper.read(_inRaw, data);
+                    if (read != sizeVal) {
+                        _listener.unknownMessageReceived(major, minor, params);
+                    } else {
+                        _listener.rawReceived(data, 0, sizeVal, fromPort, toPort, protocol);
+                    }
+                } catch (NumberFormatException nfe) {
+                    _listener.unknownMessageReceived(major, minor, params);
+                } catch (IOException ioe) {
+                    _live = false;
                     _listener.unknownMessageReceived(major, minor, params);
                 }
             } else {
