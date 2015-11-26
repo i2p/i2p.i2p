@@ -80,6 +80,8 @@ public class SAMReader {
         public void streamDataReceived(String id, byte data[], int offset, int length);
         public void namingReplyReceived(String name, String result, String value, String message);
         public void destReplyReceived(String publicKey, String privateKey);
+        public void pingReceived(String data);
+        public void pongReceived(String data);
         
         public void unknownMessageReceived(String major, String minor, Properties params);
     }
@@ -118,13 +120,13 @@ public class SAMReader {
                 
                 StringTokenizer tok = new StringTokenizer(line);
                 
-                if (tok.countTokens() < 2) {
+                if (tok.countTokens() <= 0) {
                     _log.error("Invalid SAM line: [" + line + "]");
                     break;
                 }
                 
                 String major = tok.nextToken();
-                String minor = tok.nextToken();
+                String minor = tok.hasMoreTokens() ? tok.nextToken() : "";
                 
                 params.clear();
                 while (tok.hasMoreTokens()) {
@@ -247,6 +249,12 @@ public class SAMReader {
             } else {
                 _listener.unknownMessageReceived(major, minor, params);
             }
+        } else if ("PING".equals(major)) {
+            // this omits anything after a space
+            _listener.pingReceived(minor);
+        } else if ("PONG".equals(major)) {
+            // this omits anything after a space
+            _listener.pongReceived(minor);
         } else {
             _listener.unknownMessageReceived(major, minor, params);
         }

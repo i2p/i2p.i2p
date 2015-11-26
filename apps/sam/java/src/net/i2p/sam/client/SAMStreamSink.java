@@ -66,12 +66,12 @@ public class SAMStreamSink {
             _log.debug("Starting up");
         try {
             Socket sock = connect();
-            SAMEventHandler eventHandler = new SinkEventHandler(_context);
+            OutputStream out = sock.getOutputStream();
+            SAMEventHandler eventHandler = new SinkEventHandler(_context, out);
             _reader = new SAMReader(_context, sock.getInputStream(), eventHandler);
             _reader.startReading();
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Reader created");
-            OutputStream out = sock.getOutputStream();
             String ourDest = handshake(out, version, true, eventHandler);
             if (ourDest == null)
                 throw new IOException("handshake failed");
@@ -79,12 +79,12 @@ public class SAMStreamSink {
                 _log.debug("Handshake complete.  we are " + ourDest);
             if (_isV3) {
                 Socket sock2 = connect();
-                eventHandler = new SinkEventHandler2(_context, sock2.getInputStream());
+                out = sock2.getOutputStream();
+                eventHandler = new SinkEventHandler2(_context, sock2.getInputStream(), out);
                 _reader2 = new SAMReader(_context, sock2.getInputStream(), eventHandler);
                 _reader2.startReading();
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Reader2 created");
-                out = sock2.getOutputStream();
                 String ok = handshake(out, version, false, eventHandler);
                 if (ok == null)
                     throw new IOException("2nd handshake failed");
@@ -99,7 +99,12 @@ public class SAMStreamSink {
     
     private class SinkEventHandler extends SAMEventHandler {
 
-        public SinkEventHandler(I2PAppContext ctx) { super(ctx); }
+        protected final OutputStream _out;
+
+        public SinkEventHandler(I2PAppContext ctx, OutputStream out) {
+            super(ctx);
+            _out = out;
+        }
 
         @Override
         public void streamClosedReceived(String result, String id, String message) {
@@ -143,14 +148,28 @@ public class SAMStreamSink {
                 _log.error("Error creating a new sink", ioe);
             }
         }
+
+        @Override
+        public void pingReceived(String data) {
+            if (_log.shouldInfo())
+                _log.info("Got PING " + data + ", sending PONG " + data);
+            synchronized (_out) {
+                try {
+                    _out.write(("PONG " + data + '\n').getBytes());
+                    _out.flush();
+                } catch (IOException ioe) {
+                    _log.error("PONG fail", ioe);
+                }
+            }
+        }
     }
 
     private class SinkEventHandler2 extends SinkEventHandler {
 
         private final InputStream _in;
 
-        public SinkEventHandler2(I2PAppContext ctx, InputStream in) {
-            super(ctx);
+        public SinkEventHandler2(I2PAppContext ctx, InputStream in, OutputStream out) {
+            super(ctx, out);
             _in = in;
         }
 
@@ -159,10 +178,9 @@ public class SAMStreamSink {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("got STREAM STATUS, result=" + result);
             super.streamStatusReceived(result, id, message);
-            // with SILENT=true, there's nothing else coming, so fire up the Sink
             Sink sink = null;
             try {
-                String dest = "TODO if not silent";
+                String dest = "TODO_if_not_silent";
                 sink = new Sink(_v3ID, dest);
                 synchronized (_remotePeers) {
                     _remotePeers.put(_v3ID, sink);
@@ -315,7 +333,7 @@ public class SAMStreamSink {
                         _log.info(_destFile + " is located at " + destination);
                 }
                 return destination;
-            } catch (Exception e) {
+            } catch (IOException e) {
                 _log.error("Error handshaking", e);
                 return null;
             }
@@ -337,7 +355,7 @@ public class SAMStreamSink {
             fos.write(dest.getBytes());
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("My destination written to " + _destFile);
-        } catch (Exception e) {
+        } catch (IOException e) {
             _log.error("Error writing to " + _destFile, e);
             return false;
         } finally {

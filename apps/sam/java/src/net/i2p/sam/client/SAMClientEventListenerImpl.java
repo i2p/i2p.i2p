@@ -14,5 +14,7 @@ public class SAMClientEventListenerImpl implements SAMReader.SAMClientEventListe
     public void streamConnectedReceived(String remoteDestination, String id) {}
     public void streamDataReceived(String id, byte[] data, int offset, int length) {}
     public void streamStatusReceived(String result, String id, String message) {}
+    public void pingReceived(String data) {}
+    public void pongReceived(String data) {}
     public void unknownMessageReceived(String major, String minor, Properties params) {}
 }

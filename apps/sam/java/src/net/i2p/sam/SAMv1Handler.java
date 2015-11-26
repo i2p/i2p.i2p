@@ -187,7 +187,9 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
         } catch (IOException e) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Caught IOException for message [" + msg + "]", e);
-        } catch (Exception e) {
+        } catch (SAMException e) {
+            _log.error("Unexpected exception for message [" + msg + "]", e);
+        } catch (RuntimeException e) {
             _log.error("Unexpected exception for message [" + msg + "]", e);
         } finally {
             if (_log.shouldLog(Log.DEBUG))

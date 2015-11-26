@@ -294,7 +294,7 @@ class SAMv3Handler extends SAMv1Handler
 								if (now - _lastPing >= READ_TIMEOUT) {
 									if (_log.shouldWarn())
 										_log.warn("Failed to respond to PING");
-									writeString("PING STATUS RESULT=I2P_ERROR MESSAGE=\"PONG timeout\"\n");
+									writeString("SESSION STATUS RESULT=I2P_ERROR MESSAGE=\"PONG timeout\"\n");
 									break;
 								}
 							} else {
@@ -309,7 +309,7 @@ class SAMv3Handler extends SAMv1Handler
 								if (now - _lastPing >= 2*READ_TIMEOUT) {
 									if (_log.shouldWarn())
 										_log.warn("Failed to respond to PING");
-									writeString("PING STATUS RESULT=I2P_ERROR MESSAGE=\"PONG timeout\"\n");
+									writeString("SESSION STATUS RESULT=I2P_ERROR MESSAGE=\"PONG timeout\"\n");
 									break;
 								}
 							} else if (_lastPing < 0) {
@@ -420,9 +420,11 @@ class SAMv3Handler extends SAMv1Handler
 			} // while
 		} catch (IOException e) {
 			if (_log.shouldLog(Log.DEBUG))
-				_log.debug("Caught IOException for message [" + msg + "]", e);
-		} catch (Exception e) {
-			_log.error("Unexpected exception for message [" + msg + "]", e);
+				_log.debug("Caught IOException in handler", e);
+		} catch (SAMException e) {
+			_log.error("Unexpected exception for message [" + msg + ']', e);
+		} catch (RuntimeException e) {
+			_log.error("Unexpected exception for message [" + msg + ']', e);
 		} finally {
 			if (_log.shouldLog(Log.DEBUG))
 				_log.debug("Stopping handler");
@@ -464,6 +466,8 @@ class SAMv3Handler extends SAMv1Handler
 	 */
 	@Override
 	public void stopHandling() {
+            if (_log.shouldInfo())
+                _log.info("Stopping (stolen? " + stolenSocket + "): " + this, new Exception("I did it"));
 	    synchronized (stopLock) {
 	        stopHandler = true;
 	    }
@@ -728,14 +732,16 @@ class SAMv3Handler extends SAMv1Handler
 
 	@Override
 	protected boolean execStreamConnect( Properties props) {
+		// Messages are NOT sent if SILENT=true,
+		// The specs said that they were.
+	    	boolean verbose = !Boolean.parseBoolean(props.getProperty("SILENT"));
 		try {
 			if (props.isEmpty()) {
-				notifyStreamResult(true,"I2P_ERROR","No parameters specified in STREAM CONNECT message");
+				notifyStreamResult(verbose, "I2P_ERROR","No parameters specified in STREAM CONNECT message");
 				if (_log.shouldLog(Log.DEBUG))
 					_log.debug("No parameters specified in STREAM CONNECT message");
 				return false;
 			}
-		    	boolean verbose = !Boolean.parseBoolean(props.getProperty("SILENT"));
 		
 			String dest = props.getProperty("DESTINATION");
 			if (dest == null) {
@@ -776,6 +782,9 @@ class SAMv3Handler extends SAMv1Handler
 	}
 
 	private boolean execStreamForwardIncoming( Properties props ) {
+		// Messages ARE sent if SILENT=true,
+		// which is different from CONNECT and ACCEPT.
+		// But this matched the specs.
 		try {
 			try {
 				streamForwardingSocket = true ;
@@ -794,6 +803,8 @@ class SAMv3Handler extends SAMv1Handler
 
 	private boolean execStreamAccept( Properties props )
 	{
+		// Messages are NOT sent if SILENT=true,
+		// The specs said that they were.
 	    	boolean verbose = !Boolean.parseBoolean(props.getProperty("SILENT"));
 		try {
 			try {

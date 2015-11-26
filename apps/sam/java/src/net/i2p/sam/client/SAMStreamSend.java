@@ -174,7 +174,7 @@ public class SAMStreamSend {
                     _log.info("We are " + destination);
                 }
                 return destination;
-            } catch (Exception e) {
+            } catch (IOException e) {
                 _log.error("Error handshaking", e);
                 return null;
             }
@@ -327,6 +327,12 @@ public class SAMStreamSend {
                 _reader2.stopReading();
             // stop the reader, since we're only doing this once for testing
             // you wouldn't do this in a real application
+            if (_isV3) {
+                // closing the master socket too fast will kill the data socket flushing through
+                try {
+                    Thread.sleep(10000);
+                } catch (InterruptedException ie) {}
+            }
             _reader.stopReading();
         }
     }

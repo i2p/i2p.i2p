@@ -56,7 +56,7 @@ class SAMHandlerFactory {
             throw new SAMException("Timeout waiting for HELLO VERSION", e);
         } catch (IOException e) {
             throw new SAMException("Error reading from socket", e);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             throw new SAMException("Unexpected error", e);
         }
 
