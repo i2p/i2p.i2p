@@ -42,6 +42,7 @@ public class SAMReader {
         if (_thread != null) {
             _thread.interrupt();
             _thread = null;
+            try { _inRaw.close(); } catch (IOException ioe) {}
         }
     }
     
@@ -98,7 +99,7 @@ public class SAMReader {
                         baos.write(c);
                     }
                     if (c == -1) {
-                        _log.error("Error reading from the SAM bridge");
+                        _log.info("EOF reading from the SAM bridge");
                         break;
                     }
                 } catch (IOException ioe) {
@@ -106,13 +107,11 @@ public class SAMReader {
                     break;
                 }
                 
-                String line = new String(baos.toByteArray());
+                String line = "";
+                try {
+                    line = new String(baos.toByteArray(), "ISO-8859-1");
+                } catch (IOException ioe) {}
                 baos.reset();
-                
-                if (line == null) {
-                    _log.info("No more data from the SAM bridge");
-                    break;
-                }
                 
                 if (_log.shouldDebug())
                     _log.debug("Line read from the bridge: " + line);
@@ -121,7 +120,6 @@ public class SAMReader {
                 
                 if (tok.countTokens() < 2) {
                     _log.error("Invalid SAM line: [" + line + "]");
-                    _live = false;
                     break;
                 }
                 
@@ -145,6 +143,7 @@ public class SAMReader {
                 
                 processEvent(major, minor, params);
             }
+            _live = false;
             if (_log.shouldWarn())
                 _log.warn("SAMReader exiting");
         }

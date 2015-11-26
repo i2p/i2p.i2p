@@ -98,7 +98,7 @@ public class SAMEventHandler extends SAMClientEventListenerImpl {
                     else 
                         return _helloOk.booleanValue() ? _version : null;
                 }
-            } catch (InterruptedException ie) {}
+            } catch (InterruptedException ie) { return null; }
         }
     }
 
@@ -116,7 +116,7 @@ public class SAMEventHandler extends SAMClientEventListenerImpl {
                     else
                         return _sessionCreateOk.booleanValue();
                 }
-            } catch (InterruptedException ie) {}
+            } catch (InterruptedException ie) { return false; }
         }
     }
 
@@ -134,7 +134,7 @@ public class SAMEventHandler extends SAMClientEventListenerImpl {
                     else
                         return _streamStatusOk.booleanValue();
                 }
-            } catch (InterruptedException ie) {}
+            } catch (InterruptedException ie) { return false; }
         }
     }
     
@@ -161,7 +161,7 @@ public class SAMEventHandler extends SAMClientEventListenerImpl {
                             return val;
                     }
                 }
-            } catch (InterruptedException ie) {}
+            } catch (InterruptedException ie) { return null; }
         }
     }
 }

@@ -181,12 +181,14 @@ public class SAMStreamSend {
         }
     }
     
-    private void send(OutputStream samOut, SAMEventHandler eventHandler) {
+    private void send(OutputStream samOut, SAMEventHandler eventHandler) throws IOException {
         Sender sender = new Sender(samOut, eventHandler);
         boolean ok = sender.openConnection();
         if (ok) {
             I2PAppThread t = new I2PAppThread(sender, "Sender");
             t.start();
+        } else {
+            throw new IOException("Sender failed to connect");
         }
     }
     
