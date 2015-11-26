@@ -258,7 +258,8 @@ public class SAMStreamSink {
                 if (!isMaster) {
                     // only for v3
                     //String req = "STREAM ACCEPT SILENT=true ID=" + _v3ID + "\n";
-                    String req = "STREAM ACCEPT SILENT=false ID=" + _v3ID + "\n";
+                    // TO_PORT not supported until 3.2 but 3.0-3.1 will ignore
+                    String req = "STREAM ACCEPT SILENT=false TO_PORT=5678 ID=" + _v3ID + "\n";
                     samOut.write(req.getBytes());
                     samOut.flush();
                     if (_log.shouldLog(Log.DEBUG))
@@ -268,7 +269,7 @@ public class SAMStreamSink {
                     //if (!ok) 
                     //    throw new IOException("Stream status failed");
                     if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("got STREAM STATUS, awaiting connetion");
+                        _log.debug("got STREAM STATUS, awaiting connection");
                     return "OK";
                 }
                 _isV3 = VersionComparator.comp(hisVersion, "3") >= 0;

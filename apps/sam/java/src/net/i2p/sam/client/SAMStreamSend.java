@@ -227,7 +227,13 @@ public class SAMStreamSend {
                 _context.statManager().createRateStat("send." + _connectionId + ".started", "When we start", "swarm", new long[] { 5*60*1000 });
                 _context.statManager().createRateStat("send." + _connectionId + ".lifetime", "How long we talk to a peer", "swarm", new long[] { 5*60*1000 });
                 
-                byte msg[] = ("STREAM CONNECT ID=" + _connectionId + " DESTINATION=" + _remoteDestination + "\n").getBytes();
+                StringBuilder buf = new StringBuilder(1024);
+                buf.append("STREAM CONNECT ID=").append(_connectionId).append(" DESTINATION=").append(_remoteDestination);
+                // not supported until 3.2 but 3.0-3.1 will ignore
+                if (_isV3)
+                    buf.append(" FROM_PORT=1234 TO_PORT=5678");
+                buf.append('\n');
+                byte[] msg = DataHelper.getASCII(buf.toString());
                 synchronized (_samOut) {
                     _samOut.write(msg);
                     _samOut.flush();
