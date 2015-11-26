@@ -40,7 +40,8 @@ public class KeyStoreUtil {
     private static final int DEFAULT_KEY_VALID_DAYS = 3652;  // 10 years
 
     /**
-     *  No reports of these in a Java keystore but just to be safe...
+     *  No reports of some of these in a Java keystore but just to be safe...
+     *  CNNIC ones are in Ubuntu keystore.
      */
     private static final BigInteger[] BLACKLIST_SERIAL = new BigInteger[] {
         // CNNIC https://googleonlinesecurity.blogspot.com/2015/03/maintaining-digital-certificate-security.html
@@ -50,7 +51,11 @@ public class KeyStoreUtil {
         // Superfish http://blog.erratasec.com/2015/02/extracting-superfish-certificate.html
         new BigInteger("d2:fc:13:87:a9:44:dc:e7".replace(":", ""), 16),
         // eDellRoot https://www.reddit.com/r/technology/comments/3twmfv/dell_ships_laptops_with_rogue_root_ca_exactly/
-        new BigInteger("6b:c5:7b:95:18:93:aa:97:4b:62:4a:c0:88:fc:3b:b6".replace(":", ""), 16)
+        new BigInteger("6b:c5:7b:95:18:93:aa:97:4b:62:4a:c0:88:fc:3b:b6".replace(":", ""), 16),
+        // DSDTestProvider https://blog.hboeck.de/archives/876-Superfish-2.0-Dangerous-Certificate-on-Dell-Laptops-breaks-encrypted-HTTPS-Connections.html
+        // serial number is actually negative; hex string as reported by certtool below
+        //new BigInteger("a4:4c:38:47:f8:ee:71:80:43:4d:b1:80:b9:a7:e9:62".replace(":", ""), 16)
+        new BigInteger("-5b:b3:c7:b8:07:11:8e:7f:bc:b2:4e:7f:46:58:16:9e".replace(":", ""), 16)
     };
 
     /**
@@ -63,7 +68,8 @@ public class KeyStoreUtil {
         "CNNIC ROOT",
         "China Internet Network Information Center EV Certificates Root",
         "Superfish, Inc.",
-        "eDellRoot"
+        "eDellRoot",
+        "DSDTestProvider"
     };
 
     /**
@@ -318,6 +324,7 @@ public class KeyStoreUtil {
             X509Certificate cert = (X509Certificate)cf.generateCertificate(fis);
             info("Read X509 Certificate from " + file.getAbsolutePath() +
                           " Issuer: " + cert.getIssuerX500Principal() +
+                          " Serial: " + cert.getSerialNumber().toString(16) +
                           "; Valid From: " + cert.getNotBefore() +
                           " To: " + cert.getNotAfter());
             try {
