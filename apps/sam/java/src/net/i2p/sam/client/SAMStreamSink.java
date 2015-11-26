@@ -10,6 +10,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import gnu.getopt.Getopt;
+
 import net.i2p.I2PAppContext;
 import net.i2p.data.Base32;
 import net.i2p.data.DataHelper;
@@ -38,14 +40,59 @@ public class SAMStreamSink {
     /** Connection id (Integer) to peer (Flooder) */
     private final Map<String, Sink> _remotePeers;
     
+    private static final String USAGE = "Usage: SAMStreamSink [-s] [-d] [-r] [-v version] [-b samHost] [-p samPort] myDestFile sinkDir";
+
     public static void main(String args[]) {
-        if (args.length < 4) {
-            System.err.println("Usage: SAMStreamSink samHost samPort myDestFile sinkDir [version]");
+        Getopt g = new Getopt("SAM", args, "drsb:p:v:");
+        boolean isSSL = false;
+        int mode = 0; // stream
+        String version = "1.0";
+        String host = "127.0.0.1";
+        String port = "7656";
+        int c;
+        while ((c = g.getopt()) != -1) {
+          switch (c) {
+            case 's':
+                isSSL = true;
+                break;
+
+            case 'd':
+                mode = 1;  // datagram
+                break;
+
+            case 'r':
+                mode = 2;  // raw
+                break;
+
+            case 'v':
+                version = g.getOptarg();
+                break;
+
+            case 'b':
+                host = g.getOptarg();
+                break;
+
+            case 'p':
+                port = g.getOptarg();
+                break;
+
+            case 'h':
+            case '?':
+            case ':':
+            default:
+                System.err.println(USAGE);
+                return;
+          }  // switch
+        } // while
+
+        int startArgs = g.getOptind();
+        if (args.length - startArgs != 2) {
+            System.err.println(USAGE);
             return;
         }
         I2PAppContext ctx = I2PAppContext.getGlobalContext();
-        SAMStreamSink sink = new SAMStreamSink(ctx, args[0], args[1], args[2], args[3]);
-        String version = (args.length >= 5) ? args[4] : "1.0";
+        SAMStreamSink sink = new SAMStreamSink(ctx, host, port,
+                                                    args[startArgs], args[startArgs + 1]);
         sink.startup(version);
     }
     
