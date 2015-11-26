@@ -34,7 +34,10 @@ class ReadLine {
         if (timeout <= 0)
             throw new SocketTimeoutException();
         long expires = System.currentTimeMillis() + timeout;
-        InputStreamReader in = new InputStreamReader(socket.getInputStream(), "UTF-8");
+        // this reads and buffers extra bytes, so we can't use it
+        // unless we're going to decode UTF-8 on-the-fly, we're stuck with ASCII
+        //InputStreamReader in = new InputStreamReader(socket.getInputStream(), "UTF-8");
+        InputStream in = socket.getInputStream();
         int c;
         int i = 0;
         socket.setSoTimeout(timeout);

@@ -40,12 +40,15 @@ public class SAMStreamSink {
     /** Connection id (Integer) to peer (Flooder) */
     private final Map<String, Sink> _remotePeers;
     
-    private static final String USAGE = "Usage: SAMStreamSink [-s] [-d] [-r] [-v version] [-b samHost] [-p samPort] myDestFile sinkDir";
+    private static final int STREAM=0, DG=1, V1DG=2, RAW=3, V1RAW=4;
+    private static final String USAGE = "Usage: SAMStreamSink [-s] [-m mode] [-v version] [-b samHost] [-p samPort] myDestFile sinkDir\n" +
+                                        "       modes: stream: 0; datagram: 1; v1datagram: 2; raw: 3; v1raw: 4\n" +
+                                        "       -s: use SSL";
 
     public static void main(String args[]) {
-        Getopt g = new Getopt("SAM", args, "drsb:p:v:");
+        Getopt g = new Getopt("SAM", args, "sb:m:p:v:");
         boolean isSSL = false;
-        int mode = 0; // stream
+        int mode = STREAM;
         String version = "1.0";
         String host = "127.0.0.1";
         String port = "7656";
@@ -56,12 +59,12 @@ public class SAMStreamSink {
                 isSSL = true;
                 break;
 
-            case 'd':
-                mode = 1;  // datagram
-                break;
-
-            case 'r':
-                mode = 2;  // raw
+            case 'm':
+                mode = Integer.parseInt(g.getOptarg());
+                if (mode < 0 || mode > V1RAW) {
+                    System.err.println(USAGE);
+                    return;
+                }
                 break;
 
             case 'v':
@@ -93,7 +96,7 @@ public class SAMStreamSink {
         I2PAppContext ctx = I2PAppContext.getGlobalContext();
         SAMStreamSink sink = new SAMStreamSink(ctx, host, port,
                                                     args[startArgs], args[startArgs + 1]);
-        sink.startup(version);
+        sink.startup(version, isSSL, mode);
     }
     
     public SAMStreamSink(I2PAppContext ctx, String samHost, String samPort, String destFile, String sinkDir) {
@@ -108,31 +111,31 @@ public class SAMStreamSink {
         _remotePeers = new HashMap<String, Sink>();
     }
     
-    public void startup(String version) {
+    public void startup(String version, boolean isSSL, int mode) {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Starting up");
         try {
-            Socket sock = connect();
+            Socket sock = connect(isSSL);
             OutputStream out = sock.getOutputStream();
             SAMEventHandler eventHandler = new SinkEventHandler(_context, out);
             _reader = new SAMReader(_context, sock.getInputStream(), eventHandler);
             _reader.startReading();
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Reader created");
-            String ourDest = handshake(out, version, true, eventHandler);
+            String ourDest = handshake(out, version, true, eventHandler, mode);
             if (ourDest == null)
                 throw new IOException("handshake failed");
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Handshake complete.  we are " + ourDest);
             if (_isV3) {
-                Socket sock2 = connect();
+                Socket sock2 = connect(isSSL);
                 out = sock2.getOutputStream();
                 eventHandler = new SinkEventHandler2(_context, sock2.getInputStream(), out);
                 _reader2 = new SAMReader(_context, sock2.getInputStream(), eventHandler);
                 _reader2.startReading();
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Reader2 created");
-                String ok = handshake(out, version, false, eventHandler);
+                String ok = handshake(out, version, false, eventHandler, mode);
                 if (ok == null)
                     throw new IOException("2nd handshake failed");
                 if (_log.shouldLog(Log.DEBUG))
@@ -285,12 +288,12 @@ public class SAMStreamSink {
         }
     }
     
-    private Socket connect() throws IOException {
+    private Socket connect(boolean isSSL) throws IOException {
         return new Socket(_samHost, Integer.parseInt(_samPort));
     }
     
     /** @return our b64 dest or null */
-    private String handshake(OutputStream samOut, String version, boolean isMaster, SAMEventHandler eventHandler) {
+    private String handshake(OutputStream samOut, String version, boolean isMaster, SAMEventHandler eventHandler, int mode) {
         synchronized (samOut) {
             try {
                 samOut.write(("HELLO VERSION MIN=1.0 MAX=" + version + '\n').getBytes());
@@ -354,7 +357,14 @@ public class SAMStreamSink {
                     // and give it to the SAM server
                     dest = _destFile;
                 }
-                String req = "SESSION CREATE STYLE=STREAM DESTINATION=" + dest + " " + _conOptions + "\n";
+                String style;
+                if (mode == STREAM)
+                    style = "STREAM";
+                else if (mode == DG || mode == V1DG)
+                    style = "DATAGRAM";
+                else
+                    style = "RAW";
+                String req = "SESSION CREATE STYLE=" + style + " DESTINATION=" + dest + " " + _conOptions + "\n";
                 samOut.write(req.getBytes());
                 samOut.flush();
                 if (_log.shouldLog(Log.DEBUG))
