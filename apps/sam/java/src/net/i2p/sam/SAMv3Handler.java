@@ -315,7 +315,7 @@ class SAMv3Handler extends SAMv1Handler
 							} else if (_lastPing < 0) {
 								if (_log.shouldWarn())
 									_log.warn("2nd timeout");
-								writeString("XXX STATUS RESULT=I2P_ERROR MESSAGE=\"command timeout, bye\"\n");
+								writeString("SESSION STATUS RESULT=I2P_ERROR MESSAGE=\"command timeout, bye\"\n");
 								break;
 							} else {
 								// don't clear buffer, don't send ping,

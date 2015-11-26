@@ -15,6 +15,7 @@ import gnu.getopt.Getopt;
 import net.i2p.I2PAppContext;
 import net.i2p.data.Base32;
 import net.i2p.data.DataHelper;
+import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 import net.i2p.util.VersionComparator;
 
@@ -35,6 +36,7 @@ public class SAMStreamSink {
     private String _conOptions;
     private SAMReader _reader, _reader2;
     private boolean _isV3;
+    private boolean _isV32;
     private String _v3ID;
     //private boolean _dead;
     /** Connection id (Integer) to peer (Flooder) */
@@ -127,6 +129,11 @@ public class SAMStreamSink {
                 throw new IOException("handshake failed");
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Handshake complete.  we are " + ourDest);
+            if (_isV32) {
+                _log.debug("Starting pinger");
+                Thread t = new Pinger(out);
+                t.start();
+            }
             if (_isV3 && mode != V1DG && mode != V1RAW) {
                 Socket sock2 = connect(isSSL);
                 out = sock2.getOutputStream();
@@ -144,6 +151,32 @@ public class SAMStreamSink {
             writeDest(ourDest);
         } catch (IOException e) {
             _log.error("Unable to connect to SAM at " + _samHost + ":" + _samPort, e);
+        }
+    }
+
+    private static class Pinger extends I2PAppThread {
+        private final OutputStream _out;
+
+        public Pinger(OutputStream out) {
+            super("SAM Sink Pinger");
+            setDaemon(true);
+            _out = out;
+        }
+
+        public void run() {
+            while (true) {
+                try {
+                    Thread.sleep(127*1000);
+                    synchronized(_out) {
+                        _out.write(DataHelper.getASCII("PING " + System.currentTimeMillis() + '\n'));
+                        _out.flush();
+                    }
+                } catch (InterruptedException ie) {
+                    break;
+                } catch (IOException ioe) {
+                    break;
+                }
+            }
         }
     }
     
@@ -353,6 +386,7 @@ public class SAMStreamSink {
                 _isV3 = VersionComparator.comp(hisVersion, "3") >= 0;
                 String dest;
                 if (_isV3) {
+                    _isV32 = VersionComparator.comp(hisVersion, "3.2") >= 0;
                     // we use the filename as the name in sam.keys
                     // and read it in ourselves
                     File keys = new File("sam.keys");

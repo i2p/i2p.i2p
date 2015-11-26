@@ -102,7 +102,10 @@ abstract class SAMHandler implements Runnable, Handler {
         }
     }
     
-    static public void writeBytes(ByteBuffer data, SocketChannel out) throws IOException {
+    /**
+     *  Caller must synch
+     */
+    private static void writeBytes(ByteBuffer data, SocketChannel out) throws IOException {
         while (data.hasRemaining()) out.write(data);           
         out.socket().getOutputStream().flush();
     }
@@ -132,7 +135,10 @@ abstract class SAMHandler implements Runnable, Handler {
         }
     }
 
-    /** @return success */
+    /**
+     * Unsynchronized, use with caution
+     * @return success
+     */
     public static boolean writeString(String str, SocketChannel out)
     {
     	try {
