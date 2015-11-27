@@ -28,10 +28,16 @@ import net.i2p.util.Log;
 import net.i2p.util.VersionComparator;
 
 /**
- * Sit around on a SAM destination, receiving lots of data and 
- * writing it to disk
+ * Swiss army knife tester.
+ * Saves our transient b64 destination to myKeyFile where SAMStreamSend can get it.
+ * Saves received data to a file (in sinkDir).
  *
- * Usage: SAMStreamSink samHost samPort myKeyFile sinkDir
+ * Usage: SAMStreamSink [options] myKeyFile sinkDir
+ *
+ * See apps/sam/doc/README-test.txt for info on test setup.
+ * Receives data in one of 7 modes.
+ * Optionally uses SSL.
+ * Configurable SAM client version.
  *
  */
 public class SAMStreamSink {
@@ -46,7 +52,6 @@ public class SAMStreamSink {
     private boolean _isV3;
     private boolean _isV32;
     private String _v3ID;
-    //private boolean _dead;
     /** Connection id (Integer) to peer (Flooder) */
     private final Map<String, Sink> _remotePeers;
     private static I2PSSLSocketFactory _sslSocketFactory;
@@ -140,7 +145,6 @@ public class SAMStreamSink {
     public SAMStreamSink(I2PAppContext ctx, String samHost, String samPort, String destFile, String sinkDir) {
         _context = ctx;
         _log = ctx.logManager().getLog(SAMStreamSink.class);
-        //_dead = false;
         _samHost = samHost;
         _samPort = samPort;
         _destFile = destFile;

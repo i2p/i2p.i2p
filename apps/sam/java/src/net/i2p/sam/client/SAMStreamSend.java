@@ -26,9 +26,15 @@ import net.i2p.util.Log;
 import net.i2p.util.VersionComparator;
 
 /**
- * Send a file to a peer
+ * Swiss army knife tester.
+ * Sends a file (datafile) to a peer (b64 dest in peerDestFile).
  *
- * Usage: SAMStreamSend samHost samPort peerDestFile dataFile
+ * Usage: SAMStreamSend [options] peerDestFile dataFile
+ *
+ * See apps/sam/doc/README-test.txt for info on test setup.
+ * Sends data in one of 5 modes.
+ * Optionally uses SSL.
+ * Configurable SAM client version.
  *
  */
 public class SAMStreamSend {
