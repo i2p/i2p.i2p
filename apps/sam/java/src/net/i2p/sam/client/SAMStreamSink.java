@@ -168,18 +168,22 @@ public class SAMStreamSink {
                 t.start();
             }
             if (_isV3 && mode == STREAM) {
-                Socket sock2 = connect(isSSL);
-                out = sock2.getOutputStream();
-                eventHandler = new SinkEventHandler2(_context, sock2.getInputStream(), out);
-                _reader2 = new SAMReader(_context, sock2.getInputStream(), eventHandler);
-                _reader2.startReading();
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Reader2 created");
-                String ok = handshake(out, version, false, eventHandler, mode, user, password, "");
-                if (ok == null)
-                    throw new IOException("2nd handshake failed");
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Handshake2 complete.");
+                // test multiple acceptors, only works in 3.2
+                int acceptors = isV32 ? 4 : 1;
+                for (int i = 0; i < acceptors; i++) {
+                    Socket sock2 = connect(isSSL);
+                    out = sock2.getOutputStream();
+                    eventHandler = new SinkEventHandler2(_context, sock2.getInputStream(), out);
+                    _reader2 = new SAMReader(_context, sock2.getInputStream(), eventHandler);
+                    _reader2.startReading();
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("Reader " + (2 + i) + " created");
+                    String ok = handshake(out, version, false, eventHandler, mode, user, password, "");
+                    if (ok == null)
+                        throw new IOException("handshake " + (2 + i) + " failed");
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("Handshake " + (2 + i) + " complete.");
+                }
             } else if (_isV3 && (mode == DG || mode == RAW || mode == RAWHDR)) {
                 // set up a listening DatagramSocket
                 (new DGRcvr(mode)).start();
@@ -622,6 +626,8 @@ public class SAMStreamSink {
                 sinkDir.mkdirs();
             
             File out = File.createTempFile("sink", ".dat", sinkDir);
+            if (_log.shouldWarn())
+                _log.warn("outputting to " + out);
             _out = new FileOutputStream(out);
             _started = _context.clock().now();
         }
