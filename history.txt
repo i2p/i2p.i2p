@@ -1,3 +1,26 @@
+2015-11-27 zzz
+Prop from i2p.i2p.zzz.sam:
+ * PasswordManager: new methods for use by SAM
+ * SAM:
+   - Use getopt for SAM args processing
+   - Change default host from 0.0.0.0 to 127.0.0.1
+   - Add SSL support with -s option
+   - Add -c configfile option, default sam.config
+   - Add protocol and port notification
+   - Add authorization options in HELLO
+   - Add AUTH commands: ENABLE, DISABLE, ADD, REMOVE
+   - Add PING, PONG, QUIT, STOP, EXIT commands
+   - Add SSL option for STREAM FORWARD
+   - Move DatagramServer from SAMv3Handler to its own file
+   - Make DatagramServer a Handler, register with bridge
+   - Use ReadLine with timeout for SAMHandlerFactory
+   - Support parallel STREAM ACCEPTs
+   - Add HEADER option for RAW forwarding
+   - Better exception handling
+   - Extensive enhancements to Java client for testing
+   - Bump version to 3.2
+ * Streaming: Fix recognition of PoisonPacket in ConnectionHandler
+
 2015-11-22 zzz
 Prop from i2p.i2p.zzz.test2:
  * Build:
