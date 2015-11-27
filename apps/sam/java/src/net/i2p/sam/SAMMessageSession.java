@@ -19,6 +19,7 @@ import net.i2p.client.I2PClientFactory;
 import net.i2p.client.I2PSession;
 import net.i2p.client.I2PSessionException;
 import net.i2p.client.I2PSessionMuxedListener;
+import net.i2p.client.SendMessageOptions;
 import net.i2p.data.Base64;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.Destination;
@@ -123,6 +124,40 @@ abstract class SAMMessageSession {
 	}
 
 	return session.sendMessage(d, data, proto, fromPort, toPort);
+    }
+
+    /**
+     * Actually send bytes through the SAM message-based session I2PSession.
+     * TODO unused, umimplemented in the sessions and handlers
+     *
+     * @param dest Destination
+     * @param data Bytes to be sent
+     * @param proto I2CP protocol
+     * @param fromPort I2CP from port
+     * @param toPort I2CP to port
+     *
+     * @return True if the data was sent, false otherwise
+     * @throws DataFormatException on unknown / bad dest
+     * @throws I2PSessionException on serious error, probably session closed
+     * @since 0.9.24
+     */
+    protected boolean sendBytesThroughMessageSession(String dest, byte[] data,
+                                        int proto, int fromPort, int toPort,
+                                        boolean sendLeaseSet, int sendTags,
+                                        int tagThreshold, long expires)
+                                        throws DataFormatException, I2PSessionException {
+	Destination d = SAMUtils.getDest(dest);
+
+	if (_log.shouldLog(Log.DEBUG)) {
+	    _log.debug("Sending " + data.length + " bytes to " + dest);
+	}
+	SendMessageOptions opts = new SendMessageOptions();
+	opts.setSendLeaseSet(sendLeaseSet);
+	opts.setTagsToSend(sendTags);
+	opts.setTagThreshold(tagThreshold);
+	opts.setDate(expires);
+
+	return session.sendMessage(d, data, 0, data.length, proto, fromPort, toPort, opts);
     }
 
     /**
