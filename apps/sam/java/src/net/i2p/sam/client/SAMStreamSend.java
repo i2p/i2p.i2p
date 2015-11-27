@@ -6,8 +6,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.security.GeneralSecurityException;
 import java.util.HashMap;
 import java.util.Map;
+import javax.net.ssl.SSLSocket;
 
 import gnu.getopt.Getopt;
 
@@ -15,6 +17,7 @@ import net.i2p.I2PAppContext;
 import net.i2p.data.Base32;
 import net.i2p.data.DataHelper;
 import net.i2p.util.I2PAppThread;
+import net.i2p.util.I2PSSLSocketFactory;
 import net.i2p.util.Log;
 import net.i2p.util.VersionComparator;
 
@@ -38,19 +41,22 @@ public class SAMStreamSend {
     //private boolean _dead;
     /** Connection id (Integer) to peer (Flooder) */
     private final Map<String, Sender> _remotePeers;
+    private static I2PSSLSocketFactory _sslSocketFactory;
     
     private static final int STREAM=0, DG=1, V1DG=2, RAW=3, V1RAW=4;
-    private static final String USAGE = "Usage: SAMStreamSend [-s] [-m mode] [-v version] [-b samHost] [-p samPort] peerDestFile dataDir\n" +
+    private static final String USAGE = "Usage: SAMStreamSend [-s] [-m mode] [-v version] [-b samHost] [-p samPort] [-u user] [-w password] peerDestFile dataDir\n" +
                                         "       modes: stream: 0; datagram: 1; v1datagram: 2; raw: 3; v1raw: 4\n" +
                                         "       -s: use SSL";
 
     public static void main(String args[]) {
-        Getopt g = new Getopt("SAM", args, "sb:m:p:v:");
+        Getopt g = new Getopt("SAM", args, "sb:m:p:u:v:w:");
         boolean isSSL = false;
         int mode = STREAM;
         String version = "1.0";
         String host = "127.0.0.1";
         String port = "7656";
+        String user = null;
+        String password = null;
         int c;
         while ((c = g.getopt()) != -1) {
           switch (c) {
@@ -78,6 +84,14 @@ public class SAMStreamSend {
                 port = g.getOptarg();
                 break;
 
+            case 'u':
+                user = g.getOptarg();
+                break;
+
+            case 'w':
+                password = g.getOptarg();
+                break;
+
             case 'h':
             case '?':
             case ':':
@@ -92,10 +106,19 @@ public class SAMStreamSend {
             System.err.println(USAGE);
             return;
         }
+        if ((user == null && password != null) ||
+            (user != null && password == null)) {
+            System.err.println("both user and password or neither");
+            return;
+        }
+        if (user != null && password != null && VersionComparator.comp(version, "3.2") < 0) {
+            System.err.println("user/password require 3.2");
+            return;
+        }
         I2PAppContext ctx = I2PAppContext.getGlobalContext();
         SAMStreamSend sender = new SAMStreamSend(ctx, host, port,
                                                       args[startArgs], args[startArgs + 1]);
-        sender.startup(version, isSSL, mode);
+        sender.startup(version, isSSL, mode, user, password);
     }
     
     public SAMStreamSend(I2PAppContext ctx, String samHost, String samPort, String destFile, String dataFile) {
@@ -110,7 +133,7 @@ public class SAMStreamSend {
         _remotePeers = new HashMap<String, Sender>();
     }
     
-    public void startup(String version, boolean isSSL, int mode) {
+    public void startup(String version, boolean isSSL, int mode, String user, String password) {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Starting up");
         try {
@@ -121,7 +144,7 @@ public class SAMStreamSend {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Reader created");
             OutputStream out = sock.getOutputStream();
-            String ourDest = handshake(out, version, true, eventHandler, mode);
+            String ourDest = handshake(out, version, true, eventHandler, mode, user, password);
             if (ourDest == null)
                 throw new IOException("handshake failed");
             if (_log.shouldLog(Log.DEBUG))
@@ -134,7 +157,7 @@ public class SAMStreamSend {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Reader2 created");
                 out = sock2.getOutputStream();
-                String ok = handshake(out, version, false, eventHandler, mode);
+                String ok = handshake(out, version, false, eventHandler, mode, user, password);
                 if (ok == null)
                     throw new IOException("2nd handshake failed");
                 if (_log.shouldLog(Log.DEBUG))
@@ -172,14 +195,33 @@ public class SAMStreamSend {
     }
     
     private Socket connect(boolean isSSL) throws IOException {
-        return new Socket(_samHost, Integer.parseInt(_samPort));
+        int port = Integer.parseInt(_samPort);
+        if (!isSSL)
+            return new Socket(_samHost, port);
+        synchronized(SAMStreamSink.class) {
+            if (_sslSocketFactory == null) {
+                try {
+                    _sslSocketFactory = new I2PSSLSocketFactory(
+                        _context, true, "certificates/sam");
+                } catch (GeneralSecurityException gse) {
+                    throw new IOException("SSL error", gse);
+                }
+            }
+        }
+        SSLSocket sock = (SSLSocket) _sslSocketFactory.createSocket(_samHost, port);
+        I2PSSLSocketFactory.verifyHostname(_context, sock, _samHost);
+        return sock;
     }
     
     /** @return our b64 dest or null */
-    private String handshake(OutputStream samOut, String version, boolean isMaster, SAMEventHandler eventHandler, int mode) {
+    private String handshake(OutputStream samOut, String version, boolean isMaster,
+                             SAMEventHandler eventHandler, int mode, String user, String password) {
         synchronized (samOut) {
             try {
-                samOut.write(("HELLO VERSION MIN=1.0 MAX=" + version + '\n').getBytes());
+                if (user != null && password != null)
+                    samOut.write(("HELLO VERSION MIN=1.0 MAX=" + version + " USER=" + user + " PASSWORD=" + password + '\n').getBytes());
+                else
+                    samOut.write(("HELLO VERSION MIN=1.0 MAX=" + version + '\n').getBytes());
                 samOut.flush();
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Hello sent");
