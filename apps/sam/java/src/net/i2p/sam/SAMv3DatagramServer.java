@@ -164,6 +164,7 @@ class SAMv3DatagramServer implements Handler {
 						else if (t.startsWith("TO_PORT="))
 							tp = t.substring("TO_PORT=".length());
 					}
+
 					int proto = I2PSession.PROTO_UNSPECIFIED;
 					int fromPort = I2PSession.PORT_UNSPECIFIED;
 					int toPort = I2PSession.PORT_UNSPECIFIED;
@@ -196,7 +197,7 @@ class SAMv3DatagramServer implements Handler {
 					is.read(data);
 					SAMv3Handler.Session sess = rec.getHandler().getSession();
 					if (sess != null)
-						rec.getHandler().getSession().sendBytes(dest,data, proto, fromPort, toPort);
+						sess.sendBytes(dest, data, proto, fromPort, toPort);
 					else
 						warn("Dropping datagram, no session for " + nick);
 				} else {

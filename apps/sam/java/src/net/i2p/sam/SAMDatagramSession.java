@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+import net.i2p.client.I2PSession;
 import net.i2p.client.I2PSessionException;
 import net.i2p.client.datagram.I2PDatagramDissector;
 import net.i2p.client.datagram.I2PDatagramMaker;
@@ -77,6 +78,7 @@ class SAMDatagramSession extends SAMMessageSession {
      *
      * @param dest Destination
      * @param data Bytes to be sent
+     * @param proto ignored, will always use PROTO_DATAGRAM (17)
      *
      * @return True if the data was sent, false otherwise
      * @throws DataFormatException on unknown / bad dest
@@ -90,7 +92,7 @@ class SAMDatagramSession extends SAMMessageSession {
         synchronized (dgramMaker) {
         	dgram = dgramMaker.makeI2PDatagram(data);
         }
-        return sendBytesThroughMessageSession(dest, dgram, proto, fromPort, toPort);
+        return sendBytesThroughMessageSession(dest, dgram, I2PSession.PROTO_DATAGRAM, fromPort, toPort);
     }
 
     protected void messageReceived(byte[] msg, int proto, int fromPort, int toPort) {

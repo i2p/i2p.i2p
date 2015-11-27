@@ -163,7 +163,7 @@ public class SAMStreamSink {
                 Thread t = new Pinger(out);
                 t.start();
             }
-            if (_isV3 && mode != V1DG && mode != V1RAW) {
+            if (_isV3 && mode == STREAM) {
                 Socket sock2 = connect(isSSL);
                 out = sock2.getOutputStream();
                 eventHandler = new SinkEventHandler2(_context, sock2.getInputStream(), out);

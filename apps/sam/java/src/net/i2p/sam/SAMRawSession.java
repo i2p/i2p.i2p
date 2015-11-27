@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+import net.i2p.client.I2PSession;
 import net.i2p.client.I2PSessionException;
 import net.i2p.data.DataFormatException;
 import net.i2p.util.Log;
@@ -66,6 +67,7 @@ class SAMRawSession extends SAMMessageSession {
      * Send bytes through a SAM RAW session.
      *
      * @param data Bytes to be sent
+     * @param proto if 0, will use PROTO_DATAGRAM_RAW (18)
      *
      * @return True if the data was sent, false otherwise
      * @throws DataFormatException on unknown / bad dest
@@ -75,6 +77,8 @@ class SAMRawSession extends SAMMessageSession {
                              int fromPort, int toPort) throws DataFormatException, I2PSessionException {
         if (data.length > RAW_SIZE_MAX)
             throw new DataFormatException("Data size limit exceeded (" + data.length + ")");
+        if (proto == I2PSession.PROTO_UNSPECIFIED)
+            proto = I2PSession.PROTO_DATAGRAM_RAW;
         return sendBytesThroughMessageSession(dest, data, proto, fromPort, toPort);
     }
 

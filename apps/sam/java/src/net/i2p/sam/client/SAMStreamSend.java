@@ -1,10 +1,14 @@
 package net.i2p.sam.client;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.security.GeneralSecurityException;
 import java.util.HashMap;
@@ -37,6 +41,7 @@ public class SAMStreamSend {
     private String _conOptions;
     private SAMReader _reader, _reader2;
     private boolean _isV3;
+    private boolean _isV32;
     private String _v3ID;
     //private boolean _dead;
     /** Connection id (Integer) to peer (Flooder) */
@@ -155,7 +160,7 @@ public class SAMStreamSend {
                 throw new IOException("handshake failed");
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Handshake complete.  we are " + ourDest);
-            if (_isV3 && mode != V1DG && mode != V1RAW) {
+            if (_isV3 && mode == STREAM) {
                 Socket sock2 = connect(isSSL);
                 eventHandler = new SendEventHandler(_context);
                 _reader2 = new SAMReader(_context, sock2.getInputStream(), eventHandler);
@@ -169,9 +174,9 @@ public class SAMStreamSend {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Handshake2 complete.");
             }
-            if (ourDest != null) {
-                send(out, eventHandler, mode);
-            }
+            if (mode == DG || mode == RAW)
+                out = null;
+            send(out, eventHandler, mode);
         } catch (IOException e) {
             _log.error("Unable to connect to SAM at " + _samHost + ":" + _samPort, e);
             if (_reader != null)
@@ -241,6 +246,7 @@ public class SAMStreamSend {
                     return "OK";
                 _isV3 = VersionComparator.comp(hisVersion, "3") >= 0;
                 if (_isV3) {
+                    _isV32 = VersionComparator.comp(hisVersion, "3.2") >= 0;
                     byte[] id = new byte[5];
                     _context.random().nextBytes(id);
                     _v3ID = Base32.encode(id);
@@ -307,11 +313,21 @@ public class SAMStreamSend {
         private final OutputStream _samOut;
         private final SAMEventHandler _eventHandler;
         private final int _mode;
+        private final DatagramSocket _dgSock;
+        private final InetSocketAddress _dgSAM;
         
-        public Sender(OutputStream samOut, SAMEventHandler eventHandler, int mode) {
+        public Sender(OutputStream samOut, SAMEventHandler eventHandler, int mode) throws IOException {
             _samOut = samOut;
             _eventHandler = eventHandler;
             _mode = mode;
+            if (mode == DG || mode == RAW) {
+                // samOut will be null
+                _dgSock = new DatagramSocket();
+                _dgSAM = new InetSocketAddress(_samHost, 7655);
+            } else {
+                _dgSock = null;
+                _dgSAM = null;
+            }
             synchronized (_remotePeers) {
                 if (_v3ID != null)
                     _connectionId = _v3ID;
@@ -396,22 +412,42 @@ public class SAMStreamSend {
                             _log.debug("Sending " + read + " on " + _connectionId + " after " + (now-lastSend));
                         lastSend = now;
                         
-                        synchronized (_samOut) {
-                            if (!_isV3 || _mode == V1DG || _mode == V1RAW) {
-                                String m;
-                                if (_mode == STREAM)
-                                    m = "STREAM SEND ID=" + _connectionId + " SIZE=" + read + "\n";
-                                else if (_mode == V1DG)
-                                    m = "DATAGRAM SEND DESTINATION=" + _remoteDestination + " SIZE=" + read + "\n";
-                                else if (_mode == V1RAW)
-                                    m = "RAW SEND DESTINATION=" + _remoteDestination + " SIZE=" + read + "\n";
-                                else
-                                    throw new IOException("unsupported mode " + _mode);
-                                byte msg[] = DataHelper.getASCII(m);
-                                _samOut.write(msg);
+                        if (_samOut != null) {
+                            synchronized (_samOut) {
+                                if (!_isV3 || _mode == V1DG || _mode == V1RAW) {
+                                    String m;
+                                    if (_mode == STREAM) {
+                                        m = "STREAM SEND ID=" + _connectionId + " SIZE=" + read + "\n";
+                                    } else if (_mode == V1DG) {
+                                        m = "DATAGRAM SEND DESTINATION=" + _remoteDestination + " SIZE=" + read + "\n";
+                                    } else if (_mode == V1RAW) {
+                                        m = "RAW SEND DESTINATION=" + _remoteDestination + " SIZE=" + read + "\n";
+                                    } else {
+                                        throw new IOException("unsupported mode " + _mode);
+                                    }
+                                    byte msg[] = DataHelper.getASCII(m);
+                                    _samOut.write(msg);
+                                }
+                                _samOut.write(data, 0, read);
+                                _samOut.flush();
                             }
-                            _samOut.write(data, 0, read);
-                            _samOut.flush();
+                        } else {
+                            // real datagrams
+                            ByteArrayOutputStream baos = new ByteArrayOutputStream(read + 1024);
+                            baos.write(DataHelper.getASCII("3.0 "));
+                            baos.write(DataHelper.getASCII(_v3ID));
+                            baos.write((byte) ' ');
+                            baos.write(DataHelper.getASCII(_remoteDestination));
+                            if (_isV32) {
+                                // only set TO_PORT to test session setting of FROM_PORT
+                                baos.write(DataHelper.getASCII(" TO_PORT=5678"));
+                            }
+                            baos.write((byte) '\n');
+                            baos.write(data, 0, read);
+                            byte[] pkt = baos.toByteArray();
+                            DatagramPacket p = new DatagramPacket(pkt, pkt.length, _dgSAM);
+                            _dgSock.send(p);
+                            try { Thread.sleep(25); } catch (InterruptedException ie) {}
                         }
                         
                         _totalSent += read;
@@ -423,23 +459,27 @@ public class SAMStreamSend {
                 }
             }
             
-            if (_isV3) {
-                try {
-                    _samOut.close();
-                } catch (IOException ioe) {
-                    _log.info("Error closing", ioe);
-                }
-            } else {
-                byte msg[] = ("STREAM CLOSE ID=" + _connectionId + "\n").getBytes();
-                try {
-                    synchronized (_samOut) {
-                        _samOut.write(msg);
-                        _samOut.flush();
+            if (_samOut != null) {
+                if (_isV3) {
+                    try {
                         _samOut.close();
+                    } catch (IOException ioe) {
+                        _log.info("Error closing", ioe);
                     }
-                } catch (IOException ioe) {
-                    _log.info("Error closing", ioe);
+                } else {
+                    byte msg[] = ("STREAM CLOSE ID=" + _connectionId + "\n").getBytes();
+                    try {
+                        synchronized (_samOut) {
+                            _samOut.write(msg);
+                            _samOut.flush();
+                            _samOut.close();
+                        }
+                    } catch (IOException ioe) {
+                        _log.info("Error closing", ioe);
+                    }
                 }
+            } else if (_dgSock != null) { 
+                _dgSock.close();
             }
             
             closed();

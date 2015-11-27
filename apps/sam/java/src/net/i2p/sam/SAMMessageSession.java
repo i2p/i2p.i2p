@@ -22,7 +22,7 @@ import net.i2p.client.I2PSessionMuxedListener;
 import net.i2p.data.Base64;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.Destination;
-import net.i2p.util.HexDump;
+//import net.i2p.util.HexDump;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 
@@ -261,10 +261,10 @@ abstract class SAMMessageSession {
                 byte msg[] = session.receiveMessage(msgId);
                 if (msg == null)
                     return;
-                if (_log.shouldLog(Log.DEBUG)) {
-                    _log.debug("Content of message " + msgId + ":\n"
-                               + HexDump.dump(msg));
-                }
+                //if (_log.shouldLog(Log.DEBUG)) {
+                //    _log.debug("Content of message " + msgId + ":\n"
+                //               + HexDump.dump(msg));
+                //}
                 
                 messageReceived(msg, proto, fromPort, toPort);
             } catch (I2PSessionException e) {
