@@ -158,7 +158,7 @@ class SAMv3DatagramServer implements Handler {
 					while (tok.hasMoreTokens()) {
 						String t = tok.nextToken();
 						if (t.startsWith("PROTOCOL="))
-							pr = t.substring("PROTOTCOL=".length());
+							pr = t.substring("PROTOCOL=".length());
 						else if (t.startsWith("FROM_PORT="))
 							fp = t.substring("FROM_PORT=".length());
 						else if (t.startsWith("TO_PORT="))

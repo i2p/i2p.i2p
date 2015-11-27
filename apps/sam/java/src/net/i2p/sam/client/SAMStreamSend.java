@@ -440,7 +440,10 @@ public class SAMStreamSend {
                             baos.write(DataHelper.getASCII(_remoteDestination));
                             if (_isV32) {
                                 // only set TO_PORT to test session setting of FROM_PORT
-                                baos.write(DataHelper.getASCII(" TO_PORT=5678"));
+                                if (_mode == RAW)
+                                    baos.write(DataHelper.getASCII(" PROTOCOL=123 TO_PORT=5678"));
+                                else
+                                    baos.write(DataHelper.getASCII(" TO_PORT=5678"));
                             }
                             baos.write((byte) '\n');
                             baos.write(data, 0, read);
