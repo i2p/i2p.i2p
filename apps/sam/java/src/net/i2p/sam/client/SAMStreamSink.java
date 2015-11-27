@@ -1,10 +1,13 @@
 package net.i2p.sam.client;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
 import java.net.Socket;
 import java.security.GeneralSecurityException;
 import java.util.HashMap;
@@ -51,6 +54,7 @@ public class SAMStreamSink {
                                         "       modes: stream: 0; datagram: 1; v1datagram: 2; raw: 3; v1raw: 4\n" +
                                         "       -s: use SSL\n" +
                                         "       multiple -o session options are allowed";
+    private static final int V3DGPORT=9999;
 
     public static void main(String args[]) {
         Getopt g = new Getopt("SAM", args, "sb:m:p:u:v:w:");
@@ -176,10 +180,59 @@ public class SAMStreamSink {
                     throw new IOException("2nd handshake failed");
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Handshake2 complete.");
+            } else if (_isV3 && (mode == DG || mode == RAW)) {
+                // set up a listening DatagramSocket
+                (new DGRcvr(mode)).start();
             }
             writeDest(ourDest);
         } catch (IOException e) {
             _log.error("Unable to connect to SAM at " + _samHost + ":" + _samPort, e);
+        }
+    }
+
+    private class DGRcvr extends I2PAppThread {
+        private final int _mode;
+
+        public DGRcvr(int mode) { _mode = mode; }
+
+        public void run() {
+            byte[] buf = new byte[32768];
+            try {
+                Sink sink = new Sink("FAKE", "FAKEFROM");
+                DatagramSocket dg = new DatagramSocket(V3DGPORT);
+                while (true) {
+                    DatagramPacket p = new DatagramPacket(buf, 32768);
+                    dg.receive(p);
+                    int len = p.getLength();
+                    int off = p.getOffset();
+                    byte[] data = p.getData();
+                    _log.info("Got datagram length " + len);
+                    if (_mode == DG) {
+                        ByteArrayInputStream bais = new ByteArrayInputStream(data, off, len);
+                        String line = DataHelper.readLine(bais);
+                        if (line == null) {
+                            _log.error("DGRcvr no header line");
+                            continue;
+                        }
+                        if (line.length() < 516) {
+                            _log.error("DGRcvr line too short: \"" + line + '\n');
+                            continue;
+                        }
+                        String[] parts = line.split(" ");
+                        String dest = parts[0];
+                        _log.info("DG is from " + dest);
+                        for (int i = 1; i < parts.length; i++) {
+                            _log.info("Parameter: " + parts[i]);
+                        }
+                        int left = bais.available();
+                        sink.received(data, off + len - left, left);
+                    } else {
+                        sink.received(data, off, len);
+                    }
+                }
+            } catch (IOException ioe) {
+                _log.error("DGRcvr", ioe);
+            }
         }
     }
 
@@ -471,10 +524,14 @@ public class SAMStreamSink {
                 String style;
                 if (mode == STREAM)
                     style = "STREAM";
-                else if (mode == DG || mode == V1DG)
+                else if (mode == V1DG)
                     style = "DATAGRAM";
-                else
+                else if (mode == DG)
+                    style = "DATAGRAM PORT=" + V3DGPORT;
+                else if (mode == V1RAW)
                     style = "RAW";
+                else
+                    style = "RAW PORT=" + V3DGPORT;
                 String req = "SESSION CREATE STYLE=" + style + " DESTINATION=" + dest + ' ' + _conOptions + ' ' + sopts + '\n';
                 samOut.write(req.getBytes());
                 samOut.flush();
@@ -501,7 +558,7 @@ public class SAMStreamSink {
                 }
                 if (_log.shouldInfo())
                     _log.info(_destFile + " is located at " + destination);
-                if (mode != STREAM) {
+                if (mode == V1DG || mode == V1RAW) {
                     // fake it so the sink starts
                     eventHandler.streamConnectedReceived(destination, "FAKE");
                 }
