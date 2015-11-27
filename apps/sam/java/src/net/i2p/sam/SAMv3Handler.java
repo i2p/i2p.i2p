@@ -10,15 +10,16 @@ package net.i2p.sam;
 
 
 import java.io.ByteArrayOutputStream;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InterruptedIOException;
 import java.net.ConnectException;
 import java.net.InetSocketAddress;
+import java.net.Socket;
 import java.net.SocketAddress;
+import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.net.NoRouteToHostException;
-import java.nio.channels.DatagramChannel;
 import java.nio.channels.SocketChannel;
 import java.nio.ByteBuffer;
 import java.util.Properties;
@@ -28,6 +29,7 @@ import java.util.StringTokenizer;
 import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
 import net.i2p.client.I2PClient;
+import net.i2p.client.I2PSession;
 import net.i2p.client.I2PSessionException;
 import net.i2p.crypto.SigType;
 import net.i2p.data.Base64;
@@ -36,6 +38,7 @@ import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.util.Log;
 import net.i2p.util.I2PAppThread;
+import net.i2p.util.PasswordManager;
 
 /**
  * Class able to handle a SAM version 3 client connection.
@@ -50,12 +53,15 @@ class SAMv3Handler extends SAMv1Handler
 	public static final SessionsDB sSessionsHash = new SessionsDB();
 	private volatile boolean stolenSocket;
 	private volatile boolean streamForwardingSocket;
-
+	private final boolean sendPorts;
+	private long _lastPing;
+	private static final int READ_TIMEOUT = 3*60*1000;
 	
 	interface Session {
 		String getNick();
 		void close();
-		boolean sendBytes(String dest, byte[] data) throws DataFormatException, I2PSessionException;
+		boolean sendBytes(String dest, byte[] data, int proto,
+		                  int fromPort, int toPort) throws DataFormatException, I2PSessionException;
 	}
 	
 	/**
@@ -88,6 +94,7 @@ class SAMv3Handler extends SAMv1Handler
 	                    Properties i2cpProps, SAMBridge parent) throws SAMException, IOException
 	{
 		super(s, verMajor, verMinor, i2cpProps, parent);
+	        sendPorts = (verMajor == 3 && verMinor >= 2) || verMajor > 3;
 		if (_log.shouldLog(Log.DEBUG))
 			_log.debug("SAM version 3 handler instantiated");
 	}
@@ -96,124 +103,6 @@ class SAMv3Handler extends SAMv1Handler
 	public boolean verifVersion()
 	{
 		return (verMajor == 3);
-	}
-
-	public static class DatagramServer  {
-		
-		private static DatagramServer _instance;
-		private static DatagramChannel server;
-		
-		public static DatagramServer getInstance() throws IOException {
-			return getInstance(new Properties());
-		}
-		
-		public static DatagramServer getInstance(Properties props) throws IOException {
-			synchronized(DatagramServer.class) {
-				if (_instance==null)
-					_instance = new DatagramServer(props);
-				return _instance ;
-			}
-		}
-		
-		public DatagramServer(Properties props) throws IOException {
-			synchronized(DatagramServer.class) {
-				if (server==null)
-					server = DatagramChannel.open();
-			}
-			
-			String host = props.getProperty(SAMBridge.PROP_DATAGRAM_HOST, SAMBridge.DEFAULT_DATAGRAM_HOST);
-			String portStr = props.getProperty(SAMBridge.PROP_DATAGRAM_PORT, SAMBridge.DEFAULT_DATAGRAM_PORT);
-			int port ;
-			try {
-				port = Integer.parseInt(portStr);
-			} catch (NumberFormatException e) {
-				port = Integer.parseInt(SAMBridge.DEFAULT_DATAGRAM_PORT);
-			}
-			
-			server.socket().bind(new InetSocketAddress(host, port));
-			new I2PAppThread(new Listener(server), "DatagramListener").start();
-		}
-		
-		public void send(SocketAddress addr, ByteBuffer msg) throws IOException {
-			server.send(msg, addr);
-		}
-		
-		static class Listener implements Runnable {
-			
-			private final DatagramChannel server;
-			
-			public Listener(DatagramChannel server)
-			{
-				this.server = server ;
-			}
-			public void run()
-			{
-				ByteBuffer inBuf = ByteBuffer.allocateDirect(SAMRawSession.RAW_SIZE_MAX+1024);
-				
-				while (!Thread.interrupted())
-				{
-					inBuf.clear();
-					try {
-						server.receive(inBuf);
-					} catch (IOException e) {
-						break ;
-					}
-					inBuf.flip();
-					ByteBuffer outBuf = ByteBuffer.wrap(new byte[inBuf.remaining()]);
-					outBuf.put(inBuf);
-					outBuf.flip();
-					// A new thread for every message is wildly inefficient...
-					//new I2PAppThread(new MessageDispatcher(outBuf.array()), "MessageDispatcher").start();
-					// inline
-					// Even though we could be sending messages through multiple sessions,
-					// that isn't a common use case, and blocking should be rare.
-					// Inside router context, I2CP drops on overflow.
-					(new MessageDispatcher(outBuf.array())).run();
-				}
-			}
-		}
-	}
-
-	private static class MessageDispatcher implements Runnable
-	{
-		private final ByteArrayInputStream is;
-		
-		public MessageDispatcher(byte[] buf)
-		{
-			this.is = new java.io.ByteArrayInputStream(buf) ;
-		}
-		
-		public void run() {
-			try {
-				String header = DataHelper.readLine(is).trim();
-				StringTokenizer tok = new StringTokenizer(header, " ");
-				if (tok.countTokens() != 3) {
-					// This is not a correct message, for sure
-					//_log.debug("Error in message format");
-					// FIXME log? throw?
-					return;
-				}
-				String version = tok.nextToken();
-				if (!"3.0".equals(version)) return ;
-				String nick = tok.nextToken();
-				String dest = tok.nextToken();
-
-				byte[] data = new byte[is.available()];
-				is.read(data);
-				SessionRecord rec = sSessionsHash.get(nick);
-				if (rec!=null) {
-					rec.getHandler().session.sendBytes(dest,data);
-				} else {
-					Log log = I2PAppContext.getGlobalContext().logManager().getLog(SAMv3Handler.class);
-					if (log.shouldLog(Log.WARN))
-						log.warn("Dropping datagram, no session for " + nick);
-				}
-			} catch (Exception e) {
-				Log log = I2PAppContext.getGlobalContext().logManager().getLog(SAMv3Handler.class);
-				if (log.shouldLog(Log.WARN))
-					log.warn("Error handling datagram", e);
-			}
-		}
 	}
 	
 	/**
@@ -342,6 +231,11 @@ class SAMv3Handler extends SAMv1Handler
 	public void stealSocket()
 	{
 		stolenSocket = true ;
+		if (sendPorts) {
+			try {
+			       socket.socket().setSoTimeout(0);
+			} catch (SocketException se) {}
+		}
 		this.stopHandling();
 	}
 	
@@ -353,6 +247,16 @@ class SAMv3Handler extends SAMv1Handler
 		return bridge;
 	}
 	
+	/**
+	 *  For SAMv3DatagramServer
+	 *  @return may be null
+	 *  @since 0.9.24
+	 */
+	Session getSession() {
+		return session;
+	}
+	
+	@Override
 	public void handle() {
 		String msg = null;
 		String domain = null;
@@ -366,15 +270,72 @@ class SAMv3Handler extends SAMv1Handler
 			_log.debug("SAMv3 handling started");
 
 		try {
-			InputStream in = getClientSocket().socket().getInputStream();
+			Socket socket = getClientSocket().socket();
+			InputStream in = socket.getInputStream();
 
+			StringBuilder buf = new StringBuilder(1024);
 			while (true) {
 				if (shouldStop()) {
 					if (_log.shouldLog(Log.DEBUG))
 						_log.debug("Stop request found");
 					break;
 				}
-				String line = DataHelper.readLine(in) ;
+				String line;
+				if (sendPorts) {
+					// client supports PING
+					try {
+						ReadLine.readLine(socket, buf, READ_TIMEOUT);
+						line = buf.toString();
+						buf.setLength(0);					
+					} catch (SocketTimeoutException ste) {
+						long now = System.currentTimeMillis();
+						if (buf.length() <= 0) {
+							if (_lastPing > 0) {
+								if (now - _lastPing >= READ_TIMEOUT) {
+									if (_log.shouldWarn())
+										_log.warn("Failed to respond to PING");
+									writeString("SESSION STATUS RESULT=I2P_ERROR MESSAGE=\"PONG timeout\"\n");
+									break;
+								}
+							} else {
+								if (_log.shouldDebug())
+									_log.debug("Sendng PING " + now);
+								_lastPing = now;
+								if (!writeString("PING " + now + '\n'))
+									break;
+							}
+						} else {
+							if (_lastPing > 0) {
+								if (now - _lastPing >= 2*READ_TIMEOUT) {
+									if (_log.shouldWarn())
+										_log.warn("Failed to respond to PING");
+									writeString("SESSION STATUS RESULT=I2P_ERROR MESSAGE=\"PONG timeout\"\n");
+									break;
+								}
+							} else if (_lastPing < 0) {
+								if (_log.shouldWarn())
+									_log.warn("2nd timeout");
+								writeString("SESSION STATUS RESULT=I2P_ERROR MESSAGE=\"command timeout, bye\"\n");
+								break;
+							} else {
+								// don't clear buffer, don't send ping,
+								// go around again
+								_lastPing = -1;
+								if (_log.shouldWarn())
+									_log.warn("timeout after partial: " + buf);
+							}
+						}
+						if (_log.shouldDebug())
+							_log.debug("loop after timeout");
+						continue;
+					}
+				} else {
+					buf.setLength(0);					
+					if (DataHelper.readLine(in, buf))
+						line = buf.toString();
+					else
+						line = null;
+				}
 				if (line==null) {
 					if (_log.shouldLog(Log.DEBUG))
 						_log.debug("Connection closed by client (line read : null)");
@@ -394,13 +355,33 @@ class SAMv3Handler extends SAMv1Handler
 				}
 
 				tok = new StringTokenizer(msg, " ");
-				if (tok.countTokens() < 2) {
+				int count = tok.countTokens();
+				if (count <= 0) {
 					// This is not a correct message, for sure
 					if (_log.shouldLog(Log.DEBUG))
-						_log.debug("Error in message format");
-					break;
+						_log.debug("Ignoring whitespace");
+					continue;
 				}
 				domain = tok.nextToken();
+				// these may not have a second token
+				if (domain.equals("PING")) {
+					execPingMessage(tok);
+					continue;
+				} else if (domain.equals("PONG")) {
+					execPongMessage(tok);
+					continue;
+				} else if (domain.equals("QUIT") || domain.equals("STOP") ||
+				           domain.equals("EXIT")) {
+					writeString(domain + " STATUS RESULT=OK MESSAGE=bye\n");
+					break;
+				}
+				if (count <= 1) {
+					// This is not a correct message, for sure
+					if (writeString(domain + " STATUS RESULT=I2P_ERROR MESSAGE=\"command not specified\"\n"))
+						continue;
+					else
+						break;
+				}
 				opcode = tok.nextToken();
 				if (_log.shouldLog(Log.DEBUG)) {
 					_log.debug("Parsing (domain: \"" + domain
@@ -424,6 +405,8 @@ class SAMv3Handler extends SAMv1Handler
 				} else if (domain.equals("RAW")) {
 					// TODO not yet overridden, ID is ignored, most recent RAW session is used
 					canContinue = execRawMessage(opcode, props);
+				} else if (domain.equals("AUTH")) {
+					canContinue = execAuthMessage(opcode, props);
 				} else {
 					if (_log.shouldLog(Log.DEBUG))
 						_log.debug("Unrecognized message domain: \""
@@ -434,12 +417,14 @@ class SAMv3Handler extends SAMv1Handler
 				if (!canContinue) {
 					break;
 				}
-			}
+			} // while
 		} catch (IOException e) {
 			if (_log.shouldLog(Log.DEBUG))
-				_log.debug("Caught IOException for message [" + msg + "]", e);
-		} catch (Exception e) {
-			_log.error("Unexpected exception for message [" + msg + "]", e);
+				_log.debug("Caught IOException in handler", e);
+		} catch (SAMException e) {
+			_log.error("Unexpected exception for message [" + msg + ']', e);
+		} catch (RuntimeException e) {
+			_log.error("Unexpected exception for message [" + msg + ']', e);
 		} finally {
 			if (_log.shouldLog(Log.DEBUG))
 				_log.debug("Stopping handler");
@@ -481,6 +466,8 @@ class SAMv3Handler extends SAMv1Handler
 	 */
 	@Override
 	public void stopHandling() {
+            if (_log.shouldInfo())
+                _log.info("Stopping (stolen? " + stolenSocket + "): " + this, new Exception("I did it"));
 	    synchronized (stopLock) {
 	        stopHandler = true;
 	    }
@@ -609,13 +596,13 @@ class SAMv3Handler extends SAMv1Handler
 				// Create the session
 
 				if (style.equals("RAW")) {
-					DatagramServer.getInstance(i2cpProps);
-					SAMv3RawSession v3 = newSAMRawSession(nick);
+					SAMv3DatagramServer dgs = bridge.getV3DatagramServer(props);
+					SAMv3RawSession v3 = new SAMv3RawSession(nick, dgs);
                                         rawSession = v3;
 					this.session = v3;
 				} else if (style.equals("DATAGRAM")) {
-					DatagramServer.getInstance(i2cpProps);
-					SAMv3DatagramSession v3 = newSAMDatagramSession(nick);
+					SAMv3DatagramServer dgs = bridge.getV3DatagramServer(props);
+					SAMv3DatagramSession v3 = new SAMv3DatagramSession(nick, dgs);
 					datagramSession = v3;
 					this.session = v3;
 				} else if (style.equals("STREAM")) {
@@ -667,18 +654,6 @@ class SAMv3Handler extends SAMv1Handler
 			throws IOException, DataFormatException, SAMException
 	{
 		return new SAMv3StreamSession( login ) ;
-	}
-
-	private static SAMv3RawSession newSAMRawSession(String login )
-			throws IOException, DataFormatException, SAMException, I2PSessionException
-	{
-		return new SAMv3RawSession( login ) ;
-	}
-
-	private static SAMv3DatagramSession newSAMDatagramSession(String login )
-			throws IOException, DataFormatException, SAMException, I2PSessionException
-	{
-		return new SAMv3DatagramSession( login ) ;
 	}
 
 	/* Parse and execute a STREAM message */
@@ -757,14 +732,16 @@ class SAMv3Handler extends SAMv1Handler
 
 	@Override
 	protected boolean execStreamConnect( Properties props) {
+		// Messages are NOT sent if SILENT=true,
+		// The specs said that they were.
+	    	boolean verbose = !Boolean.parseBoolean(props.getProperty("SILENT"));
 		try {
 			if (props.isEmpty()) {
-				notifyStreamResult(true,"I2P_ERROR","No parameters specified in STREAM CONNECT message");
+				notifyStreamResult(verbose, "I2P_ERROR","No parameters specified in STREAM CONNECT message");
 				if (_log.shouldLog(Log.DEBUG))
 					_log.debug("No parameters specified in STREAM CONNECT message");
 				return false;
 			}
-			boolean verbose = props.getProperty("SILENT","false").equals("false");
 		
 			String dest = props.getProperty("DESTINATION");
 			if (dest == null) {
@@ -804,11 +781,14 @@ class SAMv3Handler extends SAMv1Handler
 		return false ;
 	}
 
-	protected boolean execStreamForwardIncoming( Properties props ) {
+	private boolean execStreamForwardIncoming( Properties props ) {
+		// Messages ARE sent if SILENT=true,
+		// which is different from CONNECT and ACCEPT.
+		// But this matched the specs.
 		try {
 			try {
 				streamForwardingSocket = true ;
-				((SAMv3StreamSession)streamSession).startForwardingIncoming(props);
+				((SAMv3StreamSession)streamSession).startForwardingIncoming(props, sendPorts);
 				notifyStreamResult( true, "OK", null );
 				return true ;
 			} catch (SAMException e) {
@@ -821,9 +801,11 @@ class SAMv3Handler extends SAMv1Handler
 		return false ;		
 	}
 
-	protected boolean execStreamAccept( Properties props )
+	private boolean execStreamAccept( Properties props )
 	{
-		boolean verbose = props.getProperty( "SILENT", "false").equals("false");
+		// Messages are NOT sent if SILENT=true,
+		// The specs said that they were.
+	    	boolean verbose = !Boolean.parseBoolean(props.getProperty("SILENT"));
 		try {
 			try {
 				notifyStreamResult(verbose, "OK", null);
@@ -858,13 +840,18 @@ class SAMv3Handler extends SAMv1Handler
 		}
 	}
 
-	public void notifyStreamIncomingConnection(Destination d) throws IOException {
+	public void notifyStreamIncomingConnection(Destination d, int fromPort, int toPort) throws IOException {
 	    if (getStreamSession() == null) {
 	        _log.error("BUG! Received stream connection, but session is null!");
 	        throw new NullPointerException("BUG! STREAM session is null!");
 	    }
-
-	    if (!writeString(d.toBase64() + "\n")) {
+	    StringBuilder buf = new StringBuilder(600);
+	    buf.append(d.toBase64());
+	    if (sendPorts) {
+		buf.append(" FROM_PORT=").append(fromPort).append(" TO_PORT=").append(toPort);
+	    }
+	    buf.append('\n');
+	    if (!writeString(buf.toString())) {
 	        throw new IOException("Error notifying connection to SAM client");
 	    }
 	}
@@ -874,6 +861,91 @@ class SAMv3Handler extends SAMv1Handler
 	        throw new IOException("Error notifying connection to SAM client");
 	    }
 	}
+	
+	/** @since 0.9.24 */
+	public static void notifyStreamIncomingConnection(SocketChannel client, Destination d,
+	                                                  int fromPort, int toPort) throws IOException {
+	    if (!writeString(d.toBase64() + " FROM_PORT=" + fromPort + " TO_PORT=" + toPort + '\n', client)) {
+	        throw new IOException("Error notifying connection to SAM client");
+	    }
+	}
 
+	/** @since 0.9.24 */
+	private boolean execAuthMessage(String opcode, Properties props) {
+		if (opcode.equals("ENABLE")) {
+			i2cpProps.setProperty(SAMBridge.PROP_AUTH, "true");
+		} else if (opcode.equals("DISABLE")) {
+			i2cpProps.setProperty(SAMBridge.PROP_AUTH, "false");
+		} else if (opcode.equals("ADD")) {
+			String user = props.getProperty("USER");
+			String pw = props.getProperty("PASSWORD");
+			if (user == null || pw == null)
+				return writeString("AUTH STATUS RESULT=I2P_ERROR MESSAGE=\"USER and PASSWORD required\"\n");
+			String prop = SAMBridge.PROP_PW_PREFIX + user + SAMBridge.PROP_PW_SUFFIX;
+			if (i2cpProps.containsKey(prop))
+				return writeString("AUTH STATUS RESULT=I2P_ERROR MESSAGE=\"user " + user + " already exists\"\n");
+			PasswordManager pm = new PasswordManager(I2PAppContext.getGlobalContext());
+			String shash = pm.createHash(pw);
+			i2cpProps.setProperty(prop, shash);
+		} else if (opcode.equals("REMOVE")) {
+			String user = props.getProperty("USER");
+			if (user == null)
+				return writeString("AUTH STATUS RESULT=I2P_ERROR MESSAGE=\"USER required\"\n");
+			String prop = SAMBridge.PROP_PW_PREFIX + user + SAMBridge.PROP_PW_SUFFIX;
+			if (!i2cpProps.containsKey(prop))
+				return writeString("AUTH STATUS RESULT=I2P_ERROR MESSAGE=\"user " + user + " not found\"\n");
+			i2cpProps.remove(prop);
+		} else {
+			return writeString("AUTH STATUS RESULT=I2P_ERROR MESSAGE=\"Unknown AUTH command\"\n");
+		}
+		try {
+			bridge.saveConfig();
+			return writeString("AUTH STATUS RESULT=OK\n");
+		} catch (IOException ioe) {
+			return writeString("AUTH STATUS RESULT=I2P_ERROR MESSAGE=\"Config save failed: " + ioe + "\"\n");
+		}
+	}
+
+	/**
+	 * Handle a PING.
+	 * Send a PONG.
+	 * @since 0.9.24
+	 */
+	private void execPingMessage(StringTokenizer tok) {
+		StringBuilder buf = new StringBuilder();
+		buf.append("PONG");
+		while (tok.hasMoreTokens()) {
+			buf.append(' ').append(tok.nextToken());
+		}
+		buf.append('\n');
+		writeString(buf.toString());
+	}
+
+	/**
+	 * Handle a PONG.
+	 * @since 0.9.24
+	 */
+	private void execPongMessage(StringTokenizer tok) {
+		String s;
+		if (tok.hasMoreTokens()) {
+			s = tok.nextToken();
+		} else {
+			s = "";
+		}
+		if (_lastPing > 0) {
+			String expected = Long.toString(_lastPing);
+			if (expected.equals(s)) {
+				_lastPing = 0;
+				if (_log.shouldInfo())
+					_log.warn("Got expected pong: " + s);
+			} else {
+				if (_log.shouldInfo())
+					_log.warn("Got unexpected pong: " + s);
+			}
+		} else {
+			if (_log.shouldWarn())
+				_log.warn("Pong received without a ping: " + s);
+		}
+	}
 }
 

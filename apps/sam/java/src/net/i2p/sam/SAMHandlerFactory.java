@@ -18,6 +18,7 @@ import java.util.StringTokenizer;
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
 import net.i2p.util.Log;
+import net.i2p.util.PasswordManager;
 import net.i2p.util.VersionComparator;
 
 /**
@@ -25,7 +26,7 @@ import net.i2p.util.VersionComparator;
  */
 class SAMHandlerFactory {
 
-    private static final String VERSION = "3.1";
+    private static final String VERSION = "3.2";
 
     private static final int HELLO_TIMEOUT = 60*1000;
 
@@ -45,20 +46,17 @@ class SAMHandlerFactory {
 
         try {
             Socket sock = s.socket();
-            sock.setSoTimeout(HELLO_TIMEOUT);
             sock.setKeepAlive(true);
-            String line = DataHelper.readLine(sock.getInputStream());
+            StringBuilder buf = new StringBuilder(128);
+            ReadLine.readLine(sock, buf, HELLO_TIMEOUT);
+            String line = buf.toString();
             sock.setSoTimeout(0);
-            if (line == null) {
-                log.debug("Connection closed by client");
-                return null;
-            }
             tok = new StringTokenizer(line.trim(), " ");
         } catch (SocketTimeoutException e) {
             throw new SAMException("Timeout waiting for HELLO VERSION", e);
         } catch (IOException e) {
             throw new SAMException("Error reading from socket", e);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             throw new SAMException("Unexpected error", e);
         }
 
@@ -93,6 +91,20 @@ class SAMHandlerFactory {
             SAMHandler.writeString("HELLO REPLY RESULT=NOVERSION\n", s);
             return null;
         }
+
+        if (Boolean.parseBoolean(i2cpProps.getProperty(SAMBridge.PROP_AUTH))) {
+            String user = props.getProperty("USER");
+            String pw = props.getProperty("PASSWORD");
+            if (user == null || pw == null)
+                throw new SAMException("USER and PASSWORD required");
+            String savedPW = i2cpProps.getProperty(SAMBridge.PROP_PW_PREFIX + user + SAMBridge.PROP_PW_SUFFIX);
+            if (savedPW == null)
+                throw new SAMException("Authorization failed");
+            PasswordManager pm = new PasswordManager(I2PAppContext.getGlobalContext());
+            if (!pm.checkHash(savedPW, pw))
+                throw new SAMException("Authorization failed");
+        }
+
         // Let's answer positively
         if (!SAMHandler.writeString("HELLO REPLY RESULT=OK VERSION=" + ver + "\n", s))
             throw new SAMException("Error writing to socket");       
@@ -131,6 +143,9 @@ class SAMHandlerFactory {
         if (VersionComparator.comp(VERSION, minVer) >= 0 &&
             VersionComparator.comp(VERSION, maxVer) <= 0)
             return VERSION;
+        if (VersionComparator.comp("3.1", minVer) >= 0 &&
+            VersionComparator.comp("3.1", maxVer) <= 0)
+            return "3.1";
         // in VersionComparator, "3" < "3.0" so
         // use comparisons carefully
         if (VersionComparator.comp("3.0", minVer) >= 0 &&
