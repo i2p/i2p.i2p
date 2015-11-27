@@ -44,12 +44,13 @@ public class SAMStreamSend {
     private static I2PSSLSocketFactory _sslSocketFactory;
     
     private static final int STREAM=0, DG=1, V1DG=2, RAW=3, V1RAW=4;
-    private static final String USAGE = "Usage: SAMStreamSend [-s] [-m mode] [-v version] [-b samHost] [-p samPort] [-u user] [-w password] peerDestFile dataDir\n" +
+    private static final String USAGE = "Usage: SAMStreamSend [-s] [-m mode] [-v version] [-b samHost] [-p samPort] [-o opt=val] [-u user] [-w password] peerDestFile dataDir\n" +
                                         "       modes: stream: 0; datagram: 1; v1datagram: 2; raw: 3; v1raw: 4\n" +
-                                        "       -s: use SSL";
+                                        "       -s: use SSL\n" +
+                                        "       multiple -o session options are allowed";
 
     public static void main(String args[]) {
-        Getopt g = new Getopt("SAM", args, "sb:m:p:u:v:w:");
+        Getopt g = new Getopt("SAM", args, "sb:m:o:p:u:v:w:");
         boolean isSSL = false;
         int mode = STREAM;
         String version = "1.0";
@@ -57,6 +58,7 @@ public class SAMStreamSend {
         String port = "7656";
         String user = null;
         String password = null;
+        String opts = "";
         int c;
         while ((c = g.getopt()) != -1) {
           switch (c) {
@@ -78,6 +80,10 @@ public class SAMStreamSend {
 
             case 'b':
                 host = g.getOptarg();
+                break;
+
+            case 'o':
+                opts = opts + ' ' + g.getOptarg();
                 break;
 
             case 'p':
@@ -118,7 +124,7 @@ public class SAMStreamSend {
         I2PAppContext ctx = I2PAppContext.getGlobalContext();
         SAMStreamSend sender = new SAMStreamSend(ctx, host, port,
                                                       args[startArgs], args[startArgs + 1]);
-        sender.startup(version, isSSL, mode, user, password);
+        sender.startup(version, isSSL, mode, user, password, opts);
     }
     
     public SAMStreamSend(I2PAppContext ctx, String samHost, String samPort, String destFile, String dataFile) {
@@ -133,7 +139,7 @@ public class SAMStreamSend {
         _remotePeers = new HashMap<String, Sender>();
     }
     
-    public void startup(String version, boolean isSSL, int mode, String user, String password) {
+    public void startup(String version, boolean isSSL, int mode, String user, String password, String sessionOpts) {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Starting up");
         try {
@@ -144,7 +150,7 @@ public class SAMStreamSend {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Reader created");
             OutputStream out = sock.getOutputStream();
-            String ourDest = handshake(out, version, true, eventHandler, mode, user, password);
+            String ourDest = handshake(out, version, true, eventHandler, mode, user, password, sessionOpts);
             if (ourDest == null)
                 throw new IOException("handshake failed");
             if (_log.shouldLog(Log.DEBUG))
@@ -157,7 +163,7 @@ public class SAMStreamSend {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Reader2 created");
                 out = sock2.getOutputStream();
-                String ok = handshake(out, version, false, eventHandler, mode, user, password);
+                String ok = handshake(out, version, false, eventHandler, mode, user, password, "");
                 if (ok == null)
                     throw new IOException("2nd handshake failed");
                 if (_log.shouldLog(Log.DEBUG))
@@ -215,7 +221,8 @@ public class SAMStreamSend {
     
     /** @return our b64 dest or null */
     private String handshake(OutputStream samOut, String version, boolean isMaster,
-                             SAMEventHandler eventHandler, int mode, String user, String password) {
+                             SAMEventHandler eventHandler, int mode, String user, String password,
+                             String opts) {
         synchronized (samOut) {
             try {
                 if (user != null && password != null)
@@ -246,7 +253,7 @@ public class SAMStreamSend {
                     style = "DATAGRAM";
                 else
                     style = "RAW";
-                String req = "SESSION CREATE STYLE=" + style + " DESTINATION=TRANSIENT " + _conOptions + "\n";
+                String req = "SESSION CREATE STYLE=" + style + " DESTINATION=TRANSIENT " + _conOptions + ' ' + opts + '\n';
                 samOut.write(req.getBytes());
                 samOut.flush();
                 if (_log.shouldLog(Log.DEBUG))
