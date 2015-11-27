@@ -12,6 +12,7 @@ import java.util.Properties;
 
 import net.i2p.client.I2PSessionException;
 import net.i2p.data.DataFormatException;
+import net.i2p.data.DataHelper;
 import net.i2p.util.Log;
 
 /**
@@ -24,6 +25,7 @@ class SAMv3RawSession extends SAMRawSession  implements SAMv3Handler.Session, SA
 	private final SAMv3Handler handler;
 	private final SAMv3DatagramServer server;
 	private final SocketAddress clientAddress;
+	private final boolean _sendHeader;
 
 	public String getNick() { return nick; }
 
@@ -66,13 +68,27 @@ class SAMv3RawSession extends SAMRawSession  implements SAMv3Handler.Session, SA
 			}
 			this.clientAddress = new InetSocketAddress(host, port);
 		}
+		_sendHeader = ((handler.verMajor == 3 && handler.verMinor >= 2) || handler.verMajor > 3) &&
+                              Boolean.parseBoolean(props.getProperty("HEADER"));
 	}
 	
 	public void receiveRawBytes(byte[] data, int proto, int fromPort, int toPort) throws IOException {
 		if (this.clientAddress==null) {
 			this.handler.receiveRawBytes(data, proto, fromPort, toPort);
 		} else {
-			ByteBuffer msgBuf = ByteBuffer.allocate(data.length);
+			ByteBuffer msgBuf;
+			if (_sendHeader) {
+				StringBuilder buf = new StringBuilder(64);
+				buf.append("PROTOCOL=").append(proto)
+				   .append(" FROM_PORT=").append(fromPort)
+				   .append(" TO_PORT=").append(toPort)
+				   .append('\n');
+				String msg = buf.toString();
+				msgBuf = ByteBuffer.allocate(msg.length()+data.length);
+				msgBuf.put(DataHelper.getASCII(msg));
+			} else {
+				msgBuf = ByteBuffer.allocate(data.length);
+			}
 			msgBuf.put(data);
 			msgBuf.flip();
 			this.server.send(this.clientAddress, msgBuf);

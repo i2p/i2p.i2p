@@ -49,9 +49,9 @@ public class SAMStreamSink {
     private final Map<String, Sink> _remotePeers;
     private static I2PSSLSocketFactory _sslSocketFactory;
     
-    private static final int STREAM=0, DG=1, V1DG=2, RAW=3, V1RAW=4;
+    private static final int STREAM=0, DG=1, V1DG=2, RAW=3, V1RAW=4, RAWHDR = 5;
     private static final String USAGE = "Usage: SAMStreamSink [-s] [-m mode] [-v version] [-b samHost] [-p samPort] [-o opt=val] [-u user] [-w password] myDestFile sinkDir\n" +
-                                        "       modes: stream: 0; datagram: 1; v1datagram: 2; raw: 3; v1raw: 4\n" +
+                                        "       modes: stream: 0; datagram: 1; v1datagram: 2; raw: 3; v1raw: 4 raw-with-headers: 5\n" +
                                         "       -s: use SSL\n" +
                                         "       multiple -o session options are allowed";
     private static final int V3DGPORT=9999;
@@ -75,7 +75,7 @@ public class SAMStreamSink {
 
             case 'm':
                 mode = Integer.parseInt(g.getOptarg());
-                if (mode < 0 || mode > V1RAW) {
+                if (mode < 0 || mode > RAWHDR) {
                     System.err.println(USAGE);
                     return;
                 }
@@ -180,7 +180,7 @@ public class SAMStreamSink {
                     throw new IOException("2nd handshake failed");
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Handshake2 complete.");
-            } else if (_isV3 && (mode == DG || mode == RAW)) {
+            } else if (_isV3 && (mode == DG || mode == RAW || mode == RAWHDR)) {
                 // set up a listening DatagramSocket
                 (new DGRcvr(mode)).start();
             }
@@ -207,21 +207,25 @@ public class SAMStreamSink {
                     int off = p.getOffset();
                     byte[] data = p.getData();
                     _log.info("Got datagram length " + len);
-                    if (_mode == DG) {
+                    if (_mode == DG || _mode == RAWHDR) {
                         ByteArrayInputStream bais = new ByteArrayInputStream(data, off, len);
                         String line = DataHelper.readLine(bais);
                         if (line == null) {
                             _log.error("DGRcvr no header line");
                             continue;
                         }
-                        if (line.length() < 516) {
+                        if (_mode == DG && line.length() < 516) {
                             _log.error("DGRcvr line too short: \"" + line + '\n');
                             continue;
                         }
                         String[] parts = line.split(" ");
-                        String dest = parts[0];
-                        _log.info("DG is from " + dest);
-                        for (int i = 1; i < parts.length; i++) {
+                        int i = 0;
+                        if (_mode == DG) {
+                            String dest = parts[0];
+                            _log.info("DG is from " + dest);
+                            i++;
+                        }
+                        for ( ; i < parts.length; i++) {
                             _log.info("Parameter: " + parts[i]);
                         }
                         int left = bais.available();
@@ -530,8 +534,10 @@ public class SAMStreamSink {
                     style = "DATAGRAM PORT=" + V3DGPORT;
                 else if (mode == V1RAW)
                     style = "RAW";
-                else
+                else if (mode == RAW)
                     style = "RAW PORT=" + V3DGPORT;
+                else
+                    style = "RAW HEADER=true PORT=" + V3DGPORT;
                 String req = "SESSION CREATE STYLE=" + style + " DESTINATION=" + dest + ' ' + _conOptions + ' ' + sopts + '\n';
                 samOut.write(req.getBytes());
                 samOut.flush();
