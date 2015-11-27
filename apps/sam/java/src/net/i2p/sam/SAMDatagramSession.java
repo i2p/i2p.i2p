@@ -106,12 +106,12 @@ class SAMDatagramSession extends SAMMessageSession {
             }
         } catch (DataFormatException e) {
             if (_log.shouldLog(Log.DEBUG)) {
-                _log.debug("Dropping ill-formatted I2P repliable datagram");
+                _log.debug("Dropping ill-formatted I2P repliable datagram", e);
             }
             return;
         } catch (I2PInvalidDatagramException e) {
             if (_log.shouldLog(Log.DEBUG)) {
-                _log.debug("Dropping ill-signed I2P repliable datagram");
+                _log.debug("Dropping ill-signed I2P repliable datagram", e);
             }
             return;
         }
