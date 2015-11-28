@@ -116,6 +116,8 @@ public class I2PSocketEepGet extends EepGet {
             URI url = new URI(_actualURL);
             if ("http".equals(url.getScheme())) {
                 String host = url.getHost();
+                if (host == null)
+                    throw new MalformedURLException("no hostname: " + _actualURL);
                 int port = url.getPort();
                 if (port <= 0 || port > 65535)
                     port = 80;

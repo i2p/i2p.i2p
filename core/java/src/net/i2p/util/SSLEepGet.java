@@ -560,6 +560,8 @@ public class SSLEepGet extends EepGet {
             URI url = new URI(_actualURL);
             if ("https".equals(url.getScheme())) {
                 host = url.getHost();
+                if (host == null)
+                    throw new MalformedURLException("Bad URL");
                 if (host.toLowerCase(Locale.US).endsWith(".i2p"))
                     throw new MalformedURLException("I2P addresses unsupported");
                 port = url.getPort();
