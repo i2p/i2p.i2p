@@ -266,6 +266,9 @@ class SAMUtils {
                 case '=':
                     if (isQuoted) {
                         buf.append(c);
+                    } else if (key != null) {
+                        // '=' in a value
+                        buf.append(c);
                     } else {
                         if (buf.length() == 0)
                             throw new SAMException("Empty parameter name");
