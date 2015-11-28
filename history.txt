@@ -2,6 +2,10 @@
  * i2psnark:
    - Fix NPE caused by URL-to-URI conversion in -2 (ticket #1715)
    - Increase max pieces to 32K
+ * SAM:
+   - Fix parser to allow spaces in quoted values (tickets #1325, #1488)
+   - Handle UTF-8 in ReadLine (ticket #1488)
+   - 3.2 complete (ticket #1574)
 
 2015-11-27 zzz
  * SAM:
