@@ -1,15 +1,26 @@
+2015-11-28 zzz
+ * i2psnark:
+   - Fix NPE caused by URL-to-URI conversion in -2 (ticket #1715)
+   - Increase max pieces to 32K
+
+2015-11-27 zzz
+ * SAM:
+   - Use DataHelper to load/store sam.keys
+   - Move sam.keys to config dir (ticket #677)
+
 2015-11-27 zzz
 Prop from i2p.i2p.zzz.sam:
  * PasswordManager: new methods for use by SAM
  * SAM:
    - Use getopt for SAM args processing
    - Change default host from 0.0.0.0 to 127.0.0.1
-   - Add SSL support with -s option
+   - Add SSL support with -s option (ticket #1106)
    - Add -c configfile option, default sam.config
-   - Add protocol and port notification
-   - Add authorization options in HELLO
+   - Add protocol and port notification (ticket #1323)
+   - Add authorization options in HELLO (ticket #1106)
    - Add AUTH commands: ENABLE, DISABLE, ADD, REMOVE
-   - Add PING, PONG, QUIT, STOP, EXIT commands
+   - Add PING, PONG commands (tickets #1572, #1573)
+   - Add QUIT, STOP, EXIT commands
    - Add SSL option for STREAM FORWARD
    - Move DatagramServer from SAMv3Handler to its own file
    - Make DatagramServer a Handler, register with bridge
@@ -18,7 +29,7 @@ Prop from i2p.i2p.zzz.sam:
    - Add HEADER option for RAW forwarding
    - Better exception handling
    - Extensive enhancements to Java client for testing
-   - Bump version to 3.2
+   - Bump version to 3.2 (ticket #1574)
  * Streaming: Fix recognition of PoisonPacket in ConnectionHandler
 
 2015-11-22 zzz
