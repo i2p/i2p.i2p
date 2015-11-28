@@ -307,7 +307,7 @@ public class SAMStreamSink {
                 try {
                     Thread.sleep(127*1000);
                     synchronized(_out) {
-                        _out.write(DataHelper.getASCII("PING " + System.currentTimeMillis() + '\n'));
+                        _out.write(DataHelper.getUTF8("PING " + System.currentTimeMillis() + '\n'));
                         _out.flush();
                     }
                 } catch (InterruptedException ie) {
@@ -377,7 +377,7 @@ public class SAMStreamSink {
                 _log.info("Got PING " + data + ", sending PONG " + data);
             synchronized (_out) {
                 try {
-                    _out.write(("PONG " + data + '\n').getBytes());
+                    _out.write(("PONG " + data + '\n').getBytes("UTF-8"));
                     _out.flush();
                 } catch (IOException ioe) {
                     _log.error("PONG fail", ioe);
@@ -514,9 +514,9 @@ public class SAMStreamSink {
         synchronized (samOut) {
             try {
                 if (user != null && password != null)
-                    samOut.write(("HELLO VERSION MIN=1.0 MAX=" + version + " USER=" + user + " PASSWORD=" + password + '\n').getBytes());
+                    samOut.write(("HELLO VERSION MIN=1.0 MAX=" + version + " USER=" + user + " PASSWORD=" + password + '\n').getBytes("UTF-8"));
                 else
-                    samOut.write(("HELLO VERSION MIN=1.0 MAX=" + version + '\n').getBytes());
+                    samOut.write(("HELLO VERSION MIN=1.0 MAX=" + version + '\n').getBytes("UTF-8"));
                 samOut.flush();
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Hello sent");
@@ -536,7 +536,7 @@ public class SAMStreamSink {
                         req = "STREAM FORWARD ID=" + _v3ID + " PORT=" + V3FORWARDPORT + '\n';
                     else
                         throw new IllegalStateException("mode " + mode);
-                    samOut.write(req.getBytes());
+                    samOut.write(req.getBytes("UTF-8"));
                     samOut.flush();
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("STREAM ACCEPT/FORWARD sent");
@@ -600,7 +600,7 @@ public class SAMStreamSink {
                 else
                     style = "RAW HEADER=true PORT=" + V3DGPORT;
                 String req = "SESSION CREATE STYLE=" + style + " DESTINATION=" + dest + ' ' + _conOptions + ' ' + sopts + '\n';
-                samOut.write(req.getBytes());
+                samOut.write(req.getBytes("UTF-8"));
                 samOut.flush();
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Session create sent");
@@ -612,7 +612,7 @@ public class SAMStreamSink {
                         _log.debug("Session create reply found: " + ok);
                 }
                 req = "NAMING LOOKUP NAME=ME\n";
-                samOut.write(req.getBytes());
+                samOut.write(req.getBytes("UTF-8"));
                 samOut.flush();
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Naming lookup sent");
@@ -649,7 +649,7 @@ public class SAMStreamSink {
         FileOutputStream fos = null;
         try {
             fos = new FileOutputStream(f);
-            fos.write(dest.getBytes());
+            fos.write(dest.getBytes("UTF-8"));
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("My destination written to " + _destFile);
         } catch (IOException e) {

@@ -98,6 +98,7 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
         String opcode = null;
         boolean canContinue = false;
         Properties props;
+        final StringBuilder buf = new StringBuilder(128);
 
         this.thread.setName("SAMv1Handler " + _id);
         if (_log.shouldLog(Log.DEBUG))
@@ -120,19 +121,13 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
                 	_log.info("Connection closed by client");
                 	break;
                 }
-                java.io.InputStream is = clientSocketChannel.socket().getInputStream();
-                if (is == null) {
-                	_log.info("Connection closed by client");
-                	break;
-                }
-                msg = DataHelper.readLine(is);
-                if (msg == null) {
-                    _log.info("Connection closed by client (line read : null)");
-                    break;
-                }
+                buf.setLength(0);
+                // TODO set timeout first time
+                ReadLine.readLine(clientSocketChannel.socket(), buf, 0);
+                msg = buf.toString();
 
                 if (_log.shouldLog(Log.DEBUG)) {
-                    _log.debug("New message received: [" + msg + "]");
+                    _log.debug("New message received: [" + msg + ']');
                 }
                 props = SAMUtils.parseParams(msg);
                 domain = props.getProperty(SAMUtils.COMMAND);

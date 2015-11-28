@@ -57,6 +57,8 @@ class SAMHandlerFactory {
         } catch (RuntimeException e) {
             throw new SAMException("Unexpected error", e);
         }
+        if (log.shouldDebug())
+            log.debug("New message received: [" + line + ']');
 
         // Message format: HELLO VERSION [MIN=v1] [MAX=v2]
         Properties props = SAMUtils.parseParams(line);

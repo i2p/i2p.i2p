@@ -329,21 +329,13 @@ class SAMv3Handler extends SAMv1Handler
 					}
 				} else {
 					buf.setLength(0);					
-					if (DataHelper.readLine(in, buf))
-						line = buf.toString();
-					else
-						line = null;
-				}
-				if (line==null) {
-					if (_log.shouldLog(Log.DEBUG))
-						_log.debug("Connection closed by client (line read : null)");
-					break;
+					// TODO first time, set a timeout
+					ReadLine.readLine(socket, buf, 0);
+					line = buf.toString();
 				}
 
-				if (_log.shouldLog(Log.DEBUG)) {
-					if (_log.shouldLog(Log.DEBUG))
-						_log.debug("New message received: [" + msg + "]");
-				}
+				if (_log.shouldLog(Log.DEBUG))
+					_log.debug("New message received: [" + line + ']');
 				props = SAMUtils.parseParams(line);
 				domain = props.getProperty(SAMUtils.COMMAND);
 				if (domain == null) {
