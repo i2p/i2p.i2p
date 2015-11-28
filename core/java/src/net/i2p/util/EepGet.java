@@ -1520,7 +1520,7 @@ public class EepGet {
         String key = null;
         for (int i = 0; i < data.length; i++) {
             switch (data[i]) {
-                case '\"':
+                case '"':
                     if (isQuoted) {
                         // keys never quoted
                         if (key != null) {

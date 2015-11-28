@@ -180,10 +180,10 @@ class SAMUtils {
      *  PING any   thing goes
      *  PONG any   thing   goes
      *
-     *  No escaping of '"' or anything else is allowed or defined
+     *  Escaping is allowed with a backslash, e.g. \"
      *  No spaces before or after '=' allowed
      *  Keys may not be quoted
-     *  COMMAND and OPCODE may not have '='
+     *  COMMAND, OPCODE, and keys may not have '=' or whitespace unless escaped
      *  Duplicate keys not allowed
      *</pre>
      *
@@ -273,6 +273,12 @@ class SAMUtils {
                         buf.setLength(0);
                     }
                     break;
+
+                case '\\':
+                    if (++i >= length)
+                        throw new SAMException("Unterminated escape");
+                    c = args.charAt(i);
+                    // fall through...
 
                 default:
                     buf.append(c);
