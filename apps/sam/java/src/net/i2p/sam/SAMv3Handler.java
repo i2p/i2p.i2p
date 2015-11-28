@@ -24,7 +24,6 @@ import java.nio.channels.SocketChannel;
 import java.nio.ByteBuffer;
 import java.util.Properties;
 import java.util.HashMap;
-import java.util.StringTokenizer;
 
 import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
@@ -262,7 +261,6 @@ class SAMv3Handler extends SAMv1Handler
 		String domain = null;
 		String opcode = null;
 		boolean canContinue = false;
-		StringTokenizer tok;
 		Properties props;
 
 		this.thread.setName("SAMv3Handler " + _id);
@@ -341,53 +339,46 @@ class SAMv3Handler extends SAMv1Handler
 						_log.debug("Connection closed by client (line read : null)");
 					break;
 				}
-				msg = line.trim();
 
 				if (_log.shouldLog(Log.DEBUG)) {
 					if (_log.shouldLog(Log.DEBUG))
 						_log.debug("New message received: [" + msg + "]");
 				}
-
-				if(msg.equals("")) {
+				props = SAMUtils.parseParams(line);
+				domain = props.getProperty(SAMUtils.COMMAND);
+				if (domain == null) {
 					if (_log.shouldLog(Log.DEBUG))
 						_log.debug("Ignoring newline");
 					continue;
 				}
-
-				tok = new StringTokenizer(msg, " ");
-				int count = tok.countTokens();
-				if (count <= 0) {
-					// This is not a correct message, for sure
-					if (_log.shouldLog(Log.DEBUG))
-						_log.debug("Ignoring whitespace");
-					continue;
+				opcode = props.getProperty(SAMUtils.OPCODE);
+				props.remove(SAMUtils.COMMAND);
+				props.remove(SAMUtils.OPCODE);
+				if (_log.shouldLog(Log.DEBUG)) {
+					_log.debug("Parsing (domain: \"" + domain
+							+ "\"; opcode: \"" + opcode + "\")");
 				}
-				domain = tok.nextToken();
+
 				// these may not have a second token
 				if (domain.equals("PING")) {
-					execPingMessage(tok);
+					execPingMessage(opcode);
 					continue;
 				} else if (domain.equals("PONG")) {
-					execPongMessage(tok);
+					execPongMessage(opcode);
 					continue;
 				} else if (domain.equals("QUIT") || domain.equals("STOP") ||
 				           domain.equals("EXIT")) {
 					writeString(domain + " STATUS RESULT=OK MESSAGE=bye\n");
 					break;
 				}
-				if (count <= 1) {
+
+				if (opcode == null) {
 					// This is not a correct message, for sure
 					if (writeString(domain + " STATUS RESULT=I2P_ERROR MESSAGE=\"command not specified\"\n"))
 						continue;
 					else
 						break;
 				}
-				opcode = tok.nextToken();
-				if (_log.shouldLog(Log.DEBUG)) {
-					_log.debug("Parsing (domain: \"" + domain
-							+ "\"; opcode: \"" + opcode + "\")");
-				}
-				props = SAMUtils.parseParams(tok);
 
 				if (domain.equals("STREAM")) {
 					canContinue = execStreamMessage(opcode, props);
@@ -909,13 +900,15 @@ class SAMv3Handler extends SAMv1Handler
 	/**
 	 * Handle a PING.
 	 * Send a PONG.
+	 *
+	 * @param msg to append, may be null
 	 * @since 0.9.24
 	 */
-	private void execPingMessage(StringTokenizer tok) {
+	private void execPingMessage(String msg) {
 		StringBuilder buf = new StringBuilder();
 		buf.append("PONG");
-		while (tok.hasMoreTokens()) {
-			buf.append(' ').append(tok.nextToken());
+		if (msg != null) {
+			buf.append(' ').append(msg);
 		}
 		buf.append('\n');
 		writeString(buf.toString());
@@ -923,13 +916,12 @@ class SAMv3Handler extends SAMv1Handler
 
 	/**
 	 * Handle a PONG.
+	 *
+	 * @param s received, may be null
 	 * @since 0.9.24
 	 */
-	private void execPongMessage(StringTokenizer tok) {
-		String s;
-		if (tok.hasMoreTokens()) {
-			s = tok.nextToken();
-		} else {
+	private void execPongMessage(String s) {
+		if (s == null) {
 			s = "";
 		}
 		if (_lastPing > 0) {

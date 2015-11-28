@@ -13,7 +13,6 @@ import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.nio.channels.SocketChannel;
 import java.util.Properties;
-import java.util.StringTokenizer;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
@@ -41,7 +40,7 @@ class SAMHandlerFactory {
      */
     public static SAMHandler createSAMHandler(SocketChannel s, Properties i2cpProps,
                                               SAMBridge parent) throws SAMException {
-        StringTokenizer tok;
+        String line;
         Log log = I2PAppContext.getGlobalContext().logManager().getLog(SAMHandlerFactory.class);
 
         try {
@@ -49,9 +48,8 @@ class SAMHandlerFactory {
             sock.setKeepAlive(true);
             StringBuilder buf = new StringBuilder(128);
             ReadLine.readLine(sock, buf, HELLO_TIMEOUT);
-            String line = buf.toString();
             sock.setSoTimeout(0);
-            tok = new StringTokenizer(line.trim(), " ");
+            line = buf.toString();
         } catch (SocketTimeoutException e) {
             throw new SAMException("Timeout waiting for HELLO VERSION", e);
         } catch (IOException e) {
@@ -61,15 +59,13 @@ class SAMHandlerFactory {
         }
 
         // Message format: HELLO VERSION [MIN=v1] [MAX=v2]
-        if (tok.countTokens() < 2) {
+        Properties props = SAMUtils.parseParams(line);
+        if (!"HELLO".equals(props.getProperty(SAMUtils.COMMAND)) ||
+            !"VERSION".equals(props.getProperty(SAMUtils.OPCODE))) {
             throw new SAMException("Must start with HELLO VERSION");
         }
-        if (!tok.nextToken().equals("HELLO") ||
-            !tok.nextToken().equals("VERSION")) {
-            throw new SAMException("Must start with HELLO VERSION");
-        }
-
-        Properties props = SAMUtils.parseParams(tok);
+        props.remove(SAMUtils.COMMAND);
+        props.remove(SAMUtils.OPCODE);
 
         String minVer = props.getProperty("MIN");
         if (minVer == null) {

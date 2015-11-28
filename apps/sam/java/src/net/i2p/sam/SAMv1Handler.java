@@ -18,7 +18,6 @@ import java.net.NoRouteToHostException;
 import java.nio.channels.SocketChannel;
 import java.nio.ByteBuffer;
 import java.util.Properties;
-import java.util.StringTokenizer;
 import java.util.concurrent.atomic.AtomicLong;
 
 import net.i2p.I2PException;
@@ -98,7 +97,6 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
         String domain = null;
         String opcode = null;
         boolean canContinue = false;
-        StringTokenizer tok;
         Properties props;
 
         this.thread.setName("SAMv1Handler " + _id);
@@ -132,32 +130,29 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
                     _log.info("Connection closed by client (line read : null)");
                     break;
                 }
-                msg = msg.trim();
 
                 if (_log.shouldLog(Log.DEBUG)) {
                     _log.debug("New message received: [" + msg + "]");
                 }
-
-                if(msg.equals("")) {
+                props = SAMUtils.parseParams(msg);
+                domain = props.getProperty(SAMUtils.COMMAND);
+                if (domain == null) {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Ignoring newline");
                     continue;
                 }
-
-                tok = new StringTokenizer(msg, " ");
-                if (tok.countTokens() < 2) {
-                    // This is not a correct message, for sure
+                opcode = props.getProperty(SAMUtils.OPCODE);
+                if (opcode == null) {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Error in message format");
                     break;
                 }
-                domain = tok.nextToken();
-                opcode = tok.nextToken();
+                props.remove(SAMUtils.COMMAND);
+                props.remove(SAMUtils.OPCODE);
                 if (_log.shouldLog(Log.DEBUG)) {
                     _log.debug("Parsing (domain: \"" + domain
                                + "\"; opcode: \"" + opcode + "\")");
                 }
-                props = SAMUtils.parseParams(tok);
 
                 if (domain.equals("STREAM")) {
                     canContinue = execStreamMessage(opcode, props);

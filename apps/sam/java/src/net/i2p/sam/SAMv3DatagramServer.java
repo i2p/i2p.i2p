@@ -135,6 +135,7 @@ class SAMv3DatagramServer implements Handler {
 		public void run() {
 			try {
 				String header = DataHelper.readLine(is).trim();
+				// we cannot use SAMUtils.parseParams() here
 				StringTokenizer tok = new StringTokenizer(header, " ");
 				if (tok.countTokens() < 3) {
 					// This is not a correct message, for sure
