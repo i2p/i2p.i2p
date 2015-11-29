@@ -604,11 +604,13 @@ class PeerCoordinator implements PeerListener
             bitfield = storage.getBitField();
         else
             bitfield = null;
+        // if we aren't a seed but we don't want any more
+        final boolean partialComplete = wantedBytes == 0 && bitfield != null && !bitfield.complete();
         Runnable r = new Runnable()
           {
             public void run()
             {
-              peer.runConnection(_util, listener, bitfield, magnetState);
+              peer.runConnection(_util, listener, bitfield, magnetState, partialComplete);
             }
           };
         String threadName = "Snark peer " + peer.toString();

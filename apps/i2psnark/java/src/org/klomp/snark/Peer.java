@@ -217,9 +217,11 @@ public class Peer implements Comparable<Peer>
    *
    * If the given BitField is non-null it is send to the peer as first
    * message.
+   *
+   * @param uploadOnly if we are complete with skipped files, i.e. a partial seed
    */
-  public void runConnection(I2PSnarkUtil util, PeerListener listener, BitField bitfield, MagnetState mState)
-  {
+  public void runConnection(I2PSnarkUtil util, PeerListener listener, BitField bitfield,
+                            MagnetState mState, boolean uploadOnly) {
     if (state != null)
       throw new IllegalStateException("Peer already started");
 
@@ -275,16 +277,8 @@ public class Peer implements Comparable<Peer>
             int metasize = metainfo != null ? metainfo.getInfoBytes().length : -1;
             boolean pexAndMetadata = metainfo == null || !metainfo.isPrivate();
             boolean dht = util.getDHT() != null;
-            out.sendExtension(0, ExtensionHandler.getHandshake(metasize, pexAndMetadata, dht));
+            out.sendExtension(0, ExtensionHandler.getHandshake(metasize, pexAndMetadata, dht, uploadOnly));
         }
-
-        // Old DHT PORT message
-        //if ((options & OPTION_I2P_DHT) != 0 && util.getDHT() != null) {
-        //    if (_log.shouldLog(Log.DEBUG))
-        //        _log.debug("Peer supports DHT, sending PORT message");
-        //    int port = util.getDHT().getPort();
-        //    out.sendPort(port);
-        //}
 
         // Send our bitmap
         if (bitfield != null)
