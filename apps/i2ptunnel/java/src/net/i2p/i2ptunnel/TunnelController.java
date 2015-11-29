@@ -24,6 +24,7 @@ import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 import net.i2p.util.SecureFile;
 import net.i2p.util.SecureFileOutputStream;
+import net.i2p.util.SystemVersion;
 
 /**
  * Coordinate the runtime operation and configuration of a single I2PTunnel.
@@ -103,10 +104,17 @@ public class TunnelController implements Logging {
      *  This is guaranteed to be available.
      *  @since 0.9.17
      */
-    public static final SigType PREFERRED_SIGTYPE = SigType.ECDSA_SHA256_P256.isAvailable() ?
-                                                    SigType.ECDSA_SHA256_P256 :
-                                                    SigType.DSA_SHA1;
-
+    public static final SigType PREFERRED_SIGTYPE;
+    static {
+        if (SystemVersion.isARM() || SystemVersion.isGNU() || SystemVersion.isAndroid()) {
+            if (SigType.ECDSA_SHA256_P256.isAvailable())
+                PREFERRED_SIGTYPE = SigType.ECDSA_SHA256_P256;
+            else
+                PREFERRED_SIGTYPE = SigType.DSA_SHA1;
+        } else {
+            PREFERRED_SIGTYPE = SigType.EdDSA_SHA512_Ed25519;
+        }
+    }
 
     /**
      * Create a new controller for a tunnel out of the specific config options.
@@ -185,8 +193,10 @@ public class TunnelController implements Logging {
             if (backupDir.isDirectory() || backupDir.mkdir()) {
                 String name = b32 + '-' + I2PAppContext.getGlobalContext().clock().now() + ".dat";
                 File backup = new File(backupDir, name);
-                if (FileUtil.copy(keyFile, backup, false, true))
+                if (FileUtil.copy(keyFile, backup, false, true)) {
+                    SecureFileOutputStream.setPerms(backup);
                     log("Private key backup saved to " + backup.getAbsolutePath());
+                }
             }
         } catch (I2PException ie) {
             if (_log.shouldLog(Log.ERROR))
