@@ -7,6 +7,7 @@ import java.util.Properties;
 import java.util.StringTokenizer;
 
 import net.i2p.I2PAppContext;
+import net.i2p.client.I2PSession;
 import net.i2p.data.DataHelper;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
@@ -272,7 +273,7 @@ public class SAMReader {
                 String pr = params.getProperty("PROTOCOL");
                 int fromPort = 0;
                 int toPort = 0;
-                int protocol = 18;
+                int protocol = I2PSession.PROTO_DATAGRAM_RAW;
                 try {
                     if (fp != null)
                         fromPort = Integer.parseInt(fp);
