@@ -54,6 +54,7 @@ class SAMv3Handler extends SAMv1Handler
 	private volatile boolean streamForwardingSocket;
 	private final boolean sendPorts;
 	private long _lastPing;
+	private static final int FIRST_READ_TIMEOUT = 60*1000;
 	private static final int READ_TIMEOUT = 3*60*1000;
 	
 	interface Session {
@@ -272,6 +273,7 @@ class SAMv3Handler extends SAMv1Handler
 			InputStream in = socket.getInputStream();
 
 			StringBuilder buf = new StringBuilder(1024);
+			boolean gotFirstLine = false;
 			while (true) {
 				if (shouldStop()) {
 					if (_log.shouldLog(Log.DEBUG))
@@ -329,23 +331,28 @@ class SAMv3Handler extends SAMv1Handler
 					}
 				} else {
 					buf.setLength(0);					
-					// TODO first time, set a timeout
-					ReadLine.readLine(socket, buf, 0);
+					// first time, set a timeout
+					try {
+						ReadLine.readLine(socket, buf, gotFirstLine ? 0 : FIRST_READ_TIMEOUT);
+						socket.setSoTimeout(0);
+					} catch (SocketTimeoutException ste) {
+						writeString("SESSION STATUS RESULT=I2P_ERROR MESSAGE=\"command timeout, bye\"\n");
+						break;
+					}
 					line = buf.toString();
 				}
 
 				if (_log.shouldLog(Log.DEBUG))
 					_log.debug("New message received: [" + line + ']');
 				props = SAMUtils.parseParams(line);
-				domain = props.getProperty(SAMUtils.COMMAND);
+				domain = (String) props.remove(SAMUtils.COMMAND);
 				if (domain == null) {
 					if (_log.shouldLog(Log.DEBUG))
 						_log.debug("Ignoring newline");
 					continue;
 				}
-				opcode = props.getProperty(SAMUtils.OPCODE);
-				props.remove(SAMUtils.COMMAND);
-				props.remove(SAMUtils.OPCODE);
+				gotFirstLine = true;
+				opcode = (String) props.remove(SAMUtils.OPCODE);
 				if (_log.shouldLog(Log.DEBUG)) {
 					_log.debug("Parsing (domain: \"" + domain
 							+ "\"; opcode: \"" + opcode + "\")");

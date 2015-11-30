@@ -62,12 +62,10 @@ class SAMHandlerFactory {
 
         // Message format: HELLO VERSION [MIN=v1] [MAX=v2]
         Properties props = SAMUtils.parseParams(line);
-        if (!"HELLO".equals(props.getProperty(SAMUtils.COMMAND)) ||
-            !"VERSION".equals(props.getProperty(SAMUtils.OPCODE))) {
+        if (!"HELLO".equals(props.remove(SAMUtils.COMMAND)) ||
+            !"VERSION".equals(props.remove(SAMUtils.OPCODE))) {
             throw new SAMException("Must start with HELLO VERSION");
         }
-        props.remove(SAMUtils.COMMAND);
-        props.remove(SAMUtils.OPCODE);
 
         String minVer = props.getProperty("MIN");
         if (minVer == null) {
