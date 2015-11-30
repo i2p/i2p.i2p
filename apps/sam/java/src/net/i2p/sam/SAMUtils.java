@@ -82,6 +82,7 @@ class SAMUtils {
      *
      * @return True if the destination is valid, false otherwise
      */
+/****
     public static boolean checkDestination(String dest) {
         try {
             Destination d = new Destination();
@@ -92,6 +93,7 @@ class SAMUtils {
             return false;
         }
     }
+****/
 
     /**
      * Check whether a base64-encoded {dest,privkey,signingprivkey} is valid
@@ -105,8 +107,7 @@ class SAMUtils {
             return false;
     	ByteArrayInputStream destKeyStream = new ByteArrayInputStream(b);
     	try {
-    		Destination d = new Destination();
-    		d.readBytes(destKeyStream);
+    		Destination d = Destination.create(destKeyStream);
     		new PrivateKey().readBytes(destKeyStream);
     		SigningPrivateKey spk = new SigningPrivateKey(d.getSigningPublicKey().getType());
     		spk.readBytes(destKeyStream);

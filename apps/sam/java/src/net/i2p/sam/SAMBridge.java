@@ -207,8 +207,8 @@ public class SAMBridge implements Runnable, ClientApp {
      *
      * @param name name of the destination
      * @return null if the name does not exist, or if it is improperly formatted
-     * @deprecated unused
      */
+/****
     public Destination getDestination(String name) {
         synchronized (nameToPrivKeys) {
             String val = nameToPrivKeys.get(name);
@@ -224,6 +224,7 @@ public class SAMBridge implements Runnable, ClientApp {
             }
         }
     }
+****/
     
     /**
      * Retrieve the I2P private keystream for the given name, formatted
