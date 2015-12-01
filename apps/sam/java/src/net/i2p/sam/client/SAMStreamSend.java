@@ -69,7 +69,7 @@ public class SAMStreamSend {
         String port = "7656";
         String user = null;
         String password = null;
-        String opts = "";
+        String opts = "inbound.length=0 outbound.length=0";
         int c;
         while ((c = g.getopt()) != -1) {
           switch (c) {

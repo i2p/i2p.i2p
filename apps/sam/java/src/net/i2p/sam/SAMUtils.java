@@ -167,7 +167,7 @@ class SAMUtils {
      *  Parse SAM parameters, and put them into a Propetries object
      *
      *  Modified from EepGet.
-     *  All keys, major, and minor are mapped to upper case.
+     *  COMMAND and OPCODE are mapped to upper case; keys, values, and ping data are not.
      *  Double quotes around values are stripped.
      *
      *  Possible input:
@@ -241,8 +241,9 @@ class SAMUtils {
                             key = null;
                         } else if (buf.length() > 0) {
                             // key without value
-                            String k = buf.toString().trim().toUpperCase(Locale.US);
+                            String k = buf.toString();
                             if (rv.isEmpty()) {
+                                k =  k.toUpperCase(Locale.US);
                                 rv.setProperty(COMMAND, k);
                                 if (k.equals("PING") || k.equals("PONG")) {
                                     // eat the rest of the line
@@ -254,7 +255,7 @@ class SAMUtils {
                                     i = length + 1;
                                 }
                             } else if (rv.size() == 1) {
-                                rv.setProperty(OPCODE, k);
+                                rv.setProperty(OPCODE, k.toUpperCase(Locale.US));
                             } else {
                                 if (rv.setProperty(k, "true") != null)
                                     throw new SAMException("Duplicate parameter " + k);
@@ -273,7 +274,7 @@ class SAMUtils {
                     } else {
                         if (buf.length() == 0)
                             throw new SAMException("Empty parameter name");
-                        key = buf.toString().toUpperCase(Locale.US);
+                        key = buf.toString();
                         buf.setLength(0);
                     }
                     break;

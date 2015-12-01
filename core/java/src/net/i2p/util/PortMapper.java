@@ -30,6 +30,10 @@ public class PortMapper {
     public static final String SVC_SMTP = "SMTP";
     public static final String SVC_POP = "POP3";
     public static final String SVC_SAM = "SAM";
+    /** @since 0.9.24 */
+    public static final String SVC_SAM_UDP = "SAM-UDP";
+    /** @since 0.9.24 */
+    public static final String SVC_SAM_SSL = "SAM-SSL";
     public static final String SVC_BOB = "BOB";
     /** not necessary, already in config? */
     public static final String SVC_I2CP = "I2CP";

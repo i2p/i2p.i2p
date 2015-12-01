@@ -1,7 +1,33 @@
+2015-12-01 zzz
+ * i2psnark:
+   - Consolidate default tunnel length definition
+   - Increase max peers and uploaders per torrent
+   - Increase default max total uploaders
+   - Increase max peers sent and returned in DHT
+* SAM:
+   - Don't map keys to upper case in parser, corrupts I2CP options
+   - Register SSL and UDP ports with PortMapper
+* SSU: Allow IP and port in relay request if it matches the source
+* Transport: Interrupt DH refiller thread when pool is empty,
+  to speed refilling and reduce pumper stalls
+
+2015-11-30 zzz
+ * SAM:
+   - Timeout for first command after HELLO
+   - Send error message if no NAME key in LOOKUP
+   - Destination caching enhancements
+   - Client: Add SSL forward support, handle header line in forwarded stream
+
+2015-11-29 zzz
+ * i2ptunnel:
+   - Change preferred sig type to Ed
+   - Set permissions on backup tunnel keys file
+
 2015-11-28 zzz
  * i2psnark:
    - Fix NPE caused by URL-to-URI conversion in -2 (ticket #1715)
    - Increase max pieces to 32K
+   - BEP 21 support (upload_only)
  * SAM:
    - Fix parser to allow spaces in quoted values (tickets #1325, #1488)
    - Handle UTF-8 in ReadLine (ticket #1488)

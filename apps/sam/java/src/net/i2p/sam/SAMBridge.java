@@ -709,7 +709,9 @@ public class SAMBridge implements Runnable, ClientApp {
         changeState(RUNNING);
         if (_mgr != null)
             _mgr.register(this);
-        I2PAppContext.getGlobalContext().portMapper().register(PortMapper.SVC_SAM, _listenPort);
+        I2PAppContext.getGlobalContext().portMapper().register(_useSSL ? PortMapper.SVC_SAM_SSL : PortMapper.SVC_SAM,
+                                                               _listenHost != null ? _listenHost : "127.0.0.1",
+                                                               _listenPort);
         try {
             while (acceptConnections) {
                 SocketChannel s = serverSocket.accept();
@@ -775,7 +777,7 @@ public class SAMBridge implements Runnable, ClientApp {
                 if (serverSocket != null)
                     serverSocket.close();
             } catch (IOException e) {}
-            I2PAppContext.getGlobalContext().portMapper().unregister(PortMapper.SVC_SAM);
+            I2PAppContext.getGlobalContext().portMapper().unregister(_useSSL ? PortMapper.SVC_SAM_SSL : PortMapper.SVC_SAM);
             stopHandlers();
             changeState(STOPPED);
         }
