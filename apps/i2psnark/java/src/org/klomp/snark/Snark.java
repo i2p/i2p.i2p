@@ -1329,7 +1329,7 @@ public class Snark
    * coordinatorListener
    */
   final static int MIN_TOTAL_UPLOADERS = 4;
-  final static int MAX_TOTAL_UPLOADERS = 10;
+  final static int MAX_TOTAL_UPLOADERS = 20;
 
   public boolean overUploadLimit(int uploaders) {
     if (_peerCoordinatorSet == null || uploaders <= 0)

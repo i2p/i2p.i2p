@@ -40,6 +40,7 @@ import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleTimer2;
 
+import org.klomp.snark.I2PSnarkUtil;
 import org.klomp.snark.SnarkManager;
 import org.klomp.snark.TrackerClient;
 import org.klomp.snark.bencode.BDecoder;
@@ -128,8 +129,10 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
 
     /** Max number of nodes to return. BEP 5 says 8 */
     private static final int K = 8;
-    /** Max number of peers to return. BEP 5 doesn't say. We'll use the same as I2PSnarkUtil.MAX_CONNECTIONS */
-    private static final int MAX_WANT = 16;
+    /** Max number of peers to return. BEP 5 doesn't say.
+     * We'll use more than I2PSnarkUtil.MAX_CONNECTIONS since lots could be old.
+     */
+    private static final int MAX_WANT = I2PSnarkUtil.MAX_CONNECTIONS * 3 / 2;
 
     /** overloads error codes which start with 201 */
     private static final int REPLY_NONE = 0;
@@ -1412,7 +1415,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
     private List<Hash> receivePeers(NodeInfo nInfo, List<BEValue> peers) throws InvalidBEncodingException {
         if (_log.shouldLog(Log.INFO))
              _log.info("Rcvd peers from: " + nInfo);
-        int max = Math.min(MAX_WANT, peers.size());
+        int max = Math.min(MAX_WANT * 2, peers.size());
         List<Hash> rv = new ArrayList<Hash>(max);
         for (BEValue bev : peers) {
             byte[] b = bev.getBytes();

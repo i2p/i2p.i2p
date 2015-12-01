@@ -133,6 +133,7 @@ public class SnarkManager implements CompleteListener {
     public static final int DEFAULT_STARTUP_DELAY = 3; 
     public static final int DEFAULT_REFRESH_DELAY_SECS = 60;
     private static final int DEFAULT_PAGE_SIZE = 50;
+    public static final int DEFAULT_TUNNEL_QUANTITY = 3;
     public static final String CONFIG_DIR_SUFFIX = ".d";
     private static final String SUBDIR_PREFIX = "s";
     private static final String B64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-~";
@@ -610,7 +611,9 @@ public class SnarkManager implements CompleteListener {
         if (!_config.containsKey(PROP_I2CP_PORT))
             _config.setProperty(PROP_I2CP_PORT, "7654");
         if (!_config.containsKey(PROP_I2CP_OPTS))
-            _config.setProperty(PROP_I2CP_OPTS, "inbound.length=3 outbound.length=3 inbound.quantity=3 outbound.quantity=3");
+            _config.setProperty(PROP_I2CP_OPTS, "inbound.length=3 outbound.length=3" +
+                                                " inbound.quantity=" + DEFAULT_TUNNEL_QUANTITY +
+                                                " outbound.quantity=" + DEFAULT_TUNNEL_QUANTITY);
         //if (!_config.containsKey(PROP_EEP_HOST))
         //    _config.setProperty(PROP_EEP_HOST, "127.0.0.1");
         //if (!_config.containsKey(PROP_EEP_PORT))

@@ -70,7 +70,7 @@ class PeerCoordinator implements PeerListener
 
   // package local for access by CheckDownLoadersTask
   final static long CHECK_PERIOD = 40*1000; // 40 seconds
-  final static int MAX_UPLOADERS = 6;
+  final static int MAX_UPLOADERS = 8;
   public static final long MAX_INACTIVE = 8*60*1000;
 
   /**
@@ -403,7 +403,7 @@ class PeerCoordinator implements PeerListener
    *  Formerly used to
    *  reduce max if huge pieces to keep from ooming when leeching
    *  but now we don't
-   *  @return usually 16	
+   *  @return usually I2PSnarkUtil.MAX_CONNECTIONS
    */
   private int getMaxConnections() {
     if (metainfo == null)
