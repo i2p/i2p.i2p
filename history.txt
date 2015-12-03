@@ -1,5 +1,6 @@
 2015-12-03 zzz
  * Console: Add experimental Sybil analysis tool
+ * NetDb: Fix deadlock (ticket #1722)
 
 2015-12-01 zzz
  * i2psnark:

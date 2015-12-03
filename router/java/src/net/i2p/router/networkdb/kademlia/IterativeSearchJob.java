@@ -199,10 +199,12 @@ class IterativeSearchJob extends FloodSearchJob {
             }
         }
         final boolean empty;
+        // outside sync to avoid deadlock
+        final Hash us = getContext().routerHash();
         synchronized(this) {
             _toTry.addAll(floodfillPeers);
             // don't ask ourselves or the target
-            _toTry.remove(getContext().routerHash());
+            _toTry.remove(us);
             _toTry.remove(_key);
             empty = _toTry.isEmpty();
         }

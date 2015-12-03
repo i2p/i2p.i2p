@@ -488,6 +488,9 @@ public class Router implements RouterClock.ClockShiftListener {
     /**
      *  Our current router info.
      *  Warning, may be null if called very early.
+     *
+     *  Warning - risk of deadlock - do not call while holding locks
+     *
      */
     public RouterInfo getRouterInfo() {
         synchronized (_routerInfoLock) {
@@ -498,6 +501,9 @@ public class Router implements RouterClock.ClockShiftListener {
     /**
      *  Caller must ensure info is valid - no validation done here.
      *  Not for external use.
+     *
+     *  Warning - risk of deadlock - do not call while holding locks
+     *
      */
     public void setRouterInfo(RouterInfo info) { 
         synchronized (_routerInfoLock) {
@@ -806,6 +812,9 @@ public class Router implements RouterClock.ClockShiftListener {
      * Rebuild and republish our routerInfo since something significant 
      * has changed.
      * Not for external use.
+     *
+     *  Warning - risk of deadlock - do not call while holding locks
+     *
      */
     public void rebuildRouterInfo(boolean blockingRebuild) {
         if (_log.shouldLog(Log.INFO))
@@ -959,6 +968,11 @@ public class Router implements RouterClock.ClockShiftListener {
         }
     }
     
+    /*
+     *
+     *  Warning - risk of deadlock - do not call while holding locks
+     *
+     */
     public boolean isHidden() {
         RouterInfo ri;
         synchronized (_routerInfoLock) {
