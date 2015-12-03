@@ -1,3 +1,6 @@
+2015-12-03 zzz
+ * Console: Add experimental Sybil analysis tool
+
 2015-12-01 zzz
  * i2psnark:
    - Consolidate default tunnel length definition

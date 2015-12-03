@@ -40,7 +40,7 @@ import net.i2p.util.ObjectCounter;
 import net.i2p.util.Translate;
 import net.i2p.util.VersionComparator;
 
-public class NetDbRenderer {
+class NetDbRenderer {
     private final RouterContext _context;
 
     public NetDbRenderer (RouterContext ctx) {
@@ -69,7 +69,7 @@ public class NetDbRenderer {
              _us = us;
          }
          public int compare(LeaseSet l, LeaseSet r) {
-             return HashDistance.getDistance(_us, l.getRoutingKey()).subtract(HashDistance.getDistance(_us, r.getRoutingKey())).signum();
+             return HashDistance.getDistance(_us, l.getRoutingKey()).compareTo(HashDistance.getDistance(_us, r.getRoutingKey()));
         }
     }
 
@@ -266,7 +266,7 @@ public class NetDbRenderer {
      * http://forums.sun.com/thread.jspa?threadID=597652
      * @since 0.7.14
      */
-    private static double biLog2(BigInteger a) {
+    public static double biLog2(BigInteger a) {
         int b = a.bitLength() - 1;
         double c = 0;
         double d = 0.5;
