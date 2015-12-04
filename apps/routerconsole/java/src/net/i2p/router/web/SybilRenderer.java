@@ -45,10 +45,12 @@ class SybilRenderer {
 
     private static final int PAIRMAX = 10;
     private static final int MAX = 10;
+    // multiplied by size - 1, will also get POINTS24 added
+    private static final double POINTS32 = 10.0;
+    // multiplied by size - 1, will also get POINTS16 added
+    private static final double POINTS24 = 10.0;
     // multiplied by size - 1
-    private static final double POINTS32 = 15.0;
-    // multiplied by size - 1
-    private static final double POINTS24 = 2.0;
+    private static final double POINTS16 = 0.25;
     private static final double MIN_CLOSE = 242.0;
     private static final double MIN_DISPLAY_POINTS = 3.0;
 
@@ -75,6 +77,9 @@ class SybilRenderer {
         }
     }
 
+    /**
+     *  A total score and a List of reason Strings
+     */
     private static class Points implements Comparable<Points> {
          private double points;
          private final List<String> reasons;
@@ -106,12 +111,13 @@ class SybilRenderer {
     }
 
     private static void addPoints(Map<Hash, Points> points, Hash h, double d, String reason) {
+        DecimalFormat fmt = new DecimalFormat("#0.00");
         Points dd = points.get(h);
         if (dd != null) {
             dd.points += d;
-            dd.reasons.add(reason);
+            dd.reasons.add("<b>" + fmt.format(d) + ":</b> " + reason);
         } else {
-            points.put(h, new Points(d, reason));
+            points.put(h, new Points(d, "<b>" + fmt.format(d) + ":</b> " + reason));
         }
     }
 
@@ -163,18 +169,23 @@ class SybilRenderer {
         buf.append("</p>");
 
         Map<Hash, Points> points = new HashMap<Hash, Points>(64);
+
+        // IP analysis
         renderIPGroups32(out, buf, ris, points);
         renderIPGroups24(out, buf, ris, points);
-        renderIPGroups16(out, buf, ris);
+        renderIPGroups16(out, buf, ris, points);
 
+        // Pairwise distance analysis
         renderPairDistance(out, buf, ris, points);
 
+        // Distance to our router analysis
         buf.append("<h3>Closest Floodfills to Our Routing Key (Where we Store our RI)</h3>");
         renderRouterInfoHTML(out, buf, ourRKey, avgMinDist, ris, points);
 
         buf.append("<h3>Closest Floodfills to Our Router Hash (DHT Neighbors if we are Floodfill)</h3>");
         renderRouterInfoHTML(out, buf, us, avgMinDist, ris, points);
 
+        // Distance to our published destinations analysis
         Map<Hash, TunnelPool> clientInboundPools = _context.tunnelManager().getInboundClientPools();
         List<Hash> destinations = new ArrayList<Hash>(clientInboundPools.keySet());
         boolean debug = _context.getBooleanProperty(HelperBase.PROP_ADVANCED);
@@ -193,6 +204,8 @@ class SybilRenderer {
             buf.append("<h3>Closest floodfills to the Routing Key for Our Destination " + DataHelper.escapeHTML(name) + " (where we store our LS)</h3>");
             renderRouterInfoHTML(out, buf, rkey, avgMinDist, ris, points);
         }
+
+        // TODO Profile analysis
 
         if (!points.isEmpty()) {
             List<Hash> warns = new ArrayList<Hash>(points.keySet());
@@ -260,8 +273,10 @@ class SybilRenderer {
             renderRouterInfo(buf, p.r2, null, false, false);
             double point = MIN_CLOSE - distance;
             if (point > 0) {
-                addPoints(points, p.r1.getHash(), point, fmt.format(point) + ": Too close to other floodfill " + p.r2.getHash().toBase64());
-                addPoints(points, p.r2.getHash(), point, fmt.format(point) + ": Too close to other floodfill " + p.r1.getHash().toBase64());
+                addPoints(points, p.r1.getHash(), point, "Very close (" + fmt.format(distance) +
+                          ") to other floodfill " + p.r2.getHash().toBase64());
+                addPoints(points, p.r2.getHash(), point, "Very close (" + fmt.format(distance) +
+                          ") to other floodfill " + p.r1.getHash().toBase64());
             }
         }
         out.write(buf.toString());
@@ -347,7 +362,7 @@ class SybilRenderer {
                 found = true;
                 renderRouterInfo(buf, info, null, false, false);
                 double point = POINTS32 * (count - 1);
-                addPoints(points, info.getHash(), point, fmt.format(point) + ": Same IP with " + (count - 1) + " other");
+                addPoints(points, info.getHash(), point, "Same IP with " + (count - 1) + " other");
             }
         }
         if (!found)
@@ -396,7 +411,7 @@ class SybilRenderer {
                     continue;
                 renderRouterInfo(buf, info, null, false, false);
                 double point = POINTS24 * (count - 1);
-                addPoints(points, info.getHash(), point, fmt.format(point) + ": Same /24 IP with " + (count - 1) + " other");
+                addPoints(points, info.getHash(), point, "Same /24 IP with " + (count - 1) + " other");
             }
         }
         out.write(buf.toString());
@@ -404,8 +419,7 @@ class SybilRenderer {
         buf.setLength(0);
     }
 
-    /** no points */
-    private void renderIPGroups16(Writer out, StringBuilder buf, List<RouterInfo> ris) throws IOException {
+    private void renderIPGroups16(Writer out, StringBuilder buf, List<RouterInfo> ris, Map<Hash, Points> points) throws IOException {
         buf.append("<h3>Floodfills in the Same /16 (4 minimum)</h3>");
         int sz = ris.size();
         ObjectCounter<Integer> oc = new ObjectCounter<Integer>();
@@ -423,6 +437,7 @@ class SybilRenderer {
                 foo.add(ii);
         }
         Collections.sort(foo, new FooComparator(oc));
+        DecimalFormat fmt = new DecimalFormat("#0.00");
         for (Integer ii : foo) {
             int count = oc.count(ii);
             int i = ii.intValue();
@@ -439,6 +454,8 @@ class SybilRenderer {
                 if ((ip[1] & 0xff) != i1)
                     continue;
                 renderRouterInfo(buf, info, null, false, false);
+                double point = POINTS16 * (count - 1);
+                addPoints(points, info.getHash(), point, "Same /16 IP with " + (count - 1) + " other");
             }
         }
         out.write(buf.toString());
@@ -484,7 +501,7 @@ class SybilRenderer {
             double point = MIN_CLOSE - dist;
             if (point > 0) {
                 point *= 2.0;
-                addPoints(points, ri.getHash(), point, fmt.format(point) + ": Too close to our key " + us.toBase64());
+                addPoints(points, ri.getHash(), point, "Very close (" + fmt.format(dist) + ") to our key " + us.toBase64());
             }
             if (i >= MAX - 1)
                 break;
@@ -530,7 +547,7 @@ class SybilRenderer {
         if (isUs) {
             buf.append("<a name=\"our-info\" ></a><b>" + _t("Our info") + ": ").append(hash).append("</b></th></tr><tr><td>\n");
         } else {
-            buf.append("<b>" + _t("Peer info for") + ":</b> ").append(hash).append("\n");
+            buf.append("<b>" + _t("Router") + ":</b> ").append(hash).append("\n");
             if (!full) {
                 buf.append("[<a href=\"netdb?r=").append(hash.substring(0, 6)).append("\" >").append(_t("Full entry")).append("</a>]");
             }
@@ -558,14 +575,21 @@ class SybilRenderer {
             if (prof != null) {
                 long heard = prof.getFirstHeardAbout();
                 if (heard > 0) {
-                    long age = now - heard;
-                    if (age > 0) {
-                       buf.append("<b>First heard about:</b> ")
-                          .append(_t("{0} ago", DataHelper.formatDuration2(age))).append("<br>\n");
-                    } else {
-                            // shouldnt happen
-                       buf.append("<b>First heard about:</b> in ").append(DataHelper.formatDuration2(0-age)).append("???<br>\n");
-                    }
+                    long age = Math.max(now - heard, 1);
+                    buf.append("<b>First heard about:</b> ")
+                       .append(_t("{0} ago", DataHelper.formatDuration2(age))).append("<br>\n");
+                }
+                heard = prof.getLastHeardAbout();
+                if (heard > 0) {
+                    long age = Math.max(now - heard, 1);
+                    buf.append("<b>Last heard about:</b> ")
+                       .append(_t("{0} ago", DataHelper.formatDuration2(age))).append("<br>\n");
+                }
+                heard = prof.getLastHeardFrom();
+                if (heard > 0) {
+                    long age = Math.max(now - heard, 1);
+                    buf.append("<b>Last heard from:</b> ")
+                       .append(_t("{0} ago", DataHelper.formatDuration2(age))).append("<br>\n");
                 }
                 // any other profile stuff?
             }
@@ -596,7 +620,8 @@ class SybilRenderer {
             Map<Object, Object> p = addr.getOptionsMap();
             for (Map.Entry<Object, Object> e : p.entrySet()) {
                 String name = (String) e.getKey();
-                if (name.equals("key") || name.startsWith("ikey") || name.startsWith("itag") || name.startsWith("iport"))
+                if (name.equals("key") || name.startsWith("ikey") || name.startsWith("itag") ||
+                    name.startsWith("iport") || name.equals("mtu"))
                     continue;
                 String val = (String) e.getValue();
                 buf.append('[').append(_t(DataHelper.stripHTML(name))).append('=');

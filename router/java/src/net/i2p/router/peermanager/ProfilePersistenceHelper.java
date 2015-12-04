@@ -48,12 +48,12 @@ class ProfilePersistenceHelper {
     private static final String B64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-~";
     
     /**
-     * If we haven't been able to get a message through to the peer in 3 days,
+     * If we haven't been able to get a message through to the peer in this much time,
      * drop the profile.  They may reappear, but if they do, their config may
      * have changed (etc).
      *
      */
-    private static final long EXPIRE_AGE = 3*24*60*60*1000;
+    private static final long EXPIRE_AGE = 15*24*60*60*1000;
     
     private final File _profileDir;
     private Hash _us;
@@ -263,9 +263,9 @@ class ProfilePersistenceHelper {
                     file.delete();
             }
             
-            profile.setCapacityBonus(getLong(props, "capacityBonus"));
-            profile.setIntegrationBonus(getLong(props, "integrationBonus"));
-            profile.setSpeedBonus(getLong(props, "speedBonus"));
+            profile.setCapacityBonus((int) getLong(props, "capacityBonus"));
+            profile.setIntegrationBonus((int) getLong(props, "integrationBonus"));
+            profile.setSpeedBonus((int) getLong(props, "speedBonus"));
             
             profile.setLastHeardAbout(getLong(props, "lastHeardAbout"));
             profile.setFirstHeardAbout(getLong(props, "firstHeardAbout"));
@@ -282,10 +282,10 @@ class ProfilePersistenceHelper {
             // In the interest of keeping the in-memory profiles small,
             // don't load the DB info at all unless there is something interesting there
             // (i.e. floodfills)
-            // It seems like we do one or two lookups as a part of handshaking?
-            // Not sure, to be researched.
-            if (getLong(props, "dbHistory.successfulLookups") > 1 ||
-                getLong(props, "dbHistory.failedlLokups") > 1) {
+            if (getLong(props, "dbHistory.lastLookupSuccessful") > 0 ||
+                getLong(props, "dbHistory.lastLookupFailed") > 0 ||
+                getLong(props, "dbHistory.lastStoreSuccessful") > 0 ||
+                getLong(props, "dbHistory.lastStoreFailed") > 0) {
                 profile.expandDBProfile();
                 profile.getDBHistory().load(props);
                 profile.getDbIntroduction().load(props, "dbIntroduction", true);
@@ -300,6 +300,7 @@ class ProfilePersistenceHelper {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Loaded the profile for " + peer.toBase64() + " from " + file.getName());
             
+            fixupFirstHeardAbout(profile);
             return profile;
         } catch (IOException e) {
             if (_log.shouldLog(Log.WARN))
@@ -308,8 +309,61 @@ class ProfilePersistenceHelper {
             return null;
         }
     }
+
+    /**
+     *  First heard about wasn't always set correctly before,
+     *  set it to the minimum of all recorded timestamps.
+     *
+     *  @since 0.9.24
+     */
+    private void fixupFirstHeardAbout(PeerProfile p) {
+        long min = Long.MAX_VALUE;
+        long t = p.getLastHeardAbout();
+        if (t > 0 && t < min) min = t;
+        t = p.getLastSendSuccessful();
+        if (t > 0 && t < min) min = t;
+        t = p.getLastSendFailed();
+        if (t > 0 && t < min) min = t;
+        t = p.getLastHeardFrom();
+        if (t > 0 && t < min) min = t;
+        // the first was never used and the last 4 were never persisted
+        //DBHistory dh = p.getDBHistory();
+        //if (dh != null) {
+        //    t = dh.getLastLookupReceived();
+        //    if (t > 0 && t < min) min = t;
+        //    t = dh.getLastLookupSuccessful();
+        //    if (t > 0 && t < min) min = t;
+        //    t = dh.getLastLookupFailed();
+        //    if (t > 0 && t < min) min = t;
+        //    t = dh.getLastStoreSuccessful();
+        //    if (t > 0 && t < min) min = t;
+        //    t = dh.getLastStoreFailed();
+        //    if (t > 0 && t < min) min = t;
+        //}
+        TunnelHistory th = p.getTunnelHistory();
+        if (th != null) {
+            t = th.getLastAgreedTo();
+            if (t > 0 && t < min) min = t;
+            t = th.getLastRejectedCritical();
+            if (t > 0 && t < min) min = t;
+            t = th.getLastRejectedBandwidth();
+            if (t > 0 && t < min) min = t;
+            t = th.getLastRejectedTransient();
+            if (t > 0 && t < min) min = t;
+            t = th.getLastRejectedProbabalistic();
+            if (t > 0 && t < min) min = t;
+            t = th.getLastFailed();
+            if (t > 0 && t < min) min = t;
+        }
+        long fha = p.getFirstHeardAbout();
+        if (min > 0 && min < Long.MAX_VALUE && (fha <= 0 || min < fha)) {
+            p.setFirstHeardAbout(min);
+            if (_log.shouldDebug())
+                _log.debug("Fixed up the FHA time for " + p.getPeer().toBase64() + " to " + (new Date(min)));
+        }
+    }
     
-    private final static long getLong(Properties props, String key) {
+    static long getLong(Properties props, String key) {
         String val = props.getProperty(key);
         if (val != null) {
             try {

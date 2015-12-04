@@ -1,3 +1,16 @@
+2015-12-04 zzz
+ * Console: Fix NPE on /profiles
+ * Profiles:
+   - Fix first heard about to be earliest, undeprecate
+   - Fixup first heard about at profile readin
+   - Persist good/bad lookup/store DBHistory stats added in 0.7.8
+   - Remove unused DBHistory methods and fields to save memory
+   - Change bonus longs to ints to save memory
+   - Extend profile expiration time from 3 days to 15
+   - Consolidate getLong()
+   - Synch fixes
+ * Sybil tool: Tweaks and enhancements
+
 2015-12-03 zzz
  * Console: Add experimental Sybil analysis tool
  * NetDb: Fix deadlock (ticket #1722)

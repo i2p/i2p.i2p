@@ -48,6 +48,8 @@ class ProfileOrganizerRenderer {
         for (Hash peer : peers) {
             if (_organizer.getUs().equals(peer)) continue;
             PeerProfile prof = _organizer.getProfile(peer);
+            if (prof == null)
+                continue;
             if (mode == 2) {
                 RouterInfo info = _context.netDb().lookupRouterInfoLocally(peer);
                 if (info != null && info.getCapabilities().indexOf("f") >= 0)

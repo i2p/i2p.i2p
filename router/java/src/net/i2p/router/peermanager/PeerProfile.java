@@ -24,6 +24,9 @@ import net.i2p.util.Log;
  * Once it becomes necessary, we can simply compact the poorly performing profiles
  * (keeping only the most basic data) and maintain hundreds of thousands of profiles
  * in memory. Beyond that size, we can simply eject the peers (e.g. keeping the best 100,000).
+ *
+ * TODO most of the methods should be synchronized.
+ *
  */
 
 public class PeerProfile {
@@ -46,9 +49,10 @@ public class PeerProfile {
     private RateStat _tunnelTestResponseTime;
     private RateStat _dbIntroduction;
     // calculation bonuses
-    private long _speedBonus;
-    private long _capacityBonus;
-    private long _integrationBonus;
+    // ints to save some space
+    private int _speedBonus;
+    private int _capacityBonus;
+    private int _integrationBonus;
     // calculation values
     private double _speedValue;
     private double _capacityValue;
@@ -81,6 +85,8 @@ public class PeerProfile {
     }
 
     /**
+     *  Caller should call setLastHeardAbout() and setFirstHeardAbout()
+     *
      *  @param peer non-null
      */
     public PeerProfile(RouterContext context, Hash peer) {
@@ -88,15 +94,18 @@ public class PeerProfile {
     }
 
     /**
+     *  Caller should call setLastHeardAbout() and setFirstHeardAbout()
+     *
      *  @param peer non-null
      *  @param expand must be true (see below)
      */
     private PeerProfile(RouterContext context, Hash peer, boolean expand) {
-        _context = context;
-        _log = context.logManager().getLog(PeerProfile.class);
         if (peer == null)
             throw new NullPointerException();
+        _context = context;
+        _log = context.logManager().getLog(PeerProfile.class);
         _peer = peer;
+        _firstHeardAbout = _context.clock().now();
         // this is always true, and there are several places in the router that will NPE
         // if it is false, so all need to be fixed before we can have non-expanded profiles
         if (expand)
@@ -191,14 +200,36 @@ public class PeerProfile {
     
     /**
      *  When did we first hear about this peer?
-     *  Currently unused, candidate for removal.
+     *  @return greater than zero, set to now in consturctor
      */
-    public long getFirstHeardAbout() { return _firstHeardAbout; }
-    public void setFirstHeardAbout(long when) { _firstHeardAbout = when; }
+    public synchronized long getFirstHeardAbout() { return _firstHeardAbout; }
+
+    /**
+     *  Set when did we first heard about this peer, only if older.
+     *  Package private, only set by profile management subsystem.
+     */
+    synchronized void setFirstHeardAbout(long when) {
+        if (when < _firstHeardAbout)
+            _firstHeardAbout = when;
+    }
     
-    /** when did we last hear about this peer? */
-    public long getLastHeardAbout() { return _lastHeardAbout; }
-    public void setLastHeardAbout(long when) { _lastHeardAbout = when; }
+    /**
+     *  when did we last hear about this peer?
+     *  @return 0 if unset
+     */
+    public synchronized long getLastHeardAbout() { return _lastHeardAbout; }
+
+    /**
+     *  Set when did we last hear about this peer, only if unset or newer
+     *  Also sets FirstHeardAbout if earlier
+     */
+    public synchronized void setLastHeardAbout(long when) {
+        if (_lastHeardAbout <= 0 || when > _lastHeardAbout)
+            _lastHeardAbout = when;
+        // this is called by netdb PersistentDataStore, so fixup first heard
+        if (when < _firstHeardAbout)
+            _firstHeardAbout = when;
+    }
     
     /** when did we last send to this peer successfully? */
     public long getLastSendSuccessful() { return _lastSentToSuccessfully; }
@@ -244,24 +275,24 @@ public class PeerProfile {
      * written to disk to affect how the algorithm ranks speed.  Negative values are
      * penalties
      */
-    public long getSpeedBonus() { return _speedBonus; }
-    public void setSpeedBonus(long bonus) { _speedBonus = bonus; }
+    public int getSpeedBonus() { return _speedBonus; }
+    public void setSpeedBonus(int bonus) { _speedBonus = bonus; }
     
     /**
      * extra factor added to the capacity ranking - this can be updated in the profile
      * written to disk to affect how the algorithm ranks capacity.  Negative values are
      * penalties
      */
-    public long getCapacityBonus() { return _capacityBonus; }
-    public void setCapacityBonus(long bonus) { _capacityBonus = bonus; }
+    public int getCapacityBonus() { return _capacityBonus; }
+    public void setCapacityBonus(int bonus) { _capacityBonus = bonus; }
     
     /**
      * extra factor added to the integration ranking - this can be updated in the profile
      * written to disk to affect how the algorithm ranks integration.  Negative values are
      * penalties
      */
-    public long getIntegrationBonus() { return _integrationBonus; }
-    public void setIntegrationBonus(long bonus) { _integrationBonus = bonus; }
+    public int getIntegrationBonus() { return _integrationBonus; }
+    public void setIntegrationBonus(int bonus) { _integrationBonus = bonus; }
     
     /**
      * How fast is the peer, taking into consideration both throughput and latency.
@@ -429,7 +460,7 @@ public class PeerProfile {
      * repeatedly
      *
      */
-    public void expandProfile() {
+    public synchronized void expandProfile() {
         String group = (null == _peer ? "profileUnknown" : _peer.toBase64().substring(0,6));
         //if (_sendSuccessSize == null)
         //    _sendSuccessSize = new RateStat("sendSuccessSize", "How large successfully sent messages are", group, new long[] { 5*60*1000l, 60*60*1000l });
