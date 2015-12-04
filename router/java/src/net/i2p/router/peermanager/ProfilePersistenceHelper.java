@@ -170,7 +170,7 @@ class ProfilePersistenceHelper {
     }
     
     /** @since 0.8.5 */
-    private static void add(StringBuilder buf, String name, double val, String description) {
+    private static void add(StringBuilder buf, String name, float val, String description) {
         buf.append("# ").append(name).append(NL).append("# ").append(description).append(NL);
         buf.append(name).append('=').append(val).append(NL).append(NL);
     }
@@ -272,10 +272,10 @@ class ProfilePersistenceHelper {
             profile.setLastSendSuccessful(getLong(props, "lastSentToSuccessfully"));
             profile.setLastSendFailed(getLong(props, "lastFailedSend"));
             profile.setLastHeardFrom(getLong(props, "lastHeardFrom"));
-            profile.setTunnelTestTimeAverage(getDouble(props, "tunnelTestTimeAverage"));
-            profile.setPeakThroughputKBps(getDouble(props, "tunnelPeakThroughput"));
-            profile.setPeakTunnelThroughputKBps(getDouble(props, "tunnelPeakTunnelThroughput"));
-            profile.setPeakTunnel1mThroughputKBps(getDouble(props, "tunnelPeakTunnel1mThroughput"));
+            profile.setTunnelTestTimeAverage(getFloat(props, "tunnelTestTimeAverage"));
+            profile.setPeakThroughputKBps(getFloat(props, "tunnelPeakThroughput"));
+            profile.setPeakTunnelThroughputKBps(getFloat(props, "tunnelPeakTunnelThroughput"));
+            profile.setPeakTunnel1mThroughputKBps(getFloat(props, "tunnelPeakTunnel1mThroughput"));
             
             profile.getTunnelHistory().load(props);
 
@@ -368,23 +368,19 @@ class ProfilePersistenceHelper {
         if (val != null) {
             try {
                 return Long.parseLong(val);
-            } catch (NumberFormatException nfe) {
-                return 0;
-            }
+            } catch (NumberFormatException nfe) {}
         }
         return 0;
     }
 
-    private final static double getDouble(Properties props, String key) {
+    private final static float getFloat(Properties props, String key) {
         String val = props.getProperty(key);
         if (val != null) {
             try {
-                return Double.parseDouble(val);
-            } catch (NumberFormatException nfe) {
-                return 0.0;
-            }
+                return Float.parseFloat(val);
+            } catch (NumberFormatException nfe) {}
         }
-        return 0.0;
+        return 0.0f;
     }
     
     private void loadProps(Properties props, File file) throws IOException {

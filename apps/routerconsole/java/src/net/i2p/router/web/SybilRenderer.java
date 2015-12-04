@@ -390,6 +390,7 @@ class SybilRenderer {
                 foo.add(ii);
         }
         Collections.sort(foo, new FooComparator(oc));
+        boolean found = false;
         DecimalFormat fmt = new DecimalFormat("#0.00");
         for (Integer ii : foo) {
             int count = oc.count(ii);
@@ -409,11 +410,14 @@ class SybilRenderer {
                     continue;
                 if ((ip[2] & 0xff) != i2)
                     continue;
+                found = true;
                 renderRouterInfo(buf, info, null, false, false);
                 double point = POINTS24 * (count - 1);
                 addPoints(points, info.getHash(), point, "Same /24 IP with " + (count - 1) + " other");
             }
         }
+        if (!found)
+            buf.append("<p>None</p>");
         out.write(buf.toString());
         out.flush();
         buf.setLength(0);
@@ -437,6 +441,7 @@ class SybilRenderer {
                 foo.add(ii);
         }
         Collections.sort(foo, new FooComparator(oc));
+        boolean found = false;
         DecimalFormat fmt = new DecimalFormat("#0.00");
         for (Integer ii : foo) {
             int count = oc.count(ii);
@@ -453,11 +458,14 @@ class SybilRenderer {
                     continue;
                 if ((ip[1] & 0xff) != i1)
                     continue;
+                found = true;
                 renderRouterInfo(buf, info, null, false, false);
                 double point = POINTS16 * (count - 1);
                 addPoints(points, info.getHash(), point, "Same /16 IP with " + (count - 1) + " other");
             }
         }
+        if (!found)
+            buf.append("<p>None</p>");
         out.write(buf.toString());
         out.flush();
         buf.setLength(0);
