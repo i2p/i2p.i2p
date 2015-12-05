@@ -21,8 +21,10 @@ import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
 import net.i2p.data.router.RouterAddress;
 import net.i2p.data.router.RouterInfo;
+import net.i2p.data.router.RouterKeyGenerator;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelPoolSettings;
+import net.i2p.router.peermanager.DBHistory;
 import net.i2p.router.peermanager.PeerProfile;
 import net.i2p.router.tunnel.pool.TunnelPool;
 import net.i2p.router.util.HashDistance;
@@ -43,7 +45,7 @@ class SybilRenderer {
 
     private final RouterContext _context;
 
-    private static final int PAIRMAX = 10;
+    private static final int PAIRMAX = 20;
     private static final int MAX = 10;
     // multiplied by size - 1, will also get POINTS24 added
     private static final double POINTS32 = 10.0;
@@ -52,6 +54,7 @@ class SybilRenderer {
     // multiplied by size - 1
     private static final double POINTS16 = 0.25;
     private static final double MIN_CLOSE = 242.0;
+    private static final double OUR_KEY_FACTOR = 4.0;
     private static final double MIN_DISPLAY_POINTS = 3.0;
 
     public SybilRenderer(RouterContext ctx) {
@@ -181,6 +184,10 @@ class SybilRenderer {
         // Distance to our router analysis
         buf.append("<h3>Closest Floodfills to Our Routing Key (Where we Store our RI)</h3>");
         renderRouterInfoHTML(out, buf, ourRKey, avgMinDist, ris, points);
+        RouterKeyGenerator rkgen = _context.routerKeyGenerator();
+        Hash nkey = rkgen.getNextRoutingKey(us);
+        buf.append("<h3>Closest Floodfills to Tomorrow's Routing Key (Where we will Store our RI)</h3>");
+        renderRouterInfoHTML(out, buf, nkey, avgMinDist, ris, points);
 
         buf.append("<h3>Closest Floodfills to Our Router Hash (DHT Neighbors if we are Floodfill)</h3>");
         renderRouterInfoHTML(out, buf, us, avgMinDist, ris, points);
@@ -201,8 +208,11 @@ class SybilRenderer {
             Hash rkey = ls.getRoutingKey();
             TunnelPool in = clientInboundPools.get(client);
             String name = (in != null) ? in.getSettings().getDestinationNickname() : client.toBase64().substring(0,4);
-            buf.append("<h3>Closest floodfills to the Routing Key for Our Destination " + DataHelper.escapeHTML(name) + " (where we store our LS)</h3>");
+            buf.append("<h3>Closest floodfills to the Routing Key for " + DataHelper.escapeHTML(name) + " (where we store our LS)</h3>");
             renderRouterInfoHTML(out, buf, rkey, avgMinDist, ris, points);
+            nkey = rkgen.getNextRoutingKey(ls.getHash());
+            buf.append("<h3>Closest floodfills to Tomorrow's Routing Key for " + DataHelper.escapeHTML(name) + " (where we store our LS)</h3>");
+            renderRouterInfoHTML(out, buf, nkey, avgMinDist, ris, points);
         }
 
         // TODO Profile analysis
@@ -245,9 +255,9 @@ class SybilRenderer {
     }
 
     private void renderPairDistance(Writer out, StringBuilder buf, List<RouterInfo> ris, Map<Hash, Points> points) throws IOException {
-        buf.append("<h3>Closest Floodfill Pairs by Hash</h3>");
         int sz = ris.size();
         List<Pair> pairs = new ArrayList<Pair>(PAIRMAX);
+        double total = 0;
         for (int i = 0; i < sz; i++) {
             RouterInfo info1 = ris.get(i);
             for (int j = i + 1; j < sz; j++) {
@@ -262,22 +272,31 @@ class SybilRenderer {
                     pairs.set(PAIRMAX - 1, new Pair(info1, info2, dist));
                     Collections.sort(pairs);
                 }
+                total += biLog2(dist);
             }
         }
+
         DecimalFormat fmt = new DecimalFormat("#0.00");
+        double avg = total / (sz * sz / 2);
+        buf.append("<h3>Average Floodfill Distance is ").append(fmt.format(avg)).append("</h3>");
+
+        buf.append("<h3>Closest Floodfill Pairs by Hash</h3>");
         for (Pair p : pairs) {
             double distance = biLog2(p.dist);
-            buf.append("<p><b>Hash Distance: ").append(fmt.format(distance)).append(": </b>");
-            buf.append("</p>");
-            renderRouterInfo(buf, p.r1, null, false, false);
-            renderRouterInfo(buf, p.r2, null, false, false);
             double point = MIN_CLOSE - distance;
-            if (point > 0) {
-                addPoints(points, p.r1.getHash(), point, "Very close (" + fmt.format(distance) +
-                          ") to other floodfill " + p.r2.getHash().toBase64());
-                addPoints(points, p.r2.getHash(), point, "Very close (" + fmt.format(distance) +
-                          ") to other floodfill " + p.r1.getHash().toBase64());
+            if (point < 0)
+                break;  // sorted;
+            if (point >= 2) {
+                // limit display
+                buf.append("<p><b>Hash Distance: ").append(fmt.format(distance)).append(": </b>");
+                buf.append("</p>");
+                renderRouterInfo(buf, p.r1, null, false, false);
+                renderRouterInfo(buf, p.r2, null, false, false);
             }
+            addPoints(points, p.r1.getHash(), point, "Very close (" + fmt.format(distance) +
+                          ") to other floodfill " + p.r2.getHash().toBase64());
+            addPoints(points, p.r2.getHash(), point, "Very close (" + fmt.format(distance) +
+                          ") to other floodfill " + p.r1.getHash().toBase64());
         }
         out.write(buf.toString());
         out.flush();
@@ -449,7 +468,7 @@ class SybilRenderer {
             int i0 = i >> 8;
             int i1 = i & 0xff;
             buf.append("<p><b>").append(count).append(" floodfills in ").append(i0).append('.')
-               .append(i1).append(".0.0/16:</b></p>");
+               .append(i1).append(".0.0/16</b></p>");
             for (RouterInfo info : ris) {
                 byte[] ip = getIP(info);
                 if (ip == null)
@@ -459,7 +478,8 @@ class SybilRenderer {
                 if ((ip[1] & 0xff) != i1)
                     continue;
                 found = true;
-                renderRouterInfo(buf, info, null, false, false);
+                // limit display
+                //renderRouterInfo(buf, info, null, false, false);
                 double point = POINTS16 * (count - 1);
                 addPoints(points, info.getHash(), point, "Same /16 IP with " + (count - 1) + " other");
             }
@@ -508,7 +528,7 @@ class SybilRenderer {
                 median = (median + dist) / 2;
             double point = MIN_CLOSE - dist;
             if (point > 0) {
-                point *= 2.0;
+                point *= OUR_KEY_FACTOR;
                 addPoints(points, ri.getHash(), point, "Very close (" + fmt.format(dist) + ") to our key " + us.toBase64());
             }
             if (i >= MAX - 1)
@@ -599,19 +619,43 @@ class SybilRenderer {
                     buf.append("<b>Last heard from:</b> ")
                        .append(_t("{0} ago", DataHelper.formatDuration2(age))).append("<br>\n");
                 }
+                DBHistory dbh = prof.getDBHistory();
+                if (dbh != null) {
+                    heard = dbh.getLastLookupSuccessful();
+                    if (heard > 0) {
+                        long age = Math.max(now - heard, 1);
+                        buf.append("<b>Last lookup successful:</b> ")
+                           .append(_t("{0} ago", DataHelper.formatDuration2(age))).append("<br>\n");
+                    }
+                    heard = dbh.getLastLookupFailed();
+                    if (heard > 0) {
+                        long age = Math.max(now - heard, 1);
+                        buf.append("<b>Last lookup failed:</b> ")
+                           .append(_t("{0} ago", DataHelper.formatDuration2(age))).append("<br>\n");
+                    }
+                    heard = dbh.getLastStoreSuccessful();
+                    if (heard > 0) {
+                        long age = Math.max(now - heard, 1);
+                        buf.append("<b>Last store successful:</b> ")
+                           .append(_t("{0} ago", DataHelper.formatDuration2(age))).append("<br>\n");
+                    }
+                    heard = dbh.getLastStoreFailed();
+                    if (heard > 0) {
+                        long age = Math.max(now - heard, 1);
+                        buf.append("<b>Last store failed:</b> ")
+                           .append(_t("{0} ago", DataHelper.formatDuration2(age))).append("<br>\n");
+                    }
+                }
                 // any other profile stuff?
             }
         }
-        long age = now - info.getPublished();
+        long age = Math.max(now - info.getPublished(), 1);
         if (isUs && _context.router().isHidden()) {
             buf.append("<b>").append(_t("Hidden")).append(", ").append(_t("Updated")).append(":</b> ")
                .append(_t("{0} ago", DataHelper.formatDuration2(age))).append("<br>\n");
-        } else if (age > 0) {
+        } else {
             buf.append("<b>").append(_t("Published")).append(":</b> ")
                .append(_t("{0} ago", DataHelper.formatDuration2(age))).append("<br>\n");
-        } else {
-            // shouldnt happen
-            buf.append("<b>" + _t("Published") + ":</b> in ").append(DataHelper.formatDuration2(0-age)).append("???<br>\n");
         }
         buf.append("<b>").append(_t("Signing Key")).append(":</b> ")
            .append(info.getIdentity().getSigningPublicKey().getType().toString());
