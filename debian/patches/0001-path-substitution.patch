@@ -309,11 +309,10 @@ Debian wrapper.config to try to prevent confusion.
  
  #********************************************************************
  # Wrapper General Properties
-@@ -258,30 +239,3 @@
- wrapper.umask=0022
+@@ -259,32 +240,6 @@
  wrapper.java.umask=0022
  wrapper.logfile.umask=0077
--
+ 
 -#********************************************************************
 -# Wrapper NT Service Properties
 -#********************************************************************
@@ -340,6 +339,9 @@ Debian wrapper.config to try to prevent confusion.
 -# Allow the service to interact with the desktop.
 -wrapper.ntservice.interactive=false
 -
+ # http://wrapper.tanukisoftware.com/doc/english/prop-check-deadlock.html
+ # requires wrapper 3.5.0 or higher
+ # interval is seconds
 --- a/installer/resources/locale/po/messages_de.po
 +++ b/installer/resources/locale/po/messages_de.po
 @@ -195,15 +195,15 @@
