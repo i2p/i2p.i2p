@@ -46,12 +46,10 @@ public class TunnelRenderer {
             boolean isLocal = _context.clientManager().isLocal(client);
             if ((!isLocal) && (!debug))
                 continue;
-            TunnelPool in = null;
-            TunnelPool outPool = null;
-            in = clientInboundPools.get(client);
-            outPool = clientOutboundPools.get(client);
+            TunnelPool in = clientInboundPools.get(client);
+            TunnelPool outPool = clientOutboundPools.get(client);
             // TODO the following code is duplicated in SummaryHelper
-            String name = (in != null ? in.getSettings().getDestinationNickname() : null);
+            String name = (in != null) ? in.getSettings().getDestinationNickname() : null;
             if ( (name == null) && (outPool != null) )
                 name = outPool.getSettings().getDestinationNickname();
             if (name == null)

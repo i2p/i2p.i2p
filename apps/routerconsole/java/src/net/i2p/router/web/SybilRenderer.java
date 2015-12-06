@@ -48,9 +48,9 @@ class SybilRenderer {
     private static final int PAIRMAX = 20;
     private static final int MAX = 10;
     // multiplied by size - 1, will also get POINTS24 added
-    private static final double POINTS32 = 10.0;
+    private static final double POINTS32 = 5.0;
     // multiplied by size - 1, will also get POINTS16 added
-    private static final double POINTS24 = 10.0;
+    private static final double POINTS24 = 5.0;
     // multiplied by size - 1
     private static final double POINTS16 = 0.25;
     private static final double MIN_CLOSE = 242.0;
@@ -211,7 +211,7 @@ class SybilRenderer {
             buf.append("<h3>Closest floodfills to the Routing Key for " + DataHelper.escapeHTML(name) + " (where we store our LS)</h3>");
             renderRouterInfoHTML(out, buf, rkey, avgMinDist, ris, points);
             nkey = rkgen.getNextRoutingKey(ls.getHash());
-            buf.append("<h3>Closest floodfills to Tomorrow's Routing Key for " + DataHelper.escapeHTML(name) + " (where we store our LS)</h3>");
+            buf.append("<h3>Closest floodfills to Tomorrow's Routing Key for " + DataHelper.escapeHTML(name) + " (where we will store our LS)</h3>");
             renderRouterInfoHTML(out, buf, nkey, avgMinDist, ris, points);
         }
 
