@@ -1,4 +1,4 @@
-# Last Modified: Sun Apr 12 22:08:32 2015
+#Last Modified: Sun Dec 06 12:30:32 2015
 # vim:syntax=apparmor et ts=8 sw=4
 
 #include <tunables/global>
@@ -15,7 +15,7 @@ $INSTALL_PATH/{i2prouter,runplain.sh} flags=(complain) {
 
   $INSTALL_PATH/                                          r,
   $INSTALL_PATH/{i2psvc,wrapper}                          rmix,
-  owner $INSTALL_PATH/**                                  rwklm,
+  owner $INSTALL_PATH/**                                  rwkm,
 
   # Needed for Java
   owner @{PROC}                                           r,
@@ -57,7 +57,7 @@ $INSTALL_PATH/{i2prouter,runplain.sh} flags=(complain) {
   /usr/share/java/eclipse-ecj-*.jar                       r,
 
   /{,var/}tmp/                                            rwm,
-  owner /{,var/}tmp/**                                    rwklm,
+  owner /{,var/}tmp/**                                    rwkm,
 
   /{,usr/}bin/{,b,d}ash                                   rix,
   /{,usr/}bin/cat                                         rix,
