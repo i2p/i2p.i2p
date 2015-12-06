@@ -98,7 +98,7 @@ public abstract class TransportUtil {
      */
     public static boolean isIPv6(RouterAddress addr) {
         // do this the fast way, without calling getIP() to parse the host string
-        String host = addr.getOption(RouterAddress.PROP_HOST);
+        String host = addr.getHost();
         return host != null && host.contains(":");
     }
 
