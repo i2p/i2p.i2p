@@ -40,7 +40,7 @@
 
   @{HOME}/.java/fonts/**                r,
   owner  @{HOME}/.i2p/                  rw,
-  owner  @{HOME}/.i2p/**                rwkl,
+  owner  @{HOME}/.i2p/**                rwk,
   owner  @{HOME}/.i2p/eepsite/cgi-bin/** rix,
 
   # Prevent spamming the logs

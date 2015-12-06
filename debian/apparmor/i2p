@@ -61,7 +61,7 @@
   owner /{,lib/live/mount/overlay/}tmp/scrypt*            rwk,
   owner /{,lib/live/mount/overlay/}tmp/scrypt*/**         rw,
   owner /{,lib/live/mount/overlay/}tmp/i2p-daemon/        rwm,
-  owner /{,lib/live/mount/overlay/}tmp/i2p-daemon/**      rwklm,
+  owner /{,lib/live/mount/overlay/}tmp/i2p-daemon/**      rwkm,
 
   # Prevent spamming the logs
   deny /dev/tty                                           rw,
