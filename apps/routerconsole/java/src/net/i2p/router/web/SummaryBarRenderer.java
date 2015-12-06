@@ -633,7 +633,7 @@ public class SummaryBarRenderer {
                 buf.append("<ul>\n");
                 DateFormat fmt = DateFormat.getDateInstance(DateFormat.SHORT);
                 // the router sets the JVM time zone to UTC but saves the original here so we can get it
-                fmt.setTimeZone(DataHelper.getSystemTimeZone(_context));
+                fmt.setTimeZone(SystemVersion.getSystemTimeZone(_context));
                 int i = 0;
                 final int max = 2;
                 for (NewsEntry entry : entries) {

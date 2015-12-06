@@ -31,6 +31,7 @@ import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.util.Log;
 import net.i2p.util.SecureFile;
+import net.i2p.util.SystemVersion;
 import net.i2p.util.Translate;
 
 import org.klomp.snark.I2PSnarkUtil;
@@ -2802,7 +2803,7 @@ public class I2PSnarkServlet extends BasicServlet {
                 }
                 long dat = meta.getCreationDate();
                 SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-                fmt.setTimeZone(DataHelper.getSystemTimeZone(_context));
+                fmt.setTimeZone(SystemVersion.getSystemTimeZone(_context));
                 if (dat > 0) {
                     String date = fmt.format(new Date(dat));
                     buf.append("<tr><td>");
