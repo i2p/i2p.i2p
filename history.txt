@@ -1,3 +1,11 @@
+2015-12-06 zzz
+ * Console: Don't force profile creation when loading floodfill tab
+ * Installer: Add wrapper deadlock detection to default wrapper.config
+ * NetDb: Stub out a "family" indicator (ticket #1510)
+ * Profiles: More changes to reduce memory usage
+ * Startup: Increase rekey probability
+ * Sybil tool: Tweaks and enhancements
+
 2015-12-04 zzz
  * Console: Fix NPE on /profiles
  * Profiles:
