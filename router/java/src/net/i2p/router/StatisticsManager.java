@@ -30,6 +30,10 @@ public class StatisticsManager implements Service {
     private final RouterContext _context;
     
     public final static String PROP_PUBLISH_RANKINGS = "router.publishPeerRankings";
+    private static final String PROP_CONTACT_NAME = "netdb.contact";
+    private static final String PROP_FAMILY_NAME = "netdb.family.name";
+    private static final String PROP_FAMILY_KEY = "netdb.family.key";
+    private static final String PROP_FAMILY_SIG = "netdb.family.sig";
     /** enhance anonymity by only including build stats one out of this many times */
     private static final int RANDOM_INCLUDE_STATS = 16;
 
@@ -159,6 +163,21 @@ public class StatisticsManager implements Service {
                      _context.netDb().getKnownLeaseSets() :
                      30 + _context.random().nextInt(40);   // so it isn't obvious we restarted
             stats.setProperty("netdb.knownLeaseSets", String.valueOf(ls));
+        }
+
+        String contact = _context.getProperty(PROP_CONTACT_NAME);
+        if (contact != null)
+            stats.setProperty("contact", contact);
+        String family = _context.getProperty(PROP_FAMILY_NAME);
+        if (family != null) {
+            stats.setProperty("family", family);
+            // TODO
+            //String key = _context.getProperty(PROP_FAMILY_KEY);
+            //if (key != null) {
+                // get privkey
+                // sign something
+                // add b64 sig
+            //}
         }
 
         return stats;
