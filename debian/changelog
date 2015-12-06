@@ -1,8 +1,11 @@
-i2p (0.9.23-2) unstable; urgency=medium
+i2p (0.9.23-2) UNRELEASED; urgency=medium
 
   * Backport of two fixes from after the release of 0.9.23
     - debian/patches/0005-Console-Fix-escaping-of-plugin-description-on-config.patch
     - debian/patches/0006-NetDb-Fix-deadlock-ticket-1722.patch
+  * AppArmor:
+    - Remove 'l' from the debian AppArmor profiles
+    - Allow writing to /tmp/imageio*, needed by graph creation on some systems
 
  -- Kill Your TV <killyourtv@i2pmail.org>  Sat, 05 Dec 2015 01:13:00 +0000
 
