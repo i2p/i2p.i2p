@@ -15,8 +15,6 @@ import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
@@ -978,24 +976,12 @@ public class SU3File {
      *  @since 0.9.15
      */
     private static PublicKey loadKey(File kd) throws IOException {
-        InputStream fis = null;
         try {
-            fis = new FileInputStream(kd);
-            CertificateFactory cf = CertificateFactory.getInstance("X.509");
-            X509Certificate cert = (X509Certificate)cf.generateCertificate(fis);
-            cert.checkValidity();
-            return cert.getPublicKey();
+            return CertUtil.loadKey(kd);
         } catch (GeneralSecurityException gse) {
             IOException ioe = new IOException("cert error");
             ioe.initCause(gse);
             throw ioe;
-        } catch (IllegalArgumentException iae) {
-            // java 1.8.0_40-b10, openSUSE
-            IOException ioe = new IOException("cert error");
-            ioe.initCause(iae);
-            throw ioe;
-        } finally {
-            try { if (fis != null) fis.close(); } catch (IOException foo) {}
         }
     }
 }

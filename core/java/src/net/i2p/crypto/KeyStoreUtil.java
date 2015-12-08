@@ -12,7 +12,6 @@ import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
-import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Enumeration;
 import java.util.Locale;
@@ -317,46 +316,32 @@ public class KeyStoreUtil {
      *  @since 0.8.2, moved from SSLEepGet in 0.9.9
      */
     public static boolean addCert(File file, String alias, KeyStore ks) {
-        InputStream fis = null;
         try {
-            fis = new FileInputStream(file);
-            CertificateFactory cf = CertificateFactory.getInstance("X.509");
-            X509Certificate cert = (X509Certificate)cf.generateCertificate(fis);
+            X509Certificate cert = CertUtil.loadCert(file);
             info("Read X509 Certificate from " + file.getAbsolutePath() +
                           " Issuer: " + cert.getIssuerX500Principal() +
                           " Serial: " + cert.getSerialNumber().toString(16) +
                           "; Valid From: " + cert.getNotBefore() +
                           " To: " + cert.getNotAfter());
-            try {
-                cert.checkValidity();
-            } catch (CertificateExpiredException cee) {
-                String s = "Rejecting expired X509 Certificate: " + file.getAbsolutePath();
-                // Android often has old system certs
-                if (SystemVersion.isAndroid())
-                    warn(s, cee);
-                else
-                    error(s, cee);
-                return false;
-            } catch (CertificateNotYetValidException cnyve) {
-                error("Rejecting X509 Certificate not yet valid: " + file.getAbsolutePath(), cnyve);
-                return false;
-            }
             ks.setCertificateEntry(alias, cert);
             info("Now trusting X509 Certificate, Issuer: " + cert.getIssuerX500Principal());
+        } catch (CertificateExpiredException cee) {
+            String s = "Rejecting expired X509 Certificate: " + file.getAbsolutePath();
+            // Android often has old system certs
+            if (SystemVersion.isAndroid())
+                warn(s, cee);
+            else
+                error(s, cee);
+            return false;
+        } catch (CertificateNotYetValidException cnyve) {
+            error("Rejecting X509 Certificate not yet valid: " + file.getAbsolutePath(), cnyve);
+            return false;
         } catch (GeneralSecurityException gse) {
             error("Error reading X509 Certificate: " + file.getAbsolutePath(), gse);
             return false;
         } catch (IOException ioe) {
             error("Error reading X509 Certificate: " + file.getAbsolutePath(), ioe);
             return false;
-        } catch (IllegalArgumentException iae) {
-            // java 1.8.0_40-b10, openSUSE
-            // Exception in thread "main" java.lang.IllegalArgumentException: Input byte array has wrong 4-byte ending unit
-            // at java.util.Base64$Decoder.decode0(Base64.java:704)
-            error("Error reading X509 Certificate: " + file.getAbsolutePath(), iae);
-            return false;
-        } finally {
-            try { if (fis != null) fis.close(); } catch (IOException foo) {}
         }
         return true;
     }

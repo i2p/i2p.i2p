@@ -1,11 +1,16 @@
 package net.i2p.crypto;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.security.GeneralSecurityException;
+import java.security.PublicKey;
 import java.security.cert.Certificate;
+import java.security.cert.CertificateFactory;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.Locale;
@@ -133,5 +138,41 @@ public class CertUtil {
     private static void log(I2PAppContext ctx, int level, String msg, Throwable t) {
         Log l = ctx.logManager().getLog(CertUtil.class);
         l.log(level, msg, t);
+    }
+
+    /**
+     *  Get the Java public key from a X.509 certificate file.
+     *  Throws if the certificate is invalid (e.g. expired).
+     *
+     *  @return non-null, throws on all errors including certificate invalid
+     *  @since 0.9.24 moved from SU3File private method
+     */
+    public static PublicKey loadKey(File kd) throws IOException, GeneralSecurityException {
+        return loadCert(kd).getPublicKey();
+    }
+
+    /**
+     *  Get the certificate from a X.509 certificate file.
+     *  Throws if the certificate is invalid (e.g. expired).
+     *
+     *  @return non-null, throws on all errors including certificate invalid
+     *  @since 0.9.24 adapted from SU3File private method
+     */
+    public static X509Certificate loadCert(File kd) throws IOException, GeneralSecurityException {
+        InputStream fis = null;
+        try {
+            fis = new FileInputStream(kd);
+            CertificateFactory cf = CertificateFactory.getInstance("X.509");
+            X509Certificate cert = (X509Certificate)cf.generateCertificate(fis);
+            cert.checkValidity();
+            return cert;
+        } catch (IllegalArgumentException iae) {
+            // java 1.8.0_40-b10, openSUSE
+            // Exception in thread "main" java.lang.IllegalArgumentException: Input byte array has wrong 4-byte ending unit
+            // at java.util.Base64$Decoder.decode0(Base64.java:704)
+            throw new GeneralSecurityException("cert error", iae);
+        } finally {
+            try { if (fis != null) fis.close(); } catch (IOException foo) {}
+        }
     }
 }
