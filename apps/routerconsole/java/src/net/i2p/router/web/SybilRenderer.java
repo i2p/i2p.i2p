@@ -53,6 +53,7 @@ class SybilRenderer {
     private static final double POINTS24 = 5.0;
     // multiplied by size - 1
     private static final double POINTS16 = 0.25;
+    private static final double POINTS_FAMILY = -2.0;
     private static final double MIN_CLOSE = 242.0;
     private static final double OUR_KEY_FACTOR = 4.0;
     private static final double MIN_DISPLAY_POINTS = 3.0;
@@ -174,6 +175,7 @@ class SybilRenderer {
         Map<Hash, Points> points = new HashMap<Hash, Points>(64);
 
         // IP analysis
+        renderIPGroupsFamily(out, buf, ris, points);
         renderIPGroups32(out, buf, ris, points);
         renderIPGroups24(out, buf, ris, points);
         renderIPGroups16(out, buf, ris, points);
@@ -336,6 +338,19 @@ class SybilRenderer {
         }
     }
 
+    private static class FoofComparator implements Comparator<String>, Serializable {
+         private final ObjectCounter<String> _o;
+         public FoofComparator(ObjectCounter<String> o) { _o = o;}
+         public int compare(String l, String r) {
+             // reverse by count
+             int rv = _o.count(r) - _o.count(l);
+             if (rv != 0)
+                 return rv;
+             // foward by name
+             return l.compareTo(r);
+        }
+    }
+
     private void renderIPGroups32(Writer out, StringBuilder buf, List<RouterInfo> ris, Map<Hash, Points> points) throws IOException {
         buf.append("<h3>Floodfills with the Same IP</h3>");
         int sz = ris.size();
@@ -381,7 +396,7 @@ class SybilRenderer {
                 found = true;
                 renderRouterInfo(buf, info, null, false, false);
                 double point = POINTS32 * (count - 1);
-                addPoints(points, info.getHash(), point, "Same IP with " + (count - 1) + " other");
+                addPoints(points, info.getHash(), point, "Same IP with " + (count - 1) + " other" + (( count > 2) ? "s" : ""));
             }
         }
         if (!found)
@@ -432,7 +447,7 @@ class SybilRenderer {
                 found = true;
                 renderRouterInfo(buf, info, null, false, false);
                 double point = POINTS24 * (count - 1);
-                addPoints(points, info.getHash(), point, "Same /24 IP with " + (count - 1) + " other");
+                addPoints(points, info.getHash(), point, "Same /24 IP with " + (count - 1) + " other" + (( count > 2) ? "s" : ""));
             }
         }
         if (!found)
@@ -481,7 +496,48 @@ class SybilRenderer {
                 // limit display
                 //renderRouterInfo(buf, info, null, false, false);
                 double point = POINTS16 * (count - 1);
-                addPoints(points, info.getHash(), point, "Same /16 IP with " + (count - 1) + " other");
+                addPoints(points, info.getHash(), point, "Same /16 IP with " + (count - 1) + " other" + (( count > 2) ? "s" : ""));
+            }
+        }
+        if (!found)
+            buf.append("<p>None</p>");
+        out.write(buf.toString());
+        out.flush();
+        buf.setLength(0);
+    }
+
+    private void renderIPGroupsFamily(Writer out, StringBuilder buf, List<RouterInfo> ris, Map<Hash, Points> points) throws IOException {
+        buf.append("<h3>Floodfills in the Same Declared Family</h3>");
+        int sz = ris.size();
+        ObjectCounter<String> oc = new ObjectCounter<String>();
+        for (RouterInfo info : ris) {
+            String fam = info.getOption("family");
+            if (fam == null)
+                continue;
+            oc.increment(fam);
+        }
+        List<String> foo = new ArrayList<String>(oc.objects());
+        Collections.sort(foo, new FoofComparator(oc));
+        boolean found = false;
+        DecimalFormat fmt = new DecimalFormat("#0.00");
+        for (String s : foo) {
+            int count = oc.count(s);
+            buf.append("<p><b>").append(count).append(" floodfills in declared family \"").append(DataHelper.escapeHTML(s) + '"')
+               .append("</b></p>");
+            for (RouterInfo info : ris) {
+                String fam = info.getOption("family");
+                if (fam == null)
+                    continue;
+                if (!fam.equals(s))
+                    continue;
+                found = true;
+                // limit display
+                //renderRouterInfo(buf, info, null, false, false);
+                double point = POINTS_FAMILY;
+                if (count > 1)
+                    addPoints(points, info.getHash(), point, "Same declared family \"" + DataHelper.escapeHTML(s) + "\" with " + (count - 1) + " other" + (( count > 2) ? "s" : ""));
+                else
+                    addPoints(points, info.getHash(), point, "Declared family \"" + DataHelper.escapeHTML(s) + '"');
             }
         }
         if (!found)
@@ -590,6 +646,9 @@ class SybilRenderer {
         buf.append("<b>Routing Key: </b>").append(info.getRoutingKey().toBase64()).append("<br>\n");
         buf.append("<b>Version: </b>").append(DataHelper.stripHTML(info.getVersion())).append("<br>\n");
         buf.append("<b>Caps: </b>").append(DataHelper.stripHTML(info.getCapabilities())).append("<br>\n");
+        String fam = info.getOption("family");
+        if (fam != null)
+            buf.append("<b>Family: </b>").append(DataHelper.stripHTML(fam)).append("<br>\n");
         String kls = info.getOption("netdb.knownLeaseSets");
         if (kls != null)
             buf.append("<b>Lease Sets: </b>").append(DataHelper.stripHTML(kls)).append("<br>\n");
