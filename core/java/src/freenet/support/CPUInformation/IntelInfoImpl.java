@@ -320,6 +320,13 @@ class IntelInfoImpl extends CPUIDCPUInfo implements IntelCPUInfo
                         isCoreiCompatible = false;
                         modelString = "Atom";
                         break;
+                    // Silvermont 22 nm Celeron
+                    case 0x37:
+                        isAtomCompatible = true;
+                        isCore2Compatible = false;
+                        isCoreiCompatible = false;
+                        modelString = "Atom";
+                        break;
                     // Ivy Bridge 22 nm
                     case 0x3a:
                         isSandyCompatible = true;

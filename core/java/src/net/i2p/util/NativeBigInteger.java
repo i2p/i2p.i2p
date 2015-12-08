@@ -19,6 +19,7 @@ import java.math.BigInteger;
 import java.net.URL;
 import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -219,9 +220,9 @@ public class NativeBigInteger extends BigInteger {
     private final static String[] JBIGI_COMPAT_LIST_AMD_APU       = {JBIGI_OPTIMIZATION_JAGUAR, JBIGI_OPTIMIZATION_BOBCAT, JBIGI_OPTIMIZATION_ATHLON64};
     private final static String[] JBIGI_COMPAT_LIST_AMD_BULLDOZER = {JBIGI_OPTIMIZATION_EXCAVATOR, JBIGI_OPTIMIZATION_STEAMROLLER, JBIGI_OPTIMIZATION_PILEDRIVER,
                                                                      JBIGI_OPTIMIZATION_BULLDOZER, JBIGI_OPTIMIZATION_ATHLON64, JBIGI_OPTIMIZATION_X86};
-    private final static String[] JBIGI_COMPAT_LIST_INTEL_ATOM    = {JBIGI_OPTIMIZATION_ATOM, JBIGI_OPTIMIZATION_PENTIUM4, JBIGI_OPTIMIZATION_PENTIUM3,
-                                                                     JBIGI_OPTIMIZATION_PENTIUM2, JBIGI_OPTIMIZATION_PENTIUMMMX, JBIGI_OPTIMIZATION_PENTIUM,
-                                                                     JBIGI_OPTIMIZATION_X86};
+    private final static String[] JBIGI_COMPAT_LIST_INTEL_ATOM    = {JBIGI_OPTIMIZATION_ATOM, JBIGI_OPTIMIZATION_PENTIUM3, JBIGI_OPTIMIZATION_PENTIUM2,
+                                                                     JBIGI_OPTIMIZATION_PENTIUMMMX, JBIGI_OPTIMIZATION_PENTIUM, JBIGI_OPTIMIZATION_X86,
+                                                                     JBIGI_OPTIMIZATION_PENTIUM4};
     private final static String[] JBIGI_COMPAT_LIST_INTEL_PENTIUM = {JBIGI_OPTIMIZATION_PENTIUM4, JBIGI_OPTIMIZATION_PENTIUMM, JBIGI_OPTIMIZATION_PENTIUM3,
                                                                      JBIGI_OPTIMIZATION_PENTIUM2, JBIGI_OPTIMIZATION_PENTIUMMMX, JBIGI_OPTIMIZATION_PENTIUM,
                                                                      JBIGI_OPTIMIZATION_X86};
@@ -264,7 +265,7 @@ public class NativeBigInteger extends BigInteger {
         put(JBIGI_OPTIMIZATION_STEAMROLLER, JBIGI_COMPAT_LIST_AMD_BULLDOZER);
         put(JBIGI_OPTIMIZATION_EXCAVATOR,   JBIGI_COMPAT_LIST_AMD_BULLDOZER);
 
-        put(JBIGI_OPTIMIZATION_ATOM, JBIGI_COMPAT_LIST_INTEL_CORE);
+        put(JBIGI_OPTIMIZATION_ATOM, JBIGI_COMPAT_LIST_INTEL_ATOM);
 
         put(JBIGI_OPTIMIZATION_PENTIUM,    JBIGI_COMPAT_LIST_INTEL_PENTIUM);
         put(JBIGI_OPTIMIZATION_PENTIUMMMX, JBIGI_COMPAT_LIST_INTEL_PENTIUM);
@@ -382,10 +383,13 @@ public class NativeBigInteger extends BigInteger {
                         return JBIGI_OPTIMIZATION_COREI;
                     if (intelcpu.IsCore2Compatible())
                         return JBIGI_OPTIMIZATION_CORE2;
-                    if (intelcpu.IsPentium4Compatible())
-                        return JBIGI_OPTIMIZATION_PENTIUM4;
+                    // The isAtomCompatible check should be done before the Pentium4
+                    // check since they are compatible, but Atom performs better with
+                    // the JBIGI_OPTIMIZATION_ATOM compability list.
                     if (intelcpu.IsAtomCompatible())
                         return JBIGI_OPTIMIZATION_ATOM;
+                    if (intelcpu.IsPentium4Compatible())
+                        return JBIGI_OPTIMIZATION_PENTIUM4;
                     if (intelcpu.IsPentiumMCompatible())
                         return JBIGI_OPTIMIZATION_PENTIUMM;
                     if (intelcpu.IsPentium3Compatible())
@@ -1157,7 +1161,8 @@ public class NativeBigInteger extends BigInteger {
             }
             
             if (rv.isEmpty()) {
-                error("Couldn't find the arch \"" + primary + "\" in its compatibility map \"" + compatList.toString() + "\"");
+                error("Couldn't find the arch \"" + primary + "\" in its compatibility map \"" +
+                      primary + ": " + Arrays.toString(compatList) + "\"");
             }
         }
         
