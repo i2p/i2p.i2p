@@ -5,7 +5,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.UnknownHostException;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Locale;
 import java.util.Properties;
 
@@ -112,9 +113,11 @@ public class I2PSocketEepGet extends EepGet {
         if (_socket != null) try { _socket.close(); } catch (IOException ioe) {}
 
         try {
-            URL url = new URL(_actualURL);
-            if ("http".equals(url.getProtocol())) {
+            URI url = new URI(_actualURL);
+            if ("http".equals(url.getScheme())) {
                 String host = url.getHost();
+                if (host == null)
+                    throw new MalformedURLException("no hostname: " + _actualURL);
                 int port = url.getPort();
                 if (port <= 0 || port > 65535)
                     port = 80;
@@ -123,13 +126,16 @@ public class I2PSocketEepGet extends EepGet {
                 // Rewrite the url to strip out the /i2p/,
                 // as the naming service accepts B64KEY (but not B64KEY.i2p atm)
                 if ("i2p".equals(host)) {
-                    String file = url.getFile();
+                    String file = url.getRawPath();
                     try {
                         int slash = 1 + file.substring(1).indexOf("/");
                         host = file.substring(1, slash);
                         _actualURL = "http://" + host + file.substring(slash);
+                        String query = url.getRawQuery();
+                        if (query != null)
+                            _actualURL = _actualURL + '?' + query;
                     } catch (IndexOutOfBoundsException ioobe) {
-                        throw new IOException("Bad /i2p/ format: " + _actualURL);
+                        throw new MalformedURLException("Bad /i2p/ format: " + _actualURL);
                     }
                 }
 
@@ -173,12 +179,14 @@ public class I2PSocketEepGet extends EepGet {
                 opts.setPort(port);
                 _socket = _socketManager.connect(dest, opts);
             } else {
-                throw new IOException("Unsupported protocol: " + _actualURL);
+                throw new MalformedURLException("Unsupported protocol: " + _actualURL);
             }
-        } catch (MalformedURLException mue) {
-            throw new IOException("Request URL is invalid: " + _actualURL);
+        } catch (URISyntaxException use) {
+            IOException ioe = new MalformedURLException("Bad URL");
+            ioe.initCause(use);
+            throw ioe;
         } catch (I2PException ie) {
-            throw new IOException(ie.toString());
+            throw new IOException("I2P error", ie);
         }
 
         _proxyIn = _socket.getInputStream();
@@ -202,10 +210,17 @@ public class I2PSocketEepGet extends EepGet {
     @Override
     protected String getRequest() throws IOException {
         StringBuilder buf = new StringBuilder(2048);
-        URL url = new URL(_actualURL);
+        URI url;
+        try {
+            url = new URI(_actualURL);
+        } catch (URISyntaxException use) {
+            IOException ioe = new MalformedURLException("Bad URL");
+            ioe.initCause(use);
+            throw ioe;
+        }
         //String host = url.getHost();
-        String path = url.getPath();
-        String query = url.getQuery();
+        String path = url.getRawPath();
+        String query = url.getRawQuery();
         if (query != null)
             path = path + '?' + query;
         if (!path.startsWith("/"))
@@ -232,6 +247,8 @@ public class I2PSocketEepGet extends EepGet {
         if(!uaOverridden)
             buf.append("User-Agent: " + USER_AGENT + "\r\n");
         buf.append("\r\n");
+        if (_log.shouldDebug())
+            _log.debug("Request: [" + buf.toString() + "]");
         return buf.toString();
     }
 
@@ -264,7 +281,7 @@ public class I2PSocketEepGet extends EepGet {
                     url = args[i];
                 }
             }
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             e.printStackTrace();
             usage();
             return;

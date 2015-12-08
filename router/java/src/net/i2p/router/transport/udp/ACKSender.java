@@ -148,7 +148,7 @@ class ACKSender implements Runnable {
                         try {
                             // bulk operations may throw an exception
                             _peersToACK.addAll(notYet);
-                        } catch (Exception e) {}
+                        } catch (RuntimeException e) {}
                         if (_log.shouldLog(Log.DEBUG))
                             _log.debug("sleeping, pending size = " + notYet.size());
                         notYet.clear();

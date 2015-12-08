@@ -209,7 +209,7 @@ public class DeliveryInstructions extends DataStructureImpl {
     
     public int readBytes(byte data[], int offset) throws DataFormatException {
         int cur = offset;
-        long flags = DataHelper.fromLong(data, cur, 1);
+        int flags = data[cur] & 0xff;
         cur++;
         //if (_log.shouldLog(Log.DEBUG))
         //    _log.debug("Read flags: " + flags + " mode: " +  flagMode(flags));

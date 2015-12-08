@@ -261,6 +261,9 @@ public class RouterContext extends I2PAppContext {
     /**
      *  Convenience method for getting the router hash.
      *  Equivalent to context.router().getRouterInfo().getIdentity().getHash()
+     *
+     *  Warning - risk of deadlock - do not call while holding locks
+     *
      *  @return may be null if called very early
      */
     public Hash routerHash() {

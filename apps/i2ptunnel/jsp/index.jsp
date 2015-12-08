@@ -60,6 +60,7 @@
 <%
 
   if (indexBean.isInitialized()) {
+      String nextNonce = net.i2p.i2ptunnel.web.IndexBean.getNextNonce();
 
 %>
     <div id="globalOperationsPanel" class="panel">
@@ -67,12 +68,12 @@
         <div class="footer">
             <div class="toolbox">
                 <a class="control" href="wizard"><%=intl._t("Tunnel Wizard")%></a>
-                <a class="control" href="list?nonce=<%=indexBean.getNextNonce()%>&amp;action=Stop%20all"><%=intl._t("Stop All")%></a>
-                <a class="control" href="list?nonce=<%=indexBean.getNextNonce()%>&amp;action=Start%20all"><%=intl._t("Start All")%></a>
-                <a class="control" href="list?nonce=<%=indexBean.getNextNonce()%>&amp;action=Restart%20all"><%=intl._t("Restart All")%></a>
+                <a class="control" href="list?nonce=<%=nextNonce%>&amp;action=Stop%20all"><%=intl._t("Stop All")%></a>
+                <a class="control" href="list?nonce=<%=nextNonce%>&amp;action=Start%20all"><%=intl._t("Start All")%></a>
+                <a class="control" href="list?nonce=<%=nextNonce%>&amp;action=Restart%20all"><%=intl._t("Restart All")%></a>
 <%--
                 //this is really bad because it stops and restarts all tunnels, which is probably not what you want
-                <a class="control" href="list?nonce=<%=indexBean.getNextNonce()%>&amp;action=Reload%20configuration"><%=intl._t("Reload Config")%></a>
+                <a class="control" href="list?nonce=<%=nextNonce%>&amp;action=Reload%20configuration"><%=intl._t("Reload Config")%></a>
 --%>
             </div>
         </div> 
@@ -152,17 +153,17 @@
             switch (indexBean.getTunnelStatus(curServer)) {
                 case IndexBean.STARTING:
           %><div class="statusStarting text"><%=intl._t("Starting...")%></div>    
-            <a class="control" title="Stop this Tunnel" href="list?nonce=<%=indexBean.getNextNonce()%>&amp;action=stop&amp;tunnel=<%=curServer%>"><%=intl._t("Stop")%></a>
+            <a class="control" title="Stop this Tunnel" href="list?nonce=<%=nextNonce%>&amp;action=stop&amp;tunnel=<%=curServer%>"><%=intl._t("Stop")%></a>
         <%
                 break;
                 case IndexBean.RUNNING:
           %><div class="statusRunning text"><%=intl._t("Running")%></div>    
-            <a class="control" title="Stop this Tunnel" href="list?nonce=<%=indexBean.getNextNonce()%>&amp;action=stop&amp;tunnel=<%=curServer%>"><%=intl._t("Stop")%></a>
+            <a class="control" title="Stop this Tunnel" href="list?nonce=<%=nextNonce%>&amp;action=stop&amp;tunnel=<%=curServer%>"><%=intl._t("Stop")%></a>
         <%
                 break;
                 case IndexBean.NOT_RUNNING:
           %><div class="statusNotRunning text"><%=intl._t("Stopped")%></div>    
-            <a class="control" title="Start this Tunnel" href="list?nonce=<%=indexBean.getNextNonce()%>&amp;action=start&amp;tunnel=<%=curServer%>"><%=intl._t("Start")%></a>
+            <a class="control" title="Start this Tunnel" href="list?nonce=<%=nextNonce%>&amp;action=start&amp;tunnel=<%=curServer%>"><%=intl._t("Start")%></a>
         <%
                 break;
             }
@@ -275,22 +276,22 @@
             switch (indexBean.getTunnelStatus(curClient)) {
                 case IndexBean.STARTING:
           %><div class="statusStarting text"><%=intl._t("Starting...")%></div>
-            <a class="control" title="Stop this Tunnel" href="list?nonce=<%=indexBean.getNextNonce()%>&amp;action=stop&amp;tunnel=<%=curClient%>"><%=intl._t("Stop")%></a>
+            <a class="control" title="Stop this Tunnel" href="list?nonce=<%=nextNonce%>&amp;action=stop&amp;tunnel=<%=curClient%>"><%=intl._t("Stop")%></a>
         <%
                 break;
                 case IndexBean.STANDBY:
           %><div class="statusStarting text"><%=intl._t("Standby")%></div>
-            <a class="control" title="Stop this Tunnel" href="list?nonce=<%=indexBean.getNextNonce()%>&amp;action=stop&amp;tunnel=<%=curClient%>"><%=intl._t("Stop")%></a>
+            <a class="control" title="Stop this Tunnel" href="list?nonce=<%=nextNonce%>&amp;action=stop&amp;tunnel=<%=curClient%>"><%=intl._t("Stop")%></a>
         <%
                 break;
                 case IndexBean.RUNNING:
           %><div class="statusRunning text"><%=intl._t("Running")%></div>
-            <a class="control" title="Stop this Tunnel" href="list?nonce=<%=indexBean.getNextNonce()%>&amp;action=stop&amp;tunnel=<%=curClient%>"><%=intl._t("Stop")%></a>
+            <a class="control" title="Stop this Tunnel" href="list?nonce=<%=nextNonce%>&amp;action=stop&amp;tunnel=<%=curClient%>"><%=intl._t("Stop")%></a>
         <%
                 break;
                 case IndexBean.NOT_RUNNING:
           %><div class="statusNotRunning text"><%=intl._t("Stopped")%></div>
-            <a class="control" title="Start this Tunnel" href="list?nonce=<%=indexBean.getNextNonce()%>&amp;action=start&amp;tunnel=<%=curClient%>"><%=intl._t("Start")%></a>
+            <a class="control" title="Start this Tunnel" href="list?nonce=<%=nextNonce%>&amp;action=start&amp;tunnel=<%=curClient%>"><%=intl._t("Start")%></a>
         <%
                 break;
             }

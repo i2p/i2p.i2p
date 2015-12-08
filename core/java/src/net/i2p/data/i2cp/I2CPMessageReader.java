@@ -160,7 +160,7 @@ public class I2CPMessageReader {
         public void run() {
             try {
                 run2();
-            } catch (Exception e) {
+            } catch (RuntimeException e) {
                 _log.log(Log.CRIT, "Uncaught I2CP error", e);
                 _listener.readError(I2CPMessageReader.this, e);
                 cancelRunner();
@@ -193,7 +193,7 @@ public class I2CPMessageReader {
                     } catch (OutOfMemoryError oom) {
                         // ooms seen here... maybe log and keep going?
                         throw oom;
-                    } catch (Exception e) {
+                    } catch (RuntimeException e) {
                         _log.log(Log.CRIT, "Unhandled error reading I2CP stream", e);
                         _listener.disconnected(I2CPMessageReader.this);
                         cancelRunner();

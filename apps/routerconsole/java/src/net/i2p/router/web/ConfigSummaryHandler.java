@@ -108,7 +108,7 @@ public class ConfigSummaryHandler extends FormHandler {
                     }
                 }
             } else if (moving) {
-                String parts[] = _action.split("_");
+                String parts[] = DataHelper.split(_action, "_");
                 try {
                     int from = Integer.parseInt(parts[1]);
                     int to = 0;

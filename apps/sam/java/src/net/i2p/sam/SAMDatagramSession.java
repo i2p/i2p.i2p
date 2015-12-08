@@ -78,24 +78,24 @@ class SAMDatagramSession extends SAMMessageSession {
      *
      * @param dest Destination
      * @param data Bytes to be sent
+     * @param proto ignored, will always use PROTO_DATAGRAM (17)
      *
      * @return True if the data was sent, false otherwise
      * @throws DataFormatException on unknown / bad dest
      * @throws I2PSessionException on serious error, probably session closed
      */
-    public boolean sendBytes(String dest, byte[] data) throws DataFormatException, I2PSessionException {
+    public boolean sendBytes(String dest, byte[] data, int proto,
+                             int fromPort, int toPort) throws DataFormatException, I2PSessionException {
         if (data.length > DGRAM_SIZE_MAX)
             throw new DataFormatException("Datagram size exceeded (" + data.length + ")");
         byte[] dgram ;
         synchronized (dgramMaker) {
         	dgram = dgramMaker.makeI2PDatagram(data);
         }
-        // TODO pass ports through
-        return sendBytesThroughMessageSession(dest, dgram, I2PSession.PROTO_DATAGRAM,
-                                              I2PSession.PORT_UNSPECIFIED, I2PSession.PORT_UNSPECIFIED);
+        return sendBytesThroughMessageSession(dest, dgram, I2PSession.PROTO_DATAGRAM, fromPort, toPort);
     }
 
-    protected void messageReceived(byte[] msg) {
+    protected void messageReceived(byte[] msg, int proto, int fromPort, int toPort) {
         byte[] payload;
         Destination sender;
         try {
@@ -106,18 +106,18 @@ class SAMDatagramSession extends SAMMessageSession {
             }
         } catch (DataFormatException e) {
             if (_log.shouldLog(Log.DEBUG)) {
-                _log.debug("Dropping ill-formatted I2P repliable datagram");
+                _log.debug("Dropping ill-formatted I2P repliable datagram", e);
             }
             return;
         } catch (I2PInvalidDatagramException e) {
             if (_log.shouldLog(Log.DEBUG)) {
-                _log.debug("Dropping ill-signed I2P repliable datagram");
+                _log.debug("Dropping ill-signed I2P repliable datagram", e);
             }
             return;
         }
 
         try {
-            recv.receiveDatagramBytes(sender, payload);
+            recv.receiveDatagramBytes(sender, payload, proto, fromPort, toPort);
         } catch (IOException e) {
             _log.error("Error forwarding message to receiver", e);
             close();

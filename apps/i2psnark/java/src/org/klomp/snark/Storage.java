@@ -78,14 +78,15 @@ public class Storage implements Closeable
   /** The default piece size. */
   private static final int DEFAULT_PIECE_SIZE = 256*1024;
   /** bigger than this will be rejected */
-  public static final int MAX_PIECE_SIZE = 8*1024*1024;
+  public static final int MAX_PIECE_SIZE = 16*1024*1024;
   /** The maximum number of pieces in a torrent. */
-  public static final int MAX_PIECES = 10*1024;
+  public static final int MAX_PIECES = 32*1024;
   public static final long MAX_TOTAL_SIZE = MAX_PIECE_SIZE * (long) MAX_PIECES;
 
   private static final Map<String, String> _filterNameCache = new ConcurrentHashMap<String, String>();
 
   private static final boolean _isWindows = SystemVersion.isWindows();
+  private static final boolean _isARM = SystemVersion.isARM();
 
   private static final int BUFSIZE = PeerState.PARTSIZE;
   private static final ByteCache _cache = ByteCache.getInstance(16, BUFSIZE);
@@ -165,7 +166,7 @@ public class Storage implements Closeable
     else
         pc_size = DEFAULT_PIECE_SIZE;
     int pcs = (int) ((total - 1)/pc_size) + 1;
-    while (pcs > (MAX_PIECES * 2 / 3) && pc_size < MAX_PIECE_SIZE)
+    while (pcs > (MAX_PIECES / 3) && pc_size < MAX_PIECE_SIZE)
       {
         pc_size *= 2;
         pcs = (int) ((total - 1)/pc_size) +1;
@@ -518,6 +519,31 @@ public class Storage implements Closeable
   }
 
   /**
+   *  Call setPriority() for all changed files first,
+   *  then call this.
+   *  The length of all the pieces that are not yet downloaded,
+   *  and are set to skipped.
+   *  This is not the same as the total of all skipped files,
+   *  since pieces may span multiple files.
+   *
+   *  @return 0 on error, if complete, or if only one file
+   *  @since 0.9.24
+   */
+  public long getSkippedLength() {
+      int[] pri = getPiecePriorities();
+      if (pri == null)
+          return 0;
+      long rv = 0;
+      final int end = pri.length - 1;
+      for (int i = 0; i <= end; i++) {
+          if (pri[i] <= -9 && !bitfield.get(i)) {
+              rv += (i != end) ? piece_size : metainfo.getPieceLength(i);
+          }
+      }
+      return rv;
+  }
+
+  /**
    * The BitField that tells which pieces this storage contains.
    * Do not change this since this is the current state of the storage.
    */
@@ -747,7 +773,7 @@ public class Storage implements Closeable
                     }
                     rv = repl;
                 }
-            } catch (Exception ex) {
+            } catch (RuntimeException ex) {
                 ex.printStackTrace();
             }
         }
@@ -817,6 +843,14 @@ public class Storage implements Closeable
           rv.add(tf.RAFfile);
       }
       return rv;
+  }
+
+  /**
+   *  Does not include directories.
+   *  @since 0.9.23
+   */
+  public int getFileCount() {
+      return _torrentFiles.size();
   }
 
   /**
@@ -958,11 +992,9 @@ public class Storage implements Closeable
             pieceEnd += length;
             while (fileEnd <= pieceEnd) {
                 TorrentFile tf = _torrentFiles.get(file);
-                synchronized(tf) {
-                    try {
-                        tf.closeRAF();
-                    } catch (IOException ioe) {}
-                }
+                try {
+                    tf.closeRAF();
+                } catch (IOException ioe) {}
                 if (++file >= _torrentFiles.size())
                     break;
                 fileEnd += _torrentFiles.get(file).length;
@@ -1035,9 +1067,7 @@ public class Storage implements Closeable
     for (TorrentFile tf : _torrentFiles)
       {
         try {
-          synchronized(tf) {
             tf.closeRAF();
-          }
         } catch (IOException ioe) {
             _log.error("Error closing " + tf, ioe);
             // gobble gobble
@@ -1262,17 +1292,15 @@ public class Storage implements Closeable
     return length;
   }
 
-  private static final long RAFCloseDelay = 4*60*1000;
+  private static final long RAF_CLOSE_DELAY = 4*60*1000;
 
   /**
    * Close unused RAFs - call periodically
    */
   public void cleanRAFs() {
-    long cutoff = System.currentTimeMillis() - RAFCloseDelay;
+    long cutoff = System.currentTimeMillis() - RAF_CLOSE_DELAY;
     for (TorrentFile tf : _torrentFiles) {
-      synchronized(tf) {
          tf.closeRAF(cutoff);
-      }
     }
   }
 
@@ -1398,7 +1426,9 @@ public class Storage implements Closeable
           // Windows will zero-fill up to the point of the write, which
           // will make the file fairly unfragmented, on average, at least until
           // near the end where it will get exponentially more fragmented.
-          if (!_isWindows)
+          // Also don't ballon on ARM, as a proxy for solid state disk, where fragmentation doesn't matter too much.
+          // Actual detection of SSD is almost impossible.
+          if (!_isWindows && !_isARM)
               isSparse = true;
       }
 
@@ -1478,7 +1508,7 @@ public class Storage implements Closeable
                   break;
             }  // switch
           } // while
-      } catch (Exception e) {
+      } catch (RuntimeException e) {
           e.printStackTrace();
           error = true;
       }

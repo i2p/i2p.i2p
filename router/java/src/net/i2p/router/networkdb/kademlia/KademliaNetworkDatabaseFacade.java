@@ -274,7 +274,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         //_ds = new TransientDataStore();
 //        _exploreKeys = new HashSet(64);
         _dbDir = dbDir;
-        _negativeCache = new NegativeLookupCache();
+        _negativeCache = new NegativeLookupCache(_context);
         
         createHandlers();
         

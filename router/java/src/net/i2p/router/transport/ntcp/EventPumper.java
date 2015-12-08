@@ -335,7 +335,7 @@ class EventPumper implements Runnable {
                             con.close();
                             key.cancel();
                         }
-                    } catch (Exception ke) {
+                    } catch (IOException ke) {
                         _log.error("Error closing key " + key + " on pumper shutdown", ke);
                     }
                 }
@@ -344,7 +344,7 @@ class EventPumper implements Runnable {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Closing down the event pumper with no selection keys remaining");
             }
-        } catch (Exception e) {
+        } catch (IOException e) {
             _log.error("Error closing keys on pumper shutdown", e);
         }
         _wantsConRegister.clear();

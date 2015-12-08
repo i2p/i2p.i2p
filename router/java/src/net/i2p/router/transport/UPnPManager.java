@@ -88,7 +88,7 @@ class UPnPManager {
                 _isRunning = _upnp.runPlugin();
                 if (_log.shouldLog(Log.INFO))
                     _log.info("UPnP runPlugin took " + (_context.clock().now() - b));
-            } catch (Exception e) {
+            } catch (RuntimeException e) {
                 // NPE in UPnP (ticket #728), can't let it bring us down
                 if (!_errorLogged) {
                     _log.error("UPnP error, please report", e);
@@ -233,7 +233,17 @@ class UPnPManager {
         public void portForwardStatus(Map<ForwardPort,ForwardPortStatus> statuses) {
             if (_log.shouldLog(Log.DEBUG))
                  _log.debug("UPnP Callback:");
+            // Let's not have two of these running at once.
+            // Deadlock reported in ticket #1699
+            // and the locking isn't foolproof in UDPTransport.
+            // UPnP runs the callbacks in a thread, so we can block.
+            // There is only one UPnPCallback, so lock on this
+            synchronized(this) {
+                locked_PFS(statuses);
+            }
+        }
 
+        private void locked_PFS(Map<ForwardPort,ForwardPortStatus> statuses) {
             byte[] ipaddr = null;
             DetectedIP[] ips = _upnp.getAddress();
             if (ips != null) {
@@ -244,6 +254,7 @@ class UPnPManager {
                             _log.debug("External address: " + ip.publicAddress + " type: " + ip.natType);
                         if (!ip.publicAddress.equals(_detectedAddress)) {
                             _detectedAddress = ip.publicAddress;
+                            // deadlock path 1
                             _manager.externalAddressReceived(SOURCE_UPNP, _detectedAddress.getAddress(), 0);
                         }
                         ipaddr = ip.publicAddress.getAddress();
@@ -269,6 +280,7 @@ class UPnPManager {
                 else
                     continue;
                 boolean success = fps.status >= ForwardPortStatus.MAYBE_SUCCESS;
+                // deadlock path 2
                 _manager.forwardPortStatus(style, ipaddr, fp.portNumber, fps.externalPort, success, fps.reasonString);
             }
         }

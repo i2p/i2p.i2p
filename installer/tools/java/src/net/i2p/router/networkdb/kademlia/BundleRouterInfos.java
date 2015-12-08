@@ -24,6 +24,7 @@ import java.util.Properties;
 import gnu.getopt.Getopt;
 
 import net.i2p.I2PAppContext;
+import net.i2p.data.DataFormatException;
 import net.i2p.data.Hash;
 import net.i2p.data.router.RouterAddress;
 import net.i2p.data.router.RouterInfo;
@@ -109,7 +110,9 @@ public class BundleRouterInfos {
             RouterInfo ri = new RouterInfo();
             ri.readBytes(fis, true);  // true = verify sig on read
             me = ri.getIdentity().getHash();
-        } catch (Exception e) {
+        } catch (IOException e) {
+            //System.out.println("Can't determine our identity");
+        } catch (DataFormatException e) {
             //System.out.println("Can't determine our identity");
         } finally {
             if (fis != null) try { fis.close(); } catch (IOException ioe) {}
@@ -209,7 +212,9 @@ public class BundleRouterInfos {
                     copied++;
                 else
                     System.out.println("Failed copy of " + file + " to " + toDir);
-            } catch (Exception e) {
+            } catch (IOException e) {
+                System.out.println("Skipping bad " + file);
+            } catch (DataFormatException e) {
                 System.out.println("Skipping bad " + file);
             } finally {
                 if (fis != null) try { fis.close(); } catch (IOException ioe) {}

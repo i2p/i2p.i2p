@@ -288,7 +288,7 @@ public class WebMail extends HttpServlet
 	 */
 	private static class SenderSorter extends SorterBase {
 
-		private final Comparator collator = Collator.getInstance();
+		private final Comparator<Object> collator = Collator.getInstance();
 
 		public SenderSorter( MailCache mailCache )
 		{
@@ -307,7 +307,7 @@ public class WebMail extends HttpServlet
 	 * @author susi
 	 */
 	private static class SubjectSorter extends SorterBase {
-		private final Comparator collator = Collator.getInstance();
+		private final Comparator<Object> collator = Collator.getInstance();
 
 		public SubjectSorter( MailCache mailCache )
 		{
@@ -614,7 +614,7 @@ public class WebMail extends HttpServlet
 						showBody = false;
 						reason = _t("Charset \\''{0}\\'' not supported.", quoteHTML( mailPart.charset )) + br;
 					}
-					catch (Exception e1) {
+					catch (IOException e1) {
 						showBody = false;
 						reason += _t("Part ({0}) not shown, because of {1}", ident, e1.toString()) + br;
 					}
@@ -996,7 +996,7 @@ public class WebMail extends HttpServlet
 							PrintWriter pw2 = new PrintWriter( text2 );
 							showPart( pw2, part, 0, TEXT_ONLY );
 							pw2.flush();
-							String[] lines = text2.toString().split( "\r\n" );
+							String[] lines = DataHelper.split(text2.toString(), "\r\n");
 							for( int i = 0; i < lines.length; i++ )
 								pw.println( "> " + lines[i] );
 							pw.flush();
@@ -2299,7 +2299,7 @@ public class WebMail extends HttpServlet
 	/**
 	 *  first prev next last
 	 */
-	private static void showPageButtons(PrintWriter out, Folder folder) {
+	private static void showPageButtons(PrintWriter out, Folder<?> folder) {
 		out.println(
 			"<br>" +
 			( folder.isFirstPage() ?

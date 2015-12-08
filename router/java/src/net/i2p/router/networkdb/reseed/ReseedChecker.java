@@ -3,7 +3,7 @@ package net.i2p.router.networkdb.reseed;
 import java.io.File;
 import java.io.InputStream;
 import java.io.IOException;
-import java.net.URL;
+import java.net.URI;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import net.i2p.data.DataHelper;
@@ -131,7 +131,7 @@ public class ReseedChecker {
      *  @throws IllegalArgumentException if it doesn't end with zip or su3
      *  @since 0.9.19
      */
-    public boolean requestReseed(URL url) throws IllegalArgumentException {
+    public boolean requestReseed(URI url) throws IllegalArgumentException {
         if (_inProgress.compareAndSet(false, true)) {
             Reseeder reseeder = new Reseeder(_context, this);
             try {

@@ -15,7 +15,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-07-13 21:46+0000\n"
-"PO-Revision-Date: 2015-08-26 06:24+0000\n"
+"PO-Revision-Date: 2015-11-08 21:30+0000\n"
 "Last-Translator: Anders Nilsson <locally@devode.se>\n"
 "Language-Team: Swedish (Sweden) (http://www.transifex.com/otf/I2P/language/sv_SE/)\n"
 "MIME-Version: 1.0\n"
@@ -32,7 +32,7 @@ msgstr "Välkommen till I2P!"
 
 #, java-format
 msgid "Please {0}have patience{1} as I2P boots up and finds peers."
-msgstr "{0}Ha tålamod{1} medan I2P startar upp och letar upp peers."
+msgstr "Vänligen {0}ha tålamod{1} medan I2P startar och letar upp noder."
 
 #, java-format
 msgid ""

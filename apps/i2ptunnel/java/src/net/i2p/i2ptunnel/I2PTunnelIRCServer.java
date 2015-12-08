@@ -13,6 +13,7 @@ import java.util.Properties;
 
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.crypto.SHA256Generator;
+import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
 import net.i2p.data.Base32;
@@ -277,7 +278,7 @@ public class I2PTunnelIRCServer extends I2PTunnelServer implements Runnable {
             //if (_log.shouldLog(Log.DEBUG))
             //    _log.debug("Got line: " + s);
 
-            String field[]=s.split(" ",5);
+            String field[] = DataHelper.split(s, " ", 5);
             String command;
             int idx=0;
 

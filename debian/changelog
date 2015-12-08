@@ -1,3 +1,57 @@
+i2p (0.9.23-2) unstable; urgency=medium
+
+  * Backport of two fixes from after the release of 0.9.23
+    - debian/patches/0005-Console-Fix-escaping-of-plugin-description-on-config.patch
+    - debian/patches/0006-NetDb-Fix-deadlock-ticket-1722.patch
+  * AppArmor:
+    - Remove 'l' from the debian AppArmor profiles
+    - Allow writing to /tmp/imageio*, needed by graph creation on some systems
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Sun, 06 Dec 2015 14:28:23 +0000
+
+i2p (0.9.23-1) unstable; urgency=medium
+
+  * New Upstream Version
+    - Accelerate transition to Ed25519
+    - Fix some bugs soft restarting after a large clock shift (e.g. resume) (but more to do)
+    - Fix streaming retransmission timers that were dying, and related timer bugs
+    - Fix streaming connections rejected while tunnel is opening
+    - Fix rare i2psnark and UPnP deadlocks
+    - Fix lifetime participating bandwidth display in console
+    - Increase default outbound exploratory tunnel length to 3
+    - Use max of 2 not-failing peers in exploratory tunnels to improve build success
+    - Add support for hostnames prefixed with "www.";
+    - Store news feed items separately on disk, show on new /news page, limit display on home page to 2
+    - Increase probability of rekeying to EdDSA
+    - Detect for broken ECDSA support in Gentoo
+    - Console: Add a Java 6 warning, this is the last release to support Java 6
+    - Changes to prepare for Java 9 compatibility
+    - i2ptunnel: Pass Accept-Encoding header through client and server proxies, to allow end-to-end compression
+    - i2psnark: Increase piece size, piece count, and file count limits
+    - i2psnark: Save added and completed times
+    - i2psnark: Save magnet parameters across restart
+    - i2psnark: Don't delete .torrent file on errors at startup, rename to .torrent.BAD
+    - i2psnark: Add recheck, start, stop buttons on details pages
+    - i2psnark: Add option to disable "smart sort"
+    - Speed up IP address validation
+    - Separate streaming blacklists for ECDSA and EdDSA
+    - Translation updates
+    - Update GeoIP data (new installs and PPA only)
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Thu, 19 Nov 2015 12:41:36 +0000
+
+i2p (0.9.22-1) unstable; urgency=medium
+
+  * New Upstream Version
+   - Start migration to Ed25519 router info signatures
+   - Fix i2psnark getting stuck before download complete, and not deleting temp
+     files
+   - Fix excluded SSL ciphers in console
+   - Translation updates
+   - Update GeoIP data
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Sun, 13 Sep 2015 11:27:16 +0000
+
 i2p (0.9.21-2) unstable; urgency=medium
 
   * Add exception to apparmor rules for scrypt, needed by I2P-Bote

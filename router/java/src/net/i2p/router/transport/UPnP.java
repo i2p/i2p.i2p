@@ -4,9 +4,9 @@
 package net.i2p.router.transport;
 
 import java.net.InetAddress;
-import java.net.MalformedURLException;
 import java.net.UnknownHostException;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -19,6 +19,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
 import net.i2p.util.Addresses;
+import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 import net.i2p.util.Translate;
 
@@ -223,7 +224,7 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 		boolean ignore = false;
 		String toIgnore = _context.getProperty(PROP_IGNORE);
 		if (toIgnore != null) {
-			String[] ignores = toIgnore.split("[,; \r\n\t]");
+			String[] ignores = DataHelper.split(toIgnore, "[,; \r\n\t]");
 			for (int i = 0; i < ignores.length; i++) {
 				if (ignores[i].equals(udn)) {
 					ignore = true;
@@ -475,7 +476,7 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 		ServiceStateTable table;
 		try {
 			table = serv.getServiceStateTable();
-		} catch (Exception e) {
+		} catch (RuntimeException e) {
 			// getSCPDNode() returns null,
 			// NPE at org.cybergarage.upnp.Service.getServiceStateTable(Service.java:526)
 			sb.append(" : no state");
@@ -822,17 +823,17 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 		String him = _router.getURLBase();
 		if (him != null && him.length() > 0) {
 			try {
-				URL url = new URL(him);
+				URI url = new URI(him);
 				hisIP = url.getHost();
-			} catch (MalformedURLException mue) {}
+			} catch (URISyntaxException use) {}
 		}
 		if (hisIP == null) {
 			him = _router.getLocation();
 			if (him != null && him.length() > 0) {
 				try {
-					URL url = new URL(him);
+					URI url = new URI(him);
 					hisIP = url.getHost();
-				} catch (MalformedURLException mue) {}
+				} catch (URISyntaxException use) {}
 			}
 		}
 		if (hisIP == null)
@@ -994,7 +995,7 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 		}
 		if (_log.shouldLog(Log.INFO))
 			_log.info("Starting thread to forward " + portsToForwardNow.size() + " ports");
-	        Thread t = new Thread(new RegisterPortsThread(portsToForwardNow));
+	        Thread t = new I2PThread(new RegisterPortsThread(portsToForwardNow));
 		t.setName("UPnP Port Opener " + __id.incrementAndGet());
 		t.setDaemon(true);
 		t.start();
@@ -1034,7 +1035,7 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 	private void unregisterPorts(Set<ForwardPort> portsToForwardNow) {
 		if (_log.shouldLog(Log.INFO))
 			_log.info("Starting thread to un-forward " + portsToForwardNow.size() + " ports");
-	        Thread t = new Thread(new UnregisterPortsThread(portsToForwardNow));
+	        Thread t = new I2PThread(new UnregisterPortsThread(portsToForwardNow));
 		t.setName("UPnP Port Closer " + __id.incrementAndGet());
 		t.setDaemon(true);
 		t.start();

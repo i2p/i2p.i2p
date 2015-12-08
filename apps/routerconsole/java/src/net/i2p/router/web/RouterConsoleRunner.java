@@ -299,12 +299,12 @@ public class RouterConsoleRunner implements RouterApp {
             log.logAlways(net.i2p.util.Log.WARN, s);
             System.out.println("Warning: " + s);
             if (noJava7) {
-                s = "Java 7 will be required by mid-2015, please upgrade soon";
+                s = "Java 7 will be required by late 2015, please upgrade soon";
                 log.logAlways(net.i2p.util.Log.WARN, s);
                 System.out.println("Warning: " + s);
             }
             if (noPack200) {
-                s = "Pack200 will be required by mid-2015, please upgrade Java soon";
+                s = "Pack200 will be required by late 2015, please upgrade Java soon";
                 log.logAlways(net.i2p.util.Log.WARN, s);
                 System.out.println("Warning: " + s);
             }
@@ -630,8 +630,9 @@ public class RouterConsoleRunner implements RouterApp {
                 }
             }
             if (error) {
+                String port = (_listenPort != null) ? _listenPort : ((_sslListenPort != null) ? _sslListenPort : "7657");
                 System.err.println("WARNING: Error starting one or more listeners of the Router Console server.\n" +
-                               "If your console is still accessible at http://127.0.0.1:" + _listenPort + "/,\n" +
+                               "If your console is still accessible at http://127.0.0.1:" + port + "/,\n" +
                                "this may be a problem only with binding to the IPV6 address ::1.\n" +
                                "If so, you may ignore this error, or remove the\n" +
                                "\"::1,\" in the \"clientApp.0.args\" line of the clients.config file.");

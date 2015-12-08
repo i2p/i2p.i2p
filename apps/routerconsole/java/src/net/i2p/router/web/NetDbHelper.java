@@ -19,7 +19,8 @@ public class NetDbHelper extends HelperBase {
                                            _x("All Routers"),                   // 3
                                            _x("All Routers with Full Stats"),   // 4
                                            "LeaseSet Debug",                    // 5
-                                           _x("LeaseSets")   };                 // 6
+                                           _x("LeaseSets"),                     // 6
+                                           "Sybil"   };                         // 7
 
     private static final String links[] =
                                           {"",                                  // 0
@@ -28,7 +29,8 @@ public class NetDbHelper extends HelperBase {
                                            "?f=2",                              // 3
                                            "?f=1",                              // 4
                                            "?l=2",                              // 5
-                                           "?l=1" };                            // 6
+                                           "?l=1",                              // 6
+                                           "?f=3" };                            // 7
 
     public void setRouter(String r) {
         if (r != null)
@@ -77,6 +79,8 @@ public class NetDbHelper extends HelperBase {
                 renderer.renderRouterInfoHTML(_out, _routerPrefix, _version, _country);
             else if (_lease)
                 renderer.renderLeaseSetHTML(_out, _debug);
+            else if (_full == 3)
+                (new SybilRenderer(_context)).getNetDbSummary(_out);
             else
                 renderer.renderStatusHTML(_out, _full);
         } catch (IOException ioe) {
@@ -101,6 +105,8 @@ public class NetDbHelper extends HelperBase {
             return 3;
         if (_full == 1)
             return 4;
+        if (_full == 3)
+            return 7;
         return 0;
     }
 
@@ -119,7 +125,7 @@ public class NetDbHelper extends HelperBase {
         for (int i = 0; i < titles.length; i++) {
             if (i == 2 && tab != 2)
                 continue;   // can't nav to lookup
-            if (i == 5 && !_context.getBooleanProperty(PROP_ADVANCED))
+            if ((i == 5 || i == 7) && !_context.getBooleanProperty(PROP_ADVANCED))
                 continue;
             if (i == tab) {
                 // we are there

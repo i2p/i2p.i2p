@@ -257,7 +257,7 @@ public class DSAEngine {
                     _log.warn("Took too long to verify the signature (" + diff + "ms)");
             }
             return ok;
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             _log.log(Log.CRIT, "Error verifying the signature", e);
             return false;
         }

@@ -13,6 +13,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import net.i2p.I2PAppContext;
+import net.i2p.data.DataHelper;
 import net.i2p.util.SecureFileOutputStream;
 
 /**
@@ -125,7 +126,7 @@ public class EventLog {
             String line = null;
             while ( (line = br.readLine()) != null) {
                 try {
-                    String[] s = line.split(" ", 3);
+                    String[] s = DataHelper.split(line, " ", 3);
                     if (!s[1].equals(event))
                         continue;
                     long time = Long.parseLong(s[0]);
@@ -167,7 +168,7 @@ public class EventLog {
             String line = null;
             while ( (line = br.readLine()) != null) {
                 try {
-                    String[] s = line.split(" ", 2);
+                    String[] s = DataHelper.split(line, " ", 2);
                     if (s.length < 2)
                         continue;
                     long time = Long.parseLong(s[0]);

@@ -107,7 +107,7 @@ public class CSSHelper extends HelperBase {
             if (Integer.parseInt(r) < MIN_REFRESH)
                 r = "" + MIN_REFRESH;
             _context.router().saveConfig(PROP_REFRESH, r);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
         }
     }
 
@@ -117,7 +117,7 @@ public class CSSHelper extends HelperBase {
         try {
             if (Integer.parseInt(r) < MIN_REFRESH)
                 r = "" + MIN_REFRESH;
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             r = "" + MIN_REFRESH;
         }
         return r;

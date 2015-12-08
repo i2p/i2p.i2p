@@ -124,7 +124,7 @@ public class ResettableGZIPInputStream extends InflaterInputStream {
     public long getTotalRead() {
         try {
             return inf.getBytesRead(); 
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             return 0;
         }
     }
@@ -136,7 +136,7 @@ public class ResettableGZIPInputStream extends InflaterInputStream {
     public long getTotalExpanded() { 
         try {
             return inf.getBytesWritten(); 
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             // possible NPE in some implementations
             return 0;
         }
@@ -149,7 +149,7 @@ public class ResettableGZIPInputStream extends InflaterInputStream {
     public long getRemaining() { 
         try {
             return inf.getRemaining(); 
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             // possible NPE in some implementations
             return 0;
         }
@@ -162,7 +162,7 @@ public class ResettableGZIPInputStream extends InflaterInputStream {
     public boolean getFinished() { 
         try {
             return inf.finished(); 
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             // possible NPE in some implementations
             return true;
         }

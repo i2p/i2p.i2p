@@ -247,11 +247,11 @@ public class BOB implements Runnable, ClientApp {
 			save = true;
 		}
 		if (!props.containsKey("inbound.length")) {
-			props.setProperty("inbound.length", "1");
+			props.setProperty("inbound.length", "3");
 			save = true;
 		}
 		if (!props.containsKey("outbound.length")) {
-			props.setProperty("outbound.length", "1");
+			props.setProperty("outbound.length", "3");
 			save = true;
 		}
 		if (!props.containsKey("inbound.lengthVariance")) {
@@ -338,7 +338,7 @@ public class BOB implements Runnable, ClientApp {
 
 				if (g) {
 					DoCMDS conn_c = new DoCMDS(spin, lock, server, props, database, _log);
-					Thread t = new Thread(conn_c);
+					Thread t = new I2PAppThread(conn_c);
 					t.setName("BOB.DoCMDS " + i);
 					t.start();
 					i++;

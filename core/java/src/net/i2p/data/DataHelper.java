@@ -37,6 +37,8 @@ import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Pattern;
 import java.util.zip.Deflater;
 
 import net.i2p.I2PAppContext;
@@ -1615,11 +1617,11 @@ public class DataHelper {
      * NOTE: formatDuration2() recommended in most cases for readability
      */
     public static String formatSize(long bytes) {
-        double val = bytes;
+        float val = bytes;
         int scale = 0;
-        while (val >= 1024) {
+        while (val >= 1024.0f) {
             scale++; 
-            val /= 1024;
+            val /= 1024.0f;
         }
         
         DecimalFormat fmt = new DecimalFormat("##0.00");
@@ -1693,7 +1695,7 @@ public class DataHelper {
         if (unescaped == null) return null;
         String escaped = unescaped;
         for (int i = 0; i < escapeChars.length; i++) {
-            escaped = escaped.replaceAll(escapeChars[i], escapeCodes[i]);
+            escaped = escaped.replace(escapeChars[i], escapeCodes[i]);
         }
         return escaped;
     }
@@ -1708,7 +1710,7 @@ public class DataHelper {
         if (escaped == null) return null;
         String unescaped = escaped;
         for (int i = 0; i < escapeChars.length; i++) {
-            unescaped = unescaped.replaceAll(escapeCodes[i], escapeChars[i]);
+            unescaped = unescaped.replace(escapeCodes[i], escapeChars[i]);
         }
         return unescaped;
     }
@@ -1887,5 +1889,39 @@ public class DataHelper {
             rv[i] = (byte)orig.charAt(i);
         }
         return rv;
+    }
+
+    /**
+     *  Same as s.split(regex) but caches the compiled pattern for speed.
+     *  This saves about 10 microseconds (Bulldozer) on subsequent invocations.
+     *
+     *  @param s non-null
+     *  @param regex non-null
+     *  @throws java.util.regex.PatternSyntaxException unchecked
+     *  @since 0.9.24
+     */
+    public static String[] split(String s, String regex) {
+        return split(s, regex, 0);
+    }
+
+    private static final ConcurrentHashMap<String, Pattern> patterns = new ConcurrentHashMap<String, Pattern>();
+
+    /**
+     *  Same as s.split(regex, limit) but caches the compiled pattern for speed.
+     *  This saves about 10 microseconds (Bulldozer) on subsequent invocations.
+     *
+     *  @param s non-null
+     *  @param regex non-null
+     *  @param limit result threshold
+     *  @throws java.util.regex.PatternSyntaxException unchecked
+     *  @since 0.9.24
+     */
+    public static String[] split(String s, String regex, int limit) {
+        Pattern p = patterns.get(regex);
+        if (p == null) {
+            p = Pattern.compile(regex);
+            patterns.putIfAbsent(regex, p);
+        }
+        return p.split(s, limit);
     }
 }

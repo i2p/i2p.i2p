@@ -62,7 +62,7 @@ public class ConfigFile {
         try {
             fileInputStream = new FileInputStream(_configFile);
             _properties.load(fileInputStream);
-        } catch (Exception e) {
+        } catch (IOException e) {
             rv = false;
         } finally {
             if (fileInputStream != null) {
@@ -79,7 +79,7 @@ public class ConfigFile {
         try {
             fileOutputStream = new FileOutputStream(_configFile);
             _properties.store(fileOutputStream, null);
-        } catch (Exception e) {
+        } catch (IOException e) {
             rv = false;
         } finally {
             if (fileOutputStream != null) {

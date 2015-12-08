@@ -14,6 +14,7 @@ import java.util.StringTokenizer;
 import net.i2p.I2PAppContext;
 import net.i2p.client.naming.NamingService;
 import net.i2p.data.DataFormatException;
+import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.i2ptunnel.I2PTunnelHTTPClient;
 import net.i2p.util.FileUtil;
@@ -165,7 +166,8 @@ public abstract class LocalHTTPServer {
                 Properties nsOptions = new Properties();
                 nsOptions.setProperty("list", book);
                 if (referer != null && referer.startsWith("http")) {
-                    String from = "<a href=\"" + referer + "\">" + referer + "</a>";
+                    String ref = DataHelper.escapeHTML(referer);
+                    String from = "<a href=\"" + ref + "\">" + ref + "</a>";
                     nsOptions.setProperty("s", _t("Added via address helper from {0}", from));
                 } else {
                     nsOptions.setProperty("s", _t("Added via address helper"));

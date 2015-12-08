@@ -30,6 +30,10 @@ public class PortMapper {
     public static final String SVC_SMTP = "SMTP";
     public static final String SVC_POP = "POP3";
     public static final String SVC_SAM = "SAM";
+    /** @since 0.9.24 */
+    public static final String SVC_SAM_UDP = "SAM-UDP";
+    /** @since 0.9.24 */
+    public static final String SVC_SAM_SSL = "SAM-SSL";
     public static final String SVC_BOB = "BOB";
     /** not necessary, already in config? */
     public static final String SVC_I2CP = "I2CP";
@@ -111,7 +115,7 @@ public class PortMapper {
      *  @since 0.9.20
      */
     public void renderStatusHTML(Writer out) throws IOException {
-        List<String> services = new ArrayList(_dir.keySet());
+        List<String> services = new ArrayList<String>(_dir.keySet());
         out.write("<h2>Port Mapper</h2><table><tr><th>Service<th>Host<th>Port\n");
         Collections.sort(services);
         for (String s : services) {

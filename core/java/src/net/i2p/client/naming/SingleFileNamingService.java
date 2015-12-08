@@ -77,6 +77,8 @@ public class SingleFileNamingService extends NamingService {
     }
 
     /** 
+     *  Will strip a "www." prefix and retry if lookup fails
+     *
      *  @param hostname case-sensitive; caller should convert to lower case
      *  @param lookupOptions ignored
      *  @param storedOptions ignored
@@ -85,9 +87,11 @@ public class SingleFileNamingService extends NamingService {
     public Destination lookup(String hostname, Properties lookupOptions, Properties storedOptions) {
         try {
             String key = getKey(hostname);
+            if (key == null && hostname.startsWith("www.") && hostname.length() > 7)
+                key = getKey(hostname.substring(4));
             if (key != null)
                 return lookupBase64(key);
-        } catch (Exception ioe) {
+        } catch (IOException ioe) {
             if (_file.exists())
                 _log.error("Error loading hosts file " + _file, ioe);
             else if (_log.shouldLog(Log.WARN))
@@ -119,7 +123,7 @@ public class SingleFileNamingService extends NamingService {
                     return line.substring(0, split);
             }
             return null;
-        } catch (Exception ioe) {
+        } catch (IOException ioe) {
             if (_file.exists())
                 _log.error("Error loading hosts file " + _file, ioe);
             else if (_log.shouldLog(Log.WARN))

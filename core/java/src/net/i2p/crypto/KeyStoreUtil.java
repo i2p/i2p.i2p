@@ -5,13 +5,13 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.math.BigInteger;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
-import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Enumeration;
 import java.util.Locale;
@@ -31,10 +31,45 @@ import net.i2p.util.SystemVersion;
  */
 public class KeyStoreUtil {
         
+    public static boolean _blacklistLogged;
+
     public static final String DEFAULT_KEYSTORE_PASSWORD = "changeit";
     private static final String DEFAULT_KEY_ALGORITHM = "RSA";
     private static final int DEFAULT_KEY_SIZE = 2048;
     private static final int DEFAULT_KEY_VALID_DAYS = 3652;  // 10 years
+
+    /**
+     *  No reports of some of these in a Java keystore but just to be safe...
+     *  CNNIC ones are in Ubuntu keystore.
+     */
+    private static final BigInteger[] BLACKLIST_SERIAL = new BigInteger[] {
+        // CNNIC https://googleonlinesecurity.blogspot.com/2015/03/maintaining-digital-certificate-security.html
+        new BigInteger("49:33:00:01".replace(":", ""), 16),
+        // CNNIC EV root https://bugzilla.mozilla.org/show_bug.cgi?id=607208
+        new BigInteger("48:9f:00:01".replace(":", ""), 16),
+        // Superfish http://blog.erratasec.com/2015/02/extracting-superfish-certificate.html
+        new BigInteger("d2:fc:13:87:a9:44:dc:e7".replace(":", ""), 16),
+        // eDellRoot https://www.reddit.com/r/technology/comments/3twmfv/dell_ships_laptops_with_rogue_root_ca_exactly/
+        new BigInteger("6b:c5:7b:95:18:93:aa:97:4b:62:4a:c0:88:fc:3b:b6".replace(":", ""), 16),
+        // DSDTestProvider https://blog.hboeck.de/archives/876-Superfish-2.0-Dangerous-Certificate-on-Dell-Laptops-breaks-encrypted-HTTPS-Connections.html
+        // serial number is actually negative; hex string as reported by certtool below
+        //new BigInteger("a4:4c:38:47:f8:ee:71:80:43:4d:b1:80:b9:a7:e9:62".replace(":", ""), 16)
+        new BigInteger("-5b:b3:c7:b8:07:11:8e:7f:bc:b2:4e:7f:46:58:16:9e".replace(":", ""), 16)
+    };
+
+    /**
+     *  Corresponding issuer CN for the serial number.
+     *  Must be same number of entries as BLACKLIST_SERIAL.
+     *  See removeBlacklistedCerts() below for alternatives if we want
+     *  to blacklist a cert without an issuer CN.
+     */
+    private static final String[] BLACKLIST_ISSUER_CN = new String[] {
+        "CNNIC ROOT",
+        "China Internet Network Information Center EV Certificates Root",
+        "Superfish, Inc.",
+        "eDellRoot",
+        "DSDTestProvider"
+    };
 
     /**
      *  Create a new KeyStore object, and load it from ksFile if it is
@@ -63,6 +98,8 @@ public class KeyStoreUtil {
         if (ksFile != null && !exists) {
             OutputStream fos = null;
             try {
+                // must be initted
+                ks.load(null, DEFAULT_KEYSTORE_PASSWORD.toCharArray());
                 fos = new SecureFileOutputStream(ksFile);
                 ks.store(fos, pwchars);
             } finally {
@@ -98,7 +135,8 @@ public class KeyStoreUtil {
                     try {
                         ks.load(null, DEFAULT_KEYSTORE_PASSWORD.toCharArray());
                         success = addCerts(new File(System.getProperty("java.home"), "etc/security/cacerts"), ks) > 0;
-                    } catch (Exception e) {}
+                    } catch (IOException e) {
+                    } catch (GeneralSecurityException e) {}
                 } else {
                     success = loadCerts(new File(System.getProperty("java.home"), "etc/security/cacerts.bks"), ks);
                 }
@@ -109,11 +147,14 @@ public class KeyStoreUtil {
             }
         }
 
-        if (!success) {
+        if (success) {
+            removeBlacklistedCerts(ks);
+        } else {
             try {
                 // must be initted
                 ks.load(null, DEFAULT_KEYSTORE_PASSWORD.toCharArray());
-            } catch (Exception e) {}
+            } catch (IOException e) {
+            } catch (GeneralSecurityException e) {}
             error("All key store loads failed, will only load local certificates", null);
         }
         return ks;
@@ -140,13 +181,15 @@ public class KeyStoreUtil {
             try {
                 // not clear if null is allowed for password
                 ks.load(null, DEFAULT_KEYSTORE_PASSWORD.toCharArray());
-            } catch (Exception foo) {}
+            } catch (IOException foo) {
+            } catch (GeneralSecurityException e) {}
             return false;
         } catch (IOException ioe) {
             error("KeyStore load error, no default keys: " + file.getAbsolutePath(), ioe);
             try {
                 ks.load(null, DEFAULT_KEYSTORE_PASSWORD.toCharArray());
-            } catch (Exception foo) {}
+            } catch (IOException foo) {
+            } catch (GeneralSecurityException e) {}
             return false;
         } finally {
             try { if (fis != null) fis.close(); } catch (IOException foo) {}
@@ -167,11 +210,66 @@ public class KeyStoreUtil {
             for(Enumeration<String> e = ks.aliases(); e.hasMoreElements();) {
                 String alias = e.nextElement();
                 if (ks.isCertificateEntry(alias)) {
-                    info("Found cert " + alias);
+                    //info("Found cert " + alias);
                     count++;
                 }
             }
-        } catch (Exception foo) {}
+        } catch (GeneralSecurityException e) {}
+        return count;
+    }
+
+    /**
+     *  Remove all blacklisted X509 Certs in a key store.
+     *  Match by serial number and issuer CN, which should uniquely identify a cert,
+     *  if the CN is present. Should be faster than fingerprints.
+     *
+     *  @return number successfully removed
+     *  @since 0.9.24
+     */
+    private static int removeBlacklistedCerts(KeyStore ks) {
+        // This matches on the CN in the issuer,
+        // and we can't do that on Android.
+        // We could just match the whole string, and we will have to
+        // if we want do it on Android or match a cert that has an issuer without a CN.
+        // Or, most certs that don't have a CN have an OU, that could be a fallback.
+        // Or do sha1hash(cert.getEncoded()) but that would be slower.
+        if (SystemVersion.isAndroid())
+            return 0;
+        int count = 0;
+        try {
+            for(Enumeration<String> e = ks.aliases(); e.hasMoreElements();) {
+                String alias = e.nextElement();
+                if (ks.isCertificateEntry(alias)) {
+                    Certificate c = ks.getCertificate(alias);
+                    if (c != null && (c instanceof X509Certificate)) {
+                        X509Certificate xc = (X509Certificate) c;
+                        BigInteger serial = xc.getSerialNumber();
+                        for (int i = 0; i < BLACKLIST_SERIAL.length; i++) {
+                            // debug:
+                            //String xname = CertUtil.getIssuerValue(xc, "CN");
+                            //info("Found \"" + xname + "\" s/n: " + serial.toString(16));
+                            //if (xname == null)
+                            //    info("name is null, full issuer: " + xc.getIssuerX500Principal().getName());
+                            if (BLACKLIST_SERIAL[i].equals(serial)) {
+                                String name = CertUtil.getIssuerValue(xc, "CN");
+                                if (BLACKLIST_ISSUER_CN[i].equals(name)) {
+                                    ks.deleteEntry(alias);
+                                    count++;
+                                    if (!_blacklistLogged) {
+                                        // should this be a logAlways?
+                                        warn("Ignoring blacklisted certificate \"" + alias +
+                                             "\" issued by: \"" + name +
+                                             "\" s/n: " + serial.toString(16), null);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (GeneralSecurityException e) {}
+        if (count > 0)
+            _blacklistLogged = true;
         return count;
     }
 
@@ -198,7 +296,8 @@ public class KeyStoreUtil {
                     String alias = f.getName().toLowerCase(Locale.US);
                     if (alias.endsWith(".crt") || alias.endsWith(".pem") || alias.endsWith(".key") ||
                         alias.endsWith(".der") || alias.endsWith(".key") || alias.endsWith(".p7b") ||
-                        alias.endsWith(".p7c") || alias.endsWith(".pfx") || alias.endsWith(".p12"))
+                        alias.endsWith(".p7c") || alias.endsWith(".pfx") || alias.endsWith(".p12") ||
+                        alias.endsWith(".cer"))
                         alias = alias.substring(0, alias.length() - 4);
                     boolean success = addCert(f, alias, ks);
                     if (success)
@@ -217,45 +316,32 @@ public class KeyStoreUtil {
      *  @since 0.8.2, moved from SSLEepGet in 0.9.9
      */
     public static boolean addCert(File file, String alias, KeyStore ks) {
-        InputStream fis = null;
         try {
-            fis = new FileInputStream(file);
-            CertificateFactory cf = CertificateFactory.getInstance("X.509");
-            X509Certificate cert = (X509Certificate)cf.generateCertificate(fis);
+            X509Certificate cert = CertUtil.loadCert(file);
             info("Read X509 Certificate from " + file.getAbsolutePath() +
                           " Issuer: " + cert.getIssuerX500Principal() +
+                          " Serial: " + cert.getSerialNumber().toString(16) +
                           "; Valid From: " + cert.getNotBefore() +
                           " To: " + cert.getNotAfter());
-            try {
-                cert.checkValidity();
-            } catch (CertificateExpiredException cee) {
-                String s = "Rejecting expired X509 Certificate: " + file.getAbsolutePath();
-                // Android often has old system certs
-                if (SystemVersion.isAndroid())
-                    warn(s, cee);
-                else
-                    error(s, cee);
-                return false;
-            } catch (CertificateNotYetValidException cnyve) {
-                error("Rejecting X509 Certificate not yet valid: " + file.getAbsolutePath(), cnyve);
-                return false;
-            }
             ks.setCertificateEntry(alias, cert);
             info("Now trusting X509 Certificate, Issuer: " + cert.getIssuerX500Principal());
+        } catch (CertificateExpiredException cee) {
+            String s = "Rejecting expired X509 Certificate: " + file.getAbsolutePath();
+            // Android often has old system certs
+            if (SystemVersion.isAndroid())
+                warn(s, cee);
+            else
+                error(s, cee);
+            return false;
+        } catch (CertificateNotYetValidException cnyve) {
+            error("Rejecting X509 Certificate not yet valid: " + file.getAbsolutePath(), cnyve);
+            return false;
         } catch (GeneralSecurityException gse) {
             error("Error reading X509 Certificate: " + file.getAbsolutePath(), gse);
             return false;
         } catch (IOException ioe) {
             error("Error reading X509 Certificate: " + file.getAbsolutePath(), ioe);
             return false;
-        } catch (IllegalArgumentException iae) {
-            // java 1.8.0_40-b10, openSUSE
-            // Exception in thread "main" java.lang.IllegalArgumentException: Input byte array has wrong 4-byte ending unit
-            // at java.util.Base64$Decoder.decode0(Base64.java:704)
-            error("Error reading X509 Certificate: " + file.getAbsolutePath(), iae);
-            return false;
-        } finally {
-            try { if (fis != null) fis.close(); } catch (IOException foo) {}
         }
         return true;
     }
@@ -316,7 +402,10 @@ public class KeyStoreUtil {
                     error("Not overwriting key " + alias + ", already exists in " + ks, null);
                     return false;
                 }
-            } catch (Exception e) {
+            } catch (IOException e) {
+                error("Not overwriting key \"" + alias + "\", already exists in " + ks, e);
+                return false;
+            } catch (GeneralSecurityException e) {
                 error("Not overwriting key \"" + alias + "\", already exists in " + ks, e);
                 return false;
             }
@@ -354,7 +443,10 @@ public class KeyStoreUtil {
                     success = getPrivateKey(ks, ksPW, alias, keyPW) != null;
                     if (!success)
                         error("Key gen failed to get private key", null);
-                } catch (Exception e) {
+                } catch (IOException e) {
+                    error("Key gen failed to get private key", e);
+                    success = false;
+                } catch (GeneralSecurityException e) {
                     error("Key gen failed to get private key", e);
                     success = false;
                 }
@@ -503,9 +595,9 @@ public class KeyStoreUtil {
 
 /****
     public static void main(String[] args) {
+        File ksf = (args.length > 0) ? new File(args[0]) : null;
         try {
-            if (args.length > 0) {
-                File ksf = new File(args[0]);
+            if (ksf != null && !ksf.exists()) {
                 createKeyStore(ksf, DEFAULT_KEYSTORE_PASSWORD);
                 System.out.println("Created empty keystore " + ksf);
             } else {
@@ -514,6 +606,17 @@ public class KeyStoreUtil {
                     System.out.println("Loaded system keystore");
                     int count = countCerts(ks);
                     System.out.println("Found " + count + " certs");
+                    if (ksf != null && ksf.isDirectory()) {
+                        count = addCerts(ksf, ks);
+                        System.out.println("Found " + count + " certs in " + ksf);
+                        if (count > 0) {
+                            // rerun blacklist as a test
+                            _blacklistLogged = false;
+                            count = removeBlacklistedCerts(ks);
+                            if (count > 0)
+                                System.out.println("Found " + count + " blacklisted certs in " + ksf);
+                        }
+                    }
                 } else {
                     System.out.println("FAIL");
                 }

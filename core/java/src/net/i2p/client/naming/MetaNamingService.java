@@ -41,8 +41,8 @@ public class MetaNamingService extends DummyNamingService {
         while (tok.hasMoreTokens()) {
             try {
                 Class<?> cls = Class.forName(tok.nextToken());
-                Constructor<?> con = cls.getConstructor(new Class[] { I2PAppContext.class });
-                addNamingService((NamingService)con.newInstance(new Object[] { context }), false);
+                Constructor<?> con = cls.getConstructor(I2PAppContext.class);
+                addNamingService((NamingService)con.newInstance(), false);
             } catch (Exception ex) {
             }
         }

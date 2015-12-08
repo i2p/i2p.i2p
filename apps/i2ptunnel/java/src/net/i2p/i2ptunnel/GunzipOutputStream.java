@@ -105,7 +105,7 @@ class GunzipOutputStream extends InflaterOutputStream {
     public long getTotalRead() {
         try {
             return inf.getBytesRead(); 
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             return 0;
         }
     }
@@ -116,7 +116,7 @@ class GunzipOutputStream extends InflaterOutputStream {
     public long getTotalExpanded() { 
         try {
             return inf.getBytesWritten(); 
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             // possible NPE in some implementations
             return 0;
         }
@@ -128,7 +128,7 @@ class GunzipOutputStream extends InflaterOutputStream {
     public long getRemaining() { 
         try {
             return inf.getRemaining(); 
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             // possible NPE in some implementations
             return 0;
         }
@@ -140,7 +140,7 @@ class GunzipOutputStream extends InflaterOutputStream {
     public boolean getFinished() { 
         try {
             return inf.finished(); 
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             // possible NPE in some implementations
             return true;
         }

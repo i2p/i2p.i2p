@@ -3,6 +3,7 @@ package net.i2p.crypto;
 import java.lang.reflect.Constructor;
 import java.math.BigInteger;
 import java.security.AlgorithmParameters;
+import java.security.GeneralSecurityException;
 import java.security.Provider;
 import java.security.Security;
 import java.security.spec.ECField;
@@ -42,8 +43,8 @@ class ECConstants {
         if (Security.getProvider("BC") == null) {
             try {
                 Class<?> cls = Class.forName("org.bouncycastle.jce.provider.BouncyCastleProvider");
-                Constructor<?> con = cls.getConstructor(new Class[0]);
-                Provider bc = (Provider)con.newInstance(new Object[0]);
+                Constructor<?> con = cls.getConstructor();
+                Provider bc = (Provider)con.newInstance();
                 Security.addProvider(bc);
                 log("Added BC provider");
                 loaded = true;
@@ -278,7 +279,7 @@ class ECConstants {
             AlgorithmParameters ap;
             try {
                 ap = AlgorithmParameters.getInstance("EC");
-            } catch (Exception e) {
+            } catch (GeneralSecurityException e) {
                 if (BC_AVAILABLE) {
                     log("Named curve " + name + " is not available, trying BC", e);
                     ap = AlgorithmParameters.getInstance("EC", "BC");
@@ -292,7 +293,7 @@ class ECConstants {
             ECParameterSpec rv = ap.getParameterSpec(ECParameterSpec.class);
             log("Named curve " + name + " loaded");
             return rv;
-        } catch (Exception e) {
+        } catch (GeneralSecurityException e) {
             log("Named curve " + name + " is not available", e);
             return null;
         }

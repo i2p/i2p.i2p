@@ -16,7 +16,7 @@ import net.i2p.util.Clock;
  *
  * For use by the router only. Not to be used by applications or plugins.
  */
-public class JobTiming implements Clock.ClockUpdateListener, RouterClock.ClockShiftListener {
+public class JobTiming implements Clock.ClockUpdateListener {
     private volatile long _start;
     private volatile long _actualStart;
     private volatile long _actualEnd;
@@ -81,9 +81,5 @@ public class JobTiming implements Clock.ClockUpdateListener, RouterClock.ClockSh
             _actualStart += delta;
         if (_actualEnd != 0)
             _actualEnd += delta;
-    }
-
-    public void clockShift(long delta) {
-        offsetChanged(delta);
     }
 }

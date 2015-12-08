@@ -210,7 +210,7 @@ public class SMTPClient {
 		
 		try {
 			socket = new Socket( host, port );
-		} catch (Exception e) {
+		} catch (IOException e) {
 			error += _t("Cannot connect") + ": " + e.getMessage() + '\n';
 			ok = false;
 		}
@@ -282,7 +282,7 @@ public class SMTPClient {
 			error += e.getMessage();
 		}
 		if( !mailSent && lastResponse.length() > 0 ) {
-			String[] lines = lastResponse.split( "\r" );
+			String[] lines = DataHelper.split(lastResponse, "\r");
 			for( int i = 0; i < lines.length; i++ )
 				error += lines[i] + '\n';			
 		}

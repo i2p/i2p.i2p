@@ -21,7 +21,9 @@
         </depend>
     </target>
 
-    <property name="javac.compilerargs" value="" />
+    <!-- ignored for now, we require java 7 here -->
+    <property name="javac.compilerargs7" value="" />
+    <!-- ignored for now, we require java 7 here -->
     <property name="javac.version" value="1.6" />
 
     <!-- compile everything including client classes -->
@@ -30,22 +32,22 @@
         <mkdir dir="./build/obj" />
         <javac 
             srcdir="./src" 
-            debug="true" deprecation="on" source="${javac.version}" target="${javac.version}" 
+            debug="true" deprecation="on" source="1.7" target="1.7" 
             includeAntRuntime="false"
             destdir="./build/obj" 
             classpath="../../../core/java/build/i2p.jar:../../ministreaming/java/build/mstreaming.jar" >
-            <compilerarg line="${javac.compilerargs}" />
+            <compilerarg line="${javac.compilerargs7}" />
         </javac>
     </target>
 
     <target name="compileTest" depends="compile">
         <javac 
             srcdir="./test" 
-            debug="true" deprecation="on" source="${javac.version}" target="${javac.version}" 
+            debug="true" deprecation="on" source="1.7" target="1.7" 
             includeAntRuntime="false"
             destdir="./build/obj" 
             classpath="../../../core/java/build/i2p.jar:../../ministreaming/java/build/mstreaming.jar" >
-            <compilerarg line="${javac.compilerargs}" />
+            <compilerarg line="${javac.compilerargs7}" />
         </javac>
     </target>
 

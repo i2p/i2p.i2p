@@ -83,6 +83,7 @@ import javax.net.ssl.TrustManagerFactory;
 
 import net.i2p.I2PAppContext;
 import net.i2p.crypto.KeyStoreUtil;
+import net.i2p.data.DataHelper;
 
 import org.apache.http.conn.ssl.DefaultHostnameVerifier;
 import org.apache.http.conn.util.PublicSuffixList;
@@ -204,7 +205,15 @@ public class I2PSSLSocketFactory {
         "TLS_ECDH_ECDSA_WITH_3DES_EDE_CBC_SHA",
         "TLS_ECDH_RSA_WITH_3DES_EDE_CBC_SHA",
         "TLS_ECDHE_ECDSA_WITH_3DES_EDE_CBC_SHA",
-        "TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA"
+        "TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA",
+        // following is disabled because it is weak
+        // see e.g. https://bugzilla.mozilla.org/show_bug.cgi?id=1107787
+        "TLS_DHE_DSS_WITH_AES_128_CBC_SHA"
+        // ??? "TLS_DHE_DSS_WITH_AES_256_CBC_SHA"
+        //
+        //  NOTE:
+        //  If you add anything here, please also add to installer/resources/eepsite/jetty-ssl.xml
+        //
     }));
 
     /**
@@ -435,7 +444,7 @@ public class I2PSSLSocketFactory {
                 try {
                     if (line.charAt(0) == '#')
                         continue;
-                    String[] s = line.split(",");
+                    String[] s = DataHelper.split(line, ",");
                     String lc = s[0].toLowerCase(Locale.US);
                     tlds.add(lc);
                     i++;

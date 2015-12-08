@@ -4,6 +4,7 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
 # Translators:
+# Anders Nilsson <locally@devode.se>, 2015
 # Calle Rundgren <samaire@samaire.net>, 2013
 # cacapo <handelsehorisont@gmail.com>, 2015
 # hottuna <i2p@robertfoss.se>, 2013
@@ -13,10 +14,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-05-14 08:33+0000\n"
-"PO-Revision-Date: 2015-06-06 18:32+0000\n"
-"Last-Translator: cacapo <handelsehorisont@gmail.com>\n"
-"Language-Team: Swedish (Sweden) (http://www.transifex.com/projects/p/I2P/language/sv_SE/)\n"
+"POT-Creation-Date: 2015-11-05 17:12+0000\n"
+"PO-Revision-Date: 2015-11-08 21:24+0000\n"
+"Last-Translator: Anders Nilsson <locally@devode.se>\n"
+"Language-Team: Swedish (Sweden) (http://www.transifex.com/otf/I2P/language/sv_SE/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -281,7 +282,7 @@ msgstr "Webbsidan var inte nåbar."
 msgid ""
 "The website is offline, there is network congestion, or your router is not "
 "yet well-integrated with peers."
-msgstr "Webbsidan är offline, nätverket är under stor belastning eller så är din router inte välintegrerad med peers."
+msgstr "Webbsidan är offline, nätverket är under stor belastning eller så är din router inte välintegrerad med noder."
 
 #: ../java/build/Proxy.java:106 ../java/build/Proxy.java:112
 msgid "Warning: Invalid Destination"
@@ -410,7 +411,7 @@ msgstr "HTTP Utproxyn hittades ej."
 msgid ""
 "It is offline, there is network congestion, or your router is not yet well-"
 "integrated with peers."
-msgstr "Den är antingen offline, nätverket är under stor belastning eller så är din router ännu inte väl integrerad med peers."
+msgstr "Den är antingen offline, nätverket är under stor belastning eller så är din router ännu inte väl integrerad med noder."
 
 #: ../java/build/Proxy.java:196
 msgid "Proxy Authorization Required"
@@ -456,39 +457,39 @@ msgid ""
 "click <a href=\"{1}\">here</a>."
 msgstr "För att besöka målet i din värd databas href=\"{0}\"> klicka <a här </ a>. För att besöka de motstridiga hjälpaddresserna,<a href=\"{1}\"> klicka <a här </ a>."
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1119
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1121
 msgid "Destination lease set not found"
 msgstr "Destinationens leaseset kunde inte hittas"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1271
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1273
 msgid "Host"
 msgstr "Värd"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1275
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1277
 msgid "Base 32"
 msgstr "Bas 32"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1279
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1281
 msgid "Destination"
 msgstr "Mål"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1285
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1287
 #, java-format
 msgid "Continue to {0} without saving"
 msgstr "Fortsätt till {0} utan att spara"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1291
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1293
 #, java-format
 msgid "Save {0} to router address book and continue to website"
 msgstr "Spara {0} till routerns adressbok och fortsätt till webbsidan."
 
 #. only blockfile supports multiple books
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1294
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1296
 #, java-format
 msgid "Save {0} to master address book and continue to website"
 msgstr "Spara {0} till huvudadressboken och fortsätt till webbsidan."
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1295
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1297
 #, java-format
 msgid "Save {0} to private address book and continue to website"
 msgstr "Spara {0} till privata adressboken och fortsätt till webbsidan."

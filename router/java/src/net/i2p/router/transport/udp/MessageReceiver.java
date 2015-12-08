@@ -243,7 +243,7 @@ class MessageReceiver {
             }
             _context.messageHistory().droppedInboundMessage(state.getMessageId(), state.getFrom(), "error: " + ime.toString() + ": " + state.toString());
             return null;
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             // e.g. AIOOBE
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Error handling a message: " + state, e);

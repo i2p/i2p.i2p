@@ -226,8 +226,7 @@ class SAMStreamSession {
             return false;
         }
 
-        Destination d = new Destination();
-        d.fromBase64(dest);
+        Destination d = SAMUtils.getDest(dest);
 
         I2PSocketOptions opts = socketMgr.buildOptions(props);
         if (props.getProperty(I2PSocketOptions.PROP_CONNECT_TIMEOUT) == null)

@@ -8,7 +8,9 @@ import net.i2p.router.util.RFC822Date;
 import net.i2p.router.web.ConfigUpdateHandler;
 import net.i2p.update.*;
 import net.i2p.util.EepHead;
+import net.i2p.util.Log;
 import net.i2p.util.PortMapper;
+import net.i2p.util.SystemVersion;
 
 /**
  *  Does a simple EepHead to get the last-modified header.
@@ -76,9 +78,17 @@ class UnsignedUpdateChecker extends UpdateRunner {
                     if (modtime <= 0) return false;
                     if (_ms <= 0) return false;
                     if (modtime > _ms) {
-                        _unsignedUpdateAvailable = true;
-                        _mgr.notifyVersionAvailable(this, _urls.get(0), getType(), "", getMethod(), _urls,
-                                                    Long.toString(modtime), "");
+                        String newVersion = Long.toString(modtime);
+                        if (SystemVersion.isJava7()) {
+                            _unsignedUpdateAvailable = true;
+                            _mgr.notifyVersionAvailable(this, _urls.get(0), getType(), "", getMethod(), _urls,
+                                                        newVersion, "");
+                        } else {
+                            String ourJava = System.getProperty("java.version");
+                            String msg = _mgr._t("Requires Java version {0} but installed Java version is {1}", "1.7", ourJava);
+                            _log.logAlways(Log.WARN, "Cannot update to version " + newVersion + ": " + msg);
+                            _mgr.notifyVersionConstraint(this, _urls.get(0), getType(), "", newVersion, msg);
+                        }
                     }
                 }
                 return true;

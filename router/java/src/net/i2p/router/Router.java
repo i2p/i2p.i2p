@@ -9,6 +9,7 @@ package net.i2p.router;
  */
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -487,6 +488,9 @@ public class Router implements RouterClock.ClockShiftListener {
     /**
      *  Our current router info.
      *  Warning, may be null if called very early.
+     *
+     *  Warning - risk of deadlock - do not call while holding locks
+     *
      */
     public RouterInfo getRouterInfo() {
         synchronized (_routerInfoLock) {
@@ -497,6 +501,9 @@ public class Router implements RouterClock.ClockShiftListener {
     /**
      *  Caller must ensure info is valid - no validation done here.
      *  Not for external use.
+     *
+     *  Warning - risk of deadlock - do not call while holding locks
+     *
      */
     public void setRouterInfo(RouterInfo info) { 
         synchronized (_routerInfoLock) {
@@ -611,6 +618,7 @@ public class Router implements RouterClock.ClockShiftListener {
      * This is synchronized with saveConfig().
      * Not for external use.
      */
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     public void readConfig() {
         synchronized(_configFileLock) {
             String f = getConfigFilename();
@@ -647,7 +655,7 @@ public class Router implements RouterClock.ClockShiftListener {
                 //else
                 //    System.err.println("WARNING: Configuration file " + filename + " does not exist");
             }
-        } catch (Exception ioe) {
+        } catch (IOException ioe) {
             if (log != null)
                 log.error("Error loading the router configuration from " + filename, ioe);
             else
@@ -804,6 +812,9 @@ public class Router implements RouterClock.ClockShiftListener {
      * Rebuild and republish our routerInfo since something significant 
      * has changed.
      * Not for external use.
+     *
+     *  Warning - risk of deadlock - do not call while holding locks
+     *
      */
     public void rebuildRouterInfo(boolean blockingRebuild) {
         if (_log.shouldLog(Log.INFO))
@@ -957,6 +968,11 @@ public class Router implements RouterClock.ClockShiftListener {
         }
     }
     
+    /*
+     *
+     *  Warning - risk of deadlock - do not call while holding locks
+     *
+     */
     public boolean isHidden() {
         RouterInfo ri;
         synchronized (_routerInfoLock) {
@@ -1140,7 +1156,7 @@ public class Router implements RouterClock.ClockShiftListener {
                 _log.warn("Running shutdown task " + task.getClass());
             try {
                 //task.run();
-                Thread t = new Thread(task, "Shutdown task " + task.getClass().getName());
+                Thread t = new I2PAppThread(task, "Shutdown task " + task.getClass().getName());
                 t.setDaemon(true);
                 t.start();
                 try {
@@ -1350,7 +1366,7 @@ public class Router implements RouterClock.ClockShiftListener {
                 ordered.putAll(_config);
                 DataHelper.storeProps(ordered, new File(_configFilename));
             }
-        } catch (Exception ioe) {
+        } catch (IOException ioe) {
                 // warning, _log will be null when called from constructor
                 if (_log != null)
                     _log.error("Error saving the config to " + _configFilename, ioe);
@@ -1391,6 +1407,7 @@ public class Router implements RouterClock.ClockShiftListener {
      * @return success
      * @since 0.8.13
      */
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     public boolean saveConfig(Map toAdd, Collection<String> toRemove) {
         synchronized(_configFileLock) {
             if (toAdd != null)
@@ -1452,7 +1469,7 @@ public class Router implements RouterClock.ClockShiftListener {
         ((RouterClock) _context.clock()).removeShiftListener(this);
         // Let's not stop accepting tunnels, etc
         //_started = _context.clock().now();
-        Thread t = new Thread(new Restarter(_context), "Router Restart");
+        Thread t = new I2PThread(new Restarter(_context), "Router Restart");
         t.setPriority(Thread.NORM_PRIORITY + 1);
         t.start();
     }    

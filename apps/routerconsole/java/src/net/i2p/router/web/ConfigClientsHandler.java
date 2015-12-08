@@ -244,7 +244,7 @@ public class ConfigClientsHandler extends FormHandler {
             // edit of an existing entry
             if (_context.getBooleanProperty(ConfigClientsHelper.PROP_ENABLE_CLIENT_CHANGE) ||
                 isAdvanced()) {
-                String desc = getJettyString("desc" + cur);
+                String desc = getJettyString("nofilter_desc" + cur);
                 if (desc != null) {
                     int spc = desc.indexOf(" ");
                     String clss = desc;
@@ -255,7 +255,7 @@ public class ConfigClientsHandler extends FormHandler {
                     }
                     ca.className = clss;
                     ca.args = args;
-                    ca.clientName = getJettyString("name" + cur);
+                    ca.clientName = getJettyString("nofilter_name" + cur);
                 }
             }
         }
@@ -264,7 +264,7 @@ public class ConfigClientsHandler extends FormHandler {
         if (_context.getBooleanProperty(ConfigClientsHelper.PROP_ENABLE_CLIENT_CHANGE) ||
             isAdvanced()) {
             int newClient = clients.size();
-            String newDesc = getJettyString("desc" + newClient);
+            String newDesc = getJettyString("nofilter_desc" + newClient);
             if (newDesc != null && newDesc.trim().length() > 0) {
                 // new entry
                 int spc = newDesc.indexOf(" ");
@@ -274,10 +274,10 @@ public class ConfigClientsHandler extends FormHandler {
                     clss = newDesc.substring(0, spc);
                     args = newDesc.substring(spc + 1);
                 }
-                String name = getJettyString("name" + newClient);
+                String name = getJettyString("nofilter_name" + newClient);
                 if (name == null || name.trim().length() <= 0) name = "new client";
                 ClientAppConfig ca = new ClientAppConfig(clss, name, args, 2*60*1000,
-                                                         _settings.get(newClient + ".enabled") != null);
+                                                         _settings.get(newClient + ".enabled") == null);  // true for disabled
                 clients.add(ca);
                 addFormNotice(_t("New client added") + ": " + name + " (" + clss + ").");
             }

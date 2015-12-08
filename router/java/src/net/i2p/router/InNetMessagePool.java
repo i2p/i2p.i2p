@@ -434,7 +434,7 @@ public class InNetMessagePool implements Service {
                     
                 } catch (OutOfMemoryError oome) {
                     throw oome;
-                } catch (Exception e) {
+                } catch (RuntimeException e) {
                     if (_log.shouldLog(Log.CRIT))
                         _log.log(Log.CRIT, "Error in the tunnel gateway dispatcher", e);
                 }
@@ -467,7 +467,7 @@ public class InNetMessagePool implements Service {
                     
                 } catch (OutOfMemoryError oome) {
                     throw oome;
-                } catch (Exception e) {
+                } catch (RuntimeException e) {
                     if (_log.shouldLog(Log.CRIT))
                         _log.log(Log.CRIT, "Error in the tunnel data dispatcher", e);
                 }

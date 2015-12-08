@@ -4,6 +4,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Properties;
 
+import net.i2p.util.LogManager;
+
 /**
  * Handler to deal with form submissions from the logging config form and act
  * upon the values.
@@ -113,7 +115,7 @@ public class ConfigLoggingHandler extends FormHandler {
         }
         
         if (_fileSize != null) {
-            int newBytes = _context.logManager().getFileSize(_fileSize);
+            int newBytes = LogManager.getFileSize(_fileSize);
             int oldBytes = _context.logManager().getFileSize();
             if (newBytes > 0) {
                 if (oldBytes != newBytes) {

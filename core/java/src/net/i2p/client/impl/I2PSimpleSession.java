@@ -122,11 +122,11 @@ public class I2PSimpleSession extends I2PSessionImpl2 {
                     Properties auth = new OrderedProperties();
                     auth.setProperty(PROP_USER, opts.getProperty(PROP_USER));
                     auth.setProperty(PROP_PW, opts.getProperty(PROP_PW));
-                    sendMessage(new GetDateMessage(CoreVersion.VERSION, auth));
+                    sendMessage_unchecked(new GetDateMessage(CoreVersion.VERSION, auth));
                 } else {
                     // we must now send a GetDate even in SimpleSession, or we won't know
                     // what version we are talking with and cannot use HostLookup
-                    sendMessage(new GetDateMessage(CoreVersion.VERSION));
+                    sendMessage_unchecked(new GetDateMessage(CoreVersion.VERSION));
                 }
                 waitForDate();
             }

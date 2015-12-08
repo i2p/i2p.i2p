@@ -912,6 +912,30 @@ public class Snark
     }
 
     /**
+     *  Bytes not received and set to skipped.
+     *  This is not the same as the total of all skipped files,
+     *  since pieces may span multiple files.
+     *
+     *  @return exact value. or 0 if no storage yet.
+     *  @since 0.9.24
+     */
+    public long getSkippedLength() {
+        PeerCoordinator coord = coordinator;
+        if (coord != null) {
+            // fast way
+            long r = getRemainingLength();
+            if (r <= 0)
+                return 0;
+            long n = coord.getNeededLength();
+            return r - n;
+        } else if (storage != null) {
+            // slow way
+            return storage.getSkippedLength();
+        }
+        return 0;
+    }
+
+    /**
      *  Does not account (i.e. includes) for skipped files.
      *  @return number of pieces still needed (magnet mode or not), or -1 if unknown
      *  @since 0.8.4
@@ -1305,7 +1329,7 @@ public class Snark
    * coordinatorListener
    */
   final static int MIN_TOTAL_UPLOADERS = 4;
-  final static int MAX_TOTAL_UPLOADERS = 10;
+  final static int MAX_TOTAL_UPLOADERS = 20;
 
   public boolean overUploadLimit(int uploaders) {
     if (_peerCoordinatorSet == null || uploaders <= 0)

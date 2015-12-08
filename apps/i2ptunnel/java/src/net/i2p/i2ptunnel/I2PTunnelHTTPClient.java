@@ -414,7 +414,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                         _log.debug(getPrefix(requestId) + "First line [" + line + "]");
                     }
 
-                    String[] params = line.split(" ", 3);
+                    String[] params = DataHelper.split(line, " ", 3);
                     if(params.length != 3) {
                         break;
                     }
@@ -1252,7 +1252,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
         String s = getTunnel().getClientOptions().getProperty(PROP_SSL_OUTPROXIES);
         if (s == null)
             return null;
-        String[] p = s.split("[,; \r\n\t]");
+        String[] p = DataHelper.split(s, "[,; \r\n\t]");
         if (p.length == 0)
             return null;
         // todo doesn't check for ""

@@ -25,21 +25,22 @@ where there are comments labeled "PORTABLE". Do this before you
 run I2P for the first time.
 
 To start I2P:
-   (*nix): sh i2prouter start
+   (*nix, BSD, Mac): sh i2prouter start
    (win*): I2P.exe
-   (non-x86 platforms PPC, ARM, etc): sh runplain.sh
+   (platforms without wrapper support): sh runplain.sh
 
 To stop I2P (gracefully):
    lynx http://localhost:7657/summaryframe (click "Shutdown")
+   or (*nix, BSD, Mac) sh i2prouter graceful
 
 To stop I2P immediately:
-   sh i2prouter stop
+   (*nix, BSD, Mac) sh i2prouter stop
 
 To uninstall I2P:
    rm -rf $I2PInstallDir ~/.i2p
 
 Supported JVMs:
-  All platforms: Java 1.6 or higher required; 1.7 or higher recommended
+  All platforms: Java 1.7 or higher required
   Windows: OpenJDK or Oracle from http://java.com/download
   Linux:   OpenJDK or Oracle from http://java.com/download
   FreeBSD: OpenJDK or Oracle from http://java.com/download

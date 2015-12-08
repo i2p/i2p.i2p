@@ -92,7 +92,7 @@
                 } %>
                 <input type="hidden" name="page" value="<%=curPage%>" />
                 <input type="hidden" name="tunnel" value="null" />
-                <input type="hidden" name="nonce" value="<%=editBean.getNextNonce()%>" />
+                <input type="hidden" name="nonce" value="<%=net.i2p.i2ptunnel.web.IndexBean.getNextNonce()%>" />
             </div>
 
             <div class="separator">

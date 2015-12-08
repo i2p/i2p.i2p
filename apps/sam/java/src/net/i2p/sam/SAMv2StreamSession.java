@@ -105,29 +105,18 @@ class SAMv2StreamSession extends SAMStreamSession
 				return false ;
 			}
 
-			Destination d = new Destination();
-
-			d.fromBase64 ( dest );
-
+			Destination d = SAMUtils.getDest(dest);
 			I2PSocketOptions opts = socketMgr.buildOptions ( props );
-
 			if ( props.getProperty ( I2PSocketOptions.PROP_CONNECT_TIMEOUT ) == null )
 				opts.setConnectTimeout ( 60 * 1000 );
 
 			if (_log.shouldLog(Log.DEBUG))
 				_log.debug ( "Connecting new I2PSocket..." );
 
-
 			// non-blocking connection (SAMv2)
-
-			StreamConnector connector ;
-
-			connector = new StreamConnector ( id, d, opts );
-			
+			StreamConnector connector = new StreamConnector ( id, d, opts );
 			I2PAppThread connectThread = new I2PAppThread ( connector, "StreamConnector" + id ) ;
-
 			connectThread.start() ;
-
 			return true ;
 		}
 

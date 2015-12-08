@@ -12,11 +12,11 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TimeZone;
 import java.util.TreeMap;
 
 import net.i2p.data.DataHelper;
 import net.i2p.router.util.EventLog;
+import net.i2p.util.SystemVersion;
 
 /**
  *  /events.jsp
@@ -189,9 +189,7 @@ public class EventLogHelper extends FormHandler {
 
         SimpleDateFormat fmt = (SimpleDateFormat) DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.MEDIUM);
         // the router sets the JVM time zone to UTC but saves the original here so we can get it
-        String systemTimeZone = _context.getProperty("i2p.systemTimeZone");
-        if (systemTimeZone != null)
-            fmt.setTimeZone(TimeZone.getTimeZone(systemTimeZone));
+        fmt.setTimeZone(SystemVersion.getSystemTimeZone(_context));
 
         List<Map.Entry<Long, String>> entries = new ArrayList<Map.Entry<Long, String>>(events.entrySet());
         Collections.reverse(entries);
@@ -202,7 +200,7 @@ public class EventLogHelper extends FormHandler {
             buf.append(fmt.format(new Date(time)));
             buf.append("</td><td>");
             if (isAll) {
-                 String[] s = event.split(" ", 2);
+                 String[] s = DataHelper.split(event, " ", 2);
                  String xs = _xevents.get(s[0]);
                  if (xs == null)
                      xs = s[0];

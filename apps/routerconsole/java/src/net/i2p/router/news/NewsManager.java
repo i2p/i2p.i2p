@@ -10,15 +10,16 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
 
 import net.i2p.I2PAppContext;
+import net.i2p.app.ClientApp;
 import net.i2p.app.ClientAppManager;
 import net.i2p.app.ClientAppState;
 import static net.i2p.app.ClientAppState.*;
-import net.i2p.router.app.RouterApp;
+import net.i2p.data.DataHelper;
 import net.i2p.util.FileUtil;
 import net.i2p.util.Log;
+import net.i2p.util.SystemVersion;
 import net.i2p.util.TranslateReader;
 
 import org.cybergarage.xml.Node;
@@ -30,7 +31,7 @@ import org.cybergarage.xml.Node;
  *
  *  @since 0.9.23
  */
-public class NewsManager implements RouterApp {
+public class NewsManager implements ClientApp {
 
     private final I2PAppContext _context;
     private final Log _log;
@@ -64,7 +65,7 @@ public class NewsManager implements RouterApp {
      */
     public synchronized List<NewsEntry> getEntries() {
         if (!_currentNews.isEmpty())
-            return new ArrayList(_currentNews);
+            return new ArrayList<NewsEntry>(_currentNews);
         // load old news.xml
         if (_log.shouldWarn())
             _log.warn("no real XML, falling back to news.xml");
@@ -233,9 +234,7 @@ public class NewsManager implements RouterApp {
                     //  Doesn't work if the date has a : in it, but SHORT hopefully does not
                     DateFormat fmt = DateFormat.getDateInstance(DateFormat.SHORT);
                     // the router sets the JVM time zone to UTC but saves the original here so we can get it
-                    String systemTimeZone = _context.getProperty("i2p.systemTimeZone");
-                    if (systemTimeZone != null)
-                        fmt.setTimeZone(TimeZone.getTimeZone(systemTimeZone));
+                    fmt.setTimeZone(SystemVersion.getSystemTimeZone(_context));
                     try {
                         Date date = fmt.parse(newsContent.substring(0, colon));
                         entry.updated = date.getTime();

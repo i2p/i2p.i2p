@@ -517,7 +517,7 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
                 break;
             } catch(SocketTimeoutException ste) {
                 // ignored, we never set the timeout
-            } catch (Exception e) {
+            } catch (RuntimeException e) {
                 // streaming borkage
                 if (_log.shouldLog(Log.ERROR))
                     _log.error("Uncaught exception accepting", e);

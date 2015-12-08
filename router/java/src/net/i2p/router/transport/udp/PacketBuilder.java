@@ -57,10 +57,11 @@ to the various messages - a one byte flag and a four byte sending
 timestamp (*seconds* since the unix epoch).  The flag byte contains 
 the following bitfields:</p>
 <pre>
-  bits 0-3: payload type
-     bit 4: rekey?
-     bit 5: extended options included
-  bits 6-7: reserved
+Bit order: 76543210
+  bits 7-4: payload type
+     bit 3: rekey?
+     bit 2: extended options included
+  bits 1-0: reserved
 </pre>
 
 <p>If the rekey flag is set, 64 bytes of keying material follow the 
@@ -166,6 +167,19 @@ class PacketBuilder {
     private static final String PROP_PADDING = "i2np.udp.padding";
     private static final boolean DEFAULT_ENABLE_PADDING = true;
 
+    /**
+     *  The nine message types, 0-8, shifted to bits 7-4 for convenience
+     */
+    private static final byte SESSION_REQUEST_FLAG_BYTE = UDPPacket.PAYLOAD_TYPE_SESSION_REQUEST << 4;
+    private static final byte SESSION_CREATED_FLAG_BYTE = UDPPacket.PAYLOAD_TYPE_SESSION_CREATED << 4;
+    private static final byte SESSION_CONFIRMED_FLAG_BYTE = UDPPacket.PAYLOAD_TYPE_SESSION_CONFIRMED << 4;
+    private static final byte PEER_RELAY_REQUEST_FLAG_BYTE = UDPPacket.PAYLOAD_TYPE_RELAY_REQUEST << 4;
+    private static final byte PEER_RELAY_RESPONSE_FLAG_BYTE = UDPPacket.PAYLOAD_TYPE_RELAY_RESPONSE << 4;
+    private static final byte PEER_RELAY_INTRO_FLAG_BYTE = UDPPacket.PAYLOAD_TYPE_RELAY_INTRO << 4;
+    private static final byte DATA_FLAG_BYTE = UDPPacket.PAYLOAD_TYPE_DATA << 4;
+    private static final byte PEER_TEST_FLAG_BYTE = UDPPacket.PAYLOAD_TYPE_TEST << 4;
+    private static final byte SESSION_DESTROY_FLAG_BYTE = (byte) (UDPPacket.PAYLOAD_TYPE_SESSION_DESTROY << 4);
+    
     /**
      *  @param transport may be null for unit testing only
      */
@@ -332,7 +346,7 @@ class PacketBuilder {
         int availableForExplicitAcks = availableForAcks;
 
         // make the packet
-        UDPPacket packet = buildPacketHeader((byte)(UDPPacket.PAYLOAD_TYPE_DATA << 4));
+        UDPPacket packet = buildPacketHeader(DATA_FLAG_BYTE);
         DatagramPacket pkt = packet.getPacket();
         byte data[] = pkt.getData();
         int off = HEADER_SIZE;
@@ -573,7 +587,7 @@ class PacketBuilder {
      * @param ackBitfields list of ACKBitfield instances to either fully or partially ACK
      */
     public UDPPacket buildACK(PeerState peer, List<ACKBitfield> ackBitfields) {
-        UDPPacket packet = buildPacketHeader((byte)(UDPPacket.PAYLOAD_TYPE_DATA << 4));
+        UDPPacket packet = buildPacketHeader(DATA_FLAG_BYTE);
         DatagramPacket pkt = packet.getPacket();
         byte data[] = pkt.getData();
         int off = HEADER_SIZE;
@@ -666,12 +680,6 @@ class PacketBuilder {
         setTo(packet, peer.getRemoteIPAddress(), peer.getRemotePort());
         return packet;
     }
-    
-    /** 
-     * full flag info for a sessionCreated message.  this can be fixed, 
-     * since we never rekey on startup, and don't need any extended options
-     */
-    private static final byte SESSION_CREATED_FLAG_BYTE = (UDPPacket.PAYLOAD_TYPE_SESSION_CREATED << 4);
     
     /**
      * Build a new SessionCreated packet for the given peer, encrypting it 
@@ -768,12 +776,6 @@ class PacketBuilder {
         return packet;
     }
     
-    /** 
-     * full flag info for a sessionRequest message.  this can be fixed, 
-     * since we never rekey on startup, and don't need any extended options
-     */
-    private static final byte SESSION_REQUEST_FLAG_BYTE = (UDPPacket.PAYLOAD_TYPE_SESSION_REQUEST << 4);
-    
     /**
      * Build a new SessionRequest packet for the given peer, encrypting it 
      * as necessary.
@@ -781,10 +783,23 @@ class PacketBuilder {
      * @return ready to send packet, or null if there was a problem
      */
     public UDPPacket buildSessionRequestPacket(OutboundEstablishState state) {
-        UDPPacket packet = buildPacketHeader(SESSION_REQUEST_FLAG_BYTE);
+        int off = HEADER_SIZE;
+        byte[] options;
+        boolean ext = state.isExtendedOptionsAllowed();
+        if (ext) {
+            options = new byte[UDPPacket.SESS_REQ_MIN_EXT_OPTIONS_LENGTH];
+            boolean intro = state.needIntroduction();
+            if (intro)
+                options[1] = (byte) UDPPacket.SESS_REQ_EXT_FLAG_REQUEST_RELAY_TAG;
+            if (_log.shouldInfo())
+                _log.info("send sess req. w/ ext. options, need intro? " + intro + ' ' + state);
+            off += UDPPacket.SESS_REQ_MIN_EXT_OPTIONS_LENGTH + 1;
+        } else {
+            options = null;
+        }
+        UDPPacket packet = buildPacketHeader(SESSION_REQUEST_FLAG_BYTE, options);
         DatagramPacket pkt = packet.getPacket();
         byte data[] = pkt.getData();
-        int off = HEADER_SIZE;
 
         byte toIP[] = state.getSentIP();
         if (!_transport.isValid(toIP)) {
@@ -854,13 +869,6 @@ class PacketBuilder {
         return packets;
     }
 
-    
-    /** 
-     * full flag info for a sessionConfirmed message.  this can be fixed, 
-     * since we never rekey on startup, and don't need any extended options
-     */
-    private static final byte SESSION_CONFIRMED_FLAG_BYTE = (UDPPacket.PAYLOAD_TYPE_SESSION_CONFIRMED << 4);
-    
     /**
      * Build a new SessionConfirmed packet for the given peer
      * 
@@ -1018,7 +1026,7 @@ class PacketBuilder {
      *  @since 0.9.2
      */
     private UDPPacket buildSessionDestroyPacket(SessionKey cipherKey, SessionKey macKey, InetAddress addr, int port) {
-        UDPPacket packet = buildPacketHeader((byte)(UDPPacket.PAYLOAD_TYPE_SESSION_DESTROY << 4));
+        UDPPacket packet = buildPacketHeader(SESSION_DESTROY_FLAG_BYTE);
         int off = HEADER_SIZE;
         
         // no body in this message
@@ -1034,12 +1042,6 @@ class PacketBuilder {
         return packet;
     }
     
-    /** 
-     * full flag info for a peerTest message.  this can be fixed, 
-     * since we never rekey on test, and don't need any extended options
-     */
-    private static final byte PEER_TEST_FLAG_BYTE = (UDPPacket.PAYLOAD_TYPE_TEST << 4);
-
     /**
      * Build a packet as if we are Alice and we either want Bob to begin a 
      * peer test or Charlie to finish a peer test.
@@ -1197,12 +1199,6 @@ class PacketBuilder {
         packet.setMessageType(TYPE_TCB);
         return packet;
     }
-    
-    /** 
-     * full flag info for a relay request message.  this can be fixed, 
-     * since we never rekey on relay request, and don't need any extended options
-     */
-    private static final byte PEER_RELAY_REQUEST_FLAG_BYTE = (UDPPacket.PAYLOAD_TYPE_RELAY_REQUEST << 4);
 
     // specify these if we know what our external receive ip/port is and if its different
     // from what bob is going to think
@@ -1330,12 +1326,6 @@ class PacketBuilder {
         return packet;
     }
 
-    /** 
-     * full flag info for a relay intro message.  this can be fixed, 
-     * since we never rekey on relay request, and don't need any extended options
-     */
-    private static final byte PEER_RELAY_INTRO_FLAG_BYTE = (UDPPacket.PAYLOAD_TYPE_RELAY_INTRO << 4);
-    
     UDPPacket buildRelayIntro(RemoteHostId alice, PeerState charlie, UDPPacketReader.RelayRequestReader request) {
         UDPPacket packet = buildPacketHeader(PEER_RELAY_INTRO_FLAG_BYTE);
         DatagramPacket pkt = packet.getPacket();
@@ -1370,12 +1360,6 @@ class PacketBuilder {
         packet.setMessageType(TYPE_INTRO);
         return packet;
     }
-
-    /** 
-     * full flag info for a relay response message.  this can be fixed, 
-     * since we never rekey on relay response, and don't need any extended options
-     */
-    private static final byte PEER_RELAY_RESPONSE_FLAG_BYTE = (UDPPacket.PAYLOAD_TYPE_RELAY_RESPONSE << 4);
     
     UDPPacket buildRelayResponse(RemoteHostId alice, PeerState charlie, long nonce,
                                  SessionKey cipherKey, SessionKey macKey) {
@@ -1462,24 +1446,50 @@ class PacketBuilder {
     /**
      *  Create a new packet and add the flag byte and the time stamp.
      *  Caller should add data starting at HEADER_SIZE.
-     *  At this point, adding support for extended options and rekeying is unlikely,
-     *  but if we do, we'll have to change this.
+     *  Does not include extended options or rekeying.
      *
      *  @param flagByte contains type and flags
      *  @since 0.8.1
      */
     private UDPPacket buildPacketHeader(byte flagByte) {
+        return buildPacketHeader(flagByte, null);
+    }
+
+    /**
+     *  Create a new packet and add the flag byte and the time stamp.
+     *  Caller should add data starting at HEADER_SIZE.
+     *  (if extendedOptions != null, at HEADER_SIZE + 1 + extendedOptions.length)
+     *  Does not include rekeying.
+     *
+     *  @param flagByte contains type and flags
+     *  @param extendedOptions May be null. If non-null, we will add the associated flag here.
+     *                         255 bytes max.
+     *  @since 0.9.24
+     */
+    private UDPPacket buildPacketHeader(byte flagByte, byte[] extendedOptions) {
         UDPPacket packet = UDPPacket.acquire(_context, false);
         byte data[] = packet.getPacket().getData();
         Arrays.fill(data, 0, data.length, (byte)0x0);
         int off = UDPPacket.MAC_SIZE + UDPPacket.IV_SIZE;
         
         // header
+        if (extendedOptions != null)
+            flagByte |= UDPPacket.HEADER_FLAG_EXTENDED_OPTIONS;
         data[off] = flagByte;
         off++;
+        // Note, this is unsigned, so we're good until February 2106
         long now = (_context.clock().now() + 500) / 1000;
         DataHelper.toLong(data, off, 4, now);
-        // todo: add support for rekeying and extended options
+        // todo: add support for rekeying
+        // extended options
+        if (extendedOptions != null) {
+            off+= 4;
+            int len = extendedOptions.length;
+            if (len > 255)
+                throw new IllegalArgumentException();
+            data[off++] = (byte) len;
+            System.arraycopy(extendedOptions, 0, data, off, len);
+        }
         return packet;
     }
 

@@ -10,8 +10,10 @@ import net.i2p.router.RouterContext;
 import net.i2p.router.RouterVersion;
 import net.i2p.router.web.ConfigUpdateHandler;
 import net.i2p.update.*;
+import net.i2p.util.Log;
 import net.i2p.util.PartialEepGet;
 import net.i2p.util.PortMapper;
+import net.i2p.util.SystemVersion;
 import net.i2p.util.VersionComparator;
 
 /**
@@ -73,8 +75,15 @@ class DevSU3UpdateChecker extends UpdateRunner {
         String newVersion = TrustedUpdate.getVersionString(new ByteArrayInputStream(_baos.toByteArray()));
         boolean newer = VersionComparator.comp(newVersion, RouterVersion.FULL_VERSION) > 0;
         if (newer) {
-            _mgr.notifyVersionAvailable(this, _currentURI, UpdateType.ROUTER_DEV_SU3, "", UpdateMethod.HTTP,
+            if (SystemVersion.isJava7()) {
+                _mgr.notifyVersionAvailable(this, _currentURI, UpdateType.ROUTER_DEV_SU3, "", UpdateMethod.HTTP,
                                         _urls, newVersion, RouterVersion.FULL_VERSION);
+            } else {
+                String ourJava = System.getProperty("java.version");
+                String msg = _mgr._t("Requires Java version {0} but installed Java version is {1}", "1.7", ourJava);
+                _log.logAlways(Log.WARN, "Cannot update to version " + newVersion + ": " + msg);
+                _mgr.notifyVersionConstraint(this, _currentURI, UpdateType.ROUTER_DEV_SU3, "", newVersion, msg);
+            }
         } else {
             //updateStatus("<b>" + _t("No new version found at {0}", linkify(url)) + "</b>");
             if (_log.shouldWarn())

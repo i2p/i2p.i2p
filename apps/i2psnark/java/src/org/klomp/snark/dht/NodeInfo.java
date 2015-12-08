@@ -102,7 +102,7 @@ class NodeInfo extends SimpleDataStructure {
      */
     public NodeInfo(String s) throws DataFormatException {
         super();
-        String[] parts = s.split(":", 4);
+        String[] parts = DataHelper.split(s, ":", 4);
         if (parts.length != 4)
             throw new DataFormatException("Bad format");
         byte[] nid = Base64.decode(parts[0]);
@@ -225,7 +225,7 @@ class NodeInfo extends SimpleDataStructure {
             NodeInfo ni = (NodeInfo) o;
             // assume dest matches, ignore it
             return this.hash.equals(ni.hash) && nID.equals(ni.nID) && port == ni.port;
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             return false;
         }
     }

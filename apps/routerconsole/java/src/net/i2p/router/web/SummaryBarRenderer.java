@@ -9,7 +9,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TimeZone;
 
 import net.i2p.app.ClientAppManager;
 import net.i2p.crypto.SigType;
@@ -18,6 +17,7 @@ import net.i2p.router.RouterContext;
 import net.i2p.router.news.NewsEntry;
 import net.i2p.router.news.NewsManager;
 import net.i2p.util.PortMapper;
+import net.i2p.util.SystemVersion;
 
 /**
  *  Refactored from summarynoframe.jsp to save ~100KB
@@ -345,6 +345,13 @@ public class SummaryBarRenderer {
                .append(_t("Warning: ECDSA is not available. Update your Java or OS"))
                .append("</a></h4>\n");
         }
+        if (!SystemVersion.isJava7()) {
+            buf.append("<hr><h4>")
+               .append(_t("Warning: Java version {0} is no longer supported by I2P.", System.getProperty("java.version")))
+               .append(' ')
+               .append(_t("Update Java to version {0} or higher to receive I2P updates.", "7"))
+               .append("</h4>\n");
+        }
         return buf.toString();
     }
 
@@ -626,9 +633,7 @@ public class SummaryBarRenderer {
                 buf.append("<ul>\n");
                 DateFormat fmt = DateFormat.getDateInstance(DateFormat.SHORT);
                 // the router sets the JVM time zone to UTC but saves the original here so we can get it
-                String systemTimeZone = _context.getProperty("i2p.systemTimeZone");
-                if (systemTimeZone != null)
-                    fmt.setTimeZone(TimeZone.getTimeZone(systemTimeZone));
+                fmt.setTimeZone(SystemVersion.getSystemTimeZone(_context));
                 int i = 0;
                 final int max = 2;
                 for (NewsEntry entry : entries) {
@@ -663,6 +668,11 @@ public class SummaryBarRenderer {
     /** translate a string */
     private String _t(String s) {
         return Messages.getString(s, _context);
+    }
+
+    /** @since 0.9.23 */
+    private String _t(String s, Object o) {
+        return Messages.getString(s, o, _context);
     }
 
     /**

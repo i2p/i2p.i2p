@@ -70,7 +70,7 @@ class PeerCoordinator implements PeerListener
 
   // package local for access by CheckDownLoadersTask
   final static long CHECK_PERIOD = 40*1000; // 40 seconds
-  final static int MAX_UPLOADERS = 6;
+  final static int MAX_UPLOADERS = 8;
   public static final long MAX_INACTIVE = 8*60*1000;
 
   /**
@@ -403,7 +403,7 @@ class PeerCoordinator implements PeerListener
    *  Formerly used to
    *  reduce max if huge pieces to keep from ooming when leeching
    *  but now we don't
-   *  @return usually 16	
+   *  @return usually I2PSnarkUtil.MAX_CONNECTIONS
    */
   private int getMaxConnections() {
     if (metainfo == null)
@@ -604,11 +604,13 @@ class PeerCoordinator implements PeerListener
             bitfield = storage.getBitField();
         else
             bitfield = null;
+        // if we aren't a seed but we don't want any more
+        final boolean partialComplete = wantedBytes == 0 && bitfield != null && !bitfield.complete();
         Runnable r = new Runnable()
           {
             public void run()
             {
-              peer.runConnection(_util, listener, bitfield, magnetState);
+              peer.runConnection(_util, listener, bitfield, magnetState, partialComplete);
             }
           };
         String threadName = "Snark peer " + peer.toString();
@@ -984,8 +986,9 @@ class PeerCoordinator implements PeerListener
     }
     int piece = pp.getPiece();
     
-    synchronized(wantedPieces)
-      {
+    // try/catch outside the synch to avoid deadlock in the catch
+    try {
+      synchronized(wantedPieces) {
         Piece p = new Piece(piece);
         if (!wantedPieces.contains(p))
           {
@@ -1001,8 +1004,7 @@ class PeerCoordinator implements PeerListener
             }
           }
         
-        try
-          {
+          // try/catch moved outside of synch
             // this takes forever if complete, as it rechecks
             if (storage.putPiece(pp))
               {
@@ -1028,21 +1030,21 @@ class PeerCoordinator implements PeerListener
                     _log.warn("Got BAD piece " + piece + "/" + metainfo.getPieces() + " from " + peer + " for " + metainfo.getName());
                 return false; // No need to announce BAD piece to peers.
               }
-          }
-        catch (IOException ioe)
-          {
+
+        wantedPieces.remove(p);
+        wantedBytes -= metainfo.getPieceLength(p.getId());
+      }  // synch
+    } catch (IOException ioe) {
             String msg = "Error writing storage (piece " + piece + ") for " + metainfo.getName() + ": " + ioe;
             _log.error(msg, ioe);
             if (listener != null) {
                 listener.addMessage(msg);
                 listener.addMessage("Fatal storage error: Stopping torrent " + metainfo.getName());
             }
+            // deadlock was here
             snark.stopTorrent();
             throw new RuntimeException(msg, ioe);
-          }
-        wantedPieces.remove(p);
-        wantedBytes -= metainfo.getPieceLength(p.getId());
-      }
+    }
 
     // just in case
     removePartialPiece(piece);

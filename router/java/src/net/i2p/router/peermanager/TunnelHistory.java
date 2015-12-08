@@ -89,10 +89,10 @@ public class TunnelHistory {
         _lifetimeRejected.incrementAndGet();
         if (severity >= TUNNEL_REJECT_CRIT) {
             _lastRejectedCritical = _context.clock().now();
-            _rejectRate.addData(1, 1);
+            _rejectRate.addData(1);
         } else if (severity >= TUNNEL_REJECT_BANDWIDTH) {
             _lastRejectedBandwidth = _context.clock().now();
-            _rejectRate.addData(1, 1);
+            _rejectRate.addData(1);
         } else if (severity >= TUNNEL_REJECT_TRANSIENT_OVERLOAD) {
             _lastRejectedTransient = _context.clock().now();
             // dont increment the reject rate in this case
@@ -108,7 +108,7 @@ public class TunnelHistory {
      */
     public void incrementFailed(int pct) {
         _lifetimeFailed.incrementAndGet();
-        _failRate.addData(pct, 1);
+        _failRate.addData(pct);
         _lastFailed = _context.clock().now();
     }
     
@@ -190,14 +190,6 @@ public class TunnelHistory {
     }
     
     private final static long getLong(Properties props, String key) {
-        String val = props.getProperty(key);
-        if (val != null) {
-            try {
-                return Long.parseLong(val);
-            } catch (NumberFormatException nfe) {
-                return 0;
-            }
-        }
-        return 0;
+        return ProfilePersistenceHelper.getLong(props, key);
     }
 }

@@ -62,6 +62,8 @@ class InboundEstablishState {
     private final Queue<OutNetMessage> _queuedMessages;
     // count for backoff
     private int _createdSentCount;
+    // default true
+    private boolean _introductionRequested = true;
     
     public enum InboundState {
         /** nothin known yet */
@@ -150,6 +152,12 @@ class InboundEstablishState {
         if (_bobIP == null)
             _bobIP = new byte[req.readIPSize()];
         req.readIP(_bobIP, 0);
+        byte[] ext = req.readExtendedOptions();
+        if (ext != null && ext.length >= UDPPacket.SESS_REQ_MIN_EXT_OPTIONS_LENGTH) {
+            _introductionRequested = (ext[1] & (byte) UDPPacket.SESS_REQ_EXT_FLAG_REQUEST_RELAY_TAG) != 0;
+            if (_log.shouldInfo())
+                _log.info("got sess req. w/ ext. options, need intro? " + _introductionRequested + ' ' + this);
+        }
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Receive sessionRequest, BobIP = " + Addresses.toString(_bobIP));
         if (_currentState == InboundState.IB_STATE_UNKNOWN)
@@ -160,6 +168,12 @@ class InboundEstablishState {
     public synchronized boolean sessionRequestReceived() { return _receivedX != null; }
     public synchronized byte[] getReceivedX() { return _receivedX; }
     public synchronized byte[] getReceivedOurIP() { return _bobIP; }
+    /**
+     *  True (default) if no extended options in session request,
+     *  or value of flag bit in the extended options.
+     *  @since 0.9.24
+     */
+    public synchronized boolean isIntroductionRequested() { return _introductionRequested; }
     
     /**
      *  Generates session key and mac key.

@@ -2,8 +2,8 @@ package net.i2p.router.web;
 
 import java.io.InputStream;
 import java.io.IOException;
-import java.net.URL;
-import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -37,10 +37,10 @@ public class ConfigReseedHandler extends FormHandler {
                 addFormError(_t("You must enter a URL"));
                 return;
             }
-            URL url;
+            URI url;
             try {
-                url = new URL(val);
-            } catch (MalformedURLException mue) {
+                url = new URI(val);
+            } catch (URISyntaxException mue) {
                 addFormError(_t("Bad URL {0}", val));
                 return;
             }

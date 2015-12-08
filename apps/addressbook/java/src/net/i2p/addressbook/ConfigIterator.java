@@ -32,6 +32,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
+import net.i2p.data.DataHelper;
+
 /**
  *  A class to iterate through a hosts.txt or config file without
  *  reading the whole thing into memory.
@@ -69,7 +71,7 @@ class ConfigIterator implements Iterator<Map.Entry<String, String>>, Closeable {
             String inputLine = input.readLine();
             while (inputLine != null) {
                 inputLine = ConfigParser.stripComments(inputLine);
-                String[] splitLine = inputLine.split("=");
+                String[] splitLine = DataHelper.split(inputLine, "=");
                 if (splitLine.length == 2) {
                     next = new ConfigEntry(splitLine[0].trim().toLowerCase(Locale.US), splitLine[1].trim());
                     return true;

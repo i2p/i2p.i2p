@@ -23,6 +23,7 @@ public abstract class FormHandler {
     protected RouterContext _context;
     protected Log _log;
     /** Not for multipart/form-data, will be null */
+    @SuppressWarnings("rawtypes")
     protected Map _settings;
     /** Only for multipart/form-data. Warning, parameters are NOT XSS filtered */
     protected RequestWrapper _requestWrapper;
@@ -63,6 +64,7 @@ public abstract class FormHandler {
      *
      * @since 0.9.4 consolidated from numerous FormHandlers
      */
+    @SuppressWarnings({"rawtypes", "unchecked"})
     public void setSettings(Map settings) { _settings = new HashMap(settings); }
 
     /**
@@ -303,7 +305,7 @@ public abstract class FormHandler {
      *    The {0} will be replaced by the parameter.
      *    Single quotes must be doubled, i.e. ' -> '' in the string.
      *  @param o parameter, not translated.
-     *    To tranlslate parameter also, use _t("foo {0} bar", _t("baz"))
+     *    To translate parameter also, use _t("foo {0} bar", _t("baz"))
      *    Do not double the single quotes in the parameter.
      *    Use autoboxing to call with ints, longs, floats, etc.
      */

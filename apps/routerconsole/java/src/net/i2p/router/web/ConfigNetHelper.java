@@ -207,7 +207,7 @@ public class ConfigNetHelper extends HelperBase {
             configs = Collections.emptySet();
         } else {
             configs = new HashSet<String>(4);
-            String[] ca = cs.split("[,; \r\n\t]");
+            String[] ca = DataHelper.split(cs, "[,; \r\n\t]");
             for (int i = 0; i < ca.length; i++) {
                 String c = ca[i];
                 if (c.length() > 0) {

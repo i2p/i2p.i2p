@@ -48,7 +48,7 @@ public abstract class CommSystemFacade implements Service {
     public boolean haveInboundCapacity(int pct) { return true; }
     public boolean haveOutboundCapacity(int pct) { return true; }
     public boolean haveHighOutboundCapacity() { return true; }
-    public List getMostRecentErrorMessages() { return Collections.emptyList(); }
+    public List<String> getMostRecentErrorMessages() { return Collections.emptyList(); }
     
     /**
      * Median clock skew of connected peers in seconds, or null if we cannot answer.

@@ -164,7 +164,7 @@ public class AddressbookBean extends BaseBean
 
 			message = generateLoadMessage();
 		}
-		catch (Exception e) {
+		catch (IOException e) {
 			warn(e);
 		} finally {
 			if (fis != null)
@@ -316,7 +316,7 @@ public class AddressbookBean extends BaseBean
 					try {
 						save();
 						message += "<br>" + _t("Address book saved.");
-					} catch (Exception e) {
+					} catch (IOException e) {
 						warn(e);
 						message += "<br>" + _t("ERROR: Could not write addressbook file.");
 					}

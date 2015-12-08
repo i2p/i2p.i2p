@@ -31,12 +31,11 @@ class SortHelper {
      *  WARNING - this sort order must be consistent network-wide, so while the order is arbitrary,
      *  it cannot be changed.
      *  Why? Just because it has to be consistent so signing will work.
-     *  How to spec as returning the same type as the param?
      *  DEPRECATED - Only used by RouterInfo.
      *
      *  @return a new list
      */
-    public static List<? extends DataStructure> sortStructures(Collection<? extends DataStructure> dataStructures) {
+    public static <T extends DataStructure> List<T> sortStructures(Collection<T> dataStructures) {
         if (dataStructures == null) return Collections.emptyList();
 
         // This used to use Hash.toString(), which is insane, since a change to toString()
@@ -52,7 +51,7 @@ class SortHelper {
         //for (DataStructure struct : tm.values()) {
         //    rv.add(struct);
         //}
-        ArrayList<DataStructure> rv = new ArrayList<DataStructure>(dataStructures);
+        ArrayList<T> rv = new ArrayList<T>(dataStructures);
         sortStructureList(rv);
         return rv;
     }

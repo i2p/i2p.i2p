@@ -340,7 +340,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
 
         List<InetAddress> bindToAddrs = new ArrayList<InetAddress>(4);
         if (bindTo != null) {
-            String[] bta = bindTo.split("[,; \r\n\t]");
+            String[] bta = DataHelper.split(bindTo, "[,; \r\n\t]");
             for (int i = 0; i < bta.length; i++) {
                 String bt = bta[i];
                 if (bt.length() <= 0)
@@ -993,6 +993,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 // save PROP_EXTERNAL_PORT
                 _context.router().saveConfig(changes, null);
             }
+            // deadlock thru here ticket #1699
             _context.router().rebuildRouterInfo();
         }
         _testEvent.forceRunImmediately();
@@ -1895,7 +1896,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         if (explicitAddressSpecified()) {
             host = _context.getProperty(PROP_EXTERNAL_HOST);
             if (host != null) {
-                String[] hosts = host.split("[,; \r\n\t]");
+                String[] hosts = DataHelper.split(host, "[,; \r\n\t]");
                 RouterAddress rv = null;
                 for (int i = 0; i < hosts.length; i++) {
                     String h = hosts[i];
@@ -2115,6 +2116,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      *  @since 0.9.18
      */
     private RouterAddress getCurrentExternalAddress(boolean isIPv6) {
+        // deadlock thru here ticket #1699
         synchronized (_rebuildLock) {
             return isIPv6 ? _currentOurV6Address : _currentOurV4Address;
         }
@@ -2214,6 +2216,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Require introducers, because our status is " + status);
                 return true;
+
             default:
                 if (!allowDirectUDP()) {
                     if (_log.shouldLog(Log.DEBUG))
@@ -2221,6 +2224,30 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                     return true;
                 }
                 return false;
+        }
+    }
+    
+    /**
+     *  MIGHT we require introducers?
+     *  This is like introducersRequired, but if we aren't sure, this returns true.
+     *  Used only by EstablishmentManager.
+     *
+     *  @since 0.9.24
+     */
+    boolean introducersMaybeRequired() {
+        Status status = getReachabilityStatus();
+        switch (status) {
+            case REJECT_UNSOLICITED:
+            case DIFFERENT:
+            case IPV4_FIREWALLED_IPV6_OK:
+            case IPV4_FIREWALLED_IPV6_UNKNOWN:
+            case IPV4_UNKNOWN_IPV6_OK:
+            case IPV4_UNKNOWN_IPV6_FIREWALLED:
+            case UNKNOWN:
+                return true;
+
+            default:
+                return !allowDirectUDP();
         }
     }
     

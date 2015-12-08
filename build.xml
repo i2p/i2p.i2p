@@ -868,6 +868,21 @@
     </target>
 
     <target name="-pre-release">
+            <fail message="javac.compilerargs must contain a -bootclasspath option in override.properties">
+                <condition>
+                    <not><contains string="${javac.compilerargs}" substring="-bootclasspath"/></not>
+                </condition>
+            </fail>
+            <fail message="build.built-by must be set in override.properties">
+                <condition>
+                    <equals arg1="${build.built-by}" arg2="unknown"/>
+                </condition>
+            </fail>
+            <fail message="require.gettext must be true">
+                <condition>
+                    <not><equals arg1="${require.gettext}" arg2="true"/></not>
+                </condition>
+            </fail>
             <echo message="================================================================" />
             <echo message="Did you update these files?" />
             <exec executable="ls" failonerror="true">
@@ -1450,9 +1465,7 @@
     </target>
 
     <!-- All jetty jars required for update.
-         We don't need commons-el or commons-logging, they haven't changed.
          TODO do we need to bother updating jasper?
-         TODO where is JMX? We don't need it I hope.
       -->
     <target name="prepjupdate" depends="prepupdate, buildWEB">
         <copy todir="pkg-temp/lib" >
@@ -1789,15 +1802,11 @@
         <copy file="i2pupdate.zip" tofile="i2pupdate_${release.number}.zip" />
         <copy file="i2pinstall_${full.version}.jar" tofile="i2pinstall_${release.number}.jar" />
         <copy file="i2pinstall_${full.version}_windows.exe" tofile="i2pinstall_${release.number}_windows.exe" />
+        <!-- remove these, we don't build them anymore -->
         <delete file="i2pupdate.sud" />
         <delete file="i2pupdate.su2" />
-        <!-- make this a lot easier by putting release.privkey=/path/to/privkey in override.properties -->
+        <!-- make this a lot easier by putting release.privkey.su3=/path/to/su3keystore.ks in override.properties -->
 
-        <!-- now build and verify the packed sud from the packed zip -->
-        <sudsign infile="i2pupdate.zip" outfile="i2pupdate.sud" />
-
-        <!-- now build and verify the packed su2 from the packed zip -->
-        <sudsign infile="i2pupdate200.zip" outfile="i2pupdate.su2" />
         <!-- now build and verify the packed su3 from the packed zip -->
         <su3sign infile="i2pupdate200.zip" sigtype="ROUTER" outfile="i2pupdate.su3" su3.ver="${release.number}" />
         <!-- this will use the monotonerc file in the current workspace -->
@@ -1835,9 +1844,7 @@
 
         <chmod perm="444" type="file">
             <fileset dir="${basedir}">
-                <include name="i2pupdate.su2" />
                 <include name="i2pupdate.su3" />
-                <include name="i2pupdate.sud" />
             </fileset>
         </chmod>
         <echo message="File sizes:" />
@@ -1847,9 +1854,7 @@
             <arg value="i2pinstall_${release.number}.jar" />
             <arg value="i2psource_${release.number}.tar.bz2" />
             <arg value="i2pupdate_${release.number}.zip" />
-            <arg value="i2pupdate.su2" />
             <arg value="i2pupdate.su3" />
-            <arg value="i2pupdate.sud" />
             <arg value="i2pinstall_${release.number}_windows.exe.sig" />
             <arg value="i2pinstall_${release.number}.jar.sig" />
             <arg value="i2psource_${release.number}.tar.bz2.sig" />
@@ -1860,14 +1865,8 @@
         <sha256sum file="i2pinstall_${release.number}.jar" />
         <sha256sum file="i2psource_${release.number}.tar.bz2" />
         <sha256sum file="i2pupdate_${release.number}.zip" />
-        <sha256sum file="i2pupdate.su2" />
         <sha256sum file="i2pupdate.su3" />
-        <sha256sum file="i2pupdate.sud" />
         <!-- make torrent files -->
-        <copy file="i2pupdate.sud" tofile="i2pupdate-${release.number}.sud" />
-        <mktorrent file="i2pupdate-${release.number}.sud" />
-        <copy file="i2pupdate.su2" tofile="i2pupdate-${release.number}.su2" />
-        <mktorrent file="i2pupdate-${release.number}.su2" />
         <copy file="i2pupdate.su3" tofile="i2pupdate-${release.number}.su3" />
         <mktorrent file="i2pupdate-${release.number}.su3" />
         <echo message="Don't forget to mtn tag w: i2p-${release.number}" />

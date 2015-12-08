@@ -109,6 +109,7 @@ class MailCache {
 	 * @param mode CACHE_ONLY to not pull from pop server
 	 * @return An e-mail or null
 	 */
+        @SuppressWarnings({"unchecked", "rawtypes"})
 	public Mail getMail(String uidl, FetchMode mode) {
 		
 		Mail mail = null, newMail = null;
@@ -163,6 +164,7 @@ class MailCache {
 	 * @return true if any were fetched
 	 * @since 0.9.13
 	 */
+        @SuppressWarnings({"unchecked", "rawtypes"})
 	public boolean getMail(FetchMode mode) {
 		if (mode == FetchMode.CACHE_ONLY)
 			throw new IllegalArgumentException();

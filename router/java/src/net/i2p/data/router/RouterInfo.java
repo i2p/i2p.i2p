@@ -339,7 +339,7 @@ public class RouterInfo extends DatabaseEntry {
                     // WARNING this sort algorithm cannot be changed, as it must be consistent
                     // network-wide. The signature is not checked at readin time, but only
                     // later, and the hashes are stored in a Set, not a List.
-                    peers = (Collection<Hash>) SortHelper.sortStructures(peers);
+                    peers = SortHelper.sortStructures(peers);
                 for (Hash peerHash : peers) {
                     peerHash.writeBytes(out);
                 }
@@ -724,7 +724,10 @@ public class RouterInfo extends DatabaseEntry {
                      System.err.println("Router info " + args[i] + " is invalid");
                      fail = true;
                   }
-             } catch (Exception e) {
+             } catch (IOException e) {
+                 System.err.println("Error reading " + args[i] + ": " + e);
+                 fail = true;
+             } catch (DataFormatException e) {
                  System.err.println("Error reading " + args[i] + ": " + e);
                  fail = true;
              } finally {

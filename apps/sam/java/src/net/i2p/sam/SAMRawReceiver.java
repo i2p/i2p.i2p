@@ -20,9 +20,12 @@ interface SAMRawReceiver {
      * regarding the sender.
      *
      * @param data Byte array to be received
+     * @param proto I2CP protocol
+     * @param fromPort I2CP from port
+     * @param toPort I2CP to port
      * @throws IOException 
      */
-    public void receiveRawBytes(byte data[]) throws IOException;
+    public void receiveRawBytes(byte data[], int proto, int fromPort, int toPort) throws IOException;
 
     /**
      * Stop receiving data.
