@@ -90,6 +90,9 @@ public class I2PThread extends Thread {
                 System.out.println("Check ulimit -u, /etc/security/limits.conf, or /proc/sys/kernel/threads-max");
             }
             oom.printStackTrace();
+            if (!(SystemVersion.isWindows() || SystemVersion.isAndroid()))
+                throw new RuntimeException("Thread could not be started, " +
+                                           "Check ulimit -u, /etc/security/limits.conf, or /proc/sys/kernel/threads-max", oom);
             throw new RuntimeException("Thread could not be started", oom);
         }
     }
