@@ -9,6 +9,7 @@ package net.i2p.router;
  */
 
 import java.io.Writer;
+import java.security.GeneralSecurityException;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
@@ -16,6 +17,9 @@ import java.util.Properties;
 
 import net.i2p.CoreVersion;
 import net.i2p.data.DataHelper;
+import net.i2p.data.Hash;
+import net.i2p.data.router.RouterInfo;
+import net.i2p.router.crypto.FamilyKeyCrypto;
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import net.i2p.stat.Rate;
 import net.i2p.stat.RateStat;
@@ -25,15 +29,12 @@ import net.i2p.util.Log;
  * Publishes some statistics about the router in the netDB.
  *
  */
-public class StatisticsManager implements Service {
+public class StatisticsManager {
     private final Log _log;
     private final RouterContext _context;
     
     public final static String PROP_PUBLISH_RANKINGS = "router.publishPeerRankings";
     private static final String PROP_CONTACT_NAME = "netdb.contact";
-    private static final String PROP_FAMILY_NAME = "netdb.family.name";
-    private static final String PROP_FAMILY_KEY = "netdb.family.key";
-    private static final String PROP_FAMILY_SIG = "netdb.family.sig";
     /** enhance anonymity by only including build stats one out of this many times */
     private static final int RANDOM_INCLUDE_STATS = 16;
 
@@ -47,20 +48,32 @@ public class StatisticsManager implements Service {
         _log = context.logManager().getLog(StatisticsManager.class);
     }
         
-    /** noop */
-    public void shutdown() {}
-
-    /** noop */
-    public void restart() {}
-
-    /** noop */
-    public void startup() {}
-    
-    /** Retrieve a snapshot of the statistics that should be published */
+    /**
+     *  Retrieve a snapshot of the statistics that should be published.
+     *
+     *  This includes all standard options (as of 0.9.24, network ID and caps)
+     */
     public Properties publishStatistics() { 
+        // if hash is null, will be caught in fkc.sign()
+        return publishStatistics(_context.routerHash());
+    }
+    
+    /**
+     *  Retrieve a snapshot of the statistics that should be published.
+     *
+     *  This includes all standard options (as of 0.9.24, network ID and caps)
+     *
+     *  @param current router hash, non-null
+     *  @since 0.9.24
+     */
+    public Properties publishStatistics(Hash h) { 
         Properties stats = new Properties();
         stats.setProperty("router.version", RouterVersion.VERSION);
-        stats.setProperty("coreVersion", CoreVersion.VERSION);
+        // scheduled for removal, never used
+        if (CoreVersion.VERSION.equals("0.9.23"))
+            stats.setProperty("coreVersion", CoreVersion.VERSION);
+        stats.setProperty(RouterInfo.PROP_NETWORK_ID, Integer.toString(Router.NETWORK_ID));
+        stats.setProperty(RouterInfo.PROP_CAPABILITIES, _context.router().getCapabilities());
 
         // No longer expose, to make build tracking more expensive
         // stats.setProperty("router.id", RouterVersion.ID);
@@ -152,8 +165,10 @@ public class StatisticsManager implements Service {
             //includeRate("tunnel.acceptLoad", stats, new long[] { 10*60*1000 });
         }
 
-        // So that we will still get build requests
-        stats.setProperty("stat_uptime", "90m");
+        // So that we will still get build requests - not required since 0.7.9 2010-01-12
+        // scheduled for removal
+        if (CoreVersion.VERSION.equals("0.9.23"))
+            stats.setProperty("stat_uptime", "90m");
         if (FloodfillNetworkDatabaseFacade.isFloodfill(_context.router().getRouterInfo())) {
             int ri = _context.router().getUptime() > 30*60*1000 ?
                      _context.netDb().getKnownRouters() :
@@ -168,16 +183,32 @@ public class StatisticsManager implements Service {
         String contact = _context.getProperty(PROP_CONTACT_NAME);
         if (contact != null)
             stats.setProperty("contact", contact);
-        String family = _context.getProperty(PROP_FAMILY_NAME);
+
+        String family = _context.getProperty(FamilyKeyCrypto.PROP_FAMILY_NAME);
         if (family != null) {
-            stats.setProperty("family", family);
-            // TODO
-            //String key = _context.getProperty(PROP_FAMILY_KEY);
-            //if (key != null) {
-                // get privkey
-                // sign something
-                // add b64 sig
-            //}
+            stats.setProperty(FamilyKeyCrypto.OPT_NAME, family);
+            String sig = null;
+            RouterInfo oldRI = _context.router().getRouterInfo();
+            if (oldRI != null) {
+                // don't do it if family changed
+                if (family.equals(oldRI.getOption(FamilyKeyCrypto.OPT_NAME))) {
+                    // copy over the signature
+                    sig = oldRI.getOption(FamilyKeyCrypto.OPT_SIG);
+                    if (sig != null)
+                        stats.setProperty(FamilyKeyCrypto.OPT_SIG, sig);
+                }
+            }
+            if (sig == null) {
+                FamilyKeyCrypto fkc = _context.router().getFamilyKeyCrypto();
+                if (fkc != null) {
+                    try {
+                        sig = fkc.sign(family, h);
+                        stats.setProperty(FamilyKeyCrypto.OPT_SIG, sig);
+                    } catch (GeneralSecurityException gse) {
+                        _log.error("Failed to sign router family", gse);
+                    }
+                }
+            }
         }
 
         return stats;

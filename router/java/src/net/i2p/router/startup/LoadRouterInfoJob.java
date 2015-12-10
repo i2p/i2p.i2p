@@ -31,6 +31,7 @@ import net.i2p.data.router.RouterPrivateKeyFile;
 import net.i2p.router.JobImpl;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
+import net.i2p.router.crypto.FamilyKeyCrypto;
 import net.i2p.router.networkdb.kademlia.PersistentDataStore;
 import net.i2p.util.Log;
 
@@ -98,7 +99,13 @@ class LoadRouterInfoJob extends JobImpl {
                     throw new DataFormatException("Our RouterInfo has a bad signature");
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Reading in routerInfo from " + rif.getAbsolutePath() + " and it has " + info.getAddresses().size() + " addresses");
-                _us = info;
+                // don't reuse if family name changed
+                if (DataHelper.eq(info.getOption(FamilyKeyCrypto.OPT_NAME),
+                                  getContext().getProperty(FamilyKeyCrypto.PROP_FAMILY_NAME))) {
+                    _us = info;
+                } else {
+                    _log.logAlways(Log.WARN, "NetDb family name changed");
+                }
             }
             
             if (keys2Exist || keysExist) {

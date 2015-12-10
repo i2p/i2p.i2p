@@ -10,6 +10,7 @@ package net.i2p.router;
 
 import java.io.File;
 import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -35,6 +36,7 @@ import net.i2p.data.SigningPublicKey;
 import net.i2p.data.i2np.GarlicMessage;
 import net.i2p.data.router.RouterInfo;
 import net.i2p.router.CommSystemFacade.Status;
+import net.i2p.router.crypto.FamilyKeyCrypto;
 import net.i2p.router.message.GarlicMessageHandler;
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import net.i2p.router.startup.CreateRouterInfoJob;
@@ -88,6 +90,8 @@ public class Router implements RouterClock.ClockShiftListener {
     private final EventLog _eventLog;
     private final Object _stateLock = new Object();
     private State _state = State.UNINITIALIZED;
+    private FamilyKeyCrypto _familyKeyCrypto;
+    private boolean _familyKeyCryptoFail;
     
     public final static String PROP_CONFIG_FILE = "router.configLocation";
     
@@ -830,7 +834,7 @@ public class Router implements RouterClock.ClockShiftListener {
      * has changed.
      */
     private void locked_rebuildRouterInfo(boolean blockingRebuild) {
-        RouterInfo ri = null;
+        RouterInfo ri;
         if (_routerInfo != null)
             ri = new RouterInfo(_routerInfo);
         else
@@ -839,12 +843,10 @@ public class Router implements RouterClock.ClockShiftListener {
         try {
             ri.setPublished(_context.clock().now());
             Properties stats = _context.statPublisher().publishStatistics();
-            stats.setProperty(RouterInfo.PROP_NETWORK_ID, NETWORK_ID+"");
             
             ri.setOptions(stats);
             ri.setAddresses(_context.commSystem().createAddresses());
 
-            addCapabilities(ri);
             SigningPrivateKey key = _context.keyManager().getSigningPrivateKey();
             if (key == null) {
                 _log.log(Log.CRIT, "Internal error - signing private key not known? Impossible?");
@@ -862,6 +864,32 @@ public class Router implements RouterClock.ClockShiftListener {
         } catch (DataFormatException dfe) {
             _log.log(Log.CRIT, "Internal error - unable to sign our own address?!", dfe);
         }
+    }
+
+    /**
+     *  Family Key Crypto Signer / Verifier.
+     *  Not for external use.
+     *  If family key is set, first call Will take a while to generate keys.
+     *  Warning - risk of deadlock - do not call while holding locks
+     *  (other than routerInfoLock)
+     *
+     *  @return null on initialization failure
+     *  @since 0.9.24
+     */
+    public FamilyKeyCrypto getFamilyKeyCrypto() {
+        synchronized (_routerInfoLock) {
+            if (_familyKeyCrypto == null) {
+                if (!_familyKeyCryptoFail) {
+                    try {
+                        _familyKeyCrypto = new FamilyKeyCrypto(_context);
+                    } catch (GeneralSecurityException gse) {
+                        _log.error("Failed to initialize family key crypto", gse);
+                        _familyKeyCryptoFail = true;
+                    }
+                }
+            }
+        }
+        return _familyKeyCrypto;
     }
 
     // publicize our ballpark capacity
@@ -887,14 +915,11 @@ public class Router implements RouterClock.ClockShiftListener {
     
     /**
      *  For building our RI. Not for external use.
-     *  This does not publish the ri.
-     *  This does not use anything in the ri (i.e. it can be freshly constructed)
      *
-     *  TODO just return a string instead of passing in the RI? See PublishLocalRouterInfoJob.
-     *
-     *  @param ri an unpublished ri we are generating.
+     *  @return a capabilities string to be added to the RI
      */
-    public void addCapabilities(RouterInfo ri) {
+    String getCapabilities() {
+        StringBuilder rv = new StringBuilder(4);
         int bwLim = Math.min(_context.bandwidthLimiter().getInboundKBytesPerSecond(),
                              _context.bandwidthLimiter().getOutboundKBytesPerSecond());
         bwLim = (int)(bwLim * getSharePercentage());
@@ -903,40 +928,40 @@ public class Router implements RouterClock.ClockShiftListener {
         
         String force = _context.getProperty(PROP_FORCE_BWCLASS);
         if (force != null && force.length() > 0) {
-            ri.addCapability(force.charAt(0));
+            rv.append(force.charAt(0));
         } else if (bwLim < 12) {
-            ri.addCapability(CAPABILITY_BW12);
+            rv.append(CAPABILITY_BW12);
         } else if (bwLim <= 48) {
-            ri.addCapability(CAPABILITY_BW32);
+            rv.append(CAPABILITY_BW32);
         } else if (bwLim <= 64) {
-            ri.addCapability(CAPABILITY_BW64);
+            rv.append(CAPABILITY_BW64);
         } else if (bwLim <= 128) {
-            ri.addCapability(CAPABILITY_BW128);
+            rv.append(CAPABILITY_BW128);
         } else if (bwLim <= 256) {
-            ri.addCapability(CAPABILITY_BW256);
+            rv.append(CAPABILITY_BW256);
         } else if (bwLim <= 2000) {    // TODO adjust threshold
             // 512 supported as of 0.9.18;
             // Add 256 as well for compatibility
-            ri.addCapability(CAPABILITY_BW512);
-            ri.addCapability(CAPABILITY_BW256);
+            rv.append(CAPABILITY_BW512);
+            rv.append(CAPABILITY_BW256);
         } else {
             // Unlimited supported as of 0.9.18;
             // Add 256 as well for compatibility
-            ri.addCapability(CAPABILITY_BW_UNLIMITED);
-            ri.addCapability(CAPABILITY_BW256);
+            rv.append(CAPABILITY_BW_UNLIMITED);
+            rv.append(CAPABILITY_BW256);
         }
         
         // if prop set to true, don't tell people we are ff even if we are
         if (_context.netDb().floodfillEnabled() &&
             !_context.getBooleanProperty("router.hideFloodfillParticipant"))
-            ri.addCapability(FloodfillNetworkDatabaseFacade.CAPABILITY_FLOODFILL);
+            rv.append(FloodfillNetworkDatabaseFacade.CAPABILITY_FLOODFILL);
         
         if(_context.getBooleanProperty(PROP_HIDDEN))
-            ri.addCapability(RouterInfo.CAPABILITY_HIDDEN);
+            rv.append(RouterInfo.CAPABILITY_HIDDEN);
         
         if (_context.getBooleanProperty(PROP_FORCE_UNREACHABLE)) {
-            ri.addCapability(CAPABILITY_UNREACHABLE);
-            return;
+            rv.append(CAPABILITY_UNREACHABLE);
+            return rv.toString();
         }
         switch (_context.commSystem().getStatus()) {
             case OK:
@@ -946,13 +971,13 @@ public class Router implements RouterClock.ClockShiftListener {
             case IPV4_DISABLED_IPV6_OK:
             case IPV4_UNKNOWN_IPV6_OK:
             case IPV4_SNAT_IPV6_OK:
-                ri.addCapability(CAPABILITY_REACHABLE);
+                rv.append(CAPABILITY_REACHABLE);
                 break;
 
             case DIFFERENT:
             case REJECT_UNSOLICITED:
             case IPV4_DISABLED_IPV6_FIREWALLED:
-                ri.addCapability(CAPABILITY_UNREACHABLE);
+                rv.append(CAPABILITY_UNREACHABLE);
                 break;
 
             case DISCONNECTED:
@@ -966,6 +991,7 @@ public class Router implements RouterClock.ClockShiftListener {
                 // no explicit capability
                 break;
         }
+        return rv.toString();
     }
     
     /*
@@ -1178,7 +1204,6 @@ public class Router implements RouterClock.ClockShiftListener {
         try { _context.clientManager().shutdown(); } catch (Throwable t) { _log.error("Error shutting down the client manager", t); }
         try { _context.namingService().shutdown(); } catch (Throwable t) { _log.error("Error shutting down the naming service", t); }
         try { _context.jobQueue().shutdown(); } catch (Throwable t) { _log.error("Error shutting down the job queue", t); }
-        try { _context.statPublisher().shutdown(); } catch (Throwable t) { _log.error("Error shutting down the stats publisher", t); }
         try { _context.tunnelManager().shutdown(); } catch (Throwable t) { _log.error("Error shutting down the tunnel manager", t); }
         try { _context.tunnelDispatcher().shutdown(); } catch (Throwable t) { _log.error("Error shutting down the tunnel dispatcher", t); }
         try { _context.netDb().shutdown(); } catch (Throwable t) { _log.error("Error shutting down the networkDb", t); }

@@ -36,7 +36,6 @@ public class StartupJob extends JobImpl {
     public void runJob() {
         if (!SystemVersion.isAndroid())
             getContext().jobQueue().addJob(new LoadClientAppsJob(getContext()));
-        getContext().statPublisher().startup();
         getContext().jobQueue().addJob(new LoadRouterInfoJob(getContext()));
     }
 }

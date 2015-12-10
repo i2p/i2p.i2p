@@ -435,44 +435,6 @@ public class RouterInfo extends DatabaseEntry {
     }
 
     /**
-     * Warning, must be called AFTER setOptions().
-     *
-     * @throws IllegalStateException if RouterInfo is already signed
-     */
-    public void addCapability(char cap) {
-        if (_signature != null)
-            throw new IllegalStateException();
-
-            String caps = _options.getProperty(PROP_CAPABILITIES);
-            if (caps == null)
-                _options.setProperty(PROP_CAPABILITIES, String.valueOf(cap));
-            else if (caps.indexOf(cap) == -1)
-                _options.setProperty(PROP_CAPABILITIES, caps + cap);
-    }
-
-    /**
-     * @throws IllegalStateException if RouterInfo is already signed
-     * @deprecated unused
-     */
-    public void delCapability(char cap) {
-        if (_signature != null)
-            throw new IllegalStateException();
-
-            String caps = _options.getProperty(PROP_CAPABILITIES);
-            int idx;
-            if (caps == null) {
-                return;
-            } else if ((idx = caps.indexOf(cap)) == -1) {
-                return;
-	    } else {
-                StringBuilder buf = new StringBuilder(caps);
-		while ( (idx = buf.indexOf(""+cap)) != -1)
-                    buf.deleteCharAt(idx);
-                _options.setProperty(PROP_CAPABILITIES, buf.toString());
-            }
-    }
-
-    /**
      * Determine whether the router was published recently (within the given age milliseconds).
      * The age should be large enough to take into consideration any clock fudge factor, so
      * values such as 1 or 2 hours are probably reasonable.

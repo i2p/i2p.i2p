@@ -98,10 +98,6 @@ public class CreateRouterInfoJob extends JobImpl {
         OutputStream fos1 = null;
         try {
             info.setAddresses(getContext().commSystem().createAddresses());
-            Properties stats = getContext().statPublisher().publishStatistics();
-            stats.setProperty(RouterInfo.PROP_NETWORK_ID, Router.NETWORK_ID+"");
-            getContext().router().addCapabilities(info);
-            info.setOptions(stats);
             // not necessary, in constructor
             //info.setPeers(new HashSet());
             info.setPublished(getCurrentPublishDate(getContext()));
@@ -126,6 +122,8 @@ public class CreateRouterInfoJob extends JobImpl {
                 padding = null;
             }
             info.setIdentity(ident);
+            Properties stats = getContext().statPublisher().publishStatistics(ident.getHash());
+            info.setOptions(stats);
             
             info.sign(signingPrivKey);
 
