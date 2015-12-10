@@ -53,6 +53,9 @@ class SybilRenderer {
     private static final double POINTS24 = 5.0;
     // multiplied by size - 1
     private static final double POINTS16 = 0.25;
+    private static final double POINTS_US32 = 25.0;
+    private static final double POINTS_US24 = 25.0;
+    private static final double POINTS_US16 = 10.0;
     private static final double POINTS_FAMILY = -2.0;
     private static final double MIN_CLOSE = 242.0;
     private static final double OUR_KEY_FACTOR = 4.0;
@@ -176,6 +179,7 @@ class SybilRenderer {
 
         // IP analysis
         renderIPGroupsFamily(out, buf, ris, points);
+        renderIPGroupsUs(out, buf, ris, points);
         renderIPGroups32(out, buf, ris, points);
         renderIPGroups24(out, buf, ris, points);
         renderIPGroups16(out, buf, ris, points);
@@ -295,10 +299,12 @@ class SybilRenderer {
                 renderRouterInfo(buf, p.r1, null, false, false);
                 renderRouterInfo(buf, p.r2, null, false, false);
             }
+            String b2 = p.r2.getHash().toBase64();
             addPoints(points, p.r1.getHash(), point, "Very close (" + fmt.format(distance) +
-                          ") to other floodfill " + p.r2.getHash().toBase64());
+                          ") to other floodfill <a href=\"netdb?r=" + b2 + "\">" + b2 + "</a>");
+            String b1 = p.r1.getHash().toBase64();
             addPoints(points, p.r2.getHash(), point, "Very close (" + fmt.format(distance) +
-                          ") to other floodfill " + p.r1.getHash().toBase64());
+                          ") to other floodfill <a href=\"netdb?r=" + b1 + "\">" + b1 + "</a>");
         }
         out.write(buf.toString());
         out.flush();
@@ -351,9 +357,45 @@ class SybilRenderer {
         }
     }
 
+    private void renderIPGroupsUs(Writer out, StringBuilder buf, List<RouterInfo> ris, Map<Hash, Points> points) throws IOException {
+        RouterInfo us = _context.router().getRouterInfo();
+        byte[] ourIP = getIP(us);
+        if (ourIP == null)
+            return;
+        buf.append("<h3>Floodfills close to Our IP</h3>");
+        boolean found = false;
+        for (RouterInfo info : ris) {
+            byte[] ip = getIP(info);
+            if (ip == null)
+                continue;
+            if (ip[0] == ourIP[0] && ip[1] == ourIP[1]) {
+                buf.append("<p><b>");
+                if (ip[2] == ourIP[2]) {
+                    if (ip[3] == ourIP[3]) {
+                        buf.append("Same IP as us");
+                        addPoints(points, info.getHash(), POINTS_US32, "Same IP as us");
+                    } else {
+                        buf.append("Same /24 as us");
+                        addPoints(points, info.getHash(), POINTS_US24, "Same /24 as us");
+                    }
+                } else {
+                    buf.append("Same /16 as us");
+                    addPoints(points, info.getHash(), POINTS_US16, "Same /16 as us");
+                }
+                buf.append(":</b></p>");
+                renderRouterInfo(buf, info, null, false, false);
+                found = true;
+            }
+        }
+        if (!found)
+            buf.append("<p>None</p>");
+        out.write(buf.toString());
+        out.flush();
+        buf.setLength(0);
+    }
+
     private void renderIPGroups32(Writer out, StringBuilder buf, List<RouterInfo> ris, Map<Hash, Points> points) throws IOException {
         buf.append("<h3>Floodfills with the Same IP</h3>");
-        int sz = ris.size();
         ObjectCounter<Integer> oc = new ObjectCounter<Integer>();
         for (RouterInfo info : ris) {
             byte[] ip = getIP(info);
@@ -408,7 +450,6 @@ class SybilRenderer {
 
     private void renderIPGroups24(Writer out, StringBuilder buf, List<RouterInfo> ris, Map<Hash, Points> points) throws IOException {
         buf.append("<h3>Floodfills in the Same /24 (2 minimum)</h3>");
-        int sz = ris.size();
         ObjectCounter<Integer> oc = new ObjectCounter<Integer>();
         for (RouterInfo info : ris) {
             byte[] ip = getIP(info);
@@ -459,7 +500,6 @@ class SybilRenderer {
 
     private void renderIPGroups16(Writer out, StringBuilder buf, List<RouterInfo> ris, Map<Hash, Points> points) throws IOException {
         buf.append("<h3>Floodfills in the Same /16 (4 minimum)</h3>");
-        int sz = ris.size();
         ObjectCounter<Integer> oc = new ObjectCounter<Integer>();
         for (RouterInfo info : ris) {
             byte[] ip = getIP(info);
@@ -508,7 +548,6 @@ class SybilRenderer {
 
     private void renderIPGroupsFamily(Writer out, StringBuilder buf, List<RouterInfo> ris, Map<Hash, Points> points) throws IOException {
         buf.append("<h3>Floodfills in the Same Declared Family</h3>");
-        int sz = ris.size();
         ObjectCounter<String> oc = new ObjectCounter<String>();
         for (RouterInfo info : ris) {
             String fam = info.getOption("family");
@@ -648,7 +687,7 @@ class SybilRenderer {
         buf.append("<b>Caps: </b>").append(DataHelper.stripHTML(info.getCapabilities())).append("<br>\n");
         String fam = info.getOption("family");
         if (fam != null)
-            buf.append("<b>Family: </b>").append(DataHelper.stripHTML(fam)).append("<br>\n");
+            buf.append("<b>Family: ").append(DataHelper.escapeHTML(fam)).append("</b><br>\n");
         String kls = info.getOption("netdb.knownLeaseSets");
         if (kls != null)
             buf.append("<b>Lease Sets: </b>").append(DataHelper.stripHTML(kls)).append("<br>\n");

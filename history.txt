@@ -1,9 +1,23 @@
+2015-12-10 zzz
+ * Router:
+   - Change addCapabilities() to getCapabilities()
+   - Add netdb family sign/verify utility (ticket #1510)
+ * RouterInfo:
+   - Remove addCapability() and delCapability()
+ * StatPublisher:
+   - Remove Service interface, not required
+   - Consolidate getCapabilities() and network ID here
+   - Add family signatures
+
 2015-12-08 str4d
  * Core: Fill in basic datastructure length tests
  * Ministreaming: Add unit tests
  * Streaming:
    - Add more unit tests
    - Separate out integration tests
+
+2015-12-08 zzz
+ * Crypto: Consolidate certificate import methods
 
 2015-12-06 zzz
  * Console: Don't force profile creation when loading floodfill tab
