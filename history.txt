@@ -1,3 +1,18 @@
+2015-12-11 zzz
+ * Logs: Windows line ending fixes
+ * Router:
+   - Fix family verification, partially hook into netdb store()
+   - Limit wait for NTP to 45 seconds (ticket #1725)
+   - Increase lookup cache max sizes,
+     reduce max lookup depth, and increase non-floodfill profile bonus
+     to attempt to reduce load on floodfills
+   - Don't let context clock shifts affect calculated uptime
+ * Transport: More deadlock prevention (ticket #1722)
+ * SSU: Fix outbound IPv6 errors on Windows without a real v6 address
+   when explict host is set. Validate addresses before confirming that
+   we have an IPv6 address. Possibly related to ticket #1538.
+ * Wrapper: Listen for Windows Service shutdown events to stop router
+
 2015-12-10 zzz
  * Router:
    - Change addCapabilities() to getCapabilities()

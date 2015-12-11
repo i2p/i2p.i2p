@@ -62,10 +62,16 @@ public abstract class Addresses {
     }
 
     /**
+     *  Warning: When includeLocal is false,
+     *  all returned addresses should be routable, but they are not necessarily
+     *  appropriate for external use. For example, Teredo and 6to4 addresses
+     *  are included with IPv6 results. Additional validation is recommended.
+     *  See e.g. TransportUtil.isPubliclyRoutable().
+     *
      *  @return a sorted set of all addresses including wildcard
      *  @param includeLocal whether to include local
      *  @param includeIPv6 whether to include IPV6
-     *  @return an array of all addresses
+     *  @return a Set of all addresses
      *  @since 0.8.3
      */
     public static SortedSet<String> getAddresses(boolean includeLocal, boolean includeIPv6) {
@@ -73,11 +79,17 @@ public abstract class Addresses {
     }
 
     /**
+     *  Warning: When includeSiteLocal and includeLoopbackAndWildcard are false,
+     *  all returned addresses should be routable, but they are not necessarily
+     *  appropriate for external use. For example, Teredo and 6to4 addresses
+     *  are included with IPv6 results. Additional validation is recommended.
+     *  See e.g. TransportUtil.isPubliclyRoutable().
+     *
      *  @return a sorted set of all addresses
      *  @param includeSiteLocal whether to include private like 192.168.x.x
      *  @param includeLoopbackAndWildcard whether to include 127.x.x.x and 0.0.0.0
      *  @param includeIPv6 whether to include IPV6
-     *  @return an array of all addresses
+     *  @return a Set of all addresses
      *  @since 0.9.4
      */
     public static SortedSet<String> getAddresses(boolean includeSiteLocal,
