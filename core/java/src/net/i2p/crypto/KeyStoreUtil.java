@@ -54,22 +54,46 @@ public class KeyStoreUtil {
         // DSDTestProvider https://blog.hboeck.de/archives/876-Superfish-2.0-Dangerous-Certificate-on-Dell-Laptops-breaks-encrypted-HTTPS-Connections.html
         // serial number is actually negative; hex string as reported by certtool below
         //new BigInteger("a4:4c:38:47:f8:ee:71:80:43:4d:b1:80:b9:a7:e9:62".replace(":", ""), 16)
-        new BigInteger("-5b:b3:c7:b8:07:11:8e:7f:bc:b2:4e:7f:46:58:16:9e".replace(":", ""), 16)
+        new BigInteger("-5b:b3:c7:b8:07:11:8e:7f:bc:b2:4e:7f:46:58:16:9e".replace(":", ""), 16),
+        // Verisign G1 Roots
+        // https://googleonlinesecurity.blogspot.com/2015/12/proactive-measures-in-digital.html
+        // https://knowledge.symantec.com/support/ssl-certificates-support/index?page=content&id=ALERT1941
+        // SHA-1
+        new BigInteger("3c:91:31:cb:1f:f6:d0:1b:0e:9a:b8:d0:44:bf:12:be".replace(":", ""), 16),
+        // MD2
+        new BigInteger("70:ba:e4:1d:10:d9:29:34:b6:38:ca:7b:03:cc:ba:bf".replace(":", ""), 16)
     };
 
     /**
      *  Corresponding issuer CN for the serial number.
      *  Must be same number of entries as BLACKLIST_SERIAL.
-     *  See removeBlacklistedCerts() below for alternatives if we want
-     *  to blacklist a cert without an issuer CN.
+     *  Either CN or OU must be non-null
      */
     private static final String[] BLACKLIST_ISSUER_CN = new String[] {
         "CNNIC ROOT",
         "China Internet Network Information Center EV Certificates Root",
         "Superfish, Inc.",
         "eDellRoot",
-        "DSDTestProvider"
+        "DSDTestProvider",
+        null,
+        null
     };
+
+    /**
+     *  Corresponding issuer OU for the serial number.
+     *  Must be same number of entries as BLACKLIST_SERIAL.
+     *  Either CN or OU must be non-null
+     */
+    private static final String[] BLACKLIST_ISSUER_OU = new String[] {
+        null,
+        null,
+        null,
+        null,
+        null,
+        "Class 3 Public Primary Certification Authority",
+        "Class 3 Public Primary Certification Authority"
+    };
+
 
     /**
      *  Create a new KeyStore object, and load it from ksFile if it is
@@ -227,12 +251,10 @@ public class KeyStoreUtil {
      *  @since 0.9.24
      */
     private static int removeBlacklistedCerts(KeyStore ks) {
-        // This matches on the CN in the issuer,
+        // This matches on the CN or OU in the issuer,
         // and we can't do that on Android.
-        // We could just match the whole string, and we will have to
-        // if we want do it on Android or match a cert that has an issuer without a CN.
-        // Or, most certs that don't have a CN have an OU, that could be a fallback.
-        // Or do sha1hash(cert.getEncoded()) but that would be slower.
+        // Alternative is sha1hash(cert.getEncoded()) but that would be slower,
+        // unless the blacklist gets a little longer.
         if (SystemVersion.isAndroid())
             return 0;
         int count = 0;
@@ -244,22 +266,39 @@ public class KeyStoreUtil {
                     if (c != null && (c instanceof X509Certificate)) {
                         X509Certificate xc = (X509Certificate) c;
                         BigInteger serial = xc.getSerialNumber();
+                        // debug:
+                        //String xname = CertUtil.getIssuerValue(xc, "CN");
+                        //info("Found \"" + xname + "\" s/n: " + serial.toString(16));
+                        //if (xname == null)
+                        //    info("name is null, full issuer: " + xc.getIssuerX500Principal().getName());
                         for (int i = 0; i < BLACKLIST_SERIAL.length; i++) {
-                            // debug:
-                            //String xname = CertUtil.getIssuerValue(xc, "CN");
-                            //info("Found \"" + xname + "\" s/n: " + serial.toString(16));
-                            //if (xname == null)
-                            //    info("name is null, full issuer: " + xc.getIssuerX500Principal().getName());
                             if (BLACKLIST_SERIAL[i].equals(serial)) {
-                                String name = CertUtil.getIssuerValue(xc, "CN");
-                                if (BLACKLIST_ISSUER_CN[i].equals(name)) {
-                                    ks.deleteEntry(alias);
-                                    count++;
-                                    if (!_blacklistLogged) {
-                                        // should this be a logAlways?
-                                        warn("Ignoring blacklisted certificate \"" + alias +
-                                             "\" issued by: \"" + name +
-                                             "\" s/n: " + serial.toString(16), null);
+                                if (BLACKLIST_ISSUER_CN[i] != null) {
+                                    String name = CertUtil.getIssuerValue(xc, "CN");
+                                    if (BLACKLIST_ISSUER_CN[i].equals(name)) {
+                                        ks.deleteEntry(alias);
+                                        count++;
+                                        if (!_blacklistLogged) {
+                                            // should this be a logAlways?
+                                            warn("Ignoring blacklisted certificate \"" + alias +
+                                                 "\" CN: \"" + name +
+                                                 "\" s/n: " + serial.toString(16), null);
+                                        }
+                                        break;
+                                    }
+                                }
+                                if (BLACKLIST_ISSUER_OU[i] != null) {
+                                    String name = CertUtil.getIssuerValue(xc, "OU");
+                                    if (BLACKLIST_ISSUER_OU[i].equals(name)) {
+                                        ks.deleteEntry(alias);
+                                        count++;
+                                        if (!_blacklistLogged) {
+                                            // should this be a logAlways?
+                                            warn("Ignoring blacklisted certificate \"" + alias +
+                                                 "\" OU: \"" + name +
+                                                 "\" s/n: " + serial.toString(16), null);
+                                        }
+                                        break;
                                     }
                                 }
                             }
@@ -593,6 +632,11 @@ public class KeyStoreUtil {
         l.log(level, msg, t);
     }
 
+    /**
+     *   Usage: KeyStoreUtil (loads from system keystore)
+     *          KeyStoreUtil foo.ks (loads from system keystore, and from foo.ks keystore if exists, else creates empty)
+     *          KeyStoreUtil certDir (loads from system keystore and all certs in certDir if exists)
+     */
 /****
     public static void main(String[] args) {
         File ksf = (args.length > 0) ? new File(args[0]) : null;
