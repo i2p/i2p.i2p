@@ -92,6 +92,7 @@ public class Router implements RouterClock.ClockShiftListener {
     private State _state = State.UNINITIALIZED;
     private FamilyKeyCrypto _familyKeyCrypto;
     private boolean _familyKeyCryptoFail;
+    public final Object _familyKeyLock = new Object();
     
     public final static String PROP_CONFIG_FILE = "router.configLocation";
     
@@ -877,7 +878,7 @@ public class Router implements RouterClock.ClockShiftListener {
      *  @since 0.9.24
      */
     public FamilyKeyCrypto getFamilyKeyCrypto() {
-        synchronized (_routerInfoLock) {
+        synchronized (_familyKeyLock) {
             if (_familyKeyCrypto == null) {
                 if (!_familyKeyCryptoFail) {
                     try {
@@ -918,7 +919,7 @@ public class Router implements RouterClock.ClockShiftListener {
      *
      *  @return a capabilities string to be added to the RI
      */
-    String getCapabilities() {
+    public String getCapabilities() {
         StringBuilder rv = new StringBuilder(4);
         int bwLim = Math.min(_context.bandwidthLimiter().getInboundKBytesPerSecond(),
                              _context.bandwidthLimiter().getOutboundKBytesPerSecond());

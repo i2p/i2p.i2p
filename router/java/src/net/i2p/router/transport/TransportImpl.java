@@ -141,9 +141,10 @@ public abstract class TransportImpl implements Transport {
         else // shouldn't happen
             maxProp = "i2np." + style.toLowerCase(Locale.US) + ".maxConnections";
         int def = MAX_CONNECTION_FACTOR;
-        RouterInfo ri = _context.router().getRouterInfo();
-        if (ri != null) {
-            char bw = ri.getBandwidthTier().charAt(0);
+        // get it from here, not the RI, to avoid deadlock
+        String caps = _context.router().getCapabilities();
+
+            char bw = caps.charAt(0);
             switch (bw) {
                 case Router.CAPABILITY_BW12:
                 case 'u':  // unknown
@@ -168,7 +169,7 @@ public abstract class TransportImpl implements Transport {
                     def *= 12;
                     break;
             }
-        }
+
         if (_context.netDb().floodfillEnabled()) {
             // && !SystemVersion.isWindows()) {
             def *= 17; def /= 10;  // 425 for Class O ff
@@ -747,13 +748,11 @@ public abstract class TransportImpl implements Transport {
      *  This can be called before startListening() to set an initial address,
      *  or after the transport is running.
      *
-     *  This implementation does nothing. Transports should override if they want notification.
-     *
      *  @param source defined in Transport.java
      *  @param ip typ. IPv4 or IPv6 non-local; may be null to indicate IPv4 failure or port info only
      *  @param port 0 for unknown or unchanged
      */
-    public void externalAddressReceived(AddressSource source, byte[] ip, int port) {}
+    public abstract void externalAddressReceived(AddressSource source, byte[] ip, int port);
 
     /**
      *  Notify a transport of an external address change.
