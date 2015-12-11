@@ -522,13 +522,19 @@ public class Router implements RouterClock.ClockShiftListener {
 
     /**
      *  Used only by routerconsole.. to be deprecated?
+     *  @return System time, NOT context time
      */
     public long getWhenStarted() { return _started; }
 
-    /** wall clock uptime */
+    /**
+     * Wall clock uptime.
+     * This uses System time, NOT context time, so context clock shifts will
+     * not affect it. This is important if NTP fails and the
+     * clock then shifts from a SSU peer source just after startup.
+     */
     public long getUptime() { 
-        if ( (_context == null) || (_context.clock() == null) ) return 1; // racing on startup
-        return Math.max(1, _context.clock().now() - _context.clock().getOffset() - _started);
+        if (_started <= 0) return 1000; // racing on startup
+        return Math.max(1000, System.currentTimeMillis() - _started);
     }
     
     /**
@@ -566,7 +572,7 @@ public class Router implements RouterClock.ClockShiftListener {
         _eventLog.addEvent(EventLog.STARTED, RouterVersion.FULL_VERSION);
         startupStuff();
         changeState(State.STARTING_2);
-        _started = _context.clock().now();
+        _started = System.currentTimeMillis();
         try {
             Runtime.getRuntime().addShutdownHook(_shutdownHook);
         } catch (IllegalStateException ise) {}
