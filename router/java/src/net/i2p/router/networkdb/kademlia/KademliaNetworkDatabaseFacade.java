@@ -40,6 +40,7 @@ import net.i2p.router.Job;
 import net.i2p.router.NetworkDatabaseFacade;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
+import net.i2p.router.crypto.FamilyKeyCrypto;
 import net.i2p.router.networkdb.PublishLocalRouterInfoJob;
 import net.i2p.router.networkdb.reseed.ReseedChecker;
 import net.i2p.router.peermanager.PeerProfile;
@@ -893,6 +894,15 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Bad network: " + routerInfo);
             return "Not in our network";
+        }
+        FamilyKeyCrypto fkc = _context.router().getFamilyKeyCrypto();
+        if (fkc != null) {
+            boolean validFamily = fkc.verify(routerInfo);
+            if (!validFamily) {
+                if (_log.shouldWarn())
+                    _log.warn("Bad family sig: " + routerInfo);
+            }
+            // todo store in RI
         }
         return validate(routerInfo);
     }

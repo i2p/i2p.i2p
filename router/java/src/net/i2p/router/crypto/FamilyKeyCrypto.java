@@ -41,19 +41,21 @@ public class FamilyKeyCrypto {
     private final RouterContext _context;
     private final Log _log;
     private final Map<Hash, String> _verified;
-    private final Set<String> _negativeCache;
+    private final Set<Hash> _negativeCache;
     // following for verification only, otherwise null
     private final String _fname;
     private final SigningPrivateKey _privkey;
+    private final SigningPublicKey _pubkey;
 
     private static final String PROP_KEYSTORE_PASSWORD = "netdb.family.keystorePassword";
     public static final String PROP_FAMILY_NAME = "netdb.family.name";
-    private static final String DEFAULT_KEYSTORE_PASSWORD = "changeit";
     private static final String PROP_KEY_PASSWORD = "netdb.family.keyPassword";
     private static final String CERT_SUFFIX = ".crt";
     private static final String KEYSTORE_PREFIX = "family-";
     private static final String KEYSTORE_SUFFIX = ".ks";
     private static final int DEFAULT_KEY_VALID_DAYS = 3652;  // 10 years
+    // Note that we can't use RSA here, as the b64 sig would exceed the 256 char limit for a Mapping
+    // Note that we can't use EdDSA here, as keystore doesn't know how, and encoding/decoding is unimplemented
     private static final String DEFAULT_KEY_ALGORITHM = SigType.ECDSA_SHA256_P256.isAvailable() ? "EC" : "DSA";
     private static final int DEFAULT_KEY_SIZE = SigType.ECDSA_SHA256_P256.isAvailable() ? 256 : 1024;
     private static final String KS_DIR = "keystore";
@@ -78,8 +80,9 @@ public class FamilyKeyCrypto {
                 throw new GeneralSecurityException("Illegal family name");
         }
         _privkey = (_fname != null) ? initialize() : null;
+        _pubkey = (_privkey != null) ? _privkey.toPublic() : null;
         _verified = new ConcurrentHashMap<Hash, String>(4);
-        _negativeCache = new ConcurrentHashSet<String>(4);
+        _negativeCache = new ConcurrentHashSet<Hash>(4);
     }
     
     /** 
@@ -135,10 +138,13 @@ public class FamilyKeyCrypto {
         String name = ri.getOption(OPT_NAME);
         if (name == null)
             return true;
-        String ssig = ri.getOption("OPT_SIG");
-        if (ssig == null)
-            return false;
         Hash h = ri.getHash();
+        String ssig = ri.getOption(OPT_SIG);
+        if (ssig == null) {
+            if (_log.shouldInfo())
+                _log.info("No sig for " + h + ' ' + name);
+            return false;
+        }
         String nameAndSig = _verified.get(h);
         String riNameAndSig = name + ssig;
         if (nameAndSig != null) {
@@ -147,30 +153,49 @@ public class FamilyKeyCrypto {
             // name or sig changed
             _verified.remove(h);
         }
-        if (_negativeCache.contains(name))
-            return false;
-        SigningPublicKey spk = loadCert(name);
-        if (spk == null) {
-            _negativeCache.add(name);
-            return false;
+        SigningPublicKey spk;
+        if (name.equals(_fname)) {
+            // us
+            spk = _pubkey;
+        } else {
+            if (_negativeCache.contains(h))
+                return false;
+            spk = loadCert(name);
+            if (spk == null) {
+                _negativeCache.add(h);
+                if (_log.shouldInfo())
+                    _log.info("No cert for " + h + ' ' + name);
+                return false;
+            }
         }
         byte[] bsig = Base64.decode(ssig);
-        if (bsig == null)
+        if (bsig == null) {
+            _negativeCache.add(h);
+            if (_log.shouldInfo())
+                _log.info("Bad sig for " + h + ' ' + name + ' ' + ssig);
             return false;
+        }
         Signature sig;
         try {
             sig = new Signature(spk.getType(), bsig);
         } catch (IllegalArgumentException iae) {
             // wrong size (type mismatch)
+            _negativeCache.add(h);
+            if (_log.shouldInfo())
+                _log.info("Bad sig for " + ri, iae);
             return false;
         }
-        byte[] nb = DataHelper.getUTF8(_fname);
+        byte[] nb = DataHelper.getUTF8(name);
         byte[] b = new byte[nb.length + Hash.HASH_LENGTH];
         System.arraycopy(nb, 0, b, 0, nb.length);
         System.arraycopy(ri.getHash().getData(), 0, b, nb.length, Hash.HASH_LENGTH);
         boolean rv = _context.dsa().verifySignature(sig, b, spk);
         if (rv)
             _verified.put(h, riNameAndSig);
+        else
+            _negativeCache.add(h);
+        if (_log.shouldInfo())
+            _log.info("Verified? " + rv + " for " + h + ' ' + name + ' ' + ssig);
         return rv;
     }
 
@@ -220,14 +245,14 @@ public class FamilyKeyCrypto {
         // and one for the cname
         String cname = _fname + ".family.i2p.net";
 
-        boolean success = KeyStoreUtil.createKeys(ks, DEFAULT_KEYSTORE_PASSWORD, _fname, cname, "family",
+        boolean success = KeyStoreUtil.createKeys(ks, KeyStoreUtil.DEFAULT_KEYSTORE_PASSWORD, _fname, cname, "family",
                                                   DEFAULT_KEY_VALID_DAYS, DEFAULT_KEY_ALGORITHM,
                                                   DEFAULT_KEY_SIZE, keyPassword);
         if (success) {
             success = ks.exists();
             if (success) {
                 Map<String, String> changes = new HashMap<String, String>();
-                changes.put(PROP_KEYSTORE_PASSWORD, DEFAULT_KEYSTORE_PASSWORD);
+                changes.put(PROP_KEYSTORE_PASSWORD, KeyStoreUtil.DEFAULT_KEYSTORE_PASSWORD);
                 changes.put(PROP_KEY_PASSWORD, keyPassword);
                 changes.put(PROP_FAMILY_NAME, _fname);
                 _context.router().saveConfig(changes, null);
@@ -239,7 +264,7 @@ public class FamilyKeyCrypto {
                            "Copy the keystore to the other routers in the family,\n" +
                            "and add the following entries to their router.config file:\n" +
                            PROP_FAMILY_NAME + '=' + _fname + '\n' +
-                           PROP_KEYSTORE_PASSWORD + '=' + DEFAULT_KEYSTORE_PASSWORD + '\n' +
+                           PROP_KEYSTORE_PASSWORD + '=' + KeyStoreUtil.DEFAULT_KEYSTORE_PASSWORD + '\n' +
                            PROP_KEY_PASSWORD + '=' + keyPassword);
 
         } else {
@@ -259,7 +284,7 @@ public class FamilyKeyCrypto {
     private void exportCert(File ks) {
         File sdir = new SecureDirectory(_context.getConfigDir(), CERT_DIR);
         if (sdir.exists() || sdir.mkdirs()) {
-            String ksPass = _context.getProperty(PROP_KEYSTORE_PASSWORD, DEFAULT_KEYSTORE_PASSWORD);
+            String ksPass = _context.getProperty(PROP_KEYSTORE_PASSWORD, KeyStoreUtil.DEFAULT_KEYSTORE_PASSWORD);
             String name = _fname.replace("@", "_at_") + CERT_SUFFIX;
             File out = new File(sdir, name);
             boolean success = KeyStoreUtil.exportCert(ks, ksPass, _fname, out);
@@ -307,7 +332,7 @@ public class FamilyKeyCrypto {
      * @return non-null, throws on all errors
      */
     private SigningPrivateKey getPrivKey(File ks) throws GeneralSecurityException {
-        String ksPass = _context.getProperty(PROP_KEYSTORE_PASSWORD, DEFAULT_KEYSTORE_PASSWORD);
+        String ksPass = _context.getProperty(PROP_KEYSTORE_PASSWORD, KeyStoreUtil.DEFAULT_KEYSTORE_PASSWORD);
         String keyPass = _context.getProperty(PROP_KEY_PASSWORD);
         if (keyPass == null)
             throw new GeneralSecurityException("No key password, set " + PROP_KEY_PASSWORD +
