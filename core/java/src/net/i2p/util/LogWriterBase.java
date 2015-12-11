@@ -147,7 +147,8 @@ abstract class LogWriterBase implements Runnable {
     private String dupMessage(int dupCount, LogRecord lastRecord, boolean reverse) {
         String arrows = reverse ? (SystemVersion.isAndroid() ? "vvv" : "&darr;&darr;&darr;") : "^^^";
         return LogRecordFormatter.getWhen(_manager, lastRecord) + ' ' + arrows + ' ' +
-               _t(dupCount, "1 similar message omitted", "{0} similar messages omitted") + ' ' + arrows + '\n';
+               _t(dupCount, "1 similar message omitted", "{0} similar messages omitted") + ' ' + arrows +
+               LogRecordFormatter.NL;
     }
     
     private static final String BUNDLE_NAME = "net.i2p.router.web.messages";

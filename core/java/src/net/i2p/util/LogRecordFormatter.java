@@ -22,7 +22,7 @@ import net.i2p.data.DataHelper;
  *
  */
 class LogRecordFormatter {
-    private final static String NL = System.getProperty("line.separator");
+    final static String NL = System.getProperty("line.separator");
     // arbitrary max length for the classname property (this makes is it lines up nicely)
     private final static int MAX_WHERE_LENGTH = 30;
     // if we're going to have one for where... be consistent
