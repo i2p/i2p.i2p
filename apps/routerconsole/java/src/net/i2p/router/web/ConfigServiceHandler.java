@@ -160,8 +160,7 @@ public class ConfigServiceHandler extends FormHandler {
      *  @since 0.8.13
      */
     synchronized static void registerSignalHandler(RouterContext ctx) {
-        if (ctx.hasWrapper() && _wrapperListener == null &&
-            !SystemVersion.isWindows()) {
+        if (ctx.hasWrapper() && _wrapperListener == null) {
             String wv = System.getProperty("wrapper.version");
             if (wv != null && VersionComparator.comp(wv, LISTENER_AVAILABLE) >= 0) {
                 try {
