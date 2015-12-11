@@ -29,7 +29,7 @@ class CapacityCalculator {
     private static final double PENALTY_UNREACHABLE = 2;
     // we make this a bonus for non-ff, not a penalty for ff, so we
     // don't drive the ffs below the default
-    private static final double BONUS_NON_FLOODFILL = 0.5;
+    private static final double BONUS_NON_FLOODFILL = 1.0;
     
     public static double calc(PeerProfile profile) {
         double capacity;

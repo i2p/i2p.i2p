@@ -170,11 +170,12 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
     private volatile boolean _routerSupportsFastReceive;
     private volatile boolean _routerSupportsHostLookup;
 
+    protected static final int CACHE_MAX_SIZE = SystemVersion.isAndroid() ? 32 : 128;
     /**
      *  Since 0.9.11, key is either a Hash or a String
      *  @since 0.8.9
      */
-    private static final Map<Object, Destination> _lookupCache = new LHMCache<Object, Destination>(64);
+    private static final Map<Object, Destination> _lookupCache = new LHMCache<Object, Destination>(CACHE_MAX_SIZE);
     private static final String MIN_HOST_LOOKUP_VERSION = "0.9.11";
     private static final boolean TEST_LOOKUP = false;
 

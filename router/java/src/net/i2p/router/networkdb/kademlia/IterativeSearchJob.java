@@ -74,7 +74,7 @@ class IterativeSearchJob extends FloodSearchJob {
     
     private static final int MAX_NON_FF = 3;
     /** Max number of peers to query */
-    private static final int TOTAL_SEARCH_LIMIT = 6;
+    private static final int TOTAL_SEARCH_LIMIT = 5;
     /** Max number of peers to query if we are ff */
     private static final int TOTAL_SEARCH_LIMIT_WHEN_FF = 3;
     /** TOTAL_SEARCH_LIMIT * SINGLE_SEARCH_TIME, plus some extra */
@@ -539,16 +539,20 @@ class IterativeSearchJob extends FloodSearchJob {
             unheard = new ArrayList<Hash>(_unheardFrom);
         }
         // blame the unheard-from (others already blamed in failed() above)
-        for (Hash h : unheard)
+        for (Hash h : unheard) {
             getContext().profileManager().dbLookupFailed(h);
+        }
         long time = System.currentTimeMillis() - _created;
         if (_log.shouldLog(Log.INFO)) {
             long timeRemaining = _expiration - getContext().clock().now();
             _log.info(getJobId() + ": ISJ for " + _key + " failed with " + timeRemaining + " remaining after " + time +
                       ", peers queried: " + tries);
         }
-        getContext().statManager().addRateData("netDb.failedTime", time);
-        getContext().statManager().addRateData("netDb.failedRetries", Math.max(0, tries - 1));
+        if (tries > 0) {
+            // don't bias the stats with immediate fails
+            getContext().statManager().addRateData("netDb.failedTime", time);
+            getContext().statManager().addRateData("netDb.failedRetries", tries - 1);
+        }
         for (Job j : _onFailed) {
             getContext().jobQueue().addJob(j);
         }
