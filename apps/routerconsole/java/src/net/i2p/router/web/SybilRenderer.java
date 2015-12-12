@@ -44,6 +44,7 @@ import net.i2p.util.VersionComparator;
 class SybilRenderer {
 
     private final RouterContext _context;
+    private final DecimalFormat fmt = new DecimalFormat("#0.00");
 
     private static final int PAIRMAX = 20;
     private static final int MAX = 10;
@@ -118,8 +119,7 @@ class SybilRenderer {
         }
     }
 
-    private static void addPoints(Map<Hash, Points> points, Hash h, double d, String reason) {
-        DecimalFormat fmt = new DecimalFormat("#0.00");
+    private void addPoints(Map<Hash, Points> points, Hash h, double d, String reason) {
         Points dd = points.get(h);
         if (dd != null) {
             dd.points += d;
@@ -167,7 +167,6 @@ class SybilRenderer {
             double d = closestDistance(h, ris);
             tot += d;
         }
-        DecimalFormat fmt = new DecimalFormat("#0.00");
         double avgMinDist = tot / count;
         buf.append("<p>Average closest floodfill distance: " + fmt.format(avgMinDist) + "</p>");
         buf.append("<p>Routing Data: \"").append(DataHelper.getUTF8(_context.routerKeyGenerator().getModData()))
@@ -284,7 +283,6 @@ class SybilRenderer {
             }
         }
 
-        DecimalFormat fmt = new DecimalFormat("#0.00");
         double avg = total / (sz * sz / 2);
         buf.append("<h3>Average Floodfill Distance is ").append(fmt.format(avg)).append("</h3>");
 
@@ -415,7 +413,6 @@ class SybilRenderer {
         }
         Collections.sort(foo, new FooComparator(oc));
         boolean found = false;
-        DecimalFormat fmt = new DecimalFormat("#0.00");
         for (Integer ii : foo) {
             int count = oc.count(ii);
             int i = ii.intValue();
@@ -469,7 +466,6 @@ class SybilRenderer {
         }
         Collections.sort(foo, new FooComparator(oc));
         boolean found = false;
-        DecimalFormat fmt = new DecimalFormat("#0.00");
         for (Integer ii : foo) {
             int count = oc.count(ii);
             int i = ii.intValue();
@@ -519,7 +515,6 @@ class SybilRenderer {
         }
         Collections.sort(foo, new FooComparator(oc));
         boolean found = false;
-        DecimalFormat fmt = new DecimalFormat("#0.00");
         for (Integer ii : foo) {
             int count = oc.count(ii);
             int i = ii.intValue();
@@ -561,7 +556,6 @@ class SybilRenderer {
         List<String> foo = new ArrayList<String>(oc.objects());
         Collections.sort(foo, new FoofComparator(oc));
         boolean found = false;
-        DecimalFormat fmt = new DecimalFormat("#0.00");
         for (String s : foo) {
             int count = oc.count(s);
             buf.append("<p><b>").append(count).append(" floodfills in declared family \"").append(DataHelper.escapeHTML(s) + '"')
@@ -621,7 +615,6 @@ class SybilRenderer {
         int count = Math.min(MAX, ris.size());
         boolean isEven = (count % 2) == 0;
         int medIdx = isEven ? (count / 2) - 1 : (count / 2);
-        DecimalFormat fmt = new DecimalFormat("#0.00");
         for (int i = 0; i < count; i++) {
             RouterInfo ri = ris.get(i);
             double dist = renderRouterInfo(buf, ri, us, false, false);
@@ -701,7 +694,6 @@ class SybilRenderer {
             }
             buf.append("</th></tr><tr><td>\n");
             if (us != null) {
-                DecimalFormat fmt = new DecimalFormat("#0.00");
                 BigInteger dist = HashDistance.getDistance(us, info.getHash());
                 distance = biLog2(dist);
                 buf.append("<b>Hash Distance: ").append(fmt.format(distance)).append("</b><br>");
