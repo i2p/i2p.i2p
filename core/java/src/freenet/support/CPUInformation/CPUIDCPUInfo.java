@@ -63,18 +63,26 @@ abstract class CPUIDCPUInfo implements CPUInfo
      */
     public boolean hasAVX2()
     {
-        return hasAVX() &&
-               (CPUID.getExtendedEBXCPUFlags() & (1 << 5)) != 0; //Extended EBX Bit 5
+        return (CPUID.getExtendedEBXFeatureFlags() & (1 << 5)) != 0; //Extended EBX Bit 5
     }
     
     /**
-     * @return true iff the CPU supports the AVX512 instruction set.
+     * Does the CPU supports the AVX-512 Foundation instruction set?
+     *
+     * Quote wikipedia:
+     *
+     * AVX-512 consists of multiple extensions not all meant to be supported
+     * by all processors implementing them. Only the core extension AVX-512F
+     * (AVX-512 Foundation) is required by all implementations.
+     *
+     * ref: https://en.wikipedia.org/wiki/AVX-512
+     *
+     * @return true iff the CPU supports the AVX-512 Foundation instruction set.
      * @since 0.9.21
      */
     public boolean hasAVX512()
     {
-        return hasAVX() &&
-               (CPUID.getExtendedEBXCPUFlags() & (1 << 5)) != 0; //Extended EBX Bit 5
+        return (CPUID.getExtendedEBXFeatureFlags() & (1 << 16)) != 0; //Extended EBX Bit 16
     }
     
     /**
@@ -83,8 +91,7 @@ abstract class CPUIDCPUInfo implements CPUInfo
      */
     public boolean hasADX()
     {
-        return hasAVX() &&
-               (CPUID.getExtendedEBXCPUFlags() & (1 << 19)) != 0; //Extended EBX Bit 19
+        return (CPUID.getExtendedEBXFeatureFlags() & (1 << 19)) != 0; //Extended EBX Bit 19
     }
     
     /**

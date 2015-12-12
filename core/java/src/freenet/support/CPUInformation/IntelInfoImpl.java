@@ -282,6 +282,8 @@ class IntelInfoImpl extends CPUIDCPUInfo implements IntelCPUInfo
                         modelString = "Atom";
                         break;
                     // Sandy bridge 32 nm
+                    // 1, 2, or 4 cores
+                    // ref: https://en.wikipedia.org/wiki/Sandy_Bridge_%28microarchitecture%29
                     case 0x2a:
                         isSandyCompatible = true;
                         modelString = "Sandy Bridge";
@@ -295,6 +297,8 @@ class IntelInfoImpl extends CPUIDCPUInfo implements IntelCPUInfo
                         modelString = "Westmere";
                         break;
                     // Sandy Bridge 32 nm
+                    // Sandy Bridge-E up to 8 cores
+                    // ref: https://en.wikipedia.org/wiki/Sandy_Bridge_%28microarchitecture%29
                     case 0x2d:
                         isSandyCompatible = true;
                         modelString = "Sandy Bridge";
@@ -328,18 +332,15 @@ class IntelInfoImpl extends CPUIDCPUInfo implements IntelCPUInfo
                         modelString = "Atom";
                         break;
                     // Ivy Bridge 22 nm
+                    // ref: https://en.wikipedia.org/wiki/Sandy_Bridge_%28microarchitecture%29
                     case 0x3a:
                         isSandyCompatible = true;
                         isIvyCompatible = true;
                         modelString = "Ivy Bridge";
                         break;
-                    // Haswell 22 nm
-                    case 0x3c:
-                        isSandyCompatible = true;
-                        isIvyCompatible = true;
-                        isHaswellCompatible = true;
-                        modelString = "Haswell";
-                        break;
+
+                    // case 0x3c: See below
+
                     // Broadwell 14 nm
                     case 0x3d:
                         isSandyCompatible = true;
@@ -354,32 +355,72 @@ class IntelInfoImpl extends CPUIDCPUInfo implements IntelCPUInfo
                         isIvyCompatible = true;
                         modelString = "Ivy Bridge";
                         break;
-                    // Haswell 22 nm
-                    case 0x3f:
-                        isSandyCompatible = true;
-                        isIvyCompatible = true;
-                        isHaswellCompatible = true;
-                        modelString = "Haswell";
-                        break;
+
+                    // case 0x3f: See below
 
                 // following are for extended model == 4
                 // most flags are set above
                 // isCoreiCompatible = true is the default
 
                     // Haswell 22 nm
+                    // Pentium and Celeron Haswells do not support new Haswell instructions,
+                    // only Corei ones do, but we can't tell that from the model alone.
+                    //
+                    // We know for sure that GMP coreihwl uses the MULX instruction from BMI2,
+                    // unsure about the others, but let's be safe and check all 6 feature bits, as
+                    // the Intel app note suggests.
+                    //
+                    // ref: https://en.wikipedia.org/wiki/Haswell_%28microarchitecture%29
+                    // ref: https://software.intel.com/en-us/articles/how-to-detect-new-instruction-support-in-the-4th-generation-intel-core-processor-family
+                    case 0x3c:
+                    case 0x3f:
                     case 0x45:
-                        isSandyCompatible = true;
-                        isIvyCompatible = true;
-                        isHaswellCompatible = true;
-                        modelString = "Haswell";
-                        break;
-                    // Haswell 22 nm
                     case 0x46:
-                        isSandyCompatible = true;
-                        isIvyCompatible = true;
-                        isHaswellCompatible = true;
-                        modelString = "Haswell";
+                        boolean hasNewInstructions = false;
+                        int reg = CPUID.getECXCPUFlags();
+                        boolean hasFMA3 = (reg & (1 << 12)) != 0;
+                        boolean hasMOVBE = (reg & (1 << 22)) != 0;
+                        // AVX is implied by AVX2, so we don't need to check the value here,
+                        // but we will need it below to enable Sandy Bridge if the Haswell checks fail.
+                        // This is the same as hasAVX().
+                        boolean hasAVX = (reg & (1 << 28)) != 0 && (reg & (1 << 27)) != 0;
+                        //System.out.println("FMA3 MOVBE: " +
+                        //                   hasFMA3 + ' ' + hasMOVBE);
+                        if (hasFMA3 && hasMOVBE) {
+                            reg = CPUID.getExtendedECXCPUFlags();
+                            boolean hasABM = (reg & (1 << 5)) != 0;  // aka LZCNT
+                            //System.out.println("FMA3 MOVBE ABM: " +
+                            //                   hasFMA3 + ' ' + hasMOVBE + ' ' + hasABM);
+                            if (hasABM) {
+                                reg = CPUID.getExtendedEBXFeatureFlags();
+                                boolean hasAVX2 = (reg & (1 << 5)) != 0;
+                                boolean hasBMI1 = (reg & (1 << 3)) != 0;
+                                boolean hasBMI2 = (reg & (1 << 8)) != 0;
+                                //System.out.println("FMA3 MOVBE ABM AVX2 BMI1 BMI2: " +
+                                //                   hasFMA3 + ' ' + hasMOVBE + ' ' + hasABM + ' ' +
+                                //                   hasAVX2 + ' ' + hasBMI1 + ' ' + hasBMI2);
+                                if (hasAVX2 && hasBMI1 && hasBMI2)
+                                    hasNewInstructions = true;
+                            }
+                        }
+                        if (hasNewInstructions) {
+                            isSandyCompatible = true;
+                            isIvyCompatible = true;
+                            isHaswellCompatible = true;
+                            modelString = "Haswell Core i3/i5/i7 model " + model;
+                        } else {
+                            // This processor is "corei" compatible, as we define it,
+                            // i.e. SSE4.2 but not necessarily AVX.
+                            if (hasAVX) {
+                                isSandyCompatible = true;
+                                isIvyCompatible = true;
+                                modelString = "Haswell Celeron/Pentium w/ AVX model " + model;
+                            } else {
+                                modelString = "Haswell Celeron/Pentium model " + model;
+                            }
+                        }
                         break;
+
                     // Quark 32nm
                     case 0x4a:
                         isCore2Compatible = false;

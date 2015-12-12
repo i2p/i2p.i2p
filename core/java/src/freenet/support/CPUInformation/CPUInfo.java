@@ -59,6 +59,9 @@ public interface CPUInfo
     public boolean hasSSE42();
 
     /**
+     * AMD K10 only. Not supported on Intel.
+     * ref: https://en.wikipedia.org/wiki/SSE4.2#SSE4a
+     *
      * @return true iff the CPU support the SSE4A instruction set.
      */
     public boolean hasSSE4A();
@@ -76,10 +79,26 @@ public interface CPUInfo
     public boolean hasAVX2();
     
     /**
-     * @return true iff the CPU supports the full AVX512 instruction set.
+     * Does the CPU supports the AVX-512 Foundation instruction set?
+     *
+     * Quote wikipedia:
+     *
+     * AVX-512 consists of multiple extensions not all meant to be supported
+     * by all processors implementing them. Only the core extension AVX-512F
+     * (AVX-512 Foundation) is required by all implementations.
+     *
+     * ref: https://en.wikipedia.org/wiki/AVX-512
+     *
+     * @return true iff the CPU supports the AVX-512 Foundation instruction set.
      * @since 0.9.21
      */
     public boolean hasAVX512();
+    
+    /**
+     * @return true iff the CPU supports the ADX instruction set.
+     * @since 0.9.21
+     */
+    public boolean hasADX();
     
     /**
      * @return true iff the CPU supports TBM.

@@ -66,6 +66,10 @@ public interface IntelCPUInfo extends CPUInfo {
     /**
      * Supports the SSE 3, 4.1, 4.2 instructions.
      * In general, this requires 45nm or smaller process.
+     *
+     * This is the Nehalem architecture.
+     * ref: https://en.wikipedia.org/wiki/Nehalem_%28microarchitecture%29
+     *
      * @return true if the CPU implements at least a Corei level instruction/feature set.
      */
     public boolean IsCoreiCompatible();
@@ -82,6 +86,11 @@ public interface IntelCPUInfo extends CPUInfo {
      * Supports the SSE 3, 4.1, 4.2 instructions.
      * Supports the AVX 1 instructions.
      * In general, this requires 22nm or smaller process.
+     *
+     * UNUSED, there is no specific GMP build for Ivy Bridge,
+     * and this is never called from NativeBigInteger.
+     * Ivy Bridge is a successor to Sandy Bridge, so use IsSandyCompatible().
+     *
      * @return true if the CPU implements at least a IvyBridge level instruction/feature set.
      */
     public boolean IsIvyCompatible();
@@ -89,6 +98,19 @@ public interface IntelCPUInfo extends CPUInfo {
     /**
      * Supports the SSE 3, 4.1, 4.2 instructions.
      * Supports the AVX 1, 2 instructions.
+     * Supports the BMI 1, 2 instructions.
+     *
+     * WARNING - GMP 6 uses the BMI2 MULX instruction for the "coreihwl" binaries.
+     * Only Core i3/i5/i7 Haswell processors support BMI2.
+     *
+     * Requires support for all 6 of these Corei features: FMA3 MOVBE ABM AVX2 BMI1 BMI2
+     * Pentium/Celeron Haswell processors do NOT support BMI2 and are NOT compatible.
+     * Those processors will be Sandy-compatible if they have AVX 1 support,
+     * and Corei-compatible if they do not.
+     *
+     * ref: https://software.intel.com/en-us/articles/how-to-detect-new-instruction-support-in-the-4th-generation-intel-core-processor-family
+     * ref: https://en.wikipedia.org/wiki/Haswell_%28microarchitecture%29
+     *
      * In general, this requires 22nm or smaller process.
      * @return true if the CPU implements at least a Haswell level instruction/feature set.
      */
@@ -98,6 +120,11 @@ public interface IntelCPUInfo extends CPUInfo {
      * Supports the SSE 3, 4.1, 4.2 instructions.
      * Supports the AVX 1, 2 instructions.
      * In general, this requires 14nm or smaller process.
+     *
+     * NOT FULLY USED as of GMP 6.0.
+     * All GMP coreibwl binaries are duplicates of binaries for older technologies,
+     * so we do not distribute any. However, this is called from NativeBigInteger.
+     *
      * @return true if the CPU implements at least a Broadwell level instruction/feature set.
      */
     public boolean IsBroadwellCompatible();

@@ -190,12 +190,6 @@ public class CPUID {
         return c.ECX;
     }
 
-    static int getExtendedEBXCPUFlags()
-    {
-        CPUIDResult c = doCPUID(0x80000001);
-        return c.EBX;
-    }
-
     static int getExtendedECXCPUFlags()
     {
         CPUIDResult c = doCPUID(0x80000001);
@@ -207,6 +201,31 @@ public class CPUID {
     {
         CPUIDResult c = doCPUID(0x80000001);
         return c.EDX;
+    }
+
+    /**
+     *  @since 0.9.24
+     */
+    static int getExtendedEBXFeatureFlags()
+    {
+        // Supposed to set ECX to 0 before calling?
+        // But we don't have support for that in jcpuid.
+        // And it works just fine without that.
+        CPUIDResult c = doCPUID(7);
+        return c.EBX;
+    }
+
+    /**
+     *  There's almost nothing in here.
+     *  @since 0.9.24
+     */
+    static int getExtendedECXFeatureFlags()
+    {
+        // Supposed to set ECX to 0 before calling?
+        // But we don't have support for that in jcpuid.
+        // And it works just fine without that.
+        CPUIDResult c = doCPUID(7);
+        return c.ECX;
     }
 
     /**
@@ -294,19 +313,28 @@ public class CPUID {
         System.out.println("CPU Family: " + family);
         System.out.println("CPU Model: " + model);
         System.out.println("CPU Stepping: " + getCPUStepping());
-        System.out.println("CPU Flags: 0x" + Integer.toHexString(getEDXCPUFlags()));
+        System.out.println("CPU Flags (EDX):      0x" + Integer.toHexString(getEDXCPUFlags()));
+        System.out.println("CPU Flags (ECX):      0x" + Integer.toHexString(getECXCPUFlags()));
+        System.out.println("CPU Ext. Info. (EDX): 0x" + Integer.toHexString(getExtendedEDXCPUFlags()));
+        System.out.println("CPU Ext. Info. (ECX): 0x" + Integer.toHexString(getExtendedECXCPUFlags()));
+        System.out.println("CPU Ext. Feat. (EBX): 0x" + Integer.toHexString(getExtendedEBXFeatureFlags()));
+        System.out.println("CPU Ext. Feat. (ECX): 0x" + Integer.toHexString(getExtendedECXFeatureFlags()));
 
         CPUInfo c = getInfo();
         System.out.println("\n **More CPUInfo**");
         System.out.println("CPU model string: " + c.getCPUModelString());
-        System.out.println("CPU has MMX: " + c.hasMMX());
-        System.out.println("CPU has SSE: " + c.hasSSE());
-        System.out.println("CPU has SSE2: " + c.hasSSE2());
-        System.out.println("CPU has SSE3: " + c.hasSSE3());
+        System.out.println("CPU has MMX:    " + c.hasMMX());
+        System.out.println("CPU has SSE:    " + c.hasSSE());
+        System.out.println("CPU has SSE2:   " + c.hasSSE2());
+        System.out.println("CPU has SSE3:   " + c.hasSSE3());
         System.out.println("CPU has SSE4.1: " + c.hasSSE41());
         System.out.println("CPU has SSE4.2: " + c.hasSSE42());
-        System.out.println("CPU has SSE4A: " + c.hasSSE4A());
-        System.out.println("CPU has AES-NI: " + c.hasAES());
+        System.out.println("CPU has SSE4A:  " + c.hasSSE4A());
+        System.out.println("CPU has AVX:    " + c.hasAVX());
+        System.out.println("CPU has AVX2:   " + c.hasAVX2());
+        System.out.println("CPU has AVX512: " + c.hasAVX512());
+        System.out.println("CPU has ADX:    " + c.hasADX());
+        System.out.println("CPU has TBM:    " + c.hasTBM());
         if(c instanceof IntelCPUInfo){
             System.out.println("\n **Intel-info**");
             System.out.println("Is PII-compatible: "+((IntelCPUInfo)c).IsPentium2Compatible());
@@ -316,6 +344,10 @@ public class CPUID {
             System.out.println("Is Pentium M compatible: "+((IntelCPUInfo)c).IsPentiumMCompatible());
             System.out.println("Is Core2-compatible: "+((IntelCPUInfo)c).IsCore2Compatible());
             System.out.println("Is Corei-compatible: "+((IntelCPUInfo)c).IsCoreiCompatible());
+            System.out.println("Is Sandy-compatible: "+((IntelCPUInfo)c).IsSandyCompatible());
+            System.out.println("Is Ivy-compatible: "+((IntelCPUInfo)c).IsIvyCompatible());
+            System.out.println("Is Haswell-compatible: "+((IntelCPUInfo)c).IsHaswellCompatible());
+            System.out.println("Is Broadwell-compatible: "+((IntelCPUInfo)c).IsBroadwellCompatible());
         }
         if(c instanceof AMDCPUInfo){
             System.out.println("\n **AMD-info**");
