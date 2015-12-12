@@ -54,7 +54,7 @@ public class FamilyKeyCrypto {
     private static final String KEYSTORE_PREFIX = "family-";
     private static final String KEYSTORE_SUFFIX = ".ks";
     private static final int DEFAULT_KEY_VALID_DAYS = 3652;  // 10 years
-    // Note that we can't use RSA here, as the b64 sig would exceed the 256 char limit for a Mapping
+    // Note that we can't use RSA here, as the b64 sig would exceed the 255 char limit for a Mapping
     // Note that we can't use EdDSA here, as keystore doesn't know how, and encoding/decoding is unimplemented
     private static final String DEFAULT_KEY_ALGORITHM = SigType.ECDSA_SHA256_P256.isAvailable() ? "EC" : "DSA";
     private static final int DEFAULT_KEY_SIZE = SigType.ECDSA_SHA256_P256.isAvailable() ? 256 : 1024;
@@ -62,6 +62,7 @@ public class FamilyKeyCrypto {
     private static final String CERT_DIR = "certificates/family";
     public static final String OPT_NAME = "family";
     public static final String OPT_SIG = "family.sig";
+    public static final String OPT_KEY = "family.key";
 
 
     /** 
@@ -109,16 +110,20 @@ public class FamilyKeyCrypto {
      *
      *  @param family non-null, must match that we were initialized with or will throw GSE
      *  @param h non-null
-     *  @return non-null base 64 signature string to be added to the RI
+     *  @return non-null options to be added to the RI
      *  @throws GeneralSecurityException on null hash, null or changed family, or signing error
      */
-    public String sign(String family, Hash h) throws GeneralSecurityException {
-        if (_privkey == null)
-            throw new GeneralSecurityException("family name set, must restart router");
+    public Map<String, String> sign(String family, Hash h) throws GeneralSecurityException {
+        if (_privkey == null) {
+            _log.logAlways(Log.WARN, "family name now set, must restart router to generate or load keys");
+            throw new GeneralSecurityException("family name now set, must restart router to generate or load keys");
+        }
         if (h == null)
             throw new GeneralSecurityException("null router hash");
-        if (!_fname.equals(family))
-            throw new GeneralSecurityException("family name changed, must restart router");
+        if (!_fname.equals(family)) {
+            _log.logAlways(Log.WARN, "family name changed, must restart router to generate or load new keys");
+            throw new GeneralSecurityException("family name changed, must restart router to generate or load new keys");
+        }
         byte[] nb = DataHelper.getUTF8(_fname);
         int len = nb.length + Hash.HASH_LENGTH;
         byte[] b = new byte[len];
@@ -127,7 +132,11 @@ public class FamilyKeyCrypto {
         Signature sig = _context.dsa().sign(b, _privkey);
         if (sig == null)
             throw new GeneralSecurityException("sig failed");
-        return sig.toBase64();
+        Map<String, String> rv = new HashMap<String, String>(3);
+        rv.put(OPT_NAME, family);
+        rv.put(OPT_KEY, _pubkey.getType().getCode() + ";" + _pubkey.toBase64());
+        rv.put(OPT_SIG, sig.toBase64());
+        return rv;
     }
 
     /** 
@@ -162,11 +171,45 @@ public class FamilyKeyCrypto {
                 return false;
             spk = loadCert(name);
             if (spk == null) {
-                _negativeCache.add(h);
-                if (_log.shouldInfo())
-                    _log.info("No cert for " + h + ' ' + name);
-                return false;
+                // look for a b64 key in the RI
+                String skey = ri.getOption(OPT_KEY);
+                if (skey != null) {
+                    int semi = skey.indexOf(";");
+                    if (semi > 0) {
+                        try {
+                            int code = Integer.parseInt(skey.substring(0, semi));
+                            SigType type = SigType.getByCode(code);
+                            if (type != null) {
+                                byte[] bkey = Base64.decode(skey.substring(semi + 1));
+                                if (bkey != null) {
+                                    spk = new SigningPublicKey(type, bkey);
+                                }
+                            }
+                        } catch (NumberFormatException e) {
+                            if (_log.shouldInfo())
+                                _log.info("Bad b64 family key: " + ri, e);
+                        } catch (IllegalArgumentException e) {
+                            if (_log.shouldInfo())
+                                _log.info("Bad b64 family key: " + ri, e);
+                        } catch (ArrayIndexOutOfBoundsException e) {
+                            if (_log.shouldInfo())
+                                _log.info("Bad b64 family key: " + ri, e);
+                        }
+                    }
+                }
+                if (spk == null) {
+                    _negativeCache.add(h);
+                    if (_log.shouldInfo())
+                        _log.info("No cert or valid key for " + h + ' ' + name);
+                    return false;
+                }
             }
+        }
+        if (!spk.getType().isAvailable()) {
+            _negativeCache.add(h);
+            if (_log.shouldInfo())
+                _log.info("Unsupported crypto for sig for " + h);
+            return false;
         }
         byte[] bsig = Base64.decode(ssig);
         if (bsig == null) {

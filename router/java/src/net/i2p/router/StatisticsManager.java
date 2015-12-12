@@ -188,24 +188,29 @@ public class StatisticsManager {
         if (family != null) {
             stats.setProperty(FamilyKeyCrypto.OPT_NAME, family);
             String sig = null;
+            String key = null;
             RouterInfo oldRI = _context.router().getRouterInfo();
             if (oldRI != null) {
                 // don't do it if family changed
                 if (family.equals(oldRI.getOption(FamilyKeyCrypto.OPT_NAME))) {
-                    // copy over the signature
+                    // copy over the pubkey and signature
+                    key = oldRI.getOption(FamilyKeyCrypto.OPT_KEY);
+                    if (key != null)
+                        stats.setProperty(FamilyKeyCrypto.OPT_KEY, key);
                     sig = oldRI.getOption(FamilyKeyCrypto.OPT_SIG);
                     if (sig != null)
                         stats.setProperty(FamilyKeyCrypto.OPT_SIG, sig);
                 }
             }
-            if (sig == null) {
+            if (sig == null || key == null) {
                 FamilyKeyCrypto fkc = _context.router().getFamilyKeyCrypto();
                 if (fkc != null) {
                     try {
-                        sig = fkc.sign(family, h);
-                        stats.setProperty(FamilyKeyCrypto.OPT_SIG, sig);
+                        stats.putAll(fkc.sign(family, h));
                     } catch (GeneralSecurityException gse) {
                         _log.error("Failed to sign router family", gse);
+                        stats.remove(FamilyKeyCrypto.OPT_KEY);
+                        stats.remove(FamilyKeyCrypto.OPT_SIG);
                     }
                 }
             }
