@@ -359,7 +359,7 @@ public class SAMBridge implements Runnable, ClientApp {
      * TODO we could have multiple servers on different hosts/ports in the future.
      *
      * @param props non-null instantiate and start server if it doesn't exist
-     * @param return non-null
+     * @return non-null
      * @throws IOException if can't bind to host/port, or if different than existing
      * @since 0.9.24
      */

@@ -63,7 +63,7 @@ public class StatisticsManager {
      *
      *  This includes all standard options (as of 0.9.24, network ID and caps)
      *
-     *  @param current router hash, non-null
+     *  @param h current router hash, non-null
      *  @since 0.9.24
      */
     public Properties publishStatistics(Hash h) { 
