@@ -487,16 +487,10 @@ public class RouterInfo extends DatabaseEntry {
 
         if (!_isValid) {
             Log log = I2PAppContext.getGlobalContext().logManager().getLog(RouterInfo.class);
-            byte data[] = null;
-            try {
-                data = getBytes();
-            } catch (DataFormatException dfe) {
-                log.error("Error validating", dfe);
-                return;
-            }
-            log.error("Invalid [" + SHA256Generator.getInstance().calculateHash(data).toBase64()
-                           + (log.shouldLog(Log.WARN) ? ("]\n" + toString()) : ""),
-                           new Exception("Signature failed"));
+            // TODO change to warn
+            //if (log.shouldWarn()) {
+                log.error("Sig verify fail: " + toString(), new Exception("from"));
+            //}
         }
     }
     
