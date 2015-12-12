@@ -852,6 +852,7 @@ public class Router implements RouterClock.ClockShiftListener {
             Properties stats = _context.statPublisher().publishStatistics();
             
             ri.setOptions(stats);
+            // deadlock thru createAddresses() thru SSU REA... move outside lock?
             ri.setAddresses(_context.commSystem().createAddresses());
 
             SigningPrivateKey key = _context.keyManager().getSigningPrivateKey();
@@ -1002,16 +1003,18 @@ public class Router implements RouterClock.ClockShiftListener {
     }
     
     /*
-     *
-     *  Warning - risk of deadlock - do not call while holding locks
+     *  This checks the config only. We don't check the current RI
+     *  due to deadlocks.
      *
      */
     public boolean isHidden() {
-        RouterInfo ri;
-        synchronized (_routerInfoLock) {
-            ri = _routerInfo;
-        }
-        if ( (ri != null) && (ri.isHidden()) )
+        //RouterInfo ri;
+        //synchronized (_routerInfoLock) {
+        //    ri = _routerInfo;
+        //}
+        //if ( (ri != null) && (ri.isHidden()) )
+        //    return true;
+        if (_context.getBooleanProperty(PROP_HIDDEN))
             return true;
         String h = _context.getProperty(PROP_HIDDEN_HIDDEN);
         if (h != null)

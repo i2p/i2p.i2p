@@ -1,3 +1,8 @@
+2015-12-12 zzz
+ * Router:
+   - Add family public key to router info (ticket #1510)
+   - More deadlock prevention (ticket #1722)
+
 2015-12-11 zzz
  * Logs: Windows line ending fixes
  * Router:
