@@ -58,6 +58,7 @@ class SybilRenderer {
     private static final double POINTS_US16 = 10.0;
     private static final double POINTS_FAMILY = -2.0;
     private static final double MIN_CLOSE = 242.0;
+    private static final double PAIR_DISTANCE_FACTOR = 2.0;
     private static final double OUR_KEY_FACTOR = 4.0;
     private static final double MIN_DISPLAY_POINTS = 3.0;
 
@@ -221,7 +222,8 @@ class SybilRenderer {
             renderRouterInfoHTML(out, buf, nkey, avgMinDist, ris, points);
         }
 
-        // TODO Profile analysis
+        // Profile analysis
+        addProfilePoints(ris, points);
 
         if (!points.isEmpty()) {
             List<Hash> warns = new ArrayList<Hash>(points.keySet());
@@ -299,6 +301,7 @@ class SybilRenderer {
                 renderRouterInfo(buf, p.r1, null, false, false);
                 renderRouterInfo(buf, p.r2, null, false, false);
             }
+            point *= PAIR_DISTANCE_FACTOR;
             String b2 = p.r2.getHash().toBase64();
             addPoints(points, p.r1.getHash(), point, "Very close (" + fmt.format(distance) +
                           ") to other floodfill <a href=\"netdb?r=" + b2 + "\">" + b2 + "</a>");
@@ -584,6 +587,28 @@ class SybilRenderer {
         out.write(buf.toString());
         out.flush();
         buf.setLength(0);
+    }
+
+    private static final long DAY = 24*60*60*1000L;
+
+    private void addProfilePoints(List<RouterInfo> ris, Map<Hash, Points> points) throws IOException {
+        long now = _context.clock().now();
+        for (RouterInfo info : ris) {
+            Hash h = info.getHash();
+            PeerProfile prof = _context.profileOrganizer().getProfileNonblocking(h);
+            if (prof != null) {
+                long heard = prof.getFirstHeardAbout();
+                if (heard > 0) {
+                    long age = Math.max(now - heard, 1);
+                    if (age < DAY) {
+                        // .125 point for every hour under 24, max 3 points
+                        double point = Math.min(3.0d, (DAY - age) / (DAY / 3.0d));
+                        addPoints(points, h, point,
+                                  "First heard about: " + _t("{0} ago", DataHelper.formatDuration2(age)));
+                    }
+                }
+            }
+        }
     }
 
     private void renderRouterInfoHTML(Writer out, StringBuilder buf, Hash us, double avgMinDist,
