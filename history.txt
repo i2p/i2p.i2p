@@ -1,3 +1,6 @@
+2015-12-13 zzz
+ * Data: Optimize router info writes, disable caching
+
 2015-12-12 zzz
  * Router:
    - Add family public key to router info (ticket #1510)

@@ -900,7 +900,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             boolean validFamily = fkc.verify(routerInfo);
             if (!validFamily) {
                 if (_log.shouldWarn())
-                    _log.warn("Bad family sig: " + routerInfo);
+                    _log.warn("Bad family sig: " + routerInfo.getHash());
             }
             // todo store in RI
         }
