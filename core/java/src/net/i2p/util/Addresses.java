@@ -131,7 +131,15 @@ public abstract class Addresses {
                     }
                 }
             }
-        } catch (SocketException e) {}
+        } catch (SocketException e) {
+        } catch (java.lang.Error e) {
+            // Windows, possibly when IPv6 only...
+            // https://bugs.openjdk.java.net/browse/JDK-8046500
+            // java.lang.Error: IP Helper Library GetIfTable function failed
+            //   at java.net.NetworkInterface.getAll(Native Method)
+            //   at java.net.NetworkInterface.getNetworkInterfaces(Unknown Source)
+            //   at net.i2p.util.Addresses.getAddresses ...
+        }
 
         if (includeLoopbackAndWildcard) {
             if (haveIPv4)
