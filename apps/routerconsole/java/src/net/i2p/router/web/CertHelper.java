@@ -3,7 +3,9 @@ package net.i2p.router.web;
 import java.io.File;
 import java.io.IOException;
 
+import net.i2p.data.DataHelper;
 import net.i2p.util.FileUtil;
+import net.i2p.router.crypto.FamilyKeyCrypto;
 
 
 /**
@@ -49,7 +51,23 @@ public class CertHelper extends HelperBase {
             }
             if (!hasTunnels)
                 output(_t("I2PTunnel"), null);
+
+            _out.write("<h3>");
+            _out.write(_t("Local Router Family Certificate"));
+            _out.write("</h3>\n");
+            String family = _context.getProperty(FamilyKeyCrypto.PROP_FAMILY_NAME);
+            if (family != null) {
+                File f = new File(dir, "family");
+                f = new File(f, family + ".crt");
+                output(_t("Family") + ": " + DataHelper.escapeHTML(family), f);
+            } else {
+                _out.write("<p>");
+                _out.write(_t("none"));
+                _out.write("</p>\n");
+            }
+
             // anything else? plugins?
+
         } catch (IOException ioe) {
             ioe.printStackTrace();
         }
@@ -61,8 +79,8 @@ public class CertHelper extends HelperBase {
      */
     private void output(String name, File file) throws IOException {
         _out.write("<p><h4>");
-        _out.write("</h4>");
         _out.write(name);
+        _out.write("</h4>");
         if (file != null && file.exists()) {
             String cert = FileUtil.readTextFile(file.toString(), -1, true);
             if (cert != null) {
@@ -73,9 +91,9 @@ public class CertHelper extends HelperBase {
                 _out.write(": read failure");
             }
         } else {
-            _out.write(": ");
+            _out.write("<p>");
             _out.write(_t("none"));
+            _out.write("</p>\n");
         }
-        _out.write("</p>\n");
     }
 }
