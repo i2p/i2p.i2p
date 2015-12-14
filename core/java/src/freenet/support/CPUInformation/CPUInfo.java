@@ -22,6 +22,7 @@ public interface CPUInfo
      * @return A string indicating the vendor of the CPU.
      */
     public String getVendor();
+
     /**
      * @return A string detailing what type of CPU that is present in the machine. I.e. 'Pentium IV' etc.
      * @throws UnknownCPUException If for any reason the retrieval of the requested information
@@ -29,32 +30,39 @@ public interface CPUInfo
      * cause of the failure.
      */
     public String getCPUModelString() throws UnknownCPUException;
-    
+
     /**
-     * @return true iff the CPU support the MMX instruction set.
+     * @return true iff the CPU supports the MMX instruction set.
      */
     public boolean hasMMX();
+
     /**
-     * @return true iff the CPU support the SSE instruction set.
+     * @return true iff the CPU supports the BMI2 instruction set.
+     */
+    public boolean hasBMI2();
+
+    /**
+     * @return true iff the CPU supports the SSE instruction set.
      */
     public boolean hasSSE();
+
     /**
-     * @return true iff the CPU support the SSE2 instruction set.
+     * @return true iff the CPU supports the SSE2 instruction set.
      */
     public boolean hasSSE2();
 
     /**
-     * @return true iff the CPU support the SSE3 instruction set.
+     * @return true iff the CPU supports the SSE3 instruction set.
      */
     public boolean hasSSE3();
     
     /**
-     * @return true iff the CPU support the SSE4.1 instruction set.
+     * @return true iff the CPU supports the SSE4.1 instruction set.
      */
     public boolean hasSSE41();
 
     /**
-     * @return true iff the CPU support the SSE4.2 instruction set.
+     * @return true iff the CPU supports the SSE4.2 instruction set.
      */
     public boolean hasSSE42();
 
@@ -62,7 +70,7 @@ public interface CPUInfo
      * AMD K10 only. Not supported on Intel.
      * ref: https://en.wikipedia.org/wiki/SSE4.2#SSE4a
      *
-     * @return true iff the CPU support the SSE4A instruction set.
+     * @return true iff the CPU supports the SSE4A instruction set.
      */
     public boolean hasSSE4A();
     
@@ -105,6 +113,7 @@ public interface CPUInfo
      * @since 0.9.21
      */
     public boolean hasTBM();
+
     /**
      * @return true iff the CPU supports the AES-NI instruction set.
      * @since 0.9.14

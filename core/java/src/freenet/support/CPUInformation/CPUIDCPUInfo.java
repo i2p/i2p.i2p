@@ -17,6 +17,10 @@ abstract class CPUIDCPUInfo implements CPUInfo
         return (CPUID.getEDXCPUFlags() & (1 << 23)) != 0; //EDX Bit 23
     }
 
+    public boolean hasBMI2(){
+        return (CPUID.getExtendedEBXFeatureFlags() & (1 << 8)) != 0; // Extended EBX Bit 8
+    }
+
     public boolean hasSSE(){
         return (CPUID.getEDXCPUFlags() & (1 << 25)) != 0; //EDX Bit 25
     }

@@ -324,6 +324,7 @@ public class CPUID {
         System.out.println("\n **More CPUInfo**");
         System.out.println("CPU model string: " + c.getCPUModelString());
         System.out.println("CPU has MMX:    " + c.hasMMX());
+        System.out.println("CPU has BMI2:   " + c.hasBMI2());
         System.out.println("CPU has SSE:    " + c.hasSSE());
         System.out.println("CPU has SSE2:   " + c.hasSSE2());
         System.out.println("CPU has SSE3:   " + c.hasSSE3());
