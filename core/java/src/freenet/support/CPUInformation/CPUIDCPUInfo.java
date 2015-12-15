@@ -62,8 +62,7 @@ public class CPUIDCPUInfo implements CPUInfo
      * @since 0.9.21
      */
     public boolean hasAVX2() {
-        return this.hasABM() &&
-               (CPUID.getExtendedEBXFeatureFlags() & (1 << 5)) != 0; //Extended EBX Feature Bit 5
+        return (CPUID.getExtendedEBXFeatureFlags() & (1 << 5)) != 0; //Extended EBX Feature Bit 5
     }
     
     /**
