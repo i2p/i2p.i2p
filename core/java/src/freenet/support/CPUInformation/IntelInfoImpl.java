@@ -37,13 +37,7 @@ class IntelInfoImpl extends CPUIDCPUInfo implements IntelCPUInfo
     public boolean IsCoreiCompatible(){ return isCoreiCompatible; }
     public boolean IsSandyCompatible(){ return isSandyCompatible; }
     public boolean IsIvyCompatible(){ return isIvyCompatible; }
-    public boolean IsHaswellCompatible(){
-      // Some Celeron Haswell CPUs do not support BMI2, which
-      // GMP-6.0 assumes is present in all Haswell CPUs and causes
-      // crashes. Mark these CPUs as non-Haswell.
-      
-      return this.hasBMI2() && isHaswellCompatible;
-    }
+    public boolean IsHaswellCompatible(){ return isHaswellCompatible; }
     public boolean IsBroadwellCompatible(){ return isBroadwellCompatible; }
 
     public String getCPUModelString() throws UnknownCPUException
@@ -382,7 +376,7 @@ class IntelInfoImpl extends CPUIDCPUInfo implements IntelCPUInfo
                     case 0x3f:
                     case 0x45:
                     case 0x46:
-                        CPUInfo c = CPUID.getInfo();
+                    	CPUIDCPUInfo c = new CPUIDCPUInfo();
                         if (c.hasAVX2() && c.hasBMI1() && c.hasBMI2()) {
                             isSandyCompatible = true;
                             isIvyCompatible = true;

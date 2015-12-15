@@ -5,7 +5,7 @@ package freenet.support.CPUInformation;
  *  Ref: http://en.wikipedia.org/wiki/CPUID
  *  @since 0.8.7
  */
-abstract class CPUIDCPUInfo implements CPUInfo
+public class CPUIDCPUInfo implements CPUInfo
 {
     public String getVendor()
     {
@@ -124,8 +124,7 @@ abstract class CPUIDCPUInfo implements CPUInfo
      * @since 0.9.24
      */
     public boolean hasBMI1() {
-        return this.hasABM() &&
-               (CPUID.getExtendedEBXFeatureFlags() & (1 << 3)) != 0; // Extended EBX Feature Bit 3
+        return (CPUID.getExtendedEBXFeatureFlags() & (1 << 3)) != 0; // Extended EBX Feature Bit 3
     }
     
     /**
@@ -133,8 +132,7 @@ abstract class CPUIDCPUInfo implements CPUInfo
      * @since 0.9.24
      */
     public boolean hasBMI2() {
-        return this.hasABM() &&
-               (CPUID.getExtendedEBXFeatureFlags() & (1 << 8)) != 0; // Extended EBX Feature Bit 8
+        return (CPUID.getExtendedEBXFeatureFlags() & (1 << 8)) != 0; // Extended EBX Feature Bit 8
     }
 
     /**
@@ -158,8 +156,11 @@ abstract class CPUIDCPUInfo implements CPUInfo
      * @since 0.9.24
      */
     public boolean hasABM() {
-        return this.hasFMA3() &&
-               this.hasMOVBE() &&
-               (CPUID.getExtendedECXCPUFlags() & (1 << 5)) != 0; // Extended EBX Bit 5
+        return (CPUID.getExtendedECXCPUFlags() & (1 << 5)) != 0; // Extended EBX Bit 5
     }
+
+	@Override
+	public String getCPUModelString() throws UnknownCPUException {
+        throw new UnknownCPUException("Class CPUIDCPUInfo cannot indentify CPUs"); 
+	}
 }
