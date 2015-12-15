@@ -382,34 +382,8 @@ class IntelInfoImpl extends CPUIDCPUInfo implements IntelCPUInfo
                     case 0x3f:
                     case 0x45:
                     case 0x46:
-                        boolean hasNewInstructions = false;
-                        int reg = CPUID.getECXCPUFlags();
-                        boolean hasFMA3 = (reg & (1 << 12)) != 0;
-                        boolean hasMOVBE = (reg & (1 << 22)) != 0;
-                        // AVX is implied by AVX2, so we don't need to check the value here,
-                        // but we will need it below to enable Sandy Bridge if the Haswell checks fail.
-                        // This is the same as hasAVX().
-                        boolean hasAVX = (reg & (1 << 28)) != 0 && (reg & (1 << 27)) != 0;
-                        //System.out.println("FMA3 MOVBE: " +
-                        //                   hasFMA3 + ' ' + hasMOVBE);
-                        if (hasFMA3 && hasMOVBE) {
-                            reg = CPUID.getExtendedECXCPUFlags();
-                            boolean hasABM = (reg & (1 << 5)) != 0;  // aka LZCNT
-                            //System.out.println("FMA3 MOVBE ABM: " +
-                            //                   hasFMA3 + ' ' + hasMOVBE + ' ' + hasABM);
-                            if (hasABM) {
-                                reg = CPUID.getExtendedEBXFeatureFlags();
-                                boolean hasAVX2 = (reg & (1 << 5)) != 0;
-                                boolean hasBMI1 = (reg & (1 << 3)) != 0;
-                                boolean hasBMI2 = (reg & (1 << 8)) != 0;
-                                //System.out.println("FMA3 MOVBE ABM AVX2 BMI1 BMI2: " +
-                                //                   hasFMA3 + ' ' + hasMOVBE + ' ' + hasABM + ' ' +
-                                //                   hasAVX2 + ' ' + hasBMI1 + ' ' + hasBMI2);
-                                if (hasAVX2 && hasBMI1 && hasBMI2)
-                                    hasNewInstructions = true;
-                            }
-                        }
-                        if (hasNewInstructions) {
+                        CPUInfo c = CPUID.getInfo();
+                        if (c.hasAVX2() && c.hasBMI1() && c.hasBMI2()) {
                             isSandyCompatible = true;
                             isIvyCompatible = true;
                             isHaswellCompatible = true;
@@ -417,7 +391,7 @@ class IntelInfoImpl extends CPUIDCPUInfo implements IntelCPUInfo
                         } else {
                             // This processor is "corei" compatible, as we define it,
                             // i.e. SSE4.2 but not necessarily AVX.
-                            if (hasAVX) {
+                            if (c.hasAVX()) {
                                 isSandyCompatible = true;
                                 isIvyCompatible = true;
                                 modelString = "Haswell Celeron/Pentium w/ AVX model " + model;

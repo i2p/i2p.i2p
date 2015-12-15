@@ -37,11 +37,6 @@ public interface CPUInfo
     public boolean hasMMX();
 
     /**
-     * @return true iff the CPU supports the BMI2 instruction set.
-     */
-    public boolean hasBMI2();
-
-    /**
      * @return true iff the CPU supports the SSE instruction set.
      */
     public boolean hasSSE();
@@ -125,4 +120,34 @@ public interface CPUInfo
      * @since 0.9.21
      */
     public boolean hasX64();
+    
+    /**
+     * @return true iff the CPU supports the BMI1 instruction set.
+     * @since 0.9.24
+     */
+    public boolean hasBMI1();
+    
+    /**
+     * @return true iff the CPU supports the BMI2 instruction set.
+     * @since 0.9.24
+     */
+    public boolean hasBMI2();
+    
+    /**
+     * @return true iff the CPU supports the FMA3 instruction set.
+     * @since 0.9.24
+     */
+    public boolean hasFMA3();
+
+    /**
+     * @return true iff the CPU supports the MOVBE instruction set.
+     * @since 0.9.24
+     */
+    public boolean hasMOVBE();
+
+    /**
+     * @return true iff the CPU supports the ABM instruction set.
+     * @since 0.9.24
+     */
+    public boolean hasABM();
 }

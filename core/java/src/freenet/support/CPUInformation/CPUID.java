@@ -324,7 +324,6 @@ public class CPUID {
         System.out.println("\n **More CPUInfo**");
         System.out.println("CPU model string: " + c.getCPUModelString());
         System.out.println("CPU has MMX:    " + c.hasMMX());
-        System.out.println("CPU has BMI2:   " + c.hasBMI2());
         System.out.println("CPU has SSE:    " + c.hasSSE());
         System.out.println("CPU has SSE2:   " + c.hasSSE2());
         System.out.println("CPU has SSE3:   " + c.hasSSE3());
@@ -336,6 +335,11 @@ public class CPUID {
         System.out.println("CPU has AVX512: " + c.hasAVX512());
         System.out.println("CPU has ADX:    " + c.hasADX());
         System.out.println("CPU has TBM:    " + c.hasTBM());
+        System.out.println("CPU has BMI1:   " + c.hasBMI1());
+        System.out.println("CPU has BMI2:   " + c.hasBMI2());
+        System.out.println("CPU has FMA3:   " + c.hasFMA3());
+        System.out.println("CPU has MOVBE:  " + c.hasMOVBE());
+        System.out.println("CPU has ABM:    " + c.hasABM());
         if(c instanceof IntelCPUInfo){
             System.out.println("\n **Intel-info**");
             System.out.println("Is PII-compatible: "+((IntelCPUInfo)c).IsPentium2Compatible());

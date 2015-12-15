@@ -17,10 +17,6 @@ abstract class CPUIDCPUInfo implements CPUInfo
         return (CPUID.getEDXCPUFlags() & (1 << 23)) != 0; //EDX Bit 23
     }
 
-    public boolean hasBMI2(){
-        return (CPUID.getExtendedEBXFeatureFlags() & (1 << 8)) != 0; // Extended EBX Bit 8
-    }
-
     public boolean hasSSE(){
         return (CPUID.getEDXCPUFlags() & (1 << 25)) != 0; //EDX Bit 25
     }
@@ -65,9 +61,9 @@ abstract class CPUIDCPUInfo implements CPUInfo
      * @return true iff the CPU supports the AVX2 instruction set.
      * @since 0.9.21
      */
-    public boolean hasAVX2()
-    {
-        return (CPUID.getExtendedEBXFeatureFlags() & (1 << 5)) != 0; //Extended EBX Bit 5
+    public boolean hasAVX2() {
+        return this.hasABM() &&
+               (CPUID.getExtendedEBXFeatureFlags() & (1 << 5)) != 0; //Extended EBX Feature Bit 5
     }
     
     /**
@@ -121,5 +117,49 @@ abstract class CPUIDCPUInfo implements CPUInfo
      */
     public boolean hasX64() {
         return (CPUID.getExtendedEDXCPUFlags() & (1 << 29)) != 0; //Extended EDX Bit 29
+    }
+    
+    /**
+     * @return true iff the CPU supports the BMI1 instruction set.
+     * @since 0.9.24
+     */
+    public boolean hasBMI1() {
+        return this.hasABM() &&
+               (CPUID.getExtendedEBXFeatureFlags() & (1 << 3)) != 0; // Extended EBX Feature Bit 3
+    }
+    
+    /**
+     * @return true iff the CPU supports the BMI2 instruction set.
+     * @since 0.9.24
+     */
+    public boolean hasBMI2() {
+        return this.hasABM() &&
+               (CPUID.getExtendedEBXFeatureFlags() & (1 << 8)) != 0; // Extended EBX Feature Bit 8
+    }
+
+    /**
+     * @return true iff the CPU supports the FMA3 instruction set.
+     * @since 0.9.24
+     */
+    public boolean hasFMA3() {
+        return (CPUID.getECXCPUFlags() & (1 << 12)) != 0; // ECX Bit 12
+    }
+
+    /**
+     * @return true iff the CPU supports the MOVBE instruction set.
+     * @since 0.9.24
+     */
+    public boolean hasMOVBE() {
+        return (CPUID.getECXCPUFlags() & (1 << 22)) != 0; // ECX Bit 22
+    }
+
+    /**
+     * @return true iff the CPU supports the ABM instruction set.
+     * @since 0.9.24
+     */
+    public boolean hasABM() {
+        return this.hasFMA3() &&
+               this.hasMOVBE() &&
+               (CPUID.getExtendedECXCPUFlags() & (1 << 5)) != 0; // Extended EBX Bit 5
     }
 }
