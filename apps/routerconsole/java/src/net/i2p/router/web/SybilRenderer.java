@@ -154,9 +154,23 @@ class SybilRenderer {
         StringBuilder buf = new StringBuilder(4*1024);
         buf.append("<p><b>This is an experimental network database tool for debugging and analysis. Do not panic even if you see warnings below. " +
                    "Possible \"threats\" are summarized at the bottom, however these are unlikely to be real threats. " +
-                   "If you see anything you would like to discuss with the devs, contact us on IRC #i2p-dev.</b></p>");
+                   "If you see anything you would like to discuss with the devs, contact us on IRC #i2p-dev.</b></p>" +
+                   "<ul><li><a href=\"#known\">FF Summary</a>" +
+                   "</li><li><a href=\"#family\">Same Family</a>" +
+                   "</li><li><a href=\"#ourIP\">IP close to us</a>" +
+                   "</li><li><a href=\"#sameIP\">Same IP</a>" +
+                   "</li><li><a href=\"#same24\">Same /24</a>" +
+                   "</li><li><a href=\"#same16\">Same /16</a>" +
+                   "</li><li><a href=\"#pairs\">Pair distance</a>" +
+                   "</li><li><a href=\"#ritoday\">Close to us</a>" +
+                   "</li><li><a href=\"#ritmrw\">Close to us tomorrow</a>" +
+                   "</li><li><a href=\"#dht\">DHT neighbors</a>" +
+                   "</li><li><a href=\"#dest\">Close to our destinations</a>" +
+                   "</li><li><a href=\"#threats\">Highest threats</a>" +
+                   "</li></ul>");
+
         renderRouterInfo(buf, _context.router().getRouterInfo(), null, true, false);
-        buf.append("<h3>Known Floodfills: ").append(ris.size()).append("</h3>");
+        buf.append("<h3 id=\"known\">Known Floodfills: ").append(ris.size()).append("</h3>");
 
         double tot = 0;
         int count = 200;
@@ -188,17 +202,18 @@ class SybilRenderer {
         renderPairDistance(out, buf, ris, points);
 
         // Distance to our router analysis
-        buf.append("<h3>Closest Floodfills to Our Routing Key (Where we Store our RI)</h3>");
+        buf.append("<h3 id=\"ritoday\">Closest Floodfills to Our Routing Key (Where we Store our RI)</h3>");
         renderRouterInfoHTML(out, buf, ourRKey, avgMinDist, ris, points);
         RouterKeyGenerator rkgen = _context.routerKeyGenerator();
         Hash nkey = rkgen.getNextRoutingKey(us);
-        buf.append("<h3>Closest Floodfills to Tomorrow's Routing Key (Where we will Store our RI)</h3>");
+        buf.append("<h3 id=\"ritmrw\">Closest Floodfills to Tomorrow's Routing Key (Where we will Store our RI)</h3>");
         renderRouterInfoHTML(out, buf, nkey, avgMinDist, ris, points);
 
-        buf.append("<h3>Closest Floodfills to Our Router Hash (DHT Neighbors if we are Floodfill)</h3>");
+        buf.append("<h3 id=\"dht\">Closest Floodfills to Our Router Hash (DHT Neighbors if we are Floodfill)</h3>");
         renderRouterInfoHTML(out, buf, us, avgMinDist, ris, points);
 
         // Distance to our published destinations analysis
+        buf.append("<h3 id=\"dest\">Floodfills Close to Our Destinations</h3>");
         Map<Hash, TunnelPool> clientInboundPools = _context.tunnelManager().getInboundClientPools();
         List<Hash> destinations = new ArrayList<Hash>(clientInboundPools.keySet());
         boolean debug = _context.getBooleanProperty(HelperBase.PROP_ADVANCED);
@@ -227,7 +242,7 @@ class SybilRenderer {
         if (!points.isEmpty()) {
             List<Hash> warns = new ArrayList<Hash>(points.keySet());
             Collections.sort(warns, new PointsComparator(points));
-            buf.append("<h3>Routers with Most Threat Points</h3>");
+            buf.append("<h3 id=\"threats\">Routers with Most Threat Points</h3>");
             for (Hash h : warns) {
                 RouterInfo ri = _context.netDb().lookupRouterInfoLocally(h);
                 if (h == null)
@@ -286,7 +301,7 @@ class SybilRenderer {
         double avg = total / (sz * sz / 2);
         buf.append("<h3>Average Floodfill Distance is ").append(fmt.format(avg)).append("</h3>");
 
-        buf.append("<h3>Closest Floodfill Pairs by Hash</h3>");
+        buf.append("<h3 id=\"pairs\">Closest Floodfill Pairs by Hash</h3>");
         for (Pair p : pairs) {
             double distance = biLog2(p.dist);
             double point = MIN_CLOSE - distance;
@@ -363,7 +378,7 @@ class SybilRenderer {
         byte[] ourIP = getIP(us);
         if (ourIP == null)
             return;
-        buf.append("<h3>Floodfills close to Our IP</h3>");
+        buf.append("<h3 \"ourIP\">Floodfills close to Our IP</h3>");
         boolean found = false;
         for (RouterInfo info : ris) {
             byte[] ip = getIP(info);
@@ -396,7 +411,7 @@ class SybilRenderer {
     }
 
     private void renderIPGroups32(Writer out, StringBuilder buf, List<RouterInfo> ris, Map<Hash, Points> points) throws IOException {
-        buf.append("<h3>Floodfills with the Same IP</h3>");
+        buf.append("<h3 id=\"sameIP\">Floodfills with the Same IP</h3>");
         ObjectCounter<Integer> oc = new ObjectCounter<Integer>();
         for (RouterInfo info : ris) {
             byte[] ip = getIP(info);
@@ -449,7 +464,7 @@ class SybilRenderer {
     }
 
     private void renderIPGroups24(Writer out, StringBuilder buf, List<RouterInfo> ris, Map<Hash, Points> points) throws IOException {
-        buf.append("<h3>Floodfills in the Same /24 (2 minimum)</h3>");
+        buf.append("<h3 id=\"same24\">Floodfills in the Same /24 (2 minimum)</h3>");
         ObjectCounter<Integer> oc = new ObjectCounter<Integer>();
         for (RouterInfo info : ris) {
             byte[] ip = getIP(info);
@@ -498,7 +513,7 @@ class SybilRenderer {
     }
 
     private void renderIPGroups16(Writer out, StringBuilder buf, List<RouterInfo> ris, Map<Hash, Points> points) throws IOException {
-        buf.append("<h3>Floodfills in the Same /16 (4 minimum)</h3>");
+        buf.append("<h3 id=\"same16\">Floodfills in the Same /16 (4 minimum)</h3>");
         ObjectCounter<Integer> oc = new ObjectCounter<Integer>();
         for (RouterInfo info : ris) {
             byte[] ip = getIP(info);
@@ -594,9 +609,9 @@ class SybilRenderer {
                 long heard = prof.getFirstHeardAbout();
                 if (heard > 0) {
                     long age = Math.max(now - heard, 1);
-                    if (age < DAY) {
-                        // .125 point for every hour under 24, max 3 points
-                        double point = Math.min(3.0d, (DAY - age) / (DAY / 3.0d));
+                    if (age < 2 * DAY) {
+                        // .125 point for every hour under 48, max 6 points
+                        double point = Math.min(6.0d, (2 * DAY - age) / (2 * DAY / 6.0d));
                         addPoints(points, h, point,
                                   "First heard about: " + _t("{0} ago", DataHelper.formatDuration2(age)));
                     }
