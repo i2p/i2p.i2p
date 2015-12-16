@@ -17,7 +17,7 @@ import java.util.TreeSet;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import net.i2p.crypto.SHA256Generator;
+import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.router.RouterAddress;
 import net.i2p.data.router.RouterInfo;
@@ -1234,12 +1234,15 @@ public class ProfileOrganizer {
     }
 
     /**
+      *
+      * As of 0.9.24, checks for a netdb family match as well, unless mask == 0.
+      *
      * @param mask 0-4 Number of bytes to match to determine if peers in the same IP range should
      *             not be in the same tunnel. 0 = disable check; 1 = /8; 2 = /16; 3 = /24; 4 = exact IP match
      */
     private void locked_selectPeers(Map<Hash, PeerProfile> peers, int howMany, Set<Hash> toExclude, Set<Hash> matches, int mask) {
         List<Hash> all = new ArrayList<Hash>(peers.keySet());
-        Set<Integer> IPSet = new HashSet<Integer>(8);
+        Set<String> IPSet = new HashSet<String>(8);
         // use RandomIterator to avoid shuffling the whole thing
         for (Iterator<Hash> iter = new RandomIterator<Hash>(all); (matches.size() < howMany) && iter.hasNext(); ) {
             Hash peer = iter.next();
@@ -1265,11 +1268,14 @@ public class ProfileOrganizer {
     /**
      * Does the peer's IP address NOT match the IP address of any peer already in the set,
      * on any transport, within a given mask?
+     *
+     * As of 0.9.24, checks for a netdb family match as well.
+     *
      * @param mask is 1-4 (number of bytes to match)
      * @param IPMatches all IPs so far, modified by this routine
      */
-    private boolean notRestricted(Hash peer, Set<Integer> IPSet, int mask) {
-        Set<Integer> peerIPs = maskedIPSet(peer, mask);
+    private boolean notRestricted(Hash peer, Set<String> IPSet, int mask) {
+        Set<String> peerIPs = maskedIPSet(peer, mask);
         if (containsAny(IPSet, peerIPs))
             return false;
         IPSet.addAll(peerIPs);
@@ -1280,10 +1286,12 @@ public class ProfileOrganizer {
       * The Set of IPs for this peer, with a given mask.
       * Includes the comm system's record of the IP, and all netDb addresses.
       *
+      * As of 0.9.24, returned set will include netdb family as well.
+      *
       * @return an opaque set of masked IPs for this peer
       */
-    private Set<Integer> maskedIPSet(Hash peer, int mask) {
-        Set<Integer> rv = new HashSet<Integer>(4);
+    private Set<String> maskedIPSet(Hash peer, int mask) {
+        Set<String> rv = new HashSet<String>(4);
         byte[] commIP = _context.commSystem().getIP(peer);
         if (commIP != null)
             rv.add(maskedIP(commIP, mask));
@@ -1296,31 +1304,40 @@ public class ProfileOrganizer {
             if (pib == null) continue;
             rv.add(maskedIP(pib, mask));
         }
+        String family = pinfo.getOption("family");
+        if (family != null) {
+            // TODO should KNDF put a family-verified indicator in the RI,
+            // after checking the sig, or does it matter?
+            // What's the threat here of not avoid ding a router
+            // falsely claiming to be in the family?
+            // Prefix with something so an IP can't be spoofed
+            rv.add('x' + family);
+        }
         return rv;
     }
 
     /**
      * generate an arbitrary unique value for this ip/mask (mask = 1-4)
-     * If IPv6, force mask = 8.
+     * If IPv6, force mask = 6.
      */
-    private static Integer maskedIP(byte[] ip, int mask) {
-        int rv = ip[0];
+    private static String maskedIP(byte[] ip, int mask) {
+        final StringBuilder buf = new StringBuilder(1 + (mask*2));
+        final char delim;
         if (ip.length == 16) {
-            for (int i = 1; i < 8; i++) {
-                rv <<= i * 4;
-                rv ^= ip[i];
-            }
+            mask = 6;
+            delim = ':';
         } else {
-            for (int i = 1; i < mask; i++) {
-                rv <<= 8;
-                rv ^= ip[i];
-            }
+            delim = '.';
         }
-        return Integer.valueOf(rv);
+        buf.append(delim);
+        buf.append(Long.toHexString(DataHelper.fromLong(ip, 0, mask)));
+        return buf.toString();
     }
 
     /** does a contain any of the elements in b? */
     private static <T> boolean  containsAny(Set<T> a, Set<T> b) {
+        if (a.isEmpty() || b.isEmpty())
+            return false;
         for (T o : b) {
             if (a.contains(o))
                 return true;
