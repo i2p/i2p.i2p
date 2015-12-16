@@ -5,7 +5,7 @@ package freenet.support.CPUInformation;
  *  Ref: http://en.wikipedia.org/wiki/CPUID
  *  @since 0.8.7
  */
-public class CPUIDCPUInfo implements CPUInfo
+class CPUIDCPUInfo implements CPUInfo
 {
     public String getVendor()
     {

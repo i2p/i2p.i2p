@@ -34,6 +34,7 @@ public class CPUID {
 
     /** did we load the native lib correctly? */
     private static boolean _nativeOk = false;
+    private static int _jcpuidVersion;
 
     /**
      * do we want to dump some basic success/failure info to stderr during
@@ -105,6 +106,27 @@ public class CPUID {
      */
     private static native CPUIDResult doCPUID(int iFunction);
 
+    /**
+     *  Get the jbigi version, only available since jbigi version 3
+     *  Caller must catch Throwable
+     *  @since 0.9.25
+     */
+    private native static int nativeJcpuidVersion();
+
+    /**
+     *  Get the jcpuid version
+     *  @return 0 if no jcpuid available, 2 if version not supported
+     *  @since 0.9.25
+     */
+    private static int fetchJcpuidVersion() {
+        if (!_nativeOk)
+            return 0;
+        try {
+            return nativeJcpuidVersion();
+        } catch (Throwable t) {
+            return 2;
+        }
+    }
 
     static String getCPUVendorID()
     {
@@ -293,6 +315,7 @@ public class CPUID {
         if(!_nativeOk){
             System.out.println("**Failed to retrieve CPUInfo. Please verify the existence of jcpuid dll/so**");
         }
+        System.out.println("JCPUID Version: " + _jcpuidVersion);
         System.out.println(" **CPUInfo**");
         String mname = getCPUModelName();
         if (mname != null)
@@ -396,6 +419,7 @@ public class CPUID {
                         System.err.println("WARNING: Native CPUID library jcpuid not loaded - will not be able to read CPU information using CPUID");
                 }
             }
+            _jcpuidVersion = fetchJcpuidVersion();
         } else {
             if (_doLog)
                 System.err.println("INFO: Native CPUID library jcpuid not loaded - will not be able to read CPU information using CPUID");

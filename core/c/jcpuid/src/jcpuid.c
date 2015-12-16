@@ -17,7 +17,7 @@
 #define JCPUID_VERSION 3
 
 /* since version 3 */
-JNIEXPORT jint JNICALL Java_net_i2p_util_NativeBigInteger_nativeJcpuidVersion
+JNIEXPORT jint JNICALL Java_freenet_support_CPUInformation_CPUID_nativeJcpuidVersion
         (JNIEnv* env, jclass cls) {
     return (jint) JCPUID_VERSION;
 }
