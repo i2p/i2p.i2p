@@ -342,13 +342,31 @@ class IntelInfoImpl extends CPUIDCPUInfo implements IntelCPUInfo
                     // case 0x3c: See below
 
                     // Broadwell 14 nm
-                    case 0x3d:
-                        isSandyCompatible = true;
-                        isIvyCompatible = true;
-                        isHaswellCompatible = true;
-                        isBroadwellCompatible = true;
-                        modelString = "Broadwell";
+                    // See Haswell notes below
+                    case 0x3d: {
+                        CPUIDCPUInfo c = new CPUIDCPUInfo();
+                        if (c.hasAVX2() && c.hasBMI1()  && c.hasBMI2() &&
+                            c.hasFMA3() && c.hasMOVBE() && c.hasABM() &&
+                            c.hasADX()) {
+                            isSandyCompatible = true;
+                            isIvyCompatible = true;
+                            isHaswellCompatible = true;
+                            isBroadwellCompatible = true;
+                            modelString = "Broadwell Core i3/i5/i7";
+                        } else {
+                            // This processor is "corei" compatible, as we define it,
+                            // i.e. SSE4.2 but not necessarily AVX.
+                            if (c.hasAVX()) {
+                                isSandyCompatible = true;
+                                isIvyCompatible = true;
+                                modelString = "Broadwell Celeron/Pentium w/ AVX";
+                            } else {
+                                modelString = "Broadwell Celeron/Pentium";
+                            }
+                        }
                         break;
+                    }
+
                     // Ivy Bridge 22 nm
                     case 0x3e:
                         isSandyCompatible = true;
@@ -376,6 +394,7 @@ class IntelInfoImpl extends CPUIDCPUInfo implements IntelCPUInfo
                     case 0x3f:
                     case 0x45:
                     case 0x46:
+                    {
                         CPUIDCPUInfo c = new CPUIDCPUInfo();
                         if (c.hasAVX2() && c.hasBMI1()  && c.hasBMI2() &&
                             c.hasFMA3() && c.hasMOVBE() && c.hasABM()) {
@@ -395,6 +414,7 @@ class IntelInfoImpl extends CPUIDCPUInfo implements IntelCPUInfo
                             }
                         }
                         break;
+                    }
 
                     // Quark 32nm
                     case 0x4a:
@@ -409,10 +429,43 @@ class IntelInfoImpl extends CPUIDCPUInfo implements IntelCPUInfo
                         modelString = "Atom";
                         break;
 
+                // following are for extended model == 5
+                // most flags are set above
+                // isCoreiCompatible = true is the default
+
+                    // Skylake 14 nm
+                    // See reference link errata #SKD052 re: BMI
+                    // ref: http://www.intel.com/content/dam/www/public/us/en/documents/specification-updates/desktop-6th-gen-core-family-spec-update.pdf
+                    // See Haswell notes above
+                    case 0x5e: {
+                        CPUIDCPUInfo c = new CPUIDCPUInfo();
+                        if (c.hasAVX2() && c.hasBMI1()  && c.hasBMI2() &&
+                            c.hasFMA3() && c.hasMOVBE() && c.hasABM() &&
+                            c.hasADX()) {
+                            isSandyCompatible = true;
+                            isIvyCompatible = true;
+                            isHaswellCompatible = true;
+                            isBroadwellCompatible = true;
+                            modelString = "Skylake Core i3/i5/i7";
+                        } else {
+                            // This processor is "corei" compatible, as we define it,
+                            // i.e. SSE4.2 but not necessarily AVX.
+                            if (c.hasAVX()) {
+                                isSandyCompatible = true;
+                                isIvyCompatible = true;
+                                modelString = "Skylake Celeron/Pentium w/ AVX";
+                            } else {
+                                modelString = "Skylake Celeron/Pentium";
+                            }
+                        }
+                        break;
+                    }
+
                     // others
                     default:
                         modelString = "Intel model " + model;
                         break;
+
                 } // switch model
             } // case 6
             break;

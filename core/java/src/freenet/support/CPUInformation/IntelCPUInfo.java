@@ -128,6 +128,13 @@ public interface IntelCPUInfo extends CPUInfo {
      * All GMP coreibwl binaries are duplicates of binaries for older technologies,
      * so we do not distribute any. However, this is called from NativeBigInteger.
      *
+     * Broadwell is supported in GMP 6.1 and requires the ADX instructions.
+     *
+     * Requires support for all 7 of these Corei features: FMA3 MOVBE ABM AVX2 BMI1 BMI2 ADX
+     * Pentium/Celeron Broadwell processors that do not support these instruction sets are not compatible.
+     * Those processors will be Sandy-compatible if they have AVX 1 support,
+     * and Corei-compatible if they do not.
+     *
      * @return true if the CPU implements at least a Broadwell level instruction/feature set.
      * @since 0.9.25
      */

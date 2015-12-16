@@ -85,6 +85,11 @@ class CPUIDCPUInfo implements CPUInfo
     }
     
     /**
+     *
+     * Intel Multi-Precision Add-Carry Instruction Extensions
+     * Available in Broadwell.
+     * Unused until GMP 6.1.
+     *
      * @return true iff the CPU supports the ADX instruction set.
      * @since 0.9.25
      */
