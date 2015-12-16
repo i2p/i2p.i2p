@@ -376,9 +376,9 @@ class IntelInfoImpl extends CPUIDCPUInfo implements IntelCPUInfo
                     case 0x3f:
                     case 0x45:
                     case 0x46:
-                    	CPUIDCPUInfo c = new CPUIDCPUInfo();
+                        CPUIDCPUInfo c = new CPUIDCPUInfo();
                         if (c.hasAVX2() && c.hasBMI1()  && c.hasBMI2() &&
-                        	c.hasFMA3() && c.hasMOVBE() && c.hasABM()) {
+                            c.hasFMA3() && c.hasMOVBE() && c.hasABM()) {
                             isSandyCompatible = true;
                             isIvyCompatible = true;
                             isHaswellCompatible = true;

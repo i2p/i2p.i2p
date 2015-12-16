@@ -156,10 +156,10 @@ public class NativeBigInteger extends BigInteger {
     /** all libjbibi builds are identical to pentium3, case handled in getMiddleName2() */
     private final static String JBIGI_OPTIMIZATION_VIAC32     = "viac32";
     /**
-     * The optimization levels defined here are since 0.9.21. Each of the 32-bit processors below
+     * The optimization levels defined here are since 0.9.25. Each of the 32-bit processors below
      * needs an explicit fallback in getResourceList() or getMiddleName2().
      * 64-bit processors will fallback to athlon64 and athlon in getResourceList().
-     * @since 0.9.21
+     * @since 0.9.25
      */
     private final static String JBIGI_OPTIMIZATION_COREI_SBR   = "coreisbr";
     private final static String JBIGI_OPTIMIZATION_COREI_HWL   = "coreihwl";
@@ -179,7 +179,7 @@ public class NativeBigInteger extends BigInteger {
     
     /**
      * ARM
-     * @since 0.9.21
+     * @since 0.9.25
      */
     private final static String JBIGI_OPTIMIZATION_ARM_ARMV5           = "armv5";
     private final static String JBIGI_OPTIMIZATION_ARM_ARMV6           = "armv6";
@@ -192,7 +192,7 @@ public class NativeBigInteger extends BigInteger {
     
     /**
      * None, no optimizations. The default fallback for x86.
-     * @since 0.9.21
+     * @since 0.9.25
      */
     private final static String JBIGI_OPTIMIZATION_X86       = "none";
     
@@ -561,7 +561,7 @@ public class NativeBigInteger extends BigInteger {
     /**
      *  Set the jbigi and libgmp versions. Call after loading.
      *  Sets _jbigiVersion, _nativeOk3, and _libGMPVersion.
-     *  @since 0.9.21
+     *  @since 0.9.25
      */
     private static void setVersions() {
         _jbigiVersion = fetchJbigiVersion();
@@ -1001,12 +1001,12 @@ public class NativeBigInteger extends BigInteger {
             _loadStatus = s;
     }
     
-    /** @since 0.9.21 */
+    /** @since 0.9.25 */
     private static void error(String s) {
         error(s, null);
     }
     
-    /** @since 0.9.21 */
+    /** @since 0.9.25 */
     private static void error(String s, Throwable t) {
         if(_doLog) {
             System.err.println("ERROR: " + s);

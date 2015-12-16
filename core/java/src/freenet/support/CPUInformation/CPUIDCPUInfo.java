@@ -48,7 +48,7 @@ public class CPUIDCPUInfo implements CPUInfo
     
     /**
      * @return true iff the CPU supports the AVX instruction set.
-     * @since 0.9.21
+     * @since 0.9.25
      */
     public boolean hasAVX()
     {
@@ -59,7 +59,7 @@ public class CPUIDCPUInfo implements CPUInfo
 
     /**
      * @return true iff the CPU supports the AVX2 instruction set.
-     * @since 0.9.21
+     * @since 0.9.25
      */
     public boolean hasAVX2() {
         return (CPUID.getExtendedEBXFeatureFlags() & (1 << 5)) != 0; //Extended EBX Feature Bit 5
@@ -77,7 +77,7 @@ public class CPUIDCPUInfo implements CPUInfo
      * ref: https://en.wikipedia.org/wiki/AVX-512
      *
      * @return true iff the CPU supports the AVX-512 Foundation instruction set.
-     * @since 0.9.21
+     * @since 0.9.25
      */
     public boolean hasAVX512()
     {
@@ -86,7 +86,7 @@ public class CPUIDCPUInfo implements CPUInfo
     
     /**
      * @return true iff the CPU supports the ADX instruction set.
-     * @since 0.9.21
+     * @since 0.9.25
      */
     public boolean hasADX()
     {
@@ -95,7 +95,7 @@ public class CPUIDCPUInfo implements CPUInfo
     
     /**
      * @return true iff the CPU supports TBM.
-     * @since 0.9.21
+     * @since 0.9.25
      */
     public boolean hasTBM()
     {
@@ -112,7 +112,7 @@ public class CPUIDCPUInfo implements CPUInfo
     
     /**
      * @return true iff the CPU supports the 64-bit support
-     * @since 0.9.21
+     * @since 0.9.25
      */
     public boolean hasX64() {
         return (CPUID.getExtendedEDXCPUFlags() & (1 << 29)) != 0; //Extended EDX Bit 29
@@ -120,7 +120,7 @@ public class CPUIDCPUInfo implements CPUInfo
     
     /**
      * @return true iff the CPU supports the BMI1 instruction set.
-     * @since 0.9.24
+     * @since 0.9.25
      */
     public boolean hasBMI1() {
         return (CPUID.getExtendedEBXFeatureFlags() & (1 << 3)) != 0; // Extended EBX Feature Bit 3
@@ -128,7 +128,7 @@ public class CPUIDCPUInfo implements CPUInfo
     
     /**
      * @return true iff the CPU supports the BMI2 instruction set.
-     * @since 0.9.24
+     * @since 0.9.25
      */
     public boolean hasBMI2() {
         return (CPUID.getExtendedEBXFeatureFlags() & (1 << 8)) != 0; // Extended EBX Feature Bit 8
@@ -136,7 +136,7 @@ public class CPUIDCPUInfo implements CPUInfo
 
     /**
      * @return true iff the CPU supports the FMA3 instruction set.
-     * @since 0.9.24
+     * @since 0.9.25
      */
     public boolean hasFMA3() {
         return (CPUID.getECXCPUFlags() & (1 << 12)) != 0; // ECX Bit 12
@@ -144,22 +144,23 @@ public class CPUIDCPUInfo implements CPUInfo
 
     /**
      * @return true iff the CPU supports the MOVBE instruction set.
-     * @since 0.9.24
+     * @since 0.9.25
      */
     public boolean hasMOVBE() {
         return (CPUID.getECXCPUFlags() & (1 << 22)) != 0; // ECX Bit 22
     }
 
     /**
+     * Also known as LZCNT
      * @return true iff the CPU supports the ABM instruction set.
-     * @since 0.9.24
+     * @since 0.9.25
      */
     public boolean hasABM() {
-        return (CPUID.getExtendedECXCPUFlags() & (1 << 5)) != 0; // Extended EBX Bit 5
+        return (CPUID.getExtendedECXCPUFlags() & (1 << 5)) != 0; // Extended ECX Bit 5
     }
 
-	@Override
-	public String getCPUModelString() throws UnknownCPUException {
+    @Override
+    public String getCPUModelString() throws UnknownCPUException {
         throw new UnknownCPUException("Class CPUIDCPUInfo cannot indentify CPUs"); 
-	}
+    }
 }

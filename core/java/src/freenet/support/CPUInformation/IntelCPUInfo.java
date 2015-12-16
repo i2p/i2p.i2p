@@ -79,6 +79,7 @@ public interface IntelCPUInfo extends CPUInfo {
      * Supports the AVX 1 instructions.
      * In general, this requires 32nm or smaller process.
      * @return true if the CPU implements at least a SandyBridge level instruction/feature set.
+     * @since 0.9.25
      */
     public boolean IsSandyCompatible();
     
@@ -92,6 +93,7 @@ public interface IntelCPUInfo extends CPUInfo {
      * Ivy Bridge is a successor to Sandy Bridge, so use IsSandyCompatible().
      *
      * @return true if the CPU implements at least a IvyBridge level instruction/feature set.
+     * @since 0.9.25
      */
     public boolean IsIvyCompatible();
     
@@ -113,6 +115,7 @@ public interface IntelCPUInfo extends CPUInfo {
      *
      * In general, this requires 22nm or smaller process.
      * @return true if the CPU implements at least a Haswell level instruction/feature set.
+     * @since 0.9.25
      */
     public boolean IsHaswellCompatible();
     
@@ -126,6 +129,7 @@ public interface IntelCPUInfo extends CPUInfo {
      * so we do not distribute any. However, this is called from NativeBigInteger.
      *
      * @return true if the CPU implements at least a Broadwell level instruction/feature set.
+     * @since 0.9.25
      */
     public boolean IsBroadwellCompatible();
 }

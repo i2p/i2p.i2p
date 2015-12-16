@@ -204,7 +204,7 @@ public class CPUID {
     }
 
     /**
-     *  @since 0.9.24
+     *  @since 0.9.25
      */
     static int getExtendedEBXFeatureFlags()
     {
@@ -217,7 +217,7 @@ public class CPUID {
 
     /**
      *  There's almost nothing in here.
-     *  @since 0.9.24
+     *  @since 0.9.25
      */
     static int getExtendedECXFeatureFlags()
     {
@@ -274,15 +274,16 @@ public class CPUID {
     {
         if(!_nativeOk)
             throw new UnknownCPUException("Failed to read CPU information from the system. Please verify the existence of the jcpuid dll/so.");
-        if(getCPUVendorID().equals("CentaurHauls"))
+        String id = getCPUVendorID();
+        if(id.equals("CentaurHauls"))
             return new VIAInfoImpl();
         if(!isX86)
             throw new UnknownCPUException("Failed to read CPU information from the system. The CPUID instruction exists on x86 CPU's only");
-        if(getCPUVendorID().equals("AuthenticAMD"))
+        if(id.equals("AuthenticAMD"))
             return new AMDInfoImpl();
-        if(getCPUVendorID().equals("GenuineIntel"))
+        if(id.equals("GenuineIntel"))
             return new IntelInfoImpl();
-        throw new UnknownCPUException("Unknown CPU type: '"+getCPUVendorID()+"'");
+        throw new UnknownCPUException("Unknown CPU type: '" + id + '\'');
     }
 
 
