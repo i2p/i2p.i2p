@@ -346,12 +346,12 @@ class IntelInfoImpl extends CPUIDCPUInfo implements IntelCPUInfo
                     case 0x3d: {
                         CPUIDCPUInfo c = new CPUIDCPUInfo();
                         if (c.hasAVX2() && c.hasBMI1()  && c.hasBMI2() &&
-                            c.hasFMA3() && c.hasMOVBE() && c.hasABM() &&
-                            c.hasADX()) {
+                            c.hasFMA3() && c.hasMOVBE() && c.hasABM()) {
                             isSandyCompatible = true;
                             isIvyCompatible = true;
                             isHaswellCompatible = true;
-                            isBroadwellCompatible = true;
+                            if (c.hasADX())
+                                isBroadwellCompatible = true;
                             modelString = "Broadwell Core i3/i5/i7";
                         } else {
                             // This processor is "corei" compatible, as we define it,
@@ -440,12 +440,12 @@ class IntelInfoImpl extends CPUIDCPUInfo implements IntelCPUInfo
                     case 0x5e: {
                         CPUIDCPUInfo c = new CPUIDCPUInfo();
                         if (c.hasAVX2() && c.hasBMI1()  && c.hasBMI2() &&
-                            c.hasFMA3() && c.hasMOVBE() && c.hasABM() &&
-                            c.hasADX()) {
+                            c.hasFMA3() && c.hasMOVBE() && c.hasABM()) {
                             isSandyCompatible = true;
                             isIvyCompatible = true;
                             isHaswellCompatible = true;
-                            isBroadwellCompatible = true;
+                            if (c.hasADX())
+                                isBroadwellCompatible = true;
                             modelString = "Skylake Core i3/i5/i7";
                         } else {
                             // This processor is "corei" compatible, as we define it,
