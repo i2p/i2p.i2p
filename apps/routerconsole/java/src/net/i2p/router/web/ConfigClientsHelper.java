@@ -64,7 +64,7 @@ public class ConfigClientsHelper extends HelperBase {
         if ((mode == 0 && disabled) ||
             (mode == 1 && (!disabled) && (!ssl)) ||
             (mode == 2 && (!disabled) && ssl))
-            return "checked=\"checked\"";
+            return CHECKED;
         return "";
     }
 
@@ -72,7 +72,7 @@ public class ConfigClientsHelper extends HelperBase {
     public String getAuth() {
         boolean enabled =  _context.getBooleanProperty(PROP_AUTH);
         if (enabled)
-            return "checked=\"checked\"";
+            return CHECKED;
         return "";
     }
 
@@ -342,7 +342,7 @@ public class ConfigClientsHelper extends HelperBase {
         }
         buf.append("</td><td align=\"center\" width=\"10%\"><input type=\"checkbox\" class=\"optbox\" name=\"").append(index).append(".enabled\"");
         if (enabled) {
-            buf.append("checked=\"checked\" ");
+            buf.append(CHECKED);
             if (ro || preventDisable)
                 buf.append("disabled=\"disabled\" ");
         }

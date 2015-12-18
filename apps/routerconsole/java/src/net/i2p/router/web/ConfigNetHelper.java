@@ -25,7 +25,6 @@ public class ConfigNetHelper extends HelperBase {
     final static String PROP_I2NP_NTCP_PORT = "i2np.ntcp.port";
     final static String PROP_I2NP_NTCP_AUTO_PORT = "i2np.ntcp.autoport";
     final static String PROP_I2NP_NTCP_AUTO_IP = "i2np.ntcp.autoip";
-    private final static String CHECKED = " checked=\"checked\" ";
 
     public String getUdphostname() {
         return _context.getProperty(UDPTransport.PROP_EXTERNAL_HOST, ""); 
@@ -76,13 +75,6 @@ public class ConfigNetHelper extends HelperBase {
      */
     public String getConfiguredUdpPort() {
         return _context.getProperty(UDPTransport.PROP_INTERNAL_PORT, "unset");
-    }
-
-    /** @param prop must default to false */
-    public String getChecked(String prop) {
-        if (_context.getBooleanProperty(prop))
-            return CHECKED;
-        return "";
     }
 
     public String getDynamicKeysChecked() {

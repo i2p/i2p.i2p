@@ -103,8 +103,7 @@ public class HomeHelper extends HelperBase {
     }
 
     public String getConfigHome() {
-        boolean oldHome = _context.getBooleanProperty(PROP_OLDHOME);
-        return oldHome ? "checked=\"checked\"" : "";
+        return getChecked(PROP_OLDHOME);
     }
 
     public String getProxyStatus() {

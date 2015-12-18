@@ -90,18 +90,14 @@ public class ConfigUpdateHelper extends HelperBase {
     }
     
     public String getUpdateUnsigned() {
-        if (_context.getBooleanProperty(ConfigUpdateHandler.PROP_UPDATE_UNSIGNED))
-            return "<input type=\"checkbox\" class=\"optbox\" value=\"true\" name=\"updateUnsigned\" checked=\"checked\" >";
-        else
-            return "<input type=\"checkbox\" class=\"optbox\" value=\"true\" name=\"updateUnsigned\" >";
+        return "<input type=\"checkbox\" class=\"optbox\" value=\"true\" name=\"updateUnsigned\" " +
+               getChecked(ConfigUpdateHandler.PROP_UPDATE_UNSIGNED) + '>';
     }
     
     /** @since 0.9.20 */
     public String getUpdateDevSU3() {
-        if (_context.getBooleanProperty(ConfigUpdateHandler.PROP_UPDATE_DEV_SU3))
-            return "<input type=\"checkbox\" class=\"optbox\" value=\"true\" name=\"updateDevSU3\" checked=\"checked\" >";
-        else
-            return "<input type=\"checkbox\" class=\"optbox\" value=\"true\" name=\"updateDevSU3\" >";
+        return "<input type=\"checkbox\" class=\"optbox\" value=\"true\" name=\"updateDevSU3\" " +
+               getChecked(ConfigUpdateHandler.PROP_UPDATE_DEV_SU3) + '>';
     }
     
     private static final long PERIODS[] = new long[] { 12*60*60*1000l, 24*60*60*1000l,

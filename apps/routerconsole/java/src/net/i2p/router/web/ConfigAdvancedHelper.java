@@ -6,7 +6,6 @@ import java.util.TreeMap;
 import net.i2p.data.DataHelper;
 
 public class ConfigAdvancedHelper extends HelperBase {
-    private final static String CHECKED = " checked=\"checked\" ";
     static final String PROP_FLOODFILL_PARTICIPANT = "router.floodfillParticipant";
 
     public String getSettings() {
