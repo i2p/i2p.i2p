@@ -648,7 +648,7 @@ class BuildHandler implements Runnable {
         // previous test should be sufficient to keep it from getting here but maybe not?
         if (!isInGW) {
             Hash from = state.fromHash;
-            if (from == null)
+            if (from == null && state.from != null)
                 from = state.from.calculateHash();
             if (_context.routerHash().equals(from)) {
                 _context.statManager().addRateData("tunnel.rejectHostile", 1);
@@ -658,7 +658,7 @@ class BuildHandler implements Runnable {
         }
         if ((!isOutEnd) && (!isInGW)) {
             Hash from = state.fromHash;
-            if (from == null)
+            if (from == null && state.from != null)
                 from = state.from.calculateHash();
             // Previous and next hop the same? Don't help somebody be evil. Drop it without a reply.
             // A-B-C-A is not preventable
@@ -762,7 +762,7 @@ class BuildHandler implements Runnable {
         // We may need another counter above for requests.
         if (response == 0 && !isInGW) {
             Hash from = state.fromHash;
-            if (from == null)
+            if (from == null && state.from != null)
                 from = state.from.calculateHash();
             if (from != null && _throttler.shouldThrottle(from)) {
                 if (_log.shouldLog(Log.WARN))

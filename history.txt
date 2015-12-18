@@ -1,3 +1,11 @@
+2015-12-18 zzz
+ * BuildHandler: Fix NPE (ticket #1738)
+
+2015-12-16 zzz
+ * Profiles:
+   - Don't use same family in a tunnel
+   - Reduce IPv6 mask from 8 to 6
+
 2015-12-13 zzz
  * Data: Optimize router info writes, disable caching
 
