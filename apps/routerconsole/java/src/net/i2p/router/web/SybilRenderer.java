@@ -28,6 +28,9 @@ import net.i2p.router.peermanager.DBHistory;
 import net.i2p.router.peermanager.PeerProfile;
 import net.i2p.router.tunnel.pool.TunnelPool;
 import net.i2p.router.util.HashDistance;
+import net.i2p.stat.Rate;
+import net.i2p.stat.RateAverages;
+import net.i2p.stat.RateStat;
 import net.i2p.util.Log;
 import net.i2p.util.ObjectCounter;
 import net.i2p.util.Translate;
@@ -62,6 +65,7 @@ class SybilRenderer {
     private static final double PAIR_DISTANCE_FACTOR = 2.0;
     private static final double OUR_KEY_FACTOR = 4.0;
     private static final double MIN_DISPLAY_POINTS = 3.0;
+    private static final double VERSION_FACTOR = 1.0;
 
     public SybilRenderer(RouterContext ctx) {
         _context = ctx;
@@ -238,6 +242,7 @@ class SybilRenderer {
 
         // Profile analysis
         addProfilePoints(ris, points);
+        addVersionPoints(ris, points);
 
         if (!points.isEmpty()) {
             List<Hash> warns = new ArrayList<Hash>(points.keySet());
@@ -245,7 +250,7 @@ class SybilRenderer {
             buf.append("<h3 id=\"threats\">Routers with Most Threat Points</h3>");
             for (Hash h : warns) {
                 RouterInfo ri = _context.netDb().lookupRouterInfoLocally(h);
-                if (h == null)
+                if (ri == null)
                     continue;
                 Points pp = points.get(h);
                 double p = pp.points;
@@ -600,8 +605,9 @@ class SybilRenderer {
 
     private static final long DAY = 24*60*60*1000L;
 
-    private void addProfilePoints(List<RouterInfo> ris, Map<Hash, Points> points) throws IOException {
+    private void addProfilePoints(List<RouterInfo> ris, Map<Hash, Points> points) {
         long now = _context.clock().now();
+        RateAverages ra = RateAverages.getTemp();
         for (RouterInfo info : ris) {
             Hash h = info.getHash();
             PeerProfile prof = _context.profileOrganizer().getProfileNonblocking(h);
@@ -616,7 +622,57 @@ class SybilRenderer {
                                   "First heard about: " + _t("{0} ago", DataHelper.formatDuration2(age)));
                     }
                 }
+                DBHistory dbh = prof.getDBHistory();
+                if (dbh != null) {
+                    RateStat rs = dbh.getFailedLookupRate();
+                    if (rs != null) {
+                        Rate r = rs.getRate(24*60*60*1000);
+                        if (r != null) {
+                            r.computeAverages(ra, false);
+                            if (ra.getTotalEventCount() > 0) {
+                                double avg = 100 * ra.getAverage();
+                                if (avg > 40)
+                                    addPoints(points, h, (avg - 40) / 6.0, "Lookup fail rate " + ((int) avg) + '%');
+                            }
+                        }
+                    }
+                }
             }
+        }
+    }
+
+    private void addVersionPoints(List<RouterInfo> ris, Map<Hash, Points> points) {
+        RouterInfo us = _context.router().getRouterInfo();
+        if (us == null) return;
+        String ourVer = us.getVersion();
+        if (!ourVer.startsWith("0.9.")) return;
+        ourVer = ourVer.substring(4);
+        int dot = ourVer.indexOf('.');
+        if (dot > 0)
+            ourVer = ourVer.substring(0, dot);
+        int minor;
+        try {
+            minor = Integer.parseInt(ourVer);
+        } catch (NumberFormatException nfe) { return; }
+        for (RouterInfo info : ris) {
+            Hash h = info.getHash();
+            String hisFullVer = info.getVersion();
+            if (!hisFullVer.startsWith("0.9.")) {
+                addPoints(points, h, 50.0, "Strange version " + DataHelper.escapeHTML(hisFullVer));
+                continue;
+            }
+            String hisVer = hisFullVer.substring(4);
+            dot = hisVer.indexOf('.');
+            if (dot > 0)
+                hisVer = hisVer.substring(0, dot);
+            int hisMinor;
+            try {
+                hisMinor = Integer.parseInt(hisVer);
+            } catch (NumberFormatException nfe) { continue; }
+            int howOld = minor - hisMinor;
+            if (howOld < 3)
+                continue;
+            addPoints(points, h, howOld * VERSION_FACTOR, howOld + " versions behind: " + DataHelper.escapeHTML(hisFullVer));
         }
     }
 
