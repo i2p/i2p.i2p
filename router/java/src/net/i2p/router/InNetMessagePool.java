@@ -94,7 +94,7 @@ public class InNetMessagePool implements Service {
      * @return previous builder for this message type, or null
      * @throws AIOOBE if i2npMessageType is greater than MAX_I2NP_MESSAGE_TYPE
      */
-    public HandlerJobBuilder registerHandlerJobBuilder(int i2npMessageType, HandlerJobBuilder builder) {
+    public synchronized HandlerJobBuilder registerHandlerJobBuilder(int i2npMessageType, HandlerJobBuilder builder) {
         HandlerJobBuilder old = _handlerJobBuilders[i2npMessageType];
         _handlerJobBuilders[i2npMessageType] = builder;
         return old;
@@ -103,8 +103,10 @@ public class InNetMessagePool implements Service {
     /**
      * @return previous builder for this message type, or null
      * @throws AIOOBE if i2npMessageType is greater than MAX_I2NP_MESSAGE_TYPE
+     * @deprecated unused
      */
-    public HandlerJobBuilder unregisterHandlerJobBuilder(int i2npMessageType) {
+    @Deprecated
+    public synchronized HandlerJobBuilder unregisterHandlerJobBuilder(int i2npMessageType) {
         HandlerJobBuilder old = _handlerJobBuilders[i2npMessageType];
         _handlerJobBuilders[i2npMessageType] = null;
         return old;
