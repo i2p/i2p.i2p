@@ -1,3 +1,13 @@
+2015-12-20 zzz
+ * BuildHandler: Additional fixes (ticket #1738)
+ * CertUtil: Add methods to export private keys
+ * Console: Sybil tool enhancementsrivate keys
+ * Transports:
+   - Disconnect faster when first message is a
+     tunnel build request which we reject
+   - Display SSU sent/received messages, not packets,
+     on /peers to be consistent with NTCP
+
 2015-12-18 zzz
  * BuildHandler: Fix NPE (ticket #1738)
 

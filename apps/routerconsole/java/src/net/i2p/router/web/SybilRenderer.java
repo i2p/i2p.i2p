@@ -64,8 +64,11 @@ class SybilRenderer {
     private static final double MIN_CLOSE = 242.0;
     private static final double PAIR_DISTANCE_FACTOR = 2.0;
     private static final double OUR_KEY_FACTOR = 4.0;
-    private static final double MIN_DISPLAY_POINTS = 3.0;
+    private static final double MIN_DISPLAY_POINTS = 5.0;
     private static final double VERSION_FACTOR = 1.0;
+    private static final double POINTS_BAD_VERSION = 50.0;
+    private static final double POINTS_UNREACHABLE = 4.0;
+    private static final double POINTS_NEW = 4.0;
 
     public SybilRenderer(RouterContext ctx) {
         _context = ctx;
@@ -616,8 +619,8 @@ class SybilRenderer {
                 if (heard > 0) {
                     long age = Math.max(now - heard, 1);
                     if (age < 2 * DAY) {
-                        // .125 point for every hour under 48, max 6 points
-                        double point = Math.min(6.0d, (2 * DAY - age) / (2 * DAY / 6.0d));
+                        // (POINTS_NEW / 48) for every hour under 48, max POINTS_NEW
+                        double point = Math.min(POINTS_NEW, (2 * DAY - age) / (2 * DAY / POINTS_NEW));
                         addPoints(points, h, point,
                                   "First heard about: " + _t("{0} ago", DataHelper.formatDuration2(age)));
                     }
@@ -656,9 +659,12 @@ class SybilRenderer {
         } catch (NumberFormatException nfe) { return; }
         for (RouterInfo info : ris) {
             Hash h = info.getHash();
+            String caps = info.getCapabilities();
+            if (!caps.contains("R"))
+                addPoints(points, h, POINTS_UNREACHABLE, "Unreachable: " + DataHelper.escapeHTML(caps));
             String hisFullVer = info.getVersion();
             if (!hisFullVer.startsWith("0.9.")) {
-                addPoints(points, h, 50.0, "Strange version " + DataHelper.escapeHTML(hisFullVer));
+                addPoints(points, h, POINTS_BAD_VERSION, "Strange version " + DataHelper.escapeHTML(hisFullVer));
                 continue;
             }
             String hisVer = hisFullVer.substring(4);

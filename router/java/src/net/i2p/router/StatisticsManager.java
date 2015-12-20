@@ -195,11 +195,17 @@ public class StatisticsManager {
                 if (family.equals(oldRI.getOption(FamilyKeyCrypto.OPT_NAME))) {
                     // copy over the pubkey and signature
                     key = oldRI.getOption(FamilyKeyCrypto.OPT_KEY);
-                    if (key != null)
-                        stats.setProperty(FamilyKeyCrypto.OPT_KEY, key);
-                    sig = oldRI.getOption(FamilyKeyCrypto.OPT_SIG);
-                    if (sig != null)
-                        stats.setProperty(FamilyKeyCrypto.OPT_SIG, sig);
+                    if (key != null) {
+                        if (key.contains(";")) {
+                            // we changed the separator from ';' to ':'
+                            key = null;
+                        } else {
+                            stats.setProperty(FamilyKeyCrypto.OPT_KEY, key);
+                            sig = oldRI.getOption(FamilyKeyCrypto.OPT_SIG);
+                            if (sig != null)
+                                stats.setProperty(FamilyKeyCrypto.OPT_SIG, sig);
+                        }
+                    }
                 }
             }
             if (sig == null || key == null) {

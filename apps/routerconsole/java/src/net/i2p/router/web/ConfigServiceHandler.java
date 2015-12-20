@@ -155,7 +155,7 @@ public class ConfigServiceHandler extends FormHandler {
 
     /**
      *  Register a handler for signals,
-     *  so we can handle HUP from the wrapper (non-Windows only, wrapper 3.2.0 or higher)
+     *  so we can handle HUP from the wrapper (wrapper 3.2.0 or higher)
      *
      *  @since 0.8.13
      */

@@ -638,6 +638,8 @@ class BuildHandler implements Runnable {
         if (isInGW && isOutEnd) {
             _context.statManager().addRateData("tunnel.rejectHostile", 1);
             _log.error("Dropping build request, IBGW+OBEP");
+            if (from != null)
+                _context.commSystem().mayDisconnect(from);
             return;
         }
 
@@ -649,6 +651,8 @@ class BuildHandler implements Runnable {
             // old i2pd
             if (_log.shouldWarn())
                 _log.warn("Dropping build request, we are the next hop");
+            if (from != null)
+                _context.commSystem().mayDisconnect(from);
             return;
         }
         if (!isInGW) {
@@ -669,6 +673,7 @@ class BuildHandler implements Runnable {
                 _context.statManager().addRateData("tunnel.rejectHostile", 1);
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Dropping build request with the same previous and next hop");
+                _context.commSystem().mayDisconnect(from);
                 return;
             }
         }
@@ -683,12 +688,16 @@ class BuildHandler implements Runnable {
             _context.statManager().addRateData("tunnel.rejectTooOld", 1);
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Dropping build request too old... replay attack? " + DataHelper.formatDuration(timeDiff));
+            if (from != null)
+                _context.commSystem().mayDisconnect(from);
             return;
         }
         if (timeDiff < 0 - MAX_REQUEST_FUTURE) {
             _context.statManager().addRateData("tunnel.rejectFuture", 1);
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Dropping build request too far in future " + DataHelper.formatDuration(0 - timeDiff));
+            if (from != null)
+                _context.commSystem().mayDisconnect(from);
             return;
         }
 
@@ -844,6 +853,8 @@ class BuildHandler implements Runnable {
                                                      state.msg.getUniqueId() + "/" + ourId + "/" + req.readNextTunnelId() + " delay " +
                                                      recvDelay + " as " +
                                                      (isOutEnd ? "outbound endpoint" : isInGW ? "inbound gw" : "participant"));
+            if (from != null)
+                _context.commSystem().mayDisconnect(from);
             // Connection congestion control:
             // If we rejected the request, are near our conn limits, and aren't connected to the next hop,
             // just drop it.
@@ -856,6 +867,9 @@ class BuildHandler implements Runnable {
                     _log.warn("Not sending rejection due to conn limits");
                 return;
             }
+        } else if (isInGW && from != null) {
+            // we're the start of the tunnel, no use staying connected
+            _context.commSystem().mayDisconnect(from);
         }
 
         EncryptedBuildRecord reply = BuildResponseRecord.create(_context, response, req.readReplyKey(), req.readReplyIV(), state.msg.getUniqueId());
