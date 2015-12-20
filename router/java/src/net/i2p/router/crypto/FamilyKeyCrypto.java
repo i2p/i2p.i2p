@@ -134,7 +134,7 @@ public class FamilyKeyCrypto {
             throw new GeneralSecurityException("sig failed");
         Map<String, String> rv = new HashMap<String, String>(3);
         rv.put(OPT_NAME, family);
-        rv.put(OPT_KEY, _pubkey.getType().getCode() + ";" + _pubkey.toBase64());
+        rv.put(OPT_KEY, _pubkey.getType().getCode() + ":" + _pubkey.toBase64());
         rv.put(OPT_SIG, sig.toBase64());
         return rv;
     }
@@ -174,13 +174,16 @@ public class FamilyKeyCrypto {
                 // look for a b64 key in the RI
                 String skey = ri.getOption(OPT_KEY);
                 if (skey != null) {
-                    int semi = skey.indexOf(";");
-                    if (semi > 0) {
+                    int colon = skey.indexOf(':');
+                    // switched from ';' to ':' during dev, remove this later
+                    if (colon < 0)
+                        colon = skey.indexOf(';');
+                    if (colon > 0) {
                         try {
-                            int code = Integer.parseInt(skey.substring(0, semi));
+                            int code = Integer.parseInt(skey.substring(0, colon));
                             SigType type = SigType.getByCode(code);
                             if (type != null) {
-                                byte[] bkey = Base64.decode(skey.substring(semi + 1));
+                                byte[] bkey = Base64.decode(skey.substring(colon + 1));
                                 if (bkey != null) {
                                     spk = new SigningPublicKey(type, bkey);
                                 }
