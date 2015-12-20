@@ -2432,6 +2432,21 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         return peer != null && peer.isBacklogged();
     }
 
+    /**
+     * Tell the transport that we may disconnect from this peer.
+     * This is advisory only.
+     *
+     * @since 0.9.24
+     */
+    @Override
+    public void mayDisconnect(final Hash peer) {
+        final PeerState ps =  _peersByIdent.get(peer);
+        if (ps != null && ps.isInbound() &&
+            ps.getMessagesReceived() <= 2 && ps.getMessagesSent() <= 1) {
+            ps.setMayDisconnect();
+        }
+    }
+
     public boolean allowConnection() {
             return _peersByIdent.size() < getMaxConnections();
     }
@@ -2678,8 +2693,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             //buf.append(peer.getMTUDecreases());
             buf.append("</td>");
         
-            long sent = peer.getPacketsTransmitted();
-            long recv = peer.getPacketsReceived();
+            long sent = peer.getMessagesSent();
+            long recv = peer.getMessagesReceived();
             
             buf.append("<td class=\"cells\" align=\"right\">");
             buf.append(sent);
@@ -2820,6 +2835,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         private static final long LONG_LOOP_TIME = 25*1000;
         private static final long EXPIRE_INCREMENT = 15*1000;
         private static final long EXPIRE_DECREMENT = 45*1000;
+        private static final long MAY_DISCON_TIMEOUT = 10*1000;
 
         public ExpirePeerEvent() {
             super(_context.simpleTimer2());
@@ -2829,7 +2845,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
 
         public void timeReached() {
             // Increase allowed idle time if we are well under allowed connections, otherwise decrease
-            if (haveCapacity(33)) {
+            boolean haveCap = haveCapacity(33);
+            if (haveCap) {
                 long inc;
                 // don't adjust too quickly if we are looping fast
                 if (_lastLoopShort)
@@ -2848,6 +2865,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             long now = _context.clock().now();
             long shortInactivityCutoff = now - _expireTimeout;
             long longInactivityCutoff = now - EXPIRE_TIMEOUT;
+            final long mayDisconCutoff = now - MAY_DISCON_TIMEOUT;
             long pingCutoff = now - (2 * 60*60*1000);
             long pingFirewallCutoff = now - PING_FIREWALL_CUTOFF;
             boolean shouldPingFirewall = _reachabilityStatus != Status.OK;
@@ -2862,10 +2880,14 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                     PeerState peer = iter.next();
                     long inactivityCutoff;
                     // if we offered to introduce them, or we used them as introducer in last 2 hours
-                    if (peer.getWeRelayToThemAs() > 0 || peer.getIntroducerTime() > pingCutoff)
+                    if (peer.getWeRelayToThemAs() > 0 || peer.getIntroducerTime() > pingCutoff) {
                         inactivityCutoff = longInactivityCutoff;
-                    else
+                    } else if (!haveCap && peer.getMayDisconnect() &&
+                               peer.getMessagesReceived() <= 2 && peer.getMessagesSent() <= 1) {
+                        inactivityCutoff = mayDisconCutoff;
+                    } else {
                         inactivityCutoff = shortInactivityCutoff;
+                    }
                     if ( (peer.getLastReceiveTime() < inactivityCutoff) && (peer.getLastSendTime() < inactivityCutoff) ) {
                         _expireBuffer.add(peer);
                         iter.remove();

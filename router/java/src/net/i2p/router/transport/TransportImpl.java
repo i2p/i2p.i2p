@@ -809,6 +809,7 @@ public abstract class TransportImpl implements Transport {
     /**
      * @deprecated unused
      */
+    @Deprecated
     public void recheckReachability() {}
 
     /**
@@ -818,8 +819,16 @@ public abstract class TransportImpl implements Transport {
         return TransportUtil.isIPv4Firewalled(_context, getStyle());
     }
 
-    public boolean isBacklogged(Hash dest) { return false; }
-    public boolean isEstablished(Hash dest) { return false; }
+    public boolean isBacklogged(Hash peer) { return false; }
+    public boolean isEstablished(Hash peer) { return false; }
+
+    /**
+     * Tell the transport that we may disconnect from this peer.
+     * This is advisory only.
+     *
+     * @since 0.9.24
+     */
+    public void mayDisconnect(Hash peer) {}
 
     public boolean isUnreachable(Hash peer) {
         long now = _context.clock().now();

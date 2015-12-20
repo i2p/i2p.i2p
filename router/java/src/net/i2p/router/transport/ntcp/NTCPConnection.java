@@ -13,6 +13,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.zip.Adler32;
 
@@ -115,8 +116,8 @@ class NTCPConnection implements Closeable {
     private byte _prevWriteEnd[];
     /** current partially read I2NP message */
     private final ReadState _curReadState;
-    private final AtomicLong _messagesRead = new AtomicLong();
-    private final AtomicLong _messagesWritten = new AtomicLong();
+    private final AtomicInteger _messagesRead = new AtomicInteger();
+    private final AtomicInteger _messagesWritten = new AtomicInteger();
     private long _lastSendTime;
     private long _lastReceiveTime;
     private long _lastRateUpdated;
@@ -134,6 +135,7 @@ class NTCPConnection implements Closeable {
     /** how many consecutive sends were failed due to (estimated) send queue time */
     //private int _consecutiveBacklog;
     private long _nextInfoTime;
+    private boolean _mayDisconnect;
     
     /*
      *  Update frequency for send/recv rates in console peers page
@@ -325,11 +327,11 @@ class NTCPConnection implements Closeable {
             return _context.clock().now() -_establishedOn; 
     }
 
-    public long getMessagesSent() { return _messagesWritten.get(); }
+    public int getMessagesSent() { return _messagesWritten.get(); }
 
-    public long getMessagesReceived() { return _messagesRead.get(); }
+    public int getMessagesReceived() { return _messagesRead.get(); }
 
-    public long getOutboundQueueSize() {
+    public int getOutboundQueueSize() {
             int queued;
             synchronized(_outbound) {
                 queued = _outbound.size();
@@ -359,6 +361,17 @@ class NTCPConnection implements Closeable {
      *  @since 0.9.20
      */
     public long getCreated() { return _created; }
+
+    /**
+     * Sets to true.
+     * @since 0.9.24
+     */
+    public void setMayDisconnect() { _mayDisconnect = true; }
+
+    /**
+     * @since 0.9.24
+     */
+    public boolean getMayDisconnect() { return _mayDisconnect; }
 
     /**
      *  workaround for EventPumper

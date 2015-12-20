@@ -177,11 +177,14 @@ class OutboundMessageState implements CDPQEntry {
     /**
      * Note that we have pushed the message fragments.
      * Increments push count (and max sends... why?)
+     * @return true if this is the first push
      */
-    public synchronized void push() { 
+    public synchronized boolean push() { 
+        boolean rv = _pushCount == 0;
         // these will never be different...
         _pushCount++; 
         _maxSends = _pushCount;
+        return rv;
     }
 
     /**
