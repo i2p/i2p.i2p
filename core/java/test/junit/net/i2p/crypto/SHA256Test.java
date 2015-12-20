@@ -10,6 +10,7 @@ package net.i2p.crypto;
  
 import junit.framework.TestCase;
 import net.i2p.I2PAppContext;
+import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 /**
  * @author Comwiz
@@ -36,7 +37,7 @@ public class SHA256Test extends TestCase{
      * Check if the behaviour remains the same.
      */
     public void testMultipleEquality(){
-        byte[] data = "blahblah".getBytes();
+        byte[] data = DataHelper.getASCII("blahblah");
 
         Hash firstHash = SHA256Generator.getInstance().calculateHash(data);
 

@@ -32,6 +32,7 @@ package net.i2p.crypto;
 import java.util.Properties;
 
 import net.i2p.I2PAppContext;
+import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.SessionKey;
 
@@ -74,12 +75,12 @@ public class HMACSHA256Bench {
 		for (int x = 0; x < 2*1024; x++) {
 			buf.append("a");
 		}
-		byte[] mmess = buf.toString().getBytes(); // new String("abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq").getBytes();
+		byte[] mmess = DataHelper.getASCII(buf.toString()); // new String("abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq").getBytes();
 		buf = new StringBuilder();
 		for (int x = 0; x < 10000; x++) {
 			buf.append("a");
 		}
-		byte[] lmess = buf.toString().getBytes();
+		byte[] lmess = DataHelper.getASCII(buf.toString());
 
 		// warm up the engines
         ctx.hmac().calculate(key, smess);

@@ -136,11 +136,11 @@ public class ElGamalTest extends TestCase{
         System.arraycopy(h.getData(), 0, iv, 0, 16);
         
         String msg = "Hello world01234012345678901234501234567890123450123456789012345";
-        h = SHA256Generator.getInstance().calculateHash(msg.getBytes());
+        h = SHA256Generator.getInstance().calculateHash(DataHelper.getASCII(msg));
         
-        byte aesEncr[] = new byte[msg.getBytes().length];
+        byte aesEncr[] = new byte[DataHelper.getASCII(msg).length];
         byte aesDecr[] = new byte[aesEncr.length];
-        _context.aes().encrypt(msg.getBytes(), 0, aesEncr, 0, sessionKey, iv, aesEncr.length);
+        _context.aes().encrypt(DataHelper.getASCII(msg), 0, aesEncr, 0, sessionKey, iv, aesEncr.length);
         _context.aes().decrypt(aesEncr, 0, aesDecr, 0, sessionKey, iv, aesEncr.length);
         h = SHA256Generator.getInstance().calculateHash(aesDecr);
         
@@ -155,7 +155,7 @@ public class ElGamalTest extends TestCase{
         
         String msg = "Hello world";
         
-        byte encrypted[] = _context.elGamalAESEngine().encryptAESBlock(msg.getBytes(), sessionKey, iv, null, null, 64);
+        byte encrypted[] = _context.elGamalAESEngine().encryptAESBlock(DataHelper.getASCII(msg), sessionKey, iv, null, null, 64);
         Set<SessionTag> foundTags = new HashSet<SessionTag>();
         SessionKey foundKey = new SessionKey();
         byte decrypted[] = null;
@@ -180,7 +180,7 @@ public class ElGamalTest extends TestCase{
         SessionKey key = _context.sessionKeyManager().getCurrentKey(pubKey);
         if (key == null)
             key = _context.sessionKeyManager().createSession(pubKey);
-        byte[] encrypted = _context.elGamalAESEngine().encrypt(msg.getBytes(), pubKey, key, 64);
+        byte[] encrypted = _context.elGamalAESEngine().encrypt(DataHelper.getASCII(msg), pubKey, key, 64);
         byte[] decrypted = null;
         try{
             decrypted = _context.elGamalAESEngine().decrypt(encrypted, privKey);
@@ -286,7 +286,7 @@ public class ElGamalTest extends TestCase{
         PrivateKey priv = (PrivateKey)keypair[1];
 
         for (int i = 0; i < UNENCRYPTED.length; i++) { 
-            byte orig[] = UNENCRYPTED[i].getBytes();
+            byte orig[] = DataHelper.getASCII(UNENCRYPTED[i]);
 
             byte encrypted[] = _context.elGamalEngine().encrypt(orig, pub);
             byte decrypted[] = _context.elGamalEngine().decrypt(encrypted, priv);
@@ -310,7 +310,7 @@ public class ElGamalTest extends TestCase{
             byte enc[] = Base64.decode(ENCRYPTED[i]);
             byte decrypted[] = _context.elGamalEngine().decrypt(enc, priv);
 
-            assertTrue(DataHelper.eq(decrypted, UNENCRYPTED[i].getBytes()));
+            assertTrue(DataHelper.eq(decrypted, DataHelper.getASCII(UNENCRYPTED[i])));
         }
     }
     
@@ -343,7 +343,7 @@ public class ElGamalTest extends TestCase{
                 for (int j = 0; j < 5; j++)
                     tags.add(new SessionTag(true));
             }
-            byte encrypted[] = e.encrypt("blah".getBytes(), pubKey, sessionKey, tags, 1024);
+            byte encrypted[] = e.encrypt(DataHelper.getASCII("blah"), pubKey, sessionKey, tags, 1024);
             byte decrypted[] = e.decrypt(encrypted, privKey);
             assertEquals("blah", new String(decrypted));
                 

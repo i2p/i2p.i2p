@@ -385,7 +385,7 @@ public class PrivateKeyFile {
         hcs = hcs.substring(0, end1) + hcs.substring(start2);
         System.out.println("Short Hashcash is: " + hcs);
 
-        c.setPayload(hcs.getBytes());
+        c.setPayload(DataHelper.getUTF8(hcs));
         return c;
     }
     

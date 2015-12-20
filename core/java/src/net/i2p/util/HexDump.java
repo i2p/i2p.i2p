@@ -114,7 +114,7 @@ public class HexDump {
                 }
             }
 
-            out.write(" |".getBytes());
+            out.write(DataHelper.getASCII(" |"));
 
             for (i = 0; i < FORMAT_BYTES_PER_ROW; ++i) {
                 if (i >= nextbytes) {
