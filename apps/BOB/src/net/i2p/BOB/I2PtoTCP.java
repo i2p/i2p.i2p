@@ -21,6 +21,7 @@ import java.net.Socket;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import net.i2p.client.streaming.I2PSocket;
+import net.i2p.data.DataHelper;
 import net.i2p.util.I2PAppThread;
 
 /**
@@ -106,7 +107,7 @@ public class I2PtoTCP implements Runnable {
 
 					if (tell) {
 						// tell who is connecting
-						out.write(I2P.getPeerDestination().toBase64().getBytes());
+						out.write(DataHelper.getASCII(I2P.getPeerDestination().toBase64()));
 						out.write(10); // nl
 						out.flush(); // not really needed, but...
 					}

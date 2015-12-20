@@ -7,6 +7,7 @@ import java.net.Socket;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
+import net.i2p.data.DataHelper;
 import net.i2p.util.Log;
 
 public class TestDatagramTransfer {
@@ -22,17 +23,17 @@ public class TestDatagramTransfer {
         try {
             Socket s = new Socket(host, port);
             OutputStream out = s.getOutputStream();
-            out.write("HELLO VERSION MIN=1.0 MAX=1.0\n".getBytes());
+            out.write(DataHelper.getASCII("HELLO VERSION MIN=1.0 MAX=1.0\n"));
             BufferedReader reader = new BufferedReader(new InputStreamReader(s.getInputStream()));
             String line = reader.readLine();
             _log.debug("line read for valid version: " + line);
             String req = "SESSION CREATE STYLE=DATAGRAM DESTINATION=" + destName + " " + conOptions + "\n";
-            out.write(req.getBytes());
+            out.write(DataHelper.getASCII(req));
             line = reader.readLine();
             _log.info("Response to creating the session with destination " + destName + ": " + line);
             _log.debug("The above should contain SESSION STATUS RESULT=OK\n\n\n");
             String lookup = "NAMING LOOKUP NAME=ME\n";
-            out.write(lookup.getBytes());
+            out.write(DataHelper.getASCII(lookup));
             line = reader.readLine();
             _log.info("Response from the lookup for ME: " + line);
             _log.debug("The above should be a NAMING REPLY");
@@ -50,7 +51,7 @@ public class TestDatagramTransfer {
             }
             
             String send = "DATAGRAM SEND DESTINATION=" + value + " SIZE=3\nYo!";
-            out.write(send.getBytes());
+            out.write(DataHelper.getASCII(send));
             line = reader.readLine();
             tok = new StringTokenizer(line);
             maj = tok.nextToken();

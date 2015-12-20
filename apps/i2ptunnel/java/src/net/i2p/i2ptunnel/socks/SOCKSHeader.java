@@ -55,7 +55,7 @@ public class SOCKSHeader {
         this.header = new byte[beg.length + 60 + end.length];
         System.arraycopy(this.header, 0, beg, 0, beg.length);
         String b32 = dest.toBase32();
-        System.arraycopy(this.header, beg.length, b32.getBytes(), 0, 60);
+        System.arraycopy(this.header, beg.length, DataHelper.getASCII(b32), 0, 60);
         System.arraycopy(this.header, beg.length + 60, end, 0, end.length);
     }
     

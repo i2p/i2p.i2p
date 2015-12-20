@@ -11,6 +11,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 import net.i2p.data.Hash;
+import net.i2p.data.DataHelper
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.util.I2PThread;
@@ -47,7 +48,7 @@ class AdminRunner implements Runnable {
             reply(out, "this is not a website");
         } else if ( (command.indexOf("routerStats.html") >= 0) || (command.indexOf("oldstats.jsp") >= 0) ) {
             try {
-                out.write("HTTP/1.1 200 OK\nConnection: close\nCache-control: no-cache\nContent-type: text/html\n\n".getBytes());
+                out.write(DataHelper.getASCII("HTTP/1.1 200 OK\nConnection: close\nCache-control: no-cache\nContent-type: text/html\n\n"));
                 _generator.generateStatsPage(new OutputStreamWriter(out));
                 out.close();
             } catch (IOException ioe) {
@@ -61,7 +62,7 @@ class AdminRunner implements Runnable {
             reply(out, shutdown(command));
         } else if (true || command.indexOf("routerConsole.html") > 0) {
             try {
-                out.write("HTTP/1.1 200 OK\nConnection: close\nCache-control: no-cache\nContent-type: text/html\n\n".getBytes());
+                out.write(DataHelper.getASCII("HTTP/1.1 200 OK\nConnection: close\nCache-control: no-cache\nContent-type: text/html\n\n"));
                 _context.router().renderStatusHTML(new OutputStreamWriter(out));
                 out.close();
             } catch (IOException ioe) {
@@ -80,7 +81,7 @@ class AdminRunner implements Runnable {
         reply.append("Content-type: text/html\n\n");
         reply.append(content);
         try {
-            out.write(reply.toString().getBytes());
+            out.write(DataHelper.getASCII(reply.toString()));
             out.close();
         } catch (IOException ioe) {
             if (_log.shouldLog(Log.WARN))
@@ -97,7 +98,7 @@ class AdminRunner implements Runnable {
         reply.append("Content-type: text/plain\n\n");
         reply.append(content);
         try {
-            out.write(reply.toString().getBytes());
+            out.write(DataHelper.getASCII(reply.toString()));
             out.close();
         } catch (IOException ioe) {
             if (_log.shouldLog(Log.WARN))

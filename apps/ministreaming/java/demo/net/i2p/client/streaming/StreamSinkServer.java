@@ -11,6 +11,7 @@ import java.util.Properties;
 import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
 import net.i2p.data.DataFormatException;
+import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
@@ -141,7 +142,7 @@ public class StreamSinkServer {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("read and wrote " + read + " (" + written + ")");
                 }
-                fos.write(("written: [" + written + "]\n").getBytes());
+                fos.write((DataHelper.getUTF8("written: [" + written + "]\n")));
                 long lifetime = System.currentTimeMillis() - start;
                 _log.info("Got EOF from client socket [written=" + written + " lifetime=" + lifetime + "]");
             } catch (IOException ioe) {

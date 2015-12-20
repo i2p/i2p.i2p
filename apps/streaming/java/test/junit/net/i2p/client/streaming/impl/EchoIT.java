@@ -12,6 +12,7 @@ import net.i2p.client.I2PSession;
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.client.streaming.I2PServerSocket;
 import net.i2p.client.streaming.I2PSocketManager;
+import net.i2p.data.DataHelper;
 import net.i2p.util.Log;
 
 /**
@@ -116,7 +117,7 @@ public class EchoIT extends StreamingITBase {
                 InputStream in = socket.getInputStream();
                 OutputStream out = socket.getOutputStream();
                 for (int i = 0; i < 3; i++) {
-                    out.write("blah!".getBytes());
+                    out.write(DataHelper.getASCII("blah!"));
                     _log.debug("client wrote a line");
                     out.flush();
                     _log.debug("client flushed");

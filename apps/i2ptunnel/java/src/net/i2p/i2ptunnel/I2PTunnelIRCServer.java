@@ -129,7 +129,7 @@ public class I2PTunnelIRCServer extends I2PTunnelServer implements Runnable {
             this.cloakKey = new byte[Hash.HASH_LENGTH];
             tunnel.getContext().random().nextBytes(this.cloakKey);
         } else {
-            this.cloakKey = SHA256Generator.getInstance().calculateHash(passphrase.trim().getBytes()).getData();
+            this.cloakKey = SHA256Generator.getInstance().calculateHash(DataHelper.getUTF8(passphrase.trim())).getData();
         }
         
         // get the fake hostmask to use
@@ -159,7 +159,7 @@ public class I2PTunnelIRCServer extends I2PTunnelServer implements Runnable {
                 modifiedRegistration = buf.toString();
             }
             Socket s = getSocket(socket.getPeerDestination().calculateHash(), socket.getLocalPort());
-            Thread t = new I2PTunnelRunner(s, socket, slock, null, modifiedRegistration.getBytes(),
+            Thread t = new I2PTunnelRunner(s, socket, slock, null, DataHelper.getUTF8(modifiedRegistration),
                                            null, (I2PTunnelRunner.FailCallback) null);
             // run in the unlimited client pool
             //t.start();

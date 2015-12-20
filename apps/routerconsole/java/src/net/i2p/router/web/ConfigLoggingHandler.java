@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Properties;
 
+import net.i2p.data.DataHelper;
 import net.i2p.util.LogManager;
 
 /**
@@ -76,7 +77,7 @@ public class ConfigLoggingHandler extends FormHandler {
             try {
                 Properties props = new Properties();
                 if (_levels != null)
-                    props.load(new ByteArrayInputStream(_levels.getBytes()));
+                    props.load(new ByteArrayInputStream(DataHelper.getUTF8(_levels)));
                 if (_newLogClass != null)
                     props.setProperty(_newLogClass, _newLogLevel);
                 _context.logManager().setLimits(props);

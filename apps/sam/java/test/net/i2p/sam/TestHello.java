@@ -5,6 +5,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.Socket;
 
+import net.i2p.data.DataHelper;
 import net.i2p.util.Log;
 
 public class TestHello {
@@ -21,7 +22,7 @@ public class TestHello {
         try {
             Socket s = new Socket(host, port);
             OutputStream out = s.getOutputStream();
-            out.write("HELLO VERSION MIN=1.0 MAX=1.0\n".getBytes());
+            out.write(DataHelper.getASCII("HELLO VERSION MIN=1.0 MAX=1.0\n"));
             BufferedReader reader = new BufferedReader(new InputStreamReader(s.getInputStream()));
             String line = reader.readLine();
             _log.info("line read for valid version: " + line);
@@ -36,7 +37,7 @@ public class TestHello {
         try {
             Socket s = new Socket(host, port);
             OutputStream out = s.getOutputStream();
-            out.write("HELLO VERSION MIN=9.0 MAX=8.3\n".getBytes());
+            out.write(DataHelper.getASCII("HELLO VERSION MIN=9.0 MAX=8.3\n"));
             BufferedReader reader = new BufferedReader(new InputStreamReader(s.getInputStream()));
             String line = reader.readLine();
             _log.info("line read for invalid version: " + line);
@@ -51,7 +52,7 @@ public class TestHello {
         try {
             Socket s = new Socket(host, port);
             OutputStream out = s.getOutputStream();
-            out.write("HELLO h0 h0 h0\n".getBytes());
+            out.write(DataHelper.getASCII("HELLO h0 h0 h0\n"));
             BufferedReader reader = new BufferedReader(new InputStreamReader(s.getInputStream()));
             String line = reader.readLine();
             _log.info("line read for valid version: " + line);
