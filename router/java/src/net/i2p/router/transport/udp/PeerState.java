@@ -792,6 +792,7 @@ class PeerState {
             _receiveBytes += bytes;
             //if (isForACK)
             //    _receiveACKBytes += bytes;
+            _messagesReceived++;
         } else {
             //if (true || _retransmissionPeriodStart + 1000 < _context.clock().now()) {
                 _packetsReceivedDuplicate++;
