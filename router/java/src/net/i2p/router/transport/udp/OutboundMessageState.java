@@ -293,6 +293,7 @@ class OutboundMessageState implements CDPQEntry {
     public String toString() {
         StringBuilder buf = new StringBuilder(256);
         buf.append("OB Message ").append(_i2npMessage.getUniqueId());
+        buf.append(" type ").append(_i2npMessage.getType());
         buf.append(" with ").append(_numFragments).append(" fragments");
         buf.append(" of size ").append(_messageBuf.length);
         buf.append(" volleys: ").append(_maxSends);
@@ -304,6 +305,7 @@ class OutboundMessageState implements CDPQEntry {
                     buf.append(i).append(' ');
             }
         }
+        buf.append(" to: ").append(_peer.toString());
         return buf.toString();
     }
 }

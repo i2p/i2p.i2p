@@ -2442,7 +2442,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     public void mayDisconnect(final Hash peer) {
         final PeerState ps =  _peersByIdent.get(peer);
         if (ps != null && ps.isInbound() &&
-            ps.getMessagesReceived() <= 2 && ps.getMessagesSent() <= 1) {
+            ps.getMessagesReceived() <= 2 && ps.getMessagesSent() <= 2) {
             ps.setMayDisconnect();
         }
     }
@@ -2883,7 +2883,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                     if (peer.getWeRelayToThemAs() > 0 || peer.getIntroducerTime() > pingCutoff) {
                         inactivityCutoff = longInactivityCutoff;
                     } else if (!haveCap && peer.getMayDisconnect() &&
-                               peer.getMessagesReceived() <= 2 && peer.getMessagesSent() <= 1) {
+                               peer.getMessagesReceived() <= 2 && peer.getMessagesSent() <= 2) {
                         inactivityCutoff = mayDisconCutoff;
                     } else {
                         inactivityCutoff = shortInactivityCutoff;

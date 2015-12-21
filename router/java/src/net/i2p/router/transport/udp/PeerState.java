@@ -1180,7 +1180,6 @@ class PeerState {
                 _sendWindowBytesRemaining = _sendWindowBytes;
         //}
         
-        _messagesSent++;
         if (numSends < 2) {
             // caller synchs
             //synchronized (this) {
