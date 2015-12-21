@@ -1828,14 +1828,74 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     }
 
     /**
-     *  "injected" message from the EstablishmentManager
+     *  "injected" message from the EstablishmentManager.
+     *  If you have multiple messages, use the list variant,
+     *  so the messages may be bundled efficiently.
+     *
+     *  @param peer all messages MUST be going to this peer
      */
     void send(I2NPMessage msg, PeerState peer) {
         try {
             OutboundMessageState state = new OutboundMessageState(_context, msg, peer);
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Injecting a data message to a new peer: " + peer);
-            _fragments.add(state);
+            _fragments.add(state, peer);
+        } catch (IllegalArgumentException iae) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Shouldnt happen", new Exception("I did it"));
+        }
+    }
+
+    /**
+     *  "injected" message from the EstablishmentManager,
+     *  plus pending messages to send,
+     *  so the messages may be bundled efficiently.
+     *  Called at end of outbound establishment.
+     *
+     *  @param msg may be null if nothing to inject
+     *  @param msgs non-null, may be empty
+     *  @param peer all messages MUST be going to this peer
+     *  @since 0.9.24
+     */
+    void send(I2NPMessage msg, List<OutNetMessage> msgs, PeerState peer) {
+        try {
+            int sz = msgs.size();
+            List<OutboundMessageState> states = new ArrayList<OutboundMessageState>(sz + 1);
+            if (msg != null) {
+                OutboundMessageState state = new OutboundMessageState(_context, msg, peer);
+                states.add(state);
+            }
+            for (int i = 0; i < sz; i++) {
+                OutboundMessageState state = new OutboundMessageState(_context, msgs.get(i), peer);
+                states.add(state);
+            }
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Injecting " + states.size() + " data messages to a new peer: " + peer);
+            _fragments.add(states, peer);
+        } catch (IllegalArgumentException iae) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Shouldnt happen", new Exception("I did it"));
+        }
+    }
+
+    /**
+     *  "injected" messages from the EstablishmentManager.
+     *  Called at end of inbound establishment.
+     *
+     *  @param peer all messages MUST be going to this peer
+     *  @since 0.9.24
+     */
+    void send(List<I2NPMessage> msgs, PeerState peer) {
+        try {
+            int sz = msgs.size();
+            List<OutboundMessageState> states = new ArrayList<OutboundMessageState>(sz);
+            for (int i = 0; i < sz; i++) {
+                OutboundMessageState state = new OutboundMessageState(_context, msgs.get(i), peer);
+                states.add(state);
+            }
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Injecting " + sz + " data messages to a new peer: " + peer);
+            _fragments.add(states, peer);
         } catch (IllegalArgumentException iae) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Shouldnt happen", new Exception("I did it"));

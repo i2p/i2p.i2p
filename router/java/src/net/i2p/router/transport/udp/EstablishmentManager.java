@@ -770,7 +770,7 @@ class EstablishmentManager {
                                            // so it needs to be caught in InNetMessagePool.
         dsm.setMessageExpiration(_context.clock().now() + DATA_MESSAGE_TIMEOUT);
         dsm.setMessageId(_context.random().nextLong(I2NPMessage.MAX_ID_VALUE));
-        _transport.send(dsm, peer);
+        // sent below
 
         // just do this inline
         //_context.simpleTimer2().addEvent(new PublishToNewInbound(peer), 0);
@@ -780,8 +780,14 @@ class EstablishmentManager {
                 // ok, we are fine with them, send them our latest info
                 //if (_log.shouldLog(Log.INFO))
                 //    _log.info("Publishing to the peer after confirm plus delay (without banlist): " + peer);
-                sendOurInfo(peer, true);
+                // bundle the two messages together for efficiency
+                DatabaseStoreMessage dbsm = getOurInfo();
+                List<I2NPMessage> msgs = new ArrayList<I2NPMessage>(2);
+                msgs.add(dsm);
+                msgs.add(dbsm);
+                _transport.send(msgs, peer);
             } else {
+                _transport.send(dsm, peer);
                 // nuh uh.
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("NOT publishing to the peer after confirm plus delay (WITH banlist): " + (hash != null ? hash.toString() : "unknown"));
@@ -828,12 +834,14 @@ class EstablishmentManager {
         _transport.setIP(remote.calculateHash(), state.getSentIP());
         
         _context.statManager().addRateData("udp.outboundEstablishTime", state.getLifetime(), 0);
+        DatabaseStoreMessage dbsm = null;
         if (!state.isFirstMessageOurDSM()) {
-            sendOurInfo(peer, false);
+            dbsm = getOurInfo();
         } else if (_log.shouldLog(Log.INFO)) {
             _log.info("Skipping publish: " + state);
         }
         
+        List<OutNetMessage> msgs = new ArrayList<OutNetMessage>(8);
         OutNetMessage msg;
         while ((msg = state.getNextQueuedMessage()) != null) {
             if (now - Router.CLOCK_FUDGE_FACTOR > msg.getExpiration()) {
@@ -841,21 +849,33 @@ class EstablishmentManager {
                 _transport.failed(msg, "Took too long to establish, but it was established");
             } else {
                 msg.timestamp("session fully established and sent");
-                _transport.send(msg);
+                msgs.add(msg);
             }
         }
+        _transport.send(dbsm, msgs, peer);
         return peer;
     }
     
+/****
     private void sendOurInfo(PeerState peer, boolean isInbound) {
         if (_log.shouldLog(Log.INFO))
             _log.info("Publishing to the peer after confirm: " + 
                       (isInbound ? " inbound con from " + peer : "outbound con to " + peer));
-        
+        DatabaseStoreMessage m = getOurInfo();
+        _transport.send(m, peer);
+    }
+****/
+    
+    /**
+     *  A database store message with our router info
+     *  @return non-null
+     *  @since 0.9.24 split from sendOurInfo()
+     */
+    private DatabaseStoreMessage getOurInfo() {
         DatabaseStoreMessage m = new DatabaseStoreMessage(_context);
         m.setEntry(_context.router().getRouterInfo());
         m.setMessageExpiration(_context.clock().now() + DATA_MESSAGE_TIMEOUT);
-        _transport.send(m, peer);
+        return m;
     }
     
     /** the relay tag is a 4-byte field in the protocol */

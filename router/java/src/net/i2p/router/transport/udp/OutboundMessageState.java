@@ -305,7 +305,7 @@ class OutboundMessageState implements CDPQEntry {
                     buf.append(i).append(' ');
             }
         }
-        buf.append(" to: ").append(_peer.toString());
+        //buf.append(" to: ").append(_peer.toString());
         return buf.toString();
     }
 }

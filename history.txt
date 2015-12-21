@@ -1,3 +1,8 @@
+2015-12-21 zzz
+ * SSU: Hand all messages pending after establishment to the
+   outbound queue at once, for efficiency.
+   Don't sort outbound messages by size, keep priority order instead.
+
 2015-12-20 zzz
  * BuildHandler: Additional fixes (ticket #1738)
  * CertUtil: Add methods to export private keys
