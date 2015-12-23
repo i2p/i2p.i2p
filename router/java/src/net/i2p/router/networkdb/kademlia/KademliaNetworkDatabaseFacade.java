@@ -212,7 +212,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     public void removeFromExploreKeys(Collection<Hash> toRemove) {
         if (!_initialized) return;
         _exploreKeys.removeAll(toRemove);
-        _context.statManager().addRateData("netDb.exploreKeySet", _exploreKeys.size(), 0);
+        _context.statManager().addRateData("netDb.exploreKeySet", _exploreKeys.size());
     }
 
     public void queueForExploration(Collection<Hash> keys) {
@@ -220,7 +220,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         for (Iterator<Hash> iter = keys.iterator(); iter.hasNext() && _exploreKeys.size() < MAX_EXPLORE_QUEUE; ) {
             _exploreKeys.add(iter.next());
         }
-        _context.statManager().addRateData("netDb.exploreKeySet", _exploreKeys.size(), 0);
+        _context.statManager().addRateData("netDb.exploreKeySet", _exploreKeys.size());
     }
     
     public synchronized void shutdown() {

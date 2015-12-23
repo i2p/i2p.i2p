@@ -165,7 +165,7 @@ public class PersistentDataStore extends TransientDataStore {
     }
     
     private class RemoveJob extends JobImpl {
-        private Hash _key;
+        private final Hash _key;
         public RemoveJob(Hash key) {
             super(PersistentDataStore.this._context);
             _key = key;
