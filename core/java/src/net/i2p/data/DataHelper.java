@@ -88,6 +88,7 @@ public class DataHelper {
             "stat_tunnel.buildExploratorySuccess.60m",
             "stat_tunnel.participatingTunnels.60m",
             "stat_uptime",
+            "family", "family.key", "family.sig",
             // BlockfileNamingService
             "version", "created", "upgraded", "lists",
             "a", "s",
