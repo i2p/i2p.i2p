@@ -61,7 +61,10 @@ public class KeyStoreUtil {
         // SHA-1
         new BigInteger("3c:91:31:cb:1f:f6:d0:1b:0e:9a:b8:d0:44:bf:12:be".replace(":", ""), 16),
         // MD2
-        new BigInteger("70:ba:e4:1d:10:d9:29:34:b6:38:ca:7b:03:cc:ba:bf".replace(":", ""), 16)
+        new BigInteger("70:ba:e4:1d:10:d9:29:34:b6:38:ca:7b:03:cc:ba:bf".replace(":", ""), 16),
+        // Comodo SHA1 https://cabforum.org/pipermail/public/2015-December/006500.html
+        // https://bugzilla.mozilla.org/show_bug.cgi?id=1208461
+        new BigInteger("44:be:0c:8b:50:00:21:b4:11:d3:2a:68:06:a9:ad:69".replace(":", ""), 16)
     };
 
     /**
@@ -76,7 +79,8 @@ public class KeyStoreUtil {
         "eDellRoot",
         "DSDTestProvider",
         null,
-        null
+        null,
+	"UTN - DATACorp SGC"
     };
 
     /**
@@ -91,7 +95,8 @@ public class KeyStoreUtil {
         null,
         null,
         "Class 3 Public Primary Certification Authority",
-        "Class 3 Public Primary Certification Authority"
+        "Class 3 Public Primary Certification Authority",
+        null
     };
 
 
