@@ -39,6 +39,10 @@ public interface AMDCPUInfo extends CPUInfo {
      * @return true if the CPU present in the machine is at least an 'k8' CPU (Atlhon 64, Opteron etc. and better)
      */
     public boolean IsAthlon64Compatible();
+    /** 
+     * @return true if the CPU present in the machine is at least an 'k10' CPU
+     */
+    public boolean IsK10Compatible();
     /**
      * @return true if the CPU present in the machine is at least an 'bobcat' CPU
      */

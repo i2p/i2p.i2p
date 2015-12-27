@@ -164,6 +164,7 @@ public class NativeBigInteger extends BigInteger {
     private final static String JBIGI_OPTIMIZATION_COREI_SBR   = "coreisbr";
     private final static String JBIGI_OPTIMIZATION_COREI_HWL   = "coreihwl";
     private final static String JBIGI_OPTIMIZATION_COREI_BWL   = "coreibwl";
+    private final static String JBIGI_OPTIMIZATION_K10         = "k10";
     private final static String JBIGI_OPTIMIZATION_BULLDOZER   = "bulldozer";
     private final static String JBIGI_OPTIMIZATION_PILEDRIVER  = "piledriver";
     private final static String JBIGI_OPTIMIZATION_STEAMROLLER = "steamroller";
@@ -213,8 +214,8 @@ public class NativeBigInteger extends BigInteger {
                                                                      JBIGI_OPTIMIZATION_ARM_ARMV6, JBIGI_OPTIMIZATION_ARM_ARMV5};
     private final static String[] JBIGI_COMPAT_LIST_VIA           = {JBIGI_OPTIMIZATION_NANO, JBIGI_OPTIMIZATION_VIAC32, JBIGI_OPTIMIZATION_VIAC3,
                                                                      JBIGI_OPTIMIZATION_PENTIUM, JBIGI_OPTIMIZATION_X86};
-    private final static String[] JBIGI_COMPAT_LIST_AMD_ATHLON    = {JBIGI_OPTIMIZATION_ATHLON64, JBIGI_OPTIMIZATION_ATHLON, JBIGI_OPTIMIZATION_K6_3,
-                                                                     JBIGI_OPTIMIZATION_K6_2, JBIGI_OPTIMIZATION_K6, JBIGI_OPTIMIZATION_X86};
+    private final static String[] JBIGI_COMPAT_LIST_AMD_ATHLON    = {JBIGI_OPTIMIZATION_K10, JBIGI_OPTIMIZATION_ATHLON64, JBIGI_OPTIMIZATION_ATHLON,
+                                                                     JBIGI_OPTIMIZATION_K6_3, JBIGI_OPTIMIZATION_K6_2, JBIGI_OPTIMIZATION_K6, JBIGI_OPTIMIZATION_X86};
     private final static String[] JBIGI_COMPAT_LIST_AMD_GEODE     = {JBIGI_OPTIMIZATION_GEODE, JBIGI_OPTIMIZATION_K6_3, JBIGI_OPTIMIZATION_K6_2, JBIGI_OPTIMIZATION_K6,
                                                                      JBIGI_OPTIMIZATION_X86};
     private final static String[] JBIGI_COMPAT_LIST_AMD_APU       = {JBIGI_OPTIMIZATION_JAGUAR, JBIGI_OPTIMIZATION_BOBCAT, JBIGI_OPTIMIZATION_ATHLON64};
@@ -254,6 +255,7 @@ public class NativeBigInteger extends BigInteger {
         put(JBIGI_OPTIMIZATION_K6_3,     JBIGI_COMPAT_LIST_AMD_ATHLON);
         put(JBIGI_OPTIMIZATION_ATHLON,   JBIGI_COMPAT_LIST_AMD_ATHLON);
         put(JBIGI_OPTIMIZATION_ATHLON64, JBIGI_COMPAT_LIST_AMD_ATHLON);
+        put(JBIGI_OPTIMIZATION_K10, JBIGI_COMPAT_LIST_AMD_ATHLON);
 
         put(JBIGI_OPTIMIZATION_GEODE, JBIGI_COMPAT_LIST_AMD_GEODE);
 
@@ -359,6 +361,8 @@ public class NativeBigInteger extends BigInteger {
                         return JBIGI_OPTIMIZATION_JAGUAR;
                     if (amdcpu.IsBobcatCompatible())
                         return JBIGI_OPTIMIZATION_BOBCAT;
+                    if (amdcpu.IsK10Compatible())
+                        return JBIGI_OPTIMIZATION_K10;
                     if (amdcpu.IsAthlon64Compatible())
                         return JBIGI_OPTIMIZATION_ATHLON64;
                     if (amdcpu.IsAthlonCompatible())

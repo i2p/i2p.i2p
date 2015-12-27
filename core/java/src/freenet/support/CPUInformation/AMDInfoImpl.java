@@ -15,6 +15,7 @@ class AMDInfoImpl extends CPUIDCPUInfo implements AMDCPUInfo
     private static boolean isGeodeCompatible;
     private static boolean isAthlonCompatible;
     private static boolean isAthlon64Compatible;
+    private static boolean isK10Compatible;
     private static boolean isBobcatCompatible;
     private static boolean isJaguarCompatible;
     private static boolean isBulldozerCompatible;
@@ -34,6 +35,8 @@ class AMDInfoImpl extends CPUIDCPUInfo implements AMDCPUInfo
     public boolean IsAthlonCompatible(){ return isAthlonCompatible; }
 
     public boolean IsAthlon64Compatible(){ return isAthlon64Compatible; }
+
+    public boolean IsK10Compatible(){ return isK10Compatible; }
 
     public boolean IsBobcatCompatible(){ return isBobcatCompatible; }
     
@@ -324,6 +327,7 @@ class AMDInfoImpl extends CPUIDCPUInfo implements AMDCPUInfo
             isK6_3_Compatible = true;
             isAthlonCompatible = true;
             isAthlon64Compatible = true;
+            isK10Compatible = true;
             switch (model) {
                 case 2:
                     modelString = "Phenom / Athlon / Opteron Gen 3 (Barcelona/Agena/Toliman/Kuma, 65 nm)";
