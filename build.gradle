@@ -10,10 +10,10 @@ subprojects {
         testCompile 'junit:junit:4.+'
     }
 
-    sourceCompatibility = 1.5
+    sourceCompatibility = 1.6
     jar {
         manifest {
-            attributes 'Implementation-Version': '0.9.13-8'
+            attributes 'Implementation-Version': '0.9.23-18'
         }
     }
 }
